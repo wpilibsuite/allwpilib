@@ -6,8 +6,6 @@ package org.wpilib.backend;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import org.wpilib.networktables.BooleanArrayPublisher;
 import org.wpilib.networktables.BooleanPublisher;
 import org.wpilib.networktables.DoubleArrayPublisher;
@@ -69,9 +67,9 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
   private static final class Entry implements TelemetryEntry {
     private final NetworkTableInstance m_inst;
     private final String m_path;
-    private final AtomicReference<Publisher> m_pub = new AtomicReference<>();
-    private String m_typeString;
-    private final AtomicBoolean m_keepDuplicates = new AtomicBoolean();
+    private volatile Publisher m_pub;
+    private volatile String m_typeString;
+    private volatile boolean m_keepDuplicates;
     private final Map<String, String> m_propertiesMap = new HashMap<>();
     private String m_properties = "{}";
     private Struct<?> m_struct;
@@ -83,7 +81,11 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
     }
 
     public void close() {
-      var pub = m_pub.getAndSet(null);
+      Publisher pub;
+      synchronized (this) {
+        pub = m_pub;
+        m_pub = null;
+      }
       if (pub != null) {
         pub.close();
       }
@@ -91,7 +93,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void keepDuplicates() {
-      m_keepDuplicates.set(true);
+      m_keepDuplicates = true;
       // TODO: update publisher while not losing last value
     }
 
@@ -113,7 +115,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
         String oldValue = m_propertiesMap.put(key, value);
         if (!value.equals(oldValue)) {
           refreshProperties();
-          Publisher pub = m_pub.get();
+          Publisher pub = m_pub;
           if (pub != null) {
             pub.getTopic().setProperties(m_properties);
           }
@@ -122,15 +124,15 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
     }
 
     private synchronized <T> StructPublisher<T> initStruct(Struct<T> struct) {
-      Publisher pub = m_pub.get();
+      Publisher pub = m_pub;
       return switch (pub) {
         case null -> {
           StructPublisher<T> p =
               m_inst
                   .getStructTopic(m_path, struct)
-                  .publishEx(m_properties, new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
+                  .publishEx(m_properties, new PubSubOption.KeepDuplicates(m_keepDuplicates));
           m_struct = struct;
-          m_pub.set(p);
+          m_pub = p;
           yield p;
         }
         case StructPublisher<?> p when struct.equals(m_struct) -> {
@@ -153,15 +155,15 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
     }
 
     private synchronized <T> ProtobufPublisher<T> initProtobuf(Protobuf<T, ?> proto) {
-      Publisher pub = m_pub.get();
+      Publisher pub = m_pub;
       return switch (pub) {
         case null -> {
           ProtobufPublisher<T> p =
               m_inst
                   .getProtobufTopic(m_path, proto)
-                  .publishEx(m_properties, new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
+                  .publishEx(m_properties, new PubSubOption.KeepDuplicates(m_keepDuplicates));
           m_proto = proto;
-          m_pub.set(p);
+          m_pub = p;
           yield p;
         }
         case ProtobufPublisher<?> p when proto.equals(m_proto) -> {
@@ -184,15 +186,15 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
     }
 
     private synchronized <T> StructArrayPublisher<T> initStructArray(Struct<T> struct) {
-      Publisher pub = m_pub.get();
+      Publisher pub = m_pub;
       return switch (pub) {
         case null -> {
           StructArrayPublisher<T> p =
               m_inst
                   .getStructArrayTopic(m_path, struct)
-                  .publishEx(m_properties, new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
+                  .publishEx(m_properties, new PubSubOption.KeepDuplicates(m_keepDuplicates));
           m_struct = struct;
-          m_pub.set(p);
+          m_pub = p;
           yield p;
         }
         case StructArrayPublisher<?> p when struct.equals(m_struct) -> {
@@ -216,11 +218,11 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logBoolean(boolean value) {
-      Publisher pub = m_pub.get();
+      Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
           // double-check
-          pub = m_pub.get();
+          pub = m_pub;
           if (pub == null) {
             pub =
                 m_inst
@@ -228,8 +230,8 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                     .publishEx(
                         NetworkTableType.BOOLEAN.getValueStr(),
                         m_properties,
-                        new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
-            m_pub.set(pub);
+                        new PubSubOption.KeepDuplicates(m_keepDuplicates));
+            m_pub = pub;
           }
         }
       }
@@ -242,11 +244,11 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logLong(long value) {
-      Publisher pub = m_pub.get();
+      Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
           // double-check
-          pub = m_pub.get();
+          pub = m_pub;
           if (pub == null) {
             pub =
                 m_inst
@@ -254,8 +256,8 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                     .publishEx(
                         NetworkTableType.INTEGER.getValueStr(),
                         m_properties,
-                        new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
-            m_pub.set(pub);
+                        new PubSubOption.KeepDuplicates(m_keepDuplicates));
+            m_pub = pub;
           }
         }
       }
@@ -268,11 +270,11 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logFloat(float value) {
-      Publisher pub = m_pub.get();
+      Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
           // double-check
-          pub = m_pub.get();
+          pub = m_pub;
           if (pub == null) {
             pub =
                 m_inst
@@ -280,8 +282,8 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                     .publishEx(
                         NetworkTableType.FLOAT.getValueStr(),
                         m_properties,
-                        new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
-            m_pub.set(pub);
+                        new PubSubOption.KeepDuplicates(m_keepDuplicates));
+            m_pub = pub;
           }
         }
       }
@@ -294,11 +296,11 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logDouble(double value) {
-      Publisher pub = m_pub.get();
+      Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
           // double-check
-          pub = m_pub.get();
+          pub = m_pub;
           if (pub == null) {
             pub =
                 m_inst
@@ -306,8 +308,8 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                     .publishEx(
                         NetworkTableType.DOUBLE.getValueStr(),
                         m_properties,
-                        new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
-            m_pub.set(pub);
+                        new PubSubOption.KeepDuplicates(m_keepDuplicates));
+            m_pub = pub;
           }
         }
       }
@@ -320,11 +322,11 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logString(String value, String typeString) {
-      Publisher pub = m_pub.get();
+      Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
           // double-check
-          pub = m_pub.get();
+          pub = m_pub;
           if (pub == null) {
             m_typeString = typeString;
             pub =
@@ -333,16 +335,13 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                     .publishEx(
                         m_typeString,
                         m_properties,
-                        new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
-            m_pub.set(pub);
+                        new PubSubOption.KeepDuplicates(m_keepDuplicates));
+            m_pub = pub;
           }
         }
       }
 
-      String curTypeString;
-      synchronized (this) {
-        curTypeString = m_typeString;
-      }
+      String curTypeString = m_typeString;
 
       switch (pub) {
         case StringPublisher e when curTypeString.equals(typeString) -> e.set(value);
@@ -352,11 +351,11 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logBooleanArray(boolean[] value) {
-      Publisher pub = m_pub.get();
+      Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
           // double-check
-          pub = m_pub.get();
+          pub = m_pub;
           if (pub == null) {
             pub =
                 m_inst
@@ -364,8 +363,8 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                     .publishEx(
                         NetworkTableType.BOOLEAN_ARRAY.getValueStr(),
                         m_properties,
-                        new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
-            m_pub.set(pub);
+                        new PubSubOption.KeepDuplicates(m_keepDuplicates));
+            m_pub = pub;
           }
         }
       }
@@ -396,11 +395,11 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logLongArray(long[] value) {
-      Publisher pub = m_pub.get();
+      Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
           // double-check
-          pub = m_pub.get();
+          pub = m_pub;
           if (pub == null) {
             pub =
                 m_inst
@@ -408,8 +407,8 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                     .publishEx(
                         NetworkTableType.INTEGER_ARRAY.getValueStr(),
                         m_properties,
-                        new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
-            m_pub.set(pub);
+                        new PubSubOption.KeepDuplicates(m_keepDuplicates));
+            m_pub = pub;
           }
         }
       }
@@ -422,11 +421,11 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logFloatArray(float[] value) {
-      Publisher pub = m_pub.get();
+      Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
           // double-check
-          pub = m_pub.get();
+          pub = m_pub;
           if (pub == null) {
             pub =
                 m_inst
@@ -434,8 +433,8 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                     .publishEx(
                         NetworkTableType.FLOAT_ARRAY.getValueStr(),
                         m_properties,
-                        new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
-            m_pub.set(pub);
+                        new PubSubOption.KeepDuplicates(m_keepDuplicates));
+            m_pub = pub;
           }
         }
       }
@@ -448,11 +447,11 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logDoubleArray(double[] value) {
-      Publisher pub = m_pub.get();
+      Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
           // double-check
-          pub = m_pub.get();
+          pub = m_pub;
           if (pub == null) {
             pub =
                 m_inst
@@ -460,8 +459,8 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                     .publishEx(
                         NetworkTableType.DOUBLE_ARRAY.getValueStr(),
                         m_properties,
-                        new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
-            m_pub.set(pub);
+                        new PubSubOption.KeepDuplicates(m_keepDuplicates));
+            m_pub = pub;
           }
         }
       }
@@ -474,11 +473,11 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logStringArray(String[] value) {
-      Publisher pub = m_pub.get();
+      Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
           // double-check
-          pub = m_pub.get();
+          pub = m_pub;
           if (pub == null) {
             pub =
                 m_inst
@@ -486,8 +485,8 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                     .publishEx(
                         NetworkTableType.STRING_ARRAY.getValueStr(),
                         m_properties,
-                        new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
-            m_pub.set(pub);
+                        new PubSubOption.KeepDuplicates(m_keepDuplicates));
+            m_pub = pub;
           }
         }
       }
@@ -500,11 +499,11 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logRaw(byte[] value, String typeString) {
-      Publisher pub = m_pub.get();
+      Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
           // double-check
-          pub = m_pub.get();
+          pub = m_pub;
           if (pub == null) {
             m_typeString = typeString;
             pub =
@@ -513,16 +512,13 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                     .publishEx(
                         m_typeString,
                         m_properties,
-                        new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
-            m_pub.set(pub);
+                        new PubSubOption.KeepDuplicates(m_keepDuplicates));
+            m_pub = pub;
           }
         }
       }
 
-      String curTypeString;
-      synchronized (this) {
-        curTypeString = m_typeString;
-      }
+      String curTypeString = m_typeString;
 
       switch (pub) {
         case RawPublisher e when curTypeString.equals(typeString) -> e.set(value);

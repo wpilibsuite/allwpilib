@@ -132,6 +132,10 @@ public final class TelemetryTable {
    * @return entry
    */
   private TelemetryEntry getEntry(String name) {
+    TelemetryEntry entry = m_entriesMap.get(name);
+    if (entry != null) {
+      return entry;
+    }
     return m_entriesMap.computeIfAbsent(name, k -> TelemetryRegistry.getEntry(m_path + k));
   }
 

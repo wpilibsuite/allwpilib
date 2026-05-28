@@ -68,6 +68,10 @@ void NotifyOnTune(TunableRegistry::TunableInfo& info) {
   }
 }
 
+bool ShouldUpdateNetwork(const TunableRegistry::TunableInfo& info) {
+  return (info.config && info.config->alwaysGet) || info.IsChanged();
+}
+
 template <typename T>
 const T& GetValue(const TunableRegistry::TunableInfo& info) {
   if (info.type == detail::GetTunableTypeValue<T, false>()) {
@@ -169,7 +173,7 @@ class NetworkTablesTunableBackend::Entry {
  public:
   virtual ~Entry() = default;
   virtual uint32_t GetUid() const = 0;
-  virtual void UpdateNetwork() = 0;
+  virtual void UpdateNetwork(bool force) = 0;
 };
 
 class NetworkTablesTunableBackend::ValueEntry : public Entry {
@@ -213,10 +217,20 @@ class NetworkTablesTunableBackend::ValueEntry : public Entry {
       return;
     }
     DoUpdateTunable(info, value);
+    m_forceUpdate = true;
     NotifyOnTune(info);
   }
 
  protected:
+  bool ShouldPublishNetworkValue(const TunableRegistry::TunableInfo& info,
+                                 bool force) {
+    if (force || m_forceUpdate || ShouldUpdateNetwork(info)) {
+      m_forceUpdate = false;
+      return true;
+    }
+    return false;
+  }
+
   virtual void DoUpdateTunable(const TunableRegistry::TunableInfo& info,
                                const wpi::nt::Value& value) = 0;
 
@@ -227,6 +241,7 @@ class NetworkTablesTunableBackend::ValueEntry : public Entry {
   uint32_t m_uid;
   wpi::nt::GenericSubscriber m_subscriber;
   NT_Listener m_listener = 0;
+  bool m_forceUpdate = false;
 };
 
 template <typename T>
@@ -234,8 +249,11 @@ class ValueTunableEntry final : public NetworkTablesTunableBackend::ValueEntry {
  public:
   using NetworkTablesTunableBackend::ValueEntry::ValueEntry;
 
-  void UpdateNetwork() override {
+  void UpdateNetwork(bool force) override {
     if (auto info = TunableRegistry::GetTunable(GetUid())) {
+      if (!ShouldPublishNetworkValue(info, force)) {
+        return;
+      }
       SetNetworkValue(GetValue<T>(info));
       info.ResetChanged();
     }
@@ -406,9 +424,12 @@ class StructTunableEntry final : public NetworkTablesTunableBackend::ValueEntry 
  public:
   using NetworkTablesTunableBackend::ValueEntry::ValueEntry;
 
-  void UpdateNetwork() override {
+  void UpdateNetwork(bool force) override {
     auto info = TunableRegistry::GetTunable(GetUid());
     if (!info) {
+      return;
+    }
+    if (!ShouldPublishNetworkValue(info, force)) {
       return;
     }
     if (info.type == detail::TunableTypeValue::STRUCT) {
@@ -472,9 +493,12 @@ class ProtobufTunableEntry final
  public:
   using NetworkTablesTunableBackend::ValueEntry::ValueEntry;
 
-  void UpdateNetwork() override {
+  void UpdateNetwork(bool force) override {
     auto info = TunableRegistry::GetTunable(GetUid());
     if (!info) {
+      return;
+    }
+    if (!ShouldPublishNetworkValue(info, force)) {
       return;
     }
     std::vector<uint8_t> data;
@@ -550,7 +574,7 @@ class ComplexTunableEntry final : public NetworkTablesTunableBackend::Entry {
 
   uint32_t GetUid() const override { return m_uid; }
 
-  void UpdateNetwork() override {
+  void UpdateNetwork(bool) override {
     if (auto info = TunableRegistry::GetTunable(m_uid)) {
       static_cast<ComplexTunable*>(info.tunable)->UpdateTunable();
       info.ResetChanged();
@@ -683,7 +707,7 @@ void NetworkTablesTunableBackend::Publish(std::string_view path, uint32_t uid,
       return;
   }
 
-  entry->UpdateNetwork();
+  entry->UpdateNetwork(true);
   m_entries[path] = std::move(entry);
   m_uids[uid].emplace_back(path);
 }
@@ -751,6 +775,6 @@ void NetworkTablesTunableBackend::Update() {
   }
 
   for (auto&& [path, entry] : m_entries) {
-    entry->UpdateNetwork();
+    entry->UpdateNetwork(false);
   }
 }

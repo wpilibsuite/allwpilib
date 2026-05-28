@@ -84,6 +84,11 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     void close();
   }
 
+  private static boolean shouldUpdateNetwork(TunableBase tunable) {
+    TunableConfig config = tunable.getConfig();
+    return config != null && config.isAlwaysGet() || tunable.hasChanged();
+  }
+
   private abstract class TunableValueEntry implements TunableEntry {
     TunableValueEntry(String path, TunableConfig config, String typeString) {
       if (config != null && config.getTypeString() != null) {
@@ -272,13 +277,18 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     TunableRawEntry(String path, Tunable<byte[]> tunable) {
       super(path, tunable.getConfig(), "raw");
       m_tunable = tunable;
-      m_publisher.setRaw(m_tunable.get(), 0, m_tunable.get().length);
+      byte[] value = m_tunable.get();
+      m_lastValue = Arrays.copyOf(value, value.length);
+      m_publisher.setRaw(value, 0, value.length);
     }
 
     @Override
     public void updateNetwork() {
       byte[] value = m_tunable.get();
-      m_publisher.setRaw(value, 0, value.length);
+      if (!Arrays.equals(value, m_lastValue)) {
+        m_lastValue = Arrays.copyOf(value, value.length);
+        m_publisher.setRaw(value, 0, value.length);
+      }
     }
 
     @Override
@@ -287,18 +297,25 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     }
 
     private final Tunable<byte[]> m_tunable;
+    private byte[] m_lastValue;
   }
 
   private final class TunableBooleanArrayEntry extends TunableValueEntry {
     TunableBooleanArrayEntry(String path, Tunable<boolean[]> tunable) {
       super(path, tunable.getConfig(), "boolean[]");
       m_tunable = tunable;
-      m_publisher.setBooleanArray(m_tunable.get());
+      boolean[] value = m_tunable.get();
+      m_lastValue = Arrays.copyOf(value, value.length);
+      m_publisher.setBooleanArray(value);
     }
 
     @Override
     public void updateNetwork() {
-      m_publisher.setBooleanArray(m_tunable.get());
+      boolean[] value = m_tunable.get();
+      if (!Arrays.equals(value, m_lastValue)) {
+        m_lastValue = Arrays.copyOf(value, value.length);
+        m_publisher.setBooleanArray(value);
+      }
     }
 
     @Override
@@ -307,6 +324,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     }
 
     private final Tunable<boolean[]> m_tunable;
+    private boolean[] m_lastValue;
   }
 
   private final class TunableIntArrayEntry extends TunableValueEntry {
@@ -356,12 +374,18 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     TunableLongArrayEntry(String path, Tunable<long[]> tunable) {
       super(path, tunable.getConfig(), "int[]");
       m_tunable = tunable;
-      m_publisher.setIntegerArray(m_tunable.get());
+      long[] value = m_tunable.get();
+      m_lastValue = Arrays.copyOf(value, value.length);
+      m_publisher.setIntegerArray(value);
     }
 
     @Override
     public void updateNetwork() {
-      m_publisher.setIntegerArray(m_tunable.get());
+      long[] value = m_tunable.get();
+      if (!Arrays.equals(value, m_lastValue)) {
+        m_lastValue = Arrays.copyOf(value, value.length);
+        m_publisher.setIntegerArray(value);
+      }
     }
 
     @Override
@@ -370,18 +394,25 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     }
 
     private final Tunable<long[]> m_tunable;
+    private long[] m_lastValue;
   }
 
   private final class TunableFloatArrayEntry extends TunableValueEntry {
     TunableFloatArrayEntry(String path, Tunable<float[]> tunable) {
       super(path, tunable.getConfig(), "float[]");
       m_tunable = tunable;
-      m_publisher.setFloatArray(m_tunable.get());
+      float[] value = m_tunable.get();
+      m_lastValue = Arrays.copyOf(value, value.length);
+      m_publisher.setFloatArray(value);
     }
 
     @Override
     public void updateNetwork() {
-      m_publisher.setFloatArray(m_tunable.get());
+      float[] value = m_tunable.get();
+      if (!Arrays.equals(value, m_lastValue)) {
+        m_lastValue = Arrays.copyOf(value, value.length);
+        m_publisher.setFloatArray(value);
+      }
     }
 
     @Override
@@ -390,18 +421,25 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     }
 
     private final Tunable<float[]> m_tunable;
+    private float[] m_lastValue;
   }
 
   private final class TunableDoubleArrayEntry extends TunableValueEntry {
     TunableDoubleArrayEntry(String path, Tunable<double[]> tunable) {
       super(path, tunable.getConfig(), "double[]");
       m_tunable = tunable;
-      m_publisher.setDoubleArray(m_tunable.get());
+      double[] value = m_tunable.get();
+      m_lastValue = Arrays.copyOf(value, value.length);
+      m_publisher.setDoubleArray(value);
     }
 
     @Override
     public void updateNetwork() {
-      m_publisher.setDoubleArray(m_tunable.get());
+      double[] value = m_tunable.get();
+      if (!Arrays.equals(value, m_lastValue)) {
+        m_lastValue = Arrays.copyOf(value, value.length);
+        m_publisher.setDoubleArray(value);
+      }
     }
 
     @Override
@@ -410,18 +448,25 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     }
 
     private final Tunable<double[]> m_tunable;
+    private double[] m_lastValue;
   }
 
   private final class TunableStringArrayEntry extends TunableValueEntry {
     TunableStringArrayEntry(String path, Tunable<String[]> tunable) {
       super(path, tunable.getConfig(), "string[]");
       m_tunable = tunable;
-      m_publisher.setStringArray(m_tunable.get());
+      String[] value = m_tunable.get();
+      m_lastValue = Arrays.copyOf(value, value.length);
+      m_publisher.setStringArray(value);
     }
 
     @Override
     public void updateNetwork() {
-      m_publisher.setStringArray(m_tunable.get());
+      String[] value = m_tunable.get();
+      if (!Arrays.equals(value, m_lastValue)) {
+        m_lastValue = Arrays.copyOf(value, value.length);
+        m_publisher.setStringArray(value);
+      }
     }
 
     @Override
@@ -430,6 +475,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     }
 
     private final Tunable<String[]> m_tunable;
+    private String[] m_lastValue;
   }
 
   private final class TunableStructEntry<T> extends TunableValueEntry {
@@ -734,7 +780,12 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
       // update network from tunable changes
       for (StoredEntry entry : m_entries.values()) {
-        entry.entry().updateNetwork();
+        if (entry.tunable() == null) {
+          entry.entry().updateNetwork();
+        } else if (shouldUpdateNetwork(entry.tunable())) {
+          entry.entry().updateNetwork();
+          entry.tunable().resetChanged();
+        }
       }
     }
   }

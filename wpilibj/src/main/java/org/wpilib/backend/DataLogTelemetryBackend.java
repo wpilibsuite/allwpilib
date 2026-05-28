@@ -6,8 +6,6 @@ package org.wpilib.backend;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import org.wpilib.datalog.BooleanArrayLogEntry;
 import org.wpilib.datalog.BooleanLogEntry;
 import org.wpilib.datalog.DataLog;
@@ -67,9 +65,9 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
   private static final class Entry implements TelemetryEntry {
     private final DataLog m_log;
     private final String m_path;
-    private final AtomicReference<DataLogEntry> m_entry = new AtomicReference<>();
-    private String m_typeString;
-    private final AtomicBoolean m_keepDuplicates = new AtomicBoolean();
+    private volatile DataLogEntry m_entry;
+    private volatile String m_typeString;
+    private volatile boolean m_keepDuplicates;
     private final Map<String, String> m_propertiesMap = new HashMap<>();
     private String m_properties = "{}";
     private Struct<?> m_struct;
@@ -81,7 +79,11 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     public void close() {
-      var entry = m_entry.getAndSet(null);
+      DataLogEntry entry;
+      synchronized (this) {
+        entry = m_entry;
+        m_entry = null;
+      }
       if (entry != null) {
         entry.finish();
       }
@@ -89,7 +91,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void keepDuplicates() {
-      m_keepDuplicates.set(true);
+      m_keepDuplicates = true;
     }
 
     synchronized void refreshProperties() {
@@ -110,7 +112,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         String oldValue = m_propertiesMap.put(key, value);
         if (!value.equals(oldValue)) {
           refreshProperties();
-          DataLogEntry entry = m_entry.get();
+          DataLogEntry entry = m_entry;
           if (entry != null) {
             entry.setMetadata(m_properties);
           }
@@ -119,12 +121,12 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     private synchronized <T> StructLogEntry<T> initStruct(Struct<T> struct) {
-      DataLogEntry entry = m_entry.get();
+      DataLogEntry entry = m_entry;
       return switch (entry) {
         case null -> {
           StructLogEntry<T> e = StructLogEntry.create(m_log, m_path, struct, m_properties);
           m_struct = struct;
-          m_entry.set(e);
+          m_entry = e;
           yield e;
         }
         case StructLogEntry<?> e when struct.equals(m_struct) -> {
@@ -140,7 +142,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     public <T> void logStruct(T value, Struct<T> struct) {
       StructLogEntry<T> entry = initStruct(struct);
       if (entry != null) {
-        if (m_keepDuplicates.get()) {
+        if (m_keepDuplicates) {
           entry.append(value);
         } else {
           entry.update(value);
@@ -151,12 +153,12 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     private synchronized <T> ProtobufLogEntry<T> initProtobuf(Protobuf<T, ?> proto) {
-      DataLogEntry entry = m_entry.get();
+      DataLogEntry entry = m_entry;
       return switch (entry) {
         case null -> {
           ProtobufLogEntry<T> e = ProtobufLogEntry.create(m_log, m_path, proto, m_properties);
           m_proto = proto;
-          m_entry.set(e);
+          m_entry = e;
           yield e;
         }
         case ProtobufLogEntry<?> e when proto.equals(m_proto) -> {
@@ -172,7 +174,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     public <T> void logProtobuf(T value, Protobuf<T, ?> proto) {
       ProtobufLogEntry<T> entry = initProtobuf(proto);
       if (entry != null) {
-        if (m_keepDuplicates.get()) {
+        if (m_keepDuplicates) {
           entry.append(value);
         } else {
           entry.update(value);
@@ -183,12 +185,12 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     private synchronized <T> StructArrayLogEntry<T> initStructArray(Struct<T> struct) {
-      DataLogEntry entry = m_entry.get();
+      DataLogEntry entry = m_entry;
       return switch (entry) {
         case null -> {
           StructArrayLogEntry<T> e =
               StructArrayLogEntry.create(m_log, m_path, struct, m_properties);
-          m_entry.set(e);
+          m_entry = e;
           yield e;
         }
         case StructArrayLogEntry<?> e when struct.equals(m_struct) -> {
@@ -204,7 +206,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     public <T> void logStructArray(T[] value, Struct<T> struct) {
       StructArrayLogEntry<T> entry = initStructArray(struct);
       if (entry != null) {
-        if (m_keepDuplicates.get()) {
+        if (m_keepDuplicates) {
           entry.append(value);
         } else {
           entry.update(value);
@@ -216,21 +218,21 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logBoolean(boolean value) {
-      DataLogEntry entry = m_entry.get();
+      DataLogEntry entry = m_entry;
       if (entry == null) {
         synchronized (this) {
           // double-check
-          entry = m_entry.get();
+          entry = m_entry;
           if (entry == null) {
             entry = new BooleanLogEntry(m_log, m_path, m_properties);
-            m_entry.set(entry);
+            m_entry = entry;
           }
         }
       }
 
       switch (entry) {
         case BooleanLogEntry e -> {
-          if (m_keepDuplicates.get()) {
+          if (m_keepDuplicates) {
             e.append(value);
           } else {
             e.update(value);
@@ -242,21 +244,21 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logLong(long value) {
-      DataLogEntry entry = m_entry.get();
+      DataLogEntry entry = m_entry;
       if (entry == null) {
         synchronized (this) {
           // double-check
-          entry = m_entry.get();
+          entry = m_entry;
           if (entry == null) {
             entry = new IntegerLogEntry(m_log, m_path, m_properties);
-            m_entry.set(entry);
+            m_entry = entry;
           }
         }
       }
 
       switch (entry) {
         case IntegerLogEntry e -> {
-          if (m_keepDuplicates.get()) {
+          if (m_keepDuplicates) {
             e.append(value);
           } else {
             e.update(value);
@@ -268,21 +270,21 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logFloat(float value) {
-      DataLogEntry entry = m_entry.get();
+      DataLogEntry entry = m_entry;
       if (entry == null) {
         synchronized (this) {
           // double-check
-          entry = m_entry.get();
+          entry = m_entry;
           if (entry == null) {
             entry = new FloatLogEntry(m_log, m_path, m_properties);
-            m_entry.set(entry);
+            m_entry = entry;
           }
         }
       }
 
       switch (entry) {
         case FloatLogEntry e -> {
-          if (m_keepDuplicates.get()) {
+          if (m_keepDuplicates) {
             e.append(value);
           } else {
             e.update(value);
@@ -294,21 +296,21 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logDouble(double value) {
-      DataLogEntry entry = m_entry.get();
+      DataLogEntry entry = m_entry;
       if (entry == null) {
         synchronized (this) {
           // double-check
-          entry = m_entry.get();
+          entry = m_entry;
           if (entry == null) {
             entry = new DoubleLogEntry(m_log, m_path, m_properties);
-            m_entry.set(entry);
+            m_entry = entry;
           }
         }
       }
 
       switch (entry) {
         case DoubleLogEntry e -> {
-          if (m_keepDuplicates.get()) {
+          if (m_keepDuplicates) {
             e.append(value);
           } else {
             e.update(value);
@@ -320,27 +322,24 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logString(String value, String typeString) {
-      DataLogEntry entry = m_entry.get();
+      DataLogEntry entry = m_entry;
       if (entry == null) {
         synchronized (this) {
           // double-check
-          entry = m_entry.get();
+          entry = m_entry;
           if (entry == null) {
             m_typeString = typeString;
             entry = new StringLogEntry(m_log, m_path, m_properties, m_typeString);
-            m_entry.set(entry);
+            m_entry = entry;
           }
         }
       }
 
-      String curTypeString;
-      synchronized (this) {
-        curTypeString = m_typeString;
-      }
+      String curTypeString = m_typeString;
 
       switch (entry) {
         case StringLogEntry e when curTypeString.equals(typeString) -> {
-          if (m_keepDuplicates.get()) {
+          if (m_keepDuplicates) {
             e.append(value);
           } else {
             e.update(value);
@@ -352,21 +351,21 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logBooleanArray(boolean[] value) {
-      DataLogEntry entry = m_entry.get();
+      DataLogEntry entry = m_entry;
       if (entry == null) {
         synchronized (this) {
           // double-check
-          entry = m_entry.get();
+          entry = m_entry;
           if (entry == null) {
             entry = new BooleanArrayLogEntry(m_log, m_path, m_properties);
-            m_entry.set(entry);
+            m_entry = entry;
           }
         }
       }
 
       switch (entry) {
         case BooleanArrayLogEntry e -> {
-          if (m_keepDuplicates.get()) {
+          if (m_keepDuplicates) {
             e.append(value);
           } else {
             e.update(value);
@@ -388,21 +387,21 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logLongArray(long[] value) {
-      DataLogEntry entry = m_entry.get();
+      DataLogEntry entry = m_entry;
       if (entry == null) {
         synchronized (this) {
           // double-check
-          entry = m_entry.get();
+          entry = m_entry;
           if (entry == null) {
             entry = new IntegerArrayLogEntry(m_log, m_path, m_properties);
-            m_entry.set(entry);
+            m_entry = entry;
           }
         }
       }
 
       switch (entry) {
         case IntegerArrayLogEntry e -> {
-          if (m_keepDuplicates.get()) {
+          if (m_keepDuplicates) {
             e.append(value);
           } else {
             e.update(value);
@@ -414,21 +413,21 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logFloatArray(float[] value) {
-      DataLogEntry entry = m_entry.get();
+      DataLogEntry entry = m_entry;
       if (entry == null) {
         synchronized (this) {
           // double-check
-          entry = m_entry.get();
+          entry = m_entry;
           if (entry == null) {
             entry = new FloatArrayLogEntry(m_log, m_path, m_properties);
-            m_entry.set(entry);
+            m_entry = entry;
           }
         }
       }
 
       switch (entry) {
         case FloatArrayLogEntry e -> {
-          if (m_keepDuplicates.get()) {
+          if (m_keepDuplicates) {
             e.append(value);
           } else {
             e.update(value);
@@ -440,21 +439,21 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logDoubleArray(double[] value) {
-      DataLogEntry entry = m_entry.get();
+      DataLogEntry entry = m_entry;
       if (entry == null) {
         synchronized (this) {
           // double-check
-          entry = m_entry.get();
+          entry = m_entry;
           if (entry == null) {
             entry = new DoubleArrayLogEntry(m_log, m_path, m_properties);
-            m_entry.set(entry);
+            m_entry = entry;
           }
         }
       }
 
       switch (entry) {
         case DoubleArrayLogEntry e -> {
-          if (m_keepDuplicates.get()) {
+          if (m_keepDuplicates) {
             e.append(value);
           } else {
             e.update(value);
@@ -466,21 +465,21 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logStringArray(String[] value) {
-      DataLogEntry entry = m_entry.get();
+      DataLogEntry entry = m_entry;
       if (entry == null) {
         synchronized (this) {
           // double-check
-          entry = m_entry.get();
+          entry = m_entry;
           if (entry == null) {
             entry = new StringArrayLogEntry(m_log, m_path, m_properties);
-            m_entry.set(entry);
+            m_entry = entry;
           }
         }
       }
 
       switch (entry) {
         case StringArrayLogEntry e -> {
-          if (m_keepDuplicates.get()) {
+          if (m_keepDuplicates) {
             e.append(value);
           } else {
             e.update(value);
@@ -492,27 +491,24 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logRaw(byte[] value, String typeString) {
-      DataLogEntry entry = m_entry.get();
+      DataLogEntry entry = m_entry;
       if (entry == null) {
         synchronized (this) {
           // double-check
-          entry = m_entry.get();
+          entry = m_entry;
           if (entry == null) {
             m_typeString = typeString;
             entry = new RawLogEntry(m_log, m_path, m_properties, m_typeString);
-            m_entry.set(entry);
+            m_entry = entry;
           }
         }
       }
 
-      String curTypeString;
-      synchronized (this) {
-        curTypeString = m_typeString;
-      }
+      String curTypeString = m_typeString;
 
       switch (entry) {
         case RawLogEntry e when curTypeString.equals(typeString) -> {
-          if (m_keepDuplicates.get()) {
+          if (m_keepDuplicates) {
             e.append(value);
           } else {
             e.update(value);
