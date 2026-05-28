@@ -639,13 +639,16 @@ void NetworkTablesTunableBackend::Publish(std::string_view path, uint32_t uid,
     case STRUCT:
       entry = std::make_unique<StructTunableEntry>(
           this, ntPath, uid, config,
-          static_cast<detail::TunableStructBase&>(tunable).GetStructTypeName());
+          fmt::format("struct:{}",
+                      static_cast<detail::TunableStructBase&>(tunable)
+                          .GetStructTypeName()));
       break;
     case MEMBER_STRUCT:
       entry = std::make_unique<StructTunableEntry>(
           this, ntPath, uid, config,
-          static_cast<detail::TunableMemberStructBase&>(tunable)
-              .GetStructTypeName());
+          fmt::format("struct:{}",
+                      static_cast<detail::TunableMemberStructBase&>(tunable)
+                          .GetStructTypeName()));
       break;
     case PROTOBUF:
       entry = std::make_unique<ProtobufTunableEntry>(

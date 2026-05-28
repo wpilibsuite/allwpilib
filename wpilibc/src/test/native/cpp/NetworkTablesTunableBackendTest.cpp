@@ -7,8 +7,11 @@
 #include <gtest/gtest.h>
 
 #include "wpi/backend/NetworkTablesTunableBackend.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/ProtobufTopic.hpp"
+#include "wpi/nt/StructTopic.hpp"
 #include "wpi/tunable/Tunable.hpp"
 #include "wpi/tunable/TunableConfig.hpp"
 #include "wpi/tunable/TunableRegistry.hpp"
@@ -62,4 +65,66 @@ TEST_F(NetworkTablesTunableBackendTest, PublishesRobustDouble) {
 
   EXPECT_EQ(value.Get(), 2.0);
   EXPECT_EQ(sub.Get(), 2.0);
+}
+
+TEST_F(NetworkTablesTunableBackendTest, PublishesAndTunesStruct) {
+  const wpi::math::Translation2d initial{1.25_m, 2.5_m};
+  const wpi::math::Translation2d tuned{3.75_m, 4.5_m};
+  wpi::TunableConfig config;
+  config.robust = true;
+  wpi::Tunable<wpi::math::Translation2d> value{config, initial};
+  wpi::Tunables::Publish("translation", value);
+
+  auto sub =
+      inst.GetStructTopic<wpi::math::Translation2d>(
+              "/Tunables/translation/value")
+          .Subscribe({});
+  auto logged = sub.Get();
+  EXPECT_EQ(initial.X(), logged.X());
+  EXPECT_EQ(initial.Y(), logged.Y());
+
+  auto pub =
+      inst.GetStructTopic<wpi::math::Translation2d>(
+              "/Tunables/translation/tune")
+          .Publish();
+  pub.Set(tuned);
+  inst.Flush();
+  wpi::TunableRegistry::Update();
+
+  EXPECT_EQ(tuned.X(), value.Get().X());
+  EXPECT_EQ(tuned.Y(), value.Get().Y());
+  logged = sub.Get();
+  EXPECT_EQ(tuned.X(), logged.X());
+  EXPECT_EQ(tuned.Y(), logged.Y());
+}
+
+TEST_F(NetworkTablesTunableBackendTest, PublishesAndTunesProtobuf) {
+  const wpi::math::Translation2d initial{5.25_m, 6.5_m};
+  const wpi::math::Translation2d tuned{7.75_m, 8.5_m};
+  wpi::TunableConfig config;
+  config.robust = true;
+  wpi::detail::TunableProtobuf<wpi::math::Translation2d> value{config, initial};
+  wpi::Tunables::Publish("translation", value);
+
+  auto sub =
+      inst.GetProtobufTopic<wpi::math::Translation2d>(
+              "/Tunables/translation/value")
+          .Subscribe({});
+  auto logged = sub.Get();
+  EXPECT_EQ(initial.X(), logged.X());
+  EXPECT_EQ(initial.Y(), logged.Y());
+
+  auto pub =
+      inst.GetProtobufTopic<wpi::math::Translation2d>(
+              "/Tunables/translation/tune")
+          .Publish();
+  pub.Set(tuned);
+  inst.Flush();
+  wpi::TunableRegistry::Update();
+
+  EXPECT_EQ(tuned.X(), value.Get().X());
+  EXPECT_EQ(tuned.Y(), value.Get().Y());
+  logged = sub.Get();
+  EXPECT_EQ(tuned.X(), logged.X());
+  EXPECT_EQ(tuned.Y(), logged.Y());
 }

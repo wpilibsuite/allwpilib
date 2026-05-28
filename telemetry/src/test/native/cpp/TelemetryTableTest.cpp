@@ -335,7 +335,7 @@ TEST_F(TelemetryTableTest, StructLoggingRegistersSchemaAndLogsRawBytes) {
   ASSERT_EQ(schema->schemaString, "double x; int32 y");
 
   auto raw = Last<wpi::MockTelemetryBackend::LogRawValue>("/point");
-  ASSERT_EQ(raw.typeString, "telemetrytest.StructPoint");
+  ASSERT_EQ(raw.typeString, "struct:telemetrytest.StructPoint");
   ASSERT_EQ(raw.value.size(), 12u);
   auto unpacked = wpi::util::UnpackStruct<telemetrytest::StructPoint>(
       std::span<const uint8_t>{raw.value});
@@ -351,7 +351,7 @@ TEST_F(TelemetryTableTest, StructArrayLoggingRegistersSchemaAndLogsRawBytes) {
   auto* schema = mock->GetSchema("struct:telemetrytest.StructPoint");
   ASSERT_NE(schema, nullptr);
   auto raw = Last<wpi::MockTelemetryBackend::LogRawValue>("/points");
-  ASSERT_EQ(raw.typeString, "telemetrytest.StructPoint");
+  ASSERT_EQ(raw.typeString, "struct:telemetrytest.StructPoint[]");
   ASSERT_EQ(raw.value.size(), 24u);
   auto first = wpi::util::UnpackStruct<telemetrytest::StructPoint>(
       std::span<const uint8_t>{raw.value}.first(12));

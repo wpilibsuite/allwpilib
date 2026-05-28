@@ -181,14 +181,14 @@ class TelemetryTable final {
         if constexpr (wpi::util::is_constexpr([] { S::GetSize(); })) {
           uint8_t buf[S::GetSize()];
           S::Pack(buf, value);
-          Log(name, std::span{buf}, std::string_view{S::GetTypeName()});
+          Log(name, std::span{buf}, wpi::util::GetStructTypeString<T>());
           return;
         }
       }
       wpi::util::SmallVector<uint8_t, 128> buf;
       buf.resize_for_overwrite(S::GetSize(info...));
       S::Pack(buf, value, info...);
-      Log(name, std::span{buf}, std::string_view{S::GetTypeName(info...)});
+      Log(name, std::span{buf}, wpi::util::GetStructTypeString<T>(info...));
     } else if constexpr (wpi::util::ProtobufSerializable<T>) {
       auto backend =
           TelemetryRegistry::GetBackend(fmt::format("{}{}", m_path, name));
@@ -241,12 +241,14 @@ class TelemetryTable final {
       auto backend =
           TelemetryRegistry::GetBackend(fmt::format("{}{}", m_path, name));
       TelemetryRegistry::AddStructSchema<T>(*backend, info...);
-      using S = wpi::util::Struct<T, I...>;
       wpi::util::StructArrayBuffer<T, I...> buf;
       buf.Write(
           value,
           [&](auto bytes) {
-            Log(name, bytes, std::string_view{S::GetTypeName(info...)});
+            Log(name, bytes,
+                fmt::format("{}[]",
+                            std::string_view{
+                                wpi::util::GetStructTypeString<T>(info...)}));
           },
           info...);
     } else if constexpr (std::constructible_from<fmt::formatter<T>>) {
