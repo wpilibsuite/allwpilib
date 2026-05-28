@@ -44,6 +44,8 @@ class NetworkTablesTunableBackend : public wpi::TunableBackend {
 
   void Remove(std::string_view path) override;
 
+  std::vector<PublishedTunable> RemovePrefix(std::string_view prefix) override;
+
   void UnregisterTunable(uint32_t uid) override;
 
   void Update() override;

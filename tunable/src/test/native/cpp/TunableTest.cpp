@@ -307,6 +307,80 @@ TEST_F(TunableTest, TablePathsRouteAndRemove) {
                std::runtime_error);
 }
 
+TEST_F(TunableTest, RegisterBackendMigratesExistingMatchingTunables) {
+  TunableDouble root{1.0};
+  TunableDouble child{2.0};
+  Tunables::Publish("root", root);
+  Tunables::Publish("child/value", child);
+
+  backend->SetDouble("/root", 3.0);
+  backend->SetDouble("/child/value", 4.0);
+  TunableRegistry::Update();
+  EXPECT_EQ(root.Get(), 3.0);
+  EXPECT_EQ(child.Get(), 4.0);
+
+  auto childBackend = std::make_shared<MockTunableBackend>();
+  TunableRegistry::RegisterBackend("/child", childBackend);
+
+  EXPECT_THROW(backend->SetDouble("/child/value", 5.0), std::runtime_error);
+  childBackend->SetDouble("/child/value", 6.0);
+  backend->SetDouble("/root", 7.0);
+  TunableRegistry::Update();
+
+  EXPECT_EQ(root.Get(), 7.0);
+  EXPECT_EQ(child.Get(), 6.0);
+}
+
+TEST_F(TunableTest, RegisterBackendReplacementMigratesExistingTunables) {
+  TunableDouble tunable{1.0};
+  Tunables::Publish("value", tunable);
+
+  auto replacementBackend = std::make_shared<MockTunableBackend>();
+  TunableRegistry::RegisterBackend("", replacementBackend);
+
+  EXPECT_THROW(backend->SetDouble("/value", 2.0), std::runtime_error);
+  replacementBackend->SetDouble("/value", 3.0);
+  TunableRegistry::Update();
+
+  EXPECT_EQ(tunable.Get(), 3.0);
+}
+
+TEST_F(TunableTest, RegisterBackendMigratesComplexTunable) {
+  MemberComplex complex;
+  Tunables::Publish("child/complex", complex);
+
+  auto childBackend = std::make_shared<MockTunableBackend>();
+  TunableRegistry::RegisterBackend("/child", childBackend);
+
+  EXPECT_THROW(backend->SetInt32("/child/complex/gain", 2),
+               std::runtime_error);
+  childBackend->SetInt32("/child/complex/gain", 4);
+  childBackend->SetStruct<TestStruct>("/child/complex/point", {5, 6});
+  TunableRegistry::Update();
+
+  EXPECT_EQ(complex.gain, 4);
+  EXPECT_EQ(complex.point.a, 5);
+  EXPECT_EQ(complex.point.b, 6);
+  EXPECT_EQ(complex.updateCount, 1);
+}
+
+TEST_F(TunableTest, MockBackendRemovePrefixReturnsMatchingTunables) {
+  TunableDouble root{1.0};
+  TunableDouble child{2.0};
+  Tunables::Publish("root", root);
+  Tunables::Publish("child/value", child);
+
+  auto removed = backend->RemovePrefix("/child");
+
+  ASSERT_EQ(removed.size(), 1u);
+  EXPECT_EQ(removed[0].path, "/child/value");
+  backend->SetDouble("/root", 3.0);
+  EXPECT_THROW(backend->SetDouble("/child/value", 4.0), std::runtime_error);
+  TunableRegistry::Update();
+  EXPECT_EQ(root.Get(), 3.0);
+  EXPECT_EQ(child.Get(), 2.0);
+}
+
 TEST_F(TunableTest, ComplexTunablePublishesMembersAndUpdates) {
   MemberComplex complex;
   Tunables::Publish("complex", complex);

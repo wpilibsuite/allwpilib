@@ -298,6 +298,72 @@ class TunableTest {
   }
 
   @Test
+  void testRegisterBackendMigratesExistingMatchingTunables() {
+    final TunableDouble root = Tunables.addDouble("rootValue", 1.0);
+    final TunableDouble child = Tunables.addDouble("child/value", 2.0);
+
+    assertEquals(1.0, m_mock.getDouble("/rootValue"));
+    assertEquals(2.0, m_mock.getDouble("/child/value"));
+
+    MockTunableBackend childBackend = new MockTunableBackend();
+    TunableRegistry.registerBackend("/child", childBackend);
+
+    assertThrows(IllegalArgumentException.class, () -> m_mock.setDouble("/child/value", 3.0));
+    childBackend.setDouble("/child/value", 4.0);
+    m_mock.setDouble("/rootValue", 5.0);
+    TunableRegistry.update();
+
+    assertEquals(5.0, root.get());
+    assertEquals(4.0, child.get());
+  }
+
+  @Test
+  void testRegisterBackendReplacementMigratesExistingTunables() {
+    final TunableDouble tunable = Tunables.addDouble("value", 1.0);
+
+    MockTunableBackend replacementBackend = new MockTunableBackend();
+    TunableRegistry.registerBackend("", replacementBackend);
+
+    assertThrows(IllegalArgumentException.class, () -> m_mock.setDouble("/value", 2.0));
+    replacementBackend.setDouble("/value", 3.0);
+    TunableRegistry.update();
+
+    assertEquals(3.0, tunable.get());
+  }
+
+  @Test
+  void testRegisterBackendMigratesComplexTunableWithoutDuplicateChildren() {
+    Tunables.addComplex("child/complex", new UpdatingComplex());
+
+    MockTunableBackend childBackend = new MockTunableBackend();
+    TunableRegistry.registerBackend("/child", childBackend);
+
+    assertThrows(IllegalArgumentException.class, () -> m_mock.getInteger("/child/complex/counter"));
+    assertEquals(0, childBackend.getInteger("/child/complex/counter"));
+
+    childBackend.setInt("/child/complex/counter", 4);
+    TunableRegistry.update();
+
+    assertEquals(5, childBackend.getInteger("/child/complex/counter"));
+  }
+
+  @Test
+  void testMockBackendRemovePrefixReturnsMatchingTunables() {
+    final TunableDouble root = Tunables.addDouble("rootValue", 1.0);
+    final TunableDouble child = Tunables.addDouble("child/value", 2.0);
+
+    var removed = m_mock.removePrefix("/child");
+
+    assertEquals(1, removed.size());
+    assertEquals("/child/value", removed.get(0).path());
+    assertSame(child, removed.get(0).tunable());
+    assertFalse(removed.get(0).isComplex());
+    assertEquals(1.0, m_mock.getDouble("/rootValue"));
+    assertThrows(IllegalArgumentException.class, () -> m_mock.getDouble("/child/value"));
+    assertEquals(1.0, root.get());
+  }
+
+  @Test
   void testComplexTunablePublishesSubtableAndUpdatesEachCycle() {
     Tunables.addComplex("complex", new UpdatingComplex());
 

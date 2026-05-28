@@ -34,6 +34,8 @@ public final class TunableRegistry {
    */
   private record TypeHandlerData<T>(Class<T> cls, TypeHandler<T> handler) {}
 
+  private record ComplexMigrationPrefix(String prefix, TunableBackend backend) {}
+
   private static final List<TypeHandlerData<?>> s_typeHandlers = new ArrayList<>();
   private static final PrefixMap<TunableBackend> s_backends = new StringPrefixMap<>();
   private static final ConcurrentMap<String, TunableTable> s_tables = new ConcurrentHashMap<>();
@@ -134,10 +136,61 @@ public final class TunableRegistry {
    * @param prefix prefix for tunables covered by this backend
    * @param backend backend
    */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public static void registerBackend(String prefix, TunableBackend backend) {
     synchronized (s_backends) {
+      List<TunableBackend> oldBackends = new ArrayList<>(s_backends.values());
+      s_backends.remove(prefix);
       s_backends.put(prefix, backend);
+
+      List<TunableBackend.PublishedTunable> migrations = new ArrayList<>();
+      for (TunableBackend oldBackend : oldBackends) {
+        if (oldBackend != backend) {
+          migrations.addAll(oldBackend.removePrefix(prefix));
+        }
+      }
+
+      // Java complex backends publish the parent and then publish their child entries as a side
+      // effect of publishComplex(). If removePrefix() returns both the parent and its children,
+      // republishing the parent will recreate the children, so suppress those returned child
+      // entries to avoid duplicate-publish errors.
+      List<ComplexMigrationPrefix> complexPrefixes = new ArrayList<>();
+      for (var published : migrations) {
+        if (published.isComplex()) {
+          complexPrefixes.add(
+              new ComplexMigrationPrefix(
+                  published.path() + "/", s_backends.getLongestMatch(published.path())));
+        }
+      }
+
+      for (var published : migrations) {
+        TunableBackend targetBackend = s_backends.getLongestMatch(published.path());
+        if (isChildOfMigratedComplex(published, targetBackend, complexPrefixes)) {
+          continue;
+        }
+        if (published.isComplex()) {
+          targetBackend.publishComplex(published.path(), published.complex());
+        } else {
+          targetBackend.publish(published.path(), published.tunable());
+        }
+      }
     }
+  }
+
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
+  private static boolean isChildOfMigratedComplex(
+      TunableBackend.PublishedTunable published,
+      TunableBackend targetBackend,
+      List<ComplexMigrationPrefix> complexPrefixes) {
+    if (published.isComplex()) {
+      return false;
+    }
+    for (var prefix : complexPrefixes) {
+      if (targetBackend == prefix.backend() && published.path().startsWith(prefix.prefix())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

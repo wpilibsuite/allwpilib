@@ -4,7 +4,22 @@
 
 package org.wpilib.tunable;
 
+import java.util.List;
+
 public interface TunableBackend extends AutoCloseable {
+  /**
+   * A tunable removed from a backend.
+   *
+   * @param path normalized path
+   * @param tunable simple tunable; null for complex tunables
+   * @param complex complex tunable; null for simple tunables
+   */
+  record PublishedTunable(String path, TunableBase tunable, ComplexTunable complex) {
+    boolean isComplex() {
+      return complex != null;
+    }
+  }
+
   /**
    * Publishes a tunable.
    *
@@ -27,6 +42,14 @@ public interface TunableBackend extends AutoCloseable {
    * @param path normalized path
    */
   void remove(String path);
+
+  /**
+   * Removes all tunables under a prefix.
+   *
+   * @param prefix normalized path prefix
+   * @return removed tunables
+   */
+  List<PublishedTunable> removePrefix(String prefix);
 
   /** Updates all tunable values and calls callbacks where appropriate. */
   void update();

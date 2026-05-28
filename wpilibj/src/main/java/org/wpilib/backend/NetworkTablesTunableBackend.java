@@ -6,9 +6,11 @@ package org.wpilib.backend;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleConsumer;
@@ -45,9 +47,11 @@ import org.wpilib.util.struct.StructBuffer;
 public class NetworkTablesTunableBackend implements TunableBackend {
   private final NetworkTableInstance m_inst;
   private final String m_prefix;
-  private final Map<String, TunableEntry> m_entries = new HashMap<>();
+  private final Map<String, StoredEntry> m_entries = new HashMap<>();
   private final Map<Integer, TunableValueEntry> m_subscriberMap = new HashMap<>();
   private final NetworkTableListenerPoller m_poller;
+
+  private record StoredEntry(TunableEntry entry, TunableBase tunable, ComplexTunable complex) {}
 
   private interface TunableEntry extends AutoCloseable {
     void updateNetwork();
@@ -541,8 +545,8 @@ public class NetworkTablesTunableBackend implements TunableBackend {
   @Override
   public void close() {
     synchronized (m_entries) {
-      for (TunableEntry entry : m_entries.values()) {
-        entry.close();
+      for (StoredEntry entry : m_entries.values()) {
+        entry.entry().close();
       }
       m_entries.clear();
     }
@@ -632,7 +636,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       } else {
         throw new IllegalArgumentException("Unsupported tunable type: " + tunable.getClass());
       }
-      m_entries.put(path, entry);
+      m_entries.put(path, new StoredEntry(entry, tunable, null));
     }
   }
 
@@ -643,7 +647,9 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       if (m_entries.containsKey(path)) {
         throw new IllegalArgumentException("Tunable already exists: " + path);
       }
-      m_entries.put(path, new ComplexTunableEntry(m_prefix + path, table, tunable));
+      m_entries.put(
+          path,
+          new StoredEntry(new ComplexTunableEntry(m_prefix + path, table, tunable), null, tunable));
     }
 
     tunable.publishTunable(table);
@@ -652,11 +658,30 @@ public class NetworkTablesTunableBackend implements TunableBackend {
   @Override
   public void remove(String path) {
     synchronized (m_entries) {
-      TunableEntry entry = m_entries.remove(path);
+      StoredEntry entry = m_entries.remove(path);
       if (entry != null) {
-        entry.close();
+        entry.entry().close();
       }
     }
+  }
+
+  @Override
+  public List<PublishedTunable> removePrefix(String prefix) {
+    List<PublishedTunable> removed = new ArrayList<>();
+    synchronized (m_entries) {
+      var iterator = m_entries.entrySet().iterator();
+      while (iterator.hasNext()) {
+        var mapEntry = iterator.next();
+        if (!mapEntry.getKey().startsWith(prefix)) {
+          continue;
+        }
+        StoredEntry entry = mapEntry.getValue();
+        removed.add(new PublishedTunable(mapEntry.getKey(), entry.tunable(), entry.complex()));
+        entry.entry().close();
+        iterator.remove();
+      }
+    }
+    return removed;
   }
 
   @Override
@@ -675,8 +700,8 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       }
 
       // update network from tunable changes
-      for (TunableEntry entry : m_entries.values()) {
-        entry.updateNetwork();
+      for (StoredEntry entry : m_entries.values()) {
+        entry.entry().updateNetwork();
       }
     }
   }

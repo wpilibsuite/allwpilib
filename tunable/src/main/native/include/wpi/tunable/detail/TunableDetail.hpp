@@ -42,7 +42,7 @@ class TunableValueBase : public detail::TunableBase {
 
   constexpr const T& Get() const { return m_value; }
 
-  constexpr void Set(T value) {
+  void Set(T value) {
     m_value = std::move(value);
     SetTunableChanged();
   }
@@ -72,15 +72,15 @@ class TunableValueBase<std::string> : public detail::TunableBase {
 
   constexpr const std::string& Get() const { return m_value; }
 
-  constexpr void Set(const char* value) {
+  void Set(const char* value) {
     m_value = value;
     SetTunableChanged();
   }
-  constexpr void Set(std::string&& value) {
+  void Set(std::string&& value) {
     m_value = std::move(value);
     SetTunableChanged();
   }
-  constexpr void Set(std::string_view value) {
+  void Set(std::string_view value) {
     m_value = value;
     SetTunableChanged();
   }
@@ -110,11 +110,11 @@ class TunableValueBase<std::vector<U>> : public detail::TunableBase {
 
   constexpr const std::vector<U>& Get() const { return m_value; }
 
-  constexpr void Set(std::vector<U>&& value) {
+  void Set(std::vector<U>&& value) {
     m_value = std::move(value);
     SetTunableChanged();
   }
-  constexpr void Set(std::span<const U> value) {
+  void Set(std::span<const U> value) {
     m_value.assign(value.begin(), value.end());
     SetTunableChanged();
   }
@@ -198,7 +198,7 @@ class TunableStruct : public detail::TunableStructBase {
     return m_value;
   }
 
-  constexpr TunableStruct& operator=(T value) {
+  TunableStruct& operator=(T value) {
     m_value = std::move(value);
     SetTunableChanged();
     return *this;
@@ -206,7 +206,7 @@ class TunableStruct : public detail::TunableStructBase {
 
   constexpr const T& Get() const { return m_value; }
 
-  constexpr void Set(T value) {
+  void Set(T value) {
     m_value = std::move(value);
     SetTunableChanged();
   }
@@ -294,11 +294,11 @@ class TunableStructVector : public detail::TunableStructBase {
 
   constexpr const std::vector<T>& Get() const { return m_value; }
 
-  constexpr void Set(std::vector<T> value) {
+  void Set(std::vector<T> value) {
     m_value = std::move(value);
     SetTunableChanged();
   }
-  constexpr void Set(std::span<const T> value) {
+  void Set(std::span<const T> value) {
     m_value.assign(value.begin(), value.end());
     SetTunableChanged();
   }
@@ -390,7 +390,7 @@ class TunableProtobuf : public detail::TunableProtobufBase {
     return m_value;
   }
 
-  constexpr TunableProtobuf& operator=(T value) {
+  TunableProtobuf& operator=(T value) {
     m_value = std::move(value);
     SetTunableChanged();
     return *this;
@@ -398,7 +398,7 @@ class TunableProtobuf : public detail::TunableProtobufBase {
 
   constexpr const T& Get() const { return m_value; }
 
-  constexpr void Set(T value) {
+  void Set(T value) {
     m_value = std::move(value);
     SetTunableChanged();
   }

@@ -5,6 +5,7 @@
 #include "wpi/tunable/TunableRegistry.hpp"
 
 #include <cstdint>
+#include <iterator>
 #include <memory>
 #include <optional>
 #include <string>
@@ -101,7 +102,37 @@ void TunableRegistry::RegisterBackend(std::string_view prefix,
   assert(backend);
   Instance& inst = GetInstance();
   std::scoped_lock lock{inst.backendsMutex};
-  inst.backends[prefix] = std::move(backend);
+  std::vector<std::shared_ptr<TunableBackend>> oldBackends;
+  for (auto oldBackend : inst.backends) {
+    oldBackends.emplace_back(std::move(oldBackend));
+  }
+
+  auto newBackend = std::move(backend);
+  inst.backends[prefix] = newBackend;
+
+  // C++ complex tunables publish each member as an independent backend entry,
+  // so migrations can republish every removed path directly.
+  std::vector<TunableBackend::PublishedTunable> migrations;
+  for (auto oldBackend : oldBackends) {
+    if (oldBackend != newBackend) {
+      auto removed = oldBackend->RemovePrefix(prefix);
+      migrations.insert(migrations.end(),
+                        std::make_move_iterator(removed.begin()),
+                        std::make_move_iterator(removed.end()));
+    }
+  }
+
+  for (auto&& migration : migrations) {
+    auto backendIt = inst.backends.longest_prefix(migration.path);
+    if (backendIt == inst.backends.end()) {
+      continue;
+    }
+    auto info = GetTunable(migration.uid);
+    if (info) {
+      backendIt.value()->Publish(migration.path, migration.uid, *info.tunable,
+                                 info.config, info.type);
+    }
+  }
 }
 
 std::shared_ptr<TunableBackend> TunableRegistry::GetBackend(

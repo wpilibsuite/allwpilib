@@ -13,6 +13,7 @@
 #include "wpi/tunable/TunableConfig.hpp"
 #include "wpi/tunable/TunableRegistry.hpp"
 #include "wpi/tunable/detail/TunableTypeTraits.hpp"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/type_name.hpp"
 
 using namespace wpi;
@@ -180,14 +181,38 @@ void MockTunableBackend::Remove(std::string_view path) {
   std::scoped_lock lock{m_mutex};
   auto it = m_tunables.find(path);
   if (it != m_tunables.end()) {
-    auto uidIt = m_uids.find(it->second);
+    auto uid = it->second;
+    auto uidIt = m_uids.find(uid);
     if (uidIt != m_uids.end()) {
       std::erase(uidIt->second, path);
     }
     m_tunables.erase(it);
-    std::erase_if(m_actions,
-                  [&](auto&& action) { return action.uid == it->second; });
+    std::erase_if(m_actions, [&](auto&& action) { return action.uid == uid; });
   }
+}
+
+std::vector<TunableBackend::PublishedTunable> MockTunableBackend::RemovePrefix(
+    std::string_view prefix) {
+  std::scoped_lock lock{m_mutex};
+  std::vector<PublishedTunable> removed;
+  for (auto it = m_tunables.begin(); it != m_tunables.end();) {
+    if (!wpi::util::starts_with(it->first, prefix)) {
+      ++it;
+      continue;
+    }
+    std::string path{it->first};
+    auto uid = it->second;
+    removed.push_back({path, uid});
+    if (auto uidIt = m_uids.find(uid); uidIt != m_uids.end()) {
+      std::erase(uidIt->second, path);
+      if (uidIt->second.empty()) {
+        m_uids.erase(uidIt);
+      }
+    }
+    it = m_tunables.erase(it);
+    std::erase_if(m_actions, [&](auto&& action) { return action.uid == uid; });
+  }
+  return removed;
 }
 
 void MockTunableBackend::UnregisterTunable(uint32_t uid) {

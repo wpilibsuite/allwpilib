@@ -28,6 +28,7 @@
 #include "wpi/tunable/detail/TunableDetail.hpp"
 #include "wpi/tunable/detail/TunableMember.hpp"
 #include "wpi/tunable/detail/TunableTypeValue.hpp"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/json.hpp"
 
 using namespace wpi;
@@ -687,6 +688,29 @@ void NetworkTablesTunableBackend::Remove(std::string_view path) {
     }
     m_entries.erase(it);
   }
+}
+
+std::vector<TunableBackend::PublishedTunable>
+NetworkTablesTunableBackend::RemovePrefix(std::string_view prefix) {
+  std::scoped_lock lock{m_mutex};
+  std::vector<PublishedTunable> removed;
+  for (auto it = m_entries.begin(); it != m_entries.end();) {
+    if (!wpi::util::starts_with(it->first, prefix)) {
+      ++it;
+      continue;
+    }
+    std::string path{it->first};
+    auto uid = it->second->GetUid();
+    removed.push_back({path, uid});
+    if (auto uidIt = m_uids.find(uid); uidIt != m_uids.end()) {
+      std::erase(uidIt->second, path);
+      if (uidIt->second.empty()) {
+        m_uids.erase(uidIt);
+      }
+    }
+    it = m_entries.erase(it);
+  }
+  return removed;
 }
 
 void NetworkTablesTunableBackend::UnregisterTunable(uint32_t uid) {

@@ -355,7 +355,7 @@ Tunables.addComplex("auto", autoChooser);
 
 Backends implement `TunableBackend`.  Publishing a frontend tunable normalizes its path and registers it with the backend selected by `TunableRegistry`.  `TunableRegistry.update()` calls each registered backend so remote writes can be applied, local values can be published, and `onTune` callbacks can run.
 
-`TunableRegistry.registerBackend(String prefix, TunableBackend backend)` associates a backend with a path prefix.  When a tunable is published, the registry selects the backend with the longest matching prefix.  This allows different backends to be used for different subtrees, such as a test backend for `/test/` and an NT backend for `/`.
+`TunableRegistry.registerBackend(String prefix, TunableBackend backend)` associates a backend with a path prefix.  When a tunable is published, the registry selects the backend with the longest matching prefix.  This allows different backends to be used for different subtrees, such as a test backend for `/test/` and an NT backend for `/`.  If a backend is registered after tunables have already been published, any existing tunables whose longest matching prefix now resolves to the newly registered backend are removed from their previous backend and republished to the new backend.
 
 Robot programs normally get a default `NetworkTablesTunableBackend` from `RobotBase`, registered with an empty prefix and a NetworkTables path prefix of `/Tunables`.  Unit tests can use `MockTunableBackend`.
 
@@ -408,9 +408,12 @@ public final class TunableRegistry {
 
 ```java
 public interface TunableBackend extends AutoCloseable {
+  record PublishedTunable(String path, TunableBase tunable, ComplexTunable complex) {}
+
   void publish(String path, TunableBase tunable);
   void publishComplex(String path, ComplexTunable tunable);
   void remove(String path);
+  List<PublishedTunable> removePrefix(String prefix);
 
   // called periodically; reads changed values, calls onTune callbacks, etc.
   void update();
@@ -728,7 +731,7 @@ Unlike Java, there are no `PublishDouble()` convenience methods; publish typed t
 
 ### `wpi::TunableRegistry` and `wpi::TunableBackend`
 
-`wpi::TunableRegistry` owns the mapping from normalized paths to registered backends and tracks published tunables by UID so moved C++ objects continue to point at the right tunable.
+`wpi::TunableRegistry` owns the mapping from normalized paths to registered backends and tracks tunables by UID so moved C++ objects continue to point at the right tunable.
 
 ```cpp
 class TunableRegistry final {
@@ -748,17 +751,24 @@ class TunableRegistry final {
 
 class TunableBackend {
  public:
+  struct PublishedTunable {
+    std::string path;
+    uint32_t uid;
+  };
+
   virtual void Publish(std::string_view path, uint32_t uid,
                        wpi::detail::TunableBase& tunable,
                        const wpi::TunableConfig* config,
                        wpi::detail::TunableTypeValue type) = 0;
   virtual void Remove(std::string_view path) = 0;
+  virtual std::vector<PublishedTunable> RemovePrefix(
+      std::string_view prefix) = 0;
   virtual void UnregisterTunable(uint32_t uid) = 0;
   virtual void Update() = 0;
 };
 ```
 
-`RegisterBackend()` takes a `std::shared_ptr<TunableBackend>` and uses longest-prefix matching.  `GetBackend()` throws if no backend matches.  `RobotBase` calls `TunableRegistry::Update()` from the main loop, but backend registration is separate.
+`RegisterBackend()` takes a `std::shared_ptr<TunableBackend>` and uses longest-prefix matching.  `GetBackend()` throws if no backend matches.  If a backend is registered after tunables have already been published, existing tunables whose longest matching prefix now resolves to the new backend are removed from their previous backend and republished to the new backend.  `RobotBase` calls `TunableRegistry::Update()` from the main loop, but backend registration is separate.
 
 ### `wpi::ComplexTunable`
 

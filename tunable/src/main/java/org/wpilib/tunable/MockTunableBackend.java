@@ -555,6 +555,31 @@ public class MockTunableBackend implements TunableBackend {
   }
 
   @Override
+  public List<PublishedTunable> removePrefix(String prefix) {
+    List<PublishedTunable> removed = new ArrayList<>();
+    synchronized (m_entries) {
+      var iterator = m_entries.entrySet().iterator();
+      while (iterator.hasNext()) {
+        var entry = iterator.next();
+        if (!entry.getKey().startsWith(prefix)) {
+          continue;
+        }
+        Object value = entry.getValue();
+        if (value instanceof ComplexTunable tunable) {
+          removed.add(new PublishedTunable(entry.getKey(), null, tunable));
+        } else {
+          removed.add(new PublishedTunable(entry.getKey(), (TunableBase) value, null));
+        }
+        iterator.remove();
+      }
+    }
+    synchronized (m_actions) {
+      m_actions.removeIf(action -> action.path.startsWith(prefix));
+    }
+    return removed;
+  }
+
+  @Override
   public void update() {
     synchronized (m_actions) {
       for (Action action : m_actions) {

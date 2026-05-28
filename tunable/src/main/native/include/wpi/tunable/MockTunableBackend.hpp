@@ -134,6 +134,8 @@ class MockTunableBackend : public TunableBackend {
    */
   void Remove(std::string_view path) override;
 
+  std::vector<PublishedTunable> RemovePrefix(std::string_view prefix) override;
+
   /**
    * Unregisters a tunable.
    *

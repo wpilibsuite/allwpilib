@@ -6,7 +6,9 @@
 
 #include <stdint.h>
 
+#include <string>
 #include <string_view>
+#include <vector>
 
 #include "wpi/tunable/detail/TunableTypeValue.hpp"
 
@@ -20,6 +22,11 @@ class TunableBase;
 
 class TunableBackend {
  public:
+  struct PublishedTunable {
+    std::string path;
+    uint32_t uid;
+  };
+
   virtual ~TunableBackend() = default;
 
   /**
@@ -42,6 +49,15 @@ class TunableBackend {
    * @param path normalized path
    */
   virtual void Remove(std::string_view path) = 0;
+
+  /**
+   * Removes all tunables under a prefix.
+   *
+   * @param prefix normalized path prefix
+   * @return removed tunables
+   */
+  virtual std::vector<PublishedTunable> RemovePrefix(
+      std::string_view prefix) = 0;
 
   /**
    * Unregisters a tunable.
