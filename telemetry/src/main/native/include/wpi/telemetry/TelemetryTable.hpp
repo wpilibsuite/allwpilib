@@ -236,7 +236,16 @@ class TelemetryTable final {
     } else if constexpr (std::same_as<U, std::string_view>) {
       GetEntry(name).LogStringArray(value);
     } else if constexpr (std::same_as<U, uint8_t>) {
-      GetEntry(name).LogRaw(value, "raw");
+      if constexpr (sizeof...(I) == 0) {
+        GetEntry(name).LogRaw(value, "raw");
+      } else if constexpr (sizeof...(I) == 1 &&
+                           (std::constructible_from<std::string_view, I> &&
+                            ...)) {
+        GetEntry(name).LogRaw(value, std::string_view{info...});
+      } else {
+        static_assert(impl::always_false<T>::value,
+                      "Don't know how to serialize type");
+      }
     } else if constexpr (wpi::util::StructSerializable<T, I...>) {
       auto backend =
           TelemetryRegistry::GetBackend(fmt::format("{}{}", m_path, name));

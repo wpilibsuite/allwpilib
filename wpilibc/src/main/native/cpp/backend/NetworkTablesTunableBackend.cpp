@@ -44,9 +44,19 @@ std::string_view GetTypeString(std::string_view defaultType,
   return defaultType;
 }
 
-const wpi::util::json& GetProperties(const TunableConfig* config) {
-  static const wpi::util::json empty = wpi::util::json::object();
-  return config ? config->properties : empty;
+wpi::util::json GetProperties(const TunableConfig* config) {
+  if (!config) {
+    return wpi::util::json::object();
+  }
+
+  wpi::util::json properties = config->properties;
+  if (config->robust) {
+    properties["robust"] = true;
+  }
+  if (!config->isMutable) {
+    properties["mutable"] = false;
+  }
+  return properties;
 }
 
 void NotifyOnTune(TunableRegistry::TunableInfo& info) {

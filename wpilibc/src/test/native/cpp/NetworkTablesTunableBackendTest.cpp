@@ -162,6 +162,21 @@ TEST_F(NetworkTablesTunableBackendTest, PublishesAndTunesArrayAndRawDataTypes) {
 }
 
 TEST_F(NetworkTablesTunableBackendTest, PublishesAndTunesDouble) {
+  wpi::TunableConfig config;
+  wpi::TunableDouble value{1.0, config};
+  wpi::Tunables::Publish("foo", value);
+
+  auto sub = inst.GetDoubleTopic("/Tunables/foo").Subscribe(0.0);
+  EXPECT_EQ(sub.Get(), 1.0);
+
+  auto pub = inst.GetDoubleTopic("/Tunables/foo").Publish();
+  pub.Set(2.0);
+  wpi::TunableRegistry::Update();
+
+  EXPECT_EQ(value.Get(), 2.0);
+}
+
+TEST_F(NetworkTablesTunableBackendTest, TunablesWithoutConfigAreMutable) {
   wpi::TunableDouble value{1.0};
   wpi::Tunables::Publish("foo", value);
 
@@ -270,6 +285,7 @@ TEST_F(NetworkTablesTunableBackendTest, AppliesBackendConfigOptions) {
 
   auto topic = inst.GetTopic("/Tunables/configured/value");
   EXPECT_EQ("json", topic.GetTypeString());
+  EXPECT_EQ(true, topic.GetProperty("robust"));
   EXPECT_EQ(0, topic.GetProperty("min"));
   EXPECT_EQ(10, topic.GetProperty("max"));
 }
@@ -303,6 +319,9 @@ TEST_F(NetworkTablesTunableBackendTest, ImmutableTunablesIgnoreRemoteUpdates) {
   };
   wpi::TunableDouble value{1.0, config};
   wpi::Tunables::Publish("immutable", value);
+
+  EXPECT_EQ(false,
+            inst.GetTopic("/Tunables/immutable/value").GetProperty("mutable"));
 
   auto pub = Tune("immutable", "double");
   pub.SetDouble(2.0);

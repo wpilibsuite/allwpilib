@@ -77,7 +77,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
         m_subscriber = m_inst.getTopic(path).genericSubscribe(typeString);
       }
       m_subscriberMap.put(m_subscriber.getHandle(), this);
-      if (config != null && config.isMutable()) {
+      if (config == null || config.isMutable()) {
         m_listener =
             m_poller.addListener(m_subscriber, EnumSet.of(NetworkTableEvent.Kind.VALUE_ALL));
       } else {

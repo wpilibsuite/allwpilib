@@ -85,7 +85,6 @@ TEST_F(NetworkTablesTelemetryBackendTest, PublishesArrayAndRawDataTypes) {
   auto strings = inst.GetTopic("/Telemetry/strings").GenericSubscribe();
   auto stringViews = inst.GetTopic("/Telemetry/stringViews").GenericSubscribe();
   auto raw = inst.GetTopic("/Telemetry/raw").GenericSubscribe();
-  auto customRaw = inst.GetTopic("/Telemetry/customRaw").GenericSubscribe();
 
   const bool boolValues[] = {true, false};
   const int16_t shortValues[] = {1, 2};
@@ -110,6 +109,7 @@ TEST_F(NetworkTablesTelemetryBackendTest, PublishesArrayAndRawDataTypes) {
   wpi::Telemetry::Log("customRaw", std::span<const uint8_t>{customRawValues},
                       "custom");
 
+  auto customRaw = inst.GetTopic("/Telemetry/customRaw").GenericSubscribe();
   EXPECT_EQ((std::vector<int>{1, 0}), booleans.GetBooleanArray({}));
   EXPECT_EQ((std::vector<int64_t>{1, 2}), shorts.GetIntegerArray({}));
   EXPECT_EQ((std::vector<int64_t>{3, 4}), ints.GetIntegerArray({}));
@@ -120,7 +120,7 @@ TEST_F(NetworkTablesTelemetryBackendTest, PublishesArrayAndRawDataTypes) {
   EXPECT_EQ((std::vector<std::string>{"c", "d"}),
             stringViews.GetStringArray({}));
   EXPECT_EQ((std::vector<uint8_t>{11, 12, 13}), raw.GetRaw({}));
-  EXPECT_EQ("raw", inst.GetTopic("/Telemetry/customRaw").GetTypeString());
+  EXPECT_EQ("custom", inst.GetTopic("/Telemetry/customRaw").GetTypeString());
   EXPECT_EQ((std::vector<uint8_t>{14, 15}), customRaw.GetRaw({}));
 }
 
