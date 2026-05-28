@@ -154,6 +154,22 @@ struct MemberComplex : public ComplexTunable {
   }
 };
 
+struct DirectStructComplex : public ComplexTunable {
+  TestStruct point{2, 3};
+
+  void PublishTunable(TunableTable& table) override {
+    table.Publish("point", this, &DirectStructComplex::point);
+  }
+};
+
+struct WrappedStructComplex : public ComplexTunable {
+  Tunable<TestStruct> point{TestStruct{2, 3}};
+
+  void PublishTunable(TunableTable& table) override {
+    table.Publish("point", point);
+  }
+};
+
 TEST_F(TunableTest, IntTunable) {
   Tunable<int32_t> tunable;
 
@@ -393,6 +409,28 @@ TEST_F(TunableTest, ComplexTunablePublishesMembersAndUpdates) {
   EXPECT_EQ(complex.point.a, 11);
   EXPECT_EQ(complex.point.b, 12);
   EXPECT_EQ(complex.updateCount, 1);
+}
+
+TEST_F(TunableTest, ComplexTunableDirectStructSerializableMember) {
+  DirectStructComplex complex;
+  Tunables::Publish("directStruct", complex);
+
+  backend->SetStruct<TestStruct>("/directStruct/point", {4, 5});
+  TunableRegistry::Update();
+
+  EXPECT_EQ(complex.point.a, 4);
+  EXPECT_EQ(complex.point.b, 5);
+}
+
+TEST_F(TunableTest, ComplexTunableWrappedStructSerializableMember) {
+  WrappedStructComplex complex;
+  Tunables::Publish("wrappedStruct", complex);
+
+  backend->SetStruct<TestStruct>("/wrappedStruct/point", {6, 7});
+  TunableRegistry::Update();
+
+  EXPECT_EQ(complex.point.Get().a, 6);
+  EXPECT_EQ(complex.point.Get().b, 7);
 }
 
 TEST_F(TunableTest, CustomTunable) {

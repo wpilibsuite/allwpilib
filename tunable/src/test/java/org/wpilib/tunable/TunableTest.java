@@ -119,6 +119,24 @@ class TunableTest {
     }
   }
 
+  private static final class DirectStructComplex implements ComplexTunable {
+    private StructThing m_point = new StructThing(1);
+
+    @Override
+    public void publishTunable(TunableTable table) {
+      table.publishValue("point", () -> m_point, value -> m_point = value, StructThing.class);
+    }
+  }
+
+  private static final class WrappedStructComplex implements ComplexTunable {
+    private final Tunable<StructThing> m_point = Tunable.create(new StructThing(1));
+
+    @Override
+    public void publishTunable(TunableTable table) {
+      table.publish("point", m_point);
+    }
+  }
+
   @BeforeEach
   public void init() {
     m_mock = new MockTunableBackend();
@@ -372,6 +390,31 @@ class TunableTest {
     assertEquals(1, m_mock.getInteger("/complex/counter"));
     TunableRegistry.update();
     assertEquals(2, m_mock.getInteger("/complex/counter"));
+  }
+
+  @Test
+  void testComplexTunablePublishesDirectStructSerializableMember() {
+    DirectStructComplex complex = Tunables.addComplex("directStruct", new DirectStructComplex());
+
+    assertEquals(new StructThing(1), m_mock.getValue("/directStruct/point"));
+
+    m_mock.setValue("/directStruct/point", new StructThing(2));
+    TunableRegistry.update();
+
+    assertEquals(new StructThing(2), complex.m_point);
+  }
+
+  @Test
+  void testComplexTunablePublishesWrappedStructSerializableMember() {
+    WrappedStructComplex complex = Tunables.addComplex("wrappedStruct", new WrappedStructComplex());
+
+    assertInstanceOf(Tunable.TunableStruct.class, complex.m_point);
+    assertEquals(new StructThing(1), m_mock.getValue("/wrappedStruct/point"));
+
+    m_mock.setValue("/wrappedStruct/point", new StructThing(3));
+    TunableRegistry.update();
+
+    assertEquals(new StructThing(3), complex.m_point.get());
   }
 
   @Test
