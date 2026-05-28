@@ -104,6 +104,15 @@ class TelemetryTableTest {
         new MockProtobuf<>(StructProtoThing.class);
   }
 
+  public record CachedStructThing(int value) implements StructSerializable {
+    public static Struct<CachedStructThing> struct = new MockStruct<>(CachedStructThing.class);
+  }
+
+  public record CachedProtoThing(int value) implements ProtobufSerializable {
+    public static Protobuf<CachedProtoThing, ProtoMessage<?>> proto =
+        new MockProtobuf<>(CachedProtoThing.class);
+  }
+
   private static class MockStruct<T> implements Struct<T> {
     private final Class<T> m_cls;
 
@@ -404,6 +413,40 @@ class TelemetryTableTest {
     assertEquals(structProtoValue, structLog.value());
     assertSame(StructProtoThing.struct, structLog.struct());
     assertNull(m_mock.getLastValue("/structProto", MockTelemetryBackend.LogProtobufValue.class));
+  }
+
+  @Test
+  void testImplicitStructAndProtobufLookupsAreClassCached() {
+    Struct<CachedStructThing> firstStruct = CachedStructThing.struct;
+    Struct<CachedStructThing> secondStruct = new MockStruct<>(CachedStructThing.class);
+    Protobuf<CachedProtoThing, ProtoMessage<?>> firstProto = CachedProtoThing.proto;
+    Protobuf<CachedProtoThing, ProtoMessage<?>> secondProto =
+        new MockProtobuf<>(CachedProtoThing.class);
+    CachedStructThing secondStructValue = new CachedStructThing(2);
+    CachedProtoThing secondProtoValue = new CachedProtoThing(4);
+
+    try {
+      Telemetry.log("firstStruct", new CachedStructThing(1));
+      CachedStructThing.struct = secondStruct;
+      Telemetry.log("secondStruct", secondStructValue);
+
+      Telemetry.log("firstProto", new CachedProtoThing(3));
+      CachedProtoThing.proto = secondProto;
+      Telemetry.log("secondProto", secondProtoValue);
+    } finally {
+      CachedStructThing.struct = firstStruct;
+      CachedProtoThing.proto = firstProto;
+    }
+
+    MockTelemetryBackend.LogStructValue<?> structLog =
+        m_mock.getLastValue("/secondStruct", MockTelemetryBackend.LogStructValue.class);
+    assertEquals(secondStructValue, structLog.value());
+    assertSame(firstStruct, structLog.struct());
+
+    MockTelemetryBackend.LogProtobufValue<?> protoLog =
+        m_mock.getLastValue("/secondProto", MockTelemetryBackend.LogProtobufValue.class);
+    assertEquals(secondProtoValue, protoLog.value());
+    assertSame(firstProto, protoLog.protobuf());
   }
 
   @Test

@@ -17,10 +17,40 @@ import org.wpilib.util.struct.StructSerializable;
  * <p>For more advanced use cases, use the NetworkTables or DataLog APIs.
  */
 public final class TelemetryTable {
+  private record StaticFieldLookup(Object value, String warning) {}
+
+  private static final ClassValue<StaticFieldLookup> s_structLookupCache =
+      new ClassValue<>() {
+        @Override
+        protected StaticFieldLookup computeValue(Class<?> type) {
+          return getStaticField(type, "struct");
+        }
+      };
+
+  private static final ClassValue<StaticFieldLookup> s_protoLookupCache =
+      new ClassValue<>() {
+        @Override
+        protected StaticFieldLookup computeValue(Class<?> type) {
+          return getStaticField(type, "proto");
+        }
+      };
+
   private final String m_path;
   private final ConcurrentMap<String, TelemetryTable> m_tablesMap = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, TelemetryEntry> m_entriesMap = new ConcurrentHashMap<>();
   private String m_type;
+
+  private static StaticFieldLookup getStaticField(Class<?> type, String fieldName) {
+    try {
+      return new StaticFieldLookup(type.getField(fieldName).get(null), null);
+    } catch (NoSuchFieldException e) {
+      return new StaticFieldLookup(
+          null, "could not get " + fieldName + " field for " + type.getName());
+    } catch (IllegalAccessException e) {
+      return new StaticFieldLookup(
+          null, "could not access " + fieldName + " field for " + type.getName());
+    }
+  }
 
   /**
    * Constructs a telemetry table.
@@ -154,20 +184,12 @@ public final class TelemetryTable {
         }
       }
       case StructSerializable v -> {
-        // use introspection to get "struct" static variable
-        Object obj;
-        try {
-          obj = v.getClass().getField("struct").get(null);
-        } catch (NoSuchFieldException e) {
-          TelemetryRegistry.reportWarning(
-              m_path + name, "could not get struct field for " + v.getClass().getName());
-          return;
-        } catch (IllegalAccessException e) {
-          TelemetryRegistry.reportWarning(
-              m_path + name, "could not access struct field for " + v.getClass().getName());
+        var lookup = s_structLookupCache.get(v.getClass());
+        if (lookup.warning() != null) {
+          TelemetryRegistry.reportWarning(m_path + name, lookup.warning());
           return;
         }
-        switch (obj) {
+        switch (lookup.value()) {
           case Struct<?> s when s.getTypeClass().equals(value.getClass()) -> {
             @SuppressWarnings("unchecked")
             Struct<T> s2 = (Struct<T>) s;
@@ -188,20 +210,12 @@ public final class TelemetryTable {
         }
       }
       case ProtobufSerializable v -> {
-        // use introspection to get "proto" static variable
-        Object obj;
-        try {
-          obj = v.getClass().getField("proto").get(null);
-        } catch (NoSuchFieldException e) {
-          TelemetryRegistry.reportWarning(
-              m_path + name, "could not get proto field for " + v.getClass().getName());
-          return;
-        } catch (IllegalAccessException e) {
-          TelemetryRegistry.reportWarning(
-              m_path + name, "could not access proto field for " + v.getClass().getName());
+        var lookup = s_protoLookupCache.get(v.getClass());
+        if (lookup.warning() != null) {
+          TelemetryRegistry.reportWarning(m_path + name, lookup.warning());
           return;
         }
-        switch (obj) {
+        switch (lookup.value()) {
           case Protobuf<?, ?> s when s.getTypeClass().equals(value.getClass()) -> {
             @SuppressWarnings("unchecked")
             Protobuf<T, ?> s2 = (Protobuf<T, ?>) s;
@@ -273,23 +287,14 @@ public final class TelemetryTable {
   public <T> void log(String name, T[] value) {
     switch (value) {
       case StructSerializable[] v -> {
-        // use introspection to get "struct" static variable
-        Object obj;
-        try {
-          obj = value.getClass().getComponentType().getField("struct").get(null);
-        } catch (NoSuchFieldException e) {
-          TelemetryRegistry.reportWarning(
-              m_path + name,
-              "could not get struct field for " + value.getClass().getComponentType().getName());
-          return;
-        } catch (IllegalAccessException e) {
-          TelemetryRegistry.reportWarning(
-              m_path + name,
-              "could not access struct field for " + value.getClass().getComponentType().getName());
+        Class<?> componentType = value.getClass().getComponentType();
+        var lookup = s_structLookupCache.get(componentType);
+        if (lookup.warning() != null) {
+          TelemetryRegistry.reportWarning(m_path + name, lookup.warning());
           return;
         }
-        switch (obj) {
-          case Struct<?> s when s.getTypeClass().equals(value.getClass().getComponentType()) -> {
+        switch (lookup.value()) {
+          case Struct<?> s when s.getTypeClass().equals(componentType) -> {
             @SuppressWarnings("unchecked")
             Struct<T> s2 = (Struct<T>) s;
             log(name, value, s2);
@@ -305,9 +310,7 @@ public final class TelemetryTable {
           default ->
               TelemetryRegistry.reportWarning(
                   m_path + name,
-                  "struct field for "
-                      + value.getClass().getComponentType().getName()
-                      + " is not of Struct<?> type");
+                  "struct field for " + componentType.getName() + " is not of Struct<?> type");
         }
       }
       case Boolean[] v -> {
