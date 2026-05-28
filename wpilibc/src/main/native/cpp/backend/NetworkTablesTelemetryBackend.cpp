@@ -8,6 +8,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 
@@ -128,11 +129,13 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
   }
 
   void LogInt16Array(std::span<const int16_t> value) override {
-    // TODO
+    std::vector<int64_t> arr{value.begin(), value.end()};
+    LogInt64Array(arr);
   }
 
   void LogInt32Array(std::span<const int32_t> value) override {
-    // TODO
+    std::vector<int64_t> arr{value.begin(), value.end()};
+    LogInt64Array(arr);
   }
 
   void LogInt64Array(std::span<const int64_t> value) override {
@@ -180,7 +183,12 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
   }
 
   void LogStringArray(std::span<const std::string_view> value) override {
-    // TODO
+    std::vector<std::string> arr;
+    arr.reserve(value.size());
+    for (auto&& val : value) {
+      arr.emplace_back(val);
+    }
+    LogStringArray(arr);
   }
 
   void LogRaw(std::span<const uint8_t> value,

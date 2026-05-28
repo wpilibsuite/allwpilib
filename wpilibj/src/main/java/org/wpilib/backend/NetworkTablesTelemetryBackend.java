@@ -378,12 +378,20 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logShortArray(short[] value) {
-      // TODO
+      long[] arr = new long[value.length];
+      for (int i = 0; i < value.length; i++) {
+        arr[i] = value[i];
+      }
+      logLongArray(arr);
     }
 
     @Override
     public void logIntArray(int[] value) {
-      // TODO
+      long[] arr = new long[value.length];
+      for (int i = 0; i < value.length; i++) {
+        arr[i] = value[i];
+      }
+      logLongArray(arr);
     }
 
     @Override
