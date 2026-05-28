@@ -204,72 +204,77 @@ public abstract class Tunable<T> extends TunableBase implements Supplier<T>, Con
    */
   public static <T> Tunable<T> createConfig(T initialValue, TunableConfig config) {
     Objects.requireNonNull(initialValue);
-    if (initialValue instanceof StructSerializable v) {
-      // use introspection to get "struct" static variable
-      Object obj;
-      try {
-        obj = v.getClass().getField("struct").get(null);
-      } catch (NoSuchFieldException e) {
-        TunableRegistry.reportWarning("could not get struct field for " + v.getClass().getName());
-        return createBasic(initialValue, config);
-      } catch (IllegalAccessException e) {
-        TunableRegistry.reportWarning(
-            "could not access struct field for " + v.getClass().getName());
-        return createBasic(initialValue, config);
-      }
-      if (obj instanceof Struct<?> s) {
-        if (s.getTypeClass().equals(initialValue.getClass())) {
-          @SuppressWarnings("unchecked")
-          Struct<T> s2 = (Struct<T>) s;
-          return createConfig(initialValue, s2, config);
-        } else {
+    switch (initialValue) {
+      case StructSerializable v -> {
+        // use introspection to get "struct" static variable
+        Object obj;
+        try {
+          obj = v.getClass().getField("struct").get(null);
+        } catch (NoSuchFieldException e) {
+          TunableRegistry.reportWarning("could not get struct field for " + v.getClass().getName());
+          return createBasic(initialValue, config);
+        } catch (IllegalAccessException e) {
           TunableRegistry.reportWarning(
-              "type mismatch, expected '"
-                  + s.getTypeClass().getName()
-                  + "', got '"
-                  + initialValue.getClass().getName()
-                  + "'");
+              "could not access struct field for " + v.getClass().getName());
+          return createBasic(initialValue, config);
         }
-      } else {
-        TunableRegistry.reportWarning(
-            "struct field for " + v.getClass().getName() + " is not of Struct<?> type");
+        switch (obj) {
+          case Struct<?> s when s.getTypeClass().equals(initialValue.getClass()) -> {
+            @SuppressWarnings("unchecked")
+            Struct<T> s2 = (Struct<T>) s;
+            return createConfig(initialValue, s2, config);
+          }
+          case Struct<?> s ->
+              TunableRegistry.reportWarning(
+                  "type mismatch, expected '"
+                      + s.getTypeClass().getName()
+                      + "', got '"
+                      + initialValue.getClass().getName()
+                      + "'");
+          default ->
+              TunableRegistry.reportWarning(
+                  "struct field for " + v.getClass().getName() + " is not of Struct<?> type");
+        }
       }
-    } else if (initialValue instanceof ProtobufSerializable v) {
-      // use introspection to get "proto" static variable
-      Object obj;
-      try {
-        obj = v.getClass().getField("proto").get(null);
-      } catch (NoSuchFieldException e) {
-        TunableRegistry.reportWarning("could not get proto field for " + v.getClass().getName());
-        return createBasic(initialValue, config);
-      } catch (IllegalAccessException e) {
-        TunableRegistry.reportWarning("could not access proto field for " + v.getClass().getName());
-        return createBasic(initialValue, config);
-      }
-      if (obj instanceof Protobuf<?, ?> s) {
-        if (s.getTypeClass().equals(initialValue.getClass())) {
-          @SuppressWarnings("unchecked")
-          Protobuf<T, ?> s2 = (Protobuf<T, ?>) s;
-          return createConfig(initialValue, s2, config);
-        } else {
+      case ProtobufSerializable v -> {
+        // use introspection to get "proto" static variable
+        Object obj;
+        try {
+          obj = v.getClass().getField("proto").get(null);
+        } catch (NoSuchFieldException e) {
+          TunableRegistry.reportWarning("could not get proto field for " + v.getClass().getName());
+          return createBasic(initialValue, config);
+        } catch (IllegalAccessException e) {
           TunableRegistry.reportWarning(
-              "type mismatch, expected '"
-                  + s.getTypeClass().getName()
-                  + "', got '"
-                  + initialValue.getClass().getName()
-                  + "'");
+              "could not access proto field for " + v.getClass().getName());
+          return createBasic(initialValue, config);
         }
-      } else {
-        TunableRegistry.reportWarning(
-            "proto field for " + v.getClass().getName() + " is not of Protobuf<?, ?> type");
+        switch (obj) {
+          case Protobuf<?, ?> s when s.getTypeClass().equals(initialValue.getClass()) -> {
+            @SuppressWarnings("unchecked")
+            Protobuf<T, ?> s2 = (Protobuf<T, ?>) s;
+            return createConfig(initialValue, s2, config);
+          }
+          case Protobuf<?, ?> s ->
+              TunableRegistry.reportWarning(
+                  "type mismatch, expected '"
+                      + s.getTypeClass().getName()
+                      + "', got '"
+                      + initialValue.getClass().getName()
+                      + "'");
+          default ->
+              TunableRegistry.reportWarning(
+                  "proto field for " + v.getClass().getName() + " is not of Protobuf<?, ?> type");
+        }
       }
-    } else {
-      // try other handlers
-      var handler = TunableRegistry.getTypeHandler(initialValue);
-      if (handler != null) {
-        Tunable<T> tunable = handler.createTunable(initialValue, config);
-        if (tunable != null) {
-          return tunable;
+      default -> {
+        // try other handlers
+        var handler = TunableRegistry.getTypeHandler(initialValue);
+        if (handler != null) {
+          Tunable<T> tunable = handler.createTunable(initialValue, config);
+          if (tunable != null) {
+            return tunable;
+          }
         }
       }
     }

@@ -133,108 +133,108 @@ public final class TelemetryTable {
    * @param value the value
    */
   public <T> void log(String name, T value) {
-    if (value instanceof TelemetryLoggable v) {
-      TelemetryTable table = getTable(name);
-      String typeString = v.getTelemetryType();
-      boolean setType = false;
-      if (typeString != null) {
-        synchronized (table) {
-          if (table.m_type == null) {
-            setType = true;
-          } else if (!table.m_type.equals(typeString)) {
-            table.typeMismatch(typeString);
-            return;
+    switch (value) {
+      case TelemetryLoggable v -> {
+        TelemetryTable table = getTable(name);
+        String typeString = v.getTelemetryType();
+        boolean setType = false;
+        if (typeString != null) {
+          synchronized (table) {
+            if (table.m_type == null) {
+              setType = true;
+            } else if (!table.m_type.equals(typeString)) {
+              table.typeMismatch(typeString);
+              return;
+            }
           }
         }
-      }
-      v.logTo(table);
-      if (setType) {
-        table.setType(typeString);
-      }
-    } else if (value instanceof StructSerializable v) {
-      // use introspection to get "struct" static variable
-      Object obj;
-      try {
-        obj = v.getClass().getField("struct").get(null);
-      } catch (NoSuchFieldException e) {
-        TelemetryRegistry.reportWarning(
-            m_path + name, "could not get struct field for " + v.getClass().getName());
-        return;
-      } catch (IllegalAccessException e) {
-        TelemetryRegistry.reportWarning(
-            m_path + name, "could not access struct field for " + v.getClass().getName());
-        return;
-      }
-      if (obj instanceof Struct<?> s) {
-        if (s.getTypeClass().equals(value.getClass())) {
-          @SuppressWarnings("unchecked")
-          Struct<T> s2 = (Struct<T>) s;
-          log(name, value, s2);
-        } else {
-          TelemetryRegistry.reportWarning(
-              m_path + name,
-              "type mismatch, expected '"
-                  + s.getTypeClass().getName()
-                  + "', got '"
-                  + value.getClass().getName()
-                  + "'");
+        v.logTo(table);
+        if (setType) {
+          table.setType(typeString);
         }
-      } else {
-        TelemetryRegistry.reportWarning(
-            m_path + name,
-            "struct field for " + v.getClass().getName() + " is not of Struct<?> type");
       }
-    } else if (value instanceof ProtobufSerializable v) {
-      // use introspection to get "proto" static variable
-      Object obj;
-      try {
-        obj = v.getClass().getField("proto").get(null);
-      } catch (NoSuchFieldException e) {
-        TelemetryRegistry.reportWarning(
-            m_path + name, "could not get proto field for " + v.getClass().getName());
-        return;
-      } catch (IllegalAccessException e) {
-        TelemetryRegistry.reportWarning(
-            m_path + name, "could not access proto field for " + v.getClass().getName());
-        return;
-      }
-      if (obj instanceof Protobuf<?, ?> s) {
-        if (s.getTypeClass().equals(value.getClass())) {
-          @SuppressWarnings("unchecked")
-          Protobuf<T, ?> s2 = (Protobuf<T, ?>) s;
-          log(name, value, s2);
-        } else {
+      case StructSerializable v -> {
+        // use introspection to get "struct" static variable
+        Object obj;
+        try {
+          obj = v.getClass().getField("struct").get(null);
+        } catch (NoSuchFieldException e) {
           TelemetryRegistry.reportWarning(
-              m_path + name,
-              "type mismatch, expected '"
-                  + s.getTypeClass().getName()
-                  + "', got '"
-                  + value.getClass().getName()
-                  + "'");
+              m_path + name, "could not get struct field for " + v.getClass().getName());
+          return;
+        } catch (IllegalAccessException e) {
+          TelemetryRegistry.reportWarning(
+              m_path + name, "could not access struct field for " + v.getClass().getName());
+          return;
         }
-      } else {
-        TelemetryRegistry.reportWarning(
-            m_path + name,
-            "proto field for " + v.getClass().getName() + " is not of Protobuf<?, ?> type");
+        switch (obj) {
+          case Struct<?> s when s.getTypeClass().equals(value.getClass()) -> {
+            @SuppressWarnings("unchecked")
+            Struct<T> s2 = (Struct<T>) s;
+            log(name, value, s2);
+          }
+          case Struct<?> s ->
+              TelemetryRegistry.reportWarning(
+                  m_path + name,
+                  "type mismatch, expected '"
+                      + s.getTypeClass().getName()
+                      + "', got '"
+                      + value.getClass().getName()
+                      + "'");
+          default ->
+              TelemetryRegistry.reportWarning(
+                  m_path + name,
+                  "struct field for " + v.getClass().getName() + " is not of Struct<?> type");
+        }
       }
-    } else if (value instanceof Boolean v) {
-      log(name, v.booleanValue());
-    } else if (value instanceof Float v) {
-      log(name, v.floatValue());
-    } else if (value instanceof Double v) {
-      log(name, v.doubleValue());
-    } else if (value instanceof Number v) {
-      log(name, v.longValue());
-    } else if (value instanceof String v) {
-      log(name, v);
-    } else {
-      // try other handlers
-      var handler = TelemetryRegistry.getTypeHandler(value);
-      if (handler != null) {
-        handler.logTo(this, name, value);
-      } else {
-        // fall back to string
-        log(name, value.toString());
+      case ProtobufSerializable v -> {
+        // use introspection to get "proto" static variable
+        Object obj;
+        try {
+          obj = v.getClass().getField("proto").get(null);
+        } catch (NoSuchFieldException e) {
+          TelemetryRegistry.reportWarning(
+              m_path + name, "could not get proto field for " + v.getClass().getName());
+          return;
+        } catch (IllegalAccessException e) {
+          TelemetryRegistry.reportWarning(
+              m_path + name, "could not access proto field for " + v.getClass().getName());
+          return;
+        }
+        switch (obj) {
+          case Protobuf<?, ?> s when s.getTypeClass().equals(value.getClass()) -> {
+            @SuppressWarnings("unchecked")
+            Protobuf<T, ?> s2 = (Protobuf<T, ?>) s;
+            log(name, value, s2);
+          }
+          case Protobuf<?, ?> s ->
+              TelemetryRegistry.reportWarning(
+                  m_path + name,
+                  "type mismatch, expected '"
+                      + s.getTypeClass().getName()
+                      + "', got '"
+                      + value.getClass().getName()
+                      + "'");
+          default ->
+              TelemetryRegistry.reportWarning(
+                  m_path + name,
+                  "proto field for " + v.getClass().getName() + " is not of Protobuf<?, ?> type");
+        }
+      }
+      case Boolean v -> log(name, v.booleanValue());
+      case Float v -> log(name, v.floatValue());
+      case Double v -> log(name, v.doubleValue());
+      case Number v -> log(name, v.longValue());
+      case String v -> log(name, v);
+      default -> {
+        // try other handlers
+        var handler = TelemetryRegistry.getTypeHandler(value);
+        if (handler != null) {
+          handler.logTo(this, name, value);
+        } else {
+          // fall back to string
+          log(name, value.toString());
+        }
       }
     }
   }
@@ -271,75 +271,82 @@ public final class TelemetryTable {
    * @param value the value
    */
   public <T> void log(String name, T[] value) {
-    if (value instanceof StructSerializable[] v) {
-      // use introspection to get "struct" static variable
-      Object obj;
-      try {
-        obj = value.getClass().getComponentType().getField("struct").get(null);
-      } catch (NoSuchFieldException e) {
-        TelemetryRegistry.reportWarning(
-            m_path + name,
-            "could not get struct field for " + value.getClass().getComponentType().getName());
-        return;
-      } catch (IllegalAccessException e) {
-        TelemetryRegistry.reportWarning(
-            m_path + name,
-            "could not access struct field for " + value.getClass().getComponentType().getName());
-        return;
-      }
-      if (obj instanceof Struct<?> s) {
-        if (s.getTypeClass().equals(value.getClass().getComponentType())) {
-          @SuppressWarnings("unchecked")
-          Struct<T> s2 = (Struct<T>) s;
-          log(name, value, s2);
-        } else {
+    switch (value) {
+      case StructSerializable[] v -> {
+        // use introspection to get "struct" static variable
+        Object obj;
+        try {
+          obj = value.getClass().getComponentType().getField("struct").get(null);
+        } catch (NoSuchFieldException e) {
           TelemetryRegistry.reportWarning(
               m_path + name,
-              "type mismatch, expected '"
-                  + s.getTypeClass().getName()
-                  + "', got '"
-                  + value.getClass().getName()
-                  + "'");
+              "could not get struct field for " + value.getClass().getComponentType().getName());
+          return;
+        } catch (IllegalAccessException e) {
+          TelemetryRegistry.reportWarning(
+              m_path + name,
+              "could not access struct field for " + value.getClass().getComponentType().getName());
+          return;
         }
-      } else {
-        TelemetryRegistry.reportWarning(
-            m_path + name,
-            "struct field for "
-                + value.getClass().getComponentType().getName()
-                + " is not of Struct<?> type");
+        switch (obj) {
+          case Struct<?> s when s.getTypeClass().equals(value.getClass().getComponentType()) -> {
+            @SuppressWarnings("unchecked")
+            Struct<T> s2 = (Struct<T>) s;
+            log(name, value, s2);
+          }
+          case Struct<?> s ->
+              TelemetryRegistry.reportWarning(
+                  m_path + name,
+                  "type mismatch, expected '"
+                      + s.getTypeClass().getName()
+                      + "', got '"
+                      + value.getClass().getName()
+                      + "'");
+          default ->
+              TelemetryRegistry.reportWarning(
+                  m_path + name,
+                  "struct field for "
+                      + value.getClass().getComponentType().getName()
+                      + " is not of Struct<?> type");
+        }
       }
-    } else if (value instanceof Boolean[] v) {
-      boolean[] arr = new boolean[v.length];
-      for (int i = 0; i < v.length; i++) {
-        arr[i] = v[i].booleanValue();
+      case Boolean[] v -> {
+        boolean[] arr = new boolean[v.length];
+        for (int i = 0; i < v.length; i++) {
+          arr[i] = v[i].booleanValue();
+        }
+        log(name, arr);
       }
-      log(name, arr);
-    } else if (value instanceof Float[] v) {
-      float[] arr = new float[v.length];
-      for (int i = 0; i < v.length; i++) {
-        arr[i] = v[i].floatValue();
+      case Float[] v -> {
+        float[] arr = new float[v.length];
+        for (int i = 0; i < v.length; i++) {
+          arr[i] = v[i].floatValue();
+        }
+        log(name, arr);
       }
-      log(name, arr);
-    } else if (value instanceof Double[] v) {
-      double[] arr = new double[v.length];
-      for (int i = 0; i < v.length; i++) {
-        arr[i] = v[i].doubleValue();
+      case Double[] v -> {
+        double[] arr = new double[v.length];
+        for (int i = 0; i < v.length; i++) {
+          arr[i] = v[i].doubleValue();
+        }
+        log(name, arr);
       }
-      log(name, arr);
-    } else if (value instanceof Number[] v) {
-      long[] arr = new long[v.length];
-      for (int i = 0; i < v.length; i++) {
-        arr[i] = v[i].longValue();
+      case Number[] v -> {
+        long[] arr = new long[v.length];
+        for (int i = 0; i < v.length; i++) {
+          arr[i] = v[i].longValue();
+        }
+        log(name, arr);
       }
-      log(name, arr);
-    } else {
-      // TODO: use other Object handler?
-      // fall back to string array
-      String[] strs = new String[value.length];
-      for (int i = 0; i < value.length; i++) {
-        strs[i] = value[i].toString();
+      default -> {
+        // TODO: use other Object handler?
+        // fall back to string array
+        String[] strs = new String[value.length];
+        for (int i = 0; i < value.length; i++) {
+          strs[i] = value[i].toString();
+        }
+        log(name, strs);
       }
-      log(name, strs);
     }
   }
 

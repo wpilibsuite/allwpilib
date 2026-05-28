@@ -85,6 +85,25 @@ class TelemetryTableTest {
         new MockProtobuf<>(ProtoThing.class);
   }
 
+  public record LoggableStructProtoThing(int value)
+      implements TelemetryLoggable, StructSerializable, ProtobufSerializable {
+    public static final Struct<LoggableStructProtoThing> struct =
+        new MockStruct<>(LoggableStructProtoThing.class);
+    public static final Protobuf<LoggableStructProtoThing, ProtoMessage<?>> proto =
+        new MockProtobuf<>(LoggableStructProtoThing.class);
+
+    @Override
+    public void logTo(TelemetryTable table) {
+      table.log("selected", "loggable");
+    }
+  }
+
+  public record StructProtoThing(int value) implements StructSerializable, ProtobufSerializable {
+    public static final Struct<StructProtoThing> struct = new MockStruct<>(StructProtoThing.class);
+    public static final Protobuf<StructProtoThing, ProtoMessage<?>> proto =
+        new MockProtobuf<>(StructProtoThing.class);
+  }
+
   private static class MockStruct<T> implements Struct<T> {
     private final Class<T> m_cls;
 
@@ -360,6 +379,31 @@ class TelemetryTableTest {
         m_mock
             .getLastValue("/explicitStructArray", MockTelemetryBackend.LogStructArrayValue.class)
             .struct());
+  }
+
+  @Test
+  void testMultiSerializationDispatchPrecedence() {
+    LoggableStructProtoThing loggableStructProtoValue = new LoggableStructProtoThing(1);
+    StructProtoThing structProtoValue = new StructProtoThing(2);
+
+    Telemetry.log("loggableStructProto", loggableStructProtoValue);
+    Telemetry.log("structProto", structProtoValue);
+
+    assertEquals(
+        "loggable",
+        m_mock
+            .getLastValue(
+                "/loggableStructProto/selected", MockTelemetryBackend.LogStringValue.class)
+            .value());
+    assertNull(
+        m_mock.getLastValue("/loggableStructProto", MockTelemetryBackend.LogStructValue.class));
+    assertNull(
+        m_mock.getLastValue("/loggableStructProto", MockTelemetryBackend.LogProtobufValue.class));
+
+    var structLog = m_mock.getLastValue("/structProto", MockTelemetryBackend.LogStructValue.class);
+    assertEquals(structProtoValue, structLog.value());
+    assertSame(StructProtoThing.struct, structLog.struct());
+    assertNull(m_mock.getLastValue("/structProto", MockTelemetryBackend.LogProtobufValue.class));
   }
 
   @Test
