@@ -12,8 +12,8 @@
 #include "wpi/system/RobotController.hpp"
 
 Drivetrain::Drivetrain() {
-  leftLeader.AddFollower(leftFollower);
-  rightLeader.AddFollower(rightFollower);
+  leftFollower.Follow(leftLeader);
+  rightFollower.Follow(rightLeader);
 
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's

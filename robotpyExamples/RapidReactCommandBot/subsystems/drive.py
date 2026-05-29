@@ -57,8 +57,8 @@ class Drive(Subsystem):
             DriveConstants.kS, DriveConstants.kV, DriveConstants.kA
         )
 
-        self.leftLeader.addFollower(self.leftFollower)
-        self.rightLeader.addFollower(self.rightFollower)
+        self.leftFollower.follow(self.leftLeader)
+        self.rightLeader.follow(self.rightFollower)
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's

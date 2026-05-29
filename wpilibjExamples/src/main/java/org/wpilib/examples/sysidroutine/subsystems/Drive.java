@@ -20,15 +20,14 @@ import org.wpilib.system.RobotController;
 
 public class Drive extends SubsystemBase {
   // The motors on the left side of the drive.
-  private final PWMSparkMax leftMotor = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
+  private final PWMSparkMax leftLeader = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
 
   // The motors on the right side of the drive.
-  private final PWMSparkMax rightMotor = new PWMSparkMax(DriveConstants.kRightMotor1Port);
+  private final PWMSparkMax rightLeader = new PWMSparkMax(DriveConstants.kRightMotor1Port);
 
   // The robot's drive
   private final DifferentialDrive drive =
-      new DifferentialDrive(leftMotor::setThrottle, rightMotor::setThrottle);
-
+      new DifferentialDrive(leftLeader::setThrottle, rightLeader::setThrottle);
   // The left-side drive encoder
   private final Encoder leftEncoder =
       new Encoder(
@@ -51,8 +50,8 @@ public class Drive extends SubsystemBase {
           new SysIdRoutine.Mechanism(
               // Tell SysId how to plumb the driving voltage to the motors.
               voltage -> {
-                leftMotor.setVoltage(voltage);
-                rightMotor.setVoltage(voltage);
+                leftLeader.setVoltage(voltage);
+                rightLeader.setVoltage(voltage);
               },
               // Tell SysId how to record a frame of data for each motor on the mechanism being
               // characterized.
@@ -61,14 +60,14 @@ public class Drive extends SubsystemBase {
                 // the entire group to be one motor.
                 log.motor("drive-left")
                     .voltage(
-                        Volts.of(leftMotor.getThrottle() * RobotController.getBatteryVoltage()))
+                        Volts.of(leftLeader.getThrottle() * RobotController.getBatteryVoltage()))
                     .linearPosition(Meters.of(leftEncoder.getDistance()))
                     .linearVelocity(MetersPerSecond.of(leftEncoder.getRate()));
                 // Record a frame for the right motors.  Since these share an encoder, we consider
                 // the entire group to be one motor.
                 log.motor("drive-right")
                     .voltage(
-                        Volts.of(rightMotor.getThrottle() * RobotController.getBatteryVoltage()))
+                        Volts.of(rightLeader.getThrottle() * RobotController.getBatteryVoltage()))
                     .linearPosition(Meters.of(rightEncoder.getDistance()))
                     .linearVelocity(MetersPerSecond.of(rightEncoder.getRate()));
               },
@@ -79,13 +78,13 @@ public class Drive extends SubsystemBase {
   /** Creates a new Drive subsystem. */
   public Drive() {
     // Add the second motors on each side of the drivetrain
-    leftMotor.addFollower(new PWMSparkMax(DriveConstants.kLeftMotor2Port));
-    rightMotor.addFollower(new PWMSparkMax(DriveConstants.kRightMotor2Port));
+    new PWMSparkMax(DriveConstants.kLeftMotor2Port).follow(leftLeader);
+    new PWMSparkMax(DriveConstants.kRightMotor2Port).follow(rightLeader);
 
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    rightMotor.setInverted(true);
+    rightLeader.setInverted(true);
 
     // Sets the distance per pulse for the encoders
     leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);

@@ -22,8 +22,8 @@ class Robot : public wpi::TimedRobot {
     // other side
     rightLeader.SetInverted(true);
     // Configure the followers to follow the leaders
-    leftLeader.AddFollower(leftFollower);
-    rightLeader.AddFollower(rightFollower);
+    leftFollower.Follow(leftLeader);
+    rightFollower.Follow(rightLeader);
   }
   void AutonomousPeriodic() override {
     // Drives forward at half velocity until the robot has moved 5 feet, then

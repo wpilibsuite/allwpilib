@@ -4,12 +4,9 @@
 
 #pragma once
 
-#include <concepts>
 #include <memory>
 #include <string>
 #include <string_view>
-#include <type_traits>
-#include <utility>
 #include <vector>
 
 #include "wpi/hal/SimDevice.hpp"
@@ -70,21 +67,12 @@ class PWMMotorController
   void EnableDeadbandElimination(bool eliminateDeadband);
 
   /**
-   * Make the given PWM motor controller follow the output of this one.
+   * Make the this PWM motor controller follow the output of the given one.
    *
-   * @param follower The motor controller follower.
+   * @param leader The motor controller to follow.
    */
-  void AddFollower(PWMMotorController& follower);
-
-  /**
-   * Make the given PWM motor controller follow the output of this one.
-   *
-   * @param follower The motor controller follower.
-   */
-  template <std::derived_from<PWMMotorController> T>
-  void AddFollower(T&& follower) {
-    m_owningFollowers.emplace_back(
-        std::make_unique<std::decay_t<T>>(std::forward<T>(follower)));
+  void Follow(PWMMotorController& leader) & {
+    leader.m_nonowningFollowers.push_back(this);
   }
 
  protected:

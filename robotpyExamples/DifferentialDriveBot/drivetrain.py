@@ -26,8 +26,8 @@ class Drivetrain:
         self.rightFollower = wpilib.PWMSparkMax(4)
 
         # Make sure both motors for each side are in the same group
-        self.leftLeader.addFollower(self.leftFollower)
-        self.rightLeader.addFollower(self.rightFollower)
+        self.leftFollower.follow(self.leftLeader)
+        self.rightFollower.follow(self.rightLeader)
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's

@@ -18,8 +18,8 @@ DriveSubsystem::DriveSubsystem()
   wpi::util::SendableRegistry::AddChild(&drive, &left1);
   wpi::util::SendableRegistry::AddChild(&drive, &right1);
 
-  left1.AddFollower(left2);
-  right1.AddFollower(right2);
+  left2.Follow(left1);
+  right2.Follow(right1);
 
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's

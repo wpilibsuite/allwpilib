@@ -17,8 +17,8 @@ class DriveSubsystem(commands2.Subsystem):
         self.right1 = wpilib.PWMVictorSPX(constants.kRightMotor1Port)
         self.right2 = wpilib.PWMVictorSPX(constants.kRightMotor2Port)
 
-        self.left1.addFollower(self.left2)
-        self.right1.addFollower(self.right2)
+        self.left2.follow(self.left1)
+        self.right2.follow(self.right1)
 
         # We need to invert one side of the drivetrain so that positive velocities
         # result in both sides moving forward. Depending on how your robot's

@@ -24,12 +24,13 @@ class Drive : public wpi::cmd::SubsystemBase {
   wpi::cmd::CommandPtr SysIdDynamic(wpi::cmd::sysid::Direction direction);
 
  private:
-  wpi::PWMSparkMax leftMotor{constants::drive::kLeftMotor1Port};
-  wpi::PWMSparkMax rightMotor{constants::drive::kRightMotor1Port};
+  wpi::PWMSparkMax leftLeader{constants::drive::kLeftMotor1Port};
+  wpi::PWMSparkMax rightLeader{constants::drive::kRightMotor1Port};
+  wpi::PWMSparkMax leftFollower{constants::drive::kLeftMotor2Port};
+  wpi::PWMSparkMax rightFollower{constants::drive::kRightMotor2Port};
   wpi::DifferentialDrive drive{
-      [this](auto val) { leftMotor.SetThrottle(val); },
-      [this](auto val) { rightMotor.SetThrottle(val); }};
-
+      [this](auto val) { leftLeader.SetThrottle(val); },
+      [this](auto val) { rightLeader.SetThrottle(val); }};
   wpi::Encoder leftEncoder{constants::drive::kLeftEncoderPorts[0],
                            constants::drive::kLeftEncoderPorts[1],
                            constants::drive::kLeftEncoderReversed};
@@ -43,18 +44,18 @@ class Drive : public wpi::cmd::SubsystemBase {
                               nullptr},
       wpi::cmd::sysid::Mechanism{
           [this](wpi::units::volt_t driveVoltage) {
-            leftMotor.SetVoltage(driveVoltage);
-            rightMotor.SetVoltage(driveVoltage);
+            leftLeader.SetVoltage(driveVoltage);
+            rightLeader.SetVoltage(driveVoltage);
           },
           [this](wpi::sysid::SysIdRoutineLog* log) {
             log->Motor("drive-left")
-                .voltage(leftMotor.GetThrottle() *
+                .voltage(leftLeader.GetThrottle() *
                          wpi::RobotController::GetBatteryVoltage())
                 .position(wpi::units::meter_t{leftEncoder.GetDistance()})
                 .velocity(
                     wpi::units::meters_per_second_t{leftEncoder.GetRate()});
             log->Motor("drive-right")
-                .voltage(rightMotor.GetThrottle() *
+                .voltage(rightLeader.GetThrottle() *
                          wpi::RobotController::GetBatteryVoltage())
                 .position(wpi::units::meter_t{rightEncoder.GetDistance()})
                 .velocity(

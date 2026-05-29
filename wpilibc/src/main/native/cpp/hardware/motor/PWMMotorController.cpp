@@ -77,10 +77,6 @@ void PWMMotorController::EnableDeadbandElimination(bool eliminateDeadband) {
   m_eliminateDeadband = eliminateDeadband;
 }
 
-void PWMMotorController::AddFollower(PWMMotorController& follower) {
-  m_nonowningFollowers.emplace_back(&follower);
-}
-
 PWMMotorController::PWMMotorController(std::string_view name, int channel)
     : m_pwm(channel, false) {
   wpi::util::SendableRegistry::Add(this, name, channel);

@@ -22,7 +22,7 @@ class MotorController;
  * These drive bases typically have drop-center / skid-steer with two or more
  * wheels per side (e.g., 6WD or 8WD). This class takes a setter per side. For
  * four and six motor drivetrains, use CAN motor controller followers or
- * PWMMotorController::AddFollower().
+ * PWMMotorController::Follow().
  *
  * A differential drive robot has left and right wheels separated by an
  * arbitrary width.
@@ -73,7 +73,7 @@ class DifferentialDrive : public RobotDriveBase,
    * Construct a DifferentialDrive.
    *
    * To pass multiple motors per side, use CAN motor controller followers or
-   * PWMMotorController::AddFollower(). If a motor needs to be inverted, do so
+   * PWMMotorController::Follow(). If a motor needs to be inverted, do so
    * before passing it in.
    *
    * @param leftMotor Left motor.
@@ -85,7 +85,7 @@ class DifferentialDrive : public RobotDriveBase,
    * Construct a DifferentialDrive.
    *
    * To pass multiple motors per side, use CAN motor controller followers or
-   * PWMMotorController::AddFollower(). If a motor needs to be inverted, do so
+   * PWMMotorController::Follow(). If a motor needs to be inverted, do so
    * before passing it in.
    *
    * @param leftMotor Left motor setter.
