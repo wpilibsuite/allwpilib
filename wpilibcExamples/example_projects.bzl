@@ -58,6 +58,7 @@ SNIPPET_FOLDERS = [
     "AnalogPotentiometer",
     "AprilTagsVision",
     "CANPDP",
+    "DifferentialDrive",
     "DigitalCommunication",
     "DigitalInput",
     "DutyCycleEncoder",
