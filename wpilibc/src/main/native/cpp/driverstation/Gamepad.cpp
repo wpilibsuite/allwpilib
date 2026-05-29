@@ -58,68 +58,68 @@ BooleanEvent Gamepad::RightTrigger(EventLoop* loop) const {
   return this->RightTrigger(0.5, loop);
 }
 
-bool Gamepad::GetSouthFaceButton() const {
-  return GetButton(Button::SOUTH_FACE);
+bool Gamepad::GetFaceDownButton() const {
+  return GetButton(Button::FACE_DOWN);
 }
 
-bool Gamepad::GetSouthFaceButtonPressed() {
-  return GetButtonPressed(Button::SOUTH_FACE);
+bool Gamepad::GetFaceDownButtonPressed() {
+  return GetButtonPressed(Button::FACE_DOWN);
 }
 
-bool Gamepad::GetSouthFaceButtonReleased() {
-  return GetButtonReleased(Button::SOUTH_FACE);
+bool Gamepad::GetFaceDownButtonReleased() {
+  return GetButtonReleased(Button::FACE_DOWN);
 }
 
-BooleanEvent Gamepad::SouthFace(EventLoop* loop) const {
-  return BooleanEvent(loop, [this]() { return this->GetSouthFaceButton(); });
+BooleanEvent Gamepad::FaceDown(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetFaceDownButton(); });
 }
 
-bool Gamepad::GetEastFaceButton() const {
-  return GetButton(Button::EAST_FACE);
+bool Gamepad::GetFaceRightButton() const {
+  return GetButton(Button::FACE_RIGHT);
 }
 
-bool Gamepad::GetEastFaceButtonPressed() {
-  return GetButtonPressed(Button::EAST_FACE);
+bool Gamepad::GetFaceRightButtonPressed() {
+  return GetButtonPressed(Button::FACE_RIGHT);
 }
 
-bool Gamepad::GetEastFaceButtonReleased() {
-  return GetButtonReleased(Button::EAST_FACE);
+bool Gamepad::GetFaceRightButtonReleased() {
+  return GetButtonReleased(Button::FACE_RIGHT);
 }
 
-BooleanEvent Gamepad::EastFace(EventLoop* loop) const {
-  return BooleanEvent(loop, [this]() { return this->GetEastFaceButton(); });
+BooleanEvent Gamepad::FaceRight(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetFaceRightButton(); });
 }
 
-bool Gamepad::GetWestFaceButton() const {
-  return GetButton(Button::WEST_FACE);
+bool Gamepad::GetFaceLeftButton() const {
+  return GetButton(Button::FACE_LEFT);
 }
 
-bool Gamepad::GetWestFaceButtonPressed() {
-  return GetButtonPressed(Button::WEST_FACE);
+bool Gamepad::GetFaceLeftButtonPressed() {
+  return GetButtonPressed(Button::FACE_LEFT);
 }
 
-bool Gamepad::GetWestFaceButtonReleased() {
-  return GetButtonReleased(Button::WEST_FACE);
+bool Gamepad::GetFaceLeftButtonReleased() {
+  return GetButtonReleased(Button::FACE_LEFT);
 }
 
-BooleanEvent Gamepad::WestFace(EventLoop* loop) const {
-  return BooleanEvent(loop, [this]() { return this->GetWestFaceButton(); });
+BooleanEvent Gamepad::FaceLeft(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetFaceLeftButton(); });
 }
 
-bool Gamepad::GetNorthFaceButton() const {
-  return GetButton(Button::NORTH_FACE);
+bool Gamepad::GetFaceUpButton() const {
+  return GetButton(Button::FACE_UP);
 }
 
-bool Gamepad::GetNorthFaceButtonPressed() {
-  return GetButtonPressed(Button::NORTH_FACE);
+bool Gamepad::GetFaceUpButtonPressed() {
+  return GetButtonPressed(Button::FACE_UP);
 }
 
-bool Gamepad::GetNorthFaceButtonReleased() {
-  return GetButtonReleased(Button::NORTH_FACE);
+bool Gamepad::GetFaceUpButtonReleased() {
+  return GetButtonReleased(Button::FACE_UP);
 }
 
-BooleanEvent Gamepad::NorthFace(EventLoop* loop) const {
-  return BooleanEvent(loop, [this]() { return this->GetNorthFaceButton(); });
+BooleanEvent Gamepad::FaceUp(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetFaceUpButton(); });
 }
 
 bool Gamepad::GetBackButton() const {
@@ -534,16 +534,16 @@ void Gamepad::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.AddDoubleProperty(
       "RightY", [this] { return GetAxisForSendable(Axis::RIGHT_Y); }, nullptr);
   builder.AddBooleanProperty(
-      "SouthFace", [this] { return GetButtonForSendable(Button::SOUTH_FACE); },
+      "FaceDown", [this] { return GetButtonForSendable(Button::FACE_DOWN); },
       nullptr);
   builder.AddBooleanProperty(
-      "EastFace", [this] { return GetButtonForSendable(Button::EAST_FACE); },
+      "FaceRight", [this] { return GetButtonForSendable(Button::FACE_RIGHT); },
       nullptr);
   builder.AddBooleanProperty(
-      "WestFace", [this] { return GetButtonForSendable(Button::WEST_FACE); },
+      "FaceLeft", [this] { return GetButtonForSendable(Button::FACE_LEFT); },
       nullptr);
   builder.AddBooleanProperty(
-      "NorthFace", [this] { return GetButtonForSendable(Button::NORTH_FACE); },
+      "FaceUp", [this] { return GetButtonForSendable(Button::FACE_UP); },
       nullptr);
   builder.AddBooleanProperty(
       "Back", [this] { return GetButtonForSendable(Button::BACK); }, nullptr);

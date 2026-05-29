@@ -49,23 +49,54 @@ if (OperatingSystem.current().isWindows()) {
             }
         }
 
-        def x64ZipTask = tasks.create('x64RuntimeZip', Zip) {
-            destinationDirectory = outputsFolder
-            archiveBaseName = zipBaseName
-            archiveClassifier = 'x64'
+        def x64ZipTask = null
 
-            from x64Folder
+        if (x64Folder != null) {
+            x64ZipTask = tasks.create('x64RuntimeZip', Zip) {
+                destinationDirectory = outputsFolder
+                archiveBaseName = zipBaseName
+                archiveClassifier = 'x64'
+
+                from x64Folder
+            }
+
+            addTaskToCopyAllOutputs(x64ZipTask)
+            build.dependsOn x64ZipTask
         }
 
-        addTaskToCopyAllOutputs(x64ZipTask)
+        def arm64Folder = null
+        file("$runtimeLocation\\arm64").eachFile {
+            if (it.name.endsWith('.CRT')) {
+                arm64Folder = it
+            }
+        }
 
-        build.dependsOn x64ZipTask
+        def arm64ZipTask = null
+
+        if (arm64Folder != null) {
+            arm64ZipTask = tasks.create('arm64RuntimeZip', Zip) {
+                destinationDirectory = outputsFolder
+                archiveBaseName = zipBaseName
+                archiveClassifier = 'arm64'
+
+                from arm64Folder
+            }
+
+            addTaskToCopyAllOutputs(arm64ZipTask)
+            build.dependsOn arm64ZipTask
+        }
 
         publishing {
             publications {
 
                 runtime(MavenPublication) {
-                    artifact x64ZipTask
+                    if (x64ZipTask != null) {
+                        artifact x64ZipTask
+                    }
+
+                    if (arm64ZipTask != null) {
+                        artifact arm64ZipTask
+                    }
 
                     artifactId = "${baseArtifactId}"
                     groupId = artifactGroupId

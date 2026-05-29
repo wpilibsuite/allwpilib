@@ -17,27 +17,27 @@ void SysIdRoutineBot::ConfigureBindings() {
 
   // Using bumpers as a modifier and combining it with the buttons so that we
   // can have both sets of bindings at once
-  (driverController.SouthFace() && driverController.RightBumper())
+  (driverController.FaceDown() && driverController.RightBumper())
       .WhileTrue(drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::kForward));
-  (driverController.EastFace() && driverController.RightBumper())
+  (driverController.FaceRight() && driverController.RightBumper())
       .WhileTrue(drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::kReverse));
-  (driverController.WestFace() && driverController.RightBumper())
+  (driverController.FaceLeft() && driverController.RightBumper())
       .WhileTrue(drive.SysIdDynamic(wpi::cmd::sysid::Direction::kForward));
-  (driverController.NorthFace() && driverController.RightBumper())
+  (driverController.FaceUp() && driverController.RightBumper())
       .WhileTrue(drive.SysIdDynamic(wpi::cmd::sysid::Direction::kReverse));
 
   shooter.SetDefaultCommand(shooter.RunShooterCommand(
       [this] { return driverController.GetLeftTriggerAxis(); }));
 
-  (driverController.SouthFace() && driverController.LeftBumper())
+  (driverController.FaceDown() && driverController.LeftBumper())
       .WhileTrue(
           shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::kForward));
-  (driverController.EastFace() && driverController.LeftBumper())
+  (driverController.FaceRight() && driverController.LeftBumper())
       .WhileTrue(
           shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::kReverse));
-  (driverController.WestFace() && driverController.LeftBumper())
+  (driverController.FaceLeft() && driverController.LeftBumper())
       .WhileTrue(shooter.SysIdDynamic(wpi::cmd::sysid::Direction::kForward));
-  (driverController.NorthFace() && driverController.LeftBumper())
+  (driverController.FaceUp() && driverController.LeftBumper())
       .WhileTrue(shooter.SysIdDynamic(wpi::cmd::sysid::Direction::kReverse));
 }
 

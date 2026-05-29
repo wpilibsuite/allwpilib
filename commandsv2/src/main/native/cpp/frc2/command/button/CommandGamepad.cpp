@@ -20,20 +20,20 @@ Trigger CommandGamepad::Button(enum wpi::Gamepad::Button button,
   return CommandGenericHID::Button(static_cast<int>(button), loop);
 }
 
-Trigger CommandGamepad::SouthFace(wpi::EventLoop* loop) const {
-  return Button(wpi::Gamepad::Button::SOUTH_FACE, loop);
+Trigger CommandGamepad::FaceDown(wpi::EventLoop* loop) const {
+  return Button(wpi::Gamepad::Button::FACE_DOWN, loop);
 }
 
-Trigger CommandGamepad::EastFace(wpi::EventLoop* loop) const {
-  return Button(wpi::Gamepad::Button::EAST_FACE, loop);
+Trigger CommandGamepad::FaceRight(wpi::EventLoop* loop) const {
+  return Button(wpi::Gamepad::Button::FACE_RIGHT, loop);
 }
 
-Trigger CommandGamepad::WestFace(wpi::EventLoop* loop) const {
-  return Button(wpi::Gamepad::Button::WEST_FACE, loop);
+Trigger CommandGamepad::FaceLeft(wpi::EventLoop* loop) const {
+  return Button(wpi::Gamepad::Button::FACE_LEFT, loop);
 }
 
-Trigger CommandGamepad::NorthFace(wpi::EventLoop* loop) const {
-  return Button(wpi::Gamepad::Button::NORTH_FACE, loop);
+Trigger CommandGamepad::FaceUp(wpi::EventLoop* loop) const {
+  return Button(wpi::Gamepad::Button::FACE_UP, loop);
 }
 
 Trigger CommandGamepad::Back(wpi::EventLoop* loop) const {

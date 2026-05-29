@@ -180,7 +180,6 @@ cc_test(
     size = "small",
     srcs = glob(["src/test/native/cpp/**"]),
     tags = [
-        "no-asan",
         "no-tsan",
         "no-ubsan",
     ],

@@ -64,7 +64,7 @@ int StartRobot() {
   if (!WPI_IsRuntimeValid(&foundMajor, &foundMinor, &expectedMajor,
                           &expectedMinor, &runtimePath)) {
     // We could make this error better, however unlike Java, there is only a
-    // single scenario that could be occuring. The entirety of VS is too out
+    // single scenario that could be occurring. The entirety of VS is too out
     // of date. In most cases the linker should detect this, but not always.
     fmt::println(
         "Your copy of Visual Studio is out of date. Please update it.\n");
