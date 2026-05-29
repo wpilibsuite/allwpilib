@@ -127,14 +127,14 @@ Trigger CommandGamepad::Misc6(wpi::EventLoop* loop) const {
 Trigger CommandGamepad::LeftTrigger(double threshold,
                                     wpi::EventLoop* loop) const {
   return Trigger(loop, [this, threshold] {
-    return m_hid.GetLeftTriggerAxis() > threshold;
+    return m_hid.GetAxis(wpi::Gamepad::Axis::LEFT_TRIGGER) > threshold;
   });
 }
 
 Trigger CommandGamepad::RightTrigger(double threshold,
                                      wpi::EventLoop* loop) const {
   return Trigger(loop, [this, threshold] {
-    return m_hid.GetRightTriggerAxis() > threshold;
+    return m_hid.GetAxis(wpi::Gamepad::Axis::RIGHT_TRIGGER) > threshold;
   });
 }
 

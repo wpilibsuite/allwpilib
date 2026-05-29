@@ -8,6 +8,7 @@ import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 
@@ -23,6 +24,8 @@ import org.wpilib.util.sendable.SendableBuilder;
  * party controllers.
  */
 public class Gamepad extends GenericHID implements Sendable {
+  private static final double MAX_DEADBAND = Math.nextDown(1.0);
+
   /** Represents a digital button on a Gamepad. */
   public enum Button {
     /** Face Down button. */
@@ -139,6 +142,20 @@ public class Gamepad extends GenericHID implements Sendable {
     }
   }
 
+  private double m_leftXDeadband = 0.1;
+  private double m_leftYDeadband = 0.1;
+  private double m_rightXDeadband = 0.1;
+  private double m_rightYDeadband = 0.1;
+  private double m_leftTriggerDeadband = 0.01;
+  private double m_rightTriggerDeadband = 0.01;
+
+  private static double clampDeadband(double deadband) {
+    if (Double.isNaN(deadband)) {
+      return 0.0;
+    }
+    return Math.clamp(deadband, 0.0, MAX_DEADBAND);
+  }
+
   /**
    * Construct an instance of a controller.
    *
@@ -150,49 +167,125 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
+   * Set the deadband for the left X axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setLeftXDeadband(double deadband) {
+    m_leftXDeadband = clampDeadband(deadband);
+  }
+
+  /**
+   * Set the deadband for the left Y axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setLeftYDeadband(double deadband) {
+    m_leftYDeadband = clampDeadband(deadband);
+  }
+
+  /**
+   * Set the deadband for the right X axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setRightXDeadband(double deadband) {
+    m_rightXDeadband = clampDeadband(deadband);
+  }
+
+  /**
+   * Set the deadband for the right Y axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setRightYDeadband(double deadband) {
+    m_rightYDeadband = clampDeadband(deadband);
+  }
+
+  /**
+   * Set the deadband for the left trigger axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setLeftTriggerDeadband(double deadband) {
+    m_leftTriggerDeadband = clampDeadband(deadband);
+  }
+
+  /**
+   * Set the deadband for the right trigger axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setRightTriggerDeadband(double deadband) {
+    m_rightTriggerDeadband = clampDeadband(deadband);
+  }
+
+  /**
    * Get the X axis value of left side of the controller. Right is positive.
+   *
+   * <p>A deadband of 0.1 is applied by default. Use {@link #setLeftXDeadband} to change it.
    *
    * @return The axis value.
    */
   public double getLeftX() {
-    return getAxis(Axis.LEFT_X);
+    return MathUtil.applyDeadband(getAxis(Axis.LEFT_X), m_leftXDeadband);
   }
 
   /**
    * Get the Y axis value of left side of the controller. Back is positive.
    *
+   * <p>A deadband of 0.1 is applied by default. Use {@link #setLeftYDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getLeftY() {
-    return getAxis(Axis.LEFT_Y);
+    return MathUtil.applyDeadband(getAxis(Axis.LEFT_Y), m_leftYDeadband);
   }
 
   /**
    * Get the X axis value of right side of the controller. Right is positive.
    *
+   * <p>A deadband of 0.1 is applied by default. Use {@link #setRightXDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getRightX() {
-    return getAxis(Axis.RIGHT_X);
+    return MathUtil.applyDeadband(getAxis(Axis.RIGHT_X), m_rightXDeadband);
   }
 
   /**
    * Get the Y axis value of right side of the controller. Back is positive.
    *
+   * <p>A deadband of 0.1 is applied by default. Use {@link #setRightYDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getRightY() {
-    return getAxis(Axis.RIGHT_Y);
+    return MathUtil.applyDeadband(getAxis(Axis.RIGHT_Y), m_rightYDeadband);
   }
 
   /**
    * Get the left trigger axis value of the controller. Note that this axis is bound to the range of
    * [0, 1] as opposed to the usual [-1, 1].
    *
+   * <p>A deadband of 0.01 is applied by default. Use {@link #setLeftTriggerDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getLeftTriggerAxis() {
-    return getAxis(Axis.LEFT_TRIGGER);
+    return MathUtil.applyDeadband(getAxis(Axis.LEFT_TRIGGER), m_leftTriggerDeadband);
   }
 
   /**
@@ -225,10 +318,12 @@ public class Gamepad extends GenericHID implements Sendable {
    * Get the right trigger axis value of the controller. Note that this axis is bound to the range
    * of [0, 1] as opposed to the usual [-1, 1].
    *
+   * <p>A deadband of 0.01 is applied by default. Use {@link #setRightTriggerDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getRightTriggerAxis() {
-    return getAxis(Axis.RIGHT_TRIGGER);
+    return MathUtil.applyDeadband(getAxis(Axis.RIGHT_TRIGGER), m_rightTriggerDeadband);
   }
 
   /**

@@ -15,11 +15,11 @@ Subject: [PATCH 10/10] Use operator() instead of multidimensional array
  7 files changed, 135 insertions(+), 135 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/hessian.hpp b/include/sleipnir/autodiff/hessian.hpp
-index 2a8087eda23f49f8c01be35d5289568644a9742d..c48e01c7b89d80db8032f6d2e492a0ec1bfa9f42 100644
+index d9d25a00251dd31e446bd0419f0c13e8f2456f2d..39cd798160ff272aeac4b12c92edee3f2a213a22 100644
 --- a/include/sleipnir/autodiff/hessian.hpp
 +++ b/include/sleipnir/autodiff/hessian.hpp
-@@ -100,9 +100,9 @@ class Hessian {
-       auto grad = m_graphs[row].generate_tree(m_wrt);
+@@ -111,9 +111,9 @@ class Hessian {
+       auto grad = detail::gradient_tree(m_top_lists[row], m_wrt);
        for (int col = 0; col < m_wrt.rows(); ++col) {
          if (grad[col].expr != nullptr) {
 -          result[row, col] = std::move(grad[col]);
@@ -31,11 +31,11 @@ index 2a8087eda23f49f8c01be35d5289568644a9742d..c48e01c7b89d80db8032f6d2e492a0ec
        }
      }
 diff --git a/include/sleipnir/autodiff/jacobian.hpp b/include/sleipnir/autodiff/jacobian.hpp
-index 7a5c3798dab50f14db35bee430f1d5e8e32196ff..1a5b01de99a7c011ebf8c5ed9fc64942675fcb4b 100644
+index f97b5737c8fc007299bb4a1dbe5b057c1e3645de..b202f776d00feb5eaa0703796d226ab52f89aad5 100644
 --- a/include/sleipnir/autodiff/jacobian.hpp
 +++ b/include/sleipnir/autodiff/jacobian.hpp
-@@ -104,9 +104,9 @@ class Jacobian {
-       auto grad = m_graphs[row].generate_tree(m_wrt);
+@@ -114,9 +114,9 @@ class Jacobian {
+       auto grad = detail::gradient_tree(m_top_lists[row], m_wrt);
        for (int col = 0; col < m_wrt.rows(); ++col) {
          if (grad[col].expr != nullptr) {
 -          result[row, col] = std::move(grad[col]);
@@ -47,10 +47,10 @@ index 7a5c3798dab50f14db35bee430f1d5e8e32196ff..1a5b01de99a7c011ebf8c5ed9fc64942
        }
      }
 diff --git a/include/sleipnir/autodiff/variable.hpp b/include/sleipnir/autodiff/variable.hpp
-index 3d3b355f9fef7d5b6b57521317f67041e0fb1ad6..130a4f057ea08ab0565b54f8a3556bd81fbc6825 100644
+index 5f32d7ea16864ad9a4fdcc4b067ef7dff2e9027d..5d7b56de884cdb73fc9f08fcfa1982b252bdd88e 100644
 --- a/include/sleipnir/autodiff/variable.hpp
 +++ b/include/sleipnir/autodiff/variable.hpp
-@@ -68,7 +68,7 @@ class Variable : public SleipnirBase {
+@@ -73,7 +73,7 @@ class Variable : public SleipnirBase {
    ///
    /// @param value The value of the Variable.
    // NOLINTNEXTLINE (google-explicit-constructor)
@@ -59,7 +59,7 @@ index 3d3b355f9fef7d5b6b57521317f67041e0fb1ad6..130a4f057ea08ab0565b54f8a3556bd8
      slp_assert(value.rows() == 1 && value.cols() == 1);
    }
  
-@@ -725,7 +725,7 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
+@@ -733,7 +733,7 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
    for (int row = 0; row < rhs.rows(); ++row) {
      for (int col = 0; col < rhs.cols(); ++col) {
        // Make right-hand side zero
@@ -68,7 +68,7 @@ index 3d3b355f9fef7d5b6b57521317f67041e0fb1ad6..130a4f057ea08ab0565b54f8a3556bd8
      }
    }
  
-@@ -741,7 +741,7 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
+@@ -749,7 +749,7 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
    for (int row = 0; row < lhs.rows(); ++row) {
      for (int col = 0; col < lhs.cols(); ++col) {
        // Make right-hand side zero
@@ -77,7 +77,7 @@ index 3d3b355f9fef7d5b6b57521317f67041e0fb1ad6..130a4f057ea08ab0565b54f8a3556bd8
      }
    }
  
-@@ -759,7 +759,7 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
+@@ -767,7 +767,7 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
    for (int row = 0; row < lhs.rows(); ++row) {
      for (int col = 0; col < lhs.cols(); ++col) {
        // Make right-hand side zero
@@ -388,7 +388,7 @@ index 4018606df45941b578c861caf934495f8c9e368e..cf554832b82adb17b4b1d7b56842a77d
      }
  
 diff --git a/include/sleipnir/autodiff/variable_matrix.hpp b/include/sleipnir/autodiff/variable_matrix.hpp
-index b5d15edc5b294a2ea50dca15a7612c61e5f2680b..02bccb660474d9380444f5e20124fb687e372982 100644
+index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c7449d109 100644
 --- a/include/sleipnir/autodiff/variable_matrix.hpp
 +++ b/include/sleipnir/autodiff/variable_matrix.hpp
 @@ -154,7 +154,7 @@ class VariableMatrix : public SleipnirBase {

@@ -334,6 +334,17 @@
     "robotclass": "Robot"
   },
   {
+    "name": "Differential Drive",
+    "description": "Show differential drive control with tank, arcade, and curvature drive in teleop",
+    "tags": [
+      "Differential Drive",
+      "Gamepad"
+    ],
+    "foldername": "differentialdrive",
+    "gradlebase": "java",
+    "robotclass": "Robot"
+  },
+  {
     "name": "Mecanum Drive",
     "description": "Show mecanum drive control with cartesian and polar drive in teleop.",
     "tags": [
