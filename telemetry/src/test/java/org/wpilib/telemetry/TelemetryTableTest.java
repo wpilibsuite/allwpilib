@@ -65,6 +65,20 @@ class TelemetryTableTest {
     }
   }
 
+  private static final class ThrowingToString {
+    @Override
+    public String toString() {
+      throw new UnsupportedOperationException("toString should not run");
+    }
+  }
+
+  private static final class ThrowingLoggable implements TelemetryLoggable {
+    @Override
+    public void logTo(TelemetryTable table) {
+      throw new UnsupportedOperationException("logTo should not run");
+    }
+  }
+
   public record StructThing(double x, int y) implements StructSerializable {
     public static final Struct<StructThing> struct = new MockStruct<>(StructThing.class);
   }
@@ -502,6 +516,27 @@ class TelemetryTableTest {
 
     assertNull(m_mock.getLastValue("/drive/speed", Double.class));
     assertEquals(2.0, driveMock.getLastValue("/drive/speed", Double.class));
+  }
+
+  @Test
+  void testDiscardBackendSkipsTelemetryWorkAndCacheResets() {
+    TelemetryRegistry.registerBackend("/discard", new DiscardTelemetryBackend());
+    TelemetryTable discard = Telemetry.getTable("discard");
+
+    discard.keepDuplicates("dups");
+    discard.setProperty("prop", "unit", "\"count\"");
+    discard.log("object", new ThrowingToString());
+    discard.log("objectArray", new Object[] {new ThrowingToString()});
+    discard.log("loggable", new ThrowingLoggable());
+    discard.log("primitive", 1.0);
+    discard.log("raw", new byte[] {1, 2, 3});
+
+    assertTrue(m_mock.getActions().isEmpty());
+
+    TelemetryRegistry.registerBackend("/discard", m_mock);
+    discard.log("primitive", 2.0);
+
+    assertEquals(2.0, m_mock.getLastValue("/discard/primitive", Double.class));
   }
 
   @Test

@@ -13,6 +13,8 @@ using namespace wpi;
 namespace {
 class Entry : public TelemetryEntry {
  public:
+  bool IsDiscard() const override { return true; }
+
   void KeepDuplicates() override {}
 
   void SetProperty(std::string_view key, std::string_view value) override {}

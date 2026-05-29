@@ -140,6 +140,10 @@ class TelemetryTable final {
   template <typename T, typename... I>
     requires(!impl::IsSpan<T>)
   void Log(std::string_view name, const T& value, I... info) {
+    TelemetryEntry& entry = GetEntry(name);
+    if (entry.IsDiscard()) {
+      return;
+    }
     if constexpr (SupportsTelemetryWithTypeName<T, I...>) {
       auto& table = GetTable(name);
       auto typeString = GetTelemetryTypeName(value, info...);
@@ -163,7 +167,16 @@ class TelemetryTable final {
     } else if constexpr (SupportsTelemetryValue<T, I...>) {
       LogValueTo(*this, name, value, info...);
     } else if constexpr (std::constructible_from<std::string_view, T>) {
-      Log(name, std::string_view{value}, info...);
+      if constexpr (sizeof...(I) == 0) {
+        entry.LogString(std::string_view{value}, "string");
+      } else if constexpr (sizeof...(I) == 1 &&
+                           (std::constructible_from<std::string_view, I> &&
+                            ...)) {
+        entry.LogString(std::string_view{value}, std::string_view{info...});
+      } else {
+        static_assert(impl::always_false<T>::value,
+                      "Don't know how to serialize type");
+      }
     } else if constexpr (impl::IsSpanConvertible<T>) {
       if constexpr (impl::HasValueType<T>) {
         using V = typename std::remove_cvref_t<T>::value_type;
@@ -181,14 +194,14 @@ class TelemetryTable final {
         if constexpr (wpi::util::is_constexpr([] { S::GetSize(); })) {
           uint8_t buf[S::GetSize()];
           S::Pack(buf, value);
-          Log(name, std::span{buf}, wpi::util::GetStructTypeString<T>());
+          entry.LogRaw(std::span{buf}, wpi::util::GetStructTypeString<T>());
           return;
         }
       }
       wpi::util::SmallVector<uint8_t, 128> buf;
       buf.resize_for_overwrite(S::GetSize(info...));
       S::Pack(buf, value, info...);
-      Log(name, std::span{buf}, wpi::util::GetStructTypeString<T>(info...));
+      entry.LogRaw(std::span{buf}, wpi::util::GetStructTypeString<T>(info...));
     } else if constexpr (wpi::util::ProtobufSerializable<T>) {
       auto backend =
           TelemetryRegistry::GetBackend(fmt::format("{}{}", m_path, name));
@@ -196,13 +209,13 @@ class TelemetryTable final {
       TelemetryRegistry::AddProtobufSchema<T>(*backend, msg);
       wpi::util::SmallVector<uint8_t, 128> buf;
       msg.Pack(buf, value);
-      Log(name, buf, msg.GetTypeString());
+      entry.LogRaw(buf, msg.GetTypeString());
     } else if constexpr (std::integral<T>) {
-      Log(name, static_cast<int64_t>(value));
+      entry.LogInt64(static_cast<int64_t>(value));
     } else if constexpr (std::floating_point<T>) {
-      Log(name, static_cast<double>(value));
+      entry.LogDouble(static_cast<double>(value));
     } else if constexpr (std::constructible_from<fmt::formatter<T>>) {
-      Log(name, std::string_view{fmt::to_string(value)});
+      entry.LogString(fmt::to_string(value), "string");
     } else {
       static_assert(impl::always_false<T>::value,
                     "Don't know how to serialize type");
@@ -218,30 +231,34 @@ class TelemetryTable final {
    */
   template <typename T, typename... I>
   void Log(std::string_view name, std::span<const T> value, I... info) {
+    TelemetryEntry& entry = GetEntry(name);
+    if (entry.IsDiscard()) {
+      return;
+    }
     using U = std::remove_cv_t<T>;
     if constexpr (std::same_as<U, bool>) {
-      GetEntry(name).LogBooleanArray(value);
+      entry.LogBooleanArray(value);
     } else if constexpr (std::same_as<U, int16_t>) {
-      GetEntry(name).LogInt16Array(value);
+      entry.LogInt16Array(value);
     } else if constexpr (std::same_as<U, int32_t>) {
-      GetEntry(name).LogInt32Array(value);
+      entry.LogInt32Array(value);
     } else if constexpr (std::same_as<U, int64_t>) {
-      GetEntry(name).LogInt64Array(value);
+      entry.LogInt64Array(value);
     } else if constexpr (std::same_as<U, float>) {
-      GetEntry(name).LogFloatArray(value);
+      entry.LogFloatArray(value);
     } else if constexpr (std::same_as<U, double>) {
-      GetEntry(name).LogDoubleArray(value);
+      entry.LogDoubleArray(value);
     } else if constexpr (std::same_as<U, std::string>) {
-      GetEntry(name).LogStringArray(value);
+      entry.LogStringArray(value);
     } else if constexpr (std::same_as<U, std::string_view>) {
-      GetEntry(name).LogStringArray(value);
+      entry.LogStringArray(value);
     } else if constexpr (std::same_as<U, uint8_t>) {
       if constexpr (sizeof...(I) == 0) {
-        GetEntry(name).LogRaw(value, "raw");
+        entry.LogRaw(value, "raw");
       } else if constexpr (sizeof...(I) == 1 &&
                            (std::constructible_from<std::string_view, I> &&
                             ...)) {
-        GetEntry(name).LogRaw(value, std::string_view{info...});
+        entry.LogRaw(value, std::string_view{info...});
       } else {
         static_assert(impl::always_false<T>::value,
                       "Don't know how to serialize type");
@@ -254,7 +271,8 @@ class TelemetryTable final {
       buf.Write(
           value,
           [&](auto bytes) {
-            Log(name, bytes,
+            entry.LogRaw(
+                bytes,
                 fmt::format("{}[]",
                             std::string_view{
                                 wpi::util::GetStructTypeString<T>(info...)}));
@@ -266,7 +284,7 @@ class TelemetryTable final {
       for (auto&& v : value) {
         strings.emplace_back(fmt::to_string(v));
       }
-      Log(name, strings);
+      entry.LogStringArray(strings);
     } else {
       static_assert(impl::always_false<T>::value,
                     "Don't know how to serialize type");

@@ -145,7 +145,11 @@ public final class TelemetryTable {
    * @param name the name
    */
   public void keepDuplicates(String name) {
-    getEntry(name).keepDuplicates();
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.keepDuplicates();
   }
 
   /**
@@ -156,7 +160,11 @@ public final class TelemetryTable {
    * @param value property value
    */
   public void setProperty(String name, String key, String value) {
-    getEntry(name).setProperty(key, value);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.setProperty(key, value);
   }
 
   /**
@@ -167,6 +175,10 @@ public final class TelemetryTable {
    * @param value the value
    */
   public <T> void log(String name, T value) {
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
     switch (value) {
       case TelemetryLoggable v -> {
         TelemetryTable table = getTable(name);
@@ -197,7 +209,7 @@ public final class TelemetryTable {
           case Struct<?> s when s.getTypeClass().equals(value.getClass()) -> {
             @SuppressWarnings("unchecked")
             Struct<T> s2 = (Struct<T>) s;
-            log(name, value, s2);
+            entry.logStruct(value, s2);
           }
           case Struct<?> s ->
               TelemetryRegistry.reportWarning(
@@ -223,7 +235,7 @@ public final class TelemetryTable {
           case Protobuf<?, ?> s when s.getTypeClass().equals(value.getClass()) -> {
             @SuppressWarnings("unchecked")
             Protobuf<T, ?> s2 = (Protobuf<T, ?>) s;
-            log(name, value, s2);
+            entry.logProtobuf(value, s2);
           }
           case Protobuf<?, ?> s ->
               TelemetryRegistry.reportWarning(
@@ -239,11 +251,11 @@ public final class TelemetryTable {
                   "proto field for " + v.getClass().getName() + " is not of Protobuf<?, ?> type");
         }
       }
-      case Boolean v -> log(name, v.booleanValue());
-      case Float v -> log(name, v.floatValue());
-      case Double v -> log(name, v.doubleValue());
-      case Number v -> log(name, v.longValue());
-      case String v -> log(name, v);
+      case Boolean v -> entry.logBoolean(v.booleanValue());
+      case Float v -> entry.logFloat(v.floatValue());
+      case Double v -> entry.logDouble(v.doubleValue());
+      case Number v -> entry.logLong(v.longValue());
+      case String v -> entry.logString(v, "string");
       default -> {
         // try other handlers
         var handler = TelemetryRegistry.getTypeHandler(value);
@@ -251,7 +263,7 @@ public final class TelemetryTable {
           handler.logTo(this, name, value);
         } else {
           // fall back to string
-          log(name, value.toString());
+          entry.logString(value.toString(), "string");
         }
       }
     }
@@ -266,7 +278,11 @@ public final class TelemetryTable {
    * @param struct struct serializer
    */
   public <T> void log(String name, T value, Struct<T> struct) {
-    getEntry(name).logStruct(value, struct);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logStruct(value, struct);
   }
 
   /**
@@ -278,7 +294,11 @@ public final class TelemetryTable {
    * @param proto protobuf serializer
    */
   public <T> void log(String name, T value, Protobuf<T, ?> proto) {
-    getEntry(name).logProtobuf(value, proto);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logProtobuf(value, proto);
   }
 
   /**
@@ -289,6 +309,10 @@ public final class TelemetryTable {
    * @param value the value
    */
   public <T> void log(String name, T[] value) {
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
     switch (value) {
       case StructSerializable[] v -> {
         Class<?> componentType = value.getClass().getComponentType();
@@ -301,7 +325,7 @@ public final class TelemetryTable {
           case Struct<?> s when s.getTypeClass().equals(componentType) -> {
             @SuppressWarnings("unchecked")
             Struct<T> s2 = (Struct<T>) s;
-            log(name, value, s2);
+            entry.logStructArray(value, s2);
           }
           case Struct<?> s ->
               TelemetryRegistry.reportWarning(
@@ -322,28 +346,28 @@ public final class TelemetryTable {
         for (int i = 0; i < v.length; i++) {
           arr[i] = v[i].booleanValue();
         }
-        log(name, arr);
+        entry.logBooleanArray(arr);
       }
       case Float[] v -> {
         float[] arr = new float[v.length];
         for (int i = 0; i < v.length; i++) {
           arr[i] = v[i].floatValue();
         }
-        log(name, arr);
+        entry.logFloatArray(arr);
       }
       case Double[] v -> {
         double[] arr = new double[v.length];
         for (int i = 0; i < v.length; i++) {
           arr[i] = v[i].doubleValue();
         }
-        log(name, arr);
+        entry.logDoubleArray(arr);
       }
       case Number[] v -> {
         long[] arr = new long[v.length];
         for (int i = 0; i < v.length; i++) {
           arr[i] = v[i].longValue();
         }
-        log(name, arr);
+        entry.logLongArray(arr);
       }
       default -> {
         // TODO: use other Object handler?
@@ -352,7 +376,7 @@ public final class TelemetryTable {
         for (int i = 0; i < value.length; i++) {
           strs[i] = value[i].toString();
         }
-        log(name, strs);
+        entry.logStringArray(strs);
       }
     }
   }
@@ -366,7 +390,11 @@ public final class TelemetryTable {
    * @param struct struct serializer
    */
   public <T> void log(String name, T[] value, Struct<T> struct) {
-    getEntry(name).logStructArray(value, struct);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logStructArray(value, struct);
   }
 
   /**
@@ -376,7 +404,11 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, boolean value) {
-    getEntry(name).logBoolean(value);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logBoolean(value);
   }
 
   /**
@@ -386,7 +418,11 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, byte value) {
-    getEntry(name).logByte(value);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logByte(value);
   }
 
   /**
@@ -396,7 +432,11 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, short value) {
-    getEntry(name).logShort(value);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logShort(value);
   }
 
   /**
@@ -406,7 +446,11 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, int value) {
-    getEntry(name).logInt(value);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logInt(value);
   }
 
   /**
@@ -416,7 +460,11 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, long value) {
-    getEntry(name).logLong(value);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logLong(value);
   }
 
   /**
@@ -426,7 +474,11 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, float value) {
-    getEntry(name).logFloat(value);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logFloat(value);
   }
 
   /**
@@ -436,7 +488,11 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, double value) {
-    getEntry(name).logDouble(value);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logDouble(value);
   }
 
   /**
@@ -446,7 +502,11 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, String value) {
-    getEntry(name).logString(value, "string");
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logString(value, "string");
   }
 
   /**
@@ -457,7 +517,11 @@ public final class TelemetryTable {
    * @param typeString the type string
    */
   public void log(String name, String value, String typeString) {
-    getEntry(name).logString(value, typeString);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logString(value, typeString);
   }
 
   /**
@@ -467,7 +531,11 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, boolean[] value) {
-    getEntry(name).logBooleanArray(value);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logBooleanArray(value);
   }
 
   /**
@@ -477,7 +545,11 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, short[] value) {
-    getEntry(name).logShortArray(value);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logShortArray(value);
   }
 
   /**
@@ -487,7 +559,11 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, int[] value) {
-    getEntry(name).logIntArray(value);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logIntArray(value);
   }
 
   /**
@@ -497,7 +573,11 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, long[] value) {
-    getEntry(name).logLongArray(value);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logLongArray(value);
   }
 
   /**
@@ -507,7 +587,11 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, float[] value) {
-    getEntry(name).logFloatArray(value);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logFloatArray(value);
   }
 
   /**
@@ -517,7 +601,11 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, double[] value) {
-    getEntry(name).logDoubleArray(value);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logDoubleArray(value);
   }
 
   /**
@@ -527,7 +615,11 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, String[] value) {
-    getEntry(name).logStringArray(value);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logStringArray(value);
   }
 
   /**
@@ -537,7 +629,11 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, byte[] value) {
-    getEntry(name).logRaw(value, "raw");
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logRaw(value, "raw");
   }
 
   /**
@@ -548,6 +644,10 @@ public final class TelemetryTable {
    * @param typeString the type string
    */
   public void log(String name, byte[] value, String typeString) {
-    getEntry(name).logRaw(value, typeString);
+    TelemetryEntry entry = getEntry(name);
+    if (entry.isDiscard()) {
+      return;
+    }
+    entry.logRaw(value, typeString);
   }
 }

@@ -24,6 +24,13 @@ class TelemetryEntry {
   TelemetryEntry& operator=(const TelemetryEntry&) = delete;
 
   /**
+   * Checks if this entry discards data.
+   *
+   * @return True if this entry discards logged data
+   */
+  virtual bool IsDiscard() const { return false; }
+
+  /**
    * Indicates duplicate values should be preserved. Normally duplicate values
    * are ignored.
    */

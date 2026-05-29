@@ -12,6 +12,15 @@ import org.wpilib.util.struct.Struct;
  * the TelemetryTable class.
  */
 public interface TelemetryEntry {
+  /**
+   * Checks if this entry discards data.
+   *
+   * @return true if this entry discards logged data
+   */
+  default boolean isDiscard() {
+    return false;
+  }
+
   /** Indicates duplicate values should be preserved. Normally duplicate values are ignored. */
   void keepDuplicates();
 

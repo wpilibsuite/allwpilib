@@ -24,6 +24,11 @@ public class DiscardTelemetryBackend implements TelemetryBackend {
 
   private static final class Entry implements TelemetryEntry {
     @Override
+    public boolean isDiscard() {
+      return true;
+    }
+
+    @Override
     public void keepDuplicates() {}
 
     @Override

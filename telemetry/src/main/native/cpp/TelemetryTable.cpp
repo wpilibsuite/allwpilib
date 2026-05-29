@@ -61,96 +61,180 @@ TelemetryTable& TelemetryTable::GetTable(std::string_view name) const {
 }
 
 void TelemetryTable::KeepDuplicates(std::string_view name) {
-  GetEntry(name).KeepDuplicates();
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.KeepDuplicates();
 }
 
 void TelemetryTable::SetProperty(std::string_view name, std::string_view key,
                                  std::string_view value) {
-  GetEntry(name).SetProperty(key, value);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.SetProperty(key, value);
 }
 
 void TelemetryTable::Log(std::string_view name, bool value) {
-  GetEntry(name).LogBoolean(value);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogBoolean(value);
 }
 
 void TelemetryTable::Log(std::string_view name, int8_t value) {
-  GetEntry(name).LogInt8(value);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogInt8(value);
 }
 
 void TelemetryTable::Log(std::string_view name, int16_t value) {
-  GetEntry(name).LogInt16(value);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogInt16(value);
 }
 
 void TelemetryTable::Log(std::string_view name, int32_t value) {
-  GetEntry(name).LogInt32(value);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogInt32(value);
 }
 
 void TelemetryTable::Log(std::string_view name, int64_t value) {
-  GetEntry(name).LogInt64(value);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogInt64(value);
 }
 
 void TelemetryTable::Log(std::string_view name, float value) {
-  GetEntry(name).LogFloat(value);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogFloat(value);
 }
 
 void TelemetryTable::Log(std::string_view name, double value) {
-  GetEntry(name).LogDouble(value);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogDouble(value);
 }
 
 void TelemetryTable::Log(std::string_view name, std::string_view value) {
-  GetEntry(name).LogString(value, "string");
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogString(value, "string");
 }
 
 void TelemetryTable::Log(std::string_view name, std::string_view value,
                          std::string_view typeString) {
-  GetEntry(name).LogString(value, typeString);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogString(value, typeString);
 }
 
 void TelemetryTable::Log(std::string_view name, std::span<const bool> value) {
-  GetEntry(name).LogBooleanArray(value);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogBooleanArray(value);
 }
 
 void TelemetryTable::Log(std::string_view name,
                          std::span<const int16_t> value) {
-  GetEntry(name).LogInt16Array(value);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogInt16Array(value);
 }
 
 void TelemetryTable::Log(std::string_view name,
                          std::span<const int32_t> value) {
-  GetEntry(name).LogInt32Array(value);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogInt32Array(value);
 }
 
 void TelemetryTable::Log(std::string_view name,
                          std::span<const int64_t> value) {
-  GetEntry(name).LogInt64Array(value);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogInt64Array(value);
 }
 
 void TelemetryTable::Log(std::string_view name, std::span<const float> value) {
-  GetEntry(name).LogFloatArray(value);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogFloatArray(value);
 }
 
 void TelemetryTable::Log(std::string_view name, std::span<const double> value) {
-  GetEntry(name).LogDoubleArray(value);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogDoubleArray(value);
 }
 
 void TelemetryTable::Log(std::string_view name,
                          std::span<const std::string> value) {
-  GetEntry(name).LogStringArray(value);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogStringArray(value);
 }
 
 void TelemetryTable::Log(std::string_view name,
                          std::span<const std::string_view> value) {
-  GetEntry(name).LogStringArray(value);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogStringArray(value);
 }
 
 void TelemetryTable::Log(std::string_view name,
                          std::span<const uint8_t> value) {
-  GetEntry(name).LogRaw(value, "raw");
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogRaw(value, "raw");
 }
 
 void TelemetryTable::Log(std::string_view name, std::span<const uint8_t> value,
                          std::string_view typeString) {
-  GetEntry(name).LogRaw(value, typeString);
+  TelemetryEntry& entry = GetEntry(name);
+  if (entry.IsDiscard()) {
+    return;
+  }
+  entry.LogRaw(value, typeString);
 }
 
 TelemetryEntry& TelemetryTable::GetEntry(std::string_view name) {

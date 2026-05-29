@@ -9,6 +9,7 @@
 #include <array>
 #include <memory>
 #include <span>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -17,6 +18,7 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/telemetry/DiscardTelemetryBackend.hpp"
 #include "wpi/telemetry/MockTelemetryBackend.hpp"
 #include "wpi/telemetry/Telemetry.hpp"
 #include "wpi/telemetry/TelemetryRegistry.hpp"
@@ -84,6 +86,15 @@ struct StructPoint {
 struct Formattable {
   int value = 0;
 };
+
+struct ThrowingFormattable {};
+
+struct ThrowingLoggable : public wpi::TelemetryLoggable {
+  void LogTo(wpi::TelemetryTable& table) const override {
+    (void)table;
+    throw std::logic_error{"LogTo should not run"};
+  }
+};
 }  // namespace telemetrytest
 
 template <>
@@ -111,6 +122,17 @@ struct fmt::formatter<telemetrytest::Formattable> : fmt::formatter<int> {
   auto format(const telemetrytest::Formattable& value,
               format_context& ctx) const {
     return fmt::formatter<int>::format(value.value, ctx);
+  }
+};
+
+template <>
+struct fmt::formatter<telemetrytest::ThrowingFormattable>
+    : fmt::formatter<int> {
+  auto format(const telemetrytest::ThrowingFormattable& value,
+              format_context& ctx) const {
+    (void)value;
+    throw std::logic_error{"format should not run"};
+    return fmt::formatter<int>::format(0, ctx);
   }
 };
 
@@ -390,6 +412,33 @@ TEST_F(TelemetryTableTest, BackendPrefixSelectionAndCacheReset) {
 
   ASSERT_FALSE(mock->GetLastValue<double>("/drive/speed"));
   auto value = driveMock->GetLastValue<double>("/drive/speed");
+  ASSERT_TRUE(value);
+  ASSERT_EQ(*value, 2.0);
+}
+
+TEST_F(TelemetryTableTest, DiscardBackendSkipsTelemetryWorkAndCacheResets) {
+  wpi::TelemetryRegistry::RegisterBackend(
+      "/discard", std::make_shared<wpi::DiscardTelemetryBackend>());
+  auto& discard = wpi::Telemetry::GetTable("discard");
+
+  discard.KeepDuplicates("dups");
+  discard.SetProperty("prop", "unit", "\"count\"");
+  discard.Log("formattable", telemetrytest::ThrowingFormattable{});
+  std::array<telemetrytest::ThrowingFormattable, 1> formattableArray;
+  discard.Log(
+      "formattableArray",
+      std::span<const telemetrytest::ThrowingFormattable>{formattableArray});
+  discard.Log("loggable", telemetrytest::ThrowingLoggable{});
+  discard.Log("primitive", 1.0);
+  std::array<uint8_t, 3> raw{1, 2, 3};
+  discard.Log("raw", std::span<const uint8_t>{raw});
+
+  ASSERT_TRUE(mock->GetActions().empty());
+
+  wpi::TelemetryRegistry::RegisterBackend("/discard", mock);
+  discard.Log("primitive", 2.0);
+
+  auto value = mock->GetLastValue<double>("/discard/primitive");
   ASSERT_TRUE(value);
   ASSERT_EQ(*value, 2.0);
 }
