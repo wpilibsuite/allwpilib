@@ -220,10 +220,6 @@ Mechanism2d = "wpi/smartdashboard/Mechanism2d.hpp"
 MechanismLigament2d = "wpi/smartdashboard/MechanismLigament2d.hpp"
 MechanismObject2d = "wpi/smartdashboard/MechanismObject2d.hpp"
 MechanismRoot2d = "wpi/smartdashboard/MechanismRoot2d.hpp"
-SendableBuilderImpl = "wpi/smartdashboard/SendableBuilderImpl.hpp"
-SendableChooser = "wpi/smartdashboard/SendableChooser.hpp"
-SendableChooserBase = "wpi/smartdashboard/SendableChooserBase.hpp"
-SmartDashboard = "wpi/smartdashboard/SmartDashboard.hpp"
 
 # wpi/sysid
 SysIdRoutineLog = "wpi/sysid/SysIdRoutineLog.hpp"

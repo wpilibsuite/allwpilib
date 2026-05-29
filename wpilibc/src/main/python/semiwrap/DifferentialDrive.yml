@@ -1,11 +1,11 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
+- wpi/telemetry/TelemetryTable.hpp
 - wpi/hardware/motor/MotorController.hpp
 
 classes:
   wpi::DifferentialDrive:
     ignored_bases:
-    - wpi::util::SendableHelper<DifferentialDrive>
+    - wpi::TelemetryLoggable  # TODO(telemetry PR)
     methods:
       DifferentialDrive:
         overloads:
@@ -22,7 +22,8 @@ classes:
       TankDriveIK:
       StopMotor:
       GetDescription:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:
     doc: |
       A class for driving differential drive/skid-steer drive platforms such as
       the Kit of Parts drive base, "tank drive", or West Coast Drive.

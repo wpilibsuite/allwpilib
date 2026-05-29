@@ -1,0 +1,69 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "wpi/glass/networktables/NTSelectable.hpp"
+
+#include <utility>
+
+#include <fmt/format.h>
+
+#include "wpi/util/json.hpp"
+
+using namespace wpi::glass;
+
+NTSelectableModel::NTSelectableModel(std::string_view path)
+    : NTSelectableModel{wpi::nt::NetworkTableInstance::GetDefault(), path} {}
+
+NTSelectableModel::NTSelectableModel(wpi::nt::NetworkTableInstance inst,
+                                     std::string_view path)
+    : m_inst{inst},
+      m_default{
+          m_inst.GetStringTopic(fmt::format("{}/default", path)).Subscribe("")},
+      m_selected{m_inst.GetStringTopic(fmt::format("{}/selected/tune", path))
+                     .Subscribe("")},
+      m_selectedPub{m_inst.GetStringTopic(fmt::format("{}/selected/tune", path))
+                        .PublishEx(wpi::nt::StringTopic::TYPE_STRING,
+                                   wpi::util::json::object("retained", true))},
+      m_active{m_inst.GetStringTopic(fmt::format("{}/selected/value", path))
+                   .Subscribe("")},
+      m_options{m_inst.GetStringArrayTopic(fmt::format("{}/options", path))
+                    .Subscribe({})} {}
+
+void NTSelectableModel::SetSelected(std::string_view val) {
+  m_selectedPub.Set(val);
+}
+
+void NTSelectableModel::Update() {
+  if (!m_default.Exists()) {
+    m_defaultValue.clear();
+  }
+  for (auto&& v : m_default.ReadQueue()) {
+    m_defaultValue = std::move(v.value);
+  }
+
+  if (!m_selected.Exists()) {
+    m_selectedValue.clear();
+  }
+  for (auto&& v : m_selected.ReadQueue()) {
+    m_selectedValue = std::move(v.value);
+  }
+
+  if (!m_active.Exists()) {
+    m_activeValue.clear();
+  }
+  for (auto&& v : m_active.ReadQueue()) {
+    m_activeValue = std::move(v.value);
+  }
+
+  if (!m_options.Exists()) {
+    m_optionsValue.clear();
+  }
+  for (auto&& v : m_options.ReadQueue()) {
+    m_optionsValue = std::move(v.value);
+  }
+}
+
+bool NTSelectableModel::Exists() {
+  return m_options.Exists();
+}

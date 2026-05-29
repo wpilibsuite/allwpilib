@@ -7,7 +7,7 @@
 #include "wpi/driverstation/NiDsStadiaController.hpp"
 
 #include "wpi/hal/UsageReporting.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 #include "wpi/event/BooleanEvent.hpp"
 
@@ -273,26 +273,28 @@ BooleanEvent NiDsStadiaController::Frame(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetFrameButton(); });
 }
 
-void NiDsStadiaController::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("HID");
-  builder.PublishConstString("ControllerType", "NiDsStadia");
-  builder.AddDoubleProperty("LeftX", [this] { return GetLeftX(); }, nullptr);
-  builder.AddDoubleProperty("RightX", [this] { return GetRightX(); }, nullptr);
-  builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);
-  builder.AddDoubleProperty("RightY", [this] { return GetRightY(); }, nullptr);
-  builder.AddBooleanProperty("A", [this] { return GetAButton(); }, nullptr);
-  builder.AddBooleanProperty("B", [this] { return GetBButton(); }, nullptr);
-  builder.AddBooleanProperty("X", [this] { return GetXButton(); }, nullptr);
-  builder.AddBooleanProperty("Y", [this] { return GetYButton(); }, nullptr);
-  builder.AddBooleanProperty("LeftBumper", [this] { return GetLeftBumperButton(); }, nullptr);
-  builder.AddBooleanProperty("RightBumper", [this] { return GetRightBumperButton(); }, nullptr);
-  builder.AddBooleanProperty("LeftStick", [this] { return GetLeftStickButton(); }, nullptr);
-  builder.AddBooleanProperty("RightStick", [this] { return GetRightStickButton(); }, nullptr);
-  builder.AddBooleanProperty("Ellipses", [this] { return GetEllipsesButton(); }, nullptr);
-  builder.AddBooleanProperty("Hamburger", [this] { return GetHamburgerButton(); }, nullptr);
-  builder.AddBooleanProperty("Stadia", [this] { return GetStadiaButton(); }, nullptr);
-  builder.AddBooleanProperty("RightTrigger", [this] { return GetRightTriggerButton(); }, nullptr);
-  builder.AddBooleanProperty("LeftTrigger", [this] { return GetLeftTriggerButton(); }, nullptr);
-  builder.AddBooleanProperty("Google", [this] { return GetGoogleButton(); }, nullptr);
-  builder.AddBooleanProperty("Frame", [this] { return GetFrameButton(); }, nullptr);
+std::string_view NiDsStadiaController::GetTelemetryType() const {
+  return "HID:NiDsStadia";
+}
+
+void NiDsStadiaController::LogTo(wpi::TelemetryTable& table) const {
+  table.Log("LeftX", GetLeftX());
+  table.Log("RightX", GetRightX());
+  table.Log("LeftY", GetLeftY());
+  table.Log("RightY", GetRightY());
+  table.Log("A", GetAButton());
+  table.Log("B", GetBButton());
+  table.Log("X", GetXButton());
+  table.Log("Y", GetYButton());
+  table.Log("LeftBumper", GetLeftBumperButton());
+  table.Log("RightBumper", GetRightBumperButton());
+  table.Log("LeftStick", GetLeftStickButton());
+  table.Log("RightStick", GetRightStickButton());
+  table.Log("Ellipses", GetEllipsesButton());
+  table.Log("Hamburger", GetHamburgerButton());
+  table.Log("Stadia", GetStadiaButton());
+  table.Log("RightTrigger", GetRightTriggerButton());
+  table.Log("LeftTrigger", GetLeftTriggerButton());
+  table.Log("Google", GetGoogleButton());
+  table.Log("Frame", GetFrameButton());
 }

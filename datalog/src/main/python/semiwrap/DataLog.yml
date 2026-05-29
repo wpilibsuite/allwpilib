@@ -74,6 +74,7 @@ classes:
     methods:
       SetMetadata:
       Finish:
+      GetIndex:
   wpi::log::DataLogValueEntryImpl:
     template_params:
     - T

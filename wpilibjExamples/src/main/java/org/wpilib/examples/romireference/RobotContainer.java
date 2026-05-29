@@ -16,8 +16,10 @@ import org.wpilib.examples.romireference.commands.AutonomousTime;
 import org.wpilib.examples.romireference.subsystems.Drivetrain;
 import org.wpilib.romi.OnBoardIO;
 import org.wpilib.romi.OnBoardIO.ChannelMode;
-import org.wpilib.smartdashboard.SendableChooser;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.tunable.Selectable;
+import org.wpilib.tunable.Tunables;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -25,7 +27,7 @@ import org.wpilib.smartdashboard.SmartDashboard;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
-public class RobotContainer {
+public class RobotContainer implements TelemetryLoggable {
   // The robot's subsystems and commands are defined here...
   private final Drivetrain drivetrain = new Drivetrain();
   private final OnBoardIO onboardIO = new OnBoardIO(ChannelMode.INPUT, ChannelMode.INPUT);
@@ -34,7 +36,7 @@ public class RobotContainer {
   private final Joystick controller = new Joystick(0);
 
   // Create SmartDashboard chooser for autonomous routines
-  private final SendableChooser<Command> chooser = new SendableChooser<>();
+  private final Selectable<Command> chooser = new Selectable<>();
 
   // NOTE: The I/O pin functionality of the 5 exposed I/O pins depends on the hardware "overlay"
   // that is specified when launching the wpilib-ws server on the Romi raspberry pi.
@@ -71,9 +73,9 @@ public class RobotContainer {
         .onFalse(new PrintCommand("Button A Released"));
 
     // Setup SmartDashboard options
-    chooser.setDefaultOption("Auto Routine Distance", new AutonomousDistance(drivetrain));
-    chooser.addOption("Auto Routine Time", new AutonomousTime(drivetrain));
-    SmartDashboard.putData(chooser);
+    chooser.addDefault("Auto Routine Distance", new AutonomousDistance(drivetrain));
+    chooser.add("Auto Routine Time", new AutonomousTime(drivetrain));
+    Tunables.publish("Auto Chooser", chooser);
   }
 
   /**
@@ -93,5 +95,10 @@ public class RobotContainer {
   public Command getArcadeDriveCommand() {
     return new ArcadeDrive(
         drivetrain, () -> -controller.getRawAxis(1), () -> -controller.getRawAxis(2));
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
+    table.log("drivetrain", m_drivetrain);
   }
 }

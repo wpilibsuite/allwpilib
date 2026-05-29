@@ -7,7 +7,6 @@
 #include "wpi/commands2/InstantCommand.hpp"
 #include "wpi/commands2/RunCommand.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 
 using namespace wpi::cmd;
 class CommandScheduleTest : public CommandTestBase {};

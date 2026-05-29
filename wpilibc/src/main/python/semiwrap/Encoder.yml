@@ -1,10 +1,10 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
+- wpi/telemetry/TelemetryTable.hpp
 
 classes:
   wpi::Encoder:
     ignored_bases:
-    - wpi::util::SendableHelper<Encoder>
+    - wpi::TelemetryLoggable  # TODO(telemetry PR)
     typealias:
     - wpi::Encoder::EncodingType
     methods:
@@ -40,4 +40,5 @@ classes:
       GetSamplesToAverage:
       SetSimDevice:
       GetFPGAIndex:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:

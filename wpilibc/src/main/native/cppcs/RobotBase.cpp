@@ -15,6 +15,8 @@
 #include <string>
 #include <utility>
 
+#include "wpi/backend/NetworkTablesTelemetryBackend.hpp"
+#include "wpi/backend/NetworkTablesTunableBackend.hpp"
 #include "wpi/cameraserver/CameraServerShared.hpp"
 #include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
@@ -23,9 +25,10 @@
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/WPILibVersion.hpp"
+#include "wpi/telemetry/TelemetryRegistry.hpp"
+#include "wpi/tunable/TunableRegistry.hpp"
 #include "wpi/util/print.hpp"
 #include "wpi/util/timestamp.hpp"
 
@@ -197,6 +200,13 @@ RobotBase::RobotBase() {
     inst.StartServer("networktables.json", "", "robot");
   }
 
+  wpi::TelemetryRegistry::RegisterBackend(
+      "", std::make_shared<backend::NetworkTablesTelemetryBackend>(
+              inst, "/Telemetry"));
+  wpi::TunableRegistry::RegisterBackend(
+      "", std::make_shared<backend::NetworkTablesTunableBackend>(inst,
+                                                                 "/Tunables"));
+
   // wait for the NT server to actually start
   int count = 0;
   while ((inst.GetNetworkMode() & NT_NET_MODE_STARTING) != 0) {
@@ -217,8 +227,6 @@ RobotBase::RobotBase() {
           HAL_ReportUsage(fmt::format("NT/{}", connInfo->remote_id), "");
         }
       });
-
-  SmartDashboard::init();
 
   // Call wpi::internal::DriverStationBackend::RefreshData() to kick things off
   wpi::internal::DriverStationBackend::RefreshData();

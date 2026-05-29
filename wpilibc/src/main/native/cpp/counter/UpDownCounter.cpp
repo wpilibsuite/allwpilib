@@ -9,8 +9,8 @@
 #include "wpi/hal/Counter.h"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/StackTrace.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
 
 using namespace wpi;
 
@@ -26,7 +26,6 @@ UpDownCounter::UpDownCounter(int channel, EdgeConfiguration configuration)
   Reset();
 
   HAL_ReportUsage("IO", channel, "UpDownCounter");
-  wpi::util::SendableRegistry::Add(this, "UpDown Counter", channel);
 }
 
 int UpDownCounter::GetCount() const {
@@ -49,7 +48,10 @@ void UpDownCounter::SetEdgeConfiguration(EdgeConfiguration configuration) {
   WPILIB_CheckErrorStatus(status, "{}", m_channel);
 }
 
-void UpDownCounter::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("UpDown Counter");
-  builder.AddDoubleProperty("Count", [&] { return GetCount(); }, nullptr);
+void UpDownCounter::LogTo(wpi::TelemetryTable& table) const {
+  table.Log("Count", GetCount());
+}
+
+std::string_view UpDownCounter::GetTelemetryType() const {
+  return "UpDown Counter";
 }

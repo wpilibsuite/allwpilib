@@ -40,9 +40,9 @@ import org.wpilib.opmode.OpMode;
 import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Teleop;
 import org.wpilib.opmode.Utility;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 import org.wpilib.system.Watchdog;
+import org.wpilib.tunable.TunableRegistry;
 import org.wpilib.util.Color;
 import org.wpilib.util.ConstructorMatch;
 
@@ -747,8 +747,8 @@ public abstract class OpModeRobot extends RobotBase {
     // Always observe user program state
     DriverStationJNI.observeUserProgram(m_word.getNative());
 
-    SmartDashboard.updateValues();
-    m_watchdog.addEpoch("SmartDashboard.updateValues()");
+    TunableRegistry.update();
+    m_watchdog.addEpoch("TunableRegistry.update()");
 
     // Call simulationPeriodic if in simulation
     if (isSimulation()) {

@@ -9,9 +9,10 @@
 #include <gcem.hpp>
 
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/tunable/ComplexTunable.hpp"
+#include "wpi/tunable/Tunable.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi::math {
 
@@ -28,9 +29,8 @@ namespace wpi::math {
  * ensure that your motor controllers are set to "coast" before attempting to
  * control them with a bang-bang controller.
  */
-class WPILIB_DLLEXPORT BangBangController
-    : public wpi::util::Sendable,
-      public wpi::util::SendableHelper<BangBangController> {
+class WPILIB_DLLEXPORT BangBangController : public wpi::TelemetryLoggable,
+                                            public wpi::ComplexTunable {
  public:
   /**
    * Creates a new bang-bang controller.
@@ -128,12 +128,18 @@ class WPILIB_DLLEXPORT BangBangController
     return Calculate(measurement, m_setpoint);
   }
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
+
+  void PublishTunable(wpi::TunableTable& table) override;
+
+  std::string_view GetTunableType() const override;
 
  private:
-  double m_tolerance;
+  wpi::Tunable<double> m_tolerance;
 
-  double m_setpoint = 0;
+  wpi::Tunable<double> m_setpoint;
   double m_measurement = 0;
 
   // Usage reporting instances

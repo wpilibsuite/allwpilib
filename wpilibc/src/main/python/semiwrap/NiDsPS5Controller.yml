@@ -1,10 +1,10 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
+- wpi/telemetry/TelemetryTable.hpp
 
 classes:
   wpi::NiDsPS5Controller:
     ignored_bases:
-    - wpi::util::SendableHelper<NiDsPS5Controller>
+    - wpi::TelemetryLoggable  # TODO(telemetry PR)
     methods:
       NiDsPS5Controller:
       GetLeftX:
@@ -69,7 +69,8 @@ classes:
       GetTouchpadButton:
       GetTouchpadButtonPressed:
       GetTouchpadButtonReleased:
-      InitSendable:
+      GetTelemetryType:
+      LogTo:
   wpi::NiDsPS5Controller::Button:
     attributes:
       kSquare:

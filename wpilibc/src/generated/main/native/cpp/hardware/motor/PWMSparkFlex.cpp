@@ -10,7 +10,7 @@
 
 using namespace wpi;
 
-PWMSparkFlex::PWMSparkFlex(int channel) : PWMMotorController("PWMSparkFlex", channel) {
+PWMSparkFlex::PWMSparkFlex(int channel) : PWMMotorController(channel) {
   SetBounds(2.003_ms, 1.55_ms, 1.5_ms, 1.46_ms, 0.999_ms);
   m_pwm.SetOutputPeriod(5_ms);
   SetThrottle(0.0);

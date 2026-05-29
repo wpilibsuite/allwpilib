@@ -17,7 +17,6 @@
 #include "wpi/simulation/DifferentialDrivetrainSim.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/smartdashboard/Field2d.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/velocity.hpp"
@@ -50,8 +49,6 @@ class Drivetrain {
     rightEncoder.Reset();
 
     rightLeader.SetInverted(true);
-
-    wpi::SmartDashboard::PutData("Field", &fieldSim);
   }
 
   static constexpr wpi::units::meters_per_second_t kMaxVelocity =

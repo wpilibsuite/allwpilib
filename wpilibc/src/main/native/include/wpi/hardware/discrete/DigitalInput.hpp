@@ -6,8 +6,7 @@
 
 #include "wpi/hal/DIO.h"
 #include "wpi/hal/Types.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
@@ -20,8 +19,7 @@ namespace wpi {
  * as required. This class is only for devices like switches etc. that aren't
  * implemented anywhere else.
  */
-class DigitalInput : public wpi::util::Sendable,
-                     public wpi::util::SendableHelper<DigitalInput> {
+class DigitalInput : public wpi::TelemetryLoggable {
  public:
   /**
    * Create an instance of a Digital Input class.
@@ -56,7 +54,9 @@ class DigitalInput : public wpi::util::Sendable,
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   int m_channel;

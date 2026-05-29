@@ -1,3 +1,6 @@
+extra_includes:
+- wpi/tunable/TunableTable.hpp  # TODO(telemetry PR)
+
 functions:
   IncrementAndGetProfiledPIDControllerInstances:
     ignore: true
@@ -8,7 +11,8 @@ classes:
     template_params:
     - Distance
     ignored_bases:
-    - wpi::util::SendableHelper<ProfiledPIDController<Distance>>
+    - wpi::TelemetryLoggable  # TODO(telemetry PR)
+    - wpi::ComplexTunable  # TODO(telemetry PR)
     typealias:
     - typename wpi::math::ProfiledPIDController<Distance>::Velocity
     - typename wpi::math::ProfiledPIDController<Distance>::Velocity_t
@@ -62,7 +66,10 @@ classes:
           const State&:
           Distance_t, Velocity_t:
           Distance_t:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:
+      InitTunable:
+      GetTunableType:
 
 templates:
   ProfiledPIDController:

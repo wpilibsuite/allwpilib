@@ -1,7 +1,7 @@
 classes:
   wpi::Tachometer:
     ignored_bases:
-    - wpi::util::SendableHelper<Tachometer>
+    - wpi::TelemetryLoggable  # TODO(telemetry PR)
     methods:
       Tachometer:
         overloads:
@@ -15,5 +15,6 @@ classes:
       GetRevolutionsPerMinute:
       GetStopped:
       SetMaxPeriod:
-      InitSendable:
       SetEdgeConfiguration:
+      LogTo:
+      GetTelemetryType:

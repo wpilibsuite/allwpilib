@@ -388,6 +388,8 @@ def ntcore_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         local_native_libraries = [
             "//datalog:robotpy-native-datalog.copy_headers",
             "//ntcore:robotpy-native-ntcore.copy_headers",
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunable:robotpy-native-tunable.copy_headers",
             "//wpinet:robotpy-native-wpinet.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
@@ -483,6 +485,7 @@ def define_pybind_library(name, pkgcfgs = []):
         deps = [
             "//datalog:robotpy-wpilog",
             "//ntcore:robotpy-native-ntcore",
+            "//tunable:robotpy-native-tunable",
             "//wpinet:robotpy-wpinet",
             "//wpiutil:robotpy-wpiutil",
         ],
@@ -504,6 +507,8 @@ def define_pybind_library(name, pkgcfgs = []):
         extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
             "//datalog:robotpy-native-datalog.copy_headers",
             "//ntcore:robotpy-native-ntcore.copy_headers",
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunable:robotpy-native-tunable.copy_headers",
             "//wpinet:robotpy-native-wpinet.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
@@ -516,7 +521,7 @@ def define_pybind_library(name, pkgcfgs = []):
     scan_headers(
         name = "{}-scan-headers".format(name),
         extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
-            "//ntcore:robotpy-native-ntcore.copy_headers",
+            "//ntcore:robotpy-native-ntcore.copy_headers","//tunable:robotpy-native-tunable.copy_headers",
         ],
         package_root_file = "src/main/python/ntcore/__init__.py",
         pkgcfgs = pkgcfgs,

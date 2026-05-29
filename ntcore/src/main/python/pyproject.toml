@@ -6,6 +6,7 @@ requires = [
     "hatch-robotpy~=0.2.1",
     "hatchling",
     "robotpy-native-ntcore==0.0.0",
+    "robotpy-native-tunable==0.0.0",
     "robotpy-wpiutil==0.0.0",
     "robotpy-wpinet==0.0.0",
     "robotpy-wpilog==0.0.0",
@@ -23,6 +24,7 @@ authors = [
 license = "BSD-3-Clause"
 dependencies = [
     "robotpy-native-ntcore==0.0.0",
+    "robotpy-native-tunable==0.0.0",
     "robotpy-wpiutil==0.0.0",
     "robotpy-wpinet==0.0.0",
     "robotpy-wpilog==0.0.0",
@@ -58,6 +60,9 @@ scan_headers_ignore = [
     "wpi/nt/ntcore_test.hpp",
 
     "src/*",
+    
+
+    "wpi/nt/NetworkTablesTelemetryBackend.hpp" # TODO(robotpy) Tunable/Telemetry upgrade
 ]
 
 [tool.semiwrap.extension_modules."ntcore._ntcore"]

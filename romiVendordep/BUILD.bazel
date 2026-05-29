@@ -68,6 +68,7 @@ wpilib_java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//hal:hal-java",
+        "//telemetry:telemetry-java",
         "//wpilibj:wpilibj-java",
     ],
 )
@@ -124,6 +125,8 @@ PKG_CONFIG_DEPS = [
     "//hal:robotpy-hal.generated_pkgcfg_files",
     "//ntcore:native/ntcore/robotpy-native-ntcore.pc",
     "//ntcore:pyntcore.generated_pkgcfg_files",
+    "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
+    "//tunable:native/tunable/robotpy-native-tunable.pc",
     "//wpilibc:native/wpilib/robotpy-native-wpilib.pc",
     "//wpilibc:robotpy-wpilib.generated_pkgcfg_files",
     "//wpimath:native/wpimath/robotpy-native-wpimath.pc",

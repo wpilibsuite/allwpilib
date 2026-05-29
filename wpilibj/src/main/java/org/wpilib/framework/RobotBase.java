@@ -6,6 +6,8 @@ package org.wpilib.framework;
 
 import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
+import org.wpilib.backend.NetworkTablesTelemetryBackend;
+import org.wpilib.backend.NetworkTablesTunableBackend;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.UserControls;
@@ -21,6 +23,12 @@ import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.system.RuntimeType;
 import org.wpilib.system.Timer;
 import org.wpilib.system.WPILibVersion;
+import org.wpilib.telemetry.TelemetryRegistry;
+import org.wpilib.tunable.Tunable;
+import org.wpilib.tunable.TunableConfig;
+import org.wpilib.tunable.TunableDouble;
+import org.wpilib.tunable.TunableRegistry;
+import org.wpilib.units.Measure;
 import org.wpilib.util.ConstructorMatch;
 import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.vision.stream.CameraServerShared;
@@ -91,6 +99,49 @@ public abstract class RobotBase implements AutoCloseable {
         });
   }
 
+  @SuppressWarnings("rawtypes")
+  private static class TunableMeasure extends Tunable<Measure> implements Tunable.CustomTunable {
+    TunableMeasure(Measure initialValue, TunableConfig config) {
+      super(config);
+      m_value = initialValue;
+      m_magnitudeTunable =
+          new TunableDouble(config) {
+            @Override
+            public void set(double value) {
+              m_value = m_value.unit().of(value);
+            }
+
+            @Override
+            public double get() {
+              return m_value.magnitude();
+            }
+          };
+    }
+
+    @Override
+    public void set(Measure value) {
+      m_value = value;
+    }
+
+    @Override
+    public Measure get() {
+      return m_value;
+    }
+
+    @Override
+    public TunableDouble getInnerTunable() {
+      return m_magnitudeTunable;
+    }
+
+    @Override
+    public Class<Measure> getTypeClass() {
+      return Measure.class;
+    }
+
+    private Measure m_value;
+    private final TunableDouble m_magnitudeTunable;
+  }
+
   /**
    * Constructor for a generic robot program. User code can be placed in the constructor that runs
    * before the Autonomous or Operator Control period starts. The constructor will run to completion
@@ -111,6 +162,27 @@ public abstract class RobotBase implements AutoCloseable {
     } else {
       inst.startServer("networktables.json", "", "robot");
     }
+
+    // set up telemetry
+    TelemetryRegistry.registerBackend("", new NetworkTablesTelemetryBackend(inst, "/Telemetry"));
+    TelemetryRegistry.registerTypeHandler(
+        Measure.class,
+        (table, name, value) -> {
+          table.setProperty(name, "unit", "\"" + value.unit().name() + "\"");
+          table.log(name, value.magnitude());
+        });
+
+    // set up tunables
+    TunableRegistry.registerBackend("", new NetworkTablesTunableBackend(inst, "/Tunables"));
+    TunableRegistry.registerTypeHandler(
+        Measure.class,
+        (initialValue, config) -> {
+          if (config == null) {
+            config = new TunableConfig();
+          }
+          return new TunableMeasure(
+              initialValue, config.withProperty("unit", "\"" + initialValue.unit().name() + "\""));
+        });
 
     // wait for the NT server to actually start
     try {

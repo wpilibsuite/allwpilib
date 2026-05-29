@@ -75,6 +75,8 @@ if(WITH_JAVA)
         wpimath_jar
         ${JAVA_SOURCES}
         INCLUDE_JARS
+            telemetry_jar
+            tunable_jar
             wpiutil_jar
             wpiunits_jar
             wpiannotations_jar
@@ -167,7 +169,7 @@ if(MSVC)
     target_compile_options(wpimath PUBLIC /utf-8 /bigobj)
 endif()
 wpilib_target_warnings(wpimath)
-target_link_libraries(wpimath wpiutil)
+target_link_libraries(wpimath telemetry tunable wpiutil)
 
 if(NOT USE_SYSTEM_EIGEN)
     install(

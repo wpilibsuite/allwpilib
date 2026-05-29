@@ -6,7 +6,6 @@
 #include "wpi/commands2/Commands.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 
 using namespace wpi::cmd;
 

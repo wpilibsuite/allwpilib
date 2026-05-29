@@ -75,6 +75,18 @@ model {
     binaries {
         all {
             it.cppCompiler.define 'SLEIPNIR_EXPORTS'
+
+            if (it.component.name == "${nativeName}JNI") {
+                lib project: ':telemetry', library: 'telemetry', linkage: 'static'
+            } else {
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+            }
+
+            if (it.component.name == "${nativeName}JNI") {
+                lib project: ':tunable', library: 'tunable', linkage: 'static'
+            } else {
+                lib project: ':tunable', library: 'tunable', linkage: 'shared'
+            }
         }
     }
 }
@@ -89,6 +101,8 @@ nativeUtils.exportsConfigs {
 
 dependencies {
     annotationProcessor libs.avaje.jsonb.generator
+    api project(":telemetry")
+    api project(":tunable")
     api project(":wpiunits")
     api libs.avaje.jsonb
     api libs.bundles.ejml

@@ -128,6 +128,11 @@ third_party_cc_lib_helper(
 )
 
 third_party_cc_lib_helper(
+    name = "htrie",
+    include_root = "src/main/native/thirdparty/htrie/include",
+)
+
+third_party_cc_lib_helper(
     name = "llvm",
     include_root = "src/main/native/thirdparty/llvm/include",
     src_root = "src/main/native/thirdparty/llvm/cpp",
@@ -192,6 +197,8 @@ wpilib_cc_library(
     third_party_header_only_libraries = [
         ":argparse",
         ":expected",
+        ":htrie",
+        ":json",
         ":sigslot",
     ],
     third_party_libraries = [

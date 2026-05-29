@@ -10,6 +10,8 @@ evaluationDependsOn(":wpimath")
 evaluationDependsOn(":wpilibc")
 evaluationDependsOn(":cameraserver")
 evaluationDependsOn(":wpilibj")
+evaluationDependsOn(":telemetry")
+evaluationDependsOn(":tunable")
 
 apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
 
@@ -21,6 +23,8 @@ dependencies {
     implementation project(":hal")
     implementation project(":wpimath")
     implementation project(":wpilibj")
+    implementation project(":telemetry")
+    implementation project(":tunable")
 }
 
 nativeUtils.exportsConfigs {
@@ -39,6 +43,8 @@ model {
             lib project: ":wpilibc", library: "wpilibc", linkage: "shared"
             project(":ntcore").addNtcoreDependency(it, "shared")
             project(":hal").addHalDependency(it, "shared")
+            lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+            lib project: ':tunable', library: 'tunable', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'

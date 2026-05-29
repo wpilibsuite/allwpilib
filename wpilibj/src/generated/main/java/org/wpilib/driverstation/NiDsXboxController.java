@@ -9,8 +9,8 @@ package org.wpilib.driverstation;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Handle input from NiDsXbox controllers connected to the Driver Station.
@@ -23,7 +23,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * only through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any
  * 3rd party controllers.
  */
-public class NiDsXboxController extends GenericHID implements Sendable {
+public class NiDsXboxController extends GenericHID implements TelemetryLoggable {
   /** Represents a digital button on a NiDsXboxController. */
   public enum Button {
     /** A button. */
@@ -608,24 +608,27 @@ public class NiDsXboxController extends GenericHID implements Sendable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("HID");
-    builder.publishConstString("ControllerType", "NiDsXbox");
-    builder.addDoubleProperty("LeftTrigger Axis", this::getLeftTriggerAxis, null);
-    builder.addDoubleProperty("RightTrigger Axis", this::getRightTriggerAxis, null);
-    builder.addDoubleProperty("LeftX", this::getLeftX, null);
-    builder.addDoubleProperty("RightX", this::getRightX, null);
-    builder.addDoubleProperty("LeftY", this::getLeftY, null);
-    builder.addDoubleProperty("RightY", this::getRightY, null);
-    builder.addBooleanProperty("A", this::getAButton, null);
-    builder.addBooleanProperty("B", this::getBButton, null);
-    builder.addBooleanProperty("X", this::getXButton, null);
-    builder.addBooleanProperty("Y", this::getYButton, null);
-    builder.addBooleanProperty("LeftBumper", this::getLeftBumperButton, null);
-    builder.addBooleanProperty("RightBumper", this::getRightBumperButton, null);
-    builder.addBooleanProperty("Back", this::getBackButton, null);
-    builder.addBooleanProperty("Start", this::getStartButton, null);
-    builder.addBooleanProperty("LeftStick", this::getLeftStickButton, null);
-    builder.addBooleanProperty("RightStick", this::getRightStickButton, null);
+  public String getTelemetryType() {
+    return "HID:NiDsXbox";
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
+    table.log("LeftTrigger Axis", getLeftTriggerAxis());
+    table.log("RightTrigger Axis", getRightTriggerAxis());
+    table.log("LeftX", getLeftX());
+    table.log("RightX", getRightX());
+    table.log("LeftY", getLeftY());
+    table.log("RightY", getRightY());
+    table.log("A", getAButton());
+    table.log("B", getBButton());
+    table.log("X", getXButton());
+    table.log("Y", getYButton());
+    table.log("LeftBumper", getLeftBumperButton());
+    table.log("RightBumper", getRightBumperButton());
+    table.log("Back", getBackButton());
+    table.log("Start", getStartButton());
+    table.log("LeftStick", getLeftStickButton());
+    table.log("RightStick", getRightStickButton());
   }
 }

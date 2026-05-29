@@ -18,6 +18,8 @@ if(WITH_JAVA)
             ${AVAJE_JARS}
             cscore_jar
             cameraserver_jar
+            datalog_jar
+            telemetry_jar
             wpimath_jar
             wpiunits_jar
             wpiutil_jar

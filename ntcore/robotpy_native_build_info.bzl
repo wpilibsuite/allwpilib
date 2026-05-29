@@ -26,6 +26,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         pyproject_toml = pyproject_toml,
         pc_deps = [
             "//datalog:native/datalog/robotpy-native-datalog.pc",
+            "//tunable:native/tunable/robotpy-native-tunable.pc",
             "//wpinet:native/wpinet/robotpy-native-wpinet.pc",
             "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
         ],
@@ -50,6 +51,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         ],
         deps = [
             "//datalog:robotpy-native-datalog",
+            "//tunable:robotpy-native-tunable",
             "//wpinet:robotpy-native-wpinet",
             "//wpiutil:robotpy-native-wpiutil",
         ],

@@ -2,6 +2,8 @@ evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':cscore')
 evaluationDependsOn(':cameraserver')
+evaluationDependsOn(':telemetry')
+evaluationDependsOn(':tunable')
 
 ext {
     baseId = 'wpilibj'
@@ -69,7 +71,9 @@ dependencies {
     implementation project(':wpimath')
     implementation project(':ntcore')
     implementation project(':cscore')
-    api project(':datalog')
+    implementation project(':telemetry')
+    implementation project(':tunable')
+    implementation project(':datalog')
     implementation project(':cameraserver')
     testImplementation(libs.bundles.mockito)
     devImplementation sourceSets.main.output
@@ -109,10 +113,13 @@ model {
             binaries.all {
                 project(':ntcore').addNtcoreDependency(it, 'shared')
                 project(':ntcore').addNtcoreJniDependency(it)
+                lib project: ':datalog', library: 'datalog', linkage: 'shared'
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunable', library: 'tunable', linkage: 'shared'
                 lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'

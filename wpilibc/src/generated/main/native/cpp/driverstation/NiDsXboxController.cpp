@@ -7,7 +7,7 @@
 #include "wpi/driverstation/NiDsXboxController.hpp"
 
 #include "wpi/hal/UsageReporting.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 #include "wpi/event/BooleanEvent.hpp"
 
@@ -217,23 +217,25 @@ BooleanEvent NiDsXboxController::RightStick(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetRightStickButton(); });
 }
 
-void NiDsXboxController::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("HID");
-  builder.PublishConstString("ControllerType", "NiDsXbox");
-  builder.AddDoubleProperty("LeftTrigger Axis", [this] { return GetLeftTriggerAxis(); }, nullptr);
-  builder.AddDoubleProperty("RightTrigger Axis", [this] { return GetRightTriggerAxis(); }, nullptr);
-  builder.AddDoubleProperty("LeftX", [this] { return GetLeftX(); }, nullptr);
-  builder.AddDoubleProperty("RightX", [this] { return GetRightX(); }, nullptr);
-  builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);
-  builder.AddDoubleProperty("RightY", [this] { return GetRightY(); }, nullptr);
-  builder.AddBooleanProperty("A", [this] { return GetAButton(); }, nullptr);
-  builder.AddBooleanProperty("B", [this] { return GetBButton(); }, nullptr);
-  builder.AddBooleanProperty("X", [this] { return GetXButton(); }, nullptr);
-  builder.AddBooleanProperty("Y", [this] { return GetYButton(); }, nullptr);
-  builder.AddBooleanProperty("LeftBumper", [this] { return GetLeftBumperButton(); }, nullptr);
-  builder.AddBooleanProperty("RightBumper", [this] { return GetRightBumperButton(); }, nullptr);
-  builder.AddBooleanProperty("Back", [this] { return GetBackButton(); }, nullptr);
-  builder.AddBooleanProperty("Start", [this] { return GetStartButton(); }, nullptr);
-  builder.AddBooleanProperty("LeftStick", [this] { return GetLeftStickButton(); }, nullptr);
-  builder.AddBooleanProperty("RightStick", [this] { return GetRightStickButton(); }, nullptr);
+std::string_view NiDsXboxController::GetTelemetryType() const {
+  return "HID:NiDsXbox";
+}
+
+void NiDsXboxController::LogTo(wpi::TelemetryTable& table) const {
+  table.Log("LeftTrigger Axis", GetLeftTriggerAxis());
+  table.Log("RightTrigger Axis", GetRightTriggerAxis());
+  table.Log("LeftX", GetLeftX());
+  table.Log("RightX", GetRightX());
+  table.Log("LeftY", GetLeftY());
+  table.Log("RightY", GetRightY());
+  table.Log("A", GetAButton());
+  table.Log("B", GetBButton());
+  table.Log("X", GetXButton());
+  table.Log("Y", GetYButton());
+  table.Log("LeftBumper", GetLeftBumperButton());
+  table.Log("RightBumper", GetRightBumperButton());
+  table.Log("Back", GetBackButton());
+  table.Log("Start", GetStartButton());
+  table.Log("LeftStick", GetLeftStickButton());
+  table.Log("RightStick", GetRightStickButton());
 }

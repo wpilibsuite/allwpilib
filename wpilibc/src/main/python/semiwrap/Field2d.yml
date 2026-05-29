@@ -4,7 +4,7 @@ extra_includes:
 classes:
   wpi::Field2d:
     ignored_bases:
-    - wpi::util::SendableHelper<Field2d>
+    - wpi::TelemetryLoggable  # TODO(telemetry PR)
     methods:
       Field2d:
       SetRobotPose:
@@ -16,4 +16,5 @@ classes:
         return_value_policy: reference_internal
       GetRobotObject:
         return_value_policy: reference_internal
-      InitSendable:
+      LogTo:
+      GetTelemetryType:
