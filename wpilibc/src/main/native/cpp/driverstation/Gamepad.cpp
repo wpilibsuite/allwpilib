@@ -4,39 +4,71 @@
 
 #include "wpi/driverstation/Gamepad.hpp"
 
+#include <algorithm>
+#include <cmath>
+
 #include "wpi/event/BooleanEvent.hpp"
 #include "wpi/hal/UsageReporting.hpp"
+#include "wpi/math/util/MathUtil.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
 using namespace wpi;
+
+static double ClampDeadband(double deadband) {
+  if (std::isnan(deadband)) {
+    return 0.0;
+  }
+  return std::clamp(deadband, 0.0, std::nextafter(1.0, 0.0));
+}
 
 Gamepad::Gamepad(int port) : GenericHID(port) {
   HAL_ReportUsage("HID", port, "Gamepad");
 }
 
 double Gamepad::GetLeftX() const {
-  return GetAxis(Axis::LEFT_X);
+  return wpi::math::ApplyDeadband(GetAxis(Axis::LEFT_X), m_leftXDeadband);
+}
+
+void Gamepad::SetLeftXDeadband(double deadband) {
+  m_leftXDeadband = ClampDeadband(deadband);
 }
 
 double Gamepad::GetLeftY() const {
-  return GetAxis(Axis::LEFT_Y);
+  return wpi::math::ApplyDeadband(GetAxis(Axis::LEFT_Y), m_leftYDeadband);
+}
+
+void Gamepad::SetLeftYDeadband(double deadband) {
+  m_leftYDeadband = ClampDeadband(deadband);
 }
 
 double Gamepad::GetRightX() const {
-  return GetAxis(Axis::RIGHT_X);
+  return wpi::math::ApplyDeadband(GetAxis(Axis::RIGHT_X), m_rightXDeadband);
+}
+
+void Gamepad::SetRightXDeadband(double deadband) {
+  m_rightXDeadband = ClampDeadband(deadband);
 }
 
 double Gamepad::GetRightY() const {
-  return GetAxis(Axis::RIGHT_Y);
+  return wpi::math::ApplyDeadband(GetAxis(Axis::RIGHT_Y), m_rightYDeadband);
+}
+
+void Gamepad::SetRightYDeadband(double deadband) {
+  m_rightYDeadband = ClampDeadband(deadband);
 }
 
 double Gamepad::GetLeftTriggerAxis() const {
-  return GetAxis(Axis::LEFT_TRIGGER);
+  return wpi::math::ApplyDeadband(GetAxis(Axis::LEFT_TRIGGER),
+                                  m_leftTriggerDeadband);
+}
+
+void Gamepad::SetLeftTriggerDeadband(double deadband) {
+  m_leftTriggerDeadband = ClampDeadband(deadband);
 }
 
 BooleanEvent Gamepad::LeftTrigger(double threshold, EventLoop* loop) const {
   return BooleanEvent(loop, [this, threshold] {
-    return this->GetLeftTriggerAxis() > threshold;
+    return this->GetAxis(Axis::LEFT_TRIGGER) > threshold;
   });
 }
 
@@ -45,12 +77,17 @@ BooleanEvent Gamepad::LeftTrigger(EventLoop* loop) const {
 }
 
 double Gamepad::GetRightTriggerAxis() const {
-  return GetAxis(Axis::RIGHT_TRIGGER);
+  return wpi::math::ApplyDeadband(GetAxis(Axis::RIGHT_TRIGGER),
+                                  m_rightTriggerDeadband);
+}
+
+void Gamepad::SetRightTriggerDeadband(double deadband) {
+  m_rightTriggerDeadband = ClampDeadband(deadband);
 }
 
 BooleanEvent Gamepad::RightTrigger(double threshold, EventLoop* loop) const {
   return BooleanEvent(loop, [this, threshold] {
-    return this->GetRightTriggerAxis() > threshold;
+    return this->GetAxis(Axis::RIGHT_TRIGGER) > threshold;
   });
 }
 
