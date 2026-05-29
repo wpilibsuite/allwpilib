@@ -211,7 +211,8 @@ public class TrapezoidProfile {
   }
 
   /**
-   * Returns the time left until a target distance in the profile is reached.
+   * Returns the time to get between two states. This does not affect the internal variables, and as
+   * a result, may be used for states not on the active trajectory.
    *
    * @param current The current state.
    * @param goal The goal state.
@@ -313,9 +314,9 @@ public class TrapezoidProfile {
   double getSign(State current, State goal) {
     double dx = goal.position - current.position;
 
-    // Calculate threshold distance
+    // Calculate threshold displacement
     // d = |v_t - v_i| * (v_t + v_i) / a_m   (9)
-    double thresholdDistance =
+    double thresholdDisplacement =
         Math.abs(goal.velocity - current.velocity)
             / m_constraints.maxAcceleration
             * (current.velocity + goal.velocity)
@@ -324,13 +325,13 @@ public class TrapezoidProfile {
     // As discussed in TrapezoidProfile.md the correct sign must be chosen when dx == d because
     // following a suboptimal profile may lead to "chattering".
     if (goal.velocity < 0.0) {
-      if (dx > thresholdDistance) {
+      if (dx > thresholdDisplacement) {
         return 1.0;
       } else {
         return -1.0;
       }
     } else {
-      if (dx >= thresholdDistance) {
+      if (dx >= thresholdDisplacement) {
         return 1.0;
       } else {
         return -1.0;
@@ -353,7 +354,7 @@ public class TrapezoidProfile {
 
     double acceleration = sign * m_constraints.maxAcceleration;
     double velocityLimit = sign * m_constraints.maxVelocity;
-    double distance = goal.position - current.position;
+    double dx = goal.position - current.position;
 
     // Calculate the peak velocity to compare to velocity constraint.
     // v_p = √(a * Δx + (v_t² + v_i²) / 2)   (9)
@@ -362,7 +363,7 @@ public class TrapezoidProfile {
             * Math.sqrt(
                 Math.max(
                     (goal.velocity * goal.velocity + current.velocity * current.velocity) / 2
-                        + acceleration * distance,
+                        + acceleration * dx,
                     0));
 
     // Handle the case where we hit maximum velocity.
@@ -375,7 +376,7 @@ public class TrapezoidProfile {
       // x_2 = Δx - x_1 - x_3   (12)
       // t_2 = x_2 / v_l   (14)
       profile.cruiseTime =
-          (distance
+          (dx
                   - (2 * velocityLimit * velocityLimit
                           - (current.velocity * current.velocity + goal.velocity * goal.velocity))
                       / (2 * acceleration))

@@ -289,9 +289,9 @@ class TrapezoidProfile {
   constexpr double GetSign(const State& current, const State& goal) const {
     Distance_t dx = goal.position - current.position;
 
-    // Calculate threshold distance
+    // Calculate threshold displacement
     // d = |v_t - v_i| * (v_t + v_i) / 2 a_m   (9)
-    Distance_t thresholdDistance =
+    Distance_t thresholdDisplacement =
         wpi::units::math::abs(goal.velocity - current.velocity) /
         m_constraints.maxAcceleration * (current.velocity + goal.velocity) /
         2.0;
@@ -299,13 +299,13 @@ class TrapezoidProfile {
     // As discussed in TrapezoidProfile.md the correct sign must be chosen when
     // dx == d because following a suboptimal profile may lead to "chattering".
     if (goal.velocity < Velocity_t{0.0}) {
-      if (dx > thresholdDistance) {
+      if (dx > thresholdDisplacement) {
         return 1.0;
       } else {
         return -1.0;
       }
     } else {
-      if (dx >= thresholdDistance) {
+      if (dx >= thresholdDisplacement) {
         return 1.0;
       } else {
         return -1.0;
@@ -329,7 +329,7 @@ class TrapezoidProfile {
 
     Acceleration_t acceleration = sign * m_constraints.maxAcceleration;
     Velocity_t velocityLimit = sign * m_constraints.maxVelocity;
-    Distance_t distance = goal.position - current.position;
+    Distance_t dx = goal.position - current.position;
 
     // Calculate the peak velocity to compare to velocity constraint.
     // v_p = √(a * Δx + (v_t² + v_i²) / 2)   (8)
@@ -338,7 +338,7 @@ class TrapezoidProfile {
                    (goal.velocity * goal.velocity +
                     current.velocity * current.velocity) /
                            2 +
-                       acceleration * distance,
+                       acceleration * dx,
                    wpi::units::math::pow<2>(Velocity_t{0.0})));
 
     // Handle the case where we hit maximum velocity.
@@ -350,10 +350,10 @@ class TrapezoidProfile {
 
       // x_2 = Δx - x_1 - x_3   (12)
       // t_2 = x_2 / v_l   (14)
-      profile.cruiseTime = (distance - (2 * velocityLimit * velocityLimit -
-                                        (current.velocity * current.velocity +
-                                         goal.velocity * goal.velocity)) /
-                                           (2 * acceleration)) /
+      profile.cruiseTime = (dx - (2 * velocityLimit * velocityLimit -
+                                  (current.velocity * current.velocity +
+                                   goal.velocity * goal.velocity)) /
+                                     (2 * acceleration)) /
                            velocityLimit;
     } else {
       // t_1 = (v_p - v_i) / a   (13)
