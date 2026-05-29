@@ -42,9 +42,9 @@ class Robot : public wpi::TimedRobot {
                            -driverController.GetLeftX());
     // Curvature drive with a given forward and turn rate, as well as a
     // quick-turn button
-    robotDrive.CurvatureDrive(
-        -driverController.GetLeftY(), -driverController.GetLeftX(),
-        driverController.GetNorthFaceButton());
+    robotDrive.CurvatureDrive(-driverController.GetLeftY(),
+                              -driverController.GetLeftX(),
+                              driverController.GetFaceUpButton());
   }
 };
 

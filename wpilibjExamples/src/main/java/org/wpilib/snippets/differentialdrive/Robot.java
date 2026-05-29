@@ -39,6 +39,6 @@ public class Robot extends TimedRobot {
     robotDrive.curvatureDrive(
         -driverController.getLeftY(),
         -driverController.getLeftX(),
-        driverController.getNorthFaceButton());
+        driverController.getFaceUpButton());
   }
 }
