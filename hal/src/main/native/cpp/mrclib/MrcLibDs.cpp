@@ -5,7 +5,9 @@
 #include "wpi/hal/cpp/MrcLibDs.hpp"
 
 #include <algorithm>
+#include <cstring>
 #include <exception>
+#include <span>
 #include <utility>
 #include <vector>
 
