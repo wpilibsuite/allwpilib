@@ -128,12 +128,20 @@ void HALSIM_StepTiming(uint64_t delta) {
   while (delta > 0) {
     uint64_t curTime = HAL_GetMonotonicTime();
     uint64_t nextTimeout = HALSIM_GetNextNotifierTimeout();
-    uint64_t step = (std::min)(delta, nextTimeout - curTime);
+    // If a notifier is already due, process it at the current simulated time
+    // instead of underflowing nextTimeout - curTime.
+    uint64_t step =
+        nextTimeout <= curTime ? 0 : (std::min)(delta, nextTimeout - curTime);
 
     StepTiming(step);
     delta -= step;
 
     WakeupWaitNotifiers();
+
+    // Guard against notifiers that keep rearming at or before the same time.
+    if (step == 0 && HALSIM_GetNextNotifierTimeout() <= curTime) {
+      break;
+    }
   }
 }
 
