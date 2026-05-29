@@ -10,8 +10,8 @@ import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.motor.PWMSparkMax;
 
 /**
- * DifferentialDrive snippets for wpilib-docs. Runs the motors with tank
- * drive, arcade drive, and curvature drive.
+ * DifferentialDrive snippets for wpilib-docs. Runs the motors with tank drive, arcade drive, and
+ * curvature drive.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/motors/wpi-drive-classes.html
  */
 public class Robot extends TimedRobot {
@@ -36,6 +36,9 @@ public class Robot extends TimedRobot {
     // Arcade drive with a given forward and turn rate
     robotDrive.arcadeDrive(-driverController.getLeftY(), -driverController.getLeftX());
     // Curvature drive with a given forward and turn rate, as well as a button for turning in-place.
-    robotDrive.curvatureDrive(-driverController.getLeftY(), -driverController.getLeftX(), driverController.getButton(Gamepad.Button.NORTH_FACE));
+    robotDrive.curvatureDrive(
+        -driverController.getLeftY(),
+        -driverController.getLeftX(),
+        driverController.getButton(Gamepad.Button.NORTH_FACE));
   }
 }

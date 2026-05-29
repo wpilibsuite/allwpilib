@@ -61,6 +61,7 @@ SNIPPET_FOLDERS = [
     "canpdp",
     "digitalcommunication",
     "digitalinput",
+    "differentialdrive",
     "dutycycleencoder",
     "dutycycleinput",
     "encoder",

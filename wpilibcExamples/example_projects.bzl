@@ -60,6 +60,7 @@ SNIPPET_FOLDERS = [
     "CANPDP",
     "DigitalCommunication",
     "DigitalInput",
+    "DifferentialDrive",
     "DutyCycleEncoder",
     "DutyCycleInput",
     "Encoder",
