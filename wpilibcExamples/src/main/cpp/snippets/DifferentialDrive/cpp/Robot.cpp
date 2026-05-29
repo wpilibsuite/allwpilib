@@ -44,7 +44,7 @@ class Robot : public wpi::TimedRobot {
     // quick-turn button
     robotDrive.CurvatureDrive(
         -driverController.GetLeftY(), -driverController.GetLeftX(),
-        driverController.GetButton(wpi::Gamepad::Button::NORTH_FACE));
+        driverController.GetNorthFaceButton());
   }
 };
 
