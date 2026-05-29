@@ -96,21 +96,26 @@ struct Expression {
   /// The adjoint of the expression node, used during autodiff.
   Scalar adjoint{0};
 
-  /// Counts incoming edges for this node.
-  uint32_t incoming_edges = 0;
-
-  /// This expression's column in a Jacobian, or -1 otherwise.
-  int32_t col = -1;
-
   /// The adjoint of the expression node, used during gradient expression tree
   /// generation.
   ExpressionPtr<Scalar> adjoint_expr;
 
-  /// Reference count for intrusive shared pointer.
-  uint32_t ref_count = 0;
-
   /// Expression arguments.
   std::array<ExpressionPtr<Scalar>, 2> args{nullptr, nullptr};
+
+  /// Scratch space for various graph algorithms.
+  ///
+  /// In expression_graph.hpp's topological_sort(), scratch counts incoming
+  /// edges for this node, offset by -1 so -1 means no edges.
+  ///
+  /// In Hessian and Jacobian constructors, scratch represents this expression's
+  /// column in a Jacobian, or -1 otherwise.
+  ///
+  /// They share a default state of -1 to avoid extra assignments.
+  int32_t scratch = -1;
+
+  /// Reference count for intrusive shared pointer.
+  uint32_t ref_count = 0;
 
   /// Constructs a constant expression with a value of zero.
   constexpr Expression() = default;
@@ -774,6 +779,8 @@ void dec_ref_count(Expression<Scalar>* expr) {
         auto alloc = global_pool_allocator<Expression<Scalar>>();
         std::allocator_traits<decltype(alloc)>::deallocate(
             alloc, elem, sizeof(Expression<Scalar>));
+      } else {
+        operator delete(elem);
       }
     }
   }
