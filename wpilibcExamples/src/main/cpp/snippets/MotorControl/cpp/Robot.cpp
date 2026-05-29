@@ -20,6 +20,10 @@
  *
  * In addition, the encoder value of an encoder connected to ports 0 and 1 is
  * consistently sent to the Dashboard.
+ *
+ * Finally, short code snippets show how to invert the motor direction and how
+ * to use the motor safety for frc-docs.
+ * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/motors/wpi-drive-classes.html
  */
 class Robot : public wpi::TimedRobot {
  public:
@@ -37,6 +41,15 @@ class Robot : public wpi::TimedRobot {
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
     encoder.SetDistancePerPulse((std::numbers::pi * 6) / 360.0);
+
+    // show motor inversion
+    motor.SetInverted(true);
+
+    // show motor safety features
+    motor.SetSafetyEnabled(true);
+    motor.SetSafetyEnabled(false);
+    motor.SetExpiration(0.1_s);
+    motor.Feed();
   }
 
  private:
