@@ -332,5 +332,17 @@
     "foldername": "solenoid",
     "gradlebase": "java",
     "robotclass": "Robot"
+  },
+  {
+    "name": "Mecanum Drive",
+    "description": "Show mecanum drive control with cartesian and polar drive in teleop.",
+    "tags": [
+      "Mecanum Drive",
+      "Gyro",
+      "Joystick"
+    ],
+    "foldername": "mecanumdrive",
+    "gradlebase": "java",
+    "robotclass": "Robot"
   }
 ]
