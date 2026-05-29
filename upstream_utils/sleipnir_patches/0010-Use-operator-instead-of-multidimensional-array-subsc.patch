@@ -15,10 +15,10 @@ Subject: [PATCH 10/10] Use operator() instead of multidimensional array
  7 files changed, 135 insertions(+), 135 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/hessian.hpp b/include/sleipnir/autodiff/hessian.hpp
-index 11af6033d1cf00b27cb9ff796c4a7f16b32df90a..d4cc02f54accd568d052ae5709213d45c4c8917a 100644
+index 2a8087eda23f49f8c01be35d5289568644a9742d..c48e01c7b89d80db8032f6d2e492a0ec1bfa9f42 100644
 --- a/include/sleipnir/autodiff/hessian.hpp
 +++ b/include/sleipnir/autodiff/hessian.hpp
-@@ -99,9 +99,9 @@ class Hessian {
+@@ -100,9 +100,9 @@ class Hessian {
        auto grad = m_graphs[row].generate_tree(m_wrt);
        for (int col = 0; col < m_wrt.rows(); ++col) {
          if (grad[col].expr != nullptr) {
@@ -31,7 +31,7 @@ index 11af6033d1cf00b27cb9ff796c4a7f16b32df90a..d4cc02f54accd568d052ae5709213d45
        }
      }
 diff --git a/include/sleipnir/autodiff/jacobian.hpp b/include/sleipnir/autodiff/jacobian.hpp
-index f1915a0d08c509f4eb4d032d4e6a5e6099b68ebc..edd949eefd018af1b1e091b4b2780fc1a0a492cf 100644
+index 7a5c3798dab50f14db35bee430f1d5e8e32196ff..1a5b01de99a7c011ebf8c5ed9fc64942675fcb4b 100644
 --- a/include/sleipnir/autodiff/jacobian.hpp
 +++ b/include/sleipnir/autodiff/jacobian.hpp
 @@ -104,9 +104,9 @@ class Jacobian {
@@ -388,7 +388,7 @@ index 4018606df45941b578c861caf934495f8c9e368e..cf554832b82adb17b4b1d7b56842a77d
      }
  
 diff --git a/include/sleipnir/autodiff/variable_matrix.hpp b/include/sleipnir/autodiff/variable_matrix.hpp
-index 38b90b4a1c784cfd2fd806536d001db9335ebe2d..e9f90fb12d230e40497e8557b985ff9c82ebaaeb 100644
+index b5d15edc5b294a2ea50dca15a7612c61e5f2680b..02bccb660474d9380444f5e20124fb687e372982 100644
 --- a/include/sleipnir/autodiff/variable_matrix.hpp
 +++ b/include/sleipnir/autodiff/variable_matrix.hpp
 @@ -154,7 +154,7 @@ class VariableMatrix : public SleipnirBase {
@@ -959,10 +959,10 @@ index 5e20b9b8debc13611d5d719b589d8fd896c35a90..e5163f9c2dbbfa0a580d029e61c741e6
        if (m_dynamics_type == DynamicsType::EXPLICIT_ODE) {
          x_end = rk4<const decltype(m_dynamics)&, VariableMatrix<Scalar>,
 diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
-index c4a45f7f954c9e028b1c85c45d5034bde284474f..4e38a082855c07c47f1aa191613114a5a392a4e4 100644
+index d3feadd577bd53147a8b07da76910e046ccbf95d..18afc996590de98050bfd3ddc629952bf0c8c2e2 100644
 --- a/include/sleipnir/optimization/problem.hpp
 +++ b/include/sleipnir/optimization/problem.hpp
-@@ -97,7 +97,7 @@ class Problem {
+@@ -98,7 +98,7 @@ class Problem {
      for (int row = 0; row < rows; ++row) {
        for (int col = 0; col < cols; ++col) {
          m_decision_variables.emplace_back();
@@ -971,7 +971,7 @@ index c4a45f7f954c9e028b1c85c45d5034bde284474f..4e38a082855c07c47f1aa191613114a5
        }
      }
  
-@@ -132,8 +132,8 @@ class Problem {
+@@ -133,8 +133,8 @@ class Problem {
      for (int row = 0; row < rows; ++row) {
        for (int col = 0; col <= row; ++col) {
          m_decision_variables.emplace_back();
