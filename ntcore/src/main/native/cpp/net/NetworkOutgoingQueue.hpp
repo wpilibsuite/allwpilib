@@ -95,29 +95,38 @@ class NetworkOutgoingQueue {
     auto [infoIt, created] = m_idMap.try_emplace(id);
     if (!created && infoIt->getSecond().queueIndex != queueIndex) {
       // need to move any items from old queue to new queue
-      auto& oldMsgs = m_queues[infoIt->getSecond().queueIndex].msgs;
+      auto oldQueueIndex = infoIt->getSecond().queueIndex;
+      auto& oldMsgs = m_queues[oldQueueIndex].msgs;
+
+      // Before stable_partition, recompute valuePos for every publisher in
+      // the old queue. stable_partition shifts non-removed elements toward
+      // the front, so a saved index that falls after any removed element is
+      // now too large by the number of removed elements before it.
+      // Entries whose saved slot is itself being moved out are invalidated.
+      for (auto&& kv : m_idMap) {
+        auto& info = kv.getSecond();
+        if (info.queueIndex == oldQueueIndex && info.valuePos != -1) {
+          size_t vp = static_cast<size_t>(info.valuePos);
+          if (vp < oldMsgs.size() && oldMsgs[vp].id == id) {
+            info.valuePos = -1;  // this publisher's slot is being moved out
+          } else {
+            // shift left by the number of 'id' elements before vp
+            int shift = static_cast<int>(
+                std::count_if(oldMsgs.begin(), oldMsgs.begin() + vp,
+                              [id](const auto& e) { return e.id == id; }));
+            info.valuePos -= shift;
+          }
+        }
+      }
+
       auto it =
           std::stable_partition(oldMsgs.begin(), oldMsgs.end(),
                                 [&](const auto& e) { return e.id != id; });
-      // save partition point for valuePos adjustment
-      size_t partIdx = it - oldMsgs.begin();
       auto& newMsgs = m_queues[queueIndex].msgs;
       for (auto i = it; i != oldMsgs.end(); ++i) {
         newMsgs.emplace_back(std::move(*i));
       }
-      oldMsgs.erase(oldMsgs.begin() + partIdx, oldMsgs.end());
-
-      // adjust valuePos for other publishers still in the old queue:
-      // any valuePos that pointed to or past the partition boundary
-      // (into the removed region) is now stale
-      auto oldQueueIndex = infoIt->getSecond().queueIndex;
-      for (auto&& kv : m_idMap) {
-        auto& info = kv.getSecond();
-        if (info.queueIndex == oldQueueIndex && info.valuePos != -1 &&
-            static_cast<size_t>(info.valuePos) >= partIdx) {
-          info.valuePos = -1;
-        }
-      }
+      oldMsgs.erase(it, oldMsgs.end());
     }
 
     infoIt->getSecond().queueIndex = queueIndex;
