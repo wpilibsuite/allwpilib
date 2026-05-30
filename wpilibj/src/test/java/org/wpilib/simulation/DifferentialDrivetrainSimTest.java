@@ -46,7 +46,7 @@ class DifferentialDrivetrainSimTest {
             1,
             kinematics.trackwidth,
             Units.inchesToMeters(2),
-            VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
+            VecBuilder.fill(0.001, 0.001, 0.0001, 0.1, 0.1, 0.005, 0.005));
 
     var feedforward = new LinearPlantInversionFeedforward<>(plant, 0.020);
     var feedback = new LTVUnicycleController(0.020);
