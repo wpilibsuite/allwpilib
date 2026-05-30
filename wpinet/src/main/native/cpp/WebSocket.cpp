@@ -824,6 +824,23 @@ void WebSocket::SendControl(
     return;
   }
 
+  // Try direct write first to bypass any queued data writes.
+  // RFC 6455 requires control frames to be delivered ASAP and not held
+  // behind data frames. TryWrite bypasses the write req chain and, on
+  // success, sends the frame directly to the kernel socket buffer.
+  if (m_writeInProgress) {
+    detail::SerializedFrames sendFrames;
+    size_t numBytes = sendFrames.AddFrame(frame, m_server);
+    int sentBytes = m_stream.TryWrite(sendFrames.m_bufs);
+    if (static_cast<size_t>(sentBytes) == numBytes) {
+      // Control frame sent immediately; call the callback with the user buffers
+      wpi::util::SmallVector<uv::Buffer, 4> userBufs;
+      userBufs.append(frame.data.begin(), frame.data.end());
+      callback(userBufs, {});
+      return;
+    }
+  }
+
   // If nothing else is in flight, just use SendFrames()
   std::shared_ptr<WriteReq> curReq = m_curWriteReq.lock();
   if (!m_writeInProgress || !curReq) {
