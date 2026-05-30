@@ -285,11 +285,11 @@ void NetworkClient::WsConnected(wpi::net::WebSocket& ws, uv::Tcp& tcp,
       uv::Timer::SingleShot(
           m_loop, uv::Timer::Time{0},
           [this, reason = std::string{reason}, keepws = ws.shared_from_this()] {
-            // Check that the connection is still alive (this may fire after
-            // ~NetworkClient if the loop processes the timer between
-            // ExecSync and Stop). keepws ensures the WebSocket object is
-            // still valid for this check.
-            if (keepws->GetStream().IsLoopClosing()) {
+            // Check that the loop is not shutting down. keepws->GetStream()
+            // would dereference the underlying uv::Tcp which may have been
+            // destroyed after Handle::Close() released its self-reference.
+            // m_loop is safe to access as long as `this` is alive.
+            if (m_loop.IsClosing()) {
               return;
             }
             DoDisconnect(reason);
