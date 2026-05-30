@@ -30,6 +30,8 @@ dependencies {
     testAnnotationProcessor project(':epilogue-processor')
     testImplementation(libs.bundles.mockito)
     testImplementation project(':epilogue-runtime')
+
+    implementation "com.amihaiemil.web:eo-yaml:8.0.6"
 }
 
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
