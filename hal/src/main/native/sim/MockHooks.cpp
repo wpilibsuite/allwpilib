@@ -77,12 +77,23 @@ bool GetProgramStarted() {
 using namespace wpi::hal;
 
 extern "C" {
-void HALSIM_WaitForProgramStart(void) {
+void HALSIM_WaitForProgramStart(HAL_Bool waitForFirstNotifier) {
   int count = 0;
   while (!programStarted) {
     count++;
     if (count % 10 == 0) {
       wpi::util::print("Waiting for program start signal: {}\n", count);
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
+
+  // Frameworks observe program start before arming their first notifier alarm.
+  // Wait for that alarm so a following StepTiming() can see and service it.
+  while (waitForFirstNotifier &&
+         HALSIM_GetNextNotifierTimeout() == UINT64_MAX) {
+    count++;
+    if (count % 10 == 0) {
+      wpi::util::print("Waiting for first notifier alarm: {}\n", count);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
