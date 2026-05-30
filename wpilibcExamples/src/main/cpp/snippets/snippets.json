@@ -305,6 +305,17 @@
     "gradlebase": "cpp"
   },
   {
+    "name": "Mecanum Drive",
+    "description": "Show mecanum drive control with cartesian and polar drive in teleop.",
+    "tags": [
+      "Mecanum Drive",
+      "Gyro",
+      "Joystick"
+    ],
+    "foldername": "MecanumDrive",
+    "gradlebase": "cpp"
+  },
+  {
     "name": "Differential Drive",
     "description": "Show differential drive control with tank, arcade, and curvature drive in teleop",
     "tags": [

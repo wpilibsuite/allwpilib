@@ -73,6 +73,7 @@ SNIPPET_FOLDERS = [
     "i2ccommunication",
     "intermediatevision",
     "limitswitch",
+    "mecanumdrive",
     "motorcontrol",
     "onboardimu",
     "profiledpidfeedforward",
