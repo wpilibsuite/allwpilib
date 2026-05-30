@@ -839,6 +839,48 @@ void WebSocket::SendControl(
       callback(userBufs, {});
       return;
     }
+    if (sentBytes > 0) {
+      // Partial write: bytes [0, sentBytes) are already on the wire.
+      // Falling through to normal queuing would re-send the full frame and
+      // corrupt the stream. Queue only the remaining bytes instead.
+      std::shared_ptr<WriteReq> curReq2 = m_curWriteReq.lock();
+      auto req2 =
+          std::make_shared<WriteReq>(weak_from_this(), std::move(callback));
+      req2->m_userBufs.append(frame.data.begin(), frame.data.end());
+      req2->m_frames.m_allocBufs = std::move(sendFrames.m_allocBufs);
+      req2->m_frames.m_allocBufPos = sendFrames.m_allocBufPos;
+
+      wpi::util::SmallVector<uv::Buffer, 4> writeBufs;
+      int pos = 0;
+      auto bufIt = sendFrames.m_bufs.begin();
+      auto bufEnd = sendFrames.m_bufs.end();
+      while (bufIt != bufEnd && pos < sentBytes) {
+        pos += (bufIt++)->len;
+      }
+      if (bufIt != sendFrames.m_bufs.begin() && pos != sentBytes) {
+        writeBufs.emplace_back(
+            wpi::util::take_back((bufIt - 1)->bytes(), pos - sentBytes));
+      }
+      while (bufIt != bufEnd) {
+        writeBufs.emplace_back(*bufIt++);
+      }
+
+      if (curReq2) {
+        req2->m_cont = curReq2;
+        if (!curReq2->m_controlCont) {
+          curReq2->m_controlCont = req2;
+        } else {
+          auto c = curReq2->m_controlCont;
+          while (c->m_cont != req2->m_cont) {
+            c = c->m_cont;
+          }
+          c->m_cont = req2;
+        }
+      }
+      m_stream.Write(writeBufs, req2);
+      return;
+    }
+    // sentBytes <= 0: nothing sent or error; fall through to normal queuing.
   }
 
   // If nothing else is in flight, just use SendFrames()
