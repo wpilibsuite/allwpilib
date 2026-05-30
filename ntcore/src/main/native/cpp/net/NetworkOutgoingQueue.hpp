@@ -99,11 +99,25 @@ class NetworkOutgoingQueue {
       auto it =
           std::stable_partition(oldMsgs.begin(), oldMsgs.end(),
                                 [&](const auto& e) { return e.id != id; });
+      // save partition point for valuePos adjustment
+      size_t partIdx = it - oldMsgs.begin();
       auto& newMsgs = m_queues[queueIndex].msgs;
-      for (auto i = it, end = oldMsgs.end(); i != end; ++i) {
+      for (auto i = it; i != oldMsgs.end(); ++i) {
         newMsgs.emplace_back(std::move(*i));
       }
-      oldMsgs.erase(it, oldMsgs.end());
+      oldMsgs.erase(oldMsgs.begin() + partIdx, oldMsgs.end());
+
+      // adjust valuePos for other publishers still in the old queue:
+      // any valuePos that pointed to or past the partition boundary
+      // (into the removed region) is now stale
+      auto oldQueueIndex = infoIt->getSecond().queueIndex;
+      for (auto&& kv : m_idMap) {
+        auto& info = kv.getSecond();
+        if (info.queueIndex == oldQueueIndex && info.valuePos != -1 &&
+            static_cast<size_t>(info.valuePos) >= partIdx) {
+          info.valuePos = -1;
+        }
+      }
     }
 
     infoIt->getSecond().queueIndex = queueIndex;
@@ -261,7 +275,13 @@ class NetworkOutgoingQueue {
       for (auto&& kv : m_idMap) {
         auto& info = kv.getSecond();
         if (info.queueIndex == queueIndex) {
-          if (info.valuePos < delta) {
+          // guard against stale valuePos: if it was already out of range
+          // (e.g. from a prior SetPeriod move), invalidate rather than
+          // compounding the error with an incorrect adjustment
+          if (info.valuePos != -1 &&
+              static_cast<size_t>(info.valuePos) >= msgs.size() + delta) {
+            info.valuePos = -1;
+          } else if (info.valuePos < delta) {
             info.valuePos = -1;
           } else {
             info.valuePos -= delta;
