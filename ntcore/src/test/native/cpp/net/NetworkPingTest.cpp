@@ -65,24 +65,34 @@ TEST_F(NetworkPingTest, TimeoutOnStaleGetLastReceivedTime) {
   ASSERT_FALSE(m_ping.Send(2400));
 }
 
-TEST_F(NetworkPingTest, NoTimeoutWhenGetLastReceivedTimeIsZero) {
-  // First ping — establishes the interval
+TEST_F(NetworkPingTest, TimeoutWhenNeverReceivedData) {
+  // First ping — establishes m_firstPingTimeMs = 1000.
   EXPECT_CALL(m_wire, GetLastReceivedTime()).WillOnce(Return(0));
   EXPECT_CALL(m_wire, SendPing(1000));
   ASSERT_TRUE(m_ping.Send(1000));
 
-  // Second call — GetLastReceivedTime returns 0 (connection never received data)
-  // The old code would fall back to m_pongTimeMs (1000) and potentially timeout.
-  // The fixed code skips the timeout check when lastData is 0.
   EXPECT_CALL(m_wire, GetLastReceivedTime()).WillOnce(Return(0));
   EXPECT_CALL(m_wire, SendPing(1200));
   ASSERT_TRUE(m_ping.Send(1200));
 
-  // Even further in the future with no received data
-  // The fixed code still does not timeout because lastData is 0.
   EXPECT_CALL(m_wire, GetLastReceivedTime()).WillOnce(Return(0));
-  EXPECT_CALL(m_wire, SendPing(3000));
-  ASSERT_TRUE(m_ping.Send(3000));
+  EXPECT_CALL(m_wire, SendPing(1400));
+  ASSERT_TRUE(m_ping.Send(1400));
+
+  EXPECT_CALL(m_wire, GetLastReceivedTime()).WillOnce(Return(0));
+  EXPECT_CALL(m_wire, SendPing(1600));
+  ASSERT_TRUE(m_ping.Send(1600));
+
+  EXPECT_CALL(m_wire, GetLastReceivedTime()).WillOnce(Return(0));
+  EXPECT_CALL(m_wire, SendPing(1800));
+  ASSERT_TRUE(m_ping.Send(1800));
+
+  // At t=2001: curTimeMs(2001) > m_firstPingTimeMs(1000) +
+  // kPingTimeoutMs(1000). The connection never sent any data so must be
+  // disconnected.
+  EXPECT_CALL(m_wire, GetLastReceivedTime()).WillOnce(Return(0));
+  EXPECT_CALL(m_wire, Disconnect("connection timed out"));
+  ASSERT_FALSE(m_ping.Send(2001));
 }
 
 TEST_F(NetworkPingTest, MultipleCyclesWithValidData) {

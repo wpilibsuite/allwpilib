@@ -30,7 +30,17 @@ bool NetworkPing::Send(uint64_t curTimeMs) {
     m_wire.Disconnect("connection timed out");
     return false;
   }
+  // When no data has ever been received, fall back to the time of the first
+  // ping as the timeout baseline so half-open connections are still detected.
+  if (lastData == 0 && m_firstPingTimeMs != 0 &&
+      curTimeMs > (m_firstPingTimeMs + kPingTimeoutMs)) {
+    m_wire.Disconnect("connection timed out");
+    return false;
+  }
   m_wire.SendPing(curTimeMs);
+  if (m_firstPingTimeMs == 0) {
+    m_firstPingTimeMs = curTimeMs;
+  }
   m_nextPingTimeMs = curTimeMs + kPingIntervalMs;
   m_pongTimeMs = curTimeMs;
   return true;
