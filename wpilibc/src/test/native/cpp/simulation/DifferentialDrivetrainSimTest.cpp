@@ -14,11 +14,14 @@
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
+#include "wpi/simulation/RoboRioSim.hpp"
 #include "wpi/units/current.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 
 TEST(DifferentialDrivetrainSimTest, Convergence) {
+  wpi::sim::RoboRioSim::ResetData();
+
   auto motor = wpi::math::DCMotor::NEO(2);
   auto plant = wpi::math::Models::DifferentialDriveFromPhysicalConstants(
       motor, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
@@ -26,7 +29,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
   wpi::math::DifferentialDriveKinematics kinematics{24_in};
   wpi::sim::DifferentialDrivetrainSim sim{
       plant, 24_in, motor,
-      1.0,   2_in,  {0.001, 0.001, 0.0001, 0.1, 0.1, 0.005, 0.005}};
+      1.0,   2_in,  {0.0, 0.0, 0.0001, 0.1, 0.1, 0.005, 0.005}};
 
   wpi::math::LinearPlantInversionFeedforward feedforward{plant, 20_ms};
   wpi::math::LTVUnicycleController feedback{20_ms};
@@ -50,10 +53,11 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
     auto [l, r] = kinematics.ToWheelVelocities(feedbackOut);
     auto voltages =
         feedforward.Calculate(wpi::math::Vectord<2>{l.value(), r.value()});
+    auto clampedVoltages = sim.ClampInput(voltages);
 
     // Sim periodic code.
-    sim.SetInputs(wpi::units::volt_t{voltages(0, 0)},
-                  wpi::units::volt_t{voltages(1, 0)});
+    sim.SetInputs(wpi::units::volt_t{clampedVoltages(0, 0)},
+                  wpi::units::volt_t{clampedVoltages(1, 0)});
     sim.Update(20_ms);
 
     // Update ground truth.
@@ -61,7 +65,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
         [&sim](const auto& x, const auto& u) -> wpi::math::Vectord<7> {
           return sim.Dynamics(x, u);
         },
-        groundTruthX, voltages, 20_ms);
+        groundTruthX, clampedVoltages, 20_ms);
   }
 
   // 2 inch tolerance is OK since our ground truth is an approximation of the
