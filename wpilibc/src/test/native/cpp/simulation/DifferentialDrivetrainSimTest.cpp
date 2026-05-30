@@ -29,7 +29,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
   wpi::math::DifferentialDriveKinematics kinematics{24_in};
   wpi::sim::DifferentialDrivetrainSim sim{
       plant, 24_in, motor,
-      1.0,   2_in,  {0.0, 0.0, 0.0001, 0.1, 0.1, 0.005, 0.005}};
+      1.0,   2_in,  {0.001, 0.001, 0.0001, 0.1, 0.1, 0.005, 0.005}};
 
   wpi::math::LinearPlantInversionFeedforward feedforward{plant, 20_ms};
   wpi::math::LTVUnicycleController feedback{20_ms};
