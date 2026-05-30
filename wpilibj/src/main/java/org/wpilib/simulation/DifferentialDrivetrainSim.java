@@ -151,7 +151,7 @@ public class DifferentialDrivetrainSim {
   }
 
   /** Returns the full simulated state of the drivetrain. */
-  Matrix<N7, N1> getState() {
+  public Matrix<N7, N1> getState() {
     return m_x;
   }
 
@@ -161,7 +161,7 @@ public class DifferentialDrivetrainSim {
    * @param state the state to get
    * @return the state
    */
-  double getState(State state) {
+  public double getState(State state) {
     return m_x.get(state.value, 0);
   }
 

@@ -20,6 +20,8 @@
 #include "wpi/units/moment_of_inertia.hpp"
 
 TEST(DifferentialDrivetrainSimTest, Convergence) {
+  using State = wpi::sim::DifferentialDrivetrainSim::State;
+
   wpi::sim::RoboRioSim::ResetData();
 
   auto motor = wpi::math::DCMotor::NEO(2);
@@ -70,9 +72,9 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
 
   // 2 inch tolerance is OK since our ground truth is an approximation of the
   // ODE solution using wpi::math::RKDP anyway
-  EXPECT_NEAR(groundTruthX(0, 0), sim.GetPose().X().value(), 0.05);
-  EXPECT_NEAR(groundTruthX(1, 0), sim.GetPose().Y().value(), 0.05);
-  EXPECT_NEAR(groundTruthX(2, 0), sim.GetHeading().Radians().value(), 0.01);
+  EXPECT_NEAR(groundTruthX(0, 0), sim.GetState(State::X), 0.05);
+  EXPECT_NEAR(groundTruthX(1, 0), sim.GetState(State::Y), 0.05);
+  EXPECT_NEAR(groundTruthX(2, 0), sim.GetState(State::HEADING), 0.01);
 }
 
 TEST(DifferentialDrivetrainSimTest, Current) {
