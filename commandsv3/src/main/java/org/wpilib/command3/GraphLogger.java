@@ -4,17 +4,18 @@
 
 package org.wpilib.command3;
 
-import com.amihaiemil.eoyaml.Yaml;
-import com.amihaiemil.eoyaml.YamlMapping;
+import io.avaje.json.JsonDataException;
+import io.avaje.json.JsonIoException;
+import io.avaje.jsonb.Json;
+import io.avaje.jsonb.JsonType;
+import io.avaje.jsonb.Jsonb;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.regex.Pattern;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.system.Filesystem;
 
@@ -28,7 +29,12 @@ public class GraphLogger {
 
   private static final GraphLogger instance = new GraphLogger();
 
-  private record StateMachineGraph(String graph, List<String> stateDefinitionOrder) {}
+  @Json
+  static class StateMachineGraph {
+    @Json.Raw String transitions = "";
+    List<String> stateDefinitionOrder = List.of();
+    String initialState = "";
+  }
 
   /**
    * Returns the default instance of the GraphLogger.
@@ -43,9 +49,10 @@ public class GraphLogger {
   protected GraphLogger() {}
 
   private boolean hasStarted = false;
-  private BiConsumer<String, String> logger = (key, value) -> {};
-  private final Pattern frontmatterPattern =
-      Pattern.compile("^---\\s*(.*?)\\s*---", Pattern.DOTALL);
+  private BiConsumer<String, String> logString = (_, _) -> {};
+  private BiConsumer<String, String[]> logStringArray = (_, _) -> {};
+  private final JsonType<StateMachineGraph> graphType =
+      Jsonb.instance().type(StateMachineGraph.class);
   private final Map<String, StateMachineGraph> stateMachineGraphs = new HashMap<>();
 
   /**
@@ -53,62 +60,37 @@ public class GraphLogger {
    *
    * <p>This will load the state machine graphs from the filesystem and start accepting updates.
    *
-   * @param logger a consumer that handles the logging of graph data (key, value)
+   * @param logString a callback that logs a string to an arbitrary key.
+   * @param logStringArray a callback that logs an array of strings to an arbitrary key.
    */
-  public void start(BiConsumer<String, String> logger) {
+  public void start(
+      BiConsumer<String, String> logString, BiConsumer<String, String[]> logStringArray) {
     this.hasStarted = true;
-    this.logger = logger;
+    this.logString = logString;
+    this.logStringArray = logStringArray;
     loadStateMachineGraphs();
   }
 
   private void loadStateMachineGraphs() {
     var stateMachineGraphsDir =
-        new File(Filesystem.getDeployDirectory(), "stateMachineGraphs").listFiles();
+        new File(Filesystem.getDeployDirectory(), "stateMachineGraphData").listFiles();
     if (stateMachineGraphsDir == null) {
       return;
     }
     for (var file : stateMachineGraphsDir) {
-      if (!file.getName().endsWith(".mermaid")) {
+      if (!file.getName().endsWith(".json")) {
         continue;
       }
-      var stateMachineName = file.getName().replace(".mermaid", "");
+      var stateMachineName = file.getName().replace(".json", "");
       try {
-        var graph = Files.readString(file.toPath());
-        if (!graph.contains("---")) {
-          continue;
-        }
-        var frontmatter = extractFrontmatter(graph);
-        if (frontmatter == null) {
-          continue;
-        }
-        var stateDefOrderProperty = frontmatter.yamlSequence("state_definition_order");
-        if (stateDefOrderProperty == null) {
-          continue;
-        }
-        var stateDefOrder = new ArrayList<String>();
-        for (var item : stateDefOrderProperty.children()) {
-          stateDefOrder.add(item.toString());
-        }
-        graph = graph.substring(graph.lastIndexOf("---") + 3);
-        stateMachineGraphs.put(stateMachineName, new StateMachineGraph(graph, stateDefOrder));
-        logger.accept("StateMachineGraphs/" + stateMachineName, graph);
-      } catch (IOException e) {
+        var data = graphType.fromJson(Files.readString(file.toPath()));
+        stateMachineGraphs.put(stateMachineName, data);
+        logString.accept("StateMachines/" + stateMachineName + "/graph/", data.transitions);
+      } catch (IOException | JsonIoException | JsonDataException e) {
         DriverStationBackend.reportError(
             "The graph of " + stateMachineName + " could not be loaded. Error: " + e.getMessage(),
             false);
       }
-    }
-  }
-
-  private YamlMapping extractFrontmatter(String mermaidCode) {
-    var matcher = frontmatterPattern.matcher(mermaidCode);
-    if (!matcher.find()) {
-      return null;
-    }
-    try {
-      return Yaml.createYamlInput(matcher.group(1)).readYamlMapping();
-    } catch (IOException e) {
-      return null;
     }
   }
 
@@ -126,9 +108,10 @@ public class GraphLogger {
       return;
     }
     var stateDefs = graph.stateDefinitionOrder;
-    var historyAsStringList =
-        history.stream().map(s -> stateDefs.get(allStates.indexOf(s))).toList();
-    var graphStr = "---\nhistory: " + historyAsStringList + "\n---\n" + graph.graph();
-    logger.accept("StateMachineGraphs/" + stateMachineName, graphStr);
+    var historyAsArray = new String[history.size()];
+    for (int i = 0; i < history.size(); i++) {
+      historyAsArray[i] = stateDefs.get(allStates.indexOf(history.get(i)));
+    }
+    logStringArray.accept("StateMachines/" + stateMachineName + "/history/", historyAsArray);
   }
 }
