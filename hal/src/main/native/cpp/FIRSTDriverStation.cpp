@@ -183,7 +183,7 @@ HAL_Bool HAL_GetJoystickIsGamepad(int32_t joystickNum) {
   if (status == 0) {
     return joystickDesc.isGamepad != 0;
   }
-  return -1;
+  return false;
 }
 
 int32_t HAL_GetJoystickGamepadType(int32_t joystickNum) {
