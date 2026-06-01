@@ -445,16 +445,19 @@ int32_t MrcLibDsImpl::setOpModeOptions(const struct HAL_OpModeOption* options,
           std::min(static_cast<size_t>(option.name.len),
                    static_cast<size_t>(MRCLIB_MAX_OPMODE_NAME_LENGTH));
       std::memcpy(newValue.name, option.name.str, nameLen);
+      newValue.nameLength = static_cast<uint8_t>(nameLen);
 
       auto groupLen =
           std::min(static_cast<size_t>(option.group.len),
                    static_cast<size_t>(MRCLIB_MAX_OPMODE_GROUP_LENGTH));
       std::memcpy(newValue.group, option.group.str, groupLen);
+      newValue.groupLength = static_cast<uint8_t>(groupLen);
 
       auto descLen =
           std::min(static_cast<size_t>(option.description.len),
                    static_cast<size_t>(MRCLIB_MAX_OPMODE_DESCRIPTION_LENGTH));
       std::memcpy(newValue.description, option.description.str, descLen);
+      newValue.descriptionLength = static_cast<uint8_t>(descLen);
 
       newValue.textColor = option.textColor;
       newValue.backgroundColor = option.backgroundColor;
