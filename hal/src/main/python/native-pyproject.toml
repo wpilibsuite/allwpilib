@@ -32,6 +32,17 @@ version = "0.0.0"
 extract_to = "src/native/wpihal"
 libs = ["wpiHal"]
 
+[[tool.hatch.build.hooks.robotpy.maven_lib_download]]
+artifact_id = "mrclib-cpp"
+group_id = "org.wpilib.mrclib"
+repo_url = "https://frcmaven.wpi.edu/artifactory/development-2027"
+version = "2027.1.0-alpha-1-50-gd008523"
+
+extract_to = "src/native/wpihal"
+libs = ["MrcLib"]
+
+enable_if = 'platform_machine != "systemcore"'
+
 [[tool.hatch.build.hooks.nativelib.pcfile]]
 pcfile = "src/native/wpihal/robotpy-native-wpihal.pc"
 name = "wpihal"
@@ -40,3 +51,13 @@ includedir = "src/native/wpihal/include"
 libdir = "src/native/wpihal/lib"
 shared_libraries = ["wpiHal"]
 requires = ["robotpy-native-wpiutil", "robotpy-native-ntcore"]
+
+[[tool.hatch.build.hooks.nativelib.pcfile]]
+pcfile = "src/native/wpihal/robotpy-native-mrclib.pc"
+name = "mrclib"
+
+includedir = "src/native/wpihal/include"
+libdir = "src/native/wpihal/lib"
+shared_libraries = ["MrcLib"]
+
+enable_if = 'platform_machine != "systemcore"'
