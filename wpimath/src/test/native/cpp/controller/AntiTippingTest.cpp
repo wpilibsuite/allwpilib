@@ -8,9 +8,13 @@
 
 static constexpr double kTolerance = 1e-6;
 
+// Shared constructor parameters used by all tests
+static constexpr wpi::units::unit_t<wpi::math::AntiTipping::kp_unit> kKp{0.1};
+static constexpr wpi::units::radian_t kThreshold = 3_deg;
+static constexpr wpi::units::meters_per_second_t kMaxSpeed = 2_mps;
+
 TEST(AntiTippingTest, BelowThresholdGeneratesNoCorrection) {
-  wpi::math::AntiTipping antiTipping{0.1, wpi::units::radian_t{3_deg}.value(),
-                                     2.0};
+  wpi::math::AntiTipping antiTipping{kKp, kThreshold, kMaxSpeed};
   auto correction =
       antiTipping.Calculate(wpi::math::Rotation3d{1_deg, 1_deg, 0_deg});
 
@@ -19,8 +23,7 @@ TEST(AntiTippingTest, BelowThresholdGeneratesNoCorrection) {
 }
 
 TEST(AntiTippingTest, ForwardTipDrivesForward) {
-  wpi::math::AntiTipping antiTipping{0.1, wpi::units::radian_t{3_deg}.value(),
-                                     2.0};
+  wpi::math::AntiTipping antiTipping{kKp, kThreshold, kMaxSpeed};
   auto correction =
       antiTipping.Calculate(wpi::math::Rotation3d{0_deg, 10_deg, 0_deg});
 
@@ -29,8 +32,7 @@ TEST(AntiTippingTest, ForwardTipDrivesForward) {
 }
 
 TEST(AntiTippingTest, BackwardTipDrivesBackward) {
-  wpi::math::AntiTipping antiTipping{0.1, wpi::units::radian_t{3_deg}.value(),
-                                     2.0};
+  wpi::math::AntiTipping antiTipping{kKp, kThreshold, kMaxSpeed};
   auto correction =
       antiTipping.Calculate(wpi::math::Rotation3d{0_deg, -10_deg, 0_deg});
 
@@ -39,8 +41,7 @@ TEST(AntiTippingTest, BackwardTipDrivesBackward) {
 }
 
 TEST(AntiTippingTest, RightRollDrivesRight) {
-  wpi::math::AntiTipping antiTipping{0.1, wpi::units::radian_t{3_deg}.value(),
-                                     2.0};
+  wpi::math::AntiTipping antiTipping{kKp, kThreshold, kMaxSpeed};
   auto correction =
       antiTipping.Calculate(wpi::math::Rotation3d{15_deg, 0_deg, 0_deg});
 
@@ -49,11 +50,10 @@ TEST(AntiTippingTest, RightRollDrivesRight) {
 }
 
 TEST(AntiTippingTest, LeftRollDrivesLeft) {
-  wpi::math::AntiTipping antiTipping{0.1, wpi::units::radian_t{3_deg}.value(),
-                                     2.0};
+  wpi::math::AntiTipping antiTipping{kKp, kThreshold, kMaxSpeed};
   auto correction =
       antiTipping.Calculate(wpi::math::Rotation3d{-15_deg, 0_deg, 0_deg});
 
-  EXPECT_NEAR(0.0, correction.vy.value(), kTolerance);  // corrected: vx check
+  EXPECT_NEAR(0.0, correction.vx.value(), kTolerance);
   EXPECT_GT(correction.vy.value(), 0.0);
 }

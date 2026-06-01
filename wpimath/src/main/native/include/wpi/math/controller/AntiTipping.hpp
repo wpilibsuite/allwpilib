@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <gcem.hpp>
+
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
@@ -49,17 +51,23 @@ namespace wpi::math {
  */
 class WPILIB_DLLEXPORT AntiTipping {
  public:
+  /// Proportional gain unit: meters per second per radian of inclination.
+  using kp_unit =
+      wpi::units::compound_unit<wpi::units::meters_per_second,
+                                wpi::units::inverse<wpi::units::radians>>;
+
   /**
    * Creates a new AntiTipping instance.
    *
-   * @param kp The proportional coefficient in meters per second. The P
-   *     controller input is the sine of the inclination angle, and the output
-   *     is in meters per second.
-   * @param tippingThreshold Tipping detection threshold in radians.
-   * @param maxCorrectionSpeed Maximum correction velocity in meters per second.
+   * @param kp The proportional coefficient in meters per second per radian.
+   *     The P controller input is the sine of the inclination angle, and the
+   *     output is in meters per second.
+   * @param tippingThreshold Tipping detection threshold.
+   * @param maxCorrectionSpeed Maximum correction velocity.
    */
-  constexpr AntiTipping(double kp, double tippingThreshold,
-                        double maxCorrectionSpeed)
+  constexpr AntiTipping(wpi::units::unit_t<kp_unit> kp,
+                        wpi::units::radian_t tippingThreshold,
+                        wpi::units::meters_per_second_t maxCorrectionSpeed)
       : m_kp(kp),
         m_tippingThreshold(tippingThreshold),
         m_maxCorrectionSpeed(maxCorrectionSpeed) {}
@@ -67,48 +75,51 @@ class WPILIB_DLLEXPORT AntiTipping {
   /**
    * Sets the proportional coefficient.
    *
-   * @param kp The proportional coefficient in meters per second.
+   * @param kp The proportional coefficient in meters per second per radian.
    */
-  constexpr void SetP(double kp) { m_kp = kp; }
+  constexpr void SetP(wpi::units::unit_t<kp_unit> kp) { m_kp = kp; }
 
   /**
    * Gets the proportional coefficient.
    *
-   * @return The proportional coefficient in meters per second.
+   * @return The proportional coefficient in meters per second per radian.
    */
-  constexpr double GetP() const { return m_kp; }
+  constexpr wpi::units::unit_t<kp_unit> GetP() const { return m_kp; }
 
   /**
    * Sets the tipping detection threshold.
    *
-   * @param threshold The tipping threshold in radians.
+   * @param threshold The tipping threshold.
    */
-  constexpr void SetTippingThreshold(double threshold) {
+  constexpr void SetTippingThreshold(wpi::units::radian_t threshold) {
     m_tippingThreshold = threshold;
   }
 
   /**
    * Gets the tipping detection threshold.
    *
-   * @return The tipping threshold in radians.
+   * @return The tipping threshold.
    */
-  constexpr double GetTippingThreshold() const { return m_tippingThreshold; }
+  constexpr wpi::units::radian_t GetTippingThreshold() const {
+    return m_tippingThreshold;
+  }
 
   /**
    * Sets the maximum correction velocity.
    *
-   * @param speed The maximum correction speed in meters per second.
+   * @param speed The maximum correction speed.
    */
-  constexpr void SetMaxCorrectionSpeed(double speed) {
+  constexpr void SetMaxCorrectionSpeed(
+      wpi::units::meters_per_second_t speed) {
     m_maxCorrectionSpeed = speed;
   }
 
   /**
    * Gets the maximum correction velocity.
    *
-   * @return The maximum correction speed in meters per second.
+   * @return The maximum correction speed.
    */
-  constexpr double GetMaxCorrectionSpeed() const {
+  constexpr wpi::units::meters_per_second_t GetMaxCorrectionSpeed() const {
     return m_maxCorrectionSpeed;
   }
 
@@ -119,12 +130,45 @@ class WPILIB_DLLEXPORT AntiTipping {
    * @return Correction ChassisVelocities to counteract tipping. Returns zeros
    *     if below threshold.
    */
-  ChassisVelocities Calculate(const Rotation3d& attitude);
+  constexpr ChassisVelocities Calculate(const Rotation3d& attitude) const {
+    // To find the correction, we rotate the z axis (scaled by the P gain) by
+    // the attitude, then project onto the x-y plane.
+    Translation2d correction =
+        Translation3d{0_m, 0_m, wpi::units::meter_t{m_kp.value()}}
+            .RotateBy(attitude)
+            .ToTranslation2d();
+    wpi::units::meters_per_second_t speed{correction.Norm().value()};
+
+    // Let inclination angle of 3D correction be θ.
+    //
+    //    _o_       +z
+    //    \  |       ^
+    //   h \θ|       |
+    //      \|  +x <--
+    //
+    // where o is length of 2D correction and h is length of 3D correction.
+    //
+    //   sinθ = o/h
+    //   θ = asin(speed / m_kp)
+    wpi::units::radian_t inclinationAngle{
+        gcem::asin(speed.value() / m_kp.value())};
+
+    if (inclinationAngle < m_tippingThreshold) {
+      return {};
+    } else if (speed > m_maxCorrectionSpeed) {
+      correction =
+          correction * (m_maxCorrectionSpeed.value() / speed.value());
+    }
+
+    return {wpi::units::meters_per_second_t{correction.X().value()},
+            wpi::units::meters_per_second_t{correction.Y().value()},
+            0_rad_per_s};
+  }
 
  private:
-  double m_kp;
-  double m_tippingThreshold;
-  double m_maxCorrectionSpeed;
+  wpi::units::unit_t<kp_unit> m_kp;
+  wpi::units::radian_t m_tippingThreshold;
+  wpi::units::meters_per_second_t m_maxCorrectionSpeed;
 };
 
 }  // namespace wpi::math
