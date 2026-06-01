@@ -5,8 +5,8 @@
 #pragma once
 
 #include "wpi/hal/DIO.h"
-#include "wpi/hal/Types.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/Handle.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -142,8 +142,8 @@ class DigitalOutput : public wpi::util::Sendable,
 
  private:
   int m_channel;
-  wpi::hal::Handle<HAL_DigitalHandle, HAL_FreeDIOPort> m_handle;
-  wpi::hal::Handle<HAL_DigitalPWMHandle> m_pwmGenerator;
+  wpi::util::Handle<HAL_DigitalHandle, HAL_FreeDIOPort> m_handle;
+  wpi::util::Handle<HAL_DigitalPWMHandle> m_pwmGenerator;
 };
 
 }  // namespace wpi
