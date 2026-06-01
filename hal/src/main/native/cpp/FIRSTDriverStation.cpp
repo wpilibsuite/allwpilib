@@ -63,8 +63,8 @@ int32_t DefaultSendErrorImpl(bool isError, int32_t errorCode,
   int retval = 0;
   if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
     if (backendWriteFunc) {
-      retval = backendWriteFunc(isError, errorCode, details, location, callStack,
-                       &printMsg);
+      retval = backendWriteFunc(isError, errorCode, details, location,
+                                callStack, &printMsg);
     }
 
     if (printMsg) {
