@@ -292,7 +292,11 @@ int32_t MrcLibDsSimImpl::setOpModeOptions(
   if (count < 0 || count > 1000 || (count != 0 && !options)) {
     return HAL_PARAMETER_OUT_OF_RANGE;
   }
-  SimDriverStationData->SetOpModeOptions({options, options + count});
+  if (count == 0) {
+    SimDriverStationData->SetOpModeOptions({});
+  } else {
+    SimDriverStationData->SetOpModeOptions({options, options + count});
+  }
   return 0;
 }
 

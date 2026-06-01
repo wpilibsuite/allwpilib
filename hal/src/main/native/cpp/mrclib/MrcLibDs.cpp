@@ -467,7 +467,11 @@ int32_t MrcLibDsImpl::setOpModeOptions(const struct HAL_OpModeOption* options,
   int32_t status =
       MRC_DsCommsControl_SetOpModeOptions(newOptions.data(), newOptions.size());
 
-  wpi::hal::SetDashboardOpModeOptions({options, options + count});
+  if (count == 0) {
+    wpi::hal::SetDashboardOpModeOptions({});
+  } else {
+    wpi::hal::SetDashboardOpModeOptions({options, options + count});
+  }
 
   return status;
 }

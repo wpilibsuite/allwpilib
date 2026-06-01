@@ -63,7 +63,7 @@ int32_t DefaultSendErrorImpl(bool isError, int32_t errorCode,
   int retval = 0;
   if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
     if (backendWriteFunc) {
-      backendWriteFunc(isError, errorCode, details, location, callStack,
+      retval = backendWriteFunc(isError, errorCode, details, location, callStack,
                        &printMsg);
     }
 
@@ -183,7 +183,7 @@ HAL_Bool HAL_GetJoystickIsGamepad(int32_t joystickNum) {
   if (status == 0) {
     return joystickDesc.isGamepad != 0;
   }
-  return false;
+  return -1;
 }
 
 int32_t HAL_GetJoystickGamepadType(int32_t joystickNum) {
@@ -192,7 +192,7 @@ int32_t HAL_GetJoystickGamepadType(int32_t joystickNum) {
   if (status == 0) {
     return joystickDesc.gamepadType;
   }
-  return false;
+  return -1;
 }
 
 int32_t HAL_GetGameData(HAL_GameData* gameData) {
@@ -205,7 +205,7 @@ int32_t HAL_GetJoystickSupportedOutputs(int32_t joystickNum) {
   if (status == 0) {
     return joystickDesc.supportedOutputs;
   }
-  return false;
+  return -1;
 }
 
 void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum) {
