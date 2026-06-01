@@ -8,7 +8,7 @@ import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.rotation.Encoder;
 
 /**
- * Encoder snippets for frc-docs.
+ * Encoder snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html
  */
 @SuppressWarnings("deprecation")

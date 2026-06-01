@@ -35,8 +35,6 @@ class EpilogueGeneratorTest {
 
         import org.wpilib.hardware.hal.HAL;
 
-        import org.wpilib.epilogue.ExampleLogger;
-
         public final class Epilogue {
           static {
             HAL.reportUsage("Epilogue", "");
@@ -90,8 +88,6 @@ class EpilogueGeneratorTest {
 
         import org.wpilib.hardware.hal.HAL;
 
-        import org.wpilib.epilogue.ExampleLogger;
-
         public final class Epilogue {
           static {
             HAL.reportUsage("Epilogue", "");
@@ -114,6 +110,17 @@ class EpilogueGeneratorTest {
            */
           public static boolean shouldLog(Logged.Importance importance) {
             return importance.compareTo(config.minimumImportance) >= 0;
+          }
+
+          /**
+           * Updates Epilogue. This must be called periodically in order for Epilogue to record
+           * new values. Alternatively, {@code bind()} can be used to update at an offset from
+           * the main robot loop.
+           */
+          public static void update(org.wpilib.epilogue.Example robot) {
+            long start = System.nanoTime();
+            org_wpilib_epilogue_ExampleLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
+            config.backend.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
           }
         }
         """;
@@ -139,8 +146,6 @@ class EpilogueGeneratorTest {
         import static org.wpilib.units.Units.Seconds;
 
         import org.wpilib.hardware.hal.HAL;
-
-        import org.wpilib.epilogue.ExampleLogger;
 
         public final class Epilogue {
           static {
@@ -224,9 +229,6 @@ class EpilogueGeneratorTest {
 
         import org.wpilib.hardware.hal.HAL;
 
-        import org.wpilib.epilogue.AlphaBotLogger;
-        import org.wpilib.epilogue.BetaBotLogger;
-
         public final class Epilogue {
           static {
             HAL.reportUsage("Epilogue", "");
@@ -264,6 +266,17 @@ class EpilogueGeneratorTest {
           }
 
           /**
+           * Updates Epilogue. This must be called periodically in order for Epilogue to record
+           * new values. Alternatively, {@code bind()} can be used to update at an offset from
+           * the main robot loop.
+           */
+          public static void update(org.wpilib.epilogue.BetaBot robot) {
+            long start = System.nanoTime();
+            org_wpilib_epilogue_BetaBotLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
+            config.backend.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
+          }
+
+          /**
            * Binds Epilogue updates to a timed robot's update period. Log calls will be made at the
            * same update rate as the robot's loop function, but will be offset by a full phase
            * (for example, a 20ms update rate but 10ms offset from the main loop invocation) to
@@ -282,17 +295,6 @@ class EpilogueGeneratorTest {
             robot.addPeriodic(() -> {
               update(robot);
             }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
-          }
-
-          /**
-           * Updates Epilogue. This must be called periodically in order for Epilogue to record
-           * new values. Alternatively, {@code bind()} can be used to update at an offset from
-           * the main robot loop.
-           */
-          public static void update(org.wpilib.epilogue.BetaBot robot) {
-            long start = System.nanoTime();
-            org_wpilib_epilogue_BetaBotLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
-            config.backend.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
           }
 
           /**
@@ -356,9 +358,6 @@ class EpilogueGeneratorTest {
         import static org.wpilib.units.Units.Seconds;
 
         import org.wpilib.hardware.hal.HAL;
-
-        import org.wpilib.epilogue.ExampleLogger;
-        import org.wpilib.epilogue.CustomLogger;
 
         public final class Epilogue {
           static {

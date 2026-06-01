@@ -31,6 +31,7 @@
 #include "sleipnir/optimization/solver/options.hpp"
 #include "sleipnir/optimization/solver/sqp.hpp"
 #include "sleipnir/optimization/solver/util/bounds.hpp"
+#include "sleipnir/optimization/solver/util/problem_scaling.hpp"
 #include "sleipnir/util/empty.hpp"
 #include "sleipnir/util/print.hpp"
 #include "sleipnir/util/print_diagnostics.hpp"
@@ -113,7 +114,7 @@ class Problem {
   /// Decision variables have an initial value of zero.
   ///
   /// @param rows Number of matrix rows.
-  /// @return A symmetric matrix of decision varaibles in the optimization
+  /// @return A symmetric matrix of decision variables in the optimization
   ///     problem.
   [[nodiscard]]
   VariableMatrix<Scalar> symmetric_decision_variable(int rows) {
@@ -377,20 +378,26 @@ class Problem {
       }
 #endif
 
+      // Automatically scale the cost. The problem scaling procedure is
+      // described in more detail in docs/algorithms.md#problem-scaling.
+      x_ad.set_value(x);
+      const ProblemScaling<Scalar> scaling{g.value()};
+
       NewtonMatrixCallbacks<Scalar> matrix_callbacks{
           num_decision_variables,
           [&](const DenseVector& x) -> Scalar {
             x_ad.set_value(x);
-            return f.value();
+            return scaling.f * f.value();
           },
           [&](const DenseVector& x) -> SparseVector {
             x_ad.set_value(x);
-            return g.value();
+            return scaling.f * g.value();
           },
           [&](const DenseVector& x) -> SparseMatrix {
             x_ad.set_value(x);
-            return H.value();
-          }};
+            return scaling.f * H.value();
+          },
+          scaling};
 
       // Invoke Newton solver
       status =
@@ -465,35 +472,42 @@ class Problem {
       }
 #endif
 
+      // Automatically scale the cost and constraints. The problem scaling
+      // procedure is described in more detail in
+      // docs/algorithms.md#problem-scaling.
+      x_ad.set_value(x);
+      const ProblemScaling<Scalar> scaling{g.value(), A_e.value()};
+
       SQPMatrixCallbacks<Scalar> matrix_callbacks{
           num_decision_variables,
           num_equality_constraints,
           [&](const DenseVector& x) -> Scalar {
             x_ad.set_value(x);
-            return f.value();
+            return scaling.f * f.value();
           },
           [&](const DenseVector& x) -> SparseVector {
             x_ad.set_value(x);
-            return g.value();
+            return scaling.f * g.value();
           },
           [&](const DenseVector& x, const DenseVector& y) -> SparseMatrix {
             x_ad.set_value(x);
-            y_ad.set_value(y);
-            return H_f.value() + H_c.value();
+            y_ad.set_value(scaling.c_e.cwiseProduct(y));
+            return scaling.f * H_f.value() + H_c.value();
           },
           [&](const DenseVector& x, const DenseVector& y) -> SparseMatrix {
             x_ad.set_value(x);
-            y_ad.set_value(y);
+            y_ad.set_value(scaling.c_e.cwiseProduct(y));
             return H_c.value();
           },
           [&](const DenseVector& x) -> DenseVector {
             x_ad.set_value(x);
-            return c_e_ad.value();
+            return scaling.c_e.cwiseProduct(c_e_ad.value());
           },
           [&](const DenseVector& x) -> SparseMatrix {
             x_ad.set_value(x);
-            return A_e.value();
-          }};
+            return scaling.c_e.asDiagonal() * A_e.value();
+          },
+          scaling};
 
       // Invoke SQP solver
       status = sqp<Scalar>(matrix_callbacks, iteration_callbacks, options, x);
@@ -597,48 +611,55 @@ class Problem {
       project_onto_bounds(x, bounds);
 #endif
 
+      // Automatically scale the cost and constraints. The problem scaling
+      // procedure is described in more detail in
+      // docs/algorithms.md#problem-scaling.
+      x_ad.set_value(x);
+      const ProblemScaling<Scalar> scaling{g.value(), A_e.value(), A_i.value()};
+
       InteriorPointMatrixCallbacks<Scalar> matrix_callbacks{
           num_decision_variables,
           num_equality_constraints,
           num_inequality_constraints,
           [&](const DenseVector& x) -> Scalar {
             x_ad.set_value(x);
-            return f.value();
+            return scaling.f * f.value();
           },
           [&](const DenseVector& x) -> SparseVector {
             x_ad.set_value(x);
-            return g.value();
+            return scaling.f * g.value();
           },
           [&](const DenseVector& x, const DenseVector& y,
               const DenseVector& z) -> SparseMatrix {
             x_ad.set_value(x);
-            y_ad.set_value(y);
-            z_ad.set_value(z);
-            return H_f.value() + H_c.value();
+            y_ad.set_value(scaling.c_e.cwiseProduct(y));
+            z_ad.set_value(scaling.c_i.cwiseProduct(z));
+            return scaling.f * H_f.value() + H_c.value();
           },
           [&](const DenseVector& x, const DenseVector& y,
               const DenseVector& z) -> SparseMatrix {
             x_ad.set_value(x);
-            y_ad.set_value(y);
-            z_ad.set_value(z);
+            y_ad.set_value(scaling.c_e.cwiseProduct(y));
+            z_ad.set_value(scaling.c_i.cwiseProduct(z));
             return H_c.value();
           },
           [&](const DenseVector& x) -> DenseVector {
             x_ad.set_value(x);
-            return c_e_ad.value();
+            return scaling.c_e.cwiseProduct(c_e_ad.value());
           },
           [&](const DenseVector& x) -> SparseMatrix {
             x_ad.set_value(x);
-            return A_e.value();
+            return scaling.c_e.asDiagonal() * A_e.value();
           },
           [&](const DenseVector& x) -> DenseVector {
             x_ad.set_value(x);
-            return c_i_ad.value();
+            return scaling.c_i.cwiseProduct(c_i_ad.value());
           },
           [&](const DenseVector& x) -> SparseMatrix {
             x_ad.set_value(x);
-            return A_i.value();
-          }};
+            return scaling.c_i.asDiagonal() * A_i.value();
+          },
+          scaling};
 
       // Invoke interior-point method solver
       status =

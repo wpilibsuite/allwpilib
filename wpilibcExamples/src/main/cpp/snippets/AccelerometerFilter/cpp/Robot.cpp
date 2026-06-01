@@ -9,7 +9,7 @@
 #include "wpi/units/acceleration.hpp"
 
 /**
- * Accelerometer filtering snippets for frc-docs.
+ * Accelerometer filtering snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
 class Robot : public wpi::TimedRobot {
