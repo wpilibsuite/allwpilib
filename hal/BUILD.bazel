@@ -115,8 +115,8 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":generated_mrc_cc_headers",
-        "//shared/bazel/thirdparty/mrclib:mrclib",
         "//ntcore",
+        "//shared/bazel/thirdparty/mrclib",
         "//wpinet",
         "//wpiutil",
     ] + select({
@@ -239,6 +239,12 @@ generate_robotpy_native_wrapper_build_info(
     pyproject_toml = "src/main/python/native-pyproject.toml",
 )
 
+# Alias to make robotpy gen simpler.
+alias(
+    name = "shared/MrcLib",
+    actual = "//shared/bazel/thirdparty/mrclib:MrcLib",
+)
+
 define_native_wrapper(
     name = "robotpy-native-wpihal",
 )
@@ -246,6 +252,7 @@ define_native_wrapper(
 PYBIND_PKGCFG_DEPS = [
     "//datalog:native/datalog/robotpy-native-datalog.pc",
     "//datalog:robotpy-wpilog.generated_pkgcfg_files",
+    "//hal:native/wpihal/robotpy-native-mrclib.pc",
     "//hal:native/wpihal/robotpy-native-wpihal.pc",
     "//ntcore:native/ntcore/robotpy-native-ntcore.pc",
     "//ntcore:pyntcore.generated_pkgcfg_files",

@@ -50,7 +50,6 @@ scan_headers_ignore = [
 
     # TODO: might want this in the future
     "mrc/*",
-    "mrclib/*",
 
     "src/ds_types_fmt.h",
     "sim_cb.h",
