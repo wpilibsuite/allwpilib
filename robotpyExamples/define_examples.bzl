@@ -43,7 +43,6 @@ def _define_robot_project(projects, project_type):
             **common_kwargs
         )
 
-
 def define_examples():
     _define_robot_project(EXAMPLE_PROJECTS, "example")
 

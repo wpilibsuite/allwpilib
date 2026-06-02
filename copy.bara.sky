@@ -176,7 +176,7 @@ def define_mostrobotpy_to_allwpilib():
     ], exclude = EXCLUDES)
     destination_files += glob(["robotpyExamples/**"], exclude = ["robotpyExamples/define_examples.bzl", "robotpyExamples/example_projects.bzl", "robotpyExamples/generate_bazel_files.py", "robotpyExamples/BUILD.bazel"])
     transformations.append(core.move("examples/robot/", "robotpyExamples/examples"))
-    
+
     origin_files += glob([
         "examples/snippets/**",
     ], exclude = EXCLUDES)
