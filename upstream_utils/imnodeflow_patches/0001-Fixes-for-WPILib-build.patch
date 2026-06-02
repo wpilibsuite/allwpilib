@@ -1,0 +1,119 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Drew Williams <drew.williams@capstanmedical.com>
+Date: Sat, 25 Apr 2026 17:00:00 -0700
+Subject: [PATCH] Fixes for WPILib build
+
+WPILib's imgui is built with IMGUI_DEFINE_MATH_OPERATORS, which makes
+imgui.h provide operator*(float, ImVec2). ImNodeFlow's imgui_extra_math
+helpers (forked from imgui-node-editor) redefine the same operator
+unconditionally. Guard ImNodeFlow's copy on
+IMGUI_DEFINE_MATH_OPERATORS_IMPLEMENTED so it stays out of the way when
+imgui has already provided it.
+
+Mirror the host's BackendFlags and DisplayFramebufferScale into the
+contained sub-context. The sub-context shares the host's font atlas;
+without RendererHasTextures parity the new-frame consistency check
+asserts, and without DisplayFramebufferScale parity the dynamic font
+rasterizer bakes glyphs at 1x while the host renders at HiDPI density
+(blurry text in the node editor).
+
+Also fix two -Werror warnings the WPILib build trips on:
+ - unused-but-set t_best in imgui_bezier_math.inl
+ - reorder-ctor in the Pin constructor in ImNodeFlow.h
+
+Signed-off-by: Drew Williams <drew.williams@capstanmedical.com>
+---
+ include/ImNodeFlow.h      | 2 +-
+ src/context_wrapper.h     | 8 ++++++++
+ src/imgui_bezier_math.inl | 2 --
+ src/imgui_extra_math.h    | 2 ++
+ src/imgui_extra_math.inl  | 2 ++
+ 5 files changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/include/ImNodeFlow.h b/include/ImNodeFlow.h
+index cede05a6f536e5bf60581f0a58e47bfaa159986b..a140cf66f20669eb96d673204c3b688d3b90e366 100644
+--- a/include/ImNodeFlow.h
++++ b/include/ImNodeFlow.h
+@@ -898,7 +898,7 @@ namespace ImFlow
+          * @param style Style of the pin
+          */
+         explicit Pin(PinUID uid, std::string name, std::shared_ptr<PinStyle> style, PinType kind, BaseNode* parent, ImNodeFlow** inf)
+-            :m_uid(uid), m_name(std::move(name)), m_style(std::move(style)), m_type(kind), m_parent(parent), m_inf(inf)
++            :m_uid(uid), m_name(std::move(name)), m_type(kind), m_parent(parent), m_inf(inf), m_style(std::move(style))
+             {
+                 if(!m_style)
+                     m_style = PinStyle::cyan();
+diff --git a/src/context_wrapper.h b/src/context_wrapper.h
+index 857cadd871e870424a29f560eb67047f13dfd31b..17bd3bed6e70bf55652961d20cccbaea1cfd6fd3 100644
+--- a/src/context_wrapper.h
++++ b/src/context_wrapper.h
+@@ -112,10 +112,18 @@ inline void ContainedContext::begin()
+     m_origin = ImGui::GetCursorScreenPos();
+     m_original_ctx = ImGui::GetCurrentContext();
+     const ImGuiStyle& orig_style = ImGui::GetStyle();
++    const ImGuiBackendFlags orig_backend_flags = ImGui::GetIO().BackendFlags;
++    const ImVec2 orig_framebuffer_scale = ImGui::GetIO().DisplayFramebufferScale;
+     if (!m_ctx) m_ctx = ImGui::CreateContext(ImGui::GetIO().Fonts);
+     ImGui::SetCurrentContext(m_ctx);
+     ImGuiStyle& new_style = ImGui::GetStyle();
+     new_style = orig_style;
++    // Sub-context shares the host's font atlas. Mirror the host's backend
++    // flags so atlas-consistency checks (e.g. RendererHasTextures) pass, and
++    // mirror DisplayFramebufferScale so the dynamic font rasterizer bakes
++    // glyphs at the host's render density (otherwise text is blurry on HiDPI).
++    ImGui::GetIO().BackendFlags = orig_backend_flags;
++    ImGui::GetIO().DisplayFramebufferScale = orig_framebuffer_scale;
+ 
+     CopyIOEvents(m_original_ctx, m_ctx, m_origin, m_scale);
+ 
+diff --git a/src/imgui_bezier_math.inl b/src/imgui_bezier_math.inl
+index 3020bdb49048eea9b056226bdb7fc4c4a4c7919a..4c3626bbc68f7bc5256fc24a7dc86845ec21b2de 100644
+--- a/src/imgui_bezier_math.inl
++++ b/src/imgui_bezier_math.inl
+@@ -595,7 +595,6 @@ inline void ImCubicBezierFixedStep(ImCubicBezierFixedStepCallback callback, void
+         float t_end   = t_max;
+         float t       = t_0;
+ 
+-        float t_best     = t;
+         float error_best = total_length;
+ 
+         while (true)
+@@ -615,7 +614,6 @@ inline void ImCubicBezierFixedStep(ImCubicBezierFixedStepCallback callback, void
+             if (error < error_best)
+             {
+                 error_best = error;
+-                t_best     = t;
+             }
+ 
+             if (ImFabs(error) <= max_value_error || ImFabs(t_start - t_end) <= max_t_error)
+diff --git a/src/imgui_extra_math.h b/src/imgui_extra_math.h
+index 3df615ac93e3c3955700cb38db84d91d2cb8d520..185b29619d433b15c9eca947b475fd63d948ac5c 100644
+--- a/src/imgui_extra_math.h
++++ b/src/imgui_extra_math.h
+@@ -34,7 +34,9 @@ struct ImLine
+ inline bool operator==(const ImVec2& lhs, const ImVec2& rhs);
+ inline bool operator!=(const ImVec2& lhs, const ImVec2& rhs);
+ # endif
++# ifndef IMGUI_DEFINE_MATH_OPERATORS_IMPLEMENTED
+ inline ImVec2 operator*(const float lhs, const ImVec2& rhs);
++# endif
+ # if IMGUI_VERSION_NUM < 18955
+ inline ImVec2 operator-(const ImVec2& lhs);
+ # endif
+diff --git a/src/imgui_extra_math.inl b/src/imgui_extra_math.inl
+index 8e2347f7e8a01793af7fc02432bc5d22c73932de..7dc839f12bde74387aa8b6914ba9e049c79e25e8 100644
+--- a/src/imgui_extra_math.inl
++++ b/src/imgui_extra_math.inl
+@@ -31,10 +31,12 @@ inline bool operator!=(const ImVec2& lhs, const ImVec2& rhs)
+ }
+ # endif
+ 
++# ifndef IMGUI_DEFINE_MATH_OPERATORS_IMPLEMENTED
+ inline ImVec2 operator*(const float lhs, const ImVec2& rhs)
+ {
+     return ImVec2(lhs * rhs.x, lhs * rhs.y);
+ }
++# endif
+ 
+ # if IMGUI_VERSION_NUM < 18955
+ inline ImVec2 operator-(const ImVec2& lhs)

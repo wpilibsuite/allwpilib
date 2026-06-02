@@ -334,6 +334,17 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
+            class_name = "BiquadFilter",
+            yml_file = "semiwrap/BiquadFilter.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/filter/BiquadFilter.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::BiquadFilter", "wpi__math__BiquadFilter.hpp"),
+                ("wpi::math::BiquadFilter::Section", "wpi__math__BiquadFilter__Section.hpp"),
+            ],
+        ),
+        struct(
             class_name = "Debouncer",
             yml_file = "semiwrap/Debouncer.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",

@@ -1494,6 +1494,7 @@ SwerveDrivePoseEstimator3d = "wpi/math/estimator/SwerveDrivePoseEstimator3d.hpp"
 # UnscentedTransform = "wpi/math/estimator/UnscentedTransform.hpp"
 
 # wpi/math/filter
+BiquadFilter = "wpi/math/filter/BiquadFilter.hpp"
 Debouncer = "wpi/math/filter/Debouncer.hpp"
 EdgeCounterFilter = "wpi/math/filter/EdgeCounterFilter.hpp"
 LinearFilter = "wpi/math/filter/LinearFilter.hpp"

@@ -1,0 +1,118 @@
+apply plugin: 'maven-publish'
+
+def baseArtifactId = 'FilterDesigner'
+def artifactGroupId = 'org.wpilib.tools'
+def zipBaseName = '_GROUP_org_wpilib_tools_ID_FilterDesigner_CLS'
+
+def outputsFolder = file("$project.buildDir/outputs")
+
+model {
+    tasks {
+        // Create the run task.
+        $.components.filterdesigner.binaries.each { bin ->
+            if (bin.buildable && bin.name.toLowerCase().contains("debug") && nativeUtils.isNativeDesktopPlatform(bin.targetPlatform)) {
+                Task run = project.tasks.create("run", Exec) {
+                    commandLine bin.tasks.install.runScriptFile.get().asFile.toString()
+                }
+                run.dependsOn bin.tasks.install
+            }
+        }
+    }
+    publishing {
+        def filterDesignerTaskList = []
+        $.components.each { component ->
+            component.binaries.each { binary ->
+                if (binary in NativeExecutableBinarySpec && binary.component.name.contains("filterdesigner")) {
+                    if (binary.buildable && (binary.name.contains('Release') || binary.name.contains('release'))) {
+                        def applicationPath = binary.executable.file
+                        def icon = file("$project.projectDir/src/main/native/mac/filterdesigner.icns")
+
+                        def task = project.tasks.create("copyFilterDesignerExecutable" + binary.targetPlatform.operatingSystem.name + binary.targetPlatform.architecture.name, Zip) {
+                            description = "Copies the FilterDesigner executable to the outputs directory."
+                            destinationDirectory = outputsFolder
+
+                            archiveBaseName = zipBaseName
+                            duplicatesStrategy = 'exclude'
+                            archiveClassifier = nativeUtils.getPublishClassifier(binary)
+
+                            from(licenseFile) {
+                                into '/'
+                            }
+
+                            if (binary.targetPlatform.operatingSystem.isWindows()) {
+                                def exePath = binary.executable.file.absolutePath
+                                exePath = exePath.substring(0, exePath.length() - 4)
+                                def pdbPath = new File(exePath + '.pdb')
+                                from(pdbPath)
+                            }
+
+                            into(nativeUtils.getPlatformPath(binary))
+                        }
+
+                        if (binary.targetPlatform.operatingSystem.isMacOsX()) {
+                            def bundleTask = project.tasks.create("bundleFilterDesignerOsxApp" + binary.targetPlatform.architecture.name, Copy) {
+                                description = "Creates a macOS application bundle for FilterDesigner"
+                                from(file("$project.projectDir/Info.plist"))
+                                into(file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/FilterDesigner.app/Contents"))
+                                into("MacOS") {
+                                    with copySpec {
+                                        from binary.executable.file
+                                    }
+                                }
+                                into("Resources") {
+                                    with copySpec {
+                                        from icon
+                                    }
+                                }
+
+                                inputs.property "HasDeveloperId", project.hasProperty("developerID")
+
+                                doLast {
+                                    if (project.hasProperty("developerID")) {
+                                        providers.exec {
+                                            setWorkingDir(rootDir)
+                                            def args = [
+                                                "sh",
+                                                "-c",
+                                                "codesign --force --strict --deep " +
+                                                "--timestamp --options=runtime " +
+                                                "--verbose -s ${project.findProperty("developerID")} " +
+                                                "$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/FilterDesigner.app/"
+                                            ]
+                                            commandLine(args)
+                                        }.result.get()
+                                    }
+                                }
+                            }
+
+                            applicationPath = file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name")
+                            task.from(applicationPath)
+                            project.build.dependsOn bundleTask
+
+                            bundleTask.dependsOn binary.tasks.link
+                            task.dependsOn(bundleTask)
+                        } else {
+                            task.from(applicationPath)
+                        }
+
+                        task.dependsOn binary.tasks.link
+                        filterDesignerTaskList.add(task)
+                        project.build.dependsOn task
+                        project.artifacts { task }
+                        addTaskToCopyAllOutputs(task)
+                    }
+                }
+            }
+        }
+
+        publications {
+            filterdesigner(MavenPublication) {
+                filterDesignerTaskList.each { artifact it }
+
+                artifactId = baseArtifactId
+                groupId = artifactGroupId
+                version = wpilibVersioning.version.get()
+            }
+        }
+    }
+}
