@@ -131,7 +131,7 @@ public final class Scheduler implements ProtobufSerializable {
   private final Stack<CommandState> m_currentCommandAncestry = new Stack<>();
 
   /** The periodic callbacks to run, outside of the command structure. */
-  private final List<Coroutine> m_periodicCallbacks = new ArrayList<>();
+  private final SequencedMap<BindingScope, Coroutine> m_periodicCallbacks = new LinkedHashMap<>();
 
   /** Event loop for trigger bindings. */
   private final EventLoop m_eventLoop = new EventLoop();
@@ -269,16 +269,18 @@ public final class Scheduler implements ProtobufSerializable {
    * unrecoverable infinite loop!
    *
    * @param callback the callback to sideload
+   * @see #addPeriodic(Runnable)
    */
   public void sideload(Consumer<Coroutine> callback) {
     var coroutine = new Coroutine(this, m_scope, callback);
-    m_periodicCallbacks.add(coroutine);
+    var scope = BindingScope.createNarrowestScope(this);
+    m_periodicCallbacks.put(scope, coroutine);
   }
 
   /**
-   * Adds a task to run repeatedly for as long as the scheduler runs. This internally handles the
-   * looping and control yielding necessary for proper function. The callback will run at the same
-   * periodic frequency as the scheduler.
+   * Adds a periodic callback to run as part of the scheduler. The callback should not manipulate or
+   * control any mechanisms, but can be used to log information, update data (such as simulations or
+   * LED data buffers), or perform some other helpful task.
    *
    * <p>For example:
    *
@@ -290,7 +292,24 @@ public final class Scheduler implements ProtobufSerializable {
    * });
    * }</pre>
    *
+   * <p>{@code addPeriodic} is a convenience method that is identical to using {@link
+   * #sideload(Consumer)} with an unending {@code while} loop:
+   *
+   * <pre>{@code
+   * // An addPeriodic call:
+   * scheduler.addPeriodic(() -> leds.setData(ledDataBuffer));
+   *
+   * // Is equivalent to this sideload call:
+   * scheduler.sideload(coroutine -> {
+   *   while (true) {
+   *     leds.setData(ledDataBuffer)
+   *     coroutine.yield();
+   *   }
+   * });
+   * }</pre>
+   *
    * @param callback the periodic function to run
+   * @see #sideload(Consumer)
    */
   public void addPeriodic(Runnable callback) {
     sideload(
@@ -641,8 +660,10 @@ public final class Scheduler implements ProtobufSerializable {
   }
 
   private void runPeriodicSideloads() {
+    m_periodicCallbacks.entrySet().removeIf(e -> !e.getKey().active());
+
     // Update periodic callbacks
-    for (Coroutine coroutine : m_periodicCallbacks) {
+    for (Coroutine coroutine : m_periodicCallbacks.values()) {
       coroutine.mount();
       try {
         coroutine.runToYieldPoint();
@@ -652,7 +673,7 @@ public final class Scheduler implements ProtobufSerializable {
     }
 
     // And remove any periodic callbacks that have completed
-    m_periodicCallbacks.removeIf(Coroutine::isDone);
+    m_periodicCallbacks.entrySet().removeIf(e -> e.getValue().isDone());
   }
 
   private void runCommands() {

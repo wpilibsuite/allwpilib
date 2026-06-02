@@ -79,7 +79,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger faceDown(EventLoop loop) {
-    return button(Gamepad.Button.SOUTH_FACE, loop);
+    return button(Gamepad.Button.FACE_DOWN, loop);
   }
 
   /**
@@ -101,7 +101,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger faceRight(EventLoop loop) {
-    return button(Gamepad.Button.EAST_FACE, loop);
+    return button(Gamepad.Button.FACE_RIGHT, loop);
   }
 
   /**
@@ -123,7 +123,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger faceLeft(EventLoop loop) {
-    return button(Gamepad.Button.WEST_FACE, loop);
+    return button(Gamepad.Button.FACE_LEFT, loop);
   }
 
   /**
@@ -145,7 +145,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger faceUp(EventLoop loop) {
-    return button(Gamepad.Button.NORTH_FACE, loop);
+    return button(Gamepad.Button.FACE_UP, loop);
   }
 
   /**

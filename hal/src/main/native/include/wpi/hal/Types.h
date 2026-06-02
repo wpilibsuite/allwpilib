@@ -6,15 +6,17 @@
 
 #include <stdint.h>
 
+#include "wpi/util/Handle.h"
+
 /**
  * @defgroup hal_types Type Definitions
  * @ingroup hal_capi
  * @{
  */
 
-#define HAL_INVALID_HANDLE 0
+#define HAL_INVALID_HANDLE WPI_INVALID_HANDLE
 
-typedef int32_t HAL_Handle;
+typedef WPI_Handle HAL_Handle;
 
 typedef HAL_Handle HAL_AlertHandle;
 

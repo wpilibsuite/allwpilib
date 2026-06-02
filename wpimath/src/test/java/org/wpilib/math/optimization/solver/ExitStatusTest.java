@@ -27,13 +27,16 @@ class ExitStatusTest {
       problem.minimize(x.times(x));
 
       problem.addCallback(info -> false);
+      x.setValue(1.0);
       assertEquals(ExitStatus.SUCCESS, problem.solve());
 
       problem.addCallback(info -> true);
+      x.setValue(1.0);
       assertEquals(ExitStatus.CALLBACK_REQUESTED_STOP, problem.solve());
 
       problem.clearCallbacks();
       problem.addCallback(info -> false);
+      x.setValue(1.0);
       assertEquals(ExitStatus.SUCCESS, problem.solve());
     }
 
@@ -187,6 +190,7 @@ class ExitStatusTest {
 
     try (var problem = new Problem()) {
       var x = problem.decisionVariable();
+      x.setValue(1.0);
 
       problem.minimize(x.times(x));
 
@@ -207,6 +211,7 @@ class ExitStatusTest {
 
     try (var problem = new Problem()) {
       var x = problem.decisionVariable();
+      x.setValue(1.0);
 
       problem.minimize(x.times(x));
 

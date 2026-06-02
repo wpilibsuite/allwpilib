@@ -27,9 +27,8 @@ struct LagrangeMultiplierEstimate {
 /// Estimates Lagrange multipliers for SQP.
 ///
 /// @tparam Scalar Scalar type.
-/// @param g Gradient of the cost function ∇f.
-/// @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
-///     current iterate.
+/// @param g Cost function gradient ∇f.
+/// @param A_e Equality constraint Jacobian Aₑ(x).
 template <typename Scalar>
 Eigen::Vector<Scalar, Eigen::Dynamic> lagrange_multiplier_estimate(
     const Eigen::SparseVector<Scalar>& g,
@@ -47,11 +46,9 @@ Eigen::Vector<Scalar, Eigen::Dynamic> lagrange_multiplier_estimate(
 /// Estimates Lagrange multipliers for interior-point method.
 ///
 /// @tparam Scalar Scalar type.
-/// @param g Gradient of the cost function ∇f.
-/// @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
-///     current iterate.
-/// @param A_i The problem's inequality constraint Jacobian Aᵢ(x) evaluated at
-///     the current iterate.
+/// @param g Cost function gradient ∇f.
+/// @param A_e Equality constraint Jacobian Aₑ(x).
+/// @param A_i Inequality constraint Jacobian Aᵢ(x).
 /// @param s Inequality constraint slack variables.
 /// @param μ Barrier parameter.
 template <typename Scalar>

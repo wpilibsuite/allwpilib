@@ -13,3 +13,4 @@ classes:
       SetGreenLed:
       SetRedLed:
       SetYellowLed:
+      AllocatePWM:

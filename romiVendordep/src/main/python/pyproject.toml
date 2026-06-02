@@ -58,3 +58,4 @@ depends = [
 OnBoardIO = "wpi/romi/OnBoardIO.hpp"
 RomiGyro = "wpi/romi/RomiGyro.hpp"
 RomiMotor = "wpi/romi/RomiMotor.hpp"
+RomiServo = "wpi/romi/RomiServo.hpp"

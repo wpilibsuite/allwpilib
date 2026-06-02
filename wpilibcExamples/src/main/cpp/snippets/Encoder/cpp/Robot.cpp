@@ -7,7 +7,7 @@
 #include "wpi/util/deprecated.hpp"
 
 /**
- * Encoder snippets for frc-docs.
+ * Encoder snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html
  */
 WPI_IGNORE_DEPRECATED
