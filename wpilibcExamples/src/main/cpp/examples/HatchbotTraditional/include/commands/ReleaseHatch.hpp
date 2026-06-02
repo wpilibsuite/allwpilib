@@ -25,5 +25,5 @@ class ReleaseHatch
   bool IsFinished() override;
 
  private:
-  HatchSubsystem* m_hatch;
+  HatchSubsystem* hatch;
 };

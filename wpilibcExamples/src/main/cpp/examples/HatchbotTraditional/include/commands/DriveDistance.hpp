@@ -29,7 +29,7 @@ class DriveDistance
   bool IsFinished() override;
 
  private:
-  DriveSubsystem* m_drive;
-  double m_distance;
-  double m_velocity;
+  DriveSubsystem* drive;
+  double distance;
+  double velocity;
 };

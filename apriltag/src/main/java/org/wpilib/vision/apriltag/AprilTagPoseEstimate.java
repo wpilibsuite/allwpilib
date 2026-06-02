@@ -7,7 +7,6 @@ package org.wpilib.vision.apriltag;
 import org.wpilib.math.geometry.Transform3d;
 
 /** A pair of AprilTag pose estimates. */
-@SuppressWarnings("MemberName")
 public class AprilTagPoseEstimate {
   /**
    * Constructs a pose estimate.

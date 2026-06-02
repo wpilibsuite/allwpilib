@@ -9,12 +9,12 @@ import org.wpilib.hardware.accelerometer.ADXL345_I2C;
 import org.wpilib.hardware.bus.I2C;
 
 /**
- * ADXL345, 362 Accelerometer snippets for frc-docs.
+ * ADXL345, 362 Accelerometer snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
 public class Robot extends TimedRobot {
   // Creates an ADXL345 accelerometer object with a measurement range from -8 to 8 G's
-  ADXL345_I2C m_accelerometer345I2C = new ADXL345_I2C(I2C.Port.PORT_0, 8);
+  ADXL345_I2C accelerometer345I2C = new ADXL345_I2C(I2C.Port.PORT_0, 8);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {}
@@ -22,10 +22,10 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // Gets the current acceleration in the X axis
-    m_accelerometer345I2C.getX();
+    accelerometer345I2C.getX();
     // Gets the current acceleration in the Y axis
-    m_accelerometer345I2C.getY();
+    accelerometer345I2C.getY();
     // Gets the current acceleration in the Z axis
-    m_accelerometer345I2C.getZ();
+    accelerometer345I2C.getZ();
   }
 }

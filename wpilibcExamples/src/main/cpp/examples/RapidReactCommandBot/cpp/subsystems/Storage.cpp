@@ -6,9 +6,9 @@
 
 Storage::Storage() {
   SetDefaultCommand(
-      RunOnce([this] { m_motor.Disable(); }).AndThen([] {}).WithName("Idle"));
+      RunOnce([this] { motor.Disable(); }).AndThen([] {}).WithName("Idle"));
 }
 
 wpi::cmd::CommandPtr Storage::RunCommand() {
-  return Run([this] { m_motor.SetThrottle(1.0); }).WithName("Run");
+  return Run([this] { motor.SetThrottle(1.0); }).WithName("Run");
 }

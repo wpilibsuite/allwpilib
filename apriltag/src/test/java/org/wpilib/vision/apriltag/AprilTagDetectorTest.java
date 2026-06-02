@@ -25,7 +25,6 @@ import org.wpilib.math.util.Units;
 import org.wpilib.util.runtime.RuntimeLoader;
 
 class AprilTagDetectorTest {
-  @SuppressWarnings("MemberName")
   AprilTagDetector detector;
 
   @BeforeAll

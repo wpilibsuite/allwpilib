@@ -24,6 +24,6 @@ class Robot : public wpi::TimedRobot {
   void UtilityPeriodic() override;
 
  private:
-  RapidReactCommandBot m_robot;
-  std::optional<wpi::cmd::CommandPtr> m_autonomousCommand;
+  RapidReactCommandBot robot;
+  std::optional<wpi::cmd::CommandPtr> autonomousCommand;
 };

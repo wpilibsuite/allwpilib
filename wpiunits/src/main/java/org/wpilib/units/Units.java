@@ -374,17 +374,35 @@ public final class Units {
    */
   public static final LinearMomentumUnit KilogramMetersPerSecond = Kilograms.mult(MetersPerSecond);
 
+  /** The equivalent of a one {@link #Pound} mass moving at one {@link #InchesPerSecond}. */
+  public static final LinearMomentumUnit PoundInchesPerSecond = Pounds.mult(InchesPerSecond);
+
   // Angular momentum
 
-  /** The standard SI unit for angular momentum. */
+  /**
+   * The standard SI unit for angular momentum, equivalent to a rotating object with a linear
+   * momentum of one {@link #KilogramMetersPerSecond} one {@link #Meter} away from its center of
+   * mass.
+   */
   public static final AngularMomentumUnit KilogramMetersSquaredPerSecond =
       KilogramMetersPerSecond.mult(Meters);
+
+  /**
+   * The angular momentum of an object with a linear momentum of one {@link PoundInchesPerSecond}
+   * one {@link Inch} away from its center of mass.
+   */
+  public static final AngularMomentumUnit PoundInchesSquaredPerSecond =
+      PoundInchesPerSecond.mult(Inches);
 
   // Moment of Inertia
 
   /** The standard SI unit for moment of inertia. */
   public static final MomentOfInertiaUnit KilogramSquareMeters =
       KilogramMetersSquaredPerSecond.per(RadiansPerSecond);
+
+  /** A common imperial unit for moment of inertia. */
+  public static final MomentOfInertiaUnit PoundSquareInches =
+      PoundInchesSquaredPerSecond.per(RadiansPerSecond);
 
   // VoltageUnit
   /** The base unit of electric potential. */

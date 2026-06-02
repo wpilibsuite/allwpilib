@@ -21,10 +21,10 @@ class Robot : public wpi::TimedRobot {
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_right.SetInverted(true);
+    right.SetInverted(true);
 
-    wpi::util::SendableRegistry::AddChild(&m_drive, &m_left);
-    wpi::util::SendableRegistry::AddChild(&m_drive, &m_right);
+    wpi::util::SendableRegistry::AddChild(&drive, &left);
+    wpi::util::SendableRegistry::AddChild(&drive, &right);
   }
 
   /**
@@ -34,8 +34,8 @@ class Robot : public wpi::TimedRobot {
    */
   void TeleopPeriodic() override {
     double turningValue =
-        (kAngleSetpoint - m_imu.GetRotation2d().Degrees().value()) * kP;
-    m_drive.ArcadeDrive(-m_joystick.GetY(), -turningValue);
+        (kAngleSetpoint - imu.GetRotation2d().Degrees().value()) * kP;
+    drive.ArcadeDrive(-joystick.GetY(), -turningValue);
   }
 
  private:
@@ -48,14 +48,14 @@ class Robot : public wpi::TimedRobot {
       wpi::OnboardIMU::FLAT;
   static constexpr int kJoystickPort = 0;
 
-  wpi::PWMSparkMax m_left{kLeftMotorPort};
-  wpi::PWMSparkMax m_right{kRightMotorPort};
-  wpi::DifferentialDrive m_drive{
-      [&](double output) { m_left.SetThrottle(output); },
-      [&](double output) { m_right.SetThrottle(output); }};
+  wpi::PWMSparkMax left{kLeftMotorPort};
+  wpi::PWMSparkMax right{kRightMotorPort};
+  wpi::DifferentialDrive drive{
+      [&](double output) { left.SetThrottle(output); },
+      [&](double output) { right.SetThrottle(output); }};
 
-  wpi::OnboardIMU m_imu{kIMUMountOrientation};
-  wpi::Joystick m_joystick{kJoystickPort};
+  wpi::OnboardIMU imu{kIMUMountOrientation};
+  wpi::Joystick joystick{kJoystickPort};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

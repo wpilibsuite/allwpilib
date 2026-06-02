@@ -10,16 +10,16 @@
 
 void TurnDegrees::Initialize() {
   // Set motors to stop, read encoder values for starting point
-  m_drive->ArcadeDrive(0, 0);
-  m_drive->ResetEncoders();
+  drive->ArcadeDrive(0, 0);
+  drive->ResetEncoders();
 }
 
 void TurnDegrees::Execute() {
-  m_drive->ArcadeDrive(0, m_velocity);
+  drive->ArcadeDrive(0, velocity);
 }
 
 void TurnDegrees::End(bool interrupted) {
-  m_drive->ArcadeDrive(0, 0);
+  drive->ArcadeDrive(0, 0);
 }
 
 bool TurnDegrees::IsFinished() {
@@ -30,11 +30,11 @@ bool TurnDegrees::IsFinished() {
   static auto inchPerDegree = (5.551_in * std::numbers::pi) / 360_deg;
 
   // Compare distance traveled from start to distance based on degree turn.
-  return GetAverageTurningDistance() >= inchPerDegree * m_angle;
+  return GetAverageTurningDistance() >= inchPerDegree * angle;
 }
 
 wpi::units::meter_t TurnDegrees::GetAverageTurningDistance() {
-  auto l = wpi::units::math::abs(m_drive->GetLeftDistance());
-  auto r = wpi::units::math::abs(m_drive->GetRightDistance());
+  auto l = wpi::units::math::abs(drive->GetLeftDistance());
+  auto r = wpi::units::math::abs(drive->GetRightDistance());
   return (l + r) / 2;
 }

@@ -119,7 +119,6 @@ class DataLogTest {
     }
   }
 
-  @SuppressWarnings("MemberName")
   private static int cloneCalls;
 
   static class CloneableThing implements StructSerializable, Cloneable {
@@ -201,10 +200,8 @@ class DataLogTest {
     public static final ThingStruct struct = new ThingStruct();
   }
 
-  @SuppressWarnings("MemberName")
   private ByteArrayOutputStream data;
 
-  @SuppressWarnings("MemberName")
   private DataLog log;
 
   @BeforeEach

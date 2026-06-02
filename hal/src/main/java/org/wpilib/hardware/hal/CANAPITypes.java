@@ -55,7 +55,6 @@ public final class CANAPITypes {
     FIRMWARE_UPDATE(31);
 
     /** The device type ID. */
-    @SuppressWarnings("MemberName")
     public final int id;
 
     CANDeviceType(int id) {
@@ -118,7 +117,6 @@ public final class CANAPITypes {
     BRUSHLAND_LABS(20);
 
     /** The manufacturer ID. */
-    @SuppressWarnings("MemberName")
     public final int id;
 
     CANManufacturer(int id) {

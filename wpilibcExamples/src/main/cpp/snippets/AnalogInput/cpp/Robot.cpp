@@ -6,7 +6,7 @@
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 
 /**
- * AnalogInput snippets for frc-docs.
+ * AnalogInput snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/analog-input-software.html
  */
 class Robot : public wpi::TimedRobot {
@@ -15,18 +15,18 @@ class Robot : public wpi::TimedRobot {
     // Gets the raw instantaneous measured value from the analog input, without
     // applying any calibration and ignoring oversampling and averaging
     // settings.
-    m_analog.GetValue();
+    analog.GetValue();
 
     // Gets the instantaneous measured voltage from the analog input.
     // Oversampling and averaging settings are ignored
-    m_analog.GetVoltage();
+    analog.GetVoltage();
   }
 
   void TeleopPeriodic() override {}
 
  private:
   // Initializes an AnalogInput on port 0
-  wpi::AnalogInput m_analog{0};
+  wpi::AnalogInput analog{0};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

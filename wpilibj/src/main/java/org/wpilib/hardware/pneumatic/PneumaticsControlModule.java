@@ -14,8 +14,8 @@ import org.wpilib.system.SensorUtil;
 /** Module class for controlling a Cross The Road Electronics Pneumatics Control Module. */
 public class PneumaticsControlModule implements PneumaticsBase {
   private static class DataStore implements AutoCloseable {
-    public final int m_module;
-    public final int m_handle;
+    private final int m_module;
+    private final int m_handle;
     private final int m_busId;
     private int m_refCount;
     private int m_reservedMask;

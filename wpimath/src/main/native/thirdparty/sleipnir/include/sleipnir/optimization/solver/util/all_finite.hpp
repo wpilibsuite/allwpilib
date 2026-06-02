@@ -6,6 +6,8 @@
 
 #include <Eigen/SparseCore>
 
+namespace slp {
+
 /// Returns true if elements of sparse matrix are all finite.
 ///
 /// @param mat Sparse matrix.
@@ -24,3 +26,5 @@ bool all_finite(const Eigen::SparseCompressedBase<Derived>& mat) {
 
   return true;
 }
+
+}  // namespace slp

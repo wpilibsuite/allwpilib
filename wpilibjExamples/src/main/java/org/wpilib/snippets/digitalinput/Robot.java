@@ -8,16 +8,16 @@ import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.discrete.DigitalInput;
 
 /**
- * DigitalInput snippets for frc-docs.
+ * DigitalInput snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/digital-inputs-software.html
  */
 public class Robot extends TimedRobot {
   // Initializes a DigitalInput on DIO 0
-  DigitalInput m_input = new DigitalInput(0);
+  DigitalInput input = new DigitalInput(0);
 
   @Override
   public void teleopPeriodic() {
     // Gets the value of the digital input.  Returns true if the circuit is open.
-    m_input.get();
+    input.get();
   }
 }

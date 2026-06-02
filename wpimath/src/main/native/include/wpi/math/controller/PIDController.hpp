@@ -229,7 +229,7 @@ class WPILIB_DLLEXPORT PIDController
 
   /**
    * Returns true if the error is within the tolerance of the setpoint.
-   * The error tolerance defauls to 0.05, and the error derivative tolerance
+   * The error tolerance defaults to 0.05, and the error derivative tolerance
    * defaults to ∞.
    *
    * This will return false until at least one input value has been computed.

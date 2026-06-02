@@ -5,7 +5,6 @@
 package org.wpilib.networktables;
 
 /** NetworkTables value event data. */
-@SuppressWarnings("MemberName")
 public final class ValueEventData {
   /** Topic handle. Topic.getHandle() can be used to map this to the corresponding Topic object. */
   public final int topic;

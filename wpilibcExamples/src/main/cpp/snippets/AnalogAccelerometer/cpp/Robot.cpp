@@ -7,26 +7,26 @@
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 
 /**
- * AnalogAccelerometer snippets for frc-docs.
+ * AnalogAccelerometer snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
 class Robot : public wpi::TimedRobot {
  public:
   Robot() {
     // Sets the sensitivity of the accelerometer to 1 volt per G
-    m_accelerometer.SetSensitivity(1);
+    accelerometer.SetSensitivity(1);
     // Sets the zero voltage of the accelerometer to 3 volts
-    m_accelerometer.SetZero(3);
+    accelerometer.SetZero(3);
   }
 
   void TeleopPeriodic() override {
     // Gets the current acceleration
-    m_accelerometer.GetAcceleration();
+    accelerometer.GetAcceleration();
   }
 
  private:
   // Creates an analog accelerometer on analog input 0
-  wpi::AnalogAccelerometer m_accelerometer{0};
+  wpi::AnalogAccelerometer accelerometer{0};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

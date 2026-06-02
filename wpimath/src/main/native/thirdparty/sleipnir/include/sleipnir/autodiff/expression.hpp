@@ -96,21 +96,26 @@ struct Expression {
   /// The adjoint of the expression node, used during autodiff.
   Scalar adjoint{0};
 
-  /// Counts incoming edges for this node.
-  uint32_t incoming_edges = 0;
-
-  /// This expression's column in a Jacobian, or -1 otherwise.
-  int32_t col = -1;
-
   /// The adjoint of the expression node, used during gradient expression tree
   /// generation.
   ExpressionPtr<Scalar> adjoint_expr;
 
-  /// Reference count for intrusive shared pointer.
-  uint32_t ref_count = 0;
-
   /// Expression arguments.
   std::array<ExpressionPtr<Scalar>, 2> args{nullptr, nullptr};
+
+  /// Scratch space for various graph algorithms.
+  ///
+  /// In expression_graph.hpp's topological_sort(), scratch counts incoming
+  /// edges for this node, offset by -1 so -1 means no edges.
+  ///
+  /// In Hessian and Jacobian constructors, scratch represents this expression's
+  /// column in a Jacobian, or -1 otherwise.
+  ///
+  /// They share a default state of -1 to avoid extra assignments.
+  int32_t scratch = -1;
+
+  /// Reference count for intrusive shared pointer.
+  uint32_t ref_count = 0;
 
   /// Constructs a constant expression with a value of zero.
   constexpr Expression() = default;
@@ -153,14 +158,16 @@ struct Expression {
 
     // Prune expression
     if (lhs->is_constant(Scalar(0))) {
-      // Return zero
+      // Return zero, which lhs currently is
       return lhs;
     } else if (rhs->is_constant(Scalar(0))) {
-      // Return zero
+      // Return zero, which rhs currently is
       return rhs;
     } else if (lhs->is_constant(Scalar(1))) {
+      // Return rhs unmodified
       return rhs;
     } else if (rhs->is_constant(Scalar(1))) {
+      // Return lhs unmodified
       return lhs;
     }
 
@@ -203,9 +210,10 @@ struct Expression {
 
     // Prune expression
     if (lhs->is_constant(Scalar(0))) {
-      // Return zero
+      // Return zero, which lhs currently is
       return lhs;
     } else if (rhs->is_constant(Scalar(1))) {
+      // Return lhs unmodified
       return lhs;
     }
 
@@ -236,10 +244,13 @@ struct Expression {
                                          const ExpressionPtr<Scalar>& rhs) {
     using enum ExpressionType;
 
-    // Prune expression
+    // Prune expression. We check for nullptr because operator+ is used in
+    // adjoint accumulation, and child nodes can be null.
     if (lhs == nullptr || lhs->is_constant(Scalar(0))) {
+      // Return rhs unmodified
       return rhs;
     } else if (rhs == nullptr || rhs->is_constant(Scalar(0))) {
+      // Return lhs unmodified
       return lhs;
     }
 
@@ -281,12 +292,14 @@ struct Expression {
     // Prune expression
     if (lhs->is_constant(Scalar(0))) {
       if (rhs->is_constant(Scalar(0))) {
-        // Return zero
+        // Return zero, which rhs currently is
         return rhs;
       } else {
+        // Return rhs negated
         return -rhs;
       }
     } else if (rhs->is_constant(Scalar(0))) {
+      // Return lhs unmodified
       return lhs;
     }
 
@@ -316,7 +329,7 @@ struct Expression {
 
     // Prune expression
     if (lhs->is_constant(Scalar(0))) {
-      // Return zero
+      // Return zero, which lhs currently is
       return lhs;
     }
 
@@ -766,6 +779,8 @@ void dec_ref_count(Expression<Scalar>* expr) {
         auto alloc = global_pool_allocator<Expression<Scalar>>();
         std::allocator_traits<decltype(alloc)>::deallocate(
             alloc, elem, sizeof(Expression<Scalar>));
+      } else {
+        operator delete(elem);
       }
     }
   }
@@ -825,7 +840,7 @@ ExpressionPtr<Scalar> abs(const ExpressionPtr<Scalar>& x) {
 
   // Prune expression
   if (x->is_constant(Scalar(0))) {
-    // Return zero
+    // Return zero, which x currently is
     return x;
   }
 
@@ -934,7 +949,7 @@ ExpressionPtr<Scalar> asin(const ExpressionPtr<Scalar>& x) {
 
   // Prune expression
   if (x->is_constant(Scalar(0))) {
-    // Return zero
+    // Return zero, which x currently is
     return x;
   }
 
@@ -988,7 +1003,7 @@ ExpressionPtr<Scalar> atan(const ExpressionPtr<Scalar>& x) {
 
   // Prune expression
   if (x->is_constant(Scalar(0))) {
-    // Return zero
+    // Return zero, which x currently is
     return x;
   }
 
@@ -1056,7 +1071,7 @@ ExpressionPtr<Scalar> atan2(const ExpressionPtr<Scalar>& y,
 
   // Prune expression
   if (y->is_constant(Scalar(0))) {
-    // Return zero
+    // Return zero, which y currently is
     return y;
   } else if (x->is_constant(Scalar(0))) {
     return constant_ptr(Scalar(std::numbers::pi) / Scalar(2));
@@ -1223,7 +1238,7 @@ ExpressionPtr<Scalar> erf(const ExpressionPtr<Scalar>& x) {
 
   // Prune expression
   if (x->is_constant(Scalar(0))) {
-    // Return zero
+    // Return zero, which x currently is
     return x;
   }
 
@@ -1406,7 +1421,7 @@ ExpressionPtr<Scalar> log(const ExpressionPtr<Scalar>& x) {
 
   // Prune expression
   if (x->is_constant(Scalar(0))) {
-    // Return zero
+    // Return zero, which x currently is
     return x;
   }
 
@@ -1460,7 +1475,7 @@ ExpressionPtr<Scalar> log10(const ExpressionPtr<Scalar>& x) {
 
   // Prune expression
   if (x->is_constant(Scalar(0))) {
-    // Return zero
+    // Return zero, which x currently is
     return x;
   }
 
@@ -1708,15 +1723,16 @@ ExpressionPtr<Scalar> pow(const ExpressionPtr<Scalar>& base,
 
   // Prune expression
   if (base->is_constant(Scalar(0))) {
-    // Return zero
+    // Return zero, which base currently is
     return base;
   } else if (base->is_constant(Scalar(1))) {
-    // Return one
+    // Return one, which base currently is
     return base;
   }
   if (power->is_constant(Scalar(0))) {
     return constant_ptr(Scalar(1));
   } else if (power->is_constant(Scalar(1))) {
+    // Return base unmodified
     return base;
   }
 
@@ -1828,7 +1844,7 @@ ExpressionPtr<Scalar> sin(const ExpressionPtr<Scalar>& x) {
 
   // Prune expression
   if (x->is_constant(Scalar(0))) {
-    // Return zero
+    // Return zero, which x currently is
     return x;
   }
 
@@ -1883,7 +1899,7 @@ ExpressionPtr<Scalar> sinh(const ExpressionPtr<Scalar>& x) {
 
   // Prune expression
   if (x->is_constant(Scalar(0))) {
-    // Return zero
+    // Return zero, which x currently is
     return x;
   }
 
@@ -1997,7 +2013,7 @@ ExpressionPtr<Scalar> tan(const ExpressionPtr<Scalar>& x) {
 
   // Prune expression
   if (x->is_constant(Scalar(0))) {
-    // Return zero
+    // Return zero, which x currently is
     return x;
   }
 
@@ -2055,7 +2071,7 @@ ExpressionPtr<Scalar> tanh(const ExpressionPtr<Scalar>& x) {
 
   // Prune expression
   if (x->is_constant(Scalar(0))) {
-    // Return zero
+    // Return zero, which x currently is
     return x;
   }
 

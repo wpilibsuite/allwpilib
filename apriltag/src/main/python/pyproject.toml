@@ -2,7 +2,7 @@
 build-backend = "hatchling.build"
 requires = [
     "semiwrap~=0.3.0",
-    "hatch-meson~=0.1.0",
+    "hatch-meson~=0.1.2",
     "hatch-robotpy~=0.2.1",
     "hatchling",
     "robotpy-native-apriltag==0.0.0",
@@ -14,6 +14,7 @@ requires = [
 name = "robotpy-apriltag"
 version = "0.0.0"
 description = "RobotPy bindings for WPILib's AprilTag library"
+requires-python = ">=3.11"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
@@ -63,7 +64,7 @@ wraps = ["robotpy-native-apriltag"]
 depends = ["wpiutil", "wpimath"]
 
 [tool.semiwrap.extension_modules."robotpy_apriltag._apriltag".headers]
-# frc/apriltag
+# wpi/apriltag
 AprilTag = "wpi/apriltag/AprilTag.hpp"
 AprilTagDetection = "wpi/apriltag/AprilTagDetection.hpp"
 AprilTagDetector = "wpi/apriltag/AprilTagDetector.hpp"

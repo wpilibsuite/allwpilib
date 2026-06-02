@@ -12,7 +12,6 @@ public enum EdgeConfiguration {
   FALLING_EDGE(false);
 
   /** True if triggering on rising edge. */
-  @SuppressWarnings("MemberName")
   public final boolean rising;
 
   EdgeConfiguration(boolean rising) {

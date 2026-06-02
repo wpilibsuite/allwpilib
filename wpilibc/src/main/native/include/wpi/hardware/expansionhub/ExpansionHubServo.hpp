@@ -14,12 +14,14 @@
 
 namespace wpi {
 
-/** This class controls a specific servo hooked up to an ExpansionHub. */
+/** This class controls a specific servo in positional/servo mode hooked up to
+ * an ExpansionHub. */
 class ExpansionHubServo {
  public:
   /**
    * Constructs a servo at the requested channel on a specific USB port.
    *
+   * @sa ExpansionHubCRServo if the servo is in continuous rotation mode
    * @param usbId The USB port ID the hub is connected to
    * @param channel The servo channel
    */
@@ -34,16 +36,16 @@ class ExpansionHubServo {
    *
    * @param value Position from 0.0 to 1.0.
    */
-  void Set(double value);
+  void SetPosition(double value);
 
   /**
-   * Sets the servo angle
+   * Sets the servo angle.
    *
-   * Servo angles range from 0 to 180 degrees. Use Set() with your own scaler
-   * for other angle ranges.
+   * Servo angles range defaults to 0 to 180 degrees, but can be changed with
+   * setAngleRange().
    *
-   * @param angle Position in angle units. Will be scaled between 0 and 180
-   * degrees
+   * @param angle Position in angle units. Will be clamped to be within the
+   * current angle range.
    */
   void SetAngle(wpi::units::degree_t angle);
 
@@ -76,7 +78,7 @@ class ExpansionHubServo {
   bool IsHubConnected() const { return m_hub.IsHubConnected(); }
 
   /**
-   * Sets the angle range for the setAngle call.
+   * Sets the angle range for the SetAngle call.
    * By default, this is 0 to 180 degrees.
    *
    * Maximum angle must be greater than minimum angle.
@@ -102,21 +104,11 @@ class ExpansionHubServo {
   /**
    * Sets whether the servo is reversed.
    *
-   * This will reverse both Set() and SetAngle().
+   * This will reverse both SetPosition() and SetAngle().
    *
    * @param reversed True to reverse, false for normal
    */
   void SetReversed(bool reversed);
-
-  /**
-   * Enables or disables continuous rotation mode.
-   *
-   * In continuous rotation mode, the servo will interpret
-   * Set() commands to between -1.0 and 1.0, instead of 0.0 to 1.0.
-   *
-   * @param enable True to enable continuous rotation mode, false to disable
-   */
-  void SetContinuousRotationMode(bool enable);
 
  private:
   wpi::units::microsecond_t GetFullRangeScaleFactor();
@@ -132,7 +124,6 @@ class ExpansionHubServo {
   wpi::units::microsecond_t m_maxPwm = 2400_us;
 
   bool m_reversed = false;
-  bool m_continuousMode = false;
 
   wpi::nt::IntegerPublisher m_pulseWidthPublisher;
   wpi::nt::IntegerPublisher m_framePeriodPublisher;

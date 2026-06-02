@@ -32,7 +32,7 @@ public class EducationalRobot extends RobotBase {
     run();
   }
 
-  private volatile boolean m_exit;
+  private volatile boolean exit;
 
   @Override
   public void startCompetition() {
@@ -52,7 +52,7 @@ public class EducationalRobot extends RobotBase {
     // Tell the DS that the robot is ready to be enabled
     DriverStationBackend.observeUserProgramStarting();
 
-    while (!Thread.currentThread().isInterrupted() && !m_exit) {
+    while (!Thread.currentThread().isInterrupted() && !exit) {
       DriverStationBackend.refreshControlWordFromCache(word);
       modeThread.inControl(word);
       if (isDisabled()) {
@@ -100,6 +100,6 @@ public class EducationalRobot extends RobotBase {
 
   @Override
   public void endCompetition() {
-    m_exit = true;
+    exit = true;
   }
 }

@@ -19,6 +19,10 @@ import org.wpilib.smartdashboard.SmartDashboard;
  *
  * <p>In addition, the encoder value of an encoder connected to ports 0 and 1 is consistently sent
  * to the Dashboard.
+ *
+ * <p>Finally, short code snippets show how to invert the motor direction and how to use the motor
+ * safety for frc-docs.
+ * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/motors/wpi-drive-classes.html
  */
 public class Robot extends TimedRobot {
   private static final int kMotorPort = 0;
@@ -26,18 +30,27 @@ public class Robot extends TimedRobot {
   private static final int kEncoderPortA = 0;
   private static final int kEncoderPortB = 1;
 
-  private final PWMSparkMax m_motor;
-  private final Joystick m_joystick;
-  private final Encoder m_encoder;
+  private final PWMSparkMax motor;
+  private final Joystick joystick;
+  private final Encoder encoder;
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    m_motor = new PWMSparkMax(kMotorPort);
-    m_joystick = new Joystick(kJoystickPort);
-    m_encoder = new Encoder(kEncoderPortA, kEncoderPortB);
+    motor = new PWMSparkMax(kMotorPort);
+    joystick = new Joystick(kJoystickPort);
+    encoder = new Encoder(kEncoderPortA, kEncoderPortB);
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
-    m_encoder.setDistancePerPulse((Math.PI * 6) / 360.0);
+    encoder.setDistancePerPulse((Math.PI * 6) / 360.0);
+
+    // show motor inversion
+    motor.setInverted(true);
+
+    // show motor safety features
+    motor.setSafetyEnabled(true);
+    motor.setSafetyEnabled(false);
+    motor.setExpiration(0.1);
+    motor.feed();
   }
 
   /*
@@ -46,12 +59,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    SmartDashboard.putNumber("Encoder", m_encoder.getDistance());
+    SmartDashboard.putNumber("Encoder", encoder.getDistance());
   }
 
   /** The teleop periodic function is called every control packet in teleop. */
   @Override
   public void teleopPeriodic() {
-    m_motor.setThrottle(m_joystick.getY());
+    motor.setThrottle(joystick.getY());
   }
 }

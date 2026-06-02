@@ -20,29 +20,42 @@
  *
  * In addition, the encoder value of an encoder connected to ports 0 and 1 is
  * consistently sent to the Dashboard.
+ *
+ * Finally, short code snippets show how to invert the motor direction and how
+ * to use the motor safety for frc-docs.
+ * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/motors/wpi-drive-classes.html
  */
 class Robot : public wpi::TimedRobot {
  public:
-  void TeleopPeriodic() override { m_motor.SetThrottle(m_stick.GetY()); }
+  void TeleopPeriodic() override { motor.SetThrottle(stick.GetY()); }
 
   /*
    * The RobotPeriodic function is called every control packet no matter the
    * robot mode.
    */
   void RobotPeriodic() override {
-    wpi::SmartDashboard::PutNumber("Encoder", m_encoder.GetDistance());
+    wpi::SmartDashboard::PutNumber("Encoder", encoder.GetDistance());
   }
 
   Robot() {
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
-    m_encoder.SetDistancePerPulse((std::numbers::pi * 6) / 360.0);
+    encoder.SetDistancePerPulse((std::numbers::pi * 6) / 360.0);
+
+    // show motor inversion
+    motor.SetInverted(true);
+
+    // show motor safety features
+    motor.SetSafetyEnabled(true);
+    motor.SetSafetyEnabled(false);
+    motor.SetExpiration(0.1_s);
+    motor.Feed();
   }
 
  private:
-  wpi::Joystick m_stick{0};
-  wpi::PWMSparkMax m_motor{0};
-  wpi::Encoder m_encoder{0, 1};
+  wpi::Joystick stick{0};
+  wpi::PWMSparkMax motor{0};
+  wpi::Encoder encoder{0, 1};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

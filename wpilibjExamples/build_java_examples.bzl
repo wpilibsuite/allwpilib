@@ -47,6 +47,7 @@ def build_examples(halsim_deps):
                 "//wpimath:wpimath-java",
                 "//wpilibj:wpilibj-java",
                 "//commandsv2:commandsv2-java",
+                "//commandsv3:commandsv3-java",
                 "//wpiutil:wpiutil-java",
                 "//romiVendordep:romiVendordep-java",
                 "//xrpVendordep:xrpVendordep-java",

@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 #include "wpi/hal/CANAPI.h"
-#include "wpi/hal/Types.hpp"
+#include "wpi/util/Handle.hpp"
 
 namespace wpi {
 
@@ -155,6 +155,6 @@ class CAN {
       HAL_CAN_DEV_MISCELLANEOUS;
 
  private:
-  wpi::hal::Handle<HAL_CANHandle, HAL_CleanCAN> m_handle;
+  wpi::util::Handle<HAL_CANHandle, HAL_CleanCAN> m_handle;
 };
 }  // namespace wpi

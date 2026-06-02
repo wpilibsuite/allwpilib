@@ -51,6 +51,7 @@ generate_wpilibj(
 
 write_source_files(
     name = "write_wpilibj",
+    diff_args = ["-u"],
     files = {
         "src/generated": ":generate_wpilibj",
     },

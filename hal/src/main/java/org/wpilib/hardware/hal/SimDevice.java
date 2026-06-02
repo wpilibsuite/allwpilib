@@ -26,10 +26,10 @@ public class SimDevice implements AutoCloseable {
     BIDIR(SimDeviceJNI.VALUE_BIDIR);
 
     /** The native value of this Direction. */
-    public final int m_value;
+    public final int value;
 
     Direction(int value) {
-      m_value = value;
+      this.value = value;
     }
   }
 
@@ -140,7 +140,7 @@ public class SimDevice implements AutoCloseable {
    * @return simulated value object
    */
   public SimValue createValue(String name, Direction direction, HALValue initialValue) {
-    int handle = SimDeviceJNI.createSimValue(m_handle, name, direction.m_value, initialValue);
+    int handle = SimDeviceJNI.createSimValue(m_handle, name, direction.value, initialValue);
     if (handle <= 0) {
       return null;
     }
@@ -158,7 +158,7 @@ public class SimDevice implements AutoCloseable {
    * @return simulated double value object
    */
   public SimInt createInt(String name, Direction direction, int initialValue) {
-    int handle = SimDeviceJNI.createSimValueInt(m_handle, name, direction.m_value, initialValue);
+    int handle = SimDeviceJNI.createSimValueInt(m_handle, name, direction.value, initialValue);
     if (handle <= 0) {
       return null;
     }
@@ -176,7 +176,7 @@ public class SimDevice implements AutoCloseable {
    * @return simulated double value object
    */
   public SimLong createLong(String name, Direction direction, long initialValue) {
-    int handle = SimDeviceJNI.createSimValueLong(m_handle, name, direction.m_value, initialValue);
+    int handle = SimDeviceJNI.createSimValueLong(m_handle, name, direction.value, initialValue);
     if (handle <= 0) {
       return null;
     }
@@ -194,7 +194,7 @@ public class SimDevice implements AutoCloseable {
    * @return simulated double value object
    */
   public SimDouble createDouble(String name, Direction direction, double initialValue) {
-    int handle = SimDeviceJNI.createSimValueDouble(m_handle, name, direction.m_value, initialValue);
+    int handle = SimDeviceJNI.createSimValueDouble(m_handle, name, direction.value, initialValue);
     if (handle <= 0) {
       return null;
     }
@@ -216,7 +216,7 @@ public class SimDevice implements AutoCloseable {
    */
   public SimEnum createEnum(String name, Direction direction, String[] options, int initialValue) {
     int handle =
-        SimDeviceJNI.createSimValueEnum(m_handle, name, direction.m_value, options, initialValue);
+        SimDeviceJNI.createSimValueEnum(m_handle, name, direction.value, options, initialValue);
     if (handle <= 0) {
       return null;
     }
@@ -241,7 +241,7 @@ public class SimDevice implements AutoCloseable {
       String name, Direction direction, String[] options, double[] optionValues, int initialValue) {
     int handle =
         SimDeviceJNI.createSimValueEnumDouble(
-            m_handle, name, direction.m_value, options, optionValues, initialValue);
+            m_handle, name, direction.value, options, optionValues, initialValue);
     if (handle <= 0) {
       return null;
     }
@@ -259,8 +259,7 @@ public class SimDevice implements AutoCloseable {
    * @return simulated boolean value object
    */
   public SimBoolean createBoolean(String name, Direction direction, boolean initialValue) {
-    int handle =
-        SimDeviceJNI.createSimValueBoolean(m_handle, name, direction.m_value, initialValue);
+    int handle = SimDeviceJNI.createSimValueBoolean(m_handle, name, direction.value, initialValue);
     if (handle <= 0) {
       return null;
     }

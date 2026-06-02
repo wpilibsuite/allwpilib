@@ -25,8 +25,8 @@ class Robot : public wpi::TimedRobot {
   void SimulationPeriodic() override;
 
  private:
-  wpi::SendableChooser<std::string> m_chooser;
+  wpi::SendableChooser<std::string> chooser;
   const std::string kAutoNameDefault = "Default";
   const std::string kAutoNameCustom = "My Auto";
-  std::string m_autoSelected;
+  std::string autoSelected;
 };

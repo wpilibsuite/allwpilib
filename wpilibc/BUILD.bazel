@@ -76,6 +76,7 @@ generate_version_file(
 
 write_source_files(
     name = "write_wpilibc",
+    diff_args = ["-u"],
     files = {
         "src/generated": ":generate_wpilibc",
     },
@@ -179,7 +180,6 @@ cc_test(
     size = "small",
     srcs = glob(["src/test/native/cpp/**"]),
     tags = [
-        "no-asan",
         "no-tsan",
         "no-ubsan",
     ],

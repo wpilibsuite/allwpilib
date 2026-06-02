@@ -28,30 +28,30 @@
 class Drivetrain {
  public:
   Drivetrain() {
-    m_imu.ResetYaw();
+    imu.ResetYaw();
 
-    m_leftLeader.AddFollower(m_leftFollower);
-    m_rightLeader.AddFollower(m_rightFollower);
+    leftLeader.AddFollower(leftFollower);
+    rightLeader.AddFollower(rightFollower);
 
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightLeader.SetInverted(true);
+    rightLeader.SetInverted(true);
 
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    m_leftEncoder.SetDistancePerPulse(2 * std::numbers::pi * kWheelRadius /
-                                      kEncoderResolution);
-    m_rightEncoder.SetDistancePerPulse(2 * std::numbers::pi * kWheelRadius /
-                                       kEncoderResolution);
+    leftEncoder.SetDistancePerPulse(2 * std::numbers::pi * kWheelRadius /
+                                    kEncoderResolution);
+    rightEncoder.SetDistancePerPulse(2 * std::numbers::pi * kWheelRadius /
+                                     kEncoderResolution);
 
-    m_leftEncoder.Reset();
-    m_rightEncoder.Reset();
+    leftEncoder.Reset();
+    rightEncoder.Reset();
 
-    m_rightLeader.SetInverted(true);
+    rightLeader.SetInverted(true);
 
-    wpi::SmartDashboard::PutData("Field", &m_fieldSim);
+    wpi::SmartDashboard::PutData("Field", &fieldSim);
   }
 
   static constexpr wpi::units::meters_per_second_t kMaxVelocity =
@@ -66,7 +66,7 @@ class Drivetrain {
   void UpdateOdometry();
   void ResetOdometry(const wpi::math::Pose2d& pose);
 
-  wpi::math::Pose2d GetPose() const { return m_odometry.GetPose(); }
+  wpi::math::Pose2d GetPose() const { return odometry.GetPose(); }
 
   void SimulationPeriodic();
   void Periodic();
@@ -76,36 +76,36 @@ class Drivetrain {
   static constexpr double kWheelRadius = 0.0508;  // meters
   static constexpr int kEncoderResolution = 4096;
 
-  wpi::PWMSparkMax m_leftLeader{1};
-  wpi::PWMSparkMax m_leftFollower{2};
-  wpi::PWMSparkMax m_rightLeader{3};
-  wpi::PWMSparkMax m_rightFollower{4};
+  wpi::PWMSparkMax leftLeader{1};
+  wpi::PWMSparkMax leftFollower{2};
+  wpi::PWMSparkMax rightLeader{3};
+  wpi::PWMSparkMax rightFollower{4};
 
-  wpi::Encoder m_leftEncoder{0, 1};
-  wpi::Encoder m_rightEncoder{2, 3};
+  wpi::Encoder leftEncoder{0, 1};
+  wpi::Encoder rightEncoder{2, 3};
 
-  wpi::math::PIDController m_leftPIDController{8.5, 0.0, 0.0};
-  wpi::math::PIDController m_rightPIDController{8.5, 0.0, 0.0};
+  wpi::math::PIDController leftPIDController{8.5, 0.0, 0.0};
+  wpi::math::PIDController rightPIDController{8.5, 0.0, 0.0};
 
-  wpi::OnboardIMU m_imu{wpi::OnboardIMU::FLAT};
+  wpi::OnboardIMU imu{wpi::OnboardIMU::FLAT};
 
-  wpi::math::DifferentialDriveKinematics m_kinematics{kTrackwidth};
-  wpi::math::DifferentialDriveOdometry m_odometry{
-      m_imu.GetRotation2d(), wpi::units::meter_t{m_leftEncoder.GetDistance()},
-      wpi::units::meter_t{m_rightEncoder.GetDistance()}};
+  wpi::math::DifferentialDriveKinematics kinematics{kTrackwidth};
+  wpi::math::DifferentialDriveOdometry odometry{
+      imu.GetRotation2d(), wpi::units::meter_t{leftEncoder.GetDistance()},
+      wpi::units::meter_t{rightEncoder.GetDistance()}};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> feedforward{
       1_V, 3_V / 1_mps};
 
   // Simulation classes help us simulate our robot
-  wpi::sim::EncoderSim m_leftEncoderSim{m_leftEncoder};
-  wpi::sim::EncoderSim m_rightEncoderSim{m_rightEncoder};
-  wpi::Field2d m_fieldSim;
-  wpi::math::LinearSystem<2, 2, 2> m_drivetrainSystem =
+  wpi::sim::EncoderSim leftEncoderSim{leftEncoder};
+  wpi::sim::EncoderSim rightEncoderSim{rightEncoder};
+  wpi::Field2d fieldSim;
+  wpi::math::LinearSystem<2, 2, 2> drivetrainSystem =
       wpi::math::Models::DifferentialDriveFromSysId(
           1.98_V / 1_mps, 0.2_V / 1_mps_sq, 1.5_V / 1_mps, 0.3_V / 1_mps_sq);
-  wpi::sim::DifferentialDrivetrainSim m_drivetrainSimulator{
-      m_drivetrainSystem, kTrackwidth, wpi::math::DCMotor::CIM(2), 8, 2_in};
+  wpi::sim::DifferentialDrivetrainSim drivetrainSimulator{
+      drivetrainSystem, kTrackwidth, wpi::math::DCMotor::CIM(2), 8, 2_in};
 };

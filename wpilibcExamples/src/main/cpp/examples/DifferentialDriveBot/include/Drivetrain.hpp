@@ -24,25 +24,25 @@
 class Drivetrain {
  public:
   Drivetrain() {
-    m_leftLeader.AddFollower(m_leftFollower);
-    m_rightLeader.AddFollower(m_rightFollower);
+    leftLeader.AddFollower(leftFollower);
+    rightLeader.AddFollower(rightFollower);
 
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightLeader.SetInverted(true);
+    rightLeader.SetInverted(true);
 
-    m_imu.ResetYaw();
+    imu.ResetYaw();
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    m_leftEncoder.SetDistancePerPulse(2 * std::numbers::pi * kWheelRadius /
-                                      kEncoderResolution);
-    m_rightEncoder.SetDistancePerPulse(2 * std::numbers::pi * kWheelRadius /
-                                       kEncoderResolution);
+    leftEncoder.SetDistancePerPulse(2 * std::numbers::pi * kWheelRadius /
+                                    kEncoderResolution);
+    rightEncoder.SetDistancePerPulse(2 * std::numbers::pi * kWheelRadius /
+                                     kEncoderResolution);
 
-    m_leftEncoder.Reset();
-    m_rightEncoder.Reset();
+    leftEncoder.Reset();
+    rightEncoder.Reset();
   }
 
   static constexpr wpi::units::meters_per_second_t kMaxVelocity =
@@ -61,26 +61,26 @@ class Drivetrain {
   static constexpr double kWheelRadius = 0.0508;  // meters
   static constexpr int kEncoderResolution = 4096;
 
-  wpi::PWMSparkMax m_leftLeader{1};
-  wpi::PWMSparkMax m_leftFollower{2};
-  wpi::PWMSparkMax m_rightLeader{3};
-  wpi::PWMSparkMax m_rightFollower{4};
+  wpi::PWMSparkMax leftLeader{1};
+  wpi::PWMSparkMax leftFollower{2};
+  wpi::PWMSparkMax rightLeader{3};
+  wpi::PWMSparkMax rightFollower{4};
 
-  wpi::Encoder m_leftEncoder{0, 1};
-  wpi::Encoder m_rightEncoder{2, 3};
+  wpi::Encoder leftEncoder{0, 1};
+  wpi::Encoder rightEncoder{2, 3};
 
-  wpi::math::PIDController m_leftPIDController{1.0, 0.0, 0.0};
-  wpi::math::PIDController m_rightPIDController{1.0, 0.0, 0.0};
+  wpi::math::PIDController leftPIDController{1.0, 0.0, 0.0};
+  wpi::math::PIDController rightPIDController{1.0, 0.0, 0.0};
 
-  wpi::OnboardIMU m_imu{wpi::OnboardIMU::FLAT};
+  wpi::OnboardIMU imu{wpi::OnboardIMU::FLAT};
 
-  wpi::math::DifferentialDriveKinematics m_kinematics{kTrackwidth};
-  wpi::math::DifferentialDriveOdometry m_odometry{
-      m_imu.GetRotation2d(), wpi::units::meter_t{m_leftEncoder.GetDistance()},
-      wpi::units::meter_t{m_rightEncoder.GetDistance()}};
+  wpi::math::DifferentialDriveKinematics kinematics{kTrackwidth};
+  wpi::math::DifferentialDriveOdometry odometry{
+      imu.GetRotation2d(), wpi::units::meter_t{leftEncoder.GetDistance()},
+      wpi::units::meter_t{rightEncoder.GetDistance()}};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> feedforward{
       1_V, 3_V / 1_mps};
 };

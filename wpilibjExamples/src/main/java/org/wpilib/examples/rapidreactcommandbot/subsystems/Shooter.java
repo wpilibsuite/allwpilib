@@ -18,28 +18,28 @@ import org.wpilib.math.controller.SimpleMotorFeedforward;
 
 @Logged
 public class Shooter extends SubsystemBase {
-  private final PWMSparkMax m_shooterMotor = new PWMSparkMax(ShooterConstants.kShooterMotorPort);
-  private final PWMSparkMax m_feederMotor = new PWMSparkMax(ShooterConstants.kFeederMotorPort);
-  private final Encoder m_shooterEncoder =
+  private final PWMSparkMax shooterMotor = new PWMSparkMax(ShooterConstants.kShooterMotorPort);
+  private final PWMSparkMax feederMotor = new PWMSparkMax(ShooterConstants.kFeederMotorPort);
+  private final Encoder shooterEncoder =
       new Encoder(
           ShooterConstants.kEncoderPorts[0],
           ShooterConstants.kEncoderPorts[1],
           ShooterConstants.kEncoderReversed);
-  private final SimpleMotorFeedforward m_shooterFeedforward =
+  private final SimpleMotorFeedforward shooterFeedforward =
       new SimpleMotorFeedforward(ShooterConstants.kS, ShooterConstants.kV);
-  private final PIDController m_shooterFeedback = new PIDController(ShooterConstants.kP, 0.0, 0.0);
+  private final PIDController shooterFeedback = new PIDController(ShooterConstants.kP, 0.0, 0.0);
 
   /** The shooter subsystem for the robot. */
   public Shooter() {
-    m_shooterFeedback.setTolerance(ShooterConstants.kShooterToleranceRPS);
-    m_shooterEncoder.setDistancePerPulse(ShooterConstants.kEncoderDistancePerPulse);
+    shooterFeedback.setTolerance(ShooterConstants.kShooterToleranceRPS);
+    shooterEncoder.setDistancePerPulse(ShooterConstants.kEncoderDistancePerPulse);
 
     // Set default command to turn off both the shooter and feeder motors, and then idle
     setDefaultCommand(
         runOnce(
                 () -> {
-                  m_shooterMotor.disable();
-                  m_feederMotor.disable();
+                  shooterMotor.disable();
+                  feederMotor.disable();
                 })
             .andThen(run(() -> {}))
             .withName("Idle"));
@@ -56,14 +56,14 @@ public class Shooter extends SubsystemBase {
             // Run the shooter flywheel at the desired setpoint using feedforward and feedback
             run(
                 () -> {
-                  m_shooterMotor.setThrottle(
-                      m_shooterFeedforward.calculate(setpointRotationsPerSecond)
-                          + m_shooterFeedback.calculate(
-                              m_shooterEncoder.getRate(), setpointRotationsPerSecond));
+                  shooterMotor.setThrottle(
+                      shooterFeedforward.calculate(setpointRotationsPerSecond)
+                          + shooterFeedback.calculate(
+                              shooterEncoder.getRate(), setpointRotationsPerSecond));
                 }),
 
             // Wait until the shooter has reached the setpoint, and then run the feeder
-            waitUntil(m_shooterFeedback::atSetpoint).andThen(() -> m_feederMotor.setThrottle(1)))
+            waitUntil(shooterFeedback::atSetpoint).andThen(() -> feederMotor.setThrottle(1)))
         .withName("Shoot");
   }
 }
