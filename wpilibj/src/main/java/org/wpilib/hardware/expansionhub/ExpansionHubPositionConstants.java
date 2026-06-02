@@ -17,9 +17,9 @@ public class ExpansionHubPositionConstants {
   private final DoublePublisher m_dPublisher;
 
   private final DoublePublisher m_sPublisher;
-  private final DoublePublisher m_gLiftPublisher;
-  private final DoublePublisher m_gArmPublisher;
-  private final DoublePublisher m_gArmRatioPublisher;
+  private final DoublePublisher m_gPublisher;
+  private final DoublePublisher m_cosPublisher;
+  private final DoublePublisher m_cosRatioPublisher;
 
   private final BooleanPublisher m_continuousPublisher;
   private final DoublePublisher m_continuousMinimumPublisher;
@@ -57,19 +57,19 @@ public class ExpansionHubPositionConstants {
                 "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/position" + "/ks")
             .publish(options);
 
-    m_gLiftPublisher =
+    m_gPublisher =
         systemServer
             .getDoubleTopic(
-                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/position" + "/kgLift")
+                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/position" + "/kg")
             .publish(options);
 
-    m_gArmPublisher =
+    m_cosPublisher =
         systemServer
             .getDoubleTopic(
-                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/position" + "/kgArm")
+                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/position" + "/kcos")
             .publish(options);
 
-    m_gArmRatioPublisher =
+    m_cosRatioPublisher =
         systemServer
             .getDoubleTopic(
                 "/rhsp/"
@@ -77,7 +77,7 @@ public class ExpansionHubPositionConstants {
                     + "/motor"
                     + motorNumber
                     + "/constants/position"
-                    + "/kgArmRatio")
+                    + "/kcosRatio")
             .publish(options);
 
     m_continuousPublisher =
@@ -152,12 +152,12 @@ public class ExpansionHubPositionConstants {
    * <p>These gravity-compensation settings are mutually exclusive; setting this value clears the
    * arm gravity gain.
    *
-   * @param gLift The lifting gravity gain.
+   * @param g The lifting gravity gain.
    * @return This object, for method chaining.
    */
-  public ExpansionHubPositionConstants setGLift(double gLift) {
-    m_gLiftPublisher.set(gLift);
-    m_gArmPublisher.set(0);
+  public ExpansionHubPositionConstants setG(double g) {
+    m_gPublisher.set(g);
+    m_cosPublisher.set(0);
     return this;
   }
 
@@ -167,12 +167,12 @@ public class ExpansionHubPositionConstants {
    * <p>These gravity-compensation settings are mutually exclusive; setting this value clears the
    * lift gravity gain.
    *
-   * @param gArm The arm gravity gain.
+   * @param cos The arm gravity gain.
    * @return This object, for method chaining.
    */
-  public ExpansionHubPositionConstants setGArm(double gArm) {
-    m_gArmPublisher.set(gArm);
-    m_gLiftPublisher.set(0);
+  public ExpansionHubPositionConstants setCos(double cos) {
+    m_cosPublisher.set(cos);
+    m_gPublisher.set(0);
     return this;
   }
 
@@ -180,11 +180,11 @@ public class ExpansionHubPositionConstants {
    * Sets the conversion factor that translates the selected sensor's position units into absolute
    * mechanism rotations for an arm mechanism.
    *
-   * @param gArmRatio The conversion factor for the arm gravity compensation ratio.
+   * @param cosRatio The conversion factor for the arm gravity compensation ratio.
    * @return This object, for method chaining.
    */
-  public ExpansionHubPositionConstants setGArmRatio(double gArmRatio) {
-    m_gArmRatioPublisher.set(gArmRatio);
+  public ExpansionHubPositionConstants setCosRatio(double cosRatio) {
+    m_cosRatioPublisher.set(cosRatio);
     return this;
   }
 
@@ -221,9 +221,9 @@ public class ExpansionHubPositionConstants {
     m_iPublisher.close();
     m_dPublisher.close();
     m_sPublisher.close();
-    m_gLiftPublisher.close();
-    m_gArmPublisher.close();
-    m_gArmRatioPublisher.close();
+    m_gPublisher.close();
+    m_cosPublisher.close();
+    m_cosRatioPublisher.close();
     m_continuousPublisher.close();
     m_continuousMinimumPublisher.close();
     m_continuousMaximumPublisher.close();

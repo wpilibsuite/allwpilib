@@ -42,24 +42,23 @@ ExpansionHubPositionConstants::ExpansionHubPositionConstants(int hubNumber,
                                       hubNumber, motorNumber))
           .Publish(options);
 
-  m_gLiftPublisher = systemServer
-                         .GetDoubleTopic(fmt::format(
-                             "/rhsp/{}/motor{}/constants/position/kgLift",
-                             hubNumber, motorNumber))
-                         .Publish(options);
-
-  m_gArmPublisher = systemServer
-                        .GetDoubleTopic(fmt::format(
-                            "/rhsp/{}/motor{}/constants/position/kgArm",
-                            hubNumber, motorNumber))
-                        .Publish(options);
-
-  m_gArmRatioPublisher =
+  m_gPublisher =
       systemServer
-          .GetDoubleTopic(
-              fmt::format("/rhsp/{}/motor{}/constants/position/kgArmRatio",
-                          hubNumber, motorNumber))
+          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/position/kg",
+                                      hubNumber, motorNumber))
           .Publish(options);
+
+  m_cosPublisher = systemServer
+                       .GetDoubleTopic(fmt::format(
+                           "/rhsp/{}/motor{}/constants/position/kcos",
+                           hubNumber, motorNumber))
+                       .Publish(options);
+
+  m_cosRatioPublisher = systemServer
+                            .GetDoubleTopic(fmt::format(
+                                "/rhsp/{}/motor{}/constants/position/kcosRatio",
+                                hubNumber, motorNumber))
+                            .Publish(options);
 
   m_continuousPublisher =
       systemServer
@@ -97,23 +96,22 @@ ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetS(double s) {
   return *this;
 }
 
-ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetGLift(
-    double gLift) {
-  m_gLiftPublisher.Set(gLift);
-  m_gArmPublisher.Set(0);
+ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetG(double g) {
+  m_gPublisher.Set(g);
+  m_cosPublisher.Set(0);
   return *this;
 }
 
-ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetGArm(
-    double gArm) {
-  m_gArmPublisher.Set(gArm);
-  m_gLiftPublisher.Set(0);
+ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetCos(
+    double cos) {
+  m_cosPublisher.Set(cos);
+  m_gPublisher.Set(0);
   return *this;
 }
 
-ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetGArmRatio(
-    double gArmRatio) {
-  m_gArmRatioPublisher.Set(gArmRatio);
+ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetCosRatio(
+    double cosRatio) {
+  m_cosRatioPublisher.Set(cosRatio);
   return *this;
 }
 
