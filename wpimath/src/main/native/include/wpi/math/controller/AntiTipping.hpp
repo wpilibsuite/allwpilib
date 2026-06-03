@@ -68,9 +68,9 @@ class WPILIB_DLLEXPORT AntiTipping {
   constexpr AntiTipping(wpi::units::unit_t<kp_unit> kp,
                         wpi::units::radian_t tippingThreshold,
                         wpi::units::meters_per_second_t maxCorrectionSpeed)
-      : m_kp(kp),
-        m_tippingThreshold(tippingThreshold),
-        m_maxCorrectionSpeed(maxCorrectionSpeed) {}
+      : m_kp{kp},
+        m_tippingThreshold{tippingThreshold},
+        m_maxCorrectionSpeed{maxCorrectionSpeed} {}
 
   /**
    * Sets the proportional coefficient.

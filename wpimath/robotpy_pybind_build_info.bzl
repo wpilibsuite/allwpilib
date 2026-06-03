@@ -45,7 +45,7 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
-            class_name = "BangBangController",
+            class_name = "BangBangContro
             yml_file = "semiwrap/BangBangController.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
             header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/controller/BangBangController.hpp",
