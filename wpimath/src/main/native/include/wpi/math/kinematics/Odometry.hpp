@@ -95,7 +95,7 @@ class WPILIB_DLLEXPORT Odometry {
    * @param rotation The rotation to reset to.
    */
   void ResetRotation(const Rotation2d& rotation) {
-    m_gyroOffset = m_gyroOffset.RotateBy(m_pose.Rotation()).RotateBy(rotation);
+    m_gyroOffset = m_gyroOffset.RotateBy(-m_pose.Rotation()).RotateBy(rotation);
     m_pose = Pose2d{m_pose.Translation(), rotation};
     m_previousAngle = rotation;
   }
