@@ -22,7 +22,6 @@ filegroup(
         "src/main/native/thirdparty/argparse/include/**/*",
         "src/main/native/thirdparty/debugging/include/**/*",
         "src/main/native/thirdparty/double-conversion/include/**/*",
-        "src/main/native/thirdparty/expected/include/**/*",
         "src/main/native/thirdparty/fmtlib/include/**/*",
         "src/main/native/thirdparty/json/include/**/*",
         "src/main/native/thirdparty/llvm/include/**/*",
@@ -108,12 +107,6 @@ third_party_cc_lib_helper(
 )
 
 third_party_cc_lib_helper(
-    name = "expected",
-    include_root = "src/main/native/thirdparty/expected/include",
-    visibility = ["//visibility:public"],
-)
-
-third_party_cc_lib_helper(
     name = "fmtlib",
     include_root = "src/main/native/thirdparty/fmtlib/include",
     src_root = "src/main/native/thirdparty/fmtlib/src",
@@ -191,7 +184,6 @@ wpilib_cc_library(
     strip_include_prefix = "src/main/native/include",
     third_party_header_only_libraries = [
         ":argparse",
-        ":expected",
         ":sigslot",
     ],
     third_party_libraries = [
@@ -369,7 +361,6 @@ generate_robotpy_native_wrapper_build_info(
         "argparse",
         "debugging",
         "double-conversion",
-        "expected",
         "fmtlib",
         "json",
         "llvm",

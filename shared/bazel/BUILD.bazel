@@ -3,6 +3,7 @@ package(default_visibility = ["//visibility:public"])
 platform(
     name = "systemcore",
     flags = [
+        "--host_cxxopt=-std=c++23",
     ],
     parents = [
         "@rules_bzlmodrio_toolchains//platforms/systemcore",

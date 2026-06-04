@@ -5,12 +5,12 @@
 #include "wpi/glass/support/ExpressionParser.hpp"
 
 #include <cmath>
+#include <expected>
 #include <stack>
 #include <string>
 #include <type_traits>
 
 #include "wpi/util/StringExtras.hpp"
-#include "wpi/util/expected"
 
 namespace wpi::glass::expression {
 
@@ -219,17 +219,17 @@ std::optional<double> ValueFromString(std::string_view str) {
 }
 
 template <typename V>
-wpi::util::expected<V, std::string> EvalAll(std::stack<Operator>& operStack,
-                                            std::stack<V>& valStack) {
+std::expected<V, std::string> EvalAll(std::stack<Operator>& operStack,
+                                      std::stack<V>& valStack) {
   while (!operStack.empty()) {
     if (valStack.size() < 2) {
-      return wpi::util::unexpected("Missing operand");
+      return std::unexpected("Missing operand");
     }
     ApplyOperator<V>(valStack, operStack.top());
     operStack.pop();
   }
   if (valStack.empty()) {
-    return wpi::util::unexpected("No value");
+    return std::unexpected("No value");
   }
 
   // Intentionally leaves the result value on top of valStack so unmatched
@@ -238,7 +238,7 @@ wpi::util::expected<V, std::string> EvalAll(std::stack<Operator>& operStack,
 }
 
 template <typename V>
-wpi::util::expected<V, std::string> ParseExpr(Lexer& lexer, bool insideParen) {
+std::expected<V, std::string> ParseExpr(Lexer& lexer, bool insideParen) {
   std::stack<Operator> operStack;
   std::stack<V> valStack;
 
@@ -257,7 +257,7 @@ wpi::util::expected<V, std::string> ParseExpr(Lexer& lexer, bool insideParen) {
         // is probably not what the user intended in this case, so give them an
         // error.
         if (prevType == TokenType::Number) {
-          return wpi::util::unexpected("Missing operator");
+          return std::unexpected("Missing operator");
         }
 
         // Implicit multiplication. Ex: "2(4 + 5)"
@@ -270,7 +270,7 @@ wpi::util::expected<V, std::string> ParseExpr(Lexer& lexer, bool insideParen) {
         if (value) {
           valStack.push(value.value());
         } else {
-          return wpi::util::unexpected("Invalid number");
+          return std::unexpected("Invalid number");
         }
 
         break;
@@ -282,7 +282,7 @@ wpi::util::expected<V, std::string> ParseExpr(Lexer& lexer, bool insideParen) {
           operStack.push(Operator::Multiply);
         }
 
-        wpi::util::expected<V, std::string> result = ParseExpr<V>(lexer, true);
+        std::expected<V, std::string> result = ParseExpr<V>(lexer, true);
         if (!result) {
           return result;
         }
@@ -293,7 +293,7 @@ wpi::util::expected<V, std::string> ParseExpr(Lexer& lexer, bool insideParen) {
           if (nextType == TokenType::End) {
             goto end;  // Act as if closed at end of expression
           }
-          return wpi::util::unexpected("Expected )");
+          return std::unexpected("Expected )");
         }
         break;
       }
@@ -307,8 +307,7 @@ wpi::util::expected<V, std::string> ParseExpr(Lexer& lexer, bool insideParen) {
         // Acts as if there was open paren at start of expression. EvalAll will
         // clear both stacks, and leave the result value on top of valStack.
         // This makes sure everything inside the parentheses is evaluated first
-        wpi::util::expected<V, std::string> result =
-            EvalAll<V>(operStack, valStack);
+        std::expected<V, std::string> result = EvalAll<V>(operStack, valStack);
         if (!result) {
           return result;
         }
@@ -316,7 +315,7 @@ wpi::util::expected<V, std::string> ParseExpr(Lexer& lexer, bool insideParen) {
       }
 
       case TokenType::Error:
-        return wpi::util::unexpected(std::string("Unexpected character: ")
+        return std::unexpected(std::string("Unexpected character: ")
                                          .append(token.str, token.strLen));
 
       default:
@@ -343,7 +342,7 @@ wpi::util::expected<V, std::string> ParseExpr(Lexer& lexer, bool insideParen) {
               precedence < prevPrecedence) {
             operStack.pop();
             if (valStack.size() < 2) {
-              return wpi::util::unexpected("Missing operand");
+              return std::unexpected("Missing operand");
             }
             ApplyOperator<V>(valStack, prevOp);
           } else {
@@ -364,13 +363,13 @@ end:
 
 // expr is null-terminated string, as ImGui::inputText() uses
 template <typename V>
-wpi::util::expected<V, std::string> TryParseExpr(const char* expr) {
+std::expected<V, std::string> TryParseExpr(const char* expr) {
   Lexer lexer(expr, std::is_integral_v<V>);
   return ParseExpr<V>(lexer, false);
 }
 
-template wpi::util::expected<double, std::string> TryParseExpr(const char*);
-template wpi::util::expected<float, std::string> TryParseExpr(const char*);
-template wpi::util::expected<int64_t, std::string> TryParseExpr(const char*);
+template std::expected<double, std::string> TryParseExpr(const char*);
+template std::expected<float, std::string> TryParseExpr(const char*);
+template std::expected<int64_t, std::string> TryParseExpr(const char*);
 
 }  // namespace wpi::glass::expression
