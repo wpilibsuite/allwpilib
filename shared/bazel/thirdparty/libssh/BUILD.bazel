@@ -4,6 +4,12 @@ package(default_visibility = ["//visibility:public"])
 
 cc_import(
     name = "libssh",
+    linkopts = select({
+        "@platforms//os:windows": [
+            "-DEFAULTLIB:Iphlpapi.lib",
+        ],
+        "//conditions:default": [],
+    }),
     static_library = select({
         "@rules_bzlmodrio_toolchains//conditions:linux_x86_64": "@libssh_linuxx86-64static//:static_libs",
         "@rules_bzlmodrio_toolchains//conditions:linux_x86_64_debug": "@libssh_linuxx86-64staticdebug//:static_libs",
