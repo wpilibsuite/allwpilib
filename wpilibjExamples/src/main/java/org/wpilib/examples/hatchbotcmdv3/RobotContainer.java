@@ -73,9 +73,9 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Grab the hatch when the Circle button is pressed.
-    driverController.eastFace().onTrue(hatchSubsystem.grabHatchCommand());
+    driverController.faceRight().onTrue(hatchSubsystem.grabHatchCommand());
     // Release the hatch when the Square button is pressed.
-    driverController.westFace().onTrue(hatchSubsystem.releaseHatchCommand());
+    driverController.faceLeft().onTrue(hatchSubsystem.releaseHatchCommand());
     // While holding R1, drive at half speed
     driverController
         .rightBumper()

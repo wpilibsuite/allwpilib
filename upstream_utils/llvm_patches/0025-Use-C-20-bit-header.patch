@@ -1,0 +1,462 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Tue, 11 Jul 2023 22:56:09 -0700
+Subject: [PATCH 25/34] Use C++20 <bit> header
+
+---
+ llvm/include/llvm/ADT/DenseMap.h       |   1 +
+ llvm/include/llvm/ADT/PointerUnion.h   |   2 +-
+ llvm/include/llvm/ADT/SmallPtrSet.h    |   6 +-
+ llvm/include/llvm/ADT/bit.h            | 286 -------------------------
+ llvm/include/llvm/Support/MathExtras.h |  23 +-
+ 5 files changed, 17 insertions(+), 301 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
+index 41199ac39da56994d9086600e6dfc1dad2c93ce0..2c23fa2d268d34429faa0ed7b1d889c2c5ea4f9c 100644
+--- a/llvm/include/llvm/ADT/DenseMap.h
++++ b/llvm/include/llvm/ADT/DenseMap.h
+@@ -26,6 +26,7 @@
+ #include "llvm/Support/ReverseIteration.h"
+ #include "llvm/Support/type_traits.h"
+ #include <algorithm>
++#include <bit>
+ #include <cassert>
+ #include <cstddef>
+ #include <cstring>
+diff --git a/llvm/include/llvm/ADT/PointerUnion.h b/llvm/include/llvm/ADT/PointerUnion.h
+index 02d11537e3823a43301295e4645d84357df63703..be3bbb6ac65588626b746ce83aa3ed65ac9dc856 100644
+--- a/llvm/include/llvm/ADT/PointerUnion.h
++++ b/llvm/include/llvm/ADT/PointerUnion.h
+@@ -76,7 +76,7 @@ namespace pointer_union_detail {
+   /// Determine the number of bits required to store integers with values < n.
+   /// This is ceil(log2(n)).
+   constexpr int bitsRequired(unsigned n) {
+-    return n == 0 ? 0 : llvm::bit_width_constexpr(n - 1);
++    return n == 0 ? 0 : std::bit_width(n - 1);
+   }
+ 
+   template <typename... Ts> constexpr int lowBitsAvailable() {
+diff --git a/llvm/include/llvm/ADT/SmallPtrSet.h b/llvm/include/llvm/ADT/SmallPtrSet.h
+index c07de1a110479ed625b112cc5b30d0bd5d56430f..474aa405d789e8c291d3bfc16a653ad043365883 100644
+--- a/llvm/include/llvm/ADT/SmallPtrSet.h
++++ b/llvm/include/llvm/ADT/SmallPtrSet.h
+@@ -81,7 +81,7 @@ protected:
+   explicit SmallPtrSetImplBase(const void **SmallStorage, unsigned SmallSize)
+       : CurArray(SmallStorage), CurArraySize(SmallSize), NumEntries(0),
+         NumTombstones(0), IsSmall(true) {
+-    assert(llvm::has_single_bit(SmallSize) &&
++    assert(std::has_single_bit(SmallSize) &&
+            "Initial size must be a power of two!");
+   }
+ 
+@@ -129,7 +129,7 @@ public:
+     // We must Grow -- find the size where we'd be 75% full, then round up to
+     // the next power of two.
+     size_type NewSize = NewNumEntries + (NewNumEntries / 3);
+-    NewSize = llvm::bit_ceil(NewSize);
++    NewSize = std::bit_ceil(NewSize);
+     // Like insert_imp_big, always allocate at least 128 elements.
+     NewSize = (std::max)(128u, NewSize);
+     Grow(NewSize);
+@@ -533,7 +533,7 @@ class SmallPtrSet : public SmallPtrSetImpl<PtrType> {
+   using BaseT = SmallPtrSetImpl<PtrType>;
+ 
+   // Make sure that SmallSize is a power of two, round up if not.
+-  static constexpr size_t SmallSizePowTwo = llvm::bit_ceil_constexpr(SmallSize);
++  static constexpr size_t SmallSizePowTwo = std::bit_ceil(SmallSize);
+   /// SmallStorage - Fixed size storage used in 'small mode'.
+   const void *SmallStorage[SmallSizePowTwo];
+ 
+diff --git a/llvm/include/llvm/ADT/bit.h b/llvm/include/llvm/ADT/bit.h
+index 5971b75045b6b5f40b46900b685faf2e475c5a7f..3426ea7602a95f7292ec262ed246527c840dc176 100644
+--- a/llvm/include/llvm/ADT/bit.h
++++ b/llvm/include/llvm/ADT/bit.h
+@@ -28,44 +28,6 @@
+ #include <cstdlib>  // for _byteswap_{ushort,ulong,uint64}
+ #endif
+ 
+-#if defined(__linux__) || defined(__GNU__) || defined(__HAIKU__) ||            \
+-    defined(__Fuchsia__) || defined(__EMSCRIPTEN__) || defined(__NetBSD__) ||  \
+-    defined(__OpenBSD__) || defined(__DragonFly__) || defined(__managarm__)
+-#include <endian.h>
+-#elif defined(_AIX)
+-#include <sys/machine.h>
+-#elif defined(__sun)
+-/* Solaris provides _BIG_ENDIAN/_LITTLE_ENDIAN selector in sys/types.h */
+-#include <sys/types.h>
+-#define BIG_ENDIAN 4321
+-#define LITTLE_ENDIAN 1234
+-#if defined(_BIG_ENDIAN)
+-#define BYTE_ORDER BIG_ENDIAN
+-#else
+-#define BYTE_ORDER LITTLE_ENDIAN
+-#endif
+-#elif defined(__MVS__)
+-#define BIG_ENDIAN 4321
+-#define LITTLE_ENDIAN 1234
+-#define BYTE_ORDER BIG_ENDIAN
+-#else
+-#if !defined(BYTE_ORDER) && !defined(_WIN32)
+-#include <machine/endian.h>
+-#endif
+-#endif
+-
+-#ifdef _MSC_VER
+-// Declare these intrinsics manually rather including intrin.h. It's very
+-// expensive, and bit.h is popular via MathExtras.h.
+-// #include <intrin.h>
+-extern "C" {
+-unsigned char _BitScanForward(unsigned long *_Index, unsigned long _Mask);
+-unsigned char _BitScanForward64(unsigned long *_Index, unsigned __int64 _Mask);
+-unsigned char _BitScanReverse(unsigned long *_Index, unsigned long _Mask);
+-unsigned char _BitScanReverse64(unsigned long *_Index, unsigned __int64 _Mask);
+-}
+-#endif
+-
+ namespace llvm {
+ 
+ enum class endianness {
+@@ -143,254 +105,6 @@ template <typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
+   }
+ }
+ 
+-template <typename T, typename = std::enable_if_t<std::is_unsigned_v<T>>>
+-[[nodiscard]] constexpr inline bool has_single_bit(T Value) noexcept {
+-  return (Value != 0) && ((Value & (Value - 1)) == 0);
+-}
+-
+-/// Count the number of set bits in a value.
+-/// Ex. popcount(0xF000F000) = 8
+-/// Returns 0 if Value is zero.
+-template <typename T> [[nodiscard]] constexpr int popcount(T Value) noexcept {
+-  static_assert(std::is_unsigned_v<T>, "T must be an unsigned integer type");
+-  static_assert(sizeof(T) <= 8, "T must be 8 bytes or less");
+-
+-  if constexpr (sizeof(T) <= 4) {
+-#if defined(__GNUC__)
+-    return (int)__builtin_popcount(Value);
+-#else
+-    uint32_t V = Value;
+-    V = V - ((V >> 1) & 0x55555555);
+-    V = (V & 0x33333333) + ((V >> 2) & 0x33333333);
+-    return int(((V + (V >> 4) & 0xF0F0F0F) * 0x1010101) >> 24);
+-#endif
+-  } else {
+-#if defined(__GNUC__)
+-    return (int)__builtin_popcountll(Value);
+-#else
+-    uint64_t V = Value;
+-    V = V - ((V >> 1) & 0x5555555555555555ULL);
+-    V = (V & 0x3333333333333333ULL) + ((V >> 2) & 0x3333333333333333ULL);
+-    V = (V + (V >> 4)) & 0x0F0F0F0F0F0F0F0FULL;
+-    return int((uint64_t)(V * 0x0101010101010101ULL) >> 56);
+-#endif
+-  }
+-}
+-
+-/// Count number of 0's from the least significant bit to the most
+-/// stopping at the first 1.
+-///
+-/// A constexpr version of countr_zero.
+-///
+-/// Only unsigned integral types are allowed.
+-///
+-/// Returns std::numeric_limits<T>::digits on an input of 0.
+-template <typename T> [[nodiscard]] constexpr int countr_zero_constexpr(T Val) {
+-  static_assert(std::is_unsigned_v<T>,
+-                "Only unsigned integral types are allowed.");
+-  // "(Val & -Val) - 1" generates a mask with all bits set up to (but not
+-  // including) the least significant set bit of Val.
+-  return llvm::popcount(static_cast<std::make_unsigned_t<T>>((Val & -Val) - 1));
+-}
+-
+-/// Count number of 0's from the least significant bit to the most
+-/// stopping at the first 1.
+-///
+-/// Only unsigned integral types are allowed.
+-///
+-/// Returns std::numeric_limits<T>::digits on an input of 0.
+-template <typename T> [[nodiscard]] int countr_zero(T Val) {
+-  static_assert(std::is_unsigned_v<T>,
+-                "Only unsigned integral types are allowed.");
+-  if (!Val)
+-    return std::numeric_limits<T>::digits;
+-
+-  // Use the intrinsic if available.
+-  if constexpr (sizeof(T) <= 4) {
+-#if __has_builtin(__builtin_ctz) || defined(__GNUC__)
+-    return __builtin_ctz(Val);
+-#elif defined(_MSC_VER)
+-    unsigned long Index;
+-    _BitScanForward(&Index, Val);
+-    return Index;
+-#endif
+-  } else if constexpr (sizeof(T) == 8) {
+-#if __has_builtin(__builtin_ctzll) || defined(__GNUC__)
+-    return __builtin_ctzll(Val);
+-#elif defined(_MSC_VER) && defined(_M_X64)
+-    unsigned long Index;
+-    _BitScanForward64(&Index, Val);
+-    return Index;
+-#endif
+-  }
+-
+-  return countr_zero_constexpr(Val);
+-}
+-
+-/// Count number of 0's from the most significant bit to the least
+-///   stopping at the first 1.
+-///
+-/// Only unsigned integral types are allowed.
+-///
+-/// Returns std::numeric_limits<T>::digits on an input of 0.
+-template <typename T> [[nodiscard]] int countl_zero(T Val) {
+-  static_assert(std::is_unsigned_v<T>,
+-                "Only unsigned integral types are allowed.");
+-  if (!Val)
+-    return std::numeric_limits<T>::digits;
+-
+-  // Use the intrinsic if available.
+-  if constexpr (sizeof(T) == 4) {
+-#if __has_builtin(__builtin_clz) || defined(__GNUC__)
+-    return __builtin_clz(Val);
+-#elif defined(_MSC_VER)
+-    unsigned long Index;
+-    _BitScanReverse(&Index, Val);
+-    return Index ^ 31;
+-#endif
+-  } else if constexpr (sizeof(T) == 8) {
+-#if __has_builtin(__builtin_clzll) || defined(__GNUC__)
+-    return __builtin_clzll(Val);
+-#elif defined(_MSC_VER) && defined(_M_X64)
+-    unsigned long Index;
+-    _BitScanReverse64(&Index, Val);
+-    return Index ^ 63;
+-#endif
+-  }
+-
+-  // Fall back to the bisection method.
+-  unsigned ZeroBits = 0;
+-  for (T Shift = std::numeric_limits<T>::digits >> 1; Shift; Shift >>= 1) {
+-    T Tmp = Val >> Shift;
+-    if (Tmp)
+-      Val = Tmp;
+-    else
+-      ZeroBits |= Shift;
+-  }
+-  return ZeroBits;
+-}
+-
+-/// Count the number of ones from the most significant bit to the first
+-/// zero bit.
+-///
+-/// Ex. countl_one(0xFF0FFF00) == 8.
+-/// Only unsigned integral types are allowed.
+-///
+-/// Returns std::numeric_limits<T>::digits on an input of all ones.
+-template <typename T> [[nodiscard]] int countl_one(T Value) {
+-  static_assert(std::is_unsigned_v<T>,
+-                "Only unsigned integral types are allowed.");
+-  return llvm::countl_zero<T>(~Value);
+-}
+-
+-/// Count the number of ones from the least significant bit to the first
+-/// zero bit.
+-///
+-/// Ex. countr_one(0x00FF00FF) == 8.
+-/// Only unsigned integral types are allowed.
+-///
+-/// Returns std::numeric_limits<T>::digits on an input of all ones.
+-template <typename T> [[nodiscard]] int countr_one(T Value) {
+-  static_assert(std::is_unsigned_v<T>,
+-                "Only unsigned integral types are allowed.");
+-  return llvm::countr_zero<T>(~Value);
+-}
+-
+-/// Returns the number of bits needed to represent Value if Value is nonzero.
+-/// Returns 0 otherwise.
+-///
+-/// Ex. bit_width(5) == 3.
+-template <typename T> [[nodiscard]] int bit_width(T Value) {
+-  static_assert(std::is_unsigned_v<T>,
+-                "Only unsigned integral types are allowed.");
+-  return std::numeric_limits<T>::digits - llvm::countl_zero(Value);
+-}
+-
+-/// Returns the number of bits needed to represent Value if Value is nonzero.
+-/// Returns 0 otherwise.
+-///
+-/// A constexpr version of bit_width.
+-///
+-/// Ex. bit_width_constexpr(5) == 3.
+-template <typename T> [[nodiscard]] constexpr int bit_width_constexpr(T Value) {
+-  static_assert(std::is_unsigned_v<T>,
+-                "Only unsigned integral types are allowed.");
+-  int Width = 0;
+-  while (Value > 0) {
+-    Value >>= 1;
+-    ++Width;
+-  }
+-  return Width;
+-}
+-
+-/// Returns the largest integral power of two no greater than Value if Value is
+-/// nonzero.  Returns 0 otherwise.
+-///
+-/// Ex. bit_floor(5) == 4.
+-template <typename T> [[nodiscard]] T bit_floor(T Value) {
+-  static_assert(std::is_unsigned_v<T>,
+-                "Only unsigned integral types are allowed.");
+-  if (!Value)
+-    return 0;
+-  return T(1) << (llvm::bit_width(Value) - 1);
+-}
+-
+-/// Returns the smallest integral power of two no smaller than Value if Value is
+-/// nonzero.  Returns 1 otherwise.
+-///
+-/// Ex. bit_ceil(5) == 8.
+-///
+-/// The return value is undefined if the input is larger than the largest power
+-/// of two representable in T.
+-template <typename T> [[nodiscard]] T bit_ceil(T Value) {
+-  static_assert(std::is_unsigned_v<T>,
+-                "Only unsigned integral types are allowed.");
+-  if (Value < 2)
+-    return 1;
+-  return T(1) << llvm::bit_width<T>(Value - 1u);
+-}
+-
+-/// Returns the smallest integral power of two no smaller than Value if Value is
+-/// nonzero.  Returns 1 otherwise.
+-///
+-/// Ex. bit_ceil(5) == 8.
+-///
+-/// The return value is undefined if the input is larger than the largest power
+-/// of two representable in T.
+-template <typename T> [[nodiscard]] constexpr T bit_ceil_constexpr(T Value) {
+-  static_assert(std::is_unsigned_v<T>,
+-                "Only unsigned integral types are allowed.");
+-  if (Value < 2)
+-    return 1;
+-  return T(1) << llvm::bit_width_constexpr<T>(Value - 1u);
+-}
+-
+-template <typename T, typename = std::enable_if_t<std::is_unsigned_v<T>>>
+-[[nodiscard]] constexpr T rotl(T V, int R) {
+-  constexpr unsigned N = std::numeric_limits<T>::digits;
+-
+-  static_assert(has_single_bit(N), "& (N - 1) is only valid for powers of two");
+-  R = R & (N - 1);
+-
+-  if (R == 0)
+-    return V;
+-
+-  return (V << R) | (V >> (N - R));
+-}
+-
+-template <typename T, typename = std::enable_if_t<std::is_unsigned_v<T>>>
+-[[nodiscard]] constexpr T rotr(T V, int R) {
+-  constexpr unsigned N = std::numeric_limits<T>::digits;
+-
+-  static_assert(has_single_bit(N), "& (N - 1) is only valid for powers of two");
+-  R = R & (N - 1);
+-
+-  if (R == 0)
+-    return V;
+-
+-  return (V >> R) | (V << (N - R));
+-}
+-
+ } // namespace llvm
+ 
+ #endif
+diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
+index 0735d9c9f756349a19c5aa2ec34ceca5d8274f16..38b1486c54be5102025192b3b90e86e54ab347c0 100644
+--- a/llvm/include/llvm/Support/MathExtras.h
++++ b/llvm/include/llvm/Support/MathExtras.h
+@@ -16,6 +16,7 @@
+ #include "llvm/ADT/STLForwardCompat.h"
+ #include "llvm/ADT/bit.h"
+ #include "llvm/Support/Compiler.h"
++#include <bit>
+ #include <cassert>
+ #include <climits>
+ #include <cstdint>
+@@ -255,12 +256,12 @@ constexpr bool isShiftedMask_64(uint64_t Value) {
+ /// Return true if the argument is a power of two > 0.
+ /// Ex. isPowerOf2_32(0x00100000U) == true (32 bit edition.)
+ constexpr bool isPowerOf2_32(uint32_t Value) {
+-  return llvm::has_single_bit(Value);
++  return std::has_single_bit(Value);
+ }
+ 
+ /// Return true if the argument is a power of two > 0 (64 bit edition.)
+ constexpr bool isPowerOf2_64(uint64_t Value) {
+-  return llvm::has_single_bit(Value);
++  return std::has_single_bit(Value);
+ }
+ 
+ /// Return true if the argument contains a non-empty sequence of ones with the
+@@ -272,8 +273,8 @@ inline bool isShiftedMask_32(uint32_t Value, unsigned &MaskIdx,
+                              unsigned &MaskLen) {
+   if (!isShiftedMask_32(Value))
+     return false;
+-  MaskIdx = llvm::countr_zero(Value);
+-  MaskLen = llvm::popcount(Value);
++  MaskIdx = std::countr_zero(Value);
++  MaskLen = std::popcount(Value);
+   return true;
+ }
+ 
+@@ -285,8 +286,8 @@ inline bool isShiftedMask_64(uint64_t Value, unsigned &MaskIdx,
+                              unsigned &MaskLen) {
+   if (!isShiftedMask_64(Value))
+     return false;
+-  MaskIdx = llvm::countr_zero(Value);
+-  MaskLen = llvm::popcount(Value);
++  MaskIdx = std::countr_zero(Value);
++  MaskLen = std::popcount(Value);
+   return true;
+ }
+ 
+@@ -294,7 +295,7 @@ inline bool isShiftedMask_64(uint64_t Value, unsigned &MaskIdx,
+ /// Valid only for positive powers of two.
+ template <size_t kValue> constexpr size_t ConstantLog2() {
+   static_assert(llvm::isPowerOf2_64(kValue), "Value is not a valid power of 2");
+-  return llvm::countr_zero_constexpr(kValue);
++  return std::countr_zero(kValue);
+ }
+ 
+ template <size_t kValue>
+@@ -307,26 +308,26 @@ constexpr size_t CTLog2() {
+ /// (32 bit edition.)
+ /// Ex. Log2_32(32) == 5, Log2_32(1) == 0, Log2_32(0) == -1, Log2_32(6) == 2
+ inline unsigned Log2_32(uint32_t Value) {
+-  return static_cast<unsigned>(31 - llvm::countl_zero(Value));
++  return static_cast<unsigned>(31 - std::countl_zero(Value));
+ }
+ 
+ /// Return the floor log base 2 of the specified value, -1 if the value is zero.
+ /// (64 bit edition.)
+ inline unsigned Log2_64(uint64_t Value) {
+-  return static_cast<unsigned>(63 - llvm::countl_zero(Value));
++  return static_cast<unsigned>(63 - std::countl_zero(Value));
+ }
+ 
+ /// Return the ceil log base 2 of the specified value, 32 if the value is zero.
+ /// (32 bit edition).
+ /// Ex. Log2_32_Ceil(32) == 5, Log2_32_Ceil(1) == 0, Log2_32_Ceil(6) == 3
+ inline unsigned Log2_32_Ceil(uint32_t Value) {
+-  return static_cast<unsigned>(32 - llvm::countl_zero(Value - 1));
++  return static_cast<unsigned>(32 - std::countl_zero(Value - 1));
+ }
+ 
+ /// Return the ceil log base 2 of the specified value, 64 if the value is zero.
+ /// (64 bit edition.)
+ inline unsigned Log2_64_Ceil(uint64_t Value) {
+-  return static_cast<unsigned>(64 - llvm::countl_zero(Value - 1));
++  return static_cast<unsigned>(64 - std::countl_zero(Value - 1));
+ }
+ 
+ /// A and B are either alignments or offsets. Return the minimum alignment that

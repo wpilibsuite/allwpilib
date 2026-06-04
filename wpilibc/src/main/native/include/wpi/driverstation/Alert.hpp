@@ -8,7 +8,7 @@
 #include <string_view>
 
 #include "wpi/hal/Alert.h"
-#include "wpi/hal/Types.hpp"
+#include "wpi/util/Handle.hpp"
 
 namespace wpi {
 
@@ -116,7 +116,7 @@ class Alert {
 
  private:
   Level m_type;
-  wpi::hal::Handle<HAL_AlertHandle, HAL_DestroyAlert> m_handle;
+  wpi::util::Handle<HAL_AlertHandle, HAL_DestroyAlert> m_handle;
 };
 
 }  // namespace wpi

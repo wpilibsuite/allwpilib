@@ -132,8 +132,7 @@ void Drivetrain::SimulationPeriodic() {
   leftEncoderSim.SetRate(drivetrainSimulator.GetLeftVelocity().value());
   rightEncoderSim.SetDistance(drivetrainSimulator.GetRightPosition().value());
   rightEncoderSim.SetRate(drivetrainSimulator.GetRightVelocity().value());
-  // gyroSim.SetAngle(-drivetrainSimulator.GetHeading().Degrees().value());
-  // // TODO(Ryan): fixup when sim implemented
+  imuSim.SetYaw(-drivetrainSimulator.GetHeading().Degrees());
 }
 
 void Drivetrain::Periodic() {

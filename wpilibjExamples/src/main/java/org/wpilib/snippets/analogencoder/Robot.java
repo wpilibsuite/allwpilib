@@ -8,7 +8,7 @@ import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.rotation.AnalogEncoder;
 
 /**
- * AnalogEncoder snippets for frc-docs.
+ * AnalogEncoder snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html
  */
 public class Robot extends TimedRobot {

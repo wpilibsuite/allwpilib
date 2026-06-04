@@ -8,7 +8,7 @@ Subject: [PATCH 08/10] Suppress GCC 12 warning false positive
  1 file changed, 7 insertions(+)
 
 diff --git a/include/sleipnir/autodiff/variable_matrix.hpp b/include/sleipnir/autodiff/variable_matrix.hpp
-index 3eeaccac274cf38d554ea834b3ff666615939382..38b90b4a1c784cfd2fd806536d001db9335ebe2d 100644
+index 2bdbf11841b9920111b9cb1426d6fd04764040e4..8b84a04780240cffb801e2c6f84e22c0e5246286 100644
 --- a/include/sleipnir/autodiff/variable_matrix.hpp
 +++ b/include/sleipnir/autodiff/variable_matrix.hpp
 @@ -503,6 +503,10 @@ class VariableMatrix : public SleipnirBase {

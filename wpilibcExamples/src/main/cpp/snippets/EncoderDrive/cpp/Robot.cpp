@@ -8,7 +8,7 @@
 #include "wpi/hardware/rotation/Encoder.hpp"
 
 /**
- * Encoder drive to distance snippets for frc-docs.
+ * Encoder drive to distance snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html
  */
 class Robot : public wpi::TimedRobot {
