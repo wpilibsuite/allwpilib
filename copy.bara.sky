@@ -175,7 +175,13 @@ def define_mostrobotpy_to_allwpilib():
         "examples/robot/**",
     ], exclude = EXCLUDES)
     destination_files += glob(["robotpyExamples/**"], exclude = ["robotpyExamples/define_examples.bzl", "robotpyExamples/example_projects.bzl", "robotpyExamples/generate_bazel_files.py", "robotpyExamples/BUILD.bazel"])
-    transformations.append(core.move("examples/robot/", "robotpyExamples/"))
+    transformations.append(core.move("examples/robot/", "robotpyExamples/examples"))
+
+    origin_files += glob([
+        "examples/snippets/**",
+    ], exclude = EXCLUDES)
+    destination_files += glob(["robotpyExamples/**"], exclude = ["robotpyExamples/define_examples.bzl", "robotpyExamples/example_projects.bzl", "robotpyExamples/generate_bazel_files.py", "robotpyExamples/BUILD.bazel"])
+    transformations.append(core.move("examples/snippets/", "robotpyExamples/snippets"))
 
     # Some tests seem to fail in mostrobotpy, but don't in allwpilib
     # We will leave them turned on in allwpilib, and mark them as xfail in mostrobotpy.
@@ -189,11 +195,11 @@ def define_mostrobotpy_to_allwpilib():
         name = "mostrobotpy_to_allwpilib",
         origin = git.origin(
             url = "https://github.com/robotpy/mostrobotpy.git",
-            ref = "2027",
+            ref = "main",
         ),
         destination = git.destination(
             url = "https://github.com/OVERRIDE_ME/OVERRIDE_ME",
-            fetch = "2027",
+            fetch = "main",
             push = "copybara_mostrobotpy_to_allwpilib",
         ),
         destination_files = destination_files,
@@ -226,7 +232,9 @@ def define_allwpilib_to_mostrobotpy():
         "robotpyExamples/**",
     ], exclude = ["robotpyExamples/BUILD.bazel", "robotpyExamples/define_examples.bzl", "robotpyExamples/example_projects.bzl", "robotpyExamples/generate_bazel_files.py"])
     destination_files += glob(["examples/robot/**"], exclude = ["examples/robot/.gitignore"])
-    transformations.append(core.move("robotpyExamples/", "examples/robot/"))
+    destination_files += glob(["examples/snippets/**"], exclude = ["examples/snippets/.gitignore"])
+    transformations.append(core.move("robotpyExamples/examples", "examples/robot/"))
+    transformations.append(core.move("robotpyExamples/snippets", "snippets/robot/"))
 
     # Some tests seem to fail in mostrobotpy, but don't in allwpilib
     # We will leave them turned on in allwpilib, and mark them as xfail in mostrobotpy.
@@ -240,11 +248,11 @@ def define_allwpilib_to_mostrobotpy():
         name = "allwpilib_to_mostrobotpy",
         origin = git.origin(
             url = "https://github.com/wpilibsuite/allwpilib.git",
-            ref = "2027",
+            ref = "main",
         ),
         destination = git.github_destination(
             url = "https://github.com/OVERRIDE_ME/OVERRIDE_ME",
-            fetch = "2027",
+            fetch = "main",
             push = "copybara_allwpilib_to_mostrobotpy",
         ),
         destination_files = destination_files,
