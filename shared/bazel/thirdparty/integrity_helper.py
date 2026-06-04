@@ -98,6 +98,7 @@ def download_integrities(module_file: str, has_headers: bool, platforms: list[st
     # print(updated_contents)
 
 def update_ceres():
+    # Keep in sync with shared/ceres.gradle
     year = "frc2026"
     version = "2.2-1"
 
@@ -122,13 +123,11 @@ def update_ceres():
 
 
 def update_libssh():
-    year = "frc2024"
-    version = "0.105-1"
+    # Keep in sync with shared/libssh.gradle
+    version = "2027-0.120-1"
 
     has_headers = True
     platforms = [
-        "linuxarm32static",
-        "linuxarm32staticdebug",
         "linuxarm64static",
         "linuxarm64staticdebug",
         "linuxx86-64static",
@@ -137,17 +136,16 @@ def update_libssh():
         "osxuniversalstaticdebug",
         "windowsx86-64static",
         "windowsx86-64staticdebug",
-        "windowsx86static",
-        "windowsx86staticdebug",
         "windowsarm64static",
         "windowsarm64staticdebug",
     ]
-    url_base = f"https://frcmaven.wpi.edu/release/edu/wpi/first/thirdparty/{year}/libssh/{version}/libssh-{version}-%s.zip"
+    url_base = f"https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/libssh/{version}/libssh-{version}-%s.zip"
         
     download_integrities("shared/bazel/thirdparty/libssh/libssh.MODULE.bazel", has_headers, platforms, url_base, False)
     
 def update_mrclib():
-    version = "2027.1.0-alpha-1-42-g019903f"
+    # Keep in sync with shared/libmrclib.gradle
+    version = "2027.1.0-alpha-1-50-gd008523"
 
     has_headers = True
     platforms = [
