@@ -74,6 +74,7 @@ class NotifierInstance {
 };
 
 static NotifierInstance* notifierInstance;
+static std::atomic<uint64_t> notifierAlarmSetCount{0};
 
 namespace wpi::hal::init {
 void InitializeNotifier() {
@@ -209,6 +210,10 @@ void wpi::hal::WakeupWaitNotifiers() {
   DoWaitNotifiers(thr, signaled);
 }
 
+uint64_t wpi::hal::GetNotifierAlarmSetCount() {
+  return notifierAlarmSetCount;
+}
+
 extern "C" {
 
 HAL_NotifierHandle HAL_CreateNotifier(int32_t* status) {
@@ -268,6 +273,7 @@ void HAL_SetNotifierAlarm(HAL_NotifierHandle notifierHandle, uint64_t alarmTime,
   notifier->intervalTime = intervalTime;
   notifier->overrunCount = 0;
   thr->m_alarmQueue.push({notifierHandle, notifier});
+  ++notifierAlarmSetCount;
 
   // wake up notifier thread if needed
   if (alarmTime < prevWakeup) {
