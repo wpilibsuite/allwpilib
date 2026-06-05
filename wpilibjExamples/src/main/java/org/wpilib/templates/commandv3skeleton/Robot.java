@@ -16,6 +16,6 @@ public class Robot extends OpModeRobot {
   @Override
   public void robotPeriodic() {
     Scheduler.getDefault().run();
-        Epilogue.update(this);
+    Epilogue.update(this);
   }
 }
