@@ -1,0 +1,43 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "wpi/driverstation/SwitchProController.hpp"
+
+#include <gtest/gtest.h>
+
+#include "JoystickTestMacros.hpp"
+#include "wpi/simulation/SwitchProControllerSim.hpp"
+
+using namespace wpi;
+
+TEST(SwitchProControllerTest, WrappedHID) {
+  SwitchProController controller{2};
+
+  ASSERT_EQ(controller.GetPort(), 2);
+  ASSERT_EQ(controller.GetHID().GetPort(), 2);
+}
+
+BUTTON_TEST(SwitchProController, BButton)
+BUTTON_TEST(SwitchProController, AButton)
+BUTTON_TEST(SwitchProController, YButton)
+BUTTON_TEST(SwitchProController, XButton)
+BUTTON_TEST(SwitchProController, MinusButton)
+BUTTON_TEST(SwitchProController, HomeButton)
+BUTTON_TEST(SwitchProController, PlusButton)
+BUTTON_TEST(SwitchProController, LeftStickButton)
+BUTTON_TEST(SwitchProController, RightStickButton)
+BUTTON_TEST(SwitchProController, LButton)
+BUTTON_TEST(SwitchProController, RButton)
+BUTTON_TEST(SwitchProController, DpadUpButton)
+BUTTON_TEST(SwitchProController, DpadDownButton)
+BUTTON_TEST(SwitchProController, DpadLeftButton)
+BUTTON_TEST(SwitchProController, DpadRightButton)
+BUTTON_TEST(SwitchProController, CaptureButton)
+
+AXIS_TEST(SwitchProController, LeftX)
+AXIS_TEST(SwitchProController, LeftY)
+AXIS_TEST(SwitchProController, RightX)
+AXIS_TEST(SwitchProController, RightY)
+AXIS_TEST(SwitchProController, ZLAxis)
+AXIS_TEST(SwitchProController, ZRAxis)

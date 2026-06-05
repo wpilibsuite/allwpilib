@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 from wpilibj.generate_hids import generate_hids
+from wpilibj.generate_new_ds_hids import generate_new_ds_hids
 from wpilibj.generate_pwm_motor_controllers import generate_pwm_motor_controllers
 
 
@@ -25,6 +26,7 @@ def main():
     args = parser.parse_args()
 
     generate_hids(args.output_directory, args.template_root)
+    generate_new_ds_hids(args.output_directory, args.template_root)
     generate_pwm_motor_controllers(args.output_directory, args.template_root)
 
 

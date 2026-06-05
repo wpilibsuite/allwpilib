@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 from wpilibc.generate_hids import generate_hids
+from wpilibc.generate_new_ds_hids import generate_new_ds_hids
 from wpilibc.generate_pwm_motor_controllers import generate_pwm_motor_controllers
 
 
@@ -32,6 +33,11 @@ def main():
 
     generate_hids(
         args.output_directory, args.template_root, args.schema_root / "hids.json"
+    )
+    generate_new_ds_hids(
+        args.output_directory,
+        args.template_root,
+        args.schema_root / "new_ds_hids.json",
     )
     generate_pwm_motor_controllers(
         args.output_directory, args.template_root, args.schema_root

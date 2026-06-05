@@ -1,0 +1,42 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "wpi/driverstation/LogitechF310Controller.hpp"
+
+#include <gtest/gtest.h>
+
+#include "JoystickTestMacros.hpp"
+#include "wpi/simulation/LogitechF310ControllerSim.hpp"
+
+using namespace wpi;
+
+TEST(LogitechF310ControllerTest, WrappedHID) {
+  LogitechF310Controller controller{2};
+
+  ASSERT_EQ(controller.GetPort(), 2);
+  ASSERT_EQ(controller.GetHID().GetPort(), 2);
+}
+
+BUTTON_TEST(LogitechF310Controller, AButton)
+BUTTON_TEST(LogitechF310Controller, BButton)
+BUTTON_TEST(LogitechF310Controller, XButton)
+BUTTON_TEST(LogitechF310Controller, YButton)
+BUTTON_TEST(LogitechF310Controller, BackButton)
+BUTTON_TEST(LogitechF310Controller, LogitechButton)
+BUTTON_TEST(LogitechF310Controller, StartButton)
+BUTTON_TEST(LogitechF310Controller, LeftStickButton)
+BUTTON_TEST(LogitechF310Controller, RightStickButton)
+BUTTON_TEST(LogitechF310Controller, LeftBumperButton)
+BUTTON_TEST(LogitechF310Controller, RightBumperButton)
+BUTTON_TEST(LogitechF310Controller, DpadUpButton)
+BUTTON_TEST(LogitechF310Controller, DpadDownButton)
+BUTTON_TEST(LogitechF310Controller, DpadLeftButton)
+BUTTON_TEST(LogitechF310Controller, DpadRightButton)
+
+AXIS_TEST(LogitechF310Controller, LeftX)
+AXIS_TEST(LogitechF310Controller, LeftY)
+AXIS_TEST(LogitechF310Controller, RightX)
+AXIS_TEST(LogitechF310Controller, RightY)
+AXIS_TEST(LogitechF310Controller, LeftTriggerAxis)
+AXIS_TEST(LogitechF310Controller, RightTriggerAxis)

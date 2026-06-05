@@ -32,6 +32,16 @@ py_binary(
 )
 
 py_binary(
+    name = "generate_new_ds_hids",
+    srcs = ["generate_new_ds_hids.py"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [requirement("jinja2")],
+)
+
+py_binary(
     name = "generate_pwm_motor_controllers",
     srcs = ["generate_pwm_motor_controllers.py"],
     target_compatible_with = select({
@@ -52,6 +62,7 @@ py_binary(
     }),
     deps = [
         ":generate_hids",
+        ":generate_new_ds_hids",
         ":generate_pwm_motor_controllers",
     ],
 )
