@@ -39,7 +39,7 @@ OpenCV needs to be findable by CMake. On systems like the Jetson, this is instal
 The following build options are available:
 
 * `BUILD_SHARED_LIBS` (ON Default)
-  * This option will cause CMake to build static libraries instead of shared libraries. If this is off, `WITH_JAVA` must be off. Otherwise CMake will error.
+  * This option will cause CMake to build static libraries instead of shared libraries.
 * `WITH_CSCORE` (ON Default)
   * This option will cause cscore to be built. Turning this off will implicitly disable cameraserver. If this is off, the OpenCV build requirement is removed.
 * `WITH_EXAMPLES` (OFF Default)
@@ -53,11 +53,9 @@ The following build options are available:
 * `WITH_TESTS` (ON Default)
   * This option will build C++ unit tests. These can be run via `ctest -C <config>`, where `<config>` is the build configuration, e.g. `Debug` or `Release`.
 * `WITH_WPILIB` (ON Default)
-  * This option will build the HAL and wpilibc/j during the build. The HAL is the simulation HAL, unless the external HAL options are used. The CMake build has no capability to build for Systemcore.
+  * This option will build the HAL and wpilibc during the build. The HAL is the simulation HAL, unless the external HAL options are used. The CMake build has no capability to build for Systemcore.
 * `WITH_WPIMATH` (ON Default)
   * This option will build the wpimath library. This option must be on to build wpilib.
-* `WITH_WPIUNITS` (`WITH_JAVA` Default)
-  * This option will build the wpiunits library. This option must be on to build the Java wpimath library and requires `WITH_JAVA` to also be on.
 * `NO_WERROR` (OFF Default)
   * This option will disable the `-Werror` compilation flag for non-MSVC builds.
 * `WPILIB_TARGET_WARNINGS`
