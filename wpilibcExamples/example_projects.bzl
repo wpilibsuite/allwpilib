@@ -1,7 +1,6 @@
 EXAMPLE_FOLDERS = [
     "ArcadeDriveGamepad",
     "ArmSimulation",
-    "Commandv3",
     "DifferentialDriveBot",
     "DifferentialDrivePoseEstimator",
     "DriveDistanceOffboard",
