@@ -22,6 +22,7 @@
 #include "../net/MockMessageHandler.hpp"
 #include "../net/MockWireConnection.hpp"
 #include "Handle.hpp"
+#include "ProtocolVersions.hpp"
 #include "gmock/gmock.h"
 #include "net/Message.hpp"
 #include "net/WireEncoder.hpp"
@@ -49,7 +50,7 @@ class ServerImplTest : public ::testing::Test {
   ::testing::StrictMock<net::MockServerMessageHandler> local;
   ::testing::StrictMock<net::MockClientMessageQueue> queue;
   wpi::MockLogger logger;
-  server::ServerImpl server{logger};
+  server::ServerImpl server{logger, NT_DEFAULT_PORT};
 };
 
 TEST_F(ServerImplTest, AddClient) {
@@ -177,7 +178,7 @@ TEST_F(ServerImplTest, PublishLocal) {
   // subscribes
   ::testing::StrictMock<net::MockWireConnection> wire;
   MockSetPeriodicFunc setPeriodic;
-  EXPECT_CALL(wire, GetVersion()).WillRepeatedly(Return(0x0401));
+  EXPECT_CALL(wire, GetVersion()).WillRepeatedly(Return(NT_4_1));
   {
     ::testing::InSequence seq;
     // EXPECT_CALL(wire, Flush()).WillOnce(Return(0));     // AddClient()
@@ -253,7 +254,7 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
   }
 
   ::testing::StrictMock<net::MockWireConnection> wire;
-  EXPECT_CALL(wire, GetVersion()).WillRepeatedly(Return(0x0401));
+  EXPECT_CALL(wire, GetVersion()).WillRepeatedly(Return(NT_4_1));
   MockSetPeriodicFunc setPeriodic;
   {
     ::testing::InSequence seq;
@@ -341,7 +342,7 @@ TEST_F(ServerImplTest, ClientDisconnectUnpublish) {
   }
 
   ::testing::StrictMock<net::MockWireConnection> wire;
-  EXPECT_CALL(wire, GetVersion()).WillRepeatedly(Return(0x0401));
+  EXPECT_CALL(wire, GetVersion()).WillRepeatedly(Return(NT_4_1));
   MockSetPeriodicFunc setPeriodic;
   {
     ::testing::InSequence seq;

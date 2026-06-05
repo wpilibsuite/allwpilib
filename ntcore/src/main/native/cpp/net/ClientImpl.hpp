@@ -16,8 +16,10 @@
 #include "NetworkOutgoingQueue.hpp"
 #include "NetworkPing.hpp"
 #include "PubSubOptions.hpp"
+#include "TimeSyncClient.h"
 #include "WireConnection.hpp"
 #include "WireDecoder.hpp"
+#include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/util/DenseMap.hpp"
 
 namespace wpi::util {
@@ -37,7 +39,8 @@ class WireConnection;
 class ClientImpl final : private ServerMessageHandler {
  public:
   ClientImpl(
-      uint64_t curTimeMs, WireConnection& wire, bool local,
+      uint64_t curTimeMs, wpi::net::EventLoopRunner& loopRunner,
+      WireConnection& wire, ConnectionInfo connInfo, bool local,
       wpi::util::Logger& logger,
       std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
           timeSyncUpdated,
@@ -77,6 +80,9 @@ class ClientImpl final : private ServerMessageHandler {
   void Unpublish(int pubuid, ClientMessage&& msg);
   void SetValue(int pubuid, const Value& value);
 
+  // TODO this couples ClientImple to libuv. Is that OK?
+  wpi::net::EventLoopRunner& m_loopRunner;
+
   WireConnection& m_wire;
   wpi::util::Logger& m_logger;
   ServerMessageHandler* m_local{nullptr};
@@ -92,6 +98,10 @@ class ClientImpl final : private ServerMessageHandler {
 
   // ping
   NetworkPing m_ping;
+
+  // If the server is new enough, use TSP. Created on NT connection (so we know
+  // the endpoint to use)
+  std::unique_ptr<wpi::tsp::TimeSyncClient> m_tspClient{nullptr};
 
   // timestamp handling
   static constexpr uint32_t kRttIntervalMs = 3000;

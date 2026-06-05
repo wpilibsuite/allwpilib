@@ -17,6 +17,7 @@
 #include "IConnectionList.hpp"
 #include "InstanceImpl.hpp"
 #include "Log.hpp"
+#include "ProtocolVersions.hpp"
 #include "net/WebSocketConnection.hpp"
 #include "net/WireDecoder.hpp"
 #include "net/WireEncoder.hpp"
@@ -80,9 +81,10 @@ class NetworkServer::ServerConnection4 final
       : ServerConnection{server, addr, port, logger},
         HttpWebSocketServerConnection(
             stream,
-            {"v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu",
+            {"v4.2.networktables.first.wpi.edu",
+             "v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu",
              "rtt.networktables.first.wpi.edu"}) {
-    m_info.protocol_version = 0x0400;
+    m_info.protocol_version = NT_4_0;
   }
 
  private:
@@ -187,7 +189,7 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
   m_websocket->open.connect([this, name = std::string{name}](
                                 std::string_view protocol) {
     m_info.protocol_version =
-        protocol == "v4.1.networktables.first.wpi.edu" ? 0x0401 : 0x0400;
+        protocol == "v4.1.networktables.first.wpi.edu" ? NT_4_1 : NT_4_0;
     m_wire = std::make_shared<net::WebSocketConnection>(
         *m_websocket, m_info.protocol_version, m_logger);
 
@@ -264,9 +266,10 @@ NetworkServer::NetworkServer(std::string_view persistentFilename,
       m_listenAddress{wpi::util::trim(listenAddress)},
       m_mdnsService{wpi::util::trim(mdnsService)},
       m_port{port},
-      m_serverImpl{logger},
+      m_serverImpl{logger, port},
       m_localQueue{logger},
-      m_loop(*m_loopRunner.GetLoop()) {
+      m_loop(*m_loopRunner.GetLoop()),
+      m_tspServer{logger, listenAddress, port} {
   m_loopRunner.ExecAsync([=, this](uv::Loop& loop) {
     // connect local storage to server
     m_serverImpl.SetLocal(&m_localStorage, &m_localQueue);

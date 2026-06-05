@@ -112,7 +112,7 @@ class NetworkOutgoingQueue {
   void EraseId(int id) { m_idMap.erase(id); }
 
   template <typename T>
-  void SendMessage(int id, T&& msg) {
+  void SendMessageToServer(int id, T&& msg) {
     if (m_local) {
       m_wire.SendText([&](auto& os) {
         if (!WireEncodeText(os, MessageType{std::forward<T>(msg)})) {
