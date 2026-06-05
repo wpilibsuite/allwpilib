@@ -31,55 +31,6 @@ foreach(example ${datalog_examples})
     endif()
 endforeach()
 
-# Java bindings
-if(WITH_JAVA)
-    include(UseJava)
-
-    set(CMAKE_JNI_TARGET true)
-
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
-    file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
-
-    add_jar(
-        datalog_jar
-        ${JAVA_SOURCES}
-        INCLUDE_JARS wpiutil_jar ${QUICKBUF_JAR}
-        OUTPUT_NAME datalog
-        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
-        GENERATE_NATIVE_HEADERS datalog_jni_headers
-    )
-    set_property(TARGET datalog_jar PROPERTY FOLDER "java")
-
-    install_jar(datalog_jar DESTINATION ${java_lib_dest})
-    install_jar_exports(TARGETS datalog_jar FILE datalog_jar.cmake DESTINATION share/datalog)
-
-    add_library(datalogjni ${datalog_jni_src})
-    wpilib_target_warnings(datalogjni)
-    target_link_libraries(datalogjni PUBLIC datalog wpiutil)
-
-    set_property(TARGET datalogjni PROPERTY FOLDER "libraries")
-
-    target_link_libraries(datalogjni PRIVATE datalog_jni_headers)
-    add_dependencies(datalogjni datalog_jar)
-
-    install(TARGETS datalogjni EXPORT datalogjni)
-    export(TARGETS datalogjni FILE datalogjni.cmake NAMESPACE datalogjni::)
-endif()
-
-if(WITH_JAVA_SOURCE)
-    include(UseJava)
-    include(CreateSourceJar)
-    add_source_jar(
-        datalog_src_jar
-        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
-        OUTPUT_NAME datalog-sources
-        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
-    )
-    set_property(TARGET datalog_src_jar PROPERTY FOLDER "java")
-
-    install_jar(datalog_src_jar DESTINATION ${java_lib_dest})
-endif()
-
 install(TARGETS datalog EXPORT datalog)
 export(TARGETS datalog FILE datalog.cmake NAMESPACE datalog::)
 

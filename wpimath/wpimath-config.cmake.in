@@ -8,8 +8,3 @@ endif()
 
 @FILENAME_DEP_REPLACE@
 include(${SELF_DIR}/wpimath.cmake)
-if(@WITH_JAVA@)
-    @WPIUNITS_DEP_REPLACE@
-    @FILENAME_DEP_REPLACE@
-    include(${SELF_DIR}/wpimath_jar.cmake)
-endif()
