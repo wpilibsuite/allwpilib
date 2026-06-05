@@ -1,0 +1,34 @@
+extra_includes:
+- wpi/driverstation/XboxController.hpp
+
+classes:
+  wpi::sim::XboxControllerSim:
+    force_no_trampoline: true
+    typealias:
+    - wpi::XboxController
+    methods:
+      XboxControllerSim:
+        overloads:
+          const XboxController&:
+          int:
+      SetLeftX:
+      SetLeftY:
+      SetRightX:
+      SetRightY:
+      SetLeftTriggerAxis:
+      SetRightTriggerAxis:
+      SetAButton:
+      SetBButton:
+      SetXButton:
+      SetYButton:
+      SetViewButton:
+      SetXboxButton:
+      SetMenuButton:
+      SetLeftStickButton:
+      SetRightStickButton:
+      SetLeftBumperButton:
+      SetRightBumperButton:
+      SetDpadUpButton:
+      SetDpadDownButton:
+      SetDpadLeftButton:
+      SetDpadRightButton:

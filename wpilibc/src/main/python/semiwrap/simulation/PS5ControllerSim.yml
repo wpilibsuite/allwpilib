@@ -1,0 +1,36 @@
+extra_includes:
+- wpi/driverstation/PS5Controller.hpp
+
+classes:
+  wpi::sim::PS5ControllerSim:
+    force_no_trampoline: true
+    typealias:
+    - wpi::PS5Controller
+    methods:
+      PS5ControllerSim:
+        overloads:
+          const PS5Controller&:
+          int:
+      SetLeftX:
+      SetLeftY:
+      SetRightX:
+      SetRightY:
+      SetL2Axis:
+      SetR2Axis:
+      SetCrossButton:
+      SetCircleButton:
+      SetSquareButton:
+      SetTriangleButton:
+      SetCreateButton:
+      SetPSButton:
+      SetOptionsButton:
+      SetL3Button:
+      SetR3Button:
+      SetL1Button:
+      SetR1Button:
+      SetDpadUpButton:
+      SetDpadDownButton:
+      SetDpadLeftButton:
+      SetDpadRightButton:
+      SetMicrophoneButton:
+      SetTouchpadButton:

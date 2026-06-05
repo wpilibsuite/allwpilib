@@ -1,0 +1,35 @@
+extra_includes:
+- wpi/driverstation/SwitchProController.hpp
+
+classes:
+  wpi::sim::SwitchProControllerSim:
+    force_no_trampoline: true
+    typealias:
+    - wpi::SwitchProController
+    methods:
+      SwitchProControllerSim:
+        overloads:
+          const SwitchProController&:
+          int:
+      SetLeftX:
+      SetLeftY:
+      SetRightX:
+      SetRightY:
+      SetZLAxis:
+      SetZRAxis:
+      SetBButton:
+      SetAButton:
+      SetYButton:
+      SetXButton:
+      SetMinusButton:
+      SetHomeButton:
+      SetPlusButton:
+      SetLeftStickButton:
+      SetRightStickButton:
+      SetLButton:
+      SetRButton:
+      SetDpadUpButton:
+      SetDpadDownButton:
+      SetDpadLeftButton:
+      SetDpadRightButton:
+      SetCaptureButton:
