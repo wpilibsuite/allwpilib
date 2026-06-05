@@ -4,9 +4,6 @@ include(CompileWarnings)
 
 file(GLOB datalog_native_src src/main/native/cpp/*.cpp)
 
-file(GLOB datalog_jni_src src/main/native/cpp/jni/DataLogJNI.cpp)
-list(REMOVE_ITEM datalog_native_src ${datalog_jni_src})
-
 add_library(datalog ${datalog_native_src})
 set_target_properties(datalog PROPERTIES DEBUG_POSTFIX "d")
 
