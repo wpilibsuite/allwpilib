@@ -1,0 +1,43 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "wpi/driverstation/Switch2GCController.hpp"
+
+#include <gtest/gtest.h>
+
+#include "JoystickTestMacros.hpp"
+#include "wpi/simulation/Switch2GCControllerSim.hpp"
+
+using namespace wpi;
+
+TEST(Switch2GCControllerTest, WrappedHID) {
+  Switch2GCController controller{2};
+
+  ASSERT_EQ(controller.GetPort(), 2);
+  ASSERT_EQ(controller.GetHID().GetPort(), 2);
+}
+
+BUTTON_TEST(Switch2GCController, AButton)
+BUTTON_TEST(Switch2GCController, BButton)
+BUTTON_TEST(Switch2GCController, XButton)
+BUTTON_TEST(Switch2GCController, YButton)
+BUTTON_TEST(Switch2GCController, HomeButton)
+BUTTON_TEST(Switch2GCController, StartButton)
+BUTTON_TEST(Switch2GCController, LButton)
+BUTTON_TEST(Switch2GCController, RButton)
+BUTTON_TEST(Switch2GCController, DpadUpButton)
+BUTTON_TEST(Switch2GCController, DpadDownButton)
+BUTTON_TEST(Switch2GCController, DpadLeftButton)
+BUTTON_TEST(Switch2GCController, DpadRightButton)
+BUTTON_TEST(Switch2GCController, CaptureButton)
+BUTTON_TEST(Switch2GCController, ZLButton)
+BUTTON_TEST(Switch2GCController, ZButton)
+BUTTON_TEST(Switch2GCController, CButton)
+
+AXIS_TEST(Switch2GCController, LeftX)
+AXIS_TEST(Switch2GCController, LeftY)
+AXIS_TEST(Switch2GCController, CStickX)
+AXIS_TEST(Switch2GCController, CStickY)
+AXIS_TEST(Switch2GCController, LTriggerAxis)
+AXIS_TEST(Switch2GCController, RTriggerAxis)

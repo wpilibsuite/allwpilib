@@ -135,6 +135,18 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
+            class_name = "GameCubeController",
+            yml_file = "semiwrap/GameCubeController.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/GameCubeController.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::GameCubeController", "wpi__GameCubeController.hpp"),
+                ("wpi::GameCubeController::Button", "wpi__GameCubeController__Button.hpp"),
+                ("wpi::GameCubeController::Axis", "wpi__GameCubeController__Axis.hpp"),
+            ],
+        ),
+        struct(
             class_name = "MatchState",
             yml_file = "semiwrap/MatchState.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -268,6 +280,18 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
                 ("wpi::SteamController", "wpi__SteamController.hpp"),
                 ("wpi::SteamController::Button", "wpi__SteamController__Button.hpp"),
                 ("wpi::SteamController::Axis", "wpi__SteamController__Axis.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "Switch2GCController",
+            yml_file = "semiwrap/Switch2GCController.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/Switch2GCController.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::Switch2GCController", "wpi__Switch2GCController.hpp"),
+                ("wpi::Switch2GCController::Button", "wpi__Switch2GCController__Button.hpp"),
+                ("wpi::Switch2GCController::Axis", "wpi__Switch2GCController__Axis.hpp"),
             ],
         ),
         struct(
@@ -1493,6 +1517,16 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             ],
         ),
         struct(
+            class_name = "GameCubeControllerSim",
+            yml_file = "semiwrap/simulation/GameCubeControllerSim.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/GameCubeControllerSim.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::sim::GameCubeControllerSim", "wpi__sim__GameCubeControllerSim.hpp"),
+            ],
+        ),
+        struct(
             class_name = "GenericHIDSim",
             yml_file = "semiwrap/simulation/GenericHIDSim.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -1577,6 +1611,16 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::sim::SteamControllerSim", "wpi__sim__SteamControllerSim.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "Switch2GCControllerSim",
+            yml_file = "semiwrap/simulation/Switch2GCControllerSim.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/Switch2GCControllerSim.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::sim::Switch2GCControllerSim", "wpi__sim__Switch2GCControllerSim.hpp"),
             ],
         ),
         struct(

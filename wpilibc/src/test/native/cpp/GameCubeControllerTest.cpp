@@ -1,0 +1,39 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "wpi/driverstation/GameCubeController.hpp"
+
+#include <gtest/gtest.h>
+
+#include "JoystickTestMacros.hpp"
+#include "wpi/simulation/GameCubeControllerSim.hpp"
+
+using namespace wpi;
+
+TEST(GameCubeControllerTest, WrappedHID) {
+  GameCubeController controller{2};
+
+  ASSERT_EQ(controller.GetPort(), 2);
+  ASSERT_EQ(controller.GetHID().GetPort(), 2);
+}
+
+BUTTON_TEST(GameCubeController, AButton)
+BUTTON_TEST(GameCubeController, BButton)
+BUTTON_TEST(GameCubeController, XButton)
+BUTTON_TEST(GameCubeController, YButton)
+BUTTON_TEST(GameCubeController, StartButton)
+BUTTON_TEST(GameCubeController, ZButton)
+BUTTON_TEST(GameCubeController, DpadUpButton)
+BUTTON_TEST(GameCubeController, DpadDownButton)
+BUTTON_TEST(GameCubeController, DpadLeftButton)
+BUTTON_TEST(GameCubeController, DpadRightButton)
+BUTTON_TEST(GameCubeController, LButton)
+BUTTON_TEST(GameCubeController, RButton)
+
+AXIS_TEST(GameCubeController, LeftX)
+AXIS_TEST(GameCubeController, LeftY)
+AXIS_TEST(GameCubeController, CStickX)
+AXIS_TEST(GameCubeController, CStickY)
+AXIS_TEST(GameCubeController, LTriggerAxis)
+AXIS_TEST(GameCubeController, RTriggerAxis)

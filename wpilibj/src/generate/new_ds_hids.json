@@ -193,6 +193,76 @@
     }
   },
   {
+    "ClassName": "Switch2GC",
+    "HIDType": "SWITCH_PRO",
+    "axes": {
+      "leftX": 0,
+      "leftY": 1,
+      "CStickX": 2,
+      "CStickY": 3,
+      "LTriggerAxis": 4,
+      "RTriggerAxis": 5
+    },
+    "buttons": {
+      "a": 0,
+      "x": 1,
+      "b": 2,
+      "y": 3,
+      "home": 5,
+      "start": 6,
+      "ZL": 9,
+      "Z": 10,
+      "dpadUp": 11,
+      "dpadDown": 12,
+      "dpadLeft": 13,
+      "dpadRight": 14,
+      "capture": 15,
+      "C": 21,
+      "L": 22,
+      "R": 23
+    },
+    "touchpads": 0,
+    "supports": {
+      "rumble": true,
+      "triggerRumble": false,
+      "monoLed": false,
+      "rgbLed": false
+    }
+  },
+  {
+    "ClassName": "GameCube",
+    "HIDType": "STANDARD",
+    "axes": {
+      "leftX": 0,
+      "leftY": 1,
+      "CStickX": 2,
+      "CStickY": 3,
+      "LTriggerAxis": 4,
+      "RTriggerAxis": 5
+    },
+    "buttons": {
+      "a": 0,
+      "x": 1,
+      "b": 2,
+      "y": 3,
+      "start": 6,
+      "Z": 10,
+      "dpadUp": 11,
+      "dpadDown": 12,
+      "dpadLeft": 13,
+      "dpadRight": 14,
+      "L": 22,
+      "R": 23
+    },
+    "touchpads": 0,
+    "supports": {
+      "rumble": false,
+      "triggerRumble": false,
+      "monoLed": false,
+      "rgbLed": false
+    }
+  },
+  {
     "ClassName": "SwitchPro",
     "HIDType": "SWITCH_PRO",
     "axes": {
