@@ -102,6 +102,52 @@ class SwerveDriveOdometryTest {
   }
 
   @Test
+  void testResetTranslation() {
+    var modulePositions = new SwerveModulePosition[] {zero, zero, zero, zero};
+    var gyro = Rotation2d.fromDegrees(30.0);
+
+    m_odometry.resetPosition(
+        Rotation2d.kZero, modulePositions, new Pose2d(Translation2d.kZero, Rotation2d.kZero));
+    var initialPose = m_odometry.update(gyro, modulePositions);
+
+    assertAll(
+        () -> assertEquals(0.00, initialPose.getX(), 0.1),
+        () -> assertEquals(0.00, initialPose.getY(), 0.1),
+        () -> assertEquals(30.0, initialPose.getRotation().getDegrees(), 0.1));
+
+    m_odometry.resetTranslation(new Translation2d(0.5, 0));
+    var newPose = m_odometry.update(gyro, modulePositions);
+
+    assertAll(
+        () -> assertEquals(0.50, newPose.getX(), 0.1),
+        () -> assertEquals(0.00, newPose.getY(), 0.1),
+        () -> assertEquals(30.0, newPose.getRotation().getDegrees(), 0.1));
+  }
+
+  @Test
+  void testResetRotation() {
+    var modulePositions = new SwerveModulePosition[] {zero, zero, zero, zero};
+    var gyro = Rotation2d.fromDegrees(30.0);
+
+    m_odometry.resetPosition(
+        Rotation2d.kZero, modulePositions, new Pose2d(0.5, 0.0, Rotation2d.kZero));
+    var initialPose = m_odometry.update(gyro, modulePositions);
+
+    assertAll(
+        () -> assertEquals(0.50, initialPose.getX(), 0.1),
+        () -> assertEquals(0.00, initialPose.getY(), 0.1),
+        () -> assertEquals(30.0, initialPose.getRotation().getDegrees(), 0.1));
+
+    m_odometry.resetRotation(Rotation2d.kCCW_90deg);
+    var newPose = m_odometry.update(gyro, modulePositions);
+
+    assertAll(
+        () -> assertEquals(0.50, newPose.getX(), 0.1),
+        () -> assertEquals(0.00, newPose.getY(), 0.1),
+        () -> assertEquals(90.0, newPose.getRotation().getDegrees(), 0.1));
+  }
+
+  @Test
   void testAccuracyFacingTrajectory() {
     var kinematics =
         new SwerveDriveKinematics(
