@@ -102,7 +102,7 @@ class NetworkOutgoingQueue {
       auto& newMsgs = m_queues[queueIndex].msgs;
       int valuePos = -1;
       for (auto i = it, end = oldMsgs.end(); i != end; ++i) {
-        if (std::get_if<ValueMsg>(&i->msg.contents)) {
+        if (std::holds_alternative<ValueMsg>(i->msg.contents)) {
           valuePos = newMsgs.size();
         }
         newMsgs.emplace_back(std::move(*i));
