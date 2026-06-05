@@ -85,8 +85,6 @@ SNIPPET_FOLDERS = [
 TEMPLATE_FOLDERS = [
     "commandv2",
     "commandv2skeleton",
-    "commandv3",
-    "commandv3skeleton",
     "opmode",
     "robotbaseskeleton",
     "timed",
