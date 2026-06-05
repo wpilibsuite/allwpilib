@@ -7,6 +7,7 @@
 #include <memory>
 #include <queue>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -16,6 +17,8 @@
 #include <opencv2/objdetect/aruco_board.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/videoio.hpp>
+
+#include "wpi/util/mutex.hpp"
 
 static bool filter(std::vector<cv::Point2f> charucoCorners,
                    std::vector<int> charucoIds, std::vector<int> markerIds,

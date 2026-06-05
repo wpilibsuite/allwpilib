@@ -4,8 +4,6 @@
 
 #include "wpi/net/WorkerThread.hpp"
 
-#include <thread>
-
 #include <gtest/gtest.h>
 
 #include "wpi/net/EventLoopRunner.hpp"

@@ -4,8 +4,6 @@
 
 #include "wpi/hal/Encoder.h"
 
-#include <fmt/format.h>
-
 #include "HALInitializer.hpp"
 #include "wpi/hal/Errors.h"
 

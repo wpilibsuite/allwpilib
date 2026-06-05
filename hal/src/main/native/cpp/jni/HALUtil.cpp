@@ -15,7 +15,6 @@
 #include <fmt/format.h>
 
 #include "org_wpilib_hardware_hal_HALUtil.h"
-#include "wpi/hal/CAN.h"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/HAL.h"

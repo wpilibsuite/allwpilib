@@ -10,8 +10,6 @@
 #include <cstring>
 #include <thread>
 
-#include <fmt/format.h>
-
 #include "AddressableLEDSimd.hpp"
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"

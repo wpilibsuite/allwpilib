@@ -6,7 +6,6 @@
 
 #include "../CommandTestBase.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/simulation/DriverStationSim.hpp"
 

@@ -8,12 +8,10 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
-
 #include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_DriverStationJNI.h"
 #include "wpi/hal/DriverStation.h"
-#include "wpi/hal/HAL.h"
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/util/jni_util.hpp"
 
 static_assert(

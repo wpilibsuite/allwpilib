@@ -9,7 +9,6 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <fmt/ranges.h>
 
 #include "IListenerStorage.hpp"
@@ -17,7 +16,6 @@
 #include "net/MessageHandler.hpp"
 #include "wpi/datalog/DataLog.hpp"
 #include "wpi/util/SmallString.hpp"
-#include "wpi/util/StringExtras.hpp"
 
 using namespace wpi::nt;
 using namespace wpi::nt::local;

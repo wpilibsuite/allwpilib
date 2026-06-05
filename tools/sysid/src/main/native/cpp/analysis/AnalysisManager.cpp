@@ -4,7 +4,6 @@
 
 #include "wpi/sysid/analysis/AnalysisManager.hpp"
 
-#include <cmath>
 #include <limits>
 #include <utility>
 #include <vector>
@@ -13,7 +12,6 @@
 
 #include "wpi/sysid/analysis/FeedforwardAnalysis.hpp"
 #include "wpi/sysid/analysis/FilteringUtils.hpp"
-#include "wpi/units/angle.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/StringMap.hpp"

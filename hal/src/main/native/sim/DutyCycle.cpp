@@ -9,7 +9,6 @@
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
 #include "mockdata/DutyCycleDataInternal.hpp"
-#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/handles/IndexedHandleResource.hpp"
