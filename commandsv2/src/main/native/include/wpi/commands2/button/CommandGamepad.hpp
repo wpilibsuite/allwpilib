@@ -479,7 +479,7 @@ class CommandGamepad : public CommandGenericHID {
    *
    * @return The axis value.
    */
-  double GetLeftTriggerAxis() const;
+  double GetLeftTrigger() const;
 
   /**
    * Get the right trigger axis value of the controller. Note that this axis is
@@ -487,7 +487,7 @@ class CommandGamepad : public CommandGenericHID {
    *
    * @return The axis value.
    */
-  double GetRightTriggerAxis() const;
+  double GetRightTrigger() const;
 
  private:
   wpi::Gamepad m_hid;

@@ -174,10 +174,10 @@ double CommandGamepad::GetRightY() const {
   return m_hid.GetRightY();
 }
 
-double CommandGamepad::GetLeftTriggerAxis() const {
-  return m_hid.GetLeftTriggerAxis();
+double CommandGamepad::GetLeftTrigger() const {
+  return m_hid.GetLeftTrigger();
 }
 
-double CommandGamepad::GetRightTriggerAxis() const {
-  return m_hid.GetRightTriggerAxis();
+double CommandGamepad::GetRightTrigger() const {
+  return m_hid.GetRightTrigger();
 }

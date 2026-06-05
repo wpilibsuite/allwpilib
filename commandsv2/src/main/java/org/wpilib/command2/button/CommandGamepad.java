@@ -845,8 +845,8 @@ public class CommandGamepad extends CommandGenericHID {
    *
    * @return The axis value.
    */
-  public double getLeftTriggerAxis() {
-    return m_hid.getLeftTriggerAxis();
+  public double getLeftTrigger() {
+    return m_hid.getLeftTrigger();
   }
 
   /**
@@ -855,7 +855,7 @@ public class CommandGamepad extends CommandGenericHID {
    *
    * @return The axis value.
    */
-  public double getRightTriggerAxis() {
-    return m_hid.getRightTriggerAxis();
+  public double getRightTrigger() {
+    return m_hid.getRightTrigger();
   }
 }

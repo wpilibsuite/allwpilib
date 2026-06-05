@@ -198,7 +198,7 @@ class Gamepad : public GenericHID,
    *
    * @return the axis value.
    */
-  double GetLeftTriggerAxis() const;
+  double GetLeftTrigger() const;
 
   /**
    * Set the deadband for the left trigger axis.
@@ -240,7 +240,7 @@ class Gamepad : public GenericHID,
    *
    * @return the axis value.
    */
-  double GetRightTriggerAxis() const;
+  double GetRightTrigger() const;
 
   /**
    * Set the deadband for the right trigger axis.

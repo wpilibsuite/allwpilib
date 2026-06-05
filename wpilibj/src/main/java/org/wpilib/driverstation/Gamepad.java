@@ -284,7 +284,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return The axis value.
    */
-  public double getLeftTriggerAxis() {
+  public double getLeftTrigger() {
     return MathUtil.applyDeadband(getAxis(Axis.LEFT_TRIGGER), m_leftTriggerDeadband);
   }
 
@@ -322,7 +322,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return The axis value.
    */
-  public double getRightTriggerAxis() {
+  public double getRightTrigger() {
     return MathUtil.applyDeadband(getAxis(Axis.RIGHT_TRIGGER), m_rightTriggerDeadband);
   }
 
@@ -1442,9 +1442,9 @@ public class Gamepad extends GenericHID implements Sendable {
     builder.setSmartDashboardType("HID");
     builder.publishConstString("ControllerType", "Gamepad");
     builder.addDoubleProperty(
-        "LeftTrigger Axis", () -> getAxisForSendable(Axis.LEFT_TRIGGER), null);
+        "LeftTrigger", () -> getAxisForSendable(Axis.LEFT_TRIGGER), null);
     builder.addDoubleProperty(
-        "RightTrigger Axis", () -> getAxisForSendable(Axis.RIGHT_TRIGGER), null);
+        "RightTrigger", () -> getAxisForSendable(Axis.RIGHT_TRIGGER), null);
     builder.addDoubleProperty("LeftX", () -> getAxisForSendable(Axis.LEFT_X), null);
     builder.addDoubleProperty("LeftY", () -> getAxisForSendable(Axis.LEFT_Y), null);
     builder.addDoubleProperty("RightX", () -> getAxisForSendable(Axis.RIGHT_X), null);
