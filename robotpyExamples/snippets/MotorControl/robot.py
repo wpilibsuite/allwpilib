@@ -20,6 +20,10 @@ class MyRobot(wpilib.TimedRobot):
 
     In addition, the encoder value of an encoder connected to ports 0 and 1 is consistently sent
     to the Dashboard.
+
+    Finally, short code snippets show how to invert the motor direction and how to use the motor
+    safety for frc-docs.
+    https://docs.wpilib.org/en/stable/docs/software/hardware-apis/motors/wpi-drive-classes.html
     """
 
     kMotorPort = 0
@@ -37,6 +41,15 @@ class MyRobot(wpilib.TimedRobot):
         # Use SetDistancePerPulse to set the multiplier for GetDistance
         # This is set up assuming a 6 inch wheel with a 360 CPR encoder.
         self.encoder.setDistancePerPulse((math.pi * 6) / 360.0)
+
+        # show motor inversion
+        self.motor.setInverted(True)
+
+        # show motor safety features
+        self.motor.setSafetyEnabled(True)
+        self.motor.setSafetyEnabled(False)
+        self.motor.setExpiration(0.1)
+        self.motor.feed()
 
     def robotPeriodic(self):
         """The RobotPeriodic function is called every control packet no matter the robot mode."""

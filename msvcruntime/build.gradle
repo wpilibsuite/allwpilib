@@ -65,9 +65,12 @@ if (OperatingSystem.current().isWindows()) {
         }
 
         def arm64Folder = null
-        file("$runtimeLocation\\arm64").eachFile {
-            if (it.name.endsWith('.CRT')) {
-                arm64Folder = it
+        def arm64Dir = file("$runtimeLocation\\arm64")
+        if (arm64Dir.exists()) {
+            arm64Dir.eachFile {
+                if (it.name.endsWith('.CRT')) {
+                    arm64Folder = it
+                }
             }
         }
 

@@ -429,6 +429,101 @@ TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {
   }
 }
 
+// When a client re-subscribes with a shorter period for a topic it already
+// matched, UpdatePeriod must be called so the outgoing queue period is updated.
+//
+// Bug: the original code used `added ^ removed`. When a subscription update
+// matches a topic that was already subscribed (added=true AND removed=true),
+// XOR evaluates to false and UpdatePeriod is never called. The topic stays in
+// the old outgoing queue (longer period) even though the client asked for a
+// shorter one.
+//
+// Fix: change to `added || removed`. Now the period is recomputed whenever
+// anything changed, including the both-true re-subscribe case.
+//
+// Test strategy: subscribe with period=200ms, drain the queue (nextSendMs now
+// 200), then re-subscribe with period=100ms. The re-subscribe causes the last
+// value to be re-queued (wasSubscribed is false after erasing the old sub).
+// A send at t=150 is between the two periods:
+//   With fix:  SetPeriod(100) called → 100ms queue (nextSendMs=0) fires →
+//              DoWriteBinary called once.
+//   With bug:  SetPeriod not called → value stays in 200ms queue
+//              (nextSendMs=200) → DoWriteBinary NOT called at t=150.
+TEST_F(ServerImplTest, ResubscribeShorterPeriodUpdatesTopicOutgoing) {
+  server.SetLocal(&local, &queue);
+  constexpr int pubuid = 1;
+  constexpr int subuid = 1;
+
+  EXPECT_CALL(local, ServerAnnounce(std::string_view{"test"}, _, _, _, _))
+      .WillOnce(Return(0));
+  EXPECT_CALL(local, ServerSetValue(_, _)).Times(::testing::AnyNumber());
+
+  // Publish topic and initial value so there is a lastValue when the client
+  // subscribes.
+  queue.msgs.emplace_back(net::ClientMessage{net::PublishMsg{
+      pubuid, "test", "double", wpi::util::json::object(), {}}});
+  queue.msgs.emplace_back(net::ClientMessage{
+      net::ClientValueMsg{pubuid, Value::MakeDouble(1.0, 50)}});
+  ASSERT_FALSE(server.ProcessLocalMessages(UINT_MAX));
+
+  ::testing::NiceMock<net::MockWireConnection> wire;
+  EXPECT_CALL(wire, GetVersion()).WillRepeatedly(Return(0x0401));
+  MockSetPeriodicFunc setPeriodic;
+  EXPECT_CALL(setPeriodic, Call(_)).Times(::testing::AnyNumber());
+
+  int binaryCallCount = 0;
+  ON_CALL(wire, DoWriteBinary(_)).WillByDefault([&](std::span<const uint8_t>) {
+    ++binaryCallCount;
+    return 0;
+  });
+  ON_CALL(wire, Ready()).WillByDefault(Return(true));
+  ON_CALL(wire, DoWriteText(_)).WillByDefault(Return(0));
+  ON_CALL(wire, Flush()).WillByDefault(Return(0));
+  ON_CALL(wire, GetLastReceivedTime()).WillByDefault(Return(0));
+
+  auto [name, id] = server.AddClient("test", "connInfo", false, wire,
+                                     setPeriodic.AsStdFunction());
+
+  // Subscribe with period=200ms; initial value 1.0 is queued in the 200ms
+  // queue via the last-value send path.
+  {
+    std::vector<net::ClientMessage> msgs;
+    msgs.emplace_back(net::ClientMessage{net::SubscribeMsg{
+        subuid, {{""}}, PubSubOptions{.periodic = 0.2, .prefixMatch = true}}});
+    server.ProcessIncomingText(id, EncodeText(msgs));
+  }
+
+  // First send at t=100: drains the initial 200ms queue (nextSendMs=0 fires),
+  // sends announce + initial value 1.0. After this nextSendMs[200ms]=200.
+  server.SendOutgoing(id, 100);
+
+  // Re-subscribe same subuid with period=100ms. Because the old subscriber is
+  // erased first, wasSubscribed becomes false and the server re-queues the last
+  // value (1.0). Where it lands depends on which queue the topic is mapped to:
+  //   With fix: SetPeriod(topicId, 100) → topic maps to 100ms queue
+  //             (nextSendMs=0) → value queued there.
+  //   With bug: SetPeriod not called → topic still maps to 200ms queue
+  //             (nextSendMs=200) → value queued there.
+  {
+    std::vector<net::ClientMessage> msgs;
+    msgs.emplace_back(net::ClientMessage{net::SubscribeMsg{
+        subuid, {{""}}, PubSubOptions{.periodic = 0.1, .prefixMatch = true}}});
+    server.ProcessIncomingText(id, EncodeText(msgs));
+  }
+
+  // At t=150 (between 100ms and 200ms):
+  //   With fix:  100ms queue (nextSendMs=0) fires → 1 binary write.
+  //   With bug:  200ms queue (nextSendMs=200) skips → 0 binary writes.
+  binaryCallCount = 0;
+  server.SendOutgoing(id, 150);
+
+  EXPECT_EQ(binaryCallCount, 1)
+      << "Re-subscribing with a shorter period must update the topic's "
+         "outgoing queue period; the re-queued last value should be sent by "
+         "t=150ms (XOR bug: UpdatePeriod is skipped when added && removed are "
+         "both true, leaving the topic mapped to the 200ms queue)";
+}
+
 TEST_F(ServerImplTest, InvalidPubUid) {
   EXPECT_CALL(logger, Call(_, _, _, "0: pubuid out of range"));
   server.SetLocal(&local, &queue);

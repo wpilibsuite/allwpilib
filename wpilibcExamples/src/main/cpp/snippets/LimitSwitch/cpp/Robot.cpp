@@ -8,7 +8,7 @@
 #include "wpi/hardware/motor/PWMVictorSPX.hpp"
 
 /**
- * Limit Switch snippets for frc-docs.
+ * Limit Switch snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/limit-switch.html
  */
 class Robot : public wpi::TimedRobot {

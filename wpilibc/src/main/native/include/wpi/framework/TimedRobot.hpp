@@ -8,10 +8,10 @@
 
 #include "wpi/framework/IterativeRobotBase.hpp"
 #include "wpi/hal/Notifier.hpp"
-#include "wpi/hal/Types.hpp"
 #include "wpi/internal/PeriodicPriorityQueue.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/Handle.hpp"
 
 namespace wpi {
 
@@ -88,7 +88,7 @@ class TimedRobot : public IterativeRobotBase {
                    wpi::units::second_t offset = 0_s);
 
  protected:
-  wpi::hal::Handle<HAL_NotifierHandle, HAL_DestroyNotifier> m_notifier;
+  wpi::util::Handle<HAL_NotifierHandle, HAL_DestroyNotifier> m_notifier;
   std::chrono::microseconds m_startTime;
 
  private:

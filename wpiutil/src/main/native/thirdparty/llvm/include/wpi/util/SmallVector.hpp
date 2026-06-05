@@ -275,14 +275,18 @@ public:
   // forward iterator creation methods.
   iterator begin() { return (iterator)this->BeginX; }
   const_iterator begin() const { return (const_iterator)this->BeginX; }
+  const_iterator cbegin() const { return (const_iterator)this->BeginX; }
   iterator end() { return begin() + size(); }
   const_iterator end() const { return begin() + size(); }
+  const_iterator cend() const { return begin() + size(); }
 
   // reverse iterator creation methods.
   reverse_iterator rbegin()            { return reverse_iterator(end()); }
   const_reverse_iterator rbegin() const{ return const_reverse_iterator(end()); }
+  const_reverse_iterator crbegin() const{ return const_reverse_iterator(end()); }
   reverse_iterator rend()              { return reverse_iterator(begin()); }
   const_reverse_iterator rend() const { return const_reverse_iterator(begin());}
+  const_reverse_iterator crend() const { return const_reverse_iterator(begin());}
 
   size_type size_in_bytes() const { return size() * sizeof(T); }
   size_type max_size() const {

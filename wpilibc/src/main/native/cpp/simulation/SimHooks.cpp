@@ -12,8 +12,8 @@ void SetRuntimeType(HAL_RuntimeType type) {
   HALSIM_SetRuntimeType(type);
 }
 
-void WaitForProgramStart() {
-  HALSIM_WaitForProgramStart();
+void WaitForProgramStart(bool waitForFirstNotifier) {
+  HALSIM_WaitForProgramStart(waitForFirstNotifier);
 }
 
 void SetProgramStarted(bool started) {
