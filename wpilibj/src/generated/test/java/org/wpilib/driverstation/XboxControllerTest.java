@@ -21,6 +21,7 @@ import org.wpilib.simulation.XboxControllerSim;
 class XboxControllerTest {
   @Test
   void testWrappedHID() {
+    HAL.initialize(500, 0);
     XboxController controller = new XboxController(2);
     XboxControllerSim sim = new XboxControllerSim(controller);
     sim.notifyNewData();

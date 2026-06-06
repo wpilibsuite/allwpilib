@@ -21,6 +21,7 @@ import org.wpilib.simulation.DualSenseControllerSim;
 class DualSenseControllerTest {
   @Test
   void testWrappedHID() {
+    HAL.initialize(500, 0);
     DualSenseController controller = new DualSenseController(2);
     DualSenseControllerSim sim = new DualSenseControllerSim(controller);
     sim.notifyNewData();
