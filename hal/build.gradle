@@ -1,12 +1,4 @@
 ext {
-    addHalDependency = { binary, shared->
-        binary.lib project: ':hal', library: 'hal', linkage: shared
-    }
-
-    addHalJniDependency = { binary->
-        binary.lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
-    }
-
     nativeName = 'hal'
     setBaseName = 'wpiHal'
     devMain = 'org.wpilib.hardware.hal.DevMain'
@@ -59,6 +51,20 @@ ext {
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
+
+apply from: "${rootDir}/shared/libmrclib.gradle"
+
+ext {
+    addHalDependency = { binary, shared->
+        nativeUtils.useRequiredLibrary(binary, 'mrclib')
+        binary.lib project: ':hal', library: 'hal', linkage: shared
+    }
+
+    addHalJniDependency = { binary->
+        nativeUtils.useRequiredLibrary(binary, 'mrclib')
+        binary.lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
+    }
+}
 
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 
@@ -113,6 +119,7 @@ model {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {
                 return
             }
+            nativeUtils.useRequiredLibrary(it, 'mrclib')
             if (it.component.name == "${nativeName}JNI") {
                 project(':ntcore').addNtcoreDependency(it, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
