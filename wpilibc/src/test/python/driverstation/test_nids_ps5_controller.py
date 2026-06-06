@@ -1,13 +1,12 @@
-
-
 from wpilib import NiDsPS5Controller
 from wpilib.simulation import NiDsPS5ControllerSim
 from driverstation.joystick_test_macros import button_test, axis_test
 
+
 def test_buttons():
     def ps5_button_test(btn_name):
         button_test(NiDsPS5Controller, NiDsPS5ControllerSim, btn_name)
-        
+
     def ps5_axis_test(axis_name):
         axis_test(NiDsPS5Controller, NiDsPS5ControllerSim, axis_name)
 

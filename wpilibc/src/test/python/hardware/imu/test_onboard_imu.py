@@ -1,6 +1,7 @@
 from wpilib import OnboardIMU
 from wpilib.simulation import OnboardIMUSim
 
+
 def test_sim_device() -> None:
 
     imu = OnboardIMU(OnboardIMU.MountOrientation.FLAT)
@@ -15,15 +16,15 @@ def test_sim_device() -> None:
     assert 0.0 == imu.getAccelX()
     assert 0.0 == imu.getAccelY()
     assert 0.0 == imu.getAccelZ()
-    
+
     sim.setAngleX(1)
     sim.setAngleY(2)
     sim.setAngleZ(3)
-    
+
     sim.setGyroRateX(3.504)
     sim.setGyroRateY(1.91)
     sim.setGyroRateZ(22.9)
-    
+
     sim.setAccelX(-1)
     sim.setAccelY(-2)
     sim.setAccelZ(-3)

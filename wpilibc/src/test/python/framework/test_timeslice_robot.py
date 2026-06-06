@@ -36,8 +36,12 @@ def test_schedule():
     callback_count1 = [0]
     callback_count2 = [0]
 
-    robot.schedule(lambda: callback_count1.__setitem__(0, callback_count1[0] + 1), 0.0005)
-    robot.schedule(lambda: callback_count2.__setitem__(0, callback_count2[0] + 1), 0.001)
+    robot.schedule(
+        lambda: callback_count1.__setitem__(0, callback_count1[0] + 1), 0.0005
+    )
+    robot.schedule(
+        lambda: callback_count2.__setitem__(0, callback_count2[0] + 1), 0.001
+    )
 
     robot_thread = threading.Thread(target=robot.startCompetition, daemon=True)
     robot_thread.start()

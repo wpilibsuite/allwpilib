@@ -36,7 +36,6 @@ def button_test(controller_clazz, sim_clazz, btn_name):
     assert True == joy_get_func()
     assert True == joy_get_pressed_func()
     assert False == joy_get_released_func()
-    
 
     sim_setter_func(False)
     joysim.notifyNewData()

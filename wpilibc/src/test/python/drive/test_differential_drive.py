@@ -2,6 +2,7 @@ import pytest
 
 from wpilib import DifferentialDrive
 
+
 class MockMotorController:
     def __init__(self):
         self.throttle = 0

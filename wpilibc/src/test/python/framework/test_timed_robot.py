@@ -317,7 +317,9 @@ def test_mode_change():
 def test_add_periodic():
     robot = MockRobot()
     callback_count = [0]
-    robot.addPeriodic(lambda: callback_count.__setitem__(0, callback_count[0] + 1), _PERIOD / 2.0)
+    robot.addPeriodic(
+        lambda: callback_count.__setitem__(0, callback_count[0] + 1), _PERIOD / 2.0
+    )
 
     robot_thread = threading.Thread(target=robot.startCompetition, daemon=True)
     robot_thread.start()

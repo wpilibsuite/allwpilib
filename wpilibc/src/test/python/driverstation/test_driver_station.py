@@ -25,12 +25,27 @@ def test_is_joystick_connected(wpilib_state, axes_max, buttons_max, povs_max, ex
 
 
 @pytest.mark.parametrize(
-    "fms_attached, silenced, expected_silenced, expected_warning", 
+    "fms_attached, silenced, expected_silenced, expected_warning",
     [
         (False, True, True, ""),
-        (False, False, False, "Warning: Joystick on port 0 not available, check if all controllers are plugged in"),
-        (True, True, False, "Warning: Joystick on port 0 not available, check if all controllers are plugged in"), # FMS overrides silence
-        (True, False, False, "Warning: Joystick on port 0 not available, check if all controllers are plugged in"),
+        (
+            False,
+            False,
+            False,
+            "Warning: Joystick on port 0 not available, check if all controllers are plugged in",
+        ),
+        (
+            True,
+            True,
+            False,
+            "Warning: Joystick on port 0 not available, check if all controllers are plugged in",
+        ),  # FMS overrides silence
+        (
+            True,
+            False,
+            False,
+            "Warning: Joystick on port 0 not available, check if all controllers are plugged in",
+        ),
     ],
 )
 def test_joystick_connection_warnings(
@@ -47,7 +62,7 @@ def test_joystick_connection_warnings(
     assert (
         DriverStationBackend.isJoystickConnectionWarningSilenced() == expected_silenced
     )
-    
+
     # Capture stderr to check for warnings
     captured = capsys.readouterr()
     assert expected_warning in captured.err

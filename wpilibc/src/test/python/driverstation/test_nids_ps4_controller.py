@@ -1,13 +1,12 @@
-
-
 from wpilib import NiDsPS4Controller
 from wpilib.simulation import NiDsPS4ControllerSim
 from driverstation.joystick_test_macros import button_test, axis_test
 
+
 def test_buttons():
     def ps4_button_test(btn_name):
         button_test(NiDsPS4Controller, NiDsPS4ControllerSim, btn_name)
-        
+
     def ps4_axis_test(axis_name):
         axis_test(NiDsPS4Controller, NiDsPS4ControllerSim, axis_name)
 
