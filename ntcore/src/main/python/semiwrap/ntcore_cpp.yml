@@ -130,8 +130,6 @@ classes:
     attributes:
       listener:
       flags:
-      data:
-        ignore: true
     methods:
       Event:
         overloads:
