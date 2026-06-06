@@ -146,12 +146,12 @@ def test_large_velocity_opposite_peak_backwards():
 
 def test_sign_at_threshold():
     constraints = TrapezoidProfile.Constraints(4.0, 4.0)
-    goal = TrapezoidProfile.State(0.375, 1.0)
-    state = TrapezoidProfile.State(0.0, 2.0)
+    goal = TrapezoidProfile.State(1, 1.0)
+    state = TrapezoidProfile.State(0.0, 3.0)
     profile = TrapezoidProfile(constraints)
 
-    # Normal profile is 0.25s long. Some failure modes are multiples of that.
-    for i in range(90):
+    # Normal profile is 0.5s, and an incorrect implementation might repeat.
+    for i in range(52):
         newState = profile.calculate(kDt, state, goal)
         assert_feasible(state, newState, constraints.maxAcceleration)
         state = newState
@@ -161,12 +161,12 @@ def test_sign_at_threshold():
 
 def test_sign_at_threshold_backwards():
     constraints = TrapezoidProfile.Constraints(4.0, 4.0)
-    goal = TrapezoidProfile.State(-0.375, -1.0)
-    state = TrapezoidProfile.State(0.0, -2.0)
+    goal = TrapezoidProfile.State(-1, -1.0)
+    state = TrapezoidProfile.State(0.0, -3.0)
     profile = TrapezoidProfile(constraints)
 
-    # Normal profile is 0.25s long. Some failure modes are multiples of that.
-    for i in range(90):
+    # Normal profile is 0.5s, and an incorrect implementation might repeat.
+    for i in range(52):
         newState = profile.calculate(kDt, state, goal)
         assert_feasible(state, newState, constraints.maxAcceleration)
         state = newState

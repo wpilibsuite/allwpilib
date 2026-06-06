@@ -110,48 +110,48 @@ public class TrapezoidProfile {
   /** Profile Timing. */
   public static class ProfileTiming {
     /** The time the profile spends in the first leg. */
-    public double accelTime;
+    public double t_1;
 
     /** The time the profile spends at the velocity limit. */
-    public double cruiseTime;
+    public double t_2;
 
     /** The time the profile spends in the last leg. */
-    public double decelTime;
+    public double t_3;
 
     /**
      * Constructs the timing object for a Trapezoid Profile.
      *
-     * @param accelTime The time the profile spends on the first leg of the profile.
-     * @param cruiseTime The time the profile spends at the velocity limit.
-     * @param decelTime the time the profile spends on the last leg of the profile.
+     * @param t_1 The time the profile spends on the first leg of the profile.
+     * @param t_2 The time the profile spends at the velocity limit.
+     * @param t_3 the time the profile spends on the last leg of the profile.
      */
-    public ProfileTiming(double accelTime, double cruiseTime, double decelTime) {
-      if (accelTime < 0.0 || cruiseTime < 0.0 || decelTime < 0.0) {
+    public ProfileTiming(double t_1, double t_2, double t_3) {
+      if (t_1 < 0.0 || t_2 < 0.0 || t_3 < 0.0) {
         throw new IllegalArgumentException("Times must be non-negative");
       }
-      this.accelTime = accelTime;
-      this.cruiseTime = cruiseTime;
-      this.decelTime = decelTime;
+      this.t_1 = t_1;
+      this.t_2 = t_2;
+      this.t_3 = t_3;
     }
 
     /** Zero initializes the timing object for a Trapezoid Profile. */
     public ProfileTiming() {
-      this.accelTime = 0.0;
-      this.cruiseTime = 0.0;
-      this.decelTime = 0.0;
+      this.t_1 = 0.0;
+      this.t_2 = 0.0;
+      this.t_3 = 0.0;
     }
 
     @Override
     public boolean equals(Object other) {
       return other instanceof ProfileTiming rhs
-          && this.accelTime == rhs.accelTime
-          && this.cruiseTime == rhs.cruiseTime
-          && this.decelTime == rhs.decelTime;
+          && this.t_1 == rhs.t_1
+          && this.t_2 == rhs.t_2
+          && this.t_3 == rhs.t_3;
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(accelTime, cruiseTime, decelTime);
+      return Objects.hash(t_1, t_2, t_3);
     }
   }
 
@@ -185,23 +185,23 @@ public class TrapezoidProfile {
     state = new State(current.position, current.velocity);
 
     // Make sure we add time to get to a valid state back onto the profile times.
-    m_profile.accelTime += recoveryTime;
+    m_profile.t_1 += recoveryTime;
 
     double acceleration = sign * m_constraints.maxAcceleration;
     advanceState(
-        Math.min(t, m_profile.accelTime),
+        Math.min(t, m_profile.t_1),
         recoveryTime > 0.0 && sign * state.velocity > 0.0 ? -acceleration : acceleration,
         state);
 
-    if (t > m_profile.accelTime) {
-      t -= m_profile.accelTime;
-      advanceState(Math.min(t, m_profile.cruiseTime), 0.0, state);
+    if (t > m_profile.t_1) {
+      t -= m_profile.t_1;
+      advanceState(Math.min(t, m_profile.t_2), 0.0, state);
 
-      if (t > m_profile.cruiseTime) {
-        t -= m_profile.cruiseTime;
-        advanceState(Math.min(t, m_profile.decelTime), -acceleration, state);
+      if (t > m_profile.t_2) {
+        t -= m_profile.t_2;
+        advanceState(Math.min(t, m_profile.t_3), -acceleration, state);
 
-        if (t > m_profile.decelTime) {
+        if (t > m_profile.t_3) {
           state = target;
         }
       }
@@ -226,9 +226,9 @@ public class TrapezoidProfile {
     double sign = getSign(state, target);
     ProfileTiming profile = generateProfile(sign, state, target);
 
-    profile.accelTime += recoveryTime;
+    profile.t_1 += recoveryTime;
 
-    return profile.accelTime + profile.cruiseTime + profile.decelTime;
+    return profile.t_1 + profile.t_2 + profile.t_3;
   }
 
   /**
@@ -237,7 +237,7 @@ public class TrapezoidProfile {
    * @return The total time the profile takes to reach the goal, or zero if no goal was set.
    */
   public double totalTime() {
-    return m_profile.accelTime + m_profile.cruiseTime + m_profile.decelTime;
+    return m_profile.t_1 + m_profile.t_2 + m_profile.t_3;
   }
 
   /**
@@ -316,22 +316,23 @@ public class TrapezoidProfile {
 
     // Calculate threshold displacement
     // d = |v_t - v_i| * (v_t + v_i) / a_m   (9)
-    double thresholdDisplacement =
+    double d =
         Math.abs(goal.velocity - current.velocity)
             / m_constraints.maxAcceleration
             * (current.velocity + goal.velocity)
             / 2.0;
 
     // As discussed in TrapezoidProfile.md the correct sign must be chosen when dx == d because
-    // following a suboptimal profile may lead to "chattering".
-    if (goal.velocity < 0.0) {
-      if (dx > thresholdDisplacement) {
-        return 1.0;
-      } else {
-        return -1.0;
-      }
+    // following a suboptimal profile may lead to "chattering". Additionally, if numerical precision
+    // errors cause the calculated optimal sign to change throughout the profile, that may lead to
+    // suboptimal states being calculated. To fix this we add a tolerance such that if |dx - d| <
+    // epsilon we return the sign that would lead to the minimum profile being calculated. We do not
+    // have control over the floating point precision error from previous calculations and as such
+    // it is difficult to bound the possible error. 1e-12 should be good enough for FRC though.
+    if (Math.abs(dx - d) < 1e-12) {
+      return Math.copySign(1.0, goal.velocity);
     } else {
-      if (dx >= thresholdDisplacement) {
+      if (dx > d) {
         return 1.0;
       } else {
         return -1.0;
@@ -369,13 +370,13 @@ public class TrapezoidProfile {
     // Handle the case where we hit maximum velocity.
     if (sign * peakVelocity > m_constraints.maxVelocity) {
       // t_1 = (v_l - v_i) / a   (13)
-      profile.accelTime = (velocityLimit - current.velocity) / acceleration;
+      profile.t_1 = (velocityLimit - current.velocity) / acceleration;
       // t_3 = (v_l - v_t) / a   (15)
-      profile.decelTime = (velocityLimit - goal.velocity) / acceleration;
+      profile.t_3 = (velocityLimit - goal.velocity) / acceleration;
 
       // x_2 = Δx - x_1 - x_3   (12)
       // t_2 = x_2 / v_l   (14)
-      profile.cruiseTime =
+      profile.t_2 =
           (dx
                   - (2 * velocityLimit * velocityLimit
                           - (current.velocity * current.velocity + goal.velocity * goal.velocity))
@@ -383,9 +384,9 @@ public class TrapezoidProfile {
               / velocityLimit;
     } else {
       // t_1 = (v_p - v_i) / a   (13)
-      profile.accelTime = (peakVelocity - current.velocity) / acceleration;
+      profile.t_1 = (peakVelocity - current.velocity) / acceleration;
       // t_3 = (v_p - v_t) / a   (15)
-      profile.decelTime = (peakVelocity - goal.velocity) / acceleration;
+      profile.t_3 = (peakVelocity - goal.velocity) / acceleration;
     }
 
     return profile;

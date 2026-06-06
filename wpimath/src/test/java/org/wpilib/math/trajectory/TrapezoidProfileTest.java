@@ -219,13 +219,13 @@ class TrapezoidProfileTest {
   @Test
   void checkSignAtThreshold() {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(4, 4);
-    TrapezoidProfile.State goal = new TrapezoidProfile.State(0.375, 1);
-    TrapezoidProfile.State state = new TrapezoidProfile.State(0, 2);
+    TrapezoidProfile.State goal = new TrapezoidProfile.State(1, 1);
+    TrapezoidProfile.State state = new TrapezoidProfile.State(0, 3);
 
     TrapezoidProfile profile = new TrapezoidProfile(constraints);
 
-    // Normal profile is 0.25s, and some failure modes are multiples of 0.25s.
-    for (int i = 0; i < 90; ++i) {
+    // Normal profile is 0.5s, and an incorrect implementation might repeat.
+    for (int i = 0; i < 52; ++i) {
       var newState = profile.calculate(kDt, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
@@ -239,13 +239,13 @@ class TrapezoidProfileTest {
   @Test
   void checkSignAtThresholdBackwards() {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(4, 4);
-    TrapezoidProfile.State goal = new TrapezoidProfile.State(-0.375, -1);
-    TrapezoidProfile.State state = new TrapezoidProfile.State(0, -2);
+    TrapezoidProfile.State goal = new TrapezoidProfile.State(-1, -1);
+    TrapezoidProfile.State state = new TrapezoidProfile.State(0, -3);
 
     TrapezoidProfile profile = new TrapezoidProfile(constraints);
 
-    // Normal profile is 0.25s, and some failure modes are multiples of 0.25s.
-    for (int i = 0; i < 90; ++i) {
+    // Normal profile is 0.5s, and an incorrect implementation might repeat.
+    for (int i = 0; i < 52; ++i) {
       var newState = profile.calculate(kDt, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;

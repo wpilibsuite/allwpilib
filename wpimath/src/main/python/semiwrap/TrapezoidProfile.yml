@@ -92,9 +92,9 @@ classes:
         cpp_code: py::self == State()
   wpi::math::TrapezoidProfile::ProfileTiming:
     attributes:
-      accelTime:
-      cruiseTime:
-      decelTime:
+      t_1:
+      t_2:
+      t_3:
     methods:
       operator==:
 templates:

@@ -115,11 +115,11 @@ class TrapezoidProfile {
   class ProfileTiming {
    public:
     /// The time the profile spends in the first leg of the profile.
-    wpi::units::second_t accelTime;
+    wpi::units::second_t t_1;
     /// The time the profile spends at the velocity limit.
-    wpi::units::second_t cruiseTime;
+    wpi::units::second_t t_2;
     /// The time the profile spends in the last leg of the profile.
-    wpi::units::second_t decelTime;
+    wpi::units::second_t t_3;
 
     constexpr bool operator==(const ProfileTiming&) const = default;
   };
@@ -153,10 +153,10 @@ class TrapezoidProfile {
     double sign = GetSign(current, goal);
     m_profile = GenerateProfile(sign, current, goal);
 
-    // The accelTime and recoveryTime will always be in the same direction
+    // The t_1 and recoveryTime will always be in the same direction
     // since if the sign of the profile differs from the sign of recovery
     // acceleration, the profile basically starts at max velocity.
-    m_profile.accelTime += recoveryTime;
+    m_profile.t_1 += recoveryTime;
 
     auto advance = [](wpi::units::second_t time, Acceleration_t acceleration,
                       State& state) {
@@ -168,23 +168,22 @@ class TrapezoidProfile {
     };
 
     Acceleration_t acceleration = sign * m_constraints.maxAcceleration;
-    advance(wpi::units::math::min(t, m_profile.accelTime),
+    advance(wpi::units::math::min(t, m_profile.t_1),
             recoveryTime > 0.0_s && sample.velocity * sign > Velocity_t{0.0}
                 ? -acceleration
                 : acceleration,
             sample);
 
-    if (t > m_profile.accelTime) {
-      t -= m_profile.accelTime;
-      advance(wpi::units::math::min(t, m_profile.cruiseTime),
-              Acceleration_t{0.0}, sample);
+    if (t > m_profile.t_1) {
+      t -= m_profile.t_1;
+      advance(wpi::units::math::min(t, m_profile.t_2), Acceleration_t{0.0},
+              sample);
 
-      if (t > m_profile.cruiseTime) {
-        t -= m_profile.cruiseTime;
-        advance(wpi::units::math::min(t, m_profile.decelTime), -acceleration,
-                sample);
+      if (t > m_profile.t_2) {
+        t -= m_profile.t_2;
+        advance(wpi::units::math::min(t, m_profile.t_3), -acceleration, sample);
 
-        if (t > m_profile.decelTime) {
+        if (t > m_profile.t_3) {
           sample = goal;
         }
       }
@@ -208,9 +207,9 @@ class TrapezoidProfile {
     double sign = GetSign(current, goal);
     ProfileTiming profile = GenerateProfile(sign, current, goal);
 
-    profile.accelTime += recoveryTime;
+    profile.t_1 += recoveryTime;
 
-    return profile.accelTime + profile.cruiseTime + profile.decelTime;
+    return profile.t_1 + profile.t_2 + profile.t_3;
   }
 
   /**
@@ -220,7 +219,7 @@ class TrapezoidProfile {
    * goal was set.
    */
   constexpr wpi::units::second_t TotalTime() const {
-    return m_profile.accelTime + m_profile.cruiseTime + m_profile.decelTime;
+    return m_profile.t_1 + m_profile.t_2 + m_profile.t_3;
   }
 
   /**
@@ -291,21 +290,24 @@ class TrapezoidProfile {
 
     // Calculate threshold displacement
     // d = |v_t - v_i| * (v_t + v_i) / 2 a_m   (9)
-    Distance_t thresholdDisplacement =
-        wpi::units::math::abs(goal.velocity - current.velocity) /
-        m_constraints.maxAcceleration * (current.velocity + goal.velocity) /
-        2.0;
+    Distance_t d = wpi::units::math::abs(goal.velocity - current.velocity) /
+                   m_constraints.maxAcceleration *
+                   (current.velocity + goal.velocity) / 2.0;
 
     // As discussed in TrapezoidProfile.md the correct sign must be chosen when
     // dx == d because following a suboptimal profile may lead to "chattering".
-    if (goal.velocity < Velocity_t{0.0}) {
-      if (dx > thresholdDisplacement) {
-        return 1.0;
-      } else {
-        return -1.0;
-      }
+    // Additionally, if numerical precision errors cause the calculated optimal
+    // sign to change throughout the profile, that may lead to suboptimal states
+    // being calculated. To fix this we add a tolerance such that if |dx - d| <
+    // epsilon we return the sign that would lead to the minimum profile being
+    // calculated. We do not have control over the floating point precision
+    // error from previous calculations and as such it is difficult to bound the
+    // possible error. 1e-12 should be good enough for FRC though.
+
+    if (wpi::units::math::abs(dx - d) < Distance_t{1e-12}) {
+      return std::copysign(1.0, goal.velocity.value());
     } else {
-      if (dx >= thresholdDisplacement) {
+      if (dx > d) {
         return 1.0;
       } else {
         return -1.0;
@@ -344,22 +346,22 @@ class TrapezoidProfile {
     // Handle the case where we hit maximum velocity.
     if (sign * peakVelocity > m_constraints.maxVelocity) {
       // t_1 = (v_l - v_i) / a   (13)
-      profile.accelTime = (velocityLimit - current.velocity) / acceleration;
+      profile.t_1 = (velocityLimit - current.velocity) / acceleration;
       // t_3 = (v_l - v_t) / a   (15)
-      profile.decelTime = (velocityLimit - goal.velocity) / acceleration;
+      profile.t_3 = (velocityLimit - goal.velocity) / acceleration;
 
       // x_2 = Δx - x_1 - x_3   (12)
       // t_2 = x_2 / v_l   (14)
-      profile.cruiseTime = (dx - (2 * velocityLimit * velocityLimit -
-                                  (current.velocity * current.velocity +
-                                   goal.velocity * goal.velocity)) /
-                                     (2 * acceleration)) /
-                           velocityLimit;
+      profile.t_2 = (dx - (2 * velocityLimit * velocityLimit -
+                           (current.velocity * current.velocity +
+                            goal.velocity * goal.velocity)) /
+                              (2 * acceleration)) /
+                    velocityLimit;
     } else {
       // t_1 = (v_p - v_i) / a   (13)
-      profile.accelTime = (peakVelocity - current.velocity) / acceleration;
+      profile.t_1 = (peakVelocity - current.velocity) / acceleration;
       // t_3 = (v_p - v_t) / a   (15)
-      profile.decelTime = (peakVelocity - goal.velocity) / acceleration;
+      profile.t_3 = (peakVelocity - goal.velocity) / acceleration;
     }
 
     return profile;
