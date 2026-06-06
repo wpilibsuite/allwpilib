@@ -2,8 +2,8 @@ import argparse
 import os
 from pathlib import Path
 
-from wpilibc.generate_hids import generate_hids
 from wpilibc.generate_first_ds_hids import generate_first_ds_hids
+from wpilibc.generate_hids import generate_hids
 from wpilibc.generate_pwm_motor_controllers import generate_pwm_motor_controllers
 
 
