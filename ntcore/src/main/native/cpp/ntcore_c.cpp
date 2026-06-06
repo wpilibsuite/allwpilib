@@ -35,7 +35,9 @@ static void ConvertToC(const TopicInfo& in, NT_TopicInfo* out) {
 static void ConvertToC(const ConnectionInfo& in, NT_ConnectionInfo* out) {
   ConvertToC(in.remote_id, &out->remote_id);
   ConvertToC(in.remote_ip, &out->remote_ip);
+  ConvertToC(in.local_ip, &out->local_ip);
   out->remote_port = in.remote_port;
+  out->local_port = in.local_port;
   out->last_update = in.last_update;
   out->protocol_version = in.protocol_version;
 }
@@ -89,6 +91,7 @@ static void ConvertToC(const Event& in, NT_Event* out) {
 static void DisposeConnectionInfo(NT_ConnectionInfo* info) {
   WPI_FreeString(&info->remote_id);
   WPI_FreeString(&info->remote_ip);
+  WPI_FreeString(&info->local_ip);
 }
 
 static void DisposeTopicInfo(NT_TopicInfo* info) {
