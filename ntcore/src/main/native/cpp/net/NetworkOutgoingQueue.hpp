@@ -102,7 +102,7 @@ class NetworkOutgoingQueue {
       auto& newMsgs = m_queues[queueIndex].msgs;
       int valuePos = -1;
       for (auto i = it, end = oldMsgs.end(); i != end; ++i) {
-        if (std::holds_alternative<ValueMsg>(i->msg.contents)) {
+        if (i->msg.type() == MessageType::Type::VALUE) {
           valuePos = newMsgs.size();
         }
         newMsgs.emplace_back(std::move(*i));
@@ -119,13 +119,15 @@ class NetworkOutgoingQueue {
   template <typename T>
   void SendMessage(int id, T&& msg) {
     if (m_local) {
+      MessageType wireMsg{std::forward<T>(msg)};
       m_wire.SendText([&](auto& os) {
-        if (!WireEncodeText(os, MessageType{std::forward<T>(msg)})) {
+        if (!WireEncodeText(os, wireMsg)) {
           os << "{}";
         }
       });
     } else {
-      m_queues[m_idMap[id].queueIndex].Append(id, std::forward<T>(msg));
+      m_queues[m_idMap[id].queueIndex].Append(
+          id, MessageType{std::forward<T>(msg)});
       m_totalSize += sizeof(Message);
     }
 
@@ -153,7 +155,7 @@ class NetworkOutgoingQueue {
         auto& info = m_idMap[id];
         auto& queue = m_queues[info.queueIndex];
         info.valuePos = queue.msgs.size();
-        queue.Append(id, ValueMsg{id, value});
+        queue.Append(id, MessageType{ValueMsg{id, value}});
         m_totalSize += sizeof(Message) + value.size();
         break;
       }
@@ -164,7 +166,7 @@ class NetworkOutgoingQueue {
         if (info.valuePos != -1 &&
             static_cast<unsigned int>(info.valuePos) < queue.msgs.size()) {
           auto& elem = queue.msgs[info.valuePos];
-          if (auto m = std::get_if<ValueMsg>(&elem.msg.contents)) {
+          if (auto m = elem.msg.GetValue()) {
             // double-check handle, and only replace if timestamp newer
             if (elem.id == id) {
               if (m->value.time() == 0 || value.time() >= m->value.time()) {
@@ -177,7 +179,7 @@ class NetworkOutgoingQueue {
           }
         }
         info.valuePos = queue.msgs.size();
-        queue.Append(id, ValueMsg{id, value});
+        queue.Append(id, MessageType{ValueMsg{id, value}});
         m_totalSize += sizeof(Message) + value.size();
         break;
       }
@@ -234,7 +236,8 @@ class NetworkOutgoingQueue {
       auto end = msgs.end();
       int unsent = 0;
       for (; it != end && unsent == 0; ++it) {
-        if (auto m = std::get_if<ValueMsg>(&it->msg.contents)) {
+        const auto& msg = it->msg;
+        if (auto m = msg.GetValue()) {
           unsent = m_wire.WriteBinary(
               [&](auto& os) { EncodeValue(os, it->id, m->value); });
         } else {
@@ -257,7 +260,8 @@ class NetworkOutgoingQueue {
       }
       int delta = it - msgs.begin() - unsent;
       for (auto&& msg : std::span{msgs}.subspan(0, delta)) {
-        if (auto m = std::get_if<ValueMsg>(&msg.msg.contents)) {
+        const auto& queuedMsg = msg.msg;
+        if (auto m = queuedMsg.GetValue()) {
           m_totalSize -= sizeof(Message) + m->value.size();
         } else {
           m_totalSize -= sizeof(Message);
@@ -312,8 +316,7 @@ class NetworkOutgoingQueue {
 
   struct Message {
     Message() = default;
-    template <typename T>
-    Message(T&& msg, int id) : msg{std::forward<T>(msg)}, id{id} {}
+    Message(MessageType&& msg, int id) : msg{std::move(msg)}, id{id} {}
 
     MessageType msg;
     int id;
@@ -321,9 +324,8 @@ class NetworkOutgoingQueue {
 
   struct Queue {
     explicit Queue(uint32_t periodMs) : periodMs{periodMs} {}
-    template <typename T>
-    void Append(NT_Handle handle, T&& msg) {
-      msgs.emplace_back(std::forward<T>(msg), handle);
+    void Append(NT_Handle handle, MessageType&& msg) {
+      msgs.emplace_back(std::move(msg), handle);
     }
     std::vector<Message> msgs;
     uint64_t nextSendMs = 0;

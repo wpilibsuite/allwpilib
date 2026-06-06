@@ -119,8 +119,8 @@ std::pair<int, Value> DecodeBinary(std::span<const uint8_t> data,
 }
 
 ClientMessage Publish(int pubuid, std::string_view name) {
-  return ClientMessage{PublishMsg{
-      pubuid, std::string{name}, "double"s, wpi::util::json::object(), {}}};
+  return PublishMsg{
+      pubuid, std::string{name}, "double"s, wpi::util::json::object(), {}};
 }
 
 }  // namespace

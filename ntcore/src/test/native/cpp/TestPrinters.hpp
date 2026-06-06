@@ -20,8 +20,8 @@ class Message3;
 }  // namespace net3
 
 namespace net {
-struct ClientMessage;
-struct ServerMessage;
+class ClientMessage;
+class ServerMessage;
 }  // namespace net
 
 class Event;

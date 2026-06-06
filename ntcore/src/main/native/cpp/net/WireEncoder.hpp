@@ -21,8 +21,8 @@ class Value;
 
 namespace wpi::nt::net {
 
-struct ClientMessage;
-struct ServerMessage;
+class ClientMessage;
+class ServerMessage;
 
 // encoders for client text messages (avoids need to construct a Message struct)
 void WireEncodePublish(wpi::util::raw_ostream& os, int pubuid,

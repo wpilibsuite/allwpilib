@@ -114,11 +114,11 @@ static std::vector<uint8_t> EncodeServerBinary1(const T& msg) {
   std::vector<uint8_t> data;
   wpi::util::raw_uvector_ostream os{data};
   if constexpr (std::same_as<T, net::ServerMessage>) {
-    if (auto m = std::get_if<net::ServerValueMsg>(&msg.contents)) {
+    if (auto m = msg.GetValue()) {
       net::WireEncodeBinary(os, m->topic, m->value.time(), m->value);
     }
   } else if constexpr (std::same_as<T, net::ClientMessage>) {
-    if (auto m = std::get_if<net::ClientValueMsg>(&msg.contents)) {
+    if (auto m = msg.GetValue()) {
       net::WireEncodeBinary(os, Handle{m->pubHandle}.GetIndex(),
                             m->value.time(), m->value);
     }
@@ -132,12 +132,12 @@ static std::vector<uint8_t> EncodeServerBinary(const T& msgs) {
   wpi::util::raw_uvector_ostream os{data};
   for (auto&& msg : msgs) {
     if constexpr (std::same_as<typename T::value_type, net::ServerMessage>) {
-      if (auto m = std::get_if<net::ServerValueMsg>(&msg.contents)) {
+      if (auto m = msg.GetValue()) {
         net::WireEncodeBinary(os, m->topic, m->value.time(), m->value);
       }
     } else if constexpr (std::same_as<typename T::value_type,
                                       net::ClientMessage>) {
-      if (auto m = std::get_if<net::ClientValueMsg>(&msg.contents)) {
+      if (auto m = msg.GetValue()) {
         net::WireEncodeBinary(os, m->pubuid, m->value.time(), m->value);
       }
     }
@@ -168,8 +168,8 @@ TEST_F(ServerImplTest, PublishLocal) {
   }
 
   {
-    queue.msgs.emplace_back(net::ClientMessage{net::PublishMsg{
-        pubuid, "test", "double", wpi::util::json::object(), {}}});
+    queue.msgs.emplace_back(net::PublishMsg{
+        pubuid, "test", "double", wpi::util::json::object(), {}});
     EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
@@ -211,15 +211,15 @@ TEST_F(ServerImplTest, PublishLocal) {
   {
     constexpr int subuid = 1;
     std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{
-        net::SubscribeMsg{subuid, {{""}}, PubSubOptions{.prefixMatch = true}}});
+    msgs.emplace_back(
+        net::SubscribeMsg{subuid, {{""}}, PubSubOptions{.prefixMatch = true}});
     server.ProcessIncomingText(id, EncodeText(msgs));
   }
 
   // publish before send control
   {
-    queue.msgs.emplace_back(net::ClientMessage{net::PublishMsg{
-        pubuid2, "test2", "double", wpi::util::json::object(), {}}});
+    queue.msgs.emplace_back(net::PublishMsg{
+        pubuid2, "test2", "double", wpi::util::json::object(), {}});
     EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
@@ -227,8 +227,8 @@ TEST_F(ServerImplTest, PublishLocal) {
 
   // publish after send control
   {
-    queue.msgs.emplace_back(net::ClientMessage{net::PublishMsg{
-        pubuid3, "test3", "double", wpi::util::json::object(), {}}});
+    queue.msgs.emplace_back(net::PublishMsg{
+        pubuid3, "test3", "double", wpi::util::json::object(), {}});
     EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
@@ -245,10 +245,10 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
                      wpi::util::json::object(), std::optional<int>{pubuid}));
 
   {
-    queue.msgs.emplace_back(net::ClientMessage{net::PublishMsg{
-        pubuid, "test", "double", wpi::util::json::object(), {}}});
-    queue.msgs.emplace_back(net::ClientMessage{
-        net::ClientValueMsg{pubuid, Value::MakeDouble(1.0, 10)}});
+    queue.msgs.emplace_back(net::PublishMsg{
+        pubuid, "test", "double", wpi::util::json::object(), {}});
+    queue.msgs.emplace_back(
+        net::ClientValueMsg{pubuid, Value::MakeDouble(1.0, 10)});
     EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
@@ -288,10 +288,10 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
   {
     constexpr int subuid = 1;
     std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{net::SubscribeMsg{
+    msgs.emplace_back(net::SubscribeMsg{
         subuid,
         {{""}},
-        PubSubOptions{.topicsOnly = true, .prefixMatch = true}}});
+        PubSubOptions{.topicsOnly = true, .prefixMatch = true}});
     server.ProcessIncomingText(id, EncodeText(msgs));
   }
 
@@ -301,8 +301,7 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
   {
     constexpr int subuid = 2;
     std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{
-        net::SubscribeMsg{subuid, {{"test"}}, PubSubOptions{}}});
+    msgs.emplace_back(net::SubscribeMsg{subuid, {{"test"}}, PubSubOptions{}});
     server.ProcessIncomingText(id, EncodeText(msgs));
   }
 
@@ -327,16 +326,15 @@ TEST_F(ServerImplTest, ClientDisconnectUnpublish) {
   }
 
   {
-    queue.msgs.emplace_back(net::ClientMessage{net::PublishMsg{
-        pubuidLocal, "test2", "double", wpi::util::json::object(), {}}});
-    queue.msgs.emplace_back(net::ClientMessage{
-        net::ClientValueMsg{pubuidLocal, Value::MakeDouble(1.0, 10)}});
+    queue.msgs.emplace_back(net::PublishMsg{
+        pubuidLocal, "test2", "double", wpi::util::json::object(), {}});
+    queue.msgs.emplace_back(
+        net::ClientValueMsg{pubuidLocal, Value::MakeDouble(1.0, 10)});
     EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
   {
-    queue.msgs.emplace_back(
-        net::ClientMessage{net::SubscribeMsg{subuid, {"test"}, {}}});
+    queue.msgs.emplace_back(net::SubscribeMsg{subuid, {"test"}, {}});
     EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
@@ -363,8 +361,8 @@ TEST_F(ServerImplTest, ClientDisconnectUnpublish) {
   {
     constexpr int pubuid = 1;
     std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{net::PublishMsg{
-        pubuid, "test", "double", wpi::util::json::object(), {}}});
+    msgs.emplace_back(net::PublishMsg{
+        pubuid, "test", "double", wpi::util::json::object(), {}});
     server.ProcessIncomingText(id, EncodeText(msgs));
   }
 
@@ -396,12 +394,10 @@ TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {
   }
 
   {
-    queue.msgs.emplace_back(net::ClientMessage{net::PublishMsg{
-        pubuid, "test", "double", wpi::util::json::object(), {}}});
-    queue.msgs.emplace_back(
-        net::ClientMessage{net::ClientValueMsg{pubuid, defaultValue}});
-    queue.msgs.emplace_back(
-        net::ClientMessage{net::SubscribeMsg{subuid, {"test"}, {}}});
+    queue.msgs.emplace_back(net::PublishMsg{
+        pubuid, "test", "double", wpi::util::json::object(), {}});
+    queue.msgs.emplace_back(net::ClientValueMsg{pubuid, defaultValue});
+    queue.msgs.emplace_back(net::SubscribeMsg{subuid, {"test"}, {}});
     EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
@@ -420,11 +416,11 @@ TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {
   {
     constexpr int pubuid2 = 2;
     std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{net::PublishMsg{
-        pubuid2, "test", "double", wpi::util::json::object(), {}}});
+    msgs.emplace_back(net::PublishMsg{
+        pubuid2, "test", "double", wpi::util::json::object(), {}});
     server.ProcessIncomingText(id, EncodeText(msgs));
     msgs.clear();
-    msgs.emplace_back(net::ClientMessage{net::ClientValueMsg{pubuid2, value}});
+    msgs.emplace_back(net::ClientValueMsg{pubuid2, value});
     server.ProcessIncomingBinary(id, EncodeServerBinary(msgs));
   }
 }
@@ -460,10 +456,10 @@ TEST_F(ServerImplTest, ResubscribeShorterPeriodUpdatesTopicOutgoing) {
 
   // Publish topic and initial value so there is a lastValue when the client
   // subscribes.
-  queue.msgs.emplace_back(net::ClientMessage{net::PublishMsg{
-      pubuid, "test", "double", wpi::util::json::object(), {}}});
-  queue.msgs.emplace_back(net::ClientMessage{
-      net::ClientValueMsg{pubuid, Value::MakeDouble(1.0, 50)}});
+  queue.msgs.emplace_back(
+      net::PublishMsg{pubuid, "test", "double", wpi::util::json::object(), {}});
+  queue.msgs.emplace_back(
+      net::ClientValueMsg{pubuid, Value::MakeDouble(1.0, 50)});
   ASSERT_FALSE(server.ProcessLocalMessages(UINT_MAX));
 
   ::testing::NiceMock<net::MockWireConnection> wire;
@@ -488,8 +484,8 @@ TEST_F(ServerImplTest, ResubscribeShorterPeriodUpdatesTopicOutgoing) {
   // queue via the last-value send path.
   {
     std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{net::SubscribeMsg{
-        subuid, {{""}}, PubSubOptions{.periodic = 0.2, .prefixMatch = true}}});
+    msgs.emplace_back(net::SubscribeMsg{
+        subuid, {{""}}, PubSubOptions{.periodic = 0.2, .prefixMatch = true}});
     server.ProcessIncomingText(id, EncodeText(msgs));
   }
 
@@ -506,8 +502,8 @@ TEST_F(ServerImplTest, ResubscribeShorterPeriodUpdatesTopicOutgoing) {
   //             (nextSendMs=200) → value queued there.
   {
     std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{net::SubscribeMsg{
-        subuid, {{""}}, PubSubOptions{.periodic = 0.1, .prefixMatch = true}}});
+    msgs.emplace_back(net::SubscribeMsg{
+        subuid, {{""}}, PubSubOptions{.periodic = 0.1, .prefixMatch = true}});
     server.ProcessIncomingText(id, EncodeText(msgs));
   }
 

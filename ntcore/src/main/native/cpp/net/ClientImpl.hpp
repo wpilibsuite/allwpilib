@@ -31,7 +31,7 @@ class Value;
 
 namespace wpi::nt::net {
 
-struct ClientMessage;
+class ClientMessage;
 class WireConnection;
 
 class ClientImpl final : private ServerMessageHandler {

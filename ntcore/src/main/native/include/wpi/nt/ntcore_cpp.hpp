@@ -7,13 +7,15 @@
 #include <stdint.h>
 
 #include <cassert>
+#include <concepts>
 #include <functional>
+#include <new>
 #include <optional>
 #include <span>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
-#include <variant>
 #include <vector>
 
 #include "wpi/nt/NetworkTableValue.hpp"
@@ -215,29 +217,65 @@ class TimeSyncEventData {
 class Event {
  public:
   Event() = default;
+  Event(const Event& other) : listener{other.listener}, flags{other.flags} {
+    CopyFrom(other);
+  }
+  Event(Event&& other) : listener{other.listener}, flags{other.flags} {
+    MoveFrom(std::move(other));
+  }
+  ~Event() { Clear(); }
+
+  Event& operator=(const Event& other) {
+    if (this != &other) {
+      Clear();
+      listener = other.listener;
+      flags = other.flags;
+      CopyFrom(other);
+    }
+    return *this;
+  }
+
+  Event& operator=(Event&& other) {
+    if (this != &other) {
+      Clear();
+      listener = other.listener;
+      flags = other.flags;
+      MoveFrom(std::move(other));
+    }
+    return *this;
+  }
+
   Event(NT_Listener listener, unsigned int flags, ConnectionInfo info)
-      : listener{listener}, flags{flags}, data{std::move(info)} {}
+      : listener{listener}, flags{flags} {
+    Construct(std::move(info));
+  }
   Event(NT_Listener listener, unsigned int flags, TopicInfo info)
-      : listener{listener}, flags{flags}, data{std::move(info)} {}
+      : listener{listener}, flags{flags} {
+    Construct(std::move(info));
+  }
   Event(NT_Listener listener, unsigned int flags, ValueEventData data)
-      : listener{listener}, flags{flags}, data{std::move(data)} {}
+      : listener{listener}, flags{flags} {
+    Construct(std::move(data));
+  }
   Event(NT_Listener listener, unsigned int flags, LogMessage msg)
-      : listener{listener}, flags{flags}, data{std::move(msg)} {}
+      : listener{listener}, flags{flags} {
+    Construct(std::move(msg));
+  }
   Event(NT_Listener listener, unsigned int flags, NT_Topic topic,
         NT_Handle subentry, Value value)
-      : listener{listener},
-        flags{flags},
-        data{ValueEventData{topic, subentry, std::move(value)}} {}
+      : listener{listener}, flags{flags} {
+    Construct(ValueEventData{topic, subentry, std::move(value)});
+  }
   Event(NT_Listener listener, unsigned int flags, unsigned int level,
         std::string_view filename, unsigned int line, std::string_view message)
-      : listener{listener},
-        flags{flags},
-        data{LogMessage{level, filename, line, message}} {}
+      : listener{listener}, flags{flags} {
+    Construct(LogMessage{level, filename, line, message});
+  }
   Event(NT_Listener listener, unsigned int flags, int64_t serverTimeOffset,
         int64_t rtt2, bool valid)
-      : listener{listener},
-        flags{flags},
-        data{TimeSyncEventData{serverTimeOffset, rtt2, valid}} {}
+      : listener{listener}, flags{flags} {
+    Construct(TimeSyncEventData{serverTimeOffset, rtt2, valid});
+  }
 
   /** Listener that triggered this event. */
   NT_Listener listener{0};
@@ -262,41 +300,141 @@ class Event {
    */
   bool Is(unsigned int kind) const { return (flags & kind) != 0; }
 
-  /** Event data; content depends on flags. */
-  std::variant<ConnectionInfo, TopicInfo, ValueEventData, LogMessage,
-               TimeSyncEventData>
-      data;
-
+  /** Get connection info if included with this event. */
   const ConnectionInfo* GetConnectionInfo() const {
-    return std::get_if<ConnectionInfo>(&data);
+    return HasConnectionInfo(flags) ? &m_storage.connectionInfo : nullptr;
   }
   ConnectionInfo* GetConnectionInfo() {
-    return std::get_if<ConnectionInfo>(&data);
+    return HasConnectionInfo(flags) ? &m_storage.connectionInfo : nullptr;
   }
 
+  /** Get topic info if included with this event. */
   const TopicInfo* GetTopicInfo() const {
-    return std::get_if<TopicInfo>(&data);
+    return HasTopicInfo(flags) ? &m_storage.topicInfo : nullptr;
   }
-  TopicInfo* GetTopicInfo() { return std::get_if<TopicInfo>(&data); }
+  TopicInfo* GetTopicInfo() {
+    return HasTopicInfo(flags) ? &m_storage.topicInfo : nullptr;
+  }
 
+  /** Get value event data if included with this event. */
   const ValueEventData* GetValueEventData() const {
-    return std::get_if<ValueEventData>(&data);
+    return HasValueEventData(flags) ? &m_storage.valueEventData : nullptr;
   }
   ValueEventData* GetValueEventData() {
-    return std::get_if<ValueEventData>(&data);
+    return HasValueEventData(flags) ? &m_storage.valueEventData : nullptr;
   }
 
+  /** Get log message if included with this event. */
   const LogMessage* GetLogMessage() const {
-    return std::get_if<LogMessage>(&data);
+    return HasLogMessage(flags) ? &m_storage.logMessage : nullptr;
   }
-  LogMessage* GetLogMessage() { return std::get_if<LogMessage>(&data); }
+  LogMessage* GetLogMessage() {
+    return HasLogMessage(flags) ? &m_storage.logMessage : nullptr;
+  }
 
+  /** Get time sync event data if included with this event. */
   const TimeSyncEventData* GetTimeSyncEventData() const {
-    return std::get_if<TimeSyncEventData>(&data);
+    return HasTimeSyncEventData(flags) ? &m_storage.timeSyncEventData : nullptr;
   }
   TimeSyncEventData* GetTimeSyncEventData() {
-    return std::get_if<TimeSyncEventData>(&data);
+    return HasTimeSyncEventData(flags) ? &m_storage.timeSyncEventData : nullptr;
   }
+
+ private:
+  static bool HasConnectionInfo(unsigned int flags) {
+    return (flags & EventFlags::CONNECTION) != 0;
+  }
+  static bool HasTopicInfo(unsigned int flags) {
+    return (flags & EventFlags::TOPIC) != 0;
+  }
+  static bool HasValueEventData(unsigned int flags) {
+    return (flags & EventFlags::VALUE_ALL) != 0;
+  }
+  static bool HasLogMessage(unsigned int flags) {
+    return (flags & EventFlags::LOG_MESSAGE) != 0;
+  }
+  static bool HasTimeSyncEventData(unsigned int flags) {
+    return (flags & EventFlags::TIME_SYNC) != 0;
+  }
+
+  template <typename T>
+  void Construct(T&& data) {
+    using U = std::remove_cvref_t<T>;
+
+    if constexpr (std::same_as<U, ConnectionInfo>) {
+      assert(HasConnectionInfo(flags));
+      new (&m_storage.connectionInfo) ConnectionInfo{std::forward<T>(data)};
+    } else if constexpr (std::same_as<U, TopicInfo>) {
+      assert(HasTopicInfo(flags));
+      new (&m_storage.topicInfo) TopicInfo{std::forward<T>(data)};
+    } else if constexpr (std::same_as<U, ValueEventData>) {
+      assert(HasValueEventData(flags));
+      new (&m_storage.valueEventData) ValueEventData{std::forward<T>(data)};
+    } else if constexpr (std::same_as<U, LogMessage>) {
+      assert(HasLogMessage(flags));
+      new (&m_storage.logMessage) LogMessage{std::forward<T>(data)};
+    } else if constexpr (std::same_as<U, TimeSyncEventData>) {
+      assert(HasTimeSyncEventData(flags));
+      new (&m_storage.timeSyncEventData)
+          TimeSyncEventData{std::forward<T>(data)};
+    } else {
+      static_assert(std::same_as<U, void>, "unsupported event data type");
+    }
+  }
+
+  void Clear() {
+    if (HasConnectionInfo(flags)) {
+      m_storage.connectionInfo.~ConnectionInfo();
+    } else if (HasTopicInfo(flags)) {
+      m_storage.topicInfo.~TopicInfo();
+    } else if (HasValueEventData(flags)) {
+      m_storage.valueEventData.~ValueEventData();
+    } else if (HasLogMessage(flags)) {
+      m_storage.logMessage.~LogMessage();
+    } else if (HasTimeSyncEventData(flags)) {
+      m_storage.timeSyncEventData.~TimeSyncEventData();
+    }
+    flags = 0;
+  }
+
+  void CopyFrom(const Event& other) {
+    if (HasConnectionInfo(other.flags)) {
+      Construct(other.m_storage.connectionInfo);
+    } else if (HasTopicInfo(other.flags)) {
+      Construct(other.m_storage.topicInfo);
+    } else if (HasValueEventData(other.flags)) {
+      Construct(other.m_storage.valueEventData);
+    } else if (HasLogMessage(other.flags)) {
+      Construct(other.m_storage.logMessage);
+    } else if (HasTimeSyncEventData(other.flags)) {
+      Construct(other.m_storage.timeSyncEventData);
+    }
+  }
+
+  void MoveFrom(Event&& other) {
+    if (HasConnectionInfo(other.flags)) {
+      Construct(std::move(other.m_storage.connectionInfo));
+    } else if (HasTopicInfo(other.flags)) {
+      Construct(std::move(other.m_storage.topicInfo));
+    } else if (HasValueEventData(other.flags)) {
+      Construct(std::move(other.m_storage.valueEventData));
+    } else if (HasLogMessage(other.flags)) {
+      Construct(std::move(other.m_storage.logMessage));
+    } else if (HasTimeSyncEventData(other.flags)) {
+      Construct(std::move(other.m_storage.timeSyncEventData));
+    }
+  }
+
+  union Storage {
+    Storage() {}
+    ~Storage() {}
+
+    ConnectionInfo connectionInfo;
+    TopicInfo topicInfo;
+    ValueEventData valueEventData;
+    LogMessage logMessage;
+    TimeSyncEventData timeSyncEventData;
+  } m_storage;
 };
 
 /** NetworkTables publish/subscribe options. */

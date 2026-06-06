@@ -130,15 +130,15 @@ void wpi::nt::net::WireEncodeUnsubscribe(wpi::util::raw_ostream& os,
 
 bool wpi::nt::net::WireEncodeText(wpi::util::raw_ostream& os,
                                   const ClientMessage& msg) {
-  if (auto m = std::get_if<PublishMsg>(&msg.contents)) {
+  if (auto m = msg.GetPublish()) {
     WireEncodePublish(os, m->pubuid, m->name, m->typeStr, m->properties);
-  } else if (auto m = std::get_if<UnpublishMsg>(&msg.contents)) {
+  } else if (auto m = msg.GetUnpublish()) {
     WireEncodeUnpublish(os, m->pubuid);
-  } else if (auto m = std::get_if<SetPropertiesMsg>(&msg.contents)) {
+  } else if (auto m = msg.GetSetProperties()) {
     WireEncodeSetProperties(os, m->name, m->update);
-  } else if (auto m = std::get_if<SubscribeMsg>(&msg.contents)) {
+  } else if (auto m = msg.GetSubscribe()) {
     WireEncodeSubscribe(os, m->subuid, m->topicNames, m->options);
-  } else if (auto m = std::get_if<UnsubscribeMsg>(&msg.contents)) {
+  } else if (auto m = msg.GetUnsubscribe()) {
     WireEncodeUnsubscribe(os, m->subuid);
   } else {
     return false;
@@ -195,12 +195,12 @@ void wpi::nt::net::WireEncodePropertiesUpdate(wpi::util::raw_ostream& os,
 
 bool wpi::nt::net::WireEncodeText(wpi::util::raw_ostream& os,
                                   const ServerMessage& msg) {
-  if (auto m = std::get_if<AnnounceMsg>(&msg.contents)) {
+  if (auto m = msg.GetAnnounce()) {
     WireEncodeAnnounce(os, m->name, m->id, m->typeStr, m->properties,
                        m->pubuid);
-  } else if (auto m = std::get_if<UnannounceMsg>(&msg.contents)) {
+  } else if (auto m = msg.GetUnannounce()) {
     WireEncodeUnannounce(os, m->name, m->id);
-  } else if (auto m = std::get_if<PropertiesUpdateMsg>(&msg.contents)) {
+  } else if (auto m = msg.GetPropertiesUpdate()) {
     WireEncodePropertiesUpdate(os, m->name, m->update, m->ack);
   } else {
     return false;

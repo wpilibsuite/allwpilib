@@ -214,21 +214,21 @@ bool ServerClient4Base::DoProcessIncomingMessages(
   bool updatesub = false;
   for (const auto& elem : msgs) {  // NOLINT
     // common case is value, so check that first
-    if (auto msg = std::get_if<net::ClientValueMsg>(&elem.contents)) {
+    if (auto msg = elem.GetValue()) {
       ClientSetValue(msg->pubuid, msg->value);
-    } else if (auto msg = std::get_if<net::PublishMsg>(&elem.contents)) {
+    } else if (auto msg = elem.GetPublish()) {
       ClientPublish(msg->pubuid, msg->name, msg->typeStr, msg->properties,
                     msg->options);
       updatepub = true;
-    } else if (auto msg = std::get_if<net::UnpublishMsg>(&elem.contents)) {
+    } else if (auto msg = elem.GetUnpublish()) {
       ClientUnpublish(msg->pubuid);
       updatepub = true;
-    } else if (auto msg = std::get_if<net::SetPropertiesMsg>(&elem.contents)) {
+    } else if (auto msg = elem.GetSetProperties()) {
       ClientSetProperties(msg->name, msg->update);
-    } else if (auto msg = std::get_if<net::SubscribeMsg>(&elem.contents)) {
+    } else if (auto msg = elem.GetSubscribe()) {
       ClientSubscribe(msg->subuid, msg->topicNames, msg->options);
       updatesub = true;
-    } else if (auto msg = std::get_if<net::UnsubscribeMsg>(&elem.contents)) {
+    } else if (auto msg = elem.GetUnsubscribe()) {
       ClientUnsubscribe(msg->subuid);
       updatesub = true;
     }

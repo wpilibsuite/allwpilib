@@ -49,7 +49,8 @@ class ClientMessageQueueImpl final : public ClientMessageHandler,
         break;
       }
       if constexpr (MaxValueSize != 0) {
-        if (auto* val = std::get_if<ClientValueMsg>(&msg.contents)) {
+        const auto& constMsg = msg;
+        if (auto* val = constMsg.GetValue()) {
           m_valueSize.size -= sizeof(ClientMessage) + val->value.size();
           m_valueSize.errored = false;
         }
@@ -76,31 +77,31 @@ class ClientMessageQueueImpl final : public ClientMessageHandler,
                      const wpi::util::json& properties,
                      const PubSubOptionsImpl& options) final {
     std::scoped_lock lock{m_mutex};
-    m_queue.enqueue(ClientMessage{PublishMsg{
-        pubuid, std::string{name}, std::string{typeStr}, properties, options}});
+    m_queue.enqueue(PublishMsg{pubuid, std::string{name}, std::string{typeStr},
+                               properties, options});
   }
 
   void ClientUnpublish(int pubuid) final {
     std::scoped_lock lock{m_mutex};
-    m_queue.enqueue(ClientMessage{UnpublishMsg{pubuid}});
+    m_queue.enqueue(UnpublishMsg{pubuid});
   }
 
   void ClientSetProperties(std::string_view name,
                            const wpi::util::json& update) final {
     std::scoped_lock lock{m_mutex};
-    m_queue.enqueue(ClientMessage{SetPropertiesMsg{std::string{name}, update}});
+    m_queue.enqueue(SetPropertiesMsg{std::string{name}, update});
   }
 
   void ClientSubscribe(int subuid, std::span<const std::string> topicNames,
                        const PubSubOptionsImpl& options) final {
     std::scoped_lock lock{m_mutex};
-    m_queue.enqueue(ClientMessage{
-        SubscribeMsg{subuid, {topicNames.begin(), topicNames.end()}, options}});
+    m_queue.enqueue(
+        SubscribeMsg{subuid, {topicNames.begin(), topicNames.end()}, options});
   }
 
   void ClientUnsubscribe(int subuid) final {
     std::scoped_lock lock{m_mutex};
-    m_queue.enqueue(ClientMessage{UnsubscribeMsg{subuid}});
+    m_queue.enqueue(UnsubscribeMsg{subuid});
   }
 
   void ClientSetValue(int pubuid, const Value& value) final {
@@ -116,7 +117,7 @@ class ClientMessageQueueImpl final : public ClientMessageHandler,
       }
       m_valueSize.size += addedSize;
     }
-    m_queue.enqueue(ClientMessage{ClientValueMsg{pubuid, value}});
+    m_queue.enqueue(ClientValueMsg{pubuid, value});
   }
 
  private:
