@@ -1,8 +1,0 @@
-classes:
-  wpi::math::DoubleFollowerWheelOdometry:
-    force_no_trampoline: true
-    methods:
-      DoubleFollowerWheelOdometry:
-      ResetPosition:
-      Update:
-      ToChassisVelocities:

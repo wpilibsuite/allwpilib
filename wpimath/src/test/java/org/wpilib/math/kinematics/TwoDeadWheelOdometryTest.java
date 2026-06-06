@@ -6,34 +6,24 @@ package org.wpilib.math.kinematics;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 
-class ThreeDeadWheelOdometryTest {
-  private static final double m_xWheel1YPos = 1;
-  private static final double m_xWheel2YPos = -1;
+class TwoDeadWheelOdometryTest {
+  private static final double m_xWheelYPos = 1;
   private static final double m_yWheelXPos = 1;
 
-  private final ThreeDeadWheelPositions zero = new ThreeDeadWheelPositions();
+  private final TwoDeadWheelPositions zero = new TwoDeadWheelPositions();
 
-  private final ThreeDeadWheelOdometry m_odometry =
-      new ThreeDeadWheelOdometry(
-          m_xWheel1YPos, m_xWheel2YPos, m_yWheelXPos, Rotation2d.kZero, zero, Pose2d.kZero);
-
-  @Test
-  void testThrowOnInvalidXWheelSetup() {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> new ThreeDeadWheelOdometry(0, 0, 1, Rotation2d.kZero, zero, Pose2d.kZero));
-  }
+  private final TwoDeadWheelOdometry m_odometry =
+      new TwoDeadWheelOdometry(m_xWheelYPos, m_yWheelXPos, Rotation2d.kZero, zero);
 
   @Test
   void testMultipleConsecutiveUpdates() {
-    var wheelPositions = new ThreeDeadWheelPositions(1, 1, 1);
+    var wheelPositions = new TwoDeadWheelPositions(1, 1);
 
     m_odometry.resetPosition(Rotation2d.kZero, wheelPositions, Pose2d.kZero);
 
@@ -48,10 +38,10 @@ class ThreeDeadWheelOdometryTest {
 
   @Test
   void testTwoIterations() {
-    final var wheelPositions = new ThreeDeadWheelPositions(0.1, 0.1, 0);
-    m_odometry.resetPosition(Rotation2d.kZero, new ThreeDeadWheelPositions(), Pose2d.kZero);
+    final var wheelPositions = new TwoDeadWheelPositions(0.1, 0);
+    m_odometry.resetPosition(Rotation2d.kZero, new TwoDeadWheelPositions(), Pose2d.kZero);
 
-    m_odometry.update(Rotation2d.kZero, new ThreeDeadWheelPositions());
+    m_odometry.update(Rotation2d.kZero, new TwoDeadWheelPositions());
     final var pose = m_odometry.update(Rotation2d.kZero, wheelPositions);
 
     assertAll(
@@ -65,10 +55,11 @@ class ThreeDeadWheelOdometryTest {
     var gyro = Rotation2d.kCCW_Pi_2;
     var fieldAngle = Rotation2d.kZero;
     m_odometry.resetPosition(
-        gyro, new ThreeDeadWheelPositions(), new Pose2d(Translation2d.kZero, fieldAngle));
-    var positions = new ThreeDeadWheelPositions(1, 1, 0);
-    m_odometry.update(gyro, new ThreeDeadWheelPositions());
+        gyro, new TwoDeadWheelPositions(), new Pose2d(Translation2d.kZero, fieldAngle));
+    var positions = new TwoDeadWheelPositions(1, 0);
+    m_odometry.update(gyro, new TwoDeadWheelPositions());
     var pose = m_odometry.update(gyro, positions);
+
     assertAll(
         () -> assertEquals(1, pose.getX(), 0.1),
         () -> assertEquals(0.0, pose.getY(), 0.1),
@@ -77,7 +68,7 @@ class ThreeDeadWheelOdometryTest {
 
   @Test
   void testStraightForwardsForwardKinematics() {
-    var wheelVelocities = m_odometry.toChassisVelocities(5, 5, 0);
+    var wheelVelocities = m_odometry.toChassisVelocities(0, 5, 0);
 
     assertAll(
         () -> assertEquals(5.0, wheelVelocities.vx, 0.1),
@@ -97,12 +88,12 @@ class ThreeDeadWheelOdometryTest {
 
   @Test
   void testSpinInPlaceForwardKinematics() {
-    var wheelVelocities = m_odometry.toChassisVelocities(5, -5, -5);
+    var wheelVelocities = m_odometry.toChassisVelocities(5, -5, 5);
 
     assertAll(
         () -> assertEquals(0.0, wheelVelocities.vx, 0.1),
         () -> assertEquals(0.0, wheelVelocities.vy, 0.1),
-        () -> assertEquals(-5.0, wheelVelocities.omega, 0.1));
+        () -> assertEquals(5.0, wheelVelocities.omega, 0.1));
   }
 
   @Test
@@ -110,8 +101,8 @@ class ThreeDeadWheelOdometryTest {
     var wheelVelocities = m_odometry.toChassisVelocities(5, 1, -1);
 
     assertAll(
-        () -> assertEquals(3.0, wheelVelocities.vx, 0.1),
-        () -> assertEquals(1.0, wheelVelocities.vy, 0.1),
-        () -> assertEquals(-2.0, wheelVelocities.omega, 0.1));
+        () -> assertEquals(6.0, wheelVelocities.vx, 0.1),
+        () -> assertEquals(-6.0, wheelVelocities.vy, 0.1),
+        () -> assertEquals(5.0, wheelVelocities.omega, 0.1));
   }
 }

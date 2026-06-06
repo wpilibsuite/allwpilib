@@ -1,0 +1,7 @@
+classes:
+  wpi::math::ThreeDeadWheelOdometry3d:
+    methods:
+      ThreeDeadWheelOdometry3d:
+      ResetPosition:
+      Update:
+      ToChassisVelocities:

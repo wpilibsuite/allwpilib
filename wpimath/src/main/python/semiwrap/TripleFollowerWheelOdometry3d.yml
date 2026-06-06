@@ -1,7 +1,0 @@
-classes:
-  wpi::math::TripleFollowerWheelOdometry3d:
-    methods:
-      TripleFollowerWheelOdometry3d:
-      ResetPosition:
-      Update:
-      ToChassisVelocities:

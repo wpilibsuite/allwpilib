@@ -1,9 +1,9 @@
 extra_includes:
-- wpi/math/kinematics/DoubleFollowerWheelPositions.hpp
+- wpi/math/kinematics/TwoDeadWheelPositions.hpp
 - wpi/math/kinematics/DifferentialDriveWheelPositions.hpp
 - wpi/math/kinematics/MecanumDriveWheelPositions.hpp
 - wpi/math/kinematics/SwerveModulePosition.hpp
-- wpi/math/kinematics/TripleFollowerWheelPositions.hpp
+- wpi/math/kinematics/ThreeDeadWheelPositions.hpp
 
 classes:
   wpi::math::Odometry3d:
@@ -26,10 +26,10 @@ classes:
 
 
 templates:
-  DoubleFollowerWheelOdometry3dBase:
+  TwoDeadWheelOdometry3dBase:
     qualname: wpi::math::Odometry3d
     params:
-    - wpi::math::DoubleFollowerWheelPositions
+    - wpi::math::TwoDeadWheelPositions
   DifferentialDriveOdometry3dBase:
     qualname: wpi::math::Odometry3d
     params:
@@ -54,7 +54,7 @@ templates:
     qualname: wpi::math::Odometry3d
     params:
     - wpi::util::array<wpi::math::SwerveModulePosition,6>
-  TripleFollowerWheelOdometry3dBase:
+  ThreeDeadWheelOdometry3dBase:
     qualname: wpi::math::Odometry3d
     params:
-    - wpi::math::TripleFollowerWheelPositions
+    - wpi::math::ThreeDeadWheelPositions

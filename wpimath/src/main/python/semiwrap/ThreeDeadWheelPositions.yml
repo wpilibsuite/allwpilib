@@ -1,0 +1,13 @@
+classes:
+  wpi::math::ThreeDeadWheelPositions:
+    attributes:
+      x1:
+      x2:
+      y:
+    methods:
+      ThreeDeadWheelPositions:
+        overloads:
+          "":
+          wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t:
+      operator==:
+      Interpolate:

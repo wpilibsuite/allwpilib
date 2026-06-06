@@ -2,8 +2,8 @@ extra_includes:
 - wpi/math/kinematics/DifferentialDriveWheelPositions.hpp
 - wpi/math/kinematics/MecanumDriveWheelPositions.hpp
 - wpi/math/kinematics/SwerveModulePosition.hpp
-- wpi/math/kinematics/DoubleFollowerWheelPositions.hpp
-- wpi/math/kinematics/TripleFollowerWheelPositions.hpp
+- wpi/math/kinematics/TwoDeadWheelPositions.hpp
+- wpi/math/kinematics/ThreeDeadWheelPositions.hpp
 
 
 classes:
@@ -52,11 +52,11 @@ templates:
     qualname: wpi::math::PoseEstimator
     params:
     - wpi::util::array<wpi::math::SwerveModulePosition,6>
-  DoubleFollowerWheelPoseEstimatorBase:
+  TwoDeadWheelPoseEstimatorBase:
     qualname: wpi::math::PoseEstimator
     params:
-    - wpi::math::DoubleFollowerWheelPositions
-  TripleFollowerWheelPoseEstimatorBase:
+    - wpi::math::TwoDeadWheelPositions
+  ThreeDeadWheelPoseEstimatorBase:
     qualname: wpi::math::PoseEstimator
     params:
-    - wpi::math::TripleFollowerWheelPositions
+    - wpi::math::ThreeDeadWheelPositions

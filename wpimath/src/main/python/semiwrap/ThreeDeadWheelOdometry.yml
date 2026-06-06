@@ -1,0 +1,13 @@
+classes:
+  wpi::math::ThreeDeadWheelOdometry:
+    methods:
+      ThreeDeadWheelOdometry:
+      ResetPosition:
+        overloads:
+          const Rotation2d&, wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, const Pose2d&:
+          const Rotation2d&, const ThreeDeadWheelPositions&, const Pose2d&:
+      Update:
+        overloads:
+          const Rotation2d&, wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t:
+          const Rotation2d&, const ThreeDeadWheelPositions&:
+      ToChassisVelocities:
