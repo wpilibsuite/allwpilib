@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: jfrog/setup-jfrog-cli@v4
+      - uses: jfrog/setup-jfrog-cli@v5
         env:
           JF_ENV_1: ${{ secrets.ARTIFACTORY_CLI_SECRET }}
       - name: Cleanup
@@ -26,7 +26,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: jfrog/setup-jfrog-cli@v4
+      - uses: jfrog/setup-jfrog-cli@v5
         env:
           JF_ENV_1: ${{ secrets.ARTIFACTORY_CLI_SECRET }}
       - name: Cleanup
