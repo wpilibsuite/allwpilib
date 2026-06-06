@@ -8,12 +8,12 @@ classes:
     ignored_bases:
     - wpi::util::SendableHelper<XboxController>
     attributes:
-      kTouchpadCount:
-      kSupportsRumble:
-      kSupportsTriggerRumble:
-      kSupportsMonoLed:
-      kSupportsRgbLed:
-      kSupportedOutputs:
+      TOUCHPAD_COUNT:
+      SUPPORTS_RUMBLE:
+      SUPPORTS_TRIGGER_RUMBLE:
+      SUPPORTS_MONO_LED:
+      SUPPORTS_RGB_LED:
+      SUPPORTED_OUTPUTS:
     methods:
       XboxController:
       GetHID:
@@ -26,8 +26,6 @@ classes:
       GetLeftY:
       GetRightX:
       GetRightY:
-      GetLeftTriggerAxis:
-      GetRightTriggerAxis:
       GetAxis:
       AxisLessThan:
       AxisGreaterThan:
@@ -99,28 +97,30 @@ classes:
       SetLeds:
       SetRumble:
       InitSendable:
+      GetLeftTrigger:
+      GetRightTrigger:
   wpi::XboxController::Button:
     attributes:
-      kA:
-      kB:
-      kX:
-      kY:
-      kView:
-      kXbox:
-      kMenu:
-      kLeftStick:
-      kRightStick:
-      kLeftBumper:
-      kRightBumper:
-      kDpadUp:
-      kDpadDown:
-      kDpadLeft:
-      kDpadRight:
+      A:
+      B:
+      X:
+      Y:
+      VIEW:
+      XBOX:
+      MENU:
+      LEFT_STICK:
+      RIGHT_STICK:
+      LEFT_BUMPER:
+      RIGHT_BUMPER:
+      DPAD_UP:
+      DPAD_DOWN:
+      DPAD_LEFT:
+      DPAD_RIGHT:
   wpi::XboxController::Axis:
     attributes:
-      kLeftX:
-      kLeftY:
-      kRightX:
-      kRightY:
-      kLeftTriggerAxis:
-      kRightTriggerAxis:
+      LEFT_X:
+      LEFT_Y:
+      RIGHT_X:
+      RIGHT_Y:
+      LEFT_TRIGGER:
+      RIGHT_TRIGGER:
