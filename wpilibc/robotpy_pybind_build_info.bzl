@@ -235,15 +235,15 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "LogitechF310Controller",
-            yml_file = "semiwrap/LogitechF310Controller.yml",
+            class_name = "DualSenseController",
+            yml_file = "semiwrap/DualSenseController.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/LogitechF310Controller.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/DualSenseController.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::LogitechF310Controller", "wpi__LogitechF310Controller.hpp"),
-                ("wpi::LogitechF310Controller::Button", "wpi__LogitechF310Controller__Button.hpp"),
-                ("wpi::LogitechF310Controller::Axis", "wpi__LogitechF310Controller__Axis.hpp"),
+                ("wpi::DualSenseController", "wpi__DualSenseController.hpp"),
+                ("wpi::DualSenseController::Button", "wpi__DualSenseController__Button.hpp"),
+                ("wpi::DualSenseController::Axis", "wpi__DualSenseController__Axis.hpp"),
             ],
         ),
         struct(
@@ -259,15 +259,15 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "DualSenseController",
-            yml_file = "semiwrap/DualSenseController.yml",
+            class_name = "LogitechF310Controller",
+            yml_file = "semiwrap/LogitechF310Controller.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/DualSenseController.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/LogitechF310Controller.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::DualSenseController", "wpi__DualSenseController.hpp"),
-                ("wpi::DualSenseController::Button", "wpi__DualSenseController__Button.hpp"),
-                ("wpi::DualSenseController::Axis", "wpi__DualSenseController__Axis.hpp"),
+                ("wpi::LogitechF310Controller", "wpi__LogitechF310Controller.hpp"),
+                ("wpi::LogitechF310Controller::Button", "wpi__LogitechF310Controller__Button.hpp"),
+                ("wpi::LogitechF310Controller::Axis", "wpi__LogitechF310Controller__Axis.hpp"),
             ],
         ),
         struct(
@@ -1574,13 +1574,13 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             ],
         ),
         struct(
-            class_name = "LogitechF310ControllerSim",
-            yml_file = "semiwrap/simulation/LogitechF310ControllerSim.yml",
+            class_name = "DualSenseControllerSim",
+            yml_file = "semiwrap/simulation/DualSenseControllerSim.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/LogitechF310ControllerSim.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/DualSenseControllerSim.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::sim::LogitechF310ControllerSim", "wpi__sim__LogitechF310ControllerSim.hpp"),
+                ("wpi::sim::DualSenseControllerSim", "wpi__sim__DualSenseControllerSim.hpp"),
             ],
         ),
         struct(
@@ -1594,13 +1594,13 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             ],
         ),
         struct(
-            class_name = "DualSenseControllerSim",
-            yml_file = "semiwrap/simulation/DualSenseControllerSim.yml",
+            class_name = "LogitechF310ControllerSim",
+            yml_file = "semiwrap/simulation/LogitechF310ControllerSim.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/DualSenseControllerSim.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/LogitechF310ControllerSim.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::sim::DualSenseControllerSim", "wpi__sim__DualSenseControllerSim.hpp"),
+                ("wpi::sim::LogitechF310ControllerSim", "wpi__sim__LogitechF310ControllerSim.hpp"),
             ],
         ),
         struct(
