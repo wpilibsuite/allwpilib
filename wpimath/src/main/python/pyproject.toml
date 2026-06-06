@@ -1492,8 +1492,6 @@ PoseEstimator = "wpi/math/estimator/PoseEstimator.hpp"
 PoseEstimator3d = "wpi/math/estimator/PoseEstimator3d.hpp"
 SwerveDrivePoseEstimator = "wpi/math/estimator/SwerveDrivePoseEstimator.hpp"
 SwerveDrivePoseEstimator3d = "wpi/math/estimator/SwerveDrivePoseEstimator3d.hpp"
-TripleFollowerWheelPoseEstimator = "wpi/math/estimator/TripleFollowerWheelPoseEstimator.hpp"
-TripleFollowerWheelPoseEstimator3d = "wpi/math/estimator/TripleFollowerWheelPoseEstimator3d.hpp"
 # UnscentedKalmanFilter = "wpi/math/estimator/UnscentedKalmanFilter.hpp"
 # UnscentedTransform = "wpi/math/estimator/UnscentedTransform.hpp"
 
@@ -1551,9 +1549,6 @@ SwerveDriveOdometry3d = "wpi/math/kinematics/SwerveDriveOdometry3d.hpp"
 SwerveModulePosition = "wpi/math/kinematics/SwerveModulePosition.hpp"
 SwerveModuleVelocity = "wpi/math/kinematics/SwerveModuleVelocity.hpp"
 SwerveModuleAcceleration = "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
-TripleFollowerWheelOdometry = "wpi/math/kinematics/TripleFollowerWheelOdometry.hpp"
-TripleFollowerWheelOdometry3d = "wpi/math/kinematics/TripleFollowerWheelOdometry3d.hpp"
-TripleFollowerWheelPositions = "wpi/math/kinematics/TripleFollowerWheelPositions.hpp"
 
 
 # wpi/math/optimization

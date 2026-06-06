@@ -779,7 +779,6 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
                 ("Odometry_tmpl5", "SwerveDrive4OdometryBase"),
                 ("Odometry_tmpl6", "SwerveDrive6OdometryBase"),
                 ("Odometry_tmpl7", "TwoDeadWheelOdometryBase"),
-                ("Odometry_tmpl8", "TripleFollowerWheelOdometryBase"),
             ],
             trampolines = [
                 ("wpi::math::Odometry", "wpi__math__Odometry.hpp"),
@@ -798,7 +797,6 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
                 ("Odometry3d_tmpl5", "SwerveDrive3Odometry3dBase"),
                 ("Odometry3d_tmpl6", "SwerveDrive4Odometry3dBase"),
                 ("Odometry3d_tmpl7", "SwerveDrive6Odometry3dBase"),
-                ("Odometry3d_tmpl8", "TripleFollowerWheelOdometry3dBase"),
             ],
             trampolines = [
                 ("wpi::math::Odometry3d", "wpi__math__Odometry3d.hpp"),
@@ -877,36 +875,6 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::math::SwerveModuleAcceleration", "wpi__math__SwerveModuleAcceleration.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "TripleFollowerWheelOdometry",
-            yml_file = "semiwrap/TripleFollowerWheelOdometry.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/TripleFollowerWheelOdometry.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::TripleFollowerWheelOdometry", "wpi__math__TripleFollowerWheelOdometry.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "TripleFollowerWheelOdometry3d",
-            yml_file = "semiwrap/TripleFollowerWheelOdometry3d.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/TripleFollowerWheelOdometry3d.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::TripleFollowerWheelOdometry3d", "wpi__math__TripleFollowerWheelOdometry3d.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "TripleFollowerWheelPositions",
-            yml_file = "semiwrap/TripleFollowerWheelPositions.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/TripleFollowerWheelPositions.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::TripleFollowerWheelPositions", "wpi__math__TripleFollowerWheelPositions.hpp"),
             ],
         ),
         struct(
