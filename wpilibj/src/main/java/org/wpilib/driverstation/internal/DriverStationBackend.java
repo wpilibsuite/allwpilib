@@ -571,8 +571,45 @@ public final class DriverStationBackend {
         }
       }
     }
-    DriverStationJNI.sendError(
-        isError, code, false, error, locString, traceString.toString(), true);
+    DriverStationJNI.sendError(isError, code, error, locString, traceString.toString(), true);
+  }
+
+  /**
+   * Report crash to Driver Station. Appends provided stack trace to crash message.
+   *
+   * @param error The error message
+   * @param stackTrace The stack trace to append
+   */
+  public static void reportCrash(String error, StackTraceElement[] stackTrace) {
+    reportCrashImpl(error, stackTrace, 0);
+  }
+
+  private static void reportCrashImpl(
+      String error, StackTraceElement[] stackTrace, int stackTraceFirst) {
+    String locString;
+    if (stackTrace.length >= stackTraceFirst + 1) {
+      locString = stackTrace[stackTraceFirst].toString();
+    } else {
+      locString = "";
+    }
+    StringBuilder traceString = new StringBuilder();
+    boolean haveLoc = false;
+    for (int i = stackTraceFirst; i < stackTrace.length; i++) {
+      String loc = stackTrace[i].toString();
+      traceString.append("\tat ").append(loc).append('\n');
+      // get first user function
+      if (!haveLoc && !loc.startsWith("org.wpilib")) {
+        locString = loc;
+        haveLoc = true;
+      }
+    }
+    DriverStationJNI.sendProgramCrash(error, locString, traceString.toString());
+    // Sleep to ensure message is sent before crash
+    try {
+      Thread.sleep(100);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
   }
 
   /**

@@ -4,49 +4,6 @@ include(SubDirList)
 include(CompileWarnings)
 include(AddTest)
 
-if(WITH_JAVA)
-    include(UseJava)
-
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
-    add_jar(
-        xrpVendordep_jar
-        ${JAVA_SOURCES}
-        INCLUDE_JARS
-            hal_jar
-            ntcore_jar
-            cscore_jar
-            cameraserver_jar
-            wpimath_jar
-            wpiunits_jar
-            wpiutil_jar
-            wpilibj_jar
-        OUTPUT_NAME xrpVendordep
-        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
-    )
-    set_property(TARGET xrpVendordep_jar PROPERTY FOLDER "java")
-
-    install_jar(xrpVendordep_jar DESTINATION ${java_lib_dest})
-    install_jar_exports(
-        TARGETS xrpVendordep_jar
-        FILE xrpVendordep_jar.cmake
-        DESTINATION share/xrpVendordep
-    )
-endif()
-
-if(WITH_JAVA_SOURCE)
-    include(UseJava)
-    include(CreateSourceJar)
-    add_source_jar(
-        xrpVendordep_src_jar
-        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
-        OUTPUT_NAME xrpVendordep-sources
-        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
-    )
-    set_property(TARGET xrpVendordep_src_jar PROPERTY FOLDER "java")
-
-    install_jar(xrpVendordep_src_jar DESTINATION ${java_lib_dest})
-endif()
-
 file(GLOB_RECURSE xrpVendordep_native_src src/main/native/cpp/*.cpp)
 add_library(xrpVendordep ${xrpVendordep_native_src})
 set_target_properties(xrpVendordep PROPERTIES DEBUG_POSTFIX "d")
