@@ -169,7 +169,7 @@ def main():
     parser.add_argument(
         "--test_output_directory",
         help="Optional. If set, will output generated tests to this directory",
-        default=dirname / "src/test",
+        default=dirname / "src/generated/test",
         type=Path,
     )
     args = parser.parse_args()

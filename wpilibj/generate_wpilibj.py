@@ -26,7 +26,7 @@ def main():
     parser.add_argument(
         "--test_output_directory",
         help="Optional. If set, will output generated tests to this directory",
-        default=os.path.join(dirname, "src/test"),
+        default=os.path.join(dirname, "src/generated/test"),
         type=Path,
     )
     args = parser.parse_args()

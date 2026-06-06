@@ -118,7 +118,10 @@ pkg_files(
 
 wpilib_java_junit5_test(
     name = "wpilibj-java-test",
-    srcs = glob(["src/test/java/**/*.java"]),
+    srcs = glob([
+        "src/generated/test/java/**/*.java",
+        "src/test/java/**/*.java",
+    ]),
     resource_strip_prefix = "wpilibj/src/test/resources",
     resources = glob(["src/test/resources/**"]),
     deps = [

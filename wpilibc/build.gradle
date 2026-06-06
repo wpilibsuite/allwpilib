@@ -186,7 +186,7 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/test/native/cpp'
+                        srcDirs 'src/test/native/cpp', 'src/generated/test/native/cpp'
                         include '**/*.cpp'
                     }
                     exportedHeaders {

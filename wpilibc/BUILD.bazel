@@ -189,7 +189,10 @@ cc_library(
 cc_test(
     name = "wpilibc-test",
     size = "small",
-    srcs = glob(["src/test/native/cpp/**"]),
+    srcs = glob([
+        "src/generated/test/native/cpp/**",
+        "src/test/native/cpp/**",
+    ]),
     tags = [
         "no-tsan",
         "no-ubsan",
