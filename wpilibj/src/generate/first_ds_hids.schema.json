@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
-  "$id": "https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/wpilibj/src/generate/new_ds_hids.schema.json",
-  "title": "A schema for defining new Driver Station HIDs with JSON",
+  "$id": "https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/wpilibj/src/generate/first_ds_hids.schema.json",
+  "title": "A schema for defining FIRST Driver Station HIDs with JSON",
   "type": "array",
   "items": {
     "type": "object",

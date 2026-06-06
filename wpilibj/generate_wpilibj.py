@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 from wpilibj.generate_hids import generate_hids
-from wpilibj.generate_new_ds_hids import generate_new_ds_hids
+from wpilibj.generate_first_ds_hids import generate_first_ds_hids
 from wpilibj.generate_pwm_motor_controllers import generate_pwm_motor_controllers
 
 
@@ -37,7 +37,7 @@ def main():
         if args.test_output_directory.name == "__none__"
         else args.test_output_directory
     )
-    generate_new_ds_hids(
+    generate_first_ds_hids(
         args.output_directory, args.template_root, test_output_directory
     )
     generate_pwm_motor_controllers(args.output_directory, args.template_root)

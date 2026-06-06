@@ -106,45 +106,77 @@ def _normalize_controller(controller: dict):
     return normalized
 
 
-def generate_new_ds_hids(
+def generate_first_ds_hids(
     output_directory: Path,
     template_directory: Path,
+    schema_file: Path,
     test_output_directory: Path | None = None,
 ):
-    with (template_directory / "new_ds_hids.json").open(encoding="utf-8") as f:
+    with schema_file.open(encoding="utf-8") as f:
         controllers = [_normalize_controller(controller) for controller in json.load(f)]
 
+    hdr_subdirectory = "main/native/include/wpi/driverstation"
     env = Environment(
-        loader=FileSystemLoader(template_directory / "main/java"),
+        loader=FileSystemLoader(template_directory / hdr_subdirectory),
         autoescape=False,
         keep_trailing_newline=True,
     )
-
-    root_path = output_directory / "main/java/org/wpilib/driverstation"
-    template = env.get_template("new_ds_hid.java.jinja")
+    root_path = output_directory / hdr_subdirectory
+    template = env.get_template("first_ds_hid.hpp.jinja")
     for controller in controllers:
-        controller_name = f"{controller['ClassName']}Controller.java"
+        controller_name = f"{controller['ClassName']}Controller.hpp"
         output = template.render(controller)
         write_controller_file(root_path, controller_name, output)
 
-    root_path = output_directory / "main/java/org/wpilib/simulation"
-    template = env.get_template("new_ds_hidsim.java.jinja")
+    cpp_subdirectory = "main/native/cpp/driverstation"
+    env = Environment(
+        loader=FileSystemLoader(template_directory / cpp_subdirectory),
+        autoescape=False,
+        keep_trailing_newline=True,
+    )
+    root_path = output_directory / cpp_subdirectory
+    template = env.get_template("first_ds_hid.cpp.jinja")
     for controller in controllers:
-        controller_name = f"{controller['ClassName']}ControllerSim.java"
+        controller_name = f"{controller['ClassName']}Controller.cpp"
+        output = template.render(controller)
+        write_controller_file(root_path, controller_name, output)
+
+    sim_hdr_subdirectory = "main/native/include/wpi/simulation"
+    env = Environment(
+        loader=FileSystemLoader(template_directory / sim_hdr_subdirectory),
+        autoescape=False,
+        keep_trailing_newline=True,
+    )
+    root_path = output_directory / sim_hdr_subdirectory
+    template = env.get_template("first_ds_hidsim.hpp.jinja")
+    for controller in controllers:
+        controller_name = f"{controller['ClassName']}ControllerSim.hpp"
+        output = template.render(controller)
+        write_controller_file(root_path, controller_name, output)
+
+    sim_cpp_subdirectory = "main/native/cpp/simulation"
+    env = Environment(
+        loader=FileSystemLoader(template_directory / sim_cpp_subdirectory),
+        autoescape=False,
+        keep_trailing_newline=True,
+    )
+    root_path = output_directory / sim_cpp_subdirectory
+    template = env.get_template("first_ds_hidsim.cpp.jinja")
+    for controller in controllers:
+        controller_name = f"{controller['ClassName']}ControllerSim.cpp"
         output = template.render(controller)
         write_controller_file(root_path, controller_name, output)
 
     if test_output_directory is not None:
         env = Environment(
-            loader=FileSystemLoader(template_directory / "test/java"),
+            loader=FileSystemLoader(template_directory / "test/native/cpp"),
             autoescape=False,
             keep_trailing_newline=True,
         )
-
-        root_path = test_output_directory / "java/org/wpilib/driverstation"
-        template = env.get_template("new_ds_hid_test.java.jinja")
+        root_path = test_output_directory / "native/cpp"
+        template = env.get_template("first_ds_hid_test.cpp.jinja")
         for controller in controllers:
-            controller_name = f"{controller['ClassName']}ControllerTest.java"
+            controller_name = f"{controller['ClassName']}ControllerTest.cpp"
             output = template.render(controller)
             write_controller_file(root_path, controller_name, output)
 
@@ -167,6 +199,12 @@ def main():
         type=Path,
     )
     parser.add_argument(
+        "--schema_file",
+        help="Optional. If set, will use this file for the FIRST Driver Station HID schema",
+        default="wpilibj/src/generate/first_ds_hids.json",
+        type=Path,
+    )
+    parser.add_argument(
         "--test_output_directory",
         help="Optional. If set, will output generated tests to this directory",
         default=dirname / "src/generated/test",
@@ -179,8 +217,11 @@ def main():
         if args.test_output_directory.name == "__none__"
         else args.test_output_directory
     )
-    generate_new_ds_hids(
-        args.output_directory, args.template_root, test_output_directory
+    generate_first_ds_hids(
+        args.output_directory,
+        args.template_root,
+        args.schema_file,
+        test_output_directory,
     )
 
 

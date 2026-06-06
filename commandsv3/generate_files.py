@@ -73,7 +73,7 @@ def _normalize_command_mapping(mapping: dict[str, int]):
     ]
 
 
-def _normalize_new_ds_command_controller(controller: dict):
+def _normalize_first_ds_command_controller(controller: dict):
     buttons = _normalize_command_mapping(controller["buttons"])
     axes = _normalize_command_mapping(controller["axes"])
     button_names = {button["Name"] for button in buttons}
@@ -104,12 +104,12 @@ def _normalize_new_ds_command_controller(controller: dict):
     return normalized
 
 
-def generate_new_ds_hids(
+def generate_first_ds_hids(
     output_directory: Path, template_directory: Path, schema_file: Path
 ):
     with schema_file.open(encoding="utf-8") as f:
         controllers = [
-            _normalize_new_ds_command_controller(controller)
+            _normalize_first_ds_command_controller(controller)
             for controller in json.load(f)
         ]
 
@@ -120,7 +120,7 @@ def generate_new_ds_hids(
         keep_trailing_newline=True,
     )
     root_path = output_directory / java_subdirectory
-    template = env.get_template("new_ds_commandhid.java.jinja")
+    template = env.get_template("first_ds_commandhid.java.jinja")
     for controller in controllers:
         controller_name = f"Command{controller['ClassName']}Controller.java"
         output = template.render(controller)
@@ -180,9 +180,9 @@ def main():
         type=Path,
     )
     parser.add_argument(
-        "--new_ds_schema_file",
-        help="Optional. If set, will use this file for the new Driver Station HID schema",
-        default="wpilibj/src/generate/new_ds_hids.json",
+        "--first_ds_schema_file",
+        help="Optional. If set, will use this file for the FIRST Driver Station HID schema",
+        default="wpilibj/src/generate/first_ds_hids.json",
         type=Path,
     )
     parser.add_argument(
@@ -203,8 +203,8 @@ def main():
     args = parser.parse_args()
 
     generate_hids(args.output_directory, args.template_root, args.schema_file)
-    generate_new_ds_hids(
-        args.output_directory, args.template_root, args.new_ds_schema_file
+    generate_first_ds_hids(
+        args.output_directory, args.template_root, args.first_ds_schema_file
     )
     generate_quickbuf(
         args.protoc,
