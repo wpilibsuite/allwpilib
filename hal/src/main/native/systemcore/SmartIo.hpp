@@ -7,48 +7,21 @@
 #include <string>
 
 #include "PortsInternal.hpp"
+#include "mrclib/SmartIO.h"
 #include "wpi/hal/handles/DigitalHandleResource.hpp"
-#include "wpi/nt/IntegerTopic.hpp"
 
 namespace wpi::hal {
 
 constexpr int32_t kPwmDisabled = 0;
 constexpr int32_t kPwmAlwaysHigh = 0xFFFF;
 
-enum class SmartIoMode {
-  DigitalInput = 0,
-  DigitalOutput = 1,
-  AnalogInput = 2,
-  PwmInput = 3,
-  PwmOutput = 4,
-  SingleCounterRising = 5,
-  SingleCounterFalling = 6,
-  AddressableLED = 13,
-};
-
-enum class PwmOutputPeriod {
-  k20ms = 0,
-  k10ms,
-  k5ms,
-  k2ms,
-};
-
 struct SmartIo {
+  ~SmartIo() noexcept;
   uint8_t channel;
   std::string previousAllocation;
-  SmartIoMode currentMode{SmartIoMode::DigitalInput};
-  wpi::nt::IntegerPublisher modePublisher;
+  MRC_SmartIOMode currentMode{MRC_SmartIOMode::MRC_SmartIOMode_DigitalInput};
 
-  wpi::nt::IntegerPublisher setPublisher;
-  wpi::nt::IntegerSubscriber getSubscriber;
-
-  wpi::nt::IntegerPublisher periodSetPublisher;
-  wpi::nt::IntegerSubscriber periodGetSubscriber;
-
-  wpi::nt::IntegerPublisher ledcountPublisher;
-  wpi::nt::IntegerPublisher ledoffsetPublisher;
-
-  int32_t InitializeMode(SmartIoMode mode);
+  int32_t InitializeMode(MRC_SmartIOMode mode);
   int32_t SwitchDioDirection(bool input);
 
   int32_t SetDigitalOutput(bool value);
@@ -57,7 +30,7 @@ struct SmartIo {
   int32_t GetPwmInputMicroseconds(uint16_t* microseconds);
   int32_t GetPwmInputPeriodMicroseconds(uint16_t* microseconds);
 
-  int32_t SetPwmOutputPeriod(PwmOutputPeriod period);
+  int32_t SetPwmOutputPeriod(MRC_PwmOutputPeriod period);
 
   int32_t SetPwmMicroseconds(uint16_t microseconds);
   int32_t GetPwmMicroseconds(uint16_t* microseconds);
