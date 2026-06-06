@@ -79,22 +79,22 @@ class ClientMessage {
   ClientMessage() = default;
   ClientMessage(const ClientMessage& other) = delete;
   ClientMessage(ClientMessage&& other) { MoveFrom(std::move(other)); }
-  ClientMessage(PublishMsg msg) {  // NOLINT(implicit)
+  ClientMessage(PublishMsg msg) {  // NOLINT(runtime/explicit)
     Construct(std::move(msg));
   }
-  ClientMessage(UnpublishMsg msg) {  // NOLINT(implicit)
+  ClientMessage(UnpublishMsg msg) {  // NOLINT(runtime/explicit)
     Construct(std::move(msg));
   }
-  ClientMessage(SetPropertiesMsg msg) {  // NOLINT(implicit)
+  ClientMessage(SetPropertiesMsg msg) {  // NOLINT(runtime/explicit)
     Construct(std::move(msg));
   }
-  ClientMessage(SubscribeMsg msg) {  // NOLINT(implicit)
+  ClientMessage(SubscribeMsg msg) {  // NOLINT(runtime/explicit)
     Construct(std::move(msg));
   }
-  ClientMessage(UnsubscribeMsg msg) {  // NOLINT(implicit)
+  ClientMessage(UnsubscribeMsg msg) {  // NOLINT(runtime/explicit)
     Construct(std::move(msg));
   }
-  ClientMessage(ClientValueMsg msg) {  // NOLINT(implicit)
+  ClientMessage(ClientValueMsg msg) {  // NOLINT(runtime/explicit)
     Construct(std::move(msg));
   }
   ~ClientMessage() { Clear(); }
@@ -270,10 +270,18 @@ class ServerMessage {
   ServerMessage() = default;
   ServerMessage(const ServerMessage& other) = delete;
   ServerMessage(ServerMessage&& other) { MoveFrom(std::move(other)); }
-  ServerMessage(AnnounceMsg msg) { Construct(std::move(msg)); }
-  ServerMessage(UnannounceMsg msg) { Construct(std::move(msg)); }
-  ServerMessage(PropertiesUpdateMsg msg) { Construct(std::move(msg)); }
-  ServerMessage(ServerValueMsg msg) { Construct(std::move(msg)); }
+  ServerMessage(AnnounceMsg msg) {  // NOLINT(runtime/explicit)
+    Construct(std::move(msg));
+  }
+  ServerMessage(UnannounceMsg msg) {  // NOLINT(runtime/explicit)
+    Construct(std::move(msg));
+  }
+  ServerMessage(PropertiesUpdateMsg msg) {  // NOLINT(runtime/explicit)
+    Construct(std::move(msg));
+  }
+  ServerMessage(ServerValueMsg msg) {  // NOLINT(runtime/explicit)
+    Construct(std::move(msg));
+  }
   ~ServerMessage() { Clear(); }
 
   ServerMessage& operator=(const ServerMessage& other) = delete;
