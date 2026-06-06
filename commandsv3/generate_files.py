@@ -109,7 +109,8 @@ def generate_new_ds_hids(
 ):
     with schema_file.open(encoding="utf-8") as f:
         controllers = [
-            _normalize_new_ds_command_controller(controller) for controller in json.load(f)
+            _normalize_new_ds_command_controller(controller)
+            for controller in json.load(f)
         ]
 
     java_subdirectory = "main/java/org/wpilib/command3/button"

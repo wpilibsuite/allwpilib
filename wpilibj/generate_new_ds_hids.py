@@ -179,7 +179,9 @@ def main():
         if args.test_output_directory.name == "__none__"
         else args.test_output_directory
     )
-    generate_new_ds_hids(args.output_directory, args.template_root, test_output_directory)
+    generate_new_ds_hids(
+        args.output_directory, args.template_root, test_output_directory
+    )
 
 
 if __name__ == "__main__":

@@ -9,7 +9,8 @@ using namespace wpi::cmd;
 Trigger CommandHIDBase::Button(const wpi::GenericHID& hid, int button,
                                wpi::EventLoop* loop) const {
   const auto* hidPtr = &hid;
-  return Trigger(loop, [hidPtr, button] { return hidPtr->GetRawButton(button); });
+  return Trigger(loop,
+                 [hidPtr, button] { return hidPtr->GetRawButton(button); });
 }
 
 Trigger CommandHIDBase::AxisGreaterThan(const wpi::GenericHID& hid, int axis,
