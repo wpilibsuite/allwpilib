@@ -119,9 +119,8 @@ class NetworkOutgoingQueue {
   template <typename T>
   void SendMessage(int id, T&& msg) {
     if (m_local) {
-      MessageType wireMsg{std::forward<T>(msg)};
       m_wire.SendText([&](auto& os) {
-        if (!WireEncodeText(os, wireMsg)) {
+        if (!WireEncodeText(os, std::forward<T>(msg))) {
           os << "{}";
         }
       });
@@ -315,7 +314,8 @@ class NetworkOutgoingQueue {
 
   struct Message {
     Message() = default;
-    Message(MessageType&& msg, int id) : msg{std::move(msg)}, id{id} {}
+    template <typename T>
+    Message(T&& msg, int id) : msg{std::forward<T>(msg)}, id{id} {}
 
     MessageType msg;
     int id;
@@ -325,7 +325,7 @@ class NetworkOutgoingQueue {
     explicit Queue(uint32_t periodMs) : periodMs{periodMs} {}
     template <typename T>
     void Append(NT_Handle handle, T&& msg) {
-      msgs.emplace_back(MessageType{std::forward<T>(msg)}, handle);
+      msgs.emplace_back(std::forward<T>(msg), handle);
     }
     std::vector<Message> msgs;
     uint64_t nextSendMs = 0;
