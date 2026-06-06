@@ -5,7 +5,6 @@
 #include "wpi/hal/IMU.h"
 
 #include <cstring>
-
 #include <numbers>
 
 #include "HALInitializer.hpp"
