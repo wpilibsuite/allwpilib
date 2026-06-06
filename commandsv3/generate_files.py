@@ -50,14 +50,19 @@ def _display_name(name: str) -> str:
     return name[0].upper() + name[1:]
 
 
+def _constant_name(name: str) -> str:
+    name = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", name)
+    name = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", name)
+    name = re.sub(r"([a-z])([0-9])", r"\1_\2", name)
+    return name.upper()
+
+
 def _is_trigger_axis(name: str) -> bool:
-    return name.endswith("TriggerAxis") or name in {
-        "L2Axis",
-        "R2Axis",
-        "ZLAxis",
-        "ZRAxis",
-        "LTriggerAxis",
-        "RTriggerAxis",
+    return name.endswith("Trigger") or name in {
+        "L2",
+        "R2",
+        "ZL",
+        "ZR",
     }
 
 
@@ -66,6 +71,7 @@ def _normalize_command_mapping(mapping: dict[str, int]):
         {
             "Name": name,
             "MethodName": _capitalize_first(name),
+            "ConstantName": _constant_name(name),
             "DocName": _display_name(name),
             "value": value,
         }
@@ -84,7 +90,7 @@ def _normalize_first_ds_command_controller(controller: dict):
             continue
 
         name = axis["Name"]
-        trigger_name = name[:-4] if name.endswith("Axis") else name
+        trigger_name = name
         trigger_axes.append(
             {
                 "Name": trigger_name,
@@ -92,6 +98,7 @@ def _normalize_first_ds_command_controller(controller: dict):
                 "DocName": _display_name(trigger_name),
                 "AxisName": axis["Name"],
                 "AxisMethodName": axis["MethodName"],
+                "AxisConstantName": axis["ConstantName"],
                 "AxisDocName": axis["DocName"],
                 "HasDefaultThresholdMethod": trigger_name not in button_names,
             }

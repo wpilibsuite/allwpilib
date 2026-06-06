@@ -32,27 +32,27 @@ bool XboxController::IsConnected() const {
 }
 
 double XboxController::GetLeftX() const {
-  return GetAxis(Axis::kLeftX);
+  return GetAxis(Axis::LEFT_X);
 }
 
 double XboxController::GetLeftY() const {
-  return GetAxis(Axis::kLeftY);
+  return GetAxis(Axis::LEFT_Y);
 }
 
 double XboxController::GetRightX() const {
-  return GetAxis(Axis::kRightX);
+  return GetAxis(Axis::RIGHT_X);
 }
 
 double XboxController::GetRightY() const {
-  return GetAxis(Axis::kRightY);
+  return GetAxis(Axis::RIGHT_Y);
 }
 
-double XboxController::GetLeftTriggerAxis() const {
-  return GetAxis(Axis::kLeftTriggerAxis);
+double XboxController::GetLeftTrigger() const {
+  return GetAxis(Axis::LEFT_TRIGGER);
 }
 
-double XboxController::GetRightTriggerAxis() const {
-  return GetAxis(Axis::kRightTriggerAxis);
+double XboxController::GetRightTrigger() const {
+  return GetAxis(Axis::RIGHT_TRIGGER);
 }
 
 double XboxController::GetAxis(int axis) const {
@@ -70,243 +70,243 @@ BooleanEvent XboxController::AxisGreaterThan(
 }
 
 bool XboxController::GetAButton() const {
-  return GetButton(Button::kA);
+  return GetButton(Button::A);
 }
 
 bool XboxController::GetAButtonPressed() {
-  return GetButtonPressed(Button::kA);
+  return GetButtonPressed(Button::A);
 }
 
 bool XboxController::GetAButtonReleased() {
-  return GetButtonReleased(Button::kA);
+  return GetButtonReleased(Button::A);
 }
 
 BooleanEvent XboxController::A(EventLoop* loop) const {
-  return ButtonEvent(Button::kA, loop);
+  return ButtonEvent(Button::A, loop);
 }
 
 bool XboxController::GetBButton() const {
-  return GetButton(Button::kB);
+  return GetButton(Button::B);
 }
 
 bool XboxController::GetBButtonPressed() {
-  return GetButtonPressed(Button::kB);
+  return GetButtonPressed(Button::B);
 }
 
 bool XboxController::GetBButtonReleased() {
-  return GetButtonReleased(Button::kB);
+  return GetButtonReleased(Button::B);
 }
 
 BooleanEvent XboxController::B(EventLoop* loop) const {
-  return ButtonEvent(Button::kB, loop);
+  return ButtonEvent(Button::B, loop);
 }
 
 bool XboxController::GetXButton() const {
-  return GetButton(Button::kX);
+  return GetButton(Button::X);
 }
 
 bool XboxController::GetXButtonPressed() {
-  return GetButtonPressed(Button::kX);
+  return GetButtonPressed(Button::X);
 }
 
 bool XboxController::GetXButtonReleased() {
-  return GetButtonReleased(Button::kX);
+  return GetButtonReleased(Button::X);
 }
 
 BooleanEvent XboxController::X(EventLoop* loop) const {
-  return ButtonEvent(Button::kX, loop);
+  return ButtonEvent(Button::X, loop);
 }
 
 bool XboxController::GetYButton() const {
-  return GetButton(Button::kY);
+  return GetButton(Button::Y);
 }
 
 bool XboxController::GetYButtonPressed() {
-  return GetButtonPressed(Button::kY);
+  return GetButtonPressed(Button::Y);
 }
 
 bool XboxController::GetYButtonReleased() {
-  return GetButtonReleased(Button::kY);
+  return GetButtonReleased(Button::Y);
 }
 
 BooleanEvent XboxController::Y(EventLoop* loop) const {
-  return ButtonEvent(Button::kY, loop);
+  return ButtonEvent(Button::Y, loop);
 }
 
 bool XboxController::GetViewButton() const {
-  return GetButton(Button::kView);
+  return GetButton(Button::VIEW);
 }
 
 bool XboxController::GetViewButtonPressed() {
-  return GetButtonPressed(Button::kView);
+  return GetButtonPressed(Button::VIEW);
 }
 
 bool XboxController::GetViewButtonReleased() {
-  return GetButtonReleased(Button::kView);
+  return GetButtonReleased(Button::VIEW);
 }
 
 BooleanEvent XboxController::View(EventLoop* loop) const {
-  return ButtonEvent(Button::kView, loop);
+  return ButtonEvent(Button::VIEW, loop);
 }
 
 bool XboxController::GetXboxButton() const {
-  return GetButton(Button::kXbox);
+  return GetButton(Button::XBOX);
 }
 
 bool XboxController::GetXboxButtonPressed() {
-  return GetButtonPressed(Button::kXbox);
+  return GetButtonPressed(Button::XBOX);
 }
 
 bool XboxController::GetXboxButtonReleased() {
-  return GetButtonReleased(Button::kXbox);
+  return GetButtonReleased(Button::XBOX);
 }
 
 BooleanEvent XboxController::Xbox(EventLoop* loop) const {
-  return ButtonEvent(Button::kXbox, loop);
+  return ButtonEvent(Button::XBOX, loop);
 }
 
 bool XboxController::GetMenuButton() const {
-  return GetButton(Button::kMenu);
+  return GetButton(Button::MENU);
 }
 
 bool XboxController::GetMenuButtonPressed() {
-  return GetButtonPressed(Button::kMenu);
+  return GetButtonPressed(Button::MENU);
 }
 
 bool XboxController::GetMenuButtonReleased() {
-  return GetButtonReleased(Button::kMenu);
+  return GetButtonReleased(Button::MENU);
 }
 
 BooleanEvent XboxController::Menu(EventLoop* loop) const {
-  return ButtonEvent(Button::kMenu, loop);
+  return ButtonEvent(Button::MENU, loop);
 }
 
 bool XboxController::GetLeftStickButton() const {
-  return GetButton(Button::kLeftStick);
+  return GetButton(Button::LEFT_STICK);
 }
 
 bool XboxController::GetLeftStickButtonPressed() {
-  return GetButtonPressed(Button::kLeftStick);
+  return GetButtonPressed(Button::LEFT_STICK);
 }
 
 bool XboxController::GetLeftStickButtonReleased() {
-  return GetButtonReleased(Button::kLeftStick);
+  return GetButtonReleased(Button::LEFT_STICK);
 }
 
 BooleanEvent XboxController::LeftStick(EventLoop* loop) const {
-  return ButtonEvent(Button::kLeftStick, loop);
+  return ButtonEvent(Button::LEFT_STICK, loop);
 }
 
 bool XboxController::GetRightStickButton() const {
-  return GetButton(Button::kRightStick);
+  return GetButton(Button::RIGHT_STICK);
 }
 
 bool XboxController::GetRightStickButtonPressed() {
-  return GetButtonPressed(Button::kRightStick);
+  return GetButtonPressed(Button::RIGHT_STICK);
 }
 
 bool XboxController::GetRightStickButtonReleased() {
-  return GetButtonReleased(Button::kRightStick);
+  return GetButtonReleased(Button::RIGHT_STICK);
 }
 
 BooleanEvent XboxController::RightStick(EventLoop* loop) const {
-  return ButtonEvent(Button::kRightStick, loop);
+  return ButtonEvent(Button::RIGHT_STICK, loop);
 }
 
 bool XboxController::GetLeftBumperButton() const {
-  return GetButton(Button::kLeftBumper);
+  return GetButton(Button::LEFT_BUMPER);
 }
 
 bool XboxController::GetLeftBumperButtonPressed() {
-  return GetButtonPressed(Button::kLeftBumper);
+  return GetButtonPressed(Button::LEFT_BUMPER);
 }
 
 bool XboxController::GetLeftBumperButtonReleased() {
-  return GetButtonReleased(Button::kLeftBumper);
+  return GetButtonReleased(Button::LEFT_BUMPER);
 }
 
 BooleanEvent XboxController::LeftBumper(EventLoop* loop) const {
-  return ButtonEvent(Button::kLeftBumper, loop);
+  return ButtonEvent(Button::LEFT_BUMPER, loop);
 }
 
 bool XboxController::GetRightBumperButton() const {
-  return GetButton(Button::kRightBumper);
+  return GetButton(Button::RIGHT_BUMPER);
 }
 
 bool XboxController::GetRightBumperButtonPressed() {
-  return GetButtonPressed(Button::kRightBumper);
+  return GetButtonPressed(Button::RIGHT_BUMPER);
 }
 
 bool XboxController::GetRightBumperButtonReleased() {
-  return GetButtonReleased(Button::kRightBumper);
+  return GetButtonReleased(Button::RIGHT_BUMPER);
 }
 
 BooleanEvent XboxController::RightBumper(EventLoop* loop) const {
-  return ButtonEvent(Button::kRightBumper, loop);
+  return ButtonEvent(Button::RIGHT_BUMPER, loop);
 }
 
 bool XboxController::GetDpadUpButton() const {
-  return GetButton(Button::kDpadUp);
+  return GetButton(Button::DPAD_UP);
 }
 
 bool XboxController::GetDpadUpButtonPressed() {
-  return GetButtonPressed(Button::kDpadUp);
+  return GetButtonPressed(Button::DPAD_UP);
 }
 
 bool XboxController::GetDpadUpButtonReleased() {
-  return GetButtonReleased(Button::kDpadUp);
+  return GetButtonReleased(Button::DPAD_UP);
 }
 
 BooleanEvent XboxController::DpadUp(EventLoop* loop) const {
-  return ButtonEvent(Button::kDpadUp, loop);
+  return ButtonEvent(Button::DPAD_UP, loop);
 }
 
 bool XboxController::GetDpadDownButton() const {
-  return GetButton(Button::kDpadDown);
+  return GetButton(Button::DPAD_DOWN);
 }
 
 bool XboxController::GetDpadDownButtonPressed() {
-  return GetButtonPressed(Button::kDpadDown);
+  return GetButtonPressed(Button::DPAD_DOWN);
 }
 
 bool XboxController::GetDpadDownButtonReleased() {
-  return GetButtonReleased(Button::kDpadDown);
+  return GetButtonReleased(Button::DPAD_DOWN);
 }
 
 BooleanEvent XboxController::DpadDown(EventLoop* loop) const {
-  return ButtonEvent(Button::kDpadDown, loop);
+  return ButtonEvent(Button::DPAD_DOWN, loop);
 }
 
 bool XboxController::GetDpadLeftButton() const {
-  return GetButton(Button::kDpadLeft);
+  return GetButton(Button::DPAD_LEFT);
 }
 
 bool XboxController::GetDpadLeftButtonPressed() {
-  return GetButtonPressed(Button::kDpadLeft);
+  return GetButtonPressed(Button::DPAD_LEFT);
 }
 
 bool XboxController::GetDpadLeftButtonReleased() {
-  return GetButtonReleased(Button::kDpadLeft);
+  return GetButtonReleased(Button::DPAD_LEFT);
 }
 
 BooleanEvent XboxController::DpadLeft(EventLoop* loop) const {
-  return ButtonEvent(Button::kDpadLeft, loop);
+  return ButtonEvent(Button::DPAD_LEFT, loop);
 }
 
 bool XboxController::GetDpadRightButton() const {
-  return GetButton(Button::kDpadRight);
+  return GetButton(Button::DPAD_RIGHT);
 }
 
 bool XboxController::GetDpadRightButtonPressed() {
-  return GetButtonPressed(Button::kDpadRight);
+  return GetButtonPressed(Button::DPAD_RIGHT);
 }
 
 bool XboxController::GetDpadRightButtonReleased() {
-  return GetButtonReleased(Button::kDpadRight);
+  return GetButtonReleased(Button::DPAD_RIGHT);
 }
 
 BooleanEvent XboxController::DpadRight(EventLoop* loop) const {
-  return ButtonEvent(Button::kDpadRight, loop);
+  return ButtonEvent(Button::DPAD_RIGHT, loop);
 }
 
 bool XboxController::GetButton(int button) const {
@@ -344,8 +344,8 @@ void XboxController::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);
   builder.AddDoubleProperty("RightX", [this] { return GetRightX(); }, nullptr);
   builder.AddDoubleProperty("RightY", [this] { return GetRightY(); }, nullptr);
-  builder.AddDoubleProperty("LeftTriggerAxis", [this] { return GetLeftTriggerAxis(); }, nullptr);
-  builder.AddDoubleProperty("RightTriggerAxis", [this] { return GetRightTriggerAxis(); }, nullptr);
+  builder.AddDoubleProperty("LeftTrigger", [this] { return GetLeftTrigger(); }, nullptr);
+  builder.AddDoubleProperty("RightTrigger", [this] { return GetRightTrigger(); }, nullptr);
   builder.AddBooleanProperty("A", [this] { return GetAButton(); }, nullptr);
   builder.AddBooleanProperty("B", [this] { return GetBButton(); }, nullptr);
   builder.AddBooleanProperty("X", [this] { return GetXButton(); }, nullptr);

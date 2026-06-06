@@ -32,7 +32,7 @@ bool {{ ClassName }}Controller::IsConnected() const {
 }
 {% for axis in axes %}
 double {{ ClassName }}Controller::Get{{ axis.MethodName }}() const {
-  return GetAxis(Axis::k{{ axis.MethodName }});
+  return GetAxis(Axis::{{ axis.ConstantName }});
 }
 {% endfor %}
 double {{ ClassName }}Controller::GetAxis(int axis) const {
@@ -50,19 +50,19 @@ BooleanEvent {{ ClassName }}Controller::AxisGreaterThan(
 }
 {% for button in buttons %}
 bool {{ ClassName }}Controller::Get{{ button.MethodName }}Button() const {
-  return GetButton(Button::k{{ button.MethodName }});
+  return GetButton(Button::{{ button.ConstantName }});
 }
 
 bool {{ ClassName }}Controller::Get{{ button.MethodName }}ButtonPressed() {
-  return GetButtonPressed(Button::k{{ button.MethodName }});
+  return GetButtonPressed(Button::{{ button.ConstantName }});
 }
 
 bool {{ ClassName }}Controller::Get{{ button.MethodName }}ButtonReleased() {
-  return GetButtonReleased(Button::k{{ button.MethodName }});
+  return GetButtonReleased(Button::{{ button.ConstantName }});
 }
 
 BooleanEvent {{ ClassName }}Controller::{{ button.MethodName }}(EventLoop* loop) const {
-  return ButtonEvent(Button::k{{ button.MethodName }}, loop);
+  return ButtonEvent(Button::{{ button.ConstantName }}, loop);
 }
 {% endfor %}
 bool {{ ClassName }}Controller::GetButton(int button) const {

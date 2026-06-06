@@ -7,8 +7,8 @@
       "leftY": 1,
       "rightX": 2,
       "rightY": 3,
-      "leftTriggerAxis": 4,
-      "rightTriggerAxis": 5
+      "leftTrigger": 4,
+      "rightTrigger": 5
     },
     "buttons": {
       "a": 0,
@@ -43,8 +43,8 @@
       "leftY": 1,
       "rightX": 2,
       "rightY": 3,
-      "L2Axis": 4,
-      "R2Axis": 5
+      "L2": 4,
+      "R2": 5
     },
     "buttons": {
       "cross": 0,

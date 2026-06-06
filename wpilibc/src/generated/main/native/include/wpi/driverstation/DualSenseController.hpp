@@ -26,22 +26,22 @@ class DualSenseController
       public wpi::util::SendableHelper<DualSenseController> {
  public:
   /** The number of touchpads supported by this controller. */
-  static constexpr int kTouchpadCount = 1;
+  static constexpr int TOUCHPAD_COUNT = 1;
 
   /** Whether this controller supports main rumble motors. */
-  static constexpr bool kSupportsRumble = true;
+  static constexpr bool SUPPORTS_RUMBLE = true;
 
   /** Whether this controller supports trigger rumble motors. */
-  static constexpr bool kSupportsTriggerRumble = true;
+  static constexpr bool SUPPORTS_TRIGGER_RUMBLE = true;
 
   /** Whether this controller supports mono LED output. */
-  static constexpr bool kSupportsMonoLed = false;
+  static constexpr bool SUPPORTS_MONO_LED = false;
 
   /** Whether this controller supports RGB LED output. */
-  static constexpr bool kSupportsRgbLed = true;
+  static constexpr bool SUPPORTS_RGB_LED = true;
 
   /** Supported outputs expected for this controller type. */
-  static constexpr GenericHID::SupportedOutputs kSupportedOutputs =
+  static constexpr GenericHID::SupportedOutputs SUPPORTED_OUTPUTS =
       static_cast<GenericHID::SupportedOutputs>(26);
 
   /**
@@ -116,18 +116,18 @@ class DualSenseController
   double GetRightY() const;
 
   /**
-   * Get the L 2 Axis value of the controller.
+   * Get the L 2 value of the controller.
    *
    * @return the axis value.
    */
-  double GetL2Axis() const;
+  double GetL2() const;
 
   /**
-   * Get the R 2 Axis value of the controller.
+   * Get the R 2 value of the controller.
    *
    * @return the axis value.
    */
-  double GetR2Axis() const;
+  double GetR2() const;
 
   /**
    * Get the value of the axis.
@@ -756,55 +756,55 @@ class DualSenseController
   /** Represents a digital button on a DualSenseController. */
   struct Button {
     /// Cross button.
-    static constexpr int kCross = 0;
+    static constexpr int CROSS = 0;
     /// Circle button.
-    static constexpr int kCircle = 1;
+    static constexpr int CIRCLE = 1;
     /// Square button.
-    static constexpr int kSquare = 2;
+    static constexpr int SQUARE = 2;
     /// Triangle button.
-    static constexpr int kTriangle = 3;
+    static constexpr int TRIANGLE = 3;
     /// Create button.
-    static constexpr int kCreate = 4;
+    static constexpr int CREATE = 4;
     /// PS button.
-    static constexpr int kPS = 5;
+    static constexpr int PS = 5;
     /// Options button.
-    static constexpr int kOptions = 6;
+    static constexpr int OPTIONS = 6;
     /// L 3 button.
-    static constexpr int kL3 = 7;
+    static constexpr int L3 = 7;
     /// R 3 button.
-    static constexpr int kR3 = 8;
+    static constexpr int R3 = 8;
     /// L 1 button.
-    static constexpr int kL1 = 9;
+    static constexpr int L1 = 9;
     /// R 1 button.
-    static constexpr int kR1 = 10;
+    static constexpr int R1 = 10;
     /// Dpad Up button.
-    static constexpr int kDpadUp = 11;
+    static constexpr int DPAD_UP = 11;
     /// Dpad Down button.
-    static constexpr int kDpadDown = 12;
+    static constexpr int DPAD_DOWN = 12;
     /// Dpad Left button.
-    static constexpr int kDpadLeft = 13;
+    static constexpr int DPAD_LEFT = 13;
     /// Dpad Right button.
-    static constexpr int kDpadRight = 14;
+    static constexpr int DPAD_RIGHT = 14;
     /// Microphone button.
-    static constexpr int kMicrophone = 15;
+    static constexpr int MICROPHONE = 15;
     /// Touchpad button.
-    static constexpr int kTouchpad = 20;
+    static constexpr int TOUCHPAD = 20;
   };
 
   /** Represents an axis on a DualSenseController. */
   struct Axis {
     /// Left X.
-    static constexpr int kLeftX = 0;
+    static constexpr int LEFT_X = 0;
     /// Left Y.
-    static constexpr int kLeftY = 1;
+    static constexpr int LEFT_Y = 1;
     /// Right X.
-    static constexpr int kRightX = 2;
+    static constexpr int RIGHT_X = 2;
     /// Right Y.
-    static constexpr int kRightY = 3;
-    /// L 2 Axis.
-    static constexpr int kL2Axis = 4;
-    /// R 2 Axis.
-    static constexpr int kR2Axis = 5;
+    static constexpr int RIGHT_Y = 3;
+    /// L 2.
+    static constexpr int L2 = 4;
+    /// R 2.
+    static constexpr int R2 = 5;
   };
 
   void InitSendable(wpi::util::SendableBuilder& builder) override;

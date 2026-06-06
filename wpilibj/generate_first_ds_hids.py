@@ -29,11 +29,19 @@ def _display_name(name: str) -> str:
     return name[0].upper() + name[1:]
 
 
+def _constant_name(name: str) -> str:
+    name = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", name)
+    name = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", name)
+    name = re.sub(r"([a-z])([0-9])", r"\1_\2", name)
+    return name.upper()
+
+
 def _normalize_mapping(mapping: dict[str, int]):
     return [
         {
             "Name": name,
             "MethodName": _capitalize_first(name),
+            "ConstantName": _constant_name(name),
             "DocName": _display_name(name),
             "value": value,
         }

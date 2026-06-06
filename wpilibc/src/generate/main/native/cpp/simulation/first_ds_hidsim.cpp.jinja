@@ -16,7 +16,7 @@ using namespace wpi::sim;
   SetButtonsAvailable({{ ButtonsAvailableMask }}ULL);
   SetPOVsAvailable(0);
   SetGamepadType(GenericHID::HIDType::{{ HIDType }});
-  SetSupportedOutputs({{ ClassName }}Controller::kSupportedOutputs);
+  SetSupportedOutputs({{ ClassName }}Controller::SUPPORTED_OUTPUTS);
 }
 
 {{ ClassName }}ControllerSim::{{ ClassName }}ControllerSim(int port) : GenericHIDSim{port} {
@@ -24,15 +24,15 @@ using namespace wpi::sim;
   SetButtonsAvailable({{ ButtonsAvailableMask }}ULL);
   SetPOVsAvailable(0);
   SetGamepadType(GenericHID::HIDType::{{ HIDType }});
-  SetSupportedOutputs({{ ClassName }}Controller::kSupportedOutputs);
+  SetSupportedOutputs({{ ClassName }}Controller::SUPPORTED_OUTPUTS);
 }
 {% for axis in axes %}
 void {{ ClassName }}ControllerSim::Set{{ axis.MethodName }}(double value) {
-  SetRawAxis({{ ClassName }}Controller::Axis::k{{ axis.MethodName }}, value);
+  SetRawAxis({{ ClassName }}Controller::Axis::{{ axis.ConstantName }}, value);
 }
 {% endfor -%}
 {% for button in buttons %}
 void {{ ClassName }}ControllerSim::Set{{ button.MethodName }}Button(bool value) {
-  SetRawButton({{ ClassName }}Controller::Button::k{{ button.MethodName }}, value);
+  SetRawButton({{ ClassName }}Controller::Button::{{ button.ConstantName }}, value);
 }
 {% endfor -%}

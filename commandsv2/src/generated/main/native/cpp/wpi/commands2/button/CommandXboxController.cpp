@@ -23,119 +23,119 @@ CommandXboxController::GetController() const {
 Trigger CommandXboxController::A(
     wpi::EventLoop* loop) const {
   return Button(m_controller.GetHID(),
-                wpi::XboxController::Button::kA,
+                wpi::XboxController::Button::A,
                 loop);
 }
 
 Trigger CommandXboxController::B(
     wpi::EventLoop* loop) const {
   return Button(m_controller.GetHID(),
-                wpi::XboxController::Button::kB,
+                wpi::XboxController::Button::B,
                 loop);
 }
 
 Trigger CommandXboxController::X(
     wpi::EventLoop* loop) const {
   return Button(m_controller.GetHID(),
-                wpi::XboxController::Button::kX,
+                wpi::XboxController::Button::X,
                 loop);
 }
 
 Trigger CommandXboxController::Y(
     wpi::EventLoop* loop) const {
   return Button(m_controller.GetHID(),
-                wpi::XboxController::Button::kY,
+                wpi::XboxController::Button::Y,
                 loop);
 }
 
 Trigger CommandXboxController::View(
     wpi::EventLoop* loop) const {
   return Button(m_controller.GetHID(),
-                wpi::XboxController::Button::kView,
+                wpi::XboxController::Button::VIEW,
                 loop);
 }
 
 Trigger CommandXboxController::Xbox(
     wpi::EventLoop* loop) const {
   return Button(m_controller.GetHID(),
-                wpi::XboxController::Button::kXbox,
+                wpi::XboxController::Button::XBOX,
                 loop);
 }
 
 Trigger CommandXboxController::Menu(
     wpi::EventLoop* loop) const {
   return Button(m_controller.GetHID(),
-                wpi::XboxController::Button::kMenu,
+                wpi::XboxController::Button::MENU,
                 loop);
 }
 
 Trigger CommandXboxController::LeftStick(
     wpi::EventLoop* loop) const {
   return Button(m_controller.GetHID(),
-                wpi::XboxController::Button::kLeftStick,
+                wpi::XboxController::Button::LEFT_STICK,
                 loop);
 }
 
 Trigger CommandXboxController::RightStick(
     wpi::EventLoop* loop) const {
   return Button(m_controller.GetHID(),
-                wpi::XboxController::Button::kRightStick,
+                wpi::XboxController::Button::RIGHT_STICK,
                 loop);
 }
 
 Trigger CommandXboxController::LeftBumper(
     wpi::EventLoop* loop) const {
   return Button(m_controller.GetHID(),
-                wpi::XboxController::Button::kLeftBumper,
+                wpi::XboxController::Button::LEFT_BUMPER,
                 loop);
 }
 
 Trigger CommandXboxController::RightBumper(
     wpi::EventLoop* loop) const {
   return Button(m_controller.GetHID(),
-                wpi::XboxController::Button::kRightBumper,
+                wpi::XboxController::Button::RIGHT_BUMPER,
                 loop);
 }
 
 Trigger CommandXboxController::DpadUp(
     wpi::EventLoop* loop) const {
   return Button(m_controller.GetHID(),
-                wpi::XboxController::Button::kDpadUp,
+                wpi::XboxController::Button::DPAD_UP,
                 loop);
 }
 
 Trigger CommandXboxController::DpadDown(
     wpi::EventLoop* loop) const {
   return Button(m_controller.GetHID(),
-                wpi::XboxController::Button::kDpadDown,
+                wpi::XboxController::Button::DPAD_DOWN,
                 loop);
 }
 
 Trigger CommandXboxController::DpadLeft(
     wpi::EventLoop* loop) const {
   return Button(m_controller.GetHID(),
-                wpi::XboxController::Button::kDpadLeft,
+                wpi::XboxController::Button::DPAD_LEFT,
                 loop);
 }
 
 Trigger CommandXboxController::DpadRight(
     wpi::EventLoop* loop) const {
   return Button(m_controller.GetHID(),
-                wpi::XboxController::Button::kDpadRight,
+                wpi::XboxController::Button::DPAD_RIGHT,
                 loop);
 }
 
 Trigger CommandXboxController::LeftTrigger(
     double threshold, wpi::EventLoop* loop) const {
   return AxisGreaterThan(m_controller.GetHID(),
-                         wpi::XboxController::Axis::kLeftTriggerAxis,
+                         wpi::XboxController::Axis::LEFT_TRIGGER,
                          threshold, loop);
 }
 
 Trigger CommandXboxController::RightTrigger(
     double threshold, wpi::EventLoop* loop) const {
   return AxisGreaterThan(m_controller.GetHID(),
-                         wpi::XboxController::Axis::kRightTriggerAxis,
+                         wpi::XboxController::Axis::RIGHT_TRIGGER,
                          threshold, loop);
 }
 
@@ -155,10 +155,10 @@ double CommandXboxController::GetRightY() const {
   return m_controller.GetRightY();
 }
 
-double CommandXboxController::GetLeftTriggerAxis() const {
-  return m_controller.GetLeftTriggerAxis();
+double CommandXboxController::GetLeftTrigger() const {
+  return m_controller.GetLeftTrigger();
 }
 
-double CommandXboxController::GetRightTriggerAxis() const {
-  return m_controller.GetRightTriggerAxis();
+double CommandXboxController::GetRightTrigger() const {
+  return m_controller.GetRightTrigger();
 }

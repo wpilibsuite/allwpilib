@@ -61,18 +61,18 @@ class DualSenseControllerSim : public GenericHIDSim {
   void SetRightY(double value);
 
   /**
-   * Change the L 2 Axis value of the controller.
+   * Change the L 2 value of the controller.
    *
    * @param value the new value
    */
-  void SetL2Axis(double value);
+  void SetL2(double value);
 
   /**
-   * Change the R 2 Axis value of the controller.
+   * Change the R 2 value of the controller.
    *
    * @param value the new value
    */
-  void SetR2Axis(double value);
+  void SetR2(double value);
 
   /**
    * Change the value of the Cross button on the controller.

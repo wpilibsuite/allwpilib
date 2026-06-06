@@ -51,7 +51,7 @@ public class {{ ClassName }}ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void set{{ axis.MethodName }}(double value) {
-    setRawAxis({{ ClassName }}Controller.Axis.k{{ axis.MethodName }}.value, value);
+    setRawAxis({{ ClassName }}Controller.Axis.{{ axis.ConstantName }}.value, value);
   }
 {% endfor -%}
 {% for button in buttons %}
@@ -61,7 +61,7 @@ public class {{ ClassName }}ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void set{{ button.MethodName }}Button(boolean value) {
-    setRawButton({{ ClassName }}Controller.Button.k{{ button.MethodName }}.value, value);
+    setRawButton({{ ClassName }}Controller.Button.{{ button.ConstantName }}.value, value);
   }
 {% endfor -%}
 }

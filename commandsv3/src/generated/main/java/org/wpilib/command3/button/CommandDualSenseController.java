@@ -74,7 +74,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger cross(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        DualSenseController.Button.kCross.value,
+        DualSenseController.Button.CROSS.value,
         loop);
   }
 
@@ -101,7 +101,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger circle(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        DualSenseController.Button.kCircle.value,
+        DualSenseController.Button.CIRCLE.value,
         loop);
   }
 
@@ -128,7 +128,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger square(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        DualSenseController.Button.kSquare.value,
+        DualSenseController.Button.SQUARE.value,
         loop);
   }
 
@@ -155,7 +155,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger triangle(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        DualSenseController.Button.kTriangle.value,
+        DualSenseController.Button.TRIANGLE.value,
         loop);
   }
 
@@ -182,7 +182,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger create(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        DualSenseController.Button.kCreate.value,
+        DualSenseController.Button.CREATE.value,
         loop);
   }
 
@@ -209,7 +209,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger PS(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        DualSenseController.Button.kPS.value,
+        DualSenseController.Button.PS.value,
         loop);
   }
 
@@ -236,7 +236,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger options(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        DualSenseController.Button.kOptions.value,
+        DualSenseController.Button.OPTIONS.value,
         loop);
   }
 
@@ -263,7 +263,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger L3(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        DualSenseController.Button.kL3.value,
+        DualSenseController.Button.L3.value,
         loop);
   }
 
@@ -290,7 +290,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger R3(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        DualSenseController.Button.kR3.value,
+        DualSenseController.Button.R3.value,
         loop);
   }
 
@@ -317,7 +317,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger L1(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        DualSenseController.Button.kL1.value,
+        DualSenseController.Button.L1.value,
         loop);
   }
 
@@ -344,7 +344,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger R1(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        DualSenseController.Button.kR1.value,
+        DualSenseController.Button.R1.value,
         loop);
   }
 
@@ -371,7 +371,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger dpadUp(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        DualSenseController.Button.kDpadUp.value,
+        DualSenseController.Button.DPAD_UP.value,
         loop);
   }
 
@@ -398,7 +398,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger dpadDown(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        DualSenseController.Button.kDpadDown.value,
+        DualSenseController.Button.DPAD_DOWN.value,
         loop);
   }
 
@@ -425,7 +425,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger dpadLeft(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        DualSenseController.Button.kDpadLeft.value,
+        DualSenseController.Button.DPAD_LEFT.value,
         loop);
   }
 
@@ -452,7 +452,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger dpadRight(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        DualSenseController.Button.kDpadRight.value,
+        DualSenseController.Button.DPAD_RIGHT.value,
         loop);
   }
 
@@ -479,7 +479,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger microphone(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        DualSenseController.Button.kMicrophone.value,
+        DualSenseController.Button.MICROPHONE.value,
         loop);
   }
 
@@ -506,7 +506,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger touchpad(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        DualSenseController.Button.kTouchpad.value,
+        DualSenseController.Button.TOUCHPAD.value,
         loop);
   }
 
@@ -523,7 +523,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger L2(double threshold, EventLoop loop) {
     return axisGreaterThan(
         m_controller.getHID(),
-        DualSenseController.Axis.kL2Axis.value,
+        DualSenseController.Axis.L2.value,
         threshold,
         loop);
   }
@@ -570,7 +570,7 @@ public class CommandDualSenseController extends CommandHIDBase {
   public Trigger R2(double threshold, EventLoop loop) {
     return axisGreaterThan(
         m_controller.getHID(),
-        DualSenseController.Axis.kR2Axis.value,
+        DualSenseController.Axis.R2.value,
         threshold,
         loop);
   }
@@ -641,20 +641,20 @@ public class CommandDualSenseController extends CommandHIDBase {
   }
 
   /**
-   * Get the L 2 Axis value of the controller.
+   * Get the L 2 value of the controller.
    *
    * @return The axis value.
    */
-  public double getL2Axis() {
-    return m_controller.getL2Axis();
+  public double getL2() {
+    return m_controller.getL2();
   }
 
   /**
-   * Get the R 2 Axis value of the controller.
+   * Get the R 2 value of the controller.
    *
    * @return The axis value.
    */
-  public double getR2Axis() {
-    return m_controller.getR2Axis();
+  public double getR2() {
+    return m_controller.getR2();
   }
 }

@@ -26,22 +26,22 @@ class {{ ClassName }}Controller
       public wpi::util::SendableHelper<{{ ClassName }}Controller> {
  public:
   /** The number of touchpads supported by this controller. */
-  static constexpr int kTouchpadCount = {{ touchpads }};
+  static constexpr int TOUCHPAD_COUNT = {{ touchpads }};
 
   /** Whether this controller supports main rumble motors. */
-  static constexpr bool kSupportsRumble = {{ "true" if supports.rumble else "false" }};
+  static constexpr bool SUPPORTS_RUMBLE = {{ "true" if supports.rumble else "false" }};
 
   /** Whether this controller supports trigger rumble motors. */
-  static constexpr bool kSupportsTriggerRumble = {{ "true" if supports.triggerRumble else "false" }};
+  static constexpr bool SUPPORTS_TRIGGER_RUMBLE = {{ "true" if supports.triggerRumble else "false" }};
 
   /** Whether this controller supports mono LED output. */
-  static constexpr bool kSupportsMonoLed = {{ "true" if supports.monoLed else "false" }};
+  static constexpr bool SUPPORTS_MONO_LED = {{ "true" if supports.monoLed else "false" }};
 
   /** Whether this controller supports RGB LED output. */
-  static constexpr bool kSupportsRgbLed = {{ "true" if supports.rgbLed else "false" }};
+  static constexpr bool SUPPORTS_RGB_LED = {{ "true" if supports.rgbLed else "false" }};
 
   /** Supported outputs expected for this controller type. */
-  static constexpr GenericHID::SupportedOutputs kSupportedOutputs =
+  static constexpr GenericHID::SupportedOutputs SUPPORTED_OUTPUTS =
       static_cast<GenericHID::SupportedOutputs>({{ SupportedOutputsValue }});
 
   /**
@@ -245,7 +245,7 @@ class {{ ClassName }}Controller
   struct Button {
 {%- for button in buttons %}
     /// {{ button.DocName }} button.
-    static constexpr int k{{ button.MethodName }} = {{ button.value }};
+    static constexpr int {{ button.ConstantName }} = {{ button.value }};
 {%- endfor %}
   };
 
@@ -253,7 +253,7 @@ class {{ ClassName }}Controller
   struct Axis {
 {%- for axis in axes %}
     /// {{ axis.DocName }}.
-    static constexpr int k{{ axis.MethodName }} = {{ axis.value }};
+    static constexpr int {{ axis.ConstantName }} = {{ axis.value }};
 {%- endfor %}
   };
 

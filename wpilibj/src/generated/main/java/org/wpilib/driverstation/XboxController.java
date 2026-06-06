@@ -21,52 +21,52 @@ import org.wpilib.util.sendable.SendableBuilder;
  */
 public class XboxController implements Sendable {
   /** The number of touchpads supported by this controller. */
-  public static final int kTouchpadCount = 0;
+  public static final int TOUCHPAD_COUNT = 0;
 
   /** Whether this controller supports main rumble motors. */
-  public static final boolean kSupportsRumble = true;
+  public static final boolean SUPPORTS_RUMBLE = true;
 
   /** Whether this controller supports trigger rumble motors. */
-  public static final boolean kSupportsTriggerRumble = true;
+  public static final boolean SUPPORTS_TRIGGER_RUMBLE = true;
 
   /** Whether this controller supports mono LED output. */
-  public static final boolean kSupportsMonoLed = false;
+  public static final boolean SUPPORTS_MONO_LED = false;
 
   /** Whether this controller supports RGB LED output. */
-  public static final boolean kSupportsRgbLed = false;
+  public static final boolean SUPPORTS_RGB_LED = false;
 
   /** Represents a digital button on a XboxController. */
   public enum Button {
     /** A button. */
-    kA(0, "AButton"),
+    A(0, "AButton"),
     /** B button. */
-    kB(1, "BButton"),
+    B(1, "BButton"),
     /** X button. */
-    kX(2, "XButton"),
+    X(2, "XButton"),
     /** Y button. */
-    kY(3, "YButton"),
+    Y(3, "YButton"),
     /** View button. */
-    kView(4, "ViewButton"),
+    VIEW(4, "ViewButton"),
     /** Xbox button. */
-    kXbox(5, "XboxButton"),
+    XBOX(5, "XboxButton"),
     /** Menu button. */
-    kMenu(6, "MenuButton"),
+    MENU(6, "MenuButton"),
     /** Left Stick button. */
-    kLeftStick(7, "LeftStickButton"),
+    LEFT_STICK(7, "LeftStickButton"),
     /** Right Stick button. */
-    kRightStick(8, "RightStickButton"),
+    RIGHT_STICK(8, "RightStickButton"),
     /** Left Bumper button. */
-    kLeftBumper(9, "LeftBumperButton"),
+    LEFT_BUMPER(9, "LeftBumperButton"),
     /** Right Bumper button. */
-    kRightBumper(10, "RightBumperButton"),
+    RIGHT_BUMPER(10, "RightBumperButton"),
     /** Dpad Up button. */
-    kDpadUp(11, "DpadUpButton"),
+    DPAD_UP(11, "DpadUpButton"),
     /** Dpad Down button. */
-    kDpadDown(12, "DpadDownButton"),
+    DPAD_DOWN(12, "DpadDownButton"),
     /** Dpad Left button. */
-    kDpadLeft(13, "DpadLeftButton"),
+    DPAD_LEFT(13, "DpadLeftButton"),
     /** Dpad Right button. */
-    kDpadRight(14, "DpadRightButton");
+    DPAD_RIGHT(14, "DpadRightButton");
 
     /** Button value. */
     public final int value;
@@ -87,17 +87,17 @@ public class XboxController implements Sendable {
   /** Represents an axis on a XboxController. */
   public enum Axis {
     /** Left X. */
-    kLeftX(0, "LeftX"),
+    LEFT_X(0, "LeftX"),
     /** Left Y. */
-    kLeftY(1, "LeftY"),
+    LEFT_Y(1, "LeftY"),
     /** Right X. */
-    kRightX(2, "RightX"),
+    RIGHT_X(2, "RightX"),
     /** Right Y. */
-    kRightY(3, "RightY"),
-    /** Left Trigger Axis. */
-    kLeftTriggerAxis(4, "LeftTriggerAxis"),
-    /** Right Trigger Axis. */
-    kRightTriggerAxis(5, "RightTriggerAxis");
+    RIGHT_Y(3, "RightY"),
+    /** Left Trigger. */
+    LEFT_TRIGGER(4, "LeftTrigger"),
+    /** Right Trigger. */
+    RIGHT_TRIGGER(5, "RightTrigger");
 
     /** Axis value. */
     public final int value;
@@ -172,7 +172,7 @@ public class XboxController implements Sendable {
    * @return The axis value.
    */
   public double getLeftX() {
-    return getAxis(Axis.kLeftX);
+    return getAxis(Axis.LEFT_X);
   }
 
   /**
@@ -181,7 +181,7 @@ public class XboxController implements Sendable {
    * @return The axis value.
    */
   public double getLeftY() {
-    return getAxis(Axis.kLeftY);
+    return getAxis(Axis.LEFT_Y);
   }
 
   /**
@@ -190,7 +190,7 @@ public class XboxController implements Sendable {
    * @return The axis value.
    */
   public double getRightX() {
-    return getAxis(Axis.kRightX);
+    return getAxis(Axis.RIGHT_X);
   }
 
   /**
@@ -199,25 +199,25 @@ public class XboxController implements Sendable {
    * @return The axis value.
    */
   public double getRightY() {
-    return getAxis(Axis.kRightY);
+    return getAxis(Axis.RIGHT_Y);
   }
 
   /**
-   * Get the Left Trigger Axis value of the controller.
+   * Get the Left Trigger value of the controller.
    *
    * @return The axis value.
    */
-  public double getLeftTriggerAxis() {
-    return getAxis(Axis.kLeftTriggerAxis);
+  public double getLeftTrigger() {
+    return getAxis(Axis.LEFT_TRIGGER);
   }
 
   /**
-   * Get the Right Trigger Axis value of the controller.
+   * Get the Right Trigger value of the controller.
    *
    * @return The axis value.
    */
-  public double getRightTriggerAxis() {
-    return getAxis(Axis.kRightTriggerAxis);
+  public double getRightTrigger() {
+    return getAxis(Axis.RIGHT_TRIGGER);
   }
 
   /**
@@ -263,7 +263,7 @@ public class XboxController implements Sendable {
    * @return The state of the button.
    */
   public boolean getAButton() {
-    return getButton(Button.kA);
+    return getButton(Button.A);
   }
 
   /**
@@ -272,7 +272,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getAButtonPressed() {
-    return getButtonPressed(Button.kA);
+    return getButtonPressed(Button.A);
   }
 
   /**
@@ -281,7 +281,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getAButtonReleased() {
-    return getButtonReleased(Button.kA);
+    return getButtonReleased(Button.A);
   }
 
   /**
@@ -292,7 +292,7 @@ public class XboxController implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent a(EventLoop loop) {
-    return button(Button.kA, loop);
+    return button(Button.A, loop);
   }
 
   /**
@@ -301,7 +301,7 @@ public class XboxController implements Sendable {
    * @return The state of the button.
    */
   public boolean getBButton() {
-    return getButton(Button.kB);
+    return getButton(Button.B);
   }
 
   /**
@@ -310,7 +310,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getBButtonPressed() {
-    return getButtonPressed(Button.kB);
+    return getButtonPressed(Button.B);
   }
 
   /**
@@ -319,7 +319,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getBButtonReleased() {
-    return getButtonReleased(Button.kB);
+    return getButtonReleased(Button.B);
   }
 
   /**
@@ -330,7 +330,7 @@ public class XboxController implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent b(EventLoop loop) {
-    return button(Button.kB, loop);
+    return button(Button.B, loop);
   }
 
   /**
@@ -339,7 +339,7 @@ public class XboxController implements Sendable {
    * @return The state of the button.
    */
   public boolean getXButton() {
-    return getButton(Button.kX);
+    return getButton(Button.X);
   }
 
   /**
@@ -348,7 +348,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getXButtonPressed() {
-    return getButtonPressed(Button.kX);
+    return getButtonPressed(Button.X);
   }
 
   /**
@@ -357,7 +357,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getXButtonReleased() {
-    return getButtonReleased(Button.kX);
+    return getButtonReleased(Button.X);
   }
 
   /**
@@ -368,7 +368,7 @@ public class XboxController implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent x(EventLoop loop) {
-    return button(Button.kX, loop);
+    return button(Button.X, loop);
   }
 
   /**
@@ -377,7 +377,7 @@ public class XboxController implements Sendable {
    * @return The state of the button.
    */
   public boolean getYButton() {
-    return getButton(Button.kY);
+    return getButton(Button.Y);
   }
 
   /**
@@ -386,7 +386,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getYButtonPressed() {
-    return getButtonPressed(Button.kY);
+    return getButtonPressed(Button.Y);
   }
 
   /**
@@ -395,7 +395,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getYButtonReleased() {
-    return getButtonReleased(Button.kY);
+    return getButtonReleased(Button.Y);
   }
 
   /**
@@ -406,7 +406,7 @@ public class XboxController implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent y(EventLoop loop) {
-    return button(Button.kY, loop);
+    return button(Button.Y, loop);
   }
 
   /**
@@ -415,7 +415,7 @@ public class XboxController implements Sendable {
    * @return The state of the button.
    */
   public boolean getViewButton() {
-    return getButton(Button.kView);
+    return getButton(Button.VIEW);
   }
 
   /**
@@ -424,7 +424,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getViewButtonPressed() {
-    return getButtonPressed(Button.kView);
+    return getButtonPressed(Button.VIEW);
   }
 
   /**
@@ -433,7 +433,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getViewButtonReleased() {
-    return getButtonReleased(Button.kView);
+    return getButtonReleased(Button.VIEW);
   }
 
   /**
@@ -444,7 +444,7 @@ public class XboxController implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent view(EventLoop loop) {
-    return button(Button.kView, loop);
+    return button(Button.VIEW, loop);
   }
 
   /**
@@ -453,7 +453,7 @@ public class XboxController implements Sendable {
    * @return The state of the button.
    */
   public boolean getXboxButton() {
-    return getButton(Button.kXbox);
+    return getButton(Button.XBOX);
   }
 
   /**
@@ -462,7 +462,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getXboxButtonPressed() {
-    return getButtonPressed(Button.kXbox);
+    return getButtonPressed(Button.XBOX);
   }
 
   /**
@@ -471,7 +471,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getXboxButtonReleased() {
-    return getButtonReleased(Button.kXbox);
+    return getButtonReleased(Button.XBOX);
   }
 
   /**
@@ -482,7 +482,7 @@ public class XboxController implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent xbox(EventLoop loop) {
-    return button(Button.kXbox, loop);
+    return button(Button.XBOX, loop);
   }
 
   /**
@@ -491,7 +491,7 @@ public class XboxController implements Sendable {
    * @return The state of the button.
    */
   public boolean getMenuButton() {
-    return getButton(Button.kMenu);
+    return getButton(Button.MENU);
   }
 
   /**
@@ -500,7 +500,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getMenuButtonPressed() {
-    return getButtonPressed(Button.kMenu);
+    return getButtonPressed(Button.MENU);
   }
 
   /**
@@ -509,7 +509,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getMenuButtonReleased() {
-    return getButtonReleased(Button.kMenu);
+    return getButtonReleased(Button.MENU);
   }
 
   /**
@@ -520,7 +520,7 @@ public class XboxController implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent menu(EventLoop loop) {
-    return button(Button.kMenu, loop);
+    return button(Button.MENU, loop);
   }
 
   /**
@@ -529,7 +529,7 @@ public class XboxController implements Sendable {
    * @return The state of the button.
    */
   public boolean getLeftStickButton() {
-    return getButton(Button.kLeftStick);
+    return getButton(Button.LEFT_STICK);
   }
 
   /**
@@ -538,7 +538,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getLeftStickButtonPressed() {
-    return getButtonPressed(Button.kLeftStick);
+    return getButtonPressed(Button.LEFT_STICK);
   }
 
   /**
@@ -547,7 +547,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getLeftStickButtonReleased() {
-    return getButtonReleased(Button.kLeftStick);
+    return getButtonReleased(Button.LEFT_STICK);
   }
 
   /**
@@ -558,7 +558,7 @@ public class XboxController implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent leftStick(EventLoop loop) {
-    return button(Button.kLeftStick, loop);
+    return button(Button.LEFT_STICK, loop);
   }
 
   /**
@@ -567,7 +567,7 @@ public class XboxController implements Sendable {
    * @return The state of the button.
    */
   public boolean getRightStickButton() {
-    return getButton(Button.kRightStick);
+    return getButton(Button.RIGHT_STICK);
   }
 
   /**
@@ -576,7 +576,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRightStickButtonPressed() {
-    return getButtonPressed(Button.kRightStick);
+    return getButtonPressed(Button.RIGHT_STICK);
   }
 
   /**
@@ -585,7 +585,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getRightStickButtonReleased() {
-    return getButtonReleased(Button.kRightStick);
+    return getButtonReleased(Button.RIGHT_STICK);
   }
 
   /**
@@ -596,7 +596,7 @@ public class XboxController implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent rightStick(EventLoop loop) {
-    return button(Button.kRightStick, loop);
+    return button(Button.RIGHT_STICK, loop);
   }
 
   /**
@@ -605,7 +605,7 @@ public class XboxController implements Sendable {
    * @return The state of the button.
    */
   public boolean getLeftBumperButton() {
-    return getButton(Button.kLeftBumper);
+    return getButton(Button.LEFT_BUMPER);
   }
 
   /**
@@ -614,7 +614,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getLeftBumperButtonPressed() {
-    return getButtonPressed(Button.kLeftBumper);
+    return getButtonPressed(Button.LEFT_BUMPER);
   }
 
   /**
@@ -623,7 +623,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getLeftBumperButtonReleased() {
-    return getButtonReleased(Button.kLeftBumper);
+    return getButtonReleased(Button.LEFT_BUMPER);
   }
 
   /**
@@ -634,7 +634,7 @@ public class XboxController implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent leftBumper(EventLoop loop) {
-    return button(Button.kLeftBumper, loop);
+    return button(Button.LEFT_BUMPER, loop);
   }
 
   /**
@@ -643,7 +643,7 @@ public class XboxController implements Sendable {
    * @return The state of the button.
    */
   public boolean getRightBumperButton() {
-    return getButton(Button.kRightBumper);
+    return getButton(Button.RIGHT_BUMPER);
   }
 
   /**
@@ -652,7 +652,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRightBumperButtonPressed() {
-    return getButtonPressed(Button.kRightBumper);
+    return getButtonPressed(Button.RIGHT_BUMPER);
   }
 
   /**
@@ -661,7 +661,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getRightBumperButtonReleased() {
-    return getButtonReleased(Button.kRightBumper);
+    return getButtonReleased(Button.RIGHT_BUMPER);
   }
 
   /**
@@ -672,7 +672,7 @@ public class XboxController implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent rightBumper(EventLoop loop) {
-    return button(Button.kRightBumper, loop);
+    return button(Button.RIGHT_BUMPER, loop);
   }
 
   /**
@@ -681,7 +681,7 @@ public class XboxController implements Sendable {
    * @return The state of the button.
    */
   public boolean getDpadUpButton() {
-    return getButton(Button.kDpadUp);
+    return getButton(Button.DPAD_UP);
   }
 
   /**
@@ -690,7 +690,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getDpadUpButtonPressed() {
-    return getButtonPressed(Button.kDpadUp);
+    return getButtonPressed(Button.DPAD_UP);
   }
 
   /**
@@ -699,7 +699,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getDpadUpButtonReleased() {
-    return getButtonReleased(Button.kDpadUp);
+    return getButtonReleased(Button.DPAD_UP);
   }
 
   /**
@@ -710,7 +710,7 @@ public class XboxController implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent dpadUp(EventLoop loop) {
-    return button(Button.kDpadUp, loop);
+    return button(Button.DPAD_UP, loop);
   }
 
   /**
@@ -719,7 +719,7 @@ public class XboxController implements Sendable {
    * @return The state of the button.
    */
   public boolean getDpadDownButton() {
-    return getButton(Button.kDpadDown);
+    return getButton(Button.DPAD_DOWN);
   }
 
   /**
@@ -728,7 +728,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getDpadDownButtonPressed() {
-    return getButtonPressed(Button.kDpadDown);
+    return getButtonPressed(Button.DPAD_DOWN);
   }
 
   /**
@@ -737,7 +737,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getDpadDownButtonReleased() {
-    return getButtonReleased(Button.kDpadDown);
+    return getButtonReleased(Button.DPAD_DOWN);
   }
 
   /**
@@ -748,7 +748,7 @@ public class XboxController implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent dpadDown(EventLoop loop) {
-    return button(Button.kDpadDown, loop);
+    return button(Button.DPAD_DOWN, loop);
   }
 
   /**
@@ -757,7 +757,7 @@ public class XboxController implements Sendable {
    * @return The state of the button.
    */
   public boolean getDpadLeftButton() {
-    return getButton(Button.kDpadLeft);
+    return getButton(Button.DPAD_LEFT);
   }
 
   /**
@@ -766,7 +766,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getDpadLeftButtonPressed() {
-    return getButtonPressed(Button.kDpadLeft);
+    return getButtonPressed(Button.DPAD_LEFT);
   }
 
   /**
@@ -775,7 +775,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getDpadLeftButtonReleased() {
-    return getButtonReleased(Button.kDpadLeft);
+    return getButtonReleased(Button.DPAD_LEFT);
   }
 
   /**
@@ -786,7 +786,7 @@ public class XboxController implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent dpadLeft(EventLoop loop) {
-    return button(Button.kDpadLeft, loop);
+    return button(Button.DPAD_LEFT, loop);
   }
 
   /**
@@ -795,7 +795,7 @@ public class XboxController implements Sendable {
    * @return The state of the button.
    */
   public boolean getDpadRightButton() {
-    return getButton(Button.kDpadRight);
+    return getButton(Button.DPAD_RIGHT);
   }
 
   /**
@@ -804,7 +804,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getDpadRightButtonPressed() {
-    return getButtonPressed(Button.kDpadRight);
+    return getButtonPressed(Button.DPAD_RIGHT);
   }
 
   /**
@@ -813,7 +813,7 @@ public class XboxController implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getDpadRightButtonReleased() {
-    return getButtonReleased(Button.kDpadRight);
+    return getButtonReleased(Button.DPAD_RIGHT);
   }
 
   /**
@@ -824,7 +824,7 @@ public class XboxController implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent dpadRight(EventLoop loop) {
-    return button(Button.kDpadRight, loop);
+    return button(Button.DPAD_RIGHT, loop);
   }
 
   /**
@@ -899,8 +899,8 @@ public class XboxController implements Sendable {
     builder.addDoubleProperty("LeftY", this::getLeftY, null);
     builder.addDoubleProperty("RightX", this::getRightX, null);
     builder.addDoubleProperty("RightY", this::getRightY, null);
-    builder.addDoubleProperty("LeftTriggerAxis", this::getLeftTriggerAxis, null);
-    builder.addDoubleProperty("RightTriggerAxis", this::getRightTriggerAxis, null);
+    builder.addDoubleProperty("LeftTrigger", this::getLeftTrigger, null);
+    builder.addDoubleProperty("RightTrigger", this::getRightTrigger, null);
     builder.addBooleanProperty("A", this::getAButton, null);
     builder.addBooleanProperty("B", this::getBButton, null);
     builder.addBooleanProperty("X", this::getXButton, null);

@@ -32,27 +32,27 @@ bool DualSenseController::IsConnected() const {
 }
 
 double DualSenseController::GetLeftX() const {
-  return GetAxis(Axis::kLeftX);
+  return GetAxis(Axis::LEFT_X);
 }
 
 double DualSenseController::GetLeftY() const {
-  return GetAxis(Axis::kLeftY);
+  return GetAxis(Axis::LEFT_Y);
 }
 
 double DualSenseController::GetRightX() const {
-  return GetAxis(Axis::kRightX);
+  return GetAxis(Axis::RIGHT_X);
 }
 
 double DualSenseController::GetRightY() const {
-  return GetAxis(Axis::kRightY);
+  return GetAxis(Axis::RIGHT_Y);
 }
 
-double DualSenseController::GetL2Axis() const {
-  return GetAxis(Axis::kL2Axis);
+double DualSenseController::GetL2() const {
+  return GetAxis(Axis::L2);
 }
 
-double DualSenseController::GetR2Axis() const {
-  return GetAxis(Axis::kR2Axis);
+double DualSenseController::GetR2() const {
+  return GetAxis(Axis::R2);
 }
 
 double DualSenseController::GetAxis(int axis) const {
@@ -70,275 +70,275 @@ BooleanEvent DualSenseController::AxisGreaterThan(
 }
 
 bool DualSenseController::GetCrossButton() const {
-  return GetButton(Button::kCross);
+  return GetButton(Button::CROSS);
 }
 
 bool DualSenseController::GetCrossButtonPressed() {
-  return GetButtonPressed(Button::kCross);
+  return GetButtonPressed(Button::CROSS);
 }
 
 bool DualSenseController::GetCrossButtonReleased() {
-  return GetButtonReleased(Button::kCross);
+  return GetButtonReleased(Button::CROSS);
 }
 
 BooleanEvent DualSenseController::Cross(EventLoop* loop) const {
-  return ButtonEvent(Button::kCross, loop);
+  return ButtonEvent(Button::CROSS, loop);
 }
 
 bool DualSenseController::GetCircleButton() const {
-  return GetButton(Button::kCircle);
+  return GetButton(Button::CIRCLE);
 }
 
 bool DualSenseController::GetCircleButtonPressed() {
-  return GetButtonPressed(Button::kCircle);
+  return GetButtonPressed(Button::CIRCLE);
 }
 
 bool DualSenseController::GetCircleButtonReleased() {
-  return GetButtonReleased(Button::kCircle);
+  return GetButtonReleased(Button::CIRCLE);
 }
 
 BooleanEvent DualSenseController::Circle(EventLoop* loop) const {
-  return ButtonEvent(Button::kCircle, loop);
+  return ButtonEvent(Button::CIRCLE, loop);
 }
 
 bool DualSenseController::GetSquareButton() const {
-  return GetButton(Button::kSquare);
+  return GetButton(Button::SQUARE);
 }
 
 bool DualSenseController::GetSquareButtonPressed() {
-  return GetButtonPressed(Button::kSquare);
+  return GetButtonPressed(Button::SQUARE);
 }
 
 bool DualSenseController::GetSquareButtonReleased() {
-  return GetButtonReleased(Button::kSquare);
+  return GetButtonReleased(Button::SQUARE);
 }
 
 BooleanEvent DualSenseController::Square(EventLoop* loop) const {
-  return ButtonEvent(Button::kSquare, loop);
+  return ButtonEvent(Button::SQUARE, loop);
 }
 
 bool DualSenseController::GetTriangleButton() const {
-  return GetButton(Button::kTriangle);
+  return GetButton(Button::TRIANGLE);
 }
 
 bool DualSenseController::GetTriangleButtonPressed() {
-  return GetButtonPressed(Button::kTriangle);
+  return GetButtonPressed(Button::TRIANGLE);
 }
 
 bool DualSenseController::GetTriangleButtonReleased() {
-  return GetButtonReleased(Button::kTriangle);
+  return GetButtonReleased(Button::TRIANGLE);
 }
 
 BooleanEvent DualSenseController::Triangle(EventLoop* loop) const {
-  return ButtonEvent(Button::kTriangle, loop);
+  return ButtonEvent(Button::TRIANGLE, loop);
 }
 
 bool DualSenseController::GetCreateButton() const {
-  return GetButton(Button::kCreate);
+  return GetButton(Button::CREATE);
 }
 
 bool DualSenseController::GetCreateButtonPressed() {
-  return GetButtonPressed(Button::kCreate);
+  return GetButtonPressed(Button::CREATE);
 }
 
 bool DualSenseController::GetCreateButtonReleased() {
-  return GetButtonReleased(Button::kCreate);
+  return GetButtonReleased(Button::CREATE);
 }
 
 BooleanEvent DualSenseController::Create(EventLoop* loop) const {
-  return ButtonEvent(Button::kCreate, loop);
+  return ButtonEvent(Button::CREATE, loop);
 }
 
 bool DualSenseController::GetPSButton() const {
-  return GetButton(Button::kPS);
+  return GetButton(Button::PS);
 }
 
 bool DualSenseController::GetPSButtonPressed() {
-  return GetButtonPressed(Button::kPS);
+  return GetButtonPressed(Button::PS);
 }
 
 bool DualSenseController::GetPSButtonReleased() {
-  return GetButtonReleased(Button::kPS);
+  return GetButtonReleased(Button::PS);
 }
 
 BooleanEvent DualSenseController::PS(EventLoop* loop) const {
-  return ButtonEvent(Button::kPS, loop);
+  return ButtonEvent(Button::PS, loop);
 }
 
 bool DualSenseController::GetOptionsButton() const {
-  return GetButton(Button::kOptions);
+  return GetButton(Button::OPTIONS);
 }
 
 bool DualSenseController::GetOptionsButtonPressed() {
-  return GetButtonPressed(Button::kOptions);
+  return GetButtonPressed(Button::OPTIONS);
 }
 
 bool DualSenseController::GetOptionsButtonReleased() {
-  return GetButtonReleased(Button::kOptions);
+  return GetButtonReleased(Button::OPTIONS);
 }
 
 BooleanEvent DualSenseController::Options(EventLoop* loop) const {
-  return ButtonEvent(Button::kOptions, loop);
+  return ButtonEvent(Button::OPTIONS, loop);
 }
 
 bool DualSenseController::GetL3Button() const {
-  return GetButton(Button::kL3);
+  return GetButton(Button::L3);
 }
 
 bool DualSenseController::GetL3ButtonPressed() {
-  return GetButtonPressed(Button::kL3);
+  return GetButtonPressed(Button::L3);
 }
 
 bool DualSenseController::GetL3ButtonReleased() {
-  return GetButtonReleased(Button::kL3);
+  return GetButtonReleased(Button::L3);
 }
 
 BooleanEvent DualSenseController::L3(EventLoop* loop) const {
-  return ButtonEvent(Button::kL3, loop);
+  return ButtonEvent(Button::L3, loop);
 }
 
 bool DualSenseController::GetR3Button() const {
-  return GetButton(Button::kR3);
+  return GetButton(Button::R3);
 }
 
 bool DualSenseController::GetR3ButtonPressed() {
-  return GetButtonPressed(Button::kR3);
+  return GetButtonPressed(Button::R3);
 }
 
 bool DualSenseController::GetR3ButtonReleased() {
-  return GetButtonReleased(Button::kR3);
+  return GetButtonReleased(Button::R3);
 }
 
 BooleanEvent DualSenseController::R3(EventLoop* loop) const {
-  return ButtonEvent(Button::kR3, loop);
+  return ButtonEvent(Button::R3, loop);
 }
 
 bool DualSenseController::GetL1Button() const {
-  return GetButton(Button::kL1);
+  return GetButton(Button::L1);
 }
 
 bool DualSenseController::GetL1ButtonPressed() {
-  return GetButtonPressed(Button::kL1);
+  return GetButtonPressed(Button::L1);
 }
 
 bool DualSenseController::GetL1ButtonReleased() {
-  return GetButtonReleased(Button::kL1);
+  return GetButtonReleased(Button::L1);
 }
 
 BooleanEvent DualSenseController::L1(EventLoop* loop) const {
-  return ButtonEvent(Button::kL1, loop);
+  return ButtonEvent(Button::L1, loop);
 }
 
 bool DualSenseController::GetR1Button() const {
-  return GetButton(Button::kR1);
+  return GetButton(Button::R1);
 }
 
 bool DualSenseController::GetR1ButtonPressed() {
-  return GetButtonPressed(Button::kR1);
+  return GetButtonPressed(Button::R1);
 }
 
 bool DualSenseController::GetR1ButtonReleased() {
-  return GetButtonReleased(Button::kR1);
+  return GetButtonReleased(Button::R1);
 }
 
 BooleanEvent DualSenseController::R1(EventLoop* loop) const {
-  return ButtonEvent(Button::kR1, loop);
+  return ButtonEvent(Button::R1, loop);
 }
 
 bool DualSenseController::GetDpadUpButton() const {
-  return GetButton(Button::kDpadUp);
+  return GetButton(Button::DPAD_UP);
 }
 
 bool DualSenseController::GetDpadUpButtonPressed() {
-  return GetButtonPressed(Button::kDpadUp);
+  return GetButtonPressed(Button::DPAD_UP);
 }
 
 bool DualSenseController::GetDpadUpButtonReleased() {
-  return GetButtonReleased(Button::kDpadUp);
+  return GetButtonReleased(Button::DPAD_UP);
 }
 
 BooleanEvent DualSenseController::DpadUp(EventLoop* loop) const {
-  return ButtonEvent(Button::kDpadUp, loop);
+  return ButtonEvent(Button::DPAD_UP, loop);
 }
 
 bool DualSenseController::GetDpadDownButton() const {
-  return GetButton(Button::kDpadDown);
+  return GetButton(Button::DPAD_DOWN);
 }
 
 bool DualSenseController::GetDpadDownButtonPressed() {
-  return GetButtonPressed(Button::kDpadDown);
+  return GetButtonPressed(Button::DPAD_DOWN);
 }
 
 bool DualSenseController::GetDpadDownButtonReleased() {
-  return GetButtonReleased(Button::kDpadDown);
+  return GetButtonReleased(Button::DPAD_DOWN);
 }
 
 BooleanEvent DualSenseController::DpadDown(EventLoop* loop) const {
-  return ButtonEvent(Button::kDpadDown, loop);
+  return ButtonEvent(Button::DPAD_DOWN, loop);
 }
 
 bool DualSenseController::GetDpadLeftButton() const {
-  return GetButton(Button::kDpadLeft);
+  return GetButton(Button::DPAD_LEFT);
 }
 
 bool DualSenseController::GetDpadLeftButtonPressed() {
-  return GetButtonPressed(Button::kDpadLeft);
+  return GetButtonPressed(Button::DPAD_LEFT);
 }
 
 bool DualSenseController::GetDpadLeftButtonReleased() {
-  return GetButtonReleased(Button::kDpadLeft);
+  return GetButtonReleased(Button::DPAD_LEFT);
 }
 
 BooleanEvent DualSenseController::DpadLeft(EventLoop* loop) const {
-  return ButtonEvent(Button::kDpadLeft, loop);
+  return ButtonEvent(Button::DPAD_LEFT, loop);
 }
 
 bool DualSenseController::GetDpadRightButton() const {
-  return GetButton(Button::kDpadRight);
+  return GetButton(Button::DPAD_RIGHT);
 }
 
 bool DualSenseController::GetDpadRightButtonPressed() {
-  return GetButtonPressed(Button::kDpadRight);
+  return GetButtonPressed(Button::DPAD_RIGHT);
 }
 
 bool DualSenseController::GetDpadRightButtonReleased() {
-  return GetButtonReleased(Button::kDpadRight);
+  return GetButtonReleased(Button::DPAD_RIGHT);
 }
 
 BooleanEvent DualSenseController::DpadRight(EventLoop* loop) const {
-  return ButtonEvent(Button::kDpadRight, loop);
+  return ButtonEvent(Button::DPAD_RIGHT, loop);
 }
 
 bool DualSenseController::GetMicrophoneButton() const {
-  return GetButton(Button::kMicrophone);
+  return GetButton(Button::MICROPHONE);
 }
 
 bool DualSenseController::GetMicrophoneButtonPressed() {
-  return GetButtonPressed(Button::kMicrophone);
+  return GetButtonPressed(Button::MICROPHONE);
 }
 
 bool DualSenseController::GetMicrophoneButtonReleased() {
-  return GetButtonReleased(Button::kMicrophone);
+  return GetButtonReleased(Button::MICROPHONE);
 }
 
 BooleanEvent DualSenseController::Microphone(EventLoop* loop) const {
-  return ButtonEvent(Button::kMicrophone, loop);
+  return ButtonEvent(Button::MICROPHONE, loop);
 }
 
 bool DualSenseController::GetTouchpadButton() const {
-  return GetButton(Button::kTouchpad);
+  return GetButton(Button::TOUCHPAD);
 }
 
 bool DualSenseController::GetTouchpadButtonPressed() {
-  return GetButtonPressed(Button::kTouchpad);
+  return GetButtonPressed(Button::TOUCHPAD);
 }
 
 bool DualSenseController::GetTouchpadButtonReleased() {
-  return GetButtonReleased(Button::kTouchpad);
+  return GetButtonReleased(Button::TOUCHPAD);
 }
 
 BooleanEvent DualSenseController::Touchpad(EventLoop* loop) const {
-  return ButtonEvent(Button::kTouchpad, loop);
+  return ButtonEvent(Button::TOUCHPAD, loop);
 }
 
 bool DualSenseController::GetButton(int button) const {
@@ -384,8 +384,8 @@ void DualSenseController::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);
   builder.AddDoubleProperty("RightX", [this] { return GetRightX(); }, nullptr);
   builder.AddDoubleProperty("RightY", [this] { return GetRightY(); }, nullptr);
-  builder.AddDoubleProperty("L2Axis", [this] { return GetL2Axis(); }, nullptr);
-  builder.AddDoubleProperty("R2Axis", [this] { return GetR2Axis(); }, nullptr);
+  builder.AddDoubleProperty("L2", [this] { return GetL2(); }, nullptr);
+  builder.AddDoubleProperty("R2", [this] { return GetR2(); }, nullptr);
   builder.AddBooleanProperty("Cross", [this] { return GetCrossButton(); }, nullptr);
   builder.AddBooleanProperty("Circle", [this] { return GetCircleButton(); }, nullptr);
   builder.AddBooleanProperty("Square", [this] { return GetSquareButton(); }, nullptr);

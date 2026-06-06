@@ -61,18 +61,18 @@ class XboxControllerSim : public GenericHIDSim {
   void SetRightY(double value);
 
   /**
-   * Change the Left Trigger Axis value of the controller.
+   * Change the Left Trigger value of the controller.
    *
    * @param value the new value
    */
-  void SetLeftTriggerAxis(double value);
+  void SetLeftTrigger(double value);
 
   /**
-   * Change the Right Trigger Axis value of the controller.
+   * Change the Right Trigger value of the controller.
    *
    * @param value the new value
    */
-  void SetRightTriggerAxis(double value);
+  void SetRightTrigger(double value);
 
   /**
    * Change the value of the A button on the controller.

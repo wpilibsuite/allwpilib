@@ -48,7 +48,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftX(double value) {
-    setRawAxis(DualSenseController.Axis.kLeftX.value, value);
+    setRawAxis(DualSenseController.Axis.LEFT_X.value, value);
   }
 
   /**
@@ -57,7 +57,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftY(double value) {
-    setRawAxis(DualSenseController.Axis.kLeftY.value, value);
+    setRawAxis(DualSenseController.Axis.LEFT_Y.value, value);
   }
 
   /**
@@ -66,7 +66,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightX(double value) {
-    setRawAxis(DualSenseController.Axis.kRightX.value, value);
+    setRawAxis(DualSenseController.Axis.RIGHT_X.value, value);
   }
 
   /**
@@ -75,25 +75,25 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightY(double value) {
-    setRawAxis(DualSenseController.Axis.kRightY.value, value);
+    setRawAxis(DualSenseController.Axis.RIGHT_Y.value, value);
   }
 
   /**
-   * Change the L 2 Axis value of the controller.
+   * Change the L 2 value of the controller.
    *
    * @param value the new value
    */
-  public void setL2Axis(double value) {
-    setRawAxis(DualSenseController.Axis.kL2Axis.value, value);
+  public void setL2(double value) {
+    setRawAxis(DualSenseController.Axis.L2.value, value);
   }
 
   /**
-   * Change the R 2 Axis value of the controller.
+   * Change the R 2 value of the controller.
    *
    * @param value the new value
    */
-  public void setR2Axis(double value) {
-    setRawAxis(DualSenseController.Axis.kR2Axis.value, value);
+  public void setR2(double value) {
+    setRawAxis(DualSenseController.Axis.R2.value, value);
   }
 
   /**
@@ -102,7 +102,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setCrossButton(boolean value) {
-    setRawButton(DualSenseController.Button.kCross.value, value);
+    setRawButton(DualSenseController.Button.CROSS.value, value);
   }
 
   /**
@@ -111,7 +111,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setCircleButton(boolean value) {
-    setRawButton(DualSenseController.Button.kCircle.value, value);
+    setRawButton(DualSenseController.Button.CIRCLE.value, value);
   }
 
   /**
@@ -120,7 +120,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setSquareButton(boolean value) {
-    setRawButton(DualSenseController.Button.kSquare.value, value);
+    setRawButton(DualSenseController.Button.SQUARE.value, value);
   }
 
   /**
@@ -129,7 +129,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setTriangleButton(boolean value) {
-    setRawButton(DualSenseController.Button.kTriangle.value, value);
+    setRawButton(DualSenseController.Button.TRIANGLE.value, value);
   }
 
   /**
@@ -138,7 +138,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setCreateButton(boolean value) {
-    setRawButton(DualSenseController.Button.kCreate.value, value);
+    setRawButton(DualSenseController.Button.CREATE.value, value);
   }
 
   /**
@@ -147,7 +147,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setPSButton(boolean value) {
-    setRawButton(DualSenseController.Button.kPS.value, value);
+    setRawButton(DualSenseController.Button.PS.value, value);
   }
 
   /**
@@ -156,7 +156,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setOptionsButton(boolean value) {
-    setRawButton(DualSenseController.Button.kOptions.value, value);
+    setRawButton(DualSenseController.Button.OPTIONS.value, value);
   }
 
   /**
@@ -165,7 +165,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setL3Button(boolean value) {
-    setRawButton(DualSenseController.Button.kL3.value, value);
+    setRawButton(DualSenseController.Button.L3.value, value);
   }
 
   /**
@@ -174,7 +174,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setR3Button(boolean value) {
-    setRawButton(DualSenseController.Button.kR3.value, value);
+    setRawButton(DualSenseController.Button.R3.value, value);
   }
 
   /**
@@ -183,7 +183,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setL1Button(boolean value) {
-    setRawButton(DualSenseController.Button.kL1.value, value);
+    setRawButton(DualSenseController.Button.L1.value, value);
   }
 
   /**
@@ -192,7 +192,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setR1Button(boolean value) {
-    setRawButton(DualSenseController.Button.kR1.value, value);
+    setRawButton(DualSenseController.Button.R1.value, value);
   }
 
   /**
@@ -201,7 +201,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setDpadUpButton(boolean value) {
-    setRawButton(DualSenseController.Button.kDpadUp.value, value);
+    setRawButton(DualSenseController.Button.DPAD_UP.value, value);
   }
 
   /**
@@ -210,7 +210,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setDpadDownButton(boolean value) {
-    setRawButton(DualSenseController.Button.kDpadDown.value, value);
+    setRawButton(DualSenseController.Button.DPAD_DOWN.value, value);
   }
 
   /**
@@ -219,7 +219,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setDpadLeftButton(boolean value) {
-    setRawButton(DualSenseController.Button.kDpadLeft.value, value);
+    setRawButton(DualSenseController.Button.DPAD_LEFT.value, value);
   }
 
   /**
@@ -228,7 +228,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setDpadRightButton(boolean value) {
-    setRawButton(DualSenseController.Button.kDpadRight.value, value);
+    setRawButton(DualSenseController.Button.DPAD_RIGHT.value, value);
   }
 
   /**
@@ -237,7 +237,7 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setMicrophoneButton(boolean value) {
-    setRawButton(DualSenseController.Button.kMicrophone.value, value);
+    setRawButton(DualSenseController.Button.MICROPHONE.value, value);
   }
 
   /**
@@ -246,6 +246,6 @@ public class DualSenseControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setTouchpadButton(boolean value) {
-    setRawButton(DualSenseController.Button.kTouchpad.value, value);
+    setRawButton(DualSenseController.Button.TOUCHPAD.value, value);
   }
 }

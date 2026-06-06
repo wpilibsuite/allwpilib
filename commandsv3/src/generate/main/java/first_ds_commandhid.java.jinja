@@ -74,7 +74,7 @@ public class Command{{ ClassName }}Controller extends CommandHIDBase {
   public Trigger {{ button.Name }}(EventLoop loop) {
     return button(
         m_controller.getHID(),
-        {{ ClassName }}Controller.Button.k{{ button.MethodName }}.value,
+        {{ ClassName }}Controller.Button.{{ button.ConstantName }}.value,
         loop);
   }
 {% endfor -%}
@@ -92,7 +92,7 @@ public class Command{{ ClassName }}Controller extends CommandHIDBase {
   public Trigger {{ trigger.Name }}(double threshold, EventLoop loop) {
     return axisGreaterThan(
         m_controller.getHID(),
-        {{ ClassName }}Controller.Axis.k{{ trigger.AxisMethodName }}.value,
+        {{ ClassName }}Controller.Axis.{{ trigger.AxisConstantName }}.value,
         threshold,
         loop);
   }

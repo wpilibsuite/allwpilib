@@ -23,7 +23,7 @@ Command{{ ClassName }}Controller::GetController() const {
 Trigger Command{{ ClassName }}Controller::{{ button.MethodName }}(
     wpi::EventLoop* loop) const {
   return Button(m_controller.GetHID(),
-                wpi::{{ ClassName }}Controller::Button::k{{ button.MethodName }},
+                wpi::{{ ClassName }}Controller::Button::{{ button.ConstantName }},
                 loop);
 }
 {% endfor -%}
@@ -31,7 +31,7 @@ Trigger Command{{ ClassName }}Controller::{{ button.MethodName }}(
 Trigger Command{{ ClassName }}Controller::{{ trigger.MethodName }}(
     double threshold, wpi::EventLoop* loop) const {
   return AxisGreaterThan(m_controller.GetHID(),
-                         wpi::{{ ClassName }}Controller::Axis::k{{ trigger.AxisMethodName }},
+                         wpi::{{ ClassName }}Controller::Axis::{{ trigger.AxisConstantName }},
                          threshold, loop);
 }
 {% endfor -%}

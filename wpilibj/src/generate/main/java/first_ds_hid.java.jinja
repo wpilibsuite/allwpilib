@@ -21,25 +21,25 @@ import org.wpilib.util.sendable.SendableBuilder;
  */
 public class {{ ClassName }}Controller implements Sendable {
   /** The number of touchpads supported by this controller. */
-  public static final int kTouchpadCount = {{ touchpads }};
+  public static final int TOUCHPAD_COUNT = {{ touchpads }};
 
   /** Whether this controller supports main rumble motors. */
-  public static final boolean kSupportsRumble = {{ supports.rumble|string|lower }};
+  public static final boolean SUPPORTS_RUMBLE = {{ supports.rumble|string|lower }};
 
   /** Whether this controller supports trigger rumble motors. */
-  public static final boolean kSupportsTriggerRumble = {{ supports.triggerRumble|string|lower }};
+  public static final boolean SUPPORTS_TRIGGER_RUMBLE = {{ supports.triggerRumble|string|lower }};
 
   /** Whether this controller supports mono LED output. */
-  public static final boolean kSupportsMonoLed = {{ supports.monoLed|string|lower }};
+  public static final boolean SUPPORTS_MONO_LED = {{ supports.monoLed|string|lower }};
 
   /** Whether this controller supports RGB LED output. */
-  public static final boolean kSupportsRgbLed = {{ supports.rgbLed|string|lower }};
+  public static final boolean SUPPORTS_RGB_LED = {{ supports.rgbLed|string|lower }};
 
   /** Represents a digital button on a {{ ClassName }}Controller. */
   public enum Button {
 {%- for button in buttons %}
     /** {{ button.DocName }} button. */
-    k{{ button.MethodName }}({{ button.value }}, "{{ button.MethodName }}Button"){{ ";" if loop.last else "," }}
+    {{ button.ConstantName }}({{ button.value }}, "{{ button.MethodName }}Button"){{ ";" if loop.last else "," }}
 {%- endfor %}
 
     /** Button value. */
@@ -62,7 +62,7 @@ public class {{ ClassName }}Controller implements Sendable {
   public enum Axis {
 {%- for axis in axes %}
     /** {{ axis.DocName }}. */
-    k{{ axis.MethodName }}({{ axis.value }}, "{{ axis.MethodName }}"){{ ";" if loop.last else "," }}
+    {{ axis.ConstantName }}({{ axis.value }}, "{{ axis.MethodName }}"){{ ";" if loop.last else "," }}
 {%- endfor %}
 
     /** Axis value. */
@@ -143,7 +143,7 @@ public class {{ ClassName }}Controller implements Sendable {
    * @return The axis value.
    */
   public double get{{ axis.MethodName }}() {
-    return getAxis(Axis.k{{ axis.MethodName }});
+    return getAxis(Axis.{{ axis.ConstantName }});
   }
 {% endfor %}
   /**
@@ -189,7 +189,7 @@ public class {{ ClassName }}Controller implements Sendable {
    * @return The state of the button.
    */
   public boolean get{{ button.MethodName }}Button() {
-    return getButton(Button.k{{ button.MethodName }});
+    return getButton(Button.{{ button.ConstantName }});
   }
 
   /**
@@ -198,7 +198,7 @@ public class {{ ClassName }}Controller implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean get{{ button.MethodName }}ButtonPressed() {
-    return getButtonPressed(Button.k{{ button.MethodName }});
+    return getButtonPressed(Button.{{ button.ConstantName }});
   }
 
   /**
@@ -207,7 +207,7 @@ public class {{ ClassName }}Controller implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean get{{ button.MethodName }}ButtonReleased() {
-    return getButtonReleased(Button.k{{ button.MethodName }});
+    return getButtonReleased(Button.{{ button.ConstantName }});
   }
 
   /**
@@ -218,7 +218,7 @@ public class {{ ClassName }}Controller implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent {{ button.Name }}(EventLoop loop) {
-    return button(Button.k{{ button.MethodName }}, loop);
+    return button(Button.{{ button.ConstantName }}, loop);
   }
 {% endfor %}
   /**
