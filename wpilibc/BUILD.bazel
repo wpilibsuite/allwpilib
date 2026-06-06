@@ -61,8 +61,8 @@ py_binary(
         "//conditions:default": [],
     }),
     deps = [
-        ":generate_hids",
         ":generate_first_ds_hids",
+        ":generate_hids",
         ":generate_pwm_motor_controllers",
     ],
 )

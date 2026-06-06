@@ -51,8 +51,8 @@ py_binary(
         "//conditions:default": [],
     }),
     deps = [
-        ":generate_hids",
         ":generate_first_ds_hids",
+        ":generate_hids",
         ":generate_pwm_motor_controllers",
     ],
 )
@@ -156,10 +156,10 @@ java_binary(
 filegroup(
     name = "hid_schema",
     srcs = [
-        "src/generate/hids.json",
-        "src/generate/hids.schema.json",
         "src/generate/first_ds_hids.json",
         "src/generate/first_ds_hids.schema.json",
+        "src/generate/hids.json",
+        "src/generate/hids.schema.json",
     ],
     visibility = ["//visibility:public"],
 )
