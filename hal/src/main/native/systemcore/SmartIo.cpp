@@ -39,11 +39,20 @@ int32_t SmartIo::InitializeMode(MRC_SmartIOMode mode) {
     return mrcSmartIo.status;
   }
 
-  return MRC_SmartIO_InitializeMode(channel, mode);
+  MRC_Status ret = MRC_SmartIO_InitializeMode(channel, mode);
+  if (ret == 0) {
+    currentMode = mode;
+  }
+  return ret;
 }
 
 int32_t SmartIo::SwitchDioDirection(bool input) {
-  return MRC_SmartIO_SwitchDirection(channel, input);
+  MRC_Status ret = MRC_SmartIO_SwitchDirection(channel, input);
+  if (ret == 0) {
+    currentMode = input ? MRC_SmartIOMode::MRC_SmartIOMode_DigitalInput
+                        : MRC_SmartIOMode::MRC_SmartIOMode_DigitalOutput;
+  }
+  return ret;
 }
 
 int32_t SmartIo::SetDigitalOutput(bool value) {
@@ -83,18 +92,19 @@ int32_t SmartIo::SetPwmOutputPeriod(MRC_PwmOutputPeriod period) {
   return MRC_SmartIO_SetPwmOutputPeriod(channel, period);
 }
 
-int32_t SmartIo::SetPwmMicroseconds(uint16_t microseconds) {
-  return MRC_SmartIO_SetPwmOutputMicroseconds(channel, microseconds);
+int32_t SmartIo::SetPwmOutputMicroseconds(uint16_t microseconds) {
+  MRC_Status ret = MRC_SmartIO_SetPwmOutputMicroseconds(channel, microseconds);
+  if (ret != 0) {
+    setPwmOutputMicrosecondsValue = 0;
+  } else {
+    setPwmOutputMicrosecondsValue = microseconds;
+  }
+  return ret;
 }
 
-int32_t SmartIo::GetPwmMicroseconds(uint16_t* microseconds) {
-  int32_t microsecondsInt;
-  int32_t status =
-      MRC_SmartIO_GetPwmInputMicroseconds(channel, &microsecondsInt);
-  if (status == 0) {
-    *microseconds = microsecondsInt;
-  }
-  return status;
+int32_t SmartIo::GetPwmOutputMicroseconds(uint16_t* microseconds) {
+  *microseconds = setPwmOutputMicrosecondsValue;
+  return MRC_STATUS_SUCCESS;
 }
 
 int32_t SmartIo::GetAnalogInput(uint16_t* value) {

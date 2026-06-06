@@ -20,6 +20,7 @@ struct SmartIo {
   uint8_t channel;
   std::string previousAllocation;
   MRC_SmartIOMode currentMode{MRC_SmartIOMode::MRC_SmartIOMode_DigitalInput};
+  uint16_t setPwmOutputMicrosecondsValue{0};
 
   int32_t InitializeMode(MRC_SmartIOMode mode);
   int32_t SwitchDioDirection(bool input);
@@ -31,9 +32,8 @@ struct SmartIo {
   int32_t GetPwmInputPeriodMicroseconds(uint16_t* microseconds);
 
   int32_t SetPwmOutputPeriod(MRC_PwmOutputPeriod period);
-
-  int32_t SetPwmMicroseconds(uint16_t microseconds);
-  int32_t GetPwmMicroseconds(uint16_t* microseconds);
+  int32_t SetPwmOutputMicroseconds(uint16_t microseconds);
+  int32_t GetPwmOutputMicroseconds(uint16_t* microseconds);
 
   int32_t GetAnalogInput(uint16_t* value);
 

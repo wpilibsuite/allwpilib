@@ -112,7 +112,7 @@ void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
     return;
   }
 
-  *status = port->SetPwmMicroseconds(microsecondPulseTime);
+  *status = port->SetPwmOutputMicroseconds(microsecondPulseTime);
 }
 
 int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
@@ -124,7 +124,7 @@ int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
   }
 
   uint16_t microseconds = 0;
-  *status = port->GetPwmMicroseconds(&microseconds);
+  *status = port->GetPwmOutputMicroseconds(&microseconds);
   return microseconds;
 }
 
