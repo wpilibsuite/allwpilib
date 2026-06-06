@@ -21,6 +21,7 @@ static std::atomic<int64_t> programState{0};
 static std::atomic<uint64_t> programStartTime{0};
 static std::atomic<uint64_t> programPauseTime{0};
 static std::atomic<uint64_t> programStepTime{0};
+static std::atomic<uint64_t> programStartNotifierAlarmCount{0};
 
 namespace wpi::hal::init {
 void InitializeMockHooks() {
@@ -67,6 +68,7 @@ uint64_t GetMonotonicTime() {
 }
 
 void SetProgramStarted(bool started) {
+  programStartNotifierAlarmCount = GetNotifierAlarmSetCount();
   programStarted = started;
 }
 bool GetProgramStarted() {
@@ -88,9 +90,11 @@ void HALSIM_WaitForProgramStart(HAL_Bool waitForFirstNotifier) {
   }
 
   // Frameworks observe program start before arming their first notifier alarm.
-  // Wait for that alarm so a following StepTiming() can see and service it.
+  // Wait for an alarm armed after that program-start edge so a stale notifier
+  // cannot satisfy this check.
   while (waitForFirstNotifier &&
-         HALSIM_GetNextNotifierTimeout() == UINT64_MAX) {
+         (GetNotifierAlarmSetCount() == programStartNotifierAlarmCount ||
+          HALSIM_GetNextNotifierTimeout() == UINT64_MAX)) {
     count++;
     if (count % 10 == 0) {
       wpi::util::print("Waiting for first notifier alarm: {}\n", count);
