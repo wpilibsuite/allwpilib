@@ -52,11 +52,11 @@ class WPILIB_DLLEXPORT TwoDeadWheelPoseEstimator3d
    * @param wheelPositions The current wheel position readings.
    * @param initialPose The starting pose estimate.
    */
-  TwoDeadWheelPoseEstimator3d(
-      wpi::units::meter_t xWheelYPos, wpi::units::meter_t yWheelXPos,
-      const Rotation3d& gyroAngle,
-      const TwoDeadWheelPositions& wheelPositions,
-      const Pose3d& initialPose);
+  TwoDeadWheelPoseEstimator3d(wpi::units::meter_t xWheelYPos,
+                              wpi::units::meter_t yWheelXPos,
+                              const Rotation3d& gyroAngle,
+                              const TwoDeadWheelPositions& wheelPositions,
+                              const Pose3d& initialPose);
 
   /**
    * Constructs a TwoDeadWheelPoseEstimator3d.
@@ -78,8 +78,7 @@ class WPILIB_DLLEXPORT TwoDeadWheelPoseEstimator3d
    */
   TwoDeadWheelPoseEstimator3d(
       wpi::units::meter_t xWheelYPos, wpi::units::meter_t yWheelXPos,
-      const Rotation3d& gyroAngle,
-      const TwoDeadWheelPositions& wheelPositions,
+      const Rotation3d& gyroAngle, const TwoDeadWheelPositions& wheelPositions,
       const Pose3d& initialPose,
       const wpi::util::array<double, 4>& stateStdDevs,
       const wpi::util::array<double, 4>& visionMeasurementStdDevs);

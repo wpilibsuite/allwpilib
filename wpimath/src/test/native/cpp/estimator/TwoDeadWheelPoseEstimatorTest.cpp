@@ -116,10 +116,9 @@ TEST(TwoDeadWheelPoseEstimatorTest, SampleAt) {
   // Add a tiny tolerance for the upper bound because of floating point rounding
   // error
   for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
-    estimator.UpdateWithTime(wpi::units::second_t{time},
-                             wpi::math::Rotation2d{},
-                             wpi::math::TwoDeadWheelPositions{
-                                 wpi::units::meter_t{time}, 0_m});
+    estimator.UpdateWithTime(
+        wpi::units::second_t{time}, wpi::math::Rotation2d{},
+        wpi::math::TwoDeadWheelPositions{wpi::units::meter_t{time}, 0_m});
   }
 
   // Sample at an added time

@@ -11,25 +11,20 @@
 
 using namespace wpi::math;
 
-wpi::math::TwoDeadWheelPoseEstimator3d::
-    TwoDeadWheelPoseEstimator3d(
-        wpi::units::meter_t xWheelYPos, wpi::units::meter_t yWheelXPos,
-        const Rotation3d& gyroAngle,
-        const TwoDeadWheelPositions& wheelPositions,
-        const Pose3d& initialPose)
-    : TwoDeadWheelPoseEstimator3d{
-          xWheelYPos,          yWheelXPos,  gyroAngle,
-          wheelPositions,      initialPose, {0.1, 0.1, 0.1, 0.1},
-          {0.9, 0.9, 0.9, 0.9}} {}
+wpi::math::TwoDeadWheelPoseEstimator3d::TwoDeadWheelPoseEstimator3d(
+    wpi::units::meter_t xWheelYPos, wpi::units::meter_t yWheelXPos,
+    const Rotation3d& gyroAngle, const TwoDeadWheelPositions& wheelPositions,
+    const Pose3d& initialPose)
+    : TwoDeadWheelPoseEstimator3d{xWheelYPos,          yWheelXPos,
+                                  gyroAngle,           wheelPositions,
+                                  initialPose,         {0.1, 0.1, 0.1, 0.1},
+                                  {0.9, 0.9, 0.9, 0.9}} {}
 
-wpi::math::TwoDeadWheelPoseEstimator3d::
-    TwoDeadWheelPoseEstimator3d(
-        wpi::units::meter_t xWheelYPos, wpi::units::meter_t yWheelXPos,
-        const Rotation3d& gyroAngle,
-        const TwoDeadWheelPositions& wheelPositions,
-        const Pose3d& initialPose,
-        const wpi::util::array<double, 4>& stateStdDevs,
-        const wpi::util::array<double, 4>& visionMeasurementStdDevs)
+wpi::math::TwoDeadWheelPoseEstimator3d::TwoDeadWheelPoseEstimator3d(
+    wpi::units::meter_t xWheelYPos, wpi::units::meter_t yWheelXPos,
+    const Rotation3d& gyroAngle, const TwoDeadWheelPositions& wheelPositions,
+    const Pose3d& initialPose, const wpi::util::array<double, 4>& stateStdDevs,
+    const wpi::util::array<double, 4>& visionMeasurementStdDevs)
     : PoseEstimator3d(m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
       m_odometryImpl(xWheelYPos, yWheelXPos, gyroAngle, wheelPositions,
                      initialPose) {

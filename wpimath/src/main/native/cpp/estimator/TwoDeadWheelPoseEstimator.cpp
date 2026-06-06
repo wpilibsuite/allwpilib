@@ -13,17 +13,15 @@ using namespace wpi::math;
 
 wpi::math::TwoDeadWheelPoseEstimator::TwoDeadWheelPoseEstimator(
     wpi::units::meter_t xWheelYPos, wpi::units::meter_t yWheelXPos,
-    const Rotation2d& gyroAngle,
-    const TwoDeadWheelPositions& wheelPositions,
+    const Rotation2d& gyroAngle, const TwoDeadWheelPositions& wheelPositions,
     const Pose2d& initialPose)
-    : TwoDeadWheelPoseEstimator{
-          xWheelYPos,  yWheelXPos,      gyroAngle,      wheelPositions,
-          initialPose, {0.1, 0.1, 0.1}, {0.9, 0.9, 0.9}} {}
+    : TwoDeadWheelPoseEstimator{xWheelYPos,     yWheelXPos,  gyroAngle,
+                                wheelPositions, initialPose, {0.1, 0.1, 0.1},
+                                {0.9, 0.9, 0.9}} {}
 
 wpi::math::TwoDeadWheelPoseEstimator::TwoDeadWheelPoseEstimator(
     wpi::units::meter_t xWheelYPos, wpi::units::meter_t yWheelXPos,
-    const Rotation2d& gyroAngle,
-    const TwoDeadWheelPositions& wheelPositions,
+    const Rotation2d& gyroAngle, const TwoDeadWheelPositions& wheelPositions,
     const Pose2d& initialPose, const wpi::util::array<double, 3>& stateStdDevs,
     const wpi::util::array<double, 3>& visionMeasurementStdDevs)
     : PoseEstimator(m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),

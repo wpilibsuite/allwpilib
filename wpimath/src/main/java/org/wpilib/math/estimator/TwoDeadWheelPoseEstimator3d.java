@@ -29,15 +29,13 @@ import org.wpilib.math.numbers.N4;
  *
  * <p>{@link TwoDeadWheelPoseEstimator3d#update} should be called every robot loop.
  *
- * <p>{@link TwoDeadWheelPoseEstimator3d#addVisionMeasurement} can be called as infrequently
- * as you want; if you never call it, then this class will behave mostly like regular encoder
- * odometry.
+ * <p>{@link TwoDeadWheelPoseEstimator3d#addVisionMeasurement} can be called as infrequently as you
+ * want; if you never call it, then this class will behave mostly like regular encoder odometry.
  */
-public class TwoDeadWheelPoseEstimator3d
-    extends PoseEstimator3d<TwoDeadWheelPositions> {
+public class TwoDeadWheelPoseEstimator3d extends PoseEstimator3d<TwoDeadWheelPositions> {
   /**
-   * Constructs a TwoDeadWheelPoseEstimator with default standard deviations for the model
-   * and vision measurements.
+   * Constructs a TwoDeadWheelPoseEstimator with default standard deviations for the model and
+   * vision measurements.
    *
    * <p>The default standard deviations of the model states are 0.1 meters for x, 0.1 meters for y,
    * and 0.1 radians for heading. The default standard deviations of the vision measurements are 0.9
@@ -93,8 +91,7 @@ public class TwoDeadWheelPoseEstimator3d
       Matrix<N4, N1> stateStdDevs,
       Matrix<N4, N1> visionMeasurementStdDevs) {
     super(
-        new TwoDeadWheelOdometry3d(
-            xWheelYPos, yWheelXPos, gyroAngle, wheelPositions, initialPose),
+        new TwoDeadWheelOdometry3d(xWheelYPos, yWheelXPos, gyroAngle, wheelPositions, initialPose),
         stateStdDevs,
         visionMeasurementStdDevs);
   }

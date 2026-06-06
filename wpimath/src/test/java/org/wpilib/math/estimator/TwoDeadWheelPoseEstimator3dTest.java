@@ -187,9 +187,7 @@ class TwoDeadWheelPoseEstimator3dTest {
 
     // Test reset position
     estimator.resetPosition(
-        Rotation3d.kZero,
-        new TwoDeadWheelPositions(1, 0),
-        new Pose3d(1, 0, 0, Rotation3d.kZero));
+        Rotation3d.kZero, new TwoDeadWheelPositions(1, 0), new Pose3d(1, 0, 0, Rotation3d.kZero));
 
     assertAll(
         () -> assertEquals(1, estimator.getEstimatedPosition().getX(), kEpsilon),

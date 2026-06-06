@@ -3,7 +3,6 @@ extra_includes:
 - wpi/math/kinematics/MecanumDriveWheelPositions.hpp
 - wpi/math/kinematics/SwerveModulePosition.hpp
 - wpi/math/kinematics/TwoDeadWheelPositions.hpp
-- wpi/math/kinematics/ThreeDeadWheelPositions.hpp
 
 
 classes:
@@ -56,7 +55,3 @@ templates:
     qualname: wpi::math::PoseEstimator
     params:
     - wpi::math::TwoDeadWheelPositions
-  ThreeDeadWheelPoseEstimatorBase:
-    qualname: wpi::math::PoseEstimator
-    params:
-    - wpi::math::ThreeDeadWheelPositions

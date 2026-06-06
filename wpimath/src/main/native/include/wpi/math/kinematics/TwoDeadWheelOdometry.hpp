@@ -8,8 +8,8 @@
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
-#include "wpi/math/kinematics/TwoDeadWheelPositions.hpp"
 #include "wpi/math/kinematics/Odometry.hpp"
+#include "wpi/math/kinematics/TwoDeadWheelPositions.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/length.hpp"
@@ -36,11 +36,11 @@ class WPILIB_DLLEXPORT TwoDeadWheelOdometry
    * @param wheelPositions The current wheel position readings.
    * @param initialPose The starting position of the robot on the field.
    */
-  TwoDeadWheelOdometry(
-      wpi::units::meter_t xWheelYPos, wpi::units::meter_t yWheelXPos,
-      const Rotation2d& gyroAngle,
-      const TwoDeadWheelPositions& wheelPositions,
-      const Pose2d& initialPose = Pose2d{})
+  TwoDeadWheelOdometry(wpi::units::meter_t xWheelYPos,
+                       wpi::units::meter_t yWheelXPos,
+                       const Rotation2d& gyroAngle,
+                       const TwoDeadWheelPositions& wheelPositions,
+                       const Pose2d& initialPose = Pose2d{})
       : Odometry(gyroAngle, initialPose),
         m_xWheelYPos(xWheelYPos),
         m_yWheelXPos(yWheelXPos),
@@ -55,9 +55,8 @@ class WPILIB_DLLEXPORT TwoDeadWheelOdometry
     Odometry::ResetPosition(gyroAngle, pose);
   }
 
-  const Pose2d& Update(
-      const Rotation2d& gyroAngle,
-      const TwoDeadWheelPositions& wheelPositions) override {
+  const Pose2d& Update(const Rotation2d& gyroAngle,
+                       const TwoDeadWheelPositions& wheelPositions) override {
     auto deltaTheta = (gyroAngle - m_previousAngle).Radians();
     auto deltaX =
         wheelPositions.x - m_previousWheelPositions.x +

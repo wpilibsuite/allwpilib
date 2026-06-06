@@ -16,20 +16,19 @@ import org.wpilib.math.numbers.N3;
 /**
  * This class wraps {@link TwoDeadWheelOdometry Double Follower Wheel Odometry} to fuse
  * latency-compensated vision measurements with differential drive encoder measurements. It is
- * intended to be a drop-in replacement for {@link TwoDeadWheelOdometry}; in fact, if you
- * never call {@link TwoDeadWheelPoseEstimator#addVisionMeasurement} and only call {@link
- * TwoDeadWheelPoseEstimator#update} then this will behave exactly the same as
- * TwoDeadWheelOdometry.
+ * intended to be a drop-in replacement for {@link TwoDeadWheelOdometry}; in fact, if you never call
+ * {@link TwoDeadWheelPoseEstimator#addVisionMeasurement} and only call {@link
+ * TwoDeadWheelPoseEstimator#update} then this will behave exactly the same as TwoDeadWheelOdometry.
  *
  * <p>{@link TwoDeadWheelPoseEstimator#update} should be called every robot loop.
  *
- * <p>{@link TwoDeadWheelPoseEstimator#addVisionMeasurement} can be called as infrequently as
- * you want; if you never call it then this class will behave exactly like regular encoder odometry.
+ * <p>{@link TwoDeadWheelPoseEstimator#addVisionMeasurement} can be called as infrequently as you
+ * want; if you never call it then this class will behave exactly like regular encoder odometry.
  */
 public class TwoDeadWheelPoseEstimator extends PoseEstimator<TwoDeadWheelPositions> {
   /**
-   * Constructs a TwoDeadWheelPoseEstimator with default standard deviations for the model
-   * and vision measurements.
+   * Constructs a TwoDeadWheelPoseEstimator with default standard deviations for the model and
+   * vision measurements.
    *
    * <p>The default standard deviations of the model states are 0.1 meters for x, 0.1 meters for y,
    * and 0.1 radians for heading. The default standard deviations of the vision measurements are 0.9
@@ -85,8 +84,7 @@ public class TwoDeadWheelPoseEstimator extends PoseEstimator<TwoDeadWheelPositio
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     super(
-        new TwoDeadWheelOdometry(
-            xWheelYPos, yWheelXPos, gyroAngle, wheelPositions, initialPose),
+        new TwoDeadWheelOdometry(xWheelYPos, yWheelXPos, gyroAngle, wheelPositions, initialPose),
         stateStdDevs,
         visionMeasurementStdDevs);
   }

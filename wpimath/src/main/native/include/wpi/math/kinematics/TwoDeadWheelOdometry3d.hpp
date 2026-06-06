@@ -9,8 +9,8 @@
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
-#include "wpi/math/kinematics/TwoDeadWheelPositions.hpp"
 #include "wpi/math/kinematics/Odometry3d.hpp"
+#include "wpi/math/kinematics/TwoDeadWheelPositions.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/velocity.hpp"
@@ -20,11 +20,11 @@ namespace wpi::math {
 class WPILIB_DLLEXPORT TwoDeadWheelOdometry3d
     : public Odometry3d<TwoDeadWheelPositions> {
  public:
-  TwoDeadWheelOdometry3d(
-      wpi::units::meter_t xWheelYPos, wpi::units::meter_t yWheelXPos,
-      const Rotation3d& gyroAngle,
-      const TwoDeadWheelPositions& wheelPositions,
-      const Pose3d& initialPose = Pose3d{})
+  TwoDeadWheelOdometry3d(wpi::units::meter_t xWheelYPos,
+                         wpi::units::meter_t yWheelXPos,
+                         const Rotation3d& gyroAngle,
+                         const TwoDeadWheelPositions& wheelPositions,
+                         const Pose3d& initialPose = Pose3d{})
       : Odometry3d(gyroAngle, initialPose),
         m_xWheelYPos(xWheelYPos),
         m_yWheelXPos(yWheelXPos),
@@ -39,9 +39,8 @@ class WPILIB_DLLEXPORT TwoDeadWheelOdometry3d
     Odometry3d::ResetPosition(gyroAngle, pose);
   }
 
-  const Pose3d& Update(
-      const Rotation3d& gyroAngle,
-      const TwoDeadWheelPositions& wheelPositions) override {
+  const Pose3d& Update(const Rotation3d& gyroAngle,
+                       const TwoDeadWheelPositions& wheelPositions) override {
     auto deltaAngle = gyroAngle.RelativeTo(m_previousAngle);
     auto deltaTheta = deltaAngle.ToRotation2d().Radians();
     auto deltaX = wheelPositions.x - m_previousWheelPositions.x +

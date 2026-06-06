@@ -24,8 +24,7 @@ struct WPILIB_DLLEXPORT TwoDeadWheelPositions {
    * @param x The distance traveled by the forward-facing wheel.
    * @param y The distance traveled by the left-facing wheel.
    */
-  constexpr TwoDeadWheelPositions(wpi::units::meter_t x,
-                                         wpi::units::meter_t y)
+  constexpr TwoDeadWheelPositions(wpi::units::meter_t x, wpi::units::meter_t y)
       : x(x), y(y) {}
 
   /**
@@ -45,8 +44,7 @@ struct WPILIB_DLLEXPORT TwoDeadWheelPositions {
    * @param other The other object.
    * @return Whether the two objects are equal.
    */
-  constexpr bool operator==(const TwoDeadWheelPositions& other) const =
-      default;
+  constexpr bool operator==(const TwoDeadWheelPositions& other) const = default;
 
   constexpr TwoDeadWheelPositions Interpolate(
       const TwoDeadWheelPositions& endValue, double t) const {

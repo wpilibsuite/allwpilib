@@ -127,10 +127,9 @@ TEST(TwoDeadWheelPoseEstimator3dTest, SampleAt) {
   // Add a tiny tolerance for the upper bound because of floating point rounding
   // error
   for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
-    estimator.UpdateWithTime(wpi::units::second_t{time},
-                             wpi::math::Rotation3d{},
-                             wpi::math::TwoDeadWheelPositions{
-                                 wpi::units::meter_t{time}, 0_m});
+    estimator.UpdateWithTime(
+        wpi::units::second_t{time}, wpi::math::Rotation3d{},
+        wpi::math::TwoDeadWheelPositions{wpi::units::meter_t{time}, 0_m});
   }
 
   // Sample at an added time
@@ -200,8 +199,7 @@ TEST(TwoDeadWheelPoseEstimator3dTest, Reset) {
 
   // Test reset position
   estimator.ResetPosition(
-      wpi::math::Rotation3d{},
-      wpi::math::TwoDeadWheelPositions{1_m, 0_m},
+      wpi::math::Rotation3d{}, wpi::math::TwoDeadWheelPositions{1_m, 0_m},
       wpi::math::Pose3d{1_m, 0_m, 0_m, wpi::math::Rotation3d{}});
 
   EXPECT_NEAR(1, estimator.GetEstimatedPosition().X().value(), kEpsilon);

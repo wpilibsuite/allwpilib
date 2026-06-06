@@ -19,8 +19,7 @@ class TwoDeadWheelOdometry3dTest : public ::testing::Test {
   static constexpr auto kYWheelXPos = 1_m;
 
   TwoDeadWheelPositions zero;
-  TwoDeadWheelOdometry3d odometry{kXWheelYPos, kYWheelXPos, Rotation3d{},
-                                         zero};
+  TwoDeadWheelOdometry3d odometry{kXWheelYPos, kYWheelXPos, Rotation3d{}, zero};
 };
 
 TEST_F(TwoDeadWheelOdometry3dTest, MultipleConsecutiveUpdates) {
@@ -40,8 +39,7 @@ TEST_F(TwoDeadWheelOdometry3dTest, MultipleConsecutiveUpdates) {
 
 TEST_F(TwoDeadWheelOdometry3dTest, TwoIterations) {
   TwoDeadWheelPositions wheelPositions{0.1_m, 0_m};
-  odometry.ResetPosition(Rotation3d{}, TwoDeadWheelPositions{},
-                         Pose3d{});
+  odometry.ResetPosition(Rotation3d{}, TwoDeadWheelPositions{}, Pose3d{});
 
   odometry.Update(Rotation3d{}, TwoDeadWheelPositions{});
   auto pose = odometry.Update(Rotation3d{}, wheelPositions);
