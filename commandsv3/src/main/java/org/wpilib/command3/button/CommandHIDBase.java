@@ -19,20 +19,47 @@ public class CommandHIDBase {
   private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisGreaterThanCache =
       new HashMap<>();
 
+  /**
+   * Constructs a CommandHIDBase.
+   *
+   * @param scheduler the scheduler that owns created triggers
+   */
   protected CommandHIDBase(Scheduler scheduler) {
     m_scheduler = scheduler;
   }
 
+  /**
+   * Returns the scheduler's default event loop.
+   *
+   * @return the default event loop
+   */
   protected EventLoop getDefaultEventLoop() {
     return m_scheduler.getDefaultEventLoop();
   }
 
+  /**
+   * Returns a trigger that is active while the given button is pressed.
+   *
+   * @param hid the HID to read from
+   * @param button the button index
+   * @param loop the event loop to poll on
+   * @return a trigger for the button
+   */
   protected Trigger button(GenericHID hid, int button, EventLoop loop) {
     var cache = m_buttonCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
         button, k -> new Trigger(m_scheduler, loop, () -> hid.getRawButton(k)));
   }
 
+  /**
+   * Returns a trigger that is active while the given axis is greater than the threshold.
+   *
+   * @param hid the HID to read from
+   * @param axis the axis index
+   * @param threshold the axis threshold
+   * @param loop the event loop to poll on
+   * @return a trigger for the axis threshold
+   */
   protected Trigger axisGreaterThan(GenericHID hid, int axis, double threshold, EventLoop loop) {
     var cache = m_axisGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
