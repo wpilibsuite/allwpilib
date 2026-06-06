@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include "wpi/util/Handle.h"
 #include "wpi/util/string.h"
 
 #ifdef __cplusplus
@@ -31,7 +32,7 @@ struct WPI_DataLog;
 /** Typedefs */
 typedef int NT_Bool;
 
-typedef unsigned int NT_Handle;
+typedef WPI_Handle NT_Handle;
 typedef NT_Handle NT_ConnectionDataLogger;
 typedef NT_Handle NT_DataLogger;
 typedef NT_Handle NT_Entry;
