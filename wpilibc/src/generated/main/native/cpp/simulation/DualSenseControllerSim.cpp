@@ -12,17 +12,17 @@ using namespace wpi::sim;
 
 DualSenseControllerSim::DualSenseControllerSim(const DualSenseController& joystick)
     : GenericHIDSim{joystick.GetHID()} {
-  SetAxesMaximumIndex(6);
-  SetButtonsMaximumIndex(21);
-  SetPOVsMaximumIndex(1);
+  SetAxesAvailable(0x3F);
+  SetButtonsAvailable(0x10FFFFULL);
+  SetPOVsAvailable(0);
   SetGamepadType(GenericHID::HIDType::PS5);
   SetSupportedOutputs(DualSenseController::kSupportedOutputs);
 }
 
 DualSenseControllerSim::DualSenseControllerSim(int port) : GenericHIDSim{port} {
-  SetAxesMaximumIndex(6);
-  SetButtonsMaximumIndex(21);
-  SetPOVsMaximumIndex(1);
+  SetAxesAvailable(0x3F);
+  SetButtonsAvailable(0x10FFFFULL);
+  SetPOVsAvailable(0);
   SetGamepadType(GenericHID::HIDType::PS5);
   SetSupportedOutputs(DualSenseController::kSupportedOutputs);
 }

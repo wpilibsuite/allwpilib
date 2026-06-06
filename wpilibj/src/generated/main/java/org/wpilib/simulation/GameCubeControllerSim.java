@@ -20,11 +20,7 @@ public class GameCubeControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public GameCubeControllerSim(GameCubeController joystick) {
     super(joystick.getHID());
-    setAxesMaximumIndex(6);
-    setButtonsMaximumIndex(24);
-    setPOVsMaximumIndex(1);
-    setGamepadType(GenericHID.HIDType.STANDARD);
-    setSupportedOutputs(GameCubeController.getSupportedOutputCapabilities());
+    configureDevice();
   }
 
   /**
@@ -35,9 +31,13 @@ public class GameCubeControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public GameCubeControllerSim(int port) {
     super(port);
-    setAxesMaximumIndex(6);
-    setButtonsMaximumIndex(24);
-    setPOVsMaximumIndex(1);
+    configureDevice();
+  }
+
+  private void configureDevice() {
+    setAxesAvailable(0x3F);
+    setButtonsAvailable(0xC07C4FL);
+    setPOVsAvailable(0);
     setGamepadType(GenericHID.HIDType.STANDARD);
     setSupportedOutputs(GameCubeController.getSupportedOutputCapabilities());
   }

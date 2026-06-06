@@ -12,17 +12,17 @@ using namespace wpi::sim;
 
 SteamControllerSim::SteamControllerSim(const SteamController& joystick)
     : GenericHIDSim{joystick.GetHID()} {
-  SetAxesMaximumIndex(6);
-  SetButtonsMaximumIndex(26);
-  SetPOVsMaximumIndex(1);
+  SetAxesAvailable(0x3F);
+  SetButtonsAvailable(0x3FFFFFFULL);
+  SetPOVsAvailable(0);
   SetGamepadType(GenericHID::HIDType::STANDARD);
   SetSupportedOutputs(SteamController::kSupportedOutputs);
 }
 
 SteamControllerSim::SteamControllerSim(int port) : GenericHIDSim{port} {
-  SetAxesMaximumIndex(6);
-  SetButtonsMaximumIndex(26);
-  SetPOVsMaximumIndex(1);
+  SetAxesAvailable(0x3F);
+  SetButtonsAvailable(0x3FFFFFFULL);
+  SetPOVsAvailable(0);
   SetGamepadType(GenericHID::HIDType::STANDARD);
   SetSupportedOutputs(SteamController::kSupportedOutputs);
 }

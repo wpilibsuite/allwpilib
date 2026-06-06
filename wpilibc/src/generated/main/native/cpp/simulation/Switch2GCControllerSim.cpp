@@ -12,17 +12,17 @@ using namespace wpi::sim;
 
 Switch2GCControllerSim::Switch2GCControllerSim(const Switch2GCController& joystick)
     : GenericHIDSim{joystick.GetHID()} {
-  SetAxesMaximumIndex(6);
-  SetButtonsMaximumIndex(24);
-  SetPOVsMaximumIndex(1);
+  SetAxesAvailable(0x3F);
+  SetButtonsAvailable(0xE0FE6FULL);
+  SetPOVsAvailable(0);
   SetGamepadType(GenericHID::HIDType::SWITCH_PRO);
   SetSupportedOutputs(Switch2GCController::kSupportedOutputs);
 }
 
 Switch2GCControllerSim::Switch2GCControllerSim(int port) : GenericHIDSim{port} {
-  SetAxesMaximumIndex(6);
-  SetButtonsMaximumIndex(24);
-  SetPOVsMaximumIndex(1);
+  SetAxesAvailable(0x3F);
+  SetButtonsAvailable(0xE0FE6FULL);
+  SetPOVsAvailable(0);
   SetGamepadType(GenericHID::HIDType::SWITCH_PRO);
   SetSupportedOutputs(Switch2GCController::kSupportedOutputs);
 }

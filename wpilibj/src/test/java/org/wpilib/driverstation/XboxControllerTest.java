@@ -22,9 +22,14 @@ class XboxControllerTest {
   @Test
   void testWrappedHID() {
     XboxController controller = new XboxController(2);
+    XboxControllerSim sim = new XboxControllerSim(controller);
+    sim.notifyNewData();
 
     assertEquals(2, controller.getPort());
     assertEquals(2, controller.getHID().getPort());
+    assertEquals(0x3F, controller.getHID().getAxesAvailable());
+    assertEquals(0x7FFFL, controller.getHID().getButtonsAvailable());
+    assertEquals(0, controller.getHID().getPOVsAvailable());
   }
 
   @ParameterizedTest

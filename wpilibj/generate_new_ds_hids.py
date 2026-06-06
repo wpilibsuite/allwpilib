@@ -68,6 +68,17 @@ def _supported_outputs_value(outputs: list[str]):
     return result
 
 
+def _availability_mask(mapping: list[dict]):
+    result = 0
+    for entry in mapping:
+        result |= 1 << entry["value"]
+    return result
+
+
+def _hex_literal(value: int):
+    return f"0x{value:X}"
+
+
 def _normalize_controller(controller: dict):
     normalized = dict(controller)
     normalized["axes"] = _normalize_mapping(controller["axes"])
@@ -85,6 +96,12 @@ def _normalize_controller(controller: dict):
         max(button["value"] for button in normalized["buttons"]) + 1
         if normalized["buttons"]
         else 0
+    )
+    normalized["AxesAvailableMask"] = _hex_literal(
+        _availability_mask(normalized["axes"])
+    )
+    normalized["ButtonsAvailableMask"] = _hex_literal(
+        _availability_mask(normalized["buttons"])
     )
     return normalized
 

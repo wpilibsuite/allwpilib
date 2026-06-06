@@ -20,11 +20,7 @@ public class XboxControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public XboxControllerSim(XboxController joystick) {
     super(joystick.getHID());
-    setAxesMaximumIndex(6);
-    setButtonsMaximumIndex(15);
-    setPOVsMaximumIndex(1);
-    setGamepadType(GenericHID.HIDType.XBOX_ONE);
-    setSupportedOutputs(XboxController.getSupportedOutputCapabilities());
+    configureDevice();
   }
 
   /**
@@ -35,9 +31,13 @@ public class XboxControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public XboxControllerSim(int port) {
     super(port);
-    setAxesMaximumIndex(6);
-    setButtonsMaximumIndex(15);
-    setPOVsMaximumIndex(1);
+    configureDevice();
+  }
+
+  private void configureDevice() {
+    setAxesAvailable(0x3F);
+    setButtonsAvailable(0x7FFFL);
+    setPOVsAvailable(0);
     setGamepadType(GenericHID.HIDType.XBOX_ONE);
     setSupportedOutputs(XboxController.getSupportedOutputCapabilities());
   }

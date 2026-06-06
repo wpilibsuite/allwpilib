@@ -12,17 +12,17 @@ using namespace wpi::sim;
 
 DualShock4ControllerSim::DualShock4ControllerSim(const DualShock4Controller& joystick)
     : GenericHIDSim{joystick.GetHID()} {
-  SetAxesMaximumIndex(6);
-  SetButtonsMaximumIndex(21);
-  SetPOVsMaximumIndex(1);
+  SetAxesAvailable(0x3F);
+  SetButtonsAvailable(0x107FFFULL);
+  SetPOVsAvailable(0);
   SetGamepadType(GenericHID::HIDType::PS4);
   SetSupportedOutputs(DualShock4Controller::kSupportedOutputs);
 }
 
 DualShock4ControllerSim::DualShock4ControllerSim(int port) : GenericHIDSim{port} {
-  SetAxesMaximumIndex(6);
-  SetButtonsMaximumIndex(21);
-  SetPOVsMaximumIndex(1);
+  SetAxesAvailable(0x3F);
+  SetButtonsAvailable(0x107FFFULL);
+  SetPOVsAvailable(0);
   SetGamepadType(GenericHID::HIDType::PS4);
   SetSupportedOutputs(DualShock4Controller::kSupportedOutputs);
 }

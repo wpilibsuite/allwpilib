@@ -14,9 +14,14 @@ using namespace wpi;
 
 TEST({{ ClassName }}ControllerTest, WrappedHID) {
   {{ ClassName }}Controller controller{2};
+  sim::{{ ClassName }}ControllerSim sim{controller};
+  sim.NotifyNewData();
 
   ASSERT_EQ(controller.GetPort(), 2);
   ASSERT_EQ(controller.GetHID().GetPort(), 2);
+  ASSERT_EQ(controller.GetHID().GetAxesAvailable(), {{ AxesAvailableMask }});
+  ASSERT_EQ(controller.GetHID().GetButtonsAvailable(), {{ ButtonsAvailableMask }}ULL);
+  ASSERT_EQ(controller.GetHID().GetPOVsAvailable(), 0);
 }
 {% for button in buttons %}
 BUTTON_TEST({{ ClassName }}Controller, {{ button.MethodName }}Button)

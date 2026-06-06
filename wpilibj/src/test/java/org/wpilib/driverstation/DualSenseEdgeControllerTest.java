@@ -22,9 +22,14 @@ class DualSenseEdgeControllerTest {
   @Test
   void testWrappedHID() {
     DualSenseEdgeController controller = new DualSenseEdgeController(2);
+    DualSenseEdgeControllerSim sim = new DualSenseEdgeControllerSim(controller);
+    sim.notifyNewData();
 
     assertEquals(2, controller.getPort());
     assertEquals(2, controller.getHID().getPort());
+    assertEquals(0x3F, controller.getHID().getAxesAvailable());
+    assertEquals(0x73FFFFL, controller.getHID().getButtonsAvailable());
+    assertEquals(0, controller.getHID().getPOVsAvailable());
   }
 
   @ParameterizedTest

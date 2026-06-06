@@ -22,9 +22,14 @@ class SteamControllerTest {
   @Test
   void testWrappedHID() {
     SteamController controller = new SteamController(2);
+    SteamControllerSim sim = new SteamControllerSim(controller);
+    sim.notifyNewData();
 
     assertEquals(2, controller.getPort());
     assertEquals(2, controller.getHID().getPort());
+    assertEquals(0x3F, controller.getHID().getAxesAvailable());
+    assertEquals(0x3FFFFFFL, controller.getHID().getButtonsAvailable());
+    assertEquals(0, controller.getHID().getPOVsAvailable());
   }
 
   @ParameterizedTest

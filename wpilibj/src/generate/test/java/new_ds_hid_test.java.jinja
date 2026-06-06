@@ -22,9 +22,14 @@ class {{ ClassName }}ControllerTest {
   @Test
   void testWrappedHID() {
     {{ ClassName }}Controller controller = new {{ ClassName }}Controller(2);
+    {{ ClassName }}ControllerSim sim = new {{ ClassName }}ControllerSim(controller);
+    sim.notifyNewData();
 
     assertEquals(2, controller.getPort());
     assertEquals(2, controller.getHID().getPort());
+    assertEquals({{ AxesAvailableMask }}, controller.getHID().getAxesAvailable());
+    assertEquals({{ ButtonsAvailableMask }}L, controller.getHID().getButtonsAvailable());
+    assertEquals(0, controller.getHID().getPOVsAvailable());
   }
 
   @ParameterizedTest

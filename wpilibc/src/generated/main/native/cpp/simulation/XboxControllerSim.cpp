@@ -12,17 +12,17 @@ using namespace wpi::sim;
 
 XboxControllerSim::XboxControllerSim(const XboxController& joystick)
     : GenericHIDSim{joystick.GetHID()} {
-  SetAxesMaximumIndex(6);
-  SetButtonsMaximumIndex(15);
-  SetPOVsMaximumIndex(1);
+  SetAxesAvailable(0x3F);
+  SetButtonsAvailable(0x7FFFULL);
+  SetPOVsAvailable(0);
   SetGamepadType(GenericHID::HIDType::XBOX_ONE);
   SetSupportedOutputs(XboxController::kSupportedOutputs);
 }
 
 XboxControllerSim::XboxControllerSim(int port) : GenericHIDSim{port} {
-  SetAxesMaximumIndex(6);
-  SetButtonsMaximumIndex(15);
-  SetPOVsMaximumIndex(1);
+  SetAxesAvailable(0x3F);
+  SetButtonsAvailable(0x7FFFULL);
+  SetPOVsAvailable(0);
   SetGamepadType(GenericHID::HIDType::XBOX_ONE);
   SetSupportedOutputs(XboxController::kSupportedOutputs);
 }

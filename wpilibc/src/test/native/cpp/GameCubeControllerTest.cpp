@@ -14,9 +14,14 @@ using namespace wpi;
 
 TEST(GameCubeControllerTest, WrappedHID) {
   GameCubeController controller{2};
+  sim::GameCubeControllerSim sim{controller};
+  sim.NotifyNewData();
 
   ASSERT_EQ(controller.GetPort(), 2);
   ASSERT_EQ(controller.GetHID().GetPort(), 2);
+  ASSERT_EQ(controller.GetHID().GetAxesAvailable(), 0x3F);
+  ASSERT_EQ(controller.GetHID().GetButtonsAvailable(), 0xC07C4FULL);
+  ASSERT_EQ(controller.GetHID().GetPOVsAvailable(), 0);
 }
 
 BUTTON_TEST(GameCubeController, AButton)

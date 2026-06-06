@@ -22,9 +22,14 @@ class SwitchProControllerTest {
   @Test
   void testWrappedHID() {
     SwitchProController controller = new SwitchProController(2);
+    SwitchProControllerSim sim = new SwitchProControllerSim(controller);
+    sim.notifyNewData();
 
     assertEquals(2, controller.getPort());
     assertEquals(2, controller.getHID().getPort());
+    assertEquals(0x3F, controller.getHID().getAxesAvailable());
+    assertEquals(0xFFFFL, controller.getHID().getButtonsAvailable());
+    assertEquals(0, controller.getHID().getPOVsAvailable());
   }
 
   @ParameterizedTest

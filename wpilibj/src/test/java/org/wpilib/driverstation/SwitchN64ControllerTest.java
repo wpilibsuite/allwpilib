@@ -22,9 +22,14 @@ class SwitchN64ControllerTest {
   @Test
   void testWrappedHID() {
     SwitchN64Controller controller = new SwitchN64Controller(2);
+    SwitchN64ControllerSim sim = new SwitchN64ControllerSim(controller);
+    sim.notifyNewData();
 
     assertEquals(2, controller.getPort());
     assertEquals(2, controller.getHID().getPort());
+    assertEquals(0x33, controller.getHID().getAxesAvailable());
+    assertEquals(0x20FE7FL, controller.getHID().getButtonsAvailable());
+    assertEquals(0, controller.getHID().getPOVsAvailable());
   }
 
   @ParameterizedTest

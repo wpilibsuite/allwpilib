@@ -22,9 +22,14 @@ class GameCubeControllerTest {
   @Test
   void testWrappedHID() {
     GameCubeController controller = new GameCubeController(2);
+    GameCubeControllerSim sim = new GameCubeControllerSim(controller);
+    sim.notifyNewData();
 
     assertEquals(2, controller.getPort());
     assertEquals(2, controller.getHID().getPort());
+    assertEquals(0x3F, controller.getHID().getAxesAvailable());
+    assertEquals(0xC07C4FL, controller.getHID().getButtonsAvailable());
+    assertEquals(0, controller.getHID().getPOVsAvailable());
   }
 
   @ParameterizedTest

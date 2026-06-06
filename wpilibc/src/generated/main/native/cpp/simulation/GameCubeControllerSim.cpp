@@ -12,17 +12,17 @@ using namespace wpi::sim;
 
 GameCubeControllerSim::GameCubeControllerSim(const GameCubeController& joystick)
     : GenericHIDSim{joystick.GetHID()} {
-  SetAxesMaximumIndex(6);
-  SetButtonsMaximumIndex(24);
-  SetPOVsMaximumIndex(1);
+  SetAxesAvailable(0x3F);
+  SetButtonsAvailable(0xC07C4FULL);
+  SetPOVsAvailable(0);
   SetGamepadType(GenericHID::HIDType::STANDARD);
   SetSupportedOutputs(GameCubeController::kSupportedOutputs);
 }
 
 GameCubeControllerSim::GameCubeControllerSim(int port) : GenericHIDSim{port} {
-  SetAxesMaximumIndex(6);
-  SetButtonsMaximumIndex(24);
-  SetPOVsMaximumIndex(1);
+  SetAxesAvailable(0x3F);
+  SetButtonsAvailable(0xC07C4FULL);
+  SetPOVsAvailable(0);
   SetGamepadType(GenericHID::HIDType::STANDARD);
   SetSupportedOutputs(GameCubeController::kSupportedOutputs);
 }

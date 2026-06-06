@@ -20,11 +20,7 @@ public class LogitechF310ControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public LogitechF310ControllerSim(LogitechF310Controller joystick) {
     super(joystick.getHID());
-    setAxesMaximumIndex(6);
-    setButtonsMaximumIndex(15);
-    setPOVsMaximumIndex(1);
-    setGamepadType(GenericHID.HIDType.XBOX_360);
-    setSupportedOutputs(LogitechF310Controller.getSupportedOutputCapabilities());
+    configureDevice();
   }
 
   /**
@@ -35,9 +31,13 @@ public class LogitechF310ControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public LogitechF310ControllerSim(int port) {
     super(port);
-    setAxesMaximumIndex(6);
-    setButtonsMaximumIndex(15);
-    setPOVsMaximumIndex(1);
+    configureDevice();
+  }
+
+  private void configureDevice() {
+    setAxesAvailable(0x3F);
+    setButtonsAvailable(0x7FFFL);
+    setPOVsAvailable(0);
     setGamepadType(GenericHID.HIDType.XBOX_360);
     setSupportedOutputs(LogitechF310Controller.getSupportedOutputCapabilities());
   }

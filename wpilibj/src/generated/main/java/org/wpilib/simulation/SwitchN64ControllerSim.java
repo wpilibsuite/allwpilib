@@ -20,11 +20,7 @@ public class SwitchN64ControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public SwitchN64ControllerSim(SwitchN64Controller joystick) {
     super(joystick.getHID());
-    setAxesMaximumIndex(6);
-    setButtonsMaximumIndex(22);
-    setPOVsMaximumIndex(1);
-    setGamepadType(GenericHID.HIDType.SWITCH_PRO);
-    setSupportedOutputs(SwitchN64Controller.getSupportedOutputCapabilities());
+    configureDevice();
   }
 
   /**
@@ -35,9 +31,13 @@ public class SwitchN64ControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public SwitchN64ControllerSim(int port) {
     super(port);
-    setAxesMaximumIndex(6);
-    setButtonsMaximumIndex(22);
-    setPOVsMaximumIndex(1);
+    configureDevice();
+  }
+
+  private void configureDevice() {
+    setAxesAvailable(0x33);
+    setButtonsAvailable(0x20FE7FL);
+    setPOVsAvailable(0);
     setGamepadType(GenericHID.HIDType.SWITCH_PRO);
     setSupportedOutputs(SwitchN64Controller.getSupportedOutputCapabilities());
   }

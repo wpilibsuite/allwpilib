@@ -22,9 +22,14 @@ class Switch2GCControllerTest {
   @Test
   void testWrappedHID() {
     Switch2GCController controller = new Switch2GCController(2);
+    Switch2GCControllerSim sim = new Switch2GCControllerSim(controller);
+    sim.notifyNewData();
 
     assertEquals(2, controller.getPort());
     assertEquals(2, controller.getHID().getPort());
+    assertEquals(0x3F, controller.getHID().getAxesAvailable());
+    assertEquals(0xE0FE6FL, controller.getHID().getButtonsAvailable());
+    assertEquals(0, controller.getHID().getPOVsAvailable());
   }
 
   @ParameterizedTest

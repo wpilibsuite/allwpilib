@@ -22,9 +22,14 @@ class DualShock4ControllerTest {
   @Test
   void testWrappedHID() {
     DualShock4Controller controller = new DualShock4Controller(2);
+    DualShock4ControllerSim sim = new DualShock4ControllerSim(controller);
+    sim.notifyNewData();
 
     assertEquals(2, controller.getPort());
     assertEquals(2, controller.getHID().getPort());
+    assertEquals(0x3F, controller.getHID().getAxesAvailable());
+    assertEquals(0x107FFFL, controller.getHID().getButtonsAvailable());
+    assertEquals(0, controller.getHID().getPOVsAvailable());
   }
 
   @ParameterizedTest

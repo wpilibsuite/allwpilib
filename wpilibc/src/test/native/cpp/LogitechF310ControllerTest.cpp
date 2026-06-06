@@ -14,9 +14,14 @@ using namespace wpi;
 
 TEST(LogitechF310ControllerTest, WrappedHID) {
   LogitechF310Controller controller{2};
+  sim::LogitechF310ControllerSim sim{controller};
+  sim.NotifyNewData();
 
   ASSERT_EQ(controller.GetPort(), 2);
   ASSERT_EQ(controller.GetHID().GetPort(), 2);
+  ASSERT_EQ(controller.GetHID().GetAxesAvailable(), 0x3F);
+  ASSERT_EQ(controller.GetHID().GetButtonsAvailable(), 0x7FFFULL);
+  ASSERT_EQ(controller.GetHID().GetPOVsAvailable(), 0);
 }
 
 BUTTON_TEST(LogitechF310Controller, AButton)

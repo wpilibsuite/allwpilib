@@ -20,11 +20,7 @@ public class DualShock4ControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public DualShock4ControllerSim(DualShock4Controller joystick) {
     super(joystick.getHID());
-    setAxesMaximumIndex(6);
-    setButtonsMaximumIndex(21);
-    setPOVsMaximumIndex(1);
-    setGamepadType(GenericHID.HIDType.PS4);
-    setSupportedOutputs(DualShock4Controller.getSupportedOutputCapabilities());
+    configureDevice();
   }
 
   /**
@@ -35,9 +31,13 @@ public class DualShock4ControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public DualShock4ControllerSim(int port) {
     super(port);
-    setAxesMaximumIndex(6);
-    setButtonsMaximumIndex(21);
-    setPOVsMaximumIndex(1);
+    configureDevice();
+  }
+
+  private void configureDevice() {
+    setAxesAvailable(0x3F);
+    setButtonsAvailable(0x107FFFL);
+    setPOVsAvailable(0);
     setGamepadType(GenericHID.HIDType.PS4);
     setSupportedOutputs(DualShock4Controller.getSupportedOutputCapabilities());
   }

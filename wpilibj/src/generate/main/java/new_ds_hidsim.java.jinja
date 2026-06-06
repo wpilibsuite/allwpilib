@@ -23,11 +23,7 @@ public class {{ ClassName }}ControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public {{ ClassName }}ControllerSim({{ ClassName }}Controller joystick) {
     super(joystick.getHID());
-    setAxesMaximumIndex({{ AxesMaximumIndex }});
-    setButtonsMaximumIndex({{ ButtonsMaximumIndex }});
-    setPOVsMaximumIndex(1);
-    setGamepadType(GenericHID.HIDType.{{ HIDType }});
-    setSupportedOutputs({{ ClassName }}Controller.getSupportedOutputCapabilities());
+    configureDevice();
   }
 
   /**
@@ -38,9 +34,13 @@ public class {{ ClassName }}ControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public {{ ClassName }}ControllerSim(int port) {
     super(port);
-    setAxesMaximumIndex({{ AxesMaximumIndex }});
-    setButtonsMaximumIndex({{ ButtonsMaximumIndex }});
-    setPOVsMaximumIndex(1);
+    configureDevice();
+  }
+
+  private void configureDevice() {
+    setAxesAvailable({{ AxesAvailableMask }});
+    setButtonsAvailable({{ ButtonsAvailableMask }}L);
+    setPOVsAvailable(0);
     setGamepadType(GenericHID.HIDType.{{ HIDType }});
     setSupportedOutputs({{ ClassName }}Controller.getSupportedOutputCapabilities());
   }

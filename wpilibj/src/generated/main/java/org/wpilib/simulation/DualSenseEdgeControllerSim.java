@@ -20,11 +20,7 @@ public class DualSenseEdgeControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public DualSenseEdgeControllerSim(DualSenseEdgeController joystick) {
     super(joystick.getHID());
-    setAxesMaximumIndex(6);
-    setButtonsMaximumIndex(23);
-    setPOVsMaximumIndex(1);
-    setGamepadType(GenericHID.HIDType.PS5);
-    setSupportedOutputs(DualSenseEdgeController.getSupportedOutputCapabilities());
+    configureDevice();
   }
 
   /**
@@ -35,9 +31,13 @@ public class DualSenseEdgeControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public DualSenseEdgeControllerSim(int port) {
     super(port);
-    setAxesMaximumIndex(6);
-    setButtonsMaximumIndex(23);
-    setPOVsMaximumIndex(1);
+    configureDevice();
+  }
+
+  private void configureDevice() {
+    setAxesAvailable(0x3F);
+    setButtonsAvailable(0x73FFFFL);
+    setPOVsAvailable(0);
     setGamepadType(GenericHID.HIDType.PS5);
     setSupportedOutputs(DualSenseEdgeController.getSupportedOutputCapabilities());
   }

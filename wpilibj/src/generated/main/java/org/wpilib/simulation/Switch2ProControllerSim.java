@@ -20,11 +20,7 @@ public class Switch2ProControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public Switch2ProControllerSim(Switch2ProController joystick) {
     super(joystick.getHID());
-    setAxesMaximumIndex(6);
-    setButtonsMaximumIndex(22);
-    setPOVsMaximumIndex(1);
-    setGamepadType(GenericHID.HIDType.SWITCH_PRO);
-    setSupportedOutputs(Switch2ProController.getSupportedOutputCapabilities());
+    configureDevice();
   }
 
   /**
@@ -35,9 +31,13 @@ public class Switch2ProControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public Switch2ProControllerSim(int port) {
     super(port);
-    setAxesMaximumIndex(6);
-    setButtonsMaximumIndex(22);
-    setPOVsMaximumIndex(1);
+    configureDevice();
+  }
+
+  private void configureDevice() {
+    setAxesAvailable(0x3F);
+    setButtonsAvailable(0x23FFFFL);
+    setPOVsAvailable(0);
     setGamepadType(GenericHID.HIDType.SWITCH_PRO);
     setSupportedOutputs(Switch2ProController.getSupportedOutputCapabilities());
   }

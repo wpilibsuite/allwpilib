@@ -12,17 +12,17 @@ using namespace wpi::sim;
 
 {{ ClassName }}ControllerSim::{{ ClassName }}ControllerSim(const {{ ClassName }}Controller& joystick)
     : GenericHIDSim{joystick.GetHID()} {
-  SetAxesMaximumIndex({{ AxesMaximumIndex }});
-  SetButtonsMaximumIndex({{ ButtonsMaximumIndex }});
-  SetPOVsMaximumIndex(1);
+  SetAxesAvailable({{ AxesAvailableMask }});
+  SetButtonsAvailable({{ ButtonsAvailableMask }}ULL);
+  SetPOVsAvailable(0);
   SetGamepadType(GenericHID::HIDType::{{ HIDType }});
   SetSupportedOutputs({{ ClassName }}Controller::kSupportedOutputs);
 }
 
 {{ ClassName }}ControllerSim::{{ ClassName }}ControllerSim(int port) : GenericHIDSim{port} {
-  SetAxesMaximumIndex({{ AxesMaximumIndex }});
-  SetButtonsMaximumIndex({{ ButtonsMaximumIndex }});
-  SetPOVsMaximumIndex(1);
+  SetAxesAvailable({{ AxesAvailableMask }});
+  SetButtonsAvailable({{ ButtonsAvailableMask }}ULL);
+  SetPOVsAvailable(0);
   SetGamepadType(GenericHID::HIDType::{{ HIDType }});
   SetSupportedOutputs({{ ClassName }}Controller::kSupportedOutputs);
 }

@@ -14,9 +14,14 @@ using namespace wpi;
 
 TEST(Switch2ProControllerTest, WrappedHID) {
   Switch2ProController controller{2};
+  sim::Switch2ProControllerSim sim{controller};
+  sim.NotifyNewData();
 
   ASSERT_EQ(controller.GetPort(), 2);
   ASSERT_EQ(controller.GetHID().GetPort(), 2);
+  ASSERT_EQ(controller.GetHID().GetAxesAvailable(), 0x3F);
+  ASSERT_EQ(controller.GetHID().GetButtonsAvailable(), 0x23FFFFULL);
+  ASSERT_EQ(controller.GetHID().GetPOVsAvailable(), 0);
 }
 
 BUTTON_TEST(Switch2ProController, BButton)

@@ -20,11 +20,7 @@ public class SteamControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public SteamControllerSim(SteamController joystick) {
     super(joystick.getHID());
-    setAxesMaximumIndex(6);
-    setButtonsMaximumIndex(26);
-    setPOVsMaximumIndex(1);
-    setGamepadType(GenericHID.HIDType.STANDARD);
-    setSupportedOutputs(SteamController.getSupportedOutputCapabilities());
+    configureDevice();
   }
 
   /**
@@ -35,9 +31,13 @@ public class SteamControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public SteamControllerSim(int port) {
     super(port);
-    setAxesMaximumIndex(6);
-    setButtonsMaximumIndex(26);
-    setPOVsMaximumIndex(1);
+    configureDevice();
+  }
+
+  private void configureDevice() {
+    setAxesAvailable(0x3F);
+    setButtonsAvailable(0x3FFFFFFL);
+    setPOVsAvailable(0);
     setGamepadType(GenericHID.HIDType.STANDARD);
     setSupportedOutputs(SteamController.getSupportedOutputCapabilities());
   }
