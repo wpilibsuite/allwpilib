@@ -126,8 +126,7 @@ class NetworkOutgoingQueue {
         }
       });
     } else {
-      m_queues[m_idMap[id].queueIndex].Append(
-          id, MessageType{std::forward<T>(msg)});
+      m_queues[m_idMap[id].queueIndex].Append(id, std::forward<T>(msg));
       m_totalSize += sizeof(Message);
     }
 
@@ -155,7 +154,7 @@ class NetworkOutgoingQueue {
         auto& info = m_idMap[id];
         auto& queue = m_queues[info.queueIndex];
         info.valuePos = queue.msgs.size();
-        queue.Append(id, MessageType{ValueMsg{id, value}});
+        queue.Append(id, ValueMsg{id, value});
         m_totalSize += sizeof(Message) + value.size();
         break;
       }
@@ -179,7 +178,7 @@ class NetworkOutgoingQueue {
           }
         }
         info.valuePos = queue.msgs.size();
-        queue.Append(id, MessageType{ValueMsg{id, value}});
+        queue.Append(id, ValueMsg{id, value});
         m_totalSize += sizeof(Message) + value.size();
         break;
       }
@@ -324,8 +323,9 @@ class NetworkOutgoingQueue {
 
   struct Queue {
     explicit Queue(uint32_t periodMs) : periodMs{periodMs} {}
-    void Append(NT_Handle handle, MessageType&& msg) {
-      msgs.emplace_back(std::move(msg), handle);
+    template <typename T>
+    void Append(NT_Handle handle, T&& msg) {
+      msgs.emplace_back(MessageType{std::forward<T>(msg)}, handle);
     }
     std::vector<Message> msgs;
     uint64_t nextSendMs = 0;
