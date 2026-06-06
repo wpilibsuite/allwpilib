@@ -4,6 +4,8 @@
 
 #include "wpi/hal/IMU.h"
 
+#include <cstring>
+
 #include <numbers>
 
 #include "HALInitializer.hpp"
@@ -37,6 +39,7 @@ void HAL_GetIMUAcceleration(HAL_Acceleration3d* accel, int32_t* status) {
   }
 
   MRC_Acceleration3d accelData;
+  std::memset(&accelData, 0, sizeof(accelData));
   *status = MRC_IMU_GetAcceleration(&accelData);
   *accel = HAL_Acceleration3d{.timestamp = accelData.timestamp,
                               .x = accelData.x,
@@ -52,6 +55,7 @@ void HAL_GetIMUGyroRates(HAL_GyroRate3d* rate, int32_t* status) {
   }
 
   MRC_GyroRate3d rateData;
+  std::memset(&rateData, 0, sizeof(rateData));
   *status = MRC_IMU_GetGyroRate(&rateData);
   *rate = HAL_GyroRate3d{.timestamp = rateData.timestamp,
                          .x = rateData.x,
@@ -67,6 +71,7 @@ void HAL_GetIMUEulerAnglesFlat(HAL_EulerAngles3d* angles, int32_t* status) {
   }
 
   MRC_EulerAngles3d angleData;
+  std::memset(&angleData, 0, sizeof(angleData));
   *status = MRC_IMU_GetEulerAnglesFlat(&angleData);
   *angles = HAL_EulerAngles3d{.timestamp = angleData.timestamp,
                               .x = angleData.x,
@@ -83,6 +88,7 @@ void HAL_GetIMUEulerAnglesLandscape(HAL_EulerAngles3d* angles,
   }
 
   MRC_EulerAngles3d angleData;
+  std::memset(&angleData, 0, sizeof(angleData));
   *status = MRC_IMU_GetEulerAnglesLandscape(&angleData);
   *angles = HAL_EulerAngles3d{.timestamp = angleData.timestamp,
                               .x = angleData.x,
@@ -98,6 +104,7 @@ void HAL_GetIMUEulerAnglesPortrait(HAL_EulerAngles3d* angles, int32_t* status) {
   }
 
   MRC_EulerAngles3d angleData;
+  std::memset(&angleData, 0, sizeof(angleData));
   *status = MRC_IMU_GetEulerAnglesPortrait(&angleData);
   *angles = HAL_EulerAngles3d{.timestamp = angleData.timestamp,
                               .x = angleData.x,
@@ -113,6 +120,7 @@ void HAL_GetIMUQuaternion(HAL_Quaternion* quat, int32_t* status) {
   }
 
   MRC_Quaternion quatData;
+  std::memset(&quatData, 0, sizeof(quatData));
   *status = MRC_IMU_GetQuaternion(&quatData);
   *quat = HAL_Quaternion{.timestamp = quatData.timestamp,
                          .w = quatData.w,
@@ -128,7 +136,8 @@ double HAL_GetIMUYawFlat(int64_t* timestamp) {
     return 0;
   }
 
-  double ret;
+  double ret = 0;
+  *timestamp = 0;
   MRC_IMU_GetYawFlat(&ret, timestamp);
   return ret;
 }
@@ -140,7 +149,8 @@ double HAL_GetIMUYawLandscape(int64_t* timestamp) {
     return 0;
   }
 
-  double ret;
+  double ret = 0;
+  *timestamp = 0;
   MRC_IMU_GetYawLandscape(&ret, timestamp);
   return ret;
 }
@@ -152,7 +162,8 @@ double HAL_GetIMUYawPortrait(int64_t* timestamp) {
     return 0;
   }
 
-  double ret;
+  double ret = 0;
+  *timestamp = 0;
   MRC_IMU_GetYawPortrait(&ret, timestamp);
   return ret;
 }
