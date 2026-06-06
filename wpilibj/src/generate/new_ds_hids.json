@@ -36,7 +36,7 @@
     }
   },
   {
-    "ClassName": "PS5",
+    "ClassName": "DualSense",
     "HIDType": "PS5",
     "axes": {
       "leftX": 0,
@@ -116,7 +116,7 @@
     }
   },
   {
-    "ClassName": "PS4",
+    "ClassName": "DualShock4",
     "HIDType": "PS4",
     "axes": {
       "leftX": 0,

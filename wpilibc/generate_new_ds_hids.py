@@ -90,7 +90,10 @@ def _normalize_controller(controller: dict):
 
 
 def generate_new_ds_hids(
-    output_directory: Path, template_directory: Path, schema_file: Path
+    output_directory: Path,
+    template_directory: Path,
+    schema_file: Path,
+    test_output_directory: Path | None = None,
 ):
     with schema_file.open(encoding="utf-8") as f:
         controllers = [_normalize_controller(controller) for controller in json.load(f)]
@@ -147,6 +150,19 @@ def generate_new_ds_hids(
         output = template.render(controller)
         write_controller_file(root_path, controller_name, output)
 
+    if test_output_directory is not None:
+        env = Environment(
+            loader=FileSystemLoader(template_directory / "test/native/cpp"),
+            autoescape=False,
+            keep_trailing_newline=True,
+        )
+        root_path = test_output_directory / "native/cpp"
+        template = env.get_template("new_ds_hid_test.cpp.jinja")
+        for controller in controllers:
+            controller_name = f"{controller['ClassName']}ControllerTest.cpp"
+            output = template.render(controller)
+            write_controller_file(root_path, controller_name, output)
+
 
 def main():
     script_path = Path(__file__).resolve()
@@ -171,9 +187,25 @@ def main():
         default="wpilibj/src/generate/new_ds_hids.json",
         type=Path,
     )
+    parser.add_argument(
+        "--test_output_directory",
+        help="Optional. If set, will output generated tests to this directory",
+        default=dirname / "src/test",
+        type=Path,
+    )
     args = parser.parse_args()
 
-    generate_new_ds_hids(args.output_directory, args.template_root, args.schema_file)
+    test_output_directory = (
+        None
+        if args.test_output_directory.name == "__none__"
+        else args.test_output_directory
+    )
+    generate_new_ds_hids(
+        args.output_directory,
+        args.template_root,
+        args.schema_file,
+        test_output_directory,
+    )
 
 
 if __name__ == "__main__":

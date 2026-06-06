@@ -1,0 +1,36 @@
+extra_includes:
+- wpi/driverstation/DualSenseController.hpp
+
+classes:
+  wpi::sim::DualSenseControllerSim:
+    force_no_trampoline: true
+    typealias:
+    - wpi::DualSenseController
+    methods:
+      DualSenseControllerSim:
+        overloads:
+          const DualSenseController&:
+          int:
+      SetLeftX:
+      SetLeftY:
+      SetRightX:
+      SetRightY:
+      SetL2Axis:
+      SetR2Axis:
+      SetCrossButton:
+      SetCircleButton:
+      SetSquareButton:
+      SetTriangleButton:
+      SetCreateButton:
+      SetPSButton:
+      SetOptionsButton:
+      SetL3Button:
+      SetR3Button:
+      SetL1Button:
+      SetR1Button:
+      SetDpadUpButton:
+      SetDpadDownButton:
+      SetDpadLeftButton:
+      SetDpadRightButton:
+      SetMicrophoneButton:
+      SetTouchpadButton:

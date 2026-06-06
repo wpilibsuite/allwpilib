@@ -8,6 +8,7 @@ def __generate_wpilibc_impl(ctx):
     args.add("--output_directory", output_dir.path)
     args.add("--schema_root", "wpilibj/src/generate")
     args.add("--template_root", "wpilibc/src/generate")
+    args.add("--test_output_directory", "__none__")
 
     ctx.actions.run(
         inputs = ctx.attr._templates.files,

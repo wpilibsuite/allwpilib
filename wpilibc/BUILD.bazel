@@ -69,7 +69,7 @@ py_binary(
 
 filegroup(
     name = "templates",
-    srcs = glob(["src/generate/main/native/**"]) + [
+    srcs = glob(["src/generate/main/native/**"]) + glob(["src/generate/test/native/**"]) + [
         "//wpilibj:hid_schema",
         "//wpilibj:pwm_schema",
     ],
