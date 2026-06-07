@@ -20,6 +20,7 @@ classes:
         overloads:
           "":
           '[const]':
+            ignore: true
       GetPort:
       IsConnected:
       GetLeftX:

@@ -137,7 +137,10 @@ def _normalize_first_ds_command_controller(controller: dict):
 
 
 def generate_first_ds_hids(
-    output_directory: Path, template_directory: Path, schema_file: Path
+    output_directory: Path,
+    template_directory: Path,
+    schema_file: Path,
+    python_output_directory: Path | None = None,
 ):
     with schema_file.open(encoding="utf-8") as f:
         controllers = [
@@ -187,6 +190,20 @@ def generate_first_ds_hids(
         output = template.render(controller)
         write_controller_file(root_path, controller_name, output)
 
+    if python_output_directory is not None:
+        python_subdirectory = "commands2/button"
+        env = Environment(
+            loader=FileSystemLoader(template_directory / "main/python"),
+            autoescape=False,
+            keep_trailing_newline=True,
+        )
+        root_path = python_output_directory / python_subdirectory
+        template = env.get_template("first_ds_commandhid.py.jinja")
+        for controller in controllers:
+            controller_name = f"command{controller['ClassName'].lower()}controller.py"
+            output = template.render(controller)
+            write_controller_file(root_path, controller_name, output)
+
 
 def main():
     script_path = Path(__file__).resolve()
@@ -217,11 +234,25 @@ def main():
         default="wpilibj/src/generate/first_ds_hids.json",
         type=Path,
     )
+    parser.add_argument(
+        "--python_output_directory",
+        help="Optional. If set, will output generated Python files to this directory",
+        default=dirname / "src/main/python",
+        type=Path,
+    )
     args = parser.parse_args()
 
     generate_hids(args.output_directory, args.template_root, args.schema_file)
+    python_output_directory = (
+        None
+        if args.python_output_directory.name == "__none__"
+        else args.python_output_directory
+    )
     generate_first_ds_hids(
-        args.output_directory, args.template_root, args.first_ds_schema_file
+        args.output_directory,
+        args.template_root,
+        args.first_ds_schema_file,
+        python_output_directory,
     )
 
 
