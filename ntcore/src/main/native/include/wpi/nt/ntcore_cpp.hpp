@@ -651,7 +651,8 @@ std::string GetTopicName(NT_Topic topic);
  * Gets the user data associated with the specified topic.
  * Returns nullptr if the handle is invalid or no user data is associated.
  * User data is not used by ntcore and is for the user's convenience.  It is not
- * inherited by subscribers/publishers of the topic, and is not automatically freed.
+ * inherited by subscribers/publishers of the topic, and is not automatically
+ * freed.
  *
  * @param topic   topic handle
  * @return User data pointer
