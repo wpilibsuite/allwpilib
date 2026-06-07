@@ -1,7 +1,7 @@
-
 import wpiutil
 import time
 import pytest
+
 
 def test_default():
     wpi_now = wpiutil.now() * 1e-6
@@ -13,6 +13,7 @@ def test_default():
 
 
 NOW_TIMESTAMP_S = 0
+
 
 def custom_now_getter():
     global NOW_TIMESTAMP_S
@@ -33,7 +34,7 @@ def test_custom_timestamp(custom_fixture):
 
     NOW_TIMESTAMP_S = 1.5
     assert 1_500_000 == wpiutil.now()
-    
+
     NOW_TIMESTAMP_S = 100
     assert 100_000_000 == wpiutil.now()
 
@@ -42,5 +43,3 @@ def test_custom_timestamp(custom_fixture):
     wpi_now = wpiutil.now() * 1e-6
     py_now = int(time.time())
     assert py_now == pytest.approx(wpi_now, abs=1)
-
-

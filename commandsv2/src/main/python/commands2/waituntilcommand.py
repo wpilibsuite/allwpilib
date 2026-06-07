@@ -36,6 +36,12 @@ class WaitUntilCommand(Command):
         guarantee that the time at which the action is performed will be judged to be legal by the
         referees. When in doubt, add a safety factor or time the action manually.
 
+        The match time counts down when connected to FMS or the DS is in practice mode for the
+        current mode. When the DS is not connected to FMS or in practice mode, the command will not
+        wait.
+
+        see :func:`wpilib.DriverStation.GetMatchTime`
+
         :param time: the match time at which to end, in seconds
         """
         ...
@@ -48,7 +54,7 @@ class WaitUntilCommand(Command):
             self._condition = condition
 
         def init_time(time: float) -> None:
-            self._condition = lambda: Timer.getMatchTime() - time > 0
+            self._condition = lambda: Timer.getMatchTime() < time
 
         num_args = len(args) + len(kwargs)
 
