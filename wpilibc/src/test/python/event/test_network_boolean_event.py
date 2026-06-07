@@ -18,22 +18,24 @@ def nt_inst(wpilib_state):
 
 def test_set(nt_inst):
     loop = EventLoop()
-    counter = [0]
+    counter = 0
+
+    def on_high() -> None:
+        nonlocal counter
+        counter += 1
 
     pub = nt_inst.getTable("TestTable").getBooleanTopic("Test").publish()
 
-    NetworkBooleanEvent(loop, nt_inst, "TestTable", "Test").ifHigh(
-        lambda: counter.__setitem__(0, counter[0] + 1)
-    )
+    NetworkBooleanEvent(loop, nt_inst, "TestTable", "Test").ifHigh(on_high)
 
     pub.set(False)
     loop.poll()
-    assert counter[0] == 0
+    assert counter == 0
 
     pub.set(True)
     loop.poll()
-    assert counter[0] == 1
+    assert counter == 1
 
     pub.set(False)
     loop.poll()
-    assert counter[0] == 1
+    assert counter == 1

@@ -316,10 +316,13 @@ def test_mode_change():
 
 def test_add_periodic():
     robot = MockRobot()
-    callback_count = [0]
-    robot.addPeriodic(
-        lambda: callback_count.__setitem__(0, callback_count[0] + 1), _PERIOD / 2.0
-    )
+    callback_count = 0
+
+    def on_periodic() -> None:
+        nonlocal callback_count
+        callback_count += 1
+
+    robot.addPeriodic(on_periodic, _PERIOD / 2.0)
 
     robot_thread = threading.Thread(target=robot.startCompetition, daemon=True)
     robot_thread.start()
@@ -330,19 +333,19 @@ def test_add_periodic():
 
     assert robot.disabled_init_count == 0
     assert robot.disabled_periodic_count == 0
-    assert callback_count[0] == 0
+    assert callback_count == 0
 
     stepTiming(_PERIOD / 2.0)
 
     assert robot.disabled_init_count == 0
     assert robot.disabled_periodic_count == 0
-    assert callback_count[0] == 1
+    assert callback_count == 1
 
     stepTiming(_PERIOD / 2.0)
 
     assert robot.disabled_init_count == 1
     assert robot.disabled_periodic_count == 1
-    assert callback_count[0] == 2
+    assert callback_count == 2
 
     robot.endCompetition()
     robot_thread.join()
@@ -350,12 +353,13 @@ def test_add_periodic():
 
 def test_add_periodic_with_offset():
     robot = MockRobot()
-    callback_count = [0]
-    robot.addPeriodic(
-        lambda: callback_count.__setitem__(0, callback_count[0] + 1),
-        _PERIOD / 2.0,
-        _PERIOD / 4.0,
-    )
+    callback_count = 0
+
+    def on_periodic() -> None:
+        nonlocal callback_count
+        callback_count += 1
+
+    robot.addPeriodic(on_periodic, _PERIOD / 2.0, _PERIOD / 4.0)
 
     robot_thread = threading.Thread(target=robot.startCompetition, daemon=True)
     robot_thread.start()
@@ -366,31 +370,31 @@ def test_add_periodic_with_offset():
 
     assert robot.disabled_init_count == 0
     assert robot.disabled_periodic_count == 0
-    assert callback_count[0] == 0
+    assert callback_count == 0
 
     stepTiming(_PERIOD * 3.0 / 8.0)
 
     assert robot.disabled_init_count == 0
     assert robot.disabled_periodic_count == 0
-    assert callback_count[0] == 0
+    assert callback_count == 0
 
     stepTiming(_PERIOD * 3.0 / 8.0)
 
     assert robot.disabled_init_count == 0
     assert robot.disabled_periodic_count == 0
-    assert callback_count[0] == 1
+    assert callback_count == 1
 
     stepTiming(_PERIOD / 4.0)
 
     assert robot.disabled_init_count == 1
     assert robot.disabled_periodic_count == 1
-    assert callback_count[0] == 1
+    assert callback_count == 1
 
     stepTiming(_PERIOD / 4.0)
 
     assert robot.disabled_init_count == 1
     assert robot.disabled_periodic_count == 1
-    assert callback_count[0] == 2
+    assert callback_count == 2
 
     robot.endCompetition()
     robot_thread.join()

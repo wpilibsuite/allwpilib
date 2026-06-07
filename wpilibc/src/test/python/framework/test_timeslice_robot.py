@@ -33,15 +33,19 @@ class MockRobot(TimesliceRobot):
 def test_schedule():
     robot = MockRobot()
 
-    callback_count1 = [0]
-    callback_count2 = [0]
+    callback_count1 = 0
+    callback_count2 = 0
 
-    robot.schedule(
-        lambda: callback_count1.__setitem__(0, callback_count1[0] + 1), 0.0005
-    )
-    robot.schedule(
-        lambda: callback_count2.__setitem__(0, callback_count2[0] + 1), 0.001
-    )
+    def callback1() -> None:
+        nonlocal callback_count1
+        callback_count1 += 1
+
+    def callback2() -> None:
+        nonlocal callback_count2
+        callback_count2 += 1
+
+    robot.schedule(callback1, 0.0005)
+    robot.schedule(callback2, 0.001)
 
     robot_thread = threading.Thread(target=robot.startCompetition, daemon=True)
     robot_thread.start()
@@ -53,26 +57,26 @@ def test_schedule():
     # First 5 ms: no callbacks fired yet (delayed by one period)
     stepTiming(0.005)
     assert robot.robot_periodic_count == 0
-    assert callback_count1[0] == 0
-    assert callback_count2[0] == 0
+    assert callback_count1 == 0
+    assert callback_count2 == 0
 
     # Step to 1.5 ms into next period — nothing yet
     stepTiming(0.0015)
     assert robot.robot_periodic_count == 0
-    assert callback_count1[0] == 0
-    assert callback_count2[0] == 0
+    assert callback_count1 == 0
+    assert callback_count2 == 0
 
     # Step to 2.25 ms — callback1 fires (offset 2 ms, period 0.5 ms)
     stepTiming(0.00075)
     assert robot.robot_periodic_count == 0
-    assert callback_count1[0] == 1
-    assert callback_count2[0] == 0
+    assert callback_count1 == 1
+    assert callback_count2 == 0
 
     # Step to 2.75 ms — callback2 fires (offset 2.5 ms, period 1 ms)
     stepTiming(0.0005)
     assert robot.robot_periodic_count == 0
-    assert callback_count1[0] == 1
-    assert callback_count2[0] == 1
+    assert callback_count1 == 1
+    assert callback_count2 == 1
 
     robot.endCompetition()
     robot_thread.join()
