@@ -5,14 +5,13 @@
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
-#include <catch2/internal/catch_enum_values_registry.hpp>
+
+#include <catch2/internal/catch_enum_info.hpp>
 #include <catch2/internal/catch_string_manip.hpp>
 
 #include <cassert>
 
 namespace Catch {
-
-    IMutableEnumValuesRegistry::~IMutableEnumValuesRegistry() = default;
 
     namespace Detail {
 
@@ -39,9 +38,7 @@ namespace Catch {
             return parsed;
         }
 
-        EnumInfo::~EnumInfo() = default;
-
-        StringRef EnumInfo::lookup( int value ) const {
+        StringRef EnumInfo::lookup( int64_t value ) const {
             for( auto const& valueToName : m_values ) {
                 if( valueToName.first == value )
                     return valueToName.second;
@@ -49,23 +46,18 @@ namespace Catch {
             return "{** unexpected enum value **}"_sr;
         }
 
-        Catch::Detail::unique_ptr<EnumInfo> makeEnumInfo( StringRef enumName, StringRef allValueNames, std::vector<int> const& values ) {
-            auto enumInfo = Catch::Detail::make_unique<EnumInfo>();
-            enumInfo->m_name = enumName;
-            enumInfo->m_values.reserve( values.size() );
+        EnumInfo makeEnumInfo( StringRef enumName, StringRef allValueNames, std::vector<int64_t> const& values ) {
+            EnumInfo enumInfo;
+            enumInfo.m_name = enumName;
+            enumInfo.m_values.reserve( values.size() );
 
             const auto valueNames = Catch::Detail::parseEnums( allValueNames );
             assert( valueNames.size() == values.size() );
-            std::size_t i = 0;
-            for( auto value : values )
-                enumInfo->m_values.emplace_back(value, valueNames[i++]);
+            for (size_t i = 0; i < values.size(); ++i) {
+                enumInfo.m_values.emplace_back( values[i], valueNames[i] );
+            }
 
             return enumInfo;
-        }
-
-        EnumInfo const& EnumValuesRegistry::registerEnum( StringRef enumName, StringRef allValueNames, std::vector<int> const& values ) {
-            m_enumInfos.push_back(makeEnumInfo(enumName, allValueNames, values));
-            return *m_enumInfos.back();
         }
 
     } // Detail

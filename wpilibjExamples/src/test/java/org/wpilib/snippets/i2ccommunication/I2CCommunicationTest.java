@@ -5,11 +5,9 @@
 package org.wpilib.snippets.i2ccommunication;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,6 +63,11 @@ class I2CCommunicationTest {
     i2c.resetData();
   }
 
+  private String getWriteString() {
+    assertTrue(future.isDone(), "I2C write callback did not run during timing step");
+    return future.join();
+  }
+
   @EnumSource(AllianceStationID.class)
   @ParameterizedTest(name = "alliance[{index}]: {0}")
   void allianceTest(AllianceStationID alliance) {
@@ -75,7 +78,7 @@ class I2CCommunicationTest {
 
     SimHooks.stepTiming(0.02);
 
-    String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> future.get());
+    String str = getWriteString();
     char expected = alliance.name().startsWith("RED") ? 'R' : 'B';
     if (alliance.name().startsWith("UNKNOWN")) {
       expected = 'U';
@@ -94,7 +97,7 @@ class I2CCommunicationTest {
 
     SimHooks.stepTiming(0.02);
 
-    String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> future.get());
+    String str = getWriteString();
     char expected = enabled ? 'E' : 'D';
 
     assertEquals(expected, str.charAt(1));
@@ -110,7 +113,7 @@ class I2CCommunicationTest {
 
     SimHooks.stepTiming(0.02);
 
-    String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> future.get());
+    String str = getWriteString();
     char expected = autonomous ? 'A' : 'T';
 
     assertEquals(expected, str.charAt(2));
@@ -125,7 +128,7 @@ class I2CCommunicationTest {
 
     SimHooks.stepTiming(0.02);
 
-    String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> future.get());
+    String str = getWriteString();
     String expected = String.format("%03d", (int) MatchState.getMatchTime());
 
     assertEquals(expected, str.substring(3));
