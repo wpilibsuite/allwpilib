@@ -655,6 +655,25 @@ NT_Topic NT_GetTopic(NT_Inst inst, const struct WPI_String* name);
 void NT_GetTopicName(NT_Topic topic, struct WPI_String* name);
 
 /**
+ * Gets the user data pointer for the specified topic.
+ * Returns nullptr if the handle is invalid or no user data is associated.
+ * The user data pointer is not used by ntcore and is for the caller's use.
+ *
+ * @param topic     topic handle
+ * @return User data pointer
+ */
+void* NT_GetTopicUserData(NT_Topic topic);
+
+/**
+ * Sets the user data pointer for the specified topic.  The user data pointer
+ * is not used by ntcore and is for the caller's use.
+ *
+ * @param topic     topic handle
+ * @param userData  user data pointer to associate with the topic
+ */
+void NT_SetTopicUserData(NT_Topic topic, void* userData);
+
+/**
  * Gets the type for the specified topic, or unassigned if non existent.
  *
  * @param topic   topic handle
