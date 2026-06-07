@@ -10,7 +10,7 @@ import org.wpilib.hardware.imu.OnboardIMU.MountOrientation;
 import org.wpilib.smartdashboard.SmartDashboard;
 
 /**
- * Collision detection snippets for frc-docs.
+ * Collision detection snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
 @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")

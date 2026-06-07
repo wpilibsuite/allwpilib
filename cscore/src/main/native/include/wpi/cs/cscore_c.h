@@ -7,6 +7,7 @@
 #include <stddef.h>  // NOLINT
 #include <stdint.h>
 
+#include "wpi/util/Handle.h"
 #include "wpi/util/PixelFormat.h"
 #include "wpi/util/string.h"
 
@@ -40,7 +41,7 @@ extern "C" {
 typedef int CS_Bool;
 typedef int CS_Status;
 
-typedef int CS_Handle;
+typedef WPI_Handle CS_Handle;
 typedef CS_Handle CS_Property;
 typedef CS_Handle CS_Listener;
 typedef CS_Handle CS_ListenerPoller;

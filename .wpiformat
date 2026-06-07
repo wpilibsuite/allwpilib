@@ -40,4 +40,5 @@ licenseUpdateExclude {
   wpiutil/src/main/native/cpp/Base64\.cpp$
   wpiutil/src/main/native/cpp/sha1\.cpp$
   wpiutil/src/main/native/include/wpi/util/sha1\.hpp$
+  wpinet/src/main/native/linux/AvahiClient\.hpp$
 }

@@ -5,9 +5,9 @@
 #pragma once
 
 #include "wpi/hal/DutyCycle.h"
-#include "wpi/hal/Types.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/Handle.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -72,6 +72,6 @@ class DutyCycle : public wpi::util::Sendable,
  private:
   void InitDutyCycle();
   int m_channel;
-  wpi::hal::Handle<HAL_DutyCycleHandle, HAL_FreeDutyCycle> m_handle;
+  wpi::util::Handle<HAL_DutyCycleHandle, HAL_FreeDutyCycle> m_handle;
 };
 }  // namespace wpi

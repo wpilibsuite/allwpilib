@@ -305,5 +305,15 @@ bool convertWideToUTF8(const std::wstring &Source, SmallVectorImpl<char> &Result
   }
 }
 
+bool IsSingleCodeUnitUTF8Codepoint(unsigned V) { return V <= 0x7F; }
+
+bool IsSingleCodeUnitUTF16Codepoint(unsigned V) {
+  return V <= 0xD7FF || (V >= 0xE000 && V <= 0xFFFF);
+}
+
+bool IsSingleCodeUnitUTF32Codepoint(unsigned V) {
+  return V <= 0xD7FF || (V >= 0xE000 && V <= 0x10FFFF);
+}
+
 } // end namespace wpi::util
 

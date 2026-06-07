@@ -8,7 +8,7 @@ extern "C" {
 
 void HALSIM_SetRuntimeType(HAL_RuntimeType type) {}
 
-void HALSIM_WaitForProgramStart(void) {}
+void HALSIM_WaitForProgramStart(HAL_Bool waitForFirstNotifier) {}
 
 void HALSIM_SetProgramStarted(HAL_Bool started) {}
 

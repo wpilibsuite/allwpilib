@@ -26,7 +26,7 @@ namespace sys {
 constexpr bool IsBigEndianHost =
     wpi::util::endianness::native == wpi::util::endianness::big;
 
-static const bool IsLittleEndianHost = !IsBigEndianHost;
+constexpr bool IsLittleEndianHost = !IsBigEndianHost;
 
 inline unsigned char      getSwappedBytes(unsigned char      C) { return wpi::util::byteswap(C); }
 inline   signed char      getSwappedBytes( signed  char      C) { return wpi::util::byteswap(C); }

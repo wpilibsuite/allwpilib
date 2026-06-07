@@ -283,7 +283,6 @@ public class DriverStationJNI extends JNIWrapper {
    *
    * @param isError true for error, false for warning
    * @param errorCode the error code
-   * @param isLVCode true for a LV error code, false for a standard error code
    * @param details the details of the error
    * @param location the file location of the error
    * @param callStack the callstack of the error
@@ -294,7 +293,6 @@ public class DriverStationJNI extends JNIWrapper {
   public static native int sendError(
       boolean isError,
       int errorCode,
-      boolean isLVCode,
       String details,
       String location,
       String callStack,
@@ -307,6 +305,17 @@ public class DriverStationJNI extends JNIWrapper {
    * @return the error code, or 0 for success
    */
   public static native int sendConsoleLine(String line);
+
+  /**
+   * Sends a program crash to the driver station.
+   *
+   * @param details the details of the crash
+   * @param location the file location of the crash
+   * @param callStack the callstack of the crash
+   * @return the error code, or 0 for success
+   * @see "HAL_SendProgramCrash"
+   */
+  public static native int sendProgramCrash(String details, String location, String callStack);
 
   /**
    * Refresh the DS control word.

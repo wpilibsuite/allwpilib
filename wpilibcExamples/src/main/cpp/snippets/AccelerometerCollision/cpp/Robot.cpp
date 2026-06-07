@@ -8,7 +8,7 @@
 #include "wpi/units/acceleration.hpp"
 
 /**
- * Collision detection snippets for frc-docs.
+ * Collision detection snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
 class Robot : public wpi::TimedRobot {
