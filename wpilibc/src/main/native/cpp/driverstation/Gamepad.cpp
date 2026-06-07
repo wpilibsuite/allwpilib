@@ -557,8 +557,8 @@ void Gamepad::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "Gamepad");
   builder.AddDoubleProperty(
-      "LeftTrigger",
-      [this] { return GetAxisForSendable(Axis::LEFT_TRIGGER); }, nullptr);
+      "LeftTrigger", [this] { return GetAxisForSendable(Axis::LEFT_TRIGGER); },
+      nullptr);
   builder.AddDoubleProperty(
       "RightTrigger",
       [this] { return GetAxisForSendable(Axis::RIGHT_TRIGGER); }, nullptr);

@@ -792,8 +792,8 @@ public class CommandGamepad extends CommandGenericHID {
   }
 
   /**
-   * Get the left trigger value of the controller. Note that this axis is bound to the range of
-   * [0, 1] as opposed to the usual [-1, 1].
+   * Get the left trigger value of the controller. Note that this axis is bound to the range of [0,
+   * 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */
@@ -802,8 +802,8 @@ public class CommandGamepad extends CommandGenericHID {
   }
 
   /**
-   * Get the right trigger value of the controller. Note that this axis is bound to the range
-   * of [0, 1] as opposed to the usual [-1, 1].
+   * Get the right trigger value of the controller. Note that this axis is bound to the range of [0,
+   * 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */
