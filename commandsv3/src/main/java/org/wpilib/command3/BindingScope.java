@@ -4,6 +4,8 @@
 
 package org.wpilib.command3;
 
+import java.util.Objects;
+
 /**
  * A scope for when a binding is live. Bindings tied to a scope must be deleted when the scope
  * becomes inactive.
@@ -26,12 +28,12 @@ interface BindingScope {
    */
   static BindingScope createNarrowestScope(Scheduler scheduler) {
     Command currentCommand = scheduler.currentCommand();
-    long currentOpMode = OpModeFetcher.getFetcher().getOpModeId();
+    String currentOpMode = OpModeFetcher.getFetcher().getOpModeName();
 
     if (currentCommand != null) {
       return new ForCommand(scheduler, currentCommand);
-    } else if (currentOpMode != 0) {
-      return new ForOpmode(currentOpMode);
+    } else if (currentOpMode != null && !currentOpMode.isBlank()) {
+      return new ForOpMode(currentOpMode);
     } else {
       return Global.INSTANCE;
     }
@@ -63,14 +65,14 @@ interface BindingScope {
   }
 
   /**
-   * A binding scoped to a running opmode.
+   * A binding scoped to an opmode.
    *
-   * @param opmodeId The ID of the opmode that the binding is scoped to.
+   * @param opModeName The name of the opmode that the binding is scoped to.
    */
-  record ForOpmode(long opmodeId) implements BindingScope {
+  record ForOpMode(String opModeName) implements BindingScope {
     @Override
     public boolean active() {
-      return OpModeFetcher.getFetcher().getOpModeId() == opmodeId;
+      return Objects.equals(OpModeFetcher.getFetcher().getOpModeName(), opModeName);
     }
   }
 }
