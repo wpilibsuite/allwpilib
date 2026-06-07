@@ -43,24 +43,9 @@ public class OpModeTriggers {
 }
 ```
 
-## CommandRobot
-
-The `CommandRobot` class is the base class for the user's command-based `Robot` class. It implements the library machinery for robot startup and execution, and provides factory functions for creating and registering opmodes.
-
-```java
-public abstract class CommandRobot extends OpModeRobot {
-  // these register the opmode and return a new OpModeTriggers object for it
-  public OpModeTriggers createAutoOpMode(String name);
-  public OpModeTriggers createTeleopOpMode(String name);
-  public OpModeTriggers createUtilityOpMode(String name);
-
-  // other overloads available for group, description, and colors
-}
-```
-
 ## CommandOpModes
 
-For teams not using the `CommandRobot` base class, the `CommandOpModes` utility class provides static factory methods to create and register opmodes.
+The `CommandOpModes` class provides static factory methods for creating `OpModeTriggers` objects. Each of these static factory methods register the opmode with `RobotState` and return a new `OpModeTriggers` object. Note that calling `RobotState.publishOpModes()` is still required to publish the opmodes to the Driver Station.
 
 ```java
 public final class CommandOpModes {
@@ -68,6 +53,21 @@ public final class CommandOpModes {
   public static OpModeTriggers createAutoOpMode(String name);
   public static OpModeTriggers createTeleopOpMode(String name);
   public static OpModeTriggers createUtilityOpMode(String name);
+
+  // other overloads available for group, description, and colors
+}
+```
+
+## CommandRobot (v3 Only)
+
+The `CommandRobot` class extends `OpModeRobot` and provides static factory methods for creating `OpModeTriggers` objects. Using this class is the recommended way to register opmodes in a robot program that uses both command-based and periodic opmodes.
+
+```java
+public abstract class CommandRobot extends OpModeRobot {
+  // these register the opmode and return a new OpModeTriggers object for it
+  public OpModeTriggers createAutoOpMode(String name);
+  public OpModeTriggers createTeleopOpMode(String name);
+  public OpModeTriggers createUtilityOpMode(String name);
 
   // other overloads available for group, description, and colors
 }
@@ -147,6 +147,37 @@ public class Autos {
   public static Command followPath(Robot robot, String path) {...}
 }
 ```
+
+# Commands v2 vs v3 OpMode Support
+
+The opmode functionality described in this document is implemented differently across Commands framework versions:
+
+## Commands v3 (Java Only)
+
+Commands v3 provides full opmode integration through:
+
+- **`CommandRobot` class**: Extends `OpModeRobot` to enable safe mixing of command-based and periodic opmodes
+- **Automatic scope management**: Commands v3 has better scope control that prevents commands, triggers, and other framework objects from leaking between opmodes
+- **Safe opmode transitions**: The framework automatically manages command lifecycle during opmode changes, ensuring clean teardown and initialization
+
+This design allows teams to use both command-based opmodes (for behaviors that benefit from the command framework) and traditional periodic opmodes (for simple state machines or legacy code) within the same robot program without interference.
+
+## Commands v2 (Java and C++)
+
+Commands v2 provides a subset of opmode functionality through utility classes:
+
+- **`CommandOpModes` utility class**: Static factory methods for creating `OpModeTriggers` objects
+- **`OpModeTriggers` class**: Provides `loaded()`, `enabled()`, and `disabled()` triggers for command binding
+- **No automatic scope isolation**: Commands and triggers created in one opmode may persist and interfere with other opmodes
+- **Best for purely command-based programs**: Recommended when all robot behaviors are implemented as commands
+
+The lack of automatic scope management in Commands v2 means teams should be cautious when mixing command-based and periodic approaches, as commands scheduled in one opmode may continue running when switching to a different opmode that doesn't expect them.
+
+## Recommendation
+
+- Use **Commands v3** when you need to mix command-based and periodic opmodes safely
+- Use **Commands v2** for purely command-based robot programs where all behaviors are modeled as commands
+- For C++ programs, Commands v2 is the only option (v3 is Java-only due to C++ coroutine limitations)
 
 # Future Work
 
