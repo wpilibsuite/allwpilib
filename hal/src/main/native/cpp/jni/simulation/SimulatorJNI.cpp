@@ -141,13 +141,13 @@ Java_org_wpilib_hardware_hal_simulation_SimulatorJNI_setRuntimeType
 /*
  * Class:     org_wpilib_hardware_hal_simulation_SimulatorJNI
  * Method:    waitForProgramStart
- * Signature: ()V
+ * Signature: (Z)V
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_simulation_SimulatorJNI_waitForProgramStart
-  (JNIEnv*, jclass)
+  (JNIEnv*, jclass, jboolean waitForFirstNotifier)
 {
-  HALSIM_WaitForProgramStart();
+  HALSIM_WaitForProgramStart(waitForFirstNotifier);
 }
 
 /*

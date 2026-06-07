@@ -19,7 +19,7 @@ jobs:
           - name: asan
             cmake-flags: "-DCMAKE_BUILD_TYPE=Asan"
             ctest-env: ""
-            ctest-flags: "-E 'wpilibc'"
+            ctest-flags: ""
           - name: tsan
             cmake-flags: "-DCMAKE_BUILD_TYPE=Tsan"
             ctest-env: "TSAN_OPTIONS=second_deadlock_stack=1:suppressions=$GITHUB_WORKSPACE/tsan_suppressions.txt"
@@ -33,7 +33,7 @@ jobs:
     container: wpilib/roborio-cross-ubuntu:2025-24.04
     steps:
       - name: Install Dependencies
-        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv-java clang-18 ninja-build avahi-daemon
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev clang-18 ninja-build avahi-daemon
 
       - name: Install sccache
         uses: mozilla-actions/sccache-action@v0.0.10
@@ -41,7 +41,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: configure
-        run: mkdir build && cd build && cmake -G Ninja -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_C_COMPILER:FILEPATH=/usr/bin/clang-18 -DCMAKE_CXX_COMPILER:FILEPATH=/usr/bin/clang++-18 -DWITH_JAVA=OFF ${{ matrix.cmake-flags }} ..
+        run: mkdir build && cd build && cmake -G Ninja -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_C_COMPILER:FILEPATH=/usr/bin/clang-18 -DCMAKE_CXX_COMPILER:FILEPATH=/usr/bin/clang++-18 ${{ matrix.cmake-flags }} ..
         env:
           SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}

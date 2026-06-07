@@ -4,55 +4,6 @@ include(SubDirList)
 include(CompileWarnings)
 include(AddTest)
 
-if(WITH_JAVA)
-    include(UseJava)
-
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
-    file(GLOB AVAJE_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/avaje/*.jar")
-    add_jar(
-        commandsv2_jar
-        ${JAVA_SOURCES}
-        INCLUDE_JARS
-            hal_jar
-            ntcore_jar
-            ${AVAJE_JARS}
-            cscore_jar
-            cameraserver_jar
-            wpimath_jar
-            wpiunits_jar
-            wpiutil_jar
-            wpilibj_jar
-            datalog_jar
-            wpiannotations_jar
-        OUTPUT_NAME commandsv2
-        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
-    )
-    set_property(TARGET commandsv2_jar PROPERTY FOLDER "java")
-
-    install_jar(commandsv2_jar DESTINATION ${java_lib_dest})
-    install_jar_exports(
-        TARGETS commandsv2_jar
-        FILE commandsv2_jar.cmake
-        DESTINATION share/commandsv2
-    )
-endif()
-
-if(WITH_JAVA_SOURCE)
-    include(UseJava)
-    include(CreateSourceJar)
-    add_source_jar(
-        commandsv2_src_jar
-        BASE_DIRECTORIES
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/java
-        OUTPUT_NAME commandsv2-sources
-        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
-    )
-    set_property(TARGET commandsv2_src_jar PROPERTY FOLDER "java")
-
-    install_jar(commandsv2_src_jar DESTINATION ${java_lib_dest})
-endif()
-
 file(
     GLOB_RECURSE commandsv2_native_src
     src/main/native/cpp/*.cpp

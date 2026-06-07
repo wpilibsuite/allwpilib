@@ -9,7 +9,7 @@ import org.wpilib.hardware.discrete.AnalogInput;
 import org.wpilib.hardware.rotation.AnalogPotentiometer;
 
 /**
- * AnalogPotentiometer snippets for frc-docs.
+ * AnalogPotentiometer snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/analog-poteniometers-software.html
  */
 public class Robot extends TimedRobot {

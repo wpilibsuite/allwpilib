@@ -48,7 +48,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
   auto [handle, port] = *resource;
   port->channel = channel;
 
-  *status = port->InitializeMode(SmartIoMode::PwmOutput);
+  *status = port->InitializeMode(MRC_SmartIOMode::MRC_SmartIOMode_PwmOutput);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::PWM);
     return HAL_INVALID_HANDLE;
@@ -112,7 +112,7 @@ void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
     return;
   }
 
-  *status = port->SetPwmMicroseconds(microsecondPulseTime);
+  *status = port->SetPwmOutputMicroseconds(microsecondPulseTime);
 }
 
 int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
@@ -124,7 +124,7 @@ int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
   }
 
   uint16_t microseconds = 0;
-  *status = port->GetPwmMicroseconds(&microseconds);
+  *status = port->GetPwmOutputMicroseconds(&microseconds);
   return microseconds;
 }
 
@@ -138,14 +138,17 @@ void HAL_SetPWMOutputPeriod(HAL_DigitalHandle pwmPortHandle, int32_t period,
 
   switch (period) {
     case 0:
-      *status = port->SetPwmOutputPeriod(wpi::hal::PwmOutputPeriod::k5ms);
+      *status = port->SetPwmOutputPeriod(
+          MRC_PwmOutputPeriod::MRC_PwmOutputPeriod_5ms);
       break;
     case 1:
     case 2:
-      *status = port->SetPwmOutputPeriod(wpi::hal::PwmOutputPeriod::k10ms);
+      *status = port->SetPwmOutputPeriod(
+          MRC_PwmOutputPeriod::MRC_PwmOutputPeriod_10ms);
       break;
     case 3:
-      *status = port->SetPwmOutputPeriod(wpi::hal::PwmOutputPeriod::k20ms);
+      *status = port->SetPwmOutputPeriod(
+          MRC_PwmOutputPeriod::MRC_PwmOutputPeriod_20ms);
       break;
     default:
       *status = HAL_PARAMETER_OUT_OF_RANGE;
