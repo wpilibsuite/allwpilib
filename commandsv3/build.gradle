@@ -5,7 +5,7 @@ ext {
     groupId = 'org.wpilib'
 
     nativeName = 'commands3'
-    devMain = 'org.wpilib.commands3.DevMain'
+    devMain = 'org.wpilib.command3.DevMain'
 }
 
 apply from: "${rootDir}/shared/java/javacommon.gradle"
@@ -44,8 +44,8 @@ test {
     // For reflective access to the continuation classes
     jvmArgs += [
         '--add-opens',
-        'java.base/jdk.internal.vm=ALL-UNNAMED',
+        'java.base/jdk.internal.vm=wpilib.command3',
         '--add-opens',
-        'java.base/java.lang=ALL-UNNAMED',
+        'java.base/java.lang=wpilib.command3'
     ]
 }

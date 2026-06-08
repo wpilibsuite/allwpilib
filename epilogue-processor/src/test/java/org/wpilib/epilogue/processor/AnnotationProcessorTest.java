@@ -40,7 +40,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -78,7 +78,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -117,7 +117,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -180,7 +180,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -219,7 +219,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
       import java.lang.invoke.MethodHandles;
@@ -274,7 +274,7 @@ class AnnotationProcessorTest {
     package org.wpilib.epilogue;
 
     import org.wpilib.epilogue.Logged;
-    import org.wpilib.epilogue.Epilogue;
+    import org.wpilib.epilogue.generated.Epilogue;
     import org.wpilib.epilogue.logging.ClassSpecificLogger;
     import org.wpilib.epilogue.logging.EpilogueBackend;
     import java.lang.invoke.MethodHandles;
@@ -327,7 +327,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
       import java.lang.invoke.MethodHandles;
@@ -382,7 +382,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -430,7 +430,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -474,7 +474,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -520,7 +520,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
       import java.lang.invoke.MethodHandles;
@@ -601,7 +601,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
       import java.lang.invoke.MethodHandles;
@@ -678,7 +678,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -725,7 +725,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -770,7 +770,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -815,7 +815,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -862,7 +862,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -909,7 +909,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -959,7 +959,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -1008,7 +1008,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -1058,7 +1058,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -1117,7 +1117,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -1191,7 +1191,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -1238,7 +1238,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -1288,7 +1288,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -1420,7 +1420,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
       import java.lang.invoke.MethodHandles;
@@ -1488,7 +1488,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -1575,7 +1575,7 @@ class AnnotationProcessorTest {
         package org.wpilib.epilogue;
 
         import org.wpilib.epilogue.Logged;
-        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.generated.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
         import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -1638,7 +1638,7 @@ class AnnotationProcessorTest {
         package org.wpilib.epilogue;
 
         import org.wpilib.epilogue.Logged;
-        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.generated.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
         import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -1684,7 +1684,7 @@ class AnnotationProcessorTest {
         package org.wpilib.epilogue;
 
         import org.wpilib.epilogue.Logged;
-        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.generated.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
         import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -1724,7 +1724,7 @@ class AnnotationProcessorTest {
         package org.wpilib.epilogue;
 
         import org.wpilib.epilogue.Logged;
-        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.generated.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
         import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -1777,7 +1777,7 @@ class AnnotationProcessorTest {
         package org.wpilib.epilogue;
 
         import org.wpilib.epilogue.Logged;
-        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.generated.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
         import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -1829,7 +1829,7 @@ class AnnotationProcessorTest {
         package org.wpilib.epilogue;
 
         import org.wpilib.epilogue.Logged;
-        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.generated.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
         import org.wpilib.epilogue.logging.EpilogueBackend;
         import java.lang.invoke.MethodHandles;
@@ -1891,7 +1891,7 @@ class AnnotationProcessorTest {
         package org.wpilib.epilogue;
 
         import org.wpilib.epilogue.Logged;
-        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.generated.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
         import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -1922,21 +1922,21 @@ class AnnotationProcessorTest {
 
         record Point(int x, int y) {}
 
-        @CustomLoggerFor(Point.class)
-        class CustomPointLogger extends ClassSpecificLogger<Point> {
-          public CustomPointLogger() {
-            super(Point.class);
-          }
-
-          @Override
-          public void update(EpilogueBackend backend, Point point) {
-            // Implementation is irrelevant
-          }
-        }
-
         @Logged
-        class Example {
+        public class Example {
           Point point;
+
+          @CustomLoggerFor(Point.class)
+          public static class CustomPointLogger extends ClassSpecificLogger<Point> {
+            public CustomPointLogger() {
+              super(Point.class);
+            }
+
+            @Override
+            public void update(EpilogueBackend backend, Point point) {
+              // Implementation is irrelevant
+            }
+          }
         }
         """;
 
@@ -1945,7 +1945,7 @@ class AnnotationProcessorTest {
       package org.wpilib.epilogue;
 
       import org.wpilib.epilogue.Logged;
-      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.generated.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
       import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -1957,7 +1957,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            Epilogue.org_wpilib_epilogue_CustomPointLogger.tryUpdate(backend.getNested("point"), object.point, Epilogue.getConfig().errorHandler);
+            Epilogue.org_wpilib_epilogue_Example_CustomPointLogger.tryUpdate(backend.getNested("point"), object.point, Epilogue.getConfig().errorHandler);
           }
         }
       }
@@ -1977,21 +1977,21 @@ class AnnotationProcessorTest {
         import org.wpilib.math.util.Num;
         import org.wpilib.math.linalg.Vector;
 
-        @CustomLoggerFor(Vector.class)
-        class VectorLogger extends ClassSpecificLogger<Vector<?>> {
-          public VectorLogger() {
-            super((Class) Vector.class);
-          }
-
-          @Override
-          public void update(EpilogueBackend backend, Vector<?> object) {
-            // Implementation is irrelevant
-          }
-        }
-
         @Logged
-        class Example {
+        public class Example {
           Vector<N3> vec;
+
+          @CustomLoggerFor(Vector.class)
+          public static class VectorLogger extends ClassSpecificLogger<Vector<?>> {
+            public VectorLogger() {
+              super((Class) Vector.class);
+            }
+
+            @Override
+            public void update(EpilogueBackend backend, Vector<?> object) {
+              // Implementation is irrelevant
+            }
+          }
         }
         """;
 
@@ -2000,7 +2000,7 @@ class AnnotationProcessorTest {
         package org.wpilib.epilogue;
 
         import org.wpilib.epilogue.Logged;
-        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.generated.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
         import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -2012,7 +2012,7 @@ class AnnotationProcessorTest {
           @Override
           public void update(EpilogueBackend backend, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              Epilogue.org_wpilib_epilogue_VectorLogger.tryUpdate(backend.getNested("vec"), object.vec, Epilogue.getConfig().errorHandler);
+              Epilogue.org_wpilib_epilogue_Example_VectorLogger.tryUpdate(backend.getNested("vec"), object.vec, Epilogue.getConfig().errorHandler);
             }
           }
         }
@@ -2108,7 +2108,7 @@ class AnnotationProcessorTest {
         package org.wpilib.epilogue;
 
         import org.wpilib.epilogue.Logged;
-        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.generated.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
         import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -2196,7 +2196,7 @@ class AnnotationProcessorTest {
         package org.wpilib.epilogue;
 
         import org.wpilib.epilogue.Logged;
-        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.generated.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
         import org.wpilib.epilogue.logging.EpilogueBackend;
 
@@ -2248,7 +2248,7 @@ class AnnotationProcessorTest {
         package org.wpilib.epilogue;
 
         import org.wpilib.epilogue.Logged;
-        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.generated.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
         import org.wpilib.epilogue.logging.EpilogueBackend;
 

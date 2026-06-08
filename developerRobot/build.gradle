@@ -65,9 +65,9 @@ tasks.withType(JavaExec).configureEach {
     // Commands v3 needs reflective access to the continuation classes
     jvmArgs += [
         '--add-opens',
-        'java.base/jdk.internal.vm=ALL-UNNAMED',
+        'java.base/jdk.internal.vm=wpilib.command3',
         '--add-opens',
-        'java.base/java.lang=ALL-UNNAMED',
+        'java.base/java.lang=wpilib.command3',
     ]
 }
 
