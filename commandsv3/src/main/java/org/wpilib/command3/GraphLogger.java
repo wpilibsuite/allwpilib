@@ -23,7 +23,7 @@ import org.wpilib.system.Filesystem;
  * GraphLogger is responsible for managing and logging state machine graphs that have been generated
  * with WPILib's <code>@MakeStateMachineGraph</code> annotation.
  */
-public class GraphLogger {
+public final class GraphLogger {
   /** The maximum number of states to keep in the history. */
   public static final int MAX_HISTORY_LENGTH = 4;
 
@@ -45,8 +45,16 @@ public class GraphLogger {
     return instance;
   }
 
-  /** Default constructor. */
-  protected GraphLogger() {}
+  /**
+   * Creates an independent GraphLogger instance for unit testing purposes.
+   *
+   * @return A new GraphLogger instance
+   */
+  static GraphLogger createIndependentLogger() {
+    return new GraphLogger();
+  }
+
+  private GraphLogger() {}
 
   private boolean hasStarted = false;
   private BiConsumer<String, String> logString = (_, _) -> {};
