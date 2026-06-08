@@ -15,6 +15,8 @@ public @interface MakeStateMachineGraph {
   /**
    * An advanced configuration option that allows you to generate diagrams for a custom state
    * machine class sharing the same syntax as WPILib's state machine.
+   *
+   * @return The fully qualified name of the state machine class.
    */
   String stateMachineType() default "StateMachine";
 }
