@@ -18,7 +18,7 @@ jobs:
         include:
           - os: ubuntu-24.04
             name: Linux
-            container: wpilib/systemcore-cross-debian:trixie
+            container: wpilib/debina-base:trixie
             flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
           - os: macOS-15
             name: macOS
