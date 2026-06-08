@@ -30,7 +30,7 @@ jobs:
             ctest-flags: ""
     name: "${{ matrix.name }}"
     runs-on: ubuntu-24.04
-    container: wpilib/systemcore-cross-debian:trixie
+    container: wpilib/debian-base:trixie
     steps:
       - name: Install Dependencies
         run: sudo apt-get update && sudo apt-get install -y libopencv-dev clang-18 ninja-build avahi-daemon
