@@ -18,6 +18,7 @@ evaluationDependsOn(':wpilibj')
 
 dependencies {
     annotationProcessor project(':javacPlugin')
+    annotationProcessor libs.avaje.jsonb.generator
     implementation project(':wpiannotations')
     implementation project(':wpiutil')
     implementation project(':wpinet')
@@ -25,13 +26,12 @@ dependencies {
     implementation project(':hal')
     implementation project(':wpimath')
     implementation project(':wpilibj')
+    implementation libs.avaje.jsonb
     api(libs.quickbuf.runtime)
     testAnnotationProcessor project(':javacPlugin')
     testAnnotationProcessor project(':epilogue-processor')
     testImplementation(libs.bundles.mockito)
     testImplementation project(':epilogue-runtime')
-
-    implementation "com.amihaiemil.web:eo-yaml:8.0.6"
 }
 
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
