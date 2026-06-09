@@ -142,15 +142,25 @@ TEST_F(OpModeLifecycleTest, OpModeChangeWhileEnabled) {
   EXPECT_EQ(counts1.start.load(), 1u);
   EXPECT_EQ(counts1.periodic.load(), 1u);
 
-  // 2. Change to OpMode2 while enabled
+  // 2. Switch to OpMode2 while enabled. Selecting a different opmode while
+  // enabled disables the robot first, so the DS sends disabled + new opmode.
   wpi::sim::DriverStationSim::SetOpMode(
       MakeOpModeId(wpi::RobotMode::TELEOPERATED, "OpMode2"));
+  wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
-  wpi::sim::StepTiming(40_ms);
+  wpi::sim::StepTiming(20_ms);
   // OpMode1 should be ended and destructed
   EXPECT_EQ(counts1.end.load(), 1u);
   EXPECT_EQ(counts1.destructed.load(), 1u);
-  // OpMode2 should be started
+  // OpMode2 should be constructed exactly once and persist while disabled
+  EXPECT_EQ(counts2.constructed.load(), 1u);
+  EXPECT_EQ(counts2.start.load(), 0u);
+
+  // 3. Re-enable. The same OpMode2 instance is started; it is not
+  // reconstructed.
+  wpi::sim::DriverStationSim::SetEnabled(true);
+  wpi::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::StepTiming(40_ms);
   EXPECT_EQ(counts2.constructed.load(), 1u);
   EXPECT_EQ(counts2.start.load(), 1u);
   EXPECT_EQ(counts2.periodic.load(), 1u);

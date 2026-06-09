@@ -209,7 +209,8 @@ class OpModeLifecycleTest {
     assertEquals(1, startCount1.get());
     assertEquals(1, periodicCount1.get());
 
-    // 2. Change to OpMode2 while enabled
+    // 2. Switch to OpMode2 while enabled. Selecting a different opmode while
+    // enabled disables the robot first, so the DS sends disabled + new opmode.
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "OpMode2"));
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
@@ -217,8 +218,11 @@ class OpModeLifecycleTest {
     // OpMode1 should be ended and closed
     assertEquals(1, endCount1.get());
     assertEquals(1, closeCount1.get());
+    // OpMode2 should be constructed exactly once and persist while disabled
+    assertEquals(1, constructedCount2.get());
+    assertEquals(0, startCount2.get());
 
-    // DS transitions to disabled on opmode switch, so enable again to start OpMode2
+    // 3. Re-enable. The same OpMode2 instance is started; it is not reconstructed.
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(2 * kPeriod);
@@ -280,14 +284,14 @@ class OpModeLifecycleTest {
     DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "OpMode1"));
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(2 * kPeriod);
+    SimHooks.stepTiming(kPeriod);
     assertEquals(1, constructedCount1.get());
-    assertEquals(2, disabledPeriodicCount1.get());
+    assertEquals(1, disabledPeriodicCount1.get());
 
     // 2. Change to OpMode2 while disabled
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "OpMode2"));
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(2 * kPeriod);
+    SimHooks.stepTiming(kPeriod);
     // OpMode1 should be closed, but NOT ended (since it never started)
     assertEquals(1, closeCount1.get());
     assertEquals(0, endCount1.get());

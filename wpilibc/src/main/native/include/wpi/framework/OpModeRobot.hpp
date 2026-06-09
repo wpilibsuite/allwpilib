@@ -221,6 +221,13 @@ class OpModeRobotBase : public RobotBase {
   void LoopFunc();
 
   /**
+   * Starts the current OpMode, registering its periodic callback and calling
+   * Start(). Does nothing if there is no current OpMode or it is already
+   * started.
+   */
+  void StartCurrentOpMode();
+
+  /**
    * Ends the current OpMode, cleaning up callbacks and resetting state.
    */
   void EndCurrentOpMode();
@@ -246,6 +253,7 @@ class OpModeRobotBase : public RobotBase {
   bool m_calledDriverStationConnected = false;
   bool m_lastEnabledState = false;
   std::shared_ptr<OpMode> m_currentOpMode;
+  std::string m_currentOpModeName;
   std::vector<wpi::internal::PeriodicPriorityQueue::Callback>
       m_activeOpModeCallbacks;
   std::optional<wpi::internal::PeriodicPriorityQueue::Callback>

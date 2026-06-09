@@ -78,13 +78,12 @@ void OpModeRobotBase::LoopFunc() {
 
   // Set up new opmode
   if (modeId != 0 && !m_currentOpMode) {
-    fmt::print(
-        "DEBUG: Looking for OpMode with ID {} in registry with {} entries\n",
-        modeId, m_opModes.size());
     auto data = m_opModes.lookup(modeId);
     if (data.factory) {
       // Instantiate the new opmode
-      fmt::print("********** Creating OpMode {} **********\n", data.name);
+      m_currentOpModeName = data.name;
+      fmt::print("********** Creating OpMode {} **********\n",
+                 m_currentOpModeName);
       m_currentOpMode = data.factory();
       if (m_currentOpMode) {
         // Register the opmode's additional periodic callbacks immediately on
@@ -99,25 +98,7 @@ void OpModeRobotBase::LoopFunc() {
         m_currentOpMode->DisabledPeriodic();
         m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
         calledOpModeDisabledPeriodicThisIteration = true;
-
-        if (enabled && !m_opmodePeriodic) {
-          fmt::print("********** Starting OpMode **********\n");
-          // Register the main opmode periodic callback
-          m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
-              [op = std::weak_ptr<OpMode>{m_currentOpMode}] {
-                if (auto shared_op = op.lock()) {
-                  shared_op->Periodic();
-                }
-              },
-              m_startTime, m_period};
-          m_callbacks.Add(*m_opmodePeriodic);
-
-          m_currentOpMode->Start();
-          m_watchdog.AddEpoch("OpMode::Start()");
-        }
       }
-      // Update m_lastModeId immediately to prevent race conditions
-      m_lastModeId = modeId;
     } else {
       WPILIB_ReportError(err::Error, "No OpMode found for mode {}", modeId);
     }
@@ -130,26 +111,11 @@ void OpModeRobotBase::LoopFunc() {
       // Transitioning to enabled
       DisabledExit();
       m_watchdog.AddEpoch("DisabledExit()");
-      if (m_currentOpMode && !m_opmodePeriodic) {
-        // Only start if not already started
-        // Register the main opmode periodic callback
-        m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
-            [op = std::weak_ptr<OpMode>{m_currentOpMode}] {
-              if (auto shared_op = op.lock()) {
-                shared_op->Periodic();
-              }
-            },
-            m_startTime, m_period};
-        m_callbacks.Add(*m_opmodePeriodic);
-
-        // Start the opmode
-        fmt::print("********** Starting OpMode **********\n");
-        m_currentOpMode->Start();
-        m_watchdog.AddEpoch("OpMode::Start()");
-      }
     } else {
-      // Transitioning to disabled
-      if (m_currentOpMode) {
+      // Transitioning to disabled. Only tear down an opmode that was actually
+      // running; a freshly selected opmode entering its disabled phase must
+      // persist so it can be started on the next enable.
+      if (m_currentOpMode && m_opmodePeriodic) {
         EndCurrentOpMode();
       }
       DisabledInit();
@@ -157,6 +123,13 @@ void OpModeRobotBase::LoopFunc() {
       justCalledDisabledInit = true;
     }
     m_lastEnabledState = enabled;
+  }
+
+  // Start the opmode if enabled and not already started. This single check
+  // covers both the disabled->enabled transition and an opmode constructed
+  // while the robot is already enabled.
+  if (enabled && m_currentOpMode && !m_opmodePeriodic) {
+    StartCurrentOpMode();
   }
 
   // Call periodic functions based on current state
@@ -175,9 +148,10 @@ void OpModeRobotBase::LoopFunc() {
     }
   }
 
+  m_lastModeId = modeId;
+
   // Call NonePeriodic when no opmode is selected
   if (modeId == 0) {
-    m_lastModeId = modeId;
     NonePeriodic();
     m_watchdog.AddEpoch("NonePeriodic()");
   }
@@ -242,13 +216,7 @@ void OpModeRobotBase::AddOpModeFactory(
   int64_t id = RobotState::AddOpMode(mode, name, group, description, textColor,
                                      backgroundColor);
   if (id != 0) {
-    fmt::print("DEBUG: Registering OpMode '{}' with ID {}\n", name, id);
     m_opModes[id] = OpModeData{std::string{name}, std::move(factory)};
-  } else {
-    fmt::print(
-        "DEBUG: Failed to register OpMode '{}' - RobotState::AddOpMode "
-        "returned 0\n",
-        name);
   }
 }
 
@@ -258,13 +226,7 @@ void OpModeRobotBase::AddOpModeFactory(OpModeFactory factory, RobotMode mode,
                                        std::string_view description) {
   int64_t id = RobotState::AddOpMode(mode, name, group, description);
   if (id != 0) {
-    fmt::print("DEBUG: Registering OpMode '{}' with ID {}\n", name, id);
     m_opModes[id] = OpModeData{std::string{name}, std::move(factory)};
-  } else {
-    fmt::print(
-        "DEBUG: Failed to register OpMode '{}' - RobotState::AddOpMode "
-        "returned 0\n",
-        name);
   }
 }
 
@@ -284,6 +246,28 @@ void OpModeRobotBase::ClearOpModes() {
   m_opModes.clear();
 }
 
+void OpModeRobotBase::StartCurrentOpMode() {
+  if (!m_currentOpMode || m_opmodePeriodic) {
+    return;
+  }
+
+  fmt::print("********** Starting OpMode {} **********\n", m_currentOpModeName);
+
+  // Register the main opmode periodic callback. Capture a weak_ptr so a queued
+  // callback can never resurrect or outlive a destroyed opmode.
+  m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
+      [op = std::weak_ptr<OpMode>{m_currentOpMode}] {
+        if (auto shared_op = op.lock()) {
+          shared_op->Periodic();
+        }
+      },
+      m_startTime, m_period};
+  m_callbacks.Add(*m_opmodePeriodic);
+
+  m_currentOpMode->Start();
+  m_watchdog.AddEpoch("OpMode::Start()");
+}
+
 void OpModeRobotBase::EndCurrentOpMode() {
   if (!m_currentOpMode) {
     return;
@@ -291,7 +275,7 @@ void OpModeRobotBase::EndCurrentOpMode() {
 
   // If opmode was started (enabled)
   if (m_opmodePeriodic) {
-    fmt::print("********** Ending OpMode **********\n");
+    fmt::print("********** Ending OpMode {} **********\n", m_currentOpModeName);
 
     m_currentOpMode->End();
     m_watchdog.AddEpoch("OpMode::End()");
@@ -306,6 +290,6 @@ void OpModeRobotBase::EndCurrentOpMode() {
   }
 
   // Regardless of whether opmode was started, destroy it
-  fmt::print("********** Closing OpMode **********\n");
+  fmt::print("********** Closing OpMode {} **********\n", m_currentOpModeName);
   m_currentOpMode.reset();
 }

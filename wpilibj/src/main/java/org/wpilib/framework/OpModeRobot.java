@@ -662,6 +662,11 @@ public abstract class OpModeRobot extends RobotBase {
       m_watchdog.addEpoch("driverStationConnected()");
     }
 
+    // Handle opmode changes: tear down the old opmode if the selection changed
+    if (modeId != m_lastModeId && m_currentOpMode != null) {
+      endCurrentOpMode();
+    }
+
     // Set up new opmode
     if (modeId != 0 && m_currentOpMode == null) {
       OpModeFactory factory = m_opModes.get(modeId);
@@ -679,9 +684,6 @@ public abstract class OpModeRobot extends RobotBase {
           m_watchdog.addEpoch("opMode.disabledPeriodic()");
           calledOpModeDisabledPeriodicThisIteration = true;
         }
-        // Update m_lastModeId immediately to prevent the opmode change logic
-        // from destroying this OpMode later in the same loop iteration
-        m_lastModeId = modeId;
       } else {
         DriverStationErrors.reportError("No OpMode found for mode " + modeId, false);
       }
@@ -694,19 +696,11 @@ public abstract class OpModeRobot extends RobotBase {
         // Transitioning to enabled
         disabledExit();
         m_watchdog.addEpoch("disabledExit()");
-        if (m_currentOpMode != null) {
-          // Register the main opmode periodic callback
-          m_currentOpModePeriodic =
-              m_callbacks.add(m_currentOpMode::periodic, m_startTimeUs, m_period);
-
-          // Start the opmode
-          System.out.println("********** Starting OpMode " + m_currentOpModeName + " **********");
-          m_currentOpMode.start();
-          m_watchdog.addEpoch("opMode.start()");
-        }
       } else {
-        // Transitioning to disabled
-        if (m_currentOpMode != null) {
+        // Transitioning to disabled. Only tear down an opmode that was actually
+        // running; a freshly selected opmode entering its disabled phase must
+        // persist so it can be started on the next enable.
+        if (m_currentOpMode != null && m_currentOpModePeriodic != null) {
           endCurrentOpMode();
         }
         disabledInit();
@@ -716,17 +710,19 @@ public abstract class OpModeRobot extends RobotBase {
       m_lastEnabledState = enabled;
     }
 
+    // Start the opmode if enabled and not already started. This single check
+    // covers both the disabled->enabled transition and an opmode constructed
+    // while the robot is already enabled.
+    if (enabled && m_currentOpMode != null && m_currentOpModePeriodic == null) {
+      startCurrentOpMode();
+    }
+
     // Call periodic functions based on current state
     if (!enabled) {
       // Only call disabledPeriodic if we didn't just call disabledInit
       if (!justCalledDisabledInit) {
         disabledPeriodic();
         m_watchdog.addEpoch("disabledPeriodic()");
-
-        // Handle opmode changes while disabled
-        if (modeId != m_lastModeId && m_currentOpMode != null) {
-          endCurrentOpMode();
-        }
       }
 
       // Call opmode disabledPeriodic if we have one and haven't called it already this iteration
@@ -771,6 +767,20 @@ public abstract class OpModeRobot extends RobotBase {
     if (m_watchdog.isExpired()) {
       m_watchdog.printEpochs();
     }
+  }
+
+  private void startCurrentOpMode() {
+    if (m_currentOpMode == null || m_currentOpModePeriodic != null) {
+      return;
+    }
+
+    System.out.println("********** Starting OpMode " + m_currentOpModeName + " **********");
+
+    // Register the main opmode periodic callback
+    m_currentOpModePeriodic = m_callbacks.add(m_currentOpMode::periodic, m_startTimeUs, m_period);
+
+    m_currentOpMode.start();
+    m_watchdog.addEpoch("opMode.start()");
   }
 
   private void endCurrentOpMode() {
