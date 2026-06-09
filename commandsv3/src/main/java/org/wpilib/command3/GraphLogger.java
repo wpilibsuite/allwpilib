@@ -93,7 +93,8 @@ public final class GraphLogger {
       try {
         var data = graphType.fromJson(Files.readString(file.toPath()));
         stateMachineGraphs.put(stateMachineName, data);
-        logString.accept("StateMachines/" + stateMachineName + "/graph/", data.transitions);
+        logString.accept("StateMachines/" + stateMachineName + "/graph", data.transitions);
+        logString.accept("StateMachines/" + stateMachineName + "/.type", "StateMachineGraph");
       } catch (IOException | JsonIoException | JsonDataException e) {
         DriverStationBackend.reportError(
             "The graph of " + stateMachineName + " could not be loaded. Error: " + e.getMessage(),
@@ -120,6 +121,6 @@ public final class GraphLogger {
     for (int i = 0; i < history.size(); i++) {
       historyAsArray[i] = stateDefs.get(allStates.indexOf(history.get(i)));
     }
-    logStringArray.accept("StateMachines/" + stateMachineName + "/history/", historyAsArray);
+    logStringArray.accept("StateMachines/" + stateMachineName + "/history", historyAsArray);
   }
 }
