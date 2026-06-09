@@ -217,6 +217,19 @@ std::string GetTopicName(NT_Topic topic) {
     return {};
   }
 }
+void* GetTopicUserData(NT_Topic topic) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
+    return ii->localStorage.GetTopicUserData(topic);
+  } else {
+    return nullptr;
+  }
+}
+
+void SetTopicUserData(NT_Topic topic, void* userData) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
+    ii->localStorage.SetTopicUserData(topic, userData);
+  }
+}
 
 NT_Type GetTopicType(NT_Topic topic) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {

@@ -648,6 +648,28 @@ NT_Topic GetTopic(NT_Inst inst, std::string_view name);
 std::string GetTopicName(NT_Topic topic);
 
 /**
+ * Gets the user data associated with the specified topic.
+ * Returns nullptr if the handle is invalid or no user data is associated.
+ * User data is not used by ntcore and is for the user's convenience.  It is not
+ * inherited by subscribers/publishers of the topic, and is not automatically
+ * freed.
+ *
+ * @param topic   topic handle
+ * @return User data pointer
+ */
+void* GetTopicUserData(NT_Topic topic);
+
+/**
+ * Sets the user data associated with the specified topic.  User data is not
+ * used by ntcore and is for the user's convenience.  It is not inherited by
+ * subscribers/publishers of the topic, and is not automatically freed.
+ *
+ * @param topic   topic handle
+ * @param userData User data pointer to associate with the topic
+ */
+void SetTopicUserData(NT_Topic topic, void* userData);
+
+/**
  * Gets the type for the specified topic, or unassigned if non existent.
  *
  * @param topic   topic handle
