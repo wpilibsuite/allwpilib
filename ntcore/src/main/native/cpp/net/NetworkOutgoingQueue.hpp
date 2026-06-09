@@ -100,10 +100,15 @@ class NetworkOutgoingQueue {
           std::stable_partition(oldMsgs.begin(), oldMsgs.end(),
                                 [&](const auto& e) { return e.id != id; });
       auto& newMsgs = m_queues[queueIndex].msgs;
+      int valuePos = -1;
       for (auto i = it, end = oldMsgs.end(); i != end; ++i) {
+        if (std::holds_alternative<ValueMsg>(i->msg.contents)) {
+          valuePos = newMsgs.size();
+        }
         newMsgs.emplace_back(std::move(*i));
       }
       oldMsgs.erase(it, oldMsgs.end());
+      infoIt->getSecond().valuePos = valuePos;
     }
 
     infoIt->getSecond().queueIndex = queueIndex;
@@ -161,11 +166,12 @@ class NetworkOutgoingQueue {
           auto& elem = queue.msgs[info.valuePos];
           if (auto m = std::get_if<ValueMsg>(&elem.msg.contents)) {
             // double-check handle, and only replace if timestamp newer
-            if (elem.id == id &&
-                (m->value.time() == 0 || value.time() >= m->value.time())) {
-              int delta = value.size() - m->value.size();
-              m->value = value;
-              m_totalSize += delta;
+            if (elem.id == id) {
+              if (m->value.time() == 0 || value.time() >= m->value.time()) {
+                m->value = value;
+                m_totalSize += static_cast<int64_t>(value.size()) -
+                               static_cast<int64_t>(m->value.size());
+              }
               return;
             }
           }

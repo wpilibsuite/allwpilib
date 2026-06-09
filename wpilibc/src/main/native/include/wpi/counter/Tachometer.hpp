@@ -6,10 +6,10 @@
 
 #include "EdgeConfiguration.hpp"
 #include "wpi/hal/Counter.h"
-#include "wpi/hal/Types.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/Handle.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -110,7 +110,7 @@ class Tachometer : public wpi::util::Sendable,
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
-  wpi::hal::Handle<HAL_CounterHandle, HAL_FreeCounter> m_handle;
+  wpi::util::Handle<HAL_CounterHandle, HAL_FreeCounter> m_handle;
   int m_edgesPerRevolution;
   int32_t m_channel;
 };

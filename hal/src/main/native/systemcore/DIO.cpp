@@ -46,8 +46,9 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
   auto [handle, port] = *resource;
   port->channel = channel;
 
-  *status = port->InitializeMode(input ? SmartIoMode::DigitalInput
-                                       : SmartIoMode::DigitalOutput);
+  *status = port->InitializeMode(
+      input ? MRC_SmartIOMode::MRC_SmartIOMode_DigitalInput
+            : MRC_SmartIOMode::MRC_SmartIOMode_DigitalOutput);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::DIO);
     return HAL_INVALID_HANDLE;
@@ -158,9 +159,9 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
   }
 
   switch (port->currentMode) {
-    case SmartIoMode::DigitalInput:
+    case MRC_SmartIOMode::MRC_SmartIOMode_DigitalInput:
       return true;
-    case SmartIoMode::DigitalOutput:
+    case MRC_SmartIOMode::MRC_SmartIOMode_DigitalOutput:
       return false;
     default:
       *status = HAL_INCOMPATIBLE_STATE;
