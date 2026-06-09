@@ -784,19 +784,21 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   private void endCurrentOpMode() {
-    // if opmode was started
+    // If the opmode was started, end it and remove its main periodic callback.
     if (m_currentOpModePeriodic != null) {
       System.out.println("********** Ending OpMode " + m_currentOpModeName + " **********");
 
       m_currentOpMode.end();
       m_watchdog.addEpoch("opMode.end()");
 
-      // Remove opmode callbacks
       m_callbacks.remove(m_currentOpModePeriodic);
-      m_callbacks.removeAll(m_activeOpModeCallbacks);
-      m_activeOpModeCallbacks.clear();
       m_currentOpModePeriodic = null;
     }
+
+    // The additional getCallbacks() callbacks are registered immediately on construction (even
+    // while disabled), so always remove them regardless of whether the opmode was started.
+    m_callbacks.removeAll(m_activeOpModeCallbacks);
+    m_activeOpModeCallbacks.clear();
 
     // regardless of whether opmode was started, close it and set to null
     System.out.println("********** Closing OpMode " + m_currentOpModeName + " **********");

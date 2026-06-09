@@ -273,21 +273,24 @@ void OpModeRobotBase::EndCurrentOpMode() {
     return;
   }
 
-  // If opmode was started (enabled)
+  // If the opmode was started, end it and remove its main periodic callback.
   if (m_opmodePeriodic) {
     fmt::print("********** Ending OpMode {} **********\n", m_currentOpModeName);
 
     m_currentOpMode->End();
     m_watchdog.AddEpoch("OpMode::End()");
 
-    // Remove opmode callbacks first to break circular references
     m_callbacks.Remove(*m_opmodePeriodic);
     m_opmodePeriodic.reset();
-    for (auto& cb : m_activeOpModeCallbacks) {
-      m_callbacks.Remove(cb);
-    }
-    m_activeOpModeCallbacks.clear();
   }
+
+  // The additional GetCallbacks() callbacks are registered immediately on
+  // construction (even while disabled), so always remove them regardless of
+  // whether the opmode was started.
+  for (auto& cb : m_activeOpModeCallbacks) {
+    m_callbacks.Remove(cb);
+  }
+  m_activeOpModeCallbacks.clear();
 
   // Regardless of whether opmode was started, destroy it
   fmt::print("********** Closing OpMode {} **********\n", m_currentOpModeName);

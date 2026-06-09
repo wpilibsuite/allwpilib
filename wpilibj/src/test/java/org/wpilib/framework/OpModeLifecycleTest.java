@@ -5,7 +5,9 @@
 package org.wpilib.framework;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.OpModeOption;
 import org.wpilib.hardware.hal.RobotMode;
+import org.wpilib.internal.PeriodicPriorityQueue;
 import org.wpilib.opmode.OpMode;
 import org.wpilib.simulation.DriverStationSim;
 import org.wpilib.simulation.SimHooks;
@@ -79,6 +82,23 @@ class OpModeLifecycleTest {
   static class LifecycleRobot extends OpModeRobot {
     LifecycleRobot() {
       super();
+    }
+  }
+
+  // OpMode whose getCallbacks() returns a single callback with no enabled check,
+  // used to verify that getCallbacks() callbacks are registered immediately and
+  // run even while disabled.
+  static class CallbackOpMode implements OpMode {
+    private final AtomicInteger m_callbackCount;
+
+    CallbackOpMode(AtomicInteger callbackCount) {
+      m_callbackCount = callbackCount;
+    }
+
+    @Override
+    public Set<PeriodicPriorityQueue.Callback> getCallbacks() {
+      return Set.of(
+          new PeriodicPriorityQueue.Callback(m_callbackCount::incrementAndGet, 0, kPeriod));
     }
   }
 
@@ -298,6 +318,40 @@ class OpModeLifecycleTest {
     // OpMode2 should be selected
     assertEquals(1, constructedCount2.get());
     assertEquals(1, disabledPeriodicCount2.get());
+
+    robot.endCompetition();
+    robotThread.join();
+    robot.close();
+  }
+
+  @Test
+  void testGetCallbacksRunImmediatelyWhileDisabled() throws InterruptedException {
+    AtomicInteger callbackCount = new AtomicInteger(0);
+    LifecycleRobot robot = new LifecycleRobot();
+    robot.addOpModeFactory(
+        () -> new CallbackOpMode(callbackCount), RobotMode.TELEOPERATED, "CallbackOpMode");
+    robot.publishOpModes();
+
+    Thread robotThread = new Thread(robot::startCompetition);
+    robotThread.start();
+    SimHooks.waitForProgramStart();
+
+    // Select the opmode while disabled. getCallbacks() callbacks are registered
+    // immediately on construction and run even while the robot is disabled.
+    DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
+    DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "CallbackOpMode"));
+    DriverStationSim.notifyNewData();
+    SimHooks.stepTiming(5 * kPeriod);
+    assertTrue(callbackCount.get() >= 1);
+
+    // Deselecting the opmode tears it down and removes its callbacks, so the
+    // callback must stop running.
+    DriverStationSim.setOpMode(0);
+    DriverStationSim.notifyNewData();
+    SimHooks.stepTiming(5 * kPeriod); // let teardown settle
+    int countAfterTeardown = callbackCount.get();
+    SimHooks.stepTiming(5 * kPeriod);
+    assertEquals(countAfterTeardown, callbackCount.get());
 
     robot.endCompetition();
     robotThread.join();

@@ -5,6 +5,7 @@
 #include <atomic>
 #include <memory>
 #include <thread>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -47,6 +48,26 @@ class LifecycleOpMode : public wpi::OpMode {
 class LifecycleRobot : public wpi::OpModeRobot<LifecycleRobot> {
  public:
   LifecycleRobot() = default;
+};
+
+// OpMode whose GetCallbacks() returns a single callback with no enabled check,
+// used to verify that getCallbacks() callbacks are registered immediately and
+// run even while disabled.
+class CallbackOpMode : public wpi::OpMode {
+ public:
+  explicit CallbackOpMode(std::atomic<uint32_t>& callbackCount)
+      : m_callbackCount(callbackCount) {}
+
+  std::vector<wpi::internal::PeriodicPriorityQueue::Callback> GetCallbacks()
+      override {
+    std::vector<wpi::internal::PeriodicPriorityQueue::Callback> callbacks;
+    callbacks.emplace_back([&count = m_callbackCount] { count++; },
+                           std::chrono::microseconds{0}, 20_ms);
+    return callbacks;
+  }
+
+ private:
+  std::atomic<uint32_t>& m_callbackCount;
 };
 
 class OpModeLifecycleTest : public ::testing::Test {
@@ -207,6 +228,41 @@ TEST_F(OpModeLifecycleTest, OpModeChangeWhileDisabled) {
   // OpMode2 should be selected
   EXPECT_EQ(counts2.constructed.load(), 1u);
   EXPECT_EQ(counts2.disabledPeriodic.load(), 1u);
+
+  robot.EndCompetition();
+  robotThread.join();
+}
+
+TEST_F(OpModeLifecycleTest, GetCallbacksRunImmediatelyWhileDisabled) {
+  std::atomic<uint32_t> callbackCount{0};
+  LifecycleRobot robot;
+  robot.AddOpModeFactory(
+      [&] { return std::make_unique<CallbackOpMode>(callbackCount); },
+      wpi::RobotMode::TELEOPERATED, "CallbackOpMode");
+  robot.PublishOpModes();
+
+  std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
+
+  wpi::sim::DriverStationSim::SetDsAttached(true);
+
+  // Select the opmode while disabled. getCallbacks() callbacks are registered
+  // immediately on construction and run even while the robot is disabled.
+  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_TELEOPERATED);
+  wpi::sim::DriverStationSim::SetOpMode(
+      MakeOpModeId(wpi::RobotMode::TELEOPERATED, "CallbackOpMode"));
+  wpi::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::StepTiming(100_ms);
+  EXPECT_GE(callbackCount.load(), 1u);
+
+  // Deselecting the opmode tears it down and removes its callbacks, so the
+  // callback must stop running.
+  wpi::sim::DriverStationSim::SetOpMode(0);
+  wpi::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::StepTiming(100_ms);  // let teardown settle
+  uint32_t countAfterTeardown = callbackCount.load();
+  wpi::sim::StepTiming(100_ms);
+  EXPECT_EQ(callbackCount.load(), countAfterTeardown);
 
   robot.EndCompetition();
   robotThread.join();
