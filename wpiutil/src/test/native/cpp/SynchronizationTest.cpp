@@ -4,7 +4,9 @@
 
 #include "wpi/util/Synchronization.hpp"
 
+#include <array>
 #include <thread>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -54,4 +56,36 @@ TEST(EventTest, WaitMultiple) {
       wpi::util::WaitForObjects({event1, event2}, signaled, 0, &timedOut);
   ASSERT_EQ(timedOut, true);
   ASSERT_EQ(result2.size(), 0u);
+}
+
+TEST(SignalObjectTest, ConcurrentSetDifferentHandles) {
+  constexpr int HANDLE_COUNT = 64;
+  constexpr int SET_COUNT = 100;
+
+  std::array<WPI_Handle, HANDLE_COUNT> handles;
+  for (int i = 0; i < HANDLE_COUNT; ++i) {
+    handles[i] = (wpi::util::HANDLE_TYPE_USER_BASE << 24) | i;
+    wpi::util::CreateSignalObject(handles[i], true, false);
+  }
+
+  std::vector<std::thread> threads;
+  threads.reserve(HANDLE_COUNT);
+  for (auto handle : handles) {
+    threads.emplace_back([=] {
+      for (int i = 0; i < SET_COUNT; ++i) {
+        wpi::util::SetSignalObject(handle);
+      }
+    });
+  }
+
+  for (auto& thread : threads) {
+    thread.join();
+  }
+
+  for (auto handle : handles) {
+    bool timedOut = true;
+    ASSERT_TRUE(wpi::util::WaitForObject(handle, 0, &timedOut));
+    ASSERT_FALSE(timedOut);
+    wpi::util::DestroySignalObject(handle);
+  }
 }
