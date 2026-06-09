@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <concepts>
+#include <cstddef>
 
 #include "wpi/util/Handle.h"
 

@@ -37,6 +37,17 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
+            class_name = "AddressableLEDBuffer",
+            yml_file = "semiwrap/AddressableLEDBuffer.yml",
+            header_root = "wpilibc/src/main/python/wpilib/src",
+            header_file = "wpilibc/src/main/python/wpilib/src/rpy/AddressableLEDBuffer.h",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::AddressableLEDBuffer", "wpi__AddressableLEDBuffer.hpp"),
+                ("wpi::AddressableLEDBuffer::View", "wpi__AddressableLEDBuffer__View.hpp"),
+            ],
+        ),
+        struct(
             class_name = "EdgeConfiguration",
             yml_file = "semiwrap/EdgeConfiguration.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
