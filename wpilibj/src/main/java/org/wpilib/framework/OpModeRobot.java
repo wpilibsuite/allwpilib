@@ -24,8 +24,6 @@ import java.util.jar.JarFile;
 import org.wpilib.driverstation.Alert;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.RobotState;
-import org.wpilib.driverstation.UserControls;
-import org.wpilib.driverstation.UserControlsInstance;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
@@ -90,23 +88,6 @@ public abstract class OpModeRobot extends RobotBase {
         "Error adding OpMode " + cls.getSimpleName() + ": " + message, false);
   }
 
-  private final Optional<Class<? extends UserControls>> m_userControlsBaseClass;
-  private UserControls m_userControlsInstance;
-
-  void setUserControlsInstance(UserControls userControlsInstance) {
-    if (m_userControlsBaseClass.isEmpty()) {
-      throw new IllegalStateException("No UserControls class specified");
-    }
-
-    if (!m_userControlsBaseClass.get().isAssignableFrom(userControlsInstance.getClass())) {
-      throw new IllegalArgumentException(
-          userControlsInstance.getClass().getSimpleName()
-              + " is not assignable to "
-              + m_userControlsBaseClass.get().getSimpleName());
-    }
-    m_userControlsInstance = userControlsInstance;
-  }
-
   /**
    * Find a public constructor to instantiate the opmode. This constructor can have up to 2
    * parameters. The first parameter (if present) must be assignable from this.getClass(). The
@@ -116,26 +97,10 @@ public abstract class OpModeRobot extends RobotBase {
   private <T> Optional<ConstructorMatch<T>> findOpModeConstructor(Class<T> cls) {
     Optional<ConstructorMatch<T>> ctor;
 
-    // try 2-parameter constructor
-    if (m_userControlsBaseClass.isPresent()) {
-      ctor = ConstructorMatch.findBestConstructor(cls, getClass(), m_userControlsBaseClass.get());
-      if (ctor.isPresent()) {
-        return ctor;
-      }
-    }
-
     // try 1-parameter constructor with RobotBase parameter
     ctor = ConstructorMatch.findBestConstructor(cls, getClass());
     if (ctor.isPresent()) {
       return ctor;
-    }
-
-    // try 1-parameter constructor with UserControls parameter
-    if (m_userControlsBaseClass.isPresent()) {
-      ctor = ConstructorMatch.findBestConstructor(cls, m_userControlsBaseClass.get());
-      if (ctor.isPresent()) {
-        return ctor;
-      }
     }
 
     // try no-parameter constructor
@@ -151,11 +116,7 @@ public abstract class OpModeRobot extends RobotBase {
       return null;
     }
     try {
-      if (m_userControlsInstance != null) {
-        return constructor.get().newInstance(this, m_userControlsInstance);
-      } else {
-        return constructor.get().newInstance(this);
-      }
+      return constructor.get().newInstance(this);
     } catch (ReflectiveOperationException e) {
       DriverStationErrors.reportError(
           "Could not instantiate OpMode " + cls.getSimpleName(), e.getStackTrace());
@@ -564,14 +525,6 @@ public abstract class OpModeRobot extends RobotBase {
     // Add LoopFunc as periodic callback (match C++)
     addPeriodic(this::loopFunc, period);
 
-    // Check to see if we have a DS annotation
-    UserControlsInstance userControlsAnnotation =
-        getClass().getAnnotation(UserControlsInstance.class);
-    if (userControlsAnnotation != null) {
-      m_userControlsBaseClass = Optional.of(userControlsAnnotation.value());
-    } else {
-      m_userControlsBaseClass = Optional.empty();
-    }
     // Scan for annotated opmode classes within the derived class's package and subpackages
     addAnnotatedOpModeClasses(getClass().getPackage());
     RobotState.publishOpModes();
