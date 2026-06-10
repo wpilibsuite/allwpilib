@@ -1,5 +1,6 @@
 extra_includes:
 - wpi/driverstation/internal/DriverStationBackend.hpp
+- wpi/event/BooleanEvent.hpp
 
 classes:
   wpi::Joystick:
