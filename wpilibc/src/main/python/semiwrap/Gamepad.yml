@@ -1,3 +1,8 @@
+extra_includes:
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/driverstation/internal/DriverStationBackend.hpp
+- wpi/event/BooleanEvent.hpp
+
 classes:
   wpi::Gamepad:
     ignored_bases:
