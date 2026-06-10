@@ -8,4 +8,4 @@ classes:
         overloads:
           "":
           '[const]':
-            ignore: true
+            ignore_py: true
