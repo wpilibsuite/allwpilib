@@ -62,8 +62,8 @@ def test_elliptical_region_constraint():
     exceededConstraintOutsideRegion = False
     for point in trajectory.samples():
         if ellipse.contains(point.pose.translation()):
-            assert abs(point.velocity.vx) < maxVelocity + 0.05
-        elif abs(point.velocity.vx) >= maxVelocity + 0.05:
+            assert abs(point.forwardVelocity()) < maxVelocity + 0.05
+        elif abs(point.forwardVelocity()) >= maxVelocity + 0.05:
             exceededConstraintOutsideRegion = True
 
         # translation = point.pose.translation()
@@ -95,8 +95,8 @@ def test_rectangular_region_constraint():
     exceededConstraintOutsideRegion = False
     for point in trajectory.samples():
         if rectangle.contains(point.pose.translation()):
-            assert abs(point.velocity.vx) < maxVelocity + 0.05
-        elif abs(point.velocity.vx) >= maxVelocity + 0.05:
+            assert abs(point.forwardVelocity()) < maxVelocity + 0.05
+        elif abs(point.forwardVelocity()) >= maxVelocity + 0.05:
             exceededConstraintOutsideRegion = True
 
     assert exceededConstraintOutsideRegion

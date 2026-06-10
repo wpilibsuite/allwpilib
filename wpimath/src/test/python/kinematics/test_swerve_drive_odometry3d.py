@@ -187,20 +187,20 @@ def test_accuracy_facing_x_axis():
         ground_truth_state = trajectory. sampleAt(t)
 
         fl.distance += (
-            ground_truth_state.velocity.vx * dt
-            + 0.5 * ground_truth_state.acceleration.ax * dt * dt
+            ground_truth_state.forwardVelocity() * dt
+            + 0.5 * ground_truth_state.forwardAcceleration() * dt * dt
         )
         fr.distance += (
-            ground_truth_state.velocity.vx * dt
-            + 0.5 * ground_truth_state.acceleration.ax * dt * dt
+            ground_truth_state.forwardVelocity() * dt
+            + 0.5 * ground_truth_state.forwardAcceleration() * dt * dt
         )
         bl.distance += (
-            ground_truth_state.velocity.vx * dt
-            + 0.5 * ground_truth_state.acceleration.ax * dt * dt
+            ground_truth_state.forwardVelocity() * dt
+            + 0.5 * ground_truth_state.forwardAcceleration() * dt * dt
         )
         br.distance += (
-            ground_truth_state.velocity.vx * dt
-            + 0.5 * ground_truth_state.acceleration.ax * dt * dt
+            ground_truth_state.forwardVelocity() * dt
+            + 0.5 * ground_truth_state.forwardAcceleration() * dt * dt
         )
 
         fl.angle = ground_truth_state.pose.rotation()

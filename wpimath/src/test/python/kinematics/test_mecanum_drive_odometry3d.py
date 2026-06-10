@@ -156,7 +156,9 @@ def test_accuracy_facing_trajectory():
         ground_truth_state = trajectory. sampleAt(t)
 
         wheel_velocities = kinematics.toWheelVelocities(
-            ground_truth_state.velocity
+            ground_truth_state.velocity.toRobotRelative(
+                ground_truth_state.pose.rotation()
+            )
         )
 
         wheel_velocities.frontLeft += random.gauss(0.0, 1.0) * 0.1
@@ -226,8 +228,8 @@ def test_accuracy_facing_x_axis():
 
         wheel_velocities = kinematics.toWheelVelocities(
             ChassisVelocities(
-                ground_truth_state.velocity.vx * ground_truth_state.pose.rotation().cos(),
-                ground_truth_state.velocity.vx * ground_truth_state.pose.rotation().sin(),
+                ground_truth_state.forwardVelocity() * ground_truth_state.pose.rotation().cos(),
+                ground_truth_state.forwardVelocity() * ground_truth_state.pose.rotation().sin(),
                 0,
             )
         )

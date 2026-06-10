@@ -130,7 +130,7 @@ def test_accuracy_facing_trajectory():
     while t < trajectory.totalTime():
         ground_truth_state = trajectory. sampleAt(t)
 
-        wheel_velocities = kinematics.toWheelVelocities(ground_truth_state.velocity)
+        wheel_velocities = kinematics.toWheelVelocities(ground_truth_state.velocity.toRobotRelative(ground_truth_state.pose.rotation()))
 
         wheel_velocities.frontLeft += random.gauss(0.0, 1.0) * 0.1
         wheel_velocities.frontRight += random.gauss(0.0, 1.0) * 0.1

@@ -18,6 +18,8 @@ classes:
           double, const Pose2d&, double, double, double:
           const TrajectorySample&:
           wpi::units::second_t, const Pose2d&, const ChassisVelocities&, const ChassisAccelerations&, wpi::units::curvature_t:
+      ForwardVelocity:
+      ForwardAcceleration:
       Transform:
       RelativeTo:
       WithNewTimestamp:
