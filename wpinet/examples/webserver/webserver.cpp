@@ -10,6 +10,7 @@
 #include "wpi/net/UrlParser.hpp"
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/Tcp.hpp"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/print.hpp"
 
 namespace uv = wpi::net::uv;
@@ -45,7 +46,7 @@ void MyHttpServerConnection::ProcessRequest() {
   }
   wpi::util::print(stderr, "query: \"{}\"\n", query);
 
-  const bool isGET = m_request.GetMethod() == wpi::net::HTTP_GET;
+  const bool isGET = m_request.GetMethod() == HTTP_GET;
   if (isGET && path == "/") {
     // build HTML root page
     SendResponse(200, "OK", "text/html",

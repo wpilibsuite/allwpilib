@@ -8,7 +8,8 @@
 
 #include <string_view>
 
-#include "wpi/net/http_parser.hpp"
+#include <llhttp.h>
+
 #include "wpi/util/Signal.h"
 #include "wpi/util/SmallString.hpp"
 
@@ -26,12 +27,6 @@ class HttpParser {
     RESPONSE = HTTP_RESPONSE,
     BOTH = HTTP_BOTH
   };
-
-  /**
-   * Returns the library version. Bits 16-23 contain the major version number,
-   * bits 8-15 the minor version number and bits 0-7 the patch level.
-   */
-  static uint32_t GetParserVersion();
 
   /**
    * Constructor.
@@ -58,11 +53,7 @@ class HttpParser {
    * @param in input data
    * @return Trailing input data after the parse.
    */
-  std::string_view Execute(std::string_view in) {
-    in.remove_prefix(
-        http_parser_execute(&m_parser, &m_settings, in.data(), in.size()));
-    return in;
-  }
+  std::string_view Execute(std::string_view in);
 
   /**
    * Get HTTP major version.
@@ -83,22 +74,23 @@ class HttpParser {
   /**
    * Get HTTP method.  Valid only on requests.
    */
-  http_method GetMethod() const {
-    return static_cast<http_method>(m_parser.method);
+  llhttp_method GetMethod() const {
+    return static_cast<llhttp_method>(m_parser.method);
   }
 
   /**
    * Determine if an error occurred.
    * @return False if no error.
    */
-  bool HasError() const { return m_parser.http_errno != HPE_OK; }
+  bool HasError() const {
+    return llhttp_get_errno(&m_parser) != HPE_OK &&
+           llhttp_get_errno(&m_parser) != HPE_PAUSED_UPGRADE;
+  }
 
   /**
    * Get error number.
    */
-  http_errno GetError() const {
-    return static_cast<http_errno>(m_parser.http_errno);
-  }
+  llhttp_errno GetError() const { return llhttp_get_errno(&m_parser); }
 
   /**
    * Abort the parse.  Call this from a callback handler to indicate an error.
@@ -121,18 +113,19 @@ class HttpParser {
    * If you are the server, respond with the "Connection: close" header.
    * If you are the client, close the connection.
    */
-  bool ShouldKeepAlive() const { return http_should_keep_alive(&m_parser); }
+  bool ShouldKeepAlive() const { return llhttp_should_keep_alive(&m_parser); }
 
   /**
    * Pause the parser.
    * @param paused True to pause, false to unpause.
    */
-  void Pause(bool paused) { http_parser_pause(&m_parser, paused); }
-
-  /**
-   * Checks if this is the final chunk of the body.
-   */
-  bool IsBodyFinal() const { return http_body_is_final(&m_parser); }
+  void Pause(bool paused) {
+    if (paused) {
+      llhttp_pause(&m_parser);
+    } else {
+      llhttp_resume(&m_parser);
+    }
+  }
 
   /**
    * Get URL.  Valid in and after the url callback has been called.
@@ -179,12 +172,11 @@ class HttpParser {
   /**
    * Body data callback.
    *
-   * The parameters to the callback is the data chunk and whether this is the
-   * final chunk of data in the message.  Note this callback will be called
-   * multiple times arbitrarily (e.g. it's possible that it may be called with
-   * just a few characters at a time).
+   * The parameter to the callback is the data chunk. Note this callback will be
+   * called multiple times arbitrarily (e.g. it's possible that it may be called
+   * with just a few characters at a time).
    */
-  wpi::util::sig::Signal<std::string_view, bool> body;
+  wpi::util::sig::Signal<std::string_view> body;
 
   /**
    * Headers complete callback.
@@ -209,8 +201,8 @@ class HttpParser {
   wpi::util::sig::Signal<> chunkComplete;
 
  private:
-  http_parser m_parser;
-  http_parser_settings m_settings;
+  llhttp_t m_parser;
+  llhttp_settings_t m_settings;
 
   size_t m_maxLength = 1024;
   enum class State { START, URL, STATUS, FIELD, VALUE };

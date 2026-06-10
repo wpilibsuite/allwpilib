@@ -26,6 +26,7 @@
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/Signal.h"
 #include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/json.hpp"
@@ -255,7 +256,7 @@ void MyHttpConnection::ProcessRequest() {
   // wpi::util::print(stderr, "query: \"{}\"\n", query);
   HttpQueryMap qmap{query};
 
-  const bool isGET = m_request.GetMethod() == wpi::net::HTTP_GET;
+  const bool isGET = m_request.GetMethod() == HTTP_GET;
   if (isGET && wpi::util::starts_with(path, '/') &&
       !wpi::util::contains(path, "..")) {
     fs::path fullpath = std::format("{}{}", m_path, path);

@@ -101,6 +101,12 @@ pkg_files(
 )
 
 third_party_cc_lib_helper(
+    name = "llhttp",
+    include_root = "src/main/native/thirdparty/llhttp/include",
+    src_root = "src/main/native/thirdparty/llhttp/src",
+)
+
+third_party_cc_lib_helper(
     name = "tcpsockets",
     include_root = "src/main/native/thirdparty/tcpsockets/include",
     src_root = "src/main/native/thirdparty/tcpsockets/cpp",
@@ -132,6 +138,13 @@ wpilib_cc_library(
         ":libuv-srcs",
     ] + ["native-srcs"],
     hdrs = glob(["src/main/native/include/**/*"]),
+    copts = select({
+        "@platforms//os:windows": [],
+        "//conditions:default": [
+            "-Wno-error=pedantic",
+            "-Wno-error=format",
+        ],
+    }),
     extra_hdr_pkg_files = [":thirdparty-libuv-hdr-pkg"],
     extra_src_pkg_files = [
         ":wpinet-java-jni-hdrs-pkg",
@@ -147,6 +160,7 @@ wpilib_cc_library(
     }),
     strip_include_prefix = "src/main/native/include",
     third_party_libraries = [
+        ":llhttp",
         ":tcpsockets",
     ],
     visibility = ["//visibility:public"],
@@ -306,6 +320,7 @@ generate_robotpy_native_wrapper_build_info(
     pyproject_toml = "src/main/python/native-pyproject.toml",
     third_party_dirs = [
         "libuv",
+        "llhttp",
         "tcpsockets",
     ],
 )

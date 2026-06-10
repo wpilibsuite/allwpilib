@@ -10,6 +10,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         name = "{}.copy_headers".format(name),
         srcs = native.glob(["src/main/native/include/**"]) + native.glob(["src/generated/main/native/include/**"], allow_empty = True) + native.glob([
             "src/main/native/thirdparty/libuv/include/**",
+            "src/main/native/thirdparty/llhttp/include/**",
             "src/main/native/thirdparty/tcpsockets/include/**",
         ]),
         out = "native/wpinet/include",
@@ -18,6 +19,7 @@ def define_native_wrapper(name, pyproject_toml = None):
             "wpinet/src/generated/main/native/include": "",
             "wpinet/src/main/native/include": "",
             "wpinet/src/main/native/thirdparty/libuv/include": "",
+            "wpinet/src/main/native/thirdparty/llhttp/include": "",
             "wpinet/src/main/native/thirdparty/tcpsockets/include": "",
         },
         verbose = False,
