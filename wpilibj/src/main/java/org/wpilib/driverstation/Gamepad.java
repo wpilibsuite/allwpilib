@@ -24,7 +24,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * requested the most recent value is returned. There is a single class instance for each controller
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
  */
-public class Gamepad implements Sendable {
+public class Gamepad implements HIDDevice, Sendable {
   private static final double MAX_DEADBAND = Math.nextDown(1.0);
 
   /** Represents a digital button on a Gamepad. */
@@ -164,8 +164,18 @@ public class Gamepad implements Sendable {
    *
    * @return the wrapped GenericHID object
    */
-  public GenericHID getHID() {
+  @Override
+  public GenericHID getGenericHID() {
     return m_hid;
+  }
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  public GenericHID getHID() {
+    return getGenericHID();
   }
 
   /**

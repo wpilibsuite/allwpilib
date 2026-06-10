@@ -8,6 +8,7 @@
 
 #include <string>
 
+#include "wpi/driverstation/HIDDevice.hpp"
 #include "wpi/driverstation/POVDirection.hpp"
 #include "wpi/driverstation/TouchpadFinger.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
@@ -25,7 +26,7 @@ class EventLoop;
  * single class instance for each device and the mapping of ports to hardware
  * buttons depends on the code in the Driver Station.
  */
-class GenericHID {
+class GenericHID : public HIDDevice {
  public:
   /**
    * Represents a rumble output on the Joystick.
@@ -89,6 +90,24 @@ class GenericHID {
 
   explicit GenericHID(int port);
   virtual ~GenericHID() = default;
+
+  /**
+   * Get this GenericHID object.
+   *
+   * @return this GenericHID object
+   */
+  GenericHID& GetGenericHID() override {
+    return *this;
+  }
+
+  /**
+   * Get this GenericHID object.
+   *
+   * @return this GenericHID object
+   */
+  const GenericHID& GetGenericHID() const override {
+    return *this;
+  }
 
   GenericHID(GenericHID&&) = default;
   GenericHID& operator=(GenericHID&&) = default;

@@ -7,6 +7,7 @@
 #include <array>
 
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/driverstation/HIDDevice.hpp"
 #include "wpi/units/angle.hpp"
 
 namespace wpi {
@@ -19,7 +20,7 @@ namespace wpi {
  * single class instance for each joystick and the mapping of ports to hardware
  * buttons depends on the code in the Driver Station.
  */
-class Joystick {
+class Joystick : public HIDDevice {
  public:
   /// Default X axis channel.
   static constexpr int kDefaultXChannel = 0;
@@ -75,7 +76,7 @@ class Joystick {
    */
   explicit Joystick(GenericHID& hid);
 
-  ~Joystick() = default;
+  ~Joystick() override = default;
 
   Joystick(Joystick&&) = default;
   Joystick& operator=(Joystick&&) = default;
@@ -93,6 +94,20 @@ class Joystick {
    * @return the wrapped GenericHID object
    */
   const GenericHID& GetHID() const;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  GenericHID& GetGenericHID() override;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  const GenericHID& GetGenericHID() const override;
 
   /**
    * Set the channel associated with the X axis.

@@ -7,6 +7,7 @@
 #include <string>
 
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/driverstation/HIDDevice.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -24,7 +25,8 @@ namespace wpi {
  * correct mapping, and only through the official NI DS. Sim is not guaranteed
  * to have the same mapping, as well as any 3rd party controllers.
  */
-class Gamepad : public wpi::util::Sendable,
+class Gamepad : public HIDDevice,
+                public wpi::util::Sendable,
                 public wpi::util::SendableHelper<Gamepad> {
  public:
   /** Represents a digital button on an Gamepad. */
@@ -134,6 +136,20 @@ class Gamepad : public wpi::util::Sendable,
    * @return the wrapped GenericHID object
    */
   const GenericHID& GetHID() const;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  GenericHID& GetGenericHID() override;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  const GenericHID& GetGenericHID() const override;
 
   /**
    * Get the X axis value of left side of the controller. Right is positive.

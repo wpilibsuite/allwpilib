@@ -16,7 +16,7 @@ import org.wpilib.hardware.hal.HAL;
  * requested the most recent value is returned. There is a single class instance for each joystick
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
  */
-public class Joystick {
+public class Joystick implements HIDDevice {
   /** Default X axis channel. */
   public static final byte kDefaultXChannel = 0;
 
@@ -77,8 +77,18 @@ public class Joystick {
    *
    * @return the wrapped GenericHID object
    */
-  public GenericHID getHID() {
+  @Override
+  public GenericHID getGenericHID() {
     return m_hid;
+  }
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  public GenericHID getHID() {
+    return getGenericHID();
   }
 
   /**

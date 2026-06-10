@@ -37,6 +37,14 @@ const GenericHID& Gamepad::GetHID() const {
   return *m_hid;
 }
 
+GenericHID& Gamepad::GetGenericHID() {
+  return GetHID();
+}
+
+const GenericHID& Gamepad::GetGenericHID() const {
+  return GetHID();
+}
+
 double Gamepad::GetLeftX() const {
   return wpi::math::ApplyDeadband(GetAxis(Axis::LEFT_X), m_leftXDeadband);
 }

@@ -8,6 +8,7 @@ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.GenericHID;
+import org.wpilib.driverstation.HIDDevice;
 import org.wpilib.driverstation.POVDirection;
 
 /** A {@link Trigger} that gets its state from a POV on a {@link GenericHID}. */
@@ -31,6 +32,30 @@ public class POVButton extends Trigger {
    * @param angle The desired angle
    */
   public POVButton(GenericHID joystick, POVDirection angle) {
+    this(joystick, angle, 0);
+  }
+
+  /**
+   * Creates a POV button for triggering commands.
+   *
+   * @param joystick The HIDDevice object that has the POV
+   * @param angle The desired angle
+   * @param povNumber The POV number (see {@link GenericHID#getPOV(int)})
+   */
+  public POVButton(HIDDevice joystick, POVDirection angle, int povNumber) {
+    this(
+        requireNonNullParam(joystick, "joystick", "POVButton").getGenericHID(),
+        angle,
+        povNumber);
+  }
+
+  /**
+   * Creates a POV button for triggering commands. By default, acts on POV 0
+   *
+   * @param joystick The HIDDevice object that has the POV
+   * @param angle The desired angle
+   */
+  public POVButton(HIDDevice joystick, POVDirection angle) {
     this(joystick, angle, 0);
   }
 }
