@@ -22,7 +22,7 @@ import org.wpilib.units.measure.Time;
  */
 public abstract class Trajectory<SampleType extends TrajectorySample> {
   /** The samples this Trajectory is composed of. */
-  protected final SampleType[] samples;
+  protected final List<SampleType> samples;
 
   @Json.Ignore private final InterpolatingTreeMap<Double, SampleType> sampleMap;
 
@@ -37,10 +37,19 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
    */
   @SuppressWarnings({"this-escape"})
   public Trajectory(SampleType[] samples) {
+    this(Arrays.asList(samples));
+  }
+
+  /**
+   * Constructs a Trajectory.
+   *
+   * @param samples the samples of the trajectory. Order does not matter as they will be ordered
+   *     internally.
+   */
+  @SuppressWarnings({"this-escape"})
+  public Trajectory(List<SampleType> samples) {
     this.samples =
-        Arrays.stream(samples)
-            .sorted(Comparator.comparingDouble(s -> s.timestamp))
-            .toArray(size -> Arrays.copyOf(samples, size));
+        samples.stream().sorted(Comparator.comparingDouble(s -> s.timestamp)).toList();
 
     this.sampleMap = new InterpolatingTreeMap<>(MathUtil::inverseLerp, this::interpolate);
 
@@ -48,7 +57,7 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
       sampleMap.put(sample.timestamp, sample);
     }
 
-    this.duration = this.samples.length > 0 ? this.samples[this.samples.length - 1].timestamp : 0.0;
+    this.duration = this.samples.isEmpty() ? 0.0 : this.samples.getLast().timestamp;
   }
 
   /**
@@ -57,7 +66,7 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
    * @return the samples of the trajectory as an unmodifiable list.
    */
   public List<SampleType> getSamples() {
-    return List.of(samples);
+    return samples;
   }
 
   /**
@@ -73,12 +82,12 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
 
   /** Gets the first sample in the trajectory. */
   public SampleType start() {
-    return samples[0];
+    return samples.getFirst();
   }
 
   /** Gets the last sample in the trajectory. */
   public SampleType end() {
-    return samples[samples.length - 1];
+    return samples.getLast();
   }
 
   /** Gets the sample at the given timestamp. */

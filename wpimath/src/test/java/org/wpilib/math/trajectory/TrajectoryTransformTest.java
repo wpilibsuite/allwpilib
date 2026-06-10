@@ -50,13 +50,13 @@ class TrajectoryTransformTest {
     testSameShapedTrajectory(trajectory.samples, transformedTrajectory.samples);
   }
 
-  void testSameShapedTrajectory(SplineSample[] statesA, SplineSample[] statesB) {
-    for (int i = 0; i < statesA.length - 1; i++) {
-      var a1 = statesA[i].pose;
-      var a2 = statesA[i + 1].pose;
+  void testSameShapedTrajectory(List<SplineSample> statesA, List<SplineSample> statesB) {
+    for (int i = 0; i < statesA.size() - 1; i++) {
+      var a1 = statesA.get(i).pose;
+      var a2 = statesA.get(i + 1).pose;
 
-      var b1 = statesB[i].pose;
-      var b2 = statesB[i + 1].pose;
+      var b1 = statesB.get(i).pose;
+      var b2 = statesB.get(i + 1).pose;
 
       var expectedRel = a2.relativeTo(a1);
       var actualRel = b2.relativeTo(b1);

@@ -4,16 +4,12 @@
 
 package org.wpilib.math.trajectory;
 
-import io.avaje.json.JsonAdapter;
-import io.avaje.json.JsonReader;
-import io.avaje.json.JsonWriter;
-import io.avaje.json.PropertyNames;
 import io.avaje.jsonb.Json;
+import io.avaje.jsonb.Jsonb;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 import org.wpilib.math.geometry.Pose2d;
@@ -21,27 +17,30 @@ import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.trajectory.proto.HolonomicTrajectoryProto;
 
 /** A base trajectory class for general-purpose trajectory following. */
+@Json
 public class HolonomicTrajectory extends Trajectory<TrajectorySample> {
   /** Base proto for serialization. */
   public static final HolonomicTrajectoryProto proto = new HolonomicTrajectoryProto();
 
   /**
-   * Constructs a BaseTrajectory.
+   * Constructs a HolonomicTrajectory.
+   *
+   * @param samples the samples of the trajectory. Order does not matter as they will be ordered
+   *     internally.
+   */
+  @Json.Creator
+  public HolonomicTrajectory(List<TrajectorySample> samples) {
+    super(samples);
+  }
+
+  /**
+   * Constructs a HolonomicTrajectory.
    *
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
    */
   public HolonomicTrajectory(TrajectorySample[] samples) {
     super(samples);
-  }
-
-  public HolonomicTrajectory(List<? extends TrajectorySample> samples) {
-    this(samples.toArray(TrajectorySample[]::new));
-  }
-
-  @Json.Property("samples")
-  TrajectorySample[] getHolonomicSamples() {
-    return Arrays.copyOf(samples, samples.length);
   }
 
   /**
@@ -67,7 +66,7 @@ public class HolonomicTrajectory extends Trajectory<TrajectorySample> {
             start().timestamp, transformedFirstPose, start().velocity, start().acceleration);
 
     Stream<TrajectorySample> transformedSamples =
-        Arrays.stream(samples)
+        samples.stream()
             .skip(1)
             .map(
                 sample ->
@@ -78,32 +77,24 @@ public class HolonomicTrajectory extends Trajectory<TrajectorySample> {
                         sample.acceleration));
 
     return new HolonomicTrajectory(
-        Stream.concat(Stream.of(transformedFirstSample), transformedSamples)
-            .toArray(TrajectorySample[]::new));
+        Stream.concat(Stream.of(transformedFirstSample), transformedSamples).toList());
   }
 
   @Override
   public HolonomicTrajectory concatenate(Trajectory<TrajectorySample> other) {
-    if (other.samples.length < 1) {
+    if (other.samples.isEmpty()) {
       return this;
     }
 
     var withNewTimestamp =
-        Arrays.stream(other.samples)
-            .map(s -> s.withNewTimestamp(s.timestamp + this.duration))
-            .toArray(TrajectorySample[]::new);
+        other.samples.stream().map(s -> s.withNewTimestamp(s.timestamp + this.duration));
 
-    var combinedSamples =
-        Stream.concat(Arrays.stream(samples), Arrays.stream(withNewTimestamp))
-            .toArray(TrajectorySample[]::new);
-
-    return new HolonomicTrajectory(combinedSamples);
+    return new HolonomicTrajectory(Stream.concat(samples.stream(), withNewTimestamp).toList());
   }
 
   @Override
   public HolonomicTrajectory relativeTo(Pose2d other) {
-    return new HolonomicTrajectory(
-        Arrays.stream(samples).map(s -> s.relativeTo(other)).toArray(TrajectorySample[]::new));
+    return new HolonomicTrajectory(samples.stream().map(s -> s.relativeTo(other)).toList());
   }
 
   /**
@@ -114,44 +105,7 @@ public class HolonomicTrajectory extends Trajectory<TrajectorySample> {
    * @throws IOException if there's an error reading the file or parsing the JSON
    */
   public static HolonomicTrajectory loadFromStream(InputStream stream) throws IOException {
-    return io.avaje.jsonb.Jsonb.instance().type(HolonomicTrajectory.class).fromJson(stream);
-  }
-
-  /**
-   * Returns a JSON-B adapter for {@link HolonomicTrajectory}.
-   *
-   * @return the adapter
-   */
-  public static JsonAdapter<HolonomicTrajectory> jsonbAdapter() {
-    return new JsonAdapter<>() {
-      private final JsonAdapter<TrajectorySample[]> samplesAdapter =
-          io.avaje.jsonb.Jsonb.instance().adapter(TrajectorySample[].class);
-      private final PropertyNames names = io.avaje.jsonb.Jsonb.instance().properties("samples");
-
-      @Override
-      public void toJson(JsonWriter writer, HolonomicTrajectory value) {
-        writer.beginObject(names);
-        writer.name(0);
-        samplesAdapter.toJson(writer, value.samples);
-        writer.endObject();
-      }
-
-      @Override
-      public HolonomicTrajectory fromJson(JsonReader reader) {
-        TrajectorySample[] samples = null;
-        reader.beginObject(names);
-        while (reader.hasNextField()) {
-          String fieldName = reader.nextField();
-          if ("samples".equals(fieldName)) {
-            samples = samplesAdapter.fromJson(reader);
-          } else {
-            reader.skipValue();
-          }
-        }
-        reader.endObject();
-        return new HolonomicTrajectory(samples);
-      }
-    };
+    return Jsonb.instance().type(HolonomicTrajectory.class).fromJson(stream);
   }
 
   /**

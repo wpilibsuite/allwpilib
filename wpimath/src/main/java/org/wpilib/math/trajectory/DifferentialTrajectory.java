@@ -4,16 +4,13 @@
 
 package org.wpilib.math.trajectory;
 
-import io.avaje.json.JsonAdapter;
-import io.avaje.json.JsonReader;
-import io.avaje.json.JsonWriter;
-import io.avaje.json.PropertyNames;
+import io.avaje.jsonb.Json;
 import io.avaje.jsonb.Jsonb;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
@@ -32,9 +29,21 @@ import org.wpilib.math.trajectory.proto.DifferentialTrajectoryProto;
 import org.wpilib.math.util.MathUtil;
 
 /** A trajectory for differential drive robots with drivetrain-specific interpolation. */
+@Json
 public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
   /** Base proto for serialization. */
   public static final DifferentialTrajectoryProto proto = new DifferentialTrajectoryProto();
+
+  /**
+   * Constructs a DifferentialTrajectory.
+   *
+   * @param samples the samples of the trajectory. Order does not matter as they will be ordered
+   *     internally.
+   */
+  @Json.Creator
+  public DifferentialTrajectory(List<DifferentialSample> samples) {
+    super(samples);
+  }
 
   /**
    * Constructs a DifferentialTrajectory.
@@ -49,16 +58,13 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
   /**
    * Constructs a DifferentialTrajectory.
    *
+   * @param kinematics the kinematics of the drivetrain.
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
-   * @param kinematics the kinematics of the drivetrain.
    */
   public DifferentialTrajectory(
-      DifferentialDriveKinematics kinematics, TrajectorySample[] samples) {
-    this(
-        Arrays.stream(samples)
-            .map(s -> new DifferentialSample(s, kinematics))
-            .toArray(DifferentialSample[]::new));
+      DifferentialDriveKinematics kinematics, List<? extends TrajectorySample> samples) {
+    this(samples.stream().map(s -> new DifferentialSample(s, kinematics)).toList());
   }
 
   /**
@@ -170,7 +176,7 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
             start().rightSpeed);
 
     Stream<DifferentialSample> transformedSamples =
-        Arrays.stream(samples)
+        samples.stream()
             .skip(1)
             .map(
                 sample ->
@@ -183,32 +189,24 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
                         sample.rightSpeed));
 
     return new DifferentialTrajectory(
-        Stream.concat(Stream.of(transformedFirstSample), transformedSamples)
-            .toArray(DifferentialSample[]::new));
+        Stream.concat(Stream.of(transformedFirstSample), transformedSamples).toList());
   }
 
   @Override
   public DifferentialTrajectory concatenate(Trajectory<DifferentialSample> other) {
-    if (other.samples.length < 1) {
+    if (other.samples.isEmpty()) {
       return this;
     }
 
     var withNewTimestamp =
-        Arrays.stream(other.samples)
-            .map(s -> s.withNewTimestamp(s.timestamp + this.duration))
-            .toArray(DifferentialSample[]::new);
+        other.samples.stream().map(s -> s.withNewTimestamp(s.timestamp + this.duration));
 
-    var combinedSamples =
-        Stream.concat(Arrays.stream(samples), Arrays.stream(withNewTimestamp))
-            .toArray(DifferentialSample[]::new);
-
-    return new DifferentialTrajectory(combinedSamples);
+    return new DifferentialTrajectory(Stream.concat(samples.stream(), withNewTimestamp).toList());
   }
 
   @Override
   public DifferentialTrajectory relativeTo(Pose2d other) {
-    return new DifferentialTrajectory(
-        Arrays.stream(samples).map(s -> s.relativeTo(other)).toArray(DifferentialSample[]::new));
+    return new DifferentialTrajectory(samples.stream().map(s -> s.relativeTo(other)).toList());
   }
 
   /**
@@ -220,43 +218,6 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
    */
   public static DifferentialTrajectory loadFromStream(InputStream stream) throws IOException {
     return Jsonb.instance().type(DifferentialTrajectory.class).fromJson(stream);
-  }
-
-  /**
-   * Returns a JSON-B adapter for {@link DifferentialTrajectory}.
-   *
-   * @return the adapter
-   */
-  public static JsonAdapter<DifferentialTrajectory> jsonbAdapter() {
-    return new JsonAdapter<>() {
-      private final JsonAdapter<DifferentialSample[]> samplesAdapter =
-          Jsonb.instance().adapter(DifferentialSample[].class);
-      private final PropertyNames names = Jsonb.instance().properties("samples");
-
-      @Override
-      public void toJson(JsonWriter writer, DifferentialTrajectory value) {
-        writer.beginObject(names);
-        writer.name(0);
-        samplesAdapter.toJson(writer, value.samples);
-        writer.endObject();
-      }
-
-      @Override
-      public DifferentialTrajectory fromJson(JsonReader reader) {
-        DifferentialSample[] samples = null;
-        reader.beginObject(names);
-        while (reader.hasNextField()) {
-          String fieldName = reader.nextField();
-          if ("samples".equals(fieldName)) {
-            samples = samplesAdapter.fromJson(reader);
-          } else {
-            reader.skipValue();
-          }
-        }
-        reader.endObject();
-        return new DifferentialTrajectory(samples);
-      }
-    };
   }
 
   /**

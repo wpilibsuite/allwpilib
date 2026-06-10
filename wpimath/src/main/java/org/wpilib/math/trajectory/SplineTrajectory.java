@@ -107,7 +107,7 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
             start().curvature);
 
     Stream<SplineSample> transformedSamples =
-        Arrays.stream(samples)
+        samples.stream()
             .skip(1)
             .map(
                 sample ->
@@ -119,31 +119,23 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
                         sample.curvature));
 
     return new SplineTrajectory(
-        Stream.concat(Stream.of(transformedFirstSample), transformedSamples)
-            .toArray(SplineSample[]::new));
+        Stream.concat(Stream.of(transformedFirstSample), transformedSamples).toList());
   }
 
   @Override
   public SplineTrajectory concatenate(Trajectory<SplineSample> other) {
-    if (other.samples.length < 1) {
+    if (other.samples.isEmpty()) {
       return this;
     }
 
     var withNewTimestamp =
-        Arrays.stream(other.samples)
-            .map(s -> s.withNewTimestamp(s.timestamp + this.duration))
-            .toArray(SplineSample[]::new);
+        other.samples.stream().map(s -> s.withNewTimestamp(s.timestamp + this.duration));
 
-    var combinedSamples =
-        Stream.concat(Arrays.stream(samples), Arrays.stream(withNewTimestamp))
-            .toArray(SplineSample[]::new);
-
-    return new SplineTrajectory(combinedSamples);
+    return new SplineTrajectory(Stream.concat(samples.stream(), withNewTimestamp).toList());
   }
 
   @Override
   public SplineTrajectory relativeTo(Pose2d other) {
-    return new SplineTrajectory(
-        Arrays.stream(samples).map(s -> s.relativeTo(other)).toArray(SplineSample[]::new));
+    return new SplineTrajectory(samples.stream().map(s -> s.relativeTo(other)).toList());
   }
 }
