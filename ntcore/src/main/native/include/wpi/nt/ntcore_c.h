@@ -358,6 +358,12 @@ struct NT_PubSubOptions {
    * will not appear in metatopics.
    */
   NT_Bool hidden;
+
+  /**
+   * For subscriptions, don't signal the local handle when value updates are
+   * queued.
+   */
+  NT_Bool disableSignal;
 };
 
 /**

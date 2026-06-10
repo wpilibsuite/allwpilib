@@ -380,6 +380,12 @@ struct PubSubOptions {
    * will not appear in metatopics.
    */
   bool hidden = false;
+
+  /**
+   * For subscriptions, don't signal the local handle when value updates are
+   * queued.
+   */
+  bool disableSignal = false;
 };
 
 /**

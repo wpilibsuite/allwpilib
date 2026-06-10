@@ -166,7 +166,9 @@ class RobotStarter:
         inst = ntcore.NetworkTableInstance.getDefault()
 
         # subscribe to "" to force persistent values to progagate to local
-        msub = ntcore.MultiSubscriber(inst, [""])
+        msub = ntcore.MultiSubscriber(
+            inst, [""], ntcore.PubSubOptions(disableSignal=True)
+        )
 
         if not isSimulation:
             inst.startServer("/home/systemcore/networktables.json", "", "robot")

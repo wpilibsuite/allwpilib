@@ -18,6 +18,7 @@ import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.networktables.MultiSubscriber;
 import org.wpilib.networktables.NetworkTableEvent;
 import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.PubSubOption;
 import org.wpilib.system.RuntimeType;
 import org.wpilib.system.Timer;
 import org.wpilib.system.WPILibVersion;
@@ -105,7 +106,7 @@ public abstract class RobotBase implements AutoCloseable {
     setupCameraServerShared();
     setupMathShared();
     // subscribe to "" to force persistent values to propagate to local
-    m_suball = new MultiSubscriber(inst, new String[] {""});
+    m_suball = new MultiSubscriber(inst, new String[] {""}, PubSubOption.DISABLE_SIGNAL);
     if (!isSimulation()) {
       inst.startServer("/home/systemcore/networktables.json", "", "robot");
     } else {
