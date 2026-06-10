@@ -3,7 +3,7 @@ extra_includes:
 
 classes:
   wpi::HIDDevice:
-    force_no_trampoline: true
+    force_no_default_constructor: true
     methods:
       GetGenericHID:
         overloads:
