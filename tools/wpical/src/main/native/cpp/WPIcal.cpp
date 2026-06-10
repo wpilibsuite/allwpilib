@@ -25,7 +25,6 @@
 #include "wpi/gui/portable-file-dialogs.h"
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/gui/wpigui_openurl.hpp"
-#include "wpi/math/util/MathUtil.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/json.hpp"
