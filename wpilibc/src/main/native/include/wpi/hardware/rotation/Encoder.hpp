@@ -5,8 +5,8 @@
 #pragma once
 
 #include "wpi/hal/Encoder.h"
-#include "wpi/hal/Types.hpp"
 #include "wpi/hardware/discrete/CounterBase.hpp"
+#include "wpi/util/Handle.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -272,7 +272,7 @@ class Encoder : public CounterBase,
    */
   double DecodingScaleFactor() const;
 
-  wpi::hal::Handle<HAL_EncoderHandle, HAL_FreeEncoder> m_encoder;
+  wpi::util::Handle<HAL_EncoderHandle, HAL_FreeEncoder> m_encoder;
 };
 
 }  // namespace wpi

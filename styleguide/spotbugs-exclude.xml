@@ -41,7 +41,7 @@
   </Match>
   <Match>
     <!--
-    These are false positives where the Random instance is used multiple times in a loop. Futhermore, high randomness is not a
+    These are false positives where the Random instance is used multiple times in a loop. Furthermore, high randomness is not a
     high priority because these are tests- In fact, the odometry tests seed the Random instance to guarantee repeatability.
     -->
     <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE" />

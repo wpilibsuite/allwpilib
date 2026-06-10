@@ -66,11 +66,12 @@ jobs:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
 
-      - id: Setup_bazel_remote
-        uses: ./.github/actions/setup-bazel-remote
+      - id: Setup_bazel_cache
+        uses: ./.github/actions/setup-bazel-cache
         with:
-          username: ${{ secrets.BAZEL_CACHE_USERNAME }}
-          password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
+          bazel_remote_username: ${{ secrets.BAZEL_CACHE_USERNAME }}
+          bazel_remote_password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
+          buildbuddy_token: ${{ secrets.BUILDBUDDY_API_KEY }}
 
       - name: Install apt dependencies
         if: runner.os == 'Linux'
@@ -137,6 +138,27 @@ jobs:
           path: "*-bazel-lint-fixes.patch"
         if: ${{ failure() }}
 
+  mod-lock:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check lockfile
+        run: bazel mod deps --lockfile_mode=error
+
+      - run: bazel mod deps --lockfile_mode=update
+        if: ${{ failure() }}
+
+      - name: Generate diff
+        run: git diff HEAD > bazel-mod-lock-fixes.patch
+        if: ${{ failure() }}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          path: "bazel-mod-lock-fixes.patch"
+        if: ${{ failure() }}
+
   non_robotpy_pregeneration:
     name: "Non-RobotPy Pregen"
     runs-on: ubuntu-24.04
@@ -144,14 +166,15 @@ jobs:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
 
-      - id: Setup_bazel_remote
-        uses: ./.github/actions/setup-bazel-remote
+      - id: Setup_bazel_cache
+        uses: ./.github/actions/setup-bazel-cache
         with:
-          username: ${{ secrets.BAZEL_CACHE_USERNAME }}
-          password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
+          bazel_remote_username: ${{ secrets.BAZEL_CACHE_USERNAME }}
+          bazel_remote_password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
+          buildbuddy_token: ${{ secrets.BUILDBUDDY_API_KEY }}
 
       - name: Run Non-RobotPy pregeneration
-        run: bazel run //:write_pregenerated_files
+        run: bazel run --config=ci //:write_pregenerated_files
 
       - name: Check Output
         run: git --no-pager diff --exit-code HEAD
@@ -173,21 +196,23 @@ jobs:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
 
-      - id: Setup_build_buddy
-        uses: ./.github/actions/setup-build-buddy
+      - id: Setup_bazel_cache
+        uses: ./.github/actions/setup-bazel-cache
         with:
-          token: ${{ secrets.BUILDBUDDY_API_KEY }}
+          bazel_remote_username: ${{ secrets.BAZEL_CACHE_USERNAME }}
+          bazel_remote_password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
+          buildbuddy_token: ${{ secrets.BUILDBUDDY_API_KEY }}
 
       # You should ensure the headers are correct before trying to pregen files
       - name: Test Scan Headers
-        run: bazel test //... -k --test_tag_filters=robotpy_scan_headers --build_tests_only
+        run: bazel test --config=ci //... -k --test_tag_filters=robotpy_scan_headers --build_tests_only
         shell: bash
 
       - name: Run yaml file generation
-        run: bazel run //:write_robotpy_update_yaml_files
+        run: bazel run --config=ci //:write_robotpy_update_yaml_files
 
       - name: Run build file generation
-        run: bazel run //:write_robotpy_generated_pybind_files
+        run: bazel run --config=ci //:write_robotpy_generated_pybind_files
 
       - name: Check Output
         run: git --no-pager diff --exit-code HEAD

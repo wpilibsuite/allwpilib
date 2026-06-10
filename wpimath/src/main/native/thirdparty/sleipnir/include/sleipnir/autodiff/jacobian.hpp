@@ -7,12 +7,11 @@
 #include <Eigen/SparseCore>
 #include <gch/small_vector.hpp>
 
-#include "sleipnir/autodiff/gradient_expression_graph.hpp"
+#include "sleipnir/autodiff/expression_graph.hpp"
 #include "sleipnir/autodiff/variable.hpp"
 #include "sleipnir/autodiff/variable_matrix.hpp"
 #include "sleipnir/util/assert.hpp"
 #include "sleipnir/util/concepts.hpp"
-#include "sleipnir/util/empty.hpp"
 #include "sleipnir/util/symbol_exports.hpp"
 
 namespace slp {
@@ -54,18 +53,28 @@ class Jacobian {
     slp_assert(m_variables.cols() == 1);
     slp_assert(m_wrt.cols() == 1);
 
-    // Initialize column each expression's adjoint occupies in the Jacobian
-    for (size_t col = 0; col < m_wrt.size(); ++col) {
-      m_wrt[col].expr->col = col;
+    for (auto& variable : m_variables) {
+      m_top_lists.emplace_back(detail::topological_sort(variable.expr));
     }
 
-    for (auto& variable : m_variables) {
-      m_graphs.emplace_back(variable);
+    // Initialize column each expression's adjoint occupies in the Jacobian
+    for (size_t col = 0; col < m_wrt.size(); ++col) {
+      m_wrt[col].expr->scratch = col;
+    }
+
+    // Make list of output rows as column-node pairs
+    for (auto& top_list : m_top_lists) {
+      m_output_lists.emplace_back();
+      for (const auto& node : top_list) {
+        if (node->scratch != -1) {
+          m_output_lists.back().emplace_back(node->scratch, node);
+        }
+      }
     }
 
     // Reset col to -1
     for (auto& node : m_wrt) {
-      node.expr->col = -1;
+      node.expr->scratch = -1;
     }
 
     for (int row = 0; row < m_variables.rows(); ++row) {
@@ -77,7 +86,8 @@ class Jacobian {
         // If the row is linear, compute its gradient once here and cache its
         // triplets. Constant rows are ignored because their gradients have no
         // nonzero triplets.
-        m_graphs[row].append_triplets(m_cached_triplets, row, m_wrt);
+        detail::append_triplets(m_top_lists[row], m_output_lists[row],
+                                m_cached_triplets, row);
       } else if (m_variables[row].type() > ExpressionType::LINEAR) {
         // If the row is quadratic or nonlinear, add it to the list of nonlinear
         // rows to be recomputed in value().
@@ -101,7 +111,7 @@ class Jacobian {
                                   m_wrt.rows()};
 
     for (int row = 0; row < m_variables.rows(); ++row) {
-      auto grad = m_graphs[row].generate_tree(m_wrt);
+      auto grad = detail::gradient_tree(m_top_lists[row], m_wrt);
       for (int col = 0; col < m_wrt.rows(); ++col) {
         if (grad[col].expr != nullptr) {
           result(row, col) = std::move(grad[col]);
@@ -122,8 +132,8 @@ class Jacobian {
       return m_J;
     }
 
-    for (auto& graph : m_graphs) {
-      graph.update_values();
+    for (auto& top_list : m_top_lists) {
+      detail::update_values(top_list);
     }
 
     // Copy the cached triplets so triplets added for the nonlinear rows are
@@ -132,7 +142,8 @@ class Jacobian {
 
     // Compute each nonlinear row of the Jacobian
     for (int row : m_nonlinear_rows) {
-      m_graphs[row].append_triplets(triplets, row, m_wrt);
+      detail::append_triplets(m_top_lists[row], m_output_lists[row], triplets,
+                              row);
     }
 
     m_J.setFromTriplets(triplets.begin(), triplets.end());
@@ -144,7 +155,13 @@ class Jacobian {
   VariableMatrix<Scalar> m_variables;
   VariableMatrix<Scalar> m_wrt;
 
-  gch::small_vector<detail::GradientExpressionGraph<Scalar>> m_graphs;
+  /// List of topologically sorted graphs from parent to child, one for each row
+  gch::small_vector<detail::ExpressionGraph<Scalar>> m_top_lists;
+
+  /// List of output rows as column-node pairs
+  gch::small_vector<
+      gch::small_vector<std::pair<int, detail::Expression<Scalar>*>>>
+      m_output_lists;
 
   Eigen::SparseMatrix<Scalar> m_J{m_variables.rows(), m_wrt.rows()};
 

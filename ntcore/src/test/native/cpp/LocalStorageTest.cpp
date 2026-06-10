@@ -73,11 +73,11 @@ TEST_F(LocalStorageTest, GetTopic2) {
 }
 
 TEST_F(LocalStorageTest, GetTopicEmptyName) {
-  EXPECT_EQ(storage.GetTopic(""), 0u);
+  EXPECT_EQ(storage.GetTopic(""), 0);
 }
 
 TEST_F(LocalStorageTest, GetEntryEmptyName) {
-  EXPECT_EQ(storage.GetEntry(""), 0u);
+  EXPECT_EQ(storage.GetEntry(""), 0);
 }
 
 TEST_F(LocalStorageTest, GetEntryCached) {
@@ -538,11 +538,11 @@ TEST_F(LocalStorageTest, PublishUntyped) {
                    std::string_view{"cannot publish 'foo' with an unassigned "
                                     "type or empty type string"}));
 
-  EXPECT_EQ(storage.Publish(fooTopic, NT_UNASSIGNED, "", {}, {}), 0u);
+  EXPECT_EQ(storage.Publish(fooTopic, NT_UNASSIGNED, "", {}, {}), 0);
 }
 
 TEST_F(LocalStorageTest, SetValueInvalidHandle) {
-  EXPECT_FALSE(storage.SetEntryValue(0u, {}));
+  EXPECT_FALSE(storage.SetEntryValue(0, {}));
 }
 
 class LocalStorageDuplicatesTest : public LocalStorageTest {

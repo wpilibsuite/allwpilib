@@ -209,6 +209,8 @@ class BazelExtensionModule:
                 transitive_deps = set()
                 self._get_transitive_native_dependencies(dep_name, transitive_deps)
                 for d in transitive_deps:
+                    if d == "robotpy-native-mrclib":
+                        continue
                     base_library = fixup_root_package_name(
                         d.replace("robotpy-native-", "")
                     )

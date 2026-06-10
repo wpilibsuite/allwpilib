@@ -66,7 +66,7 @@ void HAL_FreeDutyCycle(HAL_DutyCycleHandle dutyCycleHandle) {
   SimDutyCycleData[dutyCycle->index].initialized = false;
 }
 
-void HAL_SetDutyCycleSimDevice(HAL_EncoderHandle handle,
+void HAL_SetDutyCycleSimDevice(HAL_DutyCycleHandle handle,
                                HAL_SimDeviceHandle device) {
   auto dutyCycle = dutyCycleHandles->Get(handle);
   if (dutyCycle == nullptr) {

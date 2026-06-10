@@ -7,19 +7,22 @@ package org.wpilib.command3;
 import static org.wpilib.units.Units.Seconds;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import org.wpilib.event.EventLoop;
 import org.wpilib.math.filter.Debouncer;
+import org.wpilib.system.Timer;
 import org.wpilib.units.measure.Time;
 
 /**
  * Triggers allow users to specify conditions for when commands should run. Triggers can be set up
  * to read from joystick and controller buttons (eg {@link
- * org.wpilib.command3.button.CommandGamepad#southFace()}) or be customized to read sensor values or
+ * org.wpilib.command3.button.CommandGamepad#faceDown()}) or be customized to read sensor values or
  * any other arbitrary true/false condition.
  *
  * <p>It is very easy to link a button to a command. For instance, you could link the trigger button
@@ -140,7 +143,8 @@ public class Trigger implements BooleanSupplier {
    * Starts the given command when the condition changes to `true` and cancels it when the condition
    * changes to `false`.
    *
-   * <p>Doesn't re-start the command if it ends while the condition is still `true`.
+   * <p>Unlike {@link #retryWhileTrue(Command)}, this does <strong>not</strong> restart the command
+   * if it ends while the condition is still `true`.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
@@ -155,7 +159,8 @@ public class Trigger implements BooleanSupplier {
    * Starts the given command when the condition changes to `false` and cancels it when the
    * condition changes to `true`.
    *
-   * <p>Doesn't re-start the command if it ends while the condition is still `false`.
+   * <p>Unlike {@link #retryWhileFalse(Command)}, this does <strong>not</strong> restart the command
+   * if it ends while the condition is still `false`.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
@@ -163,6 +168,40 @@ public class Trigger implements BooleanSupplier {
   public Trigger whileFalse(Command command) {
     requireNonNullParam(command, "command", "whileFalse");
     addBinding(BindingType.RUN_WHILE_LOW, command);
+    return this;
+  }
+
+  /**
+   * Starts the given command when the condition changes to `true` and cancels it when the condition
+   * changes to `false`.
+   *
+   * <p>Unlike {@link #whileTrue(Command)}, the command is restarted if it ends while the condition
+   * is still `true`. If the command stopped because it was interrupted, restarting it will
+   * immediately interrupt the would-be interrupting command (if they have the same priority).
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger retryWhileTrue(Command command) {
+    requireNonNullParam(command, "command", "retryWhileTrue");
+    addBinding(BindingType.CONTINUOUSLY_SCHEDULE_WHILE_HIGH, command);
+    return this;
+  }
+
+  /**
+   * Starts the given command when the condition changes to `false` and cancels it when the
+   * condition changes to `true`.
+   *
+   * <p>Unlike {@link #whileFalse(Command)}, the command is restarted if it ends while the condition
+   * is still `false`. If the command stopped because it was interrupted, restarting it will
+   * immediately interrupt the would-be interrupting command (if they have the same priority).
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger retryWhileFalse(Command command) {
+    requireNonNullParam(command, "command", "retryWhileFalse");
+    addBinding(BindingType.CONTINUOUSLY_SCHEDULE_WHILE_LOW, command);
     return this;
   }
 
@@ -290,6 +329,63 @@ public class Trigger implements BooleanSupplier {
         m_scheduler, m_loop, () -> m_cachedSignal == Signal.LOW && m_previousSignal == Signal.HIGH);
   }
 
+  /**
+   * Creates a trigger that activates when this trigger has at least {@code pressCount} rising edges
+   * within the specified duration.
+   *
+   * @param pressCount The number of rising edges to require. If this is non-positive, the trigger
+   *     will always be active.
+   * @param duration The duration within which the rising edges must occur. If this is non-positive,
+   *     the trigger will never activate.
+   * @return A trigger that activates on multiple presses
+   */
+  public Trigger multiPress(int pressCount, Time duration) {
+    requireNonNullParam(duration, "duration", "multiTap");
+
+    // Short circuits to avoid unnecessary state tracking and object allocations
+    if (duration.baseUnitMagnitude() <= 0) {
+      // A nonpositive window size can never be met
+      return new Trigger(m_scheduler, m_loop, () -> false);
+    } else if (pressCount <= 0) {
+      // A nonpositive press count is always met
+      return new Trigger(m_scheduler, m_loop, () -> true);
+    }
+
+    final double durationSeconds = duration.in(Seconds);
+
+    return new Trigger(
+        m_scheduler,
+        m_loop,
+        new BooleanSupplier() {
+          // Note: unlike EdgeCounterFilter, this implementation tracks timestamps directly
+          // and remains high even if the signal is low, just as long as the number of rising edges
+          // meets the criteria. EdgeCounterFilter is only high when the requisite number of edges
+          // have been seen _and_ the signal is high.
+          private final Deque<Double> m_timestamps = new ArrayDeque<>();
+          private boolean m_risingEdgeOccurred = false;
+
+          @Override
+          public boolean getAsBoolean() {
+            if (m_cachedSignal == Signal.HIGH && m_previousSignal != Signal.HIGH) {
+              if (!m_risingEdgeOccurred) {
+                m_timestamps.addLast(Timer.getTimestamp());
+                m_risingEdgeOccurred = true;
+              }
+            } else if (m_cachedSignal != Signal.HIGH) {
+              m_risingEdgeOccurred = false;
+            }
+
+            double currentTime = Timer.getTimestamp();
+            while (!m_timestamps.isEmpty()
+                && currentTime - m_timestamps.peekFirst() > durationSeconds + 1e-9) {
+              m_timestamps.removeFirst();
+            }
+
+            return m_timestamps.size() >= pressCount;
+          }
+        });
+  }
+
   private void poll() {
     // Clear bindings that no longer need to run
     // This should always be checked, regardless of signal change, since bindings may be scoped
@@ -298,6 +394,13 @@ public class Trigger implements BooleanSupplier {
 
     m_previousSignal = m_cachedSignal;
     m_cachedSignal = readSignal();
+
+    // Always attempt to schedule bindings based on the current signal
+    if (m_cachedSignal == Signal.HIGH) {
+      scheduleBindings(BindingType.CONTINUOUSLY_SCHEDULE_WHILE_HIGH);
+    } else if (m_cachedSignal == Signal.LOW) {
+      scheduleBindings(BindingType.CONTINUOUSLY_SCHEDULE_WHILE_LOW);
+    }
 
     if (m_cachedSignal == m_previousSignal) {
       // No change in the signal. Nothing to do
@@ -309,6 +412,7 @@ public class Trigger implements BooleanSupplier {
       scheduleBindings(BindingType.SCHEDULE_ON_RISING_EDGE);
       scheduleBindings(BindingType.RUN_WHILE_HIGH);
       cancelBindings(BindingType.RUN_WHILE_LOW);
+      cancelBindings(BindingType.CONTINUOUSLY_SCHEDULE_WHILE_LOW);
       toggleBindings(BindingType.TOGGLE_ON_RISING_EDGE);
     }
 
@@ -317,6 +421,7 @@ public class Trigger implements BooleanSupplier {
       scheduleBindings(BindingType.SCHEDULE_ON_FALLING_EDGE);
       scheduleBindings(BindingType.RUN_WHILE_LOW);
       cancelBindings(BindingType.RUN_WHILE_HIGH);
+      cancelBindings(BindingType.CONTINUOUSLY_SCHEDULE_WHILE_HIGH);
       toggleBindings(BindingType.TOGGLE_ON_FALLING_EDGE);
     }
   }

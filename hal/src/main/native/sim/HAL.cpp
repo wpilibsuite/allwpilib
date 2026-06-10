@@ -197,10 +197,6 @@ HAL_Bool HAL_GetRSLState(int32_t* status) {
   return false;
 }
 
-HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
-  return true;
-}
-
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   static std::atomic_bool initialized{false};
   static wpi::util::mutex initializeMutex;
@@ -220,6 +216,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   wpi::hal::init::HAL_IsInitialized.store(true);
 
   wpi::hal::RestartTiming();
+
   wpi::hal::InitializeDriverStation();
 
   initialized = true;

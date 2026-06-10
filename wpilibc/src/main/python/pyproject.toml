@@ -16,6 +16,7 @@ requires = [
 name = "wpilib"
 version = "0.0.0"
 description = "Binary wrapper for WPILib"
+requires-python = ">=3.11"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
@@ -93,6 +94,8 @@ DYNAMIC_CAMERA_SERVER = 1
 Filesystem = "rpy/Filesystem.h"
 MotorControllerGroup = "rpy/MotorControllerGroup.h"
 Notifier = "rpy/Notifier.h"
+# rpy only
+AddressableLEDBuffer = "rpy/AddressableLEDBuffer.h"
 
 # wpi/counter
 EdgeConfiguration = "wpi/counter/EdgeConfiguration.hpp"

@@ -28,14 +28,14 @@ class Gamepad : public GenericHID,
  public:
   /** Represents a digital button on an Gamepad. */
   enum class Button {
-    /// South Face button.
-    SOUTH_FACE = 0,
-    /// East Face button.
-    EAST_FACE = 1,
-    /// West Face button.
-    WEST_FACE = 2,
-    /// North Face button.
-    NORTH_FACE = 3,
+    /// Face Down button.
+    FACE_DOWN = 0,
+    /// Face Right button.
+    FACE_RIGHT = 1,
+    /// Face Left button.
+    FACE_LEFT = 2,
+    /// Face Up button.
+    FACE_UP = 3,
     /// Back button.
     BACK = 4,
     /// Guide button.
@@ -116,38 +116,98 @@ class Gamepad : public GenericHID,
   /**
    * Get the X axis value of left side of the controller. Right is positive.
    *
+   * A deadband of 0.1 is applied by default. Use SetLeftXDeadband() to change
+   * it.
+   *
    * @return the axis value.
    */
   double GetLeftX() const;
 
   /**
+   * Set the deadband for the left X axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftXDeadband(double deadband);
+
+  /**
    * Get the Y axis value of left side of the controller. Back is positive.
+   *
+   * A deadband of 0.1 is applied by default. Use SetLeftYDeadband() to change
+   * it.
    *
    * @return the axis value.
    */
   double GetLeftY() const;
 
   /**
+   * Set the deadband for the left Y axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftYDeadband(double deadband);
+
+  /**
    * Get the X axis value of right side of the controller. Right is positive.
+   *
+   * A deadband of 0.1 is applied by default. Use SetRightXDeadband() to change
+   * it.
    *
    * @return the axis value.
    */
   double GetRightX() const;
 
   /**
+   * Set the deadband for the right X axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightXDeadband(double deadband);
+
+  /**
    * Get the Y axis value of right side of the controller. Back is positive.
+   *
+   * A deadband of 0.1 is applied by default. Use SetRightYDeadband() to change
+   * it.
    *
    * @return the axis value.
    */
   double GetRightY() const;
 
   /**
+   * Set the deadband for the right Y axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightYDeadband(double deadband);
+
+  /**
    * Get the left trigger axis value of the controller. Note that this axis
    * is bound to the range of [0, 1] as opposed to the usual [-1, 1].
+   *
+   * A deadband of 0.01 is applied by default. Use SetLeftTriggerDeadband() to
+   * change it.
    *
    * @return the axis value.
    */
   double GetLeftTriggerAxis() const;
+
+  /**
+   * Set the deadband for the left trigger axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftTriggerDeadband(double deadband);
 
   /**
    * Constructs an event instance around the axis value of the left trigger.
@@ -175,9 +235,21 @@ class Gamepad : public GenericHID,
    * Get the right trigger axis value of the controller. Note that this axis
    * is bound to the range of [0, 1] as opposed to the usual [-1, 1].
    *
+   * A deadband of 0.01 is applied by default. Use SetRightTriggerDeadband() to
+   * change it.
+   *
    * @return the axis value.
    */
   double GetRightTriggerAxis() const;
+
+  /**
+   * Set the deadband for the right trigger axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightTriggerDeadband(double deadband);
 
   /**
    * Constructs an event instance around the axis value of the right trigger.
@@ -202,128 +274,128 @@ class Gamepad : public GenericHID,
   BooleanEvent RightTrigger(EventLoop* loop) const;
 
   /**
-   * Read the value of the South Face button on the controller.
+   * Read the value of the Face Down button on the controller.
    *
    * @return The state of the button.
    */
-  bool GetSouthFaceButton() const;
+  bool GetFaceDownButton() const;
 
   /**
-   * Whether the South Face button was pressed since the last check.
+   * Whether the Face Down button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  bool GetSouthFaceButtonPressed();
+  bool GetFaceDownButtonPressed();
 
   /**
-   * Whether the South Face button was released since the last check.
+   * Whether the Face Down button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  bool GetSouthFaceButtonReleased();
+  bool GetFaceDownButtonReleased();
 
   /**
-   * Constructs an event instance around the South Face button's
+   * Constructs an event instance around the Face Down button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the South Face button's
+   * @return an event instance representing the Face Down button's
    * digital signal attached to the given loop.
    */
-  BooleanEvent SouthFace(EventLoop* loop) const;
+  BooleanEvent FaceDown(EventLoop* loop) const;
 
   /**
-   * Read the value of the East Face button on the controller.
+   * Read the value of the Face Right button on the controller.
    *
    * @return The state of the button.
    */
-  bool GetEastFaceButton() const;
+  bool GetFaceRightButton() const;
 
   /**
-   * Whether the East Face button was pressed since the last check.
+   * Whether the Face Right button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  bool GetEastFaceButtonPressed();
+  bool GetFaceRightButtonPressed();
 
   /**
-   * Whether the East Face button was released since the last check.
+   * Whether the Face Right button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  bool GetEastFaceButtonReleased();
+  bool GetFaceRightButtonReleased();
 
   /**
-   * Constructs an event instance around the East Face button's
+   * Constructs an event instance around the Face Right button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the East Face button's
+   * @return an event instance representing the Face Right button's
    * digital signal attached to the given loop.
    */
-  BooleanEvent EastFace(EventLoop* loop) const;
+  BooleanEvent FaceRight(EventLoop* loop) const;
 
   /**
-   * Read the value of the West Face button on the controller.
+   * Read the value of the Face Left button on the controller.
    *
    * @return The state of the button.
    */
-  bool GetWestFaceButton() const;
+  bool GetFaceLeftButton() const;
 
   /**
-   * Whether the West Face button was pressed since the last check.
+   * Whether the Face Left button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  bool GetWestFaceButtonPressed();
+  bool GetFaceLeftButtonPressed();
 
   /**
-   * Whether the West Face button was released since the last check.
+   * Whether the Face Left button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  bool GetWestFaceButtonReleased();
+  bool GetFaceLeftButtonReleased();
 
   /**
-   * Constructs an event instance around the West Face button's
+   * Constructs an event instance around the Face Left button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the West Face button's
+   * @return an event instance representing the Face Left button's
    * digital signal attached to the given loop.
    */
-  BooleanEvent WestFace(EventLoop* loop) const;
+  BooleanEvent FaceLeft(EventLoop* loop) const;
 
   /**
-   * Read the value of the North Face button on the controller.
+   * Read the value of the Face Up button on the controller.
    *
    * @return The state of the button.
    */
-  bool GetNorthFaceButton() const;
+  bool GetFaceUpButton() const;
 
   /**
-   * Whether the North Face button was pressed since the last check.
+   * Whether the Face Up button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  bool GetNorthFaceButtonPressed();
+  bool GetFaceUpButtonPressed();
 
   /**
-   * Whether the North Face button was released since the last check.
+   * Whether the Face Up button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  bool GetNorthFaceButtonReleased();
+  bool GetFaceUpButtonReleased();
 
   /**
-   * Constructs an event instance around the North Face button's
+   * Constructs an event instance around the Face Up button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the North Face button's
+   * @return an event instance representing the Face Up button's
    * digital signal attached to the given loop.
    */
-  BooleanEvent NorthFace(EventLoop* loop) const;
+  BooleanEvent FaceUp(EventLoop* loop) const;
 
   /**
    * Read the value of the Back button on the controller.
@@ -1090,6 +1162,13 @@ class Gamepad : public GenericHID,
  private:
   double GetAxisForSendable(Axis axis) const;
   bool GetButtonForSendable(Button button) const;
+
+  double m_leftXDeadband = 0.1;
+  double m_leftYDeadband = 0.1;
+  double m_rightXDeadband = 0.1;
+  double m_rightYDeadband = 0.1;
+  double m_leftTriggerDeadband = 0.01;
+  double m_rightTriggerDeadband = 0.01;
 };
 
 }  // namespace wpi

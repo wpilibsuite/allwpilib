@@ -13,7 +13,7 @@
 #include "wpi/units/voltage.hpp"
 
 /**
- * wpi::math::ProfiledPIDController with feedforward snippets for frc-docs.
+ * wpi::math::ProfiledPIDController with feedforward snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/controllers/profiled-pidcontroller.html
  */
 class Robot : public wpi::TimedRobot {

@@ -61,7 +61,6 @@ def reportErrorInternal(
         hal.sendError(
             not isWarning,
             code,
-            False,
             error,
             locString,
             traceString,
