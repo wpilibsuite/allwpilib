@@ -403,7 +403,7 @@ public final class CommandGenericHID {
    *
    * @return the scheduler that should execute the triggered commands
    */
-  final Scheduler getScheduler() {
+  Scheduler getScheduler() {
     return m_scheduler;
   }
 }
