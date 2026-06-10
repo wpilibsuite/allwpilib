@@ -80,6 +80,26 @@ int Joystick::GetThrottleChannel() const {
   return m_axes[Axis::kThrottle];
 }
 
+bool Joystick::GetRawButton(int button) const {
+  return m_hid->GetRawButton(button);
+}
+
+bool Joystick::GetRawButtonPressed(int button) {
+  return m_hid->GetRawButtonPressed(button);
+}
+
+bool Joystick::GetRawButtonReleased(int button) {
+  return m_hid->GetRawButtonReleased(button);
+}
+
+double Joystick::GetRawAxis(int axis) const {
+  return m_hid->GetRawAxis(axis);
+}
+
+POVDirection Joystick::GetPOV(int pov) const {
+  return m_hid->GetPOV(pov);
+}
+
 double Joystick::GetX() const {
   return m_hid->GetRawAxis(m_axes[Axis::kX]);
 }

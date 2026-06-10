@@ -207,6 +207,74 @@ public class Joystick implements HIDDevice {
   }
 
   /**
+   * Get the button value (starting at button 1).
+   *
+   * <p>The buttons are returned in a single 16 bit value with one bit representing the state of each
+   * button. The appropriate button is returned as a boolean value.
+   *
+   * @param button The button number to be read (starting at 1)
+   * @return The state of the button
+   */
+  public boolean getRawButton(int button) {
+    return m_hid.getRawButton(button);
+  }
+
+  /**
+   * Whether the button was pressed since the last check. Button indexes begin at 1.
+   *
+   * @param button The button index, beginning at 1.
+   * @return Whether the button was pressed since the last check.
+   */
+  public boolean getRawButtonPressed(int button) {
+    return m_hid.getRawButtonPressed(button);
+  }
+
+  /**
+   * Whether the button was released since the last check. Button indexes begin at 1.
+   *
+   * @param button The button index, beginning at 1.
+   * @return Whether the button was released since the last check.
+   */
+  public boolean getRawButtonReleased(int button) {
+    return m_hid.getRawButtonReleased(button);
+  }
+
+  /**
+   * Get the value of the axis.
+   *
+   * @param axis The axis to read, starting at 0.
+   * @return The value of the axis.
+   */
+  public double getRawAxis(int axis) {
+    return m_hid.getRawAxis(axis);
+  }
+
+  /**
+   * Get the angle in degrees of a POV on the HID.
+   *
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
+   * upper-left is 315).
+   *
+   * @param pov The index of the POV to read, starting at 0.
+   * @return the angle of the POV
+   */
+  public POVDirection getPOV(int pov) {
+    return m_hid.getPOV(pov);
+  }
+
+  /**
+   * Get the angle in degrees of the default POV on the HID.
+   *
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
+   * upper-left is 315).
+   *
+   * @return the angle of the POV
+   */
+  public POVDirection getPOV() {
+    return m_hid.getPOV();
+  }
+
+  /**
    * Get the X value of the joystick. This depends on the mapping of the joystick connected to the
    * current port. On most joysticks, positive is to the right.
    *
