@@ -8,6 +8,5 @@ classes:
       GetGenericHID:
         overloads:
           "":
-            ignore_pure: true
           '[const]':
             ignore_pure: true
