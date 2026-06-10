@@ -8,6 +8,7 @@ import static org.wpilib.units.Units.MetersPerSecond;
 import static org.wpilib.units.Units.Seconds;
 
 import io.avaje.jsonb.Json;
+import java.util.Objects;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
@@ -109,8 +110,8 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
    * Constructs a DifferentialSample from a TrajectorySample.
    *
    * @param sample The TrajectorySample to copy.
-   * @param leftSpeed The left-wheel speed at this sample in meters per second.
-   * @param rightSpeed The right-wheel speed at this sample in meters per second.
+   * @param leftSpeed The left wheel speed at this sample in meters per second.
+   * @param rightSpeed The right wheel speed at this sample in meters per second.
    */
   public DifferentialSample(TrajectorySample sample, double leftSpeed, double rightSpeed) {
     this(
@@ -125,6 +126,22 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
    */
   public DifferentialSample(TrajectorySample sample, DifferentialDriveKinematics kinematics) {
     this(sample.timestamp, sample.pose, sample.velocity, sample.acceleration, kinematics);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!super.equals(o)) {
+      return false;
+    }
+
+    DifferentialSample that = (DifferentialSample) o;
+    return Double.compare(leftSpeed, that.leftSpeed) == 0
+        && Double.compare(rightSpeed, that.rightSpeed) == 0;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(timestamp, pose, velocity, acceleration, leftSpeed, rightSpeed);
   }
 
   @Override

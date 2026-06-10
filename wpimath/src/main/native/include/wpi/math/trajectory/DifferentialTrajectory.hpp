@@ -95,3 +95,5 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::util::json& json, DifferentialTrajectory& trajectory);
 
 }  // namespace wpi::math
+
+#include "proto/DifferentialTrajectoryProto.hpp"

@@ -4,6 +4,7 @@
 
 package org.wpilib.math.trajectory;
 
+import java.util.Objects;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
@@ -100,5 +101,20 @@ public class SplineSample extends TrajectorySample {
   @Override
   public SplineSample withNewTimestamp(double timestamp) {
     return new SplineSample(timestamp, pose, velocity, acceleration, curvature);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!super.equals(o)) {
+      return false;
+    }
+
+    SplineSample that = (SplineSample) o;
+    return Double.compare(curvature, that.curvature) == 0;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(timestamp, pose, velocity, acceleration, curvature);
   }
 }

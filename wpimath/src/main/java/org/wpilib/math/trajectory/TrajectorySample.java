@@ -76,11 +76,15 @@ public class TrajectorySample implements StructSerializable, ProtobufSerializabl
   }
 
   @Override
-  public final boolean equals(Object o) {
-    if (!(o instanceof TrajectorySample that)) {
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
 
+    TrajectorySample that = (TrajectorySample) o;
     return Double.compare(timestamp, that.timestamp) == 0
         && pose.equals(that.pose)
         && velocity.equals(that.velocity)
