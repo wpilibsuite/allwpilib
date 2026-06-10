@@ -9,6 +9,7 @@
 #include <string>
 #include <string_view>
 
+#include <llhttp.h>
 #include <uv.h>
 
 #include "wpi/net/MimeTypes.hpp"
@@ -162,9 +163,8 @@ void HALSimHttpConnection::ProcessRequest() {
     path = url.GetPath();
   }
 
-  if (m_request.GetMethod() == wpi::net::HTTP_GET &&
-      wpi::util::starts_with(path, '/') && !wpi::util::contains(path, "..") &&
-      !wpi::util::contains(path, "//")) {
+  if (m_request.GetMethod() == HTTP_GET && wpi::util::starts_with(path, '/') &&
+      !wpi::util::contains(path, "..") && !wpi::util::contains(path, "//")) {
     // convert to fs native representation
     fs::path nativePath;
     if (auto userPath = wpi::util::remove_prefix(path, "/user/")) {
@@ -197,7 +197,7 @@ void HALSimHttpConnection::MySendError(int code, std::string_view message) {
 }
 
 void HALSimHttpConnection::Log(int code) {
-  auto method = wpi::net::http_method_str(m_request.GetMethod());
+  auto method = llhttp_method_name(m_request.GetMethod());
   wpi::util::print(stderr, "{} {} HTTP/{}.{} {}\n", method, m_request.GetUrl(),
                    m_request.GetMajor(), m_request.GetMinor(), code);
 }

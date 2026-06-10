@@ -17,6 +17,15 @@ if(NOT MSVC AND NOT APPLE)
     endif()
 endif()
 
+file(GLOB_RECURSE llhttp_native_src src/main/native/thirdparty/llhttp/src/*.c)
+
+if(NOT MSVC)
+    set_source_files_properties(
+        ${llhttp_native_src}
+        PROPERTIES COMPILE_FLAGS "-Wno-error=pedantic -Wno-error=format"
+    )
+endif()
+
 file(
     GLOB_RECURSE wpinet_native_src
     src/main/native/cpp/*.cpp
@@ -71,7 +80,7 @@ set(uv_linux_src
     src/main/native/thirdparty/libuv/src/unix/random-sysctl-linux.cpp
 )
 
-add_library(wpinet ${wpinet_native_src})
+add_library(wpinet ${wpinet_native_src} ${llhttp_native_src})
 set_target_properties(wpinet PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpinet PROPERTY FOLDER "libraries")
@@ -138,13 +147,17 @@ else()
 endif()
 
 install(
-    DIRECTORY src/main/native/include/ src/main/native/thirdparty/tcpsockets/include/
+    DIRECTORY
+        src/main/native/include/
+        src/main/native/thirdparty/llhttp/include/
+        src/main/native/thirdparty/tcpsockets/include/
     DESTINATION "${include_dest}/wpinet"
 )
 target_include_directories(
     wpinet
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llhttp/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/tcpsockets/include>
         $<INSTALL_INTERFACE:${include_dest}/wpinet>
 )

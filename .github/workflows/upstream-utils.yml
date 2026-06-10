@@ -115,6 +115,12 @@ jobs:
           ./libuv.py clone
           ./libuv.py copy-src
           ./libuv.py format-patch
+      - name: Run llhttp.py
+        run: |
+          cd upstream_utils
+          ./llhttp.py clone
+          ./llhttp.py copy-src
+          ./llhttp.py format-patch
       - name: Run llvm.py
         run: |
           cd upstream_utils

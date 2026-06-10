@@ -145,7 +145,7 @@ void NetworkServer::ServerConnection4::ProcessRequest() {
   }
   DEBUG4("query: \"{}\"\n", query);
 
-  const bool isGET = m_request.GetMethod() == wpi::net::HTTP_GET;
+  const bool isGET = m_request.GetMethod() == HTTP_GET;
   if (isGET && path == "/") {
     // build HTML root page
     SendResponse(200, "OK", "text/html",

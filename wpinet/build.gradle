@@ -1,3 +1,4 @@
+apply plugin: 'c'
 ext {
     baseId = 'wpinet'
     groupId = 'org.wpilib.net'
@@ -17,6 +18,15 @@ ext {
                     srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
                 }
             }
+            llhttpC(CSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/llhttp/src'
+                    include '*.c'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/llhttp/include'
+                }
+            }
             tcpsocketsCpp(CppSourceSet) {
                 source {
                     srcDirs 'src/main/native/thirdparty/tcpsockets/cpp'
@@ -29,6 +39,8 @@ ext {
         }
         if (!it.targetPlatform.operatingSystem.isWindows()) {
             it.cppCompiler.define '_GNU_SOURCE'
+            it.cCompiler.args.add("-Wno-error=pedantic")
+            it.cCompiler.args.add("-Wno-error=format")
             it.sources {
                 libuvUnixCpp(CppSourceSet) {
                     source {
@@ -179,12 +191,21 @@ cppHeadersZip {
     from('src/main/native/thirdparty/libuv/include') {
         into '/'
     }
+    from('src/main/native/thirdparty/llhttp/include') {
+        into '/'
+    }
     from('src/main/native/thirdparty/tcpsockets/include') {
         into '/'
     }
 }
 
 cppSourcesZip {
+    from('src/main/native/thirdparty/libuv/src') {
+        into '/'
+    }
+    from('src/main/native/thirdparty/llhttp/src') {
+        into '/'
+    }
     from('src/main/native/thirdparty/tcpsockets/cpp') {
         into '/'
     }
@@ -195,7 +216,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/tcpsockets/include', 'src/main/native/thirdparty/libuv/src'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/llhttp/include', 'src/main/native/thirdparty/tcpsockets/include', 'src/main/native/thirdparty/libuv/src'
                 }
             }
         }
