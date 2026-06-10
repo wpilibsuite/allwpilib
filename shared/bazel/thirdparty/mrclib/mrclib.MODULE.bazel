@@ -21,13 +21,21 @@ filegroup(
 )
 """
 
-mrclib_maven_base = "https://frcmaven.wpi.edu/artifactory/development-2027"
-mrclib_version = "2027.1.0-alpha-1-42-g019903f"
+mrclib_maven_base = "https://frcmaven.wpi.edu/artifactory/thirdparty-mvn-release"
+mrclib_version = "2027.1.0-alpha-1-50-gd008523"
+
+mrclib_headers_hash = "c71011e2c593749aca585eec308f394d5e7f34451c1a14cdd8e077ea3b1368b5"
+mrclib_linuxarm64_hash = "4673c573c25d1d9a03f1cf3d73c1e8a121718291171213813b95b451eea53f3a"
+mrclib_linuxx86_64_hash = "8d986ed0ffb03be1215a3cf88716c31da82848f4524e723ac89aee4eca45eb12"
+mrclib_osx_hash = "af05c46bffa58a1ca63bd18f4d8865b827746d1cdf94c8512c7f86d58731d16f"
+mrclib_systemcore_hash = "c1cad49fb96caa73fddbc852588c67a2110402539b39dba40255c21974114e84"
+mrclib_windowsarm64_hash = "8205701efbde585c6822981c7246c0a0d8e4b4cdb702097ec77674aa98aff7bb"
+mrclib_windowsx86_64_hash = "dd4eef6e1aaba5b7034889a1646e259b3e91435b3084d43b3ff3b2c6adcc2122"
 
 http_archive(
     name = "mrclib_headers",
     url = mrclib_maven_base + "/org/wpilib/mrclib/mrclib-cpp/{version}/mrclib-cpp-{version}-headers.zip".format(version = mrclib_version),
-    sha256 = "c71011e2c593749aca585eec308f394d5e7f34451c1a14cdd8e077ea3b1368b5",
+    sha256 = mrclib_headers_hash,
     build_file_content = """
 cc_library(
     name = "headers",
@@ -41,41 +49,41 @@ cc_library(
 http_archive(
     name = "mrclib_linuxarm64",
     url = mrclib_maven_base + "/org/wpilib/mrclib/mrclib-cpp/{version}/mrclib-cpp-{version}-linuxarm64.zip".format(version = mrclib_version),
-    sha256 = "666b7ed14574495b4bf2bc2f9d5e130a5c17038e5620c33ffb4a56b5447f83e8",
+    sha256 = mrclib_linuxarm64_hash,
     build_file_content = cc_shared_library_build_contents,
 )
 
 http_archive(
     name = "mrclib_linuxx86-64",
     url = mrclib_maven_base + "/org/wpilib/mrclib/mrclib-cpp/{version}/mrclib-cpp-{version}-linuxx86-64.zip".format(version = mrclib_version),
-    sha256 = "0e42d6565f7874dbfd014ea2008eeddb29ce0e1d77692b4158f2dc3a2edf7997",
+    sha256 = mrclib_linuxx86_64_hash,
     build_file_content = cc_shared_library_build_contents,
 )
 
 http_archive(
     name = "mrclib_osx",
     url = mrclib_maven_base + "/org/wpilib/mrclib/mrclib-cpp/{version}/mrclib-cpp-{version}-osxuniversal.zip".format(version = mrclib_version),
-    sha256 = "91d6207feae81144342666f5f7676633b54c9bd83aa2296d05f90a451b108bb2",
+    sha256 = mrclib_osx_hash,
     build_file_content = cc_shared_library_build_contents,
 )
 
 http_archive(
     name = "mrclib_systemcore",
     url = mrclib_maven_base + "/org/wpilib/mrclib/mrclib-cpp/{version}/mrclib-cpp-{version}-linuxsystemcore.zip".format(version = mrclib_version),
-    sha256 = "c1cad49fb96caa73fddbc852588c67a2110402539b39dba40255c21974114e84",
+    sha256 = mrclib_systemcore_hash,
     build_file_content = cc_shared_library_build_contents,
 )
 
 http_archive(
     name = "mrclib_windowsarm64",
     url = mrclib_maven_base + "/org/wpilib/mrclib/mrclib-cpp/{version}/mrclib-cpp-{version}-windowsarm64.zip".format(version = mrclib_version),
-    sha256 = "4d05453713a9a43a8c0a01d23c528be1e4fb53e397b573ecdd8c1cccb27491cb",
+    sha256 = mrclib_windowsarm64_hash,
     build_file_content = cc_shared_library_build_contents,
 )
 
 http_archive(
     name = "mrclib_windowsx86-64",
     url = mrclib_maven_base + "/org/wpilib/mrclib/mrclib-cpp/{version}/mrclib-cpp-{version}-windowsx86-64.zip".format(version = mrclib_version),
-    sha256 = "b36e96e2d523820e790f5bad824add60dc9c07d5dd70a96890a1b47644090d20",
+    sha256 = mrclib_windowsx86_64_hash,
     build_file_content = cc_shared_library_build_contents,
 )

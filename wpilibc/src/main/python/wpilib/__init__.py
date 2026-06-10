@@ -4,6 +4,7 @@ from . import _init__wpilib
 from ._wpilib import (
     ADXL345_I2C,
     AddressableLED,
+    AddressableLEDBuffer,
     Alert,
     Alliance,
     AnalogAccelerometer,
@@ -117,6 +118,7 @@ from ._wpilib import (
 __all__ = [
     "ADXL345_I2C",
     "AddressableLED",
+    "AddressableLEDBuffer",
     "Alert",
     "Alliance",
     "AnalogAccelerometer",

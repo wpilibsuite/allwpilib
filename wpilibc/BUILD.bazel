@@ -217,6 +217,7 @@ define_native_wrapper(
 PKG_CONFIG_DEPS = [
     "//datalog:native/datalog/robotpy-native-datalog.pc",
     "//datalog:robotpy-wpilog.generated_pkgcfg_files",
+    "//hal:native/wpihal/robotpy-native-mrclib.pc",
     "//hal:native/wpihal/robotpy-native-wpihal.pc",
     "//hal:robotpy-hal.generated_pkgcfg_files",
     "//ntcore:native/ntcore/robotpy-native-ntcore.pc",
@@ -233,6 +234,7 @@ PKG_CONFIG_DEPS = [
 generate_robotpy_pybind_build_info(
     name = "robotpy-wpilib-generator",
     additional_srcs = [
+        "src/main/python/wpilib/src/rpy/AddressableLEDBuffer.h",
         "src/main/python/wpilib/src/rpy/Filesystem.h",
         "src/main/python/wpilib/src/rpy/Notifier.h",
         "src/main/python/wpilib/src/rpy/MotorControllerGroup.h",

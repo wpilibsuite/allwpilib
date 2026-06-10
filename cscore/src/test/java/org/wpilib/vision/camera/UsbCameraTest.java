@@ -5,10 +5,8 @@
 package org.wpilib.vision.camera;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -23,16 +21,15 @@ class UsbCameraTest {
   @EnabledOnOs(OS.LINUX)
   static class ConnectVerbose {
     @Test
-    void setConnectVerboseEnabledTest() {
+    void setConnectVerboseEnabledTest() throws Exception {
       try (UsbCamera camera = new UsbCamera("Nonexistent Camera", getNonexistentCameraDev())) {
         camera.setConnectVerbose(1);
 
         CompletableFuture<String> result = new CompletableFuture<>();
         CameraServerJNI.setLogger((level, file, line, message) -> result.complete(message), 20);
 
-        assertTimeoutPreemptively(
-            Duration.ofSeconds(5),
-            () -> assertTrue(result.get().contains("Attempting to connect to USB camera on ")));
+        assertTrue(
+            result.get(5, TimeUnit.SECONDS).contains("Attempting to connect to USB camera on "));
       }
     }
 

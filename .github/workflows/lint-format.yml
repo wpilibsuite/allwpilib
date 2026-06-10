@@ -61,7 +61,7 @@ jobs:
     name: "clang-tidy"
     runs-on: ubuntu-24.04
     needs: [validation]
-    container: wpilib/ubuntu-base:24.04
+    container: wpilib/debian-base:trixie
     steps:
       - uses: actions/checkout@v6
         with:
@@ -94,7 +94,7 @@ jobs:
     name: "Java format"
     runs-on: ubuntu-24.04
     needs: [validation]
-    container: wpilib/systemcore-cross-ubuntu:2027-24.04
+    container: wpilib/debian-base:trixie
     steps:
       - uses: actions/checkout@v6
         with:
