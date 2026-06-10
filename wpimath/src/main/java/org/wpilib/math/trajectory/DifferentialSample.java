@@ -21,9 +21,11 @@ import org.wpilib.util.struct.StructSerializable;
 /** Represents a single sample in a differential drive trajectory. */
 @Json
 public class DifferentialSample extends TrajectorySample implements StructSerializable {
+  /** The left-wheel speed at this sample in meters per second. */
   @Json.Property("leftSpeed")
   public final double leftSpeed; // meters per second
 
+  /** The right-wheel speed at this sample in meters per second. */
   @Json.Property("rightSpeed")
   public final double rightSpeed; // meters per second
 
@@ -35,8 +37,8 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
    *
    * @param timestamp The timestamp of the sample relative to the trajectory start, in seconds.
    * @param pose The robot pose at this sample (in the field reference frame).
-   * @param velocity The robot velocity at this sample (in the robot's reference frame).
-   * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
+   * @param velocity The robot velocity at this sample (in the field reference frame).
+   * @param acceleration The robot acceleration at this sample (in the field reference frame).
    * @param leftSpeed The left-wheel speed at this sample in meters per second.
    * @param rightSpeed The right-wheel speed at this sample in meters per second.
    */
@@ -59,8 +61,8 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
    *
    * @param timestamp The timestamp of the sample relative to the trajectory start.
    * @param pose The robot pose at this sample (in the field reference frame).
-   * @param velocity The robot velocity at this sample (in the robot's reference frame).
-   * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
+   * @param velocity The robot velocity at this sample (in the field reference frame).
+   * @param acceleration The robot acceleration at this sample (in the field reference frame).
    * @param leftSpeed The left wheel speed at this sample.
    * @param rightSpeed The right wheel speed at this sample.
    */
@@ -85,8 +87,8 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
    *
    * @param timestamp The timestamp of the sample relative to the trajectory start, in seconds.
    * @param pose The robot pose at this sample (in the field reference frame).
-   * @param velocity The robot velocity at this sample (in the robot's reference frame).
-   * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
+   * @param velocity The robot velocity at this sample (in the field reference frame).
+   * @param acceleration The robot acceleration at this sample (in the field reference frame).
    * @param kinematics The kinematics of the drivetrain.
    */
   public DifferentialSample(
@@ -97,7 +99,8 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
       DifferentialDriveKinematics kinematics) {
     super(timestamp, pose, velocity, acceleration);
 
-    var wheelSpeeds = kinematics.toWheelVelocities(velocity);
+    // Wheel speeds are derived from the robot-relative velocity.
+    var wheelSpeeds = kinematics.toWheelVelocities(velocity.toRobotRelative(pose.getRotation()));
     this.leftSpeed = wheelSpeeds.left;
     this.rightSpeed = wheelSpeeds.right;
   }
@@ -127,13 +130,23 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
   @Override
   public DifferentialSample transform(Transform2d transform) {
     return new DifferentialSample(
-        timestamp, pose.transformBy(transform), velocity, acceleration, leftSpeed, rightSpeed);
+        timestamp,
+        pose.transformBy(transform),
+        velocity.toFieldRelative(transform.getRotation()),
+        acceleration.toFieldRelative(transform.getRotation()),
+        leftSpeed,
+        rightSpeed);
   }
 
   @Override
   public DifferentialSample relativeTo(Pose2d other) {
     return new DifferentialSample(
-        timestamp, pose.relativeTo(other), velocity, acceleration, leftSpeed, rightSpeed);
+        timestamp,
+        pose.relativeTo(other),
+        velocity.toRobotRelative(other.getRotation()),
+        acceleration.toRobotRelative(other.getRotation()),
+        leftSpeed,
+        rightSpeed);
   }
 
   @Override

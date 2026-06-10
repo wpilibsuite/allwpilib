@@ -29,8 +29,8 @@ class TrajectorySample {
  public:
   wpi::units::second_t timestamp{0.0};  // time since trajectory start
   Pose2d pose;                          // field-relative pose
-  ChassisVelocities velocity;           // robot-relative velocity
-  ChassisAccelerations acceleration;    // robot-relative acceleration
+  ChassisVelocities velocity;           // field-relative velocity
+  ChassisAccelerations acceleration;    // field-relative acceleration
 
   constexpr TrajectorySample() = default;
 
@@ -49,7 +49,9 @@ class TrajectorySample {
    * @return A new sample with the transformed pose.
    */
   constexpr TrajectorySample Transform(const Transform2d& transform) const {
-    return {timestamp, pose.TransformBy(transform), velocity, acceleration};
+    return {timestamp, pose.TransformBy(transform),
+            velocity.ToFieldRelative(transform.Rotation()),
+            acceleration.ToFieldRelative(transform.Rotation())};
   }
 
   /**
@@ -59,7 +61,9 @@ class TrajectorySample {
    * @return A new sample with the relative pose.
    */
   constexpr TrajectorySample RelativeTo(const Pose2d& other) const {
-    return {timestamp, pose.RelativeTo(other), velocity, acceleration};
+    return {timestamp, pose.RelativeTo(other),
+            velocity.ToRobotRelative(other.Rotation()),
+            acceleration.ToRobotRelative(other.Rotation())};
   }
 
   /**
@@ -93,8 +97,11 @@ constexpr TrajectorySample KinematicInterpolate(const TrajectorySample& start,
     return {end.timestamp, end.pose, end.velocity, end.acceleration};
   }
 
-  // Interpolated delta time between start and end timestamps
-  const auto interpT = wpi::util::Lerp(start.timestamp, end.timestamp, t);
+  // Absolute timestamp of the interpolated sample
+  const auto interpTime = wpi::util::Lerp(start.timestamp, end.timestamp, t);
+
+  // Elapsed time from the start sample, used for integration
+  const auto deltaT = interpTime - start.timestamp;
 
   // Interpolate acceleration
   ChassisAccelerations newAccel{
@@ -104,21 +111,21 @@ constexpr TrajectorySample KinematicInterpolate(const TrajectorySample& start,
 
   // vₖ₊₁ = vₖ + aₖΔt
   ChassisVelocities newVel{
-      start.velocity.vx + start.acceleration.ax * interpT,
-      start.velocity.vy + start.acceleration.ay * interpT,
-      start.velocity.omega + start.acceleration.alpha * interpT};
+      start.velocity.vx + start.acceleration.ax * deltaT,
+      start.velocity.vy + start.acceleration.ay * deltaT,
+      start.velocity.omega + start.acceleration.alpha * deltaT};
 
   // xₖ₊₁ = xₖ + vₖΔt + ½aₖ(Δt)²
   Pose2d newPose{
-      start.pose.Translation().X() + start.velocity.vx * interpT +
-          0.5 * start.acceleration.ax * interpT * interpT,
-      start.pose.Translation().Y() + start.velocity.vy * interpT +
-          0.5 * start.acceleration.ay * interpT * interpT,
+      start.pose.Translation().X() + start.velocity.vx * deltaT +
+          0.5 * start.acceleration.ax * deltaT * deltaT,
+      start.pose.Translation().Y() + start.velocity.vy * deltaT +
+          0.5 * start.acceleration.ay * deltaT * deltaT,
       Rotation2d{start.pose.Rotation().Radians() +
-                 start.velocity.omega * interpT +
-                 0.5 * start.acceleration.alpha * interpT * interpT}};
+                 start.velocity.omega * deltaT +
+                 0.5 * start.acceleration.alpha * deltaT * deltaT}};
 
-  return TrajectorySample{interpT, newPose, newVel, newAccel};
+  return TrajectorySample{interpTime, newPose, newVel, newAccel};
 }
 
 WPILIB_DLLEXPORT

@@ -77,17 +77,26 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
 
     double interpDt = interpTime - start.timestamp;
 
+    // The integration state holds wheel speeds (vₗ, vᵣ), which are
+    // frame-invariant; the field-relative chassis velocity is reconstructed from
+    // the integrated wheel speeds and heading below.
     Matrix<N6, N1> initialState =
         VecBuilder.fill(
             start.pose.getX(),
             start.pose.getY(),
             start.pose.getRotation().getRadians(),
-            start.velocity.vx,
-            start.velocity.vy,
+            start.leftSpeed,
+            start.rightSpeed,
             start.velocity.omega);
 
-    Vector<N3> initialInput =
-        VecBuilder.fill(start.acceleration.ax, start.acceleration.ay, start.acceleration.alpha);
+    // Wheel and angular accelerations are computed by finite difference between
+    // the two samples (frame-independent, so no kinematics/trackwidth is needed).
+    double segmentDt = end.timestamp - start.timestamp;
+    double leftAccel = segmentDt == 0 ? 0 : (end.leftSpeed - start.leftSpeed) / segmentDt;
+    double rightAccel = segmentDt == 0 ? 0 : (end.rightSpeed - start.rightSpeed) / segmentDt;
+    double angularAccel =
+        segmentDt == 0 ? 0 : (end.velocity.omega - start.velocity.omega) / segmentDt;
+    Vector<N3> initialInput = VecBuilder.fill(leftAccel, rightAccel, angularAccel);
 
     // integrate state derivatives [vₗ, vᵣ, ω, aₗ, aᵣ, α] to new states [x, y, θ, vₗ, vᵣ, ω]
     Matrix<N6, N1> endState =
@@ -100,17 +109,21 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
     double vl = endState.get(3, 0);
     double vr = endState.get(4, 0);
     double vx = (vl + vr) / 2.0;
-    double vy = 0.0;
     double omega = endState.get(5, 0);
 
     double ax = MathUtil.lerp(start.acceleration.ax, end.acceleration.ax, t);
     double ay = MathUtil.lerp(start.acceleration.ay, end.acceleration.ay, t);
     double alpha = MathUtil.lerp(start.acceleration.alpha, end.acceleration.alpha, t);
 
+    // Reconstruct the field-relative velocity from robot-relative forward speed.
+    Rotation2d heading = Rotation2d.fromRadians(theta);
+    ChassisVelocities fieldVelocity =
+        new ChassisVelocities(vx, 0.0, omega).toFieldRelative(heading);
+
     return new DifferentialSample(
         interpTime,
-        new Pose2d(x, y, Rotation2d.fromRadians(theta)),
-        new ChassisVelocities(vx, vy, omega),
+        new Pose2d(x, y, heading),
+        fieldVelocity,
         new ChassisAccelerations(ax, ay, alpha),
         vl,
         vr);
@@ -143,12 +156,16 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
     Pose2d firstPose = start().pose;
     Pose2d transformedFirstPose = firstPose.transformBy(transform);
 
+    // The whole trajectory is rigidly rotated by the transform's rotation, so
+    // the field-relative velocities and accelerations rotate by the same amount.
+    Rotation2d rotation = transform.getRotation();
+
     DifferentialSample transformedFirstSample =
         new DifferentialSample(
             start().timestamp,
             transformedFirstPose,
-            start().velocity,
-            start().acceleration,
+            start().velocity.toFieldRelative(rotation),
+            start().acceleration.toFieldRelative(rotation),
             start().leftSpeed,
             start().rightSpeed);
 
@@ -160,8 +177,8 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
                     new DifferentialSample(
                         sample.timestamp,
                         transformedFirstPose.plus(sample.pose.minus(firstPose)),
-                        sample.velocity,
-                        sample.acceleration,
+                        sample.velocity.toFieldRelative(rotation),
+                        sample.acceleration.toFieldRelative(rotation),
                         sample.leftSpeed,
                         sample.rightSpeed));
 

@@ -105,7 +105,7 @@ class DrivetrainTrajectoryConversionTest {
     for (DifferentialSample sample : diffTrajectory.samples) {
       // Calculate expected wheel speeds from chassis speeds using kinematics
       DifferentialDriveWheelVelocities expectedWheelSpeeds =
-          kinematics.toWheelVelocities(sample.velocity);
+          kinematics.toWheelVelocities(sample.velocity.toRobotRelative(sample.pose.getRotation()));
 
       // Assert the sample's wheel speeds match the kinematics calculation
       assertAll(
@@ -130,19 +130,19 @@ class DrivetrainTrajectoryConversionTest {
       assertAll(
           () ->
               assertEquals(
-                  sample.velocity.vx,
+                  sample.velocity.toRobotRelative(sample.pose.getRotation()).vx,
                   reconstructedSpeeds.vx,
                   kEpsilon,
                   "Reconstructed vx mismatch at t=" + sample.timestamp),
           () ->
               assertEquals(
-                  sample.velocity.vy,
+                  sample.velocity.toRobotRelative(sample.pose.getRotation()).vy,
                   reconstructedSpeeds.vy,
                   kEpsilon,
                   "Reconstructed vy mismatch at t=" + sample.timestamp),
           () ->
               assertEquals(
-                  sample.velocity.omega,
+                  sample.velocity.toRobotRelative(sample.pose.getRotation()).omega,
                   reconstructedSpeeds.omega,
                   kEpsilon,
                   "Reconstructed omega mismatch at t=" + sample.timestamp));
@@ -159,7 +159,7 @@ class DrivetrainTrajectoryConversionTest {
 
     for (DifferentialSample sample : diffTrajectory.samples) {
       DifferentialDriveWheelVelocities expectedWheelSpeeds =
-          kinematics.toWheelVelocities(sample.velocity);
+          kinematics.toWheelVelocities(sample.velocity.toRobotRelative(sample.pose.getRotation()));
 
       assertEquals(expectedWheelSpeeds.left, sample.leftSpeed, kEpsilon);
       assertEquals(expectedWheelSpeeds.right, sample.rightSpeed, kEpsilon);

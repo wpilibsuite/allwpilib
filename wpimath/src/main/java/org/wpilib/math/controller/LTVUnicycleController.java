@@ -203,8 +203,12 @@ public class LTVUnicycleController {
    * @return The linear and angular velocity outputs of the LTV controller.
    */
   public ChassisVelocities calculate(Pose2d currentPose, TrajectorySample desiredState) {
+    // The sample velocity is field-relative; the controller needs the
+    // robot-relative forward (linear) velocity.
+    double linearVelocity =
+        desiredState.velocity.toRobotRelative(desiredState.pose.getRotation()).vx;
     return calculate(
-        currentPose, desiredState.pose, desiredState.velocity.vx, desiredState.velocity.omega);
+        currentPose, desiredState.pose, linearVelocity, desiredState.velocity.omega);
   }
 
   /**

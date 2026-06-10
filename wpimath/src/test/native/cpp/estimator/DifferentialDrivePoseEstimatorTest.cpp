@@ -175,7 +175,7 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
       kinematics, estimator, trajectory,
       [&](wpi::math::SplineSample& state) {
         return wpi::math::ChassisVelocities{
-            state.velocity.vx, 0_mps, state.velocity.vx * state.curvature};
+            state.ForwardVelocity(), 0_mps, state.ForwardVelocity() * state.curvature};
       },
       [&](wpi::math::SplineSample& state) { return state.pose; },
       trajectory.InitialPose(), {0_m, 0_m, wpi::math::Rotation2d{45_deg}},
@@ -217,7 +217,7 @@ TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
 
       testFollowTrajectory(
           kinematics, estimator, trajectory,
-          [&](wpi::math::SplineSample& state) { return state.velocity; },
+          [&](wpi::math::SplineSample& state) { return state.velocity.ToRobotRelative(state.pose.Rotation()); },
           [&](wpi::math::SplineSample& state) { return state.pose; },
           initial_pose, {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms,
           100_ms, 250_ms, false, false);

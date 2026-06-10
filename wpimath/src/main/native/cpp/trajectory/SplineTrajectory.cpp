@@ -4,6 +4,7 @@
 
 #include "wpi/math/trajectory/SplineTrajectory.hpp"
 
+#include <cmath>
 #include <utility>
 #include <vector>
 
@@ -27,21 +28,25 @@ SplineSample SplineTrajectory::Interpolate(const SplineSample& start,
     return Interpolate(end, start, 1.0 - t);
   }
 
+  // Velocities and accelerations are stored field-relative; project them onto
+  // the sample's heading to recover the signed forward (path-relative) scalars.
+  const double startForwardVelocity = start.ForwardVelocity().value();
+  const double startForwardAccel = start.ForwardAcceleration().value();
+
   // Check whether the robot is reversing at this stage.
-  const bool reversing = start.velocity.vx < 0_mps ||
-                         (wpi::units::math::abs(start.velocity.vx) < 1E-9_mps &&
-                          start.acceleration.ax < 0_mps_sq);
+  const bool reversing =
+      startForwardVelocity < 0 ||
+      (std::abs(startForwardVelocity) < 1E-9 && startForwardAccel < 0);
 
   // Calculate the new velocity
   // v_f = v_0 + at
-  const double newV =
-      start.velocity.vx.value() + (start.acceleration.ax.value() * deltaT);
+  const double newV = startForwardVelocity + (startForwardAccel * deltaT);
 
   // Calculate the change in position.
   // delta_s = v_0 t + 0.5at²
-  const double newS = (start.velocity.vx.value() * deltaT +
-                       0.5 * start.acceleration.ax.value() * deltaT * deltaT) *
-                      (reversing ? -1.0 : 1.0);
+  const double newS =
+      (startForwardVelocity * deltaT + 0.5 * startForwardAccel * deltaT * deltaT) *
+      (reversing ? -1.0 : 1.0);
 
   // Return the new state. To find the new position for the new state, we
   // need to interpolate between the two endpoint poses. The fraction for
@@ -51,8 +56,8 @@ SplineSample SplineTrajectory::Interpolate(const SplineSample& start,
       newS / end.pose.Translation().Distance(start.pose.Translation()).value();
 
   Pose2d newPose = start.pose + (end.pose - start.pose) * interpolationFrac;
-  double newAccel = wpi::util::Lerp(start.acceleration.ax.value(),
-                                    end.acceleration.ax.value(), t);
+  double newAccel =
+      wpi::util::Lerp(startForwardAccel, end.ForwardAcceleration().value(), t);
   wpi::units::curvature_t newCurvature =
       wpi::util::Lerp(start.curvature, end.curvature, t);
 
@@ -64,20 +69,27 @@ SplineTrajectory SplineTrajectory::TransformBy(
   const Pose2d& firstPose = Start().pose;
   Pose2d transformedFirstPose = firstPose.TransformBy(transform);
 
+  // The whole trajectory is rigidly rotated by the transform's rotation, so the
+  // field-relative velocities and accelerations rotate by the same amount.
+  const Rotation2d& rotation = transform.Rotation();
+
   std::vector<SplineSample> transformedSamples;
   transformedSamples.reserve(Samples().size());
 
   // Transform first sample
   transformedSamples.push_back(
-      SplineSample(Start().timestamp, transformedFirstPose, Start().velocity,
-                   Start().acceleration, Start().curvature));
+      SplineSample(Start().timestamp, transformedFirstPose,
+                   Start().velocity.ToFieldRelative(rotation),
+                   Start().acceleration.ToFieldRelative(rotation),
+                   Start().curvature));
 
   // Transform remaining samples
   for (size_t i = 1; i < Samples().size(); ++i) {
     const auto& sample = Samples()[i];
     transformedSamples.push_back(SplineSample(
         sample.timestamp, transformedFirstPose + (sample.pose - firstPose),
-        sample.velocity, sample.acceleration, sample.curvature));
+        sample.velocity.ToFieldRelative(rotation),
+        sample.acceleration.ToFieldRelative(rotation), sample.curvature));
   }
 
   return SplineTrajectory(std::move(transformedSamples));

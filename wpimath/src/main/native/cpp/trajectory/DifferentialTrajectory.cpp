@@ -19,14 +19,30 @@ DifferentialSample DifferentialTrajectory::Interpolate(
       wpi::util::Lerp(start.timestamp, end.timestamp, t);
   auto interpDt = interpTime - start.timestamp;
 
+  // The integration state holds wheel speeds (vₗ, vᵣ), which are
+  // frame-invariant; the field-relative chassis velocity is reconstructed from
+  // the integrated wheel speeds and heading below.
   Eigen::Vector<double, 6> initialState;
   initialState << start.pose.X().value(), start.pose.Y().value(),
-      start.pose.Rotation().Radians().value(), start.velocity.vx.value(),
-      start.velocity.vy.value(), start.velocity.omega.value();
+      start.pose.Rotation().Radians().value(), start.leftSpeed.value(),
+      start.rightSpeed.value(), start.velocity.omega.value();
+
+  // Wheel and angular accelerations are computed by finite difference between
+  // the two samples (frame-independent, so no kinematics/trackwidth is needed).
+  double segmentDt = (end.timestamp - start.timestamp).value();
+  double leftAccel =
+      segmentDt == 0 ? 0
+                     : (end.leftSpeed - start.leftSpeed).value() / segmentDt;
+  double rightAccel =
+      segmentDt == 0 ? 0
+                     : (end.rightSpeed - start.rightSpeed).value() / segmentDt;
+  double angularAccel =
+      segmentDt == 0
+          ? 0
+          : (end.velocity.omega - start.velocity.omega).value() / segmentDt;
 
   Eigen::Vector3d initialInput;
-  initialInput << start.acceleration.ax.value(), start.acceleration.ay.value(),
-      start.acceleration.alpha.value();
+  initialInput << leftAccel, rightAccel, angularAccel;
 
   // Integrate state derivatives [vₗ, vᵣ, ω, aₗ, aᵣ, α] to new states [x, y, θ,
   // vₗ, vᵣ, ω]
@@ -57,7 +73,6 @@ DifferentialSample DifferentialTrajectory::Interpolate(
   double vl = endState(3);
   double vr = endState(4);
   double vx = (vl + vr) / 2.0;
-  double vy = 0.0;
   double omega = endState(5);
 
   auto ax = wpi::util::Lerp(start.acceleration.ax, end.acceleration.ax, t);
@@ -65,12 +80,17 @@ DifferentialSample DifferentialTrajectory::Interpolate(
   auto alpha =
       wpi::util::Lerp(start.acceleration.alpha, end.acceleration.alpha, t);
 
+  Rotation2d heading{wpi::units::radian_t{theta}};
+
+  // Reconstruct the field-relative velocity from robot-relative forward speed.
+  ChassisVelocities fieldVelocity =
+      ChassisVelocities{wpi::units::meters_per_second_t{vx}, 0_mps,
+                        wpi::units::radians_per_second_t{omega}}
+          .ToFieldRelative(heading);
+
   return {interpTime,
-          Pose2d{wpi::units::meter_t{x}, wpi::units::meter_t{y},
-                 Rotation2d{wpi::units::radian_t{theta}}},
-          ChassisVelocities{wpi::units::meters_per_second_t{vx},
-                            wpi::units::meters_per_second_t{vy},
-                            wpi::units::radians_per_second_t{omega}},
+          Pose2d{wpi::units::meter_t{x}, wpi::units::meter_t{y}, heading},
+          fieldVelocity,
           ChassisAccelerations{wpi::units::meters_per_second_squared_t{ax},
                                wpi::units::meters_per_second_squared_t{ay},
                                wpi::units::radians_per_second_squared_t{alpha}},
@@ -83,20 +103,27 @@ DifferentialTrajectory DifferentialTrajectory::TransformBy(
   const Pose2d& firstPose = Start().pose;
   Pose2d transformedFirstPose = firstPose.TransformBy(transform);
 
+  // The whole trajectory is rigidly rotated by the transform's rotation, so the
+  // field-relative velocities and accelerations rotate by the same amount.
+  const Rotation2d& rotation = transform.Rotation();
+
   std::vector<DifferentialSample> transformedSamples;
   transformedSamples.reserve(Samples().size());
 
   // Transform first sample
   transformedSamples.push_back(DifferentialSample(
-      Start().timestamp, transformedFirstPose, Start().velocity,
-      Start().acceleration, Start().leftSpeed, Start().rightSpeed));
+      Start().timestamp, transformedFirstPose,
+      Start().velocity.ToFieldRelative(rotation),
+      Start().acceleration.ToFieldRelative(rotation), Start().leftSpeed,
+      Start().rightSpeed));
 
   // Transform remaining samples
   for (size_t i = 1; i < Samples().size(); ++i) {
     const auto& sample = Samples()[i];
     transformedSamples.push_back(DifferentialSample(
         sample.timestamp, transformedFirstPose + (sample.pose - firstPose),
-        sample.velocity, sample.acceleration, sample.leftSpeed,
+        sample.velocity.ToFieldRelative(rotation),
+        sample.acceleration.ToFieldRelative(rotation), sample.leftSpeed,
         sample.rightSpeed));
   }
 

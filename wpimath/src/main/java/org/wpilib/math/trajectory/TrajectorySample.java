@@ -11,7 +11,6 @@ import java.util.Objects;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
-import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.trajectory.proto.TrajectorySampleProto;
@@ -32,11 +31,11 @@ public class TrajectorySample implements StructSerializable, ProtobufSerializabl
   @Json.Property("pose")
   public final Pose2d pose;
 
-  /** The robot velocity at this sample (in the robot's reference frame). */
+  /** The robot velocity at this sample (in the field reference frame). */
   @Json.Property("velocity")
   public final ChassisVelocities velocity;
 
-  /** The robot acceleration at this sample (in the robot's reference frame). */
+  /** The robot acceleration at this sample (in the field reference frame). */
   @Json.Property("acceleration")
   public final ChassisAccelerations acceleration;
 
@@ -51,8 +50,8 @@ public class TrajectorySample implements StructSerializable, ProtobufSerializabl
    *
    * @param timestamp The timestamp of the sample relative to the trajectory start, in seconds.
    * @param pose The robot pose at this sample (in the field reference frame).
-   * @param velocity The robot velocity at this sample (in the robot's reference frame).
-   * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
+   * @param velocity The robot velocity at this sample (in the field reference frame).
+   * @param acceleration The robot acceleration at this sample (in the field reference frame).
    */
   @Json.Creator
   public TrajectorySample(
@@ -89,24 +88,6 @@ public class TrajectorySample implements StructSerializable, ProtobufSerializabl
   }
 
   /**
-   * Integrates assuming constant acceleration.
-   *
-   * @param dt timestamp delta in seconds
-   * @return new sample
-   */
-  public TrajectorySample integrate(double dt) {
-    var newVel =
-        new ChassisVelocities(
-            velocity.vx + acceleration.ax * dt,
-            velocity.vy + acceleration.ay * dt,
-            velocity.omega + acceleration.alpha * dt);
-
-    var newPose = pose.plus(new Twist2d(newVel.vx * dt, newVel.vy * dt, newVel.omega * dt).exp());
-
-    return new TrajectorySample(timestamp + dt, newPose, newVel, acceleration);
-  }
-
-  /**
    * Interpolates between two samples using constant-acceleration kinematic equations.
    *
    * @param start The start sample.
@@ -122,7 +103,8 @@ public class TrajectorySample implements StructSerializable, ProtobufSerializabl
       return end;
     }
 
-    var interpDt = MathUtil.lerp(start.timestamp, end.timestamp, t);
+    var interpTime = MathUtil.lerp(start.timestamp, end.timestamp, t);
+    var deltaT = interpTime - start.timestamp;
 
     var newAccel =
         new ChassisAccelerations(
@@ -133,25 +115,25 @@ public class TrajectorySample implements StructSerializable, ProtobufSerializabl
     // vₖ₊₁ = vₖ + aₖΔt
     var newVel =
         new ChassisVelocities(
-            start.velocity.vx + start.acceleration.ax * interpDt,
-            start.velocity.vy + start.acceleration.ay * interpDt,
-            start.velocity.omega + start.acceleration.alpha * interpDt);
+            start.velocity.vx + start.acceleration.ax * deltaT,
+            start.velocity.vy + start.acceleration.ay * deltaT,
+            start.velocity.omega + start.acceleration.alpha * deltaT);
 
     // xₖ₊₁ = xₖ + vₖΔt + ½aₖ(Δt)²
     var newPose =
         new Pose2d(
             start.pose.getX()
-                + start.velocity.vx * interpDt
-                + 0.5 * start.acceleration.ax * interpDt * interpDt,
+                + start.velocity.vx * deltaT
+                + 0.5 * start.acceleration.ax * deltaT * deltaT,
             start.pose.getY()
-                + start.velocity.vy * interpDt
-                + 0.5 * start.acceleration.ay * interpDt * interpDt,
+                + start.velocity.vy * deltaT
+                + 0.5 * start.acceleration.ay * deltaT * deltaT,
             new Rotation2d(
                 start.pose.getRotation().getRadians()
-                    + start.velocity.omega * interpDt
-                    + 0.5 * start.acceleration.alpha * interpDt * interpDt));
+                    + start.velocity.omega * deltaT
+                    + 0.5 * start.acceleration.alpha * deltaT * deltaT));
 
-    return new TrajectorySample(interpDt, newPose, newVel, newAccel);
+    return new TrajectorySample(interpTime, newPose, newVel, newAccel);
   }
 
   /**
@@ -161,7 +143,11 @@ public class TrajectorySample implements StructSerializable, ProtobufSerializabl
    * @return A new sample with the transformed pose.
    */
   public TrajectorySample transform(Transform2d transform) {
-    return new TrajectorySample(timestamp, pose.transformBy(transform), velocity, acceleration);
+    return new TrajectorySample(
+        timestamp,
+        pose.transformBy(transform),
+        velocity.toFieldRelative(transform.getRotation()),
+        acceleration.toFieldRelative(transform.getRotation()));
   }
 
   /**
@@ -171,7 +157,11 @@ public class TrajectorySample implements StructSerializable, ProtobufSerializabl
    * @return A new sample with the relative pose.
    */
   public TrajectorySample relativeTo(Pose2d other) {
-    return new TrajectorySample(timestamp, pose.relativeTo(other), velocity, acceleration);
+    return new TrajectorySample(
+        timestamp,
+        pose.relativeTo(other),
+        velocity.toRobotRelative(other.getRotation()),
+        acceleration.toRobotRelative(other.getRotation()));
   }
 
   /**

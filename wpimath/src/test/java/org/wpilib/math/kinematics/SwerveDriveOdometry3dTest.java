@@ -164,9 +164,9 @@ class SwerveDriveOdometry3dTest {
       var moduleVelocities =
           kinematics.toSwerveModuleVelocities(
               new ChassisVelocities(
-                  groundTruthState.velocity.vx,
+                  groundTruthState.forwardVelocity(),
                   0.0,
-                  groundTruthState.velocity.vx * groundTruthState.curvature));
+                  groundTruthState.forwardVelocity() * groundTruthState.curvature));
       for (var moduleVelocity : moduleVelocities) {
         moduleVelocity.angle =
             moduleVelocity.angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
@@ -256,13 +256,13 @@ class SwerveDriveOdometry3dTest {
       var groundTruthState = trajectory.sampleAt(t);
 
       fl.distance +=
-          groundTruthState.velocity.vx * dt + 0.5 * groundTruthState.acceleration.ax * dt * dt;
+          groundTruthState.forwardVelocity() * dt + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
       fr.distance +=
-          groundTruthState.velocity.vx * dt + 0.5 * groundTruthState.acceleration.ax * dt * dt;
+          groundTruthState.forwardVelocity() * dt + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
       bl.distance +=
-          groundTruthState.velocity.vx * dt + 0.5 * groundTruthState.acceleration.ax * dt * dt;
+          groundTruthState.forwardVelocity() * dt + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
       br.distance +=
-          groundTruthState.velocity.vx * dt + 0.5 * groundTruthState.acceleration.ax * dt * dt;
+          groundTruthState.forwardVelocity() * dt + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
 
       fl.angle = groundTruthState.pose.getRotation();
       fr.angle = groundTruthState.pose.getRotation();

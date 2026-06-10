@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.util.MathUtil;
 
@@ -54,18 +55,23 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
       return interpolate(end, start, 1 - t);
     }
 
+    // Velocities and accelerations are stored field-relative; project them onto
+    // the sample's heading to recover the signed forward (path-relative) scalars.
+    final double startForwardVelocity = start.forwardVelocity();
+    final double startForwardAccel = start.forwardAcceleration();
+
     // Check whether the robot is reversing at this stage.
     final boolean reversing =
-        start.velocity.vx < 0 || Math.abs(start.velocity.vx) < 1E-9 && start.acceleration.ax < 0;
+        startForwardVelocity < 0 || Math.abs(startForwardVelocity) < 1E-9 && startForwardAccel < 0;
 
     // Calculate the new velocity
     // v_f = v_0 + at
-    final double newV = start.velocity.vx + (start.acceleration.ax * deltaT);
+    final double newV = startForwardVelocity + (startForwardAccel * deltaT);
 
     // Calculate the change in position.
     // delta_s = v_0 t + 0.5at²
     final double newS =
-        (start.velocity.vx * deltaT + 0.5 * start.acceleration.ax * Math.pow(deltaT, 2))
+        (startForwardVelocity * deltaT + 0.5 * startForwardAccel * Math.pow(deltaT, 2))
             * (reversing ? -1.0 : 1.0);
 
     // Return the new state. To find the new position for the new state, we need
@@ -79,7 +85,7 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
         newT,
         start.pose.plus(end.pose.minus(start.pose).times(interpolationFrac)),
         newV,
-        start.acceleration.ax + (end.acceleration.ax - start.acceleration.ax) * t,
+        MathUtil.lerp(startForwardAccel, end.forwardAcceleration(), t),
         MathUtil.lerp(start.curvature, end.curvature, t));
   }
 
@@ -88,12 +94,16 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
     Pose2d firstPose = start().pose;
     Pose2d transformedFirstPose = firstPose.transformBy(transform);
 
+    // The whole trajectory is rigidly rotated by the transform's rotation, so
+    // the field-relative velocities and accelerations rotate by the same amount.
+    Rotation2d rotation = transform.getRotation();
+
     SplineSample transformedFirstSample =
         new SplineSample(
             start().timestamp,
             transformedFirstPose,
-            start().velocity,
-            start().acceleration,
+            start().velocity.toFieldRelative(rotation),
+            start().acceleration.toFieldRelative(rotation),
             start().curvature);
 
     Stream<SplineSample> transformedSamples =
@@ -104,8 +114,8 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
                     new SplineSample(
                         sample.timestamp,
                         transformedFirstPose.plus(sample.pose.minus(firstPose)),
-                        sample.velocity,
-                        sample.acceleration,
+                        sample.velocity.toFieldRelative(rotation),
+                        sample.acceleration.toFieldRelative(rotation),
                         sample.curvature));
 
     return new SplineTrajectory(

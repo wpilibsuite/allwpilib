@@ -128,7 +128,7 @@ TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingTrajectory) {
     SplineSample groundTruthState = trajectory.SampleAt(t);
 
     auto moduleVelocities =
-        kinematics.ToSwerveModuleVelocities(groundTruthState.velocity);
+        kinematics.ToSwerveModuleVelocities(groundTruthState.velocity.ToRobotRelative(groundTruthState.pose.Rotation()));
 
     fl.distance += moduleVelocities[0].velocity * dt;
     fr.distance += moduleVelocities[1].velocity * dt;
@@ -192,14 +192,14 @@ TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingXAxis) {
   while (t < trajectory.TotalTime()) {
     SplineSample groundTruthState = trajectory.SampleAt(t);
 
-    fl.distance += groundTruthState.velocity.vx * dt +
-                   0.5 * groundTruthState.acceleration.ax * dt * dt;
-    fr.distance += groundTruthState.velocity.vx * dt +
-                   0.5 * groundTruthState.acceleration.ax * dt * dt;
-    bl.distance += groundTruthState.velocity.vx * dt +
-                   0.5 * groundTruthState.acceleration.ax * dt * dt;
-    br.distance += groundTruthState.velocity.vx * dt +
-                   0.5 * groundTruthState.acceleration.ax * dt * dt;
+    fl.distance += groundTruthState.ForwardVelocity() * dt +
+                   0.5 * groundTruthState.ForwardAcceleration() * dt * dt;
+    fr.distance += groundTruthState.ForwardVelocity() * dt +
+                   0.5 * groundTruthState.ForwardAcceleration() * dt * dt;
+    bl.distance += groundTruthState.ForwardVelocity() * dt +
+                   0.5 * groundTruthState.ForwardAcceleration() * dt * dt;
+    br.distance += groundTruthState.ForwardVelocity() * dt +
+                   0.5 * groundTruthState.ForwardAcceleration() * dt * dt;
 
     fl.angle = groundTruthState.pose.Rotation();
     fr.angle = groundTruthState.pose.Rotation();

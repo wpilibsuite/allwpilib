@@ -36,10 +36,10 @@ class DifferentialDriveVoltageConstraintTest {
     for (double t = 0; t < duration; t += 0.02) {
       var point = trajectory.sampleAt(t);
       var chassisVelocities =
-          new ChassisVelocities(point.velocity.vx, 0, point.velocity.vx * point.curvature);
+          new ChassisVelocities(point.forwardVelocity(), 0, point.forwardVelocity() * point.curvature);
       var wheelVelocities = kinematics.toWheelVelocities(chassisVelocities);
 
-      var acceleration = point.acceleration.ax;
+      var acceleration = point.forwardAcceleration();
 
       // Not really a strictly-correct test as we're using the chassis accel instead of the
       // wheel accel, but much easier than doing it "properly" and a reasonable check anyway

@@ -12,6 +12,7 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.util.MathUtil;
 
 class TrajectorySampleTest {
   private static final double EPSILON = 1e-9;
@@ -368,6 +369,50 @@ class TrajectorySampleTest {
   }
 
   @Test
+  void testKinematicInterpolateNonzeroStartTimestamp() {
+    // Regression test: integration must use the elapsed time from the start
+    // sample (deltaT), not the absolute interpolated timestamp. This only
+    // differs when the start sample's timestamp is nonzero.
+    var start =
+        new TrajectorySample(
+            10,
+            Pose2d.kZero,
+            new ChassisVelocities(1, 0, 0),
+            new ChassisAccelerations(2.0, 0.0, 0.0));
+
+    var end =
+        new TrajectorySample(
+            12,
+            new Pose2d(8, 0, Rotation2d.kZero),
+            new ChassisVelocities(5, 0, 0),
+            new ChassisAccelerations(2.0, 0.0, 0.0));
+
+    var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
+
+    // Absolute interpolated timestamp
+    double expectedTimestamp = MathUtil.lerp(start.timestamp, end.timestamp, 0.5);
+    assertEquals(11.0, expectedTimestamp, EPSILON);
+    assertEquals(expectedTimestamp, interpolated.timestamp, EPSILON);
+
+    // Elapsed time from start sample
+    double deltaT = expectedTimestamp - start.timestamp;
+    assertEquals(1.0, deltaT, EPSILON);
+
+    // vₖ₊₁ = vₖ + aₖΔt = 1 + 2*1 = 3 (would be 1 + 2*11 = 23 with the bug)
+    double expectedVx = start.velocity.vx + start.acceleration.ax * deltaT;
+    assertEquals(3.0, expectedVx, EPSILON);
+    assertEquals(expectedVx, interpolated.velocity.vx, EPSILON);
+
+    // xₖ₊₁ = xₖ + vₖΔt + ½aₖ(Δt)² = 0 + 1*1 + ½*2*1 = 2
+    double expectedX =
+        start.pose.getX()
+            + start.velocity.vx * deltaT
+            + 0.5 * start.acceleration.ax * deltaT * deltaT;
+    assertEquals(2.0, expectedX, EPSILON);
+    assertEquals(expectedX, interpolated.pose.getX(), EPSILON);
+  }
+
+  @Test
   void testKinematicInterpolateZeroTime() {
     var start =
         new TrajectorySample(
@@ -383,5 +428,31 @@ class TrajectorySampleTest {
     // Should handle zero time difference gracefully
     var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
     assertEquals(0.0, interpolated.timestamp, EPSILON);
+  }
+
+  @Test
+  void testSplineSampleStoresFieldRelativeVelocity() {
+    // A SplineSample is built from path-relative (forward) scalars but stores
+    // velocity/acceleration in the field frame. For a robot facing +90 degrees
+    // moving forward, the field velocity should point along +y.
+    double forward = 2.0;
+    double forwardAccel = 1.5;
+    double curvature = 0.25;
+    var sample =
+        new SplineSample(0.0, new Pose2d(0, 0, Rotation2d.kCCW_Pi_2), forward, forwardAccel,
+            curvature);
+
+    // Field-relative: forward speed rotated into +y.
+    assertEquals(0.0, sample.velocity.vx, EPSILON);
+    assertEquals(forward, sample.velocity.vy, EPSILON);
+    // Omega is frame-invariant and equals forward * curvature.
+    assertEquals(forward * curvature, sample.velocity.omega, EPSILON);
+
+    assertEquals(0.0, sample.acceleration.ax, EPSILON);
+    assertEquals(forwardAccel, sample.acceleration.ay, EPSILON);
+
+    // The projection accessors recover the path-relative scalars.
+    assertEquals(forward, sample.forwardVelocity(), EPSILON);
+    assertEquals(forwardAccel, sample.forwardAcceleration(), EPSILON);
   }
 }

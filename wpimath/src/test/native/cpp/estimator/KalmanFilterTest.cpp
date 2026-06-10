@@ -111,6 +111,8 @@ TEST(KalmanFilterTest, SwerveMovingOverTrajectory) {
       {wpi::math::Pose2d{0_m, 0_m, 0_rad}, wpi::math::Pose2d{5_m, 5_m, 0_rad}},
       wpi::math::TrajectoryConfig{2_mps, 2_mps_sq});
 
+  Eigen::Vector3d lastVelocity{0.0, 0.0, 0.0};
+
   for (wpi::units::second_t t = 0_s; t < trajectory.TotalTime(); t += dt) {
     auto sample = trajectory.SampleAt(t);
 
@@ -119,12 +121,16 @@ TEST(KalmanFilterTest, SwerveMovingOverTrajectory) {
                       sample.pose.Rotation().Radians().value()};
     y += wpi::math::Normal(0.2, 0.2, 1.0 / 3.0);
 
-    Eigen::Vector3d u{sample.acceleration.ax.value(),
-                      sample.acceleration.ay.value(),
-                      sample.acceleration.alpha.value()};
+    // The velocity is field-relative; the input is its time derivative.
+    Eigen::Vector3d velocity{sample.velocity.vx.value(),
+                             sample.velocity.vy.value(),
+                             sample.velocity.omega.value()};
+    Eigen::Vector3d u = (velocity - lastVelocity) / dt.value();
 
     filter.Correct(u, y);
     filter.Predict(u, dt);
+
+    lastVelocity = velocity;
   }
 
   EXPECT_NEAR(trajectory.SampleAt(trajectory.TotalTime())

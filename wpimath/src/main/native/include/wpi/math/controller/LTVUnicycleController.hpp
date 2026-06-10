@@ -121,7 +121,10 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    */
   ChassisVelocities Calculate(const Pose2d& currentPose,
                               const SplineSample& desiredState) {
-    return Calculate(currentPose, desiredState.pose, desiredState.velocity.vx,
+    // The sample velocity is field-relative; the controller needs the
+    // robot-relative forward (linear) velocity.
+    return Calculate(currentPose, desiredState.pose,
+                     desiredState.ForwardVelocity(),
                      desiredState.velocity.omega);
   }
 

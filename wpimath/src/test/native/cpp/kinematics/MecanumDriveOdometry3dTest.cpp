@@ -132,7 +132,7 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
     wpi::math::SplineSample groundTruthState = trajectory.SampleAt(t);
 
     auto wheelVelocities =
-        kinematics.ToWheelVelocities(groundTruthState.velocity);
+        kinematics.ToWheelVelocities(groundTruthState.velocity.ToRobotRelative(groundTruthState.pose.Rotation()));
 
     wheelVelocities.frontLeft += distribution(generator) * 0.1_mps;
     wheelVelocities.frontRight += distribution(generator) * 0.1_mps;
@@ -198,8 +198,8 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingXAxis) {
     wpi::math::SplineSample groundTruthState = trajectory.SampleAt(t);
 
     auto wheelVelocities = kinematics.ToWheelVelocities(
-        {groundTruthState.velocity.vx * groundTruthState.pose.Rotation().Cos(),
-         groundTruthState.velocity.vx * groundTruthState.pose.Rotation().Sin(),
+        {groundTruthState.ForwardVelocity() * groundTruthState.pose.Rotation().Cos(),
+         groundTruthState.ForwardVelocity() * groundTruthState.pose.Rotation().Sin(),
          0_rad_per_s});
 
     wheelVelocities.frontLeft += distribution(generator) * 0.1_mps;

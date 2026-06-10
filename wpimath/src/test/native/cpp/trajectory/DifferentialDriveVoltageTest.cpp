@@ -44,7 +44,7 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
     DifferentialSample differentialSample{point, kinematics};
     auto left = differentialSample.leftSpeed;
     auto right = differentialSample.rightSpeed;
-    auto acceleration = point.acceleration.ax;
+    auto acceleration = point.ForwardAcceleration();
     // Not really a strictly-correct test as we're using the chassis accel
     // instead of the wheel accel, but much easier than doing it "properly" and
     // a reasonable check anyway

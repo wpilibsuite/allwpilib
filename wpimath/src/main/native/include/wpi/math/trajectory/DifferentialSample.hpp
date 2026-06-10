@@ -27,8 +27,8 @@ class WPILIB_DLLEXPORT DifferentialSample {
  public:
   wpi::units::second_t timestamp{0.0};  // time since trajectory start
   Pose2d pose;                          // field-relative pose
-  ChassisVelocities velocity;           // robot-relative velocity
-  ChassisAccelerations acceleration;    // robot-relative acceleration
+  ChassisVelocities velocity;           // field-relative velocity
+  ChassisAccelerations acceleration;    // field-relative acceleration
 
   /**
    * The left wheel speed at this sample.
@@ -48,9 +48,9 @@ class WPILIB_DLLEXPORT DifferentialSample {
    * @param timestamp The timestamp of the sample relative to the trajectory
    *                  start.
    * @param pose The robot pose at this sample (in the field reference frame).
-   * @param velocity The robot velocity at this sample (in the robot's reference
+   * @param velocity The robot velocity at this sample (in the field reference
    *                 frame).
-   * @param acceleration The robot acceleration at this sample (in the robot's
+   * @param acceleration The robot acceleration at this sample (in the field
    *                     reference frame).
    * @param leftSpeed The left wheel speed at this sample.
    * @param rightSpeed The right wheel speed at this sample.
@@ -74,9 +74,9 @@ class WPILIB_DLLEXPORT DifferentialSample {
    * @param timestamp The timestamp of the sample relative to the trajectory
    *                  start.
    * @param pose The robot pose at this sample (in the field reference frame).
-   * @param velocity The robot velocity at this sample (in the robot's reference
+   * @param velocity The robot velocity at this sample (in the field reference
    *                 frame).
-   * @param acceleration The robot acceleration at this sample (in the robot's
+   * @param acceleration The robot acceleration at this sample (in the field
    *                     reference frame).
    * @param kinematics The kinematics of the drivetrain.
    */
@@ -89,8 +89,14 @@ class WPILIB_DLLEXPORT DifferentialSample {
         pose{pose},
         velocity{velocity},
         acceleration{acceleration},
-        leftSpeed{kinematics.ToWheelVelocities(velocity).left},
-        rightSpeed{kinematics.ToWheelVelocities(velocity).right} {}
+        leftSpeed{kinematics
+                      .ToWheelVelocities(
+                          velocity.ToRobotRelative(pose.Rotation()))
+                      .left},
+        rightSpeed{kinematics
+                       .ToWheelVelocities(
+                           velocity.ToRobotRelative(pose.Rotation()))
+                       .right} {}
 
   /**
    * Constructs a DifferentialSample from a TrajectorySample.
@@ -121,8 +127,14 @@ class WPILIB_DLLEXPORT DifferentialSample {
         pose{sample.pose},
         velocity{sample.velocity},
         acceleration{sample.acceleration},
-        leftSpeed{kinematics.ToWheelVelocities(sample.velocity).left},
-        rightSpeed{kinematics.ToWheelVelocities(sample.velocity).right} {}
+        leftSpeed{kinematics
+                      .ToWheelVelocities(
+                          sample.velocity.ToRobotRelative(sample.pose.Rotation()))
+                      .left},
+        rightSpeed{kinematics
+                       .ToWheelVelocities(sample.velocity.ToRobotRelative(
+                           sample.pose.Rotation()))
+                       .right} {}
 
   /**
    * Constructs a DifferentialSample from a SplineSample.
@@ -136,8 +148,14 @@ class WPILIB_DLLEXPORT DifferentialSample {
         pose{sample.pose},
         velocity{sample.velocity},
         acceleration{sample.acceleration},
-        leftSpeed{kinematics.ToWheelVelocities(sample.velocity).left},
-        rightSpeed{kinematics.ToWheelVelocities(sample.velocity).right} {}
+        leftSpeed{kinematics
+                      .ToWheelVelocities(
+                          sample.velocity.ToRobotRelative(sample.pose.Rotation()))
+                      .left},
+        rightSpeed{kinematics
+                       .ToWheelVelocities(sample.velocity.ToRobotRelative(
+                           sample.pose.Rotation()))
+                       .right} {}
 
   /**
    * Transforms the pose of this sample by the given transform.
@@ -146,9 +164,13 @@ class WPILIB_DLLEXPORT DifferentialSample {
    * @return A new sample with the transformed pose.
    */
   constexpr DifferentialSample Transform(const Transform2d& transform) const {
-    return DifferentialSample{timestamp, pose.TransformBy(transform),
-                              velocity,  acceleration,
-                              leftSpeed, rightSpeed};
+    return DifferentialSample{
+        timestamp,
+        pose.TransformBy(transform),
+        velocity.ToFieldRelative(transform.Rotation()),
+        acceleration.ToFieldRelative(transform.Rotation()),
+        leftSpeed,
+        rightSpeed};
   }
 
   /**
@@ -158,9 +180,13 @@ class WPILIB_DLLEXPORT DifferentialSample {
    * @return A new sample with the relative pose.
    */
   constexpr DifferentialSample RelativeTo(const Pose2d& other) const {
-    return DifferentialSample{timestamp, pose.RelativeTo(other),
-                              velocity,  acceleration,
-                              leftSpeed, rightSpeed};
+    return DifferentialSample{
+        timestamp,
+        pose.RelativeTo(other),
+        velocity.ToRobotRelative(other.Rotation()),
+        acceleration.ToRobotRelative(other.Rotation()),
+        leftSpeed,
+        rightSpeed};
   }
 
   /**
