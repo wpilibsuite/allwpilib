@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <string>
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
