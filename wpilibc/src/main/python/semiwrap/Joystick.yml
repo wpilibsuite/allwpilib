@@ -51,6 +51,16 @@ classes:
       GetMagnitude:
       GetDirection:
         rename: getDirectionRadians
+      GetGenericHID:
+        overloads:
+          "":
+          '[const]':
+            ignore: true
+      GetRawButton:
+      GetRawButtonPressed:
+      GetRawButtonReleased:
+      GetRawAxis:
+      GetPOV:
     inline_code: |
       .def("getDirectionDegrees", [](const Joystick &self) -> wpi::units::degree_t {
         return self.GetDirection();

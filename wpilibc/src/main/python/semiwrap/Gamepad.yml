@@ -162,3 +162,8 @@ classes:
       GetTouchpadFingerAvailable:
       GetTouchpadFinger:
       InitSendable:
+      GetGenericHID:
+        overloads:
+          "":
+          '[const]':
+            ignore: true
