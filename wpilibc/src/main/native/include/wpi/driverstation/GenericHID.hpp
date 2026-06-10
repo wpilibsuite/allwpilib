@@ -107,6 +107,8 @@ class GenericHID final : public HIDDevice {
    */
   const GenericHID& GetHID() const override { return *this; }
 
+  GenericHID(const GenericHID&) = delete;
+  GenericHID& operator=(const GenericHID&) = delete;
   GenericHID(GenericHID&&) = default;
   GenericHID& operator=(GenericHID&&) = default;
 
