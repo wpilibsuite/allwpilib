@@ -10,12 +10,10 @@
 
 namespace wpi {
 class GenericHIDGetter {
-  public:
-  static GenericHID Get(int port) {
-    return GenericHID(port);
-  }
+ public:
+  static GenericHID Get(int port) { return GenericHID(port); }
 };
-}
+}  // namespace wpi
 
 using namespace wpi;
 using RumbleType = GenericHID::RumbleType;
