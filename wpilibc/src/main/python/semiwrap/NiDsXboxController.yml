@@ -5,6 +5,7 @@ extra_includes:
 
 classes:
   wpi::NiDsXboxController:
+    force_no_trampoline: true
     ignored_bases:
     - wpi::util::SendableHelper<NiDsXboxController>
     methods:

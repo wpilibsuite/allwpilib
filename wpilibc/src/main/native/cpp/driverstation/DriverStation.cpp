@@ -29,17 +29,17 @@ void ValidatePort(int port) {
                            port);
   }
 }
+}  // namespace
 
-GenericHID& GetGenericHIDUnderLock(int port) {
+GenericHID& DriverStation::GetGenericHIDUnderLock(int port) {
   ValidatePort(port);
 
   if (!hids[port]) {
-    hids[port] = std::make_unique<GenericHID>(port);
+    hids[port].reset(new GenericHID(port));
   }
 
   return *hids[port];
 }
-}  // namespace
 
 GenericHID& DriverStation::GetGenericHID(int port) {
   std::scoped_lock lock{dsMutex};

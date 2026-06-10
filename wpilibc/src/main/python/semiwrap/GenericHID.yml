@@ -3,13 +3,13 @@ extra_includes:
 
 classes:
   wpi::GenericHID:
+    force_no_trampoline: true
     enums:
       RumbleType:
       SupportedOutputs:
         arithmetic: true
       HIDType:
     methods:
-      GenericHID:
       GetRawButton:
       GetRawButtonPressed:
       GetRawButtonReleased:

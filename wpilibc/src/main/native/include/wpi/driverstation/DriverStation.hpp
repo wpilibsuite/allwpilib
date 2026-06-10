@@ -80,6 +80,9 @@ class DriverStation final {
   static void RemoveRefreshedDataEventHandle(WPI_EventHandle handle) {
     wpi::internal::DriverStationBackend::RemoveRefreshedDataEventHandle(handle);
   }
+
+  private:
+   static GenericHID& GetGenericHIDUnderLock(int port);
 };
 
 }  // namespace wpi

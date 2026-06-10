@@ -17,6 +17,12 @@ namespace wpi {
 
 class BooleanEvent;
 class EventLoop;
+class DriverStation;
+class NiDsXboxController;
+class NiDsPS4Controller;
+class NiDsPS5Controller;
+class NiDsStadiaController;
+class GenericHIDGetter;
 
 /**
  * Handle input from standard HID devices connected to the Driver Station.
@@ -28,6 +34,13 @@ class EventLoop;
  */
 class GenericHID : public HIDDevice {
  public:
+  friend class DriverStation;
+  friend class NiDsXboxController;
+  friend class NiDsPS4Controller;
+  friend class NiDsPS5Controller;
+  friend class NiDsStadiaController;
+  friend class GenericHIDGetter;
+
   /**
    * Represents a rumble output on the Joystick.
    */
@@ -88,7 +101,6 @@ class GenericHID : public HIDDevice {
     SWITCH_JOYCON_PAIR
   };
 
-  explicit GenericHID(int port);
   ~GenericHID() override = default;
 
   /**
@@ -404,6 +416,7 @@ class GenericHID : public HIDDevice {
   TouchpadFinger GetTouchpadFinger(int touchpad, int finger) const;
 
  private:
+  explicit GenericHID(int port);
   int m_port;
   uint16_t m_leftRumble = 0;
   uint16_t m_rightRumble = 0;

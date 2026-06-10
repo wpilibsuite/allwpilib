@@ -4,6 +4,7 @@ extra_includes:
 
 classes:
   wpi::NiDsPS4Controller:
+    force_no_trampoline: true
     ignored_bases:
     - wpi::util::SendableHelper<NiDsPS4Controller>
     methods:
