@@ -1,3 +1,6 @@
+extra_includes:
+- wpi/driverstation/GenericHID.hpp
+
 classes:
   wpi::HIDDevice:
     methods:
