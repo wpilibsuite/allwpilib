@@ -72,6 +72,11 @@ public class Joystick {
 
   private final GenericHID m_hid;
 
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
   public GenericHID getHID() {
     return m_hid;
   }
