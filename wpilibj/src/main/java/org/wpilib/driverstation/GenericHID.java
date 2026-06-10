@@ -132,7 +132,7 @@ public class GenericHID {
    *
    * @param port The port index on the Driver Station that the device is plugged into.
    */
-  public GenericHID(int port) {
+  GenericHID(int port) {
     m_port = port;
   }
 

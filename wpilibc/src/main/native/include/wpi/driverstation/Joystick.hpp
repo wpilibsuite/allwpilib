@@ -19,7 +19,7 @@ namespace wpi {
  * single class instance for each joystick and the mapping of ports to hardware
  * buttons depends on the code in the Driver Station.
  */
-class Joystick : public GenericHID {
+class Joystick {
  public:
   /// Default X axis channel.
   static constexpr int kDefaultXChannel = 0;
@@ -68,10 +68,31 @@ class Joystick : public GenericHID {
    */
   explicit Joystick(int port);
 
-  ~Joystick() override = default;
+  /**
+   * Construct an instance of a joystick with a GenericHID object.
+   *
+   * @param hid The GenericHID object to use for this joystick.
+   */
+  explicit Joystick(GenericHID& hid);
+
+  ~Joystick() = default;
 
   Joystick(Joystick&&) = default;
   Joystick& operator=(Joystick&&) = default;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  GenericHID& GetHID();
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  const GenericHID& GetHID() const;
 
   /**
    * Set the channel associated with the X axis.
@@ -266,6 +287,7 @@ class Joystick : public GenericHID {
   enum Button { kTrigger = 1, kTop = 2 };
 
   std::array<int, Axis::kNumAxes> m_axes;
+  GenericHID* m_hid;
 };
 
 }  // namespace wpi

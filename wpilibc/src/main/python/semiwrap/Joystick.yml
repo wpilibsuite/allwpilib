@@ -14,6 +14,13 @@ classes:
       ButtonType:
     methods:
       Joystick:
+        overloads:
+          int:
+          GenericHID&:
+            keepalive:
+            - [1, 2]
+      GetHID:
+        return_value_policy: reference_internal
       SetXChannel:
       SetYChannel:
       SetZChannel:

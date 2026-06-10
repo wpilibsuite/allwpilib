@@ -6,19 +6,30 @@
 
 #include <cmath>
 
+#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
 #include "wpi/hal/UsageReporting.hpp"
 
 using namespace wpi;
 
-Joystick::Joystick(int port) : GenericHID(port) {
+Joystick::Joystick(int port) : Joystick{DriverStation::GetGenericHID(port)} {}
+
+Joystick::Joystick(GenericHID& hid) : m_hid{&hid} {
   m_axes[Axis::kX] = kDefaultXChannel;
   m_axes[Axis::kY] = kDefaultYChannel;
   m_axes[Axis::kZ] = kDefaultZChannel;
   m_axes[Axis::kTwist] = kDefaultTwistChannel;
   m_axes[Axis::kThrottle] = kDefaultThrottleChannel;
 
-  HAL_ReportUsage("HID", port, "Joystick");
+  HAL_ReportUsage("HID", hid.GetPort(), "Joystick");
+}
+
+GenericHID& Joystick::GetHID() {
+  return *m_hid;
+}
+
+const GenericHID& Joystick::GetHID() const {
+  return *m_hid;
 }
 
 void Joystick::SetXChannel(int channel) {
@@ -62,35 +73,35 @@ int Joystick::GetThrottleChannel() const {
 }
 
 double Joystick::GetX() const {
-  return GetRawAxis(m_axes[Axis::kX]);
+  return m_hid->GetRawAxis(m_axes[Axis::kX]);
 }
 
 double Joystick::GetY() const {
-  return GetRawAxis(m_axes[Axis::kY]);
+  return m_hid->GetRawAxis(m_axes[Axis::kY]);
 }
 
 double Joystick::GetZ() const {
-  return GetRawAxis(m_axes[Axis::kZ]);
+  return m_hid->GetRawAxis(m_axes[Axis::kZ]);
 }
 
 double Joystick::GetTwist() const {
-  return GetRawAxis(m_axes[Axis::kTwist]);
+  return m_hid->GetRawAxis(m_axes[Axis::kTwist]);
 }
 
 double Joystick::GetThrottle() const {
-  return GetRawAxis(m_axes[Axis::kThrottle]);
+  return m_hid->GetRawAxis(m_axes[Axis::kThrottle]);
 }
 
 bool Joystick::GetTrigger() const {
-  return GetRawButton(Button::kTrigger);
+  return m_hid->GetRawButton(Button::kTrigger);
 }
 
 bool Joystick::GetTriggerPressed() {
-  return GetRawButtonPressed(Button::kTrigger);
+  return m_hid->GetRawButtonPressed(Button::kTrigger);
 }
 
 bool Joystick::GetTriggerReleased() {
-  return GetRawButtonReleased(Button::kTrigger);
+  return m_hid->GetRawButtonReleased(Button::kTrigger);
 }
 
 BooleanEvent Joystick::Trigger(EventLoop* loop) const {
@@ -98,15 +109,15 @@ BooleanEvent Joystick::Trigger(EventLoop* loop) const {
 }
 
 bool Joystick::GetTop() const {
-  return GetRawButton(Button::kTop);
+  return m_hid->GetRawButton(Button::kTop);
 }
 
 bool Joystick::GetTopPressed() {
-  return GetRawButtonPressed(Button::kTop);
+  return m_hid->GetRawButtonPressed(Button::kTop);
 }
 
 bool Joystick::GetTopReleased() {
-  return GetRawButtonReleased(Button::kTop);
+  return m_hid->GetRawButtonReleased(Button::kTop);
 }
 
 BooleanEvent Joystick::Top(EventLoop* loop) const {

@@ -7,6 +7,13 @@ classes:
       Axis:
     methods:
       Gamepad:
+        overloads:
+          int:
+          GenericHID&:
+            keepalive:
+            - [1, 2]
+      GetHID:
+        return_value_policy: reference_internal
       GetLeftX:
       SetLeftXDeadband:
       GetLeftY:
@@ -139,4 +146,15 @@ classes:
       GetAxis:
       AxisLessThan:
       AxisGreaterThan:
+      GetAxesAvailable:
+      GetButtonsAvailable:
+      IsConnected:
+      GetGamepadType:
+      GetSupportedOutputs:
+      GetName:
+      GetPort:
+      SetLeds:
+      SetRumble:
+      GetTouchpadFingerAvailable:
+      GetTouchpadFinger:
       InitSendable:

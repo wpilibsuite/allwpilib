@@ -1,7 +1,7 @@
 # validated: 2024-01-20 DS 92149efa11fa button/CommandGenericHID.java
-from typing import Optional
+from typing import ClassVar, Optional
 
-from wpilib import EventLoop, GenericHID
+from wpilib import DriverStation, EventLoop, GenericHID
 
 from ..commandscheduler import CommandScheduler
 from .trigger import Trigger
@@ -12,13 +12,26 @@ class CommandGenericHID:
     A version of :class:`wpilib.GenericHID` with :class:`.Trigger` factories for command-based.
     """
 
+    _hids: ClassVar[dict[int, "CommandGenericHID"]] = {}
+
     def __init__(self, port: int):
         """
         Construct an instance of a device.
 
         :param port: The port on the Driver Station that the device is plugged into.
         """
-        self._hid = GenericHID(port)
+        self._hid = DriverStation.getGenericHID(port)
+
+    @classmethod
+    def getCommandGenericHID(cls, port: int) -> "CommandGenericHID":
+        """
+        Gets the CommandGenericHID object for the given port.
+        """
+        hid = cls._hids.get(port)
+        if hid is None:
+            hid = cls(port)
+            cls._hids[port] = hid
+        return hid
 
     def getHID(self) -> GenericHID:
         """
