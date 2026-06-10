@@ -19,42 +19,38 @@ import java.util.function.BiConsumer;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.system.Filesystem;
 
-/**
- * GraphLogger is responsible for managing and logging state machine graphs that have been generated
- * with WPILib's <code>@MakeStateMachineGraph</code> annotation.
- */
-public final class GraphLogger {
+/** Logs state machines from methods annotated with <code>@MakeStateMachineGraph</code>. */
+public final class StateMachineLogger {
   /** The maximum number of states to keep in the history. */
   public static final int MAX_HISTORY_LENGTH = 4;
 
-  private static final GraphLogger instance = new GraphLogger();
+  private static final StateMachineLogger instance = new StateMachineLogger();
 
   @Json
   static class StateMachineGraph {
     @Json.Raw String transitions = "";
     List<String> stateDefinitionOrder = List.of();
-    String initialState = "";
   }
 
   /**
-   * Returns the default instance of the GraphLogger.
+   * Returns the default instance of the StateMachineLogger.
    *
    * @return the default instance
    */
-  public static GraphLogger getDefault() {
+  public static StateMachineLogger getDefault() {
     return instance;
   }
 
   /**
-   * Creates an independent GraphLogger instance for unit testing purposes.
+   * Creates an independent StateMachineLogger instance for unit testing purposes.
    *
-   * @return A new GraphLogger instance
+   * @return A new StateMachineLogger instance
    */
-  static GraphLogger createIndependentLogger() {
-    return new GraphLogger();
+  static StateMachineLogger createIndependentLogger() {
+    return new StateMachineLogger();
   }
 
-  private GraphLogger() {}
+  private StateMachineLogger() {}
 
   private boolean hasStarted = false;
   private BiConsumer<String, String> logString = (_, _) -> {};
@@ -64,7 +60,7 @@ public final class GraphLogger {
   private final Map<String, StateMachineGraph> stateMachineGraphs = new HashMap<>();
 
   /**
-   * Starts the GraphLogger with the provided logging function.
+   * Starts the StateMachineLogger with the provided logging functions.
    *
    * <p>This will load the state machine graphs from the filesystem and start accepting updates.
    *
@@ -76,10 +72,10 @@ public final class GraphLogger {
     this.hasStarted = true;
     this.logString = logString;
     this.logStringArray = logStringArray;
-    loadStateMachineGraphs();
+    loadGraphs();
   }
 
-  private void loadStateMachineGraphs() {
+  private void loadGraphs() {
     var stateMachineGraphsDir =
         new File(Filesystem.getDeployDirectory(), "stateMachineGraphData").listFiles();
     if (stateMachineGraphsDir == null) {
@@ -103,7 +99,7 @@ public final class GraphLogger {
     }
   }
 
-  void updateStateMachineGraph(
+  void updateGraph(
       String stateMachineName,
       List<StateMachine.State> history,
       List<StateMachine.State> allStates) {

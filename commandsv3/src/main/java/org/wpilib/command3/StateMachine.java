@@ -57,7 +57,7 @@ import org.wpilib.annotation.PostConstructionInitializer;
  */
 public final class StateMachine implements Command {
   private final String m_name;
-  private final GraphLogger m_logger;
+  private final StateMachineLogger m_logger;
   private State m_initialState = null;
   private final List<State> m_states = new ArrayList<>();
 
@@ -68,14 +68,14 @@ public final class StateMachine implements Command {
    *     {@link Command#name() name} of the state machine.
    */
   public StateMachine(String name) {
-    this(name, GraphLogger.getDefault());
+    this(name, StateMachineLogger.getDefault());
   }
 
-  StateMachine(String name, GraphLogger logger) {
+  StateMachine(String name, StateMachineLogger logger) {
     requireNonNullParam(name, "name", "StateMachine");
     m_name = name;
     m_logger = logger;
-    m_logger.updateStateMachineGraph(m_name, List.of(), m_states);
+    m_logger.updateGraph(m_name, List.of(), m_states);
   }
 
   @Override
@@ -172,7 +172,7 @@ public final class StateMachine implements Command {
       final var currentCommand = currentState.command();
       coroutine.fork(currentCommand);
       currentState.runEnterCallbacks();
-      m_logger.updateStateMachineGraph(m_name, history, m_states);
+      m_logger.updateGraph(m_name, history, m_states);
       boolean didYield = false;
 
       while (coroutine.scheduler().isRunning(currentCommand)) {
@@ -190,7 +190,7 @@ public final class StateMachine implements Command {
             coroutine.scheduler().cancel(currentCommand);
             currentState = verifyState(transition.nextState());
             history.add(currentState);
-            if (history.size() > GraphLogger.MAX_HISTORY_LENGTH) {
+            if (history.size() > StateMachineLogger.MAX_HISTORY_LENGTH) {
               history.removeFirst();
             }
             continue outer_loop;
@@ -213,7 +213,7 @@ public final class StateMachine implements Command {
       currentState.runExitCallbacks();
       currentState = verifyState(currentState.nextState());
       history.add(currentState);
-      if (history.size() > GraphLogger.MAX_HISTORY_LENGTH) {
+      if (history.size() > StateMachineLogger.MAX_HISTORY_LENGTH) {
         history.removeFirst();
       }
       if (!didYield && currentState != null) {
@@ -222,7 +222,7 @@ public final class StateMachine implements Command {
       }
     }
 
-    m_logger.updateStateMachineGraph(m_name, List.of(), m_states);
+    m_logger.updateGraph(m_name, List.of(), m_states);
   }
 
   private State verifyState(State next) {
