@@ -1,0 +1,8 @@
+classes:
+  wpi::HIDDevice:
+    methods:
+      GetGenericHID:
+        overloads:
+          "":
+          '[const]':
+            ignore: true
