@@ -4,7 +4,6 @@ extra_includes:
 classes:
   wpi::HIDDevice:
     methods:
-      HIDDevice:
       GetGenericHID:
         overloads:
           "":
