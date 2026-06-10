@@ -5,6 +5,7 @@
 package org.wpilib.driverstation;
 
 /** Interface for device wrappers backed by a GenericHID. */
+@SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface HIDDevice {
   /**
    * Get the underlying GenericHID object.

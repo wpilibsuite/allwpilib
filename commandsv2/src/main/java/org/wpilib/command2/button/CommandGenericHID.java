@@ -11,8 +11,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.GenericHID;
-import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.driverstation.POVDirection;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.event.EventLoop;
 import org.wpilib.math.util.Pair;
 

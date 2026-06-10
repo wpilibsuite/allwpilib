@@ -43,10 +43,7 @@ public class POVButton extends Trigger {
    * @param povNumber The POV number (see {@link GenericHID#getPOV(int)})
    */
   public POVButton(HIDDevice joystick, POVDirection angle, int povNumber) {
-    this(
-        requireNonNullParam(joystick, "joystick", "POVButton").getGenericHID(),
-        angle,
-        povNumber);
+    this(requireNonNullParam(joystick, "joystick", "POVButton").getGenericHID(), angle, povNumber);
   }
 
   /**

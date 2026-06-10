@@ -27,7 +27,8 @@ public final class DriverStation {
   }
 
   /**
-   * Gets the GenericHID object for the given port. GenericHID objects are cached, so this will always return the same object for the same port.
+   * Gets the GenericHID object for the given port. GenericHID objects are cached, so this will
+   * always return the same object for the same port.
    *
    * @param port The port index on the Driver Station that the controller is plugged into (0-5).
    * @return The GenericHID object for the given port.
@@ -42,7 +43,8 @@ public final class DriverStation {
   }
 
   /**
-   * Gets the Gamepad object for the given port. Gamepad objects are cached, so this will always return the same object for the same port.
+   * Gets the Gamepad object for the given port. Gamepad objects are cached, so this will always
+   * return the same object for the same port.
    *
    * @param port The port index on the Driver Station that the controller is plugged into (0-5).
    * @return The Gamepad object for the given port.

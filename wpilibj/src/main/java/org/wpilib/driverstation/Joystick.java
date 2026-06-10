@@ -209,8 +209,8 @@ public class Joystick implements HIDDevice {
   /**
    * Get the button value (starting at button 1).
    *
-   * <p>The buttons are returned in a single 16 bit value with one bit representing the state of each
-   * button. The appropriate button is returned as a boolean value.
+   * <p>The buttons are returned in a single 16 bit value with one bit representing the state of
+   * each button. The appropriate button is returned as a boolean value.
    *
    * @param button The button number to be read (starting at 1)
    * @return The state of the button

@@ -89,25 +89,21 @@ class GenericHID : public HIDDevice {
   };
 
   explicit GenericHID(int port);
-  virtual ~GenericHID() = default;
+  ~GenericHID() override = default;
 
   /**
    * Get this GenericHID object.
    *
    * @return this GenericHID object
    */
-  GenericHID& GetGenericHID() override {
-    return *this;
-  }
+  GenericHID& GetGenericHID() override { return *this; }
 
   /**
    * Get this GenericHID object.
    *
    * @return this GenericHID object
    */
-  const GenericHID& GetGenericHID() const override {
-    return *this;
-  }
+  const GenericHID& GetGenericHID() const override { return *this; }
 
   GenericHID(GenericHID&&) = default;
   GenericHID& operator=(GenericHID&&) = default;
