@@ -207,8 +207,7 @@ public class LTVUnicycleController {
     // robot-relative forward (linear) velocity.
     double linearVelocity =
         desiredState.velocity.toRobotRelative(desiredState.pose.getRotation()).vx;
-    return calculate(
-        currentPose, desiredState.pose, linearVelocity, desiredState.velocity.omega);
+    return calculate(currentPose, desiredState.pose, linearVelocity, desiredState.velocity.omega);
   }
 
   /**

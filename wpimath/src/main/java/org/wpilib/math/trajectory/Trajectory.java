@@ -48,8 +48,7 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
    */
   @SuppressWarnings({"this-escape"})
   public Trajectory(List<SampleType> samples) {
-    this.samples =
-        samples.stream().sorted(Comparator.comparingDouble(s -> s.timestamp)).toList();
+    this.samples = samples.stream().sorted(Comparator.comparingDouble(s -> s.timestamp)).toList();
 
     this.sampleMap = new InterpolatingTreeMap<>(MathUtil::inverseLerp, this::interpolate);
 

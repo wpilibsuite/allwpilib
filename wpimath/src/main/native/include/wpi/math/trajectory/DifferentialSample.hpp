@@ -89,14 +89,14 @@ class WPILIB_DLLEXPORT DifferentialSample {
         pose{pose},
         velocity{velocity},
         acceleration{acceleration},
-        leftSpeed{kinematics
-                      .ToWheelVelocities(
-                          velocity.ToRobotRelative(pose.Rotation()))
-                      .left},
-        rightSpeed{kinematics
-                       .ToWheelVelocities(
-                           velocity.ToRobotRelative(pose.Rotation()))
-                       .right} {}
+        leftSpeed{
+            kinematics
+                .ToWheelVelocities(velocity.ToRobotRelative(pose.Rotation()))
+                .left},
+        rightSpeed{
+            kinematics
+                .ToWheelVelocities(velocity.ToRobotRelative(pose.Rotation()))
+                .right} {}
 
   /**
    * Constructs a DifferentialSample from a TrajectorySample.
@@ -128,8 +128,8 @@ class WPILIB_DLLEXPORT DifferentialSample {
         velocity{sample.velocity},
         acceleration{sample.acceleration},
         leftSpeed{kinematics
-                      .ToWheelVelocities(
-                          sample.velocity.ToRobotRelative(sample.pose.Rotation()))
+                      .ToWheelVelocities(sample.velocity.ToRobotRelative(
+                          sample.pose.Rotation()))
                       .left},
         rightSpeed{kinematics
                        .ToWheelVelocities(sample.velocity.ToRobotRelative(
@@ -149,8 +149,8 @@ class WPILIB_DLLEXPORT DifferentialSample {
         velocity{sample.velocity},
         acceleration{sample.acceleration},
         leftSpeed{kinematics
-                      .ToWheelVelocities(
-                          sample.velocity.ToRobotRelative(sample.pose.Rotation()))
+                      .ToWheelVelocities(sample.velocity.ToRobotRelative(
+                          sample.pose.Rotation()))
                       .left},
         rightSpeed{kinematics
                        .ToWheelVelocities(sample.velocity.ToRobotRelative(
@@ -180,13 +180,12 @@ class WPILIB_DLLEXPORT DifferentialSample {
    * @return A new sample with the relative pose.
    */
   constexpr DifferentialSample RelativeTo(const Pose2d& other) const {
-    return DifferentialSample{
-        timestamp,
-        pose.RelativeTo(other),
-        velocity.ToRobotRelative(other.Rotation()),
-        acceleration.ToRobotRelative(other.Rotation()),
-        leftSpeed,
-        rightSpeed};
+    return DifferentialSample{timestamp,
+                              pose.RelativeTo(other),
+                              velocity.ToRobotRelative(other.Rotation()),
+                              acceleration.ToRobotRelative(other.Rotation()),
+                              leftSpeed,
+                              rightSpeed};
   }
 
   /**

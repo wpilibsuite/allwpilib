@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/trajectory/TrajectorySample.hpp"
+
 #include <numbers>
 
 #include <gtest/gtest.h>
@@ -15,17 +17,16 @@
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/trajectory/DifferentialSample.hpp"
 #include "wpi/math/trajectory/SplineSample.hpp"
-#include "wpi/math/trajectory/TrajectorySample.hpp"
 
 namespace {
 constexpr double kEpsilon = 1e-9;
 }  // namespace
 
 TEST(TrajectorySampleTest, KinematicInterpolateAtStart) {
-  wpi::math::TrajectorySample start{0_s, wpi::math::Pose2d{},
-                                    wpi::math::ChassisVelocities{1_mps, 0_mps,
-                                                                 0_rad_per_s},
-                                    wpi::math::ChassisAccelerations{}};
+  wpi::math::TrajectorySample start{
+      0_s, wpi::math::Pose2d{},
+      wpi::math::ChassisVelocities{1_mps, 0_mps, 0_rad_per_s},
+      wpi::math::ChassisAccelerations{}};
   wpi::math::TrajectorySample end{
       1_s, wpi::math::Pose2d{1_m, 0_m, 0_rad},
       wpi::math::ChassisVelocities{2_mps, 0_mps, 0_rad_per_s},
@@ -40,10 +41,10 @@ TEST(TrajectorySampleTest, KinematicInterpolateAtStart) {
 }
 
 TEST(TrajectorySampleTest, KinematicInterpolateAtEnd) {
-  wpi::math::TrajectorySample start{0_s, wpi::math::Pose2d{},
-                                    wpi::math::ChassisVelocities{1_mps, 0_mps,
-                                                                 0_rad_per_s},
-                                    wpi::math::ChassisAccelerations{}};
+  wpi::math::TrajectorySample start{
+      0_s, wpi::math::Pose2d{},
+      wpi::math::ChassisVelocities{1_mps, 0_mps, 0_rad_per_s},
+      wpi::math::ChassisAccelerations{}};
   wpi::math::TrajectorySample end{
       1_s, wpi::math::Pose2d{1_m, 0_m, 0_rad},
       wpi::math::ChassisVelocities{2_mps, 0_mps, 0_rad_per_s},
@@ -128,9 +129,8 @@ TEST(TrajectorySampleTest, KinematicInterpolateAngularVelocity) {
       wpi::math::ChassisAccelerations{0_mps_sq, 0_mps_sq, 0.1_rad_per_s_sq}};
   wpi::math::TrajectorySample end{
       1_s, wpi::math::Pose2d{1_m, 0_m, 90_deg},
-      wpi::math::ChassisVelocities{1_mps, 0_mps,
-                                   wpi::units::radians_per_second_t{
-                                       std::numbers::pi / 2}},
+      wpi::math::ChassisVelocities{
+          1_mps, 0_mps, wpi::units::radians_per_second_t{std::numbers::pi / 2}},
       wpi::math::ChassisAccelerations{0_mps_sq, 0_mps_sq, 0.5_rad_per_s_sq}};
 
   auto interpolated = wpi::math::KinematicInterpolate(start, end, 0.5);
@@ -140,8 +140,8 @@ TEST(TrajectorySampleTest, KinematicInterpolateAngularVelocity) {
   double deltaT = 0.5;
 
   // ωₖ₊₁ = ωₖ + αₖΔt
-  double expectedOmega = start.velocity.omega.value() +
-                         start.acceleration.alpha.value() * deltaT;
+  double expectedOmega =
+      start.velocity.omega.value() + start.acceleration.alpha.value() * deltaT;
 
   // Linear interpolation of angular acceleration.
   double expectedAlpha =
@@ -149,9 +149,10 @@ TEST(TrajectorySampleTest, KinematicInterpolateAngularVelocity) {
       (end.acceleration.alpha.value() - start.acceleration.alpha.value()) * 0.5;
 
   // θₖ₊₁ = θₖ + ωₖΔt + ½α(Δt)²
-  double expectedTheta = start.pose.Rotation().Radians().value() +
-                         start.velocity.omega.value() * deltaT +
-                         0.5 * start.acceleration.alpha.value() * deltaT * deltaT;
+  double expectedTheta =
+      start.pose.Rotation().Radians().value() +
+      start.velocity.omega.value() * deltaT +
+      0.5 * start.acceleration.alpha.value() * deltaT * deltaT;
 
   EXPECT_NEAR(expectedOmega, interpolated.velocity.omega.value(), kEpsilon);
   EXPECT_NEAR(expectedAlpha, interpolated.acceleration.alpha.value(), kEpsilon);
@@ -182,10 +183,10 @@ TEST(TrajectorySampleTest, KinematicInterpolateNegativeVelocity) {
 }
 
 TEST(TrajectorySampleTest, KinematicInterpolateMonotonicity) {
-  wpi::math::TrajectorySample start{0_s, wpi::math::Pose2d{},
-                                    wpi::math::ChassisVelocities{1_mps, 0_mps,
-                                                                 0_rad_per_s},
-                                    wpi::math::ChassisAccelerations{}};
+  wpi::math::TrajectorySample start{
+      0_s, wpi::math::Pose2d{},
+      wpi::math::ChassisVelocities{1_mps, 0_mps, 0_rad_per_s},
+      wpi::math::ChassisAccelerations{}};
   wpi::math::TrajectorySample end{
       1_s, wpi::math::Pose2d{1_m, 0_m, 0_rad},
       wpi::math::ChassisVelocities{2_mps, 0_mps, 0_rad_per_s},
@@ -226,10 +227,10 @@ TEST(TrajectorySampleTest, KinematicInterpolateNonzeroStartTimestamp) {
 }
 
 TEST(TrajectorySampleTest, KinematicInterpolateZeroTime) {
-  wpi::math::TrajectorySample start{0_s, wpi::math::Pose2d{},
-                                    wpi::math::ChassisVelocities{1_mps, 0_mps,
-                                                                 0_rad_per_s},
-                                    wpi::math::ChassisAccelerations{}};
+  wpi::math::TrajectorySample start{
+      0_s, wpi::math::Pose2d{},
+      wpi::math::ChassisVelocities{1_mps, 0_mps, 0_rad_per_s},
+      wpi::math::ChassisAccelerations{}};
   wpi::math::TrajectorySample end{
       0_s, wpi::math::Pose2d{1_m, 0_m, 0_rad},
       wpi::math::ChassisVelocities{2_mps, 0_mps, 0_rad_per_s},

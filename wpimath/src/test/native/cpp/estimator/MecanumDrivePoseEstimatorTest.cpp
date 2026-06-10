@@ -170,7 +170,8 @@ TEST(MecanumDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
       kinematics, estimator, trajectory,
       [&](wpi::math::SplineSample& state) {
         return wpi::math::ChassisVelocities{
-            state.ForwardVelocity(), 0_mps, state.ForwardVelocity() * state.curvature};
+            state.ForwardVelocity(), 0_mps,
+            state.ForwardVelocity() * state.curvature};
       },
       [&](wpi::math::SplineSample& state) { return state.pose; },
       trajectory.InitialPose(), {0_m, 0_m, wpi::math::Rotation2d{45_deg}},
@@ -215,7 +216,8 @@ TEST(MecanumDrivePoseEstimatorTest, BadInitialPose) {
           kinematics, estimator, trajectory,
           [&](wpi::math::SplineSample& state) {
             return wpi::math::ChassisVelocities{
-                state.ForwardVelocity(), 0_mps, state.ForwardVelocity() * state.curvature};
+                state.ForwardVelocity(), 0_mps,
+                state.ForwardVelocity() * state.curvature};
           },
           [&](wpi::math::SplineSample& state) { return state.pose; },
           initial_pose, {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms,

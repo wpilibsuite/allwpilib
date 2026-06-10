@@ -442,8 +442,8 @@ class TrajectorySampleTest {
     double forwardAccel = 1.5;
     double curvature = 0.25;
     var sample =
-        new SplineSample(0.0, new Pose2d(0, 0, Rotation2d.kCCW_Pi_2), forward, forwardAccel,
-            curvature);
+        new SplineSample(
+            0.0, new Pose2d(0, 0, Rotation2d.kCCW_Pi_2), forward, forwardAccel, curvature);
 
     // Field-relative: forward speed rotated into +y.
     assertEquals(0.0, sample.velocity.vx, EPSILON);

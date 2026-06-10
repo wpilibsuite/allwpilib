@@ -83,10 +83,10 @@ DifferentialSample DifferentialTrajectory::Interpolate(
   Rotation2d heading{wpi::units::radian_t{theta}};
 
   // Reconstruct the field-relative velocity from robot-relative forward speed.
-  ChassisVelocities fieldVelocity =
-      ChassisVelocities{wpi::units::meters_per_second_t{vx}, 0_mps,
-                        wpi::units::radians_per_second_t{omega}}
-          .ToFieldRelative(heading);
+  ChassisVelocities fieldVelocity = ChassisVelocities{
+      wpi::units::meters_per_second_t{vx}, 0_mps,
+      wpi::units::radians_per_second_t{
+          omega}}.ToFieldRelative(heading);
 
   return {interpTime,
           Pose2d{wpi::units::meter_t{x}, wpi::units::meter_t{y}, heading},
@@ -111,11 +111,11 @@ DifferentialTrajectory DifferentialTrajectory::TransformBy(
   transformedSamples.reserve(Samples().size());
 
   // Transform first sample
-  transformedSamples.push_back(DifferentialSample(
-      Start().timestamp, transformedFirstPose,
-      Start().velocity.ToFieldRelative(rotation),
-      Start().acceleration.ToFieldRelative(rotation), Start().leftSpeed,
-      Start().rightSpeed));
+  transformedSamples.push_back(
+      DifferentialSample(Start().timestamp, transformedFirstPose,
+                         Start().velocity.ToFieldRelative(rotation),
+                         Start().acceleration.ToFieldRelative(rotation),
+                         Start().leftSpeed, Start().rightSpeed));
 
   // Transform remaining samples
   for (size_t i = 1; i < Samples().size(); ++i) {

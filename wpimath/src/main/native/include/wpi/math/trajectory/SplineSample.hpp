@@ -43,7 +43,8 @@ class SplineSample {
    *
    * @param time The timestamp of the sample relative to the trajectory start.
    * @param pose The robot pose at this sample (in the field reference frame).
-   * @param vel The robot velocity at this sample (in the field reference frame).
+   * @param vel The robot velocity at this sample (in the field reference
+   * frame).
    * @param acc The robot acceleration at this sample (in the field reference
    *            frame).
    * @param curvature The curvature of the path at this sample, in 1/m.
@@ -61,9 +62,9 @@ class SplineSample {
   /**
    * Constructs a SplineSample from path-relative scalars.
    *
-   * The robot follows the path along its heading, so the scalar forward velocity
-   * and acceleration are rotated into the field frame using the sample's pose.
-   * The resulting velocity and acceleration are field-relative.
+   * The robot follows the path along its heading, so the scalar forward
+   * velocity and acceleration are rotated into the field frame using the
+   * sample's pose. The resulting velocity and acceleration are field-relative.
    *
    * @param timeSeconds The timestamp in seconds.
    * @param pose The robot pose at this sample (in the field reference frame).
@@ -125,7 +126,8 @@ class SplineSample {
    *
    * @return The forward acceleration.
    */
-  constexpr wpi::units::meters_per_second_squared_t ForwardAcceleration() const {
+  constexpr wpi::units::meters_per_second_squared_t ForwardAcceleration()
+      const {
     return acceleration.ToRobotRelative(pose.Rotation()).ax;
   }
 

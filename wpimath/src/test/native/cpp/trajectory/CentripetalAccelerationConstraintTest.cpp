@@ -31,7 +31,8 @@ TEST(CentripetalAccelerationConstraintTest, Constraint) {
     time += dt;
 
     auto centripetalAcceleration =
-        wpi::units::math::pow<2>(point.ForwardVelocity()) * point.curvature / 1_rad;
+        wpi::units::math::pow<2>(point.ForwardVelocity()) * point.curvature /
+        1_rad;
 
     EXPECT_TRUE(centripetalAcceleration <
                 maxCentripetalAcceleration + 0.05_mps_sq);

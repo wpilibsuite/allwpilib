@@ -218,7 +218,9 @@ public final class TrajectoryParameterizer {
       // state. ds is zero at the first state, where there is no preceding
       // segment, so the acceleration there is left at zero.
       double accel =
-          ds == 0.0 ? 0.0 : (state.maxVelocity * state.maxVelocity - velocity * velocity) / (ds * 2);
+          ds == 0.0
+              ? 0.0
+              : (state.maxVelocity * state.maxVelocity - velocity * velocity) / (ds * 2);
       segAccel[i] = accel;
 
       // Calculate dt

@@ -44,9 +44,9 @@ SplineSample SplineTrajectory::Interpolate(const SplineSample& start,
 
   // Calculate the change in position.
   // delta_s = v_0 t + 0.5at²
-  const double newS =
-      (startForwardVelocity * deltaT + 0.5 * startForwardAccel * deltaT * deltaT) *
-      (reversing ? -1.0 : 1.0);
+  const double newS = (startForwardVelocity * deltaT +
+                       0.5 * startForwardAccel * deltaT * deltaT) *
+                      (reversing ? -1.0 : 1.0);
 
   // Return the new state. To find the new position for the new state, we
   // need to interpolate between the two endpoint poses. The fraction for
@@ -77,11 +77,10 @@ SplineTrajectory SplineTrajectory::TransformBy(
   transformedSamples.reserve(Samples().size());
 
   // Transform first sample
-  transformedSamples.push_back(
-      SplineSample(Start().timestamp, transformedFirstPose,
-                   Start().velocity.ToFieldRelative(rotation),
-                   Start().acceleration.ToFieldRelative(rotation),
-                   Start().curvature));
+  transformedSamples.push_back(SplineSample(
+      Start().timestamp, transformedFirstPose,
+      Start().velocity.ToFieldRelative(rotation),
+      Start().acceleration.ToFieldRelative(rotation), Start().curvature));
 
   // Transform remaining samples
   for (size_t i = 1; i < Samples().size(); ++i) {

@@ -116,14 +116,13 @@ constexpr TrajectorySample KinematicInterpolate(const TrajectorySample& start,
       start.velocity.omega + start.acceleration.alpha * deltaT};
 
   // xₖ₊₁ = xₖ + vₖΔt + ½aₖ(Δt)²
-  Pose2d newPose{
-      start.pose.Translation().X() + start.velocity.vx * deltaT +
-          0.5 * start.acceleration.ax * deltaT * deltaT,
-      start.pose.Translation().Y() + start.velocity.vy * deltaT +
-          0.5 * start.acceleration.ay * deltaT * deltaT,
-      Rotation2d{start.pose.Rotation().Radians() +
-                 start.velocity.omega * deltaT +
-                 0.5 * start.acceleration.alpha * deltaT * deltaT}};
+  Pose2d newPose{start.pose.Translation().X() + start.velocity.vx * deltaT +
+                     0.5 * start.acceleration.ax * deltaT * deltaT,
+                 start.pose.Translation().Y() + start.velocity.vy * deltaT +
+                     0.5 * start.acceleration.ay * deltaT * deltaT,
+                 Rotation2d{start.pose.Rotation().Radians() +
+                            start.velocity.omega * deltaT +
+                            0.5 * start.acceleration.alpha * deltaT * deltaT}};
 
   return TrajectorySample{interpTime, newPose, newVel, newAccel};
 }

@@ -11,10 +11,12 @@ using namespace wpi::math;
 
 namespace {
 const DifferentialSample kExpectedData =
-    DifferentialSample{1.5_s, Pose2d{1.1_m, 2.2_m, 30_deg},
+    DifferentialSample{1.5_s,
+                       Pose2d{1.1_m, 2.2_m, 30_deg},
                        ChassisVelocities{1_mps, 2_mps, 3_rad_per_s},
                        ChassisAccelerations{4_mps_sq, 5_mps_sq, 6_rad_per_s_sq},
-                       1.23_mps, 4.56_mps};
+                       1.23_mps,
+                       4.56_mps};
 }  // namespace
 
 TEST(DifferentialSampleProtoTest, Roundtrip) {

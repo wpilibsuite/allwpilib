@@ -128,7 +128,8 @@ class MecanumDriveOdometryTest {
       var groundTruthState = trajectory.sampleAt(t);
 
       trajectoryDistanceTravelled +=
-          groundTruthState.forwardVelocity() * dt + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
+          groundTruthState.forwardVelocity() * dt
+              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
 
       var wheelVelocities =
           kinematics.toWheelVelocities(
@@ -210,7 +211,8 @@ class MecanumDriveOdometryTest {
       var groundTruthState = trajectory.sampleAt(t);
 
       trajectoryDistanceTravelled +=
-          groundTruthState.forwardVelocity() * dt + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
+          groundTruthState.forwardVelocity() * dt
+              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
 
       var wheelVelocities =
           kinematics.toWheelVelocities(

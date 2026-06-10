@@ -26,7 +26,8 @@ TEST(TrajectoryGenerationTest, ObeysConstraints) {
     const SplineSample point = trajectory.SampleAt(time);
     time += dt;
 
-    EXPECT_TRUE(wpi::units::math::abs(point.ForwardVelocity()) <= 12_fps + 0.01_fps);
+    EXPECT_TRUE(wpi::units::math::abs(point.ForwardVelocity()) <=
+                12_fps + 0.01_fps);
     EXPECT_TRUE(wpi::units::math::abs(point.ForwardAcceleration()) <=
                 12_fps_sq + 0.01_fps_sq);
   }

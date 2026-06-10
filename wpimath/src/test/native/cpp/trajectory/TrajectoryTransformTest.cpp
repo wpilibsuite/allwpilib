@@ -32,8 +32,8 @@ void TestSameShapedTrajectory(
 
 // A rigid transform rotates both the heading and the field-relative
 // velocity/acceleration by the same amount, so the heading-relative forward
-// scalars (and curvature) are invariant. This would fail if TransformBy/RelativeTo
-// rotated the pose but not the velocity/acceleration.
+// scalars (and curvature) are invariant. This would fail if
+// TransformBy/RelativeTo rotated the pose but not the velocity/acceleration.
 void TestSameForwardScalars(
     const std::vector<wpi::math::SplineSample>& statesA,
     const std::vector<wpi::math::SplineSample>& statesB) {
@@ -63,8 +63,7 @@ TEST(TrajectoryTransformsTest, TransformBy) {
 
   TestSameShapedTrajectory(trajectory.Samples(),
                            transformedTrajectory.Samples());
-  TestSameForwardScalars(trajectory.Samples(),
-                         transformedTrajectory.Samples());
+  TestSameForwardScalars(trajectory.Samples(), transformedTrajectory.Samples());
 }
 
 TEST(TrajectoryTransformsTest, RelativeTo) {
@@ -83,6 +82,5 @@ TEST(TrajectoryTransformsTest, RelativeTo) {
 
   TestSameShapedTrajectory(trajectory.Samples(),
                            transformedTrajectory.Samples());
-  TestSameForwardScalars(trajectory.Samples(),
-                         transformedTrajectory.Samples());
+  TestSameForwardScalars(trajectory.Samples(), transformedTrajectory.Samples());
 }

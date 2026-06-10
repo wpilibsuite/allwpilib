@@ -256,13 +256,17 @@ class SwerveDriveOdometry3dTest {
       var groundTruthState = trajectory.sampleAt(t);
 
       fl.distance +=
-          groundTruthState.forwardVelocity() * dt + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
+          groundTruthState.forwardVelocity() * dt
+              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
       fr.distance +=
-          groundTruthState.forwardVelocity() * dt + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
+          groundTruthState.forwardVelocity() * dt
+              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
       bl.distance +=
-          groundTruthState.forwardVelocity() * dt + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
+          groundTruthState.forwardVelocity() * dt
+              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
       br.distance +=
-          groundTruthState.forwardVelocity() * dt + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
+          groundTruthState.forwardVelocity() * dt
+              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
 
       fl.angle = groundTruthState.pose.getRotation();
       fr.angle = groundTruthState.pose.getRotation();
