@@ -30,6 +30,24 @@ void TestSameShapedTrajectory(
   }
 }
 
+// A rigid transform rotates both the heading and the field-relative
+// velocity/acceleration by the same amount, so the heading-relative forward
+// scalars (and curvature) are invariant. This would fail if TransformBy/RelativeTo
+// rotated the pose but not the velocity/acceleration.
+void TestSameForwardScalars(
+    const std::vector<wpi::math::SplineSample>& statesA,
+    const std::vector<wpi::math::SplineSample>& statesB) {
+  ASSERT_EQ(statesA.size(), statesB.size());
+  for (unsigned int i = 0; i < statesA.size(); i++) {
+    EXPECT_NEAR(statesA[i].ForwardVelocity().value(),
+                statesB[i].ForwardVelocity().value(), 1E-9);
+    EXPECT_NEAR(statesA[i].ForwardAcceleration().value(),
+                statesB[i].ForwardAcceleration().value(), 1E-9);
+    EXPECT_NEAR(statesA[i].curvature.value(), statesB[i].curvature.value(),
+                1E-9);
+  }
+}
+
 TEST(TrajectoryTransformsTest, TransformBy) {
   wpi::math::TrajectoryConfig config{3_mps, 3_mps_sq};
   auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
@@ -45,6 +63,8 @@ TEST(TrajectoryTransformsTest, TransformBy) {
 
   TestSameShapedTrajectory(trajectory.Samples(),
                            transformedTrajectory.Samples());
+  TestSameForwardScalars(trajectory.Samples(),
+                         transformedTrajectory.Samples());
 }
 
 TEST(TrajectoryTransformsTest, RelativeTo) {
@@ -63,4 +83,6 @@ TEST(TrajectoryTransformsTest, RelativeTo) {
 
   TestSameShapedTrajectory(trajectory.Samples(),
                            transformedTrajectory.Samples());
+  TestSameForwardScalars(trajectory.Samples(),
+                         transformedTrajectory.Samples());
 }

@@ -10,8 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Transform2d;
+import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.util.MathUtil;
 
 class TrajectorySampleTest {
@@ -454,5 +457,102 @@ class TrajectorySampleTest {
     // The projection accessors recover the path-relative scalars.
     assertEquals(forward, sample.forwardVelocity(), EPSILON);
     assertEquals(forwardAccel, sample.forwardAcceleration(), EPSILON);
+  }
+
+  @Test
+  void testTransformRotatesVelocityAndAcceleration() {
+    // Field-relative velocity/acceleration must rotate with the transform's rotation.
+    var sample =
+        new TrajectorySample(
+            0,
+            new Pose2d(0, 0, Rotation2d.kZero),
+            new ChassisVelocities(1, 0, 0.5),
+            new ChassisAccelerations(2, 0, 0.3));
+
+    var transformed =
+        sample.transform(new Transform2d(new Translation2d(3, 4), Rotation2d.kCCW_Pi_2));
+
+    // Pose is transformed.
+    assertEquals(3.0, transformed.pose.getX(), EPSILON);
+    assertEquals(4.0, transformed.pose.getY(), EPSILON);
+    assertEquals(Math.PI / 2, transformed.pose.getRotation().getRadians(), EPSILON);
+
+    // Velocity/acceleration vectors rotate by +90 degrees; angular terms are unchanged.
+    assertEquals(0.0, transformed.velocity.vx, EPSILON);
+    assertEquals(1.0, transformed.velocity.vy, EPSILON);
+    assertEquals(0.5, transformed.velocity.omega, EPSILON);
+    assertEquals(0.0, transformed.acceleration.ax, EPSILON);
+    assertEquals(2.0, transformed.acceleration.ay, EPSILON);
+    assertEquals(0.3, transformed.acceleration.alpha, EPSILON);
+  }
+
+  @Test
+  void testRelativeToRotatesVelocityAndAcceleration() {
+    // relativeTo re-expresses the sample in a frame rotated by the other pose's
+    // rotation, so field-relative velocity/acceleration rotate by the negative of it.
+    var sample =
+        new TrajectorySample(
+            0,
+            new Pose2d(1, 2, Rotation2d.kCCW_Pi_2),
+            new ChassisVelocities(0, 1, 0.5),
+            new ChassisAccelerations(0, 2, 0.3));
+
+    var relative = sample.relativeTo(new Pose2d(1, 2, Rotation2d.kCCW_Pi_2));
+
+    // Pose becomes the origin.
+    assertEquals(0.0, relative.pose.getX(), EPSILON);
+    assertEquals(0.0, relative.pose.getY(), EPSILON);
+    assertEquals(0.0, relative.pose.getRotation().getRadians(), EPSILON);
+
+    // Velocity/acceleration vectors rotate by -90 degrees; angular terms are unchanged.
+    assertEquals(1.0, relative.velocity.vx, EPSILON);
+    assertEquals(0.0, relative.velocity.vy, EPSILON);
+    assertEquals(0.5, relative.velocity.omega, EPSILON);
+    assertEquals(2.0, relative.acceleration.ax, EPSILON);
+    assertEquals(0.0, relative.acceleration.ay, EPSILON);
+    assertEquals(0.3, relative.acceleration.alpha, EPSILON);
+  }
+
+  @Test
+  void testSplineSampleTransformPreservesForwardScalars() {
+    // Rotating the sample rotates both the heading and the field velocity, so the
+    // heading-relative forward scalars (and curvature) are invariant.
+    var sample =
+        new SplineSample(0.0, new Pose2d(1, 2, Rotation2d.fromDegrees(20)), 2.0, 1.5, 0.25);
+
+    var transformed =
+        sample.transform(new Transform2d(new Translation2d(3, 4), Rotation2d.fromDegrees(35)));
+    var relative = sample.relativeTo(new Pose2d(0, 0, Rotation2d.fromDegrees(-15)));
+
+    for (var s : new SplineSample[] {transformed, relative}) {
+      assertEquals(2.0, s.forwardVelocity(), EPSILON);
+      assertEquals(1.5, s.forwardAcceleration(), EPSILON);
+      assertEquals(0.25, s.curvature, EPSILON);
+    }
+  }
+
+  @Test
+  void testDifferentialSampleTransformPreservesWheelSpeeds() {
+    // Wheel speeds are frame-invariant, so they survive a transform unchanged while
+    // the field-relative velocity rotates.
+    var kinematics = new DifferentialDriveKinematics(0.5);
+    var sample =
+        new DifferentialSample(
+            0.0,
+            new Pose2d(0, 0, Rotation2d.kZero),
+            new ChassisVelocities(2, 0, 0.5),
+            new ChassisAccelerations(1, 0, 0.2),
+            kinematics);
+
+    var transformed =
+        sample.transform(new Transform2d(new Translation2d(0, 0), Rotation2d.kCCW_Pi_2));
+
+    assertEquals(sample.leftSpeed, transformed.leftSpeed, EPSILON);
+    assertEquals(sample.rightSpeed, transformed.rightSpeed, EPSILON);
+
+    // The field velocity rotates by +90 degrees.
+    assertEquals(0.0, transformed.velocity.vx, EPSILON);
+    assertEquals(2.0, transformed.velocity.vy, EPSILON);
+    assertEquals(0.5, transformed.velocity.omega, EPSILON);
   }
 }

@@ -30,6 +30,7 @@ class TrajectoryTransformTest {
         new Pose2d(1, 2, Rotation2d.fromDegrees(30)), transformedTrajectory.sampleAt(0).pose);
 
     testSameShapedTrajectory(trajectory.samples, transformedTrajectory.samples);
+    testSameForwardScalars(trajectory.samples, transformedTrajectory.samples);
   }
 
   @Test
@@ -48,6 +49,20 @@ class TrajectoryTransformTest {
     assertEquals(Pose2d.kZero, transformedTrajectory.sampleAt(0).pose);
 
     testSameShapedTrajectory(trajectory.samples, transformedTrajectory.samples);
+    testSameForwardScalars(trajectory.samples, transformedTrajectory.samples);
+  }
+
+  // A rigid transform rotates both the heading and the field-relative velocity/acceleration by the
+  // same amount, so the heading-relative forward scalars (and curvature) are invariant. This would
+  // fail if transformBy/relativeTo rotated the pose but not the velocity/acceleration.
+  void testSameForwardScalars(List<SplineSample> statesA, List<SplineSample> statesB) {
+    assertEquals(statesA.size(), statesB.size());
+    for (int i = 0; i < statesA.size(); i++) {
+      assertEquals(statesA.get(i).forwardVelocity(), statesB.get(i).forwardVelocity(), 1e-9);
+      assertEquals(
+          statesA.get(i).forwardAcceleration(), statesB.get(i).forwardAcceleration(), 1e-9);
+      assertEquals(statesA.get(i).curvature, statesB.get(i).curvature, 1e-9);
+    }
   }
 
   void testSameShapedTrajectory(List<SplineSample> statesA, List<SplineSample> statesB) {
