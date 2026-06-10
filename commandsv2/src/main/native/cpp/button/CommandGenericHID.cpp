@@ -6,10 +6,12 @@
 
 #include <array>
 #include <memory>
+#include <mutex>
 
 using namespace wpi::cmd;
 
 namespace {
+std::mutex hidsMutex;
 std::array<std::unique_ptr<CommandGenericHID>,
            wpi::internal::DriverStationBackend::JOYSTICK_PORTS>
     hids;
@@ -21,9 +23,11 @@ CommandGenericHID::CommandGenericHID(int port)
 CommandGenericHID::CommandGenericHID(wpi::GenericHID& hid) : m_hid{&hid} {}
 
 CommandGenericHID& CommandGenericHID::GetCommandGenericHID(int port) {
-  wpi::DriverStation::GetGenericHID(port);
+  auto& hid = wpi::DriverStation::GetGenericHID(port);
+  std::scoped_lock lock{hidsMutex};
+
   if (!hids[port]) {
-    hids[port] = std::make_unique<CommandGenericHID>(port);
+    hids[port] = std::make_unique<CommandGenericHID>(hid);
   }
 
   return *hids[port];

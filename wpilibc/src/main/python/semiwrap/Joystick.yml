@@ -21,6 +21,10 @@ classes:
             - [1, 2]
       GetHID:
         return_value_policy: reference_internal
+        overloads:
+          "":
+          '[const]':
+            ignore: true
       SetXChannel:
       SetYChannel:
       SetZChannel:
