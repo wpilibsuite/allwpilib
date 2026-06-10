@@ -165,17 +165,8 @@ public class Gamepad implements HIDDevice, Sendable {
    * @return the wrapped GenericHID object
    */
   @Override
-  public GenericHID getGenericHID() {
-    return m_hid;
-  }
-
-  /**
-   * Get the underlying GenericHID object.
-   *
-   * @return the wrapped GenericHID object
-   */
   public GenericHID getHID() {
-    return getGenericHID();
+    return m_hid;
   }
 
   /**

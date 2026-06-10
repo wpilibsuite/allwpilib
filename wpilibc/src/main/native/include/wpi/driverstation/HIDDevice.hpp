@@ -18,14 +18,14 @@ class HIDDevice {
    *
    * @return the wrapped GenericHID object
    */
-  virtual GenericHID& GetGenericHID() = 0;
+  virtual GenericHID& GetHID() = 0;
 
   /**
    * Get the underlying GenericHID object.
    *
    * @return the wrapped GenericHID object
    */
-  virtual const GenericHID& GetGenericHID() const = 0;
+  virtual const GenericHID& GetHID() const = 0;
 };
 
 }  // namespace wpi

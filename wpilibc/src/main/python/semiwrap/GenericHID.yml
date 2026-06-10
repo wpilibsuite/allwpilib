@@ -1,5 +1,4 @@
 extra_includes:
-- wpi/driverstation/internal/DriverStationBackend.hpp
 - wpi/event/BooleanEvent.hpp
 
 classes:
@@ -47,7 +46,7 @@ classes:
       GetButtonsAvailable:
       GetTouchpadFingerAvailable:
       GetTouchpadFinger:
-      GetGenericHID:
+      GetHID:
         overloads:
           "":
           '[const]':

@@ -1,5 +1,4 @@
 extra_includes:
-- wpi/driverstation/internal/DriverStationBackend.hpp
 - wpi/event/BooleanEvent.hpp
 
 classes:
@@ -19,10 +18,7 @@ classes:
         overloads:
           int:
           GenericHID&:
-            keepalive:
-            - [1, 2]
       GetHID:
-        return_value_policy: reference_internal
         overloads:
           "":
           '[const]':
@@ -53,11 +49,6 @@ classes:
       GetMagnitude:
       GetDirection:
         rename: getDirectionRadians
-      GetGenericHID:
-        overloads:
-          "":
-          '[const]':
-            ignore: true
       GetRawButton:
       GetRawButtonPressed:
       GetRawButtonReleased:

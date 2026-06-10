@@ -96,14 +96,14 @@ class GenericHID : public HIDDevice {
    *
    * @return this GenericHID object
    */
-  GenericHID& GetGenericHID() override { return *this; }
+  GenericHID& GetHID() override { return *this; }
 
   /**
    * Get this GenericHID object.
    *
    * @return this GenericHID object
    */
-  const GenericHID& GetGenericHID() const override { return *this; }
+  const GenericHID& GetHID() const override { return *this; }
 
   GenericHID(GenericHID&&) = default;
   GenericHID& operator=(GenericHID&&) = default;

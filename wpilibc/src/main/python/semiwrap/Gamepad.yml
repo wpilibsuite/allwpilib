@@ -1,6 +1,5 @@
 extra_includes:
 - wpi/util/sendable/SendableBuilder.hpp
-- wpi/driverstation/internal/DriverStationBackend.hpp
 - wpi/event/BooleanEvent.hpp
 
 classes:
@@ -16,10 +15,7 @@ classes:
         overloads:
           int:
           GenericHID&:
-            keepalive:
-            - [1, 2]
       GetHID:
-        return_value_policy: reference_internal
         overloads:
           "":
           '[const]':
@@ -168,8 +164,3 @@ classes:
       GetTouchpadFingerAvailable:
       GetTouchpadFinger:
       InitSendable:
-      GetGenericHID:
-        overloads:
-          "":
-          '[const]':
-            ignore: true

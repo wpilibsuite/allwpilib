@@ -42,6 +42,6 @@ class POVButton : public Trigger {
    */
   POVButton(wpi::HIDDevice* joystick, wpi::POVDirection angle,
             int povNumber = 0)
-      : POVButton(&joystick->GetGenericHID(), angle, povNumber) {}
+      : POVButton(&joystick->GetHID(), angle, povNumber) {}
 };
 }  // namespace wpi::cmd

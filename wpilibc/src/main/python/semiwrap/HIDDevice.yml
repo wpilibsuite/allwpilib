@@ -5,7 +5,7 @@ classes:
   wpi::HIDDevice:
     force_no_default_constructor: true
     methods:
-      GetGenericHID:
+      GetHID:
         overloads:
           "":
           '[const]':

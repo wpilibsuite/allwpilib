@@ -12,5 +12,5 @@ public interface HIDDevice {
    *
    * @return the wrapped GenericHID object
    */
-  GenericHID getGenericHID();
+  GenericHID getHID();
 }

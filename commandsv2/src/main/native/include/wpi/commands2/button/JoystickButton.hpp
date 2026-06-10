@@ -36,6 +36,6 @@ class JoystickButton : public Trigger {
    * @param buttonNumber The number of the button on the HID device.
    */
   explicit JoystickButton(wpi::HIDDevice* joystick, int buttonNumber)
-      : JoystickButton(&joystick->GetGenericHID(), buttonNumber) {}
+      : JoystickButton(&joystick->GetHID(), buttonNumber) {}
 };
 }  // namespace wpi::cmd

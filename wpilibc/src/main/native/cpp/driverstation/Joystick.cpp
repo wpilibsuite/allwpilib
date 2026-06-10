@@ -32,14 +32,6 @@ const GenericHID& Joystick::GetHID() const {
   return *m_hid;
 }
 
-GenericHID& Joystick::GetGenericHID() {
-  return GetHID();
-}
-
-const GenericHID& Joystick::GetGenericHID() const {
-  return GetHID();
-}
-
 void Joystick::SetXChannel(int channel) {
   m_axes[Axis::kX] = channel;
 }

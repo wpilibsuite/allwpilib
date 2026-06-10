@@ -33,6 +33,6 @@ public class JoystickButton extends Trigger {
    * @param buttonNumber The button number (see {@link GenericHID#getRawButton(int) }
    */
   public JoystickButton(HIDDevice joystick, int buttonNumber) {
-    this(requireNonNullParam(joystick, "joystick", "JoystickButton").getGenericHID(), buttonNumber);
+    this(requireNonNullParam(joystick, "joystick", "JoystickButton").getHID(), buttonNumber);
   }
 }

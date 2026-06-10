@@ -142,7 +142,7 @@ public class GenericHID implements HIDDevice {
    * @return this GenericHID object
    */
   @Override
-  public GenericHID getGenericHID() {
+  public GenericHID getHID() {
     return this;
   }
 

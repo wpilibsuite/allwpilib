@@ -86,28 +86,14 @@ class Joystick : public HIDDevice {
    *
    * @return the wrapped GenericHID object
    */
-  GenericHID& GetHID();
+  GenericHID& GetHID() override;
 
   /**
    * Get the underlying GenericHID object.
    *
    * @return the wrapped GenericHID object
    */
-  const GenericHID& GetHID() const;
-
-  /**
-   * Get the underlying GenericHID object.
-   *
-   * @return the wrapped GenericHID object
-   */
-  GenericHID& GetGenericHID() override;
-
-  /**
-   * Get the underlying GenericHID object.
-   *
-   * @return the wrapped GenericHID object
-   */
-  const GenericHID& GetGenericHID() const override;
+  const GenericHID& GetHID() const override;
 
   /**
    * Set the channel associated with the X axis.
