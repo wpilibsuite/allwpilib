@@ -7,9 +7,9 @@ classes:
   wpi::DriverStation:
     methods:
       GetGenericHID:
-        return_value_policy: reference
+        return_value_policy: reference_internal
       GetGamepad:
-        return_value_policy: reference
+        return_value_policy: reference_internal
       ProvideRefreshedDataEventHandle:
       RemoveRefreshedDataEventHandle:
       StartDataLog:

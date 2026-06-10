@@ -23,7 +23,7 @@ import org.wpilib.math.util.Pair;
  *
  * @see GenericHID
  */
-public class CommandGenericHID {
+public final class CommandGenericHID {
   private static final Lock m_hidsLock = new ReentrantLock();
   private static final Map<Scheduler, CommandGenericHID[]> m_hids = new IdentityHashMap<>();
 

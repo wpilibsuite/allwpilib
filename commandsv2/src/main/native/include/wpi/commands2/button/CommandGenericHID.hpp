@@ -19,7 +19,7 @@ namespace wpi::cmd {
  *
  * @see GenericHID
  */
-class CommandGenericHID {
+class CommandGenericHID final {
  public:
   /**
    * Construct an instance of a device.

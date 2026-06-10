@@ -18,12 +18,6 @@ namespace wpi {
 class BooleanEvent;
 class EventLoop;
 class DriverStation;
-class NiDsXboxController;
-class NiDsPS4Controller;
-class NiDsPS5Controller;
-class NiDsStadiaController;
-class GenericHIDGetter;
-
 /**
  * Handle input from standard HID devices connected to the Driver Station.
  *
@@ -32,14 +26,10 @@ class GenericHIDGetter;
  * single class instance for each device and the mapping of ports to hardware
  * buttons depends on the code in the Driver Station.
  */
-class GenericHID : public HIDDevice {
+class GenericHID final : public HIDDevice {
  public:
   friend class DriverStation;
-  friend class NiDsXboxController;
-  friend class NiDsPS4Controller;
-  friend class NiDsPS5Controller;
-  friend class NiDsStadiaController;
-  friend class GenericHIDGetter;
+  friend class internal::DriverStationBackend;
 
   /**
    * Represents a rumble output on the Joystick.

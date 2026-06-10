@@ -10,6 +10,15 @@ classes:
     - wpi::util::SendableHelper<NiDsXboxController>
     methods:
       NiDsXboxController:
+        overloads:
+          int:
+          GenericHID&:
+      GetHID:
+        overloads:
+          "":
+            return_value_policy: reference_internal
+          '[const]':
+            ignore: true
       GetLeftX:
       GetRightX:
       GetLeftY:
@@ -64,6 +73,12 @@ classes:
       GetRightBumperButton:
       GetRightBumperButtonPressed:
       GetRightBumperButtonReleased:
+      IsConnected:
+      GetGamepadType:
+      GetSupportedOutputs:
+      GetName:
+      GetPort:
+      SetRumble:
       InitSendable:
   wpi::NiDsXboxController::Button:
     attributes:

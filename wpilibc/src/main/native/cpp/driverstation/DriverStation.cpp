@@ -56,3 +56,14 @@ Gamepad& DriverStation::GetGamepad(int port) {
 
   return *gamepads[port];
 }
+
+void wpi::internal::DriverStationBackend::ResetCachedHIDData() {
+  std::scoped_lock lock{dsMutex};
+
+  for (auto& gamepad : gamepads) {
+    gamepad.reset();
+  }
+  for (auto& hid : hids) {
+    hid.reset();
+  }
+}

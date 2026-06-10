@@ -9,6 +9,15 @@ classes:
     - wpi::util::SendableHelper<NiDsPS4Controller>
     methods:
       NiDsPS4Controller:
+        overloads:
+          int:
+          GenericHID&:
+      GetHID:
+        overloads:
+          "":
+            return_value_policy: reference_internal
+          '[const]':
+            ignore: true
       GetLeftX:
       GetRightX:
       GetLeftY:
@@ -71,6 +80,12 @@ classes:
       GetTouchpadButton:
       GetTouchpadButtonPressed:
       GetTouchpadButtonReleased:
+      IsConnected:
+      GetGamepadType:
+      GetSupportedOutputs:
+      GetName:
+      GetPort:
+      SetRumble:
       InitSendable:
   wpi::NiDsPS4Controller::Button:
     attributes:

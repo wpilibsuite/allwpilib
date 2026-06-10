@@ -21,6 +21,7 @@ classes:
       GetHID:
         overloads:
           "":
+            return_value_policy: reference_internal
           '[const]':
             ignore: true
       SetXChannel:

@@ -6,51 +6,63 @@
 
 #include "wpi/driverstation/NiDsPS5Controller.hpp"
 
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/event/BooleanEvent.hpp"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-#include "wpi/event/BooleanEvent.hpp"
-
 using namespace wpi;
 
-NiDsPS5Controller::NiDsPS5Controller(int port) : GenericHID(port) {
-  HAL_ReportUsage("HID", port, "NiDsPS5Controller");
+NiDsPS5Controller::NiDsPS5Controller(int port)
+    : NiDsPS5Controller{DriverStation::GetGenericHID(port)} {}
+
+NiDsPS5Controller::NiDsPS5Controller(GenericHID& hid)
+    : m_hid{&hid} {
+  HAL_ReportUsage("HID", hid.GetPort(), "NiDsPS5Controller");
+}
+
+GenericHID& NiDsPS5Controller::GetHID() {
+  return *m_hid;
+}
+
+const GenericHID& NiDsPS5Controller::GetHID() const {
+  return *m_hid;
 }
 
 double NiDsPS5Controller::GetLeftX() const {
-  return GetRawAxis(Axis::kLeftX);
+  return m_hid->GetRawAxis(Axis::kLeftX);
 }
 
 double NiDsPS5Controller::GetLeftY() const {
-  return GetRawAxis(Axis::kLeftY);
+  return m_hid->GetRawAxis(Axis::kLeftY);
 }
 
 double NiDsPS5Controller::GetRightX() const {
-  return GetRawAxis(Axis::kRightX);
+  return m_hid->GetRawAxis(Axis::kRightX);
 }
 
 double NiDsPS5Controller::GetRightY() const {
-  return GetRawAxis(Axis::kRightY);
+  return m_hid->GetRawAxis(Axis::kRightY);
 }
 
 double NiDsPS5Controller::GetL2Axis() const {
-  return GetRawAxis(Axis::kL2);
+  return m_hid->GetRawAxis(Axis::kL2);
 }
 
 double NiDsPS5Controller::GetR2Axis() const {
-  return GetRawAxis(Axis::kR2);
+  return m_hid->GetRawAxis(Axis::kR2);
 }
 
 bool NiDsPS5Controller::GetSquareButton() const {
-  return GetRawButton(Button::kSquare);
+  return m_hid->GetRawButton(Button::kSquare);
 }
 
 bool NiDsPS5Controller::GetSquareButtonPressed() {
-  return GetRawButtonPressed(Button::kSquare);
+  return m_hid->GetRawButtonPressed(Button::kSquare);
 }
 
 bool NiDsPS5Controller::GetSquareButtonReleased() {
-  return GetRawButtonReleased(Button::kSquare);
+  return m_hid->GetRawButtonReleased(Button::kSquare);
 }
 
 BooleanEvent NiDsPS5Controller::Square(EventLoop* loop) const {
@@ -58,15 +70,15 @@ BooleanEvent NiDsPS5Controller::Square(EventLoop* loop) const {
 }
 
 bool NiDsPS5Controller::GetCrossButton() const {
-  return GetRawButton(Button::kCross);
+  return m_hid->GetRawButton(Button::kCross);
 }
 
 bool NiDsPS5Controller::GetCrossButtonPressed() {
-  return GetRawButtonPressed(Button::kCross);
+  return m_hid->GetRawButtonPressed(Button::kCross);
 }
 
 bool NiDsPS5Controller::GetCrossButtonReleased() {
-  return GetRawButtonReleased(Button::kCross);
+  return m_hid->GetRawButtonReleased(Button::kCross);
 }
 
 BooleanEvent NiDsPS5Controller::Cross(EventLoop* loop) const {
@@ -74,15 +86,15 @@ BooleanEvent NiDsPS5Controller::Cross(EventLoop* loop) const {
 }
 
 bool NiDsPS5Controller::GetCircleButton() const {
-  return GetRawButton(Button::kCircle);
+  return m_hid->GetRawButton(Button::kCircle);
 }
 
 bool NiDsPS5Controller::GetCircleButtonPressed() {
-  return GetRawButtonPressed(Button::kCircle);
+  return m_hid->GetRawButtonPressed(Button::kCircle);
 }
 
 bool NiDsPS5Controller::GetCircleButtonReleased() {
-  return GetRawButtonReleased(Button::kCircle);
+  return m_hid->GetRawButtonReleased(Button::kCircle);
 }
 
 BooleanEvent NiDsPS5Controller::Circle(EventLoop* loop) const {
@@ -90,15 +102,15 @@ BooleanEvent NiDsPS5Controller::Circle(EventLoop* loop) const {
 }
 
 bool NiDsPS5Controller::GetTriangleButton() const {
-  return GetRawButton(Button::kTriangle);
+  return m_hid->GetRawButton(Button::kTriangle);
 }
 
 bool NiDsPS5Controller::GetTriangleButtonPressed() {
-  return GetRawButtonPressed(Button::kTriangle);
+  return m_hid->GetRawButtonPressed(Button::kTriangle);
 }
 
 bool NiDsPS5Controller::GetTriangleButtonReleased() {
-  return GetRawButtonReleased(Button::kTriangle);
+  return m_hid->GetRawButtonReleased(Button::kTriangle);
 }
 
 BooleanEvent NiDsPS5Controller::Triangle(EventLoop* loop) const {
@@ -106,15 +118,15 @@ BooleanEvent NiDsPS5Controller::Triangle(EventLoop* loop) const {
 }
 
 bool NiDsPS5Controller::GetL1Button() const {
-  return GetRawButton(Button::kL1);
+  return m_hid->GetRawButton(Button::kL1);
 }
 
 bool NiDsPS5Controller::GetL1ButtonPressed() {
-  return GetRawButtonPressed(Button::kL1);
+  return m_hid->GetRawButtonPressed(Button::kL1);
 }
 
 bool NiDsPS5Controller::GetL1ButtonReleased() {
-  return GetRawButtonReleased(Button::kL1);
+  return m_hid->GetRawButtonReleased(Button::kL1);
 }
 
 BooleanEvent NiDsPS5Controller::L1(EventLoop* loop) const {
@@ -122,15 +134,15 @@ BooleanEvent NiDsPS5Controller::L1(EventLoop* loop) const {
 }
 
 bool NiDsPS5Controller::GetR1Button() const {
-  return GetRawButton(Button::kR1);
+  return m_hid->GetRawButton(Button::kR1);
 }
 
 bool NiDsPS5Controller::GetR1ButtonPressed() {
-  return GetRawButtonPressed(Button::kR1);
+  return m_hid->GetRawButtonPressed(Button::kR1);
 }
 
 bool NiDsPS5Controller::GetR1ButtonReleased() {
-  return GetRawButtonReleased(Button::kR1);
+  return m_hid->GetRawButtonReleased(Button::kR1);
 }
 
 BooleanEvent NiDsPS5Controller::R1(EventLoop* loop) const {
@@ -138,15 +150,15 @@ BooleanEvent NiDsPS5Controller::R1(EventLoop* loop) const {
 }
 
 bool NiDsPS5Controller::GetL2Button() const {
-  return GetRawButton(Button::kL2);
+  return m_hid->GetRawButton(Button::kL2);
 }
 
 bool NiDsPS5Controller::GetL2ButtonPressed() {
-  return GetRawButtonPressed(Button::kL2);
+  return m_hid->GetRawButtonPressed(Button::kL2);
 }
 
 bool NiDsPS5Controller::GetL2ButtonReleased() {
-  return GetRawButtonReleased(Button::kL2);
+  return m_hid->GetRawButtonReleased(Button::kL2);
 }
 
 BooleanEvent NiDsPS5Controller::L2(EventLoop* loop) const {
@@ -154,15 +166,15 @@ BooleanEvent NiDsPS5Controller::L2(EventLoop* loop) const {
 }
 
 bool NiDsPS5Controller::GetR2Button() const {
-  return GetRawButton(Button::kR2);
+  return m_hid->GetRawButton(Button::kR2);
 }
 
 bool NiDsPS5Controller::GetR2ButtonPressed() {
-  return GetRawButtonPressed(Button::kR2);
+  return m_hid->GetRawButtonPressed(Button::kR2);
 }
 
 bool NiDsPS5Controller::GetR2ButtonReleased() {
-  return GetRawButtonReleased(Button::kR2);
+  return m_hid->GetRawButtonReleased(Button::kR2);
 }
 
 BooleanEvent NiDsPS5Controller::R2(EventLoop* loop) const {
@@ -170,15 +182,15 @@ BooleanEvent NiDsPS5Controller::R2(EventLoop* loop) const {
 }
 
 bool NiDsPS5Controller::GetCreateButton() const {
-  return GetRawButton(Button::kCreate);
+  return m_hid->GetRawButton(Button::kCreate);
 }
 
 bool NiDsPS5Controller::GetCreateButtonPressed() {
-  return GetRawButtonPressed(Button::kCreate);
+  return m_hid->GetRawButtonPressed(Button::kCreate);
 }
 
 bool NiDsPS5Controller::GetCreateButtonReleased() {
-  return GetRawButtonReleased(Button::kCreate);
+  return m_hid->GetRawButtonReleased(Button::kCreate);
 }
 
 BooleanEvent NiDsPS5Controller::Create(EventLoop* loop) const {
@@ -186,15 +198,15 @@ BooleanEvent NiDsPS5Controller::Create(EventLoop* loop) const {
 }
 
 bool NiDsPS5Controller::GetOptionsButton() const {
-  return GetRawButton(Button::kOptions);
+  return m_hid->GetRawButton(Button::kOptions);
 }
 
 bool NiDsPS5Controller::GetOptionsButtonPressed() {
-  return GetRawButtonPressed(Button::kOptions);
+  return m_hid->GetRawButtonPressed(Button::kOptions);
 }
 
 bool NiDsPS5Controller::GetOptionsButtonReleased() {
-  return GetRawButtonReleased(Button::kOptions);
+  return m_hid->GetRawButtonReleased(Button::kOptions);
 }
 
 BooleanEvent NiDsPS5Controller::Options(EventLoop* loop) const {
@@ -202,15 +214,15 @@ BooleanEvent NiDsPS5Controller::Options(EventLoop* loop) const {
 }
 
 bool NiDsPS5Controller::GetL3Button() const {
-  return GetRawButton(Button::kL3);
+  return m_hid->GetRawButton(Button::kL3);
 }
 
 bool NiDsPS5Controller::GetL3ButtonPressed() {
-  return GetRawButtonPressed(Button::kL3);
+  return m_hid->GetRawButtonPressed(Button::kL3);
 }
 
 bool NiDsPS5Controller::GetL3ButtonReleased() {
-  return GetRawButtonReleased(Button::kL3);
+  return m_hid->GetRawButtonReleased(Button::kL3);
 }
 
 BooleanEvent NiDsPS5Controller::L3(EventLoop* loop) const {
@@ -218,15 +230,15 @@ BooleanEvent NiDsPS5Controller::L3(EventLoop* loop) const {
 }
 
 bool NiDsPS5Controller::GetR3Button() const {
-  return GetRawButton(Button::kR3);
+  return m_hid->GetRawButton(Button::kR3);
 }
 
 bool NiDsPS5Controller::GetR3ButtonPressed() {
-  return GetRawButtonPressed(Button::kR3);
+  return m_hid->GetRawButtonPressed(Button::kR3);
 }
 
 bool NiDsPS5Controller::GetR3ButtonReleased() {
-  return GetRawButtonReleased(Button::kR3);
+  return m_hid->GetRawButtonReleased(Button::kR3);
 }
 
 BooleanEvent NiDsPS5Controller::R3(EventLoop* loop) const {
@@ -234,15 +246,15 @@ BooleanEvent NiDsPS5Controller::R3(EventLoop* loop) const {
 }
 
 bool NiDsPS5Controller::GetPSButton() const {
-  return GetRawButton(Button::kPS);
+  return m_hid->GetRawButton(Button::kPS);
 }
 
 bool NiDsPS5Controller::GetPSButtonPressed() {
-  return GetRawButtonPressed(Button::kPS);
+  return m_hid->GetRawButtonPressed(Button::kPS);
 }
 
 bool NiDsPS5Controller::GetPSButtonReleased() {
-  return GetRawButtonReleased(Button::kPS);
+  return m_hid->GetRawButtonReleased(Button::kPS);
 }
 
 BooleanEvent NiDsPS5Controller::PS(EventLoop* loop) const {
@@ -250,42 +262,87 @@ BooleanEvent NiDsPS5Controller::PS(EventLoop* loop) const {
 }
 
 bool NiDsPS5Controller::GetTouchpadButton() const {
-  return GetRawButton(Button::kTouchpad);
+  return m_hid->GetRawButton(Button::kTouchpad);
 }
 
 bool NiDsPS5Controller::GetTouchpadButtonPressed() {
-  return GetRawButtonPressed(Button::kTouchpad);
+  return m_hid->GetRawButtonPressed(Button::kTouchpad);
 }
 
 bool NiDsPS5Controller::GetTouchpadButtonReleased() {
-  return GetRawButtonReleased(Button::kTouchpad);
+  return m_hid->GetRawButtonReleased(Button::kTouchpad);
 }
 
 BooleanEvent NiDsPS5Controller::Touchpad(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetTouchpadButton(); });
 }
 
+bool NiDsPS5Controller::IsConnected() const {
+  return m_hid->IsConnected();
+}
+
+GenericHID::HIDType NiDsPS5Controller::GetGamepadType() const {
+  return m_hid->GetGamepadType();
+}
+
+GenericHID::SupportedOutputs NiDsPS5Controller::GetSupportedOutputs() const {
+  return m_hid->GetSupportedOutputs();
+}
+
+std::string NiDsPS5Controller::GetName() const {
+  return m_hid->GetName();
+}
+
+int NiDsPS5Controller::GetPort() const {
+  return m_hid->GetPort();
+}
+
+void NiDsPS5Controller::SetRumble(GenericHID::RumbleType type,
+                              double value) {
+  m_hid->SetRumble(type, value);
+}
+
 void NiDsPS5Controller::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "NiDsPS5");
-  builder.AddDoubleProperty("L2 Axis", [this] { return GetL2Axis(); }, nullptr);
-  builder.AddDoubleProperty("R2 Axis", [this] { return GetR2Axis(); }, nullptr);
-  builder.AddDoubleProperty("LeftX", [this] { return GetLeftX(); }, nullptr);
-  builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);
-  builder.AddDoubleProperty("RightX", [this] { return GetRightX(); }, nullptr);
-  builder.AddDoubleProperty("RightY", [this] { return GetRightY(); }, nullptr);
-  builder.AddBooleanProperty("Square", [this] { return GetSquareButton(); }, nullptr);
-  builder.AddBooleanProperty("Cross", [this] { return GetCrossButton(); }, nullptr);
-  builder.AddBooleanProperty("Circle", [this] { return GetCircleButton(); }, nullptr);
-  builder.AddBooleanProperty("Triangle", [this] { return GetTriangleButton(); }, nullptr);
-  builder.AddBooleanProperty("L1", [this] { return GetL1Button(); }, nullptr);
-  builder.AddBooleanProperty("R1", [this] { return GetR1Button(); }, nullptr);
-  builder.AddBooleanProperty("L2", [this] { return GetL2Button(); }, nullptr);
-  builder.AddBooleanProperty("R2", [this] { return GetR2Button(); }, nullptr);
-  builder.AddBooleanProperty("Create", [this] { return GetCreateButton(); }, nullptr);
-  builder.AddBooleanProperty("Options", [this] { return GetOptionsButton(); }, nullptr);
-  builder.AddBooleanProperty("L3", [this] { return GetL3Button(); }, nullptr);
-  builder.AddBooleanProperty("R3", [this] { return GetR3Button(); }, nullptr);
-  builder.AddBooleanProperty("PS", [this] { return GetPSButton(); }, nullptr);
-  builder.AddBooleanProperty("Touchpad", [this] { return GetTouchpadButton(); }, nullptr);
+  builder.AddDoubleProperty("L2 Axis",
+                            [this] { return GetL2Axis(); }, nullptr);
+  builder.AddDoubleProperty("R2 Axis",
+                            [this] { return GetR2Axis(); }, nullptr);
+  builder.AddDoubleProperty("LeftX",
+                            [this] { return GetLeftX(); }, nullptr);
+  builder.AddDoubleProperty("LeftY",
+                            [this] { return GetLeftY(); }, nullptr);
+  builder.AddDoubleProperty("RightX",
+                            [this] { return GetRightX(); }, nullptr);
+  builder.AddDoubleProperty("RightY",
+                            [this] { return GetRightY(); }, nullptr);
+  builder.AddBooleanProperty("Square",
+                             [this] { return GetSquareButton(); }, nullptr);
+  builder.AddBooleanProperty("Cross",
+                             [this] { return GetCrossButton(); }, nullptr);
+  builder.AddBooleanProperty("Circle",
+                             [this] { return GetCircleButton(); }, nullptr);
+  builder.AddBooleanProperty("Triangle",
+                             [this] { return GetTriangleButton(); }, nullptr);
+  builder.AddBooleanProperty("L1",
+                             [this] { return GetL1Button(); }, nullptr);
+  builder.AddBooleanProperty("R1",
+                             [this] { return GetR1Button(); }, nullptr);
+  builder.AddBooleanProperty("L2",
+                             [this] { return GetL2Button(); }, nullptr);
+  builder.AddBooleanProperty("R2",
+                             [this] { return GetR2Button(); }, nullptr);
+  builder.AddBooleanProperty("Create",
+                             [this] { return GetCreateButton(); }, nullptr);
+  builder.AddBooleanProperty("Options",
+                             [this] { return GetOptionsButton(); }, nullptr);
+  builder.AddBooleanProperty("L3",
+                             [this] { return GetL3Button(); }, nullptr);
+  builder.AddBooleanProperty("R3",
+                             [this] { return GetR3Button(); }, nullptr);
+  builder.AddBooleanProperty("PS",
+                             [this] { return GetPSButton(); }, nullptr);
+  builder.AddBooleanProperty("Touchpad",
+                             [this] { return GetTouchpadButton(); }, nullptr);
 }

@@ -6,20 +6,14 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/simulation/GenericHIDSim.hpp"
-
-namespace wpi {
-class GenericHIDGetter {
- public:
-  static GenericHID Get(int port) { return GenericHID(port); }
-};
-}  // namespace wpi
 
 using namespace wpi;
 using RumbleType = GenericHID::RumbleType;
 static constexpr double kEpsilon = 0.0001;
 TEST(GenericHIDTest, RumbleRange) {
-  GenericHID hid = GenericHIDGetter::Get(0);
+  GenericHID hid = internal::DriverStationBackend::ConstructGenericHID(0);
   sim::GenericHIDSim sim{0};
 
   for (int i = 0; i <= 100; i++) {
@@ -41,7 +35,7 @@ TEST(GenericHIDTest, RumbleRange) {
 }
 
 TEST(GenericHIDTest, RumbleTypes) {
-  GenericHID hid = GenericHIDGetter::Get(0);
+  GenericHID hid = internal::DriverStationBackend::ConstructGenericHID(0);
   sim::GenericHIDSim sim{0};
 
   // Make sure all are off
