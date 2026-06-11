@@ -13,6 +13,8 @@ namespace wpi {
 
 /**
  * Provides access to the Driver Station display.
+ *
+ * Line mode is the default display mode.
  */
 class DriverStationDisplay final {
  public:
@@ -20,6 +22,8 @@ class DriverStationDisplay final {
 
   /**
    * Sets the display to line mode and clears any pending display lines.
+   *
+   * Line mode is the default display mode.
    */
   static void SetLineMode() {
     HAL_SetDisplayLineMode();

@@ -6,11 +6,19 @@ package org.wpilib.driverstation;
 
 import org.wpilib.hardware.hal.DriverStationJNI;
 
-/** Provides access to the Driver Station display. */
+/**
+ * Provides access to the Driver Station display.
+ *
+ * <p>Line mode is the default display mode.
+ */
 public final class DriverStationDisplay {
   private DriverStationDisplay() {}
 
-  /** Sets the display to line mode and clears any pending display lines. */
+  /**
+   * Sets the display to line mode and clears any pending display lines.
+   *
+   * <p>Line mode is the default display mode.
+   */
   public static void setLineMode() {
     DriverStationJNI.setDisplayLineMode();
   }

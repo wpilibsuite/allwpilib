@@ -317,6 +317,8 @@ void HAL_ObserveUserProgram(HAL_ControlWord word);
 
 /**
  * Sets the display to line mode.
+ *
+ * Line mode is the default display mode.
  */
 void HAL_SetDisplayLineMode(void);
 
