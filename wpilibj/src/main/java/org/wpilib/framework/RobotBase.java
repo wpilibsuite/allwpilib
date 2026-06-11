@@ -289,7 +289,8 @@ public abstract class RobotBase implements AutoCloseable {
   private static boolean m_suppressExitWarning;
 
   private static <T extends RobotBase> T constructRobot(Class<T> robotClass) throws Throwable {
-    Optional<ConstructorMatch<T>> constructorMatch = ConstructorMatch.findBestConstructor(robotClass);
+    Optional<ConstructorMatch<T>> constructorMatch =
+        ConstructorMatch.findBestConstructor(robotClass);
 
     if (constructorMatch.isEmpty()) {
       throw new IllegalArgumentException(
