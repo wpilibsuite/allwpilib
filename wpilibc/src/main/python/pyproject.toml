@@ -94,6 +94,8 @@ DYNAMIC_CAMERA_SERVER = 1
 Filesystem = "rpy/Filesystem.h"
 MotorControllerGroup = "rpy/MotorControllerGroup.h"
 Notifier = "rpy/Notifier.h"
+# rpy only
+AddressableLEDBuffer = "rpy/AddressableLEDBuffer.h"
 
 # wpi/counter
 EdgeConfiguration = "wpi/counter/EdgeConfiguration.hpp"
@@ -117,6 +119,7 @@ RobotState = "wpi/driverstation/RobotState.hpp"
 TouchpadFinger = "wpi/driverstation/TouchpadFinger.hpp"
 Gamepad = "wpi/driverstation/Gamepad.hpp"
 GenericHID = "wpi/driverstation/GenericHID.hpp"
+HIDDevice = "wpi/driverstation/HIDDevice.hpp"
 Joystick = "wpi/driverstation/Joystick.hpp"
 DualSenseController = "wpi/driverstation/DualSenseController.hpp"
 XboxController = "wpi/driverstation/XboxController.hpp"

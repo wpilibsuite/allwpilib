@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "wpi/halsim/ws_core/WSHalProviders.hpp"
 
 namespace wpilibws {

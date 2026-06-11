@@ -4,7 +4,6 @@
 
 #include "wpi/hal/CANAPI.h"
 
-#include <ctime>
 #include <memory>
 
 #include "HALInitializer.hpp"

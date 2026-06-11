@@ -248,6 +248,7 @@ PKG_CONFIG_DEPS = [
 generate_robotpy_pybind_build_info(
     name = "robotpy-wpilib-generator",
     additional_srcs = [
+        "src/main/python/wpilib/src/rpy/AddressableLEDBuffer.h",
         "src/main/python/wpilib/src/rpy/Filesystem.h",
         "src/main/python/wpilib/src/rpy/Notifier.h",
         "src/main/python/wpilib/src/rpy/MotorControllerGroup.h",

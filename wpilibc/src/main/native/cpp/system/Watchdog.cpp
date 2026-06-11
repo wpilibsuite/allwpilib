@@ -9,8 +9,6 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
-
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/Notifier.hpp"
 #include "wpi/system/Errors.hpp"

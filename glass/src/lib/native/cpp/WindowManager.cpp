@@ -9,8 +9,6 @@
 #include <memory>
 #include <utility>
 
-#include <fmt/format.h>
-
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/Storage.hpp"
 #include "wpi/gui/wpigui.hpp"

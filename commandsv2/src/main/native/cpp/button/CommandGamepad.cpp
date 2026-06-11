@@ -9,15 +9,24 @@
 using namespace wpi::cmd;
 
 CommandGamepad::CommandGamepad(int port)
-    : CommandGenericHID(port), m_hid{wpi::Gamepad(port)} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
+      m_gamepad{&wpi::DriverStation::GetGamepad(port)} {}
 
-wpi::Gamepad& CommandGamepad::GetHID() {
-  return m_hid;
+CommandGenericHID& CommandGamepad::GetHID() {
+  return *m_hid;
+}
+
+wpi::Gamepad& CommandGamepad::GetGamepad() {
+  return *m_gamepad;
+}
+
+Trigger CommandGamepad::Button(int button, wpi::EventLoop* loop) const {
+  return m_hid->Button(button, loop);
 }
 
 Trigger CommandGamepad::Button(enum wpi::Gamepad::Button button,
                                wpi::EventLoop* loop) const {
-  return CommandGenericHID::Button(static_cast<int>(button), loop);
+  return Button(static_cast<int>(button), loop);
 }
 
 Trigger CommandGamepad::FaceDown(wpi::EventLoop* loop) const {
@@ -127,57 +136,55 @@ Trigger CommandGamepad::Misc6(wpi::EventLoop* loop) const {
 Trigger CommandGamepad::LeftTrigger(double threshold,
                                     wpi::EventLoop* loop) const {
   return Trigger(loop, [this, threshold] {
-    return m_hid.GetAxis(wpi::Gamepad::Axis::LEFT_TRIGGER) > threshold;
+    return m_gamepad->GetAxis(wpi::Gamepad::Axis::LEFT_TRIGGER) > threshold;
   });
 }
 
 Trigger CommandGamepad::RightTrigger(double threshold,
                                      wpi::EventLoop* loop) const {
   return Trigger(loop, [this, threshold] {
-    return m_hid.GetAxis(wpi::Gamepad::Axis::RIGHT_TRIGGER) > threshold;
+    return m_gamepad->GetAxis(wpi::Gamepad::Axis::RIGHT_TRIGGER) > threshold;
   });
 }
 
 Trigger CommandGamepad::AxisLessThan(wpi::Gamepad::Axis axis, double threshold,
                                      wpi::EventLoop* loop) const {
-  return CommandGenericHID::AxisLessThan(static_cast<int>(axis), threshold,
-                                         loop);
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
 }
 
 Trigger CommandGamepad::AxisGreaterThan(wpi::Gamepad::Axis axis,
                                         double threshold,
                                         wpi::EventLoop* loop) const {
-  return CommandGenericHID::AxisGreaterThan(static_cast<int>(axis), threshold,
-                                            loop);
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
 }
 
 Trigger CommandGamepad::AxisMagnitudeGreaterThan(wpi::Gamepad::Axis axis,
                                                  double threshold,
                                                  wpi::EventLoop* loop) const {
-  return CommandGenericHID::AxisMagnitudeGreaterThan(static_cast<int>(axis),
-                                                     threshold, loop);
+  return m_hid->AxisMagnitudeGreaterThan(static_cast<int>(axis), threshold,
+                                         loop);
 }
 
 double CommandGamepad::GetLeftX() const {
-  return m_hid.GetLeftX();
+  return m_gamepad->GetLeftX();
 }
 
 double CommandGamepad::GetLeftY() const {
-  return m_hid.GetLeftY();
+  return m_gamepad->GetLeftY();
 }
 
 double CommandGamepad::GetRightX() const {
-  return m_hid.GetRightX();
+  return m_gamepad->GetRightX();
 }
 
 double CommandGamepad::GetRightY() const {
-  return m_hid.GetRightY();
+  return m_gamepad->GetRightY();
 }
 
 double CommandGamepad::GetLeftTriggerAxis() const {
-  return m_hid.GetLeftTriggerAxis();
+  return m_gamepad->GetLeftTriggerAxis();
 }
 
 double CommandGamepad::GetRightTriggerAxis() const {
-  return m_hid.GetRightTriggerAxis();
+  return m_gamepad->GetRightTriggerAxis();
 }

@@ -1,5 +1,6 @@
 from .commandgenerichid import CommandGenericHID
 from .commanddualsensecontroller import CommandDualSenseController
+from .commandgamepad import CommandGamepad
 from .commandjoystick import CommandJoystick
 from .commandnidsps4controller import CommandNiDsPS4Controller
 from .commandnidsxboxcontroller import CommandNiDsXboxController
@@ -13,6 +14,7 @@ __all__ = [
     "Trigger",
     "CommandDualSenseController",
     "CommandGenericHID",
+    "CommandGamepad",
     "CommandJoystick",
     "CommandNiDsPS4Controller",
     "CommandNiDsXboxController",
