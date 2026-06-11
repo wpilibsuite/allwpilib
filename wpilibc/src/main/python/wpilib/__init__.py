@@ -4,6 +4,7 @@ from . import _init__wpilib
 from ._wpilib import (
     ADXL345_I2C,
     AddressableLED,
+    AddressableLEDBuffer,
     Alert,
     Alliance,
     AnalogAccelerometer,
@@ -41,6 +42,7 @@ from ._wpilib import (
     GameCubeController,
     Gamepad,
     GenericHID,
+    HIDDevice,
     I2C,
     IterativeRobotBase,
     Joystick,
@@ -128,6 +130,7 @@ from ._wpilib import (
 __all__ = [
     "ADXL345_I2C",
     "AddressableLED",
+    "AddressableLEDBuffer",
     "Alert",
     "Alliance",
     "AnalogAccelerometer",
@@ -165,6 +168,7 @@ __all__ = [
     "GameCubeController",
     "Gamepad",
     "GenericHID",
+    "HIDDevice",
     "I2C",
     "IterativeRobotBase",
     "Joystick",

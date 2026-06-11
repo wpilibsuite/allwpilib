@@ -1,21 +1,17 @@
-extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
-- wpi/driverstation/internal/DriverStationBackend.hpp
-- wpi/event/BooleanEvent.hpp
-
 classes:
   wpi::LogitechF310Controller:
-    ignored_bases:
-    - wpi::util::SendableHelper<LogitechF310Controller>
     attributes:
-      kTouchpadCount:
-      kSupportsRumble:
-      kSupportsTriggerRumble:
-      kSupportsMonoLed:
-      kSupportsRgbLed:
-      kSupportedOutputs:
+      TOUCHPAD_COUNT:
+      SUPPORTS_RUMBLE:
+      SUPPORTS_TRIGGER_RUMBLE:
+      SUPPORTS_MONO_LED:
+      SUPPORTS_RGB_LED:
+      SUPPORTED_OUTPUTS:
     methods:
       LogitechF310Controller:
+        overloads:
+          int:
+          GenericHID&:
       GetHID:
         overloads:
           "":
@@ -26,8 +22,8 @@ classes:
       GetLeftY:
       GetRightX:
       GetRightY:
-      GetLeftTriggerAxis:
-      GetRightTriggerAxis:
+      GetLeftTrigger:
+      GetRightTrigger:
       GetAxis:
       AxisLessThan:
       AxisGreaterThan:
@@ -95,32 +91,31 @@ classes:
       GetButtonPressed:
       GetButtonReleased:
       ButtonEvent:
-        rename: button
       SetLeds:
       SetRumble:
       InitSendable:
   wpi::LogitechF310Controller::Button:
     attributes:
-      kA:
-      kB:
-      kX:
-      kY:
-      kBack:
-      kLogitech:
-      kStart:
-      kLeftStick:
-      kRightStick:
-      kLeftBumper:
-      kRightBumper:
-      kDpadUp:
-      kDpadDown:
-      kDpadLeft:
-      kDpadRight:
+      A:
+      B:
+      X:
+      Y:
+      BACK:
+      LOGITECH:
+      START:
+      LEFT_STICK:
+      RIGHT_STICK:
+      LEFT_BUMPER:
+      RIGHT_BUMPER:
+      DPAD_UP:
+      DPAD_DOWN:
+      DPAD_LEFT:
+      DPAD_RIGHT:
   wpi::LogitechF310Controller::Axis:
     attributes:
-      kLeftX:
-      kLeftY:
-      kRightX:
-      kRightY:
-      kLeftTriggerAxis:
-      kRightTriggerAxis:
+      LEFT_X:
+      LEFT_Y:
+      RIGHT_X:
+      RIGHT_Y:
+      LEFT_TRIGGER:
+      RIGHT_TRIGGER:

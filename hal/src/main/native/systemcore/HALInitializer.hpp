@@ -29,7 +29,6 @@ extern void InitializeDigitalInternal();
 extern void InitializeDIO();
 extern void InitializeDutyCycle();
 extern void InitializeEncoder();
-extern void InitializeFIRSTDriverStation();
 extern void InitializeHAL();
 extern void InitializeI2C();
 extern void InitializeIMU();

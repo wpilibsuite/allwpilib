@@ -1,21 +1,17 @@
-extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
-- wpi/driverstation/internal/DriverStationBackend.hpp
-- wpi/event/BooleanEvent.hpp
-
 classes:
   wpi::SteamController:
-    ignored_bases:
-    - wpi::util::SendableHelper<SteamController>
     attributes:
-      kTouchpadCount:
-      kSupportsRumble:
-      kSupportsTriggerRumble:
-      kSupportsMonoLed:
-      kSupportsRgbLed:
-      kSupportedOutputs:
+      TOUCHPAD_COUNT:
+      SUPPORTS_RUMBLE:
+      SUPPORTS_TRIGGER_RUMBLE:
+      SUPPORTS_MONO_LED:
+      SUPPORTS_RGB_LED:
+      SUPPORTED_OUTPUTS:
     methods:
       SteamController:
+        overloads:
+          int:
+          GenericHID&:
       GetHID:
         overloads:
           "":
@@ -26,8 +22,8 @@ classes:
       GetLeftY:
       GetRightX:
       GetRightY:
-      GetLeftTriggerAxis:
-      GetRightTriggerAxis:
+      GetLeftTrigger:
+      GetRightTrigger:
       GetAxis:
       AxisLessThan:
       AxisGreaterThan:
@@ -139,7 +135,6 @@ classes:
       GetButtonPressed:
       GetButtonReleased:
       ButtonEvent:
-        rename: button
       SetLeds:
       SetRumble:
       GetTouchpadFingerAvailable:
@@ -147,37 +142,37 @@ classes:
       InitSendable:
   wpi::SteamController::Button:
     attributes:
-      kA:
-      kB:
-      kX:
-      kY:
-      kMenu:
-      kSteam:
-      kView:
-      kLeftStick:
-      kRightStick:
-      kLeftBumper:
-      kRightBumper:
-      kDpadUp:
-      kDpadDown:
-      kDpadLeft:
-      kDpadRight:
-      kQAM:
-      kRightPaddle1:
-      kLeftPaddle1:
-      kRightPaddle2:
-      kLeftPaddle2:
-      kLeftTouchpad:
-      kRightTouchpad:
-      kLeftStickTouch:
-      kRightStickTouch:
-      kLeftGripTouch:
-      kRightGripTouch:
+      A:
+      B:
+      X:
+      Y:
+      MENU:
+      STEAM:
+      VIEW:
+      LEFT_STICK:
+      RIGHT_STICK:
+      LEFT_BUMPER:
+      RIGHT_BUMPER:
+      DPAD_UP:
+      DPAD_DOWN:
+      DPAD_LEFT:
+      DPAD_RIGHT:
+      QAM:
+      RIGHT_PADDLE_1:
+      LEFT_PADDLE_1:
+      RIGHT_PADDLE_2:
+      LEFT_PADDLE_2:
+      LEFT_TOUCHPAD:
+      RIGHT_TOUCHPAD:
+      LEFT_STICK_TOUCH:
+      RIGHT_STICK_TOUCH:
+      LEFT_GRIP_TOUCH:
+      RIGHT_GRIP_TOUCH:
   wpi::SteamController::Axis:
     attributes:
-      kLeftX:
-      kLeftY:
-      kRightX:
-      kRightY:
-      kLeftTriggerAxis:
-      kRightTriggerAxis:
+      LEFT_X:
+      LEFT_Y:
+      RIGHT_X:
+      RIGHT_Y:
+      LEFT_TRIGGER:
+      RIGHT_TRIGGER:

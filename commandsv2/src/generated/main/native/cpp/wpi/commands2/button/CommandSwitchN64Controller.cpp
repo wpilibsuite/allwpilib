@@ -8,7 +8,12 @@
 using namespace wpi::cmd;
 
 CommandSwitchN64Controller::CommandSwitchN64Controller(int port)
-    : m_controller{wpi::SwitchN64Controller(port)} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
+      m_controller{m_hid->GetHID()} {}
+
+CommandGenericHID& CommandSwitchN64Controller::GetHID() {
+  return *m_hid;
+}
 
 wpi::SwitchN64Controller&
 CommandSwitchN64Controller::GetController() {
@@ -22,114 +27,99 @@ CommandSwitchN64Controller::GetController() const {
 
 Trigger CommandSwitchN64Controller::A(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchN64Controller::Button::kA,
-                loop);
+  return m_hid->Button(wpi::SwitchN64Controller::Button::A,
+                       loop);
 }
 
 Trigger CommandSwitchN64Controller::B(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchN64Controller::Button::kB,
-                loop);
+  return m_hid->Button(wpi::SwitchN64Controller::Button::B,
+                       loop);
 }
 
 Trigger CommandSwitchN64Controller::CLeft(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchN64Controller::Button::kCLeft,
-                loop);
+  return m_hid->Button(wpi::SwitchN64Controller::Button::C_LEFT,
+                       loop);
 }
 
 Trigger CommandSwitchN64Controller::CUp(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchN64Controller::Button::kCUp,
-                loop);
+  return m_hid->Button(wpi::SwitchN64Controller::Button::C_UP,
+                       loop);
 }
 
 Trigger CommandSwitchN64Controller::Capture(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchN64Controller::Button::kCapture,
-                loop);
+  return m_hid->Button(wpi::SwitchN64Controller::Button::CAPTURE,
+                       loop);
 }
 
 Trigger CommandSwitchN64Controller::Home(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchN64Controller::Button::kHome,
-                loop);
+  return m_hid->Button(wpi::SwitchN64Controller::Button::HOME,
+                       loop);
 }
 
 Trigger CommandSwitchN64Controller::Start(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchN64Controller::Button::kStart,
-                loop);
+  return m_hid->Button(wpi::SwitchN64Controller::Button::START,
+                       loop);
 }
 
 Trigger CommandSwitchN64Controller::CDown(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchN64Controller::Button::kCDown,
-                loop);
+  return m_hid->Button(wpi::SwitchN64Controller::Button::C_DOWN,
+                       loop);
 }
 
 Trigger CommandSwitchN64Controller::L(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchN64Controller::Button::kL,
-                loop);
+  return m_hid->Button(wpi::SwitchN64Controller::Button::L,
+                       loop);
 }
 
 Trigger CommandSwitchN64Controller::R(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchN64Controller::Button::kR,
-                loop);
+  return m_hid->Button(wpi::SwitchN64Controller::Button::R,
+                       loop);
 }
 
 Trigger CommandSwitchN64Controller::DpadUp(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchN64Controller::Button::kDpadUp,
-                loop);
+  return m_hid->Button(wpi::SwitchN64Controller::Button::DPAD_UP,
+                       loop);
 }
 
 Trigger CommandSwitchN64Controller::DpadDown(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchN64Controller::Button::kDpadDown,
-                loop);
+  return m_hid->Button(wpi::SwitchN64Controller::Button::DPAD_DOWN,
+                       loop);
 }
 
 Trigger CommandSwitchN64Controller::DpadLeft(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchN64Controller::Button::kDpadLeft,
-                loop);
+  return m_hid->Button(wpi::SwitchN64Controller::Button::DPAD_LEFT,
+                       loop);
 }
 
 Trigger CommandSwitchN64Controller::DpadRight(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchN64Controller::Button::kDpadRight,
-                loop);
+  return m_hid->Button(wpi::SwitchN64Controller::Button::DPAD_RIGHT,
+                       loop);
 }
 
 Trigger CommandSwitchN64Controller::CRight(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchN64Controller::Button::kCRight,
-                loop);
+  return m_hid->Button(wpi::SwitchN64Controller::Button::C_RIGHT,
+                       loop);
 }
 
 Trigger CommandSwitchN64Controller::ZR(
     double threshold, wpi::EventLoop* loop) const {
-  return AxisGreaterThan(m_controller.GetHID(),
-                         wpi::SwitchN64Controller::Axis::kZRAxis,
-                         threshold, loop);
+  return m_hid->AxisGreaterThan(
+      wpi::SwitchN64Controller::Axis::ZR,
+      threshold, loop);
 }
 
 double CommandSwitchN64Controller::GetLeftX() const {
@@ -144,6 +134,6 @@ double CommandSwitchN64Controller::GetZAxis() const {
   return m_controller.GetZAxis();
 }
 
-double CommandSwitchN64Controller::GetZRAxis() const {
-  return m_controller.GetZRAxis();
+double CommandSwitchN64Controller::GetZR() const {
+  return m_controller.GetZR();
 }

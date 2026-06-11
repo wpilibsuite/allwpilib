@@ -16,7 +16,8 @@ import org.wpilib.event.EventLoop;
  * @see GameCubeController
  */
 @SuppressWarnings("MethodName")
-public class CommandGameCubeController extends CommandHIDBase {
+public class CommandGameCubeController {
+  private final CommandGenericHID m_hid;
   private final GameCubeController m_controller;
 
   /**
@@ -25,7 +26,17 @@ public class CommandGameCubeController extends CommandHIDBase {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandGameCubeController(int port) {
-    m_controller = new GameCubeController(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(port);
+    m_controller = new GameCubeController(m_hid.getHID());
+  }
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  public CommandGenericHID getHID() {
+    return m_hid;
   }
 
   /**
@@ -56,10 +67,7 @@ public class CommandGameCubeController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        GameCubeController.Button.kA.value,
-        loop);
+    return m_hid.button(GameCubeController.Button.A.value, loop);
   }
 
   /**
@@ -81,10 +89,7 @@ public class CommandGameCubeController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger x(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        GameCubeController.Button.kX.value,
-        loop);
+    return m_hid.button(GameCubeController.Button.X.value, loop);
   }
 
   /**
@@ -106,10 +111,7 @@ public class CommandGameCubeController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        GameCubeController.Button.kB.value,
-        loop);
+    return m_hid.button(GameCubeController.Button.B.value, loop);
   }
 
   /**
@@ -131,10 +133,7 @@ public class CommandGameCubeController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger y(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        GameCubeController.Button.kY.value,
-        loop);
+    return m_hid.button(GameCubeController.Button.Y.value, loop);
   }
 
   /**
@@ -156,10 +155,7 @@ public class CommandGameCubeController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger start(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        GameCubeController.Button.kStart.value,
-        loop);
+    return m_hid.button(GameCubeController.Button.START.value, loop);
   }
 
   /**
@@ -181,10 +177,7 @@ public class CommandGameCubeController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger Z(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        GameCubeController.Button.kZ.value,
-        loop);
+    return m_hid.button(GameCubeController.Button.Z.value, loop);
   }
 
   /**
@@ -206,10 +199,7 @@ public class CommandGameCubeController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        GameCubeController.Button.kDpadUp.value,
-        loop);
+    return m_hid.button(GameCubeController.Button.DPAD_UP.value, loop);
   }
 
   /**
@@ -231,10 +221,7 @@ public class CommandGameCubeController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        GameCubeController.Button.kDpadDown.value,
-        loop);
+    return m_hid.button(GameCubeController.Button.DPAD_DOWN.value, loop);
   }
 
   /**
@@ -256,10 +243,7 @@ public class CommandGameCubeController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        GameCubeController.Button.kDpadLeft.value,
-        loop);
+    return m_hid.button(GameCubeController.Button.DPAD_LEFT.value, loop);
   }
 
   /**
@@ -281,10 +265,7 @@ public class CommandGameCubeController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        GameCubeController.Button.kDpadRight.value,
-        loop);
+    return m_hid.button(GameCubeController.Button.DPAD_RIGHT.value, loop);
   }
 
   /**
@@ -306,10 +287,7 @@ public class CommandGameCubeController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger L(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        GameCubeController.Button.kL.value,
-        loop);
+    return m_hid.button(GameCubeController.Button.L.value, loop);
   }
 
   /**
@@ -331,10 +309,7 @@ public class CommandGameCubeController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger R(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        GameCubeController.Button.kR.value,
-        loop);
+    return m_hid.button(GameCubeController.Button.R.value, loop);
   }
 
   /**
@@ -348,11 +323,8 @@ public class CommandGameCubeController extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger LTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        GameCubeController.Axis.kLTriggerAxis.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        GameCubeController.Axis.L_TRIGGER.value, threshold, loop);
   }
 
   /**
@@ -393,11 +365,8 @@ public class CommandGameCubeController extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger RTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        GameCubeController.Axis.kRTriggerAxis.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        GameCubeController.Axis.R_TRIGGER.value, threshold, loop);
   }
 
   /**
@@ -464,20 +433,20 @@ public class CommandGameCubeController extends CommandHIDBase {
   }
 
   /**
-   * Get the L Trigger Axis value of the controller.
+   * Get the L Trigger value of the controller.
    *
    * @return The axis value.
    */
-  public double getLTriggerAxis() {
-    return m_controller.getLTriggerAxis();
+  public double getLTrigger() {
+    return m_controller.getLTrigger();
   }
 
   /**
-   * Get the R Trigger Axis value of the controller.
+   * Get the R Trigger value of the controller.
    *
    * @return The axis value.
    */
-  public double getRTriggerAxis() {
-    return m_controller.getRTriggerAxis();
+  public double getRTrigger() {
+    return m_controller.getRTrigger();
   }
 }

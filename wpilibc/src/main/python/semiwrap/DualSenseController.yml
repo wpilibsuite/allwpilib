@@ -5,29 +5,33 @@ extra_includes:
 
 classes:
   wpi::DualSenseController:
+    force_no_trampoline: true
     ignored_bases:
     - wpi::util::SendableHelper<DualSenseController>
     attributes:
-      kTouchpadCount:
-      kSupportsRumble:
-      kSupportsTriggerRumble:
-      kSupportsMonoLed:
-      kSupportsRgbLed:
-      kSupportedOutputs:
+      TOUCHPAD_COUNT:
+      SUPPORTS_RUMBLE:
+      SUPPORTS_TRIGGER_RUMBLE:
+      SUPPORTS_MONO_LED:
+      SUPPORTS_RGB_LED:
+      SUPPORTED_OUTPUTS:
     methods:
       DualSenseController:
+        overloads:
+          int:
+          GenericHID&:
       GetHID:
         overloads:
           "":
+            return_value_policy: reference_internal
           '[const]':
+            ignore: true
       GetPort:
       IsConnected:
       GetLeftX:
       GetLeftY:
       GetRightX:
       GetRightY:
-      GetL2Axis:
-      GetR2Axis:
       GetAxis:
       AxisLessThan:
       AxisGreaterThan:
@@ -109,30 +113,32 @@ classes:
       GetTouchpadFingerAvailable:
       GetTouchpadFinger:
       InitSendable:
+      GetL2:
+      GetR2:
   wpi::DualSenseController::Button:
     attributes:
-      kCross:
-      kCircle:
-      kSquare:
-      kTriangle:
-      kCreate:
-      kPS:
-      kOptions:
-      kL3:
-      kR3:
-      kL1:
-      kR1:
-      kDpadUp:
-      kDpadDown:
-      kDpadLeft:
-      kDpadRight:
-      kMicrophone:
-      kTouchpad:
+      CROSS:
+      CIRCLE:
+      SQUARE:
+      TRIANGLE:
+      CREATE:
+      PS:
+      OPTIONS:
+      L3:
+      R3:
+      L1:
+      R1:
+      DPAD_UP:
+      DPAD_DOWN:
+      DPAD_LEFT:
+      DPAD_RIGHT:
+      MICROPHONE:
+      TOUCHPAD:
   wpi::DualSenseController::Axis:
     attributes:
-      kLeftX:
-      kLeftY:
-      kRightX:
-      kRightY:
-      kL2Axis:
-      kR2Axis:
+      LEFT_X:
+      LEFT_Y:
+      RIGHT_X:
+      RIGHT_Y:
+      L2:
+      R2:

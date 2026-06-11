@@ -15,8 +15,6 @@ classes:
       SetLeftY:
       SetRightX:
       SetRightY:
-      SetLeftTriggerAxis:
-      SetRightTriggerAxis:
       SetAButton:
       SetBButton:
       SetXButton:
@@ -32,3 +30,5 @@ classes:
       SetDpadDownButton:
       SetDpadLeftButton:
       SetDpadRightButton:
+      SetLeftTrigger:
+      SetRightTrigger:

@@ -16,7 +16,8 @@ import org.wpilib.event.EventLoop;
  * @see LogitechF310Controller
  */
 @SuppressWarnings("MethodName")
-public class CommandLogitechF310Controller extends CommandHIDBase {
+public class CommandLogitechF310Controller {
+  private final CommandGenericHID m_hid;
   private final LogitechF310Controller m_controller;
 
   /**
@@ -25,7 +26,17 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandLogitechF310Controller(int port) {
-    m_controller = new LogitechF310Controller(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(port);
+    m_controller = new LogitechF310Controller(m_hid.getHID());
+  }
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  public CommandGenericHID getHID() {
+    return m_hid;
   }
 
   /**
@@ -56,10 +67,7 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        LogitechF310Controller.Button.kA.value,
-        loop);
+    return m_hid.button(LogitechF310Controller.Button.A.value, loop);
   }
 
   /**
@@ -81,10 +89,7 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        LogitechF310Controller.Button.kB.value,
-        loop);
+    return m_hid.button(LogitechF310Controller.Button.B.value, loop);
   }
 
   /**
@@ -106,10 +111,7 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger x(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        LogitechF310Controller.Button.kX.value,
-        loop);
+    return m_hid.button(LogitechF310Controller.Button.X.value, loop);
   }
 
   /**
@@ -131,10 +133,7 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger y(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        LogitechF310Controller.Button.kY.value,
-        loop);
+    return m_hid.button(LogitechF310Controller.Button.Y.value, loop);
   }
 
   /**
@@ -156,10 +155,7 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger back(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        LogitechF310Controller.Button.kBack.value,
-        loop);
+    return m_hid.button(LogitechF310Controller.Button.BACK.value, loop);
   }
 
   /**
@@ -181,10 +177,7 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger logitech(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        LogitechF310Controller.Button.kLogitech.value,
-        loop);
+    return m_hid.button(LogitechF310Controller.Button.LOGITECH.value, loop);
   }
 
   /**
@@ -206,10 +199,7 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger start(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        LogitechF310Controller.Button.kStart.value,
-        loop);
+    return m_hid.button(LogitechF310Controller.Button.START.value, loop);
   }
 
   /**
@@ -231,10 +221,7 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger leftStick(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        LogitechF310Controller.Button.kLeftStick.value,
-        loop);
+    return m_hid.button(LogitechF310Controller.Button.LEFT_STICK.value, loop);
   }
 
   /**
@@ -256,10 +243,7 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger rightStick(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        LogitechF310Controller.Button.kRightStick.value,
-        loop);
+    return m_hid.button(LogitechF310Controller.Button.RIGHT_STICK.value, loop);
   }
 
   /**
@@ -281,10 +265,7 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger leftBumper(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        LogitechF310Controller.Button.kLeftBumper.value,
-        loop);
+    return m_hid.button(LogitechF310Controller.Button.LEFT_BUMPER.value, loop);
   }
 
   /**
@@ -306,10 +287,7 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger rightBumper(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        LogitechF310Controller.Button.kRightBumper.value,
-        loop);
+    return m_hid.button(LogitechF310Controller.Button.RIGHT_BUMPER.value, loop);
   }
 
   /**
@@ -331,10 +309,7 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        LogitechF310Controller.Button.kDpadUp.value,
-        loop);
+    return m_hid.button(LogitechF310Controller.Button.DPAD_UP.value, loop);
   }
 
   /**
@@ -356,10 +331,7 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        LogitechF310Controller.Button.kDpadDown.value,
-        loop);
+    return m_hid.button(LogitechF310Controller.Button.DPAD_DOWN.value, loop);
   }
 
   /**
@@ -381,10 +353,7 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        LogitechF310Controller.Button.kDpadLeft.value,
-        loop);
+    return m_hid.button(LogitechF310Controller.Button.DPAD_LEFT.value, loop);
   }
 
   /**
@@ -406,10 +375,7 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        LogitechF310Controller.Button.kDpadRight.value,
-        loop);
+    return m_hid.button(LogitechF310Controller.Button.DPAD_RIGHT.value, loop);
   }
 
   /**
@@ -423,11 +389,8 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger leftTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        LogitechF310Controller.Axis.kLeftTriggerAxis.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        LogitechF310Controller.Axis.LEFT_TRIGGER.value, threshold, loop);
   }
 
   /**
@@ -468,11 +431,8 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger rightTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        LogitechF310Controller.Axis.kRightTriggerAxis.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        LogitechF310Controller.Axis.RIGHT_TRIGGER.value, threshold, loop);
   }
 
   /**
@@ -539,20 +499,20 @@ public class CommandLogitechF310Controller extends CommandHIDBase {
   }
 
   /**
-   * Get the Left Trigger Axis value of the controller.
+   * Get the Left Trigger value of the controller.
    *
    * @return The axis value.
    */
-  public double getLeftTriggerAxis() {
-    return m_controller.getLeftTriggerAxis();
+  public double getLeftTrigger() {
+    return m_controller.getLeftTrigger();
   }
 
   /**
-   * Get the Right Trigger Axis value of the controller.
+   * Get the Right Trigger value of the controller.
    *
    * @return The axis value.
    */
-  public double getRightTriggerAxis() {
-    return m_controller.getRightTriggerAxis();
+  public double getRightTrigger() {
+    return m_controller.getRightTrigger();
   }
 }

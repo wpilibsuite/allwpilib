@@ -8,7 +8,7 @@
 #include "wpi/driverstation/Switch2GCController.hpp"
 
 #include "wpi/commands2/CommandScheduler.hpp"
-#include "wpi/commands2/button/CommandHIDBase.hpp"
+#include "wpi/commands2/button/CommandGenericHID.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
 
 namespace wpi::cmd {
@@ -18,7 +18,7 @@ namespace wpi::cmd {
  *
  * @see wpi::Switch2GCController
  */
-class CommandSwitch2GCController : public CommandHIDBase {
+class CommandSwitch2GCController {
  public:
   /**
    * Construct an instance of a controller.
@@ -27,6 +27,13 @@ class CommandSwitch2GCController : public CommandHIDBase {
    * plugged into.
    */
   explicit CommandSwitch2GCController(int port);
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  CommandGenericHID& GetHID();
 
   /**
    * Get the wrapped controller object.
@@ -315,20 +322,21 @@ class CommandSwitch2GCController : public CommandHIDBase {
   double GetCStickY() const;
 
   /**
-   * Get the L Trigger Axis value of the controller.
+   * Get the L Trigger value of the controller.
    *
    * @return the axis value.
    */
-  double GetLTriggerAxis() const;
+  double GetLTrigger() const;
 
   /**
-   * Get the R Trigger Axis value of the controller.
+   * Get the R Trigger value of the controller.
    *
    * @return the axis value.
    */
-  double GetRTriggerAxis() const;
+  double GetRTrigger() const;
 
  private:
+  CommandGenericHID* m_hid;
   wpi::Switch2GCController m_controller;
 };
 }  // namespace wpi::cmd

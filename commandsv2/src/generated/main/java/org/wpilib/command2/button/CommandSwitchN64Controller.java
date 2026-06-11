@@ -16,7 +16,8 @@ import org.wpilib.event.EventLoop;
  * @see SwitchN64Controller
  */
 @SuppressWarnings("MethodName")
-public class CommandSwitchN64Controller extends CommandHIDBase {
+public class CommandSwitchN64Controller {
+  private final CommandGenericHID m_hid;
   private final SwitchN64Controller m_controller;
 
   /**
@@ -25,7 +26,17 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandSwitchN64Controller(int port) {
-    m_controller = new SwitchN64Controller(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(port);
+    m_controller = new SwitchN64Controller(m_hid.getHID());
+  }
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  public CommandGenericHID getHID() {
+    return m_hid;
   }
 
   /**
@@ -56,10 +67,7 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchN64Controller.Button.kA.value,
-        loop);
+    return m_hid.button(SwitchN64Controller.Button.A.value, loop);
   }
 
   /**
@@ -81,10 +89,7 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchN64Controller.Button.kB.value,
-        loop);
+    return m_hid.button(SwitchN64Controller.Button.B.value, loop);
   }
 
   /**
@@ -106,10 +111,7 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger CLeft(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchN64Controller.Button.kCLeft.value,
-        loop);
+    return m_hid.button(SwitchN64Controller.Button.C_LEFT.value, loop);
   }
 
   /**
@@ -131,10 +133,7 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger CUp(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchN64Controller.Button.kCUp.value,
-        loop);
+    return m_hid.button(SwitchN64Controller.Button.C_UP.value, loop);
   }
 
   /**
@@ -156,10 +155,7 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger capture(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchN64Controller.Button.kCapture.value,
-        loop);
+    return m_hid.button(SwitchN64Controller.Button.CAPTURE.value, loop);
   }
 
   /**
@@ -181,10 +177,7 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger home(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchN64Controller.Button.kHome.value,
-        loop);
+    return m_hid.button(SwitchN64Controller.Button.HOME.value, loop);
   }
 
   /**
@@ -206,10 +199,7 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger start(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchN64Controller.Button.kStart.value,
-        loop);
+    return m_hid.button(SwitchN64Controller.Button.START.value, loop);
   }
 
   /**
@@ -231,10 +221,7 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger CDown(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchN64Controller.Button.kCDown.value,
-        loop);
+    return m_hid.button(SwitchN64Controller.Button.C_DOWN.value, loop);
   }
 
   /**
@@ -256,10 +243,7 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger L(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchN64Controller.Button.kL.value,
-        loop);
+    return m_hid.button(SwitchN64Controller.Button.L.value, loop);
   }
 
   /**
@@ -281,10 +265,7 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger R(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchN64Controller.Button.kR.value,
-        loop);
+    return m_hid.button(SwitchN64Controller.Button.R.value, loop);
   }
 
   /**
@@ -306,10 +287,7 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchN64Controller.Button.kDpadUp.value,
-        loop);
+    return m_hid.button(SwitchN64Controller.Button.DPAD_UP.value, loop);
   }
 
   /**
@@ -331,10 +309,7 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchN64Controller.Button.kDpadDown.value,
-        loop);
+    return m_hid.button(SwitchN64Controller.Button.DPAD_DOWN.value, loop);
   }
 
   /**
@@ -356,10 +331,7 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchN64Controller.Button.kDpadLeft.value,
-        loop);
+    return m_hid.button(SwitchN64Controller.Button.DPAD_LEFT.value, loop);
   }
 
   /**
@@ -381,10 +353,7 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchN64Controller.Button.kDpadRight.value,
-        loop);
+    return m_hid.button(SwitchN64Controller.Button.DPAD_RIGHT.value, loop);
   }
 
   /**
@@ -406,10 +375,7 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger CRight(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchN64Controller.Button.kCRight.value,
-        loop);
+    return m_hid.button(SwitchN64Controller.Button.C_RIGHT.value, loop);
   }
 
   /**
@@ -423,11 +389,8 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger ZR(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        SwitchN64Controller.Axis.kZRAxis.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        SwitchN64Controller.Axis.ZR.value, threshold, loop);
   }
 
   /**
@@ -485,11 +448,11 @@ public class CommandSwitchN64Controller extends CommandHIDBase {
   }
 
   /**
-   * Get the ZR Axis value of the controller.
+   * Get the ZR value of the controller.
    *
    * @return The axis value.
    */
-  public double getZRAxis() {
-    return m_controller.getZRAxis();
+  public double getZR() {
+    return m_controller.getZR();
   }
 }

@@ -1,11 +1,5 @@
-extra_includes:
-- wpi/driverstation/Switch2ProController.hpp
-
 classes:
   wpi::sim::Switch2ProControllerSim:
-    force_no_trampoline: true
-    typealias:
-    - wpi::Switch2ProController
     methods:
       Switch2ProControllerSim:
         overloads:
@@ -15,8 +9,8 @@ classes:
       SetLeftY:
       SetRightX:
       SetRightY:
-      SetZLAxis:
-      SetZRAxis:
+      SetZL:
+      SetZR:
       SetBButton:
       SetAButton:
       SetYButton:

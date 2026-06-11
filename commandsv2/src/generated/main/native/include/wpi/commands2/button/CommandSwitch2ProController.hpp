@@ -8,7 +8,7 @@
 #include "wpi/driverstation/Switch2ProController.hpp"
 
 #include "wpi/commands2/CommandScheduler.hpp"
-#include "wpi/commands2/button/CommandHIDBase.hpp"
+#include "wpi/commands2/button/CommandGenericHID.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
 
 namespace wpi::cmd {
@@ -18,7 +18,7 @@ namespace wpi::cmd {
  *
  * @see wpi::Switch2ProController
  */
-class CommandSwitch2ProController : public CommandHIDBase {
+class CommandSwitch2ProController {
  public:
   /**
    * Construct an instance of a controller.
@@ -27,6 +27,13 @@ class CommandSwitch2ProController : public CommandHIDBase {
    * plugged into.
    */
   explicit CommandSwitch2ProController(int port);
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  CommandGenericHID& GetHID();
 
   /**
    * Get the wrapped controller object.
@@ -354,20 +361,21 @@ class CommandSwitch2ProController : public CommandHIDBase {
   double GetRightY() const;
 
   /**
-   * Get the ZL Axis value of the controller.
+   * Get the ZL value of the controller.
    *
    * @return the axis value.
    */
-  double GetZLAxis() const;
+  double GetZL() const;
 
   /**
-   * Get the ZR Axis value of the controller.
+   * Get the ZR value of the controller.
    *
    * @return the axis value.
    */
-  double GetZRAxis() const;
+  double GetZR() const;
 
  private:
+  CommandGenericHID* m_hid;
   wpi::Switch2ProController m_controller;
 };
 }  // namespace wpi::cmd

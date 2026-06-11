@@ -8,7 +8,12 @@
 using namespace wpi::cmd;
 
 CommandSwitchProController::CommandSwitchProController(int port)
-    : m_controller{wpi::SwitchProController(port)} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
+      m_controller{m_hid->GetHID()} {}
+
+CommandGenericHID& CommandSwitchProController::GetHID() {
+  return *m_hid;
+}
 
 wpi::SwitchProController&
 CommandSwitchProController::GetController() {
@@ -22,128 +27,112 @@ CommandSwitchProController::GetController() const {
 
 Trigger CommandSwitchProController::B(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchProController::Button::kB,
-                loop);
+  return m_hid->Button(wpi::SwitchProController::Button::B,
+                       loop);
 }
 
 Trigger CommandSwitchProController::A(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchProController::Button::kA,
-                loop);
+  return m_hid->Button(wpi::SwitchProController::Button::A,
+                       loop);
 }
 
 Trigger CommandSwitchProController::Y(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchProController::Button::kY,
-                loop);
+  return m_hid->Button(wpi::SwitchProController::Button::Y,
+                       loop);
 }
 
 Trigger CommandSwitchProController::X(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchProController::Button::kX,
-                loop);
+  return m_hid->Button(wpi::SwitchProController::Button::X,
+                       loop);
 }
 
 Trigger CommandSwitchProController::Minus(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchProController::Button::kMinus,
-                loop);
+  return m_hid->Button(wpi::SwitchProController::Button::MINUS,
+                       loop);
 }
 
 Trigger CommandSwitchProController::Home(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchProController::Button::kHome,
-                loop);
+  return m_hid->Button(wpi::SwitchProController::Button::HOME,
+                       loop);
 }
 
 Trigger CommandSwitchProController::Plus(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchProController::Button::kPlus,
-                loop);
+  return m_hid->Button(wpi::SwitchProController::Button::PLUS,
+                       loop);
 }
 
 Trigger CommandSwitchProController::LeftStick(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchProController::Button::kLeftStick,
-                loop);
+  return m_hid->Button(wpi::SwitchProController::Button::LEFT_STICK,
+                       loop);
 }
 
 Trigger CommandSwitchProController::RightStick(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchProController::Button::kRightStick,
-                loop);
+  return m_hid->Button(wpi::SwitchProController::Button::RIGHT_STICK,
+                       loop);
 }
 
 Trigger CommandSwitchProController::L(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchProController::Button::kL,
-                loop);
+  return m_hid->Button(wpi::SwitchProController::Button::L,
+                       loop);
 }
 
 Trigger CommandSwitchProController::R(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchProController::Button::kR,
-                loop);
+  return m_hid->Button(wpi::SwitchProController::Button::R,
+                       loop);
 }
 
 Trigger CommandSwitchProController::DpadUp(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchProController::Button::kDpadUp,
-                loop);
+  return m_hid->Button(wpi::SwitchProController::Button::DPAD_UP,
+                       loop);
 }
 
 Trigger CommandSwitchProController::DpadDown(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchProController::Button::kDpadDown,
-                loop);
+  return m_hid->Button(wpi::SwitchProController::Button::DPAD_DOWN,
+                       loop);
 }
 
 Trigger CommandSwitchProController::DpadLeft(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchProController::Button::kDpadLeft,
-                loop);
+  return m_hid->Button(wpi::SwitchProController::Button::DPAD_LEFT,
+                       loop);
 }
 
 Trigger CommandSwitchProController::DpadRight(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchProController::Button::kDpadRight,
-                loop);
+  return m_hid->Button(wpi::SwitchProController::Button::DPAD_RIGHT,
+                       loop);
 }
 
 Trigger CommandSwitchProController::Capture(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SwitchProController::Button::kCapture,
-                loop);
+  return m_hid->Button(wpi::SwitchProController::Button::CAPTURE,
+                       loop);
 }
 
 Trigger CommandSwitchProController::ZL(
     double threshold, wpi::EventLoop* loop) const {
-  return AxisGreaterThan(m_controller.GetHID(),
-                         wpi::SwitchProController::Axis::kZLAxis,
-                         threshold, loop);
+  return m_hid->AxisGreaterThan(
+      wpi::SwitchProController::Axis::ZL,
+      threshold, loop);
 }
 
 Trigger CommandSwitchProController::ZR(
     double threshold, wpi::EventLoop* loop) const {
-  return AxisGreaterThan(m_controller.GetHID(),
-                         wpi::SwitchProController::Axis::kZRAxis,
-                         threshold, loop);
+  return m_hid->AxisGreaterThan(
+      wpi::SwitchProController::Axis::ZR,
+      threshold, loop);
 }
 
 double CommandSwitchProController::GetLeftX() const {
@@ -162,10 +151,10 @@ double CommandSwitchProController::GetRightY() const {
   return m_controller.GetRightY();
 }
 
-double CommandSwitchProController::GetZLAxis() const {
-  return m_controller.GetZLAxis();
+double CommandSwitchProController::GetZL() const {
+  return m_controller.GetZL();
 }
 
-double CommandSwitchProController::GetZRAxis() const {
-  return m_controller.GetZRAxis();
+double CommandSwitchProController::GetZR() const {
+  return m_controller.GetZR();
 }

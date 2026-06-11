@@ -1,11 +1,5 @@
-extra_includes:
-- wpi/driverstation/DualSenseEdgeController.hpp
-
 classes:
   wpi::sim::DualSenseEdgeControllerSim:
-    force_no_trampoline: true
-    typealias:
-    - wpi::DualSenseEdgeController
     methods:
       DualSenseEdgeControllerSim:
         overloads:
@@ -15,8 +9,8 @@ classes:
       SetLeftY:
       SetRightX:
       SetRightY:
-      SetL2Axis:
-      SetR2Axis:
+      SetL2:
+      SetR2:
       SetCrossButton:
       SetCircleButton:
       SetSquareButton:

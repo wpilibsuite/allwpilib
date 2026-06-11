@@ -8,12 +8,10 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
-
 #include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_DriverStationJNI.h"
 #include "wpi/hal/DriverStation.h"
-#include "wpi/hal/HAL.h"
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/util/jni_util.hpp"
 
 static_assert(
@@ -341,20 +339,23 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_getGameData
 /*
  * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    sendError
- * Signature: (ZIZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)I
+ * Signature: (ZILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)I
  */
 JNIEXPORT jint JNICALL
 Java_org_wpilib_hardware_hal_DriverStationJNI_sendError
-  (JNIEnv* env, jclass, jboolean isError, jint errorCode, jboolean isLVCode,
-   jstring details, jstring location, jstring callStack, jboolean printMsg)
+  (JNIEnv* env, jclass, jboolean isError, jint errorCode, jstring details,
+   jstring location, jstring callStack, jboolean printMsg)
 {
   JStringRef detailsStr{env, details};
   JStringRef locationStr{env, location};
   JStringRef callStackStr{env, callStack};
 
-  jint returnValue =
-      HAL_SendError(isError, errorCode, isLVCode, detailsStr.c_str(),
-                    locationStr.c_str(), callStackStr.c_str(), printMsg);
+  WPI_String detailsWpiStr = wpi::util::make_string(detailsStr);
+  WPI_String locationWpiStr = wpi::util::make_string(locationStr);
+  WPI_String callStackWpiStr = wpi::util::make_string(callStackStr);
+
+  jint returnValue = HAL_SendError(isError, errorCode, &detailsWpiStr,
+                                   &locationWpiStr, &callStackWpiStr, printMsg);
   return returnValue;
 }
 
@@ -369,7 +370,30 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_sendConsoleLine
 {
   JStringRef lineStr{env, line};
 
-  jint returnValue = HAL_SendConsoleLine(lineStr.c_str());
+  WPI_String lineWpiStr = wpi::util::make_string(lineStr);
+  jint returnValue = HAL_SendConsoleLine(&lineWpiStr);
+  return returnValue;
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    sendProgramCrash
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_sendProgramCrash
+  (JNIEnv* env, jclass, jstring details, jstring location, jstring callStack)
+{
+  JStringRef detailsStr{env, details};
+  JStringRef locationStr{env, location};
+  JStringRef callStackStr{env, callStack};
+
+  WPI_String detailsWpiStr = wpi::util::make_string(detailsStr);
+  WPI_String locationWpiStr = wpi::util::make_string(locationStr);
+  WPI_String callStackWpiStr = wpi::util::make_string(callStackStr);
+
+  jint returnValue =
+      HAL_SendProgramCrash(&detailsWpiStr, &locationWpiStr, &callStackWpiStr);
   return returnValue;
 }
 

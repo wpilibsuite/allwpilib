@@ -8,7 +8,12 @@
 using namespace wpi::cmd;
 
 CommandGameCubeController::CommandGameCubeController(int port)
-    : m_controller{wpi::GameCubeController(port)} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
+      m_controller{m_hid->GetHID()} {}
+
+CommandGenericHID& CommandGameCubeController::GetHID() {
+  return *m_hid;
+}
 
 wpi::GameCubeController&
 CommandGameCubeController::GetController() {
@@ -22,100 +27,88 @@ CommandGameCubeController::GetController() const {
 
 Trigger CommandGameCubeController::A(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::GameCubeController::Button::kA,
-                loop);
+  return m_hid->Button(wpi::GameCubeController::Button::A,
+                       loop);
 }
 
 Trigger CommandGameCubeController::X(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::GameCubeController::Button::kX,
-                loop);
+  return m_hid->Button(wpi::GameCubeController::Button::X,
+                       loop);
 }
 
 Trigger CommandGameCubeController::B(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::GameCubeController::Button::kB,
-                loop);
+  return m_hid->Button(wpi::GameCubeController::Button::B,
+                       loop);
 }
 
 Trigger CommandGameCubeController::Y(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::GameCubeController::Button::kY,
-                loop);
+  return m_hid->Button(wpi::GameCubeController::Button::Y,
+                       loop);
 }
 
 Trigger CommandGameCubeController::Start(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::GameCubeController::Button::kStart,
-                loop);
+  return m_hid->Button(wpi::GameCubeController::Button::START,
+                       loop);
 }
 
 Trigger CommandGameCubeController::Z(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::GameCubeController::Button::kZ,
-                loop);
+  return m_hid->Button(wpi::GameCubeController::Button::Z,
+                       loop);
 }
 
 Trigger CommandGameCubeController::DpadUp(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::GameCubeController::Button::kDpadUp,
-                loop);
+  return m_hid->Button(wpi::GameCubeController::Button::DPAD_UP,
+                       loop);
 }
 
 Trigger CommandGameCubeController::DpadDown(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::GameCubeController::Button::kDpadDown,
-                loop);
+  return m_hid->Button(wpi::GameCubeController::Button::DPAD_DOWN,
+                       loop);
 }
 
 Trigger CommandGameCubeController::DpadLeft(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::GameCubeController::Button::kDpadLeft,
-                loop);
+  return m_hid->Button(wpi::GameCubeController::Button::DPAD_LEFT,
+                       loop);
 }
 
 Trigger CommandGameCubeController::DpadRight(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::GameCubeController::Button::kDpadRight,
-                loop);
+  return m_hid->Button(wpi::GameCubeController::Button::DPAD_RIGHT,
+                       loop);
 }
 
 Trigger CommandGameCubeController::L(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::GameCubeController::Button::kL,
-                loop);
+  return m_hid->Button(wpi::GameCubeController::Button::L,
+                       loop);
 }
 
 Trigger CommandGameCubeController::R(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::GameCubeController::Button::kR,
-                loop);
+  return m_hid->Button(wpi::GameCubeController::Button::R,
+                       loop);
 }
 
 Trigger CommandGameCubeController::LTrigger(
     double threshold, wpi::EventLoop* loop) const {
-  return AxisGreaterThan(m_controller.GetHID(),
-                         wpi::GameCubeController::Axis::kLTriggerAxis,
-                         threshold, loop);
+  return m_hid->AxisGreaterThan(
+      wpi::GameCubeController::Axis::L_TRIGGER,
+      threshold, loop);
 }
 
 Trigger CommandGameCubeController::RTrigger(
     double threshold, wpi::EventLoop* loop) const {
-  return AxisGreaterThan(m_controller.GetHID(),
-                         wpi::GameCubeController::Axis::kRTriggerAxis,
-                         threshold, loop);
+  return m_hid->AxisGreaterThan(
+      wpi::GameCubeController::Axis::R_TRIGGER,
+      threshold, loop);
 }
 
 double CommandGameCubeController::GetLeftX() const {
@@ -134,10 +127,10 @@ double CommandGameCubeController::GetCStickY() const {
   return m_controller.GetCStickY();
 }
 
-double CommandGameCubeController::GetLTriggerAxis() const {
-  return m_controller.GetLTriggerAxis();
+double CommandGameCubeController::GetLTrigger() const {
+  return m_controller.GetLTrigger();
 }
 
-double CommandGameCubeController::GetRTriggerAxis() const {
-  return m_controller.GetRTriggerAxis();
+double CommandGameCubeController::GetRTrigger() const {
+  return m_controller.GetRTrigger();
 }

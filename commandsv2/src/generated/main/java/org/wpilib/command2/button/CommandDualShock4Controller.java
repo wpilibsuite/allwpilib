@@ -16,7 +16,8 @@ import org.wpilib.event.EventLoop;
  * @see DualShock4Controller
  */
 @SuppressWarnings("MethodName")
-public class CommandDualShock4Controller extends CommandHIDBase {
+public class CommandDualShock4Controller {
+  private final CommandGenericHID m_hid;
   private final DualShock4Controller m_controller;
 
   /**
@@ -25,7 +26,17 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandDualShock4Controller(int port) {
-    m_controller = new DualShock4Controller(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(port);
+    m_controller = new DualShock4Controller(m_hid.getHID());
+  }
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  public CommandGenericHID getHID() {
+    return m_hid;
   }
 
   /**
@@ -56,10 +67,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger cross(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kCross.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.CROSS.value, loop);
   }
 
   /**
@@ -81,10 +89,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger circle(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kCircle.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.CIRCLE.value, loop);
   }
 
   /**
@@ -106,10 +111,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger square(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kSquare.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.SQUARE.value, loop);
   }
 
   /**
@@ -131,10 +133,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger triangle(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kTriangle.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.TRIANGLE.value, loop);
   }
 
   /**
@@ -156,10 +155,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger share(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kShare.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.SHARE.value, loop);
   }
 
   /**
@@ -181,10 +177,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger PS(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kPS.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.PS.value, loop);
   }
 
   /**
@@ -206,10 +199,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger options(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kOptions.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.OPTIONS.value, loop);
   }
 
   /**
@@ -231,10 +221,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger L3(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kL3.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.L3.value, loop);
   }
 
   /**
@@ -256,10 +243,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger R3(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kR3.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.R3.value, loop);
   }
 
   /**
@@ -281,10 +265,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger L1(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kL1.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.L1.value, loop);
   }
 
   /**
@@ -306,10 +287,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger R1(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kR1.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.R1.value, loop);
   }
 
   /**
@@ -331,10 +309,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kDpadUp.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.DPAD_UP.value, loop);
   }
 
   /**
@@ -356,10 +331,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kDpadDown.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.DPAD_DOWN.value, loop);
   }
 
   /**
@@ -381,10 +353,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kDpadLeft.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.DPAD_LEFT.value, loop);
   }
 
   /**
@@ -406,10 +375,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kDpadRight.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.DPAD_RIGHT.value, loop);
   }
 
   /**
@@ -431,10 +397,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger touchpad(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kTouchpad.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.TOUCHPAD.value, loop);
   }
 
   /**
@@ -448,11 +411,8 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger L2(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        DualShock4Controller.Axis.kL2Axis.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        DualShock4Controller.Axis.L2.value, threshold, loop);
   }
 
   /**
@@ -493,11 +453,8 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger R2(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        DualShock4Controller.Axis.kR2Axis.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        DualShock4Controller.Axis.R2.value, threshold, loop);
   }
 
   /**
@@ -564,20 +521,20 @@ public class CommandDualShock4Controller extends CommandHIDBase {
   }
 
   /**
-   * Get the L 2 Axis value of the controller.
+   * Get the L 2 value of the controller.
    *
    * @return The axis value.
    */
-  public double getL2Axis() {
-    return m_controller.getL2Axis();
+  public double getL2() {
+    return m_controller.getL2();
   }
 
   /**
-   * Get the R 2 Axis value of the controller.
+   * Get the R 2 value of the controller.
    *
    * @return The axis value.
    */
-  public double getR2Axis() {
-    return m_controller.getR2Axis();
+  public double getR2() {
+    return m_controller.getR2();
   }
 }

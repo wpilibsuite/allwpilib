@@ -17,7 +17,8 @@ import org.wpilib.event.EventLoop;
  * @see Switch2ProController
  */
 @SuppressWarnings("MethodName")
-public class CommandSwitch2ProController extends CommandHIDBase {
+public class CommandSwitch2ProController {
+  private final CommandGenericHID m_hid;
   private final Switch2ProController m_controller;
 
   /**
@@ -38,8 +39,17 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandSwitch2ProController(Scheduler scheduler, int port) {
-    super(scheduler);
-    m_controller = new Switch2ProController(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(scheduler, port);
+    m_controller = new Switch2ProController(m_hid.getHID());
+  }
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  public CommandGenericHID getHID() {
+    return m_hid;
   }
 
   /**
@@ -61,7 +71,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #b(EventLoop)
    */
   public Trigger b() {
-    return b(getDefaultEventLoop());
+    return b(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -72,10 +82,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kB.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.B.value, loop);
   }
 
   /**
@@ -88,7 +95,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #a(EventLoop)
    */
   public Trigger a() {
-    return a(getDefaultEventLoop());
+    return a(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -99,10 +106,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kA.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.A.value, loop);
   }
 
   /**
@@ -115,7 +119,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #y(EventLoop)
    */
   public Trigger y() {
-    return y(getDefaultEventLoop());
+    return y(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -126,10 +130,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger y(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kY.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.Y.value, loop);
   }
 
   /**
@@ -142,7 +143,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #x(EventLoop)
    */
   public Trigger x() {
-    return x(getDefaultEventLoop());
+    return x(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -153,10 +154,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger x(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kX.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.X.value, loop);
   }
 
   /**
@@ -169,7 +167,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #minus(EventLoop)
    */
   public Trigger minus() {
-    return minus(getDefaultEventLoop());
+    return minus(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -180,10 +178,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger minus(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kMinus.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.MINUS.value, loop);
   }
 
   /**
@@ -196,7 +191,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #home(EventLoop)
    */
   public Trigger home() {
-    return home(getDefaultEventLoop());
+    return home(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -207,10 +202,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger home(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kHome.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.HOME.value, loop);
   }
 
   /**
@@ -223,7 +215,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #plus(EventLoop)
    */
   public Trigger plus() {
-    return plus(getDefaultEventLoop());
+    return plus(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -234,10 +226,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger plus(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kPlus.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.PLUS.value, loop);
   }
 
   /**
@@ -250,7 +239,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #leftStick(EventLoop)
    */
   public Trigger leftStick() {
-    return leftStick(getDefaultEventLoop());
+    return leftStick(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -261,10 +250,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger leftStick(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kLeftStick.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.LEFT_STICK.value, loop);
   }
 
   /**
@@ -277,7 +263,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #rightStick(EventLoop)
    */
   public Trigger rightStick() {
-    return rightStick(getDefaultEventLoop());
+    return rightStick(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -288,10 +274,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger rightStick(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kRightStick.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.RIGHT_STICK.value, loop);
   }
 
   /**
@@ -304,7 +287,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #L(EventLoop)
    */
   public Trigger L() {
-    return L(getDefaultEventLoop());
+    return L(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -315,10 +298,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger L(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kL.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.L.value, loop);
   }
 
   /**
@@ -331,7 +311,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #R(EventLoop)
    */
   public Trigger R() {
-    return R(getDefaultEventLoop());
+    return R(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -342,10 +322,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger R(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kR.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.R.value, loop);
   }
 
   /**
@@ -358,7 +335,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #dpadUp(EventLoop)
    */
   public Trigger dpadUp() {
-    return dpadUp(getDefaultEventLoop());
+    return dpadUp(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -369,10 +346,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kDpadUp.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.DPAD_UP.value, loop);
   }
 
   /**
@@ -385,7 +359,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #dpadDown(EventLoop)
    */
   public Trigger dpadDown() {
-    return dpadDown(getDefaultEventLoop());
+    return dpadDown(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -396,10 +370,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kDpadDown.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.DPAD_DOWN.value, loop);
   }
 
   /**
@@ -412,7 +383,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #dpadLeft(EventLoop)
    */
   public Trigger dpadLeft() {
-    return dpadLeft(getDefaultEventLoop());
+    return dpadLeft(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -423,10 +394,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kDpadLeft.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.DPAD_LEFT.value, loop);
   }
 
   /**
@@ -439,7 +407,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #dpadRight(EventLoop)
    */
   public Trigger dpadRight() {
-    return dpadRight(getDefaultEventLoop());
+    return dpadRight(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -450,10 +418,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kDpadRight.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.DPAD_RIGHT.value, loop);
   }
 
   /**
@@ -466,7 +431,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #capture(EventLoop)
    */
   public Trigger capture() {
-    return capture(getDefaultEventLoop());
+    return capture(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -477,10 +442,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger capture(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kCapture.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.CAPTURE.value, loop);
   }
 
   /**
@@ -493,7 +455,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #GR(EventLoop)
    */
   public Trigger GR() {
-    return GR(getDefaultEventLoop());
+    return GR(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -504,10 +466,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger GR(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kGR.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.GR.value, loop);
   }
 
   /**
@@ -520,7 +479,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #GL(EventLoop)
    */
   public Trigger GL() {
-    return GL(getDefaultEventLoop());
+    return GL(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -531,10 +490,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger GL(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kGL.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.GL.value, loop);
   }
 
   /**
@@ -547,7 +503,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    * @see #C(EventLoop)
    */
   public Trigger C() {
-    return C(getDefaultEventLoop());
+    return C(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -558,10 +514,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger C(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        Switch2ProController.Button.kC.value,
-        loop);
+    return m_hid.button(Switch2ProController.Button.C.value, loop);
   }
 
   /**
@@ -575,11 +528,8 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger ZL(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        Switch2ProController.Axis.kZLAxis.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        Switch2ProController.Axis.ZL.value, threshold, loop);
   }
 
   /**
@@ -594,7 +544,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     Scheduler#getDefault default scheduler} if a scheduler was not explicitly provided.
    */
   public Trigger ZL(double threshold) {
-    return ZL(threshold, getDefaultEventLoop());
+    return ZL(threshold, m_hid.getScheduler().getDefaultEventLoop());
   }
 
 
@@ -622,11 +572,8 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger ZR(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        Switch2ProController.Axis.kZRAxis.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        Switch2ProController.Axis.ZR.value, threshold, loop);
   }
 
   /**
@@ -641,7 +588,7 @@ public class CommandSwitch2ProController extends CommandHIDBase {
    *     Scheduler#getDefault default scheduler} if a scheduler was not explicitly provided.
    */
   public Trigger ZR(double threshold) {
-    return ZR(threshold, getDefaultEventLoop());
+    return ZR(threshold, m_hid.getScheduler().getDefaultEventLoop());
   }
 
 
@@ -695,20 +642,20 @@ public class CommandSwitch2ProController extends CommandHIDBase {
   }
 
   /**
-   * Get the ZL Axis value of the controller.
+   * Get the ZL value of the controller.
    *
    * @return The axis value.
    */
-  public double getZLAxis() {
-    return m_controller.getZLAxis();
+  public double getZL() {
+    return m_controller.getZL();
   }
 
   /**
-   * Get the ZR Axis value of the controller.
+   * Get the ZR value of the controller.
    *
    * @return The axis value.
    */
-  public double getZRAxis() {
-    return m_controller.getZRAxis();
+  public double getZR() {
+    return m_controller.getZR();
   }
 }

@@ -17,7 +17,7 @@ public class JoystickSim extends GenericHIDSim {
    */
   @SuppressWarnings("this-escape")
   public JoystickSim(Joystick joystick) {
-    super(joystick);
+    super(joystick.getHID());
     m_joystick = joystick;
     // default to a reasonable joystick configuration
     setAxesMaximumIndex(5);

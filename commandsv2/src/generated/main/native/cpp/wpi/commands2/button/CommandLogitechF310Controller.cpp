@@ -8,7 +8,12 @@
 using namespace wpi::cmd;
 
 CommandLogitechF310Controller::CommandLogitechF310Controller(int port)
-    : m_controller{wpi::LogitechF310Controller(port)} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
+      m_controller{m_hid->GetHID()} {}
+
+CommandGenericHID& CommandLogitechF310Controller::GetHID() {
+  return *m_hid;
+}
 
 wpi::LogitechF310Controller&
 CommandLogitechF310Controller::GetController() {
@@ -22,121 +27,106 @@ CommandLogitechF310Controller::GetController() const {
 
 Trigger CommandLogitechF310Controller::A(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::LogitechF310Controller::Button::kA,
-                loop);
+  return m_hid->Button(wpi::LogitechF310Controller::Button::A,
+                       loop);
 }
 
 Trigger CommandLogitechF310Controller::B(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::LogitechF310Controller::Button::kB,
-                loop);
+  return m_hid->Button(wpi::LogitechF310Controller::Button::B,
+                       loop);
 }
 
 Trigger CommandLogitechF310Controller::X(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::LogitechF310Controller::Button::kX,
-                loop);
+  return m_hid->Button(wpi::LogitechF310Controller::Button::X,
+                       loop);
 }
 
 Trigger CommandLogitechF310Controller::Y(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::LogitechF310Controller::Button::kY,
-                loop);
+  return m_hid->Button(wpi::LogitechF310Controller::Button::Y,
+                       loop);
 }
 
 Trigger CommandLogitechF310Controller::Back(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::LogitechF310Controller::Button::kBack,
-                loop);
+  return m_hid->Button(wpi::LogitechF310Controller::Button::BACK,
+                       loop);
 }
 
 Trigger CommandLogitechF310Controller::Logitech(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::LogitechF310Controller::Button::kLogitech,
-                loop);
+  return m_hid->Button(wpi::LogitechF310Controller::Button::LOGITECH,
+                       loop);
 }
 
 Trigger CommandLogitechF310Controller::Start(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::LogitechF310Controller::Button::kStart,
-                loop);
+  return m_hid->Button(wpi::LogitechF310Controller::Button::START,
+                       loop);
 }
 
 Trigger CommandLogitechF310Controller::LeftStick(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::LogitechF310Controller::Button::kLeftStick,
-                loop);
+  return m_hid->Button(wpi::LogitechF310Controller::Button::LEFT_STICK,
+                       loop);
 }
 
 Trigger CommandLogitechF310Controller::RightStick(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::LogitechF310Controller::Button::kRightStick,
-                loop);
+  return m_hid->Button(wpi::LogitechF310Controller::Button::RIGHT_STICK,
+                       loop);
 }
 
 Trigger CommandLogitechF310Controller::LeftBumper(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::LogitechF310Controller::Button::kLeftBumper,
-                loop);
+  return m_hid->Button(wpi::LogitechF310Controller::Button::LEFT_BUMPER,
+                       loop);
 }
 
 Trigger CommandLogitechF310Controller::RightBumper(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::LogitechF310Controller::Button::kRightBumper,
-                loop);
+  return m_hid->Button(wpi::LogitechF310Controller::Button::RIGHT_BUMPER,
+                       loop);
 }
 
 Trigger CommandLogitechF310Controller::DpadUp(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::LogitechF310Controller::Button::kDpadUp,
-                loop);
+  return m_hid->Button(wpi::LogitechF310Controller::Button::DPAD_UP,
+                       loop);
 }
 
 Trigger CommandLogitechF310Controller::DpadDown(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::LogitechF310Controller::Button::kDpadDown,
-                loop);
+  return m_hid->Button(wpi::LogitechF310Controller::Button::DPAD_DOWN,
+                       loop);
 }
 
 Trigger CommandLogitechF310Controller::DpadLeft(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::LogitechF310Controller::Button::kDpadLeft,
-                loop);
+  return m_hid->Button(wpi::LogitechF310Controller::Button::DPAD_LEFT,
+                       loop);
 }
 
 Trigger CommandLogitechF310Controller::DpadRight(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::LogitechF310Controller::Button::kDpadRight,
-                loop);
+  return m_hid->Button(wpi::LogitechF310Controller::Button::DPAD_RIGHT,
+                       loop);
 }
 
 Trigger CommandLogitechF310Controller::LeftTrigger(
     double threshold, wpi::EventLoop* loop) const {
-  return AxisGreaterThan(m_controller.GetHID(),
-                         wpi::LogitechF310Controller::Axis::kLeftTriggerAxis,
-                         threshold, loop);
+  return m_hid->AxisGreaterThan(
+      wpi::LogitechF310Controller::Axis::LEFT_TRIGGER,
+      threshold, loop);
 }
 
 Trigger CommandLogitechF310Controller::RightTrigger(
     double threshold, wpi::EventLoop* loop) const {
-  return AxisGreaterThan(m_controller.GetHID(),
-                         wpi::LogitechF310Controller::Axis::kRightTriggerAxis,
-                         threshold, loop);
+  return m_hid->AxisGreaterThan(
+      wpi::LogitechF310Controller::Axis::RIGHT_TRIGGER,
+      threshold, loop);
 }
 
 double CommandLogitechF310Controller::GetLeftX() const {
@@ -155,10 +145,10 @@ double CommandLogitechF310Controller::GetRightY() const {
   return m_controller.GetRightY();
 }
 
-double CommandLogitechF310Controller::GetLeftTriggerAxis() const {
-  return m_controller.GetLeftTriggerAxis();
+double CommandLogitechF310Controller::GetLeftTrigger() const {
+  return m_controller.GetLeftTrigger();
 }
 
-double CommandLogitechF310Controller::GetRightTriggerAxis() const {
-  return m_controller.GetRightTriggerAxis();
+double CommandLogitechF310Controller::GetRightTrigger() const {
+  return m_controller.GetRightTrigger();
 }

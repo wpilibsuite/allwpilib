@@ -8,7 +8,7 @@
 #include <string>
 #include <thread>
 
-#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/DriverStation.hpp"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/Main.h"
 #include "wpi/nt/NetworkTable.hpp"
@@ -47,7 +47,7 @@ void RunRobot(wpi::util::mutex& m, Robot** robot) {
         "  See https://wpilib.org/stacktrace for more information.\n");
     throw;
   } catch (const std::exception& e) {
-    HAL_SendError(1, err::Error, 0, e.what(), "", "", 1);
+    wpi::hal::SendError(1, err::Error, e.what(), "", "", 1);
     throw;
   }
 }

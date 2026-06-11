@@ -8,7 +8,7 @@
 #include "wpi/driverstation/SwitchN64Controller.hpp"
 
 #include "wpi/commands2/CommandScheduler.hpp"
-#include "wpi/commands2/button/CommandHIDBase.hpp"
+#include "wpi/commands2/button/CommandGenericHID.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
 
 namespace wpi::cmd {
@@ -18,7 +18,7 @@ namespace wpi::cmd {
  *
  * @see wpi::SwitchN64Controller
  */
-class CommandSwitchN64Controller : public CommandHIDBase {
+class CommandSwitchN64Controller {
  public:
   /**
    * Construct an instance of a controller.
@@ -27,6 +27,13 @@ class CommandSwitchN64Controller : public CommandHIDBase {
    * plugged into.
    */
   explicit CommandSwitchN64Controller(int port);
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  CommandGenericHID& GetHID();
 
   /**
    * Get the wrapped controller object.
@@ -277,13 +284,14 @@ class CommandSwitchN64Controller : public CommandHIDBase {
   double GetZAxis() const;
 
   /**
-   * Get the ZR Axis value of the controller.
+   * Get the ZR value of the controller.
    *
    * @return the axis value.
    */
-  double GetZRAxis() const;
+  double GetZR() const;
 
  private:
+  CommandGenericHID* m_hid;
   wpi::SwitchN64Controller m_controller;
 };
 }  // namespace wpi::cmd

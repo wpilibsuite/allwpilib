@@ -17,7 +17,8 @@ import org.wpilib.event.EventLoop;
  * @see SteamController
  */
 @SuppressWarnings("MethodName")
-public class CommandSteamController extends CommandHIDBase {
+public class CommandSteamController {
+  private final CommandGenericHID m_hid;
   private final SteamController m_controller;
 
   /**
@@ -38,8 +39,17 @@ public class CommandSteamController extends CommandHIDBase {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandSteamController(Scheduler scheduler, int port) {
-    super(scheduler);
-    m_controller = new SteamController(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(scheduler, port);
+    m_controller = new SteamController(m_hid.getHID());
+  }
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  public CommandGenericHID getHID() {
+    return m_hid;
   }
 
   /**
@@ -61,7 +71,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #a(EventLoop)
    */
   public Trigger a() {
-    return a(getDefaultEventLoop());
+    return a(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -72,10 +82,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kA.value,
-        loop);
+    return m_hid.button(SteamController.Button.A.value, loop);
   }
 
   /**
@@ -88,7 +95,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #b(EventLoop)
    */
   public Trigger b() {
-    return b(getDefaultEventLoop());
+    return b(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -99,10 +106,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kB.value,
-        loop);
+    return m_hid.button(SteamController.Button.B.value, loop);
   }
 
   /**
@@ -115,7 +119,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #x(EventLoop)
    */
   public Trigger x() {
-    return x(getDefaultEventLoop());
+    return x(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -126,10 +130,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger x(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kX.value,
-        loop);
+    return m_hid.button(SteamController.Button.X.value, loop);
   }
 
   /**
@@ -142,7 +143,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #y(EventLoop)
    */
   public Trigger y() {
-    return y(getDefaultEventLoop());
+    return y(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -153,10 +154,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger y(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kY.value,
-        loop);
+    return m_hid.button(SteamController.Button.Y.value, loop);
   }
 
   /**
@@ -169,7 +167,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #menu(EventLoop)
    */
   public Trigger menu() {
-    return menu(getDefaultEventLoop());
+    return menu(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -180,10 +178,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger menu(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kMenu.value,
-        loop);
+    return m_hid.button(SteamController.Button.MENU.value, loop);
   }
 
   /**
@@ -196,7 +191,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #steam(EventLoop)
    */
   public Trigger steam() {
-    return steam(getDefaultEventLoop());
+    return steam(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -207,10 +202,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger steam(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kSteam.value,
-        loop);
+    return m_hid.button(SteamController.Button.STEAM.value, loop);
   }
 
   /**
@@ -223,7 +215,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #view(EventLoop)
    */
   public Trigger view() {
-    return view(getDefaultEventLoop());
+    return view(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -234,10 +226,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger view(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kView.value,
-        loop);
+    return m_hid.button(SteamController.Button.VIEW.value, loop);
   }
 
   /**
@@ -250,7 +239,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #leftStick(EventLoop)
    */
   public Trigger leftStick() {
-    return leftStick(getDefaultEventLoop());
+    return leftStick(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -261,10 +250,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger leftStick(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kLeftStick.value,
-        loop);
+    return m_hid.button(SteamController.Button.LEFT_STICK.value, loop);
   }
 
   /**
@@ -277,7 +263,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #rightStick(EventLoop)
    */
   public Trigger rightStick() {
-    return rightStick(getDefaultEventLoop());
+    return rightStick(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -288,10 +274,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger rightStick(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kRightStick.value,
-        loop);
+    return m_hid.button(SteamController.Button.RIGHT_STICK.value, loop);
   }
 
   /**
@@ -304,7 +287,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #leftBumper(EventLoop)
    */
   public Trigger leftBumper() {
-    return leftBumper(getDefaultEventLoop());
+    return leftBumper(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -315,10 +298,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger leftBumper(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kLeftBumper.value,
-        loop);
+    return m_hid.button(SteamController.Button.LEFT_BUMPER.value, loop);
   }
 
   /**
@@ -331,7 +311,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #rightBumper(EventLoop)
    */
   public Trigger rightBumper() {
-    return rightBumper(getDefaultEventLoop());
+    return rightBumper(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -342,10 +322,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger rightBumper(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kRightBumper.value,
-        loop);
+    return m_hid.button(SteamController.Button.RIGHT_BUMPER.value, loop);
   }
 
   /**
@@ -358,7 +335,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #dpadUp(EventLoop)
    */
   public Trigger dpadUp() {
-    return dpadUp(getDefaultEventLoop());
+    return dpadUp(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -369,10 +346,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kDpadUp.value,
-        loop);
+    return m_hid.button(SteamController.Button.DPAD_UP.value, loop);
   }
 
   /**
@@ -385,7 +359,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #dpadDown(EventLoop)
    */
   public Trigger dpadDown() {
-    return dpadDown(getDefaultEventLoop());
+    return dpadDown(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -396,10 +370,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kDpadDown.value,
-        loop);
+    return m_hid.button(SteamController.Button.DPAD_DOWN.value, loop);
   }
 
   /**
@@ -412,7 +383,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #dpadLeft(EventLoop)
    */
   public Trigger dpadLeft() {
-    return dpadLeft(getDefaultEventLoop());
+    return dpadLeft(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -423,10 +394,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kDpadLeft.value,
-        loop);
+    return m_hid.button(SteamController.Button.DPAD_LEFT.value, loop);
   }
 
   /**
@@ -439,7 +407,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #dpadRight(EventLoop)
    */
   public Trigger dpadRight() {
-    return dpadRight(getDefaultEventLoop());
+    return dpadRight(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -450,10 +418,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kDpadRight.value,
-        loop);
+    return m_hid.button(SteamController.Button.DPAD_RIGHT.value, loop);
   }
 
   /**
@@ -466,7 +431,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #QAM(EventLoop)
    */
   public Trigger QAM() {
-    return QAM(getDefaultEventLoop());
+    return QAM(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -477,10 +442,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger QAM(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kQAM.value,
-        loop);
+    return m_hid.button(SteamController.Button.QAM.value, loop);
   }
 
   /**
@@ -493,7 +455,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #rightPaddle1(EventLoop)
    */
   public Trigger rightPaddle1() {
-    return rightPaddle1(getDefaultEventLoop());
+    return rightPaddle1(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -504,10 +466,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger rightPaddle1(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kRightPaddle1.value,
-        loop);
+    return m_hid.button(SteamController.Button.RIGHT_PADDLE_1.value, loop);
   }
 
   /**
@@ -520,7 +479,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #leftPaddle1(EventLoop)
    */
   public Trigger leftPaddle1() {
-    return leftPaddle1(getDefaultEventLoop());
+    return leftPaddle1(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -531,10 +490,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger leftPaddle1(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kLeftPaddle1.value,
-        loop);
+    return m_hid.button(SteamController.Button.LEFT_PADDLE_1.value, loop);
   }
 
   /**
@@ -547,7 +503,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #rightPaddle2(EventLoop)
    */
   public Trigger rightPaddle2() {
-    return rightPaddle2(getDefaultEventLoop());
+    return rightPaddle2(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -558,10 +514,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger rightPaddle2(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kRightPaddle2.value,
-        loop);
+    return m_hid.button(SteamController.Button.RIGHT_PADDLE_2.value, loop);
   }
 
   /**
@@ -574,7 +527,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #leftPaddle2(EventLoop)
    */
   public Trigger leftPaddle2() {
-    return leftPaddle2(getDefaultEventLoop());
+    return leftPaddle2(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -585,10 +538,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger leftPaddle2(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kLeftPaddle2.value,
-        loop);
+    return m_hid.button(SteamController.Button.LEFT_PADDLE_2.value, loop);
   }
 
   /**
@@ -601,7 +551,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #leftTouchpad(EventLoop)
    */
   public Trigger leftTouchpad() {
-    return leftTouchpad(getDefaultEventLoop());
+    return leftTouchpad(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -612,10 +562,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger leftTouchpad(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kLeftTouchpad.value,
-        loop);
+    return m_hid.button(SteamController.Button.LEFT_TOUCHPAD.value, loop);
   }
 
   /**
@@ -628,7 +575,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #rightTouchpad(EventLoop)
    */
   public Trigger rightTouchpad() {
-    return rightTouchpad(getDefaultEventLoop());
+    return rightTouchpad(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -639,10 +586,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger rightTouchpad(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kRightTouchpad.value,
-        loop);
+    return m_hid.button(SteamController.Button.RIGHT_TOUCHPAD.value, loop);
   }
 
   /**
@@ -655,7 +599,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #leftStickTouch(EventLoop)
    */
   public Trigger leftStickTouch() {
-    return leftStickTouch(getDefaultEventLoop());
+    return leftStickTouch(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -666,10 +610,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger leftStickTouch(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kLeftStickTouch.value,
-        loop);
+    return m_hid.button(SteamController.Button.LEFT_STICK_TOUCH.value, loop);
   }
 
   /**
@@ -682,7 +623,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #rightStickTouch(EventLoop)
    */
   public Trigger rightStickTouch() {
-    return rightStickTouch(getDefaultEventLoop());
+    return rightStickTouch(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -693,10 +634,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger rightStickTouch(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kRightStickTouch.value,
-        loop);
+    return m_hid.button(SteamController.Button.RIGHT_STICK_TOUCH.value, loop);
   }
 
   /**
@@ -709,7 +647,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #leftGripTouch(EventLoop)
    */
   public Trigger leftGripTouch() {
-    return leftGripTouch(getDefaultEventLoop());
+    return leftGripTouch(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -720,10 +658,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger leftGripTouch(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kLeftGripTouch.value,
-        loop);
+    return m_hid.button(SteamController.Button.LEFT_GRIP_TOUCH.value, loop);
   }
 
   /**
@@ -736,7 +671,7 @@ public class CommandSteamController extends CommandHIDBase {
    * @see #rightGripTouch(EventLoop)
    */
   public Trigger rightGripTouch() {
-    return rightGripTouch(getDefaultEventLoop());
+    return rightGripTouch(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -747,10 +682,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger rightGripTouch(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SteamController.Button.kRightGripTouch.value,
-        loop);
+    return m_hid.button(SteamController.Button.RIGHT_GRIP_TOUCH.value, loop);
   }
 
   /**
@@ -764,11 +696,8 @@ public class CommandSteamController extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger leftTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        SteamController.Axis.kLeftTriggerAxis.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        SteamController.Axis.LEFT_TRIGGER.value, threshold, loop);
   }
 
   /**
@@ -783,7 +712,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     Scheduler#getDefault default scheduler} if a scheduler was not explicitly provided.
    */
   public Trigger leftTrigger(double threshold) {
-    return leftTrigger(threshold, getDefaultEventLoop());
+    return leftTrigger(threshold, m_hid.getScheduler().getDefaultEventLoop());
   }
 
 
@@ -811,11 +740,8 @@ public class CommandSteamController extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger rightTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        SteamController.Axis.kRightTriggerAxis.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        SteamController.Axis.RIGHT_TRIGGER.value, threshold, loop);
   }
 
   /**
@@ -830,7 +756,7 @@ public class CommandSteamController extends CommandHIDBase {
    *     Scheduler#getDefault default scheduler} if a scheduler was not explicitly provided.
    */
   public Trigger rightTrigger(double threshold) {
-    return rightTrigger(threshold, getDefaultEventLoop());
+    return rightTrigger(threshold, m_hid.getScheduler().getDefaultEventLoop());
   }
 
 
@@ -884,20 +810,20 @@ public class CommandSteamController extends CommandHIDBase {
   }
 
   /**
-   * Get the Left Trigger Axis value of the controller.
+   * Get the Left Trigger value of the controller.
    *
    * @return The axis value.
    */
-  public double getLeftTriggerAxis() {
-    return m_controller.getLeftTriggerAxis();
+  public double getLeftTrigger() {
+    return m_controller.getLeftTrigger();
   }
 
   /**
-   * Get the Right Trigger Axis value of the controller.
+   * Get the Right Trigger value of the controller.
    *
    * @return The axis value.
    */
-  public double getRightTriggerAxis() {
-    return m_controller.getRightTriggerAxis();
+  public double getRightTrigger() {
+    return m_controller.getRightTrigger();
   }
 }

@@ -1,21 +1,17 @@
-extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
-- wpi/driverstation/internal/DriverStationBackend.hpp
-- wpi/event/BooleanEvent.hpp
-
 classes:
   wpi::GameCubeController:
-    ignored_bases:
-    - wpi::util::SendableHelper<GameCubeController>
     attributes:
-      kTouchpadCount:
-      kSupportsRumble:
-      kSupportsTriggerRumble:
-      kSupportsMonoLed:
-      kSupportsRgbLed:
-      kSupportedOutputs:
+      TOUCHPAD_COUNT:
+      SUPPORTS_RUMBLE:
+      SUPPORTS_TRIGGER_RUMBLE:
+      SUPPORTS_MONO_LED:
+      SUPPORTS_RGB_LED:
+      SUPPORTED_OUTPUTS:
     methods:
       GameCubeController:
+        overloads:
+          int:
+          GenericHID&:
       GetHID:
         overloads:
           "":
@@ -26,8 +22,8 @@ classes:
       GetLeftY:
       GetCStickX:
       GetCStickY:
-      GetLTriggerAxis:
-      GetRTriggerAxis:
+      GetLTrigger:
+      GetRTrigger:
       GetAxis:
       AxisLessThan:
       AxisGreaterThan:
@@ -83,29 +79,28 @@ classes:
       GetButtonPressed:
       GetButtonReleased:
       ButtonEvent:
-        rename: button
       SetLeds:
       SetRumble:
       InitSendable:
   wpi::GameCubeController::Button:
     attributes:
-      kA:
-      kX:
-      kB:
-      kY:
-      kStart:
-      kZ:
-      kDpadUp:
-      kDpadDown:
-      kDpadLeft:
-      kDpadRight:
-      kL:
-      kR:
+      A:
+      X:
+      B:
+      Y:
+      START:
+      Z:
+      DPAD_UP:
+      DPAD_DOWN:
+      DPAD_LEFT:
+      DPAD_RIGHT:
+      L:
+      R:
   wpi::GameCubeController::Axis:
     attributes:
-      kLeftX:
-      kLeftY:
-      kCStickX:
-      kCStickY:
-      kLTriggerAxis:
-      kRTriggerAxis:
+      LEFT_X:
+      LEFT_Y:
+      C_STICK_X:
+      C_STICK_Y:
+      L_TRIGGER:
+      R_TRIGGER:

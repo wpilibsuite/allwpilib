@@ -16,7 +16,8 @@ import org.wpilib.event.EventLoop;
  * @see XboxController
  */
 @SuppressWarnings("MethodName")
-public class CommandXboxController extends CommandHIDBase {
+public class CommandXboxController {
+  private final CommandGenericHID m_hid;
   private final XboxController m_controller;
 
   /**
@@ -25,7 +26,17 @@ public class CommandXboxController extends CommandHIDBase {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandXboxController(int port) {
-    m_controller = new XboxController(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(port);
+    m_controller = new XboxController(m_hid.getHID());
+  }
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  public CommandGenericHID getHID() {
+    return m_hid;
   }
 
   /**
@@ -56,10 +67,7 @@ public class CommandXboxController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        XboxController.Button.kA.value,
-        loop);
+    return m_hid.button(XboxController.Button.A.value, loop);
   }
 
   /**
@@ -81,10 +89,7 @@ public class CommandXboxController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        XboxController.Button.kB.value,
-        loop);
+    return m_hid.button(XboxController.Button.B.value, loop);
   }
 
   /**
@@ -106,10 +111,7 @@ public class CommandXboxController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger x(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        XboxController.Button.kX.value,
-        loop);
+    return m_hid.button(XboxController.Button.X.value, loop);
   }
 
   /**
@@ -131,10 +133,7 @@ public class CommandXboxController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger y(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        XboxController.Button.kY.value,
-        loop);
+    return m_hid.button(XboxController.Button.Y.value, loop);
   }
 
   /**
@@ -156,10 +155,7 @@ public class CommandXboxController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger view(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        XboxController.Button.kView.value,
-        loop);
+    return m_hid.button(XboxController.Button.VIEW.value, loop);
   }
 
   /**
@@ -181,10 +177,7 @@ public class CommandXboxController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger xbox(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        XboxController.Button.kXbox.value,
-        loop);
+    return m_hid.button(XboxController.Button.XBOX.value, loop);
   }
 
   /**
@@ -206,10 +199,7 @@ public class CommandXboxController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger menu(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        XboxController.Button.kMenu.value,
-        loop);
+    return m_hid.button(XboxController.Button.MENU.value, loop);
   }
 
   /**
@@ -231,10 +221,7 @@ public class CommandXboxController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger leftStick(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        XboxController.Button.kLeftStick.value,
-        loop);
+    return m_hid.button(XboxController.Button.LEFT_STICK.value, loop);
   }
 
   /**
@@ -256,10 +243,7 @@ public class CommandXboxController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger rightStick(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        XboxController.Button.kRightStick.value,
-        loop);
+    return m_hid.button(XboxController.Button.RIGHT_STICK.value, loop);
   }
 
   /**
@@ -281,10 +265,7 @@ public class CommandXboxController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger leftBumper(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        XboxController.Button.kLeftBumper.value,
-        loop);
+    return m_hid.button(XboxController.Button.LEFT_BUMPER.value, loop);
   }
 
   /**
@@ -306,10 +287,7 @@ public class CommandXboxController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger rightBumper(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        XboxController.Button.kRightBumper.value,
-        loop);
+    return m_hid.button(XboxController.Button.RIGHT_BUMPER.value, loop);
   }
 
   /**
@@ -331,10 +309,7 @@ public class CommandXboxController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        XboxController.Button.kDpadUp.value,
-        loop);
+    return m_hid.button(XboxController.Button.DPAD_UP.value, loop);
   }
 
   /**
@@ -356,10 +331,7 @@ public class CommandXboxController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        XboxController.Button.kDpadDown.value,
-        loop);
+    return m_hid.button(XboxController.Button.DPAD_DOWN.value, loop);
   }
 
   /**
@@ -381,10 +353,7 @@ public class CommandXboxController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        XboxController.Button.kDpadLeft.value,
-        loop);
+    return m_hid.button(XboxController.Button.DPAD_LEFT.value, loop);
   }
 
   /**
@@ -406,10 +375,7 @@ public class CommandXboxController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        XboxController.Button.kDpadRight.value,
-        loop);
+    return m_hid.button(XboxController.Button.DPAD_RIGHT.value, loop);
   }
 
   /**
@@ -423,11 +389,8 @@ public class CommandXboxController extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger leftTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        XboxController.Axis.kLeftTriggerAxis.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        XboxController.Axis.LEFT_TRIGGER.value, threshold, loop);
   }
 
   /**
@@ -468,11 +431,8 @@ public class CommandXboxController extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger rightTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        XboxController.Axis.kRightTriggerAxis.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        XboxController.Axis.RIGHT_TRIGGER.value, threshold, loop);
   }
 
   /**
@@ -539,20 +499,20 @@ public class CommandXboxController extends CommandHIDBase {
   }
 
   /**
-   * Get the Left Trigger Axis value of the controller.
+   * Get the Left Trigger value of the controller.
    *
    * @return The axis value.
    */
-  public double getLeftTriggerAxis() {
-    return m_controller.getLeftTriggerAxis();
+  public double getLeftTrigger() {
+    return m_controller.getLeftTrigger();
   }
 
   /**
-   * Get the Right Trigger Axis value of the controller.
+   * Get the Right Trigger value of the controller.
    *
    * @return The axis value.
    */
-  public double getRightTriggerAxis() {
-    return m_controller.getRightTriggerAxis();
+  public double getRightTrigger() {
+    return m_controller.getRightTrigger();
   }
 }

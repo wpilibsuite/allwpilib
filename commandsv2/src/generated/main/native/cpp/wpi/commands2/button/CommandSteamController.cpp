@@ -8,7 +8,12 @@
 using namespace wpi::cmd;
 
 CommandSteamController::CommandSteamController(int port)
-    : m_controller{wpi::SteamController(port)} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
+      m_controller{m_hid->GetHID()} {}
+
+CommandGenericHID& CommandSteamController::GetHID() {
+  return *m_hid;
+}
 
 wpi::SteamController&
 CommandSteamController::GetController() {
@@ -22,198 +27,172 @@ CommandSteamController::GetController() const {
 
 Trigger CommandSteamController::A(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kA,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::A,
+                       loop);
 }
 
 Trigger CommandSteamController::B(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kB,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::B,
+                       loop);
 }
 
 Trigger CommandSteamController::X(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kX,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::X,
+                       loop);
 }
 
 Trigger CommandSteamController::Y(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kY,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::Y,
+                       loop);
 }
 
 Trigger CommandSteamController::Menu(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kMenu,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::MENU,
+                       loop);
 }
 
 Trigger CommandSteamController::Steam(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kSteam,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::STEAM,
+                       loop);
 }
 
 Trigger CommandSteamController::View(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kView,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::VIEW,
+                       loop);
 }
 
 Trigger CommandSteamController::LeftStick(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kLeftStick,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::LEFT_STICK,
+                       loop);
 }
 
 Trigger CommandSteamController::RightStick(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kRightStick,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::RIGHT_STICK,
+                       loop);
 }
 
 Trigger CommandSteamController::LeftBumper(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kLeftBumper,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::LEFT_BUMPER,
+                       loop);
 }
 
 Trigger CommandSteamController::RightBumper(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kRightBumper,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::RIGHT_BUMPER,
+                       loop);
 }
 
 Trigger CommandSteamController::DpadUp(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kDpadUp,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::DPAD_UP,
+                       loop);
 }
 
 Trigger CommandSteamController::DpadDown(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kDpadDown,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::DPAD_DOWN,
+                       loop);
 }
 
 Trigger CommandSteamController::DpadLeft(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kDpadLeft,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::DPAD_LEFT,
+                       loop);
 }
 
 Trigger CommandSteamController::DpadRight(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kDpadRight,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::DPAD_RIGHT,
+                       loop);
 }
 
 Trigger CommandSteamController::QAM(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kQAM,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::QAM,
+                       loop);
 }
 
 Trigger CommandSteamController::RightPaddle1(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kRightPaddle1,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::RIGHT_PADDLE_1,
+                       loop);
 }
 
 Trigger CommandSteamController::LeftPaddle1(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kLeftPaddle1,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::LEFT_PADDLE_1,
+                       loop);
 }
 
 Trigger CommandSteamController::RightPaddle2(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kRightPaddle2,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::RIGHT_PADDLE_2,
+                       loop);
 }
 
 Trigger CommandSteamController::LeftPaddle2(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kLeftPaddle2,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::LEFT_PADDLE_2,
+                       loop);
 }
 
 Trigger CommandSteamController::LeftTouchpad(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kLeftTouchpad,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::LEFT_TOUCHPAD,
+                       loop);
 }
 
 Trigger CommandSteamController::RightTouchpad(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kRightTouchpad,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::RIGHT_TOUCHPAD,
+                       loop);
 }
 
 Trigger CommandSteamController::LeftStickTouch(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kLeftStickTouch,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::LEFT_STICK_TOUCH,
+                       loop);
 }
 
 Trigger CommandSteamController::RightStickTouch(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kRightStickTouch,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::RIGHT_STICK_TOUCH,
+                       loop);
 }
 
 Trigger CommandSteamController::LeftGripTouch(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kLeftGripTouch,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::LEFT_GRIP_TOUCH,
+                       loop);
 }
 
 Trigger CommandSteamController::RightGripTouch(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::SteamController::Button::kRightGripTouch,
-                loop);
+  return m_hid->Button(wpi::SteamController::Button::RIGHT_GRIP_TOUCH,
+                       loop);
 }
 
 Trigger CommandSteamController::LeftTrigger(
     double threshold, wpi::EventLoop* loop) const {
-  return AxisGreaterThan(m_controller.GetHID(),
-                         wpi::SteamController::Axis::kLeftTriggerAxis,
-                         threshold, loop);
+  return m_hid->AxisGreaterThan(
+      wpi::SteamController::Axis::LEFT_TRIGGER,
+      threshold, loop);
 }
 
 Trigger CommandSteamController::RightTrigger(
     double threshold, wpi::EventLoop* loop) const {
-  return AxisGreaterThan(m_controller.GetHID(),
-                         wpi::SteamController::Axis::kRightTriggerAxis,
-                         threshold, loop);
+  return m_hid->AxisGreaterThan(
+      wpi::SteamController::Axis::RIGHT_TRIGGER,
+      threshold, loop);
 }
 
 double CommandSteamController::GetLeftX() const {
@@ -232,10 +211,10 @@ double CommandSteamController::GetRightY() const {
   return m_controller.GetRightY();
 }
 
-double CommandSteamController::GetLeftTriggerAxis() const {
-  return m_controller.GetLeftTriggerAxis();
+double CommandSteamController::GetLeftTrigger() const {
+  return m_controller.GetLeftTrigger();
 }
 
-double CommandSteamController::GetRightTriggerAxis() const {
-  return m_controller.GetRightTriggerAxis();
+double CommandSteamController::GetRightTrigger() const {
+  return m_controller.GetRightTrigger();
 }

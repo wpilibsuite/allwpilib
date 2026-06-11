@@ -1,11 +1,5 @@
-extra_includes:
-- wpi/driverstation/GameCubeController.hpp
-
 classes:
   wpi::sim::GameCubeControllerSim:
-    force_no_trampoline: true
-    typealias:
-    - wpi::GameCubeController
     methods:
       GameCubeControllerSim:
         overloads:
@@ -15,8 +9,8 @@ classes:
       SetLeftY:
       SetCStickX:
       SetCStickY:
-      SetLTriggerAxis:
-      SetRTriggerAxis:
+      SetLTrigger:
+      SetRTrigger:
       SetAButton:
       SetXButton:
       SetBButton:

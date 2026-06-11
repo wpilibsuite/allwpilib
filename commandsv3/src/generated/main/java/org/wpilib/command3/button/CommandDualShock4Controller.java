@@ -17,7 +17,8 @@ import org.wpilib.event.EventLoop;
  * @see DualShock4Controller
  */
 @SuppressWarnings("MethodName")
-public class CommandDualShock4Controller extends CommandHIDBase {
+public class CommandDualShock4Controller {
+  private final CommandGenericHID m_hid;
   private final DualShock4Controller m_controller;
 
   /**
@@ -38,8 +39,17 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandDualShock4Controller(Scheduler scheduler, int port) {
-    super(scheduler);
-    m_controller = new DualShock4Controller(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(scheduler, port);
+    m_controller = new DualShock4Controller(m_hid.getHID());
+  }
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  public CommandGenericHID getHID() {
+    return m_hid;
   }
 
   /**
@@ -61,7 +71,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @see #cross(EventLoop)
    */
   public Trigger cross() {
-    return cross(getDefaultEventLoop());
+    return cross(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -72,10 +82,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger cross(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kCross.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.CROSS.value, loop);
   }
 
   /**
@@ -88,7 +95,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @see #circle(EventLoop)
    */
   public Trigger circle() {
-    return circle(getDefaultEventLoop());
+    return circle(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -99,10 +106,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger circle(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kCircle.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.CIRCLE.value, loop);
   }
 
   /**
@@ -115,7 +119,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @see #square(EventLoop)
    */
   public Trigger square() {
-    return square(getDefaultEventLoop());
+    return square(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -126,10 +130,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger square(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kSquare.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.SQUARE.value, loop);
   }
 
   /**
@@ -142,7 +143,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @see #triangle(EventLoop)
    */
   public Trigger triangle() {
-    return triangle(getDefaultEventLoop());
+    return triangle(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -153,10 +154,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger triangle(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kTriangle.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.TRIANGLE.value, loop);
   }
 
   /**
@@ -169,7 +167,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @see #share(EventLoop)
    */
   public Trigger share() {
-    return share(getDefaultEventLoop());
+    return share(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -180,10 +178,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger share(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kShare.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.SHARE.value, loop);
   }
 
   /**
@@ -196,7 +191,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @see #PS(EventLoop)
    */
   public Trigger PS() {
-    return PS(getDefaultEventLoop());
+    return PS(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -207,10 +202,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger PS(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kPS.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.PS.value, loop);
   }
 
   /**
@@ -223,7 +215,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @see #options(EventLoop)
    */
   public Trigger options() {
-    return options(getDefaultEventLoop());
+    return options(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -234,10 +226,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger options(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kOptions.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.OPTIONS.value, loop);
   }
 
   /**
@@ -250,7 +239,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @see #L3(EventLoop)
    */
   public Trigger L3() {
-    return L3(getDefaultEventLoop());
+    return L3(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -261,10 +250,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger L3(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kL3.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.L3.value, loop);
   }
 
   /**
@@ -277,7 +263,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @see #R3(EventLoop)
    */
   public Trigger R3() {
-    return R3(getDefaultEventLoop());
+    return R3(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -288,10 +274,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger R3(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kR3.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.R3.value, loop);
   }
 
   /**
@@ -304,7 +287,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @see #L1(EventLoop)
    */
   public Trigger L1() {
-    return L1(getDefaultEventLoop());
+    return L1(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -315,10 +298,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger L1(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kL1.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.L1.value, loop);
   }
 
   /**
@@ -331,7 +311,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @see #R1(EventLoop)
    */
   public Trigger R1() {
-    return R1(getDefaultEventLoop());
+    return R1(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -342,10 +322,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger R1(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kR1.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.R1.value, loop);
   }
 
   /**
@@ -358,7 +335,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @see #dpadUp(EventLoop)
    */
   public Trigger dpadUp() {
-    return dpadUp(getDefaultEventLoop());
+    return dpadUp(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -369,10 +346,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kDpadUp.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.DPAD_UP.value, loop);
   }
 
   /**
@@ -385,7 +359,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @see #dpadDown(EventLoop)
    */
   public Trigger dpadDown() {
-    return dpadDown(getDefaultEventLoop());
+    return dpadDown(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -396,10 +370,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kDpadDown.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.DPAD_DOWN.value, loop);
   }
 
   /**
@@ -412,7 +383,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @see #dpadLeft(EventLoop)
    */
   public Trigger dpadLeft() {
-    return dpadLeft(getDefaultEventLoop());
+    return dpadLeft(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -423,10 +394,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kDpadLeft.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.DPAD_LEFT.value, loop);
   }
 
   /**
@@ -439,7 +407,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @see #dpadRight(EventLoop)
    */
   public Trigger dpadRight() {
-    return dpadRight(getDefaultEventLoop());
+    return dpadRight(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -450,10 +418,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kDpadRight.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.DPAD_RIGHT.value, loop);
   }
 
   /**
@@ -466,7 +431,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    * @see #touchpad(EventLoop)
    */
   public Trigger touchpad() {
-    return touchpad(getDefaultEventLoop());
+    return touchpad(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -477,10 +442,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger touchpad(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualShock4Controller.Button.kTouchpad.value,
-        loop);
+    return m_hid.button(DualShock4Controller.Button.TOUCHPAD.value, loop);
   }
 
   /**
@@ -494,11 +456,8 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger L2(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        DualShock4Controller.Axis.kL2Axis.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        DualShock4Controller.Axis.L2.value, threshold, loop);
   }
 
   /**
@@ -513,7 +472,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     Scheduler#getDefault default scheduler} if a scheduler was not explicitly provided.
    */
   public Trigger L2(double threshold) {
-    return L2(threshold, getDefaultEventLoop());
+    return L2(threshold, m_hid.getScheduler().getDefaultEventLoop());
   }
 
 
@@ -541,11 +500,8 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger R2(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        DualShock4Controller.Axis.kR2Axis.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        DualShock4Controller.Axis.R2.value, threshold, loop);
   }
 
   /**
@@ -560,7 +516,7 @@ public class CommandDualShock4Controller extends CommandHIDBase {
    *     Scheduler#getDefault default scheduler} if a scheduler was not explicitly provided.
    */
   public Trigger R2(double threshold) {
-    return R2(threshold, getDefaultEventLoop());
+    return R2(threshold, m_hid.getScheduler().getDefaultEventLoop());
   }
 
 
@@ -614,20 +570,20 @@ public class CommandDualShock4Controller extends CommandHIDBase {
   }
 
   /**
-   * Get the L 2 Axis value of the controller.
+   * Get the L 2 value of the controller.
    *
    * @return The axis value.
    */
-  public double getL2Axis() {
-    return m_controller.getL2Axis();
+  public double getL2() {
+    return m_controller.getL2();
   }
 
   /**
-   * Get the R 2 Axis value of the controller.
+   * Get the R 2 value of the controller.
    *
    * @return The axis value.
    */
-  public double getR2Axis() {
-    return m_controller.getR2Axis();
+  public double getR2() {
+    return m_controller.getR2();
   }
 }

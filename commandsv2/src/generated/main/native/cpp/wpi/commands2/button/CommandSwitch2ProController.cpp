@@ -8,7 +8,12 @@
 using namespace wpi::cmd;
 
 CommandSwitch2ProController::CommandSwitch2ProController(int port)
-    : m_controller{wpi::Switch2ProController(port)} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
+      m_controller{m_hid->GetHID()} {}
+
+CommandGenericHID& CommandSwitch2ProController::GetHID() {
+  return *m_hid;
+}
 
 wpi::Switch2ProController&
 CommandSwitch2ProController::GetController() {
@@ -22,149 +27,130 @@ CommandSwitch2ProController::GetController() const {
 
 Trigger CommandSwitch2ProController::B(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kB,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::B,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::A(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kA,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::A,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::Y(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kY,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::Y,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::X(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kX,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::X,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::Minus(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kMinus,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::MINUS,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::Home(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kHome,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::HOME,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::Plus(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kPlus,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::PLUS,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::LeftStick(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kLeftStick,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::LEFT_STICK,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::RightStick(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kRightStick,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::RIGHT_STICK,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::L(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kL,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::L,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::R(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kR,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::R,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::DpadUp(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kDpadUp,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::DPAD_UP,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::DpadDown(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kDpadDown,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::DPAD_DOWN,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::DpadLeft(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kDpadLeft,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::DPAD_LEFT,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::DpadRight(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kDpadRight,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::DPAD_RIGHT,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::Capture(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kCapture,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::CAPTURE,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::GR(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kGR,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::GR,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::GL(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kGL,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::GL,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::C(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::Switch2ProController::Button::kC,
-                loop);
+  return m_hid->Button(wpi::Switch2ProController::Button::C,
+                       loop);
 }
 
 Trigger CommandSwitch2ProController::ZL(
     double threshold, wpi::EventLoop* loop) const {
-  return AxisGreaterThan(m_controller.GetHID(),
-                         wpi::Switch2ProController::Axis::kZLAxis,
-                         threshold, loop);
+  return m_hid->AxisGreaterThan(
+      wpi::Switch2ProController::Axis::ZL,
+      threshold, loop);
 }
 
 Trigger CommandSwitch2ProController::ZR(
     double threshold, wpi::EventLoop* loop) const {
-  return AxisGreaterThan(m_controller.GetHID(),
-                         wpi::Switch2ProController::Axis::kZRAxis,
-                         threshold, loop);
+  return m_hid->AxisGreaterThan(
+      wpi::Switch2ProController::Axis::ZR,
+      threshold, loop);
 }
 
 double CommandSwitch2ProController::GetLeftX() const {
@@ -183,10 +169,10 @@ double CommandSwitch2ProController::GetRightY() const {
   return m_controller.GetRightY();
 }
 
-double CommandSwitch2ProController::GetZLAxis() const {
-  return m_controller.GetZLAxis();
+double CommandSwitch2ProController::GetZL() const {
+  return m_controller.GetZL();
 }
 
-double CommandSwitch2ProController::GetZRAxis() const {
-  return m_controller.GetZRAxis();
+double CommandSwitch2ProController::GetZR() const {
+  return m_controller.GetZR();
 }

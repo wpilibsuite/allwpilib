@@ -37,6 +37,17 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
+            class_name = "AddressableLEDBuffer",
+            yml_file = "semiwrap/AddressableLEDBuffer.yml",
+            header_root = "wpilibc/src/main/python/wpilib/src",
+            header_file = "wpilibc/src/main/python/wpilib/src/rpy/AddressableLEDBuffer.h",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::AddressableLEDBuffer", "wpi__AddressableLEDBuffer.hpp"),
+                ("wpi::AddressableLEDBuffer::View", "wpi__AddressableLEDBuffer__View.hpp"),
+            ],
+        ),
+        struct(
             class_name = "EdgeConfiguration",
             yml_file = "semiwrap/EdgeConfiguration.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -135,18 +146,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "GameCubeController",
-            yml_file = "semiwrap/GameCubeController.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/GameCubeController.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::GameCubeController", "wpi__GameCubeController.hpp"),
-                ("wpi::GameCubeController::Button", "wpi__GameCubeController__Button.hpp"),
-                ("wpi::GameCubeController::Axis", "wpi__GameCubeController__Axis.hpp"),
-            ],
-        ),
-        struct(
             class_name = "MatchState",
             yml_file = "semiwrap/MatchState.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -213,6 +212,16 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
+            class_name = "HIDDevice",
+            yml_file = "semiwrap/HIDDevice.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/HIDDevice.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::HIDDevice", "wpi__HIDDevice.hpp"),
+            ],
+        ),
+        struct(
             class_name = "Joystick",
             yml_file = "semiwrap/Joystick.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -220,6 +229,18 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::Joystick", "wpi__Joystick.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "GameCubeController",
+            yml_file = "semiwrap/GameCubeController.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/GameCubeController.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::GameCubeController", "wpi__GameCubeController.hpp"),
+                ("wpi::GameCubeController::Button", "wpi__GameCubeController__Button.hpp"),
+                ("wpi::GameCubeController::Axis", "wpi__GameCubeController__Axis.hpp"),
             ],
         ),
         struct(
@@ -1517,16 +1538,6 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             ],
         ),
         struct(
-            class_name = "GameCubeControllerSim",
-            yml_file = "semiwrap/simulation/GameCubeControllerSim.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/GameCubeControllerSim.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::sim::GameCubeControllerSim", "wpi__sim__GameCubeControllerSim.hpp"),
-            ],
-        ),
-        struct(
             class_name = "GenericHIDSim",
             yml_file = "semiwrap/simulation/GenericHIDSim.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -1561,6 +1572,16 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             ],
             trampolines = [
                 ("wpi::sim::LinearSystemSim", "wpi__sim__LinearSystemSim.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "GameCubeControllerSim",
+            yml_file = "semiwrap/simulation/GameCubeControllerSim.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/GameCubeControllerSim.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::sim::GameCubeControllerSim", "wpi__sim__GameCubeControllerSim.hpp"),
             ],
         ),
         struct(

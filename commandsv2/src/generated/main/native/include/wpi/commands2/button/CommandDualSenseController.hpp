@@ -8,7 +8,7 @@
 #include "wpi/driverstation/DualSenseController.hpp"
 
 #include "wpi/commands2/CommandScheduler.hpp"
-#include "wpi/commands2/button/CommandHIDBase.hpp"
+#include "wpi/commands2/button/CommandGenericHID.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
 
 namespace wpi::cmd {
@@ -18,7 +18,7 @@ namespace wpi::cmd {
  *
  * @see wpi::DualSenseController
  */
-class CommandDualSenseController : public CommandHIDBase {
+class CommandDualSenseController {
  public:
   /**
    * Construct an instance of a controller.
@@ -27,6 +27,13 @@ class CommandDualSenseController : public CommandHIDBase {
    * plugged into.
    */
   explicit CommandDualSenseController(int port);
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  CommandGenericHID& GetHID();
 
   /**
    * Get the wrapped controller object.
@@ -328,20 +335,21 @@ class CommandDualSenseController : public CommandHIDBase {
   double GetRightY() const;
 
   /**
-   * Get the L 2 Axis value of the controller.
+   * Get the L 2 value of the controller.
    *
    * @return the axis value.
    */
-  double GetL2Axis() const;
+  double GetL2() const;
 
   /**
-   * Get the R 2 Axis value of the controller.
+   * Get the R 2 value of the controller.
    *
    * @return the axis value.
    */
-  double GetR2Axis() const;
+  double GetR2() const;
 
  private:
+  CommandGenericHID* m_hid;
   wpi::DualSenseController m_controller;
 };
 }  // namespace wpi::cmd

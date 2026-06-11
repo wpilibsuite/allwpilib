@@ -9,7 +9,8 @@
 using namespace wpi;
 using namespace wpi::sim;
 
-GamepadSim::GamepadSim(const wpi::Gamepad& joystick) : GenericHIDSim{joystick} {
+GamepadSim::GamepadSim(const wpi::Gamepad& joystick)
+    : GenericHIDSim{joystick.GetHID()} {
   SetAxesMaximumIndex(6);
   SetButtonsMaximumIndex(26);
   SetPOVsMaximumIndex(1);

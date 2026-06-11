@@ -9,7 +9,6 @@
 #include "SimulatorJNI.hpp"
 #include "wpi/hal/Types.h"
 #include "wpi/hal/Value.h"
-#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/hal/simulation/NotifyListener.h"
 #include "wpi/util/jni_util.hpp"
 

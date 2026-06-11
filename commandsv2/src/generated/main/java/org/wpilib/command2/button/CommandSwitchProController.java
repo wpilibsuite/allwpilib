@@ -16,7 +16,8 @@ import org.wpilib.event.EventLoop;
  * @see SwitchProController
  */
 @SuppressWarnings("MethodName")
-public class CommandSwitchProController extends CommandHIDBase {
+public class CommandSwitchProController {
+  private final CommandGenericHID m_hid;
   private final SwitchProController m_controller;
 
   /**
@@ -25,7 +26,17 @@ public class CommandSwitchProController extends CommandHIDBase {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandSwitchProController(int port) {
-    m_controller = new SwitchProController(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(port);
+    m_controller = new SwitchProController(m_hid.getHID());
+  }
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  public CommandGenericHID getHID() {
+    return m_hid;
   }
 
   /**
@@ -56,10 +67,7 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchProController.Button.kB.value,
-        loop);
+    return m_hid.button(SwitchProController.Button.B.value, loop);
   }
 
   /**
@@ -81,10 +89,7 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchProController.Button.kA.value,
-        loop);
+    return m_hid.button(SwitchProController.Button.A.value, loop);
   }
 
   /**
@@ -106,10 +111,7 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger y(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchProController.Button.kY.value,
-        loop);
+    return m_hid.button(SwitchProController.Button.Y.value, loop);
   }
 
   /**
@@ -131,10 +133,7 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger x(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchProController.Button.kX.value,
-        loop);
+    return m_hid.button(SwitchProController.Button.X.value, loop);
   }
 
   /**
@@ -156,10 +155,7 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger minus(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchProController.Button.kMinus.value,
-        loop);
+    return m_hid.button(SwitchProController.Button.MINUS.value, loop);
   }
 
   /**
@@ -181,10 +177,7 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger home(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchProController.Button.kHome.value,
-        loop);
+    return m_hid.button(SwitchProController.Button.HOME.value, loop);
   }
 
   /**
@@ -206,10 +199,7 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger plus(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchProController.Button.kPlus.value,
-        loop);
+    return m_hid.button(SwitchProController.Button.PLUS.value, loop);
   }
 
   /**
@@ -231,10 +221,7 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger leftStick(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchProController.Button.kLeftStick.value,
-        loop);
+    return m_hid.button(SwitchProController.Button.LEFT_STICK.value, loop);
   }
 
   /**
@@ -256,10 +243,7 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger rightStick(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchProController.Button.kRightStick.value,
-        loop);
+    return m_hid.button(SwitchProController.Button.RIGHT_STICK.value, loop);
   }
 
   /**
@@ -281,10 +265,7 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger L(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchProController.Button.kL.value,
-        loop);
+    return m_hid.button(SwitchProController.Button.L.value, loop);
   }
 
   /**
@@ -306,10 +287,7 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger R(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchProController.Button.kR.value,
-        loop);
+    return m_hid.button(SwitchProController.Button.R.value, loop);
   }
 
   /**
@@ -331,10 +309,7 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchProController.Button.kDpadUp.value,
-        loop);
+    return m_hid.button(SwitchProController.Button.DPAD_UP.value, loop);
   }
 
   /**
@@ -356,10 +331,7 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchProController.Button.kDpadDown.value,
-        loop);
+    return m_hid.button(SwitchProController.Button.DPAD_DOWN.value, loop);
   }
 
   /**
@@ -381,10 +353,7 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchProController.Button.kDpadLeft.value,
-        loop);
+    return m_hid.button(SwitchProController.Button.DPAD_LEFT.value, loop);
   }
 
   /**
@@ -406,10 +375,7 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchProController.Button.kDpadRight.value,
-        loop);
+    return m_hid.button(SwitchProController.Button.DPAD_RIGHT.value, loop);
   }
 
   /**
@@ -431,10 +397,7 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger capture(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        SwitchProController.Button.kCapture.value,
-        loop);
+    return m_hid.button(SwitchProController.Button.CAPTURE.value, loop);
   }
 
   /**
@@ -448,11 +411,8 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger ZL(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        SwitchProController.Axis.kZLAxis.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        SwitchProController.Axis.ZL.value, threshold, loop);
   }
 
   /**
@@ -493,11 +453,8 @@ public class CommandSwitchProController extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger ZR(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        SwitchProController.Axis.kZRAxis.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        SwitchProController.Axis.ZR.value, threshold, loop);
   }
 
   /**
@@ -564,20 +521,20 @@ public class CommandSwitchProController extends CommandHIDBase {
   }
 
   /**
-   * Get the ZL Axis value of the controller.
+   * Get the ZL value of the controller.
    *
    * @return The axis value.
    */
-  public double getZLAxis() {
-    return m_controller.getZLAxis();
+  public double getZL() {
+    return m_controller.getZL();
   }
 
   /**
-   * Get the ZR Axis value of the controller.
+   * Get the ZR value of the controller.
    *
    * @return The axis value.
    */
-  public double getZRAxis() {
-    return m_controller.getZRAxis();
+  public double getZR() {
+    return m_controller.getZR();
   }
 }

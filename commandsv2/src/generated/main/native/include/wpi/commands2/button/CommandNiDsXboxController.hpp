@@ -6,11 +6,10 @@
 
 #pragma once
 
-#include "wpi/driverstation/NiDsXboxController.hpp"
-
-#include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/commands2/button/CommandGenericHID.hpp"
+#include "wpi/driverstation/NiDsXboxController.hpp"
 
 namespace wpi::cmd {
 /**
@@ -19,7 +18,7 @@ namespace wpi::cmd {
  *
  * @see wpi::NiDsXboxController
  */
-class CommandNiDsXboxController : public CommandGenericHID {
+class CommandNiDsXboxController {
  public:
   /**
    * Construct an instance of a controller.
@@ -30,11 +29,18 @@ class CommandNiDsXboxController : public CommandGenericHID {
   explicit CommandNiDsXboxController(int port);
 
   /**
-   * Get the underlying GenericHID object.
+   * Get the underlying CommandGenericHID object.
    *
-   * @return the wrapped GenericHID object
+   * @return the wrapped CommandGenericHID object
    */
-  wpi::NiDsXboxController& GetHID();
+  CommandGenericHID& GetHID();
+
+  /**
+   * Get the underlying NiDsXboxController object.
+   *
+   * @return the wrapped NiDsXboxController object
+   */
+  wpi::NiDsXboxController& GetNiDsXboxController();
 
   /**
    * Constructs a Trigger instance around the A button's
@@ -235,6 +241,7 @@ class CommandNiDsXboxController : public CommandGenericHID {
   double GetRightTriggerAxis() const;
 
  private:
-  wpi::NiDsXboxController m_hid;
+  CommandGenericHID* m_hid;
+  wpi::NiDsXboxController m_controller;
 };
 }  // namespace wpi::cmd

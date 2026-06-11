@@ -8,7 +8,7 @@
 #include "wpi/driverstation/LogitechF310Controller.hpp"
 
 #include "wpi/commands2/CommandScheduler.hpp"
-#include "wpi/commands2/button/CommandHIDBase.hpp"
+#include "wpi/commands2/button/CommandGenericHID.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
 
 namespace wpi::cmd {
@@ -18,7 +18,7 @@ namespace wpi::cmd {
  *
  * @see wpi::LogitechF310Controller
  */
-class CommandLogitechF310Controller : public CommandHIDBase {
+class CommandLogitechF310Controller {
  public:
   /**
    * Construct an instance of a controller.
@@ -27,6 +27,13 @@ class CommandLogitechF310Controller : public CommandHIDBase {
    * plugged into.
    */
   explicit CommandLogitechF310Controller(int port);
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  CommandGenericHID& GetHID();
 
   /**
    * Get the wrapped controller object.
@@ -302,20 +309,21 @@ class CommandLogitechF310Controller : public CommandHIDBase {
   double GetRightY() const;
 
   /**
-   * Get the Left Trigger Axis value of the controller.
+   * Get the Left Trigger value of the controller.
    *
    * @return the axis value.
    */
-  double GetLeftTriggerAxis() const;
+  double GetLeftTrigger() const;
 
   /**
-   * Get the Right Trigger Axis value of the controller.
+   * Get the Right Trigger value of the controller.
    *
    * @return the axis value.
    */
-  double GetRightTriggerAxis() const;
+  double GetRightTrigger() const;
 
  private:
+  CommandGenericHID* m_hid;
   wpi::LogitechF310Controller m_controller;
 };
 }  // namespace wpi::cmd

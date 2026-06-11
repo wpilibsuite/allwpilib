@@ -8,7 +8,7 @@
 #include "wpi/driverstation/SteamController.hpp"
 
 #include "wpi/commands2/CommandScheduler.hpp"
-#include "wpi/commands2/button/CommandHIDBase.hpp"
+#include "wpi/commands2/button/CommandGenericHID.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
 
 namespace wpi::cmd {
@@ -18,7 +18,7 @@ namespace wpi::cmd {
  *
  * @see wpi::SteamController
  */
-class CommandSteamController : public CommandHIDBase {
+class CommandSteamController {
  public:
   /**
    * Construct an instance of a controller.
@@ -27,6 +27,13 @@ class CommandSteamController : public CommandHIDBase {
    * plugged into.
    */
   explicit CommandSteamController(int port);
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  CommandGenericHID& GetHID();
 
   /**
    * Get the wrapped controller object.
@@ -445,20 +452,21 @@ class CommandSteamController : public CommandHIDBase {
   double GetRightY() const;
 
   /**
-   * Get the Left Trigger Axis value of the controller.
+   * Get the Left Trigger value of the controller.
    *
    * @return the axis value.
    */
-  double GetLeftTriggerAxis() const;
+  double GetLeftTrigger() const;
 
   /**
-   * Get the Right Trigger Axis value of the controller.
+   * Get the Right Trigger value of the controller.
    *
    * @return the axis value.
    */
-  double GetRightTriggerAxis() const;
+  double GetRightTrigger() const;
 
  private:
+  CommandGenericHID* m_hid;
   wpi::SteamController m_controller;
 };
 }  // namespace wpi::cmd
