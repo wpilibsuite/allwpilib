@@ -4,10 +4,10 @@
 
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <optional>
 #include <string>
-#include <thread>
 #include <vector>
 
 #include <Eigen/Core>
@@ -19,7 +19,6 @@
 #include <opencv2/videoio.hpp>
 
 #include "wpi/util/json.hpp"
-#include "wpi/util/mutex.hpp"
 
 namespace wpical {
 struct CameraModel {

@@ -4,6 +4,11 @@
 
 package org.wpilib.driverstation;
 
+import java.util.EnumSet;
+import java.util.Objects;
+import org.wpilib.driverstation.GenericHID.HIDType;
+import org.wpilib.driverstation.GenericHID.RumbleType;
+import org.wpilib.driverstation.GenericHID.SupportedOutput;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
@@ -18,12 +23,8 @@ import org.wpilib.util.sendable.SendableBuilder;
  * <p>This class handles Gamepad input that comes from the Driver Station. Each time a value is
  * requested the most recent value is returned. There is a single class instance for each controller
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
- *
- * <p>Only first party controllers from Generic are guaranteed to have the correct mapping, and only
- * through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any 3rd
- * party controllers.
  */
-public class Gamepad extends GenericHID implements Sendable {
+public class Gamepad implements HIDDevice, Sendable {
   private static final double MAX_DEADBAND = Math.nextDown(1.0);
 
   /** Represents a digital button on a Gamepad. */
@@ -156,14 +157,35 @@ public class Gamepad extends GenericHID implements Sendable {
     return Math.clamp(deadband, 0.0, MAX_DEADBAND);
   }
 
+  private final GenericHID m_hid;
+
   /**
-   * Construct an instance of a controller.
+   * Get the underlying GenericHID object.
    *
-   * @param port The port index on the Driver Station that the controller is plugged into (0-5).
+   * @return the wrapped GenericHID object
+   */
+  @Override
+  public GenericHID getHID() {
+    return m_hid;
+  }
+
+  /**
+   * Construct an instance of a gamepad.
+   *
+   * @param port The port index on the Driver Station that the gamepad is plugged into (0-5).
    */
   public Gamepad(final int port) {
-    super(port);
-    HAL.reportUsage("HID", port, "Gamepad");
+    this(DriverStation.getGenericHID(port));
+  }
+
+  /**
+   * Construct an instance of a gamepad with a GenericHID object.
+   *
+   * @param hid The GenericHID object to use for this gamepad.
+   */
+  public Gamepad(final GenericHID hid) {
+    m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
+    HAL.reportUsage("HID", hid.getPort(), "Gamepad");
   }
 
   /**
@@ -1350,7 +1372,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getButton(Button button) {
-    return getRawButton(button.value);
+    return m_hid.getRawButton(button.value);
   }
 
   /**
@@ -1364,7 +1386,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getButtonPressed(Button button) {
-    return getRawButtonPressed(button.value);
+    return m_hid.getRawButtonPressed(button.value);
   }
 
   /**
@@ -1378,7 +1400,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getButtonReleased(Button button) {
-    return getRawButtonReleased(button.value);
+    return m_hid.getRawButtonReleased(button.value);
   }
 
   /**
@@ -1389,7 +1411,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return an event instance representing the button's digital signal attached to the given loop.
    */
   public BooleanEvent button(Button button, EventLoop loop) {
-    return super.button(button.value, loop);
+    return m_hid.button(button.value, loop);
   }
 
   /**
@@ -1399,7 +1421,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The value of the axis.
    */
   public double getAxis(Axis axis) {
-    return getRawAxis(axis.value);
+    return m_hid.getRawAxis(axis.value);
   }
 
   /**
@@ -1412,7 +1434,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return an event instance that is true when the axis value is less than the provided threshold.
    */
   public BooleanEvent axisLessThan(Axis axis, double threshold, EventLoop loop) {
-    return super.axisLessThan(axis.value, threshold, loop);
+    return m_hid.axisLessThan(axis.value, threshold, loop);
   }
 
   /**
@@ -1426,15 +1448,115 @@ public class Gamepad extends GenericHID implements Sendable {
    *     threshold.
    */
   public BooleanEvent axisGreaterThan(Axis axis, double threshold, EventLoop loop) {
-    return super.axisGreaterThan(axis.value, threshold, loop);
+    return m_hid.axisGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Get the bitmask of axes for the gamepad.
+   *
+   * @return the number of axis for the current gamepad
+   */
+  public int getAxesAvailable() {
+    return m_hid.getAxesAvailable();
+  }
+
+  /**
+   * For the current gamepad, return the bitmask of available buttons.
+   *
+   * @return the bitmask of buttons for the current gamepad
+   */
+  public long getButtonsAvailable() {
+    return m_hid.getButtonsAvailable();
+  }
+
+  /**
+   * Get if the gamepad is connected.
+   *
+   * @return true if the gamepad is connected
+   */
+  public boolean isConnected() {
+    return m_hid.isConnected();
+  }
+
+  /**
+   * Get the type of the gamepad.
+   *
+   * @return the type of the gamepad.
+   */
+  public HIDType getGamepadType() {
+    return m_hid.getGamepadType();
+  }
+
+  /**
+   * Get the supported outputs for the gamepad.
+   *
+   * @return the supported outputs for the gamepad.
+   */
+  public EnumSet<SupportedOutput> getSupportedOutputs() {
+    return m_hid.getSupportedOutputs();
+  }
+
+  /**
+   * Get the name of the gamepad.
+   *
+   * @return the name of the gamepad.
+   */
+  public String getName() {
+    return m_hid.getName();
+  }
+
+  /**
+   * Set leds on the gamepad. If only mono is supported, the system will use the highest value
+   * passed in.
+   *
+   * @param r Red value from 0-255
+   * @param g Green value from 0-255
+   * @param b Blue value from 0-255
+   */
+  public void setLeds(int r, int g, int b) {
+    m_hid.setLeds(r, g, b);
+  }
+
+  /**
+   * Set the rumble output for the HID. The DS currently supports 4 rumble values: left rumble,
+   * right rumble, left trigger rumble, and right trigger rumble.
+   *
+   * @param type Which rumble value to set
+   * @param value The normalized value (0 to 1) to set the rumble to
+   */
+  public void setRumble(RumbleType type, double value) {
+    m_hid.setRumble(type, value);
+  }
+
+  /**
+   * Check if a touchpad finger is available.
+   *
+   * @param touchpad The touchpad to check.
+   * @param finger The finger to check.
+   * @return true if the touchpad finger is available.
+   */
+  public boolean getTouchpadFingerAvailable(int touchpad, int finger) {
+    return m_hid.getTouchpadFingerAvailable(touchpad, finger);
+  }
+
+  /**
+   * Get the touchpad finger data.
+   *
+   * @param touchpad The touchpad to read.
+   * @param finger The finger to read.
+   * @return The touchpad finger data.
+   */
+  public TouchpadFinger getTouchpadFinger(int touchpad, int finger) {
+    return m_hid.getTouchpadFinger(touchpad, finger);
   }
 
   private double getAxisForSendable(Axis axis) {
-    return DriverStationBackend.getStickAxisIfAvailable(getPort(), axis.value).orElse(0.0);
+    return DriverStationBackend.getStickAxisIfAvailable(m_hid.getPort(), axis.value).orElse(0.0);
   }
 
   private boolean getButtonForSendable(Button button) {
-    return DriverStationBackend.getStickButtonIfAvailable(getPort(), button.value).orElse(false);
+    return DriverStationBackend.getStickButtonIfAvailable(m_hid.getPort(), button.value)
+        .orElse(false);
   }
 
   @Override

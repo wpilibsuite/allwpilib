@@ -13,7 +13,6 @@
 #include "wpi/net/MimeTypes.hpp"
 #include "wpi/net/UrlParser.hpp"
 #include "wpi/net/raw_uv_ostream.hpp"
-#include "wpi/net/uv/Request.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringExtras.hpp"

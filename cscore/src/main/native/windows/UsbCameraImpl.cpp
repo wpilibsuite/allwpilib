@@ -24,7 +24,6 @@
 
 #include "COMCreators.hpp"
 #include "ComPtr.hpp"
-#include "Handle.hpp"
 #include "Instance.hpp"
 #include "JpegUtil.hpp"
 #include "Log.hpp"
@@ -32,10 +31,8 @@
 #include "PropertyImpl.hpp"
 #include "Telemetry.hpp"
 #include "WindowsMessagePump.hpp"
-#include "c_util.hpp"
 #include "wpi/cs/cscore_cpp.hpp"
 #include "wpi/util/ConvertUTF.hpp"
-#include "wpi/util/MemAlloc.hpp"
 #include "wpi/util/PixelFormat.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"

@@ -6,9 +6,13 @@ package org.wpilib.command2.button;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import org.wpilib.command2.CommandScheduler;
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.GenericHID;
 import org.wpilib.driverstation.POVDirection;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.event.EventLoop;
 import org.wpilib.math.util.Pair;
 
@@ -17,7 +21,11 @@ import org.wpilib.math.util.Pair;
  *
  * @see GenericHID
  */
-public class CommandGenericHID {
+public final class CommandGenericHID {
+  private static final Lock m_hidsLock = new ReentrantLock();
+  private static final CommandGenericHID[] m_hids =
+      new CommandGenericHID[DriverStationBackend.JOYSTICK_PORTS];
+
   private final GenericHID m_hid;
   private final Map<EventLoop, Map<Integer, Trigger>> m_buttonCache = new HashMap<>();
   private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisLessThanCache =
@@ -34,7 +42,38 @@ public class CommandGenericHID {
    * @param port The port index on the Driver Station that the device is plugged into.
    */
   public CommandGenericHID(int port) {
-    m_hid = new GenericHID(port);
+    m_hid = DriverStation.getGenericHID(port);
+  }
+
+  /**
+   * Construct an instance of a device with a GenericHID object.
+   *
+   * @param hid The GenericHID object to use for this command HID.
+   */
+  public CommandGenericHID(GenericHID hid) {
+    m_hid = hid;
+  }
+
+  /**
+   * Gets the CommandGenericHID object for the given port. CommandGenericHID objects are cached, so
+   * this will always return the same object for the same port.
+   *
+   * @param port The port index on the Driver Station that the device is plugged into.
+   * @return The CommandGenericHID object for the given port.
+   */
+  public static CommandGenericHID getCommandGenericHID(int port) {
+    DriverStation.getGenericHID(port);
+    m_hidsLock.lock();
+    try {
+      CommandGenericHID toRet = m_hids[port];
+      if (toRet == null) {
+        toRet = new CommandGenericHID(port);
+        m_hids[port] = toRet;
+      }
+      return toRet;
+    } finally {
+      m_hidsLock.unlock();
+    }
   }
 
   /**

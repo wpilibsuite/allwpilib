@@ -4,27 +4,28 @@
 
 package org.wpilib.examples.expansionhubsample;
 
-import org.wpilib.driverstation.DefaultUserControls;
+import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.Gamepad;
 import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Teleop;
 
 @Teleop
 public class DefaultTeleMode extends PeriodicOpMode {
   private final Robot robot;
-  private final DefaultUserControls userControls;
+  private final Gamepad gamepad;
 
-  public DefaultTeleMode(Robot robot, DefaultUserControls userControls) {
+  public DefaultTeleMode(Robot robot) {
     this.robot = robot;
-    this.userControls = userControls;
+    this.gamepad = DriverStation.getGamepad(0);
   }
 
   @Override
   public void periodic() {
-    robot.motor0.setThrottle(-userControls.getGamepad(0).getLeftY());
-    robot.motor1.setThrottle(-userControls.getGamepad(0).getRightY());
-    robot.motor2.setThrottle(-userControls.getGamepad(0).getLeftX());
-    robot.motor3.setThrottle(-userControls.getGamepad(0).getRightX());
-    robot.servo0.setPosition(userControls.getGamepad(0).getLeftTrigger());
-    robot.servo1.setPosition(userControls.getGamepad(0).getRightTrigger());
+    robot.motor0.setThrottle(-gamepad.getLeftY());
+    robot.motor1.setThrottle(-gamepad.getRightY());
+    robot.motor2.setThrottle(-gamepad.getLeftX());
+    robot.motor3.setThrottle(-gamepad.getRightX());
+    robot.servo0.setPosition(gamepad.getLeftTrigger());
+    robot.servo1.setPosition(gamepad.getRightTrigger());
   }
 }
