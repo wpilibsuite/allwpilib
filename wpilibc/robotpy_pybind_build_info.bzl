@@ -232,6 +232,30 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
+            class_name = "DualSenseController",
+            yml_file = "semiwrap/DualSenseController.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/DualSenseController.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::DualSenseController", "wpi__DualSenseController.hpp"),
+                ("wpi::DualSenseController::Button", "wpi__DualSenseController__Button.hpp"),
+                ("wpi::DualSenseController::Axis", "wpi__DualSenseController__Axis.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "XboxController",
+            yml_file = "semiwrap/XboxController.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/XboxController.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::XboxController", "wpi__XboxController.hpp"),
+                ("wpi::XboxController::Button", "wpi__XboxController__Button.hpp"),
+                ("wpi::XboxController::Axis", "wpi__XboxController__Axis.hpp"),
+            ],
+        ),
+        struct(
             class_name = "NiDsPS4Controller",
             yml_file = "semiwrap/NiDsPS4Controller.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -1440,6 +1464,26 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             ],
             trampolines = [
                 ("wpi::sim::LinearSystemSim", "wpi__sim__LinearSystemSim.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "DualSenseControllerSim",
+            yml_file = "semiwrap/simulation/DualSenseControllerSim.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/DualSenseControllerSim.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::sim::DualSenseControllerSim", "wpi__sim__DualSenseControllerSim.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "XboxControllerSim",
+            yml_file = "semiwrap/simulation/XboxControllerSim.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/XboxControllerSim.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::sim::XboxControllerSim", "wpi__sim__XboxControllerSim.hpp"),
             ],
         ),
         struct(

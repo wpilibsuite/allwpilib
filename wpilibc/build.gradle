@@ -193,6 +193,15 @@ model {
                         srcDirs 'src/test/native/include', 'src/main/native/cpp'
                     }
                 }
+                generatedCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/generated/test/native/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/test/native/include'
+                    }
+                }
                 c {
                     source {
                         srcDirs 'src/test/native/c'
@@ -201,6 +210,11 @@ model {
                     exportedHeaders {
                         srcDirs 'src/test/native/include', 'src/main/native/c'
                     }
+                }
+            }
+            it.sources.each {
+                it.exportedHeaders {
+                    srcDirs 'src/test/native/include'
                 }
             }
         }
