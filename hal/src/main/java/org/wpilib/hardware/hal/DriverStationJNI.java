@@ -354,15 +354,15 @@ public class DriverStationJNI extends JNIWrapper {
   public static native void setDisplayLineMode();
 
   /**
-   * Sets a display line in line mode.
+   * Adds a display line in line mode.
    *
    * <p>Empty or whitespace-only captions are treated as unique and always add a new line.
    *
    * @param caption the line caption
    * @param line the line contents
-   * @see "HAL_SetDisplayLine"
+   * @see "HAL_AddDisplayLine"
    */
-  public static native void setDisplayLine(String caption, String line);
+  public static native void addDisplayLine(String caption, String line);
 
   /**
    * Updates the display with all pending lines.

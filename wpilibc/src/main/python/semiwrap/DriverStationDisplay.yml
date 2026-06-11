@@ -1,10 +1,11 @@
 classes:
   wpi::DriverStationDisplay:
+    enums:
+      Mode:
     methods:
-      SetLineMode:
+      SetMode:
       AddData:
       AddLine:
       UpdateLines:
-      SetRawMode:
       WriteRawAnsiText:
       ClearRaw:

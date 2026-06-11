@@ -296,7 +296,7 @@ void HAL_SetDisplayLineMode(void) {
   displayLines.clear();
 }
 
-void HAL_SetDisplayLine(const struct WPI_String* caption,
+void HAL_AddDisplayLine(const struct WPI_String* caption,
                         const struct WPI_String* line) {
   std::scoped_lock lock(displayMutex);
   if (displayRawMode) {

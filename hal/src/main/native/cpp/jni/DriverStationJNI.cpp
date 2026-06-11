@@ -459,18 +459,18 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_setDisplayLineMode
 
 /*
  * Class:     org_wpilib_hardware_hal_DriverStationJNI
- * Method:    setDisplayLine
+ * Method:    addDisplayLine
  * Signature: (Ljava/lang/String;Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_DriverStationJNI_setDisplayLine
+Java_org_wpilib_hardware_hal_DriverStationJNI_addDisplayLine
   (JNIEnv* env, jclass, jstring caption, jstring line)
 {
   JStringRef captionStr{env, caption};
   JStringRef lineStr{env, line};
   WPI_String captionWpiStr = captionStr.wpi_str();
   WPI_String lineWpiStr = lineStr.wpi_str();
-  HAL_SetDisplayLine(&captionWpiStr, &lineWpiStr);
+  HAL_AddDisplayLine(&captionWpiStr, &lineWpiStr);
 }
 
 /*

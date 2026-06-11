@@ -323,7 +323,7 @@ void HAL_ObserveUserProgram(HAL_ControlWord word);
 void HAL_SetDisplayLineMode(void);
 
 /**
- * Sets a display line in line mode.
+ * Adds a display line in line mode.
  *
  * Empty or whitespace-only captions are treated as unique and always add a new
  * line.
@@ -331,7 +331,7 @@ void HAL_SetDisplayLineMode(void);
  * @param caption the line caption
  * @param line the line contents
  */
-void HAL_SetDisplayLine(const struct WPI_String* caption,
+void HAL_AddDisplayLine(const struct WPI_String* caption,
                         const struct WPI_String* line);
 
 /**

@@ -20,12 +20,32 @@ class DriverStationDisplay final {
  public:
   DriverStationDisplay() = delete;
 
+  /** Driver Station display mode. */
+  enum class Mode {
+    /** Display line mode. This is the default display mode. */
+    Line,
+    /** Raw ANSI text mode. */
+    RawAnsi
+  };
+
   /**
-   * Sets the display to line mode and clears any pending display lines.
+   * Sets the display mode.
    *
-   * Line mode is the default display mode.
+   * Mode::Line is the default display mode. Setting Mode::Line clears any
+   * pending display lines. Setting Mode::RawAnsi clears the display.
+   *
+   * @param mode display mode
    */
-  static void SetLineMode() { HAL_SetDisplayLineMode(); }
+  static void SetMode(Mode mode) {
+    switch (mode) {
+      case Mode::Line:
+        HAL_SetDisplayLineMode();
+        break;
+      case Mode::RawAnsi:
+        HAL_SetDisplayRawMode();
+        break;
+    }
+  }
 
   /**
    * Adds display data in line mode.
@@ -40,7 +60,7 @@ class DriverStationDisplay final {
   static void AddData(std::string_view caption, std::string_view line) {
     WPI_String captionWpiStr = wpi::util::make_string(caption);
     WPI_String lineWpiStr = wpi::util::make_string(line);
-    HAL_SetDisplayLine(&captionWpiStr, &lineWpiStr);
+    HAL_AddDisplayLine(&captionWpiStr, &lineWpiStr);
   }
 
   /**
@@ -63,14 +83,9 @@ class DriverStationDisplay final {
   static void UpdateLines() { HAL_UpdateDisplayLines(); }
 
   /**
-   * Sets the display to raw mode and clears the display.
-   */
-  static void SetRawMode() { HAL_SetDisplayRawMode(); }
-
-  /**
-   * Writes ANSI text directly to the display in raw mode.
+   * Writes ANSI text directly to the display in raw ANSI mode.
    *
-   * This call is ignored unless the display is in raw mode.
+   * This call is ignored unless the display is in raw ANSI mode.
    *
    * @param data ANSI text to write.
    */
@@ -80,9 +95,9 @@ class DriverStationDisplay final {
   }
 
   /**
-   * Clears the display in raw mode.
+   * Clears the display in raw ANSI mode.
    *
-   * This call is ignored unless the display is in raw mode.
+   * This call is ignored unless the display is in raw ANSI mode.
    */
   static void ClearRaw() { HAL_ClearDisplay(); }
 };

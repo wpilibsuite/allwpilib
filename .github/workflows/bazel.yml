@@ -78,6 +78,12 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libgl1-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev avahi-daemon
 
+      - name: Setup avahi-daemon
+        if: runner.os == 'Linux'
+        run: |
+          sudo service dbus start
+          sudo avahi-daemon -D
+
       - if: runner.os == 'Linux'
         uses: bazel-contrib/setup-bazel@0.15.0
         with:

@@ -46,7 +46,7 @@ functions:
   HAL_ObserveUserProgram:
   HAL_GetGameData:
   HAL_SetDisplayLineMode:
-  HAL_SetDisplayLine:
+  HAL_AddDisplayLine:
   HAL_UpdateDisplayLines:
   HAL_SetDisplayRawMode:
   HAL_WriteDisplayAnsiText:
