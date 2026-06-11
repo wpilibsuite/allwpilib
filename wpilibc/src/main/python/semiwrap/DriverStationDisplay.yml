@@ -1,0 +1,10 @@
+classes:
+  wpi::DriverStationDisplay:
+    methods:
+      SetLineMode:
+      AddData:
+      AddLine:
+      UpdateLines:
+      SetRawMode:
+      WriteRawAnsiText:
+      ClearRaw:

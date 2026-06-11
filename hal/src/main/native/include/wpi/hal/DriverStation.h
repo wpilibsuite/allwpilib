@@ -315,6 +315,48 @@ void HAL_ObserveUserProgramStarting(void);
  */
 void HAL_ObserveUserProgram(HAL_ControlWord word);
 
+/**
+ * Sets the display to line mode.
+ */
+void HAL_SetDisplayLineMode(void);
+
+/**
+ * Sets a display line in line mode.
+ *
+ * Empty or whitespace-only captions are treated as unique and always add a new
+ * line.
+ *
+ * @param caption the line caption
+ * @param line the line contents
+ */
+void HAL_SetDisplayLine(const struct WPI_String* caption,
+                        const struct WPI_String* line);
+
+/**
+ * Updates the display with all pending lines.
+ *
+ * Updates are sent at most once every 230 ms. If called before 230 ms has
+ * elapsed since the last update, the pending lines are cleared without sending.
+ */
+void HAL_UpdateDisplayLines(void);
+
+/**
+ * Sets the display to raw mode.
+ */
+void HAL_SetDisplayRawMode(void);
+
+/**
+ * Writes ANSI text to the display in raw mode.
+ *
+ * @param data the ANSI text to write
+ */
+void HAL_WriteDisplayAnsiText(const struct WPI_String* data);
+
+/**
+ * Clears the display in raw mode.
+ */
+void HAL_ClearDisplay(void);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

@@ -97,6 +97,21 @@ class MrcLibDs {
   virtual int32_t observeUserProgram(HAL_ControlWord controlWord) = 0;
 
   virtual int32_t getSystemTimeValid(bool* systemTimeValid) = 0;
+
+  /**
+   * Writes ANSI text to the Driver Station display.
+   *
+   * @param line the ANSI text to write
+   * @return 0 on success, non-zero on error
+   */
+  virtual int32_t writeAnsi(const struct WPI_String* line) = 0;
+
+  /**
+   * Clears the Driver Station display.
+   *
+   * @return 0 on success, non-zero on error
+   */
+  virtual int32_t clearDisplay() = 0;
 };
 
 MrcLibDs* GetMrcLibDs();

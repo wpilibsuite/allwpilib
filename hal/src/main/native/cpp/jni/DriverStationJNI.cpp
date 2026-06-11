@@ -444,4 +444,82 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_getOutputsActive
 {
   return HAL_GetOutputsEnabled();
 }
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    setDisplayLineMode
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_setDisplayLineMode
+  (JNIEnv*, jclass)
+{
+  HAL_SetDisplayLineMode();
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    setDisplayLine
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_setDisplayLine
+  (JNIEnv* env, jclass, jstring caption, jstring line)
+{
+  JStringRef captionStr{env, caption};
+  JStringRef lineStr{env, line};
+  WPI_String captionWpiStr = captionStr.wpi_str();
+  WPI_String lineWpiStr = lineStr.wpi_str();
+  HAL_SetDisplayLine(&captionWpiStr, &lineWpiStr);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    updateDisplayLines
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_updateDisplayLines
+  (JNIEnv*, jclass)
+{
+  HAL_UpdateDisplayLines();
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    setDisplayRawMode
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_setDisplayRawMode
+  (JNIEnv*, jclass)
+{
+  HAL_SetDisplayRawMode();
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    writeDisplayAnsiText
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_writeDisplayAnsiText
+  (JNIEnv* env, jclass, jstring data)
+{
+  JStringRef dataStr{env, data};
+  WPI_String dataWpiStr = dataStr.wpi_str();
+  HAL_WriteDisplayAnsiText(&dataWpiStr);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    clearDisplay
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_clearDisplay
+  (JNIEnv*, jclass)
+{
+  HAL_ClearDisplay();
+}
 }  // extern "C"
