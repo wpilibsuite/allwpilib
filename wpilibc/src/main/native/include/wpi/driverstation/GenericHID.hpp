@@ -8,6 +8,7 @@
 
 #include <string>
 
+#include "wpi/driverstation/HIDDevice.hpp"
 #include "wpi/driverstation/POVDirection.hpp"
 #include "wpi/driverstation/TouchpadFinger.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
@@ -16,7 +17,7 @@ namespace wpi {
 
 class BooleanEvent;
 class EventLoop;
-
+class DriverStation;
 /**
  * Handle input from standard HID devices connected to the Driver Station.
  *
@@ -25,8 +26,11 @@ class EventLoop;
  * single class instance for each device and the mapping of ports to hardware
  * buttons depends on the code in the Driver Station.
  */
-class GenericHID {
+class GenericHID final : public HIDDevice {
  public:
+  friend class DriverStation;
+  friend class internal::DriverStationBackend;
+
   /**
    * Represents a rumble output on the Joystick.
    */
@@ -87,9 +91,24 @@ class GenericHID {
     SWITCH_JOYCON_PAIR
   };
 
-  explicit GenericHID(int port);
-  virtual ~GenericHID() = default;
+  ~GenericHID() override = default;
 
+  /**
+   * Get this GenericHID object.
+   *
+   * @return this GenericHID object
+   */
+  GenericHID& GetHID() override { return *this; }
+
+  /**
+   * Get this GenericHID object.
+   *
+   * @return this GenericHID object
+   */
+  const GenericHID& GetHID() const override { return *this; }
+
+  GenericHID(const GenericHID&) = delete;
+  GenericHID& operator=(const GenericHID&) = delete;
   GenericHID(GenericHID&&) = default;
   GenericHID& operator=(GenericHID&&) = default;
 
@@ -389,6 +408,7 @@ class GenericHID {
   TouchpadFinger GetTouchpadFinger(int touchpad, int finger) const;
 
  private:
+  explicit GenericHID(int port);
   int m_port;
   uint16_t m_leftRumble = 0;
   uint16_t m_rightRumble = 0;

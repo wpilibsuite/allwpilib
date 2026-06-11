@@ -15,7 +15,7 @@ public class GamepadSim extends GenericHIDSim {
    */
   @SuppressWarnings("this-escape")
   public GamepadSim(Gamepad joystick) {
-    super(joystick);
+    super(joystick.getHID());
     setAxesMaximumIndex(6);
     setButtonsMaximumIndex(26);
     setPOVsMaximumIndex(1);

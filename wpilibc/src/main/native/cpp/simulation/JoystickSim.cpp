@@ -11,7 +11,7 @@ using namespace wpi;
 using namespace wpi::sim;
 
 JoystickSim::JoystickSim(const Joystick& joystick)
-    : GenericHIDSim{joystick}, m_joystick{&joystick} {
+    : GenericHIDSim{joystick.GetHID()}, m_joystick{&joystick} {
   // default to a reasonable joystick configuration
   SetAxesMaximumIndex(5);
   SetButtonsMaximumIndex(12);

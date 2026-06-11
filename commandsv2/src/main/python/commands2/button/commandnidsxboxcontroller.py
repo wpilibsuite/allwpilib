@@ -8,11 +8,12 @@ from .commandgenerichid import CommandGenericHID
 from .trigger import Trigger
 
 
-class CommandNiDsXboxController(CommandGenericHID):
+class CommandNiDsXboxController:
     """
     A version of NI DS XboxController with Trigger factories for command-based.
     """
 
+    _command_hid: CommandGenericHID
     _hid: NiDsXboxController
 
     def __init__(self, port: int):
@@ -21,14 +22,25 @@ class CommandNiDsXboxController(CommandGenericHID):
 
         :param port: The port index on the Driver Station that the controller is plugged into.
         """
-        super().__init__(port)
-        self._hid = NiDsXboxController(port)
+        self._command_hid = CommandGenericHID.getCommandGenericHID(port)
+        self._hid = NiDsXboxController(self._command_hid.getHID())
 
-    def getHID(self) -> NiDsXboxController:
+    def __getattr__(self, name: str):
+        return getattr(self._command_hid, name)
+
+    def getHID(self) -> CommandGenericHID:
         """
-        Get the underlying GenericHID object.
+        Get the underlying CommandGenericHID object.
 
-        :returns: the wrapped GenericHID object
+        :returns: the wrapped CommandGenericHID object
+        """
+        return self._command_hid
+
+    def getNiDsXboxController(self) -> NiDsXboxController:
+        """
+        Get the underlying NiDsXboxController object.
+
+        :returns: the wrapped NiDsXboxController object
         """
         return self._hid
 
