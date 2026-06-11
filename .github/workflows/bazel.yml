@@ -12,28 +12,29 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Linux System Core", classifier: "linuxsystemcore",                 os: ubuntu-24.04, action: "build" }
-          - { name: "Linux System Core Debug", classifier: "linuxsystemcoredebug",            os: ubuntu-24.04, action: "build" }
-          - { name: "Linux System Core Static", classifier: "linuxsystemcorestatic",           os: ubuntu-24.04, action: "build" }
-          - { name: "Linux System Core Static Debug", classifier: "linuxsystemcorestaticdebug",    os: ubuntu-24.04, action: "build" }
-          - { name: "Linux x86-64",      classifier: "linuxx86-64,headers,sources",     os: ubuntu-24.04, action: "test" }
-          - { name: "Linux x86-64 Debug",  classifier: "linuxx86-64debug",                os: ubuntu-24.04, action: "test" }
-          - { name: "Linux x86-64 Static", classifier: "linuxx86-64static",               os: ubuntu-24.04, action: "test" }
-          - { name: "Linux x86-64 Static Debug", classifier: "linuxx86-64staticdebug",        os: ubuntu-24.04, action: "test" }
+          - { name: "Linux System Core", classifier: "linuxsystemcore",                 os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "build" }
+          - { name: "Linux System Core Debug", classifier: "linuxsystemcoredebug",            os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "build" }
+          - { name: "Linux System Core Static", classifier: "linuxsystemcorestatic",           os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "build" }
+          - { name: "Linux System Core Static Debug", classifier: "linuxsystemcorestaticdebug",    os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "build" }
+          - { name: "Linux x86-64",      classifier: "linuxx86-64,headers,sources",     os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "test" }
+          - { name: "Linux x86-64 Debug",  classifier: "linuxx86-64debug",                os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "test" }
+          - { name: "Linux x86-64 Static", classifier: "linuxx86-64static",               os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "test" }
+          - { name: "Linux x86-64 Static Debug", classifier: "linuxx86-64staticdebug",        os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "test" }
 
-          - { name: "macOS", classifier: "osxuniversal,osxuniversaldebug,headers,sources,osxuniversalstatic,osxuniversalstaticdebug,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug", os: macOS-15, action: "test" }
+          - { name: "macOS", classifier: "osxuniversal,osxuniversaldebug,headers,sources,osxuniversalstatic,osxuniversalstaticdebug,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug", os: macOS-15, container: "", action: "test" }
 
-          - { name: "Windows x86-64",      classifier: "windowsx86-64,windowsx86-64static,headers,sources",   os: windows-2022, action: "test" }
-          - { name: "Windows x86-64 Debug", classifier: "windowsx86-64debug,windowsx86-64staticdebug",        os: windows-2022, action: "test" }
+          - { name: "Windows x86-64",      classifier: "windowsx86-64,windowsx86-64static,headers,sources",   os: windows-2022, container: "", action: "test" }
+          - { name: "Windows x86-64 Debug", classifier: "windowsx86-64debug,windowsx86-64staticdebug",        os: windows-2022, container: "", action: "test" }
 
-          - { name: "Windows ARM64",       classifier: "windowsarm64,windowsarm64static",                    os: windows-2022, action: "build" }
-          - { name: "Windows ARM64 Debug",  classifier: "windowsarm64debug,windowsarm64staticdebug",         os: windows-2022, action: "build" }
+          - { name: "Windows ARM64",       classifier: "windowsarm64,windowsarm64static",                    os: windows-2022, container: "", action: "build" }
+          - { name: "Windows ARM64 Debug",  classifier: "windowsarm64debug,windowsarm64staticdebug",         os: windows-2022, container: "", action: "build" }
 
-          - { name: "Windows System Core", classifier: "linuxsystemcore,linuxsystemcorestatic", os: windows-2022, action: "build" }
-          - { name: "Windows System Core Debug", classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug", os: windows-2022, action: "build" }
+          - { name: "Windows System Core", classifier: "linuxsystemcore,linuxsystemcorestatic", os: windows-2022, container: "", action: "build" }
+          - { name: "Windows System Core Debug", classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug", os: windows-2022, container: "", action: "build" }
 
     name: "${{ matrix.action == 'test' && 'Test' || 'Build' }} ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
     steps:
       - name: Check disk free space pre-cleanup
         run: df -h
@@ -106,6 +107,7 @@ jobs:
   buildifier:
     name: "buildifier"
     runs-on: ubuntu-24.04
+    container: wpilib/debian-base:trixie
     steps:
       - name: Set up Go 1.15.x
         uses: actions/setup-go@v6
@@ -140,8 +142,15 @@ jobs:
 
   mod-lock:
     runs-on: ubuntu-24.04
+    container: wpilib/debian-base:trixie
     steps:
       - uses: actions/checkout@v6
+
+      - uses: bazel-contrib/setup-bazel@0.15.0
+        with:
+          bazelisk-cache: true
+          repository-cache: true
+          bazelisk-version: 1.x
 
       - name: Check lockfile
         run: bazel mod deps --lockfile_mode=error
@@ -162,6 +171,7 @@ jobs:
   non_robotpy_pregeneration:
     name: "Non-RobotPy Pregen"
     runs-on: ubuntu-24.04
+    container: wpilib/debian-base:trixie
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
@@ -172,6 +182,12 @@ jobs:
           bazel_remote_username: ${{ secrets.BAZEL_CACHE_USERNAME }}
           bazel_remote_password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
           buildbuddy_token: ${{ secrets.BUILDBUDDY_API_KEY }}
+
+      - uses: bazel-contrib/setup-bazel@0.15.0
+        with:
+          bazelisk-cache: true
+          repository-cache: true
+          bazelisk-version: 1.x
 
       - name: Run Non-RobotPy pregeneration
         run: bazel run --config=ci //:write_pregenerated_files
@@ -192,6 +208,7 @@ jobs:
   robotpy_pregeneration:
     name: "Robotpy Pregeneration"
     runs-on: ubuntu-24.04
+    container: wpilib/debian-base:trixie
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
@@ -202,6 +219,12 @@ jobs:
           bazel_remote_username: ${{ secrets.BAZEL_CACHE_USERNAME }}
           bazel_remote_password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
           buildbuddy_token: ${{ secrets.BUILDBUDDY_API_KEY }}
+
+      - uses: bazel-contrib/setup-bazel@0.15.0
+        with:
+          bazelisk-cache: true
+          repository-cache: true
+          bazelisk-version: 1.x
 
       # You should ensure the headers are correct before trying to pregen files
       - name: Test Scan Headers
