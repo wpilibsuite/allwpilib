@@ -14,9 +14,9 @@
 #include <fmt/format.h>
 
 #include "wpi/hal/DashboardOpMode.hpp"
-#include "wpi/util/StringMap.hpp"
 #include "wpi/hal/cpp/MrcLibDs.hpp"
 #include "wpi/hal/monotonic_clock.hpp"
+#include "wpi/util/StringMap.hpp"
 #include "wpi/util/Synchronization.hpp"
 #include "wpi/util/mutex.hpp"
 
@@ -331,7 +331,7 @@ void HAL_SetDisplayLine(const struct WPI_String* caption,
   }
 }
 
-void HAL_UpdateDisplayLines() {
+void HAL_UpdateDisplayLines(void) {
   // Compute the lines, and send them.
   std::scoped_lock lock(displayMutex);
   if (displayRawMode) {
@@ -352,7 +352,9 @@ void HAL_UpdateDisplayLines() {
   displayBuffer.clear();
   // Then write an ANSI clear screen code to it.
   displayBuffer += "\033[2J\033[H";
-  // Then write each line, followed by a newline. Make sure the ANSI code for reset formatting is at the end of each line, in case the line contains formatting codes.
+  // Then write each line, followed by a newline. Make sure the ANSI code for
+  // reset formatting is at the end of each line, in case the line contains
+  // formatting codes.
   for (const auto& line : displayLines) {
     displayBuffer += line;
     displayBuffer += "\033[0m\n";
@@ -367,17 +369,20 @@ void HAL_UpdateDisplayLines() {
 }
 
 void HAL_SetDisplayRawMode(void) {
+  std::scoped_lock lock(displayMutex);
   displayRawMode = true;
   mrcLibDs->clearDisplay();
 }
 
 void HAL_WriteDisplayAnsiText(const struct WPI_String* data) {
+  std::scoped_lock lock(displayMutex);
   if (displayRawMode) {
     mrcLibDs->writeAnsi(data);
   }
 }
 
 void HAL_ClearDisplay(void) {
+  std::scoped_lock lock(displayMutex);
   if (displayRawMode) {
     mrcLibDs->clearDisplay();
   }

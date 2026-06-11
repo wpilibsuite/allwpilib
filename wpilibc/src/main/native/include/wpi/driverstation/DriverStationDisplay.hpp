@@ -25,9 +25,7 @@ class DriverStationDisplay final {
    *
    * Line mode is the default display mode.
    */
-  static void SetLineMode() {
-    HAL_SetDisplayLineMode();
-  }
+  static void SetLineMode() { HAL_SetDisplayLineMode(); }
 
   /**
    * Adds display data in line mode.
@@ -53,9 +51,7 @@ class DriverStationDisplay final {
    *
    * @param line Line contents.
    */
-  static void AddLine(std::string_view line) {
-    AddData({}, line);
-  }
+  static void AddLine(std::string_view line) { AddData({}, line); }
 
   /**
    * Updates the display with all pending lines and clears the pending lines.
@@ -64,16 +60,12 @@ class DriverStationDisplay final {
    * elapsed since the last update, the pending lines are cleared without
    * sending.
    */
-  static void UpdateLines() {
-    HAL_UpdateDisplayLines();
-  }
+  static void UpdateLines() { HAL_UpdateDisplayLines(); }
 
   /**
    * Sets the display to raw mode and clears the display.
    */
-  static void SetRawMode() {
-    HAL_SetDisplayRawMode();
-  }
+  static void SetRawMode() { HAL_SetDisplayRawMode(); }
 
   /**
    * Writes ANSI text directly to the display in raw mode.
@@ -92,9 +84,7 @@ class DriverStationDisplay final {
    *
    * This call is ignored unless the display is in raw mode.
    */
-  static void ClearRaw() {
-    HAL_ClearDisplay();
-  }
+  static void ClearRaw() { HAL_ClearDisplay(); }
 };
 
 }  // namespace wpi
