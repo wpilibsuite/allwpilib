@@ -23,8 +23,7 @@ namespace wpi::math {
  * when using computer-vision systems.
  */
 class WPILIB_DLLEXPORT MecanumDriveOdometry3d
-    : public Odometry3d<MecanumDriveWheelPositions, MecanumDriveWheelVelocities,
-                        MecanumDriveWheelAccelerations> {
+    : public Odometry3d<MecanumDriveWheelPositions> {
  public:
   /**
    * Constructs a MecanumDriveOdometry3d object.
@@ -39,8 +38,26 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry3d
       const MecanumDriveWheelPositions& wheelPositions,
       const Pose3d& initialPose = Pose3d{});
 
+  void ResetPosition(const Rotation3d& gyroAngle,
+                     const MecanumDriveWheelPositions& wheelPositions,
+                     const Pose3d& pose) override {
+    m_previousWheelPositions = wheelPositions;
+    Odometry3d::ResetPosition(gyroAngle, pose);
+  }
+
+  const Pose3d& Update(
+      const Rotation3d& gyroAngle,
+      const MecanumDriveWheelPositions& wheelPositions) override {
+    auto twist =
+        m_kinematics.ToTwist2d(m_previousWheelPositions, wheelPositions);
+    m_previousWheelPositions = wheelPositions;
+    return Odometry3d::Update(gyroAngle, twist);
+  }
+
  private:
-  MecanumDriveKinematics m_kinematicsImpl;
+  MecanumDriveKinematics m_kinematics;
+
+  MecanumDriveWheelPositions m_previousWheelPositions;
 };
 
 }  // namespace wpi::math

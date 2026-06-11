@@ -42,8 +42,7 @@ namespace wpi::math {
  * @tparam WheelVelocities Wheel velocities type.
  * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename WheelPositions, typename WheelVelocities,
-          typename WheelAccelerations>
+template <typename WheelPositions>
 class WPILIB_DLLEXPORT PoseEstimator {
  public:
   /**
@@ -52,8 +51,6 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * @warning The initial pose estimate will always be the default pose,
    * regardless of the odometry's current pose.
    *
-   * @param kinematics A correctly-configured kinematics object for your
-   *     drivetrain.
    * @param odometry A correctly-configured odometry object for your drivetrain.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in
    *     meters, y position in meters, and heading in radians). Increase these
@@ -63,12 +60,9 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  PoseEstimator(
-      Kinematics<WheelPositions, WheelVelocities, WheelAccelerations>&
-          kinematics,
-      Odometry<WheelPositions, WheelVelocities, WheelAccelerations>& odometry,
-      const wpi::util::array<double, 3>& stateStdDevs,
-      const wpi::util::array<double, 3>& visionMeasurementStdDevs)
+  PoseEstimator(Odometry<WheelPositions>& odometry,
+                const wpi::util::array<double, 3>& stateStdDevs,
+                const wpi::util::array<double, 3>& visionMeasurementStdDevs)
       : m_odometry(odometry) {
     for (size_t i = 0; i < 3; ++i) {
       m_q[i] = stateStdDevs[i] * stateStdDevs[i];
@@ -477,7 +471,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
 
   static constexpr wpi::units::second_t kBufferDuration = 1.5_s;
 
-  Odometry<WheelPositions, WheelVelocities, WheelAccelerations>& m_odometry;
+  Odometry<WheelPositions>& m_odometry;
 
   // Diagonal of process noise covariance matrix Q
   wpi::util::array<double, 3> m_q{wpi::util::empty_array};

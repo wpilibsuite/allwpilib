@@ -60,10 +60,10 @@ class MecanumDriveOdometry3dTest {
     var secondPose = m_odometry.update(Rotation3d.kZero, wheelPositions);
 
     assertAll(
-        () -> assertEquals(secondPose.getX(), 0.0, 0.01),
-        () -> assertEquals(secondPose.getY(), 0.0, 0.01),
-        () -> assertEquals(secondPose.getZ(), 0.0, 0.01),
-        () -> assertEquals(secondPose.getRotation().toRotation2d().getDegrees(), 0.0, 0.01));
+        () -> assertEquals(0.0, secondPose.getX(), 0.01),
+        () -> assertEquals(0.0, secondPose.getY(), 0.01),
+        () -> assertEquals(0.0, secondPose.getZ(), 0.01),
+        () -> assertEquals(0.0, secondPose.getRotation().toRotation2d().getDegrees(), 0.01));
   }
 
   @Test
@@ -105,9 +105,9 @@ class MecanumDriveOdometry3dTest {
     var fieldAngle = Rotation3d.kZero;
     m_odometry.resetPosition(
         gyro, new MecanumDriveWheelPositions(), new Pose3d(Translation3d.kZero, fieldAngle));
-    var velocities = new MecanumDriveWheelPositions(3.536, 3.536, 3.536, 3.536);
+    var positions = new MecanumDriveWheelPositions(3.536, 3.536, 3.536, 3.536);
     m_odometry.update(gyro, new MecanumDriveWheelPositions());
-    var pose = m_odometry.update(gyro, velocities);
+    var pose = m_odometry.update(gyro, positions);
 
     assertAll(
         () -> assertEquals(3.536, pose.getX(), 0.1),
@@ -299,11 +299,11 @@ class MecanumDriveOdometry3dTest {
     var pose = m_odometry.update(new Rotation3d(0, Units.degreesToRadians(10), 0), wheelPositions);
 
     assertAll(
-        () -> assertEquals(pose.getX(), 0.0, 1e-9),
-        () -> assertEquals(pose.getY(), 0.0, 1e-9),
-        () -> assertEquals(pose.getZ(), 0.0, 1e-9),
-        () -> assertEquals(pose.getRotation().getX(), Units.degreesToRadians(0), 1e-9),
-        () -> assertEquals(pose.getRotation().getY(), Units.degreesToRadians(5), 1e-9),
-        () -> assertEquals(pose.getRotation().getZ(), Units.degreesToRadians(90), 1e-9));
+        () -> assertEquals(0.0, pose.getX(), 1e-9),
+        () -> assertEquals(0.0, pose.getY(), 1e-9),
+        () -> assertEquals(0.0, pose.getZ(), 1e-9),
+        () -> assertEquals(Units.degreesToRadians(0), pose.getRotation().getX(), 1e-9),
+        () -> assertEquals(Units.degreesToRadians(5), pose.getRotation().getY(), 1e-9),
+        () -> assertEquals(Units.degreesToRadians(90), pose.getRotation().getZ(), 1e-9));
   }
 }

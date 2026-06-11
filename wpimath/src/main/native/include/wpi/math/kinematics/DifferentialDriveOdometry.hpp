@@ -21,14 +21,9 @@ namespace wpi::math {
  * Teams can use odometry during the autonomous period for complex tasks like
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
- *
- * It is important that you reset your encoders to zero before using this class.
- * Any subsequent pose resets also require the encoders to be reset to zero.
  */
 class WPILIB_DLLEXPORT DifferentialDriveOdometry
-    : public Odometry<DifferentialDriveWheelPositions,
-                      DifferentialDriveWheelVelocities,
-                      DifferentialDriveWheelAccelerations> {
+    : public Odometry<DifferentialDriveWheelPositions> {
  public:
   /**
    * Constructs a DifferentialDriveOdometry object.
@@ -46,11 +41,15 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry
                                      wpi::units::meter_t rightDistance,
                                      const Pose2d& initialPose = Pose2d{});
 
+  void ResetPosition(const Rotation2d& gyroAngle,
+                     const DifferentialDriveWheelPositions& wheelPositions,
+                     const Pose2d& pose) override {
+    m_previousWheelPositions = wheelPositions;
+    Odometry::ResetPosition(gyroAngle, pose);
+  }
+
   /**
    * Resets the robot's position on the field.
-   *
-   * IF leftDistance and rightDistance are unspecified,
-   * You NEED to reset your encoders (to zero).
    *
    * The gyroscope angle does not need to be reset here on the user's robot
    * code. The library automatically takes care of offsetting the gyro angle.
@@ -63,7 +62,16 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry
   void ResetPosition(const Rotation2d& gyroAngle,
                      wpi::units::meter_t leftDistance,
                      wpi::units::meter_t rightDistance, const Pose2d& pose) {
-    Odometry::ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
+    ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
+  }
+
+  const Pose2d& Update(
+      const Rotation2d& gyroAngle,
+      const DifferentialDriveWheelPositions& wheelPositions) override {
+    auto twist =
+        m_kinematics.ToTwist2d(m_previousWheelPositions, wheelPositions);
+    m_previousWheelPositions = wheelPositions;
+    return Odometry::Update(gyroAngle, twist);
   }
 
   /**
@@ -80,10 +88,12 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry
   const Pose2d& Update(const Rotation2d& gyroAngle,
                        wpi::units::meter_t leftDistance,
                        wpi::units::meter_t rightDistance) {
-    return Odometry::Update(gyroAngle, {leftDistance, rightDistance});
+    return Update(gyroAngle, {leftDistance, rightDistance});
   }
 
  private:
-  DifferentialDriveKinematics m_kinematicsImpl{wpi::units::meter_t{1}};
+  DifferentialDriveKinematics m_kinematics{wpi::units::meter_t{1}};
+
+  DifferentialDriveWheelPositions m_previousWheelPositions;
 };
 }  // namespace wpi::math

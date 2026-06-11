@@ -10,6 +10,7 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.math.geometry.Twist3d;
 
 /**
@@ -28,8 +29,7 @@ import org.wpilib.math.geometry.Twist3d;
  *
  * @param <T> Wheel positions type.
  */
-public class Odometry3d<T> {
-  private final Kinematics<T, ?, ?> m_kinematics;
+public abstract class Odometry3d<T> {
   private Pose3d m_pose;
 
   // Applying a rotation intrinsically to the measured gyro angle should cause the corrected angle
@@ -41,25 +41,18 @@ public class Odometry3d<T> {
   // Always equal to m_poseMeters.getRotation()
   private Rotation3d m_previousAngle;
 
-  private final T m_previousWheelPositions;
-
   /**
    * Constructs an Odometry3d object.
    *
-   * @param kinematics The kinematics of the drivebase.
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelPositions The current encoder readings.
    * @param initialPose The starting position of the robot on the field.
    */
-  public Odometry3d(
-      Kinematics<T, ?, ?> kinematics, Rotation3d gyroAngle, T wheelPositions, Pose3d initialPose) {
-    m_kinematics = kinematics;
+  public Odometry3d(Rotation3d gyroAngle, Pose3d initialPose) {
     m_pose = initialPose;
     // When applied extrinsically, m_gyroOffset cancels the current gyroAngle and
     // then rotates to m_poseMeters.getRotation()
     m_gyroOffset = gyroAngle.inverse().rotateBy(m_pose.getRotation());
     m_previousAngle = m_pose.getRotation();
-    m_previousWheelPositions = m_kinematics.copy(wheelPositions);
   }
 
   /**
@@ -72,13 +65,23 @@ public class Odometry3d<T> {
    * @param wheelPositions The current encoder readings.
    * @param pose The position on the field that your robot is at.
    */
-  public void resetPosition(Rotation3d gyroAngle, T wheelPositions, Pose3d pose) {
+  public abstract void resetPosition(Rotation3d gyroAngle, T wheelPositions, Pose3d pose);
+
+  /**
+   * Resets the robot's position on the field.
+   *
+   * <p>The implementing class should call this method once they have reset their wheel positions to
+   * the values provided in {@link #resetPosition(Rotation3d, Object, Pose3d)}.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param pose The position on the field that your robot is at.
+   */
+  protected void resetPosition(Rotation3d gyroAngle, Pose3d pose) {
     m_pose = pose;
     // When applied extrinsically, m_gyroOffset cancels the current gyroAngle and
     // then rotates to m_poseMeters.getRotation()
     m_gyroOffset = gyroAngle.inverse().rotateBy(m_pose.getRotation());
     m_previousAngle = m_pose.getRotation();
-    m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
   }
 
   /**
@@ -134,11 +137,20 @@ public class Odometry3d<T> {
    * @param wheelPositions The current encoder readings.
    * @return The new pose of the robot.
    */
-  public Pose3d update(Rotation3d gyroAngle, T wheelPositions) {
+  public abstract Pose3d update(Rotation3d gyroAngle, T wheelPositions);
+
+  /**
+   * Updates the robot's position on the field by integrating the pose over time. This protected
+   * method takes in a twist, which is to be calculated by the implementing class's kinematics.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param twist2d The twist as calculated by the implementing class's kinematics.
+   * @return The new pose of the robot.
+   */
+  protected Pose3d update(Rotation3d gyroAngle, Twist2d twist2d) {
     var angle = gyroAngle.rotateBy(m_gyroOffset);
     var angle_difference = angle.relativeTo(m_previousAngle).toVector();
 
-    var twist2d = m_kinematics.toTwist2d(m_previousWheelPositions, wheelPositions);
     var twist =
         new Twist3d(
             twist2d.dx,
@@ -150,7 +162,6 @@ public class Odometry3d<T> {
 
     var newPose = m_pose.plus(twist.exp());
 
-    m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
     m_previousAngle = angle;
     m_pose = new Pose3d(newPose.getTranslation(), angle);
 

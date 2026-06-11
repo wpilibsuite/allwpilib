@@ -92,7 +92,6 @@ public class DifferentialDrivePoseEstimator3d
       Matrix<N4, N1> stateStdDevs,
       Matrix<N4, N1> visionMeasurementStdDevs) {
     super(
-        kinematics,
         new DifferentialDriveOdometry3d(gyroAngle, leftDistance, rightDistance, initialPose),
         stateStdDevs,
         visionMeasurementStdDevs);

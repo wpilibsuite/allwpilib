@@ -5,6 +5,8 @@ classes:
     - size_t NumModules
     methods:
       SwerveDriveOdometry3d:
+      ResetPosition:
+      Update:
 
 templates:
   SwerveDrive2Odometry3d:

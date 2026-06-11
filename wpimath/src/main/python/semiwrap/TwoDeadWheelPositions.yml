@@ -1,0 +1,12 @@
+classes:
+  wpi::math::TwoDeadWheelPositions:
+    attributes:
+      x:
+      y:
+    methods:
+      TwoDeadWheelPositions:
+        overloads:
+          "":
+          wpi::units::meter_t, wpi::units::meter_t:
+      operator==:
+      Interpolate:

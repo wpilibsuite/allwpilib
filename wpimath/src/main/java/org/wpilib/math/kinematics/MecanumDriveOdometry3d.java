@@ -25,6 +25,9 @@ import org.wpilib.math.util.MathSharedStore;
  * Furthermore, odometry can be used for latency compensation when using computer-vision systems.
  */
 public class MecanumDriveOdometry3d extends Odometry3d<MecanumDriveWheelPositions> {
+  private final MecanumDriveKinematics m_kinematics;
+  private final MecanumDriveWheelPositions m_previousWheelPositions;
+
   /**
    * Constructs a MecanumDriveOdometry3d object.
    *
@@ -38,7 +41,9 @@ public class MecanumDriveOdometry3d extends Odometry3d<MecanumDriveWheelPosition
       Rotation3d gyroAngle,
       MecanumDriveWheelPositions wheelPositions,
       Pose3d initialPose) {
-    super(kinematics, gyroAngle, wheelPositions, initialPose);
+    super(gyroAngle, initialPose);
+    m_kinematics = kinematics;
+    m_previousWheelPositions = kinematics.copy(wheelPositions);
     MathSharedStore.reportUsage("MecanumDriveOdometry3d", "");
   }
 
@@ -54,5 +59,19 @@ public class MecanumDriveOdometry3d extends Odometry3d<MecanumDriveWheelPosition
       Rotation3d gyroAngle,
       MecanumDriveWheelPositions wheelPositions) {
     this(kinematics, gyroAngle, wheelPositions, Pose3d.kZero);
+  }
+
+  @Override
+  public void resetPosition(
+      Rotation3d gyroAngle, MecanumDriveWheelPositions wheelPositions, Pose3d pose) {
+    m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
+    resetPosition(gyroAngle, pose);
+  }
+
+  @Override
+  public Pose3d update(Rotation3d gyroAngle, MecanumDriveWheelPositions wheelPositions) {
+    var twist = m_kinematics.toTwist2d(m_previousWheelPositions, wheelPositions);
+    m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
+    return update(gyroAngle, twist);
   }
 }

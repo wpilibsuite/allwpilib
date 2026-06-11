@@ -26,11 +26,11 @@ import org.wpilib.units.measure.Distance;
  *
  * <p>Teams can use odometry during the autonomous period for complex tasks like path following.
  * Furthermore, odometry can be used for latency compensation when using computer-vision systems.
- *
- * <p>It is important that you reset your encoders to zero before using this class. Any subsequent
- * pose resets also require the encoders to be reset to zero.
  */
 public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWheelPositions> {
+  private final DifferentialDriveKinematics m_kinematics = new DifferentialDriveKinematics(1);
+  private final DifferentialDriveWheelPositions m_previousWheelPositions;
+
   /**
    * Constructs a DifferentialDriveOdometry3d object.
    *
@@ -41,11 +41,8 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    */
   public DifferentialDriveOdometry3d(
       Rotation3d gyroAngle, double leftDistance, double rightDistance, Pose3d initialPose) {
-    super(
-        new DifferentialDriveKinematics(1),
-        gyroAngle,
-        new DifferentialDriveWheelPositions(leftDistance, rightDistance),
-        initialPose);
+    super(gyroAngle, initialPose);
+    m_previousWheelPositions = new DifferentialDriveWheelPositions(leftDistance, rightDistance);
     MathSharedStore.reportUsage("DifferentialDriveOdometry3d", "");
   }
 
@@ -86,6 +83,13 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
     this(gyroAngle, leftDistance, rightDistance, Pose3d.kZero);
   }
 
+  @Override
+  public void resetPosition(
+      Rotation3d gyroAngle, DifferentialDriveWheelPositions wheelPositions, Pose3d pose) {
+    m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
+    resetPosition(gyroAngle, pose);
+  }
+
   /**
    * Resets the robot's position on the field.
    *
@@ -99,7 +103,7 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    */
   public void resetPosition(
       Rotation3d gyroAngle, double leftDistance, double rightDistance, Pose3d pose) {
-    super.resetPosition(
+    resetPosition(
         gyroAngle, new DifferentialDriveWheelPositions(leftDistance, rightDistance), pose);
   }
 
@@ -119,6 +123,13 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
     resetPosition(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), pose);
   }
 
+  @Override
+  public Pose3d update(Rotation3d gyroAngle, DifferentialDriveWheelPositions wheelPositions) {
+    var twist = m_kinematics.toTwist2d(m_previousWheelPositions, wheelPositions);
+    m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
+    return update(gyroAngle, twist);
+  }
+
   /**
    * Updates the robot position on the field using distance measurements from encoders. This method
    * is more numerically accurate than using velocities to integrate the pose and is also
@@ -130,7 +141,6 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    * @return The new pose of the robot.
    */
   public Pose3d update(Rotation3d gyroAngle, double leftDistance, double rightDistance) {
-    return super.update(
-        gyroAngle, new DifferentialDriveWheelPositions(leftDistance, rightDistance));
+    return update(gyroAngle, new DifferentialDriveWheelPositions(leftDistance, rightDistance));
   }
 }

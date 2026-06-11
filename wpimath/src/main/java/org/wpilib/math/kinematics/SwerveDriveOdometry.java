@@ -17,7 +17,9 @@ import org.wpilib.math.util.MathSharedStore;
  * Furthermore, odometry can be used for latency compensation when using computer-vision systems.
  */
 public class SwerveDriveOdometry extends Odometry<SwerveModulePosition[]> {
+  private final SwerveDriveKinematics m_kinematics;
   private final int m_numModules;
+  private final SwerveModulePosition[] m_previousWheelPositions;
 
   /**
    * Constructs a SwerveDriveOdometry object.
@@ -32,7 +34,9 @@ public class SwerveDriveOdometry extends Odometry<SwerveModulePosition[]> {
       Rotation2d gyroAngle,
       SwerveModulePosition[] modulePositions,
       Pose2d initialPose) {
-    super(kinematics, gyroAngle, modulePositions, initialPose);
+    super(gyroAngle, initialPose);
+    m_kinematics = kinematics;
+    m_previousWheelPositions = kinematics.copy(modulePositions);
 
     m_numModules = modulePositions.length;
 
@@ -61,7 +65,8 @@ public class SwerveDriveOdometry extends Odometry<SwerveModulePosition[]> {
           "Number of modules is not consistent with number of wheel locations provided in "
               + "constructor");
     }
-    super.resetPosition(gyroAngle, modulePositions, pose);
+    m_kinematics.copyInto(modulePositions, m_previousWheelPositions);
+    resetPosition(gyroAngle, pose);
   }
 
   @Override
@@ -71,6 +76,8 @@ public class SwerveDriveOdometry extends Odometry<SwerveModulePosition[]> {
           "Number of modules is not consistent with number of wheel locations provided in "
               + "constructor");
     }
-    return super.update(gyroAngle, modulePositions);
+    var twist = m_kinematics.toTwist2d(m_previousWheelPositions, modulePositions);
+    m_kinematics.copyInto(modulePositions, m_previousWheelPositions);
+    return update(gyroAngle, twist);
   }
 }
