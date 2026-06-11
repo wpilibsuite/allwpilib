@@ -6,6 +6,7 @@ package org.wpilib.command3.button;
 
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.Gamepad;
 import org.wpilib.event.EventLoop;
 
@@ -15,8 +16,9 @@ import org.wpilib.event.EventLoop;
  * @see Gamepad
  */
 @SuppressWarnings("MethodName")
-public class CommandGamepad extends CommandGenericHID {
-  private final Gamepad m_hid;
+public class CommandGamepad {
+  private final CommandGenericHID m_hid;
+  private final Gamepad m_gamepad;
 
   /**
    * Construct an instance of a controller.
@@ -24,8 +26,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandGamepad(int port) {
-    super(port);
-    m_hid = new Gamepad(port);
+    this(Scheduler.getDefault(), port);
   }
 
   /**
@@ -35,18 +36,49 @@ public class CommandGamepad extends CommandGenericHID {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandGamepad(Scheduler scheduler, int port) {
-    super(scheduler, port);
-    m_hid = new Gamepad(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(scheduler, port);
+    m_gamepad = DriverStation.getGamepad(port);
   }
 
   /**
-   * Get the underlying GenericHID object.
+   * Get the underlying CommandGenericHID object.
    *
-   * @return the wrapped GenericHID object
+   * @return the wrapped CommandGenericHID object
    */
-  @Override
-  public Gamepad getHID() {
+  public CommandGenericHID getHID() {
     return m_hid;
+  }
+
+  /**
+   * Get the underlying Gamepad object.
+   *
+   * @return the wrapped Gamepad object
+   */
+  public Gamepad getGamepad() {
+    return m_gamepad;
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button index
+   * @return an event instance representing the button's digital signal attached to the {@link
+   *     Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   * @see #button(int, EventLoop)
+   */
+  public Trigger button(int button) {
+    return m_hid.button(button);
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button index
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the button's digital signal attached to the given loop.
+   */
+  public Trigger button(int button, EventLoop loop) {
+    return m_hid.button(button, loop);
   }
 
   /**
@@ -59,7 +91,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #faceDown(EventLoop)
    */
   public Trigger faceDown() {
-    return faceDown(getScheduler().getDefaultEventLoop());
+    return faceDown(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -83,7 +115,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #faceRight(EventLoop)
    */
   public Trigger faceRight() {
-    return faceRight(getScheduler().getDefaultEventLoop());
+    return faceRight(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -107,7 +139,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #faceLeft(EventLoop)
    */
   public Trigger faceLeft() {
-    return faceLeft(getScheduler().getDefaultEventLoop());
+    return faceLeft(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -131,7 +163,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #faceUp(EventLoop)
    */
   public Trigger faceUp() {
-    return faceUp(getScheduler().getDefaultEventLoop());
+    return faceUp(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -155,7 +187,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #back(EventLoop)
    */
   public Trigger back() {
-    return back(getScheduler().getDefaultEventLoop());
+    return back(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -179,7 +211,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #guide(EventLoop)
    */
   public Trigger guide() {
-    return guide(getScheduler().getDefaultEventLoop());
+    return guide(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -203,7 +235,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #start(EventLoop)
    */
   public Trigger start() {
-    return start(getScheduler().getDefaultEventLoop());
+    return start(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -227,7 +259,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #leftStick(EventLoop)
    */
   public Trigger leftStick() {
-    return leftStick(getScheduler().getDefaultEventLoop());
+    return leftStick(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -251,7 +283,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #rightStick(EventLoop)
    */
   public Trigger rightStick() {
-    return rightStick(getScheduler().getDefaultEventLoop());
+    return rightStick(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -275,7 +307,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #leftBumper(EventLoop)
    */
   public Trigger leftBumper() {
-    return leftBumper(getScheduler().getDefaultEventLoop());
+    return leftBumper(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -299,7 +331,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #rightBumper(EventLoop)
    */
   public Trigger rightBumper() {
-    return rightBumper(getScheduler().getDefaultEventLoop());
+    return rightBumper(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -323,7 +355,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #dpadUp(EventLoop)
    */
   public Trigger dpadUp() {
-    return dpadUp(getScheduler().getDefaultEventLoop());
+    return dpadUp(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -347,7 +379,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #dpadDown(EventLoop)
    */
   public Trigger dpadDown() {
-    return dpadDown(getScheduler().getDefaultEventLoop());
+    return dpadDown(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -371,7 +403,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #dpadLeft(EventLoop)
    */
   public Trigger dpadLeft() {
-    return dpadLeft(getScheduler().getDefaultEventLoop());
+    return dpadLeft(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -395,7 +427,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #dpadRight(EventLoop)
    */
   public Trigger dpadRight() {
-    return dpadRight(getScheduler().getDefaultEventLoop());
+    return dpadRight(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -419,7 +451,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #misc1(EventLoop)
    */
   public Trigger misc1() {
-    return misc1(getScheduler().getDefaultEventLoop());
+    return misc1(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -443,7 +475,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #rightPaddle1(EventLoop)
    */
   public Trigger rightPaddle1() {
-    return rightPaddle1(getScheduler().getDefaultEventLoop());
+    return rightPaddle1(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -467,7 +499,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #leftPaddle1(EventLoop)
    */
   public Trigger leftPaddle1() {
-    return leftPaddle1(getScheduler().getDefaultEventLoop());
+    return leftPaddle1(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -491,7 +523,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #rightPaddle2(EventLoop)
    */
   public Trigger rightPaddle2() {
-    return rightPaddle2(getScheduler().getDefaultEventLoop());
+    return rightPaddle2(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -515,7 +547,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #leftPaddle2(EventLoop)
    */
   public Trigger leftPaddle2() {
-    return leftPaddle2(getScheduler().getDefaultEventLoop());
+    return leftPaddle2(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -539,7 +571,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #touchpad(EventLoop)
    */
   public Trigger touchpad() {
-    return touchpad(getScheduler().getDefaultEventLoop());
+    return touchpad(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -563,7 +595,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #misc2(EventLoop)
    */
   public Trigger misc2() {
-    return misc2(getScheduler().getDefaultEventLoop());
+    return misc2(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -587,7 +619,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #misc3(EventLoop)
    */
   public Trigger misc3() {
-    return misc3(getScheduler().getDefaultEventLoop());
+    return misc3(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -611,7 +643,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #misc4(EventLoop)
    */
   public Trigger misc4() {
-    return misc4(getScheduler().getDefaultEventLoop());
+    return misc4(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -635,7 +667,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #misc5(EventLoop)
    */
   public Trigger misc5() {
-    return misc5(getScheduler().getDefaultEventLoop());
+    return misc5(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -659,7 +691,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #misc6(EventLoop)
    */
   public Trigger misc6() {
-    return misc6(getScheduler().getDefaultEventLoop());
+    return misc6(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -684,7 +716,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     threshold, attached to the given event loop
    */
   public Trigger leftTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(Gamepad.Axis.LEFT_TRIGGER.value, threshold, loop);
+    return m_hid.axisGreaterThan(Gamepad.Axis.LEFT_TRIGGER.value, threshold, loop);
   }
 
   /**
@@ -698,7 +730,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     loop}.
    */
   public Trigger leftTrigger(double threshold) {
-    return leftTrigger(threshold, getScheduler().getDefaultEventLoop());
+    return leftTrigger(threshold, m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -725,7 +757,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     threshold, attached to the given event loop
    */
   public Trigger rightTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(Gamepad.Axis.RIGHT_TRIGGER.value, threshold, loop);
+    return m_hid.axisGreaterThan(Gamepad.Axis.RIGHT_TRIGGER.value, threshold, loop);
   }
 
   /**
@@ -739,7 +771,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     loop}.
    */
   public Trigger rightTrigger(double threshold) {
-    return rightTrigger(threshold, getScheduler().getDefaultEventLoop());
+    return rightTrigger(threshold, m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -761,7 +793,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @return The axis value.
    */
   public double getLeftX() {
-    return m_hid.getLeftX();
+    return m_gamepad.getLeftX();
   }
 
   /**
@@ -770,7 +802,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @return The axis value.
    */
   public double getLeftY() {
-    return m_hid.getLeftY();
+    return m_gamepad.getLeftY();
   }
 
   /**
@@ -779,7 +811,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @return The axis value.
    */
   public double getRightX() {
-    return m_hid.getRightX();
+    return m_gamepad.getRightX();
   }
 
   /**
@@ -788,7 +820,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @return The axis value.
    */
   public double getRightY() {
-    return m_hid.getRightY();
+    return m_gamepad.getRightY();
   }
 
   /**
@@ -798,7 +830,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @return The axis value.
    */
   public double getLeftTriggerAxis() {
-    return m_hid.getLeftTriggerAxis();
+    return m_gamepad.getLeftTriggerAxis();
   }
 
   /**
@@ -808,6 +840,6 @@ public class CommandGamepad extends CommandGenericHID {
    * @return The axis value.
    */
   public double getRightTriggerAxis() {
-    return m_hid.getRightTriggerAxis();
+    return m_gamepad.getRightTriggerAxis();
   }
 }

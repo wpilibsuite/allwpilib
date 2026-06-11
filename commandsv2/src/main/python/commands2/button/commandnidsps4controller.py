@@ -8,11 +8,12 @@ from .commandgenerichid import CommandGenericHID
 from .trigger import Trigger
 
 
-class CommandNiDsPS4Controller(CommandGenericHID):
+class CommandNiDsPS4Controller:
     """
     A version of NI DS PS4Controller with Trigger factories for command-based.
     """
 
+    _command_hid: CommandGenericHID
     _hid: NiDsPS4Controller
 
     def __init__(self, port: int):
@@ -21,14 +22,25 @@ class CommandNiDsPS4Controller(CommandGenericHID):
 
         :param port: The port index on the Driver Station that the device is plugged into.
         """
-        super().__init__(port)
-        self._hid = NiDsPS4Controller(port)
+        self._command_hid = CommandGenericHID.getCommandGenericHID(port)
+        self._hid = NiDsPS4Controller(self._command_hid.getHID())
 
-    def getHID(self) -> NiDsPS4Controller:
+    def __getattr__(self, name: str):
+        return getattr(self._command_hid, name)
+
+    def getHID(self) -> CommandGenericHID:
         """
-        Get the underlying GenericHID object.
+        Get the underlying CommandGenericHID object.
 
-        :returns: the wrapped GenericHID object
+        :returns: the wrapped CommandGenericHID object
+        """
+        return self._command_hid
+
+    def getNiDsPS4Controller(self) -> NiDsPS4Controller:
+        """
+        Get the underlying NiDsPS4Controller object.
+
+        :returns: the wrapped NiDsPS4Controller object
         """
         return self._hid
 

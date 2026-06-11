@@ -20,7 +20,7 @@ import org.wpilib.math.util.Pair;
  * requested the most recent value is returned. There is a single class instance for each device and
  * the mapping of ports to hardware buttons depends on the code in the Driver Station.
  */
-public class GenericHID {
+public final class GenericHID implements HIDDevice {
   /** Represents a rumble output on the Joystick. */
   public enum RumbleType {
     /** Left rumble motor. */
@@ -132,8 +132,18 @@ public class GenericHID {
    *
    * @param port The port index on the Driver Station that the device is plugged into.
    */
-  public GenericHID(int port) {
+  GenericHID(int port) {
     m_port = port;
+  }
+
+  /**
+   * Get this GenericHID object.
+   *
+   * @return this GenericHID object
+   */
+  @Override
+  public GenericHID getHID() {
+    return this;
   }
 
   /**

@@ -24,6 +24,10 @@ namespace wpi::log {
 class DataLog;
 }  // namespace wpi::log
 
+namespace wpi {
+class GenericHID;
+}  // namespace wpi
+
 namespace wpi::util {
 class Color;
 }  // namespace wpi::util
@@ -40,6 +44,22 @@ class DriverStationBackend final {
  public:
   /// Number of Joystick ports.
   static constexpr int JOYSTICK_PORTS = 6;
+
+  /**
+   * Constructs a GenericHID for the given port.
+   *
+   * @param port The port index on the Driver Station.
+   * @return The GenericHID object for the given port.
+   */
+  static GenericHID ConstructGenericHID(int port);
+
+  /**
+   * Resets cached DriverStation HID wrapper objects.
+   *
+   * This is intended for test cleanup only. Any existing references to cached
+   * GenericHID or Gamepad objects become invalid after this call.
+   */
+  static void ResetCachedHIDData();
 
   /**
    * The state of one joystick button. Button indexes begin at 0.

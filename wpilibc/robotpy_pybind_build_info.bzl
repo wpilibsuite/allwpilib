@@ -212,6 +212,16 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
+            class_name = "HIDDevice",
+            yml_file = "semiwrap/HIDDevice.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/HIDDevice.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::HIDDevice", "wpi__HIDDevice.hpp"),
+            ],
+        ),
+        struct(
             class_name = "Joystick",
             yml_file = "semiwrap/Joystick.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",

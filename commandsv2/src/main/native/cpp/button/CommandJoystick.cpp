@@ -7,22 +7,27 @@
 using namespace wpi::cmd;
 
 CommandJoystick::CommandJoystick(int port)
-    : CommandGenericHID(port), m_hid{wpi::Joystick(port)} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
+      m_joystick{wpi::DriverStation::GetGenericHID(port)} {}
 
-wpi::Joystick& CommandJoystick::GetHID() {
-  return m_hid;
+CommandGenericHID& CommandJoystick::GetHID() {
+  return *m_hid;
+}
+
+wpi::Joystick& CommandJoystick::GetJoystick() {
+  return m_joystick;
 }
 
 Trigger CommandJoystick::Trigger(wpi::EventLoop* loop) const {
-  return Button(wpi::Joystick::ButtonType::kTriggerButton, loop);
+  return m_hid->Button(wpi::Joystick::ButtonType::kTriggerButton, loop);
 }
 
 Trigger CommandJoystick::Top(wpi::EventLoop* loop) const {
-  return Button(wpi::Joystick::ButtonType::kTopButton, loop);
+  return m_hid->Button(wpi::Joystick::ButtonType::kTopButton, loop);
 }
 
 double CommandJoystick::GetMagnitude() const {
-  return m_hid.GetMagnitude();
+  return m_joystick.GetMagnitude();
 }
 
 wpi::units::radian_t CommandJoystick::GetDirection() const {
@@ -34,5 +39,5 @@ wpi::units::radian_t CommandJoystick::GetDirection() const {
   //
   // It's rotated 90 degrees CCW (y is negated and the arguments are reversed)
   // so that 0 radians is forward.
-  return m_hid.GetDirection();
+  return m_joystick.GetDirection();
 }
