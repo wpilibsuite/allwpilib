@@ -12,28 +12,29 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Linux System Core", classifier: "linuxsystemcore",                 os: ubuntu-24.04, action: "build" }
-          - { name: "Linux System Core Debug", classifier: "linuxsystemcoredebug",            os: ubuntu-24.04, action: "build" }
-          - { name: "Linux System Core Static", classifier: "linuxsystemcorestatic",           os: ubuntu-24.04, action: "build" }
-          - { name: "Linux System Core Static Debug", classifier: "linuxsystemcorestaticdebug",    os: ubuntu-24.04, action: "build" }
-          - { name: "Linux x86-64",      classifier: "linuxx86-64,headers,sources",     os: ubuntu-24.04, action: "test" }
-          - { name: "Linux x86-64 Debug",  classifier: "linuxx86-64debug",                os: ubuntu-24.04, action: "test" }
-          - { name: "Linux x86-64 Static", classifier: "linuxx86-64static",               os: ubuntu-24.04, action: "test" }
-          - { name: "Linux x86-64 Static Debug", classifier: "linuxx86-64staticdebug",        os: ubuntu-24.04, action: "test" }
+          - { name: "Linux System Core", classifier: "linuxsystemcore",                 os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "build" }
+          - { name: "Linux System Core Debug", classifier: "linuxsystemcoredebug",            os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "build" }
+          - { name: "Linux System Core Static", classifier: "linuxsystemcorestatic",           os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "build" }
+          - { name: "Linux System Core Static Debug", classifier: "linuxsystemcorestaticdebug",    os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "build" }
+          - { name: "Linux x86-64",      classifier: "linuxx86-64,headers,sources",     os: ubuntu-24.04, container: wpilib/systemcore-cross-debian:trixie, action: "test" }
+          - { name: "Linux x86-64 Debug",  classifier: "linuxx86-64debug",                os: ubuntu-24.04, container: wpilib/systemcore-cross-debian:trixie, action: "test" }
+          - { name: "Linux x86-64 Static", classifier: "linuxx86-64static",               os: ubuntu-24.04, container: wpilib/systemcore-cross-debian:trixie, action: "test" }
+          - { name: "Linux x86-64 Static Debug", classifier: "linuxx86-64staticdebug",        os: ubuntu-24.04, container: wpilib/systemcore-cross-debian:trixie, action: "test" }
 
-          - { name: "macOS", classifier: "osxuniversal,osxuniversaldebug,headers,sources,osxuniversalstatic,osxuniversalstaticdebug,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug", os: macOS-15, action: "test" }
+          - { name: "macOS", classifier: "osxuniversal,osxuniversaldebug,headers,sources,osxuniversalstatic,osxuniversalstaticdebug,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug", os: macOS-15, container: "", action: "test" }
 
-          - { name: "Windows x86-64",      classifier: "windowsx86-64,windowsx86-64static,headers,sources",   os: windows-2022, action: "test" }
-          - { name: "Windows x86-64 Debug", classifier: "windowsx86-64debug,windowsx86-64staticdebug",        os: windows-2022, action: "test" }
+          - { name: "Windows x86-64",      classifier: "windowsx86-64,windowsx86-64static,headers,sources",   os: windows-2022, container: "", action: "test" }
+          - { name: "Windows x86-64 Debug", classifier: "windowsx86-64debug,windowsx86-64staticdebug",        os: windows-2022, container: "", action: "test" }
 
-          - { name: "Windows ARM64",       classifier: "windowsarm64,windowsarm64static",                    os: windows-2022, action: "build" }
-          - { name: "Windows ARM64 Debug",  classifier: "windowsarm64debug,windowsarm64staticdebug",         os: windows-2022, action: "build" }
+          - { name: "Windows ARM64",       classifier: "windowsarm64,windowsarm64static",                    os: windows-2022, container: "", action: "build" }
+          - { name: "Windows ARM64 Debug",  classifier: "windowsarm64debug,windowsarm64staticdebug",         os: windows-2022, container: "", action: "build" }
 
-          - { name: "Windows System Core", classifier: "linuxsystemcore,linuxsystemcorestatic", os: windows-2022, action: "build" }
-          - { name: "Windows System Core Debug", classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug", os: windows-2022, action: "build" }
+          - { name: "Windows System Core", classifier: "linuxsystemcore,linuxsystemcorestatic", os: windows-2022, container: "", action: "build" }
+          - { name: "Windows System Core Debug", classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug", os: windows-2022, container: "", action: "build" }
 
     name: "${{ matrix.action == 'test' && 'Test' || 'Build' }} ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
     steps:
       - name: Check disk free space pre-cleanup
         run: df -h
@@ -76,6 +77,12 @@ jobs:
       - name: Install apt dependencies
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libgl1-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev avahi-daemon
+
+      - name: Setup avahi-daemon
+        if: runner.os == 'Linux'
+        run: |
+          sudo service dbus start
+          sudo avahi-daemon -D
 
       - if: runner.os == 'Linux'
         uses: bazel-contrib/setup-bazel@0.15.0
