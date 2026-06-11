@@ -15,7 +15,7 @@ namespace wpi::cmd {
  *
  * @see wpi::Gamepad
  */
-class CommandGamepad : public CommandGenericHID {
+class CommandGamepad {
  public:
   /**
    * Construct an instance of a controller.
@@ -26,11 +26,31 @@ class CommandGamepad : public CommandGenericHID {
   explicit CommandGamepad(int port);
 
   /**
-   * Get the underlying GenericHID object.
+   * Get the underlying CommandGenericHID object.
    *
-   * @return the wrapped GenericHID object
+   * @return the wrapped CommandGenericHID object
    */
-  wpi::Gamepad& GetHID();
+  CommandGenericHID& GetHID();
+
+  /**
+   * Get the underlying Gamepad object.
+   *
+   * @return the wrapped Gamepad object
+   */
+  wpi::Gamepad& GetGamepad();
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button index
+   * @param loop the event loop instance to attach the event to. Defaults to the
+   * CommandScheduler's default loop.
+   * @return an event instance representing the button's digital signal attached
+   * to the given loop.
+   */
+  Trigger Button(int button,
+                 wpi::EventLoop* loop = CommandScheduler::GetInstance()
+                                            .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs an event instance around this button's digital signal.
@@ -490,6 +510,7 @@ class CommandGamepad : public CommandGenericHID {
   double GetRightTriggerAxis() const;
 
  private:
-  wpi::Gamepad m_hid;
+  CommandGenericHID* m_hid;
+  wpi::Gamepad* m_gamepad;
 };
 }  // namespace wpi::cmd

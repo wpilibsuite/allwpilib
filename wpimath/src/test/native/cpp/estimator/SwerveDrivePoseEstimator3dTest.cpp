@@ -10,7 +10,6 @@
 #include <tuple>
 #include <vector>
 
-#include <fmt/format.h>
 #include <gtest/gtest.h>
 
 #include "wpi/math/geometry/Pose2d.hpp"

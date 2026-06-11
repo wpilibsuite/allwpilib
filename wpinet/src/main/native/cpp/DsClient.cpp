@@ -7,8 +7,6 @@
 #include <memory>
 #include <string>
 
-#include <fmt/format.h>
-
 #include "wpi/net/uv/Tcp.hpp"
 #include "wpi/net/uv/Timer.hpp"
 #include "wpi/util/Logger.hpp"

@@ -7,8 +7,6 @@
 #include <cstdio>
 #include <thread>
 
-#include <fmt/format.h>
-
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
 #include "SmartIo.hpp"
