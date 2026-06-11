@@ -227,17 +227,6 @@ public class LTVDifferentialDriveController {
       double leftVelocity,
       double rightVelocity,
       DifferentialSample desiredState) {
-    // v = (v_r + v_l) / 2     (1)
-    // w = (v_r - v_l) / (2r)  (2)
-    // k = w / v               (3)
-    //
-    // v_l = v - wr
-    // v_l = v - (vk)r
-    // v_l = v(1 - kr)
-    //
-    // v_r = v + wr
-    // v_r = v + (vk)r
-    // v_r = v(1 + kr)
     return calculate(
         currentPose,
         leftVelocity,

@@ -29,12 +29,6 @@ class SwerveDriveKinematics;
  * Represents a trajectory consisting of a list of samples,
  * kinematically interpolating between them.
  *
- * This non-CRTP base stores samples and provides sampling utilities.
- * Derived classes implement drivetrain-specific interpolation via the
- * virtual Interpolate() hook and expose by-value APIs (e.g., TransformBy)
- * by constructing themselves using the protected helper methods that
- * return transformed sample vectors.
- *
  * @tparam SampleType The type of sample (e.g., SplineSample,
  * DifferentialSample)
  */
