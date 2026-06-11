@@ -5,6 +5,7 @@ extra_includes:
 
 classes:
   wpi::XboxController:
+    force_no_trampoline: true
     ignored_bases:
     - wpi::util::SendableHelper<XboxController>
     attributes:
@@ -16,9 +17,13 @@ classes:
       SUPPORTED_OUTPUTS:
     methods:
       XboxController:
+        overloads:
+          int:
+          GenericHID&:
       GetHID:
         overloads:
           "":
+            return_value_policy: reference_internal
           '[const]':
             ignore: true
       GetPort:

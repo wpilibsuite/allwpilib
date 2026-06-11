@@ -6,6 +6,7 @@
 #pragma once
 
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/driverstation/HIDDevice.hpp"
 #include "wpi/driverstation/TouchpadFinger.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
@@ -22,7 +23,8 @@ class EventLoop;
  * Each time a value is requested the most recent value is returned.
  */
 class XboxController
-    : public wpi::util::Sendable,
+    : public HIDDevice,
+      public wpi::util::Sendable,
       public wpi::util::SendableHelper<XboxController> {
  public:
   /** The number of touchpads supported by this controller. */
@@ -54,6 +56,13 @@ class XboxController
    */
   explicit XboxController(int port);
 
+  /**
+   * Construct an instance of a controller with a GenericHID object.
+   *
+   * @param hid The GenericHID object to use for this controller.
+   */
+  explicit XboxController(GenericHID& hid);
+
   ~XboxController() override = default;
 
   XboxController(XboxController&&) = default;
@@ -64,14 +73,14 @@ class XboxController
    *
    * @return the wrapped GenericHID object
    */
-  GenericHID& GetHID();
+  GenericHID& GetHID() override;
 
   /**
    * Get the underlying GenericHID object.
    *
    * @return the wrapped GenericHID object
    */
-  const GenericHID& GetHID() const;
+  const GenericHID& GetHID() const override;
 
   /**
    * Get the port number of the HID.
@@ -731,7 +740,7 @@ class XboxController
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
-  GenericHID m_hid;
+  GenericHID* m_hid;
 };
 
 }  // namespace wpi

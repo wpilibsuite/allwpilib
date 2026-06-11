@@ -4,8 +4,15 @@ from typing import Optional
 
 from wpilib import EventLoop, {{ ClassName }}Controller
 
-from ..commandscheduler import CommandScheduler
+from .commandgenerichid import CommandGenericHID
 from .trigger import Trigger
+
+
+def _enum_value(value) -> int:
+    try:
+        return int(value)
+    except TypeError:
+        return value.value
 
 
 class Command{{ ClassName }}Controller:
@@ -13,6 +20,7 @@ class Command{{ ClassName }}Controller:
     A version of :class:`wpilib.{{ ClassName }}Controller` with :class:`.Trigger` factories for command-based.
     """
 
+    _hid: CommandGenericHID
     _controller: {{ ClassName }}Controller
 
     def __init__(self, port: int):
@@ -21,7 +29,19 @@ class Command{{ ClassName }}Controller:
 
         :param port: The port index on the Driver Station that the controller is plugged into.
         """
-        self._controller = {{ ClassName }}Controller(port)
+        self._hid = CommandGenericHID.getCommandGenericHID(port)
+        self._controller = {{ ClassName }}Controller(self._hid.getHID())
+
+    def __getattr__(self, name: str):
+        return getattr(self._hid, name)
+
+    def getHID(self) -> CommandGenericHID:
+        """
+        Get the underlying CommandGenericHID object.
+
+        :returns: the wrapped CommandGenericHID object
+        """
+        return self._hid
 
     def getController(self) -> {{ ClassName }}Controller:
         """
@@ -41,9 +61,9 @@ class Command{{ ClassName }}Controller:
         :returns: a Trigger instance representing the {{ button.DocName }} button's digital signal
                   attached to the given loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.get{{ button.MethodName }}Button())
+        return self._hid.button(
+            _enum_value({{ ClassName }}Controller.Button.{{ button.ConstantName }}), loop
+        )
 {% endfor -%}
 {% for trigger in triggerAxes %}
     def {{ trigger.Name }}(
@@ -63,9 +83,11 @@ class Command{{ ClassName }}Controller:
         :returns: a Trigger instance that is true when the {{ trigger.DocName }} axis exceeds the
                   provided threshold, attached to the given event loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.get{{ trigger.AxisMethodName }}() > threshold)
+        return self._hid.axisGreaterThan(
+            _enum_value({{ ClassName }}Controller.Axis.{{ trigger.AxisConstantName }}),
+            threshold,
+            loop,
+        )
 {% endfor -%}
 {% for axis in axes %}
     def get{{ axis.MethodName }}(self) -> float:

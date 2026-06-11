@@ -8,7 +8,12 @@
 using namespace wpi::cmd;
 
 Command{{ ClassName }}Controller::Command{{ ClassName }}Controller(int port)
-    : m_controller{wpi::{{ ClassName }}Controller(port)} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
+      m_controller{m_hid->GetHID()} {}
+
+CommandGenericHID& Command{{ ClassName }}Controller::GetHID() {
+  return *m_hid;
+}
 
 wpi::{{ ClassName }}Controller&
 Command{{ ClassName }}Controller::GetController() {
@@ -22,17 +27,16 @@ Command{{ ClassName }}Controller::GetController() const {
 {% for button in buttons %}
 Trigger Command{{ ClassName }}Controller::{{ button.MethodName }}(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::{{ ClassName }}Controller::Button::{{ button.ConstantName }},
-                loop);
+  return m_hid->Button(wpi::{{ ClassName }}Controller::Button::{{ button.ConstantName }},
+                       loop);
 }
 {% endfor -%}
 {% for trigger in triggerAxes %}
 Trigger Command{{ ClassName }}Controller::{{ trigger.MethodName }}(
     double threshold, wpi::EventLoop* loop) const {
-  return AxisGreaterThan(m_controller.GetHID(),
-                         wpi::{{ ClassName }}Controller::Axis::{{ trigger.AxisConstantName }},
-                         threshold, loop);
+  return m_hid->AxisGreaterThan(
+      wpi::{{ ClassName }}Controller::Axis::{{ trigger.AxisConstantName }},
+      threshold, loop);
 }
 {% endfor -%}
 {% for axis in axes %}

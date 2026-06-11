@@ -8,7 +8,7 @@
 #include "wpi/driverstation/{{ ClassName }}Controller.hpp"
 
 #include "wpi/commands2/CommandScheduler.hpp"
-#include "wpi/commands2/button/CommandHIDBase.hpp"
+#include "wpi/commands2/button/CommandGenericHID.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
 
 namespace wpi::cmd {
@@ -18,7 +18,7 @@ namespace wpi::cmd {
  *
  * @see wpi::{{ ClassName }}Controller
  */
-class Command{{ ClassName }}Controller : public CommandHIDBase {
+class Command{{ ClassName }}Controller {
  public:
   /**
    * Construct an instance of a controller.
@@ -27,6 +27,13 @@ class Command{{ ClassName }}Controller : public CommandHIDBase {
    * plugged into.
    */
   explicit Command{{ ClassName }}Controller(int port);
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  CommandGenericHID& GetHID();
 
   /**
    * Get the wrapped controller object.
@@ -83,6 +90,7 @@ class Command{{ ClassName }}Controller : public CommandHIDBase {
   double Get{{ axis.MethodName }}() const;
 {% endfor %}
  private:
+  CommandGenericHID* m_hid;
   wpi::{{ ClassName }}Controller m_controller;
 };
 }  // namespace wpi::cmd

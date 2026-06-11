@@ -5,6 +5,7 @@ extra_includes:
 
 classes:
   wpi::DualSenseController:
+    force_no_trampoline: true
     ignored_bases:
     - wpi::util::SendableHelper<DualSenseController>
     attributes:
@@ -16,9 +17,13 @@ classes:
       SUPPORTED_OUTPUTS:
     methods:
       DualSenseController:
+        overloads:
+          int:
+          GenericHID&:
       GetHID:
         overloads:
           "":
+            return_value_policy: reference_internal
           '[const]':
             ignore: true
       GetPort:

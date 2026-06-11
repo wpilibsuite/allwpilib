@@ -17,7 +17,8 @@ import org.wpilib.event.EventLoop;
  * @see DualSenseController
  */
 @SuppressWarnings("MethodName")
-public class CommandDualSenseController extends CommandHIDBase {
+public class CommandDualSenseController {
+  private final CommandGenericHID m_hid;
   private final DualSenseController m_controller;
 
   /**
@@ -38,8 +39,17 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandDualSenseController(Scheduler scheduler, int port) {
-    super(scheduler);
-    m_controller = new DualSenseController(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(scheduler, port);
+    m_controller = new DualSenseController(m_hid.getHID());
+  }
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  public CommandGenericHID getHID() {
+    return m_hid;
   }
 
   /**
@@ -61,7 +71,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @see #cross(EventLoop)
    */
   public Trigger cross() {
-    return cross(getDefaultEventLoop());
+    return cross(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -72,10 +82,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger cross(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualSenseController.Button.CROSS.value,
-        loop);
+    return m_hid.button(DualSenseController.Button.CROSS.value, loop);
   }
 
   /**
@@ -88,7 +95,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @see #circle(EventLoop)
    */
   public Trigger circle() {
-    return circle(getDefaultEventLoop());
+    return circle(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -99,10 +106,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger circle(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualSenseController.Button.CIRCLE.value,
-        loop);
+    return m_hid.button(DualSenseController.Button.CIRCLE.value, loop);
   }
 
   /**
@@ -115,7 +119,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @see #square(EventLoop)
    */
   public Trigger square() {
-    return square(getDefaultEventLoop());
+    return square(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -126,10 +130,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger square(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualSenseController.Button.SQUARE.value,
-        loop);
+    return m_hid.button(DualSenseController.Button.SQUARE.value, loop);
   }
 
   /**
@@ -142,7 +143,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @see #triangle(EventLoop)
    */
   public Trigger triangle() {
-    return triangle(getDefaultEventLoop());
+    return triangle(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -153,10 +154,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger triangle(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualSenseController.Button.TRIANGLE.value,
-        loop);
+    return m_hid.button(DualSenseController.Button.TRIANGLE.value, loop);
   }
 
   /**
@@ -169,7 +167,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @see #create(EventLoop)
    */
   public Trigger create() {
-    return create(getDefaultEventLoop());
+    return create(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -180,10 +178,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger create(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualSenseController.Button.CREATE.value,
-        loop);
+    return m_hid.button(DualSenseController.Button.CREATE.value, loop);
   }
 
   /**
@@ -196,7 +191,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @see #PS(EventLoop)
    */
   public Trigger PS() {
-    return PS(getDefaultEventLoop());
+    return PS(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -207,10 +202,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger PS(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualSenseController.Button.PS.value,
-        loop);
+    return m_hid.button(DualSenseController.Button.PS.value, loop);
   }
 
   /**
@@ -223,7 +215,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @see #options(EventLoop)
    */
   public Trigger options() {
-    return options(getDefaultEventLoop());
+    return options(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -234,10 +226,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger options(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualSenseController.Button.OPTIONS.value,
-        loop);
+    return m_hid.button(DualSenseController.Button.OPTIONS.value, loop);
   }
 
   /**
@@ -250,7 +239,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @see #L3(EventLoop)
    */
   public Trigger L3() {
-    return L3(getDefaultEventLoop());
+    return L3(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -261,10 +250,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger L3(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualSenseController.Button.L3.value,
-        loop);
+    return m_hid.button(DualSenseController.Button.L3.value, loop);
   }
 
   /**
@@ -277,7 +263,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @see #R3(EventLoop)
    */
   public Trigger R3() {
-    return R3(getDefaultEventLoop());
+    return R3(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -288,10 +274,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger R3(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualSenseController.Button.R3.value,
-        loop);
+    return m_hid.button(DualSenseController.Button.R3.value, loop);
   }
 
   /**
@@ -304,7 +287,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @see #L1(EventLoop)
    */
   public Trigger L1() {
-    return L1(getDefaultEventLoop());
+    return L1(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -315,10 +298,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger L1(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualSenseController.Button.L1.value,
-        loop);
+    return m_hid.button(DualSenseController.Button.L1.value, loop);
   }
 
   /**
@@ -331,7 +311,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @see #R1(EventLoop)
    */
   public Trigger R1() {
-    return R1(getDefaultEventLoop());
+    return R1(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -342,10 +322,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger R1(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualSenseController.Button.R1.value,
-        loop);
+    return m_hid.button(DualSenseController.Button.R1.value, loop);
   }
 
   /**
@@ -358,7 +335,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @see #dpadUp(EventLoop)
    */
   public Trigger dpadUp() {
-    return dpadUp(getDefaultEventLoop());
+    return dpadUp(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -369,10 +346,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualSenseController.Button.DPAD_UP.value,
-        loop);
+    return m_hid.button(DualSenseController.Button.DPAD_UP.value, loop);
   }
 
   /**
@@ -385,7 +359,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @see #dpadDown(EventLoop)
    */
   public Trigger dpadDown() {
-    return dpadDown(getDefaultEventLoop());
+    return dpadDown(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -396,10 +370,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualSenseController.Button.DPAD_DOWN.value,
-        loop);
+    return m_hid.button(DualSenseController.Button.DPAD_DOWN.value, loop);
   }
 
   /**
@@ -412,7 +383,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @see #dpadLeft(EventLoop)
    */
   public Trigger dpadLeft() {
-    return dpadLeft(getDefaultEventLoop());
+    return dpadLeft(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -423,10 +394,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualSenseController.Button.DPAD_LEFT.value,
-        loop);
+    return m_hid.button(DualSenseController.Button.DPAD_LEFT.value, loop);
   }
 
   /**
@@ -439,7 +407,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @see #dpadRight(EventLoop)
    */
   public Trigger dpadRight() {
-    return dpadRight(getDefaultEventLoop());
+    return dpadRight(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -450,10 +418,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualSenseController.Button.DPAD_RIGHT.value,
-        loop);
+    return m_hid.button(DualSenseController.Button.DPAD_RIGHT.value, loop);
   }
 
   /**
@@ -466,7 +431,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @see #microphone(EventLoop)
    */
   public Trigger microphone() {
-    return microphone(getDefaultEventLoop());
+    return microphone(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -477,10 +442,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger microphone(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualSenseController.Button.MICROPHONE.value,
-        loop);
+    return m_hid.button(DualSenseController.Button.MICROPHONE.value, loop);
   }
 
   /**
@@ -493,7 +455,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    * @see #touchpad(EventLoop)
    */
   public Trigger touchpad() {
-    return touchpad(getDefaultEventLoop());
+    return touchpad(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -504,10 +466,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger touchpad(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        DualSenseController.Button.TOUCHPAD.value,
-        loop);
+    return m_hid.button(DualSenseController.Button.TOUCHPAD.value, loop);
   }
 
   /**
@@ -521,11 +480,8 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger L2(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        DualSenseController.Axis.L2.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        DualSenseController.Axis.L2.value, threshold, loop);
   }
 
   /**
@@ -540,7 +496,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     Scheduler#getDefault default scheduler} if a scheduler was not explicitly provided.
    */
   public Trigger L2(double threshold) {
-    return L2(threshold, getDefaultEventLoop());
+    return L2(threshold, m_hid.getScheduler().getDefaultEventLoop());
   }
 
 
@@ -568,11 +524,8 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger R2(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        DualSenseController.Axis.R2.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        DualSenseController.Axis.R2.value, threshold, loop);
   }
 
   /**
@@ -587,7 +540,7 @@ public class CommandDualSenseController extends CommandHIDBase {
    *     Scheduler#getDefault default scheduler} if a scheduler was not explicitly provided.
    */
   public Trigger R2(double threshold) {
-    return R2(threshold, getDefaultEventLoop());
+    return R2(threshold, m_hid.getScheduler().getDefaultEventLoop());
   }
 
 

@@ -8,7 +8,7 @@
 #include "wpi/driverstation/XboxController.hpp"
 
 #include "wpi/commands2/CommandScheduler.hpp"
-#include "wpi/commands2/button/CommandHIDBase.hpp"
+#include "wpi/commands2/button/CommandGenericHID.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
 
 namespace wpi::cmd {
@@ -18,7 +18,7 @@ namespace wpi::cmd {
  *
  * @see wpi::XboxController
  */
-class CommandXboxController : public CommandHIDBase {
+class CommandXboxController {
  public:
   /**
    * Construct an instance of a controller.
@@ -27,6 +27,13 @@ class CommandXboxController : public CommandHIDBase {
    * plugged into.
    */
   explicit CommandXboxController(int port);
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  CommandGenericHID& GetHID();
 
   /**
    * Get the wrapped controller object.
@@ -316,6 +323,7 @@ class CommandXboxController : public CommandHIDBase {
   double GetRightTrigger() const;
 
  private:
+  CommandGenericHID* m_hid;
   wpi::XboxController m_controller;
 };
 }  // namespace wpi::cmd

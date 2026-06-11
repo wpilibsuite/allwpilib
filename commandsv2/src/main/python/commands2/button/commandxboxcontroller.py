@@ -4,8 +4,15 @@ from typing import Optional
 
 from wpilib import EventLoop, XboxController
 
-from ..commandscheduler import CommandScheduler
+from .commandgenerichid import CommandGenericHID
 from .trigger import Trigger
+
+
+def _enum_value(value) -> int:
+    try:
+        return int(value)
+    except TypeError:
+        return value.value
 
 
 class CommandXboxController:
@@ -13,6 +20,7 @@ class CommandXboxController:
     A version of :class:`wpilib.XboxController` with :class:`.Trigger` factories for command-based.
     """
 
+    _hid: CommandGenericHID
     _controller: XboxController
 
     def __init__(self, port: int):
@@ -21,7 +29,19 @@ class CommandXboxController:
 
         :param port: The port index on the Driver Station that the controller is plugged into.
         """
-        self._controller = XboxController(port)
+        self._hid = CommandGenericHID.getCommandGenericHID(port)
+        self._controller = XboxController(self._hid.getHID())
+
+    def __getattr__(self, name: str):
+        return getattr(self._hid, name)
+
+    def getHID(self) -> CommandGenericHID:
+        """
+        Get the underlying CommandGenericHID object.
+
+        :returns: the wrapped CommandGenericHID object
+        """
+        return self._hid
 
     def getController(self) -> XboxController:
         """
@@ -41,9 +61,9 @@ class CommandXboxController:
         :returns: a Trigger instance representing the A button's digital signal
                   attached to the given loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.getAButton())
+        return self._hid.button(
+            _enum_value(XboxController.Button.A), loop
+        )
 
     def b(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -55,9 +75,9 @@ class CommandXboxController:
         :returns: a Trigger instance representing the B button's digital signal
                   attached to the given loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.getBButton())
+        return self._hid.button(
+            _enum_value(XboxController.Button.B), loop
+        )
 
     def x(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -69,9 +89,9 @@ class CommandXboxController:
         :returns: a Trigger instance representing the X button's digital signal
                   attached to the given loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.getXButton())
+        return self._hid.button(
+            _enum_value(XboxController.Button.X), loop
+        )
 
     def y(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -83,9 +103,9 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Y button's digital signal
                   attached to the given loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.getYButton())
+        return self._hid.button(
+            _enum_value(XboxController.Button.Y), loop
+        )
 
     def view(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -97,9 +117,9 @@ class CommandXboxController:
         :returns: a Trigger instance representing the View button's digital signal
                   attached to the given loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.getViewButton())
+        return self._hid.button(
+            _enum_value(XboxController.Button.VIEW), loop
+        )
 
     def xbox(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -111,9 +131,9 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Xbox button's digital signal
                   attached to the given loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.getXboxButton())
+        return self._hid.button(
+            _enum_value(XboxController.Button.XBOX), loop
+        )
 
     def menu(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -125,9 +145,9 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Menu button's digital signal
                   attached to the given loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.getMenuButton())
+        return self._hid.button(
+            _enum_value(XboxController.Button.MENU), loop
+        )
 
     def leftStick(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -139,9 +159,9 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Left Stick button's digital signal
                   attached to the given loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.getLeftStickButton())
+        return self._hid.button(
+            _enum_value(XboxController.Button.LEFT_STICK), loop
+        )
 
     def rightStick(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -153,9 +173,9 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Right Stick button's digital signal
                   attached to the given loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.getRightStickButton())
+        return self._hid.button(
+            _enum_value(XboxController.Button.RIGHT_STICK), loop
+        )
 
     def leftBumper(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -167,9 +187,9 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Left Bumper button's digital signal
                   attached to the given loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.getLeftBumperButton())
+        return self._hid.button(
+            _enum_value(XboxController.Button.LEFT_BUMPER), loop
+        )
 
     def rightBumper(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -181,9 +201,9 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Right Bumper button's digital signal
                   attached to the given loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.getRightBumperButton())
+        return self._hid.button(
+            _enum_value(XboxController.Button.RIGHT_BUMPER), loop
+        )
 
     def dpadUp(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -195,9 +215,9 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Dpad Up button's digital signal
                   attached to the given loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.getDpadUpButton())
+        return self._hid.button(
+            _enum_value(XboxController.Button.DPAD_UP), loop
+        )
 
     def dpadDown(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -209,9 +229,9 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Dpad Down button's digital signal
                   attached to the given loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.getDpadDownButton())
+        return self._hid.button(
+            _enum_value(XboxController.Button.DPAD_DOWN), loop
+        )
 
     def dpadLeft(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -223,9 +243,9 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Dpad Left button's digital signal
                   attached to the given loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.getDpadLeftButton())
+        return self._hid.button(
+            _enum_value(XboxController.Button.DPAD_LEFT), loop
+        )
 
     def dpadRight(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -237,9 +257,9 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Dpad Right button's digital signal
                   attached to the given loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.getDpadRightButton())
+        return self._hid.button(
+            _enum_value(XboxController.Button.DPAD_RIGHT), loop
+        )
 
     def leftTrigger(
         self,
@@ -258,9 +278,11 @@ class CommandXboxController:
         :returns: a Trigger instance that is true when the Left Trigger axis exceeds the
                   provided threshold, attached to the given event loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.getLeftTrigger() > threshold)
+        return self._hid.axisGreaterThan(
+            _enum_value(XboxController.Axis.LEFT_TRIGGER),
+            threshold,
+            loop,
+        )
 
     def rightTrigger(
         self,
@@ -279,9 +301,11 @@ class CommandXboxController:
         :returns: a Trigger instance that is true when the Right Trigger axis exceeds the
                   provided threshold, attached to the given event loop.
         """
-        if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._controller.getRightTrigger() > threshold)
+        return self._hid.axisGreaterThan(
+            _enum_value(XboxController.Axis.RIGHT_TRIGGER),
+            threshold,
+            loop,
+        )
 
     def getLeftX(self) -> float:
         """

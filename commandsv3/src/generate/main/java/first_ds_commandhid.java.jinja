@@ -17,7 +17,8 @@ import org.wpilib.event.EventLoop;
  * @see {{ ClassName }}Controller
  */
 @SuppressWarnings("MethodName")
-public class Command{{ ClassName }}Controller extends CommandHIDBase {
+public class Command{{ ClassName }}Controller {
+  private final CommandGenericHID m_hid;
   private final {{ ClassName }}Controller m_controller;
 
   /**
@@ -38,8 +39,17 @@ public class Command{{ ClassName }}Controller extends CommandHIDBase {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public Command{{ ClassName }}Controller(Scheduler scheduler, int port) {
-    super(scheduler);
-    m_controller = new {{ ClassName }}Controller(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(scheduler, port);
+    m_controller = new {{ ClassName }}Controller(m_hid.getHID());
+  }
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  public CommandGenericHID getHID() {
+    return m_hid;
   }
 
   /**
@@ -61,7 +71,7 @@ public class Command{{ ClassName }}Controller extends CommandHIDBase {
    * @see #{{ button.Name }}(EventLoop)
    */
   public Trigger {{ button.Name }}() {
-    return {{ button.Name }}(getDefaultEventLoop());
+    return {{ button.Name }}(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -72,10 +82,7 @@ public class Command{{ ClassName }}Controller extends CommandHIDBase {
    *     to the given loop.
    */
   public Trigger {{ button.Name }}(EventLoop loop) {
-    return button(
-        m_controller.getHID(),
-        {{ ClassName }}Controller.Button.{{ button.ConstantName }}.value,
-        loop);
+    return m_hid.button({{ ClassName }}Controller.Button.{{ button.ConstantName }}.value, loop);
   }
 {% endfor -%}
 {% for trigger in triggerAxes %}
@@ -90,11 +97,8 @@ public class Command{{ ClassName }}Controller extends CommandHIDBase {
    *     threshold, attached to the given event loop
    */
   public Trigger {{ trigger.Name }}(double threshold, EventLoop loop) {
-    return axisGreaterThan(
-        m_controller.getHID(),
-        {{ ClassName }}Controller.Axis.{{ trigger.AxisConstantName }}.value,
-        threshold,
-        loop);
+    return m_hid.axisGreaterThan(
+        {{ ClassName }}Controller.Axis.{{ trigger.AxisConstantName }}.value, threshold, loop);
   }
 
   /**
@@ -109,7 +113,7 @@ public class Command{{ ClassName }}Controller extends CommandHIDBase {
    *     Scheduler#getDefault default scheduler} if a scheduler was not explicitly provided.
    */
   public Trigger {{ trigger.Name }}(double threshold) {
-    return {{ trigger.Name }}(threshold, getDefaultEventLoop());
+    return {{ trigger.Name }}(threshold, m_hid.getScheduler().getDefaultEventLoop());
   }
 {% if trigger.HasDefaultThresholdMethod %}
 

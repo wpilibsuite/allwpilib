@@ -8,7 +8,12 @@
 using namespace wpi::cmd;
 
 CommandDualSenseController::CommandDualSenseController(int port)
-    : m_controller{wpi::DualSenseController(port)} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
+      m_controller{m_hid->GetHID()} {}
+
+CommandGenericHID& CommandDualSenseController::GetHID() {
+  return *m_hid;
+}
 
 wpi::DualSenseController&
 CommandDualSenseController::GetController() {
@@ -22,135 +27,118 @@ CommandDualSenseController::GetController() const {
 
 Trigger CommandDualSenseController::Cross(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::DualSenseController::Button::CROSS,
-                loop);
+  return m_hid->Button(wpi::DualSenseController::Button::CROSS,
+                       loop);
 }
 
 Trigger CommandDualSenseController::Circle(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::DualSenseController::Button::CIRCLE,
-                loop);
+  return m_hid->Button(wpi::DualSenseController::Button::CIRCLE,
+                       loop);
 }
 
 Trigger CommandDualSenseController::Square(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::DualSenseController::Button::SQUARE,
-                loop);
+  return m_hid->Button(wpi::DualSenseController::Button::SQUARE,
+                       loop);
 }
 
 Trigger CommandDualSenseController::Triangle(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::DualSenseController::Button::TRIANGLE,
-                loop);
+  return m_hid->Button(wpi::DualSenseController::Button::TRIANGLE,
+                       loop);
 }
 
 Trigger CommandDualSenseController::Create(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::DualSenseController::Button::CREATE,
-                loop);
+  return m_hid->Button(wpi::DualSenseController::Button::CREATE,
+                       loop);
 }
 
 Trigger CommandDualSenseController::PS(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::DualSenseController::Button::PS,
-                loop);
+  return m_hid->Button(wpi::DualSenseController::Button::PS,
+                       loop);
 }
 
 Trigger CommandDualSenseController::Options(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::DualSenseController::Button::OPTIONS,
-                loop);
+  return m_hid->Button(wpi::DualSenseController::Button::OPTIONS,
+                       loop);
 }
 
 Trigger CommandDualSenseController::L3(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::DualSenseController::Button::L3,
-                loop);
+  return m_hid->Button(wpi::DualSenseController::Button::L3,
+                       loop);
 }
 
 Trigger CommandDualSenseController::R3(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::DualSenseController::Button::R3,
-                loop);
+  return m_hid->Button(wpi::DualSenseController::Button::R3,
+                       loop);
 }
 
 Trigger CommandDualSenseController::L1(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::DualSenseController::Button::L1,
-                loop);
+  return m_hid->Button(wpi::DualSenseController::Button::L1,
+                       loop);
 }
 
 Trigger CommandDualSenseController::R1(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::DualSenseController::Button::R1,
-                loop);
+  return m_hid->Button(wpi::DualSenseController::Button::R1,
+                       loop);
 }
 
 Trigger CommandDualSenseController::DpadUp(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::DualSenseController::Button::DPAD_UP,
-                loop);
+  return m_hid->Button(wpi::DualSenseController::Button::DPAD_UP,
+                       loop);
 }
 
 Trigger CommandDualSenseController::DpadDown(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::DualSenseController::Button::DPAD_DOWN,
-                loop);
+  return m_hid->Button(wpi::DualSenseController::Button::DPAD_DOWN,
+                       loop);
 }
 
 Trigger CommandDualSenseController::DpadLeft(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::DualSenseController::Button::DPAD_LEFT,
-                loop);
+  return m_hid->Button(wpi::DualSenseController::Button::DPAD_LEFT,
+                       loop);
 }
 
 Trigger CommandDualSenseController::DpadRight(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::DualSenseController::Button::DPAD_RIGHT,
-                loop);
+  return m_hid->Button(wpi::DualSenseController::Button::DPAD_RIGHT,
+                       loop);
 }
 
 Trigger CommandDualSenseController::Microphone(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::DualSenseController::Button::MICROPHONE,
-                loop);
+  return m_hid->Button(wpi::DualSenseController::Button::MICROPHONE,
+                       loop);
 }
 
 Trigger CommandDualSenseController::Touchpad(
     wpi::EventLoop* loop) const {
-  return Button(m_controller.GetHID(),
-                wpi::DualSenseController::Button::TOUCHPAD,
-                loop);
+  return m_hid->Button(wpi::DualSenseController::Button::TOUCHPAD,
+                       loop);
 }
 
 Trigger CommandDualSenseController::L2(
     double threshold, wpi::EventLoop* loop) const {
-  return AxisGreaterThan(m_controller.GetHID(),
-                         wpi::DualSenseController::Axis::L2,
-                         threshold, loop);
+  return m_hid->AxisGreaterThan(
+      wpi::DualSenseController::Axis::L2,
+      threshold, loop);
 }
 
 Trigger CommandDualSenseController::R2(
     double threshold, wpi::EventLoop* loop) const {
-  return AxisGreaterThan(m_controller.GetHID(),
-                         wpi::DualSenseController::Axis::R2,
-                         threshold, loop);
+  return m_hid->AxisGreaterThan(
+      wpi::DualSenseController::Axis::R2,
+      threshold, loop);
 }
 
 double CommandDualSenseController::GetLeftX() const {

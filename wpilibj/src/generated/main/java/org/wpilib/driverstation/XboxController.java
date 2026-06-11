@@ -7,6 +7,7 @@
 package org.wpilib.driverstation;
 
 import java.util.EnumSet;
+import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
@@ -19,7 +20,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * <p>This class handles Xbox input that comes from the Driver Station. Each time a value
  * is requested the most recent value is returned.
  */
-public class XboxController implements Sendable {
+public class XboxController implements HIDDevice, Sendable {
   /** The number of touchpads supported by this controller. */
   public static final int TOUCHPAD_COUNT = 0;
 
@@ -123,8 +124,17 @@ public class XboxController implements Sendable {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public XboxController(final int port) {
-    m_hid = new GenericHID(port);
-    HAL.reportUsage("HID", port, "XboxController");
+    this(DriverStation.getGenericHID(port));
+  }
+
+  /**
+   * Construct an instance of a controller with a GenericHID object.
+   *
+   * @param hid The GenericHID object to use for this controller.
+   */
+  public XboxController(final GenericHID hid) {
+    m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
+    HAL.reportUsage("HID", hid.getPort(), "XboxController");
   }
 
   /**
@@ -132,6 +142,7 @@ public class XboxController implements Sendable {
    *
    * @return the wrapped GenericHID object
    */
+  @Override
   public GenericHID getHID() {
     return m_hid;
   }
