@@ -144,6 +144,7 @@ AnalogAccelerometer = "wpi/hardware/accelerometer/AnalogAccelerometer.hpp"
 
 # wpi/hardware/bus
 CAN = "wpi/hardware/bus/CAN.hpp"
+CANBusMap = "wpi/hardware/bus/CANBusMap.hpp"
 I2C = "wpi/hardware/bus/I2C.hpp"
 SerialPort = "wpi/hardware/bus/SerialPort.hpp"
 
