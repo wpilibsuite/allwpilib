@@ -19,6 +19,8 @@ import org.wpilib.units.measure.Time;
 /**
  * Represents a trajectory consisting of a list of {@link TrajectorySample}s, kinematically
  * interpolating between them.
+ *
+ * @param <SampleType> The type of the samples in the trajectory.
  */
 public abstract class Trajectory<SampleType extends TrajectorySample> {
   /** The samples this Trajectory is composed of. */
@@ -79,17 +81,30 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
    */
   public abstract SampleType interpolate(SampleType start, SampleType end, double t);
 
-  /** Gets the first sample in the trajectory. */
+  /**
+   * Gets the first sample in the trajectory.
+   *
+   * @return the first sample in the trajectory.
+   */
   public SampleType start() {
     return samples.getFirst();
   }
 
-  /** Gets the last sample in the trajectory. */
+  /**
+   * Gets the last sample in the trajectory.
+   *
+   * @return the last sample in the trajectory.
+   */
   public SampleType end() {
     return samples.getLast();
   }
 
-  /** Gets the sample at the given timestamp. */
+  /**
+   * Gets the sample at the given timestamp.
+   *
+   * @param timestamp the time since the beginning of the trajectory to sample.
+   * @return the sample at that point in time.
+   */
   public SampleType sampleAt(Time timestamp) {
     return sampleAt(timestamp.in(Seconds));
   }
@@ -97,7 +112,8 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
   /**
    * Gets the sample at the given timestamp.
    *
-   * @param timestamp timestamp in seconds
+   * @param timestamp the time since the beginning of the trajectory to sample, in seconds.
+   * @return the sample at that point in time.
    */
   public SampleType sampleAt(double timestamp) {
     return sampleMap.get(timestamp);

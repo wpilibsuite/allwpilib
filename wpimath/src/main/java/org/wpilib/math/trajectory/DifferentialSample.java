@@ -144,6 +144,12 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
     return Objects.hash(timestamp, pose, velocity, acceleration, leftSpeed, rightSpeed);
   }
 
+  /**
+   * Transforms the pose of this sample by the given transform.
+   *
+   * @param transform The transform to apply to the pose.
+   * @return A new sample with the transformed pose.
+   */
   @Override
   public DifferentialSample transform(Transform2d transform) {
     return new DifferentialSample(
@@ -155,6 +161,12 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
         rightSpeed);
   }
 
+  /**
+   * Transforms this sample to be relative to the given pose.
+   *
+   * @param other The pose to make this sample relative to.
+   * @return A new sample with the relative pose.
+   */
   @Override
   public DifferentialSample relativeTo(Pose2d other) {
     return new DifferentialSample(
@@ -166,6 +178,12 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
         rightSpeed);
   }
 
+  /**
+   * Creates a new sample with the given timestamp.
+   *
+   * @param timestamp The new timestamp, in seconds.
+   * @return A new sample with the given timestamp.
+   */
   @Override
   public DifferentialSample withNewTimestamp(double timestamp) {
     return new DifferentialSample(timestamp, pose, velocity, acceleration, leftSpeed, rightSpeed);

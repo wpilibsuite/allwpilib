@@ -27,19 +27,37 @@ namespace wpi::math {
  */
 class TrajectorySample {
  public:
-  wpi::units::second_t timestamp{0.0};  // time since trajectory start
-  Pose2d pose;                          // field-relative pose
-  ChassisVelocities velocity;           // field-relative velocity
-  ChassisAccelerations acceleration;    // field-relative acceleration
+  /** The timestamp of the sample relative to the trajectory start. */
+  wpi::units::second_t timestamp{0.0};
+  /** The robot pose at this sample (in the field reference frame). */
+  Pose2d pose;
+  /** The robot velocity at this sample (in the field reference frame). */
+  ChassisVelocities velocity;
+  /** The robot acceleration at this sample (in the field reference frame). */
+  ChassisAccelerations acceleration;
 
+  /** Constructs a default TrajectorySample with all zero values. */
   constexpr TrajectorySample() = default;
 
+  /**
+   * Constructs a TrajectorySample.
+   *
+   * @param time The timestamp of the sample relative to the trajectory start.
+   * @param p The robot pose at this sample (in the field reference frame).
+   * @param v The robot velocity at this sample (in the field reference frame).
+   * @param a The robot acceleration at this sample (in the field reference
+   *          frame).
+   */
   constexpr TrajectorySample(wpi::units::second_t time, const Pose2d& p,
                              const ChassisVelocities& v,
                              const ChassisAccelerations& a)
       : timestamp(time), pose(p), velocity(v), acceleration(a) {}
 
-  // Equality
+  /**
+   * Checks equality between this TrajectorySample and another.
+   *
+   * @return True if the samples are equal.
+   */
   constexpr bool operator==(const TrajectorySample& other) const = default;
 
   /**

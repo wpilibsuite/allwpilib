@@ -9,9 +9,22 @@
 #include "wpi/math/trajectory/Trajectory.hpp"
 
 namespace wpi::math {
+
+/**
+ * A trajectory for holonomic (omni-directional) drive robots.
+ *
+ * Uses constant-acceleration kinematic interpolation between samples.
+ */
 class WPILIB_DLLEXPORT HolonomicTrajectory
     : public Trajectory<TrajectorySample> {
  public:
+  /**
+   * Constructs a HolonomicTrajectory from a vector of samples.
+   *
+   * @param samples The samples of the trajectory. Order does not matter as
+   *                they will be sorted internally.
+   * @throws std::invalid_argument if the vector of samples is empty.
+   */
   explicit HolonomicTrajectory(std::vector<TrajectorySample> samples)
       : Trajectory<TrajectorySample>(std::move(samples)) {}
 

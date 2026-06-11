@@ -25,10 +25,14 @@ namespace wpi::math {
  */
 class WPILIB_DLLEXPORT DifferentialSample {
  public:
-  wpi::units::second_t timestamp{0.0};  // time since trajectory start
-  Pose2d pose;                          // field-relative pose
-  ChassisVelocities velocity;           // field-relative velocity
-  ChassisAccelerations acceleration;    // field-relative acceleration
+  /** The timestamp of the sample relative to the trajectory start. */
+  wpi::units::second_t timestamp{0.0};
+  /** The robot pose at this sample (in the field reference frame). */
+  Pose2d pose;
+  /** The robot velocity at this sample (in the field reference frame). */
+  ChassisVelocities velocity;
+  /** The robot acceleration at this sample (in the field reference frame). */
+  ChassisAccelerations acceleration;
 
   /**
    * The left wheel speed at this sample.
@@ -40,6 +44,7 @@ class WPILIB_DLLEXPORT DifferentialSample {
    */
   wpi::units::meters_per_second_t rightSpeed{0_mps};
 
+  /** Constructs a default DifferentialSample with all zero values. */
   constexpr DifferentialSample() = default;
 
   /**
@@ -202,6 +207,8 @@ class WPILIB_DLLEXPORT DifferentialSample {
 
   /**
    * Checks equality between this DifferentialSample and another object.
+   *
+   * @return True if the samples are equal.
    */
   constexpr bool operator==(const DifferentialSample& other) const = default;
 };

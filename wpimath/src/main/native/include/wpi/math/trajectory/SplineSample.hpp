@@ -27,15 +27,20 @@ namespace wpi::math {
  */
 class SplineSample {
  public:
-  wpi::units::second_t timestamp{0.0};  // time since trajectory start
-  Pose2d pose;                          // field-relative pose
-  ChassisVelocities velocity;           // field-relative velocity
-  ChassisAccelerations acceleration;    // field-relative acceleration
+  /** The timestamp of the sample relative to the trajectory start. */
+  wpi::units::second_t timestamp{0.0};
+  /** The robot pose at this sample (in the field reference frame). */
+  Pose2d pose;
+  /** The robot velocity at this sample (in the field reference frame). */
+  ChassisVelocities velocity;
+  /** The robot acceleration at this sample (in the field reference frame). */
+  ChassisAccelerations acceleration;
   /**
    * The curvature of the path at this sample, in 1/m.
    */
   wpi::units::curvature_t curvature{0.0};
 
+  /** Constructs a default SplineSample with all zero values. */
   constexpr SplineSample() = default;
 
   /**
@@ -170,6 +175,8 @@ class SplineSample {
 
   /**
    * Checks equality between this SplineSample and another object.
+   *
+   * @return True if the samples are equal.
    */
   constexpr bool operator==(const SplineSample& other) const = default;
 };

@@ -10,7 +10,9 @@ import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisVelocities;
 
+/** Represents a single sample in a spline-based trajectory. */
 public class SplineSample extends TrajectorySample {
+  /** The curvature of the path at this sample, in rad/m. */
   public final double curvature;
 
   /**
@@ -19,6 +21,13 @@ public class SplineSample extends TrajectorySample {
    * <p>The robot follows the path along its heading, so the scalar forward velocity and
    * acceleration are rotated into the field frame using the sample's pose. The resulting {@link
    * #velocity} and {@link #acceleration} are field-relative.
+   *
+   * @param timestamp The timestamp of the sample relative to the trajectory start, in seconds.
+   * @param pose The robot pose at this sample (in the field reference frame).
+   * @param velocity The signed forward (path-tangential) velocity in meters per second.
+   * @param acceleration The signed forward (path-tangential) acceleration in meters per second
+   *     squared.
+   * @param curvature The curvature of the path at this sample, in rad/m.
    */
   public SplineSample(
       double timestamp, Pose2d pose, double velocity, double acceleration, double curvature) {
@@ -32,7 +41,15 @@ public class SplineSample extends TrajectorySample {
     this.curvature = curvature;
   }
 
-  /** Constructs a SplineSample. */
+  /**
+   * Constructs a SplineSample.
+   *
+   * @param timestamp The timestamp of the sample relative to the trajectory start, in seconds.
+   * @param pose The robot pose at this sample (in the field reference frame).
+   * @param velocity The robot velocity at this sample (in the field reference frame).
+   * @param acceleration The robot acceleration at this sample (in the field reference frame).
+   * @param curvature The curvature of the path at this sample, in rad/m.
+   */
   public SplineSample(
       double timestamp,
       Pose2d pose,
@@ -45,7 +62,9 @@ public class SplineSample extends TrajectorySample {
 
   /**
    * Constructs a SplineSample from another TrajectorySample, assuming the other sample's linear
-   * velocity is not zero.
+   * velocity is not zero. Curvature is computed as omega / forward velocity.
+   *
+   * @param sample The TrajectorySample to convert.
    */
   public SplineSample(TrajectorySample sample) {
     super(sample.timestamp, sample.pose, sample.velocity, sample.acceleration);
@@ -53,6 +72,7 @@ public class SplineSample extends TrajectorySample {
     this.curvature = sample.velocity.omega / (forward == 0.0 ? 1E-9 : forward);
   }
 
+  /** Constructs a SplineSample with all values set to zero. */
   public SplineSample() {
     this(0.0, Pose2d.kZero, 0.0, 0.0, 0.0);
   }
@@ -78,6 +98,12 @@ public class SplineSample extends TrajectorySample {
     return acceleration.toRobotRelative(pose.getRotation()).ax;
   }
 
+  /**
+   * Transforms the pose of this sample by the given transform.
+   *
+   * @param transform The transform to apply to the pose.
+   * @return A new sample with the transformed pose.
+   */
   @Override
   public SplineSample transform(Transform2d transform) {
     return new SplineSample(
@@ -88,6 +114,12 @@ public class SplineSample extends TrajectorySample {
         curvature);
   }
 
+  /**
+   * Transforms this sample to be relative to the given pose.
+   *
+   * @param other The pose to make this sample relative to.
+   * @return A new sample with the relative pose.
+   */
   @Override
   public SplineSample relativeTo(Pose2d other) {
     return new SplineSample(
@@ -98,6 +130,12 @@ public class SplineSample extends TrajectorySample {
         curvature);
   }
 
+  /**
+   * Creates a new sample with the given timestamp.
+   *
+   * @param timestamp The new timestamp, in seconds.
+   * @return A new sample with the given timestamp.
+   */
   @Override
   public SplineSample withNewTimestamp(double timestamp) {
     return new SplineSample(timestamp, pose, velocity, acceleration, curvature);

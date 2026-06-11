@@ -164,6 +164,8 @@ class WPILIB_DLLEXPORT Trajectory {
 
   /**
    * Checks equality between this Trajectory and another object.
+   *
+   * @return True if the trajectories are equal.
    */
   bool operator==(const Trajectory& other) const {
     return m_samples == other.m_samples;
@@ -172,7 +174,12 @@ class WPILIB_DLLEXPORT Trajectory {
   virtual ~Trajectory() = default;
 
  protected:
-  // Helper: make all samples relative to a Pose2d
+  /**
+   * Returns all samples transformed to be relative to the given pose.
+   *
+   * @param pose The pose to make samples relative to.
+   * @return A vector of samples relative to the given pose.
+   */
   std::vector<SampleType> RelativeSamples(const Pose2d& pose) const {
     std::vector<SampleType> out;
     out.reserve(m_samples.size());
@@ -182,8 +189,13 @@ class WPILIB_DLLEXPORT Trajectory {
     return out;
   }
 
-  // Helper: concatenate with another list of samples, offsetting their
-  // timestamps by this trajectory's duration
+  /**
+   * Returns the concatenation of this trajectory's samples with another list,
+   * offsetting the other samples' timestamps by this trajectory's duration.
+   *
+   * @param other The samples to concatenate.
+   * @return A vector containing all samples in order.
+   */
   std::vector<SampleType> ConcatenateSamples(
       const std::vector<SampleType>& other) const {
     std::vector<SampleType> out;

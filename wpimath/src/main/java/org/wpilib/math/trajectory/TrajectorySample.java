@@ -65,6 +65,14 @@ public class TrajectorySample implements StructSerializable, ProtobufSerializabl
     this.acceleration = acceleration;
   }
 
+  /**
+   * Constructs a TrajectorySample.
+   *
+   * @param timestamp The timestamp of the sample relative to the trajectory start.
+   * @param pose The robot pose at this sample (in the field reference frame).
+   * @param velocity The robot velocity at this sample (in the field reference frame).
+   * @param acceleration The robot acceleration at this sample (in the field reference frame).
+   */
   public TrajectorySample(
       Time timestamp, Pose2d pose, ChassisVelocities velocity, ChassisAccelerations acceleration) {
     this(timestamp.in(Seconds), pose, velocity, acceleration);
