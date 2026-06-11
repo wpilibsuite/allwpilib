@@ -61,6 +61,12 @@ namespace wpi::math {
  * https://en.wikipedia.org/wiki/Iir_filter<br>
  * https://en.wikipedia.org/wiki/Fir_filter<br>
  *
+ * For IIR filters of order 4 or higher, prefer BiquadFilter — it represents
+ * the filter as a cascade of 2nd-order sections (Direct Form II Transposed),
+ * which avoids the numerical instability that high-order direct-form
+ * polynomials exhibit. Use LinearFilter for low-order IIR (SinglePoleIIR,
+ * HighPass) and FIR filters (MovingAverage, FiniteDifference).
+ *
  * Note 1: Calculate() should be called by the user on a known, regular period.
  * You can use a Notifier for this or do it "inline" with code in a
  * periodic function.
