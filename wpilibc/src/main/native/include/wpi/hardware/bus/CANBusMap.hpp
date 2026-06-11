@@ -8,6 +8,8 @@ namespace wpi {
 
 /**
  * CAN bus mapping.
+ *
+ * S0-S4 are Systemcore CAN buses. D0-D19 are Motioncore CAN buses.
  */
 enum class CANBusMap {
   /// CAN bus S0.

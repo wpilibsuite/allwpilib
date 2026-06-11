@@ -4,7 +4,11 @@
 
 package org.wpilib.hardware.bus;
 
-/** CAN bus mapping. */
+/**
+ * CAN bus mapping.
+ *
+ * <p>S0-S4 are Systemcore CAN buses. D0-D19 are Motioncore CAN buses.
+ */
 public enum CANBusMap {
   /** CAN bus S0. */
   CAN_S0(0),
