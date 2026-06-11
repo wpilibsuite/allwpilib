@@ -26,14 +26,14 @@ import org.wpilib.system.Watchdog;
  *
  * <p>driverStationConnected() -- provide for initialization the first time the DS is connected
  *
- * <p>init() functions -- each of the following functions is called once when the appropriate mode
+ * <p>Enter() functions -- each of the following functions is called once when the appropriate mode
  * is entered:
  *
  * <ul>
- *   <li>disabledInit() -- called each and every time disabled is entered from another mode
- *   <li>autonomousInit() -- called each and every time autonomous is entered from another mode
- *   <li>teleopInit() -- called each and every time teleop is entered from another mode
- *   <li>utilityInit() -- called each and every time utility is entered from another mode
+ *   <li>disabledEnter() -- called each and every time disabled is entered from another mode
+ *   <li>autonomousEnter() -- called each and every time autonomous is entered from another mode
+ *   <li>teleopEnter() -- called each and every time teleop is entered from another mode
+ *   <li>utilityEnter() -- called each and every time utility is entered from another mode
  * </ul>
  *
  * <p>periodic() functions -- each of these functions is called on an interval:
@@ -97,36 +97,36 @@ public abstract class IterativeRobotBase extends RobotBase {
   public void simulationInit() {}
 
   /**
-   * Initialization code for disabled mode should go here.
+   * Entry code for disabled mode should go here.
    *
-   * <p>Users should override this method for initialization code which will be called each time the
-   * robot enters disabled mode.
+   * <p>Users should override this method for code which will be called each time the robot enters
+   * disabled mode.
    */
-  public void disabledInit() {}
+  public void disabledEnter() {}
 
   /**
-   * Initialization code for autonomous mode should go here.
+   * Entry code for autonomous mode should go here.
    *
-   * <p>Users should override this method for initialization code which will be called each time the
-   * robot enters autonomous mode.
+   * <p>Users should override this method for code which will be called each time the robot enters
+   * autonomous mode.
    */
-  public void autonomousInit() {}
+  public void autonomousEnter() {}
 
   /**
-   * Initialization code for teleop mode should go here.
+   * Entry code for teleop mode should go here.
    *
-   * <p>Users should override this method for initialization code which will be called each time the
-   * robot enters teleop mode.
+   * <p>Users should override this method for code which will be called each time the robot enters
+   * teleop mode.
    */
-  public void teleopInit() {}
+  public void teleopEnter() {}
 
   /**
-   * Initialization code for utility mode should go here.
+   * Entry code for utility mode should go here.
    *
-   * <p>Users should override this method for initialization code which will be called each time the
-   * robot enters utility mode.
+   * <p>Users should override this method for code which will be called each time the robot enters
+   * utility mode.
    */
-  public void utilityInit() {}
+  public void utilityEnter() {}
 
   /* ----------- Overridable periodic code ----------------- */
 
@@ -268,20 +268,20 @@ public abstract class IterativeRobotBase extends RobotBase {
       // Call current mode's entry function
       switch (mode) {
         case UNKNOWN -> {
-          disabledInit();
-          m_watchdog.addEpoch("disabledInit()");
+          disabledEnter();
+          m_watchdog.addEpoch("disabledEnter()");
         }
         case AUTONOMOUS -> {
-          autonomousInit();
-          m_watchdog.addEpoch("autonomousInit()");
+          autonomousEnter();
+          m_watchdog.addEpoch("autonomousEnter()");
         }
         case TELEOPERATED -> {
-          teleopInit();
-          m_watchdog.addEpoch("teleopInit()");
+          teleopEnter();
+          m_watchdog.addEpoch("teleopEnter()");
         }
         case UTILITY -> {
-          utilityInit();
-          m_watchdog.addEpoch("utilityInit()");
+          utilityEnter();
+          m_watchdog.addEpoch("utilityEnter()");
         }
         default -> {
           // NOP

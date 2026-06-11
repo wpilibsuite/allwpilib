@@ -27,7 +27,7 @@ void Robot::TeleopPeriodic() {
   }
 }
 
-void Robot::DisabledInit() {
+void Robot::DisabledEnter() {
   // This just makes sure that our simulation code knows that the motor's off.
   elevator.Stop();
 }
