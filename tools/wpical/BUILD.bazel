@@ -190,7 +190,7 @@ wpilib_cc_library(
     deps = [
         ":headers",
         "//apriltag",
-        "//thirdparty/ceres",
+        "//shared/bazel/thirdparty/ceres",
         "//wpigui",
         "//wpiutil",
         "@bzlmodrio-opencv//libraries/cpp/opencv",
@@ -235,7 +235,7 @@ cc_test(
     ],
     deps = [
         ":wpical_lib",
-        "//thirdparty/ceres",
+        "//shared/bazel/thirdparty/ceres",
         "//thirdparty/googletest",
         "@bazel_tools//tools/cpp/runfiles",
     ],
