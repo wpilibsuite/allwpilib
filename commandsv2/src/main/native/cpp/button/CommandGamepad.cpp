@@ -181,10 +181,10 @@ double CommandGamepad::GetRightY() const {
   return m_gamepad->GetRightY();
 }
 
-double CommandGamepad::GetLeftTriggerAxis() const {
-  return m_gamepad->GetLeftTriggerAxis();
+double CommandGamepad::GetLeftTrigger() const {
+  return m_gamepad->GetLeftTrigger();
 }
 
-double CommandGamepad::GetRightTriggerAxis() const {
-  return m_gamepad->GetRightTriggerAxis();
+double CommandGamepad::GetRightTrigger() const {
+  return m_gamepad->GetRightTrigger();
 }

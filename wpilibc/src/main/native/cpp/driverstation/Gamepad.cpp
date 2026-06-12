@@ -69,7 +69,7 @@ void Gamepad::SetRightYDeadband(double deadband) {
   m_rightYDeadband = ClampDeadband(deadband);
 }
 
-double Gamepad::GetLeftTriggerAxis() const {
+double Gamepad::GetLeftTrigger() const {
   return wpi::math::ApplyDeadband(GetAxis(Axis::LEFT_TRIGGER),
                                   m_leftTriggerDeadband);
 }
@@ -88,7 +88,7 @@ BooleanEvent Gamepad::LeftTrigger(EventLoop* loop) const {
   return this->LeftTrigger(0.5, loop);
 }
 
-double Gamepad::GetRightTriggerAxis() const {
+double Gamepad::GetRightTrigger() const {
   return wpi::math::ApplyDeadband(GetAxis(Axis::RIGHT_TRIGGER),
                                   m_rightTriggerDeadband);
 }
@@ -613,10 +613,10 @@ void Gamepad::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "Gamepad");
   builder.AddDoubleProperty(
-      "LeftTrigger Axis",
-      [this] { return GetAxisForSendable(Axis::LEFT_TRIGGER); }, nullptr);
+      "LeftTrigger", [this] { return GetAxisForSendable(Axis::LEFT_TRIGGER); },
+      nullptr);
   builder.AddDoubleProperty(
-      "RightTrigger Axis",
+      "RightTrigger",
       [this] { return GetAxisForSendable(Axis::RIGHT_TRIGGER); }, nullptr);
   builder.AddDoubleProperty(
       "LeftX", [this] { return GetAxisForSendable(Axis::LEFT_X); }, nullptr);

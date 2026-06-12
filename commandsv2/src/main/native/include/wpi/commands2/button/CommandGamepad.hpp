@@ -494,20 +494,20 @@ class CommandGamepad {
   double GetRightY() const;
 
   /**
-   * Get the left trigger axis value of the controller. Note that this axis is
+   * Get the left trigger value of the controller. Note that this axis is
    * bound to the range of [0, 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */
-  double GetLeftTriggerAxis() const;
+  double GetLeftTrigger() const;
 
   /**
-   * Get the right trigger axis value of the controller. Note that this axis is
+   * Get the right trigger value of the controller. Note that this axis is
    * bound to the range of [0, 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */
-  double GetRightTriggerAxis() const;
+  double GetRightTrigger() const;
 
  private:
   CommandGenericHID* m_hid;

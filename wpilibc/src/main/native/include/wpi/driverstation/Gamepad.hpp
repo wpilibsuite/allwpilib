@@ -214,7 +214,7 @@ class Gamepad : public HIDDevice,
   void SetRightYDeadband(double deadband);
 
   /**
-   * Get the left trigger axis value of the controller. Note that this axis
+   * Get the left trigger value of the controller. Note that this axis
    * is bound to the range of [0, 1] as opposed to the usual [-1, 1].
    *
    * A deadband of 0.01 is applied by default. Use SetLeftTriggerDeadband() to
@@ -222,7 +222,7 @@ class Gamepad : public HIDDevice,
    *
    * @return the axis value.
    */
-  double GetLeftTriggerAxis() const;
+  double GetLeftTrigger() const;
 
   /**
    * Set the deadband for the left trigger axis.
@@ -256,7 +256,7 @@ class Gamepad : public HIDDevice,
   BooleanEvent LeftTrigger(EventLoop* loop) const;
 
   /**
-   * Get the right trigger axis value of the controller. Note that this axis
+   * Get the right trigger value of the controller. Note that this axis
    * is bound to the range of [0, 1] as opposed to the usual [-1, 1].
    *
    * A deadband of 0.01 is applied by default. Use SetRightTriggerDeadband() to
@@ -264,7 +264,7 @@ class Gamepad : public HIDDevice,
    *
    * @return the axis value.
    */
-  double GetRightTriggerAxis() const;
+  double GetRightTrigger() const;
 
   /**
    * Set the deadband for the right trigger axis.
