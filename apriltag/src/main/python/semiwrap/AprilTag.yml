@@ -14,3 +14,8 @@ classes:
       Generate16h5AprilTagImage:
         ignore: true
       operator==:
+
+extra_includes:
+- wpystruct.h
+
+inline_code: SetupWPyStruct<wpi::apriltag::AprilTag>(cls_AprilTag);
