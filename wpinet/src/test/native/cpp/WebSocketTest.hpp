@@ -9,7 +9,7 @@
 #include <span>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/Pipe.hpp"
@@ -17,13 +17,15 @@
 
 namespace wpi::net {
 
-class WebSocketTest : public ::testing::Test {
+class WebSocketTest {
  public:
   static const char* pipeName;
 
-  static void SetUpTestCase();
+  static void UnlinkPipe();
 
   WebSocketTest() {
+    UnlinkPipe();
+
     loop = uv::Loop::Create();
     clientPipe = uv::Pipe::Create(loop);
     serverPipe = uv::Pipe::Create(loop);
@@ -43,13 +45,13 @@ class WebSocketTest : public ::testing::Test {
     auto failTimer = uv::Timer::Create(loop);
     failTimer->timeout.connect([this] {
       loop->Stop();
-      FAIL() << "loop failed to terminate";
+      FAIL("loop failed to terminate");
     });
     failTimer->Start(uv::Timer::Time{1000});
     failTimer->Unreference();
   }
 
-  ~WebSocketTest() override { Finish(); }
+  ~WebSocketTest() { Finish(); }
 
   void Finish() {
     loop->Walk([](uv::Handle& it) { it.Close(); });
