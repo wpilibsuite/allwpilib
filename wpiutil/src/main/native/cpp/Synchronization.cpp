@@ -5,8 +5,9 @@
 #include "wpi/util/Synchronization.hpp"
 
 #include <algorithm>
+#include <array>
 #include <atomic>
-#include <cstring>
+#include <chrono>
 #include <mutex>
 
 #include "wpi/util/DenseMap.hpp"
@@ -31,22 +32,70 @@ static std::atomic_int gActive{0};
 
 namespace {
 
+constexpr size_t STATE_SHARD_COUNT = 32;
+
+class SignalWaiter {
+ public:
+  void Notify() {
+    {
+      std::scoped_lock lock{m_mutex};
+      m_notified = true;
+    }
+    m_cv.notify_all();
+  }
+
+  void Wait() {
+    std::unique_lock lock{m_mutex};
+    m_cv.wait(lock, [&] { return m_notified; });
+    m_notified = false;
+  }
+
+  bool WaitFor(double timeout) {
+    std::unique_lock lock{m_mutex};
+    auto timeoutTime = std::chrono::steady_clock::now() +
+                       std::chrono::duration<double>{timeout};
+    if (!m_cv.wait_until(lock, timeoutTime, [&] { return m_notified; })) {
+      return true;
+    }
+    m_notified = false;
+    return false;
+  }
+
+ private:
+  wpi::util::mutex m_mutex;
+  wpi::util::condition_variable m_cv;
+  bool m_notified{false};
+};
+
 struct State {
   int signaled{0};
   bool autoReset{false};
-  wpi::util::SmallVector<wpi::util::condition_variable*, 2> waiters;
+  wpi::util::SmallVector<SignalWaiter*, 2> waiters;
 };
+
+struct StateShard {
+  wpi::util::mutex mutex;
+  wpi::util::DenseMap<WPI_Handle, State> states;
+};
+
+size_t GetStateShardIndex(WPI_Handle handle) {
+  auto value = static_cast<uint32_t>(handle);
+  value ^= value >> 16;
+  value *= 0x7feb352dU;
+  value ^= value >> 15;
+  return value % STATE_SHARD_COUNT;
+}
 
 struct HandleManager {
   ~HandleManager() {
     gActive.fetch_add(INT_MIN / 2);
 
     // wake up all waiters
-    {
-      std::scoped_lock lock{mutex};
-      for (auto&& [handle, state] : states) {
+    for (auto& shard : stateShards) {
+      std::scoped_lock lock{shard.mutex};
+      for (auto&& [handle, state] : shard.states) {
         for (auto&& waiter : state.waiters) {
-          waiter->notify_all();
+          waiter->Notify();
         }
       }
     }
@@ -67,11 +116,54 @@ struct HandleManager {
     }
 #endif
   }
-  wpi::util::mutex mutex;
+  StateShard& GetStateShard(WPI_Handle handle) {
+    return stateShards[GetStateShardIndex(handle)];
+  }
+
+  wpi::util::mutex idsMutex;
   wpi::util::UidVector<int, 8> eventIds;
   wpi::util::UidVector<int, 8> semaphoreIds;
-  wpi::util::DenseMap<WPI_Handle, State> states;
+  std::array<StateShard, STATE_SHARD_COUNT> stateShards;
 };
+
+using StateShardIndices = wpi::util::SmallVector<size_t, 8>;
+using StateShardLocks =
+    wpi::util::SmallVector<std::unique_lock<wpi::util::mutex>, 8>;
+
+StateShardIndices GetStateShardIndices(std::span<const WPI_Handle> handles) {
+  StateShardIndices indices;
+  for (auto handle : handles) {
+    indices.emplace_back(GetStateShardIndex(handle));
+  }
+
+  std::sort(indices.begin(), indices.end());
+
+  StateShardIndices uniqueIndices;
+  for (auto index : indices) {
+    if (uniqueIndices.empty() || uniqueIndices.back() != index) {
+      uniqueIndices.emplace_back(index);
+    }
+  }
+  return uniqueIndices;
+}
+
+StateShardLocks LockStateShards(HandleManager& manager,
+                                const StateShardIndices& shardIndices) {
+  StateShardLocks locks;
+  for (auto index : shardIndices) {
+    locks.emplace_back(manager.stateShards[index].mutex);
+  }
+  return locks;
+}
+
+State* FindState(HandleManager& manager, WPI_Handle handle) {
+  auto& shard = manager.GetStateShard(handle);
+  auto it = shard.states.find(handle);
+  if (it == shard.states.end()) {
+    return nullptr;
+  }
+  return &it->second;
+}
 
 class ManagerGuard {
  public:
@@ -103,13 +195,18 @@ WPI_EventHandle wpi::util::MakeEvent(bool manualReset, bool initialState) {
     return {};
   }
   auto& manager = guard.GetManager();
-  std::scoped_lock lock{manager.mutex};
 
-  auto index = manager.eventIds.emplace_back(0);
+  size_t index;
+  {
+    std::scoped_lock lock{manager.idsMutex};
+    index = manager.eventIds.emplace_back(0);
+  }
   WPI_EventHandle handle = (HANDLE_TYPE_EVENT << 24) | (index & 0xffffff);
 
   // configure state data
-  auto& state = manager.states[handle];
+  auto& shard = manager.GetStateShard(handle);
+  std::scoped_lock lock{shard.mutex};
+  auto& state = shard.states[handle];
   state.signaled = initialState ? 1 : 0;
   state.autoReset = !manualReset;
   return handle;
@@ -127,7 +224,7 @@ void wpi::util::DestroyEvent(WPI_EventHandle handle) {
     return;
   }
   auto& manager = guard.GetManager();
-  std::scoped_lock lock{manager.mutex};
+  std::scoped_lock lock{manager.idsMutex};
   manager.eventIds.erase(handle & 0xffffff);
 }
 
@@ -154,13 +251,18 @@ WPI_SemaphoreHandle wpi::util::MakeSemaphore(int initialCount,
     return {};
   }
   auto& manager = guard.GetManager();
-  std::scoped_lock lock{manager.mutex};
 
-  auto index = manager.semaphoreIds.emplace_back(maximumCount);
+  size_t index;
+  {
+    std::scoped_lock lock{manager.idsMutex};
+    index = manager.semaphoreIds.emplace_back(maximumCount);
+  }
   WPI_EventHandle handle = (HANDLE_TYPE_SEMAPHORE << 24) | (index & 0xffffff);
 
   // configure state data
-  auto& state = manager.states[handle];
+  auto& shard = manager.GetStateShard(handle);
+  std::scoped_lock lock{shard.mutex};
+  auto& state = shard.states[handle];
   state.signaled = initialCount;
   state.autoReset = true;
 
@@ -179,7 +281,7 @@ void wpi::util::DestroySemaphore(WPI_SemaphoreHandle handle) {
     return;
   }
   auto& manager = guard.GetManager();
-  std::scoped_lock lock{manager.mutex};
+  std::scoped_lock lock{manager.idsMutex};
   manager.semaphoreIds.erase(handle & 0xffffff);
 }
 
@@ -198,13 +300,21 @@ bool wpi::util::ReleaseSemaphore(WPI_SemaphoreHandle handle, int releaseCount,
     return true;
   }
   auto& manager = guard.GetManager();
-  std::scoped_lock lock{manager.mutex};
-  auto it = manager.states.find(handle);
-  if (it == manager.states.end()) {
+  auto& shard = manager.GetStateShard(handle);
+  std::scoped_lock lock{shard.mutex};
+  auto it = shard.states.find(handle);
+  if (it == shard.states.end()) {
     return false;
   }
   auto& state = it->second;
-  int maxCount = manager.semaphoreIds[index];
+  int maxCount;
+  {
+    std::scoped_lock idsLock{manager.idsMutex};
+    if (static_cast<size_t>(index) >= manager.semaphoreIds.size()) {
+      return false;
+    }
+    maxCount = manager.semaphoreIds[index];
+  }
   if (prevCount) {
     *prevCount = state.signaled;
   }
@@ -213,7 +323,7 @@ bool wpi::util::ReleaseSemaphore(WPI_SemaphoreHandle handle, int releaseCount,
   }
   state.signaled += releaseCount;
   for (auto& waiter : state.waiters) {
-    waiter->notify_all();
+    waiter->Notify();
   }
   return true;
 }
@@ -249,30 +359,31 @@ std::span<WPI_Handle> wpi::util::WaitForObjects(
     return {};
   }
   auto& manager = guard.GetManager();
-  std::unique_lock lock{manager.mutex};
-  wpi::util::condition_variable cv;
+  auto shardIndices = GetStateShardIndices(handles);
+  auto locks = LockStateShards(manager, shardIndices);
+  SignalWaiter waiter;
   bool addedWaiters = false;
   bool timedOutVal = false;
   size_t count = 0;
 
   for (;;) {
+    count = 0;
     for (auto handle : handles) {
-      auto it = manager.states.find(handle);
-      if (it == manager.states.end()) {
+      auto state = FindState(manager, handle);
+      if (!state) {
         if (count < signaled.size()) {
           // treat a non-existent handle as signaled, but set the error bit
           signaled[count++] = handle | 0x80000000ul;
         }
       } else {
-        auto& state = it->second;
-        if (state.signaled > 0) {
+        if (state->signaled > 0) {
           if (count < signaled.size()) {
             signaled[count++] = handle;
           }
-          if (state.autoReset) {
-            --state.signaled;
-            if (state.signaled < 0) {
-              state.signaled = 0;
+          if (state->autoReset) {
+            --state->signaled;
+            if (state->signaled < 0) {
+              state->signaled = 0;
             }
           }
         }
@@ -291,8 +402,10 @@ std::span<WPI_Handle> wpi::util::WaitForObjects(
     if (!addedWaiters) {
       addedWaiters = true;
       for (auto handle : handles) {
-        auto& state = manager.states[handle];
-        state.waiters.emplace_back(&cv);
+        auto state = FindState(manager, handle);
+        if (state) {
+          state->waiters.emplace_back(&waiter);
+        }
       }
     }
 
@@ -303,15 +416,13 @@ std::span<WPI_Handle> wpi::util::WaitForObjects(
       break;
     }
 
+    locks.clear();
     if (timeout < 0) {
-      cv.wait(lock);
-    } else {
-      auto timeoutTime = std::chrono::steady_clock::now() +
-                         std::chrono::duration<double>(timeout);
-      if (cv.wait_until(lock, timeoutTime) == std::cv_status::timeout) {
-        timedOutVal = true;
-      }
+      waiter.Wait();
+    } else if (waiter.WaitFor(timeout)) {
+      timedOutVal = true;
     }
+    locks = LockStateShards(manager, shardIndices);
 
     if (gActive.load(std::memory_order_acquire) < 0) {
       // shutting down
@@ -323,10 +434,13 @@ std::span<WPI_Handle> wpi::util::WaitForObjects(
 
   if (addedWaiters) {
     for (auto handle : handles) {
-      auto& state = manager.states[handle];
-      auto it = std::find(state.waiters.begin(), state.waiters.end(), &cv);
-      if (it != state.waiters.end()) {
-        state.waiters.erase(it);
+      auto state = FindState(manager, handle);
+      if (state) {
+        auto it =
+            std::find(state->waiters.begin(), state->waiters.end(), &waiter);
+        if (it != state->waiters.end()) {
+          state->waiters.erase(it);
+        }
       }
     }
   }
@@ -345,8 +459,9 @@ void wpi::util::CreateSignalObject(WPI_Handle handle, bool manualReset,
     return;
   }
   auto& manager = guard.GetManager();
-  std::scoped_lock lock{manager.mutex};
-  auto& state = manager.states[handle];
+  auto& shard = manager.GetStateShard(handle);
+  std::scoped_lock lock{shard.mutex};
+  auto& state = shard.states[handle];
   state.signaled = initialState ? 1 : 0;
   state.autoReset = !manualReset;
 }
@@ -357,15 +472,16 @@ void wpi::util::SetSignalObject(WPI_Handle handle) {
     return;
   }
   auto& manager = guard.GetManager();
-  std::scoped_lock lock{manager.mutex};
-  auto it = manager.states.find(handle);
-  if (it == manager.states.end()) {
+  auto& shard = manager.GetStateShard(handle);
+  std::scoped_lock lock{shard.mutex};
+  auto it = shard.states.find(handle);
+  if (it == shard.states.end()) {
     return;
   }
   auto& state = it->second;
   state.signaled = 1;
   for (auto& waiter : state.waiters) {
-    waiter->notify_all();
+    waiter->Notify();
     if (state.autoReset) {
       // expect the first waiter to reset it
       break;
@@ -379,9 +495,10 @@ void wpi::util::ResetSignalObject(WPI_Handle handle) {
     return;
   }
   auto& manager = guard.GetManager();
-  std::scoped_lock lock{manager.mutex};
-  auto it = manager.states.find(handle);
-  if (it != manager.states.end()) {
+  auto& shard = manager.GetStateShard(handle);
+  std::scoped_lock lock{shard.mutex};
+  auto it = shard.states.find(handle);
+  if (it != shard.states.end()) {
     it->second.signaled = 0;
   }
 }
@@ -392,15 +509,16 @@ void wpi::util::DestroySignalObject(WPI_Handle handle) {
     return;
   }
   auto& manager = guard.GetManager();
-  std::scoped_lock lock{manager.mutex};
+  auto& shard = manager.GetStateShard(handle);
+  std::scoped_lock lock{shard.mutex};
 
-  auto it = manager.states.find(handle);
-  if (it != manager.states.end()) {
+  auto it = shard.states.find(handle);
+  if (it != shard.states.end()) {
     // wake up any waiters
     for (auto& waiter : it->second.waiters) {
-      waiter->notify_all();
+      waiter->Notify();
     }
-    manager.states.erase(it);
+    shard.states.erase(it);
   }
 }
 
