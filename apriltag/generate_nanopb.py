@@ -39,6 +39,7 @@ def generate_nanopb(
             content = f.read()
 
         # src/main/proto is the input directory structure, protobuf is the output directory structure
+        # This is necessary to fix wpimath protobuf header include paths
         content = content.replace("src/main/proto/", "protobuf/")
 
         cpp_file.write_text(
