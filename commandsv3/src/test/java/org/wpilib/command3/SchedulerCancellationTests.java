@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -359,7 +360,7 @@ class SchedulerCancellationTests extends CommandTestBase {
     var mechanism = new DummyMechanism("The mechanism", m_scheduler);
     var cmd = mechanism.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
 
-    var group = new SequentialGroup("Seq", Collections.singletonList(cmd));
+    var group = new SequentialGroup("Seq", Collections.singletonList(cmd), true, Set.of());
     m_scheduler.schedule(group);
     m_scheduler.run();
     m_scheduler.cancel(group);

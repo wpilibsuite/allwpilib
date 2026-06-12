@@ -32,12 +32,17 @@ public final class ParallelGroup implements Command {
    *     this is empty, then the group will finish when <i>any</i> optional command completes.
    * @param optionalCommands The commands that do not need to complete for the group to finish. If
    *     this is empty, then the group will finish when <i>all</i> required commands complete.
+   * @param inheritRequirements Whether the group should inherit the requirements of the subcommands.
+   * @param additionalRequirements Any additional mechanism requirements. Additional requirements must be 
+   *    requirements of at least one subcommand.
    */
   ParallelGroup(
-      String name, Collection<Command> requiredCommands, Collection<Command> optionalCommands) {
+      String name, Collection<Command> requiredCommands, Collection<Command> optionalCommands, 
+      boolean inheritRequirements, Set<Mechanism> additionalRequirements) {
     requireNonNullParam(name, "name", "ParallelGroup");
     requireNonNullParam(requiredCommands, "requiredCommands", "ParallelGroup");
     requireNonNullParam(optionalCommands, "optionalCommands", "ParallelGroup");
+    requireNonNullParam(additionalRequirements, "additionalRequirements", "ParallelGroup");
 
     int i = 0;
     for (Command requiredCommand : requiredCommands) {
@@ -51,6 +56,12 @@ public final class ParallelGroup implements Command {
       i++;
     }
 
+    i = 0;
+    for(Mechanism requirement : additionalRequirements) {
+      requireNonNullParam(requirement, "additionalRequirements[" + i + "]", "ParallelGroup");
+      i++;
+    }
+
     var allCommands = new LinkedHashSet<Command>();
     allCommands.addAll(requiredCommands);
     allCommands.addAll(optionalCommands);
@@ -61,8 +72,18 @@ public final class ParallelGroup implements Command {
     m_optionalCommands.addAll(optionalCommands);
     m_requiredCommands.addAll(requiredCommands);
 
-    for (var command : allCommands) {
-      m_requirements.addAll(command.requirements());
+    // if all subcommand requirements are inherited, no need to check additional requirements
+    if(inheritRequirements) {
+      for (var command : allCommands) {
+        m_requirements.addAll(command.requirements());
+      }
+    } else {
+      // otherwise, only inherit requirements that are wanted
+      for (var command : allCommands) {
+        Set<Mechanism> required = command.requirements();
+        required.retainAll(additionalRequirements);
+        m_requirements.addAll(required);
+      }
     }
 
     m_priority =
