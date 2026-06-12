@@ -6,6 +6,7 @@ package org.wpilib.command3.button;
 
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.event.EventLoop;
 
@@ -14,8 +15,9 @@ import org.wpilib.event.EventLoop;
  *
  * @see Joystick
  */
-public class CommandJoystick extends CommandGenericHID {
-  private final Joystick m_hid;
+public class CommandJoystick {
+  private final CommandGenericHID m_hid;
+  private final Joystick m_joystick;
 
   /**
    * Construct an instance of a controller.
@@ -23,8 +25,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandJoystick(int port) {
-    super(port);
-    m_hid = new Joystick(port);
+    this(Scheduler.getDefault(), port);
   }
 
   /**
@@ -34,18 +35,26 @@ public class CommandJoystick extends CommandGenericHID {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandJoystick(Scheduler scheduler, int port) {
-    super(scheduler, port);
-    m_hid = new Joystick(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(scheduler, port);
+    m_joystick = new Joystick(DriverStation.getGenericHID(port));
   }
 
   /**
-   * Get the underlying GenericHID object.
+   * Get the underlying CommandGenericHID object.
    *
-   * @return the wrapped GenericHID object
+   * @return the wrapped CommandGenericHID object
    */
-  @Override
-  public Joystick getHID() {
+  public CommandGenericHID getHID() {
     return m_hid;
+  }
+
+  /**
+   * Get the underlying Joystick object.
+   *
+   * @return the wrapped Joystick object
+   */
+  public Joystick getJoystick() {
+    return m_joystick;
   }
 
   /**
@@ -56,7 +65,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @see #trigger(EventLoop)
    */
   public Trigger trigger() {
-    return trigger(getScheduler().getDefaultEventLoop());
+    return trigger(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -67,7 +76,7 @@ public class CommandJoystick extends CommandGenericHID {
    *     given loop.
    */
   public Trigger trigger(EventLoop loop) {
-    return button(Joystick.ButtonType.kTrigger.value, loop);
+    return m_hid.button(Joystick.ButtonType.kTrigger.value, loop);
   }
 
   /**
@@ -78,7 +87,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @see #top(EventLoop)
    */
   public Trigger top() {
-    return top(getScheduler().getDefaultEventLoop());
+    return top(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -89,7 +98,7 @@ public class CommandJoystick extends CommandGenericHID {
    *     loop.
    */
   public Trigger top(EventLoop loop) {
-    return button(Joystick.ButtonType.kTop.value, loop);
+    return m_hid.button(Joystick.ButtonType.kTop.value, loop);
   }
 
   /**
@@ -98,7 +107,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @param channel The channel to set the axis to.
    */
   public void setXChannel(int channel) {
-    m_hid.setXChannel(channel);
+    m_joystick.setXChannel(channel);
   }
 
   /**
@@ -107,7 +116,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @param channel The channel to set the axis to.
    */
   public void setYChannel(int channel) {
-    m_hid.setYChannel(channel);
+    m_joystick.setYChannel(channel);
   }
 
   /**
@@ -116,7 +125,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @param channel The channel to set the axis to.
    */
   public void setZChannel(int channel) {
-    m_hid.setZChannel(channel);
+    m_joystick.setZChannel(channel);
   }
 
   /**
@@ -125,7 +134,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @param channel The channel to set the axis to.
    */
   public void setThrottleChannel(int channel) {
-    m_hid.setThrottleChannel(channel);
+    m_joystick.setThrottleChannel(channel);
   }
 
   /**
@@ -134,7 +143,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @param channel The channel to set the axis to.
    */
   public void setTwistChannel(int channel) {
-    m_hid.setTwistChannel(channel);
+    m_joystick.setTwistChannel(channel);
   }
 
   /**
@@ -143,7 +152,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @return The channel for the axis.
    */
   public int getXChannel() {
-    return m_hid.getXChannel();
+    return m_joystick.getXChannel();
   }
 
   /**
@@ -152,7 +161,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @return The channel for the axis.
    */
   public int getYChannel() {
-    return m_hid.getYChannel();
+    return m_joystick.getYChannel();
   }
 
   /**
@@ -161,7 +170,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @return The channel for the axis.
    */
   public int getZChannel() {
-    return m_hid.getZChannel();
+    return m_joystick.getZChannel();
   }
 
   /**
@@ -170,7 +179,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @return The channel for the axis.
    */
   public int getTwistChannel() {
-    return m_hid.getTwistChannel();
+    return m_joystick.getTwistChannel();
   }
 
   /**
@@ -179,7 +188,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @return The channel for the axis.
    */
   public int getThrottleChannel() {
-    return m_hid.getThrottleChannel();
+    return m_joystick.getThrottleChannel();
   }
 
   /**
@@ -191,7 +200,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @return the x position
    */
   public double getX() {
-    return m_hid.getX();
+    return m_joystick.getX();
   }
 
   /**
@@ -203,7 +212,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @return the y position
    */
   public double getY() {
-    return m_hid.getY();
+    return m_joystick.getY();
   }
 
   /**
@@ -212,7 +221,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @return the z position
    */
   public double getZ() {
-    return m_hid.getZ();
+    return m_joystick.getZ();
   }
 
   /**
@@ -222,7 +231,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @return The Twist value of the joystick.
    */
   public double getTwist() {
-    return m_hid.getTwist();
+    return m_joystick.getTwist();
   }
 
   /**
@@ -232,7 +241,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @return The Throttle value of the joystick.
    */
   public double getThrottle() {
-    return m_hid.getThrottle();
+    return m_joystick.getThrottle();
   }
 
   /**
@@ -242,7 +251,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @return The magnitude of the direction vector
    */
   public double getMagnitude() {
-    return m_hid.getMagnitude();
+    return m_joystick.getMagnitude();
   }
 
   /**
@@ -260,7 +269,7 @@ public class CommandJoystick extends CommandGenericHID {
     //
     // It's rotated 90 degrees CCW (y is negated and the arguments are reversed)
     // so that 0 radians is forward.
-    return m_hid.getDirectionRadians();
+    return m_joystick.getDirectionRadians();
   }
 
   /**
@@ -270,6 +279,6 @@ public class CommandJoystick extends CommandGenericHID {
    * @return The direction of the vector in degrees
    */
   public double getDirectionDegrees() {
-    return m_hid.getDirectionDegrees();
+    return m_joystick.getDirectionDegrees();
   }
 }

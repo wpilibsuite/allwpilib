@@ -44,8 +44,8 @@ maven.install(
     name = "maven",
     artifacts = [
         "org.ejml:ejml-simple:0.44.0",
-        "io.avaje:avaje-jsonb:3.11",
-        "io.avaje:avaje-jsonb-generator:3.11",
+        "io.avaje:avaje-jsonb:3.14",
+        "io.avaje:avaje-jsonb-generator:3.14",
         "us.hebi.quickbuf:quickbuf-runtime:1.4",
         "com.google.code.gson:gson:2.13.1",
         "org.wpilib.thirdparty.opencv:opencv-java:2027-4.13.0-1",

@@ -12,13 +12,15 @@
 
 using namespace wpi;
 
-CAN::CAN(int busId, int deviceId)
+CAN::CAN(CANBusMap busId, int deviceId)
     : CAN{busId, deviceId, TEAM_MANUFACTURER, TEAM_DEVICE_TYPE} {}
 
-CAN::CAN(int busId, int deviceId, int deviceManufacturer, int deviceType) {
+CAN::CAN(CANBusMap busId, int deviceId, int deviceManufacturer,
+         int deviceType) {
   int32_t status = 0;
   m_handle = HAL_InitializeCAN(
-      busId, static_cast<HAL_CANManufacturer>(deviceManufacturer), deviceId,
+      static_cast<int>(busId),
+      static_cast<HAL_CANManufacturer>(deviceManufacturer), deviceId,
       static_cast<HAL_CANDeviceType>(deviceType), &status);
   WPILIB_CheckErrorStatus(status, "device id {} mfg {} type {}", deviceId,
                           deviceManufacturer, deviceType);

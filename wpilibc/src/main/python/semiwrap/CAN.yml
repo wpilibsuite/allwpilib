@@ -6,8 +6,8 @@ classes:
     methods:
       CAN:
         overloads:
-          int, int:
-          int, int, int, int:
+          CANBusMap, int:
+          CANBusMap, int, int, int:
       WritePacket:
       WritePacketNoError:
       WritePacketRepeating:

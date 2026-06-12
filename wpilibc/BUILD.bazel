@@ -32,6 +32,16 @@ py_binary(
 )
 
 py_binary(
+    name = "generate_first_ds_hids",
+    srcs = ["generate_first_ds_hids.py"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [requirement("jinja2")],
+)
+
+py_binary(
     name = "generate_pwm_motor_controllers",
     srcs = ["generate_pwm_motor_controllers.py"],
     target_compatible_with = select({
@@ -51,6 +61,7 @@ py_binary(
         "//conditions:default": [],
     }),
     deps = [
+        ":generate_first_ds_hids",
         ":generate_hids",
         ":generate_pwm_motor_controllers",
     ],
@@ -58,7 +69,7 @@ py_binary(
 
 filegroup(
     name = "templates",
-    srcs = glob(["src/generate/main/native/**"]) + [
+    srcs = glob(["src/generate/main/native/**"]) + glob(["src/generate/test/native/**"]) + [
         "//wpilibj:hid_schema",
         "//wpilibj:pwm_schema",
     ],
@@ -178,7 +189,10 @@ cc_library(
 cc_test(
     name = "wpilibc-test",
     size = "small",
-    srcs = glob(["src/test/native/cpp/**"]),
+    srcs = glob([
+        "src/generated/test/native/cpp/**",
+        "src/test/native/cpp/**",
+    ]),
     tags = [
         "no-tsan",
         "no-ubsan",

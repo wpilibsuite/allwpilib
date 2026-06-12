@@ -12,7 +12,7 @@ using namespace wpi;
 using namespace wpi::sim;
 
 NiDsPS4ControllerSim::NiDsPS4ControllerSim(const NiDsPS4Controller& joystick)
-    : GenericHIDSim{joystick} {
+    : GenericHIDSim{joystick.GetHID()} {
   SetAxesMaximumIndex(6);
   SetButtonsMaximumIndex(14);
   SetPOVsMaximumIndex(1);

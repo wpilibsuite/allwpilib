@@ -5,6 +5,7 @@
 package org.wpilib.command2.button;
 
 import org.wpilib.command2.CommandScheduler;
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.Gamepad;
 import org.wpilib.event.EventLoop;
 
@@ -14,8 +15,9 @@ import org.wpilib.event.EventLoop;
  * @see Gamepad
  */
 @SuppressWarnings("MethodName")
-public class CommandGamepad extends CommandGenericHID {
-  private final Gamepad m_hid;
+public class CommandGamepad {
+  private final CommandGenericHID m_hid;
+  private final Gamepad m_gamepad;
 
   /**
    * Construct an instance of a controller.
@@ -23,18 +25,49 @@ public class CommandGamepad extends CommandGenericHID {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandGamepad(int port) {
-    super(port);
-    m_hid = new Gamepad(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(port);
+    m_gamepad = DriverStation.getGamepad(port);
   }
 
   /**
-   * Get the underlying GenericHID object.
+   * Get the underlying CommandGenericHID object.
    *
-   * @return the wrapped GenericHID object
+   * @return the wrapped CommandGenericHID object
    */
-  @Override
-  public Gamepad getHID() {
+  public CommandGenericHID getHID() {
     return m_hid;
+  }
+
+  /**
+   * Get the underlying Gamepad object.
+   *
+   * @return the wrapped Gamepad object
+   */
+  public Gamepad getGamepad() {
+    return m_gamepad;
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button index
+   * @return an event instance representing the button's digital signal attached to the {@link
+   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @see #button(int, EventLoop)
+   */
+  public Trigger button(int button) {
+    return m_hid.button(button);
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button index
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the button's digital signal attached to the given loop.
+   */
+  public Trigger button(int button, EventLoop loop) {
+    return m_hid.button(button, loop);
   }
 
   /**
@@ -46,7 +79,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @see #button(Gamepad.Button, EventLoop)
    */
   public Trigger button(Gamepad.Button button) {
-    return super.button(button.value);
+    return button(button.value);
   }
 
   /**
@@ -721,7 +754,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     threshold.
    */
   public Trigger axisLessThan(Gamepad.Axis axis, double threshold) {
-    return super.axisLessThan(axis.value, threshold);
+    return m_hid.axisLessThan(axis.value, threshold);
   }
 
   /**
@@ -735,7 +768,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     threshold.
    */
   public Trigger axisLessThan(Gamepad.Axis axis, double threshold, EventLoop loop) {
-    return super.axisLessThan(axis.value, threshold, loop);
+    return m_hid.axisLessThan(axis.value, threshold, loop);
   }
 
   /**
@@ -749,7 +782,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     threshold.
    */
   public Trigger axisGreaterThan(Gamepad.Axis axis, double threshold) {
-    return super.axisGreaterThan(axis.value, threshold);
+    return m_hid.axisGreaterThan(axis.value, threshold);
   }
 
   /**
@@ -763,7 +796,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     threshold.
    */
   public Trigger axisGreaterThan(Gamepad.Axis axis, double threshold, EventLoop loop) {
-    return super.axisGreaterThan(axis.value, threshold, loop);
+    return m_hid.axisGreaterThan(axis.value, threshold, loop);
   }
 
   /**
@@ -777,7 +810,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     provided threshold.
    */
   public Trigger axisMagnitudeGreaterThan(Gamepad.Axis axis, double threshold, EventLoop loop) {
-    return super.axisMagnitudeGreaterThan(axis.value, threshold, loop);
+    return m_hid.axisMagnitudeGreaterThan(axis.value, threshold, loop);
   }
 
   /**
@@ -790,7 +823,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
    */
   public Trigger axisMagnitudeGreaterThan(Gamepad.Axis axis, double threshold) {
-    return super.axisMagnitudeGreaterThan(axis.value, threshold);
+    return m_hid.axisMagnitudeGreaterThan(axis.value, threshold);
   }
 
   /**
@@ -800,7 +833,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @return The value of the axis.
    */
   public double getAxis(Gamepad.Axis axis) {
-    return getRawAxis(axis.value);
+    return m_hid.getRawAxis(axis.value);
   }
 
   /**
@@ -809,7 +842,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @return The axis value.
    */
   public double getLeftX() {
-    return m_hid.getLeftX();
+    return m_gamepad.getLeftX();
   }
 
   /**
@@ -818,7 +851,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @return The axis value.
    */
   public double getLeftY() {
-    return m_hid.getLeftY();
+    return m_gamepad.getLeftY();
   }
 
   /**
@@ -827,7 +860,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @return The axis value.
    */
   public double getRightX() {
-    return m_hid.getRightX();
+    return m_gamepad.getRightX();
   }
 
   /**
@@ -836,26 +869,26 @@ public class CommandGamepad extends CommandGenericHID {
    * @return The axis value.
    */
   public double getRightY() {
-    return m_hid.getRightY();
+    return m_gamepad.getRightY();
   }
 
   /**
-   * Get the left trigger axis value of the controller. Note that this axis is bound to the range of
-   * [0, 1] as opposed to the usual [-1, 1].
+   * Get the left trigger value of the controller. Note that this axis is bound to the range of [0,
+   * 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */
-  public double getLeftTriggerAxis() {
-    return m_hid.getLeftTriggerAxis();
+  public double getLeftTrigger() {
+    return m_gamepad.getLeftTrigger();
   }
 
   /**
-   * Get the right trigger axis value of the controller. Note that this axis is bound to the range
-   * of [0, 1] as opposed to the usual [-1, 1].
+   * Get the right trigger value of the controller. Note that this axis is bound to the range of [0,
+   * 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */
-  public double getRightTriggerAxis() {
-    return m_hid.getRightTriggerAxis();
+  public double getRightTrigger() {
+    return m_gamepad.getRightTrigger();
   }
 }
