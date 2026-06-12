@@ -118,7 +118,8 @@ public abstract class OpModeRobot extends RobotBase {
     try {
       return constructor.get().newInstance(this);
     } catch (ReflectiveOperationException e) {
-      throw new RuntimeException("Could not instantiate OpMode " + cls.getSimpleName(), e.getCause());
+      throw new RuntimeException(
+          "Could not instantiate OpMode " + cls.getSimpleName(), e.getCause());
     }
   }
 
