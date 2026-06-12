@@ -415,4 +415,18 @@ public interface Command {
   default ParallelGroupBuilder raceWith(Command... parallel) {
     return new ParallelGroupBuilder().optional(this).optional(parallel);
   }
+
+  /**
+   * Gives an existing command a different name.
+   *
+   * @param newName The name to assign to this command.
+   * @return A command that has the same implementation as this command, but with a different name.
+   */
+  default Command renameTo(String newName) {
+    return requiring(requirements())
+        .executing(this::run)
+        .withPriority(priority())
+        .whenCanceled(this::onCancel)
+        .named(newName);
+  }
 }
