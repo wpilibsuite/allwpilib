@@ -32,14 +32,5 @@ TEST(AprilTagFieldLayoutProtoTest, Roundtrip) {
   EXPECT_EQ(kExpectedData.GetFieldLength(), unpacked_data->GetFieldLength());
   EXPECT_EQ(kExpectedData.GetFieldWidth(), unpacked_data->GetFieldWidth());
 
-  // Both lists are checked to confirm the presence of all tags and the absence
-  // of extra tags
-
-  for (AprilTag tag : kExpectedData.GetTags()) {
-    EXPECT_EQ(tag.pose, unpacked_data->GetTagPose(tag.ID));
-  }
-
-  for (AprilTag tag : unpacked_data->GetTags()) {
-    EXPECT_EQ(kExpectedData.GetTagPose(tag.ID), tag.pose);
-  }
+  EXPECT_EQ(kExpectedData.GetTagMap(), unpacked_data->GetTagMap());
 }
