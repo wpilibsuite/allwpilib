@@ -299,14 +299,14 @@ public class Gamepad implements HIDDevice, Sendable {
   }
 
   /**
-   * Get the left trigger axis value of the controller. Note that this axis is bound to the range of
-   * [0, 1] as opposed to the usual [-1, 1].
+   * Get the left trigger value of the controller. Note that this axis is bound to the range of [0,
+   * 1] as opposed to the usual [-1, 1].
    *
    * <p>A deadband of 0.01 is applied by default. Use {@link #setLeftTriggerDeadband} to change it.
    *
    * @return The axis value.
    */
-  public double getLeftTriggerAxis() {
+  public double getLeftTrigger() {
     return MathUtil.applyDeadband(getAxis(Axis.LEFT_TRIGGER), m_leftTriggerDeadband);
   }
 
@@ -337,14 +337,14 @@ public class Gamepad implements HIDDevice, Sendable {
   }
 
   /**
-   * Get the right trigger axis value of the controller. Note that this axis is bound to the range
-   * of [0, 1] as opposed to the usual [-1, 1].
+   * Get the right trigger value of the controller. Note that this axis is bound to the range of [0,
+   * 1] as opposed to the usual [-1, 1].
    *
    * <p>A deadband of 0.01 is applied by default. Use {@link #setRightTriggerDeadband} to change it.
    *
    * @return The axis value.
    */
-  public double getRightTriggerAxis() {
+  public double getRightTrigger() {
     return MathUtil.applyDeadband(getAxis(Axis.RIGHT_TRIGGER), m_rightTriggerDeadband);
   }
 
@@ -1563,10 +1563,8 @@ public class Gamepad implements HIDDevice, Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("HID");
     builder.publishConstString("ControllerType", "Gamepad");
-    builder.addDoubleProperty(
-        "LeftTrigger Axis", () -> getAxisForSendable(Axis.LEFT_TRIGGER), null);
-    builder.addDoubleProperty(
-        "RightTrigger Axis", () -> getAxisForSendable(Axis.RIGHT_TRIGGER), null);
+    builder.addDoubleProperty("LeftTrigger", () -> getAxisForSendable(Axis.LEFT_TRIGGER), null);
+    builder.addDoubleProperty("RightTrigger", () -> getAxisForSendable(Axis.RIGHT_TRIGGER), null);
     builder.addDoubleProperty("LeftX", () -> getAxisForSendable(Axis.LEFT_X), null);
     builder.addDoubleProperty("LeftY", () -> getAxisForSendable(Axis.LEFT_Y), null);
     builder.addDoubleProperty("RightX", () -> getAxisForSendable(Axis.RIGHT_X), null);

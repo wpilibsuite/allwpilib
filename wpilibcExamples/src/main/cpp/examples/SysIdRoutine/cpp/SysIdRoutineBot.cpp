@@ -27,7 +27,7 @@ void SysIdRoutineBot::ConfigureBindings() {
       .WhileTrue(drive.SysIdDynamic(wpi::cmd::sysid::Direction::kReverse));
 
   shooter.SetDefaultCommand(shooter.RunShooterCommand(
-      [this] { return driverController.GetLeftTriggerAxis(); }));
+      [this] { return driverController.GetLeftTrigger(); }));
 
   (driverController.FaceDown() && driverController.LeftBumper())
       .WhileTrue(

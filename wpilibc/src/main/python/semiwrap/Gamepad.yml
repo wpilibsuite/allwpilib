@@ -29,13 +29,13 @@ classes:
       SetRightXDeadband:
       GetRightY:
       SetRightYDeadband:
-      GetLeftTriggerAxis:
+      GetLeftTrigger:
       SetLeftTriggerDeadband:
       LeftTrigger:
         overloads:
           double, EventLoop* [const]:
           EventLoop* [const]:
-      GetRightTriggerAxis:
+      GetRightTrigger:
       SetRightTriggerDeadband:
       RightTrigger:
         overloads:

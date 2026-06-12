@@ -873,22 +873,22 @@ public class CommandGamepad {
   }
 
   /**
-   * Get the left trigger axis value of the controller. Note that this axis is bound to the range of
-   * [0, 1] as opposed to the usual [-1, 1].
+   * Get the left trigger value of the controller. Note that this axis is bound to the range of [0,
+   * 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */
-  public double getLeftTriggerAxis() {
-    return m_gamepad.getLeftTriggerAxis();
+  public double getLeftTrigger() {
+    return m_gamepad.getLeftTrigger();
   }
 
   /**
-   * Get the right trigger axis value of the controller. Note that this axis is bound to the range
-   * of [0, 1] as opposed to the usual [-1, 1].
+   * Get the right trigger value of the controller. Note that this axis is bound to the range of [0,
+   * 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */
-  public double getRightTriggerAxis() {
-    return m_gamepad.getRightTriggerAxis();
+  public double getRightTrigger() {
+    return m_gamepad.getRightTrigger();
   }
 }
