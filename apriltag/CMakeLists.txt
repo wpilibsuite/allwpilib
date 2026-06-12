@@ -39,9 +39,23 @@ generate_resources(
     apriltag_resources_src
 )
 
-file(GLOB apriltag_native_src src/main/native/cpp/*.cpp)
+file(GLOB apriltag_jni_src src/main/native/cpp/jni/AprilTagJNI.cpp)
 
-add_library(apriltag ${apriltag_native_src} ${apriltag_resources_src} ${apriltaglib_src})
+file(GLOB_RECURSE apriltag_native_src src/main/native/cpp/*.cpp)
+list(REMOVE_ITEM apriltag_native_src ${apriltag_jni_src})
+
+file(GLOB apriltag_protobuf_native_src src/generated/main/native/cpp/apriltag/protobuf/*.cpp)
+
+add_library(apriltag_protobuf OBJECT ${apriltag_protobuf_native_src})
+target_link_libraries(apriltag_protobuf wpimath wpiutil)
+
+add_library(
+    apriltag
+    ${apriltag_native_src}
+    ${apriltag_resources_src}
+    ${apriltaglib_src}
+    $<TARGET_OBJECTS:apriltag_protobuf>
+)
 set_target_properties(apriltag PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET apriltag PROPERTY FOLDER "libraries")
@@ -54,9 +68,16 @@ target_include_directories(
     apriltag
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/cpp>
         $<INSTALL_INTERFACE:${include_dest}/apriltag>
 )
 
+install(
+    DIRECTORY src/generated/main/native/cpp/
+    DESTINATION "${include_dest}/apriltag"
+    FILES_MATCHING
+    PATTERN "*.h"
+)
 install(
     DIRECTORY src/main/native/include/ src/main/native/thirdparty/apriltag/include/
     DESTINATION "${include_dest}/apriltag"
