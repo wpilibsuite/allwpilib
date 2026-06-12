@@ -9,6 +9,8 @@ import java.util.Objects;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.util.RawFrame;
 import org.wpilib.vision.apriltag.jni.AprilTagJNI;
+import org.wpilib.vision.apriltag.proto.AprilTagProto;
+import org.wpilib.vision.apriltag.struct.AprilTagStruct;
 
 /** Represents an AprilTag's metadata. */
 @Json
@@ -73,4 +75,10 @@ public class AprilTag {
     AprilTagJNI.generate36h11AprilTagImage(frame, frame.getNativeObj(), id);
     return frame;
   }
+
+  /** AprilTag protobuf for serialization. */
+  public static final AprilTagProto proto = new AprilTagProto();
+
+  /** AprilTag struct for serialization. */
+  public static final AprilTagStruct struct = new AprilTagStruct();
 }
