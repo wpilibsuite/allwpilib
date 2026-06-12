@@ -151,7 +151,7 @@ public class DifferentialDrivetrainSim {
   }
 
   /**
-   * Returns the full simulated state of the drivetrain.
+   * Returns the full simulated state of the drivetrain. Note that this will not include noise!
    *
    * @return The simulated state
    */
@@ -160,7 +160,7 @@ public class DifferentialDrivetrainSim {
   }
 
   /**
-   * Get one of the drivetrain states.
+   * Get one of the drivetrain states. Note that this will not include noise!
    *
    * @param state the state to get
    * @return the state

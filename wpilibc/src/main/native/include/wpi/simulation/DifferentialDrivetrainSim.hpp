@@ -127,17 +127,17 @@ class DifferentialDrivetrainSim {
   wpi::math::Pose2d GetPose() const;
 
   /**
+   * Returns the current state vector x. Note that this will not include noise!
+   */
+  wpi::math::Vectord<7> GetState() const;
+
+  /**
    * Returns an element of the state vector. Note that this will not include
    * noise!
    *
    * @param state The row of the state vector.
    */
   double GetState(int state) const;
-
-  /**
-   * Returns the current state vector x. Note that this will not include noise!
-   */
-  wpi::math::Vectord<7> GetState() const;
 
   /**
    * Get the right encoder position in meters.
