@@ -45,8 +45,8 @@ Dear ImGui            thirdparty/imgui_suite/imgui
 implot                thirdparty/imgui_suite/implot
 nanopb                wpiutil/src/main/native/thirdparty/nanopb
 upb                   wpiutil/src/main/native/thirdparty/upb
-mrcal                 tools/wpical/src/main/native/thirdparty/mrcal
-libdogleg             tools/wpical/src/main/native/thirdparty/libdogleg
+mrcal                 mrcal/src/main/native/thirdparty
+libdogleg             mrcal/src/main/native/thirdparty/libdogleg
 Simd                  hal/src/main/native/systemcore/simd
 AdvantageScope        fields/src/main/native/resources/org/wpilib/fields/ftc
 Avahi                 wpinet/src/main/native/linux/AvahiClient.hpp

@@ -1,13 +1,13 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Gold856 <117957790+Gold856@users.noreply.github.com>
 Date: Wed, 4 Dec 2024 00:58:00 -0500
-Subject: [PATCH 6/8] Fix MSVC build errors
+Subject: [PATCH 6/9] Fix MSVC build errors
 
 ---
  minimath/minimath-extra.h |   1 +
- mrcal.cpp                 |  57 ++++++-----
+ mrcal.cpp                 |  61 ++++++-----
  poseutils.c               | 209 --------------------------------------
- 3 files changed, 32 insertions(+), 235 deletions(-)
+ 3 files changed, 34 insertions(+), 237 deletions(-)
 
 diff --git a/minimath/minimath-extra.h b/minimath/minimath-extra.h
 index 2930a5d6aa47af29a3255342838d679032ee4562..194b0ccf22c47a8d693eee24f6f563a2d651f338 100644
@@ -22,7 +22,7 @@ index 2930a5d6aa47af29a3255342838d679032ee4562..194b0ccf22c47a8d693eee24f6f563a2
  // Upper triangle is stored, in the usual row-major order.
  __attribute__((unused))
 diff --git a/mrcal.cpp b/mrcal.cpp
-index e048bef1d1b5addfd137d3c492108c36e56eda7f..1560cd106ff5bcfe49476f785aa8108119318b3a 100644
+index 336e9805bb3a038f437a2a5a59fdb97c451e0fa5..04430c3d0180363d0d2a5a4f83a20f04b842c435 100644
 --- a/mrcal.cpp
 +++ b/mrcal.cpp
 @@ -2742,11 +2742,10 @@ void project( // out
@@ -53,7 +53,7 @@ index e048bef1d1b5addfd137d3c492108c36e56eda7f..1560cd106ff5bcfe49476f785aa81081
                                     camera_at_identity ? NULL : &gg,
                                     Rj, d_Rj_rj, &joint_rt[3]);
          _project_point(  q,
-@@ -3227,10 +3227,11 @@ bool _mrcal_unproject_internal( // out
+@@ -3221,10 +3221,11 @@ bool _mrcal_unproject_internal( // out
          // MSG("init. q=(%g,%g)", q[i].x, q[i].y);
  
          // initial estimate: pinhole projection
@@ -68,7 +68,19 @@ index e048bef1d1b5addfd137d3c492108c36e56eda7f..1560cd106ff5bcfe49476f785aa81081
                                       1,
                                       intrinsics );
          // MSG("init. out->xyz[]=(%g,%g)", out->x, out->y);
-@@ -4670,10 +4671,10 @@ void optimizer_callback(// input state
+@@ -3705,9 +3706,9 @@ void mrcal_unpack_solver_state_vector( // out, in
+ 
+     if( problem_selections.do_optimize_extrinsics )
+     {
+-        _Static_assert( offsetof(mrcal_pose_t, r) == 0,
++        static_assert( offsetof(mrcal_pose_t, r) == 0,
+                        "mrcal_pose_t has expected structure");
+-        _Static_assert( offsetof(mrcal_pose_t, t) == 3*sizeof(double),
++        static_assert( offsetof(mrcal_pose_t, t) == 3*sizeof(double),
+                        "mrcal_pose_t has expected structure");
+ 
+         mrcal_pose_t* rt_cam_ref = (mrcal_pose_t*)(&b[i_state]);
+@@ -4671,10 +4672,10 @@ void optimizer_callback(// input state
  
          // these are computed in respect to the real-unit parameters,
          // NOT the unit-scale parameters used by the optimizer
@@ -83,7 +95,7 @@ index e048bef1d1b5addfd137d3c492108c36e56eda7f..1560cd106ff5bcfe49476f785aa81081
          std::vector<mrcal_calobject_warp_t> dq_dcalobject_warp(ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
          std::vector<mrcal_point2_t> q_hypothesis      (ctx->calibration_object_width_n*ctx->calibration_object_height_n);
          // I get the intrinsics gradients in separate arrays, possibly sparsely.
-@@ -6242,7 +6243,7 @@ bool mrcal_optimizer_callback(// out
+@@ -6241,7 +6242,7 @@ bool mrcal_optimizer_callback(// out
             problem_selections.do_optimize_extrinsics ) )
      {
          MSG("ERROR: We have triangulated points. At this time this is only allowed if we're NOT optimizing intrinsics AND if we ARE optimizing extrinsics.");
@@ -92,7 +104,7 @@ index e048bef1d1b5addfd137d3c492108c36e56eda7f..1560cd106ff5bcfe49476f785aa81081
      }
  
      if( Nobservations_board > 0 )
-@@ -6250,7 +6251,7 @@ bool mrcal_optimizer_callback(// out
+@@ -6249,7 +6250,7 @@ bool mrcal_optimizer_callback(// out
          if( problem_selections.do_optimize_calobject_warp && calobject_warp == NULL )
          {
              MSG("ERROR: We're optimizing the calibration object warp, so a buffer with a seed MUST be passed in.");
@@ -101,7 +113,7 @@ index e048bef1d1b5addfd137d3c492108c36e56eda7f..1560cd106ff5bcfe49476f785aa81081
          }
      }
      else
-@@ -6266,7 +6267,7 @@ bool mrcal_optimizer_callback(// out
+@@ -6265,7 +6266,7 @@ bool mrcal_optimizer_callback(// out
         !problem_selections.do_optimize_calobject_warp)
      {
          MSG("Not optimizing any of our variables!");
@@ -110,7 +122,7 @@ index e048bef1d1b5addfd137d3c492108c36e56eda7f..1560cd106ff5bcfe49476f785aa81081
      }
  
  
-@@ -6279,7 +6280,7 @@ bool mrcal_optimizer_callback(// out
+@@ -6278,7 +6279,7 @@ bool mrcal_optimizer_callback(// out
      {
          MSG("The buffer passed to fill-in b_packed has the wrong size. Needed exactly %d bytes, but got %d bytes",
              Nstate*(int)sizeof(double),buffer_size_b_packed);
@@ -119,7 +131,7 @@ index e048bef1d1b5addfd137d3c492108c36e56eda7f..1560cd106ff5bcfe49476f785aa81081
      }
  
      int Nmeasurements = mrcal_num_measurements(Nobservations_board,
-@@ -6312,7 +6313,7 @@ bool mrcal_optimizer_callback(// out
+@@ -6311,7 +6312,7 @@ bool mrcal_optimizer_callback(// out
      {
          MSG("The buffer passed to fill-in x has the wrong size. Needed exactly %d bytes, but got %d bytes",
              Nmeasurements*(int)sizeof(double),buffer_size_x);
@@ -128,7 +140,7 @@ index e048bef1d1b5addfd137d3c492108c36e56eda7f..1560cd106ff5bcfe49476f785aa81081
      }
  
      const int Npoints_fromBoards =
-@@ -6332,9 +6333,9 @@ bool mrcal_optimizer_callback(// out
+@@ -6331,9 +6332,9 @@ bool mrcal_optimizer_callback(// out
          .Npoints_fixed              = Npoints_fixed,
          .observations_board         = observations_board,
          .observations_board_pool    = observations_board_pool,
@@ -139,7 +151,7 @@ index e048bef1d1b5addfd137d3c492108c36e56eda7f..1560cd106ff5bcfe49476f785aa81081
          .Nobservations_point        = Nobservations_point,
          .observations_point_triangulated  = observations_point_triangulated,
          .Nobservations_point_triangulated = Nobservations_point_triangulated,
-@@ -6367,7 +6368,6 @@ bool mrcal_optimizer_callback(// out
+@@ -6366,7 +6367,6 @@ bool mrcal_optimizer_callback(// out
  
      result = true;
  
@@ -147,7 +159,7 @@ index e048bef1d1b5addfd137d3c492108c36e56eda7f..1560cd106ff5bcfe49476f785aa81081
      return result;
  }
  
-@@ -6516,9 +6516,9 @@ mrcal_optimize( // out
+@@ -6513,9 +6513,9 @@ mrcal_optimize( // out
          .Npoints_fixed              = Npoints_fixed,
          .observations_board         = observations_board,
          .observations_board_pool    = observations_board_pool,
@@ -158,7 +170,7 @@ index e048bef1d1b5addfd137d3c492108c36e56eda7f..1560cd106ff5bcfe49476f785aa81081
          .Nobservations_point        = Nobservations_point,
          .observations_point_triangulated  = observations_point_triangulated,
          .Nobservations_point_triangulated = Nobservations_point_triangulated,
-@@ -6635,10 +6635,13 @@ mrcal_optimize( // out
+@@ -6632,10 +6632,13 @@ mrcal_optimize( // out
                                             &dogleg_parameters,
                                             &solver_context);
  
@@ -213,10 +225,10 @@ index e048bef1d1b5addfd137d3c492108c36e56eda7f..1560cd106ff5bcfe49476f785aa81081
          fclose(fp);
      return result;
 diff --git a/poseutils.c b/poseutils.c
-index 80d2b0d88dd5ad264bb579a7062b051d9972be74..59f7738477127829b87f490b5a2337c2378c2309 100644
+index 6c8f5b89f9d4a458e4bb71d77d6e77c794f1dbf2..b08f3716c4bc0adf750b1167541ff6f23d3ab66b 100644
 --- a/poseutils.c
 +++ b/poseutils.c
-@@ -1079,215 +1079,6 @@ void mrcal_r_from_R_full( // output
+@@ -1436,215 +1436,6 @@ void mrcal_r_from_R_full( // output
      }
  }
  
