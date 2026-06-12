@@ -72,6 +72,7 @@ generate_apriltag(
 
 write_source_files(
     name = "write_apriltag",
+    diff_args = ["-u"],
     files = {
         "src/generated": ":generate_apriltag",
     },
@@ -170,7 +171,6 @@ wpilib_cc_library(
 generate_def_windows(
     name = "apriltag_def",
     filters = [
-        ".pb.obj",
         ".npb.obj",
     ],
     deps = [
@@ -186,6 +186,7 @@ wpilib_cc_shared_library(
         "//wpiutil:shared/wpiutil",
     ],
     visibility = ["//visibility:public"],
+    win_def_file = ":apriltag_def",
     deps = [
         ":apriltag",
         ":thirdparty-apriltag",
