@@ -98,6 +98,13 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
   std::vector<AprilTag> GetTags() const;
 
   /**
+   * Returns an unordered map of all the april tags used in this layout, keyed
+   * by their ID.
+   * @return map of tags
+   */
+  std::unordered_map<int, AprilTag> GetTagMap() const;
+
+  /**
    * Sets the origin based on a predefined enumeration of coordinate frame
    * origins. The origins are calculated from the field dimensions.
    *
