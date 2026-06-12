@@ -150,7 +150,11 @@ public class DifferentialDrivetrainSim {
     }
   }
 
-  /** Returns the full simulated state of the drivetrain. */
+  /**
+   * Returns the full simulated state of the drivetrain.
+   *
+   * @return The simulated state
+   */
   public Matrix<N7, N1> getState() {
     return m_x;
   }
