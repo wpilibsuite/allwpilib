@@ -57,6 +57,7 @@ import org.wpilib.annotation.PostConstructionInitializer;
  */
 public final class StateMachine implements Command {
   private final String m_name;
+  private final StateMachineLogger m_logger;
   private State m_initialState = null;
   private final List<State> m_states = new ArrayList<>();
 
@@ -67,8 +68,14 @@ public final class StateMachine implements Command {
    *     {@link Command#name() name} of the state machine.
    */
   public StateMachine(String name) {
+    this(name, StateMachineLogger.getDefault());
+  }
+
+  StateMachine(String name, StateMachineLogger logger) {
     requireNonNullParam(name, "name", "StateMachine");
     m_name = name;
+    m_logger = logger;
+    m_logger.updateGraph(m_name, List.of(), m_states);
   }
 
   @Override
@@ -157,6 +164,7 @@ public final class StateMachine implements Command {
           m_name + " does not have an initial state. Use .setInitialState() to provide one.");
     }
 
+    var history = new ArrayList<>(List.of(m_initialState));
     var currentState = m_initialState;
 
     outer_loop:
@@ -164,6 +172,7 @@ public final class StateMachine implements Command {
       final var currentCommand = currentState.command();
       coroutine.fork(currentCommand);
       currentState.runEnterCallbacks();
+      m_logger.updateGraph(m_name, history, m_states);
       boolean didYield = false;
 
       while (coroutine.scheduler().isRunning(currentCommand)) {
@@ -180,6 +189,10 @@ public final class StateMachine implements Command {
             currentState.runExitCallbacks();
             coroutine.scheduler().cancel(currentCommand);
             currentState = verifyState(transition.nextState());
+            history.add(currentState);
+            if (history.size() > StateMachineLogger.MAX_HISTORY_LENGTH) {
+              history.removeFirst();
+            }
             continue outer_loop;
           }
         }
@@ -199,11 +212,17 @@ public final class StateMachine implements Command {
       // runs commands as fast as possible).
       currentState.runExitCallbacks();
       currentState = verifyState(currentState.nextState());
+      history.add(currentState);
+      if (history.size() > StateMachineLogger.MAX_HISTORY_LENGTH) {
+        history.removeFirst();
+      }
       if (!didYield && currentState != null) {
         // No need to yield if we're exiting the state machine
         coroutine.yield();
       }
     }
+
+    m_logger.updateGraph(m_name, List.of(), m_states);
   }
 
   private State verifyState(State next) {
