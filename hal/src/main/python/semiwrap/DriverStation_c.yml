@@ -45,3 +45,9 @@ functions:
   HAL_SetOpModeOptions:
   HAL_ObserveUserProgram:
   HAL_GetGameData:
+  HAL_SetDisplayLineMode:
+  HAL_AddDisplayLine:
+  HAL_UpdateDisplayLines:
+  HAL_SetDisplayRawMode:
+  HAL_WriteDisplayAnsiText:
+  HAL_ClearDisplay:

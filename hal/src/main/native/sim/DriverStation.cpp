@@ -160,6 +160,10 @@ class MrcLibDsSimImpl : public MrcLibDs {
 
   int32_t getSystemTimeValid(bool* systemTimeValid) override;
 
+  int32_t writeAnsi(const struct WPI_String* line) override;
+
+  int32_t clearDisplay() override;
+
   wpi::util::EventVector newDataEvents;
 
   void NewDriverStationData();
@@ -503,6 +507,14 @@ int32_t MrcLibDsSimImpl::getOutputsEnabled(bool* outputsEnabled) {
 
 int32_t MrcLibDsSimImpl::getSystemTimeValid(bool* systemTimeValid) {
   *systemTimeValid = true;
+  return 0;
+}
+
+int32_t MrcLibDsSimImpl::writeAnsi(const struct WPI_String* line) {
+  return 0;
+}
+
+int32_t MrcLibDsSimImpl::clearDisplay() {
   return 0;
 }
 
