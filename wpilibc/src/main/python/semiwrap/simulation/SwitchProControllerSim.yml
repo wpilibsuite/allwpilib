@@ -1,5 +1,11 @@
+extra_includes:
+- wpi/driverstation/SwitchProController.hpp
+
 classes:
   wpi::sim::SwitchProControllerSim:
+    force_no_trampoline: true
+    typealias:
+    - wpi::SwitchProController
     methods:
       SwitchProControllerSim:
         overloads:

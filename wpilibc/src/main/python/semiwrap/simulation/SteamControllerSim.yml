@@ -1,5 +1,11 @@
+extra_includes:
+- wpi/driverstation/SteamController.hpp
+
 classes:
   wpi::sim::SteamControllerSim:
+    force_no_trampoline: true
+    typealias:
+    - wpi::SteamController
     methods:
       SteamControllerSim:
         overloads:

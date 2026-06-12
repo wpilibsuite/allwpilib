@@ -1,5 +1,11 @@
+extra_includes:
+- wpi/driverstation/LogitechF310Controller.hpp
+
 classes:
   wpi::sim::LogitechF310ControllerSim:
+    force_no_trampoline: true
+    typealias:
+    - wpi::LogitechF310Controller
     methods:
       LogitechF310ControllerSim:
         overloads:

@@ -1,5 +1,11 @@
+extra_includes:
+- wpi/driverstation/Switch2GCController.hpp
+
 classes:
   wpi::sim::Switch2GCControllerSim:
+    force_no_trampoline: true
+    typealias:
+    - wpi::Switch2GCController
     methods:
       Switch2GCControllerSim:
         overloads:

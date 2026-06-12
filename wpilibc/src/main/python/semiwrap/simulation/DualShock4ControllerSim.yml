@@ -1,5 +1,11 @@
+extra_includes:
+- wpi/driverstation/DualShock4Controller.hpp
+
 classes:
   wpi::sim::DualShock4ControllerSim:
+    force_no_trampoline: true
+    typealias:
+    - wpi::DualShock4Controller
     methods:
       DualShock4ControllerSim:
         overloads:

@@ -1,5 +1,11 @@
+extra_includes:
+- wpi/driverstation/DualSenseEdgeController.hpp
+
 classes:
   wpi::sim::DualSenseEdgeControllerSim:
+    force_no_trampoline: true
+    typealias:
+    - wpi::DualSenseEdgeController
     methods:
       DualSenseEdgeControllerSim:
         overloads:

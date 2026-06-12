@@ -1,5 +1,13 @@
+extra_includes:
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/driverstation/internal/DriverStationBackend.hpp
+- wpi/event/BooleanEvent.hpp
+
 classes:
   wpi::SwitchProController:
+    force_no_trampoline: true
+    ignored_bases:
+    - wpi::util::SendableHelper<SwitchProController>
     attributes:
       TOUCHPAD_COUNT:
       SUPPORTS_RUMBLE:

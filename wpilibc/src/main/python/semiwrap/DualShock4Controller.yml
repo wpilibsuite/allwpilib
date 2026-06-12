@@ -1,5 +1,13 @@
+extra_includes:
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/driverstation/internal/DriverStationBackend.hpp
+- wpi/event/BooleanEvent.hpp
+
 classes:
   wpi::DualShock4Controller:
+    force_no_trampoline: true
+    ignored_bases:
+    - wpi::util::SendableHelper<DualShock4Controller>
     attributes:
       TOUCHPAD_COUNT:
       SUPPORTS_RUMBLE:
