@@ -1,4 +1,9 @@
+# Copyright (c) FIRST and other WPILib contributors.
+# Open Source Software; you can modify and/or share it under the terms of
+# the WPILib BSD license file in the root directory of this project.
+
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -10,6 +15,19 @@ from wpimath.generate_quickbuf import generate_quickbuf
 def main(argv):
     script_path = Path(__file__).resolve()
     dirname = script_path.parent
+
+    root_path = dirname.parent
+    nanopb_path = os.path.join(
+        root_path,
+        "wpiutil",
+        "src",
+        "main",
+        "native",
+        "thirdparty",
+        "nanopb",
+        "generator",
+        "nanopb_generator.py",
+    )
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -36,9 +54,7 @@ def main(argv):
         default="protoc",
     )
     parser.add_argument(
-        "--nanopb_generator",
-        help="Path to the quickbuf protoc plugin",
-        required=True,
+        "--nanopb_generator", help="Nanopb generator command", default=nanopb_path
     )
     parser.add_argument(
         "--quickbuf_plugin",

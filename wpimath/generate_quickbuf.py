@@ -12,6 +12,7 @@ from pathlib import Path
 def generate_quickbuf(
     protoc, quickbuf_plugin: Path, output_directory: Path, proto_dir: Path
 ):
+    output_directory.mkdir(parents=True, exist_ok=True)
     proto_files = proto_dir.glob("*.proto")
     for path in proto_files:
         absolute_filename = path.absolute()
