@@ -109,8 +109,7 @@ class WPILIB_DLLEXPORT AntiTipping {
    *
    * @param speed The maximum correction speed.
    */
-  constexpr void SetMaxCorrectionSpeed(
-      wpi::units::meters_per_second_t speed) {
+  constexpr void SetMaxCorrectionSpeed(wpi::units::meters_per_second_t speed) {
     m_maxCorrectionSpeed = speed;
   }
 
@@ -156,8 +155,7 @@ class WPILIB_DLLEXPORT AntiTipping {
     if (inclinationAngle < m_tippingThreshold) {
       return {};
     } else if (speed > m_maxCorrectionSpeed) {
-      correction =
-          correction * (m_maxCorrectionSpeed.value() / speed.value());
+      correction = correction * (m_maxCorrectionSpeed.value() / speed.value());
     }
 
     return {wpi::units::meters_per_second_t{correction.X().value()},
