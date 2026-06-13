@@ -42,7 +42,7 @@ class MyRobot(wpilib.TimedRobot):
 
     def autonomousPeriodic(self) -> None:
         elapsed = self.timer.get()
-        reference = self.trajectory.sample(elapsed)
+        reference = self.trajectory.sampleAt(elapsed)
         velocities = self.feedback.calculate(self.drive.getPose(), reference)
         self.drive.drive(velocities.vx, velocities.omega)
 

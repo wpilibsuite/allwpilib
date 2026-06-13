@@ -13,6 +13,7 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.trajectory.Trajectory;
+import org.wpilib.math.trajectory.TrajectorySample;
 import org.wpilib.networktables.DoubleArrayEntry;
 import org.wpilib.units.measure.Distance;
 
@@ -104,10 +105,12 @@ public class FieldObject2d implements AutoCloseable {
    * Sets poses from a trajectory.
    *
    * @param trajectory The trajectory from which the poses should be added.
+   * @param <SampleType> The type of the trajectory sample.
    */
-  public synchronized void setTrajectory(Trajectory trajectory) {
+  public synchronized <SampleType extends TrajectorySample> void setTrajectory(
+      Trajectory<SampleType> trajectory) {
     m_poses.clear();
-    for (Trajectory.State state : trajectory.getStates()) {
+    for (SampleType state : trajectory.getSamples()) {
       m_poses.add(state.pose);
     }
     updateEntry();

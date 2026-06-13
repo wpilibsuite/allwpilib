@@ -32,11 +32,12 @@
 
 #include <fmt/format.h>
 
+#include "wpi/math/trajectory/SplineTrajectory.hpp"
 #include "wpi/units/math.hpp"
 
 using namespace wpi::math;
 
-Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
+SplineTrajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
     const std::vector<PoseWithCurvature>& points,
     const std::vector<std::unique_ptr<TrajectoryConstraint>>& constraints,
     wpi::units::meters_per_second_t startVelocity,
@@ -165,14 +166,20 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
   }
 
   // Now we can integrate the constrained states forward in time to obtain our
-  // trajectory states.
+  // trajectory samples.
 
-  std::vector<Trajectory::State> states(points.size());
+  const size_t numStates = constrainedStates.size();
+  std::vector<wpi::units::meters_per_second_t> velocities(numStates);
+  std::vector<wpi::units::second_t> times(numStates);
+  // segAccel[i] is the (forward, path-relative) acceleration on the segment
+  // arriving at state i (from state i - 1).
+  std::vector<wpi::units::meters_per_second_squared_t> segAccel(numStates);
+
   wpi::units::second_t t = 0_s;
   wpi::units::meter_t s = 0_m;
   wpi::units::meters_per_second_t v = 0_mps;
 
-  for (unsigned int i = 0; i < constrainedStates.size(); i++) {
+  for (unsigned int i = 0; i < numStates; i++) {
     auto state = constrainedStates[i];
 
     // Calculate the change in position between the current state and the
@@ -180,14 +187,16 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
     wpi::units::meter_t ds = state.distance - s;
 
     // Calculate the acceleration between the current state and the previous
-    // state.
+    // state. ds is zero at the first state, where there is no preceding
+    // segment, so the acceleration there is left at zero.
     wpi::units::meters_per_second_squared_t accel =
-        (state.maxVelocity * state.maxVelocity - v * v) / (ds * 2);
+        ds == 0_m ? 0_mps_sq
+                  : (state.maxVelocity * state.maxVelocity - v * v) / (ds * 2);
+    segAccel[i] = accel;
 
     // Calculate dt.
     wpi::units::second_t dt = 0_s;
     if (i > 0) {
-      states.at(i - 1).acceleration = reversed ? -accel : accel;
       if (wpi::units::math::abs(accel) > 1E-6_mps_sq) {
         // v_f = v_0 + at
         dt = (state.maxVelocity - v) / accel;
@@ -206,11 +215,27 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
 
     t += dt;
 
-    states[i] = {t, reversed ? -v : v, reversed ? -accel : accel,
-                 state.pose.first, state.pose.second};
+    velocities[i] = v;
+    times[i] = t;
   }
 
-  return Trajectory(states);
+  // Build the samples. A sample's acceleration is the acceleration on the
+  // segment leaving it (segAccel[i + 1]); the final sample reuses its incoming
+  // segment's acceleration. The scalar SplineSample constructor stores the
+  // velocity and acceleration field-relative.
+  std::vector<SplineSample> samples;
+  samples.reserve(numStates);
+  for (size_t i = 0; i < numStates; i++) {
+    const auto& state = constrainedStates[i];
+    wpi::units::meters_per_second_squared_t accel =
+        i + 1 < numStates ? segAccel[i + 1] : segAccel[i];
+    samples.emplace_back(times[i].value(), state.pose.first,
+                         (reversed ? -velocities[i] : velocities[i]).value(),
+                         (reversed ? -accel : accel).value(),
+                         state.pose.second.value());
+  }
+
+  return SplineTrajectory(samples);
 }
 
 void TrajectoryParameterizer::EnforceAccelerationLimits(

@@ -110,7 +110,7 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
   wpi::math::MecanumDriveOdometry3d odometry{
       kinematics, wpi::math::Rotation3d{}, wheelPositions};
 
-  wpi::math::Trajectory trajectory =
+  wpi::math::SplineTrajectory trajectory =
       wpi::math::TrajectoryGenerator::GenerateTrajectory(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{3_m, 0_m, -90_deg},
@@ -129,11 +129,11 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
   double errorSum = 0;
 
   while (t < trajectory.TotalTime()) {
-    wpi::math::Trajectory::State groundTruthState = trajectory.Sample(t);
+    wpi::math::SplineSample groundTruthState = trajectory.SampleAt(t);
 
-    auto wheelVelocities = kinematics.ToWheelVelocities(
-        {groundTruthState.velocity, 0_mps,
-         groundTruthState.velocity * groundTruthState.curvature});
+    auto wheelVelocities =
+        kinematics.ToWheelVelocities(groundTruthState.velocity.ToRobotRelative(
+            groundTruthState.pose.Rotation()));
 
     wheelVelocities.frontLeft += distribution(generator) * 0.1_mps;
     wheelVelocities.frontRight += distribution(generator) * 0.1_mps;
@@ -177,7 +177,7 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingXAxis) {
   wpi::math::MecanumDriveOdometry3d odometry{
       kinematics, wpi::math::Rotation3d{}, wheelPositions};
 
-  wpi::math::Trajectory trajectory =
+  wpi::math::SplineTrajectory trajectory =
       wpi::math::TrajectoryGenerator::GenerateTrajectory(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{3_m, 0_m, -90_deg},
@@ -196,11 +196,13 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingXAxis) {
   double errorSum = 0;
 
   while (t < trajectory.TotalTime()) {
-    wpi::math::Trajectory::State groundTruthState = trajectory.Sample(t);
+    wpi::math::SplineSample groundTruthState = trajectory.SampleAt(t);
 
     auto wheelVelocities = kinematics.ToWheelVelocities(
-        {groundTruthState.velocity * groundTruthState.pose.Rotation().Cos(),
-         groundTruthState.velocity * groundTruthState.pose.Rotation().Sin(),
+        {groundTruthState.ForwardVelocity() *
+             groundTruthState.pose.Rotation().Cos(),
+         groundTruthState.ForwardVelocity() *
+             groundTruthState.pose.Rotation().Sin(),
          0_rad_per_s});
 
     wheelVelocities.frontLeft += distribution(generator) * 0.1_mps;

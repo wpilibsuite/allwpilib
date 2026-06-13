@@ -153,13 +153,11 @@ def test_accuracy_facing_trajectory():
     error_sum = 0
 
     while t < trajectory.totalTime():
-        ground_truth_state = trajectory.sample(t)
+        ground_truth_state = trajectory. sampleAt(t)
 
         wheel_velocities = kinematics.toWheelVelocities(
-            ChassisVelocities(
-                ground_truth_state.velocity,
-                0,
-                ground_truth_state.velocity * ground_truth_state.curvature,
+            ground_truth_state.velocity.toRobotRelative(
+                ground_truth_state.pose.rotation()
             )
         )
 
@@ -226,12 +224,12 @@ def test_accuracy_facing_x_axis():
     error_sum = 0
 
     while t < trajectory.totalTime():
-        ground_truth_state = trajectory.sample(t)
+        ground_truth_state = trajectory. sampleAt(t)
 
         wheel_velocities = kinematics.toWheelVelocities(
             ChassisVelocities(
-                ground_truth_state.velocity * ground_truth_state.pose.rotation().cos(),
-                ground_truth_state.velocity * ground_truth_state.pose.rotation().sin(),
+                ground_truth_state.forwardVelocity() * ground_truth_state.pose.rotation().cos(),
+                ground_truth_state.forwardVelocity() * ground_truth_state.pose.rotation().sin(),
                 0,
             )
         )

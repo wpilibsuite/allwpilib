@@ -25,10 +25,10 @@
 void testFollowTrajectory(
     const wpi::math::DifferentialDriveKinematics& kinematics,
     wpi::math::DifferentialDrivePoseEstimator& estimator,
-    const wpi::math::Trajectory& trajectory,
-    std::function<wpi::math::ChassisVelocities(wpi::math::Trajectory::State&)>
+    const wpi::math::SplineTrajectory& trajectory,
+    std::function<wpi::math::ChassisVelocities(wpi::math::SplineSample&)>
         chassisVelocitiesGenerator,
-    std::function<wpi::math::Pose2d(wpi::math::Trajectory::State&)>
+    std::function<wpi::math::Pose2d(wpi::math::SplineSample&)>
         visionMeasurementGenerator,
     const wpi::math::Pose2d& startingPose, const wpi::math::Pose2d& endingPose,
     const wpi::units::second_t dt, const wpi::units::second_t kVisionUpdateRate,
@@ -60,7 +60,7 @@ void testFollowTrajectory(
   }
 
   while (t < trajectory.TotalTime()) {
-    wpi::math::Trajectory::State groundTruthState = trajectory.Sample(t);
+    wpi::math::SplineSample groundTruthState = trajectory.SampleAt(t);
 
     // We are due for a new vision measurement if it's been `visionUpdateRate`
     // seconds since the last vision measurement
@@ -162,7 +162,7 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
                                                       {0.02, 0.02, 0.01},
                                                       {0.1, 0.1, 0.1}};
 
-  wpi::math::Trajectory trajectory =
+  wpi::math::SplineTrajectory trajectory =
       wpi::math::TrajectoryGenerator::GenerateTrajectory(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{3_m, 0_m, -90_deg},
@@ -173,11 +173,12 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
 
   testFollowTrajectory(
       kinematics, estimator, trajectory,
-      [&](wpi::math::Trajectory::State& state) {
-        return wpi::math::ChassisVelocities{state.velocity, 0_mps,
-                                            state.velocity * state.curvature};
+      [&](wpi::math::SplineSample& state) {
+        return wpi::math::ChassisVelocities{
+            state.ForwardVelocity(), 0_mps,
+            state.ForwardVelocity() * state.curvature};
       },
-      [&](wpi::math::Trajectory::State& state) { return state.pose; },
+      [&](wpi::math::SplineSample& state) { return state.pose; },
       trajectory.InitialPose(), {0_m, 0_m, wpi::math::Rotation2d{45_deg}},
       20_ms, 100_ms, 250_ms, true, false);
 }
@@ -193,7 +194,7 @@ TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
                                                       {0.02, 0.02, 0.01},
                                                       {0.1, 0.1, 0.1}};
 
-  wpi::math::Trajectory trajectory =
+  wpi::math::SplineTrajectory trajectory =
       wpi::math::TrajectoryGenerator::GenerateTrajectory(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{3_m, 0_m, -90_deg},
@@ -217,11 +218,10 @@ TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
 
       testFollowTrajectory(
           kinematics, estimator, trajectory,
-          [&](wpi::math::Trajectory::State& state) {
-            return wpi::math::ChassisVelocities{
-                state.velocity, 0_mps, state.velocity * state.curvature};
+          [&](wpi::math::SplineSample& state) {
+            return state.velocity.ToRobotRelative(state.pose.Rotation());
           },
-          [&](wpi::math::Trajectory::State& state) { return state.pose; },
+          [&](wpi::math::SplineSample& state) { return state.pose; },
           initial_pose, {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms,
           100_ms, 250_ms, false, false);
     }

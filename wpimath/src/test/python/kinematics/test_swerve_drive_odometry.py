@@ -152,13 +152,13 @@ def test_accuracy_facing_trajectory():
     error_sum = 0
 
     while t < trajectory.totalTime():
-        ground_truth_state = trajectory.sample(t)
+        ground_truth_state = trajectory.sampleAt(t)
 
         module_velocities = kinematics.toSwerveModuleVelocities(
             ChassisVelocities(
-                vx=ground_truth_state.velocity,
+                vx=ground_truth_state.forwardVelocity(),
                 vy=0,
-                omega=ground_truth_state.velocity * ground_truth_state.curvature,
+                omega=ground_truth_state.forwardVelocity() * ground_truth_state.curvature,
             )
         )
 
@@ -224,23 +224,23 @@ def test_accuracy_facing_x_axis():
     error_sum = 0
 
     while t < trajectory.totalTime():
-        ground_truth_state = trajectory.sample(t)
+        ground_truth_state = trajectory.sampleAt(t)
 
         fl.distance += (
-            ground_truth_state.velocity * dt
-            + 0.5 * ground_truth_state.acceleration * dt * dt
+            ground_truth_state.forwardVelocity() * dt
+            + 0.5 * ground_truth_state.forwardAcceleration() * dt * dt
         )
         fr.distance += (
-            ground_truth_state.velocity * dt
-            + 0.5 * ground_truth_state.acceleration * dt * dt
+            ground_truth_state.forwardVelocity() * dt
+            + 0.5 * ground_truth_state.forwardAcceleration() * dt * dt
         )
         bl.distance += (
-            ground_truth_state.velocity * dt
-            + 0.5 * ground_truth_state.acceleration * dt * dt
+            ground_truth_state.forwardVelocity() * dt
+            + 0.5 * ground_truth_state.forwardAcceleration() * dt * dt
         )
         br.distance += (
-            ground_truth_state.velocity * dt
-            + 0.5 * ground_truth_state.acceleration * dt * dt
+            ground_truth_state.forwardVelocity() * dt
+            + 0.5 * ground_truth_state.forwardAcceleration() * dt * dt
         )
 
         fl.angle = ground_truth_state.pose.rotation()
