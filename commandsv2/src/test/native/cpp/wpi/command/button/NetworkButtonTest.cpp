@@ -8,7 +8,6 @@
 
 #include "../CommandTestBase.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
-#include "wpi/commands2/RunCommand.hpp"
 #include "wpi/commands2/WaitUntilCommand.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 

@@ -15,8 +15,6 @@
 #include "wpi/nt/DoubleArrayTopic.hpp"
 #include "wpi/nt/MultiSubscriber.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
-#include "wpi/util/Endian.hpp"
-#include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringExtras.hpp"
 

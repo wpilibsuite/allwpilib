@@ -10,7 +10,6 @@
 #include "CommandTestBase.hpp"
 #include "CompositionTestBase.hpp"
 #include "wpi/commands2/InstantCommand.hpp"
-#include "wpi/commands2/WaitUntilCommand.hpp"
 
 using namespace wpi::cmd;
 class SequentialCommandGroupTest : public CommandTestBase {};

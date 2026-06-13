@@ -6,11 +6,10 @@
 
 #pragma once
 
-#include "wpi/driverstation/NiDsStadiaController.hpp"
-
-#include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/commands2/button/CommandGenericHID.hpp"
+#include "wpi/driverstation/NiDsStadiaController.hpp"
 
 namespace wpi::cmd {
 /**
@@ -19,7 +18,7 @@ namespace wpi::cmd {
  *
  * @see wpi::NiDsStadiaController
  */
-class CommandNiDsStadiaController : public CommandGenericHID {
+class CommandNiDsStadiaController {
  public:
   /**
    * Construct an instance of a controller.
@@ -30,11 +29,18 @@ class CommandNiDsStadiaController : public CommandGenericHID {
   explicit CommandNiDsStadiaController(int port);
 
   /**
-   * Get the underlying GenericHID object.
+   * Get the underlying CommandGenericHID object.
    *
-   * @return the wrapped GenericHID object
+   * @return the wrapped CommandGenericHID object
    */
-  wpi::NiDsStadiaController& GetHID();
+  CommandGenericHID& GetHID();
+
+  /**
+   * Get the underlying NiDsStadiaController object.
+   *
+   * @return the wrapped NiDsStadiaController object
+   */
+  wpi::NiDsStadiaController& GetNiDsStadiaController();
 
   /**
    * Constructs a Trigger instance around the A button's
@@ -245,6 +251,7 @@ class CommandNiDsStadiaController : public CommandGenericHID {
   double GetRightY() const;
 
  private:
-  wpi::NiDsStadiaController m_hid;
+  CommandGenericHID* m_hid;
+  wpi::NiDsStadiaController m_controller;
 };
 }  // namespace wpi::cmd

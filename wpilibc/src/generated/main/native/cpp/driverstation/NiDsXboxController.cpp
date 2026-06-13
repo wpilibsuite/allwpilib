@@ -6,39 +6,53 @@
 
 #include "wpi/driverstation/NiDsXboxController.hpp"
 
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/event/BooleanEvent.hpp"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-#include "wpi/event/BooleanEvent.hpp"
-
 using namespace wpi;
 
-NiDsXboxController::NiDsXboxController(int port) : GenericHID(port) {
-  HAL_ReportUsage("HID", port, "NiDsXboxController");
+NiDsXboxController::NiDsXboxController(int port)
+    : NiDsXboxController{DriverStation::GetGenericHID(port)} {}
+
+NiDsXboxController::NiDsXboxController(GenericHID& hid)
+    : m_hid{&hid} {
+  HAL_ReportUsage("HID", hid.GetPort(), "NiDsXboxController");
+}
+
+GenericHID& NiDsXboxController::GetHID() {
+  return *m_hid;
+}
+
+const GenericHID& NiDsXboxController::GetHID() const {
+  return *m_hid;
 }
 
 double NiDsXboxController::GetLeftX() const {
-  return GetRawAxis(Axis::kLeftX);
+  return m_hid->GetRawAxis(Axis::kLeftX);
 }
 
 double NiDsXboxController::GetRightX() const {
-  return GetRawAxis(Axis::kRightX);
+  return m_hid->GetRawAxis(Axis::kRightX);
 }
 
 double NiDsXboxController::GetLeftY() const {
-  return GetRawAxis(Axis::kLeftY);
+  return m_hid->GetRawAxis(Axis::kLeftY);
 }
 
 double NiDsXboxController::GetRightY() const {
-  return GetRawAxis(Axis::kRightY);
+  return m_hid->GetRawAxis(Axis::kRightY);
 }
 
 double NiDsXboxController::GetLeftTriggerAxis() const {
-  return GetRawAxis(Axis::kLeftTrigger);
+  return m_hid->GetRawAxis(Axis::kLeftTrigger);
 }
 
-BooleanEvent NiDsXboxController::LeftTrigger(double threshold, EventLoop* loop) const {
-  return BooleanEvent(loop, [this, threshold] { return this->GetLeftTriggerAxis() > threshold; });
+BooleanEvent NiDsXboxController::LeftTrigger(double threshold,
+                                                  EventLoop* loop) const {
+  return BooleanEvent(
+      loop, [this, threshold] { return this->GetLeftTriggerAxis() > threshold; });
 }
 
 BooleanEvent NiDsXboxController::LeftTrigger(EventLoop* loop) const {
@@ -46,11 +60,13 @@ BooleanEvent NiDsXboxController::LeftTrigger(EventLoop* loop) const {
 }
 
 double NiDsXboxController::GetRightTriggerAxis() const {
-  return GetRawAxis(Axis::kRightTrigger);
+  return m_hid->GetRawAxis(Axis::kRightTrigger);
 }
 
-BooleanEvent NiDsXboxController::RightTrigger(double threshold, EventLoop* loop) const {
-  return BooleanEvent(loop, [this, threshold] { return this->GetRightTriggerAxis() > threshold; });
+BooleanEvent NiDsXboxController::RightTrigger(double threshold,
+                                                  EventLoop* loop) const {
+  return BooleanEvent(
+      loop, [this, threshold] { return this->GetRightTriggerAxis() > threshold; });
 }
 
 BooleanEvent NiDsXboxController::RightTrigger(EventLoop* loop) const {
@@ -58,15 +74,15 @@ BooleanEvent NiDsXboxController::RightTrigger(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetAButton() const {
-  return GetRawButton(Button::kA);
+  return m_hid->GetRawButton(Button::kA);
 }
 
 bool NiDsXboxController::GetAButtonPressed() {
-  return GetRawButtonPressed(Button::kA);
+  return m_hid->GetRawButtonPressed(Button::kA);
 }
 
 bool NiDsXboxController::GetAButtonReleased() {
-  return GetRawButtonReleased(Button::kA);
+  return m_hid->GetRawButtonReleased(Button::kA);
 }
 
 BooleanEvent NiDsXboxController::A(EventLoop* loop) const {
@@ -74,15 +90,15 @@ BooleanEvent NiDsXboxController::A(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetBButton() const {
-  return GetRawButton(Button::kB);
+  return m_hid->GetRawButton(Button::kB);
 }
 
 bool NiDsXboxController::GetBButtonPressed() {
-  return GetRawButtonPressed(Button::kB);
+  return m_hid->GetRawButtonPressed(Button::kB);
 }
 
 bool NiDsXboxController::GetBButtonReleased() {
-  return GetRawButtonReleased(Button::kB);
+  return m_hid->GetRawButtonReleased(Button::kB);
 }
 
 BooleanEvent NiDsXboxController::B(EventLoop* loop) const {
@@ -90,15 +106,15 @@ BooleanEvent NiDsXboxController::B(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetXButton() const {
-  return GetRawButton(Button::kX);
+  return m_hid->GetRawButton(Button::kX);
 }
 
 bool NiDsXboxController::GetXButtonPressed() {
-  return GetRawButtonPressed(Button::kX);
+  return m_hid->GetRawButtonPressed(Button::kX);
 }
 
 bool NiDsXboxController::GetXButtonReleased() {
-  return GetRawButtonReleased(Button::kX);
+  return m_hid->GetRawButtonReleased(Button::kX);
 }
 
 BooleanEvent NiDsXboxController::X(EventLoop* loop) const {
@@ -106,15 +122,15 @@ BooleanEvent NiDsXboxController::X(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetYButton() const {
-  return GetRawButton(Button::kY);
+  return m_hid->GetRawButton(Button::kY);
 }
 
 bool NiDsXboxController::GetYButtonPressed() {
-  return GetRawButtonPressed(Button::kY);
+  return m_hid->GetRawButtonPressed(Button::kY);
 }
 
 bool NiDsXboxController::GetYButtonReleased() {
-  return GetRawButtonReleased(Button::kY);
+  return m_hid->GetRawButtonReleased(Button::kY);
 }
 
 BooleanEvent NiDsXboxController::Y(EventLoop* loop) const {
@@ -122,15 +138,15 @@ BooleanEvent NiDsXboxController::Y(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetLeftBumperButton() const {
-  return GetRawButton(Button::kLeftBumper);
+  return m_hid->GetRawButton(Button::kLeftBumper);
 }
 
 bool NiDsXboxController::GetLeftBumperButtonPressed() {
-  return GetRawButtonPressed(Button::kLeftBumper);
+  return m_hid->GetRawButtonPressed(Button::kLeftBumper);
 }
 
 bool NiDsXboxController::GetLeftBumperButtonReleased() {
-  return GetRawButtonReleased(Button::kLeftBumper);
+  return m_hid->GetRawButtonReleased(Button::kLeftBumper);
 }
 
 BooleanEvent NiDsXboxController::LeftBumper(EventLoop* loop) const {
@@ -138,15 +154,15 @@ BooleanEvent NiDsXboxController::LeftBumper(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetRightBumperButton() const {
-  return GetRawButton(Button::kRightBumper);
+  return m_hid->GetRawButton(Button::kRightBumper);
 }
 
 bool NiDsXboxController::GetRightBumperButtonPressed() {
-  return GetRawButtonPressed(Button::kRightBumper);
+  return m_hid->GetRawButtonPressed(Button::kRightBumper);
 }
 
 bool NiDsXboxController::GetRightBumperButtonReleased() {
-  return GetRawButtonReleased(Button::kRightBumper);
+  return m_hid->GetRawButtonReleased(Button::kRightBumper);
 }
 
 BooleanEvent NiDsXboxController::RightBumper(EventLoop* loop) const {
@@ -154,15 +170,15 @@ BooleanEvent NiDsXboxController::RightBumper(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetBackButton() const {
-  return GetRawButton(Button::kBack);
+  return m_hid->GetRawButton(Button::kBack);
 }
 
 bool NiDsXboxController::GetBackButtonPressed() {
-  return GetRawButtonPressed(Button::kBack);
+  return m_hid->GetRawButtonPressed(Button::kBack);
 }
 
 bool NiDsXboxController::GetBackButtonReleased() {
-  return GetRawButtonReleased(Button::kBack);
+  return m_hid->GetRawButtonReleased(Button::kBack);
 }
 
 BooleanEvent NiDsXboxController::Back(EventLoop* loop) const {
@@ -170,15 +186,15 @@ BooleanEvent NiDsXboxController::Back(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetStartButton() const {
-  return GetRawButton(Button::kStart);
+  return m_hid->GetRawButton(Button::kStart);
 }
 
 bool NiDsXboxController::GetStartButtonPressed() {
-  return GetRawButtonPressed(Button::kStart);
+  return m_hid->GetRawButtonPressed(Button::kStart);
 }
 
 bool NiDsXboxController::GetStartButtonReleased() {
-  return GetRawButtonReleased(Button::kStart);
+  return m_hid->GetRawButtonReleased(Button::kStart);
 }
 
 BooleanEvent NiDsXboxController::Start(EventLoop* loop) const {
@@ -186,15 +202,15 @@ BooleanEvent NiDsXboxController::Start(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetLeftStickButton() const {
-  return GetRawButton(Button::kLeftStick);
+  return m_hid->GetRawButton(Button::kLeftStick);
 }
 
 bool NiDsXboxController::GetLeftStickButtonPressed() {
-  return GetRawButtonPressed(Button::kLeftStick);
+  return m_hid->GetRawButtonPressed(Button::kLeftStick);
 }
 
 bool NiDsXboxController::GetLeftStickButtonReleased() {
-  return GetRawButtonReleased(Button::kLeftStick);
+  return m_hid->GetRawButtonReleased(Button::kLeftStick);
 }
 
 BooleanEvent NiDsXboxController::LeftStick(EventLoop* loop) const {
@@ -202,38 +218,79 @@ BooleanEvent NiDsXboxController::LeftStick(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetRightStickButton() const {
-  return GetRawButton(Button::kRightStick);
+  return m_hid->GetRawButton(Button::kRightStick);
 }
 
 bool NiDsXboxController::GetRightStickButtonPressed() {
-  return GetRawButtonPressed(Button::kRightStick);
+  return m_hid->GetRawButtonPressed(Button::kRightStick);
 }
 
 bool NiDsXboxController::GetRightStickButtonReleased() {
-  return GetRawButtonReleased(Button::kRightStick);
+  return m_hid->GetRawButtonReleased(Button::kRightStick);
 }
 
 BooleanEvent NiDsXboxController::RightStick(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetRightStickButton(); });
 }
 
+bool NiDsXboxController::IsConnected() const {
+  return m_hid->IsConnected();
+}
+
+GenericHID::HIDType NiDsXboxController::GetGamepadType() const {
+  return m_hid->GetGamepadType();
+}
+
+GenericHID::SupportedOutputs NiDsXboxController::GetSupportedOutputs() const {
+  return m_hid->GetSupportedOutputs();
+}
+
+std::string NiDsXboxController::GetName() const {
+  return m_hid->GetName();
+}
+
+int NiDsXboxController::GetPort() const {
+  return m_hid->GetPort();
+}
+
+void NiDsXboxController::SetRumble(GenericHID::RumbleType type,
+                              double value) {
+  m_hid->SetRumble(type, value);
+}
+
 void NiDsXboxController::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "NiDsXbox");
-  builder.AddDoubleProperty("LeftTrigger Axis", [this] { return GetLeftTriggerAxis(); }, nullptr);
-  builder.AddDoubleProperty("RightTrigger Axis", [this] { return GetRightTriggerAxis(); }, nullptr);
-  builder.AddDoubleProperty("LeftX", [this] { return GetLeftX(); }, nullptr);
-  builder.AddDoubleProperty("RightX", [this] { return GetRightX(); }, nullptr);
-  builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);
-  builder.AddDoubleProperty("RightY", [this] { return GetRightY(); }, nullptr);
-  builder.AddBooleanProperty("A", [this] { return GetAButton(); }, nullptr);
-  builder.AddBooleanProperty("B", [this] { return GetBButton(); }, nullptr);
-  builder.AddBooleanProperty("X", [this] { return GetXButton(); }, nullptr);
-  builder.AddBooleanProperty("Y", [this] { return GetYButton(); }, nullptr);
-  builder.AddBooleanProperty("LeftBumper", [this] { return GetLeftBumperButton(); }, nullptr);
-  builder.AddBooleanProperty("RightBumper", [this] { return GetRightBumperButton(); }, nullptr);
-  builder.AddBooleanProperty("Back", [this] { return GetBackButton(); }, nullptr);
-  builder.AddBooleanProperty("Start", [this] { return GetStartButton(); }, nullptr);
-  builder.AddBooleanProperty("LeftStick", [this] { return GetLeftStickButton(); }, nullptr);
-  builder.AddBooleanProperty("RightStick", [this] { return GetRightStickButton(); }, nullptr);
+  builder.AddDoubleProperty("LeftTrigger Axis",
+                            [this] { return GetLeftTriggerAxis(); }, nullptr);
+  builder.AddDoubleProperty("RightTrigger Axis",
+                            [this] { return GetRightTriggerAxis(); }, nullptr);
+  builder.AddDoubleProperty("LeftX",
+                            [this] { return GetLeftX(); }, nullptr);
+  builder.AddDoubleProperty("RightX",
+                            [this] { return GetRightX(); }, nullptr);
+  builder.AddDoubleProperty("LeftY",
+                            [this] { return GetLeftY(); }, nullptr);
+  builder.AddDoubleProperty("RightY",
+                            [this] { return GetRightY(); }, nullptr);
+  builder.AddBooleanProperty("A",
+                             [this] { return GetAButton(); }, nullptr);
+  builder.AddBooleanProperty("B",
+                             [this] { return GetBButton(); }, nullptr);
+  builder.AddBooleanProperty("X",
+                             [this] { return GetXButton(); }, nullptr);
+  builder.AddBooleanProperty("Y",
+                             [this] { return GetYButton(); }, nullptr);
+  builder.AddBooleanProperty("LeftBumper",
+                             [this] { return GetLeftBumperButton(); }, nullptr);
+  builder.AddBooleanProperty("RightBumper",
+                             [this] { return GetRightBumperButton(); }, nullptr);
+  builder.AddBooleanProperty("Back",
+                             [this] { return GetBackButton(); }, nullptr);
+  builder.AddBooleanProperty("Start",
+                             [this] { return GetStartButton(); }, nullptr);
+  builder.AddBooleanProperty("LeftStick",
+                             [this] { return GetLeftStickButton(); }, nullptr);
+  builder.AddBooleanProperty("RightStick",
+                             [this] { return GetRightStickButton(); }, nullptr);
 }

@@ -12,7 +12,6 @@
 
 #include "wpi/net/MulticastServiceAnnouncer.h"
 #include "wpi/net/MulticastServiceResolver.h"
-#include "wpi/util/timestamp.h"
 
 TEST(MulticastServiceAnnouncerTest, EmptyText) {
   const std::string_view serviceName = "TestServiceNoText";

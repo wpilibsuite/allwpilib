@@ -4,7 +4,10 @@
 
 #pragma once
 
+#include <string>
+
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/driverstation/HIDDevice.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -22,7 +25,7 @@ namespace wpi {
  * correct mapping, and only through the official NI DS. Sim is not guaranteed
  * to have the same mapping, as well as any 3rd party controllers.
  */
-class Gamepad : public GenericHID,
+class Gamepad : public HIDDevice,
                 public wpi::util::Sendable,
                 public wpi::util::SendableHelper<Gamepad> {
  public:
@@ -108,10 +111,31 @@ class Gamepad : public GenericHID,
    */
   explicit Gamepad(int port);
 
+  /**
+   * Construct an instance of a gamepad with a GenericHID object.
+   *
+   * @param hid The GenericHID object to use for this gamepad.
+   */
+  explicit Gamepad(GenericHID& hid);
+
   ~Gamepad() override = default;
 
   Gamepad(Gamepad&&) = default;
   Gamepad& operator=(Gamepad&&) = default;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  GenericHID& GetHID() override;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  const GenericHID& GetHID() const override;
 
   /**
    * Get the X axis value of left side of the controller. Right is positive.
@@ -190,7 +214,7 @@ class Gamepad : public GenericHID,
   void SetRightYDeadband(double deadband);
 
   /**
-   * Get the left trigger axis value of the controller. Note that this axis
+   * Get the left trigger value of the controller. Note that this axis
    * is bound to the range of [0, 1] as opposed to the usual [-1, 1].
    *
    * A deadband of 0.01 is applied by default. Use SetLeftTriggerDeadband() to
@@ -198,7 +222,7 @@ class Gamepad : public GenericHID,
    *
    * @return the axis value.
    */
-  double GetLeftTriggerAxis() const;
+  double GetLeftTrigger() const;
 
   /**
    * Set the deadband for the left trigger axis.
@@ -232,7 +256,7 @@ class Gamepad : public GenericHID,
   BooleanEvent LeftTrigger(EventLoop* loop) const;
 
   /**
-   * Get the right trigger axis value of the controller. Note that this axis
+   * Get the right trigger value of the controller. Note that this axis
    * is bound to the range of [0, 1] as opposed to the usual [-1, 1].
    *
    * A deadband of 0.01 is applied by default. Use SetRightTriggerDeadband() to
@@ -240,7 +264,7 @@ class Gamepad : public GenericHID,
    *
    * @return the axis value.
    */
-  double GetRightTriggerAxis() const;
+  double GetRightTrigger() const;
 
   /**
    * Set the deadband for the right trigger axis.
@@ -1157,6 +1181,92 @@ class Gamepad : public GenericHID,
   BooleanEvent AxisGreaterThan(Axis axis, double threshold,
                                EventLoop* loop) const;
 
+  /**
+   * Get the bitmask of axes for the gamepad.
+   *
+   * @return the number of axis for the current gamepad
+   */
+  int GetAxesAvailable() const;
+
+  /**
+   * For the current gamepad, return the bitmask of available buttons.
+   *
+   * @return the bitmask of buttons for the current gamepad
+   */
+  uint64_t GetButtonsAvailable() const;
+
+  /**
+   * Get if the gamepad is connected.
+   *
+   * @return true if the gamepad is connected
+   */
+  bool IsConnected() const;
+
+  /**
+   * Get the type of the gamepad.
+   *
+   * @return the type of the gamepad.
+   */
+  GenericHID::HIDType GetGamepadType() const;
+
+  /**
+   * Get the supported outputs for the gamepad.
+   *
+   * @return the supported outputs for the gamepad.
+   */
+  GenericHID::SupportedOutputs GetSupportedOutputs() const;
+
+  /**
+   * Get the name of the gamepad.
+   *
+   * @return the name of the gamepad.
+   */
+  std::string GetName() const;
+
+  /**
+   * Get the port number of the gamepad.
+   *
+   * @return The port number of the gamepad.
+   */
+  int GetPort() const;
+
+  /**
+   * Set leds on the gamepad. If only mono is supported, the system will use
+   * the highest value passed in.
+   *
+   * @param r Red value from 0-255
+   * @param g Green value from 0-255
+   * @param b Blue value from 0-255
+   */
+  void SetLeds(int r, int g, int b);
+
+  /**
+   * Set the rumble output for the HID.
+   *
+   * The DS currently supports 4 rumble values: left rumble, right rumble, left
+   * trigger rumble, and right trigger rumble.
+   *
+   * @param type  Which rumble value to set
+   * @param value The normalized value (0 to 1) to set the rumble to
+   */
+  void SetRumble(GenericHID::RumbleType type, double value);
+
+  /**
+   * Check if a touchpad finger is available.
+   * @param touchpad The touchpad to check.
+   * @param finger The finger to check.
+   * @return true if the touchpad finger is available.
+   */
+  bool GetTouchpadFingerAvailable(int touchpad, int finger) const;
+
+  /**
+   * Get the touchpad finger data.
+   * @param touchpad The touchpad to read.
+   * @param finger The finger to read.
+   * @return The touchpad finger data.
+   */
+  TouchpadFinger GetTouchpadFinger(int touchpad, int finger) const;
+
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
@@ -1169,6 +1279,7 @@ class Gamepad : public GenericHID,
   double m_rightYDeadband = 0.1;
   double m_leftTriggerDeadband = 0.01;
   double m_rightTriggerDeadband = 0.01;
+  GenericHID* m_hid;
 };
 
 }  // namespace wpi

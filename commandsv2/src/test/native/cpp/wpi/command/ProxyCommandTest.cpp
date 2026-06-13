@@ -4,8 +4,6 @@
 
 #include "wpi/commands2/ProxyCommand.hpp"
 
-#include <memory>
-
 #include "CommandTestBase.hpp"
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/Commands.hpp"

@@ -5,7 +5,6 @@
 #include "wpi/sysid/analysis/SimpleMotorSim.hpp"
 
 #include "wpi/math/system/Discretization.hpp"
-#include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/util/MathExtras.hpp"
 
 using namespace sysid;

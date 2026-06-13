@@ -11,8 +11,6 @@
 #include <utility>
 #include <variant>
 
-#include <fmt/format.h>
-
 #include "Log.hpp"
 #include "Message.hpp"
 #include "WireConnection.hpp"
