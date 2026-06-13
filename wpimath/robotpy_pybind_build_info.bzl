@@ -25,16 +25,6 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             trampolines = [],
         ),
         struct(
-            class_name = "ArmFeedforward",
-            yml_file = "semiwrap/ArmFeedforward.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/controller/ArmFeedforward.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::ArmFeedforward", "wpi__math__ArmFeedforward.hpp"),
-            ],
-        ),
-        struct(
             class_name = "AntiTipping",
             yml_file = "semiwrap/AntiTipping.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
@@ -42,6 +32,16 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::math::AntiTipping", "wpi__math__AntiTipping.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "ArmFeedforward",
+            yml_file = "semiwrap/ArmFeedforward.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/controller/ArmFeedforward.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::ArmFeedforward", "wpi__math__ArmFeedforward.hpp"),
             ],
         ),
         struct(
