@@ -20,6 +20,6 @@ class Robot : public wpi::TimedRobot {
   void DisabledInit() override;
 
  private:
-  wpi::Joystick m_joystick{kJoystickPort};
-  Arm m_arm;
+  wpi::Joystick joystick{kJoystickPort};
+  Arm arm;
 };

@@ -28,7 +28,7 @@ Both FTC and FRC historically have had at least some level of support for operat
 
 ### Core concepts
 
-- The robot has 3 fixed system-level modes of operation: autonomous, teleoperated, and test
+- The robot has 3 fixed system-level modes of operation: autonomous, teleoperated, and utility
 - The robot is in either enabled (actuators enabled) or disabled (actuators disabled) state
 - In competition matches, the Field Management System (FMS) automatically transitions between autonomous, disabled, and teleoperated modes
 - Robot code is structured around a top-level Robot class that instantiates the hardware objects as member variables (often organized into subsystem objects stored as members) and functions that run in each robot mode; the library robot base class handles calling these functions as directed by the DS
@@ -37,7 +37,7 @@ Both FTC and FRC historically have had at least some level of support for operat
 
 ### Driver Station
 
-When not connected to the Field Management System (FMS), the [FRC driver station application](https://docs.wpilib.org/en/stable/docs/software/driverstation/driver-station.html) provides the operator a fixed selection of 4 different modes of robot operation (teleoperated, autonomous, test, and practice) and buttons to enable and disable the robot.  In three of these modes (teleoperated, autonomous, and test), selecting a mode and enabling the robot immediately starts code execution for that mode for an unlimited amount of time (until the user disables the robot).  The "practice" mode provides for off-field testing of match behavior by mimicking match behavior (automatically transitioning disabled->auto->disabled->teleop->disabled with pre-configured durations for each step).
+When not connected to the Field Management System (FMS), the [FRC driver station application](https://docs.wpilib.org/en/stable/docs/software/driverstation/driver-station.html) provides the operator a fixed selection of 4 different modes of robot operation (teleoperated, autonomous, utility, and practice) and buttons to enable and disable the robot.  In three of these modes (teleoperated, autonomous, and utility), selecting a mode and enabling the robot immediately starts code execution for that mode for an unlimited amount of time (until the user disables the robot).  The "practice" mode provides for off-field testing of match behavior by mimicking match behavior (automatically transitioning disabled->auto->disabled->teleop->disabled with pre-configured durations for each step).
 
 ![Driver Station GUI](https://docs.wpilib.org/en/stable/_images/ds-operation-tab.webp)
 
@@ -51,11 +51,11 @@ Separate from the driver station application, WPILib-provided as well as custom 
 
 ### Robot Code
 
-The standard WPILib team code structure derives a single team-written `Robot` class from an "periodic" robot base class.  This `Robot` class is constructed and run by the Java `main()` function.  After construction, the base class implementation runs a periodic loop (typically running on a 20 ms period, although that can be changed by the user) that reads the enabled state and teleop/auto/test mode provided by the DS and calls overrideable functions for each mode (disabled, teleop, auto, and test), as well as a `robotPeriodic` overrideable function that is always called regardless of mode.  Three overrideable functions are provided for each mode: an init function (called when the mode is transitioned into from another mode), a periodic function (called on a fixed period), and an exit function (called when the mode is transitioned out of into another mode).  Teams override these functions in their Robot derived class to implement their robot code.  Because of this code structure, teams generally create their hardware configuration (can be flat or organized into subsystems) and other objects as member variables within the Robot class (constructed at robot start) and share them across all modes of operation.
+The standard WPILib team code structure derives a single team-written `Robot` class from an "periodic" robot base class.  This `Robot` class is constructed and run by the Java `main()` function.  After construction, the base class implementation runs a periodic loop (typically running on a 20 ms period, although that can be changed by the user) that reads the enabled state and teleop/auto/utility mode provided by the DS and calls overrideable functions for each mode (disabled, teleop, auto, and utility), as well as a `robotPeriodic` overrideable function that is always called regardless of mode.  Three overrideable functions are provided for each mode: an init function (called when the mode is transitioned into from another mode), a periodic function (called on a fixed period), and an exit function (called when the mode is transitioned out of into another mode).  Teams override these functions in their Robot derived class to implement their robot code.  Because of this code structure, teams generally create their hardware configuration (can be flat or organized into subsystems) and other objects as member variables within the Robot class (constructed at robot start) and share them across all modes of operation.
 
-WPILib provides a class called `SendableChooser` for creating the drop-down lists shown on the dashboard.  This class is a generic/template class that provides a map of string key (shown on the drop-down) and object value (read by robot code).  This is typically displayed by dashboards as a simple list with no categorization.  This feature is most often used by teams for autonomous routine selection, but is not limited to that use case.  Examples and templates show teams how to instantiate this class, add it to the dashboard, and use it for operator selection of different autonomous routines (by reading the chosen value from the object and executing different code).  Examples of how to use `SendableChooser` for operator selection in other modes (e.g. teleop or test) is not provided, and it's generally uncommon for teams to use it in that way–most team code has just a single teleop routine, and the test mode is rarely used (manual testing code is instead usually integrated as part of the teleop routine).
+WPILib provides a class called `SendableChooser` for creating the drop-down lists shown on the dashboard.  This class is a generic/template class that provides a map of string key (shown on the drop-down) and object value (read by robot code).  This is typically displayed by dashboards as a simple list with no categorization.  This feature is most often used by teams for autonomous routine selection, but is not limited to that use case.  Examples and templates show teams how to instantiate this class, add it to the dashboard, and use it for operator selection of different autonomous routines (by reading the chosen value from the object and executing different code).  Examples of how to use `SendableChooser` for operator selection in other modes (e.g. teleop or utility) is not provided, and it's generally uncommon for teams to use it in that way–most team code has just a single teleop routine, and the utility mode is rarely used (manual testing code is instead usually integrated as part of the teleop routine).
 
-Historically, WPILib offered a "simple" (later renamed to "sample") robot base class that had single overrideable functions for teleop, auto, and test, with no outer periodic loop (the user was responsible for writing the loop).  This was deprecated and removed circa 2016 as it was common to see teams writing autonomous loops or sleeps without proper exit condition checking (e.g. wait for the robot to drive X feet), resulting in the robot code never exiting autonomous and thus not transitioning to teleoperated in matches.  After removal of this template, this relatively common issue has entirely disappeared.
+Historically, WPILib offered a "simple" (later renamed to "sample") robot base class that had single overrideable functions for teleop, auto, and utility, with no outer periodic loop (the user was responsible for writing the loop).  This was deprecated and removed circa 2016 as it was common to see teams writing autonomous loops or sleeps without proper exit condition checking (e.g. wait for the robot to drive X feet), resulting in the robot code never exiting autonomous and thus not transitioning to teleoperated in matches.  After removal of this template, this relatively common issue has entirely disappeared.
 
 ## FTC
 
@@ -104,13 +104,13 @@ A clear enable/disable in the Driver Station that disables all robot actuators w
 
 The enabled "Init" step in the 2025 FTC SDK/DS is not a requirement due to anticipated rule changes.  However, performing initialization of opmodes while the robot is still disabled is a requirement for both FTC and FRC, as it's important for user code to be able to do expensive opmode-specific operations (e.g. computing autonomous paths) prior to actually starting the match.
 
-Providing the top-level teleop, autonomous, and test selection available in the 2025 FRC driver station is desirable and has few downsides for either program.  In combination with code specifying the applicable opmodes (also desirable), this allows for filtering down of selectable opmodes.  The "practice" mode feature of the 2025 FRC driver station which automatically transitions between modes based on time is a very useful tool for teams to simulate match transitions at home and should be retained, but should be renamed to reduce confusion, particularly as this mode is likely to be used for FTC matches without a FMS, "match" mode could be a good name for this feature.
+Providing the top-level teleop, autonomous, and utility selection available in the 2025 FRC driver station is desirable and has few downsides for either program.  In combination with code specifying the applicable opmodes (also desirable), this allows for filtering down of selectable opmodes.  The "practice" mode feature of the 2025 FRC driver station which automatically transitions between modes based on time is a very useful tool for teams to simulate match transitions at home and should be retained, but should be renamed to reduce confusion, particularly as this mode is likely to be used for FTC matches without a FMS, "match" mode could be a good name for this feature.
 
 # Design
 
 ## Overview / Key Features
 
-- DS provides a prominent enable/disable state control and a teleop/auto/test/match selector.  For teleop/auto/test, enabling the robot immediately starts execution of the selected opmode; in match mode, a match sequence is followed (auto mode followed by a disabled delay, followed by teleop mode).
+- DS provides a prominent enable/disable state control and a teleop/auto/utility/match selector.  For teleop/auto/utility, enabling the robot immediately starts execution of the selected opmode; in match mode, a match sequence is followed (auto mode followed by a disabled delay, followed by teleop mode).
 
 - DS provides drop-down selector(s) for the user-defined opmodes; these are filtered based on the top-level mode selector (e.g. if auto is selected, a single drop-down selector of just the auto opmodes is provided).  For match mode or when FMS-attached, two drop downs are provided (one for auto opmode selection and one for teleop opmode selection).  The drop-down selector provides grouped categories as specified by the robot program.
 
@@ -118,11 +118,11 @@ Providing the top-level teleop, autonomous, and test selection available in the 
 
 - The Robot class has access to comprehensive lifecycle methods that are called at different stages of robot operation, providing behavior that occurs across all opmodes.
 
-- OpModes are usually registered via annotation of classes.  These annotations may specify a name (or default to the class name), group name (for grouping of routines in the selection list), description, and optional display colors.  Annotations are used to specify whether the class is a teleop, auto, or test opmode.
+- OpModes are usually registered via annotation of classes.  These annotations may specify a name (or default to the class name), group name (for grouping of routines in the selection list), description, and optional display colors.  Annotations are used to specify whether the class is a teleop, auto, or utility opmode.
 
 - OpModes may also be registered via explicit function calls.  As C++ does not support annotations, function call registration is the only available method in that language.  If manually registered, `publishOpModes()` must be called to publish the list of opmodes to the DS.
 
-- For maximum flexibility, all code in the robot project has access to the enable/disable state, the overall robot teleop/auto/test mode, and the selected opmodes for teleop, auto, and test (even when the robot is disabled).
+- For maximum flexibility, all code in the robot project has access to the enable/disable state, the overall robot teleop/auto/utility mode, and the selected opmodes for teleop, auto, and utility (even when the robot is disabled).
 
 - OpModes may be periodic or linear (or custom).  The Robot base class handles switching between opmodes and opmode object instance creation.  OpMode objects are constructed when the drop-down selection is made in the DS and run when the robot is enabled.
 
@@ -130,17 +130,17 @@ How opmodes work with the command-based framework is described in [a separate de
 
 ## Driver Station
 
-For reference, the FRC driver station is shown below.  This illustrates the enable/disable control (2) as well as the teleop/auto/practice/test selector (1).  For this design, "practice" is renamed to "match" for clarity.
+For reference, the FRC driver station is shown below.  This illustrates the enable/disable control (2) as well as the teleop/auto/practice/utility selector (1).  For this design, "practice" is renamed to "match" for clarity.
 
 ![Driver Station GUI](https://docs.wpilib.org/en/stable/_images/ds-operation-tab.webp)
 
-One or two drop-down selectors are added to this main screen.  One selector is displayed in teleop, auto, and test modes; two selectors (one for auto and one for teleop) is displayed in match mode (either manually selected by clicking "match," or when the DS is FMS-attached).
+One or two drop-down selectors are added to this main screen.  One selector is displayed in teleop, auto, and utility modes; two selectors (one for auto and one for teleop) is displayed in match mode (either manually selected by clicking "match," or when the DS is FMS-attached).
 
 The drop-down lists have the opmodes (as defined by user code) organized into groups, similar to the below.  The groups and opmodes are sorted.
 
 ![Combo box with groups](https://i.sstatic.net/4Cmfk.gif)
 
-Only the opmodes appropriate to the selected mode are shown in the corresponding list.  For example, if the "Test" option is selected, a single drop-down list with only test opmodes listed will be shown.
+Only the opmodes appropriate to the selected mode are shown in the corresponding list.  For example, if the "Utility" option is selected, a single drop-down list with only utility opmodes listed will be shown.
 
 ## Robot Code User-Facing API
 
@@ -205,7 +205,7 @@ public abstract class OpModeRobot extends RobotBase {
 }
 ```
 
-`OpModeRobot` (in Java) automatically scans the user's package and subpackages for `@Autonomous`, `@Teleop`, and `@TestOpMode` classes in its constructor and publishes that list to the DS.  When opmodes are added or removed manually after construction, `publishOpModes()` must be called to push changes to the DS.
+`OpModeRobot` (in Java) automatically scans the user's package and subpackages for `@Autonomous`, `@Teleop`, and `@Utility` classes in its constructor and publishes that list to the DS.  When opmodes are added or removed manually after construction, `publishOpModes()` must be called to push changes to the DS.
 
 ### OpMode Classes
 
@@ -219,7 +219,7 @@ The lifecycle of an opmode is:
 - If robot disables or a different opmode is selected while enabled, `end()` is called then `close()` is called (Java), or the object is destroyed (C++/Python); the object is not reused
 - If a different opmode is selected while disabled, only `close()` is called (Java), or the object is destroyed (C++); the object is not reused
 
-Following `close()` being called (Java)/the opmode being destroyed (C++), a *new* opmode object is constructed based on the DS teleop/auto/test/match selector and selected opmode.  In teleop/auto/test, the drop-down selection will be the same as before the previous enable, so the same opmode class is constructed again.  In match (or when FMS-connected), only the selected auto opmode object is initially constructed; once auto completes, the selected teleop opmode object is constructed.  Thus only zero or one opmode objects will ever be "alive" at any given time.
+Following `close()` being called (Java)/the opmode being destroyed (C++), a *new* opmode object is constructed based on the DS teleop/auto/utility/match selector and selected opmode.  In teleop/auto/utility, the drop-down selection will be the same as before the previous enable, so the same opmode class is constructed again.  In match (or when FMS-connected), only the selected auto opmode object is initially constructed; once auto completes, the selected teleop opmode object is constructed.  Thus only zero or one opmode objects will ever be "alive" at any given time.
 
 For consistency in operation, the library will ensure that `disabledPeriodic()` is always called at least once before `start()` is called.
 
@@ -272,7 +272,7 @@ All annotations are class-level.  All elements are optional and may be omitted. 
             String textColor, String backgroundColor)
 @Teleop(String name, String group, String description,
          String textColor, String backgroundColor)
-@TestOpMode(String name, String group, String description,
+@Utility(String name, String group, String description,
             String textColor, String backgroundColor)
 ```
 
@@ -287,7 +287,7 @@ public class MyAuto extends PeriodicOpMode {...}
 @Teleop(name="Arcade", textColor="#FFFFFF", backgroundColor="#003366")
 public class MyTeleop extends PeriodicOpMode {...}
 
-@TestOpMode(name="Arm Test", group="mechanisms", description="tests arm")
+@Utility(name="Arm Test", group="mechanisms", description="tests arm")
 public class MyTest extends PeriodicOpMode {...}
 ```
 
@@ -306,7 +306,7 @@ public final class DriverStation {
   // they return false when the robot is disabled
   public static boolean isAutonomous() {...}
   public static boolean isTeleoperated() {...}
-  public static boolean isTest() {...}
+  public static boolean isUtility() {...}
 
   // returns the currently selected opmode for the currently selected robot mode;
   // this works even when the robot is disabled
@@ -336,7 +336,7 @@ The following example code for non-command-based Java demonstrates the following
 - Robot class
 - A periodic autonomous opmode
 - A periodic teleop opmode
-- A periodic test opmode
+- A periodic utility opmode
 
 Robot:
 
@@ -396,10 +396,10 @@ public class Teleop extends PeriodicOpMode {
 }
 ```
 
-Test opmode:
+Utility opmode:
 
 ```java
-@TestOpMode(name="Blink dashboard indicator")
+@UtilityOpMode(name="Blink dashboard indicator")
 public class TestDashboardIndicator extends PeriodicOpMode {
   private final Timer timer = new Timer();
   private boolean m_logged;
@@ -433,7 +433,7 @@ Should be able to be annotation (decorator) based, similar to Java.
 
 ## HAL
 
-At the HAL level, Control Word bits indicate enabled state and teleop/auto/test selection (identical to current WPILib).  The Control Word needs to be lengthened to 64-bit to indicate the selected opmode, and functions to maintain the list of available opmodes need to be added.  An "opmode ID" is the combination of the opmode hash and the robot mode (e.g. teleop/auto/test).
+At the HAL level, Control Word bits indicate enabled state and teleop/auto/utility selection (identical to current WPILib).  The Control Word needs to be lengthened to 64-bit to indicate the selected opmode, and functions to maintain the list of available opmodes need to be added.  An "opmode ID" is the combination of the opmode hash and the robot mode (e.g. teleop/auto/utility).
 
 To communicate the selected opmode ID, `HAL_ControlWord` needs to become a 64-bit type; changing it from a bitfield to a type with helper functions also will improve the ease of use:
 - `HAL_ControlWord HAL_MakeControlWord(int64_t opModeHash, HAL_RobotMode robotMode, HAL_Bool enabled, HAL_Bool eStop, HAL_Bool fmsAttached, HAL_Bool dsAttached)` - builds a control word from its parts
@@ -453,7 +453,7 @@ Adding the following function enables maintaining the available opmode options l
 - `void HAL_SetOpModeOptions(HAL_OpModeOption* array, int count)` – sets the list of available opmode options
 
 `HAL_OpModeOption` is a structure describing each option:
-- `long id` - unique ID identifying the opmode (robot mode, name) pair.  This encodes the robot mode in the upper bits, indicating which robot mode the opmode should be visible for (auto/teleop/test)
+- `long id` - unique ID identifying the opmode (robot mode, name) pair.  This encodes the robot mode in the upper bits, indicating which robot mode the opmode should be visible for (auto/teleop/utility)
 - `string name`
 - `string group`
 - `string description`
@@ -461,19 +461,19 @@ Adding the following function enables maintaining the available opmode options l
 - `int backgroundColor` - optional, used to set the text color for the option in the DS GUI
 
 The user program observe functions also need to be updated:
-- Replace `HAL_ObserveUserProgramDisabled()`, `HAL_ObserveUserProgramAutonomous()`, `HAL_ObserveUserProgramTeleop()`, and `HAL_ObserveUserProgramTest()` with `HAL_ObserveUserProgram(HAL_ControlWord word)`
+- Replace `HAL_ObserveUserProgramDisabled()`, `HAL_ObserveUserProgramAutonomous()`, `HAL_ObserveUserProgramTeleop()`, and `HAL_ObserveUserProgramUtility()` with `HAL_ObserveUserProgram(HAL_ControlWord word)`
 
 ## DS Protocol
 
 The list of opmodes (and details thereof) is communicated from the Robot to the DS via the tagged TCP link.
 
-As in the current FRC protocol, the enabled state and teleop/auto/test selection are sent as part of the UDP control word from the DS to the Robot. Additionally, the selected opmode is sent as part of every UDP packet.  This is done via a 56-bit hash of each opmode's name.  Hash collisions are extremely low probability given the low quantity of opmodes, but this can be checked on the robot side when generating the opmode list, and spaces appended as necessary to the provided names to uniquify the hashes.  The selected opmode is sent even when the robot is disabled.
+As in the current FRC protocol, the enabled state and teleop/auto/utility selection are sent as part of the UDP control word from the DS to the Robot. Additionally, the selected opmode is sent as part of every UDP packet.  This is done via a 56-bit hash of each opmode's name.  Hash collisions are extremely low probability given the low quantity of opmodes, but this can be checked on the robot side when generating the opmode list, and spaces appended as necessary to the provided names to uniquify the hashes.  The selected opmode is sent even when the robot is disabled.
 
 # Migration from 2025 FRC (WPILib)
 
 Key differences from 2025 FRC:
 - The per-opmode overrideable functions in Robot are replaced with separate annotated per-opmode classes (for non-command-based)
-- `SendableChooser` is no longer required for selecting autonomous routines; instead this functionality is integrated into opmodes, as users can create/register multiple autonomous opmodes classes, and it's been extended to support multiple teleoperated and multiple test opmodes
+- `SendableChooser` is no longer required for selecting autonomous routines; instead this functionality is integrated into opmodes, as users can create/register multiple autonomous opmodes classes, and it's been extended to support multiple teleoperated and multiple utility opmodes
 - Selection of autonomous opmodes is integrated into the DS instead of being performed by the dashboard
 
 # Migration from 2025 FTC (FTC SDK)
@@ -488,7 +488,7 @@ Key differences from 2025 FTC:
 
 # Alternatives
 
-Use SendableChooser for more opmodes (teleop and test as well as autonomous); downsides of this:
+Use SendableChooser for more opmodes (teleop and utility as well as autonomous); downsides of this:
 - Doesn't provide a first-class opmode lifecycle or opmode-specific callback scheduling model
 - Harder to use than annotations (generic class)
 - No grouping, no filtering by opmode (although these could be added)

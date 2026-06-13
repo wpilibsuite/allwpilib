@@ -18,8 +18,8 @@ jobs:
         include:
           - os: ubuntu-24.04
             name: Linux
-            container: wpilib/systemcore-cross-ubuntu:2027-24.04
-            flags: "--preset with-java-and-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
+            container: wpilib/systemcore-cross-debian:trixie
+            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
           - os: macOS-15
             name: macOS
             container: ""
@@ -35,7 +35,7 @@ jobs:
     steps:
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv-java ninja-build
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev ninja-build
 
       - name: Setup avahi-daemon
         if: runner.os == 'Linux'
@@ -55,7 +55,7 @@ jobs:
         uses: lukka/get-cmake@v3.29.3
 
       - name: Install sccache
-        uses: mozilla-actions/sccache-action@v0.0.9
+        uses: mozilla-actions/sccache-action@v0.0.10
 
       - uses: actions/checkout@v6
 

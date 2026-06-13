@@ -56,7 +56,7 @@ HAL_ENUM(HAL_RobotMode) {
   HAL_ROBOT_MODE_UNKNOWN = 0,
   HAL_ROBOT_MODE_AUTONOMOUS,
   HAL_ROBOT_MODE_TELEOPERATED,
-  HAL_ROBOT_MODE_TEST,
+  HAL_ROBOT_MODE_UTILITY,
 };
 
 /**
@@ -164,7 +164,7 @@ struct HAL_JoystickDescriptor {
 typedef struct HAL_JoystickDescriptor HAL_JoystickDescriptor;
 
 struct HAL_MatchInfo {
-  char eventName[64];
+  char eventName[65];
   HAL_MatchType matchType;
   uint16_t matchNumber;
   uint8_t replayNumber;

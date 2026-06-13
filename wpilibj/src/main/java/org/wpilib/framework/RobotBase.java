@@ -8,8 +8,6 @@ import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.RobotState;
-import org.wpilib.driverstation.UserControls;
-import org.wpilib.driverstation.UserControlsInstance;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.HALUtil;
@@ -131,7 +129,7 @@ public abstract class RobotBase implements AutoCloseable {
             false,
             event -> {
               if (event.is(NetworkTableEvent.Kind.CONNECTED)) {
-                HAL.reportUsage("NT/" + event.connInfo.remote_id, "");
+                HAL.reportUsage("NT/" + event.connInfo.remoteId, "");
               }
             });
   }
@@ -217,21 +215,22 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is currently in Test mode as determined by the Driver Station.
+   * Determine if the robot is currently in Utility mode as determined by the Driver Station.
    *
-   * @return True if the robot is currently operating in Test mode.
+   * @return True if the robot is currently operating in Utility mode.
    */
-  public static boolean isTest() {
-    return RobotState.isTest();
+  public static boolean isUtility() {
+    return RobotState.isUtility();
   }
 
   /**
-   * Determine if the robot is current in Test mode and enabled as determined by the Driver Station.
+   * Determine if the robot is current in Utility mode and enabled as determined by the Driver
+   * Station.
    *
-   * @return True if the robot is currently operating in Test mode while enabled.
+   * @return True if the robot is currently operating in Utility mode while enabled.
    */
-  public static boolean isTestEnabled() {
-    return RobotState.isTestEnabled();
+  public static boolean isUtilityEnabled() {
+    return RobotState.isUtilityEnabled();
   }
 
   /**
@@ -290,29 +289,16 @@ public abstract class RobotBase implements AutoCloseable {
   private static boolean m_suppressExitWarning;
 
   private static <T extends RobotBase> T constructRobot(Class<T> robotClass) throws Throwable {
-    UserControlsInstance userControlsAttribute =
-        robotClass.getDeclaredAnnotation(UserControlsInstance.class);
-    UserControls userControlsInstance = null;
-    Optional<ConstructorMatch<T>> constructorMatch;
-    if (userControlsAttribute != null) {
-      var userControlsClass = userControlsAttribute.value();
-      userControlsInstance = userControlsClass.getDeclaredConstructor().newInstance();
-      constructorMatch = ConstructorMatch.findBestConstructor(robotClass, userControlsClass);
-    } else {
-      constructorMatch = ConstructorMatch.findBestConstructor(robotClass);
-    }
+    Optional<ConstructorMatch<T>> constructorMatch =
+        ConstructorMatch.findBestConstructor(robotClass);
 
     if (constructorMatch.isEmpty()) {
       throw new IllegalArgumentException(
           "No valid constructor found in robot class " + robotClass.getName());
     }
 
-    T robot = constructorMatch.get().newInstance(userControlsInstance);
+    T robot = constructorMatch.get().newInstance();
 
-    if (robot instanceof OpModeRobot opModeRobot) {
-      // Insert the UserControls instance into the opModeRobot for use when constructing opmodes
-      opModeRobot.setUserControlsInstance(userControlsInstance);
-    }
     return robot;
   }
 
@@ -343,6 +329,7 @@ public abstract class RobotBase implements AutoCloseable {
               + "  See https://wpilib.org/stacktrace for more information.\n",
           false);
       DriverStationErrors.reportError("Could not instantiate robot " + robotName + "!", false);
+      DriverStationErrors.reportCrash("Could not instantiate robot " + robotName + "!", elements);
       return;
     }
 
@@ -359,6 +346,8 @@ public abstract class RobotBase implements AutoCloseable {
         throwable = cause;
       }
       DriverStationErrors.reportError(
+          "Unhandled exception: " + throwable, throwable.getStackTrace());
+      DriverStationErrors.reportCrash(
           "Unhandled exception: " + throwable, throwable.getStackTrace());
       errorOnExit = true;
     } finally {

@@ -25,30 +25,30 @@ void callback(const char* name, void* param, const unsigned char* buffer,
 template <typename T>
 class I2CCommunicationTest : public testing::TestWithParam<T> {
  public:
-  Robot m_robot;
-  std::optional<std::thread> m_thread;
-  int32_t m_callback;
-  int32_t m_port;
+  Robot robot;
+  std::optional<std::thread> thread;
+  int32_t callbackHandle;
+  int32_t port;
 
   void SetUp() override {
     gString = std::string();
     wpi::sim::PauseTiming();
     wpi::sim::SetProgramStarted(false);
     wpi::sim::DriverStationSim::ResetData();
-    m_port = static_cast<int32_t>(Robot::kPort);
+    port = static_cast<int32_t>(Robot::kPort);
 
-    m_callback = HALSIM_RegisterI2CWriteCallback(m_port, &callback, nullptr);
+    callbackHandle = HALSIM_RegisterI2CWriteCallback(port, &callback, nullptr);
 
-    m_thread = std::thread([&] { m_robot.StartCompetition(); });
+    thread = std::thread([&] { robot.StartCompetition(); });
     wpi::sim::WaitForProgramStart();
   }
 
   void TearDown() override {
-    m_robot.EndCompetition();
-    m_thread->join();
+    robot.EndCompetition();
+    thread->join();
 
-    HALSIM_CancelI2CWriteCallback(m_port, m_callback);
-    HALSIM_ResetI2CData(m_port);
+    HALSIM_CancelI2CWriteCallback(port, callbackHandle);
+    HALSIM_ResetI2CData(port);
   }
 };
 
@@ -59,7 +59,7 @@ TEST_P(AllianceTest, Alliance) {
   wpi::sim::DriverStationSim::SetAllianceStationId(alliance);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_TRUE(HALSIM_GetI2CInitialized(m_port));
+  EXPECT_TRUE(HALSIM_GetI2CInitialized(port));
 
   wpi::sim::StepTiming(20_ms);
 
@@ -116,7 +116,7 @@ TEST_P(EnabledTest, Enabled) {
   wpi::sim::DriverStationSim::SetEnabled(enabled);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_TRUE(HALSIM_GetI2CInitialized(m_port));
+  EXPECT_TRUE(HALSIM_GetI2CInitialized(port));
 
   wpi::sim::StepTiming(20_ms);
 
@@ -135,7 +135,7 @@ TEST_P(AutonomousTest, Autonomous) {
       autonomous ? HAL_ROBOT_MODE_AUTONOMOUS : HAL_ROBOT_MODE_TELEOPERATED);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_TRUE(HALSIM_GetI2CInitialized(m_port));
+  EXPECT_TRUE(HALSIM_GetI2CInitialized(port));
 
   wpi::sim::StepTiming(20_ms);
 
@@ -153,7 +153,7 @@ TEST_P(MatchTimeTest, Alert) {
   wpi::sim::DriverStationSim::SetMatchTime(matchTime);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_TRUE(HALSIM_GetI2CInitialized(m_port));
+  EXPECT_TRUE(HALSIM_GetI2CInitialized(port));
 
   wpi::sim::StepTiming(20_ms);
 

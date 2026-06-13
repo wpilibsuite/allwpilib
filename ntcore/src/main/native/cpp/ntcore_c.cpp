@@ -274,6 +274,14 @@ void NT_GetTopicName(NT_Topic topic, struct WPI_String* name) {
   wpi::nt::ConvertToC(wpi::nt::GetTopicName(topic), name);
 }
 
+void* NT_GetTopicUserData(NT_Topic topic) {
+  return wpi::nt::GetTopicUserData(topic);
+}
+
+void NT_SetTopicUserData(NT_Topic topic, void* userData) {
+  wpi::nt::SetTopicUserData(topic, userData);
+}
+
 NT_Type NT_GetTopicType(NT_Topic topic) {
   return wpi::nt::GetTopicType(topic);
 }

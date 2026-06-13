@@ -18,29 +18,29 @@
 #include "wpi/util/Preferences.hpp"
 
 class ArmSimulationTest : public testing::TestWithParam<wpi::units::degree_t> {
-  Robot m_robot;
-  std::optional<std::thread> m_thread;
+  Robot robot;
+  std::optional<std::thread> thread;
 
  protected:
-  wpi::sim::PWMMotorControllerSim m_motorSim{kMotorPort};
-  wpi::sim::EncoderSim m_encoderSim =
+  wpi::sim::PWMMotorControllerSim motorSim{kMotorPort};
+  wpi::sim::EncoderSim encoderSim =
       wpi::sim::EncoderSim::CreateForChannel(kEncoderAChannel);
-  wpi::sim::JoystickSim m_joystickSim{kJoystickPort};
+  wpi::sim::JoystickSim joystickSim{kJoystickPort};
 
  public:
   void SetUp() override {
     wpi::sim::PauseTiming();
     wpi::sim::SetProgramStarted(false);
 
-    m_thread = std::thread([&] { m_robot.StartCompetition(); });
+    thread = std::thread([&] { robot.StartCompetition(); });
     wpi::sim::WaitForProgramStart();
   }
 
   void TearDown() override {
-    m_robot.EndCompetition();
-    m_thread->join();
+    robot.EndCompetition();
+    thread->join();
 
-    m_encoderSim.ResetData();
+    encoderSim.ResetData();
     wpi::sim::DriverStationSim::ResetData();
     wpi::Preferences::RemoveAll();
   }
@@ -60,25 +60,25 @@ TEST_P(ArmSimulationTest, Teleop) {
     wpi::sim::DriverStationSim::SetEnabled(true);
     wpi::sim::DriverStationSim::NotifyNewData();
 
-    EXPECT_TRUE(m_encoderSim.GetInitialized());
+    EXPECT_TRUE(encoderSim.GetInitialized());
   }
 
   {
     wpi::sim::StepTiming(3_s);
 
     // Ensure arm is still at minimum angle.
-    EXPECT_NEAR(kMinAngle.value(), m_encoderSim.GetDistance(), 2.0);
+    EXPECT_NEAR(kMinAngle.value(), encoderSim.GetDistance(), 2.0);
   }
 
   {
     // Press button to reach setpoint
-    m_joystickSim.SetTrigger(true);
-    m_joystickSim.NotifyNewData();
+    joystickSim.SetTrigger(true);
+    joystickSim.NotifyNewData();
 
     wpi::sim::StepTiming(1.5_s);
 
     EXPECT_NEAR(setpoint.value(),
-                wpi::units::radian_t(m_encoderSim.GetDistance())
+                wpi::units::radian_t(encoderSim.GetDistance())
                     .convert<wpi::units::degree>()
                     .value(),
                 2.0);
@@ -87,7 +87,7 @@ TEST_P(ArmSimulationTest, Teleop) {
     wpi::sim::StepTiming(0.5_s);
 
     EXPECT_NEAR(setpoint.value(),
-                wpi::units::radian_t(m_encoderSim.GetDistance())
+                wpi::units::radian_t(encoderSim.GetDistance())
                     .convert<wpi::units::degree>()
                     .value(),
                 2.0);
@@ -95,24 +95,24 @@ TEST_P(ArmSimulationTest, Teleop) {
 
   {
     // Unpress the button to go back down
-    m_joystickSim.SetTrigger(false);
-    m_joystickSim.NotifyNewData();
+    joystickSim.SetTrigger(false);
+    joystickSim.NotifyNewData();
 
     wpi::sim::StepTiming(3_s);
 
-    EXPECT_NEAR(kMinAngle.value(), m_encoderSim.GetDistance(), 2.0);
+    EXPECT_NEAR(kMinAngle.value(), encoderSim.GetDistance(), 2.0);
   }
 
   {
     // Press button to go back up
-    m_joystickSim.SetTrigger(true);
-    m_joystickSim.NotifyNewData();
+    joystickSim.SetTrigger(true);
+    joystickSim.NotifyNewData();
 
     // advance 75 timesteps
     wpi::sim::StepTiming(1.5_s);
 
     EXPECT_NEAR(setpoint.value(),
-                wpi::units::radian_t(m_encoderSim.GetDistance())
+                wpi::units::radian_t(encoderSim.GetDistance())
                     .convert<wpi::units::degree>()
                     .value(),
                 2.0);
@@ -121,7 +121,7 @@ TEST_P(ArmSimulationTest, Teleop) {
     wpi::sim::StepTiming(0.5_s);
 
     EXPECT_NEAR(setpoint.value(),
-                wpi::units::radian_t(m_encoderSim.GetDistance())
+                wpi::units::radian_t(encoderSim.GetDistance())
                     .convert<wpi::units::degree>()
                     .value(),
                 2.0);
@@ -134,8 +134,8 @@ TEST_P(ArmSimulationTest, Teleop) {
 
     wpi::sim::StepTiming(3_s);
 
-    ASSERT_NEAR(0.0, m_motorSim.GetThrottle(), 0.05);
-    EXPECT_NEAR(kMinAngle.value(), m_encoderSim.GetDistance(), 2.0);
+    ASSERT_NEAR(0.0, motorSim.GetThrottle(), 0.05);
+    EXPECT_NEAR(kMinAngle.value(), encoderSim.GetDistance(), 2.0);
   }
 }
 

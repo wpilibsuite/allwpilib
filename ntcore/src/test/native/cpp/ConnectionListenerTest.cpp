@@ -51,10 +51,10 @@ void ConnectionListenerTest::Connect(const char* address, unsigned int port4) {
 TEST_F(ConnectionListenerTest, Polled) {
   // set up the poller
   NT_ListenerPoller poller = wpi::nt::CreateListenerPoller(server_inst);
-  ASSERT_NE(poller, 0u);
+  ASSERT_NE(poller, 0);
   NT_Listener handle = wpi::nt::AddPolledListener(
       poller, server_inst, wpi::nt::EventFlags::CONNECTION);
-  ASSERT_NE(handle, 0u);
+  ASSERT_NE(handle, 0);
 
   // trigger a connect event
   Connect("127.0.0.1", 10020);

@@ -10,7 +10,7 @@ import org.wpilib.math.geometry.Transform3d;
 import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.util.struct.Struct;
 
-public class Transform3dStruct implements Struct<Transform3d> {
+public final class Transform3dStruct implements Struct<Transform3d> {
   @Override
   public Class<Transform3d> getTypeClass() {
     return Transform3d.class;

@@ -66,7 +66,7 @@ import org.wpilib.util.struct.StructSerializable;
  * applying the same series in the opposite order intrinsically.
  */
 @Json
-public class Rotation3d
+public final class Rotation3d
     implements Interpolatable<Rotation3d>, ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Rotation3d representing no rotation.

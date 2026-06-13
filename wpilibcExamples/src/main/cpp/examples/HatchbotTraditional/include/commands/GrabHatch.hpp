@@ -24,5 +24,5 @@ class GrabHatch : public wpi::cmd::CommandHelper<wpi::cmd::Command, GrabHatch> {
   bool IsFinished() override;
 
  private:
-  HatchSubsystem* m_hatch;
+  HatchSubsystem* hatch;
 };

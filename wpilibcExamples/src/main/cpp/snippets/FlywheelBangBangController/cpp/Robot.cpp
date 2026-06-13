@@ -27,23 +27,23 @@ class Robot : public wpi::TimedRobot {
   void TeleopPeriodic() override {
     // Scale setpoint value between 0 and maxSetpointValue
     wpi::units::radians_per_second_t setpoint = wpi::units::math::max(
-        0_rpm, m_joystick.GetRawAxis(0) * kMaxSetpointValue);
+        0_rpm, joystick.GetRawAxis(0) * kMaxSetpointValue);
 
     // Set setpoint and measurement of the bang-bang controller
     wpi::units::volt_t bangOutput =
-        m_bangBangController.Calculate(m_encoder.GetRate(), setpoint.value()) *
+        bangBangController.Calculate(encoder.GetRate(), setpoint.value()) *
         12_V;
 
     // Controls a motor with the output of the BangBang controller and a
     // feedforward. The feedforward is reduced slightly to avoid overspeeding
     // the shooter.
-    m_flywheelMotor.SetVoltage(bangOutput +
-                               0.9 * m_feedforward.Calculate(setpoint));
+    flywheelMotor.SetVoltage(bangOutput +
+                             0.9 * feedforward.Calculate(setpoint));
   }
 
   Robot() {
     // Add bang-bang controller to SmartDashboard and networktables.
-    wpi::SmartDashboard::PutData("BangBangController", &m_bangBangController);
+    wpi::SmartDashboard::PutData("BangBangController", &bangBangController);
   }
 
   /**
@@ -52,11 +52,11 @@ class Robot : public wpi::TimedRobot {
   void SimulationPeriodic() override {
     // To update our simulation, we set motor voltage inputs, update the
     // simulation, and write the simulated velocities to our simulated encoder
-    m_flywheelSim.SetInputVoltage(
-        m_flywheelMotor.GetThrottle() *
+    flywheelSim.SetInputVoltage(
+        flywheelMotor.GetThrottle() *
         wpi::units::volt_t{wpi::RobotController::GetInputVoltage()});
-    m_flywheelSim.Update(20_ms);
-    m_encoderSim.SetRate(m_flywheelSim.GetAngularVelocity().value());
+    flywheelSim.Update(20_ms);
+    encoderSim.SetRate(flywheelSim.GetAngularVelocity().value());
   }
 
  private:
@@ -69,12 +69,12 @@ class Robot : public wpi::TimedRobot {
       6000_rpm;
 
   // Joystick to control setpoint
-  wpi::Joystick m_joystick{0};
+  wpi::Joystick joystick{0};
 
-  wpi::PWMSparkMax m_flywheelMotor{kMotorPort};
-  wpi::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
+  wpi::PWMSparkMax flywheelMotor{kMotorPort};
+  wpi::Encoder encoder{kEncoderAChannel, kEncoderBChannel};
 
-  wpi::math::BangBangController m_bangBangController;
+  wpi::math::BangBangController bangBangController;
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
@@ -82,7 +82,7 @@ class Robot : public wpi::TimedRobot {
   static constexpr decltype(1_V / 1_rad_per_s) kFlywheelKv = 0.000195_V / 1_rpm;
   static constexpr decltype(1_V / 1_rad_per_s_sq) kFlywheelKa =
       0.0003_V / 1_rev_per_m_per_s;
-  wpi::math::SimpleMotorFeedforward<wpi::units::radians> m_feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians> feedforward{
       kFlywheelKs, kFlywheelKv, kFlywheelKa};
 
   // Simulation classes help us simulate our robot
@@ -95,13 +95,13 @@ class Robot : public wpi::TimedRobot {
   static constexpr wpi::units::kilogram_square_meter_t
       kFlywheelMomentOfInertia = 0.5 * 1.5_lb * 4_in * 4_in;
 
-  wpi::math::DCMotor m_gearbox = wpi::math::DCMotor::NEO(1);
-  wpi::math::LinearSystem<1, 1, 1> m_plant{
+  wpi::math::DCMotor gearbox = wpi::math::DCMotor::NEO(1);
+  wpi::math::LinearSystem<1, 1, 1> plant{
       wpi::math::Models::FlywheelFromPhysicalConstants(
-          m_gearbox, kFlywheelMomentOfInertia, kFlywheelGearing)};
+          gearbox, kFlywheelMomentOfInertia, kFlywheelGearing)};
 
-  wpi::sim::FlywheelSim m_flywheelSim{m_plant, m_gearbox};
-  wpi::sim::EncoderSim m_encoderSim{m_encoder};
+  wpi::sim::FlywheelSim flywheelSim{plant, gearbox};
+  wpi::sim::EncoderSim encoderSim{encoder};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

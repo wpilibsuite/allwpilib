@@ -28,18 +28,18 @@ public class EducationalRobot extends RobotBase {
     run();
   }
 
-  public void test() {
+  public void utility() {
     run();
   }
 
-  private volatile boolean m_exit;
+  private volatile boolean exit;
 
   @Override
   public void startCompetition() {
     // Create an opmode per robot mode
     RobotState.addOpMode(RobotMode.AUTONOMOUS, "Auto");
     RobotState.addOpMode(RobotMode.TELEOPERATED, "Teleop");
-    RobotState.addOpMode(RobotMode.TEST, "Test");
+    RobotState.addOpMode(RobotMode.UTILITY, "Utility");
     RobotState.publishOpModes();
 
     final ControlWord word = new ControlWord();
@@ -52,7 +52,7 @@ public class EducationalRobot extends RobotBase {
     // Tell the DS that the robot is ready to be enabled
     DriverStationBackend.observeUserProgramStarting();
 
-    while (!Thread.currentThread().isInterrupted() && !m_exit) {
+    while (!Thread.currentThread().isInterrupted() && !exit) {
       DriverStationBackend.refreshControlWordFromCache(word);
       modeThread.inControl(word);
       if (isDisabled()) {
@@ -73,9 +73,9 @@ public class EducationalRobot extends RobotBase {
             Thread.currentThread().interrupt();
           }
         }
-      } else if (isTest()) {
-        test();
-        while (isTest() && isEnabled()) {
+      } else if (isUtility()) {
+        utility();
+        while (isUtility() && isEnabled()) {
           try {
             WPIUtilJNI.waitForObject(event);
           } catch (InterruptedException e) {
@@ -100,6 +100,6 @@ public class EducationalRobot extends RobotBase {
 
   @Override
   public void endCompetition() {
-    m_exit = true;
+    exit = true;
   }
 }

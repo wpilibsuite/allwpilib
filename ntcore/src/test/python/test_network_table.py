@@ -19,21 +19,21 @@ def test_put_double(table1):
     table1.putNumber("double", 42.42)
     assert table1.getNumber("double", None) == 42.42
 
-    assert table1.getNumber("Non-Existant", 44.44) == 44.44
+    assert table1.getNumber("Non-Existent", 44.44) == 44.44
 
 
 def test_put_boolean(table1):
     table1.putBoolean("boolean", True)
     assert table1.getBoolean("boolean", None) == True
 
-    assert table1.getBoolean("Non-Existant", False) == False
+    assert table1.getBoolean("Non-Existent", False) == False
 
 
 def test_put_string(table1):
     table1.putString("String", "Test 1")
     assert table1.getString("String", None) == "Test 1"
 
-    assert table1.getString("Non-Existant", "Test 3") == "Test 3"
+    assert table1.getString("Non-Existent", "Test 3") == "Test 3"
 
 
 def test_getvalue_overloads(table1):

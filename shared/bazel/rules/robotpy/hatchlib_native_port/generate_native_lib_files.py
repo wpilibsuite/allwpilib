@@ -1,4 +1,5 @@
 import functools
+import os
 import pathlib
 import platform
 import sys
@@ -22,9 +23,7 @@ is_macos = platform_sys == "Darwin"
 
 
 class NativelibHook:
-    def __init__(self, output_pcfile, output_libinit, config, metadata):
-        self.output_pcfile = output_pcfile
-        self.output_libinit = output_libinit
+    def __init__(self, output_pcfile, config, metadata):
 
         self.config = config
         self.root_pth = output_pcfile.parent.parent.parent
@@ -32,7 +31,19 @@ class NativelibHook:
 
     def initialize(self):
         for pcfg in self._pcfiles:
-            self._generate_pcfile(pcfg, {})
+            pcfile = self._generate_pcfile(pcfg, {})
+            self._add_pkg_config_path(str(pcfile.parent))
+
+    def _add_pkg_config_path(self, *paths: str) -> None:
+        current = os.environ.get("PKG_CONFIG_PATH")
+        entries = current.split(os.pathsep) if current else []
+
+        for path in paths:
+            if path not in entries:
+                entries.append(path)
+
+        if entries:
+            os.environ["PKG_CONFIG_PATH"] = os.pathsep.join(entries)
 
     def _get_pkg_from_path(self, path: pathlib.Path) -> str:
         rel = path.relative_to(self.root_pth)
@@ -43,7 +54,7 @@ class NativelibHook:
     ) -> pathlib.Path:
 
         pcfile_rel = pcfg.get_pc_path()
-        pcfile = self.output_pcfile
+        pcfile = self.root_pth / str(pcfile_rel).removeprefix("src/")
         prefix_rel = pcfile_rel.parent
         prefix_path = pcfile.parent
 
@@ -147,7 +158,7 @@ class NativelibHook:
         build_data: T.Dict[str, T.Any],
     ):
         libinit_py_rel = pcfg.get_init_module_path()
-        self.root_pth / libinit_py_rel
+        libinit_py = self.root_pth / str(libinit_py_rel).removeprefix("src/")
 
         libdir = prefix_path
         if pcfg.libdir:
@@ -165,7 +176,7 @@ class NativelibHook:
         else:
             requires = []
 
-        _write_libinit_py(self.output_libinit, lib_paths, requires)
+        _write_libinit_py(libinit_py, lib_paths, requires)
 
     def _make_shared_lib_fname(self, lib: str):
         if is_windows:
@@ -298,9 +309,8 @@ def _write_libinit_py(
 
 def main():
     pyproject_toml = sys.argv[1]
-    libinit_file = pathlib.Path(sys.argv[2])
-    pc_file = pathlib.Path(sys.argv[3])
-    pkgcfgs = [pathlib.Path(x) for x in sys.argv[4:]]
+    pc_file = pathlib.Path(sys.argv[2])
+    pkgcfgs = [pathlib.Path(x) for x in sys.argv[3:]]
 
     hack_pkgconfig(pkgcfgs)
 
@@ -310,7 +320,7 @@ def main():
     nativelib_cfg = raw_config["tool"]["hatch"]["build"]["hooks"]["nativelib"]
     metadata = raw_config["project"]
 
-    generator = NativelibHook(pc_file, libinit_file, nativelib_cfg, metadata)
+    generator = NativelibHook(pc_file, nativelib_cfg, metadata)
     generator.initialize()
 
 

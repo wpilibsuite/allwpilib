@@ -5,7 +5,8 @@
 #pragma once
 
 #include "wpi/hardware/expansionhub/ExpansionHub.hpp"
-#include "wpi/hardware/expansionhub/ExpansionHubPidConstants.hpp"
+#include "wpi/hardware/expansionhub/ExpansionHubPositionConstants.hpp"
+#include "wpi/hardware/expansionhub/ExpansionHubVelocityConstants.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
@@ -18,6 +19,14 @@ namespace wpi {
  * ExpansionHub. */
 class ExpansionHubMotor {
  public:
+  /** The direction to follow a leader motor in when using the follow method. */
+  enum class FollowDirection {
+    /** Follow the leader motor in the same direction. */
+    Aligned,
+    /** Follow the leader motor in the opposite direction. */
+    Opposed
+  };
+
   /**
    * Constructs a servo at the requested channel on a specific USB port.
    *
@@ -120,14 +129,14 @@ class ExpansionHubMotor {
    *
    * @return Velocity PID constants object
    */
-  ExpansionHubPidConstants& GetVelocityPidConstants();
+  ExpansionHubVelocityConstants& GetVelocityConstants();
 
   /**
    * Gets the PID constants object for position PID.
    *
    * @return Position PID constants object
    */
-  ExpansionHubPidConstants& GetPositionPidConstants();
+  ExpansionHubPositionConstants& GetPositionConstants();
 
   /**
    * Gets if the underlying ExpansionHub is connected.
@@ -143,8 +152,14 @@ class ExpansionHubMotor {
    * Additionally, the direction of both motors will be the same.
    *
    * @param leader The motor to follow
+   * @param direction The direction to follow the leader
    */
-  void Follow(const ExpansionHubMotor& leader);
+  void Follow(const ExpansionHubMotor& leader, FollowDirection direction);
+
+  /**
+   * Stops following the currently set leader motor.
+   */
+  void Unfollow();
 
  private:
   ExpansionHub m_hub;
@@ -165,7 +180,7 @@ class ExpansionHubMotor {
 
   wpi::nt::DoublePublisher m_distancePerCountPublisher;
 
-  ExpansionHubPidConstants m_velocityPidConstants;
-  ExpansionHubPidConstants m_positionPidConstants;
+  ExpansionHubVelocityConstants m_velocityConstants;
+  ExpansionHubPositionConstants m_positionConstants;
 };
 }  // namespace wpi

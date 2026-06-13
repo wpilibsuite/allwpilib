@@ -15,7 +15,7 @@ namespace wpi::cmd {
  *
  * @see wpi::Gamepad
  */
-class CommandGamepad : public CommandGenericHID {
+class CommandGamepad {
  public:
   /**
    * Construct an instance of a controller.
@@ -26,11 +26,31 @@ class CommandGamepad : public CommandGenericHID {
   explicit CommandGamepad(int port);
 
   /**
-   * Get the underlying GenericHID object.
+   * Get the underlying CommandGenericHID object.
    *
-   * @return the wrapped GenericHID object
+   * @return the wrapped CommandGenericHID object
    */
-  wpi::Gamepad& GetHID();
+  CommandGenericHID& GetHID();
+
+  /**
+   * Get the underlying Gamepad object.
+   *
+   * @return the wrapped Gamepad object
+   */
+  wpi::Gamepad& GetGamepad();
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button index
+   * @param loop the event loop instance to attach the event to. Defaults to the
+   * CommandScheduler's default loop.
+   * @return an event instance representing the button's digital signal attached
+   * to the given loop.
+   */
+  Trigger Button(int button,
+                 wpi::EventLoop* loop = CommandScheduler::GetInstance()
+                                            .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs an event instance around this button's digital signal.
@@ -46,52 +66,52 @@ class CommandGamepad : public CommandGenericHID {
                                             .GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance around the South Face button's
+   * Constructs a Trigger instance around the Face Down button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to. Defaults to the
    * CommandScheduler's default loop.
-   * @return a Trigger instance representing the South Face button's
+   * @return a Trigger instance representing the Face Down button's
    * digital signal attached to the given loop.
    */
-  Trigger SouthFace(wpi::EventLoop* loop = CommandScheduler::GetInstance()
-                                               .GetDefaultButtonLoop()) const;
-
-  /**
-   * Constructs a Trigger instance around the East Face button's
-   * digital signal.
-   *
-   * @param loop the event loop instance to attach the event to. Defaults to the
-   * CommandScheduler's default loop.
-   * @return a Trigger instance representing the East Face button's
-   * digital signal attached to the given loop.
-   */
-  Trigger EastFace(wpi::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger FaceDown(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                               .GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance around the West Face button's
+   * Constructs a Trigger instance around the Face Right button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to. Defaults to the
    * CommandScheduler's default loop.
-   * @return a Trigger instance representing the West Face button's
+   * @return a Trigger instance representing the Face Right button's
    * digital signal attached to the given loop.
    */
-  Trigger WestFace(wpi::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger FaceRight(wpi::EventLoop* loop = CommandScheduler::GetInstance()
+                                               .GetDefaultButtonLoop()) const;
+
+  /**
+   * Constructs a Trigger instance around the Face Left button's
+   * digital signal.
+   *
+   * @param loop the event loop instance to attach the event to. Defaults to the
+   * CommandScheduler's default loop.
+   * @return a Trigger instance representing the Face Left button's
+   * digital signal attached to the given loop.
+   */
+  Trigger FaceLeft(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                               .GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance around the North Face button's
+   * Constructs a Trigger instance around the Face Up button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to. Defaults to the
    * CommandScheduler's default loop.
-   * @return a Trigger instance representing the North Face button's
+   * @return a Trigger instance representing the Face Up button's
    * digital signal attached to the given loop.
    */
-  Trigger NorthFace(wpi::EventLoop* loop = CommandScheduler::GetInstance()
-                                               .GetDefaultButtonLoop()) const;
+  Trigger FaceUp(wpi::EventLoop* loop = CommandScheduler::GetInstance()
+                                            .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the Back button's
@@ -474,22 +494,23 @@ class CommandGamepad : public CommandGenericHID {
   double GetRightY() const;
 
   /**
-   * Get the left trigger axis value of the controller. Note that this axis is
+   * Get the left trigger value of the controller. Note that this axis is
    * bound to the range of [0, 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */
-  double GetLeftTriggerAxis() const;
+  double GetLeftTrigger() const;
 
   /**
-   * Get the right trigger axis value of the controller. Note that this axis is
+   * Get the right trigger value of the controller. Note that this axis is
    * bound to the range of [0, 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */
-  double GetRightTriggerAxis() const;
+  double GetRightTrigger() const;
 
  private:
-  wpi::Gamepad m_hid;
+  CommandGenericHID* m_hid;
+  wpi::Gamepad* m_gamepad;
 };
 }  // namespace wpi::cmd

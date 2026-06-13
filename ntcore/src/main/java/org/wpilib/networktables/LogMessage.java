@@ -5,7 +5,6 @@
 package org.wpilib.networktables;
 
 /** NetworkTables log message. */
-@SuppressWarnings("MemberName")
 public final class LogMessage {
   /** Critical logging level. */
   public static final int CRITICAL = 50;

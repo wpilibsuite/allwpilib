@@ -2,7 +2,7 @@
 build-backend = "hatchling.build"
 requires = [
     "semiwrap~=0.3.0",
-    "hatch-meson~=0.1.0",
+    "hatch-meson~=0.1.2",
     "hatch-robotpy~=0.2.1",
     "hatchling",
     "robotpy-native-wpilib==0.0.0",
@@ -16,6 +16,7 @@ requires = [
 name = "wpilib"
 version = "0.0.0"
 description = "Binary wrapper for WPILib"
+requires-python = ">=3.11"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
@@ -93,6 +94,8 @@ DYNAMIC_CAMERA_SERVER = 1
 Filesystem = "rpy/Filesystem.h"
 MotorControllerGroup = "rpy/MotorControllerGroup.h"
 Notifier = "rpy/Notifier.h"
+# rpy only
+AddressableLEDBuffer = "rpy/AddressableLEDBuffer.h"
 
 # wpi/counter
 EdgeConfiguration = "wpi/counter/EdgeConfiguration.hpp"
@@ -116,7 +119,10 @@ RobotState = "wpi/driverstation/RobotState.hpp"
 TouchpadFinger = "wpi/driverstation/TouchpadFinger.hpp"
 Gamepad = "wpi/driverstation/Gamepad.hpp"
 GenericHID = "wpi/driverstation/GenericHID.hpp"
+HIDDevice = "wpi/driverstation/HIDDevice.hpp"
 Joystick = "wpi/driverstation/Joystick.hpp"
+DualSenseController = "wpi/driverstation/DualSenseController.hpp"
+XboxController = "wpi/driverstation/XboxController.hpp"
 NiDsPS4Controller = "wpi/driverstation/NiDsPS4Controller.hpp"
 NiDsPS5Controller = "wpi/driverstation/NiDsPS5Controller.hpp"
 NiDsStadiaController = "wpi/driverstation/NiDsStadiaController.hpp"
@@ -140,6 +146,7 @@ AnalogAccelerometer = "wpi/hardware/accelerometer/AnalogAccelerometer.hpp"
 
 # wpi/hardware/bus
 CAN = "wpi/hardware/bus/CAN.hpp"
+CANBusMap = "wpi/hardware/bus/CANBusMap.hpp"
 I2C = "wpi/hardware/bus/I2C.hpp"
 SerialPort = "wpi/hardware/bus/SerialPort.hpp"
 
@@ -152,9 +159,11 @@ PWM = "wpi/hardware/discrete/PWM.hpp"
 
 # wpi/hardware/expansionhub
 ExpansionHub = "wpi/hardware/expansionhub/ExpansionHub.hpp"
+ExpansionHubCRServo = "wpi/hardware/expansionhub/ExpansionHubCRServo.hpp"
 ExpansionHubMotor = "wpi/hardware/expansionhub/ExpansionHubMotor.hpp"
-ExpansionHubPidConstants = "wpi/hardware/expansionhub/ExpansionHubPidConstants.hpp"
+ExpansionHubPositionConstants = "wpi/hardware/expansionhub/ExpansionHubPositionConstants.hpp"
 ExpansionHubServo = "wpi/hardware/expansionhub/ExpansionHubServo.hpp"
+ExpansionHubVelocityConstants = "wpi/hardware/expansionhub/ExpansionHubVelocityConstants.hpp"
 
 # wpi/hardware/imu
 OnboardIMU = "wpi/hardware/imu/OnboardIMU.hpp"
@@ -272,8 +281,11 @@ GamepadSim = "wpi/simulation/GamepadSim.hpp"
 GenericHIDSim = "wpi/simulation/GenericHIDSim.hpp"
 JoystickSim = "wpi/simulation/JoystickSim.hpp"
 LinearSystemSim = "wpi/simulation/LinearSystemSim.hpp"
+DualSenseControllerSim = "wpi/simulation/DualSenseControllerSim.hpp"
+XboxControllerSim = "wpi/simulation/XboxControllerSim.hpp"
 NiDsPS4ControllerSim = "wpi/simulation/NiDsPS4ControllerSim.hpp"
 NiDsPS5ControllerSim = "wpi/simulation/NiDsPS5ControllerSim.hpp"
+OnboardIMUSim = "wpi/simulation/OnboardIMUSim.hpp"
 PWMSim = "wpi/simulation/PWMSim.hpp"
 PneumaticsBaseSim = "wpi/simulation/PneumaticsBaseSim.hpp"
 PowerDistributionSim = "wpi/simulation/PowerDistributionSim.hpp"

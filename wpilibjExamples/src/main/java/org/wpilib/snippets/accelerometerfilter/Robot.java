@@ -11,20 +11,20 @@ import org.wpilib.math.filter.LinearFilter;
 import org.wpilib.smartdashboard.SmartDashboard;
 
 /**
- * Accelerometer filtering snippets for frc-docs.
+ * Accelerometer filtering snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
 public class Robot extends TimedRobot {
-  OnboardIMU m_accelerometer = new OnboardIMU(MountOrientation.FLAT);
+  OnboardIMU accelerometer = new OnboardIMU(MountOrientation.FLAT);
   // Create a LinearFilter that will calculate a moving average of the measured X acceleration over
   // the past 10 iterations of the main loop
-  LinearFilter m_xAccelFilter = LinearFilter.movingAverage(10);
+  LinearFilter xAccelFilter = LinearFilter.movingAverage(10);
 
   @Override
   public void robotPeriodic() {
-    double xAccel = m_accelerometer.getAccelX();
+    double xAccel = accelerometer.getAccelX();
     // Get the filtered X acceleration
-    double filteredXAccel = m_xAccelFilter.calculate(xAccel);
+    double filteredXAccel = xAccelFilter.calculate(xAccel);
 
     SmartDashboard.putNumber("X Acceleration", xAccel);
     SmartDashboard.putNumber("Filtered X Acceleration", filteredXAccel);

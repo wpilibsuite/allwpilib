@@ -29,7 +29,7 @@ import org.wpilib.util.struct.StructSerializable;
  * origin facing in the positive X direction, forward is positive X and left is positive Y.
  */
 @Json
-public class Translation2d
+public final class Translation2d
     implements Interpolatable<Translation2d>, ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Translation2d representing the origin.

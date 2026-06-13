@@ -9,11 +9,11 @@
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
-  m_chooser.SetDefaultOption("ONE", CommandSelector::ONE);
-  m_chooser.AddOption("TWO", CommandSelector::TWO);
-  m_chooser.AddOption("THREE", CommandSelector::THREE);
+  chooser.SetDefaultOption("ONE", CommandSelector::ONE);
+  chooser.AddOption("TWO", CommandSelector::TWO);
+  chooser.AddOption("THREE", CommandSelector::THREE);
 
-  wpi::SmartDashboard::PutData("Auto Chooser", &m_chooser);
+  wpi::SmartDashboard::PutData("Auto Chooser", &chooser);
 
   // Configure the button bindings
   ConfigureButtonBindings();
@@ -25,5 +25,5 @@ void RobotContainer::ConfigureButtonBindings() {
 
 wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {
   // Run the select command in autonomous
-  return m_exampleSelectCommand.get();
+  return exampleSelectCommand.get();
 }

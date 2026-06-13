@@ -23,7 +23,7 @@ namespace wpi::math {
  * Represents a 2d ellipse space containing translational, rotational, and
  * scaling components.
  */
-class WPILIB_DLLEXPORT Ellipse2d {
+class WPILIB_DLLEXPORT Ellipse2d final {
  public:
   /**
    * Constructs an ellipse around a center point and two semi-axes, a horizontal

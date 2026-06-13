@@ -33,7 +33,7 @@ import org.wpilib.system.Watchdog;
  *   <li>disabledInit() -- called each and every time disabled is entered from another mode
  *   <li>autonomousInit() -- called each and every time autonomous is entered from another mode
  *   <li>teleopInit() -- called each and every time teleop is entered from another mode
- *   <li>testInit() -- called each and every time test is entered from another mode
+ *   <li>utilityInit() -- called each and every time utility is entered from another mode
  * </ul>
  *
  * <p>periodic() functions -- each of these functions is called on an interval:
@@ -43,7 +43,7 @@ import org.wpilib.system.Watchdog;
  *   <li>disabledPeriodic()
  *   <li>autonomousPeriodic()
  *   <li>teleopPeriodic()
- *   <li>testPeriodic()
+ *   <li>utilityPeriodic()
  * </ul>
  *
  * <p>exit() functions -- each of the following functions is called once when the appropriate mode
@@ -53,7 +53,7 @@ import org.wpilib.system.Watchdog;
  *   <li>disabledExit() -- called each and every time disabled is exited
  *   <li>autonomousExit() -- called each and every time autonomous is exited
  *   <li>teleopExit() -- called each and every time teleop is exited
- *   <li>testExit() -- called each and every time test is exited
+ *   <li>utilityExit() -- called each and every time utility is exited
  * </ul>
  */
 public abstract class IterativeRobotBase extends RobotBase {
@@ -121,12 +121,12 @@ public abstract class IterativeRobotBase extends RobotBase {
   public void teleopInit() {}
 
   /**
-   * Initialization code for test mode should go here.
+   * Initialization code for utility mode should go here.
    *
    * <p>Users should override this method for initialization code which will be called each time the
-   * robot enters test mode.
+   * robot enters utility mode.
    */
-  public void testInit() {}
+  public void utilityInit() {}
 
   /* ----------- Overridable periodic code ----------------- */
 
@@ -186,10 +186,10 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_tmpFirstRun = true;
 
-  /** Periodic code for test mode should go here. */
-  public void testPeriodic() {
+  /** Periodic code for utility mode should go here. */
+  public void utilityPeriodic() {
     if (m_tmpFirstRun) {
-      System.out.println("Default testPeriodic() method... Override me!");
+      System.out.println("Default utilityPeriodic() method... Override me!");
       m_tmpFirstRun = false;
     }
   }
@@ -219,12 +219,12 @@ public abstract class IterativeRobotBase extends RobotBase {
   public void teleopExit() {}
 
   /**
-   * Exit code for test mode should go here.
+   * Exit code for utility mode should go here.
    *
    * <p>Users should override this method for code which will be called each time the robot exits
-   * test mode.
+   * utility mode.
    */
-  public void testExit() {}
+  public void utilityExit() {}
 
   /**
    * Gets time period between calls to Periodic() functions.
@@ -258,7 +258,7 @@ public abstract class IterativeRobotBase extends RobotBase {
           case UNKNOWN -> disabledExit();
           case AUTONOMOUS -> autonomousExit();
           case TELEOPERATED -> teleopExit();
-          case TEST -> testExit();
+          case UTILITY -> utilityExit();
           default -> {
             // NOP
           }
@@ -279,9 +279,9 @@ public abstract class IterativeRobotBase extends RobotBase {
           teleopInit();
           m_watchdog.addEpoch("teleopInit()");
         }
-        case TEST -> {
-          testInit();
-          m_watchdog.addEpoch("testInit()");
+        case UTILITY -> {
+          utilityInit();
+          m_watchdog.addEpoch("utilityInit()");
         }
         default -> {
           // NOP
@@ -306,9 +306,9 @@ public abstract class IterativeRobotBase extends RobotBase {
         teleopPeriodic();
         m_watchdog.addEpoch("teleopPeriodic()");
       }
-      case TEST -> {
-        testPeriodic();
-        m_watchdog.addEpoch("testPeriodic()");
+      case UTILITY -> {
+        utilityPeriodic();
+        m_watchdog.addEpoch("utilityPeriodic()");
       }
       default -> {
         // NOP

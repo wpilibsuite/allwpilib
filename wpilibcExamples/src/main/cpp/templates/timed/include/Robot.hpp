@@ -19,14 +19,14 @@ class Robot : public wpi::TimedRobot {
   void TeleopPeriodic() override;
   void DisabledInit() override;
   void DisabledPeriodic() override;
-  void TestInit() override;
-  void TestPeriodic() override;
+  void UtilityInit() override;
+  void UtilityPeriodic() override;
   void SimulationInit() override;
   void SimulationPeriodic() override;
 
  private:
-  wpi::SendableChooser<std::string> m_chooser;
+  wpi::SendableChooser<std::string> chooser;
   const std::string kAutoNameDefault = "Default";
   const std::string kAutoNameCustom = "My Auto";
-  std::string m_autoSelected;
+  std::string autoSelected;
 };

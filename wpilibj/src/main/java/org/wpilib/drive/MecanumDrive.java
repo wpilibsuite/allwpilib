@@ -70,7 +70,6 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    *
    * <p>Uses normalized voltage [-1.0..1.0].
    */
-  @SuppressWarnings("MemberName")
   public static class WheelVelocities {
     /** Front-left wheel velocity. */
     public double frontLeft;

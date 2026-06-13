@@ -216,19 +216,19 @@ public class AprilTagFieldLayout {
    * @throws UncheckedIOException If the layout does not exist.
    */
   public static AprilTagFieldLayout loadField(AprilTagFields field) {
-    if (field.m_fieldLayout == null) {
+    if (field.fieldLayout == null) {
       try {
-        field.m_fieldLayout = loadFromResource(field.m_resourceFile);
+        field.fieldLayout = loadFromResource(field.resourceFile);
       } catch (IOException e) {
         throw new UncheckedIOException(
-            "Could not load AprilTagFieldLayout from " + field.m_resourceFile, e);
+            "Could not load AprilTagFieldLayout from " + field.resourceFile, e);
       }
     }
     // Copy layout because the layout's origin is mutable
     return new AprilTagFieldLayout(
-        field.m_fieldLayout.getTags(),
-        field.m_fieldLayout.getFieldLength(),
-        field.m_fieldLayout.getFieldWidth());
+        field.fieldLayout.getTags(),
+        field.fieldLayout.getFieldLength(),
+        field.fieldLayout.getFieldWidth());
   }
 
   /**
@@ -264,11 +264,9 @@ public class AprilTagFieldLayout {
   }
 
   static class FieldDimensions {
-    @SuppressWarnings("MemberName")
     @Json.Property(value = "length")
     public final double fieldLength;
 
-    @SuppressWarnings("MemberName")
     @Json.Property(value = "width")
     public final double fieldWidth;
 

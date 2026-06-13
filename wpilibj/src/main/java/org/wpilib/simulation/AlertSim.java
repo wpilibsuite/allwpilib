@@ -31,23 +31,18 @@ public final class AlertSim {
     }
 
     /** The handle of the alert. */
-    @SuppressWarnings("MemberName")
     public final int handle;
 
     /** The group of the alert. */
-    @SuppressWarnings("MemberName")
     public final String group;
 
     /** The text of the alert. */
-    @SuppressWarnings("MemberName")
     public final String text;
 
     /** The time the alert became active. 0 if not active. */
-    @SuppressWarnings("MemberName")
     public final long activeStartTime;
 
     /** The level of the alert (HIGH, MEDIUM, or LOW). */
-    @SuppressWarnings("MemberName")
     public final Level level;
 
     /**

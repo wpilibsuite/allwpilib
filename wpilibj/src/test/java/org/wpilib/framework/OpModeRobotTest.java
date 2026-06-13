@@ -25,6 +25,7 @@ import org.wpilib.util.Color;
 class OpModeRobotTest {
   static final double kPeriod = 0.02;
 
+  @SuppressWarnings("PMD.PublicFieldNamingConvention")
   public static class MockOpMode implements OpMode {
     public final AtomicInteger m_disabledPeriodicCount = new AtomicInteger(0);
     public final AtomicInteger m_startCount = new AtomicInteger(0);
@@ -65,6 +66,7 @@ class OpModeRobotTest {
     OneArgOpMode(MockRobot robot) {}
   }
 
+  @SuppressWarnings("PMD.PublicFieldNamingConvention")
   static class MockRobot extends OpModeRobot {
     public final AtomicInteger m_driverStationConnectedCount = new AtomicInteger(0);
     public final AtomicInteger m_nonePeriodicCount = new AtomicInteger(0);
@@ -125,7 +127,7 @@ class OpModeRobotTest {
             Color.BLACK);
         addOpModeFactory(
             () -> new OneArgOpMode(this),
-            RobotMode.TEST,
+            RobotMode.UTILITY,
             "OneArgOpMode-Test",
             "Group",
             "Description",

@@ -11,7 +11,7 @@
 #include "wpimath/protobuf/geometry2d.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Rotation2d> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Rotation2d> final {
   using MessageStruct = wpi_proto_ProtobufRotation2d;
   using InputStream = wpi::util::ProtoInputStream<wpi::math::Rotation2d>;
   using OutputStream = wpi::util::ProtoOutputStream<wpi::math::Rotation2d>;

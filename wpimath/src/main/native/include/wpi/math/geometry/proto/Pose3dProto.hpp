@@ -10,7 +10,7 @@
 #include "wpimath/protobuf/geometry3d.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Pose3d> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Pose3d> final {
   using MessageStruct = wpi_proto_ProtobufPose3d;
   using InputStream = wpi::util::ProtoInputStream<wpi::math::Pose3d>;
   using OutputStream = wpi::util::ProtoOutputStream<wpi::math::Pose3d>;

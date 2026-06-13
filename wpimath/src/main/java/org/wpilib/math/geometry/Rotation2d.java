@@ -25,7 +25,7 @@ import org.wpilib.util.struct.StructSerializable;
  * A rotation in a 2D coordinate frame represented by a point on the unit circle (cosine and sine).
  */
 @Json
-public class Rotation2d
+public final class Rotation2d
     implements Interpolatable<Rotation2d>, ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Rotation2d representing no rotation.

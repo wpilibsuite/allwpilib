@@ -16,7 +16,7 @@ public class ExampleSmartMotorController {
     kMovementWitchcraft
   }
 
-  double m_value;
+  double value;
 
   /**
    * Creates a new ExampleSmartMotorController.
@@ -72,11 +72,11 @@ public class ExampleSmartMotorController {
   public void resetEncoder() {}
 
   public void setThrottle(double throttle) {
-    m_value = throttle;
+    value = throttle;
   }
 
   public double getThrottle() {
-    return m_value;
+    return value;
   }
 
   public void setInverted(boolean isInverted) {}

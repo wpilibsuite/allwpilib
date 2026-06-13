@@ -35,8 +35,6 @@ class EpilogueGeneratorTest {
 
         import org.wpilib.hardware.hal.HAL;
 
-        import org.wpilib.epilogue.ExampleLogger;
-
         public final class Epilogue {
           static {
             HAL.reportUsage("Epilogue", "");
@@ -44,7 +42,7 @@ class EpilogueGeneratorTest {
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
-          public static final ExampleLogger exampleLogger = new ExampleLogger();
+          public static final org.wpilib.epilogue.ExampleLogger org_wpilib_epilogue_ExampleLogger = new org.wpilib.epilogue.ExampleLogger();
 
           public static void configure(java.util.function.Consumer<EpilogueConfiguration> configurator) {
             configurator.accept(config);
@@ -90,8 +88,6 @@ class EpilogueGeneratorTest {
 
         import org.wpilib.hardware.hal.HAL;
 
-        import org.wpilib.epilogue.ExampleLogger;
-
         public final class Epilogue {
           static {
             HAL.reportUsage("Epilogue", "");
@@ -99,7 +95,7 @@ class EpilogueGeneratorTest {
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
-          public static final ExampleLogger exampleLogger = new ExampleLogger();
+          public static final org.wpilib.epilogue.ExampleLogger org_wpilib_epilogue_ExampleLogger = new org.wpilib.epilogue.ExampleLogger();
 
           public static void configure(java.util.function.Consumer<EpilogueConfiguration> configurator) {
             configurator.accept(config);
@@ -114,6 +110,17 @@ class EpilogueGeneratorTest {
            */
           public static boolean shouldLog(Logged.Importance importance) {
             return importance.compareTo(config.minimumImportance) >= 0;
+          }
+
+          /**
+           * Updates Epilogue. This must be called periodically in order for Epilogue to record
+           * new values. Alternatively, {@code bind()} can be used to update at an offset from
+           * the main robot loop.
+           */
+          public static void update(org.wpilib.epilogue.Example robot) {
+            long start = System.nanoTime();
+            org_wpilib_epilogue_ExampleLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
+            config.backend.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
           }
         }
         """;
@@ -140,8 +147,6 @@ class EpilogueGeneratorTest {
 
         import org.wpilib.hardware.hal.HAL;
 
-        import org.wpilib.epilogue.ExampleLogger;
-
         public final class Epilogue {
           static {
             HAL.reportUsage("Epilogue", "");
@@ -149,7 +154,7 @@ class EpilogueGeneratorTest {
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
-          public static final ExampleLogger exampleLogger = new ExampleLogger();
+          public static final org.wpilib.epilogue.ExampleLogger org_wpilib_epilogue_ExampleLogger = new org.wpilib.epilogue.ExampleLogger();
 
           public static void configure(java.util.function.Consumer<EpilogueConfiguration> configurator) {
             configurator.accept(config);
@@ -173,8 +178,8 @@ class EpilogueGeneratorTest {
            */
           public static void update(org.wpilib.epilogue.Example robot) {
             long start = System.nanoTime();
-            exampleLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
-            config.backend.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
+            org_wpilib_epilogue_ExampleLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
+            config.backend.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
           }
 
           /**
@@ -224,9 +229,6 @@ class EpilogueGeneratorTest {
 
         import org.wpilib.hardware.hal.HAL;
 
-        import org.wpilib.epilogue.AlphaBotLogger;
-        import org.wpilib.epilogue.BetaBotLogger;
-
         public final class Epilogue {
           static {
             HAL.reportUsage("Epilogue", "");
@@ -234,8 +236,8 @@ class EpilogueGeneratorTest {
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
-          public static final AlphaBotLogger alphaBotLogger = new AlphaBotLogger();
-          public static final BetaBotLogger betaBotLogger = new BetaBotLogger();
+          public static final org.wpilib.epilogue.AlphaBotLogger org_wpilib_epilogue_AlphaBotLogger = new org.wpilib.epilogue.AlphaBotLogger();
+          public static final org.wpilib.epilogue.BetaBotLogger org_wpilib_epilogue_BetaBotLogger = new org.wpilib.epilogue.BetaBotLogger();
 
           public static void configure(java.util.function.Consumer<EpilogueConfiguration> configurator) {
             configurator.accept(config);
@@ -259,8 +261,19 @@ class EpilogueGeneratorTest {
            */
           public static void update(org.wpilib.epilogue.AlphaBot robot) {
             long start = System.nanoTime();
-            alphaBotLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
-            config.backend.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
+            org_wpilib_epilogue_AlphaBotLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
+            config.backend.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
+          }
+
+          /**
+           * Updates Epilogue. This must be called periodically in order for Epilogue to record
+           * new values. Alternatively, {@code bind()} can be used to update at an offset from
+           * the main robot loop.
+           */
+          public static void update(org.wpilib.epilogue.BetaBot robot) {
+            long start = System.nanoTime();
+            org_wpilib_epilogue_BetaBotLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
+            config.backend.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
           }
 
           /**
@@ -282,17 +295,6 @@ class EpilogueGeneratorTest {
             robot.addPeriodic(() -> {
               update(robot);
             }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
-          }
-
-          /**
-           * Updates Epilogue. This must be called periodically in order for Epilogue to record
-           * new values. Alternatively, {@code bind()} can be used to update at an offset from
-           * the main robot loop.
-           */
-          public static void update(org.wpilib.epilogue.BetaBot robot) {
-            long start = System.nanoTime();
-            betaBotLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
-            config.backend.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
           }
 
           /**
@@ -357,9 +359,6 @@ class EpilogueGeneratorTest {
 
         import org.wpilib.hardware.hal.HAL;
 
-        import org.wpilib.epilogue.ExampleLogger;
-        import org.wpilib.epilogue.CustomLogger;
-
         public final class Epilogue {
           static {
             HAL.reportUsage("Epilogue", "");
@@ -367,8 +366,8 @@ class EpilogueGeneratorTest {
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
-          public static final ExampleLogger exampleLogger = new ExampleLogger();
-          public static final CustomLogger customLogger = new CustomLogger();
+          public static final org.wpilib.epilogue.ExampleLogger org_wpilib_epilogue_ExampleLogger = new org.wpilib.epilogue.ExampleLogger();
+          public static final org.wpilib.epilogue.CustomLogger org_wpilib_epilogue_CustomLogger = new org.wpilib.epilogue.CustomLogger();
 
           public static void configure(java.util.function.Consumer<EpilogueConfiguration> configurator) {
             configurator.accept(config);

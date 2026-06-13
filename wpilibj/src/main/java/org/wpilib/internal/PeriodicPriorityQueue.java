@@ -109,7 +109,7 @@ public class PeriodicPriorityQueue {
    * @param func The function whose callbacks should be removed.
    */
   public void remove(Runnable func) {
-    m_queue.removeIf(callback -> callback.m_func.equals(func));
+    m_queue.removeIf(callback -> callback.func.equals(func));
   }
 
   /**
@@ -163,7 +163,7 @@ public class PeriodicPriorityQueue {
           "No callbacks to run! Did you make sure to call add() first?");
     }
 
-    NotifierJNI.setNotifierAlarm(notifier, callback.m_expirationTime, 0, true, true);
+    NotifierJNI.setNotifierAlarm(notifier, callback.expirationTime, 0, true, true);
 
     try {
       WPIUtilJNI.waitForObject(notifier);
@@ -173,30 +173,28 @@ public class PeriodicPriorityQueue {
 
     m_loopStartTimeMicros = RobotController.getMonotonicTime();
 
-    callback.m_func.run();
+    callback.func.run();
 
     // Increment the expiration time by the number of full periods it's behind
     // plus one to avoid rapid repeat fires from a large loop overrun. We
     // assume m_loopStartTime ≥ expirationTime rather than checking for it since
     // the callback wouldn't be running otherwise.
-    callback.m_expirationTime +=
-        callback.m_period
-            + (m_loopStartTimeMicros - callback.m_expirationTime)
-                / callback.m_period
-                * callback.m_period;
+    callback.expirationTime +=
+        callback.period
+            + (m_loopStartTimeMicros - callback.expirationTime) / callback.period * callback.period;
     m_queue.add(callback);
 
     // Process all other callbacks that are ready to run
-    while (m_queue.peek().m_expirationTime <= m_loopStartTimeMicros) {
+    while (m_queue.peek().expirationTime <= m_loopStartTimeMicros) {
       callback = m_queue.poll();
 
-      callback.m_func.run();
+      callback.func.run();
 
-      callback.m_expirationTime +=
-          callback.m_period
-              + (m_loopStartTimeMicros - callback.m_expirationTime)
-                  / callback.m_period
-                  * callback.m_period;
+      callback.expirationTime +=
+          callback.period
+              + (m_loopStartTimeMicros - callback.expirationTime)
+                  / callback.period
+                  * callback.period;
       m_queue.add(callback);
     }
 
@@ -223,13 +221,13 @@ public class PeriodicPriorityQueue {
    */
   public static class Callback implements Comparable<Callback> {
     /** The function to execute when the callback fires. */
-    public final Runnable m_func;
+    public final Runnable func;
 
     /** The period at which to run the callback in microseconds. */
-    public final long m_period;
+    public final long period;
 
     /** The next scheduled execution time in monotonic timestamp microseconds. */
-    public long m_expirationTime;
+    public long expirationTime;
 
     /**
      * Construct a callback container.
@@ -240,13 +238,13 @@ public class PeriodicPriorityQueue {
      * @param offset The offset from the common starting time in microseconds.
      */
     public Callback(Runnable func, long startTime, long period, long offset) {
-      this.m_func = func;
-      this.m_period = period;
-      this.m_expirationTime =
+      this.func = func;
+      this.period = period;
+      this.expirationTime =
           startTime
               + offset
-              + (1 + (RobotController.getMonotonicTime() - startTime - offset) / this.m_period)
-                  * this.m_period;
+              + (1 + (RobotController.getMonotonicTime() - startTime - offset) / this.period)
+                  * this.period;
     }
 
     /**
@@ -280,7 +278,7 @@ public class PeriodicPriorityQueue {
      */
     @Override
     public boolean equals(Object rhs) {
-      return rhs instanceof Callback callback && m_expirationTime == callback.m_expirationTime;
+      return rhs instanceof Callback callback && expirationTime == callback.expirationTime;
     }
 
     /**
@@ -290,7 +288,7 @@ public class PeriodicPriorityQueue {
      */
     @Override
     public int hashCode() {
-      return Long.hashCode(m_expirationTime);
+      return Long.hashCode(expirationTime);
     }
 
     /**
@@ -306,7 +304,7 @@ public class PeriodicPriorityQueue {
     public int compareTo(Callback rhs) {
       // Elements with sooner expiration times are sorted as lesser. The head of
       // Java's PriorityQueue is the least element.
-      return Long.compare(m_expirationTime, rhs.m_expirationTime);
+      return Long.compare(expirationTime, rhs.expirationTime);
     }
   }
 }

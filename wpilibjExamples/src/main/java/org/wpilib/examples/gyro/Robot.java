@@ -26,22 +26,22 @@ public class Robot extends TimedRobot {
       OnboardIMU.MountOrientation.FLAT;
   private static final int kJoystickPort = 0;
 
-  private final PWMSparkMax m_leftDrive = new PWMSparkMax(kLeftMotorPort);
-  private final PWMSparkMax m_rightDrive = new PWMSparkMax(kRightMotorPort);
-  private final DifferentialDrive m_robotDrive =
-      new DifferentialDrive(m_leftDrive::setThrottle, m_rightDrive::setThrottle);
-  private final OnboardIMU m_imu = new OnboardIMU(kIMUMountOrientation);
-  private final Joystick m_joystick = new Joystick(kJoystickPort);
+  private final PWMSparkMax leftDrive = new PWMSparkMax(kLeftMotorPort);
+  private final PWMSparkMax rightDrive = new PWMSparkMax(kRightMotorPort);
+  private final DifferentialDrive robotDrive =
+      new DifferentialDrive(leftDrive::setThrottle, rightDrive::setThrottle);
+  private final OnboardIMU imu = new OnboardIMU(kIMUMountOrientation);
+  private final Joystick joystick = new Joystick(kJoystickPort);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    SendableRegistry.addChild(m_robotDrive, m_leftDrive);
-    SendableRegistry.addChild(m_robotDrive, m_rightDrive);
+    SendableRegistry.addChild(robotDrive, leftDrive);
+    SendableRegistry.addChild(robotDrive, rightDrive);
 
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightDrive.setInverted(true);
+    rightDrive.setInverted(true);
   }
 
   /**
@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    double turningValue = (kAngleSetpoint - m_imu.getRotation2d().getDegrees()) * kP;
-    m_robotDrive.arcadeDrive(-m_joystick.getY(), -turningValue);
+    double turningValue = (kAngleSetpoint - imu.getRotation2d().getDegrees()) * kP;
+    robotDrive.arcadeDrive(-joystick.getY(), -turningValue);
   }
 }

@@ -203,7 +203,7 @@ class JoystickModel {
   std::unique_ptr<wpi::glass::DoubleSource> axes[HAL_MAX_JOYSTICK_AXES];
   // use pointer instead of unique_ptr to allow it to be passed directly
   // to DrawLEDSources()
-  wpi::glass::BooleanSource* buttons[32];
+  wpi::glass::BooleanSource* buttons[64];
   std::unique_ptr<wpi::glass::IntegerSource> povs[HAL_MAX_JOYSTICK_POVS];
 
  private:
@@ -309,7 +309,7 @@ struct OpModes {
 static wpi::util::mutex gOpModeOptionsMutex;
 static OpModes gAutoOpModes;
 static OpModes gTeleopOpModes;
-static OpModes gTestOpModes;
+static OpModes gUtilityOpModes;
 
 static void UpdateOpModes(const char* name, void* param,
                           const HAL_OpModeOption* opmodes, int32_t count) {
@@ -318,8 +318,8 @@ static void UpdateOpModes(const char* name, void* param,
   gAutoOpModes.groups.clear();
   gTeleopOpModes.ids.clear();
   gTeleopOpModes.groups.clear();
-  gTestOpModes.ids.clear();
-  gTestOpModes.groups.clear();
+  gUtilityOpModes.ids.clear();
+  gUtilityOpModes.groups.clear();
   for (auto&& o : std::span{opmodes, opmodes + count}) {
     OpModes* vec;
     switch (HAL_OpMode_GetRobotMode(o.id)) {
@@ -329,8 +329,8 @@ static void UpdateOpModes(const char* name, void* param,
       case HAL_ROBOT_MODE_TELEOPERATED:
         vec = &gTeleopOpModes;
         break;
-      case HAL_ROBOT_MODE_TEST:
-        vec = &gTestOpModes;
+      case HAL_ROBOT_MODE_UTILITY:
+        vec = &gUtilityOpModes;
         break;
       default:
         continue;
@@ -341,7 +341,7 @@ static void UpdateOpModes(const char* name, void* param,
                      std::string{wpi::util::to_string_view(&o.description)},
                      o.textColor, o.backgroundColor});
   }
-  for (auto&& vec : {&gAutoOpModes, &gTeleopOpModes, &gTestOpModes}) {
+  for (auto&& vec : {&gAutoOpModes, &gTeleopOpModes, &gUtilityOpModes}) {
     for (auto&& [group, options] : vec->groups) {
       std::sort(options.begin(), options.end(),
                 [](const OpModeOption& a, const OpModeOption& b) {
@@ -1181,9 +1181,9 @@ static void DriverStationExecute() {
             isAttached && robotMode == HAL_ROBOT_MODE_TELEOPERATED)) {
       DriverStationSetRobotMode(HAL_ROBOT_MODE_TELEOPERATED);
     }
-    if (ImGui::Selectable("Test",
-                          isAttached && robotMode == HAL_ROBOT_MODE_TEST)) {
-      DriverStationSetRobotMode(HAL_ROBOT_MODE_TEST);
+    if (ImGui::Selectable("Utility",
+                          isAttached && robotMode == HAL_ROBOT_MODE_UTILITY)) {
+      DriverStationSetRobotMode(HAL_ROBOT_MODE_UTILITY);
     }
     // OpMode
     bool canEnable = isAttached && started;
@@ -1200,8 +1200,8 @@ static void DriverStationExecute() {
         case HAL_ROBOT_MODE_TELEOPERATED:
           modes = &gTeleopOpModes;
           break;
-        case HAL_ROBOT_MODE_TEST:
-          modes = &gTestOpModes;
+        case HAL_ROBOT_MODE_UTILITY:
+          modes = &gUtilityOpModes;
           break;
         default:
           modes = nullptr;
@@ -1294,8 +1294,9 @@ void FMSSimModel::UpdateHAL() {
   HALSIM_SetDriverStationRobotMode(
       static_cast<HAL_RobotMode>(m_robotMode.GetValue()));
   HALSIM_SetDriverStationMatchTime(m_matchTime.GetValue());
-  auto str = wpi::util::make_string(m_gameMessage.GetValue());
-  HALSIM_SetGameDataString(&str);
+  std::string str = m_gameMessage.GetValue();
+  auto gameData = wpi::util::make_string(str);
+  HALSIM_SetGameDataString(&gameData);
   HALSIM_SetDriverStationDsAttached(m_dsAttached.GetValue());
 }
 
@@ -1477,7 +1478,7 @@ static void DisplayJoysticks() {
       }
 
       uint8_t povCount =
-          static_cast<uint8_t>(16 - std::countl_zero(joy.data.povs.available));
+          static_cast<uint8_t>(8 - std::countl_zero(joy.data.povs.available));
 
       for (int j = 0; j < povCount; ++j) {
         if (source && source->povs[j]) {

@@ -29,6 +29,6 @@ classes:
       IsAutonomousEnabled:
       IsTeleop:
       IsTeleopEnabled:
-      IsTest:
-      IsTestEnabled:
+      IsUtility:
+      IsUtilityEnabled:
       GetValue:

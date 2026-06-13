@@ -99,13 +99,13 @@ struct DashboardOpModeInstance {
   void Start(nt::NetworkTableInstance inst) {
     autoOpModes.Start(inst, "/SmartDashboard/Auto OpMode");
     teleopOpModes.Start(inst, "/SmartDashboard/Teleop OpMode");
-    testOpModes.Start(inst, "/SmartDashboard/Test OpMode");
+    utilityOpModes.Start(inst, "/SmartDashboard/Utility OpMode");
   }
 
   util::mutex mutex;
   DashboardOpModeSender autoOpModes;
   DashboardOpModeSender teleopOpModes;
-  DashboardOpModeSender testOpModes;
+  DashboardOpModeSender utilityOpModes;
 };
 }  // namespace
 
@@ -122,7 +122,7 @@ void hal::SetDashboardOpModeOptions(std::span<const HAL_OpModeOption> options) {
   std::scoped_lock lock{gInstance->mutex};
   gInstance->autoOpModes.SetOptions(options, HAL_ROBOT_MODE_AUTONOMOUS);
   gInstance->teleopOpModes.SetOptions(options, HAL_ROBOT_MODE_TELEOPERATED);
-  gInstance->testOpModes.SetOptions(options, HAL_ROBOT_MODE_TEST);
+  gInstance->utilityOpModes.SetOptions(options, HAL_ROBOT_MODE_UTILITY);
 }
 
 void hal::StartDashboardOpMode() {
@@ -141,7 +141,7 @@ void hal::EnableDashboardOpMode() {
   std::scoped_lock lock{gInstance->mutex};
   gInstance->autoOpModes.Enable();
   gInstance->teleopOpModes.Enable();
-  gInstance->testOpModes.Enable();
+  gInstance->utilityOpModes.Enable();
 }
 
 int64_t hal::GetDashboardSelectedOpMode(HAL_RobotMode robotMode) {
@@ -154,8 +154,8 @@ int64_t hal::GetDashboardSelectedOpMode(HAL_RobotMode robotMode) {
       return gInstance->autoOpModes.GetSelected();
     case HAL_ROBOT_MODE_TELEOPERATED:
       return gInstance->teleopOpModes.GetSelected();
-    case HAL_ROBOT_MODE_TEST:
-      return gInstance->testOpModes.GetSelected();
+    case HAL_ROBOT_MODE_UTILITY:
+      return gInstance->utilityOpModes.GetSelected();
     default:
       return 0;
   }

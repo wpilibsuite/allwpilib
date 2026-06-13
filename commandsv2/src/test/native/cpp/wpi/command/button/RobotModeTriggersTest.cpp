@@ -6,7 +6,6 @@
 
 #include "../CommandTestBase.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/simulation/DriverStationSim.hpp"
 
@@ -40,11 +39,11 @@ TEST(RobotModeTriggersTest, Disabled) {
   EXPECT_TRUE(disabled.Get());
 }
 
-TEST(RobotModeTriggersTest, TestMode) {
+TEST(RobotModeTriggersTest, UtilityMode) {
   DriverStationSim::ResetData();
-  DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_TEST);
+  DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_UTILITY);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
-  Trigger test = RobotModeTriggers::Test();
+  Trigger test = RobotModeTriggers::Utility();
   EXPECT_TRUE(test.Get());
 }

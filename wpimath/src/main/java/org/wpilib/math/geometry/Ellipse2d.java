@@ -18,7 +18,7 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
 /** Represents a 2d ellipse space containing translational, rotational, and scaling components. */
-public class Ellipse2d implements ProtobufSerializable, StructSerializable {
+public final class Ellipse2d implements ProtobufSerializable, StructSerializable {
   private final Pose2d m_center;
   private final double m_xSemiAxis;
   private final double m_ySemiAxis;

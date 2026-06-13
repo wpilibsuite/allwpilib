@@ -41,7 +41,7 @@ namespace Catch {
                     callable& operator=(callable&&) = default;
                 };
                 template <typename Fun>
-                struct model : public callable {
+                struct model final : public callable {
                     model(Fun&& fun_) : fun(CATCH_MOVE(fun_)) {}
                     model(Fun const& fun_) : fun(fun_) {}
 

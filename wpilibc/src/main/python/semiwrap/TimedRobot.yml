@@ -1,8 +1,12 @@
+extra_includes:
+- pybind11/chrono.h
+
 classes:
   wpi::TimedRobot:
     attributes:
       DEFAULT_PERIOD:
       m_notifier:
+        ignore: true
       m_startTime:
     methods:
       StartCompetition:

@@ -23,12 +23,12 @@ import org.wpilib.simulation.SimHooks;
 
 @ResourceLock("timing")
 class DigitalCommunicationTest {
-  private Robot m_robot;
-  private Thread m_thread;
-  private final DIOSim m_allianceOutput = new DIOSim(Robot.kAlliancePort);
-  private final DIOSim m_enabledOutput = new DIOSim(Robot.kEnabledPort);
-  private final DIOSim m_autonomousOutput = new DIOSim(Robot.kAutonomousPort);
-  private final DIOSim m_alertOutput = new DIOSim(Robot.kAlertPort);
+  private Robot robot;
+  private Thread thread;
+  private final DIOSim allianceOutput = new DIOSim(Robot.kAlliancePort);
+  private final DIOSim enabledOutput = new DIOSim(Robot.kEnabledPort);
+  private final DIOSim autonomousOutput = new DIOSim(Robot.kAutonomousPort);
+  private final DIOSim alertOutput = new DIOSim(Robot.kAlertPort);
 
   @BeforeEach
   void startThread() {
@@ -36,26 +36,26 @@ class DigitalCommunicationTest {
     SimHooks.pauseTiming();
     SimHooks.setProgramStarted(false);
     DriverStationSim.resetData();
-    m_robot = new Robot();
-    m_thread = new Thread(m_robot::startCompetition);
-    m_thread.start();
+    robot = new Robot();
+    thread = new Thread(robot::startCompetition);
+    thread.start();
     SimHooks.waitForProgramStart();
   }
 
   @AfterEach
   void stopThread() {
-    m_robot.endCompetition();
+    robot.endCompetition();
     try {
-      m_thread.interrupt();
-      m_thread.join();
+      thread.interrupt();
+      thread.join();
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
     }
-    m_robot.close();
-    m_allianceOutput.resetData();
-    m_enabledOutput.resetData();
-    m_autonomousOutput.resetData();
-    m_alertOutput.resetData();
+    robot.close();
+    allianceOutput.resetData();
+    enabledOutput.resetData();
+    autonomousOutput.resetData();
+    alertOutput.resetData();
   }
 
   @EnumSource(AllianceStationID.class)
@@ -64,12 +64,12 @@ class DigitalCommunicationTest {
     DriverStationSim.setAllianceStationId(alliance);
     DriverStationSim.notifyNewData();
 
-    assertTrue(m_allianceOutput.getInitialized());
-    assertFalse(m_allianceOutput.getIsInput());
+    assertTrue(allianceOutput.getInitialized());
+    assertFalse(allianceOutput.getIsInput());
 
     SimHooks.stepTiming(0.02);
 
-    assertEquals(alliance.name().startsWith("RED"), m_allianceOutput.getValue());
+    assertEquals(alliance.name().startsWith("RED"), allianceOutput.getValue());
   }
 
   @ValueSource(booleans = {true, false})
@@ -78,12 +78,12 @@ class DigitalCommunicationTest {
     DriverStationSim.setEnabled(enabled);
     DriverStationSim.notifyNewData();
 
-    assertTrue(m_enabledOutput.getInitialized());
-    assertFalse(m_enabledOutput.getIsInput());
+    assertTrue(enabledOutput.getInitialized());
+    assertFalse(enabledOutput.getIsInput());
 
     SimHooks.stepTiming(0.02);
 
-    assertEquals(enabled, m_enabledOutput.getValue());
+    assertEquals(enabled, enabledOutput.getValue());
   }
 
   @ValueSource(booleans = {true, false})
@@ -92,12 +92,12 @@ class DigitalCommunicationTest {
     DriverStationSim.setRobotMode(autonomous ? RobotMode.AUTONOMOUS : RobotMode.TELEOPERATED);
     DriverStationSim.notifyNewData();
 
-    assertTrue(m_autonomousOutput.getInitialized());
-    assertFalse(m_autonomousOutput.getIsInput());
+    assertTrue(autonomousOutput.getInitialized());
+    assertFalse(autonomousOutput.getIsInput());
 
     SimHooks.stepTiming(0.02);
 
-    assertEquals(autonomous, m_autonomousOutput.getValue());
+    assertEquals(autonomous, autonomousOutput.getValue());
   }
 
   @ValueSource(doubles = {45.0, 27.0, 23.0})
@@ -106,11 +106,11 @@ class DigitalCommunicationTest {
     DriverStationSim.setMatchTime(matchTime);
     DriverStationSim.notifyNewData();
 
-    assertTrue(m_alertOutput.getInitialized());
-    assertFalse(m_alertOutput.getIsInput());
+    assertTrue(alertOutput.getInitialized());
+    assertFalse(alertOutput.getIsInput());
 
     SimHooks.stepTiming(0.02);
 
-    assertEquals(matchTime <= 30 && matchTime >= 25, m_alertOutput.getValue());
+    assertEquals(matchTime <= 30 && matchTime >= 25, alertOutput.getValue());
   }
 }

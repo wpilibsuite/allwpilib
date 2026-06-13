@@ -153,7 +153,7 @@ void MotorSafety::Check() {
     stopTime = m_stopTime;
   }
 
-  if (!enabled || RobotState::IsDisabled() || RobotState::IsTest()) {
+  if (!enabled || RobotState::IsDisabled() || RobotState::IsUtility()) {
     return;
   }
 

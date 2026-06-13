@@ -19,6 +19,7 @@ inline void CheckInit() {
 extern void InitializeCTREPCM();
 extern void InitializeREVPH();
 extern void InitializeAddressableLED();
+extern void InitializeAlert();
 extern void InitializeAnalogInput();
 extern void InitializeAnalogInternal();
 extern void InitializeCAN();
@@ -28,7 +29,6 @@ extern void InitializeDigitalInternal();
 extern void InitializeDIO();
 extern void InitializeDutyCycle();
 extern void InitializeEncoder();
-extern void InitializeFIRSTDriverStation();
 extern void InitializeHAL();
 extern void InitializeI2C();
 extern void InitializeIMU();

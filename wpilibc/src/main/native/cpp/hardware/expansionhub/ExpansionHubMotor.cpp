@@ -4,6 +4,8 @@
 
 #include "wpi/hardware/expansionhub/ExpansionHubMotor.hpp"
 
+#include "wpi/hardware/expansionhub/ExpansionHubPositionConstants.hpp"
+#include "wpi/hardware/expansionhub/ExpansionHubVelocityConstants.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/SystemServer.hpp"
 
@@ -18,8 +20,8 @@ using namespace wpi;
 ExpansionHubMotor::ExpansionHubMotor(int usbId, int channel)
     : m_hub{usbId},
       m_channel{channel},
-      m_velocityPidConstants{usbId, channel, true},
-      m_positionPidConstants{usbId, channel, false} {
+      m_velocityConstants{usbId, channel},
+      m_positionConstants{usbId, channel} {
   WPILIB_AssertMessage(channel >= 0 && channel < ExpansionHub::NumMotorPorts,
                        "ExHub Motor Channel {} out of range", channel);
 
@@ -28,7 +30,7 @@ ExpansionHubMotor::ExpansionHubMotor(int usbId, int channel)
                            channel);
   }
 
-  m_hub.ReportUsage(fmt::format("ExHubServo[{}]", channel), "ExHubServo");
+  m_hub.ReportUsage(fmt::format("ExHubMotor[{}]", channel), "ExHubMotor");
 
   auto systemServer = SystemServer::GetSystemServer();
 
@@ -148,19 +150,36 @@ void ExpansionHubMotor::ResetEncoder() {
   m_resetEncoderPublisher.Set(true);
 }
 
-ExpansionHubPidConstants& ExpansionHubMotor::GetVelocityPidConstants() {
-  return m_velocityPidConstants;
+ExpansionHubVelocityConstants& ExpansionHubMotor::GetVelocityConstants() {
+  return m_velocityConstants;
 }
 
-ExpansionHubPidConstants& ExpansionHubMotor::GetPositionPidConstants() {
-  return m_positionPidConstants;
+ExpansionHubPositionConstants& ExpansionHubMotor::GetPositionConstants() {
+  return m_positionConstants;
 }
 
-void ExpansionHubMotor::Follow(const ExpansionHubMotor& leader) {
+void ExpansionHubMotor::Follow(const ExpansionHubMotor& leader,
+                               FollowDirection direction) {
   if (m_hub.GetUsbId() != leader.m_hub.GetUsbId()) {
     throw WPILIB_MakeError(err::InvalidParameter,
                            "Cannot follow motor on different hub");
   }
+  if (m_channel == leader.m_channel) {
+    throw WPILIB_MakeError(err::InvalidParameter, "Cannot follow self");
+  }
+  m_hub.AddFollower(leader.m_channel, m_channel);
+  SetEnabled(true);
   m_modePublisher.Set(kFollowerMode);
-  m_setpointPublisher.Set(leader.m_channel);
+  if (direction == FollowDirection::Opposed) {
+    m_setpointPublisher.Set(leader.m_channel + 4);
+  } else {
+    m_setpointPublisher.Set(leader.m_channel);
+  }
+}
+
+void ExpansionHubMotor::Unfollow() {
+  m_hub.RemoveFollower(m_channel);
+  SetEnabled(false);
+  m_modePublisher.Set(kPercentageMode);
+  m_setpointPublisher.Set(0);
 }

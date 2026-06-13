@@ -15,6 +15,7 @@
 #define WPIUTIL_WPI_BIT_H
 
 #include "wpi/util/Compiler.hpp"
+#include <cstddef> // for std::size_t
 #include <cstdint>
 #include <limits>
 #include <type_traits>

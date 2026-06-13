@@ -8,7 +8,7 @@
 #include <string>
 #include <thread>
 
-#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/DriverStation.hpp"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/Main.h"
 #include "wpi/nt/NetworkTable.hpp"
@@ -47,7 +47,7 @@ void RunRobot(wpi::util::mutex& m, Robot** robot) {
         "  See https://wpilib.org/stacktrace for more information.\n");
     throw;
   } catch (const std::exception& e) {
-    HAL_SendError(1, err::Error, 0, e.what(), "", "", 1);
+    wpi::hal::SendError(1, err::Error, e.what(), "", "", 1);
     throw;
   }
 }
@@ -64,7 +64,7 @@ int StartRobot() {
   if (!WPI_IsRuntimeValid(&foundMajor, &foundMinor, &expectedMajor,
                           &expectedMinor, &runtimePath)) {
     // We could make this error better, however unlike Java, there is only a
-    // single scenario that could be occuring. The entirety of VS is too out
+    // single scenario that could be occurring. The entirety of VS is too out
     // of date. In most cases the linker should detect this, but not always.
     fmt::println(
         "Your copy of Visual Studio is out of date. Please update it.\n");
@@ -191,20 +191,20 @@ class RobotBase {
   static bool IsTeleopEnabled();
 
   /**
-   * Determine if the robot is currently in Test mode.
+   * Determine if the robot is currently in Utility mode.
    *
-   * @return True if the robot is currently running in Test mode as determined
-   * by the Driver Station.
+   * @return True if the robot is currently running in Utility mode as
+   * determined by the Driver Station.
    */
-  static bool IsTest();
+  static bool IsUtility();
 
   /**
-   * Determine if the robot is current in Test mode and enabled.
+   * Determine if the robot is currently in Utility mode and enabled.
    *
-   * @return True if the robot is currently operating in Test mode while
+   * @return True if the robot is currently operating in Utility mode while
    * enabled as determined by the Driver Station.
    */
-  static bool IsTestEnabled();
+  static bool IsUtilityEnabled();
 
   /**
    * Gets the currently selected operating mode of the driver station. Note this

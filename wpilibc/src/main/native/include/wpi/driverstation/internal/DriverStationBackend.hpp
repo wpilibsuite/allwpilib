@@ -24,6 +24,10 @@ namespace wpi::log {
 class DataLog;
 }  // namespace wpi::log
 
+namespace wpi {
+class GenericHID;
+}  // namespace wpi
+
 namespace wpi::util {
 class Color;
 }  // namespace wpi::util
@@ -40,6 +44,22 @@ class DriverStationBackend final {
  public:
   /// Number of Joystick ports.
   static constexpr int JOYSTICK_PORTS = 6;
+
+  /**
+   * Constructs a GenericHID for the given port.
+   *
+   * @param port The port index on the Driver Station.
+   * @return The GenericHID object for the given port.
+   */
+  static GenericHID ConstructGenericHID(int port);
+
+  /**
+   * Resets cached DriverStation HID wrapper objects.
+   *
+   * This is intended for test cleanup only. Any existing references to cached
+   * GenericHID or Gamepad objects become invalid after this call.
+   */
+  static void ResetCachedHIDData();
 
   /**
    * The state of one joystick button. Button indexes begin at 0.
@@ -303,19 +323,19 @@ class DriverStationBackend final {
   static bool IsTeleopEnabled() { return GetControlWord().IsTeleopEnabled(); }
 
   /**
-   * Check if the DS is commanding test mode.
+   * Check if the DS is commanding utility mode.
    *
-   * @return True if the robot is being commanded to be in test mode
+   * @return True if the robot is being commanded to be in utility mode
    */
-  static bool IsTest() { return GetControlWord().IsTest(); }
+  static bool IsUtility() { return GetControlWord().IsUtility(); }
 
   /**
-   * Check if the DS is commanding Test mode and if it has enabled the robot.
+   * Check if the DS is commanding Utility mode and if it has enabled the robot.
    *
-   * @return True if the robot is being commanded to be in Test mode and
+   * @return True if the robot is being commanded to be in Utility mode and
    * enabled.
    */
-  static bool IsTestEnabled() { return GetControlWord().IsTestEnabled(); }
+  static bool IsUtilityEnabled() { return GetControlWord().IsUtilityEnabled(); }
 
   /**
    * Adds an operating mode option. It's necessary to call PublishOpModes() to

@@ -79,6 +79,9 @@ bool HALSimWS::Initialize() {
     m_useMsgFiltering = false;
   }
 
+  wpi::util::println("Your WebSockets IP Address: {}", m_host);
+  wpi::util::println("Your WebSockets Port: {}", m_port);
+
   return true;
 }
 

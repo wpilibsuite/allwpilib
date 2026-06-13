@@ -14,16 +14,16 @@ import org.wpilib.examples.hatchbottraditional.subsystems.HatchSubsystem;
  */
 public class GrabHatch extends Command {
   // The subsystem the command runs on
-  private final HatchSubsystem m_hatchSubsystem;
+  private final HatchSubsystem hatchSubsystem;
 
   public GrabHatch(HatchSubsystem subsystem) {
-    m_hatchSubsystem = subsystem;
-    addRequirements(m_hatchSubsystem);
+    hatchSubsystem = subsystem;
+    addRequirements(hatchSubsystem);
   }
 
   @Override
   public void initialize() {
-    m_hatchSubsystem.grabHatch();
+    hatchSubsystem.grabHatch();
   }
 
   @Override

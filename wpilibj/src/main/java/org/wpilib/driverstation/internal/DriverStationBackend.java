@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 import org.wpilib.datalog.BooleanArrayLogEntry;
 import org.wpilib.datalog.DataLog;
 import org.wpilib.datalog.FloatArrayLogEntry;
@@ -65,15 +66,15 @@ public final class DriverStationBackend {
   }
 
   private static final class HALJoystickTouchpadFinger {
-    public float m_x;
-    public float m_y;
-    public boolean m_down;
+    float m_x;
+    float m_y;
+    boolean m_down;
   }
 
   private static class HALJoystickTouchpad {
-    public final HALJoystickTouchpadFinger[] m_fingers =
+    final HALJoystickTouchpadFinger[] m_fingers =
         new HALJoystickTouchpadFinger[DriverStationJNI.MAX_JOYSTICK_TOUCHPAD_FINGERS];
-    public int m_count;
+    int m_count;
 
     HALJoystickTouchpad() {
       for (int i = 0; i < m_fingers.length; i++) {
@@ -83,9 +84,9 @@ public final class DriverStationBackend {
   }
 
   private static class HALJoystickTouchpads {
-    public final HALJoystickTouchpad[] m_touchpads =
+    final HALJoystickTouchpad[] m_touchpads =
         new HALJoystickTouchpad[DriverStationJNI.MAX_JOYSTICK_TOUCHPADS];
-    public int m_count;
+    int m_count;
 
     HALJoystickTouchpads() {
       for (int i = 0; i < m_touchpads.length; i++) {
@@ -95,13 +96,13 @@ public final class DriverStationBackend {
   }
 
   private static final class HALJoystickButtons {
-    public long m_buttons;
-    public long m_available;
+    long m_buttons;
+    long m_available;
   }
 
   private static class HALJoystickAxes {
-    public final float[] m_axes;
-    public int m_available;
+    final float[] m_axes;
+    int m_available;
 
     HALJoystickAxes(int count) {
       m_axes = new float[count];
@@ -109,10 +110,10 @@ public final class DriverStationBackend {
   }
 
   private static class HALJoystickAxesRaw {
-    public final short[] m_axes;
+    final short[] m_axes;
 
     @SuppressWarnings("unused")
-    public int m_available;
+    int m_available;
 
     HALJoystickAxesRaw(int count) {
       m_axes = new short[count];
@@ -120,8 +121,8 @@ public final class DriverStationBackend {
   }
 
   private static class HALJoystickPOVs {
-    public final byte[] m_povs;
-    public int m_available;
+    final byte[] m_povs;
+    int m_available;
 
     HALJoystickPOVs(int count) {
       m_povs = new byte[count];
@@ -150,7 +151,6 @@ public final class DriverStationBackend {
     return "<" + id + ">";
   }
 
-  @SuppressWarnings("MemberName")
   private static class MatchDataSender {
     private static final String kSmartDashboardType = "FMSInfo";
 
@@ -571,8 +571,45 @@ public final class DriverStationBackend {
         }
       }
     }
-    DriverStationJNI.sendError(
-        isError, code, false, error, locString, traceString.toString(), true);
+    DriverStationJNI.sendError(isError, code, error, locString, traceString.toString(), true);
+  }
+
+  /**
+   * Report crash to Driver Station. Appends provided stack trace to crash message.
+   *
+   * @param error The error message
+   * @param stackTrace The stack trace to append
+   */
+  public static void reportCrash(String error, StackTraceElement[] stackTrace) {
+    reportCrashImpl(error, stackTrace, 0);
+  }
+
+  private static void reportCrashImpl(
+      String error, StackTraceElement[] stackTrace, int stackTraceFirst) {
+    String locString;
+    if (stackTrace.length >= stackTraceFirst + 1) {
+      locString = stackTrace[stackTraceFirst].toString();
+    } else {
+      locString = "";
+    }
+    StringBuilder traceString = new StringBuilder();
+    boolean haveLoc = false;
+    for (int i = stackTraceFirst; i < stackTrace.length; i++) {
+      String loc = stackTrace[i].toString();
+      traceString.append("\tat ").append(loc).append('\n');
+      // get first user function
+      if (!haveLoc && !loc.startsWith("org.wpilib")) {
+        locString = loc;
+        haveLoc = true;
+      }
+    }
+    DriverStationJNI.sendProgramCrash(error, locString, traceString.toString());
+    // Sleep to ensure message is sent before crash
+    try {
+      Thread.sleep(100);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
   }
 
   /**
@@ -1167,30 +1204,30 @@ public final class DriverStationBackend {
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in Test
+   * Gets a value indicating whether the Driver Station requires the robot to be running in Utility
    * mode.
    *
-   * @return True if test mode should be enabled, false otherwise.
+   * @return True if utility mode should be enabled, false otherwise.
    */
-  public static boolean isTest() {
+  public static boolean isUtility() {
     m_cacheDataMutex.lock();
     try {
-      return m_controlWord.isTest();
+      return m_controlWord.isUtility();
     } finally {
       m_cacheDataMutex.unlock();
     }
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in Test
+   * Gets a value indicating whether the Driver Station requires the robot to be running in Utility
    * mode and enabled.
    *
-   * @return True if test mode should be set and the robot should be enabled.
+   * @return True if utility mode should be set and the robot should be enabled.
    */
-  public static boolean isTestEnabled() {
+  public static boolean isUtilityEnabled() {
     m_cacheDataMutex.lock();
     try {
-      return m_controlWord.isTestEnabled();
+      return m_controlWord.isUtilityEnabled();
     } finally {
       m_cacheDataMutex.unlock();
     }
@@ -1342,6 +1379,14 @@ public final class DriverStationBackend {
       DriverStationJNI.setOpModeOptions(m_opModes.values().toArray(options));
     } finally {
       m_opModesMutex.unlock();
+    }
+
+    var modeCounts =
+        m_opModes.values().stream()
+            .collect(Collectors.groupingBy(OpModeOption::getMode, Collectors.counting()));
+
+    for (RobotMode mode : RobotMode.values()) {
+      HAL.reportUsage("OpMode/" + mode, String.valueOf(modeCounts.getOrDefault(mode, 0L)));
     }
   }
 

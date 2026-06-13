@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Sat, 7 May 2022 22:13:55 -0400
+Subject: [PATCH 03/34] FunctionExtras: change unique_function storage size
+
+---
+ llvm/include/llvm/ADT/FunctionExtras.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
+index 807a2e769999c8caca5cb9edc97c8ddccf88b694..c4d0821076d63842927d2abeef4a5189cdf325e7 100644
+--- a/llvm/include/llvm/ADT/FunctionExtras.h
++++ b/llvm/include/llvm/ADT/FunctionExtras.h
+@@ -74,7 +74,7 @@ using EnableIfCallable = std::enable_if_t<std::disjunction<
+ 
+ template <typename ReturnT, typename... ParamTs> class UniqueFunctionBase {
+ protected:
+-  static constexpr size_t InlineStorageSize = sizeof(void *) * 3;
++  static constexpr size_t InlineStorageSize = sizeof(void *) * 4;
+   static constexpr size_t InlineStorageAlign = alignof(void *);
+ 
+   // Provide a type function to map parameters that won't observe extra copies
+@@ -149,7 +149,7 @@ protected:
+         "Should always use all of the out-of-line storage for inline storage!");
+ 
+     // For in-line storage, we just provide an aligned character buffer. We
+-    // provide three pointers worth of storage here.
++    // provide four pointers worth of storage here.
+     // This is mutable as an inlined `const unique_function<void() const>` may
+     // still modify its own mutable members.
+     alignas(InlineStorageAlign) mutable std::byte

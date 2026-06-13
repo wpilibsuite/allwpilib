@@ -23,7 +23,10 @@ class OpModeRobotTest : public ::testing::Test {
     wpi::sim::SetProgramStarted(false);
   }
 
-  void TearDown() override { wpi::sim::ResumeTiming(); }
+  void TearDown() override {
+    wpi::sim::ResumeTiming();
+    wpi::nt::ResetInstance(wpi::nt::GetDefaultInstance());
+  }
 };
 
 class MockRobot;
@@ -78,7 +81,7 @@ TEST_F(OpModeRobotTest, AddOpMode) {
       AddOpMode<MockOpMode>(wpi::RobotMode::AUTONOMOUS, "NoArgOpMode-Auto",
                             "Group", "Description", wpi::util::Color::WHITE,
                             wpi::util::Color::BLACK);
-      AddOpMode<OneArgOpMode>(wpi::RobotMode::TEST, "OneArgOpMode-Test",
+      AddOpMode<OneArgOpMode>(wpi::RobotMode::UTILITY, "OneArgOpMode-Test",
                               "Group", "Description", wpi::util::Color::WHITE,
                               wpi::util::Color::BLACK);
       AddOpMode<MockOpMode>(wpi::RobotMode::TELEOPERATED, "NoArgOpMode");

@@ -4,12 +4,12 @@
 
 #include "commands/GrabHatch.hpp"
 
-GrabHatch::GrabHatch(HatchSubsystem* subsystem) : m_hatch(subsystem) {
+GrabHatch::GrabHatch(HatchSubsystem* subsystem) : hatch(subsystem) {
   AddRequirements(subsystem);
 }
 
 void GrabHatch::Initialize() {
-  m_hatch->GrabHatch();
+  hatch->GrabHatch();
 }
 
 bool GrabHatch::IsFinished() {

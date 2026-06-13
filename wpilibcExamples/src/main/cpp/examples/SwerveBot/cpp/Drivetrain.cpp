@@ -10,21 +10,20 @@ void Drivetrain::Drive(wpi::units::meters_per_second_t xVelocity,
                        wpi::units::second_t period) {
   wpi::math::ChassisVelocities chassisVelocities{xVelocity, yVelocity, rot};
   if (fieldRelative) {
-    chassisVelocities =
-        chassisVelocities.ToRobotRelative(m_imu.GetRotation2d());
+    chassisVelocities = chassisVelocities.ToRobotRelative(imu.GetRotation2d());
   }
   chassisVelocities = chassisVelocities.Discretize(period);
 
-  auto [fl, fr, bl, br] = m_kinematics.DesaturateWheelVelocities(
-      m_kinematics.ToSwerveModuleVelocities(chassisVelocities), kMaxVelocity);
-  m_frontLeft.SetDesiredVelocity(fl);
-  m_frontRight.SetDesiredVelocity(fr);
-  m_backLeft.SetDesiredVelocity(bl);
-  m_backRight.SetDesiredVelocity(br);
+  auto [fl, fr, bl, br] = kinematics.DesaturateWheelVelocities(
+      kinematics.ToSwerveModuleVelocities(chassisVelocities), kMaxVelocity);
+  frontLeft.SetDesiredVelocity(fl);
+  frontRight.SetDesiredVelocity(fr);
+  backLeft.SetDesiredVelocity(bl);
+  backRight.SetDesiredVelocity(br);
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_odometry.Update(m_imu.GetRotation2d(),
-                    {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
-                     m_backLeft.GetPosition(), m_backRight.GetPosition()});
+  odometry.Update(imu.GetRotation2d(),
+                  {frontLeft.GetPosition(), frontRight.GetPosition(),
+                   backLeft.GetPosition(), backRight.GetPosition()});
 }

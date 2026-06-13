@@ -13,16 +13,28 @@
 #include <catch2/internal/catch_reusable_string_stream.hpp>
 #include <catch2/internal/catch_stream_end_stop.hpp>
 #include <catch2/internal/catch_message_info.hpp>
+#include <catch2/internal/catch_move_and_forward.hpp>
 #include <catch2/catch_tostring.hpp>
-#include <catch2/interfaces/catch_interfaces_capture.hpp>
 
 #include <string>
 #include <vector>
 
 namespace Catch {
+    struct MessageInfo;
+    struct MessageBuilder;
+
+    namespace Detail {
+        // The message state affecting functions have to be defined in
+        // the TU where the thread-local message holders are defined.
+        // Currently this is catch_run_context.cpp
+
+        void pushScopedMessage( MessageInfo&& message );
+        void popScopedMessage( unsigned int messageId );
+        void addUnscopedMessage( MessageInfo&& message );
+        void emplaceUnscopedMessage( MessageBuilder&& builder );
+    } // namespace Detail
 
     struct SourceLineInfo;
-    class IResultCapture;
 
     struct MessageStream {
 
@@ -112,7 +124,7 @@ namespace Catch {
 
 ///////////////////////////////////////////////////////////////////////////////
 #define INTERNAL_CATCH_UNSCOPED_INFO( macroName, log ) \
-    Catch::IResultCapture::emplaceUnscopedMessage( Catch::MessageBuilder( macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, Catch::ResultWas::Info ) << log )
+    Catch::Detail::emplaceUnscopedMessage( Catch::MessageBuilder( macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, Catch::ResultWas::Info ) << log )
 
 
 #if defined(CATCH_CONFIG_PREFIX_MESSAGES) && !defined(CATCH_CONFIG_DISABLE)

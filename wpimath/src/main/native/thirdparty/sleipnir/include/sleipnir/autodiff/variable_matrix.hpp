@@ -1141,12 +1141,12 @@ class VariableMatrix : public SleipnirBase {
   /// Returns const begin iterator.
   ///
   /// @return Const begin iterator.
-  const_iterator cbegin() const { return const_iterator{m_storage.begin()}; }
+  const_iterator cbegin() const { return const_iterator{m_storage.cbegin()}; }
 
   /// Returns const end iterator.
   ///
   /// @return Const end iterator.
-  const_iterator cend() const { return const_iterator{m_storage.end()}; }
+  const_iterator cend() const { return const_iterator{m_storage.cend()}; }
 
   /// Returns reverse begin iterator.
   ///
@@ -1191,11 +1191,11 @@ class VariableMatrix : public SleipnirBase {
   /// @return Number of elements in matrix.
   size_t size() const { return m_storage.size(); }
 
-  /// Returns a variable matrix filled with zeroes.
+  /// Returns a variable matrix filled with zeros.
   ///
   /// @param rows The number of matrix rows.
   /// @param cols The number of matrix columns.
-  /// @return A variable matrix filled with zeroes.
+  /// @return A variable matrix filled with zeros.
   static VariableMatrix<Scalar> zero(int rows, int cols) {
     VariableMatrix<Scalar> result{detail::empty, rows, cols};
 
@@ -1646,6 +1646,72 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
     return X;
   }
 }
+
+namespace detail {
+
+/// Returns the variable's gradient tree.
+///
+/// This function lazily allocates variables, so elements of the returned
+/// VariableMatrix will be empty if the corresponding element of wrt had no
+/// adjoint. Ensure Variable::expr isn't nullptr before calling member
+/// functions.
+///
+/// @tparam Scalar Scalar type.
+/// @param top_list Topologically sorted graph from parent to child.
+/// @param wrt Variables with respect to which to compute the gradient.
+/// @return The variable's gradient tree.
+template <typename Scalar>
+VariableMatrix<Scalar> gradient_tree(const ExpressionGraph<Scalar>& top_list,
+                                     const VariableMatrix<Scalar>& wrt) {
+  slp_assert(wrt.cols() == 1);
+
+  // Read docs/algorithms.md#Reverse_accumulation_automatic_differentiation
+  // for background on reverse accumulation automatic differentiation.
+
+  if (top_list.empty()) {
+    return VariableMatrix<Scalar>{detail::empty, wrt.rows(), 1};
+  }
+
+  // Set root node's adjoint to 1 since df/df is 1
+  top_list[0]->adjoint_expr = constant_ptr(Scalar(1));
+
+  // df/dx = (df/dy)(dy/dx). The adjoint of x is equal to the adjoint of y
+  // multiplied by dy/dx. If there are multiple "paths" from the root node to
+  // variable; the variable's adjoint is the sum of each path's adjoint
+  // contribution.
+  for (auto& node : top_list) {
+    auto& lhs = node->args[0];
+    auto& rhs = node->args[1];
+
+    if (lhs != nullptr) {
+      if (rhs != nullptr) {
+        // Binary operator
+        lhs->adjoint_expr += node->grad_expr_l(lhs, rhs, node->adjoint_expr);
+        rhs->adjoint_expr += node->grad_expr_r(lhs, rhs, node->adjoint_expr);
+      } else {
+        // Unary operator
+        lhs->adjoint_expr += node->grad_expr_l(lhs, rhs, node->adjoint_expr);
+      }
+    }
+  }
+
+  // Move gradient tree to return value
+  VariableMatrix<Scalar> grad{detail::empty, wrt.rows(), 1};
+  for (int row = 0; row < grad.rows(); ++row) {
+    grad[row] = Variable{std::move(wrt[row].expr->adjoint_expr)};
+  }
+
+  // Unlink adjoints to avoid circular references between them and their
+  // parent expressions. This ensures all expressions are returned to the free
+  // list.
+  for (auto& node : top_list) {
+    node->adjoint_expr = nullptr;
+  }
+
+  return grad;
+}
+
+}  // namespace detail
 
 extern template SLEIPNIR_DLLEXPORT VariableMatrix<double> solve(
     const VariableMatrix<double>& A, const VariableMatrix<double>& B);

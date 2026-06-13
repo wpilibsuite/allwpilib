@@ -16,7 +16,7 @@
     "commandversion": 0
   },
   {
-    "name": "Command",
+    "name": "Command (v2)",
     "description": "A command.",
     "tags": [
       "command"
@@ -32,7 +32,7 @@
     "commandversion": 2
   },
   {
-    "name": "InstantCommand",
+    "name": "InstantCommand (v2)",
     "description": "A command that finishes instantly.",
     "tags": [
       "instantcommand"
@@ -48,7 +48,7 @@
     "commandversion": 2
   },
   {
-    "name": "ParallelCommandGroup",
+    "name": "ParallelCommandGroup (v2)",
     "description": "A command group that runs commands in parallel, ending when all commands have finished.",
     "tags": [
       "parallelcommandgroup"
@@ -64,7 +64,7 @@
     "commandversion": 2
   },
   {
-    "name": "ParallelDeadlineGroup",
+    "name": "ParallelDeadlineGroup (v2)",
     "description": "A command group that runs commands in parallel, ending when a specific command has finished.",
     "tags": [
       "paralleldeadlinegroup"
@@ -80,7 +80,7 @@
     "commandversion": 2
   },
   {
-    "name": "ParallelRaceGroup",
+    "name": "ParallelRaceGroup (v2)",
     "description": "A command that runs commands in parallel, ending as soon as any command has finished.",
     "tags": [
       "parallelracegroup"
@@ -96,7 +96,7 @@
     "commandversion": 2
   },
   {
-    "name": "SequentialCommandGroup",
+    "name": "SequentialCommandGroup (v2)",
     "description": "A command group that runs commands in sequence.",
     "tags": [
       "sequentialcommandgroup"
@@ -112,7 +112,7 @@
     "commandversion": 2
   },
   {
-    "name": "Subsystem",
+    "name": "Subsystem (v2)",
     "description": "A robot subsystem.",
     "tags": [
       "subsystem"

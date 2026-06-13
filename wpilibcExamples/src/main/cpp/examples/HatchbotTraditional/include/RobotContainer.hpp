@@ -31,19 +31,19 @@ class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   // The robot's subsystems
-  DriveSubsystem m_drive;
-  HatchSubsystem m_hatch;
+  DriveSubsystem drive;
+  HatchSubsystem hatch;
 
   // The autonomous routines
-  DriveDistance m_simpleAuto{AutoConstants::kAutoDriveDistanceInches,
-                             AutoConstants::kAutoDriveVelocity, &m_drive};
-  ComplexAuto m_complexAuto{&m_drive, &m_hatch};
+  DriveDistance simpleAuto{AutoConstants::kAutoDriveDistanceInches,
+                           AutoConstants::kAutoDriveVelocity, &drive};
+  ComplexAuto complexAuto{&drive, &hatch};
 
   // The chooser for the autonomous routines
-  wpi::SendableChooser<wpi::cmd::Command*> m_chooser;
+  wpi::SendableChooser<wpi::cmd::Command*> chooser;
 
   // The driver's controller
-  wpi::Gamepad m_driverController{OIConstants::kDriverControllerPort};
+  wpi::Gamepad driverController{OIConstants::kDriverControllerPort};
 
   void ConfigureButtonBindings();
 };

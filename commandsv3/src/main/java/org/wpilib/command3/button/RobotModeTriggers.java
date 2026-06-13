@@ -43,11 +43,11 @@ public final class RobotModeTriggers {
   }
 
   /**
-   * Returns a trigger that is true when the robot is enabled in test mode.
+   * Returns a trigger that is true when the robot is enabled in utility mode.
    *
-   * @return A trigger that is true when the robot is enabled in test mode.
+   * @return A trigger that is true when the robot is enabled in utility mode.
    */
-  public static Trigger test() {
-    return new Trigger(RobotState::isTestEnabled);
+  public static Trigger utility() {
+    return new Trigger(RobotState::isUtilityEnabled);
   }
 }

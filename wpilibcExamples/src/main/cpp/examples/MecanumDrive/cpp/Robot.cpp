@@ -16,15 +16,15 @@
 class Robot : public wpi::TimedRobot {
  public:
   Robot() {
-    wpi::util::SendableRegistry::AddChild(&m_robotDrive, &m_frontLeft);
-    wpi::util::SendableRegistry::AddChild(&m_robotDrive, &m_rearLeft);
-    wpi::util::SendableRegistry::AddChild(&m_robotDrive, &m_frontRight);
-    wpi::util::SendableRegistry::AddChild(&m_robotDrive, &m_rearRight);
+    wpi::util::SendableRegistry::AddChild(&robotDrive, &frontLeft);
+    wpi::util::SendableRegistry::AddChild(&robotDrive, &rearLeft);
+    wpi::util::SendableRegistry::AddChild(&robotDrive, &frontRight);
+    wpi::util::SendableRegistry::AddChild(&robotDrive, &rearRight);
 
     // Invert the right side motors. You may need to change or remove this to
     // match your robot.
-    m_frontRight.SetInverted(true);
-    m_rearRight.SetInverted(true);
+    frontRight.SetInverted(true);
+    rearRight.SetInverted(true);
   }
 
   /**
@@ -34,8 +34,8 @@ class Robot : public wpi::TimedRobot {
     /* Use the joystick Y axis for forward movement, X axis for lateral
      * movement, and Z axis for rotation.
      */
-    m_robotDrive.DriveCartesian(-m_joystick.GetY(), -m_joystick.GetX(),
-                                -m_joystick.GetZ(), m_imu.GetRotation2d());
+    robotDrive.DriveCartesian(-joystick.GetY(), -joystick.GetX(),
+                              -joystick.GetZ(), imu.GetRotation2d());
   }
 
  private:
@@ -47,18 +47,18 @@ class Robot : public wpi::TimedRobot {
       wpi::OnboardIMU::FLAT;
   static constexpr int kJoystickPort = 0;
 
-  wpi::PWMSparkMax m_frontLeft{kFrontLeftMotorPort};
-  wpi::PWMSparkMax m_rearLeft{kRearLeftMotorPort};
-  wpi::PWMSparkMax m_frontRight{kFrontRightMotorPort};
-  wpi::PWMSparkMax m_rearRight{kRearRightMotorPort};
-  wpi::MecanumDrive m_robotDrive{
-      [&](double output) { m_frontLeft.SetThrottle(output); },
-      [&](double output) { m_rearLeft.SetThrottle(output); },
-      [&](double output) { m_frontRight.SetThrottle(output); },
-      [&](double output) { m_rearRight.SetThrottle(output); }};
+  wpi::PWMSparkMax frontLeft{kFrontLeftMotorPort};
+  wpi::PWMSparkMax rearLeft{kRearLeftMotorPort};
+  wpi::PWMSparkMax frontRight{kFrontRightMotorPort};
+  wpi::PWMSparkMax rearRight{kRearRightMotorPort};
+  wpi::MecanumDrive robotDrive{
+      [&](double output) { frontLeft.SetThrottle(output); },
+      [&](double output) { rearLeft.SetThrottle(output); },
+      [&](double output) { frontRight.SetThrottle(output); },
+      [&](double output) { rearRight.SetThrottle(output); }};
 
-  wpi::OnboardIMU m_imu{kIMUMountOrientation};
-  wpi::Joystick m_joystick{kJoystickPort};
+  wpi::OnboardIMU imu{kIMUMountOrientation};
+  wpi::Joystick joystick{kJoystickPort};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

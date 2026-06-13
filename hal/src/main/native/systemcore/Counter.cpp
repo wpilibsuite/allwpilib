@@ -7,8 +7,6 @@
 #include <cstdio>
 #include <thread>
 
-#include <fmt/format.h>
-
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
 #include "SmartIo.hpp"
@@ -45,9 +43,9 @@ HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
   auto [handle, port] = *resource;
   port->channel = channel;
 
-  *status =
-      port->InitializeMode(risingEdge ? SmartIoMode::SingleCounterRising
-                                      : SmartIoMode::SingleCounterFalling);
+  *status = port->InitializeMode(
+      risingEdge ? MRC_SmartIOMode::MRC_SmartIOMode_SingleCounterRising
+                 : MRC_SmartIOMode::MRC_SmartIOMode_SingleCounterFalling);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::COUNTER);
     return HAL_INVALID_HANDLE;

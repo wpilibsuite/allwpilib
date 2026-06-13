@@ -26,7 +26,7 @@ namespace wpi::math {
  * A rotation in a 2D coordinate frame represented by a point on the unit circle
  * (cosine and sine).
  */
-class WPILIB_DLLEXPORT Rotation2d {
+class WPILIB_DLLEXPORT Rotation2d final {
  public:
   /**
    * Constructs a Rotation2d with a default angle of 0 degrees.

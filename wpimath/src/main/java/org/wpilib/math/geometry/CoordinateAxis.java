@@ -9,7 +9,7 @@ import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N3;
 
 /** A class representing a coordinate system axis within the NWU coordinate system. */
-public class CoordinateAxis {
+public final class CoordinateAxis {
   private static final CoordinateAxis m_n = new CoordinateAxis(1.0, 0.0, 0.0);
   private static final CoordinateAxis m_s = new CoordinateAxis(-1.0, 0.0, 0.0);
   private static final CoordinateAxis m_e = new CoordinateAxis(0.0, -1.0, 0.0);

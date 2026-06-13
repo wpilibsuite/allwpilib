@@ -100,7 +100,7 @@ public final class StringUtils {
    * @return the logger field name
    */
   public static String loggerFieldName(TypeElement clazz) {
-    return lowerCamelCase(simpleName(loggerClassName(clazz)));
+    return loggerClassName(clazz).replace('.', '_');
   }
 
   /**

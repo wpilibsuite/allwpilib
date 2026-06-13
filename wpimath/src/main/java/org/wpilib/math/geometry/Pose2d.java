@@ -24,7 +24,8 @@ import org.wpilib.util.struct.StructSerializable;
 
 /** Represents a 2D pose containing translational and rotational elements. */
 @Json
-public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, StructSerializable {
+public final class Pose2d
+    implements Interpolatable<Pose2d>, ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Pose2d representing the origin.
    *

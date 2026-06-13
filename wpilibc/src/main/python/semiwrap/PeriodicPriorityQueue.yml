@@ -1,3 +1,6 @@
+extra_includes:
+- pybind11/chrono.h
+
 classes:
   wpi::internal::PeriodicPriorityQueue:
     methods:
@@ -12,6 +15,7 @@ classes:
       Clear:
       RunCallbacks:
       GetQueue:
+        ignore: true
       GetLoopStartTime:
   wpi::internal::PeriodicPriorityQueue::Callback:
     attributes:

@@ -9,7 +9,7 @@ import org.wpilib.math.proto.ProtobufTranslation3d;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
-public class Translation3dProto implements Protobuf<Translation3d, ProtobufTranslation3d> {
+public final class Translation3dProto implements Protobuf<Translation3d, ProtobufTranslation3d> {
   @Override
   public Class<Translation3d> getTypeClass() {
     return Translation3d.class;
