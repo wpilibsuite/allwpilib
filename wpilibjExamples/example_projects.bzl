@@ -22,6 +22,7 @@ EXAMPLE_FOLDERS = [
     "mecanumdriveposeestimator",
     "mechanism2d",
     "rapidreactcommandbot",
+    "rebuiltcmdv3",
     "romireference",
     "simpledifferentialdrivesimulation",
     "statespacearm",
@@ -85,6 +86,8 @@ SNIPPET_FOLDERS = [
 TEMPLATE_FOLDERS = [
     "commandv2",
     "commandv2skeleton",
+    "commandv3",
+    "commandv3skeleton",
     "educational",
     "opmode",
     "robotbaseskeleton",
