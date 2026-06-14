@@ -92,8 +92,8 @@ class NetworkTablesModel : public Model {
     }
 
     void UpdateTopic(wpi::nt::Event&& event) {
-      if (std::holds_alternative<wpi::nt::TopicInfo>(event.data)) {
-        UpdateInfo(std::get<wpi::nt::TopicInfo>(std::move(event.data)));
+      if (auto info = event.GetTopicInfo()) {
+        UpdateInfo(std::move(*info));
       }
     }
     void UpdateInfo(wpi::nt::TopicInfo&& info_);

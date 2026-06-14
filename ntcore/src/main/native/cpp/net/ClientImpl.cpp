@@ -9,7 +9,6 @@
 #include <optional>
 #include <string>
 #include <utility>
-#include <variant>
 
 #include "Log.hpp"
 #include "Message.hpp"
@@ -98,14 +97,15 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
 void ClientImpl::HandleLocal(std::span<ClientMessage> msgs) {
   DEBUG4("HandleLocal()");
   for (auto&& elem : msgs) {
+    const auto& constElem = elem;
     // common case is value
-    if (auto msg = std::get_if<ClientValueMsg>(&elem.contents)) {
+    if (auto msg = constElem.GetValue()) {
       SetValue(msg->pubuid, msg->value);
-    } else if (auto msg = std::get_if<PublishMsg>(&elem.contents)) {
+    } else if (auto msg = constElem.GetPublish()) {
       Publish(msg->pubuid, msg->name, msg->typeStr, msg->properties,
               msg->options);
       m_outgoing.SendMessage(msg->pubuid, std::move(elem));
-    } else if (auto msg = std::get_if<UnpublishMsg>(&elem.contents)) {
+    } else if (auto msg = constElem.GetUnpublish()) {
       Unpublish(msg->pubuid, std::move(elem));
     } else {
       m_outgoing.SendMessage(0, std::move(elem));
