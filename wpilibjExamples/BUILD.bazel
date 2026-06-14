@@ -51,7 +51,6 @@ build_templates(folders = template_folders)
         name = kind + "_check",
         size = "small",
         srcs = ["//shared:examplecheck.py"],
-        main = "//shared:examplecheck.py",
         data = [
             "src/main/java/org/wpilib/{kind}/{kind}.json".format(kind = kind),
         ] + glob(["src/main/java/org/wpilib/{}/*/*.java".format(kind)]),
@@ -59,6 +58,7 @@ build_templates(folders = template_folders)
             "EXAMPLECHECK_FOLDER": "wpilibjExamples/src/main/java/org/wpilib/" + kind,
             "EXAMPLECHECK_KIND": kind,
         },
+        main = "//shared:examplecheck.py",
         tags = [
             "no-ide",
             "smoketest",

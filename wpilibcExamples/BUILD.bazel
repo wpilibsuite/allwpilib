@@ -53,13 +53,13 @@ py_test(
     name = "commands_check",
     size = "small",
     srcs = ["//shared:examplecheck.py"],
-    main = "//shared:examplecheck.py",
     data = glob(["src/main/cpp/commands/**"]),
     env = {
         "EXAMPLECHECK_FOLDER": "wpilibcExamples/src/main/cpp/commands",
         "EXAMPLECHECK_IS_CPP_COMMANDS": "true",
         "EXAMPLECHECK_KIND": "commands",
     },
+    main = "//shared:examplecheck.py",
     tags = [
         "no-ide",
         "smoketest",
@@ -71,7 +71,6 @@ py_test(
         name = kind + "_check",
         size = "small",
         srcs = ["//shared:examplecheck.py"],
-        main = "//shared:examplecheck.py",
         data = ["src/main/cpp/{kind}/{kind}.json".format(kind = kind)] + glob(
             [
                 "src/main/cpp/{}/*/cpp/Robot.cpp".format(kind),
@@ -83,6 +82,7 @@ py_test(
             "EXAMPLECHECK_FOLDER": "wpilibcExamples/src/main/cpp/" + kind,
             "EXAMPLECHECK_KIND": kind,
         },
+        main = "//shared:examplecheck.py",
         tags = [
             "no-ide",
             "smoketest",
