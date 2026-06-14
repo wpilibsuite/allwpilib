@@ -1,5 +1,5 @@
-load("@bazel_skylib//rules:native_binary.bzl", "native_test")
 load("@rules_jvm_external//:defs.bzl", "maven_export")
+load("@rules_python//python:defs.bzl", "py_test")
 load(":build_java_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates", "build_tests", "first_level_folders")
 
 command_folders = first_level_folders(
@@ -47,10 +47,11 @@ build_snippets(folders = snippet_folders)
 build_templates(folders = template_folders)
 
 [
-    native_test(
+    py_test(
         name = kind + "_check",
         size = "small",
-        src = "//shared:examplecheck",
+        srcs = ["//shared:examplecheck.py"],
+        main = "//shared:examplecheck.py",
         data = [
             "src/main/java/org/wpilib/{kind}/{kind}.json".format(kind = kind),
         ] + glob(["src/main/java/org/wpilib/{}/*/*.java".format(kind)]),
@@ -59,6 +60,7 @@ build_templates(folders = template_folders)
             "EXAMPLECHECK_KIND": kind,
         },
         tags = [
+            "no-ide",
             "smoketest",
         ],
     )
