@@ -239,8 +239,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::DualSenseController", "wpi__DualSenseController.hpp"),
-                ("wpi::DualSenseController::Button", "wpi__DualSenseController__Button.hpp"),
-                ("wpi::DualSenseController::Axis", "wpi__DualSenseController__Axis.hpp"),
             ],
         ),
         struct(
@@ -251,8 +249,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::XboxController", "wpi__XboxController.hpp"),
-                ("wpi::XboxController::Button", "wpi__XboxController__Button.hpp"),
-                ("wpi::XboxController::Axis", "wpi__XboxController__Axis.hpp"),
             ],
         ),
         struct(
