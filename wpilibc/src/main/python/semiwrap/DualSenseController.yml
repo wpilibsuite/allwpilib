@@ -8,6 +8,9 @@ classes:
     force_no_trampoline: true
     ignored_bases:
     - wpi::util::SendableHelper<DualSenseController>
+    enums:
+      Button:
+      Axis:
     attributes:
       TOUCHPAD_COUNT:
       SUPPORTS_RUMBLE:
@@ -115,30 +118,3 @@ classes:
       InitSendable:
       GetL2:
       GetR2:
-  wpi::DualSenseController::Button:
-    attributes:
-      CROSS:
-      CIRCLE:
-      SQUARE:
-      TRIANGLE:
-      CREATE:
-      PS:
-      OPTIONS:
-      L3:
-      R3:
-      L1:
-      R1:
-      DPAD_UP:
-      DPAD_DOWN:
-      DPAD_LEFT:
-      DPAD_RIGHT:
-      MICROPHONE:
-      TOUCHPAD:
-  wpi::DualSenseController::Axis:
-    attributes:
-      LEFT_X:
-      LEFT_Y:
-      RIGHT_X:
-      RIGHT_Y:
-      L2:
-      R2:

@@ -24,21 +24,52 @@ const wpi::{{ ClassName }}Controller&
 Command{{ ClassName }}Controller::GetController() const {
   return m_controller;
 }
+
+Trigger Command{{ ClassName }}Controller::Button(int button,
+                                                wpi::EventLoop* loop) const {
+  return m_hid->Button(button, loop);
+}
+
+Trigger Command{{ ClassName }}Controller::Button(
+    enum wpi::{{ ClassName }}Controller::Button button,
+    wpi::EventLoop* loop) const {
+  return Button(static_cast<int>(button), loop);
+}
+
 {% for button in buttons %}
 Trigger Command{{ ClassName }}Controller::{{ button.MethodName }}(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::{{ ClassName }}Controller::Button::{{ button.ConstantName }},
-                       loop);
+  return Button(wpi::{{ ClassName }}Controller::Button::{{ button.ConstantName }},
+                loop);
 }
 {% endfor -%}
 {% for trigger in triggerAxes %}
 Trigger Command{{ ClassName }}Controller::{{ trigger.MethodName }}(
     double threshold, wpi::EventLoop* loop) const {
-  return m_hid->AxisGreaterThan(
+  return AxisGreaterThan(
       wpi::{{ ClassName }}Controller::Axis::{{ trigger.AxisConstantName }},
       threshold, loop);
 }
-{% endfor -%}
+{% endfor %}
+Trigger Command{{ ClassName }}Controller::AxisLessThan(
+    wpi::{{ ClassName }}Controller::Axis axis, double threshold,
+    wpi::EventLoop* loop) const {
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
+}
+
+Trigger Command{{ ClassName }}Controller::AxisGreaterThan(
+    wpi::{{ ClassName }}Controller::Axis axis, double threshold,
+    wpi::EventLoop* loop) const {
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
+}
+
+Trigger Command{{ ClassName }}Controller::AxisMagnitudeGreaterThan(
+    wpi::{{ ClassName }}Controller::Axis axis, double threshold,
+    wpi::EventLoop* loop) const {
+  return m_hid->AxisMagnitudeGreaterThan(static_cast<int>(axis), threshold,
+                                         loop);
+}
+
 {% for axis in axes %}
 double Command{{ ClassName }}Controller::Get{{ axis.MethodName }}() const {
   return m_controller.Get{{ axis.MethodName }}();

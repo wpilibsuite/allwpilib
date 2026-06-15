@@ -32,9 +32,6 @@ class CommandDualSenseController:
         self._hid = CommandGenericHID.getCommandGenericHID(port)
         self._controller = DualSenseController(self._hid.getHID())
 
-    def __getattr__(self, name: str):
-        return getattr(self._hid, name)
-
     def getHID(self) -> CommandGenericHID:
         """
         Get the underlying CommandGenericHID object.
@@ -51,6 +48,15 @@ class CommandDualSenseController:
         """
         return self._controller
 
+    def button(self, button, loop: Optional[EventLoop] = None) -> Trigger:
+        """
+        Constructs an event instance around this button's digital signal.
+
+        :param button: the button index or :class:`wpilib.DualSenseController.Button`
+        :param loop: the event loop instance to attach the event to
+        """
+        return self._hid.button(_enum_value(button), loop)
+
     def cross(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Cross button's digital signal.
@@ -61,9 +67,7 @@ class CommandDualSenseController:
         :returns: a Trigger instance representing the Cross button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(DualSenseController.Button.CROSS), loop
-        )
+        return self.button(DualSenseController.Button.CROSS, loop)
 
     def circle(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -75,9 +79,7 @@ class CommandDualSenseController:
         :returns: a Trigger instance representing the Circle button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(DualSenseController.Button.CIRCLE), loop
-        )
+        return self.button(DualSenseController.Button.CIRCLE, loop)
 
     def square(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -89,9 +91,7 @@ class CommandDualSenseController:
         :returns: a Trigger instance representing the Square button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(DualSenseController.Button.SQUARE), loop
-        )
+        return self.button(DualSenseController.Button.SQUARE, loop)
 
     def triangle(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -103,9 +103,7 @@ class CommandDualSenseController:
         :returns: a Trigger instance representing the Triangle button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(DualSenseController.Button.TRIANGLE), loop
-        )
+        return self.button(DualSenseController.Button.TRIANGLE, loop)
 
     def create(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -117,9 +115,7 @@ class CommandDualSenseController:
         :returns: a Trigger instance representing the Create button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(DualSenseController.Button.CREATE), loop
-        )
+        return self.button(DualSenseController.Button.CREATE, loop)
 
     def PS(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -131,9 +127,7 @@ class CommandDualSenseController:
         :returns: a Trigger instance representing the PS button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(DualSenseController.Button.PS), loop
-        )
+        return self.button(DualSenseController.Button.PS, loop)
 
     def options(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -145,9 +139,7 @@ class CommandDualSenseController:
         :returns: a Trigger instance representing the Options button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(DualSenseController.Button.OPTIONS), loop
-        )
+        return self.button(DualSenseController.Button.OPTIONS, loop)
 
     def L3(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -159,9 +151,7 @@ class CommandDualSenseController:
         :returns: a Trigger instance representing the L 3 button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(DualSenseController.Button.L3), loop
-        )
+        return self.button(DualSenseController.Button.L3, loop)
 
     def R3(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -173,9 +163,7 @@ class CommandDualSenseController:
         :returns: a Trigger instance representing the R 3 button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(DualSenseController.Button.R3), loop
-        )
+        return self.button(DualSenseController.Button.R3, loop)
 
     def L1(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -187,9 +175,7 @@ class CommandDualSenseController:
         :returns: a Trigger instance representing the L 1 button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(DualSenseController.Button.L1), loop
-        )
+        return self.button(DualSenseController.Button.L1, loop)
 
     def R1(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -201,9 +187,7 @@ class CommandDualSenseController:
         :returns: a Trigger instance representing the R 1 button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(DualSenseController.Button.R1), loop
-        )
+        return self.button(DualSenseController.Button.R1, loop)
 
     def dpadUp(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -215,9 +199,7 @@ class CommandDualSenseController:
         :returns: a Trigger instance representing the Dpad Up button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(DualSenseController.Button.DPAD_UP), loop
-        )
+        return self.button(DualSenseController.Button.DPAD_UP, loop)
 
     def dpadDown(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -229,9 +211,7 @@ class CommandDualSenseController:
         :returns: a Trigger instance representing the Dpad Down button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(DualSenseController.Button.DPAD_DOWN), loop
-        )
+        return self.button(DualSenseController.Button.DPAD_DOWN, loop)
 
     def dpadLeft(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -243,9 +223,7 @@ class CommandDualSenseController:
         :returns: a Trigger instance representing the Dpad Left button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(DualSenseController.Button.DPAD_LEFT), loop
-        )
+        return self.button(DualSenseController.Button.DPAD_LEFT, loop)
 
     def dpadRight(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -257,9 +235,7 @@ class CommandDualSenseController:
         :returns: a Trigger instance representing the Dpad Right button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(DualSenseController.Button.DPAD_RIGHT), loop
-        )
+        return self.button(DualSenseController.Button.DPAD_RIGHT, loop)
 
     def microphone(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -271,9 +247,7 @@ class CommandDualSenseController:
         :returns: a Trigger instance representing the Microphone button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(DualSenseController.Button.MICROPHONE), loop
-        )
+        return self.button(DualSenseController.Button.MICROPHONE, loop)
 
     def touchpad(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -285,9 +259,7 @@ class CommandDualSenseController:
         :returns: a Trigger instance representing the Touchpad button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(DualSenseController.Button.TOUCHPAD), loop
-        )
+        return self.button(DualSenseController.Button.TOUCHPAD, loop)
 
     def L2(
         self,
@@ -306,8 +278,8 @@ class CommandDualSenseController:
         :returns: a Trigger instance that is true when the L 2 axis exceeds the
                   provided threshold, attached to the given event loop.
         """
-        return self._hid.axisGreaterThan(
-            _enum_value(DualSenseController.Axis.L2),
+        return self.axisGreaterThan(
+            DualSenseController.Axis.L2,
             threshold,
             loop,
         )
@@ -329,11 +301,35 @@ class CommandDualSenseController:
         :returns: a Trigger instance that is true when the R 2 axis exceeds the
                   provided threshold, attached to the given event loop.
         """
-        return self._hid.axisGreaterThan(
-            _enum_value(DualSenseController.Axis.R2),
+        return self.axisGreaterThan(
+            DualSenseController.Axis.R2,
             threshold,
             loop,
         )
+
+    def axisLessThan(
+        self, axis, threshold: float, loop: Optional[EventLoop] = None
+    ) -> Trigger:
+        return self._hid.axisLessThan(_enum_value(axis), threshold, loop)
+
+    def axisGreaterThan(
+        self, axis, threshold: float, loop: Optional[EventLoop] = None
+    ) -> Trigger:
+        return self._hid.axisGreaterThan(_enum_value(axis), threshold, loop)
+
+    def axisMagnitudeGreaterThan(
+        self, axis, threshold: float, loop: Optional[EventLoop] = None
+    ) -> Trigger:
+        return self._hid.axisMagnitudeGreaterThan(_enum_value(axis), threshold, loop)
+
+    def getAxis(self, axis) -> float:
+        """
+        Get the value of the axis.
+
+        :param axis: the axis index or :class:`wpilib.DualSenseController.Axis`
+        """
+        return self._hid.getRawAxis(_enum_value(axis))
+
 
     def getLeftX(self) -> float:
         """

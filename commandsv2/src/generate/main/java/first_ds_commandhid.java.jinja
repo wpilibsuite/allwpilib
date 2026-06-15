@@ -47,6 +47,52 @@ public class Command{{ ClassName }}Controller {
   public {{ ClassName }}Controller getController() {
     return m_controller;
   }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button index
+   * @return an event instance representing the button's digital signal attached to the {@link
+   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @see #button(int, EventLoop)
+   */
+  public Trigger button(int button) {
+    return m_hid.button(button);
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button index
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the button's digital signal attached to the given loop.
+   */
+  public Trigger button(int button, EventLoop loop) {
+    return m_hid.button(button, loop);
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button
+   * @return an event instance representing the button's digital signal attached to the {@link
+   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @see #button({{ ClassName }}Controller.Button, EventLoop)
+   */
+  public Trigger button({{ ClassName }}Controller.Button button) {
+    return button(button.value);
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the button's digital signal attached to the given loop.
+   */
+  public Trigger button({{ ClassName }}Controller.Button button, EventLoop loop) {
+    return button(button.value, loop);
+  }
 {% for button in buttons %}
   /**
    * Constructs a Trigger instance around the {{ button.DocName }} button's digital signal.
@@ -67,7 +113,7 @@ public class Command{{ ClassName }}Controller {
    *     to the given loop.
    */
   public Trigger {{ button.Name }}(EventLoop loop) {
-    return m_hid.button({{ ClassName }}Controller.Button.{{ button.ConstantName }}.value, loop);
+    return button({{ ClassName }}Controller.Button.{{ button.ConstantName }}, loop);
   }
 {% endfor -%}
 {% for trigger in triggerAxes %}
@@ -82,8 +128,8 @@ public class Command{{ ClassName }}Controller {
    *     threshold, attached to the given event loop
    */
   public Trigger {{ trigger.Name }}(double threshold, EventLoop loop) {
-    return m_hid.axisGreaterThan(
-        {{ ClassName }}Controller.Axis.{{ trigger.AxisConstantName }}.value, threshold, loop);
+    return axisGreaterThan(
+        {{ ClassName }}Controller.Axis.{{ trigger.AxisConstantName }}, threshold, loop);
   }
 
   /**
@@ -112,8 +158,104 @@ public class Command{{ ClassName }}Controller {
   public Trigger {{ trigger.Name }}() {
     return {{ trigger.Name }}(0.5);
   }
-{% endif -%}
-{% endfor -%}
+{% endif %}
+{% endfor %}
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan({{ ClassName }}Controller.Axis axis, double threshold) {
+    return m_hid.axisLessThan(axis.value, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(
+      {{ ClassName }}Controller.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisLessThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan({{ ClassName }}Controller.Axis axis, double threshold) {
+    return m_hid.axisGreaterThan(axis.value, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(
+      {{ ClassName }}Controller.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis magnitude value is greater than the
+   *     provided threshold.
+   */
+  public Trigger axisMagnitudeGreaterThan(
+      {{ ClassName }}Controller.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisMagnitudeGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
+   * scheduler button loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
+   */
+  public Trigger axisMagnitudeGreaterThan({{ ClassName }}Controller.Axis axis, double threshold) {
+    return m_hid.axisMagnitudeGreaterThan(axis.value, threshold);
+  }
+
+  /**
+   * Get the value of the axis.
+   *
+   * @param axis The axis to read
+   * @return The value of the axis.
+   */
+  public double getAxis({{ ClassName }}Controller.Axis axis) {
+    return m_hid.getRawAxis(axis.value);
+  }
+
 {% for axis in axes %}
   /**
    * Get the {{ axis.DocName }} value of the controller.

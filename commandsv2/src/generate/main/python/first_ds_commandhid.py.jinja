@@ -32,9 +32,6 @@ class Command{{ ClassName }}Controller:
         self._hid = CommandGenericHID.getCommandGenericHID(port)
         self._controller = {{ ClassName }}Controller(self._hid.getHID())
 
-    def __getattr__(self, name: str):
-        return getattr(self._hid, name)
-
     def getHID(self) -> CommandGenericHID:
         """
         Get the underlying CommandGenericHID object.
@@ -50,6 +47,15 @@ class Command{{ ClassName }}Controller:
         :returns: the wrapped controller object
         """
         return self._controller
+
+    def button(self, button, loop: Optional[EventLoop] = None) -> Trigger:
+        """
+        Constructs an event instance around this button's digital signal.
+
+        :param button: the button index or :class:`wpilib.{{ ClassName }}Controller.Button`
+        :param loop: the event loop instance to attach the event to
+        """
+        return self._hid.button(_enum_value(button), loop)
 {% for button in buttons %}
     def {{ button.Name }}(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -61,9 +67,7 @@ class Command{{ ClassName }}Controller:
         :returns: a Trigger instance representing the {{ button.DocName }} button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value({{ ClassName }}Controller.Button.{{ button.ConstantName }}), loop
-        )
+        return self.button({{ ClassName }}Controller.Button.{{ button.ConstantName }}, loop)
 {% endfor -%}
 {% for trigger in triggerAxes %}
     def {{ trigger.Name }}(
@@ -83,12 +87,35 @@ class Command{{ ClassName }}Controller:
         :returns: a Trigger instance that is true when the {{ trigger.DocName }} axis exceeds the
                   provided threshold, attached to the given event loop.
         """
-        return self._hid.axisGreaterThan(
-            _enum_value({{ ClassName }}Controller.Axis.{{ trigger.AxisConstantName }}),
+        return self.axisGreaterThan(
+            {{ ClassName }}Controller.Axis.{{ trigger.AxisConstantName }},
             threshold,
             loop,
         )
-{% endfor -%}
+{% endfor %}
+    def axisLessThan(
+        self, axis, threshold: float, loop: Optional[EventLoop] = None
+    ) -> Trigger:
+        return self._hid.axisLessThan(_enum_value(axis), threshold, loop)
+
+    def axisGreaterThan(
+        self, axis, threshold: float, loop: Optional[EventLoop] = None
+    ) -> Trigger:
+        return self._hid.axisGreaterThan(_enum_value(axis), threshold, loop)
+
+    def axisMagnitudeGreaterThan(
+        self, axis, threshold: float, loop: Optional[EventLoop] = None
+    ) -> Trigger:
+        return self._hid.axisMagnitudeGreaterThan(_enum_value(axis), threshold, loop)
+
+    def getAxis(self, axis) -> float:
+        """
+        Get the value of the axis.
+
+        :param axis: the axis index or :class:`wpilib.{{ ClassName }}Controller.Axis`
+        """
+        return self._hid.getRawAxis(_enum_value(axis))
+
 {% for axis in axes %}
     def get{{ axis.MethodName }}(self) -> float:
         """

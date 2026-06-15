@@ -46,6 +46,22 @@ class {{ ClassName }}Controller
   static constexpr GenericHID::SupportedOutputs SUPPORTED_OUTPUTS =
       static_cast<GenericHID::SupportedOutputs>({{ SupportedOutputsValue }});
 
+  /** Represents a digital button on a {{ ClassName }}Controller. */
+  enum class Button {
+{%- for button in buttons %}
+    /// {{ button.DocName }} button.
+    {{ button.ConstantName }} = {{ button.value }},
+{%- endfor %}
+  };
+
+  /** Represents an axis on a {{ ClassName }}Controller. */
+  enum class Axis {
+{%- for axis in axes %}
+    /// {{ axis.DocName }}.
+    {{ axis.ConstantName }} = {{ axis.value }},
+{%- endfor %}
+  };
+
   /**
    * Construct an instance of a controller.
    *
@@ -109,7 +125,7 @@ class {{ ClassName }}Controller
    * @param axis The axis to read
    * @return the axis value.
    */
-  double GetAxis(int axis) const;
+  double GetAxis(Axis axis) const;
 
   /**
    * Constructs an event instance that is true when the axis value is less than
@@ -121,7 +137,7 @@ class {{ ClassName }}Controller
    * @return an event instance that is true when the axis value is less than the
    * provided threshold.
    */
-  BooleanEvent AxisLessThan(int axis, double threshold, EventLoop* loop) const;
+  BooleanEvent AxisLessThan(Axis axis, double threshold, EventLoop* loop) const;
 
   /**
    * Constructs an event instance that is true when the axis value is greater
@@ -133,7 +149,7 @@ class {{ ClassName }}Controller
    * @return an event instance that is true when the axis value is greater than
    * the provided threshold.
    */
-  BooleanEvent AxisGreaterThan(int axis, double threshold,
+  BooleanEvent AxisGreaterThan(Axis axis, double threshold,
                                EventLoop* loop) const;
 {% for button in buttons %}
   /**
@@ -173,7 +189,7 @@ class {{ ClassName }}Controller
    * @param button The button to read
    * @return The state of the button.
    */
-  bool GetButton(int button) const;
+  bool GetButton(Button button) const;
 
   /**
    * Whether the button was pressed since the last check.
@@ -181,7 +197,7 @@ class {{ ClassName }}Controller
    * @param button The button to read
    * @return Whether the button was pressed since the last check.
    */
-  bool GetButtonPressed(int button);
+  bool GetButtonPressed(Button button);
 
   /**
    * Whether the button was released since the last check.
@@ -189,7 +205,7 @@ class {{ ClassName }}Controller
    * @param button The button to read
    * @return Whether the button was released since the last check.
    */
-  bool GetButtonReleased(int button);
+  bool GetButtonReleased(Button button);
 
   /**
    * Constructs an event instance around this button's digital signal.
@@ -199,7 +215,7 @@ class {{ ClassName }}Controller
    * @return an event instance representing the button's digital signal attached
    * to the given loop.
    */
-  BooleanEvent ButtonEvent(int button, EventLoop* loop) const;
+  BooleanEvent ButtonEvent(Button button, EventLoop* loop) const;
 
   /**
    * Set leds on the controller.
@@ -249,22 +265,6 @@ class {{ ClassName }}Controller
    */
   TouchpadFinger GetTouchpadFinger(int touchpad, int finger) const;
 {%- endif %}
-
-  /** Represents a digital button on a {{ ClassName }}Controller. */
-  struct Button {
-{%- for button in buttons %}
-    /// {{ button.DocName }} button.
-    static constexpr int {{ button.ConstantName }} = {{ button.value }};
-{%- endfor %}
-  };
-
-  /** Represents an axis on a {{ ClassName }}Controller. */
-  struct Axis {
-{%- for axis in axes %}
-    /// {{ axis.DocName }}.
-    static constexpr int {{ axis.ConstantName }} = {{ axis.value }};
-{%- endfor %}
-  };
 
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 
