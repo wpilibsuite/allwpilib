@@ -61,9 +61,7 @@ class CommandXboxController:
         :returns: a Trigger instance representing the A button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(XboxController.Button.A), loop
-        )
+        return self._hid.button(_enum_value(XboxController.Button.A), loop)
 
     def b(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -75,9 +73,7 @@ class CommandXboxController:
         :returns: a Trigger instance representing the B button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(XboxController.Button.B), loop
-        )
+        return self._hid.button(_enum_value(XboxController.Button.B), loop)
 
     def x(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -89,9 +85,7 @@ class CommandXboxController:
         :returns: a Trigger instance representing the X button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(XboxController.Button.X), loop
-        )
+        return self._hid.button(_enum_value(XboxController.Button.X), loop)
 
     def y(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -103,9 +97,7 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Y button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(XboxController.Button.Y), loop
-        )
+        return self._hid.button(_enum_value(XboxController.Button.Y), loop)
 
     def view(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -117,9 +109,7 @@ class CommandXboxController:
         :returns: a Trigger instance representing the View button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(XboxController.Button.VIEW), loop
-        )
+        return self._hid.button(_enum_value(XboxController.Button.VIEW), loop)
 
     def xbox(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -131,9 +121,7 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Xbox button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(XboxController.Button.XBOX), loop
-        )
+        return self._hid.button(_enum_value(XboxController.Button.XBOX), loop)
 
     def menu(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -145,9 +133,7 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Menu button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(XboxController.Button.MENU), loop
-        )
+        return self._hid.button(_enum_value(XboxController.Button.MENU), loop)
 
     def leftStick(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -159,9 +145,7 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Left Stick button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(XboxController.Button.LEFT_STICK), loop
-        )
+        return self._hid.button(_enum_value(XboxController.Button.LEFT_STICK), loop)
 
     def rightStick(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -173,9 +157,7 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Right Stick button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(XboxController.Button.RIGHT_STICK), loop
-        )
+        return self._hid.button(_enum_value(XboxController.Button.RIGHT_STICK), loop)
 
     def leftBumper(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -187,9 +169,7 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Left Bumper button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(XboxController.Button.LEFT_BUMPER), loop
-        )
+        return self._hid.button(_enum_value(XboxController.Button.LEFT_BUMPER), loop)
 
     def rightBumper(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -201,9 +181,7 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Right Bumper button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(XboxController.Button.RIGHT_BUMPER), loop
-        )
+        return self._hid.button(_enum_value(XboxController.Button.RIGHT_BUMPER), loop)
 
     def dpadUp(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -215,9 +193,7 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Dpad Up button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(XboxController.Button.DPAD_UP), loop
-        )
+        return self._hid.button(_enum_value(XboxController.Button.DPAD_UP), loop)
 
     def dpadDown(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -229,9 +205,7 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Dpad Down button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(XboxController.Button.DPAD_DOWN), loop
-        )
+        return self._hid.button(_enum_value(XboxController.Button.DPAD_DOWN), loop)
 
     def dpadLeft(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -243,9 +217,7 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Dpad Left button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(XboxController.Button.DPAD_LEFT), loop
-        )
+        return self._hid.button(_enum_value(XboxController.Button.DPAD_LEFT), loop)
 
     def dpadRight(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -257,9 +229,7 @@ class CommandXboxController:
         :returns: a Trigger instance representing the Dpad Right button's digital signal
                   attached to the given loop.
         """
-        return self._hid.button(
-            _enum_value(XboxController.Button.DPAD_RIGHT), loop
-        )
+        return self._hid.button(_enum_value(XboxController.Button.DPAD_RIGHT), loop)
 
     def leftTrigger(
         self,
