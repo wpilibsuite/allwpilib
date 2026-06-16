@@ -9,8 +9,8 @@ package org.wpilib.command3.button;
 import java.util.Objects;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
-import org.wpilib.driverstation.HIDDevice;
 import org.wpilib.driverstation.DualSenseController;
+import org.wpilib.driverstation.HIDDevice;
 import org.wpilib.event.EventLoop;
 
 /**

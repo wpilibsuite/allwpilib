@@ -8,8 +8,8 @@ package org.wpilib.command2.button;
 
 import java.util.Objects;
 import org.wpilib.command2.CommandScheduler;
-import org.wpilib.driverstation.HIDDevice;
 import org.wpilib.driverstation.DualSenseController;
+import org.wpilib.driverstation.HIDDevice;
 import org.wpilib.event.EventLoop;
 
 /**
