@@ -99,8 +99,8 @@ dependencies {
     testAnnotationProcessor project(':javacPlugin')
 }
 
-
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
+sourceSets.main.java.srcDir "${buildDir}/generated/sources/annotationProcessor/java/main"
 sourceSets.main.resources.srcDir "${projectDir}/src/main/proto"
 
 task unitsHeaders(type: Zip) {

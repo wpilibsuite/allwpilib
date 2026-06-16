@@ -57,6 +57,13 @@ build.dependsOn outputSourcesJar
 build.dependsOn outputJavadocJar
 build.dependsOn outputJar
 
+// Projects that generate source code with annotation processors (such as avaje serde classes)
+// need to have those generated files on the source path so javadoc can pick them up.
+tasks.named('javadoc').configure {
+    it.dependsOn('compileJava')
+}
+sourceSets.main.java.srcDir "${buildDir}/generated/sources/annotationProcessor/java/main"
+
 project(':').libraryBuild.dependsOn build
 
 publishing {
