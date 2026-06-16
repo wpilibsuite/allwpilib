@@ -4,6 +4,8 @@
 
 #include "wpi/commands2/button/CommandGamepad.hpp"
 
+#include <memory>
+
 #include "wpi/commands2/button/CommandGenericHID.hpp"
 
 using namespace wpi::cmd;
