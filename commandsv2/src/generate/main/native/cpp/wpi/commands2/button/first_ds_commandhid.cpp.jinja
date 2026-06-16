@@ -25,15 +25,10 @@ Command{{ ClassName }}Controller::GetController() const {
   return m_controller;
 }
 
-Trigger Command{{ ClassName }}Controller::Button(int button,
-                                                wpi::EventLoop* loop) const {
-  return m_hid->Button(button, loop);
-}
-
 Trigger Command{{ ClassName }}Controller::Button(
     enum wpi::{{ ClassName }}Controller::Button button,
     wpi::EventLoop* loop) const {
-  return Button(static_cast<int>(button), loop);
+  return m_hid->Button(static_cast<int>(button), loop);
 }
 
 {% for button in buttons %}

@@ -8,13 +8,6 @@ from .commandgenerichid import CommandGenericHID
 from .trigger import Trigger
 
 
-def _enum_value(value) -> int:
-    try:
-        return int(value)
-    except TypeError:
-        return value.value
-
-
 class CommandDualSenseController:
     """
     A version of :class:`wpilib.DualSenseController` with :class:`.Trigger` factories for command-based.
@@ -48,14 +41,18 @@ class CommandDualSenseController:
         """
         return self._controller
 
-    def button(self, button, loop: Optional[EventLoop] = None) -> Trigger:
+    def button(
+        self,
+        button: DualSenseController.Button,
+        loop: Optional[EventLoop] = None,
+    ) -> Trigger:
         """
         Constructs an event instance around this button's digital signal.
 
-        :param button: the button index or :class:`wpilib.DualSenseController.Button`
+        :param button: the :class:`wpilib.DualSenseController.Button` to read
         :param loop: the event loop instance to attach the event to
         """
-        return self._hid.button(_enum_value(button), loop)
+        return self._hid.button(button.value, loop)
 
     def cross(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -308,27 +305,69 @@ class CommandDualSenseController:
         )
 
     def axisLessThan(
-        self, axis, threshold: float, loop: Optional[EventLoop] = None
+        self,
+        axis: DualSenseController.Axis,
+        threshold: float,
+        loop: Optional[EventLoop] = None,
     ) -> Trigger:
-        return self._hid.axisLessThan(_enum_value(axis), threshold, loop)
+        """
+        Constructs a Trigger instance that is true when the axis value is less than
+        ``threshold``, attached to the given loop.
+
+        :param axis: the :class:`wpilib.DualSenseController.Axis` to read
+        :param threshold: the value below which this Trigger should return true.
+        :param loop: the event loop instance to attach the Trigger to
+
+        :returns: a Trigger instance that is true when the axis value is less than
+                  the provided threshold.
+        """
+        return self._hid.axisLessThan(axis.value, threshold, loop)
 
     def axisGreaterThan(
-        self, axis, threshold: float, loop: Optional[EventLoop] = None
+        self,
+        axis: DualSenseController.Axis,
+        threshold: float,
+        loop: Optional[EventLoop] = None,
     ) -> Trigger:
-        return self._hid.axisGreaterThan(_enum_value(axis), threshold, loop)
+        """
+        Constructs a Trigger instance that is true when the axis value is greater
+        than ``threshold``, attached to the given loop.
+
+        :param axis: the :class:`wpilib.DualSenseController.Axis` to read
+        :param threshold: the value above which this Trigger should return true.
+        :param loop: the event loop instance to attach the Trigger to.
+
+        :returns: a Trigger instance that is true when the axis value is greater
+                  than the provided threshold.
+        """
+        return self._hid.axisGreaterThan(axis.value, threshold, loop)
 
     def axisMagnitudeGreaterThan(
-        self, axis, threshold: float, loop: Optional[EventLoop] = None
+        self,
+        axis: DualSenseController.Axis,
+        threshold: float,
+        loop: Optional[EventLoop] = None,
     ) -> Trigger:
-        return self._hid.axisMagnitudeGreaterThan(_enum_value(axis), threshold, loop)
+        """
+        Constructs a Trigger instance that is true when the axis magnitude is
+        greater than ``threshold``, attached to the given loop.
 
-    def getAxis(self, axis) -> float:
+        :param axis: the :class:`wpilib.DualSenseController.Axis` to read
+        :param threshold: the value above which this Trigger should return true.
+        :param loop: the event loop instance to attach the Trigger to.
+
+        :returns: a Trigger instance that is true when the axis magnitude is
+                  greater than the provided threshold.
+        """
+        return self._hid.axisMagnitudeGreaterThan(axis.value, threshold, loop)
+
+    def getAxis(self, axis: DualSenseController.Axis) -> float:
         """
         Get the value of the axis.
 
-        :param axis: the axis index or :class:`wpilib.DualSenseController.Axis`
+        :param axis: the :class:`wpilib.DualSenseController.Axis` to read
         """
-        return self._hid.getRawAxis(_enum_value(axis))
+        return self._hid.getRawAxis(axis.value)
 
 
     def getLeftX(self) -> float:

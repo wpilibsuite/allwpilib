@@ -25,15 +25,10 @@ CommandDualSenseController::GetController() const {
   return m_controller;
 }
 
-Trigger CommandDualSenseController::Button(int button,
-                                                wpi::EventLoop* loop) const {
-  return m_hid->Button(button, loop);
-}
-
 Trigger CommandDualSenseController::Button(
     enum wpi::DualSenseController::Button button,
     wpi::EventLoop* loop) const {
-  return Button(static_cast<int>(button), loop);
+  return m_hid->Button(static_cast<int>(button), loop);
 }
 
 

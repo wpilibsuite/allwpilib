@@ -51,36 +51,13 @@ public class CommandDualSenseController {
   /**
    * Constructs an event instance around this button's digital signal.
    *
-   * @param button the button index
-   * @return an event instance representing the button's digital signal attached to the {@link
-   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
-   * @see #button(int, EventLoop)
-   */
-  public Trigger button(int button) {
-    return m_hid.button(button);
-  }
-
-  /**
-   * Constructs an event instance around this button's digital signal.
-   *
-   * @param button the button index
-   * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the button's digital signal attached to the given loop.
-   */
-  public Trigger button(int button, EventLoop loop) {
-    return m_hid.button(button, loop);
-  }
-
-  /**
-   * Constructs an event instance around this button's digital signal.
-   *
    * @param button the button
    * @return an event instance representing the button's digital signal attached to the {@link
    *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #button(DualSenseController.Button, EventLoop)
    */
   public Trigger button(DualSenseController.Button button) {
-    return button(button.value);
+    return button(button, CommandScheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -91,7 +68,7 @@ public class CommandDualSenseController {
    * @return an event instance representing the button's digital signal attached to the given loop.
    */
   public Trigger button(DualSenseController.Button button, EventLoop loop) {
-    return button(button.value, loop);
+    return m_hid.button(button.value, loop);
   }
 
   /**
