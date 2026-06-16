@@ -12,7 +12,6 @@
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/button/CommandGenericHID.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
-#include "wpi/driverstation/HIDDevice.hpp"
 
 namespace wpi::cmd {
 /**
@@ -32,11 +31,11 @@ class CommandDualSenseController {
   explicit CommandDualSenseController(int port);
 
   /**
-   * Construct an instance of a controller with an HIDDevice object.
+   * Construct an instance of a controller with a DualSenseController object.
    *
-   * @param hid The HIDDevice object to use for this controller.
+   * @param controller The DualSenseController object to use for this controller.
    */
-  explicit CommandDualSenseController(wpi::HIDDevice* hid);
+  explicit CommandDualSenseController(wpi::DualSenseController* controller);
 
   /**
    * Get the underlying CommandGenericHID object.

@@ -10,7 +10,6 @@
 #include "wpi/commands2/button/CommandGenericHID.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/driverstation/Gamepad.hpp"
-#include "wpi/driverstation/HIDDevice.hpp"
 
 namespace wpi::cmd {
 /**
@@ -30,11 +29,11 @@ class CommandGamepad {
   explicit CommandGamepad(int port);
 
   /**
-   * Construct an instance of a controller with an HIDDevice object.
+   * Construct an instance of a controller with a Gamepad object.
    *
-   * @param hid The HIDDevice object to use for this controller.
+   * @param gamepad The Gamepad object to use for this controller.
    */
-  explicit CommandGamepad(wpi::HIDDevice* hid);
+  explicit CommandGamepad(wpi::Gamepad* gamepad);
 
   /**
    * Get the underlying CommandGenericHID object.
@@ -523,7 +522,6 @@ class CommandGamepad {
  private:
   std::unique_ptr<CommandGenericHID> m_ownedHid;
   CommandGenericHID* m_hid = nullptr;
-  std::unique_ptr<wpi::Gamepad> m_ownedGamepad;
   wpi::Gamepad* m_gamepad = nullptr;
 };
 }  // namespace wpi::cmd

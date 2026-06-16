@@ -15,16 +15,10 @@ CommandXboxController::CommandXboxController(int port)
 }
 
 CommandXboxController::CommandXboxController(
-    wpi::HIDDevice* hid)
-    : m_ownedHid{std::make_unique<CommandGenericHID>(hid->GetHID())},
-      m_hid{m_ownedHid.get()} {
-  m_controller = dynamic_cast<wpi::XboxController*>(hid);
-  if (m_controller == nullptr) {
-    m_ownedController =
-        std::make_unique<wpi::XboxController>(m_hid->GetHID());
-    m_controller = m_ownedController.get();
-  }
-}
+    wpi::XboxController* controller)
+    : m_ownedHid{std::make_unique<CommandGenericHID>(controller->GetHID())},
+      m_hid{m_ownedHid.get()},
+      m_controller{controller} {}
 
 CommandGenericHID& CommandXboxController::GetHID() {
   return *m_hid;

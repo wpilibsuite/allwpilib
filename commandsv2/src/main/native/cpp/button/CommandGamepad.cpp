@@ -14,15 +14,10 @@ CommandGamepad::CommandGamepad(int port)
     : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
       m_gamepad{&wpi::DriverStation::GetGamepad(port)} {}
 
-CommandGamepad::CommandGamepad(wpi::HIDDevice* hid)
-    : m_ownedHid{std::make_unique<CommandGenericHID>(hid->GetHID())},
-      m_hid{m_ownedHid.get()} {
-  m_gamepad = dynamic_cast<wpi::Gamepad*>(hid);
-  if (m_gamepad == nullptr) {
-    m_ownedGamepad = std::make_unique<wpi::Gamepad>(m_hid->GetHID());
-    m_gamepad = m_ownedGamepad.get();
-  }
-}
+CommandGamepad::CommandGamepad(wpi::Gamepad* gamepad)
+    : m_ownedHid{std::make_unique<CommandGenericHID>(gamepad->GetHID())},
+      m_hid{m_ownedHid.get()},
+      m_gamepad{gamepad} {}
 
 CommandGenericHID& CommandGamepad::GetHID() {
   return *m_hid;

@@ -15,16 +15,10 @@ Command{{ ClassName }}Controller::Command{{ ClassName }}Controller(int port)
 }
 
 Command{{ ClassName }}Controller::Command{{ ClassName }}Controller(
-    wpi::HIDDevice* hid)
-    : m_ownedHid{std::make_unique<CommandGenericHID>(hid->GetHID())},
-      m_hid{m_ownedHid.get()} {
-  m_controller = dynamic_cast<wpi::{{ ClassName }}Controller*>(hid);
-  if (m_controller == nullptr) {
-    m_ownedController =
-        std::make_unique<wpi::{{ ClassName }}Controller>(m_hid->GetHID());
-    m_controller = m_ownedController.get();
-  }
-}
+    wpi::{{ ClassName }}Controller* controller)
+    : m_ownedHid{std::make_unique<CommandGenericHID>(controller->GetHID())},
+      m_hid{m_ownedHid.get()},
+      m_controller{controller} {}
 
 CommandGenericHID& Command{{ ClassName }}Controller::GetHID() {
   return *m_hid;

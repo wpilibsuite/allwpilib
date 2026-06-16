@@ -12,7 +12,6 @@
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/button/CommandGenericHID.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
-#include "wpi/driverstation/HIDDevice.hpp"
 
 namespace wpi::cmd {
 /**
@@ -32,11 +31,11 @@ class CommandXboxController {
   explicit CommandXboxController(int port);
 
   /**
-   * Construct an instance of a controller with an HIDDevice object.
+   * Construct an instance of a controller with a XboxController object.
    *
-   * @param hid The HIDDevice object to use for this controller.
+   * @param controller The XboxController object to use for this controller.
    */
-  explicit CommandXboxController(wpi::HIDDevice* hid);
+  explicit CommandXboxController(wpi::XboxController* controller);
 
   /**
    * Get the underlying CommandGenericHID object.

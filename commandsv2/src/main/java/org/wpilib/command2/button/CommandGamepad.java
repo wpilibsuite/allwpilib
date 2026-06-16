@@ -8,7 +8,6 @@ import java.util.Objects;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.Gamepad;
-import org.wpilib.driverstation.HIDDevice;
 import org.wpilib.event.EventLoop;
 
 /**
@@ -32,15 +31,13 @@ public class CommandGamepad {
   }
 
   /**
-   * Construct an instance of a controller with an HIDDevice object.
+   * Construct an instance of a controller with a Gamepad object.
    *
-   * @param hid The HIDDevice object to use for this controller.
+   * @param gamepad The Gamepad object to use for this controller.
    */
-  public CommandGamepad(HIDDevice hid) {
-    var device = Objects.requireNonNull(hid, "Provided HID device cannot be null");
-    var genericHID = device.getHID();
-    m_hid = new CommandGenericHID(genericHID);
-    m_gamepad = device instanceof Gamepad gamepad ? gamepad : new Gamepad(genericHID);
+  public CommandGamepad(Gamepad gamepad) {
+    m_gamepad = Objects.requireNonNull(gamepad, "Provided gamepad cannot be null");
+    m_hid = new CommandGenericHID(m_gamepad.getHID());
   }
 
   /**

@@ -9,7 +9,6 @@ package org.wpilib.command3.button;
 import java.util.Objects;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
-import org.wpilib.driverstation.HIDDevice;
 import org.wpilib.driverstation.XboxController;
 import org.wpilib.event.EventLoop;
 
@@ -37,10 +36,10 @@ public class CommandXboxController {
    * Construct an instance of a controller. Commands bound to buttons on the controller will be
    * scheduled on the {@link Scheduler#getDefault() default scheduler} using its default event loop.
    *
-   * @param hid The HIDDevice object to use for this controller.
+   * @param controller The XboxController object to use for this controller.
    */
-  public CommandXboxController(HIDDevice hid) {
-    this(Scheduler.getDefault(), hid);
+  public CommandXboxController(XboxController controller) {
+    this(Scheduler.getDefault(), controller);
   }
 
   /**
@@ -60,16 +59,12 @@ public class CommandXboxController {
    * scheduled on the given scheduler using its default event loop.
    *
    * @param scheduler The scheduler that should execute the triggered commands.
-   * @param hid The HIDDevice object to use for this controller.
+   * @param controller The XboxController object to use for this controller.
    */
-  public CommandXboxController(Scheduler scheduler, HIDDevice hid) {
-    var device = Objects.requireNonNull(hid, "Provided HID device cannot be null");
-    var genericHID = device.getHID();
-    m_hid = new CommandGenericHID(scheduler, genericHID);
+  public CommandXboxController(Scheduler scheduler, XboxController controller) {
     m_controller =
-        device instanceof XboxController controller
-            ? controller
-            : new XboxController(genericHID);
+        Objects.requireNonNull(controller, "Provided XboxController cannot be null");
+    m_hid = new CommandGenericHID(scheduler, m_controller.getHID());
   }
 
   /**

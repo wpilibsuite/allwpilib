@@ -1,7 +1,7 @@
 # validated: 2024-01-20 DS 92149efa11fa button/CommandGamepad.java
 from typing import Optional, Union
 
-from wpilib import DriverStation, EventLoop, Gamepad, HIDDevice
+from wpilib import DriverStation, EventLoop, Gamepad
 
 from .commandgenerichid import CommandGenericHID
 from .trigger import Trigger
@@ -22,20 +22,20 @@ class CommandGamepad:
     _hid: CommandGenericHID
     _gamepad: Gamepad
 
-    def __init__(self, hid: Union[int, HIDDevice]):
+    def __init__(self, hid: Union[int, Gamepad]):
         """
         Construct an instance of a controller.
 
         :param hid: The port index on the Driver Station that the controller is plugged into,
-                    or the HIDDevice object to use for this controller.
+                    or the Gamepad object to use for this controller.
         """
 
         if isinstance(hid, int):
             self._hid = CommandGenericHID.getCommandGenericHID(hid)
             self._gamepad = DriverStation.getGamepad(hid)
         else:
-            self._hid = CommandGenericHID(hid)
-            self._gamepad = hid if isinstance(hid, Gamepad) else Gamepad(self._hid.getHID())
+            self._hid = CommandGenericHID(hid.getHID())
+            self._gamepad = hid
 
     def __getattr__(self, name: str):
         return getattr(self._hid, name)

@@ -2,7 +2,7 @@
 import threading
 from typing import ClassVar, Optional, Union, final
 
-from wpilib import DriverStation, EventLoop, GenericHID, HIDDevice
+from wpilib import DriverStation, EventLoop, GenericHID
 
 from ..commandscheduler import CommandScheduler
 from .trigger import Trigger
@@ -17,17 +17,17 @@ class CommandGenericHID:
     _hids: ClassVar[dict[int, "CommandGenericHID"]] = {}
     _hids_lock = threading.Lock()
 
-    def __init__(self, hid: Union[int, HIDDevice]):
+    def __init__(self, hid: Union[int, GenericHID]):
         """
         Construct an instance of a device.
 
         :param hid: The port on the Driver Station that the device is plugged into,
-                    or the HIDDevice object to use for this command HID.
+                    or the GenericHID object to use for this command HID.
         """
         if isinstance(hid, int):
             self._hid = DriverStation.getGenericHID(hid)
         else:
-            self._hid = hid.getHID()
+            self._hid = hid
 
     @classmethod
     def getCommandGenericHID(cls, port: int) -> "CommandGenericHID":

@@ -10,7 +10,6 @@ import java.util.Objects;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.DualSenseController;
-import org.wpilib.driverstation.HIDDevice;
 import org.wpilib.event.EventLoop;
 
 /**
@@ -37,10 +36,10 @@ public class CommandDualSenseController {
    * Construct an instance of a controller. Commands bound to buttons on the controller will be
    * scheduled on the {@link Scheduler#getDefault() default scheduler} using its default event loop.
    *
-   * @param hid The HIDDevice object to use for this controller.
+   * @param controller The DualSenseController object to use for this controller.
    */
-  public CommandDualSenseController(HIDDevice hid) {
-    this(Scheduler.getDefault(), hid);
+  public CommandDualSenseController(DualSenseController controller) {
+    this(Scheduler.getDefault(), controller);
   }
 
   /**
@@ -60,16 +59,12 @@ public class CommandDualSenseController {
    * scheduled on the given scheduler using its default event loop.
    *
    * @param scheduler The scheduler that should execute the triggered commands.
-   * @param hid The HIDDevice object to use for this controller.
+   * @param controller The DualSenseController object to use for this controller.
    */
-  public CommandDualSenseController(Scheduler scheduler, HIDDevice hid) {
-    var device = Objects.requireNonNull(hid, "Provided HID device cannot be null");
-    var genericHID = device.getHID();
-    m_hid = new CommandGenericHID(scheduler, genericHID);
+  public CommandDualSenseController(Scheduler scheduler, DualSenseController controller) {
     m_controller =
-        device instanceof DualSenseController controller
-            ? controller
-            : new DualSenseController(genericHID);
+        Objects.requireNonNull(controller, "Provided DualSenseController cannot be null");
+    m_hid = new CommandGenericHID(scheduler, m_controller.getHID());
   }
 
   /**

@@ -2,7 +2,7 @@
 
 from typing import Optional, Union
 
-from wpilib import EventLoop, HIDDevice, DualSenseController
+from wpilib import EventLoop, DualSenseController
 
 from .commandgenerichid import CommandGenericHID
 from .trigger import Trigger
@@ -16,23 +16,19 @@ class CommandDualSenseController:
     _hid: CommandGenericHID
     _controller: DualSenseController
 
-    def __init__(self, hid: Union[int, HIDDevice]):
+    def __init__(self, hid: Union[int, DualSenseController]):
         """
         Construct an instance of a controller.
 
         :param hid: The port index on the Driver Station that the controller is plugged into,
-                    or the HIDDevice object to use for this controller.
+                    or the DualSenseController object to use for this controller.
         """
         if isinstance(hid, int):
             self._hid = CommandGenericHID.getCommandGenericHID(hid)
             self._controller = DualSenseController(self._hid.getHID())
         else:
-            self._hid = CommandGenericHID(hid)
-            self._controller = (
-                hid
-                if isinstance(hid, DualSenseController)
-                else DualSenseController(self._hid.getHID())
-            )
+            self._hid = CommandGenericHID(hid.getHID())
+            self._controller = hid
 
     def getHID(self) -> CommandGenericHID:
         """
