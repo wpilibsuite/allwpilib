@@ -6,7 +6,9 @@
 
 package org.wpilib.command2.button;
 
+import java.util.Objects;
 import org.wpilib.command2.CommandScheduler;
+import org.wpilib.driverstation.HIDDevice;
 import org.wpilib.driverstation.XboxController;
 import org.wpilib.event.EventLoop;
 
@@ -28,6 +30,21 @@ public class CommandXboxController {
   public CommandXboxController(int port) {
     m_hid = CommandGenericHID.getCommandGenericHID(port);
     m_controller = new XboxController(m_hid.getHID());
+  }
+
+  /**
+   * Construct an instance of a controller with an HIDDevice object.
+   *
+   * @param hid The HIDDevice object to use for this controller.
+   */
+  public CommandXboxController(HIDDevice hid) {
+    var device = Objects.requireNonNull(hid, "Provided HID device cannot be null");
+    var genericHID = device.getHID();
+    m_hid = new CommandGenericHID(genericHID);
+    m_controller =
+        device instanceof XboxController controller
+            ? controller
+            : new XboxController(genericHID);
   }
 
   /**

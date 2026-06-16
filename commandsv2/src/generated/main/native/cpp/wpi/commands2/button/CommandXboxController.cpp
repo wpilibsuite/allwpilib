@@ -8,8 +8,23 @@
 using namespace wpi::cmd;
 
 CommandXboxController::CommandXboxController(int port)
-    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
-      m_controller{m_hid->GetHID()} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)} {
+  m_ownedController =
+      std::make_unique<wpi::XboxController>(m_hid->GetHID());
+  m_controller = m_ownedController.get();
+}
+
+CommandXboxController::CommandXboxController(
+    wpi::HIDDevice* hid)
+    : m_ownedHid{std::make_unique<CommandGenericHID>(hid->GetHID())},
+      m_hid{m_ownedHid.get()} {
+  m_controller = dynamic_cast<wpi::XboxController*>(hid);
+  if (m_controller == nullptr) {
+    m_ownedController =
+        std::make_unique<wpi::XboxController>(m_hid->GetHID());
+    m_controller = m_ownedController.get();
+  }
+}
 
 CommandGenericHID& CommandXboxController::GetHID() {
   return *m_hid;
@@ -17,12 +32,12 @@ CommandGenericHID& CommandXboxController::GetHID() {
 
 wpi::XboxController&
 CommandXboxController::GetController() {
-  return m_controller;
+  return *m_controller;
 }
 
 const wpi::XboxController&
 CommandXboxController::GetController() const {
-  return m_controller;
+  return *m_controller;
 }
 
 Trigger CommandXboxController::Button(
@@ -157,25 +172,25 @@ Trigger CommandXboxController::AxisMagnitudeGreaterThan(
 
 
 double CommandXboxController::GetLeftX() const {
-  return m_controller.GetLeftX();
+  return m_controller->GetLeftX();
 }
 
 double CommandXboxController::GetLeftY() const {
-  return m_controller.GetLeftY();
+  return m_controller->GetLeftY();
 }
 
 double CommandXboxController::GetRightX() const {
-  return m_controller.GetRightX();
+  return m_controller->GetRightX();
 }
 
 double CommandXboxController::GetRightY() const {
-  return m_controller.GetRightY();
+  return m_controller->GetRightY();
 }
 
 double CommandXboxController::GetLeftTrigger() const {
-  return m_controller.GetLeftTrigger();
+  return m_controller->GetLeftTrigger();
 }
 
 double CommandXboxController::GetRightTrigger() const {
-  return m_controller.GetRightTrigger();
+  return m_controller->GetRightTrigger();
 }

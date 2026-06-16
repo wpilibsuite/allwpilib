@@ -4,10 +4,12 @@
 
 package org.wpilib.command3.button;
 
+import java.util.Objects;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.Gamepad;
+import org.wpilib.driverstation.HIDDevice;
 import org.wpilib.event.EventLoop;
 
 /**
@@ -30,6 +32,16 @@ public class CommandGamepad {
   }
 
   /**
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the {@link Scheduler#getDefault() default scheduler} using its default event loop.
+   *
+   * @param hid The HIDDevice object to use for this controller.
+   */
+  public CommandGamepad(HIDDevice hid) {
+    this(Scheduler.getDefault(), hid);
+  }
+
+  /**
    * Construct an instance of a controller.
    *
    * @param scheduler The scheduler that should execute the triggered commands.
@@ -38,6 +50,20 @@ public class CommandGamepad {
   public CommandGamepad(Scheduler scheduler, int port) {
     m_hid = CommandGenericHID.getCommandGenericHID(scheduler, port);
     m_gamepad = DriverStation.getGamepad(port);
+  }
+
+  /**
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the given scheduler using its default event loop.
+   *
+   * @param scheduler The scheduler that should execute the triggered commands.
+   * @param hid The HIDDevice object to use for this controller.
+   */
+  public CommandGamepad(Scheduler scheduler, HIDDevice hid) {
+    var device = Objects.requireNonNull(hid, "Provided HID device cannot be null");
+    var genericHID = device.getHID();
+    m_hid = new CommandGenericHID(scheduler, genericHID);
+    m_gamepad = device instanceof Gamepad gamepad ? gamepad : new Gamepad(genericHID);
   }
 
   /**

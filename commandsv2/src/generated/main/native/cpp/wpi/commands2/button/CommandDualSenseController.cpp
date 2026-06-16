@@ -8,8 +8,23 @@
 using namespace wpi::cmd;
 
 CommandDualSenseController::CommandDualSenseController(int port)
-    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
-      m_controller{m_hid->GetHID()} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)} {
+  m_ownedController =
+      std::make_unique<wpi::DualSenseController>(m_hid->GetHID());
+  m_controller = m_ownedController.get();
+}
+
+CommandDualSenseController::CommandDualSenseController(
+    wpi::HIDDevice* hid)
+    : m_ownedHid{std::make_unique<CommandGenericHID>(hid->GetHID())},
+      m_hid{m_ownedHid.get()} {
+  m_controller = dynamic_cast<wpi::DualSenseController*>(hid);
+  if (m_controller == nullptr) {
+    m_ownedController =
+        std::make_unique<wpi::DualSenseController>(m_hid->GetHID());
+    m_controller = m_ownedController.get();
+  }
+}
 
 CommandGenericHID& CommandDualSenseController::GetHID() {
   return *m_hid;
@@ -17,12 +32,12 @@ CommandGenericHID& CommandDualSenseController::GetHID() {
 
 wpi::DualSenseController&
 CommandDualSenseController::GetController() {
-  return m_controller;
+  return *m_controller;
 }
 
 const wpi::DualSenseController&
 CommandDualSenseController::GetController() const {
-  return m_controller;
+  return *m_controller;
 }
 
 Trigger CommandDualSenseController::Button(
@@ -169,25 +184,25 @@ Trigger CommandDualSenseController::AxisMagnitudeGreaterThan(
 
 
 double CommandDualSenseController::GetLeftX() const {
-  return m_controller.GetLeftX();
+  return m_controller->GetLeftX();
 }
 
 double CommandDualSenseController::GetLeftY() const {
-  return m_controller.GetLeftY();
+  return m_controller->GetLeftY();
 }
 
 double CommandDualSenseController::GetRightX() const {
-  return m_controller.GetRightX();
+  return m_controller->GetRightX();
 }
 
 double CommandDualSenseController::GetRightY() const {
-  return m_controller.GetRightY();
+  return m_controller->GetRightY();
 }
 
 double CommandDualSenseController::GetL2() const {
-  return m_controller.GetL2();
+  return m_controller->GetL2();
 }
 
 double CommandDualSenseController::GetR2() const {
-  return m_controller.GetR2();
+  return m_controller->GetR2();
 }

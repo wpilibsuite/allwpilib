@@ -8,8 +8,23 @@
 using namespace wpi::cmd;
 
 Command{{ ClassName }}Controller::Command{{ ClassName }}Controller(int port)
-    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
-      m_controller{m_hid->GetHID()} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)} {
+  m_ownedController =
+      std::make_unique<wpi::{{ ClassName }}Controller>(m_hid->GetHID());
+  m_controller = m_ownedController.get();
+}
+
+Command{{ ClassName }}Controller::Command{{ ClassName }}Controller(
+    wpi::HIDDevice* hid)
+    : m_ownedHid{std::make_unique<CommandGenericHID>(hid->GetHID())},
+      m_hid{m_ownedHid.get()} {
+  m_controller = dynamic_cast<wpi::{{ ClassName }}Controller*>(hid);
+  if (m_controller == nullptr) {
+    m_ownedController =
+        std::make_unique<wpi::{{ ClassName }}Controller>(m_hid->GetHID());
+    m_controller = m_ownedController.get();
+  }
+}
 
 CommandGenericHID& Command{{ ClassName }}Controller::GetHID() {
   return *m_hid;
@@ -17,12 +32,12 @@ CommandGenericHID& Command{{ ClassName }}Controller::GetHID() {
 
 wpi::{{ ClassName }}Controller&
 Command{{ ClassName }}Controller::GetController() {
-  return m_controller;
+  return *m_controller;
 }
 
 const wpi::{{ ClassName }}Controller&
 Command{{ ClassName }}Controller::GetController() const {
-  return m_controller;
+  return *m_controller;
 }
 
 Trigger Command{{ ClassName }}Controller::Button(
@@ -67,6 +82,6 @@ Trigger Command{{ ClassName }}Controller::AxisMagnitudeGreaterThan(
 
 {% for axis in axes %}
 double Command{{ ClassName }}Controller::Get{{ axis.MethodName }}() const {
-  return m_controller.Get{{ axis.MethodName }}();
+  return m_controller->Get{{ axis.MethodName }}();
 }
 {% endfor -%}
