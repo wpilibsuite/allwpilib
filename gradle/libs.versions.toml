@@ -1,6 +1,6 @@
 [versions]
 avaje = "3.11"
-ejml = "0.44.0"
+ejml = "0.45.2-SNAPSHOT"
 jmh = "1.37"
 opencv = "2027-4.13.0-3"
 quickbuf = "1.4"
@@ -10,7 +10,7 @@ quickbuf = "1.4"
 avaje-jsonb = { module = "io.avaje:avaje-jsonb", version.ref = "avaje" }
 avaje-jsonb-generator = { module = "io.avaje:avaje-jsonb-generator", version.ref = "avaje" }
 avaje-inject = { module = "io.avaje:avaje-inject", version = "12.5" }
-ejml-simple = { module = "org.ejml:ejml-simple", version.ref = "ejml" } # also pulls in other EJML modules as transitive dependencies
+ejml = { module = "org.ejml:ejml-java9module", version.ref = "ejml" } # uberjar
 gson = { module = "com.google.code.gson:gson", version = "2.13.1" }
 quickbuf-runtime = { module = "us.hebi.quickbuf:quickbuf-runtime", version.ref = "quickbuf" }
 thirdparty-opencv = { module = "org.wpilib.thirdparty.opencv:opencv-java", version.ref = "opencv" }
@@ -32,7 +32,7 @@ wpilib-native-utils = { module = "org.wpilib:native-utils", version = "2027.7.1"
 gradlex-moduletesting = { module = "org.gradlex:java-module-testing", version = "1.8.1" }
 
 [bundles]
-ejml = ["ejml-simple"]
+ejml = ["ejml"]
 mockito = ["mockito-core"]
 # junit api and launcher artifacts are different dependency types (implementation and runtime, respectively),
 # so it doesn't make sense to bundle them in a single "junit" bundle

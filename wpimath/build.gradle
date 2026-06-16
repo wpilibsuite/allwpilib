@@ -92,7 +92,7 @@ dependencies {
     api project(":wpiunits")
     api libs.avaje.jsonb
     implementation libs.avaje.inject
-    api "org.ejml:ejml-java9module:0.45.2-SNAPSHOT"
+    api libs.bundles.ejml
     api libs.quickbuf.runtime
     implementation project(":wpiannotations")
     annotationProcessor project(':javacPlugin')
