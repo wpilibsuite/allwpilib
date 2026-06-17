@@ -1,3 +1,4 @@
+#pragma once
 
 // clang-format off
 cls_NetworkTable
