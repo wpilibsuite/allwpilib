@@ -44,6 +44,7 @@ repositories {
 }
 
 dependencies {
+    implementation project(':allwpilib-java')
     implementation project(':wpilibj')
     implementation project(':wpimath')
     implementation project(':hal')
