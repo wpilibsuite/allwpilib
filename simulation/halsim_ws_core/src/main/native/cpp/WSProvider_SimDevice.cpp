@@ -12,7 +12,8 @@
 
 #include <fmt/format.h>
 
-#include "wpi/hal/Ports.h"
+#include "wpi/hal/SimDevice.h"
+#include "wpi/hal/simulation/SimDeviceData.h"
 #include "wpi/util/StringExtras.hpp"
 
 namespace wpilibws {

@@ -51,6 +51,7 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
 
 sourceSets.main.java.srcDir "${buildDir}/generated/java/"
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
+sourceSets.test.java.srcDir "${projectDir}/src/generated/test/java"
 
 compileJava {
     dependsOn generateJavaVersion

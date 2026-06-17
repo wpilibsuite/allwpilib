@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
-#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"

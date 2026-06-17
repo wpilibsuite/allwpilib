@@ -1,5 +1,6 @@
 extra_includes:
 - wpi/datalog/DataLog.hpp
+- wpi/driverstation/GenericHID.hpp
 - wpi/util/Color.hpp
 
 classes:
@@ -7,6 +8,8 @@ classes:
     attributes:
       JOYSTICK_PORTS:
     methods:
+      ConstructGenericHID:
+      ResetCachedHIDData:
       GetStickButton:
       GetStickButtonIfAvailable:
       GetStickButtonPressed:

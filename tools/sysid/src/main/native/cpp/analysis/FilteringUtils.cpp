@@ -17,7 +17,6 @@
 
 #include "wpi/math/filter/LinearFilter.hpp"
 #include "wpi/math/filter/MedianFilter.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/StringExtras.hpp"
 

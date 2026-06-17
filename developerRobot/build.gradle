@@ -59,6 +59,7 @@ dependencies {
     implementation project(':wpiunits')
     implementation project(':epilogue-runtime')
     annotationProcessor project(':epilogue-processor')
+    annotationProcessor project(':javacPlugin')
 }
 
 tasks.withType(JavaExec).configureEach {

@@ -61,6 +61,23 @@ class Topic {
   std::string GetName() const { return ::wpi::nt::GetTopicName(m_handle); }
 
   /**
+   * Gets the user data associated with the topic.
+   *
+   * @return User data pointer, or nullptr if no user data is associated.
+   */
+  void* GetUserData() const { return ::wpi::nt::GetTopicUserData(m_handle); }
+
+  /**
+   * Sets the user data associated with the topic. User data is not used by
+   * ntcore and is for the user's convenience. It is not automatically freed.
+   *
+   * @param userData User data pointer to associate with the topic.
+   */
+  void SetUserData(void* userData) {
+    ::wpi::nt::SetTopicUserData(m_handle, userData);
+  }
+
+  /**
    * Gets the type of the topic.
    *
    * @return the topic's type

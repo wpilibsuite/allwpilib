@@ -63,9 +63,7 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # Options for building certain parts of the repo. Everything is built by default.
-option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
-option(WITH_JAVA "Include Java and JNI in the build" OFF)
-option(WITH_JAVA_SOURCE "Build Java source jars" ${WITH_JAVA})
+option(BUILD_SHARED_LIBS "Build with shared libs" ON)
 option(WITH_DOCS "Build Doxygen docs (needs Git for versioning)" OFF)
 cmake_dependent_option(
     DOCS_WARNINGS_AS_ERRORS
@@ -78,13 +76,6 @@ option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WITH_NTCORE "Build ntcore" ON)
 option(WITH_WPICAL "Build wpical" OFF)
 option(WITH_WPIMATH "Build wpimath" ON)
-cmake_dependent_option(
-    WITH_WPIUNITS
-    "Build wpiunits"
-    ON
-    WITH_JAVA
-    OFF
-)
 option(WITH_WPILIB "Build hal, wpilibc/j, and developerRobot (needs OpenCV)" ON)
 option(WITH_EXAMPLES "Build examples" OFF)
 option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
@@ -98,25 +89,8 @@ option(USE_SYSTEM_LIBUV "Use system libuv" OFF)
 option(USE_SYSTEM_EIGEN "Use system eigen" OFF)
 option(USE_LINKED_AVAHI "Use directly linked Avahi instead of loading at runtime" OFF)
 
-# Options for location of OpenCV Java.
-set(OPENCV_JAVA_INSTALL_DIR "" CACHE PATH "Location to search for the OpenCV jar file")
-
 # Options for compilation flags.
 option(NO_WERROR "Disable -Werror flag during compilation" OFF)
-
-if(NOT WITH_JAVA OR NOT WITH_CSCORE)
-    if(NOT "${OPENCV_JAVA_INSTALL_DIR}" STREQUAL "")
-        message(
-            WARNING
-            "
-WARNING: OpenCV Java dir set but java is not enabled!
-It will be ignored.
-"
-        )
-    endif()
-endif()
-
-wpilib_config(OPTIONS WITH_JAVA REQUIRES BUILD_SHARED_LIBS)
 
 wpilib_config(OPTIONS WITH_SIMULATION_MODULES REQUIRES BUILD_SHARED_LIBS WITH_WPILIB WITH_NTCORE)
 
@@ -126,17 +100,7 @@ wpilib_config(OPTIONS WITH_GUI REQUIRES WITH_NTCORE WITH_WPIMATH)
 
 wpilib_config(OPTIONS WITH_WPILIB REQUIRES WITH_NTCORE WITH_WPIMATH)
 
-wpilib_config(OPTIONS WITH_WPIMATH WITH_JAVA REQUIRES WITH_WPIUNITS)
-
 set(include_dest include)
-set(java_lib_dest java)
-if(WITH_JAVA OR WITH_JAVA_SOURCE)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked" "-proc:full")
-    find_package(Java REQUIRED COMPONENTS Development)
-    if(NOT ANDROID)
-        find_package(JNI REQUIRED COMPONENTS JVM)
-    endif()
-endif()
 
 if(WITH_DOCS)
     find_package(Doxygen REQUIRED)
@@ -283,13 +247,8 @@ endif()
 
 set(FILENAME_DEP_REPLACE "get_filename_component(SELF_DIR \"$\{CMAKE_CURRENT_LIST_FILE\}\" PATH)")
 set(SELF_DIR "$\{SELF_DIR\}")
-set(WPIUNITS_DEP_REPLACE_IMPL "find_dependency(wpiunits)")
-set(WPIANNOTATIONS_DEP_REPLACE_IMPL "find_dependency(wpiannotations)")
 set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
 set(DATALOG_DEP_REPLACE "find_dependency(datalog)")
-if(WITH_JAVA)
-    add_subdirectory(wpiannotations)
-endif()
 
 add_subdirectory(wpiutil)
 
@@ -303,18 +262,8 @@ if(WITH_NTCORE)
 endif()
 
 if(WITH_WPIMATH)
-    if(WITH_JAVA)
-        set(WPIUNITS_DEP_REPLACE ${WPIUNITS_DEP_REPLACE_IMPL})
-        add_subdirectory(wpiunits)
-    endif()
     set(WPIMATH_DEP_REPLACE "find_dependency(wpimath)")
     add_subdirectory(wpimath)
-endif()
-
-if(WITH_WPIUNITS AND NOT WITH_WPIMATH)
-    # In case of building wpiunits standalone
-    set(WPIUNITS_DEP_REPLACE ${WPIUNITS_DEP_REPLACE_IMPL})
-    add_subdirectory(wpiunits)
 endif()
 
 if(WITH_GUI)
@@ -347,16 +296,10 @@ endif()
 
 if(WITH_WPILIB)
     set(APRILTAG_DEP_REPLACE "find_dependency(apriltag)")
-    set(COMMANDSV3_DEP_REPLACE "find_dependency(commandsv3)")
     set(WPILIBC_DEP_REPLACE "find_dependency(wpilibc)")
-    if(WITH_JAVA)
-        set(WPILIBJ_DEP_REPLACE "find_dependency(wpilibj)")
-    endif()
     set(COMMAND_DEP_REPLACE "find_dependency(commandsv2)")
     add_subdirectory(apriltag)
-    add_subdirectory(wpilibj)
     add_subdirectory(wpilibc)
-    add_subdirectory(commandsv3) # must be after wpilibj
     add_subdirectory(commandsv2)
     add_subdirectory(romiVendordep)
     add_subdirectory(xrpVendordep)

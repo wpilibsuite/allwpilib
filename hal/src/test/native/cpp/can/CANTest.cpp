@@ -8,10 +8,11 @@
 #include <gtest/gtest.h>
 
 #include "wpi/hal/CANAPI.h"
-#include "wpi/hal/CANBusMap.h"
 #include "wpi/hal/simulation/CanData.h"
 
 namespace wpi::hal {
+static constexpr int32_t kCANBusS0 = 0;
+
 struct CANTestStore {
   CANTestStore(int32_t busId, int32_t deviceId, int32_t* status) {
     this->deviceId = deviceId;
@@ -45,7 +46,7 @@ struct CANSendCallbackStore {
 TEST(CANTest, CanIdPacking) {
   int32_t status = 0;
   int32_t deviceId = 12;
-  CANTestStore testStore(HAL_CAN_BUS_S0, deviceId, &status);
+  CANTestStore testStore(kCANBusS0, deviceId, &status);
   ASSERT_EQ(0, status);
 
   std::pair<int32_t, bool> storePair;

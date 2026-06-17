@@ -6,8 +6,6 @@
 
 #include <stdexcept>
 
-#include <fmt/format.h>
-
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
