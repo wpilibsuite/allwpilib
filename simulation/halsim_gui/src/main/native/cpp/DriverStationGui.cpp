@@ -371,7 +371,7 @@ JoystickModel::JoystickModel(int index) : m_index{index} {
       static_cast<uint8_t>(64 - std::countl_zero(halButtons.available));
   for (int i = 0; i < buttonCount; ++i) {
     buttons[i] = new wpi::glass::BooleanSource(
-        fmt::format("Joystick[{}] Button[{}]", index, i + 1));
+        fmt::format("Joystick[{}] Button[{}]", index, i));
   }
   for (int i = buttonCount; i < 64; ++i) {
     buttons[i] = nullptr;
@@ -716,7 +716,7 @@ void KeyboardJoystick::SettingsDisplay() {
       m_buttonKey.emplace_back(-1);
     }
     for (int i = 0; i < m_buttonCount; ++i) {
-      wpi::util::format_to_n_c_str(label, sizeof(label), "Button {}", i + 1);
+      wpi::util::format_to_n_c_str(label, sizeof(label), "Button {}", i);
 
       EditKey(label, &m_buttonKey[i]);
     }
