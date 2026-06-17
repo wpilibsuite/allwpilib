@@ -195,14 +195,14 @@ class DriverStationSim {
    *
    * @return the alliance station color and number
    */
-  static HAL_AllianceStationID GetAllianceStationId();
+  static wpi::hal::AllianceStationID GetAllianceStationId();
 
   /**
    * Change the alliance station.
    *
    * @param allianceStationId the new alliance station
    */
-  static void SetAllianceStationId(HAL_AllianceStationID allianceStationId);
+  static void SetAllianceStationId(wpi::hal::AllianceStationID allianceStationId);
 
   /**
    * Register a callback on match time.
