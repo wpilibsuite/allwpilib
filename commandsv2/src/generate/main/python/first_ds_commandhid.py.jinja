@@ -61,9 +61,11 @@ class Command{{ ClassName }}Controller:
         :returns: a Trigger instance representing the {{ button.DocName }} button's digital signal
                   attached to the given loop.
         """
+        # fmt: off
         return self._hid.button(
             _enum_value({{ ClassName }}Controller.Button.{{ button.ConstantName }}), loop
         )
+        # fmt: on
 {% endfor -%}
 {% for trigger in triggerAxes %}
     def {{ trigger.Name }}(
