@@ -42,12 +42,12 @@ std::unique_ptr<CallbackStore> DriverStationSim::RegisterRobotModeCallback(
   return store;
 }
 
-HAL_RobotMode DriverStationSim::GetRobotMode() {
-  return HALSIM_GetDriverStationRobotMode();
+hal::RobotMode DriverStationSim::GetRobotMode() {
+  return static_cast<hal::RobotMode>(HALSIM_GetDriverStationRobotMode());
 }
 
-void DriverStationSim::SetRobotMode(HAL_RobotMode robotMode) {
-  HALSIM_SetDriverStationRobotMode(robotMode);
+void DriverStationSim::SetRobotMode(hal::RobotMode robotMode) {
+  HALSIM_SetDriverStationRobotMode(static_cast<HAL_RobotMode>(robotMode));
 }
 
 std::unique_ptr<CallbackStore> DriverStationSim::RegisterEStopCallback(
