@@ -36,7 +36,7 @@ inline_code: |
         self->left = left;
       }
     )
-    .def_property("right_fpss", 
+    .def_property("right_fpss",
       [](DifferentialDriveWheelAccelerations * self) -> wpi::units::feet_per_second_squared_t {
         return self->right;
       },

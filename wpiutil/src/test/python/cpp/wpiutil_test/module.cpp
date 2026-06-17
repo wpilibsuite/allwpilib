@@ -209,7 +209,7 @@ PYBIND11_MODULE(module, m) {
     m.def("load_stringmap_int", &load_stringmap_int);
     m.def("cast_stringmap", &cast_stringmap);
     // JSON
-    m.def("cast_json_arg", &cast_json_arg); 
+    m.def("cast_json_arg", &cast_json_arg);
     m.def("cast_json_val", &cast_json_val);
     m.attr("max_uint64") = std::numeric_limits<uint64_t>::max();
     m.attr("max_int64") = std::numeric_limits<int64_t>::max();
@@ -220,7 +220,7 @@ PYBIND11_MODULE(module, m) {
     // WPI_String
     m.def("load_wpi_string", &load_wpi_string);
     m.def("cast_wpi_string", &cast_wpi_string);
-    
+
     py::class_<StructWithWPI_String> structWithWpiStringCls(m, "StructWithWPI_String");
     structWithWpiStringCls.def_readwrite("x", &StructWithWPI_String::x);
     structWithWpiStringCls.def_readonly("str", &StructWithWPI_String::str);
