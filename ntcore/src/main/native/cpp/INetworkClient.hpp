@@ -14,10 +14,23 @@ namespace wpi::nt {
 
 class INetworkClient {
  public:
+  struct ServerResolver {
+    std::string serviceType;
+    std::string serviceName;
+    bool serviceNamePrefix = false;
+    bool requireTeam = false;
+    unsigned int team = 0;
+    unsigned int port = 0;
+    bool useResolvedPort = false;
+  };
+
   virtual ~INetworkClient() = default;
 
   virtual void SetServers(
       std::span<const std::pair<std::string, unsigned int>> servers) = 0;
+  virtual void SetServers(
+      std::span<const std::pair<std::string, unsigned int>> servers,
+      const ServerResolver& resolver) = 0;
   virtual void Disconnect() = 0;
 
   virtual void StartDSClient(unsigned int port) = 0;

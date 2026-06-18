@@ -1154,8 +1154,8 @@ void NT_StartServer(NT_Inst inst, const struct WPI_String* persist_filename,
 void NT_StopServer(NT_Inst inst);
 
 /**
- * Starts a client.  Use NT_SetServer, NT_SetServerTeam, or NT_SetServerFixed
- * to set the server name and port.
+ * Starts a client.  Use NT_SetServer, NT_SetServerTeam, NT_SetServerFixed, or
+ * NT_SetServerMdns to set the server name and port.
  *
  * @param inst      instance handle
  * @param identity  network identity to advertise (cannot be empty string)
@@ -1196,7 +1196,7 @@ void NT_SetServerMulti(NT_Inst inst, size_t count,
 /**
  * Sets server addresses and port for client (without restarting client).
  * Connects using the team-specific robot address for the specified team, USB
- * address, and WiFi address.
+ * address, WiFi address, and matching SystemCore mDNS announcements.
  *
  * @param inst        instance handle
  * @param team        team number
@@ -1207,12 +1207,40 @@ void NT_SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port);
 /**
  * Sets server addresses and port for client (without restarting client).
  * Connects using fixed robot addresses that are not team-specific (USB, WiFi,
- * and robot.local).
+ * and robot.local) and SystemCore mDNS announcements.
  *
  * @param inst        instance handle
  * @param port        port to communicate over
  */
 void NT_SetServerFixed(NT_Inst inst, unsigned int port);
+
+/**
+ * Sets server address and port for client (without restarting client).
+ * Connects using a NetworkTables server announced over mDNS with the specified
+ * service name.
+ *
+ * @param inst          instance handle
+ * @param service_name  mDNS service name
+ */
+void NT_SetServerMdns(NT_Inst inst, const struct WPI_String* service_name);
+
+/**
+ * Sets server addresses and ports for client (without restarting client).
+ * Connects using fixed server addresses and a NetworkTables server announced
+ * over mDNS with the specified service name.
+ *
+ * @param inst          instance handle
+ * @param service_name  mDNS service name
+ * @param count         length of the server_names and ports arrays
+ * @param server_names  array of server names (each a UTF-8 string, null
+ *                      terminated)
+ * @param ports         array of ports to communicate over (one for each server)
+ */
+void NT_SetServerMdnsMulti(NT_Inst inst,
+                           const struct WPI_String* service_name,
+                           size_t count,
+                           const struct WPI_String* server_names,
+                           const unsigned int* ports);
 
 /**
  * Disconnects the client if it's running and connected. This will automatically

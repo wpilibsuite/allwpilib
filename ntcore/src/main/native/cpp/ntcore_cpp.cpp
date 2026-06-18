@@ -28,6 +28,12 @@ static std::atomic<int64_t> gNowTime;
 
 namespace wpi::nt {
 
+static constexpr std::string_view kNetworkTablesServiceType =
+    "_networktables._tcp";
+static constexpr std::string_view kSystemCoreServiceType = "_SystemCore._tcp";
+static constexpr std::string_view kSystemCoreServicePrefix =
+    "SystemCore-FIRST";
+
 wpi::util::json TopicInfo::GetProperties() const {
   return wpi::util::json::parse(properties).value_or(wpi::util::json::object());
 }
@@ -685,6 +691,15 @@ void SetServer(
   }
 }
 
+static INetworkClient::ServerResolver MakeNetworkTablesResolver(
+    std::string_view service_name) {
+  INetworkClient::ServerResolver resolver;
+  resolver.serviceType = kNetworkTablesServiceType;
+  resolver.serviceName = service_name;
+  resolver.useResolvedPort = true;
+  return resolver;
+}
+
 static void AddUsbServer(
     std::vector<std::pair<std::string, unsigned int>>& servers,
     unsigned int port) {
@@ -695,6 +710,31 @@ static void AddUsbServer(
   // 172.27.0.1 (Unix USB)
   servers.emplace_back("172.27.0.1", port);
 #endif
+}
+
+static void AddWifiServer(
+    std::vector<std::pair<std::string, unsigned int>>& servers,
+    unsigned int port) {
+  // 172.30.0.1 (WiFi)
+  servers.emplace_back("172.30.0.1", port);
+}
+
+static INetworkClient::ServerResolver MakeSystemCoreResolver(
+    unsigned int port) {
+  INetworkClient::ServerResolver resolver;
+  resolver.serviceType = kSystemCoreServiceType;
+  resolver.serviceName = kSystemCoreServicePrefix;
+  resolver.serviceNamePrefix = true;
+  resolver.port = port;
+  return resolver;
+}
+
+static INetworkClient::ServerResolver MakeSystemCoreResolver(
+    unsigned int team, unsigned int port) {
+  auto resolver = MakeSystemCoreResolver(port);
+  resolver.requireTeam = true;
+  resolver.team = team;
+  return resolver;
 }
 
 void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
@@ -709,10 +749,12 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
 
     AddUsbServer(servers, port);
 
-    // 172.30.0.1 (WiFi)
-    servers.emplace_back("172.30.0.1", port);
+    AddWifiServer(servers, port);
 
-    ii->SetServers(servers);
+    INetworkClient::ServerResolver resolver =
+        MakeSystemCoreResolver(team, port);
+
+    ii->SetServers(servers, resolver);
   }
 }
 
@@ -723,13 +765,42 @@ void SetServerFixed(NT_Inst inst, unsigned int port) {
 
     AddUsbServer(servers, port);
 
-    // 172.30.0.1 (WiFi)
-    servers.emplace_back("172.30.0.1", port);
+    AddWifiServer(servers, port);
 
     // robot.local
     servers.emplace_back("robot.local", port);
 
-    ii->SetServers(servers);
+    INetworkClient::ServerResolver resolver = MakeSystemCoreResolver(port);
+
+    ii->SetServers(servers, resolver);
+  }
+}
+
+void SetServerMdns(NT_Inst inst, std::string_view service_name) {
+  SetServerMdns(
+      inst, service_name,
+      std::span<const std::pair<std::string_view, unsigned int>>{});
+}
+
+void SetServerMdns(NT_Inst inst, std::string_view service_name,
+                   std::string_view server_name, unsigned int port) {
+  SetServerMdns(inst, service_name, {{{server_name, port}}});
+}
+
+void SetServerMdns(
+    NT_Inst inst, std::string_view service_name,
+    std::span<const std::pair<std::string_view, unsigned int>> servers) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
+    std::vector<std::pair<std::string, unsigned int>> serversCopy;
+    serversCopy.reserve(servers.size());
+    for (auto&& server : servers) {
+      serversCopy.emplace_back(std::string{server.first}, server.second);
+    }
+
+    INetworkClient::ServerResolver resolver =
+        MakeNetworkTablesResolver(service_name);
+
+    ii->SetServers(serversCopy, resolver);
   }
 }
 

@@ -1095,8 +1095,8 @@ void StartServer(NT_Inst inst, std::string_view persist_filename,
 void StopServer(NT_Inst inst);
 
 /**
- * Starts a client.  Use SetServer, SetServerTeam, or SetServerFixed to set
- * the server name and port.
+ * Starts a client.  Use SetServer, SetServerTeam, SetServerFixed, or
+ * SetServerMdns to set the server name and port.
  *
  * @param inst      instance handle
  * @param identity  network identity to advertise (cannot be empty string)
@@ -1133,7 +1133,7 @@ void SetServer(
 /**
  * Sets server addresses and port for client (without restarting client).
  * Connects using the team-specific robot address for the specified team, USB
- * address, and WiFi address.
+ * address, WiFi address, and matching SystemCore mDNS announcements.
  *
  * @param inst        instance handle
  * @param team        team number
@@ -1144,12 +1144,48 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port);
 /**
  * Sets server addresses and port for client (without restarting client).
  * Connects using fixed robot addresses that are not team-specific (USB, WiFi,
- * and robot.local).
+ * and robot.local) and SystemCore mDNS announcements.
  *
  * @param inst        instance handle
  * @param port        port to communicate over
  */
 void SetServerFixed(NT_Inst inst, unsigned int port);
+
+/**
+ * Sets server address and port for client (without restarting client).
+ * Connects using a NetworkTables server announced over mDNS with the specified
+ * service name.
+ *
+ * @param inst          instance handle
+ * @param service_name  mDNS service name
+ */
+void SetServerMdns(NT_Inst inst, std::string_view service_name);
+
+/**
+ * Sets server address and port for client (without restarting client).
+ * Connects using the fixed server address and a NetworkTables server announced
+ * over mDNS with the specified service name.
+ *
+ * @param inst          instance handle
+ * @param service_name  mDNS service name
+ * @param server_name   server name
+ * @param port          port to communicate over
+ */
+void SetServerMdns(NT_Inst inst, std::string_view service_name,
+                   std::string_view server_name, unsigned int port);
+
+/**
+ * Sets server addresses and ports for client (without restarting client).
+ * Connects using fixed server addresses and a NetworkTables server announced
+ * over mDNS with the specified service name.
+ *
+ * @param inst          instance handle
+ * @param service_name  mDNS service name
+ * @param servers       array of server name and port pairs
+ */
+void SetServerMdns(
+    NT_Inst inst, std::string_view service_name,
+    std::span<const std::pair<std::string_view, unsigned int>> servers);
 
 /**
  * Disconnects the client if it's running and connected. This will automatically

@@ -51,6 +51,9 @@ class InstanceImpl {
   void StopClient();
   void SetServers(
       std::span<const std::pair<std::string, unsigned int>> servers);
+  void SetServers(
+      std::span<const std::pair<std::string, unsigned int>> servers,
+      const INetworkClient::ServerResolver& resolver);
 
   std::shared_ptr<NetworkServer> GetServer();
   std::shared_ptr<INetworkClient> GetClient();
@@ -92,6 +95,7 @@ class InstanceImpl {
   std::shared_ptr<NetworkServer> m_networkServer;
   std::shared_ptr<INetworkClient> m_networkClient;
   std::vector<std::pair<std::string, unsigned int>> m_servers;
+  std::optional<INetworkClient::ServerResolver> m_serverResolver;
   std::optional<int64_t> m_serverTimeOffset;
   int64_t m_rtt2 = 0;
   int m_inst;

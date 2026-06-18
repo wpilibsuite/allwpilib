@@ -626,8 +626,8 @@ class NetworkTableInstance final {
   void StopServer() { ::wpi::nt::StopServer(m_handle); }
 
   /**
-   * Starts a client.  Use SetServer, SetServerTeam, or SetServerFixed to set
-   * the server name and port.
+   * Starts a client.  Use SetServer, SetServerTeam, SetServerFixed, or
+   * SetServerMdns to set the server name and port.
    *
    * @param identity  network identity to advertise (cannot be empty string)
    */
@@ -674,7 +674,7 @@ class NetworkTableInstance final {
   /**
    * Sets server addresses and port for client (without restarting client).
    * Connects using the team-specific robot address for the specified team, USB
-   * address, and WiFi address.
+   * address, WiFi address, and matching SystemCore mDNS announcements.
    *
    * @param team        team number
    * @param port        port to communicate over (0 = default)
@@ -686,13 +686,65 @@ class NetworkTableInstance final {
   /**
    * Sets server addresses and port for client (without restarting client).
    * Connects using fixed robot addresses that are not team-specific (USB, WiFi,
-   * and robot.local).
+   * and robot.local) and SystemCore mDNS announcements.
    *
    * @param port        port to communicate over (0 = default)
    */
   void SetServerFixed(unsigned int port = 0) {
     ::wpi::nt::SetServerFixed(m_handle, port);
   }
+
+  /**
+   * Sets server address and port for client (without restarting client).
+   * Connects using a NetworkTables server announced over mDNS with the specified
+   * service name.
+   *
+   * @param service_name mDNS service name
+   */
+  void SetServerMdns(std::string_view service_name) {
+    ::wpi::nt::SetServerMdns(m_handle, service_name);
+  }
+
+  /**
+   * Sets server address and port for client (without restarting client).
+   * Connects using the fixed server address and a NetworkTables server announced
+   * over mDNS with the specified service name.
+   *
+   * @param service_name mDNS service name
+   * @param server_name  server name
+   * @param port         port to communicate over (0 = default)
+   */
+  void SetServerMdns(std::string_view service_name,
+                     std::string_view server_name, unsigned int port = 0) {
+    ::wpi::nt::SetServerMdns(m_handle, service_name, server_name, port);
+  }
+
+  /**
+   * Sets server addresses and ports for client (without restarting client).
+   * Connects using fixed server addresses and a NetworkTables server announced
+   * over mDNS with the specified service name.
+   *
+   * @param service_name mDNS service name
+   * @param servers      array of server address and port pairs
+   */
+  void SetServerMdns(
+      std::string_view service_name,
+      std::span<const std::pair<std::string_view, unsigned int>> servers) {
+    ::wpi::nt::SetServerMdns(m_handle, service_name, servers);
+  }
+
+  /**
+   * Sets server addresses and port for client (without restarting client).
+   * Connects using fixed server addresses and a NetworkTables server announced
+   * over mDNS with the specified service name.
+   *
+   * @param service_name mDNS service name
+   * @param servers      array of server names
+   * @param port         port to communicate over (0 = default)
+   */
+  void SetServerMdns(std::string_view service_name,
+                     std::span<const std::string_view> servers,
+                     unsigned int port = 0);
 
   /**
    * Disconnects the client if it's running and connected. This will

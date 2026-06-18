@@ -1216,8 +1216,8 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   /**
-   * Starts a client. Use SetServer, SetServerTeam, or SetServerFixed to set the server name and
-   * port.
+   * Starts a client. Use SetServer, SetServerTeam, SetServerFixed, or SetServerMdns to set the
+   * server name and port.
    *
    * @param identity network identity to advertise (cannot be empty string)
    */
@@ -1287,6 +1287,82 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   /**
+   * Sets server address and port for client (without restarting client). Connects using a
+   * NetworkTables server announced over mDNS with the specified service name.
+   *
+   * @param serviceName mDNS service name
+   */
+  public void setServerMdns(String serviceName) {
+    NetworkTablesJNI.setServerMdns(m_handle, serviceName);
+  }
+
+  /**
+   * Sets server address and port for client (without restarting client). Changes the port to the
+   * default port. Connects using the fixed server address and a NetworkTables server announced over
+   * mDNS with the specified service name.
+   *
+   * @param serviceName mDNS service name
+   * @param serverName server name
+   */
+  public void setServerMdns(String serviceName, String serverName) {
+    setServerMdns(serviceName, serverName, 0);
+  }
+
+  /**
+   * Sets server address and port for client (without restarting client). Connects using the fixed
+   * server address and a NetworkTables server announced over mDNS with the specified service name.
+   *
+   * @param serviceName mDNS service name
+   * @param serverName server name
+   * @param port port to communicate over (0=default)
+   */
+  public void setServerMdns(String serviceName, String serverName, int port) {
+    NetworkTablesJNI.setServerMdns(m_handle, serviceName, serverName, port);
+  }
+
+  /**
+   * Sets server addresses and port for client (without restarting client). Changes the port to the
+   * default port. Connects using fixed server addresses and a NetworkTables server announced over
+   * mDNS with the specified service name.
+   *
+   * @param serviceName mDNS service name
+   * @param serverNames array of server names
+   */
+  public void setServerMdns(String serviceName, String[] serverNames) {
+    setServerMdns(serviceName, serverNames, 0);
+  }
+
+  /**
+   * Sets server addresses and port for client (without restarting client). Connects using fixed
+   * server addresses and a NetworkTables server announced over mDNS with the specified service
+   * name.
+   *
+   * @param serviceName mDNS service name
+   * @param serverNames array of server names
+   * @param port port to communicate over (0=default)
+   */
+  public void setServerMdns(String serviceName, String[] serverNames, int port) {
+    int[] ports = new int[serverNames.length];
+    for (int i = 0; i < serverNames.length; i++) {
+      ports[i] = port;
+    }
+    setServerMdns(serviceName, serverNames, ports);
+  }
+
+  /**
+   * Sets server addresses and ports for client (without restarting client). Connects using fixed
+   * server addresses and a NetworkTables server announced over mDNS with the specified service
+   * name.
+   *
+   * @param serviceName mDNS service name
+   * @param serverNames array of server names
+   * @param ports array of port numbers (0=default)
+   */
+  public void setServerMdns(String serviceName, String[] serverNames, int[] ports) {
+    NetworkTablesJNI.setServerMdns(m_handle, serviceName, serverNames, ports);
+  }
+
+  /**
    * Sets server addresses and port for client (without restarting client). Changes the port to the
    * default port. The client will attempt to connect to each server in round robin fashion.
    *
@@ -1298,7 +1374,8 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   /**
    * Sets server addresses and port for client (without restarting client). Connects using the
-   * team-specific robot address for the specified team, USB address, and WiFi address.
+   * team-specific robot address for the specified team, USB address, WiFi address, and matching
+   * SystemCore mDNS announcements.
    *
    * @param team team number
    * @param port port to communicate over (0=default)
@@ -1310,7 +1387,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   /**
    * Sets server addresses and port for client (without restarting client). Changes the port to the
    * default port. Connects using fixed robot addresses that are not team-specific (USB, WiFi, and
-   * robot.local).
+   * robot.local) and SystemCore mDNS announcements.
    */
   public void setServerFixed() {
     setServerFixed(0);
@@ -1318,7 +1395,8 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   /**
    * Sets server addresses and port for client (without restarting client). Connects using fixed
-   * robot addresses that are not team-specific (USB, WiFi, and robot.local).
+   * robot addresses that are not team-specific (USB, WiFi, and robot.local) and SystemCore mDNS
+   * announcements.
    *
    * @param port port to communicate over (0=default)
    */

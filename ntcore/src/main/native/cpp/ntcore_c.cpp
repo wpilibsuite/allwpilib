@@ -578,6 +578,24 @@ void NT_SetServerFixed(NT_Inst inst, unsigned int port) {
   wpi::nt::SetServerFixed(inst, port);
 }
 
+void NT_SetServerMdns(NT_Inst inst, const struct WPI_String* service_name) {
+  wpi::nt::SetServerMdns(inst, wpi::util::to_string_view(service_name));
+}
+
+void NT_SetServerMdnsMulti(NT_Inst inst,
+                           const struct WPI_String* service_name, size_t count,
+                           const struct WPI_String* server_names,
+                           const unsigned int* ports) {
+  std::vector<std::pair<std::string_view, unsigned int>> servers;
+  servers.reserve(count);
+  for (size_t i = 0; i < count; ++i) {
+    servers.emplace_back(
+        std::pair{wpi::util::to_string_view(&server_names[i]), ports[i]});
+  }
+  wpi::nt::SetServerMdns(inst, wpi::util::to_string_view(service_name),
+                         servers);
+}
+
 void NT_Disconnect(NT_Inst inst) {
   wpi::nt::Disconnect(inst);
 }

@@ -1418,8 +1418,8 @@ public final class NetworkTablesJNI {
   public static native void stopServer(int inst);
 
   /**
-   * Starts a client. Use SetServer, SetServerTeam, or SetServerFixed to set the server name and
-   * port.
+   * Starts a client. Use SetServer, SetServerTeam, SetServerFixed, or SetServerMdns to set the
+   * server name and port.
    *
    * @param inst NT instance handle.
    * @param identity network identity to advertise (cannot be empty string)
@@ -1453,8 +1453,43 @@ public final class NetworkTablesJNI {
   public static native void setServer(int inst, String[] serverNames, int[] ports);
 
   /**
+   * Sets server address and port for client (without restarting client). Connects using a
+   * NetworkTables server announced over mDNS with the specified service name.
+   *
+   * @param inst NT instance handle.
+   * @param serviceName mDNS service name
+   */
+  public static native void setServerMdns(int inst, String serviceName);
+
+  /**
+   * Sets server address and port for client (without restarting client). Connects using the fixed
+   * server address and a NetworkTables server announced over mDNS with the specified service name.
+   *
+   * @param inst NT instance handle.
+   * @param serviceName mDNS service name
+   * @param serverName server name
+   * @param port port to communicate over
+   */
+  public static native void setServerMdns(
+      int inst, String serviceName, String serverName, int port);
+
+  /**
+   * Sets server addresses and ports for client (without restarting client). Connects using fixed
+   * server addresses and a NetworkTables server announced over mDNS with the specified service
+   * name.
+   *
+   * @param inst NT instance handle.
+   * @param serviceName mDNS service name
+   * @param serverNames array of server names
+   * @param ports array of port numbers (0=default)
+   */
+  public static native void setServerMdns(
+      int inst, String serviceName, String[] serverNames, int[] ports);
+
+  /**
    * Sets server addresses and port for client (without restarting client). Connects using the
-   * team-specific robot address for the specified team, USB address, and WiFi address.
+   * team-specific robot address for the specified team, USB address, WiFi address, and matching
+   * SystemCore mDNS announcements.
    *
    * @param inst NT instance handle.
    * @param team team number
@@ -1464,7 +1499,8 @@ public final class NetworkTablesJNI {
 
   /**
    * Sets server addresses and port for client (without restarting client). Connects using fixed
-   * robot addresses that are not team-specific (USB, WiFi, and robot.local).
+   * robot addresses that are not team-specific (USB, WiFi, and robot.local) and SystemCore mDNS
+   * announcements.
    *
    * @param inst NT instance handle.
    * @param port port to communicate over
