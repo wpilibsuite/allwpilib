@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <memory>
+#include <string>
 #include <string_view>
 
 #include <fmt/format.h>
@@ -13,7 +14,7 @@
 #include "wpi/util/struct/Struct.hpp"
 
 static inline std::string pytypename(const py::type& t) {
-  return ((PyTypeObject*)t.ptr())->tp_name;
+  return (reinterpret_cast<PyTypeObject*>(t.ptr()))->tp_name;
 }
 
 //
@@ -40,7 +41,7 @@ struct WPyStruct {
 
   WPyStruct(WPyStruct&&) = default;
 
-  WPyStruct(const py::object& py) : py(py) {}
+  explicit WPyStruct(const py::object& py) : py(py) {}
 
   ~WPyStruct() {
     py::gil_scoped_acquire gil;
@@ -155,7 +156,7 @@ void SetupWPyStruct(auto pycls) {
 
 // dynamic python converter
 struct WPyStructPyConverter : WPyStructConverter {
-  WPyStructPyConverter(py::object o) {
+  explicit WPyStructPyConverter(py::object o) {
     m_typename = o.attr("typename").cast<std::string>();
     m_schema = o.attr("schema").cast<std::string>();
     m_size = o.attr("size").cast<size_t>();
@@ -197,7 +198,7 @@ struct WPyStructPyConverter : WPyStructConverter {
       throw py::value_error(msg);
     }
 
-    rview.copy((char*)data.data(), rview.size());
+    rview.copy(reinterpret_cast<char*>(data.data()), rview.size());
   }
 
   WPyStruct Unpack(std::span<const uint8_t> data) const override {
@@ -228,7 +229,7 @@ struct WPyStructPyConverter : WPyStructConverter {
 // passed as I... to the wpi::util::Struct methods
 struct WPyStructInfo {
   WPyStructInfo() = default;
-  WPyStructInfo(const py::type& t) {
+  explicit WPyStructInfo(const py::type& t) {
     if (!py::hasattr(t, "WPIStruct")) {
       throw py::type_error(
           fmt::format("{} is not struct serializable (does not have WPIStruct)",
@@ -257,7 +258,7 @@ struct WPyStructInfo {
     }
   }
 
-  WPyStructInfo(const WPyStruct& v) : WPyStructInfo(py::type::of(v.py)) {}
+  explicit WPyStructInfo(const WPyStruct& v) : WPyStructInfo(py::type::of(v.py)) {}
 
   const WPyStructConverter* operator->() const {
     const auto* c = cvt.get();

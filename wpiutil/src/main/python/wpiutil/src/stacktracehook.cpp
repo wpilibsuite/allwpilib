@@ -1,6 +1,8 @@
 
 #include <semiwrap.h>
 
+#include <string>
+
 #include "wpi/util/StackTrace.hpp"
 
 py::object& get_hook_ref() {

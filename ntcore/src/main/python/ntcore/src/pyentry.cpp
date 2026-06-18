@@ -4,6 +4,9 @@
 #include <pybind11/stl.h>
 #include <wpi_span_type_caster.h>
 
+#include <string>
+#include <utility>
+
 #include "py2value.h"
 
 namespace pyntcore {

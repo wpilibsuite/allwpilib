@@ -3,6 +3,8 @@
 
 #include <semiwrap.h>
 
+#include <memory>
+
 #include "wpi/util/sendable/Sendable.hpp"
 
 namespace rpy {

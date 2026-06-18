@@ -13,6 +13,8 @@
 
 #include <limits>
 #include <functional>
+#include <string>
+#include <vector>
 
 #include <pybind11/functional.h>
 
@@ -178,7 +180,6 @@ StructWithWPI_String cast_struct_with_wpi_string() {
 }
 
 PYBIND11_MODULE(module, m) {
-
     sendable_test(m);
     struct_test(m);
 

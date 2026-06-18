@@ -1,4 +1,6 @@
 
+#include "wpystruct_fns.h"
+
 #include "wpystruct.h"
 
 void forEachNested(
@@ -39,7 +41,7 @@ py::bytes pack(const WPyStruct& v) {
     throw py::error_already_set();
   }
 
-  auto s = std::span((uint8_t*)pybuf, pysz);
+  auto s = std::span(reinterpret_cast<uint8_t*>(pybuf), pysz);
   wpi::util::PackStruct(s, v, info);
 
   return py::reinterpret_steal<py::bytes>(b);
@@ -71,7 +73,7 @@ py::bytes packArray(const py::sequence& seq) {
 
   for (const auto& v : seq) {
     WPyStruct wv(v);
-    auto s = std::span((uint8_t*)pybuf, sz);
+    auto s = std::span(reinterpret_cast<uint8_t*>(pybuf), sz);
     wpi::util::PackStruct(s, wv, info);
     pybuf += sz;
   }
@@ -94,7 +96,7 @@ void packInto(const WPyStruct& v, py::buffer& b) {
     throw py::value_error("buffer must be " + std::to_string(sz) + " bytes");
   }
 
-  auto s = std::span((uint8_t*)req.ptr, req.size);
+  auto s = std::span(reinterpret_cast<uint8_t*>(req.ptr), req.size);
   wpi::util::PackStruct(s, v, info);
 }
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 // clang-format off
 cls_NetworkTableEntry
     .def_property_readonly("value", [](const wpi::nt::NetworkTableEntry &self) {

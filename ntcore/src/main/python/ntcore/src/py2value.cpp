@@ -1,6 +1,8 @@
 
 #include "py2value.h"
 
+#include <string>
+#include <utility>
 #include <vector>
 
 // type casters
