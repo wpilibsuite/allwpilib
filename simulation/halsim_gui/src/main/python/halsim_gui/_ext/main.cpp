@@ -1,9 +1,10 @@
 
 #include <functional>
 
-#include <semiwrap_init.halsim_gui._ext._halsim_gui_ext.hpp>
 #include <wpi/hal/Extensions.h>
 #include <wpi/halsim/gui/HALSimGuiExt.hpp>
+
+#include "semiwrap_init.halsim_gui._ext._halsim_gui_ext.hpp"
 
 std::function<void()> g_gui_exit;
 
