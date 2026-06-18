@@ -1,18 +1,19 @@
 import contextlib
-import time
 import threading
+import time
 import typing as T
 
 import pytest
 
+from hal import RobotMode
+
 from .. import RobotBase
 from ..simulation import (
     DriverStationSim,
+    getProgramStarted,
     stepTiming,
     stepTimingAsync,
-    getProgramStarted,
 )
-from hal import RobotMode
 
 
 class RobotTestController:

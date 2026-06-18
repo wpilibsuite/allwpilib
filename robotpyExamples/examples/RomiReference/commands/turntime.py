@@ -6,7 +6,6 @@
 
 import commands2
 import wpilib
-
 from subsystems.drivetrain import Drivetrain
 
 

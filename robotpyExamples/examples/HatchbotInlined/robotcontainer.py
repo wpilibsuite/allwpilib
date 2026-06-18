@@ -4,16 +4,12 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import wpilib
-
 import commands2
 import commands2.button
 import commands2.cmd
-
-import constants
-
 import commands.autos
-
+import constants
+import wpilib
 from subsystems.drivesubsystem import DriveSubsystem
 from subsystems.hatchsubsystem import HatchSubsystem
 

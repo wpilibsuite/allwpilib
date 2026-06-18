@@ -5,11 +5,11 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import wpilib
-from wpimath import TrapezoidProfile
-
 import examplesmartmotorcontroller
+import wpilib
+
 import wpimath
+from wpimath import TrapezoidProfile
 
 
 class MyRobot(wpilib.TimedRobot):

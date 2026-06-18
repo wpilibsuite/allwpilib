@@ -7,10 +7,10 @@
 import math
 
 import wpilib
+from exampleglobalmeasurementsensor import ExampleGlobalMeasurementSensor
+
 import wpimath
 import wpimath.units
-
-from exampleglobalmeasurementsensor import ExampleGlobalMeasurementSensor
 
 
 class Drivetrain:

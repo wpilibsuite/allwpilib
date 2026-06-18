@@ -5,7 +5,6 @@
 import threading
 
 import pytest
-
 from wpilib import Notifier
 from wpilib.simulation import pauseTiming, restartTiming, resumeTiming, stepTiming
 

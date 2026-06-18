@@ -5,8 +5,10 @@
 #
 
 import math
-import wpilib
+
 import swervemodule
+import wpilib
+
 import wpimath
 
 kMaxVelocity = 3.0  # 3 meters per second

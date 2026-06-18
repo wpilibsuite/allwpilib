@@ -4,7 +4,7 @@ import commands2
 from util import *  # type: ignore
 
 if TYPE_CHECKING:
-    from .util import *
+    from .util import *  # noqa
 
 import pytest
 

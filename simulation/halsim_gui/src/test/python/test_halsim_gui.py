@@ -12,12 +12,12 @@ import pytest
 )
 def test_halsim_gui():
     # dependencies
-    import wpinet
-    import hal
-    import wpimath
-    import ntcore
-
     import halsim_gui as base
+
+    import hal  # noqa
+    import ntcore  # noqa
+    import wpimath  # noqa
+    import wpinet  # noqa
 
     loaded = 0
     for fname in (pathlib.Path(base.__file__).parent / "lib").iterdir():

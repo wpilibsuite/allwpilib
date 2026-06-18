@@ -1,7 +1,8 @@
-import pytest
 import math
 
-from wpimath import Quaternion, Rotation3d
+import pytest
+
+from wpimath import Quaternion
 
 
 def test_init():

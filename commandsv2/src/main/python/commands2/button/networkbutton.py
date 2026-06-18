@@ -19,7 +19,6 @@ class NetworkButton(Trigger):
 
         :param topic: The boolean topic that contains the value.
         """
-        pass
 
     @overload
     def __init__(self, sub: BooleanSubscriber) -> None:
@@ -28,7 +27,6 @@ class NetworkButton(Trigger):
 
         :param sub: The boolean subscriber that provides the value.
         """
-        pass
 
     @overload
     def __init__(self, table: NetworkTable, field: str) -> None:
@@ -38,7 +36,6 @@ class NetworkButton(Trigger):
         :param table: The table where the networktable value is located.
         :param field: The field that is the value.
         """
-        pass
 
     @overload
     def __init__(self, table: str, field: str) -> None:
@@ -48,7 +45,6 @@ class NetworkButton(Trigger):
         :param table: The table where the networktable value is located.
         :param field: The field that is the value.
         """
-        pass
 
     @overload
     def __init__(self, inst: NetworkTableInstance, table: str, field: str) -> None:
@@ -59,7 +55,6 @@ class NetworkButton(Trigger):
         :param table: The table where the networktable value is located.
         :param field: the field that is the value.
         """
-        pass
 
     def __init__(self, *args, **kwargs) -> None:
         def init_sub(sub: BooleanSubscriber):

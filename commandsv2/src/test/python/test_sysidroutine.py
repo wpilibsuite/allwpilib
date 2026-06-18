@@ -1,10 +1,12 @@
+from unittest.mock import ANY, Mock, call
+
 import pytest
-from unittest.mock import Mock, call, ANY
-from wpilib.simulation import stepTiming, pauseTiming, resumeTiming
-from wpimath.units import volts
 from commands2 import Command, Subsystem
 from commands2.sysid import SysIdRoutine
-from wpilib.sysid import SysIdRoutineLog, State
+from wpilib.simulation import pauseTiming, resumeTiming, stepTiming
+from wpilib.sysid import State, SysIdRoutineLog
+
+from wpimath.units import volts
 
 
 class Mechanism(Subsystem):

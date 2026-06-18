@@ -1,7 +1,8 @@
 import commands2
 import pytest
-from ntcore import NetworkTableInstance
 from wpilib.simulation import DriverStationSim
+
+from ntcore import NetworkTableInstance
 
 
 @pytest.fixture(autouse=True)

@@ -5,8 +5,8 @@
 #
 
 import math
-import commands2
 
+import commands2
 from subsystems.drivetrain import Drivetrain
 
 

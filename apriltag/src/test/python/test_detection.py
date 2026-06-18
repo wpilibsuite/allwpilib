@@ -1,10 +1,11 @@
-import cv2
-import robotpy_apriltag
-from wpimath import Transform3d
-
 import math
 import pathlib
+
+import cv2
 import pytest
+import robotpy_apriltag
+
+from wpimath import Transform3d
 
 
 def test_point():

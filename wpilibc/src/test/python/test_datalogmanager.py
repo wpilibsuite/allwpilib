@@ -1,7 +1,8 @@
 import pathlib
-import wpilib
-import pytest
 import sys
+
+import pytest
+import wpilib
 
 
 @pytest.mark.skipif(sys.platform == "darwin", reason="DataLogManager crashes on exit")

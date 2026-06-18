@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
-import io
 import inspect
+import io
 import pathlib
 import re
 import subprocess
 import sys
+
 import toml
 
 out = {}
@@ -52,7 +53,7 @@ for f in sorted(pathlib.Path(sys.argv[1]).glob("*.h")):
 
             for single, double in names:
                 ofp.write(inspect.cleandoc(f"""
-                
+
                     template <> struct handle_type_name<units::{single}_t> {{
                     static constexpr auto name = _("{double}");
                     }};

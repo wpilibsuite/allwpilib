@@ -6,9 +6,9 @@
 #
 
 import wpilib
-import wpimath
-
 from drivetrain import Drivetrain
+
+import wpimath
 
 
 class MyRobot(wpilib.TimedRobot):

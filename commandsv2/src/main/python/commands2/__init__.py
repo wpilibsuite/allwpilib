@@ -1,9 +1,7 @@
+from typing import TYPE_CHECKING
+
+from . import button, cmd, typing
 from .command import Command, InterruptionBehavior
-
-from . import button
-from . import cmd
-from . import typing
-
 from .commandscheduler import CommandScheduler
 from .conditionalcommand import ConditionalCommand
 from .deferredcommand import DeferredCommand
@@ -27,8 +25,6 @@ from .timedcommandrobot import TimedCommandRobot
 from .waitcommand import WaitCommand
 from .waituntilcommand import WaitUntilCommand
 from .wrappercommand import WrapperCommand
-
-from typing import TYPE_CHECKING
 
 __all__ = [
     "button",

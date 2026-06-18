@@ -33,7 +33,6 @@ class ExampleSmartMotorController:
         :param ki: The integral gain.
         :param kd: The derivative gain.
         """
-        pass
 
     def setSetpoint(
         self,
@@ -47,14 +46,12 @@ class ExampleSmartMotorController:
         :param setpoint: The controller setpoint.
         :param arbFeedforward: An arbitrary feedforward output (from -1 to 1).
         """
-        pass
 
     def follow(self, leader: "ExampleSmartMotorController") -> None:
         """Places this motor controller in follower mode.
 
         :param leader: The leader to follow.
         """
-        pass
 
     def getEncoderDistance(self) -> float:
         """Returns the encoder distance.
@@ -72,7 +69,6 @@ class ExampleSmartMotorController:
 
     def resetEncoder(self) -> None:
         """Resets the encoder to zero distance."""
-        pass
 
     def set(self, velocity: float) -> None:
         pass

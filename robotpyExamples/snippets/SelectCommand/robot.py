@@ -5,10 +5,9 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import wpilib
-import commands2
 import typing
 
+import commands2
 from robotcontainer import RobotContainer
 
 
@@ -33,11 +32,9 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def disabledInit(self) -> None:
         """This function is called once each time the robot enters Disabled mode."""
-        pass
 
     def disabledPeriodic(self) -> None:
         """This function is called periodically when disabled"""
-        pass
 
     def autonomousInit(self) -> None:
         """This autonomous runs the autonomous command selected by your RobotContainer class."""
@@ -48,7 +45,6 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def autonomousPeriodic(self) -> None:
         """This function is called periodically during autonomous"""
-        pass
 
     def teleopInit(self) -> None:
         # This makes sure that the autonomous stops running when
@@ -60,7 +56,6 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def teleopPeriodic(self) -> None:
         """This function is called periodically during operator control"""
-        pass
 
     def utilityInit(self) -> None:
         # Cancels all running commands at the start of utility mode

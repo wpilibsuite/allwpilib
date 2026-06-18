@@ -1,7 +1,8 @@
-import pytest
 import math
 
-from wpimath import DifferentialDriveOdometry3d, Rotation3d, Pose3d, Rotation2d
+import pytest
+
+from wpimath import DifferentialDriveOdometry3d, Pose3d, Rotation3d
 
 
 def test_initialize():

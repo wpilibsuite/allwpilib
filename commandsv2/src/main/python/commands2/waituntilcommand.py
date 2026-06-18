@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Callable, overload
 
 from wpilib import Timer
+
 from wpimath import units
 
 from .command import Command

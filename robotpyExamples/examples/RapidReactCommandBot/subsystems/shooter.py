@@ -4,11 +4,11 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-from commands2 import Command, InstantCommand, Subsystem, cmd
 import wpilib
-import wpimath
-
+from commands2 import Command, InstantCommand, Subsystem, cmd
 from constants import ShooterConstants
+
+import wpimath
 
 
 class Shooter(Subsystem):

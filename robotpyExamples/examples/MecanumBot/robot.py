@@ -5,10 +5,10 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import wpimath
 import wpilib
-
 from drivetrain import Drivetrain
+
+import wpimath
 
 
 class MyRobot(wpilib.TimedRobot):

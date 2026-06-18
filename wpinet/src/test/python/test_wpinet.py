@@ -1,4 +1,4 @@
-import wpinet
+import wpinet  # noqa
 
 
 def test_existence():

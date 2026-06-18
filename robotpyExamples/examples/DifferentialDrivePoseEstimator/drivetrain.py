@@ -6,12 +6,13 @@
 
 import math
 
-import ntcore
+import robotpy_apriltag
 import wpilib
 import wpilib.simulation
+
+import ntcore
 import wpimath
 import wpimath.units
-import robotpy_apriltag
 
 
 class Drivetrain:

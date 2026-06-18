@@ -6,9 +6,9 @@
 #
 
 import wpilib
-import wpimath
-
 from examplesmartmotorcontroller import ExampleSmartMotorController
+
+import wpimath
 
 
 class MyRobot(wpilib.TimedRobot):

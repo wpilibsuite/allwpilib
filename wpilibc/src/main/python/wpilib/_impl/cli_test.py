@@ -1,15 +1,14 @@
+import inspect
 import logging
 import os
-from os.path import abspath
-import inspect
 import pathlib
 import sys
 import tomllib
 import typing
-
-import wpilib
+from os.path import abspath
 
 import pytest
+import wpilib
 
 from ..testing import pytest_plugin
 

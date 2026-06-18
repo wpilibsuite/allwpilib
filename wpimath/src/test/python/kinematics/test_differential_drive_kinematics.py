@@ -1,12 +1,11 @@
-import pytest
 import math
-import numpy as np
+
+import pytest
 
 from wpimath import (
     ChassisVelocities,
     DifferentialDriveKinematics,
     DifferentialDriveWheelVelocities,
-    Rotation2d,
 )
 
 

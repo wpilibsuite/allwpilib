@@ -5,12 +5,12 @@
 #
 
 
-import ntcore
-import robotpy_apriltag
-from cscore import CameraServer
-
 import cv2
 import numpy as np
+import robotpy_apriltag
+
+import ntcore
+from cscore import CameraServer
 
 #
 # This code will work both on a RoboRIO and on other platforms. The exact mechanism

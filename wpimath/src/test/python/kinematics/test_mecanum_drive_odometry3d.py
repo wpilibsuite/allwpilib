@@ -1,6 +1,6 @@
-import pytest
-import math
 import random
+
+import pytest
 
 from wpimath import (
     ChassisVelocities,
@@ -11,8 +11,8 @@ from wpimath import (
     Pose3d,
     Rotation2d,
     Rotation3d,
-    TrajectoryGenerator,
     TrajectoryConfig,
+    TrajectoryGenerator,
     Translation2d,
 )
 

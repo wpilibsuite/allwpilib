@@ -10,10 +10,8 @@ import time
 import typing as T
 
 import pytest
-
 import robotpy.main
 import wpilib
-
 
 from .pytest_plugin import RobotTestingPlugin
 
@@ -317,7 +315,7 @@ class IsolatedTestsPlugin:
                 if not job.conn.poll():
                     break
                 callname, kwargs = job.conn.recv()
-            except (IOError, EOFError) as e:
+            except (IOError, EOFError):
                 job.finished = True
                 break
 

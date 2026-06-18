@@ -1,7 +1,7 @@
-import os
 import argparse
 import importlib.metadata
 import logging
+import os
 import sys
 import typing
 

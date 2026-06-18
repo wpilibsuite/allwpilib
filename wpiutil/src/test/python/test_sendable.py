@@ -1,6 +1,6 @@
-import typing
-import wpiutil
 from wpiutil_test import module
+
+import wpiutil
 
 
 class MySendable(wpiutil.Sendable):

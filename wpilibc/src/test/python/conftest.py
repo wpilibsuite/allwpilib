@@ -1,9 +1,9 @@
 import logging
 
 import pytest
-import ntcore
-import wpilib
 from wpilib.simulation._simulation import _resetWpilibSimulationData
+
+import ntcore
 
 pytest_plugins = "pytester"
 

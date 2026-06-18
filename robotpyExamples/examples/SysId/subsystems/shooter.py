@@ -8,13 +8,12 @@ from typing import Callable
 
 from commands2 import Command, Subsystem
 from commands2.sysid import SysIdRoutine
+from constants import ShooterConstants
 from wpilib import Encoder, PWMSparkMax, RobotController
 from wpilib.sysid import SysIdRoutineLog
 
 import wpimath
 import wpimath.units
-
-from constants import ShooterConstants
 
 
 class Shooter(Subsystem):

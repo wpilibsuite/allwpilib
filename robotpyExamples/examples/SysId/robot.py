@@ -6,7 +6,6 @@
 #
 
 from commands2 import CommandScheduler, TimedCommandRobot
-
 from sysidroutinebot import SysIdRoutineBot
 
 
@@ -30,7 +29,6 @@ class MyRobot(TimedCommandRobot):
 
     def disabledInit(self) -> None:
         """This function is called once each time the robot enters Disabled mode."""
-        pass
 
     def disabledPeriodic(self) -> None:
         pass
@@ -43,7 +41,6 @@ class MyRobot(TimedCommandRobot):
 
     def autonomousPeriodic(self) -> None:
         """This function is called periodically during autonomous."""
-        pass
 
     def teleopInit(self) -> None:
         # This makes sure that the autonomous stops running when
@@ -55,7 +52,6 @@ class MyRobot(TimedCommandRobot):
 
     def teleopPeriodic(self) -> None:
         """This function is called periodically during operator control."""
-        pass
 
     def utilityInit(self) -> None:
         # Cancels all running commands at the start of utility mode.
@@ -63,4 +59,3 @@ class MyRobot(TimedCommandRobot):
 
     def utilityPeriodic(self) -> None:
         """This function is called periodically during utility mode."""
-        pass

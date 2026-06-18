@@ -1,7 +1,7 @@
 # novalidate
 
-import sys
 import inspect
+import sys
 
 
 def match_arglist(name, args, kwargs, templates, allow_extra_kwargs=False):

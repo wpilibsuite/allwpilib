@@ -1,12 +1,8 @@
-from typing import Generic, TypeVar
-
 import commands2
 import pytest
 
 # T = TypeVar("T", bound=commands2.Command)
 # T = commands2.Command
-
-from util import *
 
 
 class SingleCompositionTestBase:
@@ -37,7 +33,7 @@ class SingleCompositionTestBase:
 
     def test_command_in_other_composition(self):
         command = commands2.InstantCommand()
-        wrapped = commands2.WrapperCommand(command)
+        wrapped = commands2.WrapperCommand(command)  # noqa
         with pytest.raises(commands2.IllegalCommandUse):
             self.composeSingle(command)
 

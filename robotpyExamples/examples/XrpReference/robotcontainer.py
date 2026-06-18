@@ -10,11 +10,9 @@ import commands2
 import commands2.button
 import wpilib
 import xrp
-
 from commands.arcadedrive import ArcadeDrive
 from commands.autonomousdistance import AutonomousDistance
 from commands.autonomoustime import AutonomousTime
-
 from subsystems.arm import Arm
 from subsystems.drivetrain import Drivetrain
 

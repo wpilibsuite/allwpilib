@@ -4,11 +4,12 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Callable, Optional
+
 from typing_extensions import Self
 
 if TYPE_CHECKING:
     from .command import Command
-    from .commandscheduler import CommandScheduler
+    from .commandscheduler import CommandScheduler  # noqa
 
 from wpiutil import Sendable, SendableBuilder, SendableRegistry
 
@@ -48,14 +49,12 @@ class Subsystem(Sendable):
         to be consistent within their own codebases about which responsibilities will be handled by
         Commands, and which will be handled here.
         """
-        pass
 
     def simulationPeriodic(self) -> None:
         """
         This method is called periodically by the CommandScheduler. Useful for updating
         subsystem-specific state that needs to be maintained for simulations, such as for updating simulation classes and setting simulated sensor readings.
         """
-        pass
 
     def setDefaultCommand(self, command: Command) -> None:
         """

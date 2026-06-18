@@ -8,10 +8,9 @@ from typing import Callable
 
 from commands2 import Command, Subsystem
 from commands2.sysid import SysIdRoutine
+from constants import DriveConstants
 from wpilib import DifferentialDrive, Encoder, PWMSparkMax, RobotController
 from wpilib.sysid import SysIdRoutineLog
-
-from constants import DriveConstants
 
 
 class Drive(Subsystem):

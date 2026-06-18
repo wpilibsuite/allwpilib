@@ -8,13 +8,11 @@ import typing
 
 import commands2
 import commands2.button
-import wpilib
 import romi
-
+import wpilib
 from commands.arcadedrive import ArcadeDrive
 from commands.autonomousdistance import AutonomousDistance
 from commands.autonomoustime import AutonomousTime
-
 from subsystems.drivetrain import Drivetrain
 
 

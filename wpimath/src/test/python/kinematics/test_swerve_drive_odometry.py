@@ -1,6 +1,6 @@
-import pytest
-import math
 import random
+
+import pytest
 
 from wpimath import (
     ChassisVelocities,
@@ -8,10 +8,9 @@ from wpimath import (
     Rotation2d,
     SwerveDrive4Kinematics,
     SwerveDrive4Odometry,
-    SwerveModuleVelocity,
     SwerveModulePosition,
-    TrajectoryGenerator,
     TrajectoryConfig,
+    TrajectoryGenerator,
     Translation2d,
 )
 

@@ -5,7 +5,6 @@
 #
 
 import commands2
-
 from subsystems.hatchsubsystem import HatchSubsystem
 
 

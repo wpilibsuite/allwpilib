@@ -1,7 +1,7 @@
+import typing
+
 import hal
 import hal.simulation
-
-import typing
 
 
 def test_value_changed_callback():

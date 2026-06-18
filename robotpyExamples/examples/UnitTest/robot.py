@@ -5,9 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import wpilib
-
 import constants
+import wpilib
 from subsystems.intake import Intake
 
 

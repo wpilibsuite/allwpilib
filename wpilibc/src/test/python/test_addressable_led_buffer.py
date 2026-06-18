@@ -3,8 +3,8 @@
 # the WPILib BSD license file in the root directory of this project.
 
 import pytest
-
 from wpilib import AddressableLEDBuffer
+
 from wpiutil import Color, Color8Bit
 
 AddressableLEDBufferView = AddressableLEDBuffer.View

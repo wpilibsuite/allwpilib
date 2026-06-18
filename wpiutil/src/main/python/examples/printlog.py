@@ -26,7 +26,7 @@ if __name__ == "__main__":
                 if data.entry in entries:
                     print("...DUPLICATE entry ID, overriding")
                 entries[data.entry] = data
-            except TypeError as e:
+            except TypeError:
                 print("Start(INVALID)")
         elif record.isFinish():
             try:
@@ -36,7 +36,7 @@ if __name__ == "__main__":
                     print("...ID not found")
                 else:
                     del entries[entry]
-            except TypeError as e:
+            except TypeError:
                 print("Finish(INVALID)")
         elif record.isSetMetadata():
             try:
@@ -44,7 +44,7 @@ if __name__ == "__main__":
                 print(f"{data} [{timestamp}]")
                 if data.entry not in entries:
                     print("...ID not found")
-            except TypeError as e:
+            except TypeError:
                 print("SetMetadata(INVALID)")
         elif record.isControl():
             print("Unrecognized control record")

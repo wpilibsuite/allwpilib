@@ -1,8 +1,8 @@
-import pytest
 import math
-import numpy as np
 
-from wpimath import ChassisVelocities, Twist2d, Pose2d, Rotation2d
+import pytest
+
+from wpimath import ChassisVelocities, Pose2d, Rotation2d, Twist2d
 
 
 def test_discretize():

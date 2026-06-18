@@ -1,5 +1,6 @@
-import pytest
 import math
+
+import pytest
 
 from wpimath import Rotation2d, SwerveModuleVelocity
 

@@ -4,14 +4,14 @@ import typing as T
 import weakref
 
 import pytest
+import wpilib
+import wpilib.simulation
+from wpilib.simulation import DriverStationSim, pauseTiming, restartTiming
 
-from hal import RobotMode
 import hal
 import hal.simulation
 import ntcore
-import wpilib
-from wpilib.simulation import DriverStationSim, pauseTiming, restartTiming
-import wpilib.simulation
+from hal import RobotMode
 
 # TODO: get rid of special-casing.. maybe should register a HAL shutdown hook or something
 try:

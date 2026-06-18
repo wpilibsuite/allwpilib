@@ -1,10 +1,11 @@
-from hal import RobotMode
 from typing import Optional
+
+from hal import RobotMode
 from wpiutil import Color
 
 __all__ = ["OpModeRobot"]
 
-from ._wpilib import OpModeRobotBase, OpMode
+from ._wpilib import OpMode, OpModeRobotBase
 
 
 class OpModeRobot(OpModeRobotBase):

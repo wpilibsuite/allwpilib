@@ -3,8 +3,7 @@
 import argparse
 import pathlib
 
-from wpiutil.log import DataLog, BooleanLogEntry, StringArrayLogEntry, RawLogEntry
-
+from wpiutil.log import BooleanLogEntry, DataLog, RawLogEntry, StringArrayLogEntry
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

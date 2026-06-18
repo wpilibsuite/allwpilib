@@ -6,11 +6,11 @@
 
 import wpilib
 import wpilib.simulation
+from constants import Constants
+
 import wpimath
 import wpimath.units
 import wpiutil
-
-from constants import Constants
 
 
 class Arm:

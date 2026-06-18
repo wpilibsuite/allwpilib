@@ -10,7 +10,6 @@ from typing import TYPE_CHECKING, Any, Callable, Set, Union
 from typing_extensions import Self, TypeAlias
 
 if TYPE_CHECKING:
-    from .instantcommand import InstantCommand
     from .subsystem import Subsystem
     from .parallelracegroup import ParallelRaceGroup
     from .sequentialcommandgroup import SequentialCommandGroup
@@ -21,7 +20,7 @@ if TYPE_CHECKING:
     from .conditionalcommand import ConditionalCommand
     from .wrappercommand import WrapperCommand
 
-from wpiutil import Sendable, SendableRegistry, SendableBuilder
+from wpiutil import Sendable, SendableBuilder, SendableRegistry
 
 
 class InterruptionBehavior(Enum):
@@ -72,11 +71,9 @@ class Command(Sendable):
 
     def initialize(self):
         """The initial subroutine of a command. Called once when the command is initially scheduled."""
-        pass
 
     def execute(self):
         """The main body of a command. Called repeatedly while the command is scheduled."""
-        pass
 
     def end(self, interrupted: bool):
         """
@@ -87,7 +84,6 @@ class Command(Sendable):
 
         :param interrupted: whether the command was interrupted/canceled
         """
-        pass
 
     def isFinished(self) -> bool:
         """

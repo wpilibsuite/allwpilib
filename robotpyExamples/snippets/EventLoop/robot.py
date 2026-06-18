@@ -6,6 +6,7 @@
 #
 
 import wpilib
+
 import wpimath
 
 SHOT_VELOCITY = 200.0  # rpm

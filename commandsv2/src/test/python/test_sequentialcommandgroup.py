@@ -5,10 +5,8 @@ from compositiontestbase import MultiCompositionTestBase  # type: ignore
 from util import *  # type: ignore
 
 if TYPE_CHECKING:
-    from .util import *
     from .compositiontestbase import MultiCompositionTestBase
-
-import pytest
+    from .util import *
 
 
 class TestSequentialCommandGroupComposition(MultiCompositionTestBase):
