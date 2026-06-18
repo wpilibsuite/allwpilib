@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include "wpi/hal/SimDevice.h"
 
 class SimValueCB {

@@ -19,7 +19,7 @@ class PyMotorControllerGroup
       public MotorController,
       public wpi::util::SendableHelper<PyMotorControllerGroup> {
  public:
-  PyMotorControllerGroup(
+  explicit PyMotorControllerGroup(
       std::vector<std::shared_ptr<wpi::MotorController>>&& args)
       : m_motorControllers(args) {}
   ~PyMotorControllerGroup() override = default;

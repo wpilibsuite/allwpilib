@@ -1,6 +1,9 @@
 
 #pragma once
 
+#include <cstdint>
+#include <functional>
+
 class SimCB {
  public:
   SimCB(std::function<void(void)> fn, std::function<void(int32_t)> cancel)

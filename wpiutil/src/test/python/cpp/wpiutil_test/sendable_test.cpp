@@ -14,7 +14,7 @@ class MySendableBuilder : public wpi::util::SendableBuilder {
  public:
   explicit MySendableBuilder(py::dict keys) : keys(keys) {}
 
-  ~MySendableBuilder() {
+  ~MySendableBuilder() override {
     // leak this so the python interpreter doesn't crash on shutdown
     keys.release();
   }

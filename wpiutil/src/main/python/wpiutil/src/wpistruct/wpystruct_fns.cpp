@@ -115,7 +115,7 @@ WPyStruct unpack(const py::type& t, const py::buffer& b) {
     throw py::value_error("buffer must be " + std::to_string(sz) + " bytes");
   }
 
-  auto s = std::span((const uint8_t*)req.ptr, req.size);
+  auto s = std::span(reinterpret_cast<const uint8_t*>(req.ptr), req.size);
   return wpi::util::UnpackStruct<WPyStruct, WPyStructInfo>(s, info);
 }
 
@@ -138,7 +138,7 @@ py::typing::List<WPyStruct> unpackArray(const py::type& t,
 
   auto items = req.size / sz;
   py::list a(items);
-  const uint8_t* ptr = (const uint8_t*)req.ptr;
+  const uint8_t* ptr = reinterpret_cast<const uint8_t*>(req.ptr);
   for (py::ssize_t i = 0; i < items; i++) {
     auto s = std::span(ptr, sz);
     auto v = wpi::util::UnpackStruct<WPyStruct, WPyStructInfo>(s, info);
