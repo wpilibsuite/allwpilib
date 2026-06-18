@@ -1,12 +1,11 @@
-import math
-
-import numpy as np
 import pytest
+import math
+import numpy as np
 
 from wpimath import (
+    Translation3d,
     Rotation3d,
     Translation2d,
-    Translation3d,
 )
 
 

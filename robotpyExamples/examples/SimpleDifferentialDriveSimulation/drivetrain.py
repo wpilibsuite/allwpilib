@@ -8,7 +8,6 @@ import math
 
 import wpilib
 import wpilib.simulation
-
 import wpimath
 
 

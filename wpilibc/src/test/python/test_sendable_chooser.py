@@ -1,7 +1,7 @@
 import pytest
-from wpilib import SendableChooser, SmartDashboard
 
 from ntcore import NetworkTableInstance
+from wpilib import SendableChooser, SmartDashboard
 
 
 @pytest.fixture

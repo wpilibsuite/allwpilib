@@ -1,15 +1,15 @@
 # validated: 2024-02-20 DV ee15cc172a5e sysid/SysIdRoutine.java
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
-from typing import Callable, Optional
 
+from wpilib.sysid import SysIdRoutineLog, State
+from ..command import Command
+from ..subsystem import Subsystem
 from wpilib import Timer
-from wpilib.sysid import State, SysIdRoutineLog
 
 from wpimath.units import seconds, volts
 
-from ..command import Command
-from ..subsystem import Subsystem
+from typing import Callable, Optional
 
 volts_per_second = float
 

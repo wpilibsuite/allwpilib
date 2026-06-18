@@ -1,8 +1,6 @@
-import time
-
-import pytest
-
 import wpiutil
+import time
+import pytest
 
 
 def test_default():

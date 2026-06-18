@@ -1,9 +1,8 @@
-import inspect
-import logging
+import hal
 import sys
 import traceback
-
-import hal
+import logging
+import inspect
 
 robotpy_logger = logging.getLogger("robotpy")
 user_logger = logging.getLogger("your.robot")

@@ -1,9 +1,8 @@
 from typing import TYPE_CHECKING
 
 import commands2
-from util import *  # type: ignore
-
 from ntcore import NetworkTableInstance
+from util import *  # type: ignore
 
 if TYPE_CHECKING:
     from .util import *

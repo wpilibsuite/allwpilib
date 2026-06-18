@@ -1,3 +1,5 @@
+import pytest
+
 from wpimath import DifferentialDriveWheelVelocities
 
 

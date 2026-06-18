@@ -5,6 +5,7 @@
 #
 
 import wpilib
+
 from constants import IntakeConstants
 
 

@@ -1,7 +1,7 @@
 import pytest
 
 from ntcore import NetworkTableInstance, NetworkTableType
-from ntcore.util import ChooserControl, ntproperty
+from ntcore.util import ntproperty, ChooserControl
 
 # def test_autoupdatevalue(nt):
 

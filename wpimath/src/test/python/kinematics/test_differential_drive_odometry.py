@@ -1,6 +1,5 @@
-import math
-
 import pytest
+import math
 
 from wpimath import DifferentialDriveOdometry, Rotation2d
 

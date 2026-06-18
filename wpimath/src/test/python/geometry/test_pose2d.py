@@ -1,8 +1,7 @@
+import pytest
 import math
 
-import pytest
-
-from wpimath import Pose2d, Rotation2d, Transform2d, Translation2d
+from wpimath import Pose2d, Rotation2d, Translation2d, Transform2d
 from wpimath.units import feetToMeters
 
 

@@ -1,6 +1,5 @@
-import pytest
-
 import ntcore
+import pytest
 
 
 def test_value_bool():

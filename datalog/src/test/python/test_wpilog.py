@@ -1,4 +1,4 @@
-import wpilog  # noqa
+import wpilog
 
 
 def test_existence():

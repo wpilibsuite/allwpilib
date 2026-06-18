@@ -4,9 +4,10 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import wpilib
 from commands2 import Command, Subsystem
 from commands2.button import Trigger
+import wpilib
+
 from constants import StorageConstants
 
 

@@ -1,13 +1,9 @@
+from typing import Any, Dict, TypeVar, Type
+
 import inspect
-from typing import Any, Dict, Type, TypeVar
 
 import commands2
-from wpilib.simulation import (  # noqa
-    DriverStationSim,
-    pauseTiming,
-    resumeTiming,
-    stepTiming,
-)
+from wpilib.simulation import DriverStationSim, pauseTiming, resumeTiming, stepTiming
 
 Y = TypeVar("Y")
 

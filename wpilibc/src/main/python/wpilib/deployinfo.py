@@ -1,7 +1,6 @@
+from ._wpilib import RobotBase
 import json
 import typing
-
-from ._wpilib import RobotBase
 
 
 def getDeployData() -> typing.Optional[typing.Dict[str, str]]:

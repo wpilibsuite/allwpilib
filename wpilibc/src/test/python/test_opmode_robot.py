@@ -1,10 +1,9 @@
-import threading
-
 import pytest
-from wpilib import OpMode, RobotState
+import threading
 from wpilib import simulation as wsim
+from wpimath.units import seconds
 from wpilib.opmoderobot import OpModeRobot
-
+from wpilib import OpMode, RobotState
 from hal._wpiHal import RobotMode
 from wpiutil import Color
 
@@ -89,7 +88,7 @@ def test_add_op_mode():
             self.addOpMode(OneArgOpMode, RobotMode.TELEOPERATED, "OneArgOpMode")
             self.publishOpModes()
 
-    robot = MyMockRobot()  # noqa
+    robot = MyMockRobot()
     options = wsim.DriverStationSim.getOpModeOptions()
 
     assert len(options) == 4

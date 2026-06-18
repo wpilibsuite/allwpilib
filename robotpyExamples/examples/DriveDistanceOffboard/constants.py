@@ -10,6 +10,8 @@ This offers a convenient resources to teams who need to make both quick and univ
 changes.
 """
 
+import math
+
 
 class DriveConstants:
     kDt = 0.02

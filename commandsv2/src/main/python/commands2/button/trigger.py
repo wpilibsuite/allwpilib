@@ -4,7 +4,6 @@ from typing import Callable, overload
 
 from typing_extensions import Self
 from wpilib import EventLoop
-
 from wpimath import Debouncer
 
 from ..command import Command

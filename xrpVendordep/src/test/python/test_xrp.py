@@ -1,4 +1,4 @@
-import xrp  # noqa
+import xrp
 
 
 def test_xrp():

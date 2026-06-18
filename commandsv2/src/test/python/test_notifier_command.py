@@ -6,6 +6,8 @@ from util import *  # type: ignore
 if TYPE_CHECKING:
     from .util import *
 
+import pytest
+
 
 def test_notifierCommandScheduler(scheduler: commands2.CommandScheduler):
     with ManualSimTime() as sim:

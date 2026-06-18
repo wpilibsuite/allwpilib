@@ -4,9 +4,9 @@
 # works correctly
 #
 
-import logging
-
 import pytest
+
+import logging
 
 logger = logging.getLogger("test")
 

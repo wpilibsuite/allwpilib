@@ -1,4 +1,5 @@
-import importlib.metadata
+import hal
+import wpilib
 import logging
 import os.path
 import sys
@@ -6,9 +7,7 @@ import threading
 import time
 import typing
 
-import wpilib
-
-import hal
+import importlib.metadata
 
 if sys.version_info < (3, 10):
 
@@ -24,10 +23,10 @@ from .report_error import reportError, reportErrorInternal
 
 
 def _log_versions(robotpy_version: typing.Optional[str]):
-    import logging
-
     import wpilib
     import wpilib.deployinfo
+
+    import logging
 
     data = wpilib.deployinfo.getDeployData()
     if data:
@@ -167,7 +166,7 @@ class RobotStarter:
         inst = ntcore.NetworkTableInstance.getDefault()
 
         # subscribe to "" to force persistent values to progagate to local
-        msub = ntcore.MultiSubscriber(inst, [""])  # noqa
+        msub = ntcore.MultiSubscriber(inst, [""])
 
         if not isSimulation:
             inst.startServer("/home/systemcore/networktables.json", "", "robot")

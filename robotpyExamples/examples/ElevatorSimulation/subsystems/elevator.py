@@ -4,11 +4,11 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import constants
 import wpilib
 import wpilib.simulation
-
 import wpimath
+
+import constants
 
 
 class Elevator:

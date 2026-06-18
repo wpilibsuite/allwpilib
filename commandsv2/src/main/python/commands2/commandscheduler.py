@@ -4,18 +4,19 @@ from __future__ import annotations
 import inspect
 import os.path
 import traceback
-from typing import Any, Callable, Dict, Iterable, List, Optional, Set
+from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Union
 
+import hal
+from typing_extensions import Self
 from wpilib import (
+    RobotState,
     EventLoop,
     RobotBase,
-    RobotState,
     TimedRobot,
     Watchdog,
     reportWarning,
 )
 
-import hal
 from wpiutil import Sendable, SendableBuilder, SendableRegistry
 
 from .command import Command, InterruptionBehavior

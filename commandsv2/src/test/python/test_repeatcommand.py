@@ -5,8 +5,10 @@ from compositiontestbase import SingleCompositionTestBase  # type: ignore
 from util import *  # type: ignore
 
 if TYPE_CHECKING:
-    from .compositiontestbase import SingleCompositionTestBase
     from .util import *
+    from .compositiontestbase import SingleCompositionTestBase
+
+import pytest
 
 
 class RepeatCommandCompositionTest(SingleCompositionTestBase):

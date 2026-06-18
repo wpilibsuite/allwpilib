@@ -1,8 +1,7 @@
+import pytest
 import math
 
-import pytest
-
-from wpimath import Pose2d, Twist2d
+from wpimath import Twist2d, Pose2d
 
 
 def test_straight():

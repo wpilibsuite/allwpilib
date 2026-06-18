@@ -1,9 +1,8 @@
-import math
-
-import numpy as np
 import pytest
+import math
+import numpy as np
 
-from wpimath import Rotation2d, Rotation3d
+from wpimath import Rotation3d, Rotation2d, Quaternion
 
 
 def test_gimbal_lock_accuracy():

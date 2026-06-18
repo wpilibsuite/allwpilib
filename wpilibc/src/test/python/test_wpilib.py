@@ -1,7 +1,7 @@
+import pytest
 import re
 import weakref
 
-import pytest
 import wpilib
 
 

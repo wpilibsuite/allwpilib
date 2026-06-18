@@ -1,14 +1,14 @@
 import pytest
 
 from wpimath import (
-    ChassisVelocities,
     Pose2d,
     Rotation2d,
+    Translation2d,
+    ChassisVelocities,
     SwerveDrive4Kinematics,
     SwerveDrive4Odometry,
     SwerveModulePosition,
     SwerveModuleVelocity,
-    Translation2d,
 )
 
 

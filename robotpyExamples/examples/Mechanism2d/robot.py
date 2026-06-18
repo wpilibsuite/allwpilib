@@ -6,7 +6,6 @@
 #
 
 import wpilib
-
 import wpiutil
 
 

@@ -6,12 +6,12 @@
 
 import math
 
-import swervemodule
 import wpilib
-from exampleglobalmeasurementsensor import ExampleGlobalMeasurementSensor
-
 import wpimath
 import wpimath.units
+
+import swervemodule
+from exampleglobalmeasurementsensor import ExampleGlobalMeasurementSensor
 
 
 class Drivetrain:

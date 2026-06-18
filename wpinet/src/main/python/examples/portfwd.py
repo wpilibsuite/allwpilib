@@ -2,7 +2,6 @@
 
 import argparse
 import time
-
 import wpinet
 
 if __name__ == "__main__":

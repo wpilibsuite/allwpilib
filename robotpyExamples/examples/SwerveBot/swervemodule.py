@@ -7,7 +7,6 @@
 import math
 
 import wpilib
-
 import wpimath
 
 kWheelRadius = 0.0508

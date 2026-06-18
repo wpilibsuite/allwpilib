@@ -1,7 +1,6 @@
-import array
-
 import pytest
 from wpiutil_test import module
+import array
 
 
 def test_span_load_int():

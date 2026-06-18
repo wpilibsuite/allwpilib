@@ -1,5 +1,4 @@
 import pytest
-
 from wpimath import DifferentialDriveWheelAccelerations
 from wpimath.units import feetToMeters
 

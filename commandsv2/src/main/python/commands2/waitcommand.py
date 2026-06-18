@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from wpilib import Timer
-
 from wpimath import units
 from wpiutil import SendableBuilder
 

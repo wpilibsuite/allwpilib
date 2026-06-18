@@ -2,15 +2,16 @@
 # Useful fixtures
 #
 
-import logging
 from contextlib import contextmanager
 from threading import Condition
+
+import logging
 
 logger = logging.getLogger("conftest")
 
 import pytest
 
-from ntcore import Event, EventFlags, MultiSubscriber, NetworkTableInstance
+from ntcore import NetworkTableInstance, MultiSubscriber, Event, EventFlags
 
 #
 # Fixtures for a usable in-memory version of networktables

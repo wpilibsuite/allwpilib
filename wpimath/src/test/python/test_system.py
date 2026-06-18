@@ -1,8 +1,9 @@
 import math
 
-import numpy as np
-
 import wpimath
+
+import pytest
+import numpy as np
 
 
 def test_rk4_exponential():

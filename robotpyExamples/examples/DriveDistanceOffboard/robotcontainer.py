@@ -5,8 +5,8 @@
 #
 
 import commands2
-import commands2.button
 import commands2.cmd
+import commands2.button
 import constants
 import subsystems.drivesubsystem
 

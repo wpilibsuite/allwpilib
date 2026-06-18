@@ -5,8 +5,8 @@
 #
 
 import commands2
-import constants
 import wpilib
+import constants
 
 
 class DriveSubsystem(commands2.Subsystem):

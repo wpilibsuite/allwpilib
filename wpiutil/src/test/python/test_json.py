@@ -1,13 +1,12 @@
-import math
-
-import pytest
 from wpiutil_test.module import (
     cast_json_arg,
     cast_json_val,
     max_int64,
-    max_uint64,
     min_int64,
+    max_uint64,
 )
+import pytest
+import math
 
 
 def test_json_invalid():

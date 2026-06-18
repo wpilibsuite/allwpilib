@@ -5,7 +5,8 @@
 #
 
 import commands2
-from commands2.button import CommandNiDsXboxController
+from commands2.button import CommandNiDsXboxController, Trigger
+
 from constants import AutoConstants, OIConstants, ShooterConstants
 from subsystems.drive import Drive
 from subsystems.intake import Intake

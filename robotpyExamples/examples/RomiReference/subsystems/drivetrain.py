@@ -7,8 +7,8 @@
 import math
 
 import commands2
-import romi
 import wpilib
+import romi
 
 
 class Drivetrain(commands2.Subsystem):

@@ -2,9 +2,9 @@ import dataclasses
 import re
 
 import pytest
-from wpiutil_test import module
 
 from wpiutil import wpistruct
+from wpiutil_test import module
 
 #
 # Static serialization

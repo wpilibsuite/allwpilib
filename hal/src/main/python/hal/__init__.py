@@ -1,4 +1,3 @@
-# isort: skip_file
 from .version import version as __version__
 
 # Only needed for side effects

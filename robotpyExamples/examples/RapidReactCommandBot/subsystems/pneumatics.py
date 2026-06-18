@@ -4,8 +4,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import wpilib
 from commands2 import Command, Subsystem
+import wpilib
 
 
 class Pneumatics(Subsystem):

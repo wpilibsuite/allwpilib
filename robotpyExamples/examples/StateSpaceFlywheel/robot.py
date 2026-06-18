@@ -8,7 +8,6 @@
 import math
 
 import wpilib
-
 import wpimath.units
 
 kMotorPort = 0

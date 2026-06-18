@@ -1,9 +1,10 @@
-import logging
-import subprocess
-import threading
 from typing import Optional
 
 import hal
+import subprocess
+import threading
+
+import logging
 
 logger = logging.getLogger("wpilib.cs")
 

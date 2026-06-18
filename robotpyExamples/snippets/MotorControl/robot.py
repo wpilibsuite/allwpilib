@@ -5,9 +5,9 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import math
-
 import wpilib
+
+import math
 
 
 class MyRobot(wpilib.TimedRobot):

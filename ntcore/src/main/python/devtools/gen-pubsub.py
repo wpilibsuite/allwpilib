@@ -2,6 +2,7 @@
 
 import sphinxify
 from cxxheaderparser.simple import parse_string
+from cxxheaderparser.tokfmt import tokfmt
 
 if __name__ == "__main__":
     with open("ntcore/src/main/native/include/wpi/nt/ntcore_cpp.hpp") as fp:

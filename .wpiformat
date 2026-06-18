@@ -15,6 +15,9 @@ generatedFileExclude {
   hal/src/main/native/systemcore/rev/
 
   src/main/python/.*/type_casters/
+  src/main/python/.*\.py$
+  src/test/python/.*\.py$
+  robotpyExamples/
   resources/
   thirdparty/
   wpigui/src/main/native/cpp/portable-file-dialogs\.cpp$

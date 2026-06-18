@@ -6,9 +6,11 @@
 
 import commands2
 import commands2.cmd
-import constants
+
 import subsystems.drivesubsystem
 import subsystems.hatchsubsystem
+
+import constants
 
 
 class Autos:

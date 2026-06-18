@@ -1,6 +1,7 @@
 import typing as T
 
 import pytest
+
 from wpilib import Alert
 from wpilib.simulation import AlertSim
 

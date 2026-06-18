@@ -6,11 +6,11 @@
 
 from typing import Callable
 
-import wpilib
 from commands2 import Command, Subsystem
-from constants import DriveConstants
-
+import wpilib
 import wpimath
+
+from constants import DriveConstants
 
 
 class Drive(Subsystem):

@@ -3,8 +3,9 @@ import inspect
 import struct
 import typing
 
-from .._wpiutil import wpistruct
+
 from .desc import StructDescriptor
+from .._wpiutil import wpistruct
 
 #
 # Use these types to specify explicitly sized integers, but you can
@@ -12,7 +13,7 @@ from .desc import StructDescriptor
 #
 
 # fmt: off
-
+    
 if typing.TYPE_CHECKING:
     int8 = int
     uint8 = int
@@ -184,7 +185,7 @@ def _process_class(cls, struct_name: typing.Optional[str]):
                 return _s.pack({vals})
             except Exception as e:
                 raise ValueError(f"{err_name}: error packing data") from e
-
+                            
         def _packInto(v, b):
             try:
                 {pack_stmts}
@@ -199,7 +200,7 @@ def _process_class(cls, struct_name: typing.Optional[str]):
                 return cls({cvals})
             except Exception as e:
                 raise ValueError(f"{err_name}: error unpacking data") from e
-
+        
         #def _unpackInto(v, b):
         #    try:
         #        {vals} = _s.unpack(b)

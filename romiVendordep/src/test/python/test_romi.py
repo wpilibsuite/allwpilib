@@ -1,4 +1,4 @@
-import romi  # noqa
+import romi
 
 
 def test_romi():

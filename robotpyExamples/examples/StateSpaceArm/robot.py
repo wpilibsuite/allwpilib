@@ -6,11 +6,9 @@
 #
 
 import math
-
 import wpilib
-
-import wpimath
 import wpimath.units
+import wpimath
 
 kMotorPort = 0
 kEncoderAChannel = 0

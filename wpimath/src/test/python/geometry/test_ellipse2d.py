@@ -1,6 +1,7 @@
 import pytest
+import math
 
-from wpimath import Ellipse2d, Pose2d, Rotation2d, Translation2d
+from wpimath import Pose2d, Translation2d, Ellipse2d, Rotation2d
 
 
 def test_focal_points():

@@ -5,7 +5,6 @@
 #
 
 import enum
-
 import commands2
 
 

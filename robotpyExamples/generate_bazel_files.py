@@ -1,10 +1,9 @@
-import sys
 
+import sys
 import tomli
 
-
 def load_project_names(toml_filename, project_type):
-
+    
     with open(toml_filename, "rb") as f:
         data = tomli.load(f)
 
@@ -15,7 +14,6 @@ def load_project_names(toml_filename, project_type):
 
     return contents
 
-
 def main():
     output_file = "robotpyExamples/example_projects.bzl"
 
@@ -24,7 +22,7 @@ def main():
 
     if len(sys.argv) == 2:
         output_file = sys.argv[1]
-
+        
     with open(output_file, "w") as f:
         f.write(contents)
 

@@ -5,12 +5,14 @@
 #
 
 import commands2
+
 import constants
-from subsystems.drivesubsystem import DriveSubsystem
-from subsystems.hatchsubsystem import HatchSubsystem
 
 from .drivedistance import DriveDistance
 from .releasehatch import ReleaseHatch
+
+from subsystems.drivesubsystem import DriveSubsystem
+from subsystems.hatchsubsystem import HatchSubsystem
 
 
 class ComplexAuto(commands2.SequentialCommandGroup):

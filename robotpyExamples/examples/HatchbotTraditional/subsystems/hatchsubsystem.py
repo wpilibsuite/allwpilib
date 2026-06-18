@@ -4,9 +4,10 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import commands2
-import constants
 import wpilib
+import commands2
+
+import constants
 
 
 class HatchSubsystem(commands2.Subsystem):

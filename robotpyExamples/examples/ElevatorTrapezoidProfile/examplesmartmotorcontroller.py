@@ -4,9 +4,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import enum
-
 import wpilib
+import enum
 
 
 class ExampleSmartMotorController(wpilib.MotorController):
@@ -38,6 +37,7 @@ class ExampleSmartMotorController(wpilib.MotorController):
             ki: The integral gain.
             kd: The derivative gain.
         """
+        pass
 
     def setSetPoint(
         self, mode: PIDMode, setpoint: float, arbfeedforward: float
@@ -49,6 +49,7 @@ class ExampleSmartMotorController(wpilib.MotorController):
             setpoint: The controller setpoint.
             arbfeedforward: An arbitrary feedforward output (from -1 to 1).
         """
+        pass
 
     def follow(self, leader: "ExampleSmartMotorController") -> None:
         """Places this motor controller in follower mode.
@@ -76,6 +77,7 @@ class ExampleSmartMotorController(wpilib.MotorController):
 
     def resetEncoder(self) -> None:
         """Resets the encoder to zero distance."""
+        pass
 
     def set(self, velocity: float) -> None:
         self._velocity = -velocity if self._inverted else velocity

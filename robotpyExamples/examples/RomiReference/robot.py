@@ -40,7 +40,9 @@
 
 import typing
 
+import wpilib
 import commands2
+
 from robotcontainer import RobotContainer
 
 

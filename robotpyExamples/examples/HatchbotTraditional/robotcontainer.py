@@ -4,16 +4,20 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+import wpilib
+
 import commands2
 import commands2.button
+
 import constants
-import wpilib
+
 from commands.complexauto import ComplexAuto
-from commands.defaultdrive import DefaultDrive
 from commands.drivedistance import DriveDistance
+from commands.defaultdrive import DefaultDrive
 from commands.grabhatch import GrabHatch
 from commands.halvedrivevelocity import HalveDriveVelocity
 from commands.releasehatch import ReleaseHatch
+
 from subsystems.drivesubsystem import DriveSubsystem
 from subsystems.hatchsubsystem import HatchSubsystem
 
