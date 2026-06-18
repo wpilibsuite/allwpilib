@@ -199,6 +199,7 @@ NT_SetIntegerArray
 NT_SetNow
 NT_SetRaw
 NT_SetServer
+NT_SetServerFixed
 NT_SetServerMulti
 NT_SetServerTeam
 NT_SetString

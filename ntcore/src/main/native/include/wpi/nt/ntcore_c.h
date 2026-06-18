@@ -1154,8 +1154,8 @@ void NT_StartServer(NT_Inst inst, const struct WPI_String* persist_filename,
 void NT_StopServer(NT_Inst inst);
 
 /**
- * Starts a client.  Use NT_SetServer or NT_SetServerTeam to set the server
- * name and port.
+ * Starts a client.  Use NT_SetServer, NT_SetServerTeam, or NT_SetServerFixed
+ * to set the server name and port.
  *
  * @param inst      instance handle
  * @param identity  network identity to advertise (cannot be empty string)
@@ -1195,13 +1195,24 @@ void NT_SetServerMulti(NT_Inst inst, size_t count,
 
 /**
  * Sets server addresses and port for client (without restarting client).
- * Connects using commonly known robot addresses for the specified team.
+ * Connects using the team-specific robot address for the specified team, USB
+ * address, and WiFi address.
  *
  * @param inst        instance handle
  * @param team        team number
  * @param port        port to communicate over
  */
 void NT_SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port);
+
+/**
+ * Sets server addresses and port for client (without restarting client).
+ * Connects using fixed robot addresses that are not team-specific (USB, WiFi,
+ * and robot.local).
+ *
+ * @param inst        instance handle
+ * @param port        port to communicate over
+ */
+void NT_SetServerFixed(NT_Inst inst, unsigned int port);
 
 /**
  * Disconnects the client if it's running and connected. This will automatically

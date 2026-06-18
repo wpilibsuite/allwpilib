@@ -1095,8 +1095,8 @@ void StartServer(NT_Inst inst, std::string_view persist_filename,
 void StopServer(NT_Inst inst);
 
 /**
- * Starts a client.  Use SetServer or SetServerTeam to set the server name
- * and port.
+ * Starts a client.  Use SetServer, SetServerTeam, or SetServerFixed to set
+ * the server name and port.
  *
  * @param inst      instance handle
  * @param identity  network identity to advertise (cannot be empty string)
@@ -1132,13 +1132,24 @@ void SetServer(
 
 /**
  * Sets server addresses and port for client (without restarting client).
- * Connects using commonly known robot addresses for the specified team.
+ * Connects using the team-specific robot address for the specified team, USB
+ * address, and WiFi address.
  *
  * @param inst        instance handle
  * @param team        team number
  * @param port        port to communicate over
  */
 void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port);
+
+/**
+ * Sets server addresses and port for client (without restarting client).
+ * Connects using fixed robot addresses that are not team-specific (USB, WiFi,
+ * and robot.local).
+ *
+ * @param inst        instance handle
+ * @param port        port to communicate over
+ */
+void SetServerFixed(NT_Inst inst, unsigned int port);
 
 /**
  * Disconnects the client if it's running and connected. This will automatically

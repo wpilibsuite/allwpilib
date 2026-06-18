@@ -574,6 +574,10 @@ void NT_SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
   wpi::nt::SetServerTeam(inst, team, port);
 }
 
+void NT_SetServerFixed(NT_Inst inst, unsigned int port) {
+  wpi::nt::SetServerFixed(inst, port);
+}
+
 void NT_Disconnect(NT_Inst inst) {
   wpi::nt::Disconnect(inst);
 }

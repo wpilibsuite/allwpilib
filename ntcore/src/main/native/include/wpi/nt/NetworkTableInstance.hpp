@@ -626,8 +626,8 @@ class NetworkTableInstance final {
   void StopServer() { ::wpi::nt::StopServer(m_handle); }
 
   /**
-   * Starts a client.  Use SetServer or SetServerTeam to set the server name
-   * and port.
+   * Starts a client.  Use SetServer, SetServerTeam, or SetServerFixed to set
+   * the server name and port.
    *
    * @param identity  network identity to advertise (cannot be empty string)
    */
@@ -673,13 +673,25 @@ class NetworkTableInstance final {
 
   /**
    * Sets server addresses and port for client (without restarting client).
-   * Connects using commonly known robot addresses for the specified team.
+   * Connects using the team-specific robot address for the specified team, USB
+   * address, and WiFi address.
    *
    * @param team        team number
    * @param port        port to communicate over (0 = default)
    */
   void SetServerTeam(unsigned int team, unsigned int port = 0) {
     ::wpi::nt::SetServerTeam(m_handle, team, port);
+  }
+
+  /**
+   * Sets server addresses and port for client (without restarting client).
+   * Connects using fixed robot addresses that are not team-specific (USB, WiFi,
+   * and robot.local).
+   *
+   * @param port        port to communicate over (0 = default)
+   */
+  void SetServerFixed(unsigned int port = 0) {
+    ::wpi::nt::SetServerFixed(m_handle, port);
   }
 
   /**

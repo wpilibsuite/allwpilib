@@ -132,6 +132,7 @@ classes:
           std::span<const std::pair<std::string_view, unsigned int>>:
           std::span<const std::string_view>, unsigned int:
       SetServerTeam:
+      SetServerFixed:
       Disconnect:
       StartDSClient:
       StopDSClient:

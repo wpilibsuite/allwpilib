@@ -1310,6 +1310,18 @@ Java_org_wpilib_networktables_NetworkTablesJNI_setServerTeam
 
 /*
  * Class:     org_wpilib_networktables_NetworkTablesJNI
+ * Method:    setServerFixed
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_networktables_NetworkTablesJNI_setServerFixed
+  (JNIEnv* env, jclass, jint inst, jint port)
+{
+  wpi::nt::SetServerFixed(inst, port);
+}
+
+/*
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    disconnect
  * Signature: (I)V
  */

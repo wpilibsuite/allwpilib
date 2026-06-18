@@ -685,27 +685,49 @@ void SetServer(
   }
 }
 
+static void AddUsbServer(
+    std::vector<std::pair<std::string, unsigned int>>& servers,
+    unsigned int port) {
+#if defined(WIN32) || defined(_WIN32)
+  // 172.26.0.1 (Windows USB)
+  servers.emplace_back("172.26.0.1", port);
+#else
+  // 172.27.0.1 (Unix USB)
+  servers.emplace_back("172.27.0.1", port);
+#endif
+}
+
 void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     std::vector<std::pair<std::string, unsigned int>> servers;
-    servers.reserve(5);
+    servers.reserve(3);
 
     // 10.te.am.2
     servers.emplace_back(fmt::format("10.{}.{}.2", static_cast<int>(team / 100),
                                      static_cast<int>(team % 100)),
                          port);
 
-    // 172.26.0.1 (Windows USB)
-    servers.emplace_back("172.26.0.1", port);
+    AddUsbServer(servers, port);
 
-    // 172.27.0.1 (Unix USB)
-    servers.emplace_back("172.27.0.1", port);
+    // 172.30.0.1 (WiFi)
+    servers.emplace_back("172.30.0.1", port);
+
+    ii->SetServers(servers);
+  }
+}
+
+void SetServerFixed(NT_Inst inst, unsigned int port) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
+    std::vector<std::pair<std::string, unsigned int>> servers;
+    servers.reserve(3);
+
+    AddUsbServer(servers, port);
 
     // 172.30.0.1 (WiFi)
     servers.emplace_back("172.30.0.1", port);
 
     // robot.local
-    servers.emplace_back(fmt::format("robot.local", team), port);
+    servers.emplace_back("robot.local", port);
 
     ii->SetServers(servers);
   }
