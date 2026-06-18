@@ -31,8 +31,7 @@ namespace wpi::nt {
 static constexpr std::string_view kNetworkTablesServiceType =
     "_networktables._tcp";
 static constexpr std::string_view kSystemCoreServiceType = "_SystemCore._tcp";
-static constexpr std::string_view kSystemCoreServicePrefix =
-    "SystemCore-FIRST";
+static constexpr std::string_view kSystemCoreServicePrefix = "SystemCore-FIRST";
 
 wpi::util::json TopicInfo::GetProperties() const {
   return wpi::util::json::parse(properties).value_or(wpi::util::json::object());
@@ -777,9 +776,8 @@ void SetServerFixed(NT_Inst inst, unsigned int port) {
 }
 
 void SetServerMdns(NT_Inst inst, std::string_view service_name) {
-  SetServerMdns(
-      inst, service_name,
-      std::span<const std::pair<std::string_view, unsigned int>>{});
+  SetServerMdns(inst, service_name,
+                std::span<const std::pair<std::string_view, unsigned int>>{});
 }
 
 void SetServerMdns(NT_Inst inst, std::string_view service_name,

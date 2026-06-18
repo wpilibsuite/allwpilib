@@ -157,15 +157,14 @@ void NetworkClientBase::DoSetServers(
     }
   }
 
-  m_loopRunner.ExecAsync(
-      [this, servers = std::move(serversCopy),
-       resolver = std::move(resolver)](uv::Loop&) mutable {
-        m_servers = std::move(servers);
-        m_serverResolver = std::move(resolver);
-        m_resolvedServers.clear();
-        StartResolvers();
-        UpdateConnectorServers();
-      });
+  m_loopRunner.ExecAsync([this, servers = std::move(serversCopy),
+                          resolver = std::move(resolver)](uv::Loop&) mutable {
+    m_servers = std::move(servers);
+    m_serverResolver = std::move(resolver);
+    m_resolvedServers.clear();
+    StartResolvers();
+    UpdateConnectorServers();
+  });
 }
 
 void NetworkClientBase::DoSetServers(

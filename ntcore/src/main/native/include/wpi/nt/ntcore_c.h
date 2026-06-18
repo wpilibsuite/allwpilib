@@ -1236,10 +1236,8 @@ void NT_SetServerMdns(NT_Inst inst, const struct WPI_String* service_name);
  *                      terminated)
  * @param ports         array of ports to communicate over (one for each server)
  */
-void NT_SetServerMdnsMulti(NT_Inst inst,
-                           const struct WPI_String* service_name,
-                           size_t count,
-                           const struct WPI_String* server_names,
+void NT_SetServerMdnsMulti(NT_Inst inst, const struct WPI_String* service_name,
+                           size_t count, const struct WPI_String* server_names,
                            const unsigned int* ports);
 
 /**

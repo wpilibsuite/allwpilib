@@ -36,8 +36,7 @@ class MulticastResolverClient
       wpi::net::uv::Loop& loop, wpi::util::Logger& logger,
       std::string_view serviceType);
 
-  MulticastResolverClient(wpi::net::uv::Loop& loop,
-                          wpi::util::Logger& logger,
+  MulticastResolverClient(wpi::net::uv::Loop& loop, wpi::util::Logger& logger,
                           std::string_view serviceType, const private_init&);
   ~MulticastResolverClient();
   MulticastResolverClient(const MulticastResolverClient&) = delete;

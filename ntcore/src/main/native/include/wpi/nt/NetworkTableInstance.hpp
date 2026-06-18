@@ -696,8 +696,8 @@ class NetworkTableInstance final {
 
   /**
    * Sets server address and port for client (without restarting client).
-   * Connects using a NetworkTables server announced over mDNS with the specified
-   * service name.
+   * Connects using a NetworkTables server announced over mDNS with the
+   * specified service name.
    *
    * @param service_name mDNS service name
    */
@@ -707,8 +707,8 @@ class NetworkTableInstance final {
 
   /**
    * Sets server address and port for client (without restarting client).
-   * Connects using the fixed server address and a NetworkTables server announced
-   * over mDNS with the specified service name.
+   * Connects using the fixed server address and a NetworkTables server
+   * announced over mDNS with the specified service name.
    *
    * @param service_name mDNS service name
    * @param server_name  server name

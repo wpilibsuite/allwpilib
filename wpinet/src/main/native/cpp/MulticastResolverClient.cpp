@@ -29,9 +29,10 @@ std::shared_ptr<MulticastResolverClient> MulticastResolverClient::Create(
   return client;
 }
 
-MulticastResolverClient::MulticastResolverClient(
-    wpi::net::uv::Loop& loop, wpi::util::Logger& logger,
-    std::string_view serviceType, const private_init&)
+MulticastResolverClient::MulticastResolverClient(wpi::net::uv::Loop& loop,
+                                                 wpi::util::Logger& logger,
+                                                 std::string_view serviceType,
+                                                 const private_init&)
     : m_loop{loop}, m_logger{logger}, m_serviceType{serviceType} {}
 
 MulticastResolverClient::~MulticastResolverClient() = default;

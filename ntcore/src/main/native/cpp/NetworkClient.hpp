@@ -65,9 +65,8 @@ class NetworkClientBase : public INetworkClient {
   virtual void TcpConnected(wpi::net::uv::Tcp& tcp) = 0;
   virtual void ForceDisconnect(std::string_view reason) = 0;
   virtual void DoDisconnect(std::string_view reason);
-  void ProcessResolverData(
-      const ServerResolver& resolver,
-      wpi::net::MulticastResolverClient::ServiceData data);
+  void ProcessResolverData(const ServerResolver& resolver,
+                           wpi::net::MulticastResolverClient::ServiceData data);
   void StartResolvers();
   void StopResolvers();
   void UpdateConnectorServers();
@@ -123,9 +122,8 @@ class NetworkClient final : public NetworkClientBase {
     DoSetServers(servers, std::nullopt, NT_DEFAULT_PORT);
   }
 
-  void SetServers(
-      std::span<const std::pair<std::string, unsigned int>> servers,
-      const ServerResolver& resolver) final {
+  void SetServers(std::span<const std::pair<std::string, unsigned int>> servers,
+                  const ServerResolver& resolver) final {
     DoSetServers(servers, resolver, NT_DEFAULT_PORT);
   }
 

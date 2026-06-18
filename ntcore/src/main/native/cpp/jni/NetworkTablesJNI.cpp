@@ -1337,7 +1337,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_setServerMdns__ILjava_lang_String
 /*
  * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setServerMdns
- * Signature: (ILjava/lang/String;[Ljava/lang/String;[I)V
+ * Signature: (ILjava/lang/String;[Ljava/lang/Object;[I)V
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_networktables_NetworkTablesJNI_setServerMdns__ILjava_lang_String_2_3Ljava_lang_String_2_3I
