@@ -1,9 +1,9 @@
 #pragma once
 
-#include <semiwrap.h>
-
 #include <memory>
 #include <utility>
+
+#include <semiwrap.h>
 
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 

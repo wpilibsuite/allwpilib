@@ -1,11 +1,11 @@
 
 #include "pyentry.h"
 
-#include <pybind11/stl.h>
-#include <wpi_span_type_caster.h>
-
 #include <string>
 #include <utility>
+
+#include <pybind11/stl.h>
+#include <wpi_span_type_caster.h>
 
 #include "py2value.h"
 

@@ -258,7 +258,8 @@ struct WPyStructInfo {
     }
   }
 
-  explicit WPyStructInfo(const WPyStruct& v) : WPyStructInfo(py::type::of(v.py)) {}
+  explicit WPyStructInfo(const WPyStruct& v)
+      : WPyStructInfo(py::type::of(v.py)) {}
 
   const WPyStructConverter* operator->() const {
     const auto* c = cvt.get();
