@@ -240,6 +240,7 @@ void InstanceImpl::Reset() {
   m_networkServer.reset();
   m_networkClient.reset();
   m_servers.clear();
+  m_serverResolver.reset();
   networkMode = NT_NET_MODE_NONE;
   m_serverTimeOffset.reset();
   m_rtt2 = 0;

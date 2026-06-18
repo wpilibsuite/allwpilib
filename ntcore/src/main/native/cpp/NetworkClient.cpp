@@ -42,11 +42,10 @@ static std::string Ipv4AddressToString(unsigned int address) {
 
 static bool HasMatchingTeam(
     const wpi::net::MulticastResolverClient::ServiceData& data,
-    unsigned int team) {
+    std::string_view team) {
   for (auto&& [key, value] : data.txt) {
     if (key == "team") {
-      auto parsedTeam = wpi::util::parse_integer<unsigned int>(value, 10);
-      return parsedTeam && *parsedTeam == team;
+      return wpi::util::trim(value) == team;
     }
   }
   return false;
@@ -152,6 +151,7 @@ void NetworkClientBase::DoSetServers(
   if (resolver) {
     resolver->serviceType = wpi::util::trim(resolver->serviceType);
     resolver->serviceName = wpi::util::trim(resolver->serviceName);
+    resolver->team = wpi::util::trim(resolver->team);
     if (!resolver->useResolvedPort && resolver->port == 0) {
       resolver->port = defaultPort;
     }

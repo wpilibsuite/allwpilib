@@ -570,12 +570,14 @@ void NT_SetServerMulti(NT_Inst inst, size_t count,
   wpi::nt::SetServer(inst, servers);
 }
 
-void NT_SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
-  wpi::nt::SetServerTeam(inst, team, port);
+void NT_SetServerTeam(NT_Inst inst, const struct WPI_String* team,
+                      unsigned int port) {
+  wpi::nt::SetServerTeam(inst, wpi::util::to_string_view(team), port);
 }
 
-void NT_SetServerFixed(NT_Inst inst, unsigned int port) {
-  wpi::nt::SetServerFixed(inst, port);
+void NT_SetServerFixed(NT_Inst inst, const struct WPI_String* team,
+                       unsigned int port) {
+  wpi::nt::SetServerFixed(inst, wpi::util::to_string_view(team), port);
 }
 
 void NT_SetServerMdns(NT_Inst inst, const struct WPI_String* service_name) {

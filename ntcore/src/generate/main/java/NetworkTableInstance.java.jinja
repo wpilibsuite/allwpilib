@@ -1084,44 +1084,53 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   /**
    * Sets server addresses and port for client (without restarting client). Changes the port to the
-   * default port. The client will attempt to connect to each server in round robin fashion.
+   * default port. Connects using the team-specific robot address for the specified team, USB
+   * address, WiFi address, and matching SystemCore mDNS announcements. The team-specific robot
+   * address is only added if the team string parses as an integer in the range 0 to 25599
+   * inclusive.
    *
-   * @param team team number
+   * @param team team number string
    */
-  public void setServerTeam(int team) {
+  public void setServerTeam(String team) {
     setServerTeam(team, 0);
   }
 
   /**
    * Sets server addresses and port for client (without restarting client). Connects using the
    * team-specific robot address for the specified team, USB address, WiFi address, and matching
-   * SystemCore mDNS announcements.
+   * SystemCore mDNS announcements. The team-specific robot address is only added if the team
+   * string parses as an integer in the range 0 to 25599 inclusive.
    *
-   * @param team team number
+   * @param team team number string
    * @param port port to communicate over (0=default)
    */
-  public void setServerTeam(int team, int port) {
+  public void setServerTeam(String team, int port) {
     NetworkTablesJNI.setServerTeam(m_handle, team, port);
   }
 
   /**
    * Sets server addresses and port for client (without restarting client). Changes the port to the
-   * default port. Connects using fixed robot addresses that are not team-specific (USB, WiFi, and
-   * robot.local) and SystemCore mDNS announcements.
+   * default port. Connects using fixed robot addresses (the team-specific 10.TE.AM.2 address, USB,
+   * WiFi, and robot.local) and SystemCore mDNS announcements. The team-specific robot address is
+   * only added if the team string parses as an integer in the range 0 to 25599 inclusive.
+   *
+   * @param team team number string
    */
-  public void setServerFixed() {
-    setServerFixed(0);
+  public void setServerFixed(String team) {
+    setServerFixed(team, 0);
   }
 
   /**
    * Sets server addresses and port for client (without restarting client). Connects using fixed
-   * robot addresses that are not team-specific (USB, WiFi, and robot.local) and SystemCore mDNS
-   * announcements.
+   * robot addresses (the team-specific 10.TE.AM.2 address, USB, WiFi, and robot.local) and
+   * SystemCore mDNS announcements. The team-specific robot address is only added if the team
+   * string parses as an integer in the range 0 to 25599 inclusive.
    *
+   * @param team team number string
    * @param port port to communicate over (0=default)
    */
-  public void setServerFixed(int port) {
-    NetworkTablesJNI.setServerFixed(m_handle, port);
+  public void setServerFixed(String team, int port) {
+    NetworkTablesJNI.setServerFixed(m_handle, team, port);
   }
 
   /**

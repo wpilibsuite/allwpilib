@@ -58,7 +58,7 @@ void NetworkTablesSettings::Thread::Main() {
     } while (mode != m_mode || dsClient != m_dsClient);
 
     if (m_mode == 1) {
-      std::string_view serverTeam{m_serverTeam};
+      std::string_view serverTeam{wpi::util::trim(m_serverTeam)};
       std::optional<unsigned int> team;
       if (m_mode == 1) {
         wpi::nt::StartClient(m_inst, m_clientName);
@@ -67,9 +67,9 @@ void NetworkTablesSettings::Thread::Main() {
       if (!wpi::util::contains(serverTeam, '.') &&
           (team = wpi::util::parse_integer<unsigned int>(serverTeam, 10))) {
         if (m_requireTeamNumberMatch) {
-          wpi::nt::SetServerTeam(m_inst, team.value(), m_port);
+          wpi::nt::SetServerTeam(m_inst, serverTeam, m_port);
         } else {
-          wpi::nt::SetServerFixed(m_inst, m_port);
+          wpi::nt::SetServerFixed(m_inst, serverTeam, m_port);
         }
       } else {
         std::vector<std::pair<std::string_view, unsigned int>> servers;

@@ -1388,25 +1388,33 @@ Java_org_wpilib_networktables_NetworkTablesJNI_setServerMdns__ILjava_lang_String
 /*
  * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setServerTeam
- * Signature: (III)V
+ * Signature: (ILjava/lang/String;I)V
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_networktables_NetworkTablesJNI_setServerTeam
-  (JNIEnv* env, jclass, jint inst, jint team, jint port)
+  (JNIEnv* env, jclass, jint inst, jstring team, jint port)
 {
-  wpi::nt::SetServerTeam(inst, team, port);
+  if (!team) {
+    nullPointerEx.Throw(env, "team cannot be null");
+    return;
+  }
+  wpi::nt::SetServerTeam(inst, JStringRef{env, team}.c_str(), port);
 }
 
 /*
  * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setServerFixed
- * Signature: (II)V
+ * Signature: (ILjava/lang/String;I)V
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_networktables_NetworkTablesJNI_setServerFixed
-  (JNIEnv* env, jclass, jint inst, jint port)
+  (JNIEnv* env, jclass, jint inst, jstring team, jint port)
 {
-  wpi::nt::SetServerFixed(inst, port);
+  if (!team) {
+    nullPointerEx.Throw(env, "team cannot be null");
+    return;
+  }
+  wpi::nt::SetServerFixed(inst, JStringRef{env, team}.c_str(), port);
 }
 
 /*

@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -20,6 +21,7 @@
 #include "Types_internal.hpp"
 #include "wpi/nt/ntcore.h"
 #include "wpi/nt/ntcore_c.h"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/timestamp.h"
 
@@ -32,6 +34,7 @@ static constexpr std::string_view kNetworkTablesServiceType =
     "_networktables._tcp";
 static constexpr std::string_view kSystemCoreServiceType = "_SystemCore._tcp";
 static constexpr std::string_view kSystemCoreServicePrefix = "SystemCore-FIRST";
+static constexpr unsigned int kMaxTeamNumber = 25599;
 
 wpi::util::json TopicInfo::GetProperties() const {
   return wpi::util::json::parse(properties).value_or(wpi::util::json::object());
@@ -718,6 +721,22 @@ static void AddWifiServer(
   servers.emplace_back("172.30.0.1", port);
 }
 
+static void AddTeamServer(
+    std::vector<std::pair<std::string, unsigned int>>& servers,
+    std::string_view team, unsigned int port) {
+  auto parsedTeam =
+      wpi::util::parse_integer<unsigned int>(wpi::util::trim(team), 10);
+  if (!parsedTeam || *parsedTeam > kMaxTeamNumber) {
+    return;
+  }
+
+  // 10.te.am.2
+  servers.emplace_back(
+      fmt::format("10.{}.{}.2", static_cast<int>(*parsedTeam / 100),
+                  static_cast<int>(*parsedTeam % 100)),
+      port);
+}
+
 static INetworkClient::ServerResolver MakeSystemCoreResolver(
     unsigned int port) {
   INetworkClient::ServerResolver resolver;
@@ -729,22 +748,19 @@ static INetworkClient::ServerResolver MakeSystemCoreResolver(
 }
 
 static INetworkClient::ServerResolver MakeSystemCoreResolver(
-    unsigned int team, unsigned int port) {
+    std::string_view team, unsigned int port) {
   auto resolver = MakeSystemCoreResolver(port);
   resolver.requireTeam = true;
-  resolver.team = team;
+  resolver.team = wpi::util::trim(team);
   return resolver;
 }
 
-void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
+void SetServerTeam(NT_Inst inst, std::string_view team, unsigned int port) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     std::vector<std::pair<std::string, unsigned int>> servers;
     servers.reserve(3);
 
-    // 10.te.am.2
-    servers.emplace_back(fmt::format("10.{}.{}.2", static_cast<int>(team / 100),
-                                     static_cast<int>(team % 100)),
-                         port);
+    AddTeamServer(servers, team, port);
 
     AddUsbServer(servers, port);
 
@@ -757,10 +773,12 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
   }
 }
 
-void SetServerFixed(NT_Inst inst, unsigned int port) {
+void SetServerFixed(NT_Inst inst, std::string_view team, unsigned int port) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     std::vector<std::pair<std::string, unsigned int>> servers;
-    servers.reserve(3);
+    servers.reserve(4);
+
+    AddTeamServer(servers, team, port);
 
     AddUsbServer(servers, port);
 

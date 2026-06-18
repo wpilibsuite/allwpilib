@@ -675,23 +675,28 @@ class NetworkTableInstance final {
    * Sets server addresses and port for client (without restarting client).
    * Connects using the team-specific robot address for the specified team, USB
    * address, WiFi address, and matching SystemCore mDNS announcements.
+   * The team-specific robot address is only added if the team string parses as
+   * an integer in the range 0 to 25599 inclusive.
    *
-   * @param team        team number
+   * @param team        team number string
    * @param port        port to communicate over (0 = default)
    */
-  void SetServerTeam(unsigned int team, unsigned int port = 0) {
+  void SetServerTeam(std::string_view team, unsigned int port = 0) {
     ::wpi::nt::SetServerTeam(m_handle, team, port);
   }
 
   /**
    * Sets server addresses and port for client (without restarting client).
-   * Connects using fixed robot addresses that are not team-specific (USB, WiFi,
-   * and robot.local) and SystemCore mDNS announcements.
+   * Connects using fixed robot addresses (the team-specific 10.TE.AM.2
+   * address, USB, WiFi, and robot.local) and SystemCore mDNS announcements.
+   * The team-specific robot address is only added if the team string parses as
+   * an integer in the range 0 to 25599 inclusive.
    *
+   * @param team        team number string
    * @param port        port to communicate over (0 = default)
    */
-  void SetServerFixed(unsigned int port = 0) {
-    ::wpi::nt::SetServerFixed(m_handle, port);
+  void SetServerFixed(std::string_view team, unsigned int port = 0) {
+    ::wpi::nt::SetServerFixed(m_handle, team, port);
   }
 
   /**

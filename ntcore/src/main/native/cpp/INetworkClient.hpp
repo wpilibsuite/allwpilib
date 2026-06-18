@@ -19,7 +19,7 @@ class INetworkClient {
     std::string serviceName;
     bool serviceNamePrefix = false;
     bool requireTeam = false;
-    unsigned int team = 0;
+    std::string team;
     unsigned int port = 0;
     bool useResolvedPort = false;
   };
