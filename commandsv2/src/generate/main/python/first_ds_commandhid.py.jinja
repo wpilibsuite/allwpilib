@@ -159,7 +159,6 @@ class Command{{ ClassName }}Controller:
         :param axis: the :class:`wpilib.{{ ClassName }}Controller.Axis` to read
         """
         return self._hid.getRawAxis(axis.value)
-
 {% for axis in axes %}
     def get{{ axis.MethodName }}(self) -> float:
         """
