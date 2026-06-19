@@ -16,4 +16,3 @@ classes:
             - [1, 2]
           T&&:
             ignore: true
-
