@@ -1,8 +1,7 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary", "py_test")
-load("//robotpyExamples:example_projects.bzl", "EXAMPLE_PROJECTS", "SNIPPET_PROJECTS")
 
-def _define_robot_project(projects, project_type):
+def define_robot_projects(projects):
     for example_folder in projects:
         base_name = example_folder.replace("/", "_")
         common_kwargs = dict(
@@ -42,9 +41,3 @@ def _define_robot_project(projects, project_type):
             deps = common_deps + ["//simulation/halsim_gui:robotpy-halsim-gui"],
             **common_kwargs
         )
-
-def define_examples():
-    _define_robot_project(EXAMPLE_PROJECTS, "example")
-
-def define_snippets():
-    _define_robot_project(SNIPPET_PROJECTS, "snippet")
