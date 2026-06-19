@@ -190,7 +190,8 @@ RobotBase::RobotBase() {
 
   auto inst = wpi::nt::NetworkTableInstance::GetDefault();
   // subscribe to "" to force persistent values to propagate to local
-  wpi::nt::SubscribeMultiple(inst.GetHandle(), {{std::string_view{}}});
+  wpi::nt::SubscribeMultiple(inst.GetHandle(), {{std::string_view{}}},
+                             {.disableSignal = true});
   if constexpr (!IsSimulation()) {
     inst.StartServer("/home/systemcore/networktables.json", "", "robot");
   } else {
