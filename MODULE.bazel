@@ -5,6 +5,10 @@ module(
 
 include("//docs:doxygen.MODULE.bazel")
 
+include("//shared/bazel/thirdparty/ceres:ceres.MODULE.bazel")
+
+include("//shared/bazel/thirdparty/libssh:libssh.MODULE.bazel")
+
 include("//shared/bazel/thirdparty/mrclib:mrclib.MODULE.bazel")
 
 bazel_dep(name = "apple_support", version = "2.0.0", repo_name = "build_bazel_apple_support")

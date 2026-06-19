@@ -6,6 +6,7 @@
 
 package org.wpilib.command3.button;
 
+import java.util.Objects;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.DualSenseController;
@@ -33,6 +34,16 @@ public class CommandDualSenseController {
 
   /**
    * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the {@link Scheduler#getDefault() default scheduler} using its default event loop.
+   *
+   * @param controller The DualSenseController object to use for this controller.
+   */
+  public CommandDualSenseController(DualSenseController controller) {
+    this(Scheduler.getDefault(), controller);
+  }
+
+  /**
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
    * scheduled on the given scheduler using its default event loop.
    *
    * @param scheduler The scheduler that should execute the triggered commands.
@@ -41,6 +52,19 @@ public class CommandDualSenseController {
   public CommandDualSenseController(Scheduler scheduler, int port) {
     m_hid = CommandGenericHID.getCommandGenericHID(scheduler, port);
     m_controller = new DualSenseController(m_hid.getHID());
+  }
+
+  /**
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the given scheduler using its default event loop.
+   *
+   * @param scheduler The scheduler that should execute the triggered commands.
+   * @param controller The DualSenseController object to use for this controller.
+   */
+  public CommandDualSenseController(Scheduler scheduler, DualSenseController controller) {
+    m_controller =
+        Objects.requireNonNull(controller, "Provided DualSenseController cannot be null");
+    m_hid = new CommandGenericHID(scheduler, m_controller.getHID());
   }
 
   /**

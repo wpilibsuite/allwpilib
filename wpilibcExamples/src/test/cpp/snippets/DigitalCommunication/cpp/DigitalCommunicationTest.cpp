@@ -122,7 +122,8 @@ class AutonomousTest : public DigitalCommunicationTest<bool> {};
 TEST_P(AutonomousTest, Autonomous) {
   auto autonomous = GetParam();
   wpi::sim::DriverStationSim::SetRobotMode(
-      autonomous ? HAL_ROBOT_MODE_AUTONOMOUS : HAL_ROBOT_MODE_TELEOPERATED);
+      autonomous ? wpi::hal::RobotMode::AUTONOMOUS
+                 : wpi::hal::RobotMode::TELEOPERATED);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(autonomousOutput.GetInitialized());

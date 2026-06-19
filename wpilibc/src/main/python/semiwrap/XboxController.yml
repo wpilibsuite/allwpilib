@@ -8,6 +8,9 @@ classes:
     force_no_trampoline: true
     ignored_bases:
     - wpi::util::SendableHelper<XboxController>
+    enums:
+      Button:
+      Axis:
     attributes:
       TOUCHPAD_COUNT:
       SUPPORTS_RUMBLE:
@@ -105,28 +108,3 @@ classes:
       InitSendable:
       GetLeftTrigger:
       GetRightTrigger:
-  wpi::XboxController::Button:
-    attributes:
-      A:
-      B:
-      X:
-      Y:
-      VIEW:
-      XBOX:
-      MENU:
-      LEFT_STICK:
-      RIGHT_STICK:
-      LEFT_BUMPER:
-      RIGHT_BUMPER:
-      DPAD_UP:
-      DPAD_DOWN:
-      DPAD_LEFT:
-      DPAD_RIGHT:
-  wpi::XboxController::Axis:
-    attributes:
-      LEFT_X:
-      LEFT_Y:
-      RIGHT_X:
-      RIGHT_Y:
-      LEFT_TRIGGER:
-      RIGHT_TRIGGER:

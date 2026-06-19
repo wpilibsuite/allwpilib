@@ -5,9 +5,9 @@ import weakref
 
 import pytest
 
+from hal import RobotMode
 import hal
 import hal.simulation
-from hal._wpiHal import _RobotMode as RobotMode
 import ntcore
 import wpilib
 from wpilib.simulation import DriverStationSim, pauseTiming, restartTiming
