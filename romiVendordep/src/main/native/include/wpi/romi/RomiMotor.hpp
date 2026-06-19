@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "wpi/hal/SimDevice.hpp"
@@ -61,7 +62,7 @@ class RomiMotor : public wpi::MotorController, public wpi::MotorSafety {
   void AddFollower(T&& follower) {
     m_owningFollowers.emplace_back(
         std::make_unique<std::decay_t<T>>(std::forward<T>(follower)));
-  } 
+  }
 
  private:
   hal::SimDevice m_simDevice;

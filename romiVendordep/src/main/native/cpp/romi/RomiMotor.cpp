@@ -28,7 +28,7 @@ void RomiMotor::SetThrottle(double throttle) {
   if (m_simSpeed) {
     m_simSpeed.Set(m_inverted ? -throttle : throttle);
   }
-  
+
   for (auto& follower : m_nonowningFollowers) {
     follower->SetThrottle(throttle);
   }
