@@ -350,7 +350,6 @@ class CommandXboxController:
         """
         return self._hid.getRawAxis(axis.value)
 
-
     def getLeftX(self) -> float:
         """
         Get the Left X value of the controller.
