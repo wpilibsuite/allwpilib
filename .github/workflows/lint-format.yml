@@ -16,14 +16,14 @@ jobs:
     name: "Validation"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: gradle/actions/wrapper-validation@v5
+      - uses: actions/checkout@v7
+      - uses: gradle/actions/wrapper-validation@v6
 
   wpiformat:
     name: "wpiformat"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Fetch all history and metadata
@@ -64,7 +64,7 @@ jobs:
     needs: [validation]
     container: wpilib/debian-base:trixie
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Fetch all history and metadata
@@ -97,7 +97,7 @@ jobs:
     needs: [validation]
     container: wpilib/debian-base:trixie
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Fetch all history and metadata
@@ -128,7 +128,7 @@ jobs:
   check-spelling:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: misspell
         uses: reviewdog/action-misspell@v1
         with:
