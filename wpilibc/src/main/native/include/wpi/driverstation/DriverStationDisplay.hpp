@@ -6,9 +6,6 @@
 
 #include <string_view>
 
-#include "wpi/hal/DriverStation.h"
-#include "wpi/util/string.hpp"
-
 namespace wpi {
 
 /**
@@ -36,16 +33,7 @@ class DriverStationDisplay final {
    *
    * @param mode display mode
    */
-  static void SetMode(Mode mode) {
-    switch (mode) {
-      case Mode::Line:
-        HAL_SetDisplayLineMode();
-        break;
-      case Mode::RawAnsi:
-        HAL_SetDisplayRawMode();
-        break;
-    }
-  }
+  static void SetMode(Mode mode);
 
   /**
    * Adds display data in line mode.
@@ -57,11 +45,7 @@ class DriverStationDisplay final {
    * @param caption Line caption.
    * @param line Line contents.
    */
-  static void AddData(std::string_view caption, std::string_view line) {
-    WPI_String captionWpiStr = wpi::util::make_string(caption);
-    WPI_String lineWpiStr = wpi::util::make_string(line);
-    HAL_AddDisplayLine(&captionWpiStr, &lineWpiStr);
-  }
+  static void AddData(std::string_view caption, std::string_view line);
 
   /**
    * Adds an uncaptioned display line in line mode.
@@ -71,7 +55,7 @@ class DriverStationDisplay final {
    *
    * @param line Line contents.
    */
-  static void AddLine(std::string_view line) { AddData({}, line); }
+  static void AddLine(std::string_view line);
 
   /**
    * Updates the display with all pending lines and clears the pending lines.
@@ -80,7 +64,7 @@ class DriverStationDisplay final {
    * elapsed since the last update, the pending lines are cleared without
    * sending.
    */
-  static void UpdateLines() { HAL_UpdateDisplayLines(); }
+  static void UpdateLines();
 
   /**
    * Writes ANSI text directly to the display in raw ANSI mode.
@@ -89,17 +73,14 @@ class DriverStationDisplay final {
    *
    * @param data ANSI text to write.
    */
-  static void WriteRawAnsiText(std::string_view data) {
-    WPI_String dataWpiStr = wpi::util::make_string(data);
-    HAL_WriteDisplayAnsiText(&dataWpiStr);
-  }
+  static void WriteRawAnsiText(std::string_view data);
 
   /**
    * Clears the display in raw ANSI mode.
    *
    * This call is ignored unless the display is in raw ANSI mode.
    */
-  static void ClearRaw() { HAL_ClearDisplay(); }
+  static void ClearRaw();
 };
 
 }  // namespace wpi

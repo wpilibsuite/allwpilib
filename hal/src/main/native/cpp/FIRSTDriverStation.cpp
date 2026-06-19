@@ -3,20 +3,17 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <atomic>
-#include <cctype>
 #include <chrono>
 #include <cstdio>
 #include <cstring>
 #include <functional>
 #include <string>
-#include <vector>
 
 #include <fmt/format.h>
 
 #include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/cpp/MrcLibDs.hpp"
 #include "wpi/hal/monotonic_clock.hpp"
-#include "wpi/util/StringMap.hpp"
 #include "wpi/util/Synchronization.hpp"
 #include "wpi/util/mutex.hpp"
 
@@ -283,109 +280,8 @@ HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
   return systemTimeValid;
 }
 
-static wpi::util::mutex displayMutex;
-static bool displayRawMode = false;
-static wpi::util::StringMap<uint32_t> displayLineMap;
-static std::vector<std::string> displayLines;
-static std::string displayBuffer;
-
-void HAL_SetDisplayLineMode(void) {
-  std::scoped_lock lock(displayMutex);
-  displayRawMode = false;
-  displayLineMap.clear();
-  displayLines.clear();
-}
-
-void HAL_AddDisplayLine(const struct WPI_String* caption,
-                        const struct WPI_String* line) {
-  std::scoped_lock lock(displayMutex);
-  if (displayRawMode) {
-    return;
-  }
-  auto captionView = wpi::util::to_string_view(caption);
-  auto lineView = wpi::util::to_string_view(line);
-
-  bool hasCaption = false;
-  for (char ch : captionView) {
-    if (!std::isspace(static_cast<unsigned char>(ch))) {
-      hasCaption = true;
-      break;
-    }
-  }
-  if (!hasCaption) {
-    displayLines.emplace_back(lineView);
-    return;
-  }
-
-  uint32_t lineNum;
-  auto it = displayLineMap.find(captionView);
-  if (it == displayLineMap.end()) {
-    lineNum = displayLines.size();
-    displayLineMap[captionView] = lineNum;
-    displayLines.emplace_back(lineView);
-  } else {
-    lineNum = it->second;
-    if (lineNum < displayLines.size()) {
-      displayLines[lineNum] = lineView;
-    }
-  }
-}
-
-void HAL_UpdateDisplayLines(void) {
-  // Compute the lines, and send them.
-  std::scoped_lock lock(displayMutex);
-  if (displayRawMode) {
-    return;
-  }
-
-  static auto lastDisplayUpdate =
-      wpi::hal::monotonic_clock::now() - std::chrono::milliseconds{230};
-  auto now = wpi::hal::monotonic_clock::now();
-  if (now - lastDisplayUpdate < std::chrono::milliseconds{230}) {
-    displayLineMap.clear();
-    displayLines.clear();
-    return;
-  }
-  lastDisplayUpdate = now;
-
-  // Start by clearing the data buffer.
-  displayBuffer.clear();
-  // Then write an ANSI clear screen code to it.
-  displayBuffer += "\033[2J\033[H";
-  // Then write each line, followed by a newline. Make sure the ANSI code for
-  // reset formatting is at the end of each line, in case the line contains
-  // formatting codes.
-  for (const auto& line : displayLines) {
-    displayBuffer += line;
-    displayBuffer += "\033[0m\n";
-  }
-
-  auto wpiBuffer = wpi::util::make_string(displayBuffer);
-
-  mrcLibDs->writeAnsi(&wpiBuffer);
-
-  displayLineMap.clear();
-  displayLines.clear();
-}
-
-void HAL_SetDisplayRawMode(void) {
-  std::scoped_lock lock(displayMutex);
-  displayRawMode = true;
-  mrcLibDs->clearDisplay();
-}
-
 void HAL_WriteDisplayAnsiText(const struct WPI_String* data) {
-  std::scoped_lock lock(displayMutex);
-  if (displayRawMode) {
-    mrcLibDs->writeAnsi(data);
-  }
-}
-
-void HAL_ClearDisplay(void) {
-  std::scoped_lock lock(displayMutex);
-  if (displayRawMode) {
-    mrcLibDs->clearDisplay();
-  }
+  mrcLibDs->writeAnsi(data);
 }
 
 }  // extern "C"

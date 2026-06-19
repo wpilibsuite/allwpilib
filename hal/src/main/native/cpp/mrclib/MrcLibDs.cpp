@@ -244,8 +244,6 @@ class MrcLibDsImpl : public MrcLibDs {
 
   int32_t writeAnsi(const struct WPI_String* line) override;
 
-  int32_t clearDisplay() override;
-
   wpi::util::EventVector newDataEvents;
 
  private:
@@ -668,10 +666,6 @@ int32_t MrcLibDsImpl::getSystemTimeValid(bool* systemTimeValid) {
 int32_t MrcLibDsImpl::writeAnsi(const struct WPI_String* line) {
   MRC_String mrcLine = WPIStringToMRCString(line);
   return MRC_DsCommsControl_WriteAnsi(&mrcLine);
-}
-
-int32_t MrcLibDsImpl::clearDisplay() {
-  return MRC_DsCommsControl_ClearDisplay();
 }
 
 void MrcLibDsImpl::provideNewDataEventHandle(WPI_EventHandle handle) {

@@ -105,13 +105,6 @@ class MrcLibDs {
    * @return 0 on success, non-zero on error
    */
   virtual int32_t writeAnsi(const struct WPI_String* line) = 0;
-
-  /**
-   * Clears the Driver Station display.
-   *
-   * @return 0 on success, non-zero on error
-   */
-  virtual int32_t clearDisplay() = 0;
 };
 
 MrcLibDs* GetMrcLibDs();

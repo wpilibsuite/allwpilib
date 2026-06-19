@@ -447,58 +447,6 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_getOutputsActive
 
 /*
  * Class:     org_wpilib_hardware_hal_DriverStationJNI
- * Method:    setDisplayLineMode
- * Signature: ()V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_DriverStationJNI_setDisplayLineMode
-  (JNIEnv*, jclass)
-{
-  HAL_SetDisplayLineMode();
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_DriverStationJNI
- * Method:    addDisplayLine
- * Signature: (Ljava/lang/String;Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_DriverStationJNI_addDisplayLine
-  (JNIEnv* env, jclass, jstring caption, jstring line)
-{
-  JStringRef captionStr{env, caption};
-  JStringRef lineStr{env, line};
-  WPI_String captionWpiStr = captionStr.wpi_str();
-  WPI_String lineWpiStr = lineStr.wpi_str();
-  HAL_AddDisplayLine(&captionWpiStr, &lineWpiStr);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_DriverStationJNI
- * Method:    updateDisplayLines
- * Signature: ()V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_DriverStationJNI_updateDisplayLines
-  (JNIEnv*, jclass)
-{
-  HAL_UpdateDisplayLines();
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_DriverStationJNI
- * Method:    setDisplayRawMode
- * Signature: ()V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_DriverStationJNI_setDisplayRawMode
-  (JNIEnv*, jclass)
-{
-  HAL_SetDisplayRawMode();
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    writeDisplayAnsiText
  * Signature: (Ljava/lang/String;)V
  */
@@ -511,15 +459,4 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_writeDisplayAnsiText
   HAL_WriteDisplayAnsiText(&dataWpiStr);
 }
 
-/*
- * Class:     org_wpilib_hardware_hal_DriverStationJNI
- * Method:    clearDisplay
- * Signature: ()V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_DriverStationJNI_clearDisplay
-  (JNIEnv*, jclass)
-{
-  HAL_ClearDisplay();
-}
 }  // extern "C"

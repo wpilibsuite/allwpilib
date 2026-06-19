@@ -4,6 +4,12 @@
 
 package org.wpilib.driverstation;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import org.wpilib.hardware.hal.DriverStationJNI;
 
 /**
@@ -12,6 +18,15 @@ import org.wpilib.hardware.hal.DriverStationJNI;
  * <p>Line mode is the default display mode.
  */
 public final class DriverStationDisplay {
+  private static final long UPDATE_PERIOD_NANOS = 230_000_000L;
+  private static final String CLEAR_DISPLAY = "\033[2J\033[H";
+
+  private static final Lock m_displayLock = new ReentrantLock();
+  private static boolean rawMode;
+  private static final Map<String, Integer> lineMap = new HashMap<>();
+  private static final List<String> lines = new ArrayList<>();
+  private static long lastDisplayUpdate = System.nanoTime() - UPDATE_PERIOD_NANOS;
+
   private DriverStationDisplay() {}
 
   /** Driver Station display mode. */
@@ -32,10 +47,22 @@ public final class DriverStationDisplay {
    * @param mode display mode
    */
   public static void setMode(Mode mode) {
-    switch (mode) {
-      case Line -> DriverStationJNI.setDisplayLineMode();
-      case RawAnsi -> DriverStationJNI.setDisplayRawMode();
-      default -> throw new IllegalArgumentException("Unknown display mode: " + mode);
+    m_displayLock.lock();
+    try {
+      switch (mode) {
+        case Line -> {
+          rawMode = false;
+          lineMap.clear();
+          lines.clear();
+        }
+        case RawAnsi -> {
+          rawMode = true;
+          DriverStationJNI.writeDisplayAnsiText(CLEAR_DISPLAY);
+        }
+        default -> throw new IllegalArgumentException("Unknown display mode: " + mode);
+      }
+    } finally {
+      m_displayLock.unlock();
     }
   }
 
@@ -50,7 +77,12 @@ public final class DriverStationDisplay {
    * @param line Line contents.
    */
   public static void addData(String caption, String line) {
-    DriverStationJNI.addDisplayLine(caption, line);
+    m_displayLock.lock();
+    try {
+      addDataUnderLock(caption, line);
+    } finally {
+      m_displayLock.unlock();
+    }
   }
 
   /**
@@ -84,6 +116,28 @@ public final class DriverStationDisplay {
     addData(caption, String.format(format, args));
   }
 
+  private static void addDataUnderLock(String caption, String line) {
+    if (rawMode) {
+      return;
+    }
+
+    String captionText = nonNull(caption);
+    String lineText = nonNull(line);
+
+    if (captionText.isBlank()) {
+      lines.add(lineText);
+      return;
+    }
+
+    Integer lineNum = lineMap.get(captionText);
+    if (lineNum == null) {
+      lineMap.put(captionText, lines.size());
+      lines.add(lineText);
+    } else if (lineNum < lines.size()) {
+      lines.set(lineNum, lineText);
+    }
+  }
+
   /**
    * Adds an uncaptioned display line in line mode.
    *
@@ -103,7 +157,33 @@ public final class DriverStationDisplay {
    * last update, the pending lines are cleared without sending.
    */
   public static void updateLines() {
-    DriverStationJNI.updateDisplayLines();
+    m_displayLock.lock();
+    try {
+      if (rawMode) {
+        return;
+      }
+
+      long now = System.nanoTime();
+      if (now - lastDisplayUpdate < UPDATE_PERIOD_NANOS) {
+        lineMap.clear();
+        lines.clear();
+        return;
+      }
+      lastDisplayUpdate = now;
+
+      StringBuilder builder = new StringBuilder();
+      builder.append(CLEAR_DISPLAY);
+      for (String line : lines) {
+        builder.append(line).append("\033[0m\n");
+      }
+
+      DriverStationJNI.writeDisplayAnsiText(builder.toString());
+
+      lineMap.clear();
+      lines.clear();
+    } finally {
+      m_displayLock.unlock();
+    }
   }
 
   /**
@@ -114,7 +194,14 @@ public final class DriverStationDisplay {
    * @param data ANSI text to write.
    */
   public static void writeRawAnsiText(String data) {
-    DriverStationJNI.writeDisplayAnsiText(data);
+    m_displayLock.lock();
+    try {
+      if (rawMode) {
+        DriverStationJNI.writeDisplayAnsiText(nonNull(data));
+      }
+    } finally {
+      m_displayLock.unlock();
+    }
   }
 
   /**
@@ -123,6 +210,17 @@ public final class DriverStationDisplay {
    * <p>This call is ignored unless the display is in raw ANSI mode.
    */
   public static void clearRaw() {
-    DriverStationJNI.clearDisplay();
+    m_displayLock.lock();
+    try {
+      if (rawMode) {
+        DriverStationJNI.writeDisplayAnsiText(CLEAR_DISPLAY);
+      }
+    } finally {
+      m_displayLock.unlock();
+    }
+  }
+
+  private static String nonNull(String value) {
+    return value == null ? "" : value;
   }
 }

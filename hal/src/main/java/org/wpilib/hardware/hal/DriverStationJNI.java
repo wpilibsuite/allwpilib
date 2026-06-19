@@ -347,54 +347,12 @@ public class DriverStationJNI extends JNIWrapper {
   public static native boolean getOutputsActive();
 
   /**
-   * Sets the display to line mode.
-   *
-   * @see "HAL_SetDisplayLineMode"
-   */
-  public static native void setDisplayLineMode();
-
-  /**
-   * Adds a display line in line mode.
-   *
-   * <p>Empty or whitespace-only captions are treated as unique and always add a new line.
-   *
-   * @param caption the line caption
-   * @param line the line contents
-   * @see "HAL_AddDisplayLine"
-   */
-  public static native void addDisplayLine(String caption, String line);
-
-  /**
-   * Updates the display with all pending lines.
-   *
-   * <p>Updates are sent at most once every 230 ms. If called before 230 ms has elapsed since the
-   * last update, the pending lines are cleared without sending.
-   *
-   * @see "HAL_UpdateDisplayLines"
-   */
-  public static native void updateDisplayLines();
-
-  /**
-   * Sets the display to raw mode.
-   *
-   * @see "HAL_SetDisplayRawMode"
-   */
-  public static native void setDisplayRawMode();
-
-  /**
-   * Writes ANSI text to the display in raw mode.
+   * Writes ANSI text to the display.
    *
    * @param data the ANSI text to write
    * @see "HAL_WriteDisplayAnsiText"
    */
   public static native void writeDisplayAnsiText(String data);
-
-  /**
-   * Clears the display in raw mode.
-   *
-   * @see "HAL_ClearDisplay"
-   */
-  public static native void clearDisplay();
 
   /** Utility class. */
   private DriverStationJNI() {}
