@@ -70,7 +70,7 @@ class HeaderToDatConfig:
         include_root = str(args[3]).replace("\\", "/")
         root_dir = find_root_dir(include_root)
         if "native" in include_root:
-            base_include_root = pathlib.Path(*args[3].relative_to(root_dir).parts[3:])
+            # base_include_root = pathlib.Path(*args[3].relative_to(root_dir).parts[3:])
             base_include_file = args[2].relative_to(include_root)
             base_library = re.search("native/(.*?)/", include_root).groups(1)[0]
 
@@ -205,7 +205,6 @@ class BazelExtensionModule:
         dynamic_dependencies = set()
         for dep_name in all_dependencies:
             if "native" in dep_name:
-
                 transitive_deps = set()
                 self._get_transitive_native_dependencies(dep_name, transitive_deps)
                 for d in transitive_deps:
@@ -416,7 +415,7 @@ def generate_pybind_build_file(
         version_file = raw_config["tool"]["hatch"]["build"]["hooks"]["robotpy"][
             "version_file"
         ]
-    except:
+    except KeyError:
         version_file = None
 
     # The entry points defined above are implicit to how the project is broken down in the toml files.
