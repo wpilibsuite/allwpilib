@@ -1,5 +1,5 @@
 [versions]
-avaje = "3.15"
+avaje = "3.14"
 ejml = "0.45.2-SNAPSHOT"
 jmh = "1.37"
 opencv = "2027-4.13.0-3"
