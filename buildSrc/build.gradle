@@ -12,5 +12,4 @@ repositories {
 dependencies {
     implementation libs.wpilib.native.utils
     implementation libs.wpilib.gradle.vscode
-    implementation libs.gradlex.moduletesting
 }
