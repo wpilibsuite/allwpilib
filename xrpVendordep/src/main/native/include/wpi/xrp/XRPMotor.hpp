@@ -5,8 +5,10 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <set>
 #include <string>
+#include <vector>
 
 #include "wpi/hal/SimDevice.hpp"
 #include "wpi/hardware/motor/MotorController.hpp"
@@ -44,12 +46,33 @@ class XRPMotor : public wpi::MotorController, public wpi::MotorSafety {
   void StopMotor() override;
   std::string GetDescription() const override;
 
+  /**
+   * Make the given XRP motor follow the output of this one.
+   *
+   * @param follower The motor follower.
+   */
+  void AddFollower(XRPMotor& follower);
+
+  /**
+   * Make the given XRP motor follow the output of this one.
+   *
+   * @param follower The motor follower.
+   */
+  template <std::derived_from<XRPMotor> T>
+  void AddFollower(T&& follower) {
+    m_owningFollowers.emplace_back(
+        std::make_unique<std::decay_t<T>>(std::forward<T>(follower)));
+  }
+
  private:
   hal::SimDevice m_simDevice;
   hal::SimDouble m_simThrottle;
   hal::SimBoolean m_simInverted;
 
   std::string m_deviceName;
+
+  std::vector<XRPMotor*> m_nonowningFollowers;
+  std::vector<std::unique_ptr<XRPMotor>> m_owningFollowers;
 
   static std::map<int, std::string> s_simDeviceMap;
   static std::set<int> s_registeredDevices;

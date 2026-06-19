@@ -28,6 +28,13 @@ void RomiMotor::SetThrottle(double throttle) {
   if (m_simSpeed) {
     m_simSpeed.Set(m_inverted ? -throttle : throttle);
   }
+  
+  for (auto& follower : m_nonowningFollowers) {
+    follower->SetThrottle(throttle);
+  }
+  for (auto& follower : m_owningFollowers) {
+    follower->SetThrottle(throttle);
+  }
 }
 
 double RomiMotor::GetThrottle() const {
@@ -52,6 +59,10 @@ void RomiMotor::Disable() {
 
 void RomiMotor::StopMotor() {
   SetThrottle(0.0);
+}
+
+void XRPMotor::AddFollower(XRPMotor& follower) {
+  m_nonowningFollowers.emplace_back(&follower);
 }
 
 std::string RomiMotor::GetDescription() const {
