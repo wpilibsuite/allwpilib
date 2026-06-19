@@ -16,7 +16,6 @@ _LIB_ARTIFACTS = {
 }
 # End auto-gen
 ################################################################################
->>>>>>> wpilibsuite/main
 
 http_archive(
     name = "mrclib_headers",
