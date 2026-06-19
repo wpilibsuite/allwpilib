@@ -1,0 +1,28 @@
+load("@rules_cc//cc:defs.bzl", "cc_import")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_import(
+    name = "libssh",
+    linkopts = select({
+        "@platforms//os:windows": [
+            "-DEFAULTLIB:Iphlpapi.lib",
+        ],
+        "//conditions:default": [],
+    }),
+    static_library = select({
+        "@rules_bzlmodrio_toolchains//conditions:linux_x86_64": "@libssh_linuxx86-64static//:static_libs",
+        "@rules_bzlmodrio_toolchains//conditions:linux_x86_64_debug": "@libssh_linuxx86-64staticdebug//:static_libs",
+        "@rules_bzlmodrio_toolchains//conditions:osx": "@libssh_osxuniversalstatic//:static_libs",
+        "@rules_bzlmodrio_toolchains//conditions:osx_debug": "@libssh_osxuniversalstaticdebug//:static_libs",
+        "@rules_bzlmodrio_toolchains//conditions:windows_arm64": "@libssh_windowsarm64static//:static_libs",
+        "@rules_bzlmodrio_toolchains//conditions:windows_arm64_debug": "@libssh_windowsarm64staticdebug//:static_libs",
+        "@rules_bzlmodrio_toolchains//conditions:windows_x86_64": "@libssh_windowsx86-64static//:static_libs",
+        "@rules_bzlmodrio_toolchains//conditions:windows_x86_64_debug": "@libssh_windowsx86-64staticdebug//:static_libs",
+        "@rules_bzlmodrio_toolchains//constraints/is_bookworm64:bookworm64": "@libssh_linuxarm64static//:static_libs",
+        "@rules_bzlmodrio_toolchains//constraints/is_bookworm64:bookworm64_debug": "@libssh_linuxarm64staticdebug//:static_libs",
+    }),
+    deps = [
+        "@libssh_headers//:headers",
+    ],
+)

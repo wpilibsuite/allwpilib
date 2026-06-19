@@ -1,6 +1,6 @@
 # validated: 2024-01-20 DS 92149efa11fa button/CommandGenericHID.java
 import threading
-from typing import ClassVar, Optional, final
+from typing import ClassVar, Optional, Union, final
 
 from wpilib import DriverStation, EventLoop, GenericHID
 
@@ -17,13 +17,17 @@ class CommandGenericHID:
     _hids: ClassVar[dict[int, "CommandGenericHID"]] = {}
     _hids_lock = threading.Lock()
 
-    def __init__(self, port: int):
+    def __init__(self, hid: Union[int, GenericHID]):
         """
         Construct an instance of a device.
 
-        :param port: The port on the Driver Station that the device is plugged into.
+        :param hid: The port on the Driver Station that the device is plugged into,
+                    or the GenericHID object to use for this command HID.
         """
-        self._hid = DriverStation.getGenericHID(port)
+        if isinstance(hid, int):
+            self._hid = DriverStation.getGenericHID(hid)
+        else:
+            self._hid = hid
 
     @classmethod
     def getCommandGenericHID(cls, port: int) -> "CommandGenericHID":

@@ -27,14 +27,16 @@ def copy_upstream_src(wpilib_root: Path):
         shutil.rmtree(third_party_root / d, ignore_errors=True)
 
     walk_cwd_and_copy_if(
-        lambda dp, f: has_prefix(dp, Path("googlemock/src"))
-        and f not in EXCLUDED_FILES,
+        lambda dp, f: (
+            has_prefix(dp, Path("googlemock/src")) and f not in EXCLUDED_FILES
+        ),
         third_party_root / "src",
     )
 
     walk_cwd_and_copy_if(
-        lambda dp, f: has_prefix(dp, Path("googletest/src"))
-        and f not in EXCLUDED_FILES,
+        lambda dp, f: (
+            has_prefix(dp, Path("googletest/src")) and f not in EXCLUDED_FILES
+        ),
         third_party_root / "src",
     )
 
