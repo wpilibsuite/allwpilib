@@ -21,7 +21,7 @@ using namespace wpi;
 
 static constexpr std::chrono::milliseconds UPDATE_PERIOD{230};
 
-static constexpr std::string_view CLEAR_DISPLAY = "\033[2J\033[H";
+static constexpr std::string_view CLEAR_DISPLAY = "\033[0m\033[2J\033[H";
 
 namespace {
 struct DriverStationDisplayStorage {

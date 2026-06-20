@@ -20,7 +20,7 @@ import org.wpilib.util.WPIUtilJNI;
  */
 public final class DriverStationDisplay {
   private static final long UPDATE_PERIOD_MICROS = 230_000L;
-  private static final String CLEAR_DISPLAY = "\033[2J\033[H";
+  private static final String CLEAR_DISPLAY = "\033[0m\033[2J\033[H";
 
   private static final Lock m_displayLock = new ReentrantLock();
   private static boolean rawMode;
