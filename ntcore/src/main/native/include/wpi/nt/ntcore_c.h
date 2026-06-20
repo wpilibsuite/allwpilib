@@ -1201,10 +1201,14 @@ void NT_SetServerMulti(NT_Inst inst, size_t count,
 
 /**
  * Sets server addresses and port for client (without restarting client).
- * Connects using the team-specific robot address for the specified team, USB
- * address, WiFi address, and matching SystemCore mDNS announcements.
- * The team-specific robot address is only added if the team string parses as
- * an integer in the range 0 to 25599 inclusive.
+ * Attempts connections to the following addresses in parallel:
+ * - 10.TE.AM.2
+ * - 172.26.0.1 on Windows, or 172.27.0.1 on other platforms (USB)
+ * - 172.30.0.1 (WiFi)
+ *
+ * It also connects using matching SystemCore mDNS announcements.
+ * The team-specific 10.TE.AM.2 address is only added if the team string
+ * parses as an integer in the range 0 to 25599 inclusive.
  *
  * @param inst        instance handle
  * @param team        team number string
@@ -1215,10 +1219,16 @@ void NT_SetServerTeam(NT_Inst inst, const struct WPI_String* team,
 
 /**
  * Sets server addresses and port for client (without restarting client).
- * Connects using fixed robot addresses (the team-specific 10.TE.AM.2 address,
- * USB, WiFi, and robot.local) and SystemCore mDNS announcements.
- * The team-specific robot address is only added if the team string parses as
- * an integer in the range 0 to 25599 inclusive.
+ * Attempts connections to the following static addresses and hostnames in
+ * parallel:
+ * - 10.TE.AM.2
+ * - 172.26.0.1 on Windows, or 172.27.0.1 on other platforms (USB)
+ * - 172.30.0.1 (WiFi)
+ * - robot.local
+ *
+ * It also connects using all SystemCore mDNS announcements.
+ * The team-specific 10.TE.AM.2 address is only added if the team string
+ * parses as an integer in the range 0 to 25599 inclusive.
  *
  * @param inst        instance handle
  * @param team        team number string

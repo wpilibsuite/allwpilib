@@ -1084,10 +1084,19 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   /**
    * Sets server addresses and port for client (without restarting client). Changes the port to the
-   * default port. Connects using the team-specific robot address for the specified team, USB
-   * address, WiFi address, and matching SystemCore mDNS announcements. The team-specific robot
-   * address is only added if the team string parses as an integer in the range 0 to 25599
-   * inclusive.
+   * default port.
+   *
+   * <p>Attempts connections to the following addresses in parallel:
+   *
+   * <ul>
+   *   <li>10.TE.AM.2
+   *   <li>172.26.0.1 on Windows, or 172.27.0.1 on other platforms (USB)
+   *   <li>172.30.0.1 (WiFi)
+   * </ul>
+   *
+   * <p>It also connects using matching SystemCore mDNS announcements. The team-specific
+   * 10.TE.AM.2 address is only added if the team string parses as an integer in the range 0
+   * to 25599 inclusive.
    *
    * @param team team number string
    */
@@ -1096,10 +1105,19 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   /**
-   * Sets server addresses and port for client (without restarting client). Connects using the
-   * team-specific robot address for the specified team, USB address, WiFi address, and matching
-   * SystemCore mDNS announcements. The team-specific robot address is only added if the team
-   * string parses as an integer in the range 0 to 25599 inclusive.
+   * Sets server addresses and port for client (without restarting client).
+   *
+   * <p>Attempts connections to the following addresses in parallel:
+   *
+   * <ul>
+   *   <li>10.TE.AM.2
+   *   <li>172.26.0.1 on Windows, or 172.27.0.1 on other platforms (USB)
+   *   <li>172.30.0.1 (WiFi)
+   * </ul>
+   *
+   * <p>It also connects using matching SystemCore mDNS announcements. The team-specific
+   * 10.TE.AM.2 address is only added if the team string parses as an integer in the range 0
+   * to 25599 inclusive.
    *
    * @param team team number string
    * @param port port to communicate over (0=default)
@@ -1110,9 +1128,20 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   /**
    * Sets server addresses and port for client (without restarting client). Changes the port to the
-   * default port. Connects using fixed robot addresses (the team-specific 10.TE.AM.2 address, USB,
-   * WiFi, and robot.local) and SystemCore mDNS announcements. The team-specific robot address is
-   * only added if the team string parses as an integer in the range 0 to 25599 inclusive.
+   * default port.
+   *
+   * <p>Attempts connections to the following static addresses and hostnames in parallel:
+   *
+   * <ul>
+   *   <li>10.TE.AM.2
+   *   <li>172.26.0.1 on Windows, or 172.27.0.1 on other platforms (USB)
+   *   <li>172.30.0.1 (WiFi)
+   *   <li>robot.local
+   * </ul>
+   *
+   * <p>It also connects using all SystemCore mDNS announcements. The team-specific
+   * 10.TE.AM.2 address is only added if the team string parses as an integer in the range 0
+   * to 25599 inclusive.
    *
    * @param team team number string
    */
@@ -1121,10 +1150,20 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   /**
-   * Sets server addresses and port for client (without restarting client). Connects using fixed
-   * robot addresses (the team-specific 10.TE.AM.2 address, USB, WiFi, and robot.local) and
-   * SystemCore mDNS announcements. The team-specific robot address is only added if the team
-   * string parses as an integer in the range 0 to 25599 inclusive.
+   * Sets server addresses and port for client (without restarting client).
+   *
+   * <p>Attempts connections to the following static addresses and hostnames in parallel:
+   *
+   * <ul>
+   *   <li>10.TE.AM.2
+   *   <li>172.26.0.1 on Windows, or 172.27.0.1 on other platforms (USB)
+   *   <li>172.30.0.1 (WiFi)
+   *   <li>robot.local
+   * </ul>
+   *
+   * <p>It also connects using all SystemCore mDNS announcements. The team-specific
+   * 10.TE.AM.2 address is only added if the team string parses as an integer in the range 0
+   * to 25599 inclusive.
    *
    * @param team team number string
    * @param port port to communicate over (0=default)
