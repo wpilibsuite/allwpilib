@@ -58,6 +58,28 @@ TEST(EventTest, WaitMultiple) {
   ASSERT_EQ(result2.size(), 0u);
 }
 
+TEST(SemaphoreTest, ReleaseHonorsMaximumCount) {
+  auto semaphore = wpi::util::MakeSemaphore(0, 2);
+
+  int prevCount = -1;
+  ASSERT_TRUE(wpi::util::ReleaseSemaphore(semaphore, 1, &prevCount));
+  EXPECT_EQ(prevCount, 0);
+  ASSERT_TRUE(wpi::util::ReleaseSemaphore(semaphore, 1, &prevCount));
+  EXPECT_EQ(prevCount, 1);
+  ASSERT_FALSE(wpi::util::ReleaseSemaphore(semaphore, 1, &prevCount));
+  EXPECT_EQ(prevCount, 2);
+
+  bool timedOut = true;
+  ASSERT_TRUE(wpi::util::WaitForObject(semaphore, 0, &timedOut));
+  EXPECT_FALSE(timedOut);
+  ASSERT_TRUE(wpi::util::WaitForObject(semaphore, 0, &timedOut));
+  EXPECT_FALSE(timedOut);
+  ASSERT_FALSE(wpi::util::WaitForObject(semaphore, 0, &timedOut));
+  EXPECT_TRUE(timedOut);
+
+  wpi::util::DestroySemaphore(semaphore);
+}
+
 TEST(SignalObjectTest, ConcurrentSetDifferentHandles) {
   constexpr int HANDLE_COUNT = 64;
   constexpr int SET_COUNT = 100;

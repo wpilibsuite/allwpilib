@@ -69,6 +69,7 @@ class SignalWaiter {
 
 struct State {
   int signaled{0};
+  int maxCount{0};
   bool autoReset{false};
   wpi::util::SmallVector<SignalWaiter*, 2> waiters;
 };
@@ -264,6 +265,7 @@ WPI_SemaphoreHandle wpi::util::MakeSemaphore(int initialCount,
   std::scoped_lock lock{shard.mutex};
   auto& state = shard.states[handle];
   state.signaled = initialCount;
+  state.maxCount = maximumCount;
   state.autoReset = true;
 
   return handle;
@@ -293,7 +295,6 @@ bool wpi::util::ReleaseSemaphore(WPI_SemaphoreHandle handle, int releaseCount,
   if (releaseCount <= 0) {
     return false;
   }
-  int index = handle & 0xffffff;
 
   ManagerGuard guard;
   if (!guard) {
@@ -307,18 +308,10 @@ bool wpi::util::ReleaseSemaphore(WPI_SemaphoreHandle handle, int releaseCount,
     return false;
   }
   auto& state = it->second;
-  int maxCount;
-  {
-    std::scoped_lock idsLock{manager.idsMutex};
-    if (static_cast<size_t>(index) >= manager.semaphoreIds.size()) {
-      return false;
-    }
-    maxCount = manager.semaphoreIds[index];
-  }
   if (prevCount) {
     *prevCount = state.signaled;
   }
-  if ((maxCount - state.signaled) < releaseCount) {
+  if ((state.maxCount - state.signaled) < releaseCount) {
     return false;
   }
   state.signaled += releaseCount;
