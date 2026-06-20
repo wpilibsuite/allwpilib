@@ -226,7 +226,7 @@ cc_test(
     tags = ["no-asan"],
     deps = [
         ":wpinet",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
         "//wpiutil:wpiutil-testlib",
     ],
 )
