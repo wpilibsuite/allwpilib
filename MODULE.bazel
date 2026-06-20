@@ -43,7 +43,7 @@ maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
     name = "maven",
     artifacts = [
-        "org.ejml:ejml-simple:0.44.0",
+        "org.ejml:ejml-java9module:0.45.2",
         "io.avaje:avaje-jsonb:3.14",
         "io.avaje:avaje-jsonb-generator:3.14",
         "us.hebi.quickbuf:quickbuf-runtime:1.4",
@@ -64,6 +64,7 @@ maven.install(
     repositories = [
         "https://repo1.maven.org/maven2",
         "https://frcmaven.wpi.edu/artifactory/release/",
+        "file:///home/sam/.m2/repository/",
     ],
 )
 use_repo(maven, "maven", "unpinned_maven")
