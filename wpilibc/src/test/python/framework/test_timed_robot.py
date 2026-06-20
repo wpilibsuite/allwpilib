@@ -11,7 +11,7 @@ from wpilib.simulation import (
     stepTiming,
     waitForProgramStart,
 )
-from hal._wpiHal import _RobotMode
+from hal import RobotMode
 
 _PERIOD = 0.02  # 20 ms
 
@@ -140,7 +140,7 @@ def test_autonomous_mode():
     waitForProgramStart()
 
     DriverStationSim.setEnabled(True)
-    DriverStationSim.setRobotMode(_RobotMode.AUTONOMOUS)
+    DriverStationSim.setRobotMode(RobotMode.AUTONOMOUS)
     DriverStationSim.notifyNewData()
 
     assert robot.simulation_init_count == 1
@@ -182,7 +182,7 @@ def test_teleop_mode():
     waitForProgramStart()
 
     DriverStationSim.setEnabled(True)
-    DriverStationSim.setRobotMode(_RobotMode.TELEOPERATED)
+    DriverStationSim.setRobotMode(RobotMode.TELEOPERATED)
     DriverStationSim.notifyNewData()
 
     assert robot.simulation_init_count == 1
@@ -219,7 +219,7 @@ def test_utility_mode():
     waitForProgramStart()
 
     DriverStationSim.setEnabled(True)
-    DriverStationSim.setRobotMode(_RobotMode.UTILITY)
+    DriverStationSim.setRobotMode(RobotMode.UTILITY)
     DriverStationSim.notifyNewData()
 
     assert robot.simulation_init_count == 1
@@ -268,7 +268,7 @@ def test_mode_change():
     assert robot.disabled_exit_count == 0
 
     DriverStationSim.setEnabled(True)
-    DriverStationSim.setRobotMode(_RobotMode.AUTONOMOUS)
+    DriverStationSim.setRobotMode(RobotMode.AUTONOMOUS)
     DriverStationSim.notifyNewData()
     stepTiming(_PERIOD)
 
@@ -279,7 +279,7 @@ def test_mode_change():
     assert robot.disabled_exit_count == 1
     assert robot.autonomous_exit_count == 0
 
-    DriverStationSim.setRobotMode(_RobotMode.TELEOPERATED)
+    DriverStationSim.setRobotMode(RobotMode.TELEOPERATED)
     DriverStationSim.notifyNewData()
     stepTiming(_PERIOD)
 
@@ -289,7 +289,7 @@ def test_mode_change():
     assert robot.autonomous_exit_count == 1
     assert robot.teleop_exit_count == 0
 
-    DriverStationSim.setRobotMode(_RobotMode.UTILITY)
+    DriverStationSim.setRobotMode(RobotMode.UTILITY)
     DriverStationSim.notifyNewData()
     stepTiming(_PERIOD)
 
