@@ -1,102 +1,67 @@
 import pytest
 
-from wpilib import GenericHID
-from wpilib.simulation import GenericHIDSim
+from wpilib import DriverStation, DriverStationBackend, GenericHID
+from wpilib.simulation import DriverStationSim, GenericHIDSim
+
 
 RumbleType = GenericHID.RumbleType
-_EPSILON = 0.0001
+RUMBLE_TYPES = (
+    RumbleType.LEFT_RUMBLE,
+    RumbleType.RIGHT_RUMBLE,
+    RumbleType.LEFT_TRIGGER_RUMBLE,
+    RumbleType.RIGHT_TRIGGER_RUMBLE,
+)
 
 
-def test_rumble_range(wpilib_state):
-    hid = GenericHID(0)
+@pytest.fixture(autouse=True)
+def reset_driver_station_sim():
+    DriverStationSim.resetData()
+    yield
+    DriverStationBackend.resetCachedHIDData()
+    DriverStationSim.resetData()
+
+
+def test_rumble_range() -> None:
+    hid = DriverStationBackend.constructGenericHID(0)
     sim = GenericHIDSim(0)
 
     for i in range(101):
-        value = i / 100.0
+        rumble_value = i / 100.0
 
-        hid.setRumble(RumbleType.LEFT_RUMBLE, value)
-        assert sim.getRumble(RumbleType.LEFT_RUMBLE) == pytest.approx(
-            value, abs=_EPSILON
-        )
-
-        hid.setRumble(RumbleType.RIGHT_RUMBLE, value)
-        assert sim.getRumble(RumbleType.RIGHT_RUMBLE) == pytest.approx(
-            value, abs=_EPSILON
-        )
-
-        hid.setRumble(RumbleType.LEFT_TRIGGER_RUMBLE, value)
-        assert sim.getRumble(RumbleType.LEFT_TRIGGER_RUMBLE) == pytest.approx(
-            value, abs=_EPSILON
-        )
-
-        hid.setRumble(RumbleType.RIGHT_TRIGGER_RUMBLE, value)
-        assert sim.getRumble(RumbleType.RIGHT_TRIGGER_RUMBLE) == pytest.approx(
-            value, abs=_EPSILON
-        )
+        for rumble_type in RUMBLE_TYPES:
+            hid.setRumble(rumble_type, rumble_value)
+            assert sim.getRumble(rumble_type) == pytest.approx(
+                rumble_value, abs=0.0001
+            )
 
 
-def test_rumble_types(wpilib_state):
-    hid = GenericHID(0)
+def test_rumble_types() -> None:
+    hid = DriverStationBackend.constructGenericHID(0)
     sim = GenericHIDSim(0)
 
-    # Make sure all are off
-    hid.setRumble(RumbleType.LEFT_RUMBLE, 0)
-    hid.setRumble(RumbleType.LEFT_TRIGGER_RUMBLE, 0)
-    hid.setRumble(RumbleType.RIGHT_RUMBLE, 0)
-    hid.setRumble(RumbleType.RIGHT_TRIGGER_RUMBLE, 0)
-    assert sim.getRumble(RumbleType.LEFT_RUMBLE) == pytest.approx(0, abs=_EPSILON)
-    assert sim.getRumble(RumbleType.LEFT_TRIGGER_RUMBLE) == pytest.approx(
-        0, abs=_EPSILON
-    )
-    assert sim.getRumble(RumbleType.RIGHT_RUMBLE) == pytest.approx(0, abs=_EPSILON)
-    assert sim.getRumble(RumbleType.RIGHT_TRIGGER_RUMBLE) == pytest.approx(
-        0, abs=_EPSILON
-    )
+    for rumble_type in RUMBLE_TYPES:
+        hid.setRumble(rumble_type, 0)
 
-    # Left only
-    hid.setRumble(RumbleType.LEFT_RUMBLE, 1)
-    assert sim.getRumble(RumbleType.LEFT_RUMBLE) == pytest.approx(1, abs=_EPSILON)
-    assert sim.getRumble(RumbleType.RIGHT_RUMBLE) == pytest.approx(0, abs=_EPSILON)
-    assert sim.getRumble(RumbleType.LEFT_TRIGGER_RUMBLE) == pytest.approx(
-        0, abs=_EPSILON
-    )
-    assert sim.getRumble(RumbleType.RIGHT_TRIGGER_RUMBLE) == pytest.approx(
-        0, abs=_EPSILON
-    )
-    hid.setRumble(RumbleType.LEFT_RUMBLE, 0)
+    for rumble_type in RUMBLE_TYPES:
+        assert sim.getRumble(rumble_type) == pytest.approx(0, abs=0.0001)
 
-    # Right only
-    hid.setRumble(RumbleType.RIGHT_RUMBLE, 1)
-    assert sim.getRumble(RumbleType.LEFT_RUMBLE) == pytest.approx(0, abs=_EPSILON)
-    assert sim.getRumble(RumbleType.RIGHT_RUMBLE) == pytest.approx(1, abs=_EPSILON)
-    assert sim.getRumble(RumbleType.LEFT_TRIGGER_RUMBLE) == pytest.approx(
-        0, abs=_EPSILON
-    )
-    assert sim.getRumble(RumbleType.RIGHT_TRIGGER_RUMBLE) == pytest.approx(
-        0, abs=_EPSILON
-    )
-    hid.setRumble(RumbleType.RIGHT_RUMBLE, 0)
+    for active_rumble_type in RUMBLE_TYPES:
+        hid.setRumble(active_rumble_type, 1)
 
-    # Left trigger only
-    hid.setRumble(RumbleType.LEFT_TRIGGER_RUMBLE, 1)
-    assert sim.getRumble(RumbleType.LEFT_RUMBLE) == pytest.approx(0, abs=_EPSILON)
-    assert sim.getRumble(RumbleType.RIGHT_RUMBLE) == pytest.approx(0, abs=_EPSILON)
-    assert sim.getRumble(RumbleType.LEFT_TRIGGER_RUMBLE) == pytest.approx(
-        1, abs=_EPSILON
-    )
-    assert sim.getRumble(RumbleType.RIGHT_TRIGGER_RUMBLE) == pytest.approx(
-        0, abs=_EPSILON
-    )
-    hid.setRumble(RumbleType.LEFT_TRIGGER_RUMBLE, 0)
+        for rumble_type in RUMBLE_TYPES:
+            expected = 1 if rumble_type == active_rumble_type else 0
+            assert sim.getRumble(rumble_type) == pytest.approx(
+                expected, abs=0.0001
+            )
 
-    # Right trigger only
-    hid.setRumble(RumbleType.RIGHT_TRIGGER_RUMBLE, 1)
-    assert sim.getRumble(RumbleType.LEFT_RUMBLE) == pytest.approx(0, abs=_EPSILON)
-    assert sim.getRumble(RumbleType.RIGHT_RUMBLE) == pytest.approx(0, abs=_EPSILON)
-    assert sim.getRumble(RumbleType.LEFT_TRIGGER_RUMBLE) == pytest.approx(
-        0, abs=_EPSILON
-    )
-    assert sim.getRumble(RumbleType.RIGHT_TRIGGER_RUMBLE) == pytest.approx(
-        1, abs=_EPSILON
-    )
-    hid.setRumble(RumbleType.RIGHT_TRIGGER_RUMBLE, 0)
+        hid.setRumble(active_rumble_type, 0)
+
+
+def test_cached_hid_data_reset() -> None:
+    DriverStation.getGenericHID(0)
+    DriverStation.getGamepad(0)
+
+    DriverStationBackend.resetCachedHIDData()
+
+    assert DriverStation.getGenericHID(0).getPort() == 0
+    assert DriverStation.getGamepad(0).getPort() == 0
