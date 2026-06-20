@@ -647,10 +647,11 @@ class VariableMatrix : public SleipnirBase {
     slp_assert(cols() == rhs.rows() && cols() == rhs.cols());
 
     for (int i = 0; i < rows(); ++i) {
+      VariableMatrix lhs_old_row = row(i);
       for (int j = 0; j < rhs.cols(); ++j) {
         Variable sum{Scalar(0)};
         for (int k = 0; k < cols(); ++k) {
-          sum += (*this)(i, k) * rhs(k, j);
+          sum += lhs_old_row[k] * rhs(k, j);
         }
         (*this)(i, j) = sum;
       }
@@ -665,7 +666,7 @@ class VariableMatrix : public SleipnirBase {
   /// @return Result of multiplication.
   VariableMatrix& operator*=(const ScalarLike auto& rhs) {
     for (int row = 0; row < rows(); ++row) {
-      for (int col = 0; col < rhs.cols(); ++col) {
+      for (int col = 0; col < cols(); ++col) {
         (*this)(row, col) *= rhs;
       }
     }
@@ -1686,11 +1687,11 @@ VariableMatrix<Scalar> gradient_tree(const ExpressionGraph<Scalar>& top_list,
     if (lhs != nullptr) {
       if (rhs != nullptr) {
         // Binary operator
-        lhs->adjoint_expr += node->grad_expr_l(lhs, rhs, node->adjoint_expr);
-        rhs->adjoint_expr += node->grad_expr_r(lhs, rhs, node->adjoint_expr);
+        lhs->adjoint_expr += node->grad_expr_l(lhs, rhs);
+        rhs->adjoint_expr += node->grad_expr_r(lhs, rhs);
       } else {
         // Unary operator
-        lhs->adjoint_expr += node->grad_expr_l(lhs, rhs, node->adjoint_expr);
+        lhs->adjoint_expr += node->grad_expr_l(lhs, rhs);
       }
     }
   }

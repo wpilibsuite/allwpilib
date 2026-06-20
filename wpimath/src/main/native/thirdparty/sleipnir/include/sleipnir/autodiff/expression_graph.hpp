@@ -133,11 +133,11 @@ void append_triplets(
     if (lhs != nullptr) {
       if (rhs != nullptr) {
         // Binary operator
-        lhs->adjoint += node->grad_l(lhs->val, rhs->val, node->adjoint);
-        rhs->adjoint += node->grad_r(lhs->val, rhs->val, node->adjoint);
+        lhs->adjoint += node->grad_l(lhs->val, rhs->val);
+        rhs->adjoint += node->grad_r(lhs->val, rhs->val);
       } else {
         // Unary operator
-        lhs->adjoint += node->grad_l(lhs->val, Scalar(0), node->adjoint);
+        lhs->adjoint += node->grad_l(lhs->val, Scalar(0));
       }
     }
   }
