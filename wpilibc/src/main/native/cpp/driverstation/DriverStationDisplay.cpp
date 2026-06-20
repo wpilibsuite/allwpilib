@@ -31,7 +31,7 @@ struct DriverStationDisplayStorage {
   std::vector<std::string> lines;
   std::string buffer;
 };
-}
+}  // namespace
 
 static DriverStationDisplayStorage& GetDisplayStorage() {
   static DriverStationDisplayStorage storage;

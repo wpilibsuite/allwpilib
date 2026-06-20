@@ -13,8 +13,8 @@ using namespace wpi::units::literals;
 
 namespace {
 constexpr std::array<int, 20> COLORS = {196, 202, 208, 214, 220, 226, 118,
-                                         46,  48,  51,  45,  39,  33,  27,
-                                         21,  57,  93,  129, 165, 201};
+                                        46,  48,  51,  45,  39,  33,  27,
+                                        21,  57,  93,  129, 165, 201};
 }  // namespace
 
 void DefaultTeleop::Start() {
