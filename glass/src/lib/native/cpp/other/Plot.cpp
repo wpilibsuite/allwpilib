@@ -15,8 +15,6 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
-
 #include "wpi/util/StringExtras.hpp"
 
 #if defined(__GNUC__)

@@ -28,6 +28,10 @@ bool PubSubOptionsMatcher::MatchAndExplain(
     *listener << "keepDuplicates mismatch ";
     match = false;
   }
+  if (val.disableSignal != good.disableSignal) {
+    *listener << "disableSignal mismatch ";
+    match = false;
+  }
   return match;
 }
 

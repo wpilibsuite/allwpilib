@@ -1,0 +1,76 @@
+[
+  {
+    "ClassName": "Xbox",
+    "HIDType": "XBOX_ONE",
+    "axes": {
+      "leftX": 0,
+      "leftY": 1,
+      "rightX": 2,
+      "rightY": 3,
+      "leftTrigger": 4,
+      "rightTrigger": 5
+    },
+    "buttons": {
+      "a": 0,
+      "b": 1,
+      "x": 2,
+      "y": 3,
+      "view": 4,
+      "xbox": 5,
+      "menu": 6,
+      "leftStick": 7,
+      "rightStick": 8,
+      "leftBumper": 9,
+      "rightBumper": 10,
+      "dpadUp": 11,
+      "dpadDown": 12,
+      "dpadLeft": 13,
+      "dpadRight": 14
+    },
+    "touchpads": 0,
+    "supports": {
+      "rumble": true,
+      "triggerRumble": true,
+      "monoLed": false,
+      "rgbLed": false
+    }
+  },
+  {
+    "ClassName": "DualSense",
+    "HIDType": "PS5",
+    "axes": {
+      "leftX": 0,
+      "leftY": 1,
+      "rightX": 2,
+      "rightY": 3,
+      "L2": 4,
+      "R2": 5
+    },
+    "buttons": {
+      "cross": 0,
+      "circle": 1,
+      "square": 2,
+      "triangle": 3,
+      "create": 4,
+      "PS": 5,
+      "options": 6,
+      "L3": 7,
+      "R3": 8,
+      "L1": 9,
+      "R1": 10,
+      "dpadUp": 11,
+      "dpadDown": 12,
+      "dpadLeft": 13,
+      "dpadRight": 14,
+      "microphone": 15,
+      "touchpad": 20
+    },
+    "touchpads": 1,
+    "supports": {
+      "rumble": true,
+      "triggerRumble": true,
+      "monoLed": false,
+      "rgbLed": true
+    }
+  }
+]

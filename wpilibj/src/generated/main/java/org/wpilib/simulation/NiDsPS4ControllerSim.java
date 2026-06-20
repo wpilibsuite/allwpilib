@@ -17,7 +17,7 @@ public class NiDsPS4ControllerSim extends GenericHIDSim {
    */
   @SuppressWarnings("this-escape")
   public NiDsPS4ControllerSim(NiDsPS4Controller joystick) {
-    super(joystick);
+    super(joystick.getHID());
     setAxesMaximumIndex(6);
     setButtonsMaximumIndex(14);
     setPOVsMaximumIndex(1);

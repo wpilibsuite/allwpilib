@@ -37,6 +37,17 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
+            class_name = "AddressableLEDBuffer",
+            yml_file = "semiwrap/AddressableLEDBuffer.yml",
+            header_root = "wpilibc/src/main/python/wpilib/src",
+            header_file = "wpilibc/src/main/python/wpilib/src/rpy/AddressableLEDBuffer.h",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::AddressableLEDBuffer", "wpi__AddressableLEDBuffer.hpp"),
+                ("wpi::AddressableLEDBuffer::View", "wpi__AddressableLEDBuffer__View.hpp"),
+            ],
+        ),
+        struct(
             class_name = "EdgeConfiguration",
             yml_file = "semiwrap/EdgeConfiguration.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -135,6 +146,16 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
+            class_name = "DriverStationDisplay",
+            yml_file = "semiwrap/DriverStationDisplay.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/DriverStationDisplay.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::DriverStationDisplay", "wpi__DriverStationDisplay.hpp"),
+            ],
+        ),
+        struct(
             class_name = "MatchState",
             yml_file = "semiwrap/MatchState.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -201,6 +222,16 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
+            class_name = "HIDDevice",
+            yml_file = "semiwrap/HIDDevice.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/HIDDevice.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::HIDDevice", "wpi__HIDDevice.hpp"),
+            ],
+        ),
+        struct(
             class_name = "Joystick",
             yml_file = "semiwrap/Joystick.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -208,6 +239,26 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::Joystick", "wpi__Joystick.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "DualSenseController",
+            yml_file = "semiwrap/DualSenseController.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/DualSenseController.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::DualSenseController", "wpi__DualSenseController.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "XboxController",
+            yml_file = "semiwrap/XboxController.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/XboxController.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::XboxController", "wpi__XboxController.hpp"),
             ],
         ),
         struct(
@@ -368,6 +419,14 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             trampolines = [
                 ("wpi::CAN", "wpi__CAN.hpp"),
             ],
+        ),
+        struct(
+            class_name = "CANBusMap",
+            yml_file = "semiwrap/CANBusMap.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/bus/CANBusMap.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
         ),
         struct(
             class_name = "I2C",
@@ -1419,6 +1478,26 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             ],
             trampolines = [
                 ("wpi::sim::LinearSystemSim", "wpi__sim__LinearSystemSim.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "DualSenseControllerSim",
+            yml_file = "semiwrap/simulation/DualSenseControllerSim.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/DualSenseControllerSim.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::sim::DualSenseControllerSim", "wpi__sim__DualSenseControllerSim.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "XboxControllerSim",
+            yml_file = "semiwrap/simulation/XboxControllerSim.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/XboxControllerSim.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::sim::XboxControllerSim", "wpi__sim__XboxControllerSim.hpp"),
             ],
         ),
         struct(

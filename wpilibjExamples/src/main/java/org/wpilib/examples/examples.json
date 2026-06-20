@@ -290,6 +290,30 @@
     "commandversion": 2
   },
   {
+    "name": "Driver Station Display Lines",
+    "description": "Display lines on the Driver Station display and update them every robot loop.",
+    "tags": [
+      "Basic Robot",
+      "Driver Station"
+    ],
+    "foldername": "driverstationdisplaylines",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Driver Station Display ANSI",
+    "description": "Stream ANSI text to the Driver Station display and update a value in place once per second.",
+    "tags": [
+      "Basic Robot",
+      "Driver Station"
+    ],
+    "foldername": "driverstationdisplayansi",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
     "name": "DriveDistanceOffboard",
     "description": "Drive a differential drivetrain a set distance using TrapezoidProfile and smart motor controller PID.",
     "tags": [

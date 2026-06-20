@@ -17,28 +17,32 @@ def copy_upstream_src(wpilib_root: Path):
         shutil.rmtree(wpical / d, ignore_errors=True)
 
     files = walk_cwd_and_copy_if(
-        lambda dp, f: (f.endswith(".h") or f.endswith(".hh"))
-        and not f == "heap.h"
-        and not f == "stereo-matching-libelas.h"
-        and not has_prefix(dp, Path("test")),
+        lambda dp, f: (
+            (f.endswith(".h") or f.endswith(".hh"))
+            and not f == "heap.h"
+            and not f == "stereo-matching-libelas.h"
+            and not has_prefix(dp, Path("test"))
+        ),
         wpical / "src/main/native/thirdparty/mrcal/include",
     )
     files = files + walk_cwd_and_copy_if(
         lambda dp, f: (
-            f.endswith(".c")
-            or f.endswith(".cc")
-            or f.endswith(".cpp")
-            or f.endswith(".pl")
-        )
-        and not f == "heap.cc"
-        and not f == "mrcal-pywrap.c"
-        and not f == "image.c"
-        and not f == "stereo.c"
-        and not f == "stereo-matching-libelas.cc"
-        and not f == "uncertainty.c"
-        and not f == "traverse-sensor-links.c"
-        and not has_prefix(dp, Path("doc"))
-        and not has_prefix(dp, Path("test")),
+            (
+                f.endswith(".c")
+                or f.endswith(".cc")
+                or f.endswith(".cpp")
+                or f.endswith(".pl")
+            )
+            and not f == "heap.cc"
+            and not f == "mrcal-pywrap.c"
+            and not f == "image.c"
+            and not f == "stereo.c"
+            and not f == "stereo-matching-libelas.cc"
+            and not f == "uncertainty.c"
+            and not f == "traverse-sensor-links.c"
+            and not has_prefix(dp, Path("doc"))
+            and not has_prefix(dp, Path("test"))
+        ),
         wpical / "src/main/native/thirdparty/mrcal/src",
     )
 

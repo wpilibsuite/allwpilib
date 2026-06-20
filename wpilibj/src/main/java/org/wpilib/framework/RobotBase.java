@@ -8,8 +8,6 @@ import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.RobotState;
-import org.wpilib.driverstation.UserControls;
-import org.wpilib.driverstation.UserControlsInstance;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.HALUtil;
@@ -18,6 +16,7 @@ import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.networktables.MultiSubscriber;
 import org.wpilib.networktables.NetworkTableEvent;
 import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.PubSubOption;
 import org.wpilib.system.RuntimeType;
 import org.wpilib.system.Timer;
 import org.wpilib.system.WPILibVersion;
@@ -105,7 +104,7 @@ public abstract class RobotBase implements AutoCloseable {
     setupCameraServerShared();
     setupMathShared();
     // subscribe to "" to force persistent values to propagate to local
-    m_suball = new MultiSubscriber(inst, new String[] {""});
+    m_suball = new MultiSubscriber(inst, new String[] {""}, PubSubOption.DISABLE_SIGNAL);
     if (!isSimulation()) {
       inst.startServer("/home/systemcore/networktables.json", "", "robot");
     } else {
@@ -291,32 +290,16 @@ public abstract class RobotBase implements AutoCloseable {
   private static boolean m_suppressExitWarning;
 
   private static <T extends RobotBase> T constructRobot(Class<T> robotClass) throws Throwable {
-    UserControlsInstance userControlsAttribute =
-        robotClass.getDeclaredAnnotation(UserControlsInstance.class);
-    UserControls userControlsInstance = null;
-    Optional<ConstructorMatch<T>> constructorMatch = Optional.empty();
-    if (userControlsAttribute != null) {
-      var userControlsClass = userControlsAttribute.value();
-      userControlsInstance = userControlsClass.getDeclaredConstructor().newInstance();
-      constructorMatch = ConstructorMatch.findBestConstructor(robotClass, userControlsClass);
-    }
-
-    if (constructorMatch.isEmpty()) {
-      // Try to find a constructor with no parameters if there is no UserControls constructor
-      constructorMatch = ConstructorMatch.findBestConstructor(robotClass);
-    }
+    Optional<ConstructorMatch<T>> constructorMatch =
+        ConstructorMatch.findBestConstructor(robotClass);
 
     if (constructorMatch.isEmpty()) {
       throw new IllegalArgumentException(
           "No valid constructor found in robot class " + robotClass.getName());
     }
 
-    T robot = constructorMatch.get().newInstance(userControlsInstance);
+    T robot = constructorMatch.get().newInstance();
 
-    if (userControlsInstance != null && robot instanceof OpModeRobot opModeRobot) {
-      // Insert the UserControls instance into the opModeRobot for use when constructing opmodes
-      opModeRobot.setUserControlsInstance(userControlsInstance);
-    }
     return robot;
   }
 

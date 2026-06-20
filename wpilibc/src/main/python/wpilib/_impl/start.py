@@ -166,7 +166,9 @@ class RobotStarter:
         inst = ntcore.NetworkTableInstance.getDefault()
 
         # subscribe to "" to force persistent values to progagate to local
-        msub = ntcore.MultiSubscriber(inst, [""])
+        msub = ntcore.MultiSubscriber(
+            inst, [""], ntcore.PubSubOptions(disableSignal=True)
+        )
 
         if not isSimulation:
             inst.startServer("/home/systemcore/networktables.json", "", "robot")
@@ -177,7 +179,7 @@ class RobotStarter:
         for i in range(100):
             if (
                 inst.getNetworkMode()
-                & ntcore.NetworkTableInstance.NetworkMode.kNetModeStarting
+                & ntcore.NetworkTableInstance.NetworkMode.STARTING.value
             ) == 0:
                 break
             # real sleep since we're waiting for the server, not simulated sleep

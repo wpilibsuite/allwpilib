@@ -8,14 +8,14 @@ Subject: [PATCH 10/10] Use operator() instead of multidimensional array
  include/sleipnir/autodiff/hessian.hpp         |   4 +-
  include/sleipnir/autodiff/jacobian.hpp        |   4 +-
  include/sleipnir/autodiff/variable.hpp        |   8 +-
- include/sleipnir/autodiff/variable_block.hpp  |  76 ++++-----
+ include/sleipnir/autodiff/variable_block.hpp  |  80 ++++-----
  include/sleipnir/autodiff/variable_matrix.hpp | 158 +++++++++---------
  include/sleipnir/optimization/ocp.hpp         |  14 +-
  include/sleipnir/optimization/problem.hpp     |   6 +-
- 7 files changed, 135 insertions(+), 135 deletions(-)
+ 7 files changed, 137 insertions(+), 137 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/hessian.hpp b/include/sleipnir/autodiff/hessian.hpp
-index d9d25a00251dd31e446bd0419f0c13e8f2456f2d..39cd798160ff272aeac4b12c92edee3f2a213a22 100644
+index 56100d882f9eafe2cdd4773e99a9166c21221ce8..ee42cd3fc2cdc9545f4dbfb1949a644620f30215 100644
 --- a/include/sleipnir/autodiff/hessian.hpp
 +++ b/include/sleipnir/autodiff/hessian.hpp
 @@ -111,9 +111,9 @@ class Hessian {
@@ -87,7 +87,7 @@ index 5f32d7ea16864ad9a4fdcc4b067ef7dff2e9027d..5d7b56de884cdb73fc9f08fcfa1982b2
    }
  
 diff --git a/include/sleipnir/autodiff/variable_block.hpp b/include/sleipnir/autodiff/variable_block.hpp
-index 4018606df45941b578c861caf934495f8c9e368e..cf554832b82adb17b4b1d7b56842a77d7bf629dc 100644
+index 55cafb5d48afff2dbdff07516d85759180ef74c7..9c9e9017487fb0fd19c584c58e5ba3c6c6cd3e7d 100644
 --- a/include/sleipnir/autodiff/variable_block.hpp
 +++ b/include/sleipnir/autodiff/variable_block.hpp
 @@ -49,7 +49,7 @@ class VariableBlock : public SleipnirBase {
@@ -279,7 +279,19 @@ index 4018606df45941b578c861caf934495f8c9e368e..cf554832b82adb17b4b1d7b56842a77d
                                              int row_slice_length,
                                              Slice col_slice,
                                              int col_slice_length) const {
-@@ -453,7 +453,7 @@ class VariableBlock : public SleipnirBase {
+@@ -438,9 +438,9 @@ class VariableBlock : public SleipnirBase {
+       for (int j = 0; j < rhs.cols(); ++j) {
+         Variable sum{Scalar(0)};
+         for (int k = 0; k < cols(); ++k) {
+-          sum += lhs_old_row[k] * rhs[k, j];
++          sum += lhs_old_row[k] * rhs(k, j);
+         }
+-        (*this)[i, j] = sum;
++        (*this)(i, j) = sum;
+       }
+     }
+ 
+@@ -454,7 +454,7 @@ class VariableBlock : public SleipnirBase {
    VariableBlock<Mat>& operator*=(const ScalarLike auto& rhs) {
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -288,7 +300,7 @@ index 4018606df45941b578c861caf934495f8c9e368e..cf554832b82adb17b4b1d7b56842a77d
        }
      }
  
-@@ -469,7 +469,7 @@ class VariableBlock : public SleipnirBase {
+@@ -470,7 +470,7 @@ class VariableBlock : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -297,7 +309,7 @@ index 4018606df45941b578c861caf934495f8c9e368e..cf554832b82adb17b4b1d7b56842a77d
        }
      }
  
-@@ -483,7 +483,7 @@ class VariableBlock : public SleipnirBase {
+@@ -484,7 +484,7 @@ class VariableBlock : public SleipnirBase {
    VariableBlock<Mat>& operator/=(const ScalarLike auto& rhs) {
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -306,7 +318,7 @@ index 4018606df45941b578c861caf934495f8c9e368e..cf554832b82adb17b4b1d7b56842a77d
        }
      }
  
-@@ -499,7 +499,7 @@ class VariableBlock : public SleipnirBase {
+@@ -500,7 +500,7 @@ class VariableBlock : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -315,7 +327,7 @@ index 4018606df45941b578c861caf934495f8c9e368e..cf554832b82adb17b4b1d7b56842a77d
        }
      }
  
-@@ -515,7 +515,7 @@ class VariableBlock : public SleipnirBase {
+@@ -516,7 +516,7 @@ class VariableBlock : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -324,7 +336,7 @@ index 4018606df45941b578c861caf934495f8c9e368e..cf554832b82adb17b4b1d7b56842a77d
        }
      }
  
-@@ -531,7 +531,7 @@ class VariableBlock : public SleipnirBase {
+@@ -532,7 +532,7 @@ class VariableBlock : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -333,7 +345,7 @@ index 4018606df45941b578c861caf934495f8c9e368e..cf554832b82adb17b4b1d7b56842a77d
        }
      }
  
-@@ -547,7 +547,7 @@ class VariableBlock : public SleipnirBase {
+@@ -548,7 +548,7 @@ class VariableBlock : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -342,7 +354,7 @@ index 4018606df45941b578c861caf934495f8c9e368e..cf554832b82adb17b4b1d7b56842a77d
        }
      }
  
-@@ -558,7 +558,7 @@ class VariableBlock : public SleipnirBase {
+@@ -559,7 +559,7 @@ class VariableBlock : public SleipnirBase {
    // NOLINTNEXTLINE (google-explicit-constructor)
    operator Variable<Scalar>() const {
      slp_assert(rows() == 1 && cols() == 1);
@@ -351,7 +363,7 @@ index 4018606df45941b578c861caf934495f8c9e368e..cf554832b82adb17b4b1d7b56842a77d
    }
  
    /// Returns the transpose of the variable matrix.
-@@ -569,7 +569,7 @@ class VariableBlock : public SleipnirBase {
+@@ -570,7 +570,7 @@ class VariableBlock : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -360,7 +372,7 @@ index 4018606df45941b578c861caf934495f8c9e368e..cf554832b82adb17b4b1d7b56842a77d
        }
      }
  
-@@ -591,7 +591,7 @@ class VariableBlock : public SleipnirBase {
+@@ -592,7 +592,7 @@ class VariableBlock : public SleipnirBase {
    /// @param row The row of the element to return.
    /// @param col The column of the element to return.
    /// @return An element of the variable matrix.
@@ -369,7 +381,7 @@ index 4018606df45941b578c861caf934495f8c9e368e..cf554832b82adb17b4b1d7b56842a77d
  
    /// Returns an element of the variable block.
    ///
-@@ -611,7 +611,7 @@ class VariableBlock : public SleipnirBase {
+@@ -612,7 +612,7 @@ class VariableBlock : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -378,7 +390,7 @@ index 4018606df45941b578c861caf934495f8c9e368e..cf554832b82adb17b4b1d7b56842a77d
        }
      }
  
-@@ -629,7 +629,7 @@ class VariableBlock : public SleipnirBase {
+@@ -630,7 +630,7 @@ class VariableBlock : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -388,7 +400,7 @@ index 4018606df45941b578c861caf934495f8c9e368e..cf554832b82adb17b4b1d7b56842a77d
      }
  
 diff --git a/include/sleipnir/autodiff/variable_matrix.hpp b/include/sleipnir/autodiff/variable_matrix.hpp
-index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c7449d109 100644
+index 284cfd3aafdee76e8623df402e9c1bdd90dab116..2f91d1714ccee8271c0186c877dd5f84720da692 100644
 --- a/include/sleipnir/autodiff/variable_matrix.hpp
 +++ b/include/sleipnir/autodiff/variable_matrix.hpp
 @@ -154,7 +154,7 @@ class VariableMatrix : public SleipnirBase {
@@ -571,28 +583,28 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -650,9 +650,9 @@ class VariableMatrix : public SleipnirBase {
+@@ -651,9 +651,9 @@ class VariableMatrix : public SleipnirBase {
        for (int j = 0; j < rhs.cols(); ++j) {
          Variable sum{Scalar(0)};
          for (int k = 0; k < cols(); ++k) {
--          sum += (*this)[i, k] * rhs[k, j];
-+          sum += (*this)(i, k) * rhs(k, j);
+-          sum += lhs_old_row[k] * rhs[k, j];
++          sum += lhs_old_row[k] * rhs(k, j);
          }
 -        (*this)[i, j] = sum;
 +        (*this)(i, j) = sum;
        }
      }
  
-@@ -666,7 +666,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -667,7 +667,7 @@ class VariableMatrix : public SleipnirBase {
    VariableMatrix& operator*=(const ScalarLike auto& rhs) {
      for (int row = 0; row < rows(); ++row) {
-       for (int col = 0; col < rhs.cols(); ++col) {
+       for (int col = 0; col < cols(); ++col) {
 -        (*this)[row, col] *= rhs;
 +        (*this)(row, col) *= rhs;
        }
      }
  
-@@ -685,7 +685,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -686,7 +686,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
        for (int col = 0; col < result.cols(); ++col) {
@@ -601,7 +613,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -704,7 +704,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -705,7 +705,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
        for (int col = 0; col < result.cols(); ++col) {
@@ -610,7 +622,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -723,7 +723,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -724,7 +724,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
        for (int col = 0; col < result.cols(); ++col) {
@@ -619,7 +631,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -737,7 +737,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -738,7 +738,7 @@ class VariableMatrix : public SleipnirBase {
    VariableMatrix& operator/=(const ScalarLike auto& rhs) {
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -628,7 +640,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -757,7 +757,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -758,7 +758,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
        for (int col = 0; col < result.cols(); ++col) {
@@ -637,7 +649,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -777,7 +777,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -778,7 +778,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
        for (int col = 0; col < result.cols(); ++col) {
@@ -646,7 +658,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -797,7 +797,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -798,7 +798,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
        for (int col = 0; col < result.cols(); ++col) {
@@ -655,7 +667,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -813,7 +813,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -814,7 +814,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -664,7 +676,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -829,7 +829,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -830,7 +830,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -673,7 +685,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -849,7 +849,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -850,7 +850,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
        for (int col = 0; col < result.cols(); ++col) {
@@ -682,7 +694,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -869,7 +869,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -870,7 +870,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
        for (int col = 0; col < result.cols(); ++col) {
@@ -691,7 +703,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -889,7 +889,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -890,7 +890,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
        for (int col = 0; col < result.cols(); ++col) {
@@ -700,7 +712,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -905,7 +905,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -906,7 +906,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -709,7 +721,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -921,7 +921,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -922,7 +922,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -718,7 +730,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -937,7 +937,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -938,7 +938,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
        for (int col = 0; col < result.cols(); ++col) {
@@ -727,7 +739,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -948,7 +948,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -949,7 +949,7 @@ class VariableMatrix : public SleipnirBase {
    // NOLINTNEXTLINE (google-explicit-constructor)
    operator Variable<Scalar>() const {
      slp_assert(rows() == 1 && cols() == 1);
@@ -736,7 +748,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
    }
  
    /// Returns the transpose of the variable matrix.
-@@ -959,7 +959,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -960,7 +960,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -745,7 +757,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -981,7 +981,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -982,7 +982,7 @@ class VariableMatrix : public SleipnirBase {
    /// @param row The row of the element to return.
    /// @param col The column of the element to return.
    /// @return An element of the variable matrix.
@@ -754,7 +766,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
  
    /// Returns an element of the variable matrix.
    ///
-@@ -998,7 +998,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -999,7 +999,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -763,7 +775,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -1016,7 +1016,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -1017,7 +1017,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -772,7 +784,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -1269,7 +1269,7 @@ VariableMatrix<Scalar> cwise_reduce(
+@@ -1270,7 +1270,7 @@ VariableMatrix<Scalar> cwise_reduce(
  
    for (int row = 0; row < lhs.rows(); ++row) {
      for (int col = 0; col < lhs.cols(); ++col) {
@@ -781,7 +793,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
      }
    }
  
-@@ -1402,17 +1402,17 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
+@@ -1403,17 +1403,17 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
  
    if (A.rows() == 1 && A.cols() == 1) {
      // Compute optimal inverse instead of using Eigen's general solver
@@ -804,7 +816,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
  
      VariableMatrix adj_A{{d, -b}, {-c, a}};
      auto det_A = a * d - b * c;
-@@ -1429,15 +1429,15 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
+@@ -1430,15 +1430,15 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
      //
      // https://www.wolframalpha.com/input?i=inverse+%7B%7Ba%2C+b%2C+c%7D%2C+%7Bd%2C+e%2C+f%7D%2C+%7Bg%2C+h%2C+i%7D%7D
  
@@ -829,7 +841,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
  
      auto ae = a * e;
      auto af = a * f;
-@@ -1477,22 +1477,22 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
+@@ -1478,22 +1478,22 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
      //
      // https://www.wolframalpha.com/input?i=inverse+%7B%7Ba%2C+b%2C+c%2C+d%7D%2C+%7Be%2C+f%2C+g%2C+h%7D%2C+%7Bi%2C+j%2C+k%2C+l%7D%2C+%7Bm%2C+n%2C+o%2C+p%7D%7D
  
@@ -868,7 +880,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
  
      auto afk = a * f * k;
      auto afl = a * f * l;
-@@ -1623,14 +1623,14 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
+@@ -1624,14 +1624,14 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
      MatrixXv eigen_A{A.rows(), A.cols()};
      for (int row = 0; row < A.rows(); ++row) {
        for (int col = 0; col < A.cols(); ++col) {
@@ -885,7 +897,7 @@ index 8b84a04780240cffb801e2c6f84e22c0e5246286..d82b90191f6fb3f30460fecb2653655c
        }
      }
  
-@@ -1639,7 +1639,7 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
+@@ -1640,7 +1640,7 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
      VariableMatrix<Scalar> X{detail::empty, A.cols(), B.cols()};
      for (int row = 0; row < X.rows(); ++row) {
        for (int col = 0; col < X.cols(); ++col) {

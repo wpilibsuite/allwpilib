@@ -6,7 +6,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <string>
 
+#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
@@ -21,8 +23,18 @@ static double ClampDeadband(double deadband) {
   return std::clamp(deadband, 0.0, std::nextafter(1.0, 0.0));
 }
 
-Gamepad::Gamepad(int port) : GenericHID(port) {
-  HAL_ReportUsage("HID", port, "Gamepad");
+Gamepad::Gamepad(int port) : Gamepad{DriverStation::GetGenericHID(port)} {}
+
+Gamepad::Gamepad(GenericHID& hid) : m_hid{&hid} {
+  HAL_ReportUsage("HID", hid.GetPort(), "Gamepad");
+}
+
+GenericHID& Gamepad::GetHID() {
+  return *m_hid;
+}
+
+const GenericHID& Gamepad::GetHID() const {
+  return *m_hid;
 }
 
 double Gamepad::GetLeftX() const {
@@ -57,7 +69,7 @@ void Gamepad::SetRightYDeadband(double deadband) {
   m_rightYDeadband = ClampDeadband(deadband);
 }
 
-double Gamepad::GetLeftTriggerAxis() const {
+double Gamepad::GetLeftTrigger() const {
   return wpi::math::ApplyDeadband(GetAxis(Axis::LEFT_TRIGGER),
                                   m_leftTriggerDeadband);
 }
@@ -76,7 +88,7 @@ BooleanEvent Gamepad::LeftTrigger(EventLoop* loop) const {
   return this->LeftTrigger(0.5, loop);
 }
 
-double Gamepad::GetRightTriggerAxis() const {
+double Gamepad::GetRightTrigger() const {
   return wpi::math::ApplyDeadband(GetAxis(Axis::RIGHT_TRIGGER),
                                   m_rightTriggerDeadband);
 }
@@ -512,44 +524,88 @@ BooleanEvent Gamepad::Misc6(EventLoop* loop) const {
 }
 
 bool Gamepad::GetButton(Button button) const {
-  return GetRawButton(static_cast<int>(button));
+  return m_hid->GetRawButton(static_cast<int>(button));
 }
 
 bool Gamepad::GetButtonPressed(Button button) {
-  return GetRawButtonPressed(static_cast<int>(button));
+  return m_hid->GetRawButtonPressed(static_cast<int>(button));
 }
 
 bool Gamepad::GetButtonReleased(Button button) {
-  return GetRawButtonReleased(static_cast<int>(button));
+  return m_hid->GetRawButtonReleased(static_cast<int>(button));
 }
 
 BooleanEvent Gamepad::ButtonEvent(Button button, EventLoop* loop) const {
-  return GenericHID::Button(static_cast<int>(button), loop);
+  return m_hid->Button(static_cast<int>(button), loop);
 }
 
 double Gamepad::GetAxis(Axis axis) const {
-  return GetRawAxis(static_cast<int>(axis));
+  return m_hid->GetRawAxis(static_cast<int>(axis));
 }
 
 BooleanEvent Gamepad::AxisLessThan(Axis axis, double threshold,
                                    EventLoop* loop) const {
-  return GenericHID::AxisLessThan(static_cast<int>(axis), threshold, loop);
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
 }
 
 BooleanEvent Gamepad::AxisGreaterThan(Axis axis, double threshold,
                                       EventLoop* loop) const {
-  return GenericHID::AxisGreaterThan(static_cast<int>(axis), threshold, loop);
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
+}
+
+int Gamepad::GetAxesAvailable() const {
+  return m_hid->GetAxesAvailable();
+}
+
+uint64_t Gamepad::GetButtonsAvailable() const {
+  return m_hid->GetButtonsAvailable();
+}
+
+bool Gamepad::IsConnected() const {
+  return m_hid->IsConnected();
+}
+
+GenericHID::HIDType Gamepad::GetGamepadType() const {
+  return m_hid->GetGamepadType();
+}
+
+GenericHID::SupportedOutputs Gamepad::GetSupportedOutputs() const {
+  return m_hid->GetSupportedOutputs();
+}
+
+std::string Gamepad::GetName() const {
+  return m_hid->GetName();
+}
+
+int Gamepad::GetPort() const {
+  return m_hid->GetPort();
+}
+
+void Gamepad::SetLeds(int r, int g, int b) {
+  m_hid->SetLeds(r, g, b);
+}
+
+void Gamepad::SetRumble(GenericHID::RumbleType type, double value) {
+  m_hid->SetRumble(type, value);
+}
+
+bool Gamepad::GetTouchpadFingerAvailable(int touchpad, int finger) const {
+  return m_hid->GetTouchpadFingerAvailable(touchpad, finger);
+}
+
+TouchpadFinger Gamepad::GetTouchpadFinger(int touchpad, int finger) const {
+  return m_hid->GetTouchpadFinger(touchpad, finger);
 }
 
 double Gamepad::GetAxisForSendable(Axis axis) const {
   return wpi::internal::DriverStationBackend::GetStickAxisIfAvailable(
-             GetPort(), static_cast<int>(axis))
+             m_hid->GetPort(), static_cast<int>(axis))
       .value_or(0.0);
 }
 
 bool Gamepad::GetButtonForSendable(Button button) const {
   return wpi::internal::DriverStationBackend::GetStickButtonIfAvailable(
-             GetPort(), static_cast<int>(button))
+             m_hid->GetPort(), static_cast<int>(button))
       .value_or(false);
 }
 
@@ -557,10 +613,10 @@ void Gamepad::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "Gamepad");
   builder.AddDoubleProperty(
-      "LeftTrigger Axis",
-      [this] { return GetAxisForSendable(Axis::LEFT_TRIGGER); }, nullptr);
+      "LeftTrigger", [this] { return GetAxisForSendable(Axis::LEFT_TRIGGER); },
+      nullptr);
   builder.AddDoubleProperty(
-      "RightTrigger Axis",
+      "RightTrigger",
       [this] { return GetAxisForSendable(Axis::RIGHT_TRIGGER); }, nullptr);
   builder.AddDoubleProperty(
       "LeftX", [this] { return GetAxisForSendable(Axis::LEFT_X); }, nullptr);

@@ -5,21 +5,14 @@ module(
 
 include("//docs:doxygen.MODULE.bazel")
 
+include("//shared/bazel/thirdparty/ceres:ceres.MODULE.bazel")
+
+include("//shared/bazel/thirdparty/libssh:libssh.MODULE.bazel")
+
 include("//shared/bazel/thirdparty/mrclib:mrclib.MODULE.bazel")
 
 bazel_dep(name = "apple_support", version = "2.0.0", repo_name = "build_bazel_apple_support")
-
-# TODO(austin): Upgrade when the patches land.
-# https://github.com/bazelbuild/rules_cc/pull/430
-# https://github.com/bazelbuild/rules_cc/pull/431
-# https://github.com/bazelbuild/rules_cc/pull/432
-bazel_dep(name = "rules_cc", version = "0.2.13")
-single_version_override(
-    module_name = "rules_cc",
-    patch_strip = 1,
-    patches = ["//:shared/bazel/patches/rules_cc_windows.patch"],
-)
-
+bazel_dep(name = "rules_cc", version = "0.2.17")
 bazel_dep(name = "rules_pkg", version = "1.1.0")
 bazel_dep(name = "bazel_features", version = "1.33.0")
 bazel_dep(name = "aspect_bazel_lib", version = "2.14.0")
@@ -55,8 +48,8 @@ maven.install(
     name = "maven",
     artifacts = [
         "org.ejml:ejml-simple:0.44.0",
-        "io.avaje:avaje-jsonb:3.11",
-        "io.avaje:avaje-jsonb-generator:3.11",
+        "io.avaje:avaje-jsonb:3.14",
+        "io.avaje:avaje-jsonb-generator:3.14",
         "us.hebi.quickbuf:quickbuf-runtime:1.4",
         "com.google.code.gson:gson:2.13.1",
         "org.wpilib.thirdparty.opencv:opencv-java:2027-4.13.0-1",
