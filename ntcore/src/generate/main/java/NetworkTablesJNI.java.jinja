@@ -947,6 +947,20 @@ public final class NetworkTablesJNI {
       int inst, String serviceName, String[] serverNames, int[] ports);
 
   /**
+   * Sets server addresses and ports for client (without restarting client). Connects using fixed
+   * server addresses and a NetworkTables server announced over mDNS with the specified service
+   * name.
+   *
+   * @param inst NT instance handle.
+   * @param serviceName mDNS service name
+   * @param mdnsPort mDNS port to communicate over (0=default)
+   * @param serverNames array of server names
+   * @param ports array of port numbers (0=default)
+   */
+  public static native void setServerMdns(
+      int inst, String serviceName, int mdnsPort, String[] serverNames, int[] ports);
+
+  /**
    * Sets server addresses and port for client (without restarting client).
    *
    * <p>Attempts connections to the following addresses in parallel:

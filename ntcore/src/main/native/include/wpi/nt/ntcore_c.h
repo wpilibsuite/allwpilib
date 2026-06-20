@@ -1240,7 +1240,8 @@ void NT_SetServerFixed(NT_Inst inst, const struct WPI_String* team,
 /**
  * Sets server address and port for client (without restarting client).
  * Connects using a NetworkTables server announced over mDNS with the specified
- * service name.
+ * service name.  The mDNS lookup is used only for the server address; the
+ * default NetworkTables port is used.
  *
  * @param inst          instance handle
  * @param service_name  mDNS service name
@@ -1250,7 +1251,8 @@ void NT_SetServerMdns(NT_Inst inst, const struct WPI_String* service_name);
 /**
  * Sets server addresses and ports for client (without restarting client).
  * Connects using fixed server addresses and a NetworkTables server announced
- * over mDNS with the specified service name.
+ * over mDNS with the specified service name.  The mDNS lookup is used only for
+ * the server address; the default NetworkTables port is used.
  *
  * @param inst          instance handle
  * @param service_name  mDNS service name
@@ -1262,6 +1264,26 @@ void NT_SetServerMdns(NT_Inst inst, const struct WPI_String* service_name);
 void NT_SetServerMdnsMulti(NT_Inst inst, const struct WPI_String* service_name,
                            size_t count, const struct WPI_String* server_names,
                            const unsigned int* ports);
+
+/**
+ * Sets server addresses and ports for client (without restarting client).
+ * Connects using fixed server addresses and a NetworkTables server announced
+ * over mDNS with the specified service name.  The mDNS lookup is used only for
+ * the server address; the specified mDNS port is used.
+ *
+ * @param inst          instance handle
+ * @param service_name  mDNS service name
+ * @param mdns_port     mDNS port to communicate over
+ * @param count         length of the server_names and ports arrays
+ * @param server_names  array of server names (each a UTF-8 string, null
+ *                      terminated)
+ * @param ports         array of ports to communicate over (one for each server)
+ */
+void NT_SetServerMdnsMultiPort(NT_Inst inst,
+                               const struct WPI_String* service_name,
+                               unsigned int mdns_port, size_t count,
+                               const struct WPI_String* server_names,
+                               const unsigned int* ports);
 
 /**
  * Disconnects the client if it's running and connected. This will automatically

@@ -152,7 +152,7 @@ void NetworkClientBase::DoSetServers(
     resolver->serviceType = wpi::util::trim(resolver->serviceType);
     resolver->serviceName = wpi::util::trim(resolver->serviceName);
     resolver->team = wpi::util::trim(resolver->team);
-    if (!resolver->useResolvedPort && resolver->port == 0) {
+    if (resolver->port == 0) {
       resolver->port = defaultPort;
     }
   }
@@ -205,13 +205,7 @@ void NetworkClientBase::ProcessResolverData(
     return;
   }
 
-  if (resolver.useResolvedPort && data.port <= 0) {
-    return;
-  }
-
-  unsigned int port = resolver.useResolvedPort
-                          ? static_cast<unsigned int>(data.port)
-                          : resolver.port;
+  unsigned int port = resolver.port;
   if (port == 0) {
     return;
   }

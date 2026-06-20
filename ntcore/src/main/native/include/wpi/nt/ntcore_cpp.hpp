@@ -1175,7 +1175,8 @@ void SetServerFixed(NT_Inst inst, std::string_view team, unsigned int port);
 /**
  * Sets server address and port for client (without restarting client).
  * Connects using a NetworkTables server announced over mDNS with the specified
- * service name.
+ * service name.  The mDNS lookup is used only for the server address; the
+ * default NetworkTables port is used.
  *
  * @param inst          instance handle
  * @param service_name  mDNS service name
@@ -1185,7 +1186,8 @@ void SetServerMdns(NT_Inst inst, std::string_view service_name);
 /**
  * Sets server address and port for client (without restarting client).
  * Connects using the fixed server address and a NetworkTables server announced
- * over mDNS with the specified service name.
+ * over mDNS with the specified service name.  The mDNS lookup is used only for
+ * the server address; the specified port is used.
  *
  * @param inst          instance handle
  * @param service_name  mDNS service name
@@ -1198,7 +1200,8 @@ void SetServerMdns(NT_Inst inst, std::string_view service_name,
 /**
  * Sets server addresses and ports for client (without restarting client).
  * Connects using fixed server addresses and a NetworkTables server announced
- * over mDNS with the specified service name.
+ * over mDNS with the specified service name.  The mDNS lookup is used only for
+ * the server address; the default NetworkTables port is used.
  *
  * @param inst          instance handle
  * @param service_name  mDNS service name
@@ -1206,6 +1209,21 @@ void SetServerMdns(NT_Inst inst, std::string_view service_name,
  */
 void SetServerMdns(
     NT_Inst inst, std::string_view service_name,
+    std::span<const std::pair<std::string_view, unsigned int>> servers);
+
+/**
+ * Sets server addresses and ports for client (without restarting client).
+ * Connects using fixed server addresses and a NetworkTables server announced
+ * over mDNS with the specified service name.  The mDNS lookup is used only for
+ * the server address; the specified mDNS port is used.
+ *
+ * @param inst          instance handle
+ * @param service_name  mDNS service name
+ * @param mdns_port     mDNS port to communicate over
+ * @param servers       array of server name and port pairs
+ */
+void SetServerMdns(
+    NT_Inst inst, std::string_view service_name, unsigned int mdns_port,
     std::span<const std::pair<std::string_view, unsigned int>> servers);
 
 /**

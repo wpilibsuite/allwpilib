@@ -595,6 +595,14 @@ void NT_SetServerMdns(NT_Inst inst, const struct WPI_String* service_name) {
 void NT_SetServerMdnsMulti(NT_Inst inst, const struct WPI_String* service_name,
                            size_t count, const struct WPI_String* server_names,
                            const unsigned int* ports) {
+  NT_SetServerMdnsMultiPort(inst, service_name, 0, count, server_names, ports);
+}
+
+void NT_SetServerMdnsMultiPort(NT_Inst inst,
+                               const struct WPI_String* service_name,
+                               unsigned int mdns_port, size_t count,
+                               const struct WPI_String* server_names,
+                               const unsigned int* ports) {
   std::vector<std::pair<std::string_view, unsigned int>> servers;
   servers.reserve(count);
   for (size_t i = 0; i < count; ++i) {
@@ -602,7 +610,7 @@ void NT_SetServerMdnsMulti(NT_Inst inst, const struct WPI_String* service_name,
         std::pair{wpi::util::to_string_view(&server_names[i]), ports[i]});
   }
   wpi::nt::SetServerMdns(inst, wpi::util::to_string_view(service_name),
-                         servers);
+                         mdns_port, servers);
 }
 
 void NT_Disconnect(NT_Inst inst) {

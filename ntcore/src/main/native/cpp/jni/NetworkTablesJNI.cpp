@@ -1389,6 +1389,58 @@ Java_org_wpilib_networktables_NetworkTablesJNI_setServerMdns__ILjava_lang_String
 
 /*
  * Class:     org_wpilib_networktables_NetworkTablesJNI
+ * Method:    setServerMdns
+ * Signature: (ILjava/lang/String;I[Ljava/lang/Object;[I)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_networktables_NetworkTablesJNI_setServerMdns__ILjava_lang_String_2I_3Ljava_lang_String_2_3I
+  (JNIEnv* env, jclass, jint inst, jstring serviceName, jint mdnsPort,
+   jobjectArray serverNames, jintArray ports)
+{
+  if (!serviceName) {
+    nullPointerEx.Throw(env, "serviceName cannot be null");
+    return;
+  }
+  if (!serverNames) {
+    nullPointerEx.Throw(env, "serverNames cannot be null");
+    return;
+  }
+  if (!ports) {
+    nullPointerEx.Throw(env, "ports cannot be null");
+    return;
+  }
+  int len = env->GetArrayLength(serverNames);
+  if (len != env->GetArrayLength(ports)) {
+    illegalArgEx.Throw(env,
+                       "serverNames and ports arrays must be the same size");
+    return;
+  }
+  JSpan<const jint> portInts{env, ports};
+  if (!portInts) {
+    return;
+  }
+
+  std::vector<std::string> names;
+  std::vector<std::pair<std::string_view, unsigned int>> servers;
+  names.reserve(len);
+  servers.reserve(len);
+  for (int i = 0; i < len; ++i) {
+    JLocal<jstring> elem{
+        env, static_cast<jstring>(env->GetObjectArrayElement(serverNames, i))};
+    if (!elem) {
+      nullPointerEx.Throw(env, "null string in serverNames");
+      return;
+    }
+    names.emplace_back(JStringRef{env, elem}.str());
+    servers.emplace_back(
+        std::pair{std::string_view{names.back()}, portInts[i]});
+  }
+  wpi::nt::SetServerMdns(inst, JStringRef{env, serviceName}.c_str(), mdnsPort,
+                         servers);
+}
+
+/*
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setServerTeam
  * Signature: (ILjava/lang/String;I)V
  */

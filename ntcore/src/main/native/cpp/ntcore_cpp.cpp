@@ -694,11 +694,11 @@ void SetServer(
 }
 
 static INetworkClient::ServerResolver MakeNetworkTablesResolver(
-    std::string_view service_name) {
+    std::string_view service_name, unsigned int port) {
   INetworkClient::ServerResolver resolver;
   resolver.serviceType = kNetworkTablesServiceType;
   resolver.serviceName = service_name;
-  resolver.useResolvedPort = true;
+  resolver.port = port;
   return resolver;
 }
 
@@ -800,11 +800,17 @@ void SetServerMdns(NT_Inst inst, std::string_view service_name) {
 
 void SetServerMdns(NT_Inst inst, std::string_view service_name,
                    std::string_view server_name, unsigned int port) {
-  SetServerMdns(inst, service_name, {{{server_name, port}}});
+  SetServerMdns(inst, service_name, port, {{{server_name, port}}});
 }
 
 void SetServerMdns(
     NT_Inst inst, std::string_view service_name,
+    std::span<const std::pair<std::string_view, unsigned int>> servers) {
+  SetServerMdns(inst, service_name, 0, servers);
+}
+
+void SetServerMdns(
+    NT_Inst inst, std::string_view service_name, unsigned int mdns_port,
     std::span<const std::pair<std::string_view, unsigned int>> servers) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     std::vector<std::pair<std::string, unsigned int>> serversCopy;
@@ -814,7 +820,7 @@ void SetServerMdns(
     }
 
     INetworkClient::ServerResolver resolver =
-        MakeNetworkTablesResolver(service_name);
+        MakeNetworkTablesResolver(service_name, mdns_port);
 
     ii->SetServers(serversCopy, resolver);
   }

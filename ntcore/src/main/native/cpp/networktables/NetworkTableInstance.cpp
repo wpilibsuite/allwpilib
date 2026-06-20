@@ -113,7 +113,7 @@ void NetworkTableInstance::SetServerMdns(
   for (const auto& server : servers) {
     serversArr.emplace_back(server, port);
   }
-  SetServerMdns(service_name, serversArr);
+  SetServerMdns(service_name, port, serversArr);
 }
 
 NT_Listener NetworkTableInstance::AddListener(Topic topic,

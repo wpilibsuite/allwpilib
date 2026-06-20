@@ -712,7 +712,8 @@ class NetworkTableInstance final {
   /**
    * Sets server address and port for client (without restarting client).
    * Connects using a NetworkTables server announced over mDNS with the
-   * specified service name.
+   * specified service name.  The mDNS lookup is used only for the server
+   * address; the default NetworkTables port is used.
    *
    * @param service_name mDNS service name
    */
@@ -723,7 +724,8 @@ class NetworkTableInstance final {
   /**
    * Sets server address and port for client (without restarting client).
    * Connects using the fixed server address and a NetworkTables server
-   * announced over mDNS with the specified service name.
+   * announced over mDNS with the specified service name.  The mDNS lookup is
+   * used only for the server address; the specified port is used.
    *
    * @param service_name mDNS service name
    * @param server_name  server name
@@ -737,7 +739,8 @@ class NetworkTableInstance final {
   /**
    * Sets server addresses and ports for client (without restarting client).
    * Connects using fixed server addresses and a NetworkTables server announced
-   * over mDNS with the specified service name.
+   * over mDNS with the specified service name.  The mDNS lookup is used only
+   * for the server address; the default NetworkTables port is used.
    *
    * @param service_name mDNS service name
    * @param servers      array of server address and port pairs
@@ -749,9 +752,26 @@ class NetworkTableInstance final {
   }
 
   /**
+   * Sets server addresses and ports for client (without restarting client).
+   * Connects using fixed server addresses and a NetworkTables server announced
+   * over mDNS with the specified service name.  The mDNS lookup is used only
+   * for the server address; the specified mDNS port is used.
+   *
+   * @param service_name mDNS service name
+   * @param mdns_port    mDNS port to communicate over (0 = default)
+   * @param servers      array of server address and port pairs
+   */
+  void SetServerMdns(
+      std::string_view service_name, unsigned int mdns_port,
+      std::span<const std::pair<std::string_view, unsigned int>> servers) {
+    ::wpi::nt::SetServerMdns(m_handle, service_name, mdns_port, servers);
+  }
+
+  /**
    * Sets server addresses and port for client (without restarting client).
    * Connects using fixed server addresses and a NetworkTables server announced
-   * over mDNS with the specified service name.
+   * over mDNS with the specified service name.  The mDNS lookup is used only
+   * for the server address; the specified port is used.
    *
    * @param service_name mDNS service name
    * @param servers      array of server names

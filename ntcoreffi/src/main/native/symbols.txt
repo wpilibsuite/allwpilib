@@ -201,6 +201,7 @@ NT_SetRaw
 NT_SetServer
 NT_SetServerMdns
 NT_SetServerMdnsMulti
+NT_SetServerMdnsMultiPort
 NT_SetServerFixed
 NT_SetServerMulti
 NT_SetServerTeam

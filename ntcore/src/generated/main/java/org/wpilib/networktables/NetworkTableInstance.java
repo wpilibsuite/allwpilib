@@ -1288,7 +1288,8 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   /**
    * Sets server address and port for client (without restarting client). Connects using a
-   * NetworkTables server announced over mDNS with the specified service name.
+   * NetworkTables server announced over mDNS with the specified service name. The mDNS lookup is
+   * used only for the server address; the default NetworkTables port is used.
    *
    * @param serviceName mDNS service name
    */
@@ -1299,7 +1300,8 @@ public final class NetworkTableInstance implements AutoCloseable {
   /**
    * Sets server address and port for client (without restarting client). Changes the port to the
    * default port. Connects using the fixed server address and a NetworkTables server announced over
-   * mDNS with the specified service name.
+   * mDNS with the specified service name. The mDNS lookup is used only for the server address; the
+   * default NetworkTables port is used.
    *
    * @param serviceName mDNS service name
    * @param serverName server name
@@ -1311,6 +1313,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   /**
    * Sets server address and port for client (without restarting client). Connects using the fixed
    * server address and a NetworkTables server announced over mDNS with the specified service name.
+   * The mDNS lookup is used only for the server address; the specified port is used.
    *
    * @param serviceName mDNS service name
    * @param serverName server name
@@ -1323,7 +1326,8 @@ public final class NetworkTableInstance implements AutoCloseable {
   /**
    * Sets server addresses and port for client (without restarting client). Changes the port to the
    * default port. Connects using fixed server addresses and a NetworkTables server announced over
-   * mDNS with the specified service name.
+   * mDNS with the specified service name. The mDNS lookup is used only for the server address; the
+   * default NetworkTables port is used.
    *
    * @param serviceName mDNS service name
    * @param serverNames array of server names
@@ -1335,7 +1339,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   /**
    * Sets server addresses and port for client (without restarting client). Connects using fixed
    * server addresses and a NetworkTables server announced over mDNS with the specified service
-   * name.
+   * name. The mDNS lookup is used only for the server address; the specified port is used.
    *
    * @param serviceName mDNS service name
    * @param serverNames array of server names
@@ -1346,20 +1350,37 @@ public final class NetworkTableInstance implements AutoCloseable {
     for (int i = 0; i < serverNames.length; i++) {
       ports[i] = port;
     }
-    setServerMdns(serviceName, serverNames, ports);
+    setServerMdns(serviceName, port, serverNames, ports);
   }
 
   /**
    * Sets server addresses and ports for client (without restarting client). Connects using fixed
    * server addresses and a NetworkTables server announced over mDNS with the specified service
-   * name.
+   * name. The mDNS lookup is used only for the server address; the default NetworkTables port is
+   * used.
    *
    * @param serviceName mDNS service name
    * @param serverNames array of server names
    * @param ports array of port numbers (0=default)
    */
   public void setServerMdns(String serviceName, String[] serverNames, int[] ports) {
-    NetworkTablesJNI.setServerMdns(m_handle, serviceName, serverNames, ports);
+    setServerMdns(serviceName, 0, serverNames, ports);
+  }
+
+  /**
+   * Sets server addresses and ports for client (without restarting client). Connects using fixed
+   * server addresses and a NetworkTables server announced over mDNS with the specified service
+   * name. The mDNS lookup is used only for the server address; the specified mDNS port is used.
+   *
+   * @param serviceName mDNS service name
+   * @param mdnsPort mDNS port to communicate over (0=default)
+   * @param serverNames array of server names
+   * @param ports array of port numbers (0=default)
+   */
+  public void setServerMdns(
+      String serviceName, int mdnsPort, String[] serverNames, int[] ports) {
+    NetworkTablesJNI.setServerMdns(
+        m_handle, serviceName, mdnsPort, serverNames, ports);
   }
 
   /**

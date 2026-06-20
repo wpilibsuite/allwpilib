@@ -21,7 +21,6 @@ class INetworkClient {
     bool requireTeam = false;
     std::string team;
     unsigned int port = 0;
-    bool useResolvedPort = false;
   };
 
   virtual ~INetworkClient() = default;
