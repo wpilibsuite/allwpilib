@@ -60,18 +60,18 @@ double XboxController::GetRightTrigger() const {
   return GetAxis(Axis::RIGHT_TRIGGER);
 }
 
-double XboxController::GetAxis(int axis) const {
-  return m_hid->GetRawAxis(axis);
+double XboxController::GetAxis(Axis axis) const {
+  return m_hid->GetRawAxis(static_cast<int>(axis));
 }
 
-BooleanEvent XboxController::AxisLessThan(int axis, double threshold,
+BooleanEvent XboxController::AxisLessThan(Axis axis, double threshold,
                                                      EventLoop* loop) const {
-  return m_hid->AxisLessThan(axis, threshold, loop);
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
 }
 
 BooleanEvent XboxController::AxisGreaterThan(
-    int axis, double threshold, EventLoop* loop) const {
-  return m_hid->AxisGreaterThan(axis, threshold, loop);
+    Axis axis, double threshold, EventLoop* loop) const {
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
 }
 
 bool XboxController::GetAButton() const {
@@ -314,21 +314,21 @@ BooleanEvent XboxController::DpadRight(EventLoop* loop) const {
   return ButtonEvent(Button::DPAD_RIGHT, loop);
 }
 
-bool XboxController::GetButton(int button) const {
-  return m_hid->GetRawButton(button);
+bool XboxController::GetButton(Button button) const {
+  return m_hid->GetRawButton(static_cast<int>(button));
 }
 
-bool XboxController::GetButtonPressed(int button) {
-  return m_hid->GetRawButtonPressed(button);
+bool XboxController::GetButtonPressed(Button button) {
+  return m_hid->GetRawButtonPressed(static_cast<int>(button));
 }
 
-bool XboxController::GetButtonReleased(int button) {
-  return m_hid->GetRawButtonReleased(button);
+bool XboxController::GetButtonReleased(Button button) {
+  return m_hid->GetRawButtonReleased(static_cast<int>(button));
 }
 
-BooleanEvent XboxController::ButtonEvent(int button,
+BooleanEvent XboxController::ButtonEvent(Button button,
                                                     EventLoop* loop) const {
-  return m_hid->Button(button, loop);
+  return m_hid->Button(static_cast<int>(button), loop);
 }
 
 void XboxController::SetLeds(int r, int g, int b) {

@@ -434,10 +434,11 @@ class VariableBlock : public SleipnirBase {
     slp_assert(cols() == rhs.rows() && cols() == rhs.cols());
 
     for (int i = 0; i < rows(); ++i) {
+      Mat lhs_old_row = row(i);
       for (int j = 0; j < rhs.cols(); ++j) {
         Variable sum{Scalar(0)};
         for (int k = 0; k < cols(); ++k) {
-          sum += (*this)(i, k) * rhs(k, j);
+          sum += lhs_old_row[k] * rhs(k, j);
         }
         (*this)(i, j) = sum;
       }
