@@ -160,7 +160,7 @@ class MrcLibDsSimImpl : public MrcLibDs {
 
   int32_t getSystemTimeValid(bool* systemTimeValid) override;
 
-  int32_t writeAnsi(const struct WPI_String* line) override;
+  int32_t writeDisplayAnsi(const struct WPI_String* line) override;
 
   wpi::util::EventVector newDataEvents;
 
@@ -508,7 +508,7 @@ int32_t MrcLibDsSimImpl::getSystemTimeValid(bool* systemTimeValid) {
   return 0;
 }
 
-int32_t MrcLibDsSimImpl::writeAnsi(const struct WPI_String* line) {
+int32_t MrcLibDsSimImpl::writeDisplayAnsi(const struct WPI_String* line) {
   return 0;
 }
 

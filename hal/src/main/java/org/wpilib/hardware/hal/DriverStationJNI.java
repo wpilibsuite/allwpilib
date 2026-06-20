@@ -350,9 +350,9 @@ public class DriverStationJNI extends JNIWrapper {
    * Writes ANSI text to the display.
    *
    * @param data the ANSI text to write
-   * @see "HAL_WriteDisplayAnsiText"
+   * @see "HAL_WriteDisplayAnsi"
    */
-  public static native void writeDisplayAnsiText(String data);
+  public static native void writeDisplayAnsi(String data);
 
   /** Utility class. */
   private DriverStationJNI() {}

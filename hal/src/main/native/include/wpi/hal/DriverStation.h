@@ -320,7 +320,7 @@ void HAL_ObserveUserProgram(HAL_ControlWord word);
  *
  * @param data the ANSI text to write
  */
-void HAL_WriteDisplayAnsiText(const struct WPI_String* data);
+void HAL_WriteDisplayAnsi(const struct WPI_String* data);
 
 #ifdef __cplusplus
 }  // extern "C"

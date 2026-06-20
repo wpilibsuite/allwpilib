@@ -58,7 +58,7 @@ public final class DriverStationDisplay {
         }
         case RawAnsi -> {
           rawMode = true;
-          DriverStationJNI.writeDisplayAnsiText(CLEAR_DISPLAY);
+          DriverStationJNI.writeDisplayAnsi(CLEAR_DISPLAY);
         }
         default -> throw new IllegalArgumentException("Unknown display mode: " + mode);
       }
@@ -178,7 +178,7 @@ public final class DriverStationDisplay {
         builder.append(line).append("\033[0m\n");
       }
 
-      DriverStationJNI.writeDisplayAnsiText(builder.toString());
+      DriverStationJNI.writeDisplayAnsi(builder.toString());
 
       lineMap.clear();
       lines.clear();
@@ -194,11 +194,11 @@ public final class DriverStationDisplay {
    *
    * @param data ANSI text to write.
    */
-  public static void writeRawAnsiText(String data) {
+  public static void writeRawAnsi(String data) {
     m_displayLock.lock();
     try {
       if (rawMode) {
-        DriverStationJNI.writeDisplayAnsiText(nonNull(data));
+        DriverStationJNI.writeDisplayAnsi(nonNull(data));
       }
     } finally {
       m_displayLock.unlock();
@@ -214,7 +214,7 @@ public final class DriverStationDisplay {
     m_displayLock.lock();
     try {
       if (rawMode) {
-        DriverStationJNI.writeDisplayAnsiText(CLEAR_DISPLAY);
+        DriverStationJNI.writeDisplayAnsi(CLEAR_DISPLAY);
       }
     } finally {
       m_displayLock.unlock();

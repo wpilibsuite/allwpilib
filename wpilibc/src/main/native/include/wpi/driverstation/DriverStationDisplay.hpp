@@ -73,7 +73,7 @@ class DriverStationDisplay final {
    *
    * @param data ANSI text to write.
    */
-  static void WriteRawAnsiText(std::string_view data);
+  static void WriteRawAnsi(std::string_view data);
 
   /**
    * Clears the display in raw ANSI mode.

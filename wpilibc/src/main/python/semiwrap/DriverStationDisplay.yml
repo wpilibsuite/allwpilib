@@ -7,5 +7,5 @@ classes:
       AddData:
       AddLine:
       UpdateLines:
-      WriteRawAnsiText:
+      WriteRawAnsi:
       ClearRaw:

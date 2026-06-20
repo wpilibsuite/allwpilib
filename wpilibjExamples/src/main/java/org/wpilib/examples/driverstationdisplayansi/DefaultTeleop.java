@@ -27,7 +27,7 @@ public class DefaultTeleop extends PeriodicOpMode {
     timer.restart();
     seconds = 0;
 
-    DriverStationDisplay.writeRawAnsiText(
+    DriverStationDisplay.writeRawAnsi(
         "\033[2J\033[H"
             + "DriverStationDisplay ANSI mode\n"
             + "This header and footer stay on screen.\n"
@@ -47,7 +47,7 @@ public class DefaultTeleop extends PeriodicOpMode {
 
   private void updateSecondsDisplay() {
     int color = COLORS[seconds % COLORS.length];
-    DriverStationDisplay.writeRawAnsiText(
+    DriverStationDisplay.writeRawAnsi(
         String.format("\033[3;18H\033[38;5;%dm%5d\033[0m", color, seconds));
   }
 }

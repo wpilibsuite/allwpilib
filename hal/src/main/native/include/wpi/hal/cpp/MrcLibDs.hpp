@@ -104,7 +104,7 @@ class MrcLibDs {
    * @param line the ANSI text to write
    * @return 0 on success, non-zero on error
    */
-  virtual int32_t writeAnsi(const struct WPI_String* line) = 0;
+  virtual int32_t writeDisplayAnsi(const struct WPI_String* line) = 0;
 };
 
 MrcLibDs* GetMrcLibDs();

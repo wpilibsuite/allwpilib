@@ -22,7 +22,7 @@ void DefaultTeleop::Start() {
   m_timer.Restart();
   m_seconds = 0;
 
-  wpi::DriverStationDisplay::WriteRawAnsiText(
+  wpi::DriverStationDisplay::WriteRawAnsi(
       "\033[2J\033[H"
       "DriverStationDisplay ANSI mode\n"
       "This header and footer stay on screen.\n"
@@ -43,5 +43,5 @@ void DefaultTeleop::UpdateSecondsDisplay() {
   std::array<char, 64> buffer;
   std::snprintf(buffer.data(), buffer.size(),
                 "\033[3;18H\033[38;5;%dm%5d\033[0m", color, m_seconds);
-  wpi::DriverStationDisplay::WriteRawAnsiText(buffer.data());
+  wpi::DriverStationDisplay::WriteRawAnsi(buffer.data());
 }

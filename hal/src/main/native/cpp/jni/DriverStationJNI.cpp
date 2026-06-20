@@ -447,16 +447,16 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_getOutputsActive
 
 /*
  * Class:     org_wpilib_hardware_hal_DriverStationJNI
- * Method:    writeDisplayAnsiText
+ * Method:    writeDisplayAnsi
  * Signature: (Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_DriverStationJNI_writeDisplayAnsiText
+Java_org_wpilib_hardware_hal_DriverStationJNI_writeDisplayAnsi
   (JNIEnv* env, jclass, jstring data)
 {
   JStringRef dataStr{env, data};
   WPI_String dataWpiStr = dataStr.wpi_str();
-  HAL_WriteDisplayAnsiText(&dataWpiStr);
+  HAL_WriteDisplayAnsi(&dataWpiStr);
 }
 
 }  // extern "C"

@@ -280,8 +280,8 @@ HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
   return systemTimeValid;
 }
 
-void HAL_WriteDisplayAnsiText(const struct WPI_String* data) {
-  mrcLibDs->writeAnsi(data);
+void HAL_WriteDisplayAnsi(const struct WPI_String* data) {
+  mrcLibDs->writeDisplayAnsi(data);
 }
 
 }  // extern "C"

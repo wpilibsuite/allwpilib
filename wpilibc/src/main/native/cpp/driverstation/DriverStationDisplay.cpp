@@ -38,9 +38,9 @@ static DriverStationDisplayStorage& GetDisplayStorage() {
   return storage;
 }
 
-static void WriteAnsiText(std::string_view data) {
+static void WriteDisplayAnsiToHal(std::string_view data) {
   WPI_String dataWpiStr = wpi::util::make_string(data);
-  HAL_WriteDisplayAnsiText(&dataWpiStr);
+  HAL_WriteDisplayAnsi(&dataWpiStr);
 }
 
 void DriverStationDisplay::SetMode(Mode mode) {
@@ -55,7 +55,7 @@ void DriverStationDisplay::SetMode(Mode mode) {
       break;
     case Mode::RawAnsi:
       storage.rawMode = true;
-      WriteAnsiText(CLEAR_DISPLAY);
+      WriteDisplayAnsiToHal(CLEAR_DISPLAY);
       break;
   }
 }
@@ -123,26 +123,26 @@ void DriverStationDisplay::UpdateLines() {
   }
 
   WPI_String wpiBuffer = wpi::util::make_string(storage.buffer);
-  HAL_WriteDisplayAnsiText(&wpiBuffer);
+  HAL_WriteDisplayAnsi(&wpiBuffer);
 
   storage.lineMap.clear();
   storage.lines.clear();
 }
 
-void DriverStationDisplay::WriteRawAnsiText(std::string_view data) {
+void DriverStationDisplay::WriteRawAnsi(std::string_view data) {
   auto& storage = GetDisplayStorage();
   std::scoped_lock lock(storage.mutex);
   if (!storage.rawMode) {
     return;
   }
 
-  WriteAnsiText(data);
+  WriteDisplayAnsiToHal(data);
 }
 
 void DriverStationDisplay::ClearRaw() {
   auto& storage = GetDisplayStorage();
   std::scoped_lock lock(storage.mutex);
   if (storage.rawMode) {
-    WriteAnsiText(CLEAR_DISPLAY);
+    WriteDisplayAnsiToHal(CLEAR_DISPLAY);
   }
 }
