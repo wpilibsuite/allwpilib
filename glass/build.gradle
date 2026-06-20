@@ -7,6 +7,7 @@ if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsyst
 description = "A different kind of dashboard"
 
 apply plugin: 'cpp'
+apply plugin: 'google-test-test-suite'
 apply plugin: 'visual-studio'
 apply plugin: 'org.wpilib.NativeUtils'
 
@@ -16,10 +17,13 @@ if (OperatingSystem.current().isWindows()) {
 
 ext {
     nativeName = 'glass'
+    staticGtestConfigs = [:]
 }
+staticGtestConfigs["${nativeName}Catch2Test"] = []
 
 apply from: "${rootDir}/shared/resources.gradle"
 apply from: "${rootDir}/shared/config.gradle"
+apply from: "${rootDir}/shared/catch2.gradle"
 
 def wpilibVersionFileInput = file("src/app/generate/WPILibVersion.cpp.in")
 def wpilibVersionFileOutput = file("$buildDir/generated/app/cpp/WPILibVersion.cpp")
@@ -60,6 +64,7 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
 }
 
 def generateTask = createGenerateResourcesTask('app', 'GLASS', 'wpi::glass', project)
+def mrccommIncludeDir = file('src/lib/native/thirdparty/mrccomm/include').absolutePath
 
 project(':').libraryBuild.dependsOn build
 tasks.withType(CppCompile) {
@@ -77,7 +82,7 @@ model {
         "${nativeName}"(NativeLibrarySpec) {
             sources.cpp {
                 source {
-                    srcDirs 'src/lib/native/cpp'
+                    srcDirs 'src/lib/native/cpp', 'src/lib/native/thirdparty/mrccomm/src'
                     include '**/*.cpp'
                 }
                 exportedHeaders {
@@ -92,6 +97,12 @@ model {
                 if (it instanceof SharedLibraryBinarySpec) {
                     it.buildable = false
                     return
+                }
+
+                if (it.targetPlatform.operatingSystem.isWindows()) {
+                    it.cppCompiler.args.add("/I${mrccommIncludeDir}")
+                } else {
+                    it.cppCompiler.args.add("-I${mrccommIncludeDir}")
                 }
 
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -180,6 +191,47 @@ model {
                         it.linker.args << '-lGL'
                     }
                 }
+            }
+        }
+    }
+    testSuites {
+        "${nativeName}Catch2Test"(GoogleTestTestSuiteSpec) {
+            for (NativeComponentSpec c : $.components) {
+                if (c.name == nativeName) {
+                    testing c
+                    break
+                }
+            }
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/test/native/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/test/native/include',
+                                'src/lib/native/include'
+                    }
+                }
+            }
+        }
+    }
+    binaries {
+        withType(GoogleTestTestSuiteBinarySpec) {
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                it.buildable = false
+                return
+            }
+            lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
+            lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+            lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+            lib project: ':fields', library: 'fields', linkage: 'static'
+            lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            if (it.targetPlatform.operatingSystem.isWindows()) {
+                it.cppCompiler.args.add("/I${mrccommIncludeDir}")
+            } else {
+                it.cppCompiler.args.add("-I${mrccommIncludeDir}")
             }
         }
     }
