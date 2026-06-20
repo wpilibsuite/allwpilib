@@ -9,7 +9,7 @@ Subject: [PATCH 02/10] Use wpi::SmallVector
  2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/expression.hpp b/include/sleipnir/autodiff/expression.hpp
-index f04967c6a84ea76b77cebb7ef8edcb798d03e2a5..361c74702107eadf6f1fbe1682a7ef296abd19a3 100644
+index 1e0a57bd78bdd6a41d87539c1e4536aed8bfc42d..8b1c520934580ccc94d0a7e46ab500e6bdd65207 100644
 --- a/include/sleipnir/autodiff/expression.hpp
 +++ b/include/sleipnir/autodiff/expression.hpp
 @@ -34,7 +34,7 @@ struct Expression;
@@ -21,7 +21,7 @@ index f04967c6a84ea76b77cebb7ef8edcb798d03e2a5..361c74702107eadf6f1fbe1682a7ef29
  
  /// Typedef for intrusive shared pointer to Expression.
  ///
-@@ -749,7 +749,7 @@ constexpr void inc_ref_count(Expression<Scalar>* expr) {
+@@ -727,7 +727,7 @@ constexpr void inc_ref_count(Expression<Scalar>* expr) {
  /// @tparam Scalar Scalar type.
  /// @param expr The shared pointer's managed object.
  template <typename Scalar>
