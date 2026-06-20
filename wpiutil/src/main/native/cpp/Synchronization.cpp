@@ -416,6 +416,9 @@ std::span<WPI_Handle> wpi::util::WaitForObjects(
       timedOutVal = true;
     }
     locks = LockStateShards(manager, shardIndices);
+    if (timedOutVal) {
+      break;
+    }
 
     if (gActive.load(std::memory_order_acquire) < 0) {
       // shutting down
