@@ -5,7 +5,6 @@
 #include "wpi/driverstation/DriverStationDisplay.hpp"
 
 #include <cctype>
-#include <chrono>
 #include <cstdint>
 #include <string>
 #include <string_view>
