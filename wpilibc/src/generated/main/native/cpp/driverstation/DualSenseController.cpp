@@ -60,18 +60,18 @@ double DualSenseController::GetR2() const {
   return GetAxis(Axis::R2);
 }
 
-double DualSenseController::GetAxis(int axis) const {
-  return m_hid->GetRawAxis(axis);
+double DualSenseController::GetAxis(Axis axis) const {
+  return m_hid->GetRawAxis(static_cast<int>(axis));
 }
 
-BooleanEvent DualSenseController::AxisLessThan(int axis, double threshold,
+BooleanEvent DualSenseController::AxisLessThan(Axis axis, double threshold,
                                                      EventLoop* loop) const {
-  return m_hid->AxisLessThan(axis, threshold, loop);
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
 }
 
 BooleanEvent DualSenseController::AxisGreaterThan(
-    int axis, double threshold, EventLoop* loop) const {
-  return m_hid->AxisGreaterThan(axis, threshold, loop);
+    Axis axis, double threshold, EventLoop* loop) const {
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
 }
 
 bool DualSenseController::GetCrossButton() const {
@@ -346,21 +346,21 @@ BooleanEvent DualSenseController::Touchpad(EventLoop* loop) const {
   return ButtonEvent(Button::TOUCHPAD, loop);
 }
 
-bool DualSenseController::GetButton(int button) const {
-  return m_hid->GetRawButton(button);
+bool DualSenseController::GetButton(Button button) const {
+  return m_hid->GetRawButton(static_cast<int>(button));
 }
 
-bool DualSenseController::GetButtonPressed(int button) {
-  return m_hid->GetRawButtonPressed(button);
+bool DualSenseController::GetButtonPressed(Button button) {
+  return m_hid->GetRawButtonPressed(static_cast<int>(button));
 }
 
-bool DualSenseController::GetButtonReleased(int button) {
-  return m_hid->GetRawButtonReleased(button);
+bool DualSenseController::GetButtonReleased(Button button) {
+  return m_hid->GetRawButtonReleased(static_cast<int>(button));
 }
 
-BooleanEvent DualSenseController::ButtonEvent(int button,
+BooleanEvent DualSenseController::ButtonEvent(Button button,
                                                     EventLoop* loop) const {
-  return m_hid->Button(button, loop);
+  return m_hid->Button(static_cast<int>(button), loop);
 }
 
 void DualSenseController::SetLeds(int r, int g, int b) {

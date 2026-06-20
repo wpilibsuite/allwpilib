@@ -9,7 +9,7 @@
 #include <memory>
 
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
-#include "wpi/hal/DriverStationTypes.h"
+#include "wpi/hal/DriverStationTypes.hpp"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/simulation/CallbackStore.hpp"
 
@@ -91,14 +91,14 @@ class DriverStationSim {
    *
    * @return robot mode
    */
-  static HAL_RobotMode GetRobotMode();
+  static hal::RobotMode GetRobotMode();
 
   /**
    * Change the robot mode set by the DS.
    *
    * @param robotMode the new value
    */
-  static void SetRobotMode(HAL_RobotMode robotMode);
+  static void SetRobotMode(hal::RobotMode robotMode);
 
   /**
    * Register a callback on the eStop state.

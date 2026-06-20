@@ -846,7 +846,9 @@ void StorageImpl::NotifyValue(LocalTopic* topic, const Value& value,
         (!publisher || (publisher && (subscriber->config.excludePublisher !=
                                       publisher->handle)))) {
       subscriber->pollStorage.emplace_back(value);
-      subscriber->handle.Set();
+      if (!subscriber->config.disableSignal) {
+        subscriber->handle.Set();
+      }
       if (!subscriber->valueListeners.empty()) {
         m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
                                  topic->handle, 0, value);
@@ -856,7 +858,9 @@ void StorageImpl::NotifyValue(LocalTopic* topic, const Value& value,
 
   for (auto&& subscriber : topic->multiSubscribers) {
     if (subscriber->options.keepDuplicates || !isDuplicate) {
-      subscriber->handle.Set();
+      if (!subscriber->options.disableSignal) {
+        subscriber->handle.Set();
+      }
       if (!subscriber->valueListeners.empty()) {
         m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
                                  topic->handle, 0, value);
@@ -1011,10 +1015,14 @@ LocalSubscriber* StorageImpl::AddLocalSubscriber(LocalTopic* topic,
   if (subscriber->active) {
     if (!topic->lastValueFromNetwork && !config.disableLocal) {
       subscriber->pollStorage.emplace_back(topic->lastValue);
-      subscriber->handle.Set();
+      if (!subscriber->config.disableSignal) {
+        subscriber->handle.Set();
+      }
     } else if (topic->lastValueFromNetwork && !config.disableRemote) {
       subscriber->pollStorage.emplace_back(topic->lastValueNetwork);
-      subscriber->handle.Set();
+      if (!subscriber->config.disableSignal) {
+        subscriber->handle.Set();
+      }
     }
   }
   return subscriber;

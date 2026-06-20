@@ -40,18 +40,18 @@ double {{ ClassName }}Controller::Get{{ axis.MethodName }}() const {
   return GetAxis(Axis::{{ axis.ConstantName }});
 }
 {% endfor %}
-double {{ ClassName }}Controller::GetAxis(int axis) const {
-  return m_hid->GetRawAxis(axis);
+double {{ ClassName }}Controller::GetAxis(Axis axis) const {
+  return m_hid->GetRawAxis(static_cast<int>(axis));
 }
 
-BooleanEvent {{ ClassName }}Controller::AxisLessThan(int axis, double threshold,
+BooleanEvent {{ ClassName }}Controller::AxisLessThan(Axis axis, double threshold,
                                                      EventLoop* loop) const {
-  return m_hid->AxisLessThan(axis, threshold, loop);
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
 }
 
 BooleanEvent {{ ClassName }}Controller::AxisGreaterThan(
-    int axis, double threshold, EventLoop* loop) const {
-  return m_hid->AxisGreaterThan(axis, threshold, loop);
+    Axis axis, double threshold, EventLoop* loop) const {
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
 }
 {% for button in buttons %}
 bool {{ ClassName }}Controller::Get{{ button.MethodName }}Button() const {
@@ -70,21 +70,21 @@ BooleanEvent {{ ClassName }}Controller::{{ button.MethodName }}(EventLoop* loop)
   return ButtonEvent(Button::{{ button.ConstantName }}, loop);
 }
 {% endfor %}
-bool {{ ClassName }}Controller::GetButton(int button) const {
-  return m_hid->GetRawButton(button);
+bool {{ ClassName }}Controller::GetButton(Button button) const {
+  return m_hid->GetRawButton(static_cast<int>(button));
 }
 
-bool {{ ClassName }}Controller::GetButtonPressed(int button) {
-  return m_hid->GetRawButtonPressed(button);
+bool {{ ClassName }}Controller::GetButtonPressed(Button button) {
+  return m_hid->GetRawButtonPressed(static_cast<int>(button));
 }
 
-bool {{ ClassName }}Controller::GetButtonReleased(int button) {
-  return m_hid->GetRawButtonReleased(button);
+bool {{ ClassName }}Controller::GetButtonReleased(Button button) {
+  return m_hid->GetRawButtonReleased(static_cast<int>(button));
 }
 
-BooleanEvent {{ ClassName }}Controller::ButtonEvent(int button,
+BooleanEvent {{ ClassName }}Controller::ButtonEvent(Button button,
                                                     EventLoop* loop) const {
-  return m_hid->Button(button, loop);
+  return m_hid->Button(static_cast<int>(button), loop);
 }
 
 void {{ ClassName }}Controller::SetLeds(int r, int g, int b) {

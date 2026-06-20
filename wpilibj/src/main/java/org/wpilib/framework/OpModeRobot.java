@@ -118,9 +118,8 @@ public abstract class OpModeRobot extends RobotBase {
     try {
       return constructor.get().newInstance(this);
     } catch (ReflectiveOperationException e) {
-      DriverStationErrors.reportError(
-          "Could not instantiate OpMode " + cls.getSimpleName(), e.getStackTrace());
-      return null;
+      throw new RuntimeException(
+          "Could not instantiate OpMode " + cls.getSimpleName(), e.getCause());
     }
   }
 

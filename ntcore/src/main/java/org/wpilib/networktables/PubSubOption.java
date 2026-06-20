@@ -95,6 +95,14 @@ public sealed interface PubSubOption {
    */
   record Hidden(boolean enabled) implements PubSubOption {}
 
+  /**
+   * For subscriptions, specify whether value updates should not signal the local subscription
+   * handle. This option defaults to disabled.
+   *
+   * @param disabled True to disable, false to enable
+   */
+  record DisableSignal(boolean disabled) implements PubSubOption {}
+
   /** Indicates only value changes will be sent over the network (default). */
   PubSubOption SEND_CHANGES = new SendAll(false);
 
@@ -138,6 +146,12 @@ public sealed interface PubSubOption {
 
   /** For subscriptions, indicates the subscription is hidden from the network. */
   PubSubOption HIDDEN = new Hidden(true);
+
+  /** For subscriptions, indicates value updates will signal the local handle (default). */
+  PubSubOption ENABLE_SIGNAL = new DisableSignal(false);
+
+  /** For subscriptions, indicates value updates will not signal the local handle. */
+  PubSubOption DISABLE_SIGNAL = new DisableSignal(true);
 
   /**
    * How frequently changes will be sent over the network. NetworkTables may send more frequently
