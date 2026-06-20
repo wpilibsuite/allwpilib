@@ -202,7 +202,8 @@ class DriverStationSim {
    *
    * @param allianceStationId the new alliance station
    */
-  static void SetAllianceStationId(wpi::hal::AllianceStationID allianceStationId);
+  static void SetAllianceStationId(
+      wpi::hal::AllianceStationID allianceStationId);
 
   /**
    * Register a callback on match time.

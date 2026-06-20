@@ -141,7 +141,8 @@ TEST(DriverStationTest, AllianceStationId) {
   EXPECT_FALSE(MatchState::GetAlliance().has_value());
   EXPECT_FALSE(MatchState::GetLocation().has_value());
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(static_cast<HAL_AllianceStationID>(allianceStation), callback.GetLastValue());
+  EXPECT_EQ(static_cast<HAL_AllianceStationID>(allianceStation),
+            callback.GetLastValue());
 
   // B1
   allianceStation = hal::AllianceStationID::BLUE_1;
@@ -151,7 +152,8 @@ TEST(DriverStationTest, AllianceStationId) {
   EXPECT_EQ(Alliance::BLUE, MatchState::GetAlliance());
   EXPECT_EQ(1, MatchState::GetLocation());
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(static_cast<HAL_AllianceStationID>(allianceStation), callback.GetLastValue());
+  EXPECT_EQ(static_cast<HAL_AllianceStationID>(allianceStation),
+            callback.GetLastValue());
 
   // B2
   allianceStation = hal::AllianceStationID::BLUE_2;
@@ -161,7 +163,8 @@ TEST(DriverStationTest, AllianceStationId) {
   EXPECT_EQ(Alliance::BLUE, MatchState::GetAlliance());
   EXPECT_EQ(2, MatchState::GetLocation());
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(static_cast<HAL_AllianceStationID>(allianceStation), callback.GetLastValue());
+  EXPECT_EQ(static_cast<HAL_AllianceStationID>(allianceStation),
+            callback.GetLastValue());
 
   // B3
   allianceStation = hal::AllianceStationID::BLUE_3;
@@ -171,7 +174,8 @@ TEST(DriverStationTest, AllianceStationId) {
   EXPECT_EQ(Alliance::BLUE, MatchState::GetAlliance());
   EXPECT_EQ(3, MatchState::GetLocation());
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(static_cast<HAL_AllianceStationID>(allianceStation), callback.GetLastValue());
+  EXPECT_EQ(static_cast<HAL_AllianceStationID>(allianceStation),
+            callback.GetLastValue());
 
   // R1
   allianceStation = hal::AllianceStationID::RED_1;
@@ -181,7 +185,8 @@ TEST(DriverStationTest, AllianceStationId) {
   EXPECT_EQ(Alliance::RED, MatchState::GetAlliance());
   EXPECT_EQ(1, MatchState::GetLocation());
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(static_cast<HAL_AllianceStationID>(allianceStation), callback.GetLastValue());
+  EXPECT_EQ(static_cast<HAL_AllianceStationID>(allianceStation),
+            callback.GetLastValue());
 
   // R2
   allianceStation = hal::AllianceStationID::RED_2;
@@ -191,7 +196,8 @@ TEST(DriverStationTest, AllianceStationId) {
   EXPECT_EQ(Alliance::RED, MatchState::GetAlliance());
   EXPECT_EQ(2, MatchState::GetLocation());
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(static_cast<HAL_AllianceStationID>(allianceStation), callback.GetLastValue());
+  EXPECT_EQ(static_cast<HAL_AllianceStationID>(allianceStation),
+            callback.GetLastValue());
 
   // R3
   allianceStation = hal::AllianceStationID::RED_3;
@@ -201,7 +207,8 @@ TEST(DriverStationTest, AllianceStationId) {
   EXPECT_EQ(Alliance::RED, MatchState::GetAlliance());
   EXPECT_EQ(3, MatchState::GetLocation());
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(static_cast<HAL_AllianceStationID>(allianceStation), callback.GetLastValue());
+  EXPECT_EQ(static_cast<HAL_AllianceStationID>(allianceStation),
+            callback.GetLastValue());
 }
 
 TEST(DriverStationTest, ReplayNumber) {

@@ -43,7 +43,8 @@ class DigitalCommunicationTest : public testing::TestWithParam<T> {
   }
 };
 
-class AllianceTest : public DigitalCommunicationTest<wpi::hal::AllianceStationID> {};
+class AllianceTest
+    : public DigitalCommunicationTest<wpi::hal::AllianceStationID> {};
 
 TEST_P(AllianceTest, Alliance) {
   auto alliance = GetParam();
@@ -77,7 +78,8 @@ INSTANTIATE_TEST_SUITE_P(
     testing::Values<wpi::hal::AllianceStationID>(
         wpi::hal::AllianceStationID::RED_1, wpi::hal::AllianceStationID::RED_2,
         wpi::hal::AllianceStationID::RED_3, wpi::hal::AllianceStationID::BLUE_1,
-        wpi::hal::AllianceStationID::BLUE_2, wpi::hal::AllianceStationID::BLUE_3,
+        wpi::hal::AllianceStationID::BLUE_2,
+        wpi::hal::AllianceStationID::BLUE_3,
         wpi::hal::AllianceStationID::UNKNOWN),
     [](const testing::TestParamInfo<AllianceTest::ParamType>& info) {
       switch (info.param) {
