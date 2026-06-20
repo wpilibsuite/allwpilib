@@ -50,10 +50,8 @@ class SignalWaiter {
     m_notified = false;
   }
 
-  bool WaitFor(double timeout) {
+  bool WaitUntil(std::chrono::steady_clock::time_point timeoutTime) {
     std::unique_lock lock{m_mutex};
-    auto timeoutTime = std::chrono::steady_clock::now() +
-                       std::chrono::duration<double>{timeout};
     if (!m_cv.wait_until(lock, timeoutTime, [&] { return m_notified; })) {
       return true;
     }
@@ -358,6 +356,10 @@ std::span<WPI_Handle> wpi::util::WaitForObjects(
   bool addedWaiters = false;
   bool timedOutVal = false;
   size_t count = 0;
+  const auto timeoutTime =
+      std::chrono::steady_clock::now() +
+      std::chrono::ceil<std::chrono::steady_clock::duration>(
+          std::chrono::duration<double>{timeout});
 
   for (;;) {
     count = 0;
@@ -412,7 +414,7 @@ std::span<WPI_Handle> wpi::util::WaitForObjects(
     locks.clear();
     if (timeout < 0) {
       waiter.Wait();
-    } else if (waiter.WaitFor(timeout)) {
+    } else if (waiter.WaitUntil(timeoutTime)) {
       timedOutVal = true;
     }
     locks = LockStateShards(manager, shardIndices);
@@ -478,10 +480,6 @@ void wpi::util::SetSignalObject(WPI_Handle handle) {
   state.signaled = 1;
   for (auto& waiter : state.waiters) {
     waiter->Notify();
-    if (state.autoReset) {
-      // expect the first waiter to reset it
-      break;
-    }
   }
 }
 
