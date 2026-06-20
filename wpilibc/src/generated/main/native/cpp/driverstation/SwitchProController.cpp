@@ -60,18 +60,18 @@ double SwitchProController::GetZR() const {
   return GetAxis(Axis::ZR);
 }
 
-double SwitchProController::GetAxis(int axis) const {
-  return m_hid->GetRawAxis(axis);
+double SwitchProController::GetAxis(Axis axis) const {
+  return m_hid->GetRawAxis(static_cast<int>(axis));
 }
 
-BooleanEvent SwitchProController::AxisLessThan(int axis, double threshold,
+BooleanEvent SwitchProController::AxisLessThan(Axis axis, double threshold,
                                                      EventLoop* loop) const {
-  return m_hid->AxisLessThan(axis, threshold, loop);
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
 }
 
 BooleanEvent SwitchProController::AxisGreaterThan(
-    int axis, double threshold, EventLoop* loop) const {
-  return m_hid->AxisGreaterThan(axis, threshold, loop);
+    Axis axis, double threshold, EventLoop* loop) const {
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
 }
 
 bool SwitchProController::GetBButton() const {
@@ -330,21 +330,21 @@ BooleanEvent SwitchProController::Capture(EventLoop* loop) const {
   return ButtonEvent(Button::CAPTURE, loop);
 }
 
-bool SwitchProController::GetButton(int button) const {
-  return m_hid->GetRawButton(button);
+bool SwitchProController::GetButton(Button button) const {
+  return m_hid->GetRawButton(static_cast<int>(button));
 }
 
-bool SwitchProController::GetButtonPressed(int button) {
-  return m_hid->GetRawButtonPressed(button);
+bool SwitchProController::GetButtonPressed(Button button) {
+  return m_hid->GetRawButtonPressed(static_cast<int>(button));
 }
 
-bool SwitchProController::GetButtonReleased(int button) {
-  return m_hid->GetRawButtonReleased(button);
+bool SwitchProController::GetButtonReleased(Button button) {
+  return m_hid->GetRawButtonReleased(static_cast<int>(button));
 }
 
-BooleanEvent SwitchProController::ButtonEvent(int button,
+BooleanEvent SwitchProController::ButtonEvent(Button button,
                                                     EventLoop* loop) const {
-  return m_hid->Button(button, loop);
+  return m_hid->Button(static_cast<int>(button), loop);
 }
 
 void SwitchProController::SetLeds(int r, int g, int b) {

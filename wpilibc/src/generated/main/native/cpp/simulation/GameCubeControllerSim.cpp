@@ -28,73 +28,73 @@ GameCubeControllerSim::GameCubeControllerSim(int port) : GenericHIDSim{port} {
 }
 
 void GameCubeControllerSim::SetLeftX(double value) {
-  SetRawAxis(GameCubeController::Axis::LEFT_X, value);
+  SetRawAxis(static_cast<int>(GameCubeController::Axis::LEFT_X), value);
 }
 
 void GameCubeControllerSim::SetLeftY(double value) {
-  SetRawAxis(GameCubeController::Axis::LEFT_Y, value);
+  SetRawAxis(static_cast<int>(GameCubeController::Axis::LEFT_Y), value);
 }
 
 void GameCubeControllerSim::SetCStickX(double value) {
-  SetRawAxis(GameCubeController::Axis::C_STICK_X, value);
+  SetRawAxis(static_cast<int>(GameCubeController::Axis::C_STICK_X), value);
 }
 
 void GameCubeControllerSim::SetCStickY(double value) {
-  SetRawAxis(GameCubeController::Axis::C_STICK_Y, value);
+  SetRawAxis(static_cast<int>(GameCubeController::Axis::C_STICK_Y), value);
 }
 
 void GameCubeControllerSim::SetLTrigger(double value) {
-  SetRawAxis(GameCubeController::Axis::L_TRIGGER, value);
+  SetRawAxis(static_cast<int>(GameCubeController::Axis::L_TRIGGER), value);
 }
 
 void GameCubeControllerSim::SetRTrigger(double value) {
-  SetRawAxis(GameCubeController::Axis::R_TRIGGER, value);
+  SetRawAxis(static_cast<int>(GameCubeController::Axis::R_TRIGGER), value);
 }
 
 void GameCubeControllerSim::SetAButton(bool value) {
-  SetRawButton(GameCubeController::Button::A, value);
+  SetRawButton(static_cast<int>(GameCubeController::Button::A), value);
 }
 
 void GameCubeControllerSim::SetXButton(bool value) {
-  SetRawButton(GameCubeController::Button::X, value);
+  SetRawButton(static_cast<int>(GameCubeController::Button::X), value);
 }
 
 void GameCubeControllerSim::SetBButton(bool value) {
-  SetRawButton(GameCubeController::Button::B, value);
+  SetRawButton(static_cast<int>(GameCubeController::Button::B), value);
 }
 
 void GameCubeControllerSim::SetYButton(bool value) {
-  SetRawButton(GameCubeController::Button::Y, value);
+  SetRawButton(static_cast<int>(GameCubeController::Button::Y), value);
 }
 
 void GameCubeControllerSim::SetStartButton(bool value) {
-  SetRawButton(GameCubeController::Button::START, value);
+  SetRawButton(static_cast<int>(GameCubeController::Button::START), value);
 }
 
 void GameCubeControllerSim::SetZButton(bool value) {
-  SetRawButton(GameCubeController::Button::Z, value);
+  SetRawButton(static_cast<int>(GameCubeController::Button::Z), value);
 }
 
 void GameCubeControllerSim::SetDpadUpButton(bool value) {
-  SetRawButton(GameCubeController::Button::DPAD_UP, value);
+  SetRawButton(static_cast<int>(GameCubeController::Button::DPAD_UP), value);
 }
 
 void GameCubeControllerSim::SetDpadDownButton(bool value) {
-  SetRawButton(GameCubeController::Button::DPAD_DOWN, value);
+  SetRawButton(static_cast<int>(GameCubeController::Button::DPAD_DOWN), value);
 }
 
 void GameCubeControllerSim::SetDpadLeftButton(bool value) {
-  SetRawButton(GameCubeController::Button::DPAD_LEFT, value);
+  SetRawButton(static_cast<int>(GameCubeController::Button::DPAD_LEFT), value);
 }
 
 void GameCubeControllerSim::SetDpadRightButton(bool value) {
-  SetRawButton(GameCubeController::Button::DPAD_RIGHT, value);
+  SetRawButton(static_cast<int>(GameCubeController::Button::DPAD_RIGHT), value);
 }
 
 void GameCubeControllerSim::SetLButton(bool value) {
-  SetRawButton(GameCubeController::Button::L, value);
+  SetRawButton(static_cast<int>(GameCubeController::Button::L), value);
 }
 
 void GameCubeControllerSim::SetRButton(bool value) {
-  SetRawButton(GameCubeController::Button::R, value);
+  SetRawButton(static_cast<int>(GameCubeController::Button::R), value);
 }

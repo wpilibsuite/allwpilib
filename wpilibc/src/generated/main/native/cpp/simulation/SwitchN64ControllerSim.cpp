@@ -28,77 +28,77 @@ SwitchN64ControllerSim::SwitchN64ControllerSim(int port) : GenericHIDSim{port} {
 }
 
 void SwitchN64ControllerSim::SetLeftX(double value) {
-  SetRawAxis(SwitchN64Controller::Axis::LEFT_X, value);
+  SetRawAxis(static_cast<int>(SwitchN64Controller::Axis::LEFT_X), value);
 }
 
 void SwitchN64ControllerSim::SetLeftY(double value) {
-  SetRawAxis(SwitchN64Controller::Axis::LEFT_Y, value);
+  SetRawAxis(static_cast<int>(SwitchN64Controller::Axis::LEFT_Y), value);
 }
 
 void SwitchN64ControllerSim::SetZAxis(double value) {
-  SetRawAxis(SwitchN64Controller::Axis::Z_AXIS, value);
+  SetRawAxis(static_cast<int>(SwitchN64Controller::Axis::Z_AXIS), value);
 }
 
 void SwitchN64ControllerSim::SetZR(double value) {
-  SetRawAxis(SwitchN64Controller::Axis::ZR, value);
+  SetRawAxis(static_cast<int>(SwitchN64Controller::Axis::ZR), value);
 }
 
 void SwitchN64ControllerSim::SetAButton(bool value) {
-  SetRawButton(SwitchN64Controller::Button::A, value);
+  SetRawButton(static_cast<int>(SwitchN64Controller::Button::A), value);
 }
 
 void SwitchN64ControllerSim::SetBButton(bool value) {
-  SetRawButton(SwitchN64Controller::Button::B, value);
+  SetRawButton(static_cast<int>(SwitchN64Controller::Button::B), value);
 }
 
 void SwitchN64ControllerSim::SetCLeftButton(bool value) {
-  SetRawButton(SwitchN64Controller::Button::C_LEFT, value);
+  SetRawButton(static_cast<int>(SwitchN64Controller::Button::C_LEFT), value);
 }
 
 void SwitchN64ControllerSim::SetCUpButton(bool value) {
-  SetRawButton(SwitchN64Controller::Button::C_UP, value);
+  SetRawButton(static_cast<int>(SwitchN64Controller::Button::C_UP), value);
 }
 
 void SwitchN64ControllerSim::SetCaptureButton(bool value) {
-  SetRawButton(SwitchN64Controller::Button::CAPTURE, value);
+  SetRawButton(static_cast<int>(SwitchN64Controller::Button::CAPTURE), value);
 }
 
 void SwitchN64ControllerSim::SetHomeButton(bool value) {
-  SetRawButton(SwitchN64Controller::Button::HOME, value);
+  SetRawButton(static_cast<int>(SwitchN64Controller::Button::HOME), value);
 }
 
 void SwitchN64ControllerSim::SetStartButton(bool value) {
-  SetRawButton(SwitchN64Controller::Button::START, value);
+  SetRawButton(static_cast<int>(SwitchN64Controller::Button::START), value);
 }
 
 void SwitchN64ControllerSim::SetCDownButton(bool value) {
-  SetRawButton(SwitchN64Controller::Button::C_DOWN, value);
+  SetRawButton(static_cast<int>(SwitchN64Controller::Button::C_DOWN), value);
 }
 
 void SwitchN64ControllerSim::SetLButton(bool value) {
-  SetRawButton(SwitchN64Controller::Button::L, value);
+  SetRawButton(static_cast<int>(SwitchN64Controller::Button::L), value);
 }
 
 void SwitchN64ControllerSim::SetRButton(bool value) {
-  SetRawButton(SwitchN64Controller::Button::R, value);
+  SetRawButton(static_cast<int>(SwitchN64Controller::Button::R), value);
 }
 
 void SwitchN64ControllerSim::SetDpadUpButton(bool value) {
-  SetRawButton(SwitchN64Controller::Button::DPAD_UP, value);
+  SetRawButton(static_cast<int>(SwitchN64Controller::Button::DPAD_UP), value);
 }
 
 void SwitchN64ControllerSim::SetDpadDownButton(bool value) {
-  SetRawButton(SwitchN64Controller::Button::DPAD_DOWN, value);
+  SetRawButton(static_cast<int>(SwitchN64Controller::Button::DPAD_DOWN), value);
 }
 
 void SwitchN64ControllerSim::SetDpadLeftButton(bool value) {
-  SetRawButton(SwitchN64Controller::Button::DPAD_LEFT, value);
+  SetRawButton(static_cast<int>(SwitchN64Controller::Button::DPAD_LEFT), value);
 }
 
 void SwitchN64ControllerSim::SetDpadRightButton(bool value) {
-  SetRawButton(SwitchN64Controller::Button::DPAD_RIGHT, value);
+  SetRawButton(static_cast<int>(SwitchN64Controller::Button::DPAD_RIGHT), value);
 }
 
 void SwitchN64ControllerSim::SetCRightButton(bool value) {
-  SetRawButton(SwitchN64Controller::Button::C_RIGHT, value);
+  SetRawButton(static_cast<int>(SwitchN64Controller::Button::C_RIGHT), value);
 }

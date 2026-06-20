@@ -46,6 +46,52 @@ class SwitchN64Controller
   static constexpr GenericHID::SupportedOutputs SUPPORTED_OUTPUTS =
       static_cast<GenericHID::SupportedOutputs>(0);
 
+  /** Represents a digital button on a SwitchN64Controller. */
+  enum class Button {
+    /// A button.
+    A = 0,
+    /// B button.
+    B = 1,
+    /// C Left button.
+    C_LEFT = 3,
+    /// C Up button.
+    C_UP = 4,
+    /// Capture button.
+    CAPTURE = 15,
+    /// Home button.
+    HOME = 5,
+    /// Start button.
+    START = 6,
+    /// C Down button.
+    C_DOWN = 2,
+    /// L button.
+    L = 9,
+    /// R button.
+    R = 10,
+    /// Dpad Up button.
+    DPAD_UP = 11,
+    /// Dpad Down button.
+    DPAD_DOWN = 12,
+    /// Dpad Left button.
+    DPAD_LEFT = 13,
+    /// Dpad Right button.
+    DPAD_RIGHT = 14,
+    /// C Right button.
+    C_RIGHT = 21,
+  };
+
+  /** Represents an axis on a SwitchN64Controller. */
+  enum class Axis {
+    /// Left X.
+    LEFT_X = 0,
+    /// Left Y.
+    LEFT_Y = 1,
+    /// Z Axis.
+    Z_AXIS = 4,
+    /// ZR.
+    ZR = 5,
+  };
+
   /**
    * Construct an instance of a controller.
    *
@@ -130,7 +176,7 @@ class SwitchN64Controller
    * @param axis The axis to read
    * @return the axis value.
    */
-  double GetAxis(int axis) const;
+  double GetAxis(Axis axis) const;
 
   /**
    * Constructs an event instance that is true when the axis value is less than
@@ -142,7 +188,7 @@ class SwitchN64Controller
    * @return an event instance that is true when the axis value is less than the
    * provided threshold.
    */
-  BooleanEvent AxisLessThan(int axis, double threshold, EventLoop* loop) const;
+  BooleanEvent AxisLessThan(Axis axis, double threshold, EventLoop* loop) const;
 
   /**
    * Constructs an event instance that is true when the axis value is greater
@@ -154,7 +200,7 @@ class SwitchN64Controller
    * @return an event instance that is true when the axis value is greater than
    * the provided threshold.
    */
-  BooleanEvent AxisGreaterThan(int axis, double threshold,
+  BooleanEvent AxisGreaterThan(Axis axis, double threshold,
                                EventLoop* loop) const;
 
   /**
@@ -628,7 +674,7 @@ class SwitchN64Controller
    * @param button The button to read
    * @return The state of the button.
    */
-  bool GetButton(int button) const;
+  bool GetButton(Button button) const;
 
   /**
    * Whether the button was pressed since the last check.
@@ -636,7 +682,7 @@ class SwitchN64Controller
    * @param button The button to read
    * @return Whether the button was pressed since the last check.
    */
-  bool GetButtonPressed(int button);
+  bool GetButtonPressed(Button button);
 
   /**
    * Whether the button was released since the last check.
@@ -644,7 +690,7 @@ class SwitchN64Controller
    * @param button The button to read
    * @return Whether the button was released since the last check.
    */
-  bool GetButtonReleased(int button);
+  bool GetButtonReleased(Button button);
 
   /**
    * Constructs an event instance around this button's digital signal.
@@ -654,7 +700,7 @@ class SwitchN64Controller
    * @return an event instance representing the button's digital signal attached
    * to the given loop.
    */
-  BooleanEvent ButtonEvent(int button, EventLoop* loop) const;
+  BooleanEvent ButtonEvent(Button button, EventLoop* loop) const;
 
   /**
    * Set leds on the controller.
@@ -672,52 +718,6 @@ class SwitchN64Controller
    * @param value The normalized value (0 to 1) to set the rumble to
    */
   void SetRumble(GenericHID::RumbleType type, double value);
-
-  /** Represents a digital button on a SwitchN64Controller. */
-  struct Button {
-    /// A button.
-    static constexpr int A = 0;
-    /// B button.
-    static constexpr int B = 1;
-    /// C Left button.
-    static constexpr int C_LEFT = 3;
-    /// C Up button.
-    static constexpr int C_UP = 4;
-    /// Capture button.
-    static constexpr int CAPTURE = 15;
-    /// Home button.
-    static constexpr int HOME = 5;
-    /// Start button.
-    static constexpr int START = 6;
-    /// C Down button.
-    static constexpr int C_DOWN = 2;
-    /// L button.
-    static constexpr int L = 9;
-    /// R button.
-    static constexpr int R = 10;
-    /// Dpad Up button.
-    static constexpr int DPAD_UP = 11;
-    /// Dpad Down button.
-    static constexpr int DPAD_DOWN = 12;
-    /// Dpad Left button.
-    static constexpr int DPAD_LEFT = 13;
-    /// Dpad Right button.
-    static constexpr int DPAD_RIGHT = 14;
-    /// C Right button.
-    static constexpr int C_RIGHT = 21;
-  };
-
-  /** Represents an axis on a SwitchN64Controller. */
-  struct Axis {
-    /// Left X.
-    static constexpr int LEFT_X = 0;
-    /// Left Y.
-    static constexpr int LEFT_Y = 1;
-    /// Z Axis.
-    static constexpr int Z_AXIS = 4;
-    /// ZR.
-    static constexpr int ZR = 5;
-  };
 
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 

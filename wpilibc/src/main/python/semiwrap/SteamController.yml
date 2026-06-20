@@ -148,39 +148,6 @@ classes:
       GetTouchpadFingerAvailable:
       GetTouchpadFinger:
       InitSendable:
-  wpi::SteamController::Button:
-    attributes:
-      A:
-      B:
-      X:
-      Y:
-      MENU:
-      STEAM:
-      VIEW:
-      LEFT_STICK:
-      RIGHT_STICK:
-      LEFT_BUMPER:
-      RIGHT_BUMPER:
-      DPAD_UP:
-      DPAD_DOWN:
-      DPAD_LEFT:
-      DPAD_RIGHT:
-      QAM:
-      RIGHT_PADDLE_1:
-      LEFT_PADDLE_1:
-      RIGHT_PADDLE_2:
-      LEFT_PADDLE_2:
-      LEFT_TOUCHPAD:
-      RIGHT_TOUCHPAD:
-      LEFT_STICK_TOUCH:
-      RIGHT_STICK_TOUCH:
-      LEFT_GRIP_TOUCH:
-      RIGHT_GRIP_TOUCH:
-  wpi::SteamController::Axis:
-    attributes:
-      LEFT_X:
-      LEFT_Y:
-      RIGHT_X:
-      RIGHT_Y:
-      LEFT_TRIGGER:
-      RIGHT_TRIGGER:
+    enums:
+      Button:
+      Axis:

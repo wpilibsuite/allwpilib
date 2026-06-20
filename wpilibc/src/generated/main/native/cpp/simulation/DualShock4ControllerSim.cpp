@@ -28,89 +28,89 @@ DualShock4ControllerSim::DualShock4ControllerSim(int port) : GenericHIDSim{port}
 }
 
 void DualShock4ControllerSim::SetLeftX(double value) {
-  SetRawAxis(DualShock4Controller::Axis::LEFT_X, value);
+  SetRawAxis(static_cast<int>(DualShock4Controller::Axis::LEFT_X), value);
 }
 
 void DualShock4ControllerSim::SetLeftY(double value) {
-  SetRawAxis(DualShock4Controller::Axis::LEFT_Y, value);
+  SetRawAxis(static_cast<int>(DualShock4Controller::Axis::LEFT_Y), value);
 }
 
 void DualShock4ControllerSim::SetRightX(double value) {
-  SetRawAxis(DualShock4Controller::Axis::RIGHT_X, value);
+  SetRawAxis(static_cast<int>(DualShock4Controller::Axis::RIGHT_X), value);
 }
 
 void DualShock4ControllerSim::SetRightY(double value) {
-  SetRawAxis(DualShock4Controller::Axis::RIGHT_Y, value);
+  SetRawAxis(static_cast<int>(DualShock4Controller::Axis::RIGHT_Y), value);
 }
 
 void DualShock4ControllerSim::SetL2(double value) {
-  SetRawAxis(DualShock4Controller::Axis::L2, value);
+  SetRawAxis(static_cast<int>(DualShock4Controller::Axis::L2), value);
 }
 
 void DualShock4ControllerSim::SetR2(double value) {
-  SetRawAxis(DualShock4Controller::Axis::R2, value);
+  SetRawAxis(static_cast<int>(DualShock4Controller::Axis::R2), value);
 }
 
 void DualShock4ControllerSim::SetCrossButton(bool value) {
-  SetRawButton(DualShock4Controller::Button::CROSS, value);
+  SetRawButton(static_cast<int>(DualShock4Controller::Button::CROSS), value);
 }
 
 void DualShock4ControllerSim::SetCircleButton(bool value) {
-  SetRawButton(DualShock4Controller::Button::CIRCLE, value);
+  SetRawButton(static_cast<int>(DualShock4Controller::Button::CIRCLE), value);
 }
 
 void DualShock4ControllerSim::SetSquareButton(bool value) {
-  SetRawButton(DualShock4Controller::Button::SQUARE, value);
+  SetRawButton(static_cast<int>(DualShock4Controller::Button::SQUARE), value);
 }
 
 void DualShock4ControllerSim::SetTriangleButton(bool value) {
-  SetRawButton(DualShock4Controller::Button::TRIANGLE, value);
+  SetRawButton(static_cast<int>(DualShock4Controller::Button::TRIANGLE), value);
 }
 
 void DualShock4ControllerSim::SetShareButton(bool value) {
-  SetRawButton(DualShock4Controller::Button::SHARE, value);
+  SetRawButton(static_cast<int>(DualShock4Controller::Button::SHARE), value);
 }
 
 void DualShock4ControllerSim::SetPSButton(bool value) {
-  SetRawButton(DualShock4Controller::Button::PS, value);
+  SetRawButton(static_cast<int>(DualShock4Controller::Button::PS), value);
 }
 
 void DualShock4ControllerSim::SetOptionsButton(bool value) {
-  SetRawButton(DualShock4Controller::Button::OPTIONS, value);
+  SetRawButton(static_cast<int>(DualShock4Controller::Button::OPTIONS), value);
 }
 
 void DualShock4ControllerSim::SetL3Button(bool value) {
-  SetRawButton(DualShock4Controller::Button::L3, value);
+  SetRawButton(static_cast<int>(DualShock4Controller::Button::L3), value);
 }
 
 void DualShock4ControllerSim::SetR3Button(bool value) {
-  SetRawButton(DualShock4Controller::Button::R3, value);
+  SetRawButton(static_cast<int>(DualShock4Controller::Button::R3), value);
 }
 
 void DualShock4ControllerSim::SetL1Button(bool value) {
-  SetRawButton(DualShock4Controller::Button::L1, value);
+  SetRawButton(static_cast<int>(DualShock4Controller::Button::L1), value);
 }
 
 void DualShock4ControllerSim::SetR1Button(bool value) {
-  SetRawButton(DualShock4Controller::Button::R1, value);
+  SetRawButton(static_cast<int>(DualShock4Controller::Button::R1), value);
 }
 
 void DualShock4ControllerSim::SetDpadUpButton(bool value) {
-  SetRawButton(DualShock4Controller::Button::DPAD_UP, value);
+  SetRawButton(static_cast<int>(DualShock4Controller::Button::DPAD_UP), value);
 }
 
 void DualShock4ControllerSim::SetDpadDownButton(bool value) {
-  SetRawButton(DualShock4Controller::Button::DPAD_DOWN, value);
+  SetRawButton(static_cast<int>(DualShock4Controller::Button::DPAD_DOWN), value);
 }
 
 void DualShock4ControllerSim::SetDpadLeftButton(bool value) {
-  SetRawButton(DualShock4Controller::Button::DPAD_LEFT, value);
+  SetRawButton(static_cast<int>(DualShock4Controller::Button::DPAD_LEFT), value);
 }
 
 void DualShock4ControllerSim::SetDpadRightButton(bool value) {
-  SetRawButton(DualShock4Controller::Button::DPAD_RIGHT, value);
+  SetRawButton(static_cast<int>(DualShock4Controller::Button::DPAD_RIGHT), value);
 }
 
 void DualShock4ControllerSim::SetTouchpadButton(bool value) {
-  SetRawButton(DualShock4Controller::Button::TOUCHPAD, value);
+  SetRawButton(static_cast<int>(DualShock4Controller::Button::TOUCHPAD), value);
 }

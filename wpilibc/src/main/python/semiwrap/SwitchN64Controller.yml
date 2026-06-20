@@ -100,26 +100,6 @@ classes:
       SetLeds:
       SetRumble:
       InitSendable:
-  wpi::SwitchN64Controller::Button:
-    attributes:
-      A:
-      B:
-      C_LEFT:
-      C_UP:
-      CAPTURE:
-      HOME:
-      START:
-      C_DOWN:
-      L:
-      R:
-      DPAD_UP:
-      DPAD_DOWN:
-      DPAD_LEFT:
-      DPAD_RIGHT:
-      C_RIGHT:
-  wpi::SwitchN64Controller::Axis:
-    attributes:
-      LEFT_X:
-      LEFT_Y:
-      Z_AXIS:
-      ZR:
+    enums:
+      Button:
+      Axis:

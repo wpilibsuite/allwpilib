@@ -28,89 +28,89 @@ Switch2GCControllerSim::Switch2GCControllerSim(int port) : GenericHIDSim{port} {
 }
 
 void Switch2GCControllerSim::SetLeftX(double value) {
-  SetRawAxis(Switch2GCController::Axis::LEFT_X, value);
+  SetRawAxis(static_cast<int>(Switch2GCController::Axis::LEFT_X), value);
 }
 
 void Switch2GCControllerSim::SetLeftY(double value) {
-  SetRawAxis(Switch2GCController::Axis::LEFT_Y, value);
+  SetRawAxis(static_cast<int>(Switch2GCController::Axis::LEFT_Y), value);
 }
 
 void Switch2GCControllerSim::SetCStickX(double value) {
-  SetRawAxis(Switch2GCController::Axis::C_STICK_X, value);
+  SetRawAxis(static_cast<int>(Switch2GCController::Axis::C_STICK_X), value);
 }
 
 void Switch2GCControllerSim::SetCStickY(double value) {
-  SetRawAxis(Switch2GCController::Axis::C_STICK_Y, value);
+  SetRawAxis(static_cast<int>(Switch2GCController::Axis::C_STICK_Y), value);
 }
 
 void Switch2GCControllerSim::SetLTrigger(double value) {
-  SetRawAxis(Switch2GCController::Axis::L_TRIGGER, value);
+  SetRawAxis(static_cast<int>(Switch2GCController::Axis::L_TRIGGER), value);
 }
 
 void Switch2GCControllerSim::SetRTrigger(double value) {
-  SetRawAxis(Switch2GCController::Axis::R_TRIGGER, value);
+  SetRawAxis(static_cast<int>(Switch2GCController::Axis::R_TRIGGER), value);
 }
 
 void Switch2GCControllerSim::SetAButton(bool value) {
-  SetRawButton(Switch2GCController::Button::A, value);
+  SetRawButton(static_cast<int>(Switch2GCController::Button::A), value);
 }
 
 void Switch2GCControllerSim::SetXButton(bool value) {
-  SetRawButton(Switch2GCController::Button::X, value);
+  SetRawButton(static_cast<int>(Switch2GCController::Button::X), value);
 }
 
 void Switch2GCControllerSim::SetBButton(bool value) {
-  SetRawButton(Switch2GCController::Button::B, value);
+  SetRawButton(static_cast<int>(Switch2GCController::Button::B), value);
 }
 
 void Switch2GCControllerSim::SetYButton(bool value) {
-  SetRawButton(Switch2GCController::Button::Y, value);
+  SetRawButton(static_cast<int>(Switch2GCController::Button::Y), value);
 }
 
 void Switch2GCControllerSim::SetHomeButton(bool value) {
-  SetRawButton(Switch2GCController::Button::HOME, value);
+  SetRawButton(static_cast<int>(Switch2GCController::Button::HOME), value);
 }
 
 void Switch2GCControllerSim::SetStartButton(bool value) {
-  SetRawButton(Switch2GCController::Button::START, value);
+  SetRawButton(static_cast<int>(Switch2GCController::Button::START), value);
 }
 
 void Switch2GCControllerSim::SetZLButton(bool value) {
-  SetRawButton(Switch2GCController::Button::ZL, value);
+  SetRawButton(static_cast<int>(Switch2GCController::Button::ZL), value);
 }
 
 void Switch2GCControllerSim::SetZButton(bool value) {
-  SetRawButton(Switch2GCController::Button::Z, value);
+  SetRawButton(static_cast<int>(Switch2GCController::Button::Z), value);
 }
 
 void Switch2GCControllerSim::SetDpadUpButton(bool value) {
-  SetRawButton(Switch2GCController::Button::DPAD_UP, value);
+  SetRawButton(static_cast<int>(Switch2GCController::Button::DPAD_UP), value);
 }
 
 void Switch2GCControllerSim::SetDpadDownButton(bool value) {
-  SetRawButton(Switch2GCController::Button::DPAD_DOWN, value);
+  SetRawButton(static_cast<int>(Switch2GCController::Button::DPAD_DOWN), value);
 }
 
 void Switch2GCControllerSim::SetDpadLeftButton(bool value) {
-  SetRawButton(Switch2GCController::Button::DPAD_LEFT, value);
+  SetRawButton(static_cast<int>(Switch2GCController::Button::DPAD_LEFT), value);
 }
 
 void Switch2GCControllerSim::SetDpadRightButton(bool value) {
-  SetRawButton(Switch2GCController::Button::DPAD_RIGHT, value);
+  SetRawButton(static_cast<int>(Switch2GCController::Button::DPAD_RIGHT), value);
 }
 
 void Switch2GCControllerSim::SetCaptureButton(bool value) {
-  SetRawButton(Switch2GCController::Button::CAPTURE, value);
+  SetRawButton(static_cast<int>(Switch2GCController::Button::CAPTURE), value);
 }
 
 void Switch2GCControllerSim::SetCButton(bool value) {
-  SetRawButton(Switch2GCController::Button::C, value);
+  SetRawButton(static_cast<int>(Switch2GCController::Button::C), value);
 }
 
 void Switch2GCControllerSim::SetLButton(bool value) {
-  SetRawButton(Switch2GCController::Button::L, value);
+  SetRawButton(static_cast<int>(Switch2GCController::Button::L), value);
 }
 
 void Switch2GCControllerSim::SetRButton(bool value) {
-  SetRawButton(Switch2GCController::Button::R, value);
+  SetRawButton(static_cast<int>(Switch2GCController::Button::R), value);
 }

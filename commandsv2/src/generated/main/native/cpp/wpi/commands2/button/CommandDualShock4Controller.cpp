@@ -8,8 +8,17 @@
 using namespace wpi::cmd;
 
 CommandDualShock4Controller::CommandDualShock4Controller(int port)
-    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
-      m_controller{m_hid->GetHID()} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)} {
+  m_ownedController =
+      std::make_unique<wpi::DualShock4Controller>(m_hid->GetHID());
+  m_controller = m_ownedController.get();
+}
+
+CommandDualShock4Controller::CommandDualShock4Controller(
+    wpi::DualShock4Controller* controller)
+    : m_ownedHid{std::make_unique<CommandGenericHID>(controller->GetHID())},
+      m_hid{m_ownedHid.get()},
+      m_controller{controller} {}
 
 CommandGenericHID& CommandDualShock4Controller::GetHID() {
   return *m_hid;
@@ -17,144 +26,171 @@ CommandGenericHID& CommandDualShock4Controller::GetHID() {
 
 wpi::DualShock4Controller&
 CommandDualShock4Controller::GetController() {
-  return m_controller;
+  return *m_controller;
 }
 
 const wpi::DualShock4Controller&
 CommandDualShock4Controller::GetController() const {
-  return m_controller;
+  return *m_controller;
 }
+
+Trigger CommandDualShock4Controller::Button(
+    enum wpi::DualShock4Controller::Button button,
+    wpi::EventLoop* loop) const {
+  return m_hid->Button(static_cast<int>(button), loop);
+}
+
 
 Trigger CommandDualShock4Controller::Cross(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::DualShock4Controller::Button::CROSS,
-                       loop);
+  return Button(wpi::DualShock4Controller::Button::CROSS,
+                loop);
 }
 
 Trigger CommandDualShock4Controller::Circle(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::DualShock4Controller::Button::CIRCLE,
-                       loop);
+  return Button(wpi::DualShock4Controller::Button::CIRCLE,
+                loop);
 }
 
 Trigger CommandDualShock4Controller::Square(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::DualShock4Controller::Button::SQUARE,
-                       loop);
+  return Button(wpi::DualShock4Controller::Button::SQUARE,
+                loop);
 }
 
 Trigger CommandDualShock4Controller::Triangle(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::DualShock4Controller::Button::TRIANGLE,
-                       loop);
+  return Button(wpi::DualShock4Controller::Button::TRIANGLE,
+                loop);
 }
 
 Trigger CommandDualShock4Controller::Share(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::DualShock4Controller::Button::SHARE,
-                       loop);
+  return Button(wpi::DualShock4Controller::Button::SHARE,
+                loop);
 }
 
 Trigger CommandDualShock4Controller::PS(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::DualShock4Controller::Button::PS,
-                       loop);
+  return Button(wpi::DualShock4Controller::Button::PS,
+                loop);
 }
 
 Trigger CommandDualShock4Controller::Options(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::DualShock4Controller::Button::OPTIONS,
-                       loop);
+  return Button(wpi::DualShock4Controller::Button::OPTIONS,
+                loop);
 }
 
 Trigger CommandDualShock4Controller::L3(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::DualShock4Controller::Button::L3,
-                       loop);
+  return Button(wpi::DualShock4Controller::Button::L3,
+                loop);
 }
 
 Trigger CommandDualShock4Controller::R3(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::DualShock4Controller::Button::R3,
-                       loop);
+  return Button(wpi::DualShock4Controller::Button::R3,
+                loop);
 }
 
 Trigger CommandDualShock4Controller::L1(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::DualShock4Controller::Button::L1,
-                       loop);
+  return Button(wpi::DualShock4Controller::Button::L1,
+                loop);
 }
 
 Trigger CommandDualShock4Controller::R1(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::DualShock4Controller::Button::R1,
-                       loop);
+  return Button(wpi::DualShock4Controller::Button::R1,
+                loop);
 }
 
 Trigger CommandDualShock4Controller::DpadUp(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::DualShock4Controller::Button::DPAD_UP,
-                       loop);
+  return Button(wpi::DualShock4Controller::Button::DPAD_UP,
+                loop);
 }
 
 Trigger CommandDualShock4Controller::DpadDown(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::DualShock4Controller::Button::DPAD_DOWN,
-                       loop);
+  return Button(wpi::DualShock4Controller::Button::DPAD_DOWN,
+                loop);
 }
 
 Trigger CommandDualShock4Controller::DpadLeft(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::DualShock4Controller::Button::DPAD_LEFT,
-                       loop);
+  return Button(wpi::DualShock4Controller::Button::DPAD_LEFT,
+                loop);
 }
 
 Trigger CommandDualShock4Controller::DpadRight(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::DualShock4Controller::Button::DPAD_RIGHT,
-                       loop);
+  return Button(wpi::DualShock4Controller::Button::DPAD_RIGHT,
+                loop);
 }
 
 Trigger CommandDualShock4Controller::Touchpad(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::DualShock4Controller::Button::TOUCHPAD,
-                       loop);
+  return Button(wpi::DualShock4Controller::Button::TOUCHPAD,
+                loop);
 }
 
 Trigger CommandDualShock4Controller::L2(
     double threshold, wpi::EventLoop* loop) const {
-  return m_hid->AxisGreaterThan(
+  return AxisGreaterThan(
       wpi::DualShock4Controller::Axis::L2,
       threshold, loop);
 }
 
 Trigger CommandDualShock4Controller::R2(
     double threshold, wpi::EventLoop* loop) const {
-  return m_hid->AxisGreaterThan(
+  return AxisGreaterThan(
       wpi::DualShock4Controller::Axis::R2,
       threshold, loop);
 }
 
+Trigger CommandDualShock4Controller::AxisLessThan(
+    wpi::DualShock4Controller::Axis axis, double threshold,
+    wpi::EventLoop* loop) const {
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
+}
+
+Trigger CommandDualShock4Controller::AxisGreaterThan(
+    wpi::DualShock4Controller::Axis axis, double threshold,
+    wpi::EventLoop* loop) const {
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
+}
+
+Trigger CommandDualShock4Controller::AxisMagnitudeGreaterThan(
+    wpi::DualShock4Controller::Axis axis, double threshold,
+    wpi::EventLoop* loop) const {
+  return m_hid->AxisMagnitudeGreaterThan(static_cast<int>(axis), threshold,
+                                         loop);
+}
+
+
 double CommandDualShock4Controller::GetLeftX() const {
-  return m_controller.GetLeftX();
+  return m_controller->GetLeftX();
 }
 
 double CommandDualShock4Controller::GetLeftY() const {
-  return m_controller.GetLeftY();
+  return m_controller->GetLeftY();
 }
 
 double CommandDualShock4Controller::GetRightX() const {
-  return m_controller.GetRightX();
+  return m_controller->GetRightX();
 }
 
 double CommandDualShock4Controller::GetRightY() const {
-  return m_controller.GetRightY();
+  return m_controller->GetRightY();
 }
 
 double CommandDualShock4Controller::GetL2() const {
-  return m_controller.GetL2();
+  return m_controller->GetL2();
 }
 
 double CommandDualShock4Controller::GetR2() const {
-  return m_controller.GetR2();
+  return m_controller->GetR2();
 }

@@ -52,18 +52,18 @@ double SwitchN64Controller::GetZR() const {
   return GetAxis(Axis::ZR);
 }
 
-double SwitchN64Controller::GetAxis(int axis) const {
-  return m_hid->GetRawAxis(axis);
+double SwitchN64Controller::GetAxis(Axis axis) const {
+  return m_hid->GetRawAxis(static_cast<int>(axis));
 }
 
-BooleanEvent SwitchN64Controller::AxisLessThan(int axis, double threshold,
+BooleanEvent SwitchN64Controller::AxisLessThan(Axis axis, double threshold,
                                                      EventLoop* loop) const {
-  return m_hid->AxisLessThan(axis, threshold, loop);
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
 }
 
 BooleanEvent SwitchN64Controller::AxisGreaterThan(
-    int axis, double threshold, EventLoop* loop) const {
-  return m_hid->AxisGreaterThan(axis, threshold, loop);
+    Axis axis, double threshold, EventLoop* loop) const {
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
 }
 
 bool SwitchN64Controller::GetAButton() const {
@@ -306,21 +306,21 @@ BooleanEvent SwitchN64Controller::CRight(EventLoop* loop) const {
   return ButtonEvent(Button::C_RIGHT, loop);
 }
 
-bool SwitchN64Controller::GetButton(int button) const {
-  return m_hid->GetRawButton(button);
+bool SwitchN64Controller::GetButton(Button button) const {
+  return m_hid->GetRawButton(static_cast<int>(button));
 }
 
-bool SwitchN64Controller::GetButtonPressed(int button) {
-  return m_hid->GetRawButtonPressed(button);
+bool SwitchN64Controller::GetButtonPressed(Button button) {
+  return m_hid->GetRawButtonPressed(static_cast<int>(button));
 }
 
-bool SwitchN64Controller::GetButtonReleased(int button) {
-  return m_hid->GetRawButtonReleased(button);
+bool SwitchN64Controller::GetButtonReleased(Button button) {
+  return m_hid->GetRawButtonReleased(static_cast<int>(button));
 }
 
-BooleanEvent SwitchN64Controller::ButtonEvent(int button,
+BooleanEvent SwitchN64Controller::ButtonEvent(Button button,
                                                     EventLoop* loop) const {
-  return m_hid->Button(button, loop);
+  return m_hid->Button(static_cast<int>(button), loop);
 }
 
 void SwitchN64Controller::SetLeds(int r, int g, int b) {

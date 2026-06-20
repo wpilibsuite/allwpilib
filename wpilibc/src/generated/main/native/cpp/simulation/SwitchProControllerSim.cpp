@@ -28,89 +28,89 @@ SwitchProControllerSim::SwitchProControllerSim(int port) : GenericHIDSim{port} {
 }
 
 void SwitchProControllerSim::SetLeftX(double value) {
-  SetRawAxis(SwitchProController::Axis::LEFT_X, value);
+  SetRawAxis(static_cast<int>(SwitchProController::Axis::LEFT_X), value);
 }
 
 void SwitchProControllerSim::SetLeftY(double value) {
-  SetRawAxis(SwitchProController::Axis::LEFT_Y, value);
+  SetRawAxis(static_cast<int>(SwitchProController::Axis::LEFT_Y), value);
 }
 
 void SwitchProControllerSim::SetRightX(double value) {
-  SetRawAxis(SwitchProController::Axis::RIGHT_X, value);
+  SetRawAxis(static_cast<int>(SwitchProController::Axis::RIGHT_X), value);
 }
 
 void SwitchProControllerSim::SetRightY(double value) {
-  SetRawAxis(SwitchProController::Axis::RIGHT_Y, value);
+  SetRawAxis(static_cast<int>(SwitchProController::Axis::RIGHT_Y), value);
 }
 
 void SwitchProControllerSim::SetZL(double value) {
-  SetRawAxis(SwitchProController::Axis::ZL, value);
+  SetRawAxis(static_cast<int>(SwitchProController::Axis::ZL), value);
 }
 
 void SwitchProControllerSim::SetZR(double value) {
-  SetRawAxis(SwitchProController::Axis::ZR, value);
+  SetRawAxis(static_cast<int>(SwitchProController::Axis::ZR), value);
 }
 
 void SwitchProControllerSim::SetBButton(bool value) {
-  SetRawButton(SwitchProController::Button::B, value);
+  SetRawButton(static_cast<int>(SwitchProController::Button::B), value);
 }
 
 void SwitchProControllerSim::SetAButton(bool value) {
-  SetRawButton(SwitchProController::Button::A, value);
+  SetRawButton(static_cast<int>(SwitchProController::Button::A), value);
 }
 
 void SwitchProControllerSim::SetYButton(bool value) {
-  SetRawButton(SwitchProController::Button::Y, value);
+  SetRawButton(static_cast<int>(SwitchProController::Button::Y), value);
 }
 
 void SwitchProControllerSim::SetXButton(bool value) {
-  SetRawButton(SwitchProController::Button::X, value);
+  SetRawButton(static_cast<int>(SwitchProController::Button::X), value);
 }
 
 void SwitchProControllerSim::SetMinusButton(bool value) {
-  SetRawButton(SwitchProController::Button::MINUS, value);
+  SetRawButton(static_cast<int>(SwitchProController::Button::MINUS), value);
 }
 
 void SwitchProControllerSim::SetHomeButton(bool value) {
-  SetRawButton(SwitchProController::Button::HOME, value);
+  SetRawButton(static_cast<int>(SwitchProController::Button::HOME), value);
 }
 
 void SwitchProControllerSim::SetPlusButton(bool value) {
-  SetRawButton(SwitchProController::Button::PLUS, value);
+  SetRawButton(static_cast<int>(SwitchProController::Button::PLUS), value);
 }
 
 void SwitchProControllerSim::SetLeftStickButton(bool value) {
-  SetRawButton(SwitchProController::Button::LEFT_STICK, value);
+  SetRawButton(static_cast<int>(SwitchProController::Button::LEFT_STICK), value);
 }
 
 void SwitchProControllerSim::SetRightStickButton(bool value) {
-  SetRawButton(SwitchProController::Button::RIGHT_STICK, value);
+  SetRawButton(static_cast<int>(SwitchProController::Button::RIGHT_STICK), value);
 }
 
 void SwitchProControllerSim::SetLButton(bool value) {
-  SetRawButton(SwitchProController::Button::L, value);
+  SetRawButton(static_cast<int>(SwitchProController::Button::L), value);
 }
 
 void SwitchProControllerSim::SetRButton(bool value) {
-  SetRawButton(SwitchProController::Button::R, value);
+  SetRawButton(static_cast<int>(SwitchProController::Button::R), value);
 }
 
 void SwitchProControllerSim::SetDpadUpButton(bool value) {
-  SetRawButton(SwitchProController::Button::DPAD_UP, value);
+  SetRawButton(static_cast<int>(SwitchProController::Button::DPAD_UP), value);
 }
 
 void SwitchProControllerSim::SetDpadDownButton(bool value) {
-  SetRawButton(SwitchProController::Button::DPAD_DOWN, value);
+  SetRawButton(static_cast<int>(SwitchProController::Button::DPAD_DOWN), value);
 }
 
 void SwitchProControllerSim::SetDpadLeftButton(bool value) {
-  SetRawButton(SwitchProController::Button::DPAD_LEFT, value);
+  SetRawButton(static_cast<int>(SwitchProController::Button::DPAD_LEFT), value);
 }
 
 void SwitchProControllerSim::SetDpadRightButton(bool value) {
-  SetRawButton(SwitchProController::Button::DPAD_RIGHT, value);
+  SetRawButton(static_cast<int>(SwitchProController::Button::DPAD_RIGHT), value);
 }
 
 void SwitchProControllerSim::SetCaptureButton(bool value) {
-  SetRawButton(SwitchProController::Button::CAPTURE, value);
+  SetRawButton(static_cast<int>(SwitchProController::Button::CAPTURE), value);
 }

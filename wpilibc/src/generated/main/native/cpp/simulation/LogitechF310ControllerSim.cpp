@@ -28,85 +28,85 @@ LogitechF310ControllerSim::LogitechF310ControllerSim(int port) : GenericHIDSim{p
 }
 
 void LogitechF310ControllerSim::SetLeftX(double value) {
-  SetRawAxis(LogitechF310Controller::Axis::LEFT_X, value);
+  SetRawAxis(static_cast<int>(LogitechF310Controller::Axis::LEFT_X), value);
 }
 
 void LogitechF310ControllerSim::SetLeftY(double value) {
-  SetRawAxis(LogitechF310Controller::Axis::LEFT_Y, value);
+  SetRawAxis(static_cast<int>(LogitechF310Controller::Axis::LEFT_Y), value);
 }
 
 void LogitechF310ControllerSim::SetRightX(double value) {
-  SetRawAxis(LogitechF310Controller::Axis::RIGHT_X, value);
+  SetRawAxis(static_cast<int>(LogitechF310Controller::Axis::RIGHT_X), value);
 }
 
 void LogitechF310ControllerSim::SetRightY(double value) {
-  SetRawAxis(LogitechF310Controller::Axis::RIGHT_Y, value);
+  SetRawAxis(static_cast<int>(LogitechF310Controller::Axis::RIGHT_Y), value);
 }
 
 void LogitechF310ControllerSim::SetLeftTrigger(double value) {
-  SetRawAxis(LogitechF310Controller::Axis::LEFT_TRIGGER, value);
+  SetRawAxis(static_cast<int>(LogitechF310Controller::Axis::LEFT_TRIGGER), value);
 }
 
 void LogitechF310ControllerSim::SetRightTrigger(double value) {
-  SetRawAxis(LogitechF310Controller::Axis::RIGHT_TRIGGER, value);
+  SetRawAxis(static_cast<int>(LogitechF310Controller::Axis::RIGHT_TRIGGER), value);
 }
 
 void LogitechF310ControllerSim::SetAButton(bool value) {
-  SetRawButton(LogitechF310Controller::Button::A, value);
+  SetRawButton(static_cast<int>(LogitechF310Controller::Button::A), value);
 }
 
 void LogitechF310ControllerSim::SetBButton(bool value) {
-  SetRawButton(LogitechF310Controller::Button::B, value);
+  SetRawButton(static_cast<int>(LogitechF310Controller::Button::B), value);
 }
 
 void LogitechF310ControllerSim::SetXButton(bool value) {
-  SetRawButton(LogitechF310Controller::Button::X, value);
+  SetRawButton(static_cast<int>(LogitechF310Controller::Button::X), value);
 }
 
 void LogitechF310ControllerSim::SetYButton(bool value) {
-  SetRawButton(LogitechF310Controller::Button::Y, value);
+  SetRawButton(static_cast<int>(LogitechF310Controller::Button::Y), value);
 }
 
 void LogitechF310ControllerSim::SetBackButton(bool value) {
-  SetRawButton(LogitechF310Controller::Button::BACK, value);
+  SetRawButton(static_cast<int>(LogitechF310Controller::Button::BACK), value);
 }
 
 void LogitechF310ControllerSim::SetLogitechButton(bool value) {
-  SetRawButton(LogitechF310Controller::Button::LOGITECH, value);
+  SetRawButton(static_cast<int>(LogitechF310Controller::Button::LOGITECH), value);
 }
 
 void LogitechF310ControllerSim::SetStartButton(bool value) {
-  SetRawButton(LogitechF310Controller::Button::START, value);
+  SetRawButton(static_cast<int>(LogitechF310Controller::Button::START), value);
 }
 
 void LogitechF310ControllerSim::SetLeftStickButton(bool value) {
-  SetRawButton(LogitechF310Controller::Button::LEFT_STICK, value);
+  SetRawButton(static_cast<int>(LogitechF310Controller::Button::LEFT_STICK), value);
 }
 
 void LogitechF310ControllerSim::SetRightStickButton(bool value) {
-  SetRawButton(LogitechF310Controller::Button::RIGHT_STICK, value);
+  SetRawButton(static_cast<int>(LogitechF310Controller::Button::RIGHT_STICK), value);
 }
 
 void LogitechF310ControllerSim::SetLeftBumperButton(bool value) {
-  SetRawButton(LogitechF310Controller::Button::LEFT_BUMPER, value);
+  SetRawButton(static_cast<int>(LogitechF310Controller::Button::LEFT_BUMPER), value);
 }
 
 void LogitechF310ControllerSim::SetRightBumperButton(bool value) {
-  SetRawButton(LogitechF310Controller::Button::RIGHT_BUMPER, value);
+  SetRawButton(static_cast<int>(LogitechF310Controller::Button::RIGHT_BUMPER), value);
 }
 
 void LogitechF310ControllerSim::SetDpadUpButton(bool value) {
-  SetRawButton(LogitechF310Controller::Button::DPAD_UP, value);
+  SetRawButton(static_cast<int>(LogitechF310Controller::Button::DPAD_UP), value);
 }
 
 void LogitechF310ControllerSim::SetDpadDownButton(bool value) {
-  SetRawButton(LogitechF310Controller::Button::DPAD_DOWN, value);
+  SetRawButton(static_cast<int>(LogitechF310Controller::Button::DPAD_DOWN), value);
 }
 
 void LogitechF310ControllerSim::SetDpadLeftButton(bool value) {
-  SetRawButton(LogitechF310Controller::Button::DPAD_LEFT, value);
+  SetRawButton(static_cast<int>(LogitechF310Controller::Button::DPAD_LEFT), value);
 }
 
 void LogitechF310ControllerSim::SetDpadRightButton(bool value) {
-  SetRawButton(LogitechF310Controller::Button::DPAD_RIGHT, value);
+  SetRawButton(static_cast<int>(LogitechF310Controller::Button::DPAD_RIGHT), value);
 }

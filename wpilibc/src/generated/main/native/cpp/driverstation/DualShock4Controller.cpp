@@ -60,18 +60,18 @@ double DualShock4Controller::GetR2() const {
   return GetAxis(Axis::R2);
 }
 
-double DualShock4Controller::GetAxis(int axis) const {
-  return m_hid->GetRawAxis(axis);
+double DualShock4Controller::GetAxis(Axis axis) const {
+  return m_hid->GetRawAxis(static_cast<int>(axis));
 }
 
-BooleanEvent DualShock4Controller::AxisLessThan(int axis, double threshold,
+BooleanEvent DualShock4Controller::AxisLessThan(Axis axis, double threshold,
                                                      EventLoop* loop) const {
-  return m_hid->AxisLessThan(axis, threshold, loop);
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
 }
 
 BooleanEvent DualShock4Controller::AxisGreaterThan(
-    int axis, double threshold, EventLoop* loop) const {
-  return m_hid->AxisGreaterThan(axis, threshold, loop);
+    Axis axis, double threshold, EventLoop* loop) const {
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
 }
 
 bool DualShock4Controller::GetCrossButton() const {
@@ -330,21 +330,21 @@ BooleanEvent DualShock4Controller::Touchpad(EventLoop* loop) const {
   return ButtonEvent(Button::TOUCHPAD, loop);
 }
 
-bool DualShock4Controller::GetButton(int button) const {
-  return m_hid->GetRawButton(button);
+bool DualShock4Controller::GetButton(Button button) const {
+  return m_hid->GetRawButton(static_cast<int>(button));
 }
 
-bool DualShock4Controller::GetButtonPressed(int button) {
-  return m_hid->GetRawButtonPressed(button);
+bool DualShock4Controller::GetButtonPressed(Button button) {
+  return m_hid->GetRawButtonPressed(static_cast<int>(button));
 }
 
-bool DualShock4Controller::GetButtonReleased(int button) {
-  return m_hid->GetRawButtonReleased(button);
+bool DualShock4Controller::GetButtonReleased(Button button) {
+  return m_hid->GetRawButtonReleased(static_cast<int>(button));
 }
 
-BooleanEvent DualShock4Controller::ButtonEvent(int button,
+BooleanEvent DualShock4Controller::ButtonEvent(Button button,
                                                     EventLoop* loop) const {
-  return m_hid->Button(button, loop);
+  return m_hid->Button(static_cast<int>(button), loop);
 }
 
 void DualShock4Controller::SetLeds(int r, int g, int b) {

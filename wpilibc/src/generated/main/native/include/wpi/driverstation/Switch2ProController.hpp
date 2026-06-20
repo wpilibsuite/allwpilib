@@ -46,6 +46,64 @@ class Switch2ProController
   static constexpr GenericHID::SupportedOutputs SUPPORTED_OUTPUTS =
       static_cast<GenericHID::SupportedOutputs>(8);
 
+  /** Represents a digital button on a Switch2ProController. */
+  enum class Button {
+    /// B button.
+    B = 0,
+    /// A button.
+    A = 1,
+    /// Y button.
+    Y = 2,
+    /// X button.
+    X = 3,
+    /// Minus button.
+    MINUS = 4,
+    /// Home button.
+    HOME = 5,
+    /// Plus button.
+    PLUS = 6,
+    /// Left Stick button.
+    LEFT_STICK = 7,
+    /// Right Stick button.
+    RIGHT_STICK = 8,
+    /// L button.
+    L = 9,
+    /// R button.
+    R = 10,
+    /// Dpad Up button.
+    DPAD_UP = 11,
+    /// Dpad Down button.
+    DPAD_DOWN = 12,
+    /// Dpad Left button.
+    DPAD_LEFT = 13,
+    /// Dpad Right button.
+    DPAD_RIGHT = 14,
+    /// Capture button.
+    CAPTURE = 15,
+    /// GR button.
+    GR = 16,
+    /// GL button.
+    GL = 17,
+    /// C button.
+    C = 21,
+  };
+
+  /** Represents an axis on a Switch2ProController. */
+  enum class Axis {
+    /// Left X.
+    LEFT_X = 0,
+    /// Left Y.
+    LEFT_Y = 1,
+    /// Right X.
+    RIGHT_X = 2,
+    /// Right Y.
+    RIGHT_Y = 3,
+    /// ZL.
+    ZL = 4,
+    /// ZR.
+    ZR = 5,
+  };
+
   /**
    * Construct an instance of a controller.
    *
@@ -144,7 +202,7 @@ class Switch2ProController
    * @param axis The axis to read
    * @return the axis value.
    */
-  double GetAxis(int axis) const;
+  double GetAxis(Axis axis) const;
 
   /**
    * Constructs an event instance that is true when the axis value is less than
@@ -156,7 +214,7 @@ class Switch2ProController
    * @return an event instance that is true when the axis value is less than the
    * provided threshold.
    */
-  BooleanEvent AxisLessThan(int axis, double threshold, EventLoop* loop) const;
+  BooleanEvent AxisLessThan(Axis axis, double threshold, EventLoop* loop) const;
 
   /**
    * Constructs an event instance that is true when the axis value is greater
@@ -168,7 +226,7 @@ class Switch2ProController
    * @return an event instance that is true when the axis value is greater than
    * the provided threshold.
    */
-  BooleanEvent AxisGreaterThan(int axis, double threshold,
+  BooleanEvent AxisGreaterThan(Axis axis, double threshold,
                                EventLoop* loop) const;
 
   /**
@@ -766,7 +824,7 @@ class Switch2ProController
    * @param button The button to read
    * @return The state of the button.
    */
-  bool GetButton(int button) const;
+  bool GetButton(Button button) const;
 
   /**
    * Whether the button was pressed since the last check.
@@ -774,7 +832,7 @@ class Switch2ProController
    * @param button The button to read
    * @return Whether the button was pressed since the last check.
    */
-  bool GetButtonPressed(int button);
+  bool GetButtonPressed(Button button);
 
   /**
    * Whether the button was released since the last check.
@@ -782,7 +840,7 @@ class Switch2ProController
    * @param button The button to read
    * @return Whether the button was released since the last check.
    */
-  bool GetButtonReleased(int button);
+  bool GetButtonReleased(Button button);
 
   /**
    * Constructs an event instance around this button's digital signal.
@@ -792,7 +850,7 @@ class Switch2ProController
    * @return an event instance representing the button's digital signal attached
    * to the given loop.
    */
-  BooleanEvent ButtonEvent(int button, EventLoop* loop) const;
+  BooleanEvent ButtonEvent(Button button, EventLoop* loop) const;
 
   /**
    * Set leds on the controller.
@@ -810,64 +868,6 @@ class Switch2ProController
    * @param value The normalized value (0 to 1) to set the rumble to
    */
   void SetRumble(GenericHID::RumbleType type, double value);
-
-  /** Represents a digital button on a Switch2ProController. */
-  struct Button {
-    /// B button.
-    static constexpr int B = 0;
-    /// A button.
-    static constexpr int A = 1;
-    /// Y button.
-    static constexpr int Y = 2;
-    /// X button.
-    static constexpr int X = 3;
-    /// Minus button.
-    static constexpr int MINUS = 4;
-    /// Home button.
-    static constexpr int HOME = 5;
-    /// Plus button.
-    static constexpr int PLUS = 6;
-    /// Left Stick button.
-    static constexpr int LEFT_STICK = 7;
-    /// Right Stick button.
-    static constexpr int RIGHT_STICK = 8;
-    /// L button.
-    static constexpr int L = 9;
-    /// R button.
-    static constexpr int R = 10;
-    /// Dpad Up button.
-    static constexpr int DPAD_UP = 11;
-    /// Dpad Down button.
-    static constexpr int DPAD_DOWN = 12;
-    /// Dpad Left button.
-    static constexpr int DPAD_LEFT = 13;
-    /// Dpad Right button.
-    static constexpr int DPAD_RIGHT = 14;
-    /// Capture button.
-    static constexpr int CAPTURE = 15;
-    /// GR button.
-    static constexpr int GR = 16;
-    /// GL button.
-    static constexpr int GL = 17;
-    /// C button.
-    static constexpr int C = 21;
-  };
-
-  /** Represents an axis on a Switch2ProController. */
-  struct Axis {
-    /// Left X.
-    static constexpr int LEFT_X = 0;
-    /// Left Y.
-    static constexpr int LEFT_Y = 1;
-    /// Right X.
-    static constexpr int RIGHT_X = 2;
-    /// Right Y.
-    static constexpr int RIGHT_Y = 3;
-    /// ZL.
-    static constexpr int ZL = 4;
-    /// ZR.
-    static constexpr int ZR = 5;
-  };
 
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 

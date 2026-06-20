@@ -46,6 +46,50 @@ class GameCubeController
   static constexpr GenericHID::SupportedOutputs SUPPORTED_OUTPUTS =
       static_cast<GenericHID::SupportedOutputs>(0);
 
+  /** Represents a digital button on a GameCubeController. */
+  enum class Button {
+    /// A button.
+    A = 0,
+    /// X button.
+    X = 1,
+    /// B button.
+    B = 2,
+    /// Y button.
+    Y = 3,
+    /// Start button.
+    START = 6,
+    /// Z button.
+    Z = 10,
+    /// Dpad Up button.
+    DPAD_UP = 11,
+    /// Dpad Down button.
+    DPAD_DOWN = 12,
+    /// Dpad Left button.
+    DPAD_LEFT = 13,
+    /// Dpad Right button.
+    DPAD_RIGHT = 14,
+    /// L button.
+    L = 22,
+    /// R button.
+    R = 23,
+  };
+
+  /** Represents an axis on a GameCubeController. */
+  enum class Axis {
+    /// Left X.
+    LEFT_X = 0,
+    /// Left Y.
+    LEFT_Y = 1,
+    /// C Stick X.
+    C_STICK_X = 2,
+    /// C Stick Y.
+    C_STICK_Y = 3,
+    /// L Trigger.
+    L_TRIGGER = 4,
+    /// R Trigger.
+    R_TRIGGER = 5,
+  };
+
   /**
    * Construct an instance of a controller.
    *
@@ -144,7 +188,7 @@ class GameCubeController
    * @param axis The axis to read
    * @return the axis value.
    */
-  double GetAxis(int axis) const;
+  double GetAxis(Axis axis) const;
 
   /**
    * Constructs an event instance that is true when the axis value is less than
@@ -156,7 +200,7 @@ class GameCubeController
    * @return an event instance that is true when the axis value is less than the
    * provided threshold.
    */
-  BooleanEvent AxisLessThan(int axis, double threshold, EventLoop* loop) const;
+  BooleanEvent AxisLessThan(Axis axis, double threshold, EventLoop* loop) const;
 
   /**
    * Constructs an event instance that is true when the axis value is greater
@@ -168,7 +212,7 @@ class GameCubeController
    * @return an event instance that is true when the axis value is greater than
    * the provided threshold.
    */
-  BooleanEvent AxisGreaterThan(int axis, double threshold,
+  BooleanEvent AxisGreaterThan(Axis axis, double threshold,
                                EventLoop* loop) const;
 
   /**
@@ -549,7 +593,7 @@ class GameCubeController
    * @param button The button to read
    * @return The state of the button.
    */
-  bool GetButton(int button) const;
+  bool GetButton(Button button) const;
 
   /**
    * Whether the button was pressed since the last check.
@@ -557,7 +601,7 @@ class GameCubeController
    * @param button The button to read
    * @return Whether the button was pressed since the last check.
    */
-  bool GetButtonPressed(int button);
+  bool GetButtonPressed(Button button);
 
   /**
    * Whether the button was released since the last check.
@@ -565,7 +609,7 @@ class GameCubeController
    * @param button The button to read
    * @return Whether the button was released since the last check.
    */
-  bool GetButtonReleased(int button);
+  bool GetButtonReleased(Button button);
 
   /**
    * Constructs an event instance around this button's digital signal.
@@ -575,7 +619,7 @@ class GameCubeController
    * @return an event instance representing the button's digital signal attached
    * to the given loop.
    */
-  BooleanEvent ButtonEvent(int button, EventLoop* loop) const;
+  BooleanEvent ButtonEvent(Button button, EventLoop* loop) const;
 
   /**
    * Set leds on the controller.
@@ -593,50 +637,6 @@ class GameCubeController
    * @param value The normalized value (0 to 1) to set the rumble to
    */
   void SetRumble(GenericHID::RumbleType type, double value);
-
-  /** Represents a digital button on a GameCubeController. */
-  struct Button {
-    /// A button.
-    static constexpr int A = 0;
-    /// X button.
-    static constexpr int X = 1;
-    /// B button.
-    static constexpr int B = 2;
-    /// Y button.
-    static constexpr int Y = 3;
-    /// Start button.
-    static constexpr int START = 6;
-    /// Z button.
-    static constexpr int Z = 10;
-    /// Dpad Up button.
-    static constexpr int DPAD_UP = 11;
-    /// Dpad Down button.
-    static constexpr int DPAD_DOWN = 12;
-    /// Dpad Left button.
-    static constexpr int DPAD_LEFT = 13;
-    /// Dpad Right button.
-    static constexpr int DPAD_RIGHT = 14;
-    /// L button.
-    static constexpr int L = 22;
-    /// R button.
-    static constexpr int R = 23;
-  };
-
-  /** Represents an axis on a GameCubeController. */
-  struct Axis {
-    /// Left X.
-    static constexpr int LEFT_X = 0;
-    /// Left Y.
-    static constexpr int LEFT_Y = 1;
-    /// C Stick X.
-    static constexpr int C_STICK_X = 2;
-    /// C Stick Y.
-    static constexpr int C_STICK_Y = 3;
-    /// L Trigger.
-    static constexpr int L_TRIGGER = 4;
-    /// R Trigger.
-    static constexpr int R_TRIGGER = 5;
-  };
 
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 

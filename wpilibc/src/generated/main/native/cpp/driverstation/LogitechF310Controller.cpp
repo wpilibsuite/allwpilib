@@ -60,18 +60,18 @@ double LogitechF310Controller::GetRightTrigger() const {
   return GetAxis(Axis::RIGHT_TRIGGER);
 }
 
-double LogitechF310Controller::GetAxis(int axis) const {
-  return m_hid->GetRawAxis(axis);
+double LogitechF310Controller::GetAxis(Axis axis) const {
+  return m_hid->GetRawAxis(static_cast<int>(axis));
 }
 
-BooleanEvent LogitechF310Controller::AxisLessThan(int axis, double threshold,
+BooleanEvent LogitechF310Controller::AxisLessThan(Axis axis, double threshold,
                                                      EventLoop* loop) const {
-  return m_hid->AxisLessThan(axis, threshold, loop);
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
 }
 
 BooleanEvent LogitechF310Controller::AxisGreaterThan(
-    int axis, double threshold, EventLoop* loop) const {
-  return m_hid->AxisGreaterThan(axis, threshold, loop);
+    Axis axis, double threshold, EventLoop* loop) const {
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
 }
 
 bool LogitechF310Controller::GetAButton() const {
@@ -314,21 +314,21 @@ BooleanEvent LogitechF310Controller::DpadRight(EventLoop* loop) const {
   return ButtonEvent(Button::DPAD_RIGHT, loop);
 }
 
-bool LogitechF310Controller::GetButton(int button) const {
-  return m_hid->GetRawButton(button);
+bool LogitechF310Controller::GetButton(Button button) const {
+  return m_hid->GetRawButton(static_cast<int>(button));
 }
 
-bool LogitechF310Controller::GetButtonPressed(int button) {
-  return m_hid->GetRawButtonPressed(button);
+bool LogitechF310Controller::GetButtonPressed(Button button) {
+  return m_hid->GetRawButtonPressed(static_cast<int>(button));
 }
 
-bool LogitechF310Controller::GetButtonReleased(int button) {
-  return m_hid->GetRawButtonReleased(button);
+bool LogitechF310Controller::GetButtonReleased(Button button) {
+  return m_hid->GetRawButtonReleased(static_cast<int>(button));
 }
 
-BooleanEvent LogitechF310Controller::ButtonEvent(int button,
+BooleanEvent LogitechF310Controller::ButtonEvent(Button button,
                                                     EventLoop* loop) const {
-  return m_hid->Button(button, loop);
+  return m_hid->Button(static_cast<int>(button), loop);
 }
 
 void LogitechF310Controller::SetLeds(int r, int g, int b) {

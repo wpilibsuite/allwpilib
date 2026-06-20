@@ -108,29 +108,6 @@ classes:
       GetTouchpadFingerAvailable:
       GetTouchpadFinger:
       InitSendable:
-  wpi::DualShock4Controller::Button:
-    attributes:
-      CROSS:
-      CIRCLE:
-      SQUARE:
-      TRIANGLE:
-      SHARE:
-      PS:
-      OPTIONS:
-      L3:
-      R3:
-      L1:
-      R1:
-      DPAD_UP:
-      DPAD_DOWN:
-      DPAD_LEFT:
-      DPAD_RIGHT:
-      TOUCHPAD:
-  wpi::DualShock4Controller::Axis:
-    attributes:
-      LEFT_X:
-      LEFT_Y:
-      RIGHT_X:
-      RIGHT_Y:
-      L2:
-      R2:
+    enums:
+      Button:
+      Axis:

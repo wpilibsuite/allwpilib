@@ -28,109 +28,109 @@ DualSenseEdgeControllerSim::DualSenseEdgeControllerSim(int port) : GenericHIDSim
 }
 
 void DualSenseEdgeControllerSim::SetLeftX(double value) {
-  SetRawAxis(DualSenseEdgeController::Axis::LEFT_X, value);
+  SetRawAxis(static_cast<int>(DualSenseEdgeController::Axis::LEFT_X), value);
 }
 
 void DualSenseEdgeControllerSim::SetLeftY(double value) {
-  SetRawAxis(DualSenseEdgeController::Axis::LEFT_Y, value);
+  SetRawAxis(static_cast<int>(DualSenseEdgeController::Axis::LEFT_Y), value);
 }
 
 void DualSenseEdgeControllerSim::SetRightX(double value) {
-  SetRawAxis(DualSenseEdgeController::Axis::RIGHT_X, value);
+  SetRawAxis(static_cast<int>(DualSenseEdgeController::Axis::RIGHT_X), value);
 }
 
 void DualSenseEdgeControllerSim::SetRightY(double value) {
-  SetRawAxis(DualSenseEdgeController::Axis::RIGHT_Y, value);
+  SetRawAxis(static_cast<int>(DualSenseEdgeController::Axis::RIGHT_Y), value);
 }
 
 void DualSenseEdgeControllerSim::SetL2(double value) {
-  SetRawAxis(DualSenseEdgeController::Axis::L2, value);
+  SetRawAxis(static_cast<int>(DualSenseEdgeController::Axis::L2), value);
 }
 
 void DualSenseEdgeControllerSim::SetR2(double value) {
-  SetRawAxis(DualSenseEdgeController::Axis::R2, value);
+  SetRawAxis(static_cast<int>(DualSenseEdgeController::Axis::R2), value);
 }
 
 void DualSenseEdgeControllerSim::SetCrossButton(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::CROSS, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::CROSS), value);
 }
 
 void DualSenseEdgeControllerSim::SetCircleButton(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::CIRCLE, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::CIRCLE), value);
 }
 
 void DualSenseEdgeControllerSim::SetSquareButton(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::SQUARE, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::SQUARE), value);
 }
 
 void DualSenseEdgeControllerSim::SetTriangleButton(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::TRIANGLE, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::TRIANGLE), value);
 }
 
 void DualSenseEdgeControllerSim::SetCreateButton(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::CREATE, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::CREATE), value);
 }
 
 void DualSenseEdgeControllerSim::SetPSButton(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::PS, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::PS), value);
 }
 
 void DualSenseEdgeControllerSim::SetOptionsButton(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::OPTIONS, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::OPTIONS), value);
 }
 
 void DualSenseEdgeControllerSim::SetL3Button(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::L3, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::L3), value);
 }
 
 void DualSenseEdgeControllerSim::SetR3Button(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::R3, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::R3), value);
 }
 
 void DualSenseEdgeControllerSim::SetL1Button(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::L1, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::L1), value);
 }
 
 void DualSenseEdgeControllerSim::SetR1Button(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::R1, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::R1), value);
 }
 
 void DualSenseEdgeControllerSim::SetDpadUpButton(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::DPAD_UP, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::DPAD_UP), value);
 }
 
 void DualSenseEdgeControllerSim::SetDpadDownButton(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::DPAD_DOWN, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::DPAD_DOWN), value);
 }
 
 void DualSenseEdgeControllerSim::SetDpadLeftButton(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::DPAD_LEFT, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::DPAD_LEFT), value);
 }
 
 void DualSenseEdgeControllerSim::SetDpadRightButton(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::DPAD_RIGHT, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::DPAD_RIGHT), value);
 }
 
 void DualSenseEdgeControllerSim::SetMicrophoneButton(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::MICROPHONE, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::MICROPHONE), value);
 }
 
 void DualSenseEdgeControllerSim::SetRightPaddle1Button(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::RIGHT_PADDLE_1, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::RIGHT_PADDLE_1), value);
 }
 
 void DualSenseEdgeControllerSim::SetLeftPaddle1Button(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::LEFT_PADDLE_1, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::LEFT_PADDLE_1), value);
 }
 
 void DualSenseEdgeControllerSim::SetTouchpadButton(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::TOUCHPAD, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::TOUCHPAD), value);
 }
 
 void DualSenseEdgeControllerSim::SetLeftFunctionButton(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::LEFT_FUNCTION, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::LEFT_FUNCTION), value);
 }
 
 void DualSenseEdgeControllerSim::SetRightFunctionButton(bool value) {
-  SetRawButton(DualSenseEdgeController::Button::RIGHT_FUNCTION, value);
+  SetRawButton(static_cast<int>(DualSenseEdgeController::Button::RIGHT_FUNCTION), value);
 }

@@ -8,8 +8,17 @@
 using namespace wpi::cmd;
 
 CommandSwitch2GCController::CommandSwitch2GCController(int port)
-    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
-      m_controller{m_hid->GetHID()} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)} {
+  m_ownedController =
+      std::make_unique<wpi::Switch2GCController>(m_hid->GetHID());
+  m_controller = m_ownedController.get();
+}
+
+CommandSwitch2GCController::CommandSwitch2GCController(
+    wpi::Switch2GCController* controller)
+    : m_ownedHid{std::make_unique<CommandGenericHID>(controller->GetHID())},
+      m_hid{m_ownedHid.get()},
+      m_controller{controller} {}
 
 CommandGenericHID& CommandSwitch2GCController::GetHID() {
   return *m_hid;
@@ -17,144 +26,171 @@ CommandGenericHID& CommandSwitch2GCController::GetHID() {
 
 wpi::Switch2GCController&
 CommandSwitch2GCController::GetController() {
-  return m_controller;
+  return *m_controller;
 }
 
 const wpi::Switch2GCController&
 CommandSwitch2GCController::GetController() const {
-  return m_controller;
+  return *m_controller;
 }
+
+Trigger CommandSwitch2GCController::Button(
+    enum wpi::Switch2GCController::Button button,
+    wpi::EventLoop* loop) const {
+  return m_hid->Button(static_cast<int>(button), loop);
+}
+
 
 Trigger CommandSwitch2GCController::A(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Switch2GCController::Button::A,
-                       loop);
+  return Button(wpi::Switch2GCController::Button::A,
+                loop);
 }
 
 Trigger CommandSwitch2GCController::X(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Switch2GCController::Button::X,
-                       loop);
+  return Button(wpi::Switch2GCController::Button::X,
+                loop);
 }
 
 Trigger CommandSwitch2GCController::B(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Switch2GCController::Button::B,
-                       loop);
+  return Button(wpi::Switch2GCController::Button::B,
+                loop);
 }
 
 Trigger CommandSwitch2GCController::Y(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Switch2GCController::Button::Y,
-                       loop);
+  return Button(wpi::Switch2GCController::Button::Y,
+                loop);
 }
 
 Trigger CommandSwitch2GCController::Home(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Switch2GCController::Button::HOME,
-                       loop);
+  return Button(wpi::Switch2GCController::Button::HOME,
+                loop);
 }
 
 Trigger CommandSwitch2GCController::Start(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Switch2GCController::Button::START,
-                       loop);
+  return Button(wpi::Switch2GCController::Button::START,
+                loop);
 }
 
 Trigger CommandSwitch2GCController::ZL(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Switch2GCController::Button::ZL,
-                       loop);
+  return Button(wpi::Switch2GCController::Button::ZL,
+                loop);
 }
 
 Trigger CommandSwitch2GCController::Z(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Switch2GCController::Button::Z,
-                       loop);
+  return Button(wpi::Switch2GCController::Button::Z,
+                loop);
 }
 
 Trigger CommandSwitch2GCController::DpadUp(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Switch2GCController::Button::DPAD_UP,
-                       loop);
+  return Button(wpi::Switch2GCController::Button::DPAD_UP,
+                loop);
 }
 
 Trigger CommandSwitch2GCController::DpadDown(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Switch2GCController::Button::DPAD_DOWN,
-                       loop);
+  return Button(wpi::Switch2GCController::Button::DPAD_DOWN,
+                loop);
 }
 
 Trigger CommandSwitch2GCController::DpadLeft(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Switch2GCController::Button::DPAD_LEFT,
-                       loop);
+  return Button(wpi::Switch2GCController::Button::DPAD_LEFT,
+                loop);
 }
 
 Trigger CommandSwitch2GCController::DpadRight(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Switch2GCController::Button::DPAD_RIGHT,
-                       loop);
+  return Button(wpi::Switch2GCController::Button::DPAD_RIGHT,
+                loop);
 }
 
 Trigger CommandSwitch2GCController::Capture(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Switch2GCController::Button::CAPTURE,
-                       loop);
+  return Button(wpi::Switch2GCController::Button::CAPTURE,
+                loop);
 }
 
 Trigger CommandSwitch2GCController::C(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Switch2GCController::Button::C,
-                       loop);
+  return Button(wpi::Switch2GCController::Button::C,
+                loop);
 }
 
 Trigger CommandSwitch2GCController::L(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Switch2GCController::Button::L,
-                       loop);
+  return Button(wpi::Switch2GCController::Button::L,
+                loop);
 }
 
 Trigger CommandSwitch2GCController::R(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Switch2GCController::Button::R,
-                       loop);
+  return Button(wpi::Switch2GCController::Button::R,
+                loop);
 }
 
 Trigger CommandSwitch2GCController::LTrigger(
     double threshold, wpi::EventLoop* loop) const {
-  return m_hid->AxisGreaterThan(
+  return AxisGreaterThan(
       wpi::Switch2GCController::Axis::L_TRIGGER,
       threshold, loop);
 }
 
 Trigger CommandSwitch2GCController::RTrigger(
     double threshold, wpi::EventLoop* loop) const {
-  return m_hid->AxisGreaterThan(
+  return AxisGreaterThan(
       wpi::Switch2GCController::Axis::R_TRIGGER,
       threshold, loop);
 }
 
+Trigger CommandSwitch2GCController::AxisLessThan(
+    wpi::Switch2GCController::Axis axis, double threshold,
+    wpi::EventLoop* loop) const {
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
+}
+
+Trigger CommandSwitch2GCController::AxisGreaterThan(
+    wpi::Switch2GCController::Axis axis, double threshold,
+    wpi::EventLoop* loop) const {
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
+}
+
+Trigger CommandSwitch2GCController::AxisMagnitudeGreaterThan(
+    wpi::Switch2GCController::Axis axis, double threshold,
+    wpi::EventLoop* loop) const {
+  return m_hid->AxisMagnitudeGreaterThan(static_cast<int>(axis), threshold,
+                                         loop);
+}
+
+
 double CommandSwitch2GCController::GetLeftX() const {
-  return m_controller.GetLeftX();
+  return m_controller->GetLeftX();
 }
 
 double CommandSwitch2GCController::GetLeftY() const {
-  return m_controller.GetLeftY();
+  return m_controller->GetLeftY();
 }
 
 double CommandSwitch2GCController::GetCStickX() const {
-  return m_controller.GetCStickX();
+  return m_controller->GetCStickX();
 }
 
 double CommandSwitch2GCController::GetCStickY() const {
-  return m_controller.GetCStickY();
+  return m_controller->GetCStickY();
 }
 
 double CommandSwitch2GCController::GetLTrigger() const {
-  return m_controller.GetLTrigger();
+  return m_controller->GetLTrigger();
 }
 
 double CommandSwitch2GCController::GetRTrigger() const {
-  return m_controller.GetRTrigger();
+  return m_controller->GetRTrigger();
 }

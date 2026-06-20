@@ -6,6 +6,7 @@
 
 package org.wpilib.command3.button;
 
+import java.util.Objects;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.SwitchN64Controller;
@@ -33,6 +34,16 @@ public class CommandSwitchN64Controller {
 
   /**
    * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the {@link Scheduler#getDefault() default scheduler} using its default event loop.
+   *
+   * @param controller The SwitchN64Controller object to use for this controller.
+   */
+  public CommandSwitchN64Controller(SwitchN64Controller controller) {
+    this(Scheduler.getDefault(), controller);
+  }
+
+  /**
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
    * scheduled on the given scheduler using its default event loop.
    *
    * @param scheduler The scheduler that should execute the triggered commands.
@@ -41,6 +52,19 @@ public class CommandSwitchN64Controller {
   public CommandSwitchN64Controller(Scheduler scheduler, int port) {
     m_hid = CommandGenericHID.getCommandGenericHID(scheduler, port);
     m_controller = new SwitchN64Controller(m_hid.getHID());
+  }
+
+  /**
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the given scheduler using its default event loop.
+   *
+   * @param scheduler The scheduler that should execute the triggered commands.
+   * @param controller The SwitchN64Controller object to use for this controller.
+   */
+  public CommandSwitchN64Controller(Scheduler scheduler, SwitchN64Controller controller) {
+    m_controller =
+        Objects.requireNonNull(controller, "Provided SwitchN64Controller cannot be null");
+    m_hid = new CommandGenericHID(scheduler, m_controller.getHID());
   }
 
   /**

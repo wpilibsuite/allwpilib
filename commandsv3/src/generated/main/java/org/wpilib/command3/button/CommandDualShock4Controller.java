@@ -6,6 +6,7 @@
 
 package org.wpilib.command3.button;
 
+import java.util.Objects;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.DualShock4Controller;
@@ -33,6 +34,16 @@ public class CommandDualShock4Controller {
 
   /**
    * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the {@link Scheduler#getDefault() default scheduler} using its default event loop.
+   *
+   * @param controller The DualShock4Controller object to use for this controller.
+   */
+  public CommandDualShock4Controller(DualShock4Controller controller) {
+    this(Scheduler.getDefault(), controller);
+  }
+
+  /**
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
    * scheduled on the given scheduler using its default event loop.
    *
    * @param scheduler The scheduler that should execute the triggered commands.
@@ -41,6 +52,19 @@ public class CommandDualShock4Controller {
   public CommandDualShock4Controller(Scheduler scheduler, int port) {
     m_hid = CommandGenericHID.getCommandGenericHID(scheduler, port);
     m_controller = new DualShock4Controller(m_hid.getHID());
+  }
+
+  /**
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the given scheduler using its default event loop.
+   *
+   * @param scheduler The scheduler that should execute the triggered commands.
+   * @param controller The DualShock4Controller object to use for this controller.
+   */
+  public CommandDualShock4Controller(Scheduler scheduler, DualShock4Controller controller) {
+    m_controller =
+        Objects.requireNonNull(controller, "Provided DualShock4Controller cannot be null");
+    m_hid = new CommandGenericHID(scheduler, m_controller.getHID());
   }
 
   /**

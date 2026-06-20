@@ -28,129 +28,129 @@ SteamControllerSim::SteamControllerSim(int port) : GenericHIDSim{port} {
 }
 
 void SteamControllerSim::SetLeftX(double value) {
-  SetRawAxis(SteamController::Axis::LEFT_X, value);
+  SetRawAxis(static_cast<int>(SteamController::Axis::LEFT_X), value);
 }
 
 void SteamControllerSim::SetLeftY(double value) {
-  SetRawAxis(SteamController::Axis::LEFT_Y, value);
+  SetRawAxis(static_cast<int>(SteamController::Axis::LEFT_Y), value);
 }
 
 void SteamControllerSim::SetRightX(double value) {
-  SetRawAxis(SteamController::Axis::RIGHT_X, value);
+  SetRawAxis(static_cast<int>(SteamController::Axis::RIGHT_X), value);
 }
 
 void SteamControllerSim::SetRightY(double value) {
-  SetRawAxis(SteamController::Axis::RIGHT_Y, value);
+  SetRawAxis(static_cast<int>(SteamController::Axis::RIGHT_Y), value);
 }
 
 void SteamControllerSim::SetLeftTrigger(double value) {
-  SetRawAxis(SteamController::Axis::LEFT_TRIGGER, value);
+  SetRawAxis(static_cast<int>(SteamController::Axis::LEFT_TRIGGER), value);
 }
 
 void SteamControllerSim::SetRightTrigger(double value) {
-  SetRawAxis(SteamController::Axis::RIGHT_TRIGGER, value);
+  SetRawAxis(static_cast<int>(SteamController::Axis::RIGHT_TRIGGER), value);
 }
 
 void SteamControllerSim::SetAButton(bool value) {
-  SetRawButton(SteamController::Button::A, value);
+  SetRawButton(static_cast<int>(SteamController::Button::A), value);
 }
 
 void SteamControllerSim::SetBButton(bool value) {
-  SetRawButton(SteamController::Button::B, value);
+  SetRawButton(static_cast<int>(SteamController::Button::B), value);
 }
 
 void SteamControllerSim::SetXButton(bool value) {
-  SetRawButton(SteamController::Button::X, value);
+  SetRawButton(static_cast<int>(SteamController::Button::X), value);
 }
 
 void SteamControllerSim::SetYButton(bool value) {
-  SetRawButton(SteamController::Button::Y, value);
+  SetRawButton(static_cast<int>(SteamController::Button::Y), value);
 }
 
 void SteamControllerSim::SetMenuButton(bool value) {
-  SetRawButton(SteamController::Button::MENU, value);
+  SetRawButton(static_cast<int>(SteamController::Button::MENU), value);
 }
 
 void SteamControllerSim::SetSteamButton(bool value) {
-  SetRawButton(SteamController::Button::STEAM, value);
+  SetRawButton(static_cast<int>(SteamController::Button::STEAM), value);
 }
 
 void SteamControllerSim::SetViewButton(bool value) {
-  SetRawButton(SteamController::Button::VIEW, value);
+  SetRawButton(static_cast<int>(SteamController::Button::VIEW), value);
 }
 
 void SteamControllerSim::SetLeftStickButton(bool value) {
-  SetRawButton(SteamController::Button::LEFT_STICK, value);
+  SetRawButton(static_cast<int>(SteamController::Button::LEFT_STICK), value);
 }
 
 void SteamControllerSim::SetRightStickButton(bool value) {
-  SetRawButton(SteamController::Button::RIGHT_STICK, value);
+  SetRawButton(static_cast<int>(SteamController::Button::RIGHT_STICK), value);
 }
 
 void SteamControllerSim::SetLeftBumperButton(bool value) {
-  SetRawButton(SteamController::Button::LEFT_BUMPER, value);
+  SetRawButton(static_cast<int>(SteamController::Button::LEFT_BUMPER), value);
 }
 
 void SteamControllerSim::SetRightBumperButton(bool value) {
-  SetRawButton(SteamController::Button::RIGHT_BUMPER, value);
+  SetRawButton(static_cast<int>(SteamController::Button::RIGHT_BUMPER), value);
 }
 
 void SteamControllerSim::SetDpadUpButton(bool value) {
-  SetRawButton(SteamController::Button::DPAD_UP, value);
+  SetRawButton(static_cast<int>(SteamController::Button::DPAD_UP), value);
 }
 
 void SteamControllerSim::SetDpadDownButton(bool value) {
-  SetRawButton(SteamController::Button::DPAD_DOWN, value);
+  SetRawButton(static_cast<int>(SteamController::Button::DPAD_DOWN), value);
 }
 
 void SteamControllerSim::SetDpadLeftButton(bool value) {
-  SetRawButton(SteamController::Button::DPAD_LEFT, value);
+  SetRawButton(static_cast<int>(SteamController::Button::DPAD_LEFT), value);
 }
 
 void SteamControllerSim::SetDpadRightButton(bool value) {
-  SetRawButton(SteamController::Button::DPAD_RIGHT, value);
+  SetRawButton(static_cast<int>(SteamController::Button::DPAD_RIGHT), value);
 }
 
 void SteamControllerSim::SetQAMButton(bool value) {
-  SetRawButton(SteamController::Button::QAM, value);
+  SetRawButton(static_cast<int>(SteamController::Button::QAM), value);
 }
 
 void SteamControllerSim::SetRightPaddle1Button(bool value) {
-  SetRawButton(SteamController::Button::RIGHT_PADDLE_1, value);
+  SetRawButton(static_cast<int>(SteamController::Button::RIGHT_PADDLE_1), value);
 }
 
 void SteamControllerSim::SetLeftPaddle1Button(bool value) {
-  SetRawButton(SteamController::Button::LEFT_PADDLE_1, value);
+  SetRawButton(static_cast<int>(SteamController::Button::LEFT_PADDLE_1), value);
 }
 
 void SteamControllerSim::SetRightPaddle2Button(bool value) {
-  SetRawButton(SteamController::Button::RIGHT_PADDLE_2, value);
+  SetRawButton(static_cast<int>(SteamController::Button::RIGHT_PADDLE_2), value);
 }
 
 void SteamControllerSim::SetLeftPaddle2Button(bool value) {
-  SetRawButton(SteamController::Button::LEFT_PADDLE_2, value);
+  SetRawButton(static_cast<int>(SteamController::Button::LEFT_PADDLE_2), value);
 }
 
 void SteamControllerSim::SetLeftTouchpadButton(bool value) {
-  SetRawButton(SteamController::Button::LEFT_TOUCHPAD, value);
+  SetRawButton(static_cast<int>(SteamController::Button::LEFT_TOUCHPAD), value);
 }
 
 void SteamControllerSim::SetRightTouchpadButton(bool value) {
-  SetRawButton(SteamController::Button::RIGHT_TOUCHPAD, value);
+  SetRawButton(static_cast<int>(SteamController::Button::RIGHT_TOUCHPAD), value);
 }
 
 void SteamControllerSim::SetLeftStickTouchButton(bool value) {
-  SetRawButton(SteamController::Button::LEFT_STICK_TOUCH, value);
+  SetRawButton(static_cast<int>(SteamController::Button::LEFT_STICK_TOUCH), value);
 }
 
 void SteamControllerSim::SetRightStickTouchButton(bool value) {
-  SetRawButton(SteamController::Button::RIGHT_STICK_TOUCH, value);
+  SetRawButton(static_cast<int>(SteamController::Button::RIGHT_STICK_TOUCH), value);
 }
 
 void SteamControllerSim::SetLeftGripTouchButton(bool value) {
-  SetRawButton(SteamController::Button::LEFT_GRIP_TOUCH, value);
+  SetRawButton(static_cast<int>(SteamController::Button::LEFT_GRIP_TOUCH), value);
 }
 
 void SteamControllerSim::SetRightGripTouchButton(bool value) {
-  SetRawButton(SteamController::Button::RIGHT_GRIP_TOUCH, value);
+  SetRawButton(static_cast<int>(SteamController::Button::RIGHT_GRIP_TOUCH), value);
 }

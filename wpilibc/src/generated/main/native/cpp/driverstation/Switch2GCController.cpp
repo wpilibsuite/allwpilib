@@ -60,18 +60,18 @@ double Switch2GCController::GetRTrigger() const {
   return GetAxis(Axis::R_TRIGGER);
 }
 
-double Switch2GCController::GetAxis(int axis) const {
-  return m_hid->GetRawAxis(axis);
+double Switch2GCController::GetAxis(Axis axis) const {
+  return m_hid->GetRawAxis(static_cast<int>(axis));
 }
 
-BooleanEvent Switch2GCController::AxisLessThan(int axis, double threshold,
+BooleanEvent Switch2GCController::AxisLessThan(Axis axis, double threshold,
                                                      EventLoop* loop) const {
-  return m_hid->AxisLessThan(axis, threshold, loop);
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
 }
 
 BooleanEvent Switch2GCController::AxisGreaterThan(
-    int axis, double threshold, EventLoop* loop) const {
-  return m_hid->AxisGreaterThan(axis, threshold, loop);
+    Axis axis, double threshold, EventLoop* loop) const {
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
 }
 
 bool Switch2GCController::GetAButton() const {
@@ -330,21 +330,21 @@ BooleanEvent Switch2GCController::R(EventLoop* loop) const {
   return ButtonEvent(Button::R, loop);
 }
 
-bool Switch2GCController::GetButton(int button) const {
-  return m_hid->GetRawButton(button);
+bool Switch2GCController::GetButton(Button button) const {
+  return m_hid->GetRawButton(static_cast<int>(button));
 }
 
-bool Switch2GCController::GetButtonPressed(int button) {
-  return m_hid->GetRawButtonPressed(button);
+bool Switch2GCController::GetButtonPressed(Button button) {
+  return m_hid->GetRawButtonPressed(static_cast<int>(button));
 }
 
-bool Switch2GCController::GetButtonReleased(int button) {
-  return m_hid->GetRawButtonReleased(button);
+bool Switch2GCController::GetButtonReleased(Button button) {
+  return m_hid->GetRawButtonReleased(static_cast<int>(button));
 }
 
-BooleanEvent Switch2GCController::ButtonEvent(int button,
+BooleanEvent Switch2GCController::ButtonEvent(Button button,
                                                     EventLoop* loop) const {
-  return m_hid->Button(button, loop);
+  return m_hid->Button(static_cast<int>(button), loop);
 }
 
 void Switch2GCController::SetLeds(int r, int g, int b) {

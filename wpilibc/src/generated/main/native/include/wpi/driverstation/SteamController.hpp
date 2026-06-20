@@ -46,6 +46,78 @@ class SteamController
   static constexpr GenericHID::SupportedOutputs SUPPORTED_OUTPUTS =
       static_cast<GenericHID::SupportedOutputs>(8);
 
+  /** Represents a digital button on a SteamController. */
+  enum class Button {
+    /// A button.
+    A = 0,
+    /// B button.
+    B = 1,
+    /// X button.
+    X = 2,
+    /// Y button.
+    Y = 3,
+    /// Menu button.
+    MENU = 4,
+    /// Steam button.
+    STEAM = 5,
+    /// View button.
+    VIEW = 6,
+    /// Left Stick button.
+    LEFT_STICK = 7,
+    /// Right Stick button.
+    RIGHT_STICK = 8,
+    /// Left Bumper button.
+    LEFT_BUMPER = 9,
+    /// Right Bumper button.
+    RIGHT_BUMPER = 10,
+    /// Dpad Up button.
+    DPAD_UP = 11,
+    /// Dpad Down button.
+    DPAD_DOWN = 12,
+    /// Dpad Left button.
+    DPAD_LEFT = 13,
+    /// Dpad Right button.
+    DPAD_RIGHT = 14,
+    /// QAM button.
+    QAM = 15,
+    /// Right Paddle 1 button.
+    RIGHT_PADDLE_1 = 16,
+    /// Left Paddle 1 button.
+    LEFT_PADDLE_1 = 17,
+    /// Right Paddle 2 button.
+    RIGHT_PADDLE_2 = 18,
+    /// Left Paddle 2 button.
+    LEFT_PADDLE_2 = 19,
+    /// Left Touchpad button.
+    LEFT_TOUCHPAD = 20,
+    /// Right Touchpad button.
+    RIGHT_TOUCHPAD = 21,
+    /// Left Stick Touch button.
+    LEFT_STICK_TOUCH = 22,
+    /// Right Stick Touch button.
+    RIGHT_STICK_TOUCH = 23,
+    /// Left Grip Touch button.
+    LEFT_GRIP_TOUCH = 24,
+    /// Right Grip Touch button.
+    RIGHT_GRIP_TOUCH = 25,
+  };
+
+  /** Represents an axis on a SteamController. */
+  enum class Axis {
+    /// Left X.
+    LEFT_X = 0,
+    /// Left Y.
+    LEFT_Y = 1,
+    /// Right X.
+    RIGHT_X = 2,
+    /// Right Y.
+    RIGHT_Y = 3,
+    /// Left Trigger.
+    LEFT_TRIGGER = 4,
+    /// Right Trigger.
+    RIGHT_TRIGGER = 5,
+  };
+
   /**
    * Construct an instance of a controller.
    *
@@ -144,7 +216,7 @@ class SteamController
    * @param axis The axis to read
    * @return the axis value.
    */
-  double GetAxis(int axis) const;
+  double GetAxis(Axis axis) const;
 
   /**
    * Constructs an event instance that is true when the axis value is less than
@@ -156,7 +228,7 @@ class SteamController
    * @return an event instance that is true when the axis value is less than the
    * provided threshold.
    */
-  BooleanEvent AxisLessThan(int axis, double threshold, EventLoop* loop) const;
+  BooleanEvent AxisLessThan(Axis axis, double threshold, EventLoop* loop) const;
 
   /**
    * Constructs an event instance that is true when the axis value is greater
@@ -168,7 +240,7 @@ class SteamController
    * @return an event instance that is true when the axis value is greater than
    * the provided threshold.
    */
-  BooleanEvent AxisGreaterThan(int axis, double threshold,
+  BooleanEvent AxisGreaterThan(Axis axis, double threshold,
                                EventLoop* loop) const;
 
   /**
@@ -983,7 +1055,7 @@ class SteamController
    * @param button The button to read
    * @return The state of the button.
    */
-  bool GetButton(int button) const;
+  bool GetButton(Button button) const;
 
   /**
    * Whether the button was pressed since the last check.
@@ -991,7 +1063,7 @@ class SteamController
    * @param button The button to read
    * @return Whether the button was pressed since the last check.
    */
-  bool GetButtonPressed(int button);
+  bool GetButtonPressed(Button button);
 
   /**
    * Whether the button was released since the last check.
@@ -999,7 +1071,7 @@ class SteamController
    * @param button The button to read
    * @return Whether the button was released since the last check.
    */
-  bool GetButtonReleased(int button);
+  bool GetButtonReleased(Button button);
 
   /**
    * Constructs an event instance around this button's digital signal.
@@ -1009,7 +1081,7 @@ class SteamController
    * @return an event instance representing the button's digital signal attached
    * to the given loop.
    */
-  BooleanEvent ButtonEvent(int button, EventLoop* loop) const;
+  BooleanEvent ButtonEvent(Button button, EventLoop* loop) const;
 
   /**
    * Set leds on the controller.
@@ -1042,78 +1114,6 @@ class SteamController
    * @return The touchpad finger data.
    */
   TouchpadFinger GetTouchpadFinger(int touchpad, int finger) const;
-
-  /** Represents a digital button on a SteamController. */
-  struct Button {
-    /// A button.
-    static constexpr int A = 0;
-    /// B button.
-    static constexpr int B = 1;
-    /// X button.
-    static constexpr int X = 2;
-    /// Y button.
-    static constexpr int Y = 3;
-    /// Menu button.
-    static constexpr int MENU = 4;
-    /// Steam button.
-    static constexpr int STEAM = 5;
-    /// View button.
-    static constexpr int VIEW = 6;
-    /// Left Stick button.
-    static constexpr int LEFT_STICK = 7;
-    /// Right Stick button.
-    static constexpr int RIGHT_STICK = 8;
-    /// Left Bumper button.
-    static constexpr int LEFT_BUMPER = 9;
-    /// Right Bumper button.
-    static constexpr int RIGHT_BUMPER = 10;
-    /// Dpad Up button.
-    static constexpr int DPAD_UP = 11;
-    /// Dpad Down button.
-    static constexpr int DPAD_DOWN = 12;
-    /// Dpad Left button.
-    static constexpr int DPAD_LEFT = 13;
-    /// Dpad Right button.
-    static constexpr int DPAD_RIGHT = 14;
-    /// QAM button.
-    static constexpr int QAM = 15;
-    /// Right Paddle 1 button.
-    static constexpr int RIGHT_PADDLE_1 = 16;
-    /// Left Paddle 1 button.
-    static constexpr int LEFT_PADDLE_1 = 17;
-    /// Right Paddle 2 button.
-    static constexpr int RIGHT_PADDLE_2 = 18;
-    /// Left Paddle 2 button.
-    static constexpr int LEFT_PADDLE_2 = 19;
-    /// Left Touchpad button.
-    static constexpr int LEFT_TOUCHPAD = 20;
-    /// Right Touchpad button.
-    static constexpr int RIGHT_TOUCHPAD = 21;
-    /// Left Stick Touch button.
-    static constexpr int LEFT_STICK_TOUCH = 22;
-    /// Right Stick Touch button.
-    static constexpr int RIGHT_STICK_TOUCH = 23;
-    /// Left Grip Touch button.
-    static constexpr int LEFT_GRIP_TOUCH = 24;
-    /// Right Grip Touch button.
-    static constexpr int RIGHT_GRIP_TOUCH = 25;
-  };
-
-  /** Represents an axis on a SteamController. */
-  struct Axis {
-    /// Left X.
-    static constexpr int LEFT_X = 0;
-    /// Left Y.
-    static constexpr int LEFT_Y = 1;
-    /// Right X.
-    static constexpr int RIGHT_X = 2;
-    /// Right Y.
-    static constexpr int RIGHT_Y = 3;
-    /// Left Trigger.
-    static constexpr int LEFT_TRIGGER = 4;
-    /// Right Trigger.
-    static constexpr int RIGHT_TRIGGER = 5;
-  };
 
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 

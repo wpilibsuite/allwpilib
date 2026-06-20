@@ -106,29 +106,6 @@ classes:
       SetLeds:
       SetRumble:
       InitSendable:
-  wpi::SwitchProController::Button:
-    attributes:
-      B:
-      A:
-      Y:
-      X:
-      MINUS:
-      HOME:
-      PLUS:
-      LEFT_STICK:
-      RIGHT_STICK:
-      L:
-      R:
-      DPAD_UP:
-      DPAD_DOWN:
-      DPAD_LEFT:
-      DPAD_RIGHT:
-      CAPTURE:
-  wpi::SwitchProController::Axis:
-    attributes:
-      LEFT_X:
-      LEFT_Y:
-      RIGHT_X:
-      RIGHT_Y:
-      ZL:
-      ZR:
+    enums:
+      Button:
+      Axis:

@@ -6,6 +6,7 @@
 
 package org.wpilib.command2.button;
 
+import java.util.Objects;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.SwitchProController;
 import org.wpilib.event.EventLoop;
@@ -31,6 +32,17 @@ public class CommandSwitchProController {
   }
 
   /**
+   * Construct an instance of a controller with a SwitchProController object.
+   *
+   * @param controller The SwitchProController object to use for this controller.
+   */
+  public CommandSwitchProController(SwitchProController controller) {
+    m_controller =
+        Objects.requireNonNull(controller, "Provided SwitchProController cannot be null");
+    m_hid = new CommandGenericHID(m_controller.getHID());
+  }
+
+  /**
    * Get the underlying CommandGenericHID object.
    *
    * @return the wrapped CommandGenericHID object
@@ -46,6 +58,29 @@ public class CommandSwitchProController {
    */
   public SwitchProController getController() {
     return m_controller;
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button
+   * @return an event instance representing the button's digital signal attached to the {@link
+   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @see #button(SwitchProController.Button, EventLoop)
+   */
+  public Trigger button(SwitchProController.Button button) {
+    return button(button, CommandScheduler.getInstance().getDefaultButtonLoop());
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the button's digital signal attached to the given loop.
+   */
+  public Trigger button(SwitchProController.Button button, EventLoop loop) {
+    return m_hid.button(button.value, loop);
   }
 
   /**
@@ -67,7 +102,7 @@ public class CommandSwitchProController {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return m_hid.button(SwitchProController.Button.B.value, loop);
+    return button(SwitchProController.Button.B, loop);
   }
 
   /**
@@ -89,7 +124,7 @@ public class CommandSwitchProController {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return m_hid.button(SwitchProController.Button.A.value, loop);
+    return button(SwitchProController.Button.A, loop);
   }
 
   /**
@@ -111,7 +146,7 @@ public class CommandSwitchProController {
    *     to the given loop.
    */
   public Trigger y(EventLoop loop) {
-    return m_hid.button(SwitchProController.Button.Y.value, loop);
+    return button(SwitchProController.Button.Y, loop);
   }
 
   /**
@@ -133,7 +168,7 @@ public class CommandSwitchProController {
    *     to the given loop.
    */
   public Trigger x(EventLoop loop) {
-    return m_hid.button(SwitchProController.Button.X.value, loop);
+    return button(SwitchProController.Button.X, loop);
   }
 
   /**
@@ -155,7 +190,7 @@ public class CommandSwitchProController {
    *     to the given loop.
    */
   public Trigger minus(EventLoop loop) {
-    return m_hid.button(SwitchProController.Button.MINUS.value, loop);
+    return button(SwitchProController.Button.MINUS, loop);
   }
 
   /**
@@ -177,7 +212,7 @@ public class CommandSwitchProController {
    *     to the given loop.
    */
   public Trigger home(EventLoop loop) {
-    return m_hid.button(SwitchProController.Button.HOME.value, loop);
+    return button(SwitchProController.Button.HOME, loop);
   }
 
   /**
@@ -199,7 +234,7 @@ public class CommandSwitchProController {
    *     to the given loop.
    */
   public Trigger plus(EventLoop loop) {
-    return m_hid.button(SwitchProController.Button.PLUS.value, loop);
+    return button(SwitchProController.Button.PLUS, loop);
   }
 
   /**
@@ -221,7 +256,7 @@ public class CommandSwitchProController {
    *     to the given loop.
    */
   public Trigger leftStick(EventLoop loop) {
-    return m_hid.button(SwitchProController.Button.LEFT_STICK.value, loop);
+    return button(SwitchProController.Button.LEFT_STICK, loop);
   }
 
   /**
@@ -243,7 +278,7 @@ public class CommandSwitchProController {
    *     to the given loop.
    */
   public Trigger rightStick(EventLoop loop) {
-    return m_hid.button(SwitchProController.Button.RIGHT_STICK.value, loop);
+    return button(SwitchProController.Button.RIGHT_STICK, loop);
   }
 
   /**
@@ -265,7 +300,7 @@ public class CommandSwitchProController {
    *     to the given loop.
    */
   public Trigger L(EventLoop loop) {
-    return m_hid.button(SwitchProController.Button.L.value, loop);
+    return button(SwitchProController.Button.L, loop);
   }
 
   /**
@@ -287,7 +322,7 @@ public class CommandSwitchProController {
    *     to the given loop.
    */
   public Trigger R(EventLoop loop) {
-    return m_hid.button(SwitchProController.Button.R.value, loop);
+    return button(SwitchProController.Button.R, loop);
   }
 
   /**
@@ -309,7 +344,7 @@ public class CommandSwitchProController {
    *     to the given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return m_hid.button(SwitchProController.Button.DPAD_UP.value, loop);
+    return button(SwitchProController.Button.DPAD_UP, loop);
   }
 
   /**
@@ -331,7 +366,7 @@ public class CommandSwitchProController {
    *     to the given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return m_hid.button(SwitchProController.Button.DPAD_DOWN.value, loop);
+    return button(SwitchProController.Button.DPAD_DOWN, loop);
   }
 
   /**
@@ -353,7 +388,7 @@ public class CommandSwitchProController {
    *     to the given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return m_hid.button(SwitchProController.Button.DPAD_LEFT.value, loop);
+    return button(SwitchProController.Button.DPAD_LEFT, loop);
   }
 
   /**
@@ -375,7 +410,7 @@ public class CommandSwitchProController {
    *     to the given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return m_hid.button(SwitchProController.Button.DPAD_RIGHT.value, loop);
+    return button(SwitchProController.Button.DPAD_RIGHT, loop);
   }
 
   /**
@@ -397,7 +432,7 @@ public class CommandSwitchProController {
    *     to the given loop.
    */
   public Trigger capture(EventLoop loop) {
-    return m_hid.button(SwitchProController.Button.CAPTURE.value, loop);
+    return button(SwitchProController.Button.CAPTURE, loop);
   }
 
   /**
@@ -411,8 +446,8 @@ public class CommandSwitchProController {
    *     threshold, attached to the given event loop
    */
   public Trigger ZL(double threshold, EventLoop loop) {
-    return m_hid.axisGreaterThan(
-        SwitchProController.Axis.ZL.value, threshold, loop);
+    return axisGreaterThan(
+        SwitchProController.Axis.ZL, threshold, loop);
   }
 
   /**
@@ -442,6 +477,7 @@ public class CommandSwitchProController {
     return ZL(0.5);
   }
 
+
   /**
    * Constructs a Trigger instance around the axis value of the ZR. The returned
    * trigger will be true when the axis value is greater than {@code threshold}.
@@ -453,8 +489,8 @@ public class CommandSwitchProController {
    *     threshold, attached to the given event loop
    */
   public Trigger ZR(double threshold, EventLoop loop) {
-    return m_hid.axisGreaterThan(
-        SwitchProController.Axis.ZR.value, threshold, loop);
+    return axisGreaterThan(
+        SwitchProController.Axis.ZR, threshold, loop);
   }
 
   /**
@@ -483,6 +519,104 @@ public class CommandSwitchProController {
   public Trigger ZR() {
     return ZR(0.5);
   }
+
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(SwitchProController.Axis axis, double threshold) {
+    return m_hid.axisLessThan(axis.value, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(
+      SwitchProController.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisLessThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(SwitchProController.Axis axis, double threshold) {
+    return m_hid.axisGreaterThan(axis.value, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(
+      SwitchProController.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis magnitude value is greater than the
+   *     provided threshold.
+   */
+  public Trigger axisMagnitudeGreaterThan(
+      SwitchProController.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisMagnitudeGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
+   * scheduler button loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
+   */
+  public Trigger axisMagnitudeGreaterThan(SwitchProController.Axis axis, double threshold) {
+    return m_hid.axisMagnitudeGreaterThan(axis.value, threshold);
+  }
+
+  /**
+   * Get the value of the axis.
+   *
+   * @param axis The axis to read
+   * @return The value of the axis.
+   */
+  public double getAxis(SwitchProController.Axis axis) {
+    return m_hid.getRawAxis(axis.value);
+  }
+
 
   /**
    * Get the Left X value of the controller.

@@ -106,29 +106,6 @@ classes:
       SetLeds:
       SetRumble:
       InitSendable:
-  wpi::Switch2GCController::Button:
-    attributes:
-      A:
-      X:
-      B:
-      Y:
-      HOME:
-      START:
-      ZL:
-      Z:
-      DPAD_UP:
-      DPAD_DOWN:
-      DPAD_LEFT:
-      DPAD_RIGHT:
-      CAPTURE:
-      C:
-      L:
-      R:
-  wpi::Switch2GCController::Axis:
-    attributes:
-      LEFT_X:
-      LEFT_Y:
-      C_STICK_X:
-      C_STICK_Y:
-      L_TRIGGER:
-      R_TRIGGER:
+    enums:
+      Button:
+      Axis:

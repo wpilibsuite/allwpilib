@@ -128,34 +128,6 @@ classes:
       GetTouchpadFingerAvailable:
       GetTouchpadFinger:
       InitSendable:
-  wpi::DualSenseEdgeController::Button:
-    attributes:
-      CROSS:
-      CIRCLE:
-      SQUARE:
-      TRIANGLE:
-      CREATE:
-      PS:
-      OPTIONS:
-      L3:
-      R3:
-      L1:
-      R1:
-      DPAD_UP:
-      DPAD_DOWN:
-      DPAD_LEFT:
-      DPAD_RIGHT:
-      MICROPHONE:
-      RIGHT_PADDLE_1:
-      LEFT_PADDLE_1:
-      TOUCHPAD:
-      LEFT_FUNCTION:
-      RIGHT_FUNCTION:
-  wpi::DualSenseEdgeController::Axis:
-    attributes:
-      LEFT_X:
-      LEFT_Y:
-      RIGHT_X:
-      RIGHT_Y:
-      L2:
-      R2:
+    enums:
+      Button:
+      Axis:

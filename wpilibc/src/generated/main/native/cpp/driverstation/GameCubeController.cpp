@@ -60,18 +60,18 @@ double GameCubeController::GetRTrigger() const {
   return GetAxis(Axis::R_TRIGGER);
 }
 
-double GameCubeController::GetAxis(int axis) const {
-  return m_hid->GetRawAxis(axis);
+double GameCubeController::GetAxis(Axis axis) const {
+  return m_hid->GetRawAxis(static_cast<int>(axis));
 }
 
-BooleanEvent GameCubeController::AxisLessThan(int axis, double threshold,
+BooleanEvent GameCubeController::AxisLessThan(Axis axis, double threshold,
                                                      EventLoop* loop) const {
-  return m_hid->AxisLessThan(axis, threshold, loop);
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
 }
 
 BooleanEvent GameCubeController::AxisGreaterThan(
-    int axis, double threshold, EventLoop* loop) const {
-  return m_hid->AxisGreaterThan(axis, threshold, loop);
+    Axis axis, double threshold, EventLoop* loop) const {
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
 }
 
 bool GameCubeController::GetAButton() const {
@@ -266,21 +266,21 @@ BooleanEvent GameCubeController::R(EventLoop* loop) const {
   return ButtonEvent(Button::R, loop);
 }
 
-bool GameCubeController::GetButton(int button) const {
-  return m_hid->GetRawButton(button);
+bool GameCubeController::GetButton(Button button) const {
+  return m_hid->GetRawButton(static_cast<int>(button));
 }
 
-bool GameCubeController::GetButtonPressed(int button) {
-  return m_hid->GetRawButtonPressed(button);
+bool GameCubeController::GetButtonPressed(Button button) {
+  return m_hid->GetRawButtonPressed(static_cast<int>(button));
 }
 
-bool GameCubeController::GetButtonReleased(int button) {
-  return m_hid->GetRawButtonReleased(button);
+bool GameCubeController::GetButtonReleased(Button button) {
+  return m_hid->GetRawButtonReleased(static_cast<int>(button));
 }
 
-BooleanEvent GameCubeController::ButtonEvent(int button,
+BooleanEvent GameCubeController::ButtonEvent(Button button,
                                                     EventLoop* loop) const {
-  return m_hid->Button(button, loop);
+  return m_hid->Button(static_cast<int>(button), loop);
 }
 
 void GameCubeController::SetLeds(int r, int g, int b) {

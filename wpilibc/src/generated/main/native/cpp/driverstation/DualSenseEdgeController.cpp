@@ -60,18 +60,18 @@ double DualSenseEdgeController::GetR2() const {
   return GetAxis(Axis::R2);
 }
 
-double DualSenseEdgeController::GetAxis(int axis) const {
-  return m_hid->GetRawAxis(axis);
+double DualSenseEdgeController::GetAxis(Axis axis) const {
+  return m_hid->GetRawAxis(static_cast<int>(axis));
 }
 
-BooleanEvent DualSenseEdgeController::AxisLessThan(int axis, double threshold,
+BooleanEvent DualSenseEdgeController::AxisLessThan(Axis axis, double threshold,
                                                      EventLoop* loop) const {
-  return m_hid->AxisLessThan(axis, threshold, loop);
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
 }
 
 BooleanEvent DualSenseEdgeController::AxisGreaterThan(
-    int axis, double threshold, EventLoop* loop) const {
-  return m_hid->AxisGreaterThan(axis, threshold, loop);
+    Axis axis, double threshold, EventLoop* loop) const {
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
 }
 
 bool DualSenseEdgeController::GetCrossButton() const {
@@ -410,21 +410,21 @@ BooleanEvent DualSenseEdgeController::RightFunction(EventLoop* loop) const {
   return ButtonEvent(Button::RIGHT_FUNCTION, loop);
 }
 
-bool DualSenseEdgeController::GetButton(int button) const {
-  return m_hid->GetRawButton(button);
+bool DualSenseEdgeController::GetButton(Button button) const {
+  return m_hid->GetRawButton(static_cast<int>(button));
 }
 
-bool DualSenseEdgeController::GetButtonPressed(int button) {
-  return m_hid->GetRawButtonPressed(button);
+bool DualSenseEdgeController::GetButtonPressed(Button button) {
+  return m_hid->GetRawButtonPressed(static_cast<int>(button));
 }
 
-bool DualSenseEdgeController::GetButtonReleased(int button) {
-  return m_hid->GetRawButtonReleased(button);
+bool DualSenseEdgeController::GetButtonReleased(Button button) {
+  return m_hid->GetRawButtonReleased(static_cast<int>(button));
 }
 
-BooleanEvent DualSenseEdgeController::ButtonEvent(int button,
+BooleanEvent DualSenseEdgeController::ButtonEvent(Button button,
                                                     EventLoop* loop) const {
-  return m_hid->Button(button, loop);
+  return m_hid->Button(static_cast<int>(button), loop);
 }
 
 void DualSenseEdgeController::SetLeds(int r, int g, int b) {

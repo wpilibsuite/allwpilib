@@ -6,6 +6,7 @@
 
 package org.wpilib.command2.button;
 
+import java.util.Objects;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.LogitechF310Controller;
 import org.wpilib.event.EventLoop;
@@ -31,6 +32,17 @@ public class CommandLogitechF310Controller {
   }
 
   /**
+   * Construct an instance of a controller with a LogitechF310Controller object.
+   *
+   * @param controller The LogitechF310Controller object to use for this controller.
+   */
+  public CommandLogitechF310Controller(LogitechF310Controller controller) {
+    m_controller =
+        Objects.requireNonNull(controller, "Provided LogitechF310Controller cannot be null");
+    m_hid = new CommandGenericHID(m_controller.getHID());
+  }
+
+  /**
    * Get the underlying CommandGenericHID object.
    *
    * @return the wrapped CommandGenericHID object
@@ -46,6 +58,29 @@ public class CommandLogitechF310Controller {
    */
   public LogitechF310Controller getController() {
     return m_controller;
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button
+   * @return an event instance representing the button's digital signal attached to the {@link
+   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @see #button(LogitechF310Controller.Button, EventLoop)
+   */
+  public Trigger button(LogitechF310Controller.Button button) {
+    return button(button, CommandScheduler.getInstance().getDefaultButtonLoop());
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the button's digital signal attached to the given loop.
+   */
+  public Trigger button(LogitechF310Controller.Button button, EventLoop loop) {
+    return m_hid.button(button.value, loop);
   }
 
   /**
@@ -67,7 +102,7 @@ public class CommandLogitechF310Controller {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return m_hid.button(LogitechF310Controller.Button.A.value, loop);
+    return button(LogitechF310Controller.Button.A, loop);
   }
 
   /**
@@ -89,7 +124,7 @@ public class CommandLogitechF310Controller {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return m_hid.button(LogitechF310Controller.Button.B.value, loop);
+    return button(LogitechF310Controller.Button.B, loop);
   }
 
   /**
@@ -111,7 +146,7 @@ public class CommandLogitechF310Controller {
    *     to the given loop.
    */
   public Trigger x(EventLoop loop) {
-    return m_hid.button(LogitechF310Controller.Button.X.value, loop);
+    return button(LogitechF310Controller.Button.X, loop);
   }
 
   /**
@@ -133,7 +168,7 @@ public class CommandLogitechF310Controller {
    *     to the given loop.
    */
   public Trigger y(EventLoop loop) {
-    return m_hid.button(LogitechF310Controller.Button.Y.value, loop);
+    return button(LogitechF310Controller.Button.Y, loop);
   }
 
   /**
@@ -155,7 +190,7 @@ public class CommandLogitechF310Controller {
    *     to the given loop.
    */
   public Trigger back(EventLoop loop) {
-    return m_hid.button(LogitechF310Controller.Button.BACK.value, loop);
+    return button(LogitechF310Controller.Button.BACK, loop);
   }
 
   /**
@@ -177,7 +212,7 @@ public class CommandLogitechF310Controller {
    *     to the given loop.
    */
   public Trigger logitech(EventLoop loop) {
-    return m_hid.button(LogitechF310Controller.Button.LOGITECH.value, loop);
+    return button(LogitechF310Controller.Button.LOGITECH, loop);
   }
 
   /**
@@ -199,7 +234,7 @@ public class CommandLogitechF310Controller {
    *     to the given loop.
    */
   public Trigger start(EventLoop loop) {
-    return m_hid.button(LogitechF310Controller.Button.START.value, loop);
+    return button(LogitechF310Controller.Button.START, loop);
   }
 
   /**
@@ -221,7 +256,7 @@ public class CommandLogitechF310Controller {
    *     to the given loop.
    */
   public Trigger leftStick(EventLoop loop) {
-    return m_hid.button(LogitechF310Controller.Button.LEFT_STICK.value, loop);
+    return button(LogitechF310Controller.Button.LEFT_STICK, loop);
   }
 
   /**
@@ -243,7 +278,7 @@ public class CommandLogitechF310Controller {
    *     to the given loop.
    */
   public Trigger rightStick(EventLoop loop) {
-    return m_hid.button(LogitechF310Controller.Button.RIGHT_STICK.value, loop);
+    return button(LogitechF310Controller.Button.RIGHT_STICK, loop);
   }
 
   /**
@@ -265,7 +300,7 @@ public class CommandLogitechF310Controller {
    *     to the given loop.
    */
   public Trigger leftBumper(EventLoop loop) {
-    return m_hid.button(LogitechF310Controller.Button.LEFT_BUMPER.value, loop);
+    return button(LogitechF310Controller.Button.LEFT_BUMPER, loop);
   }
 
   /**
@@ -287,7 +322,7 @@ public class CommandLogitechF310Controller {
    *     to the given loop.
    */
   public Trigger rightBumper(EventLoop loop) {
-    return m_hid.button(LogitechF310Controller.Button.RIGHT_BUMPER.value, loop);
+    return button(LogitechF310Controller.Button.RIGHT_BUMPER, loop);
   }
 
   /**
@@ -309,7 +344,7 @@ public class CommandLogitechF310Controller {
    *     to the given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return m_hid.button(LogitechF310Controller.Button.DPAD_UP.value, loop);
+    return button(LogitechF310Controller.Button.DPAD_UP, loop);
   }
 
   /**
@@ -331,7 +366,7 @@ public class CommandLogitechF310Controller {
    *     to the given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return m_hid.button(LogitechF310Controller.Button.DPAD_DOWN.value, loop);
+    return button(LogitechF310Controller.Button.DPAD_DOWN, loop);
   }
 
   /**
@@ -353,7 +388,7 @@ public class CommandLogitechF310Controller {
    *     to the given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return m_hid.button(LogitechF310Controller.Button.DPAD_LEFT.value, loop);
+    return button(LogitechF310Controller.Button.DPAD_LEFT, loop);
   }
 
   /**
@@ -375,7 +410,7 @@ public class CommandLogitechF310Controller {
    *     to the given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return m_hid.button(LogitechF310Controller.Button.DPAD_RIGHT.value, loop);
+    return button(LogitechF310Controller.Button.DPAD_RIGHT, loop);
   }
 
   /**
@@ -389,8 +424,8 @@ public class CommandLogitechF310Controller {
    *     threshold, attached to the given event loop
    */
   public Trigger leftTrigger(double threshold, EventLoop loop) {
-    return m_hid.axisGreaterThan(
-        LogitechF310Controller.Axis.LEFT_TRIGGER.value, threshold, loop);
+    return axisGreaterThan(
+        LogitechF310Controller.Axis.LEFT_TRIGGER, threshold, loop);
   }
 
   /**
@@ -420,6 +455,7 @@ public class CommandLogitechF310Controller {
     return leftTrigger(0.5);
   }
 
+
   /**
    * Constructs a Trigger instance around the axis value of the Right Trigger. The returned
    * trigger will be true when the axis value is greater than {@code threshold}.
@@ -431,8 +467,8 @@ public class CommandLogitechF310Controller {
    *     threshold, attached to the given event loop
    */
   public Trigger rightTrigger(double threshold, EventLoop loop) {
-    return m_hid.axisGreaterThan(
-        LogitechF310Controller.Axis.RIGHT_TRIGGER.value, threshold, loop);
+    return axisGreaterThan(
+        LogitechF310Controller.Axis.RIGHT_TRIGGER, threshold, loop);
   }
 
   /**
@@ -461,6 +497,104 @@ public class CommandLogitechF310Controller {
   public Trigger rightTrigger() {
     return rightTrigger(0.5);
   }
+
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(LogitechF310Controller.Axis axis, double threshold) {
+    return m_hid.axisLessThan(axis.value, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(
+      LogitechF310Controller.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisLessThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(LogitechF310Controller.Axis axis, double threshold) {
+    return m_hid.axisGreaterThan(axis.value, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(
+      LogitechF310Controller.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis magnitude value is greater than the
+   *     provided threshold.
+   */
+  public Trigger axisMagnitudeGreaterThan(
+      LogitechF310Controller.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisMagnitudeGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
+   * scheduler button loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
+   */
+  public Trigger axisMagnitudeGreaterThan(LogitechF310Controller.Axis axis, double threshold) {
+    return m_hid.axisMagnitudeGreaterThan(axis.value, threshold);
+  }
+
+  /**
+   * Get the value of the axis.
+   *
+   * @param axis The axis to read
+   * @return The value of the axis.
+   */
+  public double getAxis(LogitechF310Controller.Axis axis) {
+    return m_hid.getRawAxis(axis.value);
+  }
+
 
   /**
    * Get the Left X value of the controller.

@@ -239,8 +239,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::GameCubeController", "wpi__GameCubeController.hpp"),
-                ("wpi::GameCubeController::Button", "wpi__GameCubeController__Button.hpp"),
-                ("wpi::GameCubeController::Axis", "wpi__GameCubeController__Axis.hpp"),
             ],
         ),
         struct(
@@ -251,8 +249,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::DualSenseEdgeController", "wpi__DualSenseEdgeController.hpp"),
-                ("wpi::DualSenseEdgeController::Button", "wpi__DualSenseEdgeController__Button.hpp"),
-                ("wpi::DualSenseEdgeController::Axis", "wpi__DualSenseEdgeController__Axis.hpp"),
             ],
         ),
         struct(
@@ -273,8 +269,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::DualShock4Controller", "wpi__DualShock4Controller.hpp"),
-                ("wpi::DualShock4Controller::Button", "wpi__DualShock4Controller__Button.hpp"),
-                ("wpi::DualShock4Controller::Axis", "wpi__DualShock4Controller__Axis.hpp"),
             ],
         ),
         struct(
@@ -285,8 +279,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::LogitechF310Controller", "wpi__LogitechF310Controller.hpp"),
-                ("wpi::LogitechF310Controller::Button", "wpi__LogitechF310Controller__Button.hpp"),
-                ("wpi::LogitechF310Controller::Axis", "wpi__LogitechF310Controller__Axis.hpp"),
             ],
         ),
         struct(
@@ -297,8 +289,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::SteamController", "wpi__SteamController.hpp"),
-                ("wpi::SteamController::Button", "wpi__SteamController__Button.hpp"),
-                ("wpi::SteamController::Axis", "wpi__SteamController__Axis.hpp"),
             ],
         ),
         struct(
@@ -309,8 +299,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::Switch2GCController", "wpi__Switch2GCController.hpp"),
-                ("wpi::Switch2GCController::Button", "wpi__Switch2GCController__Button.hpp"),
-                ("wpi::Switch2GCController::Axis", "wpi__Switch2GCController__Axis.hpp"),
             ],
         ),
         struct(
@@ -321,8 +309,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::Switch2ProController", "wpi__Switch2ProController.hpp"),
-                ("wpi::Switch2ProController::Button", "wpi__Switch2ProController__Button.hpp"),
-                ("wpi::Switch2ProController::Axis", "wpi__Switch2ProController__Axis.hpp"),
             ],
         ),
         struct(
@@ -333,8 +319,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::SwitchN64Controller", "wpi__SwitchN64Controller.hpp"),
-                ("wpi::SwitchN64Controller::Button", "wpi__SwitchN64Controller__Button.hpp"),
-                ("wpi::SwitchN64Controller::Axis", "wpi__SwitchN64Controller__Axis.hpp"),
             ],
         ),
         struct(
@@ -345,8 +329,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::SwitchProController", "wpi__SwitchProController.hpp"),
-                ("wpi::SwitchProController::Button", "wpi__SwitchProController__Button.hpp"),
-                ("wpi::SwitchProController::Axis", "wpi__SwitchProController__Axis.hpp"),
             ],
         ),
         struct(

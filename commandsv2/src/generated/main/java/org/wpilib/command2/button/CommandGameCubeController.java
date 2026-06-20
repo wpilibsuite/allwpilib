@@ -6,6 +6,7 @@
 
 package org.wpilib.command2.button;
 
+import java.util.Objects;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.GameCubeController;
 import org.wpilib.event.EventLoop;
@@ -31,6 +32,17 @@ public class CommandGameCubeController {
   }
 
   /**
+   * Construct an instance of a controller with a GameCubeController object.
+   *
+   * @param controller The GameCubeController object to use for this controller.
+   */
+  public CommandGameCubeController(GameCubeController controller) {
+    m_controller =
+        Objects.requireNonNull(controller, "Provided GameCubeController cannot be null");
+    m_hid = new CommandGenericHID(m_controller.getHID());
+  }
+
+  /**
    * Get the underlying CommandGenericHID object.
    *
    * @return the wrapped CommandGenericHID object
@@ -46,6 +58,29 @@ public class CommandGameCubeController {
    */
   public GameCubeController getController() {
     return m_controller;
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button
+   * @return an event instance representing the button's digital signal attached to the {@link
+   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @see #button(GameCubeController.Button, EventLoop)
+   */
+  public Trigger button(GameCubeController.Button button) {
+    return button(button, CommandScheduler.getInstance().getDefaultButtonLoop());
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the button's digital signal attached to the given loop.
+   */
+  public Trigger button(GameCubeController.Button button, EventLoop loop) {
+    return m_hid.button(button.value, loop);
   }
 
   /**
@@ -67,7 +102,7 @@ public class CommandGameCubeController {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return m_hid.button(GameCubeController.Button.A.value, loop);
+    return button(GameCubeController.Button.A, loop);
   }
 
   /**
@@ -89,7 +124,7 @@ public class CommandGameCubeController {
    *     to the given loop.
    */
   public Trigger x(EventLoop loop) {
-    return m_hid.button(GameCubeController.Button.X.value, loop);
+    return button(GameCubeController.Button.X, loop);
   }
 
   /**
@@ -111,7 +146,7 @@ public class CommandGameCubeController {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return m_hid.button(GameCubeController.Button.B.value, loop);
+    return button(GameCubeController.Button.B, loop);
   }
 
   /**
@@ -133,7 +168,7 @@ public class CommandGameCubeController {
    *     to the given loop.
    */
   public Trigger y(EventLoop loop) {
-    return m_hid.button(GameCubeController.Button.Y.value, loop);
+    return button(GameCubeController.Button.Y, loop);
   }
 
   /**
@@ -155,7 +190,7 @@ public class CommandGameCubeController {
    *     to the given loop.
    */
   public Trigger start(EventLoop loop) {
-    return m_hid.button(GameCubeController.Button.START.value, loop);
+    return button(GameCubeController.Button.START, loop);
   }
 
   /**
@@ -177,7 +212,7 @@ public class CommandGameCubeController {
    *     to the given loop.
    */
   public Trigger Z(EventLoop loop) {
-    return m_hid.button(GameCubeController.Button.Z.value, loop);
+    return button(GameCubeController.Button.Z, loop);
   }
 
   /**
@@ -199,7 +234,7 @@ public class CommandGameCubeController {
    *     to the given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return m_hid.button(GameCubeController.Button.DPAD_UP.value, loop);
+    return button(GameCubeController.Button.DPAD_UP, loop);
   }
 
   /**
@@ -221,7 +256,7 @@ public class CommandGameCubeController {
    *     to the given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return m_hid.button(GameCubeController.Button.DPAD_DOWN.value, loop);
+    return button(GameCubeController.Button.DPAD_DOWN, loop);
   }
 
   /**
@@ -243,7 +278,7 @@ public class CommandGameCubeController {
    *     to the given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return m_hid.button(GameCubeController.Button.DPAD_LEFT.value, loop);
+    return button(GameCubeController.Button.DPAD_LEFT, loop);
   }
 
   /**
@@ -265,7 +300,7 @@ public class CommandGameCubeController {
    *     to the given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return m_hid.button(GameCubeController.Button.DPAD_RIGHT.value, loop);
+    return button(GameCubeController.Button.DPAD_RIGHT, loop);
   }
 
   /**
@@ -287,7 +322,7 @@ public class CommandGameCubeController {
    *     to the given loop.
    */
   public Trigger L(EventLoop loop) {
-    return m_hid.button(GameCubeController.Button.L.value, loop);
+    return button(GameCubeController.Button.L, loop);
   }
 
   /**
@@ -309,7 +344,7 @@ public class CommandGameCubeController {
    *     to the given loop.
    */
   public Trigger R(EventLoop loop) {
-    return m_hid.button(GameCubeController.Button.R.value, loop);
+    return button(GameCubeController.Button.R, loop);
   }
 
   /**
@@ -323,8 +358,8 @@ public class CommandGameCubeController {
    *     threshold, attached to the given event loop
    */
   public Trigger LTrigger(double threshold, EventLoop loop) {
-    return m_hid.axisGreaterThan(
-        GameCubeController.Axis.L_TRIGGER.value, threshold, loop);
+    return axisGreaterThan(
+        GameCubeController.Axis.L_TRIGGER, threshold, loop);
   }
 
   /**
@@ -354,6 +389,7 @@ public class CommandGameCubeController {
     return LTrigger(0.5);
   }
 
+
   /**
    * Constructs a Trigger instance around the axis value of the R Trigger. The returned
    * trigger will be true when the axis value is greater than {@code threshold}.
@@ -365,8 +401,8 @@ public class CommandGameCubeController {
    *     threshold, attached to the given event loop
    */
   public Trigger RTrigger(double threshold, EventLoop loop) {
-    return m_hid.axisGreaterThan(
-        GameCubeController.Axis.R_TRIGGER.value, threshold, loop);
+    return axisGreaterThan(
+        GameCubeController.Axis.R_TRIGGER, threshold, loop);
   }
 
   /**
@@ -395,6 +431,104 @@ public class CommandGameCubeController {
   public Trigger RTrigger() {
     return RTrigger(0.5);
   }
+
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(GameCubeController.Axis axis, double threshold) {
+    return m_hid.axisLessThan(axis.value, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(
+      GameCubeController.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisLessThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(GameCubeController.Axis axis, double threshold) {
+    return m_hid.axisGreaterThan(axis.value, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(
+      GameCubeController.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis magnitude value is greater than the
+   *     provided threshold.
+   */
+  public Trigger axisMagnitudeGreaterThan(
+      GameCubeController.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisMagnitudeGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
+   * scheduler button loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
+   */
+  public Trigger axisMagnitudeGreaterThan(GameCubeController.Axis axis, double threshold) {
+    return m_hid.axisMagnitudeGreaterThan(axis.value, threshold);
+  }
+
+  /**
+   * Get the value of the axis.
+   *
+   * @param axis The axis to read
+   * @return The value of the axis.
+   */
+  public double getAxis(GameCubeController.Axis axis) {
+    return m_hid.getRawAxis(axis.value);
+  }
+
 
   /**
    * Get the Left X value of the controller.

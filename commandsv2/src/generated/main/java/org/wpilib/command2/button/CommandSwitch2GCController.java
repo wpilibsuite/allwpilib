@@ -6,6 +6,7 @@
 
 package org.wpilib.command2.button;
 
+import java.util.Objects;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.Switch2GCController;
 import org.wpilib.event.EventLoop;
@@ -31,6 +32,17 @@ public class CommandSwitch2GCController {
   }
 
   /**
+   * Construct an instance of a controller with a Switch2GCController object.
+   *
+   * @param controller The Switch2GCController object to use for this controller.
+   */
+  public CommandSwitch2GCController(Switch2GCController controller) {
+    m_controller =
+        Objects.requireNonNull(controller, "Provided Switch2GCController cannot be null");
+    m_hid = new CommandGenericHID(m_controller.getHID());
+  }
+
+  /**
    * Get the underlying CommandGenericHID object.
    *
    * @return the wrapped CommandGenericHID object
@@ -46,6 +58,29 @@ public class CommandSwitch2GCController {
    */
   public Switch2GCController getController() {
     return m_controller;
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button
+   * @return an event instance representing the button's digital signal attached to the {@link
+   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @see #button(Switch2GCController.Button, EventLoop)
+   */
+  public Trigger button(Switch2GCController.Button button) {
+    return button(button, CommandScheduler.getInstance().getDefaultButtonLoop());
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the button's digital signal attached to the given loop.
+   */
+  public Trigger button(Switch2GCController.Button button, EventLoop loop) {
+    return m_hid.button(button.value, loop);
   }
 
   /**
@@ -67,7 +102,7 @@ public class CommandSwitch2GCController {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return m_hid.button(Switch2GCController.Button.A.value, loop);
+    return button(Switch2GCController.Button.A, loop);
   }
 
   /**
@@ -89,7 +124,7 @@ public class CommandSwitch2GCController {
    *     to the given loop.
    */
   public Trigger x(EventLoop loop) {
-    return m_hid.button(Switch2GCController.Button.X.value, loop);
+    return button(Switch2GCController.Button.X, loop);
   }
 
   /**
@@ -111,7 +146,7 @@ public class CommandSwitch2GCController {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return m_hid.button(Switch2GCController.Button.B.value, loop);
+    return button(Switch2GCController.Button.B, loop);
   }
 
   /**
@@ -133,7 +168,7 @@ public class CommandSwitch2GCController {
    *     to the given loop.
    */
   public Trigger y(EventLoop loop) {
-    return m_hid.button(Switch2GCController.Button.Y.value, loop);
+    return button(Switch2GCController.Button.Y, loop);
   }
 
   /**
@@ -155,7 +190,7 @@ public class CommandSwitch2GCController {
    *     to the given loop.
    */
   public Trigger home(EventLoop loop) {
-    return m_hid.button(Switch2GCController.Button.HOME.value, loop);
+    return button(Switch2GCController.Button.HOME, loop);
   }
 
   /**
@@ -177,7 +212,7 @@ public class CommandSwitch2GCController {
    *     to the given loop.
    */
   public Trigger start(EventLoop loop) {
-    return m_hid.button(Switch2GCController.Button.START.value, loop);
+    return button(Switch2GCController.Button.START, loop);
   }
 
   /**
@@ -199,7 +234,7 @@ public class CommandSwitch2GCController {
    *     to the given loop.
    */
   public Trigger ZL(EventLoop loop) {
-    return m_hid.button(Switch2GCController.Button.ZL.value, loop);
+    return button(Switch2GCController.Button.ZL, loop);
   }
 
   /**
@@ -221,7 +256,7 @@ public class CommandSwitch2GCController {
    *     to the given loop.
    */
   public Trigger Z(EventLoop loop) {
-    return m_hid.button(Switch2GCController.Button.Z.value, loop);
+    return button(Switch2GCController.Button.Z, loop);
   }
 
   /**
@@ -243,7 +278,7 @@ public class CommandSwitch2GCController {
    *     to the given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return m_hid.button(Switch2GCController.Button.DPAD_UP.value, loop);
+    return button(Switch2GCController.Button.DPAD_UP, loop);
   }
 
   /**
@@ -265,7 +300,7 @@ public class CommandSwitch2GCController {
    *     to the given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return m_hid.button(Switch2GCController.Button.DPAD_DOWN.value, loop);
+    return button(Switch2GCController.Button.DPAD_DOWN, loop);
   }
 
   /**
@@ -287,7 +322,7 @@ public class CommandSwitch2GCController {
    *     to the given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return m_hid.button(Switch2GCController.Button.DPAD_LEFT.value, loop);
+    return button(Switch2GCController.Button.DPAD_LEFT, loop);
   }
 
   /**
@@ -309,7 +344,7 @@ public class CommandSwitch2GCController {
    *     to the given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return m_hid.button(Switch2GCController.Button.DPAD_RIGHT.value, loop);
+    return button(Switch2GCController.Button.DPAD_RIGHT, loop);
   }
 
   /**
@@ -331,7 +366,7 @@ public class CommandSwitch2GCController {
    *     to the given loop.
    */
   public Trigger capture(EventLoop loop) {
-    return m_hid.button(Switch2GCController.Button.CAPTURE.value, loop);
+    return button(Switch2GCController.Button.CAPTURE, loop);
   }
 
   /**
@@ -353,7 +388,7 @@ public class CommandSwitch2GCController {
    *     to the given loop.
    */
   public Trigger C(EventLoop loop) {
-    return m_hid.button(Switch2GCController.Button.C.value, loop);
+    return button(Switch2GCController.Button.C, loop);
   }
 
   /**
@@ -375,7 +410,7 @@ public class CommandSwitch2GCController {
    *     to the given loop.
    */
   public Trigger L(EventLoop loop) {
-    return m_hid.button(Switch2GCController.Button.L.value, loop);
+    return button(Switch2GCController.Button.L, loop);
   }
 
   /**
@@ -397,7 +432,7 @@ public class CommandSwitch2GCController {
    *     to the given loop.
    */
   public Trigger R(EventLoop loop) {
-    return m_hid.button(Switch2GCController.Button.R.value, loop);
+    return button(Switch2GCController.Button.R, loop);
   }
 
   /**
@@ -411,8 +446,8 @@ public class CommandSwitch2GCController {
    *     threshold, attached to the given event loop
    */
   public Trigger LTrigger(double threshold, EventLoop loop) {
-    return m_hid.axisGreaterThan(
-        Switch2GCController.Axis.L_TRIGGER.value, threshold, loop);
+    return axisGreaterThan(
+        Switch2GCController.Axis.L_TRIGGER, threshold, loop);
   }
 
   /**
@@ -442,6 +477,7 @@ public class CommandSwitch2GCController {
     return LTrigger(0.5);
   }
 
+
   /**
    * Constructs a Trigger instance around the axis value of the R Trigger. The returned
    * trigger will be true when the axis value is greater than {@code threshold}.
@@ -453,8 +489,8 @@ public class CommandSwitch2GCController {
    *     threshold, attached to the given event loop
    */
   public Trigger RTrigger(double threshold, EventLoop loop) {
-    return m_hid.axisGreaterThan(
-        Switch2GCController.Axis.R_TRIGGER.value, threshold, loop);
+    return axisGreaterThan(
+        Switch2GCController.Axis.R_TRIGGER, threshold, loop);
   }
 
   /**
@@ -483,6 +519,104 @@ public class CommandSwitch2GCController {
   public Trigger RTrigger() {
     return RTrigger(0.5);
   }
+
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(Switch2GCController.Axis axis, double threshold) {
+    return m_hid.axisLessThan(axis.value, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(
+      Switch2GCController.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisLessThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(Switch2GCController.Axis axis, double threshold) {
+    return m_hid.axisGreaterThan(axis.value, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(
+      Switch2GCController.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis magnitude value is greater than the
+   *     provided threshold.
+   */
+  public Trigger axisMagnitudeGreaterThan(
+      Switch2GCController.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisMagnitudeGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
+   * scheduler button loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
+   */
+  public Trigger axisMagnitudeGreaterThan(Switch2GCController.Axis axis, double threshold) {
+    return m_hid.axisMagnitudeGreaterThan(axis.value, threshold);
+  }
+
+  /**
+   * Get the value of the axis.
+   *
+   * @param axis The axis to read
+   * @return The value of the axis.
+   */
+  public double getAxis(Switch2GCController.Axis axis) {
+    return m_hid.getRawAxis(axis.value);
+  }
+
 
   /**
    * Get the Left X value of the controller.

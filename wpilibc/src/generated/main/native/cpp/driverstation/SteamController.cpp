@@ -60,18 +60,18 @@ double SteamController::GetRightTrigger() const {
   return GetAxis(Axis::RIGHT_TRIGGER);
 }
 
-double SteamController::GetAxis(int axis) const {
-  return m_hid->GetRawAxis(axis);
+double SteamController::GetAxis(Axis axis) const {
+  return m_hid->GetRawAxis(static_cast<int>(axis));
 }
 
-BooleanEvent SteamController::AxisLessThan(int axis, double threshold,
+BooleanEvent SteamController::AxisLessThan(Axis axis, double threshold,
                                                      EventLoop* loop) const {
-  return m_hid->AxisLessThan(axis, threshold, loop);
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
 }
 
 BooleanEvent SteamController::AxisGreaterThan(
-    int axis, double threshold, EventLoop* loop) const {
-  return m_hid->AxisGreaterThan(axis, threshold, loop);
+    Axis axis, double threshold, EventLoop* loop) const {
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
 }
 
 bool SteamController::GetAButton() const {
@@ -490,21 +490,21 @@ BooleanEvent SteamController::RightGripTouch(EventLoop* loop) const {
   return ButtonEvent(Button::RIGHT_GRIP_TOUCH, loop);
 }
 
-bool SteamController::GetButton(int button) const {
-  return m_hid->GetRawButton(button);
+bool SteamController::GetButton(Button button) const {
+  return m_hid->GetRawButton(static_cast<int>(button));
 }
 
-bool SteamController::GetButtonPressed(int button) {
-  return m_hid->GetRawButtonPressed(button);
+bool SteamController::GetButtonPressed(Button button) {
+  return m_hid->GetRawButtonPressed(static_cast<int>(button));
 }
 
-bool SteamController::GetButtonReleased(int button) {
-  return m_hid->GetRawButtonReleased(button);
+bool SteamController::GetButtonReleased(Button button) {
+  return m_hid->GetRawButtonReleased(static_cast<int>(button));
 }
 
-BooleanEvent SteamController::ButtonEvent(int button,
+BooleanEvent SteamController::ButtonEvent(Button button,
                                                     EventLoop* loop) const {
-  return m_hid->Button(button, loop);
+  return m_hid->Button(static_cast<int>(button), loop);
 }
 
 void SteamController::SetLeds(int r, int g, int b) {
