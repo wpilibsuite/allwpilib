@@ -103,6 +103,7 @@ classes:
       GetButtonPressed:
       GetButtonReleased:
       ButtonEvent:
+        rename: button
       SetLeds:
       SetRumble:
       InitSendable:

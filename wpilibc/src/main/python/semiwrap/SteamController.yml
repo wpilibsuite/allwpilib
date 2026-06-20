@@ -143,6 +143,7 @@ classes:
       GetButtonPressed:
       GetButtonReleased:
       ButtonEvent:
+        rename: button
       SetLeds:
       SetRumble:
       GetTouchpadFingerAvailable:
