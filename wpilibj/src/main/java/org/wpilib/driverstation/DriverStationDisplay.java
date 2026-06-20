@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.wpilib.hardware.hal.DriverStationJNI;
+import org.wpilib.util.WPIUtilJNI;
 
 /**
  * Provides access to the Driver Station display.
@@ -18,14 +19,14 @@ import org.wpilib.hardware.hal.DriverStationJNI;
  * <p>Line mode is the default display mode.
  */
 public final class DriverStationDisplay {
-  private static final long UPDATE_PERIOD_NANOS = 230_000_000L;
+  private static final long UPDATE_PERIOD_MICROS = 230_000L;
   private static final String CLEAR_DISPLAY = "\033[2J\033[H";
 
   private static final Lock m_displayLock = new ReentrantLock();
   private static boolean rawMode;
   private static final Map<String, Integer> lineMap = new HashMap<>();
   private static final List<String> lines = new ArrayList<>();
-  private static long lastDisplayUpdate = System.nanoTime() - UPDATE_PERIOD_NANOS;
+  private static long lastDisplayUpdate = WPIUtilJNI.now() - UPDATE_PERIOD_MICROS;
 
   private DriverStationDisplay() {}
 
@@ -163,8 +164,8 @@ public final class DriverStationDisplay {
         return;
       }
 
-      long now = System.nanoTime();
-      if (now - lastDisplayUpdate < UPDATE_PERIOD_NANOS) {
+      long now = WPIUtilJNI.now();
+      if (now - lastDisplayUpdate < UPDATE_PERIOD_MICROS) {
         lineMap.clear();
         lines.clear();
         return;

@@ -19,12 +19,24 @@
 
 using namespace wpi;
 
-static constexpr std::string_view kClearDisplay = "\033[2J\033[H";
-static wpi::util::mutex displayMutex;
-static bool displayRawMode = false;
-static wpi::util::StringMap<uint32_t> displayLineMap;
-static std::vector<std::string> displayLines;
-static std::string displayBuffer;
+static constexpr std::chrono::milliseconds UPDATE_PERIOD{230};
+
+static constexpr std::string_view CLEAR_DISPLAY = "\033[2J\033[H";
+
+namespace {
+struct DriverStationDisplayStorage {
+  wpi::util::mutex mutex;
+  bool rawMode = false;
+  wpi::util::StringMap<uint32_t> lineMap;
+  std::vector<std::string> lines;
+  std::string buffer;
+};
+}
+
+static DriverStationDisplayStorage& GetDisplayStorage() {
+  static DriverStationDisplayStorage storage;
+  return storage;
+}
 
 static void WriteAnsiText(std::string_view data) {
   WPI_String dataWpiStr = wpi::util::make_string(data);
@@ -32,25 +44,27 @@ static void WriteAnsiText(std::string_view data) {
 }
 
 void DriverStationDisplay::SetMode(Mode mode) {
-  std::scoped_lock lock(displayMutex);
+  auto& storage = GetDisplayStorage();
+  std::scoped_lock lock(storage.mutex);
 
   switch (mode) {
     case Mode::Line:
-      displayRawMode = false;
-      displayLineMap.clear();
-      displayLines.clear();
+      storage.rawMode = false;
+      storage.lineMap.clear();
+      storage.lines.clear();
       break;
     case Mode::RawAnsi:
-      displayRawMode = true;
-      WriteAnsiText(kClearDisplay);
+      storage.rawMode = true;
+      WriteAnsiText(CLEAR_DISPLAY);
       break;
   }
 }
 
 void DriverStationDisplay::AddData(std::string_view caption,
                                    std::string_view line) {
-  std::scoped_lock lock(displayMutex);
-  if (displayRawMode) {
+  auto& storage = GetDisplayStorage();
+  std::scoped_lock lock(storage.mutex);
+  if (storage.rawMode) {
     return;
   }
 
@@ -62,20 +76,20 @@ void DriverStationDisplay::AddData(std::string_view caption,
     }
   }
   if (!hasCaption) {
-    displayLines.emplace_back(line);
+    storage.lines.emplace_back(line);
     return;
   }
 
   uint32_t lineNum;
-  auto it = displayLineMap.find(caption);
-  if (it == displayLineMap.end()) {
-    lineNum = displayLines.size();
-    displayLineMap[caption] = lineNum;
-    displayLines.emplace_back(line);
+  auto it = storage.lineMap.find(caption);
+  if (it == storage.lineMap.end()) {
+    lineNum = storage.lines.size();
+    storage.lineMap[caption] = lineNum;
+    storage.lines.emplace_back(line);
   } else {
     lineNum = it->second;
-    if (lineNum < displayLines.size()) {
-      displayLines[lineNum] = line;
+    if (lineNum < storage.lines.size()) {
+      storage.lines[lineNum] = line;
     }
   }
 }
@@ -85,38 +99,40 @@ void DriverStationDisplay::AddLine(std::string_view line) {
 }
 
 void DriverStationDisplay::UpdateLines() {
-  std::scoped_lock lock(displayMutex);
-  if (displayRawMode) {
+  auto& storage = GetDisplayStorage();
+  std::scoped_lock lock(storage.mutex);
+  if (storage.rawMode) {
     return;
   }
 
   static auto lastDisplayUpdate =
-      wpi::hal::monotonic_clock::now() - std::chrono::milliseconds{230};
+      wpi::hal::monotonic_clock::now() - UPDATE_PERIOD;
   auto now = wpi::hal::monotonic_clock::now();
-  if (now - lastDisplayUpdate < std::chrono::milliseconds{230}) {
-    displayLineMap.clear();
-    displayLines.clear();
+  if (now - lastDisplayUpdate < UPDATE_PERIOD) {
+    storage.lineMap.clear();
+    storage.lines.clear();
     return;
   }
   lastDisplayUpdate = now;
 
-  displayBuffer.clear();
-  displayBuffer += kClearDisplay;
-  for (const auto& line : displayLines) {
-    displayBuffer += line;
-    displayBuffer += "\033[0m\n";
+  storage.buffer.clear();
+  storage.buffer += CLEAR_DISPLAY;
+  for (const auto& line : storage.lines) {
+    storage.buffer += line;
+    storage.buffer += "\033[0m\n";
   }
 
-  WPI_String wpiBuffer = wpi::util::make_string(displayBuffer);
+  WPI_String wpiBuffer = wpi::util::make_string(storage.buffer);
   HAL_WriteDisplayAnsiText(&wpiBuffer);
 
-  displayLineMap.clear();
-  displayLines.clear();
+  storage.lineMap.clear();
+  storage.lines.clear();
 }
 
 void DriverStationDisplay::WriteRawAnsiText(std::string_view data) {
-  std::scoped_lock lock(displayMutex);
-  if (!displayRawMode) {
+  auto& storage = GetDisplayStorage();
+  std::scoped_lock lock(storage.mutex);
+  if (!storage.rawMode) {
     return;
   }
 
@@ -124,8 +140,9 @@ void DriverStationDisplay::WriteRawAnsiText(std::string_view data) {
 }
 
 void DriverStationDisplay::ClearRaw() {
-  std::scoped_lock lock(displayMutex);
-  if (displayRawMode) {
-    WriteAnsiText(kClearDisplay);
+  auto& storage = GetDisplayStorage();
+  std::scoped_lock lock(storage.mutex);
+  if (storage.rawMode) {
+    WriteAnsiText(CLEAR_DISPLAY);
   }
 }

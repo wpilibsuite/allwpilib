@@ -12,7 +12,7 @@
 using namespace wpi::units::literals;
 
 namespace {
-constexpr std::array<int, 20> kColors = {196, 202, 208, 214, 220, 226, 118,
+constexpr std::array<int, 20> COLORS = {196, 202, 208, 214, 220, 226, 118,
                                          46,  48,  51,  45,  39,  33,  27,
                                          21,  57,  93,  129, 165, 201};
 }  // namespace
@@ -39,7 +39,7 @@ void DefaultTeleop::Periodic() {
 }
 
 void DefaultTeleop::UpdateSecondsDisplay() {
-  int color = kColors[m_seconds % kColors.size()];
+  int color = COLORS[m_seconds % COLORS.size()];
   std::array<char, 64> buffer;
   std::snprintf(buffer.data(), buffer.size(),
                 "\033[3;18H\033[38;5;%dm%5d\033[0m", color, m_seconds);

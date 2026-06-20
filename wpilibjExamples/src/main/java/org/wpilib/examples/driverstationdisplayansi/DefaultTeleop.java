@@ -12,7 +12,7 @@ import org.wpilib.system.Timer;
 
 @Teleop(name = "Default Teleop")
 public class DefaultTeleop extends PeriodicOpMode {
-  private static final int[] kColors = {
+  private static final int[] COLORS = {
     196, 202, 208, 214, 220, 226, 118, 46, 48, 51,
     45, 39, 33, 27, 21, 57, 93, 129, 165, 201
   };
@@ -46,7 +46,7 @@ public class DefaultTeleop extends PeriodicOpMode {
   }
 
   private void updateSecondsDisplay() {
-    int color = kColors[seconds % kColors.length];
+    int color = COLORS[seconds % COLORS.length];
     DriverStationDisplay.writeRawAnsiText(
         String.format("\033[3;18H\033[38;5;%dm%5d\033[0m", color, seconds));
   }
