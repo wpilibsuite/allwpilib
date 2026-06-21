@@ -353,13 +353,6 @@ static void UpdateOpModes(const char* name, void* param,
   }
 }
 
-static int32_t WriteDisplayAnsi(const struct WPI_String* data) {
-  if (gDisplayModel) {
-    gDisplayModel->Append(wpi::util::to_string_view(data));
-  }
-  return 0;
-}
-
 static inline bool IsDSDisabled() {
   return (gpDisableDS != nullptr && *gpDisableDS) ||
          (gpDSSocketConnected && *gpDSSocketConnected);
@@ -1568,7 +1561,10 @@ void DriverStationGui::GlobalInit() {
   gDisplayModel = std::make_unique<wpi::glass::AnsiDisplayModel>();
 
   HALSIM_RegisterOpModeOptionsCallback(UpdateOpModes, nullptr, true);
-  HALSIM_SetWriteDisplayAnsi(WriteDisplayAnsi);
+  HALSIM_SetWriteDisplayAnsi([](const struct WPI_String* data) {
+    gDisplayModel->Append(wpi::util::to_string_view(data));
+    return 0;
+  });
 
   wpi::gui::AddEarlyExecute(DriverStationExecute);
 
@@ -1650,9 +1646,7 @@ void DriverStationGui::GlobalInit() {
 
   storageRoot.SetCustomClear([&storageRoot] {
     dsManager->EraseWindows();
-    if (gDisplayModel) {
-      gDisplayModel->Clear();
-    }
+    gDisplayModel->Clear();
     gKeyboardJoysticks.clear();
     gRobotJoysticks.clear();
     storageRoot.GetChildArray("keyboardJoysticks").clear();
