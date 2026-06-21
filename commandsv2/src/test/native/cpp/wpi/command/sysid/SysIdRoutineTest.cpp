@@ -12,6 +12,7 @@
 
 #include "wpi/commands2/Subsystem.hpp"
 #include "wpi/simulation/SimHooks.hpp"
+#include "wpi/system/DataLogManager.hpp"
 #include "wpi/system/Timer.hpp"
 #include "wpi/units/math.hpp"
 
@@ -33,7 +34,10 @@ class SysIdRoutineTest {
  public:
   SysIdRoutineTest() { wpi::sim::PauseTiming(); }
 
-  ~SysIdRoutineTest() { wpi::sim::ResumeTiming(); }
+  ~SysIdRoutineTest() {
+    wpi::sim::ResumeTiming();
+    wpi::DataLogManager::Stop();
+  }
 
   std::vector<StateTest> currentStateList{};
   std::vector<wpi::units::volt_t> sentVoltages{};
