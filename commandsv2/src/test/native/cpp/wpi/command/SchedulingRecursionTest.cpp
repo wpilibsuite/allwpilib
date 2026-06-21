@@ -4,7 +4,7 @@
 
 #include <utility>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "CommandTestBase.hpp"
 #include "wpi/commands2/Command.hpp"
@@ -15,8 +15,7 @@
 
 using namespace wpi::cmd;
 
-class SchedulingRecursionTest
-    : public CommandTestBaseWithParam<Command::InterruptionBehavior> {};
+class SchedulingRecursionTest : public CommandTestBase {};
 
 class SelfCancellingCommand
     : public CommandHelper<Command, SelfCancellingCommand> {
@@ -49,13 +48,15 @@ class SelfCancellingCommand
  * Checks <a
  * href="https://github.com/wpilibsuite/allwpilib/issues/4259">wpilibsuite/allwpilib#4259</a>.
  */
-TEST_P(SchedulingRecursionTest, CancelFromInitialize) {
-  CommandScheduler scheduler = GetScheduler();
+void CheckCancelFromInitialize(
+    Command::InterruptionBehavior interruptionBehavior) {
+  SchedulingRecursionTest testBase;
+  CommandScheduler scheduler = testBase.GetScheduler();
   bool hasOtherRun = false;
   int counter = 0;
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
-                                    GetParam()};
+                                    interruptionBehavior};
   auto other =
       wpi::cmd::Run([&hasOtherRun] { hasOtherRun = true; }, {&requirement});
 
@@ -63,14 +64,16 @@ TEST_P(SchedulingRecursionTest, CancelFromInitialize) {
   scheduler.Run();
   scheduler.Schedule(other);
 
-  EXPECT_FALSE(scheduler.IsScheduled(&selfCancels));
-  EXPECT_TRUE(scheduler.IsScheduled(other));
-  EXPECT_EQ(1, counter);
+  CHECK_FALSE(scheduler.IsScheduled(&selfCancels));
+  CHECK(scheduler.IsScheduled(other));
+  CHECK(1 == counter);
   scheduler.Run();
-  EXPECT_TRUE(hasOtherRun);
+  CHECK(hasOtherRun);
 }
 
-TEST_F(SchedulingRecursionTest, CancelFromInitializeAction) {
+TEST_CASE_METHOD(SchedulingRecursionTest,
+                 "SchedulingRecursionTest CancelFromInitializeAction",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
   bool hasOtherRun = false;
   int counter = 0;
@@ -89,21 +92,22 @@ TEST_F(SchedulingRecursionTest, CancelFromInitializeAction) {
   scheduler.Run();
   scheduler.Schedule(other);
 
-  EXPECT_FALSE(scheduler.IsScheduled(&selfCancels));
-  EXPECT_TRUE(scheduler.IsScheduled(other));
-  EXPECT_EQ(1, counter);
+  CHECK_FALSE(scheduler.IsScheduled(&selfCancels));
+  CHECK(scheduler.IsScheduled(other));
+  CHECK(1 == counter);
   scheduler.Run();
-  EXPECT_TRUE(hasOtherRun);
+  CHECK(hasOtherRun);
 }
 
-TEST_P(SchedulingRecursionTest,
-       DefaultCommandGetsRescheduledAfterSelfCanceling) {
-  CommandScheduler scheduler = GetScheduler();
+void CheckDefaultCommandGetsRescheduledAfterSelfCanceling(
+    Command::InterruptionBehavior interruptionBehavior) {
+  SchedulingRecursionTest testBase;
+  CommandScheduler scheduler = testBase.GetScheduler();
   bool hasOtherRun = false;
   int counter = 0;
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
-                                    GetParam()};
+                                    interruptionBehavior};
   auto other =
       wpi::cmd::Run([&hasOtherRun] { hasOtherRun = true; }, {&requirement});
   scheduler.SetDefaultCommand(&requirement, std::move(other));
@@ -111,11 +115,11 @@ TEST_P(SchedulingRecursionTest,
   scheduler.Schedule(&selfCancels);
   scheduler.Run();
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(&selfCancels));
-  EXPECT_TRUE(scheduler.IsScheduled(scheduler.GetDefaultCommand(&requirement)));
-  EXPECT_EQ(1, counter);
+  CHECK_FALSE(scheduler.IsScheduled(&selfCancels));
+  CHECK(scheduler.IsScheduled(scheduler.GetDefaultCommand(&requirement)));
+  CHECK(1 == counter);
   scheduler.Run();
-  EXPECT_TRUE(hasOtherRun);
+  CHECK(hasOtherRun);
 }
 
 class CancelEndCommand : public CommandHelper<Command, CancelEndCommand> {
@@ -133,19 +137,23 @@ class CancelEndCommand : public CommandHelper<Command, CancelEndCommand> {
   int& m_counter;
 };
 
-TEST_F(SchedulingRecursionTest, CancelFromEnd) {
+TEST_CASE_METHOD(SchedulingRecursionTest,
+                 "SchedulingRecursionTest CancelFromEnd",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   CancelEndCommand selfCancels{&scheduler, counter};
 
   scheduler.Schedule(&selfCancels);
 
-  EXPECT_NO_THROW({ scheduler.Cancel(&selfCancels); });
-  EXPECT_EQ(1, counter);
-  EXPECT_FALSE(scheduler.IsScheduled(&selfCancels));
+  CHECK_NOTHROW(scheduler.Cancel(&selfCancels));
+  CHECK(1 == counter);
+  CHECK_FALSE(scheduler.IsScheduled(&selfCancels));
 }
 
-TEST_F(SchedulingRecursionTest, CancelFromInterruptAction) {
+TEST_CASE_METHOD(SchedulingRecursionTest,
+                 "SchedulingRecursionTest CancelFromInterruptAction",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   FunctionalCommand selfCancels{[] {}, [] {}, [](bool) {},
@@ -156,9 +164,9 @@ TEST_F(SchedulingRecursionTest, CancelFromInterruptAction) {
   });
   scheduler.Schedule(&selfCancels);
 
-  EXPECT_NO_THROW({ scheduler.Cancel(&selfCancels); });
-  EXPECT_EQ(1, counter);
-  EXPECT_FALSE(scheduler.IsScheduled(&selfCancels));
+  CHECK_NOTHROW(scheduler.Cancel(&selfCancels));
+  CHECK(1 == counter);
+  CHECK_FALSE(scheduler.IsScheduled(&selfCancels));
 }
 
 class EndCommand : public CommandHelper<Command, EndCommand> {
@@ -171,7 +179,9 @@ class EndCommand : public CommandHelper<Command, EndCommand> {
   std::function<void(bool)> m_end;
 };
 
-TEST_F(SchedulingRecursionTest, CancelFromEndLoop) {
+TEST_CASE_METHOD(SchedulingRecursionTest,
+                 "SchedulingRecursionTest CancelFromEndLoop",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   EndCommand dCancelsAll([&](bool) {
@@ -195,15 +205,17 @@ TEST_F(SchedulingRecursionTest, CancelFromEndLoop) {
   scheduler.Schedule(&cCancelsD);
   scheduler.Schedule(&dCancelsAll);
 
-  EXPECT_NO_THROW({ scheduler.Cancel(&aCancelsB); });
-  EXPECT_EQ(4, counter);
-  EXPECT_FALSE(scheduler.IsScheduled(&aCancelsB));
-  EXPECT_FALSE(scheduler.IsScheduled(&bCancelsC));
-  EXPECT_FALSE(scheduler.IsScheduled(&cCancelsD));
-  EXPECT_FALSE(scheduler.IsScheduled(&dCancelsAll));
+  CHECK_NOTHROW(scheduler.Cancel(&aCancelsB));
+  CHECK(4 == counter);
+  CHECK_FALSE(scheduler.IsScheduled(&aCancelsB));
+  CHECK_FALSE(scheduler.IsScheduled(&bCancelsC));
+  CHECK_FALSE(scheduler.IsScheduled(&cCancelsD));
+  CHECK_FALSE(scheduler.IsScheduled(&dCancelsAll));
 }
 
-TEST_F(SchedulingRecursionTest, CancelFromEndLoopWhileInRunLoop) {
+TEST_CASE_METHOD(SchedulingRecursionTest,
+                 "SchedulingRecursionTest CancelFromEndLoopWhileInRunLoop",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
   int counter = 0;
 
@@ -228,12 +240,12 @@ TEST_F(SchedulingRecursionTest, CancelFromEndLoopWhileInRunLoop) {
   scheduler.Schedule(&cCancelsD);
   scheduler.Schedule(&dCancelsAll);
 
-  EXPECT_NO_THROW({ scheduler.Run(); });
-  EXPECT_EQ(4, counter);
-  EXPECT_FALSE(scheduler.IsScheduled(&aCancelsB));
-  EXPECT_FALSE(scheduler.IsScheduled(&bCancelsC));
-  EXPECT_FALSE(scheduler.IsScheduled(&cCancelsD));
-  EXPECT_FALSE(scheduler.IsScheduled(&dCancelsAll));
+  CHECK_NOTHROW(scheduler.Run());
+  CHECK(4 == counter);
+  CHECK_FALSE(scheduler.IsScheduled(&aCancelsB));
+  CHECK_FALSE(scheduler.IsScheduled(&bCancelsC));
+  CHECK_FALSE(scheduler.IsScheduled(&cCancelsD));
+  CHECK_FALSE(scheduler.IsScheduled(&dCancelsAll));
 }
 
 class MultiCancelCommand : public CommandHelper<Command, MultiCancelCommand> {
@@ -254,7 +266,9 @@ class MultiCancelCommand : public CommandHelper<Command, MultiCancelCommand> {
   Command* m_command;
 };
 
-TEST_F(SchedulingRecursionTest, MultiCancelFromEnd) {
+TEST_CASE_METHOD(SchedulingRecursionTest,
+                 "SchedulingRecursionTest MultiCancelFromEnd",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   EndCommand bIncrementsCounter([&counter](bool) { counter++; });
@@ -263,41 +277,47 @@ TEST_F(SchedulingRecursionTest, MultiCancelFromEnd) {
   scheduler.Schedule(&aCancelsB);
   scheduler.Schedule(&bIncrementsCounter);
 
-  EXPECT_NO_THROW({ scheduler.Cancel(&aCancelsB); });
-  EXPECT_EQ(2, counter);
-  EXPECT_FALSE(scheduler.IsScheduled(&aCancelsB));
-  EXPECT_FALSE(scheduler.IsScheduled(&bIncrementsCounter));
+  CHECK_NOTHROW(scheduler.Cancel(&aCancelsB));
+  CHECK(2 == counter);
+  CHECK_FALSE(scheduler.IsScheduled(&aCancelsB));
+  CHECK_FALSE(scheduler.IsScheduled(&bIncrementsCounter));
 }
 
-TEST_P(SchedulingRecursionTest, ScheduleFromEndCancel) {
-  CommandScheduler scheduler = GetScheduler();
+void CheckScheduleFromEndCancel(
+    Command::InterruptionBehavior interruptionBehavior) {
+  SchedulingRecursionTest testBase;
+  CommandScheduler scheduler = testBase.GetScheduler();
   int counter = 0;
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
-                                    GetParam()};
+                                    interruptionBehavior};
 
   scheduler.Schedule(&selfCancels);
-  EXPECT_NO_THROW({ scheduler.Cancel(&selfCancels); });
-  EXPECT_EQ(1, counter);
-  EXPECT_FALSE(scheduler.IsScheduled(&selfCancels));
+  CHECK_NOTHROW(scheduler.Cancel(&selfCancels));
+  CHECK(1 == counter);
+  CHECK_FALSE(scheduler.IsScheduled(&selfCancels));
 }
 
-TEST_P(SchedulingRecursionTest, ScheduleFromEndInterrupt) {
-  CommandScheduler scheduler = GetScheduler();
+void CheckScheduleFromEndInterrupt(
+    Command::InterruptionBehavior interruptionBehavior) {
+  SchedulingRecursionTest testBase;
+  CommandScheduler scheduler = testBase.GetScheduler();
   int counter = 0;
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
-                                    GetParam()};
+                                    interruptionBehavior};
   auto other = Idle({&requirement});
 
   scheduler.Schedule(&selfCancels);
-  EXPECT_NO_THROW({ scheduler.Schedule(other); });
-  EXPECT_EQ(1, counter);
-  EXPECT_FALSE(scheduler.IsScheduled(&selfCancels));
-  EXPECT_TRUE(scheduler.IsScheduled(other));
+  CHECK_NOTHROW(scheduler.Schedule(other));
+  CHECK(1 == counter);
+  CHECK_FALSE(scheduler.IsScheduled(&selfCancels));
+  CHECK(scheduler.IsScheduled(other));
 }
 
-TEST_F(SchedulingRecursionTest, ScheduleFromEndInterruptAction) {
+TEST_CASE_METHOD(SchedulingRecursionTest,
+                 "SchedulingRecursionTest ScheduleFromEndInterruptAction",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   TestSubsystem requirement;
@@ -308,13 +328,15 @@ TEST_F(SchedulingRecursionTest, ScheduleFromEndInterruptAction) {
     scheduler.Schedule(other);
   });
   scheduler.Schedule(selfCancels);
-  EXPECT_NO_THROW({ scheduler.Schedule(other); });
-  EXPECT_EQ(1, counter);
-  EXPECT_FALSE(scheduler.IsScheduled(selfCancels));
-  EXPECT_TRUE(scheduler.IsScheduled(other));
+  CHECK_NOTHROW(scheduler.Schedule(other));
+  CHECK(1 == counter);
+  CHECK_FALSE(scheduler.IsScheduled(selfCancels));
+  CHECK(scheduler.IsScheduled(other));
 }
 
-TEST_F(SchedulingRecursionTest, CancelDefaultCommandFromEnd) {
+TEST_CASE_METHOD(SchedulingRecursionTest,
+                 "SchedulingRecursionTest CancelDefaultCommandFromEnd",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   TestSubsystem requirement;
@@ -331,19 +353,21 @@ TEST_F(SchedulingRecursionTest, CancelDefaultCommandFromEnd) {
                                          },
                                          [] { return false; }};
 
-  EXPECT_NO_THROW({
+  CHECK_NOTHROW([&] {
     scheduler.Schedule(&cancelDefaultCommand);
     scheduler.SetDefaultCommand(&requirement, std::move(defaultCommand));
 
     scheduler.Run();
     scheduler.Cancel(&cancelDefaultCommand);
-  });
-  EXPECT_EQ(2, counter);
-  EXPECT_FALSE(scheduler.IsScheduled(&defaultCommand));
-  EXPECT_TRUE(scheduler.IsScheduled(other));
+  }());
+  CHECK(2 == counter);
+  CHECK_FALSE(scheduler.IsScheduled(&defaultCommand));
+  CHECK(scheduler.IsScheduled(other));
 }
 
-TEST_F(SchedulingRecursionTest, CancelNextCommandFromCommand) {
+TEST_CASE_METHOD(SchedulingRecursionTest,
+                 "SchedulingRecursionTest CancelNextCommandFromCommand",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   RunCommand* command1Ptr = nullptr;
@@ -366,23 +390,38 @@ TEST_F(SchedulingRecursionTest, CancelNextCommandFromCommand) {
   scheduler.Schedule(&command2);
   scheduler.Run();
 
-  EXPECT_EQ(counter, 1) << "Second command was run when it shouldn't have been";
+  CHECK(counter == 1);
 
   // only one of the commands should be canceled.
-  EXPECT_FALSE(scheduler.IsScheduled(&command1) &&
-               scheduler.IsScheduled(&command2))
-      << "Both commands are running when only one should be";
+  CHECK_FALSE(
+      (scheduler.IsScheduled(&command1) && scheduler.IsScheduled(&command2)));
   // one of the commands shouldn't be canceled because the other one is canceled
   // first
-  EXPECT_TRUE(scheduler.IsScheduled(&command1) ||
-              scheduler.IsScheduled(&command2))
-      << "Both commands are canceled when only one should be";
+  CHECK((scheduler.IsScheduled(&command1) || scheduler.IsScheduled(&command2)));
 
   scheduler.Run();
-  EXPECT_EQ(counter, 2);
+  CHECK(counter == 2);
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    SchedulingRecursionTests, SchedulingRecursionTest,
-    testing::Values(Command::InterruptionBehavior::kCancelSelf,
-                    Command::InterruptionBehavior::kCancelIncoming));
+namespace {
+
+#define SCHEDULING_RECURSION_TEST_CASE(Name, Behavior)      \
+  TEST_CASE("SchedulingRecursionTest " #Name " " #Behavior, \
+            "[commandsv2][command]") {                      \
+    Check##Name(Command::InterruptionBehavior::Behavior);   \
+  }
+
+SCHEDULING_RECURSION_TEST_CASE(CancelFromInitialize, kCancelSelf)
+SCHEDULING_RECURSION_TEST_CASE(CancelFromInitialize, kCancelIncoming)
+SCHEDULING_RECURSION_TEST_CASE(DefaultCommandGetsRescheduledAfterSelfCanceling,
+                               kCancelSelf)
+SCHEDULING_RECURSION_TEST_CASE(DefaultCommandGetsRescheduledAfterSelfCanceling,
+                               kCancelIncoming)
+SCHEDULING_RECURSION_TEST_CASE(ScheduleFromEndCancel, kCancelSelf)
+SCHEDULING_RECURSION_TEST_CASE(ScheduleFromEndCancel, kCancelIncoming)
+SCHEDULING_RECURSION_TEST_CASE(ScheduleFromEndInterrupt, kCancelSelf)
+SCHEDULING_RECURSION_TEST_CASE(ScheduleFromEndInterrupt, kCancelIncoming)
+
+#undef SCHEDULING_RECURSION_TEST_CASE
+
+}  // namespace

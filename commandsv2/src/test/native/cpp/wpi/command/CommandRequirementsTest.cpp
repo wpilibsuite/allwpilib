@@ -12,7 +12,9 @@
 using namespace wpi::cmd;
 class CommandRequirementsTest : public CommandTestBase {};
 
-TEST_F(CommandRequirementsTest, RequirementInterrupt) {
+TEST_CASE_METHOD(CommandRequirementsTest,
+                 "CommandRequirementsTest RequirementInterrupt",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem requirement;
@@ -20,26 +22,28 @@ TEST_F(CommandRequirementsTest, RequirementInterrupt) {
   MockCommand command1({&requirement});
   MockCommand command2({&requirement});
 
-  EXPECT_CALL(command1, Initialize());
-  EXPECT_CALL(command1, Execute());
-  EXPECT_CALL(command1, End(true));
-  EXPECT_CALL(command1, End(false)).Times(0);
+  command1.ExpectInitialize(1);
+  command1.ExpectExecute(1);
+  command1.ExpectEnd(true, 1);
+  command1.ExpectEnd(false, 0);
 
-  EXPECT_CALL(command2, Initialize());
-  EXPECT_CALL(command2, Execute());
-  EXPECT_CALL(command2, End(true)).Times(0);
-  EXPECT_CALL(command2, End(false)).Times(0);
+  command2.ExpectInitialize(1);
+  command2.ExpectExecute(1);
+  command2.ExpectEnd(true, 0);
+  command2.ExpectEnd(false, 0);
 
   scheduler.Schedule(&command1);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(&command1));
+  CHECK(scheduler.IsScheduled(&command1));
   scheduler.Schedule(&command2);
-  EXPECT_FALSE(scheduler.IsScheduled(&command1));
-  EXPECT_TRUE(scheduler.IsScheduled(&command2));
+  CHECK_FALSE(scheduler.IsScheduled(&command1));
+  CHECK(scheduler.IsScheduled(&command2));
   scheduler.Run();
 }
 
-TEST_F(CommandRequirementsTest, RequirementUninterruptible) {
+TEST_CASE_METHOD(CommandRequirementsTest,
+                 "CommandRequirementsTest RequirementUninterruptible",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem requirement;
@@ -57,29 +61,31 @@ TEST_F(CommandRequirementsTest, RequirementUninterruptible) {
               Command::InterruptionBehavior::kCancelIncoming);
   MockCommand command2({&requirement});
 
-  EXPECT_CALL(command2, Initialize()).Times(0);
-  EXPECT_CALL(command2, Execute()).Times(0);
-  EXPECT_CALL(command2, End(true)).Times(0);
-  EXPECT_CALL(command2, End(false)).Times(0);
+  command2.ExpectInitialize(0);
+  command2.ExpectExecute(0);
+  command2.ExpectEnd(true, 0);
+  command2.ExpectEnd(false, 0);
 
   scheduler.Schedule(command1);
-  EXPECT_EQ(1, initCounter);
+  CHECK(1 == initCounter);
   scheduler.Run();
-  EXPECT_EQ(1, exeCounter);
-  EXPECT_TRUE(scheduler.IsScheduled(command1));
+  CHECK(1 == exeCounter);
+  CHECK(scheduler.IsScheduled(command1));
   scheduler.Schedule(&command2);
-  EXPECT_TRUE(scheduler.IsScheduled(command1));
-  EXPECT_FALSE(scheduler.IsScheduled(&command2));
+  CHECK(scheduler.IsScheduled(command1));
+  CHECK_FALSE(scheduler.IsScheduled(&command2));
   scheduler.Run();
-  EXPECT_EQ(2, exeCounter);
-  EXPECT_EQ(0, endCounter);
+  CHECK(2 == exeCounter);
+  CHECK(0 == endCounter);
 }
 
-TEST_F(CommandRequirementsTest, DefaultCommandRequirementError) {
+TEST_CASE_METHOD(CommandRequirementsTest,
+                 "CommandRequirementsTest DefaultCommandRequirementError",
+                 "[commandsv2][command]") {
   TestSubsystem requirement1;
 
   MockCommand command1;
 
-  ASSERT_THROW(requirement1.SetDefaultCommand(std::move(command1)),
-               wpi::RuntimeError);
+  REQUIRE_THROWS_AS(requirement1.SetDefaultCommand(std::move(command1)),
+                    wpi::RuntimeError);
 }
