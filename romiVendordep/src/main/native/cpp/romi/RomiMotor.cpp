@@ -61,7 +61,7 @@ void RomiMotor::StopMotor() {
   SetThrottle(0.0);
 }
 
-void XRPMotor::AddFollower(XRPMotor& follower) {
+void RomiMotor::AddFollower(RomiMotor& follower) {
   m_nonowningFollowers.emplace_back(&follower);
 }
 
