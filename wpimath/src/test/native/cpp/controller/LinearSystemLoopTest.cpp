@@ -7,8 +7,9 @@
 #include <numbers>
 #include <random>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
 #include "wpi/math/estimator/KalmanFilter.hpp"
@@ -33,7 +34,7 @@ std::default_random_engine generator;
 std::normal_distribution<double> distribution{0.0, 1.0};
 }  // namespace
 
-TEST(LinearSystemLoopTest, StateSpaceEnabled) {
+TEST_CASE("LinearSystemLoopTest StateSpaceEnabled", "[wpimath]") {
   wpi::math::LinearSystem<2, 1, 2> plant{
       wpi::math::Models::ElevatorFromPhysicalConstants(
           wpi::math::DCMotor::Vex775Pro(2), 5_kg, 0.0181864_m, 1.0)};
@@ -75,15 +76,15 @@ TEST(LinearSystemLoopTest, StateSpaceEnabled) {
 
     double u = loop.U(0);
 
-    EXPECT_GT(u, -12.1);
-    EXPECT_LE(u, 12.1);
+    CHECK(u > -12.1);
+    CHECK(u <= 12.1);
   }
 
-  EXPECT_NEAR(2.0, loop.Xhat(0), 0.05);
-  EXPECT_NEAR(0.0, loop.Xhat(1), 0.5);
+  CHECK_NEAR(2.0, loop.Xhat(0), 0.05);
+  CHECK_NEAR(0.0, loop.Xhat(1), 0.5);
 }
 
-TEST(LinearSystemLoopTest, FlywheelEnabled) {
+TEST_CASE("LinearSystemLoopTest FlywheelEnabled", "[wpimath]") {
   wpi::math::LinearSystem<1, 1, 1> plant{
       wpi::math::Models::FlywheelFromPhysicalConstants(
           wpi::math::DCMotor::NEO(2), 0.00289_kg_sq_m, 1.0)};
@@ -115,11 +116,11 @@ TEST(LinearSystemLoopTest, FlywheelEnabled) {
 
     double u = loop.U(0);
 
-    EXPECT_GT(u, -12.1);
-    EXPECT_LE(u, 12.1);
+    CHECK(u > -12.1);
+    CHECK(u <= 12.1);
 
     time += kDt;
   }
 
-  EXPECT_NEAR(0.0, loop.Error().value(), 0.1);
+  CHECK_NEAR(0.0, loop.Error().value(), 0.1);
 }

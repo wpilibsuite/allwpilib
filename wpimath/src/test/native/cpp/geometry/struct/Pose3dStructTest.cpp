@@ -2,7 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/geometry/Pose3d.hpp"
 
@@ -16,13 +17,13 @@ const Pose3d kExpectedData{
            Rotation3d{Quaternion{1.91, 0.3504, 3.3, 1.74}}}};
 }  // namespace
 
-TEST(Pose3dStructTest, Roundtrip) {
+TEST_CASE("Pose3dStructTest Roundtrip", "[wpimath]") {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
   StructType::Pack(buffer, kExpectedData);
 
   Pose3d unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.Translation(), unpacked_data.Translation());
-  EXPECT_EQ(kExpectedData.Rotation(), unpacked_data.Rotation());
+  CHECK(kExpectedData.Translation() == unpacked_data.Translation());
+  CHECK(kExpectedData.Rotation() == unpacked_data.Rotation());
 }

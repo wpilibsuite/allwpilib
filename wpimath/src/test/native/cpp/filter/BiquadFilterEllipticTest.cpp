@@ -8,8 +8,10 @@
 #include <span>
 #include <stdexcept>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/filter/BiquadFilter.hpp"
 #include "wpi/units/frequency.hpp"
 
@@ -33,19 +35,20 @@ double CascadeMagnitude(std::span<const Section> sos, double f, double fs) {
 }
 
 void ExpectSectionNear(const Section& got, const Section& want, double tol) {
-  EXPECT_NEAR(got.b0, want.b0, tol);
-  EXPECT_NEAR(got.b1, want.b1, tol);
-  EXPECT_NEAR(got.b2, want.b2, tol);
-  EXPECT_NEAR(got.a1, want.a1, tol);
-  EXPECT_NEAR(got.a2, want.a2, tol);
+  CHECK_NEAR(got.b0, want.b0, tol);
+  CHECK_NEAR(got.b1, want.b1, tol);
+  CHECK_NEAR(got.b2, want.b2, tol);
+  CHECK_NEAR(got.a1, want.a1, tol);
+  CHECK_NEAR(got.a2, want.a2, tol);
 }
 
-TEST(BiquadFilterEllipticTest, LowPass4thOrderMatchesScipy) {
+TEST_CASE("BiquadFilterEllipticTest LowPass4thOrderMatchesScipy",
+          "[wpimath][filter]") {
   // scipy.signal.ellip(4, 1.0, 40.0, 50.0, btype='low', fs=1000.0)
   auto filter =
       BiquadFilter::Elliptic(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz, 1.0, 40.0);
   auto sections = filter.Sections();
-  ASSERT_EQ(sections.size(), 2u);
+  REQUIRE(sections.size() == 2u);
   ExpectSectionNear(
       sections[0],
       {0.011738158079014929, -0.01231742214386518, 0.011738158079014929,
@@ -57,7 +60,8 @@ TEST(BiquadFilterEllipticTest, LowPass4thOrderMatchesScipy) {
       1e-10);
 }
 
-TEST(BiquadFilterEllipticTest, LowPassOddOrder5HasFirstOrderSection) {
+TEST_CASE("BiquadFilterEllipticTest LowPassOddOrder5HasFirstOrderSection",
+          "[wpimath][filter]") {
   // Odd order means one first-order-as-biquad section in the cascade (a2 = 0
   // and b2 = 0 for that section). scipy emits 3 sections — verify count and
   // shape rather than coefficient-by-coefficient, because section ordering
@@ -65,7 +69,7 @@ TEST(BiquadFilterEllipticTest, LowPassOddOrder5HasFirstOrderSection) {
   auto filter =
       BiquadFilter::Elliptic(Kind::LowPass, 5, 1000.0_Hz, 50.0_Hz, 1.0, 40.0);
   auto sections = filter.Sections();
-  ASSERT_EQ(sections.size(), 3u);
+  REQUIRE(sections.size() == 3u);
 
   int firstOrderSections = 0;
   for (const auto& s : sections) {
@@ -73,10 +77,11 @@ TEST(BiquadFilterEllipticTest, LowPassOddOrder5HasFirstOrderSection) {
       ++firstOrderSections;
     }
   }
-  EXPECT_EQ(firstOrderSections, 1);
+  CHECK(firstOrderSections == 1);
 }
 
-TEST(BiquadFilterEllipticTest, LowPassEquirippleInPassbandAndStopband) {
+TEST_CASE("BiquadFilterEllipticTest LowPassEquirippleInPassbandAndStopband",
+          "[wpimath][filter]") {
   // Even order: |H(0)| = -rippleDb at DC; odd order: |H(0)| = 0 dB.
   // Both share a stopband floor at -stopAttenDb.
   constexpr double kRipple = 1.0;
@@ -87,22 +92,23 @@ TEST(BiquadFilterEllipticTest, LowPassEquirippleInPassbandAndStopband) {
 
   double dcDb = 20.0 * std::log10(CascadeMagnitude(sections, 0.0, 1000.0));
   double fcDb = 20.0 * std::log10(CascadeMagnitude(sections, 50.0, 1000.0));
-  EXPECT_NEAR(dcDb, -kRipple, 0.01);
-  EXPECT_NEAR(fcDb, -kRipple, 0.01);
+  CHECK_NEAR(dcDb, -kRipple, 0.01);
+  CHECK_NEAR(fcDb, -kRipple, 0.01);
 
   // Past the transition band the response stays at -rs floor.
   double stopDb = 20.0 * std::log10(CascadeMagnitude(sections, 100.0, 1000.0));
-  EXPECT_LT(stopDb, -kAtten + 0.5);
+  CHECK(stopDb < -kAtten + 0.5);
 }
 
-TEST(BiquadFilterEllipticTest, OddOrderHasUnityDcGain) {
+TEST_CASE("BiquadFilterEllipticTest OddOrderHasUnityDcGain",
+          "[wpimath][filter]") {
   auto filter =
       BiquadFilter::Elliptic(Kind::LowPass, 5, 1000.0_Hz, 50.0_Hz, 1.0, 40.0);
   double gainDc = CascadeMagnitude(filter.Sections(), 0.0, 1000.0);
-  EXPECT_NEAR(gainDc, 1.0, 1e-9);
+  CHECK_NEAR(gainDc, 1.0, 1e-9);
 }
 
-TEST(BiquadFilterEllipticTest, HighPassResponse) {
+TEST_CASE("BiquadFilterEllipticTest HighPassResponse", "[wpimath][filter]") {
   // Section ordering may differ from scipy for HP, like Cheby2 — verify the
   // total response instead.
   constexpr double kRipple = 1.0;
@@ -113,23 +119,24 @@ TEST(BiquadFilterEllipticTest, HighPassResponse) {
 
   double passbandDb =
       20.0 * std::log10(CascadeMagnitude(sections, 400.0, 1000.0));
-  EXPECT_NEAR(passbandDb, 0.0, kRipple + 0.01);
+  CHECK_NEAR(passbandDb, 0.0, kRipple + 0.01);
 
   double cutoffDb =
       20.0 * std::log10(CascadeMagnitude(sections, 100.0, 1000.0));
-  EXPECT_NEAR(cutoffDb, -kRipple, 0.01);
+  CHECK_NEAR(cutoffDb, -kRipple, 0.01);
 
   double dcDb = 20.0 * std::log10(CascadeMagnitude(sections, 0.0, 1000.0));
-  EXPECT_LT(dcDb, -kAtten + 0.5);
+  CHECK(dcDb < -kAtten + 0.5);
 }
 
-TEST(BiquadFilterEllipticTest, BandPass4thOrderMatchesScipy) {
+TEST_CASE("BiquadFilterEllipticTest BandPass4thOrderMatchesScipy",
+          "[wpimath][filter]") {
   // scipy.signal.ellip(4, 1.0, 40.0, [80.0, 120.0], btype='bandpass',
   // fs=1000.0)
   auto filter = BiquadFilter::Elliptic(Kind::BandPass, 4, 1000.0_Hz, 80.0_Hz,
                                        120.0_Hz, 1.0, 40.0);
   auto sections = filter.Sections();
-  ASSERT_EQ(sections.size(), 4u);
+  REQUIRE(sections.size() == 4u);
   ExpectSectionNear(
       sections[0],
       {0.010903156756394984, -0.008920205787636758, 0.010903156756394982,
@@ -149,7 +156,7 @@ TEST(BiquadFilterEllipticTest, BandPass4thOrderMatchesScipy) {
                     1e-10);
 }
 
-TEST(BiquadFilterEllipticTest, BandPassResponse) {
+TEST_CASE("BiquadFilterEllipticTest BandPassResponse", "[wpimath][filter]") {
   constexpr double kRipple = 1.0;
   constexpr double kAtten = 40.0;
   auto filter = BiquadFilter::Elliptic(Kind::BandPass, 3, 1000.0_Hz, 80.0_Hz,
@@ -158,40 +165,40 @@ TEST(BiquadFilterEllipticTest, BandPassResponse) {
 
   double centerDb =
       20.0 * std::log10(CascadeMagnitude(sections, 100.0, 1000.0));
-  EXPECT_NEAR(centerDb, 0.0, kRipple + 0.01);
+  CHECK_NEAR(centerDb, 0.0, kRipple + 0.01);
 
   // Outside the band: deeply attenuated.
-  EXPECT_LT(20.0 * std::log10(CascadeMagnitude(sections, 0.0, 1000.0)),
-            -kAtten + 1.0);
-  EXPECT_LT(20.0 * std::log10(CascadeMagnitude(sections, 400.0, 1000.0)),
-            -kAtten + 1.0);
+  CHECK(20.0 * std::log10(CascadeMagnitude(sections, 0.0, 1000.0)) <
+        -kAtten + 1.0);
+  CHECK(20.0 * std::log10(CascadeMagnitude(sections, 400.0, 1000.0)) <
+        -kAtten + 1.0);
 }
 
-TEST(BiquadFilterEllipticTest, RejectsInvalidArgs) {
+TEST_CASE("BiquadFilterEllipticTest RejectsInvalidArgs", "[wpimath][filter]") {
   // Order, fs, ripple, atten ranges.
-  EXPECT_THROW(
+  CHECK_THROWS_AS(
       BiquadFilter::Elliptic(Kind::LowPass, 0, 1000.0_Hz, 50.0_Hz, 1.0, 40.0),
       std::invalid_argument);
-  EXPECT_THROW(
+  CHECK_THROWS_AS(
       BiquadFilter::Elliptic(Kind::LowPass, 4, 0.0_Hz, 50.0_Hz, 1.0, 40.0),
       std::invalid_argument);
-  EXPECT_THROW(
+  CHECK_THROWS_AS(
       BiquadFilter::Elliptic(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz, 0.0, 40.0),
       std::invalid_argument);
   // Stopband must be deeper than passband ripple.
-  EXPECT_THROW(
+  CHECK_THROWS_AS(
       BiquadFilter::Elliptic(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz, 40.0, 1.0),
       std::invalid_argument);
-  EXPECT_THROW(
+  CHECK_THROWS_AS(
       BiquadFilter::Elliptic(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz, 5.0, 5.0),
       std::invalid_argument);
   // Frequencies out of range / inverted.
-  EXPECT_THROW(
+  CHECK_THROWS_AS(
       BiquadFilter::Elliptic(Kind::LowPass, 4, 1000.0_Hz, 600.0_Hz, 1.0, 40.0),
       std::invalid_argument);
-  EXPECT_THROW(BiquadFilter::Elliptic(Kind::BandPass, 4, 1000.0_Hz, 120.0_Hz,
-                                      80.0_Hz, 1.0, 40.0),
-               std::invalid_argument);
+  CHECK_THROWS_AS(BiquadFilter::Elliptic(Kind::BandPass, 4, 1000.0_Hz, 120.0_Hz,
+                                         80.0_Hz, 1.0, 40.0),
+                  std::invalid_argument);
 }
 
 }  // namespace

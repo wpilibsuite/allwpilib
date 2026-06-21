@@ -9,7 +9,8 @@
 #include <numbers>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
@@ -27,8 +28,8 @@
 #include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
 
-#define EXPECT_NEAR_UNITS(val1, val2, eps) \
-  EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
+#define CHECK_NEAR_UNITS(val1, val2, eps) \
+  CHECK(wpi::units::math::abs(val1 - val2) <= eps)
 
 static constexpr wpi::units::meter_t kTolerance{1 / 12.0};
 static constexpr wpi::units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
@@ -76,7 +77,7 @@ wpi::math::Vectord<5> Dynamics(const wpi::math::Vectord<5>& x,
   return xdot;
 }
 
-TEST(LTVDifferentialDriveControllerTest, ReachesReference) {
+TEST_CASE("LTVDifferentialDriveControllerTest ReachesReference", "[wpimath]") {
   constexpr wpi::units::second_t kDt = 20_ms;
 
   wpi::math::LTVDifferentialDriveController controller{
@@ -111,9 +112,9 @@ TEST(LTVDifferentialDriveControllerTest, ReachesReference) {
   }
 
   auto& endPose = trajectory.Samples().back().pose;
-  EXPECT_NEAR_UNITS(endPose.X(), robotPose.X(), kTolerance);
-  EXPECT_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
-  EXPECT_NEAR_UNITS(wpi::math::AngleModulus(endPose.Rotation().Radians() -
-                                            robotPose.Rotation().Radians()),
-                    0_rad, kAngularTolerance);
+  CHECK_NEAR_UNITS(endPose.X(), robotPose.X(), kTolerance);
+  CHECK_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
+  CHECK_NEAR_UNITS(wpi::math::AngleModulus(endPose.Rotation().Radians() -
+                                           robotPose.Rotation().Radians()),
+                   0_rad, kAngularTolerance);
 }

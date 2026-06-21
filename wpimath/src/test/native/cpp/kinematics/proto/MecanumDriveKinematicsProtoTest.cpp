@@ -2,7 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
 #include "wpi/util/SmallVector.hpp"
@@ -16,16 +17,16 @@ const MecanumDriveKinematics kExpectedData = MecanumDriveKinematics{
     Translation2d{1.74_m, 3.504_m}, Translation2d{3.504_m, 1.91_m}};
 }  // namespace
 
-TEST(MecanumDriveKinematicsProtoTest, Roundtrip) {
+TEST_CASE("MecanumDriveKinematicsProtoTest Roundtrip", "[wpimath]") {
   wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, kExpectedData));
   auto unpacked_data = message.Unpack(buf);
-  ASSERT_TRUE(unpacked_data.has_value());
+  REQUIRE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.GetFrontLeft(), unpacked_data->GetFrontLeft());
-  EXPECT_EQ(kExpectedData.GetFrontRight(), unpacked_data->GetFrontRight());
-  EXPECT_EQ(kExpectedData.GetRearLeft(), unpacked_data->GetRearLeft());
-  EXPECT_EQ(kExpectedData.GetRearRight(), unpacked_data->GetRearRight());
+  CHECK(kExpectedData.GetFrontLeft() == unpacked_data->GetFrontLeft());
+  CHECK(kExpectedData.GetFrontRight() == unpacked_data->GetFrontRight());
+  CHECK(kExpectedData.GetRearLeft() == unpacked_data->GetRearLeft());
+  CHECK(kExpectedData.GetRearRight() == unpacked_data->GetRearRight());
 }
