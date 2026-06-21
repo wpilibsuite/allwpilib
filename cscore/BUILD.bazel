@@ -223,10 +223,10 @@ wpilib_jni_java_library(
 cc_test(
     name = "cscore-cpp-test",
     size = "small",
-    srcs = glob(["src/test/native/**"]),
+    srcs = glob(["src/test/native/**/*.cpp"]),
     deps = [
         ":cscore",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 
