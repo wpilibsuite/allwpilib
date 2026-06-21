@@ -304,10 +304,10 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest PubUnpubPub",
                 Value::MakeBoolean(true, 5));
   CheckSetValue(network.setValueCalls[1], Handle{pub}.GetIndex(),
                 Value::MakeInteger(3, 5));
-  CHECK(logger.HasMessage(
+  logger.CheckMessage(
       NT_LOG_INFO,
       "local subscribe to 'foo' disabled due to type mismatch (wanted 'int', "
-      "published as 'boolean')"));
+      "published as 'boolean')");
 }
 
 TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest LocalPubConflict",
@@ -342,10 +342,10 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest LocalPubConflict",
                 Value::MakeBoolean(true, 5));
   CheckSetValue(network.setValueCalls[1], Handle{pub2}.GetIndex(),
                 Value::MakeInteger(3, 5));
-  CHECK(logger.HasMessage(
+  logger.CheckMessage(
       NT_LOG_INFO,
       "local publish to 'foo' disabled due to type mismatch (wanted 'int', "
-      "currently 'boolean')"));
+      "currently 'boolean')");
 }
 
 TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest LocalSubConflict",
@@ -357,10 +357,10 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest LocalSubConflict",
   CheckPublish(network.publishCalls[0], "foo", "boolean",
                wpi::util::json::object());
   CheckSubscribe(network.subscribeCalls[0], {"foo"});
-  CHECK(logger.HasMessage(
+  logger.CheckMessage(
       NT_LOG_INFO,
       "local subscribe to 'foo' disabled due to type mismatch (wanted 'int', "
-      "published as 'boolean')"));
+      "published as 'boolean')");
 }
 
 TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest RemotePubConflict",
@@ -386,10 +386,10 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest RemotePubConflict",
                wpi::util::json::object());
   CheckPublish(network.publishCalls[1], "foo", "boolean",
                wpi::util::json::object());
-  CHECK(logger.HasMessage(
+  logger.CheckMessage(
       NT_LOG_INFO,
       "network announce of 'foo' overriding local publish (was 'boolean', now "
-      "'int')"));
+      "'int')");
 }
 
 TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SubNonExist",
@@ -516,9 +516,9 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest PublishUntyped",
   CHECK(storage.Publish(fooTopic, NT_UNASSIGNED, "", {}, {}) == 0);
 
   CheckNoClientCalls(network);
-  CHECK(logger.HasMessage(
+  logger.CheckMessage(
       NT_LOG_ERROR,
-      "cannot publish 'foo' with an unassigned type or empty type string"));
+      "cannot publish 'foo' with an unassigned type or empty type string");
 }
 
 TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetValueInvalidHandle",
@@ -875,10 +875,10 @@ TEST_CASE_METHOD(LocalStorageNumberVariantsTest,
   CheckNetworkCounts(network, 1, 5, 1);
   CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(),
                 Value::MakeDouble(1.0, 50));
-  CHECK(logger.HasMessage(
+  logger.CheckMessage(
       NT_LOG_INFO,
       "local subscribe to 'foo' disabled due to type mismatch (wanted "
-      "'boolean', published as 'double')"));
+      "'boolean', published as 'double')");
 }
 
 TEST_CASE_METHOD(LocalStorageNumberVariantsTest,
@@ -904,10 +904,10 @@ TEST_CASE_METHOD(LocalStorageNumberVariantsTest,
   CheckNetworkCounts(network, 1, 5, 1);
   CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(),
                 Value::MakeDouble(1.0, 50));
-  CHECK(logger.HasMessage(
+  logger.CheckMessage(
       NT_LOG_INFO,
       "local subscribe to 'foo' disabled due to type mismatch (wanted "
-      "'boolean', published as 'double')"));
+      "'boolean', published as 'double')");
 }
 
 template <typename T, typename U>
@@ -937,10 +937,10 @@ TEST_CASE_METHOD(LocalStorageNumberVariantsTest,
   CheckNetworkCounts(network, 1, 5, 1);
   CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(),
                 Value::MakeDouble(1.0, 50));
-  CHECK(logger.HasMessage(
+  logger.CheckMessage(
       NT_LOG_INFO,
       "local subscribe to 'foo' disabled due to type mismatch (wanted "
-      "'boolean', published as 'double')"));
+      "'boolean', published as 'double')");
 }
 
 template <typename T, typename U>
@@ -991,10 +991,10 @@ TEST_CASE_METHOD(LocalStorageNumberVariantsTest,
   CheckNetworkCounts(network, 1, 5, 1);
   CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(),
                 Value::MakeDoubleArray({1.0}, 50));
-  CHECK(logger.HasMessage(
+  logger.CheckMessage(
       NT_LOG_INFO,
       "local subscribe to 'foo' disabled due to type mismatch (wanted "
-      "'boolean[]', published as 'double[]')"));
+      "'boolean[]', published as 'double[]')");
 }
 
 TEST_CASE_METHOD(LocalStorageNumberVariantsTest,
@@ -1051,10 +1051,10 @@ TEST_CASE_METHOD(LocalStorageNumberVariantsTest,
                 Value::MakeDouble(3.0, 50));
   CheckSetValue(network.setValueCalls[3], Handle{pub}.GetIndex(),
                 Value::MakeDouble(4.0, 50));
-  CHECK(logger.HasMessage(
+  logger.CheckMessage(
       NT_LOG_INFO,
       "local subscribe to 'foo' disabled due to type mismatch (wanted "
-      "'boolean', published as 'double')"));
+      "'boolean', published as 'double')");
 }
 
 TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest MultiSubSpecial",

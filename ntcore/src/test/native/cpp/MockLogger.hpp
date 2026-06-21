@@ -4,9 +4,12 @@
 
 #pragma once
 
+#include <initializer_list>
 #include <string>
 #include <string_view>
 #include <vector>
+
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/util/Logger.hpp"
 
@@ -28,22 +31,24 @@ class MockLogger : public wpi::util::Logger {
     });
   }
 
-  bool HasMessage(std::string_view msg) const {
+  struct ExpectedMessage {
+    unsigned int level;
+    std::string_view msg;
+  };
+
+  void CheckMessages(std::initializer_list<ExpectedMessage> expected) const {
+    REQUIRE(messages.size() == expected.size());
+
+    auto expectedIt = expected.begin();
     for (const auto& message : messages) {
-      if (message.msg == msg) {
-        return true;
-      }
+      CHECK(message.level == expectedIt->level);
+      CHECK(std::string_view{message.msg} == expectedIt->msg);
+      ++expectedIt;
     }
-    return false;
   }
 
-  bool HasMessage(unsigned int level, std::string_view msg) const {
-    for (const auto& message : messages) {
-      if (message.level == level && message.msg == msg) {
-        return true;
-      }
-    }
-    return false;
+  void CheckMessage(unsigned int level, std::string_view expected) const {
+    CheckMessages({{level, expected}});
   }
 
   std::vector<Message> messages;

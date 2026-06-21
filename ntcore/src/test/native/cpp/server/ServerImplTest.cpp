@@ -500,7 +500,7 @@ TEST_CASE_METHOD(ServerImplTest, "ServerImplTest InvalidPubUid",
       id,
       "[{\"method\":\"publish\",\"params\":{\"type\":\"string\",\"name\":"
       "\"myvalue\",\"pubuid\":2147483647,\"properties\":{}}}]");
-  CHECK(logger.HasMessage("0: pubuid out of range"));
+  logger.CheckMessage(NT_LOG_WARNING, "0: pubuid out of range");
   CheckNoServerCalls(local);
 }
 
