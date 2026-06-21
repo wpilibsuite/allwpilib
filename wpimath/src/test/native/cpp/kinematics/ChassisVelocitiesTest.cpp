@@ -6,11 +6,12 @@
 
 #include <cmath>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 static constexpr double kEpsilon = 1E-9;
 
-TEST(ChassisVelocitiesTest, Discretize) {
+TEST_CASE("ChassisVelocitiesTest Discretize", "[wpimath]") {
   constexpr wpi::math::ChassisVelocities target{1_mps, 0_mps, 0.5_rad_per_s};
   constexpr wpi::units::second_t duration = 1_s;
   constexpr wpi::units::second_t dt = 10_ms;
@@ -24,83 +25,87 @@ TEST(ChassisVelocitiesTest, Discretize) {
     pose = pose + twist.Exp();
   }
 
-  EXPECT_NEAR((target.vx * duration).value(), pose.X().value(), kEpsilon);
-  EXPECT_NEAR((target.vy * duration).value(), pose.Y().value(), kEpsilon);
-  EXPECT_NEAR((target.omega * duration).value(),
-              pose.Rotation().Radians().value(), kEpsilon);
+  CHECK((target.vx * duration).value() ==
+        Catch::Approx(pose.X().value()).margin(kEpsilon));
+  CHECK((target.vy * duration).value() ==
+        Catch::Approx(pose.Y().value()).margin(kEpsilon));
+  CHECK((target.omega * duration).value() ==
+        Catch::Approx(pose.Rotation().Radians().value()).margin(kEpsilon));
 }
 
-TEST(ChassisVelocitiesTest, ToRobotRelative) {
+TEST_CASE("ChassisVelocitiesTest ToRobotRelative", "[wpimath]") {
   const auto chassisVelocities =
       wpi::math::ChassisVelocities{1_mps, 0_mps, 0.5_rad_per_s}.ToRobotRelative(
           -90.0_deg);
 
-  EXPECT_NEAR(0.0, chassisVelocities.vx.value(), kEpsilon);
-  EXPECT_NEAR(1.0, chassisVelocities.vy.value(), kEpsilon);
-  EXPECT_NEAR(0.5, chassisVelocities.omega.value(), kEpsilon);
+  CHECK(0.0 == Catch::Approx(chassisVelocities.vx.value()).margin(kEpsilon));
+  CHECK(1.0 == Catch::Approx(chassisVelocities.vy.value()).margin(kEpsilon));
+  CHECK(0.5 == Catch::Approx(chassisVelocities.omega.value()).margin(kEpsilon));
 }
 
-TEST(ChassisVelocitiesTest, ToFieldRelative) {
+TEST_CASE("ChassisVelocitiesTest ToFieldRelative", "[wpimath]") {
   const auto chassisVelocities =
       wpi::math::ChassisVelocities{1_mps, 0_mps, 0.5_rad_per_s}.ToFieldRelative(
           45.0_deg);
 
-  EXPECT_NEAR(1.0 / std::sqrt(2.0), chassisVelocities.vx.value(), kEpsilon);
-  EXPECT_NEAR(1.0 / std::sqrt(2.0), chassisVelocities.vy.value(), kEpsilon);
-  EXPECT_NEAR(0.5, chassisVelocities.omega.value(), kEpsilon);
+  CHECK(1.0 / std::sqrt(2.0) ==
+        Catch::Approx(chassisVelocities.vx.value()).margin(kEpsilon));
+  CHECK(1.0 / std::sqrt(2.0) ==
+        Catch::Approx(chassisVelocities.vy.value()).margin(kEpsilon));
+  CHECK(0.5 == Catch::Approx(chassisVelocities.omega.value()).margin(kEpsilon));
 }
 
-TEST(ChassisVelocitiesTest, Plus) {
+TEST_CASE("ChassisVelocitiesTest Plus", "[wpimath]") {
   const wpi::math::ChassisVelocities left{1.0_mps, 0.5_mps, 0.75_rad_per_s};
   const wpi::math::ChassisVelocities right{2.0_mps, 1.5_mps, 0.25_rad_per_s};
 
   const wpi::math::ChassisVelocities result = left + right;
 
-  EXPECT_NEAR(3.0, result.vx.value(), kEpsilon);
-  EXPECT_NEAR(2.0, result.vy.value(), kEpsilon);
-  EXPECT_NEAR(1.0, result.omega.value(), kEpsilon);
+  CHECK(3.0 == Catch::Approx(result.vx.value()).margin(kEpsilon));
+  CHECK(2.0 == Catch::Approx(result.vy.value()).margin(kEpsilon));
+  CHECK(1.0 == Catch::Approx(result.omega.value()).margin(kEpsilon));
 }
 
-TEST(ChassisVelocitiesTest, Minus) {
+TEST_CASE("ChassisVelocitiesTest Minus", "[wpimath]") {
   const wpi::math::ChassisVelocities left{1.0_mps, 0.5_mps, 0.75_rad_per_s};
   const wpi::math::ChassisVelocities right{2.0_mps, 0.5_mps, 0.25_rad_per_s};
 
   const wpi::math::ChassisVelocities result = left - right;
 
-  EXPECT_NEAR(-1.0, result.vx.value(), kEpsilon);
-  EXPECT_NEAR(0, result.vy.value(), kEpsilon);
-  EXPECT_NEAR(0.5, result.omega.value(), kEpsilon);
+  CHECK(-1.0 == Catch::Approx(result.vx.value()).margin(kEpsilon));
+  CHECK(0 == Catch::Approx(result.vy.value()).margin(kEpsilon));
+  CHECK(0.5 == Catch::Approx(result.omega.value()).margin(kEpsilon));
 }
 
-TEST(ChassisVelocitiesTest, UnaryMinus) {
+TEST_CASE("ChassisVelocitiesTest UnaryMinus", "[wpimath]") {
   const wpi::math::ChassisVelocities velocities{1.0_mps, 0.5_mps,
                                                 0.75_rad_per_s};
 
   const wpi::math::ChassisVelocities result = -velocities;
 
-  EXPECT_NEAR(-1.0, result.vx.value(), kEpsilon);
-  EXPECT_NEAR(-0.5, result.vy.value(), kEpsilon);
-  EXPECT_NEAR(-0.75, result.omega.value(), kEpsilon);
+  CHECK(-1.0 == Catch::Approx(result.vx.value()).margin(kEpsilon));
+  CHECK(-0.5 == Catch::Approx(result.vy.value()).margin(kEpsilon));
+  CHECK(-0.75 == Catch::Approx(result.omega.value()).margin(kEpsilon));
 }
 
-TEST(ChassisVelocitiesTest, Multiplication) {
+TEST_CASE("ChassisVelocitiesTest Multiplication", "[wpimath]") {
   const wpi::math::ChassisVelocities velocities{1.0_mps, 0.5_mps,
                                                 0.75_rad_per_s};
 
   const wpi::math::ChassisVelocities result = velocities * 2;
 
-  EXPECT_NEAR(2.0, result.vx.value(), kEpsilon);
-  EXPECT_NEAR(1.0, result.vy.value(), kEpsilon);
-  EXPECT_NEAR(1.5, result.omega.value(), kEpsilon);
+  CHECK(2.0 == Catch::Approx(result.vx.value()).margin(kEpsilon));
+  CHECK(1.0 == Catch::Approx(result.vy.value()).margin(kEpsilon));
+  CHECK(1.5 == Catch::Approx(result.omega.value()).margin(kEpsilon));
 }
 
-TEST(ChassisVelocitiesTest, Division) {
+TEST_CASE("ChassisVelocitiesTest Division", "[wpimath]") {
   const wpi::math::ChassisVelocities velocities{1.0_mps, 0.5_mps,
                                                 0.75_rad_per_s};
 
   const wpi::math::ChassisVelocities result = velocities / 2;
 
-  EXPECT_NEAR(0.5, result.vx.value(), kEpsilon);
-  EXPECT_NEAR(0.25, result.vy.value(), kEpsilon);
-  EXPECT_NEAR(0.375, result.omega.value(), kEpsilon);
+  CHECK(0.5 == Catch::Approx(result.vx.value()).margin(kEpsilon));
+  CHECK(0.25 == Catch::Approx(result.vy.value()).margin(kEpsilon));
+  CHECK(0.375 == Catch::Approx(result.omega.value()).margin(kEpsilon));
 }

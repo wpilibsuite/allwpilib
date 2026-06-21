@@ -4,14 +4,15 @@
 
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/units/time.hpp"
 
 namespace wpi::math {
 
-TEST(LinearPlantInversionFeedforwardTest, Calculate) {
+TEST_CASE("LinearPlantInversionFeedforwardTest Calculate", "[wpimath]") {
   Matrixd<2, 2> A{{1, 0}, {0, 1}};
   Matrixd<2, 1> B{0, 1};
 
@@ -20,7 +21,8 @@ TEST(LinearPlantInversionFeedforwardTest, Calculate) {
   Vectord<2> r{2, 2};
   Vectord<2> nextR{3, 3};
 
-  EXPECT_NEAR(47.502599, feedforward.Calculate(r, nextR)(0, 0), 0.002);
+  CHECK(47.502599 ==
+        Catch::Approx(feedforward.Calculate(r, nextR)(0, 0)).margin(0.002));
 }
 
 }  // namespace wpi::math

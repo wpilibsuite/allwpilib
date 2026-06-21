@@ -10,7 +10,8 @@
 #include <vector>
 
 #include <Eigen/QR>
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/estimator/AngleStatistics.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
@@ -70,7 +71,7 @@ wpi::math::Vectord<5> DriveGlobalMeasurementModel(
   return wpi::math::Vectord<5>{x(0), x(1), x(2), x(3), x(4)};
 }
 
-TEST(MerweUKFTest, DriveInit) {
+TEST_CASE("MerweUKFTest DriveInit", "[wpimath]") {
   constexpr wpi::units::second_t dt = 5_ms;
 
   wpi::math::MerweUKF<5, 2, 3> observer{DriveDynamics,
@@ -97,7 +98,7 @@ TEST(MerweUKFTest, DriveInit) {
       wpi::math::AngleResidual<5>(2), wpi::math::AngleAdd<5>(2));
 }
 
-TEST(MerweUKFTest, DriveConvergence) {
+TEST_CASE("MerweUKFTest DriveConvergence", "[wpimath]") {
   constexpr wpi::units::second_t dt = 5_ms;
   constexpr auto rb = 0.8382_m / 2.0;  // Robot radius
 
@@ -171,17 +172,17 @@ TEST(MerweUKFTest, DriveConvergence) {
   );
 
   auto finalPosition = trajectory.Sample(trajectory.TotalTime());
-  EXPECT_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
-              0.055);
-  EXPECT_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),
-              0.15);
-  EXPECT_NEAR(finalPosition.pose.Rotation().Radians().value(), observer.Xhat(2),
-              0.000005);
-  EXPECT_NEAR(0.0, observer.Xhat(3), 0.1);
-  EXPECT_NEAR(0.0, observer.Xhat(4), 0.1);
+  CHECK(finalPosition.pose.Translation().X().value() ==
+        Catch::Approx(observer.Xhat(0)).margin(0.055));
+  CHECK(finalPosition.pose.Translation().Y().value() ==
+        Catch::Approx(observer.Xhat(1)).margin(0.15));
+  CHECK(finalPosition.pose.Rotation().Radians().value() ==
+        Catch::Approx(observer.Xhat(2)).margin(0.000005));
+  CHECK(0.0 == Catch::Approx(observer.Xhat(3)).margin(0.1));
+  CHECK(0.0 == Catch::Approx(observer.Xhat(4)).margin(0.1));
 }
 
-TEST(MerweUKFTest, LinearUKF) {
+TEST_CASE("MerweUKFTest LinearUKF", "[wpimath]") {
   constexpr wpi::units::second_t dt = 20_ms;
   auto plant = wpi::math::Models::FlywheelFromSysId(0.02_V / 1_rad_per_s,
                                                     0.006_V / 1_rad_per_s_sq);
@@ -209,10 +210,10 @@ TEST(MerweUKFTest, LinearUKF) {
     u = discB.householderQr().solve(ref - discA * ref);
   }
 
-  EXPECT_NEAR(ref(0, 0), observer.Xhat(0), 5);
+  CHECK(ref(0, 0) == Catch::Approx(observer.Xhat(0)).margin(5));
 }
 
-TEST(MerweUKFTest, RoundTripP) {
+TEST_CASE("MerweUKFTest RoundTripP", "[wpimath]") {
   constexpr wpi::units::second_t dt = 5_ms;
 
   wpi::math::MerweUKF<2, 2, 2> observer{
@@ -229,7 +230,7 @@ TEST(MerweUKFTest, RoundTripP) {
   wpi::math::Matrixd<2, 2> P({{2, 1}, {1, 2}});
   observer.SetP(P);
 
-  ASSERT_TRUE(observer.P().isApprox(P));
+  REQUIRE(observer.P().isApprox(P));
 }
 
 // Second system, single motor feedforward estimator
@@ -266,7 +267,7 @@ wpi::math::Vectord<1> MotorControlInput(double t) {
                  -12.0, 12.0)};
 }
 
-TEST(MerweUKFTest, MotorConvergence) {
+TEST_CASE("MerweUKFTest MotorConvergence", "[wpimath]") {
   constexpr wpi::units::second_t dt = 10_ms;
   constexpr int steps = 500;
   constexpr double true_kV = 3;
@@ -313,8 +314,8 @@ TEST(MerweUKFTest, MotorConvergence) {
     observer.Correct(inputs[i], measurements[i]);
   }
 
-  EXPECT_NEAR(true_kV, observer.Xhat(2), true_kV * 0.5);
-  EXPECT_NEAR(true_kA, observer.Xhat(3), true_kA * 0.5);
+  CHECK(true_kV == Catch::Approx(observer.Xhat(2)).margin(true_kV * 0.5));
+  CHECK(true_kA == Catch::Approx(observer.Xhat(3)).margin(true_kA * 0.5));
 }
 
 }  // namespace

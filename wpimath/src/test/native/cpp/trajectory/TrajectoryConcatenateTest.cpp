@@ -2,12 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
-TEST(TrajectoryConcatenateTest, States) {
+TEST_CASE("TrajectoryConcatenateTest States", "[wpimath]") {
   auto t1 = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       {}, {}, {1_m, 1_m, 0_deg}, {2_mps, 2_mps_sq});
   auto t2 = wpi::math::TrajectoryGenerator::GenerateTrajectory(
@@ -20,16 +21,16 @@ TEST(TrajectoryConcatenateTest, States) {
     const auto& state = t.States()[i];
 
     // Make sure that the timestamps are strictly increasing.
-    EXPECT_GT(state.t.value(), time);
+    CHECK(state.t.value() > time);
     time = state.t.value();
 
     // Ensure that the states in t are the same as those in t1 and t2.
     if (i < t1.States().size()) {
-      EXPECT_EQ(state, t1.States()[i]);
+      CHECK(state == t1.States()[i]);
     } else {
       auto st = t2.States()[i - t1.States().size() + 1];
       st.t += t1.TotalTime();
-      EXPECT_EQ(state, st);
+      CHECK(state == st);
     }
   }
 }

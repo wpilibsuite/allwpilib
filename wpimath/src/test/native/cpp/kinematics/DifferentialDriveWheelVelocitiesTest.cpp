@@ -4,54 +4,55 @@
 
 #include "wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
-TEST(DifferentialDriveWheelVelocitiesTest, Plus) {
+TEST_CASE("DifferentialDriveWheelVelocitiesTest Plus", "[wpimath]") {
   const wpi::math::DifferentialDriveWheelVelocities left{1.0_mps, 0.5_mps};
   const wpi::math::DifferentialDriveWheelVelocities right{2.0_mps, 1.5_mps};
 
   const wpi::math::DifferentialDriveWheelVelocities result = left + right;
 
-  EXPECT_EQ(3.0, result.left.value());
-  EXPECT_EQ(2.0, result.right.value());
+  CHECK(3.0 == result.left.value());
+  CHECK(2.0 == result.right.value());
 }
 
-TEST(DifferentialDriveWheelVelocitiesTest, Minus) {
+TEST_CASE("DifferentialDriveWheelVelocitiesTest Minus", "[wpimath]") {
   const wpi::math::DifferentialDriveWheelVelocities left{1.0_mps, 0.5_mps};
   const wpi::math::DifferentialDriveWheelVelocities right{2.0_mps, 0.5_mps};
 
   const wpi::math::DifferentialDriveWheelVelocities result = left - right;
 
-  EXPECT_EQ(-1.0, result.left.value());
-  EXPECT_EQ(0, result.right.value());
+  CHECK(-1.0 == result.left.value());
+  CHECK(0 == result.right.value());
 }
 
-TEST(DifferentialDriveWheelVelocitiesTest, UnaryMinus) {
+TEST_CASE("DifferentialDriveWheelVelocitiesTest UnaryMinus", "[wpimath]") {
   const wpi::math::DifferentialDriveWheelVelocities velocities{1.0_mps,
                                                                0.5_mps};
 
   const wpi::math::DifferentialDriveWheelVelocities result = -velocities;
 
-  EXPECT_EQ(-1.0, result.left.value());
-  EXPECT_EQ(-0.5, result.right.value());
+  CHECK(-1.0 == result.left.value());
+  CHECK(-0.5 == result.right.value());
 }
 
-TEST(DifferentialDriveWheelVelocitiesTest, Multiplication) {
+TEST_CASE("DifferentialDriveWheelVelocitiesTest Multiplication", "[wpimath]") {
   const wpi::math::DifferentialDriveWheelVelocities velocities{1.0_mps,
                                                                0.5_mps};
 
   const wpi::math::DifferentialDriveWheelVelocities result = velocities * 2;
 
-  EXPECT_EQ(2.0, result.left.value());
-  EXPECT_EQ(1.0, result.right.value());
+  CHECK(2.0 == result.left.value());
+  CHECK(1.0 == result.right.value());
 }
 
-TEST(DifferentialDriveWheelVelocitiesTest, Division) {
+TEST_CASE("DifferentialDriveWheelVelocitiesTest Division", "[wpimath]") {
   const wpi::math::DifferentialDriveWheelVelocities velocities{1.0_mps,
                                                                0.5_mps};
 
   const wpi::math::DifferentialDriveWheelVelocities result = velocities / 2;
 
-  EXPECT_EQ(0.5, result.left.value());
-  EXPECT_EQ(0.25, result.right.value());
+  CHECK(0.5 == result.left.value());
+  CHECK(0.25 == result.right.value());
 }

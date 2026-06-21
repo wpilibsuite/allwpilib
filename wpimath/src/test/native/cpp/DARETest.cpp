@@ -6,7 +6,9 @@
 
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_message.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/fmt/Eigen.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
@@ -85,23 +87,20 @@ void ExpectMatrixEqual(const Eigen::MatrixXd& lhs, const Eigen::MatrixXd& rhs,
                        double tolerance) {
   for (int row = 0; row < lhs.rows(); ++row) {
     for (int col = 0; col < lhs.cols(); ++col) {
-      EXPECT_NEAR(lhs(row, col), rhs(row, col), tolerance)
-          << fmt::format("row = {}, col = {}", row, col);
+      UNSCOPED_INFO("row = " << row << ", col = " << col << "\nlhs:\n"
+                             << lhs << "\nrhs:\n"
+                             << rhs);
+      CHECK(lhs(row, col) == Catch::Approx(rhs(row, col)).margin(tolerance));
     }
-  }
-
-  if (::testing::Test::HasFailure()) {
-    wpi::util::print("lhs =\n{}\n", lhs);
-    wpi::util::print("rhs =\n{}\n", rhs);
-    wpi::util::print("delta =\n{}\n", Eigen::MatrixXd{lhs - rhs});
   }
 }
 
-void ExpectPositiveSemidefinite(const Eigen::Ref<const Eigen::MatrixXd>& X) {
-  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigX{X,
-                                                      Eigen::EigenvaluesOnly};
+void ExpectPositiveSemidefinite(const Eigen::MatrixXd& X) {
+  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigX{X};
+  CHECK(eigX.info() == Eigen::Success);
+
   for (int i = 0; i < X.rows(); ++i) {
-    EXPECT_GE(eigX.eigenvalues()[i], 0.0);
+    CHECK(eigX.eigenvalues()[i] >= 0.0);
   }
 }
 
@@ -142,7 +141,7 @@ void ExpectDARESolution(const Eigen::Ref<const Eigen::MatrixXd>& A,
   ExpectMatrixEqual(Y, Eigen::MatrixXd::Zero(X.rows(), X.cols()), 1e-10);
 }
 
-TEST(DARETest, NonInvertibleA_ABQR) {
+TEST_CASE("DARETest NonInvertibleA ABQR", "[wpimath]") {
   // Example 2 of "On the Numerical Solution of the Discrete-Time Algebraic
   // Riccati Equation"
 
@@ -154,7 +153,7 @@ TEST(DARETest, NonInvertibleA_ABQR) {
   wpi::math::Matrixd<1, 1> R{0.25};
 
   auto ret = wpi::math::DARE<4, 1>(A, B, Q, R);
-  EXPECT_TRUE(ret);
+  CHECK(ret);
   auto X = ret.value();
 
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
@@ -162,7 +161,7 @@ TEST(DARETest, NonInvertibleA_ABQR) {
   ExpectDARESolution(A, B, Q, R, X);
 }
 
-TEST(DARETest, NonInvertibleA_ABQRN) {
+TEST_CASE("DARETest NonInvertibleA ABQRN", "[wpimath]") {
   // Example 2 of "On the Numerical Solution of the Discrete-Time Algebraic
   // Riccati Equation"
 
@@ -180,7 +179,7 @@ TEST(DARETest, NonInvertibleA_ABQRN) {
   wpi::math::Matrixd<4, 1> N = (A - Aref).transpose() * Q * B;
 
   auto ret = wpi::math::DARE<4, 1>(A, B, Q, R, N);
-  EXPECT_TRUE(ret);
+  CHECK(ret);
   auto X = ret.value();
 
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
@@ -188,14 +187,14 @@ TEST(DARETest, NonInvertibleA_ABQRN) {
   ExpectDARESolution(A, B, Q, R, N, X);
 }
 
-TEST(DARETest, InvertibleA_ABQR) {
+TEST_CASE("DARETest InvertibleA ABQR", "[wpimath]") {
   wpi::math::Matrixd<2, 2> A{{1, 1}, {0, 1}};
   wpi::math::Matrixd<2, 1> B{{0}, {1}};
   wpi::math::Matrixd<2, 2> Q{{1, 0}, {0, 0}};
   wpi::math::Matrixd<1, 1> R{{0.3}};
 
   auto ret = wpi::math::DARE<2, 1>(A, B, Q, R);
-  EXPECT_TRUE(ret);
+  CHECK(ret);
   auto X = ret.value();
 
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
@@ -203,7 +202,7 @@ TEST(DARETest, InvertibleA_ABQR) {
   ExpectDARESolution(A, B, Q, R, X);
 }
 
-TEST(DARETest, InvertibleA_ABQRN) {
+TEST_CASE("DARETest InvertibleA ABQRN", "[wpimath]") {
   wpi::math::Matrixd<2, 2> A{{1, 1}, {0, 1}};
   wpi::math::Matrixd<2, 1> B{{0}, {1}};
   wpi::math::Matrixd<2, 2> Q{{1, 0}, {0, 0}};
@@ -215,7 +214,7 @@ TEST(DARETest, InvertibleA_ABQRN) {
   wpi::math::Matrixd<2, 1> N = (A - Aref).transpose() * Q * B;
 
   auto ret = wpi::math::DARE<2, 1>(A, B, Q, R, N);
-  EXPECT_TRUE(ret);
+  CHECK(ret);
   auto X = ret.value();
 
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
@@ -223,7 +222,7 @@ TEST(DARETest, InvertibleA_ABQRN) {
   ExpectDARESolution(A, B, Q, R, N, X);
 }
 
-TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQR) {
+TEST_CASE("DARETest FirstGeneralizedEigenvalueOfSTIsStable ABQR", "[wpimath]") {
   // The first generalized eigenvalue of (S, T) is stable
 
   wpi::math::Matrixd<2, 2> A{{0, 1}, {0, 0}};
@@ -232,7 +231,7 @@ TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQR) {
   wpi::math::Matrixd<1, 1> R{1};
 
   auto ret = wpi::math::DARE<2, 1>(A, B, Q, R);
-  EXPECT_TRUE(ret);
+  CHECK(ret);
   auto X = ret.value();
 
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
@@ -240,7 +239,8 @@ TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQR) {
   ExpectDARESolution(A, B, Q, R, X);
 }
 
-TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQRN) {
+TEST_CASE("DARETest FirstGeneralizedEigenvalueOfSTIsStable ABQRN",
+          "[wpimath]") {
   // The first generalized eigenvalue of (S, T) is stable
 
   wpi::math::Matrixd<2, 2> A{{0, 1}, {0, 0}};
@@ -254,7 +254,7 @@ TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQRN) {
   wpi::math::Matrixd<2, 1> N = (A - Aref).transpose() * Q * B;
 
   auto ret = wpi::math::DARE<2, 1>(A, B, Q, R, N);
-  EXPECT_TRUE(ret);
+  CHECK(ret);
   auto X = ret.value();
 
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
@@ -262,14 +262,14 @@ TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQRN) {
   ExpectDARESolution(A, B, Q, R, N, X);
 }
 
-TEST(DARETest, IdentitySystem_ABQR) {
+TEST_CASE("DARETest IdentitySystem ABQR", "[wpimath]") {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d B{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d R{Eigen::Matrix2d::Identity()};
 
   auto ret = wpi::math::DARE<2, 2>(A, B, Q, R);
-  EXPECT_TRUE(ret);
+  CHECK(ret);
   auto X = ret.value();
 
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
@@ -277,7 +277,7 @@ TEST(DARETest, IdentitySystem_ABQR) {
   ExpectDARESolution(A, B, Q, R, X);
 }
 
-TEST(DARETest, IdentitySystem_ABQRN) {
+TEST_CASE("DARETest IdentitySystem ABQRN", "[wpimath]") {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d B{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Identity()};
@@ -285,7 +285,7 @@ TEST(DARETest, IdentitySystem_ABQRN) {
   const Eigen::Matrix2d N{Eigen::Matrix2d::Identity()};
 
   auto ret = wpi::math::DARE<2, 2>(A, B, Q, R, N);
-  EXPECT_TRUE(ret);
+  CHECK(ret);
   auto X = ret.value();
 
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
@@ -293,14 +293,14 @@ TEST(DARETest, IdentitySystem_ABQRN) {
   ExpectDARESolution(A, B, Q, R, N, X);
 }
 
-TEST(DARETest, MoreInputsThanStates_ABQR) {
+TEST_CASE("DARETest MoreInputsThanStates ABQR", "[wpimath]") {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
   const wpi::math::Matrixd<2, 3> B{{1.0, 0.0, 0.0}, {0.0, 0.5, 0.3}};
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix3d R{Eigen::Matrix3d::Identity()};
 
   auto ret = wpi::math::DARE<2, 3>(A, B, Q, R);
-  EXPECT_TRUE(ret);
+  CHECK(ret);
   auto X = ret.value();
 
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
@@ -308,7 +308,7 @@ TEST(DARETest, MoreInputsThanStates_ABQR) {
   ExpectDARESolution(A, B, Q, R, X);
 }
 
-TEST(DARETest, MoreInputsThanStates_ABQRN) {
+TEST_CASE("DARETest MoreInputsThanStates ABQRN", "[wpimath]") {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
   const wpi::math::Matrixd<2, 3> B{{1.0, 0.0, 0.0}, {0.0, 0.5, 0.3}};
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Identity()};
@@ -316,7 +316,7 @@ TEST(DARETest, MoreInputsThanStates_ABQRN) {
   const wpi::math::Matrixd<2, 3> N{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}};
 
   auto ret = wpi::math::DARE<2, 3>(A, B, Q, R, N);
-  EXPECT_TRUE(ret);
+  CHECK(ret);
   auto X = ret.value();
 
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
@@ -324,29 +324,29 @@ TEST(DARETest, MoreInputsThanStates_ABQRN) {
   ExpectDARESolution(A, B, Q, R, N, X);
 }
 
-TEST(DARETest, QNotSymmetric_ABQR) {
+TEST_CASE("DARETest QNotSymmetric ABQR", "[wpimath]") {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d B{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d Q{{1.0, 1.0}, {0.0, 1.0}};
   const Eigen::Matrix2d R{Eigen::Matrix2d::Identity()};
 
   auto ret = wpi::math::DARE<2, 2>(A, B, Q, R);
-  EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), wpi::math::DAREError::QNotSymmetric);
+  CHECK_FALSE(ret);
+  CHECK(ret.error() == wpi::math::DAREError::QNotSymmetric);
 }
 
-TEST(DARETest, QNotPositiveSemidefinite_ABQR) {
+TEST_CASE("DARETest QNotPositiveSemidefinite ABQR", "[wpimath]") {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d B{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d Q{-Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d R{Eigen::Matrix2d::Identity()};
 
   auto ret = wpi::math::DARE<2, 2>(A, B, Q, R);
-  EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), wpi::math::DAREError::QNotPositiveSemidefinite);
+  CHECK_FALSE(ret);
+  CHECK(ret.error() == wpi::math::DAREError::QNotPositiveSemidefinite);
 }
 
-TEST(DARETest, QNotSymmetric_ABQRN) {
+TEST_CASE("DARETest QNotSymmetric ABQRN", "[wpimath]") {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d B{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d Q{{1.0, 1.0}, {0.0, 1.0}};
@@ -354,11 +354,11 @@ TEST(DARETest, QNotSymmetric_ABQRN) {
   const Eigen::Matrix2d N{2.0 * Eigen::Matrix2d::Identity()};
 
   auto ret = wpi::math::DARE<2, 2>(A, B, Q, R, N);
-  EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), wpi::math::DAREError::QNotSymmetric);
+  CHECK_FALSE(ret);
+  CHECK(ret.error() == wpi::math::DAREError::QNotSymmetric);
 }
 
-TEST(DARETest, QNotPositiveSemidefinite_ABQRN) {
+TEST_CASE("DARETest QNotPositiveSemidefinite ABQRN", "[wpimath]") {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d B{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Identity()};
@@ -366,38 +366,38 @@ TEST(DARETest, QNotPositiveSemidefinite_ABQRN) {
   const Eigen::Matrix2d N{2.0 * Eigen::Matrix2d::Identity()};
 
   auto ret = wpi::math::DARE<2, 2>(A, B, Q, R, N);
-  EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), wpi::math::DAREError::QNotPositiveSemidefinite);
+  CHECK_FALSE(ret);
+  CHECK(ret.error() == wpi::math::DAREError::QNotPositiveSemidefinite);
 }
 
-TEST(DARETest, RNotSymmetric_ABQR) {
+TEST_CASE("DARETest RNotSymmetric ABQR", "[wpimath]") {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d B{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d R{{1.0, 1.0}, {0.0, 1.0}};
 
   auto ret = wpi::math::DARE<2, 2>(A, B, Q, R);
-  EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), wpi::math::DAREError::RNotSymmetric);
+  CHECK_FALSE(ret);
+  CHECK(ret.error() == wpi::math::DAREError::RNotSymmetric);
 }
 
-TEST(DARETest, RNotPositiveDefinite_ABQR) {
+TEST_CASE("DARETest RNotPositiveDefinite ABQR", "[wpimath]") {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d B{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Identity()};
 
   const Eigen::Matrix2d R1{Eigen::Matrix2d::Zero()};
   auto ret1 = wpi::math::DARE<2, 2>(A, B, Q, R1);
-  EXPECT_FALSE(ret1);
-  EXPECT_EQ(ret1.error(), wpi::math::DAREError::RNotPositiveDefinite);
+  CHECK_FALSE(ret1);
+  CHECK(ret1.error() == wpi::math::DAREError::RNotPositiveDefinite);
 
   const Eigen::Matrix2d R2{-Eigen::Matrix2d::Identity()};
   auto ret2 = wpi::math::DARE<2, 2>(A, B, Q, R2);
-  EXPECT_FALSE(ret2);
-  EXPECT_EQ(ret2.error(), wpi::math::DAREError::RNotPositiveDefinite);
+  CHECK_FALSE(ret2);
+  CHECK(ret2.error() == wpi::math::DAREError::RNotPositiveDefinite);
 }
 
-TEST(DARETest, RNotSymmetric_ABQRN) {
+TEST_CASE("DARETest RNotSymmetric ABQRN", "[wpimath]") {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d B{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Identity()};
@@ -405,11 +405,11 @@ TEST(DARETest, RNotSymmetric_ABQRN) {
   const Eigen::Matrix2d R{{1.0, 1.0}, {0.0, 1.0}};
 
   auto ret = wpi::math::DARE<2, 2>(A, B, Q, R, N);
-  EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), wpi::math::DAREError::RNotSymmetric);
+  CHECK_FALSE(ret);
+  CHECK(ret.error() == wpi::math::DAREError::RNotSymmetric);
 }
 
-TEST(DARETest, RNotPositiveDefinite_ABQRN) {
+TEST_CASE("DARETest RNotPositiveDefinite ABQRN", "[wpimath]") {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d B{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Identity()};
@@ -417,27 +417,27 @@ TEST(DARETest, RNotPositiveDefinite_ABQRN) {
 
   const Eigen::Matrix2d R1{Eigen::Matrix2d::Zero()};
   auto ret1 = wpi::math::DARE<2, 2>(A, B, Q, R1, N);
-  EXPECT_FALSE(ret1);
-  EXPECT_EQ(ret1.error(), wpi::math::DAREError::RNotPositiveDefinite);
+  CHECK_FALSE(ret1);
+  CHECK(ret1.error() == wpi::math::DAREError::RNotPositiveDefinite);
 
   const Eigen::Matrix2d R2{-Eigen::Matrix2d::Identity()};
   auto ret2 = wpi::math::DARE<2, 2>(A, B, Q, R2, N);
-  EXPECT_FALSE(ret2);
-  EXPECT_EQ(ret2.error(), wpi::math::DAREError::RNotPositiveDefinite);
+  CHECK_FALSE(ret2);
+  CHECK(ret2.error() == wpi::math::DAREError::RNotPositiveDefinite);
 }
 
-TEST(DARETest, ABNotStabilizable_ABQR) {
+TEST_CASE("DARETest ABNotStabilizable ABQR", "[wpimath]") {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d B{Eigen::Matrix2d::Zero()};
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d R{Eigen::Matrix2d::Identity()};
 
   auto ret = wpi::math::DARE<2, 2>(A, B, Q, R);
-  EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), wpi::math::DAREError::ABNotStabilizable);
+  CHECK_FALSE(ret);
+  CHECK(ret.error() == wpi::math::DAREError::ABNotStabilizable);
 }
 
-TEST(DARETest, ABNotStabilizable_ABQRN) {
+TEST_CASE("DARETest ABNotStabilizable ABQRN", "[wpimath]") {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d B{Eigen::Matrix2d::Zero()};
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Identity()};
@@ -445,22 +445,22 @@ TEST(DARETest, ABNotStabilizable_ABQRN) {
   const Eigen::Matrix2d N{Eigen::Matrix2d::Identity()};
 
   auto ret = wpi::math::DARE<2, 2>(A, B, Q, R, N);
-  EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), wpi::math::DAREError::ABNotStabilizable);
+  CHECK_FALSE(ret);
+  CHECK(ret.error() == wpi::math::DAREError::ABNotStabilizable);
 }
 
-TEST(DARETest, ACNotDetectable_ABQR) {
+TEST_CASE("DARETest ACNotDetectable ABQR", "[wpimath]") {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d B{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Zero()};
   const Eigen::Matrix2d R{Eigen::Matrix2d::Identity()};
 
   auto ret = wpi::math::DARE<2, 2>(A, B, Q, R);
-  EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), wpi::math::DAREError::ACNotDetectable);
+  CHECK_FALSE(ret);
+  CHECK(ret.error() == wpi::math::DAREError::ACNotDetectable);
 }
 
-TEST(DARETest, ACNotDetectable_ABQRN) {
+TEST_CASE("DARETest ACNotDetectable ABQRN", "[wpimath]") {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d B{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Zero()};
@@ -468,11 +468,11 @@ TEST(DARETest, ACNotDetectable_ABQRN) {
   const Eigen::Matrix2d N{Eigen::Matrix2d::Zero()};
 
   auto ret = wpi::math::DARE<2, 2>(A, B, Q, R, N);
-  EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), wpi::math::DAREError::ACNotDetectable);
+  CHECK_FALSE(ret);
+  CHECK(ret.error() == wpi::math::DAREError::ACNotDetectable);
 }
 
-TEST(DARETest, QDecomposition) {
+TEST_CASE("DARETest QDecomposition", "[wpimath]") {
   // Ensures the decomposition of Q into CᵀC is correct
 
   const Eigen::Matrix2d A{{1.0, 0.0}, {0.0, 0.0}};
@@ -483,11 +483,11 @@ TEST(DARETest, QDecomposition) {
   const Eigen::Matrix2d C_1{{0.0, 0.0}, {1.0, 0.0}};
   const Eigen::Matrix2d Q_1 = C_1.transpose() * C_1;
   auto ret1 = wpi::math::DARE<2, 2>(A, B, Q_1, R);
-  EXPECT_TRUE(ret1);
+  CHECK(ret1);
 
   // (A, C₂) shouldn't be detectable pair
   const Eigen::Matrix2d C_2 = C_1.transpose();
   const Eigen::Matrix2d Q_2 = C_2.transpose() * C_2;
   auto ret2 = wpi::math::DARE<2, 2>(A, B, Q_2, R);
-  EXPECT_FALSE(ret2);
+  CHECK_FALSE(ret2);
 }

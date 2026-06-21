@@ -4,53 +4,55 @@
 
 #include <numbers>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 
 using namespace wpi::math;
 
-TEST(Twist2dTest, Straight) {
+TEST_CASE("Twist2dTest Straight", "[wpimath]") {
   const Twist2d straight{5_m, 0_m, 0_rad};
   const auto straightTransform = straight.Exp();
 
-  EXPECT_DOUBLE_EQ(5.0, straightTransform.X().value());
-  EXPECT_DOUBLE_EQ(0.0, straightTransform.Y().value());
-  EXPECT_DOUBLE_EQ(0.0, straightTransform.Rotation().Radians().value());
+  CHECK(5.0 == Catch::Approx(straightTransform.X().value()));
+  CHECK(0.0 == Catch::Approx(straightTransform.Y().value()));
+  CHECK(0.0 == Catch::Approx(straightTransform.Rotation().Radians().value()));
 }
 
-TEST(Twist2dTest, QuarterCircle) {
+TEST_CASE("Twist2dTest QuarterCircle", "[wpimath]") {
   const Twist2d quarterCircle{5_m / 2.0 * std::numbers::pi, 0_m,
                               wpi::units::radian_t{std::numbers::pi / 2.0}};
   const auto quarterCircleTransform = quarterCircle.Exp();
 
-  EXPECT_DOUBLE_EQ(5.0, quarterCircleTransform.X().value());
-  EXPECT_DOUBLE_EQ(5.0, quarterCircleTransform.Y().value());
-  EXPECT_DOUBLE_EQ(90.0, quarterCircleTransform.Rotation().Degrees().value());
+  CHECK(5.0 == Catch::Approx(quarterCircleTransform.X().value()));
+  CHECK(5.0 == Catch::Approx(quarterCircleTransform.Y().value()));
+  CHECK(90.0 ==
+        Catch::Approx(quarterCircleTransform.Rotation().Degrees().value()));
 }
 
-TEST(Twist2dTest, DiagonalNoDtheta) {
+TEST_CASE("Twist2dTest DiagonalNoDtheta", "[wpimath]") {
   const Twist2d diagonal{2_m, 2_m, 0_deg};
   const auto diagonalTransform = diagonal.Exp();
 
-  EXPECT_DOUBLE_EQ(2.0, diagonalTransform.X().value());
-  EXPECT_DOUBLE_EQ(2.0, diagonalTransform.Y().value());
-  EXPECT_DOUBLE_EQ(0.0, diagonalTransform.Rotation().Degrees().value());
+  CHECK(2.0 == Catch::Approx(diagonalTransform.X().value()));
+  CHECK(2.0 == Catch::Approx(diagonalTransform.Y().value()));
+  CHECK(0.0 == Catch::Approx(diagonalTransform.Rotation().Degrees().value()));
 }
 
-TEST(Twist2dTest, Equality) {
+TEST_CASE("Twist2dTest Equality", "[wpimath]") {
   const Twist2d one{5_m, 1_m, 3_rad};
   const Twist2d two{5_m, 1_m, 3_rad};
-  EXPECT_TRUE(one == two);
+  CHECK(one == two);
 }
 
-TEST(Twist2dTest, Inequality) {
+TEST_CASE("Twist2dTest Inequality", "[wpimath]") {
   const Twist2d one{5_m, 1_m, 3_rad};
   const Twist2d two{5_m, 1.2_m, 3_rad};
-  EXPECT_TRUE(one != two);
+  CHECK(one != two);
 }
 
-TEST(Twist2dTest, Pose2dLog) {
+TEST_CASE("Twist2dTest Pose2dLog", "[wpimath]") {
   const Pose2d end{5_m, 5_m, 90_deg};
   const Pose2d start;
 
@@ -58,14 +60,14 @@ TEST(Twist2dTest, Pose2dLog) {
 
   Twist2d expected{wpi::units::meter_t{5.0 / 2.0 * std::numbers::pi}, 0_m,
                    wpi::units::radian_t{std::numbers::pi / 2.0}};
-  EXPECT_EQ(expected, twist);
+  CHECK(expected == twist);
 
   // Make sure computed twist gives back original end pose
   const auto reapplied = start + twist.Exp();
-  EXPECT_EQ(end, reapplied);
+  CHECK(end == reapplied);
 }
 
-TEST(Twist2dTest, Constexpr) {
+TEST_CASE("Twist2dTest Constexpr", "[wpimath]") {
   constexpr Twist2d defaultCtor;
   constexpr Twist2d componentCtor{1_m, 2_m, 3_rad};
   constexpr auto multiplied = componentCtor * 2;

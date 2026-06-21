@@ -2,7 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "../../ProtoTestBase.hpp"
 #include "wpi/math/controller/DifferentialDriveFeedforward.hpp"
@@ -17,10 +18,10 @@ struct DifferentialDriveFeedforwardProtoTestData {
       decltype(1_V / 1_mps){4.4}, decltype(1_V / 1_mps_sq){4.5}};
 
   static void CheckEq(const Type& testData, const Type& data) {
-    EXPECT_EQ(testData.kVLinear.value(), data.kVLinear.value());
-    EXPECT_EQ(testData.kALinear.value(), data.kALinear.value());
-    EXPECT_EQ(testData.kVAngular.value(), data.kVAngular.value());
-    EXPECT_EQ(testData.kAAngular.value(), data.kAAngular.value());
+    CHECK(testData.kVLinear.value() == data.kVLinear.value());
+    CHECK(testData.kALinear.value() == data.kALinear.value());
+    CHECK(testData.kVAngular.value() == data.kVAngular.value());
+    CHECK(testData.kAAngular.value() == data.kAAngular.value());
   }
 };
 

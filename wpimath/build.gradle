@@ -5,6 +5,7 @@ ext {
     groupId = 'org.wpilib.wpimath'
 
     nativeName = 'wpimath'
+    nativeTestSuiteName = "${nativeName}Catch2Test"
     devMain = 'org.wpilib.math.DevMain'
 
     splitSetup = {

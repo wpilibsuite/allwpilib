@@ -2,30 +2,31 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/controller/PIDController.hpp"
 
-TEST(PIDInputOutputTest, ContinuousInput) {
+TEST_CASE("PIDInputOutputTest ContinuousInput", "[wpimath]") {
   wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetP(1);
   controller.EnableContinuousInput(-180, 180);
-  EXPECT_DOUBLE_EQ(controller.Calculate(-179, 179), -2);
+  CHECK(controller.Calculate(-179, 179) == Catch::Approx(-2));
 
   controller.EnableContinuousInput(0, 360);
-  EXPECT_DOUBLE_EQ(controller.Calculate(1, 359), -2);
+  CHECK(controller.Calculate(1, 359) == Catch::Approx(-2));
 }
 
-TEST(PIDInputOutputTest, ProportionalGainOutput) {
+TEST_CASE("PIDInputOutputTest ProportionalGainOutput", "[wpimath]") {
   wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetP(4);
 
-  EXPECT_DOUBLE_EQ(-0.1, controller.Calculate(0.025, 0));
+  CHECK(-0.1 == Catch::Approx(controller.Calculate(0.025, 0)));
 }
 
-TEST(PIDInputOutputTest, IntegralGainOutput) {
+TEST_CASE("PIDInputOutputTest IntegralGainOutput", "[wpimath]") {
   wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetI(4);
@@ -36,21 +37,21 @@ TEST(PIDInputOutputTest, IntegralGainOutput) {
     out = controller.Calculate(0.025, 0);
   }
 
-  EXPECT_DOUBLE_EQ(-0.5 * controller.GetPeriod().value(), out);
+  CHECK(-0.5 * controller.GetPeriod().value() == Catch::Approx(out));
 }
 
-TEST(PIDInputOutputTest, DerivativeGainOutput) {
+TEST_CASE("PIDInputOutputTest DerivativeGainOutput", "[wpimath]") {
   wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetD(4);
 
   controller.Calculate(0, 0);
 
-  EXPECT_DOUBLE_EQ(-10_ms / controller.GetPeriod(),
-                   controller.Calculate(0.0025, 0));
+  CHECK(-10_ms / controller.GetPeriod() ==
+        Catch::Approx(controller.Calculate(0.0025, 0)));
 }
 
-TEST(PIDInputOutputTest, IZoneNoOutput) {
+TEST_CASE("PIDInputOutputTest IZoneNoOutput", "[wpimath]") {
   wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetI(1);
@@ -58,10 +59,10 @@ TEST(PIDInputOutputTest, IZoneNoOutput) {
 
   double out = controller.Calculate(2, 0);
 
-  EXPECT_DOUBLE_EQ(0, out);
+  CHECK(0 == Catch::Approx(out));
 }
 
-TEST(PIDInputOutputTest, IZoneOutput) {
+TEST_CASE("PIDInputOutputTest IZoneOutput", "[wpimath]") {
   wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetI(1);
@@ -69,5 +70,5 @@ TEST(PIDInputOutputTest, IZoneOutput) {
 
   double out = controller.Calculate(1, 0);
 
-  EXPECT_DOUBLE_EQ(-1 * controller.GetPeriod().value(), out);
+  CHECK(-1 * controller.GetPeriod().value() == Catch::Approx(out));
 }
