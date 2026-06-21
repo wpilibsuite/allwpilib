@@ -564,19 +564,14 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
       Pxy = Pxy.plus(dx.times(dy).times(m_pts.getWc(i)));
     }
 
-    // Compute the Kalman gain. We use Eigen's QR decomposition to solve. This
-    // is equivalent to MATLAB's \ operator, so we need to rearrange to use
-    // that.
+    // Compute the Kalman gain
     //
     //   K = (P_{xy} / S_{y}ᵀ) / S_{y}
     //   K = (S_{y} \ P_{xy})ᵀ / S_{y}
     //   K = (S_{y}ᵀ \ (S_{y} \ P_{xy}ᵀ))ᵀ
     //
     // equation (27)
-    Matrix<States, R> K =
-        Sy.transpose()
-            .solveFullPivHouseholderQr(Sy.solveFullPivHouseholderQr(Pxy.transpose()))
-            .transpose();
+    Matrix<States, R> K = Sy.transpose().solve(Sy.solve(Pxy.transpose())).transpose();
 
     // Compute the posterior state mean
     //
