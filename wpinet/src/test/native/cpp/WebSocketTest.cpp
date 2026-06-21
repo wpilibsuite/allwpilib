@@ -143,7 +143,7 @@ TEST_CASE_METHOD(WebSocketTest, "WebSocketTest CreateClientBasic",
       if (req.HasError()) {
         Finish();
       }
-      INFO(http_errno_name(req.GetError()));
+      UNSCOPED_INFO(http_errno_name(req.GetError()));
       REQUIRE(req.GetError() == HPE_OK);
     });
   });
@@ -183,7 +183,7 @@ TEST_CASE_METHOD(WebSocketTest, "WebSocketTest CreateClientExtraHeaders",
       if (req.HasError()) {
         Finish();
       }
-      INFO(http_errno_name(req.GetError()));
+      UNSCOPED_INFO(http_errno_name(req.GetError()));
       REQUIRE(req.GetError() == HPE_OK);
     });
   });
@@ -234,7 +234,7 @@ TEST_CASE_METHOD(WebSocketTest, "WebSocketTest CreateServerBasic",
   HttpParser resp{HttpParser::Type::RESPONSE};
   resp.status.connect([&](std::string_view status) {
     ++gotStatus;
-    INFO("status: " << status);
+    UNSCOPED_INFO("status: " << status);
     REQUIRE(resp.GetStatusCode() == 101u);
   });
   resp.header.connect([&](std::string_view name, std::string_view value) {
@@ -268,7 +268,7 @@ TEST_CASE_METHOD(WebSocketTest, "WebSocketTest CreateServerBasic",
       if (resp.HasError()) {
         Finish();
       }
-      INFO(http_errno_name(resp.GetError()));
+      UNSCOPED_INFO(http_errno_name(resp.GetError()));
       REQUIRE(resp.GetError() == HPE_OK);
     });
   });
@@ -310,7 +310,7 @@ TEST_CASE_METHOD(WebSocketTest, "WebSocketTest CreateServerProtocol",
       if (resp.HasError()) {
         Finish();
       }
-      INFO(http_errno_name(resp.GetError()));
+      UNSCOPED_INFO(http_errno_name(resp.GetError()));
       REQUIRE(resp.GetError() == HPE_OK);
     });
   });
@@ -329,7 +329,7 @@ TEST_CASE_METHOD(WebSocketTest, "WebSocketTest CreateServerBadVersion",
   HttpParser resp{HttpParser::Type::RESPONSE};
   resp.status.connect([&](std::string_view status) {
     ++gotStatus;
-    INFO("status: " << status);
+    UNSCOPED_INFO("status: " << status);
     REQUIRE(resp.GetStatusCode() == 426u);
   });
   resp.header.connect([&](std::string_view name, std::string_view value) {
@@ -360,7 +360,7 @@ TEST_CASE_METHOD(WebSocketTest, "WebSocketTest CreateServerBadVersion",
       if (resp.HasError()) {
         Finish();
       }
-      INFO(http_errno_name(resp.GetError()));
+      UNSCOPED_INFO(http_errno_name(resp.GetError()));
       REQUIRE(resp.GetError() == HPE_OK);
     });
   });

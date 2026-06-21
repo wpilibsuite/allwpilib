@@ -41,7 +41,7 @@ class WebSocketServerTest : public WebSocketTest {
           if (resp.HasError()) {
             Finish();
           }
-          INFO(http_errno_name(resp.GetError()));
+          UNSCOPED_INFO(http_errno_name(resp.GetError()));
           REQUIRE(resp.GetError() == HPE_OK);
           if (data.empty()) {
             return;
@@ -75,7 +75,7 @@ TEST_CASE_METHOD(WebSocketServerTest, "WebSocketServerTest Terminate",
     ws->open.connect([&](std::string_view) { ws->Terminate(); });
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
-      INFO("reason: " << reason);
+      UNSCOPED_INFO("reason: " << reason);
       REQUIRE(code == 1006);
     });
   };
@@ -93,7 +93,7 @@ TEST_CASE_METHOD(WebSocketServerTest, "WebSocketServerTest TerminateCode",
     ws->open.connect([&](std::string_view) { ws->Terminate(1000); });
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
-      INFO("reason: " << reason);
+      UNSCOPED_INFO("reason: " << reason);
       REQUIRE(code == 1000);
     });
   };
@@ -133,7 +133,7 @@ TEST_CASE_METHOD(WebSocketServerTest, "WebSocketServerTest CloseBasic",
     ws->open.connect([&](std::string_view) { ws->Close(); });
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
-      INFO("reason: " << reason);
+      UNSCOPED_INFO("reason: " << reason);
       REQUIRE(code == 1005);
     });
   };
@@ -157,7 +157,7 @@ TEST_CASE_METHOD(WebSocketServerTest, "WebSocketServerTest CloseCode",
     ws->open.connect([&](std::string_view) { ws->Close(1000); });
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
-      INFO("reason: " << reason);
+      UNSCOPED_INFO("reason: " << reason);
       REQUIRE(code == 1000);
     });
   };
@@ -210,7 +210,7 @@ TEST_CASE_METHOD(WebSocketServerTest, "WebSocketServerTest ReceiveCloseBasic",
   setupWebSocket = [&] {
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
-      INFO("reason: " << reason);
+      UNSCOPED_INFO("reason: " << reason);
       REQUIRE(code == 1005);
     });
   };
@@ -233,7 +233,7 @@ TEST_CASE_METHOD(WebSocketServerTest, "WebSocketServerTest ReceiveCloseCode",
   setupWebSocket = [&] {
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
-      INFO("reason: " << reason);
+      UNSCOPED_INFO("reason: " << reason);
       REQUIRE(code == 1000);
     });
   };
@@ -292,7 +292,7 @@ TEST_CASE_METHOD(WebSocketServerBadOpcodeTest,
   setupWebSocket = [&] {
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotCallback;
-      INFO("reason: " << reason);
+      UNSCOPED_INFO("reason: " << reason);
       REQUIRE(code == 1002);
     });
   };
@@ -321,7 +321,7 @@ TEST_CASE_METHOD(WebSocketServerControlFrameTest,
   setupWebSocket = [&] {
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotCallback;
-      INFO("reason: " << reason);
+      UNSCOPED_INFO("reason: " << reason);
       REQUIRE(code == 1002);
     });
   };
@@ -351,7 +351,7 @@ TEST_CASE_METHOD(WebSocketServerTest,
   setupWebSocket = [&] {
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotCallback;
-      INFO("reason: " << reason);
+      UNSCOPED_INFO("reason: " << reason);
       REQUIRE(code == 1002);
     });
   };
@@ -374,7 +374,7 @@ TEST_CASE_METHOD(WebSocketServerTest,
   setupWebSocket = [&] {
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotCallback;
-      INFO("reason: " << reason);
+      UNSCOPED_INFO("reason: " << reason);
       REQUIRE(code == 1002);
     });
   };
@@ -397,7 +397,7 @@ TEST_CASE_METHOD(WebSocketServerTest,
   setupWebSocket = [&] {
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotCallback;
-      INFO("reason: " << reason);
+      UNSCOPED_INFO("reason: " << reason);
       REQUIRE(code == 1002);
     });
   };
@@ -576,7 +576,7 @@ TEST_CASE_METHOD(WebSocketServerTest, "WebSocketServerTest ReceiveTooLarge",
     });
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotCallback;
-      INFO("reason: " << reason);
+      UNSCOPED_INFO("reason: " << reason);
       REQUIRE(code == 1009);
     });
   };
@@ -604,7 +604,7 @@ TEST_CASE_METHOD(WebSocketServerTest,
     });
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotCallback;
-      INFO("reason: " << reason);
+      UNSCOPED_INFO("reason: " << reason);
       REQUIRE(code == 1009);
     });
   };
@@ -839,7 +839,7 @@ TEST_CASE_METHOD(WebSocketServerDataTest,
     });
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotCallback;
-      INFO("reason: " << reason);
+      UNSCOPED_INFO("reason: " << reason);
       REQUIRE(code == 1002);
     });
   };
