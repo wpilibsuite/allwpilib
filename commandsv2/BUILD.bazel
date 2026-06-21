@@ -140,7 +140,7 @@ cc_test(
     ],
     deps = [
         ":commandsv2",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 
