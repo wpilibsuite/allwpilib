@@ -230,6 +230,10 @@ model {
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             if (it.targetPlatform.operatingSystem.isWindows()) {
                 it.cppCompiler.args.add("/I${mrccommIncludeDir}")
+                it.linker.args << 'kernel32.lib' << 'Gdi32.lib' << 'User32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
+            } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                it.cppCompiler.args.add("-I${mrccommIncludeDir}")
+                it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
             } else {
                 it.cppCompiler.args.add("-I${mrccommIncludeDir}")
             }
