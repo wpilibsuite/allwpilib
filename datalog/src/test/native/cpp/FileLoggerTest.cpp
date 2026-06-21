@@ -8,36 +8,36 @@
 #include <string_view>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
-TEST(FileLoggerTest, BufferSingleLine) {
+TEST_CASE("FileLoggerTest BufferSingleLine", "[datalog][file-logger]") {
   std::vector<std::string> buf;
   auto func = wpi::log::FileLogger::Buffer(
       [&buf](std::string_view line) { buf.emplace_back(line); });
   func("qwertyuiop\n");
-  EXPECT_EQ("qwertyuiop", buf[0]);
+  CHECK("qwertyuiop" == buf[0]);
 }
 
-TEST(FileLoggerTest, BufferMultiLine) {
+TEST_CASE("FileLoggerTest BufferMultiLine", "[datalog][file-logger]") {
   std::vector<std::string> buf;
   auto func = wpi::log::FileLogger::Buffer(
       [&buf](std::string_view line) { buf.emplace_back(line); });
   func("line 1\nline 2\nline 3\n");
-  EXPECT_EQ("line 1\nline 2\nline 3", buf[0]);
+  CHECK("line 1\nline 2\nline 3" == buf[0]);
 }
 
-TEST(FileLoggerTest, BufferPartials) {
+TEST_CASE("FileLoggerTest BufferPartials", "[datalog][file-logger]") {
   std::vector<std::string> buf;
   auto func = wpi::log::FileLogger::Buffer(
       [&buf](std::string_view line) { buf.emplace_back(line); });
   func("part 1");
   func("part 2\npart 3");
-  EXPECT_EQ("part 1part 2", buf[0]);
+  CHECK("part 1part 2" == buf[0]);
   func("\n");
-  EXPECT_EQ("part 3", buf[1]);
+  CHECK("part 3" == buf[1]);
 }
 
-TEST(FileLoggerTest, BufferMultiplePartials) {
+TEST_CASE("FileLoggerTest BufferMultiplePartials", "[datalog][file-logger]") {
   std::vector<std::string> buf;
   auto func = wpi::log::FileLogger::Buffer(
       [&buf](std::string_view line) { buf.emplace_back(line); });
@@ -45,15 +45,16 @@ TEST(FileLoggerTest, BufferMultiplePartials) {
   func("part 2");
   func("part 3");
   func("part 4\n");
-  EXPECT_EQ("part 1part 2part 3part 4", buf[0]);
+  CHECK("part 1part 2part 3part 4" == buf[0]);
 }
-TEST(FileLoggerTest, BufferMultipleMultiLinePartials) {
+TEST_CASE("FileLoggerTest BufferMultipleMultiLinePartials",
+          "[datalog][file-logger]") {
   std::vector<std::string> buf;
   auto func = wpi::log::FileLogger::Buffer(
       [&buf](std::string_view line) { buf.emplace_back(line); });
   func("part 1");
   func("part 2\npart 3");
   func("part 4\n");
-  EXPECT_EQ("part 1part 2", buf[0]);
-  EXPECT_EQ("part 3part 4", buf[1]);
+  CHECK("part 1part 2" == buf[0]);
+  CHECK("part 3part 4" == buf[1]);
 }

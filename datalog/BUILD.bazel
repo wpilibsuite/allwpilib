@@ -148,7 +148,7 @@ cc_test(
     ],
     deps = [
         ":datalog",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
         "//wpiutil:wpiutil-testlib",
     ],
 )
