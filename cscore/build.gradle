@@ -3,6 +3,7 @@ import org.gradle.internal.os.OperatingSystem
 ext {
     nativeName = 'cscore'
     devMain = 'org.wpilib.cscore.DevMain'
+    nativeTestSuiteName = "${nativeName}Catch2Test"
 }
 
 // Removed because having the objective-cpp plugin added breaks
