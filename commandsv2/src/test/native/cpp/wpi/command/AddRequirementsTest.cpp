@@ -21,13 +21,26 @@ class AddRequirementsRecorder {
     Subsystem,
   };
 
-  void AddRequirements(Requirements) { called = Overload::Requirements; }
+  void AddRequirements(Requirements) {
+    called = Overload::Requirements;
+    ++callCount;
+  }
   void AddRequirements(wpi::util::SmallSet<Subsystem*, 4>) {
     called = Overload::SmallSet;
+    ++callCount;
   }
-  void AddRequirements(Subsystem*) { called = Overload::Subsystem; }
+  void AddRequirements(Subsystem*) {
+    called = Overload::Subsystem;
+    ++callCount;
+  }
+
+  void CheckCalled(Overload expected) const {
+    CHECK(called == expected);
+    CHECK(callCount == 1);
+  }
 
   Overload called = Overload::None;
+  int callCount = 0;
 };
 
 TEST_CASE("AddRequirementsTest InitializerListOverloadResolution",
@@ -37,8 +50,7 @@ TEST_CASE("AddRequirementsTest InitializerListOverloadResolution",
   AddRequirementsRecorder overloadResolver;
 
   overloadResolver.AddRequirements({&requirement, &requirement});
-  CHECK(overloadResolver.called ==
-        AddRequirementsRecorder::Overload::Requirements);
+  overloadResolver.CheckCalled(AddRequirementsRecorder::Overload::Requirements);
 }
 
 TEST_CASE("AddRequirementsTest SpanOverloadResolution",
@@ -48,8 +60,7 @@ TEST_CASE("AddRequirementsTest SpanOverloadResolution",
   AddRequirementsRecorder overloadResolver;
 
   overloadResolver.AddRequirements(requirementsSpan);
-  CHECK(overloadResolver.called ==
-        AddRequirementsRecorder::Overload::Requirements);
+  overloadResolver.CheckCalled(AddRequirementsRecorder::Overload::Requirements);
 }
 
 TEST_CASE("AddRequirementsTest SmallSetOverloadResolution",
@@ -59,7 +70,7 @@ TEST_CASE("AddRequirementsTest SmallSetOverloadResolution",
   AddRequirementsRecorder overloadResolver;
 
   overloadResolver.AddRequirements(requirementsSet);
-  CHECK(overloadResolver.called == AddRequirementsRecorder::Overload::SmallSet);
+  overloadResolver.CheckCalled(AddRequirementsRecorder::Overload::SmallSet);
 }
 
 TEST_CASE("AddRequirementsTest SubsystemOverloadResolution",
@@ -69,8 +80,7 @@ TEST_CASE("AddRequirementsTest SubsystemOverloadResolution",
   AddRequirementsRecorder overloadResolver;
 
   overloadResolver.AddRequirements(&requirement);
-  CHECK(overloadResolver.called ==
-        AddRequirementsRecorder::Overload::Subsystem);
+  overloadResolver.CheckCalled(AddRequirementsRecorder::Overload::Subsystem);
 }
 
 TEST_CASE("AddRequirementsTest InitializerListSemantics",
