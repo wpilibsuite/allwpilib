@@ -89,7 +89,7 @@ cc_test(
     deps = [
         ":halsim_ws_server",
         ":test_headers",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 
