@@ -164,13 +164,13 @@ pkg_files(
 cc_test(
     name = "apriltag-cpp-test",
     size = "small",
-    srcs = glob(["src/test/native/cpp/**"]),
+    srcs = glob(["src/test/native/cpp/**/*.cpp"]),
     tags = [
         "no-asan",
     ],
     deps = [
         ":apriltag",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 

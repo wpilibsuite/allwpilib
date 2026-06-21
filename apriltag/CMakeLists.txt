@@ -77,7 +77,7 @@ install(FILES ${WPILIB_BINARY_DIR}/apriltag-config.cmake DESTINATION share/april
 install(EXPORT apriltag DESTINATION share/apriltag)
 
 if(WITH_TESTS)
-    wpilib_add_test(apriltag src/test/native/cpp)
+    wpilib_add_test_catch2(apriltag src/test/native/cpp)
     target_include_directories(apriltag_test PRIVATE src/test/native/include)
-    target_link_libraries(apriltag_test apriltag googletest)
+    target_link_libraries(apriltag_test apriltag)
 endif()
