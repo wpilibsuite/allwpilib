@@ -71,7 +71,7 @@ ext {
     sharedCvConfigs = [cscore    : [],
         cscoreBase: [],
         cscoreDev : [],
-        cscoreTest: [],
+        (nativeTestSuiteName): [],
         cscoreJNIShared: []]
     staticCvConfigs = [cscoreJNI: [],
         cscoreJNICvStatic: []]
