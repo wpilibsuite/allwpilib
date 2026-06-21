@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/apriltag/AprilTag.hpp"
 #include "wpi/apriltag/AprilTagFieldLayout.hpp"
@@ -13,7 +13,7 @@
 
 using namespace wpi::apriltag;
 
-TEST(AprilTagJsonTest, DeserializeMatches) {
+TEST_CASE("AprilTagJsonTest DeserializeMatches", "[apriltag][json]") {
   auto layout = AprilTagFieldLayout{
       std::vector{AprilTag{1, wpi::math::Pose3d{}},
                   AprilTag{3, wpi::math::Pose3d{0_m, 1_m, 0_m,
@@ -23,6 +23,6 @@ TEST(AprilTagJsonTest, DeserializeMatches) {
 
   AprilTagFieldLayout deserialized;
   wpi::util::json json = layout;
-  EXPECT_NO_THROW(deserialized = json.get<AprilTagFieldLayout>());
-  EXPECT_EQ(layout, deserialized);
+  CHECK_NOTHROW(deserialized = json.get<AprilTagFieldLayout>());
+  CHECK(layout == deserialized);
 }
