@@ -4,6 +4,7 @@
 
 #include "server/ServerImpl.hpp"
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include <concepts>
@@ -38,6 +39,25 @@ class SetPeriodicRecorder {
 
   std::vector<uint32_t> calls;
 };
+
+struct WireConnectionCounts {
+  size_t sendPing = 0;
+  size_t writeText = 0;
+  size_t writeBinary = 0;
+  size_t sendText = 0;
+  size_t sendBinary = 0;
+  size_t disconnect = 0;
+};
+
+void CheckWireConnectionCounts(const net::MockWireConnection& wire,
+                               const WireConnectionCounts& expected = {}) {
+  REQUIRE(wire.sendPingCalls.size() == expected.sendPing);
+  REQUIRE(wire.writeTextCalls.size() == expected.writeText);
+  REQUIRE(wire.writeBinaryCalls.size() == expected.writeBinary);
+  REQUIRE(wire.sendTextCalls.size() == expected.sendText);
+  REQUIRE(wire.sendBinaryCalls.size() == expected.sendBinary);
+  REQUIRE(wire.disconnectCalls.size() == expected.disconnect);
+}
 
 }  // namespace
 
@@ -189,7 +209,7 @@ TEST_CASE_METHOD(ServerImplTest, "ServerImplTest PublishLocal",
 
   server.SendAllOutgoing(200, false);
 
-  REQUIRE(local.announceCalls.size() == 3u);
+  CheckServerMessageCounts(local, {.announce = 3});
   CHECK(local.announceCalls[0].name == "test");
   CHECK(local.announceCalls[0].pubuid == std::optional<int>{pubuid});
   CHECK(local.announceCalls[1].name == "test2");
@@ -199,8 +219,8 @@ TEST_CASE_METHOD(ServerImplTest, "ServerImplTest PublishLocal",
 
   REQUIRE(setPeriodic.calls.size() == 1u);
   CHECK(setPeriodic.calls[0] == 100u);
+  CheckWireConnectionCounts(wire, {.sendPing = 1, .writeText = 3});
   CHECK(wire.sendPingCalls == std::vector<uint64_t>{100});
-  REQUIRE(wire.writeTextCalls.size() == 3u);
   CHECK(wire.writeTextCalls[0] ==
         EncodeText1(net::ServerMessage{net::AnnounceMsg{
             "test", 3, "double", std::nullopt, wpi::util::json::object()}}));
@@ -257,16 +277,16 @@ TEST_CASE_METHOD(ServerImplTest, "ServerImplTest ClientSubTopicOnlyThenValue",
 
   server.SendOutgoing(id, 200);
 
-  REQUIRE(local.announceCalls.size() == 1u);
+  CheckServerMessageCounts(local, {.announce = 1});
   CHECK(local.announceCalls[0].name == "test");
   CHECK(local.announceCalls[0].pubuid == std::optional<int>{pubuid});
   CHECK(setPeriodic.calls == std::vector<uint32_t>{100, 100});
+  CheckWireConnectionCounts(wire,
+                            {.sendPing = 1, .writeText = 1, .writeBinary = 1});
   CHECK(wire.sendPingCalls == std::vector<uint64_t>{100});
-  REQUIRE(wire.writeTextCalls.size() == 1u);
   CHECK(wire.writeTextCalls[0] ==
         EncodeText1(net::ServerMessage{net::AnnounceMsg{
             "test", 3, "double", std::nullopt, wpi::util::json::object()}}));
-  REQUIRE(wire.writeBinaryCalls.size() == 1u);
   CHECK(wire.writeBinaryCalls[0] ==
         EncodeServerBinary1(net::ServerMessage{
             net::ServerValueMsg{3, Value::MakeDouble(1.0, 10)}}));
@@ -313,16 +333,15 @@ TEST_CASE_METHOD(ServerImplTest, "ServerImplTest ClientDisconnectUnpublish",
   // disconnect client
   server.RemoveClient(id);
 
-  REQUIRE(local.announceCalls.size() == 2u);
+  CheckServerMessageCounts(local, {.announce = 2, .unannounce = 1});
   CHECK(local.announceCalls[0].name == "test2");
   CHECK(local.announceCalls[0].pubuid == std::optional<int>{pubuidLocal});
   CHECK(local.announceCalls[1].name == "test");
   CHECK(local.announceCalls[1].pubuid == std::optional<int>{});
-  REQUIRE(local.unannounceCalls.size() == 1u);
   CHECK(local.unannounceCalls[0].name == "test");
   CHECK(local.unannounceCalls[0].id == 0);
+  CheckWireConnectionCounts(wire, {.sendPing = 1, .writeText = 1});
   CHECK(wire.sendPingCalls == std::vector<uint64_t>{100});
-  REQUIRE(wire.writeTextCalls.size() == 1u);
   CHECK(wire.writeTextCalls[0] ==
         EncodeText1(net::ServerMessage{net::AnnounceMsg{
             "test", 8, "double", 1, wpi::util::json::object()}}));
@@ -370,10 +389,9 @@ TEST_CASE_METHOD(ServerImplTest, "ServerImplTest ZeroTimestampNegativeTime",
     server.ProcessIncomingBinary(id, EncodeServerBinary(msgs));
   }
 
-  REQUIRE(local.announceCalls.size() == 1u);
+  CheckServerMessageCounts(local, {.announce = 1, .setValue = 2});
   CHECK(local.announceCalls[0].name == "test");
   CHECK(local.announceCalls[0].pubuid == std::optional<int>{pubuid});
-  REQUIRE(local.setValueCalls.size() == 2u);
   CHECK(local.setValueCalls[0].topicuid == topicHandle);
   CHECK(local.setValueCalls[0].value == defaultValue);
   CHECK(local.setValueCalls[1].topicuid == topicHandle);

@@ -59,20 +59,48 @@ inline void CheckSetValue(
   CHECK(call.value == value);
 }
 
+struct ClientMessageCounts {
+  size_t publish = 0;
+  size_t unpublish = 0;
+  size_t setProperties = 0;
+  size_t subscribe = 0;
+  size_t unsubscribe = 0;
+  size_t setValue = 0;
+};
+
+inline void CheckClientMessageCounts(
+    const net::MockClientMessageHandler& handler,
+    const ClientMessageCounts& expected = {}) {
+  REQUIRE(handler.publishCalls.size() == expected.publish);
+  REQUIRE(handler.unpublishCalls.size() == expected.unpublish);
+  REQUIRE(handler.setPropertiesCalls.size() == expected.setProperties);
+  REQUIRE(handler.subscribeCalls.size() == expected.subscribe);
+  REQUIRE(handler.unsubscribeCalls.size() == expected.unsubscribe);
+  REQUIRE(handler.setValueCalls.size() == expected.setValue);
+}
+
 inline void CheckNoClientCalls(const net::MockClientMessageHandler& handler) {
-  CHECK(handler.publishCalls.empty());
-  CHECK(handler.unpublishCalls.empty());
-  CHECK(handler.setPropertiesCalls.empty());
-  CHECK(handler.subscribeCalls.empty());
-  CHECK(handler.unsubscribeCalls.empty());
-  CHECK(handler.setValueCalls.empty());
+  CheckClientMessageCounts(handler);
+}
+
+struct ServerMessageCounts {
+  size_t announce = 0;
+  size_t unannounce = 0;
+  size_t propertiesUpdate = 0;
+  size_t setValue = 0;
+};
+
+inline void CheckServerMessageCounts(
+    const net::MockServerMessageHandler& handler,
+    const ServerMessageCounts& expected = {}) {
+  REQUIRE(handler.announceCalls.size() == expected.announce);
+  REQUIRE(handler.unannounceCalls.size() == expected.unannounce);
+  REQUIRE(handler.propertiesUpdateCalls.size() == expected.propertiesUpdate);
+  REQUIRE(handler.setValueCalls.size() == expected.setValue);
 }
 
 inline void CheckNoServerCalls(const net::MockServerMessageHandler& handler) {
-  CHECK(handler.announceCalls.empty());
-  CHECK(handler.unannounceCalls.empty());
-  CHECK(handler.propertiesUpdateCalls.empty());
-  CHECK(handler.setValueCalls.empty());
+  CheckServerMessageCounts(handler);
 }
 
 inline void CheckValueNotifyHandles(
@@ -88,12 +116,14 @@ inline void CheckNetworkCounts(const net::MockClientMessageHandler& network,
                                size_t setValueCount, size_t unpublishCount = 0,
                                size_t setPropertiesCount = 0,
                                size_t unsubscribeCount = 0) {
-  REQUIRE(network.publishCalls.size() == publishCount);
-  REQUIRE(network.unpublishCalls.size() == unpublishCount);
-  REQUIRE(network.setPropertiesCalls.size() == setPropertiesCount);
-  REQUIRE(network.subscribeCalls.size() == subscribeCount);
-  REQUIRE(network.unsubscribeCalls.size() == unsubscribeCount);
-  REQUIRE(network.setValueCalls.size() == setValueCount);
+  CheckClientMessageCounts(network, {
+                                        .publish = publishCount,
+                                        .unpublish = unpublishCount,
+                                        .setProperties = setPropertiesCount,
+                                        .subscribe = subscribeCount,
+                                        .unsubscribe = unsubscribeCount,
+                                        .setValue = setValueCount,
+                                    });
 }
 
 }  // namespace wpi::nt

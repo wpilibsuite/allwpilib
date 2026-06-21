@@ -128,7 +128,7 @@ TEST_CASE_METHOD(WireDecodeTextClientTest,
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"properties\":{},\"pubuid\":5,\"type\":\"double\"}}]",
       handler, logger);
-  REQUIRE(handler.publishCalls.size() == 1u);
+  CheckClientMessageCounts(handler, {.publish = 1});
   CheckPublish(handler.publishCalls.back(), 5, "test", "double",
                wpi::util::json::object());
 
@@ -136,7 +136,7 @@ TEST_CASE_METHOD(WireDecodeTextClientTest,
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"pubuid\":5,\"type\":\"double\"}}]",
       handler, logger);
-  REQUIRE(handler.publishCalls.size() == 2u);
+  CheckClientMessageCounts(handler, {.publish = 2});
   CheckPublish(handler.publishCalls.back(), 5, "test", "double",
                wpi::util::json::object());
 }
@@ -150,7 +150,7 @@ TEST_CASE_METHOD(WireDecodeTextClientTest,
       "\"name\":\"test\",\"properties\":{\"k\":6},"
       "\"pubuid\":5,\"type\":\"double\"}}]",
       handler, logger);
-  REQUIRE(handler.publishCalls.size() == 1u);
+  CheckClientMessageCounts(handler, {.publish = 1});
   CheckPublish(handler.publishCalls[0], 5, "test", "double", props);
 }
 
@@ -195,7 +195,7 @@ TEST_CASE_METHOD(WireDecodeTextClientTest, "WireDecodeTextClientTest Unpublish",
                  "[ntcore][wire][decoder]") {
   net::WireDecodeText("[{\"method\":\"unpublish\",\"params\":{\"pubuid\":5}}]",
                       handler, logger);
-  REQUIRE(handler.unpublishCalls.size() == 1u);
+  CheckClientMessageCounts(handler, {.unpublish = 1});
   CHECK(handler.unpublishCalls[0] == 5);
 }
 
@@ -206,7 +206,7 @@ TEST_CASE_METHOD(WireDecodeTextClientTest,
       "[{\"method\":\"unpublish\",\"params\":{\"pubuid\":5}},{\"method\":"
       "\"unpublish\",\"params\":{\"pubuid\":6}}]",
       handler, logger);
-  REQUIRE(handler.unpublishCalls.size() == 2u);
+  CheckClientMessageCounts(handler, {.unpublish = 2});
   CHECK(handler.unpublishCalls[0] == 5);
   CHECK(handler.unpublishCalls[1] == 6);
 }

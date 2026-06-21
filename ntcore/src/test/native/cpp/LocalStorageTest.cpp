@@ -67,7 +67,7 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest GetEntryCached",
   auto entry1 = storage.GetEntry("tocache");
   CHECK(entry1 == storage.GetEntry("tocache"));
 
-  REQUIRE(network.subscribeCalls.size() == 1);
+  CheckNetworkCounts(network, 0, 1, 0);
   CheckSubscribe(network.subscribeCalls[0], {"tocache"});
 }
 
@@ -100,7 +100,7 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest DefaultProps",
   CHECK_FALSE(storage.GetTopicRetained(fooTopic));
   CHECK(storage.GetTopicCached(fooTopic));
 
-  REQUIRE(network.publishCalls.size() == 1);
+  CheckNetworkCounts(network, 1, 0, 0);
   CheckPublish(network.publishCalls[0], "foo", "boolean",
                wpi::util::json::object());
 }
@@ -113,7 +113,7 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest PublishNewNoProps",
   auto info = storage.GetTopicInfo(fooTopic);
   CHECK(info.properties == "{}");
 
-  REQUIRE(network.publishCalls.size() == 1);
+  CheckNetworkCounts(network, 1, 0, 0);
   CheckPublish(network.publishCalls[0], "foo", "boolean",
                wpi::util::json::object());
 }
@@ -125,7 +125,7 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest PublishNewNoPropsNull",
   auto info = storage.GetTopicInfo(fooTopic);
   CHECK(info.properties == "{}");
 
-  REQUIRE(network.publishCalls.size() == 1);
+  CheckNetworkCounts(network, 1, 0, 0);
   CheckPublish(network.publishCalls[0], "foo", "boolean",
                wpi::util::json::object());
 }
@@ -147,7 +147,7 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest PublishNew",
   CHECK(storage.GetTopicTypeString(fooTopic) == "boolean");
   CHECK(storage.GetTopicExists(fooTopic));
 
-  REQUIRE(network.publishCalls.size() == 1);
+  CheckNetworkCounts(network, 1, 0, 0);
   CheckPublish(network.publishCalls[0], "foo", "boolean", properties);
 }
 
@@ -180,12 +180,10 @@ TEST_CASE_METHOD(LocalStorageTest,
   auto vals2 = storage.ReadQueue<int64_t>(sub);  // mismatched type
   REQUIRE(vals2.empty());
 
-  REQUIRE(network.subscribeCalls.size() == 1);
+  CheckNetworkCounts(network, 1, 1, 2);
   CheckSubscribe(network.subscribeCalls[0], {"foo"});
-  REQUIRE(network.publishCalls.size() == 1);
   CheckPublish(network.publishCalls[0], "foo", "boolean",
                wpi::util::json::object());
-  REQUIRE(network.setValueCalls.size() == 2);
   CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(),
                 Value::MakeBoolean(true, 5));
   CheckSetValue(network.setValueCalls[1], Handle{pub}.GetIndex(),
@@ -210,12 +208,10 @@ TEST_CASE_METHOD(LocalStorageTest,
   CHECK(value.GetBoolean() == true);
   CHECK(value.time() == 5);
 
-  REQUIRE(network.publishCalls.size() == 1);
+  CheckNetworkCounts(network, 1, 1, 1);
   CheckPublish(network.publishCalls[0], "foo", "boolean",
                wpi::util::json::object());
-  REQUIRE(network.setValueCalls.size() == 1);
   CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(), val);
-  REQUIRE(network.subscribeCalls.size() == 1);
   CheckSubscribe(network.subscribeCalls[0], {"foo"});
 }
 
@@ -258,12 +254,10 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest EntryNoTypeLocalSet",
   auto vals3 = storage.ReadQueue<int64_t>(entry);  // mismatched type
   REQUIRE(vals3.empty());
 
-  REQUIRE(network.subscribeCalls.size() == 1);
+  CheckNetworkCounts(network, 1, 1, 2);
   CheckSubscribe(network.subscribeCalls[0], {"foo"});
-  REQUIRE(network.publishCalls.size() == 1);
   CheckPublish(network.publishCalls[0], "foo", "boolean",
                wpi::util::json::object());
-  REQUIRE(network.setValueCalls.size() == 2);
   CheckSetValue(network.setValueCalls[0], network.publishCalls[0].pubuid,
                 Value::MakeBoolean(true, 5));
   CheckSetValue(network.setValueCalls[1], network.publishCalls[0].pubuid,
@@ -299,16 +293,13 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest PubUnpubPub",
 
   CHECK(storage.ReadQueue<int64_t>(sub).size() == 1u);
 
-  REQUIRE(network.subscribeCalls.size() == 1);
+  CheckNetworkCounts(network, 2, 1, 2, 1);
   CheckSubscribe(network.subscribeCalls[0], {"foo"});
-  REQUIRE(network.publishCalls.size() == 2);
   CheckPublish(network.publishCalls[0], "foo", "boolean",
                wpi::util::json::object());
   CheckPublish(network.publishCalls[1], "foo", "int",
                wpi::util::json::object());
-  REQUIRE(network.unpublishCalls.size() == 1);
   CHECK(network.unpublishCalls[0] == network.publishCalls[0].pubuid);
-  REQUIRE(network.setValueCalls.size() == 2);
   CheckSetValue(network.setValueCalls[0], network.publishCalls[0].pubuid,
                 Value::MakeBoolean(true, 5));
   CheckSetValue(network.setValueCalls[1], Handle{pub}.GetIndex(),
@@ -341,14 +332,12 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest LocalPubConflict",
   CHECK_FALSE(storage.SetEntryValue(pub1, Value::MakeBoolean(true, 5)));
   CHECK(storage.SetEntryValue(pub2, Value::MakeInteger(3, 5)));
 
-  REQUIRE(network.publishCalls.size() == 2);
+  CheckNetworkCounts(network, 2, 0, 2, 1);
   CheckPublish(network.publishCalls[0], "foo", "boolean",
                wpi::util::json::object());
   CheckPublish(network.publishCalls[1], "foo", "int",
                wpi::util::json::object());
-  REQUIRE(network.unpublishCalls.size() == 1);
   CHECK(network.unpublishCalls[0] == static_cast<int>(Handle{pub1}.GetIndex()));
-  REQUIRE(network.setValueCalls.size() == 2);
   CheckSetValue(network.setValueCalls[0], Handle{pub1}.GetIndex(),
                 Value::MakeBoolean(true, 5));
   CheckSetValue(network.setValueCalls[1], Handle{pub2}.GetIndex(),
@@ -364,10 +353,9 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest LocalSubConflict",
   storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
   storage.Subscribe(fooTopic, NT_INTEGER, "int", {});
 
-  REQUIRE(network.publishCalls.size() == 1);
+  CheckNetworkCounts(network, 1, 1, 0);
   CheckPublish(network.publishCalls[0], "foo", "boolean",
                wpi::util::json::object());
-  REQUIRE(network.subscribeCalls.size() == 1);
   CheckSubscribe(network.subscribeCalls[0], {"foo"});
   CHECK(logger.HasMessage(
       NT_LOG_INFO,
@@ -393,7 +381,7 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest RemotePubConflict",
   CHECK(storage.GetTopicTypeString(fooTopic) == "boolean");
   CHECK(storage.GetTopicExists(fooTopic));
 
-  REQUIRE(network.publishCalls.size() == 2);
+  CheckNetworkCounts(network, 2, 0, 0);
   CheckPublish(network.publishCalls[0], "foo", "boolean",
                wpi::util::json::object());
   CheckPublish(network.publishCalls[1], "foo", "boolean",
@@ -409,7 +397,7 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SubNonExist",
   // makes sure no warning is emitted
   storage.Subscribe(fooTopic, NT_BOOLEAN, "boolean", {});
 
-  REQUIRE(network.subscribeCalls.size() == 1);
+  CheckNetworkCounts(network, 0, 1, 0);
   CheckSubscribe(network.subscribeCalls[0], {"foo"});
   CHECK(logger.messages.empty());
 }
@@ -424,10 +412,8 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetDefaultSubscribe",
   REQUIRE(val.GetBoolean());
   REQUIRE(val.time() == 0);
 
-  REQUIRE(network.subscribeCalls.size() == 1);
+  CheckNetworkCounts(network, 0, 1, 0);
   CheckSubscribe(network.subscribeCalls[0], {"foo"});
-  CHECK(network.publishCalls.empty());
-  CHECK(network.setValueCalls.empty());
 }
 
 TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetDefaultPublish",
@@ -443,12 +429,10 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetDefaultPublish",
   REQUIRE(val.GetBoolean());
   REQUIRE(val.time() == 0);
 
-  REQUIRE(network.publishCalls.size() == 1);
+  CheckNetworkCounts(network, 1, 1, 1);
   CheckPublish(network.publishCalls[0], "foo", "boolean",
                wpi::util::json::object());
-  REQUIRE(network.setValueCalls.size() == 1);
   CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(), expectVal);
-  REQUIRE(network.subscribeCalls.size() == 1);
   CheckSubscribe(network.subscribeCalls[0], {"foo"});
 }
 
@@ -465,12 +449,10 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetDefaultEntry",
   REQUIRE(val.GetBoolean());
   REQUIRE(val.time() == 0);
 
-  REQUIRE(network.subscribeCalls.size() == 1);
+  CheckNetworkCounts(network, 1, 1, 1);
   CheckSubscribe(network.subscribeCalls[0], {"foo"});
-  REQUIRE(network.publishCalls.size() == 1);
   CheckPublish(network.publishCalls[0], "foo", "boolean",
                wpi::util::json::object());
-  REQUIRE(network.setValueCalls.size() == 1);
   CheckSetValue(network.setValueCalls[0], network.publishCalls[0].pubuid,
                 expectVal);
 }
@@ -489,12 +471,10 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetDefaultEntryUnassigned",
   REQUIRE(val.GetBoolean());
   REQUIRE(val.time() == 0);
 
-  REQUIRE(network.subscribeCalls.size() == 1);
+  CheckNetworkCounts(network, 1, 1, 1);
   CheckSubscribe(network.subscribeCalls[0], {"foo"});
-  REQUIRE(network.publishCalls.size() == 1);
   CheckPublish(network.publishCalls[0], "foo", "boolean",
                wpi::util::json::object());
-  REQUIRE(network.setValueCalls.size() == 1);
   CheckSetValue(network.setValueCalls[0], network.publishCalls[0].pubuid,
                 expectVal);
 }
@@ -506,10 +486,9 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetDefaultEntryDiffType",
   CHECK_FALSE(storage.SetDefaultEntryValue(pub, Value::MakeBoolean(true)));
   REQUIRE(storage.GetTopicType(fooTopic) == NT_STRING);
 
-  REQUIRE(network.publishCalls.size() == 1);
+  CheckNetworkCounts(network, 1, 0, 0);
   CheckPublish(network.publishCalls[0], "foo", "string",
                wpi::util::json::object());
-  CHECK(network.setValueCalls.empty());
 }
 
 TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetValueEmptyValue",
@@ -518,10 +497,9 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetValueEmptyValue",
 
   CHECK_FALSE(storage.SetEntryValue(pub, {}));
 
-  REQUIRE(network.publishCalls.size() == 1);
+  CheckNetworkCounts(network, 1, 0, 0);
   CheckPublish(network.publishCalls[0], "foo", "string",
                wpi::util::json::object());
-  CHECK(network.setValueCalls.empty());
 }
 
 TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetValueEmptyUntypedEntry",
@@ -529,10 +507,8 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetValueEmptyUntypedEntry",
   auto entry = storage.GetEntry(fooTopic, NT_UNASSIGNED, "", {});
   CHECK_FALSE(storage.SetEntryValue(entry, {}));
 
-  REQUIRE(network.subscribeCalls.size() == 1);
+  CheckNetworkCounts(network, 0, 1, 0);
   CheckSubscribe(network.subscribeCalls[0], {"foo"});
-  CHECK(network.publishCalls.empty());
-  CHECK(network.setValueCalls.empty());
 }
 
 TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest PublishUntyped",
@@ -573,12 +549,10 @@ TEST_CASE_METHOD(
   CHECK(values[0].value == 1.0);
   CHECK(values[0].time == 50);
 
-  REQUIRE(network.subscribeCalls.size() == 1u);
+  CheckNetworkCounts(network, 1, 1, 1);
   CheckSubscribe(network.subscribeCalls[0], {"foo"}, subOptions);
-  REQUIRE(network.publishCalls.size() == 1u);
   CheckPublish(network.publishCalls[0], "foo", "double",
                wpi::util::json::object());
-  REQUIRE(network.setValueCalls.size() == 1u);
   CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(), val);
 }
 
@@ -600,12 +574,10 @@ TEST_CASE_METHOD(
   CHECK_FALSE(wpi::util::WaitForObject(sub, 0, &timedOut));
   CHECK(timedOut);
 
-  REQUIRE(network.subscribeCalls.size() == 1u);
+  CheckNetworkCounts(network, 1, 1, 1);
   CheckSubscribe(network.subscribeCalls[0], {""}, subOptions);
-  REQUIRE(network.publishCalls.size() == 1u);
   CheckPublish(network.publishCalls[0], "foo", "double",
                wpi::util::json::object());
-  REQUIRE(network.setValueCalls.size() == 1u);
   CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(), val);
 }
 
@@ -623,7 +595,11 @@ class LocalStorageDuplicatesTest : public LocalStorageTest {
 
 void LocalStorageDuplicatesTest::SetupPubSub(bool keepPub, bool keepSub) {
   auto publishCount = network.publishCalls.size();
+  auto unpublishCount = network.unpublishCalls.size();
+  auto setPropertiesCount = network.setPropertiesCalls.size();
   auto subscribeCount = network.subscribeCalls.size();
+  auto unsubscribeCount = network.unsubscribeCalls.size();
+  auto setValueCount = network.setValueCalls.size();
 
   PubSubOptionsImpl pubOptions;
   pubOptions.keepDuplicates = keepPub;
@@ -636,10 +612,16 @@ void LocalStorageDuplicatesTest::SetupPubSub(bool keepPub, bool keepSub) {
   sub = storage.Subscribe(fooTopic, NT_DOUBLE, "double",
                           {.pollStorage = 10, .keepDuplicates = keepSub});
 
-  REQUIRE(network.publishCalls.size() == publishCount + 1);
+  CheckClientMessageCounts(network, {
+                                        .publish = publishCount + 1,
+                                        .unpublish = unpublishCount,
+                                        .setProperties = setPropertiesCount,
+                                        .subscribe = subscribeCount + 1,
+                                        .unsubscribe = unsubscribeCount,
+                                        .setValue = setValueCount,
+                                    });
   CheckPublish(network.publishCalls[publishCount], "foo", "double",
                wpi::util::json::object(), pubOptions);
-  REQUIRE(network.subscribeCalls.size() == subscribeCount + 1);
   CheckSubscribe(network.subscribeCalls[subscribeCount], {"foo"}, subOptions);
 }
 
@@ -666,7 +648,7 @@ TEST_CASE_METHOD(LocalStorageDuplicatesTest,
   REQUIRE(values[1].value == val3.GetDouble());
   REQUIRE(values[1].time == val3.time());
 
-  REQUIRE(network.setValueCalls.size() == 2);
+  CheckNetworkCounts(network, 1, 1, 2);
   CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(), val1);
   CheckSetValue(network.setValueCalls[1], Handle{pub}.GetIndex(), val3);
 }
@@ -681,7 +663,7 @@ TEST_CASE_METHOD(LocalStorageDuplicatesTest,
   auto values = storage.ReadQueue<double>(sub);
   REQUIRE(values.size() == 2u);
 
-  REQUIRE(network.setValueCalls.size() == 3);
+  CheckNetworkCounts(network, 1, 1, 3);
   CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(), val1);
   CheckSetValue(network.setValueCalls[1], Handle{pub}.GetIndex(), val2);
   CheckSetValue(network.setValueCalls[2], Handle{pub}.GetIndex(), val3);
@@ -699,7 +681,7 @@ TEST_CASE_METHOD(LocalStorageDuplicatesTest,
   auto values = storage.ReadQueue<double>(sub);
   REQUIRE(values.size() == 2u);
 
-  REQUIRE(network.setValueCalls.size() == 2);
+  CheckNetworkCounts(network, 1, 1, 2);
   CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(), val1);
   CheckSetValue(network.setValueCalls[1], Handle{pub}.GetIndex(), val3);
 }
@@ -716,7 +698,7 @@ TEST_CASE_METHOD(LocalStorageDuplicatesTest,
   auto values = storage.ReadQueue<double>(sub);
   REQUIRE(values.size() == 3u);
 
-  REQUIRE(network.setValueCalls.size() == 3);
+  CheckNetworkCounts(network, 1, 1, 3);
   CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(), val1);
   CheckSetValue(network.setValueCalls[1], Handle{pub}.GetIndex(), val2);
   CheckSetValue(network.setValueCalls[2], Handle{pub}.GetIndex(), val3);
@@ -743,6 +725,8 @@ TEST_CASE_METHOD(LocalStorageDuplicatesTest,
   REQUIRE(values[0].time == val1.time());
   REQUIRE(values[1].value == val3.GetDouble());
   REQUIRE(values[1].time == val3.time());
+
+  CheckNetworkCounts(network, 1, 1, 0);
 }
 
 TEST_CASE_METHOD(LocalStorageDuplicatesTest,
@@ -766,6 +750,8 @@ TEST_CASE_METHOD(LocalStorageDuplicatesTest,
   REQUIRE(values[0].time == val1.time());
   REQUIRE(values[1].value == val3.GetDouble());
   REQUIRE(values[1].time == val3.time());
+
+  CheckNetworkCounts(network, 1, 1, 0);
 }
 TEST_CASE_METHOD(LocalStorageDuplicatesTest,
                  "LocalStorageDuplicatesTest FromNetworkKeepSub",
@@ -790,6 +776,8 @@ TEST_CASE_METHOD(LocalStorageDuplicatesTest,
   REQUIRE(values[1].time == val2.time());
   REQUIRE(values[2].value == val3.GetDouble());
   REQUIRE(values[2].time == val3.time());
+
+  CheckNetworkCounts(network, 1, 1, 0);
 }
 
 TEST_CASE_METHOD(LocalStorageDuplicatesTest,
@@ -815,6 +803,8 @@ TEST_CASE_METHOD(LocalStorageDuplicatesTest,
   REQUIRE(values[1].time == val2.time());
   REQUIRE(values[2].value == val3.GetDouble());
   REQUIRE(values[2].time == val3.time());
+
+  CheckNetworkCounts(network, 1, 1, 0);
 }
 
 class LocalStorageNumberVariantsTest : public LocalStorageTest {
