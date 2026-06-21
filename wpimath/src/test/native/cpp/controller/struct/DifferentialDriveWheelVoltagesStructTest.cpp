@@ -2,7 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
 
@@ -15,13 +16,13 @@ const DifferentialDriveWheelVoltages kExpectedData{
     DifferentialDriveWheelVoltages{0.174_V, 0.191_V}};
 }  // namespace
 
-TEST(DifferentialDriveWheelVoltagesStructTest, Roundtrip) {
+TEST_CASE("DifferentialDriveWheelVoltagesStructTest Roundtrip", "[wpimath]") {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
   StructType::Pack(buffer, kExpectedData);
 
   DifferentialDriveWheelVoltages unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.left.value(), unpacked_data.left.value());
-  EXPECT_EQ(kExpectedData.right.value(), unpacked_data.right.value());
+  CHECK(kExpectedData.left.value() == unpacked_data.left.value());
+  CHECK(kExpectedData.right.value() == unpacked_data.right.value());
 }

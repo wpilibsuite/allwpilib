@@ -8,8 +8,10 @@
 #include <vector>
 
 #include <Eigen/QR>
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/random/Normal.hpp"
 #include "wpi/math/system/DCMotor.hpp"
@@ -64,7 +66,7 @@ wpi::math::Vectord<5> GlobalMeasurementModel(
 }
 }  // namespace
 
-TEST(ExtendedKalmanFilterTest, Init) {
+TEST_CASE("ExtendedKalmanFilterTest Init", "[wpimath]") {
   constexpr wpi::units::second_t dt = 5_ms;
 
   wpi::math::ExtendedKalmanFilter<5, 2, 3> observer{Dynamics,
@@ -83,7 +85,7 @@ TEST(ExtendedKalmanFilterTest, Init) {
   observer.Correct<5>(u, globalY, GlobalMeasurementModel, R);
 }
 
-TEST(ExtendedKalmanFilterTest, Convergence) {
+TEST_CASE("ExtendedKalmanFilterTest Convergence", "[wpimath]") {
   constexpr wpi::units::second_t dt = 5_ms;
   constexpr auto rb = 0.8382_m / 2.0;  // Robot radius
 
@@ -142,12 +144,12 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
   observer.Correct<5>(u, globalY, GlobalMeasurementModel, R);
 
   auto finalPosition = trajectory.SampleAt(trajectory.Duration());
-  ASSERT_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
-              1.0);
-  ASSERT_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),
-              1.0);
-  ASSERT_NEAR(finalPosition.pose.Rotation().Radians().value(), observer.Xhat(2),
-              1.0);
-  ASSERT_NEAR(0.0, observer.Xhat(3), 1.0);
-  ASSERT_NEAR(0.0, observer.Xhat(4), 1.0);
+  REQUIRE_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
+               1.0);
+  REQUIRE_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),
+               1.0);
+  REQUIRE_NEAR(finalPosition.pose.Rotation().Radians().value(),
+               observer.Xhat(2), 1.0);
+  REQUIRE_NEAR(0.0, observer.Xhat(3), 1.0);
+  REQUIRE_NEAR(0.0, observer.Xhat(4), 1.0);
 }

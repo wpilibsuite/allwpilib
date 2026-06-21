@@ -7,8 +7,10 @@
 #include <limits>
 #include <random>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
@@ -18,7 +20,7 @@ using namespace wpi::math;
 
 static constexpr double kEpsilon = 0.01;
 
-class SwerveDriveOdometryTest : public ::testing::Test {
+class SwerveDriveOdometryTest {
  protected:
   Translation2d m_fl{12_m, 12_m};
   Translation2d m_fr{12_m, -12_m};
@@ -31,7 +33,8 @@ class SwerveDriveOdometryTest : public ::testing::Test {
       m_kinematics, 0_rad, {zero, zero, zero, zero}};
 };
 
-TEST_F(SwerveDriveOdometryTest, TwoIterations) {
+TEST_CASE_METHOD(SwerveDriveOdometryTest,
+                 "SwerveDriveOdometryTest TwoIterations", "[wpimath]") {
   SwerveModulePosition position{0.5_m, 0_deg};
 
   m_odometry.ResetPosition(0_rad, {zero, zero, zero, zero}, Pose2d{});
@@ -41,12 +44,13 @@ TEST_F(SwerveDriveOdometryTest, TwoIterations) {
   auto pose =
       m_odometry.Update(0_deg, {position, position, position, position});
 
-  EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Rotation().Degrees().value(), kEpsilon);
+  CHECK_NEAR(0.5, pose.X().value(), kEpsilon);
+  CHECK_NEAR(0.0, pose.Y().value(), kEpsilon);
+  CHECK_NEAR(0.0, pose.Rotation().Degrees().value(), kEpsilon);
 }
 
-TEST_F(SwerveDriveOdometryTest, 90DegreeTurn) {
+TEST_CASE_METHOD(SwerveDriveOdometryTest,
+                 "SwerveDriveOdometryTest 90DegreeTurn", "[wpimath]") {
   SwerveModulePosition fl{18.85_m, 90_deg};
   SwerveModulePosition fr{42.15_m, 26.565_deg};
   SwerveModulePosition bl{18.85_m, -90_deg};
@@ -55,12 +59,13 @@ TEST_F(SwerveDriveOdometryTest, 90DegreeTurn) {
   m_odometry.ResetPosition(0_rad, {zero, zero, zero, zero}, Pose2d{});
   auto pose = m_odometry.Update(90_deg, {fl, fr, bl, br});
 
-  EXPECT_NEAR(12.0, pose.X().value(), kEpsilon);
-  EXPECT_NEAR(12.0, pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(90.0, pose.Rotation().Degrees().value(), kEpsilon);
+  CHECK_NEAR(12.0, pose.X().value(), kEpsilon);
+  CHECK_NEAR(12.0, pose.Y().value(), kEpsilon);
+  CHECK_NEAR(90.0, pose.Rotation().Degrees().value(), kEpsilon);
 }
 
-TEST_F(SwerveDriveOdometryTest, GyroAngleReset) {
+TEST_CASE_METHOD(SwerveDriveOdometryTest,
+                 "SwerveDriveOdometryTest GyroAngleReset", "[wpimath]") {
   m_odometry.ResetPosition(90_deg, {zero, zero, zero, zero}, Pose2d{});
 
   SwerveModulePosition position{0.5_m, 0_deg};
@@ -68,50 +73,54 @@ TEST_F(SwerveDriveOdometryTest, GyroAngleReset) {
   auto pose =
       m_odometry.Update(90_deg, {position, position, position, position});
 
-  EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Rotation().Degrees().value(), kEpsilon);
+  CHECK_NEAR(0.5, pose.X().value(), kEpsilon);
+  CHECK_NEAR(0.0, pose.Y().value(), kEpsilon);
+  CHECK_NEAR(0.0, pose.Rotation().Degrees().value(), kEpsilon);
 }
 
-TEST_F(SwerveDriveOdometryTest, ResetTranslation) {
+TEST_CASE_METHOD(SwerveDriveOdometryTest,
+                 "SwerveDriveOdometryTest ResetTranslation", "[wpimath]") {
   wpi::util::array<SwerveModulePosition, 4> wheelPositions{zero, zero, zero,
                                                            zero};
 
   m_odometry.ResetPosition(0_deg, wheelPositions, Pose2d{});
   auto pose = m_odometry.Update(30_deg, wheelPositions);
 
-  EXPECT_NEAR(0.0, pose.X().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(30.0, pose.Rotation().Degrees().value(), kEpsilon);
+  CHECK_NEAR(0.0, pose.X().value(), kEpsilon);
+  CHECK_NEAR(0.0, pose.Y().value(), kEpsilon);
+  CHECK_NEAR(30.0, pose.Rotation().Degrees().value(), kEpsilon);
 
   m_odometry.ResetTranslation({0.5_m, 0_m});
   pose = m_odometry.Update(30_deg, wheelPositions);
 
-  EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(30.0, pose.Rotation().Degrees().value(), kEpsilon);
+  CHECK_NEAR(0.5, pose.X().value(), kEpsilon);
+  CHECK_NEAR(0.0, pose.Y().value(), kEpsilon);
+  CHECK_NEAR(30.0, pose.Rotation().Degrees().value(), kEpsilon);
 }
 
-TEST_F(SwerveDriveOdometryTest, ResetRotation) {
+TEST_CASE_METHOD(SwerveDriveOdometryTest,
+                 "SwerveDriveOdometryTest ResetRotation", "[wpimath]") {
   wpi::util::array<SwerveModulePosition, 4> wheelPositions{zero, zero, zero,
                                                            zero};
 
   m_odometry.ResetPosition(0_deg, wheelPositions, Pose2d{0.5_m, 0_m, 0_rad});
   auto pose = m_odometry.Update(30_deg, wheelPositions);
 
-  EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(30.0, pose.Rotation().Degrees().value(), kEpsilon);
+  CHECK_NEAR(0.5, pose.X().value(), kEpsilon);
+  CHECK_NEAR(0.0, pose.Y().value(), kEpsilon);
+  CHECK_NEAR(30.0, pose.Rotation().Degrees().value(), kEpsilon);
 
   m_odometry.ResetRotation(90_deg);
   pose = m_odometry.Update(30_deg, wheelPositions);
 
-  EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(90.0, pose.Rotation().Degrees().value(), kEpsilon);
+  CHECK_NEAR(0.5, pose.X().value(), kEpsilon);
+  CHECK_NEAR(0.0, pose.Y().value(), kEpsilon);
+  CHECK_NEAR(90.0, pose.Rotation().Degrees().value(), kEpsilon);
 }
 
-TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
+TEST_CASE_METHOD(SwerveDriveOdometryTest,
+                 "SwerveDriveOdometryTest AccuracyFacingTrajectory",
+                 "[wpimath]") {
   SwerveDriveKinematics<4> kinematics{
       Translation2d{1_m, 1_m}, Translation2d{1_m, -1_m},
       Translation2d{-1_m, -1_m}, Translation2d{-1_m, 1_m}};
@@ -173,11 +182,12 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.05);
-  EXPECT_LT(maxError, 0.125);
+  CHECK(errorSum / (trajectory.Duration().value() / dt.value()) < 0.05);
+  CHECK(maxError < 0.125);
 }
 
-TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
+TEST_CASE_METHOD(SwerveDriveOdometryTest,
+                 "SwerveDriveOdometryTest AccuracyFacingXAxis", "[wpimath]") {
   SwerveDriveKinematics<4> kinematics{
       Translation2d{1_m, 1_m}, Translation2d{1_m, -1_m},
       Translation2d{-1_m, -1_m}, Translation2d{-1_m, 1_m}};
@@ -238,6 +248,6 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.06);
-  EXPECT_LT(maxError, 0.125);
+  CHECK(errorSum / (trajectory.Duration().value() / dt.value()) < 0.06);
+  CHECK(maxError < 0.125);
 }

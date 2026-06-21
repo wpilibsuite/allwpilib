@@ -5,19 +5,20 @@
 #include "wpi/math/random/Normal.hpp"
 
 #include <Eigen/Core>
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
-TEST(NormalTest, NormalParameterPack) {
+TEST_CASE("NormalTest NormalParameterPack", "[wpimath]") {
   [[maybe_unused]]
   Eigen::Vector<double, 2> vec = wpi::math::Normal(2.0, 3.0);
 }
 
-TEST(NormalTest, NormalArray) {
+TEST_CASE("NormalTest NormalArray", "[wpimath]") {
   [[maybe_unused]]
   Eigen::Vector<double, 2> vec = wpi::math::Normal<2>({2.0, 3.0});
 }
 
-TEST(NormalTest, NormalDynamic) {
+TEST_CASE("NormalTest NormalDynamic", "[wpimath]") {
   [[maybe_unused]]
   Eigen::VectorXd vec = wpi::math::Normal(std::vector{2.0, 3.0});
 }

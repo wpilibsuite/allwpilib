@@ -10,25 +10,28 @@
 #include <random>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/filter/LinearFilter.hpp"
 #include "wpi/units/time.hpp"
 
 using wpi::math::BiquadFilter;
 
-TEST(BiquadFilterTest, PassThrough) {
+TEST_CASE("BiquadFilterTest PassThrough", "[wpimath][filter]") {
   BiquadFilter filter({{1.0, 0.0, 0.0, 0.0, 0.0}});
 
   std::mt19937 rng(42);
   std::uniform_real_distribution<double> dist(-100.0, 100.0);
   for (int i = 0; i < 200; ++i) {
     double x = dist(rng);
-    EXPECT_DOUBLE_EQ(filter.Calculate(x), x);
+    CHECK_DOUBLE_EQ(filter.Calculate(x), x);
   }
 }
 
-TEST(BiquadFilterTest, FirstOrderMatchesSinglePoleIIR) {
+TEST_CASE("BiquadFilterTest FirstOrderMatchesSinglePoleIIR",
+          "[wpimath][filter]") {
   // SinglePoleIIR: y[n] = (1-g) x[n] + g y[n-1], g = exp(-dt/T)
   // As biquad:     {1-g, 0, 0, -g, 0}
   constexpr double kTimeConstant = 0.015915;
@@ -45,11 +48,11 @@ TEST(BiquadFilterTest, FirstOrderMatchesSinglePoleIIR) {
     double x = dist(rng);
     double y_lin = linear.Calculate(x);
     double y_biq = biquad.Calculate(x);
-    EXPECT_NEAR(y_lin, y_biq, 1e-12);
+    CHECK_NEAR(y_lin, y_biq, 1e-12);
   }
 }
 
-TEST(BiquadFilterTest, Butterworth4thOrderLowPass) {
+TEST_CASE("BiquadFilterTest Butterworth4thOrderLowPass", "[wpimath][filter]") {
   // scipy.signal.butter(4, 50.0, btype='low', fs=1000.0, output='sos')
   BiquadFilter filter({
       {0.00041659920440659937, 0.0008331984088131987, 0.00041659920440659937,
@@ -74,11 +77,12 @@ TEST(BiquadFilterTest, Butterworth4thOrderLowPass) {
   for (size_t i = 0; i < kExpected.size(); ++i) {
     double x = (i == 0) ? 1.0 : 0.0;
     double y = filter.Calculate(x);
-    EXPECT_NEAR(y, kExpected[i], 1e-10) << "sample " << i;
+    UNSCOPED_INFO("sample " << i);
+    CHECK_NEAR(y, kExpected[i], 1e-10);
   }
 }
 
-TEST(BiquadFilterTest, Notch60Hz) {
+TEST_CASE("BiquadFilterTest Notch60Hz", "[wpimath][filter]") {
   // scipy.signal.iirnotch(60.0, Q=10.0, fs=1000.0), converted via tf2sos
   BiquadFilter filter({
       {0.9814970254751076, -1.8251457105120343, 0.9814970254751076,
@@ -96,8 +100,8 @@ TEST(BiquadFilterTest, Notch60Hz) {
   }
 
   // Spot-check against scipy.signal.sosfilt outputs
-  EXPECT_NEAR(output[500], -0.017355123579818322, 1e-10);
-  EXPECT_NEAR(output[999], -0.08007594066581347, 1e-10);
+  CHECK_NEAR(output[500], -0.017355123579818322, 1e-10);
+  CHECK_NEAR(output[999], -0.08007594066581347, 1e-10);
 
   // Attenuation check via a basic DFT at 10 Hz and 60 Hz over the last 512
   // samples (in steady state). 60 Hz should be strongly attenuated, 10 Hz
@@ -130,11 +134,14 @@ TEST(BiquadFilterTest, Notch60Hz) {
   double atten60_dB = 20.0 * std::log10(out60 / in60);
   double atten10_dB = 20.0 * std::log10(out10 / in10);
 
-  EXPECT_LT(atten60_dB, -40.0) << "60 Hz not sufficiently attenuated";
-  EXPECT_GT(atten10_dB, -0.5) << "10 Hz passband loss too large";
+  UNSCOPED_INFO("60 Hz not sufficiently attenuated");
+  CHECK(atten60_dB < -40.0);
+  UNSCOPED_INFO("10 Hz passband loss too large");
+  CHECK(atten10_dB > -0.5);
 }
 
-TEST(BiquadFilterTest, Order8ButterworthMatchesScipy) {
+TEST_CASE("BiquadFilterTest Order8ButterworthMatchesScipy",
+          "[wpimath][filter]") {
   // High-order filter = 4 biquads. This test exists to prove that the SOS
   // (Direct Form II Transposed) implementation is numerically correct at the
   // orders that a flattened-polynomial LinearFilter cannot reliably run.
@@ -177,12 +184,12 @@ TEST(BiquadFilterTest, Order8ButterworthMatchesScipy) {
   }
 
   for (size_t i = 0; i < kExpected.size(); ++i) {
-    EXPECT_NEAR(spot_samples[i], kExpected[i], 1e-10)
-        << "sample index " << kSpotIndices[i];
+    UNSCOPED_INFO("sample index " << kSpotIndices[i]);
+    CHECK_NEAR(spot_samples[i], kExpected[i], 1e-10);
   }
 }
 
-TEST(BiquadFilterTest, ResetZerosState) {
+TEST_CASE("BiquadFilterTest ResetZerosState", "[wpimath][filter]") {
   BiquadFilter filter({
       {0.00041659920440659937, 0.0008331984088131987, 0.00041659920440659937,
        -1.4796742169311934, 0.5558215432824889},
@@ -192,18 +199,18 @@ TEST(BiquadFilterTest, ResetZerosState) {
   for (int i = 0; i < 50; ++i) {
     filter.Calculate(1.0);
   }
-  EXPECT_NE(filter.LastValue(), 0.0);
+  CHECK(filter.LastValue() != 0.0);
 
   filter.Reset();
-  EXPECT_DOUBLE_EQ(filter.LastValue(), 0.0);
+  CHECK_DOUBLE_EQ(filter.LastValue(), 0.0);
 
   // First call after Reset should behave like the filter starts fresh —
   // matches the impulse-response first sample.
   double y = filter.Calculate(1.0);
-  EXPECT_NEAR(y, 0.00041659920440659937, 1e-12);
+  CHECK_NEAR(y, 0.00041659920440659937, 1e-12);
 }
 
-TEST(BiquadFilterTest, ResetToSteadyState) {
+TEST_CASE("BiquadFilterTest ResetToSteadyState", "[wpimath][filter]") {
   // DC gain of each section is (b0+b1+b2)/(1+a1+a2). After Reset(value),
   // Calculate(value) should immediately return value * cascade_DC_gain.
   BiquadFilter filter({
@@ -216,17 +223,17 @@ TEST(BiquadFilterTest, ResetToSteadyState) {
   filter.Reset(kInput);
 
   // Cascade DC gain for a Butterworth LP is 1.0, so output should equal input.
-  EXPECT_NEAR(filter.LastValue(), kInput, 1e-12);
+  CHECK_NEAR(filter.LastValue(), kInput, 1e-12);
   double y = filter.Calculate(kInput);
-  EXPECT_NEAR(y, kInput, 1e-12);
+  CHECK_NEAR(y, kInput, 1e-12);
 
   // And remain at steady state
   for (int i = 0; i < 20; ++i) {
-    EXPECT_NEAR(filter.Calculate(kInput), kInput, 1e-12);
+    CHECK_NEAR(filter.Calculate(kInput), kInput, 1e-12);
   }
 }
 
-TEST(BiquadFilterTest, DCGainConverges) {
+TEST_CASE("BiquadFilterTest DCGainConverges", "[wpimath][filter]") {
   BiquadFilter filter({
       {0.00041659920440659937, 0.0008331984088131987, 0.00041659920440659937,
        -1.4796742169311934, 0.5558215432824889},
@@ -238,27 +245,27 @@ TEST(BiquadFilterTest, DCGainConverges) {
   for (int i = 0; i < 500; ++i) {
     y = filter.Calculate(kInput);
   }
-  EXPECT_NEAR(y, kInput, 1e-6);  // Butterworth LP has DC gain 1
+  CHECK_NEAR(y, kInput, 1e-6);  // Butterworth LP has DC gain 1
 }
 
-TEST(BiquadFilterTest, NumSections) {
+TEST_CASE("BiquadFilterTest NumSections", "[wpimath][filter]") {
   BiquadFilter one({{1.0, 0.0, 0.0, 0.0, 0.0}});
-  EXPECT_EQ(one.NumSections(), 1u);
+  CHECK(one.NumSections() == 1u);
 
   BiquadFilter three({
       {1.0, 0.0, 0.0, 0.0, 0.0},
       {1.0, 0.0, 0.0, 0.0, 0.0},
       {1.0, 0.0, 0.0, 0.0, 0.0},
   });
-  EXPECT_EQ(three.NumSections(), 3u);
+  CHECK(three.NumSections() == 3u);
 }
 
-TEST(BiquadFilterTest, EmptyCascadeThrows) {
-  EXPECT_THROW(
-      {
+TEST_CASE("BiquadFilterTest EmptyCascadeThrows", "[wpimath][filter]") {
+  CHECK_THROWS_AS(
+      [] {
         std::vector<BiquadFilter::Section> sections;
         std::span<const BiquadFilter::Section> empty{sections};
         BiquadFilter filter{empty};
-      },
+      }(),
       std::runtime_error);
 }

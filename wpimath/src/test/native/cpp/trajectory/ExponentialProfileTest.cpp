@@ -7,7 +7,8 @@
 #include <tuple>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/units/acceleration.hpp"
@@ -20,8 +21,8 @@ static constexpr auto kDt = 10_ms;
 static constexpr auto kV = 2.5629_V / 1_mps;
 static constexpr auto kA = 0.43277_V / 1_mps_sq;
 
-#define EXPECT_NEAR_UNITS(val1, val2, eps) \
-  EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
+#define CHECK_NEAR_UNITS(val1, val2, eps) \
+  CHECK(wpi::units::math::abs(val1 - val2) <= eps)
 
 wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
 CheckDynamics(
@@ -36,12 +37,12 @@ CheckDynamics(
   auto next = profile.Calculate(kDt, current, goal);
   auto signal = feedforward.Calculate(current.velocity, next.velocity);
 
-  EXPECT_LE(wpi::units::math::abs(signal), (constraints.maxInput + 1e-9_V));
+  CHECK(wpi::units::math::abs(signal) <= (constraints.maxInput + 1e-9_V));
 
   return next;
 }
 
-TEST(ExponentialProfileTest, ReachesGoal) {
+TEST_CASE("ExponentialProfileTest ReachesGoal", "[wpimath]") {
   wpi::math::ExponentialProfile<wpi::units::meter,
                                 wpi::units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
@@ -57,12 +58,12 @@ TEST(ExponentialProfileTest, ReachesGoal) {
   for (int i = 0; i < 450; ++i) {
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
   }
-  EXPECT_EQ(state, goal);
+  CHECK(state == goal);
 }
 
 // Tests that decreasing the maximum velocity in the middle when it is already
 // moving faster than the new max is handled correctly
-TEST(ExponentialProfileTest, PosContinuousUnderVelChange) {
+TEST_CASE("ExponentialProfileTest PosContinuousUnderVelChange", "[wpimath]") {
   wpi::math::ExponentialProfile<wpi::units::meter,
                                 wpi::units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
@@ -85,12 +86,13 @@ TEST(ExponentialProfileTest, PosContinuousUnderVelChange) {
 
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
   }
-  EXPECT_EQ(state, goal);
+  CHECK(state == goal);
 }
 
 // Tests that decreasing the maximum velocity in the middle when it is already
 // moving faster than the new max is handled correctly
-TEST(ExponentialProfileTest, PosContinuousUnderVelChangeBackward) {
+TEST_CASE("ExponentialProfileTest PosContinuousUnderVelChangeBackward",
+          "[wpimath]") {
   wpi::math::ExponentialProfile<wpi::units::meter,
                                 wpi::units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
@@ -113,11 +115,11 @@ TEST(ExponentialProfileTest, PosContinuousUnderVelChangeBackward) {
 
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
   }
-  EXPECT_EQ(state, goal);
+  CHECK(state == goal);
 }
 
 // There is some somewhat tricky code for dealing with going backwards
-TEST(ExponentialProfileTest, Backwards) {
+TEST_CASE("ExponentialProfileTest Backwards", "[wpimath]") {
   wpi::math::ExponentialProfile<wpi::units::meter,
                                 wpi::units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
@@ -133,10 +135,10 @@ TEST(ExponentialProfileTest, Backwards) {
   for (int i = 0; i < 400; ++i) {
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
   }
-  EXPECT_EQ(state, goal);
+  CHECK(state == goal);
 }
 
-TEST(ExponentialProfileTest, SwitchGoalInMiddle) {
+TEST_CASE("ExponentialProfileTest SwitchGoalInMiddle", "[wpimath]") {
   wpi::math::ExponentialProfile<wpi::units::meter,
                                 wpi::units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
@@ -152,17 +154,17 @@ TEST(ExponentialProfileTest, SwitchGoalInMiddle) {
   for (int i = 0; i < 50; ++i) {
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
   }
-  EXPECT_NE(state, goal);
+  CHECK(state != goal);
 
   goal = {0.0_m, 0.0_mps};
   for (int i = 0; i < 100; ++i) {
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
   }
-  EXPECT_EQ(state, goal);
+  CHECK(state == goal);
 }
 
 // Checks to make sure that it hits top velocity on long trajectories
-TEST(ExponentialProfileTest, TopVelocity) {
+TEST_CASE("ExponentialProfileTest TopVelocity", "[wpimath]") {
   wpi::math::ExponentialProfile<wpi::units::meter,
                                 wpi::units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
@@ -182,12 +184,12 @@ TEST(ExponentialProfileTest, TopVelocity) {
     maxVelocity = wpi::units::math::max(state.velocity, maxVelocity);
   }
 
-  EXPECT_NEAR_UNITS(constraints.MaxVelocity(), maxVelocity, 1e-5_mps);
-  EXPECT_EQ(state, goal);
+  CHECK_NEAR_UNITS(constraints.MaxVelocity(), maxVelocity, 1e-5_mps);
+  CHECK(state == goal);
 }
 
 // Checks to make sure that it hits top velocity on long trajectories
-TEST(ExponentialProfileTest, TopVelocityBackward) {
+TEST_CASE("ExponentialProfileTest TopVelocityBackward", "[wpimath]") {
   wpi::math::ExponentialProfile<wpi::units::meter,
                                 wpi::units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
@@ -207,12 +209,12 @@ TEST(ExponentialProfileTest, TopVelocityBackward) {
     maxVelocity = wpi::units::math::min(state.velocity, maxVelocity);
   }
 
-  EXPECT_NEAR_UNITS(-constraints.MaxVelocity(), maxVelocity, 1e-5_mps);
-  EXPECT_EQ(state, goal);
+  CHECK_NEAR_UNITS(-constraints.MaxVelocity(), maxVelocity, 1e-5_mps);
+  CHECK(state == goal);
 }
 
 // Checks to make sure that it hits top velocity on long trajectories
-TEST(ExponentialProfileTest, HighInitialVelocity) {
+TEST_CASE("ExponentialProfileTest HighInitialVelocity", "[wpimath]") {
   wpi::math::ExponentialProfile<wpi::units::meter,
                                 wpi::units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
@@ -229,11 +231,11 @@ TEST(ExponentialProfileTest, HighInitialVelocity) {
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
   }
 
-  EXPECT_EQ(state, goal);
+  CHECK(state == goal);
 }
 
 // Checks to make sure that it hits top velocity on long trajectories
-TEST(ExponentialProfileTest, HighInitialVelocityBackward) {
+TEST_CASE("ExponentialProfileTest HighInitialVelocityBackward", "[wpimath]") {
   wpi::math::ExponentialProfile<wpi::units::meter,
                                 wpi::units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
@@ -250,10 +252,10 @@ TEST(ExponentialProfileTest, HighInitialVelocityBackward) {
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
   }
 
-  EXPECT_EQ(state, goal);
+  CHECK(state == goal);
 }
 
-TEST(ExponentialProfileTest, TestHeuristic) {
+TEST_CASE("ExponentialProfileTest TestHeuristic", "[wpimath]") {
   wpi::math::ExponentialProfile<wpi::units::meter,
                                 wpi::units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
@@ -303,14 +305,14 @@ TEST(ExponentialProfileTest, TestHeuristic) {
   for (auto& testCase : testCases) {
     auto state = profile.CalculateInflectionPoint(std::get<0>(testCase),
                                                   std::get<1>(testCase));
-    EXPECT_NEAR_UNITS(std::get<2>(testCase).position / 1_m,
-                      state.position / 1_m, 1e-3);
-    EXPECT_NEAR_UNITS(std::get<2>(testCase).velocity / 1_mps,
-                      state.velocity / 1_mps, 1e-3);
+    CHECK_NEAR_UNITS(std::get<2>(testCase).position / 1_m, state.position / 1_m,
+                     1e-3);
+    CHECK_NEAR_UNITS(std::get<2>(testCase).velocity / 1_mps,
+                     state.velocity / 1_mps, 1e-3);
   }
 }
 
-TEST(ExponentialProfileTest, TimingToCurrent) {
+TEST_CASE("ExponentialProfileTest TimingToCurrent", "[wpimath]") {
   wpi::math::ExponentialProfile<wpi::units::meter,
                                 wpi::units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
@@ -325,13 +327,13 @@ TEST(ExponentialProfileTest, TimingToCurrent) {
 
   for (int i = 0; i < 900; ++i) {
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
-    EXPECT_NEAR_UNITS(profile.TimeLeftUntil(state, state), 0_s, 2e-2_s);
+    CHECK_NEAR_UNITS(profile.TimeLeftUntil(state, state), 0_s, 2e-2_s);
   }
 
-  EXPECT_EQ(state, goal);
+  CHECK(state == goal);
 }
 
-TEST(ExponentialProfileTest, TimingToGoal) {
+TEST_CASE("ExponentialProfileTest TimingToGoal", "[wpimath]") {
   wpi::math::ExponentialProfile<wpi::units::meter,
                                 wpi::units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
@@ -350,15 +352,15 @@ TEST(ExponentialProfileTest, TimingToGoal) {
   for (int i = 0; i < 900; ++i) {
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
     if (!reachedGoal && state == goal) {
-      EXPECT_NEAR_UNITS(prediction, i * 10_ms, 250_ms);
+      CHECK_NEAR_UNITS(prediction, i * 10_ms, 250_ms);
       reachedGoal = true;
     }
   }
 
-  EXPECT_EQ(state, goal);
+  CHECK(state == goal);
 }
 
-TEST(ExponentialProfileTest, TimingToNegativeGoal) {
+TEST_CASE("ExponentialProfileTest TimingToNegativeGoal", "[wpimath]") {
   wpi::math::ExponentialProfile<wpi::units::meter,
                                 wpi::units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
@@ -377,10 +379,10 @@ TEST(ExponentialProfileTest, TimingToNegativeGoal) {
   for (int i = 0; i < 900; ++i) {
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
     if (!reachedGoal && state == goal) {
-      EXPECT_NEAR_UNITS(prediction, i * 10_ms, 250_ms);
+      CHECK_NEAR_UNITS(prediction, i * 10_ms, 250_ms);
       reachedGoal = true;
     }
   }
 
-  EXPECT_EQ(state, goal);
+  CHECK(state == goal);
 }

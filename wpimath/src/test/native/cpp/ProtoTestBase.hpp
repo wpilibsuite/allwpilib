@@ -4,25 +4,24 @@
 
 #pragma once
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
 
-template <typename T>
-class ProtoTest : public testing::Test {};
-
-TYPED_TEST_SUITE_P(ProtoTest);
-
-TYPED_TEST_P(ProtoTest, RoundTrip) {
+template <typename TypeParam>
+void CheckProtoRoundTrip() {
   wpi::util::ProtobufMessage<decltype(TypeParam::kTestData)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, TypeParam::kTestData));
+  REQUIRE(message.Pack(buf, TypeParam::kTestData));
   auto unpacked_data = message.Unpack(buf);
-  ASSERT_TRUE(unpacked_data.has_value());
+  REQUIRE(unpacked_data.has_value());
 
   TypeParam::CheckEq(TypeParam::kTestData, *unpacked_data);
 }
 
-REGISTER_TYPED_TEST_SUITE_P(ProtoTest, RoundTrip);
+#define INSTANTIATE_TYPED_TEST_SUITE_P(Prefix, Suite, TypeParam) \
+  TEST_CASE(#Prefix " " #Suite " RoundTrip", "[wpimath]") {      \
+    CheckProtoRoundTrip<TypeParam>();                            \
+  }

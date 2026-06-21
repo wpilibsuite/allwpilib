@@ -4,7 +4,8 @@
 
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
@@ -20,7 +21,7 @@
 
 using namespace wpi::math;
 
-TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
+TEST_CASE("DifferentialDriveVoltageConstraintTest Constraint", "[wpimath]") {
   // Pick an unreasonably large kA to ensure the constraint has to do some work
   SimpleMotorFeedforward<wpi::units::meter> feedforward{1_V, 1_V / 1_mps,
                                                         3_V / 1_mps_sq};
@@ -46,20 +47,20 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
     // Not really a strictly-correct test as we're using the chassis accel
     // instead of the wheel accel, but much easier than doing it "properly" and
     // a reasonable check anyway
-    EXPECT_TRUE(feedforward.Calculate(left, left + acceleration * dt) <
-                maxVoltage + 0.05_V);
-    EXPECT_TRUE(feedforward.Calculate(left, left + acceleration * dt) >
-                -maxVoltage - 0.05_V);
-    EXPECT_TRUE(feedforward.Calculate(right,
+    CHECK(feedforward.Calculate(left, left + acceleration * dt) <
+          maxVoltage + 0.05_V);
+    CHECK(feedforward.Calculate(left, left + acceleration * dt) >
+          -maxVoltage - 0.05_V);
+    CHECK(feedforward.Calculate(right,
 
-                                      right + acceleration * dt) <
-                maxVoltage + 0.05_V);
-    EXPECT_TRUE(feedforward.Calculate(right, right + acceleration * dt) >
-                -maxVoltage - 0.05_V);
+                                right + acceleration * dt) <
+          maxVoltage + 0.05_V);
+    CHECK(feedforward.Calculate(right, right + acceleration * dt) >
+          -maxVoltage - 0.05_V);
   }
 }
 
-TEST(DifferentialDriveVoltageConstraintTest, HighCurvature) {
+TEST_CASE("DifferentialDriveVoltageConstraintTest HighCurvature", "[wpimath]") {
   SimpleMotorFeedforward<wpi::units::meter> feedforward{1_V, 1_V / 1_mps,
                                                         3_V / 1_mps_sq};
   // Large trackwidth - need to test with radius of curvature less than half of
@@ -71,13 +72,13 @@ TEST(DifferentialDriveVoltageConstraintTest, HighCurvature) {
   config.AddConstraint(
       DifferentialDriveVoltageConstraint(feedforward, kinematics, maxVoltage));
 
-  EXPECT_NO_FATAL_FAILURE(TrajectoryGenerator::GenerateTrajectory(
+  CHECK_NOTHROW(TrajectoryGenerator::GenerateTrajectory(
       Pose2d{1_m, 0_m, 90_deg}, std::vector<Translation2d>{},
       Pose2d{0_m, 1_m, 180_deg}, config));
 
   config.SetReversed(true);
 
-  EXPECT_NO_FATAL_FAILURE(TrajectoryGenerator::GenerateTrajectory(
+  CHECK_NOTHROW(TrajectoryGenerator::GenerateTrajectory(
       Pose2d{0_m, 1_m, 180_deg}, std::vector<Translation2d>{},
       Pose2d{1_m, 0_m, 90_deg}, config));
 }

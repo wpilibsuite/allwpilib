@@ -4,7 +4,8 @@
 
 #include "wpi/math/system/proto/LinearSystemProto.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "../../ProtoTestBase.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
@@ -24,10 +25,10 @@ struct LinearSystemProtoTestData {
                     {4.10, 4.11, 4.12}}};
 
   static void CheckEq(const Type& testData, const Type& data) {
-    EXPECT_EQ(testData.A(), data.A());
-    EXPECT_EQ(testData.B(), data.B());
-    EXPECT_EQ(testData.C(), data.C());
-    EXPECT_EQ(testData.D(), data.D());
+    CHECK(testData.A() == data.A());
+    CHECK(testData.B() == data.B());
+    CHECK(testData.C() == data.C());
+    CHECK(testData.D() == data.D());
   }
 };
 

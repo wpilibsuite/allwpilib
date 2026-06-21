@@ -5,15 +5,17 @@
 #include "wpi/math/estimator/KalmanFilter.hpp"
 
 #include <Eigen/Core>
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/random/Normal.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/units/time.hpp"
 
-TEST(KalmanFilterTest, SwerveStationary) {
+TEST_CASE("KalmanFilterTest SwerveStationary", "[wpimath]") {
   constexpr wpi::units::second_t dt = 20_ms;
 
   // Swerve drive with x = [x, y, θ, v_x, v_y, ω]ᵀ, u = [a_x, a_y, α]ᵀ,
@@ -43,11 +45,11 @@ TEST(KalmanFilterTest, SwerveStationary) {
     filter.Predict(u, dt);
   }
 
-  EXPECT_NEAR(0.0, filter.Xhat(0), 0.3);
-  EXPECT_NEAR(0.0, filter.Xhat(1), 0.3);
+  CHECK_NEAR(0.0, filter.Xhat(0), 0.3);
+  CHECK_NEAR(0.0, filter.Xhat(1), 0.3);
 }
 
-TEST(KalmanFilterTest, SwerveBadInitialPose) {
+TEST_CASE("KalmanFilterTest SwerveBadInitialPose", "[wpimath]") {
   constexpr wpi::units::second_t dt = 20_ms;
 
   // Swerve drive with x = [x, y, θ, v_x, v_y, ω]ᵀ, u = [a_x, a_y, α]ᵀ,
@@ -82,11 +84,11 @@ TEST(KalmanFilterTest, SwerveBadInitialPose) {
     filter.Predict(u, dt);
   }
 
-  EXPECT_NEAR(0.0, filter.Xhat(0), 0.2);
-  EXPECT_NEAR(0.0, filter.Xhat(1), 0.2);
+  CHECK_NEAR(0.0, filter.Xhat(0), 0.2);
+  CHECK_NEAR(0.0, filter.Xhat(1), 0.2);
 }
 
-TEST(KalmanFilterTest, SwerveMovingOverTrajectory) {
+TEST_CASE("KalmanFilterTest SwerveMovingOverTrajectory", "[wpimath]") {
   constexpr wpi::units::second_t dt = 20_ms;
 
   // Swerve drive with x = [x, y, θ, v_x, v_y, ω]ᵀ, u = [a_x, a_y, α]ᵀ,
@@ -133,10 +135,10 @@ TEST(KalmanFilterTest, SwerveMovingOverTrajectory) {
     lastVelocity = velocity;
   }
 
-  EXPECT_NEAR(
+  CHECK_NEAR(
       trajectory.SampleAt(trajectory.Duration()).pose.Translation().X().value(),
       filter.Xhat(0), 0.2);
-  EXPECT_NEAR(
+  CHECK_NEAR(
       trajectory.SampleAt(trajectory.Duration()).pose.Translation().Y().value(),
       filter.Xhat(1), 0.2);
 }

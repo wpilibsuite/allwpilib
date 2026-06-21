@@ -4,8 +4,10 @@
 
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
@@ -13,17 +15,17 @@
 
 static constexpr auto kDt = 10_ms;
 
-#define EXPECT_NEAR_UNITS(val1, val2, eps) \
-  EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
+#define CHECK_NEAR_UNITS(val1, val2, eps) \
+  CHECK(wpi::units::math::abs(val1 - val2) <= eps)
 
-#define EXPECT_LT_OR_NEAR_UNITS(val1, val2, eps) \
-  if (val1 <= val2) {                            \
-    EXPECT_LE(val1, val2);                       \
-  } else {                                       \
-    EXPECT_NEAR_UNITS(val1, val2, eps);          \
+#define CHECK_LT_OR_NEAR_UNITS(val1, val2, eps) \
+  if (val1 <= val2) {                           \
+    CHECK(val1 <= val2);                        \
+  } else {                                      \
+    CHECK_NEAR_UNITS(val1, val2, eps);          \
   }
 
-TEST(TrapezoidProfileTest, ReachesGoal) {
+TEST_CASE("TrapezoidProfileTest ReachesGoal", "[wpimath]") {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       1.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{3_m, 0_mps};
@@ -33,12 +35,12 @@ TEST(TrapezoidProfileTest, ReachesGoal) {
   for (int i = 0; i < 450; ++i) {
     state = profile.Calculate(kDt, state, goal);
   }
-  EXPECT_EQ(state, goal);
+  CHECK(state == goal);
 }
 
 // Tests that decreasing the maximum velocity in the middle when it is already
 // moving faster than the new max is handled correctly
-TEST(TrapezoidProfileTest, PosContinuousUnderVelChange) {
+TEST_CASE("TrapezoidProfileTest PosContinuousUnderVelChange", "[wpimath]") {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       1.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{12_m, 0_mps};
@@ -61,18 +63,18 @@ TEST(TrapezoidProfileTest, PosContinuousUnderVelChange) {
       // Since estimatedVel can have floating point rounding errors, we check
       // whether value is less than or within an error delta of the new
       // constraint.
-      EXPECT_LT_OR_NEAR_UNITS(estimatedVel, constraints.maxVelocity, 1e-4_mps);
+      CHECK_LT_OR_NEAR_UNITS(estimatedVel, constraints.maxVelocity, 1e-4_mps);
 
-      EXPECT_LE(state.velocity, constraints.maxVelocity);
+      CHECK(state.velocity <= constraints.maxVelocity);
     }
 
     lastPos = state.position;
   }
-  EXPECT_EQ(state, goal);
+  CHECK(state == goal);
 }
 
 // There is some somewhat tricky code for dealing with going backwards
-TEST(TrapezoidProfileTest, Backwards) {
+TEST_CASE("TrapezoidProfileTest Backwards", "[wpimath]") {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{-2_m, 0_mps};
@@ -82,10 +84,10 @@ TEST(TrapezoidProfileTest, Backwards) {
   for (int i = 0; i < 400; ++i) {
     state = profile.Calculate(kDt, state, goal);
   }
-  EXPECT_EQ(state, goal);
+  CHECK(state == goal);
 }
 
-TEST(TrapezoidProfileTest, SwitchGoalInMiddle) {
+TEST_CASE("TrapezoidProfileTest SwitchGoalInMiddle", "[wpimath]") {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{-2_m, 0_mps};
@@ -95,18 +97,18 @@ TEST(TrapezoidProfileTest, SwitchGoalInMiddle) {
   for (int i = 0; i < 200; ++i) {
     state = profile.Calculate(kDt, state, goal);
   }
-  EXPECT_NE(state, goal);
+  CHECK(state != goal);
 
   goal = {0.0_m, 0.0_mps};
   profile = wpi::math::TrapezoidProfile<wpi::units::meter>{constraints};
   for (int i = 0; i < 550; ++i) {
     state = profile.Calculate(kDt, state, goal);
   }
-  EXPECT_EQ(state, goal);
+  CHECK(state == goal);
 }
 
 // Checks to make sure that it hits top velocity
-TEST(TrapezoidProfileTest, TopVelocity) {
+TEST_CASE("TrapezoidProfileTest TopVelocity", "[wpimath]") {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{4_m, 0_mps};
@@ -116,16 +118,16 @@ TEST(TrapezoidProfileTest, TopVelocity) {
   for (int i = 0; i < 200; ++i) {
     state = profile.Calculate(kDt, state, goal);
   }
-  EXPECT_NEAR_UNITS(constraints.maxVelocity, state.velocity, 10e-5_mps);
+  CHECK_NEAR_UNITS(constraints.maxVelocity, state.velocity, 10e-5_mps);
 
   profile = wpi::math::TrapezoidProfile<wpi::units::meter>{constraints};
   for (int i = 0; i < 2000; ++i) {
     state = profile.Calculate(kDt, state, goal);
   }
-  EXPECT_EQ(state, goal);
+  CHECK(state == goal);
 }
 
-TEST(TrapezoidProfileTest, TimingToCurrent) {
+TEST_CASE("TrapezoidProfileTest TimingToCurrent", "[wpimath]") {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{2_m, 0_mps};
@@ -134,11 +136,11 @@ TEST(TrapezoidProfileTest, TimingToCurrent) {
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
   for (int i = 0; i < 400; i++) {
     state = profile.Calculate(kDt, state, goal);
-    EXPECT_NEAR_UNITS(profile.TimeLeftUntil(state.position), 0_s, 2e-2_s);
+    CHECK_NEAR_UNITS(profile.TimeLeftUntil(state.position), 0_s, 2e-2_s);
   }
 }
 
-TEST(TrapezoidProfileTest, TimingToGoal) {
+TEST_CASE("TrapezoidProfileTest TimingToGoal", "[wpimath]") {
   using wpi::units::unit_cast;
 
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
@@ -156,13 +158,13 @@ TEST(TrapezoidProfileTest, TimingToGoal) {
     if (!reachedGoal && state == goal) {
       // Expected value using for loop index is just an approximation since the
       // time left in the profile doesn't increase linearly at the endpoints
-      EXPECT_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 0.25);
+      CHECK_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 0.25);
       reachedGoal = true;
     }
   }
 }
 
-TEST(TrapezoidProfileTest, TimingBeforeGoal) {
+TEST_CASE("TrapezoidProfileTest TimingBeforeGoal", "[wpimath]") {
   using wpi::units::unit_cast;
 
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
@@ -179,13 +181,13 @@ TEST(TrapezoidProfileTest, TimingBeforeGoal) {
     state = profile.Calculate(kDt, state, goal);
     if (!reachedGoal &&
         (wpi::units::math::abs(state.velocity - 1_mps) < 10e-5_mps)) {
-      EXPECT_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 2e-2);
+      CHECK_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 2e-2);
       reachedGoal = true;
     }
   }
 }
 
-TEST(TrapezoidProfileTest, TimingToNegativeGoal) {
+TEST_CASE("TrapezoidProfileTest TimingToNegativeGoal", "[wpimath]") {
   using wpi::units::unit_cast;
 
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
@@ -203,13 +205,13 @@ TEST(TrapezoidProfileTest, TimingToNegativeGoal) {
     if (!reachedGoal && state == goal) {
       // Expected value using for loop index is just an approximation since the
       // time left in the profile doesn't increase linearly at the endpoints
-      EXPECT_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 0.25);
+      CHECK_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 0.25);
       reachedGoal = true;
     }
   }
 }
 
-TEST(TrapezoidProfileTest, TimingBeforeNegativeGoal) {
+TEST_CASE("TrapezoidProfileTest TimingBeforeNegativeGoal", "[wpimath]") {
   using wpi::units::unit_cast;
 
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
@@ -226,21 +228,21 @@ TEST(TrapezoidProfileTest, TimingBeforeNegativeGoal) {
     state = profile.Calculate(kDt, state, goal);
     if (!reachedGoal &&
         (wpi::units::math::abs(state.velocity + 1_mps) < 10e-5_mps)) {
-      EXPECT_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 2e-2);
+      CHECK_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 2e-2);
       reachedGoal = true;
     }
   }
 }
 
-TEST(TrapezoidProfileTest, InitalizationOfCurrentState) {
+TEST_CASE("TrapezoidProfileTest InitalizationOfCurrentState", "[wpimath]") {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       1_mps, 1_mps_sq};
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
-  EXPECT_NEAR_UNITS(profile.TimeLeftUntil(0_m), 0_s, 1e-10_s);
-  EXPECT_NEAR_UNITS(profile.Duration(), 0_s, 1e-10_s);
+  CHECK_NEAR_UNITS(profile.TimeLeftUntil(0_m), 0_s, 1e-10_s);
+  CHECK_NEAR_UNITS(profile.Duration(), 0_s, 1e-10_s);
 }
 
-TEST(TrapezoidProfileTest, InitialVelocityConstraints) {
+TEST_CASE("TrapezoidProfileTest InitialVelocityConstraints", "[wpimath]") {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{10_m, 0_mps};
@@ -250,12 +252,12 @@ TEST(TrapezoidProfileTest, InitialVelocityConstraints) {
 
   for (int i = 0; i < 200; ++i) {
     state = profile.Calculate(kDt, state, goal);
-    EXPECT_LE(wpi::units::math::abs(state.velocity),
-              wpi::units::math::abs(constraints.maxVelocity));
+    CHECK(wpi::units::math::abs(state.velocity) <=
+          wpi::units::math::abs(constraints.maxVelocity));
   }
 }
 
-TEST(TrapezoidProfileTest, GoalVelocityConstraints) {
+TEST_CASE("TrapezoidProfileTest GoalVelocityConstraints", "[wpimath]") {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{10_m, 5_mps};
@@ -265,12 +267,12 @@ TEST(TrapezoidProfileTest, GoalVelocityConstraints) {
 
   for (int i = 0; i < 200; ++i) {
     state = profile.Calculate(kDt, state, goal);
-    EXPECT_LE(wpi::units::math::abs(state.velocity),
-              wpi::units::math::abs(constraints.maxVelocity));
+    CHECK(wpi::units::math::abs(state.velocity) <=
+          wpi::units::math::abs(constraints.maxVelocity));
   }
 }
 
-TEST(TrapezoidProfileTest, NegativeGoalVelocityConstraints) {
+TEST_CASE("TrapezoidProfileTest NegativeGoalVelocityConstraints", "[wpimath]") {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{10_m, -5_mps};
@@ -280,7 +282,7 @@ TEST(TrapezoidProfileTest, NegativeGoalVelocityConstraints) {
 
   for (int i = 0; i < 200; ++i) {
     state = profile.Calculate(kDt, state, goal);
-    EXPECT_LE(wpi::units::math::abs(state.velocity),
-              wpi::units::math::abs(constraints.maxVelocity));
+    CHECK(wpi::units::math::abs(state.velocity) <=
+          wpi::units::math::abs(constraints.maxVelocity));
   }
 }

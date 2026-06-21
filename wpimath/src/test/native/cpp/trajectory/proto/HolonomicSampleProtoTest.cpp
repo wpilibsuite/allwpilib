@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/trajectory/HolonomicSample.hpp"
 #include "wpi/util/SmallVector.hpp"
@@ -16,13 +16,13 @@ const HolonomicSample kExpectedData =
                     ChassisAccelerations{4_mps_sq, 5_mps_sq, 6_rad_per_s_sq}};
 }  // namespace
 
-TEST(HolonomicSampleProtoTest, Roundtrip) {
+TEST_CASE("HolonomicSampleProtoTest Roundtrip", "[wpimath]") {
   wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, kExpectedData));
   auto unpacked_data = message.Unpack(buf);
-  ASSERT_TRUE(unpacked_data.has_value());
+  REQUIRE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData, unpacked_data.value());
+  CHECK(kExpectedData == unpacked_data.value());
 }

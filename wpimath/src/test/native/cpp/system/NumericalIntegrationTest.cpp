@@ -6,12 +6,14 @@
 
 #include <cmath>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 
 // Test that integrating dx/dt = eˣ works
-TEST(NumericalIntegrationTest, Exponential) {
+TEST_CASE("NumericalIntegrationTest Exponential", "[wpimath]") {
   wpi::math::Vectord<1> y0{0.0};
 
   wpi::math::Vectord<1> y1 = wpi::math::RK4(
@@ -19,11 +21,11 @@ TEST(NumericalIntegrationTest, Exponential) {
         return wpi::math::Vectord<1>{std::exp(x(0))};
       },
       y0, 0.1_s);
-  EXPECT_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
+  CHECK_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
 }
 
 // Test that integrating dx/dt = eˣ works when we provide a u
-TEST(NumericalIntegrationTest, ExponentialWithU) {
+TEST_CASE("NumericalIntegrationTest ExponentialWithU", "[wpimath]") {
   wpi::math::Vectord<1> y0{0.0};
 
   wpi::math::Vectord<1> y1 = wpi::math::RK4(
@@ -31,7 +33,7 @@ TEST(NumericalIntegrationTest, ExponentialWithU) {
         return wpi::math::Vectord<1>{std::exp(u(0) * x(0))};
       },
       y0, wpi::math::Vectord<1>{1.0}, 0.1_s);
-  EXPECT_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
+  CHECK_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
 }
 
 // Tests RK4 with a time varying solution. From
@@ -42,7 +44,7 @@ TEST(NumericalIntegrationTest, ExponentialWithU) {
 // The true (analytical) solution is:
 //
 //   x(t) = 12eᵗ/(eᵗ + 1)²
-TEST(NumericalIntegrationTest, RK4TimeVarying) {
+TEST_CASE("NumericalIntegrationTest RK4TimeVarying", "[wpimath]") {
   wpi::math::Vectord<1> y0{12.0 * std::exp(5.0) /
                            std::pow(std::exp(5.0) + 1.0, 2.0)};
 
@@ -52,22 +54,22 @@ TEST(NumericalIntegrationTest, RK4TimeVarying) {
                                      (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
       },
       5_s, y0, 1_s);
-  EXPECT_NEAR(y1(0), 12.0 * std::exp(6.0) / std::pow(std::exp(6.0) + 1.0, 2.0),
-              1e-3);
+  CHECK_NEAR(y1(0), 12.0 * std::exp(6.0) / std::pow(std::exp(6.0) + 1.0, 2.0),
+             1e-3);
 }
 
 // Tests that integrating dx/dt = 0 works with RKDP
-TEST(NumericalIntegrationTest, ZeroRKDP) {
+TEST_CASE("NumericalIntegrationTest ZeroRKDP", "[wpimath]") {
   wpi::math::Vectord<1> y1 = wpi::math::RKDP(
       [](const wpi::math::Vectord<1>& x, const wpi::math::Vectord<1>& u) {
         return wpi::math::Vectord<1>::Zero();
       },
       wpi::math::Vectord<1>{0.0}, wpi::math::Vectord<1>{0.0}, 0.1_s);
-  EXPECT_NEAR(y1(0), 0.0, 1e-3);
+  CHECK_NEAR(y1(0), 0.0, 1e-3);
 }
 
 // Tests that integrating dx/dt = eˣ works with RKDP
-TEST(NumericalIntegrationTest, ExponentialRKDP) {
+TEST_CASE("NumericalIntegrationTest ExponentialRKDP", "[wpimath]") {
   wpi::math::Vectord<1> y0{0.0};
 
   wpi::math::Vectord<1> y1 = wpi::math::RKDP(
@@ -75,7 +77,7 @@ TEST(NumericalIntegrationTest, ExponentialRKDP) {
         return wpi::math::Vectord<1>{std::exp(x(0))};
       },
       y0, wpi::math::Vectord<1>{0.0}, 0.1_s);
-  EXPECT_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
+  CHECK_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
 }
 
 // Tests RKDP with a time varying solution. From
@@ -86,7 +88,7 @@ TEST(NumericalIntegrationTest, ExponentialRKDP) {
 // The true (analytical) solution is:
 //
 //   x(t) = 12eᵗ/(eᵗ + 1)²
-TEST(NumericalIntegrationTest, RKDPTimeVarying) {
+TEST_CASE("NumericalIntegrationTest RKDPTimeVarying", "[wpimath]") {
   wpi::math::Vectord<1> y0{12.0 * std::exp(5.0) /
                            std::pow(std::exp(5.0) + 1.0, 2.0)};
 
@@ -96,6 +98,6 @@ TEST(NumericalIntegrationTest, RKDPTimeVarying) {
                                      (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
       },
       5_s, y0, 1_s, 1e-12);
-  EXPECT_NEAR(y1(0), 12.0 * std::exp(6.0) / std::pow(std::exp(6.0) + 1.0, 2.0),
-              1e-3);
+  CHECK_NEAR(y1(0), 12.0 * std::exp(6.0) / std::pow(std::exp(6.0) + 1.0, 2.0),
+             1e-3);
 }

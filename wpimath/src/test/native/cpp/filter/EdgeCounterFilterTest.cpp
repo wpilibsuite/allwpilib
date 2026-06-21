@@ -4,74 +4,80 @@
 
 #include "wpi/math/filter/EdgeCounterFilter.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/units/time.hpp"
 #include "wpi/util/timestamp.h"
 
 static wpi::units::second_t now = 0_s;
 
-class EdgeCounterFilterTest : public ::testing::Test {
+class EdgeCounterFilterTest {
  protected:
-  void SetUp() override {
+  EdgeCounterFilterTest() {
     WPI_SetNowImpl(
         [] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
     now = 0_ms;
   }
 
-  void TearDown() override {
+  ~EdgeCounterFilterTest() {
     now = 0_ms;
     WPI_SetNowImpl(nullptr);
   }
 };
 
-TEST_F(EdgeCounterFilterTest, EdgeCounterFilterActivated) {
+TEST_CASE_METHOD(EdgeCounterFilterTest,
+                 "EdgeCounterFilterTest EdgeCounterFilterActivated",
+                 "[wpimath]") {
   wpi::math::EdgeCounterFilter filter{2, 0.2_s};
 
-  EXPECT_FALSE(filter.Calculate(true));  // First edge
+  CHECK_FALSE(filter.Calculate(true));  // First edge
 
   now = 50_ms;
-  EXPECT_FALSE(filter.Calculate(false));  // First edge ended
+  CHECK_FALSE(filter.Calculate(false));  // First edge ended
 
   now = 100_ms;
-  EXPECT_TRUE(filter.Calculate(true));  // Second edge
+  CHECK(filter.Calculate(true));  // Second edge
 
   now = 150_ms;
-  EXPECT_TRUE(filter.Calculate(true));  // Still true
+  CHECK(filter.Calculate(true));  // Still true
 
   now = 250_ms;
-  EXPECT_TRUE(filter.Calculate(true));  // Still true
+  CHECK(filter.Calculate(true));  // Still true
 
   now = 300_ms;
-  EXPECT_FALSE(filter.Calculate(false));  // Input false, should reset
+  CHECK_FALSE(filter.Calculate(false));  // Input false, should reset
 }
 
-TEST_F(EdgeCounterFilterTest, EdgeCounterFilterExpired) {
+TEST_CASE_METHOD(EdgeCounterFilterTest,
+                 "EdgeCounterFilterTest EdgeCounterFilterExpired",
+                 "[wpimath]") {
   wpi::math::EdgeCounterFilter filter{2, 0.2_s};
 
-  EXPECT_FALSE(filter.Calculate(true));  // First edge
+  CHECK_FALSE(filter.Calculate(true));  // First edge
 
   now = 50_ms;
   filter.Calculate(false);  // First edge ended
 
   now = 250_ms;
-  EXPECT_FALSE(filter.Calculate(true));  // Second edge after window expired
+  CHECK_FALSE(filter.Calculate(true));  // Second edge after window expired
 
   now = 300_ms;
-  EXPECT_FALSE(filter.Calculate(true));  // Still false
+  CHECK_FALSE(filter.Calculate(true));  // Still false
 }
 
-TEST_F(EdgeCounterFilterTest, EdgeCounterFilterParams) {
+TEST_CASE_METHOD(EdgeCounterFilterTest,
+                 "EdgeCounterFilterTest EdgeCounterFilterParams", "[wpimath]") {
   wpi::math::EdgeCounterFilter filter{2, 0.2_s};
 
-  EXPECT_EQ(filter.GetRequiredEdges(), 2);
-  EXPECT_EQ(filter.GetWindowTime(), 0.2_s);
+  CHECK(filter.GetRequiredEdges() == 2);
+  CHECK(filter.GetWindowTime() == 0.2_s);
 
   filter.SetRequiredEdges(3);
 
-  EXPECT_EQ(filter.GetRequiredEdges(), 3);
+  CHECK(filter.GetRequiredEdges() == 3);
 
   filter.SetWindowTime(0.5_s);
 
-  EXPECT_EQ(filter.GetWindowTime(), 0.5_s);
+  CHECK(filter.GetWindowTime() == 0.5_s);
 }

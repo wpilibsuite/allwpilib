@@ -6,48 +6,49 @@
 
 #include <cmath>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/units/time.hpp"
 
-TEST(TimeInterpolatableBufferTest, AddSample) {
+TEST_CASE("TimeInterpolatableBufferTest AddSample", "[wpimath]") {
   wpi::math::TimeInterpolatableBuffer<wpi::math::Rotation2d> buffer{10_s};
 
   // No entries
   buffer.AddSample(1_s, 0_rad);
-  EXPECT_TRUE(buffer.Sample(1_s).value() == 0_rad);
+  CHECK(buffer.Sample(1_s).value() == 0_rad);
 
   // New entry at start of container
   buffer.AddSample(0_s, 1_rad);
-  EXPECT_TRUE(buffer.Sample(0_s).value() == 1_rad);
+  CHECK(buffer.Sample(0_s).value() == 1_rad);
 
   // New entry in middle of container
   buffer.AddSample(0.5_s, 0.5_rad);
-  EXPECT_TRUE(buffer.Sample(0.5_s).value() == 0.5_rad);
+  CHECK(buffer.Sample(0.5_s).value() == 0.5_rad);
 
   // Override sample
   buffer.AddSample(0.5_s, 1_rad);
-  EXPECT_TRUE(buffer.Sample(0.5_s).value() == 1_rad);
+  CHECK(buffer.Sample(0.5_s).value() == 1_rad);
 }
 
-TEST(TimeInterpolatableBufferTest, Interpolation) {
+TEST_CASE("TimeInterpolatableBufferTest Interpolation", "[wpimath]") {
   wpi::math::TimeInterpolatableBuffer<wpi::math::Rotation2d> buffer{10_s};
 
   buffer.AddSample(0_s, 0_rad);
-  EXPECT_TRUE(buffer.Sample(0_s).value() == 0_rad);
+  CHECK(buffer.Sample(0_s).value() == 0_rad);
   buffer.AddSample(1_s, 1_rad);
-  EXPECT_TRUE(buffer.Sample(0.5_s).value() == 0.5_rad);
-  EXPECT_TRUE(buffer.Sample(1_s).value() == 1_rad);
+  CHECK(buffer.Sample(0.5_s).value() == 0.5_rad);
+  CHECK(buffer.Sample(1_s).value() == 1_rad);
   buffer.AddSample(3_s, 2_rad);
-  EXPECT_TRUE(buffer.Sample(2_s).value() == 1.5_rad);
+  CHECK(buffer.Sample(2_s).value() == 1.5_rad);
 
   buffer.AddSample(10.5_s, 2_rad);
-  EXPECT_TRUE(buffer.Sample(0_s) == 1_rad);
+  CHECK(buffer.Sample(0_s) == 1_rad);
 }
 
-TEST(TimeInterpolatableBufferTest, Pose2d) {
+TEST_CASE("TimeInterpolatableBufferTest Pose2d", "[wpimath]") {
   wpi::math::TimeInterpolatableBuffer<wpi::math::Pose2d> buffer{10_s};
 
   // We expect to be at (1 - 1/std::sqrt(2), 1/std::sqrt(2), 45deg) at t=0.5
@@ -55,8 +56,7 @@ TEST(TimeInterpolatableBufferTest, Pose2d) {
   buffer.AddSample(1_s, wpi::math::Pose2d{1_m, 1_m, 0_deg});
   wpi::math::Pose2d sample = buffer.Sample(0.5_s).value();
 
-  EXPECT_TRUE(std::abs(sample.X().value() - (1.0 - 1.0 / std::sqrt(2.0))) <
-              0.01);
-  EXPECT_TRUE(std::abs(sample.Y().value() - (1.0 / std::sqrt(2.0))) < 0.01);
-  EXPECT_TRUE(std::abs(sample.Rotation().Degrees().value() - 45.0) < 0.01);
+  CHECK(std::abs(sample.X().value() - (1.0 - 1.0 / std::sqrt(2.0))) < 0.01);
+  CHECK(std::abs(sample.Y().value() - (1.0 / std::sqrt(2.0))) < 0.01);
+  CHECK(std::abs(sample.Rotation().Degrees().value() - 45.0) < 0.01);
 }

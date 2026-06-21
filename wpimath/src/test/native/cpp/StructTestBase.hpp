@@ -4,21 +4,17 @@
 
 #pragma once
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/util/struct/Struct.hpp"
-
-template <typename T>
-class StructTest : public testing::Test {};
-
-TYPED_TEST_SUITE_P(StructTest);
 
 // For these tests:
 // TypeParam defines Type, kTestData, and CheckEq
 // Type is the data type
 // StructType is the instantiation of wpi::util::Struct<>
 
-TYPED_TEST_P(StructTest, RoundTrip) {
+template <typename TypeParam>
+void CheckStructRoundTrip() {
   using Type = typename TypeParam::Type;
   using StructType = wpi::util::Struct<Type>;
   uint8_t buffer[StructType::GetSize()];
@@ -29,7 +25,8 @@ TYPED_TEST_P(StructTest, RoundTrip) {
   TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
 }
 
-TYPED_TEST_P(StructTest, DoublePack) {
+template <typename TypeParam>
+void CheckStructDoublePack() {
   using Type = typename TypeParam::Type;
   using StructType = wpi::util::Struct<Type>;
   uint8_t buffer[StructType::GetSize()];
@@ -41,7 +38,8 @@ TYPED_TEST_P(StructTest, DoublePack) {
   TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
 }
 
-TYPED_TEST_P(StructTest, DoubleUnpack) {
+template <typename TypeParam>
+void CheckStructDoubleUnpack() {
   using Type = typename TypeParam::Type;
   using StructType = wpi::util::Struct<Type>;
   uint8_t buffer[StructType::GetSize()];
@@ -59,4 +57,13 @@ TYPED_TEST_P(StructTest, DoubleUnpack) {
   }
 }
 
-REGISTER_TYPED_TEST_SUITE_P(StructTest, RoundTrip, DoublePack, DoubleUnpack);
+#define INSTANTIATE_TYPED_TEST_SUITE_P(Prefix, Suite, TypeParam) \
+  TEST_CASE(#Prefix " " #Suite " RoundTrip", "[wpimath]") {      \
+    CheckStructRoundTrip<TypeParam>();                           \
+  }                                                              \
+  TEST_CASE(#Prefix " " #Suite " DoublePack", "[wpimath]") {     \
+    CheckStructDoublePack<TypeParam>();                          \
+  }                                                              \
+  TEST_CASE(#Prefix " " #Suite " DoubleUnpack", "[wpimath]") {   \
+    CheckStructDoubleUnpack<TypeParam>();                        \
+  }

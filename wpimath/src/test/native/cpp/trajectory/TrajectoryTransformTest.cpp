@@ -4,8 +4,10 @@
 
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
@@ -23,10 +25,10 @@ void TestSameShapedTrajectory(
     auto a = a2.RelativeTo(a1);
     auto b = b2.RelativeTo(b1);
 
-    EXPECT_NEAR(a.X().value(), b.X().value(), 1E-9);
-    EXPECT_NEAR(a.Y().value(), b.Y().value(), 1E-9);
-    EXPECT_NEAR(a.Rotation().Radians().value(), b.Rotation().Radians().value(),
-                1E-9);
+    CHECK_NEAR(a.X().value(), b.X().value(), 1E-9);
+    CHECK_NEAR(a.Y().value(), b.Y().value(), 1E-9);
+    CHECK_NEAR(a.Rotation().Radians().value(), b.Rotation().Radians().value(),
+               1E-9);
   }
 }
 
@@ -37,18 +39,18 @@ void TestSameShapedTrajectory(
 void TestSameForwardScalars(
     const std::vector<wpi::math::DrivetrainSplineSample>& statesA,
     const std::vector<wpi::math::DrivetrainSplineSample>& statesB) {
-  ASSERT_EQ(statesA.size(), statesB.size());
+  REQUIRE(statesA.size() == statesB.size());
   for (unsigned int i = 0; i < statesA.size(); i++) {
-    EXPECT_NEAR(statesA[i].ForwardVelocity().value(),
-                statesB[i].ForwardVelocity().value(), 1E-9);
-    EXPECT_NEAR(statesA[i].ForwardAcceleration().value(),
-                statesB[i].ForwardAcceleration().value(), 1E-9);
-    EXPECT_NEAR(statesA[i].curvature.value(), statesB[i].curvature.value(),
-                1E-9);
+    CHECK_NEAR(statesA[i].ForwardVelocity().value(),
+               statesB[i].ForwardVelocity().value(), 1E-9);
+    CHECK_NEAR(statesA[i].ForwardAcceleration().value(),
+               statesB[i].ForwardAcceleration().value(), 1E-9);
+    CHECK_NEAR(statesA[i].curvature.value(), statesB[i].curvature.value(),
+               1E-9);
   }
 }
 
-TEST(TrajectoryTransformsTest, TransformBy) {
+TEST_CASE("TrajectoryTransformsTest TransformBy", "[wpimath]") {
   wpi::math::TrajectoryConfig config{3_mps, 3_mps_sq};
   auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       wpi::math::Pose2d{}, {}, wpi::math::Pose2d{1_m, 1_m, 90_deg}, config);
@@ -57,16 +59,16 @@ TEST(TrajectoryTransformsTest, TransformBy) {
 
   auto firstPose = transformedTrajectory.SampleAt(0_s).pose;
 
-  EXPECT_NEAR(firstPose.X().value(), 1.0, 1E-9);
-  EXPECT_NEAR(firstPose.Y().value(), 2.0, 1E-9);
-  EXPECT_NEAR(firstPose.Rotation().Degrees().value(), 30.0, 1E-9);
+  CHECK_NEAR(firstPose.X().value(), 1.0, 1E-9);
+  CHECK_NEAR(firstPose.Y().value(), 2.0, 1E-9);
+  CHECK_NEAR(firstPose.Rotation().Degrees().value(), 30.0, 1E-9);
 
   TestSameShapedTrajectory(trajectory.Samples(),
                            transformedTrajectory.Samples());
   TestSameForwardScalars(trajectory.Samples(), transformedTrajectory.Samples());
 }
 
-TEST(TrajectoryTransformsTest, RelativeTo) {
+TEST_CASE("TrajectoryTransformsTest RelativeTo", "[wpimath]") {
   wpi::math::TrajectoryConfig config{3_mps, 3_mps_sq};
   auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       wpi::math::Pose2d{1_m, 2_m, 30_deg}, {},
@@ -76,9 +78,9 @@ TEST(TrajectoryTransformsTest, RelativeTo) {
 
   auto firstPose = transformedTrajectory.SampleAt(0_s).pose;
 
-  EXPECT_NEAR(firstPose.X().value(), 0, 1E-9);
-  EXPECT_NEAR(firstPose.Y().value(), 0, 1E-9);
-  EXPECT_NEAR(firstPose.Rotation().Degrees().value(), 0, 1E-9);
+  CHECK_NEAR(firstPose.X().value(), 0, 1E-9);
+  CHECK_NEAR(firstPose.Y().value(), 0, 1E-9);
+  CHECK_NEAR(firstPose.Rotation().Degrees().value(), 0, 1E-9);
 
   TestSameShapedTrajectory(trajectory.Samples(),
                            transformedTrajectory.Samples());
