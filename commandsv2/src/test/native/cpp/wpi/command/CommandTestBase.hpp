@@ -77,6 +77,7 @@ class MockCommand : public CommandHelper<Command, MockCommand> {
   void ExpectExecute(int count = 1) { m_expectedExecute = count; }
 
   void ExpectEnd(bool interrupted, int count = 1) {
+    m_hasExpectedEnd = true;
     if (interrupted) {
       m_expectedEndTrue = count;
     } else {
@@ -97,11 +98,9 @@ class MockCommand : public CommandHelper<Command, MockCommand> {
     if (m_expectedExecute) {
       CHECK(m_executeCount == *m_expectedExecute);
     }
-    if (m_expectedEndTrue) {
-      CHECK(m_endTrueCount == *m_expectedEndTrue);
-    }
-    if (m_expectedEndFalse) {
-      CHECK(m_endFalseCount == *m_expectedEndFalse);
+    if (m_hasExpectedEnd) {
+      CHECK(m_endTrueCount == m_expectedEndTrue.value_or(0));
+      CHECK(m_endFalseCount == m_expectedEndFalse.value_or(0));
     }
   }
 
@@ -113,6 +112,7 @@ class MockCommand : public CommandHelper<Command, MockCommand> {
   int m_executeCount = 0;
   int m_endTrueCount = 0;
   int m_endFalseCount = 0;
+  bool m_hasExpectedEnd = false;
   std::optional<int> m_expectedInitialize;
   std::optional<int> m_expectedExecute;
   std::optional<int> m_expectedEndTrue;
