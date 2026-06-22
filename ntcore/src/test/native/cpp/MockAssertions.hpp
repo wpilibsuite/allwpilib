@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <initializer_list>
 #include <string_view>
+#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -71,6 +72,9 @@ struct ClientMessageCounts {
 inline void CheckClientMessageCounts(
     const net::MockClientMessageHandler& handler,
     const ClientMessageCounts& expected = {}) {
+  REQUIRE(handler.calls.size() ==
+          expected.publish + expected.unpublish + expected.setProperties +
+              expected.subscribe + expected.unsubscribe + expected.setValue);
   REQUIRE(handler.publishCalls.size() == expected.publish);
   REQUIRE(handler.unpublishCalls.size() == expected.unpublish);
   REQUIRE(handler.setPropertiesCalls.size() == expected.setProperties);
@@ -93,6 +97,9 @@ struct ServerMessageCounts {
 inline void CheckServerMessageCounts(
     const net::MockServerMessageHandler& handler,
     const ServerMessageCounts& expected = {}) {
+  REQUIRE(handler.calls.size() == expected.announce + expected.unannounce +
+                                      expected.propertiesUpdate +
+                                      expected.setValue);
   REQUIRE(handler.announceCalls.size() == expected.announce);
   REQUIRE(handler.unannounceCalls.size() == expected.unannounce);
   REQUIRE(handler.propertiesUpdateCalls.size() == expected.propertiesUpdate);
@@ -124,6 +131,39 @@ inline void CheckNetworkCounts(const net::MockClientMessageHandler& network,
                                         .unsubscribe = unsubscribeCount,
                                         .setValue = setValueCount,
                                     });
+
+  std::vector<int> activePubs;
+  std::vector<int> activeSubs;
+  for (const auto& call : network.calls) {
+    if (auto publish =
+            std::get_if<net::MockClientMessageHandler::PublishCall>(&call)) {
+      activePubs.emplace_back(publish->pubuid);
+    } else if (auto unpublish =
+                   std::get_if<net::MockClientMessageHandler::UnpublishCall>(
+                       &call)) {
+      int pubuid = unpublish->pubuid;
+      CHECK(std::find(activePubs.begin(), activePubs.end(), pubuid) !=
+            activePubs.end());
+      std::erase(activePubs, pubuid);
+    } else if (auto subscribe =
+                   std::get_if<net::MockClientMessageHandler::SubscribeCall>(
+                       &call)) {
+      activeSubs.emplace_back(subscribe->subuid);
+    } else if (auto unsubscribe =
+                   std::get_if<net::MockClientMessageHandler::UnsubscribeCall>(
+                       &call)) {
+      int subuid = unsubscribe->subuid;
+      CHECK(std::find(activeSubs.begin(), activeSubs.end(), subuid) !=
+            activeSubs.end());
+      std::erase(activeSubs, subuid);
+    } else if (auto setValue =
+                   std::get_if<net::MockClientMessageHandler::SetValueCall>(
+                       &call)) {
+      int pubuid = setValue->pubuid;
+      CHECK(std::find(activePubs.begin(), activePubs.end(), pubuid) !=
+            activePubs.end());
+    }
+  }
 }
 
 }  // namespace wpi::nt

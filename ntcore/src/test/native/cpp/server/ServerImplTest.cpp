@@ -12,6 +12,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <variant>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
@@ -44,6 +45,7 @@ struct WireConnectionCounts {
   size_t sendPing = 0;
   size_t writeText = 0;
   size_t writeBinary = 0;
+  size_t flush = 0;
   size_t sendText = 0;
   size_t sendBinary = 0;
   size_t disconnect = 0;
@@ -54,9 +56,21 @@ void CheckWireConnectionCounts(const net::MockWireConnection& wire,
   REQUIRE(wire.sendPingCalls.size() == expected.sendPing);
   REQUIRE(wire.writeTextCalls.size() == expected.writeText);
   REQUIRE(wire.writeBinaryCalls.size() == expected.writeBinary);
+  REQUIRE(static_cast<size_t>(wire.flushCalls) == expected.flush);
   REQUIRE(wire.sendTextCalls.size() == expected.sendText);
   REQUIRE(wire.sendBinaryCalls.size() == expected.sendBinary);
   REQUIRE(wire.disconnectCalls.size() == expected.disconnect);
+}
+
+template <typename... Expected, typename... Calls>
+void CheckCallOrder(const std::vector<std::variant<Calls...>>& calls) {
+  REQUIRE(calls.size() == sizeof...(Expected));
+  size_t index = 0;
+  ([&] {
+    CHECK(std::holds_alternative<Expected>(calls[index]));
+    ++index;
+  }(),
+   ...);
 }
 
 }  // namespace
@@ -210,6 +224,9 @@ TEST_CASE_METHOD(ServerImplTest, "ServerImplTest PublishLocal",
   server.SendAllOutgoing(200, false);
 
   CheckServerMessageCounts(local, {.announce = 3});
+  CheckCallOrder<net::MockServerMessageHandler::AnnounceCall,
+                 net::MockServerMessageHandler::AnnounceCall,
+                 net::MockServerMessageHandler::AnnounceCall>(local.calls);
   CHECK(local.announceCalls[0].name == "test");
   CHECK(local.announceCalls[0].pubuid == std::optional<int>{pubuid});
   CHECK(local.announceCalls[1].name == "test2");
@@ -219,8 +236,13 @@ TEST_CASE_METHOD(ServerImplTest, "ServerImplTest PublishLocal",
 
   REQUIRE(setPeriodic.calls.size() == 1u);
   CHECK(setPeriodic.calls[0] == 100u);
-  CheckWireConnectionCounts(wire, {.sendPing = 1, .writeText = 3});
+  CheckWireConnectionCounts(wire, {.sendPing = 1, .writeText = 3, .flush = 2});
   CHECK(wire.sendPingCalls == std::vector<uint64_t>{100});
+  CheckCallOrder<net::MockWireConnection::WriteTextCall,
+                 net::MockWireConnection::WriteTextCall,
+                 net::MockWireConnection::FlushCall,
+                 net::MockWireConnection::WriteTextCall,
+                 net::MockWireConnection::FlushCall>(wire.writeCalls);
   CHECK(wire.writeTextCalls[0] ==
         EncodeText1(net::ServerMessage{net::AnnounceMsg{
             "test", 3, "double", std::nullopt, wpi::util::json::object()}}));
@@ -278,12 +300,17 @@ TEST_CASE_METHOD(ServerImplTest, "ServerImplTest ClientSubTopicOnlyThenValue",
   server.SendOutgoing(id, 200);
 
   CheckServerMessageCounts(local, {.announce = 1});
+  CheckCallOrder<net::MockServerMessageHandler::AnnounceCall>(local.calls);
   CHECK(local.announceCalls[0].name == "test");
   CHECK(local.announceCalls[0].pubuid == std::optional<int>{pubuid});
   CHECK(setPeriodic.calls == std::vector<uint32_t>{100, 100});
-  CheckWireConnectionCounts(wire,
-                            {.sendPing = 1, .writeText = 1, .writeBinary = 1});
+  CheckWireConnectionCounts(
+      wire, {.sendPing = 1, .writeText = 1, .writeBinary = 1, .flush = 2});
   CHECK(wire.sendPingCalls == std::vector<uint64_t>{100});
+  CheckCallOrder<net::MockWireConnection::WriteTextCall,
+                 net::MockWireConnection::FlushCall,
+                 net::MockWireConnection::WriteBinaryCall,
+                 net::MockWireConnection::FlushCall>(wire.writeCalls);
   CHECK(wire.writeTextCalls[0] ==
         EncodeText1(net::ServerMessage{net::AnnounceMsg{
             "test", 3, "double", std::nullopt, wpi::util::json::object()}}));
@@ -334,14 +361,19 @@ TEST_CASE_METHOD(ServerImplTest, "ServerImplTest ClientDisconnectUnpublish",
   server.RemoveClient(id);
 
   CheckServerMessageCounts(local, {.announce = 2, .unannounce = 1});
+  CheckCallOrder<net::MockServerMessageHandler::AnnounceCall,
+                 net::MockServerMessageHandler::AnnounceCall,
+                 net::MockServerMessageHandler::UnannounceCall>(local.calls);
   CHECK(local.announceCalls[0].name == "test2");
   CHECK(local.announceCalls[0].pubuid == std::optional<int>{pubuidLocal});
   CHECK(local.announceCalls[1].name == "test");
   CHECK(local.announceCalls[1].pubuid == std::optional<int>{});
   CHECK(local.unannounceCalls[0].name == "test");
   CHECK(local.unannounceCalls[0].id == 0);
-  CheckWireConnectionCounts(wire, {.sendPing = 1, .writeText = 1});
+  CheckWireConnectionCounts(wire, {.sendPing = 1, .writeText = 1, .flush = 1});
   CHECK(wire.sendPingCalls == std::vector<uint64_t>{100});
+  CheckCallOrder<net::MockWireConnection::WriteTextCall,
+                 net::MockWireConnection::FlushCall>(wire.writeCalls);
   CHECK(wire.writeTextCalls[0] ==
         EncodeText1(net::ServerMessage{net::AnnounceMsg{
             "test", 8, "double", 1, wpi::util::json::object()}}));
@@ -390,6 +422,9 @@ TEST_CASE_METHOD(ServerImplTest, "ServerImplTest ZeroTimestampNegativeTime",
   }
 
   CheckServerMessageCounts(local, {.announce = 1, .setValue = 2});
+  CheckCallOrder<net::MockServerMessageHandler::AnnounceCall,
+                 net::MockServerMessageHandler::SetValueCall,
+                 net::MockServerMessageHandler::SetValueCall>(local.calls);
   CHECK(local.announceCalls[0].name == "test");
   CHECK(local.announceCalls[0].pubuid == std::optional<int>{pubuid});
   CHECK(local.setValueCalls[0].topicuid == topicHandle);
@@ -484,6 +519,13 @@ TEST_CASE_METHOD(ServerImplTest,
       "bug: UpdatePeriod is skipped when added && removed are both true, "
       "leaving the topic mapped to the 200ms queue)");
   CHECK(binaryCallCount == 1);
+  CheckWireConnectionCounts(
+      wire, {.sendPing = 1, .writeText = 1, .writeBinary = 2, .flush = 2});
+  CheckCallOrder<net::MockWireConnection::WriteTextCall,
+                 net::MockWireConnection::WriteBinaryCall,
+                 net::MockWireConnection::FlushCall,
+                 net::MockWireConnection::WriteBinaryCall,
+                 net::MockWireConnection::FlushCall>(wire.writeCalls);
 }
 
 TEST_CASE_METHOD(ServerImplTest, "ServerImplTest InvalidPubUid",

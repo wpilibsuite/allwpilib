@@ -11,6 +11,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <variant>
 #include <vector>
 
 #include "net/WireConnection.hpp"
@@ -20,6 +21,24 @@ namespace wpi::nt::net {
 
 class MockWireConnection : public WireConnection {
  public:
+  struct WriteTextCall {
+    std::string contents;
+
+    bool operator==(const WriteTextCall&) const = default;
+  };
+
+  struct WriteBinaryCall {
+    std::vector<uint8_t> contents;
+
+    bool operator==(const WriteBinaryCall&) const = default;
+  };
+
+  struct FlushCall {
+    bool operator==(const FlushCall&) const = default;
+  };
+
+  using WriteCall = std::variant<WriteTextCall, WriteBinaryCall, FlushCall>;
+
   unsigned int GetVersion() const override { return version; }
 
   void SendPing(uint64_t time) override { sendPingCalls.emplace_back(time); }
@@ -66,6 +85,7 @@ class MockWireConnection : public WireConnection {
 
   int DoWriteText(std::string_view contents) {
     writeTextCalls.emplace_back(contents);
+    writeCalls.emplace_back(WriteTextCall{writeTextCalls.back()});
     if (onWriteText) {
       return onWriteText(contents);
     }
@@ -79,6 +99,7 @@ class MockWireConnection : public WireConnection {
 
   int DoWriteBinary(std::span<const uint8_t> contents) {
     writeBinaryCalls.emplace_back(contents.begin(), contents.end());
+    writeCalls.emplace_back(WriteBinaryCall{writeBinaryCalls.back()});
     if (onWriteBinary) {
       return onWriteBinary(contents);
     }
@@ -100,6 +121,7 @@ class MockWireConnection : public WireConnection {
 
   int Flush() override {
     ++flushCalls;
+    writeCalls.emplace_back(FlushCall{});
     if (!flushReturns.empty()) {
       int rv = flushReturns.front();
       flushReturns.pop_front();
@@ -147,6 +169,7 @@ class MockWireConnection : public WireConnection {
   mutable int readyCalls = 0;
   std::vector<std::string> writeTextCalls;
   std::vector<std::vector<uint8_t>> writeBinaryCalls;
+  std::vector<WriteCall> writeCalls;
   std::vector<std::string> sendTextCalls;
   std::vector<std::vector<uint8_t>> sendBinaryCalls;
   int flushCalls = 0;
