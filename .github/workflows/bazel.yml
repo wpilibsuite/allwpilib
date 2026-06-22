@@ -233,3 +233,42 @@ jobs:
           name: robotpy-pregeneration-fixes
           path: robotpy-pregeneration.patch
         if: ${{ failure() }}
+
+  # RobotPy does not want to run the additional python linting that wpiformat
+  # implements, only the black linter. Here we run black on only the files
+  # that get transfered to the upstream mostrobotpy repository
+  robotpy_format:
+    name: "RobotPy Formatting"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install black
+        run: |
+          python -m venv ${{ runner.temp }}/black
+          # Keep version in sync with .github/workflows/lint-format.yml
+          ${{ runner.temp }}/black/bin/pip3 install black
+      - name: Run black on RobotPy files
+        run: ${{ runner.temp }}/black/bin/black **/src/main/python/**/*.py **/src/test/python/**/*.py robotpyExamples --force-exclude "thirdparty"
+      - name: Check output
+        run: git --no-pager diff --exit-code HEAD
+      - name: Generate diff
+        run: git diff HEAD > robotpy-format-fixes.patch
+        if: ${{ failure() }}
+      - uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          path: robotpy-format-fixes.patch
+        if: ${{ failure() }}
+      - name: Write to job summary
+        run: |
+          echo '```diff' >> $GITHUB_STEP_SUMMARY
+          cat robotpy-format-fixes.patch >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        if: ${{ failure() }}
