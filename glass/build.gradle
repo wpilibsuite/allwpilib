@@ -100,9 +100,9 @@ model {
                 }
 
                 if (it.targetPlatform.operatingSystem.isWindows()) {
-                    it.cppCompiler.args.add("/I${mrccommIncludeDir}")
+                    it.cppCompiler.args.add("/I${mrccommIncludeDir}".toString())
                 } else {
-                    it.cppCompiler.args.add("-I${mrccommIncludeDir}")
+                    it.cppCompiler.args.add("-I${mrccommIncludeDir}".toString())
                 }
 
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -229,13 +229,13 @@ model {
             lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             if (it.targetPlatform.operatingSystem.isWindows()) {
-                it.cppCompiler.args.add("/I${mrccommIncludeDir}")
+                it.cppCompiler.args.add("/I${mrccommIncludeDir}".toString())
                 it.linker.args << 'kernel32.lib' << 'Gdi32.lib' << 'User32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
             } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
-                it.cppCompiler.args.add("-I${mrccommIncludeDir}")
+                it.cppCompiler.args.add("-I${mrccommIncludeDir}".toString())
                 it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
             } else {
-                it.cppCompiler.args.add("-I${mrccommIncludeDir}")
+                it.cppCompiler.args.add("-I${mrccommIncludeDir}".toString())
             }
         }
     }
