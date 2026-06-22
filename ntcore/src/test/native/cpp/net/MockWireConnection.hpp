@@ -21,6 +21,16 @@ namespace wpi::nt::net {
 
 class MockWireConnection : public WireConnection {
  public:
+  struct SendPingCall {
+    uint64_t time;
+
+    bool operator==(const SendPingCall&) const = default;
+  };
+
+  struct ReadyCall {
+    bool operator==(const ReadyCall&) const = default;
+  };
+
   struct WriteTextCall {
     std::string contents;
 
@@ -37,14 +47,24 @@ class MockWireConnection : public WireConnection {
     bool operator==(const FlushCall&) const = default;
   };
 
-  using WriteCall = std::variant<WriteTextCall, WriteBinaryCall, FlushCall>;
+  struct GetLastReceivedTimeCall {
+    bool operator==(const GetLastReceivedTimeCall&) const = default;
+  };
+
+  using Call =
+      std::variant<SendPingCall, ReadyCall, WriteTextCall, WriteBinaryCall,
+                   FlushCall, GetLastReceivedTimeCall>;
 
   unsigned int GetVersion() const override { return version; }
 
-  void SendPing(uint64_t time) override { sendPingCalls.emplace_back(time); }
+  void SendPing(uint64_t time) override {
+    sendPingCalls.emplace_back(time);
+    calls.emplace_back(SendPingCall{time});
+  }
 
   bool Ready() const override {
     ++readyCalls;
+    calls.emplace_back(ReadyCall{});
     if (!readyReturns.empty()) {
       bool rv = readyReturns.front();
       readyReturns.pop_front();
@@ -85,7 +105,7 @@ class MockWireConnection : public WireConnection {
 
   int DoWriteText(std::string_view contents) {
     writeTextCalls.emplace_back(contents);
-    writeCalls.emplace_back(WriteTextCall{writeTextCalls.back()});
+    calls.emplace_back(WriteTextCall{writeTextCalls.back()});
     if (onWriteText) {
       return onWriteText(contents);
     }
@@ -99,7 +119,7 @@ class MockWireConnection : public WireConnection {
 
   int DoWriteBinary(std::span<const uint8_t> contents) {
     writeBinaryCalls.emplace_back(contents.begin(), contents.end());
-    writeCalls.emplace_back(WriteBinaryCall{writeBinaryCalls.back()});
+    calls.emplace_back(WriteBinaryCall{writeBinaryCalls.back()});
     if (onWriteBinary) {
       return onWriteBinary(contents);
     }
@@ -121,7 +141,7 @@ class MockWireConnection : public WireConnection {
 
   int Flush() override {
     ++flushCalls;
-    writeCalls.emplace_back(FlushCall{});
+    calls.emplace_back(FlushCall{});
     if (!flushReturns.empty()) {
       int rv = flushReturns.front();
       flushReturns.pop_front();
@@ -134,6 +154,7 @@ class MockWireConnection : public WireConnection {
 
   uint64_t GetLastReceivedTime() const override {
     ++lastReceivedTimeCalls;
+    calls.emplace_back(GetLastReceivedTimeCall{});
     if (!lastReceivedTimeReturns.empty()) {
       uint64_t rv = lastReceivedTimeReturns.front();
       lastReceivedTimeReturns.pop_front();
@@ -169,7 +190,7 @@ class MockWireConnection : public WireConnection {
   mutable int readyCalls = 0;
   std::vector<std::string> writeTextCalls;
   std::vector<std::vector<uint8_t>> writeBinaryCalls;
-  std::vector<WriteCall> writeCalls;
+  mutable std::vector<Call> calls;
   std::vector<std::string> sendTextCalls;
   std::vector<std::vector<uint8_t>> sendBinaryCalls;
   int flushCalls = 0;
