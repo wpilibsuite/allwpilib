@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
-import java.util.stream.Collectors;
 import org.wpilib.annotation.NoDiscard;
 
 /**
@@ -63,18 +62,6 @@ public class ParallelGroupBuilder {
 
     m_requiredCommands.addAll(Arrays.asList(commands));
     return this;
-  }
-
-  /**
-   * Adds a command to the group. The command must complete for the group to exit.
-   *
-   * @param command The command to add to the group
-   * @return The builder object, for chaining
-   */
-  // Note: this primarily exists so users can cleanly chain .alongWith calls to build a
-  //       parallel group, eg `fooCommand().alongWith(barCommand()).alongWith(bazCommand())`
-  public ParallelGroupBuilder alongWith(Command command) {
-    return requiring(command);
   }
 
   /**
