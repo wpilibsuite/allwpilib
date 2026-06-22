@@ -252,13 +252,15 @@ static jobject MakeJValue(JNIEnv* env, const wpi::nt::Value& value) {
 }
 
 static jobject MakeJObject(JNIEnv* env, const wpi::nt::ConnectionInfo& info) {
-  static jmethodID constructor =
-      env->GetMethodID(connectionInfoCls, "<init>",
-                       "(Ljava/lang/String;Ljava/lang/String;IJI)V");
+  static jmethodID constructor = env->GetMethodID(
+      connectionInfoCls, "<init>",
+      "(Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;IJI)V");
   JLocal<jstring> remote_id{env, MakeJString(env, info.remote_id)};
   JLocal<jstring> remote_ip{env, MakeJString(env, info.remote_ip)};
+  JLocal<jstring> local_ip{env, MakeJString(env, info.local_ip)};
   return env->NewObject(connectionInfoCls, constructor, remote_id.obj(),
                         remote_ip.obj(), static_cast<jint>(info.remote_port),
+                        local_ip.obj(), static_cast<jint>(info.local_port),
                         static_cast<jlong>(info.last_update),
                         static_cast<jint>(info.protocol_version));
 }
