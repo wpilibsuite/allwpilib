@@ -627,9 +627,9 @@ struct AnsiDisplayState::Impl {
         size_t TargetColumn =
             ((CursorColumn / DisplayTabWidth) + 1) * DisplayTabWidth;
         TargetColumn = std::min(TargetColumn, MaxDisplayColumnIndex);
-        do {
+        while (CursorColumn < TargetColumn) {
             WriteCharacter(" ");
-        } while (CursorColumn < TargetColumn);
+        }
     }
 
     void SetCell(size_t Row, size_t Column, DisplayCell Cell) {
