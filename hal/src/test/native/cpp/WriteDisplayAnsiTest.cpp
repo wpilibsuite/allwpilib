@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/simulation/MockHooks.h"
@@ -19,7 +19,8 @@ int32_t CaptureDisplayAnsi(const struct WPI_String* data) {
 }
 }  // namespace
 
-TEST(DriverStationDisplayAnsiTest, WriteDisplayAnsiUsesSimulationHook) {
+TEST_CASE("DriverStationDisplayAnsiTest WriteDisplayAnsiUsesSimulationHook",
+          "[hal]") {
   HALSIM_SetWriteDisplayAnsi(nullptr);
   gDisplayAnsi.clear();
   HALSIM_SetWriteDisplayAnsi(CaptureDisplayAnsi);
@@ -28,5 +29,5 @@ TEST(DriverStationDisplayAnsiTest, WriteDisplayAnsiUsesSimulationHook) {
   HAL_WriteDisplayAnsi(&data);
 
   HALSIM_SetWriteDisplayAnsi(nullptr);
-  EXPECT_EQ("Robot display", gDisplayAnsi);
+  CHECK("Robot display" == gDisplayAnsi);
 }
