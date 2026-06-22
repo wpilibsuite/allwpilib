@@ -2,8 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.examples.hatchbotcmdv3.subsystems;
+package org.wpilib.examples.hatchbotcmdv3.mechanisms;
 
+import java.util.function.DoubleSupplier;
+import org.wpilib.command3.Command;
 import org.wpilib.command3.Mechanism;
 import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.examples.hatchbotcmdv3.Constants.DriveConstants;
@@ -11,7 +13,7 @@ import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.util.sendable.SendableRegistry;
 
-public class DriveSubsystem implements Mechanism {
+public class DriveMechanism implements Mechanism {
   // The motors on the left side of the drive.
   private final PWMSparkMax leftLeader = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
   private final PWMSparkMax leftFollower = new PWMSparkMax(DriveConstants.kLeftMotor2Port);
@@ -38,8 +40,8 @@ public class DriveSubsystem implements Mechanism {
           DriveConstants.kRightEncoderPorts[1],
           DriveConstants.kRightEncoderReversed);
 
-  /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {
+  /** Creates a new DriveMechanism. */
+  public DriveMechanism() {
     SendableRegistry.addChild(drive, leftLeader);
     SendableRegistry.addChild(drive, rightLeader);
 
@@ -59,15 +61,50 @@ public class DriveSubsystem implements Mechanism {
   /**
    * Drives the robot using arcade controls.
    *
-   * @param fwd the commanded forward movement
-   * @param rot the commanded rotation
+   * @param speed The speed to drive at, from -1 (full reverse) to +1 (full forward)
+   * @param turn The turn rate, from -1 (full counterclockwise) to +1 (full clockwise)
+   * @return A command that drives the robot using arcade controls
    */
-  public void arcadeDrive(double fwd, double rot) {
-    drive.arcadeDrive(fwd, rot);
+  public Command arcadeDrive(DoubleSupplier speed, DoubleSupplier turn) {
+    return runRepeatedly(() -> drive.arcadeDrive(speed.getAsDouble(), turn.getAsDouble()))
+        .named("Arcade Drive");
+  }
+
+  /**
+   * Drives a set distance, in inches, at a set speed ratio from 0-1. The command will exit when the
+   * distance has been reached.
+   *
+   * @param distance How many inches to travel. This may be negative to drive backwards.
+   * @param speed Speed ratio from 0 (off) to 1 (full speed). Negative values will make the robot
+   *     drive the wrong way.
+   * @return A command that drives a specified distance.
+   */
+  public Command driveDistance(double distance, double speed) {
+    return run(coroutine -> {
+          resetEncoders();
+
+          if (distance >= 0) {
+            // drive forward
+            while (getAverageEncoderDistance() < distance) {
+              drive.tankDrive(speed, 0);
+              coroutine.yield();
+            }
+          } else {
+            // drive backward
+            while (getAverageEncoderDistance() > distance) {
+              drive.tankDrive(-speed, 0);
+              coroutine.yield();
+            }
+          }
+
+          // Finally, stop
+          drive.stopMotor();
+        })
+        .named("Drive Distance[" + distance + "@" + speed + "]");
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
-  public void resetEncoders() {
+  private void resetEncoders() {
     leftEncoder.reset();
     rightEncoder.reset();
   }

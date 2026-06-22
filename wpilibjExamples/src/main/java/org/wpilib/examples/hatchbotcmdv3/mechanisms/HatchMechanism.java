@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.examples.hatchbotcmdv3.subsystems;
+package org.wpilib.examples.hatchbotcmdv3.mechanisms;
 
 import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.FORWARD;
 import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.REVERSE;
@@ -14,7 +14,7 @@ import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 
 /** A hatch mechanism actuated by a single {@link org.wpilib.hardware.pneumatic.DoubleSolenoid}. */
-public class HatchSubsystem implements Mechanism {
+public class HatchMechanism implements Mechanism {
   private final DoubleSolenoid hatchSolenoid =
       new DoubleSolenoid(
           0,
