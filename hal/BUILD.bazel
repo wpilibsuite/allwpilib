@@ -200,7 +200,7 @@ cc_test(
     srcs = glob(["src/test/native/**/*.cpp"]),
     deps = [
         ":wpiHal",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 
