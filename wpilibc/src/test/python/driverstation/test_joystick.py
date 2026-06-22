@@ -4,6 +4,11 @@ from wpilib import Joystick
 from wpilib.simulation import JoystickSim
 
 
+def test_fast_deconstruction(wpilib_state):
+    # https://github.com/wpilibsuite/allwpilib/issues/1550
+    Joystick(0)
+
+
 def test_getX() -> None:
     joy = Joystick(1)
     joysim = JoystickSim(joy)

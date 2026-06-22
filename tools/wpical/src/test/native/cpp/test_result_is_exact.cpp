@@ -2,15 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_message.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <mrcal_wrapper.h>
 
 #include "path_lookup.hpp"
@@ -148,7 +153,7 @@ std::vector<double> calibrate(const std::string& fname, cv::Size boardSize,
 
 const std::string projectRootPath = PROJECT_ROOT_PATH;
 
-TEST(MrcalResultExactlyMatchesTest, lifecam_1280) {
+TEST_CASE("MrcalResultExactlyMatchesTest lifecam_1280", "[wpical]") {
   auto calculated_intrinsics{
       calibrate(LookupPath(projectRootPath + "/lifecam_1280p_10x10.vnl"),
                 {10, 10}, {1280, 720})};
@@ -163,8 +168,12 @@ TEST(MrcalResultExactlyMatchesTest, lifecam_1280) {
       0.1489878273, -1.348622726,   0.002839630852, 0.001135629909,
       2.560627057,  -0.03170208336, 0.0695788644,   -0.09547554864};
 
-  for (int i = 0; i < 12; i++) {
-    EXPECT_NEAR(mrcal_cli_groundtruth_intrinsics[i], calculated_intrinsics[i],
-                1e-6);
+  REQUIRE(calculated_intrinsics.size() ==
+          mrcal_cli_groundtruth_intrinsics.size());
+
+  for (size_t i = 0; i < mrcal_cli_groundtruth_intrinsics.size(); i++) {
+    UNSCOPED_INFO("i = " << i);
+    CHECK(mrcal_cli_groundtruth_intrinsics[i] ==
+          Catch::Approx(calculated_intrinsics[i]).margin(1e-6));
   }
 }

@@ -130,7 +130,7 @@ cc_test(
     ],
     deps = [
         ":halsim_gui",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 

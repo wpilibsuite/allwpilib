@@ -160,6 +160,8 @@ class MrcLibDsSimImpl : public MrcLibDs {
 
   int32_t getSystemTimeValid(bool* systemTimeValid) override;
 
+  int32_t writeDisplayAnsi(const struct WPI_String* line) override;
+
   wpi::util::EventVector newDataEvents;
 
   void NewDriverStationData();
@@ -201,6 +203,8 @@ MrcLibDsSimImpl::MrcLibDsSimImpl() {
 static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
 static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
     nullptr};
+static std::atomic<HALSIM_WriteDisplayAnsiHandler> writeDisplayAnsiHandler{
+    nullptr};
 
 extern "C" {
 
@@ -210,6 +214,10 @@ void HALSIM_SetSendError(HALSIM_SendErrorHandler handler) {
 
 void HALSIM_SetSendConsoleLine(HALSIM_SendConsoleLineHandler handler) {
   sendConsoleLineHandler.store(handler);
+}
+
+void HALSIM_SetWriteDisplayAnsi(HALSIM_WriteDisplayAnsiHandler handler) {
+  writeDisplayAnsiHandler.store(handler);
 }
 }  // extern "C"
 
@@ -503,6 +511,14 @@ int32_t MrcLibDsSimImpl::getOutputsEnabled(bool* outputsEnabled) {
 
 int32_t MrcLibDsSimImpl::getSystemTimeValid(bool* systemTimeValid) {
   *systemTimeValid = true;
+  return 0;
+}
+
+int32_t MrcLibDsSimImpl::writeDisplayAnsi(const struct WPI_String* line) {
+  auto handler = writeDisplayAnsiHandler.load();
+  if (handler) {
+    return handler(line);
+  }
   return 0;
 }
 

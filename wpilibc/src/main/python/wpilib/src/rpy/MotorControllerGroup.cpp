@@ -40,7 +40,9 @@ void PyMotorControllerGroup::SetInverted(bool isInverted) {
   m_isInverted = isInverted;
 }
 
-bool PyMotorControllerGroup::GetInverted() const { return m_isInverted; }
+bool PyMotorControllerGroup::GetInverted() const {
+  return m_isInverted;
+}
 
 void PyMotorControllerGroup::Disable() {
   for (auto motorController : m_motorControllers) {
@@ -51,6 +53,7 @@ void PyMotorControllerGroup::Disable() {
 void PyMotorControllerGroup::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Motor Controller");
   builder.SetActuator(true);
-  builder.AddDoubleProperty("Value", [=, this]() { return GetThrottle(); },
-                            [=, this](double value) { SetThrottle(value); });
+  builder.AddDoubleProperty(
+      "Value", [=, this]() { return GetThrottle(); },
+      [=, this](double value) { SetThrottle(value); });
 }
