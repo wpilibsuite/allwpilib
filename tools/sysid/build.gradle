@@ -17,6 +17,7 @@ if (OperatingSystem.current().isWindows()) {
 
 ext {
     nativeName = 'sysid'
+    nativeTestSuiteName = "${nativeName}Catch2Test"
 }
 
 apply from: "${rootDir}/shared/resources.gradle"
@@ -120,7 +121,7 @@ model {
         }
     }
     testSuites {
-        "${nativeName}Test"(GoogleTestTestSuiteSpec) {
+        "${nativeTestSuiteName}"(GoogleTestTestSuiteSpec) {
             for (NativeComponentSpec c : $.components) {
                 if (c.name == nativeName) {
                     testing c
@@ -157,7 +158,7 @@ model {
                     }
                 }
 
-                lib project: ':thirdparty:googletest', library: 'googletest', linkage: 'static'
+                lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
                 it.cppCompiler.define("RUNNING_SYSID_TESTS")
             }
         }

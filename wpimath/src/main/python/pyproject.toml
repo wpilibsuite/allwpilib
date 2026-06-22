@@ -1460,6 +1460,7 @@ MathUtil = "wpi/math/util/MathUtil.hpp"
 # StateSpaceUtil = "wpi/math/util/StateSpaceUtil.hpp"
 
 # wpi/math/controller
+AntiTipping = "wpi/math/controller/AntiTipping.hpp"
 ArmFeedforward = "wpi/math/controller/ArmFeedforward.hpp"
 BangBangController = "wpi/math/controller/BangBangController.hpp"
 ControlAffinePlantInversionFeedforward = "wpi/math/controller/ControlAffinePlantInversionFeedforward.hpp"

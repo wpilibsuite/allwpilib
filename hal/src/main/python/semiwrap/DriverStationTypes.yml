@@ -5,6 +5,7 @@ extra_includes:
 - src/ds_types_fmt.h
 
 enums:
+  AllianceStationID:
   RobotMode:
 classes:
   wpi::hal::ControlWord:

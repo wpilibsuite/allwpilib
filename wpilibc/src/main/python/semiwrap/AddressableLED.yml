@@ -24,7 +24,7 @@ classes:
       ColorOrder:
     inline_code: |
       .def("setData", [](wpi::AddressableLED& self, const wpi::AddressableLEDBuffer& data) {
-            return self.SetData(data); 
+            return self.SetData(data);
           }, release_gil(), py::prepend());
   wpi::AddressableLED::LEDData:
     force_no_trampoline: true

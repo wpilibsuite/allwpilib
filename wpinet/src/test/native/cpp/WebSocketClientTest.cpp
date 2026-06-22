@@ -82,7 +82,7 @@ class WebSocketClientTest : public WebSocketTest {
           if (req.HasError()) {
             Finish();
           }
-          INFO(http_errno_name(req.GetError()));
+          UNSCOPED_INFO(http_errno_name(req.GetError()));
           REQUIRE(req.GetError() == HPE_OK);
           if (data.empty()) {
             return;
@@ -138,7 +138,7 @@ TEST_CASE_METHOD(WebSocketClientTest, "WebSocketClientTest BadAccept",
     ws->closed.connect([&](uint16_t code, std::string_view msg) {
       Finish();
       ++gotClosed;
-      INFO("Message: " << msg);
+      UNSCOPED_INFO("Message: " << msg);
       REQUIRE(code == 1002);
     });
     ws->open.connect([&](std::string_view protocol) {
@@ -188,7 +188,7 @@ TEST_CASE_METHOD(WebSocketClientTest, "WebSocketClientTest ProtocolRespNotReq",
     ws->closed.connect([&](uint16_t code, std::string_view msg) {
       Finish();
       ++gotClosed;
-      INFO("Message: " << msg);
+      UNSCOPED_INFO("Message: " << msg);
       REQUIRE(code == 1003);
     });
     ws->open.connect([&](std::string_view protocol) {
@@ -211,7 +211,7 @@ TEST_CASE_METHOD(WebSocketClientTest, "WebSocketClientTest ProtocolReqNotResp",
     ws->closed.connect([&](uint16_t code, std::string_view msg) {
       Finish();
       ++gotClosed;
-      INFO("Message: " << msg);
+      UNSCOPED_INFO("Message: " << msg);
       REQUIRE(code == 1002);
     });
     ws->open.connect([&](std::string_view protocol) {
@@ -311,7 +311,7 @@ TEST_CASE_METHOD(WebSocketClientDataTest,
     });
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotCallback;
-      INFO("reason: " << reason);
+      UNSCOPED_INFO("reason: " << reason);
       REQUIRE(code == 1002);
     });
   };
