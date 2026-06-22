@@ -275,9 +275,9 @@ public interface Command {
    * complete when every command in the group has completed naturally.
    *
    * @param commands The commands to run in parallel
-   * @return A command builder
+   * @return A parallel command group
    */
-  static Command parallel(Command... commands) {
+  static ParallelGroup parallel(Command... commands) {
     // parameters will be null checked by the command group
     return new ParallelGroup(null, List.of(commands), List.of());
   }
@@ -288,9 +288,9 @@ public interface Command {
    * will be canceled.
    *
    * @param commands The commands to run in parallel
-   * @return A command builder
+   * @return A parallel command group
    */
-  static Command race(Command... commands) {
+  static ParallelGroup race(Command... commands) {
     // parameters will be null checked by the command group
     return new ParallelGroup(null, List.of(), List.of(commands));
   }
@@ -301,9 +301,9 @@ public interface Command {
    * run in the order they're passed to this method.
    *
    * @param commands The commands to run in sequence.
-   * @return A command builder
+   * @return A command sequence
    */
-  static Command sequence(Command... commands) {
+  static SequentialGroup sequence(Command... commands) {
     // parameters will be null checked by the builder
     return new SequentialGroup(commands);
   }
@@ -366,9 +366,9 @@ public interface Command {
    * }</pre>
    *
    * @param next The command to run after this one in the sequence
-   * @return A sequence builder
+   * @return A command sequence
    */
-  default Command andThen(Command next) {
+  default SequentialGroup andThen(Command next) {
     // parameter will be null checked by the builder
     return new SequentialGroup(this, next);
   }
@@ -388,9 +388,9 @@ public interface Command {
    * }</pre>
    *
    * @param parallel The commands to run in parallel with this one
-   * @return A parallel group builder
+   * @return A parallel command group
    */
-  default Command alongWith(Command... parallel) {
+  default ParallelGroup alongWith(Command... parallel) {
     var commands = new ArrayList<Command>();
     commands.add(this);
     commands.addAll(List.of(parallel));
@@ -405,9 +405,9 @@ public interface Command {
    * created. See {@link ParallelGroupBuilder} for details.
    *
    * @param parallel The commands to run in parallel with this one
-   * @return A parallel group builder
+   * @return A parallel command group
    */
-  default Command raceWith(Command... parallel) {
+  default ParallelGroup raceWith(Command... parallel) {
     var commands = new ArrayList<Command>();
     commands.add(this);
     commands.addAll(List.of(parallel));
