@@ -13,6 +13,7 @@
 
 #include "Log.hpp"
 #include "Message.hpp"
+#include "ProtocolVersions.hpp"
 #include "WireConnection.hpp"
 #include "WireEncoder.hpp"
 #include "wpi/nt/NetworkTableValue.hpp"
@@ -23,25 +24,49 @@ using namespace wpi::nt;
 using namespace wpi::nt::net;
 
 ClientImpl::ClientImpl(
-    uint64_t curTimeMs, WireConnection& wire, bool local,
-    wpi::util::Logger& logger,
+    uint64_t curTimeMs, wpi::net::EventLoopRunner& loop, WireConnection& wire,
+    ConnectionInfo connInfo, bool local, wpi::util::Logger& logger,
     std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
         timeSyncUpdated,
     std::function<void(uint32_t repeatMs)> setPeriodic)
-    : m_wire{wire},
+    : m_loopRunner(loop),
+      m_wire{wire},
       m_logger{logger},
       m_timeSyncUpdated{std::move(timeSyncUpdated)},
       m_setPeriodic{std::move(setPeriodic)},
       m_ping{wire},
-      m_nextPingTimeMs{curTimeMs + (wire.GetVersion() >= 0x0401
+      m_nextPingTimeMs{curTimeMs + (wire.GetVersion() >= NT_4_1
                                         ? NetworkPing::kPingIntervalMs
                                         : kRttIntervalMs)},
       m_outgoing{wire, local} {
-  // immediately send RTT ping
-  auto now = wpi::util::Now();
-  DEBUG4("Sending initial RTT ping {}", now);
-  m_wire.SendBinary(
-      [&](auto& os) { WireEncodeBinary(os, -1, 0, Value::MakeInteger(now)); });
+  if (m_wire.GetVersion() >= NT_4_2) {
+    DEBUG4("Creating UDP-based time sync client");
+    using namespace std::chrono_literals;
+    m_tspClient = std::make_unique<tsp::TimeSyncClient>(
+        logger, connInfo.remote_ip, connInfo.remote_port,
+        // 1 second seems reasonable
+        1s, [this](tsp::TimeSyncClient::Metadata meta) {
+          // This callback is called in TimeSyncClient's eventloop's context, so
+          // accessing members here isn't thread-safe. Do it from m_loop's
+          // context instead
+          m_loopRunner.ExecSync([this, meta](auto& loop) {
+            m_rtt2Us = meta.rtt2;
+            int64_t serverTimeOffsetUs = meta.offset;
+            DEBUG3("Time offset: {}", serverTimeOffsetUs);
+            m_outgoing.SetTimeOffset(serverTimeOffsetUs);
+            m_haveTimeOffset = true;
+          });
+          m_timeSyncUpdated(meta.offset, meta.rtt2, true);
+        });
+  } else {
+    // immediately send RTT ping
+    auto now = wpi::util::Now();
+    DEBUG4("Sending initial RTT ping {}", now);
+    m_wire.SendBinary([&](auto& os) {
+      WireEncodeBinary(os, -1, 0, Value::MakeInteger(now));
+    });
+  }
+
   m_setPeriodic(m_periodMs);
 }
 
@@ -65,6 +90,11 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
 
     // handle RTT ping response (only use first one)
     if (id == -1) {
+      if (m_wire.GetVersion() == NT_4_2) {
+        WARN("RTT protocol triggered but wire is version 4.2?");
+        continue;
+      }
+
       if (!m_haveTimeOffset) {
         if (!value.IsInteger()) {
           WARN("RTT ping response with non-integer type {}",
@@ -73,7 +103,7 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
         }
         DEBUG4("RTT ping response time {} value {}", value.time(),
                value.GetInteger());
-        if (m_wire.GetVersion() < 0x0401) {
+        if (m_wire.GetVersion() < NT_4_1) {
           m_pongTimeMs = curTimeMs;
         }
         int64_t now = wpi::util::Now();
@@ -104,11 +134,11 @@ void ClientImpl::HandleLocal(std::span<ClientMessage> msgs) {
     } else if (auto msg = std::get_if<PublishMsg>(&elem.contents)) {
       Publish(msg->pubuid, msg->name, msg->typeStr, msg->properties,
               msg->options);
-      m_outgoing.SendMessage(msg->pubuid, std::move(elem));
+      m_outgoing.SendMessageToServer(msg->pubuid, std::move(elem));
     } else if (auto msg = std::get_if<UnpublishMsg>(&elem.contents)) {
       Unpublish(msg->pubuid, std::move(elem));
     } else {
-      m_outgoing.SendMessage(0, std::move(elem));
+      m_outgoing.SendMessageToServer(0, std::move(elem));
     }
   }
 }
@@ -116,7 +146,7 @@ void ClientImpl::HandleLocal(std::span<ClientMessage> msgs) {
 void ClientImpl::SendOutgoing(uint64_t curTimeMs, bool flush) {
   DEBUG4("SendOutgoing({}, {})", curTimeMs, flush);
 
-  if (m_wire.GetVersion() >= 0x0401) {
+  if (m_wire.GetVersion() >= NT_4_1) {
     // Use WS pings
     if (!m_ping.Send(curTimeMs)) {
       return;
@@ -198,7 +228,7 @@ void ClientImpl::Unpublish(int32_t pubuid, ClientMessage&& msg) {
   }
   UpdatePeriodic();
 
-  m_outgoing.SendMessage(pubuid, std::move(msg));
+  m_outgoing.SendMessageToServer(pubuid, std::move(msg));
 
   // remove from outgoing handle map
   m_outgoing.EraseId(pubuid);

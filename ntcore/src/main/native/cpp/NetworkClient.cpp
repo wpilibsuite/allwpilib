@@ -16,6 +16,7 @@
 
 #include "IConnectionList.hpp"
 #include "Log.hpp"
+#include "ProtocolVersions.hpp"
 #include "net/NetworkInterface.hpp"
 #include "wpi/net/HttpUtil.hpp"
 #include "wpi/net/uv/Loop.hpp"
@@ -232,7 +233,8 @@ void NetworkClient::TcpConnected(uv::Tcp& tcp) {
   wpi::util::SmallString<128> idBuf;
   auto ws = wpi::net::WebSocket::CreateClient(
       tcp, fmt::format("/nt/{}", wpi::net::EscapeURI(m_id, idBuf)), "",
-      {"v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu"},
+      {"v4.2.networktables.first.wpi.edu", "v4.1.networktables.first.wpi.edu",
+       "networktables.first.wpi.edu"},
       options);
   ws->SetMaxMessageSize(kMaxMessageSize);
   ws->open.connect([this, &tcp, ws = ws.get()](std::string_view protocol) {
@@ -252,8 +254,7 @@ void NetworkClient::WsConnected(wpi::net::WebSocket& ws, uv::Tcp& tcp,
 
   ConnectionInfo connInfo;
   uv::AddrToName(tcp.GetPeer(), &connInfo.remote_ip, &connInfo.remote_port);
-  connInfo.protocol_version =
-      protocol == "v4.1.networktables.first.wpi.edu" ? 0x0401 : 0x0400;
+  connInfo.protocol_version = ProtocolStringToVersion(protocol);
 
   INFO("CONNECTED NT4 to {} port {}", connInfo.remote_ip, connInfo.remote_port);
   m_connHandle = m_connList.AddConnection(connInfo);
@@ -263,8 +264,8 @@ void NetworkClient::WsConnected(wpi::net::WebSocket& ws, uv::Tcp& tcp,
   m_wire = std::make_shared<net::WebSocketConnection>(
       ws, connInfo.protocol_version, m_logger);
   m_clientImpl = std::make_unique<net::ClientImpl>(
-      m_loop.Now().count(), *m_wire, local, m_logger, m_timeSyncUpdated,
-      [this](uint32_t repeatMs) {
+      m_loop.Now().count(), m_loopRunner, *m_wire, connInfo, local, m_logger,
+      m_timeSyncUpdated, [this](uint32_t repeatMs) {
         DEBUG4("Setting periodic timer to {}", repeatMs);
         if (m_sendOutgoingTimer &&
             (!m_sendOutgoingTimer->IsActive() ||
