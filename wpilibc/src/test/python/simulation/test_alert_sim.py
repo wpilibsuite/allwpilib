@@ -10,10 +10,9 @@ Level = Alert.Level
 
 @pytest.fixture(scope="function")
 def group_name(request):
-
+    AlertSim.resetData()
     group_name = f"AlertTest_{request.node.name}"
     yield group_name
-
     AlertSim.resetData()
 
 
