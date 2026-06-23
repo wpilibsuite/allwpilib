@@ -236,7 +236,7 @@ jobs:
 
   # RobotPy does not want to run the additional python linting that wpiformat
   # implements, only the black linter. Here we run black on only the files
-  # that get transfered to the upstream mostrobotpy repository
+  # that get transferred to the upstream mostrobotpy repository
   robotpy_format:
     name: "RobotPy Formatting"
     runs-on: ubuntu-24.04
