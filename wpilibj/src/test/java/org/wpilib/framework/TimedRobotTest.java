@@ -131,6 +131,25 @@ class TimedRobotTest {
   }
 
   @Test
+  void robotNameTest() {
+    // Simulated stack trace from a robot crash
+    StackTraceElement[] elements = {
+      new StackTraceElement("org.wpilib.framework.TimedRobot", "<init>", null, 1),
+      new StackTraceElement("org.wpilib.framework.TimedRobotTest$MockRobot", "<init>", null, 1),
+      new StackTraceElement(
+          "jdk.internal.reflect.DirectConstructorHandleAccessor", "newInstance", null, 1),
+      new StackTraceElement("java.lang.reflect.Constructor", "newInstanceWithCaller", null, 1),
+      new StackTraceElement("java.lang.reflect.Constructor", "newInstance", null, 1),
+      new StackTraceElement("org.wpilib.util.ConstructorMatch", "newInstance", null, 1),
+      new StackTraceElement("org.wpilib.framework.RobotBase", "constructRobot", null, 1),
+      new StackTraceElement("org.wpilib.framework.RobotBase", "runRobot", null, 1),
+      new StackTraceElement("org.wpilib.framework.RobotBase", "lambda$startRobot$0", null, 1),
+      new StackTraceElement("java.lang.Thread", "run", null, 1)
+    };
+    assertEquals("org.wpilib.framework.TimedRobotTest$MockRobot", MockRobot.getRobotName(elements));
+  }
+
+  @Test
   @ResourceLock("timing")
   void disabledModeTest() {
     MockRobot robot = new MockRobot();
