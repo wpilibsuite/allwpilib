@@ -3,7 +3,6 @@ import pytest
 from wpilib import DriverStation, DriverStationBackend, GenericHID
 from wpilib.simulation import DriverStationSim, GenericHIDSim
 
-
 RumbleType = GenericHID.RumbleType
 RUMBLE_TYPES = (
     RumbleType.LEFT_RUMBLE,
@@ -30,9 +29,7 @@ def test_rumble_range() -> None:
 
         for rumble_type in RUMBLE_TYPES:
             hid.setRumble(rumble_type, rumble_value)
-            assert sim.getRumble(rumble_type) == pytest.approx(
-                rumble_value, abs=0.0001
-            )
+            assert sim.getRumble(rumble_type) == pytest.approx(rumble_value, abs=0.0001)
 
 
 def test_rumble_types() -> None:
@@ -50,9 +47,7 @@ def test_rumble_types() -> None:
 
         for rumble_type in RUMBLE_TYPES:
             expected = 1 if rumble_type == active_rumble_type else 0
-            assert sim.getRumble(rumble_type) == pytest.approx(
-                expected, abs=0.0001
-            )
+            assert sim.getRumble(rumble_type) == pytest.approx(expected, abs=0.0001)
 
         hid.setRumble(active_rumble_type, 0)
 
