@@ -89,8 +89,7 @@ _print_sos(
 #   test_biquad_filter.test_butterworth_bandpass_factory_matches_scipy
 sos_butter4_bp = sig.butter(4, [80.0, 120.0], btype="bandpass", fs=1000.0, output="sos")
 _print_sos(
-    "scipy.signal.butter(4, [80.0, 120.0], btype='bandpass', fs=1000.0, "
-    "output='sos')",
+    "scipy.signal.butter(4, [80.0, 120.0], btype='bandpass', fs=1000.0, output='sos')",
     sos_butter4_bp,
 )
 
