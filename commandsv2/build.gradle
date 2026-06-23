@@ -28,6 +28,7 @@ dependencies {
     testAnnotationProcessor project(':javacPlugin')
 }
 
+
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 
 nativeUtils.exportsConfigs {

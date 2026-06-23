@@ -12,7 +12,6 @@ plugins {
     id 'base'
     id 'idea'
     id 'visual-studio'
-
     alias(libs.plugins.wpilib.versioning)
     alias(libs.plugins.wpilib.repositories)
     // NativeUtils and GradleVsCode are on the classpath for buildSrc, which doesn't carry version information.
@@ -27,6 +26,7 @@ plugins {
     alias(libs.plugins.lint.errorprone) apply false
     alias(libs.plugins.lint.spotbugs) apply false
     alias(libs.plugins.lint.spotless) apply false
+    id 'org.javamodularity.moduleplugin' version '2.0.1' apply false
 }
 
 wpilibVersioning.buildServerMode = project.hasProperty('buildServer')
@@ -35,8 +35,10 @@ wpilibVersioning.releaseMode = project.hasProperty('releaseMode')
 allprojects {
     repositories {
         maven {
-        url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
-    }
+            url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+        }
+        // For testing local EJML uberjar builds
+        mavenLocal()
     }
     wpilibRepositories.use2027Repos()
     if (project.hasProperty('releaseMode')) {

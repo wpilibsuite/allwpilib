@@ -2,6 +2,7 @@ import org.wpilib.toolchain.NativePlatforms
 
 apply plugin: 'java'
 apply plugin: 'jacoco'
+apply plugin: 'org.javamodularity.moduleplugin'
 
 ext {
     useJava = true
@@ -51,9 +52,11 @@ tasks.withType(JavaExec).configureEach {
     // Commands v3 needs reflective access to the continuation classes
     jvmArgs += [
         '--add-opens',
-        'java.base/jdk.internal.vm=ALL-UNNAMED',
+        'java.base/jdk.internal.vm=wpilib.command3',
         '--add-opens',
-        'java.base/java.lang=ALL-UNNAMED',
+        'java.base/java.lang=wpilib.command3',
+        // Explicitly permit native access to WPILib JNI wrappers
+        '--enabled-native-access=wpilib.util,wpilib.hal,wpilib.ntcore'
     ]
 }
 

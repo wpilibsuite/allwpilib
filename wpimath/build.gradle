@@ -91,6 +91,7 @@ dependencies {
     annotationProcessor libs.avaje.jsonb.generator
     api project(":wpiunits")
     api libs.avaje.jsonb
+    implementation libs.avaje.inject
     api libs.bundles.ejml
     api libs.quickbuf.runtime
     implementation project(":wpiannotations")
@@ -99,6 +100,7 @@ dependencies {
 }
 
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
+sourceSets.main.java.srcDir "${buildDir}/generated/sources/annotationProcessor/java/main"
 sourceSets.main.resources.srcDir "${projectDir}/src/main/proto"
 
 task unitsHeaders(type: Zip) {

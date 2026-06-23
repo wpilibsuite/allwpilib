@@ -14,4 +14,20 @@ dependencies {
     api project(':commandsv2')
 
     testImplementation libs.compile.testing
+    testImplementation libs.guava
+    testCompileOnly 'com.google.errorprone:error_prone_annotations:2.41.0'
+}
+
+test {
+    moduleOptions {
+        // com.google.truth REALLY messes with the module path and guava dependencies.
+        // Force the test runtime to put everything on the classpath.
+        runOnClasspath = true
+    }
+}
+
+afterEvaluate {
+    tasks.withType(JavaCompile).matching { it.name.contains("Test") }.configureEach {
+        options.compilerArgs << "--add-modules" << "com.google.common" << "--add-reads" << "wpilib.epilogue.processor=com.google.common"
+    }
 }
