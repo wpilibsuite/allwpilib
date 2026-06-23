@@ -254,7 +254,9 @@ jobs:
           # Keep version in sync with .github/workflows/lint-format.yml
           ${{ runner.temp }}/black/bin/pip3 install black
       - name: Run black on RobotPy files
-        run: ${{ runner.temp }}/black/bin/black **/src/main/python/**/*.py **/src/test/python/**/*.py robotpyExamples --force-exclude "thirdparty"
+        run: |
+          shopt -s globstar
+          ${{ runner.temp }}/black/bin/black **/src/main/python/**/*.py **/src/test/python/**/*.py robotpyExamples --force-exclude "thirdparty"
       - name: Check output
         run: git --no-pager diff --exit-code HEAD
       - name: Generate diff
