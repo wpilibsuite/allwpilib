@@ -317,7 +317,7 @@ MrcLibDsImpl::MrcLibDsImpl() {
 
   // Initialize control first, making sure its properly checked for errors
   MRC_Status controlInitStatus = MRC_DsCommsControl_Initialize();
-  if (controlInitStatus == -7) {  // MRC_STATUS_MULTIPLE_USER_PROGRAMS
+  if (controlInitStatus == MRC_STATUS_MULTIPLE_USER_PROGRAMS) {
     fmt::print(stderr,
                "Warning: Multiple user programs detected. Restarting app and "
                "retrying...\n");
