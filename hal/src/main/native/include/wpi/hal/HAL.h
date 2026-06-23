@@ -57,14 +57,14 @@ const char* HAL_GetLastError(HAL_Status* status);
 const char* HAL_GetErrorMessage(int32_t code);
 
 /**
- * Returns the roboRIO serial number.
+ * Returns the Systemcore serial number.
  *
- * @param[out] serialNumber The roboRIO serial number. Free with WPI_FreeString
+ * @param[out] serialNumber The Systemcore serial number. Free with WPI_FreeString
  */
 void HAL_GetSerialNumber(struct WPI_String* serialNumber);
 
 /**
- * Returns the comments from the roboRIO web interface.
+ * Returns the comments from the Systemcore web interface.
  *
  * @param[out] comments The comments string. Free with WPI_FreeString
  */
