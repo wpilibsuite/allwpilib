@@ -29,7 +29,7 @@ install(FILES ${WPILIB_BINARY_DIR}/romivendordep-config.cmake DESTINATION share/
 install(EXPORT romivendordep DESTINATION share/romiVendordep)
 
 if(WITH_TESTS)
-    wpilib_add_test(romiVendordep src/test/native/cpp)
+    wpilib_add_test_catch2(romiVendordep src/test/native/cpp)
     target_include_directories(romiVendordep_test PRIVATE src/test/native/include)
-    target_link_libraries(romiVendordep_test romiVendordep googletest)
+    target_link_libraries(romiVendordep_test romiVendordep)
 endif()
