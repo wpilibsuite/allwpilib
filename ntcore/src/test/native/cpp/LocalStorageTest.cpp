@@ -399,7 +399,7 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SubNonExist",
 
   CheckNetworkCounts(network, 0, 1, 0);
   CheckSubscribe(network.subscribeCalls[0], {"foo"});
-  CHECK(logger.messages.empty());
+  logger.CheckMessages({});
 }
 
 TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetDefaultSubscribe",
@@ -1070,8 +1070,8 @@ TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest MultiSubSpecial",
   storage.SetEntryValue(pubnormal, Value::MakeDouble(2.0, 40));
 
   CheckNetworkCounts(network, 2, 2, 2);
-  REQUIRE(listenerStorage.activateCalls.size() == 2);
-  REQUIRE(listenerStorage.valueNotifyCalls.size() == 3);
+  CheckListenerStorageCounts(listenerStorage,
+                             {.activate = 2, .valueNotify = 3});
   CheckValueNotifyHandles(listenerStorage.valueNotifyCalls[0], {2});
   CheckValueNotifyHandles(listenerStorage.valueNotifyCalls[1], {1});
   CheckValueNotifyHandles(listenerStorage.valueNotifyCalls[2], {2});

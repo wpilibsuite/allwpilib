@@ -110,6 +110,28 @@ inline void CheckNoServerCalls(const net::MockServerMessageHandler& handler) {
   CheckServerMessageCounts(handler);
 }
 
+struct ListenerStorageCounts {
+  size_t activate = 0;
+  size_t connectionNotify = 0;
+  size_t topicNotify = 0;
+  size_t valueNotify = 0;
+  size_t logNotify = 0;
+  size_t timeSyncNotify = 0;
+};
+
+inline void CheckListenerStorageCounts(
+    const MockListenerStorage& listenerStorage,
+    const ListenerStorageCounts& expected = {}) {
+  REQUIRE(listenerStorage.activateCalls.size() == expected.activate);
+  REQUIRE(listenerStorage.connectionNotifyCalls.size() ==
+          expected.connectionNotify);
+  REQUIRE(listenerStorage.topicNotifyCalls.size() == expected.topicNotify);
+  REQUIRE(listenerStorage.valueNotifyCalls.size() == expected.valueNotify);
+  REQUIRE(listenerStorage.logNotifyCalls.size() == expected.logNotify);
+  REQUIRE(listenerStorage.timeSyncNotifyCalls.size() ==
+          expected.timeSyncNotify);
+}
+
 inline void CheckValueNotifyHandles(
     const MockListenerStorage::ValueNotifyCall& call,
     std::initializer_list<NT_Listener> expectedHandles) {

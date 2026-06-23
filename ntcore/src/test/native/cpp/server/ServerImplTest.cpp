@@ -50,6 +50,8 @@ struct WireConnectionCounts {
   size_t lastReceivedTime = 0;
   size_t sendText = 0;
   size_t sendBinary = 0;
+  size_t stopRead = 0;
+  size_t startRead = 0;
   size_t disconnect = 0;
 };
 
@@ -64,6 +66,8 @@ void CheckWireConnectionCounts(const net::MockWireConnection& wire,
           expected.lastReceivedTime);
   REQUIRE(wire.sendTextCalls.size() == expected.sendText);
   REQUIRE(wire.sendBinaryCalls.size() == expected.sendBinary);
+  REQUIRE(static_cast<size_t>(wire.stopReadCalls) == expected.stopRead);
+  REQUIRE(static_cast<size_t>(wire.startReadCalls) == expected.startRead);
   REQUIRE(wire.disconnectCalls.size() == expected.disconnect);
 }
 
