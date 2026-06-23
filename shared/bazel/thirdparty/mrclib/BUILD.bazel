@@ -19,8 +19,8 @@ alias(
         "@wpilib_toolchains//conditions:osx": "@mrclib_osxuniversal//:shared_libs",
         "@wpilib_toolchains//conditions:windows_arm64": "@mrclib_windowsarm64//:shared_libs",
         "@wpilib_toolchains//conditions:windows_x86_64": "@mrclib_windowsx86-64//:shared_libs",
-        "@wpilib_toolchains//constraints/is_trixie64:trixie64": "@mrclib_linuxarm64//:shared_libs",
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": "@mrclib_linuxsystemcore//:shared_libs",
+        "@wpilib_toolchains//constraints/is_trixie64:trixie64": "@mrclib_linuxarm64//:shared_libs",
     }),
     visibility = ["//visibility:public"],
 )
