@@ -44,9 +44,9 @@ alias(
     name = "quickbuf_protoc",
     actual = select({
         "@platforms//os:windows": "@quickbuffer_protoc_windows//file",
-        "@rules_bzlmodrio_toolchains//conditions:osx_aarch64": "@quickbuffer_protoc_osx_aarch64//file",
-        "@rules_bzlmodrio_toolchains//conditions:osx_x86_64": "@quickbuffer_protoc_osx_x86-64//file",
-        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": "@quickbuffer_protoc_linux//file",
+        "@wpilib_toolchains//conditions:osx_aarch64": "@quickbuffer_protoc_osx_aarch64//file",
+        "@wpilib_toolchains//conditions:osx_x86_64": "@quickbuffer_protoc_osx_x86-64//file",
+        "@wpilib_toolchains//constraints/combined:is_linux": "@quickbuffer_protoc_linux//file",
     }),
     tags = ["pregeneration"],
     visibility = ["//visibility:public"],
