@@ -5,11 +5,11 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 #include <utility>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
-#include "gmock/gmock.h"
 #include "wpi/commands2/CommandHelper.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/Requirements.hpp"
@@ -28,78 +28,110 @@ class TestSubsystem : public SubsystemBase {
   std::function<void()> m_periodic;
 };
 
-/**
- * NOTE: Moving mock objects causes EXPECT_CALL to not work correctly!
- */
 class MockCommand : public CommandHelper<Command, MockCommand> {
  public:
-  MOCK_CONST_METHOD0(GetRequirements, wpi::util::SmallSet<Subsystem*, 4>());
-  MOCK_METHOD0(IsFinished, bool());
-  MOCK_CONST_METHOD0(RunsWhenDisabled, bool());
-  MOCK_METHOD0(Initialize, void());
-  MOCK_METHOD0(Execute, void());
-  MOCK_METHOD1(End, void(bool interrupted));
-
-  MockCommand() {
-    m_requirements = {};
-    EXPECT_CALL(*this, GetRequirements())
-        .WillRepeatedly(::testing::Return(m_requirements));
-    EXPECT_CALL(*this, IsFinished()).WillRepeatedly(::testing::Return(false));
-    EXPECT_CALL(*this, RunsWhenDisabled())
-        .WillRepeatedly(::testing::Return(true));
-  }
+  MockCommand() = default;
 
   explicit MockCommand(Requirements requirements, bool finished = false,
-                       bool runWhenDisabled = true) {
+                       bool runWhenDisabled = true)
+      : m_finished{finished}, m_runsWhenDisabled{runWhenDisabled} {
     m_requirements.insert(requirements.begin(), requirements.end());
-    EXPECT_CALL(*this, GetRequirements())
-        .WillRepeatedly(::testing::Return(m_requirements));
-    EXPECT_CALL(*this, IsFinished())
-        .WillRepeatedly(::testing::Return(finished));
-    EXPECT_CALL(*this, RunsWhenDisabled())
-        .WillRepeatedly(::testing::Return(runWhenDisabled));
   }
 
-  MockCommand(MockCommand&& other) {
-    EXPECT_CALL(*this, IsFinished())
-        .WillRepeatedly(::testing::Return(other.IsFinished()));
-    EXPECT_CALL(*this, RunsWhenDisabled())
-        .WillRepeatedly(::testing::Return(other.RunsWhenDisabled()));
-    std::swap(m_requirements, other.m_requirements);
-    EXPECT_CALL(*this, GetRequirements())
-        .WillRepeatedly(::testing::Return(m_requirements));
+  MockCommand(MockCommand&& other) noexcept
+      : CommandHelper{std::move(other)},
+        m_requirements{std::move(other.m_requirements)},
+        m_finished{other.m_finished},
+        m_runsWhenDisabled{other.m_runsWhenDisabled} {}
+
+  MockCommand(const MockCommand& other)
+      : CommandHelper{other},
+        m_requirements{other.m_requirements},
+        m_finished{other.m_finished},
+        m_runsWhenDisabled{other.m_runsWhenDisabled} {}
+
+  wpi::util::SmallSet<Subsystem*, 4> GetRequirements() const override {
+    return m_requirements;
   }
 
-  MockCommand(const MockCommand& other) : CommandHelper{other} {}
+  bool IsFinished() override { return m_finished; }
 
-  void SetFinished(bool finished) {
-    EXPECT_CALL(*this, IsFinished())
-        .WillRepeatedly(::testing::Return(finished));
+  bool RunsWhenDisabled() const override { return m_runsWhenDisabled; }
+
+  void Initialize() override { ++m_initializeCount; }
+
+  void Execute() override { ++m_executeCount; }
+
+  void End(bool interrupted) override {
+    if (interrupted) {
+      ++m_endTrueCount;
+    } else {
+      ++m_endFalseCount;
+    }
+  }
+
+  void SetFinished(bool finished) { m_finished = finished; }
+
+  void ExpectInitialize(int count = 1) { m_expectedInitialize = count; }
+
+  void ExpectExecute(int count = 1) { m_expectedExecute = count; }
+
+  void ExpectEnd(bool interrupted, int count = 1) {
+    m_hasExpectedEnd = true;
+    if (interrupted) {
+      m_expectedEndTrue = count;
+    } else {
+      m_expectedEndFalse = count;
+    }
   }
 
   ~MockCommand() {  // NOLINT
     auto& scheduler = CommandScheduler::GetInstance();
     scheduler.Cancel(this);
+    Verify();
+  }
+
+  void Verify() const {
+    if (m_expectedInitialize) {
+      CHECK(m_initializeCount == *m_expectedInitialize);
+    }
+    if (m_expectedExecute) {
+      CHECK(m_executeCount == *m_expectedExecute);
+    }
+    if (m_hasExpectedEnd) {
+      CHECK(m_endTrueCount == m_expectedEndTrue.value_or(0));
+      CHECK(m_endFalseCount == m_expectedEndFalse.value_or(0));
+    }
   }
 
  private:
   wpi::util::SmallSet<Subsystem*, 4> m_requirements;
+  bool m_finished = false;
+  bool m_runsWhenDisabled = true;
+  int m_initializeCount = 0;
+  int m_executeCount = 0;
+  int m_endTrueCount = 0;
+  int m_endFalseCount = 0;
+  bool m_hasExpectedEnd = false;
+  std::optional<int> m_expectedInitialize;
+  std::optional<int> m_expectedExecute;
+  std::optional<int> m_expectedEndTrue;
+  std::optional<int> m_expectedEndFalse;
 };
 
-class CommandTestBase : public ::testing::Test {
+class CommandTestBase {
  public:
   CommandTestBase();
 
-  ~CommandTestBase() override;
+  virtual ~CommandTestBase();
 
- protected:
   CommandScheduler GetScheduler();
 
   void SetDSEnabled(bool enabled);
 };
 
 template <typename T>
-class CommandTestBaseWithParam : public ::testing::TestWithParam<T> {
+class CommandTestBaseWithParam {
  public:
   CommandTestBaseWithParam() {
     auto& scheduler = CommandScheduler::GetInstance();
@@ -111,12 +143,11 @@ class CommandTestBaseWithParam : public ::testing::TestWithParam<T> {
     SetDSEnabled(true);
   }
 
-  ~CommandTestBaseWithParam() override {
+  virtual ~CommandTestBaseWithParam() {
     CommandScheduler::GetInstance().GetActiveButtonLoop()->Clear();
     CommandScheduler::GetInstance().UnregisterAllSubsystems();
   }
 
- protected:
   CommandScheduler GetScheduler() { return CommandScheduler(); }
 
   void SetDSEnabled(bool enabled) {

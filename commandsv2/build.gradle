@@ -1,6 +1,7 @@
 ext {
     nativeName = 'commandsv2'
     devMain = 'org.wpilib.commandsv2.DevMain'
+    nativeTestSuiteName = "${nativeName}Catch2Test"
 }
 
 evaluationDependsOn(':ntcore')

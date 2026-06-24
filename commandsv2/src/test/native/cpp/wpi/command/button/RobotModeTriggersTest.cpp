@@ -13,37 +13,37 @@ using namespace wpi::cmd;
 using namespace wpi::sim;
 class RobotModeTriggersTest : public CommandTestBase {};
 
-TEST(RobotModeTriggersTest, Autonomous) {
+TEST_CASE("RobotModeTriggersTest Autonomous", "[commandsv2][command]") {
   DriverStationSim::ResetData();
   DriverStationSim::SetRobotMode(wpi::hal::RobotMode::AUTONOMOUS);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
   Trigger autonomous = RobotModeTriggers::Autonomous();
-  EXPECT_TRUE(autonomous.Get());
+  CHECK(autonomous.Get());
 }
 
-TEST(RobotModeTriggersTest, Teleop) {
+TEST_CASE("RobotModeTriggersTest Teleop", "[commandsv2][command]") {
   DriverStationSim::ResetData();
   DriverStationSim::SetRobotMode(wpi::hal::RobotMode::TELEOPERATED);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
   Trigger teleop = RobotModeTriggers::Teleop();
-  EXPECT_TRUE(teleop.Get());
+  CHECK(teleop.Get());
 }
 
-TEST(RobotModeTriggersTest, Disabled) {
+TEST_CASE("RobotModeTriggersTest Disabled", "[commandsv2][command]") {
   DriverStationSim::ResetData();
   DriverStationSim::SetEnabled(false);
   DriverStationSim::NotifyNewData();
   Trigger disabled = RobotModeTriggers::Disabled();
-  EXPECT_TRUE(disabled.Get());
+  CHECK(disabled.Get());
 }
 
-TEST(RobotModeTriggersTest, UtilityMode) {
+TEST_CASE("RobotModeTriggersTest UtilityMode", "[commandsv2][command]") {
   DriverStationSim::ResetData();
   DriverStationSim::SetRobotMode(wpi::hal::RobotMode::UTILITY);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
   Trigger test = RobotModeTriggers::Utility();
-  EXPECT_TRUE(test.Get());
+  CHECK(test.Get());
 }

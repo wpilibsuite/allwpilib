@@ -11,7 +11,8 @@
 using namespace wpi::cmd;
 class WaitCommandTest : public CommandTestBase {};
 
-TEST_F(WaitCommandTest, WaitCommandSchedule) {
+TEST_CASE_METHOD(WaitCommandTest, "WaitCommandTest WaitCommandSchedule",
+                 "[commandsv2][command]") {
   wpi::sim::PauseTiming();
 
   CommandScheduler scheduler = GetScheduler();
@@ -20,10 +21,10 @@ TEST_F(WaitCommandTest, WaitCommandSchedule) {
 
   scheduler.Schedule(command);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(command));
+  CHECK(scheduler.IsScheduled(command));
   wpi::sim::StepTiming(110_ms);
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(command));
+  CHECK_FALSE(scheduler.IsScheduled(command));
 
   wpi::sim::ResumeTiming();
 }
