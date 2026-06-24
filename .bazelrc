@@ -24,10 +24,6 @@ import %workspace%/shared/bazel/compiler_flags/systemcore_flags.rc
 import %workspace%/shared/bazel/compiler_flags/windows_flags.rc
 import %workspace%/shared/bazel/compiler_flags/coverage_flags.rc
 
-# Alias toolchain names to what wpilibsuite uses for CI/Artifact naming
-build:linuxarm32 --config=raspibookworm32
-build:linuxarm64 --config=bookworm64
-
 build:build_java --test_tag_filters=allwpilib-build-java --build_tag_filters=allwpilib-build-java
 build:build_cpp --test_tag_filters=+allwpilib-build-cpp --build_tag_filters=+allwpilib-build-cpp
 build:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
