@@ -4,6 +4,11 @@
 
 #include "wpi/hal/CTREPCM.h"
 
+#include <stdint.h>
+
+#include <algorithm>
+#include <cstring>
+#include <mutex>
 #include <string>
 
 #include <fmt/format.h>
@@ -11,9 +16,13 @@
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
 #include "wpi/hal/CANAPI.h"
+#include "wpi/hal/CANAPITypes.h"
 #include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
+#include "wpi/hal/Types.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/handles/IndexedHandleResource.hpp"
+#include "wpi/util/mutex.hpp"
 
 using namespace wpi::hal;
 
