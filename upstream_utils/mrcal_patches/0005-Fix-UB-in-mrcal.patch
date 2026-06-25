@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Matt <matthew.morley.ca@gmail.com>
 Date: Thu, 5 Dec 2024 00:10:15 -0500
-Subject: [PATCH 8/9] Fix UB in mrcal
+Subject: [PATCH 5/6] Fix UB in mrcal
 
 ---
  mrcal.cpp | 27 ++++++++++++++++-----------
  1 file changed, 16 insertions(+), 11 deletions(-)
 
 diff --git a/mrcal.cpp b/mrcal.cpp
-index 9bf712862c2f0fff25435f7807c0a03005165c3f..ce935cd21f2a175111b3163313e6685fbd260156 100644
+index 5d34130d8c651c298f454981333eda58a1137bd6..e1b2aa78fd6e129dd775caa68545e6afc70a63cb 100644
 --- a/mrcal.cpp
 +++ b/mrcal.cpp
-@@ -4580,7 +4580,6 @@ void optimizer_callback(// input state
+@@ -4554,7 +4554,6 @@ void optimizer_callback(// input state
          // Construct the FULL intrinsics vector, based on either the
          // optimization vector or the inputs, depending on what we're optimizing
          double* intrinsics_here  = &intrinsics_all[icam_intrinsics][0];
@@ -19,7 +19,7 @@ index 9bf712862c2f0fff25435f7807c0a03005165c3f..ce935cd21f2a175111b3163313e6685f
  
          int i_var_intrinsics =
              mrcal_state_index_intrinsics(icam_intrinsics,
-@@ -4602,15 +4601,20 @@ void optimizer_callback(// input state
+@@ -4576,15 +4575,20 @@ void optimizer_callback(// input state
                          &ctx->intrinsics[ctx->Nintrinsics*icam_intrinsics],
                          Ncore*sizeof(double) );
          }
@@ -48,7 +48,7 @@ index 9bf712862c2f0fff25435f7807c0a03005165c3f..ce935cd21f2a175111b3163313e6685f
      }
      for(int icam_extrinsics=0;
          icam_extrinsics<ctx->Ncameras_extrinsics;
-@@ -4697,6 +4701,7 @@ void optimizer_callback(// input state
+@@ -4669,6 +4673,7 @@ void optimizer_callback(// input state
  
          int splined_intrinsics_grad_irun = 0;
  
@@ -56,7 +56,7 @@ index 9bf712862c2f0fff25435f7807c0a03005165c3f..ce935cd21f2a175111b3163313e6685f
          project(q_hypothesis.data(),
  
                  ctx->problem_selections.do_optimize_intrinsics_core || ctx->problem_selections.do_optimize_intrinsics_distortions ?
-@@ -4718,9 +4723,9 @@ void optimizer_callback(// input state
+@@ -4690,9 +4695,9 @@ void optimizer_callback(// input state
  
                  // input
                  intrinsics_all[icam_intrinsics].data(),
