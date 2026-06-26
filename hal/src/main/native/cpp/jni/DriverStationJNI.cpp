@@ -8,12 +8,10 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
-
 #include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_DriverStationJNI.h"
 #include "wpi/hal/DriverStation.h"
-#include "wpi/hal/HAL.h"
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/util/jni_util.hpp"
 
 static_assert(
@@ -446,4 +444,19 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_getOutputsActive
 {
   return HAL_GetOutputsEnabled();
 }
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    writeDisplayAnsi
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_writeDisplayAnsi
+  (JNIEnv* env, jclass, jstring data)
+{
+  JStringRef dataStr{env, data};
+  WPI_String dataWpiStr = dataStr.wpi_str();
+  HAL_WriteDisplayAnsi(&dataWpiStr);
+}
+
 }  // extern "C"

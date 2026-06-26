@@ -3,6 +3,7 @@ import org.gradle.internal.os.OperatingSystem
 ext {
     nativeName = 'cscore'
     devMain = 'org.wpilib.cscore.DevMain'
+    nativeTestSuiteName = "${nativeName}Catch2Test"
 }
 
 // Removed because having the objective-cpp plugin added breaks
@@ -70,7 +71,7 @@ ext {
     sharedCvConfigs = [cscore    : [],
         cscoreBase: [],
         cscoreDev : [],
-        cscoreTest: [],
+        (nativeTestSuiteName): [],
         cscoreJNIShared: []]
     staticCvConfigs = [cscoreJNI: [],
         cscoreJNICvStatic: []]
@@ -171,7 +172,7 @@ model {
     components {
         examplesMap.each { key, value ->
             if (key == "usbviewer") {
-                if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxsystemcore')) {
+                if (!project.hasProperty('onlylinuxsystemcore')) {
                     "${key}"(NativeExecutableSpec) {
                         targetBuildTypes 'debug'
                         binaries.all {

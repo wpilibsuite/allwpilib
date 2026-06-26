@@ -501,6 +501,7 @@ ExitStatus interior_point(
     // Loop until a step is accepted
     while (1) {
       trial_x = x + α * step.p_x;
+      trial_c_i = matrices.c_i(trial_x);
       if (options.feasible_ipm && c_i.cwiseGreater(Scalar(0)).all()) {
         // If the inequality constraints are all feasible, prevent them from
         // becoming infeasible again.
@@ -515,7 +516,6 @@ ExitStatus interior_point(
 
       trial_f = matrices.f(trial_x);
       trial_c_e = matrices.c_e(trial_x);
-      trial_c_i = matrices.c_i(trial_x);
 
       // If f(xₖ + αpₖˣ), cₑ(xₖ + αpₖˣ), or cᵢ(xₖ + αpₖˣ) aren't finite, reduce
       // step size immediately

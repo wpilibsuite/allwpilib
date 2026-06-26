@@ -22,9 +22,9 @@ public final class AlertSim {
       this.activeStartTime = info.activeStartTime;
       this.level =
           switch (info.level) {
-            case 0 -> Level.HIGH;
-            case 1 -> Level.MEDIUM;
-            case 2 -> Level.LOW;
+            case AlertDataJNI.LEVEL_HIGH -> Level.HIGH;
+            case AlertDataJNI.LEVEL_MEDIUM -> Level.MEDIUM;
+            case AlertDataJNI.LEVEL_LOW -> Level.LOW;
             default -> throw new IllegalArgumentException("Unknown alert level: " + info.level);
           };
     }

@@ -62,7 +62,7 @@ public class SysIdRoutineBot {
         .whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Control the shooter wheel with the left trigger
-    shooter.setDefaultCommand(shooter.runShooter(driverController::getLeftTriggerAxis));
+    shooter.setDefaultCommand(shooter.runShooter(driverController::getLeftTrigger));
 
     driverController
         .faceDown()

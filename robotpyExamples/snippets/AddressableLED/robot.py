@@ -18,7 +18,7 @@ class MyRobot(wpilib.TimedRobot):
 
         # Reuse buffer
         # Default to a length of 60
-        self.ledData = [wpilib.AddressableLED.LEDData() for _ in range(60)]
+        self.ledData = wpilib.AddressableLEDBuffer(60)
         self.led.setLength(len(self.ledData))
 
         # Set the data

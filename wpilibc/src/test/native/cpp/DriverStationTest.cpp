@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <string>
+#include <cstring>
 #include <tuple>
 
 #include <gtest/gtest.h>
@@ -37,7 +37,7 @@ INSTANTIATE_TEST_SUITE_P(IsConnectedTests, IsJoystickConnectedParametersTest,
                                            std::make_tuple(4, 10, 1, true)));
 class JoystickConnectionWarningTest
     : public ::testing::TestWithParam<
-          std::tuple<bool, bool, bool, std::string>> {};
+          std::tuple<bool, bool, bool, const char*>> {};
 
 TEST_P(JoystickConnectionWarningTest, JoystickConnectionWarnings) {
   // Capture all output to stderr.
@@ -51,15 +51,17 @@ TEST_P(JoystickConnectionWarningTest, JoystickConnectionWarnings) {
 
   // Create joystick and attempt to retrieve button.
   wpi::Joystick joystick(0);
-  joystick.GetRawButton(1);
+  joystick.GetHID().GetRawButton(1);
 
   wpi::sim::StepTiming(1_s);
   EXPECT_EQ(wpi::internal::DriverStationBackend::
                 IsJoystickConnectionWarningSilenced(),
             std::get<2>(GetParam()));
-  EXPECT_EQ(::testing::internal::GetCapturedStderr().substr(
-                0, std::get<3>(GetParam()).size()),
-            std::get<3>(GetParam()));
+  auto expected = std::get<3>(GetParam());
+  EXPECT_STREQ(::testing::internal::GetCapturedStderr()
+                   .substr(0, std::strlen(expected))
+                   .c_str(),
+               expected);
 }
 
 INSTANTIATE_TEST_SUITE_P(

@@ -68,6 +68,7 @@ tasks.withType(JavaExec).configureEach {
         'java.base/jdk.internal.vm=ALL-UNNAMED',
         '--add-opens',
         'java.base/java.lang=ALL-UNNAMED',
+        "--enable-native-access=ALL-UNNAMED",
     ]
 }
 
@@ -76,6 +77,7 @@ tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
 }
 
 def simProjects = ['halsim_gui']
+def projectJarTask = jar
 
 deploy {
     targets {
@@ -139,10 +141,13 @@ deploy {
                     excludes.add('**/*.so.*.debug')
                 }
 
-                developerRobotJava(JavaArtifact) {
-                    jarTask = shadowJar
+                developerRobotJava(JavaClasspathArtifact) {
+                    it.directory = "wpilib/allwpilibclasspath"
+                    it.deleteOldFiles = true
+                    it.setJar(projectJarTask)
+                    it.setConfiguration(configurations.runtimeClasspath)
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/usr/bin/java -XX:+UseG1GC -Djava.library.path=/home/systemcore/wpilib/third-party/lib -jar /home/systemcore/developerRobot-all.jar' > /home/systemcore/robotCommand")
+                        ctx.execute("echo '/usr/bin/java -XX:+UseG1GC -Djava.library.path=/home/systemcore/wpilib/third-party/lib --add-opens java.base/jdk.internal.vm=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --enable-native-access=ALL-UNNAMED -cp \"/home/systemcore/wpilib/allwpilibclasspath/*\" wpilib.robot.Main' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                     }
                 }

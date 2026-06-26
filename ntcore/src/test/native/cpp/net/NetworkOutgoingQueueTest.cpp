@@ -21,8 +21,6 @@
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
-using namespace std::string_literals;
-
 namespace wpi::nt::net {
 namespace {
 
@@ -119,6 +117,7 @@ std::pair<int, Value> DecodeBinary(std::span<const uint8_t> data,
 }
 
 ClientMessage Publish(int pubuid, std::string_view name) {
+  using namespace std::literals;
   return ClientMessage{PublishMsg{
       pubuid, std::string{name}, "double"s, wpi::util::json::object(), {}}};
 }

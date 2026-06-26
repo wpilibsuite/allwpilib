@@ -4,6 +4,9 @@
 
 #include "CTREPDP.h"
 
+#include <stdint.h>
+
+#include <cstring>
 #include <string>
 
 #include <fmt/format.h>
@@ -12,8 +15,12 @@
 #include "PortsInternal.hpp"
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/CANAPI.h"
+#include "wpi/hal/CANAPITypes.h"
 #include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
+#include "wpi/hal/PowerDistribution.h"
+#include "wpi/hal/Types.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/handles/IndexedHandleResource.hpp"
 
 using namespace wpi::hal;

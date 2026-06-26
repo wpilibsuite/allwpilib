@@ -6,7 +6,6 @@
 
 #include "CommandTestBase.hpp"
 #include "wpi/commands2/Commands.hpp"
-#include "wpi/commands2/WaitUntilCommand.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 
 using namespace wpi::cmd;

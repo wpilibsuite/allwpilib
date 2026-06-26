@@ -4,10 +4,29 @@
 
 package org.wpilib.util;
 
-import java.io.IOException;
-
 /** JNI for alert data. */
 public class AlertDataJNI {
+
+  /**
+   * High priority alert - displayed first with a red "X" symbol. Use this type for problems which
+   * will seriously affect the robot's functionality and thus require immediate attention.
+   */
+  public static final int LEVEL_HIGH = 0;
+
+  /**
+   * Medium priority alert - displayed second with a yellow "!" symbol. Use this type for problems
+   * which could affect the robot's functionality but do not necessarily require immediate
+   * attention.
+   */
+  public static final int LEVEL_MEDIUM = 1;
+
+  /**
+   * Low priority alert - displayed last with a green "i" symbol. Use this type for problems which
+   * are unlikely to affect the robot's functionality, or any other alerts which do not fall under
+   * the other categories.
+   */
+  public static final int LEVEL_LOW = 2;
+
   /** Information about an alert. */
   public static class AlertInfo {
     public AlertInfo(String group, String id, String text, long activeStartTime, int level) {
@@ -26,16 +45,7 @@ public class AlertDataJNI {
 
     public final long activeStartTime; // 0 if not active
 
-    public final int level; // ALERT_LEVEL_HIGH, ALERT_LEVEL_MEDIUM, ALERT_LEVEL_LOW
-  }
-
-  static {
-    try {
-      WPIUtilJNI.forceLoad();
-    } catch (IOException ex) {
-      ex.printStackTrace();
-      System.exit(1);
-    }
+    public final int level; // LEVEL_HIGH, LEVEL_MEDIUM, LEVEL_LOW
   }
 
   /**

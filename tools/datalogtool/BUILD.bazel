@@ -53,7 +53,7 @@ cc_binary(
     deps = [
         "//datalog",
         "//glass",
-        "@bzlmodrio-libssh//libraries/cpp/libssh",
+        "//shared/bazel/thirdparty/libssh",
     ],
 )
 

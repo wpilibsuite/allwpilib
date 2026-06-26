@@ -50,6 +50,8 @@ install(EXPORT wpilibc DESTINATION share/wpilibc)
 
 if(WITH_TESTS)
     wpilib_add_test(wpilibc src/test/native/cpp)
+    file(GLOB_RECURSE wpilibc_generated_test_src src/generated/test/native/cpp/*.cpp)
+    target_sources(wpilibc_test PRIVATE ${wpilibc_generated_test_src})
     target_include_directories(wpilibc_test PRIVATE src/test/native/include)
     target_link_libraries(wpilibc_test wpilibc googletest)
     if(NOT WITH_CSCORE)

@@ -12,6 +12,24 @@ package org.wpilib.util;
  *
  * <p>Alerts should be created once and stored persistently, then updated to "active" or "inactive"
  * as necessary. {@link #set(boolean)} can be safely called periodically.
+ *
+ * <pre>
+ * class Robot {
+ *   Alert alert = new Alert("Something went wrong", Alert.Level.MEDIUM);
+ *
+ *   periodic() {
+ *     alert.set(...);
+ *   }
+ * }
+ * </pre>
+ *
+ * <p>Alternatively, alerts which are only used once at startup can be created and activated inline.
+ *
+ * <pre>
+ * public Robot() {
+ *   new Alert("Failed to load auto paths", Alert.Level.HIGH).set(true);
+ * }
+ * </pre>
  */
 public class Alert implements AutoCloseable {
   /** Represents an alert's level of urgency. */
@@ -20,21 +38,21 @@ public class Alert implements AutoCloseable {
      * High priority alert - displayed first with a red "X" symbol. Use this type for problems which
      * will seriously affect the robot's functionality and thus require immediate attention.
      */
-    HIGH(0),
+    HIGH(AlertDataJNI.LEVEL_HIGH),
 
     /**
      * Medium priority alert - displayed second with a yellow "!" symbol. Use this type for problems
      * which could affect the robot's functionality but do not necessarily require immediate
      * attention.
      */
-    MEDIUM(1),
+    MEDIUM(AlertDataJNI.LEVEL_MEDIUM),
 
     /**
      * Low priority alert - displayed last with a green "i" symbol. Use this type for problems which
      * are unlikely to affect the robot's functionality, or any other alerts which do not fall under
      * the other categories.
      */
-    LOW(2);
+    LOW(AlertDataJNI.LEVEL_LOW);
 
     private final int m_value;
 

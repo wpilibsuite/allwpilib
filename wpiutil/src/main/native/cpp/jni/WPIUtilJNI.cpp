@@ -16,6 +16,10 @@
 #include "wpi/util/print.hpp"
 #include "wpi/util/timestamp.hpp"
 
+static_assert(WPI_ALERT_HIGH == org_wpilib_util_AlertDataJNI_LEVEL_HIGH);
+static_assert(WPI_ALERT_MEDIUM == org_wpilib_util_AlertDataJNI_LEVEL_MEDIUM);
+static_assert(WPI_ALERT_LOW == org_wpilib_util_AlertDataJNI_LEVEL_LOW);
+
 using namespace wpi::util::java;
 
 static bool mockTimeEnabled = false;
