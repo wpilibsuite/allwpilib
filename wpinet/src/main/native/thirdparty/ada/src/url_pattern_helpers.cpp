@@ -1,0 +1,1173 @@
+#if ADA_INCLUDE_URL_PATTERN
+#include "ada/url_pattern_helpers-inl.h"
+
+#include <algorithm>
+#include <array>
+#include <charconv>
+#include <optional>
+#include <ranges>
+#include <string>
+
+#include "ada/character_sets.h"
+#include "ada/helpers.h"
+#include "ada/scheme.h"
+#include "ada/unicode.h"
+
+namespace ada::url_pattern_helpers {
+
+std::tuple<std::string, std::vector<std::string>>
+generate_regular_expression_and_name_list(
+    const std::vector<url_pattern_part>& part_list,
+    url_pattern_compile_component_options options) {
+  // Let result be "^"
+  std::string result = "^";
+  // Reserve capacity to reduce reallocations
+  result.reserve(part_list.size() * 16);
+
+  // Let name list be a new list
+  std::vector<std::string> name_list{};
+  name_list.reserve(part_list.size());
+
+  // Pre-generate segment wildcard regexp if needed (avoids repeated generation)
+  std::string segment_wildcard_regexp;
+
+  // For each part of part list:
+  for (const url_pattern_part& part : part_list) {
+    // If part's type is "fixed-text":
+    if (part.type == url_pattern_part_type::FIXED_TEXT) {
+      // If part's modifier is "none"
+      if (part.modifier == url_pattern_part_modifier::none) {
+        result.append(escape_regexp_string(part.value));
+      } else {
+        // (?:<fixed text>)<modifier>
+        result.append("(?:");
+        result.append(escape_regexp_string(part.value));
+        result.push_back(')');
+        result.append(convert_modifier_to_string(part.modifier));
+      }
+      continue;
+    }
+
+    // Assert: part's name is not the empty string
+    ADA_ASSERT_TRUE(!part.name.empty());
+    name_list.push_back(part.name);
+
+    // Use string_view to avoid copies where possible
+    std::string_view regexp_value = part.value;
+
+    if (part.type == url_pattern_part_type::SEGMENT_WILDCARD) {
+      // Lazy generate segment wildcard regexp
+      if (segment_wildcard_regexp.empty()) {
+        segment_wildcard_regexp = generate_segment_wildcard_regexp(options);
+      }
+      regexp_value = segment_wildcard_regexp;
+    } else if (part.type == url_pattern_part_type::FULL_WILDCARD) {
+      regexp_value = ".*";
+    }
+
+    // If part's prefix is the empty string and part's suffix is the empty
+    // string
+    if (part.prefix.empty() && part.suffix.empty()) {
+      // If part's modifier is "none" or "optional"
+      if (part.modifier == url_pattern_part_modifier::none ||
+          part.modifier == url_pattern_part_modifier::optional) {
+        // (<regexp value>)<modifier>
+        result.push_back('(');
+        result.append(regexp_value);
+        result.push_back(')');
+        result.append(convert_modifier_to_string(part.modifier));
+      } else {
+        // ((?:<regexp value>)<modifier>)
+        result.append("((?:");
+        result.append(regexp_value);
+        result.push_back(')');
+        result.append(convert_modifier_to_string(part.modifier));
+        result.push_back(')');
+      }
+      continue;
+    }
+
+    // If part's modifier is "none" or "optional"
+    if (part.modifier == url_pattern_part_modifier::none ||
+        part.modifier == url_pattern_part_modifier::optional) {
+      // (?:<prefix>(<regexp value>)<suffix>)<modifier>
+      result.append("(?:");
+      result.append(escape_regexp_string(part.prefix));
+      result.push_back('(');
+      result.append(regexp_value);
+      result.push_back(')');
+      result.append(escape_regexp_string(part.suffix));
+      result.push_back(')');
+      result.append(convert_modifier_to_string(part.modifier));
+      continue;
+    }
+
+    // Assert: part's modifier is "zero-or-more" or "one-or-more"
+    ADA_ASSERT_TRUE(part.modifier == url_pattern_part_modifier::zero_or_more ||
+                    part.modifier == url_pattern_part_modifier::one_or_more);
+
+    // Assert: part's prefix is not the empty string or part's suffix is not the
+    // empty string
+    ADA_ASSERT_TRUE(!part.prefix.empty() || !part.suffix.empty());
+
+    // (?:<prefix>((?:<regexp value>)(?:<suffix><prefix>(?:<regexp
+    // value>))*)<suffix>)?
+    // Append "(?:" to the end of result.
+    result.append("(?:");
+    // Append the result of running escape a regexp string given part's prefix
+    // to the end of result.
+    result.append(escape_regexp_string(part.prefix));
+    // Append "((?:" to the end of result.
+    result.append("((?:");
+    // Append regexp value to the end of result.
+    result.append(regexp_value);
+    // Append ")(?:" to the end of result.
+    result.append(")(?:");
+    // Append the result of running escape a regexp string given part's suffix
+    // to the end of result.
+    result.append(escape_regexp_string(part.suffix));
+    // Append the result of running escape a regexp string given part's prefix
+    // to the end of result.
+    result.append(escape_regexp_string(part.prefix));
+    // Append "(?:" to the end of result.
+    result.append("(?:");
+    // Append regexp value to the end of result.
+    result.append(regexp_value);
+    // Append "))*)" to the end of result.
+    result.append("))*)");
+    // Append the result of running escape a regexp string given part's suffix
+    // to the end of result.
+    result.append(escape_regexp_string(part.suffix));
+    // Append ")" to the end of result.
+    result.append(")");
+
+    // If part's modifier is "zero-or-more" then append "?" to the end of result
+    if (part.modifier == url_pattern_part_modifier::zero_or_more) {
+      result += "?";
+    }
+  }
+
+  // Append "$" to the end of result
+  result += "$";
+
+  // Return (result, name list)
+  return {std::move(result), std::move(name_list)};
+}
+
+bool is_ipv6_address(std::string_view input) noexcept {
+  // If input's code point length is less than 2, then return false.
+  if (input.size() < 2) return false;
+
+  // Let input code points be input interpreted as a list of code points.
+  // If input code points[0] is U+005B ([), then return true.
+  if (input.front() == '[') return true;
+  // If input code points[0] is U+007B ({) and input code points[1] is U+005B
+  // ([), then return true.
+  if (input.starts_with("{[")) return true;
+  // If input code points[0] is U+005C (\) and input code points[1] is U+005B
+  // ([), then return true.
+  return input.starts_with("\\[");
+}
+
+std::string_view convert_modifier_to_string(
+    url_pattern_part_modifier modifier) {
+  switch (modifier) {
+      // If modifier is "zero-or-more", then return "*".
+    case url_pattern_part_modifier::zero_or_more:
+      return "*";
+    // If modifier is "optional", then return "?".
+    case url_pattern_part_modifier::optional:
+      return "?";
+    // If modifier is "one-or-more", then return "+".
+    case url_pattern_part_modifier::one_or_more:
+      return "+";
+    // Return the empty string.
+    default:
+      return "";
+  }
+}
+
+std::string generate_segment_wildcard_regexp(
+    url_pattern_compile_component_options options) {
+  // Let result be "[^".
+  std::string result = "[^";
+  // Append the result of running escape a regexp string given options's
+  // delimiter code point to the end of result.
+  result.append(escape_regexp_string(options.get_delimiter()));
+  // Append "]+?" to the end of result.
+  result.append("]+?");
+  // Return result.
+  ada_log("generate_segment_wildcard_regexp result: ", result);
+  return result;
+}
+
+namespace {
+// Unified lookup table for URL pattern character classification
+// Bit flags for different character types
+constexpr uint8_t CHAR_SCHEME = 1;  // valid in scheme (a-z, A-Z, 0-9, +, -, .)
+constexpr uint8_t CHAR_UPPER = 2;   // uppercase letter (needs lowercasing)
+constexpr uint8_t CHAR_SIMPLE_HOSTNAME = 4;  // simple hostname (a-z, 0-9, -, .)
+constexpr uint8_t CHAR_SIMPLE_PATHNAME =
+    8;  // simple pathname (a-z, A-Z, 0-9, /, -, _, ~)
+
+constexpr std::array<uint8_t, 256> char_class_table = []() consteval {
+  std::array<uint8_t, 256> table{};
+  for (int c = 'a'; c <= 'z'; c++)
+    table[c] = CHAR_SCHEME | CHAR_SIMPLE_HOSTNAME | CHAR_SIMPLE_PATHNAME;
+  for (int c = 'A'; c <= 'Z'; c++)
+    table[c] = CHAR_SCHEME | CHAR_UPPER | CHAR_SIMPLE_PATHNAME;
+  for (int c = '0'; c <= '9'; c++)
+    table[c] = CHAR_SCHEME | CHAR_SIMPLE_HOSTNAME | CHAR_SIMPLE_PATHNAME;
+  table['+'] = CHAR_SCHEME;
+  table['-'] = CHAR_SCHEME | CHAR_SIMPLE_HOSTNAME | CHAR_SIMPLE_PATHNAME;
+  table['.'] =
+      CHAR_SCHEME | CHAR_SIMPLE_HOSTNAME;  // not pathname (needs normalization)
+  table['/'] = CHAR_SIMPLE_PATHNAME;
+  table['_'] = CHAR_SIMPLE_PATHNAME;
+  table['~'] = CHAR_SIMPLE_PATHNAME;
+  return table;
+}();
+}  // namespace
+
+tl::expected<std::string, errors> canonicalize_protocol(
+    std::string_view input) {
+  ada_log("canonicalize_protocol called with input=", input);
+  if (input.empty()) [[unlikely]] {
+    return "";
+  }
+
+  if (input.ends_with(":")) {
+    input.remove_suffix(1);
+  }
+
+  // Fast path: special schemes are already canonical
+  if (scheme::is_special(input)) {
+    return std::string(input);
+  }
+
+  // Fast path: validate scheme chars and check for uppercase
+  // First char must be alpha (not +, -, ., or digit)
+  uint8_t first_flags = char_class_table[static_cast<uint8_t>(input[0])];
+  if (!(first_flags & CHAR_SCHEME) || input[0] == '+' || input[0] == '-' ||
+      input[0] == '.' || unicode::is_ascii_digit(input[0])) {
+    return tl::unexpected(errors::type_error);
+  }
+
+  uint8_t needs_lowercase = first_flags & CHAR_UPPER;
+  for (size_t i = 1; i < input.size(); i++) {
+    uint8_t flags = char_class_table[static_cast<uint8_t>(input[i])];
+    if (!(flags & CHAR_SCHEME)) {
+      return tl::unexpected(errors::type_error);
+    }
+    needs_lowercase |= flags & CHAR_UPPER;
+  }
+
+  if (needs_lowercase == 0) {
+    return std::string(input);
+  }
+
+  std::string result(input);
+  unicode::to_lower_ascii(result.data(), result.size());
+  return result;
+}
+
+tl::expected<std::string, errors> canonicalize_username(
+    std::string_view input) {
+  // If value is the empty string, return value.
+  if (input.empty()) [[unlikely]] {
+    return "";
+  }
+  // Percent-encode the input using the userinfo percent-encode set.
+  size_t idx = ada::unicode::percent_encode_index(
+      input, character_sets::USERINFO_PERCENT_ENCODE);
+  if (idx == input.size()) {
+    // No encoding needed, return input as-is
+    return std::string(input);
+  }
+  // Percent-encode from the first character that needs encoding
+  return ada::unicode::percent_encode(
+      input, character_sets::USERINFO_PERCENT_ENCODE, idx);
+}
+
+tl::expected<std::string, errors> canonicalize_password(
+    std::string_view input) {
+  // If value is the empty string, return value.
+  if (input.empty()) [[unlikely]] {
+    return "";
+  }
+  // Percent-encode the input using the userinfo percent-encode set.
+  size_t idx = ada::unicode::percent_encode_index(
+      input, character_sets::USERINFO_PERCENT_ENCODE);
+  if (idx == input.size()) {
+    // No encoding needed, return input as-is
+    return std::string(input);
+  }
+  // Percent-encode from the first character that needs encoding
+  return ada::unicode::percent_encode(
+      input, character_sets::USERINFO_PERCENT_ENCODE, idx);
+}
+
+tl::expected<std::string, errors> canonicalize_hostname(
+    std::string_view input) {
+  ada_log("canonicalize_hostname input=", input);
+  if (input.empty()) [[unlikely]] {
+    return "";
+  }
+
+  // Fast path: simple hostnames (lowercase ASCII, digits, -, .) need no IDNA
+  bool needs_processing = false;
+  for (char c : input) {
+    needs_processing |=
+        !(char_class_table[static_cast<uint8_t>(c)] & CHAR_SIMPLE_HOSTNAME);
+  }
+  if (!needs_processing) {
+    return std::string(input);
+  }
+
+  // Let dummyURL be a new URL record.
+  // Let parseResult be the result of running the basic URL parser given value
+  // with dummyURL as url and hostname state as state override.
+
+  // IMPORTANT: The protocol needs to be a special protocol, otherwise the
+  // hostname will not be converted using IDNA.
+  auto url = ada::parse<url_aggregator>("https://dummy.test", nullptr);
+  ADA_ASSERT_TRUE(url);
+  // if (!isValidHostnameInput(hostname)) return kj::none;
+  if (!url->set_hostname(input)) {
+    // If parseResult is failure, then throw a TypeError.
+    return tl::unexpected(errors::type_error);
+  }
+  // Return dummyURL's host, serialized, or empty string if it is null.
+  return std::string(url->get_hostname());
+}
+
+tl::expected<std::string, errors> canonicalize_ipv6_hostname(
+    std::string_view input) {
+  ada_log("canonicalize_ipv6_hostname input=", input);
+  // TODO: Optimization opportunity: Use lookup table to speed up checking
+  if (std::ranges::any_of(input, [](char c) {
+        return c != '[' && c != ']' && c != ':' &&
+               !unicode::is_ascii_hex_digit(c);
+      })) {
+    return tl::unexpected(errors::type_error);
+  }
+  // Append the result of running ASCII lowercase given code point to the end of
+  // result.
+  auto hostname = std::string(input);
+  unicode::to_lower_ascii(hostname.data(), hostname.size());
+  return hostname;
+}
+
+tl::expected<std::string, errors> canonicalize_port(
+    std::string_view port_value) {
+  // If portValue is the empty string, return portValue.
+  if (port_value.empty()) [[unlikely]] {
+    return "";
+  }
+
+  // Remove ASCII tab or newline characters
+  std::string trimmed(port_value);
+  helpers::remove_ascii_tab_or_newline(trimmed);
+
+  if (trimmed.empty()) {
+    return "";
+  }
+
+  // Input should start with a digit character
+  if (!unicode::is_ascii_digit(trimmed.front())) {
+    return tl::unexpected(errors::type_error);
+  }
+
+  // Find the first non-digit character
+  auto first_non_digit =
+      std::ranges::find_if_not(trimmed, unicode::is_ascii_digit);
+  std::string_view digits_to_parse =
+      std::string_view(trimmed.data(), first_non_digit - trimmed.begin());
+
+  // Here we have that a range of ASCII digit characters identified
+  // by digits_to_parse. It is none empty.
+  // We want to determine whether it is a valid port number (0-65535).
+  // Clearly, if the length is greater than 5, it is invalid.
+  // If the length is 5, we need to compare lexicographically to "65535".
+  // Otherwise it is valid.
+  if (digits_to_parse.size() == 5) {
+    if (digits_to_parse > "65535") {
+      return tl::unexpected(errors::type_error);
+    }
+  } else if (digits_to_parse.size() > 5) {
+    return tl::unexpected(errors::type_error);
+  }
+  if (digits_to_parse[0] == '0' && digits_to_parse.size() > 1) {
+    // Leading zeros are not allowed for multi-digit ports
+    return tl::unexpected(errors::type_error);
+  }
+  // It is valid! Most times, we do not need to parse it into an integer.
+  return std::string(digits_to_parse);
+}
+
+tl::expected<std::string, errors> canonicalize_port_with_protocol(
+    std::string_view port_value, std::string_view protocol) {
+  // If portValue is the empty string, return portValue.
+  if (port_value.empty()) [[unlikely]] {
+    return "";
+  }
+
+  // Handle empty or trailing colon in protocol
+  if (protocol.empty()) {
+    protocol = "fake";
+  } else if (protocol.ends_with(":")) {
+    protocol.remove_suffix(1);
+  }
+
+  // Remove ASCII tab or newline characters
+  std::string trimmed(port_value);
+  helpers::remove_ascii_tab_or_newline(trimmed);
+
+  if (trimmed.empty()) {
+    return "";
+  }
+
+  // Input should start with a digit character
+  if (!unicode::is_ascii_digit(trimmed.front())) {
+    return tl::unexpected(errors::type_error);
+  }
+
+  // Find the first non-digit character
+  auto first_non_digit =
+      std::ranges::find_if_not(trimmed, unicode::is_ascii_digit);
+  std::string_view digits_to_parse =
+      std::string_view(trimmed.data(), first_non_digit - trimmed.begin());
+
+  // Parse the port number
+  uint16_t parsed_port{};
+  auto result = std::from_chars(digits_to_parse.data(),
+                                digits_to_parse.data() + digits_to_parse.size(),
+                                parsed_port);
+
+  if (result.ec == std::errc::result_out_of_range) {
+    return tl::unexpected(errors::type_error);
+  }
+
+  if (result.ec == std::errc()) {
+    // Check if this is the default port for the scheme
+    uint16_t default_port = scheme::get_special_port(protocol);
+
+    // If it's the default port for a special scheme, return empty string
+    if (default_port != 0 && default_port == parsed_port) {
+      return "";
+    }
+
+    // Successfully parsed, return as string
+    return std::to_string(parsed_port);
+  }
+
+  return tl::unexpected(errors::type_error);
+}
+
+tl::expected<std::string, errors> canonicalize_pathname(
+    std::string_view input) {
+  if (input.empty()) [[unlikely]] {
+    return "";
+  }
+
+  // Fast path: simple pathnames (no . which needs normalization) can be
+  // returned as-is
+  bool needs_processing = false;
+  for (char c : input) {
+    needs_processing |=
+        !(char_class_table[static_cast<uint8_t>(c)] & CHAR_SIMPLE_PATHNAME);
+  }
+  if (!needs_processing) {
+    return std::string(input);
+  }
+
+  // Let leading slash be true if the first code point in value is U+002F (/)
+  // and otherwise false.
+  const bool leading_slash = input.starts_with("/");
+  // Let modified value be "/-" if leading slash is false and otherwise the
+  // empty string.
+  const auto modified_value = leading_slash ? "" : "/-";
+  const auto full_url =
+      std::string("fake://fake-url") + modified_value + std::string(input);
+  if (auto url = ada::parse<url_aggregator>(full_url, nullptr)) {
+    const auto pathname = url->get_pathname();
+    // If leading slash is false, then set result to the code point substring
+    // from 2 to the end of the string within result.
+    if (!leading_slash) {
+      // pathname should start with "/-" but path traversal (e.g. "../../")
+      // can reduce it to just "/" which is shorter than 2 characters.
+      if (pathname.size() < 2) {
+        return tl::unexpected(errors::type_error);
+      }
+      return std::string(pathname.substr(2));
+    }
+    return std::string(pathname);
+  }
+  // If parseResult is failure, then throw a TypeError.
+  return tl::unexpected(errors::type_error);
+}
+
+tl::expected<std::string, errors> canonicalize_opaque_pathname(
+    std::string_view input) {
+  // If value is the empty string, return value.
+  if (input.empty()) [[unlikely]] {
+    return "";
+  }
+  // Let dummyURL be a new URL record.
+  // Set dummyURL's path to the empty string.
+  // Let parseResult be the result of running URL parsing given value with
+  // dummyURL as url and opaque path state as state override.
+  if (auto url =
+          ada::parse<url_aggregator>("fake:" + std::string(input), nullptr)) {
+    // Return the result of URL path serializing dummyURL.
+    return std::string(url->get_pathname());
+  }
+  // If parseResult is failure, then throw a TypeError.
+  return tl::unexpected(errors::type_error);
+}
+
+tl::expected<std::string, errors> canonicalize_search(std::string_view input) {
+  // If value is the empty string, return value.
+  if (input.empty()) [[unlikely]] {
+    return "";
+  }
+  // Remove leading '?' if present
+  std::string new_value;
+  new_value = input[0] == '?' ? input.substr(1) : input;
+  // Remove ASCII tab or newline characters
+  helpers::remove_ascii_tab_or_newline(new_value);
+
+  if (new_value.empty()) {
+    return "";
+  }
+
+  // Percent-encode using QUERY_PERCENT_ENCODE (for non-special URLs)
+  // Note: "fake://dummy.test" is not a special URL, so we use
+  // QUERY_PERCENT_ENCODE
+  size_t idx = ada::unicode::percent_encode_index(
+      new_value, character_sets::QUERY_PERCENT_ENCODE);
+  if (idx == new_value.size()) {
+    // No encoding needed
+    return new_value;
+  }
+  // Percent-encode from the first character that needs encoding
+  return ada::unicode::percent_encode(
+      new_value, character_sets::QUERY_PERCENT_ENCODE, idx);
+}
+
+tl::expected<std::string, errors> canonicalize_hash(std::string_view input) {
+  // If value is the empty string, return value.
+  if (input.empty()) [[unlikely]] {
+    return "";
+  }
+  // Remove leading '#' if present
+  std::string new_value;
+  new_value = input[0] == '#' ? input.substr(1) : input;
+  // Remove ASCII tab or newline characters
+  helpers::remove_ascii_tab_or_newline(new_value);
+
+  if (new_value.empty()) {
+    return "";
+  }
+
+  // Percent-encode using FRAGMENT_PERCENT_ENCODE
+  size_t idx = ada::unicode::percent_encode_index(
+      new_value, character_sets::FRAGMENT_PERCENT_ENCODE);
+  if (idx == new_value.size()) {
+    // No encoding needed
+    return new_value;
+  }
+  // Percent-encode from the first character that needs encoding
+  return ada::unicode::percent_encode(
+      new_value, character_sets::FRAGMENT_PERCENT_ENCODE, idx);
+}
+
+tl::expected<std::vector<token>, errors> tokenize(std::string_view input,
+                                                  token_policy policy) {
+  ada_log("tokenize input: ", input);
+  // Let tokenizer be a new tokenizer.
+  // Set tokenizer's input to input.
+  // Set tokenizer's policy to policy.
+  auto tokenizer = Tokenizer(input, policy);
+  // While tokenizer's index is less than tokenizer's input's code point length:
+  while (tokenizer.index < tokenizer.input.size()) {
+    // Run seek and get the next code point given tokenizer and tokenizer's
+    // index.
+    tokenizer.seek_and_get_next_code_point(tokenizer.index);
+
+    // If tokenizer's code point is U+002A (*):
+    if (tokenizer.code_point == '*') {
+      // Run add a token with default position and length given tokenizer and
+      // "asterisk".
+      tokenizer.add_token_with_defaults(token_type::ASTERISK);
+      ada_log("add ASTERISK token");
+      // Continue.
+      continue;
+    }
+
+    // If tokenizer's code point is U+002B (+) or U+003F (?):
+    if (tokenizer.code_point == '+' || tokenizer.code_point == '?') {
+      // Run add a token with default position and length given tokenizer and
+      // "other-modifier".
+      tokenizer.add_token_with_defaults(token_type::OTHER_MODIFIER);
+      // Continue.
+      continue;
+    }
+
+    // If tokenizer's code point is U+005C (\):
+    if (tokenizer.code_point == '\\') {
+      // If tokenizer's index is equal to tokenizer's input's code point length
+      // - 1:
+      if (tokenizer.index == tokenizer.input.size() - 1) {
+        // Run process a tokenizing error given tokenizer, tokenizer's next
+        // index, and tokenizer's index.
+        if (auto error = tokenizer.process_tokenizing_error(
+                tokenizer.next_index, tokenizer.index)) {
+          ada_log("process_tokenizing_error failed");
+          return tl::unexpected(*error);
+        }
+        continue;
+      }
+
+      // Let escaped index be tokenizer's next index.
+      auto escaped_index = tokenizer.next_index;
+      // Run get the next code point given tokenizer.
+      tokenizer.get_next_code_point();
+      // Run add a token with default length given tokenizer, "escaped-char",
+      // tokenizer's next index, and escaped index.
+      tokenizer.add_token_with_default_length(
+          token_type::ESCAPED_CHAR, tokenizer.next_index, escaped_index);
+      ada_log("add ESCAPED_CHAR token on next_index ", tokenizer.next_index,
+              " with escaped index ", escaped_index);
+      // Continue.
+      continue;
+    }
+
+    // If tokenizer's code point is U+007B ({):
+    if (tokenizer.code_point == '{') {
+      // Run add a token with default position and length given tokenizer and
+      // "open".
+      tokenizer.add_token_with_defaults(token_type::OPEN);
+      ada_log("add OPEN token");
+      continue;
+    }
+
+    // If tokenizer's code point is U+007D (}):
+    if (tokenizer.code_point == '}') {
+      // Run add a token with default position and length given tokenizer and
+      // "close".
+      tokenizer.add_token_with_defaults(token_type::CLOSE);
+      ada_log("add CLOSE token");
+      continue;
+    }
+
+    // If tokenizer's code point is U+003A (:):
+    if (tokenizer.code_point == ':') {
+      // Let name position be tokenizer's next index.
+      auto name_position = tokenizer.next_index;
+      // Let name start be name position.
+      auto name_start = name_position;
+      // While name position is less than tokenizer's input's code point length:
+      while (name_position < tokenizer.input.size()) {
+        // Run seek and get the next code point given tokenizer and name
+        // position.
+        tokenizer.seek_and_get_next_code_point(name_position);
+        // Let first code point be true if name position equals name start and
+        // false otherwise.
+        bool first_code_point = name_position == name_start;
+        // Let valid code point be the result of running is a valid name code
+        // point given tokenizer's code point and first code point.
+        auto valid_code_point =
+            idna::valid_name_code_point(tokenizer.code_point, first_code_point);
+        ada_log("tokenizer.code_point=", uint32_t(tokenizer.code_point),
+                " first_code_point=", first_code_point,
+                " valid_code_point=", valid_code_point);
+        // If valid code point is false break.
+        if (!valid_code_point) break;
+        // Set name position to tokenizer's next index.
+        name_position = tokenizer.next_index;
+      }
+
+      // If name position is less than or equal to name start:
+      if (name_position <= name_start) {
+        // Run process a tokenizing error given tokenizer, name start, and
+        // tokenizer's index.
+        if (auto error = tokenizer.process_tokenizing_error(name_start,
+                                                            tokenizer.index)) {
+          ada_log("process_tokenizing_error failed");
+          return tl::unexpected(*error);
+        }
+        // Continue
+        continue;
+      }
+
+      // Run add a token with default length given tokenizer, "name", name
+      // position, and name start.
+      tokenizer.add_token_with_default_length(token_type::NAME, name_position,
+                                              name_start);
+      continue;
+    }
+
+    // If tokenizer's code point is U+0028 (():
+    if (tokenizer.code_point == '(') {
+      // Let depth be 1.
+      size_t depth = 1;
+      // Let regexp position be tokenizer's next index.
+      auto regexp_position = tokenizer.next_index;
+      // Let regexp start be regexp position.
+      auto regexp_start = regexp_position;
+      // Let error be false.
+      bool error = false;
+
+      // While regexp position is less than tokenizer's input's code point
+      // length:
+      while (regexp_position < tokenizer.input.size()) {
+        // Run seek and get the next code point given tokenizer and regexp
+        // position.
+        tokenizer.seek_and_get_next_code_point(regexp_position);
+
+        // TODO: Optimization opportunity: The next 2 if statements can be
+        // merged. If the result of running is ASCII given tokenizer's code
+        // point is false:
+        if (!unicode::is_ascii(tokenizer.code_point)) {
+          // Run process a tokenizing error given tokenizer, regexp start, and
+          // tokenizer's index.
+          if (auto process_error = tokenizer.process_tokenizing_error(
+                  regexp_start, tokenizer.index)) {
+            return tl::unexpected(*process_error);
+          }
+          // Set error to true.
+          error = true;
+          break;
+        }
+
+        // If regexp position equals regexp start and tokenizer's code point is
+        // U+003F (?):
+        if (regexp_position == regexp_start && tokenizer.code_point == '?') {
+          // Run process a tokenizing error given tokenizer, regexp start, and
+          // tokenizer's index.
+          if (auto process_error = tokenizer.process_tokenizing_error(
+                  regexp_start, tokenizer.index)) {
+            return tl::unexpected(*process_error);
+          }
+          // Set error to true;
+          error = true;
+          break;
+        }
+
+        // If tokenizer's code point is U+005C (\):
+        if (tokenizer.code_point == '\\') {
+          // If regexp position equals tokenizer's input's code point length - 1
+          if (regexp_position == tokenizer.input.size() - 1) {
+            // Run process a tokenizing error given tokenizer, regexp start, and
+            // tokenizer's index.
+            if (auto process_error = tokenizer.process_tokenizing_error(
+                    regexp_start, tokenizer.index)) {
+              return tl::unexpected(*process_error);
+            }
+            // Set error to true.
+            error = true;
+            break;
+          }
+          // Run get the next code point given tokenizer.
+          tokenizer.get_next_code_point();
+          // If the result of running is ASCII given tokenizer's code point is
+          // false:
+          if (!unicode::is_ascii(tokenizer.code_point)) {
+            // Run process a tokenizing error given tokenizer, regexp start, and
+            // tokenizer's index.
+            if (auto process_error = tokenizer.process_tokenizing_error(
+                    regexp_start, tokenizer.index);
+                process_error.has_value()) {
+              return tl::unexpected(*process_error);
+            }
+            // Set error to true.
+            error = true;
+            break;
+          }
+          // Set regexp position to tokenizer's next index.
+          regexp_position = tokenizer.next_index;
+          continue;
+        }
+
+        // If tokenizer's code point is U+0029 ()):
+        if (tokenizer.code_point == ')') {
+          // Decrement depth by 1.
+          depth--;
+          // If depth is 0:
+          if (depth == 0) {
+            // Set regexp position to tokenizer's next index.
+            regexp_position = tokenizer.next_index;
+            // Break.
+            break;
+          }
+        } else if (tokenizer.code_point == '(') {
+          // Otherwise if tokenizer's code point is U+0028 (():
+          // Increment depth by 1.
+          depth++;
+          // If regexp position equals tokenizer's input's code point length -
+          // 1:
+          if (regexp_position == tokenizer.input.size() - 1) {
+            // Run process a tokenizing error given tokenizer, regexp start, and
+            // tokenizer's index.
+            if (auto process_error = tokenizer.process_tokenizing_error(
+                    regexp_start, tokenizer.index)) {
+              return tl::unexpected(*process_error);
+            }
+            // Set error to true.
+            error = true;
+            break;
+          }
+          // Let temporary position be tokenizer's next index.
+          auto temporary_position = tokenizer.next_index;
+          // Run get the next code point given tokenizer.
+          tokenizer.get_next_code_point();
+          // If tokenizer's code point is not U+003F (?):
+          if (tokenizer.code_point != '?') {
+            // Run process a tokenizing error given tokenizer, regexp start, and
+            // tokenizer's index.
+            if (auto process_error = tokenizer.process_tokenizing_error(
+                    regexp_start, tokenizer.index)) {
+              return tl::unexpected(*process_error);
+            }
+            // Set error to true.
+            error = true;
+            break;
+          }
+          // Set tokenizer's next index to temporary position.
+          tokenizer.next_index = temporary_position;
+        }
+        // Set regexp position to tokenizer's next index.
+        regexp_position = tokenizer.next_index;
+      }
+
+      // If error is true continue.
+      if (error) continue;
+      // If depth is not zero:
+      if (depth != 0) {
+        // Run process a tokenizing error given tokenizer, regexp start, and
+        // tokenizer's index.
+        if (auto process_error = tokenizer.process_tokenizing_error(
+                regexp_start, tokenizer.index)) {
+          return tl::unexpected(*process_error);
+        }
+        continue;
+      }
+      // Let regexp length be regexp position - regexp start - 1.
+      auto regexp_length = regexp_position - regexp_start - 1;
+      // If regexp length is zero:
+      if (regexp_length == 0) {
+        // Run process a tokenizing error given tokenizer, regexp start, and
+        // tokenizer's index.
+        if (auto process_error = tokenizer.process_tokenizing_error(
+                regexp_start, tokenizer.index)) {
+          ada_log("process_tokenizing_error failed");
+          return tl::unexpected(*process_error);
+        }
+        continue;
+      }
+      // Run add a token given tokenizer, "regexp", regexp position, regexp
+      // start, and regexp length.
+      tokenizer.add_token(token_type::REGEXP, regexp_position, regexp_start,
+                          regexp_length);
+      continue;
+    }
+    // Run add a token with default position and length given tokenizer and
+    // "char".
+    tokenizer.add_token_with_defaults(token_type::CHAR);
+  }
+  // Run add a token with default length given tokenizer, "end", tokenizer's
+  // index, and tokenizer's index.
+  tokenizer.add_token_with_default_length(token_type::END, tokenizer.index,
+                                          tokenizer.index);
+
+  ada_log("tokenizer.token_list size is: ", tokenizer.token_list.size());
+  // Return tokenizer's token list.
+  return tokenizer.token_list;
+}
+
+namespace {
+constexpr std::array<uint8_t, 256> escape_pattern_table = []() consteval {
+  std::array<uint8_t, 256> out{};
+  for (auto& c : {'+', '*', '?', ':', '{', '}', '(', ')', '\\'}) {
+    out[c] = 1;
+  }
+  return out;
+}();
+
+constexpr bool should_escape_pattern_char(char c) {
+  return escape_pattern_table[static_cast<uint8_t>(c)];
+}
+}  // namespace
+
+std::string escape_pattern_string(std::string_view input) {
+  ada_log("escape_pattern_string called with input=", input);
+  if (input.empty()) [[unlikely]] {
+    return "";
+  }
+  // Assert: input is an ASCII string.
+  ADA_ASSERT_TRUE(ada::idna::is_ascii(input));
+  // Let result be the empty string.
+  std::string result{};
+  // Reserve extra space for potential escapes
+  result.reserve(input.size() * 2);
+
+  // While index is less than input's length:
+  for (const char c : input) {
+    if (should_escape_pattern_char(c)) {
+      // Append U+005C (\) to the end of result.
+      result.push_back('\\');
+    }
+    // Append c to the end of result.
+    result.push_back(c);
+  }
+  // Return result.
+  return result;
+}
+
+namespace {
+constexpr std::array<uint8_t, 256> escape_regexp_table = []() consteval {
+  std::array<uint8_t, 256> out{};
+  for (auto& c : {'.', '+', '*', '?', '^', '$', '{', '}', '(', ')', '[', ']',
+                  '|', '/', '\\'}) {
+    out[c] = 1;
+  }
+  return out;
+}();
+
+constexpr bool should_escape_regexp_char(char c) {
+  return escape_regexp_table[(uint8_t)c];
+}
+}  // namespace
+
+std::string escape_regexp_string(std::string_view input) {
+  // Assert: input is an ASCII string.
+  ADA_ASSERT_TRUE(idna::is_ascii(input));
+  // Let result be the empty string.
+  std::string result{};
+  // Reserve extra space for potential escapes (worst case: all chars escaped)
+  result.reserve(input.size() * 2);
+  for (const char c : input) {
+    if (should_escape_regexp_char(c)) {
+      // Avoid temporary string allocation - directly append characters
+      result.push_back('\\');
+      result.push_back(c);
+    } else {
+      result.push_back(c);
+    }
+  }
+  return result;
+}
+
+std::string process_base_url_string(std::string_view input,
+                                    url_pattern_init::process_type type) {
+  // If type is not "pattern" return input.
+  if (type != url_pattern_init::process_type::pattern) {
+    return std::string(input);
+  }
+  // Return the result of escaping a pattern string given input.
+  return escape_pattern_string(input);
+}
+
+constexpr bool is_absolute_pathname(
+    std::string_view input, url_pattern_init::process_type type) noexcept {
+  // If input is the empty string, then return false.
+  if (input.empty()) [[unlikely]] {
+    return false;
+  }
+  // If input[0] is U+002F (/), then return true.
+  if (input.starts_with("/")) return true;
+  // If type is "url", then return false.
+  if (type == url_pattern_init::process_type::url) return false;
+  // If input's code point length is less than 2, then return false.
+  if (input.size() < 2) return false;
+  // If input[0] is U+005C (\) and input[1] is U+002F (/), then return true.
+  // If input[0] is U+007B ({) and input[1] is U+002F (/), then return true.
+  // Return false.
+  return input[1] == '/' && (input[0] == '\\' || input[0] == '{');
+}
+
+std::string generate_pattern_string(
+    std::vector<url_pattern_part>& part_list,
+    url_pattern_compile_component_options& options) {
+  // Let result be the empty string.
+  std::string result{};
+  // Let index list be the result of getting the indices for part list.
+  // For each index of index list:
+  for (size_t index = 0; index < part_list.size(); index++) {
+    // Let part be part list[index].
+    // Use reference to avoid copy
+    const auto& part = part_list[index];
+    // Let previous part be part list[index - 1] if index is greater than 0,
+    // otherwise let it be null.
+    // Use pointer to avoid copy
+    const url_pattern_part* previous_part =
+        index == 0 ? nullptr : &part_list[index - 1];
+    // Let next part be part list[index + 1] if index is less than index list's
+    // size - 1, otherwise let it be null.
+    const url_pattern_part* next_part =
+        index < part_list.size() - 1 ? &part_list[index + 1] : nullptr;
+    // If part's type is "fixed-text" then:
+    if (part.type == url_pattern_part_type::FIXED_TEXT) {
+      // If part's modifier is "none" then:
+      if (part.modifier == url_pattern_part_modifier::none) {
+        // Append the result of running escape a pattern string given part's
+        // value to the end of result.
+        result.append(escape_pattern_string(part.value));
+        continue;
+      }
+      // Append "{" to the end of result.
+      result += "{";
+      // Append the result of running escape a pattern string given part's value
+      // to the end of result.
+      result.append(escape_pattern_string(part.value));
+      // Append "}" to the end of result.
+      result += "}";
+      // Append the result of running convert a modifier to a string given
+      // part's modifier to the end of result.
+      result.append(convert_modifier_to_string(part.modifier));
+      continue;
+    }
+    // Let custom name be true if part's name[0] is not an ASCII digit;
+    // otherwise false.
+    bool custom_name = !unicode::is_ascii_digit(part.name[0]);
+    // Let needs grouping be true if at least one of the following are true,
+    // otherwise let it be false:
+    // - part's suffix is not the empty string.
+    // - part's prefix is not the empty string and is not options's prefix code
+    // point.
+    bool needs_grouping =
+        !part.suffix.empty() ||
+        (!part.prefix.empty() && !options.get_prefix().empty() &&
+         part.prefix[0] != options.get_prefix()[0]);
+
+    // If all of the following are true:
+    // - needs grouping is false; and
+    // - custom name is true; and
+    // - part's type is "segment-wildcard"; and
+    // - part's modifier is "none"; and
+    // - next part is not null; and
+    // - next part's prefix is the empty string; and
+    // - next part's suffix is the empty string
+    if (!needs_grouping && custom_name &&
+        part.type == url_pattern_part_type::SEGMENT_WILDCARD &&
+        part.modifier == url_pattern_part_modifier::none && next_part &&
+        next_part->prefix.empty() && next_part->suffix.empty()) {
+      // If next part's type is "fixed-text":
+      if (next_part->type == url_pattern_part_type::FIXED_TEXT) {
+        // Set needs grouping to true if the result of running is a valid name
+        // code point given next part's value's first code point and the boolean
+        // false is true.
+        if (idna::valid_name_code_point(next_part->value[0], false)) {
+          needs_grouping = true;
+        }
+      } else {
+        // Set needs grouping to true if next part's name[0] is an ASCII digit.
+        needs_grouping = !next_part->name.empty() &&
+                         unicode::is_ascii_digit(next_part->name[0]);
+      }
+    }
+
+    // If all of the following are true:
+    // - needs grouping is false; and
+    // - part's prefix is the empty string; and
+    // - previous part is not null; and
+    // - previous part's type is "fixed-text"; and
+    // - previous part's value's last code point is options's prefix code point.
+    // then set needs grouping to true.
+    if (!needs_grouping && part.prefix.empty() && previous_part &&
+        previous_part->type == url_pattern_part_type::FIXED_TEXT &&
+        !previous_part->value.empty() && !options.get_prefix().empty() &&
+        previous_part->value.back() == options.get_prefix()[0]) {
+      needs_grouping = true;
+    }
+
+    // Assert: part's name is not the empty string or null.
+    ADA_ASSERT_TRUE(!part.name.empty());
+
+    // If needs grouping is true, then append "{" to the end of result.
+    if (needs_grouping) {
+      result.append("{");
+    }
+
+    // Append the result of running escape a pattern string given part's prefix
+    // to the end of result.
+    result.append(escape_pattern_string(part.prefix));
+
+    // If custom name is true:
+    if (custom_name) {
+      // Append ":" to the end of result.
+      result.append(":");
+      // Append part's name to the end of result.
+      result.append(part.name);
+    }
+
+    // If part's type is "regexp" then:
+    if (part.type == url_pattern_part_type::REGEXP) {
+      // Append "(" to the end of result.
+      result.append("(");
+      // Append part's value to the end of result.
+      result.append(part.value);
+      // Append ")" to the end of result.
+      result.append(")");
+    } else if (part.type == url_pattern_part_type::SEGMENT_WILDCARD &&
+               !custom_name) {
+      // Otherwise if part's type is "segment-wildcard" and custom name is
+      // false: Append "(" to the end of result.
+      result.append("(");
+      // Append the result of running generate a segment wildcard regexp given
+      // options to the end of result.
+      result.append(generate_segment_wildcard_regexp(options));
+      // Append ")" to the end of result.
+      result.append(")");
+    } else if (part.type == url_pattern_part_type::FULL_WILDCARD) {
+      // Otherwise if part's type is "full-wildcard":
+      // If custom name is false and one of the following is true:
+      // - previous part is null; or
+      // - previous part's type is "fixed-text"; or
+      // - previous part's modifier is not "none"; or
+      // - needs grouping is true; or
+      // - part's prefix is not the empty string
+      // - then append "*" to the end of result.
+      if (!custom_name &&
+          (!previous_part ||
+           previous_part->type == url_pattern_part_type::FIXED_TEXT ||
+           previous_part->modifier != url_pattern_part_modifier::none ||
+           needs_grouping || !part.prefix.empty())) {
+        result.append("*");
+      } else {
+        // Append "(" to the end of result.
+        // Append full wildcard regexp value to the end of result.
+        // Append ")" to the end of result.
+        result.append("(.*)");
+      }
+    }
+
+    // If all of the following are true:
+    // - part's type is "segment-wildcard"; and
+    // - custom name is true; and
+    // - part's suffix is not the empty string; and
+    // - The result of running is a valid name code point given part's suffix's
+    // first code point and the boolean false is true then append U+005C (\) to
+    // the end of result.
+    if (part.type == url_pattern_part_type::SEGMENT_WILDCARD && custom_name &&
+        !part.suffix.empty() &&
+        idna::valid_name_code_point(part.suffix[0], false)) {
+      result.append("\\");
+    }
+
+    // Append the result of running escape a pattern string given part's suffix
+    // to the end of result.
+    result.append(escape_pattern_string(part.suffix));
+    // If needs grouping is true, then append "}" to the end of result.
+    if (needs_grouping) result.append("}");
+    // Append the result of running convert a modifier to a string given part's
+    // modifier to the end of result.
+    result.append(convert_modifier_to_string(part.modifier));
+  }
+  // Return result.
+  return result;
+}
+}  // namespace ada::url_pattern_helpers
+
+#endif  // ADA_INCLUDE_URL_PATTERN

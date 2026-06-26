@@ -9,11 +9,11 @@
 #include <string>
 #include <string_view>
 
+#include <ada.h>
 #include <llhttp.h>
 #include <uv.h>
 
 #include "wpi/net/MimeTypes.hpp"
-#include "wpi/net/UrlParser.hpp"
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/SmallVector.hpp"
@@ -150,17 +150,16 @@ void HALSimHttpConnection::SendFileResponse(int code, std::string_view codeText,
 }
 
 void HALSimHttpConnection::ProcessRequest() {
-  wpi::net::UrlParser url{m_request.GetUrl(),
-                          m_request.GetMethod() == wpi::net::HTTP_CONNECT};
-  if (!url.IsValid()) {
+  auto url = ada::parse(m_request.GetUrl());
+  if (!url) {
     // failed to parse URL
     MySendError(400, "Invalid URL");
     return;
   }
 
   std::string_view path;
-  if (url.HasPath()) {
-    path = url.GetPath();
+  if (url->get_pathname_length() > 0) {
+    path = url->get_pathname();
   }
 
   if (m_request.GetMethod() == HTTP_GET && wpi::util::starts_with(path, '/') &&

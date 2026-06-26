@@ -9,6 +9,15 @@ ext {
 
     splitSetup = {
         it.sources {
+            adaCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/ada/src'
+                    include 'ada.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/ada/include', 'src/main/native/thirdparty/ada/src'
+                }
+            }
             libuvCpp(CppSourceSet) {
                 source {
                     srcDirs 'src/main/native/thirdparty/libuv/src'
@@ -188,6 +197,9 @@ nativeUtils.exportsConfigs {
 }
 
 cppHeadersZip {
+    from('src/main/native/thirdparty/ada/include') {
+        into '/'
+    }
     from('src/main/native/thirdparty/libuv/include') {
         into '/'
     }
@@ -200,6 +212,9 @@ cppHeadersZip {
 }
 
 cppSourcesZip {
+    from('src/main/native/thirdparty/ada/src') {
+        into '/'
+    }
     from('src/main/native/thirdparty/libuv/src') {
         into '/'
     }
@@ -216,7 +231,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/llhttp/include', 'src/main/native/thirdparty/tcpsockets/include', 'src/main/native/thirdparty/libuv/src'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/ada/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/llhttp/include', 'src/main/native/thirdparty/tcpsockets/include', 'src/main/native/thirdparty/libuv/src', 'src/main/native/thirdparty/ada/src'
                 }
             }
         }
