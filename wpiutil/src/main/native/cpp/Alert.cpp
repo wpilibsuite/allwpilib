@@ -117,9 +117,6 @@ int32_t DefaultSetAlertActive(WPI_AlertHandle alertHandle, int32_t active) {
     return ALERT_ERROR;
   }
   if (active) {
-    if (alert->activeStartTime.load(std::memory_order_relaxed) != 0) {
-      return 0;
-    }
     int64_t now = wpi::util::Now();
     int64_t expected = 0;
     alert->activeStartTime.compare_exchange_strong(expected, now);

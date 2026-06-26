@@ -21,6 +21,7 @@
 #include "mrclib/MrcString.hpp"
 #include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/Errors.h"
+#include "wpi/hal/cpp/MrcLibAlert.hpp"
 #include "wpi/util/EventVector.hpp"
 #include "wpi/util/mutex.hpp"
 
@@ -318,6 +319,7 @@ MrcLibDsImpl::MrcLibDsImpl() {
   MRC_DsComms_Initialize();
   MRC_DsCommsControl_Initialize();
   MRC_Console_Initialize();
+  wpi::hal::SetMrcLibAlertBackend();
 
   // Wait for 10 seconds for the system server to be ready.
   if (!MRC_DsComms_WaitForSystemServer(10000)) {
