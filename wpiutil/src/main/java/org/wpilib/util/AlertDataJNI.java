@@ -6,7 +6,6 @@ package org.wpilib.util;
 
 /** JNI for alert data. */
 public class AlertDataJNI {
-
   /**
    * High priority alert - displayed first with a red "X" symbol. Use this type for problems which
    * will seriously affect the robot's functionality and thus require immediate attention.
@@ -29,6 +28,15 @@ public class AlertDataJNI {
 
   /** Information about an alert. */
   public static class AlertInfo {
+    /**
+     * Constructs an AlertInfo object. Called from JNI.
+     *
+     * @param group Group name for the alert
+     * @param id Unique ID for the alert
+     * @param text Text description of the alert
+     * @param activeStartTime Time when the alert became active, or 0 if not active
+     * @param level Level of the alert
+     */
     public AlertInfo(String group, String id, String text, long activeStartTime, int level) {
       this.group = group;
       this.id = id;
@@ -37,14 +45,19 @@ public class AlertDataJNI {
       this.level = level;
     }
 
+    /** Group name for the alert. */
     public final String group;
 
+    /** Unique ID for the alert. */
     public final String id;
 
+    /** Text description of the alert. */
     public final String text;
 
+    /** Time when the alert became active, or 0 if not active. */
     public final long activeStartTime; // 0 if not active
 
+    /** Level of the alert. */
     public final int level; // LEVEL_HIGH, LEVEL_MEDIUM, LEVEL_LOW
   }
 
