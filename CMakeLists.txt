@@ -84,9 +84,10 @@ option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
 option(WITH_BENCHMARK "Build the benchmark project" ON)
 
 # Options for using a package manager (e.g., vcpkg) for certain dependencies.
+option(USE_SYSTEM_EIGEN "Use system Eigen" OFF)
 option(USE_SYSTEM_FMTLIB "Use system fmtlib" OFF)
 option(USE_SYSTEM_LIBUV "Use system libuv" OFF)
-option(USE_SYSTEM_EIGEN "Use system eigen" OFF)
+option(USE_SYSTEM_SLEIPNIR "Use system Sleipnir" OFF)
 option(USE_LINKED_AVAHI "Use directly linked Avahi instead of loading at runtime" OFF)
 
 # Options for compilation flags.
