@@ -29,6 +29,7 @@ endif()
 file(
     GLOB_RECURSE wpinet_native_src
     src/main/native/cpp/*.cpp
+    src/main/native/thirdparty/ada/src/ada.cpp
     src/main/native/thirdparty/tcpsockets/cpp/*.cpp
 )
 list(REMOVE_ITEM wpinet_native_src ${wpinet_jni_src})
@@ -149,6 +150,7 @@ endif()
 install(
     DIRECTORY
         src/main/native/include/
+        src/main/native/thirdparty/ada/include/
         src/main/native/thirdparty/llhttp/include/
         src/main/native/thirdparty/tcpsockets/include/
     DESTINATION "${include_dest}/wpinet"
@@ -157,6 +159,7 @@ target_include_directories(
     wpinet
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/ada/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llhttp/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/tcpsockets/include>
         $<INSTALL_INTERFACE:${include_dest}/wpinet>

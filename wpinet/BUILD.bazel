@@ -21,6 +21,38 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
+cc_library(
+    name = "ada-headers",
+    hdrs = glob([
+        "src/main/native/thirdparty/ada/include/**/*.h",
+    ]),
+    includes = ["src/main/native/thirdparty/ada/src"],
+    strip_include_prefix = "src/main/native/thirdparty/ada/include",
+)
+
+cc_library(
+    name = "ada",
+    srcs = ["src/main/native/thirdparty/ada/src/ada.cpp"],
+    hdrs = glob([
+        "src/main/native/thirdparty/ada/src/**/*.cpp",
+    ]),
+    strip_include_prefix = "src/main/native/thirdparty/ada/src",
+    visibility = ["//wpinet:__subpackages__"],
+    deps = [":ada-headers"],
+)
+
+pkg_files(
+    name = "thirdparty-ada-hdr-pkg",
+    srcs = glob(["src/main/native/thirdparty/ada/include/**"]),
+    strip_prefix = "src/main/native/thirdparty/ada/include",
+)
+
+pkg_files(
+    name = "thirdparty-ada-src-pkg",
+    srcs = glob(["src/main/native/thirdparty/ada/src/**"]),
+    strip_prefix = "src/main/native/thirdparty/ada/src",
+)
+
 WIN_UV_SRCS = glob([
     "src/main/native/thirdparty/libuv/src/win/*.cpp",
     "src/main/native/thirdparty/libuv/src/win/*.h",
@@ -145,7 +177,10 @@ wpilib_cc_library(
             "-Wno-error=format",
         ],
     }),
-    extra_hdr_pkg_files = [":thirdparty-libuv-hdr-pkg"],
+    extra_hdr_pkg_files = [
+        ":thirdparty-ada-hdr-pkg",
+        ":thirdparty-libuv-hdr-pkg",
+    ],
     extra_src_pkg_files = [
         ":wpinet-java-jni-hdrs-pkg",
     ],
@@ -165,6 +200,7 @@ wpilib_cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":ada",
         ":libuv-headers",
         ":private_includes",
         "//wpiutil",
@@ -319,6 +355,7 @@ generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-wpinet-generator",
     pyproject_toml = "src/main/python/native-pyproject.toml",
     third_party_dirs = [
+        "ada",
         "libuv",
         "llhttp",
         "tcpsockets",

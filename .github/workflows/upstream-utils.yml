@@ -31,6 +31,12 @@ jobs:
         run: |
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
+      - name: Run ada.py
+        run: |
+          cd upstream_utils
+          ./ada.py clone
+          ./ada.py copy-src
+          ./ada.py format-patch
       - name: Run apriltag.py
         run: |
           cd upstream_utils
