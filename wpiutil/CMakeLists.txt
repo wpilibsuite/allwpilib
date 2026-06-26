@@ -58,7 +58,7 @@ if(ATOMIC)
     target_link_libraries(wpiutil ${ATOMIC})
 endif()
 
-if(NOT USE_SYSTEM_FMTLIB)
+if(NOT WPILIB_USE_SYSTEM_FMTLIB)
     target_sources(wpiutil PRIVATE ${fmtlib_native_src})
     install(
         DIRECTORY src/main/native/thirdparty/fmtlib/include/
@@ -141,7 +141,7 @@ foreach(example ${wpiutil_examples})
     endif()
 endforeach()
 
-if(WITH_TESTS)
+if(WPILIB_WITH_TESTS)
     file(GLOB_RECURSE wpiutil_testlib_src src/test/native/include/*.h)
     add_library(wpiutil_testlib INTERFACE ${wpiutil_test_src})
     target_include_directories(wpiutil_testlib INTERFACE src/test/native/include)
