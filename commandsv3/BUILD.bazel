@@ -17,7 +17,10 @@ py_binary(
 
 filegroup(
     name = "templates",
-    srcs = glob(["src/generate/main/**"]) + [
+    srcs = glob([
+        "src/generate/main/**",
+        "src/main/proto/**",
+    ]) + [
         "//wpilibj:hid_schema",
     ],
 )

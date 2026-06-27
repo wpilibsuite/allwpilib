@@ -56,6 +56,23 @@ build:remote_cache --remote_cache=grpcs://gitlib-bazel.wpi.edu
 
 common:remote_cache_readonly --noremote_upload_local_results
 
+# Stubs for remote execution.
+build:linux --strategy=TsProject=remote,sandboxed
+build --strategy=CopyFile=remote,standalone
+build --strategy=CopyDirectory=remote,standalone
+build --strategy=TestRunner=remote,standalone
+build:linux --strategy=NpmLifecycleHook=remote,sandboxed,standalone
+
+common:common_cache --experimental_remote_merkle_tree_cache
+common:remote --config=common_cache
+build:remote --incompatible_strict_action_env --experimental_inmemory_dotd_files --experimental_inmemory_jdeps_files --experimental_remote_merkle_tree_cache --incompatible_allow_tags_propagation
+# Specify your cluster as follows:
+# build:remote --remote_executor=grpcs://engflow.example.com --bes_backend=grpcs://engflow.example.com --bes_results_url=https://engflow.example.com/invocation/
+build:remote --jobs=100
+build:remote --remote_timeout=1500
+build:remote --spawn_strategy=remote,sandboxed,standalone
+build:remote --grpc_keepalive_time=30s
+
 # This config should be used locally. It downloads more than the CI version
 build:remote_user --config=remote_cache
 build:remote_user --config=remote_cache_readonly
