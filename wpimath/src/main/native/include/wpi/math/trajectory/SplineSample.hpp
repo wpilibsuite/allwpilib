@@ -97,10 +97,10 @@ class SplineSample {
    * @param sample The TrajectorySample to convert.
    */
   explicit constexpr SplineSample(const TrajectorySample& sample)
-      : timestamp(sample.timestamp),
-        pose(sample.pose),
-        velocity(sample.velocity),
-        acceleration(sample.acceleration) {
+      : timestamp{sample.timestamp},
+        pose{sample.pose},
+        velocity{sample.velocity},
+        acceleration{sample.acceleration} {
     auto vx = sample.velocity.ToRobotRelative(sample.pose.Rotation()).vx;
     curvature = sample.velocity.omega / (vx == 0_mps ? 1e-9_mps : vx);
   }

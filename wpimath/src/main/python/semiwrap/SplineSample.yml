@@ -15,9 +15,10 @@ classes:
       SplineSample:
         overloads:
           "":
-          double, const Pose2d&, double, double, double:
-          const TrajectorySample&:
+          ? wpi::units::second_t, const Pose2d&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_squared_t, wpi::units::curvature_t
+          :
           wpi::units::second_t, const Pose2d&, const ChassisVelocities&, const ChassisAccelerations&, wpi::units::curvature_t:
+          const TrajectorySample&:
       ForwardVelocity:
       ForwardAcceleration:
       Transform:
