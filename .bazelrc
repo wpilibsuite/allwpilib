@@ -38,6 +38,7 @@ build:build_buddy_bes --bes_backend=grpcs://remote.buildbuddy.io
 build:common_cache --remote_timeout=3600
 build:common_cache --remote_cache_compression
 build:common_cache --experimental_remote_cache_compression_threshold=100
+common:common_cache --experimental_remote_merkle_tree_cache
 
 # Build Buddy Cache Setup
 build:build_buddy --config=common_cache
@@ -57,14 +58,13 @@ build:remote_cache --remote_cache=grpcs://gitlib-bazel.wpi.edu
 common:remote_cache_readonly --noremote_upload_local_results
 
 # Stubs for remote execution.
-build:linux --strategy=TsProject=remote,sandboxed
-build --strategy=CopyFile=remote,standalone
-build --strategy=CopyDirectory=remote,standalone
-build --strategy=CopyToDirectory=remote,standalone
-build --strategy=TestRunner=remote,sandboxed,standalone
-build:linux --strategy=NpmLifecycleHook=remote,sandboxed,standalone
+build:remote --strategy=TsProject=remote,sandboxed
+build:remote --strategy=CopyFile=remote,standalone
+build:remote --strategy=CopyDirectory=remote,standalone
+build:remote --strategy=CopyToDirectory=remote,standalone
+build:remote --strategy=TestRunner=remote,sandboxed,standalone
+build:remote --strategy=NpmLifecycleHook=remote,sandboxed,standalone
 
-common:common_cache --experimental_remote_merkle_tree_cache
 common:remote --config=common_cache
 build:remote --incompatible_strict_action_env --experimental_inmemory_dotd_files --experimental_inmemory_jdeps_files --experimental_remote_merkle_tree_cache --incompatible_allow_tags_propagation
 # Specify your cluster as follows:
