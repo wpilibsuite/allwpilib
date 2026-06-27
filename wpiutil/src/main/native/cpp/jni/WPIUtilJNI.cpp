@@ -41,11 +41,15 @@ static const JExceptionInit exceptions[] = {
     {"java/lang/NullPointerException", &nullPointerEx},
     {"org/wpilib/util/runtime/MsvcRuntimeException", &msvcRuntimeEx}};
 
-static bool CheckStatus(JNIEnv* env, int32_t status) {
+static bool CheckAlertStatus(JNIEnv* env, int32_t status) {
   if (status == 0) {
     return true;
   }
-  illegalArgEx.Throw(env, "Alert operation failed");
+  if (status == ALERT_ALREADY_ALLOCATED) {
+    illegalArgEx.Throw(env, "Alert already allocated");
+  } else {
+    illegalArgEx.Throw(env, "Alert operation failed");
+  }
   return false;
 }
 
@@ -231,7 +235,7 @@ Java_org_wpilib_util_WPIUtilJNI_createAlert
   WPI_AlertHandle alertHandle = WPI_INVALID_HANDLE;
   int32_t status =
       WPI_CreateAlert(&wpiGroup, &wpiId, &wpiText, level, &alertHandle);
-  if (!CheckStatus(env, status) || alertHandle <= 0) {
+  if (!CheckAlertStatus(env, status) || alertHandle <= 0) {
     return 0;
   }
   return alertHandle;
@@ -260,7 +264,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_util_WPIUtilJNI_setAlertActive
   (JNIEnv* env, jclass, jint alertHandle, jboolean active)
 {
-  CheckStatus(env, WPI_SetAlertActive(alertHandle, active));
+  CheckAlertStatus(env, WPI_SetAlertActive(alertHandle, active));
 }
 
 /*
@@ -273,7 +277,7 @@ Java_org_wpilib_util_WPIUtilJNI_isAlertActive
   (JNIEnv* env, jclass, jint alertHandle)
 {
   int32_t active = 0;
-  CheckStatus(env, WPI_IsAlertActive(alertHandle, &active));
+  CheckAlertStatus(env, WPI_IsAlertActive(alertHandle, &active));
   return active;
 }
 
@@ -288,7 +292,7 @@ Java_org_wpilib_util_WPIUtilJNI_setAlertText
 {
   wpi::util::java::JStringRef jtext{env, text};
   WPI_String wpiText = wpi::util::make_string(jtext);
-  CheckStatus(env, WPI_SetAlertText(alertHandle, &wpiText));
+  CheckAlertStatus(env, WPI_SetAlertText(alertHandle, &wpiText));
 }
 
 /*
@@ -301,7 +305,7 @@ Java_org_wpilib_util_WPIUtilJNI_getAlertText
   (JNIEnv* env, jclass, jint alertHandle)
 {
   WPI_String text;
-  if (!CheckStatus(env, WPI_GetAlertText(alertHandle, &text))) {
+  if (!CheckAlertStatus(env, WPI_GetAlertText(alertHandle, &text))) {
     return nullptr;
   }
   jstring rv = MakeJString(env, wpi::util::to_string_view(&text));

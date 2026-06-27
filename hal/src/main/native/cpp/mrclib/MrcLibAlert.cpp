@@ -18,8 +18,6 @@ static_assert(WPI_ALERT_MEDIUM == MRC_ALERT_MEDIUM);
 static_assert(WPI_ALERT_LOW == MRC_ALERT_LOW);
 
 namespace {
-constexpr int32_t ALERT_ERROR = -1;
-constexpr int32_t ALERT_HANDLE_TYPE = 23;
 
 struct AlertData {
   explicit AlertData(MRC_AlertHandle handle) : mrcHandle{handle} {}
@@ -105,7 +103,7 @@ static int32_t MrcLibCreateAlert(const struct WPI_String* group,
       MRC_Alert_CreateAlert(&mrcGroup, &mrcId, &mrcText, level, &mrcHandle);
   if (status != 0) {
     *handle = WPI_INVALID_HANDLE;
-    return ALERT_ERROR;
+    return status == MRC_STATUS_RESOURCE_ALREADY_ALLOCATED ? ALERT_ALREADY_ALLOCATED : ALERT_ERROR;
   }
 
   auto& manager = GetManager();

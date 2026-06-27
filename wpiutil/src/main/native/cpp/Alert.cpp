@@ -19,9 +19,6 @@ using namespace wpi::util;
 
 namespace {
 
-constexpr int32_t ALERT_ERROR = -1;
-constexpr int32_t ALERT_HANDLE_TYPE = 23;
-
 struct AlertData {
   AlertData(std::string_view group, std::string_view id, std::string_view text,
             int32_t level)

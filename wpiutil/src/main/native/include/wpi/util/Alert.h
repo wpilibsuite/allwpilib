@@ -10,6 +10,9 @@
 #include "wpi/util/string.h"
 
 typedef WPI_Handle WPI_AlertHandle;   // NOLINT(modernize-use-using)
+#define ALERT_ERROR -1
+#define ALERT_ALREADY_ALLOCATED -2
+#define ALERT_HANDLE_TYPE 23
 
 #ifdef __cplusplus
 extern "C" {
