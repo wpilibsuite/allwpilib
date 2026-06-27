@@ -31,8 +31,9 @@ using namespace wpi;
 OpModeRobotBase::OpModeRobotBase(wpi::units::second_t period)
     : m_period{period},
       m_loopOverrunAlert{
+          "opmode-loop-overrun",
           fmt::format("Loop time of {:.6f}s overrun", m_period.value()),
-          Alert::Level::MEDIUM},
+          wpi::util::Alert::Level::MEDIUM},
       m_watchdog{period, [this] { m_loopOverrunAlert.Set(true); }} {
   // Create our own notifier and callback queue
   int32_t status = 0;

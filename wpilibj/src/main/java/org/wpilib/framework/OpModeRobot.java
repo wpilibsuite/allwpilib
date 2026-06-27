@@ -21,7 +21,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import org.wpilib.driverstation.Alert;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.internal.DriverStationBackend;
@@ -41,6 +40,7 @@ import org.wpilib.opmode.Utility;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 import org.wpilib.system.Watchdog;
+import org.wpilib.util.Alert;
 import org.wpilib.util.Color;
 import org.wpilib.util.ConstructorMatch;
 
@@ -518,7 +518,10 @@ public abstract class OpModeRobot extends RobotBase {
     m_startTimeUs = RobotController.getMonotonicTime();
 
     m_loopOverrunAlert =
-        new Alert("Loop time of \"" + m_period + "\"s overrun", Alert.Level.MEDIUM);
+        new Alert(
+            "opmode-loop-overrun",
+            "Loop time of \"" + m_period + "\"s overrun",
+            Alert.Level.MEDIUM);
     m_watchdog = new Watchdog(Seconds.of(m_period), () -> m_loopOverrunAlert.set(true));
 
     // Add LoopFunc as periodic callback (match C++)
@@ -743,7 +746,9 @@ public abstract class OpModeRobot extends RobotBase {
 
   @Override
   public void close() {
+    m_loopOverrunAlert.close();
     NotifierJNI.destroyNotifier(m_notifier);
+    super.close();
   }
 
   /** Ends the main loop in startCompetition(). */

@@ -10,13 +10,13 @@
 #include <string>
 #include <vector>
 
-#include "wpi/driverstation/Alert.hpp"
 #include "wpi/framework/RobotBase.hpp"
 #include "wpi/hal/DriverStationTypes.hpp"
 #include "wpi/internal/PeriodicPriorityQueue.hpp"
 #include "wpi/opmode/OpMode.hpp"
 #include "wpi/system/Watchdog.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/Alert.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/mutex.hpp"
 
@@ -230,7 +230,7 @@ class OpModeRobotBase : public RobotBase {
   HAL_NotifierHandle m_notifier;
   wpi::units::second_t m_period;
   std::chrono::microseconds m_startTime;
-  Alert m_loopOverrunAlert;
+  wpi::util::Alert m_loopOverrunAlert;
   Watchdog m_watchdog;
 
   // OpMode lifecycle state

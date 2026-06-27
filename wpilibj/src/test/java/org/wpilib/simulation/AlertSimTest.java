@@ -10,13 +10,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
-import org.wpilib.driverstation.Alert;
-import org.wpilib.driverstation.Alert.Level;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.util.Alert;
+import org.wpilib.util.Alert.Level;
 
 class AlertSimTest {
   private String m_groupName;
@@ -50,7 +51,7 @@ class AlertSimTest {
   }
 
   private Alert makeAlert(String text, Alert.Level type) {
-    return new Alert(m_groupName, text, type);
+    return new Alert(m_groupName, text, text, type);
   }
 
   @Test
@@ -171,6 +172,9 @@ class AlertSimTest {
       var all = AlertSim.getAll();
       assertEquals(2, active.length);
       assertEquals(3, all.length);
+      assertEquals(
+          Set.of("A", "B", "C"),
+          Arrays.stream(all).map(x -> x.id).collect(java.util.stream.Collectors.toSet()));
       assertTrue(Arrays.stream(active).anyMatch(x -> "A".equals(x.text)));
       assertTrue(Arrays.stream(active).anyMatch(x -> "B".equals(x.text)));
 

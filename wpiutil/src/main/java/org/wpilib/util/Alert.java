@@ -2,16 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.driverstation;
-
-import org.wpilib.hardware.hal.AlertJNI;
+package org.wpilib.util;
 
 /**
- * Persistent alert to be sent via NetworkTables. Alerts are tagged with a type of {@code HIGH},
- * {@code MEDIUM}, or {@code LOW} to denote urgency. See {@link org.wpilib.driverstation.Alert.Level
- * Level} for suggested usage of each type. Alerts can be displayed on supported dashboards, and are
- * shown in a priority order based on type and recency of activation, with newly activated alerts
- * first.
+ * Persistent alert. Alerts are tagged with a type of {@code HIGH}, {@code MEDIUM}, or {@code LOW}
+ * to denote urgency. See {@link org.wpilib.util.Alert.Level Level} for suggested usage of each
+ * type. Alerts can be displayed on supported dashboards, and are shown in a priority order based on
+ * type and recency of activation, with newly activated alerts first.
  *
  * <p>Alerts should be created once and stored persistently, then updated to "active" or "inactive"
  * as necessary. {@link #set(boolean)} can be safely called periodically.
@@ -41,54 +38,63 @@ public class Alert implements AutoCloseable {
      * High priority alert - displayed first with a red "X" symbol. Use this type for problems which
      * will seriously affect the robot's functionality and thus require immediate attention.
      */
-    HIGH(AlertJNI.LEVEL_HIGH),
+    HIGH(AlertDataJNI.LEVEL_HIGH),
 
     /**
      * Medium priority alert - displayed second with a yellow "!" symbol. Use this type for problems
      * which could affect the robot's functionality but do not necessarily require immediate
      * attention.
      */
-    MEDIUM(AlertJNI.LEVEL_MEDIUM),
+    MEDIUM(AlertDataJNI.LEVEL_MEDIUM),
 
     /**
      * Low priority alert - displayed last with a green "i" symbol. Use this type for problems which
      * are unlikely to affect the robot's functionality, or any other alerts which do not fall under
      * the other categories.
      */
-    LOW(AlertJNI.LEVEL_LOW);
+    LOW(AlertDataJNI.LEVEL_LOW);
 
     private final int m_value;
 
     Level(int value) {
       m_value = value;
     }
+
+    /**
+     * Gets the integer value for this level.
+     *
+     * @return Integer value for this level.
+     */
+    public int getValue() {
+      return m_value;
+    }
   }
 
-  private final Level m_type;
+  private final Level m_level;
   private int m_handle;
 
   /**
-   * Creates a new alert in the default group - "Alerts". If this is the first to be instantiated,
-   * the appropriate entries will be added to NetworkTables.
+   * Creates a new alert in the default group - "Alerts".
    *
+   * @param id Alert identifier. This should be unique within the group.
    * @param text Text to be displayed when the alert is active.
-   * @param type Alert urgency level.
+   * @param level Alert urgency level.
    */
-  public Alert(String text, Level type) {
-    this("Alerts", text, type);
+  public Alert(String id, String text, Level level) {
+    this("Alerts", id, text, level);
   }
 
   /**
-   * Creates a new alert. If this is the first to be instantiated in its group, the appropriate
-   * entries will be added to NetworkTables.
+   * Creates a new alert.
    *
-   * @param group Group identifier, used as the entry name in NetworkTables.
+   * @param group Group identifier.
+   * @param id Alert identifier. This should be unique within the group.
    * @param text Text to be displayed when the alert is active.
-   * @param type Alert urgency level.
+   * @param level Alert urgency level.
    */
-  public Alert(String group, String text, Level type) {
-    m_type = type;
-    m_handle = AlertJNI.createAlert(group, text, type.m_value);
+  public Alert(String group, String id, String text, Level level) {
+    m_level = level;
+    m_handle = WPIUtilJNI.createAlert(group, id, text, level.m_value);
   }
 
   /**
@@ -98,7 +104,7 @@ public class Alert implements AutoCloseable {
    * @param active Whether to display the alert.
    */
   public void set(boolean active) {
-    AlertJNI.setAlertActive(m_handle, active);
+    WPIUtilJNI.setAlertActive(m_handle, active);
   }
 
   /**
@@ -107,7 +113,7 @@ public class Alert implements AutoCloseable {
    * @return whether the alert is active.
    */
   public boolean get() {
-    return AlertJNI.isAlertActive(m_handle);
+    return WPIUtilJNI.isAlertActive(m_handle);
   }
 
   /**
@@ -117,7 +123,7 @@ public class Alert implements AutoCloseable {
    * @param text Text to be displayed when the alert is active.
    */
   public void setText(String text) {
-    AlertJNI.setAlertText(m_handle, text);
+    WPIUtilJNI.setAlertText(m_handle, text);
   }
 
   /**
@@ -126,21 +132,23 @@ public class Alert implements AutoCloseable {
    * @return the current text.
    */
   public String getText() {
-    return AlertJNI.getAlertText(m_handle);
+    return WPIUtilJNI.getAlertText(m_handle);
   }
 
   /**
-   * Get the type of this alert.
+   * Get the level of this alert.
    *
-   * @return the type
+   * @return the level
    */
-  public Level getType() {
-    return m_type;
+  public Level getLevel() {
+    return m_level;
   }
 
   @Override
   public void close() {
-    AlertJNI.destroyAlert(m_handle);
-    m_handle = 0;
+    if (m_handle != 0) {
+      WPIUtilJNI.destroyAlert(m_handle);
+      m_handle = 0;
+    }
   }
 }
