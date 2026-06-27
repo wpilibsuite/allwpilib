@@ -122,4 +122,23 @@ class AlertTest {
       assertEquals(Set.of("A", "B"), activeIds);
     }
   }
+
+  @Test
+  void duplicateAlertThrowsAndCanStillBeCreatedAfterwards() {
+    try (Alert alert = new Alert("group", "id", "text", Alert.Level.HIGH)) {
+      alert.set(true);
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> new Alert("group", "id", "duplicate", Alert.Level.HIGH));
+      // After the exception, we can still create a new alert with a different id
+      try (Alert alert2 = new Alert("group", "id2", "text2", Alert.Level.HIGH)) {
+        alert2.set(true);
+        assertEquals(2, AlertDataJNI.getNumAlerts());
+      }
+    }
+    try (Alert alert3 = new Alert("group", "id", "text", Alert.Level.HIGH)) {
+      alert3.set(true);
+      assertEquals(1, AlertDataJNI.getNumAlerts());
+    }
+  }
 }

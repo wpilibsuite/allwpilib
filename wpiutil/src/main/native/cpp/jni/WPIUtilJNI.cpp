@@ -31,6 +31,7 @@ static JException interruptedEx;
 static JException ioEx;
 static JException nullPointerEx;
 static JException msvcRuntimeEx;
+static JClass alertEx;
 static JClass alertInfoCls;
 
 static const JExceptionInit exceptions[] = {
@@ -45,11 +46,16 @@ static bool CheckAlertStatus(JNIEnv* env, int32_t status) {
   if (status == 0) {
     return true;
   }
+  static jmethodID func = env->GetMethodID(
+      alertEx, "<init>",
+      "(Ljava/lang/String;I)V");
+  jobject exception;
   if (status == ALERT_ALREADY_ALLOCATED) {
-    illegalArgEx.Throw(env, "Alert already allocated");
+    exception = env->NewObject(alertEx, func, MakeJString(env, "Alert already allocated"), status);
   } else {
-    illegalArgEx.Throw(env, "Alert operation failed");
+    exception = env->NewObject(alertEx, func, MakeJString(env, "Alert operation failed"), status);
   }
+  env->Throw(static_cast<jthrowable>(exception));
   return false;
 }
 
@@ -90,6 +96,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_ERR;
   }
 
+  alertEx = JClass(env, "org/wpilib/util/AlertException");
+  if (!alertEx) {
+    return JNI_ERR;
+  }
+
   return JNI_VERSION_1_6;
 }
 
@@ -103,6 +114,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
     c.cls->free(env);
   }
   alertInfoCls.free(env);
+  alertEx.free(env);
 }
 
 /*
