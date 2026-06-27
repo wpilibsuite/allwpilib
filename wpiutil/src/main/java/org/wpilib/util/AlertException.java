@@ -8,7 +8,8 @@ package org.wpilib.util;
 public class AlertException extends RuntimeException {
   private static final long serialVersionUID = -4273483424L;
 
-  private final int m_reason;
+  /** The reason code associated with this exception. */
+  private final int reason;
 
   /**
    * Constructs a new AlertException with the specified detail message and reason code.
@@ -18,7 +19,7 @@ public class AlertException extends RuntimeException {
    */
   public AlertException(String message, int reason) {
     super(message);
-    this.m_reason = reason;
+    this.reason = reason;
   }
 
   /**
@@ -27,6 +28,6 @@ public class AlertException extends RuntimeException {
    * @return the reason code
    */
   public int getReason() {
-    return m_reason;
+    return reason;
   }
 }
