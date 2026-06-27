@@ -23,18 +23,31 @@ def copy_upstream_src(wpilib_root: Path):
         (wpinet / d).mkdir(parents=True, exist_ok=True)
 
     # Copy files into allwpilib
-    walk_cwd_and_copy_if(
+    src_files = walk_cwd_and_copy_if(
         lambda dp, f: (
-            has_prefix(dp, Path("src")) and f.endswith(".cpp") and f != "ada_c.cpp"
+            has_prefix(dp, Path("src"))
+            and f.endswith(".cpp")
+            and f != "ada_c.cpp"
+            and not f.startswith("url_pattern")
         ),
         wpinet / "src/main/native/thirdparty/ada",
     )
 
     # Copy header files into allwpilib
     header_files = walk_cwd_and_copy_if(
-        lambda dp, f: has_prefix(dp, Path("include")) and f != "ada_c.h",
+        lambda dp, f: (
+            has_prefix(dp, Path("include"))
+            and f != "ada_c.h"
+            and f != "expected.h"
+            and not f.startswith("url_pattern")
+        ),
         wpinet / "src/main/native/thirdparty/ada",
     )
+    for f in header_files + src_files:
+        comment_out_invalid_includes(
+            f,
+            [wpinet / "src/main/native/thirdparty/ada/include"],
+        )
 
 
 def main():

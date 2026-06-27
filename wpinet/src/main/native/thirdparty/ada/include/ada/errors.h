@@ -12,7 +12,7 @@ namespace ada {
 /**
  * @brief Error codes for URL parsing operations.
  *
- * Used with `tl::expected` to indicate why a URL parsing operation failed.
+ * Used with `std::expected` to indicate why a URL parsing operation failed.
  */
 enum class errors : uint8_t {
   type_error /**< A type error occurred (e.g., invalid URL syntax). */

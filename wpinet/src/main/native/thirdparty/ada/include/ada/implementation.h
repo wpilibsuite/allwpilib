@@ -18,14 +18,14 @@
 #include "ada/url.h"
 #include "ada/common_defs.h"
 #include "ada/errors.h"
-#include "ada/url_pattern_init.h"
+// #include "ada/url_pattern_init.h"
 
 namespace ada {
 
 /**
  * Result type for URL parsing operations.
  *
- * Uses `tl::expected` to represent either a successfully parsed URL or an
+ * Uses `std::expected` to represent either a successfully parsed URL or an
  * error. This allows for exception-free error handling.
  *
  * @tparam result_type The URL type to return (default: `ada::url_aggregator`)
@@ -41,7 +41,7 @@ namespace ada {
  * ```
  */
 template <class result_type = ada::url_aggregator>
-using result = tl::expected<result_type, ada::errors>;
+using result = std::expected<result_type, ada::errors>;
 
 /**
  * Parses a URL string according to the WHATWG URL Standard.
@@ -143,13 +143,13 @@ bool can_parse(std::string_view input,
  *        resolving relative patterns.
  * @param options Optional pointer to configuration options (e.g., ignore_case).
  *
- * @return A `tl::expected` containing either the parsed url_pattern on success,
+ * @return A `std::expected` containing either the parsed url_pattern on success,
  *         or an error code on failure.
  *
  * @see https://urlpattern.spec.whatwg.org
  */
 template <url_pattern_regex::regex_concept regex_provider>
-ada_warn_unused tl::expected<url_pattern<regex_provider>, errors>
+ada_warn_unused std::expected<url_pattern<regex_provider>, errors>
 parse_url_pattern(std::variant<std::string_view, url_pattern_init>&& input,
                   const std::string_view* base_url = nullptr,
                   const url_pattern_options* options = nullptr);

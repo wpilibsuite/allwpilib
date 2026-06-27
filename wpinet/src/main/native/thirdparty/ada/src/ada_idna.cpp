@@ -8887,7 +8887,7 @@ inline static bool is_rtl_label(const std::u32string_view label) noexcept {
 
   size_t directions = 0;
   for (size_t i = 0; i < label.size(); i++) {
-    directions |= 1ull << find_direction(label[i]);
+    directions |= 1u << find_direction(label[i]);
   }
   return (directions & mask) != 0;
 }
@@ -9427,7 +9427,7 @@ bool is_label_valid(const std::u32string_view label) {
 
 
 #ifdef ADA_USE_SIMDUTF
-#include "simdutf.h"
+// #include "simdutf.h"
 #endif
 
 namespace ada::idna {
@@ -9648,7 +9648,7 @@ std::string to_ascii(std::string_view ut8_string) {
 
 
 #ifdef ADA_USE_SIMDUTF
-#include "simdutf.h"
+// #include "simdutf.h"
 #endif
 
 namespace ada::idna {

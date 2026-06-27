@@ -279,8 +279,4 @@ namespace ada {
 #endif
 #endif
 
-#ifndef ADA_INCLUDE_URL_PATTERN
-#define ADA_INCLUDE_URL_PATTERN 1
-#endif  // ADA_INCLUDE_URL_PATTERN
-
 #endif  // ADA_COMMON_DEFS_H
