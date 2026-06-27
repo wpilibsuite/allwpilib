@@ -67,7 +67,8 @@ build --strategy=CopyToDirectory=remote,standalone
 # https://github.com/bazelbuild/bazel/issues/7480
 build:linux --strategy=TestRunner=remote,sandboxed,standalone
 build:macos --strategy=TestRunner=remote,sandboxed,standalone
-build --strategy=NpmLifecycleHook=remote,sandboxed,standalone
+build:linux --strategy=NpmLifecycleHook=remote,sandboxed,standalone
+build:macos --strategy=NpmLifecycleHook=remote,sandboxed,standalone
 
 common:remote --config=common_cache
 build:remote --incompatible_strict_action_env --experimental_inmemory_dotd_files --experimental_inmemory_jdeps_files --experimental_remote_merkle_tree_cache --incompatible_allow_tags_propagation
