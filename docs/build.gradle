@@ -103,6 +103,7 @@ doxygen.sourceSets.main {
         exclude 'sleipnir/optimization/solver/interior_point.hpp'
         exclude 'sleipnir/optimization/solver/newton.hpp'
         exclude 'sleipnir/optimization/solver/sqp.hpp'
+        exclude 'sleipnir/optimization/solver/util/feasibility_restoration.hpp'
 
         // apriltag
         exclude 'apriltag_pose.h'
