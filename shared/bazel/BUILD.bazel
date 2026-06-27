@@ -47,6 +47,12 @@ platform(
 
 platform(
     name = "linux_x86_64",
+    exec_properties = {
+        "OSFamily": "Linux",
+        "container-image": "docker://wpilib/debian-base:trixie@sha256:4c20e850c88d9766a3aeaaf12901c9ca5e511b6ce59930046c187ce576fa1eeb",
+        "dockerAddCapabilities": "SYS_PTRACE",
+        "dockerReuse": "True",
+    },
     flags = [
         "--per_file_copt=external/.*@-Wno-pedantic,-Wno-format-nonliteral,-Wno-sign-compare,-Wno-type-limits,-Wno-maybe-uninitialized,-Wno-missing-field-initializers,-Wno-trigraphs,-Wno-attributes,-Wno-return-type,-Wno-unused-function,-Wno-format-y2k,-Wno-deprecated-declarations",
         "--per_file_copt=external/.*\\.cpp$,external/.*\\.cc$@-Wno-missing-requires,-Wno-volatile,-Wno-redundant-move,-Wno-class-memaccess,-Wno-ignored-qualifiers,-Wno-stringop-overflow,-Wno-extra",
