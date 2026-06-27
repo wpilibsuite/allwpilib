@@ -93,15 +93,13 @@ class WPILIB_DLLEXPORT DifferentialSample {
       : timestamp{timestamp},
         pose{pose},
         velocity{velocity},
-        acceleration{acceleration},
-        leftSpeed{
-            kinematics
-                .ToWheelVelocities(velocity.ToRobotRelative(pose.Rotation()))
-                .left},
-        rightSpeed{
-            kinematics
-                .ToWheelVelocities(velocity.ToRobotRelative(pose.Rotation()))
-                .right} {}
+        acceleration{acceleration} {
+    // Wheel speeds are derived from the robot-relative velocity.
+    auto wheelSpeeds =
+        kinematics.ToWheelVelocities(velocity.ToRobotRelative(pose.Rotation()));
+    leftSpeed = wheelSpeeds.left;
+    rightSpeed = wheelSpeeds.right;
+  }
 
   /**
    * Constructs a DifferentialSample from a TrajectorySample.
@@ -113,12 +111,8 @@ class WPILIB_DLLEXPORT DifferentialSample {
   constexpr DifferentialSample(const TrajectorySample& sample,
                                wpi::units::meters_per_second_t leftSpeed,
                                wpi::units::meters_per_second_t rightSpeed)
-      : timestamp{sample.timestamp},
-        pose{sample.pose},
-        velocity{sample.velocity},
-        acceleration{sample.acceleration},
-        leftSpeed{leftSpeed},
-        rightSpeed{rightSpeed} {}
+      : DifferentialSample(sample.timestamp, sample.pose, sample.velocity,
+                           sample.acceleration, leftSpeed, rightSpeed) {}
 
   /**
    * Constructs a DifferentialSample from a TrajectorySample.
@@ -128,18 +122,8 @@ class WPILIB_DLLEXPORT DifferentialSample {
    */
   constexpr DifferentialSample(const TrajectorySample& sample,
                                const DifferentialDriveKinematics& kinematics)
-      : timestamp{sample.timestamp},
-        pose{sample.pose},
-        velocity{sample.velocity},
-        acceleration{sample.acceleration},
-        leftSpeed{kinematics
-                      .ToWheelVelocities(sample.velocity.ToRobotRelative(
-                          sample.pose.Rotation()))
-                      .left},
-        rightSpeed{kinematics
-                       .ToWheelVelocities(sample.velocity.ToRobotRelative(
-                           sample.pose.Rotation()))
-                       .right} {}
+      : DifferentialSample(sample.timestamp, sample.pose, sample.velocity,
+                           sample.acceleration, kinematics) {}
 
   /**
    * Constructs a DifferentialSample from a SplineSample.

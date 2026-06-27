@@ -438,25 +438,29 @@ class TrajectorySampleTest {
     // A SplineSample is built from path-relative (forward) scalars but stores
     // velocity/acceleration in the field frame. For a robot facing +90 degrees
     // moving forward, the field velocity should point along +y.
-    double forward = 2.0;
-    double forwardAccel = 1.5;
+    double forwardVelocity = 2.0;
+    double forwardAcceleration = 1.5;
     double curvature = 0.25;
     var sample =
         new SplineSample(
-            0.0, new Pose2d(0, 0, Rotation2d.kCCW_Pi_2), forward, forwardAccel, curvature);
+            0.0,
+            new Pose2d(0, 0, Rotation2d.kCCW_Pi_2),
+            forwardVelocity,
+            forwardAcceleration,
+            curvature);
 
     // Field-relative: forward speed rotated into +y.
     assertEquals(0.0, sample.velocity.vx, EPSILON);
-    assertEquals(forward, sample.velocity.vy, EPSILON);
+    assertEquals(forwardVelocity, sample.velocity.vy, EPSILON);
     // Omega is frame-invariant and equals forward * curvature.
-    assertEquals(forward * curvature, sample.velocity.omega, EPSILON);
+    assertEquals(forwardVelocity * curvature, sample.velocity.omega, EPSILON);
 
     assertEquals(0.0, sample.acceleration.ax, EPSILON);
-    assertEquals(forwardAccel, sample.acceleration.ay, EPSILON);
+    assertEquals(forwardAcceleration, sample.acceleration.ay, EPSILON);
 
     // The projection accessors recover the path-relative scalars.
-    assertEquals(forward, sample.forwardVelocity(), EPSILON);
-    assertEquals(forwardAccel, sample.forwardAcceleration(), EPSILON);
+    assertEquals(forwardVelocity, sample.forwardVelocity(), EPSILON);
+    assertEquals(forwardAcceleration, sample.forwardAcceleration(), EPSILON);
   }
 
   @Test

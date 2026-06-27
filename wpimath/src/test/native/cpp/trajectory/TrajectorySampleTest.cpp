@@ -17,10 +17,23 @@
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/trajectory/DifferentialSample.hpp"
 #include "wpi/math/trajectory/SplineSample.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/curvature.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/util/MathExtras.hpp"
 
 namespace {
 constexpr double kEpsilon = 1e-9;
 }  // namespace
+
+#define EXPECT_NEAR_UNITS(val1, val2, eps) \
+  EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
 
 TEST(TrajectorySampleTest, KinematicInterpolateAtStart) {
   wpi::math::TrajectorySample start{
@@ -71,28 +84,25 @@ TEST(TrajectorySampleTest, KinematicInterpolateMidpoint) {
   auto interpolated = wpi::math::KinematicInterpolate(start, end, 0.5);
 
   // Absolute interpolated timestamp.
-  EXPECT_NEAR(1.0, interpolated.timestamp.value(), kEpsilon);
+  EXPECT_NEAR_UNITS(1_s, interpolated.timestamp, 1e-9_s);
 
   // Elapsed time from the start sample.
-  double deltaT = 1.0;
+  auto deltaT = 1_s;
 
   // vₖ₊₁ = vₖ + aₖΔt
-  double expectedVx =
-      start.velocity.vx.value() + start.acceleration.ax.value() * deltaT;
+  auto expectedVx = start.velocity.vx + start.acceleration.ax * deltaT;
 
   // xₖ₊₁ = xₖ + vₖΔt + ½a(Δt)²
-  double expectedX = start.pose.X().value() +
-                     start.velocity.vx.value() * deltaT +
-                     0.5 * start.acceleration.ax.value() * deltaT * deltaT;
+  auto expectedX = start.pose.X() + start.velocity.vx * deltaT +
+                   0.5 * start.acceleration.ax * deltaT * deltaT;
 
   // Linear interpolation of acceleration.
-  double expectedAx =
-      start.acceleration.ax.value() +
-      (end.acceleration.ax.value() - start.acceleration.ax.value()) * 0.5;
+  auto expectedAx =
+      wpi::util::Lerp(start.acceleration.ax, end.acceleration.ax, 0.5);
 
-  EXPECT_NEAR(expectedX, interpolated.pose.X().value(), kEpsilon);
-  EXPECT_NEAR(expectedVx, interpolated.velocity.vx.value(), kEpsilon);
-  EXPECT_NEAR(expectedAx, interpolated.acceleration.ax.value(), kEpsilon);
+  EXPECT_NEAR_UNITS(expectedX, interpolated.pose.X(), 1e-9_m);
+  EXPECT_NEAR_UNITS(expectedVx, interpolated.velocity.vx, 1e-9_mps);
+  EXPECT_NEAR_UNITS(expectedAx, interpolated.acceleration.ax, 1e-9_mps_sq);
 }
 
 TEST(TrajectorySampleTest, KinematicInterpolateWithAcceleration) {
@@ -107,19 +117,19 @@ TEST(TrajectorySampleTest, KinematicInterpolateWithAcceleration) {
 
   auto interpolated = wpi::math::KinematicInterpolate(start, end, 0.5);
 
-  EXPECT_NEAR(0.5, interpolated.timestamp.value(), kEpsilon);
+  EXPECT_NEAR_UNITS(0.5_s, interpolated.timestamp, 1e-9_s);
 
-  double deltaT = 0.5;
+  auto deltaT = 0.5_s;
 
   // vₖ₊₁ = 0 + 1.0 * 0.5 = 0.5
-  EXPECT_NEAR(0.5, interpolated.velocity.vx.value(), kEpsilon);
+  EXPECT_NEAR_UNITS(0.5_mps, interpolated.velocity.vx, 1e-9_mps);
 
   // xₖ₊₁ = 0 + 0 + ½ * 1.0 * 0.25 = 0.125
-  double expectedX = 0.5 * start.acceleration.ax.value() * deltaT * deltaT;
-  EXPECT_NEAR(expectedX, interpolated.pose.X().value(), kEpsilon);
+  auto expectedX = 0.5 * start.acceleration.ax * deltaT * deltaT;
+  EXPECT_NEAR_UNITS(expectedX, interpolated.pose.X(), 1e-9_m);
 
   // Linear interpolation of acceleration at t=0.5: 1.0 + (0 - 1.0) * 0.5 = 0.5
-  EXPECT_NEAR(0.5, interpolated.acceleration.ax.value(), kEpsilon);
+  EXPECT_NEAR_UNITS(0.5_mps_sq, interpolated.acceleration.ax, 1e-9_mps_sq);
 }
 
 TEST(TrajectorySampleTest, KinematicInterpolateAngularVelocity) {
@@ -135,29 +145,27 @@ TEST(TrajectorySampleTest, KinematicInterpolateAngularVelocity) {
 
   auto interpolated = wpi::math::KinematicInterpolate(start, end, 0.5);
 
-  EXPECT_NEAR(0.5, interpolated.timestamp.value(), kEpsilon);
+  EXPECT_NEAR_UNITS(0.5_s, interpolated.timestamp, 1e-9_s);
 
-  double deltaT = 0.5;
+  auto deltaT = 0.5_s;
 
   // ωₖ₊₁ = ωₖ + αₖΔt
-  double expectedOmega =
-      start.velocity.omega.value() + start.acceleration.alpha.value() * deltaT;
+  auto expectedOmega = start.velocity.omega + start.acceleration.alpha * deltaT;
 
   // Linear interpolation of angular acceleration.
-  double expectedAlpha =
-      start.acceleration.alpha.value() +
-      (end.acceleration.alpha.value() - start.acceleration.alpha.value()) * 0.5;
+  auto expectedAlpha =
+      wpi::util::Lerp(start.acceleration.alpha, end.acceleration.alpha, 0.5);
 
   // θₖ₊₁ = θₖ + ωₖΔt + ½α(Δt)²
-  double expectedTheta =
-      start.pose.Rotation().Radians().value() +
-      start.velocity.omega.value() * deltaT +
-      0.5 * start.acceleration.alpha.value() * deltaT * deltaT;
+  auto expectedTheta = start.pose.Rotation().Radians() +
+                       start.velocity.omega * deltaT +
+                       0.5 * start.acceleration.alpha * deltaT * deltaT;
 
-  EXPECT_NEAR(expectedOmega, interpolated.velocity.omega.value(), kEpsilon);
-  EXPECT_NEAR(expectedAlpha, interpolated.acceleration.alpha.value(), kEpsilon);
-  EXPECT_NEAR(expectedTheta, interpolated.pose.Rotation().Radians().value(),
-              kEpsilon);
+  EXPECT_NEAR_UNITS(expectedOmega, interpolated.velocity.omega, 1e-9_rad_per_s);
+  EXPECT_NEAR_UNITS(expectedAlpha, interpolated.acceleration.alpha,
+                    1e-9_rad_per_s_sq);
+  EXPECT_NEAR_UNITS(expectedTheta, interpolated.pose.Rotation().Radians(),
+                    1e-9_rad);
 }
 
 TEST(TrajectorySampleTest, KinematicInterpolateNegativeVelocity) {
@@ -172,14 +180,13 @@ TEST(TrajectorySampleTest, KinematicInterpolateNegativeVelocity) {
 
   auto interpolated = wpi::math::KinematicInterpolate(start, end, 0.5);
 
-  EXPECT_NEAR(0.5, interpolated.timestamp.value(), kEpsilon);
+  EXPECT_NEAR_UNITS(0.5_s, interpolated.timestamp, 1e-9_s);
 
   // xₖ₊₁ = xₖ + vₖΔt + ½a(Δt)²
-  double deltaT = 0.5;
-  double expectedX = start.pose.X().value() +
-                     start.velocity.vx.value() * deltaT +
-                     0.5 * start.acceleration.ax.value() * deltaT * deltaT;
-  EXPECT_NEAR(expectedX, interpolated.pose.X().value(), kEpsilon);
+  auto deltaT = 0.5_s;
+  auto expectedX = start.pose.X() + start.velocity.vx * deltaT +
+                   0.5 * start.acceleration.ax * deltaT * deltaT;
+  EXPECT_NEAR_UNITS(expectedX, interpolated.pose.X(), 1e-9_m);
 }
 
 TEST(TrajectorySampleTest, KinematicInterpolateMonotonicity) {
@@ -217,13 +224,13 @@ TEST(TrajectorySampleTest, KinematicInterpolateNonzeroStartTimestamp) {
   auto interpolated = wpi::math::KinematicInterpolate(start, end, 0.5);
 
   // Absolute interpolated timestamp.
-  EXPECT_NEAR(11.0, interpolated.timestamp.value(), kEpsilon);
+  EXPECT_NEAR_UNITS(11_s, interpolated.timestamp, 1e-9_s);
 
   // vₖ₊₁ = vₖ + aₖΔt = 1 + 2*1 = 3 (would be 1 + 2*11 = 23 with the bug)
-  EXPECT_NEAR(3.0, interpolated.velocity.vx.value(), kEpsilon);
+  EXPECT_NEAR_UNITS(3_mps, interpolated.velocity.vx, 1e-9_mps);
 
   // xₖ₊₁ = xₖ + vₖΔt + ½aₖ(Δt)² = 0 + 1*1 + ½*2*1 = 2
-  EXPECT_NEAR(2.0, interpolated.pose.X().value(), kEpsilon);
+  EXPECT_NEAR_UNITS(2_m, interpolated.pose.X(), 1e-9_m);
 }
 
 TEST(TrajectorySampleTest, KinematicInterpolateZeroTime) {
@@ -238,31 +245,34 @@ TEST(TrajectorySampleTest, KinematicInterpolateZeroTime) {
 
   // Should handle zero time difference gracefully.
   auto interpolated = wpi::math::KinematicInterpolate(start, end, 0.5);
-  EXPECT_NEAR(0.0, interpolated.timestamp.value(), kEpsilon);
+  EXPECT_NEAR_UNITS(0_s, interpolated.timestamp, 1e-9_s);
 }
 
 TEST(TrajectorySampleTest, SplineSampleStoresFieldRelativeVelocity) {
   // A SplineSample is built from path-relative (forward) scalars but stores
   // velocity/acceleration in the field frame. For a robot facing +90 degrees
   // moving forward, the field velocity should point along +y.
-  double forward = 2.0;
-  double forwardAccel = 1.5;
-  double curvature = 0.25;
-  wpi::math::SplineSample sample{0.0, wpi::math::Pose2d{0_m, 0_m, 90_deg},
-                                 forward, forwardAccel, curvature};
+  wpi::units::meters_per_second_t forwardVelocity{2.0};
+  wpi::units::meters_per_second_squared_t forwardAcceleration{1.5};
+  wpi::units::curvature_t curvature{0.25};
+  wpi::math::SplineSample sample{0_s, wpi::math::Pose2d{0_m, 0_m, 90_deg},
+                                 forwardVelocity, forwardAcceleration,
+                                 curvature};
 
   // Field-relative: forward speed rotated into +y.
-  EXPECT_NEAR(0.0, sample.velocity.vx.value(), kEpsilon);
-  EXPECT_NEAR(forward, sample.velocity.vy.value(), kEpsilon);
+  EXPECT_NEAR_UNITS(0_mps, sample.velocity.vx, 1e-9_mps);
+  EXPECT_NEAR_UNITS(forwardVelocity, sample.velocity.vy, 1e-9_mps);
   // Omega is frame-invariant and equals forward * curvature.
-  EXPECT_NEAR(forward * curvature, sample.velocity.omega.value(), kEpsilon);
+  EXPECT_NEAR_UNITS(forwardVelocity * curvature, sample.velocity.omega,
+                    1e-9_rad_per_s);
 
-  EXPECT_NEAR(0.0, sample.acceleration.ax.value(), kEpsilon);
-  EXPECT_NEAR(forwardAccel, sample.acceleration.ay.value(), kEpsilon);
+  EXPECT_NEAR_UNITS(0_mps_sq, sample.acceleration.ax, 1e-9_mps_sq);
+  EXPECT_NEAR_UNITS(forwardAcceleration, sample.acceleration.ay, 1e-9_mps_sq);
 
   // The projection accessors recover the path-relative scalars.
-  EXPECT_NEAR(forward, sample.ForwardVelocity().value(), kEpsilon);
-  EXPECT_NEAR(forwardAccel, sample.ForwardAcceleration().value(), kEpsilon);
+  EXPECT_NEAR_UNITS(forwardVelocity, sample.ForwardVelocity(), 1e-9_mps);
+  EXPECT_NEAR_UNITS(forwardAcceleration, sample.ForwardAcceleration(),
+                    1e-9_mps_sq);
 }
 
 TEST(TrajectorySampleTest, TransformRotatesVelocityAndAcceleration) {
@@ -276,19 +286,20 @@ TEST(TrajectorySampleTest, TransformRotatesVelocityAndAcceleration) {
   auto transformed = sample.Transform(
       wpi::math::Transform2d{wpi::math::Translation2d{3_m, 4_m}, 90_deg});
 
-  EXPECT_NEAR(3.0, transformed.pose.X().value(), kEpsilon);
-  EXPECT_NEAR(4.0, transformed.pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(std::numbers::pi / 2,
-              transformed.pose.Rotation().Radians().value(), kEpsilon);
+  EXPECT_NEAR_UNITS(3_m, transformed.pose.X(), 1e-9_m);
+  EXPECT_NEAR_UNITS(4_m, transformed.pose.Y(), 1e-9_m);
+  EXPECT_NEAR_UNITS(wpi::units::radian_t{std::numbers::pi / 2},
+                    transformed.pose.Rotation().Radians(), 1e-9_rad);
 
   // Velocity/acceleration vectors rotate by +90 degrees; angular terms are
   // unchanged.
-  EXPECT_NEAR(0.0, transformed.velocity.vx.value(), kEpsilon);
-  EXPECT_NEAR(1.0, transformed.velocity.vy.value(), kEpsilon);
-  EXPECT_NEAR(0.5, transformed.velocity.omega.value(), kEpsilon);
-  EXPECT_NEAR(0.0, transformed.acceleration.ax.value(), kEpsilon);
-  EXPECT_NEAR(2.0, transformed.acceleration.ay.value(), kEpsilon);
-  EXPECT_NEAR(0.3, transformed.acceleration.alpha.value(), kEpsilon);
+  EXPECT_NEAR_UNITS(0_mps, transformed.velocity.vx, 1e-9_mps);
+  EXPECT_NEAR_UNITS(1_mps, transformed.velocity.vy, 1e-9_mps);
+  EXPECT_NEAR_UNITS(0.5_rad_per_s, transformed.velocity.omega, 1e-9_rad_per_s);
+  EXPECT_NEAR_UNITS(0_mps_sq, transformed.acceleration.ax, 1e-9_mps_sq);
+  EXPECT_NEAR_UNITS(2_mps_sq, transformed.acceleration.ay, 1e-9_mps_sq);
+  EXPECT_NEAR_UNITS(0.3_rad_per_s_sq, transformed.acceleration.alpha,
+                    1e-9_rad_per_s_sq);
 }
 
 TEST(TrajectorySampleTest, RelativeToRotatesVelocityAndAcceleration) {
@@ -302,34 +313,35 @@ TEST(TrajectorySampleTest, RelativeToRotatesVelocityAndAcceleration) {
 
   auto relative = sample.RelativeTo(wpi::math::Pose2d{1_m, 2_m, 90_deg});
 
-  EXPECT_NEAR(0.0, relative.pose.X().value(), kEpsilon);
-  EXPECT_NEAR(0.0, relative.pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(0.0, relative.pose.Rotation().Radians().value(), kEpsilon);
+  EXPECT_NEAR_UNITS(0_m, relative.pose.X(), 1e-9_m);
+  EXPECT_NEAR_UNITS(0_m, relative.pose.Y(), 1e-9_m);
+  EXPECT_NEAR_UNITS(0_rad, relative.pose.Rotation().Radians(), 1e-9_rad);
 
   // Velocity/acceleration vectors rotate by -90 degrees; angular terms are
   // unchanged.
-  EXPECT_NEAR(1.0, relative.velocity.vx.value(), kEpsilon);
-  EXPECT_NEAR(0.0, relative.velocity.vy.value(), kEpsilon);
-  EXPECT_NEAR(0.5, relative.velocity.omega.value(), kEpsilon);
-  EXPECT_NEAR(2.0, relative.acceleration.ax.value(), kEpsilon);
-  EXPECT_NEAR(0.0, relative.acceleration.ay.value(), kEpsilon);
-  EXPECT_NEAR(0.3, relative.acceleration.alpha.value(), kEpsilon);
+  EXPECT_NEAR_UNITS(1_mps, relative.velocity.vx, 1e-9_mps);
+  EXPECT_NEAR_UNITS(0_mps, relative.velocity.vy, 1e-9_mps);
+  EXPECT_NEAR_UNITS(0.5_rad_per_s, relative.velocity.omega, 1e-9_rad_per_s);
+  EXPECT_NEAR_UNITS(2_mps_sq, relative.acceleration.ax, 1e-9_mps_sq);
+  EXPECT_NEAR_UNITS(0_mps_sq, relative.acceleration.ay, 1e-9_mps_sq);
+  EXPECT_NEAR_UNITS(0.3_rad_per_s_sq, relative.acceleration.alpha,
+                    1e-9_rad_per_s_sq);
 }
 
 TEST(TrajectorySampleTest, SplineSampleTransformPreservesForwardScalars) {
   // Rotating the sample rotates both the heading and the field velocity, so the
   // heading-relative forward scalars (and curvature) are invariant.
-  wpi::math::SplineSample sample{0.0, wpi::math::Pose2d{1_m, 2_m, 20_deg}, 2.0,
-                                 1.5, 0.25};
+  wpi::math::SplineSample sample{0_s, wpi::math::Pose2d{1_m, 2_m, 20_deg},
+                                 2_mps, 1.5_mps_sq, 0.25_rad / 1_m};
 
   auto transformed = sample.Transform(
       wpi::math::Transform2d{wpi::math::Translation2d{3_m, 4_m}, 35_deg});
   auto relative = sample.RelativeTo(wpi::math::Pose2d{0_m, 0_m, -15_deg});
 
   for (const auto& s : {transformed, relative}) {
-    EXPECT_NEAR(2.0, s.ForwardVelocity().value(), kEpsilon);
-    EXPECT_NEAR(1.5, s.ForwardAcceleration().value(), kEpsilon);
-    EXPECT_NEAR(0.25, s.curvature.value(), kEpsilon);
+    EXPECT_NEAR_UNITS(2_mps, s.ForwardVelocity(), 1e-9_mps);
+    EXPECT_NEAR_UNITS(1.5_mps_sq, s.ForwardAcceleration(), 1e-9_mps_sq);
+    EXPECT_NEAR_UNITS(0.25_rad / 1_m, s.curvature, 1e-9_rad / 1_m);
   }
 }
 
@@ -346,13 +358,11 @@ TEST(TrajectorySampleTest, DifferentialSampleTransformPreservesWheelSpeeds) {
   auto transformed = sample.Transform(
       wpi::math::Transform2d{wpi::math::Translation2d{0_m, 0_m}, 90_deg});
 
-  EXPECT_NEAR(sample.leftSpeed.value(), transformed.leftSpeed.value(),
-              kEpsilon);
-  EXPECT_NEAR(sample.rightSpeed.value(), transformed.rightSpeed.value(),
-              kEpsilon);
+  EXPECT_NEAR_UNITS(sample.leftSpeed, transformed.leftSpeed, 1e-9_mps);
+  EXPECT_NEAR_UNITS(sample.rightSpeed, transformed.rightSpeed, 1e-9_mps);
 
   // The field velocity rotates by +90 degrees.
-  EXPECT_NEAR(0.0, transformed.velocity.vx.value(), kEpsilon);
-  EXPECT_NEAR(2.0, transformed.velocity.vy.value(), kEpsilon);
-  EXPECT_NEAR(0.5, transformed.velocity.omega.value(), kEpsilon);
+  EXPECT_NEAR_UNITS(0_mps, transformed.velocity.vx, 1e-9_mps);
+  EXPECT_NEAR_UNITS(2_mps, transformed.velocity.vy, 1e-9_mps);
+  EXPECT_NEAR_UNITS(0.5_rad_per_s, transformed.velocity.omega, 1e-9_rad_per_s);
 }

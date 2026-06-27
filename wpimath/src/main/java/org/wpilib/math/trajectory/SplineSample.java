@@ -68,8 +68,8 @@ public class SplineSample extends TrajectorySample {
    */
   public SplineSample(TrajectorySample sample) {
     super(sample.timestamp, sample.pose, sample.velocity, sample.acceleration);
-    double forward = sample.velocity.toRobotRelative(sample.pose.getRotation()).vx;
-    this.curvature = sample.velocity.omega / (forward == 0.0 ? 1E-9 : forward);
+    double vx = sample.velocity.toRobotRelative(sample.pose.getRotation()).vx;
+    this.curvature = sample.velocity.omega / (vx == 0.0 ? 1e-9 : vx);
   }
 
   /** Constructs a SplineSample with all values set to zero. */

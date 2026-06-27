@@ -4,16 +4,16 @@
 
 #pragma once
 
-#include <vector>
-
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/trajectory/TrajectorySample.hpp"
+#include "wpi/units/acceleration.hpp"
 #include "wpi/units/curvature.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::util {
@@ -35,34 +35,11 @@ class SplineSample {
   ChassisVelocities velocity;
   /** The robot acceleration at this sample (in the field reference frame). */
   ChassisAccelerations acceleration;
-  /**
-   * The curvature of the path at this sample, in 1/m.
-   */
+  /** The curvature of the path at this sample. */
   wpi::units::curvature_t curvature{0.0};
 
   /** Constructs a default SplineSample with all zero values. */
   constexpr SplineSample() = default;
-
-  /**
-   * Constructs a SplineSample.
-   *
-   * @param time The timestamp of the sample relative to the trajectory start.
-   * @param pose The robot pose at this sample (in the field reference frame).
-   * @param vel The robot velocity at this sample (in the field reference
-   * frame).
-   * @param acc The robot acceleration at this sample (in the field reference
-   *            frame).
-   * @param curvature The curvature of the path at this sample, in 1/m.
-   */
-  constexpr SplineSample(wpi::units::second_t time, const Pose2d& pose,
-                         const ChassisVelocities& vel,
-                         const ChassisAccelerations& acc,
-                         wpi::units::curvature_t curvature)
-      : timestamp(time),
-        pose(pose),
-        velocity(vel),
-        acceleration(acc),
-        curvature(curvature) {}
 
   /**
    * Constructs a SplineSample from path-relative scalars.
@@ -71,28 +48,47 @@ class SplineSample {
    * velocity and acceleration are rotated into the field frame using the
    * sample's pose. The resulting velocity and acceleration are field-relative.
    *
-   * @param timeSeconds The timestamp in seconds.
+   * @param timestamp The timestamp of the sample relative to the trajectory
+   *     start.
    * @param pose The robot pose at this sample (in the field reference frame).
-   * @param linearVelocity The linear velocity in m/s.
-   * @param linearAcceleration The linear acceleration in m/s².
-   * @param curvature The curvature of the path at this sample, in rad/m.
+   * @param velocity The signed forward (path-tangential) velocity.
+   * @param acceleration The signed forward (path-tangential) acceleration.
+   * @param curvature The curvature of the path at this sample.
    */
-  explicit constexpr SplineSample(double timeSeconds, const Pose2d& pose,
-                                  double linearVelocity,
-                                  double linearAcceleration, double curvature)
-      : timestamp(wpi::units::second_t{timeSeconds}),
-        pose(pose),
-        velocity(ChassisVelocities{
-            wpi::units::meters_per_second_t{linearVelocity}, 0_mps,
-            wpi::units::radians_per_second_t{linearVelocity * curvature}}
-                     .ToFieldRelative(pose.Rotation())),
-        acceleration(ChassisAccelerations{
-            wpi::units::meters_per_second_squared_t{linearAcceleration},
-            0_mps_sq,
-            wpi::units::radians_per_second_squared_t{linearAcceleration *
-                                                     curvature}}
-                         .ToFieldRelative(pose.Rotation())),
-        curvature(wpi::units::curvature_t{curvature}) {}
+  constexpr SplineSample(wpi::units::second_t timestamp, const Pose2d& pose,
+                         wpi::units::meters_per_second_t velocity,
+                         wpi::units::meters_per_second_squared_t acceleration,
+                         wpi::units::curvature_t curvature)
+      : timestamp{timestamp},
+        pose{pose},
+        velocity{ChassisVelocities{velocity, 0_mps, velocity * curvature}
+                     .ToFieldRelative(pose.Rotation())},
+        acceleration{ChassisAccelerations{acceleration, 0_mps_sq,
+                                          acceleration * curvature}
+                         .ToFieldRelative(pose.Rotation())},
+        curvature{curvature} {}
+
+  /**
+   * Constructs a SplineSample.
+   *
+   * @param timestamp The timestamp of the sample relative to the trajectory
+   * start.
+   * @param pose The robot pose at this sample (in the field reference frame).
+   * @param velocity The robot velocity at this sample (in the field reference
+   *     frame).
+   * @param acceleration The robot acceleration at this sample (in the field
+   *     reference frame).
+   * @param curvature The curvature of the path at this sample.
+   */
+  constexpr SplineSample(wpi::units::second_t timestamp, const Pose2d& pose,
+                         const ChassisVelocities& velocity,
+                         const ChassisAccelerations& acceleration,
+                         wpi::units::curvature_t curvature)
+      : timestamp{timestamp},
+        pose{pose},
+        velocity{velocity},
+        acceleration{acceleration},
+        curvature{curvature} {}
 
   /**
    * Constructs a SplineSample from a generic sample.
@@ -104,14 +100,10 @@ class SplineSample {
       : timestamp(sample.timestamp),
         pose(sample.pose),
         velocity(sample.velocity),
-        acceleration(sample.acceleration),
-        curvature(wpi::units::curvature_t{
-            sample.velocity.ToRobotRelative(sample.pose.Rotation())
-                        .vx.value() == 0.0
-                ? (sample.velocity.omega.value() / 1e-9)
-                : (sample.velocity.omega.value() /
-                   sample.velocity.ToRobotRelative(sample.pose.Rotation())
-                       .vx.value())}) {}
+        acceleration(sample.acceleration) {
+    auto vx = sample.velocity.ToRobotRelative(sample.pose.Rotation()).vx;
+    curvature = sample.velocity.omega / (vx == 0_mps ? 1e-9_mps : vx);
+  }
 
   /**
    * Returns the signed forward (robot-relative tangential) velocity at this

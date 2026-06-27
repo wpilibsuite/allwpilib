@@ -229,10 +229,9 @@ SplineTrajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
     const auto& state = constrainedStates[i];
     wpi::units::meters_per_second_squared_t accel =
         i + 1 < numStates ? segAccel[i + 1] : segAccel[i];
-    samples.emplace_back(times[i].value(), state.pose.first,
-                         (reversed ? -velocities[i] : velocities[i]).value(),
-                         (reversed ? -accel : accel).value(),
-                         state.pose.second.value());
+    samples.emplace_back(times[i], state.pose.first,
+                         (reversed ? -velocities[i] : velocities[i]),
+                         (reversed ? -accel : accel), state.pose.second);
   }
 
   return SplineTrajectory(samples);
