@@ -74,7 +74,7 @@ class AlertTest {
       assertEquals(2, AlertDataJNI.getNumAlerts());
 
       assertThrows(
-          IllegalArgumentException.class,
+          AlertException.class,
           () -> new Alert("group", "id", "duplicate", Alert.Level.HIGH));
 
       AlertDataJNI.AlertInfo[] infos = AlertDataJNI.getAlerts();
@@ -95,7 +95,7 @@ class AlertTest {
 
       assertEquals(0, AlertDataJNI.getNumAlerts());
       assertEquals(0, AlertDataJNI.getAlerts().length);
-      assertThrows(IllegalArgumentException.class, () -> alert.get());
+      assertThrows(AlertException.class, () -> alert.get());
     }
   }
 
@@ -128,7 +128,7 @@ class AlertTest {
     try (Alert alert = new Alert("group", "id", "text", Alert.Level.HIGH)) {
       alert.set(true);
       assertThrows(
-          IllegalArgumentException.class,
+          AlertException.class,
           () -> new Alert("group", "id", "duplicate", Alert.Level.HIGH));
       // After the exception, we can still create a new alert with a different id
       try (Alert alert2 = new Alert("group", "id2", "text2", Alert.Level.HIGH)) {
