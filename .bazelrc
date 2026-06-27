@@ -65,7 +65,8 @@ build --strategy=CopyToDirectory=remote,standalone
 # All tests have a strategy of TestRunner.  Enable standalone for only tests.
 # See the following for more details:
 # https://github.com/bazelbuild/bazel/issues/7480
-build --strategy=TestRunner=remote,sandboxed,standalone
+build:linux --strategy=TestRunner=remote,sandboxed,standalone
+build:macos --strategy=TestRunner=remote,sandboxed,standalone
 build --strategy=NpmLifecycleHook=remote,sandboxed,standalone
 
 common:remote --config=common_cache
