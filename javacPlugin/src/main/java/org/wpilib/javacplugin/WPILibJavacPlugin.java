@@ -27,6 +27,7 @@ public class WPILibJavacPlugin implements Plugin {
     task.addTaskListener(new CodeAfterCoroutineParkDetector(task));
     task.addTaskListener(new IncorrectCoroutineUseDetector(task));
     task.addTaskListener(new IntegerDivisionDetector(task));
+    task.addTaskListener(new MatrixSizeListener(task));
   }
 
   @Override
