@@ -315,6 +315,13 @@ void HAL_ObserveUserProgramStarting(void);
  */
 void HAL_ObserveUserProgram(HAL_ControlWord word);
 
+/**
+ * Writes ANSI text to the display.
+ *
+ * @param data the ANSI text to write
+ */
+void HAL_WriteDisplayAnsi(const struct WPI_String* data);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

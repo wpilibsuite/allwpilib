@@ -1,13 +1,14 @@
 project(glass)
 
 include(CompileWarnings)
+include(AddTest)
 include(GenResources)
 include(LinkMacOSGUI)
 
 #
 # libglass
 #
-file(GLOB_RECURSE libglass_src src/lib/native/cpp/*.cpp)
+file(GLOB_RECURSE libglass_src src/lib/native/cpp/*.cpp src/lib/native/thirdparty/mrccomm/src/*.cpp)
 
 add_library(libglass STATIC ${libglass_src})
 set_target_properties(libglass PROPERTIES DEBUG_POSTFIX "d")
@@ -25,12 +26,21 @@ target_include_directories(
     libglass
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lib/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lib/native/thirdparty/mrccomm/include>
         $<INSTALL_INTERFACE:${include_dest}/glass>
 )
 
 install(TARGETS libglass EXPORT libglass)
 export(TARGETS libglass FILE libglass.cmake NAMESPACE libglass::)
-install(DIRECTORY src/lib/native/include/ DESTINATION "${include_dest}/glass")
+install(
+    DIRECTORY src/lib/native/include/ src/lib/native/thirdparty/mrccomm/include/
+    DESTINATION "${include_dest}/glass"
+)
+
+if(WITH_TESTS)
+    wpilib_add_test_catch2(glass src/test/native/cpp)
+    target_link_libraries(glass_test libglass)
+endif()
 
 #
 # libglassnt

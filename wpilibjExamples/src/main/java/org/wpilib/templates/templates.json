@@ -23,6 +23,29 @@
     "commandversion": 2
   },
   {
+    "name": "Command v3 Robot",
+    "description": "Command v3, with explanatory comments and example code.",
+    "tags": [
+      "Commandv3"
+    ],
+    "foldername": "commandv3",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 3
+  },
+  {
+    "name": "Command v3 Robot Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for Command v3, without explanatory comments and example code.",
+    "tags": [
+      "Commandv3",
+      "Skeleton"
+    ],
+    "foldername": "commandv3skeleton",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 3
+  },
+  {
     "name": "OpMode Robot",
     "description": "OpMode style, with explanatory comments and example code.",
     "tags": [

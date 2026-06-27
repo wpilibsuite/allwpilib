@@ -4,6 +4,7 @@
 
 package org.wpilib.command2.button;
 
+import java.util.Objects;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.Gamepad;
@@ -27,6 +28,16 @@ public class CommandGamepad {
   public CommandGamepad(int port) {
     m_hid = CommandGenericHID.getCommandGenericHID(port);
     m_gamepad = DriverStation.getGamepad(port);
+  }
+
+  /**
+   * Construct an instance of a controller with a Gamepad object.
+   *
+   * @param gamepad The Gamepad object to use for this controller.
+   */
+  public CommandGamepad(Gamepad gamepad) {
+    m_gamepad = Objects.requireNonNull(gamepad, "Provided gamepad cannot be null");
+    m_hid = new CommandGenericHID(m_gamepad.getHID());
   }
 
   /**
@@ -873,22 +884,22 @@ public class CommandGamepad {
   }
 
   /**
-   * Get the left trigger axis value of the controller. Note that this axis is bound to the range of
-   * [0, 1] as opposed to the usual [-1, 1].
+   * Get the left trigger value of the controller. Note that this axis is bound to the range of [0,
+   * 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */
-  public double getLeftTriggerAxis() {
-    return m_gamepad.getLeftTriggerAxis();
+  public double getLeftTrigger() {
+    return m_gamepad.getLeftTrigger();
   }
 
   /**
-   * Get the right trigger axis value of the controller. Note that this axis is bound to the range
-   * of [0, 1] as opposed to the usual [-1, 1].
+   * Get the right trigger value of the controller. Note that this axis is bound to the range of [0,
+   * 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */
-  public double getRightTriggerAxis() {
-    return m_gamepad.getRightTriggerAxis();
+  public double getRightTrigger() {
+    return m_gamepad.getRightTrigger();
   }
 }

@@ -4,6 +4,8 @@
 
 #include "wpi/commands2/button/CommandGamepad.hpp"
 
+#include <memory>
+
 #include "wpi/commands2/button/CommandGenericHID.hpp"
 
 using namespace wpi::cmd;
@@ -11,6 +13,11 @@ using namespace wpi::cmd;
 CommandGamepad::CommandGamepad(int port)
     : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
       m_gamepad{&wpi::DriverStation::GetGamepad(port)} {}
+
+CommandGamepad::CommandGamepad(wpi::Gamepad* gamepad)
+    : m_ownedHid{std::make_unique<CommandGenericHID>(gamepad->GetHID())},
+      m_hid{m_ownedHid.get()},
+      m_gamepad{gamepad} {}
 
 CommandGenericHID& CommandGamepad::GetHID() {
   return *m_hid;
@@ -181,10 +188,10 @@ double CommandGamepad::GetRightY() const {
   return m_gamepad->GetRightY();
 }
 
-double CommandGamepad::GetLeftTriggerAxis() const {
-  return m_gamepad->GetLeftTriggerAxis();
+double CommandGamepad::GetLeftTrigger() const {
+  return m_gamepad->GetLeftTrigger();
 }
 
-double CommandGamepad::GetRightTriggerAxis() const {
-  return m_gamepad->GetRightTriggerAxis();
+double CommandGamepad::GetRightTrigger() const {
+  return m_gamepad->GetRightTrigger();
 }

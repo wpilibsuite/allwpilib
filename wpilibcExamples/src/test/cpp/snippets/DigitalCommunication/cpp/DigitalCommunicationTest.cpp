@@ -43,7 +43,8 @@ class DigitalCommunicationTest : public testing::TestWithParam<T> {
   }
 };
 
-class AllianceTest : public DigitalCommunicationTest<HAL_AllianceStationID> {};
+class AllianceTest
+    : public DigitalCommunicationTest<wpi::hal::AllianceStationID> {};
 
 TEST_P(AllianceTest, Alliance) {
   auto alliance = GetParam();
@@ -57,15 +58,15 @@ TEST_P(AllianceTest, Alliance) {
 
   bool isRed = false;
   switch (alliance) {
-    case HAL_ALLIANCE_STATION_BLUE_1:
-    case HAL_ALLIANCE_STATION_BLUE_2:
-    case HAL_ALLIANCE_STATION_BLUE_3:
-    case HAL_ALLIANCE_STATION_UNKNOWN:
+    case wpi::hal::AllianceStationID::BLUE_1:
+    case wpi::hal::AllianceStationID::BLUE_2:
+    case wpi::hal::AllianceStationID::BLUE_3:
+    case wpi::hal::AllianceStationID::UNKNOWN:
       isRed = false;
       break;
-    case HAL_ALLIANCE_STATION_RED_1:
-    case HAL_ALLIANCE_STATION_RED_2:
-    case HAL_ALLIANCE_STATION_RED_3:
+    case wpi::hal::AllianceStationID::RED_1:
+    case wpi::hal::AllianceStationID::RED_2:
+    case wpi::hal::AllianceStationID::RED_3:
       isRed = true;
       break;
   }
@@ -74,26 +75,27 @@ TEST_P(AllianceTest, Alliance) {
 
 INSTANTIATE_TEST_SUITE_P(
     DigitalCommunicationTests, AllianceTest,
-    testing::Values<HAL_AllianceStationID>(
-        HAL_ALLIANCE_STATION_RED_1, HAL_ALLIANCE_STATION_RED_2,
-        HAL_ALLIANCE_STATION_RED_3, HAL_ALLIANCE_STATION_BLUE_1,
-        HAL_ALLIANCE_STATION_BLUE_2, HAL_ALLIANCE_STATION_BLUE_3,
-        HAL_ALLIANCE_STATION_UNKNOWN),
+    testing::Values<wpi::hal::AllianceStationID>(
+        wpi::hal::AllianceStationID::RED_1, wpi::hal::AllianceStationID::RED_2,
+        wpi::hal::AllianceStationID::RED_3, wpi::hal::AllianceStationID::BLUE_1,
+        wpi::hal::AllianceStationID::BLUE_2,
+        wpi::hal::AllianceStationID::BLUE_3,
+        wpi::hal::AllianceStationID::UNKNOWN),
     [](const testing::TestParamInfo<AllianceTest::ParamType>& info) {
       switch (info.param) {
-        case HAL_ALLIANCE_STATION_BLUE_1:
+        case wpi::hal::AllianceStationID::BLUE_1:
           return std::string{"Blue1"};
-        case HAL_ALLIANCE_STATION_BLUE_2:
+        case wpi::hal::AllianceStationID::BLUE_2:
           return std::string{"Blue2"};
-        case HAL_ALLIANCE_STATION_BLUE_3:
+        case wpi::hal::AllianceStationID::BLUE_3:
           return std::string{"Blue3"};
-        case HAL_ALLIANCE_STATION_RED_1:
+        case wpi::hal::AllianceStationID::RED_1:
           return std::string{"Red1"};
-        case HAL_ALLIANCE_STATION_RED_2:
+        case wpi::hal::AllianceStationID::RED_2:
           return std::string{"Red2"};
-        case HAL_ALLIANCE_STATION_RED_3:
+        case wpi::hal::AllianceStationID::RED_3:
           return std::string{"Red3"};
-        case HAL_ALLIANCE_STATION_UNKNOWN:
+        case wpi::hal::AllianceStationID::UNKNOWN:
           return std::string{"Unknown"};
       }
       return std::string{"Error"};
@@ -122,7 +124,8 @@ class AutonomousTest : public DigitalCommunicationTest<bool> {};
 TEST_P(AutonomousTest, Autonomous) {
   auto autonomous = GetParam();
   wpi::sim::DriverStationSim::SetRobotMode(
-      autonomous ? HAL_ROBOT_MODE_AUTONOMOUS : HAL_ROBOT_MODE_TELEOPERATED);
+      autonomous ? wpi::hal::RobotMode::AUTONOMOUS
+                 : wpi::hal::RobotMode::TELEOPERATED);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(autonomousOutput.GetInitialized());

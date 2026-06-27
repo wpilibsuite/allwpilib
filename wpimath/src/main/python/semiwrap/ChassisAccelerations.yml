@@ -48,7 +48,7 @@ inline_code: |
         self->ax = ax;
       }
     )
-    .def_property("ay_fpss", 
+    .def_property("ay_fpss",
       [](ChassisAccelerations * self) -> wpi::units::feet_per_second_squared_t {
         return self->ay;
       },
@@ -56,7 +56,7 @@ inline_code: |
         self->ay = ay;
       }
     )
-    .def_property("alpha_dpss", 
+    .def_property("alpha_dpss",
       [](ChassisAccelerations * self) -> wpi::units::degrees_per_second_squared_t {
         return self->alpha;
       },

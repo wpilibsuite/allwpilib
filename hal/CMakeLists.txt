@@ -34,6 +34,6 @@ install(FILES ${WPILIB_BINARY_DIR}/hal-config.cmake DESTINATION share/hal)
 install(EXPORT hal DESTINATION share/hal)
 
 if(WITH_TESTS)
-    wpilib_add_test(hal src/test/native/cpp)
-    target_link_libraries(hal_test hal googletest)
+    wpilib_add_test_catch2(hal src/test/native/cpp)
+    target_link_libraries(hal_test hal)
 endif()

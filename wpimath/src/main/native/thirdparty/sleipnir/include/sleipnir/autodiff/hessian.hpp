@@ -45,7 +45,7 @@ class Hessian {
       : m_variables{detail::gradient_tree(
             detail::topological_sort(variable.expr), wrt)},
         m_wrt{std::move(wrt)} {
-    slp_assert(wrt.cols() == 1);
+    slp_assert(m_wrt.cols() == 1);
 
     for (auto& variable : m_variables) {
       m_top_lists.emplace_back(detail::topological_sort(variable.expr));

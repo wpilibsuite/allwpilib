@@ -4,6 +4,8 @@ EXAMPLE_FOLDERS = [
     "DifferentialDriveBot",
     "DifferentialDrivePoseEstimator",
     "DriveDistanceOffboard",
+    "DriverStationDisplayAnsi",
+    "DriverStationDisplayLines",
     "DutyCycleEncoder",
     "ElevatorExponentialProfile",
     "ElevatorExponentialSimulation",
