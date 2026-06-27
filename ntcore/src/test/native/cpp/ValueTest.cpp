@@ -271,10 +271,6 @@ TEST_CASE("ValueTest StringArray", "[ntcore][value]") {
   NT_DisposeValue(&cv);
 }
 
-TEST_CASE("ValueDeathTest GetAssertions", "[ntcore][value][.]") {
-  SKIP("Death assertions are disabled");
-}
-
 TEST_CASE("ValueTest UnassignedComparison", "[ntcore][value]") {
   Value v1, v2;
   REQUIRE(v1 == v2);
