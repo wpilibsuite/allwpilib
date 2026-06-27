@@ -746,7 +746,9 @@ public abstract class OpModeRobot extends RobotBase {
 
   @Override
   public void close() {
+    m_loopOverrunAlert.close();
     NotifierJNI.destroyNotifier(m_notifier);
+    super.close();
   }
 
   /** Ends the main loop in startCompetition(). */

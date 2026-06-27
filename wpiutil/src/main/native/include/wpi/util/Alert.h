@@ -9,7 +9,7 @@
 #include "wpi/util/Handle.h"
 #include "wpi/util/string.h"
 
-typedef WPI_Handle WPI_AlertHandle;
+typedef WPI_Handle WPI_AlertHandle;   // NOLINT(modernize-use-using)
 
 #ifdef __cplusplus
 extern "C" {
