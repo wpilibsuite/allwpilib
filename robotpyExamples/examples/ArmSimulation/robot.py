@@ -22,7 +22,7 @@ class MyRobot(wpilib.TimedRobot):
     def simulationPeriodic(self) -> None:
         self.arm.simulationPeriodic()
 
-    def teleopInit(self) -> None:
+    def teleopEnter(self) -> None:
         self.arm.loadPreferences()
 
     def teleopPeriodic(self) -> None:
@@ -33,6 +33,6 @@ class MyRobot(wpilib.TimedRobot):
             # Otherwise, we disable the motor.
             self.arm.stop()
 
-    def disabledInit(self) -> None:
+    def disabledEnter(self) -> None:
         # This just makes sure that our simulation code knows that the motor's off.
         self.arm.stop()

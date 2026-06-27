@@ -80,7 +80,7 @@ class RapidReactCommandBot:
     def getAutonomousCommand(self) -> commands2.Command:
         """Use this to define the command that runs during autonomous.
 
-        Scheduled during :meth:`.Robot.autonomousInit`.
+        Scheduled during :meth:`.Robot.autonomouEnter`.
         """
         # Drive forward for 2 meters at half velocity with a 3 second timeout
         return self.drive.driveDistanceCommand(

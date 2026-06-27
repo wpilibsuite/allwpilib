@@ -567,13 +567,13 @@ public abstract class OpModeRobot extends RobotBase {
   /** Function called periodically in simulation. */
   public void simulationPeriodic() {}
 
-  /** Function called once when the robot becomes disabled. */
-  public void disabledInit() {}
+  /** Function called each time the robot enters disabled state. */
+  public void disabledEnter() {}
 
   /** Function called periodically while the robot is disabled. */
   public void disabledPeriodic() {}
 
-  /** Function called once when the robot exits disabled state. */
+  /** Function called each time the robot exits disabled state. */
   public void disabledExit() {}
 
   /**
@@ -647,7 +647,7 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     // Handle enabled state changes
-    boolean justCalledDisabledInit = false;
+    boolean justCalledDisabledEnter = false;
     if (m_lastEnabledState != enabled) {
       if (enabled) {
         // Transitioning to enabled
@@ -664,17 +664,17 @@ public abstract class OpModeRobot extends RobotBase {
           m_currentOpMode.end();
           m_watchdog.addEpoch("opMode.end()");
         }
-        disabledInit();
-        m_watchdog.addEpoch("disabledInit()");
-        justCalledDisabledInit = true;
+        disabledEnter();
+        m_watchdog.addEpoch("disabledEnter()");
+        justCalledDisabledEnter = true;
       }
       m_lastEnabledState = enabled;
     }
 
     // Call periodic functions based on current state
     if (!enabled) {
-      // Only call disabledPeriodic if we didn't just call disabledInit
-      if (!justCalledDisabledInit) {
+      // Only call disabledPeriodic if we didn't just call disabledEnter
+      if (!justCalledDisabledEnter) {
         disabledPeriodic();
         m_watchdog.addEpoch("disabledPeriodic()");
       }

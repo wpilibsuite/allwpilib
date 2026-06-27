@@ -32,14 +32,14 @@ class MyRobot(commands2.TimedCommandRobot):
         # Initialize data logging.
         wpilib.DataLogManager.start()
 
-    def disabledInit(self) -> None:
-        """This function is called once each time the robot enters Disabled mode."""
+    def disabledEnter(self) -> None:
+        """This function is called each time the robot enters Disabled mode."""
         pass
 
     def disabledPeriodic(self) -> None:
         pass
 
-    def autonomousInit(self) -> None:
+    def autonomousEnter(self) -> None:
         self.autonomousCommand = self.robot.getAutonomousCommand()
 
         if self.autonomousCommand is not None:
@@ -49,7 +49,7 @@ class MyRobot(commands2.TimedCommandRobot):
         """This function is called periodically during autonomous."""
         pass
 
-    def teleopInit(self) -> None:
+    def teleopEnter(self) -> None:
         # This makes sure that the autonomous stops running when
         # teleop starts running. If you want the autonomous to
         # continue until interrupted by another command, remove
@@ -61,7 +61,7 @@ class MyRobot(commands2.TimedCommandRobot):
         """This function is called periodically during operator control."""
         pass
 
-    def utilityInit(self) -> None:
+    def utilityEnter(self) -> None:
         # Cancels all running commands at the start of utility mode.
         commands2.CommandScheduler.getInstance().cancelAll()
 
