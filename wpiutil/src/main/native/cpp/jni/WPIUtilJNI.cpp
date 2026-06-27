@@ -46,14 +46,15 @@ static bool CheckAlertStatus(JNIEnv* env, int32_t status) {
   if (status == 0) {
     return true;
   }
-  static jmethodID func = env->GetMethodID(
-      alertEx, "<init>",
-      "(Ljava/lang/String;I)V");
+  static jmethodID func =
+      env->GetMethodID(alertEx, "<init>", "(Ljava/lang/String;I)V");
   jobject exception;
   if (status == ALERT_ALREADY_ALLOCATED) {
-    exception = env->NewObject(alertEx, func, MakeJString(env, "Alert already allocated"), status);
+    exception = env->NewObject(
+        alertEx, func, MakeJString(env, "Alert already allocated"), status);
   } else {
-    exception = env->NewObject(alertEx, func, MakeJString(env, "Alert operation failed"), status);
+    exception = env->NewObject(
+        alertEx, func, MakeJString(env, "Alert operation failed"), status);
   }
   env->Throw(static_cast<jthrowable>(exception));
   return false;

@@ -4,13 +4,11 @@
 
 package org.wpilib.util;
 
-/**
- * Exception thrown to indicate an alert condition with an associated reason code.
- */
+/** Exception thrown to indicate an alert condition with an associated reason code. */
 public class AlertException extends RuntimeException {
   private static final long serialVersionUID = -4273483424L;
 
-  private final int reason;
+  private final int m_reason;
 
   /**
    * Constructs a new AlertException with the specified detail message and reason code.
@@ -20,7 +18,7 @@ public class AlertException extends RuntimeException {
    */
   public AlertException(String message, int reason) {
     super(message);
-    this.reason = reason;
+    this.m_reason = reason;
   }
 
   /**
@@ -29,6 +27,6 @@ public class AlertException extends RuntimeException {
    * @return the reason code
    */
   public int getReason() {
-    return reason;
+    return m_reason;
   }
 }

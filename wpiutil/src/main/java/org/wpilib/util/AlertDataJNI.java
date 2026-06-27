@@ -5,7 +5,7 @@
 package org.wpilib.util;
 
 /** JNI for alert data. */
-public class AlertDataJNI {
+public class AlertDataJNI extends WPIUtilJNIWrapper {
   /**
    * High priority alert - displayed first with a red "X" symbol. Use this type for problems which
    * will seriously affect the robot's functionality and thus require immediate attention.

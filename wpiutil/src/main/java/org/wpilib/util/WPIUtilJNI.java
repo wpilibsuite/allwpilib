@@ -4,66 +4,10 @@
 
 package org.wpilib.util;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.wpilib.util.runtime.RuntimeLoader;
 
 /** WPIUtil JNI. */
-public class WPIUtilJNI {
-  static boolean libraryLoaded = false;
-
-  /** Sets whether JNI should be loaded in the static block. */
-  public static class Helper {
-    private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
-
-    /**
-     * Returns true if the JNI should be loaded in the static block.
-     *
-     * @return True if the JNI should be loaded in the static block.
-     */
-    public static boolean getExtractOnStaticLoad() {
-      return extractOnStaticLoad.get();
-    }
-
-    /**
-     * Sets whether the JNI should be loaded in the static block.
-     *
-     * @param load Whether the JNI should be loaded in the static block.
-     */
-    public static void setExtractOnStaticLoad(boolean load) {
-      extractOnStaticLoad.set(load);
-    }
-
-    /** Utility class. */
-    private Helper() {}
-  }
-
-  static {
-    if (Helper.getExtractOnStaticLoad()) {
-      try {
-        RuntimeLoader.loadLibrary("wpiutiljni");
-      } catch (Exception ex) {
-        ex.printStackTrace();
-        System.exit(1);
-      }
-      libraryLoaded = true;
-    }
-  }
-
-  /**
-   * Force load the library.
-   *
-   * @throws IOException if the library failed to load
-   */
-  public static synchronized void forceLoad() throws IOException {
-    if (libraryLoaded) {
-      return;
-    }
-    RuntimeLoader.loadLibrary("wpiutiljni");
-    libraryLoaded = true;
-  }
-
+public class WPIUtilJNI extends WPIUtilJNIWrapper {
   /** Checks if the MSVC runtime is valid. Throws a runtime exception if not. */
   public static native void checkMsvcRuntime();
 
@@ -236,5 +180,5 @@ public class WPIUtilJNI {
       throws InterruptedException;
 
   /** Utility class. */
-  protected WPIUtilJNI() {}
+  private WPIUtilJNI() {}
 }

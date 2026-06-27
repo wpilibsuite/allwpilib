@@ -103,7 +103,9 @@ static int32_t MrcLibCreateAlert(const struct WPI_String* group,
       MRC_Alert_CreateAlert(&mrcGroup, &mrcId, &mrcText, level, &mrcHandle);
   if (status != 0) {
     *handle = WPI_INVALID_HANDLE;
-    return status == MRC_STATUS_RESOURCE_ALREADY_ALLOCATED ? ALERT_ALREADY_ALLOCATED : ALERT_ERROR;
+    return status == MRC_STATUS_RESOURCE_ALREADY_ALLOCATED
+               ? ALERT_ALREADY_ALLOCATED
+               : ALERT_ERROR;
   }
 
   auto& manager = GetManager();
