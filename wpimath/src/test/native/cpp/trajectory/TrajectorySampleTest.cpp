@@ -28,10 +28,6 @@
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/MathExtras.hpp"
 
-namespace {
-constexpr double kEpsilon = 1e-9;
-}  // namespace
-
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
 
@@ -202,8 +198,8 @@ TEST(TrajectorySampleTest, KinematicInterpolateMonotonicity) {
   auto prev = start;
   for (int t = 1; t <= 10; t++) {
     auto curr = wpi::math::KinematicInterpolate(start, end, t / 10.0);
-    EXPECT_GE(curr.pose.X().value(), prev.pose.X().value() - kEpsilon);
-    EXPECT_GE(curr.timestamp.value(), prev.timestamp.value() - kEpsilon);
+    EXPECT_GE(curr.pose.X(), prev.pose.X() - 1e-9_m);
+    EXPECT_GE(curr.timestamp, prev.timestamp - 1e-9_s);
     prev = curr;
   }
 }
