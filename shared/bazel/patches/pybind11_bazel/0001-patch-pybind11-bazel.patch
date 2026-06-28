@@ -1,0 +1,54 @@
+diff --git a/build_defs.bzl b/build_defs.bzl
+index 6b0fd2b..7cbe6ed 100644
+--- a/build_defs.bzl
++++ b/build_defs.bzl
+@@ -135,6 +135,8 @@ def pybind_extension(
+     # Mark common dependencies as required for build_cleaner.
+     tags = tags + ["req_dep=%s" % dep for dep in PYBIND_DEPS]
+ 
++    arg_target_compatible_with = kwargs.pop("target_compatible_with", [])
++
+     cc_binary(
+         name = name + ".so",
+         copts = copts + PYBIND_COPTS + select({
+@@ -149,7 +151,7 @@ def pybind_extension(
+         }),
+         linkshared = 1,
+         tags = tags,
+-        target_compatible_with = select({
++        target_compatible_with = arg_target_compatible_with + select({
+             "@platforms//os:windows": ["@platforms//:incompatible"],
+             "//conditions:default": [],
+         }),
+@@ -171,7 +173,7 @@ def pybind_extension(
+         }),
+         linkshared = 1,
+         tags = tags,
+-        target_compatible_with = select({
++        target_compatible_with = arg_target_compatible_with + select({
+             "@platforms//os:windows": [],
+             "//conditions:default": ["@platforms//:incompatible"],
+         }),
+diff --git a/internal_configure.bzl b/internal_configure.bzl
+index 6f439c9..c83de7b 100644
+--- a/internal_configure.bzl
++++ b/internal_configure.bzl
+@@ -12,15 +12,13 @@ _INTEGRITIES = {
+     "2.13.6": "sha256-4Iy4f0dz2pf6e18DXeh2OrxlbYfVdz5i9toFh9Hw7CA=",
+     "3.0.0": "sha256-RTsaPismbDrp2ockEcrbbWk6wYBjvXMibZbPtwFaIAw=",
+     "3.0.1": "sha256-dBYz2nRrfHOLtx8YVPlXudpmC80tzmjXGUkDfwlp0Mo=",
++    "3.0.2": "sha256-LyCgrwuSGBXg4Wnqf+xjkJhpMjWBuJ194VU0aFU/ai0=",
+ }
+ 
+ def _internal_configure_extension_impl(module_ctx):
+-    (pybind11_bazel,) = [module for module in module_ctx.modules if module.name == "pybind11_bazel"]
+-    version = pybind11_bazel.version
++    # Hardcode version to 3.0.2 to use the newer pybind11 release.
++    version = "3.0.2"
+ 
+-    # The pybind11_bazel version should typically just be the pybind11 version,
+-    # but can end with ".bzl.<N>" if the Bazel plumbing was updated separately.
+-    version = version.split(".bzl.")[0]
+     http_archive(
+         name = "pybind11",
+         build_file = "//:pybind11-BUILD.bazel",

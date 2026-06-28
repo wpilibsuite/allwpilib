@@ -4,11 +4,8 @@ module(
 )
 
 include("//docs:doxygen.MODULE.bazel")
-
 include("//shared/bazel/thirdparty/ceres:ceres.MODULE.bazel")
-
 include("//shared/bazel/thirdparty/libssh:libssh.MODULE.bazel")
-
 include("//shared/bazel/thirdparty/mrclib:mrclib.MODULE.bazel")
 
 bazel_dep(name = "apple_support", version = "2.0.0", repo_name = "build_bazel_apple_support")
@@ -21,6 +18,21 @@ bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "rules_java", version = "8.16.1")
 bazel_dep(name = "rules_python", version = "1.7.0")
 bazel_dep(name = "rules_pycross", version = "0.8.1")
+bazel_dep(name = "pybind11_bazel", version = "3.0.1")
+single_version_override(
+    module_name = "pybind11_bazel",
+    patch_strip = 1,
+    patches = ["shared/bazel/patches/pybind11_bazel/0001-patch-pybind11-bazel.patch"],
+    version = "3.0.1",
+)
+
+publishing = use_extension("//shared/bazel/rules:publishing_rule.bzl", "publishing_extension")
+use_repo(publishing, "com_wpilib_allwpilib_publishing_config")
+
+pycross = use_extension("@rules_pycross//pycross/extensions:pycross.bzl", "pycross")
+pycross.configure_environments(
+    python_versions = ["3.13"],
+)
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
