@@ -70,7 +70,7 @@ class WPILIB_DLLEXPORT PIDController
       wpi::math::MathSharedStore::ReportWarning(
           "Controller period defaulted to 20ms.");
     }
-    if (!std::is_constant_evaluated()) {
+    if !consteval {
       ++instances;
 
       wpi::math::MathSharedStore::ReportUsage("PIDController",
