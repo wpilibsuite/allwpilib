@@ -469,26 +469,6 @@ class VariableBlock : public SleipnirBase {
   ///
   /// @param rhs Variable to divide.
   /// @return Result of division.
-  VariableBlock<Mat>& operator/=(const MatrixLike auto& rhs) {
-    slp_assert(rhs.rows() == 1 && rhs.cols() == 1);
-
-    for (int row = 0; row < rows(); ++row) {
-      for (int col = 0; col < cols(); ++col) {
-        if constexpr (EigenMatrixLike<decltype(rhs)>) {
-          (*this)[row, col] /= rhs(0, 0);
-        } else {
-          (*this)[row, col] /= rhs[0, 0];
-        }
-      }
-    }
-
-    return *this;
-  }
-
-  /// Compound matrix division-assignment operator.
-  ///
-  /// @param rhs Variable to divide.
-  /// @return Result of division.
   VariableBlock<Mat>& operator/=(const ScalarLike auto& rhs) {
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
