@@ -7,54 +7,6 @@ include(AddTest)
 
 file(GLOB wpinet_jni_src src/main/native/cpp/jni/WPINetJNI.cpp)
 
-# Java bindings
-if(WITH_JAVA)
-    include(UseJava)
-
-    set(CMAKE_JNI_TARGET true)
-
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
-
-    add_jar(
-        wpinet_jar
-        ${JAVA_SOURCES}
-        INCLUDE_JARS wpiutil_jar
-        OUTPUT_NAME wpinet
-        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
-        GENERATE_NATIVE_HEADERS wpinet_jni_headers
-    )
-    set_property(TARGET wpinet_jar PROPERTY FOLDER "java")
-
-    install_jar(wpinet_jar DESTINATION ${java_lib_dest})
-    install_jar_exports(TARGETS wpinet_jar FILE wpinet_jar.cmake DESTINATION share/wpinet)
-
-    add_library(wpinetjni ${wpinet_jni_src})
-    wpilib_target_warnings(wpinetjni)
-    target_link_libraries(wpinetjni PUBLIC wpinet)
-
-    set_property(TARGET wpinetjni PROPERTY FOLDER "libraries")
-
-    target_link_libraries(wpinetjni PRIVATE wpinet_jni_headers)
-    add_dependencies(wpinetjni wpinet_jar)
-
-    install(TARGETS wpinetjni EXPORT wpinetjni)
-    export(TARGETS wpinetjni FILE wpinetjni.cmake NAMESPACE wpinetjni::)
-endif()
-
-if(WITH_JAVA_SOURCE)
-    include(UseJava)
-    include(CreateSourceJar)
-    add_source_jar(
-        wpinet_src_jar
-        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
-        OUTPUT_NAME wpinet-sources
-        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
-    )
-    set_property(TARGET wpinet_src_jar PROPERTY FOLDER "java")
-
-    install_jar(wpinet_src_jar DESTINATION ${java_lib_dest})
-endif()
-
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
@@ -235,7 +187,7 @@ set_property(TARGET netconsoleServer PROPERTY FOLDER "examples")
 set_property(TARGET netconsoleTee PROPERTY FOLDER "examples")
 
 if(WITH_TESTS)
-    wpilib_add_test(wpinet src/test/native/cpp)
+    wpilib_add_test_catch2(wpinet src/test/native/cpp)
     target_include_directories(wpinet_test PRIVATE src/test/native/include src/main/native/cpp)
-    target_link_libraries(wpinet_test wpinet ${LIBUTIL} googletest wpiutil_testlib)
+    target_link_libraries(wpinet_test wpinet ${LIBUTIL} wpiutil_testlib)
 endif()

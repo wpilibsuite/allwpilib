@@ -4,10 +4,6 @@
 
 #pragma once
 
-#include <string_view>
-
-#include "wpi/util/SymbolExports.hpp"
-
 namespace wpi::apriltag {
 
 /**

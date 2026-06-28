@@ -7,6 +7,8 @@ def __generate_hal_impl(ctx):
     args = ctx.actions.args()
     args.add("--output_directory", output_dir.path + "/main/native/cpp/mrc/protobuf")
     args.add("--nanopb", ctx.executable._nanopb_generator)
+    first_file = ctx.attr.proto_files.files.to_list()[0]
+    args.add("--proto_directory", first_file.dirname)
 
     ctx.actions.run(
         inputs = ctx.attr.proto_files.files.to_list(),

@@ -14,6 +14,7 @@ requires = [
 name = "robotpy-romi"
 version = "0.0.0"
 description = "Binary wrapper for WPILib Romi Vendor library"
+requires-python = ">=3.11"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
@@ -57,3 +58,4 @@ depends = [
 OnBoardIO = "wpi/romi/OnBoardIO.hpp"
 RomiGyro = "wpi/romi/RomiGyro.hpp"
 RomiMotor = "wpi/romi/RomiMotor.hpp"
+RomiServo = "wpi/romi/RomiServo.hpp"

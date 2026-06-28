@@ -19,6 +19,10 @@ import org.wpilib.smartdashboard.SmartDashboard;
  *
  * <p>In addition, the encoder value of an encoder connected to ports 0 and 1 is consistently sent
  * to the Dashboard.
+ *
+ * <p>Finally, short code snippets show how to invert the motor direction and how to use the motor
+ * safety for frc-docs.
+ * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/motors/wpi-drive-classes.html
  */
 public class Robot extends TimedRobot {
   private static final int kMotorPort = 0;
@@ -38,6 +42,15 @@ public class Robot extends TimedRobot {
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
     encoder.setDistancePerPulse((Math.PI * 6) / 360.0);
+
+    // show motor inversion
+    motor.setInverted(true);
+
+    // show motor safety features
+    motor.setSafetyEnabled(true);
+    motor.setSafetyEnabled(false);
+    motor.setExpiration(0.1);
+    motor.feed();
   }
 
   /*

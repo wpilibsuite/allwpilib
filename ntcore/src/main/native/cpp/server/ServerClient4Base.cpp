@@ -137,7 +137,7 @@ void ServerClient4Base::ClientSubscribe(int subuid,
       added = true;
     }
 
-    if (added ^ removed) {
+    if (added || removed) {
       UpdatePeriod(tcdIt->second, topic);
       m_storage.UpdateMetaTopicSub(topic);
     }

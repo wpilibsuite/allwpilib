@@ -36,7 +36,7 @@ jobs:
       - name: Install wpiformat
         run: |
           python -m venv ${{ runner.temp }}/wpiformat
-          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2026.57
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2026.64
       - name: Run
         run: ${{ runner.temp }}/wpiformat/bin/wpiformat
       - name: Check output
@@ -61,7 +61,7 @@ jobs:
     name: "clang-tidy"
     runs-on: ubuntu-24.04
     needs: [validation]
-    container: wpilib/ubuntu-base:24.04
+    container: wpilib/debian-base:trixie
     steps:
       - uses: actions/checkout@v6
         with:
@@ -78,7 +78,7 @@ jobs:
       - name: Install wpiformat
         run: |
           python -m venv ${{ runner.temp }}/wpiformat
-          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2026.57
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2026.64
       - name: Create compile_commands.json
         run: |
           ./gradlew generateCompileCommands -Ptoolchain-optional-roboRio
@@ -94,7 +94,7 @@ jobs:
     name: "Java format"
     runs-on: ubuntu-24.04
     needs: [validation]
-    container: wpilib/systemcore-cross-ubuntu:2027-24.04
+    container: wpilib/debian-base:trixie
     steps:
       - uses: actions/checkout@v6
         with:
@@ -123,3 +123,27 @@ jobs:
           echo '' >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
         if: ${{ failure() }}
+
+  check-spelling:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: misspell
+        uses: reviewdog/action-misspell@v1
+        with:
+          reporter: "github-check"
+          fail_level: "error"
+          exclude: |
+            **/*.svg
+            **/thirdparty/**
+            **/upstream_utils/**
+            **/generated/**
+            ./wpigui/src/main/native/cpp/portable-file-dialogs.*
+            ./wpimath/src/main/native/include/wpi/units/base.hpp
+            ./wpinet/src/main/native/linux/AvahiClient.*
+            ./wpinet/src/main/native/cpp/http_parser.cpp
+            ./wpinet/src/main/native/include/wpi/net/http_parser.hpp
+            ./wpiutil/src/main/native/include/wpi/util/FastQueue.hpp
+            ./wpiutil/src/test/native/cpp/json/**
+            ./wpiutil/src/test/native/cpp/llvm/**
+            ./wpiutil/src/test/native/cpp/span/**

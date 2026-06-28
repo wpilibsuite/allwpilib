@@ -1,4 +1,4 @@
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsystemcore')) {
+if (project.hasProperty('onlylinuxsystemcore')) {
     return;
 }
 
@@ -11,19 +11,13 @@ ext {
 
 apply plugin: 'google-test-test-suite'
 
-
-ext {
-    staticGtestConfigs = [:]
-}
-
-staticGtestConfigs["${pluginName}Test"] = []
-apply from: "${rootDir}/shared/googletest.gradle"
+apply from: "${rootDir}/shared/catch2.gradle"
 
 apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
 
 model {
     testSuites {
-        "${pluginName}Test"(GoogleTestTestSuiteSpec) {
+        "${pluginName}Catch2Test"(GoogleTestTestSuiteSpec) {
             for(NativeComponentSpec c : $.components) {
                 if (c.name == pluginName) {
                     testing c
@@ -38,6 +32,9 @@ model {
                 exportedHeaders {
                     srcDirs 'src/test/native/include', 'src/main/native/cpp'
                 }
+            }
+            binaries.all {
+                lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
             }
         }
     }

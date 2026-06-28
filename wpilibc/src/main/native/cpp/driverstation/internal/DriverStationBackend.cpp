@@ -18,6 +18,7 @@
 #include <fmt/format.h>
 
 #include "wpi/datalog/DataLog.hpp"
+#include "wpi/driverstation/GenericHID.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HAL.h"
@@ -45,6 +46,10 @@ using namespace wpi::internal;
 
 static constexpr int availableToCount(uint64_t available) {
   return 64 - std::countl_zero(available);
+}
+
+GenericHID DriverStationBackend::ConstructGenericHID(int port) {
+  return GenericHID{port};
 }
 
 namespace {

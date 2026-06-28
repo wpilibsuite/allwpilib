@@ -140,6 +140,7 @@ static wpi::nt::PubSubOptions FromJavaPubSubOptions(JNIEnv* env,
   FIELD(disableLocal, "Z");
   FIELD(excludeSelf, "Z");
   FIELD(hidden, "Z");
+  FIELD(disableSignal, "Z");
 
 #undef FIELD
 
@@ -156,7 +157,8 @@ static wpi::nt::PubSubOptions FromJavaPubSubOptions(JNIEnv* env,
           FIELD(bool, Boolean, disableRemote),
           FIELD(bool, Boolean, disableLocal),
           FIELD(bool, Boolean, excludeSelf),
-          FIELD(bool, Boolean, hidden)};
+          FIELD(bool, Boolean, hidden),
+          FIELD(bool, Boolean, disableSignal)};
 
 #undef GET
 #undef FIELD

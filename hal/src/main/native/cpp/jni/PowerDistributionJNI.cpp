@@ -6,7 +6,6 @@
 
 #include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_PowerDistributionJNI.h"
-#include "wpi/hal/Ports.h"
 #include "wpi/hal/PowerDistribution.h"
 #include "wpi/util/jni_util.hpp"
 

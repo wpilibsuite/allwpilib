@@ -1,24 +1,45 @@
 # validated: 2024-01-20 DS 92149efa11fa button/CommandGenericHID.java
-from typing import Optional
+import threading
+from typing import ClassVar, Optional, Union, final
 
-from wpilib import EventLoop, GenericHID
+from wpilib import DriverStation, EventLoop, GenericHID
 
 from ..commandscheduler import CommandScheduler
 from .trigger import Trigger
 
 
+@final
 class CommandGenericHID:
     """
     A version of :class:`wpilib.GenericHID` with :class:`.Trigger` factories for command-based.
     """
 
-    def __init__(self, port: int):
+    _hids: ClassVar[dict[int, "CommandGenericHID"]] = {}
+    _hids_lock = threading.Lock()
+
+    def __init__(self, hid: Union[int, GenericHID]):
         """
         Construct an instance of a device.
 
-        :param port: The port on the Driver Station that the device is plugged into.
+        :param hid: The port on the Driver Station that the device is plugged into,
+                    or the GenericHID object to use for this command HID.
         """
-        self._hid = GenericHID(port)
+        if isinstance(hid, int):
+            self._hid = DriverStation.getGenericHID(hid)
+        else:
+            self._hid = hid
+
+    @classmethod
+    def getCommandGenericHID(cls, port: int) -> "CommandGenericHID":
+        """
+        Gets the CommandGenericHID object for the given port.
+        """
+        with cls._hids_lock:
+            hid = cls._hids.get(port)
+            if hid is None:
+                hid = cls(port)
+                cls._hids[port] = hid
+            return hid
 
     def getHID(self) -> GenericHID:
         """
@@ -221,3 +242,8 @@ class CommandGenericHID:
         :returns: True if the HID is connected.
         """
         return self._hid.isConnected()
+
+
+def _resetCommandGenericHIDData() -> None:
+    with CommandGenericHID._hids_lock:
+        CommandGenericHID._hids.clear()

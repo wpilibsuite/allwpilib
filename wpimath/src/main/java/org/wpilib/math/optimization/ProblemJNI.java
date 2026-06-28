@@ -40,7 +40,7 @@ final class ProblemJNI extends WPIMathJNI {
    *
    * @param handle Problem handle.
    * @param rows Number of matrix rows.
-   * @return A symmetric matrix of decision varaibles in the optimization problem.
+   * @return A symmetric matrix of decision variables in the optimization problem.
    */
   static native long[] symmetricDecisionVariable(long handle, int rows);
 

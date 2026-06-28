@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leander Schulten <Leander.Schulten@rwth-aachen.de>
+Date: Mon, 10 Jul 2023 00:53:43 +0200
+Subject: [PATCH 24/34] DenseMap: unused variable in release mode
+
+---
+ llvm/include/llvm/ADT/DenseMap.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
+index 37d8970209dcedf8840324a376ab27b3ba3bdf6a..41199ac39da56994d9086600e6dfc1dad2c93ce0 100644
+--- a/llvm/include/llvm/ADT/DenseMap.h
++++ b/llvm/include/llvm/ADT/DenseMap.h
+@@ -138,7 +138,7 @@ public:
+         B.getFirst() = EmptyKey;
+     } else {
+       const KeyT TombstoneKey = KeyInfoT::getTombstoneKey();
+-      unsigned NumEntries = getNumEntries();
++      [[maybe_unused]] unsigned NumEntries = getNumEntries();
+       for (BucketT &B : buckets()) {
+         if (!KeyInfoT::isEqual(B.getFirst(), EmptyKey)) {
+           if (!KeyInfoT::isEqual(B.getFirst(), TombstoneKey)) {

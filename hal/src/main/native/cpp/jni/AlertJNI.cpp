@@ -5,7 +5,6 @@
 #include <jni.h>
 
 #include <cassert>
-#include <cstdio>
 
 #include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_AlertJNI.h"

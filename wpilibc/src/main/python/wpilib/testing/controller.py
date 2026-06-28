@@ -12,7 +12,7 @@ from ..simulation import (
     stepTimingAsync,
     getProgramStarted,
 )
-from hal._wpiHal import _RobotMode as RobotMode
+from hal import RobotMode
 
 
 class RobotTestController:

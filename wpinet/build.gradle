@@ -4,6 +4,7 @@ ext {
 
     nativeName = 'wpinet'
     devMain = 'org.wpilib.net.DevMain'
+    nativeTestSuiteName = "${nativeName}Catch2Test"
 
     splitSetup = {
         it.sources {

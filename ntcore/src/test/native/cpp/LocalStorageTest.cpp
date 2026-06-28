@@ -20,6 +20,7 @@
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/SpanMatcher.hpp"
+#include "wpi/util/Synchronization.hpp"
 
 using ::testing::_;
 using ::testing::AllOf;
@@ -38,7 +39,9 @@ namespace wpi::nt {
       Field("pollStorage", &PubSubOptionsImpl::pollStorage, good.pollStorage),
       Field("sendAll", &PubSubOptionsImpl::sendAll, good.sendAll),
       Field("keepDuplicates", &PubSubOptionsImpl::keepDuplicates,
-            good.keepDuplicates));
+            good.keepDuplicates),
+      Field("disableSignal", &PubSubOptionsImpl::disableSignal,
+            good.disableSignal));
 }
 
 ::testing::Matcher<const PubSubOptionsImpl&> IsDefaultPubSubOptions() {
@@ -73,11 +76,11 @@ TEST_F(LocalStorageTest, GetTopic2) {
 }
 
 TEST_F(LocalStorageTest, GetTopicEmptyName) {
-  EXPECT_EQ(storage.GetTopic(""), 0u);
+  EXPECT_EQ(storage.GetTopic(""), 0);
 }
 
 TEST_F(LocalStorageTest, GetEntryEmptyName) {
-  EXPECT_EQ(storage.GetEntry(""), 0u);
+  EXPECT_EQ(storage.GetEntry(""), 0);
 }
 
 TEST_F(LocalStorageTest, GetEntryCached) {
@@ -538,11 +541,60 @@ TEST_F(LocalStorageTest, PublishUntyped) {
                    std::string_view{"cannot publish 'foo' with an unassigned "
                                     "type or empty type string"}));
 
-  EXPECT_EQ(storage.Publish(fooTopic, NT_UNASSIGNED, "", {}, {}), 0u);
+  EXPECT_EQ(storage.Publish(fooTopic, NT_UNASSIGNED, "", {}, {}), 0);
 }
 
 TEST_F(LocalStorageTest, SetValueInvalidHandle) {
-  EXPECT_FALSE(storage.SetEntryValue(0u, {}));
+  EXPECT_FALSE(storage.SetEntryValue(0, {}));
+}
+
+TEST_F(LocalStorageTest, DisableSignalSubscriberQueuesWithoutSignaling) {
+  PubSubOptionsImpl subOptions;
+  subOptions.disableSignal = true;
+  EXPECT_CALL(network,
+              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
+                              IsPubSubOptions(subOptions)));
+  auto sub =
+      storage.Subscribe(fooTopic, NT_DOUBLE, "double", {.disableSignal = true});
+
+  EXPECT_CALL(
+      network,
+      ClientPublish(_, std::string_view{"foo"}, std::string_view{"double"},
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
+  auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
+
+  auto val = Value::MakeDouble(1.0, 50);
+  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val));
+  storage.SetEntryValue(pub, val);
+
+  bool timedOut = false;
+  EXPECT_FALSE(wpi::util::WaitForObject(sub, 0, &timedOut));
+  EXPECT_TRUE(timedOut);
+  auto values = storage.ReadQueue<double>(sub);
+  ASSERT_EQ(values.size(), 1u);
+  EXPECT_EQ(values[0].value, 1.0);
+  EXPECT_EQ(values[0].time, 50);
+}
+
+TEST_F(LocalStorageTest, DisableSignalMultiSubscriberDoesNotSignalHandle) {
+  PubSubOptionsImpl subOptions;
+  subOptions.disableSignal = true;
+  EXPECT_CALL(network, ClientSubscribe(_, _, IsPubSubOptions(subOptions)));
+  auto sub = storage.SubscribeMultiple({{""}}, {.disableSignal = true});
+
+  EXPECT_CALL(
+      network,
+      ClientPublish(_, std::string_view{"foo"}, std::string_view{"double"},
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
+  auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
+
+  auto val = Value::MakeDouble(1.0, 50);
+  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val));
+  storage.SetEntryValue(pub, val);
+
+  bool timedOut = false;
+  EXPECT_FALSE(wpi::util::WaitForObject(sub, 0, &timedOut));
+  EXPECT_TRUE(timedOut);
 }
 
 class LocalStorageDuplicatesTest : public LocalStorageTest {

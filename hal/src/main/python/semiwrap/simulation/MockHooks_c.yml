@@ -26,6 +26,8 @@ functions:
     ignore: true
   HALSIM_SetSendConsoleLine:
     ignore: true
+  HALSIM_SetWriteDisplayAnsi:
+    ignore: true
 
   HALSIM_RegisterSimPeriodicBeforeCallback:
     param_override:

@@ -9,9 +9,7 @@
 
 #include "CommandTestBase.hpp"
 #include "CompositionTestBase.hpp"
-#include "wpi/commands2/InstantCommand.hpp"
-#include "wpi/commands2/SequentialCommandGroup.hpp"
-#include "wpi/commands2/WaitUntilCommand.hpp"
+#include "wpi/commands2/Commands.hpp"
 
 using namespace wpi::cmd;
 class ParallelRaceGroupTest : public CommandTestBase {};

@@ -45,7 +45,7 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
   auto [handle, port] = *resource;
   port->channel = channel;
 
-  *status = port->InitializeMode(SmartIoMode::PwmInput);
+  *status = port->InitializeMode(MRC_SmartIOMode::MRC_SmartIOMode_PwmInput);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::DUTY_CYCLE);
     return HAL_INVALID_HANDLE;
@@ -68,7 +68,7 @@ void HAL_FreeDutyCycle(HAL_DutyCycleHandle dutyCycleHandle) {
   while (port.use_count() != 1) {
     auto current = wpi::hal::monotonic_clock::now();
     if (start + std::chrono::seconds(1) < current) {
-      std::puts("DIO handle free timeout");
+      std::puts("DutyCycle handle free timeout");
       std::fflush(stdout);
       break;
     }
@@ -76,7 +76,7 @@ void HAL_FreeDutyCycle(HAL_DutyCycleHandle dutyCycleHandle) {
   }
 }
 
-void HAL_SetDutyCycleSimDevice(HAL_EncoderHandle handle,
+void HAL_SetDutyCycleSimDevice(HAL_DutyCycleHandle handle,
                                HAL_SimDeviceHandle device) {}
 
 double HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,

@@ -26,7 +26,7 @@ class StateMachineTest extends CommandTestBase {
   @Test
   @SuppressWarnings(PostConstructionInitializer.SUPPRESSION_KEY)
   void errorsWithoutInitialState() {
-    Mechanism mech = new Mechanism("Mechanism", m_scheduler);
+    Mechanism mech = new DummyMechanism("Mechanism", m_scheduler);
     Command command1 = mech.run(Coroutine::park).named("Command 1");
     Command command2 = mech.run(Coroutine::park).named("Command 2");
 
@@ -49,7 +49,7 @@ class StateMachineTest extends CommandTestBase {
 
   @Test
   void initialStateCanBeOverridden() {
-    Mechanism mech = new Mechanism("Mechanism", m_scheduler);
+    Mechanism mech = new DummyMechanism("Mechanism", m_scheduler);
     Command command1 = mech.run(Coroutine::park).named("Command 1");
     Command command2 = mech.run(Coroutine::park).named("Command 2");
 
@@ -72,7 +72,7 @@ class StateMachineTest extends CommandTestBase {
     AtomicBoolean signalA = new AtomicBoolean(false);
     AtomicBoolean signalB = new AtomicBoolean(false);
 
-    Mechanism mech = new Mechanism("Mechanism", m_scheduler);
+    Mechanism mech = new DummyMechanism("Mechanism", m_scheduler);
     var command1 = mech.run(Coroutine::park).named("Command 1");
     var command2 = mech.run(Coroutine::park).named("Command 2");
     var command3 = mech.run(Coroutine::park).named("Command 3");
@@ -565,7 +565,7 @@ class StateMachineTest extends CommandTestBase {
 
   @Test
   void onExitCanSchedule() {
-    var mech = new Mechanism("Mechanism", m_scheduler);
+    var mech = new DummyMechanism("Mechanism", m_scheduler);
     var mainMechCommand = mech.run(Coroutine::park).named("Main Mech Command");
     var backgroundMechCommand = mech.run(Coroutine::park).named("Background Mech Command");
     var nextStateCommand = Command.noRequirements(Coroutine::park).named("Next");
@@ -697,7 +697,7 @@ class StateMachineTest extends CommandTestBase {
   @Test
   void ledStateMachine() {
     var leds =
-        new Mechanism("LEDs", m_scheduler) {
+        new DummyMechanism("LEDs", m_scheduler) {
           Command idleAnimation() {
             return run(Coroutine::park).withPriority(-1).named("Default Animation");
           }

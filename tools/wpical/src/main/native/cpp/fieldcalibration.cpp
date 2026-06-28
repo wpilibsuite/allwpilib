@@ -27,8 +27,6 @@
 #include "wpi/apriltag/AprilTagDetector.hpp"
 #include "wpi/apriltag/AprilTagDetector_cv.hpp"
 #include "wpi/apriltag/AprilTagFieldLayout.hpp"
-#include "wpi/math/geometry/Rotation3d.hpp"
-#include "wpi/math/geometry/Translation3d.hpp"
 
 struct Pose {
   Eigen::Vector3d p;

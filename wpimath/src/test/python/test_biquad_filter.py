@@ -106,15 +106,11 @@ def test_order_8_butterworth_matches_scipy():
                 -1.0263514742610553,
                 0.26864019099379005,
             ),
-            BiquadFilter.Section(
-                1.0, 2.0, 1.0, -1.0868584613628944, 0.343430940165366
-            ),
+            BiquadFilter.Section(1.0, 2.0, 1.0, -1.0868584613628944, 0.343430940165366),
             BiquadFilter.Section(
                 1.0, 2.0, 1.0, -1.2197253651240232, 0.5076634651740437
             ),
-            BiquadFilter.Section(
-                1.0, 2.0, 1.0, -1.4515795942478362, 0.794251053241888
-            ),
+            BiquadFilter.Section(1.0, 2.0, 1.0, -1.4515795942478362, 0.794251053241888),
         ]
     )
     N = 500
@@ -261,9 +257,7 @@ def test_butterworth_factory_matches_scipy():
     )
     _expect_section_near(
         sections[1],
-        BiquadFilter.Section(
-            1.0, 2.0, 1.0, -1.7009643319435257, 0.7884997398152979
-        ),
+        BiquadFilter.Section(1.0, 2.0, 1.0, -1.7009643319435257, 0.7884997398152979),
         1e-10,
     )
 
@@ -347,9 +341,7 @@ def test_chebyshev2_factory_matches_scipy():
 
 def test_elliptic_factory_matches_scipy():
     # scipy.signal.ellip(4, 1.0, 40.0, 50.0, btype='low', fs=1000.0)
-    f = BiquadFilter.elliptic(
-        BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 1.0, 40.0
-    )
+    f = BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 1.0, 40.0)
     sections = list(f.sections())
     assert len(sections) == 2
     _expect_section_near(
