@@ -6,7 +6,7 @@ index 6b0fd2b..7cbe6ed 100644
      # Mark common dependencies as required for build_cleaner.
      tags = tags + ["req_dep=%s" % dep for dep in PYBIND_DEPS]
  
-+    arg_target_compatible_with = kwargs.pop("target_compatible_with", [])
++    target_compatible_with = kwargs.pop("target_compatible_with", [])
 +
      cc_binary(
          name = name + ".so",
@@ -16,7 +16,7 @@ index 6b0fd2b..7cbe6ed 100644
          linkshared = 1,
          tags = tags,
 -        target_compatible_with = select({
-+        target_compatible_with = arg_target_compatible_with + select({
++        target_compatible_with = target_compatible_with + select({
              "@platforms//os:windows": ["@platforms//:incompatible"],
              "//conditions:default": [],
          }),
@@ -25,7 +25,7 @@ index 6b0fd2b..7cbe6ed 100644
          linkshared = 1,
          tags = tags,
 -        target_compatible_with = select({
-+        target_compatible_with = arg_target_compatible_with + select({
++        target_compatible_with = target_compatible_with + select({
              "@platforms//os:windows": [],
              "//conditions:default": ["@platforms//:incompatible"],
          }),
