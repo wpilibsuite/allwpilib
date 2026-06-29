@@ -6,8 +6,10 @@
 
 #include <stdint.h>
 
+#include <algorithm>
 #include <atomic>
 #include <memory>
+#include <span>
 #include <string>
 #include <utility>
 #include <vector>
@@ -31,6 +33,41 @@ static constexpr uv::Timer::Time kReconnectRate{1000};
 static constexpr uv::Timer::Time kWebsocketHandshakeTimeout{500};
 // use a larger max message size for websockets
 static constexpr size_t kMaxMessageSize = 2 * 1024 * 1024;
+
+static std::string Ipv4AddressToString(unsigned int address) {
+  return fmt::format("{}.{}.{}.{}", (address >> 24) & 0xff,
+                     (address >> 16) & 0xff, (address >> 8) & 0xff,
+                     address & 0xff);
+}
+
+static bool HasMatchingTeam(
+    const wpi::net::MulticastResolverClient::ServiceData& data,
+    std::string_view team) {
+  for (auto&& [key, value] : data.txt) {
+    if (key == "team") {
+      return wpi::util::trim(value) == team;
+    }
+  }
+  return false;
+}
+
+static bool MatchesResolver(
+    const INetworkClient::ServerResolver& resolver,
+    const wpi::net::MulticastResolverClient::ServiceData& data) {
+  if (resolver.serviceNamePrefix) {
+    if (!wpi::util::starts_with(data.serviceName, resolver.serviceName)) {
+      return false;
+    }
+  } else if (data.serviceName != resolver.serviceName) {
+    return false;
+  }
+
+  if (resolver.requireTeam && !HasMatchingTeam(data, resolver.team)) {
+    return false;
+  }
+
+  return true;
+}
 
 NetworkClientBase::NetworkClientBase(int inst, std::string_view id,
                                      net::ILocalStorage& localStorage,
@@ -72,9 +109,7 @@ void NetworkClientBase::StartDSClient(unsigned int port) {
       });
       m_dsClient->clearIp.connect([this] {
         m_dsClientServer.first.clear();
-        if (m_parallelConnect) {
-          m_parallelConnect->SetServers(m_servers);
-        }
+        UpdateConnectorServers();
       });
     }
   });
@@ -86,6 +121,8 @@ void NetworkClientBase::StopDSClient() {
       m_dsClient->Close();
       m_dsClient.reset();
     }
+    m_dsClientServer.first.clear();
+    UpdateConnectorServers();
   });
 }
 
@@ -103,7 +140,7 @@ void NetworkClientBase::Flush() {
 
 void NetworkClientBase::DoSetServers(
     std::span<const std::pair<std::string, unsigned int>> servers,
-    unsigned int defaultPort) {
+    std::optional<ServerResolver> resolver, unsigned int defaultPort) {
   std::vector<std::pair<std::string, unsigned int>> serversCopy;
   serversCopy.reserve(servers.size());
   for (auto&& server : servers) {
@@ -111,15 +148,92 @@ void NetworkClientBase::DoSetServers(
                              server.second == 0 ? defaultPort : server.second);
   }
 
-  m_loopRunner.ExecAsync(
-      [this, servers = std::move(serversCopy)](uv::Loop&) mutable {
-        m_servers = std::move(servers);
-        if (m_dsClientServer.first.empty()) {
-          if (m_parallelConnect) {
-            m_parallelConnect->SetServers(m_servers);
-          }
-        }
-      });
+  if (resolver) {
+    resolver->serviceType = wpi::util::trim(resolver->serviceType);
+    resolver->serviceName = wpi::util::trim(resolver->serviceName);
+    resolver->team = wpi::util::trim(resolver->team);
+    if (resolver->port == 0) {
+      resolver->port = defaultPort;
+    }
+  }
+
+  m_loopRunner.ExecAsync([this, servers = std::move(serversCopy),
+                          resolver = std::move(resolver)](uv::Loop&) mutable {
+    m_servers = std::move(servers);
+    m_serverResolver = std::move(resolver);
+    m_resolvedServers.clear();
+    StartResolvers();
+    UpdateConnectorServers();
+  });
+}
+
+void NetworkClientBase::DoSetServers(
+    std::span<const std::pair<std::string, unsigned int>> servers,
+    unsigned int defaultPort) {
+  DoSetServers(servers, std::nullopt, defaultPort);
+}
+
+void NetworkClientBase::StartResolvers() {
+  StopResolvers();
+
+  if (!m_serverResolver || m_connHandle != 0) {
+    return;
+  }
+
+  m_mdnsResolver = wpi::net::MulticastResolverClient::Create(
+      m_loop, m_logger, m_serverResolver->serviceType);
+  if (m_mdnsResolver) {
+    m_mdnsResolver->serviceResolved.connect(
+        [this, resolverConfig = *m_serverResolver](
+            wpi::net::MulticastResolverClient::ServiceData data) {
+          ProcessResolverData(resolverConfig, std::move(data));
+        });
+  }
+}
+
+void NetworkClientBase::StopResolvers() {
+  if (m_mdnsResolver) {
+    m_mdnsResolver->Close();
+    m_mdnsResolver.reset();
+  }
+}
+
+void NetworkClientBase::ProcessResolverData(
+    const ServerResolver& resolver,
+    wpi::net::MulticastResolverClient::ServiceData data) {
+  if (!MatchesResolver(resolver, data)) {
+    return;
+  }
+
+  unsigned int port = resolver.port;
+  if (port == 0) {
+    return;
+  }
+
+  std::pair<std::string, unsigned int> server{
+      Ipv4AddressToString(data.ipv4Address), port};
+  if (std::find(m_resolvedServers.begin(), m_resolvedServers.end(), server) !=
+      m_resolvedServers.end()) {
+    return;
+  }
+
+  INFO("mDNS resolved service '{}' to {} port {}", data.serviceName,
+       server.first, server.second);
+  m_resolvedServers.emplace_back(std::move(server));
+  UpdateConnectorServers();
+}
+
+void NetworkClientBase::UpdateConnectorServers() {
+  if (!m_parallelConnect || !m_dsClientServer.first.empty()) {
+    return;
+  }
+
+  std::vector<std::pair<std::string, unsigned int>> servers;
+  servers.reserve(m_servers.size() + m_resolvedServers.size());
+  servers.insert(servers.end(), m_servers.begin(), m_servers.end());
+  servers.insert(servers.end(), m_resolvedServers.begin(),
+                 m_resolvedServers.end());
+  m_parallelConnect->SetServers(servers);
 }
 
 void NetworkClientBase::DoDisconnect(std::string_view reason) {
@@ -136,6 +250,7 @@ void NetworkClientBase::DoDisconnect(std::string_view reason) {
 
   // start trying to connect again
   uv::Timer::SingleShot(m_loop, kReconnectRate, [this] {
+    StartResolvers();
     if (m_parallelConnect) {
       m_parallelConnect->Disconnected();
     }
@@ -198,6 +313,7 @@ NetworkClient::NetworkClient(
 NetworkClient::~NetworkClient() {
   // must explicitly destroy these on loop
   m_loopRunner.ExecSync([&](auto&) {
+    StopResolvers();
     m_clientImpl.reset();
     m_wire.reset();
   });
@@ -249,6 +365,7 @@ void NetworkClient::WsConnected(wpi::net::WebSocket& ws, uv::Tcp& tcp,
   if (m_parallelConnect) {
     m_parallelConnect->Succeeded(tcp);
   }
+  StopResolvers();
 
   ConnectionInfo connInfo;
   uv::AddrToName(tcp.GetPeer(), &connInfo.remote_ip, &connInfo.remote_port);

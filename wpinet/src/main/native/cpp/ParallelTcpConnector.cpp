@@ -53,6 +53,11 @@ void ParallelTcpConnector::Close() {
 void ParallelTcpConnector::SetServers(
     std::span<const std::pair<std::string, unsigned int>> servers) {
   m_servers.assign(servers.begin(), servers.end());
+  if (m_servers.empty()) {
+    CancelAll();
+    m_reconnectTimer->Stop();
+    return;
+  }
   if (!IsConnected()) {
     Connect();
   }

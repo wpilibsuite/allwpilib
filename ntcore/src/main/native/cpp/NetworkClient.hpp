@@ -7,6 +7,7 @@
 #include <atomic>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -20,6 +21,7 @@
 #include "net/WebSocketConnection.hpp"
 #include "wpi/net/DsClient.hpp"
 #include "wpi/net/EventLoopRunner.hpp"
+#include "wpi/net/MulticastResolverClient.hpp"
 #include "wpi/net/ParallelTcpConnector.hpp"
 #include "wpi/net/WebSocket.hpp"
 #include "wpi/net/uv/Async.hpp"
@@ -55,11 +57,19 @@ class NetworkClientBase : public INetworkClient {
  protected:
   void DoSetServers(
       std::span<const std::pair<std::string, unsigned int>> servers,
+      std::optional<ServerResolver> resolver, unsigned int defaultPort);
+  void DoSetServers(
+      std::span<const std::pair<std::string, unsigned int>> servers,
       unsigned int defaultPort);
 
   virtual void TcpConnected(wpi::net::uv::Tcp& tcp) = 0;
   virtual void ForceDisconnect(std::string_view reason) = 0;
   virtual void DoDisconnect(std::string_view reason);
+  void ProcessResolverData(const ServerResolver& resolver,
+                           wpi::net::MulticastResolverClient::ServiceData data);
+  void StartResolvers();
+  void StopResolvers();
+  void UpdateConnectorServers();
 
   // invariants
   int m_inst;
@@ -79,6 +89,9 @@ class NetworkClientBase : public INetworkClient {
   net::ClientMessage m_localMsgs[Queue::kBlockSize];
 
   std::vector<std::pair<std::string, unsigned int>> m_servers;
+  std::optional<ServerResolver> m_serverResolver;
+  std::vector<std::pair<std::string, unsigned int>> m_resolvedServers;
+  std::shared_ptr<wpi::net::MulticastResolverClient> m_mdnsResolver;
 
   std::pair<std::string, unsigned int> m_dsClientServer{"", 0};
   std::shared_ptr<wpi::net::DsClient> m_dsClient;
@@ -106,7 +119,12 @@ class NetworkClient final : public NetworkClientBase {
 
   void SetServers(
       std::span<const std::pair<std::string, unsigned int>> servers) final {
-    DoSetServers(servers, NT_DEFAULT_PORT);
+    DoSetServers(servers, std::nullopt, NT_DEFAULT_PORT);
+  }
+
+  void SetServers(std::span<const std::pair<std::string, unsigned int>> servers,
+                  const ServerResolver& resolver) final {
+    DoSetServers(servers, resolver, NT_DEFAULT_PORT);
   }
 
  private:

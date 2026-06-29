@@ -105,6 +105,17 @@ void NetworkTableInstance::SetServer(std::span<const std::string_view> servers,
   SetServer(serversArr);
 }
 
+void NetworkTableInstance::SetServerMdns(
+    std::string_view service_name, std::span<const std::string_view> servers,
+    unsigned int port) {
+  std::vector<std::pair<std::string_view, unsigned int>> serversArr;
+  serversArr.reserve(servers.size());
+  for (const auto& server : servers) {
+    serversArr.emplace_back(server, port);
+  }
+  SetServerMdns(service_name, port, serversArr);
+}
+
 NT_Listener NetworkTableInstance::AddListener(Topic topic,
                                               unsigned int eventMask,
                                               ListenerCallback listener) {
