@@ -24,6 +24,10 @@ jobs:
             name: macOS
             container: ""
             flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
+          - os: ubuntu-24.04-arm
+            name: Linux ARM
+            container: wpilib/debian-base:arm64-trixie
+            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
           - os: windows-2022
             name: Windows
             container: ""
@@ -35,7 +39,7 @@ jobs:
     steps:
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libopencv-dev ninja-build
+        run: sudo apt-get update && sudo apt-get install -y avahi-daemon libopencv-dev ninja-build
 
       - name: Setup avahi-daemon
         if: runner.os == 'Linux'
