@@ -17,21 +17,17 @@ wpi::math::TrajectorySample StructType::Unpack(std::span<const uint8_t> data) {
   return wpi::math::TrajectorySample{
       wpi::units::second_t{
           wpi::util::UnpackStruct<double, kTimestampOff>(data)},
-      wpi::util::Struct<wpi::math::Pose2d>::Unpack(data.subspan(kPoseOff, 24)),
-      wpi::util::Struct<wpi::math::ChassisVelocities>::Unpack(
-          data.subspan(kVelocityOff, 24)),
-      wpi::util::Struct<wpi::math::ChassisAccelerations>::Unpack(
-          data.subspan(kAccelerationOff, 24)),
+      wpi::util::UnpackStruct<wpi::math::Pose2d, kPoseOff>(data),
+      wpi::util::UnpackStruct<wpi::math::ChassisVelocities, kVelocityOff>(data),
+      wpi::util::UnpackStruct<wpi::math::ChassisAccelerations,
+                              kAccelerationOff>(data),
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
                       const wpi::math::TrajectorySample& value) {
   wpi::util::PackStruct<kTimestampOff>(data, value.timestamp.value());
-  wpi::util::Struct<wpi::math::Pose2d>::Pack(data.subspan(kPoseOff, 24),
-                                             value.pose);
-  wpi::util::Struct<wpi::math::ChassisVelocities>::Pack(
-      data.subspan(kVelocityOff, 24), value.velocity);
-  wpi::util::Struct<wpi::math::ChassisAccelerations>::Pack(
-      data.subspan(kAccelerationOff, 24), value.acceleration);
+  wpi::util::PackStruct<kPoseOff>(data, value.pose);
+  wpi::util::PackStruct<kVelocityOff>(data, value.velocity);
+  wpi::util::PackStruct<kAccelerationOff>(data, value.acceleration);
 }

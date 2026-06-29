@@ -12,10 +12,7 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"
-#include "wpi/math/trajectory/TrajectorySample.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/util/MathExtras.hpp"
-#include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
 
@@ -33,7 +30,7 @@ class SwerveDriveKinematics;
  * DifferentialSample)
  */
 template <typename SampleType>
-class WPILIB_DLLEXPORT Trajectory {
+class Trajectory {
  public:
   /**
    * Constructs a Trajectory from a vector of samples.

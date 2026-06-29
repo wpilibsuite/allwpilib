@@ -4,10 +4,27 @@
 
 #include "wpi/math/trajectory/DifferentialTrajectory.hpp"
 
+#include <cstddef>
 #include <utility>
 #include <vector>
 
+#include <Eigen/Core>
+#include <gcem.hpp>
+
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/kinematics/ChassisAccelerations.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/math/trajectory/DifferentialSample.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/util/MathExtras.hpp"
 #include "wpi/util/json.hpp"
 
 using namespace wpi::math;
@@ -22,10 +39,12 @@ DifferentialSample DifferentialTrajectory::Interpolate(
   // The integration state holds wheel speeds (vₗ, vᵣ), which are
   // frame-invariant; the field-relative chassis velocity is reconstructed from
   // the integrated wheel speeds and heading below.
-  Eigen::Vector<double, 6> initialState;
-  initialState << start.pose.X().value(), start.pose.Y().value(),
-      start.pose.Rotation().Radians().value(), start.leftSpeed.value(),
-      start.rightSpeed.value(), start.velocity.omega.value();
+  Eigen::Vector<double, 6> initialState{
+      {start.pose.X().value()},
+      {start.pose.Y().value()},
+      {start.pose.Rotation().Radians().value()},
+      {start.leftSpeed.value()},
+      {start.rightSpeed.value(), start.velocity.omega.value()}};
 
   // Wheel and angular accelerations are computed by finite difference between
   // the two samples (frame-independent, so no kinematics/trackwidth is needed).
@@ -41,13 +60,13 @@ DifferentialSample DifferentialTrajectory::Interpolate(
           ? 0
           : (end.velocity.omega - start.velocity.omega).value() / segmentDt;
 
-  Eigen::Vector3d initialInput;
-  initialInput << leftAccel, rightAccel, angularAccel;
+  Eigen::Vector<double, 3> initialInput{
+      {leftAccel}, {rightAccel}, {angularAccel}};
 
   // Integrate state derivatives [vₗ, vᵣ, ω, aₗ, aᵣ, α] to new states [x, y, θ,
   // vₗ, vᵣ, ω]
   auto dynamics = [&](const Eigen::Vector<double, 6>& state,
-                      const Eigen::Vector3d& input) {
+                      const Eigen::Vector<double, 3>& input) {
     double theta = state(2);
     double vl = state(3);
     double vr = state(4);
@@ -58,10 +77,12 @@ DifferentialSample DifferentialTrajectory::Interpolate(
 
     double v = (vl + vr) / 2.0;
 
-    Eigen::Vector<double, 6> output;
-    output << v * std::cos(theta), v * std::sin(theta), omega, leftAccel,
-        rightAccel, alpha;
-    return output;
+    return Eigen::Vector<double, 6>{{v * gcem::cos(theta)},
+                                    {v * gcem::sin(theta)},
+                                    {omega},
+                                    {leftAccel},
+                                    {rightAccel},
+                                    {alpha}};
   };
 
   Eigen::Vector<double, 6> endState =

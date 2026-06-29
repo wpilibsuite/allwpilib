@@ -25,12 +25,17 @@ public class DifferentialSampleStruct implements Struct<DifferentialSample> {
 
   @Override
   public int getSize() {
-    return TrajectorySample.struct.getSize() + 8 + 8;
+    return TrajectorySample.struct.getSize() + DOUBLE_SIZE + DOUBLE_SIZE;
   }
 
   @Override
   public String getSchema() {
     return TrajectorySample.struct.getSchema() + ";double leftSpeed;double rightSpeed";
+  }
+
+  @Override
+  public Struct<?>[] getNested() {
+    return new Struct<?>[] {TrajectorySample.struct};
   }
 
   @Override

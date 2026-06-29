@@ -5,8 +5,13 @@
 #pragma once
 
 #include <utility>
+#include <vector>
 
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
+#include "wpi/math/trajectory/TrajectorySample.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
 

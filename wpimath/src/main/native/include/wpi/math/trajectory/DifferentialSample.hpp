@@ -23,17 +23,8 @@ namespace wpi::math {
 /**
  * Represents a single sample in a differential drive trajectory.
  */
-class WPILIB_DLLEXPORT DifferentialSample {
+class WPILIB_DLLEXPORT DifferentialSample : public TrajectorySample {
  public:
-  /** The timestamp of the sample relative to the trajectory start. */
-  wpi::units::second_t timestamp{0.0};
-  /** The robot pose at this sample (in the field reference frame). */
-  Pose2d pose;
-  /** The robot velocity at this sample (in the field reference frame). */
-  ChassisVelocities velocity;
-  /** The robot acceleration at this sample (in the field reference frame). */
-  ChassisAccelerations acceleration;
-
   /**
    * The left wheel speed at this sample.
    */
@@ -66,10 +57,7 @@ class WPILIB_DLLEXPORT DifferentialSample {
                                const ChassisAccelerations& acceleration,
                                wpi::units::meters_per_second_t leftSpeed,
                                wpi::units::meters_per_second_t rightSpeed)
-      : timestamp{timestamp},
-        pose{pose},
-        velocity{velocity},
-        acceleration{acceleration},
+      : TrajectorySample{timestamp, pose, velocity, acceleration},
         leftSpeed{leftSpeed},
         rightSpeed{rightSpeed} {}
 
@@ -90,10 +78,7 @@ class WPILIB_DLLEXPORT DifferentialSample {
                                const ChassisVelocities& velocity,
                                const ChassisAccelerations& acceleration,
                                const DifferentialDriveKinematics& kinematics)
-      : timestamp{timestamp},
-        pose{pose},
-        velocity{velocity},
-        acceleration{acceleration} {
+      : TrajectorySample{timestamp, pose, velocity, acceleration} {
     // Wheel speeds are derived from the robot-relative velocity.
     auto wheelSpeeds =
         kinematics.ToWheelVelocities(velocity.ToRobotRelative(pose.Rotation()));
@@ -111,8 +96,8 @@ class WPILIB_DLLEXPORT DifferentialSample {
   constexpr DifferentialSample(const TrajectorySample& sample,
                                wpi::units::meters_per_second_t leftSpeed,
                                wpi::units::meters_per_second_t rightSpeed)
-      : DifferentialSample(sample.timestamp, sample.pose, sample.velocity,
-                           sample.acceleration, leftSpeed, rightSpeed) {}
+      : DifferentialSample{sample.timestamp,    sample.pose, sample.velocity,
+                           sample.acceleration, leftSpeed,   rightSpeed} {}
 
   /**
    * Constructs a DifferentialSample from a TrajectorySample.
@@ -122,8 +107,8 @@ class WPILIB_DLLEXPORT DifferentialSample {
    */
   constexpr DifferentialSample(const TrajectorySample& sample,
                                const DifferentialDriveKinematics& kinematics)
-      : DifferentialSample(sample.timestamp, sample.pose, sample.velocity,
-                           sample.acceleration, kinematics) {}
+      : DifferentialSample{sample.timestamp, sample.pose, sample.velocity,
+                           sample.acceleration, kinematics} {}
 
   /**
    * Constructs a DifferentialSample from a SplineSample.
@@ -133,10 +118,8 @@ class WPILIB_DLLEXPORT DifferentialSample {
    */
   constexpr DifferentialSample(const SplineSample& sample,
                                const DifferentialDriveKinematics& kinematics)
-      : timestamp{sample.timestamp},
-        pose{sample.pose},
-        velocity{sample.velocity},
-        acceleration{sample.acceleration},
+      : TrajectorySample{sample.timestamp, sample.pose, sample.velocity,
+                         sample.acceleration},
         leftSpeed{kinematics
                       .ToWheelVelocities(sample.velocity.ToRobotRelative(
                           sample.pose.Rotation()))

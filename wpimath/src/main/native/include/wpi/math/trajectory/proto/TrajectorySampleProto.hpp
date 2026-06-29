@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "pb.h"
 #include "wpi/math/trajectory/TrajectorySample.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"

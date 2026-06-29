@@ -104,8 +104,8 @@ public class FieldObject2d implements AutoCloseable {
   /**
    * Sets poses from a trajectory.
    *
-   * @param trajectory The trajectory from which the poses should be added.
    * @param <SampleType> The type of the trajectory sample.
+   * @param trajectory The trajectory from which the poses should be added.
    */
   public synchronized <SampleType extends TrajectorySample> void setTrajectory(
       Trajectory<SampleType> trajectory) {

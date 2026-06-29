@@ -6,7 +6,6 @@
 
 #include <vector>
 
-#include "Trajectory.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"

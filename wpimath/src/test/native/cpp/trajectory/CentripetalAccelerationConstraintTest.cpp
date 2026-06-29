@@ -22,14 +22,9 @@ TEST(CentripetalAccelerationConstraintTest, Constraint) {
 
   auto trajectory = TestTrajectory::GetTrajectory(config);
 
-  wpi::units::second_t time = 0_s;
-  wpi::units::second_t dt = 20_ms;
-  wpi::units::second_t duration = trajectory.TotalTime();
-
-  while (time < duration) {
-    const SplineSample point = trajectory.SampleAt(time);
-    time += dt;
-
+  constexpr wpi::units::second_t dt = 20_ms;
+  for (auto t = 0_s; t < trajectory.TotalTime(); t += dt) {
+    auto point = trajectory.SampleAt(t);
     auto centripetalAcceleration =
         wpi::units::math::pow<2>(point.ForwardVelocity()) * point.curvature /
         1_rad;

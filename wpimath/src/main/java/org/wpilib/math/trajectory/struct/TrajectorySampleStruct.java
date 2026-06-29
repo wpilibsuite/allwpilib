@@ -36,6 +36,11 @@ public class TrajectorySampleStruct implements Struct<TrajectorySample> {
   }
 
   @Override
+  public Struct<?>[] getNested() {
+    return new Struct<?>[] {Pose2d.struct, ChassisVelocities.struct, ChassisAccelerations.struct};
+  }
+
+  @Override
   public TrajectorySample unpack(ByteBuffer bb) {
     double timestamp = bb.getDouble();
     Pose2d pose = Pose2d.struct.unpack(bb);
