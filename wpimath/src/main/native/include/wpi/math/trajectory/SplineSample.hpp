@@ -25,16 +25,8 @@ namespace wpi::math {
 /**
  * Represents a single sample in a spline-based trajectory.
  */
-class SplineSample {
+class SplineSample : public TrajectorySample {
  public:
-  /** The timestamp of the sample relative to the trajectory start. */
-  wpi::units::second_t timestamp{0.0};
-  /** The robot pose at this sample (in the field reference frame). */
-  Pose2d pose;
-  /** The robot velocity at this sample (in the field reference frame). */
-  ChassisVelocities velocity;
-  /** The robot acceleration at this sample (in the field reference frame). */
-  ChassisAccelerations acceleration;
   /** The curvature of the path at this sample. */
   wpi::units::curvature_t curvature{0.0};
 
@@ -59,13 +51,13 @@ class SplineSample {
                          wpi::units::meters_per_second_t velocity,
                          wpi::units::meters_per_second_squared_t acceleration,
                          wpi::units::curvature_t curvature)
-      : timestamp{timestamp},
-        pose{pose},
-        velocity{ChassisVelocities{velocity, 0_mps, velocity * curvature}
-                     .ToFieldRelative(pose.Rotation())},
-        acceleration{ChassisAccelerations{acceleration, 0_mps_sq,
-                                          acceleration * curvature}
-                         .ToFieldRelative(pose.Rotation())},
+      : TrajectorySample{
+            timestamp, pose,
+            ChassisVelocities{velocity, 0_mps, velocity * curvature}
+                .ToFieldRelative(pose.Rotation()),
+            ChassisAccelerations{acceleration, 0_mps_sq,
+                                 acceleration * curvature}
+                .ToFieldRelative(pose.Rotation())},
         curvature{curvature} {}
 
   /**
@@ -84,10 +76,7 @@ class SplineSample {
                          const ChassisVelocities& velocity,
                          const ChassisAccelerations& acceleration,
                          wpi::units::curvature_t curvature)
-      : timestamp{timestamp},
-        pose{pose},
-        velocity{velocity},
-        acceleration{acceleration},
+      : TrajectorySample{timestamp, pose, velocity, acceleration},
         curvature{curvature} {}
 
   /**
@@ -97,10 +86,8 @@ class SplineSample {
    * @param sample The TrajectorySample to convert.
    */
   explicit constexpr SplineSample(const TrajectorySample& sample)
-      : timestamp{sample.timestamp},
-        pose{sample.pose},
-        velocity{sample.velocity},
-        acceleration{sample.acceleration} {
+      : TrajectorySample{sample.timestamp, sample.pose, sample.velocity,
+                         sample.acceleration} {
     auto vx = sample.velocity.ToRobotRelative(sample.pose.Rotation()).vx;
     curvature = sample.velocity.omega / (vx == 0_mps ? 1e-9_mps : vx);
   }
