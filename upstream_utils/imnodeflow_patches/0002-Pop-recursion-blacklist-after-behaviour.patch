@@ -1,0 +1,62 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Drew Williams <drew.williams@capstanmedical.com>
+Date: Tue, 12 May 2026 16:30:00 -0700
+Subject: [PATCH] Pop the recursion blacklist after running an OutPin's
+ behaviour
+
+Upstream's recursion-cycle guard in `OutPin<T>::val` is a list of node
+UIDs that gets cleared only once per frame, at the end of
+`ImNodeFlow::update`. The behaviour code adds the parent's UID before
+running, but never removes it. That means once any of a node's output
+pins has been pulled this frame, every other output pin on the same
+node skips its behaviour and returns a cached (initially indeterminate)
+`m_val`.
+
+This silently broke multi-output nodes. In the WPILib filter designer,
+a BiquadStage exposes both a Filter wire (the designed cascade) and a
+Signal wire (the filtered input). Pull the Signal pin first this frame
+and a downstream Bode plot reading the Filter pin sees `m_val_filter`
+in its default-initialized state (typically nullptr for pointer types)
+and renders empty.
+
+Turn the blacklist into a proper recursion stack: push before the
+behaviour, pop after. Real recursion (an OutPin's behaviour pulling its
+own node back through an input) is still caught, because the parent's
+UID is on the stack during the behaviour call; the second entry sees
+it and short-circuits. Once the behaviour finishes the UID pops off,
+freeing sibling outputs to run their own behaviours later in the same
+frame.
+
+Signed-off-by: Drew Williams <drew.williams@capstanmedical.com>
+---
+ src/ImNodeFlow.inl | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/src/ImNodeFlow.inl b/src/ImNodeFlow.inl
+index fd140f8d80000000000000000000000000000000..fd140f8d80000000000000000000000000000000 100644
+--- a/src/ImNodeFlow.inl
++++ b/src/ImNodeFlow.inl
+@@ -326,10 +326,21 @@ namespace ImFlow
+     template<class T>
+     const T &OutPin<T>::val()
+     {
+-        if (std::find((*m_inf)->get_recursion_blacklist().begin(), (*m_inf)->get_recursion_blacklist().end(), m_parent->getUID()) == (*m_inf)->get_recursion_blacklist().end())
++        // The recursion blacklist is a stack, not a once-per-frame flag:
++        // push the parent's UID before running our behaviour, pop after.
++        // Upstream forgot the pop, which silently broke any node with
++        // more than one output pin — only the first OutPin pulled this
++        // frame ran its behaviour; every subsequent OutPin on the same
++        // node returned its (often indeterminate) cached m_val. With the
++        // pop, the blacklist correctly catches real recursion (an
++        // OutPin's behaviour pulling its own node back through an input)
++        // without poisoning sibling outputs.
++        auto& blacklist = (*m_inf)->get_recursion_blacklist();
++        if (std::find(blacklist.begin(), blacklist.end(), m_parent->getUID()) == blacklist.end())
+         {
+-            (*m_inf)->get_recursion_blacklist().emplace_back(m_parent->getUID());
++            blacklist.emplace_back(m_parent->getUID());
+             m_val = m_behaviour();
++            blacklist.pop_back();
+         }
+
+         return m_val;

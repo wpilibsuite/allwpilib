@@ -343,6 +343,29 @@ cc_library(
     ],
 )
 
+#----------------------------------------
+# IMNODEFLOW
+#----------------------------------------
+
+# Upstream's include/ImNodeFlow.h reaches into ../src/ for inline templates and
+# helper headers, so the src/ .h and .inl files must be exposed as hdrs (not
+# srcs) for relative includes to resolve in consumers' compiles.
+cc_library(
+    name = "imnodeflow",
+    srcs = glob(["imnodeflow/src/**/*.cpp"]),
+    hdrs = glob(["imnodeflow/include/**/*.h"]),
+    includes = ["imnodeflow/include"],
+    linkstatic = True,
+    strip_include_prefix = "imnodeflow/include",
+    textual_hdrs = glob([
+        "imnodeflow/src/**/*.h",
+        "imnodeflow/src/**/*.inl",
+    ]),
+    deps = [
+        "//thirdparty/imgui_suite:imgui",
+    ],
+)
+
 #----------------------------------
 # STB
 #----------------------------------
@@ -368,6 +391,7 @@ wpilib_cc_library(
         ":fonts",
         ":gl3w",
         ":imgui",
+        ":imnodeflow",
         ":implot",
         ":stb",
     ],
@@ -400,6 +424,12 @@ pkg_files(
 )
 
 pkg_files(
+    name = "imnodeflow-hdrs-pkg",
+    srcs = glob(["imnodeflow/include/**"]),
+    strip_prefix = "imnodeflow/include",
+)
+
+pkg_files(
     name = "stb-hdrs-pkg",
     srcs = glob(["stb/include/**"]),
     strip_prefix = "stb/include",
@@ -424,6 +454,7 @@ pkg_zip(
         "generated-gl3w-hdrs-pkg",
         "glfw-hdrs-pkg",
         "imgui-hdrs-pkg",
+        "imnodeflow-hdrs-pkg",
         "implot-hdrs-pkg",
         "stb-hdrs-pkg",
         "//:license_pkg_files",
@@ -452,6 +483,12 @@ pkg_files(
 )
 
 pkg_files(
+    name = "imnodeflow-srcs-pkg",
+    srcs = glob(["imnodeflow/src/**"]),
+    strip_prefix = "imnodeflow/src",
+)
+
+pkg_files(
     name = "stb-srcs-pkg",
     srcs = glob(["stb/cpp/**"]),
     strip_prefix = "stb/cpp",
@@ -476,6 +513,7 @@ pkg_zip(
         "generated-gl3w-srcs-pkg",
         "glfw-srcs-pkg",
         "imgui-srcs-pkg",
+        "imnodeflow-srcs-pkg",
         "implot-srcs-pkg",
         "stb-srcs-pkg",
         "//:license_pkg_files",

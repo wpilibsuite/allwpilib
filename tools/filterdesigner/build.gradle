@@ -1,0 +1,171 @@
+import org.gradle.internal.os.OperatingSystem
+
+if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsystemcore')) {
+    return;
+}
+
+description = "Interactive digital filter designer for WPILib"
+
+apply plugin: 'cpp'
+apply plugin: 'google-test-test-suite'
+apply plugin: 'visual-studio'
+apply plugin: 'org.wpilib.NativeUtils'
+
+if (OperatingSystem.current().isWindows()) {
+    apply plugin: 'windows-resources'
+}
+
+ext {
+    nativeName = 'filterdesigner'
+}
+
+apply from: "${rootDir}/shared/config.gradle"
+apply from: "${rootDir}/shared/resources.gradle"
+
+def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
+def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
+
+task generateCppVersion() {
+    description = 'Generates the wpilib version class'
+    group = 'WPILib'
+
+    outputs.file wpilibVersionFileOutput
+    inputs.file wpilibVersionFileInput
+
+    if (wpilibVersioning.releaseMode) {
+        outputs.upToDateWhen { false }
+    }
+
+    doLast {
+        def version = wpilibVersioning.version.get()
+        println "Writing version ${version} to $wpilibVersionFileOutput"
+
+        if (wpilibVersionFileOutput.exists()) {
+            wpilibVersionFileOutput.delete()
+        }
+        def read = wpilibVersionFileInput.text.replace('${wpilib_version}', version)
+        wpilibVersionFileOutput.write(read)
+    }
+}
+
+gradle.taskGraph.addTaskExecutionGraphListener { graph ->
+    def willPublish = graph.hasTask(publish)
+    if (willPublish) {
+        generateCppVersion.outputs.upToDateWhen { false }
+    }
+}
+
+def generateTask = createGenerateResourcesTask('main', 'FILTERDESIGNER', 'wpi::filterdesigner', project)
+
+project(':').libraryBuild.dependsOn build
+tasks.withType(CppCompile) {
+    dependsOn generateTask
+    dependsOn generateCppVersion
+}
+
+model {
+    components {
+        "${nativeName}"(NativeExecutableSpec) {
+            baseName = 'filterdesigner'
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/cpp', "$buildDir/generated/main/cpp"
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include',
+                                'src/main/native/thirdparty/pocketfft'
+                    }
+                }
+                if (OperatingSystem.current().isWindows()) {
+                    rc.source {
+                        srcDirs 'src/main/native/win'
+                        include '*.rc'
+                    }
+                }
+            }
+            binaries.all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    it.buildable = false
+                    return
+                }
+                lib project: ':glass', library: 'glass', linkage: 'static'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'static'
+                project(':ntcore').addNtcoreDependency(it, 'static')
+                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
+                lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+                lib project: ':datalog', library: 'datalog', linkage: 'static'
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                if (!(toolChain in VisualCpp)) {
+                    // Third-party ImNodeFlow headers trip -Wshadow and -Wcomment
+                    // when included transitively; keep warnings but don't fail.
+                    it.cppCompiler.args '-Wno-error=shadow', '-Wno-error=comment'
+                }
+                if (it.targetPlatform.operatingSystem.isWindows()) {
+                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
+                } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                    it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
+                    if (it.buildType.getName() == "release") {
+                        it.linker.args << '-s'
+                    }
+                } else {
+                    it.linker.args << '-lX11'
+                    if (it.targetPlatform.name.startsWith('linuxarm')) {
+                        it.linker.args << '-lGL'
+                    }
+                }
+            }
+        }
+    }
+    testSuites {
+        "${nativeName}Test"(GoogleTestTestSuiteSpec) {
+            for (NativeComponentSpec c : $.components) {
+                if (c.name == nativeName) {
+                    testing c
+                    break
+                }
+            }
+            sources.cpp.source {
+                srcDirs "src/test/native/cpp"
+                include "**/*.cpp"
+            }
+            binaries.all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    it.buildable = false
+                    return
+                }
+                lib project: ':glass', library: 'glass', linkage: 'static'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'static'
+                project(':ntcore').addNtcoreDependency(it, 'static')
+                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
+                lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+                lib project: ':datalog', library: 'datalog', linkage: 'static'
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                if (!(toolChain in VisualCpp)) {
+                    it.cppCompiler.args '-Wno-error=shadow', '-Wno-error=comment'
+                }
+                if (it.targetPlatform.operatingSystem.isWindows()) {
+                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
+                } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                    it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
+                    if (it.buildType.getName() == "release") {
+                        it.linker.args << '-s'
+                    }
+                } else {
+                    it.linker.args << '-lX11'
+                    if (it.targetPlatform.name.startsWith('linuxarm')) {
+                        it.linker.args << '-lGL'
+                    }
+                }
+
+                lib project: ':thirdparty:googletest', library: 'googletest', linkage: 'static'
+                it.cppCompiler.define("RUNNING_FILTERDESIGNER_TESTS")
+            }
+        }
+    }
+}
+
+apply from: 'publish.gradle'

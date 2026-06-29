@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Drew Williams <drew.williams@capstanmedical.com>
+Date: Sat, 25 Apr 2026 19:20:28 +0000
+Subject: [PATCH] Suppress compiler warnings
+
+---
+ pocketfft_hdronly.h | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/pocketfft_hdronly.h b/pocketfft_hdronly.h
+index 330e7e051500669d767117475db81abb57af2917..44fcb7f70a8d8b14e7e742686a8fc26637ed0633 100644
+--- a/pocketfft_hdronly.h
++++ b/pocketfft_hdronly.h
+@@ -45,6 +45,21 @@
+ #ifndef POCKETFFT_HDRONLY_H
+ #define POCKETFFT_HDRONLY_H
+ 
++#if defined(__GNUC__) || defined(__clang__)
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wshadow"
++#pragma GCC diagnostic ignored "-Wsign-compare"
++#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
++#pragma GCC diagnostic ignored "-Wfloat-equal"
++#pragma GCC diagnostic ignored "-Wcast-qual"
++#pragma GCC diagnostic ignored "-Wpedantic"
++#pragma GCC diagnostic ignored "-Wunused-function"
++#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
++#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
++#elif defined(_MSC_VER)
++#pragma warning(push, 0)
++#endif
++
+ #ifndef __cplusplus
+ #error This file is C++ and requires a C++ compiler.
+ #endif
+@@ -3847,4 +3862,10 @@ using detail::dst;
+ #undef POCKETFFT_NOINLINE
+ #undef POCKETFFT_RESTRICT
+ 
++#if defined(__GNUC__) || defined(__clang__)
++#pragma GCC diagnostic pop
++#elif defined(_MSC_VER)
++#pragma warning(pop)
++#endif
++
+ #endif // POCKETFFT_HDRONLY_H
