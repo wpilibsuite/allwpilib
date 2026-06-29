@@ -133,14 +133,10 @@ TEST(KalmanFilterTest, SwerveMovingOverTrajectory) {
     lastVelocity = velocity;
   }
 
-  EXPECT_NEAR(trajectory.SampleAt(trajectory.Duration())
-                  .pose.Translation()
-                  .X()
-                  .value(),
-              filter.Xhat(0), 0.2);
-  EXPECT_NEAR(trajectory.SampleAt(trajectory.Duration())
-                  .pose.Translation()
-                  .Y()
-                  .value(),
-              filter.Xhat(1), 0.2);
+  EXPECT_NEAR(
+      trajectory.SampleAt(trajectory.Duration()).pose.Translation().X().value(),
+      filter.Xhat(0), 0.2);
+  EXPECT_NEAR(
+      trajectory.SampleAt(trajectory.Duration()).pose.Translation().Y().value(),
+      filter.Xhat(1), 0.2);
 }

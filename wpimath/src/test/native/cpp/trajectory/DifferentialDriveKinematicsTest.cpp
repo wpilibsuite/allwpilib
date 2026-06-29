@@ -23,13 +23,8 @@ TEST(DifferentialDriveKinematicsConstraintTest, Constraint) {
 
   auto trajectory = TestTrajectory::GetTrajectory(config);
 
-  wpi::units::second_t time = 0_s;
-  wpi::units::second_t dt = 20_ms;
-  wpi::units::second_t duration = trajectory.Duration();
-
-  while (time < duration) {
-    const SplineSample point = trajectory.SampleAt(time);
-    time += dt;
+  for (auto t = 0_s; t < trajectory.Duration(); t += 20_ms) {
+    auto point = trajectory.SampleAt(t);
 
     const DifferentialSample differentialSample{point, kinematics};
 
