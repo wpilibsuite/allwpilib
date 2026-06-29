@@ -7,7 +7,6 @@ package org.wpilib.vision.apriltag.proto;
 import org.wpilib.util.protobuf.Protobuf;
 import org.wpilib.vision.apriltag.AprilTag;
 import org.wpilib.vision.apriltag.AprilTagFieldLayout;
-import org.wpilib.vision.apriltag.proto.Apriltag.ProtobufAprilTagFieldLayout;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
 public class AprilTagFieldLayoutProto

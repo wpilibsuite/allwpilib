@@ -13,7 +13,6 @@ import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.util.Units;
 import org.wpilib.vision.apriltag.AprilTag;
 import org.wpilib.vision.apriltag.AprilTagFieldLayout;
-import org.wpilib.vision.apriltag.proto.Apriltag.ProtobufAprilTagFieldLayout;
 
 class AprilTagFieldLayoutProtoTest {
   private static final AprilTagFieldLayout DATA =

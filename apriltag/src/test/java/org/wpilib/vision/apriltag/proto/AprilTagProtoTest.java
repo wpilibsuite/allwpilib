@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.vision.apriltag.AprilTag;
-import org.wpilib.vision.apriltag.proto.Apriltag.ProtobufAprilTag;
 
 class AprilTagProtoTest {
   private static final AprilTag DATA = new AprilTag(3, new Pose3d(0, 1, 0, Rotation3d.kZero));

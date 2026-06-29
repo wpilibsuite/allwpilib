@@ -6,6 +6,10 @@ import "wpimath/src/main/proto/geometry3d.proto";
 
 option java_package = "org.wpilib.vision.apriltag.proto";
 
+option java_outer_classname = "ProtobufAprilTagDescriptor";
+
+option java_multiple_files = true;
+
 message ProtobufAprilTag {
   uint32 id = 1;
   ProtobufPose3d pose = 2;
