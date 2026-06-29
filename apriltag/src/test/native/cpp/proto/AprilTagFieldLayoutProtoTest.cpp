@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/apriltag/AprilTagFieldLayout.hpp"
 #include "wpi/util/SmallVector.hpp"
@@ -21,16 +21,16 @@ const AprilTagFieldLayout kExpectedData = AprilTagFieldLayout{
     54_ft, 27_ft};
 }  // namespace
 
-TEST(AprilTagFieldLayoutProtoTest, Roundtrip) {
+TEST_CASE("AprilTagFieldLayoutProtoTest Roundtrip", "[apriltag]") {
   wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
   wpi::util::SmallVector<uint8_t, 256> buf;
 
-  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, kExpectedData));
   auto unpacked_data = message.Unpack(buf);
-  ASSERT_TRUE(unpacked_data.has_value());
+  REQUIRE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.GetFieldLength(), unpacked_data->GetFieldLength());
-  EXPECT_EQ(kExpectedData.GetFieldWidth(), unpacked_data->GetFieldWidth());
+  REQUIRE(unpacked_data->GetFieldLength() == kExpectedData.GetFieldLength());
+  REQUIRE(unpacked_data->GetFieldWidth() == kExpectedData.GetFieldWidth());
 
-  EXPECT_EQ(kExpectedData.GetTagMap(), unpacked_data->GetTagMap());
+  REQUIRE(unpacked_data->GetTagMap() == kExpectedData.GetTagMap());
 }

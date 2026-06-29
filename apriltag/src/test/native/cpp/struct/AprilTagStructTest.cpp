@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/apriltag/AprilTag.hpp"
 
@@ -16,13 +16,13 @@ const AprilTag kExpectedData =
                                   wpi::math::Rotation3d{0_deg, 0_deg, 0_deg}}};
 }  // namespace
 
-TEST(AprilTagStructTest, Roundtrip) {
+TEST_CASE("AprilTagStructTest Roundtrip", "[apriltag]") {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
   StructType::Pack(buffer, kExpectedData);
 
   AprilTag unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.ID, unpacked_data.ID);
-  EXPECT_EQ(kExpectedData.pose, unpacked_data.pose);
+  REQUIRE(unpacked_data.ID == kExpectedData.ID);
+  REQUIRE(unpacked_data.pose == kExpectedData.pose);
 }
