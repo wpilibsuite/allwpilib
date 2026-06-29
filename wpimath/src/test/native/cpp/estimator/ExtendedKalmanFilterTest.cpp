@@ -110,8 +110,8 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
       trajectory.InitialPose().Translation().Y().value(),
       trajectory.InitialPose().Rotation().Radians().value(), 0.0, 0.0});
 
-  auto totalTime = trajectory.Duration();
-  for (size_t i = 0; i < (totalTime / dt).value(); ++i) {
+  auto duration = trajectory.Duration();
+  for (size_t i = 0; i < (duration / dt).value(); ++i) {
     auto ref = trajectory.SampleAt(dt * i);
     wpi::units::meters_per_second_t vl =
         ref.ForwardVelocity() * (1 - (ref.curvature * rb).value());

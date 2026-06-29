@@ -36,8 +36,8 @@ class LTVUnicycleControllerTest {
     var config = new TrajectoryConfig(8.8, 0.1);
     final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
 
-    final var totalTime = trajectory.duration;
-    for (int i = 0; i < (totalTime / kDt); ++i) {
+    final var duration = trajectory.duration;
+    for (int i = 0; i < (duration / kDt); ++i) {
       var state = trajectory.sampleAt(kDt * i);
 
       var output = controller.calculate(robotPose, state);

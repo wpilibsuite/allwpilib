@@ -142,8 +142,8 @@ class ExtendedKalmanFilterTest {
 
     var groundTruthX = observer.getXhat();
 
-    double totalTime = trajectory.duration;
-    for (int i = 0; i < (totalTime / dt); ++i) {
+    double duration = trajectory.duration;
+    for (int i = 0; i < (duration / dt); ++i) {
       var ref = trajectory.sampleAt(dt * i);
       double vl = ref.forwardVelocity() * (1 - (ref.curvature * rb));
       double vr = ref.forwardVelocity() * (1 + (ref.curvature * rb));

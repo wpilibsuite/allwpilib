@@ -82,8 +82,8 @@ TEST(LTVDifferentialDriveControllerTest, ReachesReference) {
   x(State::kY) = robotPose.Y().value();
   x(State::kHeading) = robotPose.Rotation().Radians().value();
 
-  auto totalTime = trajectory.Duration();
-  for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {
+  auto duration = trajectory.Duration();
+  for (size_t i = 0; i < (duration / kDt).value(); ++i) {
     wpi::math::DifferentialSample state{trajectory.SampleAt(kDt * i),
                                         kinematics};
     robotPose = wpi::math::Pose2d{wpi::units::meter_t{x(State::kX)},
