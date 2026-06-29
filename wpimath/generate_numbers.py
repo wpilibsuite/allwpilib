@@ -4,16 +4,16 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 
-import argparse
+import sys
 from pathlib import Path
 
+
+# When invoked directly, Python puts the script directory on sys.path.
+# Add the repo root so absolute package imports still work.
+sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
+
 from jinja2 import Environment, FileSystemLoader
-
-
-def output(output_dir: Path, outfn: str, contents: str):
-    output_dir.mkdir(parents=True, exist_ok=True)
-    output_file = output_dir / outfn
-    output_file.write_text(contents, encoding="utf-8", newline="\n")
+from shared.generation import make_arg_parser, add_jinja_args, write_file
 
 
 def generate_numbers(output_directory: Path, template_root: Path):
@@ -30,31 +30,20 @@ def generate_numbers(output_directory: Path, template_root: Path):
 
     for i in range(MAX_NUM + 1):
         contents = template.render(num=i)
-        output(rootPath, f"N{i}.java", contents)
+        write_file(rootPath, f"N{i}.java", contents)
 
     template = env.get_template("Nat.java.jinja")
     rootPath = output_directory / "main/java/org/wpilib/math/util"
     contents = template.render(nums=range(MAX_NUM + 1))
-    output(rootPath, "Nat.java", contents)
+    write_file(rootPath, "Nat.java", contents)
 
 
 def main():
     script_path = Path(__file__).resolve()
     dirname = script_path.parent
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--output_directory",
-        help="Optional. If set, will output the generated files to this directory, otherwise it will use a path relative to the script",
-        default=dirname / "src/generated",
-        type=Path,
-    )
-    parser.add_argument(
-        "--template_root",
-        help="Optional. If set, will use this directory as the root for the jinja templates",
-        default=dirname / "src/generate",
-        type=Path,
-    )
+    parser = make_arg_parser(dirname, dirname.parent)
+    add_jinja_args(parser, dirname, None)
     args = parser.parse_args()
 
     generate_numbers(args.output_directory, args.template_root)

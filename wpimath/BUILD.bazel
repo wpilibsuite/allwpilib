@@ -43,6 +43,10 @@ py_binary(
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
+    deps = [
+        requirement("jinja2"),
+        "//:generation",
+    ],
 )
 
 py_binary(
@@ -53,7 +57,10 @@ py_binary(
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    deps = [requirement("jinja2")],
+    deps = [
+        requirement("jinja2"),
+        "//:generation",
+    ],
 )
 
 py_binary(
@@ -63,6 +70,9 @@ py_binary(
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
+    deps = [
+        "//:generation",
+    ],
 )
 
 py_binary(

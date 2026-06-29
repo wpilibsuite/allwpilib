@@ -116,7 +116,7 @@ def define_mostrobotpy_to_allwpilib():
     for project_info in MOSTROBOTPY_PROJECTS:
         project_excludes = EXCLUDES
         if project_info.wpilib_name == "commandsv2":
-            project_excludes = project_excludes + ["subprojects/robotpy-commands-v2/tools/hids/**"]
+            project_excludes = project_excludes + ["subprojects/robotpy-commands-v2/tools/hids/**", "subprojects/robotpy-commands-v2/tools/shared/**"]
 
         origin_files += glob([
             "subprojects/" + project_info.robotpy_name + "/**",
@@ -235,12 +235,14 @@ def define_allwpilib_to_mostrobotpy():
     origin_files += [
         "commandsv2/generate_hids.py",
         "commandsv2/src/generate/main/python/first_ds_commandhid.py.jinja",
+        "shared/generation.py",
         "wpilibj/src/generate/first_ds_hids.json",
         "wpilibj/src/generate/first_ds_hids.schema.json",
     ]
     destination_files += [
         "subprojects/robotpy-commands-v2/tools/hids/generate_hids.py",
         "subprojects/robotpy-commands-v2/tools/hids/templates/main/python/first_ds_commandhid.py.jinja",
+        "subprojects/robotpy-commands-v2/tools/shared/generation.py",
         "subprojects/robotpy-commands-v2/tools/hids/first_ds_hids.json",
         "subprojects/robotpy-commands-v2/tools/hids/first_ds_hids.schema.json",
     ]
@@ -251,6 +253,10 @@ def define_allwpilib_to_mostrobotpy():
     transformations.append(core.move(
         "commandsv2/src/generate/main/python/first_ds_commandhid.py.jinja",
         "subprojects/robotpy-commands-v2/tools/hids/templates/main/python/first_ds_commandhid.py.jinja",
+    ))
+    transformations.append(core.move(
+        "shared/generation.py",
+        "subprojects/robotpy-commands-v2/tools/shared/generation.py",
     ))
     transformations.append(core.move(
         "wpilibj/src/generate/first_ds_hids.json",
