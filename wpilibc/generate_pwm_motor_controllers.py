@@ -4,23 +4,18 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 
-import argparse
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Any, Dict
 
+# When invoked directly, Python puts the script directory on sys.path.
+# Add the repo root so absolute package imports still work.
+sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
+
 from jinja2 import Environment, FileSystemLoader
-from jinja2.environment import Template
-
-
-def render_template(
-    template: Template, output_dir: Path, filename: str, controller: Dict[str, Any]
-):
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    output_file = output_dir / filename
-    output_file.write_text(template.render(controller), encoding="utf-8", newline="\n")
+from shared.generation import write_file, add_jinja_args, make_arg_parser
 
 
 def generate_cpp_headers(
@@ -38,7 +33,7 @@ def generate_cpp_headers(
 
     for controller in pwm_motor_controllers:
         controller_name = os.path.basename(f"{controller['name']}.hpp")
-        render_template(template, root_path, controller_name, controller)
+        write_file(root_path, controller_name, template.render(controller))
 
 
 def generate_cpp_sources(output_root, template_root, pwm_motor_controllers):
@@ -54,13 +49,13 @@ def generate_cpp_sources(output_root, template_root, pwm_motor_controllers):
 
     for controller in pwm_motor_controllers:
         controller_name = os.path.basename(f"{controller['name']}.cpp")
-        render_template(template, root_path, controller_name, controller)
+        write_file(root_path, controller_name, template.render(controller))
 
 
 def generate_pwm_motor_controllers(
-    output_root: Path, template_root: Path, schema_root: Path
+    output_root: Path, template_root: Path, schema_file: Path
 ):
-    with (schema_root / "pwm_motor_controllers.json").open(encoding="utf-8") as f:
+    with schema_file.open(encoding="utf-8") as f:
         controllers = json.load(f)
 
     generate_cpp_headers(output_root, template_root, controllers)
@@ -71,29 +66,12 @@ def main():
     script_path = Path(__file__).resolve()
     dirname = script_path.parent
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--output_directory",
-        help="Optional. If set, will output the generated files to this directory, otherwise it will use a path relative to the script",
-        default=dirname / "src/generated",
-        type=Path,
-    )
-    parser.add_argument(
-        "--schema_root",
-        help="Optional. If set, will use this directory as the root for discovering the pwm controller schema",
-        default=dirname / "../wpilibj/src/generate",
-        type=Path,
-    )
-    parser.add_argument(
-        "--template_root",
-        help="Optional. If set, will use this directory as the root for the jinja templates",
-        default=dirname / "src/generate",
-        type=Path,
-    )
+    parser = make_arg_parser(dirname, dirname.parent)
+    add_jinja_args(parser, dirname, "wpilibj/src/generate/pwm_motor_controllers.json")
     args = parser.parse_args()
 
     generate_pwm_motor_controllers(
-        args.output_directory, args.template_root, args.schema_root
+        args.output_directory, args.template_root, args.schema_file
     )
 
 

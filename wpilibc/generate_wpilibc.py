@@ -52,7 +52,9 @@ def main():
         test_output_directory,
     )
     generate_pwm_motor_controllers(
-        args.output_directory, args.template_root, args.schema_root
+        args.output_directory,
+        args.template_root,
+        args.schema_root / "pwm_motor_controllers.json",
     )
 
 
