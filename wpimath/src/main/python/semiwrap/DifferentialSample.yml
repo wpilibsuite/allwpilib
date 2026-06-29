@@ -13,6 +13,7 @@ functions:
         ignore: true
 classes:
   wpi::math::DifferentialSample:
+    force_no_trampoline: true
     attributes:
       leftSpeed:
       rightSpeed:

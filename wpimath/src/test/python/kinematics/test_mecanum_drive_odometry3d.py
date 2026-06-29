@@ -152,7 +152,7 @@ def test_accuracy_facing_trajectory():
     max_error = -1e10
     error_sum = 0
 
-    while t < trajectory.totalTime():
+    while t < trajectory.duration():
         ground_truth_state = trajectory.sampleAt(t)
 
         wheel_velocities = kinematics.toWheelVelocities(
@@ -188,7 +188,7 @@ def test_accuracy_facing_trajectory():
 
         t += dt
 
-    assert error_sum / (trajectory.totalTime() / dt) < 0.07
+    assert error_sum / (trajectory.duration() / dt) < 0.07
     assert max_error < 0.125
 
 
@@ -223,7 +223,7 @@ def test_accuracy_facing_x_axis():
     max_error = -1e10
     error_sum = 0
 
-    while t < trajectory.totalTime():
+    while t < trajectory.duration():
         ground_truth_state = trajectory.sampleAt(t)
 
         wheel_velocities = kinematics.toWheelVelocities(
@@ -260,5 +260,5 @@ def test_accuracy_facing_x_axis():
 
         t += dt
 
-    assert error_sum / (trajectory.totalTime() / dt) < 0.06
+    assert error_sum / (trajectory.duration() / dt) < 0.06
     assert max_error < 0.125

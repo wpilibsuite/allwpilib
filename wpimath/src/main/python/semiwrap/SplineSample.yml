@@ -5,6 +5,7 @@ functions:
     ignore: true
 classes:
   wpi::math::SplineSample:
+    force_no_trampoline: true
     attributes:
       curvature:
     methods:

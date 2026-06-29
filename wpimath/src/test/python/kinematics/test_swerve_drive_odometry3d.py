@@ -183,7 +183,7 @@ def test_accuracy_facing_x_axis():
     max_error = -float("inf")
     error_sum = 0
 
-    while t < trajectory.totalTime():
+    while t < trajectory.duration():
         ground_truth_state = trajectory.sampleAt(t)
 
         fl.distance += (
@@ -222,5 +222,5 @@ def test_accuracy_facing_x_axis():
 
         t += dt
 
-    assert error_sum / (trajectory.totalTime() / dt) < 0.06
+    assert error_sum / (trajectory.duration() / dt) < 0.06
     assert max_error < 0.125
