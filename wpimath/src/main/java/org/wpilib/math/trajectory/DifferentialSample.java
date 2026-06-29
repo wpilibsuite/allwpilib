@@ -15,6 +15,7 @@ import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.trajectory.proto.DifferentialSampleProto;
+import org.wpilib.math.trajectory.struct.DifferentialSampleStruct;
 import org.wpilib.units.measure.LinearVelocity;
 import org.wpilib.units.measure.Time;
 import org.wpilib.util.struct.StructSerializable;
@@ -32,6 +33,9 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
 
   /** Base proto for serialization. */
   public static final DifferentialSampleProto proto = new DifferentialSampleProto();
+
+  /** Base struct for serialization. */
+  public static final DifferentialSampleStruct struct = new DifferentialSampleStruct();
 
   /**
    * Constructs a DifferentialSample.
