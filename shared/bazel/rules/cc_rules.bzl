@@ -441,8 +441,8 @@ def wpilib_cc_shared_library(
     _split_debug_symbols(
         name = name + "-symbolsplit",
         copy = select({
-            "@rules_bzlmodrio_toolchains//conditions:linux_arm64": False,
-            "@rules_bzlmodrio_toolchains//conditions:linux_x86_64": True,
+            "@wpilib_toolchains//conditions:linux_arm64": False,
+            "@wpilib_toolchains//conditions:linux_x86_64": True,
             "//conditions:default": True,
         }),
         use_debug_name = select({
@@ -455,13 +455,13 @@ def wpilib_cc_shared_library(
     pkg_files(
         name = folder + "/lib" + lib + "-shared-files",
         srcs = select({
-            "@rules_bzlmodrio_toolchains//conditions:osx": [universal_name],
+            "@wpilib_toolchains//conditions:osx": [universal_name],
             "//conditions:default": [
                 ":" + name + "-symbolsplit",
             ],
         }),
         strip_prefix = select({
-            "@rules_bzlmodrio_toolchains//conditions:osx": "universal",
+            "@wpilib_toolchains//conditions:osx": "universal",
             "//conditions:default": None,
         }),
         visibility = visibility,

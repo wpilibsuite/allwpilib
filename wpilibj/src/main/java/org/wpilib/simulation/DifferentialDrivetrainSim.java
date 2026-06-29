@@ -150,18 +150,22 @@ public class DifferentialDrivetrainSim {
     }
   }
 
-  /** Returns the full simulated state of the drivetrain. */
-  Matrix<N7, N1> getState() {
+  /**
+   * Returns the full simulated state of the drivetrain. Note that this will not include noise!
+   *
+   * @return The simulated state
+   */
+  public Matrix<N7, N1> getState() {
     return m_x;
   }
 
   /**
-   * Get one of the drivetrain states.
+   * Get one of the drivetrain states. Note that this will not include noise!
    *
    * @param state the state to get
    * @return the state
    */
-  double getState(State state) {
+  public double getState(State state) {
     return m_x.get(state.value, 0);
   }
 

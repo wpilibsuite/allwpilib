@@ -28,93 +28,93 @@ DualSenseControllerSim::DualSenseControllerSim(int port) : GenericHIDSim{port} {
 }
 
 void DualSenseControllerSim::SetLeftX(double value) {
-  SetRawAxis(DualSenseController::Axis::LEFT_X, value);
+  SetRawAxis(static_cast<int>(DualSenseController::Axis::LEFT_X), value);
 }
 
 void DualSenseControllerSim::SetLeftY(double value) {
-  SetRawAxis(DualSenseController::Axis::LEFT_Y, value);
+  SetRawAxis(static_cast<int>(DualSenseController::Axis::LEFT_Y), value);
 }
 
 void DualSenseControllerSim::SetRightX(double value) {
-  SetRawAxis(DualSenseController::Axis::RIGHT_X, value);
+  SetRawAxis(static_cast<int>(DualSenseController::Axis::RIGHT_X), value);
 }
 
 void DualSenseControllerSim::SetRightY(double value) {
-  SetRawAxis(DualSenseController::Axis::RIGHT_Y, value);
+  SetRawAxis(static_cast<int>(DualSenseController::Axis::RIGHT_Y), value);
 }
 
 void DualSenseControllerSim::SetL2(double value) {
-  SetRawAxis(DualSenseController::Axis::L2, value);
+  SetRawAxis(static_cast<int>(DualSenseController::Axis::L2), value);
 }
 
 void DualSenseControllerSim::SetR2(double value) {
-  SetRawAxis(DualSenseController::Axis::R2, value);
+  SetRawAxis(static_cast<int>(DualSenseController::Axis::R2), value);
 }
 
 void DualSenseControllerSim::SetCrossButton(bool value) {
-  SetRawButton(DualSenseController::Button::CROSS, value);
+  SetRawButton(static_cast<int>(DualSenseController::Button::CROSS), value);
 }
 
 void DualSenseControllerSim::SetCircleButton(bool value) {
-  SetRawButton(DualSenseController::Button::CIRCLE, value);
+  SetRawButton(static_cast<int>(DualSenseController::Button::CIRCLE), value);
 }
 
 void DualSenseControllerSim::SetSquareButton(bool value) {
-  SetRawButton(DualSenseController::Button::SQUARE, value);
+  SetRawButton(static_cast<int>(DualSenseController::Button::SQUARE), value);
 }
 
 void DualSenseControllerSim::SetTriangleButton(bool value) {
-  SetRawButton(DualSenseController::Button::TRIANGLE, value);
+  SetRawButton(static_cast<int>(DualSenseController::Button::TRIANGLE), value);
 }
 
 void DualSenseControllerSim::SetCreateButton(bool value) {
-  SetRawButton(DualSenseController::Button::CREATE, value);
+  SetRawButton(static_cast<int>(DualSenseController::Button::CREATE), value);
 }
 
 void DualSenseControllerSim::SetPSButton(bool value) {
-  SetRawButton(DualSenseController::Button::PS, value);
+  SetRawButton(static_cast<int>(DualSenseController::Button::PS), value);
 }
 
 void DualSenseControllerSim::SetOptionsButton(bool value) {
-  SetRawButton(DualSenseController::Button::OPTIONS, value);
+  SetRawButton(static_cast<int>(DualSenseController::Button::OPTIONS), value);
 }
 
 void DualSenseControllerSim::SetL3Button(bool value) {
-  SetRawButton(DualSenseController::Button::L3, value);
+  SetRawButton(static_cast<int>(DualSenseController::Button::L3), value);
 }
 
 void DualSenseControllerSim::SetR3Button(bool value) {
-  SetRawButton(DualSenseController::Button::R3, value);
+  SetRawButton(static_cast<int>(DualSenseController::Button::R3), value);
 }
 
 void DualSenseControllerSim::SetL1Button(bool value) {
-  SetRawButton(DualSenseController::Button::L1, value);
+  SetRawButton(static_cast<int>(DualSenseController::Button::L1), value);
 }
 
 void DualSenseControllerSim::SetR1Button(bool value) {
-  SetRawButton(DualSenseController::Button::R1, value);
+  SetRawButton(static_cast<int>(DualSenseController::Button::R1), value);
 }
 
 void DualSenseControllerSim::SetDpadUpButton(bool value) {
-  SetRawButton(DualSenseController::Button::DPAD_UP, value);
+  SetRawButton(static_cast<int>(DualSenseController::Button::DPAD_UP), value);
 }
 
 void DualSenseControllerSim::SetDpadDownButton(bool value) {
-  SetRawButton(DualSenseController::Button::DPAD_DOWN, value);
+  SetRawButton(static_cast<int>(DualSenseController::Button::DPAD_DOWN), value);
 }
 
 void DualSenseControllerSim::SetDpadLeftButton(bool value) {
-  SetRawButton(DualSenseController::Button::DPAD_LEFT, value);
+  SetRawButton(static_cast<int>(DualSenseController::Button::DPAD_LEFT), value);
 }
 
 void DualSenseControllerSim::SetDpadRightButton(bool value) {
-  SetRawButton(DualSenseController::Button::DPAD_RIGHT, value);
+  SetRawButton(static_cast<int>(DualSenseController::Button::DPAD_RIGHT), value);
 }
 
 void DualSenseControllerSim::SetMicrophoneButton(bool value) {
-  SetRawButton(DualSenseController::Button::MICROPHONE, value);
+  SetRawButton(static_cast<int>(DualSenseController::Button::MICROPHONE), value);
 }
 
 void DualSenseControllerSim::SetTouchpadButton(bool value) {
-  SetRawButton(DualSenseController::Button::TOUCHPAD, value);
+  SetRawButton(static_cast<int>(DualSenseController::Button::TOUCHPAD), value);
 }

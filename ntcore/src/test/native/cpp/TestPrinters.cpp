@@ -102,7 +102,8 @@ void PrintTo(const PubSubOptionsImpl& options, std::ostream* os) {
   *os << "PubSubOptions{periodicMs=" << options.periodicMs
       << ", pollStorage=" << options.pollStorage
       << ", sendAll=" << options.sendAll
-      << ", keepDuplicates=" << options.keepDuplicates << '}';
+      << ", keepDuplicates=" << options.keepDuplicates
+      << ", disableSignal=" << options.disableSignal << '}';
 }
 
 }  // namespace wpi::nt

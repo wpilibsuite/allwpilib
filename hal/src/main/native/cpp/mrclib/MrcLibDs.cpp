@@ -242,6 +242,8 @@ class MrcLibDsImpl : public MrcLibDs {
 
   int32_t getSystemTimeValid(bool* systemTimeValid) override;
 
+  int32_t writeDisplayAnsi(const struct WPI_String* line) override;
+
   wpi::util::EventVector newDataEvents;
 
  private:
@@ -313,8 +315,23 @@ MrcLibDsImpl::MrcLibDsImpl() {
     std::terminate();
   }
 
+  // Initialize control first, making sure its properly checked for errors
+  MRC_Status controlInitStatus = MRC_DsCommsControl_Initialize();
+  if (controlInitStatus == MRC_STATUS_MULTIPLE_USER_PROGRAMS) {
+    fmt::print(stderr,
+               "Warning: Multiple user programs detected. Restarting app and "
+               "retrying...\n");
+    std::terminate();
+  }
+  if (controlInitStatus != MRC_STATUS_SUCCESS) {
+    fmt::print(stderr,
+               "Error: MRC_DsCommsControl_Initialize failed with status {}. "
+               "Restarting app and retrying...\n",
+               controlInitStatus);
+    std::terminate();
+  }
   MRC_DsComms_Initialize();
-  MRC_DsCommsControl_Initialize();
+
   MRC_Console_Initialize();
 
   // Wait for 10 seconds for the system server to be ready.
@@ -659,6 +676,11 @@ int32_t MrcLibDsImpl::getSystemTimeValid(bool* systemTimeValid) {
     *systemTimeValid = false;
   }
   return status;
+}
+
+int32_t MrcLibDsImpl::writeDisplayAnsi(const struct WPI_String* line) {
+  MRC_String mrcLine = WPIStringToMRCString(line);
+  return MRC_DsCommsControl_WriteAnsi(&mrcLine);
 }
 
 void MrcLibDsImpl::provideNewDataEventHandle(WPI_EventHandle handle) {

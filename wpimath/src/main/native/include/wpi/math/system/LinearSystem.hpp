@@ -52,7 +52,7 @@ class LinearSystem {
                          const Matrixd<Outputs, States>& C,
                          const Matrixd<Outputs, Inputs>& D) {
     auto allFinite = [](const auto& mat) {
-      if (std::is_constant_evaluated()) {
+      if consteval {
         for (int row = 0; row < mat.rows(); ++row) {
           for (int col = 0; col < mat.cols(); ++col) {
             if (!gcem::internal::is_finite(mat(row, col))) {

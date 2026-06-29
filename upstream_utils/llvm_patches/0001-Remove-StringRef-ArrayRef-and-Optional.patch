@@ -14,7 +14,7 @@ Subject: [PATCH 01/34] Remove StringRef, ArrayRef, and Optional
  llvm/include/llvm/Support/VersionTuple.h      |   6 --
  .../llvm/Support/Windows/WindowsSupport.h     |   4 +-
  llvm/include/llvm/Support/raw_ostream.h       |  46 ++++----
- llvm/lib/Support/ConvertUTFWrapper.cpp        |  39 +++----
+ llvm/lib/Support/ConvertUTFWrapper.cpp        |  39 ++++---
  llvm/lib/Support/ErrorHandling.cpp            |  21 ++--
  llvm/lib/Support/SmallVector.cpp              |   5 +-
  llvm/lib/Support/VersionTuple.cpp             |  49 ---------
@@ -25,7 +25,7 @@ Subject: [PATCH 01/34] Remove StringRef, ArrayRef, and Optional
  llvm/unittests/ADT/SmallStringTest.cpp        |  50 ++++-----
  llvm/unittests/ADT/SmallVectorTest.cpp        |  36 ++-----
  llvm/unittests/Support/ConvertUTFTest.cpp     |  42 ++++----
- 21 files changed, 226 insertions(+), 315 deletions(-)
+ 21 files changed, 225 insertions(+), 316 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/PointerUnion.h b/llvm/include/llvm/ADT/PointerUnion.h
 index d9087dd1c516ee265aa00851ca98b1df09936f3e..c3d6458777d186a700c359089c4afcac8db0185a 100644
@@ -749,10 +749,10 @@ index 70916d8e4adb0f98984ff335187a083a3091bc58..19df8739b6013c1b1a1527f5880a040d
  
  LLVM_ABI raw_ostream &operator<<(raw_ostream &OS, std::nullopt_t);
 diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
-index 76ead00c977bd37147048d321b425a9a9e76497a..39f151c716dacfef07038551add0f84a09b0cb62 100644
+index 76ead00c977bd37147048d321b425a9a9e76497a..448dbde16986172f506c247a1cd3a78a311f1fa2 100644
 --- a/llvm/lib/Support/ConvertUTFWrapper.cpp
 +++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
-@@ -6,23 +6,24 @@
+@@ -6,23 +6,23 @@
  //
  //===----------------------------------------------------------------------===//
  
@@ -760,7 +760,6 @@ index 76ead00c977bd37147048d321b425a9a9e76497a..39f151c716dacfef07038551add0f84a
 -#include "llvm/ADT/StringRef.h"
  #include "llvm/Support/ConvertUTF.h"
  #include "llvm/Support/ErrorHandling.h"
-+#include "llvm/Support/SwapByteOrder.h"
 +#include <span>
  #include <string>
 +#include <string_view>
@@ -782,7 +781,7 @@ index 76ead00c977bd37147048d321b425a9a9e76497a..39f151c716dacfef07038551add0f84a
        result = sourceIllegal;
        ErrorPtr = Pos;
      } else {
-@@ -75,12 +76,12 @@ bool ConvertCodePointToUTF8(unsigned Source, char *&ResultPtr) {
+@@ -75,12 +75,12 @@ bool ConvertCodePointToUTF8(unsigned Source, char *&ResultPtr) {
    return true;
  }
  
@@ -797,7 +796,7 @@ index 76ead00c977bd37147048d321b425a9a9e76497a..39f151c716dacfef07038551add0f84a
    assert(Out.empty());
  
    // Error out on an uneven byte count.
-@@ -131,14 +132,14 @@ bool convertUTF16ToUTF8String(ArrayRef<char> SrcBytes, std::string &Out) {
+@@ -131,14 +131,14 @@ bool convertUTF16ToUTF8String(ArrayRef<char> SrcBytes, std::string &Out) {
    return true;
  }
  
@@ -815,7 +814,7 @@ index 76ead00c977bd37147048d321b425a9a9e76497a..39f151c716dacfef07038551add0f84a
    assert(Out.empty());
  
    // Error out on an uneven byte count.
-@@ -189,14 +190,14 @@ bool convertUTF32ToUTF8String(ArrayRef<char> SrcBytes, std::string &Out) {
+@@ -189,14 +189,14 @@ bool convertUTF32ToUTF8String(ArrayRef<char> SrcBytes, std::string &Out) {
    return true;
  }
  
@@ -833,7 +832,7 @@ index 76ead00c977bd37147048d321b425a9a9e76497a..39f151c716dacfef07038551add0f84a
                                SmallVectorImpl<UTF16> &DstUTF16) {
    assert(DstUTF16.empty());
  
-@@ -207,8 +208,8 @@ bool convertUTF8ToUTF16String(StringRef SrcUTF8,
+@@ -207,8 +207,8 @@ bool convertUTF8ToUTF16String(StringRef SrcUTF8,
      return true;
    }
  
@@ -844,7 +843,7 @@ index 76ead00c977bd37147048d321b425a9a9e76497a..39f151c716dacfef07038551add0f84a
  
    // Allocate the same number of UTF-16 code units as UTF-8 code units. Encoding
    // as UTF-16 should always require the same amount or less code units than the
-@@ -239,7 +240,7 @@ static_assert(sizeof(wchar_t) == 1 || sizeof(wchar_t) == 2 ||
+@@ -239,7 +239,7 @@ static_assert(sizeof(wchar_t) == 1 || sizeof(wchar_t) == 2 ||
                "Expected wchar_t to be 1, 2, or 4 bytes");
  
  template <typename TResult>
@@ -853,7 +852,7 @@ index 76ead00c977bd37147048d321b425a9a9e76497a..39f151c716dacfef07038551add0f84a
                                               TResult &Result) {
    // Even in the case of UTF-16, the number of bytes in a UTF-8 string is
    // at least as large as the number of elements in the resulting wide
-@@ -255,7 +256,7 @@ static inline bool ConvertUTF8toWideInternal(llvm::StringRef Source,
+@@ -255,7 +255,7 @@ static inline bool ConvertUTF8toWideInternal(llvm::StringRef Source,
    return true;
  }
  
@@ -862,7 +861,7 @@ index 76ead00c977bd37147048d321b425a9a9e76497a..39f151c716dacfef07038551add0f84a
    return ConvertUTF8toWideInternal(Source, Result);
  }
  
-@@ -264,7 +265,7 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result) {
+@@ -264,7 +264,7 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result) {
      Result.clear();
      return true;
    }
@@ -871,7 +870,7 @@ index 76ead00c977bd37147048d321b425a9a9e76497a..39f151c716dacfef07038551add0f84a
  }
  
  bool convertWideToUTF8(const std::wstring &Source, std::string &Result) {
-@@ -279,7 +280,7 @@ bool convertWideToUTF8(const std::wstring &Source, std::string &Result) {
+@@ -279,7 +279,7 @@ bool convertWideToUTF8(const std::wstring &Source, std::string &Result) {
      return true;
    } else if (sizeof(wchar_t) == 2) {
      return convertUTF16ToUTF8String(
@@ -880,6 +879,11 @@ index 76ead00c977bd37147048d321b425a9a9e76497a..39f151c716dacfef07038551add0f84a
                                Source.size()),
          Result);
    } else if (sizeof(wchar_t) == 4) {
+@@ -314,4 +314,3 @@ bool IsSingleCodeUnitUTF32Codepoint(unsigned V) {
+ }
+ 
+ } // end namespace llvm
+-
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
 index 097041f1ae282a0387da8f839e5e37fe350d5d51..fc9d118e85508cdf86553bb63cce4a1c567045b7 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp

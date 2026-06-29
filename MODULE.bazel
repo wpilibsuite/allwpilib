@@ -5,6 +5,10 @@ module(
 
 include("//docs:doxygen.MODULE.bazel")
 
+include("//shared/bazel/thirdparty/ceres:ceres.MODULE.bazel")
+
+include("//shared/bazel/thirdparty/libssh:libssh.MODULE.bazel")
+
 include("//shared/bazel/thirdparty/mrclib:mrclib.MODULE.bazel")
 
 bazel_dep(name = "apple_support", version = "2.0.0", repo_name = "build_bazel_apple_support")
@@ -107,11 +111,18 @@ http_file(
     urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.3.3/protoc-gen-quickbuf-1.3.3-windows-x86_64.exe"],
 )
 
-bazel_dep(name = "rules_bzlmodrio_toolchains", version = "2025-1.bcr6")
+bazel_dep(name = "wpilib_toolchains", version = "")
 archive_override(
-    module_name = "rules_bzlmodrio_toolchains",
-    integrity = "sha256-ECtFB2KOlySwweRBcndiw0TkAXD2WsYFFhaBeOozqJo=",
-    urls = ["https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr6/rules_bzlmodrio_toolchains-2025-1.bcr6.tar.gz"],
+    module_name = "wpilib_toolchains",
+    integrity = "sha256-4c3CfQWaDQHnYDREDpaKzy6EvPMSs4SnvYrgbGi9Q4I=",
+    urls = ["https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2027-1/wpilib_toolchains-2027-1.tar.gz"],
+)
+
+bazel_dep(name = "bzlmodrio-opencv", version = "")
+archive_override(
+    module_name = "bzlmodrio-opencv",
+    integrity = "sha256-WPeLraGmt9Fv8tYXvyzxDAGTZ1BW5qb6g95bXIk6otw=",
+    urls = ["https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2027.4.13.0-3.bcr1/bzlmodRio-opencv-2027.4.13.0-3.bcr1.tar.gz"],
 )
 
 bazel_dep(name = "protobuf", version = "32.1", repo_name = "com_google_protobuf")

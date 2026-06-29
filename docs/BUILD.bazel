@@ -89,7 +89,6 @@ doxygen(
         "*/wpi/util/ErrorHandling.hpp",
         "*/wpi/util/SmallVector.hpp",
         "*/wpi/util/StringExtras.hpp",
-        "*/wpi/util/bit.hpp",
         "*/wpi/util/raw_ostream.hpp",
         # Sleipnir
         "*/sleipnir/optimization/solver/interior_point.hpp",

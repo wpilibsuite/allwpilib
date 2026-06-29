@@ -29,7 +29,7 @@ install(FILES ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake DESTINATION share/x
 install(EXPORT xrpvendordep DESTINATION share/xrpVendordep)
 
 if(WITH_TESTS)
-    wpilib_add_test(xrpVendordep src/test/native/cpp)
+    wpilib_add_test_catch2(xrpVendordep src/test/native/cpp)
     target_include_directories(xrpVendordep_test PRIVATE src/test/native/include)
-    target_link_libraries(xrpVendordep_test xrpVendordep googletest)
+    target_link_libraries(xrpVendordep_test xrpVendordep)
 endif()

@@ -5,11 +5,12 @@ apply plugin: 'c'
 ext {
     nativeName = 'apriltag'
     devMain = 'org.wpilib.vision.apriltag.DevMain'
+    nativeTestSuiteName = "${nativeName}Catch2Test"
     useJava = true
     useCpp = true
     sharedCvConfigs = [
         apriltagDev : [],
-        apriltagTest: []]
+        (nativeTestSuiteName): []]
     staticCvConfigs = []
 
     def generateTask = createGenerateResourcesTask('main', 'APRILTAG', 'wpi::apriltag', project)

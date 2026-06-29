@@ -40,6 +40,8 @@ void HALSIM_SetSendError(HALSIM_SendErrorHandler handler) {}
 
 void HALSIM_SetSendConsoleLine(HALSIM_SendConsoleLineHandler handler) {}
 
+void HALSIM_SetWriteDisplayAnsi(HALSIM_WriteDisplayAnsiHandler handler) {}
+
 int32_t HALSIM_RegisterSimPeriodicBeforeCallback(
     HALSIM_SimPeriodicCallback callback, void* param) {
   return 0;

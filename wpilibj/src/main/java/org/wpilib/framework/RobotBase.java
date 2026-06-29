@@ -16,6 +16,7 @@ import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.networktables.MultiSubscriber;
 import org.wpilib.networktables.NetworkTableEvent;
 import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.PubSubOption;
 import org.wpilib.system.RuntimeType;
 import org.wpilib.system.Timer;
 import org.wpilib.system.WPILibVersion;
@@ -103,7 +104,7 @@ public abstract class RobotBase implements AutoCloseable {
     setupCameraServerShared();
     setupMathShared();
     // subscribe to "" to force persistent values to propagate to local
-    m_suball = new MultiSubscriber(inst, new String[] {""});
+    m_suball = new MultiSubscriber(inst, new String[] {""}, PubSubOption.DISABLE_SIGNAL);
     if (!isSimulation()) {
       inst.startServer("/home/systemcore/networktables.json", "", "robot");
     } else {
@@ -302,6 +303,31 @@ public abstract class RobotBase implements AutoCloseable {
     return robot;
   }
 
+  /**
+   * Gets the Robot subclass name from a stack trace.
+   *
+   * @param elements The stack trace elements to walk.
+   * @return The Robot subclass name.
+   */
+  protected static String getRobotName(StackTraceElement[] elements) {
+    // Walk bottom to top to account for multiple layers of subclassing
+    for (int i = elements.length - 1; i >= 0; i--) {
+      StackTraceElement element = elements[i];
+      try {
+        // Skip our own class when walking
+        if (RobotBase.class.equals(Class.forName(element.getClassName()))) {
+          continue;
+        }
+        if (RobotBase.class.isAssignableFrom(Class.forName(element.getClassName()))) {
+          return element.getClassName();
+        }
+      } catch (ClassNotFoundException e) {
+        // Unreachable
+      }
+    }
+    return "Unknown";
+  }
+
   /** Run the robot main loop. */
   @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private static <T extends RobotBase> void runRobot(Class<T> robotClass) {
@@ -315,11 +341,8 @@ public abstract class RobotBase implements AutoCloseable {
       if (cause != null) {
         throwable = cause;
       }
-      String robotName = "Unknown";
       StackTraceElement[] elements = throwable.getStackTrace();
-      if (elements.length > 0) {
-        robotName = elements[0].getClassName();
-      }
+      String robotName = getRobotName(elements);
       DriverStationErrors.reportError(
           "Unhandled exception instantiating robot " + robotName + " " + throwable, elements);
       DriverStationErrors.reportError(

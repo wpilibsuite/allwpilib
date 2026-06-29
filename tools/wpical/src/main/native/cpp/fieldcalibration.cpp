@@ -27,18 +27,17 @@
 #include "wpi/apriltag/AprilTagDetector.hpp"
 #include "wpi/apriltag/AprilTagDetector_cv.hpp"
 #include "wpi/apriltag/AprilTagFieldLayout.hpp"
+#include "wpi/math/geometry/Pose3d.hpp"
 
 struct Pose {
   Eigen::Vector3d p;
   Eigen::Quaterniond q;
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 struct Constraint {
   int idBegin;
   int idEnd;
   Pose tBeginEnd;
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 class PoseGraphError {
@@ -82,8 +81,6 @@ class PoseGraphError {
     return new ceres::AutoDiffCostFunction<PoseGraphError, 6, 3, 4, 3, 4>(
         new PoseGraphError(t_ab_observed));
   }
-
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  private:
   const Pose m_t_ab_observed;
@@ -190,14 +187,12 @@ inline void DrawTagCube(cv::Mat& frame, Eigen::Matrix4d cameraToTag,
   }
 }
 
-inline bool ProcessVideoFile(
-    wpi::apriltag::AprilTagDetector& detector,
-    const wpical::CameraModel& cameraModel, double tagSize,
-    const std::string& path,
-    std::map<int, Pose, std::less<int>,
-             Eigen::aligned_allocator<std::pair<const int, Pose>>>& poses,
-    std::vector<Constraint, Eigen::aligned_allocator<Constraint>>& constraints,
-    bool showDebugWindow) {
+inline bool ProcessVideoFile(wpi::apriltag::AprilTagDetector& detector,
+                             const wpical::CameraModel& cameraModel,
+                             double tagSize, const std::string& path,
+                             std::map<int, Pose, std::less<int>>& poses,
+                             std::vector<Constraint>& constraints,
+                             bool showDebugWindow) {
   if (showDebugWindow) {
     cv::namedWindow("Processing Frame", cv::WINDOW_NORMAL);
   }
@@ -330,10 +325,8 @@ std::optional<wpi::apriltag::AprilTagFieldLayout> wpical::calibrate(
   detector.AddFamily("tag36h11");
 
   // Find tag poses
-  std::map<int, Pose, std::less<int>,
-           Eigen::aligned_allocator<std::pair<const int, Pose>>>
-      poses;
-  std::vector<Constraint, Eigen::aligned_allocator<Constraint>> constraints;
+  std::map<int, Pose, std::less<int>> poses;
+  std::vector<Constraint> constraints;
 
   for (const auto& entry : std::filesystem::directory_iterator(inputDirPath)) {
     if (entry.path().filename().string()[0] == '.') {
@@ -384,11 +377,11 @@ std::optional<wpi::apriltag::AprilTagFieldLayout> wpical::calibrate(
   ceres::Solver::Summary summary;
   ceres::Solve(options, &problem, &summary);
 
-  Eigen::Matrix4d correctionA;
-  correctionA << 0, 0, -1, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1;
+  Eigen::Matrix4d correctionA{
+      {0, 0, -1, 0}, {1, 0, 0, 0}, {0, -1, 0, 0}, {0, 0, 0, 1}};
 
-  Eigen::Matrix4d correctionB;
-  correctionB << 0, 1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 1;
+  Eigen::Matrix4d correctionB{
+      {0, 1, 0, 0}, {0, 0, -1, 0}, {-1, 0, 0, 0}, {0, 0, 0, 1}};
 
   Eigen::Matrix4d pinnedTagTransform =
       idealLayout.GetTagPose(pinnedTagId)->ToMatrix();

@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <atomic>
+#include <chrono>
 #include <cstdio>
 #include <cstring>
 #include <functional>
@@ -277,6 +278,10 @@ HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
   bool systemTimeValid;
   *status = mrcLibDs->getSystemTimeValid(&systemTimeValid);
   return systemTimeValid;
+}
+
+void HAL_WriteDisplayAnsi(const struct WPI_String* data) {
+  mrcLibDs->writeDisplayAnsi(data);
 }
 
 }  // extern "C"

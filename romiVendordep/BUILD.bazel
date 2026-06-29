@@ -78,7 +78,7 @@ cc_test(
     srcs = glob(["src/test/native/cpp/**"]),
     deps = [
         ":romiVendordep",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 
