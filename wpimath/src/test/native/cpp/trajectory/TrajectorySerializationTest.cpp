@@ -35,7 +35,7 @@ TEST(TrajectorySerializationTest, TestJsonSerialization) {
   HolonomicTrajectory deserializedTrajectory{std::move(samples_out)};
 
   // Verify they are equal
-  EXPECT_EQ(trajectory.TotalTime(), deserializedTrajectory.TotalTime());
+  EXPECT_EQ(trajectory.Duration(), deserializedTrajectory.Duration());
   EXPECT_EQ(trajectory.Samples().size(),
             deserializedTrajectory.Samples().size());
 
@@ -74,7 +74,7 @@ TEST(TrajectorySerializationTest, TestDifferentialSerialization) {
   DifferentialTrajectory deserializedTrajectory{std::move(samples_out)};
 
   // Verify they are equal
-  EXPECT_EQ(trajectory.TotalTime(), deserializedTrajectory.TotalTime());
+  EXPECT_EQ(trajectory.Duration(), deserializedTrajectory.Duration());
   EXPECT_EQ(trajectory.Samples().size(),
             deserializedTrajectory.Samples().size());
 

@@ -34,7 +34,7 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
   auto trajectory = TestTrajectory::GetTrajectory(config);
 
   constexpr wpi::units::second_t dt = 20_ms;
-  for (auto t = 0_s; t < trajectory.TotalTime(); t += dt) {
+  for (auto t = 0_s; t < trajectory.Duration(); t += dt) {
     auto point = trajectory.SampleAt(t);
 
     DifferentialSample differentialSample{point, kinematics};

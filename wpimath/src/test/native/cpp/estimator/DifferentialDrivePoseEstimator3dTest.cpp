@@ -59,7 +59,7 @@ void testFollowTrajectory(
         "right\n");
   }
 
-  while (t < trajectory.TotalTime()) {
+  while (t < trajectory.Duration()) {
     wpi::math::SplineSample groundTruthState = trajectory.SampleAt(t);
 
     // We are due for a new vision measurement if it's been `visionUpdateRate`
@@ -152,7 +152,7 @@ void testFollowTrajectory(
 
   if (checkError) {
     // NOLINTNEXTLINE(bugprone-integer-division)
-    EXPECT_LT(errorSum / (trajectory.TotalTime() / dt), 0.05);
+    EXPECT_LT(errorSum / (trajectory.Duration() / dt), 0.05);
     EXPECT_LT(maxError, 0.2);
   }
 }

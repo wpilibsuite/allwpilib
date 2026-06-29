@@ -28,7 +28,7 @@ TEST(TrajectoryConcatenateTest, Samples) {
       EXPECT_EQ(state, t1.Samples()[i]);
     } else {
       auto st = t2.Samples()[i - t1.Samples().size()];
-      st.timestamp += t1.TotalTime();
+      st.timestamp += t1.Duration();
       EXPECT_EQ(state, st);
     }
   }

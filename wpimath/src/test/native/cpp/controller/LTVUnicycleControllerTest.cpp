@@ -31,7 +31,7 @@ TEST(LTVUnicycleControllerTest, ReachesReference) {
   auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
-  auto totalTime = trajectory.TotalTime();
+  auto totalTime = trajectory.Duration();
   for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {
     auto state = trajectory.SampleAt(kDt * i);
     auto [vx, vy, omega] = controller.Calculate(robotPose, state);

@@ -51,13 +51,11 @@ class TrajectoryGeneratorTest {
   void testGenerationAndConstraints() {
     Trajectory<SplineSample> trajectory = getTrajectory(new ArrayList<>());
 
-    double duration = trajectory.duration;
-    double t = 0.0;
-    double dt = 0.02;
+    final double dt = 0.02;
 
-    while (t < duration) {
+    for (double t = 0.0; t < trajectory.duration; t += dt) {
       var point = trajectory.sampleAt(t);
-      t += dt;
+
       assertAll(
           () -> assertTrue(Math.abs(point.forwardVelocity()) < feetToMeters(12.0) + 0.05),
           () -> assertTrue(Math.abs(point.forwardAcceleration()) < feetToMeters(12.0) + 0.05));

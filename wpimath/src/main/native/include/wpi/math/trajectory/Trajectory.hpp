@@ -65,7 +65,7 @@ class Trajectory {
    *
    * @return The duration of the trajectory.
    */
-  wpi::units::second_t TotalTime() const { return m_duration; }
+  wpi::units::second_t Duration() const { return m_duration; }
 
   /**
    * Returns the samples of the trajectory.

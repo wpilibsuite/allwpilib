@@ -132,7 +132,7 @@ TEST(S3UKFTest, DriveConvergence) {
 
   auto trueXhat = observer.Xhat();
 
-  auto totalTime = trajectory.TotalTime();
+  auto totalTime = trajectory.Duration();
   for (size_t i = 0; i < (totalTime / dt).value(); ++i) {
     auto ref = trajectory.SampleAt(dt * i);
     wpi::units::meters_per_second_t vl =
@@ -170,7 +170,7 @@ TEST(S3UKFTest, DriveConvergence) {
 
   );
 
-  auto finalPosition = trajectory.SampleAt(trajectory.TotalTime());
+  auto finalPosition = trajectory.SampleAt(trajectory.Duration());
   EXPECT_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
               0.055);
   EXPECT_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),

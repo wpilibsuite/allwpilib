@@ -25,7 +25,7 @@ TEST(DifferentialDriveKinematicsConstraintTest, Constraint) {
 
   wpi::units::second_t time = 0_s;
   wpi::units::second_t dt = 20_ms;
-  wpi::units::second_t duration = trajectory.TotalTime();
+  wpi::units::second_t duration = trajectory.Duration();
 
   while (time < duration) {
     const SplineSample point = trajectory.SampleAt(time);

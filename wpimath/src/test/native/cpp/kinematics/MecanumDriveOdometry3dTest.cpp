@@ -128,7 +128,7 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
   double maxError = -std::numeric_limits<double>::max();
   double errorSum = 0;
 
-  while (t < trajectory.TotalTime()) {
+  while (t < trajectory.Duration()) {
     wpi::math::SplineSample groundTruthState = trajectory.SampleAt(t);
 
     auto wheelVelocities =
@@ -162,7 +162,7 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.06);
+  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.06);
   EXPECT_LT(maxError, 0.125);
 }
 
@@ -195,7 +195,7 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingXAxis) {
   double maxError = -std::numeric_limits<double>::max();
   double errorSum = 0;
 
-  while (t < trajectory.TotalTime()) {
+  while (t < trajectory.Duration()) {
     wpi::math::SplineSample groundTruthState = trajectory.SampleAt(t);
 
     auto wheelVelocities = kinematics.ToWheelVelocities(
@@ -230,7 +230,7 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingXAxis) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.06);
+  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.06);
   EXPECT_LT(maxError, 0.125);
 }
 

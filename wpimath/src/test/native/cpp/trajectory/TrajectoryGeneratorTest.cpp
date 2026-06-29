@@ -9,7 +9,6 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/trajectory/TestTrajectory.hpp"
-#include "wpi/math/trajectory/Trajectory.hpp"
 #include "wpi/units/math.hpp"
 
 using namespace wpi::math;
@@ -18,13 +17,10 @@ TEST(TrajectoryGenerationTest, ObeysConstraints) {
   TrajectoryConfig config{12_fps, 12_fps_sq};
   auto trajectory = TestTrajectory::GetTrajectory(config);
 
-  wpi::units::second_t time = 0_s;
-  wpi::units::second_t dt = 20_ms;
-  wpi::units::second_t duration = trajectory.TotalTime();
+  constexpr wpi::units::second_t dt = 20_ms;
 
-  while (time < duration) {
-    const SplineSample point = trajectory.SampleAt(time);
-    time += dt;
+  for (auto t = 0_s; t < trajectory.Duration(); t += dt) {
+    auto point = trajectory.SampleAt(t);
 
     EXPECT_TRUE(wpi::units::math::abs(point.ForwardVelocity()) <=
                 12_fps + 0.01_fps);
@@ -39,7 +35,7 @@ TEST(TrajectoryGenerationTest, ReturnsEmptyOnMalformed) {
       TrajectoryConfig(12_fps, 12_fps_sq));
 
   ASSERT_EQ(t.Samples().size(), 1u);
-  ASSERT_EQ(t.TotalTime(), 0_s);
+  ASSERT_EQ(t.Duration(), 0_s);
 }
 
 TEST(TrajectoryGenerationTest, CurvatureOptimization) {

@@ -139,7 +139,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
   double maxError = -std::numeric_limits<double>::max();
   double errorSum = 0;
 
-  while (t < trajectory.TotalTime()) {
+  while (t < trajectory.Duration()) {
     SplineSample groundTruthState = trajectory.SampleAt(t);
 
     auto moduleVelocities = kinematics.ToSwerveModuleVelocities(
@@ -172,7 +172,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.05);
+  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.05);
   EXPECT_LT(maxError, 0.125);
 }
 
@@ -204,7 +204,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
   double maxError = -std::numeric_limits<double>::max();
   double errorSum = 0;
 
-  while (t < trajectory.TotalTime()) {
+  while (t < trajectory.Duration()) {
     SplineSample groundTruthState = trajectory.SampleAt(t);
 
     fl.distance += groundTruthState.ForwardVelocity() * dt +
@@ -236,6 +236,6 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.06);
+  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.06);
   EXPECT_LT(maxError, 0.125);
 }
