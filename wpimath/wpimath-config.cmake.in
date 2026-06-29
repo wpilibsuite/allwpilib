@@ -6,5 +6,9 @@ if(@USE_SYSTEM_EIGEN@)
     find_dependency(Eigen3)
 endif()
 
+if(@USE_SYSTEM_SLEIPNIR@)
+  find_dependency(Sleipnir)
+endif()
+
 @FILENAME_DEP_REPLACE@
 include(${SELF_DIR}/wpimath.cmake)

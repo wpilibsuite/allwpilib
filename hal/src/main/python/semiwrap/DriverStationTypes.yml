@@ -3,6 +3,7 @@ strip_prefixes:
 
 extra_includes:
 - src/ds_types_fmt.h
+- wpystruct.h
 
 enums:
   AllianceStationID:
@@ -33,3 +34,6 @@ classes:
       IsUtility:
       IsUtilityEnabled:
       GetValue:
+
+inline_code: |
+  SetupWPyStruct<wpi::hal::ControlWord>(cls_ControlWord);

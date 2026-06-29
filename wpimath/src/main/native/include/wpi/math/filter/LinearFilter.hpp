@@ -99,7 +99,7 @@ class LinearFilter {
       m_outputs.emplace_front(0.0);
     }
 
-    if (!std::is_constant_evaluated()) {
+    if !consteval {
       ++instances;
       wpi::math::MathSharedStore::ReportUsage("LinearFilter",
                                               std::to_string(instances));

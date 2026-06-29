@@ -88,7 +88,7 @@ py_binary(
     srcs = ["examples/printlog/datalog.py"],
     main = "examples/printlog/datalog.py",
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
 )

@@ -32,8 +32,7 @@ py_binary(
     name = "generate_nanopb",
     srcs = ["generate_nanopb.py"],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
 )
@@ -75,7 +74,7 @@ SIM_SRCS = glob(["src/main/native/sim/**"])
 filegroup(
     name = "platform-srcs",
     srcs = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": SYSTEMCORE_SRCS,
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": SYSTEMCORE_SRCS,
         "//conditions:default": SIM_SRCS,
     }),
 )

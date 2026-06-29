@@ -70,7 +70,7 @@ class TrapezoidProfile {
      * Default constructor.
      */
     constexpr Constraints() {
-      if (!std::is_constant_evaluated()) {
+      if !consteval {
         wpi::math::MathSharedStore::ReportUsage("TrapezoidProfile", "");
       }
     }
@@ -84,7 +84,7 @@ class TrapezoidProfile {
     constexpr Constraints(Velocity_t maxVelocity,
                           Acceleration_t maxAcceleration)
         : maxVelocity{maxVelocity}, maxAcceleration{maxAcceleration} {
-      if (!std::is_constant_evaluated()) {
+      if !consteval {
         wpi::math::MathSharedStore::ReportUsage("TrapezoidProfile", "");
       }
 

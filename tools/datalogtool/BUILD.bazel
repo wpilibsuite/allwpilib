@@ -39,15 +39,14 @@ cc_binary(
             "-DEFAULTLIB:user32.lib",
             "-SUBSYSTEM:WINDOWS",
         ],
-        "@rules_bzlmodrio_toolchains//conditions:linux_x86_64": [],
-        "@rules_bzlmodrio_toolchains//constraints/combined:is_cross_compiler": [],
+        "@wpilib_toolchains//conditions:linux_x86_64": [],
+        "@wpilib_toolchains//constraints/combined:is_cross_compiler": [],
     }),
     tags = [
         "wpi-cpp-gui",
     ],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     deps = [

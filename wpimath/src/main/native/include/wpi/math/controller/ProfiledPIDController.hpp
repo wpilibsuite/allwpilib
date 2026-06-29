@@ -61,7 +61,7 @@ class ProfiledPIDController
       : m_controller{Kp, Ki, Kd, period},
         m_constraints{constraints},
         m_profile{m_constraints} {
-    if (!std::is_constant_evaluated()) {
+    if !consteval {
       int instances = detail::IncrementAndGetProfiledPIDControllerInstances();
       wpi::math::MathSharedStore::ReportUsage("ProfiledPIDController",
                                               std::to_string(instances));
