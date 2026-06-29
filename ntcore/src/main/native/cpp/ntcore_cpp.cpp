@@ -32,8 +32,8 @@ namespace wpi::nt {
 
 static constexpr std::string_view kNetworkTablesServiceType =
     "_networktables._tcp";
-static constexpr std::string_view kSystemCoreServiceType = "_SystemCore._tcp";
-static constexpr std::string_view kSystemCoreServicePrefix = "SystemCore-FIRST";
+static constexpr std::string_view kSystemCoreServiceType = "_Systemcore._tcp";
+static constexpr std::string_view kSystemCoreServicePrefix = "Systemcore-FIRST";
 static constexpr unsigned int kMaxTeamNumber = 25599;
 
 wpi::util::json TopicInfo::GetProperties() const {

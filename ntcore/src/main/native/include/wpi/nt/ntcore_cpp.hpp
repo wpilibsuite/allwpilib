@@ -1143,7 +1143,7 @@ void SetServer(
  * - 172.26.0.1 on Windows, or 172.27.0.1 on other platforms (USB)
  * - 172.30.0.1 (WiFi)
  *
- * It also connects using matching SystemCore mDNS announcements.
+ * It also connects using matching Systemcore mDNS announcements.
  * The team-specific 10.TE.AM.2 address is only added if the team string
  * parses as an integer in the range 0 to 25599 inclusive.
  *
@@ -1162,7 +1162,7 @@ void SetServerTeam(NT_Inst inst, std::string_view team, unsigned int port);
  * - 172.30.0.1 (WiFi)
  * - robot.local
  *
- * It also connects using all SystemCore mDNS announcements.
+ * It also connects using all Systemcore mDNS announcements.
  * The team-specific 10.TE.AM.2 address is only added if the team string
  * parses as an integer in the range 0 to 25599 inclusive.
  *

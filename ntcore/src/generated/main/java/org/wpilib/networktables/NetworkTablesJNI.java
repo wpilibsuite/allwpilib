@@ -1511,7 +1511,7 @@ public final class NetworkTablesJNI {
    *   <li>172.30.0.1 (WiFi)
    * </ul>
    *
-   * <p>It also connects using matching SystemCore mDNS announcements. The team-specific
+   * <p>It also connects using matching Systemcore mDNS announcements. The team-specific
    * 10.TE.AM.2 address is only added if the team string parses as an integer in the range 0
    * to 25599 inclusive.
    *
@@ -1533,7 +1533,7 @@ public final class NetworkTablesJNI {
    *   <li>robot.local
    * </ul>
    *
-   * <p>It also connects using all SystemCore mDNS announcements. The team-specific
+   * <p>It also connects using all Systemcore mDNS announcements. The team-specific
    * 10.TE.AM.2 address is only added if the team string parses as an integer in the range 0
    * to 25599 inclusive.
    *
