@@ -19,7 +19,7 @@ filegroup(
     srcs = select({
         "@platforms//os:osx": MAC_SRCS,
         "@platforms//os:windows": WIN_SRCS,
-        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_SRCS,
+        "@wpilib_toolchains//constraints/combined:is_linux": LINUX_SRCS,
     }),
 )
 

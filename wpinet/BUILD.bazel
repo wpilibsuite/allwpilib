@@ -77,13 +77,13 @@ cc_library(
 filegroup(
     name = "libuv-srcs",
     srcs = select({
-               "@rules_bzlmodrio_toolchains//constraints/combined:is_unix": UNIX_UV_SRCS,
+               "@wpilib_toolchains//constraints/combined:is_unix": UNIX_UV_SRCS,
                "//conditions:default": [],
            }) +
            select({
                "@platforms//os:osx": MAC_UV_SRCS,
                "@platforms//os:windows": WIN_UV_SRCS,
-               "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_UV_SRCS,
+               "@wpilib_toolchains//constraints/combined:is_linux": LINUX_UV_SRCS,
            }) + glob(["src/main/native/thirdparty/libuv/src/*"]),
     visibility = ["//wpinet:__subpackages__"],
 )
@@ -111,7 +111,7 @@ filegroup(
     srcs = select({
         "@platforms//os:osx": glob(["src/main/native/macOS/*"]),
         "@platforms//os:windows": glob(["src/main/native/windows/*"]),
-        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": glob(["src/main/native/linux/*"]),
+        "@wpilib_toolchains//constraints/combined:is_linux": glob(["src/main/native/linux/*"]),
     }),
 )
 
@@ -261,7 +261,7 @@ cc_binary(
     name = "netconsoleServer",
     srcs = ["src/netconsoleServer/native/cpp/main.cpp"],
     linkopts = select({
-        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": ["-lutil"],
+        "@wpilib_toolchains//constraints/combined:is_linux": ["-lutil"],
         "//conditions:default": [],
     }),
     deps = [

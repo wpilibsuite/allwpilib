@@ -205,6 +205,296 @@
   },
   "selectedYankedVersions": {},
   "moduleExtensions": {
+    "@@bzlmodrio-opencv+//:maven_cpp_deps.bzl%deps": {
+      "general": {
+        "bzlTransitiveDigest": "LEkecP6UduHL8n4nQPPSjh337LiWRwPvUIlJkaNmn/M=",
+        "usagesDigest": "CnS14ymuExu7Nl5i6AZMzQdi8hsMTDI/0npjj0y1EFY=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "org_wpilib_opencv-cpp_headers": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-headers.zip",
+              "sha256": "e1454fadad5c6b525a43388e7be63bc6d5e25f74c221ab5ad18f2b3f61f030d6",
+              "build_file_content": "load(\"@rules_cc//cc:cc_library.bzl\", \"cc_library\")\n\ncc_library(\n    name = \"headers\",\n    hdrs = glob([\"**\"]),\n    includes = [\".\"],\n    visibility = [\"//visibility:public\"],\n)\n\nfilegroup(\n    name = \"header_files\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "org_wpilib_opencv-cpp_sources": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-sources.zip",
+              "sha256": "28b35e66a3cc6c4667cddd915ad4db8182fd45482595d8efdc73e08b006ceeab",
+              "build_file_content": "filegroup(\n     name = \"sources\",\n     srcs = glob([\"**\"]),\n     visibility = [\"//visibility:public\"],\n )\n "
+            }
+          },
+          "org_wpilib_opencv-cpp_linuxarm64static": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-linuxarm64static.zip",
+              "sha256": "2f4f65049e8418d4132fa0b0e95164a3e14cf5938c14a3525e5760dda34d5984",
+              "build_file_content": "load(\"@bzlmodrio-opencv//private/cpp/opencv:wrapped_cc_import.bzl\", \"static_alias\")\n\nexports_files(glob([\"**\"]))\n\nlibraries = glob([\"**/*.lib\", \"**/*.a\"], allow_empty=True)\n\nstatic_alias(\n    name = \"static_library_file\",\n    libraries = libraries,\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "org_wpilib_opencv-cpp_linuxarm64": {
+            "repoRuleId": "@@bzlmodrio-opencv+//:maven_cpp_deps.bzl%_download_and_generate",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-linuxarm64.zip",
+              "sha256": "90a81046e444fe035cdc4795e74149df8e31a70ba817f4c2e8b2966b71f92b85",
+              "static_repository_name": "org_wpilib_opencv-cpp_linuxarm64static"
+            }
+          },
+          "org_wpilib_opencv-cpp_linuxarm64staticdebug": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-linuxarm64staticdebug.zip",
+              "sha256": "7884e90b4e51f75216a1b875e1039ca96d2b5aab47d88a64ea4d1a812fe625a7",
+              "build_file_content": "load(\"@bzlmodrio-opencv//private/cpp/opencv:wrapped_cc_import.bzl\", \"static_alias\")\n\nexports_files(glob([\"**\"]))\n\nlibraries = glob([\"**/*.lib\", \"**/*.a\"], allow_empty=True)\n\nstatic_alias(\n    name = \"static_library_file\",\n    libraries = libraries,\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "org_wpilib_opencv-cpp_linuxarm64debug": {
+            "repoRuleId": "@@bzlmodrio-opencv+//:maven_cpp_deps.bzl%_download_and_generate",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-linuxarm64debug.zip",
+              "sha256": "364a7f50320f8dbd69a6fb1ee89caf3570393a9c86c38ebc22c649256f700e23",
+              "static_repository_name": "org_wpilib_opencv-cpp_linuxarm64staticdebug"
+            }
+          },
+          "org_wpilib_opencv-cpp_linuxsystemcorestatic": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-linuxsystemcorestatic.zip",
+              "sha256": "74aad4a7f48519d097c532e08d67b8429d55fb0699257a86b5641de7b038f35a",
+              "build_file_content": "load(\"@bzlmodrio-opencv//private/cpp/opencv:wrapped_cc_import.bzl\", \"static_alias\")\n\nexports_files(glob([\"**\"]))\n\nlibraries = glob([\"**/*.lib\", \"**/*.a\"], allow_empty=True)\n\nstatic_alias(\n    name = \"static_library_file\",\n    libraries = libraries,\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "org_wpilib_opencv-cpp_linuxsystemcore": {
+            "repoRuleId": "@@bzlmodrio-opencv+//:maven_cpp_deps.bzl%_download_and_generate",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-linuxsystemcore.zip",
+              "sha256": "0b8628bc0c0c0e7b45c93dde740203ba45d5157ed98273145f5f148e890acc11",
+              "static_repository_name": "org_wpilib_opencv-cpp_linuxsystemcorestatic"
+            }
+          },
+          "org_wpilib_opencv-cpp_linuxsystemcorestaticdebug": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-linuxsystemcorestaticdebug.zip",
+              "sha256": "c7aa613d8c7e6231abd825a99660d4cfdeea132fd6023856e9b55d0f283dc95e",
+              "build_file_content": "load(\"@bzlmodrio-opencv//private/cpp/opencv:wrapped_cc_import.bzl\", \"static_alias\")\n\nexports_files(glob([\"**\"]))\n\nlibraries = glob([\"**/*.lib\", \"**/*.a\"], allow_empty=True)\n\nstatic_alias(\n    name = \"static_library_file\",\n    libraries = libraries,\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "org_wpilib_opencv-cpp_linuxsystemcoredebug": {
+            "repoRuleId": "@@bzlmodrio-opencv+//:maven_cpp_deps.bzl%_download_and_generate",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-linuxsystemcoredebug.zip",
+              "sha256": "de2552db3994d846d018c43e2a5f7619328edb0708a0db10dd7e050e7fc0907a",
+              "static_repository_name": "org_wpilib_opencv-cpp_linuxsystemcorestaticdebug"
+            }
+          },
+          "org_wpilib_opencv-cpp_linuxx86-64static": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-linuxx86-64static.zip",
+              "sha256": "ab3b4bd1ef182bd4e6f16d7c9569147667e2a89ab8799f4d0de9c463f2399789",
+              "build_file_content": "load(\"@bzlmodrio-opencv//private/cpp/opencv:wrapped_cc_import.bzl\", \"static_alias\")\n\nexports_files(glob([\"**\"]))\n\nlibraries = glob([\"**/*.lib\", \"**/*.a\"], allow_empty=True)\n\nstatic_alias(\n    name = \"static_library_file\",\n    libraries = libraries,\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "org_wpilib_opencv-cpp_linuxx86-64": {
+            "repoRuleId": "@@bzlmodrio-opencv+//:maven_cpp_deps.bzl%_download_and_generate",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-linuxx86-64.zip",
+              "sha256": "9da8059c46572071bacd13f0b2288282e65853abbee9ba0cce99eeee7d0a8b59",
+              "static_repository_name": "org_wpilib_opencv-cpp_linuxx86-64static"
+            }
+          },
+          "org_wpilib_opencv-cpp_linuxx86-64staticdebug": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-linuxx86-64staticdebug.zip",
+              "sha256": "994c2a30ab9aecdfee2730f198d2aa9cc920be4480c2f4a13cd569714b8274c9",
+              "build_file_content": "load(\"@bzlmodrio-opencv//private/cpp/opencv:wrapped_cc_import.bzl\", \"static_alias\")\n\nexports_files(glob([\"**\"]))\n\nlibraries = glob([\"**/*.lib\", \"**/*.a\"], allow_empty=True)\n\nstatic_alias(\n    name = \"static_library_file\",\n    libraries = libraries,\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "org_wpilib_opencv-cpp_linuxx86-64debug": {
+            "repoRuleId": "@@bzlmodrio-opencv+//:maven_cpp_deps.bzl%_download_and_generate",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-linuxx86-64debug.zip",
+              "sha256": "20c2882dc8bfaef50f4eb10f28ccc9d385cbe58750a917ce2571a2e787f5411d",
+              "static_repository_name": "org_wpilib_opencv-cpp_linuxx86-64staticdebug"
+            }
+          },
+          "org_wpilib_opencv-cpp_osxarm64static": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-osxarm64static.zip",
+              "sha256": "6512c351254d34b33e796c2a9103fe7771a2b0cda582443b98d26ecbc819d04b",
+              "build_file_content": "load(\"@bzlmodrio-opencv//private/cpp/opencv:wrapped_cc_import.bzl\", \"static_alias\")\n\nexports_files(glob([\"**\"]))\n\nlibraries = glob([\"**/*.lib\", \"**/*.a\"], allow_empty=True)\n\nstatic_alias(\n    name = \"static_library_file\",\n    libraries = libraries,\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "org_wpilib_opencv-cpp_osxarm64": {
+            "repoRuleId": "@@bzlmodrio-opencv+//:maven_cpp_deps.bzl%_download_and_generate",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-osxarm64.zip",
+              "sha256": "5b04598eed6e4f33994aa834d7df13d862a97571cc1aca43f2f402f520878568",
+              "static_repository_name": "org_wpilib_opencv-cpp_osxarm64static"
+            }
+          },
+          "org_wpilib_opencv-cpp_osxarm64staticdebug": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-osxarm64staticdebug.zip",
+              "sha256": "79c61cf30d5559a60f2f37a778bd8b890ace738bee0a94229018f0997a191fd6",
+              "build_file_content": "load(\"@bzlmodrio-opencv//private/cpp/opencv:wrapped_cc_import.bzl\", \"static_alias\")\n\nexports_files(glob([\"**\"]))\n\nlibraries = glob([\"**/*.lib\", \"**/*.a\"], allow_empty=True)\n\nstatic_alias(\n    name = \"static_library_file\",\n    libraries = libraries,\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "org_wpilib_opencv-cpp_osxarm64debug": {
+            "repoRuleId": "@@bzlmodrio-opencv+//:maven_cpp_deps.bzl%_download_and_generate",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-osxarm64debug.zip",
+              "sha256": "3d9f17248cd9f65bd37839b4fc838e167776139770fbe7ecec7936fb94a77741",
+              "static_repository_name": "org_wpilib_opencv-cpp_osxarm64staticdebug"
+            }
+          },
+          "org_wpilib_opencv-cpp_osxuniversalstatic": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-osxuniversalstatic.zip",
+              "sha256": "d1fc11ff74a06dbb721945564b254b6e25a9e98eb47258adca80d49ee076a9d2",
+              "build_file_content": "load(\"@bzlmodrio-opencv//private/cpp/opencv:wrapped_cc_import.bzl\", \"static_alias\")\n\nexports_files(glob([\"**\"]))\n\nlibraries = glob([\"**/*.lib\", \"**/*.a\"], allow_empty=True)\n\nstatic_alias(\n    name = \"static_library_file\",\n    libraries = libraries,\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "org_wpilib_opencv-cpp_osxuniversal": {
+            "repoRuleId": "@@bzlmodrio-opencv+//:maven_cpp_deps.bzl%_download_and_generate",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-osxuniversal.zip",
+              "sha256": "1dadc172e9241d0dfc10f506d76a8635e1726f09f9d329aa2c8853a0d3ef63d4",
+              "static_repository_name": "org_wpilib_opencv-cpp_osxuniversalstatic"
+            }
+          },
+          "org_wpilib_opencv-cpp_osxuniversalstaticdebug": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-osxuniversalstaticdebug.zip",
+              "sha256": "7d75ab07e54d4d71eccfe33821e4a9a7508ecac371f99bc341584f8d4798bb4c",
+              "build_file_content": "load(\"@bzlmodrio-opencv//private/cpp/opencv:wrapped_cc_import.bzl\", \"static_alias\")\n\nexports_files(glob([\"**\"]))\n\nlibraries = glob([\"**/*.lib\", \"**/*.a\"], allow_empty=True)\n\nstatic_alias(\n    name = \"static_library_file\",\n    libraries = libraries,\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "org_wpilib_opencv-cpp_osxuniversaldebug": {
+            "repoRuleId": "@@bzlmodrio-opencv+//:maven_cpp_deps.bzl%_download_and_generate",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-osxuniversaldebug.zip",
+              "sha256": "f119c67f6dcfef74347d58a894be19c8988cdf1ee17126113eefc8d749782698",
+              "static_repository_name": "org_wpilib_opencv-cpp_osxuniversalstaticdebug"
+            }
+          },
+          "org_wpilib_opencv-cpp_osxx86-64static": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-osxx86-64static.zip",
+              "sha256": "912cea1c5b29aeda4befe09cc50882a22b180e3c798e35fda678a18130ac0183",
+              "build_file_content": "load(\"@bzlmodrio-opencv//private/cpp/opencv:wrapped_cc_import.bzl\", \"static_alias\")\n\nexports_files(glob([\"**\"]))\n\nlibraries = glob([\"**/*.lib\", \"**/*.a\"], allow_empty=True)\n\nstatic_alias(\n    name = \"static_library_file\",\n    libraries = libraries,\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "org_wpilib_opencv-cpp_osxx86-64": {
+            "repoRuleId": "@@bzlmodrio-opencv+//:maven_cpp_deps.bzl%_download_and_generate",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-osxx86-64.zip",
+              "sha256": "1be9dcc9db720224ec024215c8b7ad7cffe72323122727a773184ddef4c38579",
+              "static_repository_name": "org_wpilib_opencv-cpp_osxx86-64static"
+            }
+          },
+          "org_wpilib_opencv-cpp_osxx86-64staticdebug": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-osxx86-64staticdebug.zip",
+              "sha256": "764c70e143f3c79772c0a34bd61a0301384a5d9985ad43a80551ba9a30d3fbe0",
+              "build_file_content": "load(\"@bzlmodrio-opencv//private/cpp/opencv:wrapped_cc_import.bzl\", \"static_alias\")\n\nexports_files(glob([\"**\"]))\n\nlibraries = glob([\"**/*.lib\", \"**/*.a\"], allow_empty=True)\n\nstatic_alias(\n    name = \"static_library_file\",\n    libraries = libraries,\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "org_wpilib_opencv-cpp_osxx86-64debug": {
+            "repoRuleId": "@@bzlmodrio-opencv+//:maven_cpp_deps.bzl%_download_and_generate",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-osxx86-64debug.zip",
+              "sha256": "33f2e0f1a67c9555cc11970acd7e55fbcf2d3f45eb72e1b21430c24f8cbed894",
+              "static_repository_name": "org_wpilib_opencv-cpp_osxx86-64staticdebug"
+            }
+          },
+          "org_wpilib_opencv-cpp_windowsarm64static": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-windowsarm64static.zip",
+              "sha256": "4c4eacfbee78e497da6178d95f9417d8f3b84a193769b26dd5138f0e43803e76",
+              "build_file_content": "load(\"@bzlmodrio-opencv//private/cpp/opencv:wrapped_cc_import.bzl\", \"static_alias\")\n\nexports_files(glob([\"**\"]))\n\nlibraries = glob([\"**/*.lib\", \"**/*.a\"], allow_empty=True)\n\nstatic_alias(\n    name = \"static_library_file\",\n    libraries = libraries,\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "org_wpilib_opencv-cpp_windowsarm64": {
+            "repoRuleId": "@@bzlmodrio-opencv+//:maven_cpp_deps.bzl%_download_and_generate",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-windowsarm64.zip",
+              "sha256": "52f8a756cc79f8822d6b47a79a5eeaa4a142df59a11882ae7f212377723641c8",
+              "static_repository_name": "org_wpilib_opencv-cpp_windowsarm64static"
+            }
+          },
+          "org_wpilib_opencv-cpp_windowsarm64staticdebug": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-windowsarm64staticdebug.zip",
+              "sha256": "f38c54484d42df69d723c431768b19cd01e25a42ad9384047f5b42523c0fa038",
+              "build_file_content": "load(\"@bzlmodrio-opencv//private/cpp/opencv:wrapped_cc_import.bzl\", \"static_alias\")\n\nexports_files(glob([\"**\"]))\n\nlibraries = glob([\"**/*.lib\", \"**/*.a\"], allow_empty=True)\n\nstatic_alias(\n    name = \"static_library_file\",\n    libraries = libraries,\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "org_wpilib_opencv-cpp_windowsarm64debug": {
+            "repoRuleId": "@@bzlmodrio-opencv+//:maven_cpp_deps.bzl%_download_and_generate",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-windowsarm64debug.zip",
+              "sha256": "ed79a7ca116caab00a1132ae8df6616ca9a43fe479493ac8bceb0026603e5d6c",
+              "static_repository_name": "org_wpilib_opencv-cpp_windowsarm64staticdebug"
+            }
+          },
+          "org_wpilib_opencv-cpp_windowsx86-64static": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-windowsx86-64static.zip",
+              "sha256": "34e9c1b5af0d37622f0b9d40fed408aeecc46d772eb64278cf2318e0892e0e31",
+              "build_file_content": "load(\"@bzlmodrio-opencv//private/cpp/opencv:wrapped_cc_import.bzl\", \"static_alias\")\n\nexports_files(glob([\"**\"]))\n\nlibraries = glob([\"**/*.lib\", \"**/*.a\"], allow_empty=True)\n\nstatic_alias(\n    name = \"static_library_file\",\n    libraries = libraries,\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "org_wpilib_opencv-cpp_windowsx86-64": {
+            "repoRuleId": "@@bzlmodrio-opencv+//:maven_cpp_deps.bzl%_download_and_generate",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-windowsx86-64.zip",
+              "sha256": "47843b292e5b4c5f0331fc6c8f3d26a3f22db2438e25379eb87bbb28a6be1288",
+              "static_repository_name": "org_wpilib_opencv-cpp_windowsx86-64static"
+            }
+          },
+          "org_wpilib_opencv-cpp_windowsx86-64staticdebug": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-windowsx86-64staticdebug.zip",
+              "sha256": "022d23a87f8c213a78fe5d50177c217cdd61f164990594952d83dc319454ab56",
+              "build_file_content": "load(\"@bzlmodrio-opencv//private/cpp/opencv:wrapped_cc_import.bzl\", \"static_alias\")\n\nexports_files(glob([\"**\"]))\n\nlibraries = glob([\"**/*.lib\", \"**/*.a\"], allow_empty=True)\n\nstatic_alias(\n    name = \"static_library_file\",\n    libraries = libraries,\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "org_wpilib_opencv-cpp_windowsx86-64debug": {
+            "repoRuleId": "@@bzlmodrio-opencv+//:maven_cpp_deps.bzl%_download_and_generate",
+            "attributes": {
+              "url": "https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/opencv/opencv-cpp/2027-4.13.0-3/opencv-cpp-2027-4.13.0-3-windowsx86-64debug.zip",
+              "sha256": "353275e28d1b4bf093427b6e68889432c0c61974a14bc2372dc4455ccd44ab58",
+              "static_repository_name": "org_wpilib_opencv-cpp_windowsx86-64staticdebug"
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "bzlmodrio-opencv+",
+            "bazel_tools",
+            "bazel_tools"
+          ]
+        ]
+      }
+    },
     "@@pybind11_bazel+//:internal_configure.bzl%internal_configure_extension": {
       "general": {
         "bzlTransitiveDigest": "uxP2cZuW027Q8wpZbeJeuW5MXcNBO8GcOK/LNN2sPvQ=",
@@ -349,264 +639,6 @@
         "recordedRepoMappingEntries": [
           [
             "rules_apple+",
-            "bazel_tools",
-            "bazel_tools"
-          ]
-        ]
-      }
-    },
-    "@@rules_bzlmodrio_toolchains+//:extensions.bzl%sh_configure": {
-      "general": {
-        "bzlTransitiveDigest": "q+0LgnvjpZ9Y2r2JYzNeYCKGLphbczG73lZ3rBg+XhM=",
-        "usagesDigest": "v3Gl8jbulVVWx1eh8zubCHo+jQcJceeteF0zb1txHDE=",
-        "recordedFileInputs": {},
-        "recordedDirentsInputs": {},
-        "envVariables": {},
-        "generatedRepoSpecs": {
-          "local_bookworm_32": {
-            "repoRuleId": "@@rules_bzlmodrio_toolchains+//toolchains:configure_cross_compiler.bzl%configure_cross_compiler",
-            "attributes": {
-              "bin_subfolder": "bookworm/bin",
-              "bin_prefix": "armv7-bookworm-linux-gnueabihf-",
-              "sysroot_subfolder": "bookworm/arm-linux-gnueabihf/sysroot",
-              "cxx_version": "12",
-              "target_cpu": "armv7",
-              "target_system_name": "arm-linux-gnueabihf",
-              "sysroot_include_folder": "arm-linux-gnueabihf",
-              "repo_shortname": "bookworm_32"
-            }
-          },
-          "local_bookworm_64": {
-            "repoRuleId": "@@rules_bzlmodrio_toolchains+//toolchains:configure_cross_compiler.bzl%configure_cross_compiler",
-            "attributes": {
-              "bin_subfolder": "bookworm/bin",
-              "bin_prefix": "aarch64-bookworm-linux-gnu-",
-              "sysroot_subfolder": "bookworm/aarch64-linux-gnu/sysroot",
-              "cxx_version": "12",
-              "target_cpu": "armv8a",
-              "target_system_name": "aarch64-linux-gnu",
-              "sysroot_include_folder": "aarch64-linux-gnu",
-              "repo_shortname": "bookworm_64"
-            }
-          },
-          "local_raspi_bookworm_32": {
-            "repoRuleId": "@@rules_bzlmodrio_toolchains+//toolchains:configure_cross_compiler.bzl%configure_cross_compiler",
-            "attributes": {
-              "bin_subfolder": "raspi-bookworm/bin",
-              "bin_prefix": "armv6-bookworm-linux-gnueabihf-",
-              "sysroot_subfolder": "raspi-bookworm/arm-linux-gnueabihf/sysroot",
-              "cxx_version": "12",
-              "target_cpu": "armv7",
-              "target_system_name": "arm-linux-gnueabihf",
-              "sysroot_include_folder": "arm-linux-gnueabihf",
-              "repo_shortname": "raspi_bookworm_32"
-            }
-          },
-          "local_roborio": {
-            "repoRuleId": "@@rules_bzlmodrio_toolchains+//toolchains:configure_cross_compiler.bzl%configure_cross_compiler",
-            "attributes": {
-              "bin_subfolder": "roborio-academic/bin",
-              "bin_prefix": "arm-frc2025-linux-gnueabi-",
-              "sysroot_subfolder": "roborio-academic/arm-nilrt-linux-gnueabi/sysroot",
-              "cxx_version": "12",
-              "target_cpu": "armv7",
-              "target_system_name": "arm-nilrt-linux-gnueabi",
-              "sysroot_include_folder": "arm-nilrt-linux-gnueabi",
-              "repo_shortname": "roborio"
-            }
-          },
-          "local_systemcore": {
-            "repoRuleId": "@@rules_bzlmodrio_toolchains+//toolchains:configure_cross_compiler.bzl%configure_cross_compiler",
-            "attributes": {
-              "extra_defines": [
-                "-D__FIRST_SYSTEMCORE__=1"
-              ],
-              "bin_subfolder": "bookworm/bin",
-              "bin_prefix": "aarch64-bookworm-linux-gnu-",
-              "sysroot_subfolder": "bookworm/aarch64-linux-gnu/sysroot",
-              "cxx_version": "12",
-              "target_cpu": "armv8a",
-              "target_system_name": "aarch64-linux-gnu",
-              "sysroot_include_folder": "aarch64-linux-gnu",
-              "repo_shortname": "systemcore"
-            }
-          }
-        },
-        "recordedRepoMappingEntries": []
-      }
-    },
-    "@@rules_bzlmodrio_toolchains+//:maven_deps.bzl%deps": {
-      "general": {
-        "bzlTransitiveDigest": "bazQdcTy48zQcpSDKQmPNeBevKk/KQp/J+pNFUuv0U8=",
-        "usagesDigest": "lhiwQfjU3A2FPUhPOlGnUJbsDZanI+WuI5zAklUuEzI=",
-        "recordedFileInputs": {},
-        "recordedDirentsInputs": {},
-        "envVariables": {},
-        "generatedRepoSpecs": {
-          "bazelrio_bookworm_32_toolchain_macosarm": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/armhf-bookworm-2025-arm64-apple-darwin-Toolchain-12.2.0.tgz",
-              "sha256": "cbbfef87c1004923a01697424d6904097ff118efe0709ccd453544088693d5ab",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_bookworm_32_toolchain_macos": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/armhf-bookworm-2025-x86_64-apple-darwin-Toolchain-12.2.0.tgz",
-              "sha256": "2c0dd7352edf13f73bc802690876bf77e353265afad0acf677b1cff0cf62c7b0",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_bookworm_32_toolchain_linux": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/armhf-bookworm-2025-x86_64-linux-gnu-Toolchain-12.2.0.tgz",
-              "sha256": "1dbb38120fd37cf5b69447cb93cb5c488b2a56bec72db4edcb3fa92ad3881b05",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_bookworm_32_toolchain_windows": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/armhf-bookworm-2025-x86_64-w64-mingw32-Toolchain-12.2.0.zip",
-              "sha256": "85f75e41ec6cdee80ac4abc5cb2f1d235de67611663ecf6f69a64d05ba3591ef",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_bookworm_64_toolchain_macosarm": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/arm64-bookworm-2025-arm64-apple-darwin-Toolchain-12.2.0.tgz",
-              "sha256": "4082238f6c726c9105cd85c52cfea80349ac57737e6a3915aa896246a201a5b7",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_bookworm_64_toolchain_macos": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/arm64-bookworm-2025-x86_64-apple-darwin-Toolchain-12.2.0.tgz",
-              "sha256": "6900a02b447d89fa31e7872071c1264b20188cb0c2456a634706bf884f3016ea",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_bookworm_64_toolchain_linux": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/arm64-bookworm-2025-x86_64-linux-gnu-Toolchain-12.2.0.tgz",
-              "sha256": "7682bac991f106627ce6bd38c1f4dd552931700f3aee73534b4c10f119ad2899",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_bookworm_64_toolchain_windows": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/arm64-bookworm-2025-x86_64-w64-mingw32-Toolchain-12.2.0.zip",
-              "sha256": "258d0209ec43302cd2b9e4ce7808f163db14a66a85383bd1880c4083f09dd22f",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_raspi_bookworm_32_toolchain_macosarm": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/armhf-raspi-bookworm-2025-arm64-apple-darwin-Toolchain-12.2.0.tgz",
-              "sha256": "eca6d22a02f0a8b18723fadde0ef82ee2f31f20be8d258e4dbe8faed055547c7",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_raspi_bookworm_32_toolchain_macos": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/armhf-raspi-bookworm-2025-x86_64-apple-darwin-Toolchain-12.2.0.tgz",
-              "sha256": "f2dec8a3d9b8ccf30087454dbf4fcff0fd261f3a2a3f9cf08729b17d1ceb6101",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_raspi_bookworm_32_toolchain_linux": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/armhf-raspi-bookworm-2025-x86_64-linux-gnu-Toolchain-12.2.0.tgz",
-              "sha256": "2ab8530d9cb7c00d148ad1a4ccc027d91d02f5f83da8077a1604dff9547d9c4d",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_raspi_bookworm_32_toolchain_windows": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/armhf-raspi-bookworm-2025-x86_64-w64-mingw32-Toolchain-12.2.0.zip",
-              "sha256": "23c1c6434e761b6cc79e8622b1bcd575030a689801870ff795190f718d7fdc80",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_roborio_toolchain_macosarm": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/cortexa9_vfpv3-roborio-academic-2025-arm64-apple-darwin-Toolchain-12.1.0.tgz",
-              "sha256": "f55024a44d0d3243f4f88229baeb883e386193c99b18afdcbcefd12f6d913e35",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_roborio_toolchain_macos": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/cortexa9_vfpv3-roborio-academic-2025-x86_64-apple-darwin-Toolchain-12.1.0.tgz",
-              "sha256": "02d412a98ccec9dbb410975513b388304ff9b475c74450fe42bf497b5400212b",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_roborio_toolchain_linux": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/cortexa9_vfpv3-roborio-academic-2025-x86_64-linux-gnu-Toolchain-12.1.0.tgz",
-              "sha256": "e1aea36b35c48d81e146a12a4b7428af051e525fac18c85a53c7be98339cce9f",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_roborio_toolchain_windows": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/cortexa9_vfpv3-roborio-academic-2025-x86_64-w64-mingw32-Toolchain-12.1.0.zip",
-              "sha256": "7f15de72cdacc738c3c0d33292c869a5785ad09b87478cf6af38daf4aab92b68",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_systemcore_toolchain_macosarm": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/arm64-bookworm-2025-arm64-apple-darwin-Toolchain-12.2.0.tgz",
-              "sha256": "4082238f6c726c9105cd85c52cfea80349ac57737e6a3915aa896246a201a5b7",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_systemcore_toolchain_macos": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/arm64-bookworm-2025-x86_64-apple-darwin-Toolchain-12.2.0.tgz",
-              "sha256": "6900a02b447d89fa31e7872071c1264b20188cb0c2456a634706bf884f3016ea",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_systemcore_toolchain_linux": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/arm64-bookworm-2025-x86_64-linux-gnu-Toolchain-12.2.0.tgz",
-              "sha256": "7682bac991f106627ce6bd38c1f4dd552931700f3aee73534b4c10f119ad2899",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "bazelrio_systemcore_toolchain_windows": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2025-2/arm64-bookworm-2025-x86_64-w64-mingw32-Toolchain-12.2.0.zip",
-              "sha256": "258d0209ec43302cd2b9e4ce7808f163db14a66a85383bd1880c4083f09dd22f",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          }
-        },
-        "recordedRepoMappingEntries": [
-          [
-            "rules_bzlmodrio_toolchains+",
             "bazel_tools",
             "bazel_tools"
           ]
@@ -1159,6 +1191,197 @@
             "rules_swift+",
             "build_bazel_rules_swift",
             "rules_swift+"
+          ]
+        ]
+      }
+    },
+    "@@wpilib_toolchains+//:extensions.bzl%cfg": {
+      "general": {
+        "bzlTransitiveDigest": "4EcQ5gXuzBG/F4iFNA3PnbuyuHwxHSMo3YEgjMR8dHY=",
+        "usagesDigest": "PJDI7/4nwQLBhq5rTQLEdCc+jPyFkkfnmVCmIFh6kBU=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "local_trixie64": {
+            "repoRuleId": "@@wpilib_toolchains+//toolchains:configure_cross_compiler.bzl%configure_cross_compiler",
+            "attributes": {
+              "bin_subfolder": "trixie/bin",
+              "bin_prefix": "aarch64-trixie-linux-gnu-",
+              "sysroot_subfolder": "trixie/aarch64-linux-gnu/sysroot",
+              "cxx_version": "14",
+              "target_cpu": "armv8a",
+              "target_system_name": "aarch64-linux-gnu",
+              "sysroot_include_folder": "aarch64-linux-gnu",
+              "repo_shortname": "trixie64"
+            }
+          },
+          "local_systemcore": {
+            "repoRuleId": "@@wpilib_toolchains+//toolchains:configure_cross_compiler.bzl%configure_cross_compiler",
+            "attributes": {
+              "extra_defines": [],
+              "bin_subfolder": "systemcore/bin",
+              "bin_prefix": "aarch64-systemcore2027-linux-gnu-",
+              "sysroot_subfolder": "systemcore/aarch64-linux-gnu/sysroot",
+              "cxx_version": "14",
+              "target_cpu": "armv8a",
+              "target_system_name": "aarch64-linux-gnu",
+              "sysroot_include_folder": "aarch64-linux-gnu",
+              "repo_shortname": "systemcore"
+            }
+          },
+          "local_systemcore_debug": {
+            "repoRuleId": "@@wpilib_toolchains+//toolchains:configure_cross_compiler.bzl%configure_cross_compiler",
+            "attributes": {
+              "extra_defines": [],
+              "bin_subfolder": "systemcore/bin",
+              "bin_prefix": "aarch64-systemcore2027-linux-gnu-",
+              "sysroot_subfolder": "systemcore/aarch64-linux-gnu/sysroot",
+              "cxx_version": "14",
+              "target_cpu": "armv8a",
+              "target_system_name": "aarch64-linux-gnu",
+              "sysroot_include_folder": "aarch64-linux-gnu",
+              "repo_shortname": "systemcore_debug"
+            }
+          }
+        },
+        "recordedRepoMappingEntries": []
+      }
+    },
+    "@@wpilib_toolchains+//:maven_deps.bzl%deps": {
+      "general": {
+        "bzlTransitiveDigest": "zlHvNnUfnQ39XMj1oQlWOAxWSYf5cLsWKBz5SaBsK/k=",
+        "usagesDigest": "DZl5qUC47VZC5gNGFjMdjGAFWPPSkRubkuJxkdyfFvo=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "gcc_systemcore_debug_linux": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-debug-2027-x86_64-linux-gnu-Toolchain-14.3.0.tgz",
+              "sha256": "ce8c7bea554d48cef44e2cfcf84591ed5824f3cdb4107ce5707a6fdae7452fd2",
+              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "gcc_systemcore_debug_linuxaarch64": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-debug-2027-aarch64-trixie-linux-gnu-Toolchain-14.3.0.tgz",
+              "sha256": "7dc8d930586cc2de2e6c8288a706146d419e6072573632a9a3ac91b693b45172",
+              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "gcc_systemcore_debug_macos": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-debug-2027-x86_64-apple-darwin-Toolchain-14.3.0.tgz",
+              "sha256": "003f0b6e752a9d177dfa45b614c012e911a2a92782189501c19a635d7d8899c1",
+              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "gcc_systemcore_debug_macosarm": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-debug-2027-arm64-apple-darwin-Toolchain-14.3.0.tgz",
+              "sha256": "103cf2b9fcf32c4c264570a0719c975dc597219bb41f926e55a4ed24babe2733",
+              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "gcc_systemcore_debug_win": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-debug-2027-x86_64-w64-mingw32-Toolchain-14.3.0.tgz",
+              "sha256": "5c1ad97f9174914229b7bb0dda36a995ae81d32d65e6f3a9bfcf4f122a94ecd1",
+              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "gcc_systemcore_linux": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-2027-x86_64-linux-gnu-Toolchain-14.3.0.tgz",
+              "sha256": "992d4f2037762588c062f5b22f282b92b9143a2e8cb39a2027e67249c8ed5bea",
+              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "gcc_systemcore_linuxaarch64": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-2027-aarch64-trixie-linux-gnu-Toolchain-14.3.0.tgz",
+              "sha256": "91eb185ee07efa58b16d03076e1d96afb3b551a3cc80f7195b573a3427790b3b",
+              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "gcc_systemcore_macos": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-2027-x86_64-apple-darwin-Toolchain-14.3.0.tgz",
+              "sha256": "b63b5b2165ea81686c05e2abe483b02293a98bfd6ce72690d74c864833028dbc",
+              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "gcc_systemcore_macosarm": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-2027-arm64-apple-darwin-Toolchain-14.3.0.tgz",
+              "sha256": "12a3b4feaf48b6567b1b85274b856b423103035c297cd50b31b31e1b74a275c8",
+              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "gcc_systemcore_win": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-2027-x86_64-w64-mingw32-Toolchain-14.3.0.tgz",
+              "sha256": "337f0bc3d1d0ecc7cfdb859c0994cbba05456b8344e67aaf56cabbe324fab4aa",
+              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "gcc_trixie64_linux": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-trixie-2027-x86_64-linux-gnu-Toolchain-14.3.0.tgz",
+              "sha256": "76dd88aff88f2fda1ea0bfdb996e32a8a689c929dc492b874d5abd9a7c3ee06a",
+              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "gcc_trixie64_linuxaarch64": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-trixie-2027-aarch64-trixie-linux-gnu-Toolchain-14.3.0.tgz",
+              "sha256": "6b93174a00d8affeb7325a69da1e2e7209dc8edf9b5f5467189972040797b7ac",
+              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "gcc_trixie64_macos": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-trixie-2027-x86_64-apple-darwin-Toolchain-14.3.0.tgz",
+              "sha256": "e67b153e7cacf5dad7be349787f20a609085bbb00e61491783571f431fda991c",
+              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "gcc_trixie64_macosarm": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-trixie-2027-arm64-apple-darwin-Toolchain-14.3.0.tgz",
+              "sha256": "6d39e865ecb141027b365f6b176101028bf3793c744768fd324c78e7333acbb6",
+              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          },
+          "gcc_trixie64_win": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-trixie-2027-x86_64-w64-mingw32-Toolchain-14.3.0.tgz",
+              "sha256": "9fffe71e7f3303fed7bdabfb7418cdc91c78a09466cccb0982bb0430d5ef581d",
+              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "wpilib_toolchains+",
+            "bazel_tools",
+            "bazel_tools"
           ]
         ]
       }

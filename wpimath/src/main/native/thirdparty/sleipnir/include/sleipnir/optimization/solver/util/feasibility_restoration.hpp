@@ -96,8 +96,6 @@ compute_p_n(const Eigen::Vector<Scalar, Eigen::Dynamic>& c, Scalar ρ,
   return {std::move(p), std::move(n)};
 }
 
-// @cond Suppress Doxygen
-
 /// Finds the iterate that minimizes the constraint violation while not
 /// deviating too far from the starting point. This is a fallback procedure when
 /// the normal Sequential Quadratic Programming method fails to converge to a
@@ -625,8 +623,6 @@ ExitStatus feasibility_restoration(
     return ExitStatus::FEASIBILITY_RESTORATION_FAILED;
   }
 }
-
-// @endcond
 
 }  // namespace slp
 

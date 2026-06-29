@@ -315,8 +315,23 @@ MrcLibDsImpl::MrcLibDsImpl() {
     std::terminate();
   }
 
+  // Initialize control first, making sure its properly checked for errors
+  MRC_Status controlInitStatus = MRC_DsCommsControl_Initialize();
+  if (controlInitStatus == MRC_STATUS_MULTIPLE_USER_PROGRAMS) {
+    fmt::print(stderr,
+               "Warning: Multiple user programs detected. Restarting app and "
+               "retrying...\n");
+    std::terminate();
+  }
+  if (controlInitStatus != MRC_STATUS_SUCCESS) {
+    fmt::print(stderr,
+               "Error: MRC_DsCommsControl_Initialize failed with status {}. "
+               "Restarting app and retrying...\n",
+               controlInitStatus);
+    std::terminate();
+  }
   MRC_DsComms_Initialize();
-  MRC_DsCommsControl_Initialize();
+
   MRC_Console_Initialize();
 
   // Wait for 10 seconds for the system server to be ready.

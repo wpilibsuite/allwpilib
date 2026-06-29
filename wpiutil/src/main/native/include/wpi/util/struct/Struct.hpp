@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include <bit>
 #include <concepts>
 #include <memory>
 #include <span>
@@ -19,7 +20,6 @@
 
 #include "wpi/util/Endian.hpp"
 #include "wpi/util/array.hpp"
-#include "wpi/util/bit.hpp"
 #include "wpi/util/ct_string.hpp"
 #include "wpi/util/function_ref.hpp"
 #include "wpi/util/mutex.hpp"
@@ -687,10 +687,10 @@ struct Struct<float> {
   static constexpr size_t GetSize() { return 4; }
   static constexpr std::string_view GetSchema() { return "float value"; }
   static float Unpack(std::span<const uint8_t> data) {
-    return bit_cast<float>(support::endian::read32le(data.data()));
+    return std::bit_cast<float>(support::endian::read32le(data.data()));
   }
   static void Pack(std::span<uint8_t> data, float value) {
-    support::endian::write32le(data.data(), bit_cast<uint32_t>(value));
+    support::endian::write32le(data.data(), std::bit_cast<uint32_t>(value));
   }
 };
 
@@ -704,10 +704,10 @@ struct Struct<double> {
   static constexpr size_t GetSize() { return 8; }
   static constexpr std::string_view GetSchema() { return "double value"; }
   static double Unpack(std::span<const uint8_t> data) {
-    return bit_cast<double>(support::endian::read64le(data.data()));
+    return std::bit_cast<double>(support::endian::read64le(data.data()));
   }
   static void Pack(std::span<uint8_t> data, double value) {
-    support::endian::write64le(data.data(), bit_cast<uint64_t>(value));
+    support::endian::write64le(data.data(), std::bit_cast<uint64_t>(value));
   }
 };
 

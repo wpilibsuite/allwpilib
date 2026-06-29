@@ -26,7 +26,7 @@ index a47d68406acf38350a67ce846af4f0c1a5818db1..85152589f7e0f3d31163c5aab109cedf
  namespace llvm {
  
 diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
-index 39f151c716dacfef07038551add0f84a09b0cb62..d15c9652b0b79e5ce7a708d30844d0ece3944d2c 100644
+index 448dbde16986172f506c247a1cd3a78a311f1fa2..ce588eec8995e076dd28164157bed46c2039867e 100644
 --- a/llvm/lib/Support/ConvertUTFWrapper.cpp
 +++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
 @@ -7,6 +7,7 @@
@@ -35,8 +35,8 @@ index 39f151c716dacfef07038551add0f84a09b0cb62..d15c9652b0b79e5ce7a708d30844d0ec
  #include "llvm/Support/ConvertUTF.h"
 +#include "llvm/Support/SmallVector.h"
  #include "llvm/Support/ErrorHandling.h"
- #include "llvm/Support/SwapByteOrder.h"
  #include <span>
+ #include <string>
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
 index fcbc70535bf9869f72d001ec214d7046e975961a..c4366de2aec2f1730954aecfc627dd0e164481ab 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp

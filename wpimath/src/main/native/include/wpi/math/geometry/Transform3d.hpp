@@ -264,7 +264,7 @@ constexpr Twist3d Transform3d::Log() const {
                    wpi::units::radian_t{rvec(2)}};
   };
 
-  if (std::is_constant_evaluated()) {
+  if consteval {
     return impl.template operator()<ct_matrix3d, ct_vector3d>();
   }
   return impl.template operator()<Eigen::Matrix3d, Eigen::Vector3d>();

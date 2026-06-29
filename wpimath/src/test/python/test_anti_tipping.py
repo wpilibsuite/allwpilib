@@ -48,4 +48,3 @@ def test_left_roll_drives_left():
 
     assert correction.vx == pytest.approx(0.0, abs=1e-6)
     assert correction.vy > 0.0
-    
