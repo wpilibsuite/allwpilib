@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/units/acceleration.hpp"
