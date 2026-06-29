@@ -59,7 +59,8 @@ const char* HAL_GetErrorMessage(int32_t code);
 /**
  * Returns the Systemcore serial number.
  *
- * @param[out] serialNumber The Systemcore serial number. Free with WPI_FreeString
+ * @param[out] serialNumber The Systemcore serial number. Free with
+ * WPI_FreeString
  */
 void HAL_GetSerialNumber(struct WPI_String* serialNumber);
 

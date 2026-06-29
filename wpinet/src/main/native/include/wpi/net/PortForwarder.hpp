@@ -11,7 +11,8 @@ namespace wpi::net {
 
 /**
  * Forward ports to another host.  This is primarily useful for accessing
- * Ethernet-connected devices from a computer tethered to the Systemcore USB port.
+ * Ethernet-connected devices from a computer tethered to the Systemcore USB
+ * port.
  */
 class PortForwarder {
  public:
