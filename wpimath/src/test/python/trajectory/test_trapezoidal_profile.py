@@ -173,4 +173,4 @@ def test_initialization_of_current_state():
     constraints = TrapezoidProfile.Constraints(1.0, 1.0)
     profile = TrapezoidProfile(constraints)
     assert math.isclose(profile.timeLeftUntil(0.0), 0.0, abs_tol=1e-10)
-    assert math.isclose(profile.totalTime(), 0.0, abs_tol=1e-10)
+    assert math.isclose(profile.duration(), 0.0, abs_tol=1e-10)
