@@ -70,10 +70,6 @@ ext {
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 
 cppSourcesZip {
-    from('src/main/native/athena') {
-        into '/athena'
-    }
-
     from('src/main/native/systemcore') {
         into '/systemcore'
     }

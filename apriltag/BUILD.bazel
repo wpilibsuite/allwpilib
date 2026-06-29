@@ -47,7 +47,7 @@ cc_library(
             "/wd4267",
             "/wd4996",
         ],
-        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": [
+        "@wpilib_toolchains//constraints/combined:is_linux": [
             "-Wno-format-nonliteral",
             "-Wno-maybe-uninitialized",
             "-Wno-sign-compare",
@@ -209,7 +209,7 @@ py_binary(
     name = "convert_apriltag_layouts",
     srcs = ["convert_apriltag_layouts.py"],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
 )

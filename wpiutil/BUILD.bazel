@@ -41,8 +41,7 @@ py_binary(
     data = ["src/main/native/thirdparty/nanopb/generator/proto/nanopb.proto"],
     imports = ["src/main/native/thirdparty/nanopb/generator"],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
@@ -59,8 +58,7 @@ py_binary(
         ":nanopb_generator",
     ],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
 )
@@ -172,7 +170,7 @@ filegroup(
     name = "native-srcs",
     srcs = select({
         "@platforms//os:windows": glob(["src/main/native/windows/*.cpp"]),
-        "@rules_bzlmodrio_toolchains//constraints/combined:is_unix": glob(["src/main/native/unix/*.cpp"]),
+        "@wpilib_toolchains//constraints/combined:is_unix": glob(["src/main/native/unix/*.cpp"]),
     }),
 )
 
@@ -206,7 +204,6 @@ wpilib_cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@bzlmodrio-ni//libraries/cpp/ni:shared"],
         "//conditions:default": [],
     }),
 )

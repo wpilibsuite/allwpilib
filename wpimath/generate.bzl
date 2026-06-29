@@ -6,6 +6,8 @@ def __generate_wpimath_impl(ctx):
 
     args = ctx.actions.args()
     args.add("--output_directory", output_dir.path)
+    args.add("--template_root", "wpimath/src/generate")
+    args.add("--proto_directory", "wpimath/src/main/proto")
     args.add("--protoc", ctx.executable._protoc)
     args.add("--quickbuf_plugin", ctx.executable._quickbuf)
     args.add("--nanopb_generator", ctx.executable._nanopb_generator)

@@ -218,3 +218,12 @@ TEST_CASE("AnsiDisplayStateTest Utf8SplitAcrossApplyCallsWritesOneCell",
   CHECK(visitor.runs[0].columns == 1u);
   CHECK(visitor.runs[0].text == "X");
 }
+
+TEST_CASE("AnsiDisplayState ignores tab at max column", "[AnsiDisplayState]") {
+  mrc::AnsiDisplayState state;
+  state.Apply("\x1b[4096GX\t");
+  std::string snapshot = state.BuildSnapshot();
+
+  REQUIRE(snapshot.find("\x1b[1;4096HX") != std::string::npos);
+  REQUIRE(snapshot.ends_with("\x1b[1;1H\x1b[s\x1b[1;4096H"));
+}
