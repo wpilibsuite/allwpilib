@@ -4,14 +4,15 @@
 
 #include <numbers>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/controller/ProfiledPIDController.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_acceleration.hpp"
 #include "wpi/units/angular_velocity.hpp"
 
-TEST(ProfiledPIDInputOutputTest, ContinuousInput1) {
+TEST_CASE("ProfiledPIDInputOutputTest ContinuousInput1", "[wpimath]") {
   wpi::math::ProfiledPIDController<wpi::units::degree> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
@@ -23,15 +24,14 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput1) {
   static constexpr wpi::units::degree_t kGoal{179.0};
 
   controller.Reset(kSetpoint);
-  EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0);
+  CHECK(controller.Calculate(kMeasurement, kGoal) < 0.0);
 
   // Error must be less than half the input range at all times
-  EXPECT_LT(
-      wpi::units::math::abs(controller.GetSetpoint().position - kMeasurement),
-      180_deg);
+  CHECK(wpi::units::math::abs(controller.GetSetpoint().position -
+                              kMeasurement) < 180_deg);
 }
 
-TEST(ProfiledPIDInputOutputTest, ContinuousInput2) {
+TEST_CASE("ProfiledPIDInputOutputTest ContinuousInput2", "[wpimath]") {
   wpi::math::ProfiledPIDController<wpi::units::degree> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
@@ -44,15 +44,15 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput2) {
   static constexpr wpi::units::radian_t kGoal{-3.534162788601621};
 
   controller.Reset(kSetpoint);
-  EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0);
+  CHECK(controller.Calculate(kMeasurement, kGoal) < 0.0);
 
   // Error must be less than half the input range at all times
-  EXPECT_LT(
-      wpi::units::math::abs(controller.GetSetpoint().position - kMeasurement),
+  CHECK(
+      wpi::units::math::abs(controller.GetSetpoint().position - kMeasurement) <
       wpi::units::radian_t{std::numbers::pi});
 }
 
-TEST(ProfiledPIDInputOutputTest, ContinuousInput3) {
+TEST_CASE("ProfiledPIDInputOutputTest ContinuousInput3", "[wpimath]") {
   wpi::math::ProfiledPIDController<wpi::units::degree> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
@@ -65,15 +65,15 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput3) {
   static constexpr wpi::units::radian_t kGoal{2.709680418117445};
 
   controller.Reset(kSetpoint);
-  EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0);
+  CHECK(controller.Calculate(kMeasurement, kGoal) < 0.0);
 
   // Error must be less than half the input range at all times
-  EXPECT_LT(
-      wpi::units::math::abs(controller.GetSetpoint().position - kMeasurement),
+  CHECK(
+      wpi::units::math::abs(controller.GetSetpoint().position - kMeasurement) <
       wpi::units::radian_t{std::numbers::pi});
 }
 
-TEST(ProfiledPIDInputOutputTest, ContinuousInput4) {
+TEST_CASE("ProfiledPIDInputOutputTest ContinuousInput4", "[wpimath]") {
   wpi::math::ProfiledPIDController<wpi::units::degree> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
@@ -86,24 +86,24 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput4) {
   static constexpr wpi::units::radian_t kGoal{2.71};
 
   controller.Reset(kSetpoint);
-  EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0);
+  CHECK(controller.Calculate(kMeasurement, kGoal) < 0.0);
 
   // Error must be less than half the input range at all times
-  EXPECT_LT(
-      wpi::units::math::abs(controller.GetSetpoint().position - kMeasurement),
+  CHECK(
+      wpi::units::math::abs(controller.GetSetpoint().position - kMeasurement) <
       wpi::units::radian_t{std::numbers::pi});
 }
 
-TEST(ProfiledPIDInputOutputTest, ProportionalGainOutput) {
+TEST_CASE("ProfiledPIDInputOutputTest ProportionalGainOutput", "[wpimath]") {
   wpi::math::ProfiledPIDController<wpi::units::degree> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
   controller.SetP(4);
 
-  EXPECT_DOUBLE_EQ(-0.1, controller.Calculate(0.025_deg, 0_deg));
+  CHECK(-0.1 == Catch::Approx(controller.Calculate(0.025_deg, 0_deg)));
 }
 
-TEST(ProfiledPIDInputOutputTest, IntegralGainOutput) {
+TEST_CASE("ProfiledPIDInputOutputTest IntegralGainOutput", "[wpimath]") {
   wpi::math::ProfiledPIDController<wpi::units::degree> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
@@ -115,10 +115,10 @@ TEST(ProfiledPIDInputOutputTest, IntegralGainOutput) {
     out = controller.Calculate(0.025_deg, 0_deg);
   }
 
-  EXPECT_DOUBLE_EQ(-0.5 * controller.GetPeriod().value(), out);
+  CHECK(-0.5 * controller.GetPeriod().value() == Catch::Approx(out));
 }
 
-TEST(ProfiledPIDInputOutputTest, DerivativeGainOutput) {
+TEST_CASE("ProfiledPIDInputOutputTest DerivativeGainOutput", "[wpimath]") {
   wpi::math::ProfiledPIDController<wpi::units::degree> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
@@ -126,6 +126,6 @@ TEST(ProfiledPIDInputOutputTest, DerivativeGainOutput) {
 
   controller.Calculate(0_deg, 0_deg);
 
-  EXPECT_DOUBLE_EQ(-10_ms / controller.GetPeriod(),
-                   controller.Calculate(0.0025_deg, 0_deg));
+  CHECK(-10_ms / controller.GetPeriod() ==
+        Catch::Approx(controller.Calculate(0.0025_deg, 0_deg)));
 }

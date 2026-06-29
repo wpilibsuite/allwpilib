@@ -6,20 +6,21 @@
 
 #include <numbers>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/units/math.hpp"
 
-#define EXPECT_NEAR_UNITS(val1, val2, eps) \
-  EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
+#define CHECK_NEAR_UNITS(val1, val2, eps) \
+  CHECK(wpi::units::math::abs(val1 - val2) <= eps)
 
 static constexpr wpi::units::meter_t kTolerance{1 / 12.0};
 static constexpr wpi::units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
                                                         180.0};
 
-TEST(LTVUnicycleControllerTest, ReachesReference) {
+TEST_CASE("LTVUnicycleControllerTest ReachesReference", "[wpimath]") {
   constexpr wpi::units::second_t kDt = 20_ms;
 
   wpi::math::LTVUnicycleController controller{
@@ -42,9 +43,9 @@ TEST(LTVUnicycleControllerTest, ReachesReference) {
   }
 
   auto& endPose = trajectory.States().back().pose;
-  EXPECT_NEAR_UNITS(endPose.X(), robotPose.X(), kTolerance);
-  EXPECT_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
-  EXPECT_NEAR_UNITS(wpi::math::AngleModulus(endPose.Rotation().Radians() -
-                                            robotPose.Rotation().Radians()),
-                    0_rad, kAngularTolerance);
+  CHECK_NEAR_UNITS(endPose.X(), robotPose.X(), kTolerance);
+  CHECK_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
+  CHECK_NEAR_UNITS(wpi::math::AngleModulus(endPose.Rotation().Radians() -
+                                           robotPose.Rotation().Radians()),
+                   0_rad, kAngularTolerance);
 }

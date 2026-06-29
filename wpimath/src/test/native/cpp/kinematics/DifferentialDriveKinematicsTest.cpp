@@ -6,7 +6,8 @@
 
 #include <numbers>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
@@ -18,59 +19,65 @@ using namespace wpi::math;
 
 static constexpr double kEpsilon = 1E-9;
 
-TEST(DifferentialDriveKinematicsTest, InverseKinematicsFromZero) {
+TEST_CASE("DifferentialDriveKinematicsTest InverseKinematicsFromZero",
+          "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const ChassisVelocities chassisVelocities;
   const auto wheelVelocities = kinematics.ToWheelVelocities(chassisVelocities);
 
-  EXPECT_NEAR(wheelVelocities.left.value(), 0, kEpsilon);
-  EXPECT_NEAR(wheelVelocities.right.value(), 0, kEpsilon);
+  CHECK(wheelVelocities.left.value() == Catch::Approx(0).margin(kEpsilon));
+  CHECK(wheelVelocities.right.value() == Catch::Approx(0).margin(kEpsilon));
 }
 
-TEST(DifferentialDriveKinematicsTest, ForwardKinematicsFromZero) {
+TEST_CASE("DifferentialDriveKinematicsTest ForwardKinematicsFromZero",
+          "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const DifferentialDriveWheelVelocities wheelVelocities;
   const auto chassisVelocities =
       kinematics.ToChassisVelocities(wheelVelocities);
 
-  EXPECT_NEAR(chassisVelocities.vx.value(), 0, kEpsilon);
-  EXPECT_NEAR(chassisVelocities.vy.value(), 0, kEpsilon);
-  EXPECT_NEAR(chassisVelocities.omega.value(), 0, kEpsilon);
+  CHECK(chassisVelocities.vx.value() == Catch::Approx(0).margin(kEpsilon));
+  CHECK(chassisVelocities.vy.value() == Catch::Approx(0).margin(kEpsilon));
+  CHECK(chassisVelocities.omega.value() == Catch::Approx(0).margin(kEpsilon));
 }
 
-TEST(DifferentialDriveKinematicsTest, InverseKinematicsForStraightLine) {
+TEST_CASE("DifferentialDriveKinematicsTest InverseKinematicsForStraightLine",
+          "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const ChassisVelocities chassisVelocities{3.0_mps, 0_mps, 0_rad_per_s};
   const auto wheelVelocities = kinematics.ToWheelVelocities(chassisVelocities);
 
-  EXPECT_NEAR(wheelVelocities.left.value(), 3, kEpsilon);
-  EXPECT_NEAR(wheelVelocities.right.value(), 3, kEpsilon);
+  CHECK(wheelVelocities.left.value() == Catch::Approx(3).margin(kEpsilon));
+  CHECK(wheelVelocities.right.value() == Catch::Approx(3).margin(kEpsilon));
 }
 
-TEST(DifferentialDriveKinematicsTest, ForwardKinematicsForStraightLine) {
+TEST_CASE("DifferentialDriveKinematicsTest ForwardKinematicsForStraightLine",
+          "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const DifferentialDriveWheelVelocities wheelVelocities{3.0_mps, 3.0_mps};
   const auto chassisVelocities =
       kinematics.ToChassisVelocities(wheelVelocities);
 
-  EXPECT_NEAR(chassisVelocities.vx.value(), 3, kEpsilon);
-  EXPECT_NEAR(chassisVelocities.vy.value(), 0, kEpsilon);
-  EXPECT_NEAR(chassisVelocities.omega.value(), 0, kEpsilon);
+  CHECK(chassisVelocities.vx.value() == Catch::Approx(3).margin(kEpsilon));
+  CHECK(chassisVelocities.vy.value() == Catch::Approx(0).margin(kEpsilon));
+  CHECK(chassisVelocities.omega.value() == Catch::Approx(0).margin(kEpsilon));
 }
 
-TEST(DifferentialDriveKinematicsTest, InverseKinematicsForRotateInPlace) {
+TEST_CASE("DifferentialDriveKinematicsTest InverseKinematicsForRotateInPlace",
+          "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const ChassisVelocities chassisVelocities{
       0.0_mps, 0.0_mps, wpi::units::radians_per_second_t{std::numbers::pi}};
   const auto wheelVelocities = kinematics.ToWheelVelocities(chassisVelocities);
 
-  EXPECT_NEAR(wheelVelocities.left.value(), -0.381 * std::numbers::pi,
-              kEpsilon);
-  EXPECT_NEAR(wheelVelocities.right.value(), +0.381 * std::numbers::pi,
-              kEpsilon);
+  CHECK(wheelVelocities.left.value() ==
+        Catch::Approx(-0.381 * std::numbers::pi).margin(kEpsilon));
+  CHECK(wheelVelocities.right.value() ==
+        Catch::Approx(+0.381 * std::numbers::pi).margin(kEpsilon));
 }
 
-TEST(DifferentialDriveKinematicsTest, ForwardKinematicsForRotateInPlace) {
+TEST_CASE("DifferentialDriveKinematicsTest ForwardKinematicsForRotateInPlace",
+          "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const DifferentialDriveWheelVelocities wheelVelocities{
       wpi::units::meters_per_second_t{+0.381 * std::numbers::pi},
@@ -78,56 +85,65 @@ TEST(DifferentialDriveKinematicsTest, ForwardKinematicsForRotateInPlace) {
   const auto chassisVelocities =
       kinematics.ToChassisVelocities(wheelVelocities);
 
-  EXPECT_NEAR(chassisVelocities.vx.value(), 0, kEpsilon);
-  EXPECT_NEAR(chassisVelocities.vy.value(), 0, kEpsilon);
-  EXPECT_NEAR(chassisVelocities.omega.value(), -std::numbers::pi, kEpsilon);
+  CHECK(chassisVelocities.vx.value() == Catch::Approx(0).margin(kEpsilon));
+  CHECK(chassisVelocities.vy.value() == Catch::Approx(0).margin(kEpsilon));
+  CHECK(chassisVelocities.omega.value() ==
+        Catch::Approx(-std::numbers::pi).margin(kEpsilon));
 }
 
-TEST(DifferentialDriveKinematicsTest, InverseAccelerationsForZeros) {
+TEST_CASE("DifferentialDriveKinematicsTest InverseAccelerationsForZeros",
+          "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const ChassisAccelerations chassisAccelerations;
   const auto wheelAccelerations =
       kinematics.ToWheelAccelerations(chassisAccelerations);
 
-  EXPECT_NEAR(wheelAccelerations.left.value(), 0, kEpsilon);
-  EXPECT_NEAR(wheelAccelerations.right.value(), 0, kEpsilon);
+  CHECK(wheelAccelerations.left.value() == Catch::Approx(0).margin(kEpsilon));
+  CHECK(wheelAccelerations.right.value() == Catch::Approx(0).margin(kEpsilon));
 }
 
-TEST(DifferentialDriveKinematicsTest, ForwardAccelerationsForZeros) {
+TEST_CASE("DifferentialDriveKinematicsTest ForwardAccelerationsForZeros",
+          "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const DifferentialDriveWheelAccelerations wheelAccelerations;
   const auto chassisAccelerations =
       kinematics.ToChassisAccelerations(wheelAccelerations);
 
-  EXPECT_NEAR(chassisAccelerations.ax.value(), 0, kEpsilon);
-  EXPECT_NEAR(chassisAccelerations.ay.value(), 0, kEpsilon);
-  EXPECT_NEAR(chassisAccelerations.alpha.value(), 0, kEpsilon);
+  CHECK(chassisAccelerations.ax.value() == Catch::Approx(0).margin(kEpsilon));
+  CHECK(chassisAccelerations.ay.value() == Catch::Approx(0).margin(kEpsilon));
+  CHECK(chassisAccelerations.alpha.value() ==
+        Catch::Approx(0).margin(kEpsilon));
 }
 
-TEST(DifferentialDriveKinematicsTest, InverseAccelerationsForStraightLine) {
+TEST_CASE("DifferentialDriveKinematicsTest InverseAccelerationsForStraightLine",
+          "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const ChassisAccelerations chassisAccelerations{3.0_mps_sq, 0_mps_sq,
                                                   0_rad_per_s_sq};
   const auto wheelAccelerations =
       kinematics.ToWheelAccelerations(chassisAccelerations);
 
-  EXPECT_NEAR(wheelAccelerations.left.value(), 3, kEpsilon);
-  EXPECT_NEAR(wheelAccelerations.right.value(), 3, kEpsilon);
+  CHECK(wheelAccelerations.left.value() == Catch::Approx(3).margin(kEpsilon));
+  CHECK(wheelAccelerations.right.value() == Catch::Approx(3).margin(kEpsilon));
 }
 
-TEST(DifferentialDriveKinematicsTest, ForwardAccelerationsForStraightLine) {
+TEST_CASE("DifferentialDriveKinematicsTest ForwardAccelerationsForStraightLine",
+          "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const DifferentialDriveWheelAccelerations wheelAccelerations{3.0_mps_sq,
                                                                3.0_mps_sq};
   const auto chassisAccelerations =
       kinematics.ToChassisAccelerations(wheelAccelerations);
 
-  EXPECT_NEAR(chassisAccelerations.ax.value(), 3, kEpsilon);
-  EXPECT_NEAR(chassisAccelerations.ay.value(), 0, kEpsilon);
-  EXPECT_NEAR(chassisAccelerations.alpha.value(), 0, kEpsilon);
+  CHECK(chassisAccelerations.ax.value() == Catch::Approx(3).margin(kEpsilon));
+  CHECK(chassisAccelerations.ay.value() == Catch::Approx(0).margin(kEpsilon));
+  CHECK(chassisAccelerations.alpha.value() ==
+        Catch::Approx(0).margin(kEpsilon));
 }
 
-TEST(DifferentialDriveKinematicsTest, InverseAccelerationsForRotateInPlace) {
+TEST_CASE(
+    "DifferentialDriveKinematicsTest InverseAccelerationsForRotateInPlace",
+    "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const ChassisAccelerations chassisAccelerations{
       0.0_mps_sq, 0.0_mps_sq,
@@ -135,13 +151,15 @@ TEST(DifferentialDriveKinematicsTest, InverseAccelerationsForRotateInPlace) {
   const auto wheelAccelerations =
       kinematics.ToWheelAccelerations(chassisAccelerations);
 
-  EXPECT_NEAR(wheelAccelerations.left.value(), -0.381 * std::numbers::pi,
-              kEpsilon);
-  EXPECT_NEAR(wheelAccelerations.right.value(), +0.381 * std::numbers::pi,
-              kEpsilon);
+  CHECK(wheelAccelerations.left.value() ==
+        Catch::Approx(-0.381 * std::numbers::pi).margin(kEpsilon));
+  CHECK(wheelAccelerations.right.value() ==
+        Catch::Approx(+0.381 * std::numbers::pi).margin(kEpsilon));
 }
 
-TEST(DifferentialDriveKinematicsTest, ForwardAccelerationsForRotateInPlace) {
+TEST_CASE(
+    "DifferentialDriveKinematicsTest ForwardAccelerationsForRotateInPlace",
+    "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const DifferentialDriveWheelAccelerations wheelAccelerations{
       wpi::units::meters_per_second_squared_t{+0.381 * std::numbers::pi},
@@ -149,7 +167,8 @@ TEST(DifferentialDriveKinematicsTest, ForwardAccelerationsForRotateInPlace) {
   const auto chassisAccelerations =
       kinematics.ToChassisAccelerations(wheelAccelerations);
 
-  EXPECT_NEAR(chassisAccelerations.ax.value(), 0, kEpsilon);
-  EXPECT_NEAR(chassisAccelerations.ay.value(), 0, kEpsilon);
-  EXPECT_NEAR(chassisAccelerations.alpha.value(), -std::numbers::pi, kEpsilon);
+  CHECK(chassisAccelerations.ax.value() == Catch::Approx(0).margin(kEpsilon));
+  CHECK(chassisAccelerations.ay.value() == Catch::Approx(0).margin(kEpsilon));
+  CHECK(chassisAccelerations.alpha.value() ==
+        Catch::Approx(-std::numbers::pi).margin(kEpsilon));
 }

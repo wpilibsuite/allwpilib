@@ -10,7 +10,8 @@
 #include <numbers>
 #include <random>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/units/time.hpp"
 
@@ -26,26 +27,21 @@ static double GetData(double t) {
   return 100.0 * std::sin(2.0 * std::numbers::pi * t);
 }
 
-class LinearFilterNoiseTest
-    : public testing::TestWithParam<LinearFilterNoiseTestType> {
- protected:
-  wpi::math::LinearFilter<double> m_filter = [=] {
-    switch (GetParam()) {
-      case kTestSinglePoleIIR:
-        return wpi::math::LinearFilter<double>::SinglePoleIIR(
-            kSinglePoleIIRTimeConstant, kFilterStep);
-        break;
-      default:
-        return wpi::math::LinearFilter<double>::MovingAverage(kMovAvgTaps);
-        break;
-    }
-  }();
-};
+static wpi::math::LinearFilter<double> MakeFilter(
+    LinearFilterNoiseTestType testType) {
+  switch (testType) {
+    case kTestSinglePoleIIR:
+      return wpi::math::LinearFilter<double>::SinglePoleIIR(
+          kSinglePoleIIRTimeConstant, kFilterStep);
+    case kTestMovAvg:
+      return wpi::math::LinearFilter<double>::MovingAverage(kMovAvgTaps);
+  }
 
-/**
- * Test if the filter reduces the noise produced by a signal generator
- */
-TEST_P(LinearFilterNoiseTest, NoiseReduce) {
+  return wpi::math::LinearFilter<double>::MovingAverage(kMovAvgTaps);
+}
+
+static void CheckNoiseReduce(LinearFilterNoiseTestType testType) {
+  auto filter = MakeFilter(testType);
   double noiseGenError = 0.0;
   double filterError = 0.0;
 
@@ -56,16 +52,23 @@ TEST_P(LinearFilterNoiseTest, NoiseReduce) {
   for (auto t = 0_s; t < kFilterTime; t += kFilterStep) {
     double theory = GetData(t.value());
     double noise = distr(gen);
-    filterError += std::abs(m_filter.Calculate(theory + noise) - theory);
+    filterError += std::abs(filter.Calculate(theory + noise) - theory);
     noiseGenError += std::abs(noise - theory);
   }
 
-  RecordProperty("FilterError", filterError);
-
   // The filter should have produced values closer to the theory
-  EXPECT_GT(noiseGenError, filterError)
-      << "Filter should have reduced noise accumulation but failed";
+  CHECK(noiseGenError > filterError);
 }
 
-INSTANTIATE_TEST_SUITE_P(Tests, LinearFilterNoiseTest,
-                         testing::Values(kTestSinglePoleIIR, kTestMovAvg));
+/**
+ * Test if the filter reduces the noise produced by a signal generator
+ */
+TEST_CASE("LinearFilterNoiseTest NoiseReduce", "[wpimath]") {
+  SECTION("SinglePoleIIR") {
+    CheckNoiseReduce(kTestSinglePoleIIR);
+  }
+
+  SECTION("MovingAverage") {
+    CheckNoiseReduce(kTestMovAvg);
+  }
+}

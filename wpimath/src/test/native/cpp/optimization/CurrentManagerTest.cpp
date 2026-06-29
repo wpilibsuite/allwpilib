@@ -6,20 +6,21 @@
 
 #include <array>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
-TEST(CurrentManagerTest, EnoughCurrent) {
+TEST_CASE("CurrentManagerTest EnoughCurrent", "[wpimath]") {
   wpi::math::CurrentManager manager{std::array{1.0, 5.0, 10.0, 5.0}, 40.0};
 
   auto currents = manager.calculate(std::array{25.0, 10.0, 5.0, 0.0});
 
-  EXPECT_NEAR(currents[0], 25.0, 1e-3);
-  EXPECT_NEAR(currents[1], 10.0, 1e-3);
-  EXPECT_NEAR(currents[2], 5.0, 1e-3);
-  EXPECT_NEAR(currents[3], 0.0, 1e-3);
+  CHECK(currents[0] == Catch::Approx(25.0).margin(1e-3));
+  CHECK(currents[1] == Catch::Approx(10.0).margin(1e-3));
+  CHECK(currents[2] == Catch::Approx(5.0).margin(1e-3));
+  CHECK(currents[3] == Catch::Approx(0.0).margin(1e-3));
 }
 
-TEST(CurrentManagerTest, NotEnoughCurrent) {
+TEST_CASE("CurrentManagerTest NotEnoughCurrent", "[wpimath]") {
   wpi::math::CurrentManager manager{std::array{1.0, 5.0, 10.0, 5.0}, 40.0};
 
   auto currents = manager.calculate(std::array{30.0, 10.0, 5.0, 0.0});
@@ -42,8 +43,8 @@ TEST(CurrentManagerTest, NotEnoughCurrent) {
   //     ],
   // )
   // print(result.x)
-  EXPECT_NEAR(currents[0], 29.960, 1e-3);
-  EXPECT_NEAR(currents[1], 9.008, 1e-3);
-  EXPECT_NEAR(currents[2], 1.032, 1e-3);
-  EXPECT_NEAR(currents[3], 0.0, 1e-3);
+  CHECK(currents[0] == Catch::Approx(29.960).margin(1e-3));
+  CHECK(currents[1] == Catch::Approx(9.008).margin(1e-3));
+  CHECK(currents[2] == Catch::Approx(1.032).margin(1e-3));
+  CHECK(currents[3] == Catch::Approx(0.0).margin(1e-3));
 }

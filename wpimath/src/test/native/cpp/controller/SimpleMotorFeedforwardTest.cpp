@@ -4,7 +4,8 @@
 
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
@@ -15,7 +16,7 @@
 
 namespace wpi::math {
 
-TEST(SimpleMotorFeedforwardTest, Calculate) {
+TEST_CASE("SimpleMotorFeedforwardTest Calculate", "[wpimath]") {
   constexpr auto Ks = 0.5_V;
   constexpr auto Kv = 3_V / 1_mps;
   constexpr auto Ka = 0.6_V / 1_mps_sq;
@@ -30,27 +31,29 @@ TEST(SimpleMotorFeedforwardTest, Calculate) {
   constexpr Vectord<1> r{{2.0}};
   constexpr Vectord<1> nextR{{3.0}};
 
-  EXPECT_NEAR((37.524995834325161_V + Ks).value(),
-              simpleMotor.Calculate(2_mps, 3_mps).value(), 0.002);
-  EXPECT_NEAR(plantInversion.Calculate(r, nextR)(0) + Ks.value(),
-              simpleMotor.Calculate(2_mps, 3_mps).value(), 0.002);
+  CHECK(
+      (37.524995834325161_V + Ks).value() ==
+      Catch::Approx(simpleMotor.Calculate(2_mps, 3_mps).value()).margin(0.002));
+  CHECK(
+      plantInversion.Calculate(r, nextR)(0) + Ks.value() ==
+      Catch::Approx(simpleMotor.Calculate(2_mps, 3_mps).value()).margin(0.002));
 
   // These won't match exactly. It's just an approximation to make sure they're
   // in the same ballpark.
-  EXPECT_NEAR(plantInversion.Calculate(r, nextR)(0) + Ks.value(),
-              simpleMotor.Calculate(2_mps, 3_mps).value(), 2.0);
+  CHECK(plantInversion.Calculate(r, nextR)(0) + Ks.value() ==
+        Catch::Approx(simpleMotor.Calculate(2_mps, 3_mps).value()).margin(2.0));
 }
 
-TEST(SimpleMotorFeedforwardTest, NegativeGains) {
+TEST_CASE("SimpleMotorFeedforwardTest NegativeGains", "[wpimath]") {
   constexpr auto Ks = 0.5_V;
   constexpr auto Kv = -3_V / 1_mps;
   constexpr auto Ka = -0.6_V / 1_mps_sq;
   constexpr wpi::units::second_t dt = 0_ms;
   wpi::math::SimpleMotorFeedforward<wpi::units::meter> simpleMotor{Ks, Kv, Ka,
                                                                    dt};
-  EXPECT_EQ(simpleMotor.GetKv().value(), 0);
-  EXPECT_EQ(simpleMotor.GetKa().value(), 0);
-  EXPECT_EQ(simpleMotor.GetDt().value(), 0.02);
+  CHECK(simpleMotor.GetKv().value() == 0);
+  CHECK(simpleMotor.GetKa().value() == 0);
+  CHECK(simpleMotor.GetDt().value() == 0.02);
 }
 
 }  // namespace wpi::math

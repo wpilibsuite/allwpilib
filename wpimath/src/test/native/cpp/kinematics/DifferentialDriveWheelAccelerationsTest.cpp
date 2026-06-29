@@ -4,7 +4,8 @@
 
 #include "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/units/acceleration.hpp"
 
@@ -12,61 +13,73 @@ using namespace wpi::math;
 
 static constexpr double kEpsilon = 1E-9;
 
-TEST(DifferentialDriveWheelAccelerationsTest, DefaultConstructor) {
+TEST_CASE("DifferentialDriveWheelAccelerationsTest DefaultConstructor",
+          "[wpimath]") {
   DifferentialDriveWheelAccelerations wheelAccelerations;
 
-  EXPECT_NEAR(wheelAccelerations.left.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(wheelAccelerations.right.value(), 0.0, kEpsilon);
+  CHECK(wheelAccelerations.left.value() == Catch::Approx(0.0).margin(kEpsilon));
+  CHECK(wheelAccelerations.right.value() ==
+        Catch::Approx(0.0).margin(kEpsilon));
 }
 
-TEST(DifferentialDriveWheelAccelerationsTest, ParameterizedConstructor) {
+TEST_CASE("DifferentialDriveWheelAccelerationsTest ParameterizedConstructor",
+          "[wpimath]") {
   DifferentialDriveWheelAccelerations wheelAccelerations{1.5_mps_sq,
                                                          2.5_mps_sq};
 
-  EXPECT_NEAR(wheelAccelerations.left.value(), 1.5, kEpsilon);
-  EXPECT_NEAR(wheelAccelerations.right.value(), 2.5, kEpsilon);
+  CHECK(wheelAccelerations.left.value() == Catch::Approx(1.5).margin(kEpsilon));
+  CHECK(wheelAccelerations.right.value() ==
+        Catch::Approx(2.5).margin(kEpsilon));
 }
 
-TEST(DifferentialDriveWheelAccelerationsTest, Plus) {
+TEST_CASE("DifferentialDriveWheelAccelerationsTest Plus", "[wpimath]") {
   const DifferentialDriveWheelAccelerations left{1.0_mps_sq, 0.5_mps_sq};
   const DifferentialDriveWheelAccelerations right{2.0_mps_sq, 1.5_mps_sq};
 
   const auto wheelAccelerations = left + right;
 
-  EXPECT_NEAR(wheelAccelerations.left.value(), 3.0, kEpsilon);
-  EXPECT_NEAR(wheelAccelerations.right.value(), 2.0, kEpsilon);
+  CHECK(wheelAccelerations.left.value() == Catch::Approx(3.0).margin(kEpsilon));
+  CHECK(wheelAccelerations.right.value() ==
+        Catch::Approx(2.0).margin(kEpsilon));
 }
 
-TEST(DifferentialDriveWheelAccelerationsTest, Minus) {
+TEST_CASE("DifferentialDriveWheelAccelerationsTest Minus", "[wpimath]") {
   const DifferentialDriveWheelAccelerations left{1.0_mps_sq, 0.5_mps_sq};
   const DifferentialDriveWheelAccelerations right{2.0_mps_sq, 0.5_mps_sq};
 
   const auto wheelAccelerations = left - right;
 
-  EXPECT_NEAR(wheelAccelerations.left.value(), -1.0, kEpsilon);
-  EXPECT_NEAR(wheelAccelerations.right.value(), 0.0, kEpsilon);
+  CHECK(wheelAccelerations.left.value() ==
+        Catch::Approx(-1.0).margin(kEpsilon));
+  CHECK(wheelAccelerations.right.value() ==
+        Catch::Approx(0.0).margin(kEpsilon));
 }
 
-TEST(DifferentialDriveWheelAccelerationsTest, UnaryMinus) {
+TEST_CASE("DifferentialDriveWheelAccelerationsTest UnaryMinus", "[wpimath]") {
   const auto wheelAccelerations =
       -DifferentialDriveWheelAccelerations{1.0_mps_sq, 0.5_mps_sq};
 
-  EXPECT_NEAR(wheelAccelerations.left.value(), -1.0, kEpsilon);
-  EXPECT_NEAR(wheelAccelerations.right.value(), -0.5, kEpsilon);
+  CHECK(wheelAccelerations.left.value() ==
+        Catch::Approx(-1.0).margin(kEpsilon));
+  CHECK(wheelAccelerations.right.value() ==
+        Catch::Approx(-0.5).margin(kEpsilon));
 }
 
-TEST(DifferentialDriveWheelAccelerationsTest, Multiplication) {
+TEST_CASE("DifferentialDriveWheelAccelerationsTest Multiplication",
+          "[wpimath]") {
   const auto wheelAccelerations =
       DifferentialDriveWheelAccelerations{1.0_mps_sq, 0.5_mps_sq} * 2.0;
 
-  EXPECT_NEAR(wheelAccelerations.left.value(), 2.0, kEpsilon);
-  EXPECT_NEAR(wheelAccelerations.right.value(), 1.0, kEpsilon);
+  CHECK(wheelAccelerations.left.value() == Catch::Approx(2.0).margin(kEpsilon));
+  CHECK(wheelAccelerations.right.value() ==
+        Catch::Approx(1.0).margin(kEpsilon));
 }
 
-TEST(DifferentialDriveWheelAccelerationsTest, Division) {
+TEST_CASE("DifferentialDriveWheelAccelerationsTest Division", "[wpimath]") {
   const auto wheelAccelerations =
       DifferentialDriveWheelAccelerations{1.0_mps_sq, 0.5_mps_sq} / 2.0;
 
-  EXPECT_NEAR(wheelAccelerations.left.value(), 0.5, kEpsilon);
-  EXPECT_NEAR(wheelAccelerations.right.value(), 0.25, kEpsilon);
+  CHECK(wheelAccelerations.left.value() == Catch::Approx(0.5).margin(kEpsilon));
+  CHECK(wheelAccelerations.right.value() ==
+        Catch::Approx(0.25).margin(kEpsilon));
 }

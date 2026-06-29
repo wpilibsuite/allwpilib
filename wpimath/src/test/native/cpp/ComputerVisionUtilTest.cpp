@@ -4,9 +4,10 @@
 
 #include "wpi/math/util/ComputerVisionUtil.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
-TEST(ComputerVisionUtilTest, ObjectToRobotPose) {
+TEST_CASE("ComputerVisionUtilTest ObjectToRobotPose", "[wpimath]") {
   wpi::math::Pose3d robot{1_m, 2_m, 0_m,
                           wpi::math::Rotation3d{0_deg, 0_deg, 30_deg}};
   wpi::math::Transform3d cameraToObject{
@@ -17,6 +18,6 @@ TEST(ComputerVisionUtilTest, ObjectToRobotPose) {
       wpi::math::Rotation3d{0_deg, 0_deg, 25_deg}};
   wpi::math::Pose3d object = robot + robotToCamera + cameraToObject;
 
-  EXPECT_EQ(robot, wpi::math::ObjectToRobotPose(object, cameraToObject,
-                                                robotToCamera));
+  CHECK(robot ==
+        wpi::math::ObjectToRobotPose(object, cameraToObject, robotToCamera));
 }

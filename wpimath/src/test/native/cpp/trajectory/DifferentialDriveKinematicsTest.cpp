@@ -4,7 +4,8 @@
 
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/trajectory/TestTrajectory.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
@@ -12,7 +13,7 @@
 
 using namespace wpi::math;
 
-TEST(DifferentialDriveKinematicsConstraintTest, Constraint) {
+TEST_CASE("DifferentialDriveKinematicsConstraintTest Constraint", "[wpimath]") {
   const auto maxVelocity = 12_fps;
   const DifferentialDriveKinematics kinematics{27_in};
 
@@ -35,7 +36,7 @@ TEST(DifferentialDriveKinematicsConstraintTest, Constraint) {
 
     auto [left, right] = kinematics.ToWheelVelocities(chassisVelocities);
 
-    EXPECT_TRUE(left < maxVelocity + 0.05_mps);
-    EXPECT_TRUE(right < maxVelocity + 0.05_mps);
+    CHECK(left < maxVelocity + 0.05_mps);
+    CHECK(right < maxVelocity + 0.05_mps);
   }
 }

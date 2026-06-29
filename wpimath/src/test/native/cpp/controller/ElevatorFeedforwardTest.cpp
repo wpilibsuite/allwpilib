@@ -4,7 +4,8 @@
 
 #include "wpi/math/controller/ElevatorFeedforward.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
@@ -17,11 +18,13 @@ static constexpr auto Kv = 1.5_V * 1_s / 1_m;
 static constexpr auto Ka = 2_V * 1_s * 1_s / 1_m;
 static constexpr auto Kg = 1_V;
 
-TEST(ElevatorFeedforwardTest, Calculate) {
+TEST_CASE("ElevatorFeedforwardTest Calculate", "[wpimath]") {
   wpi::math::ElevatorFeedforward elevatorFF{Ks, Kg, Kv, Ka};
 
-  EXPECT_NEAR(elevatorFF.Calculate(0_m / 1_s).value(), Kg.value(), 0.002);
-  EXPECT_NEAR(elevatorFF.Calculate(2_m / 1_s).value(), 4.5, 0.002);
+  CHECK(elevatorFF.Calculate(0_m / 1_s).value() ==
+        Catch::Approx(Kg.value()).margin(0.002));
+  CHECK(elevatorFF.Calculate(2_m / 1_s).value() ==
+        Catch::Approx(4.5).margin(0.002));
 
   wpi::math::Matrixd<1, 1> A{-Kv.value() / Ka.value()};
   wpi::math::Matrixd<1, 1> B{1.0 / Ka.value()};
@@ -30,32 +33,33 @@ TEST(ElevatorFeedforwardTest, Calculate) {
 
   wpi::math::Vectord<1> r{2.0};
   wpi::math::Vectord<1> nextR{3.0};
-  EXPECT_NEAR(plantInversion.Calculate(r, nextR)(0) + Ks.value() + Kg.value(),
-              elevatorFF.Calculate(2_mps, 3_mps).value(), 0.002);
+  CHECK(
+      plantInversion.Calculate(r, nextR)(0) + Ks.value() + Kg.value() ==
+      Catch::Approx(elevatorFF.Calculate(2_mps, 3_mps).value()).margin(0.002));
 }
 
-TEST(ElevatorFeedforwardTest, AchievableVelocity) {
+TEST_CASE("ElevatorFeedforwardTest AchievableVelocity", "[wpimath]") {
   wpi::math::ElevatorFeedforward elevatorFF{Ks, Kg, Kv, Ka};
-  EXPECT_NEAR(elevatorFF.MaxAchievableVelocity(11_V, 1_m / 1_s / 1_s).value(),
-              5, 0.002);
-  EXPECT_NEAR(elevatorFF.MinAchievableVelocity(11_V, 1_m / 1_s / 1_s).value(),
-              -9, 0.002);
+  CHECK(elevatorFF.MaxAchievableVelocity(11_V, 1_m / 1_s / 1_s).value() ==
+        Catch::Approx(5).margin(0.002));
+  CHECK(elevatorFF.MinAchievableVelocity(11_V, 1_m / 1_s / 1_s).value() ==
+        Catch::Approx(-9).margin(0.002));
 }
 
-TEST(ElevatorFeedforwardTest, AchievableAcceleration) {
+TEST_CASE("ElevatorFeedforwardTest AchievableAcceleration", "[wpimath]") {
   wpi::math::ElevatorFeedforward elevatorFF{Ks, Kg, Kv, Ka};
-  EXPECT_NEAR(elevatorFF.MaxAchievableAcceleration(12_V, 2_m / 1_s).value(),
-              3.75, 0.002);
-  EXPECT_NEAR(elevatorFF.MaxAchievableAcceleration(12_V, -2_m / 1_s).value(),
-              7.25, 0.002);
-  EXPECT_NEAR(elevatorFF.MinAchievableAcceleration(12_V, 2_m / 1_s).value(),
-              -8.25, 0.002);
-  EXPECT_NEAR(elevatorFF.MinAchievableAcceleration(12_V, -2_m / 1_s).value(),
-              -4.75, 0.002);
+  CHECK(elevatorFF.MaxAchievableAcceleration(12_V, 2_m / 1_s).value() ==
+        Catch::Approx(3.75).margin(0.002));
+  CHECK(elevatorFF.MaxAchievableAcceleration(12_V, -2_m / 1_s).value() ==
+        Catch::Approx(7.25).margin(0.002));
+  CHECK(elevatorFF.MinAchievableAcceleration(12_V, 2_m / 1_s).value() ==
+        Catch::Approx(-8.25).margin(0.002));
+  CHECK(elevatorFF.MinAchievableAcceleration(12_V, -2_m / 1_s).value() ==
+        Catch::Approx(-4.75).margin(0.002));
 }
 
-TEST(ElevatorFeedforwardTest, NegativeGains) {
+TEST_CASE("ElevatorFeedforwardTest NegativeGains", "[wpimath]") {
   wpi::math::ElevatorFeedforward elevatorFF{Ks, Kg, -Kv, -Ka};
-  EXPECT_EQ(elevatorFF.GetKv().value(), 0);
-  EXPECT_EQ(elevatorFF.GetKa().value(), 0);
+  CHECK(elevatorFF.GetKv().value() == 0);
+  CHECK(elevatorFF.GetKa().value() == 0);
 }

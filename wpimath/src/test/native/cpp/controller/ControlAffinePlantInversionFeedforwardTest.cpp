@@ -4,7 +4,8 @@
 
 #include "wpi/math/controller/ControlAffinePlantInversionFeedforward.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/units/time.hpp"
@@ -20,24 +21,27 @@ Vectord<2> StateDynamics(const Vectord<2>& x) {
   return Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}} * x;
 }
 
-TEST(ControlAffinePlantInversionFeedforwardTest, Calculate) {
+TEST_CASE("ControlAffinePlantInversionFeedforwardTest Calculate", "[wpimath]") {
   wpi::math::ControlAffinePlantInversionFeedforward<2, 1> feedforward{&Dynamics,
                                                                       20_ms};
 
   Vectord<2> r{2, 2};
   Vectord<2> nextR{3, 3};
 
-  EXPECT_NEAR(48, feedforward.Calculate(r, nextR)(0, 0), 1e-6);
+  CHECK(48 ==
+        Catch::Approx(feedforward.Calculate(r, nextR)(0, 0)).margin(1e-6));
 }
 
-TEST(ControlAffinePlantInversionFeedforwardTest, CalculateState) {
+TEST_CASE("ControlAffinePlantInversionFeedforwardTest CalculateState",
+          "[wpimath]") {
   wpi::math::ControlAffinePlantInversionFeedforward<2, 1> feedforward{
       &StateDynamics, Matrixd<2, 1>{{0.0}, {1.0}}, 20_ms};
 
   Vectord<2> r{2, 2};
   Vectord<2> nextR{3, 3};
 
-  EXPECT_NEAR(48, feedforward.Calculate(r, nextR)(0, 0), 1e-6);
+  CHECK(48 ==
+        Catch::Approx(feedforward.Calculate(r, nextR)(0, 0)).margin(1e-6));
 }
 
 }  // namespace wpi::math

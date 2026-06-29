@@ -4,7 +4,8 @@
 
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/trajectory/Trajectory.hpp"
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
@@ -23,14 +24,14 @@ void TestSameShapedTrajectory(
     auto a = a2.RelativeTo(a1);
     auto b = b2.RelativeTo(b1);
 
-    EXPECT_NEAR(a.X().value(), b.X().value(), 1E-9);
-    EXPECT_NEAR(a.Y().value(), b.Y().value(), 1E-9);
-    EXPECT_NEAR(a.Rotation().Radians().value(), b.Rotation().Radians().value(),
-                1E-9);
+    CHECK(a.X().value() == Catch::Approx(b.X().value()).margin(1E-9));
+    CHECK(a.Y().value() == Catch::Approx(b.Y().value()).margin(1E-9));
+    CHECK(a.Rotation().Radians().value() ==
+          Catch::Approx(b.Rotation().Radians().value()).margin(1E-9));
   }
 }
 
-TEST(TrajectoryTransformsTest, TransformBy) {
+TEST_CASE("TrajectoryTransformsTest TransformBy", "[wpimath]") {
   wpi::math::TrajectoryConfig config{3_mps, 3_mps_sq};
   auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       wpi::math::Pose2d{}, {}, wpi::math::Pose2d{1_m, 1_m, 90_deg}, config);
@@ -39,14 +40,15 @@ TEST(TrajectoryTransformsTest, TransformBy) {
 
   auto firstPose = transformedTrajectory.Sample(0_s).pose;
 
-  EXPECT_NEAR(firstPose.X().value(), 1.0, 1E-9);
-  EXPECT_NEAR(firstPose.Y().value(), 2.0, 1E-9);
-  EXPECT_NEAR(firstPose.Rotation().Degrees().value(), 30.0, 1E-9);
+  CHECK(firstPose.X().value() == Catch::Approx(1.0).margin(1E-9));
+  CHECK(firstPose.Y().value() == Catch::Approx(2.0).margin(1E-9));
+  CHECK(firstPose.Rotation().Degrees().value() ==
+        Catch::Approx(30.0).margin(1E-9));
 
   TestSameShapedTrajectory(trajectory.States(), transformedTrajectory.States());
 }
 
-TEST(TrajectoryTransformsTest, RelativeTo) {
+TEST_CASE("TrajectoryTransformsTest RelativeTo", "[wpimath]") {
   wpi::math::TrajectoryConfig config{3_mps, 3_mps_sq};
   auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       wpi::math::Pose2d{1_m, 2_m, 30_deg}, {},
@@ -56,9 +58,10 @@ TEST(TrajectoryTransformsTest, RelativeTo) {
 
   auto firstPose = transformedTrajectory.Sample(0_s).pose;
 
-  EXPECT_NEAR(firstPose.X().value(), 0, 1E-9);
-  EXPECT_NEAR(firstPose.Y().value(), 0, 1E-9);
-  EXPECT_NEAR(firstPose.Rotation().Degrees().value(), 0, 1E-9);
+  CHECK(firstPose.X().value() == Catch::Approx(0).margin(1E-9));
+  CHECK(firstPose.Y().value() == Catch::Approx(0).margin(1E-9));
+  CHECK(firstPose.Rotation().Degrees().value() ==
+        Catch::Approx(0).margin(1E-9));
 
   TestSameShapedTrajectory(trajectory.States(), transformedTrajectory.States());
 }

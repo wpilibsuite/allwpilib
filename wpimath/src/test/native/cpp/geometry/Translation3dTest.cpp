@@ -6,35 +6,36 @@
 
 #include <cmath>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 using namespace wpi::math;
 
 static constexpr double kEpsilon = 1E-9;
 
-TEST(Translation3dTest, Sum) {
+TEST_CASE("Translation3dTest Sum", "[wpimath]") {
   const Translation3d one{1_m, 3_m, 5_m};
   const Translation3d two{2_m, 5_m, 8_m};
 
   const auto sum = one + two;
 
-  EXPECT_NEAR(3.0, sum.X().value(), kEpsilon);
-  EXPECT_NEAR(8.0, sum.Y().value(), kEpsilon);
-  EXPECT_NEAR(13.0, sum.Z().value(), kEpsilon);
+  CHECK(3.0 == Catch::Approx(sum.X().value()).margin(kEpsilon));
+  CHECK(8.0 == Catch::Approx(sum.Y().value()).margin(kEpsilon));
+  CHECK(13.0 == Catch::Approx(sum.Z().value()).margin(kEpsilon));
 }
 
-TEST(Translation3dTest, Difference) {
+TEST_CASE("Translation3dTest Difference", "[wpimath]") {
   const Translation3d one{1_m, 3_m, 5_m};
   const Translation3d two{2_m, 5_m, 8_m};
 
   const auto difference = one - two;
 
-  EXPECT_NEAR(difference.X().value(), -1.0, kEpsilon);
-  EXPECT_NEAR(difference.Y().value(), -2.0, kEpsilon);
-  EXPECT_NEAR(difference.Z().value(), -3.0, kEpsilon);
+  CHECK(difference.X().value() == Catch::Approx(-1.0).margin(kEpsilon));
+  CHECK(difference.Y().value() == Catch::Approx(-2.0).margin(kEpsilon));
+  CHECK(difference.Z().value() == Catch::Approx(-3.0).margin(kEpsilon));
 }
 
-TEST(Translation3dTest, RotateBy) {
+TEST_CASE("Translation3dTest RotateBy", "[wpimath]") {
   Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
   Eigen::Vector3d yAxis{0.0, 1.0, 0.0};
   Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
@@ -42,22 +43,22 @@ TEST(Translation3dTest, RotateBy) {
   const Translation3d translation{1_m, 2_m, 3_m};
 
   const auto rotated1 = translation.RotateBy(Rotation3d{xAxis, 90_deg});
-  EXPECT_NEAR(rotated1.X().value(), 1.0, kEpsilon);
-  EXPECT_NEAR(rotated1.Y().value(), -3.0, kEpsilon);
-  EXPECT_NEAR(rotated1.Z().value(), 2.0, kEpsilon);
+  CHECK(rotated1.X().value() == Catch::Approx(1.0).margin(kEpsilon));
+  CHECK(rotated1.Y().value() == Catch::Approx(-3.0).margin(kEpsilon));
+  CHECK(rotated1.Z().value() == Catch::Approx(2.0).margin(kEpsilon));
 
   const auto rotated2 = translation.RotateBy(Rotation3d{yAxis, 90_deg});
-  EXPECT_NEAR(rotated2.X().value(), 3.0, kEpsilon);
-  EXPECT_NEAR(rotated2.Y().value(), 2.0, kEpsilon);
-  EXPECT_NEAR(rotated2.Z().value(), -1.0, kEpsilon);
+  CHECK(rotated2.X().value() == Catch::Approx(3.0).margin(kEpsilon));
+  CHECK(rotated2.Y().value() == Catch::Approx(2.0).margin(kEpsilon));
+  CHECK(rotated2.Z().value() == Catch::Approx(-1.0).margin(kEpsilon));
 
   const auto rotated3 = translation.RotateBy(Rotation3d{zAxis, 90_deg});
-  EXPECT_NEAR(rotated3.X().value(), -2.0, kEpsilon);
-  EXPECT_NEAR(rotated3.Y().value(), 1.0, kEpsilon);
-  EXPECT_NEAR(rotated3.Z().value(), 3.0, kEpsilon);
+  CHECK(rotated3.X().value() == Catch::Approx(-2.0).margin(kEpsilon));
+  CHECK(rotated3.Y().value() == Catch::Approx(1.0).margin(kEpsilon));
+  CHECK(rotated3.Z().value() == Catch::Approx(3.0).margin(kEpsilon));
 }
 
-TEST(Translation3dTest, RotateAround) {
+TEST_CASE("Translation3dTest RotateAround", "[wpimath]") {
   Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
   Eigen::Vector3d yAxis{0.0, 1.0, 0.0};
   Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
@@ -67,117 +68,120 @@ TEST(Translation3dTest, RotateAround) {
 
   const auto rotated1 =
       translation.RotateAround(around, Rotation3d{xAxis, 90_deg});
-  EXPECT_NEAR(rotated1.X().value(), 1.0, kEpsilon);
-  EXPECT_NEAR(rotated1.Y().value(), 0.0, kEpsilon);
-  EXPECT_NEAR(rotated1.Z().value(), 1.0, kEpsilon);
+  CHECK(rotated1.X().value() == Catch::Approx(1.0).margin(kEpsilon));
+  CHECK(rotated1.Y().value() == Catch::Approx(0.0).margin(kEpsilon));
+  CHECK(rotated1.Z().value() == Catch::Approx(1.0).margin(kEpsilon));
 
   const auto rotated2 =
       translation.RotateAround(around, Rotation3d{yAxis, 90_deg});
-  EXPECT_NEAR(rotated2.X().value(), 5.0, kEpsilon);
-  EXPECT_NEAR(rotated2.Y().value(), 2.0, kEpsilon);
-  EXPECT_NEAR(rotated2.Z().value(), 3.0, kEpsilon);
+  CHECK(rotated2.X().value() == Catch::Approx(5.0).margin(kEpsilon));
+  CHECK(rotated2.Y().value() == Catch::Approx(2.0).margin(kEpsilon));
+  CHECK(rotated2.Z().value() == Catch::Approx(3.0).margin(kEpsilon));
 
   const auto rotated3 =
       translation.RotateAround(around, Rotation3d{zAxis, 90_deg});
-  EXPECT_NEAR(rotated3.X().value(), 3.0, kEpsilon);
-  EXPECT_NEAR(rotated3.Y().value(), 0.0, kEpsilon);
-  EXPECT_NEAR(rotated3.Z().value(), 3.0, kEpsilon);
+  CHECK(rotated3.X().value() == Catch::Approx(3.0).margin(kEpsilon));
+  CHECK(rotated3.Y().value() == Catch::Approx(0.0).margin(kEpsilon));
+  CHECK(rotated3.Z().value() == Catch::Approx(3.0).margin(kEpsilon));
 }
 
-TEST(Translation3dTest, ToTranslation2d) {
+TEST_CASE("Translation3dTest ToTranslation2d", "[wpimath]") {
   Translation3d translation{1_m, 2_m, 3_m};
   Translation2d expected{1_m, 2_m};
 
-  EXPECT_EQ(expected, translation.ToTranslation2d());
+  CHECK(expected == translation.ToTranslation2d());
 }
 
-TEST(Translation3dTest, Multiplication) {
+TEST_CASE("Translation3dTest Multiplication", "[wpimath]") {
   const Translation3d original{3_m, 5_m, 7_m};
   const auto mult = original * 3;
 
-  EXPECT_NEAR(mult.X().value(), 9.0, kEpsilon);
-  EXPECT_NEAR(mult.Y().value(), 15.0, kEpsilon);
-  EXPECT_NEAR(mult.Z().value(), 21.0, kEpsilon);
+  CHECK(mult.X().value() == Catch::Approx(9.0).margin(kEpsilon));
+  CHECK(mult.Y().value() == Catch::Approx(15.0).margin(kEpsilon));
+  CHECK(mult.Z().value() == Catch::Approx(21.0).margin(kEpsilon));
 }
 
-TEST(Translation3dTest, Division) {
+TEST_CASE("Translation3dTest Division", "[wpimath]") {
   const Translation3d original{3_m, 5_m, 7_m};
   const auto div = original / 2;
 
-  EXPECT_NEAR(div.X().value(), 1.5, kEpsilon);
-  EXPECT_NEAR(div.Y().value(), 2.5, kEpsilon);
-  EXPECT_NEAR(div.Z().value(), 3.5, kEpsilon);
+  CHECK(div.X().value() == Catch::Approx(1.5).margin(kEpsilon));
+  CHECK(div.Y().value() == Catch::Approx(2.5).margin(kEpsilon));
+  CHECK(div.Z().value() == Catch::Approx(3.5).margin(kEpsilon));
 }
 
-TEST(Translation3dTest, Norm) {
+TEST_CASE("Translation3dTest Norm", "[wpimath]") {
   const Translation3d one{3_m, 5_m, 7_m};
-  EXPECT_NEAR(one.Norm().value(), std::hypot(3, 5, 7), kEpsilon);
+  CHECK(one.Norm().value() ==
+        Catch::Approx(std::hypot(3, 5, 7)).margin(kEpsilon));
 }
 
-TEST(Translation3dTest, SquaredNorm) {
+TEST_CASE("Translation3dTest SquaredNorm", "[wpimath]") {
   const Translation3d one{3_m, 5_m, 7_m};
-  EXPECT_NEAR(one.SquaredNorm().value(), 83.0, kEpsilon);
+  CHECK(one.SquaredNorm().value() == Catch::Approx(83.0).margin(kEpsilon));
 }
 
-TEST(Translation3dTest, Distance) {
+TEST_CASE("Translation3dTest Distance", "[wpimath]") {
   const Translation3d one{1_m, 1_m, 1_m};
   const Translation3d two{6_m, 6_m, 6_m};
-  EXPECT_NEAR(one.Distance(two).value(), 5 * std::sqrt(3), kEpsilon);
+  CHECK(one.Distance(two).value() ==
+        Catch::Approx(5 * std::sqrt(3)).margin(kEpsilon));
 }
 
-TEST(Translation3dTest, SquaredDistance) {
+TEST_CASE("Translation3dTest SquaredDistance", "[wpimath]") {
   const Translation3d one{1_m, 1_m, 1_m};
   const Translation3d two{6_m, 6_m, 6_m};
-  EXPECT_NEAR(one.SquaredDistance(two).value(), 75.0, kEpsilon);
+  CHECK(one.SquaredDistance(two).value() ==
+        Catch::Approx(75.0).margin(kEpsilon));
 }
 
-TEST(Translation3dTest, UnaryMinus) {
+TEST_CASE("Translation3dTest UnaryMinus", "[wpimath]") {
   const Translation3d original{-4.5_m, 7_m, 9_m};
   const auto inverted = -original;
 
-  EXPECT_NEAR(inverted.X().value(), 4.5, kEpsilon);
-  EXPECT_NEAR(inverted.Y().value(), -7, kEpsilon);
-  EXPECT_NEAR(inverted.Z().value(), -9, kEpsilon);
+  CHECK(inverted.X().value() == Catch::Approx(4.5).margin(kEpsilon));
+  CHECK(inverted.Y().value() == Catch::Approx(-7).margin(kEpsilon));
+  CHECK(inverted.Z().value() == Catch::Approx(-9).margin(kEpsilon));
 }
 
-TEST(Translation3dTest, Equality) {
+TEST_CASE("Translation3dTest Equality", "[wpimath]") {
   const Translation3d one{9_m, 5.5_m, 3.5_m};
   const Translation3d two{9_m, 5.5_m, 3.5_m};
-  EXPECT_TRUE(one == two);
+  CHECK(one == two);
 }
 
-TEST(Translation3dTest, Inequality) {
+TEST_CASE("Translation3dTest Inequality", "[wpimath]") {
   const Translation3d one{9_m, 5.5_m, 3.5_m};
   const Translation3d two{9_m, 5.7_m, 3.5_m};
-  EXPECT_TRUE(one != two);
+  CHECK(one != two);
 }
 
-TEST(Translation3dTest, PolarConstructor) {
+TEST_CASE("Translation3dTest PolarConstructor", "[wpimath]") {
   Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
   Translation3d one{std::sqrt(2) * 1_m, Rotation3d{zAxis, 45_deg}};
-  EXPECT_NEAR(one.X().value(), 1.0, kEpsilon);
-  EXPECT_NEAR(one.Y().value(), 1.0, kEpsilon);
-  EXPECT_NEAR(one.Z().value(), 0.0, kEpsilon);
+  CHECK(one.X().value() == Catch::Approx(1.0).margin(kEpsilon));
+  CHECK(one.Y().value() == Catch::Approx(1.0).margin(kEpsilon));
+  CHECK(one.Z().value() == Catch::Approx(0.0).margin(kEpsilon));
 
   Translation3d two{2_m, Rotation3d{zAxis, 60_deg}};
-  EXPECT_NEAR(two.X().value(), 1.0, kEpsilon);
-  EXPECT_NEAR(two.Y().value(), std::sqrt(3.0), kEpsilon);
-  EXPECT_NEAR(two.Z().value(), 0.0, kEpsilon);
+  CHECK(two.X().value() == Catch::Approx(1.0).margin(kEpsilon));
+  CHECK(two.Y().value() == Catch::Approx(std::sqrt(3.0)).margin(kEpsilon));
+  CHECK(two.Z().value() == Catch::Approx(0.0).margin(kEpsilon));
 }
 
-TEST(Translation3dTest, ToVector) {
+TEST_CASE("Translation3dTest ToVector", "[wpimath]") {
   const Eigen::Vector3d vec(1.0, 2.0, 3.0);
   const Translation3d translation{vec};
 
-  EXPECT_DOUBLE_EQ(vec[0], translation.X().value());
-  EXPECT_DOUBLE_EQ(vec[1], translation.Y().value());
-  EXPECT_DOUBLE_EQ(vec[2], translation.Z().value());
+  CHECK(vec[0] == Catch::Approx(translation.X().value()));
+  CHECK(vec[1] == Catch::Approx(translation.Y().value()));
+  CHECK(vec[2] == Catch::Approx(translation.Z().value()));
 
-  EXPECT_TRUE(vec == translation.ToVector());
+  CHECK(vec == translation.ToVector());
 }
 
-TEST(Translation3dTest, Constexpr) {
+TEST_CASE("Translation3dTest Constexpr", "[wpimath]") {
   constexpr Translation3d defaultCtor;
   constexpr Translation3d componentCtor{1_m, 2_m, 3_m};
   constexpr auto added = defaultCtor + componentCtor;
@@ -198,7 +202,7 @@ TEST(Translation3dTest, Constexpr) {
   static_assert(projected.Y() == 2_m);
 }
 
-TEST(Translation3dTest, Nearest) {
+TEST_CASE("Translation3dTest Nearest", "[wpimath]") {
   const Translation3d origin{0_m, 0_m, 0_m};
 
   // Distance sort
@@ -211,33 +215,33 @@ TEST(Translation3dTest, Nearest) {
   const Translation3d translation5{3_m, 3_m, 3_m};
 
   auto nearest1 = origin.Nearest({translation5, translation3, translation4});
-  EXPECT_DOUBLE_EQ(nearest1.X().value(), translation3.X().value());
-  EXPECT_DOUBLE_EQ(nearest1.Y().value(), translation3.Y().value());
-  EXPECT_DOUBLE_EQ(nearest1.Z().value(), translation3.Z().value());
+  CHECK(nearest1.X().value() == Catch::Approx(translation3.X().value()));
+  CHECK(nearest1.Y().value() == Catch::Approx(translation3.Y().value()));
+  CHECK(nearest1.Z().value() == Catch::Approx(translation3.Z().value()));
 
   auto nearest2 = origin.Nearest({translation1, translation2, translation3});
-  EXPECT_DOUBLE_EQ(nearest2.X().value(), translation1.X().value());
-  EXPECT_DOUBLE_EQ(nearest2.Y().value(), translation1.Y().value());
-  EXPECT_DOUBLE_EQ(nearest2.Z().value(), translation1.Z().value());
+  CHECK(nearest2.X().value() == Catch::Approx(translation1.X().value()));
+  CHECK(nearest2.Y().value() == Catch::Approx(translation1.Y().value()));
+  CHECK(nearest2.Z().value() == Catch::Approx(translation1.Z().value()));
 
   auto nearest3 = origin.Nearest({translation4, translation2, translation3});
-  EXPECT_DOUBLE_EQ(nearest3.X().value(), translation2.X().value());
-  EXPECT_DOUBLE_EQ(nearest3.Y().value(), translation2.Y().value());
-  EXPECT_DOUBLE_EQ(nearest3.Z().value(), translation2.Z().value());
+  CHECK(nearest3.X().value() == Catch::Approx(translation2.X().value()));
+  CHECK(nearest3.Y().value() == Catch::Approx(translation2.Y().value()));
+  CHECK(nearest3.Z().value() == Catch::Approx(translation2.Z().value()));
 }
 
-TEST(Translation3dTest, Dot) {
+TEST_CASE("Translation3dTest Dot", "[wpimath]") {
   const Translation3d one{1_m, 2_m, 3_m};
   const Translation3d two{4_m, 5_m, 6_m};
-  EXPECT_NEAR(one.Dot(two).value(), 32.0, kEpsilon);
+  CHECK(one.Dot(two).value() == Catch::Approx(32.0).margin(kEpsilon));
 }
 
-TEST(Translation3dTest, Cross) {
+TEST_CASE("Translation3dTest Cross", "[wpimath]") {
   const Translation3d one{1_m, 2_m, 3_m};
   const Translation3d two{4_m, 5_m, 6_m};
 
   auto cross = one.Cross(two);
-  EXPECT_NEAR(cross[0].value(), -3.0, kEpsilon);
-  EXPECT_NEAR(cross[1].value(), 6.0, kEpsilon);
-  EXPECT_NEAR(cross[2].value(), -3.0, kEpsilon);
+  CHECK(cross[0].value() == Catch::Approx(-3.0).margin(kEpsilon));
+  CHECK(cross[1].value() == Catch::Approx(6.0).margin(kEpsilon));
+  CHECK(cross[2].value() == Catch::Approx(-3.0).margin(kEpsilon));
 }

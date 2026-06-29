@@ -4,102 +4,103 @@
 
 #include "wpi/math/util/StateSpaceUtil.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/linalg/EigenCore.hpp"
 
-TEST(StateSpaceUtilTest, CostParameterPack) {
+TEST_CASE("StateSpaceUtilTest CostParameterPack", "[wpimath]") {
   constexpr wpi::math::Matrixd<3, 3> mat = wpi::math::CostMatrix(1.0, 2.0, 3.0);
-  EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
-  EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
-  EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 0), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 1), 1.0 / 4.0, 1e-3);
-  EXPECT_NEAR(mat(1, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(2, 2), 1.0 / 9.0, 1e-3);
+  CHECK(mat(0, 0) == Catch::Approx(1.0).margin(1e-3));
+  CHECK(mat(0, 1) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(0, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 0) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 1) == Catch::Approx(1.0 / 4.0).margin(1e-3));
+  CHECK(mat(1, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(0, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(2, 2) == Catch::Approx(1.0 / 9.0).margin(1e-3));
 }
 
-TEST(StateSpaceUtilTest, CostArray) {
+TEST_CASE("StateSpaceUtilTest CostArray", "[wpimath]") {
   constexpr wpi::math::Matrixd<3, 3> mat =
       wpi::math::CostMatrix<3>({1.0, 2.0, 3.0});
-  EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
-  EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
-  EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 0), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 1), 1.0 / 4.0, 1e-3);
-  EXPECT_NEAR(mat(1, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(2, 2), 1.0 / 9.0, 1e-3);
+  CHECK(mat(0, 0) == Catch::Approx(1.0).margin(1e-3));
+  CHECK(mat(0, 1) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(0, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 0) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 1) == Catch::Approx(1.0 / 4.0).margin(1e-3));
+  CHECK(mat(1, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(0, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(2, 2) == Catch::Approx(1.0 / 9.0).margin(1e-3));
 }
 
-TEST(StateSpaceUtilTest, CostDynamic) {
+TEST_CASE("StateSpaceUtilTest CostDynamic", "[wpimath]") {
   Eigen::MatrixXd mat = wpi::math::CostMatrix(std::vector{1.0, 2.0, 3.0});
-  EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
-  EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
-  EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 0), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 1), 1.0 / 4.0, 1e-3);
-  EXPECT_NEAR(mat(1, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(2, 2), 1.0 / 9.0, 1e-3);
+  CHECK(mat(0, 0) == Catch::Approx(1.0).margin(1e-3));
+  CHECK(mat(0, 1) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(0, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 0) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 1) == Catch::Approx(1.0 / 4.0).margin(1e-3));
+  CHECK(mat(1, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(0, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(2, 2) == Catch::Approx(1.0 / 9.0).margin(1e-3));
 }
 
-TEST(StateSpaceUtilTest, CovParameterPack) {
+TEST_CASE("StateSpaceUtilTest CovParameterPack", "[wpimath]") {
   constexpr wpi::math::Matrixd<3, 3> mat =
       wpi::math::CovarianceMatrix(1.0, 2.0, 3.0);
-  EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
-  EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
-  EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 0), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 1), 4.0, 1e-3);
-  EXPECT_NEAR(mat(1, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(2, 2), 9.0, 1e-3);
+  CHECK(mat(0, 0) == Catch::Approx(1.0).margin(1e-3));
+  CHECK(mat(0, 1) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(0, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 0) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 1) == Catch::Approx(4.0).margin(1e-3));
+  CHECK(mat(1, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(0, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(2, 2) == Catch::Approx(9.0).margin(1e-3));
 }
 
-TEST(StateSpaceUtilTest, CovArray) {
+TEST_CASE("StateSpaceUtilTest CovArray", "[wpimath]") {
   constexpr wpi::math::Matrixd<3, 3> mat =
       wpi::math::CovarianceMatrix<3>({1.0, 2.0, 3.0});
-  EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
-  EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
-  EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 0), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 1), 4.0, 1e-3);
-  EXPECT_NEAR(mat(1, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(2, 2), 9.0, 1e-3);
+  CHECK(mat(0, 0) == Catch::Approx(1.0).margin(1e-3));
+  CHECK(mat(0, 1) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(0, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 0) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 1) == Catch::Approx(4.0).margin(1e-3));
+  CHECK(mat(1, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(0, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(2, 2) == Catch::Approx(9.0).margin(1e-3));
 }
 
-TEST(StateSpaceUtilTest, CovDynamic) {
+TEST_CASE("StateSpaceUtilTest CovDynamic", "[wpimath]") {
   Eigen::MatrixXd mat = wpi::math::CovarianceMatrix(std::vector{1.0, 2.0, 3.0});
-  EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
-  EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
-  EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 0), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 1), 4.0, 1e-3);
-  EXPECT_NEAR(mat(1, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(1, 2), 0.0, 1e-3);
-  EXPECT_NEAR(mat(2, 2), 9.0, 1e-3);
+  CHECK(mat(0, 0) == Catch::Approx(1.0).margin(1e-3));
+  CHECK(mat(0, 1) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(0, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 0) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 1) == Catch::Approx(4.0).margin(1e-3));
+  CHECK(mat(1, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(0, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(1, 2) == Catch::Approx(0.0).margin(1e-3));
+  CHECK(mat(2, 2) == Catch::Approx(9.0).margin(1e-3));
 }
 
-TEST(StateSpaceUtilTest, DesaturateInputVector) {
+TEST_CASE("StateSpaceUtilTest DesaturateInputVector", "[wpimath]") {
   constexpr Eigen::Vector2d vec1{{10.0, 12.0}};
-  EXPECT_EQ(wpi::math::DesaturateInputVector<2>(vec1, 12.0), vec1);
-  EXPECT_EQ(wpi::math::DesaturateInputVector<2>(vec1, 10.0),
-            (Eigen::Vector2d{{25.0 / 3.0}, {10.0}}));
+  CHECK(wpi::math::DesaturateInputVector<2>(vec1, 12.0) == vec1);
+  CHECK(wpi::math::DesaturateInputVector<2>(vec1, 10.0) ==
+        (Eigen::Vector2d{{25.0 / 3.0}, {10.0}}));
 
   constexpr Eigen::Vector2d vec2{{10.0, -12.0}};
-  EXPECT_EQ(wpi::math::DesaturateInputVector<2>(vec2, 12.0), vec2);
-  EXPECT_EQ(wpi::math::DesaturateInputVector<2>(vec2, 10.0),
-            (Eigen::Vector2d{{25.0 / 3.0}, {-10.0}}));
+  CHECK(wpi::math::DesaturateInputVector<2>(vec2, 12.0) == vec2);
+  CHECK(wpi::math::DesaturateInputVector<2>(vec2, 10.0) ==
+        (Eigen::Vector2d{{25.0 / 3.0}, {-10.0}}));
 
   constexpr Eigen::Vector2d vec3{{0.0, 0.0}};
-  EXPECT_EQ(wpi::math::DesaturateInputVector<2>(vec3, 12.0), vec3);
+  CHECK(wpi::math::DesaturateInputVector<2>(vec3, 12.0) == vec3);
 }
