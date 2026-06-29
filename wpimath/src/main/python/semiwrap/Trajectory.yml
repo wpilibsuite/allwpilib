@@ -11,7 +11,7 @@ classes:
     - wpi::units::curvature_t
     methods:
       Trajectory:
-      TotalTime:
+      Duration:
       InitialPose:
       operator==:
       Samples:
