@@ -114,8 +114,8 @@ http_file(
 bazel_dep(name = "wpilib_toolchains", version = "")
 archive_override(
     module_name = "wpilib_toolchains",
-    integrity = "sha256-4c3CfQWaDQHnYDREDpaKzy6EvPMSs4SnvYrgbGi9Q4I=",
-    urls = ["https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2027-1/wpilib_toolchains-2027-1.tar.gz"],
+    integrity = "sha256-t9pasV154Izb6xAllG7XI7lYljVP1jhNTQtoG2l6t6Y=",
+    urls = ["https://github.com/wpilibsuite/bazel_wpilib_toolchains/releases/download/2027-1.bcr1/wpilib_toolchains-2027-1.bcr1.tar.gz"],
 )
 
 bazel_dep(name = "bzlmodrio-opencv", version = "")
