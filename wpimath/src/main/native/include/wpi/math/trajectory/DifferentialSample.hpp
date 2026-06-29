@@ -23,7 +23,7 @@ namespace wpi::math {
 /**
  * Represents a single sample in a differential drive trajectory.
  */
-class WPILIB_DLLEXPORT DifferentialSample : public TrajectorySample {
+class DifferentialSample : public TrajectorySample {
  public:
   /**
    * The left wheel speed at this sample.
