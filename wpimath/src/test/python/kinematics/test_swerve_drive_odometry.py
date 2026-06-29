@@ -158,7 +158,8 @@ def test_accuracy_facing_trajectory():
             ChassisVelocities(
                 vx=ground_truth_state.forwardVelocity(),
                 vy=0,
-                omega=ground_truth_state.forwardVelocity() * ground_truth_state.curvature,
+                omega=ground_truth_state.forwardVelocity()
+                * ground_truth_state.curvature,
             )
         )
 

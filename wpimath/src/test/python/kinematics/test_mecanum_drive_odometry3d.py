@@ -228,8 +228,10 @@ def test_accuracy_facing_x_axis():
 
         wheel_velocities = kinematics.toWheelVelocities(
             ChassisVelocities(
-                ground_truth_state.forwardVelocity() * ground_truth_state.pose.rotation().cos(),
-                ground_truth_state.forwardVelocity() * ground_truth_state.pose.rotation().sin(),
+                ground_truth_state.forwardVelocity()
+                * ground_truth_state.pose.rotation().cos(),
+                ground_truth_state.forwardVelocity()
+                * ground_truth_state.pose.rotation().sin(),
                 0,
             )
         )
