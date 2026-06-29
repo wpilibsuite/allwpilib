@@ -21,10 +21,11 @@ class json;
 }  // namespace wpi::util
 
 namespace wpi::math {
+
 /**
  * Represents a single sample in a trajectory.
  */
-class TrajectorySample {
+class WPILIB_DLLEXPORT TrajectorySample {
  public:
   /** The timestamp of the sample relative to the trajectory start. */
   wpi::units::second_t timestamp{0.0};
