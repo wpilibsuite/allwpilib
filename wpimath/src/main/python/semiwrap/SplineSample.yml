@@ -7,10 +7,6 @@ classes:
   wpi::math::SplineSample:
     attributes:
       curvature:
-      timestamp:
-      pose:
-      velocity:
-      acceleration:
     methods:
       SplineSample:
         overloads:
