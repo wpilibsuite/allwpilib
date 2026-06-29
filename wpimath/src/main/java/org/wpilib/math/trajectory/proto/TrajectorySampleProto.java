@@ -7,7 +7,7 @@ package org.wpilib.math.trajectory.proto;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisVelocities;
-import org.wpilib.math.proto.Trajectory.ProtobufTrajectorySample;
+import org.wpilib.math.proto.ProtobufTrajectorySample;
 import org.wpilib.math.trajectory.TrajectorySample;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;

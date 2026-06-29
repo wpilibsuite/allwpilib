@@ -6,7 +6,7 @@ package org.wpilib.math.trajectory.proto;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.wpilib.math.proto.Trajectory.ProtobufDifferentialTrajectory;
+import org.wpilib.math.proto.ProtobufDifferentialTrajectory;
 import org.wpilib.math.trajectory.DifferentialSample;
 import org.wpilib.math.trajectory.DifferentialTrajectory;
 import org.wpilib.util.protobuf.Protobuf;
@@ -33,8 +33,7 @@ public class DifferentialTrajectoryProto
   @Override
   public DifferentialTrajectory unpack(ProtobufDifferentialTrajectory msg) {
     List<DifferentialSample> samples = new ArrayList<>();
-    RepeatedMessage<org.wpilib.math.proto.Trajectory.ProtobufDifferentialSample> samplesMsg =
-        msg.getSamples();
+    RepeatedMessage<org.wpilib.math.proto.ProtobufDifferentialSample> samplesMsg = msg.getSamples();
     for (int i = 0; i < samplesMsg.length(); i++) {
       samples.add(DifferentialSample.proto.unpack(samplesMsg.get(i)));
     }
@@ -43,7 +42,7 @@ public class DifferentialTrajectoryProto
 
   @Override
   public void pack(ProtobufDifferentialTrajectory msg, DifferentialTrajectory value) {
-    RepeatedMessage<org.wpilib.math.proto.Trajectory.ProtobufDifferentialSample> samplesMsg =
+    RepeatedMessage<org.wpilib.math.proto.ProtobufDifferentialSample> samplesMsg =
         msg.getMutableSamples();
     for (DifferentialSample sample : value.getSamples()) {
       DifferentialSample.proto.pack(samplesMsg.next(), sample);
