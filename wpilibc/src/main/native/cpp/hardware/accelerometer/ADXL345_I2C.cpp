@@ -97,6 +97,7 @@ double ADXL345_I2C::GetZ() {
   return GetAcceleration(Axis::Z);
 }
 
+// @Common - This is one of the commonly used methods for this class
 double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axis axis) {
   if (axis == Axis::X && m_simX) {
     return m_simX.Get();

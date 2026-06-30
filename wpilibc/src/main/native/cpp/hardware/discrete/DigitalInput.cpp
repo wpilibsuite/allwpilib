@@ -28,6 +28,7 @@ DigitalInput::DigitalInput(int channel) {
   wpi::util::SendableRegistry::Add(this, "DigitalInput", channel);
 }
 
+// @Common - This is one of the commonly used methods for this class
 bool DigitalInput::Get() const {
   int32_t status = 0;
   bool value = HAL_GetDIO(m_handle, &status);

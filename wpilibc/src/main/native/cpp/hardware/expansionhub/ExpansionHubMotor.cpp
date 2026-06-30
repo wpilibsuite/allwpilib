@@ -94,6 +94,7 @@ ExpansionHubMotor::~ExpansionHubMotor() noexcept {
   m_hub.UnreserveMotor(m_channel);
 }
 
+// @Common - This is one of the commonly used methods for this class
 void ExpansionHubMotor::SetThrottle(double throttle) {
   SetEnabled(true);
   m_modePublisher.Set(kPercentageMode);

@@ -54,6 +54,7 @@ ExpansionHubServo::~ExpansionHubServo() noexcept {
   m_hub.UnreserveServo(m_channel);
 }
 
+// @Common - This is one of the commonly used methods for this class
 void ExpansionHubServo::SetPosition(double value) {
   value = std::clamp(value, 0.0, 1.0);
   if (m_reversed) {
@@ -63,6 +64,7 @@ void ExpansionHubServo::SetPosition(double value) {
   SetPulseWidth(rawValue);
 }
 
+// @Common - This is one of the commonly used methods for this class
 void ExpansionHubServo::SetAngle(wpi::units::degree_t angle) {
   angle = std::clamp(angle, m_minServoAngle, m_maxServoAngle);
 

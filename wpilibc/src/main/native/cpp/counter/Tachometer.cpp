@@ -56,6 +56,7 @@ void Tachometer::SetEdgesPerRevolution(int edges) {
   m_edgesPerRevolution = edges;
 }
 
+// @Common - This is one of the commonly used methods for this class
 wpi::units::turns_per_second_t Tachometer::GetRevolutionsPerSecond() const {
   auto period = GetPeriod();
   if (period.value() == 0) {
@@ -69,6 +70,7 @@ wpi::units::turns_per_second_t Tachometer::GetRevolutionsPerSecond() const {
   return wpi::units::turns_per_second_t{rotationHz.value()};
 }
 
+// @Common - This is one of the commonly used methods for this class
 wpi::units::revolutions_per_minute_t Tachometer::GetRevolutionsPerMinute()
     const {
   return wpi::units::revolutions_per_minute_t{GetRevolutionsPerSecond()};

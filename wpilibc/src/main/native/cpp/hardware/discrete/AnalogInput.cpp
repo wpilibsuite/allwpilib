@@ -28,6 +28,7 @@ AnalogInput::AnalogInput(int channel) {
   wpi::util::SendableRegistry::Add(this, "AnalogInput", channel);
 }
 
+// @Common - This is one of the commonly used methods for this class
 int AnalogInput::GetValue() const {
   int32_t status = 0;
   int value = HAL_GetAnalogValue(m_port, &status);

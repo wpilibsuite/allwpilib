@@ -29,6 +29,7 @@ UpDownCounter::UpDownCounter(int channel, EdgeConfiguration configuration)
   wpi::util::SendableRegistry::Add(this, "UpDown Counter", channel);
 }
 
+// @Common - This is one of the commonly used methods for this class
 int UpDownCounter::GetCount() const {
   int32_t status = 0;
   int val = HAL_GetCounter(m_handle, &status);
@@ -36,6 +37,7 @@ int UpDownCounter::GetCount() const {
   return val;
 }
 
+// @Common - This is one of the commonly used methods for this class
 void UpDownCounter::Reset() {
   int32_t status = 0;
   HAL_ResetCounter(m_handle, &status);

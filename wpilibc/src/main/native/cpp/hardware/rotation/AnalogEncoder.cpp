@@ -75,6 +75,7 @@ void AnalogEncoder::Init(double fullRange, double expectedZero) {
                                    m_analogInput->GetChannel());
 }
 
+// @Common - This is one of the commonly used methods for this class
 double AnalogEncoder::Get() const {
   if (m_simPosition) {
     return m_simPosition.Get();

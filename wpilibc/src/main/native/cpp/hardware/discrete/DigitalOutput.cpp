@@ -40,6 +40,7 @@ DigitalOutput::~DigitalOutput() {
   }
 }
 
+// @Common - This is one of the commonly used methods for this class
 void DigitalOutput::Set(bool value) {
   int32_t status = 0;
   HAL_SetDIO(m_handle, value, &status);
@@ -57,6 +58,7 @@ int DigitalOutput::GetChannel() const {
   return m_channel;
 }
 
+// @Common - This is one of the commonly used methods for this class
 void DigitalOutput::Pulse(wpi::units::second_t pulseLength) {
   int32_t status = 0;
   HAL_Pulse(m_handle, pulseLength.value(), &status);

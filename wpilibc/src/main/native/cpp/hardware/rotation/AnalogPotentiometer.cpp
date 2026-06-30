@@ -36,6 +36,7 @@ AnalogPotentiometer::AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
                                    m_analog_input->GetChannel());
 }
 
+// @Common - This is one of the commonly used methods for this class
 double AnalogPotentiometer::Get() const {
   return (m_analog_input->GetVoltage() / RobotController::GetVoltage3V3()) *
              m_fullRange +

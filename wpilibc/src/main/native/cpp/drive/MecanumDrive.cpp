@@ -44,6 +44,7 @@ MecanumDrive::MecanumDrive(std::function<void(double)> frontLeftMotor,
   wpi::util::SendableRegistry::Add(this, "MecanumDrive", instances);
 }
 
+// @Common - This is one of the commonly used methods for this class
 void MecanumDrive::DriveCartesian(double xVelocity, double yVelocity,
                                   double zRotation,
                                   wpi::math::Rotation2d gyroAngle) {
@@ -71,6 +72,7 @@ void MecanumDrive::DriveCartesian(double xVelocity, double yVelocity,
   Feed();
 }
 
+// @Common - This is one of the commonly used methods for this class
 void MecanumDrive::DrivePolar(double magnitude, wpi::math::Rotation2d angle,
                               double zRotation) {
   if (!reported) {
@@ -82,6 +84,7 @@ void MecanumDrive::DrivePolar(double magnitude, wpi::math::Rotation2d angle,
                  0_rad);
 }
 
+// @Common - This is one of the commonly used methods for this class
 void MecanumDrive::StopMotor() {
   m_frontLeftOutput = 0.0;
   m_frontRightOutput = 0.0;

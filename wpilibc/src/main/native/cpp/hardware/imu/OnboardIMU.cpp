@@ -33,10 +33,12 @@ wpi::units::radian_t OnboardIMU::GetYawNoOffset() {
   return wpi::units::radian_t{val};
 }
 
+// @Common - This is one of the commonly used methods for this class
 wpi::units::radian_t OnboardIMU::GetYaw() {
   return GetYawNoOffset() - m_yawOffset;
 }
 
+// @Common - This is one of the commonly used methods for this class
 void OnboardIMU::ResetYaw() {
   m_yawOffset = GetYawNoOffset();
 }

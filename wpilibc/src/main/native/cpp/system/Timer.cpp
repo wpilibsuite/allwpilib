@@ -16,6 +16,7 @@ void Wait(wpi::units::second_t seconds) {
   std::this_thread::sleep_for(std::chrono::duration<double>(seconds.value()));
 }
 
+// @Common - This is one of the commonly used methods for this class
 wpi::units::second_t GetSystemTime() {
   using std::chrono::duration;
   using std::chrono::duration_cast;
@@ -34,6 +35,7 @@ Timer::Timer() {
   Reset();
 }
 
+// @Common - This is one of the commonly used methods for this class
 wpi::units::second_t Timer::Get() const {
   if (m_running) {
     return (GetTimestamp() - m_startTime) + m_accumulatedTime;
@@ -42,11 +44,13 @@ wpi::units::second_t Timer::Get() const {
   }
 }
 
+// @Common - This is one of the commonly used methods for this class
 void Timer::Reset() {
   m_accumulatedTime = 0_s;
   m_startTime = GetTimestamp();
 }
 
+// @Common - This is one of the commonly used methods for this class
 void Timer::Start() {
   if (!m_running) {
     m_startTime = GetTimestamp();
@@ -54,6 +58,7 @@ void Timer::Start() {
   }
 }
 
+// @Common - This is one of the commonly used methods for this class
 void Timer::Restart() {
   if (m_running) {
     Stop();
@@ -62,6 +67,7 @@ void Timer::Restart() {
   Start();
 }
 
+// @Common - This is one of the commonly used methods for this class
 void Timer::Stop() {
   if (m_running) {
     m_accumulatedTime = Get();

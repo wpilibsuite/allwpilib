@@ -54,6 +54,7 @@ ExpansionHubCRServo::~ExpansionHubCRServo() noexcept {
   m_hub.UnreserveServo(m_channel);
 }
 
+// @Common - This is one of the commonly used methods for this class
 void ExpansionHubCRServo::SetThrottle(double value) {
   value = std::clamp(value, -1.0, 1.0);
   value = (value + 1.0) / 2.0;

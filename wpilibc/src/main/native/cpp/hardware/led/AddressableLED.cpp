@@ -42,7 +42,6 @@ void AddressableLED::SetLength(int length) {
 
 static_assert(sizeof(AddressableLED::LEDData) == sizeof(HAL_AddressableLEDData),
               "LED Structs MUST be the same size");
-
 void AddressableLED::SetData(std::span<const LEDData> ledData) {
   int32_t status = 0;
   HAL_SetAddressableLEDData(
@@ -52,6 +51,7 @@ void AddressableLED::SetData(std::span<const LEDData> ledData) {
   WPILIB_CheckErrorStatus(status, "Port {}", m_channel);
 }
 
+// @Common - This is one of the commonly used methods for this class
 void AddressableLED::SetData(std::initializer_list<LEDData> ledData) {
   SetData(std::span{ledData.begin(), ledData.end()});
 }

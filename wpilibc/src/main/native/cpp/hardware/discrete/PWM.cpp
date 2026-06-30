@@ -36,6 +36,7 @@ PWM::~PWM() {
   }
 }
 
+// @Common - This is one of the commonly used methods for this class
 void PWM::SetPulseTime(wpi::units::microsecond_t time) {
   int32_t status = 0;
   HAL_SetPWMPulseTimeMicroseconds(m_handle, time.value(), &status);
