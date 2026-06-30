@@ -18,9 +18,11 @@
 #pragma once
 
 #include <concepts>
+#include <format>
 #include <iterator>
 #include <limits>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -450,6 +452,28 @@ constexpr std::string_view slice(std::string_view str,
   start = (std::min)(start, length);
   end = (std::min)((std::max)(start, end), length);
   return {str.data() + start, end - start};
+}
+
+/**
+ * Joins the values in @p container with @p delimiter separating each value.
+ *
+ * @param container The container of values to join.
+ * @param delimiter The delimiter to separate the values with.
+ * @returns A string with the joined values.
+ */
+template <typename T>
+constexpr std::string join(T container, std::string_view delimiter) {
+  std::string ret;
+  bool isFirst = true;
+  for (auto&& value : container) {
+    if (isFirst) {
+      isFirst = false;
+      ret += std::format("{}", value);
+    } else {
+      ret += std::format("{}{}", delimiter, value);
+    }
+  }
+  return ret;
 }
 
 /**

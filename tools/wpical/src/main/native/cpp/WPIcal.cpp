@@ -11,7 +11,6 @@
 #include <vector>
 
 #include <GLFW/glfw3.h>
-#include <fmt/ranges.h>
 #include <imgui.h>
 
 #include "cameracalibration.hpp"
@@ -26,6 +25,7 @@
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/gui/wpigui_openurl.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/raw_ostream.hpp"
@@ -426,7 +426,7 @@ void CombineCalibrations() {
         }
         auto text = std::format("{} tags: {}",
                                 std::filesystem::path(file).filename().string(),
-                                fmt::join(tagIds, ", "));
+                                wpi::util::join(tagIds, ", "));
         ImGui::Selectable(text.c_str(), false,
                           ImGuiSelectableFlags_DontClosePopups);
         if (ImGui::BeginDragDropSource()) {

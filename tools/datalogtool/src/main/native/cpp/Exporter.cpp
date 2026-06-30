@@ -4,19 +4,21 @@
 
 #include "Exporter.hpp"
 
+#include <stdint.h>
+
 #include <atomic>
-#include <chrono>
+#include <format>
 #include <functional>
 #include <future>
 #include <map>
 #include <memory>
+#include <ranges>
 #include <set>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
-#include <fmt/ranges.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
@@ -186,7 +188,7 @@ static std::unique_ptr<InputFile> LoadDataLog(std::string_view filename) {
   if (!fileBuffer) {
     return std::make_unique<InputFile>(
         filename,
-        fmt::format("Could not open file: {}", fileBuffer.error().message()));
+        std::format("Could not open file: {}", fileBuffer.error().message()));
   }
 
   wpi::log::DataLogReader reader{std::move(*fileBuffer)};
@@ -328,7 +330,7 @@ static bool EmitEntryTree(std::vector<EntryTreeNode>& tree) {
 
     if (!node.children.empty()) {
       ImGui::TableNextColumn();
-      auto label = fmt::format("##check_{}", node.name);
+      auto label = std::format("##check_{}", node.name);
       if (node.selected == -1) {
         ImGui::PushItemFlag(ImGuiItemFlags_MixedValue, true);
         bool b = false;
@@ -495,25 +497,25 @@ static void ValueToCsv(wpi::util::raw_ostream& os, const Entry& entry,
   } else if (entry.type == "boolean[]") {
     std::vector<int> val;
     if (record.GetBooleanArray(&val)) {
-      wpi::util::print(os, "{}", fmt::join(val, ";"));
+      wpi::util::print(os, "{}", wpi::util::join(val, ";"));
       return;
     }
   } else if (entry.type == "double[]") {
     std::vector<double> val;
     if (record.GetDoubleArray(&val)) {
-      wpi::util::print(os, "{}", fmt::join(val, ";"));
+      wpi::util::print(os, "{}", wpi::util::join(val, ";"));
       return;
     }
   } else if (entry.type == "float[]") {
     std::vector<float> val;
     if (record.GetFloatArray(&val)) {
-      wpi::util::print(os, "{}", fmt::join(val, ";"));
+      wpi::util::print(os, "{}", wpi::util::join(val, ";"));
       return;
     }
   } else if (entry.type == "int64[]") {
     std::vector<int64_t> val;
     if (record.GetIntegerArray(&val)) {
-      wpi::util::print(os, "{}", fmt::join(val, ";"));
+      wpi::util::print(os, "{}", wpi::util::join(val, ";"));
       return;
     }
   } else if (entry.type == "string[]") {
@@ -608,7 +610,7 @@ static void ExportCsv(std::string_view outputFolder, int style) {
       if (ec) {
         std::scoped_lock lock{gExportMutex};
         gExportErrors.emplace_back(
-            fmt::format("{}: {}", f.first, ec.message()));
+            std::format("{}: {}", f.first, ec.message()));
         ++gExportCount;
         continue;
       }

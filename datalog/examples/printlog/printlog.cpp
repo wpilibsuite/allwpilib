@@ -3,15 +3,14 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <chrono>
+#include <format>
 #include <utility>
 #include <vector>
-
-#include <fmt/chrono.h>
-#include <fmt/ranges.h>
 
 #include "wpi/datalog/DataLogReader.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/print.hpp"
 
 int main(int argc, const char** argv) {
@@ -131,35 +130,35 @@ int main(int argc, const char** argv) {
       } else if (entry->second.type == "boolean[]") {
         std::vector<int> val;
         if (record.GetBooleanArray(&val)) {
-          wpi::util::print("  {}\n", fmt::join(val, ", "));
+          wpi::util::print("  {}\n", wpi::util::join(val, ", "));
         } else {
           wpi::util::print("  invalid\n");
         }
       } else if (entry->second.type == "double[]") {
         std::vector<double> val;
         if (record.GetDoubleArray(&val)) {
-          wpi::util::print("  {}\n", fmt::join(val, ", "));
+          wpi::util::print("  {}\n", wpi::util::join(val, ", "));
         } else {
           wpi::util::print("  invalid\n");
         }
       } else if (entry->second.type == "float[]") {
         std::vector<float> val;
         if (record.GetFloatArray(&val)) {
-          wpi::util::print("  {}\n", fmt::join(val, ", "));
+          wpi::util::print("  {}\n", wpi::util::join(val, ", "));
         } else {
           wpi::util::print("  invalid\n");
         }
       } else if (entry->second.type == "int64[]") {
         std::vector<int64_t> val;
         if (record.GetIntegerArray(&val)) {
-          wpi::util::print("  {}\n", fmt::join(val, ", "));
+          wpi::util::print("  {}\n", wpi::util::join(val, ", "));
         } else {
           wpi::util::print("  invalid\n");
         }
       } else if (entry->second.type == "string[]") {
         std::vector<std::string_view> val;
         if (record.GetStringArray(&val)) {
-          wpi::util::print("  {}\n", fmt::join(val, ", "));
+          wpi::util::print("  {}\n", wpi::util::join(val, ", "));
         } else {
           wpi::util::print("  invalid\n");
         }
