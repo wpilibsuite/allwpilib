@@ -6,9 +6,8 @@
 
 #include <cmath>
 #include <cstdio>
+#include <format>
 #include <thread>
-
-#include <fmt/format.h>
 
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
@@ -107,7 +106,7 @@ void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
       (microsecondPulseTime != 0xFFFF && microsecondPulseTime >= 4096)) {
     *status = MakeError(
         HAL_PARAMETER_OUT_OF_RANGE,
-        fmt::format("Pulse time {} out of range. Expect [0-4096) or 0xFFFF",
+        std::format("Pulse time {} out of range. Expect [0-4096) or 0xFFFF",
                     microsecondPulseTime));
     return;
   }

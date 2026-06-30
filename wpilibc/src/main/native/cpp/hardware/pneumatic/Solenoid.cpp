@@ -29,7 +29,7 @@ Solenoid::Solenoid(int busId, int module, PneumaticsModuleType moduleType,
                            m_channel);
   }
 
-  m_module->ReportUsage(fmt::format("Solenoid[{}]", m_channel), "Solenoid");
+  m_module->ReportUsage(std::format("Solenoid[{}]", m_channel), "Solenoid");
   wpi::util::SendableRegistry::Add(this, "Solenoid",
                                    m_module->GetModuleNumber(), m_channel);
 }

@@ -47,7 +47,7 @@ std::pair<std::string, int> ServerImpl::AddClient(std::string_view name,
   size_t index = GetEmptyClientSlot();
 
   // ensure name is unique by suffixing index
-  std::string dedupName = fmt::format("{}@{}", name, index);
+  std::string dedupName = std::format("{}@{}", name, index);
 
   auto& clientData = m_clients[index];
   clientData = std::make_unique<ServerClient4>(dedupName, connInfo, local, wire,
@@ -125,7 +125,7 @@ void ServerImpl::UpdateMetaClients(const std::vector<ConnectionInfo>& conns) {
     mpack_write_str(&w, "id");
     mpack_write_str(&w, conn.remote_id);
     mpack_write_str(&w, "conn");
-    mpack_write_str(&w, fmt::format("{}:{}", conn.remote_ip, conn.remote_port));
+    mpack_write_str(&w, std::format("{}:{}", conn.remote_ip, conn.remote_port));
     mpack_write_str(&w, "ver");
     mpack_write_u16(&w, conn.protocol_version);
     mpack_finish_map(&w);

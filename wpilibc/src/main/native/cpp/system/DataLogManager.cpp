@@ -10,8 +10,6 @@
 #include <string>
 #include <vector>
 
-#include <fmt/chrono.h>
-
 #include "wpi/datalog/DataLog.hpp"
 #include "wpi/datalog/DataLogBackgroundWriter.hpp"
 #include "wpi/datalog/FileLogger.hpp"
@@ -229,7 +227,7 @@ void Thread::Main() {
       if (dsAttachCount > 50) {  // 1 second
         if (RobotController::IsSystemTimeValid()) {
           auto now = std::chrono::system_clock::now();
-          m_log.SetFilename(fmt::format("WPILIB_{:%Y%m%d_%H%M%S}.wpilog", now));
+          m_log.SetFilename(std::format("WPILIB_{:%Y%m%d_%H%M%S}.wpilog", now));
           dsRenamed = true;
         } else {
           dsAttachCount = 0;  // wait a bit and try again
@@ -267,7 +265,7 @@ void Thread::Main() {
           }
           auto now = std::chrono::system_clock::now();
           m_log.SetFilename(
-              fmt::format("WPILIB_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog", now,
+              std::format("WPILIB_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog", now,
                           MatchState::GetEventName(), matchTypeChar,
                           MatchState::GetMatchNumber()));
           fmsRenamed = true;

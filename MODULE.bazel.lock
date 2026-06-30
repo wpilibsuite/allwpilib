@@ -210,7 +210,7 @@
   "moduleExtensions": {
     "//shared/bazel/rules:publishing_rule.bzl%publishing_extension": {
       "general": {
-        "bzlTransitiveDigest": "mZTsxrMnPAeZx/Xsbf0C5UtU6z5bhRGc5StbboaUJP8=",
+        "bzlTransitiveDigest": "DgZKdrATsFstxG3fjcn5zJCvDthlO4s4NOuxbIFtcpk=",
         "usagesDigest": "lOBqgwomZ3hAEuj2fJjZeGl8JfDHBJeEZDJFW66DEi4=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},

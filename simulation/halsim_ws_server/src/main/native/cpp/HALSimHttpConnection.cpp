@@ -55,7 +55,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
 
     auto j = wpi::util::json::parse(msg);
     if (!j) {
-      m_websocket->Fail(400, fmt::format("JSON parse failed: {}", j.error()));
+      m_websocket->Fail(400, std::format("JSON parse failed: {}", j.error()));
       return;
     }
     m_server->OnNetValueChanged(*j);
@@ -180,7 +180,7 @@ void HALSimHttpConnection::ProcessRequest() {
     }
 
     if (!fs::exists(nativePath) || fs::is_directory(nativePath)) {
-      MySendError(404, fmt::format("Resource '{}' not found", path));
+      MySendError(404, std::format("Resource '{}' not found", path));
     } else {
       auto contentType = wpi::net::MimeTypeFromPath(nativePath.string());
       SendFileResponse(200, "OK", contentType, nativePath.string());

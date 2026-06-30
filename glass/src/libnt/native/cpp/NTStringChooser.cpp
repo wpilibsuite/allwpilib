@@ -4,9 +4,8 @@
 
 #include "wpi/glass/networktables/NTStringChooser.hpp"
 
+#include <format>
 #include <utility>
-
-#include <fmt/format.h>
 
 #include "wpi/util/json.hpp"
 
@@ -19,15 +18,15 @@ NTStringChooserModel::NTStringChooserModel(wpi::nt::NetworkTableInstance inst,
                                            std::string_view path)
     : m_inst{inst},
       m_default{
-          m_inst.GetStringTopic(fmt::format("{}/default", path)).Subscribe("")},
-      m_selected{m_inst.GetStringTopic(fmt::format("{}/selected", path))
+          m_inst.GetStringTopic(std::format("{}/default", path)).Subscribe("")},
+      m_selected{m_inst.GetStringTopic(std::format("{}/selected", path))
                      .Subscribe("")},
-      m_selectedPub{m_inst.GetStringTopic(fmt::format("{}/selected", path))
+      m_selectedPub{m_inst.GetStringTopic(std::format("{}/selected", path))
                         .PublishEx(wpi::nt::StringTopic::TYPE_STRING,
                                    wpi::util::json::object("retained", true))},
       m_active{
-          m_inst.GetStringTopic(fmt::format("{}/active", path)).Subscribe("")},
-      m_options{m_inst.GetStringArrayTopic(fmt::format("{}/options", path))
+          m_inst.GetStringTopic(std::format("{}/active", path)).Subscribe("")},
+      m_options{m_inst.GetStringArrayTopic(std::format("{}/options", path))
                     .Subscribe({})} {}
 
 void NTStringChooserModel::SetSelected(std::string_view val) {

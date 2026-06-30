@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include <fmt/format.h>
+#include <format>
 #include <gtest/gtest.h>
 
 #include "wpi/math/fmt/Eigen.hpp"
@@ -16,17 +16,17 @@ TEST(FormatterTest, Eigen) {
       "  0.000000  1.000000\n"
       "  2.000000  3.000000\n"
       "  4.000000  5.000000",
-      fmt::format("{:f}", A));
+      std::format("{:f}", A));
 
   Eigen::MatrixXd B{{0.0, 1.0}, {2.0, 3.0}, {4.0, 5.0}};
   EXPECT_EQ(
       "  0.000000  1.000000\n"
       "  2.000000  3.000000\n"
       "  4.000000  5.000000",
-      fmt::format("{:f}", B));
+      std::format("{:f}", B));
 
   Eigen::Array2d C{0.0, 1.0};
-  EXPECT_EQ("  0.000000\n  1.000000", fmt::format("{:f}", C));
+  EXPECT_EQ("  0.000000\n  1.000000", std::format("{:f}", C));
 
   Eigen::SparseMatrix<double> D{3, 2};
   std::vector<Eigen::Triplet<double>> triplets;
@@ -40,9 +40,9 @@ TEST(FormatterTest, Eigen) {
       "  0.000000  1.000000\n"
       "  2.000000  3.000000\n"
       "  4.000000  5.000000",
-      fmt::format("{:f}", D));
+      std::format("{:f}", D));
 }
 
 TEST(FormatterTest, Units) {
-  EXPECT_EQ("4 mps", fmt::format("{}", 4_mps));
+  EXPECT_EQ("4 mps", std::format("{}", 4_mps));
 }

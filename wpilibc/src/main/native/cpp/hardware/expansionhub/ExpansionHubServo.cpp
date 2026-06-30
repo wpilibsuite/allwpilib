@@ -19,7 +19,7 @@ ExpansionHubServo::ExpansionHubServo(int usbId, int channel)
                            channel);
   }
 
-  m_hub.ReportUsage(fmt::format("ExHubServo[{}]", channel), "ExHubServo");
+  m_hub.ReportUsage(std::format("ExHubServo[{}]", channel), "ExHubServo");
 
   auto systemServer = SystemServer::GetSystemServer();
 
@@ -31,7 +31,7 @@ ExpansionHubServo::ExpansionHubServo(int usbId, int channel)
   m_pulseWidthPublisher =
       systemServer
           .GetIntegerTopic(
-              fmt::format("/rhsp/{}/servo{}/pulseWidth", usbId, channel))
+              std::format("/rhsp/{}/servo{}/pulseWidth", usbId, channel))
           .Publish(options);
 
   m_pulseWidthPublisher.Set(1500);
@@ -39,13 +39,13 @@ ExpansionHubServo::ExpansionHubServo(int usbId, int channel)
   m_framePeriodPublisher =
       systemServer
           .GetIntegerTopic(
-              fmt::format("/rhsp/{}/servo{}/framePeriod", usbId, channel))
+              std::format("/rhsp/{}/servo{}/framePeriod", usbId, channel))
           .Publish(options);
 
   m_framePeriodPublisher.Set(20000);
 
   m_enabledPublisher = systemServer
-                           .GetBooleanTopic(fmt::format(
+                           .GetBooleanTopic(std::format(
                                "/rhsp/{}/servo{}/enabled", usbId, channel))
                            .Publish(options);
 }

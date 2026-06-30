@@ -12,7 +12,7 @@
 #include <string>
 #include <utility>
 
-#include <fmt/format.h>
+#include <format>
 
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/HttpServerConnection.hpp"
@@ -226,7 +226,7 @@ void MyHttpConnection::SendFileResponse(int code, std::string_view codeText,
 }
 
 void MyHttpConnection::ProcessRequest() {
-  // fmt::print(stderr, "HTTP request: '{}'\n", m_request.GetUrl());
+  // wpi::util::print(stderr, "HTTP request: '{}'\n", m_request.GetUrl());
   wpi::net::UrlParser url{m_request.GetUrl(),
                           m_request.GetMethod() == wpi::net::HTTP_CONNECT};
   if (!url.IsValid()) {
@@ -239,7 +239,7 @@ void MyHttpConnection::ProcessRequest() {
   if (url.HasPath()) {
     path = url.GetPath();
   }
-  // fmt::print(stderr, "path: \"{}\"\n", path);
+  // wpi::util::print(stderr, "path: \"{}\"\n", path);
 
   wpi::util::SmallString<128> pathBuf;
   bool error;
@@ -253,20 +253,20 @@ void MyHttpConnection::ProcessRequest() {
   if (url.HasQuery()) {
     query = url.GetQuery();
   }
-  // fmt::print(stderr, "query: \"{}\"\n", query);
+  // wpi::util::print(stderr, "query: \"{}\"\n", query);
   HttpQueryMap qmap{query};
 
   const bool isGET = m_request.GetMethod() == wpi::net::HTTP_GET;
   if (isGET && wpi::util::starts_with(path, '/') &&
       !wpi::util::contains(path, "..")) {
-    fs::path fullpath = fmt::format("{}{}", m_path, path);
+    fs::path fullpath = std::format("{}{}", m_path, path);
     std::error_code ec;
     bool isdir = fs::is_directory(fullpath, ec);
     if (isdir) {
       if (!wpi::util::ends_with(path, '/')) {
         // redirect to trailing / location
         SendResponse(301, "Moved Permanently", "text/plain", "",
-                     fmt::format("Location: {}/\r\n\r\n", path));
+                     std::format("Location: {}/\r\n\r\n", path));
         return;
       }
       // generate directory listing
@@ -302,20 +302,20 @@ void MyHttpConnection::ProcessRequest() {
           wpi::util::SmallString<128> nameUriBuf, nameHtmlBuf;
           if (subdir) {
             dirs.emplace(
-                name, fmt::format(
+                name, std::format(
                           "<tr><td><a href=\"{}/\">{}/</a></td><td></td></tr>",
                           EscapeURI(name, nameUriBuf),
                           EscapeHTML(name, nameHtmlBuf)));
           } else {
             files.emplace(
-                name, fmt::format(
+                name, std::format(
                           "<tr><td><a href=\"{}\">{}</a></td><td>{}</td></tr>",
                           EscapeURI(name, nameUriBuf),
                           EscapeHTML(name, nameHtmlBuf), entry.file_size(ec)));
           }
         }
 
-        std::string html = fmt::format(
+        std::string html = std::format(
             "<html><head><title>{}</title></head><body>"
             "<table><tr><th>Name</th><th>Size</th></tr>\n",
             path);

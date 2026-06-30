@@ -9,7 +9,7 @@
 #include <string>
 #include <string_view>
 
-#include <fmt/format.h>
+#include <format>
 
 #include "wpi/util/Color.hpp"
 #include "wpi/util/StringExtras.hpp"
@@ -64,7 +64,7 @@ class Color8Bit {
         !wpi::util::isHexDigit(hexString[5]) ||
         !wpi::util::isHexDigit(hexString[6])) {
       throw std::invalid_argument(
-          fmt::format("Invalid hex string for Color \"{}\"", hexString));
+          std::format("Invalid hex string for Color \"{}\"", hexString));
     }
 
     red = wpi::util::hexDigitValue(hexString[1]) * 16 +
@@ -97,7 +97,7 @@ class Color8Bit {
         !wpi::util::isHexDigit(hexString[5]) ||
         !wpi::util::isHexDigit(hexString[6])) {
       throw std::invalid_argument(
-          fmt::format("Invalid hex string for Color \"{}\"", hexString));
+          std::format("Invalid hex string for Color \"{}\"", hexString));
     }
 
     int r = wpi::util::hexDigitValue(hexString[0]) * 16 +

@@ -219,7 +219,7 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::util::raw_ostream& os,
     wpi::util::SmallString<64> paramBuf;
     std::string_view param = wpi::net::UnescapeURI(rawParam, paramBuf, &error);
     if (error) {
-      auto estr = fmt::format("could not unescape parameter \"{}\"", rawParam);
+      auto estr = std::format("could not unescape parameter \"{}\"", rawParam);
       SendError(os, 500, estr);
       SDEBUG("{}", estr);
       return false;
@@ -229,7 +229,7 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::util::raw_ostream& os,
     wpi::util::SmallString<64> valueBuf;
     std::string_view value = wpi::net::UnescapeURI(rawValue, valueBuf, &error);
     if (error) {
-      auto estr = fmt::format("could not unescape value \"{}\"", rawValue);
+      auto estr = std::format("could not unescape value \"{}\"", rawValue);
       SendError(os, 500, estr);
       SDEBUG("{}", estr);
       return false;
@@ -609,7 +609,7 @@ MjpegServerImpl::MjpegServerImpl(
       m_acceptor{std::move(acceptor)} {
   m_active = true;
 
-  SetDescription(fmt::format("HTTP Server on port {}", port));
+  SetDescription(std::format("HTTP Server on port {}", port));
 
   // Create properties
   m_widthProp = CreateProperty("width", [] {

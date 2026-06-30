@@ -47,7 +47,7 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, int range, int deviceAddress)
   SetRange(range);
 
   HAL_ReportUsage(
-      fmt::format("I2C[{}][{}]", static_cast<int>(port), deviceAddress),
+      std::format("I2C[{}][{}]", static_cast<int>(port), deviceAddress),
       "ADXL345");
 
   wpi::util::SendableRegistry::Add(this, "ADXL345_I2C", static_cast<int>(port));

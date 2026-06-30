@@ -79,11 +79,11 @@ class NTMechanism2DModel : public Mechanism2DModel {
     NTMechanismObjectModel(wpi::nt::NetworkTableInstance inst,
                            std::string_view path, std::string_view name)
         : m_group{inst, path, name},
-          m_typeTopic{inst.GetTopic(fmt::format("{}/.type", path))},
-          m_colorTopic{inst.GetTopic(fmt::format("{}/color", path))},
-          m_weightTopic{inst.GetTopic(fmt::format("{}/weight", path))},
-          m_angleTopic{inst.GetTopic(fmt::format("{}/angle", path))},
-          m_lengthTopic{inst.GetTopic(fmt::format("{}/length", path))} {}
+          m_typeTopic{inst.GetTopic(std::format("{}/.type", path))},
+          m_colorTopic{inst.GetTopic(std::format("{}/color", path))},
+          m_weightTopic{inst.GetTopic(std::format("{}/weight", path))},
+          m_angleTopic{inst.GetTopic(std::format("{}/angle", path))},
+          m_lengthTopic{inst.GetTopic(std::format("{}/length", path))} {}
 
     const char* GetName() const final { return m_group.GetName(); }
     void ForEachObject(
@@ -120,8 +120,8 @@ class NTMechanism2DModel : public Mechanism2DModel {
     RootModel(wpi::nt::NetworkTableInstance inst, std::string_view path,
               std::string_view name)
         : m_group{inst, path, name},
-          m_xTopic{inst.GetTopic(fmt::format("{}/x", path))},
-          m_yTopic{inst.GetTopic(fmt::format("{}/y", path))} {}
+          m_xTopic{inst.GetTopic(std::format("{}/x", path))},
+          m_yTopic{inst.GetTopic(std::format("{}/y", path))} {}
 
     const char* GetName() const final { return m_group.GetName(); }
     void ForEachObject(

@@ -4,12 +4,11 @@
 
 #include "ServerStorage.hpp"
 
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "Log.hpp"
 #include "server/MessagePackWriter.hpp"
@@ -49,8 +48,8 @@ ServerTopic* ServerStorage::CreateTopic(ServerClient* client,
 
     // create meta topics; don't create if topic is itself a meta topic
     if (!special) {
-      topic->metaPub = CreateMetaTopic(fmt::format("$pub${}", name));
-      topic->metaSub = CreateMetaTopic(fmt::format("$sub${}", name));
+      topic->metaPub = CreateMetaTopic(std::format("$pub${}", name));
+      topic->metaSub = CreateMetaTopic(std::format("$sub${}", name));
       UpdateMetaTopicPub(topic);
       UpdateMetaTopicSub(topic);
     }
@@ -366,11 +365,11 @@ static std::string* ObjGetString(wpi::util::json& obj, std::string_view key,
                                  std::string* error) {
   auto value = obj.lookup(key);
   if (!value) {
-    *error = fmt::format("no {} key", key);
+    *error = std::format("no {} key", key);
     return nullptr;
   }
   if (!value->is_string()) {
-    *error = fmt::format("{} must be a string", key);
+    *error = std::format("{} must be a string", key);
     return nullptr;
   }
   return &value->get_string();
@@ -383,7 +382,7 @@ std::string ServerStorage::LoadPersistent(std::string_view in) {
 
   auto j = wpi::util::json::parse(in);
   if (!j) {
-    return fmt::format("could not decode JSON: {}", j.error());
+    return std::format("could not decode JSON: {}", j.error());
   }
 
   if (!j->is_array()) {
@@ -576,7 +575,7 @@ std::string ServerStorage::LoadPersistent(std::string_view in) {
       continue;
     }
   err:
-    allerrors += fmt::format("{}: {}\n", i, error);
+    allerrors += std::format("{}: {}\n", i, error);
   }
 
   m_persistentChanged = persistentChanged;  // restore flag

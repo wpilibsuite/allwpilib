@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cstring>
+#include <format>
 #include <map>
 #include <memory>
 #include <string>
@@ -14,7 +15,6 @@
 #include <vector>
 
 #include <GLFW/glfw3.h>
-#include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 
@@ -364,7 +364,7 @@ JoystickModel::JoystickModel(int index) : m_index{index} {
   axisCount = static_cast<uint8_t>(16 - std::countl_zero(halAxes.available));
   for (int i = 0; i < axisCount; ++i) {
     axes[i] = std::make_unique<wpi::glass::DoubleSource>(
-        fmt::format("Joystick[{}] Axis[{}]", index, i));
+        std::format("Joystick[{}] Axis[{}]", index, i));
   }
 
   HAL_JoystickButtons halButtons;
@@ -373,7 +373,7 @@ JoystickModel::JoystickModel(int index) : m_index{index} {
       static_cast<uint8_t>(64 - std::countl_zero(halButtons.available));
   for (int i = 0; i < buttonCount; ++i) {
     buttons[i] = new wpi::glass::BooleanSource(
-        fmt::format("Joystick[{}] Button[{}]", index, i));
+        std::format("Joystick[{}] Button[{}]", index, i));
   }
   for (int i = buttonCount; i < 64; ++i) {
     buttons[i] = nullptr;
@@ -384,7 +384,7 @@ JoystickModel::JoystickModel(int index) : m_index{index} {
   povCount = static_cast<uint8_t>(8 - std::countl_zero(halPOVs.available));
   for (int i = 0; i < povCount; ++i) {
     povs[i] = std::make_unique<wpi::glass::IntegerSource>(
-        fmt::format("Joystick[{}] POV [{}]", index, i));
+        std::format("Joystick[{}] POV [{}]", index, i));
   }
 
   m_callback =

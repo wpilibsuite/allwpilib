@@ -109,26 +109,26 @@ class ExtendedKalmanFilter {
       } else if (P.error() == DAREError::QNotSymmetric ||
                  P.error() == DAREError::QNotPositiveSemidefinite) {
         std::string msg =
-            fmt::format("{}\n\nQ =\n{}\n", to_string(P.error()), discQ);
+            std::format("{}\n\nQ =\n{}\n", to_string(P.error()), discQ);
 
         wpi::math::MathSharedStore::ReportError(msg);
         throw std::invalid_argument(msg);
       } else if (P.error() == DAREError::RNotSymmetric ||
                  P.error() == DAREError::RNotPositiveDefinite) {
         std::string msg =
-            fmt::format("{}\n\nR =\n{}\n", to_string(P.error()), discR);
+            std::format("{}\n\nR =\n{}\n", to_string(P.error()), discR);
 
         wpi::math::MathSharedStore::ReportError(msg);
         throw std::invalid_argument(msg);
       } else if (P.error() == DAREError::ABNotStabilizable) {
-        std::string msg = fmt::format(
+        std::string msg = std::format(
             "The (A, C) pair is not detectable.\n\nA =\n{}\nC =\n{}\n",
             to_string(P.error()), discA, C);
 
         wpi::math::MathSharedStore::ReportError(msg);
         throw std::invalid_argument(msg);
       } else if (P.error() == DAREError::ACNotDetectable) {
-        std::string msg = fmt::format("{}\n\nA =\n{}\nQ =\n{}\n",
+        std::string msg = std::format("{}\n\nA =\n{}\nQ =\n{}\n",
                                       to_string(P.error()), discA, discQ);
 
         wpi::math::MathSharedStore::ReportError(msg);
@@ -194,26 +194,26 @@ class ExtendedKalmanFilter {
       } else if (P.error() == DAREError::QNotSymmetric ||
                  P.error() == DAREError::QNotPositiveSemidefinite) {
         std::string msg =
-            fmt::format("{}\n\nQ =\n{}\n", to_string(P.error()), discQ);
+            std::format("{}\n\nQ =\n{}\n", to_string(P.error()), discQ);
 
         wpi::math::MathSharedStore::ReportError(msg);
         throw std::invalid_argument(msg);
       } else if (P.error() == DAREError::RNotSymmetric ||
                  P.error() == DAREError::RNotPositiveDefinite) {
         std::string msg =
-            fmt::format("{}\n\nR =\n{}\n", to_string(P.error()), discR);
+            std::format("{}\n\nR =\n{}\n", to_string(P.error()), discR);
 
         wpi::math::MathSharedStore::ReportError(msg);
         throw std::invalid_argument(msg);
       } else if (P.error() == DAREError::ABNotStabilizable) {
-        std::string msg = fmt::format(
+        std::string msg = std::format(
             "The (A, C) pair is not detectable.\n\nA =\n{}\nC =\n{}\n",
             to_string(P.error()), discA, C);
 
         wpi::math::MathSharedStore::ReportError(msg);
         throw std::invalid_argument(msg);
       } else if (P.error() == DAREError::ACNotDetectable) {
-        std::string msg = fmt::format("{}\n\nA =\n{}\nQ =\n{}\n",
+        std::string msg = std::format("{}\n\nA =\n{}\nQ =\n{}\n",
                                       to_string(P.error()), discA, discQ);
 
         wpi::math::MathSharedStore::ReportError(msg);

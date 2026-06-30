@@ -5,11 +5,11 @@
 #include "wpi/simulation/AlertSim.hpp"
 
 #include <algorithm>
+#include <format>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <gtest/gtest.h>
 
 #include "wpi/driverstation/Alert.hpp"
@@ -26,7 +26,7 @@ class AlertSimTest : public ::testing::Test {
   std::string GetGroupName() {
     const ::testing::TestInfo* testInfo =
         ::testing::UnitTest::GetInstance()->current_test_info();
-    return fmt::format("{}_{}", testInfo->test_suite_name(), testInfo->name());
+    return std::format("{}_{}", testInfo->test_suite_name(), testInfo->name());
   }
 
   template <typename... Args>

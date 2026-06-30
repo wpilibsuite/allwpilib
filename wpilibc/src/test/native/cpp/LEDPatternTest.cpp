@@ -222,7 +222,7 @@ TEST(LEDPatternTest, ScrollRelativeForward) {
 
     for (size_t led = 0; led < buffer.size(); led++) {
       SCOPED_TRACE(
-          fmt::format("LED {} of 256, run {} of 500", led + 1, time + 1));
+          std::format("LED {} of 256, run {} of 500", led + 1, time + 1));
       // Base: [(0, 0, 0) (1, 1, 1) (2, 2, 2) (3, 3, 3) (4, 4, 4) ... (255, 255,
       // 255)] Value for every channel should DECREASE by 1 in each timestep,
       // wrapping around 0 and 255
@@ -266,7 +266,7 @@ TEST(LEDPatternTest, ScrollRelativeBackward) {
 
     for (size_t led = 0; led < buffer.size(); led++) {
       SCOPED_TRACE(
-          fmt::format("LED {} of 256, run {} of 500", led + 1, time + 1));
+          std::format("LED {} of 256, run {} of 500", led + 1, time + 1));
       // Base: [(0, 0, 0) (1, 1, 1) (2, 2, 2) (3, 3, 3) (4, 4, 4) ... (255, 255,
       // 255)] Value for every channel should DECREASE by 1 in each timestep,
       // wrapping around 0 and 255
@@ -310,7 +310,7 @@ TEST(LEDPatternTest, ScrollAbsoluteForward) {
 
     for (size_t led = 0; led < buffer.size(); led++) {
       SCOPED_TRACE(
-          fmt::format("LED {} of 256, run {} of 500", led + 1, time + 1));
+          std::format("LED {} of 256, run {} of 500", led + 1, time + 1));
       // Base: [(0, 0, 0) (1, 1, 1) (2, 2, 2) (3, 3, 3) (4, 4, 4) ... (255, 255,
       // 255)] Value for every channel should DECREASE by 1 in each timestep,
       // wrapping around 0 and 255
@@ -354,7 +354,7 @@ TEST(LEDPatternTest, ScrollAbsoluteBackward) {
 
     for (size_t led = 0; led < buffer.size(); led++) {
       SCOPED_TRACE(
-          fmt::format("LED {} of 256, run {} of 500", led + 1, time + 1));
+          std::format("LED {} of 256, run {} of 500", led + 1, time + 1));
       // Base: [(0, 0, 0) (1, 1, 1) (2, 2, 2) (3, 3, 3) (4, 4, 4) ... (255, 255,
       // 255)] Value for every channel should DECREASE by 1 in each timestep,
       // wrapping around 0 and 255
@@ -461,7 +461,7 @@ TEST(LEDPatternTest, RainbowThirdSize) {
   pattern.ApplyTo(buffer);
 
   for (int led = 0; led < 60; led++) {
-    SCOPED_TRACE(fmt::format("LED {} of 60", led + 1));
+    SCOPED_TRACE(std::format("LED {} of 60", led + 1));
     AssertIndexColor(buffer, led,
                      wpi::util::Color::FromHSV(led * 3, saturation, value));
   }
@@ -475,7 +475,7 @@ TEST(LEDPatternTest, RainbowDoubleSize) {
   pattern.ApplyTo(buffer);
 
   for (int led = 0; led < 360; led++) {
-    SCOPED_TRACE(fmt::format("LED {} of 360", led + 1));
+    SCOPED_TRACE(std::format("LED {} of 360", led + 1));
     AssertIndexColor(buffer, led,
                      wpi::util::Color::FromHSV(led / 2, saturation, value));
   }
@@ -490,7 +490,7 @@ TEST(LEDPatternTest, RainbowOddSize) {
   pattern.ApplyTo(buffer);
 
   for (int led = 0; led < 127; led++) {
-    SCOPED_TRACE(fmt::format("LED {} of 127", led + 1));
+    SCOPED_TRACE(std::format("LED {} of 127", led + 1));
     AssertIndexColor(buffer, led,
                      wpi::util::Color::FromHSV(static_cast<int>(led * scale),
                                                saturation, value));
@@ -507,7 +507,7 @@ TEST(LEDPatternTest, ReverseSolid) {
   pattern.ApplyTo(buffer);
 
   for (int led = 0; led < 90; led++) {
-    SCOPED_TRACE(fmt::format("LED {} of 90", led + 1));
+    SCOPED_TRACE(std::format("LED {} of 90", led + 1));
     AssertIndexColor(buffer, led, wpi::util::Color::ROSY_BROWN);
   }
 }
@@ -524,11 +524,11 @@ TEST(LEDPatternTest, ReverseSteps) {
 
   // colors should be swapped; yellow first, then plum
   for (int led = 0; led < 50; led++) {
-    SCOPED_TRACE(fmt::format("LED {} of 100", led + 1));
+    SCOPED_TRACE(std::format("LED {} of 100", led + 1));
     AssertIndexColor(buffer, led, wpi::util::Color::YELLOW);
   }
   for (int led = 50; led < 100; led++) {
-    SCOPED_TRACE(fmt::format("LED {} of 100", led + 1));
+    SCOPED_TRACE(std::format("LED {} of 100", led + 1));
     AssertIndexColor(buffer, led, wpi::util::Color::PLUM);
   }
 }
@@ -539,7 +539,7 @@ TEST(LEDPatternTest, OffsetPositive) {
   offset.ApplyTo(buffer);
 
   for (int led = 0; led < 21; led++) {
-    SCOPED_TRACE(fmt::format("LED {} of 21", led + 1));
+    SCOPED_TRACE(std::format("LED {} of 21", led + 1));
     switch (led % 3) {
       case 0:
         AssertIndexColor(buffer, led, wpi::util::Color::PURPLE);
@@ -560,7 +560,7 @@ TEST(LEDPatternTest, OffsetNegative) {
   offset.ApplyTo(buffer);
 
   for (int led = 0; led < 21; led++) {
-    SCOPED_TRACE(fmt::format("LED {} of 21", led + 1));
+    SCOPED_TRACE(std::format("LED {} of 21", led + 1));
     switch (led % 3) {
       case 0:
         AssertIndexColor(buffer, led, wpi::util::Color::YELLOW);
@@ -581,7 +581,7 @@ TEST(LEDPatternTest, OffsetZero) {
   offset.ApplyTo(buffer);
 
   for (int led = 0; led < 21; led++) {
-    SCOPED_TRACE(fmt::format("LED {} of 21", led + 1));
+    SCOPED_TRACE(std::format("LED {} of 21", led + 1));
     switch (led % 3) {
       case 0:
         AssertIndexColor(buffer, led, wpi::util::Color::WHITE);
@@ -607,7 +607,7 @@ TEST(LEDPatternTest, BlinkSymmetric) {
   WPI_SetNowImpl([] { return now; });
   for (int t = 0; t < 8; t++) {
     now = t * 1000000ull;  // time travel 1 second
-    SCOPED_TRACE(fmt::format("Time {} seconds", t));
+    SCOPED_TRACE(std::format("Time {} seconds", t));
     pattern.ApplyTo(buffer);
 
     switch (t) {
@@ -640,7 +640,7 @@ TEST(LEDPatternTest, BlinkAsymmetric) {
   WPI_SetNowImpl([] { return now; });
   for (int t = 0; t < 8; t++) {
     now = t * 1000000ull;  // time travel 1 second
-    SCOPED_TRACE(fmt::format("Time {} seconds", t));
+    SCOPED_TRACE(std::format("Time {} seconds", t));
     pattern.ApplyTo(buffer);
 
     switch (t) {
@@ -697,35 +697,35 @@ TEST(LEDPatternTest, Breathe) {
 
   {
     now = 0ull;  // start
-    SCOPED_TRACE(fmt::format("Time {}", now));
+    SCOPED_TRACE(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
     AssertIndexColor(buffer, 0, wpi::util::Color::WHITE);
   }
   {
     now = 1ull;  // midway (down)
-    SCOPED_TRACE(fmt::format("Time {}", now));
+    SCOPED_TRACE(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
     AssertIndexColor(buffer, 0, midGray);
   }
   {
     now = 2ull;  // bottom
-    SCOPED_TRACE(fmt::format("Time {}", now));
+    SCOPED_TRACE(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
     AssertIndexColor(buffer, 0, wpi::util::Color::BLACK);
   }
   {
     now = 3ull;  // midway (up)
-    SCOPED_TRACE(fmt::format("Time {}", now));
+    SCOPED_TRACE(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
     AssertIndexColor(buffer, 0, midGray);
   }
   {
     now = 4ull;  // back to start
-    SCOPED_TRACE(fmt::format("Time {}", now));
+    SCOPED_TRACE(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
     AssertIndexColor(buffer, 0, wpi::util::Color::WHITE);
@@ -839,17 +839,17 @@ TEST(LEDPatternTest, ProcessMaskLayer) {
       LEDPattern::ProgressMaskLayer([&progress]() { return progress; });
 
   for (double t = 0; t <= 1.0; t += 0.01) {
-    SCOPED_TRACE(fmt::format("Time {}", t));
+    SCOPED_TRACE(std::format("Time {}", t));
     progress = t;
     maskLayer.ApplyTo(buffer);
 
     int lastMaskedLED = static_cast<int>(t * 100);
     for (int i = 0; i < lastMaskedLED; i++) {
-      SCOPED_TRACE(fmt::format("LED {}", i));
+      SCOPED_TRACE(std::format("LED {}", i));
       AssertIndexColor(buffer, i, wpi::util::Color::WHITE);
     }
     for (int i = lastMaskedLED; i < 100; i++) {
-      SCOPED_TRACE(fmt::format("LED {}", i));
+      SCOPED_TRACE(std::format("LED {}", i));
       AssertIndexColor(buffer, i, wpi::util::Color::BLACK);
     }
   }
@@ -978,7 +978,7 @@ TEST(LEDPatternTest, RelativeScrollingMask) {
 
   {
     now = 0ull;  // start
-    SCOPED_TRACE(fmt::format("Time {}", now));
+    SCOPED_TRACE(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
 
@@ -993,7 +993,7 @@ TEST(LEDPatternTest, RelativeScrollingMask) {
   }
   {
     now = 1ull;
-    SCOPED_TRACE(fmt::format("Time {}", now));
+    SCOPED_TRACE(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
 
@@ -1008,7 +1008,7 @@ TEST(LEDPatternTest, RelativeScrollingMask) {
   }
   {
     now = 2ull;
-    SCOPED_TRACE(fmt::format("Time {}", now));
+    SCOPED_TRACE(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
 
@@ -1023,7 +1023,7 @@ TEST(LEDPatternTest, RelativeScrollingMask) {
   }
   {
     now = 3ull;
-    SCOPED_TRACE(fmt::format("Time {}", now));
+    SCOPED_TRACE(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
 
@@ -1063,7 +1063,7 @@ TEST(LEDPatternTest, AbsoluteScrollingMask) {
 
   {
     now = 0ull;  // start
-    SCOPED_TRACE(fmt::format("Time {}", now));
+    SCOPED_TRACE(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
 
@@ -1078,7 +1078,7 @@ TEST(LEDPatternTest, AbsoluteScrollingMask) {
   }
   {
     now = 1000000ull;
-    SCOPED_TRACE(fmt::format("Time {}", now));
+    SCOPED_TRACE(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
 
@@ -1093,7 +1093,7 @@ TEST(LEDPatternTest, AbsoluteScrollingMask) {
   }
   {
     now = 2000000ull;
-    SCOPED_TRACE(fmt::format("Time {}", now));
+    SCOPED_TRACE(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
 
@@ -1108,7 +1108,7 @@ TEST(LEDPatternTest, AbsoluteScrollingMask) {
   }
   {
     now = 3000000ull;
-    SCOPED_TRACE(fmt::format("Time {}", now));
+    SCOPED_TRACE(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
 

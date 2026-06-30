@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
+#include <format>
 
 #include "AvahiClient.hpp"
 #include "wpi/util/mutex.hpp"
@@ -54,7 +54,7 @@ MulticastServiceAnnouncer::Impl::Impl(std::string_view serviceName,
   } else {
     std::vector<std::string> txts;
     for (auto&& i : txt) {
-      txts.push_back(fmt::format("{}={}", i.first, i.second));
+      txts.push_back(std::format("{}={}", i.first, i.second));
     }
 
     std::vector<const char*> txtArr;

@@ -27,7 +27,7 @@
 #define DLOPEN(a) LoadLibraryA(a)
 #define DLSYM GetProcAddress
 #define DLCLOSE FreeLibrary
-#define DLERROR fmt::format("error #{}", GetLastError())
+#define DLERROR std::format("error #{}", GetLastError())
 #else
 #define DELIM ':'
 #define HTYPE void*
@@ -63,9 +63,9 @@ int HAL_LoadOneExtension(const char* library) {
 #if !defined(WIN32) && !defined(_WIN32)
   if (!handle) {
 #if defined(__APPLE__)
-    auto libraryName = fmt::format("lib{}.dylib", library);
+    auto libraryName = std::format("lib{}.dylib", library);
 #else
-    auto libraryName = fmt::format("lib{}.so", library);
+    auto libraryName = std::format("lib{}.so", library);
 #endif
     wpi::util::print(
         "HAL Extensions: Load failed: {}\nTrying modified name: {}\n", DLERROR,

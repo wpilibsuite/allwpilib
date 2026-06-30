@@ -160,7 +160,7 @@ TEST_P(MatchTimeTest, Alert) {
 
   wpi::sim::StepTiming(20_ms);
 
-  std::string expected = fmt::format("{:03}", matchTime);
+  std::string expected = std::format("{:03}", matchTime);
   EXPECT_EQ(expected, gString.substr(3));
 }
 

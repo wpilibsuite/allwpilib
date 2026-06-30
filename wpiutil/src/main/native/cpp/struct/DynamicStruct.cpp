@@ -8,7 +8,7 @@
 #include <string>
 #include <utility>
 
-#include <fmt/format.h>
+#include <format>
 
 #include "wpi/util/Endian.hpp"
 #include "wpi/util/SmallString.hpp"
@@ -169,7 +169,7 @@ std::string StructDescriptor::CalculateOffsets(
   stack.emplace_back(this);
   for (auto&& ref : m_references) {
     if (std::find(stack.begin(), stack.end(), ref) != stack.end()) {
-      [[unlikely]] return fmt::format(
+      [[unlikely]] return std::format(
           "internal error (inconsistent data): circular struct reference "
           "between {} and {}",
           m_name, ref->m_name);
@@ -189,7 +189,7 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
   structparser::Parser parser{schema};
   structparser::ParsedSchema parsed;
   if (!parser.Parse(&parsed)) {
-    *err = fmt::format("parse error: {}", parser.GetError());
+    *err = std::format("parse error: {}", parser.GetError());
     [[unlikely]] return nullptr;
   }
 
@@ -211,28 +211,28 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
       // only integer or boolean types are allowed
       if (type == StructFieldType::CHAR || type == StructFieldType::FLOAT ||
           type == StructFieldType::DOUBLE || type == StructFieldType::STRUCT) {
-        *err = fmt::format("field {}: type {} cannot be bitfield", decl.name,
+        *err = std::format("field {}: type {} cannot be bitfield", decl.name,
                            decl.typeString);
         [[unlikely]] return nullptr;
       }
 
       // bit width cannot be larger than field size
       if (decl.bitWidth > (size * 8)) {
-        *err = fmt::format("field {}: bit width {} exceeds type size",
+        *err = std::format("field {}: bit width {} exceeds type size",
                            decl.name, decl.bitWidth);
         [[unlikely]] return nullptr;
       }
 
       // bit width must be 1 for booleans
       if (type == StructFieldType::BOOL && decl.bitWidth != 1) {
-        *err = fmt::format("field {}: bit width must be 1 for bool type",
+        *err = std::format("field {}: bit width must be 1 for bool type",
                            decl.name);
         [[unlikely]] return nullptr;
       }
 
       // cannot combine array and bitfield (shouldn't parse, but double-check)
       if (decl.arraySize > 1) {
-        *err = fmt::format("field {}: cannot combine array and bitfield",
+        *err = std::format("field {}: cannot combine array and bitfield",
                            decl.name);
         [[unlikely]] return nullptr;
       }
@@ -243,7 +243,7 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
     if (type == StructFieldType::STRUCT) {
       // recursive definitions are not allowed
       if (decl.typeString == name) {
-        *err = fmt::format("field {}: recursive struct reference", decl.name);
+        *err = std::format("field {}: recursive struct reference", decl.name);
         [[unlikely]] return nullptr;
       }
 
@@ -268,7 +268,7 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
     // create field
     if (!theStruct.m_fieldsByName.insert({decl.name, theStruct.m_fields.size()})
              .second) {
-      *err = fmt::format("duplicate field {}", decl.name);
+      *err = std::format("duplicate field {}", decl.name);
       [[unlikely]] return nullptr;
     }
 
@@ -299,7 +299,7 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
         }
         os << elem->GetName();
       }
-      *err = fmt::format("circular struct reference: {}", os.str());
+      *err = std::format("circular struct reference: {}", os.str());
       [[unlikely]] return nullptr;
     }
   }

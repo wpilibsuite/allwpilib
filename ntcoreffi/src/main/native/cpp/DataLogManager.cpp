@@ -6,13 +6,11 @@
 
 #include <algorithm>
 #include <chrono>
+#include <format>
 #include <random>
 #include <string>
 #include <string_view>
 #include <vector>
-
-#include <fmt/chrono.h>
-#include <fmt/format.h>
 
 #include "wpi/datalog/DataLogBackgroundWriter.hpp"
 #include "wpi/datalog/FileLogger.hpp"
@@ -34,16 +32,16 @@ static constexpr int Warning = 16;
 
 namespace wpi {
 void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
-                  const char* funcName, fmt::string_view format,
-                  fmt::format_args args) {
+                  const char* funcName, std::string_view format,
+                  std::format_args args) {
   // TODO when we get a low level interface
   // #ifdef __FIRST_SYSTEMCORE__
   //   if (status == 0) {
   //     return;
   //   }
-  //   fmt::memory_buffer out;
-  //   fmt::format_to(fmt::appender{out}, "Warning: ");
-  //   fmt::vformat_to(fmt::appender{out}, format, args);
+  //   std::vector<char> out;
+  //   std::format_to(std::back_inserter(out), "Warning: ");
+  //   std::vformat_to(std::back_inserter(out), format, args);
   //   out.push_back('\0');
   //   WPILIB_NetworkCommunication_sendError(status < 0, status, 0, out.data(),
   //                                      "DataLogManager", "");
@@ -52,10 +50,10 @@ void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
 
 template <typename... Args>
 inline void ReportError(int32_t status, const char* fileName, int lineNumber,
-                        const char* funcName, fmt::string_view format,
+                        const char* funcName, std::string_view format,
                         Args&&... args) {
   ReportErrorV(status, fileName, lineNumber, funcName, format,
-               fmt::make_format_args(args...));
+               std::make_format_args(args...));
 }
 }  // namespace wpi
 
@@ -363,7 +361,7 @@ void Thread::Main() {
       if (dsAttachCount > 50) {  // 1 second
         if (RobotController::IsSystemTimeValid()) {
           auto now = std::chrono::system_clock::now();
-          m_log.SetFilename(fmt::format("WPILIB_{:%Y%m%d_%H%M%S}.wpilog", now));
+          m_log.SetFilename(std::format("WPILIB_{:%Y%m%d_%H%M%S}.wpilog", now));
           dsRenamed = true;
         } else {
           dsAttachCount = 0;  // wait a bit and try again
@@ -402,7 +400,7 @@ void Thread::Main() {
           }
           auto now = std::chrono::system_clock::now();
           m_log.SetFilename(
-              fmt::format("WPILIB_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog", now,
+              std::format("WPILIB_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog", now,
                           DriverStation::GetEventName(), matchTypeChar,
                           DriverStation::GetMatchNumber()));
           fmsRenamed = true;

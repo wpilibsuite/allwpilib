@@ -10,7 +10,7 @@
 #include <string>
 #include <utility>
 
-#include <fmt/format.h>
+#include <format>
 
 #include "wpi/net/uv/GetAddrInfo.hpp"
 #include "wpi/net/uv/Loop.hpp"
@@ -199,7 +199,7 @@ void ParallelTcpConnector::Connect() {
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_NUMERICSERV | AI_ADDRCONFIG;
-    uv::GetAddrInfo(m_loop, req, server.first, fmt::format("{}", server.second),
+    uv::GetAddrInfo(m_loop, req, server.first, std::format("{}", server.second),
                     hints);
   }
 }

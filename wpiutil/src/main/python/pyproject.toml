@@ -46,7 +46,6 @@ update_init = [
 scan_headers_ignore = [
     "debugging.hpp",
     "debugging/*",
-    "fmt/*",
     "google/*",
     "wpi/*",
     "wpystruct_fns.h",

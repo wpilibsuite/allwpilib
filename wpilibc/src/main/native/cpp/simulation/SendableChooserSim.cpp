@@ -13,7 +13,7 @@ SendableChooserSim::SendableChooserSim(wpi::nt::NetworkTableInstance inst,
                                        std::string_view path) {
   if constexpr (RobotBase::IsSimulation()) {
     m_publisher =
-        inst.GetStringTopic(fmt::format("{}{}", path, "selected")).Publish();
+        inst.GetStringTopic(std::format("{}{}", path, "selected")).Publish();
   }
 }
 
