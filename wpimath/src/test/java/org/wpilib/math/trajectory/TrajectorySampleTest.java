@@ -88,10 +88,6 @@ class TrajectorySampleTest {
     // deltaT = expectedTimestamp - start.timestamp = 1.0
     double deltaT = expectedTimestamp - start.timestamp;
 
-    // vₖ₊₁ = vₖ + aₖΔt
-    final double expectedVx = start.velocity.vx + start.acceleration.ax * deltaT;
-    final double expectedVy = start.velocity.vy + start.acceleration.ay * deltaT;
-
     // xₖ₊₁ = xₖ + vₖΔt + ½a(Δt)²
     double expectedX =
         start.pose.getX()
@@ -102,11 +98,13 @@ class TrajectorySampleTest {
             + start.velocity.vy * deltaT
             + 0.5 * start.acceleration.ay * deltaT * deltaT;
 
-    // Linear interpolation of accelerations
-    final double expectedAx =
-        start.acceleration.ax + (end.acceleration.ax - start.acceleration.ax) * 0.5;
-    final double expectedAy =
-        start.acceleration.ay + (end.acceleration.ay - start.acceleration.ay) * 0.5;
+    // vₖ₊₁ = vₖ + aₖΔt
+    final double expectedVx = start.velocity.vx + start.acceleration.ax * deltaT;
+    final double expectedVy = start.velocity.vy + start.acceleration.ay * deltaT;
+
+    // Constant acceleration
+    final double expectedAx = start.acceleration.ax;
+    final double expectedAy = start.acceleration.ay;
 
     assertEquals(expectedX, interpolated.pose.getX(), EPSILON);
     assertEquals(expectedY, interpolated.pose.getY(), EPSILON);
@@ -141,17 +139,17 @@ class TrajectorySampleTest {
     // Constant-acceleration kinematics from start with deltaT = 0.5
     double deltaT = expectedTimestamp - start.timestamp;
 
-    // vₖ₊₁ = vₖ + aₖΔt = 0 + 1.0*0.5 = 0.5
-    double expectedVx = start.velocity.vx + start.acceleration.ax * deltaT;
-
     // xₖ₊₁ = xₖ + vₖΔt + ½a(Δt)² = 0 + 0*0.5 + ½*1.0*0.25 = 0.125
     double expectedX =
         start.pose.getX()
             + start.velocity.vx * deltaT
             + 0.5 * start.acceleration.ax * deltaT * deltaT;
 
-    // Linear interpolation of acceleration at t=0.5: ax = 1.0 + (0 - 1.0)*0.5 = 0.5
-    double expectedAx = start.acceleration.ax + (end.acceleration.ax - start.acceleration.ax) * 0.5;
+    // vₖ₊₁ = vₖ + aₖΔt = 0 + 1.0*0.5 = 0.5
+    double expectedVx = start.velocity.vx + start.acceleration.ax * deltaT;
+
+    // Constant acceleration
+    double expectedAx = start.acceleration.ax;
 
     assertEquals(expectedX, interpolated.pose.getX(), EPSILON);
     assertEquals(expectedVx, interpolated.velocity.vx, EPSILON);
@@ -182,18 +180,17 @@ class TrajectorySampleTest {
 
     double deltaT = expectedTimestamp - start.timestamp;
 
-    // vₖ₊₁ = vₖ + aₖΔt (with zero acceleration)
-    double expectedOmega = start.velocity.omega + start.acceleration.alpha * deltaT;
-
-    // Linear interpolation of angular acceleration
-    double expectedAlpha =
-        start.acceleration.alpha + (end.acceleration.alpha - start.acceleration.alpha) * 0.5;
-
     // θₖ₊₁ = θₖ + ωₖΔt + ½α(Δt)²
     double expectedTheta =
         start.pose.getRotation().getRadians()
             + start.velocity.omega * deltaT
             + 0.5 * start.acceleration.alpha * deltaT * deltaT;
+
+    // vₖ₊₁ = vₖ + aₖΔt (with zero acceleration)
+    double expectedOmega = start.velocity.omega + start.acceleration.alpha * deltaT;
+
+    // Constant angular acceleration
+    double expectedAlpha = start.acceleration.alpha;
 
     assertEquals(expectedOmega, interpolated.velocity.omega, EPSILON);
     assertEquals(expectedAlpha, interpolated.acceleration.alpha, EPSILON);
@@ -313,9 +310,8 @@ class TrajectorySampleTest {
     // vₖ₊₁ = vₖ + aₖΔt = 1 + 0*0.5 = 1.0
     final double expectedVy = start.velocity.vy + start.acceleration.ay * deltaT;
 
-    // Linear interpolation of acceleration
-    final double expectedAy =
-        start.acceleration.ay + (end.acceleration.ay - start.acceleration.ay) * 0.5;
+    // Constant acceleration
+    final double expectedAy = start.acceleration.ay;
 
     assertEquals(0.0, interpolated.pose.getX(), EPSILON);
     assertEquals(expectedY, interpolated.pose.getY(), EPSILON);

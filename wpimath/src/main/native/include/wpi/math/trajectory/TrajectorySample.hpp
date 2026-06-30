@@ -121,11 +121,9 @@ constexpr TrajectorySample KinematicInterpolate(const TrajectorySample& start,
   // Elapsed time from the start sample, used for integration
   const auto deltaT = interpTime - start.timestamp;
 
-  // Interpolate acceleration
-  ChassisAccelerations newAccel{
-      wpi::util::Lerp(start.acceleration.ax, end.acceleration.ax, t),
-      wpi::util::Lerp(start.acceleration.ay, end.acceleration.ay, t),
-      wpi::util::Lerp(start.acceleration.alpha, end.acceleration.alpha, t)};
+  // Constant acceleration
+  ChassisAccelerations accel{start.acceleration.ax, start.acceleration.ay,
+                             start.acceleration.alpha};
 
   // vₖ₊₁ = vₖ + aₖΔt
   ChassisVelocities newVel{
@@ -142,7 +140,7 @@ constexpr TrajectorySample KinematicInterpolate(const TrajectorySample& start,
                             start.velocity.omega * deltaT +
                             0.5 * start.acceleration.alpha * deltaT * deltaT}};
 
-  return TrajectorySample{interpTime, newPose, newVel, newAccel};
+  return TrajectorySample{interpTime, newPose, newVel, accel};
 }
 
 WPILIB_DLLEXPORT

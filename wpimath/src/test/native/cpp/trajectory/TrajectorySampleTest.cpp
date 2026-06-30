@@ -85,16 +85,15 @@ TEST(TrajectorySampleTest, KinematicInterpolateMidpoint) {
   // Elapsed time from the start sample.
   auto deltaT = 1_s;
 
-  // vₖ₊₁ = vₖ + aₖΔt
-  auto expectedVx = start.velocity.vx + start.acceleration.ax * deltaT;
-
   // xₖ₊₁ = xₖ + vₖΔt + ½a(Δt)²
   auto expectedX = start.pose.X() + start.velocity.vx * deltaT +
                    0.5 * start.acceleration.ax * deltaT * deltaT;
 
-  // Linear interpolation of acceleration.
-  auto expectedAx =
-      wpi::util::Lerp(start.acceleration.ax, end.acceleration.ax, 0.5);
+  // vₖ₊₁ = vₖ + aₖΔt
+  auto expectedVx = start.velocity.vx + start.acceleration.ax * deltaT;
+
+  // Constant acceleration
+  auto expectedAx = start.acceleration.ax;
 
   EXPECT_NEAR_UNITS(expectedX, interpolated.pose.X(), 1e-9_m);
   EXPECT_NEAR_UNITS(expectedVx, interpolated.velocity.vx, 1e-9_mps);
@@ -117,15 +116,15 @@ TEST(TrajectorySampleTest, KinematicInterpolateWithAcceleration) {
 
   auto deltaT = 0.5_s;
 
-  // vₖ₊₁ = 0 + 1.0 * 0.5 = 0.5
-  EXPECT_NEAR_UNITS(0.5_mps, interpolated.velocity.vx, 1e-9_mps);
-
   // xₖ₊₁ = 0 + 0 + ½ * 1.0 * 0.25 = 0.125
   auto expectedX = 0.5 * start.acceleration.ax * deltaT * deltaT;
   EXPECT_NEAR_UNITS(expectedX, interpolated.pose.X(), 1e-9_m);
 
-  // Linear interpolation of acceleration at t=0.5: 1.0 + (0 - 1.0) * 0.5 = 0.5
-  EXPECT_NEAR_UNITS(0.5_mps_sq, interpolated.acceleration.ax, 1e-9_mps_sq);
+  // vₖ₊₁ = 0 + 1.0 * 0.5 = 0.5
+  EXPECT_NEAR_UNITS(0.5_mps, interpolated.velocity.vx, 1e-9_mps);
+
+  // Constant acceleration
+  EXPECT_NEAR_UNITS(1_mps_sq, interpolated.acceleration.ax, 1e-9_mps_sq);
 }
 
 TEST(TrajectorySampleTest, KinematicInterpolateAngularVelocity) {
@@ -145,17 +144,16 @@ TEST(TrajectorySampleTest, KinematicInterpolateAngularVelocity) {
 
   auto deltaT = 0.5_s;
 
-  // ωₖ₊₁ = ωₖ + αₖΔt
-  auto expectedOmega = start.velocity.omega + start.acceleration.alpha * deltaT;
-
-  // Linear interpolation of angular acceleration.
-  auto expectedAlpha =
-      wpi::util::Lerp(start.acceleration.alpha, end.acceleration.alpha, 0.5);
-
   // θₖ₊₁ = θₖ + ωₖΔt + ½α(Δt)²
   auto expectedTheta = start.pose.Rotation().Radians() +
                        start.velocity.omega * deltaT +
                        0.5 * start.acceleration.alpha * deltaT * deltaT;
+
+  // ωₖ₊₁ = ωₖ + αₖΔt
+  auto expectedOmega = start.velocity.omega + start.acceleration.alpha * deltaT;
+
+  // Constant angular acceleration
+  auto expectedAlpha = start.acceleration.alpha;
 
   EXPECT_NEAR_UNITS(expectedOmega, interpolated.velocity.omega, 1e-9_rad_per_s);
   EXPECT_NEAR_UNITS(expectedAlpha, interpolated.acceleration.alpha,

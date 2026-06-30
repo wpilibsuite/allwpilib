@@ -115,14 +115,16 @@ public class TrajectorySample implements StructSerializable, ProtobufSerializabl
       return end;
     }
 
+    // Absolute timestamp of the interpolated sample
     var interpTime = MathUtil.lerp(start.timestamp, end.timestamp, t);
+
+    // Elapsed time from the start sample, used for integration
     var deltaT = interpTime - start.timestamp;
 
-    var newAccel =
+    // Constant acceleration
+    var accel =
         new ChassisAccelerations(
-            MathUtil.lerp(start.acceleration.ax, end.acceleration.ax, t),
-            MathUtil.lerp(start.acceleration.ay, end.acceleration.ay, t),
-            MathUtil.lerp(start.acceleration.alpha, end.acceleration.alpha, t));
+            start.acceleration.ax, start.acceleration.ay, start.acceleration.alpha);
 
     // vₖ₊₁ = vₖ + aₖΔt
     var newVel =
@@ -145,7 +147,7 @@ public class TrajectorySample implements StructSerializable, ProtobufSerializabl
                     + start.velocity.omega * deltaT
                     + 0.5 * start.acceleration.alpha * deltaT * deltaT));
 
-    return new TrajectorySample(interpTime, newPose, newVel, newAccel);
+    return new TrajectorySample(interpTime, newPose, newVel, accel);
   }
 
   /**
