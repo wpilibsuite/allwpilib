@@ -20,10 +20,10 @@
 void testFollowTrajectory(
     const wpi::math::MecanumDriveKinematics& kinematics,
     wpi::math::MecanumDrivePoseEstimator& estimator,
-    const wpi::math::Trajectory& trajectory,
-    std::function<wpi::math::ChassisVelocities(wpi::math::Trajectory::State&)>
+    const wpi::math::SplineTrajectory& trajectory,
+    std::function<wpi::math::ChassisVelocities(wpi::math::SplineSample&)>
         chassisVelocitiesGenerator,
-    std::function<wpi::math::Pose2d(wpi::math::Trajectory::State&)>
+    std::function<wpi::math::Pose2d(wpi::math::SplineSample&)>
         visionMeasurementGenerator,
     const wpi::math::Pose2d& startingPose, const wpi::math::Pose2d& endingPose,
     const wpi::units::second_t dt, const wpi::units::second_t kVisionUpdateRate,
@@ -52,8 +52,8 @@ void testFollowTrajectory(
         "time, est_x, est_y, est_theta, true_x, true_y, true_theta\n");
   }
 
-  while (t < trajectory.TotalTime()) {
-    wpi::math::Trajectory::State groundTruthState = trajectory.Sample(t);
+  while (t < trajectory.Duration()) {
+    wpi::math::SplineSample groundTruthState = trajectory.SampleAt(t);
 
     // We are due for a new vision measurement if it's been `visionUpdateRate`
     // seconds since the last vision measurement
@@ -140,7 +140,7 @@ void testFollowTrajectory(
 
   if (checkError) {
     // NOLINTNEXTLINE(bugprone-integer-division)
-    EXPECT_LT(errorSum / (trajectory.TotalTime() / dt), 0.051);
+    EXPECT_LT(errorSum / (trajectory.Duration() / dt), 0.051);
     EXPECT_LT(maxError, 0.2);
   }
 }
@@ -157,7 +157,7 @@ TEST(MecanumDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
       kinematics,          wpi::math::Rotation2d{}, wheelPositions,
       wpi::math::Pose2d{}, {0.1, 0.1, 0.1},         {0.45, 0.45, 0.45}};
 
-  wpi::math::Trajectory trajectory =
+  wpi::math::SplineTrajectory trajectory =
       wpi::math::TrajectoryGenerator::GenerateTrajectory(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{3_m, 0_m, -90_deg},
@@ -168,11 +168,12 @@ TEST(MecanumDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
 
   testFollowTrajectory(
       kinematics, estimator, trajectory,
-      [&](wpi::math::Trajectory::State& state) {
-        return wpi::math::ChassisVelocities{state.velocity, 0_mps,
-                                            state.velocity * state.curvature};
+      [&](wpi::math::SplineSample& state) {
+        return wpi::math::ChassisVelocities{
+            state.ForwardVelocity(), 0_mps,
+            state.ForwardVelocity() * state.curvature};
       },
-      [&](wpi::math::Trajectory::State& state) { return state.pose; },
+      [&](wpi::math::SplineSample& state) { return state.pose; },
       trajectory.InitialPose(), {0_m, 0_m, wpi::math::Rotation2d{45_deg}},
       20_ms, 100_ms, 250_ms, true, false);
 }
@@ -189,7 +190,7 @@ TEST(MecanumDrivePoseEstimatorTest, BadInitialPose) {
       kinematics,          wpi::math::Rotation2d{}, wheelPositions,
       wpi::math::Pose2d{}, {0.1, 0.1, 0.1},         {0.45, 0.45, 0.1}};
 
-  wpi::math::Trajectory trajectory =
+  wpi::math::SplineTrajectory trajectory =
       wpi::math::TrajectoryGenerator::GenerateTrajectory(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{3_m, 0_m, -90_deg},
@@ -213,11 +214,12 @@ TEST(MecanumDrivePoseEstimatorTest, BadInitialPose) {
 
       testFollowTrajectory(
           kinematics, estimator, trajectory,
-          [&](wpi::math::Trajectory::State& state) {
+          [&](wpi::math::SplineSample& state) {
             return wpi::math::ChassisVelocities{
-                state.velocity, 0_mps, state.velocity * state.curvature};
+                state.ForwardVelocity(), 0_mps,
+                state.ForwardVelocity() * state.curvature};
           },
-          [&](wpi::math::Trajectory::State& state) { return state.pose; },
+          [&](wpi::math::SplineSample& state) { return state.pose; },
           initial_pose, {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms,
           100_ms, 250_ms, false, false);
     }

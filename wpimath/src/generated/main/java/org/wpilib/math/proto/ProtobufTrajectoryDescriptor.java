@@ -9,28 +9,48 @@ import us.hebi.quickbuf.ProtoUtil;
 import us.hebi.quickbuf.RepeatedByte;
 
 public final class ProtobufTrajectoryDescriptor {
-  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(880,
-    "ChB0cmFqZWN0b3J5LnByb3RvEgl3cGkucHJvdG8aEGdlb21ldHJ5MmQucHJvdG8iugEKF1Byb3RvYnVm" + 
-    "VHJhamVjdG9yeVN0YXRlEhIKBHRpbWUYASABKAFSBHRpbWUSGgoIdmVsb2NpdHkYAiABKAFSCHZlbG9j" + 
-    "aXR5EiIKDGFjY2VsZXJhdGlvbhgDIAEoAVIMYWNjZWxlcmF0aW9uEi0KBHBvc2UYBCABKAsyGS53cGku" + 
-    "cHJvdG8uUHJvdG9idWZQb3NlMmRSBHBvc2USHAoJY3VydmF0dXJlGAUgASgBUgljdXJ2YXR1cmUiUAoS" + 
-    "UHJvdG9idWZUcmFqZWN0b3J5EjoKBnN0YXRlcxgCIAMoCzIiLndwaS5wcm90by5Qcm90b2J1ZlRyYWpl" + 
-    "Y3RvcnlTdGF0ZVIGc3RhdGVzQjcKFW9yZy53cGlsaWIubWF0aC5wcm90b0IcUHJvdG9idWZUcmFqZWN0" + 
-    "b3J5RGVzY3JpcHRvclABSu4DCgYSBAAAFgEKCAoBDBIDAAASCggKAQISAwIAEgoJCgIDABIDBAAaCggK" + 
-    "AQgSAwYALgoJCgIIARIDBgAuCggKAQgSAwgAPQoJCgIICBIDCAA9CggKAQgSAwoAIgoJCgIIChIDCgAi" + 
-    "CgoKAgQAEgQMABIBCgoKAwQAARIDDAgfCgsKBAQAAgASAw0CEgoMCgUEAAIABRIDDQIICgwKBQQAAgAB" + 
-    "EgMNCQ0KDAoFBAACAAMSAw0QEQoLCgQEAAIBEgMOAhYKDAoFBAACAQUSAw4CCAoMCgUEAAIBARIDDgkR" + 
-    "CgwKBQQAAgEDEgMOFBUKCwoEBAACAhIDDwIaCgwKBQQAAgIFEgMPAggKDAoFBAACAgESAw8JFQoMCgUE" + 
-    "AAICAxIDDxgZCgsKBAQAAgMSAxACGgoMCgUEAAIDBhIDEAIQCgwKBQQAAgMBEgMQERUKDAoFBAACAwMS" + 
-    "AxAYGQoLCgQEAAIEEgMRAhcKDAoFBAACBAUSAxECCAoMCgUEAAIEARIDEQkSCgwKBQQAAgQDEgMRFRYK" + 
-    "CgoCBAESBBQAFgEKCgoDBAEBEgMUCBoKCwoEBAECABIDFQIuCgwKBQQBAgAEEgMVAgoKDAoFBAECAAYS" + 
-    "AxULIgoMCgUEAQIAARIDFSMpCgwKBQQBAgADEgMVLC1iBnByb3RvMw==");
+  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(1811,
+    "ChB0cmFqZWN0b3J5LnByb3RvEgl3cGkucHJvdG8aEGdlb21ldHJ5MmQucHJvdG8aEGtpbmVtYXRpY3Mu" + 
+    "cHJvdG8i/AEKGFByb3RvYnVmVHJhamVjdG9yeVNhbXBsZRIcCgl0aW1lc3RhbXAYASABKAFSCXRpbWVz" + 
+    "dGFtcBItCgRwb3NlGAIgASgLMhkud3BpLnByb3RvLlByb3RvYnVmUG9zZTJkUgRwb3NlEkQKCnZlbG9j" + 
+    "aXRpZXMYAyABKAsyJC53cGkucHJvdG8uUHJvdG9idWZDaGFzc2lzVmVsb2NpdGllc1IKdmVsb2NpdGll" + 
+    "cxJNCg1hY2NlbGVyYXRpb25zGAQgASgLMicud3BpLnByb3RvLlByb3RvYnVmQ2hhc3Npc0FjY2VsZXJh" + 
+    "dGlvbnNSDWFjY2VsZXJhdGlvbnMiygIKGlByb3RvYnVmRGlmZmVyZW50aWFsU2FtcGxlEhwKCXRpbWVz" + 
+    "dGFtcBgBIAEoAVIJdGltZXN0YW1wEi0KBHBvc2UYAiABKAsyGS53cGkucHJvdG8uUHJvdG9idWZQb3Nl" + 
+    "MmRSBHBvc2USRAoKdmVsb2NpdGllcxgDIAEoCzIkLndwaS5wcm90by5Qcm90b2J1ZkNoYXNzaXNWZWxv" + 
+    "Y2l0aWVzUgp2ZWxvY2l0aWVzEk0KDWFjY2VsZXJhdGlvbnMYBCABKAsyJy53cGkucHJvdG8uUHJvdG9i" + 
+    "dWZDaGFzc2lzQWNjZWxlcmF0aW9uc1INYWNjZWxlcmF0aW9ucxIjCg1sZWZ0X3ZlbG9jaXR5GAUgASgB" + 
+    "UgxsZWZ0VmVsb2NpdHkSJQoOcmlnaHRfdmVsb2NpdHkYBiABKAFSDXJpZ2h0VmVsb2NpdHkiXAobUHJv" + 
+    "dG9idWZIb2xvbm9taWNUcmFqZWN0b3J5Ej0KB3NhbXBsZXMYASADKAsyIy53cGkucHJvdG8uUHJvdG9i" + 
+    "dWZUcmFqZWN0b3J5U2FtcGxlUgdzYW1wbGVzImEKHlByb3RvYnVmRGlmZmVyZW50aWFsVHJhamVjdG9y" + 
+    "eRI/CgdzYW1wbGVzGAEgAygLMiUud3BpLnByb3RvLlByb3RvYnVmRGlmZmVyZW50aWFsU2FtcGxlUgdz" + 
+    "YW1wbGVzQjcKFW9yZy53cGlsaWIubWF0aC5wcm90b0IcUHJvdG9idWZUcmFqZWN0b3J5RGVzY3JpcHRv" + 
+    "clABSoEHCgYSBAAAIwEKCAoBDBIDAAASCggKAQISAwIAEgoJCgIDABIDBAAaCgkKAgMBEgMFABoKCAoB" + 
+    "CBIDBwAuCgkKAggBEgMHAC4KCAoBCBIDCQA9CgkKAggIEgMJAD0KCAoBCBIDCwAiCgkKAggKEgMLACIK" + 
+    "CgoCBAASBA0AEgEKCgoDBAABEgMNCCAKCwoEBAACABIDDgIXCgwKBQQAAgAFEgMOAggKDAoFBAACAAES" + 
+    "Aw4JEgoMCgUEAAIAAxIDDhUWCgsKBAQAAgESAw8CGgoMCgUEAAIBBhIDDwIQCgwKBQQAAgEBEgMPERUK" + 
+    "DAoFBAACAQMSAw8YGQoLCgQEAAICEgMQAisKDAoFBAACAgYSAxACGwoMCgUEAAICARIDEBwmCgwKBQQA",
+    "AgIDEgMQKSoKCwoEBAACAxIDEQIxCgwKBQQAAgMGEgMRAh4KDAoFBAACAwESAxEfLAoMCgUEAAIDAxID" + 
+    "ES8wCgoKAgQBEgQUABsBCgoKAwQBARIDFAgiCgsKBAQBAgASAxUCFwoMCgUEAQIABRIDFQIICgwKBQQB" + 
+    "AgABEgMVCRIKDAoFBAECAAMSAxUVFgoLCgQEAQIBEgMWAhoKDAoFBAECAQYSAxYCEAoMCgUEAQIBARID" + 
+    "FhEVCgwKBQQBAgEDEgMWGBkKCwoEBAECAhIDFwIrCgwKBQQBAgIGEgMXAhsKDAoFBAECAgESAxccJgoM" + 
+    "CgUEAQICAxIDFykqCgsKBAQBAgMSAxgCMQoMCgUEAQIDBhIDGAIeCgwKBQQBAgMBEgMYHywKDAoFBAEC" + 
+    "AwMSAxgvMAoLCgQEAQIEEgMZAhsKDAoFBAECBAUSAxkCCAoMCgUEAQIEARIDGQkWCgwKBQQBAgQDEgMZ" + 
+    "GRoKCwoEBAECBRIDGgIcCgwKBQQBAgUFEgMaAggKDAoFBAECBQESAxoJFwoMCgUEAQIFAxIDGhobCgoK" + 
+    "AgQCEgQdAB8BCgoKAwQCARIDHQgjCgsKBAQCAgASAx4CMAoMCgUEAgIABBIDHgIKCgwKBQQCAgAGEgMe" + 
+    "CyMKDAoFBAICAAESAx4kKwoMCgUEAgIAAxIDHi4vCgoKAgQDEgQhACMBCgoKAwQDARIDIQgmCgsKBAQD" + 
+    "AgASAyICMgoMCgUEAwIABBIDIgIKCgwKBQQDAgAGEgMiCyUKDAoFBAMCAAESAyImLQoMCgUEAwIAAxID" + 
+    "IjAxYgZwcm90bzM=");
 
-  static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("trajectory.proto", "wpi.proto", descriptorData, ProtobufGeometry2dDescriptor.getDescriptor());
+  static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("trajectory.proto", "wpi.proto", descriptorData, ProtobufGeometry2dDescriptor.getDescriptor(), ProtobufKinematicsDescriptor.getDescriptor());
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufTrajectoryState_descriptor = descriptor.internalContainedType(50, 186, "ProtobufTrajectoryState", "wpi.proto.ProtobufTrajectoryState");
+  static final Descriptors.Descriptor wpi_proto_ProtobufTrajectorySample_descriptor = descriptor.internalContainedType(68, 252, "ProtobufTrajectorySample", "wpi.proto.ProtobufTrajectorySample");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufTrajectory_descriptor = descriptor.internalContainedType(238, 80, "ProtobufTrajectory", "wpi.proto.ProtobufTrajectory");
+  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialSample_descriptor = descriptor.internalContainedType(323, 330, "ProtobufDifferentialSample", "wpi.proto.ProtobufDifferentialSample");
+
+  static final Descriptors.Descriptor wpi_proto_ProtobufHolonomicTrajectory_descriptor = descriptor.internalContainedType(655, 92, "ProtobufHolonomicTrajectory", "wpi.proto.ProtobufHolonomicTrajectory");
+
+  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialTrajectory_descriptor = descriptor.internalContainedType(749, 97, "ProtobufDifferentialTrajectory", "wpi.proto.ProtobufDifferentialTrajectory");
 
   /**
    * @return this proto file's descriptor.

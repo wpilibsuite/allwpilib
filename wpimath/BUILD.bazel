@@ -291,6 +291,7 @@ wpilib_java_junit5_test(
         ":wpimath-java",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
+        "@maven//:io_avaje_avaje_jsonb",
         "@maven//:org_ejml_ejml_core",
         "@maven//:org_ejml_ejml_ddense",
         "@maven//:org_ejml_ejml_simple",
