@@ -9,8 +9,9 @@
 
 using namespace wpi;
 
-ExpansionHubPositionConstants::ExpansionHubPositionConstants(int hubNumber,
-                                                             int motorNumber) {
+ExpansionHubPositionConstants::ExpansionHubPositionConstants(
+    int hubNumber, int motorNumber) {
+
   auto systemServer = SystemServer::GetSystemServer();
 
   wpi::nt::PubSubOptions options;
@@ -20,33 +21,42 @@ ExpansionHubPositionConstants::ExpansionHubPositionConstants(int hubNumber,
 
   m_pPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/position/kp",
-                                      hubNumber, motorNumber))
+          .GetDoubleTopic(fmt::format(
+              "/rhsp/{}/motor{}/constants/position/kp",
+              hubNumber, motorNumber))
           .Publish(options);
 
   m_iPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/position/ki",
-                                      hubNumber, motorNumber))
+          .GetDoubleTopic(fmt::format(
+              "/rhsp/{}/motor{}/constants/position/ki",
+              hubNumber, motorNumber))
           .Publish(options);
 
   m_dPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/position/kd",
-                                      hubNumber, motorNumber))
+          .GetDoubleTopic(fmt::format(
+              "/rhsp/{}/motor{}/constants/position/kd",
+              hubNumber, motorNumber))
           .Publish(options);
+
+  // Default PID values
+  m_pPublisher.SetDefault(1.0);
+  m_iPublisher.SetDefault(0.0);
+  m_dPublisher.SetDefault(0.01);
 
   m_sPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/position/ks",
-                                      hubNumber, motorNumber))
+          .GetDoubleTopic(fmt::format(
+              "/rhsp/{}/motor{}/constants/position/ks",
+              hubNumber, motorNumber))
           .Publish(options);
 
   m_continuousPublisher =
       systemServer
-          .GetBooleanTopic(
-              fmt::format("/rhsp/{}/motor{}/constants/position/continuous",
-                          hubNumber, motorNumber))
+          .GetBooleanTopic(fmt::format(
+              "/rhsp/{}/motor{}/constants/position/continuous",
+              hubNumber, motorNumber))
           .Publish(options);
 
   m_continuousMinimumPublisher =
@@ -64,26 +74,31 @@ ExpansionHubPositionConstants::ExpansionHubPositionConstants(int hubNumber,
           .Publish(options);
 }
 
-ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetPID(double p,
-                                                                     double i,
-                                                                     double d) {
+ExpansionHubPositionConstants&
+ExpansionHubPositionConstants::SetPID(double p,
+                                      double i,
+                                      double d) {
   m_pPublisher.Set(p);
   m_iPublisher.Set(i);
   m_dPublisher.Set(d);
   return *this;
 }
 
-ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetS(double s) {
+ExpansionHubPositionConstants&
+ExpansionHubPositionConstants::SetS(double s) {
   m_sPublisher.Set(s);
   return *this;
 }
 
 ExpansionHubPositionConstants&
-ExpansionHubPositionConstants::EnableContinuousInput(double minimumInput,
-                                                     double maximumInput) {
+ExpansionHubPositionConstants::EnableContinuousInput(
+    double minimumInput,
+    double maximumInput) {
+
   m_continuousMaximumPublisher.Set(maximumInput);
   m_continuousMinimumPublisher.Set(minimumInput);
   m_continuousPublisher.Set(true);
+
   return *this;
 }
 

@@ -35,6 +35,9 @@ ExpansionHubVelocityConstants::ExpansionHubVelocityConstants(int hubNumber,
           .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/velocity/kd",
                                       hubNumber, motorNumber))
           .Publish(options);
+    m_pPublisher.SetDefault(1.0);
+  m_iPublisher.SetDefault(0.0);
+  m_dPublisher.SetDefault(0.01);
 
   m_sPublisher =
       systemServer
