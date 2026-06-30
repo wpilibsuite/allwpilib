@@ -94,12 +94,6 @@ static bool ObjGetStringArray(wpi::util::json& obj, std::string_view key,
   return true;
 }
 
-// avoid a fmtlib "unused type alias 'char_type'" warning false positive
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-local-typedef"
-#endif
-
 template <typename T>
   requires(std::same_as<T, ClientMessageHandler> ||
            std::same_as<T, ServerMessageHandler>)
@@ -435,10 +429,6 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
 
   return rv;
 }
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 bool wpi::nt::net::WireDecodeText(std::string_view in,
                                   ClientMessageHandler& out,
