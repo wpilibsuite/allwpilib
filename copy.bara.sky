@@ -215,7 +215,7 @@ def define_mostrobotpy_to_allwpilib():
 def define_allwpilib_to_mostrobotpy():
     ignored_project_exclude = [p + "/**" for p in IGNORED_MOSTROBOTPY_PROJECTS] + [p + "/examples/**" for p in IGNORED_MOSTROBOTPY_PROJECTS]
     origin_files = []
-    destination_files = glob(["**"], exclude = ["*", ".github/**", "docs/**", "**/.gitignore", "**/meson.build", "**/requirements.txt", "devtools/**", "examples/cscore/**", "examples/datalog/**", "examples/ntcore/**", "examples/wpinet/**", "examples/robot/.gitignore", "**/run_tests.py"] + ignored_project_exclude)
+    destination_files = glob(["**"], exclude = ["*", ".github/**", "docs/**", "**/.gitignore", "**/meson.build", "**/requirements.txt", "devtools/**", "examples/cscore/**", "examples/datalog/**", "examples/ntcore/**", "examples/wpinet/**", "examples/robot/.gitignore", "subprojects/robotpy-commands-v2/tools/hids/**", "**/run_tests.py"] + ignored_project_exclude)
     transformations = []
 
     for project_info in MOSTROBOTPY_PROJECTS:
@@ -237,6 +237,12 @@ def define_allwpilib_to_mostrobotpy():
         "commandsv2/src/generate/main/python/first_ds_commandhid.py.jinja",
         "wpilibj/src/generate/first_ds_hids.json",
         "wpilibj/src/generate/first_ds_hids.schema.json",
+    ]
+    destination_files += [
+        "subprojects/robotpy-commands-v2/tools/hids/generate_hids.py",
+        "subprojects/robotpy-commands-v2/tools/hids/templates/main/python/first_ds_commandhid.py.jinja",
+        "subprojects/robotpy-commands-v2/tools/hids/first_ds_hids.json",
+        "subprojects/robotpy-commands-v2/tools/hids/first_ds_hids.schema.json",
     ]
     transformations.append(core.move(
         "commandsv2/generate_hids.py",
