@@ -74,7 +74,6 @@ int PowerDistribution::GetNumChannels() const {
   return size;
 }
 
-
 // @Common - This is one of the commonly used methods for this class
 double PowerDistribution::GetVoltage() const {
   int32_t status = 0;
@@ -82,7 +81,6 @@ double PowerDistribution::GetVoltage() const {
   WPILIB_ReportError(status, "Module {}", m_module);
   return voltage;
 }
-
 
 // @Common - This is one of the commonly used methods for this class
 double PowerDistribution::GetTemperature() const {
