@@ -59,7 +59,6 @@ void DriverStationDisplay::SetMode(Mode mode) {
   }
 }
 
-// @Common - This is one of the commonly used methods for this class
 void DriverStationDisplay::AddData(std::string_view caption,
                                    std::string_view line) {
   auto& storage = GetDisplayStorage();
@@ -94,7 +93,6 @@ void DriverStationDisplay::AddData(std::string_view caption,
   }
 }
 
-// @Common - This is one of the commonly used methods for this class
 void DriverStationDisplay::AddLine(std::string_view line) {
   AddData({}, line);
 }

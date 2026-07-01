@@ -48,7 +48,6 @@ int SharpIR::GetChannel() const {
   return m_sensor.GetChannel();
 }
 
-// @Common - This is one of the commonly used methods for this class
 wpi::units::meter_t SharpIR::GetRange() const {
   if (m_simRange) {
     return std::clamp(wpi::units::meter_t{m_simRange.Get()}, m_min, m_max);

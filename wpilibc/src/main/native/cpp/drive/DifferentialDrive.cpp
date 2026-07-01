@@ -34,7 +34,6 @@ DifferentialDrive::DifferentialDrive(std::function<void(double)> leftMotor,
   wpi::util::SendableRegistry::Add(this, "DifferentialDrive", instances);
 }
 
-// @Common - This is one of the commonly used methods for this class
 void DifferentialDrive::ArcadeDrive(double xVelocity, double zRotation,
                                     bool squareInputs) {
   static bool reported = false;

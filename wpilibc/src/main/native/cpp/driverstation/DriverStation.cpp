@@ -46,7 +46,6 @@ GenericHID& DriverStation::GetGenericHID(int port) {
   return GetGenericHIDUnderLock(port);
 }
 
-// @Common - This is one of the commonly used methods for this class
 Gamepad& DriverStation::GetGamepad(int port) {
   std::scoped_lock lock{dsMutex};
   ValidatePort(port);

@@ -74,7 +74,6 @@ int PowerDistribution::GetNumChannels() const {
   return size;
 }
 
-// @Common - This is one of the commonly used methods for this class
 double PowerDistribution::GetVoltage() const {
   int32_t status = 0;
   double voltage = HAL_GetPowerDistributionVoltage(m_handle, &status);
@@ -82,7 +81,6 @@ double PowerDistribution::GetVoltage() const {
   return voltage;
 }
 
-// @Common - This is one of the commonly used methods for this class
 double PowerDistribution::GetTemperature() const {
   int32_t status = 0;
   double temperature = HAL_GetPowerDistributionTemperature(m_handle, &status);
@@ -90,7 +88,6 @@ double PowerDistribution::GetTemperature() const {
   return temperature;
 }
 
-// @Common - This is one of the commonly used methods for this class
 double PowerDistribution::GetCurrent(int channel) const {
   int32_t status = 0;
   double current =
@@ -111,7 +108,6 @@ std::vector<double> PowerDistribution::GetAllCurrents() const {
   return currents;
 }
 
-// @Common - This is one of the commonly used methods for this class
 double PowerDistribution::GetTotalCurrent() const {
   int32_t status = 0;
   double current = HAL_GetPowerDistributionTotalCurrent(m_handle, &status);
@@ -119,7 +115,6 @@ double PowerDistribution::GetTotalCurrent() const {
   return current;
 }
 
-// @Common - This is one of the commonly used methods for this class
 double PowerDistribution::GetTotalPower() const {
   int32_t status = 0;
   double power = HAL_GetPowerDistributionTotalPower(m_handle, &status);

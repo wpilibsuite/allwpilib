@@ -33,7 +33,6 @@ AnalogAccelerometer::AnalogAccelerometer(std::shared_ptr<AnalogInput> channel)
   InitAccelerometer();
 }
 
-// @Common - This is one of the commonly used methods for this class
 double AnalogAccelerometer::GetAcceleration() const {
   return (m_analogInput->GetVoltage() - m_zeroGVoltage) / m_voltsPerG;
 }
