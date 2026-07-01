@@ -41,6 +41,8 @@ class DigitalInput : public wpi::util::Sendable,
    * Get the value from a digital input channel.
    *
    * Retrieve the value of a single digital input channel from the FPGA.
+   *
+   * @Common - This is one of the commonly used methods for this class
    */
   bool Get() const;
 

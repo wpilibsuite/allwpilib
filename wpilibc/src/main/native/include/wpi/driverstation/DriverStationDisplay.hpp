@@ -44,6 +44,7 @@ class DriverStationDisplay final {
    *
    * @param caption Line caption.
    * @param line Line contents.
+   * @Common - This is one of the commonly used methods for this class
    */
   static void AddData(std::string_view caption, std::string_view line);
 
@@ -54,6 +55,7 @@ class DriverStationDisplay final {
    * appends a new line.
    *
    * @param line Line contents.
+   * @Common - This is one of the commonly used methods for this class
    */
   static void AddLine(std::string_view line);
 

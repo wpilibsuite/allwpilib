@@ -295,7 +295,8 @@ ALIASES                = "effects=\par <i>Effects:</i>^^" \
                          "throws=\par <i>Throws:</i>^^" \
                          "requires=\par <i>Requires:</i>^^" \
                          "requiredbe=\par <i>Required Behavior:</i>^^" \
-                         "defaultbe=\par <i>Default Behavior:</i>^^"
+                         "defaultbe=\par <i>Default Behavior:</i>^^" \
+                         "Common=\par <b>Common:</b>^^"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C sources
 # only. Doxygen will then generate output that is more tailored for C. For

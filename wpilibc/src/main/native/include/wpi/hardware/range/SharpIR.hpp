@@ -80,6 +80,7 @@ class SharpIR : public wpi::util::Sendable,
    * Get the range from the distance sensor.
    *
    * @return range of the target returned by the sensor
+   * @Common - This is one of the commonly used methods for this class
    */
   wpi::units::meter_t GetRange() const;
 
