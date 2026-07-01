@@ -101,6 +101,7 @@ class ADXL345_I2C : public wpi::nt::NTSendable,
    *
    * @param axis The axis to read from.
    * @return Acceleration of the ADXL345 in Gs.
+   * @Common - This is one of the commonly used methods for this class
    */
   virtual double GetAcceleration(Axis axis);
 

@@ -48,6 +48,7 @@ class AnalogInput : public wpi::util::Sendable,
    * GetVoltage() to get the analog value in calibrated units.
    *
    * @return A sample straight from this channel.
+   * @Common - This is one of the commonly used methods for this class
    */
   int GetValue() const;
 
