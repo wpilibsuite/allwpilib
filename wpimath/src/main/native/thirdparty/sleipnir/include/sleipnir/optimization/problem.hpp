@@ -15,7 +15,6 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-#include <fmt/chrono.h>
 #include <gch/small_vector.hpp>
 
 #include "sleipnir/autodiff/expression_type.hpp"
@@ -38,7 +37,6 @@
 #include "sleipnir/util/profiler.hpp"
 #include "sleipnir/util/spy.hpp"
 #include "sleipnir/util/symbol_exports.hpp"
-#include "sleipnir/util/to_underlying.hpp"
 
 namespace slp {
 
@@ -98,7 +96,7 @@ class Problem {
     for (int row = 0; row < rows; ++row) {
       for (int col = 0; col < cols; ++col) {
         m_decision_variables.emplace_back();
-        vars(row, col) = m_decision_variables.back();
+        vars[row, col] = m_decision_variables.back();
       }
     }
 
@@ -133,8 +131,8 @@ class Problem {
     for (int row = 0; row < rows; ++row) {
       for (int col = 0; col <= row; ++col) {
         m_decision_variables.emplace_back();
-        vars(row, col) = m_decision_variables.back();
-        vars(col, row) = m_decision_variables.back();
+        vars[row, col] = m_decision_variables.back();
+        vars[col, row] = m_decision_variables.back();
       }
     }
 
@@ -774,11 +772,11 @@ class Problem {
     // Print problem structure
     slp::println("\nProblem structure:");
     slp::println("  ↳ {} cost function",
-                 types[slp::to_underlying(cost_function_type())]);
+                 types[std::to_underlying(cost_function_type())]);
     slp::println("  ↳ {} equality constraints",
-                 types[slp::to_underlying(equality_constraint_type())]);
+                 types[std::to_underlying(equality_constraint_type())]);
     slp::println("  ↳ {} inequality constraints",
-                 types[slp::to_underlying(inequality_constraint_type())]);
+                 types[std::to_underlying(inequality_constraint_type())]);
 
     if (m_decision_variables.size() == 1) {
       slp::print("\n1 decision variable\n");
@@ -790,13 +788,11 @@ class Problem {
         [](const gch::small_vector<Variable<Scalar>>& constraints) {
           std::array<size_t, 5> counts{};
           for (const auto& constraint : constraints) {
-            ++counts[slp::to_underlying(constraint.type())];
+            ++counts[std::to_underlying(constraint.type())];
           }
-          for (size_t i = 0; i < counts.size(); ++i) {
-            constexpr std::array names{"empty", "constant", "linear",
-                                       "quadratic", "nonlinear"};
-            const auto& count = counts[i];
-            const auto& name = names[i];
+          for (const auto& [count, name] :
+               std::views::zip(counts, std::array{"empty", "constant", "linear",
+                                                  "quadratic", "nonlinear"})) {
             if (count > 0) {
               slp::println("  ↳ {} {}", count, name);
             }

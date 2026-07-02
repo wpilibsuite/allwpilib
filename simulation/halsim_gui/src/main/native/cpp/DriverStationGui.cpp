@@ -20,6 +20,7 @@
 
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/Storage.hpp"
+#include "wpi/glass/other/AnsiDisplay.hpp"
 #include "wpi/glass/other/FMS.hpp"
 #include "wpi/glass/support/ExtraGuiWidgets.hpp"
 #include "wpi/glass/support/NameSetting.hpp"
@@ -280,6 +281,7 @@ static std::unique_ptr<JoystickModel> gJoystickSources[HAL_MAX_JOYSTICKS];
 
 // FMS
 static std::unique_ptr<FMSSimModel> gFMSModel;
+static std::unique_ptr<wpi::glass::AnsiDisplayModel> gDisplayModel;
 
 // Window management
 std::unique_ptr<DSManager> DriverStationGui::dsManager;
@@ -1556,8 +1558,13 @@ void DriverStationGui::GlobalInit() {
   dsManager->GlobalInit();
 
   gFMSModel = std::make_unique<FMSSimModel>();
+  gDisplayModel = std::make_unique<wpi::glass::AnsiDisplayModel>();
 
   HALSIM_RegisterOpModeOptionsCallback(UpdateOpModes, nullptr, true);
+  HALSIM_SetWriteDisplayAnsi([](const struct WPI_String* data) {
+    gDisplayModel->Append(wpi::util::to_string_view(data));
+    return 0;
+  });
 
   wpi::gui::AddEarlyExecute(DriverStationExecute);
 
@@ -1617,6 +1624,13 @@ void DriverStationGui::GlobalInit() {
       win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
       win->SetDefaultPos(5, 540);
     }
+    if (auto win = dsManager->AddWindow(
+            "Display", std::make_unique<wpi::glass::AnsiDisplayView>(
+                           gDisplayModel.get()))) {
+      win->DisableRenamePopup();
+      win->SetDefaultPos(250, 20);
+      win->SetDefaultSize(650, 320);
+    }
     if (auto win =
             dsManager->AddWindow("System Joysticks", DisplaySystemJoysticks)) {
       win->DisableRenamePopup();
@@ -1632,6 +1646,7 @@ void DriverStationGui::GlobalInit() {
 
   storageRoot.SetCustomClear([&storageRoot] {
     dsManager->EraseWindows();
+    gDisplayModel->Clear();
     gKeyboardJoysticks.clear();
     gRobotJoysticks.clear();
     storageRoot.GetChildArray("keyboardJoysticks").clear();

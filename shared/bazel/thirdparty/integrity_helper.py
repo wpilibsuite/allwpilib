@@ -157,7 +157,7 @@ def update_libssh():
 
 def update_mrclib():
     # Keep in sync with shared/libmrclib.gradle
-    version = "2027.1.0-alpha-1-65-g21f308e"
+    version = "2027.1.0-alpha-1-69-gc4dd18d"
 
     has_headers = True
     classifiers = [

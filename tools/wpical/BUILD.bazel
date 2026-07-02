@@ -236,7 +236,7 @@ cc_test(
     deps = [
         ":wpical_lib",
         "//shared/bazel/thirdparty/ceres",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
         "@bazel_tools//tools/cpp/runfiles",
     ],
 )

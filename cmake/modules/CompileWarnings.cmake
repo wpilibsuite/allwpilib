@@ -8,7 +8,7 @@ macro(wpilib_target_warnings target)
             -Wformat=2
             ${WPILIB_TARGET_WARNINGS}
         )
-        if(NOT NO_WERROR)
+        if(NOT WPILIB_NO_WERROR)
             set(WARNING_FLAGS ${WARNING_FLAGS} -Werror)
         endif()
 
@@ -23,7 +23,7 @@ macro(wpilib_target_warnings target)
             /D_CRT_SECURE_NO_WARNINGS
             ${WPILIB_TARGET_WARNINGS}
         )
-        if(NOT NO_WERROR)
+        if(NOT WPILIB_NO_WERROR)
             set(WARNING_FLAGS ${WARNING_FLAGS} /WX)
         endif()
 

@@ -111,13 +111,15 @@ DriverStationSim::RegisterAllianceStationIdCallback(NotifyCallback callback,
   return store;
 }
 
-HAL_AllianceStationID DriverStationSim::GetAllianceStationId() {
-  return HALSIM_GetDriverStationAllianceStationId();
+wpi::hal::AllianceStationID DriverStationSim::GetAllianceStationId() {
+  return static_cast<wpi::hal::AllianceStationID>(
+      HALSIM_GetDriverStationAllianceStationId());
 }
 
 void DriverStationSim::SetAllianceStationId(
-    HAL_AllianceStationID allianceStationId) {
-  HALSIM_SetDriverStationAllianceStationId(allianceStationId);
+    wpi::hal::AllianceStationID allianceStationId) {
+  HALSIM_SetDriverStationAllianceStationId(
+      static_cast<HAL_AllianceStationID>(allianceStationId));
 }
 
 std::unique_ptr<CallbackStore> DriverStationSim::RegisterMatchTimeCallback(

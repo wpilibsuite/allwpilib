@@ -2,6 +2,7 @@ ext {
     nativeName = 'hal'
     setBaseName = 'wpiHal'
     devMain = 'org.wpilib.hardware.hal.DevMain'
+    nativeTestSuiteName = "${nativeName}Catch2Test"
     generatedHeaders = "src/generated/main/native/include"
     splitSetup = {
         if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
@@ -69,10 +70,6 @@ ext {
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 
 cppSourcesZip {
-    from('src/main/native/athena') {
-        into '/athena'
-    }
-
     from('src/main/native/systemcore') {
         into '/systemcore'
     }

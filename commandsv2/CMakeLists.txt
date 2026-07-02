@@ -34,7 +34,7 @@ configure_file(commandsv2-config.cmake.in ${WPILIB_BINARY_DIR}/commandsv2-config
 install(FILES ${WPILIB_BINARY_DIR}/commandsv2-config.cmake DESTINATION share/commandsv2)
 install(EXPORT commandsv2 DESTINATION share/commandsv2)
 
-if(WITH_TESTS)
+if(WPILIB_WITH_TESTS)
     wpilib_add_test(commandsv2 src/test/native/cpp)
     target_include_directories(commandsv2_test PRIVATE src/test/native/include)
     target_link_libraries(commandsv2_test commandsv2 googletest)

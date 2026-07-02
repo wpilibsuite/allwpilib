@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include <bit>
 #include <cassert>
 #include <span>
 #include <string>
@@ -14,7 +15,6 @@
 #include <vector>
 
 #include "wpi/util/StringMap.hpp"
-#include "wpi/util/bit.hpp"
 
 namespace wpi::util {
 
@@ -457,7 +457,7 @@ class DynamicStruct {
   float GetFloatField(const StructFieldDescriptor* field,
                       size_t arrIndex = 0) const {
     assert(field->m_type == StructFieldType::FLOAT);
-    return bit_cast<float>(
+    return std::bit_cast<float>(
         static_cast<uint32_t>(GetFieldImpl(field, arrIndex)));
   }
 
@@ -471,7 +471,7 @@ class DynamicStruct {
   double GetDoubleField(const StructFieldDescriptor* field,
                         size_t arrIndex = 0) const {
     assert(field->m_type == StructFieldType::DOUBLE);
-    return bit_cast<double>(GetFieldImpl(field, arrIndex));
+    return std::bit_cast<double>(GetFieldImpl(field, arrIndex));
   }
 
   /**
@@ -591,7 +591,7 @@ class MutableDynamicStruct : public DynamicStruct {
   void SetFloatField(const StructFieldDescriptor* field, float value,
                      size_t arrIndex = 0) {
     assert(field->m_type == StructFieldType::FLOAT);
-    SetFieldImpl(field, bit_cast<uint32_t>(value), arrIndex);
+    SetFieldImpl(field, std::bit_cast<uint32_t>(value), arrIndex);
   }
 
   /**
@@ -604,7 +604,7 @@ class MutableDynamicStruct : public DynamicStruct {
   void SetDoubleField(const StructFieldDescriptor* field, double value,
                       size_t arrIndex = 0) {
     assert(field->m_type == StructFieldType::DOUBLE);
-    SetFieldImpl(field, bit_cast<uint64_t>(value), arrIndex);
+    SetFieldImpl(field, std::bit_cast<uint64_t>(value), arrIndex);
   }
 
   /**

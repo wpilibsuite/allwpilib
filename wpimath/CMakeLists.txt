@@ -20,12 +20,10 @@ file(
     src/main/native/cpp/jni/optimization/ProblemJNI.cpp
 )
 
-file(
-    GLOB_RECURSE wpimath_native_src
-    src/main/native/cpp/*.cpp
-    src/main/native/thirdparty/sleipnir/src/*.cpp
-)
+file(GLOB_RECURSE wpimath_native_src src/main/native/cpp/*.cpp)
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
+
+file(GLOB_RECURSE sleipnir_native_src src/main/native/thirdparty/sleipnir/src/*.cpp)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
 
@@ -70,7 +68,7 @@ endif()
 wpilib_target_warnings(wpimath)
 target_link_libraries(wpimath wpiutil)
 
-if(NOT USE_SYSTEM_EIGEN)
+if(NOT WPILIB_USE_SYSTEM_EIGEN)
     install(
         DIRECTORY src/main/native/thirdparty/eigen/include/
         DESTINATION "${include_dest}/wpimath"
@@ -86,18 +84,37 @@ else()
     target_link_libraries(wpimath Eigen3::Eigen)
 endif()
 
-install(
-    DIRECTORY src/main/native/thirdparty/gcem/include/ src/main/native/thirdparty/sleipnir/include/
-    DESTINATION "${include_dest}/wpimath"
-)
+install(DIRECTORY src/main/native/thirdparty/gcem/include/ DESTINATION "${include_dest}/wpimath")
 target_include_directories(
     wpimath
     SYSTEM
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/gcem/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/src>
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/gcem/include>
 )
+
+if(NOT WPILIB_USE_SYSTEM_SLEIPNIR)
+    target_sources(wpimath PRIVATE ${sleipnir_native_src})
+    install(
+        DIRECTORY src/main/native/thirdparty/sleipnir/include/
+        DESTINATION "${include_dest}/wpimath"
+    )
+    target_include_directories(
+        wpimath
+        SYSTEM
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/src>
+    )
+else()
+    find_package(Sleipnir CONFIG REQUIRED)
+    target_link_libraries(wpimath Sleipnir::Sleipnir)
+    if(MSVC)
+        get_target_property(Sleipnir_includes Sleipnir::Sleipnir INTERFACE_INCLUDE_DIRECTORIES)
+        foreach(dir ${Sleipnir_includes})
+            target_compile_options(wpimath PUBLIC /external:I "${dir}")
+        endforeach()
+        target_compile_options(wpimath PUBLIC /external:W0)
+    endif()
+endif()
 
 install(
     DIRECTORY src/generated/main/native/cpp/
@@ -121,7 +138,7 @@ configure_file(wpimath-config.cmake.in ${WPILIB_BINARY_DIR}/wpimath-config.cmake
 install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION share/wpimath)
 install(EXPORT wpimath DESTINATION share/wpimath)
 
-if(WITH_TESTS)
+if(WPILIB_WITH_TESTS)
     wpilib_add_test(wpimath src/test/native/cpp)
     target_include_directories(wpimath_test PRIVATE src/test/native/include)
     target_link_libraries(wpimath_test wpimath googletest)

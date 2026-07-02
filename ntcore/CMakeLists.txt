@@ -43,7 +43,7 @@ add_executable(ntcoredev src/dev/native/cpp/main.cpp)
 wpilib_target_warnings(ntcoredev)
 target_link_libraries(ntcoredev ntcore)
 
-if(WITH_TESTS)
+if(WPILIB_WITH_TESTS)
     wpilib_add_test_catch2(ntcore src/test/native/cpp)
     target_include_directories(ntcore_test PRIVATE src/main/native/cpp)
     target_link_libraries(ntcore_test ntcore wpiutil_testlib)
