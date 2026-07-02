@@ -1197,8 +1197,8 @@
     },
     "@@wpilib_toolchains+//:extensions.bzl%cfg": {
       "general": {
-        "bzlTransitiveDigest": "4EcQ5gXuzBG/F4iFNA3PnbuyuHwxHSMo3YEgjMR8dHY=",
-        "usagesDigest": "PJDI7/4nwQLBhq5rTQLEdCc+jPyFkkfnmVCmIFh6kBU=",
+        "bzlTransitiveDigest": "5T579AHRwLc0A/i+Rdu35JYg72ihUReW8rstqjx6gUg=",
+        "usagesDigest": "4EjUObZOc67j/tuDz4kbbxNU5EOmusMJ6q2+7VHZGKU=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -1246,144 +1246,6 @@
           }
         },
         "recordedRepoMappingEntries": []
-      }
-    },
-    "@@wpilib_toolchains+//:maven_deps.bzl%deps": {
-      "general": {
-        "bzlTransitiveDigest": "zlHvNnUfnQ39XMj1oQlWOAxWSYf5cLsWKBz5SaBsK/k=",
-        "usagesDigest": "DZl5qUC47VZC5gNGFjMdjGAFWPPSkRubkuJxkdyfFvo=",
-        "recordedFileInputs": {},
-        "recordedDirentsInputs": {},
-        "envVariables": {},
-        "generatedRepoSpecs": {
-          "gcc_systemcore_debug_linux": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-debug-2027-x86_64-linux-gnu-Toolchain-14.3.0.tgz",
-              "sha256": "ce8c7bea554d48cef44e2cfcf84591ed5824f3cdb4107ce5707a6fdae7452fd2",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "gcc_systemcore_debug_linuxaarch64": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-debug-2027-aarch64-trixie-linux-gnu-Toolchain-14.3.0.tgz",
-              "sha256": "7dc8d930586cc2de2e6c8288a706146d419e6072573632a9a3ac91b693b45172",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "gcc_systemcore_debug_macos": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-debug-2027-x86_64-apple-darwin-Toolchain-14.3.0.tgz",
-              "sha256": "003f0b6e752a9d177dfa45b614c012e911a2a92782189501c19a635d7d8899c1",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "gcc_systemcore_debug_macosarm": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-debug-2027-arm64-apple-darwin-Toolchain-14.3.0.tgz",
-              "sha256": "103cf2b9fcf32c4c264570a0719c975dc597219bb41f926e55a4ed24babe2733",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "gcc_systemcore_debug_win": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-debug-2027-x86_64-w64-mingw32-Toolchain-14.3.0.tgz",
-              "sha256": "5c1ad97f9174914229b7bb0dda36a995ae81d32d65e6f3a9bfcf4f122a94ecd1",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "gcc_systemcore_linux": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-2027-x86_64-linux-gnu-Toolchain-14.3.0.tgz",
-              "sha256": "992d4f2037762588c062f5b22f282b92b9143a2e8cb39a2027e67249c8ed5bea",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "gcc_systemcore_linuxaarch64": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-2027-aarch64-trixie-linux-gnu-Toolchain-14.3.0.tgz",
-              "sha256": "91eb185ee07efa58b16d03076e1d96afb3b551a3cc80f7195b573a3427790b3b",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "gcc_systemcore_macos": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-2027-x86_64-apple-darwin-Toolchain-14.3.0.tgz",
-              "sha256": "b63b5b2165ea81686c05e2abe483b02293a98bfd6ce72690d74c864833028dbc",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "gcc_systemcore_macosarm": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-2027-arm64-apple-darwin-Toolchain-14.3.0.tgz",
-              "sha256": "12a3b4feaf48b6567b1b85274b856b423103035c297cd50b31b31e1b74a275c8",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "gcc_systemcore_win": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-systemcore-2027-x86_64-w64-mingw32-Toolchain-14.3.0.tgz",
-              "sha256": "337f0bc3d1d0ecc7cfdb859c0994cbba05456b8344e67aaf56cabbe324fab4aa",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "gcc_trixie64_linux": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-trixie-2027-x86_64-linux-gnu-Toolchain-14.3.0.tgz",
-              "sha256": "76dd88aff88f2fda1ea0bfdb996e32a8a689c929dc492b874d5abd9a7c3ee06a",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "gcc_trixie64_linuxaarch64": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-trixie-2027-aarch64-trixie-linux-gnu-Toolchain-14.3.0.tgz",
-              "sha256": "6b93174a00d8affeb7325a69da1e2e7209dc8edf9b5f5467189972040797b7ac",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "gcc_trixie64_macos": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-trixie-2027-x86_64-apple-darwin-Toolchain-14.3.0.tgz",
-              "sha256": "e67b153e7cacf5dad7be349787f20a609085bbb00e61491783571f431fda991c",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "gcc_trixie64_macosarm": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-trixie-2027-arm64-apple-darwin-Toolchain-14.3.0.tgz",
-              "sha256": "6d39e865ecb141027b365f6b176101028bf3793c744768fd324c78e7333acbb6",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          },
-          "gcc_trixie64_win": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://github.com/wpilibsuite/opensdk/releases/download/v2027-1/arm64-trixie-2027-x86_64-w64-mingw32-Toolchain-14.3.0.tgz",
-              "sha256": "9fffe71e7f3303fed7bdabfb7418cdc91c78a09466cccb0982bb0430d5ef581d",
-              "build_file_content": "filegroup(\n    name = \"all\",\n    srcs = glob([\"**\"]),\n    visibility = [\"//visibility:public\"],\n)\n"
-            }
-          }
-        },
-        "recordedRepoMappingEntries": [
-          [
-            "wpilib_toolchains+",
-            "bazel_tools",
-            "bazel_tools"
-          ]
-        ]
       }
     }
   },
