@@ -10,7 +10,11 @@ from pathlib import Path
 
 
 def generate_quickbuf(
-    protoc, quickbuf_plugin: Path, output_directory: Path, proto_dir: Path
+    protoc,
+    quickbuf_plugin: Path,
+    output_directory: Path,
+    proto_dir: Path,
+    proto_path: Path,
 ):
     output_directory.mkdir(parents=True, exist_ok=True)
     proto_files = proto_dir.glob("*.proto")
@@ -22,10 +26,11 @@ def generate_quickbuf(
                 f"--plugin=protoc-gen-quickbuf={quickbuf_plugin}",
                 f"--quickbuf_out=gen_descriptors=true:{output_directory.absolute()}",
                 f"-I{absolute_filename.parent}",
+                f"-I={proto_path}",
                 absolute_filename,
             ]
         )
-    java_files = (output_directory / "org/wpilib/math/proto").glob("*.java")
+    java_files = (output_directory / "org/wpilib/vision/apriltag/proto").glob("*.java")
     for java_file in java_files:
         with (java_file).open(encoding="utf-8") as f:
             content = f.read()
@@ -41,6 +46,7 @@ def generate_quickbuf(
 def main():
     script_path = Path(__file__).resolve()
     dirname = script_path.parent
+    root_path = dirname.parent
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -65,10 +71,20 @@ def main():
         default=dirname / "src/main/proto",
         type=Path,
     )
+    parser.add_argument(
+        "--proto_path",
+        help="Optional. Specifies additional directories in which to search for protobuf imports",
+        default=root_path,
+        type=Path,
+    )
     args = parser.parse_args()
 
     generate_quickbuf(
-        args.protoc, args.quickbuf_plugin, args.output_directory, args.proto_directory
+        args.protoc,
+        args.quickbuf_plugin,
+        args.output_directory,
+        args.proto_directory,
+        args.proto_path,
     )
 
 
