@@ -5,9 +5,9 @@ Subject: [PATCH 2/2] Downgrade to Eigen 5.0.1
 
 ---
  include/sleipnir/autodiff/variable.hpp        | 20 ++++++--
- include/sleipnir/autodiff/variable_block.hpp  | 30 +++++++++---
- include/sleipnir/autodiff/variable_matrix.hpp | 46 ++++++++++++-------
- 3 files changed, 69 insertions(+), 27 deletions(-)
+ include/sleipnir/autodiff/variable_block.hpp  | 24 ++++++---
+ include/sleipnir/autodiff/variable_matrix.hpp | 50 ++++++++++++-------
+ 3 files changed, 66 insertions(+), 28 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/variable.hpp b/include/sleipnir/autodiff/variable.hpp
 index ad8baa3b58047f5257c210b88446324cca121d4a..6c692cbe113a3aaf7f02727260ed0b6d1f4a3c23 100644
@@ -55,7 +55,7 @@ index ad8baa3b58047f5257c210b88446324cca121d4a..6c692cbe113a3aaf7f02727260ed0b6d
    }
  
 diff --git a/include/sleipnir/autodiff/variable_block.hpp b/include/sleipnir/autodiff/variable_block.hpp
-index 55cafb5d48afff2dbdff07516d85759180ef74c7..cf1b2a37614f748db679071df1780a569527983f 100644
+index 272e036e7ca6372e9255b24e674e55cd60f8b75c..e744b11070d844514b0d6d1c5fe29c905512c3fc 100644
 --- a/include/sleipnir/autodiff/variable_block.hpp
 +++ b/include/sleipnir/autodiff/variable_block.hpp
 @@ -161,7 +161,7 @@ class VariableBlock : public SleipnirBase {
@@ -89,20 +89,7 @@ index 55cafb5d48afff2dbdff07516d85759180ef74c7..cf1b2a37614f748db679071df1780a56
          }
          (*this)[i, j] = sum;
        }
-@@ -470,7 +474,11 @@ class VariableBlock : public SleipnirBase {
- 
-     for (int row = 0; row < rows(); ++row) {
-       for (int col = 0; col < cols(); ++col) {
--        (*this)[row, col] /= rhs[0, 0];
-+        if constexpr (EigenMatrixLike<decltype(rhs)>) {
-+          (*this)[row, col] /= rhs(0, 0);
-+        } else {
-+          (*this)[row, col] /= rhs[0, 0];
-+        }
-       }
-     }
- 
-@@ -500,7 +508,11 @@ class VariableBlock : public SleipnirBase {
+@@ -484,7 +488,11 @@ class VariableBlock : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -115,7 +102,7 @@ index 55cafb5d48afff2dbdff07516d85759180ef74c7..cf1b2a37614f748db679071df1780a56
        }
      }
  
-@@ -532,7 +544,11 @@ class VariableBlock : public SleipnirBase {
+@@ -516,7 +524,11 @@ class VariableBlock : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -128,7 +115,7 @@ index 55cafb5d48afff2dbdff07516d85759180ef74c7..cf1b2a37614f748db679071df1780a56
        }
      }
  
-@@ -612,7 +628,7 @@ class VariableBlock : public SleipnirBase {
+@@ -596,7 +608,7 @@ class VariableBlock : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -138,7 +125,7 @@ index 55cafb5d48afff2dbdff07516d85759180ef74c7..cf1b2a37614f748db679071df1780a56
      }
  
 diff --git a/include/sleipnir/autodiff/variable_matrix.hpp b/include/sleipnir/autodiff/variable_matrix.hpp
-index 72559959cfc4cb38e099a2268c66088ea19551f5..59393e2eabdf9107de8ff6b554a48d83f8b9ef1e 100644
+index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83f8b9ef1e 100644
 --- a/include/sleipnir/autodiff/variable_matrix.hpp
 +++ b/include/sleipnir/autodiff/variable_matrix.hpp
 @@ -154,7 +154,7 @@ class VariableMatrix : public SleipnirBase {
@@ -168,6 +155,24 @@ index 72559959cfc4cb38e099a2268c66088ea19551f5..59393e2eabdf9107de8ff6b554a48d83
        }
      }
    }
+@@ -507,7 +507,7 @@ class VariableMatrix : public SleipnirBase {
+       for (int j = 0; j < rhs.cols(); ++j) {
+         Variable sum{Scalar(0)};
+         for (int k = 0; k < lhs.cols(); ++k) {
+-          sum += lhs[i, k] * rhs[k, j];
++          sum += lhs(i, k) * rhs[k, j];
+         }
+         result[i, j] = sum;
+       }
+@@ -530,7 +530,7 @@ class VariableMatrix : public SleipnirBase {
+       for (int j = 0; j < rhs.cols(); ++j) {
+         Variable sum{Scalar(0)};
+         for (int k = 0; k < lhs.cols(); ++k) {
+-          sum += lhs[i, k] * rhs[k, j];
++          sum += lhs[i, k] * rhs(k, j);
+         }
+         result[i, j] = sum;
+       }
 @@ -573,7 +573,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
