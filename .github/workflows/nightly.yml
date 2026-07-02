@@ -1,0 +1,221 @@
+name: Nightly Build
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Every day at 12:00 AM UTC (8PM EST)
+  pull_request: # TODO:TODO:TODO: REMOVE
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cmake:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: "Arch Linux"
+            container: ghcr.io/pkgforge-dev/archlinux:latest
+            flags: "--preset with-java-and-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
+          # - os: ubuntu-24.04-arm
+          #   name: "Arch Linux ARM"
+          #   container: ghcr.io/pkgforge-dev/archlinux:latest
+          #   flags: "--preset with-java-and-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
+          - os: macos-latest
+            name: macOS
+            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
+          - os: windows-latest
+            name: Windows
+            flags: '--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE="$Env:RUNNER_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release'
+          # - os: windows-11-arm
+          #   name: "Windows ARM"
+          #   flags: '--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE="$Env:RUNNER_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=arm64-windows-release -DVCPKG_HOST_TRIPLET=arm64-windows-release'
+
+    name: "Build CMake - ${{ matrix.name }}"
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+    steps:
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: pacman -Syu --noconfirm opencv ninja avahi cmake sccache jdk25-openjdk gcc xorg-xrandr libxinerama
+
+      - name: Setup avahi-daemon
+        if: runner.os == 'Linux'
+        run: |
+          mkdir -p /var/run/dbus
+          dbus-uuidgen --ensure
+          dbus-daemon --system --address=unix:path=/var/run/dbus/system_bus_socket
+          avahi-daemon -D
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install opencv ninja
+
+      - name: Setup Latest Xcode (macOS)
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - uses: ilammy/msvc-dev-cmd@v1.13.0
+        if: runner.os == 'Windows'
+
+      - name: Install CMake (Windows only)
+        if: runner.os == 'Windows'
+        uses: lukka/get-cmake@latest
+
+      - name: Install sccache
+        uses: mozilla-actions/sccache-action@v0.0.10
+
+      - uses: actions/checkout@v6
+
+      - name: Run vcpkg (Windows only)
+        if: runner.os == 'Windows'
+        uses: lukka/run-vcpkg@v11.5
+        with:
+          vcpkgDirectory: ${{ runner.workspace }}/vcpkg
+          vcpkgGitCommitId: 74e6536215718009aae747d86d84b78376bf9e09 # HEAD on 2025-10-17
+
+      - name: configure
+        run: cmake ${{ matrix.flags }}
+        env:
+          SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+
+      - name: build
+        run: cmake --build build-cmake --parallel $(nproc)
+        env:
+          SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+
+      - name: test
+        if: runner.os != 'Windows'
+        working-directory: build-cmake
+        run: ctest --output-on-failure
+
+      - name: test (windows)
+        if: runner.os == 'Windows'
+        working-directory: build-cmake
+        # UnitTest_test segfaults on exit occasionally
+        run: ctest --output-on-failure -E 'UnitTest'
+
+  gradle-docker:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # - os: ubuntu-24.04-arm
+          #   container: ghcr.io/pkgforge-dev/archlinux:latest
+          #   artifact-name: ArchLinuxArm64
+          #   build-options: "-Ponlylinuxarm64"
+          - os: ubuntu-latest
+            container: ghcr.io/pkgforge-dev/archlinux:latest
+            artifact-name: ArchLinux
+            build-options: "-Ponlylinuxx86-64"
+          - os: windows-latest
+            artifact-name: Win64
+            architecture: x64
+            build-options: "-PciReleaseOnly"
+            task: "copyAllOutputs"
+            outputs: "build/allOutputs"
+          # - os: windows-11-arm
+          #   artifact-name: WinArm64Release
+          #   architecture: arm64
+          #   build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64"
+          #   task: "copyAllOutputs"
+          #   outputs: "build/allOutputs"
+          - os: macos-latest
+            artifact-name: macOS
+            architecture: aarch64
+            task: "build"
+            outputs: "build/allOutputs"
+
+    name: "Build Gradle - ${{ matrix.artifact-name }}"
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Free disk space
+        if: runner.os == 'Linux'
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+
+      - name: Free disk space (macOS)
+        if: runner.os == 'macOS'
+        # CodeQL: 5G
+        # go: 748M
+        # Android: 12G
+        run: |
+          echo "##[group]Before Cleanup"
+          df -h
+          echo "##[endgroup]"
+
+          rm -rf /Users/runner/hostedtoolcache/CodeQL
+          rm -rf /Users/runner/hostedtoolcache/go
+          rm -rf /Users/runner/Library/Android
+
+          echo "##[group]After Cleanup"
+          df -h
+          echo "##[endgroup]"
+
+      - name: Setup Latest Xcode (macOS)
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        if: runner.os != 'Linux'
+        with:
+          distribution: 'temurin'
+          java-version: 25
+          architecture: ${{ matrix.architecture }}
+
+      - name: Build with Gradle (host)
+        if: ${{ matrix.container == '' }}
+        run: ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+
+      - name: Build with Gradle (docker)
+        if: matrix.container
+        uses: wpilibsuite/docker-run-action@v4
+        with:
+          image: ${{ matrix.container }}
+          options: -v ${{ github.workspace }}:/work -w /work -e ARTIFACTORY_PUBLISH_USERNAME -e ARTIFACTORY_PUBLISH_PASSWORD -e GITHUB_REF -e CI
+          # Start avahi-daemon and build
+          run: |
+            pacman -Syu --noconfirm opencv ninja avahi cmake sccache jdk25-openjdk gcc xorg-xrandr libxinerama which
+            mkdir -p /var/run/dbus
+            dbus-uuidgen --ensure
+            dbus-daemon --system --address=unix:path=/var/run/dbus/system_bus_socket
+            avahi-daemon -D
+            ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: build/allOutputs
+
+      - name: Check disk free space
+        if: always()
+        run: df -h
