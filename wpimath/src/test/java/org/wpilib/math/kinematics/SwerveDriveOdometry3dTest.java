@@ -45,10 +45,10 @@ class SwerveDriveOdometry3dTest {
             new Pose3d(1, 2, 0, new Rotation3d(0, 0, Units.degreesToRadians(45))));
     var pose = odometry.getPose();
     assertAll(
-        () -> assertEquals(pose.getX(), 1.0, 1e-9),
-        () -> assertEquals(pose.getY(), 2.0, 1e-9),
-        () -> assertEquals(pose.getZ(), 0.0, 1e-9),
-        () -> assertEquals(pose.getRotation().toRotation2d().getDegrees(), 45.0, 1e-9));
+        () -> assertEquals(1.0, pose.getX(), 1e-9),
+        () -> assertEquals(2.0, pose.getY(), 1e-9),
+        () -> assertEquals(0.0, pose.getZ(), 1e-9),
+        () -> assertEquals(45.0, pose.getRotation().toRotation2d().getDegrees(), 1e-9));
   }
 
   @Test
@@ -306,11 +306,11 @@ class SwerveDriveOdometry3dTest {
     var pose = m_odometry.update(new Rotation3d(0, Units.degreesToRadians(10), 0), modulePositions);
 
     assertAll(
-        () -> assertEquals(pose.getX(), 0.0, 1e-9),
-        () -> assertEquals(pose.getY(), 0.0, 1e-9),
-        () -> assertEquals(pose.getZ(), 0.0, 1e-9),
-        () -> assertEquals(pose.getRotation().getX(), Units.degreesToRadians(0), 1e-9),
-        () -> assertEquals(pose.getRotation().getY(), Units.degreesToRadians(5), 1e-9),
-        () -> assertEquals(pose.getRotation().getZ(), Units.degreesToRadians(90), 1e-9));
+        () -> assertEquals(0.0, pose.getX(), 1e-9),
+        () -> assertEquals(0.0, pose.getY(), 1e-9),
+        () -> assertEquals(0.0, pose.getZ(), 1e-9),
+        () -> assertEquals(Units.degreesToRadians(0), pose.getRotation().getX(), 1e-9),
+        () -> assertEquals(Units.degreesToRadians(5), pose.getRotation().getY(), 1e-9),
+        () -> assertEquals(Units.degreesToRadians(90), pose.getRotation().getZ(), 1e-9));
   }
 }

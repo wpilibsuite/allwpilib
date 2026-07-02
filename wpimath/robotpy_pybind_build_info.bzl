@@ -229,6 +229,26 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
+            class_name = "TwoDeadWheelPoseEstimator",
+            yml_file = "semiwrap/TwoDeadWheelPoseEstimator.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/estimator/TwoDeadWheelPoseEstimator.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::TwoDeadWheelPoseEstimator", "wpi__math__TwoDeadWheelPoseEstimator.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TwoDeadWheelPoseEstimator3d",
+            yml_file = "semiwrap/TwoDeadWheelPoseEstimator3d.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/estimator/TwoDeadWheelPoseEstimator3d.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::TwoDeadWheelPoseEstimator3d", "wpi__math__TwoDeadWheelPoseEstimator3d.hpp"),
+            ],
+        ),
+        struct(
             class_name = "ExtendedKalmanFilter",
             yml_file = "semiwrap/ExtendedKalmanFilter.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
@@ -291,6 +311,7 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
                 ("PoseEstimator_tmpl4", "SwerveDrive3PoseEstimatorBase"),
                 ("PoseEstimator_tmpl5", "SwerveDrive4PoseEstimatorBase"),
                 ("PoseEstimator_tmpl6", "SwerveDrive6PoseEstimatorBase"),
+                ("PoseEstimator_tmpl7", "TwoDeadWheelPoseEstimatorBase"),
             ],
             trampolines = [
                 ("wpi::math::PoseEstimator", "wpi__math__PoseEstimator.hpp"),
@@ -308,6 +329,7 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
                 ("PoseEstimator3d_tmpl4", "SwerveDrive3PoseEstimator3dBase"),
                 ("PoseEstimator3d_tmpl5", "SwerveDrive4PoseEstimator3dBase"),
                 ("PoseEstimator3d_tmpl6", "SwerveDrive6PoseEstimator3dBase"),
+                ("PoseEstimator3d_tmpl7", "TwoDeadWheelPoseEstimator3dBase"),
             ],
             trampolines = [
                 ("wpi::math::PoseEstimator3d", "wpi__math__PoseEstimator3d.hpp"),
@@ -659,6 +681,36 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
+            class_name = "TwoDeadWheelOdometry",
+            yml_file = "semiwrap/TwoDeadWheelOdometry.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/TwoDeadWheelOdometry.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::TwoDeadWheelOdometry", "wpi__math__TwoDeadWheelOdometry.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TwoDeadWheelOdometry3d",
+            yml_file = "semiwrap/TwoDeadWheelOdometry3d.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/TwoDeadWheelOdometry3d.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::TwoDeadWheelOdometry3d", "wpi__math__TwoDeadWheelOdometry3d.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TwoDeadWheelPositions",
+            yml_file = "semiwrap/TwoDeadWheelPositions.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/TwoDeadWheelPositions.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::TwoDeadWheelPositions", "wpi__math__TwoDeadWheelPositions.hpp"),
+            ],
+        ),
+        struct(
             class_name = "Kinematics",
             yml_file = "semiwrap/Kinematics.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
@@ -747,6 +799,7 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
                 ("Odometry_tmpl4", "SwerveDrive3OdometryBase"),
                 ("Odometry_tmpl5", "SwerveDrive4OdometryBase"),
                 ("Odometry_tmpl6", "SwerveDrive6OdometryBase"),
+                ("Odometry_tmpl7", "TwoDeadWheelOdometryBase"),
             ],
             trampolines = [
                 ("wpi::math::Odometry", "wpi__math__Odometry.hpp"),
@@ -758,12 +811,13 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
             header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/Odometry3d.hpp",
             tmpl_class_names = [
-                ("Odometry3d_tmpl1", "DifferentialDriveOdometry3dBase"),
-                ("Odometry3d_tmpl2", "MecanumDriveOdometry3dBase"),
-                ("Odometry3d_tmpl3", "SwerveDrive2Odometry3dBase"),
-                ("Odometry3d_tmpl4", "SwerveDrive3Odometry3dBase"),
-                ("Odometry3d_tmpl5", "SwerveDrive4Odometry3dBase"),
-                ("Odometry3d_tmpl6", "SwerveDrive6Odometry3dBase"),
+                ("Odometry3d_tmpl1", "TwoDeadWheelOdometry3dBase"),
+                ("Odometry3d_tmpl2", "DifferentialDriveOdometry3dBase"),
+                ("Odometry3d_tmpl3", "MecanumDriveOdometry3dBase"),
+                ("Odometry3d_tmpl4", "SwerveDrive2Odometry3dBase"),
+                ("Odometry3d_tmpl5", "SwerveDrive3Odometry3dBase"),
+                ("Odometry3d_tmpl6", "SwerveDrive4Odometry3dBase"),
+                ("Odometry3d_tmpl7", "SwerveDrive6Odometry3dBase"),
             ],
             trampolines = [
                 ("wpi::math::Odometry3d", "wpi__math__Odometry3d.hpp"),

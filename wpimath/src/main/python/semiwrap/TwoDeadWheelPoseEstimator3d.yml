@@ -1,0 +1,9 @@
+classes:
+  wpi::math::TwoDeadWheelPoseEstimator3d:
+    force_no_trampoline: true
+    methods:
+      TwoDeadWheelPoseEstimator3d:
+        overloads:
+          wpi::units::meter_t, wpi::units::meter_t, const Rotation3d&, const TwoDeadWheelPositions&, const Pose3d&:
+          ? wpi::units::meter_t, wpi::units::meter_t, const Rotation3d&, const TwoDeadWheelPositions&, const Pose3d&, const wpi::util::array<double, 4>&, const wpi::util::array<double, 4>&
+          :

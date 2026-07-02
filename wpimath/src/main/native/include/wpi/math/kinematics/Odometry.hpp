@@ -7,7 +7,7 @@
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
-#include "wpi/math/kinematics/Kinematics.hpp"
+#include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -26,26 +26,20 @@ namespace wpi::math {
  * @tparam WheelVelocities Wheel velocities type.
  * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename WheelPositions, typename WheelVelocities,
-          typename WheelAccelerations>
+template <typename WheelPositions>
 class WPILIB_DLLEXPORT Odometry {
  public:
+  virtual ~Odometry() = default;
+
   /**
    * Constructs an Odometry object.
    *
-   * @param kinematics The kinematics for your drivetrain.
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit Odometry(const Kinematics<WheelPositions, WheelVelocities,
-                                     WheelAccelerations>& kinematics,
-                    const Rotation2d& gyroAngle,
-                    const WheelPositions& wheelPositions,
+  explicit Odometry(const Rotation2d& gyroAngle,
                     const Pose2d& initialPose = Pose2d{})
-      : m_kinematics(kinematics),
-        m_pose(initialPose),
-        m_previousWheelPositions(wheelPositions) {
+      : m_pose(initialPose) {
     m_previousAngle = m_pose.Rotation();
     m_gyroOffset = (-gyroAngle).RotateBy(m_pose.Rotation());
   }
@@ -60,13 +54,9 @@ class WPILIB_DLLEXPORT Odometry {
    * @param wheelPositions The current distances measured by each wheel.
    * @param pose The position on the field that your robot is at.
    */
-  void ResetPosition(const Rotation2d& gyroAngle,
-                     const WheelPositions& wheelPositions, const Pose2d& pose) {
-    m_pose = pose;
-    m_previousAngle = pose.Rotation();
-    m_gyroOffset = (-gyroAngle).RotateBy(m_pose.Rotation());
-    m_previousWheelPositions = wheelPositions;
-  }
+  virtual void ResetPosition(const Rotation2d& gyroAngle,
+                             const WheelPositions& wheelPositions,
+                             const Pose2d& pose) = 0;
 
   /**
    * Resets the pose.
@@ -113,33 +103,53 @@ class WPILIB_DLLEXPORT Odometry {
    * kinematics, in addition to the current distance measurement at each wheel.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelPositions The current distances measured by each wheel.
-   *
+   * @param wheelPositions The current encoder readings.
    * @return The new pose of the robot.
    */
-  const Pose2d& Update(const Rotation2d& gyroAngle,
-                       const WheelPositions& wheelPositions) {
+  virtual const Pose2d& Update(const Rotation2d& gyroAngle,
+                               const WheelPositions& wheelPositions) = 0;
+
+ protected:
+  /**
+   * Resets the robot's position on the field.
+   *
+   * The implementing class should call this method once they have reset their
+   * wheel positions.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param pose The position on the field that your robot is at.
+   */
+  void ResetPosition(const Rotation2d& gyroAngle, const Pose2d& pose) {
+    m_pose = pose;
+    m_previousAngle = pose.Rotation();
+    m_gyroOffset = (-gyroAngle).RotateBy(m_pose.Rotation());
+  }
+
+  /**
+   * Updates the robot's position on the field by integrating the pose over
+   * time. This protected method takes in a twist, which is to be calculated by
+   * the implementing class's kinematics.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param twist The twist as calculated by the implementing class's
+   * kinematics.
+   * @return The new pose of the robot.
+   */
+  const Pose2d& Update(const Rotation2d& gyroAngle, Twist2d twist) {
     auto angle = gyroAngle.RotateBy(m_gyroOffset);
 
-    auto twist =
-        m_kinematics.ToTwist2d(m_previousWheelPositions, wheelPositions);
     twist.dtheta = (angle - m_previousAngle).Radians();
 
     auto newPose = m_pose + twist.Exp();
 
     m_previousAngle = angle;
-    m_previousWheelPositions = wheelPositions;
     m_pose = {newPose.Translation(), angle};
 
     return m_pose;
   }
 
  private:
-  const Kinematics<WheelPositions, WheelVelocities, WheelAccelerations>&
-      m_kinematics;
   Pose2d m_pose;
-
-  WheelPositions m_previousWheelPositions;
 
   // Always equal to m_pose.Rotation()
   Rotation2d m_previousAngle;

@@ -27,10 +27,9 @@ namespace wpi::math {
  */
 template <size_t NumModules>
 class SwerveDriveOdometry
-    : public Odometry<wpi::util::array<SwerveModulePosition, NumModules>,
-                      wpi::util::array<SwerveModuleVelocity, NumModules>,
-                      wpi::util::array<SwerveModuleAcceleration, NumModules>> {
+    : public Odometry<wpi::util::array<SwerveModulePosition, NumModules>> {
  public:
+  using Base = Odometry<wpi::util::array<SwerveModulePosition, NumModules>>;
   /**
    * Constructs a SwerveDriveOdometry object.
    *
@@ -43,14 +42,33 @@ class SwerveDriveOdometry
       SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
       const wpi::util::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose2d& initialPose = Pose2d{})
-      : SwerveDriveOdometry::Odometry(m_kinematicsImpl, gyroAngle,
-                                      modulePositions, initialPose),
-        m_kinematicsImpl(kinematics) {
+      : Base(gyroAngle, initialPose),
+        m_kinematics(kinematics),
+        m_previousWheelPositions(modulePositions) {
     wpi::math::MathSharedStore::ReportUsage("SwerveDriveOdometry", "");
   }
 
+  void ResetPosition(
+      const Rotation2d& gyroAngle,
+      const wpi::util::array<SwerveModulePosition, NumModules>& modulePositions,
+      const Pose2d& pose) override {
+    m_previousWheelPositions = modulePositions;
+    Base::ResetPosition(gyroAngle, pose);
+  }
+
+  const Pose2d& Update(const Rotation2d& gyroAngle,
+                       const wpi::util::array<SwerveModulePosition, NumModules>&
+                           modulePositions) override {
+    auto twist =
+        m_kinematics.ToTwist2d(m_previousWheelPositions, modulePositions);
+    m_previousWheelPositions = modulePositions;
+    return Base::Update(gyroAngle, twist);
+  }
+
  private:
-  SwerveDriveKinematics<NumModules> m_kinematicsImpl;
+  SwerveDriveKinematics<NumModules> m_kinematics;
+
+  wpi::util::array<SwerveModulePosition, NumModules> m_previousWheelPositions;
 };
 
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)

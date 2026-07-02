@@ -37,8 +37,8 @@ classes:
     methods:
       DifferentialDrivePoseEstimator:
         overloads:
-          DifferentialDriveKinematics&, const Rotation2d&, wpi::units::meter_t, wpi::units::meter_t, const Pose2d&:
-          ? DifferentialDriveKinematics&, const Rotation2d&, wpi::units::meter_t, wpi::units::meter_t, const Pose2d&, const wpi::util::array<double, 3>&, const wpi::util::array<double, 3>&
+          const Rotation2d&, wpi::units::meter_t, wpi::units::meter_t, const Pose2d&:
+          ? const Rotation2d&, wpi::units::meter_t, wpi::units::meter_t, const Pose2d&, const wpi::util::array<double, 3>&, const wpi::util::array<double, 3>&
           :
       ResetPosition:
       Update:

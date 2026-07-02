@@ -7,6 +7,7 @@ package org.wpilib.math.kinematics;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Twist2d;
 
 /**
  * Class for odometry. Robot code should not use this directly- Instead, use the particular type for
@@ -19,8 +20,7 @@ import org.wpilib.math.geometry.Translation2d;
  *
  * @param <T> Wheel positions type.
  */
-public class Odometry<T> {
-  private final Kinematics<T, ?, ?> m_kinematics;
+public abstract class Odometry<T> {
   private Pose2d m_pose;
 
   private Rotation2d m_gyroOffset;
@@ -28,23 +28,16 @@ public class Odometry<T> {
   // Always equal to m_poseMeters.getRotation()
   private Rotation2d m_previousAngle;
 
-  private final T m_previousWheelPositions;
-
   /**
    * Constructs an Odometry object.
    *
-   * @param kinematics The kinematics of the drivebase.
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelPositions The current encoder readings.
    * @param initialPose The starting position of the robot on the field.
    */
-  public Odometry(
-      Kinematics<T, ?, ?> kinematics, Rotation2d gyroAngle, T wheelPositions, Pose2d initialPose) {
-    m_kinematics = kinematics;
+  public Odometry(Rotation2d gyroAngle, Pose2d initialPose) {
     m_pose = initialPose;
     m_gyroOffset = gyroAngle.unaryMinus().rotateBy(m_pose.getRotation());
     m_previousAngle = m_pose.getRotation();
-    m_previousWheelPositions = m_kinematics.copy(wheelPositions);
   }
 
   /**
@@ -57,11 +50,21 @@ public class Odometry<T> {
    * @param wheelPositions The current encoder readings.
    * @param pose The position on the field that your robot is at.
    */
-  public void resetPosition(Rotation2d gyroAngle, T wheelPositions, Pose2d pose) {
+  public abstract void resetPosition(Rotation2d gyroAngle, T wheelPositions, Pose2d pose);
+
+  /**
+   * Resets the robot's position on the field.
+   *
+   * <p>The implementing class should call this method once they have reset their wheel positions to
+   * the values provided in {@link #resetPosition(Rotation2d, Object, Pose2d)}.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param pose The position on the field that your robot is at.
+   */
+  protected void resetPosition(Rotation2d gyroAngle, Pose2d pose) {
     m_pose = pose;
     m_gyroOffset = gyroAngle.unaryMinus().rotateBy(m_pose.getRotation());
     m_previousAngle = m_pose.getRotation();
-    m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
   }
 
   /**
@@ -115,15 +118,23 @@ public class Odometry<T> {
    * @param wheelPositions The current encoder readings.
    * @return The new pose of the robot.
    */
-  public Pose2d update(Rotation2d gyroAngle, T wheelPositions) {
+  public abstract Pose2d update(Rotation2d gyroAngle, T wheelPositions);
+
+  /**
+   * Updates the robot's position on the field by integrating the pose over time. This protected
+   * method takes in a twist, which is to be calculated by the implementing class's kinematics.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param twist The twist as calculated by the implementing class's kinematics.
+   * @return The new pose of the robot.
+   */
+  protected Pose2d update(Rotation2d gyroAngle, Twist2d twist) {
     var angle = gyroAngle.rotateBy(m_gyroOffset);
 
-    var twist = m_kinematics.toTwist2d(m_previousWheelPositions, wheelPositions);
     twist.dtheta = angle.minus(m_previousAngle).getRadians();
 
     var newPose = m_pose.plus(twist.exp());
 
-    m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
     m_previousAngle = angle;
     m_pose = new Pose2d(newPose.getTranslation(), angle);
 

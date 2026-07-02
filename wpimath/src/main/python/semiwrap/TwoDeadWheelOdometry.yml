@@ -1,0 +1,8 @@
+classes:
+  wpi::math::TwoDeadWheelOdometry:
+    force_no_trampoline: true
+    methods:
+      TwoDeadWheelOdometry:
+      ResetPosition:
+      Update:
+      ToChassisVelocities:
