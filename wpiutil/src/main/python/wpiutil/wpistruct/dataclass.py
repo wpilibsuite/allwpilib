@@ -57,9 +57,9 @@ def make_wpistruct(cls=None, /, *, name: typing.Optional[str] = None):
             z: wpiutil.struct.double
 
     The types defined in the dataclass can be another WPIStruct compatible class
-    (either builtin or user defined); one of int, bool, or float; or you can
-    use one of the ``wpiutil.wpistruct.[u]int*`` values for explicitly sized
-    integer types.
+    (either builtin or user defined); one of int, bool, or float; a fixed-length
+    homogeneous tuple of those supported types; or you can use one of the
+    ``wpiutil.wpistruct.[u]int*`` values for explicitly sized integer types.
     """
 
     def wrap(cls):
@@ -91,6 +91,33 @@ _type_to_fmt = {
 }
 
 
+def _get_supported_type_names():
+    supported_names = ", ".join(t.__name__ for t in _type_to_fmt.keys())
+    return f"{supported_names}, or fixed-length homogeneous tuple of a supported type"
+
+
+def _get_fixed_tuple_array_info(cls_name: str, field_name: str, ftype: type):
+    origin = typing.get_origin(ftype)
+    if origin is not tuple:
+        return None
+
+    args = typing.get_args(ftype)
+    if not args or args[-1] is Ellipsis:
+        raise TypeError(
+            f"{cls_name}.{field_name} has unsupported tuple type hint: "
+            "tuple fields must be fixed-length and homogeneous"
+        ) from None
+
+    element_type = args[0]
+    if not all(arg == element_type for arg in args):
+        raise TypeError(
+            f"{cls_name}.{field_name} has unsupported tuple type hint: "
+            "tuple fields must be fixed-length and homogeneous"
+        ) from None
+
+    return element_type, len(args)
+
+
 def _process_class(cls, struct_name: typing.Optional[str]):
     resolved_hints = typing.get_type_hints(cls)
     field_names = [field.name for field in dataclasses.fields(cls)]
@@ -109,6 +136,7 @@ def _process_class(cls, struct_name: typing.Optional[str]):
 
     fmts = []
     schema = []
+    unpackvals = []
     cvvals = []
     vvals = []
     packs = []
@@ -124,8 +152,47 @@ def _process_class(cls, struct_name: typing.Optional[str]):
 
             fmts.append(fmt)
             schema.append(f"{stype} {name}")
+            unpackvals.append(f"arg_{name}")
             cvvals.append(f"arg_{name}")
             vvals.append(f"v.{name}")
+
+        elif array_info := _get_fixed_tuple_array_info(cls_name, name, ftype):
+            element_type, array_len = array_info
+            argn = f"arg_{name}"
+            unpack_args = [f"{argn}_{i}" for i in range(array_len)]
+
+            if element_type in _type_to_fmt:
+                fmt, stype = _type_to_fmt[element_type]
+
+                fmts.append(f"{array_len}{fmt}")
+                schema.append(f"{stype} {name}[{array_len}]")
+                unpackvals.extend(unpack_args)
+                cvvals.append(argn)
+                vvals.append(f"*v.{name}")
+                unpacks.append(f"{argn} = ({', '.join(unpack_args)},)")
+
+            elif hasattr(element_type, "WPIStruct"):
+                typn = f"type_{name}"
+
+                ctx[typn] = element_type
+                ts = wpistruct.getTypeName(element_type)
+                schema.append(f"{ts} {name}[{array_len}]")
+                sz = wpistruct.getSize(element_type)
+                fmts.extend(f"{sz}s" for _ in range(array_len))
+                unpackvals.extend(unpack_args)
+                vvals.append(f"*{argn}")
+                cvvals.append(argn)
+                packs.append(f"{argn} = tuple(wpistruct.pack(i) for i in v.{name})")
+                unpack_exprs = [f"wpistruct.unpack({typn}, {a})" for a in unpack_args]
+                unpacks.append(f"{argn} = ({', '.join(unpack_exprs)},)")
+                # unpackIntos.append(f"wpistruct.unpackInto(v.{name}, {argn})")
+                forEachNested.append(f"wpistruct.forEachNested({typn}, fn)")
+
+            else:
+                raise TypeError(
+                    f"{cls_name}.{name} is not a wpistruct or does not have a supported type hint "
+                    f"(supported: {_get_supported_type_names()})"
+                ) from None
 
         elif hasattr(ftype, "WPIStruct"):
             # nested struct
@@ -138,6 +205,7 @@ def _process_class(cls, struct_name: typing.Optional[str]):
             sz = wpistruct.getSize(ftype)
             fmts.append(f"{sz}s")
             vvals.append(argn)
+            unpackvals.append(argn)
             cvvals.append(argn)
             packs.append(f"{argn} = wpistruct.pack(v.{name})")
             unpacks.append(f"{argn} = wpistruct.unpack({typn}, {argn})")
@@ -145,13 +213,13 @@ def _process_class(cls, struct_name: typing.Optional[str]):
             forEachNested.append(f"wpistruct.forEachNested({typn}, fn)")
 
         else:
-            supported_names = ", ".join(t.__name__ for t in _type_to_fmt.keys())
             raise TypeError(
                 f"{cls_name}.{name} is not a wpistruct or does not have a supported type hint "
-                f"(supported: {supported_names})"
+                f"(supported: {_get_supported_type_names()})"
             ) from None
 
     s = struct.Struct(f"<{''.join(fmts)}")
+    uvals = ", ".join(unpackvals)
     cvals = ", ".join(cvvals)
     vals = ", ".join(vvals)
 
@@ -195,7 +263,7 @@ def _process_class(cls, struct_name: typing.Optional[str]):
 
         def _unpack(b):
             try:
-                {cvals} = _s.unpack(b)
+                {uvals} = _s.unpack(b)
                 {unpack_stmts}
                 return cls({cvals})
             except Exception as e:

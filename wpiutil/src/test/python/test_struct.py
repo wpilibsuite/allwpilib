@@ -179,6 +179,69 @@ def test_user_unpack():
     assert wpistruct.unpack(MyStruct, b"\x02\x00\x00\x00\x01\x00\x00\x60\x40") == v
 
 
+@wpistruct.make_wpistruct(name="VectorStruct")
+@dataclasses.dataclass
+class VectorStruct:
+    data: tuple[wpistruct.double, wpistruct.double, wpistruct.double]
+
+
+def test_user_tuple_array_get_schema():
+    assert wpistruct.getSchema(VectorStruct) == "double data[3]"
+
+
+def test_user_tuple_array_get_size():
+    assert wpistruct.getSize(VectorStruct) == 24
+
+
+def test_user_tuple_array_pack():
+    assert wpistruct.pack(VectorStruct((1.0, 2.0, 3.0))) == (
+        b"\x00\x00\x00\x00\x00\x00\xf0?"
+        b"\x00\x00\x00\x00\x00\x00\x00@"
+        b"\x00\x00\x00\x00\x00\x00\x08@"
+    )
+
+
+def test_user_tuple_array_unpack():
+    assert wpistruct.unpack(
+        VectorStruct,
+        b"\x00\x00\x00\x00\x00\x00\xf0?"
+        b"\x00\x00\x00\x00\x00\x00\x00@"
+        b"\x00\x00\x00\x00\x00\x00\x08@",
+    ) == VectorStruct((1.0, 2.0, 3.0))
+
+
+def test_user_tuple_array_rejects_mixed_types():
+    with pytest.raises(
+        TypeError,
+        match=re.escape(
+            "MixedTuple.value has unsupported tuple type hint: "
+            "tuple fields must be fixed-length and homogeneous"
+        ),
+    ):
+
+        @wpistruct.make_wpistruct
+        @dataclasses.dataclass
+        class MixedTuple:
+            value: tuple[int, float]
+
+
+def test_user_rejects_unsupported_type_with_tuple_in_supported_list():
+    with pytest.raises(
+        TypeError,
+        match=re.escape(
+            "BadField.value is not a wpistruct or does not have a supported type hint "
+            "(supported: bool, int8, uint8, int16, uint16, int, int32, uint32, "
+            "int64, uint64, float, double, or fixed-length homogeneous tuple of "
+            "a supported type)"
+        ),
+    ):
+
+        @wpistruct.make_wpistruct
+        @dataclasses.dataclass
+        class BadField:
+            value: str
+
+
 # def test_user_unpack_into():
 #     v1 = MyStruct(2, True, 3.5)
 #     v2 = MyStruct(3, True, 4.5)
