@@ -63,6 +63,7 @@ void OpModeRobotBase::LoopFunc() {
   m_watchdog.Reset();
   const bool enabled = word.IsEnabled();
   int64_t modeId = word.IsDSAttached() ? word.GetOpModeId() : 0;
+  bool calledOpModeDisabledPeriodicThisIteration = false;
 
   if (!m_calledDriverStationConnected && word.IsDSAttached()) {
     m_calledDriverStationConnected = true;
@@ -70,48 +71,37 @@ void OpModeRobotBase::LoopFunc() {
     m_watchdog.AddEpoch("DriverStationConnected()");
   }
 
-  // Handle opmode changes
-  if (modeId != m_lastModeId) {
-    // Clean up current opmode
-    if (m_currentOpMode) {
-      // Remove opmode callbacks
-      if (m_opmodePeriodic) {
-        m_callbacks.Remove(*m_opmodePeriodic);
-        m_opmodePeriodic.reset();
-      }
-      for (auto& cb : m_activeOpModeCallbacks) {
-        m_callbacks.Remove(cb);
-      }
-      m_activeOpModeCallbacks.clear();
-      m_currentOpMode.reset();
-    }
+  // Handle OpMode changes
+  if (modeId != m_lastModeId && m_currentOpMode) {
+    EndCurrentOpMode();
+  }
 
-    // Set up new opmode
-    if (modeId != 0) {
-      auto data = m_opModes.lookup(modeId);
-      if (data.factory) {
-        // Instantiate the new opmode
-        fmt::print("********** Starting OpMode {} **********\n", data.name);
-        m_currentOpMode = data.factory();
-        if (m_currentOpMode) {
-          // Ensure disabledPeriodic is called at least once
-          m_currentOpMode->DisabledPeriodic();
-          m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
-          // Register the opmode's periodic callbacks
-          m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
-              [op = m_currentOpMode.get()] { op->Periodic(); }, m_startTime,
-              m_period};
-          m_callbacks.Add(*m_opmodePeriodic);
-          m_activeOpModeCallbacks = m_currentOpMode->GetCallbacks();
-          for (auto& cb : m_activeOpModeCallbacks) {
-            m_callbacks.Add(cb);
-          }
+  // Set up new opmode
+  if (modeId != 0 && !m_currentOpMode) {
+    auto data = m_opModes.lookup(modeId);
+    if (data.factory) {
+      // Instantiate the new opmode
+      m_currentOpModeName = data.name;
+      fmt::print("********** Creating OpMode {} **********\n",
+                 m_currentOpModeName);
+      m_currentOpMode = data.factory();
+      if (m_currentOpMode) {
+        // Register the opmode's additional periodic callbacks immediately on
+        // creation
+        m_activeOpModeCallbacks = m_currentOpMode->GetCallbacks();
+        for (auto& cb : m_activeOpModeCallbacks) {
+          m_callbacks.Add(cb);
         }
-      } else {
-        WPILIB_ReportError(err::Error, "No OpMode found for mode {}", modeId);
+
+        // Call DisabledPeriodic immediately for newly created OpMode when
+        // disabled
+        m_currentOpMode->DisabledPeriodic();
+        m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
+        calledOpModeDisabledPeriodicThisIteration = true;
       }
+    } else {
+      WPILIB_ReportError(err::Error, "No OpMode found for mode {}", modeId);
     }
-    m_lastModeId = modeId;
   }
 
   // Handle enabled state changes
@@ -121,22 +111,25 @@ void OpModeRobotBase::LoopFunc() {
       // Transitioning to enabled
       DisabledExit();
       m_watchdog.AddEpoch("DisabledExit()");
-      if (m_currentOpMode) {
-        m_currentOpMode->Start();
-        m_watchdog.AddEpoch("OpMode::Start()");
-      }
     } else {
-      // Transitioning to disabled
-      if (m_currentOpMode && m_lastEnabledState) {
-        // Was enabled, now disabled
-        m_currentOpMode->End();
-        m_watchdog.AddEpoch("OpMode::End()");
+      // Transitioning to disabled. Only tear down an opmode that was actually
+      // running; a freshly selected opmode entering its disabled phase must
+      // persist so it can be started on the next enable.
+      if (m_currentOpMode && m_opmodePeriodic) {
+        EndCurrentOpMode();
       }
       DisabledInit();
       m_watchdog.AddEpoch("DisabledInit()");
       justCalledDisabledInit = true;
     }
     m_lastEnabledState = enabled;
+  }
+
+  // Start the opmode if enabled and not already started. This single check
+  // covers both the disabled->enabled transition and an opmode constructed
+  // while the robot is already enabled.
+  if (enabled && m_currentOpMode && !m_opmodePeriodic) {
+    StartCurrentOpMode();
   }
 
   // Call periodic functions based on current state
@@ -147,12 +140,15 @@ void OpModeRobotBase::LoopFunc() {
       m_watchdog.AddEpoch("DisabledPeriodic()");
     }
 
-    // Call opmode DisabledPeriodic if we have one
-    if (m_currentOpMode) {
+    // Call opmode DisabledPeriodic if we have one and haven't called it already
+    // this iteration
+    if (m_currentOpMode && !calledOpModeDisabledPeriodicThisIteration) {
       m_currentOpMode->DisabledPeriodic();
       m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
     }
   }
+
+  m_lastModeId = modeId;
 
   // Call NonePeriodic when no opmode is selected
   if (modeId == 0) {
@@ -248,4 +244,55 @@ void OpModeRobotBase::PublishOpModes() {
 void OpModeRobotBase::ClearOpModes() {
   RobotState::ClearOpModes();
   m_opModes.clear();
+}
+
+void OpModeRobotBase::StartCurrentOpMode() {
+  if (!m_currentOpMode || m_opmodePeriodic) {
+    return;
+  }
+
+  fmt::print("********** Starting OpMode {} **********\n", m_currentOpModeName);
+
+  // Register the main opmode periodic callback. Capture a weak_ptr so a queued
+  // callback can never resurrect or outlive a destroyed opmode.
+  m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
+      [op = std::weak_ptr<OpMode>{m_currentOpMode}] {
+        if (auto shared_op = op.lock()) {
+          shared_op->Periodic();
+        }
+      },
+      m_startTime, m_period};
+  m_callbacks.Add(*m_opmodePeriodic);
+
+  m_currentOpMode->Start();
+  m_watchdog.AddEpoch("OpMode::Start()");
+}
+
+void OpModeRobotBase::EndCurrentOpMode() {
+  if (!m_currentOpMode) {
+    return;
+  }
+
+  // If the opmode was started, end it and remove its main periodic callback.
+  if (m_opmodePeriodic) {
+    fmt::print("********** Ending OpMode {} **********\n", m_currentOpModeName);
+
+    m_currentOpMode->End();
+    m_watchdog.AddEpoch("OpMode::End()");
+
+    m_callbacks.Remove(*m_opmodePeriodic);
+    m_opmodePeriodic.reset();
+  }
+
+  // The additional GetCallbacks() callbacks are registered immediately on
+  // construction (even while disabled), so always remove them regardless of
+  // whether the opmode was started.
+  for (auto& cb : m_activeOpModeCallbacks) {
+    m_callbacks.Remove(cb);
+  }
+  m_activeOpModeCallbacks.clear();
+
+  // Regardless of whether opmode was started, destroy it
+  fmt::print("********** Closing OpMode {} **********\n", m_currentOpModeName);
+  m_currentOpMode.reset();
 }
