@@ -29,6 +29,8 @@
 using namespace wpi::nt;
 namespace uv = wpi::net::uv;
 
+static constexpr std::string_view kNetworkTablesServiceType =
+    "_networktables._tcp";
 static constexpr uv::Timer::Time kReconnectRate{1000};
 static constexpr uv::Timer::Time kWebsocketHandshakeTimeout{500};
 // use a larger max message size for websockets
@@ -40,33 +42,10 @@ static std::string Ipv4AddressToString(unsigned int address) {
                      address & 0xff);
 }
 
-static bool HasMatchingTeam(
-    const wpi::net::MulticastResolverClient::ServiceData& data,
-    std::string_view team) {
-  for (auto&& [key, value] : data.txt) {
-    if (key == "team") {
-      return wpi::util::trim(value) == team;
-    }
-  }
-  return false;
-}
-
-static bool MatchesResolver(
+static bool MatchesNetworkTablesResolver(
     const INetworkClient::ServerResolver& resolver,
     const wpi::net::MulticastResolverClient::ServiceData& data) {
-  if (resolver.serviceNamePrefix) {
-    if (!wpi::util::starts_with(data.serviceName, resolver.serviceName)) {
-      return false;
-    }
-  } else if (data.serviceName != resolver.serviceName) {
-    return false;
-  }
-
-  if (resolver.requireTeam && !HasMatchingTeam(data, resolver.team)) {
-    return false;
-  }
-
-  return true;
+  return data.serviceName == resolver.serviceName;
 }
 
 NetworkClientBase::NetworkClientBase(int inst, std::string_view id,
@@ -149,9 +128,10 @@ void NetworkClientBase::DoSetServers(
   }
 
   if (resolver) {
-    resolver->serviceType = wpi::util::trim(resolver->serviceType);
     resolver->serviceName = wpi::util::trim(resolver->serviceName);
-    resolver->team = wpi::util::trim(resolver->team);
+    if (resolver->team) {
+      resolver->team = std::string{wpi::util::trim(*resolver->team)};
+    }
     if (resolver->port == 0) {
       resolver->port = defaultPort;
     }
@@ -180,14 +160,30 @@ void NetworkClientBase::StartResolvers() {
     return;
   }
 
-  m_mdnsResolver = wpi::net::MulticastResolverClient::Create(
-      m_loop, m_logger, m_serverResolver->serviceType);
-  if (m_mdnsResolver) {
-    m_mdnsResolver->serviceResolved.connect(
-        [this, resolverConfig = *m_serverResolver](
-            wpi::net::MulticastResolverClient::ServiceData data) {
-          ProcessResolverData(resolverConfig, std::move(data));
-        });
+  if (m_serverResolver->kind == ServerResolver::Kind::kSystemCore) {
+    if (m_serverResolver->team) {
+      m_systemCoreResolver = wpi::net::SystemCoreResolverClient::Create(
+          m_loop, m_logger, *m_serverResolver->team, m_serverResolver->port);
+    } else {
+      m_systemCoreResolver = wpi::net::SystemCoreResolverClient::Create(
+          m_loop, m_logger, m_serverResolver->port);
+    }
+    if (m_systemCoreResolver) {
+      m_systemCoreResolver->serverResolved.connect(
+          [this](wpi::net::SystemCoreResolverClient::ServerData data) {
+            ProcessSystemCoreData(std::move(data));
+          });
+    }
+  } else {
+    m_mdnsResolver = wpi::net::MulticastResolverClient::Create(
+        m_loop, m_logger, kNetworkTablesServiceType);
+    if (m_mdnsResolver) {
+      m_mdnsResolver->serviceResolved.connect(
+          [this, resolverConfig = *m_serverResolver](
+              wpi::net::MulticastResolverClient::ServiceData data) {
+            ProcessResolverData(resolverConfig, std::move(data));
+          });
+    }
   }
 }
 
@@ -196,12 +192,16 @@ void NetworkClientBase::StopResolvers() {
     m_mdnsResolver->Close();
     m_mdnsResolver.reset();
   }
+  if (m_systemCoreResolver) {
+    m_systemCoreResolver->Close();
+    m_systemCoreResolver.reset();
+  }
 }
 
 void NetworkClientBase::ProcessResolverData(
     const ServerResolver& resolver,
     wpi::net::MulticastResolverClient::ServiceData data) {
-  if (!MatchesResolver(resolver, data)) {
+  if (!MatchesNetworkTablesResolver(resolver, data)) {
     return;
   }
 
@@ -212,15 +212,36 @@ void NetworkClientBase::ProcessResolverData(
 
   std::pair<std::string, unsigned int> server{
       Ipv4AddressToString(data.ipv4Address), port};
-  if (std::find(m_resolvedServers.begin(), m_resolvedServers.end(), server) !=
-      m_resolvedServers.end()) {
+  if (!AddResolvedServer(server)) {
     return;
   }
 
   INFO("mDNS resolved service '{}' to {} port {}", data.serviceName,
        server.first, server.second);
-  m_resolvedServers.emplace_back(std::move(server));
   UpdateConnectorServers();
+}
+
+void NetworkClientBase::ProcessSystemCoreData(
+    wpi::net::SystemCoreResolverClient::ServerData data) {
+  std::pair<std::string, unsigned int> server{std::move(data.host), data.port};
+  if (!AddResolvedServer(server)) {
+    return;
+  }
+
+  INFO("SystemCore resolved service '{}' to {} port {}", data.serviceName,
+       server.first, server.second);
+  UpdateConnectorServers();
+}
+
+bool NetworkClientBase::AddResolvedServer(
+    std::pair<std::string, unsigned int> server) {
+  if (std::find(m_resolvedServers.begin(), m_resolvedServers.end(), server) !=
+      m_resolvedServers.end()) {
+    return false;
+  }
+
+  m_resolvedServers.emplace_back(std::move(server));
+  return true;
 }
 
 void NetworkClientBase::UpdateConnectorServers() {

@@ -30,10 +30,6 @@ static std::atomic<int64_t> gNowTime;
 
 namespace wpi::nt {
 
-static constexpr std::string_view kNetworkTablesServiceType =
-    "_networktables._tcp";
-static constexpr std::string_view kSystemCoreServiceType = "_SystemCore._tcp";
-static constexpr std::string_view kSystemCoreServicePrefix = "SystemCore-FIRST";
 static constexpr unsigned int kMaxTeamNumber = 25599;
 
 wpi::util::json TopicInfo::GetProperties() const {
@@ -696,7 +692,6 @@ void SetServer(
 static INetworkClient::ServerResolver MakeNetworkTablesResolver(
     std::string_view service_name, unsigned int port) {
   INetworkClient::ServerResolver resolver;
-  resolver.serviceType = kNetworkTablesServiceType;
   resolver.serviceName = service_name;
   resolver.port = port;
   return resolver;
@@ -740,9 +735,7 @@ static void AddTeamServer(
 static INetworkClient::ServerResolver MakeSystemCoreResolver(
     unsigned int port) {
   INetworkClient::ServerResolver resolver;
-  resolver.serviceType = kSystemCoreServiceType;
-  resolver.serviceName = kSystemCoreServicePrefix;
-  resolver.serviceNamePrefix = true;
+  resolver.kind = INetworkClient::ServerResolver::Kind::kSystemCore;
   resolver.port = port;
   return resolver;
 }
@@ -750,8 +743,7 @@ static INetworkClient::ServerResolver MakeSystemCoreResolver(
 static INetworkClient::ServerResolver MakeSystemCoreResolver(
     std::string_view team, unsigned int port) {
   auto resolver = MakeSystemCoreResolver(port);
-  resolver.requireTeam = true;
-  resolver.team = wpi::util::trim(team);
+  resolver.team = std::string{wpi::util::trim(team)};
   return resolver;
 }
 

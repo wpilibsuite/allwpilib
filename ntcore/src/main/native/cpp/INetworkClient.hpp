@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <optional>
 #include <span>
 #include <string>
 #include <utility>
@@ -15,11 +16,11 @@ namespace wpi::nt {
 class INetworkClient {
  public:
   struct ServerResolver {
-    std::string serviceType;
+    enum class Kind { kNetworkTables, kSystemCore };
+
+    Kind kind = Kind::kNetworkTables;
     std::string serviceName;
-    bool serviceNamePrefix = false;
-    bool requireTeam = false;
-    std::string team;
+    std::optional<std::string> team;
     unsigned int port = 0;
   };
 
