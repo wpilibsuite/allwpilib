@@ -139,12 +139,14 @@ public class GamepadSelectable {
     BigDecimal maximum = BigDecimal.valueOf(max);
     BigDecimal increment = BigDecimal.valueOf(delta);
     List<String> options = new ArrayList<>();
+    BigDecimal lastValue = value;
     while (value.compareTo(maximum) <= 0) {
       options.add(value.toPlainString());
+      lastValue = value;
       value = value.add(increment);
     }
     String maximumString = maximum.toPlainString();
-    if (!options.get(options.size() - 1).equals(maximumString)) {
+    if (lastValue.compareTo(maximum) != 0) {
       options.add(maximumString);
     }
     return addOptions(name, options);

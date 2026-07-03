@@ -58,6 +58,15 @@ class GamepadSelectableTest {
   }
 
   @Test
+  void addDoubleOptionsDoesNotDuplicateExactMaximumWithDifferentScale() {
+    var selectable = new GamepadSelectable(0);
+
+    GamepadSelectable.Chooser chooser = selectable.addDoubleOptions("Speed", 0.25, 1.0, 0.25);
+
+    assertIterableEquals(List.of("0.25", "0.50", "0.75", "1.00"), chooser.getOptions());
+  }
+
+  @Test
   void dpadMovesBetweenChoosersAndOptions() {
     Gamepad gamepad = new Gamepad(0);
     GamepadSim sim = new GamepadSim(gamepad);
