@@ -107,6 +107,8 @@ struct MatchDataSender {
                                                        true};
   MatchDataSenderEntry<wpi::nt::IntegerTopic> station{table, "StationNumber",
                                                       1};
+  MatchDataSenderEntry<wpi::nt::IntegerTopic> allianceStation{
+      table, "AllianceStationID", 0};
   wpi::nt::StructPublisher<wpi::hal::ControlWord> controlWord;
   wpi::nt::StringPublisher opMode;
   wpi::hal::ControlWord prevControlWord;
@@ -931,9 +933,13 @@ void SendMatchData() {
       isRedAlliance = true;
       stationNumber = 2;
       break;
-    default:
+    case HAL_ALLIANCE_STATION_RED_3:
       isRedAlliance = true;
       stationNumber = 3;
+      break;
+    default:
+      isRedAlliance = true;
+      stationNumber = 0;
       break;
   }
 
@@ -944,14 +950,15 @@ void SendMatchData() {
   HAL_GetGameData(&tmpGameData);
 
   auto& inst = GetInstance();
-  inst.matchDataSender.alliance.Set(isRedAlliance);
-  inst.matchDataSender.station.Set(stationNumber);
   inst.matchDataSender.eventName.Set(tmpDataStore.eventName);
   inst.matchDataSender.gameData.Set(
       std::string(reinterpret_cast<char*>(tmpGameData.gameData)));
   inst.matchDataSender.matchNumber.Set(tmpDataStore.matchNumber);
   inst.matchDataSender.replayNumber.Set(tmpDataStore.replayNumber);
   inst.matchDataSender.matchType.Set(static_cast<int>(tmpDataStore.matchType));
+  inst.matchDataSender.alliance.Set(isRedAlliance);
+  inst.matchDataSender.station.Set(stationNumber);
+  inst.matchDataSender.allianceStation.Set(alliance);
 
   hal::ControlWord ctlWord = hal::GetControlWord();
   if (ctlWord != inst.matchDataSender.prevControlWord) {

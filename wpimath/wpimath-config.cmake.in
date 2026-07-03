@@ -2,11 +2,11 @@ include(CMakeFindDependencyMacro)
 @FILENAME_DEP_REPLACE@
 @WPIUTIL_DEP_REPLACE@
 
-if(@USE_SYSTEM_EIGEN@)
+if(@WPILIB_USE_SYSTEM_EIGEN@)
     find_dependency(Eigen3)
 endif()
 
-if(@USE_SYSTEM_SLEIPNIR@)
+if(@WPILIB_USE_SYSTEM_SLEIPNIR@)
   find_dependency(Sleipnir)
 endif()
 

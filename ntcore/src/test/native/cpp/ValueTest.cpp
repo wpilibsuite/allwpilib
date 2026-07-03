@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "TestPrinters.hpp"
 #include "Value_internal.hpp"
@@ -29,210 +29,208 @@ inline bool operator==(std::span<T> lhs, std::span<U> rhs) {
 
 namespace wpi::nt {
 
-class ValueTest : public ::testing::Test {};
-
-using ValueDeathTest = ValueTest;
-
-TEST_F(ValueTest, ConstructEmpty) {
+TEST_CASE("ValueTest ConstructEmpty", "[ntcore][value]") {
   Value v;
-  ASSERT_EQ(NT_UNASSIGNED, v.type());
+  REQUIRE(NT_UNASSIGNED == v.type());
 }
 
-TEST_F(ValueTest, Boolean) {
+TEST_CASE("ValueTest Boolean", "[ntcore][value]") {
   auto v = Value::MakeBoolean(false);
-  ASSERT_EQ(NT_BOOLEAN, v.type());
-  ASSERT_FALSE(v.GetBoolean());
+  REQUIRE(NT_BOOLEAN == v.type());
+  REQUIRE_FALSE(v.GetBoolean());
   NT_Value cv;
   NT_InitValue(&cv);
   ConvertToC(v, &cv);
-  ASSERT_EQ(NT_BOOLEAN, cv.type);
-  ASSERT_EQ(0, cv.data.v_boolean);
+  REQUIRE(NT_BOOLEAN == cv.type);
+  REQUIRE(0 == cv.data.v_boolean);
 
   v = Value::MakeBoolean(true);
-  ASSERT_EQ(NT_BOOLEAN, v.type());
-  ASSERT_TRUE(v.GetBoolean());
+  REQUIRE(NT_BOOLEAN == v.type());
+  REQUIRE(v.GetBoolean());
   NT_DisposeValue(&cv);
   ConvertToC(v, &cv);
-  ASSERT_EQ(NT_BOOLEAN, cv.type);
-  ASSERT_EQ(1, cv.data.v_boolean);
+  REQUIRE(NT_BOOLEAN == cv.type);
+  REQUIRE(1 == cv.data.v_boolean);
 
   NT_DisposeValue(&cv);
 }
 
-TEST_F(ValueTest, Double) {
+TEST_CASE("ValueTest Double", "[ntcore][value]") {
   auto v = Value::MakeDouble(0.5);
-  ASSERT_EQ(NT_DOUBLE, v.type());
-  ASSERT_EQ(0.5, v.GetDouble());
+  REQUIRE(NT_DOUBLE == v.type());
+  REQUIRE(0.5 == v.GetDouble());
   NT_Value cv;
   NT_InitValue(&cv);
   ConvertToC(v, &cv);
-  ASSERT_EQ(NT_DOUBLE, cv.type);
-  ASSERT_EQ(0.5, cv.data.v_double);
+  REQUIRE(NT_DOUBLE == cv.type);
+  REQUIRE(0.5 == cv.data.v_double);
 
   v = Value::MakeDouble(0.25);
-  ASSERT_EQ(NT_DOUBLE, v.type());
-  ASSERT_EQ(0.25, v.GetDouble());
+  REQUIRE(NT_DOUBLE == v.type());
+  REQUIRE(0.25 == v.GetDouble());
   NT_DisposeValue(&cv);
   ConvertToC(v, &cv);
-  ASSERT_EQ(NT_DOUBLE, cv.type);
-  ASSERT_EQ(0.25, cv.data.v_double);
+  REQUIRE(NT_DOUBLE == cv.type);
+  REQUIRE(0.25 == cv.data.v_double);
 
   NT_DisposeValue(&cv);
 }
 
-TEST_F(ValueTest, String) {
+TEST_CASE("ValueTest String", "[ntcore][value]") {
   auto v = Value::MakeString("hello");
-  ASSERT_EQ(NT_STRING, v.type());
-  ASSERT_EQ("hello", v.GetString());
+  REQUIRE(NT_STRING == v.type());
+  REQUIRE("hello" == v.GetString());
   NT_Value cv;
   NT_InitValue(&cv);
   ConvertToC(v, &cv);
-  ASSERT_EQ(NT_STRING, cv.type);
-  ASSERT_EQ("hello"sv, wpi::util::to_string_view(&cv.data.v_string));
-  ASSERT_EQ(5u, cv.data.v_string.len);
+  REQUIRE(NT_STRING == cv.type);
+  REQUIRE("hello"sv == wpi::util::to_string_view(&cv.data.v_string));
+  REQUIRE(5u == cv.data.v_string.len);
 
   v = Value::MakeString("goodbye");
-  ASSERT_EQ(NT_STRING, v.type());
-  ASSERT_EQ("goodbye", v.GetString());
+  REQUIRE(NT_STRING == v.type());
+  REQUIRE("goodbye" == v.GetString());
   NT_DisposeValue(&cv);
   ConvertToC(v, &cv);
-  ASSERT_EQ(NT_STRING, cv.type);
-  ASSERT_EQ("goodbye"sv, wpi::util::to_string_view(&cv.data.v_string));
-  ASSERT_EQ(7u, cv.data.v_string.len);
+  REQUIRE(NT_STRING == cv.type);
+  REQUIRE("goodbye"sv == wpi::util::to_string_view(&cv.data.v_string));
+  REQUIRE(7u == cv.data.v_string.len);
 
   NT_DisposeValue(&cv);
 }
 
-TEST_F(ValueTest, Raw) {
+TEST_CASE("ValueTest Raw", "[ntcore][value]") {
   std::vector<uint8_t> arr{5, 4, 3, 2, 1};
   auto v = Value::MakeRaw(arr);
-  ASSERT_EQ(NT_RAW, v.type());
-  ASSERT_EQ(std::span<const uint8_t>(arr), v.GetRaw());
+  REQUIRE(NT_RAW == v.type());
+  REQUIRE(std::span<const uint8_t>(arr) == v.GetRaw());
   NT_Value cv;
   NT_InitValue(&cv);
   ConvertToC(v, &cv);
-  ASSERT_EQ(NT_RAW, cv.type);
-  ASSERT_EQ(5u, cv.data.v_raw.size);
-  ASSERT_EQ(std::span(reinterpret_cast<const uint8_t*>("\5\4\3\2\1"), 5),
-            std::span(cv.data.v_raw.data, 5));
+  REQUIRE(NT_RAW == cv.type);
+  REQUIRE(5u == cv.data.v_raw.size);
+  REQUIRE(std::span(reinterpret_cast<const uint8_t*>("\5\4\3\2\1"), 5) ==
+          std::span(cv.data.v_raw.data, 5));
 
   std::vector<uint8_t> arr2{1, 2, 3, 4, 5, 6};
   v = Value::MakeRaw(arr2);
-  ASSERT_EQ(NT_RAW, v.type());
-  ASSERT_EQ(std::span<const uint8_t>(arr2), v.GetRaw());
+  REQUIRE(NT_RAW == v.type());
+  REQUIRE(std::span<const uint8_t>(arr2) == v.GetRaw());
   NT_DisposeValue(&cv);
   ConvertToC(v, &cv);
-  ASSERT_EQ(NT_RAW, cv.type);
-  ASSERT_EQ(6u, cv.data.v_raw.size);
-  ASSERT_EQ(std::span(reinterpret_cast<const uint8_t*>("\1\2\3\4\5\6"), 6),
-            std::span(cv.data.v_raw.data, 6));
+  REQUIRE(NT_RAW == cv.type);
+  REQUIRE(6u == cv.data.v_raw.size);
+  REQUIRE(std::span(reinterpret_cast<const uint8_t*>("\1\2\3\4\5\6"), 6) ==
+          std::span(cv.data.v_raw.data, 6));
 
   NT_DisposeValue(&cv);
 }
 
-TEST_F(ValueTest, BooleanArray) {
+TEST_CASE("ValueTest BooleanArray", "[ntcore][value]") {
   std::vector<int> vec{1, 0, 1};
   auto v = Value::MakeBooleanArray(vec);
-  ASSERT_EQ(NT_BOOLEAN_ARRAY, v.type());
-  ASSERT_EQ(std::span<const int>(vec), v.GetBooleanArray());
+  REQUIRE(NT_BOOLEAN_ARRAY == v.type());
+  REQUIRE(std::span<const int>(vec) == v.GetBooleanArray());
   NT_Value cv;
   NT_InitValue(&cv);
   ConvertToC(v, &cv);
-  ASSERT_EQ(NT_BOOLEAN_ARRAY, cv.type);
-  ASSERT_EQ(3u, cv.data.arr_boolean.size);
-  ASSERT_EQ(vec[0], cv.data.arr_boolean.arr[0]);
-  ASSERT_EQ(vec[1], cv.data.arr_boolean.arr[1]);
-  ASSERT_EQ(vec[2], cv.data.arr_boolean.arr[2]);
+  REQUIRE(NT_BOOLEAN_ARRAY == cv.type);
+  REQUIRE(3u == cv.data.arr_boolean.size);
+  REQUIRE(vec[0] == cv.data.arr_boolean.arr[0]);
+  REQUIRE(vec[1] == cv.data.arr_boolean.arr[1]);
+  REQUIRE(vec[2] == cv.data.arr_boolean.arr[2]);
 
   // assign with same size
   vec = {0, 1, 0};
   v = Value::MakeBooleanArray(vec);
-  ASSERT_EQ(NT_BOOLEAN_ARRAY, v.type());
-  ASSERT_EQ(std::span<const int>(vec), v.GetBooleanArray());
+  REQUIRE(NT_BOOLEAN_ARRAY == v.type());
+  REQUIRE(std::span<const int>(vec) == v.GetBooleanArray());
   NT_DisposeValue(&cv);
   ConvertToC(v, &cv);
-  ASSERT_EQ(NT_BOOLEAN_ARRAY, cv.type);
-  ASSERT_EQ(3u, cv.data.arr_boolean.size);
-  ASSERT_EQ(vec[0], cv.data.arr_boolean.arr[0]);
-  ASSERT_EQ(vec[1], cv.data.arr_boolean.arr[1]);
-  ASSERT_EQ(vec[2], cv.data.arr_boolean.arr[2]);
+  REQUIRE(NT_BOOLEAN_ARRAY == cv.type);
+  REQUIRE(3u == cv.data.arr_boolean.size);
+  REQUIRE(vec[0] == cv.data.arr_boolean.arr[0]);
+  REQUIRE(vec[1] == cv.data.arr_boolean.arr[1]);
+  REQUIRE(vec[2] == cv.data.arr_boolean.arr[2]);
 
   // assign with different size
   vec = {1, 0};
   v = Value::MakeBooleanArray(vec);
-  ASSERT_EQ(NT_BOOLEAN_ARRAY, v.type());
-  ASSERT_EQ(std::span<const int>(vec), v.GetBooleanArray());
+  REQUIRE(NT_BOOLEAN_ARRAY == v.type());
+  REQUIRE(std::span<const int>(vec) == v.GetBooleanArray());
   NT_DisposeValue(&cv);
   ConvertToC(v, &cv);
-  ASSERT_EQ(NT_BOOLEAN_ARRAY, cv.type);
-  ASSERT_EQ(2u, cv.data.arr_boolean.size);
-  ASSERT_EQ(vec[0], cv.data.arr_boolean.arr[0]);
-  ASSERT_EQ(vec[1], cv.data.arr_boolean.arr[1]);
+  REQUIRE(NT_BOOLEAN_ARRAY == cv.type);
+  REQUIRE(2u == cv.data.arr_boolean.size);
+  REQUIRE(vec[0] == cv.data.arr_boolean.arr[0]);
+  REQUIRE(vec[1] == cv.data.arr_boolean.arr[1]);
 
   NT_DisposeValue(&cv);
 }
 
-TEST_F(ValueTest, DoubleArray) {
+TEST_CASE("ValueTest DoubleArray", "[ntcore][value]") {
   std::vector<double> vec{0.5, 0.25, 0.5};
   auto v = Value::MakeDoubleArray(vec);
-  ASSERT_EQ(NT_DOUBLE_ARRAY, v.type());
-  ASSERT_EQ(std::span<const double>(vec), v.GetDoubleArray());
+  REQUIRE(NT_DOUBLE_ARRAY == v.type());
+  REQUIRE(std::span<const double>(vec) == v.GetDoubleArray());
   NT_Value cv;
   NT_InitValue(&cv);
   ConvertToC(v, &cv);
-  ASSERT_EQ(NT_DOUBLE_ARRAY, cv.type);
-  ASSERT_EQ(3u, cv.data.arr_double.size);
-  ASSERT_EQ(vec[0], cv.data.arr_double.arr[0]);
-  ASSERT_EQ(vec[1], cv.data.arr_double.arr[1]);
-  ASSERT_EQ(vec[2], cv.data.arr_double.arr[2]);
+  REQUIRE(NT_DOUBLE_ARRAY == cv.type);
+  REQUIRE(3u == cv.data.arr_double.size);
+  REQUIRE(vec[0] == cv.data.arr_double.arr[0]);
+  REQUIRE(vec[1] == cv.data.arr_double.arr[1]);
+  REQUIRE(vec[2] == cv.data.arr_double.arr[2]);
 
   // assign with same size
   vec = {0.25, 0.5, 0.25};
   v = Value::MakeDoubleArray(vec);
-  ASSERT_EQ(NT_DOUBLE_ARRAY, v.type());
-  ASSERT_EQ(std::span<const double>(vec), v.GetDoubleArray());
+  REQUIRE(NT_DOUBLE_ARRAY == v.type());
+  REQUIRE(std::span<const double>(vec) == v.GetDoubleArray());
   NT_DisposeValue(&cv);
   ConvertToC(v, &cv);
-  ASSERT_EQ(NT_DOUBLE_ARRAY, cv.type);
-  ASSERT_EQ(3u, cv.data.arr_double.size);
-  ASSERT_EQ(vec[0], cv.data.arr_double.arr[0]);
-  ASSERT_EQ(vec[1], cv.data.arr_double.arr[1]);
-  ASSERT_EQ(vec[2], cv.data.arr_double.arr[2]);
+  REQUIRE(NT_DOUBLE_ARRAY == cv.type);
+  REQUIRE(3u == cv.data.arr_double.size);
+  REQUIRE(vec[0] == cv.data.arr_double.arr[0]);
+  REQUIRE(vec[1] == cv.data.arr_double.arr[1]);
+  REQUIRE(vec[2] == cv.data.arr_double.arr[2]);
 
   // assign with different size
   vec = {0.5, 0.25};
   v = Value::MakeDoubleArray(vec);
-  ASSERT_EQ(NT_DOUBLE_ARRAY, v.type());
-  ASSERT_EQ(std::span<const double>(vec), v.GetDoubleArray());
+  REQUIRE(NT_DOUBLE_ARRAY == v.type());
+  REQUIRE(std::span<const double>(vec) == v.GetDoubleArray());
   NT_DisposeValue(&cv);
   ConvertToC(v, &cv);
-  ASSERT_EQ(NT_DOUBLE_ARRAY, cv.type);
-  ASSERT_EQ(2u, cv.data.arr_double.size);
-  ASSERT_EQ(vec[0], cv.data.arr_double.arr[0]);
-  ASSERT_EQ(vec[1], cv.data.arr_double.arr[1]);
+  REQUIRE(NT_DOUBLE_ARRAY == cv.type);
+  REQUIRE(2u == cv.data.arr_double.size);
+  REQUIRE(vec[0] == cv.data.arr_double.arr[0]);
+  REQUIRE(vec[1] == cv.data.arr_double.arr[1]);
 
   NT_DisposeValue(&cv);
 }
 
-TEST_F(ValueTest, StringArray) {
+TEST_CASE("ValueTest StringArray", "[ntcore][value]") {
   std::vector<std::string> vec;
   vec.push_back("hello");
   vec.push_back("goodbye");
   vec.push_back("string");
   auto v = Value::MakeStringArray(std::move(vec));
-  ASSERT_EQ(NT_STRING_ARRAY, v.type());
-  ASSERT_EQ(3u, v.GetStringArray().size());
-  ASSERT_EQ("hello"sv, v.GetStringArray()[0]);
-  ASSERT_EQ("goodbye"sv, v.GetStringArray()[1]);
-  ASSERT_EQ("string"sv, v.GetStringArray()[2]);
+  REQUIRE(NT_STRING_ARRAY == v.type());
+  REQUIRE(3u == v.GetStringArray().size());
+  REQUIRE("hello"sv == v.GetStringArray()[0]);
+  REQUIRE("goodbye"sv == v.GetStringArray()[1]);
+  REQUIRE("string"sv == v.GetStringArray()[2]);
   NT_Value cv;
   NT_InitValue(&cv);
   ConvertToC(v, &cv);
-  ASSERT_EQ(NT_STRING_ARRAY, cv.type);
-  ASSERT_EQ(3u, cv.data.arr_string.size);
-  ASSERT_EQ("hello"sv, wpi::util::to_string_view(&cv.data.arr_string.arr[0]));
-  ASSERT_EQ("goodbye"sv, wpi::util::to_string_view(&cv.data.arr_string.arr[1]));
-  ASSERT_EQ("string"sv, wpi::util::to_string_view(&cv.data.arr_string.arr[2]));
+  REQUIRE(NT_STRING_ARRAY == cv.type);
+  REQUIRE(3u == cv.data.arr_string.size);
+  REQUIRE("hello"sv == wpi::util::to_string_view(&cv.data.arr_string.arr[0]));
+  REQUIRE("goodbye"sv ==
+          (wpi::util::to_string_view(&cv.data.arr_string.arr[1])));
+  REQUIRE("string"sv ==
+          (wpi::util::to_string_view(&cv.data.arr_string.arr[2])));
 
   // assign with same size
   vec.clear();
@@ -240,188 +238,171 @@ TEST_F(ValueTest, StringArray) {
   vec.push_back("str2");
   vec.push_back("string3");
   v = Value::MakeStringArray(vec);
-  ASSERT_EQ(NT_STRING_ARRAY, v.type());
-  ASSERT_EQ(3u, v.GetStringArray().size());
-  ASSERT_EQ("s1"sv, v.GetStringArray()[0]);
-  ASSERT_EQ("str2"sv, v.GetStringArray()[1]);
-  ASSERT_EQ("string3"sv, v.GetStringArray()[2]);
+  REQUIRE(NT_STRING_ARRAY == v.type());
+  REQUIRE(3u == v.GetStringArray().size());
+  REQUIRE("s1"sv == v.GetStringArray()[0]);
+  REQUIRE("str2"sv == v.GetStringArray()[1]);
+  REQUIRE("string3"sv == v.GetStringArray()[2]);
   NT_DisposeValue(&cv);
   ConvertToC(v, &cv);
-  ASSERT_EQ(NT_STRING_ARRAY, cv.type);
-  ASSERT_EQ(3u, cv.data.arr_string.size);
-  ASSERT_EQ("s1"sv, wpi::util::to_string_view(&cv.data.arr_string.arr[0]));
-  ASSERT_EQ("str2"sv, wpi::util::to_string_view(&cv.data.arr_string.arr[1]));
-  ASSERT_EQ("string3"sv, wpi::util::to_string_view(&cv.data.arr_string.arr[2]));
+  REQUIRE(NT_STRING_ARRAY == cv.type);
+  REQUIRE(3u == cv.data.arr_string.size);
+  REQUIRE("s1"sv == wpi::util::to_string_view(&cv.data.arr_string.arr[0]));
+  REQUIRE("str2"sv == wpi::util::to_string_view(&cv.data.arr_string.arr[1]));
+  REQUIRE("string3"sv ==
+          (wpi::util::to_string_view(&cv.data.arr_string.arr[2])));
 
   // assign with different size
   vec.clear();
   vec.push_back("short");
   vec.push_back("er");
   v = Value::MakeStringArray(std::move(vec));
-  ASSERT_EQ(NT_STRING_ARRAY, v.type());
-  ASSERT_EQ(2u, v.GetStringArray().size());
-  ASSERT_EQ("short"sv, v.GetStringArray()[0]);
-  ASSERT_EQ("er"sv, v.GetStringArray()[1]);
+  REQUIRE(NT_STRING_ARRAY == v.type());
+  REQUIRE(2u == v.GetStringArray().size());
+  REQUIRE("short"sv == v.GetStringArray()[0]);
+  REQUIRE("er"sv == v.GetStringArray()[1]);
   NT_DisposeValue(&cv);
   ConvertToC(v, &cv);
-  ASSERT_EQ(NT_STRING_ARRAY, cv.type);
-  ASSERT_EQ(2u, cv.data.arr_string.size);
-  ASSERT_EQ("short"sv, wpi::util::to_string_view(&cv.data.arr_string.arr[0]));
-  ASSERT_EQ("er"sv, wpi::util::to_string_view(&cv.data.arr_string.arr[1]));
+  REQUIRE(NT_STRING_ARRAY == cv.type);
+  REQUIRE(2u == cv.data.arr_string.size);
+  REQUIRE("short"sv == wpi::util::to_string_view(&cv.data.arr_string.arr[0]));
+  REQUIRE("er"sv == wpi::util::to_string_view(&cv.data.arr_string.arr[1]));
 
   NT_DisposeValue(&cv);
 }
 
-// Google Test doesn't have ASSERT_DEATH when compiled with emscripten
-#ifndef __EMSCRIPTEN__
-#ifdef NDEBUG
-TEST_F(ValueDeathTest, DISABLED_GetAssertions) {
-#else
-TEST_F(ValueDeathTest, DISABLED_GetAssertions) {
-#endif
-  Value v;
-  ASSERT_DEATH((void)v.GetBoolean(), "type == NT_BOOLEAN");
-  ASSERT_DEATH((void)v.GetDouble(), "type == NT_DOUBLE");
-  ASSERT_DEATH((void)v.GetString(), "type == NT_STRING");
-  ASSERT_DEATH((void)v.GetRaw(), "type == NT_RAW");
-  ASSERT_DEATH((void)v.GetBooleanArray(), "type == NT_BOOLEAN_ARRAY");
-  ASSERT_DEATH((void)v.GetDoubleArray(), "type == NT_DOUBLE_ARRAY");
-  ASSERT_DEATH((void)v.GetStringArray(), "type == NT_STRING_ARRAY");
-}
-#endif
-
-TEST_F(ValueTest, UnassignedComparison) {
+TEST_CASE("ValueTest UnassignedComparison", "[ntcore][value]") {
   Value v1, v2;
-  ASSERT_EQ(v1, v2);
+  REQUIRE(v1 == v2);
 }
 
-TEST_F(ValueTest, MixedComparison) {
+TEST_CASE("ValueTest MixedComparison", "[ntcore][value]") {
   Value v1;
   auto v2 = Value::MakeBoolean(true);
-  ASSERT_NE(v1, v2);  // unassigned vs boolean
+  REQUIRE(v1 != v2);  // unassigned vs boolean
   auto v3 = Value::MakeDouble(0.5);
-  ASSERT_NE(v2, v3);  // boolean vs double
+  REQUIRE(v2 != v3);  // boolean vs double
 }
 
-TEST_F(ValueTest, BooleanComparison) {
+TEST_CASE("ValueTest BooleanComparison", "[ntcore][value]") {
   auto v1 = Value::MakeBoolean(true);
   auto v2 = Value::MakeBoolean(true);
-  ASSERT_EQ(v1, v2);
+  REQUIRE(v1 == v2);
   v2 = Value::MakeBoolean(false);
-  ASSERT_NE(v1, v2);
+  REQUIRE(v1 != v2);
 }
 
-TEST_F(ValueTest, DoubleComparison) {
+TEST_CASE("ValueTest DoubleComparison", "[ntcore][value]") {
   auto v1 = Value::MakeDouble(0.25);
   auto v2 = Value::MakeDouble(0.25);
-  ASSERT_EQ(v1, v2);
+  REQUIRE(v1 == v2);
   v2 = Value::MakeDouble(0.5);
-  ASSERT_NE(v1, v2);
+  REQUIRE(v1 != v2);
 }
 
-TEST_F(ValueTest, StringComparison) {
+TEST_CASE("ValueTest StringComparison", "[ntcore][value]") {
   auto v1 = Value::MakeString("hello");
   auto v2 = Value::MakeString("hello");
-  ASSERT_EQ(v1, v2);
+  REQUIRE(v1 == v2);
   v2 = Value::MakeString("world");  // different contents
-  ASSERT_NE(v1, v2);
+  REQUIRE(v1 != v2);
   v2 = Value::MakeString("goodbye");  // different size
-  ASSERT_NE(v1, v2);
+  REQUIRE(v1 != v2);
 }
 
-TEST_F(ValueTest, BooleanArrayComparison) {
+TEST_CASE("ValueTest BooleanArrayComparison", "[ntcore][value]") {
   std::vector<int> vec{1, 0, 1};
   auto v1 = Value::MakeBooleanArray(vec);
   auto v2 = Value::MakeBooleanArray(vec);
-  ASSERT_EQ(v1, v2);
+  REQUIRE(v1 == v2);
 
   // different contents
   vec = {1, 1, 1};
   v2 = Value::MakeBooleanArray(vec);
-  ASSERT_NE(v1, v2);
+  REQUIRE(v1 != v2);
 
   // different size
   vec = {1, 0};
   v2 = Value::MakeBooleanArray(vec);
-  ASSERT_NE(v1, v2);
+  REQUIRE(v1 != v2);
 
   // empty
   vec = {};
   v1 = Value::MakeBooleanArray(vec);
   v2 = Value::MakeBooleanArray(vec);
-  ASSERT_EQ(v1, v2);
+  REQUIRE(v1 == v2);
 }
 
-TEST_F(ValueTest, IntegerArrayComparison) {
+TEST_CASE("ValueTest IntegerArrayComparison", "[ntcore][value]") {
   std::vector<int64_t> vec{-42, 0, 1};
   auto v1 = Value::MakeIntegerArray(vec);
   auto v2 = Value::MakeIntegerArray(vec);
-  ASSERT_EQ(v1, v2);
+  REQUIRE(v1 == v2);
 
   // different contents
   vec = {-42, 1, 1};
   v2 = Value::MakeIntegerArray(vec);
-  ASSERT_NE(v1, v2);
+  REQUIRE(v1 != v2);
 
   // different size
   vec = {-42, 0};
   v2 = Value::MakeIntegerArray(vec);
-  ASSERT_NE(v1, v2);
+  REQUIRE(v1 != v2);
 
   // empty
   vec = {};
   v1 = Value::MakeIntegerArray(vec);
   v2 = Value::MakeIntegerArray(vec);
-  ASSERT_EQ(v1, v2);
+  REQUIRE(v1 == v2);
 }
 
-TEST_F(ValueTest, FloatArrayComparison) {
+TEST_CASE("ValueTest FloatArrayComparison", "[ntcore][value]") {
   std::vector<float> vec{0.5, 0.25, 0.5};
   auto v1 = Value::MakeFloatArray(vec);
   auto v2 = Value::MakeFloatArray(vec);
-  ASSERT_EQ(v1, v2);
+  REQUIRE(v1 == v2);
 
   // different contents
   vec = {0.5, 0.5, 0.5};
   v2 = Value::MakeFloatArray(vec);
-  ASSERT_NE(v1, v2);
+  REQUIRE(v1 != v2);
 
   // different size
   vec = {0.5, 0.25};
   v2 = Value::MakeFloatArray(vec);
-  ASSERT_NE(v1, v2);
+  REQUIRE(v1 != v2);
 
   // empty
   vec = {};
   v1 = Value::MakeFloatArray(vec);
   v2 = Value::MakeFloatArray(vec);
-  ASSERT_EQ(v1, v2);
+  REQUIRE(v1 == v2);
 }
 
-TEST_F(ValueTest, DoubleArrayComparison) {
+TEST_CASE("ValueTest DoubleArrayComparison", "[ntcore][value]") {
   std::vector<double> vec{0.5, 0.25, 0.5};
   auto v1 = Value::MakeDoubleArray(vec);
   auto v2 = Value::MakeDoubleArray(vec);
-  ASSERT_EQ(v1, v2);
+  REQUIRE(v1 == v2);
 
   // different contents
   vec = {0.5, 0.5, 0.5};
   v2 = Value::MakeDoubleArray(vec);
-  ASSERT_NE(v1, v2);
+  REQUIRE(v1 != v2);
 
   // different size
   vec = {0.5, 0.25};
   v2 = Value::MakeDoubleArray(vec);
-  ASSERT_NE(v1, v2);
+  REQUIRE(v1 != v2);
 
   // empty
   vec = {};
   v1 = Value::MakeDoubleArray(vec);
   v2 = Value::MakeDoubleArray(vec);
-  ASSERT_EQ(v1, v2);
+  REQUIRE(v1 == v2);
 }
 
-TEST_F(ValueTest, StringArrayComparison) {
+TEST_CASE("ValueTest StringArrayComparison", "[ntcore][value]") {
   std::vector<std::string> vec;
   vec.push_back("hello");
   vec.push_back("goodbye");
@@ -432,7 +413,7 @@ TEST_F(ValueTest, StringArrayComparison) {
   vec.push_back("goodbye");
   vec.push_back("string");
   auto v2 = Value::MakeStringArray(std::move(vec));
-  ASSERT_EQ(v1, v2);
+  REQUIRE(v1 == v2);
 
   // different contents
   vec.clear();
@@ -440,7 +421,7 @@ TEST_F(ValueTest, StringArrayComparison) {
   vec.push_back("goodby2");
   vec.push_back("string");
   v2 = Value::MakeStringArray(std::move(vec));
-  ASSERT_NE(v1, v2);
+  REQUIRE(v1 != v2);
 
   // different sized contents
   vec.clear();
@@ -448,20 +429,20 @@ TEST_F(ValueTest, StringArrayComparison) {
   vec.push_back("goodbye2");
   vec.push_back("string");
   v2 = Value::MakeStringArray(vec);
-  ASSERT_NE(v1, v2);
+  REQUIRE(v1 != v2);
 
   // different size
   vec.clear();
   vec.push_back("hello");
   vec.push_back("goodbye");
   v2 = Value::MakeStringArray(std::move(vec));
-  ASSERT_NE(v1, v2);
+  REQUIRE(v1 != v2);
 
   // empty
   vec.clear();
   v1 = Value::MakeStringArray(vec);
   v2 = Value::MakeStringArray(std::move(vec));
-  ASSERT_EQ(v1, v2);
+  REQUIRE(v1 == v2);
 }
 
 }  // namespace wpi::nt

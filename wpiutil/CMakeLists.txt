@@ -58,7 +58,7 @@ if(ATOMIC)
     target_link_libraries(wpiutil ${ATOMIC})
 endif()
 
-if(NOT USE_SYSTEM_FMTLIB)
+if(NOT WPILIB_USE_SYSTEM_FMTLIB)
     target_sources(wpiutil PRIVATE ${fmtlib_native_src})
     install(
         DIRECTORY src/main/native/thirdparty/fmtlib/include/
@@ -93,7 +93,6 @@ install(
         src/main/native/thirdparty/argparse/include/
         src/main/native/thirdparty/debugging/include/
         src/main/native/thirdparty/double-conversion/include/
-        src/main/native/thirdparty/expected/include/
         src/main/native/thirdparty/json/include/
         src/main/native/thirdparty/llvm/include/
         src/main/native/thirdparty/mpack/include/
@@ -109,7 +108,6 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/argparse/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/debugging/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/double-conversion/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/expected/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include>
@@ -141,7 +139,7 @@ foreach(example ${wpiutil_examples})
     endif()
 endforeach()
 
-if(WITH_TESTS)
+if(WPILIB_WITH_TESTS)
     file(GLOB_RECURSE wpiutil_testlib_src src/test/native/include/*.h)
     add_library(wpiutil_testlib INTERFACE ${wpiutil_test_src})
     target_include_directories(wpiutil_testlib INTERFACE src/test/native/include)

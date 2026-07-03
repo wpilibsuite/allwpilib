@@ -32,10 +32,9 @@ NTFMSModel::NTFMSModel(wpi::nt::NetworkTableInstance inst,
     : m_inst{inst},
       m_gameDataSubscriber{
           inst.GetStringTopic(fmt::format("{}/GameData", path)).Subscribe("")},
-      m_alliance{inst.GetBooleanTopic(fmt::format("{}/IsRedAlliance", path))
-                     .Subscribe(false)},
-      m_station{inst.GetIntegerTopic(fmt::format("{}/StationNumber", path))
-                    .Subscribe(0)},
+      m_allianceStation{
+          inst.GetIntegerTopic(fmt::format("{}/AllianceStationID", path))
+              .Subscribe(0)},
       m_controlWord{inst.GetRawTopic(fmt::format("{}/ControlWord", path))
                         .Subscribe("struct:ControlWord", {})},
       m_fmsAttached{fmt::format("NT_FMS:FMSAttached:{}", path)},
@@ -47,18 +46,8 @@ NTFMSModel::NTFMSModel(wpi::nt::NetworkTableInstance inst,
       m_gameData{fmt::format("NT_FMS:GameData:{}", path)} {}
 
 void NTFMSModel::Update() {
-  for (auto&& v : m_alliance.ReadQueue()) {
-    int allianceStationId = m_allianceStationId.GetValue();
-    allianceStationId %= 3;
-    // true if red
-    allianceStationId += 3 * (v.value ? 0 : 1);
-    m_allianceStationId.SetValue(allianceStationId, v.time);
-  }
-  for (auto&& v : m_station.ReadQueue()) {
-    int allianceStationId = m_allianceStationId.GetValue();
-    bool isRed = (allianceStationId < 3);
-    // the NT value is 1-indexed
-    m_allianceStationId.SetValue(v.value - 1 + 3 * (isRed ? 0 : 1), v.time);
+  for (auto&& v : m_allianceStation.ReadQueue()) {
+    m_allianceStationId.SetValue(v.value, v.time);
   }
   for (auto&& v : m_controlWord.ReadQueue()) {
     if (v.value.size() != sizeof(uint64_t)) {
