@@ -18,4 +18,5 @@ classes:
         ignore: true
       operator==:
 
-inline_code: SetupWPyStruct<wpi::apriltag::AprilTag>(cls_AprilTag);
+inline_code: |
+  SetupWPyStruct<wpi::apriltag::AprilTag>(cls_AprilTag);
