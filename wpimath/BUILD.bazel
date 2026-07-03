@@ -278,7 +278,7 @@ cc_library(
 
 cc_test(
     name = "wpimath-cpp-test",
-    size = "small",
+    size = "medium",
     srcs = glob([
         "src/test/native/cpp/**/*.cpp",
         "src/test/native/cpp/**/*.hpp",

@@ -95,6 +95,9 @@ model {
                             duplicatesStrategy = 'exclude'
                             archiveClassifier = nativeUtils.getPublishClassifier(binary)
 
+                            // Use permissions from the file system
+                            useFileSystemPermissions()
+
                             from(licenseFile) {
                                 into '/'
                             }

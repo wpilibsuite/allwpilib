@@ -45,39 +45,31 @@ nativeUtils.platformConfigs.each {
     if (it.name.contains('osx')) {
         it.linker.getArgs().add('-framework')
         it.linker.getArgs().add('IOKit')
-    }
-}
+    } else if (it.name.contains('linux')) {
+        // Compress debug info on Linux
+        it.cppCompiler.debugArgs.add("-gz=zlib")
+        it.linker.args.add("-gz=zlib")
+        // Make warning in OpenCV 4.10 from GCC 15 not an error
+        it.cppCompiler.args.add("-Wno-error=overloaded-virtual")
+        // Make warning from Google Benchmark not an error
+        it.cppCompiler.args.add("-Wno-error=restrict")
+    } else {
+        // On windows, for ntcoreffi, use static runtime
+        if (project.hasProperty('ntcoreffibuild')) {
+            it.cCompiler.releaseArgs.remove('/MD')
+            it.cppCompiler.releaseArgs.remove('/MD')
+            it.cCompiler.debugArgs.remove('/MDd')
+            it.cppCompiler.debugArgs.remove('/MDd')
 
-nativeUtils.platformConfigs.each {
-  if (it.name.contains('linux')) {
-    // Compress debug info on Linux
-    it.cppCompiler.debugArgs.add("-gz=zlib")
-    it.linker.args.add("-gz=zlib")
-    // Make warning in OpenCV 4.10 from GCC 15 not an error
-    it.cppCompiler.args.add("-Wno-error=overloaded-virtual")
-    // Make warning from Google Benchmark not an error
-    it.cppCompiler.args.add("-Wno-error=restrict")
-  }
+            it.cCompiler.releaseArgs.add('/MT')
+            it.cppCompiler.releaseArgs.add('/MT')
+            it.cCompiler.debugArgs.add('/MTd')
+            it.cppCompiler.debugArgs.add('/MTd')
+        }
+    }
 }
 
 nativeUtils.platformConfigs.linuxsystemcore.linker.args.add("-Wl,--fatal-warnings")
-
-if (project.hasProperty('ntcoreffibuild')) {
-  // On windows, for ntcoreffi, use static runtime
-  nativeUtils.platformConfigs.each {
-    if (it.name.contains('windows')) {
-      it.cCompiler.releaseArgs.remove('/MD')
-      it.cppCompiler.releaseArgs.remove('/MD')
-      it.cCompiler.debugArgs.remove('/MDd')
-      it.cppCompiler.debugArgs.remove('/MDd')
-
-      it.cCompiler.releaseArgs.add('/MT')
-      it.cppCompiler.releaseArgs.add('/MT')
-      it.cCompiler.debugArgs.add('/MTd')
-      it.cppCompiler.debugArgs.add('/MTd')
-    }
-  }
-}
 
 model {
     components {
