@@ -4,14 +4,11 @@
 
 package org.wpilib.math.trajectory.proto;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.wpilib.math.proto.ProtobufHolonomicTrajectory;
 import org.wpilib.math.trajectory.HolonomicTrajectory;
 import org.wpilib.math.trajectory.TrajectorySample;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
-import us.hebi.quickbuf.RepeatedMessage;
 
 public class HolonomicTrajectoryProto
     implements Protobuf<HolonomicTrajectory, ProtobufHolonomicTrajectory> {
@@ -32,20 +29,11 @@ public class HolonomicTrajectoryProto
 
   @Override
   public HolonomicTrajectory unpack(ProtobufHolonomicTrajectory msg) {
-    List<TrajectorySample> samples = new ArrayList<>();
-    RepeatedMessage<org.wpilib.math.proto.ProtobufTrajectorySample> samplesMsg = msg.getSamples();
-    for (int i = 0; i < samplesMsg.length(); i++) {
-      samples.add(TrajectorySample.proto.unpack(samplesMsg.get(i)));
-    }
-    return new HolonomicTrajectory(samples);
+    return new HolonomicTrajectory(Protobuf.unpackList(msg.getSamples(), TrajectorySample.proto));
   }
 
   @Override
   public void pack(ProtobufHolonomicTrajectory msg, HolonomicTrajectory value) {
-    RepeatedMessage<org.wpilib.math.proto.ProtobufTrajectorySample> samplesMsg =
-        msg.getMutableSamples();
-    for (TrajectorySample sample : value.getSamples()) {
-      TrajectorySample.proto.pack(samplesMsg.next(), sample);
-    }
+    Protobuf.packList(msg.getMutableSamples(), value.getSamples(), TrajectorySample.proto);
   }
 }
