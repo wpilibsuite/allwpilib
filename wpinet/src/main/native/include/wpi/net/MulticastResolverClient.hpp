@@ -10,7 +10,7 @@
 #include <string>
 #include <string_view>
 
-#include "wpi/net/MulticastServiceResolver.h"
+#include "wpi/net/MulticastServiceResolver.hpp"
 #include "wpi/util/Signal.h"
 
 namespace wpi::util {
