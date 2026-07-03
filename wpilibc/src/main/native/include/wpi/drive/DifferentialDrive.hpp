@@ -111,7 +111,7 @@ class DifferentialDrive : public RobotDriveBase,
    *     [-1.0..1.0]. Counterclockwise is positive.
    * @param squareInputs If set, decreases the input sensitivity at low
    *     velocities.
-   * @Common - This is one of the commonly used methods for this class
+   * @Common This is one of the commonly used methods for this class
    */
   void ArcadeDrive(double xVelocity, double zRotation,
                    bool squareInputs = true);

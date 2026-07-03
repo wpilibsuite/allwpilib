@@ -35,7 +35,7 @@ class ExpansionHubCRServo {
    * full forward.
    *
    * @param value Throttle from -1.0 to 1.0.
-   * @Common - This is one of the commonly used methods for this class
+   * @Common This is one of the commonly used methods for this class
    */
   void SetThrottle(double value);
 

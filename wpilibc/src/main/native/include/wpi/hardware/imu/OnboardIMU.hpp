@@ -41,7 +41,7 @@ class OnboardIMU {
   /**
    * Get the yaw value
    * @return yaw value
-   * @Common - This is one of the commonly used methods for this class
+   * @Common This is one of the commonly used methods for this class
    */
   wpi::units::radian_t GetYaw();
 
@@ -49,7 +49,7 @@ class OnboardIMU {
    * Reset the current yaw value to 0. Future reads of the yaw value will be
    * relative to the current orientation.
    *
-   * @Common - This is one of the commonly used methods for this class
+   * @Common This is one of the commonly used methods for this class
    */
   void ResetYaw();
 

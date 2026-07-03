@@ -37,14 +37,14 @@ class UpDownCounter : public wpi::util::Sendable,
    * Gets the current count.
    *
    * @return The current count.
-   * @Common - This is one of the commonly used methods for this class
+   * @Common This is one of the commonly used methods for this class
    */
   int GetCount() const;
 
   /**
    * Resets the current count.
    *
-   * @Common - This is one of the commonly used methods for this class
+   * @Common This is one of the commonly used methods for this class
    */
   void Reset();
 
