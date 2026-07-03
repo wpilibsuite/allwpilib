@@ -10,10 +10,12 @@
 #include <cmath>
 #include <iomanip>
 #include <limits>
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/driverstation/DriverStationDisplay.hpp"
@@ -264,9 +266,9 @@ int GamepadSelectable::Wrap(int value, int size) {
 std::string GamepadSelectable::FormatDisplayLine(const Chooser& chooser,
                                                  bool selected) {
   if (selected) {
-    return "> " + std::string{chooser.GetName()} + ": " +
+    return "> " + std::string{chooser.GetName()} + " : " +
            std::string{chooser.GetSelected()} + " <";
   }
-  return std::string{chooser.GetName()} + " : " +
+  return "  " + std::string{chooser.GetName()} + " : " +
          std::string{chooser.GetSelected()};
 }

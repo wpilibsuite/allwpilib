@@ -13,6 +13,7 @@ EXAMPLE_FOLDERS = [
     "ElevatorSimulation",
     "ElevatorTrapezoidProfile",
     "Encoder",
+    "GamepadSelectable",
     "GettingStarted",
     "Gyro",
     "HAL",

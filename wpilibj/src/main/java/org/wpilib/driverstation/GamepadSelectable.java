@@ -269,9 +269,9 @@ public class GamepadSelectable {
 
   private static String formatDisplayLine(Chooser chooser, boolean selected) {
     if (selected) {
-      return "> " + chooser.getName() + ": " + chooser.getSelected() + " <";
+      return "> " + chooser.getName() + " : " + chooser.getSelected() + " <";
     }
-    return chooser.getName() + " : " + chooser.getSelected();
+    return "  " + chooser.getName() + " : " + chooser.getSelected();
   }
 
   /** A single named set of selectable options. */

@@ -12,6 +12,7 @@ EXAMPLE_PROJECTS = [
     "examples/ElevatorSimulation",
     "examples/ElevatorTrapezoidProfile",
     "examples/Encoder",
+    "examples/GamepadSelectable",
     "examples/GettingStarted",
     "examples/Gyro",
     "examples/HatchbotInlined",

@@ -14,6 +14,7 @@ EXAMPLE_FOLDERS = [
     "elevatortrapezoidprofile",
     "encoder",
     "expansionhubsample",
+    "gamepadselectable",
     "gettingstarted",
     "gyro",
     "hatchbotcmdv3",
