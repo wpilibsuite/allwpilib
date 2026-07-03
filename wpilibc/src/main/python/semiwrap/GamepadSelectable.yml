@@ -1,0 +1,46 @@
+extra_includes:
+- pybind11/stl.h
+
+classes:
+  wpi::GamepadSelectable:
+    methods:
+      GamepadSelectable:
+        overloads:
+          int:
+          Gamepad&:
+      GetGamepad:
+        overloads:
+          "":
+            return_value_policy: reference_internal
+          '[const]':
+            ignore: true
+      AddOptions:
+        overloads:
+          std::string_view, std::vector<std::string>:
+            return_value_policy: reference_internal
+          std::string_view, std::initializer_list<std::string_view>:
+            ignore: true
+      AddIntegerOptions:
+        return_value_policy: reference_internal
+      AddDoubleOptions:
+        return_value_policy: reference_internal
+      Update:
+      GetSelected:
+      GetSelectedInteger:
+      GetSelectedDouble:
+      GetSelectedIndex:
+      GetChooserNames:
+      GetSelectedChooser:
+        overloads:
+          "":
+            return_value_policy: reference_internal
+          '[const]':
+            ignore: true
+
+  wpi::GamepadSelectable::Chooser:
+    qualname: wpi::GamepadSelectable
+    methods:
+      GetName:
+      GetOptions:
+      GetSelected:
+      GetSelectedIndex:

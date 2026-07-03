@@ -15,6 +15,7 @@ base = [
   "Encoder",
   "GettingStarted",
   "Gyro",
+  "GamepadSelectable",
   "HatchbotInlined",
   "HatchbotTraditional",
   "MecanumBot",

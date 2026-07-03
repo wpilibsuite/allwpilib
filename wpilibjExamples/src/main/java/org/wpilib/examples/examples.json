@@ -306,6 +306,20 @@
     "commandversion": 2
   },
   {
+    "name": "Gamepad Selectable",
+    "description": "Use a gamepad-controlled Driver Station display selector to configure separate autonomous opmodes.",
+    "tags": [
+      "Basic Robot",
+      "Driver Station",
+      "Gamepad",
+      "OpMode"
+    ],
+    "foldername": "gamepadselectable",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
     "name": "Driver Station Display Lines",
     "description": "Display lines on the Driver Station display and update them every robot loop.",
     "tags": [

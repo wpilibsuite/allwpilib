@@ -273,6 +273,19 @@
     "commandversion": 2
   },
   {
+    "name": "Gamepad Selectable",
+    "description": "Use a gamepad-controlled Driver Station display selector to configure separate autonomous opmodes.",
+    "tags": [
+      "Basic Robot",
+      "Driver Station",
+      "Gamepad",
+      "OpMode"
+    ],
+    "foldername": "GamepadSelectable",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
     "name": "DriveDistanceOffboard",
     "description": "Drive a differential drivetrain a set distance using TrapezoidProfile and smart motor controller PID.",
     "tags": [
