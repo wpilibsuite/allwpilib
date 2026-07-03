@@ -29,6 +29,8 @@ class AprilTagFieldLayoutProtoTest {
     AprilTagFieldLayout.proto.pack(proto, DATA);
 
     AprilTagFieldLayout data = AprilTagFieldLayout.proto.unpack(proto);
-    assertEquals(DATA, data);
+    assertEquals(DATA.getTagMap(), data.getTagMap());
+    assertEquals(DATA.getFieldLength(), data.getFieldLength());
+    assertEquals(DATA.getFieldWidth(), data.getFieldWidth());
   }
 }
