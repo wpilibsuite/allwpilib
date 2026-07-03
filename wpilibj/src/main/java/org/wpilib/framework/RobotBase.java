@@ -62,7 +62,7 @@ public abstract class RobotBase implements AutoCloseable {
           }
 
           @Override
-          public boolean isRoboRIO() {
+          public boolean isSystemcore() {
             return !RobotBase.isSimulation();
           }
         };

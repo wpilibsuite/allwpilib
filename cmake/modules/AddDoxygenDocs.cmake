@@ -60,7 +60,6 @@ macro(add_doxygen_docs)
                 "wpi/SmallVector.h"
                 "wpi/StringExtras.h"
                 "wpi/StringMap.h"
-                "wpi/SwapByteOrder.h"
                 "wpi/type_traits.h"
                 "wpi/VersionTuple.h"
                 "wpi/WindowsError.h"
