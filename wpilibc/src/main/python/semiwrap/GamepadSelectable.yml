@@ -38,7 +38,6 @@ classes:
             ignore: true
 
   wpi::GamepadSelectable::Chooser:
-    qualname: wpi::GamepadSelectable
     methods:
       GetName:
       GetOptions:
