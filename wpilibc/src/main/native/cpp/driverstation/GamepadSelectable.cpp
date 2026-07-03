@@ -6,8 +6,8 @@
 
 #include <atomic>
 #include <cctype>
-#include <cstdint>
 #include <cmath>
+#include <cstdint>
 #include <iomanip>
 #include <limits>
 #include <memory>
@@ -57,11 +57,13 @@ int GamepadSelectable::Chooser::GetSelectedIndex() const {
 }
 
 void GamepadSelectable::Chooser::SelectPrevious() {
-  m_selectedIndex = Wrap(m_selectedIndex - 1, static_cast<int>(m_options.size()));
+  m_selectedIndex =
+      Wrap(m_selectedIndex - 1, static_cast<int>(m_options.size()));
 }
 
 void GamepadSelectable::Chooser::SelectNext() {
-  m_selectedIndex = Wrap(m_selectedIndex + 1, static_cast<int>(m_options.size()));
+  m_selectedIndex =
+      Wrap(m_selectedIndex + 1, static_cast<int>(m_options.size()));
 }
 
 GamepadSelectable::GamepadSelectable(int port)
@@ -149,7 +151,8 @@ GamepadSelectable::Chooser& GamepadSelectable::AddDoubleOptions(
       break;
     }
     if (value <= previous) {
-      throw std::invalid_argument("Delta is too small to produce another option");
+      throw std::invalid_argument(
+          "Delta is too small to produce another option");
     }
     options.emplace_back(FormatDouble(value));
     previous = value;

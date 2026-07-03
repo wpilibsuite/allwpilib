@@ -30,7 +30,6 @@ void BalanceAuto::Periodic() {
   wpi::DriverStationDisplay::AddData("Selected Auto", "Balance");
   wpi::DriverStationDisplay::AddData("Approach", m_approach);
   wpi::DriverStationDisplay::AddData("Attempts", std::to_string(m_attempts));
-  wpi::DriverStationDisplay::AddData("Turn Scale",
-                                     std::to_string(m_turnScale));
+  wpi::DriverStationDisplay::AddData("Turn Scale", std::to_string(m_turnScale));
   wpi::DriverStationDisplay::UpdateLines();
 }

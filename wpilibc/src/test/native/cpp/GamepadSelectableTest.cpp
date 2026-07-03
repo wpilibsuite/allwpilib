@@ -90,10 +90,12 @@ TEST_F(GamepadSelectableTest, DpadMovesBetweenChoosersAndOptions) {
   Tap(sim, selectable, Gamepad::Button::DPAD_RIGHT);
   EXPECT_EQ(std::string_view{"Center"}, autoChooser.GetSelected());
   EXPECT_EQ(std::string_view{"0"}, delay.GetSelected());
-  EXPECT_EQ(std::string_view{"Auto"}, selectable.GetSelectedChooser()->GetName());
+  EXPECT_EQ(std::string_view{"Auto"},
+            selectable.GetSelectedChooser()->GetName());
 
   Tap(sim, selectable, Gamepad::Button::DPAD_DOWN);
-  EXPECT_EQ(std::string_view{"Delay"}, selectable.GetSelectedChooser()->GetName());
+  EXPECT_EQ(std::string_view{"Delay"},
+            selectable.GetSelectedChooser()->GetName());
 
   Tap(sim, selectable, Gamepad::Button::DPAD_RIGHT);
   EXPECT_EQ(std::string_view{"1"}, delay.GetSelected());
@@ -104,7 +106,8 @@ TEST_F(GamepadSelectableTest, DpadMovesBetweenChoosersAndOptions) {
   EXPECT_EQ(std::string_view{"2"}, delay.GetSelected());
 
   Tap(sim, selectable, Gamepad::Button::DPAD_UP);
-  EXPECT_EQ(std::string_view{"Auto"}, selectable.GetSelectedChooser()->GetName());
+  EXPECT_EQ(std::string_view{"Auto"},
+            selectable.GetSelectedChooser()->GetName());
 
   Tap(sim, selectable, Gamepad::Button::DPAD_LEFT);
   Tap(sim, selectable, Gamepad::Button::DPAD_LEFT);

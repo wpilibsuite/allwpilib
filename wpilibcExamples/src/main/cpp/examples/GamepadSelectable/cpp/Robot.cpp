@@ -9,8 +9,7 @@
 #include "opmode/ScoreAuto.hpp"
 
 Robot::Robot() {
-  AddOpMode<DoNothingTeleop>(wpi::RobotMode::TELEOPERATED,
-                             "Do Nothing Teleop");
+  AddOpMode<DoNothingTeleop>(wpi::RobotMode::TELEOPERATED, "Do Nothing Teleop");
   AddOpMode<ScoreAuto>(wpi::RobotMode::AUTONOMOUS, "Score Auto");
   AddOpMode<BalanceAuto>(wpi::RobotMode::AUTONOMOUS, "Balance Auto");
   PublishOpModes();
