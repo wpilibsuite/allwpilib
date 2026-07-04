@@ -219,10 +219,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::DSGamepadChooser", "wpi__DSGamepadChooser.hpp"),
-                (
-                    "wpi::DSGamepadChooser::GamepadSelectable",
-                    "wpi__DSGamepadChooser__GamepadSelectable.hpp",
-                ),
+                ("wpi::DSGamepadChooser::GamepadSelectable", "wpi__DSGamepadChooser__GamepadSelectable.hpp"),
             ],
         ),
         struct(

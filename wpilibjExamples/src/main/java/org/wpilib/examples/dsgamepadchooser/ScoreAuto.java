@@ -5,9 +5,9 @@
 package org.wpilib.examples.dsgamepadchooser;
 
 import java.util.List;
+import org.wpilib.driverstation.DSGamepadChooser;
 import org.wpilib.driverstation.DriverStationDisplay;
 import org.wpilib.driverstation.DriverStationDisplay.Mode;
-import org.wpilib.driverstation.DSGamepadChooser;
 import org.wpilib.opmode.Autonomous;
 import org.wpilib.opmode.PeriodicOpMode;
 

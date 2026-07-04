@@ -39,8 +39,7 @@ class DSGamepadChooserTest {
   void addIntegerOptionsCreatesRange() {
     var chooser = new DSGamepadChooser(0);
 
-    DSGamepadChooser.GamepadSelectable selectable =
-        chooser.addIntegerOptions("Delay", -2, 3, 2);
+    DSGamepadChooser.GamepadSelectable selectable = chooser.addIntegerOptions("Delay", -2, 3, 2);
 
     assertIterableEquals(List.of("-2", "0", "2", "3"), selectable.getOptions());
     assertEquals("-2", selectable.getSelected());
@@ -108,8 +107,7 @@ class DSGamepadChooserTest {
 
     assertThrows(IllegalArgumentException.class, () -> chooser.addOptions("", List.of("A")));
     assertThrows(IllegalArgumentException.class, () -> chooser.addOptions("Empty", List.of()));
-    assertThrows(
-        IllegalArgumentException.class, () -> chooser.addIntegerOptions("Bad", 0, 2, 0));
+    assertThrows(IllegalArgumentException.class, () -> chooser.addIntegerOptions("Bad", 0, 2, 0));
     assertThrows(
         IllegalArgumentException.class, () -> chooser.addDoubleOptions("Bad", 0.0, 1.0, 0.0));
 

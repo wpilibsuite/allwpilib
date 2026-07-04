@@ -1,6 +1,7 @@
 EXAMPLE_FOLDERS = [
     "ArcadeDriveGamepad",
     "ArmSimulation",
+    "DSGamepadChooser",
     "DifferentialDriveBot",
     "DifferentialDrivePoseEstimator",
     "DriveDistanceOffboard",
@@ -13,7 +14,6 @@ EXAMPLE_FOLDERS = [
     "ElevatorSimulation",
     "ElevatorTrapezoidProfile",
     "Encoder",
-    "DSGamepadChooser",
     "GettingStarted",
     "Gyro",
     "HAL",

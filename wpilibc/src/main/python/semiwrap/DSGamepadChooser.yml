@@ -9,6 +9,8 @@ classes:
         overloads:
           int:
           Gamepad&:
+            keepalive:
+            - [1, 2]
       GetGamepad:
         overloads:
           "":
