@@ -1,5 +1,6 @@
 extra_includes:
 - pybind11/stl.h
+- wpi/driverstation/Gamepad.hpp"
 
 classes:
   wpi::GamepadSelectable:

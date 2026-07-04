@@ -5,6 +5,12 @@
     <Class name="org.wpilib.system.Watchdog" />
   </Match>
   <Match>
+    <!-- GamepadSelectable's selected chooser index is not a cross-thread coordination primitive. -->
+    <Bug pattern="AT_NONATOMIC_OPERATIONS_ON_SHARED_VARIABLE" />
+    <Class name="org.wpilib.driverstation.GamepadSelectable" />
+    <Field name="m_selectedChooser" />
+  </Match>
+  <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
     <Or>
       <Class name="org.wpilib.driverstation.internal.DriverStationBackend" />
