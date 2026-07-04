@@ -10,20 +10,20 @@
 
 BalanceAuto::BalanceAuto() {
   wpi::DriverStationDisplay::SetMode(wpi::DriverStationDisplay::Mode::Line);
-  m_selectable.AddOptions("Approach", {"Left", "Center", "Right"});
-  m_selectable.AddIntegerOptions("Attempts", 1, 3, 1);
-  m_selectable.AddDoubleOptions("Turn Scale", 0.2, 1.0, 0.2);
+  m_chooser.AddOptions("Approach", {"Left", "Center", "Right"});
+  m_chooser.AddIntegerOptions("Attempts", 1, 3, 1);
+  m_chooser.AddDoubleOptions("Turn Scale", 0.2, 1.0, 0.2);
 }
 
 void BalanceAuto::DisabledPeriodic() {
-  m_selectable.Update();
+  m_chooser.Update();
   wpi::DriverStationDisplay::UpdateLines();
 }
 
 void BalanceAuto::Start() {
-  m_approach = m_selectable.GetSelected("Approach");
-  m_attempts = m_selectable.GetSelectedInteger("Attempts");
-  m_turnScale = m_selectable.GetSelectedDouble("Turn Scale");
+  m_approach = m_chooser.GetSelected("Approach");
+  m_attempts = m_chooser.GetSelectedInteger("Attempts");
+  m_turnScale = m_chooser.GetSelectedDouble("Turn Scale");
 }
 
 void BalanceAuto::Periodic() {

@@ -17,35 +17,35 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * A set of selectable options controlled by a {@link Gamepad}.
  *
- * <p>The D-pad up and down buttons select which chooser is active. The D-pad left and right buttons
- * change the selected option in the active chooser.
+ * <p>The D-pad up and down buttons select which selectable is active. The D-pad left and right
+ * buttons change the selected option in the active selectable.
  */
-public class GamepadSelectable {
+public class DSGamepadChooser {
   private static final AtomicInteger s_instances = new AtomicInteger();
 
   private final Gamepad m_gamepad;
-  private final List<Chooser> m_choosers = new ArrayList<>();
-  private final Map<String, Chooser> m_chooserMap = new LinkedHashMap<>();
+  private final List<GamepadSelectable> m_selectables = new ArrayList<>();
+  private final Map<String, GamepadSelectable> m_selectableMap = new LinkedHashMap<>();
   private final String m_captionPrefix;
-  private int m_selectedChooser;
+  private int m_selectedSelectable;
 
   /**
-   * Constructs a GamepadSelectable.
+   * Constructs a DSGamepadChooser.
    *
    * @param port The port index on the Driver Station that the gamepad is plugged into (0-5).
    */
-  public GamepadSelectable(int port) {
+  public DSGamepadChooser(int port) {
     this(DriverStation.getGamepad(port));
   }
 
   /**
-   * Constructs a GamepadSelectable.
+   * Constructs a DSGamepadChooser.
    *
    * @param gamepad The gamepad used to change selections.
    */
-  public GamepadSelectable(Gamepad gamepad) {
-    m_gamepad = requireNonNullParam(gamepad, "gamepad", "GamepadSelectable");
-    m_captionPrefix = "GamepadSelectable/" + s_instances.getAndIncrement() + "/";
+  public DSGamepadChooser(Gamepad gamepad) {
+    m_gamepad = requireNonNullParam(gamepad, "gamepad", "DSGamepadChooser");
+    m_captionPrefix = "DSGamepadChooser/" + s_instances.getAndIncrement() + "/";
   }
 
   /**
@@ -58,43 +58,43 @@ public class GamepadSelectable {
   }
 
   /**
-   * Adds a chooser with the given options.
+   * Adds a selectable with the given options.
    *
    * <p>The first option is selected by default.
    *
-   * @param name chooser name
+   * @param name selectable name
    * @param options available options
-   * @return the created chooser
+   * @return the created selectable
    */
-  public Chooser addOptions(String name, List<String> options) {
-    requireChooserName(name, "addOptions");
+  public GamepadSelectable addOptions(String name, List<String> options) {
+    requireSelectableName(name, "addOptions");
     requireNonNullParam(options, "options", "addOptions");
     if (options.isEmpty()) {
       throw new IllegalArgumentException("Options cannot be empty");
     }
-    if (m_chooserMap.containsKey(name)) {
-      throw new IllegalArgumentException("Chooser already exists: " + name);
+    if (m_selectableMap.containsKey(name)) {
+      throw new IllegalArgumentException("GamepadSelectable already exists: " + name);
     }
 
-    var chooser = new Chooser(name, options);
-    m_choosers.add(chooser);
-    m_chooserMap.put(name, chooser);
-    return chooser;
+    var selectable = new GamepadSelectable(name, options);
+    m_selectables.add(selectable);
+    m_selectableMap.put(name, selectable);
+    return selectable;
   }
 
   /**
-   * Adds a chooser with integer options from {@code min} to {@code max}, inclusive, stepping by
+   * Adds a selectable with integer options from {@code min} to {@code max}, inclusive, stepping by
    * {@code delta}.
    *
    * <p>The first option is selected by default.
    *
-   * @param name chooser name
+   * @param name selectable name
    * @param min minimum option
    * @param max maximum option
    * @param delta amount between options
-   * @return the created chooser
+   * @return the created selectable
    */
-  public Chooser addIntegerOptions(String name, int min, int max, int delta) {
+  public GamepadSelectable addIntegerOptions(String name, int min, int max, int delta) {
     if (min > max) {
       throw new IllegalArgumentException("Minimum cannot be greater than maximum");
     }
@@ -113,18 +113,18 @@ public class GamepadSelectable {
   }
 
   /**
-   * Adds a chooser with floating point options from {@code min} to {@code max}, inclusive, stepping
-   * by {@code delta}.
+   * Adds a selectable with floating point options from {@code min} to {@code max}, inclusive,
+   * stepping by {@code delta}.
    *
    * <p>The first option is selected by default.
    *
-   * @param name chooser name
+   * @param name selectable name
    * @param min minimum option
    * @param max maximum option
    * @param delta amount between options
-   * @return the created chooser
+   * @return the created selectable
    */
-  public Chooser addDoubleOptions(String name, double min, double max, double delta) {
+  public GamepadSelectable addDoubleOptions(String name, double min, double max, double delta) {
     if (!Double.isFinite(min) || !Double.isFinite(max) || !Double.isFinite(delta)) {
       throw new IllegalArgumentException("Minimum, maximum, and delta must be finite");
     }
@@ -153,55 +153,55 @@ public class GamepadSelectable {
   }
 
   /**
-   * Updates chooser selection and adds the current selections to the driver station display.
+   * Updates selectable selection and adds the current selections to the driver station display.
    *
-   * <p>The D-pad up and down buttons select which chooser is active. The D-pad left and right
-   * buttons change the selected option in the active chooser.
+   * <p>The D-pad up and down buttons select which selectable is active. The D-pad left and right
+   * buttons change the selected option in the active selectable.
    *
    * <p>Call {@link DriverStationDisplay#updateLines()} externally to flush display updates.
    */
   public void update() {
-    if (m_choosers.isEmpty()) {
+    if (m_selectables.isEmpty()) {
       return;
     }
 
     if (m_gamepad.getDpadUpButtonPressed()) {
-      m_selectedChooser = wrap(m_selectedChooser - 1, m_choosers.size());
+      m_selectedSelectable = wrap(m_selectedSelectable - 1, m_selectables.size());
     }
     if (m_gamepad.getDpadDownButtonPressed()) {
-      m_selectedChooser = wrap(m_selectedChooser + 1, m_choosers.size());
+      m_selectedSelectable = wrap(m_selectedSelectable + 1, m_selectables.size());
     }
 
-    Chooser chooser = m_choosers.get(m_selectedChooser);
+    GamepadSelectable selectable = m_selectables.get(m_selectedSelectable);
     if (m_gamepad.getDpadLeftButtonPressed()) {
-      chooser.selectPrevious();
+      selectable.selectPrevious();
     }
     if (m_gamepad.getDpadRightButtonPressed()) {
-      chooser.selectNext();
+      selectable.selectNext();
     }
 
-    for (int i = 0; i < m_choosers.size(); i++) {
-      Chooser displayChooser = m_choosers.get(i);
+    for (int i = 0; i < m_selectables.size(); i++) {
+      GamepadSelectable displaySelectable = m_selectables.get(i);
       DriverStationDisplay.addData(
-          m_captionPrefix + displayChooser.getName(),
-          formatDisplayLine(displayChooser, i == m_selectedChooser));
+          m_captionPrefix + displaySelectable.getName(),
+          formatDisplayLine(displaySelectable, i == m_selectedSelectable));
     }
   }
 
   /**
-   * Gets the currently selected option for a chooser.
+   * Gets the currently selected option for a selectable.
    *
-   * @param name chooser name
+   * @param name selectable name
    * @return the currently selected option
    */
   public String getSelected(String name) {
-    return getChooser(name).getSelected();
+    return getSelectable(name).getSelected();
   }
 
   /**
-   * Gets the currently selected integer option for a chooser.
+   * Gets the currently selected integer option for a selectable.
    *
-   * @param name chooser name
+   * @param name selectable name
    * @return the currently selected option
    */
   public int getSelectedInteger(String name) {
@@ -209,9 +209,9 @@ public class GamepadSelectable {
   }
 
   /**
-   * Gets the currently selected double option for a chooser.
+   * Gets the currently selected double option for a selectable.
    *
-   * @param name chooser name
+   * @param name selectable name
    * @return the currently selected option
    */
   public double getSelectedDouble(String name) {
@@ -219,49 +219,49 @@ public class GamepadSelectable {
   }
 
   /**
-   * Gets the currently selected option index for a chooser.
+   * Gets the currently selected option index for a selectable.
    *
-   * @param name chooser name
+   * @param name selectable name
    * @return the currently selected option index
    */
   public int getSelectedIndex(String name) {
-    return getChooser(name).getSelectedIndex();
+    return getSelectable(name).getSelectedIndex();
   }
 
   /**
-   * Gets the names of all choosers.
+   * Gets the names of all selectables.
    *
-   * @return chooser names
+   * @return selectable names
    */
-  public List<String> getChooserNames() {
-    return List.copyOf(m_chooserMap.keySet());
+  public List<String> getSelectableNames() {
+    return List.copyOf(m_selectableMap.keySet());
   }
 
   /**
-   * Gets the chooser currently controlled by D-pad left and right.
+   * Gets the selectable currently controlled by D-pad left and right.
    *
-   * @return the selected chooser
+   * @return the selected selectable
    */
-  public Chooser getSelectedChooser() {
-    if (m_choosers.isEmpty()) {
+  public GamepadSelectable getSelectedSelectable() {
+    if (m_selectables.isEmpty()) {
       return null;
     }
-    return m_choosers.get(m_selectedChooser);
+    return m_selectables.get(m_selectedSelectable);
   }
 
-  private Chooser getChooser(String name) {
-    requireChooserName(name, "getChooser");
-    Chooser chooser = m_chooserMap.get(name);
-    if (chooser == null) {
-      throw new IllegalArgumentException("Unknown chooser: " + name);
+  private GamepadSelectable getSelectable(String name) {
+    requireSelectableName(name, "getSelectable");
+    GamepadSelectable selectable = m_selectableMap.get(name);
+    if (selectable == null) {
+      throw new IllegalArgumentException("Unknown selectable: " + name);
     }
-    return chooser;
+    return selectable;
   }
 
-  private static void requireChooserName(String name, String methodName) {
+  private static void requireSelectableName(String name, String methodName) {
     requireNonNullParam(name, "name", methodName);
     if (name.isBlank()) {
-      throw new IllegalArgumentException("Chooser name cannot be blank");
+      throw new IllegalArgumentException("GamepadSelectable name cannot be blank");
     }
   }
 
@@ -269,28 +269,28 @@ public class GamepadSelectable {
     return Math.floorMod(value, size);
   }
 
-  private static String formatDisplayLine(Chooser chooser, boolean selected) {
+  private static String formatDisplayLine(GamepadSelectable selectable, boolean selected) {
     if (selected) {
-      return "> " + chooser.getName() + " : " + chooser.getSelected() + " <";
+      return "> " + selectable.getName() + " : " + selectable.getSelected() + " <";
     }
-    return "  " + chooser.getName() + " : " + chooser.getSelected();
+    return "  " + selectable.getName() + " : " + selectable.getSelected();
   }
 
   /** A single named set of selectable options. */
-  public static final class Chooser {
+  public static final class GamepadSelectable {
     private final String m_name;
     private final List<String> m_options;
     private int m_selectedIndex;
 
-    private Chooser(String name, List<String> options) {
+    private GamepadSelectable(String name, List<String> options) {
       m_name = name;
       m_options = Collections.unmodifiableList(new ArrayList<>(options));
     }
 
     /**
-     * Gets the chooser name.
+     * Gets the selectable name.
      *
-     * @return chooser name
+     * @return selectable name
      */
     public String getName() {
       return m_name;

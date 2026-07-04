@@ -10,20 +10,20 @@
 
 ScoreAuto::ScoreAuto() {
   wpi::DriverStationDisplay::SetMode(wpi::DriverStationDisplay::Mode::Line);
-  m_selectable.AddOptions("Target", {"High", "Mid", "Low"});
-  m_selectable.AddIntegerOptions("Delay", 0, 5, 1);
-  m_selectable.AddDoubleOptions("Speed", 0.25, 1.0, 0.25);
+  m_chooser.AddOptions("Target", {"High", "Mid", "Low"});
+  m_chooser.AddIntegerOptions("Delay", 0, 5, 1);
+  m_chooser.AddDoubleOptions("Speed", 0.25, 1.0, 0.25);
 }
 
 void ScoreAuto::DisabledPeriodic() {
-  m_selectable.Update();
+  m_chooser.Update();
   wpi::DriverStationDisplay::UpdateLines();
 }
 
 void ScoreAuto::Start() {
-  m_target = m_selectable.GetSelected("Target");
-  m_delay = m_selectable.GetSelectedInteger("Delay");
-  m_speed = m_selectable.GetSelectedDouble("Speed");
+  m_target = m_chooser.GetSelected("Target");
+  m_delay = m_chooser.GetSelectedInteger("Delay");
+  m_speed = m_chooser.GetSelectedDouble("Speed");
 }
 
 void ScoreAuto::Periodic() {

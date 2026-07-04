@@ -20,22 +20,22 @@ class ScoreAuto(wpilib.PeriodicOpMode):
     def __init__(self) -> None:
         super().__init__()
         wpilib.DriverStationDisplay.setMode(wpilib.DriverStationDisplay.Mode.Line)
-        self.selectable = wpilib.GamepadSelectable(0)
-        self.selectable.addOptions("Target", ["High", "Mid", "Low"])
-        self.selectable.addIntegerOptions("Delay", 0, 5, 1)
-        self.selectable.addDoubleOptions("Speed", 0.25, 1.0, 0.25)
+        self.chooser = wpilib.DSGamepadChooser(0)
+        self.chooser.addOptions("Target", ["High", "Mid", "Low"])
+        self.chooser.addIntegerOptions("Delay", 0, 5, 1)
+        self.chooser.addDoubleOptions("Speed", 0.25, 1.0, 0.25)
         self.target = "High"
         self.delay = 0
         self.speed = 0.25
 
     def disabledPeriodic(self) -> None:
-        self.selectable.update()
+        self.chooser.update()
         wpilib.DriverStationDisplay.updateLines()
 
     def start(self) -> None:
-        self.target = self.selectable.getSelected("Target")
-        self.delay = self.selectable.getSelectedInteger("Delay")
-        self.speed = self.selectable.getSelectedDouble("Speed")
+        self.target = self.chooser.getSelected("Target")
+        self.delay = self.chooser.getSelectedInteger("Delay")
+        self.speed = self.chooser.getSelectedDouble("Speed")
 
     def periodic(self) -> None:
         wpilib.DriverStationDisplay.addData("Selected Auto", "Score")
@@ -51,22 +51,22 @@ class BalanceAuto(wpilib.PeriodicOpMode):
     def __init__(self) -> None:
         super().__init__()
         wpilib.DriverStationDisplay.setMode(wpilib.DriverStationDisplay.Mode.Line)
-        self.selectable = wpilib.GamepadSelectable(0)
-        self.selectable.addOptions("Approach", ["Left", "Center", "Right"])
-        self.selectable.addIntegerOptions("Attempts", 1, 3, 1)
-        self.selectable.addDoubleOptions("Turn Scale", 0.2, 1.0, 0.2)
+        self.chooser = wpilib.DSGamepadChooser(0)
+        self.chooser.addOptions("Approach", ["Left", "Center", "Right"])
+        self.chooser.addIntegerOptions("Attempts", 1, 3, 1)
+        self.chooser.addDoubleOptions("Turn Scale", 0.2, 1.0, 0.2)
         self.approach = "Center"
         self.attempts = 1
         self.turnScale = 0.5
 
     def disabledPeriodic(self) -> None:
-        self.selectable.update()
+        self.chooser.update()
         wpilib.DriverStationDisplay.updateLines()
 
     def start(self) -> None:
-        self.approach = self.selectable.getSelected("Approach")
-        self.attempts = self.selectable.getSelectedInteger("Attempts")
-        self.turnScale = self.selectable.getSelectedDouble("Turn Scale")
+        self.approach = self.chooser.getSelected("Approach")
+        self.attempts = self.chooser.getSelectedInteger("Attempts")
+        self.turnScale = self.chooser.getSelectedDouble("Turn Scale")
 
     def periodic(self) -> None:
         wpilib.DriverStationDisplay.addData("Selected Auto", "Balance")

@@ -212,14 +212,17 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "GamepadSelectable",
-            yml_file = "semiwrap/GamepadSelectable.yml",
+            class_name = "DSGamepadChooser",
+            yml_file = "semiwrap/DSGamepadChooser.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/GamepadSelectable.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/DSGamepadChooser.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::GamepadSelectable", "wpi__GamepadSelectable.hpp"),
-                ("wpi::GamepadSelectable::Chooser", "wpi__GamepadSelectable__Chooser.hpp"),
+                ("wpi::DSGamepadChooser", "wpi__DSGamepadChooser.hpp"),
+                (
+                    "wpi::DSGamepadChooser::GamepadSelectable",
+                    "wpi__DSGamepadChooser__GamepadSelectable.hpp",
+                ),
             ],
         ),
         struct(

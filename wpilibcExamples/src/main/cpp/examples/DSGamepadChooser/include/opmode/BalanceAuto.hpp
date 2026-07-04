@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include "wpi/driverstation/GamepadSelectable.hpp"
+#include "wpi/driverstation/DSGamepadChooser.hpp"
 #include "wpi/opmode/PeriodicOpMode.hpp"
 
 /** An autonomous opmode with selectable balance parameters. */
@@ -19,7 +19,7 @@ class BalanceAuto : public wpi::PeriodicOpMode {
   void Periodic() override;
 
  private:
-  wpi::GamepadSelectable m_selectable{0};
+  wpi::DSGamepadChooser m_chooser{0};
   std::string m_approach = "Center";
   int m_attempts = 1;
   double m_turnScale = 0.5;

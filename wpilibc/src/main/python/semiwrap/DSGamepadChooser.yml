@@ -3,9 +3,9 @@ extra_includes:
 - wpi/driverstation/Gamepad.hpp
 
 classes:
-  wpi::GamepadSelectable:
+  wpi::DSGamepadChooser:
     methods:
-      GamepadSelectable:
+      DSGamepadChooser:
         overloads:
           int:
           Gamepad&:
@@ -30,15 +30,15 @@ classes:
       GetSelectedInteger:
       GetSelectedDouble:
       GetSelectedIndex:
-      GetChooserNames:
-      GetSelectedChooser:
+      GetSelectableNames:
+      GetSelectedSelectable:
         overloads:
           "":
             return_value_policy: reference_internal
           '[const]':
             ignore: true
 
-  wpi::GamepadSelectable::Chooser:
+  wpi::DSGamepadChooser::GamepadSelectable:
     methods:
       GetName:
       GetOptions:

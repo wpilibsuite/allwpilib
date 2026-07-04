@@ -13,7 +13,7 @@ EXAMPLE_FOLDERS = [
     "ElevatorSimulation",
     "ElevatorTrapezoidProfile",
     "Encoder",
-    "GamepadSelectable",
+    "DSGamepadChooser",
     "GettingStarted",
     "Gyro",
     "HAL",

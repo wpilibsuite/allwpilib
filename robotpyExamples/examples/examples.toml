@@ -15,7 +15,7 @@ base = [
   "Encoder",
   "GettingStarted",
   "Gyro",
-  "GamepadSelectable",
+  "DSGamepadChooser",
   "HatchbotInlined",
   "HatchbotTraditional",
   "MecanumBot",

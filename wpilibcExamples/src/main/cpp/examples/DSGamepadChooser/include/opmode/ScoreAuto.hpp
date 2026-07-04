@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include "wpi/driverstation/GamepadSelectable.hpp"
+#include "wpi/driverstation/DSGamepadChooser.hpp"
 #include "wpi/opmode/PeriodicOpMode.hpp"
 
 /** An autonomous opmode with selectable scoring parameters. */
@@ -19,7 +19,7 @@ class ScoreAuto : public wpi::PeriodicOpMode {
   void Periodic() override;
 
  private:
-  wpi::GamepadSelectable m_selectable{0};
+  wpi::DSGamepadChooser m_chooser{0};
   std::string m_target = "High";
   int m_delay = 0;
   double m_speed = 0.25;

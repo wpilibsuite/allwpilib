@@ -273,7 +273,7 @@
     "commandversion": 2
   },
   {
-    "name": "Gamepad Selectable",
+    "name": "DS Gamepad Chooser",
     "description": "Use a gamepad-controlled Driver Station display selector to configure separate autonomous opmodes.",
     "tags": [
       "Basic Robot",
@@ -281,7 +281,7 @@
       "Gamepad",
       "OpMode"
     ],
-    "foldername": "GamepadSelectable",
+    "foldername": "DSGamepadChooser",
     "gradlebase": "cpp",
     "commandversion": 2
   },
