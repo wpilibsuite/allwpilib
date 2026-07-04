@@ -1,6 +1,7 @@
 name: Upstream utils
 
 on:
+  merge_group:
   pull_request:
   push:
     branches-ignore:
