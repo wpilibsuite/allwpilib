@@ -132,8 +132,8 @@ class DSGamepadChooser {
    * @param delta amount between options
    * @return the created selectable
    */
-  GamepadSelectable& AddIntegerOptions(std::string_view name, int min,
-                                       int max, int delta);
+  GamepadSelectable& AddIntegerOptions(std::string_view name, int min, int max,
+                                       int delta);
 
   /**
    * Adds a selectable with floating point options from min to max, inclusive,

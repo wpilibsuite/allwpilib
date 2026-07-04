@@ -72,8 +72,8 @@ DSGamepadChooser::DSGamepadChooser(int port)
 
 DSGamepadChooser::DSGamepadChooser(Gamepad& gamepad)
     : m_gamepad{&gamepad},
-      m_captionPrefix{"DSGamepadChooser/" + std::to_string(instances++) +
-                      "/"} {}
+      m_captionPrefix{"DSGamepadChooser/" + std::to_string(instances++) + "/"} {
+}
 
 Gamepad& DSGamepadChooser::GetGamepad() {
   return *m_gamepad;
