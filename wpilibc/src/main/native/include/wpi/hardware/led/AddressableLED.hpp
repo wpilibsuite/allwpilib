@@ -148,6 +148,7 @@ class AddressableLED {
    * the location set by SetStart() and up to the length set by SetLength().
    *
    * @param ledData the buffer to write
+   * @Common This is one of the commonly used methods for this class
    */
   void SetData(std::span<const LEDData> ledData);
 
@@ -156,7 +157,6 @@ class AddressableLED {
    * the location set by SetStart() and up to the length set by SetLength().
    *
    * @param ledData the buffer to write
-   * @Common This is one of the commonly used methods for this class
    */
   void SetData(std::initializer_list<LEDData> ledData);
 
