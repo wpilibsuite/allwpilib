@@ -4,11 +4,8 @@ module(
 )
 
 include("//docs:doxygen.MODULE.bazel")
-
 include("//shared/bazel/thirdparty/ceres:ceres.MODULE.bazel")
-
 include("//shared/bazel/thirdparty/libssh:libssh.MODULE.bazel")
-
 include("//shared/bazel/thirdparty/mrclib:mrclib.MODULE.bazel")
 
 bazel_dep(name = "apple_support", version = "2.0.0", repo_name = "build_bazel_apple_support")
@@ -18,6 +15,7 @@ bazel_dep(name = "bazel_features", version = "1.43.0")
 bazel_dep(name = "aspect_bazel_lib", version = "2.14.0")
 bazel_dep(name = "bazel_skylib", version = "1.9.0")
 bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.2")
 bazel_dep(name = "rules_java", version = "8.16.1")
 bazel_dep(name = "rules_python", version = "1.9.0")
 bazel_dep(name = "rules_pycross", version = "0.8.1")
