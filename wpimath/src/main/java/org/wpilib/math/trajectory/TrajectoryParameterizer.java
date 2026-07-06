@@ -54,7 +54,7 @@ public final class TrajectoryParameterizer {
    *     from a -&gt; b -&gt; ... -&gt; z as defined in the waypoints.
    * @return The trajectory.
    */
-  public static Trajectory timeParameterizeTrajectory(
+  public static SplineTrajectory timeParameterizeTrajectory(
       List<PoseWithCurvature> points,
       List<TrajectoryConstraint> constraints,
       double startVelocity,
@@ -196,12 +196,18 @@ public final class TrajectoryParameterizer {
 
     // Now we can integrate the constrained states forward in time to obtain our
     // trajectory states.
-    var states = new ArrayList<Trajectory.State>(points.size());
+    final int numStates = constrainedStates.size();
+    final double[] velocities = new double[numStates];
+    final double[] times = new double[numStates];
+    // segAccel[i] is the (forward, path-relative) acceleration on the segment
+    // arriving at state i (from state i - 1).
+    final double[] segAccel = new double[numStates];
+
     double time = 0.0;
     double distance = 0.0;
     double velocity = 0.0;
 
-    for (int i = 0; i < constrainedStates.size(); i++) {
+    for (int i = 0; i < numStates; i++) {
       final var state = constrainedStates.get(i);
 
       // Calculate the change in position between the current state and the previous
@@ -209,13 +215,17 @@ public final class TrajectoryParameterizer {
       double ds = state.distance - distance;
 
       // Calculate the acceleration between the current state and the previous
-      // state.
-      double accel = (state.maxVelocity * state.maxVelocity - velocity * velocity) / (ds * 2);
+      // state. ds is zero at the first state, where there is no preceding
+      // segment, so the acceleration there is left at zero.
+      double accel =
+          ds == 0.0
+              ? 0.0
+              : (state.maxVelocity * state.maxVelocity - velocity * velocity) / (ds * 2);
+      segAccel[i] = accel;
 
       // Calculate dt
       double dt = 0.0;
       if (i > 0) {
-        states.get(i - 1).acceleration = reversed ? -accel : accel;
         if (Math.abs(accel) > 1E-6) {
           // v_f = v_0 + a * t
           dt = (state.maxVelocity - velocity) / accel;
@@ -233,16 +243,27 @@ public final class TrajectoryParameterizer {
 
       time += dt;
 
+      velocities[i] = velocity;
+      times[i] = time;
+    }
+
+    // Build the samples. A sample's acceleration is the acceleration on the
+    // segment leaving it (segAccel[i + 1]); the final sample reuses its incoming
+    // segment's acceleration.
+    var states = new ArrayList<SplineSample>(numStates);
+    for (int i = 0; i < numStates; i++) {
+      final var state = constrainedStates.get(i);
+      double accel = i < numStates - 1 ? segAccel[i + 1] : segAccel[i];
       states.add(
-          new Trajectory.State(
-              time,
-              reversed ? -velocity : velocity,
-              reversed ? -accel : accel,
+          new SplineSample(
+              times[i],
               state.pose.pose,
+              reversed ? -velocities[i] : velocities[i],
+              reversed ? -accel : accel,
               state.pose.curvature));
     }
 
-    return new Trajectory(states);
+    return new SplineTrajectory(states);
   }
 
   private static void enforceAccelerationLimits(
