@@ -201,7 +201,7 @@ class WPILIB_DLLEXPORT Quaternion final {
   constexpr Quaternion Log() const {
     double norm = Norm();
     if (norm == 0.0) {
-      return Quaternion{};
+      return Quaternion{0.0, 0.0, 0.0, 0.0};
     }
 
     double scalar = gcem::log(norm);
