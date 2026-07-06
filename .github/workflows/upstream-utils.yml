@@ -1,6 +1,7 @@
 name: Upstream utils
 
 on:
+  merge_group:
   pull_request:
   push:
     branches-ignore:
@@ -60,12 +61,6 @@ jobs:
           ./eigen.py clone
           ./eigen.py copy-src
           ./eigen.py format-patch
-      - name: Run expected.py
-        run: |
-          cd upstream_utils
-          ./expected.py clone
-          ./expected.py copy-src
-          ./expected.py format-patch
       - name: Run fmt.py
         run: |
           cd upstream_utils
