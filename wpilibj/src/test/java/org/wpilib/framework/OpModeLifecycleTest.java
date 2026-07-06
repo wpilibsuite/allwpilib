@@ -151,6 +151,7 @@ class OpModeLifecycleTest {
     SimHooks.stepTiming(kPeriod);
     assertEquals(1, constructedCount.get());
     assertEquals(1, disabledPeriodicCount.get());
+    assertEquals(0, periodicCount.get());
 
     // 2. Transition to enabled
     DriverStationSim.setEnabled(true);

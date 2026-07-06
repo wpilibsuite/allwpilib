@@ -88,6 +88,9 @@ class PeriodicPriorityQueue {
              wpi::units::second_t period);
 
     bool operator>(const Callback& rhs) const {
+      if (expirationTime == rhs.expirationTime) {
+        return id > rhs.id;
+      }
       return expirationTime > rhs.expirationTime;
     }
 

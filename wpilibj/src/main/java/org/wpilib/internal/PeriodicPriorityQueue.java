@@ -315,7 +315,8 @@ public class PeriodicPriorityQueue {
     public int compareTo(Callback rhs) {
       // Elements with sooner expiration times are sorted as lesser. The head of
       // Java's PriorityQueue is the least element.
-      return Long.compare(expirationTime, rhs.expirationTime);
+      int expTimeDiff = Long.compare(expirationTime, rhs.expirationTime);
+      return expTimeDiff != 0 ? expTimeDiff : Long.compare(id, rhs.id);
     }
   }
 }

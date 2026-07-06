@@ -63,7 +63,9 @@ void OpModeRobotBase::LoopFunc() {
   m_watchdog.Reset();
   const bool enabled = word.IsEnabled();
   int64_t modeId = word.IsDSAttached() ? word.GetOpModeId() : 0;
-  bool calledOpModeDisabledPeriodicThisIteration = false;
+
+  bool modeChanged = modeId != m_lastModeId;
+  m_lastModeId = modeId;
 
   if (!m_calledDriverStationConnected && word.IsDSAttached()) {
     m_calledDriverStationConnected = true;
@@ -72,12 +74,13 @@ void OpModeRobotBase::LoopFunc() {
   }
 
   // Handle OpMode changes
-  if (modeId != m_lastModeId && m_currentOpMode) {
+  if (modeChanged && m_currentOpMode) {
     EndCurrentOpMode();
   }
 
   // Set up new opmode
-  if (modeId != 0 && !m_currentOpMode) {
+  bool justCreatedOpMode = false;
+  if (modeId != 0 && !m_currentOpMode && modeChanged) {
     auto data = m_opModes.lookup(modeId);
     if (data.factory) {
       // Instantiate the new opmode
@@ -93,11 +96,10 @@ void OpModeRobotBase::LoopFunc() {
           m_callbacks.Add(cb);
         }
 
-        // Call DisabledPeriodic immediately for newly created OpMode when
-        // disabled
+        // Call DisabledPeriodic immediately for newly created OpMode
         m_currentOpMode->DisabledPeriodic();
         m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
-        calledOpModeDisabledPeriodicThisIteration = true;
+        justCreatedOpMode = true;
       }
     } else {
       WPILIB_ReportError(err::Error, "No OpMode found for mode {}", modeId);
@@ -117,6 +119,7 @@ void OpModeRobotBase::LoopFunc() {
       // persist so it can be started on the next enable.
       if (m_currentOpMode && m_opmodePeriodic) {
         EndCurrentOpMode();
+        m_lastModeId = -1;  // force recreate next loop
       }
       DisabledInit();
       m_watchdog.AddEpoch("DisabledInit()");
@@ -140,15 +143,12 @@ void OpModeRobotBase::LoopFunc() {
       m_watchdog.AddEpoch("DisabledPeriodic()");
     }
 
-    // Call opmode DisabledPeriodic if we have one and haven't called it already
-    // this iteration
-    if (m_currentOpMode && !calledOpModeDisabledPeriodicThisIteration) {
+    // Call opmode DisabledPeriodic if we have one
+    if (m_currentOpMode && !justCreatedOpMode) {
       m_currentOpMode->DisabledPeriodic();
       m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
     }
   }
-
-  m_lastModeId = modeId;
 
   // Call NonePeriodic when no opmode is selected
   if (modeId == 0) {

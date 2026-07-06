@@ -106,13 +106,14 @@ TEST_F(OpModeLifecycleTest, EnabledTransition) {
   wpi::sim::StepTiming(20_ms);  // Let the DS attached state propagate
 
   // 1. Selected, but disabled
-  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_TELEOPERATED);
+  wpi::sim::DriverStationSim::SetRobotMode(wpi::RobotMode::TELEOPERATED);
   wpi::sim::DriverStationSim::SetOpMode(
       MakeOpModeId(wpi::RobotMode::TELEOPERATED, "TestOpMode"));
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);
   EXPECT_EQ(counts.constructed.load(), 1u);
   EXPECT_EQ(counts.disabledPeriodic.load(), 1u);
+  EXPECT_EQ(counts.periodic.load(), 0u);
 
   // 2. Transition to enabled
   wpi::sim::DriverStationSim::SetEnabled(true);
@@ -153,7 +154,7 @@ TEST_F(OpModeLifecycleTest, OpModeChangeWhileEnabled) {
   wpi::sim::DriverStationSim::NotifyNewData();
 
   // 1. Select OpMode1 and enable
-  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_TELEOPERATED);
+  wpi::sim::DriverStationSim::SetRobotMode(wpi::RobotMode::TELEOPERATED);
   wpi::sim::DriverStationSim::SetOpMode(
       MakeOpModeId(wpi::RobotMode::TELEOPERATED, "OpMode1"));
   wpi::sim::DriverStationSim::SetEnabled(true);
@@ -209,7 +210,7 @@ TEST_F(OpModeLifecycleTest, OpModeChangeWhileDisabled) {
   wpi::sim::DriverStationSim::SetDsAttached(true);
 
   // 1. Select OpMode1 while disabled
-  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_TELEOPERATED);
+  wpi::sim::DriverStationSim::SetRobotMode(wpi::RobotMode::TELEOPERATED);
   wpi::sim::DriverStationSim::SetOpMode(
       MakeOpModeId(wpi::RobotMode::TELEOPERATED, "OpMode1"));
   wpi::sim::DriverStationSim::NotifyNewData();
@@ -248,7 +249,7 @@ TEST_F(OpModeLifecycleTest, GetCallbacksRunImmediatelyWhileDisabled) {
 
   // Select the opmode while disabled. getCallbacks() callbacks are registered
   // immediately on construction and run even while the robot is disabled.
-  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_TELEOPERATED);
+  wpi::sim::DriverStationSim::SetRobotMode(wpi::RobotMode::TELEOPERATED);
   wpi::sim::DriverStationSim::SetOpMode(
       MakeOpModeId(wpi::RobotMode::TELEOPERATED, "CallbackOpMode"));
   wpi::sim::DriverStationSim::NotifyNewData();

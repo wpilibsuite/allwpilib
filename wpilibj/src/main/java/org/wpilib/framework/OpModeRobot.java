@@ -606,7 +606,9 @@ public abstract class OpModeRobot extends RobotBase {
     m_watchdog.reset();
     final boolean enabled = m_word.isEnabled();
     long modeId = m_word.isDSAttached() ? m_word.getOpModeId() : 0;
-    boolean calledOpModeDisabledPeriodicThisIteration = false;
+
+    boolean modeChanged = modeId != m_lastModeId;
+    m_lastModeId = modeId;
 
     if (!m_calledDriverStationConnected && m_word.isDSAttached()) {
       m_calledDriverStationConnected = true;
@@ -615,12 +617,13 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     // Handle opmode changes: tear down the old opmode if the selection changed
-    if (modeId != m_lastModeId && m_currentOpMode != null) {
+    if (modeChanged && m_currentOpMode != null) {
       endCurrentOpMode();
     }
 
     // Set up new opmode
-    if (modeId != 0 && m_currentOpMode == null) {
+    boolean justCreatedOpMode = false;
+    if (modeId != 0 && m_currentOpMode == null && modeChanged) {
       OpModeFactory factory = m_opModes.get(modeId);
       if (factory != null) {
         m_currentOpModeName = factory.name();
@@ -631,10 +634,10 @@ public abstract class OpModeRobot extends RobotBase {
           m_activeOpModeCallbacks.addAll(m_currentOpMode.getCallbacks());
           m_callbacks.addAll(m_activeOpModeCallbacks);
 
-          // Call disabledPeriodic immediately for newly created OpMode when disabled
+          // Call disabledPeriodic immediately for newly created OpMode
           m_currentOpMode.disabledPeriodic();
           m_watchdog.addEpoch("opMode.disabledPeriodic()");
-          calledOpModeDisabledPeriodicThisIteration = true;
+          justCreatedOpMode = true;
         }
       } else {
         DriverStationErrors.reportError("No OpMode found for mode " + modeId, false);
@@ -654,6 +657,7 @@ public abstract class OpModeRobot extends RobotBase {
         // persist so it can be started on the next enable.
         if (m_currentOpMode != null && m_currentOpModePeriodic != null) {
           endCurrentOpMode();
+          m_lastModeId = -1; // force recreate next loop
         }
         disabledInit();
         m_watchdog.addEpoch("disabledInit()");
@@ -677,14 +681,12 @@ public abstract class OpModeRobot extends RobotBase {
         m_watchdog.addEpoch("disabledPeriodic()");
       }
 
-      // Call opmode disabledPeriodic if we have one and haven't called it already this iteration
-      if (m_currentOpMode != null && !calledOpModeDisabledPeriodicThisIteration) {
+      // Call opmode disabledPeriodic if we have one
+      if (m_currentOpMode != null && !justCreatedOpMode) {
         m_currentOpMode.disabledPeriodic();
         m_watchdog.addEpoch("opMode.disabledPeriodic()");
       }
     }
-
-    m_lastModeId = modeId;
 
     // Call nonePeriodic when no opmode is selected
     if (modeId == 0) {
