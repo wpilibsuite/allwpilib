@@ -152,7 +152,7 @@ public final class DriverStationBackend {
   }
 
   private static class MatchDataSender {
-    private static final String kSmartDashboardType = "FMSInfo";
+    private static final String kSmartDashboardType = "DriverStation";
 
     final StringPublisher gameData;
     final StringPublisher eventName;
@@ -176,7 +176,7 @@ public final class DriverStationBackend {
     final ControlWord currentControlWord = new ControlWord();
 
     MatchDataSender() {
-      var table = NetworkTableInstance.getDefault().getTable("FMSInfo");
+      var table = NetworkTableInstance.getDefault().getTable("DriverStation");
       table
           .getStringTopic(".type")
           .publishEx(

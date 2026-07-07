@@ -20,7 +20,7 @@ class DoubleSource;
 class IntegerSource;
 class StringSource;
 
-class FMSModel : public Model {
+class DSModel : public Model {
  public:
   enum RobotMode {
     kUnknown = 0,
@@ -49,13 +49,13 @@ class FMSModel : public Model {
 };
 
 /**
- * Displays FMS view.
+ * Displays DS view.
  *
  * @param matchTimeEnabled If not null, a checkbox is displayed for
  *                         "enable match time" linked to this value
  * @param editableDsAttached If true, DS attached should be editable
  */
-void DisplayFMS(FMSModel* model, bool editableDsAttached);
-void DisplayFMSReadOnly(FMSModel* model);
+void DisplayDS(DSModel* model, bool editableDsAttached);
+void DisplayDSReadOnly(DSModel* model);
 
 }  // namespace wpi::glass

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/glass/other/FMS.hpp"
+#include "wpi/glass/other/DS.hpp"
 
 #include <string>
 
@@ -19,9 +19,9 @@ static const char* stations[] = {"Invalid", "Red 1",  "Red 2", "Red 3",
 static const char* robotModes[] = {"Unknown", "Autonomous", "Teleoperated",
                                    "Utility"};
 
-void wpi::glass::DisplayFMS(FMSModel* model, bool editableDsAttached) {
+void wpi::glass::DisplayDS(DSModel* model, bool editableDsAttached) {
   if (!model->Exists() || model->IsReadOnly()) {
-    return DisplayFMSReadOnly(model);
+    return DisplayDSReadOnly(model);
   }
 
   // FMS Attached
@@ -91,7 +91,7 @@ void wpi::glass::DisplayFMS(FMSModel* model, bool editableDsAttached) {
   }
 }
 
-void wpi::glass::DisplayFMSReadOnly(FMSModel* model) {
+void wpi::glass::DisplayDSReadOnly(DSModel* model) {
   bool exists = model->Exists();
   if (!exists) {
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
