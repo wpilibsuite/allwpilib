@@ -258,11 +258,16 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
    */
   public Quaternion log() {
     var norm = norm();
+    if (norm == 0.0) {
+      return new Quaternion(0.0, 0.0, 0.0, 0.0);
+    }
+
     var scalar = Math.log(norm);
 
     var v_norm = Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
 
-    var s_norm = getW() / norm;
+    var w = getW();
+    var s_norm = w / norm;
 
     if (Math.abs(s_norm + 1) < 1e-9) {
       return new Quaternion(scalar, -Math.PI, 0, 0);
@@ -270,13 +275,15 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
 
     double v_scalar;
 
-    if (v_norm < 1e-9) {
+    if (v_norm < 1e-9 && w != 0.0) {
       // Taylor series expansion of atan2(y/x)/y at y = 0:
       //
       //   1/x - 1/3 y²/x³ + O(y⁴)
-      v_scalar = 1.0 / getW() - 1.0 / 3.0 * v_norm * v_norm / (getW() * getW() * getW());
+      v_scalar = 1.0 / w - 1.0 / 3.0 * v_norm * v_norm / (w * w * w);
+    } else if (v_norm == 0.0) {
+      v_scalar = 0.0;
     } else {
-      v_scalar = Math.atan2(v_norm, getW()) / v_norm;
+      v_scalar = Math.atan2(v_norm, w) / v_norm;
     }
 
     return new Quaternion(scalar, v_scalar * getX(), v_scalar * getY(), v_scalar * getZ());
