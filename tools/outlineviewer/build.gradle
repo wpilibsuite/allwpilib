@@ -20,6 +20,7 @@ ext {
 
 apply from: "${rootDir}/shared/resources.gradle"
 apply from: "${rootDir}/shared/config.gradle"
+apply from: "${rootDir}/shared/libsdlgpu.gradle"
 
 def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
 def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
@@ -103,16 +104,7 @@ model {
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':fields', library: 'fields', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
-                if (it.targetPlatform.operatingSystem.isWindows()) {
-                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
-                } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
-                    it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
-                } else {
-                    it.linker.args << '-lX11'
-                    if (it.targetPlatform.name.startsWith('linuxarm')) {
-                        it.linker.args << '-lGL'
-                    }
-                }
+                project.addLibSdlGpuDependency(it)
             }
         }
     }

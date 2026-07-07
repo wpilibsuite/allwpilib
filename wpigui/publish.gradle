@@ -18,15 +18,6 @@ task cppSourcesZip(type: Zip) {
     from('src/main/native/cpp') {
         into '/'
     }
-    from('src/main/native/directx11') {
-        into '/'
-    }
-    from('src/main/native/metal') {
-        into '/'
-    }
-    from('src/main/native/opengl3') {
-        into '/'
-    }
 }
 
 task cppHeadersZip(type: Zip) {

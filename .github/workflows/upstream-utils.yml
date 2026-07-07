@@ -67,18 +67,6 @@ jobs:
           ./gcem.py clone
           ./gcem.py copy-src
           ./gcem.py format-patch
-      - name: Run gl3w.py
-        run: |
-          cd upstream_utils
-          ./gl3w.py clone
-          ./gl3w.py copy-src
-          ./gl3w.py format-patch
-      - name: Run glfw.py
-        run: |
-          cd upstream_utils
-          ./glfw.py clone
-          ./glfw.py copy-src
-          ./glfw.py format-patch
       - name: Run googletest.py
         run: |
           cd upstream_utils

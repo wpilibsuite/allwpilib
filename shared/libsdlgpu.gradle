@@ -1,0 +1,63 @@
+ext.libsdlGpuPlatforms = [
+    nativeUtils.wpi.platforms.linuxx64,
+    nativeUtils.wpi.platforms.linuxarm64,
+    nativeUtils.wpi.platforms.windowsx64,
+    nativeUtils.wpi.platforms.windowsarm64,
+    nativeUtils.wpi.platforms.osxuniversal,
+]
+
+nativeUtils {
+    nativeDependencyContainer {
+        libsdlgpu(getNativeDependencyTypeClass('WPIStaticMavenDependency')) {
+            groupId = "org.wpilib.thirdparty"
+            artifactId = "libsdl-gpu"
+            headerClassifier = "headers"
+            sourceClassifier = "sources"
+            ext = "zip"
+            version = '3.4.12-5'
+            targetPlatforms.addAll(project.libsdlGpuPlatforms)
+        }
+    }
+}
+
+ext.addLibSdlGpuDependency = { binary ->
+    if (!project.libsdlGpuPlatforms.contains(binary.targetPlatform.name)) {
+        binary.buildable = false
+        return
+    }
+
+    nativeUtils.useRequiredLibrary(binary, 'libsdlgpu')
+
+    if (binary instanceof StaticLibraryBinarySpec) {
+        return
+    }
+
+    if (binary.targetPlatform.operatingSystem.isWindows()) {
+        binary.linker.args << 'Gdi32.lib' << 'User32.lib' << 'Shell32.lib'
+        binary.linker.args << 'Advapi32.lib' << 'Cfgmgr32.lib' << 'Imm32.lib'
+        binary.linker.args << 'Ole32.lib' << 'Oleaut32.lib' << 'Setupapi.lib'
+        binary.linker.args << 'Version.lib' << 'Winmm.lib' << 'Dwmapi.lib'
+        binary.linker.args << 'dxgi.lib' << 'dxguid.lib' << 'd3d11.lib'
+        binary.linker.args << 'd3d12.lib' << 'd3dcompiler.lib'
+    } else if (binary.targetPlatform.operatingSystem.isMacOsX()) {
+        binary.linker.args << '-framework' << 'AppKit'
+        binary.linker.args << '-framework' << 'ApplicationServices'
+        binary.linker.args << '-framework' << 'AudioToolbox'
+        binary.linker.args << '-framework' << 'Carbon'
+        binary.linker.args << '-framework' << 'CoreAudio'
+        binary.linker.args << '-framework' << 'CoreFoundation'
+        binary.linker.args << '-framework' << 'CoreGraphics'
+        binary.linker.args << '-framework' << 'CoreHaptics'
+        binary.linker.args << '-framework' << 'CoreServices'
+        binary.linker.args << '-framework' << 'CoreVideo'
+        binary.linker.args << '-framework' << 'ForceFeedback'
+        binary.linker.args << '-framework' << 'Foundation'
+        binary.linker.args << '-framework' << 'GameController'
+        binary.linker.args << '-framework' << 'IOKit'
+        binary.linker.args << '-framework' << 'Metal'
+        binary.linker.args << '-framework' << 'QuartzCore'
+        binary.linker.args << '-framework' << 'UniformTypeIdentifiers'
+    } else {
+        binary.linker.args << '-ldl' << '-lpthread' << '-lrt' << '-lm'
+    }
+}

@@ -6,7 +6,8 @@
 #include <memory>
 #include <string>
 
-#include <GLFW/glfw3.h>
+#define SDL_MAIN_HANDLED
+#include <SDL3/SDL.h>
 #include <imgui.h>
 
 #include "wpi/glass/Context.hpp"
@@ -26,8 +27,6 @@
 namespace gui = wpi::gui;
 
 const char* GetWPILibVersion();
-
-extern ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int keycode, int scancode);
 
 namespace wpi::glass {
 std::string_view GetResource_glass_16_png();
@@ -57,23 +56,22 @@ static bool gSetEnterKey = false;
 static bool gKeyEdit = false;
 static int* gEnterKey;
 static int* gEnterScancode;
-static void (*gPrevKeyCallback)(GLFWwindow*, int, int, int, int);
 static bool gNetworkTablesDebugLog = false;
 static unsigned int gPrevMode = NT_NET_MODE_NONE;
 
-static void RemapEnterKeyCallback(GLFWwindow* window, int key, int scancode,
-                                  int action, int mods) {
-  if (action == GLFW_PRESS || action == GLFW_RELEASE) {
-    if (gKeyEdit) {
-      *gEnterKey = key;
-      gKeyEdit = false;
-    } else if (*gEnterKey == key || *gEnterScancode == scancode) {
-      key = GLFW_KEY_ENTER;
-    }
+static void RemapEnterKeyEvent(SDL_Event& event) {
+  if (event.type != SDL_EVENT_KEY_DOWN && event.type != SDL_EVENT_KEY_UP) {
+    return;
   }
 
-  if (gPrevKeyCallback) {
-    gPrevKeyCallback(window, key, scancode, action, mods);
+  if (gKeyEdit && event.type == SDL_EVENT_KEY_DOWN) {
+    *gEnterKey = static_cast<int>(event.key.key);
+    *gEnterScancode = event.key.scancode;
+    gKeyEdit = false;
+  } else if (static_cast<SDL_Keycode>(*gEnterKey) == event.key.key ||
+             *gEnterScancode == event.key.scancode) {
+    event.key.key = SDLK_RETURN;
+    event.key.scancode = SDL_SCANCODE_RETURN;
   }
 }
 
@@ -135,7 +133,7 @@ static void NtInitialize() {
     }
 
     if (updateTitle) {
-      glfwSetWindowTitle(win, MakeTitle(inst, connectionEvent).c_str());
+      SDL_SetWindowTitle(win, MakeTitle(inst, connectionEvent).c_str());
     }
   });
 
@@ -333,12 +331,11 @@ int main(int argc, char** argv) {
       ImGui::SameLine();
       char editLabel[40];
       char nameBuf[32];
-      const char* name = glfwGetKeyName(*gEnterKey, *gEnterScancode);
-      if (!name) {
-        name = ImGui::GetKeyName(
-            ImGui_ImplGlfw_KeyToImGuiKey(*gEnterKey, *gEnterScancode));
+      const char* name = SDL_GetKeyName(static_cast<SDL_Keycode>(*gEnterKey));
+      if (!name || name[0] == '\0') {
+        name = SDL_GetScancodeName(static_cast<SDL_Scancode>(*gEnterScancode));
       }
-      if (!name) {
+      if (!name || name[0] == '\0') {
         wpi::util::format_to_n_c_str(nameBuf, sizeof(nameBuf), "{}",
                                      *gEnterKey);
 
@@ -352,8 +349,8 @@ int main(int argc, char** argv) {
       }
       ImGui::SameLine();
       if (ImGui::SmallButton("Reset")) {
-        *gEnterKey = GLFW_KEY_ENTER;
-        *gEnterScancode = glfwGetKeyScancode(GLFW_KEY_ENTER);
+        *gEnterKey = SDLK_RETURN;
+        *gEnterScancode = SDL_SCANCODE_RETURN;
       }
 
       if (ImGui::Button("Close")) {
@@ -366,12 +363,10 @@ int main(int argc, char** argv) {
 
   gui::Initialize("Glass - DISCONNECTED", 1024, 768,
                   ImGuiConfigFlags_DockingEnable);
-  gEnterKey = &wpi::glass::GetStorageRoot().GetInt("enterKey", GLFW_KEY_ENTER);
-  gEnterScancode = &wpi::glass::GetStorageRoot().GetInt(
-      "enterScancode", glfwGetKeyScancode(GLFW_KEY_ENTER));
-  if (auto win = gui::GetSystemWindow()) {
-    gPrevKeyCallback = glfwSetKeyCallback(win, RemapEnterKeyCallback);
-  }
+  gEnterKey = &wpi::glass::GetStorageRoot().GetInt("enterKey", SDLK_RETURN);
+  gEnterScancode = &wpi::glass::GetStorageRoot().GetInt("enterScancode",
+                                                        SDL_SCANCODE_RETURN);
+  gui::AddEventHandler(RemapEnterKeyEvent);
   gui::Main();
 
   gNetworkTablesSettingsWindow.reset();

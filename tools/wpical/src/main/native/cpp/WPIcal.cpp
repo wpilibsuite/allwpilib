@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include <GLFW/glfw3.h>
+#include <SDL3/SDL.h>
 #include <imgui.h>
 
 #include "cameracalibration.hpp"
@@ -627,7 +627,7 @@ static void DisplayGui() {
   // fill entire OS window with this window
   ImGui::SetNextWindowPos(ImVec2(0, 0));
   int width, height;
-  glfwGetWindowSize(gui::GetSystemWindow(), &width, &height);
+  SDL_GetWindowSize(gui::GetSystemWindow(), &width, &height);
   ImGui::SetNextWindowSize(
       ImVec2(static_cast<float>(width), static_cast<float>(height)));
 

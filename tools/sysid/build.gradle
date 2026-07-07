@@ -22,6 +22,7 @@ ext {
 
 apply from: "${rootDir}/shared/resources.gradle"
 apply from: "${rootDir}/shared/config.gradle"
+apply from: "${rootDir}/shared/libsdlgpu.gradle"
 
 def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
 def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
@@ -104,18 +105,12 @@ model {
                 lib project: ':datalog', library: 'datalog', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                project.addLibSdlGpuDependency(it)
                 if (it.targetPlatform.operatingSystem.isWindows()) {
-                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                     it.linker.args << '/DELAYLOAD:MF.dll' << '/DELAYLOAD:MFReadWrite.dll' << '/DELAYLOAD:MFPlat.dll' << '/delay:nobind'
                 } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
-                    it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
                     if (it.buildType.getName() == "release") {
                         it.linker.args << '-s'
-                    }
-                } else {
-                    it.linker.args << '-lX11'
-                    if (it.targetPlatform.name.startsWith('linuxarm')) {
-                        it.linker.args << '-lGL'
                     }
                 }
             }
@@ -144,18 +139,12 @@ model {
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                project.addLibSdlGpuDependency(it)
                 if (it.targetPlatform.operatingSystem.isWindows()) {
-                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                     it.linker.args << '/DELAYLOAD:MF.dll' << '/DELAYLOAD:MFReadWrite.dll' << '/DELAYLOAD:MFPlat.dll' << '/delay:nobind'
                 } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
-                    it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
                     if (it.buildType.getName() == "release") {
                         it.linker.args << '-s'
-                    }
-                } else {
-                    it.linker.args << '-lX11'
-                    if (it.targetPlatform.name.startsWith('linuxarm')) {
-                        it.linker.args << '-lGL'
                     }
                 }
 
