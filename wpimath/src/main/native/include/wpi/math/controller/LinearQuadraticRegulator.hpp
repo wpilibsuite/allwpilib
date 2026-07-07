@@ -177,9 +177,9 @@ class LinearQuadraticRegulator {
       wpi::math::MathSharedStore::ReportError(msg);
       throw std::invalid_argument(msg);
     } else if (S.error() == DAREError::ABNotStabilizable) {
-      std::string msg =
-          std::format("{}\n\nA =\n{}\nB =\n{}\n", to_string(S.error()),
-                      discA - discB * R.llt().solve(N.transpose()), discB);
+      std::string msg = std::format(
+          "{}\n\nA =\n{}\nB =\n{}\n", to_string(S.error()),
+          (discA - discB * R.llt().solve(N.transpose())).eval(), discB);
 
       wpi::math::MathSharedStore::ReportError(msg);
       throw std::invalid_argument(msg);
@@ -187,8 +187,8 @@ class LinearQuadraticRegulator {
       auto R_llt = R.llt();
       std::string msg =
           std::format("{}\n\nA =\n{}\nQ =\n{}\n", to_string(S.error()),
-                      discA - discB * R_llt.solve(N.transpose()),
-                      Q - N * R_llt.solve(N.transpose()));
+                      (discA - discB * R_llt.solve(N.transpose())).eval(),
+                      (Q - N * R_llt.solve(N.transpose())).eval());
 
       wpi::math::MathSharedStore::ReportError(msg);
       throw std::invalid_argument(msg);

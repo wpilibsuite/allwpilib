@@ -13,7 +13,7 @@
 // FIXME: Doxygen gives internal inconsistency errors:
 
 //! @cond Doxygen_Suppress
-
+#ifdef __cpp_lib_format_ranges
 template <class R>
   requires std::derived_from<R, Eigen::DenseBase<R>> ||
                std::derived_from<R, Eigen::SparseCompressedBase<R>>
@@ -30,6 +30,7 @@ template <typename Scalar, int Rows, int Cols, int Options, int MaxRows,
 constexpr std::range_format std::format_kind<
     Eigen::Array<Scalar, Rows, Cols, Options, MaxRows, MaxCols>> =
     std::range_format::disabled;
+#endif
 
 /**
  * Formatter for classes derived from Eigen::DenseBase<Derived> or
