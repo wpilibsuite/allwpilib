@@ -10,7 +10,8 @@
 
 #include <imgui.h>
 
-extern "C" struct GLFWwindow;
+struct SDL_Window;
+union SDL_Event;
 
 namespace wpi::gui {
 
@@ -43,6 +44,12 @@ void SetCurrentContext(Context* context);
 /**
  * Initializes the GUI.
  *
+ * To bypass SDL GPU initialization and force the SDL 2D renderer, set the
+ * WPIGUI_FORCE_2D_RENDERER environment variable to a value other than 0,
+ * false, off, or no.
+ * To enable SDL GPU debug mode, set the WPIGUI_SDL_GPU_DEBUG environment
+ * variable to a value other than 0, false, off, or no.
+ *
  * @param title main application window title
  * @param width main application window width
  * @param height main application window height
@@ -65,7 +72,7 @@ void Exit();
 
 /**
  * Adds initializer to GUI.  The passed function is called once, immediately
- * after the GUI (both GLFW and Dear ImGui) are initialized in Initialize().
+ * after the GUI (both SDL and Dear ImGui) are initialized in Initialize().
  * To have any effect, must be called prior to Initialize().
  *
  * @param initialize initialization function
@@ -82,6 +89,14 @@ void AddInit(std::function<void()> initialize);
 void AddWindowScaler(std::function<void(float scale)> windowScaler);
 
 /**
+ * Adds shutdown handler to GUI.  The passed function is called once during GUI
+ * shutdown before renderer, window, and SDL resources are destroyed.
+ *
+ * @param shutdown shutdown function
+ */
+void AddExit(std::function<void()> shutdown);
+
+/**
  * Adds per-frame executor to GUI.  The passed function is called on each
  * Dear ImGui frame prior to any of the late execute functions.
  *
@@ -96,6 +111,15 @@ void AddEarlyExecute(std::function<void()> execute);
  * @param execute frame execution function
  */
 void AddLateExecute(std::function<void()> execute);
+
+/**
+ * Adds an SDL event handler to GUI. The passed function is called for each
+ * SDL event before Dear ImGui processes it. To have any effect, must be called
+ * prior to Main().
+ *
+ * @param handler event handler function
+ */
+void AddEventHandler(std::function<void(SDL_Event& event)> handler);
 
 /**
  * Customizes save/load behavior.
@@ -128,9 +152,9 @@ void ConfigureCustomSaveSettings(std::function<void()> load,
                                  std::function<void(bool exiting)> save);
 
 /**
- * Gets GLFW window handle.
+ * Gets SDL window handle.
  */
-GLFWwindow* GetSystemWindow();
+SDL_Window* GetSystemWindow();
 
 /**
  * Adds an application icon.  Multiple icons (of different sizes) may be

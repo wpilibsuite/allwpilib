@@ -34,6 +34,8 @@ By default, all libraries get built with a default CMake setup. The libraries ar
 
 OpenCV needs to be findable by CMake. On systems like the Jetson, this is installed by default. Otherwise, you will need to build OpenCV from source and install it.
 
+To build GUI apps (`WPILIB_WITH_GUI`), SDL3 needs to be findable by CMake.
+
 ## Build Options
 
 The following build options are available:
@@ -44,8 +46,8 @@ The following build options are available:
   * This option will cause cscore to be built. Turning this off will implicitly disable cameraserver. If this is off, the OpenCV build requirement is removed.
 * `WPILIB_WITH_EXAMPLES` (OFF Default)
   * This option will build C++ examples.
-* `WPILIB_WITH_GUI` (ON Default)
-  * This option will build GUI items. If this is off, and `WPILIB_WITH_SIMULATION_MODULES` is on, the simulation GUI will not be built.
+* `WPILIB_WITH_GUI` (OFF Default)
+  * This option will build GUI items. If this is off, and `WPILIB_WITH_SIMULATION_MODULES` is on, the simulation GUI will not be built. If this is off, the SDL3 build requirement is removed.
 * `WPILIB_WITH_NTCORE` (ON Default)
   * This option will cause ntcore to be built. Turning this off will implicitly disable wpinet, and will cause an error if `WPILIB_WITH_WPILIB` is enabled.
 * `WPILIB_WITH_SIMULATION_MODULES` (ON Default)
