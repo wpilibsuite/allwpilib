@@ -4,22 +4,16 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include <format>
 
 #include "wpi/units/base.hpp"
-
-// FIXME: Replace enable_if with requires clause and remove <type_traits>
-// include once using GCC >= 12. GCC 11 incorrectly emits a struct redefinition
-// error because it doesn't use the requires clause to disambiguate.
 
 /**
  * Formatter for unit types.
  */
 template <typename Unit, typename CharT>
-struct std::formatter<Unit, CharT,
-                      std::enable_if_t<wpi::units::traits::is_unit_t_v<Unit>>> {
+  requires wpi::units::traits::is_unit_t_v<Unit>
+struct std::formatter<Unit, CharT> {
   template <typename ParseContext>
   constexpr auto parse(ParseContext& ctx) {
     return m_underlying.parse(ctx);
