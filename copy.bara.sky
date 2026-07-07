@@ -182,10 +182,10 @@ def define_mostrobotpy_to_allwpilib():
     transformations.append(core.move("examples/robot/", "robotpyExamples/examples"))
 
     origin_files += glob([
-        "examples/snippets/**",
+        "snippets/robot/**",
     ], exclude = EXCLUDES)
     destination_files += glob(["robotpyExamples/**"], exclude = ["robotpyExamples/define_examples.bzl", "robotpyExamples/example_projects.bzl", "robotpyExamples/generate_bazel_files.py", "robotpyExamples/BUILD.bazel"])
-    transformations.append(core.move("examples/snippets/", "robotpyExamples/snippets"))
+    transformations.append(core.move("snippets/robot/", "robotpyExamples/snippets"))
 
     # Some tests seem to fail in mostrobotpy, but don't in allwpilib
     # We will leave them turned on in allwpilib, and mark them as xfail in mostrobotpy.
@@ -215,7 +215,7 @@ def define_mostrobotpy_to_allwpilib():
 def define_allwpilib_to_mostrobotpy():
     ignored_project_exclude = [p + "/**" for p in IGNORED_MOSTROBOTPY_PROJECTS] + [p + "/examples/**" for p in IGNORED_MOSTROBOTPY_PROJECTS]
     origin_files = []
-    destination_files = glob(["**"], exclude = ["*", ".github/**", "docs/**", "**/.gitignore", "**/meson.build", "**/requirements.txt", "devtools/**", "examples/cscore/**", "examples/datalog/**", "examples/ntcore/**", "examples/wpinet/**", "examples/robot/.gitignore", "subprojects/robotpy-commands-v2/tools/hids/**", "**/run_tests.py"] + ignored_project_exclude)
+    destination_files = glob(["**"], exclude = ["*", ".github/**", "docs/**", "**/.gitignore", "**/meson.build", "**/requirements.txt", "devtools/**", "examples/cscore/**", "examples/datalog/**", "examples/ntcore/**", "examples/wpinet/**", "examples/robot/.gitignore", "subprojects/robotpy-commands-v2/tools/hids/**", "examples/CONTRIBUTING.md", "examples/check_header.py", "**/run_tests.py", "subprojects/robotpy-native-wpihal/tests/test_imports.py"] + ignored_project_exclude)
     transformations = []
 
     for project_info in MOSTROBOTPY_PROJECTS:
