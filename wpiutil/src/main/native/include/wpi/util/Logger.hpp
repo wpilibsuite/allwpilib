@@ -4,10 +4,9 @@
 
 #pragma once
 
+#include <format>
 #include <functional>
 #include <utility>
-
-#include <format>
 
 namespace wpi::util {
 

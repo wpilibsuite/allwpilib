@@ -5,11 +5,10 @@
 #pragma once
 
 #include <algorithm>
+#include <format>
 #include <stdexcept>
 #include <string>
 #include <string_view>
-
-#include <format>
 
 #include "wpi/util/Color.hpp"
 #include "wpi/util/StringExtras.hpp"

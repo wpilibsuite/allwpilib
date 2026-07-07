@@ -28,9 +28,8 @@
 
 #include "wpi/math/trajectory/TrajectoryParameterizer.hpp"
 
-#include <vector>
-
 #include <format>
+#include <vector>
 
 #include "wpi/math/trajectory/SplineTrajectory.hpp"
 #include "wpi/units/math.hpp"

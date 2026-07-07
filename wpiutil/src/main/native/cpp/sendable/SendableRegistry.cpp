@@ -4,11 +4,10 @@
 
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
-
-#include <format>
 
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/SmallVector.hpp"

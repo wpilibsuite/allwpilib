@@ -5,10 +5,9 @@
 #include "wpi/net/HttpUtil.hpp"
 
 #include <cctype>
+#include <format>
 #include <string>
 #include <utility>
-
-#include <format>
 
 #include "wpi/util/Base64.hpp"
 #include "wpi/util/StringExtras.hpp"

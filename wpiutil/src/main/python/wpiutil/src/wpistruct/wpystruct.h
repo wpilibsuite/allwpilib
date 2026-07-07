@@ -1,12 +1,12 @@
 
 #pragma once
 
+#include <format>
 #include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
 
-#include <format>
 #include <pybind11/functional.h>
 #include <pybind11/typing.h>
 #include <semiwrap.h>

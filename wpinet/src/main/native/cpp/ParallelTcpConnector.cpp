@@ -5,12 +5,11 @@
 #include "wpi/net/ParallelTcpConnector.hpp"
 
 #include <cstring>
+#include <format>
 #include <functional>
 #include <memory>
 #include <string>
 #include <utility>
-
-#include <format>
 
 #include "wpi/net/uv/GetAddrInfo.hpp"
 #include "wpi/net/uv/Loop.hpp"

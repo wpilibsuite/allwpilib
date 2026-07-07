@@ -5,10 +5,10 @@
 #pragma once
 
 #include <concepts>
+#include <format>
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-#include <format>
 
 // FIXME: Doxygen gives internal inconsistency errors:
 

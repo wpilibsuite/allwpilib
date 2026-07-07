@@ -4,12 +4,11 @@
 
 #include "wpi/net/MulticastServiceAnnouncer.hpp"
 
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <format>
 
 #include "AvahiClient.hpp"
 #include "wpi/util/mutex.hpp"

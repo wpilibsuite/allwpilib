@@ -4,10 +4,9 @@
 
 #include "wpi/net/PortForwarder.hpp"
 
+#include <format>
 #include <memory>
 #include <string>
-
-#include <format>
 
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/uv/GetAddrInfo.hpp"

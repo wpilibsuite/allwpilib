@@ -6,11 +6,10 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <format>
 #include <stdexcept>
 #include <string>
 #include <string_view>
-
-#include <format>
 
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/ct_string.hpp"

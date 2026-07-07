@@ -4,10 +4,9 @@
 
 #include "wpi/util/struct/SchemaParser.hpp"
 
+#include <format>
 #include <string>
 #include <utility>
-
-#include <format>
 
 #include "wpi/util/StringExtras.hpp"
 

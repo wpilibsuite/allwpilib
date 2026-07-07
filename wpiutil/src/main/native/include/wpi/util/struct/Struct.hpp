@@ -8,6 +8,7 @@
 
 #include <bit>
 #include <concepts>
+#include <format>
 #include <memory>
 #include <span>
 #include <string>
@@ -15,8 +16,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <format>
 
 #include "wpi/util/Endian.hpp"
 #include "wpi/util/array.hpp"

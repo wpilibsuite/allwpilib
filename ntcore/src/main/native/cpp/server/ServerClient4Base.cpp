@@ -9,7 +9,6 @@
 #include <string>
 #include <vector>
 
-
 #include "Log.hpp"
 #include "server/ServerImpl.hpp"
 #include "server/ServerPublisher.hpp"

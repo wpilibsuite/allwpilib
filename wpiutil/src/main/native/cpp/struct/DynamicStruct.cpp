@@ -5,10 +5,9 @@
 #include "wpi/util/struct/DynamicStruct.hpp"
 
 #include <algorithm>
+#include <format>
 #include <string>
 #include <utility>
-
-#include <format>
 
 #include "wpi/util/Endian.hpp"
 #include "wpi/util/SmallString.hpp"

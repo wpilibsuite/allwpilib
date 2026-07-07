@@ -4,10 +4,9 @@
 
 #include "wpi/util/protobuf/Protobuf.hpp"
 
+#include <format>
 #include <string>
 #include <vector>
-
-#include <format>
 
 #include "wpi/util/SmallVector.hpp"
 

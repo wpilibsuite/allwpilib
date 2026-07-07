@@ -8,11 +8,10 @@
 #include <unistd.h>
 #endif
 
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
-
-#include <format>
 
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/HttpServerConnection.hpp"

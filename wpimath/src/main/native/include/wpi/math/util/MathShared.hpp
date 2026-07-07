@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include <memory>
-
 #include <format>
+#include <memory>
 
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
