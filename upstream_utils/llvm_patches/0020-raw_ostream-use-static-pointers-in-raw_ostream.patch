@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 19 May 2022 00:58:36 -0400
-Subject: [PATCH 21/34] raw_ostream: use static pointers in raw_ostream
+Subject: [PATCH 20/33] raw_ostream: use static pointers in raw_ostream
 
 See #1401
 ---
@@ -9,10 +9,10 @@ See #1401
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index ca4492ad814505349f3e5ddfe67a165d78e35a6e..09f7ede10e4c3decb2c6d70a3e8ce7660f542519 100644
+index 3b8749841b9edb37fb47d7b3bbef3bfea759b3bc..a2ec7ea0208238e8dd02f00fbf2958009c6f3226 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -605,9 +605,9 @@ raw_fd_ostream &llvm::outs() {
+@@ -611,9 +611,9 @@ raw_fd_ostream &llvm::outs() {
    assert(!EC1);
    (void)EC1;
  
@@ -24,7 +24,7 @@ index ca4492ad814505349f3e5ddfe67a165d78e35a6e..09f7ede10e4c3decb2c6d70a3e8ce766
  }
  
  raw_fd_ostream &llvm::errs() {
-@@ -617,8 +617,8 @@ raw_fd_ostream &llvm::errs() {
+@@ -623,8 +623,8 @@ raw_fd_ostream &llvm::errs() {
    (void)EC;
  
    // Set standard error to be unbuffered.

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 26 May 2026 16:55:28 -0700
-Subject: [PATCH 34/34] SmallVector: add cbegin()/cend()/crbegin()/crend()
+Subject: [PATCH 33/33] SmallVector: add cbegin()/cend()/crbegin()/crend()
 
 ---
  llvm/include/llvm/ADT/SmallVector.h | 4 ++++

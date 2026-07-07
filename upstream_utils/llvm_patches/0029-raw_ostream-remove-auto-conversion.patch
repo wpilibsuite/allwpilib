@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Sun, 17 Mar 2024 14:51:11 -0700
-Subject: [PATCH 30/34] raw_ostream: remove auto-conversion
+Subject: [PATCH 29/33] raw_ostream: remove auto-conversion
 
 ---
  llvm/lib/Support/raw_ostream.cpp | 13 +------------
  1 file changed, 1 insertion(+), 12 deletions(-)
 
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index a9cea8ac7fa2a7edbfeb76dbed6a92e189edbbd9..21a00f58e3ed3a033a75fd5ca64d94486f9a8d42 100644
+index cc760cc40e639dbc5c1a9387ca535f56bf5767f5..8c7714c6267bef144e051a2ef5b2cd9656ec421e 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -19,7 +19,6 @@
@@ -19,7 +19,7 @@ index a9cea8ac7fa2a7edbfeb76dbed6a92e189edbbd9..21a00f58e3ed3a033a75fd5ca64d9448
  #include "llvm/Support/Compiler.h"
  #include "llvm/Support/ErrorHandling.h"
  #include "llvm/Support/FileSystem.h"
-@@ -600,23 +599,13 @@ raw_fd_ostream &llvm::outs() {
+@@ -606,23 +605,13 @@ raw_fd_ostream &llvm::outs() {
    // Set buffer settings to model stdout behavior.
    std::error_code EC;
  

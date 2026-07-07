@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:46:20 -0400
-Subject: [PATCH 17/34] ErrorHandling: prefer print
+Subject: [PATCH 16/33] ErrorHandling: prefer print
 
 ---
  llvm/lib/Support/ErrorHandling.cpp | 19 ++++++-------------
  1 file changed, 6 insertions(+), 13 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 69328303a1cc0cc6e210de5adbb4fdafafbe978f..cb455ed43ffba58443fd71dcdb2e60cc7fc812a6 100644
+index 74e0d633faf0fd9c07a430539cc9d0f25ce0a6af..47714ac14a8cc0fac6f0cfd4967c4ecaaeca708f 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -23,7 +23,7 @@
