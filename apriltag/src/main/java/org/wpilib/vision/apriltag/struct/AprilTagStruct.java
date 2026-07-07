@@ -27,7 +27,7 @@ public class AprilTagStruct implements Struct<AprilTag> {
 
   @Override
   public String getSchema() {
-    return "int id;Pose3d pose";
+    return "int32 id;Pose3d pose";
   }
 
   @Override

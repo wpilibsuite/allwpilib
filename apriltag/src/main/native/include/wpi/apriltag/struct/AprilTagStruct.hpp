@@ -12,9 +12,9 @@ template <>
 struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::apriltag::AprilTag> {
   static constexpr std::string_view GetTypeName() { return "AprilTag"; }
   static constexpr size_t GetSize() {
-    return wpi::util::GetStructSize<wpi::math::Pose3d>() + 8;
+    return wpi::util::GetStructSize<wpi::math::Pose3d>() + 4;
   }
-  static constexpr std::string_view GetSchema() { return "int id;Pose3d pose"; }
+  static constexpr std::string_view GetSchema() { return "int32 id;Pose3d pose"; }
 
   static wpi::apriltag::AprilTag Unpack(std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
