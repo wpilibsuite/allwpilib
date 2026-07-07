@@ -221,7 +221,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - name: Download docs artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: Documentation
       - name: Make output directories
@@ -296,7 +296,7 @@ jobs:
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         with:
           repository: wpilibsuite/build-tools
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         if: |
           github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
