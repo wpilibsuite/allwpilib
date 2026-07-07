@@ -31,8 +31,8 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
     m_apriltags[tag.ID] = tag;
   }
   m_field = FieldDimensions{
-      wpi::units::meter_t{json.at("field").at("width").get_double()},
-      wpi::units::meter_t{json.at("field").at("length").get_double()}};
+      wpi::units::meter_t{json.at("field").at("length").get_double()},
+      wpi::units::meter_t{json.at("field").at("width").get_double()}};
 }
 
 AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags,
