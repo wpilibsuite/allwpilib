@@ -237,7 +237,7 @@ TEST(TrapezoidProfileTest, InitalizationOfCurrentState) {
       1_mps, 1_mps_sq};
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
   EXPECT_NEAR_UNITS(profile.TimeLeftUntil(0_m), 0_s, 1e-10_s);
-  EXPECT_NEAR_UNITS(profile.TotalTime(), 0_s, 1e-10_s);
+  EXPECT_NEAR_UNITS(profile.Duration(), 0_s, 1e-10_s);
 }
 
 TEST(TrapezoidProfileTest, InitialVelocityConstraints) {
