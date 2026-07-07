@@ -93,7 +93,7 @@ int main(int argc, const char** argv) {
         if (record.GetInteger(&val)) {
           auto timeval = std::chrono::system_clock::time_point(
               std::chrono::microseconds(val));
-          wpi::util::print("  {:%Y-%m-%d %H:%M:%S}.{:06}\n", timeval,
+          wpi::util::print("  {:%Y-%m-%d %H:%M:%OS}.{:06}\n", timeval,
                            val % 1000000);
         } else {
           wpi::util::print("  invalid\n");

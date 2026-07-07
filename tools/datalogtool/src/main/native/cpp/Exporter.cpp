@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <chrono>
 #include <format>
 #include <functional>
 #include <future>
@@ -464,7 +465,7 @@ static void ValueToCsv(wpi::util::raw_ostream& os, const Entry& entry,
     if (record.GetInteger(&val)) {
       auto timeval =
           std::chrono::system_clock::time_point(std::chrono::microseconds(val));
-      wpi::util::print(os, "{:%Y-%m-%d %H:%M:%S}.{:06}", timeval,
+      wpi::util::print(os, "{:%Y-%m-%d %H:%M:%OS}.{:06}", timeval,
                        val % 1000000);
       return;
     }
