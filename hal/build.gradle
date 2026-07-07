@@ -36,20 +36,6 @@ ext {
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
-apply from: "${rootDir}/shared/libmrclib.gradle"
-
-ext {
-    addHalDependency = { binary, shared->
-        nativeUtils.useRequiredLibrary(binary, 'mrclib')
-        binary.lib project: ':hal', library: 'hal', linkage: shared
-    }
-
-    addHalJniDependency = { binary->
-        nativeUtils.useRequiredLibrary(binary, 'mrclib')
-        binary.lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
-    }
-}
-
 cppSourcesZip {
     from('src/main/native/systemcore') {
         into '/systemcore'

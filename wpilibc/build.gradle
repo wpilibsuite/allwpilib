@@ -59,6 +59,7 @@ ext {
 staticGtestConfigs["${nativeName}Test"] = []
 
 apply from: "${rootDir}/shared/googletest.gradle"
+apply from: "${rootDir}/shared/libmrclib.gradle"
 
 nativeUtils.exportsConfigs {
     wpilibc {
@@ -108,7 +109,8 @@ model {
 
                 cppCompiler.define 'DYNAMIC_CAMERA_SERVER'
                 project(':ntcore').addNtcoreDependency(it, 'shared')
-                project(':hal').addHalDependency(it, 'shared')
+                nativeUtils.useRequiredLibrary(it, 'mrclib')
+                lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -129,7 +131,8 @@ model {
             }
             binaries.all {
                 project(':ntcore').addNtcoreDependency(it, 'shared')
-                project(':hal').addHalDependency(it, 'shared')
+                nativeUtils.useRequiredLibrary(it, 'mrclib')
+                lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -166,7 +169,8 @@ model {
             binaries.all {
                 project(':ntcore').addNtcoreDependency(it, 'shared')
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                project(':hal').addHalDependency(it, 'shared')
+                nativeUtils.useRequiredLibrary(it, 'mrclib')
+                lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -228,7 +232,8 @@ model {
         withType(GoogleTestTestSuiteBinarySpec) {
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
-            project(':hal').addHalDependency(it, 'shared')
+            nativeUtils.useRequiredLibrary(it, 'mrclib')
+            lib project: ':hal', library: 'hal', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
