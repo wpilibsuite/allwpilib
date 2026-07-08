@@ -19,6 +19,7 @@
 #include "mrclib/DsComms.hpp"
 #include "mrclib/DsCommsControl.h"
 #include "mrclib/MrcString.hpp"
+#include "mrclib/Systemcore.h"
 #include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/util/EventVector.hpp"
@@ -333,6 +334,9 @@ MrcLibDsImpl::MrcLibDsImpl() {
   MRC_DsComms_Initialize();
 
   MRC_Console_Initialize();
+
+  // Used in Power.cpp to get battery voltage
+  MRC_Systemcore_Initialize();
 
   // Wait for 10 seconds for the system server to be ready.
   if (!MRC_DsComms_WaitForSystemServer(10000)) {
