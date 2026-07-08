@@ -36,7 +36,7 @@ class LinearSystemLoopTest {
           Nat.N1(),
           (LinearSystem<N2, N1, N1>) m_plant.slice(0),
           VecBuilder.fill(0.05, 1.0),
-          VecBuilder.fill(kPositionStddev),
+          VecBuilder.fill(0.0001),
           kDt);
 
   @SuppressWarnings("unchecked")
@@ -45,12 +45,12 @@ class LinearSystemLoopTest {
           (LinearSystem<N2, N1, N1>) m_plant.slice(0),
           VecBuilder.fill(0.02, 0.4),
           VecBuilder.fill(12.0),
-          kDt);
+          0.005);
 
   @SuppressWarnings("unchecked")
   private final LinearSystemLoop<N2, N1, N1> m_loop =
       new LinearSystemLoop<>(
-          (LinearSystem<N2, N1, N1>) m_plant.slice(0), m_controller, m_observer, 12, kDt);
+          (LinearSystem<N2, N1, N1>) m_plant.slice(0), m_controller, m_observer, 12, 0.005);
 
   private static void updateTwoState(
       LinearSystem<N2, N1, N1> plant, LinearSystemLoop<N2, N1, N1> loop, double noise) {
