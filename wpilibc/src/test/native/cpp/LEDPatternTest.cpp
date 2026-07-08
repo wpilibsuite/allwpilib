@@ -4,6 +4,8 @@
 
 #include "wpi/hardware/led/LEDPattern.hpp"
 
+#include <format>
+
 #include <gtest/gtest.h>
 
 #include "wpi/math/util/MathUtil.hpp"

@@ -5,6 +5,7 @@
 #include "wpi/halsim/ws_server/HALSimHttpConnection.hpp"
 
 #include <cstdio>
+#include <format>
 #include <string>
 #include <string_view>
 

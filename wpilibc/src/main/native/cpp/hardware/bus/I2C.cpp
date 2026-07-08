@@ -5,6 +5,7 @@
 #include "wpi/hardware/bus/I2C.hpp"
 
 #include <algorithm>
+#include <format>
 
 #include "wpi/hal/I2C.h"
 #include "wpi/hal/UsageReporting.hpp"

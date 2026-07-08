@@ -4,6 +4,7 @@
 
 #include "wpi/net/uv/Stream.hpp"
 
+#include <format>
 #include <functional>
 #include <memory>
 #include <string>

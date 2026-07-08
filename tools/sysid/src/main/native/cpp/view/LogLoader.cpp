@@ -5,6 +5,7 @@
 #include "wpi/sysid/view/LogLoader.hpp"
 
 #include <algorithm>
+#include <format>
 #include <memory>
 #include <span>
 #include <string>

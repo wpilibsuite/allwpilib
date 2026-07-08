@@ -4,7 +4,9 @@
 
 #include "wpi/cameraserver/CameraServerShared.hpp"
 
+#include <format>
 #include <memory>
+#include <string_view>
 #include <utility>
 
 #include "wpi/util/mutex.hpp"

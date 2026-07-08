@@ -4,6 +4,7 @@
 
 #include <jni.h>
 
+#include <format>
 #include <stdexcept>
 #include <string>
 

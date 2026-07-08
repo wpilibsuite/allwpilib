@@ -4,6 +4,7 @@
 
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 
+#include <format>
 #include <utility>
 
 #include "wpi/hal/Ports.h"

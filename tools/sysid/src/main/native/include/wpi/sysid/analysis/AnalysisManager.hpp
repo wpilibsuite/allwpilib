@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <array>
 #include <exception>
+#include <format>
 #include <limits>
 #include <numeric>
 #include <string>

@@ -4,6 +4,8 @@
 
 #include "wpi/hardware/rotation/Encoder.hpp"
 
+#include <format>
+
 #include "wpi/hal/Encoder.h"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"

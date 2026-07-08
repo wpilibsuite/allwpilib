@@ -4,7 +4,9 @@
 
 #include "wpi/math/util/MathShared.hpp"
 
+#include <format>
 #include <memory>
+#include <string_view>
 #include <utility>
 
 #include "wpi/units/time.hpp"

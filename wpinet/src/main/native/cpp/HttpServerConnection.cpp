@@ -4,6 +4,7 @@
 
 #include "wpi/net/HttpServerConnection.hpp"
 
+#include <format>
 #include <memory>
 
 #include "wpi/net/raw_uv_ostream.hpp"

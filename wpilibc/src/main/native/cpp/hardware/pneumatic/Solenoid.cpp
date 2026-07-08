@@ -4,6 +4,7 @@
 
 #include "wpi/hardware/pneumatic/Solenoid.hpp"
 
+#include <format>
 #include <utility>
 
 #include "wpi/system/Errors.hpp"

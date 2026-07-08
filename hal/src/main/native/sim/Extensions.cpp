@@ -5,6 +5,7 @@
 #include "wpi/hal/Extensions.h"
 
 #include <cstdio>
+#include <format>
 #include <string>
 #include <string_view>
 #include <utility>

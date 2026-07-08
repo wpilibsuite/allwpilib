@@ -4,6 +4,8 @@
 
 #include "wpi/hardware/bus/CAN.hpp"
 
+#include <format>
+
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/CANAPI.h"
 #include "wpi/hal/Errors.h"

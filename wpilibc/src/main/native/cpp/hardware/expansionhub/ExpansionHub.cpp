@@ -5,6 +5,7 @@
 #include "wpi/hardware/expansionhub/ExpansionHub.hpp"
 
 #include <chrono>
+#include <format>
 #include <memory>
 #include <string>
 #include <thread>

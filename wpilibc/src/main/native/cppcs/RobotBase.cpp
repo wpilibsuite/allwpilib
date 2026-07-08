@@ -11,8 +11,10 @@
 #endif
 
 #include <cstdio>
+#include <format>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include "wpi/cameraserver/CameraServerShared.hpp"

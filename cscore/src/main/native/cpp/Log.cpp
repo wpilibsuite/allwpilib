@@ -4,6 +4,7 @@
 
 #include "Log.hpp"
 
+#include <format>
 #include <iterator>
 #include <vector>
 

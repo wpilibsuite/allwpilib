@@ -5,6 +5,7 @@
 #include "ServerClient4Base.hpp"
 
 #include <algorithm>
+#include <format>
 #include <memory>
 #include <string>
 #include <vector>

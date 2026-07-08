@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <format>
 #include <memory>
 #include <span>
 #include <string>

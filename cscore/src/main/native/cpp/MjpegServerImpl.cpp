@@ -5,6 +5,7 @@
 #include "MjpegServerImpl.hpp"
 
 #include <chrono>
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>

@@ -4,6 +4,8 @@
 
 #include "wpi/hardware/expansionhub/ExpansionHubMotor.hpp"
 
+#include <format>
+
 #include "wpi/hardware/expansionhub/ExpansionHubPositionConstants.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubVelocityConstants.hpp"
 #include "wpi/system/Errors.hpp"

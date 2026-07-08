@@ -4,6 +4,8 @@
 
 #include "wpi/simulation/SendableChooserSim.hpp"
 
+#include <format>
+
 using namespace wpi::sim;
 
 SendableChooserSim::SendableChooserSim(std::string_view path)

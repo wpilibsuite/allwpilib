@@ -4,6 +4,8 @@
 
 #include "wpi/hardware/expansionhub/ExpansionHubServo.hpp"
 
+#include <format>
+
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/SystemServer.hpp"
 

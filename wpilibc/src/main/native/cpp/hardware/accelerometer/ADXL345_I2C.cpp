@@ -4,6 +4,8 @@
 
 #include "wpi/hardware/accelerometer/ADXL345_I2C.hpp"
 
+#include <format>
+
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/NTSendableBuilder.hpp"

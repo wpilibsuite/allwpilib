@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <format>
 #include <random>
 #include <string>
 #include <vector>

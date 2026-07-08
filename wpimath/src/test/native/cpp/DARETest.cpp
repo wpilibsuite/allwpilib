@@ -5,6 +5,7 @@
 #include "wpi/math/linalg/DARE.hpp"
 
 #include <expected>
+#include <format>
 
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>

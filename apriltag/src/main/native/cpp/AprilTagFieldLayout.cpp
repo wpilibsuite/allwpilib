@@ -4,6 +4,7 @@
 
 #include "wpi/apriltag/AprilTagFieldLayout.hpp"
 
+#include <format>
 #include <system_error>
 #include <utility>
 #include <vector>

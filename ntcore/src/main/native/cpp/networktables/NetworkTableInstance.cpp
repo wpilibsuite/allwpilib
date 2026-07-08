@@ -4,6 +4,7 @@
 
 #include "wpi/nt/NetworkTableInstance.hpp"
 
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
