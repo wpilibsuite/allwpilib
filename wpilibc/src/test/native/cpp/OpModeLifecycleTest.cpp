@@ -269,4 +269,151 @@ TEST_F(OpModeLifecycleTest, GetCallbacksRunImmediatelyWhileDisabled) {
   robotThread.join();
 }
 
+TEST_F(OpModeLifecycleTest, InitialEnabledState) {
+  Counts counts;
+  LifecycleRobot robot;
+  robot.AddOpModeFactory(
+      [&] { return std::make_unique<LifecycleOpMode>(counts); },
+      wpi::RobotMode::TELEOPERATED, "TestOpMode");
+  robot.PublishOpModes();
+
+  std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
+
+  // The very first DS packet is fully enabled and has an opmode selected
+  wpi::sim::DriverStationSim::SetDsAttached(true);
+  wpi::sim::DriverStationSim::SetRobotMode(wpi::RobotMode::TELEOPERATED);
+  wpi::sim::DriverStationSim::SetOpMode(
+      MakeOpModeId(wpi::RobotMode::TELEOPERATED, "TestOpMode"));
+  wpi::sim::DriverStationSim::SetEnabled(true);
+  wpi::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::StepTiming(40_ms);  // Step twice to get periodic callback
+
+  // Should construct, call disabledPeriodic once (since it's a new opmode),
+  // then start and periodic
+  EXPECT_EQ(counts.constructed.load(), 1u);
+  EXPECT_EQ(counts.disabledPeriodic.load(), 1u);
+  EXPECT_EQ(counts.start.load(), 1u);
+  EXPECT_EQ(counts.periodic.load(), 1u);
+
+  robot.EndCompetition();
+  robotThread.join();
+}
+
+TEST_F(OpModeLifecycleTest, ReconstructionOnDisable) {
+  Counts counts;
+  LifecycleRobot robot;
+  robot.AddOpModeFactory(
+      [&] { return std::make_unique<LifecycleOpMode>(counts); },
+      wpi::RobotMode::TELEOPERATED, "TestOpMode");
+  robot.PublishOpModes();
+
+  std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
+
+  wpi::sim::DriverStationSim::SetDsAttached(true);
+
+  // 1. Enable
+  wpi::sim::DriverStationSim::SetRobotMode(wpi::RobotMode::TELEOPERATED);
+  wpi::sim::DriverStationSim::SetOpMode(
+      MakeOpModeId(wpi::RobotMode::TELEOPERATED, "TestOpMode"));
+  wpi::sim::DriverStationSim::SetEnabled(true);
+  wpi::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::StepTiming(40_ms);
+
+  EXPECT_EQ(counts.constructed.load(), 1u);
+  EXPECT_EQ(counts.start.load(), 1u);
+
+  // 2. Disable
+  wpi::sim::DriverStationSim::SetEnabled(false);
+  wpi::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::StepTiming(40_ms);
+
+  EXPECT_EQ(counts.end.load(), 1u);
+  EXPECT_EQ(counts.destructed.load(), 1u);
+  EXPECT_EQ(counts.constructed.load(), 2u);
+  EXPECT_GE(counts.disabledPeriodic.load(), 1u);
+  EXPECT_EQ(counts.start.load(), 1u);
+
+  // 3. Re-enable
+  wpi::sim::DriverStationSim::SetEnabled(true);
+  wpi::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::StepTiming(40_ms);
+
+  EXPECT_EQ(counts.constructed.load(), 2u);
+  EXPECT_EQ(counts.start.load(), 2u);
+  EXPECT_EQ(counts.end.load(), 1u);
+
+  robot.EndCompetition();
+  robotThread.join();
+}
+
+TEST_F(OpModeLifecycleTest, DeselectOpMode) {
+  Counts counts;
+  LifecycleRobot robot;
+  robot.AddOpModeFactory(
+      [&] { return std::make_unique<LifecycleOpMode>(counts); },
+      wpi::RobotMode::TELEOPERATED, "TestOpMode");
+  robot.PublishOpModes();
+
+  std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
+
+  wpi::sim::DriverStationSim::SetDsAttached(true);
+
+  wpi::sim::DriverStationSim::SetRobotMode(wpi::RobotMode::TELEOPERATED);
+  wpi::sim::DriverStationSim::SetOpMode(
+      MakeOpModeId(wpi::RobotMode::TELEOPERATED, "TestOpMode"));
+  wpi::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::StepTiming(20_ms);
+
+  EXPECT_EQ(counts.constructed.load(), 1u);
+
+  // Deselect opmode
+  wpi::sim::DriverStationSim::SetOpMode(0);
+  wpi::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::StepTiming(20_ms);
+
+  EXPECT_EQ(counts.destructed.load(), 1u);
+  EXPECT_EQ(counts.constructed.load(), 1u);
+
+  robot.EndCompetition();
+  robotThread.join();
+}
+
+TEST_F(OpModeLifecycleTest, DsDisconnect) {
+  Counts counts;
+  LifecycleRobot robot;
+  robot.AddOpModeFactory(
+      [&] { return std::make_unique<LifecycleOpMode>(counts); },
+      wpi::RobotMode::TELEOPERATED, "TestOpMode");
+  robot.PublishOpModes();
+
+  std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
+
+  wpi::sim::DriverStationSim::SetDsAttached(true);
+  wpi::sim::DriverStationSim::SetRobotMode(wpi::RobotMode::TELEOPERATED);
+  wpi::sim::DriverStationSim::SetOpMode(
+      MakeOpModeId(wpi::RobotMode::TELEOPERATED, "TestOpMode"));
+  wpi::sim::DriverStationSim::SetEnabled(true);
+  wpi::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::StepTiming(40_ms);
+
+  EXPECT_EQ(counts.constructed.load(), 1u);
+  EXPECT_EQ(counts.start.load(), 1u);
+
+  // DS Disconnect
+  wpi::sim::DriverStationSim::SetDsAttached(false);
+  // wpi::sim::DriverStationSim::NotifyNewData(); // DON'T DO THIS
+  wpi::sim::StepTiming(40_ms);
+
+  EXPECT_EQ(counts.end.load(), 1u);
+  EXPECT_EQ(counts.destructed.load(), 1u);
+  EXPECT_EQ(counts.constructed.load(), 1u);
+
+  robot.EndCompetition();
+  robotThread.join();
+}
+
 }  // namespace

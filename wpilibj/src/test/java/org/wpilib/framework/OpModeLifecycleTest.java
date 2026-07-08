@@ -358,4 +358,213 @@ class OpModeLifecycleTest {
     robotThread.join();
     robot.close();
   }
+
+  @Test
+  void testLifecycleInitialEnabledState() throws InterruptedException {
+    AtomicInteger constructedCount = new AtomicInteger(0);
+    AtomicInteger disabledPeriodicCount = new AtomicInteger(0);
+    AtomicInteger startCount = new AtomicInteger(0);
+    AtomicInteger periodicCount = new AtomicInteger(0);
+    AtomicInteger endCount = new AtomicInteger(0);
+    AtomicInteger closeCount = new AtomicInteger(0);
+
+    LifecycleRobot robot = new LifecycleRobot();
+    robot.addOpModeFactory(
+        () ->
+            new MockOpMode(
+                constructedCount,
+                disabledPeriodicCount,
+                startCount,
+                periodicCount,
+                endCount,
+                closeCount),
+        RobotMode.TELEOPERATED,
+        "TestOpMode");
+    robot.publishOpModes();
+
+    Thread robotThread = new Thread(robot::startCompetition);
+    robotThread.start();
+    SimHooks.waitForProgramStart();
+
+    // The very first DS packet is fully enabled and has an opmode selected
+    DriverStationSim.setDsAttached(true);
+    DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
+    DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "TestOpMode"));
+    DriverStationSim.setEnabled(true);
+    DriverStationSim.notifyNewData();
+    SimHooks.stepTiming(2 * kPeriod);
+
+    // Should construct, call disabledPeriodic once (since it's a new opmode), then start and
+    // periodic
+    assertEquals(1, constructedCount.get());
+    assertEquals(1, disabledPeriodicCount.get());
+    assertEquals(1, startCount.get());
+    assertEquals(1, periodicCount.get());
+
+    robot.endCompetition();
+    robotThread.join();
+    robot.close();
+  }
+
+  @Test
+  void testLifecycleReconstructionOnDisable() throws InterruptedException {
+    AtomicInteger constructedCount = new AtomicInteger(0);
+    AtomicInteger disabledPeriodicCount = new AtomicInteger(0);
+    AtomicInteger startCount = new AtomicInteger(0);
+    AtomicInteger periodicCount = new AtomicInteger(0);
+    AtomicInteger endCount = new AtomicInteger(0);
+    AtomicInteger closeCount = new AtomicInteger(0);
+
+    LifecycleRobot robot = new LifecycleRobot();
+    robot.addOpModeFactory(
+        () ->
+            new MockOpMode(
+                constructedCount,
+                disabledPeriodicCount,
+                startCount,
+                periodicCount,
+                endCount,
+                closeCount),
+        RobotMode.TELEOPERATED,
+        "TestOpMode");
+    robot.publishOpModes();
+
+    Thread robotThread = new Thread(robot::startCompetition);
+    robotThread.start();
+    SimHooks.waitForProgramStart();
+
+    // 1. Enable
+    DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
+    DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "TestOpMode"));
+    DriverStationSim.setEnabled(true);
+    DriverStationSim.notifyNewData();
+    SimHooks.stepTiming(2 * kPeriod);
+
+    assertEquals(1, constructedCount.get());
+    assertEquals(1, startCount.get());
+
+    // 2. Disable
+    DriverStationSim.setEnabled(false);
+    DriverStationSim.notifyNewData();
+    SimHooks.stepTiming(2 * kPeriod);
+
+    // Old instance ended and closed
+    assertEquals(1, endCount.get());
+    assertEquals(1, closeCount.get());
+
+    // New instance should be constructed and disabledPeriodic called
+    assertEquals(2, constructedCount.get());
+    assertTrue(disabledPeriodicCount.get() >= 1);
+    assertEquals(1, startCount.get()); // new instance not started yet
+
+    // 3. Re-enable
+    DriverStationSim.setEnabled(true);
+    DriverStationSim.notifyNewData();
+    SimHooks.stepTiming(2 * kPeriod);
+
+    assertEquals(2, constructedCount.get());
+    assertEquals(2, startCount.get());
+    assertEquals(1, endCount.get());
+
+    robot.endCompetition();
+    robotThread.join();
+    robot.close();
+  }
+
+  @Test
+  void testLifecycleDeselectOpMode() throws InterruptedException {
+    AtomicInteger constructedCount = new AtomicInteger(0);
+    AtomicInteger disabledPeriodicCount = new AtomicInteger(0);
+    AtomicInteger startCount = new AtomicInteger(0);
+    AtomicInteger periodicCount = new AtomicInteger(0);
+    AtomicInteger endCount = new AtomicInteger(0);
+    AtomicInteger closeCount = new AtomicInteger(0);
+
+    LifecycleRobot robot = new LifecycleRobot();
+    robot.addOpModeFactory(
+        () ->
+            new MockOpMode(
+                constructedCount,
+                disabledPeriodicCount,
+                startCount,
+                periodicCount,
+                endCount,
+                closeCount),
+        RobotMode.TELEOPERATED,
+        "TestOpMode");
+    robot.publishOpModes();
+
+    Thread robotThread = new Thread(robot::startCompetition);
+    robotThread.start();
+    SimHooks.waitForProgramStart();
+
+    DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
+    DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "TestOpMode"));
+    DriverStationSim.notifyNewData();
+    SimHooks.stepTiming(kPeriod);
+
+    assertEquals(1, constructedCount.get());
+
+    // Deselect opmode
+    DriverStationSim.setOpMode(0);
+    DriverStationSim.notifyNewData();
+    SimHooks.stepTiming(kPeriod);
+
+    assertEquals(1, closeCount.get());
+    assertEquals(1, constructedCount.get()); // no new instance constructed
+
+    robot.endCompetition();
+    robotThread.join();
+    robot.close();
+  }
+
+  @Test
+  void testLifecycleDsDisconnect() throws InterruptedException {
+    AtomicInteger constructedCount = new AtomicInteger(0);
+    AtomicInteger disabledPeriodicCount = new AtomicInteger(0);
+    AtomicInteger startCount = new AtomicInteger(0);
+    AtomicInteger periodicCount = new AtomicInteger(0);
+    AtomicInteger endCount = new AtomicInteger(0);
+    AtomicInteger closeCount = new AtomicInteger(0);
+
+    LifecycleRobot robot = new LifecycleRobot();
+    robot.addOpModeFactory(
+        () ->
+            new MockOpMode(
+                constructedCount,
+                disabledPeriodicCount,
+                startCount,
+                periodicCount,
+                endCount,
+                closeCount),
+        RobotMode.TELEOPERATED,
+        "TestOpMode");
+    robot.publishOpModes();
+
+    Thread robotThread = new Thread(robot::startCompetition);
+    robotThread.start();
+    SimHooks.waitForProgramStart();
+
+    DriverStationSim.setEnabled(true);
+    DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
+    DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "TestOpMode"));
+    DriverStationSim.notifyNewData();
+    SimHooks.stepTiming(2 * kPeriod);
+
+    assertEquals(1, constructedCount.get());
+    assertEquals(1, startCount.get());
+
+    // DS Disconnect
+    DriverStationSim.setDsAttached(false);
+    // DriverStationSim.notifyNewData(); // DON'T DO THIS
+    SimHooks.stepTiming(2 * kPeriod);
+
+    assertEquals(1, endCount.get());
+    assertEquals(1, closeCount.get());
+    assertEquals(1, constructedCount.get()); // no new instance constructed
+
+    robot.endCompetition();
+    robotThread.join();
+    robot.close();
+  }
 }
