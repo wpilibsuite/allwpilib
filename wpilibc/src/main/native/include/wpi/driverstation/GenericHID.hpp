@@ -88,7 +88,13 @@ class GenericHID final : public HIDDevice {
     /// Nintendo Switch Joycon Right controller.
     SWITCH_JOYCON_RIGHT,
     /// Nintendo Switch Joycon controller pair.
-    SWITCH_JOYCON_PAIR
+    SWITCH_JOYCON_PAIR,
+    /// GameCube controller.
+    GAMECUBE,
+    /// Steam Controller.
+    STEAM,
+    /// Count of HID types.
+    COUNT,
   };
 
   ~GenericHID() override = default;
