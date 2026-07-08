@@ -19,18 +19,18 @@ public final class Executor {
 
     System.out.println("Loading robot class: " + packagePath);
 
-    Class<? extends RobotBase> robotClass = classLoader.loadClass(packagePath).asSubclass(RobotBase.class);
+    Class<? extends RobotBase> robotClass =
+        classLoader.loadClass(packagePath).asSubclass(RobotBase.class);
 
     System.out.println("Starting robot: " + robotClass.getName());
 
-    ConstructorMatch.findBestConstructor(robotClass).get();
-
-    RobotBase.startRobot(() -> {
-      try {
-        return ConstructorMatch.findBestConstructor(robotClass).get().newInstance();
-      } catch (ReflectiveOperationException e) {
-        throw new RuntimeException("Failed to construct robot", e);
-      }
-    });
+    RobotBase.startRobot(
+      () -> {
+        try {
+          return ConstructorMatch.findBestConstructor(robotClass).get().newInstance();
+        } catch (ReflectiveOperationException e) {
+          throw new RuntimeException("Failed to construct robot", e.getCause());
+        }
+      });
   }
 }
