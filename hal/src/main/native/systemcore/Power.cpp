@@ -7,9 +7,9 @@
 #include "HALInitializer.hpp"
 #include "SystemServerInternal.hpp"
 #include "mrc/NtNetComm.h"
+#include "mrclib/Systemcore.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/nt/DoubleTopic.hpp"
-#include "mrclib/Systemcore.h"
 
 using namespace wpi::hal;
 
@@ -22,8 +22,7 @@ static void initializePower(int32_t* status) {
 }  // namespace wpi::hal
 
 namespace wpi::hal::init {
-void InitializePower() {
-}
+void InitializePower() {}
 }  // namespace wpi::hal::init
 
 extern "C" {
