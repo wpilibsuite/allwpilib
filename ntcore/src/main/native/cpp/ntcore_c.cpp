@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <cassert>
+#include <cstddef>
 #include <cstdlib>
 #include <cstring>
 #include <string_view>
@@ -116,6 +117,9 @@ static void DisposeEvent(NT_Event* event) {
 
 static PubSubOptions ConvertToCpp(const NT_PubSubOptions* in) {
   PubSubOptions out;
+  if (!in) {
+    return out;
+  }
   out.pollStorage = in->pollStorage;
   out.periodic = in->periodic;
   out.excludePublisher = in->excludePublisher;
@@ -127,6 +131,10 @@ static PubSubOptions ConvertToCpp(const NT_PubSubOptions* in) {
   out.disableLocal = in->disableLocal;
   out.excludeSelf = in->excludeSelf;
   out.hidden = in->hidden;
+  if (in->structSize >=
+      offsetof(NT_PubSubOptions, disableSignal) + sizeof(in->disableSignal)) {
+    out.disableSignal = in->disableSignal;
+  }
   return out;
 }
 
@@ -272,6 +280,14 @@ NT_Topic NT_GetTopic(NT_Inst inst, const struct WPI_String* name) {
 
 void NT_GetTopicName(NT_Topic topic, struct WPI_String* name) {
   wpi::nt::ConvertToC(wpi::nt::GetTopicName(topic), name);
+}
+
+void* NT_GetTopicUserData(NT_Topic topic) {
+  return wpi::nt::GetTopicUserData(topic);
+}
+
+void NT_SetTopicUserData(NT_Topic topic, void* userData) {
+  wpi::nt::SetTopicUserData(topic, userData);
 }
 
 NT_Type NT_GetTopicType(NT_Topic topic) {

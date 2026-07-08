@@ -1,3 +1,9 @@
+#pragma once
+
+#include <string>
+#include <utility>
+
+// clang-format off
 cls_NetworkTable
     .def("getValue", [](const NetworkTable &self, std::string_view key, py::object defaultValue) -> py::object {
         wpi::nt::NetworkTableEntry entry;
@@ -54,3 +60,4 @@ cls_NetworkTable
         return self.ContainsKey(key);
     }, release_gil())
 ;
+// clang-format on

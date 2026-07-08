@@ -12,7 +12,6 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Pose3d.hpp"
-#include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/MathExtras.hpp"
 

@@ -14,11 +14,16 @@
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
+#include "wpi/simulation/RoboRioSim.hpp"
 #include "wpi/units/current.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 
 TEST(DifferentialDrivetrainSimTest, Convergence) {
+  using State = wpi::sim::DifferentialDrivetrainSim::State;
+
+  wpi::sim::RoboRioSim::ResetData();
+
   auto motor = wpi::math::DCMotor::NEO(2);
   auto plant = wpi::math::Models::DifferentialDriveFromPhysicalConstants(
       motor, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
@@ -43,17 +48,18 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
   auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       wpi::math::Pose2d{}, {}, wpi::math::Pose2d{2_m, 2_m, 0_rad}, config);
 
-  for (auto t = 0_s; t < trajectory.TotalTime(); t += 20_ms) {
-    auto state = trajectory.Sample(t);
+  for (auto t = 0_s; t < trajectory.Duration(); t += 20_ms) {
+    auto state = trajectory.SampleAt(t);
     auto feedbackOut = feedback.Calculate(sim.GetPose(), state);
 
     auto [l, r] = kinematics.ToWheelVelocities(feedbackOut);
     auto voltages =
         feedforward.Calculate(wpi::math::Vectord<2>{l.value(), r.value()});
+    auto clampedVoltages = sim.ClampInput(voltages);
 
     // Sim periodic code.
-    sim.SetInputs(wpi::units::volt_t{voltages(0, 0)},
-                  wpi::units::volt_t{voltages(1, 0)});
+    sim.SetInputs(wpi::units::volt_t{clampedVoltages(0, 0)},
+                  wpi::units::volt_t{clampedVoltages(1, 0)});
     sim.Update(20_ms);
 
     // Update ground truth.
@@ -61,14 +67,14 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
         [&sim](const auto& x, const auto& u) -> wpi::math::Vectord<7> {
           return sim.Dynamics(x, u);
         },
-        groundTruthX, voltages, 20_ms);
+        groundTruthX, clampedVoltages, 20_ms);
   }
 
   // 2 inch tolerance is OK since our ground truth is an approximation of the
   // ODE solution using wpi::math::RKDP anyway
-  EXPECT_NEAR(groundTruthX(0, 0), sim.GetPose().X().value(), 0.05);
-  EXPECT_NEAR(groundTruthX(1, 0), sim.GetPose().Y().value(), 0.05);
-  EXPECT_NEAR(groundTruthX(2, 0), sim.GetHeading().Radians().value(), 0.01);
+  EXPECT_NEAR(groundTruthX(0, 0), sim.GetState(State::X), 0.05);
+  EXPECT_NEAR(groundTruthX(1, 0), sim.GetState(State::Y), 0.05);
+  EXPECT_NEAR(groundTruthX(2, 0), sim.GetState(State::HEADING), 0.01);
 }
 
 TEST(DifferentialDrivetrainSimTest, Current) {

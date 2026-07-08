@@ -28,6 +28,7 @@
 #include "wpi/util/Compiler.hpp"
 #include "wpi/util/MemAlloc.hpp"
 #include <type_traits>
+#include <utility>
 
 namespace wpi::util {
 
@@ -111,7 +112,7 @@ template <typename Alloc> class AllocatorHolder : Alloc {
 public:
   AllocatorHolder() = default;
   AllocatorHolder(const Alloc &A) : Alloc(A) {}
-  AllocatorHolder(Alloc &&A) : Alloc(static_cast<Alloc &&>(A)) {}
+  AllocatorHolder(Alloc &&A) : Alloc(std::move(A)) {}
   Alloc &getAllocator() { return *this; }
   const Alloc &getAllocator() const { return *this; }
 };

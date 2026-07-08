@@ -237,11 +237,11 @@ public class TrapezoidProfile {
   }
 
   /**
-   * Returns the total time the profile takes to reach the goal.
+   * Returns the duration of the profile.
    *
-   * @return The total time the profile takes to reach the goal, or zero if no goal was set.
+   * @return The duration of the profile, or zero if no goal was set.
    */
-  public double totalTime() {
+  public double duration() {
     return m_profile.t_1 + m_profile.t_2 + m_profile.t_3;
   }
 
@@ -255,7 +255,7 @@ public class TrapezoidProfile {
    * @return True if the profile has reached the goal.
    */
   public boolean isFinished(double t) {
-    return t >= totalTime();
+    return t >= duration();
   }
 
   /**

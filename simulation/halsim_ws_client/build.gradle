@@ -1,4 +1,4 @@
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsystemcore')) {
+if (project.hasProperty('onlylinuxsystemcore')) {
     return;
 }
 
@@ -8,15 +8,6 @@ ext {
     includeWpiutil = true
     pluginName = 'halsim_ws_client'
 }
-
-apply plugin: 'google-test-test-suite'
-
-ext {
-    staticGtestConfigs = [:]
-}
-
-staticGtestConfigs["${pluginName}Test"] = []
-apply from: "${rootDir}/shared/googletest.gradle"
 
 apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
 

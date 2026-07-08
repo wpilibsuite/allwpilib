@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <fmt/format.h>
-
 #include "wpi/math/linalg/struct/StructProto.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/util/ct_string.hpp"

@@ -4,48 +4,47 @@
 
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
 #include <cstdio>
+#include <print>
 #include <system_error>
 #include <utility>
-
-#include <fmt/base.h>
 #endif
 
 namespace slp {
 
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
 
-/// Wrapper around fmt::print() that squelches write failure exceptions.
+/// Wrapper around std::print() that squelches write failure exceptions.
 template <typename... T>
-void print(fmt::format_string<T...> fmt, T&&... args) {
+void print(std::format_string<T...> fmt, T&&... args) {
   try {
-    fmt::print(fmt, std::forward<T>(args)...);
+    std::print(fmt, std::forward<T>(args)...);
   } catch (const std::system_error&) {
   }
 }
 
-/// Wrapper around fmt::print() that squelches write failure exceptions.
+/// Wrapper around std::print() that squelches write failure exceptions.
 template <typename... T>
-void print(std::FILE* f, fmt::format_string<T...> fmt, T&&... args) {
+void print(std::FILE* f, std::format_string<T...> fmt, T&&... args) {
   try {
-    fmt::print(f, fmt, std::forward<T>(args)...);
+    std::print(f, fmt, std::forward<T>(args)...);
   } catch (const std::system_error&) {
   }
 }
 
-/// Wrapper around fmt::println() that squelches write failure exceptions.
+/// Wrapper around std::println() that squelches write failure exceptions.
 template <typename... T>
-void println(fmt::format_string<T...> fmt, T&&... args) {
+void println(std::format_string<T...> fmt, T&&... args) {
   try {
-    fmt::println(fmt, std::forward<T>(args)...);
+    std::println(fmt, std::forward<T>(args)...);
   } catch (const std::system_error&) {
   }
 }
 
-/// Wrapper around fmt::println() that squelches write failure exceptions.
+/// Wrapper around std::println() that squelches write failure exceptions.
 template <typename... T>
-void println(std::FILE* f, fmt::format_string<T...> fmt, T&&... args) {
+void println(std::FILE* f, std::format_string<T...> fmt, T&&... args) {
   try {
-    fmt::println(f, fmt, std::forward<T>(args)...);
+    std::println(f, fmt, std::forward<T>(args)...);
   } catch (const std::system_error&) {
   }
 }

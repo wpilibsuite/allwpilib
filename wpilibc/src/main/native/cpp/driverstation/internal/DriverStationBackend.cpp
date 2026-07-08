@@ -18,6 +18,7 @@
 #include <fmt/format.h>
 
 #include "wpi/datalog/DataLog.hpp"
+#include "wpi/driverstation/GenericHID.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HAL.h"
@@ -45,6 +46,10 @@ using namespace wpi::internal;
 
 static constexpr int availableToCount(uint64_t available) {
   return 64 - std::countl_zero(available);
+}
+
+GenericHID DriverStationBackend::ConstructGenericHID(int port) {
+  return GenericHID{port};
 }
 
 namespace {
@@ -75,7 +80,7 @@ class MatchDataSenderEntry {
   typename Topic::ValueType prevVal;
 };
 
-static constexpr std::string_view kSmartDashboardType = "FMSInfo";
+static constexpr std::string_view kSmartDashboardType = "DriverStation";
 
 struct MatchDataSender {
   MatchDataSender()
@@ -87,7 +92,7 @@ struct MatchDataSender {
   }
 
   std::shared_ptr<wpi::nt::NetworkTable> table =
-      wpi::nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo");
+      wpi::nt::NetworkTableInstance::GetDefault().GetTable("DriverStation");
   MatchDataSenderEntry<wpi::nt::StringTopic> typeMetaData{
       table, ".type", kSmartDashboardType,
       wpi::util::json::object("SmartDashboard", kSmartDashboardType)};
@@ -102,6 +107,8 @@ struct MatchDataSender {
                                                        true};
   MatchDataSenderEntry<wpi::nt::IntegerTopic> station{table, "StationNumber",
                                                       1};
+  MatchDataSenderEntry<wpi::nt::IntegerTopic> allianceStation{
+      table, "AllianceStationID", 0};
   wpi::nt::StructPublisher<wpi::hal::ControlWord> controlWord;
   wpi::nt::StringPublisher opMode;
   wpi::hal::ControlWord prevControlWord;
@@ -926,9 +933,13 @@ void SendMatchData() {
       isRedAlliance = true;
       stationNumber = 2;
       break;
-    default:
+    case HAL_ALLIANCE_STATION_RED_3:
       isRedAlliance = true;
       stationNumber = 3;
+      break;
+    default:
+      isRedAlliance = true;
+      stationNumber = 0;
       break;
   }
 
@@ -939,14 +950,15 @@ void SendMatchData() {
   HAL_GetGameData(&tmpGameData);
 
   auto& inst = GetInstance();
-  inst.matchDataSender.alliance.Set(isRedAlliance);
-  inst.matchDataSender.station.Set(stationNumber);
   inst.matchDataSender.eventName.Set(tmpDataStore.eventName);
   inst.matchDataSender.gameData.Set(
       std::string(reinterpret_cast<char*>(tmpGameData.gameData)));
   inst.matchDataSender.matchNumber.Set(tmpDataStore.matchNumber);
   inst.matchDataSender.replayNumber.Set(tmpDataStore.replayNumber);
   inst.matchDataSender.matchType.Set(static_cast<int>(tmpDataStore.matchType));
+  inst.matchDataSender.alliance.Set(isRedAlliance);
+  inst.matchDataSender.station.Set(stationNumber);
+  inst.matchDataSender.allianceStation.Set(alliance);
 
   hal::ControlWord ctlWord = hal::GetControlWord();
   if (ctlWord != inst.matchDataSender.prevControlWord) {

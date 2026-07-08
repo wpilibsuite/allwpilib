@@ -42,7 +42,7 @@ classes:
             x_type: typename TrapezoidProfile<Distance>::State
       Calculate:
       TimeLeftUntil:
-      TotalTime:
+      Duration:
       IsFinished:
     template_inline_code: |
       {

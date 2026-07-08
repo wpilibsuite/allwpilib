@@ -7,7 +7,8 @@
 #include <stdint.h>
 
 #include "wpi/hal/CANAPI.h"
-#include "wpi/hal/Types.hpp"
+#include "wpi/hardware/bus/CANBusMap.hpp"
+#include "wpi/util/Handle.hpp"
 
 namespace wpi {
 
@@ -31,7 +32,7 @@ class CAN {
    * @param busId    The bus id
    * @param deviceId The device id
    */
-  CAN(int busId, int deviceId);
+  CAN(CANBusMap busId, int deviceId);
 
   /**
    * Create a new CAN communication interface with a specific device ID,
@@ -43,7 +44,7 @@ class CAN {
    * @param deviceManufacturer The device manufacturer
    * @param deviceType         The device type
    */
-  CAN(int busId, int deviceId, int deviceManufacturer, int deviceType);
+  CAN(CANBusMap busId, int deviceId, int deviceManufacturer, int deviceType);
 
   CAN(CAN&&) = default;
   CAN& operator=(CAN&&) = default;
@@ -155,6 +156,6 @@ class CAN {
       HAL_CAN_DEV_MISCELLANEOUS;
 
  private:
-  wpi::hal::Handle<HAL_CANHandle, HAL_CleanCAN> m_handle;
+  wpi::util::Handle<HAL_CANHandle, HAL_CleanCAN> m_handle;
 };
 }  // namespace wpi

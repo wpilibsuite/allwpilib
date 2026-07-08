@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/apriltag/AprilTag.hpp"
 #include "wpi/apriltag/AprilTagFieldLayout.hpp"
@@ -13,7 +13,8 @@
 
 using namespace wpi::apriltag;
 
-TEST(AprilTagPoseSetOriginTest, TransformationMatches) {
+TEST_CASE("AprilTagPoseSetOriginTest TransformationMatches",
+          "[apriltag][field-layout][pose]") {
   auto layout = AprilTagFieldLayout{
       std::vector<AprilTag>{
           AprilTag{
@@ -29,8 +30,8 @@ TEST(AprilTagPoseSetOriginTest, TransformationMatches) {
 
   auto mirrorPose = wpi::math::Pose3d{
       54_ft, 27_ft, 0_ft, wpi::math::Rotation3d{0_deg, 0_deg, 180_deg}};
-  EXPECT_EQ(mirrorPose, *layout.GetTagPose(1));
+  CHECK(mirrorPose == *layout.GetTagPose(1));
   mirrorPose = wpi::math::Pose3d{50_ft, 23_ft, 4_ft,
                                  wpi::math::Rotation3d{0_deg, 0_deg, 0_deg}};
-  EXPECT_EQ(mirrorPose, *layout.GetTagPose(2));
+  CHECK(mirrorPose == *layout.GetTagPose(2));
 }

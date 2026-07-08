@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
@@ -70,7 +68,7 @@ class TrapezoidProfile {
      * Default constructor.
      */
     constexpr Constraints() {
-      if (!std::is_constant_evaluated()) {
+      if !consteval {
         wpi::math::MathSharedStore::ReportUsage("TrapezoidProfile", "");
       }
     }
@@ -84,7 +82,7 @@ class TrapezoidProfile {
     constexpr Constraints(Velocity_t maxVelocity,
                           Acceleration_t maxAcceleration)
         : maxVelocity{maxVelocity}, maxAcceleration{maxAcceleration} {
-      if (!std::is_constant_evaluated()) {
+      if !consteval {
         wpi::math::MathSharedStore::ReportUsage("TrapezoidProfile", "");
       }
 
@@ -218,12 +216,11 @@ class TrapezoidProfile {
   }
 
   /**
-   * Returns the total time the profile takes to reach the goal.
+   * Returns the duration of the profile.
    *
-   * @return The total time the profile takes to reach the goal, or zero if no
-   * goal was set.
+   * @return The duration of the profile, or zero if no goal was set.
    */
-  constexpr wpi::units::second_t TotalTime() const {
+  constexpr wpi::units::second_t Duration() const {
     return m_profile.t_1 + m_profile.t_2 + m_profile.t_3;
   }
 
@@ -237,7 +234,7 @@ class TrapezoidProfile {
    * @return True if the profile has reached the goal.
    */
   constexpr bool IsFinished(wpi::units::second_t t) const {
-    return t >= TotalTime();
+    return t >= Duration();
   }
 
  private:

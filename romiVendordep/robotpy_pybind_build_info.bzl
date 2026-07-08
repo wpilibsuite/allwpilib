@@ -37,6 +37,16 @@ def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes
                 ("wpi::romi::RomiMotor", "wpi__romi__RomiMotor.hpp"),
             ],
         ),
+        struct(
+            class_name = "RomiServo",
+            yml_file = "semiwrap/RomiServo.yml",
+            header_root = "$(execpath :robotpy-native-romi.copy_headers)",
+            header_file = "$(execpath :robotpy-native-romi.copy_headers)/wpi/romi/RomiServo.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::romi::RomiServo", "wpi__romi__RomiServo.hpp"),
+            ],
+        ),
     ]
 
     resolve_casters(

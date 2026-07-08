@@ -76,12 +76,12 @@ class TrapezoidProfileTest {
     TrapezoidProfile profile = new TrapezoidProfile(constraints);
     profile.calculate(kDt, state, goal);
 
-    double profileTime = profile.totalTime();
+    double profileTime = profile.duration();
 
     assertNear(profileTime, 9.952380952380953, 1e-10);
     assertEquals(profileTime, profile.timeLeftUntil(state, goal));
     profile.timeLeftUntil(goal, new TrapezoidProfile.State(goal.position, goal.velocity));
-    assertEquals(profileTime, profile.totalTime());
+    assertEquals(profileTime, profile.duration());
   }
 
   @Test

@@ -22,14 +22,15 @@ def copy_upstream_src(wpilib_root: Path):
     )
     os.chdir(upstream_root / "src")
     walk_cwd_and_copy_if(
-        lambda dp, f: f.endswith(".cpp")
-        and "catch2" in dp.parts
-        and f != "catch_main.cpp",
+        lambda dp, f: (
+            f.endswith(".cpp") and "catch2" in dp.parts and f != "catch_main.cpp"
+        ),
         catch2 / "src/main/native/cpp",
     )
     walk_cwd_and_copy_if(
-        lambda dp, f: f.endswith(".hpp")
-        and ("third_party" in dp.parts or "catch2" in dp.parts),
+        lambda dp, f: (
+            f.endswith(".hpp") and ("third_party" in dp.parts or "catch2" in dp.parts)
+        ),
         catch2 / "src/main/native/include",
     )
 
@@ -49,7 +50,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "catch2"
     url = "https://github.com/catchorg/Catch2.git"
-    tag = "v3.14.0"
+    tag = "v3.15.1"
 
     patch_options = {
         "ignore_whitespace": True,

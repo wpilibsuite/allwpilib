@@ -123,7 +123,7 @@ class OCP : public Problem<Scalar> {
     if (timestep_method == TimestepMethod::FIXED) {
       m_DT = VariableMatrix<Scalar>{1, m_num_steps + 1};
       for (int i = 0; i < num_steps + 1; ++i) {
-        m_DT(0, i) = dt.count();
+        m_DT[0, i] = dt.count();
       }
     } else if (timestep_method == TimestepMethod::VARIABLE_SINGLE) {
       Variable single_dt = this->decision_variable();
@@ -132,12 +132,12 @@ class OCP : public Problem<Scalar> {
       // Set the member variable matrix to track the decision variable
       m_DT = VariableMatrix<Scalar>{1, m_num_steps + 1};
       for (int i = 0; i < num_steps + 1; ++i) {
-        m_DT(0, i) = single_dt;
+        m_DT[0, i] = single_dt;
       }
     } else if (timestep_method == TimestepMethod::VARIABLE) {
       m_DT = this->decision_variable(1, m_num_steps + 1);
       for (int i = 0; i < num_steps + 1; ++i) {
-        m_DT(0, i).set_value(dt.count());
+        m_DT[0, i].set_value(dt.count());
       }
     }
 
@@ -206,7 +206,7 @@ class OCP : public Problem<Scalar> {
     for (int i = 0; i < m_num_steps + 1; ++i) {
       auto x = X().col(i);
       auto u = U().col(i);
-      auto dt = this->dt()(0, i);
+      auto dt = this->dt()[0, i];
       callback(time, x, u, dt);
 
       time += dt;
@@ -326,7 +326,7 @@ class OCP : public Problem<Scalar> {
 
     // Derivation at https://mec560sbu.github.io/2016/09/30/direct_collocation/
     for (int i = 0; i < m_num_steps; ++i) {
-      Variable h = dt()(0, i);
+      Variable h = dt()[0, i];
 
       auto& f = m_dynamics;
 
@@ -363,7 +363,7 @@ class OCP : public Problem<Scalar> {
       auto x_begin = X().col(i);
       auto x_end = X().col(i + 1);
       auto u = U().col(i);
-      Variable dt = this->dt()(0, i);
+      Variable dt = this->dt()[0, i];
 
       if (m_dynamics_type == DynamicsType::EXPLICIT_ODE) {
         this->subject_to(
@@ -386,7 +386,7 @@ class OCP : public Problem<Scalar> {
       auto x_begin = X().col(i);
       auto x_end = X().col(i + 1);
       auto u = U().col(i);
-      Variable dt = this->dt()(0, i);
+      Variable dt = this->dt()[0, i];
 
       if (m_dynamics_type == DynamicsType::EXPLICIT_ODE) {
         x_end = rk4<const decltype(m_dynamics)&, VariableMatrix<Scalar>,

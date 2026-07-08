@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "wpi/hal/PowerDistribution.h"
-#include "wpi/hal/Types.hpp"
+#include "wpi/util/Handle.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -346,7 +346,7 @@ class PowerDistribution : public wpi::util::Sendable,
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
-  wpi::hal::Handle<HAL_PowerDistributionHandle, HAL_CleanPowerDistribution>
+  wpi::util::Handle<HAL_PowerDistributionHandle, HAL_CleanPowerDistribution>
       m_handle;
   int m_module;
 };

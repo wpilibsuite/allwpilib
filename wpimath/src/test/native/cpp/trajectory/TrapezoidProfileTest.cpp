@@ -55,12 +55,12 @@ TEST(TrapezoidProfileTest, CheckTiming) {
 
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
   profile.Calculate(kDt, state, goal);
-  auto profileTime = profile.TotalTime();
+  auto profileTime = profile.Duration();
 
   EXPECT_NEAR_UNITS(profileTime, 9.952380952380953_s, 1e-10_s);
   EXPECT_EQ(profileTime, profile.TimeLeftUntil(state, goal));
   profile.TimeLeftUntil(goal, goal);
-  EXPECT_EQ(profileTime, profile.TotalTime());
+  EXPECT_EQ(profileTime, profile.Duration());
 }
 
 TEST(TrapezoidProfileTest, ReachesGoal) {

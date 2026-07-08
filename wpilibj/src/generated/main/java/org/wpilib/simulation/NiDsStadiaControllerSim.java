@@ -17,7 +17,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    */
   @SuppressWarnings("this-escape")
   public NiDsStadiaControllerSim(NiDsStadiaController joystick) {
-    super(joystick);
+    super(joystick.getHID());
     setAxesMaximumIndex(4);
     setButtonsMaximumIndex(15);
     setPOVsMaximumIndex(1);

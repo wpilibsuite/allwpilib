@@ -11,8 +11,8 @@
 
 #include "../MulticastHandleManager.hpp"
 #include "org_wpilib_net_WPINetJNI.h"
-#include "wpi/net/MulticastServiceAnnouncer.h"
-#include "wpi/net/MulticastServiceResolver.h"
+#include "wpi/net/MulticastServiceAnnouncer.hpp"
+#include "wpi/net/MulticastServiceResolver.hpp"
 #include "wpi/net/PortForwarder.hpp"
 #include "wpi/net/WebServer.hpp"
 #include "wpi/util/jni_util.hpp"

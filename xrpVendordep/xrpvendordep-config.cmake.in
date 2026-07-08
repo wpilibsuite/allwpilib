@@ -10,6 +10,3 @@ include(CMakeFindDependencyMacro)
 
 @FILENAME_DEP_REPLACE@
 include(${SELF_DIR}/xrpvendordep.cmake)
-if(@WITH_JAVA@)
-    include(${SELF_DIR}/xrpVendordep_jar.cmake)
-endif()

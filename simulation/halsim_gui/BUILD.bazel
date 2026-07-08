@@ -21,8 +21,7 @@ wpilib_cc_library(
         "wpi-cpp-gui",
     ],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
@@ -50,8 +49,7 @@ wpilib_cc_library(
         "wpi-cpp-gui",
     ],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
@@ -130,7 +128,7 @@ cc_test(
     ],
     deps = [
         ":halsim_gui",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 
@@ -155,6 +153,7 @@ package_default_cc_project(
 PKG_CONFIG_DEPS = [
     "//datalog:native/datalog/robotpy-native-datalog.pc",
     "//datalog:robotpy-wpilog.generated_pkgcfg_files",
+    "//hal:native/wpihal/robotpy-native-mrclib.pc",
     "//hal:native/wpihal/robotpy-native-wpihal.pc",
     "//hal:robotpy-hal.generated_pkgcfg_files",
     "//ntcore:native/ntcore/robotpy-native-ntcore.pc",

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:43:50 -0400
-Subject: [PATCH 09/36] Remove unused functions
+Subject: [PATCH 09/34] Remove unused functions
 
 ---
  llvm/include/llvm/ADT/SmallString.h      |  77 ------
@@ -114,10 +114,10 @@ index 9fab1a7726bc6745296f5ebb24aee4055408e5f5..cb6136d8fd1886e8dc444cb807b33a5f
    // Extra methods.
  
 diff --git a/llvm/include/llvm/Support/Errno.h b/llvm/include/llvm/Support/Errno.h
-index e095c66b90860001d90b5c2eb74f6032de6de454..787805dac6c5e3c8cb85dabeb80254443d60806c 100644
+index 64817257141bbc03098624437731d31ce66f7ce8..409f39a0b2d658bd6cefc75c68cec3ccceda98c9 100644
 --- a/llvm/include/llvm/Support/Errno.h
 +++ b/llvm/include/llvm/Support/Errno.h
-@@ -19,15 +19,6 @@
+@@ -20,15 +20,6 @@
  namespace llvm {
  namespace sys {
  
@@ -125,19 +125,19 @@ index e095c66b90860001d90b5c2eb74f6032de6de454..787805dac6c5e3c8cb85dabeb8025444
 -/// thread-safe variant of strerror() is available.  Be sure to call this
 -/// immediately after the function that set errno, or errno may have been
 -/// overwritten by an intervening call.
--std::string StrError();
+-LLVM_ABI std::string StrError();
 -
 -/// Like the no-argument version above, but uses \p errnum instead of errno.
--std::string StrError(int errnum);
+-LLVM_ABI std::string StrError(int errnum);
 -
  template <typename FailT, typename Fun, typename... Args>
  inline decltype(auto) RetryAfterSignal(const FailT &Fail, const Fun &F,
                                         const Args &... As) {
 diff --git a/llvm/include/llvm/Support/VersionTuple.h b/llvm/include/llvm/Support/VersionTuple.h
-index e1cdce77ce8659305c99a21e01f9b3cc3481a5fd..9102ff063afedc03bd524b2805cba98ea5afeba8 100644
+index 32c3ad9a9fc2c9827dc4afd81c6f9d03ec1b25c2..735f73d0447fb35fc64a0f449b45bab19947bf58 100644
 --- a/llvm/include/llvm/Support/VersionTuple.h
 +++ b/llvm/include/llvm/Support/VersionTuple.h
-@@ -166,45 +166,6 @@ public:
+@@ -165,45 +165,6 @@ public:
    friend bool operator>=(const VersionTuple &X, const VersionTuple &Y) {
      return !(X < Y);
    }
@@ -153,11 +153,11 @@ index e1cdce77ce8659305c99a21e01f9b3cc3481a5fd..9102ff063afedc03bd524b2805cba98e
 -  }
 -
 -  /// Retrieve a string representation of the version number.
--  std::string getAsString() const;
+-  LLVM_ABI std::string getAsString() const;
 -};
 -
 -/// Print a version number.
--raw_ostream &operator<<(raw_ostream &Out, const VersionTuple &V);
+-LLVM_ABI raw_ostream &operator<<(raw_ostream &Out, const VersionTuple &V);
 -
 -// Provide DenseMapInfo for version tuples.
 -template <> struct DenseMapInfo<VersionTuple> {
@@ -184,10 +184,10 @@ index e1cdce77ce8659305c99a21e01f9b3cc3481a5fd..9102ff063afedc03bd524b2805cba98e
  
  } // end namespace llvm
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 96b7a2463e2336a0f61a03ce11cf643bc253f422..fed78518c3b6c44b366d04f45a1d74819e794a3c 100644
+index 856b9f9342f1ca9ee358af2bf4998f506a9d539a..f346d36ca7a36ab2d9bcddc205db0abf50c2a136 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -274,32 +274,6 @@ public:
+@@ -275,32 +275,6 @@ public:
      return write(Str.data(), Str.size());
    }
  
@@ -220,7 +220,7 @@ index 96b7a2463e2336a0f61a03ce11cf643bc253f422..fed78518c3b6c44b366d04f45a1d7481
    /// Output \p Str, turning '\\', '\t', '\n', '"', and anything that doesn't
    /// satisfy llvm::isPrint into an escape sequence.
    raw_ostream &write_escaped(std::string_view Str, bool UseHexEscapes = false);
-@@ -307,21 +281,6 @@ public:
+@@ -308,21 +282,6 @@ public:
    raw_ostream &write(unsigned char C);
    raw_ostream &write(const char *Ptr, size_t Size);
  
@@ -242,7 +242,7 @@ index 96b7a2463e2336a0f61a03ce11cf643bc253f422..fed78518c3b6c44b366d04f45a1d7481
    /// indent - Insert 'NumSpaces' spaces.
    raw_ostream &indent(unsigned NumSpaces);
  
-@@ -336,14 +295,19 @@ public:
+@@ -337,14 +296,19 @@ public:
    /// @param BG if true change the background, default: change foreground
    /// @returns itself so it can be used within << invocations
    virtual raw_ostream &changeColor(enum Colors Color, bool Bold = false,
@@ -265,7 +265,7 @@ index 96b7a2463e2336a0f61a03ce11cf643bc253f422..fed78518c3b6c44b366d04f45a1d7481
  
    /// This function determines if this stream is connected to a "tty" or
    /// "console" window. That is, the output would be displayed to the user
-@@ -414,10 +378,6 @@ private:
+@@ -415,10 +379,6 @@ private:
    /// unused bytes in the buffer.
    void copy_to_buffer(const char *Ptr, size_t Size);
  
@@ -276,7 +276,7 @@ index 96b7a2463e2336a0f61a03ce11cf643bc253f422..fed78518c3b6c44b366d04f45a1d7481
    virtual void anchor();
  };
  
-@@ -466,7 +426,6 @@ class raw_fd_ostream : public raw_pwrite_stream {
+@@ -467,7 +427,6 @@ class LLVM_ABI raw_fd_ostream : public raw_pwrite_stream {
    bool ShouldClose;
    bool SupportsSeeking = false;
    bool IsRegularFile = false;
@@ -284,7 +284,7 @@ index 96b7a2463e2336a0f61a03ce11cf643bc253f422..fed78518c3b6c44b366d04f45a1d7481
  
    /// Optional stream this stream is tied to. If this stream is written to, the
    /// tied-to stream will be flushed first.
-@@ -546,10 +505,6 @@ public:
+@@ -547,10 +506,6 @@ public:
    /// to the offset specified from the beginning of the file.
    uint64_t seek(uint64_t off);
  
@@ -295,7 +295,7 @@ index 96b7a2463e2336a0f61a03ce11cf643bc253f422..fed78518c3b6c44b366d04f45a1d7481
    /// Tie this stream to the specified stream. Replaces any existing tied-to
    /// stream. Specifying a nullptr unties the stream. This is intended for to
    /// tie errs() to outs(), so that outs() is flushed whenever something is
-@@ -575,38 +530,6 @@ public:
+@@ -576,38 +531,6 @@ public:
    ///      - from The Zen of Python, by Tim Peters
    ///
    void clear_error() { EC = std::error_code(); }
@@ -334,11 +334,11 @@ index 96b7a2463e2336a0f61a03ce11cf643bc253f422..fed78518c3b6c44b366d04f45a1d7481
  };
  
  /// This returns a reference to a raw_fd_ostream for standard output. Use it
-@@ -636,19 +559,6 @@ public:
+@@ -637,19 +560,6 @@ public:
    /// immediately destroyed.
-   raw_fd_stream(std::string_view Filename, std::error_code &EC);
+   LLVM_ABI raw_fd_stream(std::string_view Filename, std::error_code &EC);
  
--  raw_fd_stream(int fd, bool shouldClose);
+-  LLVM_ABI raw_fd_stream(int fd, bool shouldClose);
 -
 -  /// This reads the \p Size bytes into a buffer pointed by \p Ptr.
 -  ///
@@ -349,12 +349,12 @@ index 96b7a2463e2336a0f61a03ce11cf643bc253f422..fed78518c3b6c44b366d04f45a1d7481
 -  /// On success, the number of bytes read is returned, and the file position is
 -  /// advanced by this number. On error, -1 is returned, use error() to get the
 -  /// error code.
--  ssize_t read(char *Ptr, size_t Size);
+-  LLVM_ABI ssize_t read(char *Ptr, size_t Size);
 -
    /// Check if \p OS is a pointer of type raw_fd_stream*.
-   static bool classof(const raw_ostream *OS);
+   LLVM_ABI static bool classof(const raw_ostream *OS);
  };
-@@ -773,87 +683,6 @@ public:
+@@ -774,87 +684,6 @@ public:
    ~buffer_unique_ostream() override { *OS << str(); }
  };
  
@@ -424,10 +424,10 @@ index 96b7a2463e2336a0f61a03ce11cf643bc253f422..fed78518c3b6c44b366d04f45a1d7481
 -/// for other names. For raw_fd_ostream instances, the stream writes to
 -/// a temporary file. The final output file is atomically replaced with the
 -/// temporary file after the \p Write function is finished.
--Error writeToOutput(std::string_view OutputFileName,
--                    std::function<Error(raw_ostream &)> Write);
+-LLVM_ABI Error writeToOutput(std::string_view OutputFileName,
+-                             std::function<Error(raw_ostream &)> Write);
 -
--raw_ostream &operator<<(raw_ostream &OS, std::nullopt_t);
+-LLVM_ABI raw_ostream &operator<<(raw_ostream &OS, std::nullopt_t);
 -
 -template <typename T, typename = decltype(std::declval<raw_ostream &>()
 -                                          << std::declval<const T &>())>
@@ -443,7 +443,7 @@ index 96b7a2463e2336a0f61a03ce11cf643bc253f422..fed78518c3b6c44b366d04f45a1d7481
  
  #endif // LLVM_SUPPORT_RAW_OSTREAM_H
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index a75abb7a4abf71e214ea6342352cfbaa5ce3ea27..e06253e8f3a16dc09573cdec74cf54e0e3fcf848 100644
+index 5496df7f6f83debb8b13bb9b828cdbddab91b07b..32f5d5fb78b1a9e4288b875c64ded0040d6fdce6 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -19,7 +19,6 @@
@@ -454,7 +454,7 @@ index a75abb7a4abf71e214ea6342352cfbaa5ce3ea27..e06253e8f3a16dc09573cdec74cf54e0
  #include "llvm/Support/ErrorHandling.h"
  #include "llvm/Support/FileSystem.h"
  #include "llvm/Support/Format.h"
-@@ -126,49 +125,6 @@ void raw_ostream::SetBufferAndMode(char *BufferStart, size_t Size,
+@@ -116,49 +115,6 @@ void raw_ostream::SetBufferAndMode(char *BufferStart, size_t Size,
    assert(OutBufStart <= OutBufEnd && "Invalid size!");
  }
  
@@ -504,7 +504,7 @@ index a75abb7a4abf71e214ea6342352cfbaa5ce3ea27..e06253e8f3a16dc09573cdec74cf54e0
  raw_ostream &raw_ostream::write_escaped(std::string_view Str,
                                          bool UseHexEscapes) {
    for (unsigned char c : Str) {
-@@ -308,173 +264,6 @@ void raw_ostream::copy_to_buffer(const char *Ptr, size_t Size) {
+@@ -298,173 +254,6 @@ void raw_ostream::copy_to_buffer(const char *Ptr, size_t Size) {
    OutBufCur += Size;
  }
  
@@ -678,7 +678,7 @@ index a75abb7a4abf71e214ea6342352cfbaa5ce3ea27..e06253e8f3a16dc09573cdec74cf54e0
  template <char C>
  static raw_ostream &write_padding(raw_ostream &OS, unsigned NumChars) {
    static const char Chars[] = {C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C,
-@@ -505,63 +294,8 @@ raw_ostream &raw_ostream::write_zeros(unsigned NumZeros) {
+@@ -495,63 +284,8 @@ raw_ostream &raw_ostream::write_zeros(unsigned NumZeros) {
    return write_padding<'\0'>(*this, NumZeros);
  }
  
@@ -742,7 +742,7 @@ index a75abb7a4abf71e214ea6342352cfbaa5ce3ea27..e06253e8f3a16dc09573cdec74cf54e0
  //===----------------------------------------------------------------------===//
  //  raw_fd_ostream
  //===----------------------------------------------------------------------===//
-@@ -864,31 +598,6 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
+@@ -859,31 +593,6 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
  #endif
  }
  
@@ -774,7 +774,7 @@ index a75abb7a4abf71e214ea6342352cfbaa5ce3ea27..e06253e8f3a16dc09573cdec74cf54e0
  void raw_fd_ostream::anchor() {}
  
  //===----------------------------------------------------------------------===//
-@@ -939,19 +648,6 @@ raw_fd_stream::raw_fd_stream(std::string_view Filename, std::error_code &EC)
+@@ -937,19 +646,6 @@ raw_fd_stream::raw_fd_stream(std::string_view Filename, std::error_code &EC)
      EC = std::make_error_code(std::errc::invalid_argument);
  }
  
@@ -794,7 +794,7 @@ index a75abb7a4abf71e214ea6342352cfbaa5ce3ea27..e06253e8f3a16dc09573cdec74cf54e0
  bool raw_fd_stream::classof(const raw_ostream *OS) {
    return OS->get_kind() == OStreamKind::OK_FDStream;
  }
-@@ -1011,31 +707,3 @@ void raw_pwrite_stream::anchor() {}
+@@ -1009,31 +705,3 @@ void raw_pwrite_stream::anchor() {}
  void buffer_ostream::anchor() {}
  
  void buffer_unique_ostream::anchor() {}

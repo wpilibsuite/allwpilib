@@ -205,7 +205,7 @@ class WPILIB_DLLEXPORT Rotation3d final {
       return Quaternion{w, x, y, z};
     };
 
-    if (std::is_constant_evaluated()) {
+    if consteval {
       m_q = impl(ct_matrix3d{rotationMatrix});
     } else {
       m_q = impl(rotationMatrix);

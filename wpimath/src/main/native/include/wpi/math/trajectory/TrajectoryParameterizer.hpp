@@ -32,21 +32,21 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/math/trajectory/Trajectory.hpp"
+#include "wpi/math/trajectory/SplineTrajectory.hpp"
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
 /**
- * Class used to parameterize a trajectory by time.
+ * Class used to parameterize a spline trajectory by time.
  */
 class WPILIB_DLLEXPORT TrajectoryParameterizer {
  public:
   using PoseWithCurvature = std::pair<Pose2d, wpi::units::curvature_t>;
 
   /**
-   * Parameterize the trajectory by time. This is where the velocity profile is
-   * generated.
+   * Parameterize the spline trajectory by time. This is where the velocity
+   * profile is generated.
    *
    * The derivation of the algorithm used can be found here:
    * <http://www2.informatik.uni-freiburg.de/~lau/students/Sprunk2008.pdf>
@@ -61,9 +61,9 @@ class WPILIB_DLLEXPORT TrajectoryParameterizer {
    * @param reversed Whether the robot should move backwards. Note that the
    * robot will still move from a -> b -> ... -> z as defined in the waypoints.
    *
-   * @return The trajectory.
+   * @return The spline trajectory.
    */
-  static Trajectory TimeParameterizeTrajectory(
+  static SplineTrajectory TimeParameterizeTrajectory(
       const std::vector<PoseWithCurvature>& points,
       const std::vector<std::unique_ptr<TrajectoryConstraint>>& constraints,
       wpi::units::meters_per_second_t startVelocity,

@@ -4,9 +4,6 @@ from . import _init__wpiutil
 from ._wpiutil import (
     Color,
     Color8Bit,
-    getSystemTime,
-    now,
-    nowDefault,
     PixelFormat,
     Sendable,
     SendableBuilder,
@@ -15,14 +12,14 @@ from ._wpiutil import (
     TimestampSource,
     getStackTrace,
     getStackTraceDefault,
+    getSystemTime,
+    now,
+    nowDefault,
 )
 
 __all__ = [
     "Color",
     "Color8Bit",
-    "getSystemTime",
-    "now",
-    "nowDefault",
     "PixelFormat",
     "Sendable",
     "SendableBuilder",
@@ -31,6 +28,9 @@ __all__ = [
     "TimestampSource",
     "getStackTrace",
     "getStackTraceDefault",
+    "getSystemTime",
+    "now",
+    "nowDefault",
 ]
 
 # Imported for side effects only

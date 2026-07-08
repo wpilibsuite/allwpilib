@@ -127,14 +127,12 @@ def test_accuracy_facing_trajectory():
     max_error = -1e10
     error_sum = 0
 
-    while t < trajectory.totalTime():
-        ground_truth_state = trajectory.sample(t)
+    while t < trajectory.duration():
+        ground_truth_state = trajectory.sampleAt(t)
 
         wheel_velocities = kinematics.toWheelVelocities(
-            ChassisVelocities(
-                ground_truth_state.velocity,
-                0,
-                ground_truth_state.velocity * ground_truth_state.curvature,
+            ground_truth_state.velocity.toRobotRelative(
+                ground_truth_state.pose.rotation()
             )
         )
 
@@ -161,7 +159,7 @@ def test_accuracy_facing_trajectory():
 
         t += dt
 
-    assert error_sum / (trajectory.totalTime() / dt) < 0.35
+    assert error_sum / (trajectory.duration() / dt) < 0.35
     assert max_error < 0.35
 
 
@@ -196,16 +194,10 @@ def test_accuracy_facing_x_axis():
     max_error = -1e10
     error_sum = 0
 
-    while t < trajectory.totalTime():
-        ground_truth_state = trajectory.sample(t)
+    while t < trajectory.duration():
+        ground_truth_state = trajectory.sampleAt(t)
 
-        wheel_velocities = kinematics.toWheelVelocities(
-            ChassisVelocities(
-                ground_truth_state.velocity * ground_truth_state.pose.rotation().cos(),
-                ground_truth_state.velocity * ground_truth_state.pose.rotation().sin(),
-                0,
-            )
-        )
+        wheel_velocities = kinematics.toWheelVelocities(ground_truth_state.velocity)
 
         wheel_velocities.frontLeft += random.gauss(0.0, 1.0) * 0.1
         wheel_velocities.frontRight += random.gauss(0.0, 1.0) * 0.1
@@ -228,5 +220,5 @@ def test_accuracy_facing_x_axis():
 
         t += dt
 
-    assert error_sum / (trajectory.totalTime() / dt) < 0.06
+    assert error_sum / (trajectory.duration() / dt) < 0.06
     assert max_error < 0.125

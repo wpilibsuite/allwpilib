@@ -39,7 +39,6 @@ wpilib_cc_library(
         "//wpiutil:wpiutil-hdrs-pkg",
         "//wpiutil:json-hdrs-pkg",
         "//wpiutil:mpack-hdrs-pkg",
-        "//wpiutil:expected-hdrs-pkg",
         "//wpiutil:debugging-hdrs-pkg",
         "//wpiutil:sigslot-hdrs-pkg",
         "//wpiutil:nanopb-hdrs-pkg",
