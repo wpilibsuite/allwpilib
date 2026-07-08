@@ -10,12 +10,12 @@ import org.wpilib.command2.button.Trigger;
 import org.wpilib.driverstation.RobotState;
 
 /**
- * Command-aware opmode descriptor used by {@link CommandOpModes}. Use the
- * {@code create*OpMode()} methods to create command-aware opmode descriptors.
+ * Command-aware opmode descriptor used by {@link CommandOpModes}. Use the {@code create*OpMode()}
+ * methods to create command-aware opmode descriptors.
  *
  * <p>A {@code OpModeTriggers} exposes triggers for selection and active/enabled state, and can
- * produce an {@link org.wpilib.opmode.OpMode} implementation that runs optional hooks around the default {@link
- * CommandScheduler} execution.
+ * produce an {@link org.wpilib.opmode.OpMode} implementation that runs optional hooks around the
+ * default {@link CommandScheduler} execution.
  */
 public final class OpModeTriggers {
   private final Trigger m_loaded;
