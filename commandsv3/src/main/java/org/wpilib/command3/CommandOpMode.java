@@ -7,11 +7,7 @@ package org.wpilib.command3;
 import org.wpilib.opmode.OpMode;
 
 /**
- * Base opmode implementation that runs the command scheduler.
- *
- * <p>This class provides a minimal {@link OpMode} that executes the default {@link Scheduler}
- * during each periodic cycle. It is used internally by {@link CommandRobot} and {@link
- * CommandOpModes} as the opmode that commands are scheduled and run within.
+ * Base opmode implementation for mixed command-based and periodic opmode projects.
  *
  * <p>Teams typically do not instantiate this class directly; instead, use {@link
  * CommandRobot#createAutoOpMode(String)}, {@link CommandRobot#createTeleopOpMode(String)}, {@link
@@ -26,15 +22,4 @@ import org.wpilib.opmode.OpMode;
 public class CommandOpMode implements OpMode {
   /** Constructs a command opmode. */
   public CommandOpMode() {}
-
-  /**
-   * Runs the default scheduler.
-   *
-   * <p>This method is called periodically by the framework during opmode execution (when the opmode
-   * is loaded and active). The scheduler manages command scheduling and subsystem periodic methods.
-   */
-  @Override
-  public void periodic() {
-    Scheduler.getDefault().run();
-  }
 }
