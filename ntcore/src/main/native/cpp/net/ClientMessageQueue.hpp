@@ -106,14 +106,15 @@ class ClientMessageQueueImpl final : public ClientMessageHandler,
   void ClientSetValue(int pubuid, const Value& value) final {
     std::scoped_lock lock{m_mutex};
     if constexpr (MaxValueSize != 0) {
-      m_valueSize.size += sizeof(ClientMessage) + value.size();
-      if (m_valueSize.size > MaxValueSize) {
+      size_t addedSize = sizeof(ClientMessage) + value.size();
+      if (m_valueSize.size + addedSize > MaxValueSize) {
         if (!m_valueSize.errored) {
           WPI_ERROR(m_logger, "NT: dropping value set due to memory limits");
           m_valueSize.errored = true;
         }
         return;  // avoid potential out of memory
       }
+      m_valueSize.size += addedSize;
     }
     m_queue.enqueue(ClientMessage{ClientValueMsg{pubuid, value}});
   }

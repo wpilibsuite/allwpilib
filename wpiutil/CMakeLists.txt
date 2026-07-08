@@ -4,108 +4,8 @@ include(SubDirList)
 include(GenResources)
 include(CompileWarnings)
 include(AddTest)
-include(DownloadAndCheck)
 
 file(GLOB wpiutil_jni_src src/main/native/cpp/jni/WPIUtilJNI.cpp)
-
-# Java bindings
-if(WITH_JAVA)
-    include(UseJava)
-
-    if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/avaje/avaje-jsonb-3.11.jar")
-        set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
-        set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/avaje")
-
-        message(STATUS "Downloading Avaje jarfiles...")
-
-        download_and_check(
-            "${BASE_URL}io/avaje/avaje-jsonb/3.11/avaje-jsonb-3.11.jar"
-            "${JAR_ROOT}/avaje-jsonb-3.11.jar"
-        )
-        download_and_check(
-            "${BASE_URL}io/avaje/avaje-json-core/3.11/avaje-json-core-3.11.jar"
-            "${JAR_ROOT}/avaje-json-core-3.11.jar"
-        )
-        download_and_check(
-            "${BASE_URL}io/avaje/avaje-jsonb-inject-plugin/3.11/avaje-jsonb-inject-plugin-3.11.jar"
-            "${JAR_ROOT}/avaje-jsonb-inject-plugin-3.11.jar"
-        )
-        download_and_check(
-            "${BASE_URL}io/avaje/avaje-jsonb-generator/3.11/avaje-jsonb-generator-3.11.jar"
-            "${JAR_ROOT}/avaje-jsonb-generator-3.11.jar"
-        )
-        download_and_check(
-            "${BASE_URL}io/avaje/avaje-spi-service/2.16/avaje-spi-service-2.16.jar"
-            "${JAR_ROOT}/avaje-spi-service-2.16.jar"
-        )
-        download_and_check(
-            "${BASE_URL}io/avaje/avaje-spi-core/2.16/avaje-spi-core-2.16.jar"
-            "${JAR_ROOT}/avaje-spi-core-2.16.jar"
-        )
-
-        message(STATUS "All files downloaded.")
-    endif()
-
-    file(GLOB AVAJE_JARS ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/avaje/*.jar)
-
-    if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/quickbuf-runtime-1.4.jar")
-        set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
-        set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf")
-
-        message(STATUS "Downloading Quickbuf jarfile...")
-        download_and_check(
-            "${BASE_URL}us/hebi/quickbuf/quickbuf-runtime/1.4/quickbuf-runtime-1.4.jar"
-            "${JAR_ROOT}/quickbuf-runtime-1.4.jar"
-        )
-
-        message(STATUS "Downloaded.")
-    endif()
-
-    file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
-
-    set(CMAKE_JNI_TARGET true)
-
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
-
-    add_jar(
-        wpiutil_jar
-        ${JAVA_SOURCES}
-        INCLUDE_JARS ${AVAJE_JARS} ${QUICKBUF_JAR}
-        OUTPUT_NAME wpiutil
-        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
-        GENERATE_NATIVE_HEADERS wpiutil_jni_headers
-    )
-    set_property(TARGET wpiutil_jar PROPERTY FOLDER "java")
-
-    install_jar(wpiutil_jar DESTINATION ${java_lib_dest})
-    install_jar_exports(TARGETS wpiutil_jar FILE wpiutil_jar.cmake DESTINATION share/wpiutil)
-
-    add_library(wpiutiljni ${wpiutil_jni_src})
-    wpilib_target_warnings(wpiutiljni)
-    target_link_libraries(wpiutiljni PUBLIC wpiutil)
-
-    set_property(TARGET wpiutiljni PROPERTY FOLDER "libraries")
-
-    target_link_libraries(wpiutiljni PRIVATE wpiutil_jni_headers)
-    add_dependencies(wpiutiljni wpiutil_jar)
-
-    install(TARGETS wpiutiljni EXPORT wpiutiljni)
-    export(TARGETS wpiutiljni FILE wpiutiljni.cmake NAMESPACE wpiutiljni::)
-endif()
-
-if(WITH_JAVA_SOURCE)
-    include(UseJava)
-    include(CreateSourceJar)
-    add_source_jar(
-        wpiutil_src_jar
-        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
-        OUTPUT_NAME wpiutil-sources
-        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
-    )
-    set_property(TARGET wpiutil_src_jar PROPERTY FOLDER "java")
-
-    install_jar(wpiutil_src_jar DESTINATION ${java_lib_dest})
-endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -158,7 +58,7 @@ if(ATOMIC)
     target_link_libraries(wpiutil ${ATOMIC})
 endif()
 
-if(NOT USE_SYSTEM_FMTLIB)
+if(NOT WPILIB_USE_SYSTEM_FMTLIB)
     target_sources(wpiutil PRIVATE ${fmtlib_native_src})
     install(
         DIRECTORY src/main/native/thirdparty/fmtlib/include/
@@ -193,7 +93,6 @@ install(
         src/main/native/thirdparty/argparse/include/
         src/main/native/thirdparty/debugging/include/
         src/main/native/thirdparty/double-conversion/include/
-        src/main/native/thirdparty/expected/include/
         src/main/native/thirdparty/json/include/
         src/main/native/thirdparty/llvm/include/
         src/main/native/thirdparty/mpack/include/
@@ -209,7 +108,6 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/argparse/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/debugging/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/double-conversion/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/expected/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include>
@@ -241,7 +139,7 @@ foreach(example ${wpiutil_examples})
     endif()
 endforeach()
 
-if(WITH_TESTS)
+if(WPILIB_WITH_TESTS)
     file(GLOB_RECURSE wpiutil_testlib_src src/test/native/include/*.h)
     add_library(wpiutil_testlib INTERFACE ${wpiutil_test_src})
     target_include_directories(wpiutil_testlib INTERFACE src/test/native/include)
@@ -265,16 +163,9 @@ if(WITH_TESTS)
     target_sources(wpiutil_test PRIVATE ${wpiutil_nanopb_test_src})
     target_link_libraries(wpiutil_test wpiutil googletest wpiutil_testlib)
 
-    add_executable(wpiutil_catch2_test ${catch2_test_src})
-    set_property(TARGET wpiutil_catch2_test PROPERTY FOLDER "tests")
-    wpilib_target_warnings(wpiutil_catch2_test)
-    if(MSVC)
-        target_compile_options(wpiutil_catch2_test PRIVATE /wd4101 /wd4251)
-    endif()
-    target_link_libraries(wpiutil_catch2_test wpiutil catch2 wpiutil_testlib)
-    catch_discover_tests(wpiutil_catch2_test)
+    wpilib_add_test_catch2(wpiutil_catch2 ${catch2_test_src})
+    target_link_libraries(wpiutil_catch2_test wpiutil wpiutil_testlib)
     if(MSVC)
         target_compile_options(wpiutil_test PRIVATE /utf-8)
-        target_compile_options(wpiutil_catch2_test PRIVATE /utf-8)
     endif()
 endif()

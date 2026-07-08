@@ -5,9 +5,9 @@ import weakref
 
 import pytest
 
+from hal import RobotMode
 import hal
 import hal.simulation
-from hal._wpiHal import _RobotMode as RobotMode
 import ntcore
 import wpilib
 from wpilib.simulation import DriverStationSim, pauseTiming, restartTiming
@@ -16,8 +16,10 @@ import wpilib.simulation
 # TODO: get rid of special-casing.. maybe should register a HAL shutdown hook or something
 try:
     import commands2
+    from commands2.button.commandgenerichid import _resetCommandGenericHIDData
 except ImportError:
     commands2 = None
+    _resetCommandGenericHIDData = None
 
 from .controller import RobotTestController
 
@@ -98,9 +100,14 @@ class RobotTestingPlugin:
 
         if commands2 is not None:
             commands2.CommandScheduler.resetInstance()
+            _resetCommandGenericHIDData()
 
         # Double-check all objects are destroyed so that HAL handles are released
         gc.collect()
+
+        # Reset DriverStation cached HID wrapper objects after user and command
+        # references have had a chance to be released.
+        wpilib.DriverStationBackend.resetCachedHIDData()
 
         # shutdown networktables before other kinds of global cleanup
         # -> some reset functions will re-register listeners, so it's important

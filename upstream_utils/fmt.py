@@ -18,9 +18,9 @@ def copy_upstream_src(wpilib_root: Path):
 
     # Copy fmt source files into allwpilib
     walk_cwd_and_copy_if(
-        lambda dp, f: has_prefix(dp, Path("src"))
-        and f.endswith(".cc")
-        and f != "fmt.cc",
+        lambda dp, f: (
+            has_prefix(dp, Path("src")) and f.endswith(".cc") and f != "fmt.cc"
+        ),
         wpiutil / "src/main/native/thirdparty/fmtlib",
     )
 
@@ -34,7 +34,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "fmt"
     url = "https://github.com/fmtlib/fmt"
-    tag = "12.1.0"
+    tag = "12.2.0"
 
     fmt = Lib(name, url, tag, copy_upstream_src)
     fmt.main()

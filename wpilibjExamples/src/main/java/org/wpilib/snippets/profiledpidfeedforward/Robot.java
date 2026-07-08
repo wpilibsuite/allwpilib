@@ -12,7 +12,7 @@ import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 
 /**
- * ProfiledPIDController with feedforward snippets for frc-docs.
+ * ProfiledPIDController with feedforward snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/controllers/profiled-pidcontroller.html
  */
 public class Robot extends TimedRobot {

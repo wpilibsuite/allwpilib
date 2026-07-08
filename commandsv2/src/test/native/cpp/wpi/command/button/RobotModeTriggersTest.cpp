@@ -6,7 +6,6 @@
 
 #include "../CommandTestBase.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/simulation/DriverStationSim.hpp"
 
@@ -16,7 +15,7 @@ class RobotModeTriggersTest : public CommandTestBase {};
 
 TEST(RobotModeTriggersTest, Autonomous) {
   DriverStationSim::ResetData();
-  DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_AUTONOMOUS);
+  DriverStationSim::SetRobotMode(wpi::hal::RobotMode::AUTONOMOUS);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
   Trigger autonomous = RobotModeTriggers::Autonomous();
@@ -25,7 +24,7 @@ TEST(RobotModeTriggersTest, Autonomous) {
 
 TEST(RobotModeTriggersTest, Teleop) {
   DriverStationSim::ResetData();
-  DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_TELEOPERATED);
+  DriverStationSim::SetRobotMode(wpi::hal::RobotMode::TELEOPERATED);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
   Trigger teleop = RobotModeTriggers::Teleop();
@@ -42,7 +41,7 @@ TEST(RobotModeTriggersTest, Disabled) {
 
 TEST(RobotModeTriggersTest, UtilityMode) {
   DriverStationSim::ResetData();
-  DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_UTILITY);
+  DriverStationSim::SetRobotMode(wpi::hal::RobotMode::UTILITY);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
   Trigger test = RobotModeTriggers::Utility();

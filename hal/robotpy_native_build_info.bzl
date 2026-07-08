@@ -19,7 +19,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         visibility = ["//visibility:public"],
     )
 
-    libinit_files = ["native/wpihal/_init_robotpy_native_wpihal.py"]
+    libinit_files = ["native/wpihal/_init_robotpy_native_mrclib.py", "native/wpihal/_init_robotpy_native_wpihal.py"]
 
     generate_native_files(
         name = name,
@@ -29,12 +29,18 @@ def define_native_wrapper(name, pyproject_toml = None):
             "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
         ],
         libinit_files = libinit_files,
-        pc_files = ["native/wpihal/robotpy-native-wpihal.pc"],
+        pc_files = ["native/wpihal/robotpy-native-mrclib.pc", "native/wpihal/robotpy-native-wpihal.pc"],
     )
 
     copy_native_file(
         name = "wpiHal",
         library = "shared/wpiHal",
+        base_path = "native/wpihal/",
+    )
+
+    copy_native_file(
+        name = "MrcLib",
+        library = "shared/MrcLib",
         base_path = "native/wpihal/",
     )
 
@@ -45,6 +51,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         data = [
             name + ".pc_wrapper",
             ":wpiHal.copy_lib",
+            ":MrcLib.copy_lib",
             "{}.copy_headers".format(name),
         ],
         deps = [
@@ -57,6 +64,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         strip_path_prefixes = ["hal"],
         entry_points = {
             "pkg_config": [
+                "mrclib = native.mrclib",
                 "wpihal = native.wpihal",
             ],
         },

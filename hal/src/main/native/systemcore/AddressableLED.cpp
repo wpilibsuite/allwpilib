@@ -10,8 +10,6 @@
 #include <cstring>
 #include <thread>
 
-#include <fmt/format.h>
-
 #include "AddressableLEDSimd.hpp"
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
@@ -27,18 +25,9 @@
 
 using namespace wpi::hal;
 
-#define IO_PREFIX "/io/"
-
 namespace {
 
-constexpr const char* kLedsKey = IO_PREFIX "leds";
-
 struct AddressableLEDs {
-  explicit AddressableLEDs(wpi::nt::NetworkTableInstance inst)
-      : rawPub{inst.GetRawTopic(kLedsKey).Publish(
-            "raw", {.periodic = 0.005, .sendAll = true})} {}
-
-  wpi::nt::RawPublisher rawPub;
   uint8_t s_buffer[HAL_ADDRESSABLE_LED_MAX_LEN * 3];
 };
 
@@ -77,7 +66,7 @@ void ConvertAndCopyLEDData(void* dst, const struct HAL_AddressableLEDData* src,
 
 namespace wpi::hal::init {
 void InitializeAddressableLED() {
-  static AddressableLEDs leds_static{wpi::hal::GetSystemServer()};
+  static AddressableLEDs leds_static;
   leds = &leds_static;
 }
 }  // namespace wpi::hal::init
@@ -106,7 +95,8 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
   auto [handle, port] = *resource;
   port->channel = channel;
 
-  *status = port->InitializeMode(SmartIoMode::AddressableLED);
+  *status =
+      port->InitializeMode(MRC_SmartIOMode::MRC_SmartIOMode_AddressableLED);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::ADDRESSABLE_LED);
     return HAL_INVALID_HANDLE;
@@ -172,6 +162,6 @@ void HAL_SetAddressableLEDData(int32_t start, int32_t length,
     return;
   }
   ConvertAndCopyLEDData(&leds->s_buffer[start * 3], data, length, colorOrder);
-  leds->rawPub.Set(leds->s_buffer);
+  MRC_SmartIO_SetLedBuffer(leds->s_buffer, sizeof(leds->s_buffer));
 }
 }  // extern "C"

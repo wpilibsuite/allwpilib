@@ -42,7 +42,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
    */
   constexpr explicit DifferentialDriveKinematics(wpi::units::meter_t trackwidth)
       : trackwidth(trackwidth) {
-    if (!std::is_constant_evaluated()) {
+    if !consteval {
       wpi::math::MathSharedStore::ReportUsage("DifferentialDriveKinematics",
                                               "");
     }

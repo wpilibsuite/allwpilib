@@ -122,12 +122,11 @@ def architectures_pkg_zip(
 
 def platform_prefix(t):
     return select({
-        "@rules_bzlmodrio_toolchains//conditions:linux_x86_64": "linux/x86-64/" + t,
-        "@rules_bzlmodrio_toolchains//conditions:osx": "osx/universal/" + t,
-        "@rules_bzlmodrio_toolchains//conditions:windows_arm64": "windows/arm64/" + t,
-        "@rules_bzlmodrio_toolchains//conditions:windows_x86_64": "windows/x86-64/" + t,
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": "linux/roborio/" + t,
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": "linux/systemcore/" + t,
+        "@wpilib_toolchains//conditions:linux_x86_64": "linux/x86-64/" + t,
+        "@wpilib_toolchains//conditions:osx": "osx/universal/" + t,
+        "@wpilib_toolchains//conditions:windows_arm64": "windows/arm64/" + t,
+        "@wpilib_toolchains//conditions:windows_x86_64": "windows/x86-64/" + t,
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": "linux/systemcore/" + t,
     })
 
 def _wpilib_maven_export_impl(

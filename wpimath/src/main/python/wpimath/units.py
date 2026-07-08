@@ -231,6 +231,7 @@ volt_seconds_per_radian = float
 volt_seconds_squared_per_radian = float
 unit_seconds_squared_per_unit = float
 meters_per_second_squared_per_volt = float
+meters_per_second_per_radian = float
 
 # charge
 coulombs = float

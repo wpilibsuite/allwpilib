@@ -11,6 +11,7 @@ ext {
 
     nativeName = 'ntcore'
     devMain = 'org.wpilib.networktables.DevMain'
+    nativeTestSuiteName = "${nativeName}Catch2Test"
     generatedSources = "$projectDir/src/generated/main/native/cpp"
     generatedHeaders = "$projectDir/src/generated/main/native/include"
     jniSplitSetup = {

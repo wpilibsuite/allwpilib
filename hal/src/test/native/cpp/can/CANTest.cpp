@@ -5,13 +5,14 @@
 #include <cstring>
 #include <utility>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/hal/CANAPI.h"
-#include "wpi/hal/CANBusMap.h"
 #include "wpi/hal/simulation/CanData.h"
 
 namespace wpi::hal {
+static constexpr int32_t kCANBusS0 = 0;
+
 struct CANTestStore {
   CANTestStore(int32_t busId, int32_t deviceId, int32_t* status) {
     this->deviceId = deviceId;
@@ -42,11 +43,11 @@ struct CANSendCallbackStore {
   int32_t handle;
 };
 
-TEST(CANTest, CanIdPacking) {
+TEST_CASE("CANTest CanIdPacking", "[hal][can]") {
   int32_t status = 0;
   int32_t deviceId = 12;
-  CANTestStore testStore(HAL_CAN_BUS_S0, deviceId, &status);
-  ASSERT_EQ(0, status);
+  CANTestStore testStore(kCANBusS0, deviceId, &status);
+  REQUIRE(0 == status);
 
   std::pair<int32_t, bool> storePair;
   storePair.second = false;
@@ -71,17 +72,17 @@ TEST(CANTest, CanIdPacking) {
 
   HAL_WriteCANPacket(testStore.handle, apiId, &message, &status);
 
-  ASSERT_EQ(0, status);
+  REQUIRE(0 == status);
 
-  ASSERT_TRUE(storePair.second);
+  REQUIRE(storePair.second);
 
-  ASSERT_NE(0, storePair.first);
+  REQUIRE(0 != storePair.first);
 
-  ASSERT_EQ(deviceId, storePair.first & 0x3F);
-  ASSERT_EQ(apiId, (storePair.first & 0x0000FFC0) >> 6);
-  ASSERT_EQ(static_cast<int32_t>(HAL_CANManufacturer::HAL_CAN_MAN_TEAM_USE),
-            (storePair.first & 0x00FF0000) >> 16);
-  ASSERT_EQ(static_cast<int32_t>(HAL_CANDeviceType::HAL_CAN_DEV_MISCELLANEOUS),
-            (storePair.first & 0x1F000000) >> 24);
+  REQUIRE(deviceId == (storePair.first & 0x3F));
+  REQUIRE(apiId == ((storePair.first & 0x0000FFC0) >> 6));
+  REQUIRE(static_cast<int32_t>(HAL_CANManufacturer::HAL_CAN_MAN_TEAM_USE) ==
+          (storePair.first & 0x00FF0000) >> 16);
+  REQUIRE(static_cast<int32_t>(HAL_CANDeviceType::HAL_CAN_DEV_MISCELLANEOUS) ==
+          (storePair.first & 0x1F000000) >> 24);
 }
 }  // namespace wpi::hal

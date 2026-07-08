@@ -1,9 +1,15 @@
 extra_includes:
 - wpi/datalog/DataLog.hpp
+- wpi/driverstation/Gamepad.hpp
+- wpi/driverstation/GenericHID.hpp
 
 classes:
   wpi::DriverStation:
     methods:
+      GetGenericHID:
+        return_value_policy: reference_internal
+      GetGamepad:
+        return_value_policy: reference_internal
       ProvideRefreshedDataEventHandle:
       RemoveRefreshedDataEventHandle:
       StartDataLog:

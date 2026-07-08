@@ -4,10 +4,16 @@
 
 package org.wpilib.driverstation;
 
+import java.util.EnumSet;
+import java.util.Objects;
+import org.wpilib.driverstation.GenericHID.HIDType;
+import org.wpilib.driverstation.GenericHID.RumbleType;
+import org.wpilib.driverstation.GenericHID.SupportedOutput;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 
@@ -17,22 +23,20 @@ import org.wpilib.util.sendable.SendableBuilder;
  * <p>This class handles Gamepad input that comes from the Driver Station. Each time a value is
  * requested the most recent value is returned. There is a single class instance for each controller
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
- *
- * <p>Only first party controllers from Generic are guaranteed to have the correct mapping, and only
- * through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any 3rd
- * party controllers.
  */
-public class Gamepad extends GenericHID implements Sendable {
+public class Gamepad implements HIDDevice, Sendable {
+  private static final double MAX_DEADBAND = Math.nextDown(1.0);
+
   /** Represents a digital button on a Gamepad. */
   public enum Button {
-    /** South Face button. */
-    SOUTH_FACE(0, "SouthFaceButton"),
-    /** East Face button. */
-    EAST_FACE(1, "EastFaceButton"),
-    /** West Face button. */
-    WEST_FACE(2, "WestFaceButton"),
-    /** North Face button. */
-    NORTH_FACE(3, "NorthFaceButton"),
+    /** Face Down button. */
+    FACE_DOWN(0, "FaceDownButton"),
+    /** Face Right button. */
+    FACE_RIGHT(1, "FaceRightButton"),
+    /** Face Left button. */
+    FACE_LEFT(2, "FaceLeftButton"),
+    /** Face Up button. */
+    FACE_UP(3, "FaceUpButton"),
     /** Back button. */
     BACK(4, "BackButton"),
     /** Guide button. */
@@ -139,60 +143,171 @@ public class Gamepad extends GenericHID implements Sendable {
     }
   }
 
+  private double m_leftXDeadband = 0.1;
+  private double m_leftYDeadband = 0.1;
+  private double m_rightXDeadband = 0.1;
+  private double m_rightYDeadband = 0.1;
+  private double m_leftTriggerDeadband = 0.01;
+  private double m_rightTriggerDeadband = 0.01;
+
+  private static double clampDeadband(double deadband) {
+    if (Double.isNaN(deadband)) {
+      return 0.0;
+    }
+    return Math.clamp(deadband, 0.0, MAX_DEADBAND);
+  }
+
+  private final GenericHID m_hid;
+
   /**
-   * Construct an instance of a controller.
+   * Get the underlying GenericHID object.
    *
-   * @param port The port index on the Driver Station that the controller is plugged into (0-5).
+   * @return the wrapped GenericHID object
+   */
+  @Override
+  public GenericHID getHID() {
+    return m_hid;
+  }
+
+  /**
+   * Construct an instance of a gamepad.
+   *
+   * @param port The port index on the Driver Station that the gamepad is plugged into (0-5).
    */
   public Gamepad(final int port) {
-    super(port);
-    HAL.reportUsage("HID", port, "Gamepad");
+    this(DriverStation.getGenericHID(port));
+  }
+
+  /**
+   * Construct an instance of a gamepad with a GenericHID object.
+   *
+   * @param hid The GenericHID object to use for this gamepad.
+   */
+  public Gamepad(final GenericHID hid) {
+    m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
+    HAL.reportUsage("HID", hid.getPort(), "Gamepad");
+  }
+
+  /**
+   * Set the deadband for the left X axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setLeftXDeadband(double deadband) {
+    m_leftXDeadband = clampDeadband(deadband);
+  }
+
+  /**
+   * Set the deadband for the left Y axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setLeftYDeadband(double deadband) {
+    m_leftYDeadband = clampDeadband(deadband);
+  }
+
+  /**
+   * Set the deadband for the right X axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setRightXDeadband(double deadband) {
+    m_rightXDeadband = clampDeadband(deadband);
+  }
+
+  /**
+   * Set the deadband for the right Y axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setRightYDeadband(double deadband) {
+    m_rightYDeadband = clampDeadband(deadband);
+  }
+
+  /**
+   * Set the deadband for the left trigger axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setLeftTriggerDeadband(double deadband) {
+    m_leftTriggerDeadband = clampDeadband(deadband);
+  }
+
+  /**
+   * Set the deadband for the right trigger axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setRightTriggerDeadband(double deadband) {
+    m_rightTriggerDeadband = clampDeadband(deadband);
   }
 
   /**
    * Get the X axis value of left side of the controller. Right is positive.
    *
+   * <p>A deadband of 0.1 is applied by default. Use {@link #setLeftXDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getLeftX() {
-    return getAxis(Axis.LEFT_X);
+    return MathUtil.applyDeadband(getAxis(Axis.LEFT_X), m_leftXDeadband);
   }
 
   /**
    * Get the Y axis value of left side of the controller. Back is positive.
    *
+   * <p>A deadband of 0.1 is applied by default. Use {@link #setLeftYDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getLeftY() {
-    return getAxis(Axis.LEFT_Y);
+    return MathUtil.applyDeadband(getAxis(Axis.LEFT_Y), m_leftYDeadband);
   }
 
   /**
    * Get the X axis value of right side of the controller. Right is positive.
    *
+   * <p>A deadband of 0.1 is applied by default. Use {@link #setRightXDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getRightX() {
-    return getAxis(Axis.RIGHT_X);
+    return MathUtil.applyDeadband(getAxis(Axis.RIGHT_X), m_rightXDeadband);
   }
 
   /**
    * Get the Y axis value of right side of the controller. Back is positive.
    *
-   * @return The axis value.
-   */
-  public double getRightY() {
-    return getAxis(Axis.RIGHT_Y);
-  }
-
-  /**
-   * Get the left trigger axis value of the controller. Note that this axis is bound to the range of
-   * [0, 1] as opposed to the usual [-1, 1].
+   * <p>A deadband of 0.1 is applied by default. Use {@link #setRightYDeadband} to change it.
    *
    * @return The axis value.
    */
-  public double getLeftTriggerAxis() {
-    return getAxis(Axis.LEFT_TRIGGER);
+  public double getRightY() {
+    return MathUtil.applyDeadband(getAxis(Axis.RIGHT_Y), m_rightYDeadband);
+  }
+
+  /**
+   * Get the left trigger value of the controller. Note that this axis is bound to the range of [0,
+   * 1] as opposed to the usual [-1, 1].
+   *
+   * <p>A deadband of 0.01 is applied by default. Use {@link #setLeftTriggerDeadband} to change it.
+   *
+   * @return The axis value.
+   */
+  public double getLeftTrigger() {
+    return MathUtil.applyDeadband(getAxis(Axis.LEFT_TRIGGER), m_leftTriggerDeadband);
   }
 
   /**
@@ -222,13 +337,15 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Get the right trigger axis value of the controller. Note that this axis is bound to the range
-   * of [0, 1] as opposed to the usual [-1, 1].
+   * Get the right trigger value of the controller. Note that this axis is bound to the range of [0,
+   * 1] as opposed to the usual [-1, 1].
+   *
+   * <p>A deadband of 0.01 is applied by default. Use {@link #setRightTriggerDeadband} to change it.
    *
    * @return The axis value.
    */
-  public double getRightTriggerAxis() {
-    return getAxis(Axis.RIGHT_TRIGGER);
+  public double getRightTrigger() {
+    return MathUtil.applyDeadband(getAxis(Axis.RIGHT_TRIGGER), m_rightTriggerDeadband);
   }
 
   /**
@@ -258,30 +375,30 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Read the value of the South Face button on the controller.
+   * Read the value of the Face Down button on the controller.
    *
    * @return The state of the button.
    */
-  public boolean getSouthFaceButton() {
-    return getButton(Button.SOUTH_FACE);
+  public boolean getFaceDownButton() {
+    return getButton(Button.FACE_DOWN);
   }
 
   /**
-   * Whether the South Face button was pressed since the last check.
+   * Whether the Face Down button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getSouthFaceButtonPressed() {
-    return getButtonPressed(Button.SOUTH_FACE);
+  public boolean getFaceDownButtonPressed() {
+    return getButtonPressed(Button.FACE_DOWN);
   }
 
   /**
-   * Whether the South Face button was released since the last check.
+   * Whether the Face Down button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getSouthFaceButtonReleased() {
-    return getButtonReleased(Button.SOUTH_FACE);
+  public boolean getFaceDownButtonReleased() {
+    return getButtonReleased(Button.FACE_DOWN);
   }
 
   /**
@@ -292,34 +409,34 @@ public class Gamepad extends GenericHID implements Sendable {
    *     given loop.
    */
   public BooleanEvent faceDown(EventLoop loop) {
-    return button(Button.SOUTH_FACE, loop);
+    return button(Button.FACE_DOWN, loop);
   }
 
   /**
-   * Read the value of the East Face button on the controller.
+   * Read the value of the Face Right button on the controller.
    *
    * @return The state of the button.
    */
-  public boolean getEastFaceButton() {
-    return getButton(Button.EAST_FACE);
+  public boolean getFaceRightButton() {
+    return getButton(Button.FACE_RIGHT);
   }
 
   /**
-   * Whether the East Face button was pressed since the last check.
+   * Whether the Face Right button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getEastFaceButtonPressed() {
-    return getButtonPressed(Button.EAST_FACE);
+  public boolean getFaceRightButtonPressed() {
+    return getButtonPressed(Button.FACE_RIGHT);
   }
 
   /**
-   * Whether the East Face button was released since the last check.
+   * Whether the Face Right button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getEastFaceButtonReleased() {
-    return getButtonReleased(Button.EAST_FACE);
+  public boolean getFaceRightButtonReleased() {
+    return getButtonReleased(Button.FACE_RIGHT);
   }
 
   /**
@@ -330,34 +447,34 @@ public class Gamepad extends GenericHID implements Sendable {
    *     given loop.
    */
   public BooleanEvent faceRight(EventLoop loop) {
-    return button(Button.EAST_FACE, loop);
+    return button(Button.FACE_RIGHT, loop);
   }
 
   /**
-   * Read the value of the West Face button on the controller.
+   * Read the value of the Face Left button on the controller.
    *
    * @return The state of the button.
    */
-  public boolean getWestFaceButton() {
-    return getButton(Button.WEST_FACE);
+  public boolean getFaceLeftButton() {
+    return getButton(Button.FACE_LEFT);
   }
 
   /**
-   * Whether the West Face button was pressed since the last check.
+   * Whether the Face Left button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getWestFaceButtonPressed() {
-    return getButtonPressed(Button.WEST_FACE);
+  public boolean getFaceLeftButtonPressed() {
+    return getButtonPressed(Button.FACE_LEFT);
   }
 
   /**
-   * Whether the West Face button was released since the last check.
+   * Whether the Face Left button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getWestFaceButtonReleased() {
-    return getButtonReleased(Button.WEST_FACE);
+  public boolean getFaceLeftButtonReleased() {
+    return getButtonReleased(Button.FACE_LEFT);
   }
 
   /**
@@ -368,34 +485,34 @@ public class Gamepad extends GenericHID implements Sendable {
    *     given loop.
    */
   public BooleanEvent faceLeft(EventLoop loop) {
-    return button(Button.WEST_FACE, loop);
+    return button(Button.FACE_LEFT, loop);
   }
 
   /**
-   * Read the value of the North Face button on the controller.
+   * Read the value of the Face Up button on the controller.
    *
    * @return The state of the button.
    */
-  public boolean getNorthFaceButton() {
-    return getButton(Button.NORTH_FACE);
+  public boolean getFaceUpButton() {
+    return getButton(Button.FACE_UP);
   }
 
   /**
-   * Whether the North Face button was pressed since the last check.
+   * Whether the Face Up button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getNorthFaceButtonPressed() {
-    return getButtonPressed(Button.NORTH_FACE);
+  public boolean getFaceUpButtonPressed() {
+    return getButtonPressed(Button.FACE_UP);
   }
 
   /**
-   * Whether the North Face button was released since the last check.
+   * Whether the Face Up button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getNorthFaceButtonReleased() {
-    return getButtonReleased(Button.NORTH_FACE);
+  public boolean getFaceUpButtonReleased() {
+    return getButtonReleased(Button.FACE_UP);
   }
 
   /**
@@ -406,7 +523,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     given loop.
    */
   public BooleanEvent faceUp(EventLoop loop) {
-    return button(Button.NORTH_FACE, loop);
+    return button(Button.FACE_UP, loop);
   }
 
   /**
@@ -1255,7 +1372,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getButton(Button button) {
-    return getRawButton(button.value);
+    return m_hid.getRawButton(button.value);
   }
 
   /**
@@ -1269,7 +1386,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getButtonPressed(Button button) {
-    return getRawButtonPressed(button.value);
+    return m_hid.getRawButtonPressed(button.value);
   }
 
   /**
@@ -1283,7 +1400,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getButtonReleased(Button button) {
-    return getRawButtonReleased(button.value);
+    return m_hid.getRawButtonReleased(button.value);
   }
 
   /**
@@ -1294,7 +1411,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return an event instance representing the button's digital signal attached to the given loop.
    */
   public BooleanEvent button(Button button, EventLoop loop) {
-    return super.button(button.value, loop);
+    return m_hid.button(button.value, loop);
   }
 
   /**
@@ -1304,7 +1421,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The value of the axis.
    */
   public double getAxis(Axis axis) {
-    return getRawAxis(axis.value);
+    return m_hid.getRawAxis(axis.value);
   }
 
   /**
@@ -1317,7 +1434,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return an event instance that is true when the axis value is less than the provided threshold.
    */
   public BooleanEvent axisLessThan(Axis axis, double threshold, EventLoop loop) {
-    return super.axisLessThan(axis.value, threshold, loop);
+    return m_hid.axisLessThan(axis.value, threshold, loop);
   }
 
   /**
@@ -1331,33 +1448,131 @@ public class Gamepad extends GenericHID implements Sendable {
    *     threshold.
    */
   public BooleanEvent axisGreaterThan(Axis axis, double threshold, EventLoop loop) {
-    return super.axisGreaterThan(axis.value, threshold, loop);
+    return m_hid.axisGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Get the bitmask of axes for the gamepad.
+   *
+   * @return the number of axis for the current gamepad
+   */
+  public int getAxesAvailable() {
+    return m_hid.getAxesAvailable();
+  }
+
+  /**
+   * For the current gamepad, return the bitmask of available buttons.
+   *
+   * @return the bitmask of buttons for the current gamepad
+   */
+  public long getButtonsAvailable() {
+    return m_hid.getButtonsAvailable();
+  }
+
+  /**
+   * Get if the gamepad is connected.
+   *
+   * @return true if the gamepad is connected
+   */
+  public boolean isConnected() {
+    return m_hid.isConnected();
+  }
+
+  /**
+   * Get the type of the gamepad.
+   *
+   * @return the type of the gamepad.
+   */
+  public HIDType getGamepadType() {
+    return m_hid.getGamepadType();
+  }
+
+  /**
+   * Get the supported outputs for the gamepad.
+   *
+   * @return the supported outputs for the gamepad.
+   */
+  public EnumSet<SupportedOutput> getSupportedOutputs() {
+    return m_hid.getSupportedOutputs();
+  }
+
+  /**
+   * Get the name of the gamepad.
+   *
+   * @return the name of the gamepad.
+   */
+  public String getName() {
+    return m_hid.getName();
+  }
+
+  /**
+   * Set leds on the gamepad. If only mono is supported, the system will use the highest value
+   * passed in.
+   *
+   * @param r Red value from 0-255
+   * @param g Green value from 0-255
+   * @param b Blue value from 0-255
+   */
+  public void setLeds(int r, int g, int b) {
+    m_hid.setLeds(r, g, b);
+  }
+
+  /**
+   * Set the rumble output for the HID. The DS currently supports 4 rumble values: left rumble,
+   * right rumble, left trigger rumble, and right trigger rumble.
+   *
+   * @param type Which rumble value to set
+   * @param value The normalized value (0 to 1) to set the rumble to
+   */
+  public void setRumble(RumbleType type, double value) {
+    m_hid.setRumble(type, value);
+  }
+
+  /**
+   * Check if a touchpad finger is available.
+   *
+   * @param touchpad The touchpad to check.
+   * @param finger The finger to check.
+   * @return true if the touchpad finger is available.
+   */
+  public boolean getTouchpadFingerAvailable(int touchpad, int finger) {
+    return m_hid.getTouchpadFingerAvailable(touchpad, finger);
+  }
+
+  /**
+   * Get the touchpad finger data.
+   *
+   * @param touchpad The touchpad to read.
+   * @param finger The finger to read.
+   * @return The touchpad finger data.
+   */
+  public TouchpadFinger getTouchpadFinger(int touchpad, int finger) {
+    return m_hid.getTouchpadFinger(touchpad, finger);
   }
 
   private double getAxisForSendable(Axis axis) {
-    return DriverStationBackend.getStickAxisIfAvailable(getPort(), axis.value).orElse(0.0);
+    return DriverStationBackend.getStickAxisIfAvailable(m_hid.getPort(), axis.value).orElse(0.0);
   }
 
   private boolean getButtonForSendable(Button button) {
-    return DriverStationBackend.getStickButtonIfAvailable(getPort(), button.value).orElse(false);
+    return DriverStationBackend.getStickButtonIfAvailable(m_hid.getPort(), button.value)
+        .orElse(false);
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("HID");
     builder.publishConstString("ControllerType", "Gamepad");
-    builder.addDoubleProperty(
-        "LeftTrigger Axis", () -> getAxisForSendable(Axis.LEFT_TRIGGER), null);
-    builder.addDoubleProperty(
-        "RightTrigger Axis", () -> getAxisForSendable(Axis.RIGHT_TRIGGER), null);
+    builder.addDoubleProperty("LeftTrigger", () -> getAxisForSendable(Axis.LEFT_TRIGGER), null);
+    builder.addDoubleProperty("RightTrigger", () -> getAxisForSendable(Axis.RIGHT_TRIGGER), null);
     builder.addDoubleProperty("LeftX", () -> getAxisForSendable(Axis.LEFT_X), null);
     builder.addDoubleProperty("LeftY", () -> getAxisForSendable(Axis.LEFT_Y), null);
     builder.addDoubleProperty("RightX", () -> getAxisForSendable(Axis.RIGHT_X), null);
     builder.addDoubleProperty("RightY", () -> getAxisForSendable(Axis.RIGHT_Y), null);
-    builder.addBooleanProperty("SouthFace", () -> getButtonForSendable(Button.SOUTH_FACE), null);
-    builder.addBooleanProperty("EastFace", () -> getButtonForSendable(Button.EAST_FACE), null);
-    builder.addBooleanProperty("WestFace", () -> getButtonForSendable(Button.WEST_FACE), null);
-    builder.addBooleanProperty("NorthFace", () -> getButtonForSendable(Button.NORTH_FACE), null);
+    builder.addBooleanProperty("FaceDown", () -> getButtonForSendable(Button.FACE_DOWN), null);
+    builder.addBooleanProperty("FaceRight", () -> getButtonForSendable(Button.FACE_RIGHT), null);
+    builder.addBooleanProperty("FaceLeft", () -> getButtonForSendable(Button.FACE_LEFT), null);
+    builder.addBooleanProperty("FaceUp", () -> getButtonForSendable(Button.FACE_UP), null);
     builder.addBooleanProperty("Back", () -> getButtonForSendable(Button.BACK), null);
     builder.addBooleanProperty("Guide", () -> getButtonForSendable(Button.GUIDE), null);
     builder.addBooleanProperty("Start", () -> getButtonForSendable(Button.START), null);

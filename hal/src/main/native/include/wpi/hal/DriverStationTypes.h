@@ -164,7 +164,7 @@ struct HAL_JoystickDescriptor {
 typedef struct HAL_JoystickDescriptor HAL_JoystickDescriptor;
 
 struct HAL_MatchInfo {
-  char eventName[64];
+  char eventName[65];
   HAL_MatchType matchType;
   uint16_t matchNumber;
   uint8_t replayNumber;

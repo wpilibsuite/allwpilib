@@ -1,0 +1,312 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Sun, 26 Apr 2026 16:56:01 -0700
+Subject: [PATCH 2/2] Downgrade to Eigen 5.0.1
+
+---
+ include/sleipnir/autodiff/variable.hpp        | 20 ++++++--
+ include/sleipnir/autodiff/variable_block.hpp  | 24 ++++++---
+ include/sleipnir/autodiff/variable_matrix.hpp | 50 ++++++++++++-------
+ 3 files changed, 66 insertions(+), 28 deletions(-)
+
+diff --git a/include/sleipnir/autodiff/variable.hpp b/include/sleipnir/autodiff/variable.hpp
+index ad8baa3b58047f5257c210b88446324cca121d4a..6c692cbe113a3aaf7f02727260ed0b6d1f4a3c23 100644
+--- a/include/sleipnir/autodiff/variable.hpp
++++ b/include/sleipnir/autodiff/variable.hpp
+@@ -733,7 +733,11 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
+   for (int row = 0; row < rhs.rows(); ++row) {
+     for (int col = 0; col < rhs.cols(); ++col) {
+       // Make right-hand side zero
+-      constraints.emplace_back(lhs - rhs[row, col]);
++      if constexpr (EigenMatrixLike<RHS>) {
++        constraints.emplace_back(lhs - rhs(row, col));
++      } else {
++        constraints.emplace_back(lhs - rhs[row, col]);
++      }
+     }
+   }
+ 
+@@ -749,7 +753,11 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
+   for (int row = 0; row < lhs.rows(); ++row) {
+     for (int col = 0; col < lhs.cols(); ++col) {
+       // Make right-hand side zero
+-      constraints.emplace_back(lhs[row, col] - rhs);
++      if constexpr (EigenMatrixLike<LHS>) {
++        constraints.emplace_back(lhs(row, col) - rhs);
++      } else {
++        constraints.emplace_back(lhs[row, col] - rhs);
++      }
+     }
+   }
+ 
+@@ -767,7 +775,13 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
+   for (int row = 0; row < lhs.rows(); ++row) {
+     for (int col = 0; col < lhs.cols(); ++col) {
+       // Make right-hand side zero
+-      constraints.emplace_back(lhs[row, col] - rhs[row, col]);
++      if constexpr (!EigenMatrixLike<LHS> && !EigenMatrixLike<RHS>) {
++        constraints.emplace_back(lhs[row, col] - rhs[row, col]);
++      } else if constexpr (!EigenMatrixLike<LHS> && EigenMatrixLike<RHS>) {
++        constraints.emplace_back(lhs[row, col] - rhs(row, col));
++      } else if constexpr (EigenMatrixLike<LHS> && !EigenMatrixLike<RHS>) {
++        constraints.emplace_back(lhs(row, col) - rhs[row, col]);
++      }
+     }
+   }
+ 
+diff --git a/include/sleipnir/autodiff/variable_block.hpp b/include/sleipnir/autodiff/variable_block.hpp
+index 272e036e7ca6372e9255b24e674e55cd60f8b75c..e744b11070d844514b0d6d1c5fe29c905512c3fc 100644
+--- a/include/sleipnir/autodiff/variable_block.hpp
++++ b/include/sleipnir/autodiff/variable_block.hpp
+@@ -161,7 +161,7 @@ class VariableBlock : public SleipnirBase {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] = values[row, col];
++        (*this)[row, col] = values(row, col);
+       }
+     }
+ 
+@@ -178,7 +178,7 @@ class VariableBlock : public SleipnirBase {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col].set_value(values[row, col]);
++        (*this)[row, col].set_value(values(row, col));
+       }
+     }
+   }
+@@ -438,7 +438,11 @@ class VariableBlock : public SleipnirBase {
+       for (int j = 0; j < rhs.cols(); ++j) {
+         Variable sum{Scalar(0)};
+         for (int k = 0; k < cols(); ++k) {
+-          sum += lhs_old_row[k] * rhs[k, j];
++          if constexpr (EigenMatrixLike<decltype(rhs)>) {
++            sum += lhs_old_row[k] * rhs(k, j);
++          } else {
++            sum += lhs_old_row[k] * rhs[k, j];
++          }
+         }
+         (*this)[i, j] = sum;
+       }
+@@ -484,7 +488,11 @@ class VariableBlock : public SleipnirBase {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] += rhs[row, col];
++        if constexpr (EigenMatrixLike<decltype(rhs)>) {
++          (*this)[row, col] += rhs(row, col);
++        } else {
++          (*this)[row, col] += rhs[row, col];
++        }
+       }
+     }
+ 
+@@ -516,7 +524,11 @@ class VariableBlock : public SleipnirBase {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] -= rhs[row, col];
++        if constexpr (EigenMatrixLike<decltype(rhs)>) {
++          (*this)[row, col] -= rhs(row, col);
++        } else {
++          (*this)[row, col] -= rhs[row, col];
++        }
+       }
+     }
+ 
+@@ -596,7 +608,7 @@ class VariableBlock : public SleipnirBase {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        result[row, col] = value(row, col);
++        result(row, col) = value(row, col);
+       }
+     }
+ 
+diff --git a/include/sleipnir/autodiff/variable_matrix.hpp b/include/sleipnir/autodiff/variable_matrix.hpp
+index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83f8b9ef1e 100644
+--- a/include/sleipnir/autodiff/variable_matrix.hpp
++++ b/include/sleipnir/autodiff/variable_matrix.hpp
+@@ -154,7 +154,7 @@ class VariableMatrix : public SleipnirBase {
+     m_storage.reserve(values.rows() * values.cols());
+     for (int row = 0; row < values.rows(); ++row) {
+       for (int col = 0; col < values.cols(); ++col) {
+-        m_storage.emplace_back(values[row, col]);
++        m_storage.emplace_back(values(row, col));
+       }
+     }
+   }
+@@ -262,7 +262,7 @@ class VariableMatrix : public SleipnirBase {
+ 
+     for (int row = 0; row < values.rows(); ++row) {
+       for (int col = 0; col < values.cols(); ++col) {
+-        (*this)[row, col] = values[row, col];
++        (*this)[row, col] = values(row, col);
+       }
+     }
+ 
+@@ -293,7 +293,7 @@ class VariableMatrix : public SleipnirBase {
+ 
+     for (int row = 0; row < values.rows(); ++row) {
+       for (int col = 0; col < values.cols(); ++col) {
+-        (*this)[row, col].set_value(values[row, col]);
++        (*this)[row, col].set_value(values(row, col));
+       }
+     }
+   }
+@@ -507,7 +507,7 @@ class VariableMatrix : public SleipnirBase {
+       for (int j = 0; j < rhs.cols(); ++j) {
+         Variable sum{Scalar(0)};
+         for (int k = 0; k < lhs.cols(); ++k) {
+-          sum += lhs[i, k] * rhs[k, j];
++          sum += lhs(i, k) * rhs[k, j];
+         }
+         result[i, j] = sum;
+       }
+@@ -530,7 +530,7 @@ class VariableMatrix : public SleipnirBase {
+       for (int j = 0; j < rhs.cols(); ++j) {
+         Variable sum{Scalar(0)};
+         for (int k = 0; k < lhs.cols(); ++k) {
+-          sum += lhs[i, k] * rhs[k, j];
++          sum += lhs[i, k] * rhs(k, j);
+         }
+         result[i, j] = sum;
+       }
+@@ -573,7 +573,7 @@ class VariableMatrix : public SleipnirBase {
+ 
+     for (int row = 0; row < result.rows(); ++row) {
+       for (int col = 0; col < result.cols(); ++col) {
+-        result[row, col] = lhs[row, col] * rhs;
++        result[row, col] = lhs(row, col) * rhs;
+       }
+     }
+ 
+@@ -608,7 +608,7 @@ class VariableMatrix : public SleipnirBase {
+ 
+     for (int row = 0; row < result.rows(); ++row) {
+       for (int col = 0; col < result.cols(); ++col) {
+-        result[row, col] = rhs[row, col] * lhs;
++        result[row, col] = rhs(row, col) * lhs;
+       }
+     }
+ 
+@@ -644,7 +644,11 @@ class VariableMatrix : public SleipnirBase {
+       for (int j = 0; j < rhs.cols(); ++j) {
+         Variable sum{Scalar(0)};
+         for (int k = 0; k < cols(); ++k) {
+-          sum += lhs_old_row[k] * rhs[k, j];
++          if constexpr (EigenMatrixLike<decltype(rhs)>) {
++            sum += lhs_old_row[k] * rhs(k, j);
++          } else {
++            sum += lhs_old_row[k] * rhs[k, j];
++          }
+         }
+         (*this)[i, j] = sum;
+       }
+@@ -679,7 +683,7 @@ class VariableMatrix : public SleipnirBase {
+ 
+     for (int row = 0; row < result.rows(); ++row) {
+       for (int col = 0; col < result.cols(); ++col) {
+-        result[row, col] = lhs[row, col] / rhs;
++        result[row, col] = lhs(row, col) / rhs;
+       }
+     }
+ 
+@@ -751,7 +755,7 @@ class VariableMatrix : public SleipnirBase {
+ 
+     for (int row = 0; row < result.rows(); ++row) {
+       for (int col = 0; col < result.cols(); ++col) {
+-        result[row, col] = lhs[row, col] + rhs[row, col];
++        result[row, col] = lhs(row, col) + rhs[row, col];
+       }
+     }
+ 
+@@ -771,7 +775,7 @@ class VariableMatrix : public SleipnirBase {
+ 
+     for (int row = 0; row < result.rows(); ++row) {
+       for (int col = 0; col < result.cols(); ++col) {
+-        result[row, col] = lhs[row, col] + rhs[row, col];
++        result[row, col] = lhs[row, col] + rhs(row, col);
+       }
+     }
+ 
+@@ -807,7 +811,11 @@ class VariableMatrix : public SleipnirBase {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] += rhs[row, col];
++        if constexpr (EigenMatrixLike<decltype(rhs)>) {
++          (*this)[row, col] += rhs(row, col);
++        } else {
++          (*this)[row, col] += rhs[row, col];
++        }
+       }
+     }
+ 
+@@ -843,7 +851,7 @@ class VariableMatrix : public SleipnirBase {
+ 
+     for (int row = 0; row < result.rows(); ++row) {
+       for (int col = 0; col < result.cols(); ++col) {
+-        result[row, col] = lhs[row, col] - rhs[row, col];
++        result[row, col] = lhs(row, col) - rhs[row, col];
+       }
+     }
+ 
+@@ -863,7 +871,7 @@ class VariableMatrix : public SleipnirBase {
+ 
+     for (int row = 0; row < result.rows(); ++row) {
+       for (int col = 0; col < result.cols(); ++col) {
+-        result[row, col] = lhs[row, col] - rhs[row, col];
++        result[row, col] = lhs[row, col] - rhs(row, col);
+       }
+     }
+ 
+@@ -899,7 +907,11 @@ class VariableMatrix : public SleipnirBase {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] -= rhs[row, col];
++        if constexpr (EigenMatrixLike<decltype(rhs)>) {
++          (*this)[row, col] -= rhs(row, col);
++        } else {
++          (*this)[row, col] -= rhs[row, col];
++        }
+       }
+     }
+ 
+@@ -992,7 +1004,7 @@ class VariableMatrix : public SleipnirBase {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        result[row, col] = value(row, col);
++        result(row, col) = value(row, col);
+       }
+     }
+ 
+@@ -1617,14 +1629,14 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
+     MatrixXv eigen_A{A.rows(), A.cols()};
+     for (int row = 0; row < A.rows(); ++row) {
+       for (int col = 0; col < A.cols(); ++col) {
+-        eigen_A[row, col] = A[row, col];
++        eigen_A(row, col) = A[row, col];
+       }
+     }
+ 
+     MatrixXv eigen_B{B.rows(), B.cols()};
+     for (int row = 0; row < B.rows(); ++row) {
+       for (int col = 0; col < B.cols(); ++col) {
+-        eigen_B[row, col] = B[row, col];
++        eigen_B(row, col) = B[row, col];
+       }
+     }
+ 
+@@ -1633,7 +1645,7 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
+     VariableMatrix<Scalar> X{detail::empty, A.cols(), B.cols()};
+     for (int row = 0; row < X.rows(); ++row) {
+       for (int col = 0; col < X.cols(); ++col) {
+-        X[row, col] = eigen_X[row, col];
++        X[row, col] = eigen_X(row, col);
+       }
+     }
+ 

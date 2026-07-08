@@ -24,7 +24,7 @@ constexpr double ceil_int(double x, double x_whole) noexcept {
 }
 
 constexpr double ceil(double x) noexcept {
-  if (std::is_constant_evaluated()) {
+  if consteval {
     return ((x < 0.0 ? -x : x) >= 4503599627370496.
                 ? x
                 : ceil_int(x, static_cast<double>(static_cast<int64_t>(x))));

@@ -25,6 +25,16 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             trampolines = [],
         ),
         struct(
+            class_name = "AntiTipping",
+            yml_file = "semiwrap/AntiTipping.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/controller/AntiTipping.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::AntiTipping", "wpi__math__AntiTipping.hpp"),
+            ],
+        ),
+        struct(
             class_name = "ArmFeedforward",
             yml_file = "semiwrap/ArmFeedforward.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
@@ -331,6 +341,17 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
             trampolines = [
                 ("wpi::math::SwerveDrivePoseEstimator3d", "wpi__math__SwerveDrivePoseEstimator3d.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "BiquadFilter",
+            yml_file = "semiwrap/BiquadFilter.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/filter/BiquadFilter.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::BiquadFilter", "wpi__math__BiquadFilter.hpp"),
+                ("wpi::math::BiquadFilter::Section", "wpi__math__BiquadFilter__Section.hpp"),
             ],
         ),
         struct(
@@ -975,6 +996,26 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             trampolines = [],
         ),
         struct(
+            class_name = "DifferentialSample",
+            yml_file = "semiwrap/DifferentialSample.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/DifferentialSample.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::DifferentialSample", "wpi__math__DifferentialSample.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "DifferentialTrajectory",
+            yml_file = "semiwrap/DifferentialTrajectory.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/DifferentialTrajectory.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::DifferentialTrajectory", "wpi__math__DifferentialTrajectory.hpp"),
+            ],
+        ),
+        struct(
             class_name = "ExponentialProfile",
             yml_file = "semiwrap/ExponentialProfile.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
@@ -990,14 +1031,47 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
+            class_name = "HolonomicTrajectory",
+            yml_file = "semiwrap/HolonomicTrajectory.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/HolonomicTrajectory.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::HolonomicTrajectory", "wpi__math__HolonomicTrajectory.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "SplineSample",
+            yml_file = "semiwrap/SplineSample.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/SplineSample.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::SplineSample", "wpi__math__SplineSample.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "SplineTrajectory",
+            yml_file = "semiwrap/SplineTrajectory.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/SplineTrajectory.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::SplineTrajectory", "wpi__math__SplineTrajectory.hpp"),
+            ],
+        ),
+        struct(
             class_name = "Trajectory",
             yml_file = "semiwrap/Trajectory.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
             header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/Trajectory.hpp",
-            tmpl_class_names = [],
+            tmpl_class_names = [
+                ("Trajectory_tmpl1", "SplineTrajectoryBase"),
+                ("Trajectory_tmpl2", "DifferentialTrajectoryBase"),
+                ("Trajectory_tmpl3", "HolonomicTrajectoryBase"),
+            ],
             trampolines = [
                 ("wpi::math::Trajectory", "wpi__math__Trajectory.hpp"),
-                ("wpi::math::Trajectory::State", "wpi__math__Trajectory__State.hpp"),
             ],
         ),
         struct(
@@ -1028,6 +1102,16 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::math::TrajectoryParameterizer", "wpi__math__TrajectoryParameterizer.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TrajectorySample",
+            yml_file = "semiwrap/TrajectorySample.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/TrajectorySample.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::TrajectorySample", "wpi__math__TrajectorySample.hpp"),
             ],
         ),
         struct(

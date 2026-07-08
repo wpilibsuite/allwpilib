@@ -20,7 +20,8 @@
 
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/Storage.hpp"
-#include "wpi/glass/other/FMS.hpp"
+#include "wpi/glass/other/AnsiDisplay.hpp"
+#include "wpi/glass/other/DS.hpp"
 #include "wpi/glass/support/ExtraGuiWidgets.hpp"
 #include "wpi/glass/support/NameSetting.hpp"
 #include "wpi/gui/wpigui.hpp"
@@ -213,9 +214,9 @@ class JoystickModel {
   int32_t m_callback;
 };
 
-class FMSSimModel : public wpi::glass::FMSModel {
+class DSSimModel : public wpi::glass::DSModel {
  public:
-  FMSSimModel();
+  DSSimModel();
 
   wpi::glass::BooleanSource* GetFmsAttachedData() override {
     return &m_fmsAttached;
@@ -256,15 +257,15 @@ class FMSSimModel : public wpi::glass::FMSModel {
   bool IsReadOnly() override;
 
  private:
-  wpi::glass::BooleanSource m_fmsAttached{"FMS:FMSAttached"};
-  wpi::glass::BooleanSource m_dsAttached{"FMS:DSAttached"};
-  wpi::glass::IntegerSource m_allianceStationId{"FMS:AllianceStationID"};
-  wpi::glass::DoubleSource m_matchTime{"FMS:MatchTime"};
-  wpi::glass::BooleanSource m_estop{"FMS:EStop"};
-  wpi::glass::BooleanSource m_enabled{"FMS:RobotEnabled"};
-  wpi::glass::IntegerSource m_robotMode{"FMS:RobotMode"};
+  wpi::glass::BooleanSource m_fmsAttached{"DS:FMSAttached"};
+  wpi::glass::BooleanSource m_dsAttached{"DS:DSAttached"};
+  wpi::glass::IntegerSource m_allianceStationId{"DS:AllianceStationID"};
+  wpi::glass::DoubleSource m_matchTime{"DS:MatchTime"};
+  wpi::glass::BooleanSource m_estop{"DS:EStop"};
+  wpi::glass::BooleanSource m_enabled{"DS:RobotEnabled"};
+  wpi::glass::IntegerSource m_robotMode{"DS:RobotMode"};
   double m_startMatchTime = -1.0;
-  wpi::glass::StringSource m_gameMessage{"FMS:GameData"};
+  wpi::glass::StringSource m_gameMessage{"DS:GameData"};
 };
 
 }  // namespace
@@ -278,8 +279,9 @@ static std::vector<std::unique_ptr<GlfwKeyboardJoystick>> gKeyboardJoysticks;
 static std::vector<RobotJoystick> gRobotJoysticks;
 static std::unique_ptr<JoystickModel> gJoystickSources[HAL_MAX_JOYSTICKS];
 
-// FMS
-static std::unique_ptr<FMSSimModel> gFMSModel;
+// DS
+static std::unique_ptr<DSSimModel> gDSModel;
+static std::unique_ptr<wpi::glass::AnsiDisplayModel> gDisplayModel;
 
 // Window management
 std::unique_ptr<DSManager> DriverStationGui::dsManager;
@@ -371,7 +373,7 @@ JoystickModel::JoystickModel(int index) : m_index{index} {
       static_cast<uint8_t>(64 - std::countl_zero(halButtons.available));
   for (int i = 0; i < buttonCount; ++i) {
     buttons[i] = new wpi::glass::BooleanSource(
-        fmt::format("Joystick[{}] Button[{}]", index, i + 1));
+        fmt::format("Joystick[{}] Button[{}]", index, i));
   }
   for (int i = buttonCount; i < 64; ++i) {
     buttons[i] = nullptr;
@@ -716,7 +718,7 @@ void KeyboardJoystick::SettingsDisplay() {
       m_buttonKey.emplace_back(-1);
     }
     for (int i = 0; i < m_buttonCount; ++i) {
-      wpi::util::format_to_n_c_str(label, sizeof(label), "Button {}", i + 1);
+      wpi::util::format_to_n_c_str(label, sizeof(label), "Button {}", i);
 
       EditKey(label, &m_buttonKey[i]);
     }
@@ -1040,11 +1042,11 @@ void RobotJoystick::GetHAL(int i) {
 
 static void DriverStationSetRobotMode(HAL_RobotMode mode) {
   if (!HALSIM_GetDriverStationDsAttached()) {
-    // initialize FMS bits too
-    gFMSModel->SetDsAttached(true);
-    gFMSModel->SetEnabled(false);
-    gFMSModel->SetRobotMode(static_cast<FMSSimModel::RobotMode>(mode));
-    gFMSModel->UpdateHAL();
+    // initialize DS bits too
+    gDSModel->SetDsAttached(true);
+    gDSModel->SetEnabled(false);
+    gDSModel->SetRobotMode(static_cast<DSSimModel::RobotMode>(mode));
+    gDSModel->UpdateHAL();
   }
   HALSIM_SetDriverStationDsAttached(true);
   HALSIM_SetDriverStationEnabled(false);
@@ -1053,8 +1055,8 @@ static void DriverStationSetRobotMode(HAL_RobotMode mode) {
 }
 
 static void DriverStationSetEnabled(bool enabled) {
-  gFMSModel->SetEnabled(enabled);
-  gFMSModel->UpdateHAL();
+  gDSModel->SetEnabled(enabled);
+  gDSModel->UpdateHAL();
   HALSIM_SetDriverStationEnabled(enabled);
 }
 
@@ -1099,7 +1101,7 @@ static void DriverStationExecute() {
   }
   prevDisableDS = disableDS;
   if (disableDS) {
-    gFMSModel->Update();
+    gDSModel->Update();
     return;
   }
 
@@ -1169,7 +1171,7 @@ static void DriverStationExecute() {
       HALSIM_SetDriverStationOpMode(0);
       HALSIM_SetDriverStationDsAttached(false);
       isAttached = false;
-      gFMSModel->Update();
+      gDSModel->Update();
     }
     if (ImGui::Selectable(
             "Autonomous",
@@ -1275,17 +1277,17 @@ static void DriverStationExecute() {
   if ((curTime - lastNewDataTime) > 0.02 && !HALSIM_IsTimingPaused() &&
       isAttached) {
     lastNewDataTime = curTime;
-    gFMSModel->Update();
+    gDSModel->Update();
     HALSIM_NotifyDriverStationNewData();
   }
 }
 
-FMSSimModel::FMSSimModel() {
+DSSimModel::DSSimModel() {
   m_matchTime.SetValue(-1.0);
   m_allianceStationId.SetValue(HAL_ALLIANCE_STATION_RED_1);
 }
 
-void FMSSimModel::UpdateHAL() {
+void DSSimModel::UpdateHAL() {
   HALSIM_SetDriverStationFmsAttached(m_fmsAttached.GetValue());
   HALSIM_SetDriverStationAllianceStationId(
       static_cast<HAL_AllianceStationID>(m_allianceStationId.GetValue()));
@@ -1300,7 +1302,7 @@ void FMSSimModel::UpdateHAL() {
   HALSIM_SetDriverStationDsAttached(m_dsAttached.GetValue());
 }
 
-void FMSSimModel::Update() {
+void DSSimModel::Update() {
   bool enabled = HALSIM_GetDriverStationEnabled();
   m_fmsAttached.SetValue(HALSIM_GetDriverStationFmsAttached());
   m_dsAttached.SetValue(HALSIM_GetDriverStationDsAttached());
@@ -1335,7 +1337,7 @@ void FMSSimModel::Update() {
       std::string_view{reinterpret_cast<const char*>(info.gameData)});
 }
 
-bool FMSSimModel::IsReadOnly() {
+bool DSSimModel::IsReadOnly() {
   return IsDSDisabled();
 }
 
@@ -1555,9 +1557,14 @@ void DriverStationGui::GlobalInit() {
 
   dsManager->GlobalInit();
 
-  gFMSModel = std::make_unique<FMSSimModel>();
+  gDSModel = std::make_unique<DSSimModel>();
+  gDisplayModel = std::make_unique<wpi::glass::AnsiDisplayModel>();
 
   HALSIM_RegisterOpModeOptionsCallback(UpdateOpModes, nullptr, true);
+  HALSIM_SetWriteDisplayAnsi([](const struct WPI_String* data) {
+    gDisplayModel->Append(wpi::util::to_string_view(data));
+    return 0;
+  });
 
   wpi::gui::AddEarlyExecute(DriverStationExecute);
 
@@ -1606,16 +1613,23 @@ void DriverStationGui::GlobalInit() {
         win->SetDefaultSize(300, 560);
       }
     }
-    if (auto win = dsManager->AddWindow("FMS", [] {
+    if (auto win = dsManager->AddWindow("DS", [] {
           if (HALSIM_GetDriverStationDsAttached()) {
-            DisplayFMSReadOnly(gFMSModel.get());
+            DisplayDSReadOnly(gDSModel.get());
           } else {
-            DisplayFMS(gFMSModel.get(), false);
+            DisplayDS(gDSModel.get(), false);
           }
         })) {
       win->DisableRenamePopup();
       win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
       win->SetDefaultPos(5, 540);
+    }
+    if (auto win = dsManager->AddWindow(
+            "Display", std::make_unique<wpi::glass::AnsiDisplayView>(
+                           gDisplayModel.get()))) {
+      win->DisableRenamePopup();
+      win->SetDefaultPos(250, 20);
+      win->SetDefaultSize(650, 320);
     }
     if (auto win =
             dsManager->AddWindow("System Joysticks", DisplaySystemJoysticks)) {
@@ -1632,6 +1646,7 @@ void DriverStationGui::GlobalInit() {
 
   storageRoot.SetCustomClear([&storageRoot] {
     dsManager->EraseWindows();
+    gDisplayModel->Clear();
     gKeyboardJoysticks.clear();
     gRobotJoysticks.clear();
     storageRoot.GetChildArray("keyboardJoysticks").clear();

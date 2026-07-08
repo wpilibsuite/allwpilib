@@ -4,7 +4,10 @@
 
 #pragma once
 
+#include <string>
+
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/driverstation/HIDDevice.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -22,20 +25,20 @@ namespace wpi {
  * correct mapping, and only through the official NI DS. Sim is not guaranteed
  * to have the same mapping, as well as any 3rd party controllers.
  */
-class Gamepad : public GenericHID,
+class Gamepad : public HIDDevice,
                 public wpi::util::Sendable,
                 public wpi::util::SendableHelper<Gamepad> {
  public:
   /** Represents a digital button on an Gamepad. */
   enum class Button {
-    /// South Face button.
-    SOUTH_FACE = 0,
-    /// East Face button.
-    EAST_FACE = 1,
-    /// West Face button.
-    WEST_FACE = 2,
-    /// North Face button.
-    NORTH_FACE = 3,
+    /// Face Down button.
+    FACE_DOWN = 0,
+    /// Face Right button.
+    FACE_RIGHT = 1,
+    /// Face Left button.
+    FACE_LEFT = 2,
+    /// Face Up button.
+    FACE_UP = 3,
     /// Back button.
     BACK = 4,
     /// Guide button.
@@ -108,46 +111,127 @@ class Gamepad : public GenericHID,
    */
   explicit Gamepad(int port);
 
+  /**
+   * Construct an instance of a gamepad with a GenericHID object.
+   *
+   * @param hid The GenericHID object to use for this gamepad.
+   */
+  explicit Gamepad(GenericHID& hid);
+
   ~Gamepad() override = default;
 
   Gamepad(Gamepad&&) = default;
   Gamepad& operator=(Gamepad&&) = default;
 
   /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  GenericHID& GetHID() override;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  const GenericHID& GetHID() const override;
+
+  /**
    * Get the X axis value of left side of the controller. Right is positive.
+   *
+   * A deadband of 0.1 is applied by default. Use SetLeftXDeadband() to change
+   * it.
    *
    * @return the axis value.
    */
   double GetLeftX() const;
 
   /**
+   * Set the deadband for the left X axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftXDeadband(double deadband);
+
+  /**
    * Get the Y axis value of left side of the controller. Back is positive.
+   *
+   * A deadband of 0.1 is applied by default. Use SetLeftYDeadband() to change
+   * it.
    *
    * @return the axis value.
    */
   double GetLeftY() const;
 
   /**
+   * Set the deadband for the left Y axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftYDeadband(double deadband);
+
+  /**
    * Get the X axis value of right side of the controller. Right is positive.
+   *
+   * A deadband of 0.1 is applied by default. Use SetRightXDeadband() to change
+   * it.
    *
    * @return the axis value.
    */
   double GetRightX() const;
 
   /**
+   * Set the deadband for the right X axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightXDeadband(double deadband);
+
+  /**
    * Get the Y axis value of right side of the controller. Back is positive.
+   *
+   * A deadband of 0.1 is applied by default. Use SetRightYDeadband() to change
+   * it.
    *
    * @return the axis value.
    */
   double GetRightY() const;
 
   /**
-   * Get the left trigger axis value of the controller. Note that this axis
+   * Set the deadband for the right Y axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightYDeadband(double deadband);
+
+  /**
+   * Get the left trigger value of the controller. Note that this axis
    * is bound to the range of [0, 1] as opposed to the usual [-1, 1].
+   *
+   * A deadband of 0.01 is applied by default. Use SetLeftTriggerDeadband() to
+   * change it.
    *
    * @return the axis value.
    */
-  double GetLeftTriggerAxis() const;
+  double GetLeftTrigger() const;
+
+  /**
+   * Set the deadband for the left trigger axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftTriggerDeadband(double deadband);
 
   /**
    * Constructs an event instance around the axis value of the left trigger.
@@ -172,12 +256,24 @@ class Gamepad : public GenericHID,
   BooleanEvent LeftTrigger(EventLoop* loop) const;
 
   /**
-   * Get the right trigger axis value of the controller. Note that this axis
+   * Get the right trigger value of the controller. Note that this axis
    * is bound to the range of [0, 1] as opposed to the usual [-1, 1].
+   *
+   * A deadband of 0.01 is applied by default. Use SetRightTriggerDeadband() to
+   * change it.
    *
    * @return the axis value.
    */
-  double GetRightTriggerAxis() const;
+  double GetRightTrigger() const;
+
+  /**
+   * Set the deadband for the right trigger axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightTriggerDeadband(double deadband);
 
   /**
    * Constructs an event instance around the axis value of the right trigger.
@@ -202,25 +298,25 @@ class Gamepad : public GenericHID,
   BooleanEvent RightTrigger(EventLoop* loop) const;
 
   /**
-   * Read the value of the South Face button on the controller.
+   * Read the value of the Face Down button on the controller.
    *
    * @return The state of the button.
    */
-  bool GetSouthFaceButton() const;
+  bool GetFaceDownButton() const;
 
   /**
-   * Whether the South Face button was pressed since the last check.
+   * Whether the Face Down button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  bool GetSouthFaceButtonPressed();
+  bool GetFaceDownButtonPressed();
 
   /**
-   * Whether the South Face button was released since the last check.
+   * Whether the Face Down button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  bool GetSouthFaceButtonReleased();
+  bool GetFaceDownButtonReleased();
 
   /**
    * Constructs an event instance around the Face Down button's
@@ -233,25 +329,25 @@ class Gamepad : public GenericHID,
   BooleanEvent FaceDown(EventLoop* loop) const;
 
   /**
-   * Read the value of the East Face button on the controller.
+   * Read the value of the Face Right button on the controller.
    *
    * @return The state of the button.
    */
-  bool GetEastFaceButton() const;
+  bool GetFaceRightButton() const;
 
   /**
-   * Whether the East Face button was pressed since the last check.
+   * Whether the Face Right button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  bool GetEastFaceButtonPressed();
+  bool GetFaceRightButtonPressed();
 
   /**
-   * Whether the East Face button was released since the last check.
+   * Whether the Face Right button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  bool GetEastFaceButtonReleased();
+  bool GetFaceRightButtonReleased();
 
   /**
    * Constructs an event instance around the Face Right button's
@@ -264,25 +360,25 @@ class Gamepad : public GenericHID,
   BooleanEvent FaceRight(EventLoop* loop) const;
 
   /**
-   * Read the value of the West Face button on the controller.
+   * Read the value of the Face Left button on the controller.
    *
    * @return The state of the button.
    */
-  bool GetWestFaceButton() const;
+  bool GetFaceLeftButton() const;
 
   /**
-   * Whether the West Face button was pressed since the last check.
+   * Whether the Face Left button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  bool GetWestFaceButtonPressed();
+  bool GetFaceLeftButtonPressed();
 
   /**
-   * Whether the West Face button was released since the last check.
+   * Whether the Face Left button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  bool GetWestFaceButtonReleased();
+  bool GetFaceLeftButtonReleased();
 
   /**
    * Constructs an event instance around the Face Left button's
@@ -295,25 +391,25 @@ class Gamepad : public GenericHID,
   BooleanEvent FaceLeft(EventLoop* loop) const;
 
   /**
-   * Read the value of the North Face button on the controller.
+   * Read the value of the Face Up button on the controller.
    *
    * @return The state of the button.
    */
-  bool GetNorthFaceButton() const;
+  bool GetFaceUpButton() const;
 
   /**
-   * Whether the North Face button was pressed since the last check.
+   * Whether the Face Up button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  bool GetNorthFaceButtonPressed();
+  bool GetFaceUpButtonPressed();
 
   /**
-   * Whether the North Face button was released since the last check.
+   * Whether the Face Up button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  bool GetNorthFaceButtonReleased();
+  bool GetFaceUpButtonReleased();
 
   /**
    * Constructs an event instance around the Face Up button's
@@ -1085,11 +1181,105 @@ class Gamepad : public GenericHID,
   BooleanEvent AxisGreaterThan(Axis axis, double threshold,
                                EventLoop* loop) const;
 
+  /**
+   * Get the bitmask of axes for the gamepad.
+   *
+   * @return the number of axis for the current gamepad
+   */
+  int GetAxesAvailable() const;
+
+  /**
+   * For the current gamepad, return the bitmask of available buttons.
+   *
+   * @return the bitmask of buttons for the current gamepad
+   */
+  uint64_t GetButtonsAvailable() const;
+
+  /**
+   * Get if the gamepad is connected.
+   *
+   * @return true if the gamepad is connected
+   */
+  bool IsConnected() const;
+
+  /**
+   * Get the type of the gamepad.
+   *
+   * @return the type of the gamepad.
+   */
+  GenericHID::HIDType GetGamepadType() const;
+
+  /**
+   * Get the supported outputs for the gamepad.
+   *
+   * @return the supported outputs for the gamepad.
+   */
+  GenericHID::SupportedOutputs GetSupportedOutputs() const;
+
+  /**
+   * Get the name of the gamepad.
+   *
+   * @return the name of the gamepad.
+   */
+  std::string GetName() const;
+
+  /**
+   * Get the port number of the gamepad.
+   *
+   * @return The port number of the gamepad.
+   */
+  int GetPort() const;
+
+  /**
+   * Set leds on the gamepad. If only mono is supported, the system will use
+   * the highest value passed in.
+   *
+   * @param r Red value from 0-255
+   * @param g Green value from 0-255
+   * @param b Blue value from 0-255
+   */
+  void SetLeds(int r, int g, int b);
+
+  /**
+   * Set the rumble output for the HID.
+   *
+   * The DS currently supports 4 rumble values: left rumble, right rumble, left
+   * trigger rumble, and right trigger rumble.
+   *
+   * @param type  Which rumble value to set
+   * @param value The normalized value (0 to 1) to set the rumble to
+   */
+  void SetRumble(GenericHID::RumbleType type, double value);
+
+  /**
+   * Check if a touchpad finger is available.
+   * @param touchpad The touchpad to check.
+   * @param finger The finger to check.
+   * @return true if the touchpad finger is available.
+   */
+  bool GetTouchpadFingerAvailable(int touchpad, int finger) const;
+
+  /**
+   * Get the touchpad finger data.
+   * @param touchpad The touchpad to read.
+   * @param finger The finger to read.
+   * @return The touchpad finger data.
+   */
+  TouchpadFinger GetTouchpadFinger(int touchpad, int finger) const;
+
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   double GetAxisForSendable(Axis axis) const;
   bool GetButtonForSendable(Button button) const;
+
+  double m_leftXDeadband = 0.1;
+  double m_leftYDeadband = 0.1;
+  double m_rightXDeadband = 0.1;
+  double m_rightYDeadband = 0.1;
+  double m_leftTriggerDeadband = 0.01;
+  double m_rightTriggerDeadband = 0.01;
+  GenericHID* m_hid;
 };
 
 }  // namespace wpi

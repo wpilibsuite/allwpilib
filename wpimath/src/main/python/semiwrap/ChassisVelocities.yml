@@ -1,6 +1,11 @@
 extra_includes:
 - wpystruct.h
 
+functions:
+  to_json:
+    ignore: true
+  from_json:
+    ignore: true
 classes:
   wpi::math::ChassisVelocities:
     force_no_default_constructor: true
@@ -45,7 +50,7 @@ inline_code: |
         self->vx = vx;
       }
     )
-    .def_property("vy_fps", 
+    .def_property("vy_fps",
       [](ChassisVelocities * self) -> wpi::units::feet_per_second_t {
         return self->vy;
       },
@@ -53,7 +58,7 @@ inline_code: |
         self->vy = vy;
       }
     )
-    .def_property("omega_dps", 
+    .def_property("omega_dps",
       [](ChassisVelocities * self) -> wpi::units::degrees_per_second_t {
         return self->omega;
       },

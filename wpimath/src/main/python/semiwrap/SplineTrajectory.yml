@@ -1,0 +1,14 @@
+classes:
+  wpi::math::SplineTrajectory:
+    force_no_trampoline: true
+    methods:
+      SplineTrajectory:
+        overloads:
+          std::vector<SplineSample>:
+          std::initializer_list<SplineSample>:
+            ignore: true
+      TransformBy:
+      RelativeTo:
+      Concatenate:
+      operator+:
+      Interpolate:
