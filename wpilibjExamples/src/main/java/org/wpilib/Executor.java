@@ -25,12 +25,12 @@ public final class Executor {
     System.out.println("Starting robot: " + robotClass.getName());
 
     RobotBase.startRobot(
-      () -> {
-        try {
-          return ConstructorMatch.findBestConstructor(robotClass).get().newInstance();
-        } catch (ReflectiveOperationException e) {
-          throw new RuntimeException("Failed to construct robot", e.getCause());
-        }
-      });
+        () -> {
+          try {
+            return ConstructorMatch.findBestConstructor(robotClass).get().newInstance();
+          } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("Failed to construct robot", e.getCause());
+          }
+        });
   }
 }
