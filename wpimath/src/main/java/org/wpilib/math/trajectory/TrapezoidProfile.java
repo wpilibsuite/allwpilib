@@ -177,6 +177,8 @@ public class TrapezoidProfile {
     State state = new State(current.position, current.velocity);
     State target = new State(goal.position, goal.velocity);
 
+    // Adjust states so that they are within the constraints and get the time required for the
+    // current state to return to a valid state.
     double recoveryTime = adjustStates(state, target);
     double sign = getSign(state, target);
     m_profile = generateProfile(sign, state, target);
@@ -190,6 +192,7 @@ public class TrapezoidProfile {
     double acceleration = sign * m_constraints.maxAcceleration;
     advanceState(
         Math.min(t, m_profile.t_1),
+        // Handle recovery to a feasible state if necessary.
         recoveryTime > 0.0 && sign * state.velocity > 0.0 ? -acceleration : acceleration,
         state);
 
@@ -222,6 +225,8 @@ public class TrapezoidProfile {
     State state = new State(current.position, current.velocity);
     State target = new State(goal.position, goal.velocity);
 
+    // Adjust states so that they are within the constraints and get the time required for the
+    // current state to return to a valid state.
     double recoveryTime = adjustStates(state, target);
     double sign = getSign(state, target);
     ProfileTiming profile = generateProfile(sign, state, target);
@@ -295,7 +300,7 @@ public class TrapezoidProfile {
                   * recoveryTime
                   * recoveryTime
                   / 2.0;
-      // v = v_i + at   (1)
+      // The closest valid velocity will have the magnitude of the max velocity.
       current.velocity = Math.copySign(m_constraints.maxVelocity, current.velocity);
     }
 
@@ -315,7 +320,7 @@ public class TrapezoidProfile {
     double dx = goal.position - current.position;
 
     // Calculate threshold displacement
-    // d = |v_t - v_i| * (v_t + v_i) / a_m   (9)
+    // d = |v_t - v_i|(v_t + v_i) / a_m   (9)
     double d =
         Math.abs(goal.velocity - current.velocity)
             / m_constraints.maxAcceleration
@@ -358,7 +363,7 @@ public class TrapezoidProfile {
     double dx = goal.position - current.position;
 
     // Calculate the peak velocity to compare to velocity constraint.
-    // v_p = √(a * Δx + (v_t² + v_i²) / 2)   (9)
+    // v_p = √(aΔx + (v_t² + v_i²) / 2)   (8)
     double peakVelocity =
         sign
             * Math.sqrt(

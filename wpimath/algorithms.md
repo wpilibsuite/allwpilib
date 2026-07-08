@@ -1,4 +1,4 @@
-# Algorithms
+# Algorithmstrapezoid
 
 ## Simple motor feedforward
 

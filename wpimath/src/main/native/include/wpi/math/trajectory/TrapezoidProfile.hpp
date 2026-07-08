@@ -149,6 +149,8 @@ class TrapezoidProfile {
    */
   constexpr State Calculate(wpi::units::second_t t, State current, State goal) {
     State sample{current};
+    // Adjust states so that they are within the constraints and get the time
+    // required for the current state to return to a valid state.
     wpi::units::second_t recoveryTime = AdjustStates(current, goal);
     double sign = GetSign(current, goal);
     m_profile = GenerateProfile(sign, current, goal);
@@ -169,6 +171,7 @@ class TrapezoidProfile {
 
     Acceleration_t acceleration = sign * m_constraints.maxAcceleration;
     advance(wpi::units::math::min(t, m_profile.t_1),
+            // Handle recovery to a feasible state if necessary.
             recoveryTime > 0.0_s && sample.velocity * sign > Velocity_t{0.0}
                 ? -acceleration
                 : acceleration,
@@ -203,6 +206,8 @@ class TrapezoidProfile {
    */
   constexpr wpi::units::second_t TimeLeftUntil(State current,
                                                State goal) const {
+    // Adjust states so that they are within the constraints and get the time
+    // required for the current state to return to a valid state.
     wpi::units::second_t recoveryTime = AdjustStates(current, goal);
     double sign = GetSign(current, goal);
     ProfileTiming profile = GenerateProfile(sign, current, goal);
@@ -263,11 +268,13 @@ class TrapezoidProfile {
 
     if (violationAmount > Velocity_t{0.0}) {
       recoveryTime = violationAmount / m_constraints.maxAcceleration;
+      // x = x_i + v_i t + at   (2)
       current.position +=
           current.velocity * recoveryTime +
           wpi::units::math::copysign(m_constraints.maxAcceleration,
                                      -current.velocity) *
               recoveryTime * recoveryTime / 2.0;
+      // The closest valid velocity will have the magnitude of the max velocity.
       current.velocity = wpi::units::math::copysign(m_constraints.maxVelocity,
                                                     current.velocity);
     }
@@ -289,7 +296,7 @@ class TrapezoidProfile {
     Distance_t dx = goal.position - current.position;
 
     // Calculate threshold displacement
-    // d = |v_t - v_i| * (v_t + v_i) / 2 a_m   (9)
+    // d = |v_t - v_i|(v_t + v_i) / 2 a_m   (9)
     Distance_t d = wpi::units::math::abs(goal.velocity - current.velocity) /
                    m_constraints.maxAcceleration *
                    (current.velocity + goal.velocity) / 2.0;
@@ -334,7 +341,7 @@ class TrapezoidProfile {
     Distance_t dx = goal.position - current.position;
 
     // Calculate the peak velocity to compare to velocity constraint.
-    // v_p = √(a * Δx + (v_t² + v_i²) / 2)   (8)
+    // v_p = √(aΔx + (v_t² + v_i²) / 2)   (8)
     Velocity_t peakVelocity =
         sign * wpi::units::math::sqrt(wpi::units::math::max(
                    (goal.velocity * goal.velocity +

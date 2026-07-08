@@ -10,7 +10,7 @@ The fastest possible profile for the double integrator is one that applies the m
 
 We will utilize the subscript m to denote the maximum allowed acceleration magnitude (`a_m`) and velocity magnitude (`v_m`).
  To refer to the most extreme velocity achieved by a profile without an active velocity constraint we will use the term peak velocity (`v_p`).
- Occurring when the acceleration of a profile switches sign, it will be either greater than or equal to, or less than or equal to both the initial and target velocity depending on the profile sign (more on this later).
+ Occurring when the acceleration of a profile switches sign, the peak velocity will be either greater than or equal to, or less than or equal to both the initial and target velocity depending on the profile sign (more on this later).
 
 First, let us derive the dynamics of the system.
  Our control input is acceleration, which as discussed earlier, will take the form of a piecewise constant over the time of the profile.
@@ -38,7 +38,7 @@ This is the primary equation of motion we will use in this derivation.
 
 ### The sign of the profile
 
-The sign of the profile can be defined as the sign of the acceleration of the first segment of the profile.
+The sign of the profile (`s`) can be defined as the sign of the acceleration of the first segment of the profile; for us, it will only ever take on the values of `1` or `-1`.
  If we separate the profile into segments based on the value of the input, the input applied for the first, second, and third sections can be found by multiplying `a_m` by `s`, `0`, and `-s` respectively.
  From this, we can see that for profiles with a positive sign, the peak velocity would be greater than or equal to both the initial and the target velocity, and for profiles with a negative sign, the peak velocity would be less than or equal to the initial and target velocities.
  We will cover how to determine the sign of the profile later in the documentation.
