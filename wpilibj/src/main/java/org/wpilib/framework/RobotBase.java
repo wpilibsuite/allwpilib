@@ -296,18 +296,16 @@ public abstract class RobotBase implements AutoCloseable {
         ConstructorMatch.findBestConstructor(robotClass);
 
     if (constructorMatch.isEmpty()) {
-      // Class might be a singleton from Kotlin with a private constructor, try to find a static
-      // INSTANCE field and use that instead.
+      // Class might be a Kotlin object (singleton) with a private constructor.
+      // Look for a static INSTANCE field and use that.
       try {
         Field instanceField = robotClass.getField("INSTANCE");
         if (Modifier.isStatic(instanceField.getModifiers())
             && robotClass.isAssignableFrom(instanceField.getType())) {
           Object singletonInstance = instanceField.get(null);
           if (robotClass.isInstance(singletonInstance)) {
-
-            T robot = robotClass.cast(singletonInstance);
-
-            return robot;
+            T singletonRobot = robotClass.cast(singletonInstance);
+            return singletonRobot;
           }
         }
       } catch (NoSuchFieldException _) {
