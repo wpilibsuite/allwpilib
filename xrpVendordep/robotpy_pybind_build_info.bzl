@@ -6,6 +6,9 @@ load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_mo
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
 def xrp_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
+    NAME_TRANSFORMS = [
+    ]
+
     XRP_HEADER_GEN = [
         struct(
             class_name = "XRPGyro",
@@ -116,6 +119,7 @@ def xrp_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes 
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
             "//xrpVendordep:robotpy-native-xrp.copy_headers",
         ],
+        name_transforms = NAME_TRANSFORMS,
     )
 
     create_pybind_library(

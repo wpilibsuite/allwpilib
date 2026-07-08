@@ -3,7 +3,7 @@ import collections
 import json
 import pathlib
 import re
-from typing import Dict, List, Union
+from typing import Dict, List, Tuple, Union
 
 import jinja2
 import tomli
@@ -30,7 +30,11 @@ from shared.bazel.rules.robotpy.hack_pkgcfgs import hack_pkgconfig
 
 
 class HeaderToDatConfig:
-    def __init__(self, header_to_dat_args: BuildTarget):
+    def __init__(
+        self,
+        header_to_dat_args: BuildTarget,
+        extension_name_transforms: List[Tuple[str, str]],
+    ):
         includes = []
         defines = []
 
@@ -45,6 +49,26 @@ class HeaderToDatConfig:
             idx += 2
         if header_to_dat_args.args[idx] == "--cpp":
             idx += 2
+
+        transforms = []
+        while True:
+            if header_to_dat_args.args[idx] in [
+                "--name-transform-default",
+                "--name-transform-known-word",
+                "--name-transform-enum-value",
+            ]:
+                transforms.append(
+                    (header_to_dat_args.args[idx], header_to_dat_args.args[idx + 1])
+                )
+                idx += 2
+            else:
+                break
+
+        # We assume that the transforms remain the same in a given extension
+        if extension_name_transforms:
+            assert extension_name_transforms == transforms
+        else:
+            extension_name_transforms.extend(transforms)
 
         args = header_to_dat_args.args[idx:]
         self.class_name = args[0]
@@ -159,7 +183,10 @@ class BazelExtensionModule:
         self.package_name = extension_module.package_name
         self.install_path = extension_module.install_path
 
-        self.generation_data = self._extract_header_generation(extension_module.sources)
+        self.extension_name_transforms: List[Tuple[str, str]] = []
+        self.generation_data = self._extract_header_generation(
+            extension_module.sources, self.extension_name_transforms
+        )
         self.resolve_casters = ResolveCastersConfig(
             additional_extension_targets["resolve-casters"]
         )
@@ -241,11 +268,13 @@ class BazelExtensionModule:
             else:
                 raise
 
-    def _extract_header_generation(self, sources) -> Dict[str, HeaderToDatConfig]:
+    def _extract_header_generation(
+        self, sources, extension_name_transforms: List[Tuple[str, str]]
+    ) -> Dict[str, HeaderToDatConfig]:
         generation_data: Dict[str, HeaderToDatConfig] = {}
 
         def get_h2d_config(target_info: BuildTarget) -> HeaderToDatConfig:
-            config = HeaderToDatConfig(target_info)
+            config = HeaderToDatConfig(target_info, extension_name_transforms)
             if config.class_name not in generation_data:
                 generation_data[config.class_name] = config
             return generation_data[config.class_name]
