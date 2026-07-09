@@ -161,7 +161,7 @@ def header_to_dat(
     for d in extra_defines:
         cmd += " -D '" + d + "'"
     for t in name_transforms:
-        cmd += " " + t + " "
+        cmd += " '" + t + "' "
     cmd += " " + header_location
 
     cmd += " " + include_root

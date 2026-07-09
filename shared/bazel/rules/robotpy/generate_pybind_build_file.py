@@ -53,9 +53,13 @@ class HeaderToDatConfig:
         transforms = []
         while True:
             if header_to_dat_args.args[idx] in [
+                "--name-transform-attribute",
                 "--name-transform-default",
-                "--name-transform-known-word",
                 "--name-transform-enum-value",
+                "--name-transform-function",
+                "--name-transform-known-word",
+                "--name-transform-method",
+                "--name-transform-parameter",
             ]:
                 transforms.append(
                     (header_to_dat_args.args[idx], header_to_dat_args.args[idx + 1])
