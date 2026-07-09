@@ -100,9 +100,7 @@ class CommandScheduler(Sendable):
 
         self._in_run_loop = False
         self._to_schedule: Dict[Command, None] = {}
-        # python: to_cancel_interruptors stored in _to_cancel dict
         self._to_cancel: Dict[Command, Optional[Command]] = {}
-        # self._to_cancel_interruptors: List[Optional[Command]] = []
         self._ending_commands: Set[Command] = set()
 
         self._watchdog = Watchdog(TimedRobot.DEFAULT_PERIOD, lambda: None)
