@@ -8,9 +8,9 @@ import argparse
 import os
 from pathlib import Path
 
-from generate_first_ds_hids import generate_first_ds_hids
-from generate_hids import generate_hids
-from generate_pwm_motor_controllers import generate_pwm_motor_controllers
+from wpilibc.generate_first_ds_hids import generate_first_ds_hids
+from wpilibc.generate_hids import generate_hids
+from wpilibc.generate_pwm_motor_controllers import generate_pwm_motor_controllers
 
 
 def main():
