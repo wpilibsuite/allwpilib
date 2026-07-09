@@ -38,7 +38,7 @@ public class GameCubeControllerSim extends GenericHIDSim {
     setAxesAvailable(0x3F);
     setButtonsAvailable(0xC07C4FL);
     setPOVsAvailable(0);
-    setGamepadType(GenericHID.HIDType.STANDARD);
+    setGamepadType(GenericHID.HIDType.GAMECUBE);
     setSupportedOutputs(GameCubeController.getSupportedOutputCapabilities());
   }
 

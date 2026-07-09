@@ -4,10 +4,8 @@
 
 package org.wpilib.framework;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.internal.DriverStationBackend;
@@ -22,7 +20,6 @@ import org.wpilib.networktables.PubSubOption;
 import org.wpilib.system.RuntimeType;
 import org.wpilib.system.Timer;
 import org.wpilib.system.WPILibVersion;
-import org.wpilib.util.ConstructorMatch;
 import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.vision.stream.CameraServerShared;
 import org.wpilib.vision.stream.CameraServerSharedStore;
@@ -291,36 +288,6 @@ public abstract class RobotBase implements AutoCloseable {
   private static RobotBase m_robotCopy;
   private static boolean m_suppressExitWarning;
 
-  private static <T extends RobotBase> T constructRobot(Class<T> robotClass) throws Throwable {
-    Optional<ConstructorMatch<T>> constructorMatch =
-        ConstructorMatch.findBestConstructor(robotClass);
-
-    if (constructorMatch.isEmpty()) {
-      // Class might be a Kotlin object (singleton) with a private constructor.
-      // Look for a static INSTANCE field and use that.
-      try {
-        Field instanceField = robotClass.getField("INSTANCE");
-        if (Modifier.isStatic(instanceField.getModifiers())
-            && robotClass.isAssignableFrom(instanceField.getType())) {
-          Object singletonInstance = instanceField.get(null);
-          if (robotClass.isInstance(singletonInstance)) {
-            T singletonRobot = robotClass.cast(singletonInstance);
-            return singletonRobot;
-          }
-        }
-      } catch (NoSuchFieldException _) {
-        // INSTANCE field not found
-      }
-
-      throw new IllegalArgumentException(
-          "No valid constructor found in robot class " + robotClass.getName());
-    }
-
-    T robot = constructorMatch.get().newInstance();
-
-    return robot;
-  }
-
   /**
    * Gets the Robot subclass name from a stack trace.
    *
@@ -350,12 +317,12 @@ public abstract class RobotBase implements AutoCloseable {
 
   /** Run the robot main loop. */
   @SuppressWarnings("PMD.AvoidCatchingGenericException")
-  private static <T extends RobotBase> void runRobot(Class<T> robotClass) {
+  private static <T extends RobotBase> void runRobot(Supplier<T> robotConstructor) {
     System.out.println("********** Robot program starting **********");
 
     T robot;
     try {
-      robot = constructRobot(robotClass);
+      robot = robotConstructor.get();
     } catch (Throwable throwable) {
       Throwable cause = throwable.getCause();
       if (cause != null) {
@@ -433,9 +400,9 @@ public abstract class RobotBase implements AutoCloseable {
    * Starting point for the applications.
    *
    * @param <T> Robot subclass.
-   * @param robotClass Robot subclass type.
+   * @param robotConstructor Robot constructor.
    */
-  public static <T extends RobotBase> void startRobot(Class<T> robotClass) {
+  public static <T extends RobotBase> void startRobot(Supplier<T> robotConstructor) {
     // Check that the MSVC runtime is valid.
     WPIUtilJNI.checkMsvcRuntime();
 
@@ -453,7 +420,7 @@ public abstract class RobotBase implements AutoCloseable {
       Thread thread =
           new Thread(
               () -> {
-                runRobot(robotClass);
+                runRobot(robotConstructor);
                 HAL.exitMain();
               },
               "robot main");
@@ -473,7 +440,7 @@ public abstract class RobotBase implements AutoCloseable {
         Thread.currentThread().interrupt();
       }
     } else {
-      runRobot(robotClass);
+      runRobot(robotConstructor);
     }
 
     // On RIO, this will just terminate rather than shutting down cleanly (it's a no-op in sim).
