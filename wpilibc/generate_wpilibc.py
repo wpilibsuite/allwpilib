@@ -6,7 +6,12 @@
 
 import argparse
 import os
+import sys
 from pathlib import Path
+
+# When invoked directly, Python puts the script directory on sys.path.
+# Add the repo root so absolute package imports still work.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from wpilibc.generate_first_ds_hids import generate_first_ds_hids
 from wpilibc.generate_hids import generate_hids
