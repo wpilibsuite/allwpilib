@@ -7,9 +7,8 @@ import os
 import sys
 from pathlib import Path
 
-from wpimath.generate_nanopb import generate_nanopb
-from wpimath.generate_numbers import generate_numbers
-from wpimath.generate_quickbuf import generate_quickbuf
+from apriltag.generate_nanopb import generate_nanopb
+from apriltag.generate_quickbuf import generate_quickbuf
 
 
 def main(argv):
@@ -49,6 +48,12 @@ def main(argv):
         type=Path,
     )
     parser.add_argument(
+        "--proto_path",
+        help="Optional. Specifies additional directories in which to search for protobuf imports",
+        default=root_path,
+        type=Path,
+    )
+    parser.add_argument(
         "--protoc",
         help="Protoc executable command",
         default="protoc",
@@ -63,17 +68,18 @@ def main(argv):
     )
     args = parser.parse_args(argv)
 
-    generate_numbers(args.output_directory, args.template_root)
     generate_nanopb(
         args.nanopb_generator,
-        args.output_directory / "main/native/cpp/wpimath/protobuf",
+        args.output_directory / "main/native/cpp/apriltag/protobuf",
         args.proto_directory,
+        args.proto_path,
     )
     generate_quickbuf(
         args.protoc,
         args.quickbuf_plugin,
         args.output_directory / "main/java",
         args.proto_directory,
+        args.proto_path,
     )
 
 

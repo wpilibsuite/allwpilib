@@ -5,6 +5,7 @@
 #include "wpi/apriltag/AprilTagFieldLayout.hpp"
 
 #include <system_error>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -29,27 +30,26 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
     auto tag = jtag.get<AprilTag>();
     m_apriltags[tag.ID] = tag;
   }
-  m_fieldWidth = wpi::units::meter_t{json.at("field").at("width").get_number()};
-  m_fieldLength =
-      wpi::units::meter_t{json.at("field").at("length").get_number()};
+  m_field = FieldDimensions{
+      wpi::units::meter_t{json.at("field").at("length").get_double()},
+      wpi::units::meter_t{json.at("field").at("width").get_double()}};
 }
 
 AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags,
                                          wpi::units::meter_t fieldLength,
                                          wpi::units::meter_t fieldWidth)
-    : m_fieldLength(std::move(fieldLength)),
-      m_fieldWidth(std::move(fieldWidth)) {
+    : m_field{std::move(fieldLength), std::move(fieldWidth)} {
   for (const auto& tag : apriltags) {
     m_apriltags[tag.ID] = tag;
   }
 }
 
 wpi::units::meter_t AprilTagFieldLayout::GetFieldLength() const {
-  return m_fieldLength;
+  return m_field.length;
 }
 
 wpi::units::meter_t AprilTagFieldLayout::GetFieldWidth() const {
-  return m_fieldWidth;
+  return m_field.width;
 }
 
 std::vector<AprilTag> AprilTagFieldLayout::GetTags() const {
@@ -61,6 +61,10 @@ std::vector<AprilTag> AprilTagFieldLayout::GetTags() const {
   return tags;
 }
 
+std::unordered_map<int, AprilTag> AprilTagFieldLayout::GetTagMap() const {
+  return m_apriltags;
+}
+
 void AprilTagFieldLayout::SetOrigin(OriginPosition origin) {
   switch (origin) {
     case OriginPosition::kBlueAllianceWallRightSide:
@@ -68,7 +72,7 @@ void AprilTagFieldLayout::SetOrigin(OriginPosition origin) {
       break;
     case OriginPosition::kRedAllianceWallRightSide:
       SetOrigin(wpi::math::Pose3d{
-          wpi::math::Translation3d{m_fieldLength, m_fieldWidth, 0_m},
+          wpi::math::Translation3d{m_field.length, m_field.width, 0_m},
           wpi::math::Rotation3d{0_deg, 0_deg, 180_deg}});
       break;
     default:
@@ -113,8 +117,8 @@ void wpi::apriltag::to_json(wpi::util::json& json,
     tagVector.push_back(pair.second);
   }
 
-  auto field = wpi::util::json::object("length", layout.m_fieldLength.value(),
-                                       "width", layout.m_fieldWidth.value());
+  auto field = wpi::util::json::object("length", layout.m_field.length.value(),
+                                       "width", layout.m_field.width.value());
   json = wpi::util::json::object("field", std::move(field), "tags",
                                  std::move(tagVector));
 }
@@ -127,9 +131,9 @@ void wpi::apriltag::from_json(const wpi::util::json& json,
     layout.m_apriltags[tag.ID] = tag;
   }
 
-  layout.m_fieldLength =
+  layout.m_field.length =
       wpi::units::meter_t{json.at("field").at("length").get_number()};
-  layout.m_fieldWidth =
+  layout.m_field.width =
       wpi::units::meter_t{json.at("field").at("width").get_number()};
 }
 

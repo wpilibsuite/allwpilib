@@ -1,3 +1,6 @@
+extra_includes:
+- wpystruct.h
+
 functions:
   to_json:
     ignore: true
@@ -14,3 +17,6 @@ classes:
       Generate16h5AprilTagImage:
         ignore: true
       operator==:
+
+inline_code: |
+  SetupWPyStruct<wpi::apriltag::AprilTag>(cls_AprilTag);

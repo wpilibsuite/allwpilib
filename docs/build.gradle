@@ -185,6 +185,8 @@ task generateJavaDocs(type: Javadoc) {
             "-org.wpilib.math.system.struct," +
             "-org.wpilib.math.trajectory.proto," +
             "-org.wpilib.math.trajectory.struct," +
+            "-org.wpilib.vision.apriltag.proto," +
+            "-org.wpilib.vision.apriltag.struct," +
             "-org.wpilib.command3.proto," +
             // The .measure package contains generated source files for which automatic javadoc
             // generation is very difficult to do meaningfully.

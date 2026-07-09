@@ -1,11 +1,13 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//apriltag:generate.bzl", "generate_apriltag")
 load("//apriltag:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//apriltag:robotpy_pybind_build_info.bzl", "apriltag_extension", "define_pybind_library")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:cc_rules.bzl", "generate_def_windows", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
@@ -16,10 +18,69 @@ load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 filegroup(
     name = "doxygen-files",
     srcs = glob([
+        "src/generated/main/native/cpp/apriltag/protobuf/*.h",
         "src/main/native/include/**/*",
         "src/main/native/thirdparty/apriltag/include/**/*",
     ]),
     visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "generate_nanopb",
+    srcs = ["generate_nanopb.py"],
+    target_compatible_with = select({
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+py_binary(
+    name = "generate_quickbuf",
+    srcs = ["generate_quickbuf.py"],
+    target_compatible_with = select({
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+py_binary(
+    name = "generate_apriltag_py",
+    srcs = ["generate_apriltag.py"],
+    main = "generate_apriltag.py",
+    target_compatible_with = select({
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        ":generate_nanopb",
+        ":generate_quickbuf",
+    ],
+)
+
+filegroup(
+    name = "proto_files",
+    srcs = glob(["src/main/proto/**/*.proto"]),
+)
+
+generate_apriltag(
+    name = "generate_apriltag",
+    tags = ["pregeneration"],
+)
+
+write_source_files(
+    name = "write_apriltag",
+    diff_args = ["-u"],
+    files = {
+        "src/generated": ":generate_apriltag",
+    },
+    suggested_update_target = "//:write_all",
+    tags = ["pregeneration"],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "generated_java",
+    srcs = glob(["src/generated/main/java/**/*.java"]),
 )
 
 pkg_files(
@@ -65,22 +126,52 @@ generate_resources(
     resource_files = glob(["src/main/native/resources/**"]),
 )
 
+cc_library(
+    name = "nanopb-generated-headers",
+    hdrs = glob(["src/generated/main/native/cpp/**/*.h"]),
+    includes = ["src/generated/main/native/cpp"],
+    strip_include_prefix = "src/generated/main/native/cpp",
+)
+
+pkg_files(
+    name = "protobuf_hdr_pkg",
+    srcs = glob(["src/generated/main/native/cpp/apriltag/protobuf/*.npb.h"]),
+    strip_prefix = "src/generated/main/native/cpp/",
+)
+
 wpilib_cc_library(
     name = "apriltag",
     srcs = [":generate-resources"] + glob(
-        ["src/main/native/cpp/**"],
+        [
+            "src/main/native/cpp/**",
+            "src/generated/main/native/cpp/**/*.cpp",
+        ],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**/*"]),
-    extra_hdr_pkg_files = [":thirdparty-apriltag-src-pkg"],
+    extra_hdr_pkg_files = [
+        ":thirdparty-apriltag-src-pkg",
+        ":protobuf_hdr_pkg",
+    ],
     extra_src_pkg_files = [":apriltag-java-jni-hdrs-pkg"],
     local_defines = ["WPILIB_EXPORTS"],
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
+        ":nanopb-generated-headers",
         ":thirdparty-apriltag",
         "//wpimath",
         "//wpiutil",
+    ],
+)
+
+generate_def_windows(
+    name = "apriltag_def",
+    filters = [
+        ".npb.obj",
+    ],
+    deps = [
+        ":apriltag",
     ],
 )
 
@@ -92,6 +183,7 @@ wpilib_cc_shared_library(
         "//wpiutil:shared/wpiutil",
     ],
     visibility = ["//visibility:public"],
+    win_def_file = ":apriltag_def",
     deps = [
         ":apriltag",
         ":thirdparty-apriltag",
@@ -135,7 +227,7 @@ wpilib_cc_shared_library(
 
 wpilib_jni_java_library(
     name = "apriltag-java",
-    srcs = glob(["src/main/java/**/*.java"]),
+    srcs = [":generated_java"] + glob(["src/main/java/**/*.java"]),
     extra_source_pkgs = ["resources"],
     maven_artifact_name = "apriltag-java",
     maven_group_id = "org.wpilib.apriltag",
@@ -152,6 +244,7 @@ wpilib_jni_java_library(
         "@bzlmodrio-opencv//libraries/java/opencv",
         "@maven//:io_avaje_avaje_json_core",
         "@maven//:io_avaje_avaje_jsonb",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
 

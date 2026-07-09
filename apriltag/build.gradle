@@ -36,6 +36,15 @@ ext {
                             'src/main/native/thirdparty/apriltag/include/common'
                 }
             }
+            nanopbCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/generated/main/native/cpp'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/generated/main/native/cpp'
+                }
+            }
         }
     }
 }
@@ -52,8 +61,11 @@ dependencies {
 
 sourceSets {
     main {
+        java {
+            srcDir "${projectDir}/src/generated/main/java"
+        }
         resources {
-            srcDirs 'src/main/native/resources'
+            srcDirs 'src/main/native/resources', "${projectDir}/src/main/proto"
         }
     }
 }
@@ -61,6 +73,10 @@ sourceSets {
 cppHeadersZip {
     from('src/main/native/thirdparty/apriltag/include') {
         into '/'
+    }
+    from("src/generated/main/native/cpp/apriltag/protobuf") {
+        into '/apriltag/protobuf'
+        include '**/*.h'
     }
 }
 
@@ -94,7 +110,8 @@ model {
                 it.exportedHeaders {
                     srcDirs 'src/main/native/include',
                             'src/main/native/thirdparty/apriltag/include',
-                            'src/main/native/thirdparty/apriltag/include/common'
+                            'src/main/native/thirdparty/apriltag/include/common',
+                            'src/generated/main/native/cpp'
                 }
             }
         }
@@ -126,6 +143,14 @@ model {
                     }
                 }
             }
+        }
+    }
+}
+
+nativeUtils.exportsConfigs {
+    apriltag {
+        objectFilterClosure = { file ->
+            return file.name.endsWith('.pb.obj') || file.name.endsWith('.npb.obj')
         }
     }
 }

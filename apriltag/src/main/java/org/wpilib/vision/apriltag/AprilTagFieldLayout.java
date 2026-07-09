@@ -20,6 +20,7 @@ import java.util.Optional;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.vision.apriltag.proto.AprilTagFieldLayoutProto;
 
 /**
  * Class for representing a layout of AprilTags on a field and reading them from a JSON format.
@@ -110,6 +111,15 @@ public class AprilTagFieldLayout {
   @Json.Property("tags")
   public List<AprilTag> getTags() {
     return new ArrayList<>(m_apriltags.values());
+  }
+
+  /**
+   * Returns a Map of the {@link AprilTag AprilTags} used in this layout, keyed by their ID.
+   *
+   * @return The {@link AprilTag AprilTags} used in this layout.
+   */
+  public Map<Integer, AprilTag> getTagMap() {
+    return new HashMap<>(m_apriltags);
   }
 
   /**
@@ -278,4 +288,7 @@ public class AprilTagFieldLayout {
       this.fieldWidth = fieldWidth;
     }
   }
+
+  /** AprilTagFieldLayout protobuf for serialization. */
+  public static final AprilTagFieldLayoutProto proto = new AprilTagFieldLayoutProto();
 }
