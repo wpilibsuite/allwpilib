@@ -44,6 +44,9 @@ public class ExpansionHubVelocityConstants {
             .getDoubleTopic(
                 "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/velocity" + "/kd")
             .publish(options);
+     m_pPublisher.set(1);
+    m_iPublisher.set(0);
+    m_dPublisher.set(0.01);
 
     m_sPublisher =
         systemServer
