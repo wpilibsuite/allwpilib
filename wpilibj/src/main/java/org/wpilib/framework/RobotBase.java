@@ -6,7 +6,6 @@ package org.wpilib.framework;
 
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
-
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.internal.DriverStationBackend;
