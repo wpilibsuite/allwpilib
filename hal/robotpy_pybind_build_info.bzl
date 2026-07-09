@@ -6,6 +6,9 @@ load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_mo
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
 def hal_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
+    NAME_TRANSFORMS = [
+    ]
+
     HAL_SIMULATION_HEADER_GEN = [
         struct(
             class_name = "DriverStationData",
@@ -103,6 +106,7 @@ def hal_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = []
             "//wpinet:robotpy-native-wpinet.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
+        name_transforms = NAME_TRANSFORMS,
     )
 
     create_pybind_library(
@@ -142,6 +146,9 @@ def hal_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = []
     )
 
 def wpihal_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
+    NAME_TRANSFORMS = [
+    ]
+
     WPIHAL_HEADER_GEN = [
         struct(
             class_name = "CANAPITypes",
@@ -326,6 +333,7 @@ def wpihal_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             "//wpinet:robotpy-native-wpinet.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
+        name_transforms = NAME_TRANSFORMS,
     )
 
     create_pybind_library(
