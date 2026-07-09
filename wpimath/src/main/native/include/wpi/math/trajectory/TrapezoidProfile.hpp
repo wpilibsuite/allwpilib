@@ -139,8 +139,8 @@ class TrapezoidProfile {
    * Calculates the position and velocity for the profile at a time t where the
    * current state is at time t = 0.
    *
-   * @param t How long to advance from the current state toward the desired
-   *     state.
+   * @param t The amount of time to advance from the current state toward the
+   * desired state.
    * @param current The current state.
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
@@ -265,7 +265,7 @@ class TrapezoidProfile {
 
     if (violationAmount > Velocity_t{0.0}) {
       recoveryTime = violationAmount / m_constraints.maxAcceleration;
-      // x = x_i + v_i t + at   (2)
+      // x = x_i + v_i t + at² / 2   (2)
       current.position +=
           current.velocity * recoveryTime +
           wpi::units::math::copysign(m_constraints.maxAcceleration,
@@ -293,20 +293,20 @@ class TrapezoidProfile {
     Distance_t dx = goal.position - current.position;
 
     // Calculate threshold displacement
-    // d = |v_t - v_i|(v_t + v_i) / 2 a_m   (9)
-    Distance_t d = wpi::units::math::abs(goal.velocity - current.velocity) /
-                   m_constraints.maxAcceleration *
-                   (current.velocity + goal.velocity) / 2.0;
+    // d = |v_t - v_i|(v_t + v_i) / (2 a_m)   (9)
+    Distance_t d = wpi::units::math::abs(goal.velocity - current.velocity) *
+                   (current.velocity + goal.velocity) /
+                   (2.0 * m_constraints.maxAcceleration);
 
-    // As discussed in TrapezoidProfile.md the correct sign must be chosen when
+    // As discussed in TrapezoidProfile.md, the correct sign must be chosen when
     // dx == d because following a suboptimal profile may lead to "chattering".
     // Additionally, if numerical precision errors cause the calculated optimal
     // sign to change throughout the profile, that may lead to suboptimal states
-    // being calculated. To fix this we add a tolerance such that if |dx - d| <
-    // epsilon we return the sign that would lead to the minimum profile being
+    // being calculated. To fix this, we add a tolerance such that if |dx - d| <
+    // epsilon, we return the sign that would lead to the minimum profile being
     // calculated. We do not have control over the floating point precision
-    // error from previous calculations and as such it is difficult to bound the
-    // possible error. 1e-12 should be good enough for FRC though.
+    // error from previous calculations, and as such, it is difficult to bound
+    // the possible error. 1e-12 should be good enough for FRC though.
 
     if (wpi::units::math::abs(dx - d) < Distance_t{1e-12}) {
       return std::copysign(1.0, goal.velocity.value());
@@ -341,10 +341,9 @@ class TrapezoidProfile {
     // v_p = √(aΔx + (v_t² + v_i²) / 2)   (8)
     Velocity_t peakVelocity =
         sign * wpi::units::math::sqrt(wpi::units::math::max(
-                   (goal.velocity * goal.velocity +
-                    current.velocity * current.velocity) /
-                           2 +
-                       acceleration * dx,
+                   acceleration * dx + (goal.velocity * goal.velocity +
+                                        current.velocity * current.velocity) /
+                                           2,
                    wpi::units::math::pow<2>(Velocity_t{0.0})));
 
     // Handle the case where we hit maximum velocity.
@@ -354,13 +353,25 @@ class TrapezoidProfile {
       // t_3 = (v_l - v_t) / a   (15)
       profile.t_3 = (velocityLimit - goal.velocity) / acceleration;
 
+      // x_1 = (v_p² - v_i²) / (2a)   (6)
+      // Substitute v_p for v_l because this is the velocity constrained case.
+      // x_1 = (v_l² - v_i²) / (2a)
+      Distance_t x_1 = (velocityLimit * velocityLimit -
+                        current.velocity * current.velocity) /
+                       (2 * acceleration);
+
+      // x_3 = (v_p² - v_i²) / (2a)   (7)
+      // Substitute v_p for v_l because this is the velocity constrained case.
+      // x_3 = (v_l² - v_i²) / (2a)
+      Distance_t x_3 =
+          (velocityLimit * velocityLimit - goal.velocity * goal.velocity) /
+          (2 * acceleration);
+
       // x_2 = Δx - x_1 - x_3   (12)
+      Distance_t x_2 = dx - x_1 - x_3;
+
       // t_2 = x_2 / v_l   (14)
-      profile.t_2 = (dx - (2 * velocityLimit * velocityLimit -
-                           (current.velocity * current.velocity +
-                            goal.velocity * goal.velocity)) /
-                              (2 * acceleration)) /
-                    velocityLimit;
+      profile.t_2 = x_2 / velocityLimit;
     } else {
       // t_1 = (v_p - v_i) / a   (13)
       profile.t_1 = (peakVelocity - current.velocity) / acceleration;

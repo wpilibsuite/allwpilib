@@ -168,7 +168,7 @@ public class TrapezoidProfile {
    * Calculates the position and velocity for the profile at a time t where the current state is at
    * time t = 0.
    *
-   * @param t How long to advance from the current state toward the desired state.
+   * @param t The amount of time to advance from the current state toward the desired state.
    * @param current The current state.
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
@@ -293,7 +293,7 @@ public class TrapezoidProfile {
 
     if (violationAmount > 0.0) {
       recoveryTime = violationAmount / m_constraints.maxAcceleration;
-      // x = x_i + v_i t + at   (2)
+      // x = x_i + v_i t + at² / 2   (2)
       current.position +=
           current.velocity * recoveryTime
               + Math.copySign(m_constraints.maxAcceleration, -current.velocity)
@@ -320,19 +320,19 @@ public class TrapezoidProfile {
     double dx = goal.position - current.position;
 
     // Calculate threshold displacement
-    // d = |v_t - v_i|(v_t + v_i) / a_m   (9)
+    // d = |v_t - v_i|(v_t + v_i) / (2 a_m)   (9)
     double d =
         Math.abs(goal.velocity - current.velocity)
-            / m_constraints.maxAcceleration
-            * (current.velocity + goal.velocity)
-            / 2.0;
+            * (goal.velocity + current.velocity)
+            / (2.0 * m_constraints.maxAcceleration);
 
-    // As discussed in TrapezoidProfile.md the correct sign must be chosen when dx == d because
+    // As discussed in TrapezoidProfile.md, the correct sign must be chosen when dx == d because
     // following a suboptimal profile may lead to "chattering". Additionally, if numerical precision
     // errors cause the calculated optimal sign to change throughout the profile, that may lead to
-    // suboptimal states being calculated. To fix this we add a tolerance such that if |dx - d| <
-    // epsilon we return the sign that would lead to the minimum profile being calculated. We do not
-    // have control over the floating point precision error from previous calculations and as such
+    // suboptimal states being calculated. To fix this, we add a tolerance such that if |dx - d| <
+    // epsilon, we return the sign that would lead to the minimum profile being calculated. We do
+    // not
+    // have control over the floating point precision error from previous calculations, and as such,
     // it is difficult to bound the possible error. 1e-12 should be good enough for FRC though.
     if (Math.abs(dx - d) < 1e-12) {
       return Math.copySign(1.0, goal.velocity);
@@ -368,8 +368,8 @@ public class TrapezoidProfile {
         sign
             * Math.sqrt(
                 Math.max(
-                    (goal.velocity * goal.velocity + current.velocity * current.velocity) / 2
-                        + acceleration * dx,
+                    acceleration * dx
+                        + (goal.velocity * goal.velocity + current.velocity * current.velocity) / 2,
                     0));
 
     // Handle the case where we hit maximum velocity.
@@ -379,14 +379,24 @@ public class TrapezoidProfile {
       // t_3 = (v_l - v_t) / a   (15)
       profile.t_3 = (velocityLimit - goal.velocity) / acceleration;
 
+      // x_1 = (v_p² - v_i²) / (2a)   (6)
+      // Substitute v_p for v_l because this is the velocity constrained case.
+      // x_1 = (v_l² - v_i²) / (2a)
+      double x_1 =
+          (velocityLimit * velocityLimit - current.velocity * current.velocity)
+              / (2 * acceleration);
+
+      // x_3 = (v_p² - v_i²) / (2a)   (7)
+      // Substitute v_p for v_l because this is the velocity constrained case.
+      // x_3 = (v_l² - v_i²) / (2a)
+      double x_3 =
+          (velocityLimit * velocityLimit - goal.velocity * goal.velocity) / (2 * acceleration);
+
       // x_2 = Δx - x_1 - x_3   (12)
+      double x_2 = dx - x_1 - x_3;
+
       // t_2 = x_2 / v_l   (14)
-      profile.t_2 =
-          (dx
-                  - (2 * velocityLimit * velocityLimit
-                          - (current.velocity * current.velocity + goal.velocity * goal.velocity))
-                      / (2 * acceleration))
-              / velocityLimit;
+      profile.t_2 = x_2 / velocityLimit;
     } else {
       // t_1 = (v_p - v_i) / a   (13)
       profile.t_1 = (peakVelocity - current.velocity) / acceleration;
