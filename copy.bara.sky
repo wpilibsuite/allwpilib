@@ -24,6 +24,12 @@ MOSTROBOTPY_PROJECTS = [
         has_tests = True,
     ),
     struct(
+        wpilib_name = "fields",
+        robotpy_name = "robotpy-fields",
+        native_robotpy_name = "robotpy-native-fields",
+        has_tests = True,
+    ),
+    struct(
         wpilib_name = "ntcore",
         robotpy_name = "pyntcore",
         native_robotpy_name = "robotpy-native-ntcore",
@@ -74,7 +80,7 @@ MOSTROBOTPY_PROJECTS = [
     struct(
         wpilib_name = "simulation/halsim_gui",
         robotpy_name = "robotpy-halsim-gui",
-        native_robotpy_name = None,
+        native_robotpy_name = "robotpy-native-halsim-gui",
         has_tests = True,
     ),
     struct(
@@ -87,6 +93,30 @@ MOSTROBOTPY_PROJECTS = [
 
 IGNORED_MOSTROBOTPY_PROJECTS = [
     "subprojects/robotpy-cscore",
+]
+
+# allwpilib -> mostrobotpy
+COMMANDS_GENERATION_SCRIPTS = [
+    (
+        "commandsv2/generate_hids.py",
+        "subprojects/robotpy-commands-v2/tools/hids/generate_hids.py",
+    ),
+    (
+        "commandsv2/src/generate/main/python/first_ds_commandhid.py.jinja",
+        "subprojects/robotpy-commands-v2/tools/hids/templates/main/python/first_ds_commandhid.py.jinja",
+    ),
+    (
+        "shared/generation.py",
+        "subprojects/robotpy-commands-v2/tools/shared/generation.py",
+    ),
+    (
+        "wpilibj/src/generate/first_ds_hids.json",
+        "subprojects/robotpy-commands-v2/tools/hids/first_ds_hids.json",
+    ),
+    (
+        "wpilibj/src/generate/first_ds_hids.schema.json",
+        "subprojects/robotpy-commands-v2/tools/hids/first_ds_hids.schema.json",
+    )
 ]
 
 def define_mostrobotpy_to_allwpilib():
@@ -112,6 +142,12 @@ def define_mostrobotpy_to_allwpilib():
     ))
 
     EXCLUDES = ["**/meson.build", "**/.gitignore", "**/requirements.txt", "**/.gittrack", "**/.gittrackexclude", "**/run_tests.py"]
+
+    # Sync the commands generation scripts
+    for (allwpilib_path, mostrobotpy_path) in COMMANDS_GENERATION_SCRIPTS:
+        origin_files += [mostrobotpy_path]
+        destination_files += [allwpilib_path]
+        transformations.append(core.move(mostrobotpy_path, allwpilib_path))
 
     for project_info in MOSTROBOTPY_PROJECTS:
         project_excludes = EXCLUDES
@@ -195,6 +231,8 @@ def define_mostrobotpy_to_allwpilib():
         paths = glob(["**/src/test/python**/*.py"]),
     ))
 
+    transformations.append(metadata.replace_message("[copybara] mostrobotpy to allwpilib"))
+
     core.workflow(
         name = "mostrobotpy_to_allwpilib",
         origin = git.origin(
@@ -208,14 +246,14 @@ def define_mostrobotpy_to_allwpilib():
         ),
         destination_files = destination_files,
         origin_files = origin_files,
-        authoring = authoring.pass_thru("Default email <default@default.com>"),
+        authoring = authoring.pass_thru("robotpy-bot <61093798+robotpy-bot@users.noreply.github.com>"),
         transformations = transformations,
     )
 
 def define_allwpilib_to_mostrobotpy():
     ignored_project_exclude = [p + "/**" for p in IGNORED_MOSTROBOTPY_PROJECTS] + [p + "/examples/**" for p in IGNORED_MOSTROBOTPY_PROJECTS]
     origin_files = []
-    destination_files = glob(["**"], exclude = ["*", ".github/**", "docs/**", "**/.gitignore", "**/meson.build", "**/requirements.txt", "devtools/**", "examples/cscore/**", "examples/datalog/**", "examples/ntcore/**", "examples/wpinet/**", "examples/robot/.gitignore", "subprojects/robotpy-commands-v2/tools/hids/**", "examples/CONTRIBUTING.md", "examples/check_header.py", "**/run_tests.py", "subprojects/robotpy-native-wpihal/tests/test_imports.py"] + ignored_project_exclude)
+    destination_files = glob(["**"], exclude = ["*", ".github/**", "docs/**", "**/.gitignore", "**/meson.build", "**/requirements.txt", "devtools/**", "examples/cscore/**", "examples/datalog/**", "examples/ntcore/**", "examples/wpinet/**", "examples/robot/.gitignore", "subprojects/robotpy-commands-v2/tools/hids/**", "examples/CONTRIBUTING.md", "examples/check_header.py", "**/run_tests.py", "subprojects/robotpy-native-wpihal/tests/test_imports.py", "subprojects/robotpy-native-halsim-gui/tests/test_imports.py"] + ignored_project_exclude)
     transformations = []
 
     for project_info in MOSTROBOTPY_PROJECTS:
@@ -232,40 +270,11 @@ def define_allwpilib_to_mostrobotpy():
         if project_info.native_robotpy_name:
             transformations.append(core.move("subprojects/" + project_info.robotpy_name + "/native-pyproject.toml", "subprojects/" + project_info.native_robotpy_name + "/pyproject.toml"))
 
-    origin_files += [
-        "commandsv2/generate_hids.py",
-        "commandsv2/src/generate/main/python/first_ds_commandhid.py.jinja",
-        "shared/generation.py",
-        "wpilibj/src/generate/first_ds_hids.json",
-        "wpilibj/src/generate/first_ds_hids.schema.json",
-    ]
-    destination_files += [
-        "subprojects/robotpy-commands-v2/tools/hids/generate_hids.py",
-        "subprojects/robotpy-commands-v2/tools/hids/templates/main/python/first_ds_commandhid.py.jinja",
-        "subprojects/robotpy-commands-v2/tools/shared/generation.py",
-        "subprojects/robotpy-commands-v2/tools/hids/first_ds_hids.json",
-        "subprojects/robotpy-commands-v2/tools/hids/first_ds_hids.schema.json",
-    ]
-    transformations.append(core.move(
-        "commandsv2/generate_hids.py",
-        "subprojects/robotpy-commands-v2/tools/hids/generate_hids.py",
-    ))
-    transformations.append(core.move(
-        "commandsv2/src/generate/main/python/first_ds_commandhid.py.jinja",
-        "subprojects/robotpy-commands-v2/tools/hids/templates/main/python/first_ds_commandhid.py.jinja",
-    ))
-    transformations.append(core.move(
-        "shared/generation.py",
-        "subprojects/robotpy-commands-v2/tools/shared/generation.py",
-    ))
-    transformations.append(core.move(
-        "wpilibj/src/generate/first_ds_hids.json",
-        "subprojects/robotpy-commands-v2/tools/hids/first_ds_hids.json",
-    ))
-    transformations.append(core.move(
-        "wpilibj/src/generate/first_ds_hids.schema.json",
-        "subprojects/robotpy-commands-v2/tools/hids/first_ds_hids.schema.json",
-    ))
+    # Sync the commands generation scripts
+    for (allwpilib_path, mostrobotpy_path) in COMMANDS_GENERATION_SCRIPTS:
+        origin_files += [allwpilib_path]
+        destination_files += [mostrobotpy_path]
+        transformations.append(core.move(allwpilib_path, mostrobotpy_path))
 
     origin_files += glob([
         "robotpyExamples/**",
@@ -282,6 +291,8 @@ def define_allwpilib_to_mostrobotpy():
         after = '@pytest.mark.xfail(reason="wpilib bug")',
         paths = glob(["**/tests**/*.py"]),
     ))
+
+    transformations.append(metadata.replace_message("[copybara] allwpilib to mostrobotpy"))
 
     core.workflow(
         name = "allwpilib_to_mostrobotpy",
