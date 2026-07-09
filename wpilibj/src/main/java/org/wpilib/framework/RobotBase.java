@@ -295,17 +295,15 @@ public abstract class RobotBase implements AutoCloseable {
    * @return The Robot subclass name.
    */
   protected static String getRobotName(StackTraceElement[] elements) {
-    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     // Walk bottom to top to account for multiple layers of subclassing
     for (int i = elements.length - 1; i >= 0; i--) {
       StackTraceElement element = elements[i];
       try {
         // Skip our own class when walking
-        if (RobotBase.class.equals(Class.forName(element.getClassName(), false, classLoader))) {
+        if (RobotBase.class.equals(Class.forName(element.getClassName()))) {
           continue;
         }
-        if (RobotBase.class.isAssignableFrom(
-            Class.forName(element.getClassName(), false, classLoader))) {
+        if (RobotBase.class.isAssignableFrom(Class.forName(element.getClassName()))) {
           return element.getClassName();
         }
       } catch (ClassNotFoundException e) {
