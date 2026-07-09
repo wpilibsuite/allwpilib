@@ -87,7 +87,11 @@ public final class GenericHID implements HIDDevice {
     /** Switch Joycon Right. */
     SWITCH_JOYCON_RIGHT(9),
     /** Switch Joycon Pair. */
-    SWITCH_JOYCON_PAIR(10);
+    SWITCH_JOYCON_PAIR(10),
+    /** GameCube controller. */
+    GAMECUBE(11),
+    /** Steam Controller. */
+    STEAM(12);
 
     /** HIDType value. */
     public final int value;
@@ -111,7 +115,7 @@ public final class GenericHID implements HIDDevice {
      * @return HIDType with the given value.
      */
     public static HIDType of(int value) {
-      return map.get(value);
+      return map.getOrDefault(value, UNKNOWN);
     }
   }
 
