@@ -40,8 +40,16 @@ public class OpModeTriggers {
 
   // opmode is selected, robot is disabled
   public Trigger disabled();
+
+  // bind a default command to this specific OpMode
+  public void setDefaultCommand(Mechanism mechanism, Command command);
+
+  // unbind a default command from this OpMode
+  public void removeDefaultCommand(Mechanism mechanism);
 }
 ```
+
+In addition to dynamic scoping (where a default command set during an active OpMode is automatically scoped to it), the `setDefaultCommand` method above allows teams to configure all their opmode-specific defaults upfront during robot initialization for opmodes that haven't been selected yet.
 
 ## CommandOpModes
 
@@ -178,19 +186,3 @@ The lack of automatic scope management in Commands v2 means teams should be caut
 - Use **Commands v3** when you need to mix command-based and periodic opmodes safely
 - Use **Commands v2** for purely command-based robot programs where all behaviors are modeled as commands
 - For C++ programs, Commands v2 is the only option (v3 is Java-only due to C++ coroutine limitations)
-
-# Future Work
-
-We also intend to support robot startup-time binding of default commands to OpModes. Currently, if a default command is set for a mechanism while an OpMode is running, that default command will be bound to that specific OpMode. However, there is no way to bind a default command to an OpMode that is not currently running. We intend to add the following methods to the `OpModeTriggers` class:
-
-```java
-public class OpModeTriggers {
-  // existing methods
-
-  // bind a default command to this specific OpMode
-  public void setDefaultCommand(Mechanism mechanism, Command command);
-
-  // unbind a default command from this OpMode
-  public void removeDefaultCommand(Mechanism mechanism);
-}
-```
