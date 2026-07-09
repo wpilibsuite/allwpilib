@@ -18,8 +18,8 @@ class BindingScopeTest extends SchedulerTest {
     m_opModeName = "Opmode 1";
 
     var scope = BindingScope.createNarrowestScope(m_scheduler);
-    assertInstanceOf(BindingScope.ForOpmode.class, scope);
-    assertEquals(m_opModeId, ((BindingScope.ForOpmode) scope).opmodeId());
+    assertInstanceOf(BindingScope.ForOpMode.class, scope);
+    assertEquals(m_opModeName, ((BindingScope.ForOpMode) scope).opModeName());
   }
 
   @Test

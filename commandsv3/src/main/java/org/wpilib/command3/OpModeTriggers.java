@@ -20,6 +20,7 @@ import org.wpilib.opmode.OpMode;
  */
 @NoDiscard
 public final class OpModeTriggers {
+  private final String m_name;
   private final Trigger m_loaded;
   private final Trigger m_enabled;
   private final Trigger m_disabled;
@@ -31,7 +32,8 @@ public final class OpModeTriggers {
    */
   OpModeTriggers(String name) {
     requireNonNullParam(name, "name", "CommandOpMode");
-    this.m_loaded = new Trigger(() -> OpModeFetcher.getFetcher().getOpModeName().equals(name));
+    this.m_name = name;
+    this.m_loaded = new Trigger(() -> OpModeFetcher.getFetcher().getOpModeName().equals(m_name));
     this.m_enabled = m_loaded.and(RobotState::isEnabled);
     this.m_disabled = m_loaded.and(RobotState::isDisabled);
   }
@@ -83,5 +85,16 @@ public final class OpModeTriggers {
    */
   public Trigger disabled(Trigger other) {
     return disabled().and(other);
+  }
+
+  /**
+   * Sets the default command for a mechanism during this opmode.
+   *
+   * @param mechanism The mechanism
+   * @param command The default command
+   * @see Scheduler#setDefaultCommand(String, Mechanism, Command)
+   */
+  public void setDefaultCommand(Mechanism mechanism, Command command) {
+    Scheduler.getDefault().setDefaultCommand(m_name, mechanism, command);
   }
 }

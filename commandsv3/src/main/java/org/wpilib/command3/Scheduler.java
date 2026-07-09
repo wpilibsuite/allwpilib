@@ -213,6 +213,46 @@ public final class Scheduler implements ProtobufSerializable {
     var currentCommand = currentCommand();
     BindingScope scope = BindingScope.createNarrowestScope(this);
 
+    setDefaultCommand(mechanism, defaultCommand, currentCommand, scope);
+  }
+
+  /**
+   * Sets the default command for a mechanism, scoped to a specific opmode. The command must require
+   * that mechanism and cannot require any other mechanisms. If another default command has already
+   * been set for this mechanism, the one provided will supersede it.
+   *
+   * <p>Unlike {@link #setDefaultCommand(Mechanism, Command)}, this method allows binding a default
+   * command to an opmode that is not currently running. The default command will only be active
+   * when the specified opmode is selected on the Driver Station.
+   *
+   * <p>This is useful for setting up default commands during robot initialization for opmodes that
+   * haven't been selected yet, allowing teams to configure all their opmode-specific defaults
+   * upfront rather than dynamically during opmode transitions.
+   *
+   * @param opModeName the name of the opmode for which to set the default command
+   * @param mechanism the mechanism for which to set the default command
+   * @param defaultCommand the default command to execute on the mechanism when the opmode is active
+   * @throws IllegalArgumentException if the command does not meet the requirements for being a
+   *     default command
+   */
+  public void setDefaultCommand(String opModeName, Mechanism mechanism, Command defaultCommand) {
+    if (!defaultCommand.requires(mechanism)) {
+      throw new IllegalArgumentException(
+          "A mechanism's default command must require that mechanism");
+    }
+
+    if (defaultCommand.requirements().size() > 1) {
+      throw new IllegalArgumentException(
+          "A mechanism's default command cannot require other mechanisms");
+    }
+
+    var currentCommand = currentCommand();
+    BindingScope scope = new BindingScope.ForOpMode(opModeName);
+
+    setDefaultCommand(mechanism, defaultCommand, currentCommand, scope);
+  }
+
+  private void setDefaultCommand(Mechanism mechanism, Command defaultCommand, Command currentCommand, BindingScope scope) {
     var binding =
         new Binding(
             scope,
