@@ -70,7 +70,6 @@ java_binary(
 write_source_files(
     name = "write_pregenerated_files",
     additional_update_targets = [
-        "//hal:write_hal",
         "//ntcore:write_ntcore",
         "//wpilibc:write_wpilibc",
         "//wpilibcExamples:write_example_project_list",
