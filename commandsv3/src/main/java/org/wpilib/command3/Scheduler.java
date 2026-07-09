@@ -198,7 +198,6 @@ public final class Scheduler implements ProtobufSerializable {
    * @throws IllegalArgumentException if the command does not meet the requirements for being a
    *     default command
    */
-  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public void setDefaultCommand(Mechanism mechanism, Command defaultCommand) {
     if (!defaultCommand.requires(mechanism)) {
       throw new IllegalArgumentException(
@@ -252,7 +251,9 @@ public final class Scheduler implements ProtobufSerializable {
     setDefaultCommand(mechanism, defaultCommand, currentCommand, scope);
   }
 
-  private void setDefaultCommand(Mechanism mechanism, Command defaultCommand, Command currentCommand, BindingScope scope) {
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
+  private void setDefaultCommand(
+      Mechanism mechanism, Command defaultCommand, Command currentCommand, BindingScope scope) {
     var binding =
         new Binding(
             scope,
@@ -273,6 +274,39 @@ public final class Scheduler implements ProtobufSerializable {
       //
       // Note that we cannot do this if the current default command is the caller because commands
       // cannot be canceled while mounted.
+      processDefaultCommands(mechanism);
+    }
+  }
+
+  /**
+   * Removes the default command for a mechanism that was scoped to a specific opmode.
+   *
+   * @param opModeName the name of the opmode from which to remove the default command
+   * @param mechanism the mechanism for which to remove the default command
+   */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
+  public void removeDefaultCommand(String opModeName, Mechanism mechanism) {
+    var bindings = m_defaultCommandBindings.get(mechanism);
+    if (bindings == null) {
+      return;
+    }
+
+    boolean removed = false;
+    for (var iterator = bindings.iterator(); iterator.hasNext(); ) {
+      var b = iterator.next();
+      if (b.scope() instanceof BindingScope.ForOpMode(String modeName)
+          && modeName.equals(opModeName)) {
+        if (currentCommand() == b.command()) {
+          // Can't cancel while mounted
+          return;
+        }
+        cancel(b.command());
+        iterator.remove();
+        removed = true;
+      }
+    }
+
+    if (removed) {
       processDefaultCommands(mechanism);
     }
   }
@@ -861,25 +895,27 @@ public final class Scheduler implements ProtobufSerializable {
   private void processDefaultCommands(Mechanism mechanism) {
     var bindings = m_defaultCommandBindings.get(mechanism);
 
-    // Remove default command bindings that are no longer active.
-    // If a default command is running when its scope goes inactive, also be sure to cancel it.
+    // Remove default command bindings that are no longer active, but only if they are transient.
+    // ForOpMode bindings are persistent and should not be removed, just cancelled when inactive.
     bindings.removeIf(
         b -> {
           if (!b.scope().active()) {
             cancel(b.command());
-            return true;
+            return b.scope() instanceof BindingScope.ForCommand;
           }
           return false;
         });
 
-    if (bindings.isEmpty()) {
+    var activeBindings = bindings.stream().filter(b -> b.scope().active()).toList();
+
+    if (activeBindings.isEmpty()) {
       // Nothing to do. No active bindings remain.
       return;
     }
 
     // Cancel any default command except the narrowest-scoped one (the last binding in the list)
-    for (int i = 0; i < bindings.size() - 1; i++) {
-      Command widerScopeDefaultCommand = bindings.get(i).command();
+    for (int i = 0; i < activeBindings.size() - 1; i++) {
+      Command widerScopeDefaultCommand = activeBindings.get(i).command();
       cancel(widerScopeDefaultCommand);
     }
 
@@ -896,7 +932,7 @@ public final class Scheduler implements ProtobufSerializable {
     }
 
     // Nothing currently running or queued that needs this mechanism. Queue the default command.
-    var defaultCommand = bindings.getLast();
+    var defaultCommand = activeBindings.getLast().command();
     schedule(defaultCommand);
   }
 

@@ -97,4 +97,14 @@ public final class OpModeTriggers {
   public void setDefaultCommand(Mechanism mechanism, Command command) {
     Scheduler.getDefault().setDefaultCommand(m_name, mechanism, command);
   }
+
+  /**
+   * Removes the default command for a mechanism during this opmode.
+   *
+   * @param mechanism The mechanism
+   * @see Scheduler#removeDefaultCommand(String, Mechanism)
+   */
+  public void removeDefaultCommand(Mechanism mechanism) {
+    Scheduler.getDefault().removeDefaultCommand(m_name, mechanism);
+  }
 }
