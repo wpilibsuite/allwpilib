@@ -79,7 +79,7 @@ class BalanceAuto(wpilib.PeriodicOpMode):
 class MyRobot(OpModeRobot):
     def __init__(self) -> None:
         super().__init__()
-        self.addOpMode(DoNothingTeleop, RobotMode.TELEOPERATED, "Do Nothing Teleop")
-        self.addOpMode(ScoreAuto, RobotMode.AUTONOMOUS, "Score Auto")
-        self.addOpMode(BalanceAuto, RobotMode.AUTONOMOUS, "Balance Auto")
-        self.publishOpModes()
+        self.add_opmode(DoNothingTeleop, RobotMode.TELEOPERATED, "Do Nothing Teleop")
+        self.add_opmode(ScoreAuto, RobotMode.AUTONOMOUS, "Score Auto")
+        self.add_opmode(BalanceAuto, RobotMode.AUTONOMOUS, "Balance Auto")
+        self.publish_opmodes()
