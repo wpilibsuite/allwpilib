@@ -26,10 +26,10 @@ classes:
 inline_code: |
   cls_DCMotorSim
     // java API compatibility
-    .def("getAngularPositionRotations", [](const DCMotorSim &self) {
+    .def("get_angular_position_rotations", [](const DCMotorSim &self) {
       return wpi::units::turn_t{self.GetAngularPosition()};
     }, py::doc("Returns the DC motor position in rotations"))
-    .def("getAngularVelocityRPM", [](const DCMotorSim &self) {
+    .def("get_angular_velocity_rpm", [](const DCMotorSim &self) {
       return wpi::units::revolutions_per_minute_t{self.GetAngularVelocity()};
     }, py::doc("Returns the DC motor velocity in revolutions per minute"))
   ;

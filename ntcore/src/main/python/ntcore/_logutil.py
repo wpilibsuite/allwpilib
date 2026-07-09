@@ -24,22 +24,22 @@ class NtLogForwarder:
     def config_logging(
         cls,
         instance: _ntcore.NetworkTableInstance,
-        minLevel: _ntcore.NetworkTableInstance.LogLevel,
-        maxLevel: _ntcore.NetworkTableInstance.LogLevel,
-        logName: str,
+        min_level: _ntcore.NetworkTableInstance.LogLevel,
+        max_level: _ntcore.NetworkTableInstance.LogLevel,
+        log_name: str,
     ):
-        handle = instance._getHandle()
+        handle = instance._get_handle()
         with cls._instlock:
             if handle in cls._instances:
                 raise InstanceAlreadyStartedError(
                     "cannot configure logging after instance has been started"
                 )
 
-            cls._instcfg[handle] = (minLevel, maxLevel, logName)
+            cls._instcfg[handle] = (min_level, max_level, log_name)
 
     @classmethod
-    def onInstanceStart(cls, instance: _ntcore.NetworkTableInstance):
-        handle = instance._getHandle()
+    def on_instance_start(cls, instance: _ntcore.NetworkTableInstance):
+        handle = instance._get_handle()
         with cls._instlock:
             if handle in cls._instances:
                 return
@@ -49,13 +49,13 @@ class NtLogForwarder:
                 _ntcore.NetworkTableInstance.LogLevel.CRITICAL,
                 "nt",
             )
-            minLevel, maxLevel, logName = cls._instcfg.get(handle, default_cfg)
+            min_level, max_level, log_name = cls._instcfg.get(handle, default_cfg)
 
-            cls._instances[handle] = cls(instance, logName, minLevel, maxLevel)
+            cls._instances[handle] = cls(instance, log_name, min_level, max_level)
 
     @classmethod
-    def onInstanceDestroy(cls, instance: _ntcore.NetworkTableInstance):
-        handle = instance._getHandle()
+    def on_instance_destroy(cls, instance: _ntcore.NetworkTableInstance):
+        handle = instance._get_handle()
         with cls._instlock:
             lfwd = cls._instances.pop(handle, None)
             if lfwd:
@@ -64,37 +64,37 @@ class NtLogForwarder:
     def __init__(
         self,
         instance: _ntcore.NetworkTableInstance,
-        logName: str,
-        minLevel: _ntcore.NetworkTableInstance.LogLevel,
-        maxLevel: _ntcore.NetworkTableInstance.LogLevel,
+        log_name: str,
+        min_level: _ntcore.NetworkTableInstance.LogLevel,
+        max_level: _ntcore.NetworkTableInstance.LogLevel,
     ):
         self.lock = threading.Lock()
         self.poller = _ntcore.NetworkTableListenerPoller(instance)
-        ntLogger = self.poller.addLogger(minLevel, maxLevel)
+        nt_logger = self.poller.add_logger(min_level, max_level)
 
         self.thread = threading.Thread(
             target=self._logging_thread,
-            name=logName + "-log-thread",
+            name=log_name + "-log-thread",
             daemon=True,
-            args=(self.poller, logName, ntLogger),
+            args=(self.poller, log_name, nt_logger),
         )
         self.thread.start()
 
         atexit.register(self.destroy)
 
     def _logging_thread(
-        self, poller: _ntcore.NetworkTableListenerPoller, logName: str, ntLogger: int
+        self, poller: _ntcore.NetworkTableListenerPoller, log_name: str, nt_logger: int
     ):
-        logger = logging.getLogger(logName)
+        logger = logging.getLogger(log_name)
 
-        _waitForObject = wpiutil.sync.waitForObject
-        handle = poller.getHandle()
+        _wait_for_object = wpiutil.sync.wait_for_object
+        handle = poller.get_handle()
 
         while True:
-            if not _waitForObject(handle):
+            if not _wait_for_object(handle):
                 break
 
-            messages = poller.readQueue()
+            messages = poller.read_queue()
             if not messages:
                 continue
 
@@ -102,7 +102,7 @@ class NtLogForwarder:
                 msg = msg.data
                 if logger.isEnabledFor(msg.level):
                     lr = logger.makeRecord(
-                        logName,
+                        log_name,
                         msg.level,
                         msg.filename,
                         msg.line,

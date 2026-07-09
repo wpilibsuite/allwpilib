@@ -23,17 +23,17 @@ class MyRobot(wpilib.TimedRobot):
         self.intake = Intake()
         self.joystick = wpilib.Joystick(constants.JOYSTICK_INDEX)
 
-    def teleopPeriodic(self) -> None:
+    def teleop_periodic(self) -> None:
         """This function is called periodically during operator control."""
         # Activate the intake while the trigger is held
-        if self.joystick.getTrigger():
+        if self.joystick.get_trigger():
             self.intake.activate(constants.IntakeConstants.INTAKE_VELOCITY)
         else:
             self.intake.activate(0)
 
         # Toggle deploying the intake when the top button is pressed
-        if self.joystick.getTop():
-            if self.intake.isDeployed():
+        if self.joystick.get_top():
+            if self.intake.is_deployed():
                 self.intake.retract()
             else:
                 self.intake.deploy()

@@ -151,27 +151,27 @@ py::function valueFactoryByType(wpi::nt::NetworkTableType type) {
   py::object PyNtValue = py::module::import("ntcore").attr("Value");
   switch (type) {
     case wpi::nt::NetworkTableType::BOOLEAN:
-      return PyNtValue.attr("makeBoolean");
+      return PyNtValue.attr("make_boolean");
     case wpi::nt::NetworkTableType::DOUBLE:
-      return PyNtValue.attr("makeDouble");
+      return PyNtValue.attr("make_double");
     case wpi::nt::NetworkTableType::STRING:
-      return PyNtValue.attr("makeString");
+      return PyNtValue.attr("make_string");
     case wpi::nt::NetworkTableType::RAW:
-      return PyNtValue.attr("makeRaw");
+      return PyNtValue.attr("make_raw");
     case wpi::nt::NetworkTableType::BOOLEAN_ARRAY:
-      return PyNtValue.attr("makeBooleanArray");
+      return PyNtValue.attr("make_boolean_array");
     case wpi::nt::NetworkTableType::DOUBLE_ARRAY:
-      return PyNtValue.attr("makeDoubleArray");
+      return PyNtValue.attr("make_double_array");
     case wpi::nt::NetworkTableType::STRING_ARRAY:
-      return PyNtValue.attr("makeStringArray");
+      return PyNtValue.attr("make_string_array");
     case wpi::nt::NetworkTableType::INTEGER:
-      return PyNtValue.attr("makeInteger");
+      return PyNtValue.attr("make_integer");
     case wpi::nt::NetworkTableType::FLOAT:
-      return PyNtValue.attr("makeFloat");
+      return PyNtValue.attr("make_float");
     case wpi::nt::NetworkTableType::INTEGER_ARRAY:
-      return PyNtValue.attr("makeIntegerArray");
+      return PyNtValue.attr("make_integer_array");
     case wpi::nt::NetworkTableType::FLOAT_ARRAY:
-      return PyNtValue.attr("makeFloatArray");
+      return PyNtValue.attr("make_float_array");
     default:
       throw py::type_error("empty nt value");
   }

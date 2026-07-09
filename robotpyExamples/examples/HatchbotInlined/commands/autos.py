@@ -20,56 +20,56 @@ class Autos:
         raise Exception("This is a utility class!")
 
     @staticmethod
-    def simpleAuto(drive: subsystems.drivesubsystem.DriveSubsystem):
+    def simple_auto(drive: subsystems.drivesubsystem.DriveSubsystem):
         """A simple auto routine that drives forward a specified distance, and then stops."""
         return commands2.FunctionalCommand(
             # Reset encoders on command start
-            drive.resetEncoders,
+            drive.reset_encoders,
             # Drive forward while the command is executing,
-            lambda: drive.arcadeDrive(constants.kAutoDriveVelocity, 0),
+            lambda: drive.arcade_drive(constants.AUTO_DRIVE_VELOCITY, 0),
             # Stop driving at the end of the command
-            lambda interrupt: drive.arcadeDrive(0, 0),
+            lambda interrupt: drive.arcade_drive(0, 0),
             # End the command when the robot's driven distance exceeds the desired value
-            lambda: drive.getAverageEncoderDistance()
-            >= constants.kAutoDriveDistanceInches,
+            lambda: drive.get_average_encoder_distance()
+            >= constants.AUTO_DRIVE_DISTANCE_INCHES,
             # Require the drive subsystem
         )
 
     @staticmethod
-    def complexAuto(
-        driveSubsystem: subsystems.drivesubsystem.DriveSubsystem,
-        hatchSubsystem: subsystems.hatchsubsystem.HatchSubsystem,
+    def complex_auto(
+        drive_subsystem: subsystems.drivesubsystem.DriveSubsystem,
+        hatch_subsystem: subsystems.hatchsubsystem.HatchSubsystem,
     ):
         """A complex auto routine that drives forward, drops a hatch, and then drives backward."""
         return commands2.cmd.sequence(
             # Drive forward up to the front of the cargo ship
             commands2.FunctionalCommand(
                 # Reset encoders on command start
-                driveSubsystem.resetEncoders,
+                drive_subsystem.reset_encoders,
                 # Drive forward while the command is executing
-                lambda: driveSubsystem.arcadeDrive(constants.kAutoDriveVelocity, 0),
+                lambda: drive_subsystem.arcade_drive(constants.AUTO_DRIVE_VELOCITY, 0),
                 # Stop driving at the end of the command
-                lambda interrupt: driveSubsystem.arcadeDrive(0, 0),
+                lambda interrupt: drive_subsystem.arcade_drive(0, 0),
                 # End the command when the robot's driven distance exceeds the desired value
-                lambda: driveSubsystem.getAverageEncoderDistance()
-                >= constants.kAutoDriveDistanceInches,
+                lambda: drive_subsystem.get_average_encoder_distance()
+                >= constants.AUTO_DRIVE_DISTANCE_INCHES,
                 # Require the drive subsystem
-                driveSubsystem,
+                drive_subsystem,
             ),
             # Release the hatch
-            hatchSubsystem.releaseHatch(),
+            hatch_subsystem.release_hatch(),
             # Drive backward the specified distance
             commands2.FunctionalCommand(
                 # Reset encoders on command start
-                driveSubsystem.resetEncoders,
+                drive_subsystem.reset_encoders,
                 # Drive backwards while the command is executing
-                lambda: driveSubsystem.arcadeDrive(-constants.kAutoDriveVelocity, 0),
+                lambda: drive_subsystem.arcade_drive(-constants.AUTO_DRIVE_VELOCITY, 0),
                 # Stop driving at the end of the command
-                lambda interrupt: driveSubsystem.arcadeDrive(0, 0),
+                lambda interrupt: drive_subsystem.arcade_drive(0, 0),
                 # End the command when the robot's driven distance exceeds the desired value
-                lambda: abs(driveSubsystem.getAverageEncoderDistance())
-                >= constants.kAutoBackupDistanceInches,
+                lambda: abs(drive_subsystem.get_average_encoder_distance())
+                >= constants.AUTO_BACKUP_DISTANCE_INCHES,
                 # Require the drive subsystem
-                driveSubsystem,
+                drive_subsystem,
             ),
         )

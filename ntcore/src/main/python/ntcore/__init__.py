@@ -185,9 +185,9 @@ __all__ = [
     "ValueEventData",
 ]
 
-from ._ntcore import _now, _setNow
+from ._ntcore import _now, _set_now
 
-__all__ += ["_now", "_setNow"]
+__all__ += ["_now", "_set_now"]
 
 try:
     from .version import version as __version__

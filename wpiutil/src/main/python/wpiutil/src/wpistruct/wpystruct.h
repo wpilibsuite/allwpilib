@@ -160,12 +160,12 @@ struct WPyStructPyConverter : WPyStructConverter {
     m_size = o.attr("size").cast<size_t>();
 
     m_pack = py::reinterpret_borrow<py::function>(o.attr("pack"));
-    m_packInto = py::reinterpret_borrow<py::function>(o.attr("packInto"));
+    m_packInto = py::reinterpret_borrow<py::function>(o.attr("pack_into"));
     m_unpack = py::reinterpret_borrow<py::function>(o.attr("unpack"));
     // m_unpackInto =
-    // py::reinterpret_borrow<py::function>(o.attr("unpackInto"));
+    // py::reinterpret_borrow<py::function>(o.attr("unpack_into"));
     m_forEachNested =
-        py::reinterpret_borrow<py::function>(o.attr("forEachNested"));
+        py::reinterpret_borrow<py::function>(o.attr("for_each_nested"));
   }
 
   // copy all the relevant attributes locally

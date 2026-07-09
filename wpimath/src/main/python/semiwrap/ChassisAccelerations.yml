@@ -37,7 +37,7 @@ inline_code: |
       >(),
       py::arg("ax") = 0, py::arg("ay") = 0, py::arg("alpha") = 0
     )
-    .def_static("fromFps", [](wpi::units::feet_per_second_squared_t ax, wpi::units::feet_per_second_squared_t ay, wpi::units::radians_per_second_squared_t alpha){
+    .def_static("from_fps", [](wpi::units::feet_per_second_squared_t ax, wpi::units::feet_per_second_squared_t ay, wpi::units::radians_per_second_squared_t alpha){
       return ChassisAccelerations{ax, ay, alpha};
     }, py::arg("ax") = 0, py::arg("ay") = 0, py::arg("alpha") = 0)
     .def_property("ax_fpss",
