@@ -118,3 +118,18 @@ TEST_F(TimerTest, GetMonotonicTimestamp) {
   auto end = wpi::Timer::GetMonotonicTimestamp();
   EXPECT_EQ(start + 500_ms, end);
 }
+
+TEST_F(TimerTest, RestartTimingPreservesPausedClock) {
+  EXPECT_TRUE(wpi::sim::IsTimingPaused());
+
+  wpi::sim::StepTiming(500_ms);
+  auto beforeRestart = wpi::Timer::GetMonotonicTimestamp();
+
+  wpi::sim::RestartTiming();
+
+  EXPECT_TRUE(wpi::sim::IsTimingPaused());
+  EXPECT_EQ(beforeRestart, wpi::Timer::GetMonotonicTimestamp());
+
+  wpi::sim::StepTiming(500_ms);
+  EXPECT_EQ(beforeRestart + 500_ms, wpi::Timer::GetMonotonicTimestamp());
+}
