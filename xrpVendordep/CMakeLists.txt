@@ -28,7 +28,7 @@ configure_file(xrpvendordep-config.cmake.in ${WPILIB_BINARY_DIR}/xrpvendordep-co
 install(FILES ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake DESTINATION share/xrpVendordep)
 install(EXPORT xrpvendordep DESTINATION share/xrpVendordep)
 
-if(WITH_TESTS)
+if(WPILIB_WITH_TESTS)
     wpilib_add_test_catch2(xrpVendordep src/test/native/cpp)
     target_include_directories(xrpVendordep_test PRIVATE src/test/native/include)
     target_link_libraries(xrpVendordep_test xrpVendordep)

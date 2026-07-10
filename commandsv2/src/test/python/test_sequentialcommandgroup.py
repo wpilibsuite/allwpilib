@@ -16,7 +16,7 @@ class TestSequentialCommandGroupComposition(MultiCompositionTestBase):
         return commands2.SequentialCommandGroup(*members)
 
 
-def test_sequentialGroupSchedule(scheduler: commands2.CommandScheduler):
+def test_sequential_group_schedule(scheduler: commands2.CommandScheduler):
     command1 = commands2.Command()
     command2 = commands2.Command()
 
@@ -30,7 +30,7 @@ def test_sequentialGroupSchedule(scheduler: commands2.CommandScheduler):
     verify(command1).initialize()
     verify(command2, never()).initialize()
 
-    command1.isFinished = lambda: True
+    command1.is_finished = lambda: True
     scheduler.run()
 
     verify(command1).execute()
@@ -39,7 +39,7 @@ def test_sequentialGroupSchedule(scheduler: commands2.CommandScheduler):
     verify(command2, never()).execute()
     verify(command2, never()).end(False)
 
-    command2.isFinished = lambda: True
+    command2.is_finished = lambda: True
     scheduler.run()
 
     verify(command1).execute()
@@ -47,10 +47,10 @@ def test_sequentialGroupSchedule(scheduler: commands2.CommandScheduler):
     verify(command2).execute()
     verify(command2).end(False)
 
-    assert not scheduler.isScheduled(group)
+    assert not scheduler.is_scheduled(group)
 
 
-def test_sequentialGroupInterrupt(scheduler: commands2.CommandScheduler):
+def test_sequential_group_interrupt(scheduler: commands2.CommandScheduler):
     command1 = commands2.Command()
     command2 = commands2.Command()
     command3 = commands2.Command()
@@ -63,7 +63,7 @@ def test_sequentialGroupInterrupt(scheduler: commands2.CommandScheduler):
 
     scheduler.schedule(group)
 
-    command1.isFinished = lambda: True
+    command1.is_finished = lambda: True
     scheduler.run()
     scheduler.cancel(group)
     scheduler.run()
@@ -80,10 +80,10 @@ def test_sequentialGroupInterrupt(scheduler: commands2.CommandScheduler):
     verify(command3, never()).end(True)
     verify(command3, never()).end(False)
 
-    assert not scheduler.isScheduled(group)
+    assert not scheduler.is_scheduled(group)
 
 
-def test_notScheduledCancel(scheduler: commands2.CommandScheduler):
+def test_not_scheduled_cancel(scheduler: commands2.CommandScheduler):
     command1 = commands2.Command()
     command2 = commands2.Command()
 
@@ -92,23 +92,23 @@ def test_notScheduledCancel(scheduler: commands2.CommandScheduler):
     scheduler.cancel(group)
 
 
-def test_sequentialGroupRequirement(scheduler: commands2.CommandScheduler):
+def test_sequential_group_requirement(scheduler: commands2.CommandScheduler):
     system1 = commands2.Subsystem()
     system2 = commands2.Subsystem()
     system3 = commands2.Subsystem()
     system4 = commands2.Subsystem()
 
     command1 = commands2.InstantCommand()
-    command1.addRequirements(system1, system2)
+    command1.add_requirements(system1, system2)
     command2 = commands2.InstantCommand()
-    command2.addRequirements(system3)
+    command2.add_requirements(system3)
     command3 = commands2.InstantCommand()
-    command3.addRequirements(system3, system4)
+    command3.add_requirements(system3, system4)
 
     group = commands2.SequentialCommandGroup(command1, command2)
 
     scheduler.schedule(group)
     scheduler.schedule(command3)
 
-    assert not scheduler.isScheduled(group)
-    assert scheduler.isScheduled(command3)
+    assert not scheduler.is_scheduled(group)
+    assert scheduler.is_scheduled(command3)

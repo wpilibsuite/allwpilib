@@ -1,8 +1,8 @@
-import tempfile
-import hashlib
-from urllib.request import urlopen
-import os
 import base64
+import hashlib
+import os
+import tempfile
+from urllib.request import urlopen
 
 
 def __try_download_sha(base_url, use_base64):
@@ -139,10 +139,10 @@ def update_libssh():
         "linuxx86-64staticdebug",
         "osxuniversalstatic",
         "osxuniversalstaticdebug",
-        "windowsx86-64static",
-        "windowsx86-64staticdebug",
         "windowsarm64static",
         "windowsarm64staticdebug",
+        "windowsx86-64static",
+        "windowsx86-64staticdebug",
     ]
     url_base = f"https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/libssh/{version}/libssh-{version}-%s.zip"
 
@@ -162,9 +162,9 @@ def update_mrclib():
     has_headers = True
     classifiers = [
         "linuxarm64",
+        "linuxsystemcore",
         "linuxx86-64",
         "osxuniversal",
-        "linuxsystemcore",
         "windowsarm64",
         "windowsx86-64",
     ]

@@ -11,10 +11,10 @@ from subsystems.hatchsubsystem import HatchSubsystem
 class GrabHatch(commands2.Command):
     def __init__(self, hatch: HatchSubsystem) -> None:
         self.hatch = hatch
-        self.addRequirements(hatch)
+        self.add_requirements(hatch)
 
     def initialize(self) -> None:
-        self.hatch.grabHatch()
+        self.hatch.grab_hatch()
 
-    def isFinished(self) -> bool:
+    def is_finished(self) -> bool:
         return True

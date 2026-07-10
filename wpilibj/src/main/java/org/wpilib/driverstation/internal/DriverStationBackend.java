@@ -152,7 +152,7 @@ public final class DriverStationBackend {
   }
 
   private static class MatchDataSender {
-    private static final String kSmartDashboardType = "FMSInfo";
+    private static final String kSmartDashboardType = "DriverStation";
 
     final StringPublisher gameData;
     final StringPublisher eventName;
@@ -161,20 +161,22 @@ public final class DriverStationBackend {
     final IntegerPublisher matchType;
     final BooleanPublisher alliance;
     final IntegerPublisher station;
+    final IntegerPublisher allianceStation;
     final StructPublisher<ControlWord> controlWord;
     final StringPublisher opMode;
-    boolean oldIsRedAlliance = true;
-    int oldStationNumber = 1;
     String oldEventName = "";
     String oldGameData = "";
     int oldMatchNumber;
     int oldReplayNumber;
     int oldMatchType;
+    boolean oldIsRedAlliance = true;
+    int oldStationNumber = 1;
+    int oldAllianceStation = 0;
     final ControlWord oldControlWord = new ControlWord();
     final ControlWord currentControlWord = new ControlWord();
 
     MatchDataSender() {
-      var table = NetworkTableInstance.getDefault().getTable("FMSInfo");
+      var table = NetworkTableInstance.getDefault().getTable("DriverStation");
       table
           .getStringTopic(".type")
           .publishEx(
@@ -194,6 +196,8 @@ public final class DriverStationBackend {
       alliance.set(true);
       station = table.getIntegerTopic("StationNumber").publish();
       station.set(1);
+      allianceStation = table.getIntegerTopic("AllianceStationID").publish();
+      allianceStation.set(0);
       controlWord = table.getStructTopic("ControlWord", ControlWord.struct).publish();
       controlWord.set(oldControlWord);
       opMode = table.getStringTopic("OpMode").publish();
@@ -207,7 +211,8 @@ public final class DriverStationBackend {
           switch (allianceID) {
             case BLUE_1, RED_1 -> 1;
             case BLUE_2, RED_2 -> 2;
-            case BLUE_3, RED_3, UNKNOWN -> 3;
+            case BLUE_3, RED_3 -> 3;
+            case UNKNOWN -> 0;
           };
       final boolean isRedAlliance =
           switch (allianceID) {
@@ -239,6 +244,10 @@ public final class DriverStationBackend {
       if (oldStationNumber != stationNumber) {
         station.set(stationNumber);
         oldStationNumber = stationNumber;
+      }
+      if (oldAllianceStation != allianceID.ordinal()) {
+        allianceStation.set(allianceID.ordinal());
+        oldAllianceStation = allianceID.ordinal();
       }
       if (!oldEventName.equals(currentEventName)) {
         eventName.set(currentEventName);

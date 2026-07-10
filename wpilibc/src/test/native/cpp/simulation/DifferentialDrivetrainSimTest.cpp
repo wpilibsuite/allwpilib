@@ -48,8 +48,8 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
   auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       wpi::math::Pose2d{}, {}, wpi::math::Pose2d{2_m, 2_m, 0_rad}, config);
 
-  for (auto t = 0_s; t < trajectory.TotalTime(); t += 20_ms) {
-    auto state = trajectory.Sample(t);
+  for (auto t = 0_s; t < trajectory.Duration(); t += 20_ms) {
+    auto state = trajectory.SampleAt(t);
     auto feedbackOut = feedback.Calculate(sim.GetPose(), state);
 
     auto [l, r] = kinematics.ToWheelVelocities(feedbackOut);

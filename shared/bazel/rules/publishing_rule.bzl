@@ -20,7 +20,14 @@ CLASSIFIER_FILTER = "{classifier_filter}"
 publishing_repo = repository_rule(
     implementation = _publishing_repo_impl,
     environ = ["WPI_PUBLISH_CLASSIFIER_FILTER"],
-    doc = "Repository rule to determine host OS and classifier filter for publishing. " +
-          "This rule must be instantiated in the WORKSPACE file with the name " +
-          "'com_wpilib_allwpilib_publishing_config'.",
+    doc = "Repository rule to determine host OS and classifier filter for publishing.",
+)
+
+def _publishing_extension_impl(module_ctx):
+    publishing_repo(
+        name = "com_wpilib_allwpilib_publishing_config",
+    )
+
+publishing_extension = module_extension(
+    implementation = _publishing_extension_impl,
 )

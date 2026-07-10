@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import Mock, call, ANY
-from wpilib.simulation import stepTiming, pauseTiming, resumeTiming
+from wpilib.simulation import step_timing, pause_timing, resume_timing
 from wpimath.units import volts
 from commands2 import Command, Subsystem
 from commands2.sysid import SysIdRoutine
@@ -8,7 +8,7 @@ from wpilib.sysid import SysIdRoutineLog, State
 
 
 class Mechanism(Subsystem):
-    def recordState(self, state: State):
+    def record_state(self, state: State):
         pass
 
     def drive(self, voltage: volts):
@@ -26,42 +26,42 @@ def mechanism():
 @pytest.fixture
 def sysid_routine(mechanism):
     return SysIdRoutine(
-        SysIdRoutine.Config(recordState=mechanism.recordState),
+        SysIdRoutine.Config(record_state=mechanism.record_state),
         SysIdRoutine.Mechanism(mechanism.drive, mechanism.log, Subsystem()),
     )
 
 
 @pytest.fixture
 def quasistatic_forward(sysid_routine):
-    return sysid_routine.quasistatic(SysIdRoutine.Direction.kForward)
+    return sysid_routine.quasistatic(SysIdRoutine.Direction.FORWARD)
 
 
 @pytest.fixture
 def quasistatic_reverse(sysid_routine):
-    return sysid_routine.quasistatic(SysIdRoutine.Direction.kReverse)
+    return sysid_routine.quasistatic(SysIdRoutine.Direction.REVERSE)
 
 
 @pytest.fixture
 def dynamic_forward(sysid_routine):
-    return sysid_routine.dynamic(SysIdRoutine.Direction.kForward)
+    return sysid_routine.dynamic(SysIdRoutine.Direction.FORWARD)
 
 
 @pytest.fixture
 def dynamic_reverse(sysid_routine):
-    return sysid_routine.dynamic(SysIdRoutine.Direction.kReverse)
+    return sysid_routine.dynamic(SysIdRoutine.Direction.REVERSE)
 
 
 @pytest.fixture(autouse=True)
 def timing():
-    pauseTiming()
+    pause_timing()
     yield
-    resumeTiming()
+    resume_timing()
 
 
 def run_command(command: Command):
     command.initialize()
     command.execute()
-    stepTiming(1)
+    step_timing(1)
     command.execute()
     command.end(True)
 
@@ -75,9 +75,9 @@ def test_record_state_bookends_motor_logging(
         [
             call.drive(ANY),
             call.log(ANY),
-            call.recordState(State.QUASISTATIC_FORWARD),
+            call.record_state(State.QUASISTATIC_FORWARD),
             call.drive(ANY),
-            call.recordState(State.NONE),
+            call.record_state(State.NONE),
         ],
         any_order=False,
     )
@@ -89,9 +89,9 @@ def test_record_state_bookends_motor_logging(
         [
             call.drive(ANY),
             call.log(ANY),
-            call.recordState(State.DYNAMIC_FORWARD),
+            call.record_state(State.DYNAMIC_FORWARD),
             call.drive(ANY),
-            call.recordState(State.NONE),
+            call.record_state(State.NONE),
         ],
         any_order=False,
     )
@@ -105,16 +105,16 @@ def test_tests_declare_correct_state(
     dynamic_reverse,
 ):
     run_command(quasistatic_forward)
-    mechanism.recordState.assert_any_call(State.QUASISTATIC_FORWARD)
+    mechanism.record_state.assert_any_call(State.QUASISTATIC_FORWARD)
 
     run_command(quasistatic_reverse)
-    mechanism.recordState.assert_any_call(State.QUASISTATIC_REVERSE)
+    mechanism.record_state.assert_any_call(State.QUASISTATIC_REVERSE)
 
     run_command(dynamic_forward)
-    mechanism.recordState.assert_any_call(State.DYNAMIC_FORWARD)
+    mechanism.record_state.assert_any_call(State.DYNAMIC_FORWARD)
 
     run_command(dynamic_reverse)
-    mechanism.recordState.assert_any_call(State.DYNAMIC_REVERSE)
+    mechanism.record_state.assert_any_call(State.DYNAMIC_REVERSE)
 
 
 def test_tests_output_correct_voltage(

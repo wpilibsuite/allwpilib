@@ -3,7 +3,7 @@ import threading
 from wpilib import simulation as wsim
 from wpilib.opmoderobot import OpModeRobot
 from wpilib import OpMode, RobotState
-from hal._wpiHal import RobotMode
+from hal import RobotMode
 from wpiutil import Color
 
 
@@ -11,27 +11,27 @@ class MockOpMode(OpMode):
     def __init__(self):
         super().__init__()
         self.disabled_periodic_count = 0
-        self.op_mode_run_count = 0
-        self.op_mode_stop_count = 0
+        self.opmode_run_count = 0
+        self.opmode_stop_count = 0
 
     def disabled_periodic(self):
         self.disabled_periodic_count += 1
 
-    def op_mode_run(self, op_mode_id: int):
-        self.op_mode_run_count += 1
+    def opmode_run(self, opmode_id: int):
+        self.opmode_run_count += 1
 
-    def op_mode_stop(self):
-        self.op_mode_stop_count += 1
+    def opmode_stop(self):
+        self.opmode_stop_count += 1
 
 
 class OneArgOpMode(OpMode):
     def __init__(self, robot):
         super().__init__()
 
-    def op_mode_run(self, op_mode_id: int):
+    def opmode_run(self, opmode_id: int):
         pass
 
-    def op_mode_stop(self):
+    def opmode_stop(self):
         pass
 
 
@@ -42,30 +42,30 @@ class MockRobot(OpModeRobot):
         self.none_periodic_count = 0
         self.periodic_count = 0
 
-    def driverStationConnected(self):
+    def driver_station_connected(self):
         self.driver_station_connected_count += 1
 
-    def nonePeriodic(self):
+    def none_periodic(self):
         self.none_periodic_count += 1
 
-    def robotPeriodic(self):
+    def robot_periodic(self):
         self.periodic_count += 1
 
 
 @pytest.fixture(autouse=True)
 def sim_timing_setup():
-    wsim.pauseTiming()
-    wsim.setProgramStarted(False)
+    wsim.pause_timing()
+    wsim.set_program_started(False)
     yield
-    wsim.resumeTiming()
-    RobotState.clearOpModes()
+    wsim.resume_timing()
+    RobotState.clear_opmodes()
 
 
-def test_add_op_mode():
+def test_add_opmode():
     class MyMockRobot(MockRobot):
         def __init__(self):
             super().__init__()
-            self.addOpMode(
+            self.add_opmode(
                 MockOpMode,
                 RobotMode.AUTONOMOUS,
                 "NoArgOpMode-Auto",
@@ -74,7 +74,7 @@ def test_add_op_mode():
                 Color.WHITE,
                 Color.BLACK,
             )
-            self.addOpMode(
+            self.add_opmode(
                 OneArgOpMode,
                 RobotMode.UTILITY,
                 "OneArgOpMode-Utility",
@@ -83,12 +83,12 @@ def test_add_op_mode():
                 Color.WHITE,
                 Color.BLACK,
             )
-            self.addOpMode(MockOpMode, RobotMode.TELEOPERATED, "NoArgOpMode")
-            self.addOpMode(OneArgOpMode, RobotMode.TELEOPERATED, "OneArgOpMode")
-            self.publishOpModes()
+            self.add_opmode(MockOpMode, RobotMode.TELEOPERATED, "NoArgOpMode")
+            self.add_opmode(OneArgOpMode, RobotMode.TELEOPERATED, "OneArgOpMode")
+            self.publish_opmodes()
 
     robot = MyMockRobot()
-    options = wsim.DriverStationSim.getOpModeOptions()
+    options = wsim.DriverStationSim.get_opmode_options()
 
     assert len(options) == 4
 
@@ -97,43 +97,43 @@ def test_add_op_mode():
     auto_opt = opt_map["NoArgOpMode-Auto"]
     assert auto_opt.group == "Group"
     assert auto_opt.description == "Description"
-    assert auto_opt.textColor == 0xFFFFFF
-    assert auto_opt.backgroundColor == 0x000000
+    assert auto_opt.text_color == 0xFFFFFF
+    assert auto_opt.background_color == 0x000000
 
     tele_opt = opt_map["NoArgOpMode"]
     assert tele_opt.group == ""
     assert tele_opt.description == ""
-    assert tele_opt.textColor == -1
-    assert tele_opt.backgroundColor == -1
+    assert tele_opt.text_color == -1
+    assert tele_opt.background_color == -1
 
 
-def test_clear_op_modes():
+def test_clear_opmodes():
     class MyMockRobot(MockRobot):
         def __init__(self):
             super().__init__()
-            self.addOpMode(MockOpMode, RobotMode.TELEOPERATED, "NoArgOpMode")
-            self.publishOpModes()
+            self.add_opmode(MockOpMode, RobotMode.TELEOPERATED, "NoArgOpMode")
+            self.publish_opmodes()
 
     robot = MyMockRobot()
-    robot.clearOpModes()
+    robot.clear_opmodes()
 
-    options = wsim.DriverStationSim.getOpModeOptions()
+    options = wsim.DriverStationSim.get_opmode_options()
     assert len(options) == 0
 
 
-def test_remove_op_mode():
+def test_remove_opmode():
     class MyMockRobot(MockRobot):
         def __init__(self):
             super().__init__()
-            self.addOpMode(MockOpMode, RobotMode.TELEOPERATED, "NoArgOpMode")
-            self.addOpMode(OneArgOpMode, RobotMode.TELEOPERATED, "OneArgOpMode")
-            self.publishOpModes()
+            self.add_opmode(MockOpMode, RobotMode.TELEOPERATED, "NoArgOpMode")
+            self.add_opmode(OneArgOpMode, RobotMode.TELEOPERATED, "OneArgOpMode")
+            self.publish_opmodes()
 
     robot = MyMockRobot()
-    robot.removeOpMode(RobotMode.TELEOPERATED, "NoArgOpMode")
-    robot.publishOpModes()
+    robot.remove_opmode(RobotMode.TELEOPERATED, "NoArgOpMode")
+    robot.publish_opmodes()
 
-    options = wsim.DriverStationSim.getOpModeOptions()
+    options = wsim.DriverStationSim.get_opmode_options()
     assert len(options) == 1
     assert options[0].name == "OneArgOpMode"
 
@@ -143,17 +143,17 @@ def periodic_robot_test_fixture():
     class MyMockRobot(MockRobot):
         def __init__(self):
             super().__init__()
-            self.addOpMode(MockOpMode, RobotMode.TELEOPERATED, "NoArgOpMode")
-            self.publishOpModes()
+            self.add_opmode(MockOpMode, RobotMode.TELEOPERATED, "NoArgOpMode")
+            self.publish_opmodes()
 
     robot = MyMockRobot()
 
-    robot_thread = threading.Thread(target=robot.startCompetition)
+    robot_thread = threading.Thread(target=robot.start_competition)
     robot_thread.start()
 
     yield robot
 
-    robot.endCompetition()
+    robot.end_competition()
     robot_thread.join()
 
 
@@ -161,10 +161,10 @@ def periodic_robot_test_fixture():
 def test_none_periodic(periodic_robot_test_fixture):
     robot = periodic_robot_test_fixture
 
-    wsim.waitForProgramStart()
+    wsim.wait_for_program_start()
 
     # Time step to get periodic calls on 20 ms robot loop
-    wsim.stepTiming(0.110)
+    wsim.step_timing(0.110)
 
     assert robot.none_periodic_count == 5
 
@@ -174,15 +174,15 @@ def test_robot_periodic(periodic_robot_test_fixture):
 
     robot = periodic_robot_test_fixture
 
-    wsim.waitForProgramStart()
+    wsim.wait_for_program_start()
 
-    # RobotPeriodic should be called regardless of state
+    # robot_periodic should be called regardless of state
     assert robot.periodic_count == 0
 
     # Time step to get periodic calls on 20 ms robot loop
-    wsim.stepTiming(kPeriod)
+    wsim.step_timing(kPeriod)
     assert robot.periodic_count == 1
 
-    # Additional time steps should continue calling RobotPeriodic
-    wsim.stepTiming(kPeriod)
+    # Additional time steps should continue calling robot_periodic
+    wsim.step_timing(kPeriod)
     assert robot.periodic_count == 2

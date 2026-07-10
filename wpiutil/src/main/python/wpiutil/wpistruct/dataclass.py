@@ -141,8 +141,8 @@ def _process_class(cls, struct_name: typing.Optional[str]):
     vvals = []
     packs = []
     unpacks = []
-    # unpackIntos = []
-    forEachNested = []
+    # unpack_intos = []
+    for_each_nested = []
 
     ctx: typing.Dict[str, typing.Any] = {"cls": cls}
 
@@ -175,9 +175,9 @@ def _process_class(cls, struct_name: typing.Optional[str]):
                 typn = f"type_{name}"
 
                 ctx[typn] = element_type
-                ts = wpistruct.getTypeName(element_type)
+                ts = wpistruct.get_type_name(element_type)
                 schema.append(f"{ts} {name}[{array_len}]")
-                sz = wpistruct.getSize(element_type)
+                sz = wpistruct.get_size(element_type)
                 fmts.extend(f"{sz}s" for _ in range(array_len))
                 unpackvals.extend(unpack_args)
                 vvals.append(f"*{argn}")
@@ -185,8 +185,8 @@ def _process_class(cls, struct_name: typing.Optional[str]):
                 packs.append(f"{argn} = tuple(wpistruct.pack(i) for i in v.{name})")
                 unpack_exprs = [f"wpistruct.unpack({typn}, {a})" for a in unpack_args]
                 unpacks.append(f"{argn} = ({', '.join(unpack_exprs)},)")
-                # unpackIntos.append(f"wpistruct.unpackInto(v.{name}, {argn})")
-                forEachNested.append(f"wpistruct.forEachNested({typn}, fn)")
+                # unpack_intos.append(f"wpistruct.unpack_into(v.{name}, {argn})")
+                for_each_nested.append(f"wpistruct.for_each_nested({typn}, fn)")
 
             else:
                 raise TypeError(
@@ -200,17 +200,17 @@ def _process_class(cls, struct_name: typing.Optional[str]):
             typn = f"type_{name}"
 
             ctx[typn] = ftype
-            ts = wpistruct.getTypeName(ftype)
+            ts = wpistruct.get_type_name(ftype)
             schema.append(f"{ts} {name}")
-            sz = wpistruct.getSize(ftype)
+            sz = wpistruct.get_size(ftype)
             fmts.append(f"{sz}s")
             vvals.append(argn)
             unpackvals.append(argn)
             cvvals.append(argn)
             packs.append(f"{argn} = wpistruct.pack(v.{name})")
             unpacks.append(f"{argn} = wpistruct.unpack({typn}, {argn})")
-            # unpackIntos.append(f"wpistruct.unpackInto(v.{name}, {argn})")
-            forEachNested.append(f"wpistruct.forEachNested({typn}, fn)")
+            # unpack_intos.append(f"wpistruct.unpack_into(v.{name}, {argn})")
+            for_each_nested.append(f"wpistruct.for_each_nested({typn}, fn)")
 
         else:
             raise TypeError(
@@ -226,19 +226,19 @@ def _process_class(cls, struct_name: typing.Optional[str]):
     padding = "\n" + " " * 16
     pack_stmts = padding.join(packs)
     unpack_stmts = padding.join(unpacks)
-    # unpackInto_stmts = padding.join(unpackIntos)
+    # unpack_into_stmts = padding.join(unpack_intos)
 
-    if not forEachNested:
-        forEachNested_stmt = "_forEachNested = None"
+    if not for_each_nested:
+        for_each_nested_stmt = "_for_each_nested = None"
     else:
-        forEachNested_stmt = f"def _forEachNested(fn):"
-        forEachNested_stmt += "\n" + " " * 12
-        forEachNested_stmt += f"try:{padding}"
-        forEachNested_stmt += padding.join(forEachNested)
-        forEachNested_stmt += "\n" + " " * 12
-        forEachNested_stmt += f"except Exception as e:"
-        forEachNested_stmt += (
-            f"{padding}raise ValueError(f'{err_name}: error in forEachNested') from e"
+        for_each_nested_stmt = f"def _for_each_nested(fn):"
+        for_each_nested_stmt += "\n" + " " * 12
+        for_each_nested_stmt += f"try:{padding}"
+        for_each_nested_stmt += padding.join(for_each_nested)
+        for_each_nested_stmt += "\n" + " " * 12
+        for_each_nested_stmt += f"except Exception as e:"
+        for_each_nested_stmt += (
+            f"{padding}raise ValueError(f'{err_name}: error in for_each_nested') from e"
         )
 
     ctx["_s"] = s
@@ -254,7 +254,7 @@ def _process_class(cls, struct_name: typing.Optional[str]):
             except Exception as e:
                 raise ValueError(f"{err_name}: error packing data") from e
                             
-        def _packInto(v, b):
+        def _pack_into(v, b):
             try:
                 {pack_stmts}
                 return _s.pack_into(b, 0, {vals})
@@ -269,14 +269,14 @@ def _process_class(cls, struct_name: typing.Optional[str]):
             except Exception as e:
                 raise ValueError(f"{err_name}: error unpacking data") from e
         
-        #def _unpackInto(v, b):
+        #def _unpack_into(v, b):
         #    try:
         #        {vals} = _s.unpack(b)
-        #        {{unpackInto_stmts}}
+        #        {{unpack_into_stmts}}
         #    except Exception as e:
         #        raise ValueError(f"{err_name}: error unpacking data") from e
 
-        {forEachNested_stmt}
+        {for_each_nested_stmt}
     """)
 
     exec(fnsrc, ctx, ctx)
@@ -286,10 +286,10 @@ def _process_class(cls, struct_name: typing.Optional[str]):
         schema="; ".join(schema),
         size=s.size,
         pack=ctx["_pack"],
-        packInto=ctx["_packInto"],
+        pack_into=ctx["_pack_into"],
         unpack=ctx["_unpack"],
-        # unpackInto=ctx["_unpackInto"],
-        forEachNested=ctx["_forEachNested"],
+        # unpack_into=ctx["_unpack_into"],
+        for_each_nested=ctx["_for_each_nested"],
     )
 
     return cls

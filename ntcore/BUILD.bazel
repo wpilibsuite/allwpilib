@@ -190,7 +190,7 @@ cc_test(
     ],
     deps = [
         ":ntcore",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
         "//wpiutil:wpiutil-testlib",
     ],
 )

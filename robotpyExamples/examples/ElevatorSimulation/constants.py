@@ -8,29 +8,29 @@ import math
 
 import wpimath.units
 
-kMotorPort = 0
-kEncoderAChannel = 0
-kEncoderBChannel = 1
-kJoystickPort = 0
+MOTOR_PORT = 0
+ENCODER_A_CHANNEL = 0
+ENCODER_B_CHANNEL = 1
+JOYSTICK_PORT = 0
 
-kElevatorKp = 5.0
-kElevatorKi = 0.0
-kElevatorKd = 0.0
+ELEVATOR_KP = 5.0
+ELEVATOR_KI = 0.0
+ELEVATOR_KD = 0.0
 
-kElevatorkS = 0.0  # volts (V)
-kElevatorkG = 0.762  # volts (V)
-kElevatorkV = 0.762  # volt per velocity (V/(m/s))
-kElevatorkA = 0.0  # volt per acceleration (V/(m/s^2))
+ELEVATOR_KS = 0.0  # volts (V)
+ELEVATOR_KG = 0.762  # volts (V)
+ELEVATOR_KV = 0.762  # volt per velocity (V/(m/s))
+ELEVATOR_KA = 0.0  # volt per acceleration (V/(m/s^2))
 
-kElevatorGearing = 10.0
-kElevatorDrumRadius = wpimath.units.inchesToMeters(2.0)
-kCarriageMass = 4.0  # kg
+ELEVATOR_GEARING = 10.0
+ELEVATOR_DRUM_RADIUS = wpimath.units.inches_to_meters(2.0)
+CARRIAGE_MASS = 4.0  # kg
 
-kSetpoint = 0.75  # m
+SETPOINT = 0.75  # m
 # Encoder is reset to measure 0 at the bottom, so minimum height is 0.
-kMinElevatorHeight = 0.0  # m
-kMaxElevatorHeight = 1.25  # m
+MIN_ELEVATOR_HEIGHT = 0.0  # m
+MAX_ELEVATOR_HEIGHT = 1.25  # m
 
 # distance per pulse = (distance per revolution) / (pulses per revolution)
 #  = (Pi * D) / ppr
-kElevatorEncoderDistPerPulse = 2.0 * math.pi * kElevatorDrumRadius / 4096
+ELEVATOR_ENCODER_DIST_PER_PULSE = 2.0 * math.pi * ELEVATOR_DRUM_RADIUS / 4096

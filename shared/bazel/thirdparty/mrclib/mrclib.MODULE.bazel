@@ -8,9 +8,9 @@ headers_integrity = "7e0d3efa8d0264c3dcd7088a94180986555a97860db512c516a4d8a2285
 
 _LIB_ARTIFACTS = {
     "linuxarm64": ("linux", "**/*.so*", "b87f7187afc1780422526d010f2b195f2f160175dcfbba2834eda8f27c647304"),
+    "linuxsystemcore": ("linux", "**/*.so*", "40a2f1e641bec88ea21794dacf6212e99cdf19c0e7dbcb777159b6134d2ee390"),
     "linuxx86-64": ("linux", "**/*.so*", "510088cbb2b7ca3fbd47691debbe89d5d2dd022cd5472a723c95a6e1db1b9cd8"),
     "osxuniversal": ("osx", "**/*.dylib", "35d6df2d76165b099d9592bb29e84b8edd365382d926a818bfe97902919d0d63"),
-    "linuxsystemcore": ("linux", "**/*.so*", "40a2f1e641bec88ea21794dacf6212e99cdf19c0e7dbcb777159b6134d2ee390"),
     "windowsarm64": ("windows", "**/*.dll", "6bcc645f5af742613401e4e3a162cf72193c6fd67d1dd32a5cefad899013d13b"),
     "windowsx86-64": ("windows", "**/*.dll", "b69c8567586d7b5499fe602758259435c79a4ee9e311669baaff0f9878028b14"),
 }
@@ -19,8 +19,6 @@ _LIB_ARTIFACTS = {
 
 http_archive(
     name = "mrclib_headers",
-    url = url_pattern % "headers",
-    sha256 = headers_integrity,
     build_file_content = """
 cc_library(
     name = "headers",
@@ -29,6 +27,8 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 """,
+    sha256 = headers_integrity,
+    url = url_pattern % "headers",
 )
 
 library_build_content = """
@@ -48,9 +48,9 @@ filegroup(
 [
     http_archive(
         name = "mrclib_" + artifact,
-        url = url_pattern % artifact,
-        sha256 = integrity,
         build_file_content = library_build_content % glob_pattern,
+        sha256 = integrity,
+        url = url_pattern % artifact,
     )
     for artifact, (prefix, glob_pattern, integrity) in _LIB_ARTIFACTS.items()
 ]

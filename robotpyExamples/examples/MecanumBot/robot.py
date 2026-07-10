@@ -19,30 +19,30 @@ class MyRobot(wpilib.TimedRobot):
         self.mecanum = Drivetrain()
 
         # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
-        self.xvelocityLimiter = wpimath.SlewRateLimiter(3)
-        self.yvelocityLimiter = wpimath.SlewRateLimiter(3)
-        self.rotLimiter = wpimath.SlewRateLimiter(3)
+        self.x_velocity_limiter = wpimath.SlewRateLimiter(3)
+        self.y_velocity_limiter = wpimath.SlewRateLimiter(3)
+        self.rot_limiter = wpimath.SlewRateLimiter(3)
 
-    def autonomousPeriodic(self) -> None:
-        self.driveWithJoystick(False)
-        self.mecanum.updateOdometry()
+    def autonomous_periodic(self) -> None:
+        self.drive_with_joystick(False)
+        self.mecanum.update_odometry()
 
-    def teleopPeriodic(self) -> None:
-        self.driveWithJoystick(True)
+    def teleop_periodic(self) -> None:
+        self.drive_with_joystick(True)
 
-    def driveWithJoystick(self, fieldRelative: bool) -> None:
+    def drive_with_joystick(self, field_relative: bool) -> None:
         # Get the x velocity. We are inverting this because Xbox controllers return
         # negative values when we push forward.
-        xVelocity = (
-            -self.xvelocityLimiter.calculate(self.controller.getLeftY())
+        x_velocity = (
+            -self.x_velocity_limiter.calculate(self.controller.get_left_y())
             * Drivetrain.MAX_VELOCITY
         )
 
         # Get the y velocity or sideways/strafe velocity. We are inverting this because
         # we want a positive value when we pull to the left. Xbox controllers
         # return positive values when you pull to the right by default.
-        yVelocity = (
-            -self.yvelocityLimiter.calculate(self.controller.getLeftX())
+        y_velocity = (
+            -self.y_velocity_limiter.calculate(self.controller.get_left_x())
             * Drivetrain.MAX_VELOCITY
         )
 
@@ -51,8 +51,10 @@ class MyRobot(wpilib.TimedRobot):
         # mathematics). Xbox controllers return positive values when you pull to
         # the right by default.
         rot = (
-            -self.rotLimiter.calculate(self.controller.getRightX())
+            -self.rot_limiter.calculate(self.controller.get_right_x())
             * Drivetrain.MAX_ANGULAR_VELOCITY
         )
 
-        self.mecanum.drive(xVelocity, yVelocity, rot, fieldRelative, self.getPeriod())
+        self.mecanum.drive(
+            x_velocity, y_velocity, rot, field_relative, self.get_period()
+        )

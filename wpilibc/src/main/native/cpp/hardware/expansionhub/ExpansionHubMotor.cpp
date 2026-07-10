@@ -122,8 +122,8 @@ void ExpansionHubMotor::SetEnabled(bool enabled) {
   m_enabledPublisher.Set(enabled);
 }
 
-void ExpansionHubMotor::SetFloatOn0(bool floatOn0) {
-  m_floatOn0Publisher.Set(floatOn0);
+void ExpansionHubMotor::SetNeutralMode(NeutralMode mode) {
+  m_floatOn0Publisher.Set(mode == NeutralMode::COAST);
 }
 
 wpi::units::ampere_t ExpansionHubMotor::GetCurrent() const {
@@ -143,7 +143,7 @@ double ExpansionHubMotor::GetEncoderPosition() const {
 }
 
 void ExpansionHubMotor::SetReversed(bool reversed) {
-  m_reversedPublisher.Set(true);
+  m_reversedPublisher.Set(reversed);
 }
 
 void ExpansionHubMotor::ResetEncoder() {

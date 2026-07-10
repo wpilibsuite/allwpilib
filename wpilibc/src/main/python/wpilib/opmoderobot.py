@@ -16,61 +16,61 @@ class OpModeRobot(OpModeRobotBase):
 
     Opmodes are constructed when selected on the driver station, and destroyed
     when the robot is disabled after being enabled or a different opmode is
-    selected. When no opmode is selected, nonePeriodic() is called. The
-    driverStationConnected() function is called the first time the driver station
+    selected. When no opmode is selected, none_periodic() is called. The
+    driver_station_connected() function is called the first time the driver station
     connects to the robot.
     """
 
     def __init__(self):
         super().__init__()
 
-    def addOpMode(
+    def add_opmode(
         self,
-        opmodeCls: type,
+        opmode_cls: type,
         mode: RobotMode,
         name: str,
         group: Optional[str] = None,
         description: Optional[str] = None,
-        textColor: Optional[Color] = None,
-        backgroundColor: Optional[Color] = None,
+        text_color: Optional[Color] = None,
+        background_color: Optional[Color] = None,
     ) -> None:
         """
-        Adds an operating mode option. It's necessary to call PublishOpModes() to
+        Adds an operating mode option. It's necessary to call publish_opmodes() to
         make the added modes visible to the driver station.
 
-        The textColor and backgroundColor parameters are optional, but setting
+        The text_color and background_color parameters are optional, but setting
         only one has no effect (if only one is provided, it will be ignored).
 
-        :param opmodeCls: opmode class; must be a public, non-abstract subclass of OpMode
+        :param opmode_cls: opmode class; must be a public, non-abstract subclass of OpMode
                           with a constructor that either takes no arguments or accepts a
                           single argument of this class's type (the latter is preferred).
         :param mode: robot mode
         :param name: name of the operating mode
         :param group: group of the operating mode
         :param description: description of the operating mode
-        :param textColor: text color
-        :param backgroundColor: background color
+        :param text_color: text color
+        :param background_color: background color
         """
 
-        def makeOpModeInstance() -> OpMode:
+        def make_opmode_instance() -> OpMode:
             # Try to instantiate with robot argument first
             try:
-                return opmodeCls(self)  # type: ignore
+                return opmode_cls(self)  # type: ignore
             except TypeError:
                 # Fallback to no-argument constructor
-                return opmodeCls()  # type: ignore
+                return opmode_cls()  # type: ignore
 
-        if textColor is None or backgroundColor is None:
-            self.addOpModeFactory(
-                makeOpModeInstance, mode, name, group or "", description or ""
+        if text_color is None or background_color is None:
+            self.add_opmode_factory(
+                make_opmode_instance, mode, name, group or "", description or ""
             )
         else:
-            self.addOpModeFactory(
-                makeOpModeInstance,
+            self.add_opmode_factory(
+                make_opmode_instance,
                 mode,
                 name,
                 group or "",
                 description or "",
-                textColor,
-                backgroundColor,
+                text_color,
+                background_color,
             )

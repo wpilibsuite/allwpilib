@@ -22,7 +22,7 @@ class WaitCommand(Command):
         super().__init__()
         self._duration = seconds
         self._timer = Timer()
-        self.setName(f"{self.getName()}: {seconds}")
+        self.set_name(f"{self.get_name()}: {seconds}")
 
     def initialize(self):
         self._timer.restart()
@@ -30,12 +30,12 @@ class WaitCommand(Command):
     def end(self, interrupted: bool):
         self._timer.stop()
 
-    def isFinished(self) -> bool:
-        return self._timer.hasElapsed(self._duration)
+    def is_finished(self) -> bool:
+        return self._timer.has_elapsed(self._duration)
 
-    def runsWhenDisabled(self) -> bool:
+    def runs_when_disabled(self) -> bool:
         return True
 
-    def initSendable(self, builder: SendableBuilder) -> None:
-        super().initSendable(builder)
-        builder.addDoubleProperty("duration", lambda: self._duration, lambda _: None)
+    def init_sendable(self, builder: SendableBuilder) -> None:
+        super().init_sendable(builder)
+        builder.add_double_property("duration", lambda: self._duration, lambda _: None)

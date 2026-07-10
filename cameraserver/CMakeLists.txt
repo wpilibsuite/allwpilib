@@ -32,7 +32,7 @@ target_link_libraries(multiCameraServer cameraserver)
 
 set_property(TARGET multiCameraServer PROPERTY FOLDER "examples")
 
-if(WITH_TESTS)
+if(WPILIB_WITH_TESTS)
     wpilib_add_test(cameraserver src/test/native/cpp)
     target_link_libraries(cameraserver_test cameraserver googletest)
 endif()

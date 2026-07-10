@@ -23,37 +23,37 @@ def lerp_rgb(a: Color, b: Color, t: float) -> Color8Bit:
 
 @pytest.fixture(autouse=True)
 def restore_time_source():
-    RobotController.setTimeSource(lambda: 0)
+    RobotController.set_time_source(lambda: 0)
     yield
-    RobotController.setTimeSource(RobotController.getTime)
+    RobotController.set_time_source(RobotController.get_time)
 
 
 def test_apply_to_buffer_direct():
     buffer = AddressableLEDBuffer(4)
-    LEDPattern.solid(Color.YELLOW).applyTo(buffer)
+    LEDPattern.solid(Color.YELLOW).apply_to(buffer[:])
 
     for i in range(len(buffer)):
-        assert buffer.getLED8Bit(i) == Color8Bit(Color.YELLOW)
+        assert buffer.get_led_8bit(i) == Color8Bit(Color.YELLOW)
 
 
 def test_apply_to_view_direct():
     buffer = AddressableLEDBuffer(6)
     view = buffer[2:5]
-    LEDPattern.solid(Color.AQUA).applyTo(view)
+    LEDPattern.solid(Color.AQUA).apply_to(view)
 
-    assert buffer.getLED8Bit(1) == Color8Bit(Color.BLACK)
-    assert buffer.getLED8Bit(2) == Color8Bit(Color.AQUA)
-    assert buffer.getLED8Bit(3) == Color8Bit(Color.AQUA)
-    assert buffer.getLED8Bit(4) == Color8Bit(Color.AQUA)
-    assert buffer.getLED8Bit(5) == Color8Bit(Color.BLACK)
+    assert buffer.get_led_8bit(1) == Color8Bit(Color.BLACK)
+    assert buffer.get_led_8bit(2) == Color8Bit(Color.AQUA)
+    assert buffer.get_led_8bit(3) == Color8Bit(Color.AQUA)
+    assert buffer.get_led_8bit(4) == Color8Bit(Color.AQUA)
+    assert buffer.get_led_8bit(5) == Color8Bit(Color.BLACK)
 
 
 def test_solid_color():
     buffer = AddressableLEDBuffer(99)
-    LEDPattern.solid(Color.YELLOW).applyTo(buffer)
+    LEDPattern.solid(Color.YELLOW).apply_to(buffer[:])
 
     for i in range(len(buffer)):
-        assert buffer.getLED8Bit(i) == Color8Bit(Color.YELLOW)
+        assert buffer.get_led_8bit(i) == Color8Bit(Color.YELLOW)
 
 
 def test_gradient_0_sets_to_black():
@@ -61,21 +61,21 @@ def test_gradient_0_sets_to_black():
     buffer = AddressableLEDBuffer(99)
 
     for i in range(len(buffer)):
-        buffer.setRGB(i, 127, 128, 129)
+        buffer.set_rgb(i, 127, 128, 129)
 
-    pattern.applyTo(buffer)
+    pattern.apply_to(buffer[:])
 
     for i in range(len(buffer)):
-        assert buffer.getLED8Bit(i) == Color8Bit(Color.BLACK)
+        assert buffer.get_led_8bit(i) == Color8Bit(Color.BLACK)
 
 
 def test_gradient_1_sets_to_solid():
     pattern = LEDPattern.gradient(LEDPattern.GradientType.CONTINUOUS, [Color.YELLOW])
     buffer = AddressableLEDBuffer(99)
-    pattern.applyTo(buffer)
+    pattern.apply_to(buffer[:])
 
     for i in range(len(buffer)):
-        assert buffer.getLED8Bit(i) == Color8Bit(Color.YELLOW)
+        assert buffer.get_led_8bit(i) == Color8Bit(Color.YELLOW)
 
 
 def test_continuous_gradient_2_colors():
@@ -83,13 +83,13 @@ def test_continuous_gradient_2_colors():
         LEDPattern.GradientType.CONTINUOUS, [Color.YELLOW, Color.PURPLE]
     )
     buffer = AddressableLEDBuffer(99)
-    pattern.applyTo(buffer)
+    pattern.apply_to(buffer[:])
 
-    assert buffer.getLED8Bit(0) == Color8Bit(Color.YELLOW)
-    assert buffer.getLED8Bit(25) == lerp_rgb(Color.YELLOW, Color.PURPLE, 25 / 49.0)
-    assert buffer.getLED8Bit(49) == Color8Bit(Color.PURPLE)
-    assert buffer.getLED8Bit(73) == lerp_rgb(Color.YELLOW, Color.PURPLE, 25 / 49.0)
-    assert buffer.getLED8Bit(98) == Color8Bit(Color.YELLOW)
+    assert buffer.get_led_8bit(0) == Color8Bit(Color.YELLOW)
+    assert buffer.get_led_8bit(25) == lerp_rgb(Color.YELLOW, Color.PURPLE, 25 / 49.0)
+    assert buffer.get_led_8bit(49) == Color8Bit(Color.PURPLE)
+    assert buffer.get_led_8bit(73) == lerp_rgb(Color.YELLOW, Color.PURPLE, 25 / 49.0)
+    assert buffer.get_led_8bit(98) == Color8Bit(Color.YELLOW)
 
 
 def test_discontinuous_gradient_2_colors():
@@ -97,43 +97,43 @@ def test_discontinuous_gradient_2_colors():
         LEDPattern.GradientType.DISCONTINUOUS, [Color.YELLOW, Color.PURPLE]
     )
     buffer = AddressableLEDBuffer(99)
-    pattern.applyTo(buffer)
+    pattern.apply_to(buffer[:])
 
-    assert buffer.getLED8Bit(0) == Color8Bit(Color.YELLOW)
-    assert buffer.getLED8Bit(49) == lerp_rgb(Color.YELLOW, Color.PURPLE, 0.5)
-    assert buffer.getLED8Bit(98) == Color8Bit(Color.PURPLE)
+    assert buffer.get_led_8bit(0) == Color8Bit(Color.YELLOW)
+    assert buffer.get_led_8bit(49) == lerp_rgb(Color.YELLOW, Color.PURPLE, 0.5)
+    assert buffer.get_led_8bit(98) == Color8Bit(Color.PURPLE)
 
 
 def test_step_0_sets_to_black():
     pattern = LEDPattern.steps([])
     buffer = AddressableLEDBuffer(99)
     for i in range(len(buffer)):
-        buffer.setRGB(i, 127, 128, 129)
+        buffer.set_rgb(i, 127, 128, 129)
 
-    pattern.applyTo(buffer)
+    pattern.apply_to(buffer[:])
 
     for i in range(len(buffer)):
-        assert buffer.getLED8Bit(i) == Color8Bit(Color.BLACK)
+        assert buffer.get_led_8bit(i) == Color8Bit(Color.BLACK)
 
 
 def test_step_1_sets_to_solid():
     pattern = LEDPattern.steps([(0.0, Color.YELLOW)])
     buffer = AddressableLEDBuffer(99)
-    pattern.applyTo(buffer)
+    pattern.apply_to(buffer[:])
 
     for i in range(len(buffer)):
-        assert buffer.getLED8Bit(i) == Color8Bit(Color.YELLOW)
+        assert buffer.get_led_8bit(i) == Color8Bit(Color.YELLOW)
 
 
 def test_step_half_sets_to_half_off_half_color():
     pattern = LEDPattern.steps([(0.5, Color.YELLOW)])
     buffer = AddressableLEDBuffer(99)
-    pattern.applyTo(buffer)
+    pattern.apply_to(buffer[:])
 
     for i in range(49):
-        assert buffer.getLED8Bit(i) == Color8Bit(Color.BLACK)
+        assert buffer.get_led_8bit(i) == Color8Bit(Color.BLACK)
     for i in range(49, len(buffer)):
-        assert buffer.getLED8Bit(i) == Color8Bit(Color.YELLOW)
+        assert buffer.get_led_8bit(i) == Color8Bit(Color.YELLOW)
 
 
 def make_grayscale_pattern():
@@ -148,29 +148,29 @@ def make_grayscale_pattern():
 @pytest.mark.skip(reason="Python bindings do not expose a way to mock wpi::util::Now()")
 def test_scroll_forward():
     buffer = AddressableLEDBuffer(256)
-    pattern = make_grayscale_pattern().scrollAtRelativeSpeed(units.hertz(1 / 256.0))
+    pattern = make_grayscale_pattern().scroll_at_relative_speed(units.hertz(1 / 256.0))
 
     for time in range(10):
-        RobotController.setTimeSource(lambda t=time: t)
-        pattern.applyTo(buffer)
+        RobotController.set_time_source(lambda t=time: t)
+        pattern.apply_to(buffer[:])
 
         for led in range(len(buffer)):
             ch = (led - time) % 256
-            assert buffer.getLED8Bit(led) == Color8Bit(ch, ch, ch)
+            assert buffer.get_led_8bit(led) == Color8Bit(ch, ch, ch)
 
 
 @pytest.mark.skip(reason="Python bindings do not expose a way to mock wpi::util::Now()")
 def test_scroll_backward():
     buffer = AddressableLEDBuffer(256)
-    pattern = make_grayscale_pattern().scrollAtRelativeSpeed(units.hertz(-1 / 256.0))
+    pattern = make_grayscale_pattern().scroll_at_relative_speed(units.hertz(-1 / 256.0))
 
     for time in range(10):
-        RobotController.setTimeSource(lambda t=time: t)
-        pattern.applyTo(buffer)
+        RobotController.set_time_source(lambda t=time: t)
+        pattern.apply_to(buffer[:])
 
         for led in range(len(buffer)):
             ch = (led + time) % 256
-            assert buffer.getLED8Bit(led) == Color8Bit(ch, ch, ch)
+            assert buffer.get_led_8bit(led) == Color8Bit(ch, ch, ch)
 
 
 def test_rainbow_at_full_size():
@@ -178,11 +178,11 @@ def test_rainbow_at_full_size():
     saturation = 255
     value = 255
     pattern = LEDPattern.rainbow(saturation, value)
-    pattern.applyTo(buffer)
+    pattern.apply_to(buffer[:])
 
     for led in range(len(buffer)):
-        assert buffer.getLED8Bit(led) == Color8Bit(
-            Color.fromHSV(led, saturation, value)
+        assert buffer.get_led_8bit(led) == Color8Bit(
+            Color.from_hsv(led, saturation, value)
         )
 
 
@@ -192,30 +192,30 @@ def test_rainbow_odd_size():
     saturation = 73
     value = 128
     pattern = LEDPattern.rainbow(saturation, value)
-    pattern.applyTo(buffer)
+    pattern.apply_to(buffer[:])
 
     for led in range(len(buffer)):
-        expected = Color8Bit(Color.fromHSV(int(led * scale), saturation, value))
-        assert buffer.getLED8Bit(led) == expected
+        expected = Color8Bit(Color.from_hsv(int(led * scale), saturation, value))
+        assert buffer.get_led_8bit(led) == expected
 
 
 def test_reverse_solid():
     buffer = AddressableLEDBuffer(90)
     pattern = LEDPattern.solid(Color.ROSY_BROWN).reversed()
-    pattern.applyTo(buffer)
+    pattern.apply_to(buffer[:])
 
     for led in range(len(buffer)):
-        assert buffer.getLED8Bit(led) == Color8Bit(Color.ROSY_BROWN)
+        assert buffer.get_led_8bit(led) == Color8Bit(Color.ROSY_BROWN)
 
 
 def test_reverse_steps():
     buffer = AddressableLEDBuffer(100)
     pattern = LEDPattern.steps([(0.0, Color.WHITE), (0.5, Color.YELLOW)]).reversed()
-    pattern.applyTo(buffer)
+    pattern.apply_to(buffer[:])
 
     for led in range(len(buffer)):
         expected = Color8Bit(Color.YELLOW if led < 50 else Color.WHITE)
-        assert buffer.getLED8Bit(led) == expected
+        assert buffer.get_led_8bit(led) == expected
 
 
 def white_yellow_purple(reader, writer):
@@ -234,11 +234,11 @@ def white_yellow_purple(reader, writer):
 )
 def test_offset_pattern(offset, expected):
     buffer = AddressableLEDBuffer(21)
-    pattern = LEDPattern(white_yellow_purple).offsetBy(offset)
-    pattern.applyTo(buffer)
+    pattern = LEDPattern(white_yellow_purple).offset_by(offset)
+    pattern.apply_to(buffer[:])
 
     for led in range(len(buffer)):
-        assert buffer.getLED8Bit(led) == Color8Bit(expected[led % 3])
+        assert buffer.get_led_8bit(led) == Color8Bit(expected[led % 3])
 
 
 @pytest.mark.skip(reason="Python bindings do not expose a way to mock wpi::util::Now()")
@@ -247,27 +247,27 @@ def test_blink_symmetric():
     buffer = AddressableLEDBuffer(1)
 
     for t in range(8):
-        RobotController.setTimeSource(lambda tick=t: tick * 1_000_000)
-        pattern.applyTo(buffer)
+        RobotController.set_time_source(lambda tick=t: tick * 1_000_000)
+        pattern.apply_to(buffer[:])
         expected = Color8Bit(Color.WHITE if t % 4 < 2 else Color.BLACK)
-        assert buffer.getLED8Bit(0) == expected
+        assert buffer.get_led_8bit(0) == expected
 
 
 def test_blink_in_sync():
     state = {"on": False}
-    pattern = LEDPattern.solid(Color.WHITE).synchronizedBlink(lambda: state["on"])
+    pattern = LEDPattern.solid(Color.WHITE).synchronized_blink(lambda: state["on"])
     buffer = AddressableLEDBuffer(1)
 
-    pattern.applyTo(buffer)
-    assert buffer.getLED8Bit(0) == Color8Bit(Color.BLACK)
+    pattern.apply_to(buffer[:])
+    assert buffer.get_led_8bit(0) == Color8Bit(Color.BLACK)
 
     state["on"] = True
-    pattern.applyTo(buffer)
-    assert buffer.getLED8Bit(0) == Color8Bit(Color.WHITE)
+    pattern.apply_to(buffer[:])
+    assert buffer.get_led_8bit(0) == Color8Bit(Color.WHITE)
 
     state["on"] = False
-    pattern.applyTo(buffer)
-    assert buffer.getLED8Bit(0) == Color8Bit(Color.BLACK)
+    pattern.apply_to(buffer[:])
+    assert buffer.get_led_8bit(0) == Color8Bit(Color.BLACK)
 
 
 @pytest.mark.skip(reason="Python bindings do not expose a way to mock wpi::util::Now()")
@@ -275,45 +275,45 @@ def test_breathe():
     pattern = LEDPattern.solid(Color.WHITE).breathe(units.microseconds(4))
     buffer = AddressableLEDBuffer(1)
 
-    RobotController.setTimeSource(lambda: 0)
-    pattern.applyTo(buffer)
-    assert buffer.getLED8Bit(0) == Color8Bit(Color.WHITE)
+    RobotController.set_time_source(lambda: 0)
+    pattern.apply_to(buffer[:])
+    assert buffer.get_led_8bit(0) == Color8Bit(Color.WHITE)
 
-    RobotController.setTimeSource(lambda: 1)
-    pattern.applyTo(buffer)
-    assert buffer.getLED8Bit(0) == Color8Bit(Color(0.5, 0.5, 0.5))
+    RobotController.set_time_source(lambda: 1)
+    pattern.apply_to(buffer[:])
+    assert buffer.get_led_8bit(0) == Color8Bit(Color(0.5, 0.5, 0.5))
 
-    RobotController.setTimeSource(lambda: 2)
-    pattern.applyTo(buffer)
-    assert buffer.getLED8Bit(0) == Color8Bit(Color.BLACK)
+    RobotController.set_time_source(lambda: 2)
+    pattern.apply_to(buffer[:])
+    assert buffer.get_led_8bit(0) == Color8Bit(Color.BLACK)
 
 
 def test_overlay_solid_on_solid():
-    overlay = LEDPattern.solid(Color.YELLOW).overlayOn(LEDPattern.solid(Color.WHITE))
+    overlay = LEDPattern.solid(Color.YELLOW).overlay_on(LEDPattern.solid(Color.WHITE))
     buffer = AddressableLEDBuffer(1)
-    overlay.applyTo(buffer)
-    assert buffer.getLED8Bit(0) == Color8Bit(Color.YELLOW)
+    overlay.apply_to(buffer[:])
+    assert buffer.get_led_8bit(0) == Color8Bit(Color.YELLOW)
 
 
 def test_progress_mask_layer():
     progress = {"value": 0.0}
-    pattern = LEDPattern.progressMaskLayer(lambda: progress["value"])
+    pattern = LEDPattern.progress_mask_layer(lambda: progress["value"])
     buffer = AddressableLEDBuffer(10)
 
     progress["value"] = 0.3
-    pattern.applyTo(buffer)
+    pattern.apply_to(buffer[:])
 
     for i in range(3):
-        assert buffer.getLED8Bit(i) == Color8Bit(Color.WHITE)
+        assert buffer.get_led_8bit(i) == Color8Bit(Color.WHITE)
     for i in range(3, 10):
-        assert buffer.getLED8Bit(i) == Color8Bit(Color.BLACK)
+        assert buffer.get_led_8bit(i) == Color8Bit(Color.BLACK)
 
 
 def test_blend():
     pattern = LEDPattern.solid(Color.BLUE).blend(LEDPattern.solid(Color.RED))
     buffer = AddressableLEDBuffer(1)
-    pattern.applyTo(buffer)
-    assert buffer.getLED8Bit(0) == Color8Bit(Color(127, 0, 127))
+    pattern.apply_to(buffer[:])
+    assert buffer.get_led_8bit(0) == Color8Bit(Color(127, 0, 127))
 
 
 def test_binary_mask():
@@ -321,9 +321,9 @@ def test_binary_mask():
     mask = LEDPattern.steps([(0.0, Color.WHITE), (0.5, Color.BLACK)])
     pattern = base.mask(mask)
     buffer = AddressableLEDBuffer(4)
-    pattern.applyTo(buffer)
+    pattern.apply_to(buffer[:])
 
     for i in range(2):
-        assert buffer.getLED8Bit(i) == Color8Bit(Color(123, 123, 123))
+        assert buffer.get_led_8bit(i) == Color8Bit(Color(123, 123, 123))
     for i in range(2, 4):
-        assert buffer.getLED8Bit(i) == Color8Bit(Color.BLACK)
+        assert buffer.get_led_8bit(i) == Color8Bit(Color.BLACK)

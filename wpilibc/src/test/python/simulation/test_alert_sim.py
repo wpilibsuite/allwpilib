@@ -10,21 +10,21 @@ Level = Alert.Level
 
 @pytest.fixture(scope="function")
 def group_name(request):
-    AlertSim.resetData()
+    AlertSim.reset_data()
     group_name = f"AlertTest_{request.node.name}"
     yield group_name
-    AlertSim.resetData()
+    AlertSim.reset_data()
 
 
 def get_active_alerts(level: Alert.Level) -> T.List[str]:
-    return [a.text for a in AlertSim.getAll() if a.level == level and a.isActive()]
+    return [a.text for a in AlertSim.get_all() if a.level == level and a.is_active()]
 
 
 def is_alert_active(text: str, level: Alert.Level):
     matches = [
         a
-        for a in AlertSim.getAll()
-        if a.level == level and a.text == text and a.isActive()
+        for a in AlertSim.get_all()
+        if a.level == level and a.text == text and a.is_active()
     ]
     return len(matches) > 0
 
@@ -37,8 +37,8 @@ def assert_state(
 
 
 def test_no_alerts_initially(group_name):
-    assert AlertSim.getCount() == 0
-    assert not AlertSim.getAll()
+    assert AlertSim.get_count() == 0
+    assert not AlertSim.get_all()
 
 
 def test_no_alerts_after_reset(group_name):
@@ -47,9 +47,9 @@ def test_no_alerts_after_reset(group_name):
         alert.set(True)
         assert is_alert_active("alert", Alert.Level.HIGH)
 
-        AlertSim.resetData()
-        assert AlertSim.getCount() == 0
-        assert not AlertSim.getAll()
+        AlertSim.reset_data()
+        assert AlertSim.get_count() == 0
+        assert not AlertSim.get_all()
 
 
 def test_set_unset_single(group_name):
@@ -117,13 +117,13 @@ def test_close_unsets_alert(group_name):
 
 def test_set_text_while_unset(group_name):
     with Alert(group_name, "BEFORE", Alert.Level.LOW) as alert:
-        assert alert.getText() == "BEFORE"
+        assert alert.get_text() == "BEFORE"
         alert.set(True)
         assert is_alert_active("BEFORE", Alert.Level.LOW)
         alert.set(False)
         assert not is_alert_active("BEFORE", Alert.Level.LOW)
-        alert.setText("AFTER")
-        assert alert.getText() == "AFTER"
+        alert.set_text("AFTER")
+        assert alert.get_text() == "AFTER"
         alert.set(True)
         assert not is_alert_active("BEFORE", Alert.Level.LOW)
         assert is_alert_active("AFTER", Alert.Level.LOW)
@@ -131,11 +131,11 @@ def test_set_text_while_unset(group_name):
 
 def test_set_text_while_set(group_name):
     with Alert(group_name, "BEFORE", Alert.Level.LOW) as alert:
-        assert alert.getText() == "BEFORE"
+        assert alert.get_text() == "BEFORE"
         alert.set(True)
         assert is_alert_active("BEFORE", Alert.Level.LOW)
-        alert.setText("AFTER")
-        assert alert.getText() == "AFTER"
+        alert.set_text("AFTER")
+        assert alert.get_text() == "AFTER"
         assert not is_alert_active("BEFORE", Alert.Level.LOW)
         assert is_alert_active("AFTER", Alert.Level.LOW)
 
@@ -151,18 +151,18 @@ def test_get_active(group_name):
         b.set(True)
         c.set(False)
 
-        active = AlertSim.getActive()
-        allAlerts = AlertSim.getAll()
+        active = AlertSim.get_active()
+        all_alerts = AlertSim.get_all()
 
         assert len(active) == 2
-        assert len(allAlerts) == 3
+        assert len(all_alerts) == 3
 
-        activeTexts = [a.text for a in active]
-        assert set(activeTexts) == {"A", "B"}
+        active_texts = [a.text for a in active]
+        assert set(active_texts) == {"A", "B"}
 
         a.set(False)
-        active = AlertSim.getActive()
-        allAlerts = AlertSim.getAll()
+        active = AlertSim.get_active()
+        all_alerts = AlertSim.get_all()
         assert len(active) == 1
-        assert len(allAlerts) == 3
+        assert len(all_alerts) == 3
         assert active[0].text == "B"
