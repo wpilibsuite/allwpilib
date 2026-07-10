@@ -295,7 +295,7 @@ class TrapezoidProfile {
     // Calculate threshold displacement
     // d = |v_t - v_i|(v_t + v_i) / (2 a_m)   (9)
     Distance_t d = wpi::units::math::abs(goal.velocity - current.velocity) *
-                   (current.velocity + goal.velocity) /
+                   (goal.velocity + current.velocity) /
                    (2.0 * m_constraints.maxAcceleration);
 
     // As discussed in TrapezoidProfile.md, the correct sign must be chosen when
@@ -360,9 +360,9 @@ class TrapezoidProfile {
                         current.velocity * current.velocity) /
                        (2 * acceleration);
 
-      // x_3 = (v_p² - v_i²) / (2a)   (7)
+      // x_3 = (v_p² - v_t²) / (2a)   (7)
       // Substitute v_p for v_l because this is the velocity constrained case.
-      // x_3 = (v_l² - v_i²) / (2a)
+      // x_3 = (v_l² - v_t²) / (2a)
       Distance_t x_3 =
           (velocityLimit * velocityLimit - goal.velocity * goal.velocity) /
           (2 * acceleration);
