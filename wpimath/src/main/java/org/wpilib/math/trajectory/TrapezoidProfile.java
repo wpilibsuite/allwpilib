@@ -189,7 +189,7 @@ public class TrapezoidProfile {
     // In the case that the sign of the profile and the sign of the acceleration are identical, the
     // recovery can be treated as an extension of the first segment. In the case that they differ,
     // the recovered state will have a velocity of v_l and the above calculated t_1 will be zero. To
-    // handle this, a check can be added on the first segment to ensure proper recovery.
+    // handle this, a check is added to the sampling of the first segment to ensure proper recovery.
     m_profile.t_1 += recoveryTime;
 
     double acceleration = sign * m_constraints.maxAcceleration;
