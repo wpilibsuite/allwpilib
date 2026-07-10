@@ -121,9 +121,9 @@ public class TrapezoidProfile {
     /**
      * Constructs the timing object for a Trapezoid Profile.
      *
-     * @param t_1 The time the profile spends on the first leg of the profile.
+     * @param t_1 The time the profile spends on the first leg.
      * @param t_2 The time the profile spends at the velocity limit.
-     * @param t_3 the time the profile spends on the last leg of the profile.
+     * @param t_3 the time the profile spends on the last leg.
      */
     public ProfileTiming(double t_1, double t_2, double t_3) {
       if (t_1 < 0.0 || t_2 < 0.0 || t_3 < 0.0) {
@@ -183,10 +183,13 @@ public class TrapezoidProfile {
     double sign = getSign(state, target);
     m_profile = generateProfile(sign, state, target);
 
-    // Set state back to the current one to ensure continuity.
+    // Sampled state should start at the current state, regardless of validity.
     state = new State(current.position, current.velocity);
 
-    // Make sure we add time to get to a valid state back onto the profile times.
+    // In the case that the sign of the profile and the sign of the acceleration are identical, the
+    // recovery can be treated as an extension of the first segment. In the case that they differ,
+    // the recovered state will have a velocity of v_l and the above calculated t_1 will be zero. To
+    // handle this, a check can be added on the first segment to ensure proper recovery.
     m_profile.t_1 += recoveryTime;
 
     double acceleration = sign * m_constraints.maxAcceleration;
@@ -266,7 +269,9 @@ public class TrapezoidProfile {
    * @param state The state to advance.
    */
   private static void advanceState(double time, double acceleration, State state) {
+    // x = x_i + v_i t + at² / 2   (2)
     state.position += state.velocity * time + acceleration / 2.0 * time * time;
+    // v = v_i + at   (1)
     state.velocity += acceleration * time;
   }
 
@@ -331,9 +336,9 @@ public class TrapezoidProfile {
     // errors cause the calculated optimal sign to change throughout the profile, that may lead to
     // suboptimal states being calculated. To fix this, we add a tolerance such that if |dx - d| <
     // epsilon, we return the sign that would lead to the minimum profile being calculated. We do
-    // not
-    // have control over the floating point precision error from previous calculations, and as such,
-    // it is difficult to bound the possible error. 1e-12 should be good enough for FRC though.
+    // not have control over the floating point precision error from previous calculations, and as
+    // such, it is difficult to bound the possible error. 1e-12 should be good enough for FRC
+    // though.
     if (Math.abs(dx - d) < 1e-12) {
       return Math.copySign(1.0, goal.velocity);
     } else {
@@ -351,6 +356,7 @@ public class TrapezoidProfile {
    * <p>Returns the time for each section of the profile from current and goal states with valid
    * velocities.
    *
+   * @param sign The sign of the profile to generate.
    * @param current The valid current state.
    * @param goal The valid goal state.
    * @return The time for each section of the profile.

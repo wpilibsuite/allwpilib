@@ -112,11 +112,11 @@ class TrapezoidProfile {
    */
   class ProfileTiming {
    public:
-    /// The time the profile spends in the first leg of the profile.
+    /// The time the profile spends in the first leg.
     wpi::units::second_t t_1;
     /// The time the profile spends at the velocity limit.
     wpi::units::second_t t_2;
-    /// The time the profile spends in the last leg of the profile.
+    /// The time the profile spends in the last leg.
     wpi::units::second_t t_3;
 
     constexpr bool operator==(const ProfileTiming&) const = default;
@@ -146,21 +146,27 @@ class TrapezoidProfile {
    * @return The position and velocity of the profile at time t.
    */
   constexpr State Calculate(wpi::units::second_t t, State current, State goal) {
+    // Sampled trajectory should start at the current state, regardless of
+    // validity.
     State sample{current};
+
     // Adjust states so that they are within the constraints and get the time
     // required for the current state to return to a valid state.
     wpi::units::second_t recoveryTime = AdjustStates(current, goal);
     double sign = GetSign(current, goal);
     m_profile = GenerateProfile(sign, current, goal);
 
-    // The t_1 and recoveryTime will always be in the same direction
-    // since if the sign of the profile differs from the sign of recovery
-    // acceleration, the profile basically starts at max velocity.
+    // In the case that the sign of the profile and the sign of the acceleration
+    // are identical, the recovery can be treated as an extension of the first
+    // segment. In the case that they differ, the recovered state will have a
+    // velocity of v_l and the above calculated t_1 will be zero. To handle
+    // this, a check can be added on the first segment to ensure proper
+    // recovery.
     m_profile.t_1 += recoveryTime;
 
     auto advance = [](wpi::units::second_t time, Acceleration_t acceleration,
                       State& state) {
-      // x = x_i + v_i t + at   (2)
+      // x = x_i + v_i t + at² / 2   (2)
       state.position +=
           state.velocity * time + acceleration / 2.0 * time * time;
       // v = v_i + at   (1)
@@ -307,7 +313,6 @@ class TrapezoidProfile {
     // calculated. We do not have control over the floating point precision
     // error from previous calculations, and as such, it is difficult to bound
     // the possible error. 1e-12 should be good enough for FRC though.
-
     if (wpi::units::math::abs(dx - d) < Distance_t{1e-12}) {
       return std::copysign(1.0, goal.velocity.value());
     } else {
@@ -325,6 +330,7 @@ class TrapezoidProfile {
    * Returns the time for each section of the profile from current
    * and goal states with valid velocities.
    *
+   * @param sign The sign of the profile to generate.
    * @param current The valid current state.
    * @param goal The valid goal state.
    * @return The time for each section of the profile.
