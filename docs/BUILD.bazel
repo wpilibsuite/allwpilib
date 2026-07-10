@@ -21,8 +21,6 @@ paths = [
     "wpiutil/src/main/native/include",
     "wpiutil/src/main/native/thirdparty/argparse/include",
     "wpiutil/src/main/native/thirdparty/debugging/include",
-    "wpiutil/src/main/native/thirdparty/expected/include",
-    "wpiutil/src/main/native/thirdparty/fmtlib/include",
     "wpiutil/src/main/native/thirdparty/json/include",
     "wpiutil/src/main/native/thirdparty/llvm/include",
     "wpiutil/src/main/native/thirdparty/mpack/include",
@@ -89,7 +87,6 @@ doxygen(
         "*/wpi/util/ErrorHandling.hpp",
         "*/wpi/util/SmallVector.hpp",
         "*/wpi/util/StringExtras.hpp",
-        "*/wpi/util/bit.hpp",
         "*/wpi/util/raw_ostream.hpp",
         # Sleipnir
         "*/sleipnir/optimization/solver/interior_point.hpp",

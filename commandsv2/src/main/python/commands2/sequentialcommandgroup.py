@@ -29,36 +29,36 @@ class SequentialCommandGroup(Command):
         """
         super().__init__()
         self._commands: List[Command] = []
-        self._currentCommandIndex = -1
-        self._runsWhenDisabled = True
-        self._interruptBehavior = InterruptionBehavior.kCancelIncoming
-        self.addCommands(*commands)
+        self._current_command_index = -1
+        self._runs_when_disabled = True
+        self._interrupt_behavior = InterruptionBehavior.CANCEL_INCOMING
+        self.add_commands(*commands)
 
-    def addCommands(self, *commands: Command):
+    def add_commands(self, *commands: Command):
         """
         Adds the given commands to the group.
 
         :param commands: Commands to add to the group.
         """
         commands = flatten_args_commands(commands)
-        if self._currentCommandIndex != -1:
+        if self._current_command_index != -1:
             raise IllegalCommandUse(
                 "Commands cannot be added to a composition while it is running"
             )
 
-        CommandScheduler.getInstance().registerComposedCommands(commands)
+        CommandScheduler.get_instance().register_composed_commands(commands)
 
         for command in commands:
             self._commands.append(command)
-            self.requirements.update(command.getRequirements())
-            self._runsWhenDisabled = (
-                self._runsWhenDisabled and command.runsWhenDisabled()
+            self.requirements.update(command.get_requirements())
+            self._runs_when_disabled = (
+                self._runs_when_disabled and command.runs_when_disabled()
             )
-            if command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf:
-                self._interruptBehavior = InterruptionBehavior.kCancelSelf
+            if command.get_interruption_behavior() == InterruptionBehavior.CANCEL_SELF:
+                self._interrupt_behavior = InterruptionBehavior.CANCEL_SELF
 
     def initialize(self):
-        self._currentCommandIndex = 0
+        self._current_command_index = 0
         if self._commands:
             self._commands[0].initialize()
 
@@ -66,36 +66,36 @@ class SequentialCommandGroup(Command):
         if not self._commands:
             return
 
-        currentCommand = self._commands[self._currentCommandIndex]
+        current_command = self._commands[self._current_command_index]
 
-        currentCommand.execute()
-        if currentCommand.isFinished():
-            currentCommand.end(False)
-            self._currentCommandIndex += 1
-            if self._currentCommandIndex < len(self._commands):
-                self._commands[self._currentCommandIndex].initialize()
+        current_command.execute()
+        if current_command.is_finished():
+            current_command.end(False)
+            self._current_command_index += 1
+            if self._current_command_index < len(self._commands):
+                self._commands[self._current_command_index].initialize()
 
     def end(self, interrupted: bool):
         if (
             interrupted
             and self._commands
-            and -1 < self._currentCommandIndex < len(self._commands)
+            and -1 < self._current_command_index < len(self._commands)
         ):
-            self._commands[self._currentCommandIndex].end(True)
+            self._commands[self._current_command_index].end(True)
 
-        self._currentCommandIndex = -1
+        self._current_command_index = -1
 
-    def isFinished(self) -> bool:
-        return self._currentCommandIndex == len(self._commands)
+    def is_finished(self) -> bool:
+        return self._current_command_index == len(self._commands)
 
-    def runsWhenDisabled(self) -> bool:
-        return self._runsWhenDisabled
+    def runs_when_disabled(self) -> bool:
+        return self._runs_when_disabled
 
-    def getInterruptionBehavior(self) -> InterruptionBehavior:
-        return self._interruptBehavior
+    def get_interruption_behavior(self) -> InterruptionBehavior:
+        return self._interrupt_behavior
 
-    def initSendable(self, builder: SendableBuilder) -> None:
-        super().initSendable(builder)
-        builder.addIntegerProperty(
-            "index", lambda: self._currentCommandIndex, lambda _: None
+    def init_sendable(self, builder: SendableBuilder) -> None:
+        super().init_sendable(builder)
+        builder.add_integer_property(
+            "index", lambda: self._current_command_index, lambda _: None
         )

@@ -3,6 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #pragma once
+
+#include <memory>
+
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/button/CommandGenericHID.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
@@ -24,6 +27,13 @@ class CommandGamepad {
    * plugged into.
    */
   explicit CommandGamepad(int port);
+
+  /**
+   * Construct an instance of a controller with a Gamepad object.
+   *
+   * @param gamepad The Gamepad object to use for this controller.
+   */
+  explicit CommandGamepad(wpi::Gamepad* gamepad);
 
   /**
    * Get the underlying CommandGenericHID object.
@@ -510,7 +520,8 @@ class CommandGamepad {
   double GetRightTrigger() const;
 
  private:
-  CommandGenericHID* m_hid;
-  wpi::Gamepad* m_gamepad;
+  std::unique_ptr<CommandGenericHID> m_ownedHid;
+  CommandGenericHID* m_hid = nullptr;
+  wpi::Gamepad* m_gamepad = nullptr;
 };
 }  // namespace wpi::cmd

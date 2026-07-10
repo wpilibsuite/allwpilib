@@ -321,14 +321,14 @@ model {
                 }
             }
         }
-        installAthena(Task) {
+        installSystemcore(Task) {
             $.binaries.each {
                 if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore && it.component.name == 'benchmarkCpp') {
                     dependsOn it.tasks.install
                 }
             }
         }
-        installAthenaStatic(Task) {
+        installSystemcoreStatic(Task) {
             $.binaries.each {
                 if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore && it.component.name == 'benchmarkCppStatic') {
                     dependsOn it.tasks.install

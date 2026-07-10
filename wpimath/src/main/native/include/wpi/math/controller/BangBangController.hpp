@@ -43,7 +43,7 @@ class WPILIB_DLLEXPORT BangBangController
   constexpr explicit BangBangController(
       double tolerance = std::numeric_limits<double>::infinity())
       : m_tolerance(tolerance) {
-    if (!std::is_constant_evaluated()) {
+    if !consteval {
       ++instances;
       wpi::math::MathSharedStore::ReportUsage("BangBangController",
                                               std::to_string(instances));

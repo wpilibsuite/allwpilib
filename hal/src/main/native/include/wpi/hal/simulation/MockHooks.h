@@ -36,6 +36,10 @@ void HALSIM_SetSendError(HALSIM_SendErrorHandler handler);
 typedef int32_t (*HALSIM_SendConsoleLineHandler)(const struct WPI_String* line);
 void HALSIM_SetSendConsoleLine(HALSIM_SendConsoleLineHandler handler);
 
+typedef int32_t (*HALSIM_WriteDisplayAnsiHandler)(
+    const struct WPI_String* data);
+void HALSIM_SetWriteDisplayAnsi(HALSIM_WriteDisplayAnsiHandler handler);
+
 typedef void (*HALSIM_SimPeriodicCallback)(void* param);
 int32_t HALSIM_RegisterSimPeriodicBeforeCallback(
     HALSIM_SimPeriodicCallback callback, void* param);

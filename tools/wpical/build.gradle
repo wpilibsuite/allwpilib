@@ -19,8 +19,9 @@ if (OperatingSystem.current().isWindows()) {
 ext {
     nativeName = 'wpical'
     useCpp = true
+    nativeTestSuiteName = "${nativeName}Catch2Test"
     sharedCvConfigs = [
-        wpicalTest: []]
+        (nativeTestSuiteName): []]
     staticCvConfigs = []
 }
 
@@ -192,7 +193,7 @@ model {
         }
     }
     testSuites {
-        "${nativeName}Test"(GoogleTestTestSuiteSpec) {
+        "${nativeTestSuiteName}"(GoogleTestTestSuiteSpec) {
             for(NativeComponentSpec c : $.components) {
                 if (c.name == nativeName) {
                     testing c
@@ -237,7 +238,7 @@ model {
                 } else {
                     it.cppCompiler.define('GLOG_DEPRECATED', '[[deprecated]]')
                 }
-                lib project: ':thirdparty:googletest', library: 'googletest', linkage: 'static'
+                lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
                 it.cppCompiler.define("RUNNING_WPICAL_TESTS")
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'

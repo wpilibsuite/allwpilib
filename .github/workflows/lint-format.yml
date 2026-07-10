@@ -1,6 +1,7 @@
 name: Lint and Format
 
 on:
+  merge_group:
   pull_request:
   push:
     branches-ignore:
@@ -36,7 +37,7 @@ jobs:
       - name: Install wpiformat
         run: |
           python -m venv ${{ runner.temp }}/wpiformat
-          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2026.57
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2026.64
       - name: Run
         run: ${{ runner.temp }}/wpiformat/bin/wpiformat
       - name: Check output
@@ -78,10 +79,10 @@ jobs:
       - name: Install wpiformat
         run: |
           python -m venv ${{ runner.temp }}/wpiformat
-          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2026.57
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2026.64
       - name: Create compile_commands.json
         run: |
-          ./gradlew generateCompileCommands -Ptoolchain-optional-roboRio
+          ./gradlew generateCompileCommands -Ptoolchain-optional-Systemcore
           ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64release/compile_commands.json
           ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64debug/compile_commands.json
       - name: List changed files

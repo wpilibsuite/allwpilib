@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.3.0",
+    "semiwrap~=0.6.0",
     "hatch-meson~=0.1.2",
     "hatch-robotpy~=0.2.1",
     "hatchling",
@@ -95,6 +95,11 @@ scan_headers_ignore = [
     "PyTrajectoryConstraint.h",
     "_units_base_type_caster.h",
 ]
+
+[tool.semiwrap.name_transform]
+default = "snake_case"
+enum_value = "CAPS_CASE"
+known_words = ["3V3", "5V", "CAN", "CPU", "DS", "FMS", "FPGA", "HAL", "HTTP", "I2C", "IMU", "JNI", "JSON", "mDNS", "NT", "OpMode", "PCM", "PDH", "PDP", "PID", "POVs", "PWM", "RIO", "SPI", "URI", "URL", "USB", "VIn"]
 
 [tool.semiwrap.export_type_casters.wpimath-casters]
 pypackage = "wpimath"
@@ -1460,6 +1465,7 @@ MathUtil = "wpi/math/util/MathUtil.hpp"
 # StateSpaceUtil = "wpi/math/util/StateSpaceUtil.hpp"
 
 # wpi/math/controller
+AntiTipping = "wpi/math/controller/AntiTipping.hpp"
 ArmFeedforward = "wpi/math/controller/ArmFeedforward.hpp"
 BangBangController = "wpi/math/controller/BangBangController.hpp"
 ControlAffinePlantInversionFeedforward = "wpi/math/controller/ControlAffinePlantInversionFeedforward.hpp"
@@ -1494,6 +1500,7 @@ SwerveDrivePoseEstimator3d = "wpi/math/estimator/SwerveDrivePoseEstimator3d.hpp"
 # UnscentedTransform = "wpi/math/estimator/UnscentedTransform.hpp"
 
 # wpi/math/filter
+BiquadFilter = "wpi/math/filter/BiquadFilter.hpp"
 Debouncer = "wpi/math/filter/Debouncer.hpp"
 EdgeCounterFilter = "wpi/math/filter/EdgeCounterFilter.hpp"
 LinearFilter = "wpi/math/filter/LinearFilter.hpp"
@@ -1570,11 +1577,17 @@ NumericalIntegration = "wpi/math/system/NumericalIntegration.hpp"
 NumericalJacobian = "wpi/math/system/NumericalJacobian.hpp"
 
 # wpi/math/trajectory
+DifferentialSample = "wpi/math/trajectory/DifferentialSample.hpp"
+DifferentialTrajectory = "wpi/math/trajectory/DifferentialTrajectory.hpp"
 ExponentialProfile = "wpi/math/trajectory/ExponentialProfile.hpp"
+HolonomicTrajectory = "wpi/math/trajectory/HolonomicTrajectory.hpp"
+SplineSample = "wpi/math/trajectory/SplineSample.hpp"
+SplineTrajectory = "wpi/math/trajectory/SplineTrajectory.hpp"
 Trajectory = "wpi/math/trajectory/Trajectory.hpp"
 TrajectoryConfig = "wpi/math/trajectory/TrajectoryConfig.hpp"
 TrajectoryGenerator = "wpi/math/trajectory/TrajectoryGenerator.hpp"
 TrajectoryParameterizer = "wpi/math/trajectory/TrajectoryParameterizer.hpp"
+TrajectorySample = "wpi/math/trajectory/TrajectorySample.hpp"
 TrapezoidProfile = "wpi/math/trajectory/TrapezoidProfile.hpp"
 
 # wpi/math/trajectory/constraint

@@ -4,12 +4,12 @@
 
 #include "LocalStorageImpl.hpp"
 
+#include <format>
 #include <memory>
+#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
-
-#include <fmt/ranges.h>
 
 #include "IListenerStorage.hpp"
 #include "Log.hpp"
@@ -406,13 +406,27 @@ void StorageImpl::Unpublish(NT_Handle pubentryHandle) {
   }
 }
 
+// FIXME: Remove when GCC 15 is available and pass span directly
+static std::string join(std::span<const std::string_view> values) {
+  std::string ret;
+  bool isFirst = true;
+  for (auto value : values) {
+    if (isFirst) {
+      isFirst = false;
+      ret += std::format("\"{}\"", value);
+    } else {
+      ret += std::format(", \"{}\"", value);
+    }
+  }
+  return ret;
+}
 //
 // Multi-subscriber functions
 //
 
 LocalMultiSubscriber* StorageImpl::AddMultiSubscriber(
     std::span<const std::string_view> prefixes, const PubSubOptions& options) {
-  DEBUG4("AddMultiSubscriber({})", fmt::join(prefixes, ","));
+  DEBUG4("AddMultiSubscriber({})", join(prefixes));
   if (m_multiSubscribers.size() >= kMaxMultiSubscribers) {
     ERR("reached maximum number of multi-subscribers, not subscribing");
     return nullptr;
@@ -846,7 +860,9 @@ void StorageImpl::NotifyValue(LocalTopic* topic, const Value& value,
         (!publisher || (publisher && (subscriber->config.excludePublisher !=
                                       publisher->handle)))) {
       subscriber->pollStorage.emplace_back(value);
-      subscriber->handle.Set();
+      if (!subscriber->config.disableSignal) {
+        subscriber->handle.Set();
+      }
       if (!subscriber->valueListeners.empty()) {
         m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
                                  topic->handle, 0, value);
@@ -856,7 +872,9 @@ void StorageImpl::NotifyValue(LocalTopic* topic, const Value& value,
 
   for (auto&& subscriber : topic->multiSubscribers) {
     if (subscriber->options.keepDuplicates || !isDuplicate) {
-      subscriber->handle.Set();
+      if (!subscriber->options.disableSignal) {
+        subscriber->handle.Set();
+      }
       if (!subscriber->valueListeners.empty()) {
         m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
                                  topic->handle, 0, value);
@@ -1011,10 +1029,14 @@ LocalSubscriber* StorageImpl::AddLocalSubscriber(LocalTopic* topic,
   if (subscriber->active) {
     if (!topic->lastValueFromNetwork && !config.disableLocal) {
       subscriber->pollStorage.emplace_back(topic->lastValue);
-      subscriber->handle.Set();
+      if (!subscriber->config.disableSignal) {
+        subscriber->handle.Set();
+      }
     } else if (topic->lastValueFromNetwork && !config.disableRemote) {
       subscriber->pollStorage.emplace_back(topic->lastValueNetwork);
-      subscriber->handle.Set();
+      if (!subscriber->config.disableSignal) {
+        subscriber->handle.Set();
+      }
     }
   }
   return subscriber;

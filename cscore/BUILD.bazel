@@ -32,7 +32,7 @@ filegroup(
     srcs = select({
         "@platforms//os:osx": MAC_SRCS,
         "@platforms//os:windows": WIN_SRCS,
-        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_SRCS,
+        "@wpilib_toolchains//constraints/combined:is_linux": LINUX_SRCS,
     }),
 )
 
@@ -223,10 +223,10 @@ wpilib_jni_java_library(
 cc_test(
     name = "cscore-cpp-test",
     size = "small",
-    srcs = glob(["src/test/native/**"]),
+    srcs = glob(["src/test/native/**/*.cpp"]),
     deps = [
         ":cscore",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 

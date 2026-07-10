@@ -4,8 +4,8 @@
 
 package org.wpilib.framework;
 
-import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.internal.DriverStationBackend;
@@ -16,10 +16,10 @@ import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.networktables.MultiSubscriber;
 import org.wpilib.networktables.NetworkTableEvent;
 import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.PubSubOption;
 import org.wpilib.system.RuntimeType;
 import org.wpilib.system.Timer;
 import org.wpilib.system.WPILibVersion;
-import org.wpilib.util.ConstructorMatch;
 import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.vision.stream.CameraServerShared;
 import org.wpilib.vision.stream.CameraServerSharedStore;
@@ -61,7 +61,7 @@ public abstract class RobotBase implements AutoCloseable {
           }
 
           @Override
-          public boolean isRoboRIO() {
+          public boolean isSystemcore() {
             return !RobotBase.isSimulation();
           }
         };
@@ -103,7 +103,7 @@ public abstract class RobotBase implements AutoCloseable {
     setupCameraServerShared();
     setupMathShared();
     // subscribe to "" to force persistent values to propagate to local
-    m_suball = new MultiSubscriber(inst, new String[] {""});
+    m_suball = new MultiSubscriber(inst, new String[] {""}, PubSubOption.DISABLE_SIGNAL);
     if (!isSimulation()) {
       inst.startServer("/home/systemcore/networktables.json", "", "robot");
     } else {
@@ -288,38 +288,46 @@ public abstract class RobotBase implements AutoCloseable {
   private static RobotBase m_robotCopy;
   private static boolean m_suppressExitWarning;
 
-  private static <T extends RobotBase> T constructRobot(Class<T> robotClass) throws Throwable {
-    Optional<ConstructorMatch<T>> constructorMatch =
-        ConstructorMatch.findBestConstructor(robotClass);
-
-    if (constructorMatch.isEmpty()) {
-      throw new IllegalArgumentException(
-          "No valid constructor found in robot class " + robotClass.getName());
+  /**
+   * Gets the Robot subclass name from a stack trace.
+   *
+   * @param elements The stack trace elements to walk.
+   * @return The Robot subclass name.
+   */
+  protected static String getRobotName(StackTraceElement[] elements) {
+    // Walk bottom to top to account for multiple layers of subclassing
+    for (int i = elements.length - 1; i >= 0; i--) {
+      StackTraceElement element = elements[i];
+      try {
+        // Skip our own class when walking
+        if (RobotBase.class.equals(Class.forName(element.getClassName()))) {
+          continue;
+        }
+        if (RobotBase.class.isAssignableFrom(Class.forName(element.getClassName()))) {
+          return element.getClassName();
+        }
+      } catch (ClassNotFoundException e) {
+        // Unreachable
+      }
     }
-
-    T robot = constructorMatch.get().newInstance();
-
-    return robot;
+    return "Unknown";
   }
 
   /** Run the robot main loop. */
   @SuppressWarnings("PMD.AvoidCatchingGenericException")
-  private static <T extends RobotBase> void runRobot(Class<T> robotClass) {
+  private static <T extends RobotBase> void runRobot(Supplier<T> robotConstructor) {
     System.out.println("********** Robot program starting **********");
 
     T robot;
     try {
-      robot = constructRobot(robotClass);
+      robot = robotConstructor.get();
     } catch (Throwable throwable) {
       Throwable cause = throwable.getCause();
       if (cause != null) {
         throwable = cause;
       }
-      String robotName = "Unknown";
       StackTraceElement[] elements = throwable.getStackTrace();
-      if (elements.length > 0) {
-        robotName = elements[0].getClassName();
-      }
+      String robotName = getRobotName(elements);
       DriverStationErrors.reportError(
           "Unhandled exception instantiating robot " + robotName + " " + throwable, elements);
       DriverStationErrors.reportError(
@@ -390,9 +398,9 @@ public abstract class RobotBase implements AutoCloseable {
    * Starting point for the applications.
    *
    * @param <T> Robot subclass.
-   * @param robotClass Robot subclass type.
+   * @param robotConstructor Robot constructor.
    */
-  public static <T extends RobotBase> void startRobot(Class<T> robotClass) {
+  public static <T extends RobotBase> void startRobot(Supplier<T> robotConstructor) {
     // Check that the MSVC runtime is valid.
     WPIUtilJNI.checkMsvcRuntime();
 
@@ -410,7 +418,7 @@ public abstract class RobotBase implements AutoCloseable {
       Thread thread =
           new Thread(
               () -> {
-                runRobot(robotClass);
+                runRobot(robotConstructor);
                 HAL.exitMain();
               },
               "robot main");
@@ -430,7 +438,7 @@ public abstract class RobotBase implements AutoCloseable {
         Thread.currentThread().interrupt();
       }
     } else {
-      runRobot(robotClass);
+      runRobot(robotConstructor);
     }
 
     // On RIO, this will just terminate rather than shutting down cleanly (it's a no-op in sim).

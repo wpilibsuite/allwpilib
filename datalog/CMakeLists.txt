@@ -35,13 +35,13 @@ configure_file(datalog-config.cmake.in ${WPILIB_BINARY_DIR}/datalog-config.cmake
 install(FILES ${WPILIB_BINARY_DIR}/datalog-config.cmake DESTINATION share/datalog)
 install(EXPORT datalog DESTINATION share/datalog)
 
-if(WITH_TESTS)
+if(WPILIB_WITH_TESTS)
     file(GLOB_RECURSE datalog_testlib_src src/test/native/include/*.h)
     add_library(datalog_testlib INTERFACE ${datalog_test_src})
     target_include_directories(datalog_testlib INTERFACE src/test/native/include)
 
-    wpilib_add_test(datalog src/test/native/cpp)
-    target_link_libraries(datalog_test datalog googletest datalog_testlib wpiutil)
+    wpilib_add_test_catch2(datalog src/test/native/cpp)
+    target_link_libraries(datalog_test datalog datalog_testlib wpiutil)
     if(MSVC)
         target_compile_options(datalog_test PRIVATE /utf-8)
     endif()

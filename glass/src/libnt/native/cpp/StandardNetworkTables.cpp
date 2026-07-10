@@ -7,10 +7,10 @@
 #include "wpi/glass/networktables/NTAlerts.hpp"
 #include "wpi/glass/networktables/NTCommandScheduler.hpp"
 #include "wpi/glass/networktables/NTCommandSelector.hpp"
+#include "wpi/glass/networktables/NTDS.hpp"
 #include "wpi/glass/networktables/NTDifferentialDrive.hpp"
 #include "wpi/glass/networktables/NTDigitalInput.hpp"
 #include "wpi/glass/networktables/NTDigitalOutput.hpp"
-#include "wpi/glass/networktables/NTFMS.hpp"
 #include "wpi/glass/networktables/NTField2D.hpp"
 #include "wpi/glass/networktables/NTGyro.hpp"
 #include "wpi/glass/networktables/NTMecanumDrive.hpp"
@@ -70,14 +70,14 @@ void wpi::glass::AddStandardNetworkTablesViews(
         });
       });
   provider.Register(
-      NTFMSModel::kType,
+      NTDSModel::kType,
       [](wpi::nt::NetworkTableInstance inst, const char* path) {
-        return std::make_unique<NTFMSModel>(inst, path);
+        return std::make_unique<NTDSModel>(inst, path);
       },
       [](Window* win, Model* model, const char*) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         return MakeFunctionView(
-            [=] { DisplayFMS(static_cast<FMSModel*>(model), true); });
+            [=] { DisplayDS(static_cast<DSModel*>(model), true); });
       });
   provider.Register(
       NTDigitalInputModel::kType,

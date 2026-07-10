@@ -4,7 +4,8 @@
 
 #include "wpi/hardware/expansionhub/ExpansionHubPositionConstants.hpp"
 
-#include "fmt/core.h"
+#include <format>
+
 #include "wpi/system/SystemServer.hpp"
 
 using namespace wpi;
@@ -20,45 +21,45 @@ ExpansionHubPositionConstants::ExpansionHubPositionConstants(int hubNumber,
 
   m_pPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/position/kp",
+          .GetDoubleTopic(std::format("/rhsp/{}/motor{}/constants/position/kp",
                                       hubNumber, motorNumber))
           .Publish(options);
 
   m_iPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/position/ki",
+          .GetDoubleTopic(std::format("/rhsp/{}/motor{}/constants/position/ki",
                                       hubNumber, motorNumber))
           .Publish(options);
 
   m_dPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/position/kd",
+          .GetDoubleTopic(std::format("/rhsp/{}/motor{}/constants/position/kd",
                                       hubNumber, motorNumber))
           .Publish(options);
 
   m_sPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/position/ks",
+          .GetDoubleTopic(std::format("/rhsp/{}/motor{}/constants/position/ks",
                                       hubNumber, motorNumber))
           .Publish(options);
 
   m_continuousPublisher =
       systemServer
           .GetBooleanTopic(
-              fmt::format("/rhsp/{}/motor{}/constants/position/continuous",
+              std::format("/rhsp/{}/motor{}/constants/position/continuous",
                           hubNumber, motorNumber))
           .Publish(options);
 
   m_continuousMinimumPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format(
+          .GetDoubleTopic(std::format(
               "/rhsp/{}/motor{}/constants/position/continuousMinimum",
               hubNumber, motorNumber))
           .Publish(options);
 
   m_continuousMaximumPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format(
+          .GetDoubleTopic(std::format(
               "/rhsp/{}/motor{}/constants/position/continuousMaximum",
               hubNumber, motorNumber))
           .Publish(options);

@@ -5,11 +5,10 @@
 #include <jni.h>
 
 #include <cassert>
+#include <format>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "org_wpilib_networktables_NetworkTablesJNI.h"
 #include "wpi/nt/ntcore.h"
@@ -140,6 +139,7 @@ static wpi::nt::PubSubOptions FromJavaPubSubOptions(JNIEnv* env,
   FIELD(disableLocal, "Z");
   FIELD(excludeSelf, "Z");
   FIELD(hidden, "Z");
+  FIELD(disableSignal, "Z");
 
 #undef FIELD
 
@@ -156,7 +156,8 @@ static wpi::nt::PubSubOptions FromJavaPubSubOptions(JNIEnv* env,
           FIELD(bool, Boolean, disableRemote),
           FIELD(bool, Boolean, disableLocal),
           FIELD(bool, Boolean, excludeSelf),
-          FIELD(bool, Boolean, hidden)};
+          FIELD(bool, Boolean, hidden),
+          FIELD(bool, Boolean, disableSignal)};
 
 #undef GET
 #undef FIELD
@@ -750,7 +751,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_setTopicProperty
   auto j = wpi::util::json::parse(std::string_view{JStringRef{env, value}});
   if (!j) {
     illegalArgEx.Throw(
-        env, fmt::format("could not parse value JSON: {}", j.error()));
+        env, std::format("could not parse value JSON: {}", j.error()));
     return;
   }
   wpi::nt::SetTopicProperty(topic, JStringRef{env, name}, *j);
@@ -793,7 +794,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_setTopicProperties
       wpi::util::json::parse(std::string_view{JStringRef{env, properties}});
   if (!j) {
     illegalArgEx.Throw(
-        env, fmt::format("could not parse properties JSON: {}", j.error()));
+        env, std::format("could not parse properties JSON: {}", j.error()));
     return;
   }
   if (!j->is_object()) {
@@ -857,7 +858,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_publishEx
       wpi::util::json::parse(std::string_view{JStringRef{env, properties}});
   if (!j) {
     illegalArgEx.Throw(
-        env, fmt::format("could not parse properties JSON: {}", j.error()));
+        env, std::format("could not parse properties JSON: {}", j.error()));
     return 0;
   }
   if (!j->is_object()) {

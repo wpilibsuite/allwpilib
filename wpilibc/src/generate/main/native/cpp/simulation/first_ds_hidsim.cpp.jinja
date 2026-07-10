@@ -28,11 +28,11 @@ using namespace wpi::sim;
 }
 {% for axis in axes %}
 void {{ ClassName }}ControllerSim::Set{{ axis.MethodName }}(double value) {
-  SetRawAxis({{ ClassName }}Controller::Axis::{{ axis.ConstantName }}, value);
+  SetRawAxis(static_cast<int>({{ ClassName }}Controller::Axis::{{ axis.ConstantName }}), value);
 }
 {% endfor -%}
 {% for button in buttons %}
 void {{ ClassName }}ControllerSim::Set{{ button.MethodName }}Button(bool value) {
-  SetRawButton({{ ClassName }}Controller::Button::{{ button.ConstantName }}, value);
+  SetRawButton(static_cast<int>({{ ClassName }}Controller::Button::{{ button.ConstantName }}), value);
 }
 {% endfor -%}

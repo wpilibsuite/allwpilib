@@ -3,7 +3,7 @@ import collections
 import json
 import pathlib
 import re
-from typing import Dict, List, Union
+from typing import Dict, List, Tuple, Union
 
 import jinja2
 import tomli
@@ -30,7 +30,11 @@ from shared.bazel.rules.robotpy.hack_pkgcfgs import hack_pkgconfig
 
 
 class HeaderToDatConfig:
-    def __init__(self, header_to_dat_args: BuildTarget):
+    def __init__(
+        self,
+        header_to_dat_args: BuildTarget,
+        extension_name_transforms: List[Tuple[str, str]],
+    ):
         includes = []
         defines = []
 
@@ -46,43 +50,47 @@ class HeaderToDatConfig:
         if header_to_dat_args.args[idx] == "--cpp":
             idx += 2
 
+        transforms = []
+        while True:
+            if header_to_dat_args.args[idx] in [
+                "--name-transform-attribute",
+                "--name-transform-default",
+                "--name-transform-enum-value",
+                "--name-transform-function",
+                "--name-transform-known-word",
+                "--name-transform-method",
+                "--name-transform-parameter",
+            ]:
+                transforms.append(
+                    (header_to_dat_args.args[idx], header_to_dat_args.args[idx + 1])
+                )
+                idx += 2
+            else:
+                break
+
+        # We assume that the transforms remain the same in a given extension
+        if extension_name_transforms:
+            assert extension_name_transforms == transforms
+        else:
+            extension_name_transforms.extend(transforms)
+
         args = header_to_dat_args.args[idx:]
         self.class_name = args[0]
         self.yml_file = args[1].path
         self.defines = defines
 
-        def find_root_dir(include_root):
-            """
-            Somewhat naive attempt to find the "root" directory of the repository,
-            as specified from the runfiles path
-            """
-            if "__main__/" in include_root:
-                return pathlib.Path(
-                    include_root[: include_root.find("__main__/") + len("__main__/")]
-                )
-            elif "_main/" in include_root:
-                return pathlib.Path(
-                    include_root[: include_root.find("_main/") + len("_main/")]
-                )
-            else:
-                return pathlib.Path(include_root)
-
         include_root = str(args[3]).replace("\\", "/")
-        root_dir = find_root_dir(include_root)
         if "native" in include_root:
-            base_include_root = pathlib.Path(*args[3].relative_to(root_dir).parts[3:])
+            # base_include_root = pathlib.Path(*args[3].relative_to(root_dir).parts[3:])
             base_include_file = args[2].relative_to(include_root)
             base_library = re.search("native/(.*?)/", include_root).groups(1)[0]
 
             self.include_file = f"$(execpath :{fixup_native_lib_name('robotpy-native-' + base_library)}.copy_headers)/{base_include_file}"
             self.include_root = f"$(execpath :{fixup_native_lib_name('robotpy-native-' + base_library)}.copy_headers)"
         else:
-            if root_dir.is_absolute():
-                self.include_file = args[2].relative_to(root_dir)
-                self.include_root = args[3].relative_to(root_dir)
-            else:
-                self.include_file = args[2]
-                self.include_root = args[3]
+            root_dir = pathlib.Path.cwd().absolute()
+            self.include_file = pathlib.Path(args[2]).absolute().relative_to(root_dir)
+            self.include_root = pathlib.Path(args[3]).absolute().relative_to(root_dir)
         # type casters         = 4
         # dat file             = 5
         # d file               = 6
@@ -179,7 +187,10 @@ class BazelExtensionModule:
         self.package_name = extension_module.package_name
         self.install_path = extension_module.install_path
 
-        self.generation_data = self._extract_header_generation(extension_module.sources)
+        self.extension_name_transforms: List[Tuple[str, str]] = []
+        self.generation_data = self._extract_header_generation(
+            extension_module.sources, self.extension_name_transforms
+        )
         self.resolve_casters = ResolveCastersConfig(
             additional_extension_targets["resolve-casters"]
         )
@@ -205,7 +216,6 @@ class BazelExtensionModule:
         dynamic_dependencies = set()
         for dep_name in all_dependencies:
             if "native" in dep_name:
-
                 transitive_deps = set()
                 self._get_transitive_native_dependencies(dep_name, transitive_deps)
                 for d in transitive_deps:
@@ -262,11 +272,13 @@ class BazelExtensionModule:
             else:
                 raise
 
-    def _extract_header_generation(self, sources) -> Dict[str, HeaderToDatConfig]:
+    def _extract_header_generation(
+        self, sources, extension_name_transforms: List[Tuple[str, str]]
+    ) -> Dict[str, HeaderToDatConfig]:
         generation_data: Dict[str, HeaderToDatConfig] = {}
 
         def get_h2d_config(target_info: BuildTarget) -> HeaderToDatConfig:
-            config = HeaderToDatConfig(target_info)
+            config = HeaderToDatConfig(target_info, extension_name_transforms)
             if config.class_name not in generation_data:
                 generation_data[config.class_name] = config
             return generation_data[config.class_name]
@@ -416,7 +428,7 @@ def generate_pybind_build_file(
         version_file = raw_config["tool"]["hatch"]["build"]["hooks"]["robotpy"][
             "version_file"
         ]
-    except:
+    except KeyError:
         version_file = None
 
     # The entry points defined above are implicit to how the project is broken down in the toml files.

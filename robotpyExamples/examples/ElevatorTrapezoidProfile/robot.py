@@ -13,7 +13,7 @@ import wpimath
 
 
 class MyRobot(wpilib.TimedRobot):
-    kDt = 0.02
+    DT = 0.02
 
     def __init__(self):
         super().__init__()
@@ -30,21 +30,21 @@ class MyRobot(wpilib.TimedRobot):
         self.setpoint = TrapezoidProfile.State()
 
         # Note: These gains are fake, and will have to be tuned for your robot.
-        self.motor.setPID(1.3, 0.0, 0.7)
+        self.motor.set_pid(1.3, 0.0, 0.7)
 
-    def teleopPeriodic(self):
-        if self.joystick.getRawButtonPressed(2):
+    def teleop_periodic(self):
+        if self.joystick.get_raw_button_pressed(2):
             self.goal = TrapezoidProfile.State(5, 0)
-        elif self.joystick.getRawButtonPressed(3):
+        elif self.joystick.get_raw_button_pressed(3):
             self.goal = TrapezoidProfile.State(0, 0)
 
         # Retrieve the profiled setpoint for the next timestep. This setpoint moves
         # toward the goal while obeying the constraints.
-        self.setpoint = self.profile.calculate(self.kDt, self.setpoint, self.goal)
+        self.setpoint = self.profile.calculate(self.DT, self.setpoint, self.goal)
 
         # Send setpoint to offboard controller PID
-        self.motor.setSetPoint(
-            examplesmartmotorcontroller.ExampleSmartMotorController.PIDMode.kPosition,
+        self.motor.set_setpoint(
+            examplesmartmotorcontroller.ExampleSmartMotorController.PIDMode.POSITION,
             self.setpoint.position,
             self.feedforward.calculate(self.setpoint.velocity) / 12,
         )

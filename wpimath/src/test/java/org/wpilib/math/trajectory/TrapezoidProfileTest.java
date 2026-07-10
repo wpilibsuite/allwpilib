@@ -251,7 +251,7 @@ class TrapezoidProfileTest {
   void initalizationOfCurrentState() {
     var profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(1, 1));
     assertNear(profile.timeLeftUntil(0), 0, 1e-10);
-    assertNear(profile.totalTime(), 0, 1e-10);
+    assertNear(profile.duration(), 0, 1e-10);
   }
 
   @Test

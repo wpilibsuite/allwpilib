@@ -35,6 +35,14 @@ public class ExpansionHubMotor implements AutoCloseable {
   private static final int kVelocityMode = 3;
   private static final int kFollowerMode = 4;
 
+  /** Neutral mode applied when the motor output is commanded to 0. */
+  public enum NeutralMode {
+    /** Allow the motor to coast when output is zero. */
+    COAST,
+    /** Actively brake the motor when output is zero. */
+    BRAKE
+  }
+
   private ExpansionHub m_hub;
   private final int m_channel;
 
@@ -57,7 +65,7 @@ public class ExpansionHubMotor implements AutoCloseable {
   private final ExpansionHubPositionConstants m_positionPidConstants;
 
   /**
-   * Constructs a servo at the requested channel on a specific USB port.
+   * Constructs a motor at the requested channel on a specific USB port.
    *
    * @param usbId The USB port ID the hub is connected to
    * @param channel The motor channel
@@ -215,12 +223,13 @@ public class ExpansionHubMotor implements AutoCloseable {
   }
 
   /**
-   * Sets if the motor should float or brake when 0 is commanded. Defaults to false.
+   * Sets if the motor should brake or coast when 0 is commanded. Defaults to BRAKE mode.
    *
-   * @param floatOn0 True to float when commanded 0, false to brake
+   * @param mode Neutral mode to apply when output is zero.
    */
-  public void setFloatOn0(boolean floatOn0) {
-    m_floatOn0Publisher.set(floatOn0);
+  public void setNeutralMode(NeutralMode mode) {
+    requireNonNullParam(mode, "mode", "setNeutralMode");
+    m_floatOn0Publisher.set(mode == NeutralMode.COAST);
   }
 
   /**

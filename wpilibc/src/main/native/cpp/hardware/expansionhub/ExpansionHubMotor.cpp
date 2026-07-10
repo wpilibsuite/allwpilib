@@ -4,6 +4,8 @@
 
 #include "wpi/hardware/expansionhub/ExpansionHubMotor.hpp"
 
+#include <format>
+
 #include "wpi/hardware/expansionhub/ExpansionHubPositionConstants.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubVelocityConstants.hpp"
 #include "wpi/system/Errors.hpp"
@@ -30,7 +32,7 @@ ExpansionHubMotor::ExpansionHubMotor(int usbId, int channel)
                            channel);
   }
 
-  m_hub.ReportUsage(fmt::format("ExHubMotor[{}]", channel), "ExHubMotor");
+  m_hub.ReportUsage(std::format("ExHubMotor[{}]", channel), "ExHubMotor");
 
   auto systemServer = SystemServer::GetSystemServer();
 
@@ -40,53 +42,53 @@ ExpansionHubMotor::ExpansionHubMotor(int usbId, int channel)
   options.periodic = 0.005;
 
   m_encoderSubscriber = systemServer
-                            .GetDoubleTopic(fmt::format(
+                            .GetDoubleTopic(std::format(
                                 "/rhsp/{}/motor{}/encoder", usbId, channel))
                             .Subscribe(0, options);
   m_encoderVelocitySubscriber =
       systemServer
           .GetDoubleTopic(
-              fmt::format("/rhsp/{}/motor{}/encoderVelocity", usbId, channel))
+              std::format("/rhsp/{}/motor{}/encoderVelocity", usbId, channel))
           .Subscribe(0, options);
   m_currentSubscriber = systemServer
-                            .GetDoubleTopic(fmt::format(
+                            .GetDoubleTopic(std::format(
                                 "/rhsp/{}/motor{}/current", usbId, channel))
                             .Subscribe(0, options);
 
   m_setpointPublisher = systemServer
-                            .GetDoubleTopic(fmt::format(
+                            .GetDoubleTopic(std::format(
                                 "/rhsp/{}/motor{}/setpoint", usbId, channel))
                             .Publish(options);
 
   m_distancePerCountPublisher =
       systemServer
           .GetDoubleTopic(
-              fmt::format("/rhsp/{}/motor{}/distancePerCount", usbId, channel))
+              std::format("/rhsp/{}/motor{}/distancePerCount", usbId, channel))
           .Publish(options);
 
   m_floatOn0Publisher = systemServer
-                            .GetBooleanTopic(fmt::format(
+                            .GetBooleanTopic(std::format(
                                 "/rhsp/{}/motor{}/floatOn0", usbId, channel))
                             .Publish(options);
   m_enabledPublisher = systemServer
-                           .GetBooleanTopic(fmt::format(
+                           .GetBooleanTopic(std::format(
                                "/rhsp/{}/motor{}/enabled", usbId, channel))
                            .Publish(options);
 
   m_modePublisher =
       systemServer
-          .GetIntegerTopic(fmt::format("/rhsp/{}/motor{}/mode", usbId, channel))
+          .GetIntegerTopic(std::format("/rhsp/{}/motor{}/mode", usbId, channel))
           .Publish(options);
 
   m_reversedPublisher = systemServer
-                            .GetBooleanTopic(fmt::format(
+                            .GetBooleanTopic(std::format(
                                 "/rhsp/{}/motor{}/reversed", usbId, channel))
                             .Publish(options);
 
   m_resetEncoderPublisher =
       systemServer
           .GetBooleanTopic(
-              fmt::format("/rhsp/{}/motor{}/resetEncoder", usbId, channel))
+              std::format("/rhsp/{}/motor{}/resetEncoder", usbId, channel))
           .Publish(options);
 }
 
@@ -122,8 +124,8 @@ void ExpansionHubMotor::SetEnabled(bool enabled) {
   m_enabledPublisher.Set(enabled);
 }
 
-void ExpansionHubMotor::SetFloatOn0(bool floatOn0) {
-  m_floatOn0Publisher.Set(floatOn0);
+void ExpansionHubMotor::SetNeutralMode(NeutralMode mode) {
+  m_floatOn0Publisher.Set(mode == NeutralMode::COAST);
 }
 
 wpi::units::ampere_t ExpansionHubMotor::GetCurrent() const {
@@ -143,7 +145,7 @@ double ExpansionHubMotor::GetEncoderPosition() const {
 }
 
 void ExpansionHubMotor::SetReversed(bool reversed) {
-  m_reversedPublisher.Set(true);
+  m_reversedPublisher.Set(reversed);
 }
 
 void ExpansionHubMotor::ResetEncoder() {

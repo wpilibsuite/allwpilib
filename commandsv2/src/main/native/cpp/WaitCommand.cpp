@@ -4,14 +4,14 @@
 
 #include "wpi/commands2/WaitCommand.hpp"
 
-#include <fmt/format.h>
+#include <format>
 
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
 using namespace wpi::cmd;
 
 WaitCommand::WaitCommand(wpi::units::second_t duration) : m_duration{duration} {
-  SetName(fmt::format("{}: {}", GetName(), duration));
+  SetName(std::format("{}: {}", GetName(), duration));
 }
 
 void WaitCommand::Initialize() {

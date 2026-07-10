@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.3.0",
+    "semiwrap~=0.6.0",
     "hatch-meson~=0.1.2",
     "hatchling",
     "pyntcore==0.0.0",
@@ -57,12 +57,17 @@ scan_headers_ignore = [
     "sim_value_cb.h",
 ]
 
-[tool.semiwrap.extension_modules."hal._wpiHal"]
+[tool.semiwrap.name_transform]
+default = "snake_case"
+enum_value = "CAPS_CASE"
+known_words = ["3V3", "5V", "CAN", "CPU", "DS", "FMS", "FPGA", "HAL", "HTTP", "I2C", "IMU", "JNI", "JSON", "mDNS", "NT", "OpMode", "PCM", "PDH", "PDP", "PID", "POVs", "PWM", "RIO", "SPI", "URI", "URL", "USB", "VIn"]
+
+[tool.semiwrap.extension_modules."hal._wpi_hal"]
 name = "wpihal"
 wraps = ["robotpy-native-wpihal"]
 depends = ["wpiutil", "ntcore"]
 
-[tool.semiwrap.extension_modules."hal._wpiHal".headers]
+[tool.semiwrap.extension_modules."hal._wpi_hal".headers]
 # hal
 CANAPITypes = "wpi/hal/CANAPITypes.h"
 DriverStation_c = "wpi/hal/DriverStation.h"

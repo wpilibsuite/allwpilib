@@ -9,7 +9,7 @@ py_binary(
     name = "generate_files",
     srcs = ["generate_files.py"],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     deps = [requirement("jinja2")],
@@ -17,7 +17,10 @@ py_binary(
 
 filegroup(
     name = "templates",
-    srcs = glob(["src/generate/main/**"]) + [
+    srcs = glob([
+        "src/generate/main/**",
+        "src/main/proto/**",
+    ]) + [
         "//wpilibj:hid_schema",
     ],
 )

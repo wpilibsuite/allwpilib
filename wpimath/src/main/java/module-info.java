@@ -54,5 +54,5 @@ open module wpilib.math {
   exports org.wpilib.math.util;
 
   provides io.avaje.jsonb.spi.JsonbExtension with
-      org.wpilib.math.geometry.jsonb.GeneratedJsonComponent;
+      org.wpilib.math.jsonb.GeneratedJsonComponent;
 }

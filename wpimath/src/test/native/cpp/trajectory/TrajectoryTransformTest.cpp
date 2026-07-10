@@ -11,8 +11,8 @@
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
 void TestSameShapedTrajectory(
-    std::vector<wpi::math::Trajectory::State> statesA,
-    std::vector<wpi::math::Trajectory::State> statesB) {
+    const std::vector<wpi::math::SplineSample>& statesA,
+    const std::vector<wpi::math::SplineSample>& statesB) {
   for (unsigned int i = 0; i < statesA.size() - 1; i++) {
     auto a1 = statesA[i].pose;
     auto a2 = statesA[i + 1].pose;
@@ -30,6 +30,24 @@ void TestSameShapedTrajectory(
   }
 }
 
+// A rigid transform rotates both the heading and the field-relative
+// velocity/acceleration by the same amount, so the heading-relative forward
+// scalars (and curvature) are invariant. This would fail if
+// TransformBy/RelativeTo rotated the pose but not the velocity/acceleration.
+void TestSameForwardScalars(
+    const std::vector<wpi::math::SplineSample>& statesA,
+    const std::vector<wpi::math::SplineSample>& statesB) {
+  ASSERT_EQ(statesA.size(), statesB.size());
+  for (unsigned int i = 0; i < statesA.size(); i++) {
+    EXPECT_NEAR(statesA[i].ForwardVelocity().value(),
+                statesB[i].ForwardVelocity().value(), 1E-9);
+    EXPECT_NEAR(statesA[i].ForwardAcceleration().value(),
+                statesB[i].ForwardAcceleration().value(), 1E-9);
+    EXPECT_NEAR(statesA[i].curvature.value(), statesB[i].curvature.value(),
+                1E-9);
+  }
+}
+
 TEST(TrajectoryTransformsTest, TransformBy) {
   wpi::math::TrajectoryConfig config{3_mps, 3_mps_sq};
   auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
@@ -37,13 +55,15 @@ TEST(TrajectoryTransformsTest, TransformBy) {
 
   auto transformedTrajectory = trajectory.TransformBy({{1_m, 2_m}, 30_deg});
 
-  auto firstPose = transformedTrajectory.Sample(0_s).pose;
+  auto firstPose = transformedTrajectory.SampleAt(0_s).pose;
 
   EXPECT_NEAR(firstPose.X().value(), 1.0, 1E-9);
   EXPECT_NEAR(firstPose.Y().value(), 2.0, 1E-9);
   EXPECT_NEAR(firstPose.Rotation().Degrees().value(), 30.0, 1E-9);
 
-  TestSameShapedTrajectory(trajectory.States(), transformedTrajectory.States());
+  TestSameShapedTrajectory(trajectory.Samples(),
+                           transformedTrajectory.Samples());
+  TestSameForwardScalars(trajectory.Samples(), transformedTrajectory.Samples());
 }
 
 TEST(TrajectoryTransformsTest, RelativeTo) {
@@ -54,11 +74,13 @@ TEST(TrajectoryTransformsTest, RelativeTo) {
 
   auto transformedTrajectory = trajectory.RelativeTo({1_m, 2_m, 30_deg});
 
-  auto firstPose = transformedTrajectory.Sample(0_s).pose;
+  auto firstPose = transformedTrajectory.SampleAt(0_s).pose;
 
   EXPECT_NEAR(firstPose.X().value(), 0, 1E-9);
   EXPECT_NEAR(firstPose.Y().value(), 0, 1E-9);
   EXPECT_NEAR(firstPose.Rotation().Degrees().value(), 0, 1E-9);
 
-  TestSameShapedTrajectory(trajectory.States(), transformedTrajectory.States());
+  TestSameShapedTrajectory(trajectory.Samples(),
+                           transformedTrajectory.Samples());
+  TestSameForwardScalars(trajectory.Samples(), transformedTrajectory.Samples());
 }

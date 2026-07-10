@@ -46,6 +46,56 @@ class XboxController
   static constexpr GenericHID::SupportedOutputs SUPPORTED_OUTPUTS =
       static_cast<GenericHID::SupportedOutputs>(24);
 
+  /** Represents a digital button on a XboxController. */
+  enum class Button {
+    /// A button.
+    A = 0,
+    /// B button.
+    B = 1,
+    /// X button.
+    X = 2,
+    /// Y button.
+    Y = 3,
+    /// View button.
+    VIEW = 4,
+    /// Xbox button.
+    XBOX = 5,
+    /// Menu button.
+    MENU = 6,
+    /// Left Stick button.
+    LEFT_STICK = 7,
+    /// Right Stick button.
+    RIGHT_STICK = 8,
+    /// Left Bumper button.
+    LEFT_BUMPER = 9,
+    /// Right Bumper button.
+    RIGHT_BUMPER = 10,
+    /// Dpad Up button.
+    DPAD_UP = 11,
+    /// Dpad Down button.
+    DPAD_DOWN = 12,
+    /// Dpad Left button.
+    DPAD_LEFT = 13,
+    /// Dpad Right button.
+    DPAD_RIGHT = 14,
+  };
+
+  /** Represents an axis on a XboxController. */
+  enum class Axis {
+    /// Left X.
+    LEFT_X = 0,
+    /// Left Y.
+    LEFT_Y = 1,
+    /// Right X.
+    RIGHT_X = 2,
+    /// Right Y.
+    RIGHT_Y = 3,
+    /// Left Trigger.
+    LEFT_TRIGGER = 4,
+    /// Right Trigger.
+    RIGHT_TRIGGER = 5,
+  };
+
   /**
    * Construct an instance of a controller.
    *
@@ -144,7 +194,7 @@ class XboxController
    * @param axis The axis to read
    * @return the axis value.
    */
-  double GetAxis(int axis) const;
+  double GetAxis(Axis axis) const;
 
   /**
    * Constructs an event instance that is true when the axis value is less than
@@ -156,7 +206,7 @@ class XboxController
    * @return an event instance that is true when the axis value is less than the
    * provided threshold.
    */
-  BooleanEvent AxisLessThan(int axis, double threshold, EventLoop* loop) const;
+  BooleanEvent AxisLessThan(Axis axis, double threshold, EventLoop* loop) const;
 
   /**
    * Constructs an event instance that is true when the axis value is greater
@@ -168,7 +218,7 @@ class XboxController
    * @return an event instance that is true when the axis value is greater than
    * the provided threshold.
    */
-  BooleanEvent AxisGreaterThan(int axis, double threshold,
+  BooleanEvent AxisGreaterThan(Axis axis, double threshold,
                                EventLoop* loop) const;
 
   /**
@@ -642,7 +692,7 @@ class XboxController
    * @param button The button to read
    * @return The state of the button.
    */
-  bool GetButton(int button) const;
+  bool GetButton(Button button) const;
 
   /**
    * Whether the button was pressed since the last check.
@@ -650,7 +700,7 @@ class XboxController
    * @param button The button to read
    * @return Whether the button was pressed since the last check.
    */
-  bool GetButtonPressed(int button);
+  bool GetButtonPressed(Button button);
 
   /**
    * Whether the button was released since the last check.
@@ -658,7 +708,7 @@ class XboxController
    * @param button The button to read
    * @return Whether the button was released since the last check.
    */
-  bool GetButtonReleased(int button);
+  bool GetButtonReleased(Button button);
 
   /**
    * Constructs an event instance around this button's digital signal.
@@ -668,7 +718,7 @@ class XboxController
    * @return an event instance representing the button's digital signal attached
    * to the given loop.
    */
-  BooleanEvent ButtonEvent(int button, EventLoop* loop) const;
+  BooleanEvent ButtonEvent(Button button, EventLoop* loop) const;
 
   /**
    * Set leds on the controller.
@@ -686,56 +736,6 @@ class XboxController
    * @param value The normalized value (0 to 1) to set the rumble to
    */
   void SetRumble(GenericHID::RumbleType type, double value);
-
-  /** Represents a digital button on a XboxController. */
-  struct Button {
-    /// A button.
-    static constexpr int A = 0;
-    /// B button.
-    static constexpr int B = 1;
-    /// X button.
-    static constexpr int X = 2;
-    /// Y button.
-    static constexpr int Y = 3;
-    /// View button.
-    static constexpr int VIEW = 4;
-    /// Xbox button.
-    static constexpr int XBOX = 5;
-    /// Menu button.
-    static constexpr int MENU = 6;
-    /// Left Stick button.
-    static constexpr int LEFT_STICK = 7;
-    /// Right Stick button.
-    static constexpr int RIGHT_STICK = 8;
-    /// Left Bumper button.
-    static constexpr int LEFT_BUMPER = 9;
-    /// Right Bumper button.
-    static constexpr int RIGHT_BUMPER = 10;
-    /// Dpad Up button.
-    static constexpr int DPAD_UP = 11;
-    /// Dpad Down button.
-    static constexpr int DPAD_DOWN = 12;
-    /// Dpad Left button.
-    static constexpr int DPAD_LEFT = 13;
-    /// Dpad Right button.
-    static constexpr int DPAD_RIGHT = 14;
-  };
-
-  /** Represents an axis on a XboxController. */
-  struct Axis {
-    /// Left X.
-    static constexpr int LEFT_X = 0;
-    /// Left Y.
-    static constexpr int LEFT_Y = 1;
-    /// Right X.
-    static constexpr int RIGHT_X = 2;
-    /// Right Y.
-    static constexpr int RIGHT_Y = 3;
-    /// Left Trigger.
-    static constexpr int LEFT_TRIGGER = 4;
-    /// Right Trigger.
-    static constexpr int RIGHT_TRIGGER = 5;
-  };
 
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 

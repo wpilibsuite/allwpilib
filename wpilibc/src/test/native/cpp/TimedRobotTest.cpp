@@ -165,7 +165,7 @@ TEST_F(TimedRobotTest, AutonomousMode) {
   wpi::sim::WaitForProgramStart();
 
   wpi::sim::DriverStationSim::SetEnabled(true);
-  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_AUTONOMOUS);
+  wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::AUTONOMOUS);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_EQ(1u, robot.m_simulationInitCount);
@@ -237,7 +237,7 @@ TEST_F(TimedRobotTest, TeleopMode) {
   wpi::sim::WaitForProgramStart();
 
   wpi::sim::DriverStationSim::SetEnabled(true);
-  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_TELEOPERATED);
+  wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::TELEOPERATED);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_EQ(1u, robot.m_simulationInitCount);
@@ -308,7 +308,7 @@ TEST_F(TimedRobotTest, UtilityMode) {
   wpi::sim::WaitForProgramStart();
 
   wpi::sim::DriverStationSim::SetEnabled(true);
-  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_UTILITY);
+  wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::UTILITY);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_EQ(1u, robot.m_simulationInitCount);
@@ -429,7 +429,7 @@ TEST_F(TimedRobotTest, ModeChange) {
 
   // Transition to autonomous
   wpi::sim::DriverStationSim::SetEnabled(true);
-  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_AUTONOMOUS);
+  wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::AUTONOMOUS);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   wpi::sim::StepTiming(kPeriod);
@@ -446,7 +446,7 @@ TEST_F(TimedRobotTest, ModeChange) {
 
   // Transition to teleop
   wpi::sim::DriverStationSim::SetEnabled(true);
-  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_TELEOPERATED);
+  wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::TELEOPERATED);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   wpi::sim::StepTiming(kPeriod);
@@ -463,7 +463,7 @@ TEST_F(TimedRobotTest, ModeChange) {
 
   // Transition to utility
   wpi::sim::DriverStationSim::SetEnabled(true);
-  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_UTILITY);
+  wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::UTILITY);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   wpi::sim::StepTiming(kPeriod);

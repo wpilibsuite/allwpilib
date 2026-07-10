@@ -1,6 +1,7 @@
 ext {
     nativeName = 'romiVendordep'
     devMain = 'org.wpilib.romi.DevMain'
+    nativeTestSuiteName = "${nativeName}Catch2Test"
 }
 
 evaluationDependsOn(":ntcore")

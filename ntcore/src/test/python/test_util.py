@@ -9,72 +9,72 @@ from ntcore.util import ntproperty, ChooserControl
 #     # of network tables happens!
 #     nt.shutdown()
 
-#     foo = nt.getGlobalAutoUpdateValue("/SmartDashboard/foo", True, True)
+#     foo = nt.get_global_auto_update_value("/SmartDashboard/foo", True, True)
 #     assert foo.value == True
 #     assert foo.get() == True
 
-#     nt.startTestMode()
+#     nt.start_test_mode()
 
 #     assert foo.value == True
 #     assert foo.get() == True
 
-#     t = nt.getTable("/SmartDashboard")
-#     assert t.getBoolean("foo", None) == True
-#     t.putBoolean("foo", False)
+#     t = nt.get_table("/SmartDashboard")
+#     assert t.get_boolean("foo", None) == True
+#     t.put_boolean("foo", False)
 
 #     assert foo.value == False
 
 
 def test_ntproperty(nt: NetworkTableInstance):
     class Foo:
-        robotTime = ntproperty(
-            "/SmartDashboard/robotTime", 0.0, writeDefault=False, inst=nt
+        robot_time = ntproperty(
+            "/SmartDashboard/robotTime", 0.0, write_default=False, inst=nt
         )
-        dsTime = ntproperty("/SmartDashboard/dsTime", 0.0, writeDefault=True, inst=nt)
-        testIntArray = ntproperty(
-            "/SmartDashboard/testIntArray", [1, 2, 3], writeDefault=True, inst=nt
-        )
-
-        testBoolArray = ntproperty(
-            "/SmartDashboard/testBoolArray", [True, False], writeDefault=True, inst=nt
+        ds_time = ntproperty("/SmartDashboard/dsTime", 0.0, write_default=True, inst=nt)
+        test_int_array = ntproperty(
+            "/SmartDashboard/testIntArray", [1, 2, 3], write_default=True, inst=nt
         )
 
-        testFloatArray = ntproperty(
+        test_bool_array = ntproperty(
+            "/SmartDashboard/testBoolArray", [True, False], write_default=True, inst=nt
+        )
+
+        test_float_array = ntproperty(
             "/SmartDashboard/testFloatArray",
             [1.1, 1.2, 1.3],
-            writeDefault=True,
+            write_default=True,
             type=NetworkTableType.FLOAT_ARRAY,
             inst=nt,
         )
 
     f = Foo()
 
-    t = nt.getTable("/SmartDashboard")
+    t = nt.get_table("/SmartDashboard")
 
-    assert f.robotTime == 0
-    assert t.getNumber("robotTime", None) == 0
+    assert f.robot_time == 0
+    assert t.get_number("robotTime", None) == 0
 
-    f.robotTime = 2
-    assert t.getNumber("robotTime", None) == 2
+    f.robot_time = 2
+    assert t.get_number("robotTime", None) == 2
 
-    t.putNumber("robotTime", 4)
-    assert f.robotTime == 4
+    t.put_number("robotTime", 4)
+    assert f.robot_time == 4
 
-    assert f.testIntArray == [1, 2, 3]
-    f.testIntArray = [4, 5, 6]
-    assert f.testIntArray == [4, 5, 6]
+    assert f.test_int_array == [1, 2, 3]
+    f.test_int_array = [4, 5, 6]
+    assert f.test_int_array == [4, 5, 6]
 
-    assert f.testBoolArray == [True, False]
-    f.testBoolArray = [False, True]
-    assert f.testBoolArray == [False, True]
+    assert f.test_bool_array == [True, False]
+    f.test_bool_array = [False, True]
+    assert f.test_bool_array == [False, True]
 
-    assert f.testFloatArray == [
+    assert f.test_float_array == [
         pytest.approx(1.1),
         pytest.approx(1.2),
         pytest.approx(1.3),
     ]
-    f.testFloatArray = [4.1, 5.1, 6.1]
-    assert f.testFloatArray == [
+    f.test_float_array = [4.1, 5.1, 6.1]
+    assert f.test_float_array == [
         pytest.approx(4.1),
         pytest.approx(5.1),
         pytest.approx(6.1),
@@ -85,15 +85,15 @@ def test_ntproperty_emptyarray(nt: NetworkTableInstance):
     with pytest.raises(TypeError):
 
         class Foo1:
-            testArray = ntproperty(
-                "/SmartDashboard/testArray", [], writeDefault=True, inst=nt
+            test_array = ntproperty(
+                "/SmartDashboard/testArray", [], write_default=True, inst=nt
             )
 
     with pytest.raises(TypeError):
 
         class Foo2:
-            testArray = ntproperty(
-                "/SmartDashboard/testArray", [], writeDefault=False, inst=nt
+            test_array = ntproperty(
+                "/SmartDashboard/testArray", [], write_default=False, inst=nt
             )
 
 
@@ -106,47 +106,47 @@ def test_ntproperty_multitest(nt: NetworkTableInstance):
     """
 
     class Foo:
-        robotTime = ntproperty(
-            "/SmartDashboard/robotTime", 0.0, writeDefault=False, inst=nt
+        robot_time = ntproperty(
+            "/SmartDashboard/robotTime", 0.0, write_default=False, inst=nt
         )
-        dsTime = ntproperty("/SmartDashboard/dsTime", 0.0, writeDefault=True, inst=nt)
+        ds_time = ntproperty("/SmartDashboard/dsTime", 0.0, write_default=True, inst=nt)
 
     for i in range(3):
         print("Iteration", i)
 
         f = Foo()
 
-        t = nt.getTable("/SmartDashboard")
+        t = nt.get_table("/SmartDashboard")
 
-        assert f.robotTime == 0
-        assert f.dsTime == 0
+        assert f.robot_time == 0
+        assert f.ds_time == 0
 
-        assert t.getNumber("robotTime", None) == 0
-        assert t.getNumber("dsTime", None) == 0
+        assert t.get_number("robotTime", None) == 0
+        assert t.get_number("dsTime", None) == 0
 
-        f.robotTime = 2
-        assert t.getNumber("robotTime", None) == 2
-        assert t.getNumber("dsTime", None) == 0
+        f.robot_time = 2
+        assert t.get_number("robotTime", None) == 2
+        assert t.get_number("dsTime", None) == 0
 
-        t.putNumber("robotTime", 4)
-        assert f.robotTime == 4
-        assert f.dsTime == 0
-        nt.stopLocal()
+        t.put_number("robotTime", 4)
+        assert f.robot_time == 4
+        assert f.ds_time == 0
+        nt.stop_local()
         nt._reset()
-        nt.startLocal()
+        nt.start_local()
 
 
 def test_chooser_control(nt: NetworkTableInstance):
     c = ChooserControl("Autonomous Mode", inst=nt)
 
-    assert c.getChoices() == []
-    assert c.getSelected() is None
+    assert c.get_choices() == []
+    assert c.get_selected() is None
 
-    c.setSelected("foo")
-    assert c.getSelected() == "foo"
+    c.set_selected("foo")
+    assert c.get_selected() == "foo"
 
-    t = nt.getTable("/SmartDashboard/Autonomous Mode")
-    assert t.getString("selected", None) == "foo"
+    t = nt.get_table("/SmartDashboard/Autonomous Mode")
+    assert t.get_string("selected", None) == "foo"
 
-    t.putStringArray("options", ("option1", "option2"))
-    assert c.getChoices() == ["option1", "option2"]
+    t.put_string_array("options", ("option1", "option2"))
+    assert c.get_choices() == ["option1", "option2"]

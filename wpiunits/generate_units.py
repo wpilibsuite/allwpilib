@@ -256,12 +256,16 @@ UNIT_CONFIGURATIONS = {
     "Velocity": {
         "base_unit": "unit()",
         "generics": {"D": {"extends": "Unit"}},
-        "multiply": {"Time": {"implementation": inspect.cleandoc("""
+        "multiply": {
+            "Time": {
+                "implementation": inspect.cleandoc("""
                   @Override
                   public Measure<D> times(Time multiplier) {
                     return (Measure<D>) unit().numerator().ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
                   }
-                """)}},
+                """)
+            }
+        },
         "divide": {},
     },
     "Voltage": {

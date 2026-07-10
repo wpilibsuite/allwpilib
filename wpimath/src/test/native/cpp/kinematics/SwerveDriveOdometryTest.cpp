@@ -124,7 +124,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
   SwerveModulePosition bl;
   SwerveModulePosition br;
 
-  Trajectory trajectory = TrajectoryGenerator::GenerateTrajectory(
+  SplineTrajectory trajectory = TrajectoryGenerator::GenerateTrajectory(
       std::vector{Pose2d{0_m, 0_m, 45_deg}, Pose2d{3_m, 0_m, -90_deg},
                   Pose2d{0_m, 0_m, 135_deg}, Pose2d{-3_m, 0_m, -90_deg},
                   Pose2d{0_m, 0_m, 45_deg}},
@@ -139,12 +139,12 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
   double maxError = -std::numeric_limits<double>::max();
   double errorSum = 0;
 
-  while (t < trajectory.TotalTime()) {
-    Trajectory::State groundTruthState = trajectory.Sample(t);
+  while (t < trajectory.Duration()) {
+    SplineSample groundTruthState = trajectory.SampleAt(t);
 
     auto moduleVelocities = kinematics.ToSwerveModuleVelocities(
-        {groundTruthState.velocity, 0_mps,
-         groundTruthState.velocity * groundTruthState.curvature});
+        groundTruthState.velocity.ToRobotRelative(
+            groundTruthState.pose.Rotation()));
 
     fl.distance += moduleVelocities[0].velocity * dt;
     fr.distance += moduleVelocities[1].velocity * dt;
@@ -172,7 +172,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.05);
+  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.05);
   EXPECT_LT(maxError, 0.125);
 }
 
@@ -189,7 +189,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
   SwerveModulePosition bl;
   SwerveModulePosition br;
 
-  Trajectory trajectory = TrajectoryGenerator::GenerateTrajectory(
+  SplineTrajectory trajectory = TrajectoryGenerator::GenerateTrajectory(
       std::vector{Pose2d{0_m, 0_m, 45_deg}, Pose2d{3_m, 0_m, -90_deg},
                   Pose2d{0_m, 0_m, 135_deg}, Pose2d{-3_m, 0_m, -90_deg},
                   Pose2d{0_m, 0_m, 45_deg}},
@@ -204,17 +204,17 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
   double maxError = -std::numeric_limits<double>::max();
   double errorSum = 0;
 
-  while (t < trajectory.TotalTime()) {
-    Trajectory::State groundTruthState = trajectory.Sample(t);
+  while (t < trajectory.Duration()) {
+    SplineSample groundTruthState = trajectory.SampleAt(t);
 
-    fl.distance += groundTruthState.velocity * dt +
-                   0.5 * groundTruthState.acceleration * dt * dt;
-    fr.distance += groundTruthState.velocity * dt +
-                   0.5 * groundTruthState.acceleration * dt * dt;
-    bl.distance += groundTruthState.velocity * dt +
-                   0.5 * groundTruthState.acceleration * dt * dt;
-    br.distance += groundTruthState.velocity * dt +
-                   0.5 * groundTruthState.acceleration * dt * dt;
+    fl.distance += groundTruthState.ForwardVelocity() * dt +
+                   0.5 * groundTruthState.ForwardAcceleration() * dt * dt;
+    fr.distance += groundTruthState.ForwardVelocity() * dt +
+                   0.5 * groundTruthState.ForwardAcceleration() * dt * dt;
+    bl.distance += groundTruthState.ForwardVelocity() * dt +
+                   0.5 * groundTruthState.ForwardAcceleration() * dt * dt;
+    br.distance += groundTruthState.ForwardVelocity() * dt +
+                   0.5 * groundTruthState.ForwardAcceleration() * dt * dt;
 
     fl.angle = groundTruthState.pose.Rotation();
     fr.angle = groundTruthState.pose.Rotation();
@@ -236,6 +236,6 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.06);
+  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.06);
   EXPECT_LT(maxError, 0.125);
 }

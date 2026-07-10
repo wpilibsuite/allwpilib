@@ -36,8 +36,6 @@ list(REMOVE_ITEM wpiutil_native_src ${wpiutil_jni_src})
 file(GLOB_RECURSE wpiutil_unix_src src/main/native/unix/*.cpp)
 file(GLOB_RECURSE wpiutil_windows_src src/main/native/windows/*.cpp)
 
-file(GLOB fmtlib_native_src src/main/native/thirdparty/fmtlib/src/*.cpp)
-
 add_library(wpiutil ${wpiutil_native_src} ${wpiutil_resources_src})
 set_target_properties(wpiutil PROPERTIES DEBUG_POSTFIX "d")
 
@@ -58,29 +56,6 @@ if(ATOMIC)
     target_link_libraries(wpiutil ${ATOMIC})
 endif()
 
-if(NOT USE_SYSTEM_FMTLIB)
-    target_sources(wpiutil PRIVATE ${fmtlib_native_src})
-    install(
-        DIRECTORY src/main/native/thirdparty/fmtlib/include/
-        DESTINATION "${include_dest}/wpiutil"
-    )
-    target_include_directories(
-        wpiutil
-        PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/fmtlib/include>
-    )
-else()
-    find_package(fmt CONFIG REQUIRED)
-    target_link_libraries(wpiutil fmt::fmt)
-    if(MSVC)
-        get_target_property(fmt_includes fmt::fmt INTERFACE_INCLUDE_DIRECTORIES)
-        foreach(dir ${fmt_includes})
-            target_compile_options(wpiutil PUBLIC /external:I "${dir}")
-        endforeach()
-        target_compile_options(wpiutil PUBLIC /external:W0)
-    endif()
-endif()
-
 if(MSVC)
     target_sources(wpiutil PRIVATE ${wpiutil_windows_src})
 else()
@@ -93,7 +68,6 @@ install(
         src/main/native/thirdparty/argparse/include/
         src/main/native/thirdparty/debugging/include/
         src/main/native/thirdparty/double-conversion/include/
-        src/main/native/thirdparty/expected/include/
         src/main/native/thirdparty/json/include/
         src/main/native/thirdparty/llvm/include/
         src/main/native/thirdparty/mpack/include/
@@ -109,7 +83,6 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/argparse/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/debugging/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/double-conversion/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/expected/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include>
@@ -141,7 +114,7 @@ foreach(example ${wpiutil_examples})
     endif()
 endforeach()
 
-if(WITH_TESTS)
+if(WPILIB_WITH_TESTS)
     file(GLOB_RECURSE wpiutil_testlib_src src/test/native/include/*.h)
     add_library(wpiutil_testlib INTERFACE ${wpiutil_test_src})
     target_include_directories(wpiutil_testlib INTERFACE src/test/native/include)
@@ -165,16 +138,9 @@ if(WITH_TESTS)
     target_sources(wpiutil_test PRIVATE ${wpiutil_nanopb_test_src})
     target_link_libraries(wpiutil_test wpiutil googletest wpiutil_testlib)
 
-    add_executable(wpiutil_catch2_test ${catch2_test_src})
-    set_property(TARGET wpiutil_catch2_test PROPERTY FOLDER "tests")
-    wpilib_target_warnings(wpiutil_catch2_test)
-    if(MSVC)
-        target_compile_options(wpiutil_catch2_test PRIVATE /wd4101 /wd4251)
-    endif()
-    target_link_libraries(wpiutil_catch2_test wpiutil catch2 wpiutil_testlib)
-    catch_discover_tests(wpiutil_catch2_test)
+    wpilib_add_test_catch2(wpiutil_catch2 ${catch2_test_src})
+    target_link_libraries(wpiutil_catch2_test wpiutil wpiutil_testlib)
     if(MSVC)
         target_compile_options(wpiutil_test PRIVATE /utf-8)
-        target_compile_options(wpiutil_catch2_test PRIVATE /utf-8)
     endif()
 endif()

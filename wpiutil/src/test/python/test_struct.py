@@ -17,7 +17,7 @@ def test_invalid_type():
         TypeError,
         match=re.escape("str is not struct serializable (does not have WPIStruct)"),
     ):
-        wpistruct.getSchema(str)
+        wpistruct.get_schema(str)
 
 
 def test_for_each_nested():
@@ -26,20 +26,20 @@ def test_for_each_nested():
     def _fn(*args):
         l.append(args)
 
-    wpistruct.forEachNested(module.ThingA, _fn)
+    wpistruct.for_each_nested(module.ThingA, _fn)
     assert l == [("struct:ThingA", "uint8 value")]
 
 
 def test_get_type_string():
-    assert wpistruct.getTypeName(module.ThingA) == "ThingA"
+    assert wpistruct.get_type_name(module.ThingA) == "ThingA"
 
 
 def test_get_schema():
-    assert wpistruct.getSchema(module.ThingA) == "uint8 value"
+    assert wpistruct.get_schema(module.ThingA) == "uint8 value"
 
 
 def test_get_size():
-    assert wpistruct.getSize(module.ThingA) == 1
+    assert wpistruct.get_size(module.ThingA) == 1
 
 
 def test_pack():
@@ -47,19 +47,19 @@ def test_pack():
 
 
 def test_pack_array():
-    assert wpistruct.packArray([module.ThingA(1), module.ThingA(2)]) == b"\x01\x02"
+    assert wpistruct.pack_array([module.ThingA(1), module.ThingA(2)]) == b"\x01\x02"
 
 
 def test_pack_into():
     buf = bytearray(1)
-    wpistruct.packInto(module.ThingA(1), buf)
+    wpistruct.pack_into(module.ThingA(1), buf)
     assert buf == b"\x01"
 
 
 def test_pack_into_err():
     buf = bytearray(2)
     with pytest.raises(ValueError, match=re.escape("buffer must be 1 bytes")):
-        wpistruct.packInto(module.ThingA(1), buf)
+        wpistruct.pack_into(module.ThingA(1), buf)
 
 
 def test_unpack():
@@ -67,7 +67,7 @@ def test_unpack():
 
 
 def test_unpack_array():
-    assert wpistruct.unpackArray(module.ThingA, b"\x01\x02") == [
+    assert wpistruct.unpack_array(module.ThingA, b"\x01\x02") == [
         module.ThingA(1),
         module.ThingA(2),
     ]
@@ -77,7 +77,7 @@ def test_unpack_array():
 #     r1 = module.ThingA(1)
 #     r2 = module.ThingA(2)
 #     assert r1 != r2
-#     wpistruct.unpackInto(b"\x01", r2)
+#     wpistruct.unpack_into(b"\x01", r2)
 #     assert r1 == r2
 
 
@@ -92,7 +92,7 @@ def test_nested_for_each_nested():
     def _fn(*args):
         l.append(args)
 
-    wpistruct.forEachNested(module.Outer, _fn)
+    wpistruct.for_each_nested(module.Outer, _fn)
     assert l == [
         ("struct:ThingA", "uint8 value"),
         ("struct:Outer", "ThingA inner; int32 c"),
@@ -100,15 +100,15 @@ def test_nested_for_each_nested():
 
 
 def test_nested_get_type_string():
-    assert wpistruct.getTypeName(module.ThingA) == "ThingA"
+    assert wpistruct.get_type_name(module.ThingA) == "ThingA"
 
 
 def test_nested_get_schema():
-    assert wpistruct.getSchema(module.Outer) == "ThingA inner; int32 c"
+    assert wpistruct.get_schema(module.Outer) == "ThingA inner; int32 c"
 
 
 def test_nested_get_size():
-    assert wpistruct.getSize(module.Outer) == 5
+    assert wpistruct.get_size(module.Outer) == 5
 
 
 def test_nested_pack():
@@ -119,7 +119,7 @@ def test_nested_pack():
 def test_nested_pack_into():
     v = module.Outer(module.ThingA(3), 5)
     buf = bytearray(5)
-    wpistruct.packInto(v, buf)
+    wpistruct.pack_into(v, buf)
     assert buf == b"\x03\x05\x00\x00\x00"
 
 
@@ -146,20 +146,20 @@ def test_user_for_each_nested():
     def _fn(*args):
         l.append(args)
 
-    wpistruct.forEachNested(MyStruct, _fn)
+    wpistruct.for_each_nested(MyStruct, _fn)
     assert l == [("struct:mystruct", "int32 x; bool y; float z")]
 
 
 def test_user_get_type_string():
-    assert wpistruct.getTypeName(MyStruct) == "mystruct"
+    assert wpistruct.get_type_name(MyStruct) == "mystruct"
 
 
 def test_user_get_schema():
-    assert wpistruct.getSchema(MyStruct) == "int32 x; bool y; float z"
+    assert wpistruct.get_schema(MyStruct) == "int32 x; bool y; float z"
 
 
 def test_user_get_size():
-    assert wpistruct.getSize(MyStruct) == 9
+    assert wpistruct.get_size(MyStruct) == 9
 
 
 def test_user_pack():
@@ -170,7 +170,7 @@ def test_user_pack():
 def test_user_pack_into():
     v = MyStruct(2, True, 3.5)
     buf = bytearray(9)
-    wpistruct.packInto(v, buf)
+    wpistruct.pack_into(v, buf)
     assert buf == b"\x02\x00\x00\x00\x01\x00\x00\x60\x40"
 
 
@@ -179,11 +179,74 @@ def test_user_unpack():
     assert wpistruct.unpack(MyStruct, b"\x02\x00\x00\x00\x01\x00\x00\x60\x40") == v
 
 
+@wpistruct.make_wpistruct(name="VectorStruct")
+@dataclasses.dataclass
+class VectorStruct:
+    data: tuple[wpistruct.double, wpistruct.double, wpistruct.double]
+
+
+def test_user_tuple_array_get_schema():
+    assert wpistruct.get_schema(VectorStruct) == "double data[3]"
+
+
+def test_user_tuple_array_get_size():
+    assert wpistruct.get_size(VectorStruct) == 24
+
+
+def test_user_tuple_array_pack():
+    assert wpistruct.pack(VectorStruct((1.0, 2.0, 3.0))) == (
+        b"\x00\x00\x00\x00\x00\x00\xf0?"
+        b"\x00\x00\x00\x00\x00\x00\x00@"
+        b"\x00\x00\x00\x00\x00\x00\x08@"
+    )
+
+
+def test_user_tuple_array_unpack():
+    assert wpistruct.unpack(
+        VectorStruct,
+        b"\x00\x00\x00\x00\x00\x00\xf0?"
+        b"\x00\x00\x00\x00\x00\x00\x00@"
+        b"\x00\x00\x00\x00\x00\x00\x08@",
+    ) == VectorStruct((1.0, 2.0, 3.0))
+
+
+def test_user_tuple_array_rejects_mixed_types():
+    with pytest.raises(
+        TypeError,
+        match=re.escape(
+            "MixedTuple.value has unsupported tuple type hint: "
+            "tuple fields must be fixed-length and homogeneous"
+        ),
+    ):
+
+        @wpistruct.make_wpistruct
+        @dataclasses.dataclass
+        class MixedTuple:
+            value: tuple[int, float]
+
+
+def test_user_rejects_unsupported_type_with_tuple_in_supported_list():
+    with pytest.raises(
+        TypeError,
+        match=re.escape(
+            "BadField.value is not a wpistruct or does not have a supported type hint "
+            "(supported: bool, int8, uint8, int16, uint16, int, int32, uint32, "
+            "int64, uint64, float, double, or fixed-length homogeneous tuple of "
+            "a supported type)"
+        ),
+    ):
+
+        @wpistruct.make_wpistruct
+        @dataclasses.dataclass
+        class BadField:
+            value: str
+
+
 # def test_user_unpack_into():
 #     v1 = MyStruct(2, True, 3.5)
 #     v2 = MyStruct(3, True, 4.5)
 #     assert v1 != v2
-#     wpistruct.unpackInto(b"\x02\x00\x00\x00\x01\x00\x00\x60\x40", v2)
+#     wpistruct.unpack_into(b"\x02\x00\x00\x00\x01\x00\x00\x60\x40", v2)
 #     assert v1 == v2
 
 
@@ -205,7 +268,7 @@ def test_user_nested_for_each_nested():
     def _fn(*args):
         l.append(args)
 
-    wpistruct.forEachNested(Outer, _fn)
+    wpistruct.for_each_nested(Outer, _fn)
     assert l == [
         ("struct:mystruct", "int32 x; bool y; float z"),
         ("struct:Outer", "int32 x; mystruct inner"),
@@ -213,15 +276,15 @@ def test_user_nested_for_each_nested():
 
 
 def test_user_nested_get_type_string():
-    assert wpistruct.getTypeName(Outer) == "Outer"
+    assert wpistruct.get_type_name(Outer) == "Outer"
 
 
 def test_user_nested_get_schema():
-    assert wpistruct.getSchema(Outer) == "int32 x; mystruct inner"
+    assert wpistruct.get_schema(Outer) == "int32 x; mystruct inner"
 
 
 def test_user_nested_get_size():
-    assert wpistruct.getSize(Outer) == 4 + 9
+    assert wpistruct.get_size(Outer) == 4 + 9
 
 
 def test_user_nested_pack():
@@ -232,7 +295,7 @@ def test_user_nested_pack():
 def test_user_nested_pack_into():
     v = Outer(2, MyStruct(3, True, 4.0))
     buf = bytearray(4 + 9)
-    wpistruct.packInto(v, buf)
+    wpistruct.pack_into(v, buf)
     assert buf == b"\x02\x00\x00\x00\x03\x00\x00\x00\x01\x00\x00\x80\x40"
 
 

@@ -6,6 +6,7 @@ ext {
 
     nativeName = 'datalog'
     devMain = 'org.wpilib.datalog.DevMain'
+    nativeTestSuiteName = "${nativeName}Catch2Test"
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
