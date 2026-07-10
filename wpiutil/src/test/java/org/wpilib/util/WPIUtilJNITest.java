@@ -6,18 +6,41 @@ package org.wpilib.util;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class WPIUtilJNITest {
-  @Test
-  public void testEnableMockTime() {
-    assertDoesNotThrow(WPIUtilJNI::enableMockTime);
+  @BeforeEach
+  public void disableMockTimeBeforeEach() {
+    WPIUtilJNI.disableMockTime();
+  }
+
+  @AfterEach
+  public void disableMockTimeAfterEach() {
+    WPIUtilJNI.disableMockTime();
   }
 
   @Test
-  public void testSetMockTime() {
-    assertDoesNotThrow(() -> WPIUtilJNI.setMockTime(0L));
+  public void testEnableMockTimeResetsMockAndProgramStartTime() {
+    WPIUtilJNI.setMockTime(1234L);
+
+    WPIUtilJNI.enableMockTime();
+
+    assertEquals(0L, WPIUtilJNI.now());
+    assertEquals(0L, WPIUtilJNI.getProgramStartTime());
+  }
+
+  @Test
+  public void testSetMockTimeDoesNotChangeProgramStartTime() {
+    WPIUtilJNI.enableMockTime();
+
+    WPIUtilJNI.setMockTime(1234L);
+
+    assertEquals(1234L, WPIUtilJNI.now());
+    assertEquals(0L, WPIUtilJNI.getProgramStartTime());
   }
 
   @Test
@@ -30,5 +53,18 @@ public class WPIUtilJNITest {
     long startTime = WPIUtilJNI.getProgramStartTime();
 
     assertEquals(startTime, WPIUtilJNI.getProgramStartTime());
+  }
+
+  @Test
+  public void testDisableMockTimeRestoresProgramStartTime() {
+    long startTime = WPIUtilJNI.getProgramStartTime();
+
+    WPIUtilJNI.enableMockTime();
+    assertEquals(0L, WPIUtilJNI.getProgramStartTime());
+
+    WPIUtilJNI.disableMockTime();
+
+    assertEquals(startTime, WPIUtilJNI.getProgramStartTime());
+    assertTrue(WPIUtilJNI.now() >= startTime);
   }
 }
