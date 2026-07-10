@@ -5,6 +5,7 @@
 package org.wpilib.util;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
@@ -22,5 +23,12 @@ public class WPIUtilJNITest {
   @Test
   public void testNow() {
     assertDoesNotThrow(WPIUtilJNI::now);
+  }
+
+  @Test
+  public void testGetProgramStartTime() {
+    long startTime = WPIUtilJNI.getProgramStartTime();
+
+    assertEquals(startTime, WPIUtilJNI.getProgramStartTime());
   }
 }

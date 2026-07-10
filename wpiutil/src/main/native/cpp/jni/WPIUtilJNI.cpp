@@ -182,6 +182,18 @@ Java_org_wpilib_util_WPIUtilJNI_now
 
 /*
  * Class:     org_wpilib_util_WPIUtilJNI
+ * Method:    getProgramStartTime
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL
+Java_org_wpilib_util_WPIUtilJNI_getProgramStartTime
+  (JNIEnv*, jclass)
+{
+  return wpi::util::GetProgramStartTime();
+}
+
+/*
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    getSystemTime
  * Signature: ()J
  */
