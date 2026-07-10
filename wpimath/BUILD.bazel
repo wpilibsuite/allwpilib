@@ -252,9 +252,7 @@ wpilib_jni_java_library(
         "//wpiutil:wpiutil-java",
         "@maven//:io_avaje_avaje_json_core",
         "@maven//:io_avaje_avaje_jsonb",
-        "@maven//:org_ejml_ejml_core",
-        "@maven//:org_ejml_ejml_ddense",
-        "@maven//:org_ejml_ejml_simple",
+        "@maven//:org_ejml_ejml_java9module",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
@@ -292,9 +290,7 @@ wpilib_java_junit5_test(
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
         "@maven//:io_avaje_avaje_jsonb",
-        "@maven//:org_ejml_ejml_core",
-        "@maven//:org_ejml_ejml_ddense",
-        "@maven//:org_ejml_ejml_simple",
+        "@maven//:org_ejml_ejml_java9module",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
