@@ -14,5 +14,5 @@ classes:
         py::init<
           wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t
         >(),
-        py::arg("frontLeft") = 0, py::arg("frontRight") = 0, py::arg("rearLeft") = 0, py::arg("rearRight") = 0
+        py::arg("front_left") = 0, py::arg("front_right") = 0, py::arg("rear_left") = 0, py::arg("rear_right") = 0
       )

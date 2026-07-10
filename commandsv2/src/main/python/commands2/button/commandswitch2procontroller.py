@@ -24,13 +24,13 @@ class CommandSwitch2ProController:
                     or the Switch2ProController object to use for this controller.
         """
         if isinstance(hid, int):
-            self._hid = CommandGenericHID.getCommandGenericHID(hid)
-            self._controller = Switch2ProController(self._hid.getHID())
+            self._hid = CommandGenericHID.get_command_generic_hid(hid)
+            self._controller = Switch2ProController(self._hid.get_hid())
         else:
-            self._hid = CommandGenericHID(hid.getHID())
+            self._hid = CommandGenericHID(hid.get_hid())
             self._controller = hid
 
-    def getHID(self) -> CommandGenericHID:
+    def get_hid(self) -> CommandGenericHID:
         """
         Get the underlying CommandGenericHID object.
 
@@ -38,7 +38,7 @@ class CommandSwitch2ProController:
         """
         return self._hid
 
-    def getController(self) -> Switch2ProController:
+    def get_controller(self) -> Switch2ProController:
         """
         Get the wrapped controller object.
 
@@ -64,7 +64,7 @@ class CommandSwitch2ProController:
         Constructs a Trigger instance around the B button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the B button's digital signal
                   attached to the given loop.
@@ -76,7 +76,7 @@ class CommandSwitch2ProController:
         Constructs a Trigger instance around the A button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the A button's digital signal
                   attached to the given loop.
@@ -88,7 +88,7 @@ class CommandSwitch2ProController:
         Constructs a Trigger instance around the Y button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Y button's digital signal
                   attached to the given loop.
@@ -100,7 +100,7 @@ class CommandSwitch2ProController:
         Constructs a Trigger instance around the X button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the X button's digital signal
                   attached to the given loop.
@@ -112,7 +112,7 @@ class CommandSwitch2ProController:
         Constructs a Trigger instance around the Minus button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Minus button's digital signal
                   attached to the given loop.
@@ -124,7 +124,7 @@ class CommandSwitch2ProController:
         Constructs a Trigger instance around the Home button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Home button's digital signal
                   attached to the given loop.
@@ -136,103 +136,103 @@ class CommandSwitch2ProController:
         Constructs a Trigger instance around the Plus button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Plus button's digital signal
                   attached to the given loop.
         """
         return self.button(Switch2ProController.Button.PLUS, loop)
 
-    def leftStick(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def left_stick(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Left Stick button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Left Stick button's digital signal
                   attached to the given loop.
         """
         return self.button(Switch2ProController.Button.LEFT_STICK, loop)
 
-    def rightStick(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def right_stick(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Right Stick button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Right Stick button's digital signal
                   attached to the given loop.
         """
         return self.button(Switch2ProController.Button.RIGHT_STICK, loop)
 
-    def L(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def l(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the L button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the L button's digital signal
                   attached to the given loop.
         """
         return self.button(Switch2ProController.Button.L, loop)
 
-    def R(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def r(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the R button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the R button's digital signal
                   attached to the given loop.
         """
         return self.button(Switch2ProController.Button.R, loop)
 
-    def dpadUp(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def dpad_up(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Dpad Up button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Dpad Up button's digital signal
                   attached to the given loop.
         """
         return self.button(Switch2ProController.Button.DPAD_UP, loop)
 
-    def dpadDown(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def dpad_down(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Dpad Down button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Dpad Down button's digital signal
                   attached to the given loop.
         """
         return self.button(Switch2ProController.Button.DPAD_DOWN, loop)
 
-    def dpadLeft(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def dpad_left(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Dpad Left button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Dpad Left button's digital signal
                   attached to the given loop.
         """
         return self.button(Switch2ProController.Button.DPAD_LEFT, loop)
 
-    def dpadRight(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def dpad_right(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Dpad Right button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Dpad Right button's digital signal
                   attached to the given loop.
@@ -244,50 +244,50 @@ class CommandSwitch2ProController:
         Constructs a Trigger instance around the Capture button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Capture button's digital signal
                   attached to the given loop.
         """
         return self.button(Switch2ProController.Button.CAPTURE, loop)
 
-    def GR(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def gr(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the GR button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the GR button's digital signal
                   attached to the given loop.
         """
         return self.button(Switch2ProController.Button.GR, loop)
 
-    def GL(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def gl(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the GL button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the GL button's digital signal
                   attached to the given loop.
         """
         return self.button(Switch2ProController.Button.GL, loop)
 
-    def C(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def c(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the C button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the C button's digital signal
                   attached to the given loop.
         """
         return self.button(Switch2ProController.Button.C, loop)
 
-    def ZL(
+    def zl(
         self,
         threshold: float = 0.5,
         loop: Optional[EventLoop] = None,
@@ -299,18 +299,18 @@ class CommandSwitch2ProController:
         :param threshold: the minimum axis value for the returned Trigger to be true. This value
                           should be in the range [0, 1] where 0 is the unpressed state of the axis.
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance that is true when the ZL axis exceeds the
                   provided threshold, attached to the given event loop.
         """
-        return self.axisGreaterThan(
+        return self.axis_greater_than(
             Switch2ProController.Axis.ZL,
             threshold,
             loop,
         )
 
-    def ZR(
+    def zr(
         self,
         threshold: float = 0.5,
         loop: Optional[EventLoop] = None,
@@ -322,18 +322,18 @@ class CommandSwitch2ProController:
         :param threshold: the minimum axis value for the returned Trigger to be true. This value
                           should be in the range [0, 1] where 0 is the unpressed state of the axis.
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance that is true when the ZR axis exceeds the
                   provided threshold, attached to the given event loop.
         """
-        return self.axisGreaterThan(
+        return self.axis_greater_than(
             Switch2ProController.Axis.ZR,
             threshold,
             loop,
         )
 
-    def axisLessThan(
+    def axis_less_than(
         self,
         axis: Switch2ProController.Axis,
         threshold: float,
@@ -350,9 +350,9 @@ class CommandSwitch2ProController:
         :returns: a Trigger instance that is true when the axis value is less than
                   the provided threshold.
         """
-        return self._hid.axisLessThan(axis.value, threshold, loop)
+        return self._hid.axis_less_than(axis.value, threshold, loop)
 
-    def axisGreaterThan(
+    def axis_greater_than(
         self,
         axis: Switch2ProController.Axis,
         threshold: float,
@@ -369,9 +369,9 @@ class CommandSwitch2ProController:
         :returns: a Trigger instance that is true when the axis value is greater
                   than the provided threshold.
         """
-        return self._hid.axisGreaterThan(axis.value, threshold, loop)
+        return self._hid.axis_greater_than(axis.value, threshold, loop)
 
-    def axisMagnitudeGreaterThan(
+    def axis_magnitude_greater_than(
         self,
         axis: Switch2ProController.Axis,
         threshold: float,
@@ -388,60 +388,60 @@ class CommandSwitch2ProController:
         :returns: a Trigger instance that is true when the axis magnitude is
                   greater than the provided threshold.
         """
-        return self._hid.axisMagnitudeGreaterThan(axis.value, threshold, loop)
+        return self._hid.axis_magnitude_greater_than(axis.value, threshold, loop)
 
-    def getAxis(self, axis: Switch2ProController.Axis) -> float:
+    def get_axis(self, axis: Switch2ProController.Axis) -> float:
         """
         Get the value of the axis.
 
         :param axis: the :class:`wpilib.Switch2ProController.Axis` to read
         """
-        return self._hid.getRawAxis(axis.value)
+        return self._hid.get_raw_axis(axis.value)
 
-    def getLeftX(self) -> float:
+    def get_left_x(self) -> float:
         """
         Get the Left X value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.getLeftX()
+        return self._controller.get_left_x()
 
-    def getLeftY(self) -> float:
+    def get_left_y(self) -> float:
         """
         Get the Left Y value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.getLeftY()
+        return self._controller.get_left_y()
 
-    def getRightX(self) -> float:
+    def get_right_x(self) -> float:
         """
         Get the Right X value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.getRightX()
+        return self._controller.get_right_x()
 
-    def getRightY(self) -> float:
+    def get_right_y(self) -> float:
         """
         Get the Right Y value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.getRightY()
+        return self._controller.get_right_y()
 
-    def getZL(self) -> float:
+    def get_zl(self) -> float:
         """
         Get the ZL value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.getZL()
+        return self._controller.get_zl()
 
-    def getZR(self) -> float:
+    def get_zr(self) -> float:
         """
         Get the ZR value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.getZR()
+        return self._controller.get_zr()

@@ -6,6 +6,10 @@ load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "
 
 def wpimath_test_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
     NAME_TRANSFORMS = [
+        "--name-transform-default",
+        "snake_case",
+        "--name-transform-enum-value",
+        "CAPS_CASE",
     ]
 
     WPIMATH_TEST_HEADER_GEN = [

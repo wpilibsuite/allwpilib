@@ -14,7 +14,8 @@ load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "
 {% for extension_module in extension_modules%}
 def {{extension_module.name}}_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
     NAME_TRANSFORMS = [{% for transform in extension_module.extension_name_transforms %}
-        "{{ transform[0] }}", "{{ transform[1] }}",
+        "{{ transform[0] }}",
+        "{{ transform[1] }}",
         {%- endfor %}
     ]
 

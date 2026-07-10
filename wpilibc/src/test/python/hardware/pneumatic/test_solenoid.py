@@ -5,7 +5,7 @@ from wpilib import DoubleSolenoid, PneumaticsModuleType, Solenoid
 
 def test_valid_initialization_ctre(wpilib_state):
     solenoid = Solenoid(0, 3, PneumaticsModuleType.CTRE_PCM, 2)
-    assert solenoid.getChannel() == 2
+    assert solenoid.get_channel() == 2
 
     solenoid.set(True)
     assert solenoid.get()
@@ -45,7 +45,7 @@ def test_toggle_ctre(wpilib_state):
 
 def test_valid_initialization_rev(wpilib_state):
     solenoid = Solenoid(0, 3, PneumaticsModuleType.REV_PH, 2)
-    assert solenoid.getChannel() == 2
+    assert solenoid.get_channel() == 2
 
     solenoid.set(True)
     assert solenoid.get()

@@ -20,7 +20,7 @@ SEMIWRAP_PYBIND11_MODULE(m) {
   initWrapper(m);
 
   m.def(
-      "resetGlobalHandles",
+      "reset_global_handles",
       []() {
 #ifndef __FIRST_SYSTEMCORE__
         HALSIM_ResetGlobalHandles();

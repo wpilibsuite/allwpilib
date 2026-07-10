@@ -27,9 +27,9 @@ class SysIdRoutineBot:
         self.shooter = Shooter()
 
         # The driver's controller
-        self.controller = CommandNiDsXboxController(OIConstants.kDriverControllerPort)
+        self.controller = CommandNiDsXboxController(OIConstants.DRIVER_CONTROLLER_PORT)
 
-    def configureBindings(self) -> None:
+    def configure_bindings(self) -> None:
         """Use this method to define bindings between conditions and commands. These are useful for
         automating robot behaviors based on button and sensor input.
 
@@ -39,10 +39,10 @@ class SysIdRoutineBot:
         """
 
         # Control the drive with split-stick arcade controls
-        self.drive.setDefaultCommand(
-            self.drive.arcadeDriveCommand(
-                lambda: -self.controller.getLeftY(),
-                lambda: -self.controller.getRightX(),
+        self.drive.set_default_command(
+            self.drive.arcade_drive_command(
+                lambda: -self.controller.get_left_y(),
+                lambda: -self.controller.get_right_x(),
             )
         )
 
@@ -50,41 +50,41 @@ class SysIdRoutineBot:
         # once.
         # Using bumpers as a modifier and combining it with the buttons so that we can have both sets
         # of bindings at once
-        self.controller.a().and_(self.controller.rightBumper()).whileTrue(
-            self.drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward)
+        self.controller.a().and_(self.controller.right_bumper()).while_true(
+            self.drive.sys_id_quasistatic(SysIdRoutine.Direction.FORWARD)
         )
-        self.controller.b().and_(self.controller.rightBumper()).whileTrue(
-            self.drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse)
+        self.controller.b().and_(self.controller.right_bumper()).while_true(
+            self.drive.sys_id_quasistatic(SysIdRoutine.Direction.REVERSE)
         )
-        self.controller.x().and_(self.controller.rightBumper()).whileTrue(
-            self.drive.sysIdDynamic(SysIdRoutine.Direction.kForward)
+        self.controller.x().and_(self.controller.right_bumper()).while_true(
+            self.drive.sys_id_dynamic(SysIdRoutine.Direction.FORWARD)
         )
-        self.controller.y().and_(self.controller.rightBumper()).whileTrue(
-            self.drive.sysIdDynamic(SysIdRoutine.Direction.kReverse)
+        self.controller.y().and_(self.controller.right_bumper()).while_true(
+            self.drive.sys_id_dynamic(SysIdRoutine.Direction.REVERSE)
         )
 
         # Control the shooter wheel with the left trigger
-        self.shooter.setDefaultCommand(
-            self.shooter.runShooter(self.controller.getLeftTriggerAxis)
+        self.shooter.set_default_command(
+            self.shooter.run_shooter(self.controller.get_left_trigger_axis)
         )
 
-        self.controller.a().and_(self.controller.leftBumper()).whileTrue(
-            self.shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward)
+        self.controller.a().and_(self.controller.left_bumper()).while_true(
+            self.shooter.sys_id_quasistatic(SysIdRoutine.Direction.FORWARD)
         )
-        self.controller.b().and_(self.controller.leftBumper()).whileTrue(
-            self.shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse)
+        self.controller.b().and_(self.controller.left_bumper()).while_true(
+            self.shooter.sys_id_quasistatic(SysIdRoutine.Direction.REVERSE)
         )
-        self.controller.x().and_(self.controller.leftBumper()).whileTrue(
-            self.shooter.sysIdDynamic(SysIdRoutine.Direction.kForward)
+        self.controller.x().and_(self.controller.left_bumper()).while_true(
+            self.shooter.sys_id_dynamic(SysIdRoutine.Direction.FORWARD)
         )
-        self.controller.y().and_(self.controller.leftBumper()).whileTrue(
-            self.shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse)
+        self.controller.y().and_(self.controller.left_bumper()).while_true(
+            self.shooter.sys_id_dynamic(SysIdRoutine.Direction.REVERSE)
         )
 
-    def getAutonomousCommand(self) -> Command:
+    def get_autonomous_command(self) -> Command:
         """Use this to define the command that runs during autonomous.
 
-        Scheduled during :meth:`.Robot.autonomousInit`.
+        Scheduled during :meth:`.Robot.autonomous_init`.
         """
 
         # Do nothing

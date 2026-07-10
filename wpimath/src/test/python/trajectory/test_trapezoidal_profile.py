@@ -37,13 +37,13 @@ def test_pos_continuous_under_vel_change():
         estimated_vel = (state.position - last_pos) / kDt
 
         if i >= 400:
-            if estimated_vel <= constraints.maxVelocity:
-                assert estimated_vel <= constraints.maxVelocity
+            if estimated_vel <= constraints.max_velocity:
+                assert estimated_vel <= constraints.max_velocity
             else:
                 assert math.isclose(
-                    estimated_vel, constraints.maxVelocity, abs_tol=1e-4
+                    estimated_vel, constraints.max_velocity, abs_tol=1e-4
                 )
-            assert state.velocity <= constraints.maxVelocity
+            assert state.velocity <= constraints.max_velocity
 
         last_pos = state.position
 
@@ -86,7 +86,7 @@ def test_top_velocity():
 
     for _ in range(200):
         state = profile.calculate(kDt, state, goal)
-    assert math.isclose(constraints.maxVelocity, state.velocity, abs_tol=1e-4)
+    assert math.isclose(constraints.max_velocity, state.velocity, abs_tol=1e-4)
 
     profile = TrapezoidProfile(constraints)
     for _ in range(2000):
@@ -102,7 +102,7 @@ def test_timing_to_current():
 
     for _ in range(400):
         state = profile.calculate(kDt, state, goal)
-        assert math.isclose(profile.timeLeftUntil(state.position), 0.0, abs_tol=0.02)
+        assert math.isclose(profile.time_left_until(state.position), 0.0, abs_tol=0.02)
 
 
 def test_timing_to_goal():
@@ -111,7 +111,7 @@ def test_timing_to_goal():
     profile = TrapezoidProfile(constraints)
 
     state = profile.calculate(kDt, goal, TrapezoidProfile.State())
-    predicted_time_left = profile.timeLeftUntil(goal.position)
+    predicted_time_left = profile.time_left_until(goal.position)
 
     reached_goal = False
     for i in range(400):
@@ -127,7 +127,7 @@ def test_timing_before_goal():
     profile = TrapezoidProfile(constraints)
 
     state = profile.calculate(kDt, goal, TrapezoidProfile.State())
-    predicted_time_left = profile.timeLeftUntil(1.0)
+    predicted_time_left = profile.time_left_until(1.0)
 
     reached_goal = False
     for i in range(400):
@@ -143,7 +143,7 @@ def test_timing_to_negative_goal():
     profile = TrapezoidProfile(constraints)
 
     state = profile.calculate(kDt, goal, TrapezoidProfile.State())
-    predicted_time_left = profile.timeLeftUntil(goal.position)
+    predicted_time_left = profile.time_left_until(goal.position)
 
     reached_goal = False
     for i in range(400):
@@ -159,7 +159,7 @@ def test_timing_before_negative_goal():
     profile = TrapezoidProfile(constraints)
 
     state = profile.calculate(kDt, goal, TrapezoidProfile.State())
-    predicted_time_left = profile.timeLeftUntil(-1.0)
+    predicted_time_left = profile.time_left_until(-1.0)
 
     reached_goal = False
     for i in range(400):
@@ -172,5 +172,5 @@ def test_timing_before_negative_goal():
 def test_initialization_of_current_state():
     constraints = TrapezoidProfile.Constraints(1.0, 1.0)
     profile = TrapezoidProfile(constraints)
-    assert math.isclose(profile.timeLeftUntil(0.0), 0.0, abs_tol=1e-10)
+    assert math.isclose(profile.time_left_until(0.0), 0.0, abs_tol=1e-10)
     assert math.isclose(profile.duration(), 0.0, abs_tol=1e-10)

@@ -33,4 +33,4 @@ classes:
       .def(py::init([](wpi::units::meter_t tagSize, double fx, double fy, double cx, double cy) {
         AprilTagPoseEstimator::Config cfg{tagSize, fx, fy, cx, cy};
         return std::make_unique<AprilTagPoseEstimator::Config>(std::move(cfg));
-      }), py::arg("tagSize"), py::arg("fx"), py::arg("fy"), py::arg("cx"), py::arg("cy"))
+      }), py::arg("tag_size"), py::arg("fx"), py::arg("fy"), py::arg("cx"), py::arg("cy"))
