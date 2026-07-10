@@ -215,8 +215,6 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   wpi::hal::init::HAL_IsInitialized.store(true);
 
-  wpi::hal::RestartTiming();
-
   wpi::hal::InitializeDriverStation();
 
   initialized = true;
