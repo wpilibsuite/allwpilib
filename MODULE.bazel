@@ -4,30 +4,36 @@ module(
 )
 
 include("//docs:doxygen.MODULE.bazel")
-
+include("//shared/bazel/thirdparty/ceres:ceres.MODULE.bazel")
+include("//shared/bazel/thirdparty/libssh:libssh.MODULE.bazel")
 include("//shared/bazel/thirdparty/mrclib:mrclib.MODULE.bazel")
 
 bazel_dep(name = "apple_support", version = "2.0.0", repo_name = "build_bazel_apple_support")
-
-# TODO(austin): Upgrade when the patches land.
-# https://github.com/bazelbuild/rules_cc/pull/430
-# https://github.com/bazelbuild/rules_cc/pull/431
-# https://github.com/bazelbuild/rules_cc/pull/432
-bazel_dep(name = "rules_cc", version = "0.2.13")
+bazel_dep(name = "rules_cc", version = "0.2.17")
+bazel_dep(name = "rules_pkg", version = "1.1.0")
+bazel_dep(name = "bazel_features", version = "1.43.0")
+bazel_dep(name = "aspect_bazel_lib", version = "2.14.0")
+bazel_dep(name = "bazel_skylib", version = "1.9.0")
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.2")
+bazel_dep(name = "rules_java", version = "8.16.1")
+bazel_dep(name = "rules_python", version = "1.9.0")
+bazel_dep(name = "rules_pycross", version = "0.8.1")
+bazel_dep(name = "pybind11_bazel", version = "3.0.1")
 single_version_override(
-    module_name = "rules_cc",
+    module_name = "pybind11_bazel",
     patch_strip = 1,
-    patches = ["//:shared/bazel/patches/rules_cc_windows.patch"],
+    patches = ["shared/bazel/patches/pybind11_bazel/0001-patch-pybind11-bazel.patch"],
+    version = "3.0.1",
 )
 
-bazel_dep(name = "rules_pkg", version = "1.1.0")
-bazel_dep(name = "bazel_features", version = "1.33.0")
-bazel_dep(name = "aspect_bazel_lib", version = "2.14.0")
-bazel_dep(name = "bazel_skylib", version = "1.8.2")
-bazel_dep(name = "platforms", version = "1.0.0")
-bazel_dep(name = "rules_java", version = "8.16.1")
-bazel_dep(name = "rules_python", version = "1.7.0")
-bazel_dep(name = "rules_pycross", version = "0.8.1")
+publishing = use_extension("//shared/bazel/rules:publishing_rule.bzl", "publishing_extension")
+use_repo(publishing, "com_wpilib_allwpilib_publishing_config")
+
+pycross = use_extension("@rules_pycross//pycross/extensions:pycross.bzl", "pycross")
+pycross.configure_environments(
+    python_versions = ["3.13"],
+)
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
@@ -54,9 +60,9 @@ maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
     name = "maven",
     artifacts = [
-        "org.ejml:ejml-simple:0.44.0",
-        "io.avaje:avaje-jsonb:3.11",
-        "io.avaje:avaje-jsonb-generator:3.11",
+        "org.ejml:ejml-java9module:0.46.0",
+        "io.avaje:avaje-jsonb:3.14",
+        "io.avaje:avaje-jsonb-generator:3.14",
         "us.hebi.quickbuf:quickbuf-runtime:1.4",
         "com.google.code.gson:gson:2.13.1",
         "org.wpilib.thirdparty.opencv:opencv-java:2027-4.13.0-1",
@@ -118,11 +124,18 @@ http_file(
     urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.3.3/protoc-gen-quickbuf-1.3.3-windows-x86_64.exe"],
 )
 
-bazel_dep(name = "rules_bzlmodrio_toolchains", version = "2025-1.bcr6")
+bazel_dep(name = "wpilib_toolchains", version = "")
 archive_override(
-    module_name = "rules_bzlmodrio_toolchains",
-    integrity = "sha256-ECtFB2KOlySwweRBcndiw0TkAXD2WsYFFhaBeOozqJo=",
-    urls = ["https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr6/rules_bzlmodrio_toolchains-2025-1.bcr6.tar.gz"],
+    module_name = "wpilib_toolchains",
+    integrity = "sha256-t9pasV154Izb6xAllG7XI7lYljVP1jhNTQtoG2l6t6Y=",
+    urls = ["https://github.com/wpilibsuite/bazel_wpilib_toolchains/releases/download/2027-1.bcr1/wpilib_toolchains-2027-1.bcr1.tar.gz"],
+)
+
+bazel_dep(name = "bzlmodrio-opencv", version = "")
+archive_override(
+    module_name = "bzlmodrio-opencv",
+    integrity = "sha256-WPeLraGmt9Fv8tYXvyzxDAGTZ1BW5qb6g95bXIk6otw=",
+    urls = ["https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2027.4.13.0-3.bcr1/bzlmodRio-opencv-2027.4.13.0-3.bcr1.tar.gz"],
 )
 
 bazel_dep(name = "protobuf", version = "32.1", repo_name = "com_google_protobuf")

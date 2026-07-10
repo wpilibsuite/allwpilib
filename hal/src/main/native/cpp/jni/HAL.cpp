@@ -11,18 +11,12 @@
 #endif
 
 #include <cassert>
-#include <cstring>
-
-#include <fmt/format.h>
 
 #include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_HAL.h"
-#include "wpi/hal/DriverStation.h"
 #include "wpi/hal/Main.h"
-#include "wpi/util/jni_util.hpp"
 
 using namespace wpi::hal;
-using namespace wpi::util::java;
 
 extern "C" {
 

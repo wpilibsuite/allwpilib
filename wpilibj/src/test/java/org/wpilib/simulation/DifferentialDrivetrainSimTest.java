@@ -31,6 +31,8 @@ import org.wpilib.math.util.Units;
 class DifferentialDrivetrainSimTest {
   @Test
   void testConvergence() {
+    RoboRioSim.resetData();
+
     var motor = DCMotor.getNEO(2);
     var plant =
         Models.differentialDriveFromPhysicalConstants(
@@ -44,7 +46,7 @@ class DifferentialDrivetrainSimTest {
             1,
             kinematics.trackwidth,
             Units.inchesToMeters(2),
-            VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
+            VecBuilder.fill(0.001, 0.001, 0.0001, 0.1, 0.1, 0.005, 0.005));
 
     var feedforward = new LinearPlantInversionFeedforward<>(plant, 0.020);
     var feedback = new LTVUnicycleController(0.020);
@@ -61,21 +63,23 @@ class DifferentialDrivetrainSimTest {
             new TrajectoryConfig(1, 1)
                 .addConstraint(new DifferentialDriveKinematicsConstraint(kinematics, 1)));
 
-    for (double t = 0; t < traj.getTotalTime(); t += 0.020) {
-      var state = traj.sample(t);
+    for (double t = 0; t < traj.duration; t += 0.020) {
+      var state = traj.sampleAt(t);
       var feedbackOut = feedback.calculate(sim.getPose(), state);
 
       var wheelVelocities = kinematics.toWheelVelocities(feedbackOut);
 
       var voltages =
           feedforward.calculate(VecBuilder.fill(wheelVelocities.left, wheelVelocities.right));
+      var clampedVoltages = sim.clampInput(voltages);
 
       // Sim periodic code
-      sim.setInputs(voltages.get(0, 0), voltages.get(1, 0));
+      sim.setInputs(clampedVoltages.get(0, 0), clampedVoltages.get(1, 0));
       sim.update(0.020);
 
       // Update our ground truth
-      groundTruthX = NumericalIntegration.rkdp(sim::getDynamics, groundTruthX, voltages, 0.020);
+      groundTruthX =
+          NumericalIntegration.rkdp(sim::getDynamics, groundTruthX, clampedVoltages, 0.020);
     }
 
     // 2 inch tolerance is OK since our ground truth is an approximation of the

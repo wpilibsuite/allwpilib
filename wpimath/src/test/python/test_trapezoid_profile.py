@@ -13,7 +13,7 @@ def test_constraints_repr(TrapezoidProfile):
     expected_qualname = f"{TrapezoidProfile.__name__}.Constraints"
     constraints = TrapezoidProfile.Constraints()
 
-    assert repr(constraints).startswith(f"{expected_qualname}(maxVelocity=0.")
+    assert repr(constraints).startswith(f"{expected_qualname}(max_velocity=0.")
 
 
 @pytest.mark.parametrize("TrapezoidProfile", trapezoid_profile_types)

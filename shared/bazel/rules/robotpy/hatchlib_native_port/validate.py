@@ -18,7 +18,6 @@ def _convert_validation_error(
 
     e: typing.Optional[BaseException] = ve
     while e is not None:
-
         if isinstance(e, errors.WrongFieldError):
             locs.append(f".{e.wrong_field}")
         elif isinstance(e, errors.WrongListItemError):

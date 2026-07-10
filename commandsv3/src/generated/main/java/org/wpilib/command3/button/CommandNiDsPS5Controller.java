@@ -17,8 +17,9 @@ import org.wpilib.event.EventLoop;
  * @see NiDsPS5Controller
  */
 @SuppressWarnings("MethodName")
-public class CommandNiDsPS5Controller extends CommandGenericHID {
-  private final NiDsPS5Controller m_hid;
+public class CommandNiDsPS5Controller {
+  private final CommandGenericHID m_hid;
+  private final NiDsPS5Controller m_controller;
 
   /**
    * Construct an instance of a controller. Commands bound to buttons on the controller will be
@@ -27,8 +28,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandNiDsPS5Controller(int port) {
-    super(port);
-    m_hid = new NiDsPS5Controller(port);
+    this(Scheduler.getDefault(), port);
   }
 
   /**
@@ -39,18 +39,26 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandNiDsPS5Controller(Scheduler scheduler, int port) {
-    super(scheduler, port);
-    m_hid = new NiDsPS5Controller(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(scheduler, port);
+    m_controller = new NiDsPS5Controller(m_hid.getHID());
   }
 
   /**
-   * Get the underlying GenericHID object.
+   * Get the underlying CommandGenericHID object.
    *
-   * @return the wrapped GenericHID object
+   * @return the wrapped CommandGenericHID object
    */
-  @Override
-  public NiDsPS5Controller getHID() {
+  public CommandGenericHID getHID() {
     return m_hid;
+  }
+
+  /**
+   * Get the underlying NiDsPS5Controller object.
+   *
+   * @return the wrapped NiDsPS5Controller object
+   */
+  public NiDsPS5Controller getNiDsPS5Controller() {
+    return m_controller;
   }
 
   /**
@@ -63,7 +71,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @see #square(EventLoop)
    */
   public Trigger square() {
-    return square(getScheduler().getDefaultEventLoop());
+    return square(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -74,7 +82,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger square(EventLoop loop) {
-    return button(NiDsPS5Controller.Button.kSquare.value, loop);
+    return m_hid.button(NiDsPS5Controller.Button.kSquare.value, loop);
   }
 
   /**
@@ -87,7 +95,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @see #cross(EventLoop)
    */
   public Trigger cross() {
-    return cross(getScheduler().getDefaultEventLoop());
+    return cross(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -98,7 +106,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger cross(EventLoop loop) {
-    return button(NiDsPS5Controller.Button.kCross.value, loop);
+    return m_hid.button(NiDsPS5Controller.Button.kCross.value, loop);
   }
 
   /**
@@ -111,7 +119,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @see #circle(EventLoop)
    */
   public Trigger circle() {
-    return circle(getScheduler().getDefaultEventLoop());
+    return circle(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -122,7 +130,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger circle(EventLoop loop) {
-    return button(NiDsPS5Controller.Button.kCircle.value, loop);
+    return m_hid.button(NiDsPS5Controller.Button.kCircle.value, loop);
   }
 
   /**
@@ -135,7 +143,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @see #triangle(EventLoop)
    */
   public Trigger triangle() {
-    return triangle(getScheduler().getDefaultEventLoop());
+    return triangle(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -146,7 +154,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger triangle(EventLoop loop) {
-    return button(NiDsPS5Controller.Button.kTriangle.value, loop);
+    return m_hid.button(NiDsPS5Controller.Button.kTriangle.value, loop);
   }
 
   /**
@@ -159,7 +167,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @see #L1(EventLoop)
    */
   public Trigger L1() {
-    return L1(getScheduler().getDefaultEventLoop());
+    return L1(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -170,7 +178,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger L1(EventLoop loop) {
-    return button(NiDsPS5Controller.Button.kL1.value, loop);
+    return m_hid.button(NiDsPS5Controller.Button.kL1.value, loop);
   }
 
   /**
@@ -183,7 +191,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @see #R1(EventLoop)
    */
   public Trigger R1() {
-    return R1(getScheduler().getDefaultEventLoop());
+    return R1(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -194,7 +202,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger R1(EventLoop loop) {
-    return button(NiDsPS5Controller.Button.kR1.value, loop);
+    return m_hid.button(NiDsPS5Controller.Button.kR1.value, loop);
   }
 
   /**
@@ -207,7 +215,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @see #L2(EventLoop)
    */
   public Trigger L2() {
-    return L2(getScheduler().getDefaultEventLoop());
+    return L2(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -218,7 +226,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger L2(EventLoop loop) {
-    return button(NiDsPS5Controller.Button.kL2.value, loop);
+    return m_hid.button(NiDsPS5Controller.Button.kL2.value, loop);
   }
 
   /**
@@ -231,7 +239,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @see #R2(EventLoop)
    */
   public Trigger R2() {
-    return R2(getScheduler().getDefaultEventLoop());
+    return R2(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -242,7 +250,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger R2(EventLoop loop) {
-    return button(NiDsPS5Controller.Button.kR2.value, loop);
+    return m_hid.button(NiDsPS5Controller.Button.kR2.value, loop);
   }
 
   /**
@@ -255,7 +263,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @see #create(EventLoop)
    */
   public Trigger create() {
-    return create(getScheduler().getDefaultEventLoop());
+    return create(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -266,7 +274,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger create(EventLoop loop) {
-    return button(NiDsPS5Controller.Button.kCreate.value, loop);
+    return m_hid.button(NiDsPS5Controller.Button.kCreate.value, loop);
   }
 
   /**
@@ -279,7 +287,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @see #options(EventLoop)
    */
   public Trigger options() {
-    return options(getScheduler().getDefaultEventLoop());
+    return options(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -290,7 +298,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger options(EventLoop loop) {
-    return button(NiDsPS5Controller.Button.kOptions.value, loop);
+    return m_hid.button(NiDsPS5Controller.Button.kOptions.value, loop);
   }
 
   /**
@@ -303,7 +311,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @see #L3(EventLoop)
    */
   public Trigger L3() {
-    return L3(getScheduler().getDefaultEventLoop());
+    return L3(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -314,7 +322,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger L3(EventLoop loop) {
-    return button(NiDsPS5Controller.Button.kL3.value, loop);
+    return m_hid.button(NiDsPS5Controller.Button.kL3.value, loop);
   }
 
   /**
@@ -327,7 +335,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @see #R3(EventLoop)
    */
   public Trigger R3() {
-    return R3(getScheduler().getDefaultEventLoop());
+    return R3(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -338,7 +346,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger R3(EventLoop loop) {
-    return button(NiDsPS5Controller.Button.kR3.value, loop);
+    return m_hid.button(NiDsPS5Controller.Button.kR3.value, loop);
   }
 
   /**
@@ -351,7 +359,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @see #PS(EventLoop)
    */
   public Trigger PS() {
-    return PS(getScheduler().getDefaultEventLoop());
+    return PS(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -362,7 +370,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger PS(EventLoop loop) {
-    return button(NiDsPS5Controller.Button.kPS.value, loop);
+    return m_hid.button(NiDsPS5Controller.Button.kPS.value, loop);
   }
 
   /**
@@ -375,7 +383,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @see #touchpad(EventLoop)
    */
   public Trigger touchpad() {
-    return touchpad(getScheduler().getDefaultEventLoop());
+    return touchpad(m_hid.getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -386,7 +394,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger touchpad(EventLoop loop) {
-    return button(NiDsPS5Controller.Button.kTouchpad.value, loop);
+    return m_hid.button(NiDsPS5Controller.Button.kTouchpad.value, loop);
   }
 
   /**
@@ -395,7 +403,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @return The axis value.
    */
   public double getLeftX() {
-    return m_hid.getLeftX();
+    return m_controller.getLeftX();
   }
 
   /**
@@ -404,7 +412,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @return The axis value.
    */
   public double getLeftY() {
-    return m_hid.getLeftY();
+    return m_controller.getLeftY();
   }
 
   /**
@@ -413,7 +421,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @return The axis value.
    */
   public double getRightX() {
-    return m_hid.getRightX();
+    return m_controller.getRightX();
   }
 
   /**
@@ -422,7 +430,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @return The axis value.
    */
   public double getRightY() {
-    return m_hid.getRightY();
+    return m_controller.getRightY();
   }
 
   /**
@@ -432,7 +440,7 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @return The axis value.
    */
   public double getL2Axis() {
-    return m_hid.getL2Axis();
+    return m_controller.getL2Axis();
   }
 
   /**
@@ -442,6 +450,6 @@ public class CommandNiDsPS5Controller extends CommandGenericHID {
    * @return The axis value.
    */
   public double getR2Axis() {
-    return m_hid.getR2Axis();
+    return m_controller.getR2Axis();
   }
 }

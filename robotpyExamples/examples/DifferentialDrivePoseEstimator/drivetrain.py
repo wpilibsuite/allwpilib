@@ -17,135 +17,135 @@ import robotpy_apriltag
 class Drivetrain:
     """Represents a differential drive style drivetrain."""
 
-    kMaxVelocity = 3.0  # meters per second
-    kMaxAngularVelocity = math.tau  # one rotation per second
+    MAX_VELOCITY = 3.0  # meters per second
+    MAX_ANGULAR_VELOCITY = math.tau  # one rotation per second
 
-    kTrackwidth = 0.381 * 2  # meters
-    kWheelRadius = 0.0508  # meters
-    kEncoderResolution = 4096
+    TRACKWIDTH = 0.381 * 2  # meters
+    WHEEL_RADIUS = 0.0508  # meters
+    ENCODER_RESOLUTION = 4096
 
-    def __init__(self, cameraToObjectTopic: ntcore.DoubleArrayTopic) -> None:
-        self.leftLeader = wpilib.PWMSparkMax(1)
-        self.leftFollower = wpilib.PWMSparkMax(2)
-        self.rightLeader = wpilib.PWMSparkMax(3)
-        self.rightFollower = wpilib.PWMSparkMax(4)
+    def __init__(self, camera_to_object_topic: ntcore.DoubleArrayTopic) -> None:
+        self.left_leader = wpilib.PWMSparkMax(1)
+        self.left_follower = wpilib.PWMSparkMax(2)
+        self.right_leader = wpilib.PWMSparkMax(3)
+        self.right_follower = wpilib.PWMSparkMax(4)
 
-        self.leftEncoder = wpilib.Encoder(0, 1)
-        self.rightEncoder = wpilib.Encoder(2, 3)
+        self.left_encoder = wpilib.Encoder(0, 1)
+        self.right_encoder = wpilib.Encoder(2, 3)
 
         self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.FLAT)
 
-        self.leftPIDController = wpimath.PIDController(1, 0, 0)
-        self.rightPIDController = wpimath.PIDController(1, 0, 0)
+        self.left_pid_controller = wpimath.PIDController(1, 0, 0)
+        self.right_pid_controller = wpimath.PIDController(1, 0, 0)
 
-        self.kinematics = wpimath.DifferentialDriveKinematics(self.kTrackwidth)
+        self.kinematics = wpimath.DifferentialDriveKinematics(self.TRACKWIDTH)
 
-        self.robotToCamera = wpimath.Transform3d(
+        self.robot_to_camera = wpimath.Transform3d(
             wpimath.Translation3d(1, 1, 1),
             wpimath.Rotation3d(0, 0, math.pi / 2),
         )
 
-        self.defaultVal = [0.0] * 7
-        self.cameraToObjectEntry = cameraToObjectTopic.getEntry(self.defaultVal)
+        self.default_val = [0.0] * 7
+        self.camera_to_object_entry = camera_to_object_topic.get_entry(self.default_val)
 
-        layout = robotpy_apriltag.AprilTagFieldLayout.loadField(
-            robotpy_apriltag.AprilTagField.k2024Crescendo
+        layout = robotpy_apriltag.AprilTagFieldLayout.load_field(
+            robotpy_apriltag.AprilTagField.K2024_CRESCENDO
         )
-        self.objectInField = layout.getTagPose(0) or wpimath.Pose3d()
+        self.object_in_field = layout.get_tag_pose(0) or wpimath.Pose3d()
 
-        self.fieldSim = wpilib.Field2d()
-        self.fieldApproximation = wpilib.Field2d()
+        self.field_sim = wpilib.Field2d()
+        self.field_approximation = wpilib.Field2d()
 
         # Here we use DifferentialDrivePoseEstimator so that we can fuse odometry readings. The
         # numbers used below are robot specific, and should be tuned.
-        self.poseEstimator = wpimath.DifferentialDrivePoseEstimator(
-            self.imu.getRotation2d(),
-            self.leftEncoder.getDistance(),
-            self.rightEncoder.getDistance(),
+        self.pose_estimator = wpimath.DifferentialDrivePoseEstimator(
+            self.imu.get_rotation2d(),
+            self.left_encoder.get_distance(),
+            self.right_encoder.get_distance(),
             wpimath.Pose2d(),
-            (0.05, 0.05, wpimath.units.degreesToRadians(5)),
-            (0.5, 0.5, wpimath.units.degreesToRadians(30)),
+            (0.05, 0.05, wpimath.units.degrees_to_radians(5)),
+            (0.5, 0.5, wpimath.units.degrees_to_radians(30)),
         )
 
         # Gains are for example purposes only - must be determined for your own robot!
         self.feedforward = wpimath.SimpleMotorFeedforwardMeters(1, 3)
 
         # Simulation classes
-        self.leftEncoderSim = wpilib.simulation.EncoderSim(self.leftEncoder)
-        self.rightEncoderSim = wpilib.simulation.EncoderSim(self.rightEncoder)
-        self.drivetrainSystem = wpimath.Models.differentialDriveFromSysId(
+        self.left_encoder_sim = wpilib.simulation.EncoderSim(self.left_encoder)
+        self.right_encoder_sim = wpilib.simulation.EncoderSim(self.right_encoder)
+        self.drivetrain_system = wpimath.Models.differential_drive_from_sys_id(
             1.98, 0.2, 1.5, 0.3
         )
-        self.drivetrainSimulator = wpilib.simulation.DifferentialDrivetrainSim(
-            self.drivetrainSystem,
-            self.kTrackwidth,
-            wpimath.DCMotor.CIM(2),
+        self.drivetrain_simulator = wpilib.simulation.DifferentialDrivetrainSim(
+            self.drivetrain_system,
+            self.TRACKWIDTH,
+            wpimath.DCMotor.cim(2),
             8,
-            self.kWheelRadius,
+            self.WHEEL_RADIUS,
         )
 
-        self.imu.resetYaw()
+        self.imu.reset_yaw()
 
-        self.leftLeader.addFollower(self.leftFollower)
-        self.rightLeader.addFollower(self.rightFollower)
+        self.left_leader.add_follower(self.left_follower)
+        self.right_leader.add_follower(self.right_follower)
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's
         # gearbox is constructed, you might have to invert the left side instead.
-        self.rightLeader.setInverted(True)
+        self.right_leader.set_inverted(True)
 
         # Set the distance per pulse for the drive encoders. We can simply use the
         # distance traveled for one rotation of the wheel divided by the encoder
         # resolution.
-        self.leftEncoder.setDistancePerPulse(
-            math.tau * self.kWheelRadius / self.kEncoderResolution
+        self.left_encoder.set_distance_per_pulse(
+            math.tau * self.WHEEL_RADIUS / self.ENCODER_RESOLUTION
         )
-        self.rightEncoder.setDistancePerPulse(
-            math.tau * self.kWheelRadius / self.kEncoderResolution
+        self.right_encoder.set_distance_per_pulse(
+            math.tau * self.WHEEL_RADIUS / self.ENCODER_RESOLUTION
         )
 
-        self.leftEncoder.reset()
-        self.rightEncoder.reset()
+        self.left_encoder.reset()
+        self.right_encoder.reset()
 
-        wpilib.SmartDashboard.putData("Field", self.fieldSim)
-        wpilib.SmartDashboard.putData("FieldEstimation", self.fieldApproximation)
+        wpilib.SmartDashboard.put_data("Field", self.field_sim)
+        wpilib.SmartDashboard.put_data("FieldEstimation", self.field_approximation)
 
-    def setVelocities(
+    def set_velocities(
         self, velocities: wpimath.DifferentialDriveWheelVelocities
     ) -> None:
         """Sets the desired wheel velocities.
 
         :param velocities: The desired wheel velocities.
         """
-        leftFeedforward = self.feedforward.calculate(velocities.left)
-        rightFeedforward = self.feedforward.calculate(velocities.right)
+        left_feedforward = self.feedforward.calculate(velocities.left)
+        right_feedforward = self.feedforward.calculate(velocities.right)
 
-        leftOutput = self.leftPIDController.calculate(
-            self.leftEncoder.getRate(), velocities.left
+        left_output = self.left_pid_controller.calculate(
+            self.left_encoder.get_rate(), velocities.left
         )
-        rightOutput = self.rightPIDController.calculate(
-            self.rightEncoder.getRate(), velocities.right
+        right_output = self.right_pid_controller.calculate(
+            self.right_encoder.get_rate(), velocities.right
         )
-        self.leftLeader.setVoltage(leftOutput + leftFeedforward)
-        self.rightLeader.setVoltage(rightOutput + rightFeedforward)
+        self.left_leader.set_voltage(left_output + left_feedforward)
+        self.right_leader.set_voltage(right_output + right_feedforward)
 
-    def drive(self, xVelocity: float, rot: float) -> None:
+    def drive(self, x_velocity: float, rot: float) -> None:
         """Drives the robot with the given linear velocity and angular velocity.
 
-        :param xVelocity: Linear velocity in m/s.
+        :param x_velocity: Linear velocity in m/s.
         :param rot: Angular velocity in rad/s.
         """
-        wheelVelocities = self.kinematics.toWheelVelocities(
-            wpimath.ChassisVelocities(xVelocity, 0.0, rot)
+        wheel_velocities = self.kinematics.to_wheel_velocities(
+            wpimath.ChassisVelocities(x_velocity, 0.0, rot)
         )
-        self.setVelocities(wheelVelocities)
+        self.set_velocities(wheel_velocities)
 
-    def publishCameraToObject(
+    def publish_camera_to_object(
         self,
-        objectInField: wpimath.Pose3d,
-        robotToCamera: wpimath.Transform3d,
-        cameraToObjectEntry: ntcore.DoubleArrayEntry,
-        drivetrainSimulator: wpilib.simulation.DifferentialDrivetrainSim,
+        object_in_field: wpimath.Pose3d,
+        robot_to_camera: wpimath.Transform3d,
+        camera_to_object_entry: ntcore.DoubleArrayEntry,
+        drivetrain_simulator: wpilib.simulation.DifferentialDrivetrainSim,
     ) -> None:
         """Computes and publishes to a network tables topic the transformation from the
         camera's pose to the object's pose. This function exists solely for the
@@ -153,109 +153,117 @@ class Drivetrain:
 
         The object could be a target or a fiducial marker.
 
-        :param objectInField: The object's field-relative position.
-        :param robotToCamera: The transformation from the robot's pose to the camera's pose.
-        :param cameraToObjectEntry: The networktables entry publishing and querying example
+        :param object_in_field: The object's field-relative position.
+        :param robot_to_camera: The transformation from the robot's pose to the camera's pose.
+        :param camera_to_object_entry: The networktables entry publishing and querying example
             computer vision measurements.
         """
-        robotInField = wpimath.Pose3d(drivetrainSimulator.getPose())
-        cameraInField = robotInField.transformBy(robotToCamera)
-        cameraToObject = wpimath.Transform3d(cameraInField, objectInField)
+        robot_in_field = wpimath.Pose3d(drivetrain_simulator.get_pose())
+        camera_in_field = robot_in_field.transform_by(robot_to_camera)
+        camera_to_object = wpimath.Transform3d(camera_in_field, object_in_field)
 
-        # Publishes double array with Translation3D elements {x, y, z} and Rotation3D elements
-        # {w, x, y, z} which describe the cameraToObject transformation.
-        quaternion = cameraToObject.rotation().getQuaternion()
+        # Publishes double array with Translation3d elements {x, y, z} and Rotation3d elements
+        # {w, x, y, z} which describe the camera_to_object transformation.
+        quaternion = camera_to_object.rotation().get_quaternion()
         val = [
-            cameraToObject.x,
-            cameraToObject.y,
-            cameraToObject.z,
+            camera_to_object.x,
+            camera_to_object.y,
+            camera_to_object.z,
             quaternion.w,
             quaternion.x,
             quaternion.y,
             quaternion.z,
         ]
-        cameraToObjectEntry.set(val)
+        camera_to_object_entry.set(val)
 
-    def objectToRobotPose(
+    def object_to_robot_pose(
         self,
-        objectInField: wpimath.Pose3d,
-        robotToCamera: wpimath.Transform3d,
-        cameraToObjectEntry: ntcore.DoubleArrayEntry,
+        object_in_field: wpimath.Pose3d,
+        robot_to_camera: wpimath.Transform3d,
+        camera_to_object_entry: ntcore.DoubleArrayEntry,
     ) -> wpimath.Pose3d:
         """Queries the camera-to-object transformation from networktables to compute the robot's
         field-relative pose from vision measurements.
 
         The object could be a target or a fiducial marker.
 
-        :param objectInField: The object's field-relative pose.
-        :param robotToCamera: The transformation from the robot's pose to the camera's pose.
-        :param cameraToObjectEntry: The networktables entry publishing and querying example
+        :param object_in_field: The object's field-relative pose.
+        :param robot_to_camera: The transformation from the robot's pose to the camera's pose.
+        :param camera_to_object_entry: The networktables entry publishing and querying example
             computer vision measurements.
         """
-        val = cameraToObjectEntry.get()
+        val = camera_to_object_entry.get()
 
-        # Reconstruct cameraToObject Transform3d from networktables.
+        # Reconstruct camera_to_object Transform3d from networktables.
         translation = wpimath.Translation3d(val[0], val[1], val[2])
         rotation = wpimath.Rotation3d(
             wpimath.Quaternion(val[3], val[4], val[5], val[6])
         )
-        cameraToObject = wpimath.Transform3d(translation, rotation)
+        camera_to_object = wpimath.Transform3d(translation, rotation)
 
-        cameraInField = objectInField.transformBy(cameraToObject.inverse())
-        robotInField = cameraInField.transformBy(robotToCamera.inverse())
-        return robotInField
+        camera_in_field = object_in_field.transform_by(camera_to_object.inverse())
+        robot_in_field = camera_in_field.transform_by(robot_to_camera.inverse())
+        return robot_in_field
 
-    def updateOdometry(self) -> None:
+    def update_odometry(self) -> None:
         """Updates the field-relative position."""
-        self.poseEstimator.update(
-            self.imu.getRotation2d(),
-            self.leftEncoder.getDistance(),
-            self.rightEncoder.getDistance(),
+        self.pose_estimator.update(
+            self.imu.get_rotation2d(),
+            self.left_encoder.get_distance(),
+            self.right_encoder.get_distance(),
         )
 
-        # Publish cameraToObject transformation to networktables --this would normally be handled by
+        # Publish camera_to_object transformation to networktables --this would normally be handled by
         # the computer vision solution.
-        self.publishCameraToObject(
-            self.objectInField,
-            self.robotToCamera,
-            self.cameraToObjectEntry,
-            self.drivetrainSimulator,
+        self.publish_camera_to_object(
+            self.object_in_field,
+            self.robot_to_camera,
+            self.camera_to_object_entry,
+            self.drivetrain_simulator,
         )
 
         # Compute the robot's field-relative position exclusively from vision measurements.
-        visionMeasurement3d = self.objectToRobotPose(
-            self.objectInField, self.robotToCamera, self.cameraToObjectEntry
+        vision_measurement3d = self.object_to_robot_pose(
+            self.object_in_field, self.robot_to_camera, self.camera_to_object_entry
         )
 
         # Convert robot pose from Pose3d to Pose2d needed to apply vision measurements.
-        visionMeasurement2d = visionMeasurement3d.toPose2d()
+        vision_measurement2d = vision_measurement3d.to_pose2d()
 
         # Apply vision measurements. For simulation purposes only, we don't input a latency delay --
         # on a real robot, this must be calculated based either on known latency or timestamps.
-        self.poseEstimator.addVisionMeasurement(
-            visionMeasurement2d,
-            wpilib.Timer.getTimestamp(),
+        self.pose_estimator.add_vision_measurement(
+            vision_measurement2d,
+            wpilib.Timer.get_timestamp(),
         )
 
-    def simulationPeriodic(self) -> None:
+    def simulation_periodic(self) -> None:
         """This function is called periodically during simulation."""
         # To update our simulation, we set motor voltage inputs, update the
         # simulation, and write the simulated positions and velocities to our
         # simulated encoder and gyro.
-        self.drivetrainSimulator.setInputs(
-            self.leftLeader.getThrottle() * wpilib.RobotController.getInputVoltage(),
-            self.rightLeader.getThrottle() * wpilib.RobotController.getInputVoltage(),
+        self.drivetrain_simulator.set_inputs(
+            self.left_leader.get_throttle()
+            * wpilib.RobotController.get_input_voltage(),
+            self.right_leader.get_throttle()
+            * wpilib.RobotController.get_input_voltage(),
         )
-        self.drivetrainSimulator.update(0.02)
+        self.drivetrain_simulator.update(0.02)
 
-        self.leftEncoderSim.setDistance(self.drivetrainSimulator.getLeftPosition())
-        self.leftEncoderSim.setRate(self.drivetrainSimulator.getLeftVelocity())
-        self.rightEncoderSim.setDistance(self.drivetrainSimulator.getRightPosition())
-        self.rightEncoderSim.setRate(self.drivetrainSimulator.getRightVelocity())
-        # self.gyroSim.setAngle(-self.drivetrainSimulator.getHeading().getDegrees())
+        self.left_encoder_sim.set_distance(
+            self.drivetrain_simulator.get_left_position()
+        )
+        self.left_encoder_sim.set_rate(self.drivetrain_simulator.get_left_velocity())
+        self.right_encoder_sim.set_distance(
+            self.drivetrain_simulator.get_right_position()
+        )
+        self.right_encoder_sim.set_rate(self.drivetrain_simulator.get_right_velocity())
+        # self.gyro_sim.set_angle(-self.drivetrain_simulator.get_heading().degrees())
 
     def periodic(self) -> None:
         """This function is called periodically, no matter the mode."""
-        self.updateOdometry()
-        self.fieldSim.setRobotPose(self.drivetrainSimulator.getPose())
-        self.fieldApproximation.setRobotPose(self.poseEstimator.getEstimatedPosition())
+        self.update_odometry()
+        self.field_sim.set_robot_pose(self.drivetrain_simulator.get_pose())
+        self.field_approximation.set_robot_pose(
+            self.pose_estimator.get_estimated_position()
+        )

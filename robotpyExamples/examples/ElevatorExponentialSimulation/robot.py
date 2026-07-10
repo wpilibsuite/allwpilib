@@ -16,28 +16,28 @@ class MyRobot(wpilib.TimedRobot):
 
     def __init__(self) -> None:
         super().__init__(0.020)
-        self.joystick = wpilib.Joystick(constants.kJoystickPort)
+        self.joystick = wpilib.Joystick(constants.JOYSTICK_PORT)
         self.elevator = Elevator()
 
-    def robotPeriodic(self) -> None:
+    def robot_periodic(self) -> None:
         # Update the telemetry, including mechanism visualization, regardless of mode.
-        self.elevator.updateTelemetry()
+        self.elevator.update_telemetry()
 
-    def simulationPeriodic(self) -> None:
+    def simulation_periodic(self) -> None:
         # Update the simulation model.
-        self.elevator.simulationPeriodic()
+        self.elevator.simulation_periodic()
 
-    def teleopInit(self) -> None:
+    def teleop_init(self) -> None:
         self.elevator.reset()
 
-    def teleopPeriodic(self) -> None:
-        if self.joystick.getTrigger():
+    def teleop_periodic(self) -> None:
+        if self.joystick.get_trigger():
             # Here, we set the constant setpoint of 10 meters.
-            self.elevator.reachGoal(constants.kSetpoint)
+            self.elevator.reach_goal(constants.SETPOINT)
         else:
             # Otherwise, we update the setpoint to 1 meter.
-            self.elevator.reachGoal(constants.kLowerkSetpoint)
+            self.elevator.reach_goal(constants.LOWERK_SETPOINT)
 
-    def disabledInit(self) -> None:
+    def disabled_init(self) -> None:
         # This just makes sure that our simulation code knows that the motor's off.
         self.elevator.stop()

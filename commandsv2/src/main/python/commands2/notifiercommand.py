@@ -13,7 +13,7 @@ from .subsystem import Subsystem
 class NotifierCommand(Command):
     """
     A command that starts a notifier to run the given Callable periodically in a separate thread. Has
-    no end condition as-is; either subclass it or use :func:`commands2.Command.withTimeout` or :func:`commands2.Command.until` to give it one.
+    no end condition as-is; either subclass it or use :func:`commands2.Command.with_timeout` or :func:`commands2.Command.until` to give it one.
 
     .. warning:: Do not use this class unless you are confident in your ability
                  to make the executed code thread-safe. If you do not know what
@@ -22,25 +22,25 @@ class NotifierCommand(Command):
     """
 
     def __init__(
-        self, toRun: Callable[[], Any], period: units.seconds, *requirements: Subsystem
+        self, to_run: Callable[[], Any], period: units.seconds, *requirements: Subsystem
     ):
         """
         Creates a new NotifierCommand.
 
-        :param toRun: the Callable for the notifier to run
+        :param to_run: the Callable for the notifier to run
         :param period: the period at which the notifier should run, in seconds
         :param requirements: the subsystems required by this command
         """
         super().__init__()
 
-        assert callable(toRun)
+        assert callable(to_run)
 
-        self._notifier = Notifier(toRun)
+        self._notifier = Notifier(to_run)
         self._period = period
-        self.addRequirements(*requirements)
+        self.add_requirements(*requirements)
 
     def initialize(self):
-        self._notifier.startPeriodic(self._period)
+        self._notifier.start_periodic(self._period)
 
     def end(self, interrupted: bool):
         self._notifier.stop()

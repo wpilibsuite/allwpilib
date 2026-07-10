@@ -11,8 +11,10 @@
 #endif
 
 #include <cstdio>
+#include <format>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include "wpi/cameraserver/CameraServerShared.hpp"
@@ -59,17 +61,17 @@ class WPILibCameraServerShared : public wpi::CameraServerShared {
   void ReportUsage(std::string_view resource, std::string_view data) override {
     HAL_ReportUsage(resource, data);
   }
-  void SetCameraServerErrorV(fmt::string_view format,
-                             fmt::format_args args) override {
+  void SetCameraServerErrorV(std::string_view format,
+                             std::format_args args) override {
     ReportErrorV(err::CameraServerError, __FILE__, __LINE__, __FUNCTION__,
                  format, args);
   }
-  void SetVisionRunnerErrorV(fmt::string_view format,
-                             fmt::format_args args) override {
+  void SetVisionRunnerErrorV(std::string_view format,
+                             std::format_args args) override {
     ReportErrorV(err::Error, __FILE__, __LINE__, __FUNCTION__, format, args);
   }
-  void ReportDriverStationErrorV(fmt::string_view format,
-                                 fmt::format_args args) override {
+  void ReportDriverStationErrorV(std::string_view format,
+                                 std::format_args args) override {
     ReportErrorV(err::Error, __FILE__, __LINE__, __FUNCTION__, format, args);
   }
   std::pair<std::thread::id, bool> GetRobotMainThreadId() const override {
@@ -78,12 +80,12 @@ class WPILibCameraServerShared : public wpi::CameraServerShared {
 };
 class WPILibMathShared : public wpi::math::MathShared {
  public:
-  void ReportErrorV(fmt::string_view format, fmt::format_args args) override {
+  void ReportErrorV(std::string_view format, std::format_args args) override {
     wpi::ReportErrorV(err::Error, __FILE__, __LINE__, __FUNCTION__, format,
                       args);
   }
 
-  void ReportWarningV(fmt::string_view format, fmt::format_args args) override {
+  void ReportWarningV(std::string_view format, std::format_args args) override {
     wpi::ReportErrorV(warn::Warning, __FILE__, __LINE__, __FUNCTION__, format,
                       args);
   }
@@ -190,7 +192,8 @@ RobotBase::RobotBase() {
 
   auto inst = wpi::nt::NetworkTableInstance::GetDefault();
   // subscribe to "" to force persistent values to propagate to local
-  wpi::nt::SubscribeMultiple(inst.GetHandle(), {{std::string_view{}}});
+  wpi::nt::SubscribeMultiple(inst.GetHandle(), {{std::string_view{}}},
+                             {.disableSignal = true});
   if constexpr (!IsSimulation()) {
     inst.StartServer("/home/systemcore/networktables.json", "", "robot");
   } else {
@@ -214,7 +217,7 @@ RobotBase::RobotBase() {
       inst.AddConnectionListener(false, [&](const wpi::nt::Event& event) {
         if (event.Is(wpi::nt::EventFlags::CONNECTED)) {
           auto connInfo = event.GetConnectionInfo();
-          HAL_ReportUsage(fmt::format("NT/{}", connInfo->remote_id), "");
+          HAL_ReportUsage(std::format("NT/{}", connInfo->remote_id), "");
         }
       });
 

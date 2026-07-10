@@ -1427,8 +1427,8 @@ TEST_F(UnitContainer, cout) {
 }
 #endif
 
-#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
-TEST_F(UnitContainer, fmtlib) {
+#if __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
+TEST_F(UnitContainer, format) {
   testing::internal::CaptureStdout();
   wpi::util::print("{}", degree_t(349.87));
   std::string output = testing::internal::GetCapturedStdout();

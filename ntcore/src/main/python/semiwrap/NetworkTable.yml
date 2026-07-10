@@ -80,85 +80,85 @@ classes:
       SetDefaultNumber:
       GetNumber:
         cpp_code: |
-          [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
+          [](NetworkTable * table, std::string_view key, py::object default_value) -> py::object {
             wpi::nt::NetworkTableEntry entry;
             {
               py::gil_scoped_release release;
               entry = table->GetEntry(key);
             }
-            return pyntcore::GetDoubleEntry(entry, defaultValue);
+            return pyntcore::GetDoubleEntry(entry, default_value);
           }
       PutString:
       SetDefaultString:
       GetString:
         cpp_code: |
-          [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
+          [](NetworkTable * table, std::string_view key, py::object default_value) -> py::object {
             wpi::nt::NetworkTableEntry entry;
             {
               py::gil_scoped_release release;
               entry = table->GetEntry(key);
             }
-            return pyntcore::GetStringEntry(entry, defaultValue);
+            return pyntcore::GetStringEntry(entry, default_value);
           }
       PutBoolean:
       SetDefaultBoolean:
       GetBoolean:
         cpp_code: |
-          [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
+          [](NetworkTable * table, std::string_view key, py::object default_value) -> py::object {
             wpi::nt::NetworkTableEntry entry;
             {
               py::gil_scoped_release release;
               entry = table->GetEntry(key);
             }
-            return pyntcore::GetBooleanEntry(entry, defaultValue);
+            return pyntcore::GetBooleanEntry(entry, default_value);
           }
       PutBooleanArray:
       SetDefaultBooleanArray:
       GetBooleanArray:
         cpp_code: |
-          [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
+          [](NetworkTable * table, std::string_view key, py::object default_value) -> py::object {
             wpi::nt::NetworkTableEntry entry;
             {
               py::gil_scoped_release release;
               entry = table->GetEntry(key);
             }
-            return pyntcore::GetBooleanArrayEntry(entry, defaultValue);
+            return pyntcore::GetBooleanArrayEntry(entry, default_value);
           }
       PutNumberArray:
       SetDefaultNumberArray:
       GetNumberArray:
         cpp_code: |
-          [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
+          [](NetworkTable * table, std::string_view key, py::object default_value) -> py::object {
             wpi::nt::NetworkTableEntry entry;
             {
               py::gil_scoped_release release;
               entry = table->GetEntry(key);
             }
-            return pyntcore::GetDoubleArrayEntry(entry, defaultValue);
+            return pyntcore::GetDoubleArrayEntry(entry, default_value);
           }
       PutStringArray:
       SetDefaultStringArray:
       GetStringArray:
         cpp_code: |
-          [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
+          [](NetworkTable * table, std::string_view key, py::object default_value) -> py::object {
             wpi::nt::NetworkTableEntry entry;
             {
               py::gil_scoped_release release;
               entry = table->GetEntry(key);
             }
-            return pyntcore::GetStringArrayEntry(entry, defaultValue);
+            return pyntcore::GetStringArrayEntry(entry, default_value);
           }
       PutRaw:
       SetDefaultRaw:
       GetRaw:
         cpp_code: |
-          [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
+          [](NetworkTable * table, std::string_view key, py::object default_value) -> py::object {
             wpi::nt::NetworkTableEntry entry;
             {
               py::gil_scoped_release release;
               entry = table->GetEntry(key);
             }
-            return pyntcore::GetRawEntry(entry, defaultValue);
+            return pyntcore::GetRawEntry(entry, default_value);
           }
       PutValue:
         ignore: true

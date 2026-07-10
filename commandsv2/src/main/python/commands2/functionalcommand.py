@@ -17,43 +17,43 @@ class FunctionalCommand(Command):
 
     def __init__(
         self,
-        onInit: Callable[[], Any],
-        onExecute: Callable[[], Any],
-        onEnd: Callable[[bool], Any],
-        isFinished: Callable[[], bool],
+        on_init: Callable[[], Any],
+        on_execute: Callable[[], Any],
+        on_end: Callable[[bool], Any],
+        is_finished: Callable[[], bool],
         *requirements: Subsystem,
     ):
         """
         Creates a new FunctionalCommand.
 
-        :param onInit: the function to run on command initialization
-        :param onExecute: the function to run on command execution
-        :param onEnd: the function to run on command end
-        :param isFinished: the function that determines whether the command has finished
+        :param on_init: the function to run on command initialization
+        :param on_execute: the function to run on command execution
+        :param on_end: the function to run on command end
+        :param is_finished: the function that determines whether the command has finished
         :param requirements: the subsystems required by this command
         """
         super().__init__()
 
-        assert callable(onInit)
-        assert callable(onExecute)
-        assert callable(onEnd)
-        assert callable(isFinished)
+        assert callable(on_init)
+        assert callable(on_execute)
+        assert callable(on_end)
+        assert callable(is_finished)
 
-        self._onInit = onInit
-        self._onExecute = onExecute
-        self._onEnd = onEnd
-        self._isFinished = isFinished
+        self._on_init = on_init
+        self._on_execute = on_execute
+        self._on_end = on_end
+        self._is_finished = is_finished
 
-        self.addRequirements(*requirements)
+        self.add_requirements(*requirements)
 
     def initialize(self):
-        self._onInit()
+        self._on_init()
 
     def execute(self):
-        self._onExecute()
+        self._on_execute()
 
     def end(self, interrupted: bool):
-        self._onEnd(interrupted)
+        self._on_end(interrupted)
 
-    def isFinished(self) -> bool:
-        return self._isFinished()
+    def is_finished(self) -> bool:
+        return self._is_finished()

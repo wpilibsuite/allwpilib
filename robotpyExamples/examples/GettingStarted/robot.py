@@ -15,42 +15,42 @@ class MyRobot(wpilib.TimedRobot):
         should be used for any initialization code.
         """
         super().__init__()
-        self.leftDrive = wpilib.PWMSparkMax(0)
-        self.rightDrive = wpilib.PWMSparkMax(1)
-        self.robotDrive = wpilib.DifferentialDrive(self.leftDrive, self.rightDrive)
-        self.controller = wpilib.NiDsXboxController(0)
+        self.left_drive = wpilib.PWMSparkMax(0)
+        self.right_drive = wpilib.PWMSparkMax(1)
+        self.robot_drive = wpilib.DifferentialDrive(self.left_drive, self.right_drive)
+        self.controller = wpilib.Gamepad(0)
         self.timer = wpilib.Timer()
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's
         # gearbox is constructed, you might have to invert the left side instead.
-        self.rightDrive.setInverted(True)
+        self.right_drive.set_inverted(True)
 
-    def autonomousInit(self):
+    def autonomous_init(self):
         """This function is run once each time the robot enters autonomous mode."""
         self.timer.restart()
 
-    def autonomousPeriodic(self):
+    def autonomous_periodic(self):
         """This function is called periodically during autonomous."""
 
         # Drive for two seconds
         if self.timer.get() < 2.0:
             # Drive forwards half velocity, make sure to turn input squaring off
-            self.robotDrive.arcadeDrive(0.5, 0, squareInputs=False)
+            self.robot_drive.arcade_drive(0.5, 0, square_inputs=False)
         else:
-            self.robotDrive.stopMotor()  # Stop robot
+            self.robot_drive.stop_motor()  # Stop robot
 
-    def teleopInit(self):
+    def teleop_init(self):
         """This function is called once each time the robot enters teleoperated mode."""
 
-    def teleopPeriodic(self):
+    def teleop_periodic(self):
         """This function is called periodically during teleoperated mode."""
-        self.robotDrive.arcadeDrive(
-            -self.controller.getLeftY(), -self.controller.getRightX()
+        self.robot_drive.arcade_drive(
+            -self.controller.get_left_y(), -self.controller.get_right_x()
         )
 
-    def utilityInit(self):
+    def utility_init(self):
         """This function is called once each time the robot enters utility mode."""
 
-    def utilityPeriodic(self):
+    def utility_periodic(self):
         """This function is called periodically during utility mode."""

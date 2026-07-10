@@ -1,0 +1,34 @@
+functions:
+  to_json:
+    overloads:
+      wpi::util::json&, const DifferentialSample&:
+        ignore: true
+      wpi::util::json&, const std::vector<DifferentialSample>&:
+        ignore: true
+  from_json:
+    overloads:
+      const wpi::util::json&, DifferentialSample&:
+        ignore: true
+      const wpi::util::json&, std::vector<DifferentialSample>&:
+        ignore: true
+classes:
+  wpi::math::DifferentialSample:
+    force_no_trampoline: true
+    attributes:
+      leftSpeed:
+      rightSpeed:
+    methods:
+      DifferentialSample:
+        overloads:
+          "":
+          const TrajectorySample&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t:
+          const TrajectorySample&, const DifferentialDriveKinematics&:
+          const SplineSample&, const DifferentialDriveKinematics&:
+          ? wpi::units::second_t, const Pose2d&, const ChassisVelocities&, const ChassisAccelerations&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t
+          :
+          ? wpi::units::second_t, const Pose2d&, const ChassisVelocities&, const ChassisAccelerations&, const DifferentialDriveKinematics&
+          :
+      Transform:
+      RelativeTo:
+      WithNewTimestamp:
+      operator==:

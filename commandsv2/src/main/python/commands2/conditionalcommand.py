@@ -19,74 +19,74 @@ class ConditionalCommand(Command):
     subsystems its components require.
     """
 
-    selectedCommand: Optional[Command]
+    selected_command: Optional[Command]
 
     def __init__(
-        self, onTrue: Command, onFalse: Command, condition: Callable[[], bool]
+        self, on_true: Command, on_false: Command, condition: Callable[[], bool]
     ):
         """
         Creates a new ConditionalCommand.
 
-        :param onTrue: the command to run if the condition is true
-        :param onFalse: the command to run if the condition is false
+        :param on_true: the command to run if the condition is true
+        :param on_false: the command to run if the condition is false
         :param condition: the condition to determine which command to run
         """
         super().__init__()
 
-        CommandScheduler.getInstance().registerComposedCommands([onTrue, onFalse])
+        CommandScheduler.get_instance().register_composed_commands([on_true, on_false])
 
-        self.onTrue = onTrue
-        self.onFalse = onFalse
+        self.on_true = on_true
+        self.on_false = on_false
         self.condition = condition
 
-        self.addRequirements(*onTrue.getRequirements())
-        self.addRequirements(*onFalse.getRequirements())
+        self.add_requirements(*on_true.get_requirements())
+        self.add_requirements(*on_false.get_requirements())
 
     def initialize(self):
         if self.condition():
-            self.selectedCommand = self.onTrue
+            self.selected_command = self.on_true
         else:
-            self.selectedCommand = self.onFalse
+            self.selected_command = self.on_false
 
-        self.selectedCommand.initialize()
+        self.selected_command.initialize()
 
     def execute(self):
-        assert self.selectedCommand is not None
-        self.selectedCommand.execute()
+        assert self.selected_command is not None
+        self.selected_command.execute()
 
     def end(self, interrupted: bool):
-        assert self.selectedCommand is not None
-        self.selectedCommand.end(interrupted)
+        assert self.selected_command is not None
+        self.selected_command.end(interrupted)
 
-    def isFinished(self) -> bool:
-        assert self.selectedCommand is not None
-        return self.selectedCommand.isFinished()
+    def is_finished(self) -> bool:
+        assert self.selected_command is not None
+        return self.selected_command.is_finished()
 
-    def runsWhenDisabled(self) -> bool:
-        return self.onTrue.runsWhenDisabled() and self.onFalse.runsWhenDisabled()
+    def runs_when_disabled(self) -> bool:
+        return self.on_true.runs_when_disabled() and self.on_false.runs_when_disabled()
 
-    def getInterruptionBehavior(self) -> InterruptionBehavior:
+    def get_interruption_behavior(self) -> InterruptionBehavior:
         if (
-            self.onTrue.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf
-            or self.onFalse.getInterruptionBehavior()
-            == InterruptionBehavior.kCancelSelf
+            self.on_true.get_interruption_behavior() == InterruptionBehavior.CANCEL_SELF
+            or self.on_false.get_interruption_behavior()
+            == InterruptionBehavior.CANCEL_SELF
         ):
-            return InterruptionBehavior.kCancelSelf
+            return InterruptionBehavior.CANCEL_SELF
         else:
-            return InterruptionBehavior.kCancelIncoming
+            return InterruptionBehavior.CANCEL_INCOMING
 
-    def initSendable(self, builder: SendableBuilder):
-        super().initSendable(builder)
-        builder.addStringProperty("onTrue", self.onTrue.getName, lambda _: None)
-        builder.addStringProperty("onFalse", self.onFalse.getName, lambda _: None)
+    def init_sendable(self, builder: SendableBuilder):
+        super().init_sendable(builder)
+        builder.add_string_property("on_true", self.on_true.get_name, lambda _: None)
+        builder.add_string_property("on_false", self.on_false.get_name, lambda _: None)
 
         def _selected():
-            if self.selectedCommand is None:
+            if self.selected_command is None:
                 return "null"
             else:
-                return self.selectedCommand.getName()
+                return self.selected_command.get_name()
 
-        builder.addStringProperty(
+        builder.add_string_property(
             "selected",
             _selected,
             lambda _: None,

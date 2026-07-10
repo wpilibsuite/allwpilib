@@ -6,7 +6,7 @@
 
 #include "HALInitializer.hpp"
 #include "SystemServerInternal.hpp"
-#include "mrc/NtNetComm.h"
+#include "mrclib/Systemcore.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/nt/DoubleTopic.hpp"
 
@@ -20,34 +20,21 @@ static void initializePower(int32_t* status) {
 
 }  // namespace wpi::hal
 
-namespace {
-struct SystemServerPower {
-  wpi::nt::NetworkTableInstance ntInst;
-
-  wpi::nt::DoubleSubscriber batterySubscriber;
-
-  explicit SystemServerPower(wpi::nt::NetworkTableInstance inst) {
-    ntInst = inst;
-
-    batterySubscriber =
-        ntInst.GetDoubleTopic(ROBOT_BATTERY_VOLTAGE_PATH).Subscribe(0.0);
-  }
-};
-}  // namespace
-
-static ::SystemServerPower* systemServerPower;
-
 namespace wpi::hal::init {
-void InitializePower() {
-  systemServerPower = new ::SystemServerPower{wpi::hal::GetSystemServer()};
-}
+void InitializePower() {}
 }  // namespace wpi::hal::init
 
 extern "C" {
 
 double HAL_GetVinVoltage(int32_t* status) {
-  initializePower(status);
-  return systemServerPower->batterySubscriber.Get();
+  float voltage = 0;
+  MRC_Status mrcStatus = MRC_Systemcore_GetBatteryVoltage(&voltage);
+  if (mrcStatus != MRC_STATUS_SUCCESS) {
+    *status = HAL_INCOMPATIBLE_STATE;
+    return 0;
+  }
+  *status = HAL_SUCCESS;
+  return voltage;
 }
 
 double HAL_GetUserVoltage3V3(int32_t* status) {

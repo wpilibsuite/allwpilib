@@ -4,11 +4,12 @@
 
 #include <ranges>
 
-#include <fmt/base.h>
 #include <gtest/gtest.h>
 #include <sleipnir/autodiff/expression_type.hpp>
 #include <sleipnir/optimization/problem.hpp>
 #include <sleipnir/optimization/solver/exit_status.hpp>
+
+#include "wpi/util/print.hpp"
 
 template <typename T>
 auto Range(T start, T end, T step) {
@@ -37,7 +38,7 @@ TEST(ProblemTest, Quartic) {
   EXPECT_NEAR(x.value(), 1.0, 1e-6);
 
   if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
-    fmt::println("{}", output);
+    wpi::util::println("{}", output);
   }
 }
 
@@ -78,7 +79,7 @@ TEST(ProblemTest, RosenbrockWithCubicAndLineConstraint) {
   }
 
   if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
-    fmt::println("{}", output);
+    wpi::util::println("{}", output);
   }
 }
 
@@ -112,7 +113,7 @@ TEST(ProblemTest, RosenbrockWithDiskConstraint) {
   }
 
   if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
-    fmt::println("{}", output);
+    wpi::util::println("{}", output);
   }
 }
 
@@ -141,7 +142,7 @@ TEST(ProblemTest, Minimum2DDistanceWithLinearConstraint) {
   EXPECT_NEAR(y.value(), 2.5, 1e-2);
 
   if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
-    fmt::println("{}", output);
+    wpi::util::println("{}", output);
   }
 }
 
@@ -168,7 +169,7 @@ TEST(ProblemTest, ConflictingBounds) {
             slp::ExitStatus::GLOBALLY_INFEASIBLE);
 
   if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
-    fmt::println("{}", output);
+    wpi::util::println("{}", output);
   }
 }
 
@@ -208,6 +209,6 @@ TEST(ProblemTest, WachterAndBieglerLineSearchFailure) {
   EXPECT_NEAR(s2.value(), 0.5, 1e-6);
 
   if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
-    fmt::println("{}", output);
+    wpi::util::println("{}", output);
   }
 }

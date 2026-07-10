@@ -1,8 +1,9 @@
 extra_includes:
-- wpi/driverstation/internal/DriverStationBackend.hpp
+- wpi/event/BooleanEvent.hpp
 
 classes:
   wpi::Joystick:
+    force_no_trampoline: true
     attributes:
       kDefaultXChannel:
       kDefaultYChannel:
@@ -14,6 +15,15 @@ classes:
       ButtonType:
     methods:
       Joystick:
+        overloads:
+          int:
+          GenericHID&:
+      GetHID:
+        overloads:
+          "":
+            return_value_policy: reference_internal
+          '[const]':
+            ignore: true
       SetXChannel:
       SetYChannel:
       SetZChannel:
@@ -39,8 +49,13 @@ classes:
       Top:
       GetMagnitude:
       GetDirection:
-        rename: getDirectionRadians
+        rename: get_direction_radians
+      GetRawButton:
+      GetRawButtonPressed:
+      GetRawButtonReleased:
+      GetRawAxis:
+      GetPOV:
     inline_code: |
-      .def("getDirectionDegrees", [](const Joystick &self) -> wpi::units::degree_t {
+      .def("get_direction_degrees", [](const Joystick &self) -> wpi::units::degree_t {
         return self.GetDirection();
       })

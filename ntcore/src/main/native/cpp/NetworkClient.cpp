@@ -7,12 +7,11 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "IConnectionList.hpp"
 #include "Log.hpp"
@@ -231,7 +230,7 @@ void NetworkClient::TcpConnected(uv::Tcp& tcp) {
   options.handshakeTimeout = kWebsocketHandshakeTimeout;
   wpi::util::SmallString<128> idBuf;
   auto ws = wpi::net::WebSocket::CreateClient(
-      tcp, fmt::format("/nt/{}", wpi::net::EscapeURI(m_id, idBuf)), "",
+      tcp, std::format("/nt/{}", wpi::net::EscapeURI(m_id, idBuf)), "",
       {"v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu"},
       options);
   ws->SetMaxMessageSize(kMaxMessageSize);
@@ -285,6 +284,13 @@ void NetworkClient::WsConnected(wpi::net::WebSocket& ws, uv::Tcp& tcp,
       uv::Timer::SingleShot(
           m_loop, uv::Timer::Time{0},
           [this, reason = std::string{reason}, keepws = ws.shared_from_this()] {
+            // Check that the loop is not shutting down. keepws->GetStream()
+            // would dereference the underlying uv::Tcp which may have been
+            // destroyed after Handle::Close() released its self-reference.
+            // m_loop is safe to access as long as `this` is alive.
+            if (m_loop.IsClosing()) {
+              return;
+            }
             DoDisconnect(reason);
           });
     }

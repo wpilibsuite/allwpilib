@@ -26,13 +26,19 @@ HAL_Bool HALSIM_IsTimingPaused(void);
 void HALSIM_StepTiming(uint64_t delta);
 void HALSIM_StepTimingAsync(uint64_t delta);
 
-typedef int32_t (*HALSIM_SendErrorHandler)(
-    HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode, const char* details,
-    const char* location, const char* callStack, HAL_Bool printMsg);
+typedef int32_t (*HALSIM_SendErrorHandler)(HAL_Bool isError, int32_t errorCode,
+                                           const struct WPI_String* details,
+                                           const struct WPI_String* location,
+                                           const struct WPI_String* callStack,
+                                           HAL_Bool printMsg);
 void HALSIM_SetSendError(HALSIM_SendErrorHandler handler);
 
-typedef int32_t (*HALSIM_SendConsoleLineHandler)(const char* line);
+typedef int32_t (*HALSIM_SendConsoleLineHandler)(const struct WPI_String* line);
 void HALSIM_SetSendConsoleLine(HALSIM_SendConsoleLineHandler handler);
+
+typedef int32_t (*HALSIM_WriteDisplayAnsiHandler)(
+    const struct WPI_String* data);
+void HALSIM_SetWriteDisplayAnsi(HALSIM_WriteDisplayAnsiHandler handler);
 
 typedef void (*HALSIM_SimPeriodicCallback)(void* param);
 int32_t HALSIM_RegisterSimPeriodicBeforeCallback(

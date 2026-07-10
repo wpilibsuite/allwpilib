@@ -88,7 +88,7 @@ void Application(std::string_view saveDir) {
       lvl = "DEBUG: ";
     }
     std::string filename = std::filesystem::path{file}.filename().string();
-    gLog.Append(fmt::format("{}{} ({}:{})\n", lvl, msg, filename, line));
+    gLog.Append(std::format("{}{} ({}:{})\n", lvl, msg, filename, line));
 #ifndef NDEBUG
     wpi::util::print(stderr, "{}{} ({}:{})\n", lvl, msg, filename, line);
 #endif

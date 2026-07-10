@@ -13,8 +13,6 @@
 #include <memory>
 #include <string>
 
-#include <fmt/format.h>
-
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/Pipe.hpp"

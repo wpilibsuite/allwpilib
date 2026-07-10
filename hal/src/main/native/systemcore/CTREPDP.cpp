@@ -4,16 +4,22 @@
 
 #include "CTREPDP.h"
 
-#include <string>
+#include <stdint.h>
 
-#include <fmt/format.h>
+#include <cstring>
+#include <format>
+#include <string>
 
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/CANAPI.h"
+#include "wpi/hal/CANAPITypes.h"
 #include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
+#include "wpi/hal/PowerDistribution.h"
+#include "wpi/hal/Types.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/handles/IndexedHandleResource.hpp"
 
 using namespace wpi::hal;
@@ -225,7 +231,7 @@ double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
                                 int32_t* status) {
   if (!HAL_CheckPDPChannel(channel)) {
     *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
-                        fmt::format("Invalid pdp channel {}", channel));
+                        std::format("Invalid pdp channel {}", channel));
     return 0;
   }
 

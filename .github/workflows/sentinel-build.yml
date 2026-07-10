@@ -23,13 +23,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - container: wpilib/systemcore-cross-ubuntu:2027-24.04
+          - container: wpilib/systemcore-cross-debian:trixie
             artifact-name: Systemcore
             build-options: "-Ponlylinuxsystemcore"
-          - container: wpilib/aarch64-cross-ubuntu:2027-bookworm-24.04
+          - container: wpilib/aarch64-cross-debian:trixie
             artifact-name: Arm64
             build-options: "-Ponlylinuxarm64"
-          - container: wpilib/systemcore-cross-ubuntu:2027-24.04
+          - container: wpilib/systemcore-cross-debian:trixie
             artifact-name: Linux
             build-options: "-Ponlylinuxx86-64"
     name: "Build - ${{ matrix.artifact-name }}"

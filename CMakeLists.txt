@@ -63,89 +63,56 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # Options for building certain parts of the repo. Everything is built by default.
-option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
-option(WITH_JAVA "Include Java and JNI in the build" OFF)
-option(WITH_JAVA_SOURCE "Build Java source jars" ${WITH_JAVA})
-option(WITH_DOCS "Build Doxygen docs (needs Git for versioning)" OFF)
+option(BUILD_SHARED_LIBS "Build with shared libs" ON)
+option(WPILIB_WITH_DOCS "Build Doxygen docs (needs Git for versioning)" OFF)
 cmake_dependent_option(
     DOCS_WARNINGS_AS_ERRORS
     "Make docs warnings into errors"
     OFF
-    WITH_DOCS
+    WPILIB_WITH_DOCS
     OFF
 )
-option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
-option(WITH_NTCORE "Build ntcore" ON)
-option(WITH_WPICAL "Build wpical" OFF)
-option(WITH_WPIMATH "Build wpimath" ON)
-cmake_dependent_option(
-    WITH_WPIUNITS
-    "Build wpiunits"
-    ON
-    WITH_JAVA
-    OFF
-)
-option(WITH_WPILIB "Build hal, wpilibc/j, and developerRobot (needs OpenCV)" ON)
-option(WITH_EXAMPLES "Build examples" OFF)
-option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
-option(WITH_GUI "Build GUI items" ON)
-option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
-option(WITH_BENCHMARK "Build the benchmark project" ON)
+option(WPILIB_WITH_CSCORE "Build cscore (needs OpenCV)" ON)
+option(WPILIB_WITH_NTCORE "Build ntcore" ON)
+option(WPILIB_WITH_WPICAL "Build wpical" OFF)
+option(WPILIB_WITH_WPIMATH "Build wpimath" ON)
+option(WPILIB_WITH_WPILIB "Build hal, wpilibc/j, and developerRobot (needs OpenCV)" ON)
+option(WPILIB_WITH_EXAMPLES "Build examples" OFF)
+option(WPILIB_WITH_TESTS "Build unit tests (requires internet connection)" ON)
+option(WPILIB_WITH_GUI "Build GUI items" ON)
+option(WPILIB_WITH_SIMULATION_MODULES "Build simulation modules" ON)
+option(WPILIB_WITH_BENCHMARK "Build the benchmark project" ON)
 
 # Options for using a package manager (e.g., vcpkg) for certain dependencies.
-option(USE_SYSTEM_FMTLIB "Use system fmtlib" OFF)
-option(USE_SYSTEM_LIBUV "Use system libuv" OFF)
-option(USE_SYSTEM_EIGEN "Use system eigen" OFF)
-option(USE_LINKED_AVAHI "Use directly linked Avahi instead of loading at runtime" OFF)
-
-# Options for location of OpenCV Java.
-set(OPENCV_JAVA_INSTALL_DIR "" CACHE PATH "Location to search for the OpenCV jar file")
+option(WPILIB_USE_SYSTEM_EIGEN "Use system Eigen" OFF)
+option(WPILIB_USE_SYSTEM_LIBUV "Use system libuv" OFF)
+option(WPILIB_USE_SYSTEM_SLEIPNIR "Use system Sleipnir" OFF)
+option(WPILIB_USE_LINKED_AVAHI "Use directly linked Avahi instead of loading at runtime" OFF)
 
 # Options for compilation flags.
-option(NO_WERROR "Disable -Werror flag during compilation" OFF)
+option(WPILIB_NO_WERROR "Disable -Werror flag during compilation" OFF)
 
-if(NOT WITH_JAVA OR NOT WITH_CSCORE)
-    if(NOT "${OPENCV_JAVA_INSTALL_DIR}" STREQUAL "")
-        message(
-            WARNING
-            "
-WARNING: OpenCV Java dir set but java is not enabled!
-It will be ignored.
-"
-        )
-    endif()
-endif()
+wpilib_config(
+    OPTIONS WPILIB_WITH_SIMULATION_MODULES
+    REQUIRES BUILD_SHARED_LIBS WPILIB_WITH_WPILIB WPILIB_WITH_NTCORE
+)
 
-wpilib_config(OPTIONS WITH_JAVA REQUIRES BUILD_SHARED_LIBS)
+wpilib_config(OPTIONS WPILIB_WITH_CSCORE REQUIRES WPILIB_WITH_NTCORE)
 
-wpilib_config(OPTIONS WITH_SIMULATION_MODULES REQUIRES BUILD_SHARED_LIBS WITH_WPILIB WITH_NTCORE)
+wpilib_config(OPTIONS WPILIB_WITH_GUI REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WPIMATH)
 
-wpilib_config(OPTIONS WITH_CSCORE REQUIRES WITH_NTCORE)
-
-wpilib_config(OPTIONS WITH_GUI REQUIRES WITH_NTCORE WITH_WPIMATH)
-
-wpilib_config(OPTIONS WITH_WPILIB REQUIRES WITH_NTCORE WITH_WPIMATH)
-
-wpilib_config(OPTIONS WITH_WPIMATH WITH_JAVA REQUIRES WITH_WPIUNITS)
+wpilib_config(OPTIONS WPILIB_WITH_WPILIB REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WPIMATH)
 
 set(include_dest include)
-set(java_lib_dest java)
-if(WITH_JAVA OR WITH_JAVA_SOURCE)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked" "-proc:full")
-    find_package(Java REQUIRED COMPONENTS Development)
-    if(NOT ANDROID)
-        find_package(JNI REQUIRED COMPONENTS JVM)
-    endif()
-endif()
 
-if(WITH_DOCS)
+if(WPILIB_WITH_DOCS)
     find_package(Doxygen REQUIRED)
     find_package(Git REQUIRED)
     include(AddDoxygenDocs)
     add_doxygen_docs()
 endif()
 
-if(WITH_WPICAL)
+if(WPILIB_WITH_WPICAL)
     find_package(Ceres CONFIG REQUIRED)
 endif()
 
@@ -264,7 +231,7 @@ set(CMAKE_SHARED_LINKER_FLAGS_UBSAN
     FORCE
 )
 
-if(WITH_TESTS)
+if(WPILIB_WITH_TESTS)
     enable_testing()
     add_subdirectory(thirdparty/googletest)
     include(GoogleTest)
@@ -273,58 +240,43 @@ if(WITH_TESTS)
     include(Catch)
 endif()
 
-if(USE_SYSTEM_LIBUV)
+if(WPILIB_USE_SYSTEM_LIBUV)
     set(LIBUV_SYSTEM_REPLACE "find_dependency(libuv CONFIG)")
 endif()
 
-if(USE_SYSTEM_EIGEN)
+if(WPILIB_USE_SYSTEM_EIGEN)
     set(EIGEN_SYSTEM_REPLACE "find_package(Eigen3 CONFIG)")
 endif()
 
 set(FILENAME_DEP_REPLACE "get_filename_component(SELF_DIR \"$\{CMAKE_CURRENT_LIST_FILE\}\" PATH)")
 set(SELF_DIR "$\{SELF_DIR\}")
-set(WPIUNITS_DEP_REPLACE_IMPL "find_dependency(wpiunits)")
-set(WPIANNOTATIONS_DEP_REPLACE_IMPL "find_dependency(wpiannotations)")
 set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
 set(DATALOG_DEP_REPLACE "find_dependency(datalog)")
-if(WITH_JAVA)
-    add_subdirectory(wpiannotations)
-endif()
 
 add_subdirectory(wpiutil)
 
 add_subdirectory(datalog)
 
-if(WITH_NTCORE)
+if(WPILIB_WITH_NTCORE)
     set(NTCORE_DEP_REPLACE "find_dependency(ntcore)")
     set(WPINET_DEP_REPLACE "find_dependency(wpinet)")
     add_subdirectory(wpinet)
     add_subdirectory(ntcore)
 endif()
 
-if(WITH_WPIMATH)
-    if(WITH_JAVA)
-        set(WPIUNITS_DEP_REPLACE ${WPIUNITS_DEP_REPLACE_IMPL})
-        add_subdirectory(wpiunits)
-    endif()
+if(WPILIB_WITH_WPIMATH)
     set(WPIMATH_DEP_REPLACE "find_dependency(wpimath)")
     add_subdirectory(wpimath)
 endif()
 
-if(WITH_WPIUNITS AND NOT WITH_WPIMATH)
-    # In case of building wpiunits standalone
-    set(WPIUNITS_DEP_REPLACE ${WPIUNITS_DEP_REPLACE_IMPL})
-    add_subdirectory(wpiunits)
-endif()
-
-if(WITH_GUI)
+if(WPILIB_WITH_GUI)
     add_subdirectory(fields)
     add_subdirectory(thirdparty/imgui_suite)
     add_subdirectory(wpigui)
     add_subdirectory(glass)
     add_subdirectory(tools/outlineviewer)
     add_subdirectory(tools/sysid)
-    if(WITH_WPICAL)
+    if(WPILIB_WITH_WPICAL)
         add_subdirectory(tools/wpical)
     endif()
     if(LIBSSH_FOUND)
@@ -332,12 +284,12 @@ if(WITH_GUI)
     endif()
 endif()
 
-if(WITH_WPILIB OR WITH_SIMULATION_MODULES)
+if(WPILIB_WITH_WPILIB OR WPILIB_WITH_SIMULATION_MODULES)
     set(HAL_DEP_REPLACE "find_dependency(hal)")
     add_subdirectory(hal)
 endif()
 
-if(WITH_CSCORE)
+if(WPILIB_WITH_CSCORE)
     set(CAMERASERVER_DEP_REPLACE "find_dependency(cameraserver)")
     set(CSCORE_DEP_REPLACE "find_dependency(cscore)")
     find_package(OpenCV REQUIRED)
@@ -345,32 +297,26 @@ if(WITH_CSCORE)
     add_subdirectory(cameraserver)
 endif()
 
-if(WITH_WPILIB)
+if(WPILIB_WITH_WPILIB)
     set(APRILTAG_DEP_REPLACE "find_dependency(apriltag)")
-    set(COMMANDSV3_DEP_REPLACE "find_dependency(commandsv3)")
     set(WPILIBC_DEP_REPLACE "find_dependency(wpilibc)")
-    if(WITH_JAVA)
-        set(WPILIBJ_DEP_REPLACE "find_dependency(wpilibj)")
-    endif()
     set(COMMAND_DEP_REPLACE "find_dependency(commandsv2)")
     add_subdirectory(apriltag)
-    add_subdirectory(wpilibj)
     add_subdirectory(wpilibc)
-    add_subdirectory(commandsv3) # must be after wpilibj
     add_subdirectory(commandsv2)
     add_subdirectory(romiVendordep)
     add_subdirectory(xrpVendordep)
-    if(WITH_EXAMPLES)
+    if(WPILIB_WITH_EXAMPLES)
         add_subdirectory(wpilibcExamples)
     endif()
     add_subdirectory(developerRobot)
 endif()
 
-if(WITH_BENCHMARK)
+if(WPILIB_WITH_BENCHMARK)
     add_subdirectory(benchmark)
 endif()
 
-if(WITH_SIMULATION_MODULES)
+if(WPILIB_WITH_SIMULATION_MODULES)
     add_subdirectory(simulation)
 endif()
 

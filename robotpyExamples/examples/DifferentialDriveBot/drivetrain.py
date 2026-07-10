@@ -12,98 +12,98 @@ import wpimath
 class Drivetrain:
     """Represents a differential drive style drivetrain."""
 
-    kMaxVelocity = 3.0  # meters per second
-    kMaxAngularVelocity = 2 * math.pi  # one rotation per second
+    MAX_VELOCITY = 3.0  # meters per second
+    MAX_ANGULAR_VELOCITY = 2 * math.pi  # one rotation per second
 
-    kTrackwidth = 0.381 * 2  # meters
-    kWheelRadius = 0.0508  # meters
-    kEncoderResolution = 4096  # counts per revolution
+    TRACKWIDTH = 0.381 * 2  # meters
+    WHEEL_RADIUS = 0.0508  # meters
+    ENCODER_RESOLUTION = 4096  # counts per revolution
 
     def __init__(self) -> None:
-        self.leftLeader = wpilib.PWMSparkMax(1)
-        self.leftFollower = wpilib.PWMSparkMax(2)
-        self.rightLeader = wpilib.PWMSparkMax(3)
-        self.rightFollower = wpilib.PWMSparkMax(4)
+        self.left_leader = wpilib.PWMSparkMax(1)
+        self.left_follower = wpilib.PWMSparkMax(2)
+        self.right_leader = wpilib.PWMSparkMax(3)
+        self.right_follower = wpilib.PWMSparkMax(4)
 
         # Make sure both motors for each side are in the same group
-        self.leftLeader.addFollower(self.leftFollower)
-        self.rightLeader.addFollower(self.rightFollower)
+        self.left_leader.add_follower(self.left_follower)
+        self.right_leader.add_follower(self.right_follower)
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's
         # gearbox is constructed, you might have to invert the left side instead.
-        self.rightLeader.setInverted(True)
+        self.right_leader.set_inverted(True)
 
-        self.leftEncoder = wpilib.Encoder(0, 1)
-        self.rightEncoder = wpilib.Encoder(2, 3)
+        self.left_encoder = wpilib.Encoder(0, 1)
+        self.right_encoder = wpilib.Encoder(2, 3)
 
         self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.FLAT)
 
-        self.leftPIDController = wpimath.PIDController(1.0, 0.0, 0.0)
-        self.rightPIDController = wpimath.PIDController(1.0, 0.0, 0.0)
+        self.left_pid_controller = wpimath.PIDController(1.0, 0.0, 0.0)
+        self.right_pid_controller = wpimath.PIDController(1.0, 0.0, 0.0)
 
-        self.kinematics = wpimath.DifferentialDriveKinematics(self.kTrackwidth)
+        self.kinematics = wpimath.DifferentialDriveKinematics(self.TRACKWIDTH)
 
         # Gains are for example purposes only - must be determined for your own robot!
         self.feedforward = wpimath.SimpleMotorFeedforwardMeters(1, 3)
 
-        self.imu.resetYaw()
+        self.imu.reset_yaw()
 
         # Set the distance per pulse for the drive encoders. We can simply use the
         # distance traveled for one rotation of the wheel divided by the encoder
         # resolution.
-        self.leftEncoder.setDistancePerPulse(
-            2 * math.pi * self.kWheelRadius / self.kEncoderResolution
+        self.left_encoder.set_distance_per_pulse(
+            2 * math.pi * self.WHEEL_RADIUS / self.ENCODER_RESOLUTION
         )
-        self.rightEncoder.setDistancePerPulse(
-            2 * math.pi * self.kWheelRadius / self.kEncoderResolution
+        self.right_encoder.set_distance_per_pulse(
+            2 * math.pi * self.WHEEL_RADIUS / self.ENCODER_RESOLUTION
         )
 
-        self.leftEncoder.reset()
-        self.rightEncoder.reset()
+        self.left_encoder.reset()
+        self.right_encoder.reset()
 
         self.odometry = wpimath.DifferentialDriveOdometry(
-            self.imu.getRotation2d(),
-            self.leftEncoder.getDistance(),
-            self.rightEncoder.getDistance(),
+            self.imu.get_rotation2d(),
+            self.left_encoder.get_distance(),
+            self.right_encoder.get_distance(),
         )
 
-    def setVelocities(
+    def set_velocities(
         self, velocities: wpimath.DifferentialDriveWheelVelocities
     ) -> None:
         """Sets the desired wheel velocities.
 
         :param velocities: The desired wheel velocities.
         """
-        leftFeedforward = self.feedforward.calculate(velocities.left)
-        rightFeedforward = self.feedforward.calculate(velocities.right)
+        left_feedforward = self.feedforward.calculate(velocities.left)
+        right_feedforward = self.feedforward.calculate(velocities.right)
 
-        leftOutput = self.leftPIDController.calculate(
-            self.leftEncoder.getRate(), velocities.left
+        left_output = self.left_pid_controller.calculate(
+            self.left_encoder.get_rate(), velocities.left
         )
-        rightOutput = self.rightPIDController.calculate(
-            self.rightEncoder.getRate(), velocities.right
+        right_output = self.right_pid_controller.calculate(
+            self.right_encoder.get_rate(), velocities.right
         )
 
         # Controls the left and right sides of the robot using the calculated outputs
-        self.leftLeader.setVoltage(leftOutput + leftFeedforward)
-        self.rightLeader.setVoltage(rightOutput + rightFeedforward)
+        self.left_leader.set_voltage(left_output + left_feedforward)
+        self.right_leader.set_voltage(right_output + right_feedforward)
 
-    def drive(self, xVelocity: float, rot: float) -> None:
+    def drive(self, x_velocity: float, rot: float) -> None:
         """Drives the robot with the given linear velocity and angular velocity.
 
-        :param xVelocity: Linear velocity in m/s.
+        :param x_velocity: Linear velocity in m/s.
         :param rot: Angular velocity in rad/s.
         """
-        wheelVelocities = self.kinematics.toWheelVelocities(
-            wpimath.ChassisVelocities(xVelocity, 0.0, rot)
+        wheel_velocities = self.kinematics.to_wheel_velocities(
+            wpimath.ChassisVelocities(x_velocity, 0.0, rot)
         )
-        self.setVelocities(wheelVelocities)
+        self.set_velocities(wheel_velocities)
 
-    def updateOdometry(self) -> None:
+    def update_odometry(self) -> None:
         """Updates the field-relative position."""
         self.odometry.update(
-            self.imu.getRotation2d(),
-            self.leftEncoder.getDistance(),
-            self.rightEncoder.getDistance(),
+            self.imu.get_rotation2d(),
+            self.left_encoder.get_distance(),
+            self.right_encoder.get_distance(),
         )

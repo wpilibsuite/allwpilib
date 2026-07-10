@@ -24,7 +24,7 @@ inline_code: |
       py::init<wpi::units::meters_per_second_t, wpi::units::meters_per_second_t>(),
       py::arg("left") = 0, py::arg("right") = 0
     )
-    .def_static("fromFeet", [](wpi::units::feet_per_second_t left, wpi::units::feet_per_second_t right){
+    .def_static("from_feet", [](wpi::units::feet_per_second_t left, wpi::units::feet_per_second_t right){
       return DifferentialDriveWheelVelocities{left, right};
     }, py::arg("left"), py::arg("right"))
     .def_property("left_fps",
@@ -35,7 +35,7 @@ inline_code: |
         self->left = left;
       }
     )
-    .def_property("right_fps", 
+    .def_property("right_fps",
       [](DifferentialDriveWheelVelocities * self) -> wpi::units::feet_per_second_t {
         return self->right;
       },
@@ -50,4 +50,3 @@ inline_code: |
   ;
 
   SetupWPyStruct<wpi::math::DifferentialDriveWheelVelocities>(cls_DifferentialDriveWheelVelocities);
-

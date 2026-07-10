@@ -4,11 +4,10 @@
 
 #include "wpi/util/Preferences.hpp"
 
+#include <format>
 #include <memory>
 #include <string>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/MultiSubscriber.hpp"
@@ -35,7 +34,7 @@ struct Instance {
           wpi::util::json::object("SmartDashboard", kSmartDashboardType))};
   wpi::nt::MultiSubscriber tableSubscriber{
       wpi::nt::NetworkTableInstance::GetDefault(),
-      {{fmt::format("{}/", table->GetPath())}}};
+      {{std::format("{}/", table->GetPath())}}};
   wpi::nt::NetworkTableListener listener;
 };
 }  // namespace

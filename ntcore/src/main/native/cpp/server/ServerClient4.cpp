@@ -26,8 +26,8 @@ ServerClient4::ServerClient4(std::string_view name, std::string_view connInfo,
       m_incoming{logger},
       m_outgoing{wire, local} {
   // create client meta topics
-  m_metaPub = storage.CreateMetaTopic(fmt::format("$clientpub${}", name));
-  m_metaSub = storage.CreateMetaTopic(fmt::format("$clientsub${}", name));
+  m_metaPub = storage.CreateMetaTopic(std::format("$clientpub${}", name));
+  m_metaSub = storage.CreateMetaTopic(std::format("$clientsub${}", name));
 
   // update meta topics
   UpdateMetaClientPub();
@@ -61,7 +61,7 @@ bool ServerClient4::ProcessIncomingBinary(std::span<const uint8_t> data) {
     Value value;
     std::string error;
     if (!net::WireDecodeBinary(&data, &pubuid, &value, &error, 0)) {
-      m_wire.Disconnect(fmt::format("binary decode error: {}", error));
+      m_wire.Disconnect(std::format("binary decode error: {}", error));
       break;
     }
 
