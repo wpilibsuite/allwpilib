@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/util/timestamp.hpp"
+#include "wpi/util/timestamp.h"
 
 #include <atomic>
 #include <chrono>
@@ -14,7 +15,8 @@ static uint64_t timestamp() noexcept {
       .count();
 }
 
-static const uint64_t program_start_time = timestamp();
+static const uint64_t original_program_start_time = timestamp();
+static std::atomic<uint64_t> program_start_time{original_program_start_time};
 
 uint64_t wpi::util::NowDefault() {
   return timestamp();
@@ -23,7 +25,13 @@ uint64_t wpi::util::NowDefault() {
 static std::atomic<uint64_t (*)()> now_impl{wpi::util::NowDefault};
 
 void wpi::util::SetNowImpl(uint64_t (*func)(void)) {
-  now_impl = func ? func : NowDefault;
+  if (!func || func == wpi::util::NowDefault || func == WPI_NowDefault) {
+    now_impl = wpi::util::NowDefault;
+    program_start_time = original_program_start_time;
+  } else {
+    now_impl = func;
+    program_start_time = func();
+  }
 }
 
 uint64_t wpi::util::Now() {
