@@ -20,7 +20,8 @@ import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.trajectory.constraint.TrajectoryConstraint;
 
 class TrajectoryGeneratorTest {
-  static Trajectory<SplineSample> getTrajectory(List<? extends TrajectoryConstraint> constraints) {
+  static Trajectory<DrivetrainSplineSample> getTrajectory(
+      List<? extends TrajectoryConstraint> constraints) {
     final double maxVelocity = feetToMeters(12.0);
     final double maxAccel = feetToMeters(12);
 
@@ -49,7 +50,7 @@ class TrajectoryGeneratorTest {
 
   @Test
   void testGenerationAndConstraints() {
-    Trajectory<SplineSample> trajectory = getTrajectory(new ArrayList<>());
+    Trajectory<DrivetrainSplineSample> trajectory = getTrajectory(new ArrayList<>());
 
     final double dt = 0.02;
 
@@ -75,7 +76,7 @@ class TrajectoryGeneratorTest {
 
   @Test
   void testQuinticCurvatureOptimization() {
-    Trajectory<SplineSample> t =
+    Trajectory<DrivetrainSplineSample> t =
         TrajectoryGenerator.generateTrajectory(
             List.of(
                 new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),

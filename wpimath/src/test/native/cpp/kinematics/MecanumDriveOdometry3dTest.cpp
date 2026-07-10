@@ -110,7 +110,7 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
   wpi::math::MecanumDriveOdometry3d odometry{
       kinematics, wpi::math::Rotation3d{}, wheelPositions};
 
-  wpi::math::SplineTrajectory trajectory =
+  wpi::math::DrivetrainSplineTrajectory trajectory =
       wpi::math::TrajectoryGenerator::GenerateTrajectory(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{3_m, 0_m, -90_deg},
@@ -129,7 +129,7 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
   double errorSum = 0;
 
   while (t < trajectory.Duration()) {
-    wpi::math::SplineSample groundTruthState = trajectory.SampleAt(t);
+    wpi::math::DrivetrainSplineSample groundTruthState = trajectory.SampleAt(t);
 
     auto wheelVelocities =
         kinematics.ToWheelVelocities(groundTruthState.velocity.ToRobotRelative(
@@ -177,7 +177,7 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingXAxis) {
   wpi::math::MecanumDriveOdometry3d odometry{
       kinematics, wpi::math::Rotation3d{}, wheelPositions};
 
-  wpi::math::SplineTrajectory trajectory =
+  wpi::math::DrivetrainSplineTrajectory trajectory =
       wpi::math::TrajectoryGenerator::GenerateTrajectory(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{3_m, 0_m, -90_deg},
@@ -196,7 +196,7 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingXAxis) {
   double errorSum = 0;
 
   while (t < trajectory.Duration()) {
-    wpi::math::SplineSample groundTruthState = trajectory.SampleAt(t);
+    wpi::math::DrivetrainSplineSample groundTruthState = trajectory.SampleAt(t);
 
     auto wheelVelocities = kinematics.ToWheelVelocities(
         {groundTruthState.ForwardVelocity() *

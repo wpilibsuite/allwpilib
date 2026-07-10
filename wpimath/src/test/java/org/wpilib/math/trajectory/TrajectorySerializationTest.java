@@ -21,14 +21,14 @@ class TrajectorySerializationTest {
   // for exact equality (matching SampleJsonTest).
   private static final double kEpsilon = 1e-9;
 
-  <SampleType extends TrajectorySample> void assertTrajectoryEquals(
+  <SampleType extends HolonomicSample> void assertTrajectoryEquals(
       Trajectory<SampleType> expected, Trajectory<SampleType> actual) {
     assertEquals(expected.duration, actual.duration, kEpsilon);
     assertEquals(expected.samples.size(), actual.samples.size());
     for (int i = 0; i < expected.samples.size(); i++) {
-      TrajectorySample e = expected.samples.get(i);
-      TrajectorySample a = actual.samples.get(i);
-      assertEquals(e.timestamp, a.timestamp, kEpsilon);
+      HolonomicSample e = expected.samples.get(i);
+      HolonomicSample a = actual.samples.get(i);
+      assertEquals(e.time, a.time, kEpsilon);
       assertEquals(e.pose.getX(), a.pose.getX(), kEpsilon);
       assertEquals(e.pose.getY(), a.pose.getY(), kEpsilon);
       assertEquals(e.pose.getRotation().getRadians(), a.pose.getRotation().getRadians(), kEpsilon);
@@ -39,8 +39,8 @@ class TrajectorySerializationTest {
       assertEquals(e.acceleration.ay, a.acceleration.ay, kEpsilon);
       assertEquals(e.acceleration.alpha, a.acceleration.alpha, kEpsilon);
       if (e instanceof DifferentialSample de && a instanceof DifferentialSample da) {
-        assertEquals(de.leftSpeed, da.leftSpeed, kEpsilon);
-        assertEquals(de.rightSpeed, da.rightSpeed, kEpsilon);
+        assertEquals(de.leftVelocity, da.leftVelocity, kEpsilon);
+        assertEquals(de.rightVelocity, da.rightVelocity, kEpsilon);
       }
     }
   }
@@ -52,8 +52,8 @@ class TrajectorySerializationTest {
     HolonomicTrajectory trajectory =
         new HolonomicTrajectory(
             TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).getSamples().stream()
-                .map(s -> new TrajectorySample(s.timestamp, s.pose, s.velocity, s.acceleration))
-                .toArray(TrajectorySample[]::new));
+                .map(s -> new HolonomicSample(s.time, s.pose, s.velocity, s.acceleration))
+                .toArray(HolonomicSample[]::new));
 
     try (var os = Files.newOutputStream(tempFile)) {
       Jsonb.instance().type(HolonomicTrajectory.class).toJson(trajectory, os);

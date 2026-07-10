@@ -12,7 +12,7 @@ import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
-import org.wpilib.math.trajectory.SplineSample;
+import org.wpilib.math.trajectory.DrivetrainSplineSample;
 import org.wpilib.math.trajectory.Trajectory;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;
@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
   private final Drivetrain drive = new Drivetrain();
   private final LTVUnicycleController feedback = new LTVUnicycleController(0.020);
   private final Timer timer = new Timer();
-  private final Trajectory<SplineSample> trajectory;
+  private final Trajectory<DrivetrainSplineSample> trajectory;
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
@@ -55,7 +55,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     double elapsed = timer.get();
-    SplineSample reference = trajectory.sampleAt(elapsed);
+    DrivetrainSplineSample reference = trajectory.sampleAt(elapsed);
     ChassisVelocities velocities = feedback.calculate(drive.getPose(), reference);
     drive.drive(velocities.vx, velocities.omega);
   }

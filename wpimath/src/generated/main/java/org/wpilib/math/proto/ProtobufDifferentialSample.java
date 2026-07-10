@@ -24,9 +24,9 @@ public final class ProtobufDifferentialSample extends ProtoMessage<ProtobufDiffe
   private static final long serialVersionUID = 0L;
 
   /**
-   * <code>optional double timestamp = 1;</code>
+   * <code>optional double time = 1;</code>
    */
-  private double timestamp;
+  private double time;
 
   /**
    * <code>optional double left_velocity = 5;</code>
@@ -64,39 +64,39 @@ public final class ProtobufDifferentialSample extends ProtoMessage<ProtobufDiffe
   }
 
   /**
-   * <code>optional double timestamp = 1;</code>
-   * @return whether the timestamp field is set
+   * <code>optional double time = 1;</code>
+   * @return whether the time field is set
    */
-  public boolean hasTimestamp() {
+  public boolean hasTime() {
     return (bitField0_ & 0x00000001) != 0;
   }
 
   /**
-   * <code>optional double timestamp = 1;</code>
+   * <code>optional double time = 1;</code>
    * @return this
    */
-  public ProtobufDifferentialSample clearTimestamp() {
+  public ProtobufDifferentialSample clearTime() {
     bitField0_ &= ~0x00000001;
-    timestamp = 0D;
+    time = 0D;
     return this;
   }
 
   /**
-   * <code>optional double timestamp = 1;</code>
-   * @return the timestamp
+   * <code>optional double time = 1;</code>
+   * @return the time
    */
-  public double getTimestamp() {
-    return timestamp;
+  public double getTime() {
+    return time;
   }
 
   /**
-   * <code>optional double timestamp = 1;</code>
-   * @param value the timestamp to set
+   * <code>optional double time = 1;</code>
+   * @param value the time to set
    * @return this
    */
-  public ProtobufDifferentialSample setTimestamp(final double value) {
+  public ProtobufDifferentialSample setTime(final double value) {
     bitField0_ |= 0x00000001;
-    timestamp = value;
+    time = value;
     return this;
   }
 
@@ -350,7 +350,7 @@ public final class ProtobufDifferentialSample extends ProtoMessage<ProtobufDiffe
     cachedSize = other.cachedSize;
     if ((bitField0_ | other.bitField0_) != 0) {
       bitField0_ = other.bitField0_;
-      timestamp = other.timestamp;
+      time = other.time;
       leftVelocity = other.leftVelocity;
       rightVelocity = other.rightVelocity;
       pose.copyFrom(other.pose);
@@ -366,8 +366,8 @@ public final class ProtobufDifferentialSample extends ProtoMessage<ProtobufDiffe
       return this;
     }
     cachedSize = -1;
-    if (other.hasTimestamp()) {
-      setTimestamp(other.timestamp);
+    if (other.hasTime()) {
+      setTime(other.time);
     }
     if (other.hasLeftVelocity()) {
       setLeftVelocity(other.leftVelocity);
@@ -394,7 +394,7 @@ public final class ProtobufDifferentialSample extends ProtoMessage<ProtobufDiffe
     }
     cachedSize = -1;
     bitField0_ = 0;
-    timestamp = 0D;
+    time = 0D;
     leftVelocity = 0D;
     rightVelocity = 0D;
     pose.clear();
@@ -426,7 +426,7 @@ public final class ProtobufDifferentialSample extends ProtoMessage<ProtobufDiffe
     }
     ProtobufDifferentialSample other = (ProtobufDifferentialSample) o;
     return bitField0_ == other.bitField0_
-      && (!hasTimestamp() || ProtoUtil.isEqual(timestamp, other.timestamp))
+      && (!hasTime() || ProtoUtil.isEqual(time, other.time))
       && (!hasLeftVelocity() || ProtoUtil.isEqual(leftVelocity, other.leftVelocity))
       && (!hasRightVelocity() || ProtoUtil.isEqual(rightVelocity, other.rightVelocity))
       && (!hasPose() || pose.equals(other.pose))
@@ -438,7 +438,7 @@ public final class ProtobufDifferentialSample extends ProtoMessage<ProtobufDiffe
   public void writeTo(final ProtoSink output) throws IOException {
     if ((bitField0_ & 0x00000001) != 0) {
       output.writeRawByte((byte) 9);
-      output.writeDoubleNoTag(timestamp);
+      output.writeDoubleNoTag(time);
     }
     if ((bitField0_ & 0x00000002) != 0) {
       output.writeRawByte((byte) 41);
@@ -494,8 +494,8 @@ public final class ProtobufDifferentialSample extends ProtoMessage<ProtobufDiffe
     while (true) {
       switch (tag) {
         case 9: {
-          // timestamp
-          timestamp = input.readDouble();
+          // time
+          time = input.readDouble();
           bitField0_ |= 0x00000001;
           tag = input.readTag();
           if (tag != 41) {
@@ -565,7 +565,7 @@ public final class ProtobufDifferentialSample extends ProtoMessage<ProtobufDiffe
   public void writeTo(final JsonSink output) throws IOException {
     output.beginObject();
     if ((bitField0_ & 0x00000001) != 0) {
-      output.writeDouble(FieldNames.timestamp, timestamp);
+      output.writeDouble(FieldNames.time, time);
     }
     if ((bitField0_ & 0x00000002) != 0) {
       output.writeDouble(FieldNames.leftVelocity, leftVelocity);
@@ -592,10 +592,10 @@ public final class ProtobufDifferentialSample extends ProtoMessage<ProtobufDiffe
     }
     while (!input.isAtEnd()) {
       switch (input.readFieldHash()) {
-        case 55126294: {
-          if (input.isAtField(FieldNames.timestamp)) {
+        case 3560141: {
+          if (input.isAtField(FieldNames.time)) {
             if (!input.trySkipNullValue()) {
-              timestamp = input.readDouble();
+              time = input.readDouble();
               bitField0_ |= 0x00000001;
             }
           } else {
@@ -720,7 +720,7 @@ public final class ProtobufDifferentialSample extends ProtoMessage<ProtobufDiffe
    * Contains name constants used for serializing JSON
    */
   static class FieldNames {
-    static final FieldName timestamp = FieldName.forField("timestamp");
+    static final FieldName time = FieldName.forField("time");
 
     static final FieldName leftVelocity = FieldName.forField("leftVelocity", "left_velocity");
 

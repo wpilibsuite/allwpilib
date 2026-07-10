@@ -9,18 +9,12 @@
 #include "wpi/util/json.hpp"
 
 void wpi::math::to_json(wpi::util::json& json, const TrajectorySample& sample) {
-  json = wpi::util::json::object("timestamp", sample.timestamp.value(), "pose",
-                                 sample.pose, "velocity", sample.velocity,
-                                 "acceleration", sample.acceleration);
+  json = wpi::util::json::object("time", sample.time.value());
 }
 
 void wpi::math::from_json(const wpi::util::json& json,
                           TrajectorySample& sample) {
-  sample =
-      TrajectorySample{wpi::units::second_t{json.at("timestamp").get_double()},
-                       json.at("pose").get<Pose2d>(),
-                       json.at("velocity").get<ChassisVelocities>(),
-                       json.at("acceleration").get<ChassisAccelerations>()};
+  sample = TrajectorySample{wpi::units::second_t{json.at("time").get_double()}};
 }
 
 void wpi::math::to_json(wpi::util::json& json,

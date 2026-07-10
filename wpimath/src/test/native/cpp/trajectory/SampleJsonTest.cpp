@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/trajectory/DifferentialTrajectory.hpp"
+#include "wpi/math/trajectory/HolonomicSample.hpp"
 #include "wpi/math/trajectory/HolonomicTrajectory.hpp"
 #include "wpi/math/trajectory/TestTrajectory.hpp"
-#include "wpi/math/trajectory/TrajectorySample.hpp"
 #include "wpi/util/json.hpp"
 
 using namespace wpi::math;
@@ -17,16 +17,16 @@ TEST(SampleJsonTest, TestBaseSample) {
   auto splineTrajectory = TestTrajectory::GetTrajectory(config);
 
   for (const auto& splineSample : splineTrajectory.Samples()) {
-    // Convert SplineSample to TrajectorySample
-    TrajectorySample sample{splineSample.timestamp, splineSample.pose,
-                            splineSample.velocity, splineSample.acceleration};
+    // Convert DrivetrainSplineSample to HolonomicSample
+    HolonomicSample sample{splineSample.time, splineSample.pose,
+                           splineSample.velocity, splineSample.acceleration};
 
     wpi::util::json json;
     to_json(json, sample);
 
-    TrajectorySample deserializedSample = json.get<TrajectorySample>();
+    HolonomicSample deserializedSample = json.get<HolonomicSample>();
 
-    EXPECT_EQ(sample.timestamp, deserializedSample.timestamp);
+    EXPECT_EQ(sample.time, deserializedSample.time);
     EXPECT_EQ(sample.pose, deserializedSample.pose);
     EXPECT_EQ(sample.velocity, deserializedSample.velocity);
     EXPECT_EQ(sample.acceleration, deserializedSample.acceleration);
@@ -38,16 +38,16 @@ TEST(SampleJsonTest, TestFromJson) {
   auto splineTrajectory = TestTrajectory::GetTrajectory(config);
 
   for (const auto& splineSample : splineTrajectory.Samples()) {
-    // Convert SplineSample to TrajectorySample
-    TrajectorySample sample{splineSample.timestamp, splineSample.pose,
-                            splineSample.velocity, splineSample.acceleration};
+    // Convert DrivetrainSplineSample to HolonomicSample
+    HolonomicSample sample{splineSample.time, splineSample.pose,
+                           splineSample.velocity, splineSample.acceleration};
 
     wpi::util::json json;
     to_json(json, sample);
 
-    TrajectorySample deserializedSample = json.get<TrajectorySample>();
+    HolonomicSample deserializedSample = json.get<HolonomicSample>();
 
-    EXPECT_EQ(sample.timestamp, deserializedSample.timestamp);
+    EXPECT_EQ(sample.time, deserializedSample.time);
     EXPECT_EQ(sample.pose, deserializedSample.pose);
     EXPECT_EQ(sample.velocity, deserializedSample.velocity);
     EXPECT_EQ(sample.acceleration, deserializedSample.acceleration);
@@ -61,11 +61,11 @@ TEST(SampleJsonTest, TestDifferentialSamples) {
   DifferentialDriveKinematics kinematics{0.5_m};
 
   for (const auto& splineSample : splineTrajectory.Samples()) {
-    // Convert SplineSample to TrajectorySample
-    TrajectorySample trajectorySample{splineSample.timestamp, splineSample.pose,
-                                      splineSample.velocity,
-                                      splineSample.acceleration};
-    // Convert TrajectorySample to DifferentialSample
+    // Convert DrivetrainSplineSample to HolonomicSample
+    HolonomicSample trajectorySample{splineSample.time, splineSample.pose,
+                                     splineSample.velocity,
+                                     splineSample.acceleration};
+    // Convert HolonomicSample to DifferentialSample
     DifferentialSample sample{trajectorySample, kinematics};
 
     wpi::util::json json;
@@ -73,11 +73,11 @@ TEST(SampleJsonTest, TestDifferentialSamples) {
 
     DifferentialSample deserializedSample = json.get<DifferentialSample>();
 
-    EXPECT_EQ(sample.timestamp, deserializedSample.timestamp);
+    EXPECT_EQ(sample.time, deserializedSample.time);
     EXPECT_EQ(sample.pose, deserializedSample.pose);
     EXPECT_EQ(sample.velocity, deserializedSample.velocity);
     EXPECT_EQ(sample.acceleration, deserializedSample.acceleration);
-    EXPECT_EQ(sample.leftSpeed, deserializedSample.leftSpeed);
-    EXPECT_EQ(sample.rightSpeed, deserializedSample.rightSpeed);
+    EXPECT_EQ(sample.leftVelocity, deserializedSample.leftVelocity);
+    EXPECT_EQ(sample.rightVelocity, deserializedSample.rightVelocity);
   }
 }

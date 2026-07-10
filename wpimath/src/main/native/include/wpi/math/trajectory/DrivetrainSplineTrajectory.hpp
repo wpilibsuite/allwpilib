@@ -13,7 +13,7 @@
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
-#include "wpi/math/trajectory/SplineSample.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/util/MathExtras.hpp"
@@ -27,26 +27,31 @@ namespace wpi::math {
  * This trajectory uses constant-acceleration kinematic equations for
  * interpolation between samples.
  */
-class WPILIB_DLLEXPORT SplineTrajectory : public Trajectory<SplineSample> {
+class WPILIB_DLLEXPORT DrivetrainSplineTrajectory
+    : public Trajectory<DrivetrainSplineSample> {
  public:
   /**
-   * Constructs a SplineTrajectory from a vector of samples.
+   * Constructs a DrivetrainSplineTrajectory from a vector of samples.
    *
    * @param samples The samples of the trajectory. Order does not matter as
    *                they will be sorted internally.
    * @throws std::invalid_argument if the vector of samples is empty.
    */
-  explicit SplineTrajectory(std::vector<SplineSample> samples)
-      : Trajectory<SplineSample>(std::move(samples)) {}
+  explicit DrivetrainSplineTrajectory(
+      std::vector<DrivetrainSplineSample> samples)
+      : Trajectory<DrivetrainSplineSample>(std::move(samples)) {}
 
   /**
-   * Constructs a SplineTrajectory from an initializer list of samples.
+   * Constructs a DrivetrainSplineTrajectory from an initializer list of
+   * samples.
    *
    * @param samples The samples of the trajectory. Order does not matter as
    *                they will be sorted internally.
    */
-  SplineTrajectory(std::initializer_list<SplineSample> samples)
-      : Trajectory<SplineSample>(std::vector<SplineSample>(samples)) {}
+  DrivetrainSplineTrajectory(
+      std::initializer_list<DrivetrainSplineSample> samples)
+      : Trajectory<DrivetrainSplineSample>(
+            std::vector<DrivetrainSplineSample>(samples)) {}
 
   /**
    * Interpolates between two samples using constant-acceleration kinematic
@@ -57,8 +62,9 @@ class WPILIB_DLLEXPORT SplineTrajectory : public Trajectory<SplineSample> {
    * @param t The interpolation parameter between 0 and 1.
    * @return The interpolated sample.
    */
-  SplineSample Interpolate(const SplineSample& start, const SplineSample& end,
-                           double t) const final;
+  DrivetrainSplineSample Interpolate(const DrivetrainSplineSample& start,
+                                     const DrivetrainSplineSample& end,
+                                     double t) const final;
 
   /**
    * Transforms all poses in the trajectory by the given transform.
@@ -66,7 +72,7 @@ class WPILIB_DLLEXPORT SplineTrajectory : public Trajectory<SplineSample> {
    * @param transform The transform to apply to the poses.
    * @return The transformed trajectory.
    */
-  SplineTrajectory TransformBy(const Transform2d& transform) const;
+  DrivetrainSplineTrajectory TransformBy(const Transform2d& transform) const;
 
   /**
    * Transforms all poses so they are relative to the given pose.
@@ -74,7 +80,7 @@ class WPILIB_DLLEXPORT SplineTrajectory : public Trajectory<SplineSample> {
    * @param pose The pose to make the trajectory relative to.
    * @return The transformed trajectory.
    */
-  SplineTrajectory RelativeTo(const Pose2d& pose) const;
+  DrivetrainSplineTrajectory RelativeTo(const Pose2d& pose) const;
 
   /**
    * Concatenates another trajectory to this trajectory.
@@ -82,7 +88,8 @@ class WPILIB_DLLEXPORT SplineTrajectory : public Trajectory<SplineSample> {
    * @param other The trajectory to concatenate.
    * @return The concatenated trajectory.
    */
-  SplineTrajectory Concatenate(const SplineTrajectory& other) const;
+  DrivetrainSplineTrajectory Concatenate(
+      const DrivetrainSplineTrajectory& other) const;
 
   /**
    * Concatenates another trajectory to this trajectory.
@@ -90,7 +97,8 @@ class WPILIB_DLLEXPORT SplineTrajectory : public Trajectory<SplineSample> {
    * @param other The trajectory to concatenate.
    * @return The concatenated trajectory.
    */
-  SplineTrajectory operator+(const SplineTrajectory& other) const {
+  DrivetrainSplineTrajectory operator+(
+      const DrivetrainSplineTrajectory& other) const {
     return Concatenate(other);
   }
 };

@@ -32,7 +32,7 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/math/trajectory/SplineTrajectory.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
@@ -63,7 +63,7 @@ class WPILIB_DLLEXPORT TrajectoryParameterizer {
    *
    * @return The spline trajectory.
    */
-  static SplineTrajectory TimeParameterizeTrajectory(
+  static DrivetrainSplineTrajectory TimeParameterizeTrajectory(
       const std::vector<PoseWithCurvature>& points,
       const std::vector<std::unique_ptr<TrajectoryConstraint>>& constraints,
       wpi::units::meters_per_second_t startVelocity,

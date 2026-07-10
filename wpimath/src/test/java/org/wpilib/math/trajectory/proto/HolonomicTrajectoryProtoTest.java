@@ -12,19 +12,19 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.trajectory.HolonomicSample;
 import org.wpilib.math.trajectory.HolonomicTrajectory;
-import org.wpilib.math.trajectory.TrajectorySample;
 
 class HolonomicTrajectoryProtoTest {
   private static final HolonomicTrajectory DATA =
       new HolonomicTrajectory(
           List.of(
-              new TrajectorySample(
+              new HolonomicSample(
                   0.0,
                   Pose2d.kZero,
                   new ChassisVelocities(1.0, 0.0, 0.0),
                   new ChassisAccelerations(0.5, 0.0, 0.0)),
-              new TrajectorySample(
+              new HolonomicSample(
                   1.0,
                   new Pose2d(1.1, 2.2, Rotation2d.fromDegrees(30)),
                   new ChassisVelocities(1.5, 2.0, 0.3),

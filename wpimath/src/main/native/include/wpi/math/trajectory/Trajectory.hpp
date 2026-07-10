@@ -45,19 +45,18 @@ class Trajectory {
           "Trajectory manually initialized with no samples.");
     }
 
-    // Sort samples by timestamp
-    std::sort(samples.begin(), samples.end(), [](const auto& a, const auto& b) {
-      return a.timestamp < b.timestamp;
-    });
+    // Sort samples by time
+    std::sort(samples.begin(), samples.end(),
+              [](const auto& a, const auto& b) { return a.time < b.time; });
 
     m_samples = std::move(samples);
 
     // Build interpolating map
     for (const auto& sample : m_samples) {
-      m_sampleMap[sample.timestamp] = sample;
+      m_sampleMap[sample.time] = sample;
     }
 
-    m_duration = m_samples.back().timestamp;
+    m_duration = m_samples.back().time;
   }
 
   /**
@@ -101,7 +100,7 @@ class Trajectory {
           "Trajectory cannot be sampled if it has no samples.");
     }
 
-    if (t <= m_samples.front().timestamp) {
+    if (t <= m_samples.front().time) {
       return m_samples.front();
     }
     if (t >= m_duration) {
@@ -182,7 +181,7 @@ class Trajectory {
 
   /**
    * Returns the concatenation of this trajectory's samples with another list,
-   * offsetting the other samples' timestamps by this trajectory's duration.
+   * offsetting the other samples' times by this trajectory's duration.
    *
    * @param other The samples to concatenate.
    * @return A vector containing all samples in order.
@@ -193,9 +192,10 @@ class Trajectory {
     out.reserve(m_samples.size() + other.size());
     // copy existing
     out.insert(out.end(), m_samples.begin(), m_samples.end());
-    // append other with timestamp offset
-    for (const auto& s : other) {
-      out.emplace_back(s.WithNewTimestamp(s.timestamp + m_duration));
+    // append other with time offset
+    for (auto s : other) {
+      s.time += m_duration;
+      out.emplace_back(std::move(s));
     }
     return out;
   }

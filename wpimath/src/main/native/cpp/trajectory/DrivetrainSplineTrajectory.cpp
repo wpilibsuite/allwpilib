@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/trajectory/SplineTrajectory.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
 
 #include <cstddef>
 #include <utility>
@@ -10,7 +10,7 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/math/trajectory/SplineSample.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/curvature.hpp"
 #include "wpi/units/math.hpp"
@@ -20,14 +20,14 @@
 
 using namespace wpi::math;
 
-SplineSample SplineTrajectory::Interpolate(const SplineSample& start,
-                                           const SplineSample& end,
-                                           double t) const {
+DrivetrainSplineSample DrivetrainSplineTrajectory::Interpolate(
+    const DrivetrainSplineSample& start, const DrivetrainSplineSample& end,
+    double t) const {
   // Find the new t value.
-  const auto newT = wpi::util::Lerp(start.timestamp, end.timestamp, t);
+  const auto newT = wpi::util::Lerp(start.time, end.time, t);
 
   // Find the delta time between the current state and the interpolated state.
-  const auto deltaT = newT - start.timestamp;
+  const auto deltaT = newT - start.time;
 
   // If delta time is negative, flip the order of interpolation.
   if (deltaT < 0_s) {
@@ -66,10 +66,10 @@ SplineSample SplineTrajectory::Interpolate(const SplineSample& start,
       wpi::util::Lerp(startForwardAccel, end.ForwardAcceleration(), t);
   auto newCurvature = wpi::util::Lerp(start.curvature, end.curvature, t);
 
-  return SplineSample(newT, newPose, newV, newAccel, newCurvature);
+  return DrivetrainSplineSample(newT, newPose, newV, newAccel, newCurvature);
 }
 
-SplineTrajectory SplineTrajectory::TransformBy(
+DrivetrainSplineTrajectory DrivetrainSplineTrajectory::TransformBy(
     const Transform2d& transform) const {
   const Pose2d& firstPose = Start().pose;
   Pose2d transformedFirstPose = firstPose.TransformBy(transform);
@@ -78,32 +78,33 @@ SplineTrajectory SplineTrajectory::TransformBy(
   // field-relative velocities and accelerations rotate by the same amount.
   const Rotation2d& rotation = transform.Rotation();
 
-  std::vector<SplineSample> transformedSamples;
+  std::vector<DrivetrainSplineSample> transformedSamples;
   transformedSamples.reserve(Samples().size());
 
   // Transform first sample
-  transformedSamples.push_back(SplineSample(
-      Start().timestamp, transformedFirstPose,
+  transformedSamples.push_back(DrivetrainSplineSample(
+      Start().time, transformedFirstPose,
       Start().velocity.ToFieldRelative(rotation),
       Start().acceleration.ToFieldRelative(rotation), Start().curvature));
 
   // Transform remaining samples
   for (size_t i = 1; i < Samples().size(); ++i) {
     const auto& sample = Samples()[i];
-    transformedSamples.push_back(SplineSample(
-        sample.timestamp, transformedFirstPose + (sample.pose - firstPose),
+    transformedSamples.push_back(DrivetrainSplineSample(
+        sample.time, transformedFirstPose + (sample.pose - firstPose),
         sample.velocity.ToFieldRelative(rotation),
         sample.acceleration.ToFieldRelative(rotation), sample.curvature));
   }
 
-  return SplineTrajectory(std::move(transformedSamples));
+  return DrivetrainSplineTrajectory(std::move(transformedSamples));
 }
 
-SplineTrajectory SplineTrajectory::RelativeTo(const Pose2d& pose) const {
-  return SplineTrajectory{this->RelativeSamples(pose)};
+DrivetrainSplineTrajectory DrivetrainSplineTrajectory::RelativeTo(
+    const Pose2d& pose) const {
+  return DrivetrainSplineTrajectory{this->RelativeSamples(pose)};
 }
 
-SplineTrajectory SplineTrajectory::Concatenate(
-    const SplineTrajectory& other) const {
-  return SplineTrajectory{this->ConcatenateSamples(other.Samples())};
+DrivetrainSplineTrajectory DrivetrainSplineTrajectory::Concatenate(
+    const DrivetrainSplineTrajectory& other) const {
+  return DrivetrainSplineTrajectory{this->ConcatenateSamples(other.Samples())};
 }

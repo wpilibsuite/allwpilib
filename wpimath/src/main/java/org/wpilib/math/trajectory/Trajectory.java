@@ -50,15 +50,15 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
    */
   @SuppressWarnings({"this-escape"})
   public Trajectory(List<SampleType> samples) {
-    this.samples = samples.stream().sorted(Comparator.comparingDouble(s -> s.timestamp)).toList();
+    this.samples = samples.stream().sorted(Comparator.comparingDouble(s -> s.time)).toList();
 
     this.sampleMap = new InterpolatingTreeMap<>(MathUtil::inverseLerp, this::interpolate);
 
     for (var sample : this.samples) {
-      sampleMap.put(sample.timestamp, sample);
+      sampleMap.put(sample.time, sample);
     }
 
-    this.duration = this.samples.isEmpty() ? 0.0 : this.samples.getLast().timestamp;
+    this.duration = this.samples.isEmpty() ? 0.0 : this.samples.getLast().time;
   }
 
   /**
@@ -100,23 +100,23 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
   }
 
   /**
-   * Gets the sample at the given timestamp.
+   * Gets the sample at the given time.
    *
-   * @param timestamp the time since the beginning of the trajectory to sample.
+   * @param time the time since the beginning of the trajectory to sample.
    * @return the sample at that point in time.
    */
-  public SampleType sampleAt(Time timestamp) {
-    return sampleAt(timestamp.in(Seconds));
+  public SampleType sampleAt(Time time) {
+    return sampleAt(time.in(Seconds));
   }
 
   /**
-   * Gets the sample at the given timestamp.
+   * Gets the sample at the given time.
    *
-   * @param timestamp the time since the beginning of the trajectory to sample, in seconds.
+   * @param time the time since the beginning of the trajectory to sample, in seconds.
    * @return the sample at that point in time.
    */
-  public SampleType sampleAt(double timestamp) {
-    return sampleMap.get(timestamp);
+  public SampleType sampleAt(double time) {
+    return sampleMap.get(time);
   }
 
   /**
@@ -142,8 +142,8 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
   /**
    * Returns a new trajectory that is relative to the given pose. This is useful for converting a
    * field-relative trajectory into a robot-relative trajectory. The returned trajectory will have
-   * the same timestamps, velocities, and accelerations as the original trajectory, but the poses
-   * will be relative to the given pose.
+   * the same times, velocities, and accelerations as the original trajectory, but the poses will be
+   * relative to the given pose.
    *
    * @param other the pose to which the trajectory should be relative. This is typically the robot's
    *     starting pose.

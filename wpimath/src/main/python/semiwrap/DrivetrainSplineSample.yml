@@ -4,21 +4,20 @@ functions:
   from_json:
     ignore: true
 classes:
-  wpi::math::SplineSample:
+  wpi::math::DrivetrainSplineSample:
     force_no_trampoline: true
     attributes:
       curvature:
     methods:
-      SplineSample:
+      DrivetrainSplineSample:
         overloads:
           "":
           ? wpi::units::second_t, const Pose2d&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_squared_t, wpi::units::curvature_t
           :
           wpi::units::second_t, const Pose2d&, const ChassisVelocities&, const ChassisAccelerations&, wpi::units::curvature_t:
-          const TrajectorySample&:
+          const HolonomicSample&:
       ForwardVelocity:
       ForwardAcceleration:
       Transform:
       RelativeTo:
-      WithNewTimestamp:
       operator==:

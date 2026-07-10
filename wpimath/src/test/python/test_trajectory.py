@@ -2,6 +2,7 @@ import math
 
 from wpimath import (
     CubicHermiteSpline,
+    DrivetrainSplineTrajectory,
     Ellipse2d,
     EllipticalRegionConstraint,
     MaxVelocityConstraint,
@@ -10,9 +11,8 @@ from wpimath import (
     RectangularRegionConstraint,
     Rotation2d,
     SplineHelper,
-    TrajectoryConstraint,
-    SplineTrajectory,
     TrajectoryConfig,
+    TrajectoryConstraint,
     TrajectoryGenerator,
     TrajectoryParameterizer,
     Transform2d,
@@ -20,7 +20,7 @@ from wpimath import (
 )
 
 
-def get_test_trajectory(config: TrajectoryConfig) -> SplineTrajectory:
+def get_test_trajectory(config: TrajectoryConfig) -> DrivetrainSplineTrajectory:
     # 2018 cross scale auto waypoints
     side_start = Pose2d.from_feet(1.54, 23.23, Rotation2d.from_degrees(180))
     cross_scale = Pose2d.from_feet(23.7, 6.8, Rotation2d.from_degrees(-160))

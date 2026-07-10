@@ -22,14 +22,14 @@ import org.wpilib.util.struct.StructSerializable;
 
 /** Represents a single sample in a differential drive trajectory. */
 @Json
-public class DifferentialSample extends TrajectorySample implements StructSerializable {
-  /** The left-wheel speed at this sample in meters per second. */
-  @Json.Property("leftSpeed")
-  public final double leftSpeed; // meters per second
+public class DifferentialSample extends HolonomicSample implements StructSerializable {
+  /** The left-wheel velocity at this sample in meters per second. */
+  @Json.Property("leftVelocity")
+  public double leftVelocity; // meters per second
 
-  /** The right-wheel speed at this sample in meters per second. */
-  @Json.Property("rightSpeed")
-  public final double rightSpeed; // meters per second
+  /** The right-wheel velocity at this sample in meters per second. */
+  @Json.Property("rightVelocity")
+  public double rightVelocity; // meters per second
 
   /** Base proto for serialization. */
   public static final DifferentialSampleProto proto = new DifferentialSampleProto();
@@ -40,96 +40,101 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
   /**
    * Constructs a DifferentialSample.
    *
-   * @param timestamp The timestamp of the sample relative to the trajectory start, in seconds.
+   * @param time The time of the sample relative to the trajectory start, in seconds.
    * @param pose The robot pose at this sample (in the field reference frame).
    * @param velocity The robot velocity at this sample (in the field reference frame).
    * @param acceleration The robot acceleration at this sample (in the field reference frame).
-   * @param leftSpeed The left-wheel speed at this sample in meters per second.
-   * @param rightSpeed The right-wheel speed at this sample in meters per second.
+   * @param leftVelocity The left-wheel velocity at this sample in meters per second.
+   * @param rightVelocity The right-wheel velocity at this sample in meters per second.
    */
   @Json.Creator
   public DifferentialSample(
-      double timestamp,
+      double time,
       Pose2d pose,
       ChassisVelocities velocity,
       ChassisAccelerations acceleration,
-      double leftSpeed,
-      double rightSpeed) {
-    super(timestamp, pose, velocity, acceleration);
+      double leftVelocity,
+      double rightVelocity) {
+    super(time, pose, velocity, acceleration);
 
-    this.leftSpeed = leftSpeed;
-    this.rightSpeed = rightSpeed;
+    this.leftVelocity = leftVelocity;
+    this.rightVelocity = rightVelocity;
   }
 
   /**
    * Constructs a DifferentialSample.
    *
-   * @param timestamp The timestamp of the sample relative to the trajectory start.
+   * @param time The time of the sample relative to the trajectory start.
    * @param pose The robot pose at this sample (in the field reference frame).
    * @param velocity The robot velocity at this sample (in the field reference frame).
    * @param acceleration The robot acceleration at this sample (in the field reference frame).
-   * @param leftSpeed The left wheel speed at this sample.
-   * @param rightSpeed The right wheel speed at this sample.
+   * @param leftVelocity The left wheel velocity at this sample.
+   * @param rightVelocity The right wheel velocity at this sample.
    */
   public DifferentialSample(
-      Time timestamp,
+      Time time,
       Pose2d pose,
       ChassisVelocities velocity,
       ChassisAccelerations acceleration,
-      LinearVelocity leftSpeed,
-      LinearVelocity rightSpeed) {
+      LinearVelocity leftVelocity,
+      LinearVelocity rightVelocity) {
     this(
-        timestamp.in(Seconds),
+        time.in(Seconds),
         pose,
         velocity,
         acceleration,
-        leftSpeed.in(MetersPerSecond),
-        rightSpeed.in(MetersPerSecond));
+        leftVelocity.in(MetersPerSecond),
+        rightVelocity.in(MetersPerSecond));
   }
 
   /**
    * Constructs a DifferentialSample.
    *
-   * @param timestamp The timestamp of the sample relative to the trajectory start, in seconds.
+   * @param time The time of the sample relative to the trajectory start, in seconds.
    * @param pose The robot pose at this sample (in the field reference frame).
    * @param velocity The robot velocity at this sample (in the field reference frame).
    * @param acceleration The robot acceleration at this sample (in the field reference frame).
    * @param kinematics The kinematics of the drivetrain.
    */
   public DifferentialSample(
-      double timestamp,
+      double time,
       Pose2d pose,
       ChassisVelocities velocity,
       ChassisAccelerations acceleration,
       DifferentialDriveKinematics kinematics) {
-    super(timestamp, pose, velocity, acceleration);
+    super(time, pose, velocity, acceleration);
 
-    // Wheel speeds are derived from the robot-relative velocity.
-    var wheelSpeeds = kinematics.toWheelVelocities(velocity.toRobotRelative(pose.getRotation()));
-    this.leftSpeed = wheelSpeeds.left;
-    this.rightSpeed = wheelSpeeds.right;
+    // Wheel velocitys are derived from the robot-relative velocity.
+    var wheelVelocitys = kinematics.toWheelVelocities(velocity.toRobotRelative(pose.getRotation()));
+    this.leftVelocity = wheelVelocitys.left;
+    this.rightVelocity = wheelVelocitys.right;
   }
 
   /**
-   * Constructs a DifferentialSample from a TrajectorySample.
+   * Constructs a DifferentialSample from a HolonomicSample.
    *
-   * @param sample The TrajectorySample to copy.
-   * @param leftSpeed The left wheel speed at this sample in meters per second.
-   * @param rightSpeed The right wheel speed at this sample in meters per second.
+   * @param sample The HolonomicSample to copy.
+   * @param leftVelocity The left wheel velocity at this sample in meters per second.
+   * @param rightVelocity The right wheel velocity at this sample in meters per second.
    */
-  public DifferentialSample(TrajectorySample sample, double leftSpeed, double rightSpeed) {
+  public DifferentialSample(HolonomicSample sample, double leftVelocity, double rightVelocity) {
     this(
-        sample.timestamp, sample.pose, sample.velocity, sample.acceleration, leftSpeed, rightSpeed);
+        sample.time,
+        sample.pose,
+        sample.velocity,
+        sample.acceleration,
+        leftVelocity,
+        rightVelocity);
   }
 
   /**
-   * Constructs a DifferentialSample from a TrajectorySample.
+   * Constructs a DifferentialSample from a HolonomicSample.
    *
-   * @param sample The TrajectorySample to copy.
+   * @param sample The HolonomicSample to copy.
    * @param kinematics The kinematics of the drivetrain.
    */
-  public DifferentialSample(TrajectorySample sample, DifferentialDriveKinematics kinematics) {
-    this(sample.timestamp, sample.pose, sample.velocity, sample.acceleration, kinematics);
+  public DifferentialSample(HolonomicSample sample, DifferentialDriveKinematics kinematics) {
+    this(sample.time, sample.pose, sample.velocity, sample.acceleration, kinematics);
   }
 
   @Override
@@ -139,13 +144,13 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
     }
 
     DifferentialSample that = (DifferentialSample) o;
-    return Double.compare(leftSpeed, that.leftSpeed) == 0
-        && Double.compare(rightSpeed, that.rightSpeed) == 0;
+    return Double.compare(leftVelocity, that.leftVelocity) == 0
+        && Double.compare(rightVelocity, that.rightVelocity) == 0;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(timestamp, pose, velocity, acceleration, leftSpeed, rightSpeed);
+    return Objects.hash(time, pose, velocity, acceleration, leftVelocity, rightVelocity);
   }
 
   /**
@@ -157,12 +162,12 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
   @Override
   public DifferentialSample transform(Transform2d transform) {
     return new DifferentialSample(
-        timestamp,
+        time,
         pose.transformBy(transform),
         velocity.toFieldRelative(transform.getRotation()),
         acceleration.toFieldRelative(transform.getRotation()),
-        leftSpeed,
-        rightSpeed);
+        leftVelocity,
+        rightVelocity);
   }
 
   /**
@@ -174,22 +179,11 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
   @Override
   public DifferentialSample relativeTo(Pose2d other) {
     return new DifferentialSample(
-        timestamp,
+        time,
         pose.relativeTo(other),
         velocity.toRobotRelative(other.getRotation()),
         acceleration.toRobotRelative(other.getRotation()),
-        leftSpeed,
-        rightSpeed);
-  }
-
-  /**
-   * Creates a new sample with the given timestamp.
-   *
-   * @param timestamp The new timestamp, in seconds.
-   * @return A new sample with the given timestamp.
-   */
-  @Override
-  public DifferentialSample withNewTimestamp(double timestamp) {
-    return new DifferentialSample(timestamp, pose, velocity, acceleration, leftSpeed, rightSpeed);
+        leftVelocity,
+        rightVelocity);
   }
 }

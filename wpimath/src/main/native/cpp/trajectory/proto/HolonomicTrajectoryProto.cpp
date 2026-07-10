@@ -6,13 +6,13 @@
 
 #include <utility>
 
-#include "wpi/math/trajectory/proto/TrajectorySampleProto.hpp"
+#include "wpi/math/trajectory/proto/HolonomicSampleProto.hpp"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 #include "wpimath/protobuf/trajectory.npb.h"
 
 std::optional<wpi::math::HolonomicTrajectory> wpi::util::Protobuf<
     wpi::math::HolonomicTrajectory>::Unpack(InputStream& stream) {
-  wpi::util::StdVectorUnpackCallback<wpi::math::TrajectorySample, SIZE_MAX>
+  wpi::util::StdVectorUnpackCallback<wpi::math::HolonomicSample, SIZE_MAX>
       samples;
   wpi_proto_ProtobufHolonomicTrajectory msg{
       .samples = samples.Callback(),
@@ -26,7 +26,7 @@ std::optional<wpi::math::HolonomicTrajectory> wpi::util::Protobuf<
 
 bool wpi::util::Protobuf<wpi::math::HolonomicTrajectory>::Pack(
     OutputStream& stream, const wpi::math::HolonomicTrajectory& value) {
-  wpi::util::PackCallback<wpi::math::TrajectorySample> samples{value.Samples()};
+  wpi::util::PackCallback<wpi::math::HolonomicSample> samples{value.Samples()};
   wpi_proto_ProtobufHolonomicTrajectory msg{
       .samples = samples.Callback(),
   };

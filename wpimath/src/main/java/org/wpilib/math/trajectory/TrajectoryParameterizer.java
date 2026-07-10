@@ -54,7 +54,7 @@ public final class TrajectoryParameterizer {
    *     from a -&gt; b -&gt; ... -&gt; z as defined in the waypoints.
    * @return The trajectory.
    */
-  public static SplineTrajectory timeParameterizeTrajectory(
+  public static DrivetrainSplineTrajectory timeParameterizeTrajectory(
       List<PoseWithCurvature> points,
       List<TrajectoryConstraint> constraints,
       double startVelocity,
@@ -250,12 +250,12 @@ public final class TrajectoryParameterizer {
     // Build the samples. A sample's acceleration is the acceleration on the
     // segment leaving it (segAccel[i + 1]); the final sample reuses its incoming
     // segment's acceleration.
-    var states = new ArrayList<SplineSample>(numStates);
+    var states = new ArrayList<DrivetrainSplineSample>(numStates);
     for (int i = 0; i < numStates; i++) {
       final var state = constrainedStates.get(i);
       double accel = i < numStates - 1 ? segAccel[i + 1] : segAccel[i];
       states.add(
-          new SplineSample(
+          new DrivetrainSplineSample(
               times[i],
               state.pose.pose,
               reversed ? -velocities[i] : velocities[i],
@@ -263,7 +263,7 @@ public final class TrajectoryParameterizer {
               state.pose.curvature));
     }
 
-    return new SplineTrajectory(states);
+    return new DrivetrainSplineTrajectory(states);
   }
 
   private static void enforceAccelerationLimits(

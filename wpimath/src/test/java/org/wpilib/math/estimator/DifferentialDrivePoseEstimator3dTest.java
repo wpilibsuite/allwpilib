@@ -24,7 +24,7 @@ import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.trajectory.SplineSample;
+import org.wpilib.math.trajectory.DrivetrainSplineSample;
 import org.wpilib.math.trajectory.Trajectory;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;
@@ -126,9 +126,9 @@ class DifferentialDrivePoseEstimator3dTest {
   void testFollowTrajectory(
       final DifferentialDriveKinematics kinematics,
       final DifferentialDrivePoseEstimator3d estimator,
-      final Trajectory<SplineSample> trajectory,
-      final Function<SplineSample, ChassisVelocities> chassisVelocitiesGenerator,
-      final Function<SplineSample, Pose2d> visionMeasurementGenerator,
+      final Trajectory<DrivetrainSplineSample> trajectory,
+      final Function<DrivetrainSplineSample, ChassisVelocities> chassisVelocitiesGenerator,
+      final Function<DrivetrainSplineSample, Pose2d> visionMeasurementGenerator,
       final Pose2d startingPose,
       final Pose2d endingPose,
       final double dt,

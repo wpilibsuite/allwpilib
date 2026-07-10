@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "wpi/math/spline/SplineParameterizer.hpp"
-#include "wpi/math/trajectory/SplineTrajectory.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
@@ -35,7 +35,7 @@ class WPILIB_DLLEXPORT TrajectoryGenerator {
    * @param config            The configuration for the trajectory.
    * @return The generated spline trajectory.
    */
-  static SplineTrajectory GenerateTrajectory(
+  static DrivetrainSplineTrajectory GenerateTrajectory(
       Spline<3>::ControlVector initial,
       const std::vector<Translation2d>& interiorWaypoints,
       Spline<3>::ControlVector end, const TrajectoryConfig& config);
@@ -53,7 +53,7 @@ class WPILIB_DLLEXPORT TrajectoryGenerator {
    * @param config            The configuration for the trajectory.
    * @return The generated spline trajectory.
    */
-  static SplineTrajectory GenerateTrajectory(
+  static DrivetrainSplineTrajectory GenerateTrajectory(
       const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
       const Pose2d& end, const TrajectoryConfig& config);
 
@@ -67,7 +67,7 @@ class WPILIB_DLLEXPORT TrajectoryGenerator {
    * @param config         The configuration for the trajectory.
    * @return The generated spline trajectory.
    */
-  static SplineTrajectory GenerateTrajectory(
+  static DrivetrainSplineTrajectory GenerateTrajectory(
       std::vector<Spline<5>::ControlVector> controlVectors,
       const TrajectoryConfig& config);
 
@@ -81,7 +81,7 @@ class WPILIB_DLLEXPORT TrajectoryGenerator {
    * @param config    The configuration for the trajectory.
    * @return The generated spline trajectory.
    */
-  static SplineTrajectory GenerateTrajectory(
+  static DrivetrainSplineTrajectory GenerateTrajectory(
       const std::vector<Pose2d>& waypoints, const TrajectoryConfig& config);
 
   /**
@@ -124,7 +124,7 @@ class WPILIB_DLLEXPORT TrajectoryGenerator {
  private:
   static void ReportError(const char* error);
 
-  static const SplineTrajectory kDoNothingTrajectory;
+  static const DrivetrainSplineTrajectory kDoNothingTrajectory;
   static std::function<void(const char*)> s_errorFunc;
 };
 }  // namespace wpi::math

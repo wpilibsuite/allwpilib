@@ -18,10 +18,10 @@ TEST(TrajectorySerializationTest, TestJsonSerialization) {
   TrajectoryConfig config{12_fps, 12_fps_sq};
   auto splineTrajectory = TestTrajectory::GetTrajectory(config);
 
-  // Convert SplineTrajectory to HolonomicTrajectory
-  std::vector<TrajectorySample> samples;
+  // Convert DrivetrainSplineTrajectory to HolonomicTrajectory
+  std::vector<HolonomicSample> samples;
   for (const auto& splineSample : splineTrajectory.Samples()) {
-    samples.emplace_back(splineSample.timestamp, splineSample.pose,
+    samples.emplace_back(splineSample.time, splineSample.pose,
                          splineSample.velocity, splineSample.acceleration);
   }
   HolonomicTrajectory trajectory{std::move(samples)};
@@ -31,7 +31,7 @@ TEST(TrajectorySerializationTest, TestJsonSerialization) {
   to_json(json, trajectory);
 
   // Deserialize from JSON
-  auto samples_out = json.at("samples").get<std::vector<TrajectorySample>>();
+  auto samples_out = json.at("samples").get<std::vector<HolonomicSample>>();
   HolonomicTrajectory deserializedTrajectory{std::move(samples_out)};
 
   // Verify they are equal
@@ -43,7 +43,7 @@ TEST(TrajectorySerializationTest, TestJsonSerialization) {
     const auto& original = trajectory.Samples()[i];
     const auto& deserialized = deserializedTrajectory.Samples()[i];
 
-    EXPECT_EQ(original.timestamp, deserialized.timestamp);
+    EXPECT_EQ(original.time, deserialized.time);
     EXPECT_EQ(original.pose, deserialized.pose);
     EXPECT_EQ(original.velocity, deserialized.velocity);
     EXPECT_EQ(original.acceleration, deserialized.acceleration);
@@ -57,10 +57,10 @@ TEST(TrajectorySerializationTest, TestDifferentialSerialization) {
   DifferentialDriveKinematics kinematics{0.5_m};
   std::vector<DifferentialSample> samples;
   for (const auto& splineSample : splineTrajectory.Samples()) {
-    TrajectorySample trajectorySample{splineSample.timestamp, splineSample.pose,
-                                      splineSample.velocity,
-                                      splineSample.acceleration};
-    samples.emplace_back(trajectorySample, kinematics);
+    HolonomicSample holonomicSample{splineSample.time, splineSample.pose,
+                                    splineSample.velocity,
+                                    splineSample.acceleration};
+    samples.emplace_back(holonomicSample, kinematics);
   }
 
   DifferentialTrajectory trajectory{std::move(samples)};
@@ -82,11 +82,11 @@ TEST(TrajectorySerializationTest, TestDifferentialSerialization) {
     const auto& original = trajectory.Samples()[i];
     const auto& deserialized = deserializedTrajectory.Samples()[i];
 
-    EXPECT_EQ(original.timestamp, deserialized.timestamp);
+    EXPECT_EQ(original.time, deserialized.time);
     EXPECT_EQ(original.pose, deserialized.pose);
     EXPECT_EQ(original.velocity, deserialized.velocity);
     EXPECT_EQ(original.acceleration, deserialized.acceleration);
-    EXPECT_EQ(original.leftSpeed, deserialized.leftSpeed);
-    EXPECT_EQ(original.rightSpeed, deserialized.rightSpeed);
+    EXPECT_EQ(original.leftVelocity, deserialized.leftVelocity);
+    EXPECT_EQ(original.rightVelocity, deserialized.rightVelocity);
   }
 }
