@@ -63,6 +63,9 @@ uint64_t GetMonotonicTime() {
   uint64_t curTime = programPauseTime;
   if (curTime == 0) {
     curTime = wpi::util::NowDefault();
+    if (programStartTime == 0) {
+      programStartTime = curTime;
+    }
   }
   return curTime + programStepTime - programStartTime;
 }
