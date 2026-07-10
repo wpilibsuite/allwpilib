@@ -18,7 +18,7 @@ import org.wpilib.math.trajectory.proto.HolonomicTrajectoryProto;
 
 /** A base trajectory class for general-purpose trajectory following. */
 @Json
-public class HolonomicTrajectory extends Trajectory<TrajectorySample> {
+public class HolonomicTrajectory extends Trajectory<HolonomicSample> {
   /** Base proto for serialization. */
   public static final HolonomicTrajectoryProto proto = new HolonomicTrajectoryProto();
 
@@ -29,7 +29,7 @@ public class HolonomicTrajectory extends Trajectory<TrajectorySample> {
    *     internally.
    */
   @Json.Creator
-  public HolonomicTrajectory(List<TrajectorySample> samples) {
+  public HolonomicTrajectory(List<HolonomicSample> samples) {
     super(samples);
   }
 
@@ -39,7 +39,7 @@ public class HolonomicTrajectory extends Trajectory<TrajectorySample> {
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
    */
-  public HolonomicTrajectory(TrajectorySample[] samples) {
+  public HolonomicTrajectory(HolonomicSample[] samples) {
     super(samples);
   }
 
@@ -52,8 +52,8 @@ public class HolonomicTrajectory extends Trajectory<TrajectorySample> {
    * @return The interpolated sample.
    */
   @Override
-  public TrajectorySample interpolate(TrajectorySample start, TrajectorySample end, double t) {
-    return TrajectorySample.kinematicInterpolate(start, end, t);
+  public HolonomicSample interpolate(HolonomicSample start, HolonomicSample end, double t) {
+    return HolonomicSample.kinematicInterpolate(start, end, t);
   }
 
   /**
@@ -67,17 +67,17 @@ public class HolonomicTrajectory extends Trajectory<TrajectorySample> {
     Pose2d firstPose = start().pose;
     Pose2d transformedFirstPose = firstPose.transformBy(transform);
 
-    TrajectorySample transformedFirstSample =
-        new TrajectorySample(
-            start().timestamp, transformedFirstPose, start().velocity, start().acceleration);
+    HolonomicSample transformedFirstSample =
+        new HolonomicSample(
+            start().time, transformedFirstPose, start().velocity, start().acceleration);
 
-    Stream<TrajectorySample> transformedSamples =
+    Stream<HolonomicSample> transformedSamples =
         samples.stream()
             .skip(1)
             .map(
                 sample ->
-                    new TrajectorySample(
-                        sample.timestamp,
+                    new HolonomicSample(
+                        sample.time,
                         transformedFirstPose.plus(sample.pose.minus(firstPose)),
                         sample.velocity,
                         sample.acceleration));
@@ -93,15 +93,19 @@ public class HolonomicTrajectory extends Trajectory<TrajectorySample> {
    * @return a new trajectory that is the concatenation of this trajectory and the other trajectory.
    */
   @Override
-  public HolonomicTrajectory concatenate(Trajectory<TrajectorySample> other) {
+  public HolonomicTrajectory concatenate(Trajectory<HolonomicSample> other) {
     if (other.samples.isEmpty()) {
       return this;
     }
 
-    var withNewTimestamp =
-        other.samples.stream().map(s -> s.withNewTimestamp(s.timestamp + this.duration));
+    var timeShifted =
+        other.samples.stream()
+            .map(
+                s ->
+                    new HolonomicSample(
+                        s.time + this.duration, s.pose, s.velocity, s.acceleration));
 
-    return new HolonomicTrajectory(Stream.concat(samples.stream(), withNewTimestamp).toList());
+    return new HolonomicTrajectory(Stream.concat(samples.stream(), timeShifted).toList());
   }
 
   /**

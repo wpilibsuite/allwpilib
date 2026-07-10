@@ -1,6 +1,6 @@
 extra_includes:
 - wpi/math/trajectory/DifferentialTrajectory.hpp
-- wpi/math/trajectory/SplineTrajectory.hpp
+- wpi/math/trajectory/DrivetrainSplineTrajectory.hpp
 - wpi/math/trajectory/HolonomicTrajectory.hpp
 - wpi/math/trajectory/Trajectory.hpp
 
@@ -22,9 +22,9 @@ classes:
             ignore: true
       SetTrajectory:
         template_impls:
-        - [wpi::math::SplineSample]
         - [wpi::math::DifferentialSample]
-        - [wpi::math::TrajectorySample]
+        - [wpi::math::DrivetrainSplineSample]
+        - [wpi::math::HolonomicSample]
       GetPoses:
         overloads:
           '[const]':

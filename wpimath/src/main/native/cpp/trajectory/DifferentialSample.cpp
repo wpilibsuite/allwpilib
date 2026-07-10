@@ -10,21 +10,22 @@
 
 void wpi::math::to_json(wpi::util::json& json,
                         const DifferentialSample& sample) {
-  json = wpi::util::json::object(
-      "timestamp", sample.timestamp.value(), "pose", sample.pose, "velocity",
-      sample.velocity, "acceleration", sample.acceleration, "leftSpeed",
-      sample.leftSpeed.value(), "rightSpeed", sample.rightSpeed.value());
+  json = wpi::util::json::object("time", sample.time.value(), "pose",
+                                 sample.pose, "velocity", sample.velocity,
+                                 "acceleration", sample.acceleration,
+                                 "leftVelocity", sample.leftVelocity.value(),
+                                 "rightVelocity", sample.rightVelocity.value());
 }
 
 void wpi::math::from_json(const wpi::util::json& json,
                           DifferentialSample& sample) {
   sample = DifferentialSample{
-      wpi::units::second_t{json.at("timestamp").get_double()},
+      wpi::units::second_t{json.at("time").get_double()},
       json.at("pose").get<Pose2d>(),
       json.at("velocity").get<ChassisVelocities>(),
       json.at("acceleration").get<ChassisAccelerations>(),
-      wpi::units::meters_per_second_t{json.at("leftSpeed").get_double()},
-      wpi::units::meters_per_second_t{json.at("rightSpeed").get_double()}};
+      wpi::units::meters_per_second_t{json.at("leftVelocity").get_double()},
+      wpi::units::meters_per_second_t{json.at("rightVelocity").get_double()}};
 }
 
 void wpi::math::to_json(wpi::util::json& json,

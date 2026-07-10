@@ -11,8 +11,8 @@
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
 void TestSameShapedTrajectory(
-    const std::vector<wpi::math::SplineSample>& statesA,
-    const std::vector<wpi::math::SplineSample>& statesB) {
+    const std::vector<wpi::math::DrivetrainSplineSample>& statesA,
+    const std::vector<wpi::math::DrivetrainSplineSample>& statesB) {
   for (unsigned int i = 0; i < statesA.size() - 1; i++) {
     auto a1 = statesA[i].pose;
     auto a2 = statesA[i + 1].pose;
@@ -35,8 +35,8 @@ void TestSameShapedTrajectory(
 // scalars (and curvature) are invariant. This would fail if
 // TransformBy/RelativeTo rotated the pose but not the velocity/acceleration.
 void TestSameForwardScalars(
-    const std::vector<wpi::math::SplineSample>& statesA,
-    const std::vector<wpi::math::SplineSample>& statesB) {
+    const std::vector<wpi::math::DrivetrainSplineSample>& statesA,
+    const std::vector<wpi::math::DrivetrainSplineSample>& statesB) {
   ASSERT_EQ(statesA.size(), statesB.size());
   for (unsigned int i = 0; i < statesA.size(); i++) {
     EXPECT_NEAR(statesA[i].ForwardVelocity().value(),

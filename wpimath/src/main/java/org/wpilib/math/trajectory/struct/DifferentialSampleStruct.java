@@ -9,7 +9,7 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.trajectory.DifferentialSample;
-import org.wpilib.math.trajectory.TrajectorySample;
+import org.wpilib.math.trajectory.HolonomicSample;
 import org.wpilib.util.struct.Struct;
 
 public class DifferentialSampleStruct implements Struct<DifferentialSample> {
@@ -25,37 +25,37 @@ public class DifferentialSampleStruct implements Struct<DifferentialSample> {
 
   @Override
   public int getSize() {
-    return TrajectorySample.struct.getSize() + DOUBLE_SIZE + DOUBLE_SIZE;
+    return HolonomicSample.struct.getSize() + DOUBLE_SIZE + DOUBLE_SIZE;
   }
 
   @Override
   public String getSchema() {
-    return TrajectorySample.struct.getSchema() + ";double leftSpeed;double rightSpeed";
+    return HolonomicSample.struct.getSchema() + ";double leftVelocity;double rightVelocity";
   }
 
   @Override
   public Struct<?>[] getNested() {
-    return new Struct<?>[] {TrajectorySample.struct};
+    return new Struct<?>[] {HolonomicSample.struct};
   }
 
   @Override
   public DifferentialSample unpack(ByteBuffer bb) {
-    double timestamp = bb.getDouble();
+    double time = bb.getDouble();
     Pose2d pose = Pose2d.struct.unpack(bb);
     ChassisVelocities vel = ChassisVelocities.struct.unpack(bb);
     ChassisAccelerations accel = ChassisAccelerations.struct.unpack(bb);
-    double leftSpeed = bb.getDouble();
-    double rightSpeed = bb.getDouble();
-    return new DifferentialSample(timestamp, pose, vel, accel, leftSpeed, rightSpeed);
+    double leftVelocity = bb.getDouble();
+    double rightVelocity = bb.getDouble();
+    return new DifferentialSample(time, pose, vel, accel, leftVelocity, rightVelocity);
   }
 
   @Override
   public void pack(ByteBuffer bb, DifferentialSample value) {
-    bb.putDouble(value.timestamp);
+    bb.putDouble(value.time);
     Pose2d.struct.pack(bb, value.pose);
     ChassisVelocities.struct.pack(bb, value.velocity);
     ChassisAccelerations.struct.pack(bb, value.acceleration);
-    bb.putDouble(value.leftSpeed);
-    bb.putDouble(value.rightSpeed);
+    bb.putDouble(value.leftVelocity);
+    bb.putDouble(value.rightVelocity);
   }
 }

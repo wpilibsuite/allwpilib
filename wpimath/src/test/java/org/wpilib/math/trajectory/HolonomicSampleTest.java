@@ -17,25 +17,25 @@ import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.util.MathUtil;
 
-class TrajectorySampleTest {
+class HolonomicSampleTest {
   private static final double EPSILON = 1e-9;
 
   @Test
   void testKinematicInterpolateAtStart() {
     var start =
-        new TrajectorySample(
+        new HolonomicSample(
             0, Pose2d.kZero, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
 
     var end =
-        new TrajectorySample(
+        new HolonomicSample(
             1,
             new Pose2d(1, 0, Rotation2d.kZero),
             new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations());
 
-    var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0);
+    var interpolated = HolonomicSample.kinematicInterpolate(start, end, 0);
 
-    assertEquals(start.timestamp, interpolated.timestamp);
+    assertEquals(start.time, interpolated.time);
     assertEquals(start.pose, interpolated.pose);
     assertEquals(start.velocity, interpolated.velocity);
     assertEquals(start.acceleration, interpolated.acceleration);
@@ -44,19 +44,19 @@ class TrajectorySampleTest {
   @Test
   void testKinematicInterpolateAtEnd() {
     var start =
-        new TrajectorySample(
+        new HolonomicSample(
             0, Pose2d.kZero, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
 
     var end =
-        new TrajectorySample(
+        new HolonomicSample(
             1,
             new Pose2d(1, 0, Rotation2d.kZero),
             new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations());
 
-    var interpolated = TrajectorySample.kinematicInterpolate(start, end, 1);
+    var interpolated = HolonomicSample.kinematicInterpolate(start, end, 1);
 
-    assertEquals(end.timestamp, interpolated.timestamp);
+    assertEquals(end.time, interpolated.time);
     assertEquals(end.pose, interpolated.pose);
     assertEquals(end.velocity, interpolated.velocity);
     assertEquals(end.acceleration, interpolated.acceleration);
@@ -65,28 +65,28 @@ class TrajectorySampleTest {
   @Test
   void testKinematicInterpolateMidpoint() {
     var start =
-        new TrajectorySample(
+        new HolonomicSample(
             0,
             Pose2d.kZero,
             new ChassisVelocities(1, 0, 0),
             new ChassisAccelerations(0.2, 0.0, 0.0));
 
     var end =
-        new TrajectorySample(
+        new HolonomicSample(
             2,
             new Pose2d(2, 0, Rotation2d.kZero),
             new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations(0.6, 0.0, 0.0));
 
-    var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
+    var interpolated = HolonomicSample.kinematicInterpolate(start, end, 0.5);
 
-    // Expected timestamp at midpoint
+    // Expected time at midpoint
     double expectedTimestamp = 0 + (2 - 0) * 0.5;
-    assertEquals(expectedTimestamp, interpolated.timestamp, EPSILON);
+    assertEquals(expectedTimestamp, interpolated.time, EPSILON);
 
     // Using constant-acceleration kinematic equations with start's accelerations
-    // deltaT = expectedTimestamp - start.timestamp = 1.0
-    double deltaT = expectedTimestamp - start.timestamp;
+    // deltaT = expectedTimestamp - start.time = 1.0
+    double deltaT = expectedTimestamp - start.time;
 
     // xₖ₊₁ = xₖ + vₖΔt + ½a(Δt)²
     double expectedX =
@@ -117,27 +117,27 @@ class TrajectorySampleTest {
   @Test
   void testKinematicInterpolateWithAcceleration() {
     var start =
-        new TrajectorySample(
+        new HolonomicSample(
             0,
             Pose2d.kZero,
             new ChassisVelocities(0, 0, 0),
             new ChassisAccelerations(1.0, 0, 0)); // 1 m/s²
 
     var end =
-        new TrajectorySample(
+        new HolonomicSample(
             1,
             new Pose2d(0.5, 0, Rotation2d.kZero),
             new ChassisVelocities(1, 0, 0),
             new ChassisAccelerations());
 
-    var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
+    var interpolated = HolonomicSample.kinematicInterpolate(start, end, 0.5);
 
-    // Expected timestamp
+    // Expected time
     double expectedTimestamp = 0 + (1 - 0) * 0.5;
-    assertEquals(expectedTimestamp, interpolated.timestamp, EPSILON);
+    assertEquals(expectedTimestamp, interpolated.time, EPSILON);
 
     // Constant-acceleration kinematics from start with deltaT = 0.5
-    double deltaT = expectedTimestamp - start.timestamp;
+    double deltaT = expectedTimestamp - start.time;
 
     // xₖ₊₁ = xₖ + vₖΔt + ½a(Δt)² = 0 + 0*0.5 + ½*1.0*0.25 = 0.125
     double expectedX =
@@ -159,26 +159,26 @@ class TrajectorySampleTest {
   @Test
   void testKinematicInterpolateAngularVelocity() {
     var start =
-        new TrajectorySample(
+        new HolonomicSample(
             0,
             Pose2d.kZero,
             new ChassisVelocities(1, 0, 0),
             new ChassisAccelerations(0.0, 0.0, 0.1));
 
     var end =
-        new TrajectorySample(
+        new HolonomicSample(
             1,
             new Pose2d(1, 0, Rotation2d.fromDegrees(90)),
             new ChassisVelocities(1, 0, Math.PI / 2),
             new ChassisAccelerations(0.0, 0.0, 0.5));
 
-    var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
+    var interpolated = HolonomicSample.kinematicInterpolate(start, end, 0.5);
 
-    // Expected timestamp
+    // Expected time
     double expectedTimestamp = 0 + (1 - 0) * 0.5;
-    assertEquals(expectedTimestamp, interpolated.timestamp, EPSILON);
+    assertEquals(expectedTimestamp, interpolated.time, EPSILON);
 
-    double deltaT = expectedTimestamp - start.timestamp;
+    double deltaT = expectedTimestamp - start.time;
 
     // θₖ₊₁ = θₖ + ωₖΔt + ½α(Δt)²
     double expectedTheta =
@@ -200,44 +200,44 @@ class TrajectorySampleTest {
   @Test
   void testKinematicInterpolateMultipleQuarters() {
     var start =
-        new TrajectorySample(
+        new HolonomicSample(
             0,
             Pose2d.kZero,
             new ChassisVelocities(1, 0, 0),
             new ChassisAccelerations(0.2, 0.0, 0.0));
 
     var end =
-        new TrajectorySample(
+        new HolonomicSample(
             2,
             new Pose2d(2, 0, Rotation2d.kZero),
             new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations(0.4, 0.0, 0.0));
 
     // Test at 0.25
-    var q1 = TrajectorySample.kinematicInterpolate(start, end, 0.25);
+    var q1 = HolonomicSample.kinematicInterpolate(start, end, 0.25);
     double expectedT1 = 0 + (2 - 0) * 0.25;
-    double deltaT1 = expectedT1 - start.timestamp;
+    double deltaT1 = expectedT1 - start.time;
     double expectedX1 =
         start.pose.getX()
             + start.velocity.vx * deltaT1
             + 0.5 * start.acceleration.ax * deltaT1 * deltaT1;
     double expectedVx1 = start.velocity.vx + start.acceleration.ax * deltaT1;
 
-    assertEquals(expectedT1, q1.timestamp, EPSILON);
+    assertEquals(expectedT1, q1.time, EPSILON);
     assertEquals(expectedX1, q1.pose.getX(), EPSILON);
     assertEquals(expectedVx1, q1.velocity.vx, EPSILON);
 
     // Test at 0.75
-    var q3 = TrajectorySample.kinematicInterpolate(start, end, 0.75);
+    var q3 = HolonomicSample.kinematicInterpolate(start, end, 0.75);
     double expectedT3 = 0 + (2 - 0) * 0.75;
-    double deltaT3 = expectedT3 - start.timestamp;
+    double deltaT3 = expectedT3 - start.time;
     double expectedX3 =
         start.pose.getX()
             + start.velocity.vx * deltaT3
             + 0.5 * start.acceleration.ax * deltaT3 * deltaT3;
     double expectedVx3 = start.velocity.vx + start.acceleration.ax * deltaT3;
 
-    assertEquals(expectedT3, q3.timestamp, EPSILON);
+    assertEquals(expectedT3, q3.time, EPSILON);
     assertEquals(expectedX3, q3.pose.getX(), EPSILON);
     assertEquals(expectedVx3, q3.velocity.vx, EPSILON);
   }
@@ -245,27 +245,27 @@ class TrajectorySampleTest {
   @Test
   void testKinematicInterpolateNegativeVelocity() {
     var start =
-        new TrajectorySample(
+        new HolonomicSample(
             0,
             new Pose2d(1, 0, Rotation2d.kZero),
             new ChassisVelocities(-1, 0, 0),
             new ChassisAccelerations(-0.5, 0.0, 0.0));
 
     var end =
-        new TrajectorySample(
+        new HolonomicSample(
             1,
             new Pose2d(0, 0, Rotation2d.kZero),
             new ChassisVelocities(-2, 0, 0),
             new ChassisAccelerations());
 
-    var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
+    var interpolated = HolonomicSample.kinematicInterpolate(start, end, 0.5);
 
-    // Expected timestamp
+    // Expected time
     double expectedTimestamp = 0 + (1 - 0) * 0.5;
-    assertEquals(expectedTimestamp, interpolated.timestamp, EPSILON);
+    assertEquals(expectedTimestamp, interpolated.time, EPSILON);
 
     // Constant-acceleration kinematics from start
-    double deltaT = expectedTimestamp - start.timestamp;
+    double deltaT = expectedTimestamp - start.time;
 
     // xₖ₊₁ = xₖ + vₖΔt + ½a(Δt)² = 1 + (-1)*0.5 + 0 = 0.5
     double expectedX =
@@ -279,27 +279,27 @@ class TrajectorySampleTest {
   @Test
   void testKinematicInterpolateLateral() {
     var start =
-        new TrajectorySample(
+        new HolonomicSample(
             0,
             Pose2d.kZero,
             new ChassisVelocities(0, 1, 0),
             new ChassisAccelerations(0.0, 0.2, 0.0));
 
     var end =
-        new TrajectorySample(
+        new HolonomicSample(
             1,
             new Pose2d(0, 1, Rotation2d.kZero),
             new ChassisVelocities(0, 2, 0),
             new ChassisAccelerations(0.0, 0.6, 0.0));
 
-    var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
+    var interpolated = HolonomicSample.kinematicInterpolate(start, end, 0.5);
 
-    // Expected timestamp
+    // Expected time
     double expectedTimestamp = 0 + (1 - 0) * 0.5;
-    assertEquals(expectedTimestamp, interpolated.timestamp, EPSILON);
+    assertEquals(expectedTimestamp, interpolated.time, EPSILON);
 
     // Constant-acceleration kinematics from start with deltaT = 0.5
-    double deltaT = expectedTimestamp - start.timestamp;
+    double deltaT = expectedTimestamp - start.time;
 
     // yₖ₊₁ = yₖ + vₖΔt + ½a(Δt)² = 0 + 1*0.5 + 0 = 0.5
     double expectedY =
@@ -322,11 +322,11 @@ class TrajectorySampleTest {
   @Test
   void testKinematicInterpolateMonotonicity() {
     var start =
-        new TrajectorySample(
+        new HolonomicSample(
             0, Pose2d.kZero, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
 
     var end =
-        new TrajectorySample(
+        new HolonomicSample(
             1,
             new Pose2d(1, 0, Rotation2d.kZero),
             new ChassisVelocities(2, 0, 0),
@@ -334,11 +334,11 @@ class TrajectorySampleTest {
 
     var prev = start;
     for (int t = 1; t <= 10; t++) {
-      var curr = TrajectorySample.kinematicInterpolate(start, end, t / 10.0);
+      var curr = HolonomicSample.kinematicInterpolate(start, end, t / 10.0);
       // X position should be monotonically increasing
       assertTrue(curr.pose.getX() >= prev.pose.getX() - EPSILON);
       // Timestamp should be monotonically increasing
-      assertTrue(curr.timestamp >= prev.timestamp - EPSILON);
+      assertTrue(curr.time >= prev.time - EPSILON);
       prev = curr;
     }
   }
@@ -346,19 +346,19 @@ class TrajectorySampleTest {
   @Test
   void testKinematicInterpolateContinuity() {
     var start =
-        new TrajectorySample(
+        new HolonomicSample(
             0, Pose2d.kZero, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
 
     var end =
-        new TrajectorySample(
+        new HolonomicSample(
             1,
             new Pose2d(1, 0, Rotation2d.kZero),
             new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations());
 
     // Interpolate at close points
-    var t1 = TrajectorySample.kinematicInterpolate(start, end, 0.5);
-    var t2 = TrajectorySample.kinematicInterpolate(start, end, 0.500001);
+    var t1 = HolonomicSample.kinematicInterpolate(start, end, 0.5);
+    var t2 = HolonomicSample.kinematicInterpolate(start, end, 0.500001);
 
     // Positions should be very close
     var dx = Math.abs(t2.pose.getX() - t1.pose.getX());
@@ -370,31 +370,31 @@ class TrajectorySampleTest {
   @Test
   void testKinematicInterpolateNonzeroStartTimestamp() {
     // Regression test: integration must use the elapsed time from the start
-    // sample (deltaT), not the absolute interpolated timestamp. This only
-    // differs when the start sample's timestamp is nonzero.
+    // sample (deltaT), not the absolute interpolated time. This only
+    // differs when the start sample's time is nonzero.
     var start =
-        new TrajectorySample(
+        new HolonomicSample(
             10,
             Pose2d.kZero,
             new ChassisVelocities(1, 0, 0),
             new ChassisAccelerations(2.0, 0.0, 0.0));
 
     var end =
-        new TrajectorySample(
+        new HolonomicSample(
             12,
             new Pose2d(8, 0, Rotation2d.kZero),
             new ChassisVelocities(5, 0, 0),
             new ChassisAccelerations(2.0, 0.0, 0.0));
 
-    var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
+    var interpolated = HolonomicSample.kinematicInterpolate(start, end, 0.5);
 
-    // Absolute interpolated timestamp
-    double expectedTimestamp = MathUtil.lerp(start.timestamp, end.timestamp, 0.5);
+    // Absolute interpolated time
+    double expectedTimestamp = MathUtil.lerp(start.time, end.time, 0.5);
     assertEquals(11.0, expectedTimestamp, EPSILON);
-    assertEquals(expectedTimestamp, interpolated.timestamp, EPSILON);
+    assertEquals(expectedTimestamp, interpolated.time, EPSILON);
 
     // Elapsed time from start sample
-    double deltaT = expectedTimestamp - start.timestamp;
+    double deltaT = expectedTimestamp - start.time;
     assertEquals(1.0, deltaT, EPSILON);
 
     // vₖ₊₁ = vₖ + aₖΔt = 1 + 2*1 = 3 (would be 1 + 2*11 = 23 with the bug)
@@ -414,31 +414,31 @@ class TrajectorySampleTest {
   @Test
   void testKinematicInterpolateZeroTime() {
     var start =
-        new TrajectorySample(
+        new HolonomicSample(
             0, Pose2d.kZero, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
 
     var end =
-        new TrajectorySample(
+        new HolonomicSample(
             0,
             new Pose2d(1, 0, Rotation2d.kZero),
             new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations());
 
     // Should handle zero time difference gracefully
-    var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
-    assertEquals(0.0, interpolated.timestamp, EPSILON);
+    var interpolated = HolonomicSample.kinematicInterpolate(start, end, 0.5);
+    assertEquals(0.0, interpolated.time, EPSILON);
   }
 
   @Test
-  void testSplineSampleStoresFieldRelativeVelocity() {
-    // A SplineSample is built from path-relative (forward) scalars but stores
+  void testDrivetrainSplineSampleStoresFieldRelativeVelocity() {
+    // A DrivetrainSplineSample is built from path-relative (forward) scalars but stores
     // velocity/acceleration in the field frame. For a robot facing +90 degrees
     // moving forward, the field velocity should point along +y.
     double forwardVelocity = 2.0;
     double forwardAcceleration = 1.5;
     double curvature = 0.25;
     var sample =
-        new SplineSample(
+        new DrivetrainSplineSample(
             0.0,
             new Pose2d(0, 0, Rotation2d.kCCW_Pi_2),
             forwardVelocity,
@@ -463,7 +463,7 @@ class TrajectorySampleTest {
   void testTransformRotatesVelocityAndAcceleration() {
     // Field-relative velocity/acceleration must rotate with the transform's rotation.
     var sample =
-        new TrajectorySample(
+        new HolonomicSample(
             0,
             new Pose2d(0, 0, Rotation2d.kZero),
             new ChassisVelocities(1, 0, 0.5),
@@ -491,7 +491,7 @@ class TrajectorySampleTest {
     // relativeTo re-expresses the sample in a frame rotated by the other pose's
     // rotation, so field-relative velocity/acceleration rotate by the negative of it.
     var sample =
-        new TrajectorySample(
+        new HolonomicSample(
             0,
             new Pose2d(1, 2, Rotation2d.kCCW_Pi_2),
             new ChassisVelocities(0, 1, 0.5),
@@ -514,17 +514,18 @@ class TrajectorySampleTest {
   }
 
   @Test
-  void testSplineSampleTransformPreservesForwardScalars() {
+  void testDrivetrainSplineSampleTransformPreservesForwardScalars() {
     // Rotating the sample rotates both the heading and the field velocity, so the
     // heading-relative forward scalars (and curvature) are invariant.
     var sample =
-        new SplineSample(0.0, new Pose2d(1, 2, Rotation2d.fromDegrees(20)), 2.0, 1.5, 0.25);
+        new DrivetrainSplineSample(
+            0.0, new Pose2d(1, 2, Rotation2d.fromDegrees(20)), 2.0, 1.5, 0.25);
 
     var transformed =
         sample.transform(new Transform2d(new Translation2d(3, 4), Rotation2d.fromDegrees(35)));
     var relative = sample.relativeTo(new Pose2d(0, 0, Rotation2d.fromDegrees(-15)));
 
-    for (var s : new SplineSample[] {transformed, relative}) {
+    for (var s : new DrivetrainSplineSample[] {transformed, relative}) {
       assertEquals(2.0, s.forwardVelocity(), EPSILON);
       assertEquals(1.5, s.forwardAcceleration(), EPSILON);
       assertEquals(0.25, s.curvature, EPSILON);
@@ -532,7 +533,7 @@ class TrajectorySampleTest {
   }
 
   @Test
-  void testDifferentialSampleTransformPreservesWheelSpeeds() {
+  void testDifferentialSampleTransformPreservesWheelVelocities() {
     // Wheel speeds are frame-invariant, so they survive a transform unchanged while
     // the field-relative velocity rotates.
     var kinematics = new DifferentialDriveKinematics(0.5);
@@ -547,8 +548,8 @@ class TrajectorySampleTest {
     var transformed =
         sample.transform(new Transform2d(new Translation2d(0, 0), Rotation2d.kCCW_Pi_2));
 
-    assertEquals(sample.leftSpeed, transformed.leftSpeed, EPSILON);
-    assertEquals(sample.rightSpeed, transformed.rightSpeed, EPSILON);
+    assertEquals(sample.leftVelocity, transformed.leftVelocity, EPSILON);
+    assertEquals(sample.rightVelocity, transformed.rightVelocity, EPSILON);
 
     // The field velocity rotates by +90 degrees.
     assertEquals(0.0, transformed.velocity.vx, EPSILON);

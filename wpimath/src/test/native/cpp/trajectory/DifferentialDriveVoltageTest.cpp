@@ -38,8 +38,8 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
     auto point = trajectory.SampleAt(t);
 
     DifferentialSample differentialSample{point, kinematics};
-    auto left = differentialSample.leftSpeed;
-    auto right = differentialSample.rightSpeed;
+    auto left = differentialSample.leftVelocity;
+    auto right = differentialSample.rightVelocity;
 
     auto acceleration = point.ForwardAcceleration();
 

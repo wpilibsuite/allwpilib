@@ -9,8 +9,8 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"
+#include "wpi/math/trajectory/HolonomicSample.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
-#include "wpi/math/trajectory/TrajectorySample.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -21,7 +21,7 @@ namespace wpi::math {
  * Uses constant-acceleration kinematic interpolation between samples.
  */
 class WPILIB_DLLEXPORT HolonomicTrajectory
-    : public Trajectory<TrajectorySample> {
+    : public Trajectory<HolonomicSample> {
  public:
   /**
    * Constructs a HolonomicTrajectory from a vector of samples.
@@ -30,8 +30,8 @@ class WPILIB_DLLEXPORT HolonomicTrajectory
    *                they will be sorted internally.
    * @throws std::invalid_argument if the vector of samples is empty.
    */
-  explicit HolonomicTrajectory(std::vector<TrajectorySample> samples)
-      : Trajectory<TrajectorySample>(std::move(samples)) {}
+  explicit HolonomicTrajectory(std::vector<HolonomicSample> samples)
+      : Trajectory<HolonomicSample>(std::move(samples)) {}
 
   /**
    * Interpolates between two samples using kinematic interpolation.
@@ -41,9 +41,8 @@ class WPILIB_DLLEXPORT HolonomicTrajectory
    * @param t The interpolation parameter between 0 and 1.
    * @return The interpolated sample.
    */
-  TrajectorySample Interpolate(const TrajectorySample& start,
-                               const TrajectorySample& end,
-                               double t) const final;
+  HolonomicSample Interpolate(const HolonomicSample& start,
+                              const HolonomicSample& end, double t) const final;
 
   /**
    * Transforms all poses in the trajectory by the given transform.

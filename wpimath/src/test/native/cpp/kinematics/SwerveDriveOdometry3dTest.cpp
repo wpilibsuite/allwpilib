@@ -109,11 +109,12 @@ TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingTrajectory) {
   SwerveModulePosition bl;
   SwerveModulePosition br;
 
-  SplineTrajectory trajectory = TrajectoryGenerator::GenerateTrajectory(
-      std::vector{Pose2d{0_m, 0_m, 45_deg}, Pose2d{3_m, 0_m, -90_deg},
-                  Pose2d{0_m, 0_m, 135_deg}, Pose2d{-3_m, 0_m, -90_deg},
-                  Pose2d{0_m, 0_m, 45_deg}},
-      TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+  DrivetrainSplineTrajectory trajectory =
+      TrajectoryGenerator::GenerateTrajectory(
+          std::vector{Pose2d{0_m, 0_m, 45_deg}, Pose2d{3_m, 0_m, -90_deg},
+                      Pose2d{0_m, 0_m, 135_deg}, Pose2d{-3_m, 0_m, -90_deg},
+                      Pose2d{0_m, 0_m, 45_deg}},
+          TrajectoryConfig(5.0_mps, 2.0_mps_sq));
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
@@ -125,7 +126,7 @@ TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingTrajectory) {
   double errorSum = 0;
 
   while (t < trajectory.Duration()) {
-    SplineSample groundTruthState = trajectory.SampleAt(t);
+    DrivetrainSplineSample groundTruthState = trajectory.SampleAt(t);
 
     auto moduleVelocities = kinematics.ToSwerveModuleVelocities(
         groundTruthState.velocity.ToRobotRelative(
@@ -175,11 +176,12 @@ TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingXAxis) {
   SwerveModulePosition bl;
   SwerveModulePosition br;
 
-  SplineTrajectory trajectory = TrajectoryGenerator::GenerateTrajectory(
-      std::vector{Pose2d{0_m, 0_m, 45_deg}, Pose2d{3_m, 0_m, -90_deg},
-                  Pose2d{0_m, 0_m, 135_deg}, Pose2d{-3_m, 0_m, -90_deg},
-                  Pose2d{0_m, 0_m, 45_deg}},
-      TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+  DrivetrainSplineTrajectory trajectory =
+      TrajectoryGenerator::GenerateTrajectory(
+          std::vector{Pose2d{0_m, 0_m, 45_deg}, Pose2d{3_m, 0_m, -90_deg},
+                      Pose2d{0_m, 0_m, 135_deg}, Pose2d{-3_m, 0_m, -90_deg},
+                      Pose2d{0_m, 0_m, 45_deg}},
+          TrajectoryConfig(5.0_mps, 2.0_mps_sq));
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
@@ -191,7 +193,7 @@ TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingXAxis) {
   double errorSum = 0;
 
   while (t < trajectory.Duration()) {
-    SplineSample groundTruthState = trajectory.SampleAt(t);
+    DrivetrainSplineSample groundTruthState = trajectory.SampleAt(t);
 
     fl.distance += groundTruthState.ForwardVelocity() * dt +
                    0.5 * groundTruthState.ForwardAcceleration() * dt * dt;

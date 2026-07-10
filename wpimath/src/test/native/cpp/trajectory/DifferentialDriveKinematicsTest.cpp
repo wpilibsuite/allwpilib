@@ -28,7 +28,7 @@ TEST(DifferentialDriveKinematicsConstraintTest, Constraint) {
 
     const DifferentialSample differentialSample{point, kinematics};
 
-    EXPECT_TRUE(differentialSample.leftSpeed < maxVelocity + 0.05_mps);
-    EXPECT_TRUE(differentialSample.rightSpeed < maxVelocity + 0.05_mps);
+    EXPECT_TRUE(differentialSample.leftVelocity < maxVelocity + 0.05_mps);
+    EXPECT_TRUE(differentialSample.rightVelocity < maxVelocity + 0.05_mps);
   }
 }

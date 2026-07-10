@@ -12,25 +12,25 @@ import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.util.MathUtil;
 
 /** A trajectory for spline-based path following. */
-public class SplineTrajectory extends Trajectory<SplineSample> {
+public class DrivetrainSplineTrajectory extends Trajectory<DrivetrainSplineSample> {
   /**
-   * Constructs a SplineTrajectory.
+   * Constructs a DrivetrainSplineTrajectory.
    *
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
    */
-  public SplineTrajectory(SplineSample[] samples) {
+  public DrivetrainSplineTrajectory(DrivetrainSplineSample[] samples) {
     super(samples);
   }
 
   /**
-   * Constructs a SplineTrajectory.
+   * Constructs a DrivetrainSplineTrajectory.
    *
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
    */
-  public SplineTrajectory(List<SplineSample> samples) {
-    super(samples.toArray(SplineSample[]::new));
+  public DrivetrainSplineTrajectory(List<DrivetrainSplineSample> samples) {
+    super(samples.toArray(DrivetrainSplineSample[]::new));
   }
 
   /**
@@ -42,12 +42,13 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
    * @return The interpolated sample.
    */
   @Override
-  public SplineSample interpolate(SplineSample start, SplineSample end, double t) {
+  public DrivetrainSplineSample interpolate(
+      DrivetrainSplineSample start, DrivetrainSplineSample end, double t) {
     // Find the new t value.
-    final double newT = MathUtil.lerp(start.timestamp, end.timestamp, t);
+    final double newT = MathUtil.lerp(start.time, end.time, t);
 
     // Find the delta time between the current state and the interpolated state.
-    final double deltaT = newT - start.timestamp;
+    final double deltaT = newT - start.time;
 
     // If delta time is negative, flip the order of interpolation.
     if (deltaT < 0) {
@@ -80,7 +81,7 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
     final double interpolationFrac =
         newS / end.pose.getTranslation().getDistance(start.pose.getTranslation());
 
-    return new SplineSample(
+    return new DrivetrainSplineSample(
         newT,
         start.pose.plus(end.pose.minus(start.pose).times(interpolationFrac)),
         newV,
@@ -95,7 +96,7 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
    * @return The transformed trajectory.
    */
   @Override
-  public SplineTrajectory transformBy(Transform2d transform) {
+  public DrivetrainSplineTrajectory transformBy(Transform2d transform) {
     Pose2d firstPose = start().pose;
     Pose2d transformedFirstPose = firstPose.transformBy(transform);
 
@@ -103,27 +104,27 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
     // the field-relative velocities and accelerations rotate by the same amount.
     Rotation2d rotation = transform.getRotation();
 
-    SplineSample transformedFirstSample =
-        new SplineSample(
-            start().timestamp,
+    DrivetrainSplineSample transformedFirstSample =
+        new DrivetrainSplineSample(
+            start().time,
             transformedFirstPose,
             start().velocity.toFieldRelative(rotation),
             start().acceleration.toFieldRelative(rotation),
             start().curvature);
 
-    Stream<SplineSample> transformedSamples =
+    Stream<DrivetrainSplineSample> transformedSamples =
         samples.stream()
             .skip(1)
             .map(
                 sample ->
-                    new SplineSample(
-                        sample.timestamp,
+                    new DrivetrainSplineSample(
+                        sample.time,
                         transformedFirstPose.plus(sample.pose.minus(firstPose)),
                         sample.velocity.toFieldRelative(rotation),
                         sample.acceleration.toFieldRelative(rotation),
                         sample.curvature));
 
-    return new SplineTrajectory(
+    return new DrivetrainSplineTrajectory(
         Stream.concat(Stream.of(transformedFirstSample), transformedSamples).toList());
   }
 
@@ -134,15 +135,19 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
    * @return a new trajectory that is the concatenation of this trajectory and the other trajectory.
    */
   @Override
-  public SplineTrajectory concatenate(Trajectory<SplineSample> other) {
+  public DrivetrainSplineTrajectory concatenate(Trajectory<DrivetrainSplineSample> other) {
     if (other.samples.isEmpty()) {
       return this;
     }
 
-    var withNewTimestamp =
-        other.samples.stream().map(s -> s.withNewTimestamp(s.timestamp + this.duration));
+    var timeShifted =
+        other.samples.stream()
+            .map(
+                s ->
+                    new DrivetrainSplineSample(
+                        s.time + this.duration, s.pose, s.velocity, s.acceleration, s.curvature));
 
-    return new SplineTrajectory(Stream.concat(samples.stream(), withNewTimestamp).toList());
+    return new DrivetrainSplineTrajectory(Stream.concat(samples.stream(), timeShifted).toList());
   }
 
   /**
@@ -152,7 +157,7 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
    * @return a new trajectory relative to the given pose.
    */
   @Override
-  public SplineTrajectory relativeTo(Pose2d other) {
-    return new SplineTrajectory(samples.stream().map(s -> s.relativeTo(other)).toList());
+  public DrivetrainSplineTrajectory relativeTo(Pose2d other) {
+    return new DrivetrainSplineTrajectory(samples.stream().map(s -> s.relativeTo(other)).toList());
   }
 }

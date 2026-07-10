@@ -207,10 +207,10 @@ struct WPILIB_DLLEXPORT ChassisVelocities {
 };
 
 WPILIB_DLLEXPORT
-void to_json(wpi::util::json& json, const ChassisVelocities& speeds);
+void to_json(wpi::util::json& json, const ChassisVelocities& velocities);
 
 WPILIB_DLLEXPORT
-void from_json(const wpi::util::json& json, ChassisVelocities& speeds);
+void from_json(const wpi::util::json& json, ChassisVelocities& velocities);
 
 }  // namespace wpi::math
 

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/trajectory/TrajectorySample.hpp"
+#include "wpi/math/trajectory/HolonomicSample.hpp"
 
 #include <numbers>
 
@@ -16,7 +16,7 @@
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/trajectory/DifferentialSample.hpp"
-#include "wpi/math/trajectory/SplineSample.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_acceleration.hpp"
@@ -31,56 +31,56 @@
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
 
-TEST(TrajectorySampleTest, KinematicInterpolateAtStart) {
-  wpi::math::TrajectorySample start{
+TEST(HolonomicSampleTest, KinematicInterpolateAtStart) {
+  wpi::math::HolonomicSample start{
       0_s, wpi::math::Pose2d{},
       wpi::math::ChassisVelocities{1_mps, 0_mps, 0_rad_per_s},
       wpi::math::ChassisAccelerations{}};
-  wpi::math::TrajectorySample end{
+  wpi::math::HolonomicSample end{
       1_s, wpi::math::Pose2d{1_m, 0_m, 0_rad},
       wpi::math::ChassisVelocities{2_mps, 0_mps, 0_rad_per_s},
       wpi::math::ChassisAccelerations{}};
 
   auto interpolated = wpi::math::KinematicInterpolate(start, end, 0);
 
-  EXPECT_EQ(start.timestamp, interpolated.timestamp);
+  EXPECT_EQ(start.time, interpolated.time);
   EXPECT_EQ(start.pose, interpolated.pose);
   EXPECT_EQ(start.velocity, interpolated.velocity);
   EXPECT_EQ(start.acceleration, interpolated.acceleration);
 }
 
-TEST(TrajectorySampleTest, KinematicInterpolateAtEnd) {
-  wpi::math::TrajectorySample start{
+TEST(HolonomicSampleTest, KinematicInterpolateAtEnd) {
+  wpi::math::HolonomicSample start{
       0_s, wpi::math::Pose2d{},
       wpi::math::ChassisVelocities{1_mps, 0_mps, 0_rad_per_s},
       wpi::math::ChassisAccelerations{}};
-  wpi::math::TrajectorySample end{
+  wpi::math::HolonomicSample end{
       1_s, wpi::math::Pose2d{1_m, 0_m, 0_rad},
       wpi::math::ChassisVelocities{2_mps, 0_mps, 0_rad_per_s},
       wpi::math::ChassisAccelerations{}};
 
   auto interpolated = wpi::math::KinematicInterpolate(start, end, 1);
 
-  EXPECT_EQ(end.timestamp, interpolated.timestamp);
+  EXPECT_EQ(end.time, interpolated.time);
   EXPECT_EQ(end.pose, interpolated.pose);
   EXPECT_EQ(end.velocity, interpolated.velocity);
   EXPECT_EQ(end.acceleration, interpolated.acceleration);
 }
 
-TEST(TrajectorySampleTest, KinematicInterpolateMidpoint) {
-  wpi::math::TrajectorySample start{
+TEST(HolonomicSampleTest, KinematicInterpolateMidpoint) {
+  wpi::math::HolonomicSample start{
       0_s, wpi::math::Pose2d{},
       wpi::math::ChassisVelocities{1_mps, 0_mps, 0_rad_per_s},
       wpi::math::ChassisAccelerations{0.2_mps_sq, 0_mps_sq, 0_rad_per_s_sq}};
-  wpi::math::TrajectorySample end{
+  wpi::math::HolonomicSample end{
       2_s, wpi::math::Pose2d{2_m, 0_m, 0_rad},
       wpi::math::ChassisVelocities{2_mps, 0_mps, 0_rad_per_s},
       wpi::math::ChassisAccelerations{0.6_mps_sq, 0_mps_sq, 0_rad_per_s_sq}};
 
   auto interpolated = wpi::math::KinematicInterpolate(start, end, 0.5);
 
-  // Absolute interpolated timestamp.
-  EXPECT_NEAR_UNITS(1_s, interpolated.timestamp, 1e-9_s);
+  // Absolute interpolated time.
+  EXPECT_NEAR_UNITS(1_s, interpolated.time, 1e-9_s);
 
   // Elapsed time from the start sample.
   auto deltaT = 1_s;
@@ -100,19 +100,19 @@ TEST(TrajectorySampleTest, KinematicInterpolateMidpoint) {
   EXPECT_NEAR_UNITS(expectedAx, interpolated.acceleration.ax, 1e-9_mps_sq);
 }
 
-TEST(TrajectorySampleTest, KinematicInterpolateWithAcceleration) {
-  wpi::math::TrajectorySample start{
+TEST(HolonomicSampleTest, KinematicInterpolateWithAcceleration) {
+  wpi::math::HolonomicSample start{
       0_s, wpi::math::Pose2d{},
       wpi::math::ChassisVelocities{0_mps, 0_mps, 0_rad_per_s},
       wpi::math::ChassisAccelerations{1_mps_sq, 0_mps_sq, 0_rad_per_s_sq}};
-  wpi::math::TrajectorySample end{
+  wpi::math::HolonomicSample end{
       1_s, wpi::math::Pose2d{0.5_m, 0_m, 0_rad},
       wpi::math::ChassisVelocities{1_mps, 0_mps, 0_rad_per_s},
       wpi::math::ChassisAccelerations{}};
 
   auto interpolated = wpi::math::KinematicInterpolate(start, end, 0.5);
 
-  EXPECT_NEAR_UNITS(0.5_s, interpolated.timestamp, 1e-9_s);
+  EXPECT_NEAR_UNITS(0.5_s, interpolated.time, 1e-9_s);
 
   auto deltaT = 0.5_s;
 
@@ -127,12 +127,12 @@ TEST(TrajectorySampleTest, KinematicInterpolateWithAcceleration) {
   EXPECT_NEAR_UNITS(1_mps_sq, interpolated.acceleration.ax, 1e-9_mps_sq);
 }
 
-TEST(TrajectorySampleTest, KinematicInterpolateAngularVelocity) {
-  wpi::math::TrajectorySample start{
+TEST(HolonomicSampleTest, KinematicInterpolateAngularVelocity) {
+  wpi::math::HolonomicSample start{
       0_s, wpi::math::Pose2d{},
       wpi::math::ChassisVelocities{1_mps, 0_mps, 0_rad_per_s},
       wpi::math::ChassisAccelerations{0_mps_sq, 0_mps_sq, 0.1_rad_per_s_sq}};
-  wpi::math::TrajectorySample end{
+  wpi::math::HolonomicSample end{
       1_s, wpi::math::Pose2d{1_m, 0_m, 90_deg},
       wpi::math::ChassisVelocities{
           1_mps, 0_mps, wpi::units::radians_per_second_t{std::numbers::pi / 2}},
@@ -140,7 +140,7 @@ TEST(TrajectorySampleTest, KinematicInterpolateAngularVelocity) {
 
   auto interpolated = wpi::math::KinematicInterpolate(start, end, 0.5);
 
-  EXPECT_NEAR_UNITS(0.5_s, interpolated.timestamp, 1e-9_s);
+  EXPECT_NEAR_UNITS(0.5_s, interpolated.time, 1e-9_s);
 
   auto deltaT = 0.5_s;
 
@@ -162,19 +162,19 @@ TEST(TrajectorySampleTest, KinematicInterpolateAngularVelocity) {
                     1e-9_rad);
 }
 
-TEST(TrajectorySampleTest, KinematicInterpolateNegativeVelocity) {
-  wpi::math::TrajectorySample start{
+TEST(HolonomicSampleTest, KinematicInterpolateNegativeVelocity) {
+  wpi::math::HolonomicSample start{
       0_s, wpi::math::Pose2d{1_m, 0_m, 0_rad},
       wpi::math::ChassisVelocities{-1_mps, 0_mps, 0_rad_per_s},
       wpi::math::ChassisAccelerations{-0.5_mps_sq, 0_mps_sq, 0_rad_per_s_sq}};
-  wpi::math::TrajectorySample end{
+  wpi::math::HolonomicSample end{
       1_s, wpi::math::Pose2d{0_m, 0_m, 0_rad},
       wpi::math::ChassisVelocities{-2_mps, 0_mps, 0_rad_per_s},
       wpi::math::ChassisAccelerations{}};
 
   auto interpolated = wpi::math::KinematicInterpolate(start, end, 0.5);
 
-  EXPECT_NEAR_UNITS(0.5_s, interpolated.timestamp, 1e-9_s);
+  EXPECT_NEAR_UNITS(0.5_s, interpolated.time, 1e-9_s);
 
   // xₖ₊₁ = xₖ + vₖΔt + ½a(Δt)²
   auto deltaT = 0.5_s;
@@ -183,12 +183,12 @@ TEST(TrajectorySampleTest, KinematicInterpolateNegativeVelocity) {
   EXPECT_NEAR_UNITS(expectedX, interpolated.pose.X(), 1e-9_m);
 }
 
-TEST(TrajectorySampleTest, KinematicInterpolateMonotonicity) {
-  wpi::math::TrajectorySample start{
+TEST(HolonomicSampleTest, KinematicInterpolateMonotonicity) {
+  wpi::math::HolonomicSample start{
       0_s, wpi::math::Pose2d{},
       wpi::math::ChassisVelocities{1_mps, 0_mps, 0_rad_per_s},
       wpi::math::ChassisAccelerations{}};
-  wpi::math::TrajectorySample end{
+  wpi::math::HolonomicSample end{
       1_s, wpi::math::Pose2d{1_m, 0_m, 0_rad},
       wpi::math::ChassisVelocities{2_mps, 0_mps, 0_rad_per_s},
       wpi::math::ChassisAccelerations{}};
@@ -197,28 +197,28 @@ TEST(TrajectorySampleTest, KinematicInterpolateMonotonicity) {
   for (int t = 1; t <= 10; t++) {
     auto curr = wpi::math::KinematicInterpolate(start, end, t / 10.0);
     EXPECT_GE(curr.pose.X(), prev.pose.X() - 1e-9_m);
-    EXPECT_GE(curr.timestamp, prev.timestamp - 1e-9_s);
+    EXPECT_GE(curr.time, prev.time - 1e-9_s);
     prev = curr;
   }
 }
 
-TEST(TrajectorySampleTest, KinematicInterpolateNonzeroStartTimestamp) {
+TEST(HolonomicSampleTest, KinematicInterpolateNonzeroStartTimestamp) {
   // Regression test: integration must use the elapsed time from the start
-  // sample (Δt), not the absolute interpolated timestamp. This only differs
-  // when the start sample's timestamp is nonzero.
-  wpi::math::TrajectorySample start{
+  // sample (Δt), not the absolute interpolated time. This only differs
+  // when the start sample's time is nonzero.
+  wpi::math::HolonomicSample start{
       10_s, wpi::math::Pose2d{},
       wpi::math::ChassisVelocities{1_mps, 0_mps, 0_rad_per_s},
       wpi::math::ChassisAccelerations{2_mps_sq, 0_mps_sq, 0_rad_per_s_sq}};
-  wpi::math::TrajectorySample end{
+  wpi::math::HolonomicSample end{
       12_s, wpi::math::Pose2d{8_m, 0_m, 0_rad},
       wpi::math::ChassisVelocities{5_mps, 0_mps, 0_rad_per_s},
       wpi::math::ChassisAccelerations{2_mps_sq, 0_mps_sq, 0_rad_per_s_sq}};
 
   auto interpolated = wpi::math::KinematicInterpolate(start, end, 0.5);
 
-  // Absolute interpolated timestamp.
-  EXPECT_NEAR_UNITS(11_s, interpolated.timestamp, 1e-9_s);
+  // Absolute interpolated time.
+  EXPECT_NEAR_UNITS(11_s, interpolated.time, 1e-9_s);
 
   // vₖ₊₁ = vₖ + aₖΔt = 1 + 2*1 = 3 (would be 1 + 2*11 = 23 with the bug)
   EXPECT_NEAR_UNITS(3_mps, interpolated.velocity.vx, 1e-9_mps);
@@ -227,31 +227,31 @@ TEST(TrajectorySampleTest, KinematicInterpolateNonzeroStartTimestamp) {
   EXPECT_NEAR_UNITS(2_m, interpolated.pose.X(), 1e-9_m);
 }
 
-TEST(TrajectorySampleTest, KinematicInterpolateZeroTime) {
-  wpi::math::TrajectorySample start{
+TEST(HolonomicSampleTest, KinematicInterpolateZeroTime) {
+  wpi::math::HolonomicSample start{
       0_s, wpi::math::Pose2d{},
       wpi::math::ChassisVelocities{1_mps, 0_mps, 0_rad_per_s},
       wpi::math::ChassisAccelerations{}};
-  wpi::math::TrajectorySample end{
+  wpi::math::HolonomicSample end{
       0_s, wpi::math::Pose2d{1_m, 0_m, 0_rad},
       wpi::math::ChassisVelocities{2_mps, 0_mps, 0_rad_per_s},
       wpi::math::ChassisAccelerations{}};
 
   // Should handle zero time difference gracefully.
   auto interpolated = wpi::math::KinematicInterpolate(start, end, 0.5);
-  EXPECT_NEAR_UNITS(0_s, interpolated.timestamp, 1e-9_s);
+  EXPECT_NEAR_UNITS(0_s, interpolated.time, 1e-9_s);
 }
 
-TEST(TrajectorySampleTest, SplineSampleStoresFieldRelativeVelocity) {
-  // A SplineSample is built from path-relative (forward) scalars but stores
-  // velocity/acceleration in the field frame. For a robot facing +90 degrees
-  // moving forward, the field velocity should point along +y.
+TEST(HolonomicSampleTest, DrivetrainSplineSampleStoresFieldRelativeVelocity) {
+  // A DrivetrainSplineSample is built from path-relative (forward) scalars but
+  // stores velocity/acceleration in the field frame. For a robot facing +90
+  // degrees moving forward, the field velocity should point along +y.
   wpi::units::meters_per_second_t forwardVelocity{2.0};
   wpi::units::meters_per_second_squared_t forwardAcceleration{1.5};
   wpi::units::curvature_t curvature{0.25};
-  wpi::math::SplineSample sample{0_s, wpi::math::Pose2d{0_m, 0_m, 90_deg},
-                                 forwardVelocity, forwardAcceleration,
-                                 curvature};
+  wpi::math::DrivetrainSplineSample sample{
+      0_s, wpi::math::Pose2d{0_m, 0_m, 90_deg}, forwardVelocity,
+      forwardAcceleration, curvature};
 
   // Field-relative: forward speed rotated into +y.
   EXPECT_NEAR_UNITS(0_mps, sample.velocity.vx, 1e-9_mps);
@@ -269,10 +269,10 @@ TEST(TrajectorySampleTest, SplineSampleStoresFieldRelativeVelocity) {
                     1e-9_mps_sq);
 }
 
-TEST(TrajectorySampleTest, TransformRotatesVelocityAndAcceleration) {
+TEST(HolonomicSampleTest, TransformRotatesVelocityAndAcceleration) {
   // Field-relative velocity/acceleration must rotate with the transform's
   // rotation.
-  wpi::math::TrajectorySample sample{
+  wpi::math::HolonomicSample sample{
       0_s, wpi::math::Pose2d{0_m, 0_m, 0_rad},
       wpi::math::ChassisVelocities{1_mps, 0_mps, 0.5_rad_per_s},
       wpi::math::ChassisAccelerations{2_mps_sq, 0_mps_sq, 0.3_rad_per_s_sq}};
@@ -296,11 +296,11 @@ TEST(TrajectorySampleTest, TransformRotatesVelocityAndAcceleration) {
                     1e-9_rad_per_s_sq);
 }
 
-TEST(TrajectorySampleTest, RelativeToRotatesVelocityAndAcceleration) {
+TEST(HolonomicSampleTest, RelativeToRotatesVelocityAndAcceleration) {
   // relativeTo re-expresses the sample in a frame rotated by the other pose's
   // rotation, so field-relative velocity/acceleration rotate by the negative of
   // it.
-  wpi::math::TrajectorySample sample{
+  wpi::math::HolonomicSample sample{
       0_s, wpi::math::Pose2d{1_m, 2_m, 90_deg},
       wpi::math::ChassisVelocities{0_mps, 1_mps, 0.5_rad_per_s},
       wpi::math::ChassisAccelerations{0_mps_sq, 2_mps_sq, 0.3_rad_per_s_sq}};
@@ -322,11 +322,13 @@ TEST(TrajectorySampleTest, RelativeToRotatesVelocityAndAcceleration) {
                     1e-9_rad_per_s_sq);
 }
 
-TEST(TrajectorySampleTest, SplineSampleTransformPreservesForwardScalars) {
+TEST(HolonomicSampleTest,
+     DrivetrainSplineSampleTransformPreservesForwardScalars) {
   // Rotating the sample rotates both the heading and the field velocity, so the
   // heading-relative forward scalars (and curvature) are invariant.
-  wpi::math::SplineSample sample{0_s, wpi::math::Pose2d{1_m, 2_m, 20_deg},
-                                 2_mps, 1.5_mps_sq, 0.25_rad / 1_m};
+  wpi::math::DrivetrainSplineSample sample{0_s,
+                                           wpi::math::Pose2d{1_m, 2_m, 20_deg},
+                                           2_mps, 1.5_mps_sq, 0.25_rad / 1_m};
 
   auto transformed = sample.Transform(
       wpi::math::Transform2d{wpi::math::Translation2d{3_m, 4_m}, 35_deg});
@@ -339,7 +341,7 @@ TEST(TrajectorySampleTest, SplineSampleTransformPreservesForwardScalars) {
   }
 }
 
-TEST(TrajectorySampleTest, DifferentialSampleTransformPreservesWheelSpeeds) {
+TEST(HolonomicSampleTest, DifferentialSampleTransformPreservesWheelVelocities) {
   // Wheel speeds are frame-invariant, so they survive a transform unchanged
   // while the field-relative velocity rotates.
   wpi::math::DifferentialDriveKinematics kinematics{0.5_m};
@@ -352,8 +354,8 @@ TEST(TrajectorySampleTest, DifferentialSampleTransformPreservesWheelSpeeds) {
   auto transformed = sample.Transform(
       wpi::math::Transform2d{wpi::math::Translation2d{0_m, 0_m}, 90_deg});
 
-  EXPECT_NEAR_UNITS(sample.leftSpeed, transformed.leftSpeed, 1e-9_mps);
-  EXPECT_NEAR_UNITS(sample.rightSpeed, transformed.rightSpeed, 1e-9_mps);
+  EXPECT_NEAR_UNITS(sample.leftVelocity, transformed.leftVelocity, 1e-9_mps);
+  EXPECT_NEAR_UNITS(sample.rightVelocity, transformed.rightVelocity, 1e-9_mps);
 
   // The field velocity rotates by +90 degrees.
   EXPECT_NEAR_UNITS(0_mps, transformed.velocity.vx, 1e-9_mps);

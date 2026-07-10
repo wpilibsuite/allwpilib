@@ -1,11 +1,11 @@
 classes:
-  wpi::math::SplineTrajectory:
+  wpi::math::DrivetrainSplineTrajectory:
     force_no_trampoline: true
     methods:
-      SplineTrajectory:
+      DrivetrainSplineTrajectory:
         overloads:
-          std::vector<SplineSample>:
-          std::initializer_list<SplineSample>:
+          std::vector<DrivetrainSplineSample>:
+          std::initializer_list<DrivetrainSplineSample>:
             ignore: true
       TransformBy:
       RelativeTo:

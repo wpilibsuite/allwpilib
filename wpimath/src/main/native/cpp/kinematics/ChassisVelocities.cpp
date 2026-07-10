@@ -7,15 +7,15 @@
 #include "wpi/util/json.hpp"
 
 void wpi::math::to_json(wpi::util::json& json,
-                        const ChassisVelocities& speeds) {
-  json =
-      wpi::util::json::object("vx", speeds.vx.value(), "vy", speeds.vy.value(),
-                              "omega", speeds.omega.value());
+                        const ChassisVelocities& velocities) {
+  json = wpi::util::json::object("vx", velocities.vx.value(), "vy",
+                                 velocities.vy.value(), "omega",
+                                 velocities.omega.value());
 }
 
 void wpi::math::from_json(const wpi::util::json& json,
-                          ChassisVelocities& speeds) {
-  speeds = ChassisVelocities{
+                          ChassisVelocities& velocities) {
+  velocities = ChassisVelocities{
       wpi::units::meters_per_second_t{json.at("vx").get_double()},
       wpi::units::meters_per_second_t{json.at("vy").get_double()},
       wpi::units::radians_per_second_t{json.at("omega").get_double()}};

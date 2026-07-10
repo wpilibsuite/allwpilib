@@ -59,7 +59,7 @@ class Robot : public wpi::TimedRobot {
   wpi::math::SlewRateLimiter<wpi::units::scalar> rotLimiter{3 / 1_s};
 
   Drivetrain drive;
-  wpi::math::SplineTrajectory trajectory;
+  wpi::math::DrivetrainSplineTrajectory trajectory;
   wpi::math::LTVUnicycleController feedback{20_ms};
   wpi::Timer timer;
 };

@@ -31,12 +31,12 @@
 #include <format>
 #include <vector>
 
-#include "wpi/math/trajectory/SplineTrajectory.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
 #include "wpi/units/math.hpp"
 
 using namespace wpi::math;
 
-SplineTrajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
+DrivetrainSplineTrajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
     const std::vector<PoseWithCurvature>& points,
     const std::vector<std::unique_ptr<TrajectoryConstraint>>& constraints,
     wpi::units::meters_per_second_t startVelocity,
@@ -222,7 +222,7 @@ SplineTrajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
   // segment leaving it (segAccel[i + 1]); the final sample reuses its incoming
   // segment's acceleration. The scalar SplineSample constructor stores the
   // velocity and acceleration field-relative.
-  std::vector<SplineSample> samples;
+  std::vector<DrivetrainSplineSample> samples;
   samples.reserve(numStates);
   for (size_t i = 0; i < numStates; i++) {
     const auto& state = constrainedStates[i];
@@ -233,7 +233,7 @@ SplineTrajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
                          (reversed ? -accel : accel), state.pose.second);
   }
 
-  return SplineTrajectory(samples);
+  return DrivetrainSplineTrajectory(samples);
 }
 
 void TrajectoryParameterizer::EnforceAccelerationLimits(

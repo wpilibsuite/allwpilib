@@ -9,7 +9,7 @@
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
-#include "wpi/math/trajectory/TrajectorySample.hpp"
+#include "wpi/math/trajectory/HolonomicSample.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/curvature.hpp"
 #include "wpi/units/time.hpp"
@@ -23,15 +23,15 @@ class json;
 namespace wpi::math {
 
 /**
- * Represents a single sample in a spline-based trajectory.
+ * Represents a single sample in a spline-based drivetrain trajectory.
  */
-class SplineSample : public TrajectorySample {
+class DrivetrainSplineSample : public HolonomicSample {
  public:
   /** The curvature of the path at this sample. */
   wpi::units::curvature_t curvature{0.0};
 
-  /** Constructs a default SplineSample with all zero values. */
-  constexpr SplineSample() = default;
+  /** Constructs a default DrivetrainSplineSample with all zero values. */
+  constexpr DrivetrainSplineSample() = default;
 
   /**
    * Constructs a SplineSample from path-relative scalars.
@@ -40,31 +40,29 @@ class SplineSample : public TrajectorySample {
    * velocity and acceleration are rotated into the field frame using the
    * sample's pose. The resulting velocity and acceleration are field-relative.
    *
-   * @param timestamp The timestamp of the sample relative to the trajectory
-   *     start.
+   * @param time The time of the sample relative to the trajectory start.
    * @param pose The robot pose at this sample (in the field reference frame).
    * @param velocity The signed forward (path-tangential) velocity.
    * @param acceleration The signed forward (path-tangential) acceleration.
    * @param curvature The curvature of the path at this sample.
    */
-  constexpr SplineSample(wpi::units::second_t timestamp, const Pose2d& pose,
-                         wpi::units::meters_per_second_t velocity,
-                         wpi::units::meters_per_second_squared_t acceleration,
-                         wpi::units::curvature_t curvature)
-      : TrajectorySample{
-            timestamp, pose,
-            ChassisVelocities{velocity, 0_mps, velocity * curvature}
-                .ToFieldRelative(pose.Rotation()),
-            ChassisAccelerations{acceleration, 0_mps_sq,
-                                 acceleration * curvature}
-                .ToFieldRelative(pose.Rotation())},
+  constexpr DrivetrainSplineSample(
+      wpi::units::second_t time, const Pose2d& pose,
+      wpi::units::meters_per_second_t velocity,
+      wpi::units::meters_per_second_squared_t acceleration,
+      wpi::units::curvature_t curvature)
+      : HolonomicSample{time, pose,
+                        ChassisVelocities{velocity, 0_mps, velocity * curvature}
+                            .ToFieldRelative(pose.Rotation()),
+                        ChassisAccelerations{acceleration, 0_mps_sq,
+                                             acceleration * curvature}
+                            .ToFieldRelative(pose.Rotation())},
         curvature{curvature} {}
 
   /**
    * Constructs a SplineSample.
    *
-   * @param timestamp The timestamp of the sample relative to the trajectory
-   * start.
+   * @param time The time of the sample relative to the trajectory start.
    * @param pose The robot pose at this sample (in the field reference frame).
    * @param velocity The robot velocity at this sample (in the field reference
    *     frame).
@@ -72,22 +70,23 @@ class SplineSample : public TrajectorySample {
    *     reference frame).
    * @param curvature The curvature of the path at this sample.
    */
-  constexpr SplineSample(wpi::units::second_t timestamp, const Pose2d& pose,
-                         const ChassisVelocities& velocity,
-                         const ChassisAccelerations& acceleration,
-                         wpi::units::curvature_t curvature)
-      : TrajectorySample{timestamp, pose, velocity, acceleration},
+  constexpr DrivetrainSplineSample(wpi::units::second_t time,
+                                   const Pose2d& pose,
+                                   const ChassisVelocities& velocity,
+                                   const ChassisAccelerations& acceleration,
+                                   wpi::units::curvature_t curvature)
+      : HolonomicSample{time, pose, velocity, acceleration},
         curvature{curvature} {}
 
   /**
    * Constructs a SplineSample from a generic sample.
    * Curvature is calculated as omega / forward velocity.
    *
-   * @param sample The TrajectorySample to convert.
+   * @param sample The HolonomicSample to convert.
    */
-  explicit constexpr SplineSample(const TrajectorySample& sample)
-      : TrajectorySample{sample.timestamp, sample.pose, sample.velocity,
-                         sample.acceleration} {
+  explicit constexpr DrivetrainSplineSample(const HolonomicSample& sample)
+      : HolonomicSample{sample.time, sample.pose, sample.velocity,
+                        sample.acceleration} {
     auto vx = sample.velocity.ToRobotRelative(sample.pose.Rotation()).vx;
     curvature = sample.velocity.omega / (vx == 0_mps ? 1e-9_mps : vx);
   }
@@ -121,11 +120,12 @@ class SplineSample : public TrajectorySample {
    * @param transform The transform to apply to the pose.
    * @return A new sample with the transformed pose.
    */
-  constexpr SplineSample Transform(const Transform2d& transform) const {
-    return SplineSample{timestamp, pose.TransformBy(transform),
-                        velocity.ToFieldRelative(transform.Rotation()),
-                        acceleration.ToFieldRelative(transform.Rotation()),
-                        curvature};
+  constexpr DrivetrainSplineSample Transform(
+      const Transform2d& transform) const {
+    return DrivetrainSplineSample{
+        time, pose.TransformBy(transform),
+        velocity.ToFieldRelative(transform.Rotation()),
+        acceleration.ToFieldRelative(transform.Rotation()), curvature};
   }
 
   /**
@@ -134,22 +134,11 @@ class SplineSample : public TrajectorySample {
    * @param other The pose to make this sample relative to.
    * @return A new sample with the relative pose.
    */
-  constexpr SplineSample RelativeTo(const Pose2d& other) const {
-    return SplineSample{timestamp, pose.RelativeTo(other),
-                        velocity.ToRobotRelative(other.Rotation()),
-                        acceleration.ToRobotRelative(other.Rotation()),
-                        curvature};
-  }
-
-  /**
-   * Creates a new sample with the given timestamp.
-   *
-   * @param newTimestamp The new timestamp.
-   * @return A new sample with the given timestamp.
-   */
-  constexpr SplineSample WithNewTimestamp(
-      wpi::units::second_t newTimestamp) const {
-    return SplineSample{newTimestamp, pose, velocity, acceleration, curvature};
+  constexpr DrivetrainSplineSample RelativeTo(const Pose2d& other) const {
+    return DrivetrainSplineSample{
+        time, pose.RelativeTo(other),
+        velocity.ToRobotRelative(other.Rotation()),
+        acceleration.ToRobotRelative(other.Rotation()), curvature};
   }
 
   /**
@@ -157,13 +146,14 @@ class SplineSample : public TrajectorySample {
    *
    * @return True if the samples are equal.
    */
-  constexpr bool operator==(const SplineSample& other) const = default;
+  constexpr bool operator==(const DrivetrainSplineSample& other) const =
+      default;
 };
 
 WPILIB_DLLEXPORT
-void to_json(wpi::util::json& json, const SplineSample& sample);
+void to_json(wpi::util::json& json, const DrivetrainSplineSample& sample);
 
 WPILIB_DLLEXPORT
-void from_json(const wpi::util::json& json, SplineSample& sample);
+void from_json(const wpi::util::json& json, DrivetrainSplineSample& sample);
 
 }  // namespace wpi::math

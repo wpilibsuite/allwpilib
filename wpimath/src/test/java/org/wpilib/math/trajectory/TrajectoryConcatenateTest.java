@@ -35,9 +35,9 @@ class TrajectoryConcatenateTest {
     for (int i = 0; i < t.samples.size(); ++i) {
       var state = t.samples.get(i);
 
-      // Make sure that the timestamps are strictly increasing.
-      assertTrue(state.timestamp >= time);
-      time = state.timestamp;
+      // Make sure that the times are strictly increasing.
+      assertTrue(state.time >= time);
+      time = state.time;
 
       // Ensure that the states in t are the same as those in t1 and t2.
       if (i < t1.samples.size()) {
@@ -47,7 +47,7 @@ class TrajectoryConcatenateTest {
         var originalIndex = i - t1.samples.size();
         if (originalIndex < t2.samples.size()) {
           var st = t2.samples.get(originalIndex);
-          assertEquals(state.timestamp, st.timestamp + t1.duration, 1e-6);
+          assertEquals(state.time, st.time + t1.duration, 1e-6);
           assertEquals(state.pose, st.pose);
           assertEquals(state.velocity, st.velocity);
           assertEquals(state.acceleration, st.acceleration);
