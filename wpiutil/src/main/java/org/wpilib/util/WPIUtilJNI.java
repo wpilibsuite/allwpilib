@@ -74,7 +74,7 @@ public class WPIUtilJNI {
    */
   public static native void writeStderr(String str);
 
-  /** Enable mock time. */
+  /** Enable mock time. The mock time is initially set to 0. */
   public static native void enableMockTime();
 
   /** Disable mock time. */

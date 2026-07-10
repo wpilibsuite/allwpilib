@@ -135,6 +135,7 @@ Java_org_wpilib_util_WPIUtilJNI_enableMockTime
                    "WPIUtil: Mocking time is not available on systemcore\n");
 #else
   mockTimeEnabled = true;
+  mockNow = 0;
   wpi::util::SetNowImpl([] { return mockNow; });
 #endif
 }
