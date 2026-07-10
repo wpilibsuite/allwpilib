@@ -13,15 +13,36 @@
 #include <utility>
 #include <vector>
 
+#include <ada.h>
+
 #include "wpi/net/NetworkStream.hpp"
 #include "wpi/net/raw_socket_istream.hpp"
 #include "wpi/net/raw_socket_ostream.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/raw_istream.hpp"
 
 namespace wpi::net {
+
+// Parse a URL into its components.
+// @param url URL to parse
+// @return Parsed URL components or ada::errors if parsing failed
+inline ada::result<ada::url_aggregator> ParseUrl(std::string_view urlStr) {
+  // Handle origin-form request targets (e.g., "/nt/...")
+  // by parsing with a dummy base URL
+  ada::result<ada::url_aggregator> url;
+  if (wpi::util::starts_with(urlStr, '/')) {
+    auto baseUrl = ada::parse("http://localhost").value();
+    // Origin-form: parse with a dummy base
+    url = ada::parse(urlStr, &baseUrl);
+  } else {
+    // Absolute-form: parse directly
+    url = ada::parse(urlStr);
+  }
+  return url;
+}
 
 // Unescape a %xx-encoded URI.
 // @param buf Buffer for output
@@ -64,43 +85,6 @@ bool ParseHttpHeaders(wpi::util::raw_istream& is,
 // @return False if error occurred on input stream, true if boundary found.
 bool FindMultipartBoundary(wpi::util::raw_istream& is,
                            std::string_view boundary, std::string* saveBuf);
-
-/**
- * Map for looking up elements of the query portion of a URI.  Does not
- * handle multiple elements with the same name.  This is a reference type;
- * it does not make a copy of the query string, so it is important that the
- * query string has a lifetime at least as long as this object.
- */
-class HttpQueryMap {
- public:
-  /**
-   * Constructs an empty map (with no entries).
-   */
-  HttpQueryMap() = default;
-
-  /**
-   * Constructs from an escaped query string.  Note: does not make a copy of
-   * the query string, so it must not be a temporary.
-   *
-   * @param query query string
-   */
-  explicit HttpQueryMap(std::string_view query);
-
-  /**
-   * Gets an element of the query string.  Both the name and the returned
-   * value are unescaped strings.
-   *
-   * @param name name (unescaped)
-   * @param buf result buffer for value
-   * @return Optional unescaped value.  Returns an empty optional if the
-   *         name is not present in the query map.
-   */
-  std::optional<std::string_view> Get(
-      std::string_view name, wpi::util::SmallVectorImpl<char>& buf) const;
-
- private:
-  wpi::util::StringMap<std::string_view> m_elems;
-};
 
 class HttpPathRef;
 

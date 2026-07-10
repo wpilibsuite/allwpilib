@@ -5,13 +5,11 @@
 #include <cstdio>
 #include <memory>
 
-#include <ada.h>
-
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/HttpServerConnection.hpp"
+#include "wpi/net/HttpUtil.hpp"
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/Tcp.hpp"
-#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/print.hpp"
 
 namespace uv = wpi::net::uv;
@@ -27,7 +25,7 @@ class MyHttpServerConnection : public wpi::net::HttpServerConnection {
 
 void MyHttpServerConnection::ProcessRequest() {
   wpi::util::print(stderr, "HTTP request: '{}'\n", m_request.GetUrl());
-  auto url = ada::parse(m_request.GetUrl());
+  auto url = wpi::net::ParseUrl(m_request.GetUrl());
   if (!url) {
     // failed to parse URL
     SendError(400);

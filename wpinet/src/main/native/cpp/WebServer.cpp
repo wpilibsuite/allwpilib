@@ -13,8 +13,6 @@
 #include <string>
 #include <utility>
 
-#include <ada.h>
-
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/HttpServerConnection.hpp"
 #include "wpi/net/HttpUtil.hpp"
@@ -228,7 +226,7 @@ void MyHttpConnection::SendFileResponse(int code, std::string_view codeText,
 
 void MyHttpConnection::ProcessRequest() {
   // wpi::util::print(stderr, "HTTP request: '{}'\n", m_request.GetUrl());
-  auto url = ada::parse(m_request.GetUrl());
+  auto url = wpi::net::ParseUrl(m_request.GetUrl());
   if (!url) {
     // failed to parse URL
     SendError(400);
@@ -254,7 +252,7 @@ void MyHttpConnection::ProcessRequest() {
     query = url->get_search();
   }
   // wpi::util::print(stderr, "query: \"{}\"\n", query);
-  HttpQueryMap qmap{query};
+  ada::url_search_params qmap{query};
 
   const bool isGET = m_request.GetMethod() == HTTP_GET;
   if (isGET && wpi::util::starts_with(path, '/') &&
@@ -270,9 +268,8 @@ void MyHttpConnection::ProcessRequest() {
         return;
       }
       // generate directory listing
-      wpi::util::SmallString<64> formatBuf;
       fs::path indexpath = fs::path{fullpath} / "index.html";
-      if (qmap.Get("format", formatBuf).value_or("") == "json") {
+      if (qmap.get("format").value_or("") == "json") {
         wpi::util::json dirs = wpi::util::json::array();
         wpi::util::json files = wpi::util::json::array();
         for (auto&& entry : fs::directory_iterator{fullpath}) {

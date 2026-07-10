@@ -9,10 +9,10 @@
 #include <string>
 #include <string_view>
 
-#include <ada.h>
 #include <llhttp.h>
 #include <uv.h>
 
+#include "wpi/net/HttpUtil.hpp"
 #include "wpi/net/MimeTypes.hpp"
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
@@ -150,7 +150,7 @@ void HALSimHttpConnection::SendFileResponse(int code, std::string_view codeText,
 }
 
 void HALSimHttpConnection::ProcessRequest() {
-  auto url = ada::parse(m_request.GetUrl());
+  auto url = wpi::net::ParseUrl(m_request.GetUrl());
   if (!url) {
     // failed to parse URL
     MySendError(400, "Invalid URL");

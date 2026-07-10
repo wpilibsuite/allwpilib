@@ -15,8 +15,6 @@
 #include <utility>
 #include <vector>
 
-#include <ada.h>
-
 #include "IConnectionList.hpp"
 #include "InstanceImpl.hpp"
 #include "Log.hpp"
@@ -126,7 +124,7 @@ void NetworkServer::ServerConnection::ConnectionClosed() {
 
 void NetworkServer::ServerConnection4::ProcessRequest() {
   DEBUG1("HTTP request: '{}'", m_request.GetUrl());
-  auto url = ada::parse(m_request.GetUrl());
+  auto url = wpi::net::ParseUrl(m_request.GetUrl());
   if (!url) {
     // failed to parse URL
     SendError(400);
@@ -162,9 +160,9 @@ void NetworkServer::ServerConnection4::ProcessRequest() {
 
 void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
   // get name from URL
-  auto url = ada::parse(m_request.GetUrl());
+  auto url = wpi::net::ParseUrl(m_request.GetUrl());
   std::string_view path;
-  if (url->get_pathname_length() > 0) {
+  if (url && url->get_pathname_length() > 0) {
     path = url->get_pathname();
   }
   DEBUG4("path: '{}'", path);
