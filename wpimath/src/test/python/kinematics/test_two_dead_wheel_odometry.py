@@ -7,7 +7,6 @@ from wpimath import (
     Rotation2d,
 )
 
-
 X_WHEEL_Y_POS = 1
 Y_WHEEL_X_POS = 1
 

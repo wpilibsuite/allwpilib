@@ -39,8 +39,8 @@ def test_multiple_consecutive_updates():
     assert second_pose.x == pytest.approx(0.0, abs=0.01)
     assert second_pose.y == pytest.approx(0.0, abs=0.01)
     assert second_pose.z == pytest.approx(0.0, abs=0.01)
-    assert (
-        second_pose.rotation().toRotation2d().degrees() == pytest.approx(0.0, abs=0.01)
+    assert second_pose.rotation().toRotation2d().degrees() == pytest.approx(
+        0.0, abs=0.01
     )
 
 
@@ -134,4 +134,3 @@ def test_gyro_offset():
     assert pose.rotation().x == pytest.approx(math.radians(0), abs=1e-9)
     assert pose.rotation().y == pytest.approx(math.radians(5), abs=1e-9)
     assert pose.rotation().z == pytest.approx(math.radians(90), abs=1e-9)
-
