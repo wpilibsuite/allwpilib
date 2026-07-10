@@ -1,15 +1,14 @@
 import wpiutil
-import time
 import pytest
 
 
 def test_default():
-    wpi_now = wpiutil.now() * 1e-6
-    py_now = int(time.time())
+    start_time = wpiutil.get_program_start_time()
+    now = wpiutil.now()
 
-    # Allow a one second delta. We don't care about it being all that accurate in the
-    # test, just that we are in the same galaxy
-    assert py_now == pytest.approx(wpi_now, abs=2)
+    assert start_time == wpiutil.get_program_start_time()
+    assert start_time <= now
+    assert now <= wpiutil.now()
 
 
 NOW_TIMESTAMP_S = 0
@@ -38,8 +37,8 @@ def test_custom_timestamp(custom_fixture):
     NOW_TIMESTAMP_S = 100
     assert 100_000_000 == wpiutil.now()
 
-    # Set it back to the standard implementation and expect its roughly milliseconds since 1970
+    # Set it back to the standard implementation and expect monotonic time.
     wpiutil.set_now_impl(None)
-    wpi_now = wpiutil.now() * 1e-6
-    py_now = int(time.time())
-    assert py_now == pytest.approx(wpi_now, abs=2)
+    now = wpiutil.now()
+    assert wpiutil.get_program_start_time() <= now
+    assert now <= wpiutil.now()

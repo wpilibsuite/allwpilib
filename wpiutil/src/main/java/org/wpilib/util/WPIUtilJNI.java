@@ -95,6 +95,13 @@ public class WPIUtilJNI {
   public static native long now();
 
   /**
+   * Returns the timestamp at which the program started.
+   *
+   * @return The program start timestamp in microseconds.
+   */
+  public static native long getProgramStartTime();
+
+  /**
    * Returns the system time.
    *
    * @return The system time.

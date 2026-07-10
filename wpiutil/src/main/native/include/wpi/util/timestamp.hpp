@@ -31,6 +31,14 @@ void SetNowImpl(uint64_t (*func)());
 uint64_t Now();
 
 /**
+ * Return the timestamp at which the program started.
+ * This uses the same time base as NowDefault(), in microseconds.
+ *
+ * @return Program start time in microseconds.
+ */
+uint64_t GetProgramStartTime();
+
+/**
  * Return the current system time in microseconds since the Unix epoch
  * (January 1st, 1970 00:00 UTC).
  *
