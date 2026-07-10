@@ -3,10 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/util/timestamp.hpp"
-#include "wpi/util/timestamp.h"
 
 #include <atomic>
 #include <chrono>
+
+#include "wpi/util/timestamp.h"
 
 static uint64_t timestamp() noexcept {
   // 1-us intervals
