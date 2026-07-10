@@ -99,8 +99,7 @@ wpilib_java_library(
         "//wpinet:wpinet-java",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
-        "@maven//:org_ejml_ejml_core",
-        "@maven//:org_ejml_ejml_simple",
+        "@maven//:org_ejml_ejml_java9module",
     ],
 )
 
