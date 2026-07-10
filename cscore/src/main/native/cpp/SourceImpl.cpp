@@ -474,8 +474,9 @@ void SourceImpl::PutFrame(wpi::util::PixelFormat pixelFormat, int width,
   auto image = AllocImage(pixelFormat, width, height, data.size());
 
   // Copy in image data
-  SDEBUG4("Copying data to {} from {} ({} bytes)", fmt::ptr(image->data()),
-          fmt::ptr(data.data()), data.size());
+  SDEBUG4("Copying data to {} from {} ({} bytes)",
+          static_cast<void*>(image->data()),
+          static_cast<const void*>(data.data()), data.size());
   std::memcpy(image->data(), data.data(), data.size());
 
   PutFrame(std::move(image), time, timeSrc);

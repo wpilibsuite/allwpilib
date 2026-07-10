@@ -5,12 +5,12 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
+#include <format>
 #include <stdexcept>
 #include <string>
 #include <string_view>
-
-#include <fmt/format.h>
 
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/ct_string.hpp"
@@ -803,7 +803,7 @@ class Color {
   static constexpr Color FromString(std::string_view str) {
     if (str.empty()) {
       throw std::invalid_argument(
-          fmt::format("Invalid color string \"{}\"", str));
+          std::format("Invalid color string \"{}\"", str));
     }
 
     // #RRGGBB style
@@ -813,7 +813,7 @@ class Color {
           !wpi::util::isHexDigit(str[3]) || !wpi::util::isHexDigit(str[4]) ||
           !wpi::util::isHexDigit(str[5]) || !wpi::util::isHexDigit(str[6])) {
         throw std::invalid_argument(
-            fmt::format("Invalid hex string \"{}\"", str));
+            std::format("Invalid hex string \"{}\"", str));
       }
 
       int r = wpi::util::hexDigitValue(str[1]) * 16 +
@@ -833,20 +833,20 @@ class Color {
       auto [greenStr, blueStr] = wpi::util::split(gbStr, ',');
       if (blueStr.empty()) {
         throw std::invalid_argument(
-            fmt::format("Invalid RGB string \"{}\"", str));
+            std::format("Invalid RGB string \"{}\"", str));
       }
       auto r = wpi::util::parse_integer<uint8_t>(wpi::util::trim(redStr), 10);
       auto g = wpi::util::parse_integer<uint8_t>(wpi::util::trim(greenStr), 10);
       auto b = wpi::util::parse_integer<uint8_t>(wpi::util::trim(blueStr), 10);
       if (!r || !g || !b) {
         throw std::invalid_argument(
-            fmt::format("Invalid RGB string \"{}\"", str));
+            std::format("Invalid RGB string \"{}\"", str));
       }
       return Color(*r, *g, *b);
     }
 
     throw std::invalid_argument(
-        fmt::format("Invalid color string \"{}\"", str));
+        std::format("Invalid color string \"{}\"", str));
   }
 
   /**

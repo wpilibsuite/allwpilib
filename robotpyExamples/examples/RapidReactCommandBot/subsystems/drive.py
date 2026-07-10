@@ -19,65 +19,70 @@ class Drive(Subsystem):
         super().__init__()
 
         # The motors on the left side of the drive.
-        self.leftLeader = wpilib.PWMSparkMax(DriveConstants.kLeftMotor1Port)
-        self.leftFollower = wpilib.PWMSparkMax(DriveConstants.kLeftMotor2Port)
+        self.left_leader = wpilib.PWMSparkMax(DriveConstants.LEFT_MOTOR1_PORT)
+        self.left_follower = wpilib.PWMSparkMax(DriveConstants.LEFT_MOTOR2_PORT)
 
         # The motors on the right side of the drive.
-        self.rightLeader = wpilib.PWMSparkMax(DriveConstants.kRightMotor1Port)
-        self.rightFollower = wpilib.PWMSparkMax(DriveConstants.kRightMotor2Port)
+        self.right_leader = wpilib.PWMSparkMax(DriveConstants.RIGHT_MOTOR1_PORT)
+        self.right_follower = wpilib.PWMSparkMax(DriveConstants.RIGHT_MOTOR2_PORT)
 
         # The robot's drive
-        self.drive = wpilib.DifferentialDrive(self.leftLeader, self.rightLeader)
+        self.drive = wpilib.DifferentialDrive(self.left_leader, self.right_leader)
 
         # The left-side drive encoder
-        self.leftEncoder = wpilib.Encoder(
-            DriveConstants.kLeftEncoderPorts[0],
-            DriveConstants.kLeftEncoderPorts[1],
-            DriveConstants.kLeftEncoderReversed,
+        self.left_encoder = wpilib.Encoder(
+            DriveConstants.LEFT_ENCODER_PORTS[0],
+            DriveConstants.LEFT_ENCODER_PORTS[1],
+            DriveConstants.LEFT_ENCODER_REVERSED,
         )
 
         # The right-side drive encoder
-        self.rightEncoder = wpilib.Encoder(
-            DriveConstants.kRightEncoderPorts[0],
-            DriveConstants.kRightEncoderPorts[1],
-            DriveConstants.kRightEncoderReversed,
+        self.right_encoder = wpilib.Encoder(
+            DriveConstants.RIGHT_ENCODER_PORTS[0],
+            DriveConstants.RIGHT_ENCODER_PORTS[1],
+            DriveConstants.RIGHT_ENCODER_REVERSED,
         )
 
         self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.FLAT)
         self.controller = wpimath.ProfiledPIDController(
-            DriveConstants.kTurnP,
-            DriveConstants.kTurnI,
-            DriveConstants.kTurnD,
+            DriveConstants.TURN_P,
+            DriveConstants.TURN_I,
+            DriveConstants.TURN_D,
             wpimath.TrapezoidProfile.Constraints(
-                DriveConstants.kMaxTurnRateDegPerS,
-                DriveConstants.kMaxTurnAccelerationDegPerSSquared,
+                DriveConstants.MAX_TURN_RATE_DEG_PER_S,
+                DriveConstants.MAX_TURN_ACCELERATION_DEG_PER_S_SQUARED,
             ),
         )
         self.feedforward = wpimath.SimpleMotorFeedforwardMeters(
-            DriveConstants.kS, DriveConstants.kV, DriveConstants.kA
+            DriveConstants.S, DriveConstants.V, DriveConstants.A
         )
 
-        self.leftLeader.addFollower(self.leftFollower)
-        self.rightLeader.addFollower(self.rightFollower)
+        self.left_leader.add_follower(self.left_follower)
+        self.right_leader.add_follower(self.right_follower)
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's
         # gearbox is constructed, you might have to invert the left side instead.
-        self.rightLeader.setInverted(True)
+        self.right_leader.set_inverted(True)
 
         # Sets the distance per pulse for the encoders
-        self.leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse)
-        self.rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse)
-
-        # Set the controller to be continuous (because it is an angle controller)
-        self.controller.enableContinuousInput(-180, 180)
-        # Set the controller tolerance - the delta tolerance ensures the robot is stationary at the
-        # setpoint before it is considered as having reached the reference
-        self.controller.setTolerance(
-            DriveConstants.kTurnToleranceDeg, DriveConstants.kTurnRateToleranceDegPerS
+        self.left_encoder.set_distance_per_pulse(
+            DriveConstants.ENCODER_DISTANCE_PER_PULSE
+        )
+        self.right_encoder.set_distance_per_pulse(
+            DriveConstants.ENCODER_DISTANCE_PER_PULSE
         )
 
-    def arcadeDriveCommand(
+        # Set the controller to be continuous (because it is an angle controller)
+        self.controller.enable_continuous_input(-180, 180)
+        # Set the controller tolerance - the delta tolerance ensures the robot is stationary at the
+        # setpoint before it is considered as having reached the reference
+        self.controller.set_tolerance(
+            DriveConstants.TURN_TOLERANCE_DEG,
+            DriveConstants.TURN_RATE_TOLERANCE_DEG_PER_S,
+        )
+
+    def arcade_drive_command(
         self, fwd: Callable[[], float], rot: Callable[[], float]
     ) -> Command:
         """Returns a command that drives the robot with arcade controls.
@@ -87,11 +92,11 @@ class Drive(Subsystem):
         """
         # A split-stick arcade command, with forward/backward controlled by the left
         # hand, and turning controlled by the right.
-        return self.run(lambda: self.drive.arcadeDrive(fwd(), rot())).withName(
+        return self.run(lambda: self.drive.arcade_drive(fwd(), rot())).with_name(
             "arcadeDrive"
         )
 
-    def driveDistanceCommand(self, distance: float, velocity: float) -> Command:
+    def drive_distance_command(self, distance: float, velocity: float) -> Command:
         """Returns a command that drives the robot forward a specified distance at a specified
         velocity.
 
@@ -99,23 +104,23 @@ class Drive(Subsystem):
         :param velocity: The fraction of max velocity at which to drive
         """
         return (
-            self.runOnce(
+            self.run_once(
                 lambda: (
-                    self.leftEncoder.reset(),
-                    self.rightEncoder.reset(),
+                    self.left_encoder.reset(),
+                    self.right_encoder.reset(),
                 )
             )
-            .andThen(self.run(lambda: self.drive.arcadeDrive(velocity, 0)))
+            .and_then(self.run(lambda: self.drive.arcade_drive(velocity, 0)))
             .until(
                 lambda: max(
-                    self.leftEncoder.getDistance(), self.rightEncoder.getDistance()
+                    self.left_encoder.get_distance(), self.right_encoder.get_distance()
                 )
                 >= distance
             )
-            .finallyDo(lambda interrupted: self.drive.stopMotor())
+            .finally_do(lambda interrupted: self.drive.stop_motor())
         )
 
-    def turnToAngleCommand(self, angleDeg: float) -> Command:
+    def turn_to_angle_command(self, angle_deg: float) -> Command:
         """Returns a command that turns to robot to the specified angle using a motion profile and
         PID controller.
 
@@ -123,23 +128,23 @@ class Drive(Subsystem):
         """
 
         def _reset() -> None:
-            self.controller.reset(self.imu.getRotation2d().degrees())
+            self.controller.reset(self.imu.get_rotation2d().degrees())
 
         def _run() -> None:
             rotation_output = self.controller.calculate(
-                self.imu.getRotation2d().degrees(), angleDeg
+                self.imu.get_rotation2d().degrees(), angle_deg
             )
             feedforward = self.feedforward.calculate(
-                self.controller.getSetpoint().velocity
+                self.controller.get_setpoint().velocity
             )
-            self.drive.arcadeDrive(
+            self.drive.arcade_drive(
                 0,
                 rotation_output
-                + feedforward / wpilib.RobotController.getBatteryVoltage(),
+                + feedforward / wpilib.RobotController.get_battery_voltage(),
             )
 
         return (
-            self.startRun(_reset, _run)
-            .until(self.controller.atGoal)
-            .finallyDo(lambda interrupted: self.drive.arcadeDrive(0, 0))
+            self.start_run(_reset, _run)
+            .until(self.controller.at_goal)
+            .finally_do(lambda interrupted: self.drive.arcade_drive(0, 0))
         )

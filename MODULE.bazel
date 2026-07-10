@@ -60,7 +60,7 @@ maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
     name = "maven",
     artifacts = [
-        "org.ejml:ejml-simple:0.44.0",
+        "org.ejml:ejml-java9module:0.46.0",
         "io.avaje:avaje-jsonb:3.14",
         "io.avaje:avaje-jsonb-generator:3.14",
         "us.hebi.quickbuf:quickbuf-runtime:1.4",

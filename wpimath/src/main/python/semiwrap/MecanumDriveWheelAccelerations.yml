@@ -27,14 +27,14 @@ inline_code: |
       py::init<
         wpi::units::meters_per_second_squared_t, wpi::units::meters_per_second_squared_t, wpi::units::meters_per_second_squared_t, wpi::units::meters_per_second_squared_t
       >(),
-      py::arg("frontLeft") = 0, py::arg("frontRight") = 0, py::arg("rearLeft") = 0, py::arg("rearRight") = 0
+      py::arg("front_left") = 0, py::arg("front_right") = 0, py::arg("rear_left") = 0, py::arg("rear_right") = 0
     )
-    .def_static("fromFps", [](wpi::units::feet_per_second_squared_t frontLeft,
+    .def_static("from_fps", [](wpi::units::feet_per_second_squared_t frontLeft,
                                 wpi::units::feet_per_second_squared_t frontRight,
                                 wpi::units::feet_per_second_squared_t rearLeft,
                                 wpi::units::feet_per_second_squared_t rearRight){
       return MecanumDriveWheelAccelerations{frontLeft, frontRight, rearLeft, rearRight};
-    }, py::arg("frontLeft") = 0, py::arg("frontRight") = 0, py::arg("rearLeft") = 0, py::arg("rearRight") = 0)
+    }, py::arg("front_left") = 0, py::arg("front_right") = 0, py::arg("rear_left") = 0, py::arg("rear_right") = 0)
     .def_property("front_left_fpss",
       [](MecanumDriveWheelAccelerations * self) -> wpi::units::feet_per_second_squared_t {
         return self->frontLeft;
@@ -68,10 +68,10 @@ inline_code: |
       }
     )
     .def("__repr__", [](const MecanumDriveWheelAccelerations &mdwa) -> std::string {
-      return "MecanumDriveWheelAccelerations(frontLeft=" + std::to_string(mdwa.frontLeft()) + ", "
-                                            "frontRight=" + std::to_string(mdwa.frontRight()) + ", "
-                                            "rearLeft=" + std::to_string(mdwa.rearLeft()) + ", "
-                                            "rearRight=" + std::to_string(mdwa.rearRight()) + ")";
+      return "MecanumDriveWheelAccelerations(front_left=" + std::to_string(mdwa.frontLeft()) + ", "
+                                            "front_right=" + std::to_string(mdwa.frontRight()) + ", "
+                                            "rear_left=" + std::to_string(mdwa.rearLeft()) + ", "
+                                            "rear_right=" + std::to_string(mdwa.rearRight()) + ")";
     })
   ;
 

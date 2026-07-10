@@ -15,33 +15,33 @@ class MyRobot(wpilib.TimedRobot):
     keeping.
     """
 
-    kAngleSetpoint = 0.0
-    kP = 0.005  # proportional turning constant
+    ANGLE_SETPOINT = 0.0
+    P = 0.005  # proportional turning constant
 
-    kLeftMotorPort = 0
-    kRightMotorPort = 1
-    kIMUMountOrientation = wpilib.OnboardIMU.MountOrientation.FLAT
-    kJoystickPort = 0
+    LEFT_MOTOR_PORT = 0
+    RIGHT_MOTOR_PORT = 1
+    IMU_MOUNT_ORIENTATION = wpilib.OnboardIMU.MountOrientation.FLAT
+    JOYSTICK_PORT = 0
 
     def __init__(self) -> None:
         """Robot initialization function"""
         super().__init__()
 
-        self.leftDrive = wpilib.PWMSparkMax(self.kLeftMotorPort)
-        self.rightDrive = wpilib.PWMSparkMax(self.kRightMotorPort)
-        self.myRobot = wpilib.DifferentialDrive(self.leftDrive, self.rightDrive)
-        self.imu = wpilib.OnboardIMU(self.kIMUMountOrientation)
-        self.joystick = wpilib.Joystick(self.kJoystickPort)
+        self.left_drive = wpilib.PWMSparkMax(self.LEFT_MOTOR_PORT)
+        self.right_drive = wpilib.PWMSparkMax(self.RIGHT_MOTOR_PORT)
+        self.my_robot = wpilib.DifferentialDrive(self.left_drive, self.right_drive)
+        self.imu = wpilib.OnboardIMU(self.IMU_MOUNT_ORIENTATION)
+        self.joystick = wpilib.Joystick(self.JOYSTICK_PORT)
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's
         # gearbox is constructed, you might have to invert the left side instead.
-        self.rightDrive.setInverted(True)
+        self.right_drive.set_inverted(True)
 
-    def teleopPeriodic(self) -> None:
+    def teleop_periodic(self) -> None:
         # The motor velocity is set from the joystick while the DifferentialDrive turning value is assigned
         # from the error between the setpoint and the gyro angle.
-        turningValue = (
-            self.kAngleSetpoint - self.imu.getRotation2d().degrees()
-        ) * self.kP
-        self.myRobot.arcadeDrive(-self.joystick.getY(), -turningValue)
+        turning_value = (
+            self.ANGLE_SETPOINT - self.imu.get_rotation2d().degrees()
+        ) * self.P
+        self.my_robot.arcade_drive(-self.joystick.get_y(), -turning_value)

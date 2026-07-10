@@ -3,7 +3,6 @@ import math
 import random
 
 from wpimath import (
-    ChassisVelocities,
     MecanumDriveKinematics,
     MecanumDriveOdometry,
     MecanumDriveWheelPositions,
@@ -38,12 +37,14 @@ def odometry_test():
 
 def test_multiple_consecutive_updates(odometry_test):
     wheel_deltas = MecanumDriveWheelPositions(
-        frontLeft=3.536, frontRight=3.536, rearLeft=3.536, rearRight=3.536
+        front_left=3.536, front_right=3.536, rear_left=3.536, rear_right=3.536
     )
 
-    odometry_test.odometry.resetPosition(Rotation2d(0), wheel_deltas, Pose2d())
+    odometry_test.odometry.reset_position(Rotation2d(0), wheel_deltas, Pose2d())
     odometry_test.odometry.update(Rotation2d(0), wheel_deltas)
-    second_pose = odometry_test.odometry.update(Rotation2d.fromDegrees(0), wheel_deltas)
+    second_pose = odometry_test.odometry.update(
+        Rotation2d.from_degrees(0), wheel_deltas
+    )
 
     assert second_pose.x == pytest.approx(0.0, abs=0.01)
     assert second_pose.y == pytest.approx(0.0, abs=0.01)
@@ -51,9 +52,9 @@ def test_multiple_consecutive_updates(odometry_test):
 
 
 def test_two_iterations(odometry_test):
-    odometry_test.odometry.resetPosition(Rotation2d(0), odometry_test.zero, Pose2d())
+    odometry_test.odometry.reset_position(Rotation2d(0), odometry_test.zero, Pose2d())
     wheel_deltas = MecanumDriveWheelPositions(
-        frontLeft=0.3536, frontRight=0.3536, rearLeft=0.3536, rearRight=0.3536
+        front_left=0.3536, front_right=0.3536, rear_left=0.3536, rear_right=0.3536
     )
 
     odometry_test.odometry.update(Rotation2d(0), MecanumDriveWheelPositions())
@@ -65,12 +66,12 @@ def test_two_iterations(odometry_test):
 
 
 def test_90_degree_turn(odometry_test):
-    odometry_test.odometry.resetPosition(Rotation2d(0), odometry_test.zero, Pose2d())
+    odometry_test.odometry.reset_position(Rotation2d(0), odometry_test.zero, Pose2d())
     wheel_deltas = MecanumDriveWheelPositions(
-        frontLeft=-13.328, frontRight=39.986, rearLeft=-13.329, rearRight=39.986
+        front_left=-13.328, front_right=39.986, rear_left=-13.329, rear_right=39.986
     )
     odometry_test.odometry.update(Rotation2d(0), MecanumDriveWheelPositions())
-    pose = odometry_test.odometry.update(Rotation2d.fromDegrees(90), wheel_deltas)
+    pose = odometry_test.odometry.update(Rotation2d.from_degrees(90), wheel_deltas)
 
     assert pose.x == pytest.approx(8.4855, abs=0.01)
     assert pose.y == pytest.approx(8.4855, abs=0.01)
@@ -78,18 +79,18 @@ def test_90_degree_turn(odometry_test):
 
 
 def test_gyro_angle_reset(odometry_test):
-    odometry_test.odometry.resetPosition(
-        Rotation2d.fromDegrees(90), odometry_test.zero, Pose2d()
+    odometry_test.odometry.reset_position(
+        Rotation2d.from_degrees(90), odometry_test.zero, Pose2d()
     )
 
     wheel_deltas = MecanumDriveWheelPositions(
-        frontLeft=0.3536, frontRight=0.3536, rearLeft=0.3536, rearRight=0.3536
+        front_left=0.3536, front_right=0.3536, rear_left=0.3536, rear_right=0.3536
     )
 
     odometry_test.odometry.update(
-        Rotation2d.fromDegrees(90), MecanumDriveWheelPositions()
+        Rotation2d.from_degrees(90), MecanumDriveWheelPositions()
     )
-    pose = odometry_test.odometry.update(Rotation2d.fromDegrees(90), wheel_deltas)
+    pose = odometry_test.odometry.update(Rotation2d.from_degrees(90), wheel_deltas)
 
     assert pose.x == pytest.approx(0.3536, abs=0.01)
     assert pose.y == pytest.approx(0.0, abs=0.01)
@@ -98,25 +99,25 @@ def test_gyro_angle_reset(odometry_test):
 
 def test_accuracy_facing_trajectory():
     kinematics = MecanumDriveKinematics(
-        frontLeftWheel=Translation2d(x=1, y=1),
-        frontRightWheel=Translation2d(x=1, y=-1),
-        rearLeftWheel=Translation2d(x=-1, y=-1),
-        rearRightWheel=Translation2d(x=-1, y=1),
+        front_left_wheel=Translation2d(x=1, y=1),
+        front_right_wheel=Translation2d(x=1, y=-1),
+        rear_left_wheel=Translation2d(x=-1, y=-1),
+        rear_right_wheel=Translation2d(x=-1, y=1),
     )
 
     wheel_positions = MecanumDriveWheelPositions()
 
     odometry = MecanumDriveOdometry(kinematics, Rotation2d(), wheel_positions)
 
-    trajectory = TrajectoryGenerator.generateTrajectory(
+    trajectory = TrajectoryGenerator.generate_trajectory(
         [
-            Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(45)),
-            Pose2d(x=3, y=0, rotation=Rotation2d.fromDegrees(-90)),
-            Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(135)),
-            Pose2d(x=-3, y=0, rotation=Rotation2d.fromDegrees(-90)),
-            Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(45)),
+            Pose2d(x=0, y=0, rotation=Rotation2d.from_degrees(45)),
+            Pose2d(x=3, y=0, rotation=Rotation2d.from_degrees(-90)),
+            Pose2d(x=0, y=0, rotation=Rotation2d.from_degrees(135)),
+            Pose2d(x=-3, y=0, rotation=Rotation2d.from_degrees(-90)),
+            Pose2d(x=0, y=0, rotation=Rotation2d.from_degrees(45)),
         ],
-        TrajectoryConfig(maxVelocity=0.5, maxAcceleration=2.0),
+        TrajectoryConfig(max_velocity=0.5, max_acceleration=2.0),
     )
 
     random.seed(4915)
@@ -128,23 +129,23 @@ def test_accuracy_facing_trajectory():
     error_sum = 0
 
     while t < trajectory.duration():
-        ground_truth_state = trajectory.sampleAt(t)
+        ground_truth_state = trajectory.sample_at(t)
 
-        wheel_velocities = kinematics.toWheelVelocities(
-            ground_truth_state.velocity.toRobotRelative(
+        wheel_velocities = kinematics.to_wheel_velocities(
+            ground_truth_state.velocity.to_robot_relative(
                 ground_truth_state.pose.rotation()
             )
         )
 
-        wheel_velocities.frontLeft += random.gauss(0.0, 1.0) * 0.1
-        wheel_velocities.frontRight += random.gauss(0.0, 1.0) * 0.1
-        wheel_velocities.rearLeft += random.gauss(0.0, 1.0) * 0.1
-        wheel_velocities.rearRight += random.gauss(0.0, 1.0) * 0.1
+        wheel_velocities.front_left += random.gauss(0.0, 1.0) * 0.1
+        wheel_velocities.front_right += random.gauss(0.0, 1.0) * 0.1
+        wheel_velocities.rear_left += random.gauss(0.0, 1.0) * 0.1
+        wheel_velocities.rear_right += random.gauss(0.0, 1.0) * 0.1
 
-        wheel_positions.frontLeft += wheel_velocities.frontLeft * dt
-        wheel_positions.frontRight += wheel_velocities.frontRight * dt
-        wheel_positions.rearLeft += wheel_velocities.rearLeft * dt
-        wheel_positions.rearRight += wheel_velocities.rearRight * dt
+        wheel_positions.front_left += wheel_velocities.front_left * dt
+        wheel_positions.front_right += wheel_velocities.front_right * dt
+        wheel_positions.rear_left += wheel_velocities.rear_left * dt
+        wheel_positions.rear_right += wheel_velocities.rear_right * dt
 
         xhat = odometry.update(
             ground_truth_state.pose.rotation()
@@ -165,23 +166,23 @@ def test_accuracy_facing_trajectory():
 
 def test_accuracy_facing_x_axis():
     kinematics = MecanumDriveKinematics(
-        frontLeftWheel=Translation2d(x=1, y=1),
-        frontRightWheel=Translation2d(x=1, y=-1),
-        rearLeftWheel=Translation2d(x=-1, y=-1),
-        rearRightWheel=Translation2d(x=-1, y=1),
+        front_left_wheel=Translation2d(x=1, y=1),
+        front_right_wheel=Translation2d(x=1, y=-1),
+        rear_left_wheel=Translation2d(x=-1, y=-1),
+        rear_right_wheel=Translation2d(x=-1, y=1),
     )
 
     wheel_positions = MecanumDriveWheelPositions()
 
     odometry = MecanumDriveOdometry(kinematics, Rotation2d(), wheel_positions)
 
-    trajectory = TrajectoryGenerator.generateTrajectory(
+    trajectory = TrajectoryGenerator.generate_trajectory(
         [
-            Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(45)),
-            Pose2d(x=3, y=0, rotation=Rotation2d.fromDegrees(-90)),
-            Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(135)),
-            Pose2d(x=-3, y=0, rotation=Rotation2d.fromDegrees(-90)),
-            Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(45)),
+            Pose2d(x=0, y=0, rotation=Rotation2d.from_degrees(45)),
+            Pose2d(x=3, y=0, rotation=Rotation2d.from_degrees(-90)),
+            Pose2d(x=0, y=0, rotation=Rotation2d.from_degrees(135)),
+            Pose2d(x=-3, y=0, rotation=Rotation2d.from_degrees(-90)),
+            Pose2d(x=0, y=0, rotation=Rotation2d.from_degrees(45)),
         ],
         TrajectoryConfig(5.0, 2.0),
     )
@@ -195,19 +196,19 @@ def test_accuracy_facing_x_axis():
     error_sum = 0
 
     while t < trajectory.duration():
-        ground_truth_state = trajectory.sampleAt(t)
+        ground_truth_state = trajectory.sample_at(t)
 
-        wheel_velocities = kinematics.toWheelVelocities(ground_truth_state.velocity)
+        wheel_velocities = kinematics.to_wheel_velocities(ground_truth_state.velocity)
 
-        wheel_velocities.frontLeft += random.gauss(0.0, 1.0) * 0.1
-        wheel_velocities.frontRight += random.gauss(0.0, 1.0) * 0.1
-        wheel_velocities.rearLeft += random.gauss(0.0, 1.0) * 0.1
-        wheel_velocities.rearRight += random.gauss(0.0, 1.0) * 0.1
+        wheel_velocities.front_left += random.gauss(0.0, 1.0) * 0.1
+        wheel_velocities.front_right += random.gauss(0.0, 1.0) * 0.1
+        wheel_velocities.rear_left += random.gauss(0.0, 1.0) * 0.1
+        wheel_velocities.rear_right += random.gauss(0.0, 1.0) * 0.1
 
-        wheel_positions.frontLeft += wheel_velocities.frontLeft * dt
-        wheel_positions.frontRight += wheel_velocities.frontRight * dt
-        wheel_positions.rearLeft += wheel_velocities.rearLeft * dt
-        wheel_positions.rearRight += wheel_velocities.rearRight * dt
+        wheel_positions.front_left += wheel_velocities.front_left * dt
+        wheel_positions.front_right += wheel_velocities.front_right * dt
+        wheel_positions.rear_left += wheel_velocities.rear_left * dt
+        wheel_positions.rear_right += wheel_velocities.rear_right * dt
 
         xhat = odometry.update(
             Rotation2d(random.gauss(0.0, 1.0) * 0.05), wheel_positions

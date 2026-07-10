@@ -22,7 +22,7 @@ macro(add_doxygen_docs)
 
         if(DOCS_WARNINGS_AS_ERRORS)
             set(DOXYGEN_WARN_AS_ERROR "FAIL_ON_WARNINGS_PRINT")
-            list(FILTER dirs EXCLUDE REGEX fmt|memory|units)
+            list(FILTER dirs EXCLUDE REGEX memory|units)
             list(
                 APPEND DOXYGEN_EXCLUDE_PATTERNS
                 # apriltag

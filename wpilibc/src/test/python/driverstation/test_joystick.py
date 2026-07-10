@@ -9,141 +9,141 @@ def test_fast_deconstruction(wpilib_state):
     Joystick(0)
 
 
-def test_getX() -> None:
+def test_get_x() -> None:
     joy = Joystick(1)
     joysim = JoystickSim(joy)
 
-    joysim.setX(0.25)
-    joysim.notifyNewData()
-    assert math.isclose(joy.getX(), 0.25)
+    joysim.set_x(0.25)
+    joysim.notify_new_data()
+    assert math.isclose(joy.get_x(), 0.25)
 
-    joysim.setX(0)
-    joysim.notifyNewData()
-    assert math.isclose(joy.getX(), 0.0)
+    joysim.set_x(0)
+    joysim.notify_new_data()
+    assert math.isclose(joy.get_x(), 0.0)
 
 
-def test_getY() -> None:
+def test_get_y() -> None:
     joy = Joystick(1)
     joysim = JoystickSim(joy)
 
-    joysim.setY(0.25)
-    joysim.notifyNewData()
-    assert math.isclose(joy.getY(), 0.25)
+    joysim.set_y(0.25)
+    joysim.notify_new_data()
+    assert math.isclose(joy.get_y(), 0.25)
 
-    joysim.setY(0)
-    joysim.notifyNewData()
-    assert math.isclose(joy.getY(), 0.0)
+    joysim.set_y(0)
+    joysim.notify_new_data()
+    assert math.isclose(joy.get_y(), 0.0)
 
 
-def test_getZ() -> None:
+def test_get_z() -> None:
     joy = Joystick(1)
     joysim = JoystickSim(joy)
 
-    joysim.setZ(0.25)
-    joysim.notifyNewData()
-    assert math.isclose(joy.getZ(), 0.25)
+    joysim.set_z(0.25)
+    joysim.notify_new_data()
+    assert math.isclose(joy.get_z(), 0.25)
 
-    joysim.setZ(0)
-    joysim.notifyNewData()
-    assert math.isclose(joy.getZ(), 0.0)
+    joysim.set_z(0)
+    joysim.notify_new_data()
+    assert math.isclose(joy.get_z(), 0.0)
 
 
-def test_getTwist() -> None:
+def test_get_twist() -> None:
     joy = Joystick(1)
     joysim = JoystickSim(joy)
 
-    joysim.setTwist(0.25)
-    joysim.notifyNewData()
-    assert math.isclose(joy.getTwist(), 0.25)
+    joysim.set_twist(0.25)
+    joysim.notify_new_data()
+    assert math.isclose(joy.get_twist(), 0.25)
 
-    joysim.setTwist(0)
-    joysim.notifyNewData()
-    assert math.isclose(joy.getTwist(), 0.0)
+    joysim.set_twist(0)
+    joysim.notify_new_data()
+    assert math.isclose(joy.get_twist(), 0.0)
 
 
-def test_getThrottle() -> None:
+def test_get_throttle() -> None:
     joy = Joystick(1)
     joysim = JoystickSim(joy)
 
-    joysim.setThrottle(0.25)
-    joysim.notifyNewData()
-    assert math.isclose(joy.getThrottle(), 0.25)
+    joysim.set_throttle(0.25)
+    joysim.notify_new_data()
+    assert math.isclose(joy.get_throttle(), 0.25)
 
-    joysim.setThrottle(0)
-    joysim.notifyNewData()
-    assert math.isclose(joy.getThrottle(), 0.0)
+    joysim.set_throttle(0)
+    joysim.notify_new_data()
+    assert math.isclose(joy.get_throttle(), 0.0)
 
 
-def test_getTrigger() -> None:
+def test_get_trigger() -> None:
     joy = Joystick(1)
     joysim = JoystickSim(joy)
 
-    joysim.setTrigger(True)
-    joysim.notifyNewData()
-    assert joy.getTrigger()
+    joysim.set_trigger(True)
+    joysim.notify_new_data()
+    assert joy.get_trigger()
 
-    joysim.setTrigger(False)
-    joysim.notifyNewData()
-    assert not joy.getTrigger()
+    joysim.set_trigger(False)
+    joysim.notify_new_data()
+    assert not joy.get_trigger()
 
 
-def test_getTop() -> None:
+def test_get_top() -> None:
     joy = Joystick(1)
     joysim = JoystickSim(joy)
 
-    joysim.setTop(True)
-    joysim.notifyNewData()
-    assert joy.getTop()
+    joysim.set_top(True)
+    joysim.notify_new_data()
+    assert joy.get_top()
 
-    joysim.setTop(False)
-    joysim.notifyNewData()
-    assert not joy.getTop()
-
-
-def test_getMagnitude() -> None:
-    joy = Joystick(1)
-    joysim = JoystickSim(joy)
-
-    # X Only
-    joysim.setX(0.5)
-    joysim.setY(0.0)
-    joysim.notifyNewData()
-    assert math.isclose(joy.getMagnitude(), 0.5)
-
-    # Y Only
-    joysim.setX(0.0)
-    joysim.setY(-0.5)
-    joysim.notifyNewData()
-    assert math.isclose(joy.getMagnitude(), 0.5)
-
-    # Both
-    joysim.setX(0.5)
-    joysim.setY(-0.5)
-    joysim.notifyNewData()
-    assert math.isclose(joy.getMagnitude(), 0.70710678118)
+    joysim.set_top(False)
+    joysim.notify_new_data()
+    assert not joy.get_top()
 
 
-def test_getDirection() -> None:
+def test_get_magnitude() -> None:
     joy = Joystick(1)
     joysim = JoystickSim(joy)
 
     # X Only
-    joysim.setX(0.5)
-    joysim.setY(0.0)
-    joysim.notifyNewData()
-    assert math.isclose(joy.getDirectionDegrees(), 90)
-    assert math.isclose(joy.getDirectionRadians(), math.radians(90))
+    joysim.set_x(0.5)
+    joysim.set_y(0.0)
+    joysim.notify_new_data()
+    assert math.isclose(joy.get_magnitude(), 0.5)
 
     # Y Only
-    joysim.setX(0.0)
-    joysim.setY(-0.5)
-    joysim.notifyNewData()
-    assert math.isclose(joy.getDirectionDegrees(), 0)
-    assert math.isclose(joy.getDirectionRadians(), math.radians(0))
+    joysim.set_x(0.0)
+    joysim.set_y(-0.5)
+    joysim.notify_new_data()
+    assert math.isclose(joy.get_magnitude(), 0.5)
 
     # Both
-    joysim.setX(0.5)
-    joysim.setY(-0.5)
-    joysim.notifyNewData()
-    assert math.isclose(joy.getDirectionDegrees(), 45)
-    assert math.isclose(joy.getDirectionRadians(), math.radians(45))
+    joysim.set_x(0.5)
+    joysim.set_y(-0.5)
+    joysim.notify_new_data()
+    assert math.isclose(joy.get_magnitude(), 0.70710678118)
+
+
+def test_get_direction() -> None:
+    joy = Joystick(1)
+    joysim = JoystickSim(joy)
+
+    # X Only
+    joysim.set_x(0.5)
+    joysim.set_y(0.0)
+    joysim.notify_new_data()
+    assert math.isclose(joy.get_direction_degrees(), 90)
+    assert math.isclose(joy.get_direction_radians(), math.radians(90))
+
+    # Y Only
+    joysim.set_x(0.0)
+    joysim.set_y(-0.5)
+    joysim.notify_new_data()
+    assert math.isclose(joy.get_direction_degrees(), 0)
+    assert math.isclose(joy.get_direction_radians(), math.radians(0))
+
+    # Both
+    joysim.set_x(0.5)
+    joysim.set_y(-0.5)
+    joysim.notify_new_data()
+    assert math.isclose(joy.get_direction_degrees(), 45)
+    assert math.isclose(joy.get_direction_radians(), math.radians(45))

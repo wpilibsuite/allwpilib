@@ -10,10 +10,10 @@ classes:
       MinMaxAcceleration:
     template_inline_code: |
       cls_SwerveDriveKinematicsConstraint
-        .def_static("fromFps", [](const wpi::math::SwerveDriveKinematics<NumModules>& kinematics,
+        .def_static("from_fps", [](const wpi::math::SwerveDriveKinematics<NumModules>& kinematics,
                                   wpi::units::feet_per_second_t maxVelocity) {
           return std::make_shared<wpi::math::SwerveDriveKinematicsConstraint<NumModules>>(kinematics, maxVelocity);
-        }, py::arg("kinematics"), py::arg("maxVelocity"))
+        }, py::arg("kinematics"), py::arg("max_velocity"))
       ;
 
 templates:

@@ -18,35 +18,35 @@ class MyRobot(wpilib.TimedRobot):
         self.swerve = drivetrain.Drivetrain()
 
         # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
-        self.xvelocityLimiter = wpimath.SlewRateLimiter(3)
-        self.yvelocityLimiter = wpimath.SlewRateLimiter(3)
-        self.rotLimiter = wpimath.SlewRateLimiter(3)
+        self.x_velocity_limiter = wpimath.SlewRateLimiter(3)
+        self.y_velocity_limiter = wpimath.SlewRateLimiter(3)
+        self.rot_limiter = wpimath.SlewRateLimiter(3)
 
-    def autonomousPeriodic(self) -> None:
-        self.driveWithJoystick(False)
-        self.swerve.updateOdometry()
+    def autonomous_periodic(self) -> None:
+        self.drive_with_joystick(False)
+        self.swerve.update_odometry()
 
-    def teleopPeriodic(self) -> None:
-        self.driveWithJoystick(True)
+    def teleop_periodic(self) -> None:
+        self.drive_with_joystick(True)
 
-    def driveWithJoystick(self, fieldRelative: bool) -> None:
+    def drive_with_joystick(self, field_relative: bool) -> None:
         # Get the x velocity. We are inverting this because Xbox controllers return
         # negative values when we push forward.
-        xVelocity = (
-            -self.xvelocityLimiter.calculate(
-                wpimath.applyDeadband(self.controller.getLeftY(), 0.02)
+        x_velocity = (
+            -self.x_velocity_limiter.calculate(
+                wpimath.apply_deadband(self.controller.get_left_y(), 0.02)
             )
-            * drivetrain.kMaxVelocity
+            * drivetrain.MAX_VELOCITY
         )
 
         # Get the y velocity or sideways/strafe velocity. We are inverting this because
         # we want a positive value when we pull to the left. Xbox controllers
         # return positive values when you pull to the right by default.
-        yVelocity = (
-            -self.yvelocityLimiter.calculate(
-                wpimath.applyDeadband(self.controller.getLeftX(), 0.02)
+        y_velocity = (
+            -self.y_velocity_limiter.calculate(
+                wpimath.apply_deadband(self.controller.get_left_x(), 0.02)
             )
-            * drivetrain.kMaxVelocity
+            * drivetrain.MAX_VELOCITY
         )
 
         # Get the rate of angular rotation. We are inverting this because we want a
@@ -54,10 +54,12 @@ class MyRobot(wpilib.TimedRobot):
         # mathematics). Xbox controllers return positive values when you pull to
         # the right by default.
         rot = (
-            -self.rotLimiter.calculate(
-                wpimath.applyDeadband(self.controller.getRightX(), 0.02)
+            -self.rot_limiter.calculate(
+                wpimath.apply_deadband(self.controller.get_right_x(), 0.02)
             )
-            * drivetrain.kMaxAngularVelocity
+            * drivetrain.MAX_ANGULAR_VELOCITY
         )
 
-        self.swerve.drive(xVelocity, yVelocity, rot, fieldRelative, self.getPeriod())
+        self.swerve.drive(
+            x_velocity, y_velocity, rot, field_relative, self.get_period()
+        )

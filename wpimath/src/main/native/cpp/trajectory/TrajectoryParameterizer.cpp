@@ -28,9 +28,8 @@
 
 #include "wpi/math/trajectory/TrajectoryParameterizer.hpp"
 
+#include <format>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "wpi/math/trajectory/SplineTrajectory.hpp"
 #include "wpi/units/math.hpp"
@@ -204,7 +203,7 @@ SplineTrajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
         // delta_x = vt
         dt = ds / v;
       } else {
-        throw std::runtime_error(fmt::format(
+        throw std::runtime_error(std::format(
             "Something went wrong at iteration {} of time parameterization.",
             i));
       }

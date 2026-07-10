@@ -8,7 +8,7 @@ from wpimath import ExponentialProfileMeterVolts, SimpleMotorFeedforwardMeters
 
 kDt = 0.01
 feedforward = SimpleMotorFeedforwardMeters(0, 2.5629, 0.43277, kDt)
-constraints = ExponentialProfileMeterVolts.Constraints.fromCharacteristics(
+constraints = ExponentialProfileMeterVolts.Constraints.from_characteristics(
     12, 2.5629, 0.43277
 )
 
@@ -33,7 +33,7 @@ def check_dynamics(
 
     signal = feedforward.calculate(current.velocity, next_state.velocity)
 
-    assert abs(signal) < constraints.maxInput + 1e-9
+    assert abs(signal) < constraints.max_input + 1e-9
 
     return next_state
 
@@ -60,8 +60,8 @@ def test_pos_continuous_under_vel_change(profile):
     for i in range(300):
         if i == 150:
             profile = ExponentialProfileMeterVolts(
-                ExponentialProfileMeterVolts.Constraints.fromStateSpace(
-                    9, constraints.A, constraints.B
+                ExponentialProfileMeterVolts.Constraints.from_state_space(
+                    9, constraints.a, constraints.b
                 )
             )
 
@@ -77,8 +77,8 @@ def test_pos_continuous_under_vel_change_backward(profile):
     for i in range(300):
         if i == 150:
             profile = ExponentialProfileMeterVolts(
-                ExponentialProfileMeterVolts.Constraints.fromStateSpace(
-                    9, constraints.A, constraints.B
+                ExponentialProfileMeterVolts.Constraints.from_state_space(
+                    9, constraints.a, constraints.b
                 )
             )
 
@@ -122,7 +122,7 @@ def test_top_velocity(profile):
         state = check_dynamics(profile, state, goal)
         max_velocity = max(max_velocity, state.velocity)
 
-    assert_near(constraints.maxVelocity(), max_velocity, 10e-5)
+    assert_near(constraints.max_velocity(), max_velocity, 10e-5)
     assert state == goal
 
 
@@ -135,7 +135,7 @@ def test_top_velocity_backward(profile):
         state = check_dynamics(profile, state, goal)
         max_velocity = min(max_velocity, state.velocity)
 
-    assert_near(-constraints.maxVelocity(), max_velocity, 10e-5)
+    assert_near(-constraints.max_velocity(), max_velocity, 10e-5)
     assert state == goal
 
 
@@ -271,7 +271,7 @@ def test_heuristic(profile):
     ]
 
     for test_case in test_cases:
-        state = profile.calculateInflectionPoint(test_case.initial, test_case.goal)
+        state = profile.calculate_inflection_point(test_case.initial, test_case.goal)
         assert_near_state(test_case.inflection_point, state, 1e-3)
 
 
@@ -281,14 +281,14 @@ def test_timing_to_current(profile):
 
     for _ in range(400):
         state = check_dynamics(profile, state, goal)
-        assert_near(profile.timeLeftUntil(state, state), 0, 2e-2)
+        assert_near(profile.time_left_until(state, state), 0, 2e-2)
 
 
 def test_timing_to_goal(profile):
     goal = ExponentialProfileMeterVolts.State(2, 0)
     state = ExponentialProfileMeterVolts.State(0, 0)
 
-    predicted_time_left = profile.timeLeftUntil(state, goal)
+    predicted_time_left = profile.time_left_until(state, goal)
     reached_goal = False
     for _ in range(400):
         state = check_dynamics(profile, state, goal)
@@ -305,7 +305,7 @@ def test_timing_to_negative_goal(profile):
     goal = ExponentialProfileMeterVolts.State(-2, 0)
     state = ExponentialProfileMeterVolts.State(0, 0)
 
-    predicted_time_left = profile.timeLeftUntil(state, goal)
+    predicted_time_left = profile.time_left_until(state, goal)
     reached_goal = False
     for _ in range(400):
         state = check_dynamics(profile, state, goal)

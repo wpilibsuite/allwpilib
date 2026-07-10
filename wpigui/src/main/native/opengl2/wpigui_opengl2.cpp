@@ -75,9 +75,9 @@ void gui::PlatformFramebufferSizeChanged(int width, int height) {}
 
 static inline GLenum GLPixelFormat(PixelFormat format) {
   switch (format) {
-    case kPixelRGBA:
+    case PixelFormat::RGBA:
       return GL_RGBA;
-    case kPixelBGRA:
+    case PixelFormat::BGRA:
       return GL_BGRA;
     default:
       return GL_RGBA;

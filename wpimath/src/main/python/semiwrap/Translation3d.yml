@@ -47,7 +47,7 @@ classes:
       Cross:
 inline_code: |
   cls_Translation3d
-    .def_static("fromFeet", [](wpi::units::foot_t x, wpi::units::foot_t y, wpi::units::foot_t z){
+    .def_static("from_feet", [](wpi::units::foot_t x, wpi::units::foot_t y, wpi::units::foot_t z){
       return std::make_unique<Translation3d>(x, y, z);
     }, py::arg("x"), py::arg("y"), py::arg("z"))
     .def_property_readonly("x", &Translation3d::X)
@@ -62,10 +62,10 @@ inline_code: |
     .def_property_readonly("z_feet", [](const Translation3d * self) -> wpi::units::foot_t {
       return self->Z();
     })
-    .def("distanceFeet", [](Translation3d * self, const Translation3d &other) -> wpi::units::foot_t {
+    .def("distance_feet", [](Translation3d * self, const Translation3d &other) -> wpi::units::foot_t {
       return self->Distance(other);
     })
-    .def("normFeet", [](const Translation3d * self) -> wpi::units::foot_t {
+    .def("norm_feet", [](const Translation3d * self) -> wpi::units::foot_t {
       return self->Norm();
     })
     .def("__abs__", &Translation3d::Norm)

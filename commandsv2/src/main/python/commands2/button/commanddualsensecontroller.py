@@ -24,13 +24,13 @@ class CommandDualSenseController:
                     or the DualSenseController object to use for this controller.
         """
         if isinstance(hid, int):
-            self._hid = CommandGenericHID.getCommandGenericHID(hid)
-            self._controller = DualSenseController(self._hid.getHID())
+            self._hid = CommandGenericHID.get_command_generic_hid(hid)
+            self._controller = DualSenseController(self._hid.get_hid())
         else:
-            self._hid = CommandGenericHID(hid.getHID())
+            self._hid = CommandGenericHID(hid.get_hid())
             self._controller = hid
 
-    def getHID(self) -> CommandGenericHID:
+    def get_hid(self) -> CommandGenericHID:
         """
         Get the underlying CommandGenericHID object.
 
@@ -38,7 +38,7 @@ class CommandDualSenseController:
         """
         return self._hid
 
-    def getController(self) -> DualSenseController:
+    def get_controller(self) -> DualSenseController:
         """
         Get the wrapped controller object.
 
@@ -64,7 +64,7 @@ class CommandDualSenseController:
         Constructs a Trigger instance around the Cross button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Cross button's digital signal
                   attached to the given loop.
@@ -76,7 +76,7 @@ class CommandDualSenseController:
         Constructs a Trigger instance around the Circle button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Circle button's digital signal
                   attached to the given loop.
@@ -88,7 +88,7 @@ class CommandDualSenseController:
         Constructs a Trigger instance around the Square button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Square button's digital signal
                   attached to the given loop.
@@ -100,7 +100,7 @@ class CommandDualSenseController:
         Constructs a Trigger instance around the Triangle button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Triangle button's digital signal
                   attached to the given loop.
@@ -112,19 +112,19 @@ class CommandDualSenseController:
         Constructs a Trigger instance around the Create button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Create button's digital signal
                   attached to the given loop.
         """
         return self.button(DualSenseController.Button.CREATE, loop)
 
-    def PS(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def ps(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the PS button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the PS button's digital signal
                   attached to the given loop.
@@ -136,103 +136,103 @@ class CommandDualSenseController:
         Constructs a Trigger instance around the Options button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Options button's digital signal
                   attached to the given loop.
         """
         return self.button(DualSenseController.Button.OPTIONS, loop)
 
-    def L3(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def l3(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
-        Constructs a Trigger instance around the L 3 button's digital signal.
+        Constructs a Trigger instance around the L3 button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
-        :returns: a Trigger instance representing the L 3 button's digital signal
+        :returns: a Trigger instance representing the L3 button's digital signal
                   attached to the given loop.
         """
         return self.button(DualSenseController.Button.L3, loop)
 
-    def R3(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def r3(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
-        Constructs a Trigger instance around the R 3 button's digital signal.
+        Constructs a Trigger instance around the R3 button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
-        :returns: a Trigger instance representing the R 3 button's digital signal
+        :returns: a Trigger instance representing the R3 button's digital signal
                   attached to the given loop.
         """
         return self.button(DualSenseController.Button.R3, loop)
 
-    def L1(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def l1(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
-        Constructs a Trigger instance around the L 1 button's digital signal.
+        Constructs a Trigger instance around the L1 button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
-        :returns: a Trigger instance representing the L 1 button's digital signal
+        :returns: a Trigger instance representing the L1 button's digital signal
                   attached to the given loop.
         """
         return self.button(DualSenseController.Button.L1, loop)
 
-    def R1(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def r1(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
-        Constructs a Trigger instance around the R 1 button's digital signal.
+        Constructs a Trigger instance around the R1 button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
-        :returns: a Trigger instance representing the R 1 button's digital signal
+        :returns: a Trigger instance representing the R1 button's digital signal
                   attached to the given loop.
         """
         return self.button(DualSenseController.Button.R1, loop)
 
-    def dpadUp(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def dpad_up(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Dpad Up button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Dpad Up button's digital signal
                   attached to the given loop.
         """
         return self.button(DualSenseController.Button.DPAD_UP, loop)
 
-    def dpadDown(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def dpad_down(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Dpad Down button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Dpad Down button's digital signal
                   attached to the given loop.
         """
         return self.button(DualSenseController.Button.DPAD_DOWN, loop)
 
-    def dpadLeft(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def dpad_left(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Dpad Left button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Dpad Left button's digital signal
                   attached to the given loop.
         """
         return self.button(DualSenseController.Button.DPAD_LEFT, loop)
 
-    def dpadRight(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def dpad_right(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Dpad Right button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Dpad Right button's digital signal
                   attached to the given loop.
@@ -244,7 +244,7 @@ class CommandDualSenseController:
         Constructs a Trigger instance around the Microphone button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Microphone button's digital signal
                   attached to the given loop.
@@ -256,60 +256,60 @@ class CommandDualSenseController:
         Constructs a Trigger instance around the Touchpad button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Touchpad button's digital signal
                   attached to the given loop.
         """
         return self.button(DualSenseController.Button.TOUCHPAD, loop)
 
-    def L2(
+    def l2(
         self,
         threshold: float = 0.5,
         loop: Optional[EventLoop] = None,
     ) -> Trigger:
         """
-        Constructs a Trigger instance around the L 2 axis value. The returned
+        Constructs a Trigger instance around the L2 axis value. The returned
         Trigger will be true when the axis value is greater than ``threshold``.
 
         :param threshold: the minimum axis value for the returned Trigger to be true. This value
                           should be in the range [0, 1] where 0 is the unpressed state of the axis.
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
-        :returns: a Trigger instance that is true when the L 2 axis exceeds the
+        :returns: a Trigger instance that is true when the L2 axis exceeds the
                   provided threshold, attached to the given event loop.
         """
-        return self.axisGreaterThan(
+        return self.axis_greater_than(
             DualSenseController.Axis.L2,
             threshold,
             loop,
         )
 
-    def R2(
+    def r2(
         self,
         threshold: float = 0.5,
         loop: Optional[EventLoop] = None,
     ) -> Trigger:
         """
-        Constructs a Trigger instance around the R 2 axis value. The returned
+        Constructs a Trigger instance around the R2 axis value. The returned
         Trigger will be true when the axis value is greater than ``threshold``.
 
         :param threshold: the minimum axis value for the returned Trigger to be true. This value
                           should be in the range [0, 1] where 0 is the unpressed state of the axis.
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
-        :returns: a Trigger instance that is true when the R 2 axis exceeds the
+        :returns: a Trigger instance that is true when the R2 axis exceeds the
                   provided threshold, attached to the given event loop.
         """
-        return self.axisGreaterThan(
+        return self.axis_greater_than(
             DualSenseController.Axis.R2,
             threshold,
             loop,
         )
 
-    def axisLessThan(
+    def axis_less_than(
         self,
         axis: DualSenseController.Axis,
         threshold: float,
@@ -326,9 +326,9 @@ class CommandDualSenseController:
         :returns: a Trigger instance that is true when the axis value is less than
                   the provided threshold.
         """
-        return self._hid.axisLessThan(axis.value, threshold, loop)
+        return self._hid.axis_less_than(axis.value, threshold, loop)
 
-    def axisGreaterThan(
+    def axis_greater_than(
         self,
         axis: DualSenseController.Axis,
         threshold: float,
@@ -345,9 +345,9 @@ class CommandDualSenseController:
         :returns: a Trigger instance that is true when the axis value is greater
                   than the provided threshold.
         """
-        return self._hid.axisGreaterThan(axis.value, threshold, loop)
+        return self._hid.axis_greater_than(axis.value, threshold, loop)
 
-    def axisMagnitudeGreaterThan(
+    def axis_magnitude_greater_than(
         self,
         axis: DualSenseController.Axis,
         threshold: float,
@@ -364,60 +364,60 @@ class CommandDualSenseController:
         :returns: a Trigger instance that is true when the axis magnitude is
                   greater than the provided threshold.
         """
-        return self._hid.axisMagnitudeGreaterThan(axis.value, threshold, loop)
+        return self._hid.axis_magnitude_greater_than(axis.value, threshold, loop)
 
-    def getAxis(self, axis: DualSenseController.Axis) -> float:
+    def get_axis(self, axis: DualSenseController.Axis) -> float:
         """
         Get the value of the axis.
 
         :param axis: the :class:`wpilib.DualSenseController.Axis` to read
         """
-        return self._hid.getRawAxis(axis.value)
+        return self._hid.get_raw_axis(axis.value)
 
-    def getLeftX(self) -> float:
+    def get_left_x(self) -> float:
         """
         Get the Left X value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.getLeftX()
+        return self._controller.get_left_x()
 
-    def getLeftY(self) -> float:
+    def get_left_y(self) -> float:
         """
         Get the Left Y value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.getLeftY()
+        return self._controller.get_left_y()
 
-    def getRightX(self) -> float:
+    def get_right_x(self) -> float:
         """
         Get the Right X value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.getRightX()
+        return self._controller.get_right_x()
 
-    def getRightY(self) -> float:
+    def get_right_y(self) -> float:
         """
         Get the Right Y value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.getRightY()
+        return self._controller.get_right_y()
 
-    def getL2(self) -> float:
+    def get_l2(self) -> float:
         """
-        Get the L 2 value of the controller.
-
-        :returns: the axis value.
-        """
-        return self._controller.getL2()
-
-    def getR2(self) -> float:
-        """
-        Get the R 2 value of the controller.
+        Get the L2 value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.getR2()
+        return self._controller.get_l2()
+
+    def get_r2(self) -> float:
+        """
+        Get the R2 value of the controller.
+
+        :returns: the axis value.
+        """
+        return self._controller.get_r2()

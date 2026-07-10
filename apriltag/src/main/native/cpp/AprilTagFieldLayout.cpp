@@ -4,6 +4,7 @@
 
 #include "wpi/apriltag/AprilTagFieldLayout.hpp"
 
+#include <format>
 #include <system_error>
 #include <utility>
 #include <vector>
@@ -19,7 +20,7 @@ using namespace wpi::apriltag;
 AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
   auto fileBuffer = wpi::util::MemoryBuffer::GetFile(path);
   if (!fileBuffer) {
-    throw std::runtime_error(fmt::format("Cannot open file: {}", path));
+    throw std::runtime_error(std::format("Cannot open file: {}", path));
   }
 
   auto buf = fileBuffer.value()->GetCharBuffer();
@@ -97,7 +98,7 @@ void AprilTagFieldLayout::Serialize(std::string_view path) {
 
   wpi::util::raw_fd_ostream output{path, error_code};
   if (error_code) {
-    throw std::runtime_error(fmt::format("Cannot open file: {}", path));
+    throw std::runtime_error(std::format("Cannot open file: {}", path));
   }
 
   wpi::util::json json = *this;

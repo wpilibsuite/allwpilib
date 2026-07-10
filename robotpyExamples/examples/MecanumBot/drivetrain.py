@@ -16,114 +16,114 @@ class Drivetrain:
     MAX_ANGULAR_VELOCITY = math.pi  # 1/2 rotation per second
 
     def __init__(self) -> None:
-        self.frontLeftMotor = wpilib.PWMSparkMax(1)
-        self.frontRightMotor = wpilib.PWMSparkMax(2)
-        self.backLeftMotor = wpilib.PWMSparkMax(3)
-        self.backRightMotor = wpilib.PWMSparkMax(4)
+        self.front_left_motor = wpilib.PWMSparkMax(1)
+        self.front_right_motor = wpilib.PWMSparkMax(2)
+        self.back_left_motor = wpilib.PWMSparkMax(3)
+        self.back_right_motor = wpilib.PWMSparkMax(4)
 
-        self.frontLeftEncoder = wpilib.Encoder(0, 1)
-        self.frontRightEncoder = wpilib.Encoder(2, 3)
-        self.backLeftEncoder = wpilib.Encoder(4, 5)
-        self.backRightEncoder = wpilib.Encoder(6, 7)
+        self.front_left_encoder = wpilib.Encoder(0, 1)
+        self.front_right_encoder = wpilib.Encoder(2, 3)
+        self.back_left_encoder = wpilib.Encoder(4, 5)
+        self.back_right_encoder = wpilib.Encoder(6, 7)
 
-        self.frontLeftLocation = wpimath.Translation2d(0.381, 0.381)
-        self.frontRightLocation = wpimath.Translation2d(0.381, -0.381)
-        self.backLeftLocation = wpimath.Translation2d(-0.381, 0.381)
-        self.backRightLocation = wpimath.Translation2d(-0.381, -0.381)
+        self.front_left_location = wpimath.Translation2d(0.381, 0.381)
+        self.front_right_location = wpimath.Translation2d(0.381, -0.381)
+        self.back_left_location = wpimath.Translation2d(-0.381, 0.381)
+        self.back_right_location = wpimath.Translation2d(-0.381, -0.381)
 
-        self.frontLeftPIDController = wpimath.PIDController(1, 0, 0)
-        self.frontRightPIDController = wpimath.PIDController(1, 0, 0)
-        self.backLeftPIDController = wpimath.PIDController(1, 0, 0)
-        self.backRightPIDController = wpimath.PIDController(1, 0, 0)
+        self.front_left_pid_controller = wpimath.PIDController(1, 0, 0)
+        self.front_right_pid_controller = wpimath.PIDController(1, 0, 0)
+        self.back_left_pid_controller = wpimath.PIDController(1, 0, 0)
+        self.back_right_pid_controller = wpimath.PIDController(1, 0, 0)
 
         self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.FLAT)
 
         self.kinematics = wpimath.MecanumDriveKinematics(
-            self.frontLeftLocation,
-            self.frontRightLocation,
-            self.backLeftLocation,
-            self.backRightLocation,
+            self.front_left_location,
+            self.front_right_location,
+            self.back_left_location,
+            self.back_right_location,
         )
 
         self.odometry = wpimath.MecanumDriveOdometry(
-            self.kinematics, self.imu.getRotation2d(), self.getCurrentDistances()
+            self.kinematics, self.imu.get_rotation2d(), self.get_current_distances()
         )
 
         # Gains are for example purposes only - must be determined for your own robot!
         self.feedforward = wpimath.SimpleMotorFeedforwardMeters(1, 3)
 
-        self.imu.resetYaw()
+        self.imu.reset_yaw()
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's
         # gearbox is constructed, you might have to invert the left side instead.
-        self.frontRightMotor.setInverted(True)
-        self.backRightMotor.setInverted(True)
+        self.front_right_motor.set_inverted(True)
+        self.back_right_motor.set_inverted(True)
 
-    def getCurrentState(self) -> wpimath.MecanumDriveWheelVelocities:
+    def get_current_state(self) -> wpimath.MecanumDriveWheelVelocities:
         """Returns the current state of the drivetrain."""
         return wpimath.MecanumDriveWheelVelocities(
-            self.frontLeftEncoder.getRate(),
-            self.frontRightEncoder.getRate(),
-            self.backLeftEncoder.getRate(),
-            self.backRightEncoder.getRate(),
+            self.front_left_encoder.get_rate(),
+            self.front_right_encoder.get_rate(),
+            self.back_left_encoder.get_rate(),
+            self.back_right_encoder.get_rate(),
         )
 
-    def getCurrentDistances(self) -> wpimath.MecanumDriveWheelPositions:
+    def get_current_distances(self) -> wpimath.MecanumDriveWheelPositions:
         """Returns the current distances measured by the drivetrain."""
         positions = wpimath.MecanumDriveWheelPositions()
-        positions.frontLeft = self.frontLeftEncoder.getDistance()
-        positions.frontRight = self.frontRightEncoder.getDistance()
-        positions.rearLeft = self.backLeftEncoder.getDistance()
-        positions.rearRight = self.backRightEncoder.getDistance()
+        positions.front_left = self.front_left_encoder.get_distance()
+        positions.front_right = self.front_right_encoder.get_distance()
+        positions.rear_left = self.back_left_encoder.get_distance()
+        positions.rear_right = self.back_right_encoder.get_distance()
         return positions
 
-    def setVelocities(self, velocities: wpimath.MecanumDriveWheelVelocities) -> None:
+    def set_velocities(self, velocities: wpimath.MecanumDriveWheelVelocities) -> None:
         """Sets the desired velocities for each wheel."""
-        frontLeftFeedforward = self.feedforward.calculate(velocities.frontLeft)
-        frontRightFeedforward = self.feedforward.calculate(velocities.frontRight)
-        backLeftFeedforward = self.feedforward.calculate(velocities.rearLeft)
-        backRightFeedforward = self.feedforward.calculate(velocities.rearRight)
+        front_left_feedforward = self.feedforward.calculate(velocities.front_left)
+        front_right_feedforward = self.feedforward.calculate(velocities.front_right)
+        back_left_feedforward = self.feedforward.calculate(velocities.rear_left)
+        back_right_feedforward = self.feedforward.calculate(velocities.rear_right)
 
-        frontLeftOutput = self.frontLeftPIDController.calculate(
-            self.frontLeftEncoder.getRate(), velocities.frontLeft
+        front_left_output = self.front_left_pid_controller.calculate(
+            self.front_left_encoder.get_rate(), velocities.front_left
         )
-        frontRightOutput = self.frontRightPIDController.calculate(
-            self.frontRightEncoder.getRate(), velocities.frontRight
+        front_right_output = self.front_right_pid_controller.calculate(
+            self.front_right_encoder.get_rate(), velocities.front_right
         )
-        backLeftOutput = self.frontLeftPIDController.calculate(
-            self.backLeftEncoder.getRate(), velocities.rearLeft
+        back_left_output = self.front_left_pid_controller.calculate(
+            self.back_left_encoder.get_rate(), velocities.rear_left
         )
-        backRightOutput = self.frontRightPIDController.calculate(
-            self.backRightEncoder.getRate(), velocities.rearRight
+        back_right_output = self.front_right_pid_controller.calculate(
+            self.back_right_encoder.get_rate(), velocities.rear_right
         )
 
-        self.frontLeftMotor.setVoltage(frontLeftOutput + frontLeftFeedforward)
-        self.frontRightMotor.setVoltage(frontRightOutput + frontRightFeedforward)
-        self.backLeftMotor.setVoltage(backLeftOutput + backLeftFeedforward)
-        self.backRightMotor.setVoltage(backRightOutput + backRightFeedforward)
+        self.front_left_motor.set_voltage(front_left_output + front_left_feedforward)
+        self.front_right_motor.set_voltage(front_right_output + front_right_feedforward)
+        self.back_left_motor.set_voltage(back_left_output + back_left_feedforward)
+        self.back_right_motor.set_voltage(back_right_output + back_right_feedforward)
 
     def drive(
         self,
-        xVelocity: float,
-        yVelocity: float,
+        x_velocity: float,
+        y_velocity: float,
         rot: float,
-        fieldRelative: bool,
-        periodSeconds: float,
+        field_relative: bool,
+        period_seconds: float,
     ) -> None:
         """Method to drive the robot using joystick info."""
-        chassisVelocities = wpimath.ChassisVelocities(xVelocity, yVelocity, rot)
-        if fieldRelative:
-            chassisVelocities = chassisVelocities.toRobotRelative(
-                self.imu.getRotation2d()
+        chassis_velocities = wpimath.ChassisVelocities(x_velocity, y_velocity, rot)
+        if field_relative:
+            chassis_velocities = chassis_velocities.to_robot_relative(
+                self.imu.get_rotation2d()
             )
 
-        self.setVelocities(
-            self.kinematics.toWheelVelocities(
-                chassisVelocities.discretize(periodSeconds)
+        self.set_velocities(
+            self.kinematics.to_wheel_velocities(
+                chassis_velocities.discretize(period_seconds)
             ).desaturate(self.MAX_VELOCITY)
         )
 
-    def updateOdometry(self) -> None:
+    def update_odometry(self) -> None:
         """Updates the field-relative position."""
-        self.odometry.update(self.imu.getRotation2d(), self.getCurrentDistances())
+        self.odometry.update(self.imu.get_rotation2d(), self.get_current_distances())

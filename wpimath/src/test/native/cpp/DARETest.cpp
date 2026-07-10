@@ -5,6 +5,7 @@
 #include "wpi/math/linalg/DARE.hpp"
 
 #include <expected>
+#include <format>
 
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
@@ -79,7 +80,7 @@ void ExpectMatrixEqual(const Eigen::MatrixXd& lhs, const Eigen::MatrixXd& rhs,
   for (int row = 0; row < lhs.rows(); ++row) {
     for (int col = 0; col < lhs.cols(); ++col) {
       EXPECT_NEAR(lhs(row, col), rhs(row, col), tolerance)
-          << fmt::format("row = {}, col = {}", row, col);
+          << std::format("row = {}, col = {}", row, col);
     }
   }
 

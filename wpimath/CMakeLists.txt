@@ -32,6 +32,11 @@ file(GLOB_RECURSE wpimath_protobuf_native_src src/generated/main/native/cpp/wpim
 add_library(protobuf OBJECT ${wpimath_protobuf_native_src})
 target_link_libraries(protobuf wpiutil)
 
+target_include_directories(
+    protobuf
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/cpp>
+)
+
 add_library(wpimath ${wpimath_native_src} $<TARGET_OBJECTS:protobuf>)
 
 if(MSVC)

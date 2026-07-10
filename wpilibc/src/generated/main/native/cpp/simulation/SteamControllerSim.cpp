@@ -15,7 +15,7 @@ SteamControllerSim::SteamControllerSim(const SteamController& joystick)
   SetAxesAvailable(0x3F);
   SetButtonsAvailable(0x3FFFFFFULL);
   SetPOVsAvailable(0);
-  SetGamepadType(GenericHID::HIDType::STANDARD);
+  SetGamepadType(GenericHID::HIDType::STEAM);
   SetSupportedOutputs(SteamController::SUPPORTED_OUTPUTS);
 }
 
@@ -23,7 +23,7 @@ SteamControllerSim::SteamControllerSim(int port) : GenericHIDSim{port} {
   SetAxesAvailable(0x3F);
   SetButtonsAvailable(0x3FFFFFFULL);
   SetPOVsAvailable(0);
-  SetGamepadType(GenericHID::HIDType::STANDARD);
+  SetGamepadType(GenericHID::HIDType::STEAM);
   SetSupportedOutputs(SteamController::SUPPORTED_OUTPUTS);
 }
 

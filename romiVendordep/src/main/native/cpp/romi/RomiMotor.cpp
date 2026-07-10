@@ -4,9 +4,9 @@
 
 #include "wpi/romi/RomiMotor.hpp"
 
+#include <format>
 #include <string>
 
-#include "fmt/format.h"
 #include "wpi/romi/OnBoardIO.hpp"
 
 using namespace wpi::romi;
@@ -14,7 +14,7 @@ using namespace wpi::romi;
 RomiMotor::RomiMotor(int channel) {
   OnBoardIO::AllocatePWM(channel);
 
-  m_deviceName = fmt::format("PWM:{}", channel);
+  m_deviceName = std::format("PWM:{}", channel);
   m_simDevice = hal::SimDevice(m_deviceName.c_str());
 
   if (m_simDevice) {

@@ -12,7 +12,7 @@ from examplesmartmotorcontroller import ExampleSmartMotorController
 
 
 class MyRobot(wpilib.TimedRobot):
-    kDt = 0.02
+    DT = 0.02
 
     def __init__(self) -> None:
         super().__init__()
@@ -24,7 +24,7 @@ class MyRobot(wpilib.TimedRobot):
         # Create a motion profile with the given maximum voltage and characteristics kV, kA
         # These gains should match your feedforward kV, kA for best results.
         self.profile = wpimath.ExponentialProfileMeterVolts(
-            wpimath.ExponentialProfileMeterVolts.Constraints.fromCharacteristics(
+            wpimath.ExponentialProfileMeterVolts.Constraints.from_characteristics(
                 10, 1, 1
             )
         )
@@ -32,21 +32,21 @@ class MyRobot(wpilib.TimedRobot):
         self.setpoint = wpimath.ExponentialProfileMeterVolts.State(0, 0)
 
         # Note: These gains are fake, and will have to be tuned for your robot.
-        self.motor.setPID(1.3, 0.0, 0.7)
+        self.motor.set_pid(1.3, 0.0, 0.7)
 
-    def teleopPeriodic(self) -> None:
-        if self.joystick.getRawButtonPressed(2):
+    def teleop_periodic(self) -> None:
+        if self.joystick.get_raw_button_pressed(2):
             self.goal = wpimath.ExponentialProfileMeterVolts.State(5, 0)
-        elif self.joystick.getRawButtonPressed(3):
+        elif self.joystick.get_raw_button_pressed(3):
             self.goal = wpimath.ExponentialProfileMeterVolts.State(0, 0)
 
         # Retrieve the profiled setpoint for the next timestep. This setpoint moves
         # toward the goal while obeying the constraints.
-        next_state = self.profile.calculate(self.kDt, self.setpoint, self.goal)
+        next_state = self.profile.calculate(self.DT, self.setpoint, self.goal)
 
         # Send setpoint to offboard controller PID
-        self.motor.setSetpoint(
-            ExampleSmartMotorController.PIDMode.kPosition,
+        self.motor.set_setpoint(
+            ExampleSmartMotorController.PIDMode.POSITION,
             self.setpoint.position,
             self.feedforward.calculate(next_state.velocity) / 12.0,
         )
