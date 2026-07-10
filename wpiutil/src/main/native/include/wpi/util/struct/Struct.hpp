@@ -8,6 +8,7 @@
 
 #include <bit>
 #include <concepts>
+#include <format>
 #include <memory>
 #include <span>
 #include <string>
@@ -15,8 +16,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "wpi/util/Endian.hpp"
 #include "wpi/util/array.hpp"
@@ -321,7 +320,7 @@ constexpr auto GetStructTypeString(const I&... info) {
         "struct:"_ct_string,
         ct_string<char, std::char_traits<char>, typeName.size()>{typeName});
   } else {
-    return fmt::format("struct:{}", S::GetTypeName(info...));
+    return std::format("struct:{}", S::GetTypeName(info...));
   }
 }
 
@@ -358,9 +357,9 @@ constexpr auto MakeStructArrayTypeName(const I&... info) {
     }
   } else {
     if constexpr (N == std::dynamic_extent) {
-      return fmt::format("{}[]", S::GetTypeName(info...));
+      return std::format("{}[]", S::GetTypeName(info...));
     } else {
-      return fmt::format("{}[{}]", S::GetTypeName(info...), N);
+      return std::format("{}[{}]", S::GetTypeName(info...), N);
     }
   }
 }
@@ -374,7 +373,7 @@ constexpr auto MakeStructArrayTypeString(const I&... info) {
     using namespace literals;
     return Concat("struct:"_ct_string, MakeStructArrayTypeName<T, N>(info...));
   } else {
-    return fmt::format("struct:{}", MakeStructArrayTypeName<T, N>(info...));
+    return std::format("struct:{}", MakeStructArrayTypeName<T, N>(info...));
   }
 }
 
@@ -397,9 +396,9 @@ constexpr auto MakeStructArraySchema(const I&... info) {
     }
   } else {
     if constexpr (N == std::dynamic_extent) {
-      return fmt::format("{}[]", S::GetSchema(info...));
+      return std::format("{}[]", S::GetSchema(info...));
     } else {
-      return fmt::format("{}[{}]", S::GetSchema(info...), N);
+      return std::format("{}[{}]", S::GetSchema(info...), N);
     }
   }
 }

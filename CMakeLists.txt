@@ -85,7 +85,6 @@ option(WPILIB_WITH_BENCHMARK "Build the benchmark project" ON)
 
 # Options for using a package manager (e.g., vcpkg) for certain dependencies.
 option(WPILIB_USE_SYSTEM_EIGEN "Use system Eigen" OFF)
-option(WPILIB_USE_SYSTEM_FMTLIB "Use system fmtlib" OFF)
 option(WPILIB_USE_SYSTEM_LIBUV "Use system libuv" OFF)
 option(WPILIB_USE_SYSTEM_SLEIPNIR "Use system Sleipnir" OFF)
 option(WPILIB_USE_LINKED_AVAHI "Use directly linked Avahi instead of loading at runtime" OFF)

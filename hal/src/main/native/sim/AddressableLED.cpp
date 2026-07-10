@@ -4,7 +4,7 @@
 
 #include "wpi/hal/AddressableLED.h"
 
-#include <fmt/format.h>
+#include <format>
 
 #include "DigitalInternal.hpp"
 #include "HALInitializer.hpp"
@@ -73,7 +73,7 @@ void HAL_SetAddressableLEDStart(HAL_AddressableLEDHandle handle, int32_t start,
   if (start > HAL_ADDRESSABLE_LED_MAX_LEN || start < 0) {
     *status = MakeError(
         HAL_PARAMETER_OUT_OF_RANGE,
-        fmt::format(
+        std::format(
             "LED start must be less than or equal to {}. {} was requested",
             HAL_ADDRESSABLE_LED_MAX_LEN, start));
     return;
@@ -92,7 +92,7 @@ void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
   if (length > HAL_ADDRESSABLE_LED_MAX_LEN || length < 0) {
     *status = MakeError(
         HAL_PARAMETER_OUT_OF_RANGE,
-        fmt::format(
+        std::format(
             "LED length must be less than or equal to {}. {} was requested",
             HAL_ADDRESSABLE_LED_MAX_LEN, length));
     return;

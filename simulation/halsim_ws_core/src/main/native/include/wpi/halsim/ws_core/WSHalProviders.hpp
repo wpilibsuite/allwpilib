@@ -4,12 +4,11 @@
 
 #pragma once
 
+#include <format>
 #include <functional>
 #include <memory>
 #include <string_view>
 #include <utility>
-
-#include <fmt/format.h>
 
 #include "wpi/hal/simulation/NotifyListener.h"
 #include "wpi/halsim/ws_core/WSBaseProvider.hpp"
@@ -61,7 +60,7 @@ template <typename T>
 void CreateProviders(std::string_view prefix, int32_t numChannels,
                      WSRegisterFunc webRegisterFunc) {
   for (int32_t i = 0; i < numChannels; i++) {
-    auto key = fmt::format("{}/{}", prefix, i);
+    auto key = std::format("{}/{}", prefix, i);
     auto ptr = std::make_unique<T>(i, key, prefix);
     webRegisterFunc(key, std::move(ptr));
   }

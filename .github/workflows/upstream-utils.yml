@@ -61,12 +61,6 @@ jobs:
           ./eigen.py clone
           ./eigen.py copy-src
           ./eigen.py format-patch
-      - name: Run fmt.py
-        run: |
-          cd upstream_utils
-          ./fmt.py clone
-          ./fmt.py copy-src
-          ./fmt.py format-patch
       - name: Run gcem.py
         run: |
           cd upstream_utils

@@ -4,6 +4,8 @@
 
 #include "wpi/hardware/bus/CAN.hpp"
 
+#include <format>
+
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/CANAPI.h"
 #include "wpi/hal/Errors.h"
@@ -26,7 +28,7 @@ CAN::CAN(CANBusMap busId, int deviceId, int deviceManufacturer,
                           deviceManufacturer, deviceType);
 
   HAL_ReportUsage(
-      fmt::format("CAN[{}][{}][{}]", deviceType, deviceManufacturer, deviceId),
+      std::format("CAN[{}][{}][{}]", deviceType, deviceManufacturer, deviceId),
       "");
 }
 

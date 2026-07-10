@@ -8,11 +8,10 @@
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
+#include <format>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "Handle.hpp"
 #include "InstanceImpl.hpp"
@@ -691,7 +690,7 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
     servers.reserve(5);
 
     // 10.te.am.2
-    servers.emplace_back(fmt::format("10.{}.{}.2", static_cast<int>(team / 100),
+    servers.emplace_back(std::format("10.{}.{}.2", static_cast<int>(team / 100),
                                      static_cast<int>(team % 100)),
                          port);
 
@@ -705,7 +704,7 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
     servers.emplace_back("172.30.0.1", port);
 
     // robot.local
-    servers.emplace_back(fmt::format("robot.local", team), port);
+    servers.emplace_back(std::format("robot.local", team), port);
 
     ii->SetServers(servers);
   }

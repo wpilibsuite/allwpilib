@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <format>
 #include <string_view>
 
 #include "wpi/util/Logger.hpp"
@@ -12,7 +13,7 @@ namespace wpi::cs {
 
 void NamedLogV(wpi::util::Logger& logger, unsigned int level, const char* file,
                unsigned int line, std::string_view name,
-               fmt::string_view format, fmt::format_args args);
+               std::string_view format, std::format_args args);
 
 template <typename S, typename... Args>
 inline void NamedLog(wpi::util::Logger& logger, unsigned int level,
@@ -20,7 +21,7 @@ inline void NamedLog(wpi::util::Logger& logger, unsigned int level,
                      const S& format, Args&&... args) {
   if (logger.HasLogger() && level >= logger.min_level()) {
     NamedLogV(logger, level, file, line, name, format,
-              fmt::make_format_args(args...));
+              std::make_format_args(args...));
   }
 }
 
