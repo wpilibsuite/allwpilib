@@ -1,4 +1,4 @@
-load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
+load("@bazel_lib//lib:copy_file.bzl", "copy_file")
 load("@doxygen//:doxygen.bzl", "doxygen")
 load("@rules_jvm_external//:defs.bzl", "javadoc", "maven_export")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
