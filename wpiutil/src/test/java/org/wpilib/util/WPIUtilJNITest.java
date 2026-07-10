@@ -57,7 +57,7 @@ public class WPIUtilJNITest {
 
   @Test
   public void testDisableMockTimeRestoresProgramStartTime() {
-    long startTime = WPIUtilJNI.getProgramStartTime();
+    final long startTime = WPIUtilJNI.getProgramStartTime();
 
     WPIUtilJNI.enableMockTime();
     assertEquals(0L, WPIUtilJNI.getProgramStartTime());
