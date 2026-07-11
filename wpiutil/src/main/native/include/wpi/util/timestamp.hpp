@@ -21,8 +21,9 @@ uint64_t NowDefault();
  * the contract of Now().
  * The program start time is reset to the current time when this is called by
  * calling the new implementation.
- * If func is nullptr, the implementation is reset to NowDefault() and the
- * program start time is reset to the original program start time.
+ * Passing the NowDefault function explicitly sets that implementation and
+ * resets the program start time to the current time. To restore the default
+ * implementation and original program start time, pass nullptr.
  * @param func Function called by Now() to return the time.
  */
 void SetNowImpl(uint64_t (*func)());
@@ -37,9 +38,9 @@ uint64_t Now();
 /**
  * Return the timestamp at which the program started.
  * This uses the same time base as Now(), in microseconds.
- * This is reset to the current time when SetNowImpl() is called; if
- * SetNowImpl(nullptr) is called, it is reset to the original program start
- * time.
+ * This is reset to the current time when SetNowImpl() is called with a non-null
+ * implementation; if SetNowImpl(nullptr) is called, it is reset to the original
+ * program start time.
  *
  * @return Program start time in microseconds.
  */
