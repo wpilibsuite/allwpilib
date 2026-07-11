@@ -26,7 +26,7 @@ uint64_t wpi::util::NowDefault() {
 static std::atomic<uint64_t (*)()> now_impl{wpi::util::NowDefault};
 
 void wpi::util::SetNowImpl(uint64_t (*func)(void)) {
-  if (!func || func == wpi::util::NowDefault || func == WPI_NowDefault) {
+  if (!func) {
     now_impl = wpi::util::NowDefault;
     program_start_time = original_program_start_time;
   } else {

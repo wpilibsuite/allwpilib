@@ -51,7 +51,7 @@ TEST(TimestampTest, SetNowImplUpdatesProgramStartTime) {
   EXPECT_EQ(originalStartTime, wpi::util::GetProgramStartTime());
 }
 
-TEST(TimestampTest, WPISetNowImplDefaultRestoresProgramStartTime) {
+TEST(TimestampTest, WPISetNowImplNullRestoresProgramStartTime) {
   ResetNowImpl reset;
   uint64_t originalStartTime = WPI_GetProgramStartTime();
 
@@ -61,7 +61,7 @@ TEST(TimestampTest, WPISetNowImplDefaultRestoresProgramStartTime) {
   EXPECT_EQ(4321u, WPI_Now());
   EXPECT_EQ(4321u, WPI_GetProgramStartTime());
 
-  WPI_SetNowImpl(WPI_NowDefault);
+  WPI_SetNowImpl(nullptr);
 
   EXPECT_EQ(originalStartTime, WPI_GetProgramStartTime());
 }
