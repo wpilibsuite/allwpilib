@@ -46,7 +46,7 @@ def main():
     template = env.from_string(BUILD_FILE_TEMPLATE)
 
     nativelib_config = raw_config["tool"]["hatch"]["build"]["hooks"]["nativelib"]
-    project_name = raw_config["project"]["name"].replace("robotpy-native-", "")
+    project_name = raw_config["project"]["name"].replace("robotpy-native-", "").replace("-", "_")
     root_package = fixup_root_package_name(project_name)
     pc_files = []
 

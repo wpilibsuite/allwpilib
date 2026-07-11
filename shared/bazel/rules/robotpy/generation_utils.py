@@ -13,6 +13,8 @@ def fixup_root_package_name(name):
         return "ntcore"
     if name == "halsim-ws":
         return "simulation/halsim_ws_core"
+    if name == "halsim_gui":
+        return "simulation/halsim_gui"
     if name == "wpimath_test":
         return "wpimath"
     if name == "robotpy_apriltag":
