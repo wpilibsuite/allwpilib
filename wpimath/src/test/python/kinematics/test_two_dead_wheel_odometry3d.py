@@ -56,7 +56,7 @@ def test_two_iterations():
     assert pose.x == pytest.approx(0.1, abs=0.01)
     assert pose.y == pytest.approx(0.0, abs=0.01)
     assert pose.z == pytest.approx(0.0, abs=0.01)
-    assert pose.rotation().to_rotation_2d().degrees() == pytest.approx(0.0, abs=0.01)
+    assert pose.rotation().to_rotation2d().degrees() == pytest.approx(0.0, abs=0.01)
 
 
 def test_gyro_angle_reset():
@@ -73,7 +73,7 @@ def test_gyro_angle_reset():
     assert pose.x == pytest.approx(1.0, abs=0.1)
     assert pose.y == pytest.approx(0.0, abs=0.1)
     assert pose.z == pytest.approx(0.0, abs=0.1)
-    assert pose.rotation().to_rotation_2d().radians() == pytest.approx(0.0, abs=0.1)
+    assert pose.rotation().to_rotation2d().radians() == pytest.approx(0.0, abs=0.1)
 
 
 def test_straight_forwards_forward_kinematics():
