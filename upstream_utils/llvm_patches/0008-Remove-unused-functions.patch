@@ -1,15 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:43:50 -0400
-Subject: [PATCH 09/34] Remove unused functions
+Subject: [PATCH 08/33] Remove unused functions
 
 ---
- llvm/include/llvm/ADT/SmallString.h      |  77 ------
- llvm/include/llvm/Support/Errno.h        |   9 -
- llvm/include/llvm/Support/VersionTuple.h |  39 ---
- llvm/include/llvm/Support/raw_ostream.h  | 187 +------------
- llvm/lib/Support/raw_ostream.cpp         | 332 -----------------------
- 5 files changed, 8 insertions(+), 636 deletions(-)
+ llvm/include/llvm/ADT/SmallString.h     |  77 ------
+ llvm/include/llvm/Support/Errno.h       |   9 -
+ llvm/include/llvm/Support/raw_ostream.h | 193 +-------------
+ llvm/lib/Support/raw_ostream.cpp        | 332 ------------------------
+ 4 files changed, 8 insertions(+), 603 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallString.h b/llvm/include/llvm/ADT/SmallString.h
 index 9fab1a7726bc6745296f5ebb24aee4055408e5f5..cb6136d8fd1886e8dc444cb807b33a5f1e18aa44 100644
@@ -133,61 +132,24 @@ index 64817257141bbc03098624437731d31ce66f7ce8..409f39a0b2d658bd6cefc75c68cec3cc
  template <typename FailT, typename Fun, typename... Args>
  inline decltype(auto) RetryAfterSignal(const FailT &Fail, const Fun &F,
                                         const Args &... As) {
-diff --git a/llvm/include/llvm/Support/VersionTuple.h b/llvm/include/llvm/Support/VersionTuple.h
-index 32c3ad9a9fc2c9827dc4afd81c6f9d03ec1b25c2..735f73d0447fb35fc64a0f449b45bab19947bf58 100644
---- a/llvm/include/llvm/Support/VersionTuple.h
-+++ b/llvm/include/llvm/Support/VersionTuple.h
-@@ -165,45 +165,6 @@ public:
-   friend bool operator>=(const VersionTuple &X, const VersionTuple &Y) {
-     return !(X < Y);
-   }
--
--  friend hash_code hash_value(const VersionTuple &VT) {
--    return hash_combine(VT.Major, VT.Minor, VT.Subminor, VT.Build);
--  }
--
--  template <typename HasherT, llvm::endianness Endianness>
--  friend void addHash(HashBuilder<HasherT, Endianness> &HBuilder,
--                      const VersionTuple &VT) {
--    HBuilder.add(VT.Major, VT.Minor, VT.Subminor, VT.Build);
--  }
--
--  /// Retrieve a string representation of the version number.
--  LLVM_ABI std::string getAsString() const;
--};
--
--/// Print a version number.
--LLVM_ABI raw_ostream &operator<<(raw_ostream &Out, const VersionTuple &V);
--
--// Provide DenseMapInfo for version tuples.
--template <> struct DenseMapInfo<VersionTuple> {
--  static inline VersionTuple getEmptyKey() { return VersionTuple(0x7FFFFFFF); }
--  static inline VersionTuple getTombstoneKey() {
--    return VersionTuple(0x7FFFFFFE);
--  }
--  static unsigned getHashValue(const VersionTuple &Value) {
--    unsigned Result = Value.getMajor();
--    if (auto Minor = Value.getMinor())
--      Result = detail::combineHashValue(Result, *Minor);
--    if (auto Subminor = Value.getSubminor())
--      Result = detail::combineHashValue(Result, *Subminor);
--    if (auto Build = Value.getBuild())
--      Result = detail::combineHashValue(Result, *Build);
--
--    return Result;
--  }
--
--  static bool isEqual(const VersionTuple &LHS, const VersionTuple &RHS) {
--    return LHS == RHS;
--  }
- };
- 
- } // end namespace llvm
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 856b9f9342f1ca9ee358af2bf4998f506a9d539a..f346d36ca7a36ab2d9bcddc205db0abf50c2a136 100644
+index 19df8739b6013c1b1a1527f5880a040d3cfb478f..f346d36ca7a36ab2d9bcddc205db0abf50c2a136 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -275,32 +275,6 @@ public:
+@@ -28,12 +28,6 @@
+ 
+ namespace llvm {
+ 
+-class Duration;
+-class formatv_object_base;
+-class format_object_base;
+-class FormattedString;
+-class FormattedNumber;
+-class FormattedBytes;
+ template <class T> class [[nodiscard]] Expected;
+ 
+ namespace sys {
+@@ -281,32 +275,6 @@ public:
      return write(Str.data(), Str.size());
    }
  
@@ -220,7 +182,7 @@ index 856b9f9342f1ca9ee358af2bf4998f506a9d539a..f346d36ca7a36ab2d9bcddc205db0abf
    /// Output \p Str, turning '\\', '\t', '\n', '"', and anything that doesn't
    /// satisfy llvm::isPrint into an escape sequence.
    raw_ostream &write_escaped(std::string_view Str, bool UseHexEscapes = false);
-@@ -308,21 +282,6 @@ public:
+@@ -314,21 +282,6 @@ public:
    raw_ostream &write(unsigned char C);
    raw_ostream &write(const char *Ptr, size_t Size);
  
@@ -242,7 +204,7 @@ index 856b9f9342f1ca9ee358af2bf4998f506a9d539a..f346d36ca7a36ab2d9bcddc205db0abf
    /// indent - Insert 'NumSpaces' spaces.
    raw_ostream &indent(unsigned NumSpaces);
  
-@@ -337,14 +296,19 @@ public:
+@@ -343,14 +296,19 @@ public:
    /// @param BG if true change the background, default: change foreground
    /// @returns itself so it can be used within << invocations
    virtual raw_ostream &changeColor(enum Colors Color, bool Bold = false,
@@ -265,7 +227,7 @@ index 856b9f9342f1ca9ee358af2bf4998f506a9d539a..f346d36ca7a36ab2d9bcddc205db0abf
  
    /// This function determines if this stream is connected to a "tty" or
    /// "console" window. That is, the output would be displayed to the user
-@@ -415,10 +379,6 @@ private:
+@@ -421,10 +379,6 @@ private:
    /// unused bytes in the buffer.
    void copy_to_buffer(const char *Ptr, size_t Size);
  
@@ -276,7 +238,7 @@ index 856b9f9342f1ca9ee358af2bf4998f506a9d539a..f346d36ca7a36ab2d9bcddc205db0abf
    virtual void anchor();
  };
  
-@@ -467,7 +427,6 @@ class LLVM_ABI raw_fd_ostream : public raw_pwrite_stream {
+@@ -473,7 +427,6 @@ class LLVM_ABI raw_fd_ostream : public raw_pwrite_stream {
    bool ShouldClose;
    bool SupportsSeeking = false;
    bool IsRegularFile = false;
@@ -284,7 +246,7 @@ index 856b9f9342f1ca9ee358af2bf4998f506a9d539a..f346d36ca7a36ab2d9bcddc205db0abf
  
    /// Optional stream this stream is tied to. If this stream is written to, the
    /// tied-to stream will be flushed first.
-@@ -547,10 +506,6 @@ public:
+@@ -553,10 +506,6 @@ public:
    /// to the offset specified from the beginning of the file.
    uint64_t seek(uint64_t off);
  
@@ -295,7 +257,7 @@ index 856b9f9342f1ca9ee358af2bf4998f506a9d539a..f346d36ca7a36ab2d9bcddc205db0abf
    /// Tie this stream to the specified stream. Replaces any existing tied-to
    /// stream. Specifying a nullptr unties the stream. This is intended for to
    /// tie errs() to outs(), so that outs() is flushed whenever something is
-@@ -576,38 +531,6 @@ public:
+@@ -582,38 +531,6 @@ public:
    ///      - from The Zen of Python, by Tim Peters
    ///
    void clear_error() { EC = std::error_code(); }
@@ -334,7 +296,7 @@ index 856b9f9342f1ca9ee358af2bf4998f506a9d539a..f346d36ca7a36ab2d9bcddc205db0abf
  };
  
  /// This returns a reference to a raw_fd_ostream for standard output. Use it
-@@ -637,19 +560,6 @@ public:
+@@ -643,19 +560,6 @@ public:
    /// immediately destroyed.
    LLVM_ABI raw_fd_stream(std::string_view Filename, std::error_code &EC);
  
@@ -354,7 +316,7 @@ index 856b9f9342f1ca9ee358af2bf4998f506a9d539a..f346d36ca7a36ab2d9bcddc205db0abf
    /// Check if \p OS is a pointer of type raw_fd_stream*.
    LLVM_ABI static bool classof(const raw_ostream *OS);
  };
-@@ -774,87 +684,6 @@ public:
+@@ -780,87 +684,6 @@ public:
    ~buffer_unique_ostream() override { *OS << str(); }
  };
  

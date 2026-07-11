@@ -1,124 +1,46 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:22:38 -0400
-Subject: [PATCH 15/34] Windows support
+Subject: [PATCH 14/33] Windows support
 
 ---
- .../llvm/Support/Windows/WindowsSupport.h     | 56 +++++------
- llvm/lib/Support/ConvertUTF.cpp               | 95 +++++++++++++++++++
- llvm/lib/Support/ErrorHandling.cpp            | 14 +--
- llvm/lib/Support/raw_ostream.cpp              |  1 -
- 4 files changed, 129 insertions(+), 37 deletions(-)
+ llvm/lib/Support/ConvertUTF.cpp    | 105 +++++++++++++++++++++++++++++
+ llvm/lib/Support/ErrorHandling.cpp |  22 +++---
+ llvm/lib/Support/raw_ostream.cpp   |  17 +++--
+ 3 files changed, 128 insertions(+), 16 deletions(-)
 
-diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
-index 30644ef7f62cb81a33f2b62068f77f4e7f3f5019..994a145668d8f7b6c4569099fdb3b1c9096a6b30 100644
---- a/llvm/include/llvm/Support/Windows/WindowsSupport.h
-+++ b/llvm/include/llvm/Support/Windows/WindowsSupport.h
-@@ -33,8 +33,6 @@
- 
- #include "llvm/ADT/SmallVector.h"
- #include "llvm/ADT/StringExtras.h"
--#include "llvm/Config/llvm-config.h" // Get build system configuration settings
--#include "llvm/Support/Allocator.h"
- #include "llvm/Support/Chrono.h"
- #include "llvm/Support/Compiler.h"
- #include "llvm/Support/ErrorHandling.h"
-@@ -42,18 +40,46 @@
- #include <cassert>
- #include <string>
- #include <system_error>
-+#define WIN32_NO_STATUS
- #include <windows.h>
-+#undef WIN32_NO_STATUS
-+#include <winternl.h>
-+#include <ntstatus.h>
- 
- // Must be included after windows.h
- #include <wincrypt.h>
- 
- namespace llvm {
- 
-+/// Returns the Windows version as Major.Minor.0.BuildNumber. Uses
-+/// RtlGetVersion or GetVersionEx under the hood depending on what is available.
-+/// GetVersionEx is deprecated, but this API exposes the build number which can
-+/// be useful for working around certain kernel bugs.
-+inline llvm::VersionTuple GetWindowsOSVersion() {
-+  typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
-+  HMODULE hMod = ::GetModuleHandleW(L"ntdll.dll");
-+  if (hMod) {
-+    auto getVer = (RtlGetVersionPtr)::GetProcAddress(hMod, "RtlGetVersion");
-+    if (getVer) {
-+      RTL_OSVERSIONINFOEXW info{};
-+      info.dwOSVersionInfoSize = sizeof(info);
-+      if (getVer((PRTL_OSVERSIONINFOW)&info) == ((NTSTATUS)0x00000000L)) {
-+        return llvm::VersionTuple(info.dwMajorVersion, info.dwMinorVersion, 0,
-+                                  info.dwBuildNumber);
-+      }
-+    }
-+  }
-+  return llvm::VersionTuple(0, 0, 0, 0);
-+}
-+
- /// Determines if the program is running on Windows 8 or newer. This
- /// reimplements one of the helpers in the Windows 8.1 SDK, which are intended
- /// to supercede raw calls to GetVersionEx. Old SDKs, Cygwin, and MinGW don't
- /// yet have VersionHelpers.h, so we have our own helper.
--LLVM_ABI bool RunningWindows8OrGreater();
-+inline bool RunningWindows8OrGreater() {
-+  // Windows 8 is version 6.2, service pack 0.
-+  return GetWindowsOSVersion() >= llvm::VersionTuple(6, 2, 0, 0);
-+}
- 
- /// Determines if the program is running on Windows 11 or Windows Server 2022.
- LLVM_ABI bool RunningWindows11OrGreater();
-@@ -229,30 +255,6 @@ inline FILETIME toFILETIME(TimePoint<> TP) {
-   return Time;
- }
- 
--namespace windows {
--// Returns command line arguments. Unlike arguments given to main(),
--// this function guarantees that the returned arguments are encoded in
--// UTF-8 regardless of the current code page setting.
--LLVM_ABI std::error_code
--GetCommandLineArguments(SmallVectorImpl<const char *> &Args,
--                        BumpPtrAllocator &Alloc);
--
--/// Convert UTF-8 path to a suitable UTF-16 path for use with the Win32 Unicode
--/// File API.
--LLVM_ABI std::error_code widenPath(const Twine &Path8,
--                                   SmallVectorImpl<wchar_t> &Path16,
--                                   size_t MaxPathLen = MAX_PATH);
--
--/// Retrieves the handle to a in-memory system module such as ntdll.dll, while
--/// ensuring we're not retrieving a malicious injected module but a module
--/// loaded from the system path.
--LLVM_ABI HMODULE loadSystemModuleSecure(LPCWSTR lpModuleName);
--
--/// Convert a UTF-8 path to a long form UTF-8 path expanding any short 8.3 form
--/// components.
--LLVM_ABI std::error_code makeLongFormPath(const Twine &Path8,
--                                          llvm::SmallVectorImpl<char> &Result8);
--} // end namespace windows
- } // end namespace sys
- } // end namespace llvm.
- 
 diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
-index 63f92631d5b473cf9a69a06eddf4271304e8c730..f8551c7136ed44b8ed8c2f0bc4498145af504dd0 100644
+index 63f92631d5b473cf9a69a06eddf4271304e8c730..835fdf2fd178b1e03596fd5e64bfddf93904e766 100644
 --- a/llvm/lib/Support/ConvertUTF.cpp
 +++ b/llvm/lib/Support/ConvertUTF.cpp
-@@ -67,6 +67,11 @@
+@@ -62,11 +62,26 @@
+ ------------------------------------------------------------------------ */
+ 
+ #include "llvm/Support/ConvertUTF.h"
++#include "wpi/util/SmallVector.hpp"
+ #ifdef CVTUTF_DEBUG
+ #include <stdio.h>
  #endif
  #include <assert.h>
  
 +#ifdef _WIN32
 +#include "wpi/util/WindowsError.hpp"
-+#include "Windows/WindowsSupport.hpp"
++// mingw-w64 tends to define it as 0x0502 in its headers.
++#undef _WIN32_WINNT
++
++// Require at least Windows 7 API.
++#define _WIN32_WINNT 0x0601
++#define WIN32_LEAN_AND_MEAN
++#ifndef NOMINMAX
++#define NOMINMAX
++#endif
++#include <windows.h>
 +#endif
 +
  /*
   * This code extensively uses fall-through switches.
   * Keep the compiler from warning about that.
-@@ -759,6 +764,96 @@ ConversionResult ConvertUTF8toUTF32(const UTF8 **sourceStart,
+@@ -759,6 +774,96 @@ ConversionResult ConvertUTF8toUTF32(const UTF8 **sourceStart,
  
     --------------------------------------------------------------------- */
  
@@ -216,7 +138,7 @@ index 63f92631d5b473cf9a69a06eddf4271304e8c730..f8551c7136ed44b8ed8c2f0bc4498145
  
  ConvertUTF_RESTORE_WARNINGS
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index c4366de2aec2f1730954aecfc627dd0e164481ab..cc0e4665da20b619f0cf52a25b0c71bdf78e62f6 100644
+index fd5b46a2c7633391f6c7407483255963210aa056..0a7d0c3953994618043ca3058c321ef43eb1394f 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -60,7 +60,11 @@ static std::mutex BadAllocErrorHandlerMutex;
@@ -248,11 +170,58 @@ index c4366de2aec2f1730954aecfc627dd0e164481ab..cc0e4665da20b619f0cf52a25b0c71bd
  }
  
  void llvm::reportFatalInternalError(const char *reason) {
+@@ -238,8 +234,14 @@ void LLVMResetFatalErrorHandler() {
+ 
+ #ifdef _WIN32
+ 
++// mingw-w64 tends to define it as 0x0502 in its headers.
++#undef _WIN32_WINNT
++
++// Require at least Windows 7 API.
++#define _WIN32_WINNT 0x0601
++#define WIN32_LEAN_AND_MEAN
+ #define WIN32_NO_STATUS
+-#include "llvm/Support/Windows/WindowsSupport.h"
++#include <windows.h>
+ #undef WIN32_NO_STATUS
+ #include <ntstatus.h>
+ #include <winerror.h>
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 459189b0f0a006d465a857f26a78968c4f234a8d..7a834a0562af1f7da4315e735fe444278a9eef0e 100644
+index 475ac02b5f06f83ee125e02473d17f3a677a2e4c..f8c0a38f6ccd82c844e69b4ffb6aefad223772e3 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -519,7 +519,6 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+@@ -63,7 +63,17 @@
+ #ifdef _WIN32
+ #include "llvm/Support/ConvertUTF.h"
+ #include "llvm/Support/Signals.h"
+-#include "llvm/Support/Windows/WindowsSupport.h"
++// mingw-w64 tends to define it as 0x0502 in its headers.
++#undef _WIN32_WINNT
++
++// Require at least Windows 7 API.
++#define _WIN32_WINNT 0x0601
++#define WIN32_LEAN_AND_MEAN
++#ifndef NOMINMAX
++#define NOMINMAX
++#endif
++#define WIN32_NO_STATUS
++#include <windows.h>
+ #endif
+ 
+ using namespace llvm;
+@@ -440,11 +450,7 @@ static bool write_console_impl(int FD, std::string_view Data) {
+   if (auto EC = sys::windows::UTF8ToUTF16(Data, WideText))
+     return false;
+ 
+-  // On Windows 7 and earlier, WriteConsoleW has a low maximum amount of data
+-  // that can be written to the console at a time.
+   size_t MaxWriteSize = WideText.size();
+-  if (!RunningWindows8OrGreater())
+-    MaxWriteSize = 32767;
+ 
+   size_t WCharsWritten = 0;
+   do {
+@@ -519,7 +525,6 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
        DWORD WinLastError = GetLastError();
        if (WinLastError == ERROR_BROKEN_PIPE ||
            (WinLastError == ERROR_NO_DATA && errno == EINVAL)) {

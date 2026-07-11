@@ -1,31 +1,27 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:09:18 -0400
-Subject: [PATCH 01/34] Remove StringRef, ArrayRef, and Optional
+Subject: [PATCH 01/33] Remove StringRef, ArrayRef, and Optional
 
 ---
- llvm/include/llvm/ADT/PointerUnion.h          |   1 -
- llvm/include/llvm/ADT/SmallString.h           | 101 ++++++++++--------
- llvm/include/llvm/ADT/SmallVector.h           |   9 +-
- llvm/include/llvm/Support/Chrono.h            |  12 +--
- llvm/include/llvm/Support/Compiler.h          |   2 +-
- llvm/include/llvm/Support/ConvertUTF.h        |  31 +++---
- llvm/include/llvm/Support/ErrorHandling.h     |  16 +--
- llvm/include/llvm/Support/VersionTuple.h      |   6 --
- .../llvm/Support/Windows/WindowsSupport.h     |   4 +-
- llvm/include/llvm/Support/raw_ostream.h       |  46 ++++----
- llvm/lib/Support/ConvertUTFWrapper.cpp        |  39 ++++---
- llvm/lib/Support/ErrorHandling.cpp            |  21 ++--
- llvm/lib/Support/SmallVector.cpp              |   5 +-
- llvm/lib/Support/VersionTuple.cpp             |  49 ---------
- llvm/lib/Support/raw_ostream.cpp              |  25 +++--
- llvm/unittests/ADT/DenseMapTest.cpp           |  33 +-----
- llvm/unittests/ADT/FunctionExtrasTest.cpp     |  12 +--
- llvm/unittests/ADT/SmallPtrSetTest.cpp        |   1 -
- llvm/unittests/ADT/SmallStringTest.cpp        |  50 ++++-----
- llvm/unittests/ADT/SmallVectorTest.cpp        |  36 ++-----
- llvm/unittests/Support/ConvertUTFTest.cpp     |  42 ++++----
- 21 files changed, 225 insertions(+), 316 deletions(-)
+ llvm/include/llvm/ADT/PointerUnion.h      |   1 -
+ llvm/include/llvm/ADT/SmallString.h       | 101 ++++++++++++----------
+ llvm/include/llvm/ADT/SmallVector.h       |   9 +-
+ llvm/include/llvm/Support/Compiler.h      |   2 +-
+ llvm/include/llvm/Support/ConvertUTF.h    |  31 +++----
+ llvm/include/llvm/Support/ErrorHandling.h |  16 ++--
+ llvm/include/llvm/Support/raw_ostream.h   |  46 ++++++----
+ llvm/lib/Support/ConvertUTFWrapper.cpp    |  39 ++++-----
+ llvm/lib/Support/ErrorHandling.cpp        |  21 +++--
+ llvm/lib/Support/SmallVector.cpp          |   5 +-
+ llvm/lib/Support/raw_ostream.cpp          |  25 +++---
+ llvm/unittests/ADT/DenseMapTest.cpp       |  33 +------
+ llvm/unittests/ADT/FunctionExtrasTest.cpp |  12 +--
+ llvm/unittests/ADT/SmallPtrSetTest.cpp    |   1 -
+ llvm/unittests/ADT/SmallStringTest.cpp    |  50 +++++------
+ llvm/unittests/ADT/SmallVectorTest.cpp    |  36 ++------
+ llvm/unittests/Support/ConvertUTFTest.cpp |  42 ++++-----
+ 17 files changed, 218 insertions(+), 252 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/PointerUnion.h b/llvm/include/llvm/ADT/PointerUnion.h
 index d9087dd1c516ee265aa00851ca98b1df09936f3e..c3d6458777d186a700c359089c4afcac8db0185a 100644
@@ -352,55 +348,6 @@ index 23d40c3e07675d5c5cb8aa0089920ebd47cd1ccd..4499a51d40da615a3074ece034f7c30a
      this->append(A.begin(), A.end());
    }
  
-diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
-index e5f98249cc07464c4961ce4f86f973556e2d4dfb..dae64305f2b41766bb7bf9cf49b5d672b91f9493 100644
---- a/llvm/include/llvm/Support/Chrono.h
-+++ b/llvm/include/llvm/Support/Chrono.h
-@@ -91,12 +91,12 @@ LLVM_ABI raw_ostream &operator<<(raw_ostream &OS, sys::UtcTime<> TP);
- template <>
- struct format_provider<sys::TimePoint<>> {
-   LLVM_ABI static void format(const sys::TimePoint<> &TP, llvm::raw_ostream &OS,
--                              StringRef Style);
-+                              std::string_view Style);
- };
- 
- template <> struct format_provider<sys::UtcTime<std::chrono::seconds>> {
-   LLVM_ABI static void format(const sys::UtcTime<std::chrono::seconds> &TP,
--                              llvm::raw_ostream &OS, StringRef Style);
-+                              llvm::raw_ostream &OS, std::string_view Style);
- };
- 
- namespace detail {
-@@ -160,7 +160,7 @@ private:
-     return duration_cast<duration<InternalRep, AsPeriod>>(D).count();
-   }
- 
--  static std::pair<InternalRep, StringRef> consumeUnit(StringRef &Style,
-+  static std::pair<InternalRep, std::string_view> consumeUnit(std::string_view &Style,
-                                                         const Dur &D) {
-     using namespace std::chrono;
-     if (Style.consume_front("ns"))
-@@ -178,7 +178,7 @@ private:
-     return {D.count(), detail::unit<Period>::value};
-   }
- 
--  static bool consumeShowUnit(StringRef &Style) {
-+  static bool consumeShowUnit(std::string_view &Style) {
-     if (Style.empty())
-       return true;
-     if (Style.consume_front("-"))
-@@ -190,9 +190,9 @@ private:
-   }
- 
- public:
--  static void format(const Dur &D, llvm::raw_ostream &Stream, StringRef Style) {
-+  static void format(const Dur &D, llvm::raw_ostream &Stream, std::string_view Style) {
-     InternalRep count;
--    StringRef unit;
-+    std::string_view unit;
-     std::tie(count, unit) = consumeUnit(Style, D);
-     bool show_unit = consumeShowUnit(Style);
- 
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
 index 56f498a36ae52455a336c0f77a56fd16d199706b..a160164a33903408d60d6e8a57462a3b8c8623e2 100644
 --- a/llvm/include/llvm/Support/Compiler.h
@@ -580,52 +527,6 @@ index a4fd008a9ff3fc50cbb81e4b8a90ef2284ec6474..aabdfa0ad5e0caf15a72eb95ec9f888f
  
  /// Installs a new bad alloc error handler that should be used whenever a
  /// bad alloc error, e.g. failing malloc/calloc, is encountered by LLVM.
-diff --git a/llvm/include/llvm/Support/VersionTuple.h b/llvm/include/llvm/Support/VersionTuple.h
-index 867f81d74fb4d72a63a8e52ca6599cf4f463ec56..32c3ad9a9fc2c9827dc4afd81c6f9d03ec1b25c2 100644
---- a/llvm/include/llvm/Support/VersionTuple.h
-+++ b/llvm/include/llvm/Support/VersionTuple.h
-@@ -24,7 +24,6 @@
- namespace llvm {
- template <typename HasherT, llvm::endianness Endianness> class HashBuilder;
- class raw_ostream;
--class StringRef;
- 
- /// Represents a version number in the form major[.minor[.subminor[.build]]].
- class VersionTuple {
-@@ -179,11 +178,6 @@ public:
- 
-   /// Retrieve a string representation of the version number.
-   LLVM_ABI std::string getAsString() const;
--
--  /// Try to parse the given string as a version number.
--  /// \returns \c true if the string does not match the regular expression
--  ///   [0-9]+(\.[0-9]+){0,3}
--  LLVM_ABI bool tryParse(StringRef string);
- };
- 
- /// Print a version number.
-diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
-index 50a2540dba68795237fa922c2afc972f90873b5c..30644ef7f62cb81a33f2b62068f77f4e7f3f5019 100644
---- a/llvm/include/llvm/Support/Windows/WindowsSupport.h
-+++ b/llvm/include/llvm/Support/Windows/WindowsSupport.h
-@@ -33,8 +33,6 @@
- 
- #include "llvm/ADT/SmallVector.h"
- #include "llvm/ADT/StringExtras.h"
--#include "llvm/ADT/StringRef.h"
--#include "llvm/ADT/Twine.h"
- #include "llvm/Config/llvm-config.h" // Get build system configuration settings
- #include "llvm/Support/Allocator.h"
- #include "llvm/Support/Chrono.h"
-@@ -72,7 +70,7 @@ LLVM_ABI bool MakeErrMsg(std::string *ErrMsg, const std::string &prefix);
- [[noreturn]] inline void ReportLastErrorFatal(const char *Msg) {
-   std::string ErrMsg;
-   MakeErrMsg(&ErrMsg, Msg);
--  llvm::report_fatal_error(Twine(ErrMsg));
-+  llvm::report_fatal_error(ErrMsg);
- }
- 
- template <typename HandleTraits>
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
 index 70916d8e4adb0f98984ff335187a083a3091bc58..19df8739b6013c1b1a1527f5880a040d3cfb478f 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
@@ -987,66 +888,6 @@ index dceea4fbc630e85a869458af8b35ee1066c5866d..fba8fcb7cf56f4914e6ab6ede78eb8d8
  #endif
  }
  
-diff --git a/llvm/lib/Support/VersionTuple.cpp b/llvm/lib/Support/VersionTuple.cpp
-index c6e20f1bd3ef4df881e9f7b02c04af88c8342d66..9526f17bba696cc4ad00d04f7cd0a3b1d7b56981 100644
---- a/llvm/lib/Support/VersionTuple.cpp
-+++ b/llvm/lib/Support/VersionTuple.cpp
-@@ -60,55 +60,6 @@ static bool parseInt(StringRef &input, unsigned &value) {
-   return false;
- }
- 
--bool VersionTuple::tryParse(StringRef input) {
--  unsigned major = 0, minor = 0, micro = 0, build = 0;
--
--  // Parse the major version, [0-9]+
--  if (parseInt(input, major))
--    return true;
--
--  if (input.empty()) {
--    *this = VersionTuple(major);
--    return false;
--  }
--
--  // If we're not done, parse the minor version, \.[0-9]+
--  if (input[0] != '.')
--    return true;
--  input = input.substr(1);
--  if (parseInt(input, minor))
--    return true;
--
--  if (input.empty()) {
--    *this = VersionTuple(major, minor);
--    return false;
--  }
--
--  // If we're not done, parse the micro version, \.[0-9]+
--  if (!input.consume_front("."))
--    return true;
--  if (parseInt(input, micro))
--    return true;
--
--  if (input.empty()) {
--    *this = VersionTuple(major, minor, micro);
--    return false;
--  }
--
--  // If we're not done, parse the micro version, \.[0-9]+
--  if (!input.consume_front("."))
--    return true;
--  if (parseInt(input, build))
--    return true;
--
--  // If we have characters left over, it's an error.
--  if (!input.empty())
--    return true;
--
--  *this = VersionTuple(major, minor, micro, build);
--  return false;
--}
--
- VersionTuple VersionTuple::withMajorReplaced(unsigned NewMajor) const {
-   if (HasBuild)
-     return VersionTuple(NewMajor, Minor, Subminor, Build);
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
 index fe07aed335f7e49fd59488cdd4876e23e5b898b8..bf5d06018979474cf6166fed61be93eede0dece1 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
