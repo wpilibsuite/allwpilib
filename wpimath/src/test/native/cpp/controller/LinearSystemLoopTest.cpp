@@ -9,14 +9,21 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
+#include "wpi/math/estimator/KalmanFilter.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/Models.hpp"
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
+#include "wpi/units/acceleration.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/mass.hpp"
+#include "wpi/units/moment_of_inertia.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
 namespace wpi::math {
 
@@ -32,22 +39,20 @@ TEST(LinearSystemLoopTest, StateSpaceEnabled) {
   LinearSystem<2, 1, 1> slicedPlant{plant.Slice(0)};
 
   KalmanFilter<2, 1, 1> observer{
-      slicedPlant, wpi::util::array<double, 2>{0.05, 1.0},
-      wpi::util::array<double, 1>{kPositionStddev}, kDt};
+      slicedPlant, {0.05, 1.0}, {kPositionStddev}, kDt};
 
   LinearQuadraticRegulator<2, 1> controller{
       slicedPlant, {0.02, 0.4}, {12.0}, kDt};
 
   LinearSystemLoop<2, 1, 1> loop{slicedPlant, controller, observer, 12_V, kDt};
-
   loop.Reset({0, 0});
+
   Vectord<2> references{2.0, 0.0};
+  loop.SetNextR(references);
 
   TrapezoidProfile<units::meters>::Constraints constraints{4_mps, 3_mps_sq};
 
-  loop.SetNextR(references);
-
-  for (int i{0}; i < 1000; i++) {
+  for (int i = 0; i < 1000; ++i) {
     TrapezoidProfile<units::meters> profile{constraints};
 
     TrapezoidProfile<units::meters>::State current{
@@ -84,21 +89,18 @@ TEST(LinearSystemLoopTest, FlywheelEnabled) {
 
   KalmanFilter<1, 1, 1> observer{plant, {1.0}, {kPositionStddev}, kDt};
 
-  LinearQuadraticRegulator<1, 1> controller{
-      plant, wpi::util::array<double, 1>{9.0},
-      wpi::util::array<double, 1>{12.0}, kDt};
+  LinearQuadraticRegulator<1, 1> controller{plant, {9.0}, {12.0}, kDt};
 
   LinearPlantInversionFeedforward feedforward{plant, kDt};
 
   LinearSystemLoop<1, 1, 1> loop{controller, feedforward, observer, 12_V};
-
   loop.Reset(Vectord<1>{0.0});
-  Vectord<1> references{3000.0 / 60.0 * 2.0 * std::numbers::pi};
 
+  Vectord<1> references{3000.0 / 60.0 * 2.0 * std::numbers::pi};
   loop.SetNextR(references);
 
-  double time = 0.0;
-  while (time < 10) {
+  wpi::units::second_t time = 0_s;
+  while (time < 10_s) {
     loop.SetNextR(references);
     Matrixd<1, 1> y{plant.CalculateY(loop.Xhat(), loop.U()) +
                     Vectord<1>{distribution(generator) * kPositionStddev}};
@@ -111,7 +113,7 @@ TEST(LinearSystemLoopTest, FlywheelEnabled) {
     EXPECT_GT(u, -12.1);
     EXPECT_LE(u, 12.1);
 
-    time += kDt.value();
+    time += kDt;
   }
 
   EXPECT_NEAR(0.0, loop.Error().value(), 0.1);
