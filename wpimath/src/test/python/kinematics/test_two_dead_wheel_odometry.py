@@ -12,7 +12,7 @@ Y_WHEEL_X_POS = 1
 
 
 def _zero_rotation():
-    return Rotation2d.fromDegrees(0)
+    return Rotation2d.from_degrees(0)
 
 
 def _zero_pose():
@@ -29,7 +29,7 @@ def test_multiple_consecutive_updates():
     odometry = _make_odometry()
     wheel_positions = TwoDeadWheelPositions(1, 1)
 
-    odometry.resetPosition(_zero_rotation(), wheel_positions, _zero_pose())
+    odometry.reset_position(_zero_rotation(), wheel_positions, _zero_pose())
 
     odometry.update(_zero_rotation(), wheel_positions)
     second_pose = odometry.update(_zero_rotation(), wheel_positions)
@@ -43,7 +43,7 @@ def test_two_iterations():
     odometry = _make_odometry()
     wheel_positions = TwoDeadWheelPositions(0.1, 0)
 
-    odometry.resetPosition(_zero_rotation(), TwoDeadWheelPositions(), _zero_pose())
+    odometry.reset_position(_zero_rotation(), TwoDeadWheelPositions(), _zero_pose())
 
     odometry.update(_zero_rotation(), TwoDeadWheelPositions())
     pose = odometry.update(_zero_rotation(), wheel_positions)
@@ -55,10 +55,10 @@ def test_two_iterations():
 
 def test_gyro_angle_reset():
     odometry = _make_odometry()
-    gyro = Rotation2d.fromDegrees(90)
+    gyro = Rotation2d.from_degrees(90)
     field_angle = _zero_rotation()
 
-    odometry.resetPosition(gyro, TwoDeadWheelPositions(), Pose2d(0, 0, field_angle))
+    odometry.reset_position(gyro, TwoDeadWheelPositions(), Pose2d(0, 0, field_angle))
 
     positions = TwoDeadWheelPositions(1, 0)
     odometry.update(gyro, TwoDeadWheelPositions())
@@ -72,7 +72,7 @@ def test_gyro_angle_reset():
 def test_straight_forwards_forward_kinematics():
     odometry = _make_odometry()
 
-    wheel_velocities = odometry.toChassisVelocities(0, 5, 0)
+    wheel_velocities = odometry.to_chassis_velocities(0, 5, 0)
 
     assert wheel_velocities.vx == pytest.approx(5.0, abs=0.1)
     assert wheel_velocities.vy == pytest.approx(0.0, abs=0.1)
@@ -82,7 +82,7 @@ def test_straight_forwards_forward_kinematics():
 def test_straight_left_forward_kinematics():
     odometry = _make_odometry()
 
-    wheel_velocities = odometry.toChassisVelocities(0, 0, 5)
+    wheel_velocities = odometry.to_chassis_velocities(0, 0, 5)
 
     assert wheel_velocities.vx == pytest.approx(0.0, abs=0.1)
     assert wheel_velocities.vy == pytest.approx(5.0, abs=0.1)
@@ -92,7 +92,7 @@ def test_straight_left_forward_kinematics():
 def test_spin_in_place_forward_kinematics():
     odometry = _make_odometry()
 
-    wheel_velocities = odometry.toChassisVelocities(5, -5, 5)
+    wheel_velocities = odometry.to_chassis_velocities(5, -5, 5)
 
     assert wheel_velocities.vx == pytest.approx(0.0, abs=0.1)
     assert wheel_velocities.vy == pytest.approx(0.0, abs=0.1)
@@ -102,7 +102,7 @@ def test_spin_in_place_forward_kinematics():
 def test_mixed_motion_forward_kinematics():
     odometry = _make_odometry()
 
-    wheel_velocities = odometry.toChassisVelocities(5, 1, -1)
+    wheel_velocities = odometry.to_chassis_velocities(5, 1, -1)
 
     assert wheel_velocities.vx == pytest.approx(6.0, abs=0.1)
     assert wheel_velocities.vy == pytest.approx(-6.0, abs=0.1)
