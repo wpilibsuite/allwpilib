@@ -2,20 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 
 #include <vector>
 
 #include <gtest/gtest.h>
 
-#include "wpi/math/trajectory/TestTrajectory.hpp"
+#include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
 #include "wpi/units/math.hpp"
 
 using namespace wpi::math;
 
-TEST(TrajectoryGenerationTest, ObeysConstraints) {
+TEST(DrivetrainSplineTrajectoryGeneratorTest, ObeysConstraints) {
   TrajectoryConfig config{12_fps, 12_fps_sq};
-  auto trajectory = TestTrajectory::GetTrajectory(config);
+  auto trajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
   constexpr wpi::units::second_t dt = 20_ms;
 
@@ -29,8 +29,8 @@ TEST(TrajectoryGenerationTest, ObeysConstraints) {
   }
 }
 
-TEST(TrajectoryGenerationTest, ReturnsEmptyOnMalformed) {
-  const auto t = TrajectoryGenerator::GenerateTrajectory(
+TEST(DrivetrainSplineTrajectoryGeneratorTest, ReturnsEmptyOnMalformed) {
+  const auto t = DrivetrainSplineTrajectoryGenerator::Generate(
       std::vector<Pose2d>{Pose2d{0_m, 0_m, 0_deg}, Pose2d{1_m, 0_m, 180_deg}},
       TrajectoryConfig(12_fps, 12_fps_sq));
 
@@ -38,8 +38,8 @@ TEST(TrajectoryGenerationTest, ReturnsEmptyOnMalformed) {
   ASSERT_EQ(t.Duration(), 0_s);
 }
 
-TEST(TrajectoryGenerationTest, CurvatureOptimization) {
-  auto t = TrajectoryGenerator::GenerateTrajectory(
+TEST(DrivetrainSplineTrajectoryGeneratorTest, CurvatureOptimization) {
+  auto t = DrivetrainSplineTrajectoryGenerator::Generate(
       {{1_m, 0_m, 90_deg},
        {0_m, 1_m, 180_deg},
        {-1_m, 0_m, 270_deg},

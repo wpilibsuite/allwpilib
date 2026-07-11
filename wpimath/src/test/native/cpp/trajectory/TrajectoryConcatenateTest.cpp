@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
 TEST(TrajectoryConcatenateTest, Samples) {
-  auto t1 = wpi::math::TrajectoryGenerator::GenerateTrajectory(
+  auto t1 = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
       {}, {}, {1_m, 1_m, 0_deg}, {2_mps, 2_mps_sq});
-  auto t2 = wpi::math::TrajectoryGenerator::GenerateTrajectory(
+  auto t2 = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
       {1_m, 1_m, 0_deg}, {}, {2_m, 2_m, 45_deg}, {2_mps, 2_mps_sq});
 
   auto t = t1 + t2;

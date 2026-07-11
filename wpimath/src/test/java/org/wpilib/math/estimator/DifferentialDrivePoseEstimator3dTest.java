@@ -25,9 +25,9 @@ import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.trajectory.DrivetrainSplineSample;
+import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.Trajectory;
 import org.wpilib.math.trajectory.TrajectoryConfig;
-import org.wpilib.math.trajectory.TrajectoryGenerator;
 
 class DifferentialDrivePoseEstimator3dTest {
   private static final double kEpsilon = 1e-9;
@@ -46,7 +46,7 @@ class DifferentialDrivePoseEstimator3dTest {
             VecBuilder.fill(0.02, 0.02, 0.02, 0.01),
             VecBuilder.fill(0.1, 0.1, 0.1, 0.1));
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
                 new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
@@ -84,7 +84,7 @@ class DifferentialDrivePoseEstimator3dTest {
             VecBuilder.fill(0.1, 0.1, 0.1, 0.1));
 
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
                 new Pose2d(3, 0, Rotation2d.kCW_Pi_2),

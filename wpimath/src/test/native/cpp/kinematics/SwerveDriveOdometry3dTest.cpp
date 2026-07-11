@@ -10,9 +10,9 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
 using namespace wpi::math;
 
@@ -110,7 +110,7 @@ TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingTrajectory) {
   SwerveModulePosition br;
 
   DrivetrainSplineTrajectory trajectory =
-      TrajectoryGenerator::GenerateTrajectory(
+      DrivetrainSplineTrajectoryGenerator::Generate(
           std::vector{Pose2d{0_m, 0_m, 45_deg}, Pose2d{3_m, 0_m, -90_deg},
                       Pose2d{0_m, 0_m, 135_deg}, Pose2d{-3_m, 0_m, -90_deg},
                       Pose2d{0_m, 0_m, 45_deg}},
@@ -177,7 +177,7 @@ TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingXAxis) {
   SwerveModulePosition br;
 
   DrivetrainSplineTrajectory trajectory =
-      TrajectoryGenerator::GenerateTrajectory(
+      DrivetrainSplineTrajectoryGenerator::Generate(
           std::vector{Pose2d{0_m, 0_m, 45_deg}, Pose2d{3_m, 0_m, -90_deg},
                       Pose2d{0_m, 0_m, 135_deg}, Pose2d{-3_m, 0_m, -90_deg},
                       Pose2d{0_m, 0_m, 45_deg}},

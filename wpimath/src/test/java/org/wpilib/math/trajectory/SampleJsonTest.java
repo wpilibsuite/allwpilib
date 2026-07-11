@@ -23,7 +23,9 @@ class SampleJsonTest {
   void testBaseSample(@TempDir Path tempDir) throws IOException {
     HolonomicTrajectory trajectory =
         new HolonomicTrajectory(
-            TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).getSamples().stream()
+            DrivetrainSplineTrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
+                .getSamples()
+                .stream()
                 .map(s -> new HolonomicSample(s.time, s.pose, s.velocity, s.acceleration))
                 .toArray(HolonomicSample[]::new));
 
@@ -53,7 +55,7 @@ class SampleJsonTest {
     Trajectory<DifferentialSample> trajectory =
         new DifferentialTrajectory(
             new DifferentialDriveKinematics(0.5),
-            TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
+            DrivetrainSplineTrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
 
     int index = 0;
     for (DifferentialSample sample : trajectory.samples) {

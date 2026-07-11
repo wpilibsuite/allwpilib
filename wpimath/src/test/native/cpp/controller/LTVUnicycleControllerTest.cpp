@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/units/math.hpp"
 
@@ -28,7 +28,7 @@ TEST(LTVUnicycleControllerTest, ReachesReference) {
 
   auto waypoints = std::vector{wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
                                wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
-  auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
+  auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
   auto duration = trajectory.Duration();

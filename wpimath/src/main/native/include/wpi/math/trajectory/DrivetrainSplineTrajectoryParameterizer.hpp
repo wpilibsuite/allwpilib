@@ -38,15 +38,15 @@
 
 namespace wpi::math {
 /**
- * Class used to parameterize a spline trajectory by time.
+ * Class used to parameterize a drivetrain spline trajectory by time.
  */
-class WPILIB_DLLEXPORT TrajectoryParameterizer {
+class WPILIB_DLLEXPORT DrivetrainSplineTrajectoryParameterizer {
  public:
   using PoseWithCurvature = std::pair<Pose2d, wpi::units::curvature_t>;
 
   /**
-   * Parameterize the spline trajectory by time. This is where the velocity
-   * profile is generated.
+   * Parameterize the trajectory by time. This is where the velocity profile is
+   * generated.
    *
    * The derivation of the algorithm used can be found here:
    * <http://www2.informatik.uni-freiburg.de/~lau/students/Sprunk2008.pdf>
@@ -63,7 +63,7 @@ class WPILIB_DLLEXPORT TrajectoryParameterizer {
    *
    * @return The spline trajectory.
    */
-  static DrivetrainSplineTrajectory TimeParameterizeTrajectory(
+  static DrivetrainSplineTrajectory Parameterize(
       const std::vector<PoseWithCurvature>& points,
       const std::vector<std::unique_ptr<TrajectoryConstraint>>& constraints,
       wpi::units::meters_per_second_t startVelocity,

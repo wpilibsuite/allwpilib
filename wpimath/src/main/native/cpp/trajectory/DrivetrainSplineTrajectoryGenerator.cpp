@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 
 #include <utility>
 #include <vector>
@@ -11,26 +11,29 @@
 #include "wpi/math/spline/SplineHelper.hpp"
 #include "wpi/math/spline/SplineParameterizer.hpp"
 #include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
-#include "wpi/math/trajectory/TrajectoryParameterizer.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryParameterizer.hpp"
 #include "wpi/util/print.hpp"
 
 using namespace wpi::math;
 
-const DrivetrainSplineTrajectory TrajectoryGenerator::kDoNothingTrajectory(
-    std::vector<DrivetrainSplineSample>{DrivetrainSplineSample{
-        0_s, Pose2d{}, ChassisVelocities{}, ChassisAccelerations{},
-        wpi::units::curvature_t{0.0}}});
-std::function<void(const char*)> TrajectoryGenerator::s_errorFunc;
+const DrivetrainSplineTrajectory
+    DrivetrainSplineTrajectoryGenerator::kDoNothingTrajectory(
+        std::vector<DrivetrainSplineSample>{DrivetrainSplineSample{
+            0_s, Pose2d{}, ChassisVelocities{}, ChassisAccelerations{},
+            wpi::units::curvature_t{0.0}}});
+std::function<void(const char*)>
+    DrivetrainSplineTrajectoryGenerator::s_errorFunc;
 
-void TrajectoryGenerator::ReportError(const char* error) {
+void DrivetrainSplineTrajectoryGenerator::ReportError(const char* error) {
   if (s_errorFunc) {
     s_errorFunc(error);
   } else {
-    wpi::util::print(stderr, "TrajectoryGenerator error: {}\n", error);
+    wpi::util::print(stderr, "DrivetrainSplineTrajectoryGenerator error: {}\n",
+                     error);
   }
 }
 
-DrivetrainSplineTrajectory TrajectoryGenerator::GenerateTrajectory(
+DrivetrainSplineTrajectory DrivetrainSplineTrajectoryGenerator::Generate(
     Spline<3>::ControlVector initial,
     const std::vector<Translation2d>& interiorWaypoints,
     Spline<3>::ControlVector end, const TrajectoryConfig& config) {
@@ -63,21 +66,21 @@ DrivetrainSplineTrajectory TrajectoryGenerator::GenerateTrajectory(
     }
   }
 
-  return TrajectoryParameterizer::TimeParameterizeTrajectory(
+  return DrivetrainSplineTrajectoryParameterizer::Parameterize(
       points, config.Constraints(), config.StartVelocity(),
       config.EndVelocity(), config.MaxVelocity(), config.MaxAcceleration(),
       config.IsReversed());
 }
 
-DrivetrainSplineTrajectory TrajectoryGenerator::GenerateTrajectory(
+DrivetrainSplineTrajectory DrivetrainSplineTrajectoryGenerator::Generate(
     const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
     const Pose2d& end, const TrajectoryConfig& config) {
   auto [startCV, endCV] = SplineHelper::CubicControlVectorsFromWaypoints(
       start, interiorWaypoints, end);
-  return GenerateTrajectory(startCV, interiorWaypoints, endCV, config);
+  return Generate(startCV, interiorWaypoints, endCV, config);
 }
 
-DrivetrainSplineTrajectory TrajectoryGenerator::GenerateTrajectory(
+DrivetrainSplineTrajectory DrivetrainSplineTrajectoryGenerator::Generate(
     std::vector<Spline<5>::ControlVector> controlVectors,
     const TrajectoryConfig& config) {
   const Transform2d flip{Translation2d{}, 180_deg};
@@ -107,13 +110,13 @@ DrivetrainSplineTrajectory TrajectoryGenerator::GenerateTrajectory(
     }
   }
 
-  return TrajectoryParameterizer::TimeParameterizeTrajectory(
+  return DrivetrainSplineTrajectoryParameterizer::Parameterize(
       points, config.Constraints(), config.StartVelocity(),
       config.EndVelocity(), config.MaxVelocity(), config.MaxAcceleration(),
       config.IsReversed());
 }
 
-DrivetrainSplineTrajectory TrajectoryGenerator::GenerateTrajectory(
+DrivetrainSplineTrajectory DrivetrainSplineTrajectoryGenerator::Generate(
     const std::vector<Pose2d>& waypoints, const TrajectoryConfig& config) {
   auto newWaypoints = waypoints;
   const Transform2d flip{Translation2d{}, 180_deg};
@@ -140,13 +143,13 @@ DrivetrainSplineTrajectory TrajectoryGenerator::GenerateTrajectory(
     }
   }
 
-  return TrajectoryParameterizer::TimeParameterizeTrajectory(
+  return DrivetrainSplineTrajectoryParameterizer::Parameterize(
       points, config.Constraints(), config.StartVelocity(),
       config.EndVelocity(), config.MaxVelocity(), config.MaxAcceleration(),
       config.IsReversed());
 }
 
-void TrajectoryGenerator::SetErrorHandler(
+void DrivetrainSplineTrajectoryGenerator::SetErrorHandler(
     std::function<void(const char*)> func) {
   s_errorFunc = std::move(func);
 }

@@ -18,7 +18,7 @@ class TrajectoryTransformTest {
   void testTransformBy() {
     var config = new TrajectoryConfig(3, 3);
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             Pose2d.kZero, List.of(), new Pose2d(1, 1, Rotation2d.kCCW_Pi_2), config);
 
     var transformedTrajectory =
@@ -37,7 +37,7 @@ class TrajectoryTransformTest {
   void testRelativeTo() {
     var config = new TrajectoryConfig(3, 3);
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             new Pose2d(1, 2, Rotation2d.fromDegrees(30.0)),
             List.of(),
             new Pose2d(5, 7, Rotation2d.kCCW_Pi_2),

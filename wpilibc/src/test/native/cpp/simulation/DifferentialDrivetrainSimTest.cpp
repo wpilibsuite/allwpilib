@@ -12,7 +12,7 @@
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
 #include "wpi/simulation/RoboRioSim.hpp"
 #include "wpi/units/current.hpp"
@@ -45,7 +45,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
   config.AddConstraint(
       wpi::math::DifferentialDriveKinematicsConstraint(kinematics, 1_mps));
 
-  auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
+  auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
       wpi::math::Pose2d{}, {}, wpi::math::Pose2d{2_m, 2_m, 0_rad}, config);
 
   for (auto t = 0_s; t < trajectory.Duration(); t += 20_ms) {

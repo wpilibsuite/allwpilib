@@ -14,7 +14,7 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 #include "wpi/util/print.hpp"
 
 void testFollowTrajectory(
@@ -163,7 +163,7 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
       wpi::math::Pose2d{}, {0.1, 0.1, 0.1},         {0.45, 0.45, 0.45}};
 
   wpi::math::DrivetrainSplineTrajectory trajectory =
-      wpi::math::TrajectoryGenerator::GenerateTrajectory(
+      wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{3_m, 0_m, -90_deg},
                       wpi::math::Pose2d{0_m, 0_m, 135_deg},
@@ -200,7 +200,7 @@ TEST(SwerveDrivePoseEstimatorTest, BadInitialPose) {
       wpi::math::Pose2d{}, {0.1, 0.1, 0.1},         {0.9, 0.9, 0.9}};
 
   wpi::math::DrivetrainSplineTrajectory trajectory =
-      wpi::math::TrajectoryGenerator::GenerateTrajectory(
+      wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{3_m, 0_m, -90_deg},
                       wpi::math::Pose2d{0_m, 0_m, 135_deg},

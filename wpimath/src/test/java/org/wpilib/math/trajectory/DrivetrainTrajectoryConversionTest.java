@@ -50,7 +50,7 @@ class DrivetrainTrajectoryConversionTest {
 
     TrajectoryConfig config = new TrajectoryConfig(maxVelocity, maxAccel).setReversed(true);
 
-    return TrajectoryGenerator.generateTrajectory(waypoints, config);
+    return DrivetrainSplineTrajectoryGenerator.generate(waypoints, config);
   }
 
   /**
@@ -67,7 +67,7 @@ class DrivetrainTrajectoryConversionTest {
 
     TrajectoryConfig config = new TrajectoryConfig(2.0, 2.0);
 
-    return TrajectoryGenerator.generateTrajectory(waypoints, config);
+    return DrivetrainSplineTrajectoryGenerator.generate(waypoints, config);
   }
 
   /**
@@ -86,7 +86,7 @@ class DrivetrainTrajectoryConversionTest {
 
     TrajectoryConfig config = new TrajectoryConfig(2.0, 2.0);
 
-    return TrajectoryGenerator.generateTrajectory(waypoints, config);
+    return DrivetrainSplineTrajectoryGenerator.generate(waypoints, config);
   }
 
   @Test

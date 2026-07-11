@@ -9,14 +9,14 @@
 
 #include "wpi/math/trajectory/DifferentialTrajectory.hpp"
 #include "wpi/math/trajectory/HolonomicTrajectory.hpp"
-#include "wpi/math/trajectory/TestTrajectory.hpp"
+#include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
 #include "wpi/util/json.hpp"
 
 using namespace wpi::math;
 
 TEST(TrajectorySerializationTest, TestJsonSerialization) {
   TrajectoryConfig config{12_fps, 12_fps_sq};
-  auto splineTrajectory = TestTrajectory::GetTrajectory(config);
+  auto splineTrajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
   // Convert DrivetrainSplineTrajectory to HolonomicTrajectory
   std::vector<HolonomicSample> samples;
@@ -52,7 +52,7 @@ TEST(TrajectorySerializationTest, TestJsonSerialization) {
 
 TEST(TrajectorySerializationTest, TestDifferentialSerialization) {
   TrajectoryConfig config{12_fps, 12_fps_sq};
-  auto splineTrajectory = TestTrajectory::GetTrajectory(config);
+  auto splineTrajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
   DifferentialDriveKinematics kinematics{0.5_m};
   std::vector<DifferentialSample> samples;

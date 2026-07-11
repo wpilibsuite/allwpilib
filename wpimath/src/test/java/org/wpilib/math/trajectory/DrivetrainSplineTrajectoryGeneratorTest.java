@@ -19,7 +19,7 @@ import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.trajectory.constraint.TrajectoryConstraint;
 
-class TrajectoryGeneratorTest {
+class DrivetrainSplineTrajectoryGeneratorTest {
   static Trajectory<DrivetrainSplineSample> getTrajectory(
       List<? extends TrajectoryConstraint> constraints) {
     final double maxVelocity = feetToMeters(12.0);
@@ -45,7 +45,7 @@ class TrajectoryGeneratorTest {
     TrajectoryConfig config =
         new TrajectoryConfig(maxVelocity, maxAccel).setReversed(true).addConstraints(constraints);
 
-    return TrajectoryGenerator.generateTrajectory(waypoints, config);
+    return DrivetrainSplineTrajectoryGenerator.generate(waypoints, config);
   }
 
   @Test
@@ -66,7 +66,7 @@ class TrajectoryGeneratorTest {
   @Test
   void testMalformedTrajectory() {
     var traj =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(Pose2d.kZero, new Pose2d(1, 0, Rotation2d.kPi)),
             new TrajectoryConfig(feetToMeters(12), feetToMeters(12)));
 
@@ -77,7 +77,7 @@ class TrajectoryGeneratorTest {
   @Test
   void testQuinticCurvatureOptimization() {
     Trajectory<DrivetrainSplineSample> t =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
                 new Pose2d(0, 1, Rotation2d.kPi),

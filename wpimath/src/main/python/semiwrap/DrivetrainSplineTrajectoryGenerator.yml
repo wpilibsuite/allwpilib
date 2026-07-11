@@ -3,12 +3,12 @@ extra_includes:
 - wpi/math/spline/QuinticHermiteSpline.hpp
 
 classes:
-  wpi::math::TrajectoryGenerator:
+  wpi::math::DrivetrainSplineTrajectoryGenerator:
     force_type_casters:
     - wpi::units::unit_t
     - wpi::units::curvature_t
     methods:
-      GenerateTrajectory:
+      Generate:
         overloads:
           Spline<3>::ControlVector, const std::vector<Translation2d>&, Spline<3>::ControlVector, const TrajectoryConfig&:
           const Pose2d&, const std::vector<Translation2d>&, const Pose2d&, const TrajectoryConfig&:

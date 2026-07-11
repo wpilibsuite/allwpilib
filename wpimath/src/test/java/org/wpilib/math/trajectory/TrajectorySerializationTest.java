@@ -51,7 +51,9 @@ class TrajectorySerializationTest {
 
     HolonomicTrajectory trajectory =
         new HolonomicTrajectory(
-            TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).getSamples().stream()
+            DrivetrainSplineTrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
+                .getSamples()
+                .stream()
                 .map(s -> new HolonomicSample(s.time, s.pose, s.velocity, s.acceleration))
                 .toArray(HolonomicSample[]::new));
 
@@ -71,7 +73,7 @@ class TrajectorySerializationTest {
     DifferentialTrajectory trajectory =
         new DifferentialTrajectory(
             new DifferentialDriveKinematics(12.0),
-            TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
+            DrivetrainSplineTrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
 
     try (var os = Files.newOutputStream(tempFile)) {
       Jsonb.instance().type(DifferentialTrajectory.class).toJson(trajectory, os);

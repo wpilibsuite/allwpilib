@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/math/trajectory/TestTrajectory.hpp"
+#include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
 #include "wpi/math/trajectory/constraint/MaxVelocityConstraint.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/length.hpp"
@@ -22,7 +22,7 @@ TEST(RectangularRegionConstraintTest, Constraint) {
   auto config = TrajectoryConfig(13_fps, 13_fps_sq);
   config.AddConstraint(RectangularRegionConstraint{
       rectangle, MaxVelocityConstraint{maxVelocity}});
-  auto trajectory = TestTrajectory::GetTrajectory(config);
+  auto trajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
   bool exceededConstraintOutsideRegion = false;
   for (auto& point : trajectory.Samples()) {
