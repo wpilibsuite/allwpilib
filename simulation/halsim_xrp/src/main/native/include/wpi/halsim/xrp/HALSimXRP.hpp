@@ -76,8 +76,7 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
   XRPConnectionStatus m_status;
 
   std::string m_targetAddress;
-  XRPBluetoothAddressType m_targetAddressType =
-      XRPBluetoothAddressType::kRandom;
+  XRPBluetoothAddressType m_targetAddressType = XRPBluetoothAddressType::RANDOM;
 
   bool m_providersConnected = false;
 

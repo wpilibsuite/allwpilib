@@ -22,24 +22,24 @@ using namespace wpilibxrp;
 
 namespace {
 
-constexpr uint16_t kXRPBluetoothPsm = 0x0081;
-constexpr size_t kMaxBluetoothPacketSize = 512;
-constexpr const char* kXRPGattServiceUuid =
+constexpr uint16_t XRP_BLUETOOTH_PSM = 0x0081;
+constexpr size_t MAX_BLUETOOTH_PACKET_SIZE = 512;
+constexpr const char* XRP_GATT_SERVICE_UUID =
     "7d2ea28a-f7bd-485d-9d6a-2c3f0b214a3f";
-constexpr const char* kXRPGattControlCharacteristicUuid =
+constexpr const char* XRP_GATT_CONTROL_CHARACTERISTIC_UUID =
     "7d2ea28b-f7bd-485d-9d6a-2c3f0b214a3f";
-constexpr const char* kXRPGattStatusCharacteristicUuid =
+constexpr const char* XRP_GATT_STATUS_CHARACTERISTIC_UUID =
     "7d2ea28c-f7bd-485d-9d6a-2c3f0b214a3f";
 
 const char* AddressTypeToString(XRPBluetoothAddressType type) {
-  return type == XRPBluetoothAddressType::kPublic ? "public" : "random";
+  return type == XRPBluetoothAddressType::PUBLIC ? "public" : "random";
 }
 
 XRPBluetoothAddressType ParseAddressType(std::string_view type) {
   if (type == "public" || type == "PUBLIC" || type == "Public") {
-    return XRPBluetoothAddressType::kPublic;
+    return XRPBluetoothAddressType::PUBLIC;
   }
-  return XRPBluetoothAddressType::kRandom;
+  return XRPBluetoothAddressType::RANDOM;
 }
 
 }  // namespace
@@ -122,7 +122,7 @@ bool HALSimXRP::Initialize() {
   wpi::util::println(
       "HALSimXRP Bluetooth transport: LE L2CAP Credit-Based Mode PSM 0x{:04x} "
       "with GATT fallback",
-      kXRPBluetoothPsm);
+      XRP_BLUETOOTH_PSM);
   if (!m_targetAddress.empty()) {
     wpi::util::println("HALSimXRP Bluetooth target: {} ({})", m_targetAddress,
                        AddressTypeToString(m_targetAddressType));
@@ -174,11 +174,11 @@ void HALSimXRP::ConnectBluetooth(std::string address,
 
     config.address = m_targetAddress;
     config.addressType = m_targetAddressType;
-    config.psm = kXRPBluetoothPsm;
-    config.gattServiceUuid = kXRPGattServiceUuid;
-    config.gattControlCharacteristicUuid = kXRPGattControlCharacteristicUuid;
-    config.gattStatusCharacteristicUuid = kXRPGattStatusCharacteristicUuid;
-    config.maxPacketSize = kMaxBluetoothPacketSize;
+    config.psm = XRP_BLUETOOTH_PSM;
+    config.gattServiceUuid = XRP_GATT_SERVICE_UUID;
+    config.gattControlCharacteristicUuid = XRP_GATT_CONTROL_CHARACTERISTIC_UUID;
+    config.gattStatusCharacteristicUuid = XRP_GATT_STATUS_CHARACTERISTIC_UUID;
+    config.maxPacketSize = MAX_BLUETOOTH_PACKET_SIZE;
   }
 
   if (m_bluetoothClient) {
@@ -241,7 +241,7 @@ void HALSimXRP::OnSimValueChanged(const wpi::util::json& simData) {
 }
 
 uv::SimpleBufferPool<4>& HALSimXRP::GetBufferPool() {
-  static uv::SimpleBufferPool<4> bufferPool(kMaxBluetoothPacketSize);
+  static uv::SimpleBufferPool<4> bufferPool(MAX_BLUETOOTH_PACKET_SIZE);
   return bufferPool;
 }
 
@@ -266,7 +266,7 @@ void HALSimXRP::SendPacketToXRP(std::span<uv::Buffer> sendBufs) {
       packetSize += buf.len;
     }
 
-    if (packetSize <= kMaxBluetoothPacketSize) {
+    if (packetSize <= MAX_BLUETOOTH_PACKET_SIZE) {
       std::vector<uint8_t> packet;
       packet.reserve(packetSize);
       for (const auto& buf : sendBufs) {

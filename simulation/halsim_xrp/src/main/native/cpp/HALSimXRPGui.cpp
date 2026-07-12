@@ -28,9 +28,10 @@ using namespace std::chrono_literals;
 
 namespace {
 
-constexpr std::string_view kAddGuiLateExecuteName =
+constexpr std::string_view ADD_GUI_LATE_EXECUTE_NAME =
     "halsimgui::AddGuiLateExecute";
-constexpr std::string_view kGetImguiContextName = "halsimgui::GetImguiContext";
+constexpr std::string_view GET_IMGUI_CONTEXT_NAME =
+    "halsimgui::GetImguiContext";
 
 using AddGuiLateExecuteFn = void (*)(std::function<void()> execute);
 using GetImguiContextFn = ImGuiContext* (*)();
@@ -46,7 +47,7 @@ struct CommandResult {
   std::vector<BluetoothDevice> devices;
 };
 
-enum class CommandKind { kNone, kRefresh, kScan, kPair };
+enum class CommandKind { NONE, REFRESH, SCAN, PAIR };
 
 struct GuiState {
   bool initializedFromConnection = false;
@@ -55,7 +56,7 @@ struct GuiState {
   int selectedDevice = -1;
   std::vector<BluetoothDevice> devices;
   std::future<CommandResult> pendingCommand;
-  CommandKind pendingKind = CommandKind::kNone;
+  CommandKind pendingKind = CommandKind::NONE;
   std::string commandStatus;
   std::string commandOutput;
 };
@@ -199,8 +200,8 @@ void UpdatePendingCommand() {
 
   CommandResult result = gGui.pendingCommand.get();
   gGui.commandOutput = std::move(result.output);
-  if (gGui.pendingKind == CommandKind::kRefresh ||
-      gGui.pendingKind == CommandKind::kScan) {
+  if (gGui.pendingKind == CommandKind::REFRESH ||
+      gGui.pendingKind == CommandKind::SCAN) {
     gGui.devices = std::move(result.devices);
     gGui.selectedDevice =
         gGui.devices.empty()
@@ -216,7 +217,7 @@ void UpdatePendingCommand() {
   } else {
     gGui.commandStatus = "Command failed";
   }
-  gGui.pendingKind = CommandKind::kNone;
+  gGui.pendingKind = CommandKind::NONE;
 }
 
 void InitializeFromConnection(const XRPConnectionStatus& status) {
@@ -226,7 +227,7 @@ void InitializeFromConnection(const XRPConnectionStatus& status) {
 
   SetAddress(status.targetAddress);
   gGui.addressType =
-      status.addressType == XRPBluetoothAddressType::kPublic ? 0 : 1;
+      status.addressType == XRPBluetoothAddressType::PUBLIC ? 0 : 1;
   gGui.initializedFromConnection = true;
 }
 
@@ -246,11 +247,11 @@ std::string SelectedDeviceLabel() {
 void DrawDeviceControls(bool commandRunning) {
   ImGui::BeginDisabled(commandRunning);
   if (ImGui::Button("Refresh")) {
-    StartCommand(CommandKind::kRefresh, "Refreshing devices", RefreshDevices);
+    StartCommand(CommandKind::REFRESH, "Refreshing devices", RefreshDevices);
   }
   ImGui::SameLine();
   if (ImGui::Button("Scan")) {
-    StartCommand(CommandKind::kScan, "Scanning for Bluetooth devices", [] {
+    StartCommand(CommandKind::SCAN, "Scanning for Bluetooth devices", [] {
       RunCommand("bluetoothctl --timeout 8 scan on");
       return RefreshDevices();
     });
@@ -285,7 +286,7 @@ void DrawConnectionControls(HALSimXRP& simXRP,
   ImGui::BeginDisabled(commandRunning || !addressValid);
   if (ImGui::Button("Pair & Trust")) {
     std::string address = gGui.address;
-    StartCommand(CommandKind::kPair, "Pairing device", [address] {
+    StartCommand(CommandKind::PAIR, "Pairing device", [address] {
       return RunCommand("bluetoothctl pair " + address +
                         " && bluetoothctl trust " + address);
     });
@@ -295,8 +296,8 @@ void DrawConnectionControls(HALSimXRP& simXRP,
   ImGui::BeginDisabled(commandRunning || !targetValid);
   if (ImGui::Button("Connect")) {
     simXRP.ConnectBluetooth(
-        gGui.address, gGui.addressType == 0 ? XRPBluetoothAddressType::kPublic
-                                            : XRPBluetoothAddressType::kRandom);
+        gGui.address, gGui.addressType == 0 ? XRPBluetoothAddressType::PUBLIC
+                                            : XRPBluetoothAddressType::RANDOM);
   }
   ImGui::EndDisabled();
 
@@ -376,11 +377,11 @@ void DrawGui() {
 
 void ExtensionListener(void*, const char* name, void* data) {
   std::string_view nameView{name};
-  if (nameView == kAddGuiLateExecuteName && !gLateExecuteRegistered) {
+  if (nameView == ADD_GUI_LATE_EXECUTE_NAME && !gLateExecuteRegistered) {
     auto addGuiLateExecute = reinterpret_cast<AddGuiLateExecuteFn>(data);
     addGuiLateExecute(DrawGui);
     gLateExecuteRegistered = true;
-  } else if (nameView == kGetImguiContextName) {
+  } else if (nameView == GET_IMGUI_CONTEXT_NAME) {
     gGetImguiContext = reinterpret_cast<GetImguiContextFn>(data);
   }
 }
