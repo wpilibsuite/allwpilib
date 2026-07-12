@@ -316,6 +316,11 @@ public final class Coroutine {
     },
     ;
 
+    /**
+     * Checks if the wait has timed out.
+     *
+     * @return true if this result was a timeout, false if the condition was met without timing out.
+     */
     public abstract boolean timedOut();
   }
 
