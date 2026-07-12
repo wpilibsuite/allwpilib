@@ -421,7 +421,7 @@ static bool JsonArrayToStorage(Storage::Value* valuePtr,
         break;
       case wpi::util::json::Type::Double:
         if (valuePtr->type == Storage::Value::kDoubleArray) {
-          valuePtr->doubleArray->push_back(jvalue.get_double());
+          valuePtr->doubleArray->push_back(jvalue.get_number());
         } else {
           goto error;
         }
@@ -495,7 +495,7 @@ bool Storage::FromJson(const wpi::util::json& json, const char* filename) {
         break;
       case wpi::util::json::Type::Double:
         valuePtr->Reset(Value::kDouble);
-        valuePtr->doubleVal = jvalue.get_double();
+        valuePtr->doubleVal = jvalue.get_number();
         break;
       case wpi::util::json::Type::Int:
         valuePtr->Reset(Value::kInt64);

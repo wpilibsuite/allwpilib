@@ -14,7 +14,7 @@ void wpi::math::to_json(wpi::util::json& json, const TrajectorySample& sample) {
 
 void wpi::math::from_json(const wpi::util::json& json,
                           TrajectorySample& sample) {
-  sample = TrajectorySample{wpi::units::second_t{json.at("time").get_double()}};
+  sample = TrajectorySample{wpi::units::second_t{json.at("time").get_number()}};
 }
 
 void wpi::math::to_json(wpi::util::json& json,
