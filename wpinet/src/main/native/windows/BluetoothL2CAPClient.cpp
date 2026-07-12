@@ -180,7 +180,7 @@ class BluetoothL2CAPClient::Impl
       m_status.targetConfigured = true;
       m_status.connecting = true;
       m_status.connected = false;
-      m_status.transport = BluetoothPacketTransport::kNone;
+      m_status.transport = BluetoothPacketTransport::NONE;
       m_status.error.clear();
       m_status.status = "Connecting (GATT)";
     }
@@ -217,7 +217,7 @@ class BluetoothL2CAPClient::Impl
       UpdateStatus([&](auto& status) {
         status.connecting = false;
         status.connected = false;
-        status.transport = BluetoothPacketTransport::kNone;
+        status.transport = BluetoothPacketTransport::NONE;
         status.status = reason;
       });
     }
@@ -355,7 +355,7 @@ class BluetoothL2CAPClient::Impl
       UpdateStatus([](auto& status) {
         status.connecting = false;
         status.connected = true;
-        status.transport = BluetoothPacketTransport::kGATT;
+        status.transport = BluetoothPacketTransport::GATT;
         status.status = "Connected (GATT)";
         status.error.clear();
       });
@@ -384,7 +384,7 @@ class BluetoothL2CAPClient::Impl
       status.status = error;
       status.connecting = false;
       status.connected = false;
-      status.transport = BluetoothPacketTransport::kNone;
+      status.transport = BluetoothPacketTransport::NONE;
     });
   }
 

@@ -76,7 +76,7 @@ class BluetoothL2CAPClient::Impl
 
 namespace {
 
-char kMacBluetoothQueueKey;
+char MAC_BLUETOOTH_QUEUE_KEY;
 
 NSString* ToNSString(std::string_view value) {
   return [[NSString alloc] initWithBytes:value.data()
@@ -143,7 +143,7 @@ std::string ToString(NSError* error) {
     _impl = impl;
     _queue =
         dispatch_queue_create("edu.wpi.first.wpinet.bluetooth", DISPATCH_QUEUE_SERIAL);
-    dispatch_queue_set_specific(_queue, &kMacBluetoothQueueKey,
+    dispatch_queue_set_specific(_queue, &MAC_BLUETOOTH_QUEUE_KEY,
                                 (__bridge void*)self, nullptr);
     _central = [[CBCentralManager alloc] initWithDelegate:self queue:_queue];
     _pendingWrites = [[NSMutableArray alloc] init];
@@ -241,7 +241,7 @@ std::string ToString(NSError* error) {
       [self closeStreams];
     });
   };
-  if (dispatch_get_specific(&kMacBluetoothQueueKey) == (__bridge void*)self) {
+  if (dispatch_get_specific(&MAC_BLUETOOTH_QUEUE_KEY) == (__bridge void*)self) {
     block();
   } else {
     dispatch_sync(_queue, block);
@@ -570,7 +570,7 @@ std::string ToString(NSError* error) {
 
   _usingGatt = characteristic.isNotifying;
   if (_usingGatt && _impl != nullptr) {
-    _impl->SetConnected(BluetoothPacketTransport::kGATT);
+    _impl->SetConnected(BluetoothPacketTransport::GATT);
   }
 }
 
@@ -602,7 +602,7 @@ std::string ToString(NSError* error) {
       if (_inputStream.streamStatus == NSStreamStatusOpen &&
           _outputStream.streamStatus == NSStreamStatusOpen &&
           _impl != nullptr) {
-        _impl->SetConnected(BluetoothPacketTransport::kL2CAP);
+        _impl->SetConnected(BluetoothPacketTransport::L2CAP);
       }
       break;
     case NSStreamEventHasBytesAvailable:
@@ -735,7 +735,7 @@ void BluetoothL2CAPClient::Impl::SetError(std::string_view error) {
     status.status = error;
     status.connecting = false;
     status.connected = false;
-    status.transport = BluetoothPacketTransport::kNone;
+    status.transport = BluetoothPacketTransport::NONE;
   });
 }
 
@@ -746,7 +746,7 @@ void BluetoothL2CAPClient::Impl::SetConnected(
     status.connected = true;
     status.transport = transport;
     status.status =
-        transport == BluetoothPacketTransport::kL2CAP ? "Connected (L2CAP)"
+        transport == BluetoothPacketTransport::L2CAP ? "Connected (L2CAP)"
                                                       : "Connected (GATT)";
     status.error.clear();
   });
@@ -756,7 +756,7 @@ void BluetoothL2CAPClient::Impl::SetDisconnected(std::string_view reason) {
   UpdateStatus([&](auto& status) {
     status.connecting = false;
     status.connected = false;
-    status.transport = BluetoothPacketTransport::kNone;
+    status.transport = BluetoothPacketTransport::NONE;
     status.status = reason;
   });
 }

@@ -21,12 +21,12 @@ namespace wpi::net {
 /**
  * Bluetooth LE address type.
  */
-enum class BluetoothAddressType { kPublic, kRandom };
+enum class BluetoothAddressType { PUBLIC, RANDOM };
 
 /**
  * Active Bluetooth packet transport.
  */
-enum class BluetoothPacketTransport { kNone, kL2CAP, kGATT };
+enum class BluetoothPacketTransport { NONE, L2CAP, GATT };
 
 /**
  * Connection status for a Bluetooth LE packet client.
@@ -36,9 +36,9 @@ struct BluetoothL2CAPConnectionStatus {
   bool targetConfigured = false;
   bool connecting = false;
   bool connected = false;
-  BluetoothPacketTransport transport = BluetoothPacketTransport::kNone;
+  BluetoothPacketTransport transport = BluetoothPacketTransport::NONE;
   std::string targetAddress;
-  BluetoothAddressType addressType = BluetoothAddressType::kRandom;
+  BluetoothAddressType addressType = BluetoothAddressType::RANDOM;
   std::string status;
   std::string error;
   uint64_t packetsReceived = 0;
@@ -50,7 +50,7 @@ struct BluetoothL2CAPConnectionStatus {
  */
 struct BluetoothL2CAPClientConfig {
   std::string address;
-  BluetoothAddressType addressType = BluetoothAddressType::kRandom;
+  BluetoothAddressType addressType = BluetoothAddressType::RANDOM;
   uint16_t psm = 0;
   std::string gattServiceUuid;
   std::string gattControlCharacteristicUuid;
