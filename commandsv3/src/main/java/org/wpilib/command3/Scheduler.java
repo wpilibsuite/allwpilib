@@ -663,21 +663,27 @@ public final class Scheduler implements ProtobufSerializable {
   }
 
   private void runPeriodicSideloads() {
-    // Remove any periodic callbacks in an inactive scope
-    m_periodicCallbacks.removeIf(e -> !e.scope().active());
+    for (var iterator = m_periodicCallbacks.iterator(); iterator.hasNext(); ) {
+      PeriodicCallback callback = iterator.next();
+      if (!callback.scope().active()) {
+        // The callback's enclosing scope exited - remove without running it and move on
+        iterator.remove();
+        continue;
+      }
 
-    // Update periodic callbacks
-    for (PeriodicCallback callback : m_periodicCallbacks) {
+      // Update periodic callbacks
       callback.coroutine().mount();
       try {
         callback.coroutine().runToYieldPoint();
       } finally {
         Continuation.mountContinuation(null);
       }
-    }
 
-    // And remove any periodic callbacks that have completed
-    m_periodicCallbacks.removeIf(e -> e.coroutine().isDone());
+      if (callback.coroutine().isDone()) {
+        // Callback finished - remove it from the list
+        iterator.remove();
+      }
+    }
   }
 
   private void runCommands() {
