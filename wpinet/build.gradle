@@ -1,3 +1,9 @@
+import org.gradle.internal.os.OperatingSystem
+
+if (OperatingSystem.current().isMacOsX()) {
+    apply plugin: 'objective-cpp'
+}
+
 ext {
     baseId = 'wpinet'
     groupId = 'org.wpilib.net'
@@ -67,7 +73,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
                         include '**/*.h'
                     }
                 }
@@ -93,7 +99,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
                         include '**/*.h'
                     }
                 }
@@ -122,11 +128,22 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
+                        include '**/*.h'
+                    }
+                }
+                wpinetmacOSObjectiveCpp(ObjectiveCppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/macOS'
+                        include '**/*.mm'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
                         include '**/*.h'
                     }
                 }
             }
+            it.linker.args << '-framework' << 'CoreBluetooth' << '-framework' << 'Foundation'
         } else {
             it.sources {
                 libuvLinuxCpp(CppSourceSet) {
@@ -149,7 +166,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
                         include '**/*.h'
                     }
                 }

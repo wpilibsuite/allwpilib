@@ -16,10 +16,10 @@
 #include "wpi/halsim/ws_core/WSProviderContainer.hpp"
 #include "wpi/halsim/ws_core/WSProvider_SimDevice.hpp"
 #include "wpi/halsim/xrp/XRP.hpp"
+#include "wpi/net/BluetoothL2CAPClient.hpp"
 #include "wpi/net/uv/Async.hpp"
 #include "wpi/net/uv/Buffer.hpp"
 #include "wpi/net/uv/Loop.hpp"
-#include "wpi/net/uv/Poll.hpp"
 
 namespace wpi::util {
 class json;
@@ -27,20 +27,8 @@ class json;
 
 namespace wpilibxrp {
 
-enum class XRPBluetoothAddressType { kPublic, kRandom };
-
-struct XRPConnectionStatus {
-  bool bluetoothSupported = false;
-  bool targetConfigured = false;
-  bool connecting = false;
-  bool connected = false;
-  std::string targetAddress;
-  XRPBluetoothAddressType addressType = XRPBluetoothAddressType::kRandom;
-  std::string status;
-  std::string error;
-  uint64_t packetsReceived = 0;
-  uint64_t packetsSent = 0;
-};
+using XRPBluetoothAddressType = wpi::net::BluetoothAddressType;
+using XRPConnectionStatus = wpi::net::BluetoothL2CAPConnectionStatus;
 
 // This masquerades as a "WebSocket" so that we can reuse the
 // stuff in halsim_ws_core
@@ -78,8 +66,8 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
   XRP m_xrp;
 
   wpi::net::uv::Loop& m_loop;
-  std::shared_ptr<wpi::net::uv::Poll> m_bluetoothPoll;
   std::shared_ptr<UvExecFunc> m_exec;
+  std::shared_ptr<wpi::net::BluetoothL2CAPClient> m_bluetoothClient;
 
   wpilibws::ProviderContainer& m_providers;
   wpilibws::HALSimWSProviderSimDevices& m_simDevicesProvider;
@@ -91,16 +79,10 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
   XRPBluetoothAddressType m_targetAddressType =
       XRPBluetoothAddressType::kRandom;
 
-  int m_bluetoothSocket = -1;
   bool m_providersConnected = false;
 
   void SendStateToXRP();
-  void ConnectBluetoothOnLoop();
-  void CloseBluetoothOnLoop(std::string_view reason);
-  void CheckBluetoothConnect();
-  void ReadBluetoothPackets();
   void SendPacketToXRP(std::span<wpi::net::uv::Buffer> sendBufs);
-  void SetStatus(std::string_view status);
   void SetError(std::string_view error);
   void RegisterSimProviders();
   wpi::net::uv::SimpleBufferPool<4>& GetBufferPool();

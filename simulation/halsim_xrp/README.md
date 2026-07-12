@@ -8,13 +8,13 @@ The XRP client can be configured through the XRP Bluetooth window in the simulat
 
 The client also has environment variable configuration for headless use.
 
-``HALSIMXRP_BT_ADDRESS``: The Bluetooth device address to connect to. No default.
+``HALSIMXRP_BT_ADDRESS``: The Bluetooth target to connect to. On Linux, this is the Bluetooth device address. On macOS, this can be the CoreBluetooth UUID or advertised XRP device name. No default.
 
 ``HALSIMXRP_BT_ADDRESS_TYPE``: The Bluetooth LE address type. Supported values are `public` and `random`. Defaults to `random`.
 
 The firmware advertises a device name of the form `WPIXRP-AAAA-BBBB` and accepts LE L2CAP Credit-Based Mode connections on PSM `0x0081`. Each L2CAP SDU contains one XRP protocol packet.
 
-The native Bluetooth L2CAP transport is currently implemented for Linux.
+The native Bluetooth L2CAP transport is implemented for Linux and macOS. Windows reports the transport as unsupported because the Windows desktop Bluetooth socket API does not expose Bluetooth LE L2CAP Credit-Based Mode.
 
 ## XRP Protocol
 
