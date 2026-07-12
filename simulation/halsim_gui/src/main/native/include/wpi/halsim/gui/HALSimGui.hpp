@@ -28,6 +28,7 @@ class HALSimGui {
 void AddGuiInit(std::function<void()> initialize);
 void AddGuiLateExecute(std::function<void()> execute);
 void AddGuiEarlyExecute(std::function<void()> execute);
+void AddMainMenu(std::function<void()> menu);
 void GuiExit();
 
 }  // namespace halsimgui

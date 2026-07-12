@@ -7,6 +7,7 @@
 #include <functional>
 
 struct ImGuiContext;
+struct ImPlotContext;
 
 namespace wpi::glass {
 class Context;
@@ -30,11 +31,17 @@ using AddGuiLateExecuteFn = void (*)(std::function<void()> execute);
 #define HALSIMGUI_EXT_ADDGUIEARLYEXECUTE "halsimgui::AddGuiEarlyExecute"
 using AddGuiEarlyExecuteFn = void (*)(std::function<void()> execute);
 
+#define HALSIMGUI_EXT_ADDMAINMENU "halsimgui::AddMainMenu"
+using AddMainMenuFn = void (*)(std::function<void()> menu);
+
 #define HALSIMGUI_EXT_GUIEXIT "halsimgui::GuiExit"
 using GuiExitFn = void (*)();
 
 #define HALSIMGUI_EXT_GETIMGUICONTEXT "halsimgui::GetImguiContext"
 using GetImguiContextFn = ImGuiContext* (*)();
+
+#define HALSIMGUI_EXT_GETIMPLOTCONTEXT "halsimgui::GetImPlotContext"
+using GetImPlotContextFn = ImPlotContext* (*)();
 
 #define HALSIMGUI_EXT_GETGUICONTEXT "halsimgui::GetGuiContext"
 using GetGuiContextFn = wpi::gui::Context* (*)();
