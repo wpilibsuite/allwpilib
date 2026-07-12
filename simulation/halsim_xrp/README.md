@@ -1,14 +1,20 @@
 # HAL XRP Client
 
-This is an extension that provides a client version of the XRP protocol for transmitting robot hardware interface state to an XRP robot over UDP.
+This is an extension that provides a client version of the XRP protocol for transmitting robot hardware interface state to an XRP robot over Bluetooth LE L2CAP Credit-Based Mode.
 
 ## Configuration
 
-The XRP client has a number of configuration options available through environment variables.
+The XRP client can be configured through the XRP Bluetooth window in the simulator GUI. On Linux, the window can use `bluetoothctl` to scan for cached devices and pair/trust the selected XRP before opening the L2CAP channel.
 
-``HALSIMXRP_HOST``: The host to connect to.  Defaults to localhost.
+The client also has environment variable configuration for headless use.
 
-``HALSIMXRP_PORT``: The port number to connect to.  Defaults to 3540.
+``HALSIMXRP_BT_ADDRESS``: The Bluetooth device address to connect to. No default.
+
+``HALSIMXRP_BT_ADDRESS_TYPE``: The Bluetooth LE address type. Supported values are `public` and `random`. Defaults to `random`.
+
+The firmware advertises a device name of the form `WPIXRP-AAAA-BBBB` and accepts LE L2CAP Credit-Based Mode connections on PSM `0x0081`. Each L2CAP SDU contains one XRP protocol packet.
+
+The native Bluetooth L2CAP transport is currently implemented for Linux.
 
 ## XRP Protocol
 
@@ -35,7 +41,7 @@ The `Tagged Data` section can contain an arbitrary number of data blocks. Each b
 The `size` byte encodes the size of the data block, _excluding_ itself. Thus the smallest block size is 2 bytes, with a size value of 1 (1 size byte, 1 tag byte, 0 payload bytes). Maximum size of the payload is 254 bytes.
 
 
-Utilizing tagged data blocks allows us to send multiple pieces of data in a single UDP packet. The tags currently implemented for the XRP are as follows:
+Utilizing tagged data blocks allows us to send multiple pieces of data in a single transport packet. The tags currently implemented for the XRP are as follows:
 
 | Tag  | Description                   |
 |------|-------------------------------|

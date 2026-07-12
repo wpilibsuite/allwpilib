@@ -13,6 +13,7 @@
 #include "wpi/halsim/ws_core/WSProvider_Encoder.hpp"
 #include "wpi/halsim/ws_core/WSProvider_HAL.hpp"
 #include "wpi/halsim/ws_core/WSProvider_SimDevice.hpp"
+#include "wpi/halsim/xrp/HALSimXRPGui.hpp"
 #include "wpi/net/EventLoopRunner.hpp"
 
 using namespace wpilibxrp;
@@ -22,6 +23,7 @@ bool HALSimXRPClient::Initialize() {
   bool result = true;
   runner.ExecSync([&](wpi::net::uv::Loop& loop) {
     simxrp = std::make_shared<HALSimXRP>(loop, providers, simDevices);
+    InitializeXRPBluetoothGui(simxrp);
 
     if (!simxrp->Initialize()) {
       result = false;
