@@ -6,14 +6,15 @@
 
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/trajectory/TestTrajectory.hpp"
 #include "wpi/units/math.hpp"
 
 using namespace wpi::math;
 
-TEST(TrajectoryGenerationTest, ObeysConstraints) {
+TEST_CASE("TrajectoryGenerationTest ObeysConstraints", "[wpimath]") {
   TrajectoryConfig config{12_fps, 12_fps_sq};
   auto trajectory = TestTrajectory::GetTrajectory(config);
 
@@ -22,23 +23,23 @@ TEST(TrajectoryGenerationTest, ObeysConstraints) {
   for (auto t = 0_s; t < trajectory.Duration(); t += dt) {
     auto point = trajectory.SampleAt(t);
 
-    EXPECT_TRUE(wpi::units::math::abs(point.ForwardVelocity()) <=
+    CHECK(wpi::units::math::abs(point.ForwardVelocity()) <=
                 12_fps + 0.01_fps);
-    EXPECT_TRUE(wpi::units::math::abs(point.ForwardAcceleration()) <=
+    CHECK(wpi::units::math::abs(point.ForwardAcceleration()) <=
                 12_fps_sq + 0.01_fps_sq);
   }
 }
 
-TEST(TrajectoryGenerationTest, ReturnsEmptyOnMalformed) {
+TEST_CASE("TrajectoryGenerationTest ReturnsEmptyOnMalformed", "[wpimath]") {
   const auto t = TrajectoryGenerator::GenerateTrajectory(
       std::vector<Pose2d>{Pose2d{0_m, 0_m, 0_deg}, Pose2d{1_m, 0_m, 180_deg}},
       TrajectoryConfig(12_fps, 12_fps_sq));
 
-  ASSERT_EQ(t.Samples().size(), 1u);
-  ASSERT_EQ(t.Duration(), 0_s);
+  REQUIRE(t.Samples().size() == 1u);
+  REQUIRE(t.Duration() == 0_s);
 }
 
-TEST(TrajectoryGenerationTest, CurvatureOptimization) {
+TEST_CASE("TrajectoryGenerationTest CurvatureOptimization", "[wpimath]") {
   auto t = TrajectoryGenerator::GenerateTrajectory(
       {{1_m, 0_m, 90_deg},
        {0_m, 1_m, 180_deg},
@@ -48,6 +49,6 @@ TEST(TrajectoryGenerationTest, CurvatureOptimization) {
       TrajectoryConfig{12_fps, 12_fps_sq});
 
   for (size_t i = 1; i < t.Samples().size() - 1; ++i) {
-    EXPECT_NE(0, t.Samples()[i].curvature.value());
+    CHECK(0 != t.Samples()[i].curvature.value());
   }
 }

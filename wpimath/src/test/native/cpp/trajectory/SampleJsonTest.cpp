@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/trajectory/DifferentialTrajectory.hpp"
 #include "wpi/math/trajectory/HolonomicSample.hpp"
@@ -12,7 +12,7 @@
 
 using namespace wpi::math;
 
-TEST(SampleJsonTest, TestBaseSample) {
+TEST_CASE("SampleJsonTest TestBaseSample", "[wpimath]") {
   TrajectoryConfig config{12_fps, 12_fps_sq};
   auto splineTrajectory = TestTrajectory::GetTrajectory(config);
 
@@ -26,14 +26,14 @@ TEST(SampleJsonTest, TestBaseSample) {
 
     HolonomicSample deserializedSample = json.get<HolonomicSample>();
 
-    EXPECT_EQ(sample.time, deserializedSample.time);
-    EXPECT_EQ(sample.pose, deserializedSample.pose);
-    EXPECT_EQ(sample.velocity, deserializedSample.velocity);
-    EXPECT_EQ(sample.acceleration, deserializedSample.acceleration);
+    CHECK(sample.time == deserializedSample.time);
+    CHECK(sample.pose == deserializedSample.pose);
+    CHECK(sample.velocity == deserializedSample.velocity);
+    CHECK(sample.acceleration == deserializedSample.acceleration);
   }
 }
 
-TEST(SampleJsonTest, TestFromJson) {
+TEST_CASE("SampleJsonTest TestFromJson", "[wpimath]") {
   TrajectoryConfig config{12_fps, 12_fps_sq};
   auto splineTrajectory = TestTrajectory::GetTrajectory(config);
 
@@ -47,14 +47,14 @@ TEST(SampleJsonTest, TestFromJson) {
 
     HolonomicSample deserializedSample = json.get<HolonomicSample>();
 
-    EXPECT_EQ(sample.time, deserializedSample.time);
-    EXPECT_EQ(sample.pose, deserializedSample.pose);
-    EXPECT_EQ(sample.velocity, deserializedSample.velocity);
-    EXPECT_EQ(sample.acceleration, deserializedSample.acceleration);
+    CHECK(sample.time == deserializedSample.time);
+    CHECK(sample.pose == deserializedSample.pose);
+    CHECK(sample.velocity == deserializedSample.velocity);
+    CHECK(sample.acceleration == deserializedSample.acceleration);
   }
 }
 
-TEST(SampleJsonTest, TestDifferentialSamples) {
+TEST_CASE("SampleJsonTest TestDifferentialSamples", "[wpimath]") {
   TrajectoryConfig config{12_fps, 12_fps_sq};
   auto splineTrajectory = TestTrajectory::GetTrajectory(config);
 
@@ -73,11 +73,11 @@ TEST(SampleJsonTest, TestDifferentialSamples) {
 
     DifferentialSample deserializedSample = json.get<DifferentialSample>();
 
-    EXPECT_EQ(sample.time, deserializedSample.time);
-    EXPECT_EQ(sample.pose, deserializedSample.pose);
-    EXPECT_EQ(sample.velocity, deserializedSample.velocity);
-    EXPECT_EQ(sample.acceleration, deserializedSample.acceleration);
-    EXPECT_EQ(sample.leftVelocity, deserializedSample.leftVelocity);
-    EXPECT_EQ(sample.rightVelocity, deserializedSample.rightVelocity);
+    CHECK(sample.time == deserializedSample.time);
+    CHECK(sample.pose == deserializedSample.pose);
+    CHECK(sample.velocity == deserializedSample.velocity);
+    CHECK(sample.acceleration == deserializedSample.acceleration);
+    CHECK(sample.leftVelocity == deserializedSample.leftVelocity);
+    CHECK(sample.rightVelocity == deserializedSample.rightVelocity);
   }
 }

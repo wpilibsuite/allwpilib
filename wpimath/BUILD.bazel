@@ -278,7 +278,7 @@ cc_test(
     deps = [
         ":test_headers",
         ":wpimath",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 

@@ -4,8 +4,10 @@
 
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
@@ -14,7 +16,7 @@
 
 namespace wpi::math {
 
-TEST(LinearQuadraticRegulatorTest, ElevatorGains) {
+TEST_CASE("LinearQuadraticRegulatorTest ElevatorGains", "[wpimath]") {
   LinearSystem<2, 1, 1> plant = [] {
     auto motors = DCMotor::Vex775Pro(2);
 
@@ -33,11 +35,11 @@ TEST(LinearQuadraticRegulatorTest, ElevatorGains) {
   Matrixd<1, 2> K =
       LinearQuadraticRegulator<2, 1>{plant, {0.02, 0.4}, {12.0}, 5_ms}.K();
 
-  EXPECT_NEAR(522.87006795347486, K(0, 0), 1e-6);
-  EXPECT_NEAR(38.239878385020411, K(0, 1), 1e-6);
+  CHECK_NEAR(522.87006795347486, K(0, 0), 1e-6);
+  CHECK_NEAR(38.239878385020411, K(0, 1), 1e-6);
 }
 
-TEST(LinearQuadraticRegulatorTest, ArmGains) {
+TEST_CASE("LinearQuadraticRegulatorTest ArmGains", "[wpimath]") {
   LinearSystem<2, 1, 1> plant = [] {
     auto motors = DCMotor::Vex775Pro(2);
 
@@ -59,11 +61,11 @@ TEST(LinearQuadraticRegulatorTest, ArmGains) {
       LinearQuadraticRegulator<2, 1>{plant, {0.01745, 0.08726}, {12.0}, 5_ms}
           .K();
 
-  EXPECT_NEAR(19.339349883583761, K(0, 0), 1e-6);
-  EXPECT_NEAR(3.3542559517421582, K(0, 1), 1e-6);
+  CHECK_NEAR(19.339349883583761, K(0, 0), 1e-6);
+  CHECK_NEAR(3.3542559517421582, K(0, 1), 1e-6);
 }
 
-TEST(LinearQuadraticRegulatorTest, FourMotorElevator) {
+TEST_CASE("LinearQuadraticRegulatorTest FourMotorElevator", "[wpimath]") {
   LinearSystem<2, 1, 1> plant = [] {
     auto motors = DCMotor::Vex775Pro(4);
 
@@ -82,8 +84,8 @@ TEST(LinearQuadraticRegulatorTest, FourMotorElevator) {
   Matrixd<1, 2> K =
       LinearQuadraticRegulator<2, 1>{plant, {0.1, 0.2}, {12.0}, 20_ms}.K();
 
-  EXPECT_NEAR(10.38, K(0, 0), 1e-1);
-  EXPECT_NEAR(0.69, K(0, 1), 1e-1);
+  CHECK_NEAR(10.38, K(0, 0), 1e-1);
+  CHECK_NEAR(0.69, K(0, 1), 1e-1);
 }
 
 /**
@@ -123,7 +125,8 @@ Matrixd<Inputs, States> GetImplicitModelFollowingK(
       .K();
 }
 
-TEST(LinearQuadraticRegulatorTest, MatrixOverloadsWithSingleIntegrator) {
+TEST_CASE("LinearQuadraticRegulatorTest MatrixOverloadsWithSingleIntegrator",
+          "[wpimath]") {
   Matrixd<2, 2> A{Matrixd<2, 2>::Zero()};
   Matrixd<2, 2> B{Matrixd<2, 2>::Identity()};
   Matrixd<2, 2> Q{Matrixd<2, 2>::Identity()};
@@ -131,21 +134,22 @@ TEST(LinearQuadraticRegulatorTest, MatrixOverloadsWithSingleIntegrator) {
 
   // QR overload
   Matrixd<2, 2> K = LinearQuadraticRegulator<2, 2>{A, B, Q, R, 5_ms}.K();
-  EXPECT_NEAR(0.99750312499512261, K(0, 0), 1e-10);
-  EXPECT_NEAR(0.0, K(0, 1), 1e-10);
-  EXPECT_NEAR(0.0, K(1, 0), 1e-10);
-  EXPECT_NEAR(0.99750312499512261, K(1, 1), 1e-10);
+  CHECK_NEAR(0.99750312499512261, K(0, 0), 1e-10);
+  CHECK_NEAR(0.0, K(0, 1), 1e-10);
+  CHECK_NEAR(0.0, K(1, 0), 1e-10);
+  CHECK_NEAR(0.99750312499512261, K(1, 1), 1e-10);
 
   // QRN overload
   Matrixd<2, 2> N{Matrixd<2, 2>::Identity()};
   Matrixd<2, 2> Kimf = LinearQuadraticRegulator<2, 2>{A, B, Q, R, N, 5_ms}.K();
-  EXPECT_NEAR(1.0, Kimf(0, 0), 1e-10);
-  EXPECT_NEAR(0.0, Kimf(0, 1), 1e-10);
-  EXPECT_NEAR(0.0, Kimf(1, 0), 1e-10);
-  EXPECT_NEAR(1.0, Kimf(1, 1), 1e-10);
+  CHECK_NEAR(1.0, Kimf(0, 0), 1e-10);
+  CHECK_NEAR(0.0, Kimf(0, 1), 1e-10);
+  CHECK_NEAR(0.0, Kimf(1, 0), 1e-10);
+  CHECK_NEAR(1.0, Kimf(1, 1), 1e-10);
 }
 
-TEST(LinearQuadraticRegulatorTest, MatrixOverloadsWithDoubleIntegrator) {
+TEST_CASE("LinearQuadraticRegulatorTest MatrixOverloadsWithDoubleIntegrator",
+          "[wpimath]") {
   double Kv = 3.02;
   double Ka = 0.642;
 
@@ -156,17 +160,17 @@ TEST(LinearQuadraticRegulatorTest, MatrixOverloadsWithDoubleIntegrator) {
 
   // QR overload
   Matrixd<1, 2> K = LinearQuadraticRegulator<2, 1>{A, B, Q, R, 5_ms}.K();
-  EXPECT_NEAR(1.9960017786537287, K(0, 0), 1e-10);
-  EXPECT_NEAR(0.51182128351092726, K(0, 1), 1e-10);
+  CHECK_NEAR(1.9960017786537287, K(0, 0), 1e-10);
+  CHECK_NEAR(0.51182128351092726, K(0, 1), 1e-10);
 
   // QRN overload
   Matrixd<2, 2> Aref{{0, 1}, {0, -Kv / (Ka * 5.0)}};
   Matrixd<1, 2> Kimf = GetImplicitModelFollowingK<2, 1>(A, B, Q, R, Aref, 5_ms);
-  EXPECT_NEAR(0.0, Kimf(0, 0), 1e-10);
-  EXPECT_NEAR(-6.9190500116751458e-05, Kimf(0, 1), 1e-10);
+  CHECK_NEAR(0.0, Kimf(0, 0), 1e-10);
+  CHECK_NEAR(-6.9190500116751458e-05, Kimf(0, 1), 1e-10);
 }
 
-TEST(LinearQuadraticRegulatorTest, LatencyCompensate) {
+TEST_CASE("LinearQuadraticRegulatorTest LatencyCompensate", "[wpimath]") {
   LinearSystem<2, 1, 1> plant = [] {
     auto motors = DCMotor::Vex775Pro(4);
 
@@ -186,8 +190,8 @@ TEST(LinearQuadraticRegulatorTest, LatencyCompensate) {
 
   controller.LatencyCompensate(plant, 20_ms, 10_ms);
 
-  EXPECT_NEAR(8.97115941, controller.K(0, 0), 1e-3);
-  EXPECT_NEAR(0.07904881, controller.K(0, 1), 1e-3);
+  CHECK_NEAR(8.97115941, controller.K(0, 0), 1e-3);
+  CHECK_NEAR(0.07904881, controller.K(0, 1), 1e-3);
 }
 
 }  // namespace wpi::math

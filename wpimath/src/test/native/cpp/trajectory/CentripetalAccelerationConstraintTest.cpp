@@ -4,7 +4,8 @@
 
 #include "wpi/math/trajectory/constraint/CentripetalAccelerationConstraint.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/trajectory/TestTrajectory.hpp"
 #include "wpi/units/acceleration.hpp"
@@ -13,7 +14,7 @@
 
 using namespace wpi::math;
 
-TEST(CentripetalAccelerationConstraintTest, Constraint) {
+TEST_CASE("CentripetalAccelerationConstraintTest Constraint", "[wpimath]") {
   const auto maxCentripetalAcceleration = 7_fps_sq;
 
   auto config = TrajectoryConfig(12_fps, 12_fps_sq);
@@ -28,7 +29,6 @@ TEST(CentripetalAccelerationConstraintTest, Constraint) {
         wpi::units::math::pow<2>(point.ForwardVelocity()) * point.curvature /
         1_rad;
 
-    EXPECT_TRUE(centripetalAcceleration <
-                maxCentripetalAcceleration + 0.05_mps_sq);
+    CHECK(centripetalAcceleration < maxCentripetalAcceleration + 0.05_mps_sq);
   }
 }

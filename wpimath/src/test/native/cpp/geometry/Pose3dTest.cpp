@@ -6,13 +6,15 @@
 
 #include <cmath>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/util/array.hpp"
 
 using namespace wpi::math;
 
-TEST(Pose3dTest, RotateBy) {
+TEST_CASE("Pose3dTest RotateBy", "[wpimath]") {
   constexpr auto x = 1_m;
   constexpr auto y = 2_m;
   const Pose3d initial{x, y, 0_m, Rotation3d{0_deg, 0_deg, 45_deg}};
@@ -24,16 +26,16 @@ TEST(Pose3dTest, RotateBy) {
   // Translation is rotated by CCW rotation matrix
   double c = std::cos(yaw.value());
   double s = std::sin(yaw.value());
-  EXPECT_DOUBLE_EQ(c * x.value() - s * y.value(), rotated.X().value());
-  EXPECT_DOUBLE_EQ(s * x.value() + c * y.value(), rotated.Y().value());
-  EXPECT_DOUBLE_EQ(0.0, rotated.Z().value());
-  EXPECT_DOUBLE_EQ(0.0, rotated.Rotation().X().value());
-  EXPECT_DOUBLE_EQ(0.0, rotated.Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(initial.Rotation().Z().value() + rotation.Z().value(),
-                   rotated.Rotation().Z().value());
+  CHECK_DOUBLE_EQ(c * x.value() - s * y.value(), rotated.X().value());
+  CHECK_DOUBLE_EQ(s * x.value() + c * y.value(), rotated.Y().value());
+  CHECK_DOUBLE_EQ(0.0, rotated.Z().value());
+  CHECK_DOUBLE_EQ(0.0, rotated.Rotation().X().value());
+  CHECK_DOUBLE_EQ(0.0, rotated.Rotation().Y().value());
+  CHECK_DOUBLE_EQ(initial.Rotation().Z().value() + rotation.Z().value(),
+                  rotated.Rotation().Z().value());
 }
 
-TEST(Pose3dTest, TestTransformByRotations) {
+TEST_CASE("Pose3dTest TestTransformByRotations", "[wpimath]") {
   constexpr double kEpsilon = 1E-9;
 
   const Pose3d initialPose{0_m, 0_m, 0_m, Rotation3d{0_deg, 0_deg, 0_deg}};
@@ -48,15 +50,15 @@ TEST(Pose3dTest, TestTransformByRotations) {
                          .TransformBy(transform2)
                          .TransformBy(transform3);
 
-  EXPECT_NEAR(finalPose.Rotation().X().value(),
-              initialPose.Rotation().X().value(), kEpsilon);
-  EXPECT_NEAR(finalPose.Rotation().Y().value(),
-              initialPose.Rotation().Y().value(), kEpsilon);
-  EXPECT_NEAR(finalPose.Rotation().Z().value(),
-              initialPose.Rotation().Z().value(), kEpsilon);
+  CHECK_NEAR(finalPose.Rotation().X().value(),
+             initialPose.Rotation().X().value(), kEpsilon);
+  CHECK_NEAR(finalPose.Rotation().Y().value(),
+             initialPose.Rotation().Y().value(), kEpsilon);
+  CHECK_NEAR(finalPose.Rotation().Z().value(),
+             initialPose.Rotation().Z().value(), kEpsilon);
 }
 
-TEST(Pose3dTest, TransformBy) {
+TEST_CASE("Pose3dTest TransformBy", "[wpimath]") {
   Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
   const Pose3d initial{1_m, 2_m, 0_m, Rotation3d{zAxis, 45.0_deg}};
@@ -65,13 +67,13 @@ TEST(Pose3dTest, TransformBy) {
 
   const auto transformed = initial + transform;
 
-  EXPECT_DOUBLE_EQ(1.0 + 5.0 / std::sqrt(2.0), transformed.X().value());
-  EXPECT_DOUBLE_EQ(2.0 + 5.0 / std::sqrt(2.0), transformed.Y().value());
-  EXPECT_DOUBLE_EQ(transformed.Rotation().Z().value(),
-                   wpi::units::radian_t{50_deg}.value());
+  CHECK_DOUBLE_EQ(1.0 + 5.0 / std::sqrt(2.0), transformed.X().value());
+  CHECK_DOUBLE_EQ(2.0 + 5.0 / std::sqrt(2.0), transformed.Y().value());
+  CHECK_DOUBLE_EQ(transformed.Rotation().Z().value(),
+                  wpi::units::radian_t{50_deg}.value());
 }
 
-TEST(Pose3dTest, RelativeTo) {
+TEST_CASE("Pose3dTest RelativeTo", "[wpimath]") {
   Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
   const Pose3d initial{0_m, 0_m, 0_m, Rotation3d{zAxis, 45_deg}};
@@ -79,41 +81,41 @@ TEST(Pose3dTest, RelativeTo) {
 
   const auto finalRelativeToInitial = final.RelativeTo(initial);
 
-  EXPECT_DOUBLE_EQ(5.0 * std::sqrt(2.0), finalRelativeToInitial.X().value());
-  EXPECT_DOUBLE_EQ(0.0, finalRelativeToInitial.Y().value());
-  EXPECT_NEAR(0.0, finalRelativeToInitial.Rotation().Z().value(), 1e-9);
+  CHECK_DOUBLE_EQ(5.0 * std::sqrt(2.0), finalRelativeToInitial.X().value());
+  CHECK_DOUBLE_EQ(0.0, finalRelativeToInitial.Y().value());
+  CHECK_NEAR(0.0, finalRelativeToInitial.Rotation().Z().value(), 1e-9);
 }
 
-TEST(Pose3dTest, RotateAround) {
+TEST_CASE("Pose3dTest RotateAround", "[wpimath]") {
   const Pose3d initial{5_m, 0_m, 0_m, Rotation3d{}};
   const Translation3d point{0_m, 0_m, 0_m};
 
   const auto rotated =
       initial.RotateAround(point, Rotation3d{0_deg, 0_deg, 180_deg});
 
-  EXPECT_NEAR(-5.0, rotated.X().value(), 1e-9);
-  EXPECT_NEAR(0.0, rotated.Y().value(), 1e-9);
-  EXPECT_NEAR(wpi::units::radian_t{180_deg}.value(),
-              rotated.Rotation().Z().value(), 1e-9);
+  CHECK_NEAR(-5.0, rotated.X().value(), 1e-9);
+  CHECK_NEAR(0.0, rotated.Y().value(), 1e-9);
+  CHECK_NEAR(wpi::units::radian_t{180_deg}.value(),
+             rotated.Rotation().Z().value(), 1e-9);
 }
 
-TEST(Pose3dTest, Equality) {
+TEST_CASE("Pose3dTest Equality", "[wpimath]") {
   Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
   const Pose3d a{0_m, 5_m, 0_m, Rotation3d{zAxis, 43_deg}};
   const Pose3d b{0_m, 5_m, 0_m, Rotation3d{zAxis, 43_deg}};
-  EXPECT_TRUE(a == b);
+  CHECK(a == b);
 }
 
-TEST(Pose3dTest, Inequality) {
+TEST_CASE("Pose3dTest Inequality", "[wpimath]") {
   Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
   const Pose3d a{0_m, 5_m, 0_m, Rotation3d{zAxis, 43_deg}};
   const Pose3d b{0_m, 5_ft, 0_m, Rotation3d{zAxis, 43_deg}};
-  EXPECT_TRUE(a != b);
+  CHECK(a != b);
 }
 
-TEST(Pose3dTest, Minus) {
+TEST_CASE("Pose3dTest Minus", "[wpimath]") {
   Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
   const Pose3d initial{0_m, 0_m, 0_m, Rotation3d{zAxis, 45_deg}};
@@ -121,26 +123,26 @@ TEST(Pose3dTest, Minus) {
 
   const auto transform = final - initial;
 
-  EXPECT_DOUBLE_EQ(5.0 * std::sqrt(2.0), transform.X().value());
-  EXPECT_DOUBLE_EQ(0.0, transform.Y().value());
-  EXPECT_NEAR(0.0, transform.Rotation().Z().value(), 1e-9);
+  CHECK_DOUBLE_EQ(5.0 * std::sqrt(2.0), transform.X().value());
+  CHECK_DOUBLE_EQ(0.0, transform.Y().value());
+  CHECK_NEAR(0.0, transform.Rotation().Z().value(), 1e-9);
 }
 
-TEST(Pose3dTest, ToMatrix) {
+TEST_CASE("Pose3dTest ToMatrix", "[wpimath]") {
   Pose3d before{1_m, 2_m, 3_m, Rotation3d{10_deg, 20_deg, 30_deg}};
   Pose3d after{before.ToMatrix()};
 
-  EXPECT_EQ(before, after);
+  CHECK(before == after);
 }
 
-TEST(Pose3dTest, ToPose2d) {
+TEST_CASE("Pose3dTest ToPose2d", "[wpimath]") {
   Pose3d pose{1_m, 2_m, 3_m, Rotation3d{20_deg, 30_deg, 40_deg}};
   Pose2d expected{1_m, 2_m, 40_deg};
 
-  EXPECT_EQ(expected, pose.ToPose2d());
+  CHECK(expected == pose.ToPose2d());
 }
 
-TEST(Pose3dTest, ComplexTwists) {
+TEST_CASE("Pose3dTest ComplexTwists", "[wpimath]") {
   wpi::util::array<Pose3d, 5> initial_poses{
       Pose3d{0.698303_m, -0.959096_m, 0.271076_m,
              Rotation3d{Quaternion{0.86403, -0.076866, 0.147234, 0.475254}}},
@@ -176,21 +178,21 @@ TEST(Pose3dTest, ComplexTwists) {
 
     auto eps = 1E-5;
 
-    EXPECT_NEAR(start_exp.X().value(), end.X().value(), eps);
-    EXPECT_NEAR(start_exp.Y().value(), end.Y().value(), eps);
-    EXPECT_NEAR(start_exp.Z().value(), end.Z().value(), eps);
-    EXPECT_NEAR(start_exp.Rotation().GetQuaternion().W(),
-                end.Rotation().GetQuaternion().W(), eps);
-    EXPECT_NEAR(start_exp.Rotation().GetQuaternion().X(),
-                end.Rotation().GetQuaternion().X(), eps);
-    EXPECT_NEAR(start_exp.Rotation().GetQuaternion().Y(),
-                end.Rotation().GetQuaternion().Y(), eps);
-    EXPECT_NEAR(start_exp.Rotation().GetQuaternion().Z(),
-                end.Rotation().GetQuaternion().Z(), eps);
+    CHECK_NEAR(start_exp.X().value(), end.X().value(), eps);
+    CHECK_NEAR(start_exp.Y().value(), end.Y().value(), eps);
+    CHECK_NEAR(start_exp.Z().value(), end.Z().value(), eps);
+    CHECK_NEAR(start_exp.Rotation().GetQuaternion().W(),
+               end.Rotation().GetQuaternion().W(), eps);
+    CHECK_NEAR(start_exp.Rotation().GetQuaternion().X(),
+               end.Rotation().GetQuaternion().X(), eps);
+    CHECK_NEAR(start_exp.Rotation().GetQuaternion().Y(),
+               end.Rotation().GetQuaternion().Y(), eps);
+    CHECK_NEAR(start_exp.Rotation().GetQuaternion().Z(),
+               end.Rotation().GetQuaternion().Z(), eps);
   }
 }
 
-TEST(Pose3dTest, TwistNaN) {
+TEST_CASE("Pose3dTest TwistNaN", "[wpimath]") {
   wpi::util::array<Pose3d, 2> initial_poses{
       Pose3d{6.32_m, 4.12_m, 0.00_m,
              Rotation3d{Quaternion{-0.9999999999999999, 0.0, 0.0,
@@ -214,16 +216,16 @@ TEST(Pose3dTest, TwistNaN) {
     auto end = final_poses[i];
     auto twist = (end - start).Log();
 
-    EXPECT_FALSE(std::isnan(twist.dx.value()));
-    EXPECT_FALSE(std::isnan(twist.dy.value()));
-    EXPECT_FALSE(std::isnan(twist.dz.value()));
-    EXPECT_FALSE(std::isnan(twist.rx.value()));
-    EXPECT_FALSE(std::isnan(twist.ry.value()));
-    EXPECT_FALSE(std::isnan(twist.rz.value()));
+    CHECK_FALSE(std::isnan(twist.dx.value()));
+    CHECK_FALSE(std::isnan(twist.dy.value()));
+    CHECK_FALSE(std::isnan(twist.dz.value()));
+    CHECK_FALSE(std::isnan(twist.rx.value()));
+    CHECK_FALSE(std::isnan(twist.ry.value()));
+    CHECK_FALSE(std::isnan(twist.rz.value()));
   }
 }
 
-TEST(Pose3dTest, Nearest) {
+TEST_CASE("Pose3dTest Nearest", "[wpimath]") {
   const Pose3d origin{0_m, 0_m, 0_m, Rotation3d{}};
 
   // Distance sort
@@ -235,26 +237,26 @@ TEST(Pose3dTest, Nearest) {
   const Pose3d pose4{2_m, 2_m, 2_m, Rotation3d{}};
   const Pose3d pose5{3_m, 3_m, 3_m, Rotation3d{}};
 
-  EXPECT_DOUBLE_EQ(pose3.X().value(),
-                   origin.Nearest({pose5, pose3, pose4}).X().value());
-  EXPECT_DOUBLE_EQ(pose3.Y().value(),
-                   origin.Nearest({pose5, pose3, pose4}).Y().value());
-  EXPECT_DOUBLE_EQ(pose3.Z().value(),
-                   origin.Nearest({pose5, pose3, pose4}).Z().value());
+  CHECK_DOUBLE_EQ(pose3.X().value(),
+                  origin.Nearest({pose5, pose3, pose4}).X().value());
+  CHECK_DOUBLE_EQ(pose3.Y().value(),
+                  origin.Nearest({pose5, pose3, pose4}).Y().value());
+  CHECK_DOUBLE_EQ(pose3.Z().value(),
+                  origin.Nearest({pose5, pose3, pose4}).Z().value());
 
-  EXPECT_DOUBLE_EQ(pose1.X().value(),
-                   origin.Nearest({pose1, pose2, pose3}).X().value());
-  EXPECT_DOUBLE_EQ(pose1.Y().value(),
-                   origin.Nearest({pose1, pose2, pose3}).Y().value());
-  EXPECT_DOUBLE_EQ(pose1.Z().value(),
-                   origin.Nearest({pose1, pose2, pose3}).Z().value());
+  CHECK_DOUBLE_EQ(pose1.X().value(),
+                  origin.Nearest({pose1, pose2, pose3}).X().value());
+  CHECK_DOUBLE_EQ(pose1.Y().value(),
+                  origin.Nearest({pose1, pose2, pose3}).Y().value());
+  CHECK_DOUBLE_EQ(pose1.Z().value(),
+                  origin.Nearest({pose1, pose2, pose3}).Z().value());
 
-  EXPECT_DOUBLE_EQ(pose2.X().value(),
-                   origin.Nearest({pose4, pose2, pose3}).X().value());
-  EXPECT_DOUBLE_EQ(pose2.Y().value(),
-                   origin.Nearest({pose4, pose2, pose3}).Y().value());
-  EXPECT_DOUBLE_EQ(pose2.Z().value(),
-                   origin.Nearest({pose4, pose2, pose3}).Z().value());
+  CHECK_DOUBLE_EQ(pose2.X().value(),
+                  origin.Nearest({pose4, pose2, pose3}).X().value());
+  CHECK_DOUBLE_EQ(pose2.Y().value(),
+                  origin.Nearest({pose4, pose2, pose3}).Y().value());
+  CHECK_DOUBLE_EQ(pose2.Z().value(),
+                  origin.Nearest({pose4, pose2, pose3}).Z().value());
 
   // Rotation component sort (when distance is the same)
   // Use the same translation to avoid distance differences
@@ -268,52 +270,37 @@ TEST(Pose3dTest, Nearest) {
 
   auto result1 =
       Pose3d{0_m, 0_m, 0_m, Rotation3d{}}.Nearest({poseA, poseB, poseD});
-  EXPECT_DOUBLE_EQ(poseA.Rotation().X().value(),
-                   result1.Rotation().X().value());
-  EXPECT_DOUBLE_EQ(poseA.Rotation().Y().value(),
-                   result1.Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(poseA.Rotation().Z().value(),
-                   result1.Rotation().Z().value());
+  CHECK_DOUBLE_EQ(poseA.Rotation().X().value(), result1.Rotation().X().value());
+  CHECK_DOUBLE_EQ(poseA.Rotation().Y().value(), result1.Rotation().Y().value());
+  CHECK_DOUBLE_EQ(poseA.Rotation().Z().value(), result1.Rotation().Z().value());
 
   auto result2 =
       Pose3d{0_m, 0_m, 0_m, Rotation3d{25_deg, 0_deg, 0_deg}}.Nearest(
           {poseB, poseC, poseD});
-  EXPECT_DOUBLE_EQ(poseB.Rotation().X().value(),
-                   result2.Rotation().X().value());
-  EXPECT_DOUBLE_EQ(poseB.Rotation().Y().value(),
-                   result2.Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(poseB.Rotation().Z().value(),
-                   result2.Rotation().Z().value());
+  CHECK_DOUBLE_EQ(poseB.Rotation().X().value(), result2.Rotation().X().value());
+  CHECK_DOUBLE_EQ(poseB.Rotation().Y().value(), result2.Rotation().Y().value());
+  CHECK_DOUBLE_EQ(poseB.Rotation().Z().value(), result2.Rotation().Z().value());
 
   auto result3 =
       Pose3d{0_m, 0_m, 0_m, Rotation3d{0_deg, 50_deg, 0_deg}}.Nearest(
           {poseB, poseC, poseD});
-  EXPECT_DOUBLE_EQ(poseC.Rotation().X().value(),
-                   result3.Rotation().X().value());
-  EXPECT_DOUBLE_EQ(poseC.Rotation().Y().value(),
-                   result3.Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(poseC.Rotation().Z().value(),
-                   result3.Rotation().Z().value());
+  CHECK_DOUBLE_EQ(poseC.Rotation().X().value(), result3.Rotation().X().value());
+  CHECK_DOUBLE_EQ(poseC.Rotation().Y().value(), result3.Rotation().Y().value());
+  CHECK_DOUBLE_EQ(poseC.Rotation().Z().value(), result3.Rotation().Z().value());
 
   auto result4 =
       Pose3d{0_m, 0_m, 0_m, Rotation3d{0_deg, 0_deg, 85_deg}}.Nearest(
           {poseA, poseC, poseD});
-  EXPECT_DOUBLE_EQ(poseD.Rotation().X().value(),
-                   result4.Rotation().X().value());
-  EXPECT_DOUBLE_EQ(poseD.Rotation().Y().value(),
-                   result4.Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(poseD.Rotation().Z().value(),
-                   result4.Rotation().Z().value());
+  CHECK_DOUBLE_EQ(poseD.Rotation().X().value(), result4.Rotation().X().value());
+  CHECK_DOUBLE_EQ(poseD.Rotation().Y().value(), result4.Rotation().Y().value());
+  CHECK_DOUBLE_EQ(poseD.Rotation().Z().value(), result4.Rotation().Z().value());
 
   auto result5 =
       Pose3d{0_m, 0_m, 0_m, Rotation3d{170_deg, 0_deg, 0_deg}}.Nearest(
           {poseA, poseD, poseE});
-  EXPECT_DOUBLE_EQ(poseE.Rotation().X().value(),
-                   result5.Rotation().X().value());
-  EXPECT_DOUBLE_EQ(poseE.Rotation().Y().value(),
-                   result5.Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(poseE.Rotation().Z().value(),
-                   result5.Rotation().Z().value());
+  CHECK_DOUBLE_EQ(poseE.Rotation().X().value(), result5.Rotation().X().value());
+  CHECK_DOUBLE_EQ(poseE.Rotation().Y().value(), result5.Rotation().Y().value());
+  CHECK_DOUBLE_EQ(poseE.Rotation().Z().value(), result5.Rotation().Z().value());
 
   // Test with complex 3D rotations (combining roll, pitch, yaw)
   const Pose3d complexPose1{translation, Rotation3d{45_deg, 30_deg, 60_deg}};
@@ -323,10 +310,10 @@ TEST(Pose3dTest, Nearest) {
   auto complexResult =
       Pose3d{0_m, 0_m, 0_m, Rotation3d{5_deg, 10_deg, 15_deg}}.Nearest(
           {complexPose1, complexPose2, complexPose3});
-  EXPECT_DOUBLE_EQ(complexPose3.Rotation().X().value(),
-                   complexResult.Rotation().X().value());
-  EXPECT_DOUBLE_EQ(complexPose3.Rotation().Y().value(),
-                   complexResult.Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(complexPose3.Rotation().Z().value(),
-                   complexResult.Rotation().Z().value());
+  CHECK_DOUBLE_EQ(complexPose3.Rotation().X().value(),
+                  complexResult.Rotation().X().value());
+  CHECK_DOUBLE_EQ(complexPose3.Rotation().Y().value(),
+                  complexResult.Rotation().Y().value());
+  CHECK_DOUBLE_EQ(complexPose3.Rotation().Z().value(),
+                  complexResult.Rotation().Z().value());
 }

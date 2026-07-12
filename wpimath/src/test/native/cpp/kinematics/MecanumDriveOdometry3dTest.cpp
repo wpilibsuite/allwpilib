@@ -7,13 +7,15 @@
 #include <limits>
 #include <random>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
 using namespace wpi::math;
 
-class MecanumDriveOdometry3dTest : public ::testing::Test {
+class MecanumDriveOdometry3dTest {
  protected:
   Translation2d m_fl{12_m, 12_m};
   Translation2d m_fr{12_m, -12_m};
@@ -26,7 +28,8 @@ class MecanumDriveOdometry3dTest : public ::testing::Test {
   MecanumDriveOdometry3d odometry{kinematics, wpi::math::Rotation3d{}, zero};
 };
 
-TEST_F(MecanumDriveOdometry3dTest, Initialize) {
+TEST_CASE_METHOD(MecanumDriveOdometry3dTest,
+                 "MecanumDriveOdometry3dTest Initialize", "[wpimath]") {
   MecanumDriveOdometry3d odometry{
       kinematics, wpi::math::Rotation3d{}, zero,
       wpi::math::Pose3d{1_m, 2_m, 0_m,
@@ -34,13 +37,15 @@ TEST_F(MecanumDriveOdometry3dTest, Initialize) {
 
   const wpi::math::Pose3d& pose = odometry.GetPose();
 
-  EXPECT_NEAR(pose.X().value(), 1, 1e-9);
-  EXPECT_NEAR(pose.Y().value(), 2, 1e-9);
-  EXPECT_NEAR(pose.Z().value(), 0, 1e-9);
-  EXPECT_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 45, 1e-9);
+  CHECK_NEAR(pose.X().value(), 1, 1e-9);
+  CHECK_NEAR(pose.Y().value(), 2, 1e-9);
+  CHECK_NEAR(pose.Z().value(), 0, 1e-9);
+  CHECK_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 45, 1e-9);
 }
 
-TEST_F(MecanumDriveOdometry3dTest, MultipleConsecutiveUpdates) {
+TEST_CASE_METHOD(MecanumDriveOdometry3dTest,
+                 "MecanumDriveOdometry3dTest MultipleConsecutiveUpdates",
+                 "[wpimath]") {
   MecanumDriveWheelPositions wheelDeltas{3.536_m, 3.536_m, 3.536_m, 3.536_m};
 
   odometry.ResetPosition(wpi::math::Rotation3d{}, wheelDeltas, Pose3d{});
@@ -48,14 +53,14 @@ TEST_F(MecanumDriveOdometry3dTest, MultipleConsecutiveUpdates) {
   odometry.Update(wpi::math::Rotation3d{}, wheelDeltas);
   auto secondPose = odometry.Update(wpi::math::Rotation3d{}, wheelDeltas);
 
-  EXPECT_NEAR(secondPose.X().value(), 0.0, 0.01);
-  EXPECT_NEAR(secondPose.Y().value(), 0.0, 0.01);
-  EXPECT_NEAR(secondPose.Z().value(), 0.0, 0.01);
-  EXPECT_NEAR(secondPose.Rotation().ToRotation2d().Radians().value(), 0.0,
-              0.01);
+  CHECK_NEAR(secondPose.X().value(), 0.0, 0.01);
+  CHECK_NEAR(secondPose.Y().value(), 0.0, 0.01);
+  CHECK_NEAR(secondPose.Z().value(), 0.0, 0.01);
+  CHECK_NEAR(secondPose.Rotation().ToRotation2d().Radians().value(), 0.0, 0.01);
 }
 
-TEST_F(MecanumDriveOdometry3dTest, TwoIterations) {
+TEST_CASE_METHOD(MecanumDriveOdometry3dTest,
+                 "MecanumDriveOdometry3dTest TwoIterations", "[wpimath]") {
   odometry.ResetPosition(wpi::math::Rotation3d{}, zero, Pose3d{});
   MecanumDriveWheelPositions wheelDeltas{0.3536_m, 0.3536_m, 0.3536_m,
                                          0.3536_m};
@@ -63,13 +68,14 @@ TEST_F(MecanumDriveOdometry3dTest, TwoIterations) {
   odometry.Update(wpi::math::Rotation3d{}, MecanumDriveWheelPositions{});
   auto pose = odometry.Update(wpi::math::Rotation3d{}, wheelDeltas);
 
-  EXPECT_NEAR(pose.X().value(), 0.3536, 0.01);
-  EXPECT_NEAR(pose.Y().value(), 0.0, 0.01);
-  EXPECT_NEAR(pose.Z().value(), 0.0, 0.01);
-  EXPECT_NEAR(pose.Rotation().ToRotation2d().Radians().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.X().value(), 0.3536, 0.01);
+  CHECK_NEAR(pose.Y().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.Z().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.Rotation().ToRotation2d().Radians().value(), 0.0, 0.01);
 }
 
-TEST_F(MecanumDriveOdometry3dTest, 90DegreeTurn) {
+TEST_CASE_METHOD(MecanumDriveOdometry3dTest,
+                 "MecanumDriveOdometry3dTest 90DegreeTurn", "[wpimath]") {
   odometry.ResetPosition(wpi::math::Rotation3d{}, zero, Pose3d{});
   MecanumDriveWheelPositions wheelDeltas{-13.328_m, 39.986_m, -13.329_m,
                                          39.986_m};
@@ -77,13 +83,14 @@ TEST_F(MecanumDriveOdometry3dTest, 90DegreeTurn) {
   auto pose =
       odometry.Update(wpi::math::Rotation3d{0_deg, 0_deg, 90_deg}, wheelDeltas);
 
-  EXPECT_NEAR(pose.X().value(), 8.4855, 0.01);
-  EXPECT_NEAR(pose.Y().value(), 8.4855, 0.01);
-  EXPECT_NEAR(pose.Z().value(), 0, 0.01);
-  EXPECT_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 90.0, 0.01);
+  CHECK_NEAR(pose.X().value(), 8.4855, 0.01);
+  CHECK_NEAR(pose.Y().value(), 8.4855, 0.01);
+  CHECK_NEAR(pose.Z().value(), 0, 0.01);
+  CHECK_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 90.0, 0.01);
 }
 
-TEST_F(MecanumDriveOdometry3dTest, GyroAngleReset) {
+TEST_CASE_METHOD(MecanumDriveOdometry3dTest,
+                 "MecanumDriveOdometry3dTest GyroAngleReset", "[wpimath]") {
   odometry.ResetPosition(wpi::math::Rotation3d{0_deg, 0_deg, 90_deg}, zero,
                          Pose3d{});
 
@@ -93,13 +100,15 @@ TEST_F(MecanumDriveOdometry3dTest, GyroAngleReset) {
   auto pose =
       odometry.Update(wpi::math::Rotation3d{0_deg, 0_deg, 90_deg}, wheelDeltas);
 
-  EXPECT_NEAR(pose.X().value(), 0.3536, 0.01);
-  EXPECT_NEAR(pose.Y().value(), 0.0, 0.01);
-  EXPECT_NEAR(pose.Z().value(), 0.0, 0.01);
-  EXPECT_NEAR(pose.Rotation().ToRotation2d().Radians().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.X().value(), 0.3536, 0.01);
+  CHECK_NEAR(pose.Y().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.Z().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.Rotation().ToRotation2d().Radians().value(), 0.0, 0.01);
 }
 
-TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
+TEST_CASE_METHOD(MecanumDriveOdometry3dTest,
+                 "MecanumDriveOdometry3dTest AccuracyFacingTrajectory",
+                 "[wpimath]") {
   wpi::math::MecanumDriveKinematics kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
       wpi::math::Translation2d{-1_m, -1_m},
@@ -162,11 +171,13 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.06);
-  EXPECT_LT(maxError, 0.125);
+  CHECK(errorSum / (trajectory.Duration().value() / dt.value()) < 0.06);
+  CHECK(maxError < 0.125);
 }
 
-TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingXAxis) {
+TEST_CASE_METHOD(MecanumDriveOdometry3dTest,
+                 "MecanumDriveOdometry3dTest AccuracyFacingXAxis",
+                 "[wpimath]") {
   wpi::math::MecanumDriveKinematics kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
       wpi::math::Translation2d{-1_m, -1_m},
@@ -230,11 +241,12 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingXAxis) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.06);
-  EXPECT_LT(maxError, 0.125);
+  CHECK(errorSum / (trajectory.Duration().value() / dt.value()) < 0.06);
+  CHECK(maxError < 0.125);
 }
 
-TEST_F(MecanumDriveOdometry3dTest, GyroOffset) {
+TEST_CASE_METHOD(MecanumDriveOdometry3dTest,
+                 "MecanumDriveOdometry3dTest GyroOffset", "[wpimath]") {
   wpi::math::MecanumDriveWheelPositions wheelPositions;
   odometry.ResetPosition(
       wpi::math::Rotation3d{0_deg, 5_deg, 0_deg}, wheelPositions,
@@ -243,10 +255,10 @@ TEST_F(MecanumDriveOdometry3dTest, GyroOffset) {
   auto pose = odometry.Update(wpi::math::Rotation3d{0_deg, 10_deg, 0_deg},
                               wheelPositions);
 
-  EXPECT_NEAR(pose.X().value(), 0.0, 1e-9);
-  EXPECT_NEAR(pose.Y().value(), 0.0, 1e-9);
-  EXPECT_NEAR(pose.Z().value(), 0.0, 1e-9);
-  EXPECT_NEAR(wpi::units::degree_t{pose.Rotation().X()}.value(), 0.0, 1e-9);
-  EXPECT_NEAR(wpi::units::degree_t{pose.Rotation().Y()}.value(), 5.0, 1e-9);
-  EXPECT_NEAR(wpi::units::degree_t{pose.Rotation().Z()}.value(), 90.0, 1e-9);
+  CHECK_NEAR(pose.X().value(), 0.0, 1e-9);
+  CHECK_NEAR(pose.Y().value(), 0.0, 1e-9);
+  CHECK_NEAR(pose.Z().value(), 0.0, 1e-9);
+  CHECK_NEAR(wpi::units::degree_t{pose.Rotation().X()}.value(), 0.0, 1e-9);
+  CHECK_NEAR(wpi::units::degree_t{pose.Rotation().Y()}.value(), 5.0, 1e-9);
+  CHECK_NEAR(wpi::units::degree_t{pose.Rotation().Z()}.value(), 90.0, 1e-9);
 }

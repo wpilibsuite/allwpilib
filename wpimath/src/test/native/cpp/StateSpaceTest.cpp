@@ -4,8 +4,10 @@
 
 #include <random>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
 #include "wpi/math/estimator/KalmanFilter.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
@@ -20,7 +22,7 @@ namespace wpi::math {
 constexpr double kPositionStddev = 0.0001;
 constexpr auto kDt = 0.00505_s;
 
-class StateSpaceTest : public testing::Test {
+class StateSpaceTest {
  public:
   LinearSystem<2, 1, 1> plant = [] {
     auto motors = DCMotor::Vex775Pro(2);
@@ -49,7 +51,8 @@ void Update(const LinearSystem<2, 1, 1>& plant, LinearSystemLoop<2, 1, 1>& loop,
   loop.Predict(kDt);
 }
 
-TEST_F(StateSpaceTest, CorrectPredictLoop) {
+TEST_CASE_METHOD(StateSpaceTest, "StateSpaceTest CorrectPredictLoop",
+                 "[wpimath]") {
   std::default_random_engine generator;
   std::normal_distribution<double> dist{0.0, kPositionStddev};
 
@@ -58,12 +61,12 @@ TEST_F(StateSpaceTest, CorrectPredictLoop) {
 
   for (int i = 0; i < 1000; i++) {
     Update(plant, loop, dist(generator));
-    EXPECT_PRED_FORMAT2(testing::DoubleLE, -12.0, loop.U(0));
-    EXPECT_PRED_FORMAT2(testing::DoubleLE, loop.U(0), 12.0);
+    CHECK(-12.0 - 1e-12 <= loop.U(0));
+    CHECK(loop.U(0) <= 12.0 + 1e-12);
   }
 
-  EXPECT_NEAR(loop.Xhat(0), 2.0, 0.05);
-  EXPECT_NEAR(loop.Xhat(1), 0.0, 0.5);
+  CHECK_NEAR(loop.Xhat(0), 2.0, 0.05);
+  CHECK_NEAR(loop.Xhat(1), 0.0, 0.5);
 }
 
 }  // namespace wpi::math

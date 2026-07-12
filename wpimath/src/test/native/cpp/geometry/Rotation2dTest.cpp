@@ -6,87 +6,90 @@
 
 #include <numbers>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
+
+#include "wpi/math/TestAssertions.hpp"
 
 using namespace wpi::math;
 
-TEST(Rotation2dTest, RadiansToDegrees) {
+TEST_CASE("Rotation2dTest RadiansToDegrees", "[wpimath]") {
   const Rotation2d rot1{wpi::units::radian_t{std::numbers::pi / 3.0}};
   const Rotation2d rot2{wpi::units::radian_t{std::numbers::pi / 4.0}};
 
-  EXPECT_DOUBLE_EQ(60.0, rot1.Degrees().value());
-  EXPECT_DOUBLE_EQ(45.0, rot2.Degrees().value());
+  CHECK_DOUBLE_EQ(60.0, rot1.Degrees().value());
+  CHECK_DOUBLE_EQ(45.0, rot2.Degrees().value());
 }
 
-TEST(Rotation2dTest, DegreesToRadians) {
+TEST_CASE("Rotation2dTest DegreesToRadians", "[wpimath]") {
   const auto rot1 = Rotation2d{45_deg};
   const auto rot2 = Rotation2d{30_deg};
 
-  EXPECT_DOUBLE_EQ(std::numbers::pi / 4.0, rot1.Radians().value());
-  EXPECT_DOUBLE_EQ(std::numbers::pi / 6.0, rot2.Radians().value());
+  CHECK_DOUBLE_EQ(std::numbers::pi / 4.0, rot1.Radians().value());
+  CHECK_DOUBLE_EQ(std::numbers::pi / 6.0, rot2.Radians().value());
 }
 
-TEST(Rotation2dTest, RotateByFromZero) {
+TEST_CASE("Rotation2dTest RotateByFromZero", "[wpimath]") {
   const Rotation2d zero;
   auto rotated = zero + Rotation2d{90_deg};
 
-  EXPECT_DOUBLE_EQ(std::numbers::pi / 2.0, rotated.Radians().value());
-  EXPECT_DOUBLE_EQ(90.0, rotated.Degrees().value());
+  CHECK_DOUBLE_EQ(std::numbers::pi / 2.0, rotated.Radians().value());
+  CHECK_DOUBLE_EQ(90.0, rotated.Degrees().value());
 }
 
-TEST(Rotation2dTest, RotateByNonZero) {
+TEST_CASE("Rotation2dTest RotateByNonZero", "[wpimath]") {
   auto rot = Rotation2d{90_deg};
   rot = rot + Rotation2d{30_deg};
 
-  EXPECT_DOUBLE_EQ(120.0, rot.Degrees().value());
+  CHECK_DOUBLE_EQ(120.0, rot.Degrees().value());
 }
 
-TEST(Rotation2dTest, RelativeTo) {
+TEST_CASE("Rotation2dTest RelativeTo", "[wpimath]") {
   auto start = Rotation2d{30_deg};
   auto end = Rotation2d{90_deg};
 
   auto result = end.RelativeTo(start);
 
-  EXPECT_DOUBLE_EQ(60.0, result.Degrees().value());
+  CHECK_DOUBLE_EQ(60.0, result.Degrees().value());
 }
 
-TEST(Rotation2dTest, Minus) {
+TEST_CASE("Rotation2dTest Minus", "[wpimath]") {
   const auto rot1 = Rotation2d{70_deg};
   const auto rot2 = Rotation2d{30_deg};
 
-  EXPECT_DOUBLE_EQ(40.0, (rot1 - rot2).Degrees().value());
+  CHECK_DOUBLE_EQ(40.0, (rot1 - rot2).Degrees().value());
 }
 
-TEST(Rotation2dTest, UnaryMinus) {
+TEST_CASE("Rotation2dTest UnaryMinus", "[wpimath]") {
   const auto rot = Rotation2d{20_deg};
 
-  EXPECT_DOUBLE_EQ(-20.0, (-rot).Degrees().value());
+  CHECK_DOUBLE_EQ(-20.0, (-rot).Degrees().value());
 }
 
-TEST(Rotation2dTest, Multiply) {
+TEST_CASE("Rotation2dTest Multiply", "[wpimath]") {
   const auto rot = Rotation2d{10_deg};
 
-  EXPECT_DOUBLE_EQ(30.0, (rot * 3.0).Degrees().value());
-  EXPECT_DOUBLE_EQ(50.0, (rot * 41.0).Degrees().value());
+  CHECK_DOUBLE_EQ(30.0, (rot * 3.0).Degrees().value());
+  CHECK_DOUBLE_EQ(50.0, (rot * 41.0).Degrees().value());
 }
 
-TEST(Rotation2dTest, Equality) {
+TEST_CASE("Rotation2dTest Equality", "[wpimath]") {
   auto rot1 = Rotation2d{43_deg};
   auto rot2 = Rotation2d{43_deg};
-  EXPECT_EQ(rot1, rot2);
+  CHECK(rot1 == rot2);
 
   rot1 = Rotation2d{-180_deg};
   rot2 = Rotation2d{180_deg};
-  EXPECT_EQ(rot1, rot2);
+  CHECK(rot1 == rot2);
 }
 
-TEST(Rotation2dTest, Inequality) {
+TEST_CASE("Rotation2dTest Inequality", "[wpimath]") {
   const auto rot1 = Rotation2d{43_deg};
   const auto rot2 = Rotation2d{43.5_deg};
-  EXPECT_NE(rot1, rot2);
+  CHECK(rot1 != rot2);
 }
 
-TEST(Rotation2dTest, ToMatrix) {
+TEST_CASE("Rotation2dTest ToMatrix", "[wpimath]") {
 #if __GNUC__ <= 11
   Rotation2d before{20_deg};
   Rotation2d after{before.ToMatrix()};
@@ -95,10 +98,10 @@ TEST(Rotation2dTest, ToMatrix) {
   constexpr Rotation2d after{before.ToMatrix()};
 #endif
 
-  EXPECT_EQ(before, after);
+  CHECK(before == after);
 }
 
-TEST(Rotation2dTest, Constexpr) {
+TEST_CASE("Rotation2dTest Constexpr", "[wpimath]") {
   constexpr Rotation2d defaultCtor;
   constexpr Rotation2d radianCtor{5_rad};
   constexpr Rotation2d degreeCtor{270_deg};

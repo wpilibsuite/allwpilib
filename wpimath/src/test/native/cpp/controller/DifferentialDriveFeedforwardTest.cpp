@@ -5,14 +5,17 @@
 #include "wpi/math/controller/DifferentialDriveFeedforward.hpp"
 
 #include <Eigen/Core>
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/system/Models.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 
-TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
+TEST_CASE("DifferentialDriveFeedforwardTest CalculateWithTrackwidth",
+          "[wpimath]") {
   constexpr auto kVLinear = 1_V / 1_mps;
   constexpr auto kALinear = 1_V / 1_mps_sq;
   constexpr auto kVAngular = 1_V / 1_rad_per_s;
@@ -39,15 +42,16 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
           Eigen::Vector2d nextX = plant.CalculateX(
               Eigen::Vector2d{currentLeftVelocity, currentRightVelocity},
               Eigen::Vector2d{left, right}, dt);
-          EXPECT_NEAR(nextX(0), nextLeftVelocity.value(), 1e-6);
-          EXPECT_NEAR(nextX(1), nextRightVelocity.value(), 1e-6);
+          CHECK_NEAR(nextX(0), nextLeftVelocity.value(), 1e-6);
+          CHECK_NEAR(nextX(1), nextRightVelocity.value(), 1e-6);
         }
       }
     }
   }
 }
 
-TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
+TEST_CASE("DifferentialDriveFeedforwardTest CalculateWithoutTrackwidth",
+          "[wpimath]") {
   constexpr auto kVLinear = 1_V / 1_mps;
   constexpr auto kALinear = 1_V / 1_mps_sq;
   constexpr auto kVAngular = 1_V / 1_mps;
@@ -73,8 +77,8 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
           Eigen::Vector2d nextX = plant.CalculateX(
               Eigen::Vector2d{currentLeftVelocity, currentRightVelocity},
               Eigen::Vector2d{left, right}, dt);
-          EXPECT_NEAR(nextX(0), nextLeftVelocity.value(), 1e-6);
-          EXPECT_NEAR(nextX(1), nextRightVelocity.value(), 1e-6);
+          CHECK_NEAR(nextX(0), nextLeftVelocity.value(), 1e-6);
+          CHECK_NEAR(nextX(1), nextRightVelocity.value(), 1e-6);
         }
       }
     }

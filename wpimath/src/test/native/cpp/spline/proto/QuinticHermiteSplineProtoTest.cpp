@@ -2,7 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "../../ProtoTestBase.hpp"
 #include "wpi/math/spline/QuinticHermiteSpline.hpp"
@@ -19,14 +20,12 @@ struct QuinticHermiteSplineProtoTestData {
       wpi::util::array<double, 3>{{0.10, 0.11, 0.11}}};
 
   static void CheckEq(const Type& testData, const Type& data) {
-    EXPECT_EQ(testData.GetInitialControlVector().x,
-              data.GetInitialControlVector().x);
-    EXPECT_EQ(testData.GetFinalControlVector().x,
-              data.GetFinalControlVector().x);
-    EXPECT_EQ(testData.GetInitialControlVector().y,
-              data.GetInitialControlVector().y);
-    EXPECT_EQ(testData.GetFinalControlVector().y,
-              data.GetFinalControlVector().y);
+    CHECK(testData.GetInitialControlVector().x ==
+          data.GetInitialControlVector().x);
+    CHECK(testData.GetFinalControlVector().x == data.GetFinalControlVector().x);
+    CHECK(testData.GetInitialControlVector().y ==
+          data.GetInitialControlVector().y);
+    CHECK(testData.GetFinalControlVector().y == data.GetFinalControlVector().y);
   }
 };
 

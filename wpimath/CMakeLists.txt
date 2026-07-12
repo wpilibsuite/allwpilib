@@ -144,7 +144,7 @@ install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION share/wpimat
 install(EXPORT wpimath DESTINATION share/wpimath)
 
 if(WPILIB_WITH_TESTS)
-    wpilib_add_test(wpimath src/test/native/cpp)
+    wpilib_add_test_catch2(wpimath src/test/native/cpp)
     target_include_directories(wpimath_test PRIVATE src/test/native/include)
-    target_link_libraries(wpimath_test wpimath googletest)
+    target_link_libraries(wpimath_test wpimath)
 endif()
