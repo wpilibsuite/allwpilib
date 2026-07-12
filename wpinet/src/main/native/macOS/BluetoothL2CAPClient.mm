@@ -43,7 +43,7 @@ class BluetoothL2CAPClient::Impl
 
   void SetStatus(std::string_view status);
   void SetError(std::string_view error);
-  void SetConnected();
+  void SetConnected(BluetoothPacketTransport transport);
   void SetDisconnected(std::string_view reason);
   void DidReceivePacket(std::span<const uint8_t> packet);
   void DidSendPacket();
@@ -106,6 +106,9 @@ std::string ToString(NSError* error) {
 - (instancetype)initWithImpl:(BluetoothL2CAPClient::Impl*)impl;
 - (void)connectWithTarget:(NSString*)target
                       psm:(CBL2CAPPSM)psm
+              serviceUuid:(NSString*)serviceUuid
+              controlUuid:(NSString*)controlUuid
+               statusUuid:(NSString*)statusUuid
             maxPacketSize:(NSUInteger)maxPacketSize;
 - (void)disconnectWithReason:(NSString*)reason;
 - (void)sendPacket:(NSData*)packet;
@@ -120,12 +123,18 @@ std::string ToString(NSError* error) {
   CBL2CAPChannel* _channel;
   NSInputStream* _inputStream;
   NSOutputStream* _outputStream;
+  CBCharacteristic* _controlCharacteristic;
+  CBCharacteristic* _statusCharacteristic;
   NSString* _target;
+  CBUUID* _serviceUuid;
+  CBUUID* _controlUuid;
+  CBUUID* _statusUuid;
   CBL2CAPPSM _psm;
   NSUInteger _maxPacketSize;
   NSMutableArray<NSData*>* _pendingWrites;
   NSData* _currentWrite;
   NSUInteger _currentWriteOffset;
+  BOOL _usingGatt;
 }
 
 - (instancetype)initWithImpl:(BluetoothL2CAPClient::Impl*)impl {
@@ -145,11 +154,20 @@ std::string ToString(NSError* error) {
 
 - (void)connectWithTarget:(NSString*)target
                       psm:(CBL2CAPPSM)psm
+              serviceUuid:(NSString*)serviceUuid
+              controlUuid:(NSString*)controlUuid
+               statusUuid:(NSString*)statusUuid
             maxPacketSize:(NSUInteger)maxPacketSize {
   dispatch_async(_queue, ^{
     _target = [target copy];
+    _serviceUuid = [CBUUID UUIDWithString:serviceUuid];
+    _controlUuid = [CBUUID UUIDWithString:controlUuid];
+    _statusUuid = [CBUUID UUIDWithString:statusUuid];
     _psm = psm;
     _maxPacketSize = maxPacketSize;
+    _usingGatt = NO;
+    _controlCharacteristic = nil;
+    _statusCharacteristic = nil;
     dispatch_async(dispatch_get_main_queue(), ^{
       [self closeStreams];
     });
@@ -164,6 +182,7 @@ std::string ToString(NSError* error) {
 - (void)disconnectWithReason:(NSString*)reason {
   dispatch_async(_queue, ^{
     [_central stopScan];
+    _usingGatt = NO;
     if (_peripheral != nil) {
       [_central cancelPeripheralConnection:_peripheral];
       _peripheral = nil;
@@ -178,15 +197,40 @@ std::string ToString(NSError* error) {
 }
 
 - (void)sendPacket:(NSData*)packet {
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [_pendingWrites addObject:packet];
-    [self writeAvailablePackets];
+  dispatch_async(_queue, ^{
+    if (_usingGatt) {
+      if (_peripheral == nil || _controlCharacteristic == nil) {
+        return;
+      }
+      NSUInteger maxWriteLength =
+          [_peripheral maximumWriteValueLengthForType:
+                           CBCharacteristicWriteWithoutResponse];
+      if (packet.length > maxWriteLength) {
+        if (_impl != nullptr) {
+          _impl->SetError("Packet is larger than Bluetooth GATT write MTU");
+        }
+        return;
+      }
+      [_peripheral writeValue:packet
+            forCharacteristic:_controlCharacteristic
+                         type:CBCharacteristicWriteWithoutResponse];
+      if (_impl != nullptr) {
+        _impl->DidSendPacket();
+      }
+      return;
+    }
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [_pendingWrites addObject:packet];
+      [self writeAvailablePackets];
+    });
   });
 }
 
 - (void)invalidate {
   dispatch_block_t block = ^{
     [_central stopScan];
+    _usingGatt = NO;
     if (_peripheral != nil) {
       [_central cancelPeripheralConnection:_peripheral];
       _peripheral = nil;
@@ -406,6 +450,7 @@ std::string ToString(NSError* error) {
   dispatch_async(dispatch_get_main_queue(), ^{
     [self closeStreams];
   });
+  _usingGatt = NO;
   if (_impl != nullptr) {
     if (error != nil) {
       _impl->SetError(std::string{"Bluetooth connection closed: "} +
@@ -422,9 +467,9 @@ std::string ToString(NSError* error) {
   (void)peripheral;
   if (error != nil) {
     if (_impl != nullptr) {
-      _impl->SetError(std::string{"Failed to open Bluetooth L2CAP channel: "} +
-                      ToString(error));
+      _impl->SetStatus("L2CAP unavailable; discovering GATT service");
     }
+    [self discoverGattService];
     return;
   }
 
@@ -433,13 +478,131 @@ std::string ToString(NSError* error) {
   });
 }
 
+- (void)discoverGattService {
+  if (_peripheral == nil || _serviceUuid == nil) {
+    if (_impl != nullptr) {
+      _impl->SetError("No Bluetooth GATT service configured");
+    }
+    return;
+  }
+  if (_impl != nullptr) {
+    _impl->SetStatus("Discovering Bluetooth GATT service");
+  }
+  [_peripheral discoverServices:@[ _serviceUuid ]];
+}
+
+- (void)peripheral:(CBPeripheral*)peripheral didDiscoverServices:(NSError*)error {
+  if (error != nil) {
+    if (_impl != nullptr) {
+      _impl->SetError(std::string{"Failed to discover Bluetooth GATT service: "} +
+                      ToString(error));
+    }
+    return;
+  }
+
+  for (CBService* service in peripheral.services) {
+    if ([service.UUID isEqual:_serviceUuid]) {
+      if (_impl != nullptr) {
+        _impl->SetStatus("Discovering Bluetooth GATT characteristics");
+      }
+      [peripheral discoverCharacteristics:@[ _controlUuid, _statusUuid ]
+                                forService:service];
+      return;
+    }
+  }
+
+  if (_impl != nullptr) {
+    _impl->SetError("Bluetooth GATT service was not found");
+  }
+}
+
+- (void)peripheral:(CBPeripheral*)peripheral
+    didDiscoverCharacteristicsForService:(CBService*)service
+                                   error:(NSError*)error {
+  (void)service;
+  if (error != nil) {
+    if (_impl != nullptr) {
+      _impl->SetError(
+          std::string{"Failed to discover Bluetooth GATT characteristics: "} +
+          ToString(error));
+    }
+    return;
+  }
+
+  _controlCharacteristic = nil;
+  _statusCharacteristic = nil;
+  for (CBCharacteristic* characteristic in service.characteristics) {
+    if ([characteristic.UUID isEqual:_controlUuid]) {
+      _controlCharacteristic = characteristic;
+    } else if ([characteristic.UUID isEqual:_statusUuid]) {
+      _statusCharacteristic = characteristic;
+    }
+  }
+
+  if (_controlCharacteristic == nil || _statusCharacteristic == nil) {
+    if (_impl != nullptr) {
+      _impl->SetError("Bluetooth GATT packet characteristics were not found");
+    }
+    return;
+  }
+
+  if (_impl != nullptr) {
+    _impl->SetStatus("Enabling Bluetooth GATT notifications");
+  }
+  [peripheral setNotifyValue:YES forCharacteristic:_statusCharacteristic];
+}
+
+- (void)peripheral:(CBPeripheral*)peripheral
+    didUpdateNotificationStateForCharacteristic:(CBCharacteristic*)characteristic
+                                          error:(NSError*)error {
+  (void)peripheral;
+  if (![characteristic.UUID isEqual:_statusUuid]) {
+    return;
+  }
+  if (error != nil) {
+    if (_impl != nullptr) {
+      _impl->SetError(
+          std::string{"Failed to enable Bluetooth GATT notifications: "} +
+          ToString(error));
+    }
+    return;
+  }
+
+  _usingGatt = characteristic.isNotifying;
+  if (_usingGatt && _impl != nullptr) {
+    _impl->SetConnected(BluetoothPacketTransport::kGATT);
+  }
+}
+
+- (void)peripheral:(CBPeripheral*)peripheral
+    didUpdateValueForCharacteristic:(CBCharacteristic*)characteristic
+                              error:(NSError*)error {
+  (void)peripheral;
+  if (![characteristic.UUID isEqual:_statusUuid]) {
+    return;
+  }
+  if (error != nil) {
+    if (_impl != nullptr) {
+      _impl->SetError(std::string{"Bluetooth GATT notification failed: "} +
+                      ToString(error));
+    }
+    return;
+  }
+
+  NSData* value = characteristic.value;
+  if (value.length > 0 && _impl != nullptr) {
+    _impl->DidReceivePacket(
+        {static_cast<const uint8_t*>(value.bytes), value.length});
+  }
+}
+
 - (void)stream:(NSStream*)stream handleEvent:(NSStreamEvent)eventCode {
   switch (eventCode) {
     case NSStreamEventOpenCompleted:
       if (_inputStream.streamStatus == NSStreamStatusOpen &&
           _outputStream.streamStatus == NSStreamStatusOpen &&
           _impl != nullptr) {
-        _impl->SetConnected();
+        _impl->SetConnected(BluetoothPacketTransport::kL2CAP);
       }
       break;
     case NSStreamEventHasBytesAvailable:
@@ -523,6 +686,9 @@ bool BluetoothL2CAPClient::Impl::Connect(
 
   [m_client connectWithTarget:ToNSString(config.address)
                           psm:static_cast<CBL2CAPPSM>(config.psm)
+                  serviceUuid:ToNSString(config.gattServiceUuid)
+                  controlUuid:ToNSString(config.gattControlCharacteristicUuid)
+                   statusUuid:ToNSString(config.gattStatusCharacteristicUuid)
                 maxPacketSize:config.maxPacketSize];
   return true;
 }
@@ -569,14 +735,19 @@ void BluetoothL2CAPClient::Impl::SetError(std::string_view error) {
     status.status = error;
     status.connecting = false;
     status.connected = false;
+    status.transport = BluetoothPacketTransport::kNone;
   });
 }
 
-void BluetoothL2CAPClient::Impl::SetConnected() {
-  UpdateStatus([](auto& status) {
+void BluetoothL2CAPClient::Impl::SetConnected(
+    BluetoothPacketTransport transport) {
+  UpdateStatus([&](auto& status) {
     status.connecting = false;
     status.connected = true;
-    status.status = "Connected";
+    status.transport = transport;
+    status.status =
+        transport == BluetoothPacketTransport::kL2CAP ? "Connected (L2CAP)"
+                                                      : "Connected (GATT)";
     status.error.clear();
   });
 }
@@ -585,6 +756,7 @@ void BluetoothL2CAPClient::Impl::SetDisconnected(std::string_view reason) {
   UpdateStatus([&](auto& status) {
     status.connecting = false;
     status.connected = false;
+    status.transport = BluetoothPacketTransport::kNone;
     status.status = reason;
   });
 }

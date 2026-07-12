@@ -104,6 +104,7 @@ ext {
                     }
                 }
             }
+            it.linker.args << 'windowsapp.lib'
         } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
             it.sources {
                 libuvMacCpp(CppSourceSet) {

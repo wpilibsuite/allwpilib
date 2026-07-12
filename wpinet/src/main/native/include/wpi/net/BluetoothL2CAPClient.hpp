@@ -24,13 +24,19 @@ namespace wpi::net {
 enum class BluetoothAddressType { kPublic, kRandom };
 
 /**
- * Connection status for a Bluetooth LE L2CAP Credit-Based Mode client.
+ * Active Bluetooth packet transport.
+ */
+enum class BluetoothPacketTransport { kNone, kL2CAP, kGATT };
+
+/**
+ * Connection status for a Bluetooth LE packet client.
  */
 struct BluetoothL2CAPConnectionStatus {
   bool supported = false;
   bool targetConfigured = false;
   bool connecting = false;
   bool connected = false;
+  BluetoothPacketTransport transport = BluetoothPacketTransport::kNone;
   std::string targetAddress;
   BluetoothAddressType addressType = BluetoothAddressType::kRandom;
   std::string status;
@@ -40,20 +46,25 @@ struct BluetoothL2CAPConnectionStatus {
 };
 
 /**
- * Connection configuration for a Bluetooth LE L2CAP Credit-Based Mode client.
+ * Connection configuration for a Bluetooth LE packet client.
  */
 struct BluetoothL2CAPClientConfig {
   std::string address;
   BluetoothAddressType addressType = BluetoothAddressType::kRandom;
   uint16_t psm = 0;
+  std::string gattServiceUuid;
+  std::string gattControlCharacteristicUuid;
+  std::string gattStatusCharacteristicUuid;
   size_t maxPacketSize = 512;
+  bool preferL2CAP = true;
 };
 
 /**
- * Packet-oriented Bluetooth LE L2CAP Credit-Based Mode client.
+ * Packet-oriented Bluetooth LE client.
  *
- * Each Send() call writes one L2CAP SDU. Each packet callback receives one
- * packet from the platform transport when the platform exposes SDU boundaries.
+ * Each Send() call writes one packet using the best available platform
+ * transport. Each packet callback receives one packet from a GATT notification
+ * value or L2CAP SDU.
  */
 class BluetoothL2CAPClient {
  public:
@@ -62,7 +73,7 @@ class BluetoothL2CAPClient {
       std::function<void(const BluetoothL2CAPConnectionStatus& status)>;
 
   /**
-   * Creates a Bluetooth LE L2CAP Credit-Based Mode client.
+   * Creates a Bluetooth LE packet client.
    *
    * @param loop libuv loop used to marshal callbacks.
    * @param packetCallback callback invoked for received packets.
@@ -90,7 +101,7 @@ class BluetoothL2CAPClient {
   static bool IsSupported();
 
   /**
-   * Starts connecting to a Bluetooth LE L2CAP PSM.
+   * Starts connecting to a Bluetooth LE packet transport.
    *
    * @param config connection configuration.
    * @return true if the request was accepted.
@@ -105,7 +116,7 @@ class BluetoothL2CAPClient {
   void Disconnect(std::string_view reason = "Disconnected");
 
   /**
-   * Sends one packet as an L2CAP SDU.
+   * Sends one packet.
    *
    * @param packet packet payload to send.
    * @return true if the packet was accepted for sending.

@@ -161,6 +161,9 @@ wpilib_cc_library(
             "-ldl",
             "-Wl,--pop-state",
         ],
+        "@platforms//os:windows": [
+            "windowsapp.lib",
+        ],
         "//conditions:default": [],
     }),
     strip_include_prefix = "src/main/native/include",

@@ -24,6 +24,12 @@ namespace {
 
 constexpr uint16_t kXRPBluetoothPsm = 0x0081;
 constexpr size_t kMaxBluetoothPacketSize = 512;
+constexpr const char* kXRPGattServiceUuid =
+    "7d2ea28a-f7bd-485d-9d6a-2c3f0b214a3f";
+constexpr const char* kXRPGattControlCharacteristicUuid =
+    "7d2ea28b-f7bd-485d-9d6a-2c3f0b214a3f";
+constexpr const char* kXRPGattStatusCharacteristicUuid =
+    "7d2ea28c-f7bd-485d-9d6a-2c3f0b214a3f";
 
 const char* AddressTypeToString(XRPBluetoothAddressType type) {
   return type == XRPBluetoothAddressType::kPublic ? "public" : "random";
@@ -114,7 +120,8 @@ bool HALSimXRP::Initialize() {
   m_xrp.SetWPILibUpdateFunc(func);
 
   wpi::util::println(
-      "HALSimXRP Bluetooth transport: LE L2CAP Credit-Based Mode, PSM 0x{:04x}",
+      "HALSimXRP Bluetooth transport: LE L2CAP Credit-Based Mode PSM 0x{:04x} "
+      "with GATT fallback",
       kXRPBluetoothPsm);
   if (!m_targetAddress.empty()) {
     wpi::util::println("HALSimXRP Bluetooth target: {} ({})", m_targetAddress,
@@ -168,6 +175,9 @@ void HALSimXRP::ConnectBluetooth(std::string address,
     config.address = m_targetAddress;
     config.addressType = m_targetAddressType;
     config.psm = kXRPBluetoothPsm;
+    config.gattServiceUuid = kXRPGattServiceUuid;
+    config.gattControlCharacteristicUuid = kXRPGattControlCharacteristicUuid;
+    config.gattStatusCharacteristicUuid = kXRPGattStatusCharacteristicUuid;
     config.maxPacketSize = kMaxBluetoothPacketSize;
   }
 
