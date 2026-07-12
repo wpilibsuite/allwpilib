@@ -131,13 +131,16 @@ public final class Scheduler implements ProtobufSerializable {
   private final Stack<CommandState> m_currentCommandAncestry = new Stack<>();
 
   /** The periodic callbacks to run, outside of the command structure. */
-  private final SequencedMap<BindingScope, Coroutine> m_periodicCallbacks = new LinkedHashMap<>();
+  private final List<PeriodicCallback> m_periodicCallbacks = new ArrayList<>();
 
   /** Event loop for trigger bindings. */
   private final EventLoop m_eventLoop = new EventLoop();
 
   /** The scope for continuations to yield to. */
   private final ContinuationScope m_scope = new ContinuationScope("coroutine commands");
+
+  /** Represents a single periodic callback. Stores a coroutine and its scope. */
+  private record PeriodicCallback(BindingScope scope, Coroutine coroutine) {}
 
   // Telemetry
   /** Protobuf serializer for a scheduler. */
@@ -274,7 +277,7 @@ public final class Scheduler implements ProtobufSerializable {
   public void sideload(Consumer<Coroutine> callback) {
     var coroutine = new Coroutine(this, m_scope, callback);
     var scope = BindingScope.createNarrowestScope(this);
-    m_periodicCallbacks.put(scope, coroutine);
+    m_periodicCallbacks.add(new PeriodicCallback(scope, coroutine));
   }
 
   /**
@@ -660,20 +663,21 @@ public final class Scheduler implements ProtobufSerializable {
   }
 
   private void runPeriodicSideloads() {
-    m_periodicCallbacks.entrySet().removeIf(e -> !e.getKey().active());
+    // Remove any periodic callbacks in an inactive scope
+    m_periodicCallbacks.removeIf(e -> !e.scope().active());
 
     // Update periodic callbacks
-    for (Coroutine coroutine : m_periodicCallbacks.values()) {
-      coroutine.mount();
+    for (PeriodicCallback callback : m_periodicCallbacks) {
+      callback.coroutine().mount();
       try {
-        coroutine.runToYieldPoint();
+        callback.coroutine().runToYieldPoint();
       } finally {
         Continuation.mountContinuation(null);
       }
     }
 
     // And remove any periodic callbacks that have completed
-    m_periodicCallbacks.entrySet().removeIf(e -> e.getValue().isDone());
+    m_periodicCallbacks.removeIf(e -> e.coroutine().isDone());
   }
 
   private void runCommands() {
