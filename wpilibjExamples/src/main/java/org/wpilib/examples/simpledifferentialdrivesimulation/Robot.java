@@ -13,9 +13,9 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.trajectory.DrivetrainSplineSample;
+import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.Trajectory;
 import org.wpilib.math.trajectory.TrajectoryConfig;
-import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.system.Timer;
 
 public class Robot extends TimedRobot {
@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
   /** Called once at the beginning of the robot program. */
   public Robot() {
     trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             new Pose2d(2, 2, Rotation2d.kZero),
             List.of(),
             new Pose2d(6, 4, Rotation2d.kZero),

@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 
 using namespace wpi::math;
 
@@ -111,7 +111,7 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
       kinematics, wpi::math::Rotation3d{}, wheelPositions};
 
   wpi::math::DrivetrainSplineTrajectory trajectory =
-      wpi::math::TrajectoryGenerator::GenerateTrajectory(
+      wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{3_m, 0_m, -90_deg},
                       wpi::math::Pose2d{0_m, 0_m, 135_deg},
@@ -178,7 +178,7 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingXAxis) {
       kinematics, wpi::math::Rotation3d{}, wheelPositions};
 
   wpi::math::DrivetrainSplineTrajectory trajectory =
-      wpi::math::TrajectoryGenerator::GenerateTrajectory(
+      wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{3_m, 0_m, -90_deg},
                       wpi::math::Pose2d{0_m, 0_m, 135_deg},

@@ -27,7 +27,7 @@ class DifferentialDriveVoltageConstraintTest {
     var constraint = new DifferentialDriveVoltageConstraint(feedforward, kinematics, maxVoltage);
 
     Trajectory<DrivetrainSplineSample> trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(new Pose2d(0, 0, Rotation2d.kZero), new Pose2d(1, 0, Rotation2d.kZero)),
             new TrajectoryConfig(1, 1).addConstraint(constraint));
 
@@ -73,7 +73,7 @@ class DifferentialDriveVoltageConstraintTest {
     // Radius of curvature should be ~1 meter.
     assertDoesNotThrow(
         () ->
-            TrajectoryGenerator.generateTrajectory(
+            DrivetrainSplineTrajectoryGenerator.generate(
                 new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
                 new ArrayList<>(),
                 new Pose2d(0, 1, Rotation2d.kPi),
@@ -81,7 +81,7 @@ class DifferentialDriveVoltageConstraintTest {
 
     assertDoesNotThrow(
         () ->
-            TrajectoryGenerator.generateTrajectory(
+            DrivetrainSplineTrajectoryGenerator.generate(
                 new Pose2d(0, 1, Rotation2d.kPi),
                 new ArrayList<>(),
                 new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),

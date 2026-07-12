@@ -7,7 +7,7 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/trajectory/DifferentialSample.hpp"
-#include "wpi/math/trajectory/TestTrajectory.hpp"
+#include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
 #include "wpi/units/time.hpp"
 
@@ -21,7 +21,7 @@ TEST(DifferentialDriveKinematicsConstraintTest, Constraint) {
   config.AddConstraint(
       DifferentialDriveKinematicsConstraint(kinematics, maxVelocity));
 
-  auto trajectory = TestTrajectory::GetTrajectory(config);
+  auto trajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
   for (auto t = 0_s; t < trajectory.Duration(); t += 20_ms) {
     auto point = trajectory.SampleAt(t);

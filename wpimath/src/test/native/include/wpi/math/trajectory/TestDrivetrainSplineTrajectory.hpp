@@ -9,10 +9,10 @@
 #include <vector>
 
 #include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 
 namespace wpi::math {
-class TestTrajectory {
+class TestDrivetrainSplineTrajectory {
  public:
   static DrivetrainSplineTrajectory GetTrajectory(TrajectoryConfig& config) {
     // 2018 cross scale auto waypoints
@@ -27,8 +27,8 @@ class TestTrajectory {
         (sideStart + Transform2d{Translation2d{-19.5_ft, 5.0_ft}, -90_deg})
             .Translation()};
 
-    return TrajectoryGenerator::GenerateTrajectory(sideStart, vector,
-                                                   crossScale, config);
+    return DrivetrainSplineTrajectoryGenerator::Generate(sideStart, vector,
+                                                         crossScale, config);
   }
 };
 

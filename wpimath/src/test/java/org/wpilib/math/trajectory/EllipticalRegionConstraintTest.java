@@ -26,7 +26,7 @@ class EllipticalRegionConstraintTest {
             Units.feetToMeters(2.5));
 
     var trajectory =
-        TrajectoryGeneratorTest.getTrajectory(
+        DrivetrainSplineTrajectoryGeneratorTest.getTrajectory(
             List.of(
                 new EllipticalRegionConstraint(ellipse, new MaxVelocityConstraint(maxVelocity))));
 

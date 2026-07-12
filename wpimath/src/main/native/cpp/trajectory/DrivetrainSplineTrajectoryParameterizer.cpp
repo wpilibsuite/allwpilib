@@ -26,7 +26,7 @@
  * SOFTWARE.
  */
 
-#include "wpi/math/trajectory/TrajectoryParameterizer.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryParameterizer.hpp"
 
 #include <format>
 #include <vector>
@@ -36,7 +36,8 @@
 
 using namespace wpi::math;
 
-DrivetrainSplineTrajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
+DrivetrainSplineTrajectory
+DrivetrainSplineTrajectoryParameterizer::Parameterize(
     const std::vector<PoseWithCurvature>& points,
     const std::vector<std::unique_ptr<TrajectoryConstraint>>& constraints,
     wpi::units::meters_per_second_t startVelocity,
@@ -236,7 +237,7 @@ DrivetrainSplineTrajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
   return DrivetrainSplineTrajectory(samples);
 }
 
-void TrajectoryParameterizer::EnforceAccelerationLimits(
+void DrivetrainSplineTrajectoryParameterizer::EnforceAccelerationLimits(
     bool reverse,
     const std::vector<std::unique_ptr<TrajectoryConstraint>>& constraints,
     ConstrainedState* state) {

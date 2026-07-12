@@ -19,8 +19,8 @@ import org.wpilib.math.spline.SplineParameterizer;
 import org.wpilib.math.spline.SplineParameterizer.MalformedSplineException;
 import org.wpilib.math.util.MathSharedStore;
 
-/** Helper class used to generate trajectories with various constraints. */
-public final class TrajectoryGenerator {
+/** Helper class used to generate drivetrain spline trajectories with various constraints. */
+public final class DrivetrainSplineTrajectoryGenerator {
   private static final Transform2d kFlip = new Transform2d(Translation2d.kZero, Rotation2d.kPi);
 
   private static final DrivetrainSplineTrajectory kDoNothingTrajectory =
@@ -28,7 +28,7 @@ public final class TrajectoryGenerator {
   private static BiConsumer<String, StackTraceElement[]> errorFunc;
 
   /** Private constructor because this is a utility class. */
-  private TrajectoryGenerator() {}
+  private DrivetrainSplineTrajectoryGenerator() {}
 
   private static void reportError(String error, StackTraceElement[] stackTrace) {
     if (errorFunc != null) {
@@ -59,7 +59,7 @@ public final class TrajectoryGenerator {
    * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  public static DrivetrainSplineTrajectory generateTrajectory(
+  public static DrivetrainSplineTrajectory generate(
       Spline.ControlVector initial,
       List<Translation2d> interiorWaypoints,
       Spline.ControlVector end,
@@ -97,7 +97,7 @@ public final class TrajectoryGenerator {
     }
 
     // Generate and return trajectory.
-    return TrajectoryParameterizer.timeParameterizeTrajectory(
+    return DrivetrainSplineTrajectoryParameterizer.parameterize(
         points,
         config.getConstraints(),
         config.getStartVelocity(),
@@ -119,14 +119,14 @@ public final class TrajectoryGenerator {
    * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  public static DrivetrainSplineTrajectory generateTrajectory(
+  public static DrivetrainSplineTrajectory generate(
       Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end, TrajectoryConfig config) {
     var controlVectors =
         SplineHelper.getCubicControlVectorsFromWaypoints(
             start, interiorWaypoints.toArray(new Translation2d[0]), end);
 
     // Return the generated trajectory.
-    return generateTrajectory(controlVectors[0], interiorWaypoints, controlVectors[1], config);
+    return generate(controlVectors[0], interiorWaypoints, controlVectors[1], config);
   }
 
   /**
@@ -138,7 +138,7 @@ public final class TrajectoryGenerator {
    * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  public static DrivetrainSplineTrajectory generateTrajectory(
+  public static DrivetrainSplineTrajectory generate(
       ControlVectorList controlVectors, TrajectoryConfig config) {
     final var newControlVectors = new ArrayList<Spline.ControlVector>(controlVectors.size());
 
@@ -173,7 +173,7 @@ public final class TrajectoryGenerator {
     }
 
     // Generate and return trajectory.
-    return TrajectoryParameterizer.timeParameterizeTrajectory(
+    return DrivetrainSplineTrajectoryParameterizer.parameterize(
         points,
         config.getConstraints(),
         config.getStartVelocity(),
@@ -192,7 +192,7 @@ public final class TrajectoryGenerator {
    * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  public static DrivetrainSplineTrajectory generateTrajectory(
+  public static DrivetrainSplineTrajectory generate(
       List<Pose2d> waypoints, TrajectoryConfig config) {
     List<Pose2d> newWaypoints = new ArrayList<>();
     if (config.isReversed()) {
@@ -224,7 +224,7 @@ public final class TrajectoryGenerator {
     }
 
     // Generate and return trajectory.
-    return TrajectoryParameterizer.timeParameterizeTrajectory(
+    return DrivetrainSplineTrajectoryParameterizer.parameterize(
         points,
         config.getConstraints(),
         config.getStartVelocity(),

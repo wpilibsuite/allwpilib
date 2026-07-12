@@ -7,14 +7,14 @@
 #include "wpi/math/trajectory/DifferentialTrajectory.hpp"
 #include "wpi/math/trajectory/HolonomicSample.hpp"
 #include "wpi/math/trajectory/HolonomicTrajectory.hpp"
-#include "wpi/math/trajectory/TestTrajectory.hpp"
+#include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
 #include "wpi/util/json.hpp"
 
 using namespace wpi::math;
 
 TEST(SampleJsonTest, TestBaseSample) {
   TrajectoryConfig config{12_fps, 12_fps_sq};
-  auto splineTrajectory = TestTrajectory::GetTrajectory(config);
+  auto splineTrajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
   for (const auto& splineSample : splineTrajectory.Samples()) {
     // Convert DrivetrainSplineSample to HolonomicSample
@@ -35,7 +35,7 @@ TEST(SampleJsonTest, TestBaseSample) {
 
 TEST(SampleJsonTest, TestFromJson) {
   TrajectoryConfig config{12_fps, 12_fps_sq};
-  auto splineTrajectory = TestTrajectory::GetTrajectory(config);
+  auto splineTrajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
   for (const auto& splineSample : splineTrajectory.Samples()) {
     // Convert DrivetrainSplineSample to HolonomicSample
@@ -56,7 +56,7 @@ TEST(SampleJsonTest, TestFromJson) {
 
 TEST(SampleJsonTest, TestDifferentialSamples) {
   TrajectoryConfig config{12_fps, 12_fps_sq};
-  auto splineTrajectory = TestTrajectory::GetTrajectory(config);
+  auto splineTrajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
   DifferentialDriveKinematics kinematics{0.5_m};
 

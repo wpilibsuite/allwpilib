@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.TrajectoryConfig;
-import org.wpilib.math.trajectory.TrajectoryGenerator;
 
 class MecanumDriveOdometryTest {
   private final Translation2d m_fl = new Translation2d(12, 12);
@@ -105,7 +105,7 @@ class MecanumDriveOdometryTest {
         new MecanumDriveOdometry(kinematics, Rotation2d.kZero, wheelPositions, Pose2d.kZero);
 
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 Pose2d.kZero,
                 new Pose2d(20, 20, Rotation2d.kZero),
@@ -188,7 +188,7 @@ class MecanumDriveOdometryTest {
         new MecanumDriveOdometry(kinematics, Rotation2d.kZero, wheelPositions, Pose2d.kZero);
 
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 Pose2d.kZero,
                 new Pose2d(20, 20, Rotation2d.kZero),

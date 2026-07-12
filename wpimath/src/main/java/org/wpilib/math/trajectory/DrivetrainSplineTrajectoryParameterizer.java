@@ -33,10 +33,10 @@ import java.util.List;
 import org.wpilib.math.spline.PoseWithCurvature;
 import org.wpilib.math.trajectory.constraint.TrajectoryConstraint;
 
-/** Class used to parameterize a trajectory by time. */
-public final class TrajectoryParameterizer {
+/** Class used to parameterize a drivetrain spline trajectory by time. */
+public final class DrivetrainSplineTrajectoryParameterizer {
   /** Private constructor because this is a utility class. */
-  private TrajectoryParameterizer() {}
+  private DrivetrainSplineTrajectoryParameterizer() {}
 
   /**
    * Parameterize the trajectory by time. This is where the velocity profile is generated.
@@ -54,7 +54,7 @@ public final class TrajectoryParameterizer {
    *     from a -&gt; b -&gt; ... -&gt; z as defined in the waypoints.
    * @return The trajectory.
    */
-  public static DrivetrainSplineTrajectory timeParameterizeTrajectory(
+  public static DrivetrainSplineTrajectory parameterize(
       List<PoseWithCurvature> points,
       List<TrajectoryConstraint> constraints,
       double startVelocity,

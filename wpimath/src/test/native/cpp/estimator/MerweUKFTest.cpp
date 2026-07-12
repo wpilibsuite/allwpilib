@@ -20,7 +20,7 @@
 #include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 
 namespace {
@@ -115,7 +115,7 @@ TEST(MerweUKFTest, DriveConvergence) {
   auto waypoints = std::vector<wpi::math::Pose2d>{
       wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
       wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
-  auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
+  auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
   wpi::math::Vectord<5> r = wpi::math::Vectord<5>::Zero();
