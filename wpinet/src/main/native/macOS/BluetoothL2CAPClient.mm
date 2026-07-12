@@ -1,0 +1,650 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "wpi/net/BluetoothL2CAPClient.hpp"
+
+#include <memory>
+#include <mutex>
+#include <string>
+#include <utility>
+#include <vector>
+
+#import <CoreBluetooth/CoreBluetooth.h>
+#import <Foundation/Foundation.h>
+
+#include "wpi/net/uv/Async.hpp"
+#include "wpi/net/uv/Loop.hpp"
+
+namespace uv = wpi::net::uv;
+
+using namespace wpi::net;
+
+@class WPINetMacBluetoothL2CAPClient;
+
+class BluetoothL2CAPClient::Impl
+    : public std::enable_shared_from_this<BluetoothL2CAPClient::Impl> {
+ public:
+  using LoopFunc = std::function<void()>;
+  using UvExecFunc = uv::Async<LoopFunc>;
+
+  static std::shared_ptr<Impl> Create(uv::Loop& loop,
+                                      PacketCallback packetCallback,
+                                      StatusCallback statusCallback);
+
+  Impl(uv::Loop& loop, PacketCallback packetCallback,
+       StatusCallback statusCallback);
+  ~Impl();
+
+  bool Connect(BluetoothL2CAPClientConfig config);
+  void Disconnect(std::string_view reason);
+  bool Send(std::span<const uint8_t> packet);
+  BluetoothL2CAPConnectionStatus GetStatus() const;
+
+  void SetStatus(std::string_view status);
+  void SetError(std::string_view error);
+  void SetConnected();
+  void SetDisconnected(std::string_view reason);
+  void DidReceivePacket(std::span<const uint8_t> packet);
+  void DidSendPacket();
+
+ private:
+  template <typename F>
+  void UpdateStatus(F&& func) {
+    BluetoothL2CAPConnectionStatus snapshot;
+    {
+      std::scoped_lock lock{m_statusMutex};
+      func(m_status);
+      snapshot = m_status;
+    }
+    PostStatus(snapshot);
+  }
+
+  void PostStatus(const BluetoothL2CAPConnectionStatus& status);
+
+  uv::Loop& m_loop;
+  PacketCallback m_packetCallback;
+  StatusCallback m_statusCallback;
+  std::shared_ptr<UvExecFunc> m_exec;
+
+  __strong WPINetMacBluetoothL2CAPClient* m_client = nil;
+
+  mutable std::mutex m_statusMutex;
+  BluetoothL2CAPConnectionStatus m_status;
+  BluetoothL2CAPClientConfig m_config;
+};
+
+namespace {
+
+char kMacBluetoothQueueKey;
+
+NSString* ToNSString(std::string_view value) {
+  return [[NSString alloc] initWithBytes:value.data()
+                                  length:value.size()
+                                encoding:NSUTF8StringEncoding];
+}
+
+std::string ToString(NSString* value) {
+  if (value == nil) {
+    return {};
+  }
+  const char* utf8 = value.UTF8String;
+  return utf8 != nullptr ? std::string{utf8} : std::string{};
+}
+
+std::string ToString(NSError* error) {
+  if (error == nil) {
+    return {};
+  }
+  return ToString(error.localizedDescription);
+}
+
+}  // namespace
+
+@interface WPINetMacBluetoothL2CAPClient
+    : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate, NSStreamDelegate>
+- (instancetype)initWithImpl:(BluetoothL2CAPClient::Impl*)impl;
+- (void)connectWithTarget:(NSString*)target
+                      psm:(CBL2CAPPSM)psm
+            maxPacketSize:(NSUInteger)maxPacketSize;
+- (void)disconnectWithReason:(NSString*)reason;
+- (void)sendPacket:(NSData*)packet;
+- (void)invalidate;
+@end
+
+@implementation WPINetMacBluetoothL2CAPClient {
+  BluetoothL2CAPClient::Impl* _impl;
+  dispatch_queue_t _queue;
+  CBCentralManager* _central;
+  CBPeripheral* _peripheral;
+  CBL2CAPChannel* _channel;
+  NSInputStream* _inputStream;
+  NSOutputStream* _outputStream;
+  NSString* _target;
+  CBL2CAPPSM _psm;
+  NSUInteger _maxPacketSize;
+  NSMutableArray<NSData*>* _pendingWrites;
+  NSData* _currentWrite;
+  NSUInteger _currentWriteOffset;
+}
+
+- (instancetype)initWithImpl:(BluetoothL2CAPClient::Impl*)impl {
+  self = [super init];
+  if (self != nil) {
+    _impl = impl;
+    _queue =
+        dispatch_queue_create("edu.wpi.first.wpinet.bluetooth", DISPATCH_QUEUE_SERIAL);
+    dispatch_queue_set_specific(_queue, &kMacBluetoothQueueKey,
+                                (__bridge void*)self, nullptr);
+    _central = [[CBCentralManager alloc] initWithDelegate:self queue:_queue];
+    _pendingWrites = [[NSMutableArray alloc] init];
+    _maxPacketSize = 512;
+  }
+  return self;
+}
+
+- (void)connectWithTarget:(NSString*)target
+                      psm:(CBL2CAPPSM)psm
+            maxPacketSize:(NSUInteger)maxPacketSize {
+  dispatch_async(_queue, ^{
+    _target = [target copy];
+    _psm = psm;
+    _maxPacketSize = maxPacketSize;
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [self closeStreams];
+    });
+    if (_peripheral != nil) {
+      [_central cancelPeripheralConnection:_peripheral];
+      _peripheral = nil;
+    }
+    [self startConnectIfReady];
+  });
+}
+
+- (void)disconnectWithReason:(NSString*)reason {
+  dispatch_async(_queue, ^{
+    [_central stopScan];
+    if (_peripheral != nil) {
+      [_central cancelPeripheralConnection:_peripheral];
+      _peripheral = nil;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [self closeStreams];
+    });
+    if (_impl != nullptr) {
+      _impl->SetDisconnected(ToString(reason));
+    }
+  });
+}
+
+- (void)sendPacket:(NSData*)packet {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [_pendingWrites addObject:packet];
+    [self writeAvailablePackets];
+  });
+}
+
+- (void)invalidate {
+  dispatch_block_t block = ^{
+    [_central stopScan];
+    if (_peripheral != nil) {
+      [_central cancelPeripheralConnection:_peripheral];
+      _peripheral = nil;
+    }
+    _central.delegate = nil;
+    _impl = nullptr;
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [self closeStreams];
+    });
+  };
+  if (dispatch_get_specific(&kMacBluetoothQueueKey) == (__bridge void*)self) {
+    block();
+  } else {
+    dispatch_sync(_queue, block);
+  }
+}
+
+- (void)startConnectIfReady {
+  if (_impl == nullptr) {
+    return;
+  }
+
+  if (_central.state != CBManagerStatePoweredOn) {
+    _impl->SetStatus("Waiting for Bluetooth to power on");
+    return;
+  }
+
+  if (_target.length == 0) {
+    _impl->SetError("No Bluetooth target configured");
+    return;
+  }
+
+  NSUUID* uuid = [[NSUUID alloc] initWithUUIDString:_target];
+  if (uuid != nil) {
+    NSArray<CBPeripheral*>* peripherals =
+        [_central retrievePeripheralsWithIdentifiers:@[ uuid ]];
+    if (peripherals.count > 0) {
+      [self connectPeripheral:peripherals.firstObject];
+      return;
+    }
+  }
+
+  _impl->SetStatus("Scanning for Bluetooth device");
+  [_central scanForPeripheralsWithServices:nil
+                                   options:@{
+                                     CBCentralManagerScanOptionAllowDuplicatesKey : @NO
+                                   }];
+}
+
+- (void)connectPeripheral:(CBPeripheral*)peripheral {
+  if (_impl == nullptr) {
+    return;
+  }
+  [_central stopScan];
+  _peripheral = peripheral;
+  _impl->SetStatus("Connecting");
+  [_central connectPeripheral:peripheral options:nil];
+}
+
+- (BOOL)peripheralMatchesTarget:(CBPeripheral*)peripheral
+              advertisementData:(NSDictionary<NSString*, id>*)advertisementData {
+  if (_target.length == 0) {
+    return NO;
+  }
+
+  NSString* identifier = peripheral.identifier.UUIDString;
+  if ([identifier caseInsensitiveCompare:_target] == NSOrderedSame) {
+    return YES;
+  }
+
+  NSString* advertisedName = advertisementData[CBAdvertisementDataLocalNameKey];
+  NSString* name = advertisedName.length > 0 ? advertisedName : peripheral.name;
+  if (name.length == 0) {
+    return NO;
+  }
+
+  return [name caseInsensitiveCompare:_target] == NSOrderedSame ||
+         [name hasPrefix:_target];
+}
+
+- (void)setupStreamsForChannel:(CBL2CAPChannel*)channel {
+  _channel = channel;
+  _inputStream = channel.inputStream;
+  _outputStream = channel.outputStream;
+  _inputStream.delegate = self;
+  _outputStream.delegate = self;
+  [_inputStream scheduleInRunLoop:NSRunLoop.mainRunLoop
+                          forMode:NSDefaultRunLoopMode];
+  [_outputStream scheduleInRunLoop:NSRunLoop.mainRunLoop
+                           forMode:NSDefaultRunLoopMode];
+  [_inputStream open];
+  [_outputStream open];
+}
+
+- (void)closeStreams {
+  _inputStream.delegate = nil;
+  _outputStream.delegate = nil;
+  [_inputStream removeFromRunLoop:NSRunLoop.mainRunLoop
+                          forMode:NSDefaultRunLoopMode];
+  [_outputStream removeFromRunLoop:NSRunLoop.mainRunLoop
+                           forMode:NSDefaultRunLoopMode];
+  [_inputStream close];
+  [_outputStream close];
+  _inputStream = nil;
+  _outputStream = nil;
+  _channel = nil;
+  [_pendingWrites removeAllObjects];
+  _currentWrite = nil;
+  _currentWriteOffset = 0;
+}
+
+- (void)writeAvailablePackets {
+  if (_outputStream == nil || !_outputStream.hasSpaceAvailable) {
+    return;
+  }
+
+  while (_outputStream.hasSpaceAvailable) {
+    if (_currentWrite == nil) {
+      if (_pendingWrites.count == 0) {
+        return;
+      }
+      _currentWrite = _pendingWrites.firstObject;
+      [_pendingWrites removeObjectAtIndex:0];
+      _currentWriteOffset = 0;
+    }
+
+    const uint8_t* bytes =
+        static_cast<const uint8_t*>(_currentWrite.bytes) + _currentWriteOffset;
+    NSUInteger remaining = _currentWrite.length - _currentWriteOffset;
+    NSInteger written = [_outputStream write:bytes maxLength:remaining];
+    if (written > 0) {
+      _currentWriteOffset += static_cast<NSUInteger>(written);
+      if (_currentWriteOffset == _currentWrite.length) {
+        _currentWrite = nil;
+        _currentWriteOffset = 0;
+        if (_impl != nullptr) {
+          _impl->DidSendPacket();
+        }
+      }
+      continue;
+    }
+
+    if (written < 0 && _impl != nullptr) {
+      _impl->SetError(std::string{"Bluetooth send failed: "} +
+                      ToString(_outputStream.streamError));
+    }
+    return;
+  }
+}
+
+- (void)readAvailablePackets {
+  if (_inputStream == nil) {
+    return;
+  }
+
+  std::vector<uint8_t> packet(_maxPacketSize);
+  while (_inputStream.hasBytesAvailable) {
+    NSInteger received =
+        [_inputStream read:packet.data() maxLength:packet.size()];
+    if (received > 0) {
+      if (_impl != nullptr) {
+        _impl->DidReceivePacket({packet.data(), static_cast<size_t>(received)});
+      }
+      continue;
+    }
+
+    if (received < 0 && _impl != nullptr) {
+      _impl->SetError(std::string{"Bluetooth receive failed: "} +
+                      ToString(_inputStream.streamError));
+    }
+    return;
+  }
+}
+
+- (void)centralManagerDidUpdateState:(CBCentralManager*)central {
+  (void)central;
+  [self startConnectIfReady];
+}
+
+- (void)centralManager:(CBCentralManager*)central
+    didDiscoverPeripheral:(CBPeripheral*)peripheral
+        advertisementData:(NSDictionary<NSString*, id>*)advertisementData
+                     RSSI:(NSNumber*)RSSI {
+  (void)central;
+  (void)RSSI;
+  if ([self peripheralMatchesTarget:peripheral advertisementData:advertisementData]) {
+    [self connectPeripheral:peripheral];
+  }
+}
+
+- (void)centralManager:(CBCentralManager*)central
+  didConnectPeripheral:(CBPeripheral*)peripheral {
+  (void)central;
+  if (_impl != nullptr) {
+    _impl->SetStatus("Opening Bluetooth L2CAP channel");
+  }
+  peripheral.delegate = self;
+  [peripheral openL2CAPChannel:_psm];
+}
+
+- (void)centralManager:(CBCentralManager*)central
+    didFailToConnectPeripheral:(CBPeripheral*)peripheral
+                         error:(NSError*)error {
+  (void)central;
+  (void)peripheral;
+  if (_impl != nullptr) {
+    _impl->SetError(std::string{"Failed to connect Bluetooth device: "} +
+                    ToString(error));
+  }
+}
+
+- (void)centralManager:(CBCentralManager*)central
+    didDisconnectPeripheral:(CBPeripheral*)peripheral
+                      error:(NSError*)error {
+  (void)central;
+  (void)peripheral;
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self closeStreams];
+  });
+  if (_impl != nullptr) {
+    if (error != nil) {
+      _impl->SetError(std::string{"Bluetooth connection closed: "} +
+                      ToString(error));
+    } else {
+      _impl->SetDisconnected("Bluetooth connection closed");
+    }
+  }
+}
+
+- (void)peripheral:(CBPeripheral*)peripheral
+    didOpenL2CAPChannel:(CBL2CAPChannel*)channel
+                  error:(NSError*)error {
+  (void)peripheral;
+  if (error != nil) {
+    if (_impl != nullptr) {
+      _impl->SetError(std::string{"Failed to open Bluetooth L2CAP channel: "} +
+                      ToString(error));
+    }
+    return;
+  }
+
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self setupStreamsForChannel:channel];
+  });
+}
+
+- (void)stream:(NSStream*)stream handleEvent:(NSStreamEvent)eventCode {
+  switch (eventCode) {
+    case NSStreamEventOpenCompleted:
+      if (_inputStream.streamStatus == NSStreamStatusOpen &&
+          _outputStream.streamStatus == NSStreamStatusOpen &&
+          _impl != nullptr) {
+        _impl->SetConnected();
+      }
+      break;
+    case NSStreamEventHasBytesAvailable:
+      [self readAvailablePackets];
+      break;
+    case NSStreamEventHasSpaceAvailable:
+      [self writeAvailablePackets];
+      break;
+    case NSStreamEventErrorOccurred:
+      if (_impl != nullptr) {
+        _impl->SetError(std::string{"Bluetooth stream error: "} +
+                        ToString(stream.streamError));
+      }
+      break;
+    case NSStreamEventEndEncountered:
+      if (_impl != nullptr) {
+        _impl->SetDisconnected("Bluetooth connection closed");
+      }
+      [self closeStreams];
+      break;
+    default:
+      break;
+  }
+}
+
+@end
+
+std::shared_ptr<BluetoothL2CAPClient::Impl> BluetoothL2CAPClient::Impl::Create(
+    uv::Loop& loop, PacketCallback packetCallback,
+    StatusCallback statusCallback) {
+  auto impl = std::make_shared<Impl>(loop, std::move(packetCallback),
+                                     std::move(statusCallback));
+  impl->m_exec = UvExecFunc::Create(loop);
+  if (!impl->m_exec) {
+    return nullptr;
+  }
+  impl->m_exec->wakeup.connect([](auto func) { func(); });
+  impl->m_client =
+      [[WPINetMacBluetoothL2CAPClient alloc] initWithImpl:impl.get()];
+  return impl;
+}
+
+BluetoothL2CAPClient::Impl::Impl(uv::Loop& loop,
+                                 PacketCallback packetCallback,
+                                 StatusCallback statusCallback)
+    : m_loop{loop},
+      m_packetCallback{std::move(packetCallback)},
+      m_statusCallback{std::move(statusCallback)} {
+  m_status.supported = true;
+  m_status.status = "Waiting for Bluetooth target";
+}
+
+BluetoothL2CAPClient::Impl::~Impl() {
+  [m_client invalidate];
+  m_client = nil;
+}
+
+bool BluetoothL2CAPClient::Impl::Connect(
+    BluetoothL2CAPClientConfig config) {
+  if (config.address.empty()) {
+    SetError("No Bluetooth target configured");
+    return false;
+  }
+  if (config.psm == 0) {
+    SetError("No Bluetooth L2CAP PSM configured");
+    return false;
+  }
+
+  {
+    std::scoped_lock lock{m_statusMutex};
+    m_config = config;
+    m_status.targetAddress = config.address;
+    m_status.addressType = config.addressType;
+    m_status.targetConfigured = true;
+    m_status.error.clear();
+    m_status.status = "Connecting";
+    m_status.connecting = true;
+    m_status.connected = false;
+  }
+  PostStatus(GetStatus());
+
+  [m_client connectWithTarget:ToNSString(config.address)
+                          psm:static_cast<CBL2CAPPSM>(config.psm)
+                maxPacketSize:config.maxPacketSize];
+  return true;
+}
+
+void BluetoothL2CAPClient::Impl::Disconnect(std::string_view reason) {
+  [m_client disconnectWithReason:ToNSString(reason)];
+}
+
+bool BluetoothL2CAPClient::Impl::Send(std::span<const uint8_t> packet) {
+  if (packet.empty()) {
+    return false;
+  }
+
+  bool tooLarge = false;
+  {
+    std::scoped_lock lock{m_statusMutex};
+    if (!m_status.connected) {
+      return false;
+    }
+    tooLarge = packet.size() > m_config.maxPacketSize;
+  }
+  if (tooLarge) {
+    SetError("Packet is larger than Bluetooth transport MTU");
+    return false;
+  }
+
+  NSData* data = [NSData dataWithBytes:packet.data() length:packet.size()];
+  [m_client sendPacket:data];
+  return true;
+}
+
+BluetoothL2CAPConnectionStatus BluetoothL2CAPClient::Impl::GetStatus() const {
+  std::scoped_lock lock{m_statusMutex};
+  return m_status;
+}
+
+void BluetoothL2CAPClient::Impl::SetStatus(std::string_view status) {
+  UpdateStatus([&](auto& current) { current.status = status; });
+}
+
+void BluetoothL2CAPClient::Impl::SetError(std::string_view error) {
+  UpdateStatus([&](auto& status) {
+    status.error = error;
+    status.status = error;
+    status.connecting = false;
+    status.connected = false;
+  });
+}
+
+void BluetoothL2CAPClient::Impl::SetConnected() {
+  UpdateStatus([](auto& status) {
+    status.connecting = false;
+    status.connected = true;
+    status.status = "Connected";
+    status.error.clear();
+  });
+}
+
+void BluetoothL2CAPClient::Impl::SetDisconnected(std::string_view reason) {
+  UpdateStatus([&](auto& status) {
+    status.connecting = false;
+    status.connected = false;
+    status.status = reason;
+  });
+}
+
+void BluetoothL2CAPClient::Impl::DidReceivePacket(
+    std::span<const uint8_t> packet) {
+  std::vector<uint8_t> packetCopy{packet.begin(), packet.end()};
+  UpdateStatus([](auto& status) { ++status.packetsReceived; });
+  if (m_packetCallback) {
+    m_exec->Send([callback = m_packetCallback,
+                  packetCopy = std::move(packetCopy)] {
+      callback(packetCopy);
+    });
+  }
+}
+
+void BluetoothL2CAPClient::Impl::DidSendPacket() {
+  UpdateStatus([](auto& status) { ++status.packetsSent; });
+}
+
+void BluetoothL2CAPClient::Impl::PostStatus(
+    const BluetoothL2CAPConnectionStatus& status) {
+  if (m_statusCallback) {
+    m_exec->Send([callback = m_statusCallback, status] { callback(status); });
+  }
+}
+
+std::shared_ptr<BluetoothL2CAPClient> BluetoothL2CAPClient::Create(
+    wpi::net::uv::Loop& loop, PacketCallback packetCallback,
+    StatusCallback statusCallback) {
+  auto impl = Impl::Create(loop, std::move(packetCallback),
+                           std::move(statusCallback));
+  if (!impl) {
+    return nullptr;
+  }
+  return std::shared_ptr<BluetoothL2CAPClient>(
+      new BluetoothL2CAPClient{std::move(impl)});
+}
+
+BluetoothL2CAPClient::BluetoothL2CAPClient(std::shared_ptr<Impl> impl)
+    : m_impl{std::move(impl)} {}
+
+BluetoothL2CAPClient::~BluetoothL2CAPClient() = default;
+
+bool BluetoothL2CAPClient::IsSupported() {
+  return true;
+}
+
+bool BluetoothL2CAPClient::Connect(BluetoothL2CAPClientConfig config) {
+  return m_impl->Connect(std::move(config));
+}
+
+void BluetoothL2CAPClient::Disconnect(std::string_view reason) {
+  m_impl->Disconnect(reason);
+}
+
+bool BluetoothL2CAPClient::Send(std::span<const uint8_t> packet) {
+  return m_impl->Send(packet);
+}
+
+BluetoothL2CAPConnectionStatus BluetoothL2CAPClient::GetStatus() const {
+  return m_impl->GetStatus();
+}

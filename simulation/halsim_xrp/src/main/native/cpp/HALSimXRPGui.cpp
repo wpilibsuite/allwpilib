@@ -50,7 +50,7 @@ enum class CommandKind { kNone, kRefresh, kScan, kPair };
 
 struct GuiState {
   bool initializedFromConnection = false;
-  char address[18] = "";
+  char address[128] = "";
   int addressType = 1;
   int selectedDevice = -1;
   std::vector<BluetoothDevice> devices;
@@ -165,7 +165,9 @@ CommandResult RunCommand(std::string command) {
 
   result.exitCode = pclose(pipe);
 #else
-  result.output = "Bluetooth pairing commands are only available on Linux.";
+  result.output =
+      "Bluetooth pairing commands are only available on Linux. Enter the "
+      "platform Bluetooth identifier or advertised XRP name to connect.";
 #endif
   return result;
 }
@@ -270,7 +272,7 @@ void DrawDeviceControls(bool commandRunning) {
     ImGui::EndCombo();
   }
 
-  ImGui::InputText("Address", gGui.address, sizeof(gGui.address));
+  ImGui::InputText("Address / identifier", gGui.address, sizeof(gGui.address));
   const char* addressTypes[] = {"Public", "Random"};
   ImGui::Combo("Address type", &gGui.addressType, addressTypes, 2);
 }
@@ -279,6 +281,7 @@ void DrawConnectionControls(HALSimXRP& simXRP,
                             const XRPConnectionStatus& status,
                             bool commandRunning) {
   bool addressValid = IsBluetoothAddress(gGui.address);
+  bool targetValid = gGui.address[0] != '\0';
   ImGui::BeginDisabled(commandRunning || !addressValid);
   if (ImGui::Button("Pair & Trust")) {
     std::string address = gGui.address;
@@ -287,7 +290,9 @@ void DrawConnectionControls(HALSimXRP& simXRP,
                         " && bluetoothctl trust " + address);
     });
   }
+  ImGui::EndDisabled();
   ImGui::SameLine();
+  ImGui::BeginDisabled(commandRunning || !targetValid);
   if (ImGui::Button("Connect")) {
     simXRP.ConnectBluetooth(
         gGui.address, gGui.addressType == 0 ? XRPBluetoothAddressType::kPublic
@@ -331,7 +336,7 @@ void DrawGuiImpl() {
   ImGui::Separator();
 
   bool commandRunning = gGui.pendingCommand.valid();
-  if (status.bluetoothSupported) {
+  if (status.supported) {
     DrawDeviceControls(commandRunning);
     DrawConnectionControls(*simXRP, status, commandRunning);
   } else {
