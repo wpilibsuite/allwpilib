@@ -1,4 +1,4 @@
-import edu.wpi.first.toolchain.NativePlatforms
+import org.wpilib.toolchain.NativePlatforms
 
 apply plugin: 'java'
 apply plugin: 'jacoco'
@@ -21,18 +21,44 @@ dependencies {
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':cameraserver')
-    implementation project(':wpilibNewCommands')
+    implementation project(':commandsv2')
+    implementation project(':commandsv3')
     implementation project(':romiVendordep')
     implementation project(':xrpVendordep')
     implementation project(':epilogue-runtime')
     annotationProcessor project(':epilogue-processor')
+    annotationProcessor project(':javacPlugin')
+    annotationProcessor project(':wpiannotations')
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation libs.junit.api
+    testRuntimeOnly libs.junit.launcher
+}
+
+// Prevent the eclipse compiler (used by the VS Code extension for intellisense and debugging)
+// from generating bad class files from annotation processors like Epilogue
+eclipse {
+    classpath {
+        containers 'org.eclipse.buildship.core.gradleclasspathcontainer'
+        file.whenMerged { cp ->
+            def entries = cp.entries;
+            def src = new org.gradle.plugins.ide.eclipse.model.SourceFolder('build/generated/sources/annotationProcessor/java/main/', null)
+            entries.add(src)
+        }
+    }
+}
+
+tasks.withType(JavaExec).configureEach {
+    // Commands v3 needs reflective access to the continuation classes
+    jvmArgs += [
+        '--add-opens',
+        'java.base/jdk.internal.vm=ALL-UNNAMED',
+        '--add-opens',
+        'java.base/java.lang=ALL-UNNAMED',
+    ]
 }
 
 jacoco {
-    toolVersion = "0.8.10"
+    toolVersion = "0.8.14"
 }
 
 jacocoTestReport {
@@ -66,16 +92,18 @@ tasks.register('buildDesktopJava') {
 apply from: 'publish.gradle'
 
 ext {
-    templateDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/templates/")
-    templateFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/templates/templates.json")
-    exampleDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/examples/")
-    exampleFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/examples/examples.json")
-    commandDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/commands/")
-    commandFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/commands/commands.json")
+    templateDirectory = new File("$projectDir/src/main/java/org/wpilib/templates/")
+    templateFile = new File("$projectDir/src/main/java/org/wpilib/templates/templates.json")
+    exampleDirectory = new File("$projectDir/src/main/java/org/wpilib/examples/")
+    exampleFile = new File("$projectDir/src/main/java/org/wpilib/examples/examples.json")
+    commandDirectory = new File("$projectDir/src/main/java/org/wpilib/commands/")
+    commandFile = new File("$projectDir/src/main/java/org/wpilib/commands/commands.json")
+    snippetsDirectory = new File("$projectDir/src/main/java/org/wpilib/snippets/")
+    snippetsFile = new File("$projectDir/src/main/java/org/wpilib/snippets/snippets.json")
 }
 
 apply plugin: 'cpp'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 
 apply from: '../shared/config.gradle'
 
@@ -110,14 +138,12 @@ model {
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
-                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
-                } else {
-                    def systemArch = getCurrentArch()
-                    if (binary.targetPlatform.name == systemArch) {
-                        lib project: ":simulation:halsim_gui", library: 'halsim_gui', linkage: 'shared'
-                    }
+
+                def systemArch = getCurrentArch()
+                if (binary.targetPlatform.name == systemArch) {
+                    lib project: ":simulation:halsim_gui", library: 'halsim_gui', linkage: 'shared'
                 }
+
                 nativeUtils.useRequiredLibrary(binary, 'opencv_shared')
             }
         }
@@ -160,8 +186,11 @@ model {
 
                             new groovy.json.JsonSlurper().parseText(exampleFile.text).each { entry ->
                                 project.tasks.create("run${entry.foldername}", JavaExec) { run ->
-                                    run.group "run examples"
-                                    run.mainClass = "edu.wpi.first.wpilibj.examples." + entry.foldername + "." + entry.mainclass
+                                    run.group = "run examples"
+                                    run.mainClass = "org.wpilib.Executor"
+                                    run.args = [
+                                        "org.wpilib.examples." + entry.foldername + "." + entry.robotclass
+                                    ]
                                     run.classpath = sourceSets.main.runtimeClasspath
                                     run.dependsOn it.tasks.install
                                     run.systemProperty 'java.library.path', filePath
@@ -172,18 +201,18 @@ model {
                                     }
                                 }
                                 project.tasks.create("test${entry.foldername}", Test) { testTask ->
-                                    testTask.group "verification"
+                                    testTask.group = "verification"
                                     testTask.useJUnitPlatform()
                                     testTask.filter {
-                                        includeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
+                                        includeTestsMatching("org.wpilib.examples.${entry.foldername}.*")
                                         // armsimulation regularly fails on CI Win64Debug
                                         if (project.hasProperty('ciDebugOnly')) {
-                                            excludeTestsMatching("edu.wpi.first.wpilibj.examples.armsimulation.*")
+                                            excludeTestsMatching("org.wpilib.examples.armsimulation.*")
                                         }
                                         setFailOnNoMatchingTests(false)
                                     }
                                     test.filter {
-                                        excludeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
+                                        excludeTestsMatching("org.wpilib.examples.${entry.foldername}.*")
                                         setFailOnNoMatchingTests(false)
                                     }
                                     testTask.testClassesDirs = sourceSets.test.output.classesDirs
@@ -193,11 +222,55 @@ model {
                                     testTask.systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
                                     testTask.testLogging {
                                         events "failed"
-                                        exceptionFormat "full"
+                                        exceptionFormat = "full"
                                     }
                                     testTask.systemProperty 'java.library.path', filePath
 
-                                    if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
+                                    if (project.hasProperty('onlylinuxsystemcore') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
+                                        testTask.enabled = false
+                                    }
+                                    test.dependsOn(testTask)
+                                }
+                            }
+                            new groovy.json.JsonSlurper().parseText(snippetsFile.text).each { entry ->
+                                project.tasks.create("runSnippet${entry.foldername}", JavaExec) { run ->
+                                    run.group = "run snippets"
+                                    run.mainClass = "org.wpilib.Executor"
+                                    run.args = [
+                                        "org.wpilib.snippets." + entry.foldername + "." + entry.robotclass
+                                    ]
+                                    run.classpath = sourceSets.main.runtimeClasspath
+                                    run.dependsOn it.tasks.install
+                                    run.systemProperty 'java.library.path', filePath
+                                    doFirst { doFirstTask(run) }
+
+                                    if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+                                        run.jvmArgs = ['-XstartOnFirstThread']
+                                    }
+                                }
+                                project.tasks.create("testSnippet${entry.foldername}", Test) { testTask ->
+                                    testTask.group = "verification"
+                                    testTask.useJUnitPlatform()
+                                    testTask.filter {
+                                        includeTestsMatching("org.wpilib.snippets.${entry.foldername}.*")
+                                        setFailOnNoMatchingTests(false)
+                                    }
+                                    test.filter {
+                                        excludeTestsMatching("org.wpilib.snippets.${entry.foldername}.*")
+                                        setFailOnNoMatchingTests(false)
+                                    }
+                                    testTask.testClassesDirs = sourceSets.test.output.classesDirs
+                                    testTask.classpath = sourceSets.test.runtimeClasspath
+                                    testTask.dependsOn it.tasks.install
+
+                                    testTask.systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+                                    testTask.testLogging {
+                                        events "failed"
+                                        exceptionFormat = "full"
+                                    }
+                                    testTask.systemProperty 'java.library.path', filePath
+
+                                    if (project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
                                         testTask.enabled = false
                                     }
                                     test.dependsOn(testTask)

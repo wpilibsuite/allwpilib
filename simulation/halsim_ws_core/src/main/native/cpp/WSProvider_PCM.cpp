@@ -2,17 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WSProvider_PCM.h"
+#include "wpi/halsim/ws_core/WSProvider_PCM.hpp"
 
-#include <hal/Ports.h>
-#include <hal/simulation/CTREPCMData.h>
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/CTREPCMData.h"
 
 #define REGISTER_CTREPCM(halsim, jsonid, ctype, haltype)                 \
   HALSIM_RegisterCTREPCM##halsim##Callback(                              \
       m_channel,                                                         \
       [](const char* name, void* param, const struct HAL_Value* value) { \
         static_cast<HALSimWSProviderPCM*>(param)->ProcessHalCallback(    \
-            {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});    \
+            wpi::util::json::object(                                     \
+                jsonid, static_cast<ctype>(value->data.v_##haltype)));   \
       },                                                                 \
       this, true)
 namespace wpilibws {

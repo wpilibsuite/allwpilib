@@ -1,0 +1,50 @@
+extra_includes:
+- wpi/driverstation/internal/DriverStationBackend.hpp
+
+functions:
+  # TODO
+  RunHALInitialization:
+    ignore: true
+  RunRobot:
+    ignore: true
+  StartRobot:
+    ignore: true
+  ResetMotorSafety:
+    ignore: true
+classes:
+  wpi::RobotBase:
+    attributes:
+      m_threadId:
+        ignore: true
+      connListenerHandle:
+        ignore: true
+    methods:
+      IsEnabled:
+      IsDisabled:
+      IsAutonomous:
+      IsAutonomousEnabled:
+      IsTeleop:
+      IsTeleopEnabled:
+      IsUtility:
+      IsUtilityEnabled:
+      GetThreadId:
+        ignore: true
+      StartCompetition:
+      EndCompetition:
+      GetRuntimeType:
+      IsReal:
+      IsSimulation:
+      RobotBase:
+      GetOpModeId:
+      GetOpMode:
+    inline_code: |
+      .def_static("main",
+        [](py::object robot_cls) -> py::object {
+          auto start = py::module::import("wpilib._impl.start");
+          auto starter = start.attr("RobotStarter")();
+          return starter.attr("run")(robot_cls);
+        },
+        py::arg("robot_cls"), py::doc("Starting point for the application"));
+
+      auto logger = py::module::import("logging").attr("getLogger")("robot");
+      cls_RobotBase.attr("logger") = logger;

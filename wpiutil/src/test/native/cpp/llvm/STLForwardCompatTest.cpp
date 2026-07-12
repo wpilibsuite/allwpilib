@@ -6,9 +6,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/STLForwardCompat.h"
-#include "MoveOnly.h"
+#include "wpi/util/STLForwardCompat.hpp"
+#include "CountCopyAndMove.hpp"
 #include "gtest/gtest.h"
+
+#include <optional>
+#include <type_traits>
+#include <utility>
 
 namespace {
 
@@ -36,104 +40,169 @@ TYPED_TEST(STLForwardCompatRemoveCVRefTest, RemoveCVRef) {
   using From = typename TypeParam::first_type;
   using To = typename TypeParam::second_type;
   EXPECT_TRUE(
-      (std::is_same<typename wpi::remove_cvref<From>::type, To>::value));
+      (std::is_same<typename wpi::util::remove_cvref<From>::type, To>::value));
 }
 
 TYPED_TEST(STLForwardCompatRemoveCVRefTest, RemoveCVRefT) {
   using From = typename TypeParam::first_type;
-  EXPECT_TRUE((std::is_same<typename wpi::remove_cvref<From>::type,
-                            wpi::remove_cvref_t<From>>::value));
+  EXPECT_TRUE((std::is_same<typename wpi::util::remove_cvref<From>::type,
+                            wpi::util::remove_cvref_t<From>>::value));
+}
+
+template <typename T> class TypeIdentityTest : public ::testing::Test {
+public:
+  using TypeIdentity = wpi::util::type_identity<T>;
+};
+
+struct A {
+  struct B {};
+};
+using TypeIdentityTestTypes =
+    ::testing::Types<int, volatile int, A, const A::B>;
+
+TYPED_TEST_SUITE(TypeIdentityTest, TypeIdentityTestTypes, /*NameGenerator*/);
+
+TYPED_TEST(TypeIdentityTest, Identity) {
+  // TestFixture is the instantiated TypeIdentityTest.
+  EXPECT_TRUE(
+      (std::is_same_v<TypeParam, typename TestFixture::TypeIdentity::type>));
 }
 
 TEST(TransformTest, TransformStd) {
   std::optional<int> A;
 
-  std::optional<int> B = wpi::transformOptional(A, [&](int N) { return N + 1; });
+  std::optional<int> B = wpi::util::transformOptional(A, [&](int N) { return N + 1; });
   EXPECT_FALSE(B.has_value());
 
   A = 3;
-  std::optional<int> C = wpi::transformOptional(A, [&](int N) { return N + 1; });
+  std::optional<int> C = wpi::util::transformOptional(A, [&](int N) { return N + 1; });
   EXPECT_TRUE(C.has_value());
   EXPECT_EQ(4, *C);
 }
 
 TEST(TransformTest, MoveTransformStd) {
-  using wpi::MoveOnly;
+  using wpi::util::CountCopyAndMove;
 
-  std::optional<MoveOnly> A;
+  std::optional<CountCopyAndMove> A;
 
-  MoveOnly::ResetCounts();
-  std::optional<int> B = wpi::transformOptional(
-      std::move(A), [&](const MoveOnly &M) { return M.val + 2; });
+  CountCopyAndMove::ResetCounts();
+  std::optional<int> B = wpi::util::transformOptional(
+      std::move(A), [&](const CountCopyAndMove &M) { return M.val + 2; });
   EXPECT_FALSE(B.has_value());
-  EXPECT_EQ(0u, MoveOnly::MoveConstructions);
-  EXPECT_EQ(0u, MoveOnly::MoveAssignments);
-  EXPECT_EQ(0u, MoveOnly::Destructions);
+  EXPECT_EQ(0, CountCopyAndMove::TotalCopies());
+  EXPECT_EQ(0, CountCopyAndMove::MoveConstructions);
+  EXPECT_EQ(0, CountCopyAndMove::MoveAssignments);
+  EXPECT_EQ(0, CountCopyAndMove::Destructions);
 
-  A = MoveOnly(5);
-  MoveOnly::ResetCounts();
-  std::optional<int> C = wpi::transformOptional(
-      std::move(A), [&](const MoveOnly &M) { return M.val + 2; });
+  A = CountCopyAndMove(5);
+  CountCopyAndMove::ResetCounts();
+  std::optional<int> C = wpi::util::transformOptional(
+      std::move(A), [&](const CountCopyAndMove &M) { return M.val + 2; });
   EXPECT_TRUE(C.has_value());
   EXPECT_EQ(7, *C);
-  EXPECT_EQ(0u, MoveOnly::MoveConstructions);
-  EXPECT_EQ(0u, MoveOnly::MoveAssignments);
-  EXPECT_EQ(0u, MoveOnly::Destructions);
+  EXPECT_EQ(0, CountCopyAndMove::TotalCopies());
+  EXPECT_EQ(0, CountCopyAndMove::MoveConstructions);
+  EXPECT_EQ(0, CountCopyAndMove::MoveAssignments);
+  EXPECT_EQ(0, CountCopyAndMove::Destructions);
 }
 
 TEST(TransformTest, TransformLlvm) {
   std::optional<int> A;
 
   std::optional<int> B =
-      wpi::transformOptional(A, [&](int N) { return N + 1; });
+      wpi::util::transformOptional(A, [&](int N) { return N + 1; });
   EXPECT_FALSE(B.has_value());
 
   A = 3;
   std::optional<int> C =
-      wpi::transformOptional(A, [&](int N) { return N + 1; });
+      wpi::util::transformOptional(A, [&](int N) { return N + 1; });
   EXPECT_TRUE(C.has_value());
   EXPECT_EQ(4, *C);
 }
 
 TEST(TransformTest, MoveTransformLlvm) {
-  using wpi::MoveOnly;
+  using wpi::util::CountCopyAndMove;
 
-  std::optional<MoveOnly> A;
+  std::optional<CountCopyAndMove> A;
 
-  MoveOnly::ResetCounts();
-  std::optional<int> B = wpi::transformOptional(
-      std::move(A), [&](const MoveOnly &M) { return M.val + 2; });
+  CountCopyAndMove::ResetCounts();
+  std::optional<int> B = wpi::util::transformOptional(
+      std::move(A), [&](const CountCopyAndMove &M) { return M.val + 2; });
   EXPECT_FALSE(B.has_value());
-  EXPECT_EQ(0u, MoveOnly::MoveConstructions);
-  EXPECT_EQ(0u, MoveOnly::MoveAssignments);
-  EXPECT_EQ(0u, MoveOnly::Destructions);
+  EXPECT_EQ(0, CountCopyAndMove::TotalCopies());
+  EXPECT_EQ(0, CountCopyAndMove::MoveConstructions);
+  EXPECT_EQ(0, CountCopyAndMove::MoveAssignments);
+  EXPECT_EQ(0, CountCopyAndMove::Destructions);
 
-  A = MoveOnly(5);
-  MoveOnly::ResetCounts();
-  std::optional<int> C = wpi::transformOptional(
-      std::move(A), [&](const MoveOnly &M) { return M.val + 2; });
+  A = CountCopyAndMove(5);
+  CountCopyAndMove::ResetCounts();
+  std::optional<int> C = wpi::util::transformOptional(
+      std::move(A), [&](const CountCopyAndMove &M) { return M.val + 2; });
   EXPECT_TRUE(C.has_value());
   EXPECT_EQ(7, *C);
-  EXPECT_EQ(0u, MoveOnly::MoveConstructions);
-  EXPECT_EQ(0u, MoveOnly::MoveAssignments);
-  EXPECT_EQ(0u, MoveOnly::Destructions);
+  EXPECT_EQ(0, CountCopyAndMove::TotalCopies());
+  EXPECT_EQ(0, CountCopyAndMove::MoveConstructions);
+  EXPECT_EQ(0, CountCopyAndMove::MoveAssignments);
+  EXPECT_EQ(0, CountCopyAndMove::Destructions);
+}
+
+TEST(TransformTest, TransformCategory) {
+  struct StructA {
+    int x;
+  };
+  struct StructB : StructA {
+    StructB(StructA &&A) : StructA(std::move(A)) {}
+  };
+
+  std::optional<StructA> A{StructA{}};
+  wpi::util::transformOptional(A, [](auto &&s) {
+    EXPECT_FALSE(std::is_rvalue_reference_v<decltype(s)>);
+    return StructB{std::move(s)};
+  });
+
+  wpi::util::transformOptional(std::move(A), [](auto &&s) {
+    EXPECT_TRUE(std::is_rvalue_reference_v<decltype(s)>);
+    return StructB{std::move(s)};
+  });
 }
 
 TEST(TransformTest, ToUnderlying) {
   enum E { A1 = 0, B1 = -1 };
-  static_assert(wpi::to_underlying(A1) == 0);
-  static_assert(wpi::to_underlying(B1) == -1);
+  static_assert(wpi::util::to_underlying(A1) == 0);
+  static_assert(wpi::util::to_underlying(B1) == -1);
 
   enum E2 : unsigned char { A2 = 0, B2 };
   static_assert(
-      std::is_same_v<unsigned char, decltype(wpi::to_underlying(A2))>);
-  static_assert(wpi::to_underlying(A2) == 0);
-  static_assert(wpi::to_underlying(B2) == 1);
+      std::is_same_v<unsigned char, decltype(wpi::util::to_underlying(A2))>);
+  static_assert(wpi::util::to_underlying(A2) == 0);
+  static_assert(wpi::util::to_underlying(B2) == 1);
 
   enum class E3 { A3 = -1, B3 };
-  static_assert(std::is_same_v<int, decltype(wpi::to_underlying(E3::A3))>);
-  static_assert(wpi::to_underlying(E3::A3) == -1);
-  static_assert(wpi::to_underlying(E3::B3) == 0);
+  static_assert(std::is_same_v<int, decltype(wpi::util::to_underlying(E3::A3))>);
+  static_assert(wpi::util::to_underlying(E3::A3) == -1);
+  static_assert(wpi::util::to_underlying(E3::B3) == 0);
+}
+
+TEST(STLForwardCompatTest, IdentityCxx20) {
+  wpi::util::identity identity;
+
+  // Test with an lvalue.
+  int X = 42;
+  int &Y = identity(X);
+  EXPECT_EQ(&X, &Y);
+
+  // Test with a const lvalue.
+  const int CX = 10;
+  const int &CY = identity(CX);
+  EXPECT_EQ(&CX, &CY);
+
+  // Test with an rvalue.
+  EXPECT_EQ(identity(123), 123);
+
+  // Test perfect forwarding.
+  static_assert(std::is_same_v<int &, decltype(identity(X))>);
+  static_assert(std::is_same_v<const int &, decltype(identity(CX))>);
+  static_assert(std::is_same_v<int &&, decltype(identity(int(5)))>);
 }
 
 } // namespace

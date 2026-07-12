@@ -1,14 +1,17 @@
 ext {
     addNtcoreDependency = { binary, shared->
         binary.lib project: ':ntcore', library: 'ntcore', linkage: shared
+        binary.lib project: ':datalog', library: 'datalog', linkage: shared
     }
 
     addNtcoreJniDependency = { binary->
         binary.lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
+        binary.lib project: ':datalog', library: 'datalogJNIShared', linkage: 'shared'
     }
 
     nativeName = 'ntcore'
-    devMain = 'edu.wpi.first.ntcore.DevMain'
+    devMain = 'org.wpilib.networktables.DevMain'
+    nativeTestSuiteName = "${nativeName}Catch2Test"
     generatedSources = "$projectDir/src/generated/main/native/cpp"
     generatedHeaders = "$projectDir/src/generated/main/native/include"
     jniSplitSetup = {
@@ -31,13 +34,9 @@ model {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {
                 return
             }
-            if (it.component.name == "${nativeName}JNI") {
-                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-            } else {
-                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-            }
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':datalog', library: 'datalog', linkage: 'shared'
         }
     }
 }
@@ -46,6 +45,12 @@ sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 
 cppHeadersZip {
     from(generatedHeaders) {
+        into '/'
+    }
+}
+
+cppSourcesZip {
+    from(generatedSources) {
         into '/'
     }
 }
@@ -60,4 +65,8 @@ nativeUtils.exportsConfigs {
     ntcoreJNI {
         x64SymbolFilter = symbolFilter
     }
+}
+
+dependencies {
+    api project(":datalog")
 }

@@ -1,0 +1,77 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Sat, 24 May 2025 23:32:48 -0400
+Subject: [PATCH 1/5] Remove patches as they interfere with upstream_utils
+
+---
+ Disable_bundle_install.patch | 37 ------------------------------------
+ Neverlink_jruby_jars.patch   | 16 ----------------
+ 2 files changed, 53 deletions(-)
+ delete mode 100644 Disable_bundle_install.patch
+ delete mode 100644 Neverlink_jruby_jars.patch
+
+diff --git a/Disable_bundle_install.patch b/Disable_bundle_install.patch
+deleted file mode 100644
+index baa83832f51813161ab98115a54583bc9dbea741..0000000000000000000000000000000000000000
+--- a/Disable_bundle_install.patch
++++ /dev/null
+@@ -1,37 +0,0 @@
+-Subject: [PATCH] Disable bundle install
+----
+-Index: ruby/private/bundle_fetch.bzl
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/ruby/private/bundle_fetch.bzl b/ruby/private/bundle_fetch.bzl
+---- a/ruby/private/bundle_fetch.bzl	(revision 075937d3f2e22d4657f5c4693e7405d8952ab209)
+-+++ b/ruby/private/bundle_fetch.bzl	(date 1740971614385)
+-@@ -168,16 +168,16 @@
+-         )
+- 
+-     # Fetch Bundler and define an `rb_gem_install()` target for it.
+--    _download_gem(repository_ctx, gemfile_lock.bundler, cache_path, gemfile_lock.bundler.sha256)
+--    gem_full_names.append(":%s" % gemfile_lock.bundler.full_name)
+--    gem_install_fragments.append(
+--        _GEM_INSTALL_BUILD_FRAGMENT.format(
+--            name = gemfile_lock.bundler.full_name,
+--            gem = gemfile_lock.bundler.filename,
+--            cache_path = cache_path,
+--            ruby = ruby_toolchain_attr,
+--        ),
+--    )
+-+#    _download_gem(repository_ctx, gemfile_lock.bundler, cache_path, gemfile_lock.bundler.sha256)
+-+#    gem_full_names.append(":%s" % gemfile_lock.bundler.full_name)
+-+#    gem_install_fragments.append(
+-+#        _GEM_INSTALL_BUILD_FRAGMENT.format(
+-+#            name = gemfile_lock.bundler.full_name,
+-+#            gem = gemfile_lock.bundler.filename,
+-+#            cache_path = cache_path,
+-+#            ruby = ruby_toolchain_attr,
+-+#        ),
+-+#    )
+- 
+-     # Create `bin` package with shims for gem executables.
+-     # This allows targets to depend on `@bundle//bin:rake`
+diff --git a/Neverlink_jruby_jars.patch b/Neverlink_jruby_jars.patch
+deleted file mode 100644
+index 48ccca6c7cd656312620b912ff6f465059b63a53..0000000000000000000000000000000000000000
+--- a/Neverlink_jruby_jars.patch
++++ /dev/null
+@@ -1,16 +0,0 @@
+-Index: ruby/private/download/BUILD.tpl
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/ruby/private/download/BUILD.tpl b/ruby/private/download/BUILD.tpl
+---- a/ruby/private/download/BUILD.tpl	(revision 26e0ba621cb82933f28a59373cb6a7afe54fae95)
+-+++ b/ruby/private/download/BUILD.tpl	(date 1745340325192)
+-@@ -33,6 +33,7 @@
+-         ["dist/lib/**/*.jar"],
+-         allow_empty = True,
+-     ),
+-+    neverlink = True,
+- )
+-
+- rb_toolchain(

@@ -23,47 +23,49 @@
  * IN THE SOFTWARE.
  */
 
-#include "wpinet/uv/GetAddrInfo.h"  // NOLINT(build/include_order)
+// clang-format off
+#include "wpi/net/uv/GetAddrInfo.hpp"
+// clang-format on
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
-#include "wpinet/uv/Loop.h"
+#include "wpi/net/uv/Loop.hpp"
 
 #define CONCURRENT_COUNT 10
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
-TEST(UvGetAddrInfoTest, BothNull) {
+TEST_CASE("UvGetAddrInfoTest BothNull", "[uv][dns][addrinfo]") {
   int fail_cb_called = 0;
 
   auto loop = Loop::Create();
   loop->error.connect([&](Error err) {
-    ASSERT_EQ(err.code(), UV_EINVAL);
+    REQUIRE(err.code() == UV_EINVAL);
     fail_cb_called++;
   });
 
   GetAddrInfo(loop, [](const addrinfo&) { FAIL(); }, "");
   loop->Run();
-  ASSERT_EQ(fail_cb_called, 1);
+  REQUIRE(fail_cb_called == 1);
 }
 
-TEST(UvGetAddrInfoTest, FailedLookup) {
+TEST_CASE("UvGetAddrInfoTest FailedLookup", "[uv][dns][addrinfo][.]") {
   int fail_cb_called = 0;
 
   auto loop = Loop::Create();
   loop->error.connect([&](Error err) {
-    ASSERT_EQ(fail_cb_called, 0);
-    ASSERT_LT(err.code(), 0);
+    REQUIRE(fail_cb_called == 0);
+    REQUIRE(err.code() < 0);
     fail_cb_called++;
   });
 
   // Use a FQDN by ending in a period
   GetAddrInfo(loop, [](const addrinfo&) { FAIL(); }, "xyzzy.xyzzy.xyzzy.");
   loop->Run();
-  ASSERT_EQ(fail_cb_called, 1);
+  REQUIRE(fail_cb_called == 1);
 }
 
-TEST(UvGetAddrInfoTest, Basic) {
+TEST_CASE("UvGetAddrInfoTest Basic", "[uv][dns][addrinfo]") {
   int getaddrinfo_cbs = 0;
 
   auto loop = Loop::Create();
@@ -73,11 +75,11 @@ TEST(UvGetAddrInfoTest, Basic) {
 
   loop->Run();
 
-  ASSERT_EQ(getaddrinfo_cbs, 1);
+  REQUIRE(getaddrinfo_cbs == 1);
 }
 
 #ifndef _WIN32
-TEST(UvGetAddrInfoTest, Concurrent) {
+TEST_CASE("UvGetAddrInfoTest Concurrent", "[uv][dns][addrinfo]") {
   int getaddrinfo_cbs = 0;
   int callback_counts[CONCURRENT_COUNT];
 
@@ -98,9 +100,9 @@ TEST(UvGetAddrInfoTest, Concurrent) {
   loop->Run();
 
   for (int i = 0; i < CONCURRENT_COUNT; i++) {
-    ASSERT_EQ(callback_counts[i], 1);
+    REQUIRE(callback_counts[i] == 1);
   }
 }
 #endif
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

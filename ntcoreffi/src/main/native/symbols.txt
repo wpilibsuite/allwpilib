@@ -208,8 +208,7 @@ NT_SetTopicPersistent
 NT_SetTopicProperties
 NT_SetTopicProperty
 NT_SetTopicRetained
-NT_StartClient3
-NT_StartClient4
+NT_StartClient
 NT_StartConnectionDataLog
 NT_StartDSClient
 NT_StartEntryDataLog
@@ -229,8 +228,8 @@ NT_UnsubscribeMultiple
 NT_WaitForListenerQueue
 WPI_AllocateString
 WPI_AllocateStringArray
-WPI_CreateEvent
-WPI_CreateSemaphore
+WPI_MakeEvent
+WPI_MakeSemaphore
 WPI_CreateSignalObject
 WPI_DataLog_AppendBoolean
 WPI_DataLog_AppendBooleanArray
@@ -262,9 +261,6 @@ WPI_DestroySignalObject
 WPI_FreeString
 WPI_FreeStringArray
 WPI_GetSystemTime
-WPI_Impl_SetupNowUseDefaultOnRio
-WPI_Impl_SetupNowRioWithSession
-WPI_Impl_ShutdownNowRio
 WPI_InitString
 WPI_InitStringWithLength
 WPI_Now

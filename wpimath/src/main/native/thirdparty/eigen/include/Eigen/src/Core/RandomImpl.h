@@ -122,7 +122,7 @@ template <bool Specialize = (sizeof(long double) == 2 * sizeof(uint64_t)) &&
                             ((std::numeric_limits<long double>::digits != (2 * std::numeric_limits<double>::digits)))>
 struct random_longdouble_impl {
   static constexpr int Size = sizeof(long double);
-  static constexpr EIGEN_DEVICE_FUNC inline int mantissaBits() { return NumTraits<long double>::digits() - 1; }
+  static constexpr EIGEN_DEVICE_FUNC int mantissaBits() { return NumTraits<long double>::digits() - 1; }
   static EIGEN_DEVICE_FUNC inline long double run(int numRandomBits) {
     eigen_assert(numRandomBits >= 0 && numRandomBits <= mantissaBits());
     EIGEN_USING_STD(memcpy);
@@ -131,8 +131,15 @@ struct random_longdouble_impl {
     uint64_t randomBits[2];
     long double result = 2.0L;
     memcpy(&randomBits, &result, Size);
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
     randomBits[0] |= getRandomBits<uint64_t>(numLowBits);
     randomBits[1] |= getRandomBits<uint64_t>(numHighBits);
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    randomBits[0] |= getRandomBits<uint64_t>(numHighBits);
+    randomBits[1] |= getRandomBits<uint64_t>(numLowBits);
+#else
+#error Unexpected or undefined __BYTE_ORDER__
+#endif
     memcpy(&result, &randomBits, Size);
     result -= 3.0L;
     return result;
@@ -140,7 +147,7 @@ struct random_longdouble_impl {
 };
 template <>
 struct random_longdouble_impl<false> {
-  static constexpr EIGEN_DEVICE_FUNC inline int mantissaBits() { return NumTraits<double>::digits() - 1; }
+  static constexpr EIGEN_DEVICE_FUNC int mantissaBits() { return NumTraits<double>::digits() - 1; }
   static EIGEN_DEVICE_FUNC inline long double run(int numRandomBits) {
     return static_cast<long double>(random_float_impl<double>::run(numRandomBits));
   }

@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Sun, 29 Mar 2026 16:46:09 -0700
+Subject: [PATCH 01/25] Move to wpi::util namespace
+
+---
+ json.cpp | 4 ++--
+ json.h   | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/json.cpp b/json.cpp
+index 0b3e3730406ecf3bf283a56d93b7cc8c3052d61d..645266767781cb3ebdb700bf6761e6928806806e 100644
+--- a/json.cpp
++++ b/json.cpp
+@@ -83,7 +83,7 @@
+ #define ON_LOGIC_ERROR(s) abort()
+ #endif
+ 
+-namespace jt {
++namespace wpi::util {
+ 
+ static const char kJsonStr[256] = {
+     1,  1,  1,  1,  1,  1,  1,  1, // 0000 ascii (0)
+@@ -1313,4 +1313,4 @@ Json::StatusToString(Json::Status status)
+     }
+ }
+ 
+-} // namespace jt
++} // namespace wpi::util
+diff --git a/json.h b/json.h
+index 6bb9087f452ae18dfad7c52b95de27c39a886341..c676e651d7c2591a0fb07d8d8b28738cbd1defab 100644
+--- a/json.h
++++ b/json.h
+@@ -20,7 +20,7 @@
+ #include <string>
+ #include <vector>
+ 
+-namespace jt {
++namespace wpi::util {
+ 
+ class Json
+ {
+@@ -221,4 +221,4 @@ class Json
+     static Status parse(Json&, const char*&, const char*, int, int);
+ };
+ 
+-} // namespace jt
++} // namespace wpi::util

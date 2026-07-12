@@ -1,0 +1,301 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+#include <chrono>
+#include <string>
+#include <thread>
+
+#include "wpi/hal/DriverStation.hpp"
+#include "wpi/hal/HAL.h"
+#include "wpi/hal/Main.h"
+#include "wpi/nt/NetworkTable.hpp"
+#include "wpi/system/Errors.hpp"
+#include "wpi/system/RuntimeType.hpp"
+#include "wpi/util/RuntimeCheck.h"
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/util/string.h"
+
+namespace wpi {
+
+int RunHALInitialization();
+
+namespace impl {
+#ifndef __FIRST_SYSTEMCORE__
+void ResetMotorSafety();
+#endif
+
+template <class Robot>
+void RunRobot(wpi::util::mutex& m, Robot** robot) {
+  try {
+    static Robot theRobot;
+    {
+      std::scoped_lock lock{m};
+      *robot = &theRobot;
+    }
+    theRobot.StartCompetition();
+  } catch (const wpi::RuntimeError& e) {
+    e.Report();
+    WPILIB_ReportError(
+        err::Error,
+        "The robot program quit unexpectedly."
+        " This is usually due to a code error.\n"
+        "  The above stacktrace can help determine where the error occurred.\n"
+        "  See https://wpilib.org/stacktrace for more information.\n");
+    throw;
+  } catch (const std::exception& e) {
+    wpi::hal::SendError(1, err::Error, e.what(), "", "", 1);
+    throw;
+  }
+}
+
+}  // namespace impl
+
+template <class Robot>
+int StartRobot() {
+  uint32_t foundMajor;
+  uint32_t foundMinor;
+  uint32_t expectedMajor;
+  uint32_t expectedMinor;
+  WPI_String runtimePath;
+  if (!WPI_IsRuntimeValid(&foundMajor, &foundMinor, &expectedMajor,
+                          &expectedMinor, &runtimePath)) {
+    // We could make this error better, however unlike Java, there is only a
+    // single scenario that could be occurring. The entirety of VS is too out
+    // of date. In most cases the linker should detect this, but not always.
+    wpi::util::println(
+        "Your copy of Visual Studio is out of date. Please update it.\n");
+    return 1;
+  }
+
+  int halInit = RunHALInitialization();
+  if (halInit != 0) {
+    return halInit;
+  }
+
+  static wpi::util::mutex m;
+  static wpi::util::condition_variable cv;
+  static Robot* robot = nullptr;
+  static bool exited = false;
+
+  if (HAL_HasMain()) {
+    std::thread thr([] {
+      try {
+        impl::RunRobot<Robot>(m, &robot);
+      } catch (...) {
+        HAL_ExitMain();
+        {
+          std::scoped_lock lock{m};
+          robot = nullptr;
+          exited = true;
+        }
+        cv.notify_all();
+        throw;
+      }
+
+      HAL_ExitMain();
+      {
+        std::scoped_lock lock{m};
+        robot = nullptr;
+        exited = true;
+      }
+      cv.notify_all();
+    });
+
+    HAL_RunMain();
+
+    // signal loop to exit
+    if (robot) {
+      robot->EndCompetition();
+    }
+
+    // prefer to join, but detach to exit if it doesn't exit in a timely manner
+    using namespace std::chrono_literals;
+    std::unique_lock lock{m};
+    if (cv.wait_for(lock, 1s, [] { return exited; })) {
+      thr.join();
+    } else {
+      thr.detach();
+    }
+  } else {
+    impl::RunRobot<Robot>(m, &robot);
+  }
+
+#ifndef __FIRST_SYSTEMCORE__
+  wpi::impl::ResetMotorSafety();
+#endif
+  HAL_Shutdown();
+
+  return 0;
+}
+
+/**
+ * Implement a Robot Program framework. The RobotBase class is intended to be
+ * subclassed to create a robot program. The user must implement
+ * StartCompetition() which will be called once and is not expected to exit. The
+ * user must also implement EndCompetition(), which signals to the code in
+ * StartCompetition() that it should exit.
+ *
+ * It is not recommended to subclass this class directly - instead subclass
+ * IterativeRobotBase or TimedRobot.
+ */
+class RobotBase {
+ public:
+  /**
+   * Determine if the Robot is currently enabled.
+   *
+   * @return True if the Robot is currently enabled by the Driver Station.
+   */
+  static bool IsEnabled();
+
+  /**
+   * Determine if the Robot is currently disabled.
+   *
+   * @return True if the Robot is currently disabled by the Driver Station.
+   */
+  static bool IsDisabled();
+
+  /**
+   * Determine if the robot is currently in Autonomous mode.
+   *
+   * @return True if the robot is currently operating Autonomously as determined
+   *         by the Driver Station.
+   */
+  static bool IsAutonomous();
+
+  /**
+   * Determine if the robot is currently in Autonomous mode and enabled.
+   *
+   * @return True if the robot us currently operating Autonomously while enabled
+   * as determined by the Driver Station.
+   */
+  static bool IsAutonomousEnabled();
+
+  /**
+   * Determine if the robot is currently in Operator Control mode.
+   *
+   * @return True if the robot is currently operating in Tele-Op mode as
+   *         determined by the Driver Station.
+   */
+  static bool IsTeleop();
+
+  /**
+   * Determine if the robot is current in Operator Control mode and enabled.
+   *
+   * @return True if the robot is currently operating in Tele-Op mode while
+   * enabled as determined by the Driver Station.
+   */
+  static bool IsTeleopEnabled();
+
+  /**
+   * Determine if the robot is currently in Utility mode.
+   *
+   * @return True if the robot is currently running in Utility mode as
+   * determined by the Driver Station.
+   */
+  static bool IsUtility();
+
+  /**
+   * Determine if the robot is currently in Utility mode and enabled.
+   *
+   * @return True if the robot is currently operating in Utility mode while
+   * enabled as determined by the Driver Station.
+   */
+  static bool IsUtilityEnabled();
+
+  /**
+   * Gets the currently selected operating mode of the driver station. Note this
+   * does not mean the robot is enabled; use IsEnabled() for that.
+   *
+   * @return the unique ID provided by the RobotState::AddOpMode() function;
+   * may return 0 or a unique ID not added, so callers should be prepared to
+   * handle that case
+   */
+  static int64_t GetOpModeId();
+
+  /**
+   * Gets the currently selected operating mode of the driver station. Note this
+   * does not mean the robot is enabled; use IsEnabled() for that.
+   *
+   * @return Operating mode string; may return a string not in the list of
+   * options, so callers should be prepared to handle that case
+   */
+  static std::string GetOpMode();
+
+  /**
+   * Returns the main thread ID.
+   *
+   * @return The main thread ID.
+   */
+  static std::thread::id GetThreadId();
+
+  /**
+   * Start the main robot code. This function will be called once and should not
+   * exit until signalled by EndCompetition()
+   */
+  virtual void StartCompetition() = 0;
+
+  /** Ends the main loop in StartCompetition(). */
+  virtual void EndCompetition() = 0;
+
+  /**
+   * Get the current runtime type.
+   *
+   * @return Current runtime type.
+   */
+  static RuntimeType GetRuntimeType();
+
+  /**
+   * Get if the robot is real.
+   *
+   * @return If the robot is running in the real world.
+   */
+  static constexpr bool IsReal() {
+#ifdef __FIRST_SYSTEMCORE__
+    return true;
+#else
+    return false;
+#endif
+  }
+
+  /**
+   * Get if the robot is a simulation.
+   *
+   * @return If the robot is running in simulation.
+   */
+  static constexpr bool IsSimulation() {
+#ifdef __FIRST_SYSTEMCORE__
+    return false;
+#else
+    return true;
+#endif
+  }
+
+  /**
+   * Constructor for a generic robot program.
+   *
+   * User code can be placed in the constructor that runs before the
+   * Autonomous or Operator Control period starts. The constructor will run to
+   * completion before Autonomous is entered.
+   *
+   * This must be used to ensure that the communications code starts. In the
+   * future it would be nice to put this code into it's own task that loads on
+   * boot so ensure that it runs.
+   */
+  RobotBase();
+
+  virtual ~RobotBase() = default;
+
+ protected:
+  RobotBase(RobotBase&&) = default;
+  RobotBase& operator=(RobotBase&&) = default;
+
+  static std::thread::id m_threadId;
+  NT_Listener connListenerHandle;
+};
+
+}  // namespace wpi

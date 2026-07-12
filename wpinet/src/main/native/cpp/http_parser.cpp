@@ -18,7 +18,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#include "wpinet/http_parser.h"
+#include "wpi/net/http_parser.hpp"
 #include <assert.h>
 #include <stddef.h>
 #include <ctype.h>
@@ -172,7 +172,7 @@ do {                                                                 \
 #define KEEP_ALIVE "keep-alive"
 #define CLOSE "close"
 
-namespace wpi {
+namespace wpi::net {
 
 
 static const char *method_strings[] =
@@ -1326,6 +1326,12 @@ reexecute:
                 parser->header_state = h_general;
               } else if (parser->index == sizeof(TRANSFER_ENCODING)-2) {
                 parser->header_state = h_transfer_encoding;
+                /* Multiple `Transfer-Encoding` headers should be treated as
+                 * one, but with values separate by a comma.
+                 *
+                 * See: https://tools.ietf.org/html/rfc7230#section-3.2.2
+                 */
+                parser->flags &= ~F_CHUNKED;
               }
               break;
 
@@ -2472,4 +2478,4 @@ http_parser_version(void) {
          HTTP_PARSER_VERSION_PATCH * 0x00001;
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

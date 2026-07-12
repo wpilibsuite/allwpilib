@@ -6,25 +6,25 @@
 
 #include <memory>
 
-#include "CallbackStore.h"
-#include "ConstBufferCallbackStore.h"
-#include "edu_wpi_first_hal_simulation_AddressableLEDDataJNI.h"
-#include "hal/simulation/AddressableLEDData.h"
+#include "CallbackStore.hpp"
+#include "ConstBufferCallbackStore.hpp"
+#include "org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI.h"
+#include "wpi/hal/simulation/AddressableLEDData.h"
 
-static_assert(sizeof(jbyte) * 4 == sizeof(HAL_AddressableLEDData));
+static_assert(sizeof(jbyte) * 3 == sizeof(HAL_AddressableLEDData));
 
-using namespace hal;
-using namespace wpi::java;
+using namespace wpi::hal;
+using namespace wpi::util::java;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI
  * Method:    registerInitializedCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_registerInitializedCallback
+Java_org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI_registerInitializedCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(
@@ -33,12 +33,12 @@ Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_registerInitializedCallb
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI
  * Method:    cancelInitializedCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_cancelInitializedCallback
+Java_org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI_cancelInitializedCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -46,87 +46,86 @@ Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_cancelInitializedCallbac
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI
  * Method:    getInitialized
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_getInitialized
+Java_org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI_getInitialized
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetAddressableLEDInitialized(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI
  * Method:    setInitialized
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_setInitialized
+Java_org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI_setInitialized
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetAddressableLEDInitialized(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
- * Method:    registerOutputPortCallback
+ * Class:     org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI
+ * Method:    registerStartCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_registerOutputPortCallback
+Java_org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI_registerStartCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
-  return sim::AllocateCallback(
-      env, index, callback, initialNotify,
-      &HALSIM_RegisterAddressableLEDOutputPortCallback);
+  return sim::AllocateCallback(env, index, callback, initialNotify,
+                               &HALSIM_RegisterAddressableLEDStartCallback);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
- * Method:    cancelOutputPortCallback
+ * Class:     org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI
+ * Method:    cancelStartCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_cancelOutputPortCallback
+Java_org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI_cancelStartCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
-                           &HALSIM_CancelAddressableLEDOutputPortCallback);
+                           &HALSIM_CancelAddressableLEDStartCallback);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
- * Method:    getOutputPort
+ * Class:     org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI
+ * Method:    getStart
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_getOutputPort
+Java_org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI_getStart
   (JNIEnv*, jclass, jint index)
 {
-  return HALSIM_GetAddressableLEDOutputPort(index);
+  return HALSIM_GetAddressableLEDStart(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
- * Method:    setOutputPort
+ * Class:     org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI
+ * Method:    setStart
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_setOutputPort
+Java_org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI_setStart
   (JNIEnv*, jclass, jint index, jint value)
 {
-  HALSIM_SetAddressableLEDOutputPort(index, value);
+  HALSIM_SetAddressableLEDStart(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI
  * Method:    registerLengthCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_registerLengthCallback
+Java_org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI_registerLengthCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -134,12 +133,12 @@ Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_registerLengthCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI
  * Method:    cancelLengthCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_cancelLengthCallback
+Java_org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI_cancelLengthCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -147,159 +146,101 @@ Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_cancelLengthCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI
  * Method:    getLength
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_getLength
+Java_org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI_getLength
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetAddressableLEDLength(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI
  * Method:    setLength
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_setLength
+Java_org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI_setLength
   (JNIEnv*, jclass, jint index, jint value)
 {
   HALSIM_SetAddressableLEDLength(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
- * Method:    registerRunningCallback
- * Signature: (ILjava/lang/Object;Z)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_registerRunningCallback
-  (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
-{
-  return sim::AllocateCallback(env, index, callback, initialNotify,
-                               &HALSIM_RegisterAddressableLEDRunningCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
- * Method:    cancelRunningCallback
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_cancelRunningCallback
-  (JNIEnv* env, jclass, jint index, jint handle)
-{
-  return sim::FreeCallback(env, handle, index,
-                           &HALSIM_CancelAddressableLEDRunningCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
- * Method:    getRunning
- * Signature: (I)Z
- */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_getRunning
-  (JNIEnv*, jclass, jint index)
-{
-  return HALSIM_GetAddressableLEDRunning(index);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
- * Method:    setRunning
- * Signature: (IZ)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_setRunning
-  (JNIEnv*, jclass, jint index, jboolean value)
-{
-  HALSIM_SetAddressableLEDRunning(index, value);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI
  * Method:    registerDataCallback
- * Signature: (ILjava/lang/Object;)I
+ * Signature: (Ljava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_registerDataCallback
-  (JNIEnv* env, jclass, jint index, jobject callback)
+Java_org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI_registerDataCallback
+  (JNIEnv* env, jclass, jobject callback)
 {
   return sim::AllocateConstBufferCallback(
-      env, index, callback, &HALSIM_RegisterAddressableLEDDataCallback);
+      env, -1, callback,
+      [](int32_t, HAL_ConstBufferCallback callback, void* param) {
+        return HALSIM_RegisterAddressableLEDDataCallback(callback, param);
+      });
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI
  * Method:    cancelDataCallback
- * Signature: (II)V
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_cancelDataCallback
-  (JNIEnv* env, jclass, jint index, jint handle)
+Java_org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI_cancelDataCallback
+  (JNIEnv* env, jclass, jint handle)
 {
-  sim::FreeConstBufferCallback(env, handle, index,
-                               &HALSIM_CancelAddressableLEDDataCallback);
+  sim::FreeConstBufferCallback(env, handle, -1, [](int32_t, int32_t uid) {
+    HALSIM_CancelAddressableLEDDataCallback(uid);
+  });
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI
  * Method:    getData
- * Signature: (I)[B
+ * Signature: (II)[B
  */
 JNIEXPORT jbyteArray JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_getData
-  (JNIEnv* env, jclass, jint index)
+Java_org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI_getData
+  (JNIEnv* env, jclass, jint start, jint length)
 {
   auto data =
-      std::make_unique<HAL_AddressableLEDData[]>(HAL_kAddressableLEDMaxLength);
-  int32_t length = HALSIM_GetAddressableLEDData(index, data.get());
+      std::make_unique<HAL_AddressableLEDData[]>(HAL_ADDRESSABLE_LED_MAX_LEN);
+  length = HALSIM_GetAddressableLEDData(start, length, data.get());
   return MakeJByteArray(
-      env, std::span(reinterpret_cast<jbyte*>(data.get()), length * 4));
+      env, std::span(reinterpret_cast<jbyte*>(data.get()), length * 3));
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI
  * Method:    setData
  * Signature: (I[B)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_setData
-  (JNIEnv* env, jclass, jint index, jbyteArray arr)
+Java_org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI_setData
+  (JNIEnv* env, jclass, jint start, jbyteArray arr)
 {
   JSpan<const jbyte> jArrRef{env, arr};
   auto arrRef = jArrRef.array();
   HALSIM_SetAddressableLEDData(
-      index, reinterpret_cast<const HAL_AddressableLEDData*>(arrRef.data()),
-      arrRef.size() / 4);
+      start, arrRef.size() / 3,
+      reinterpret_cast<const HAL_AddressableLEDData*>(arrRef.data()));
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI
  * Method:    resetData
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_resetData
+Java_org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI_resetData
   (JNIEnv*, jclass, jint index)
 {
   HALSIM_ResetAddressableLEDData(index);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
- * Method:    findForChannel
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_findForChannel
-  (JNIEnv*, jclass, jint channel)
-{
-  return HALSIM_FindAddressableLEDForChannel(channel);
 }
 
 }  // extern "C"

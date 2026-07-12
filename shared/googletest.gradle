@@ -1,6 +1,9 @@
 model {
     binaries {
         withType(GoogleTestTestSuiteBinarySpec).all {
+            if (it.name.contains('Catch2')) {
+                return;
+            }
             lib project: ':thirdparty:googletest', library: 'googletest', linkage: 'static'
         }
     }

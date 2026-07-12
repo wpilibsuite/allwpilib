@@ -1,0 +1,87 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Austin Schuh <austin.linux@gmail.com>
+Date: Sat, 9 Aug 2025 12:45:23 -0700
+Subject: [PATCH 3/3] Add build files from bzlmod for eigen
+
+This makes it so our vendored version of eigen matches the same API as
+the upstream eigen in bcr.
+---
+ BUILD.bazel | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ WORKSPACE   |  0
+ 2 files changed, 64 insertions(+)
+ create mode 100644 BUILD.bazel
+ create mode 100644 WORKSPACE
+
+diff --git a/BUILD.bazel b/BUILD.bazel
+new file mode 100644
+index 0000000000000000000000000000000000000000..38ce6cb417485fb37cafaf1e0f536e7ac56706b0
+--- /dev/null
++++ b/BUILD.bazel
+@@ -0,0 +1,64 @@
++load("@rules_cc//cc:cc_library.bzl", "cc_library")
++load("@rules_license//rules:license.bzl", "license")
++
++package(
++    default_applicable_licenses = [
++        ":license.APACHE",
++        ":license.BSD",
++        ":license.MINPACK",  # Only used by unsupported/** not by Eigen/**.
++        ":license.MPL2",
++    ],
++)
++
++exports_files(glob(["COPYING.*"]))
++
++# Note: Eigen is primarily an MPL2 library with small bits of code under other
++# licenses. Previous versions of Eigen contained LGPL code which needed to be
++# carefully excluded, but as of approximately 2023-02-07 all LGPL code has been
++# removed upstream so does not need any special handling here.
++
++license(
++    name = "license.APACHE",
++    license_kinds = ["@rules_license//licenses/spdx:Apache-2.0"],
++    license_text = "COPYING.APACHE",
++)
++
++license(
++    name = "license.BSD",
++    license_kinds = ["@rules_license//licenses/spdx:BSD-3-Clause"],
++    license_text = "COPYING.BSD",
++)
++
++license(
++    name = "license.MINPACK",
++    license_kinds = ["@rules_license//licenses/spdx:BSD-3-Clause-Attribution"],
++    license_text = "COPYING.MINPACK",
++)
++
++license(
++    name = "license.MPL2",
++    license_kinds = ["@rules_license//licenses/spdx:MPL-2.0"],
++    license_text = "COPYING.MPL2",
++)
++
++HDRS = glob(
++    [
++        "Eigen/**",
++        "unsupported/Eigen/**",
++    ],
++    exclude = [
++        # We don't want any documentation files.
++        "**/*.md",
++        "**/*.txt",
++        "unsupported/Eigen/NonLinearOptimization",
++        #"unsupported/Eigen/MatrixFunctions",
++        "unsupported/Eigen/Polynomials",
++    ],
++)
++
++cc_library(
++    name = "eigen",
++    hdrs = HDRS,
++    includes = ["."],
++    visibility = ["//visibility:public"],
++)
+diff --git a/WORKSPACE b/WORKSPACE
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391

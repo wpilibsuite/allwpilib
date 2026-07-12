@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/other/StringChooser.h"
+#include "wpi/glass/other/StringChooser.hpp"
 
 #include <imgui.h>
 
-using namespace glass;
+using namespace wpi::glass;
 
-void glass::DisplayStringChooser(StringChooserModel* model) {
+void wpi::glass::DisplayStringChooser(StringChooserModel* model) {
   auto& defaultValue = model->GetDefault();
   auto& selected = model->GetSelected();
   auto& active = model->GetActive();

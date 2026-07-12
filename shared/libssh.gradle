@@ -1,12 +1,13 @@
 nativeUtils {
     nativeDependencyContainer {
         libssh(getNativeDependencyTypeClass('WPIStaticMavenDependency')) {
-            groupId = "edu.wpi.first.thirdparty.frc2024"
+            groupId = "org.wpilib.thirdparty"
             artifactId = "libssh"
             headerClassifier = "headers"
             sourceClassifier = "sources"
             ext = "zip"
-            version = '0.105-1'
+            // Keep in sync with shared/bazel/thirdparty/integrity_helper.py
+            version = '2027-0.120-1'
             targetPlatforms.addAll(nativeUtils.wpi.platforms.allPlatforms)
         }
     }

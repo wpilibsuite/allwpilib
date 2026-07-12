@@ -1,0 +1,20 @@
+{
+  "game": "2024 FRC Crescendo",
+  "field-image": "2024-crescendo.png",
+  "field-corners": {
+    "top-left": [
+      151,
+      80
+    ],
+    "bottom-right": [
+      2962,
+      1477
+    ]
+  },
+  "field-size": [
+    54.27083,
+    26.9375
+  ],
+  "field-unit": "foot",
+  "program": "frc"
+}

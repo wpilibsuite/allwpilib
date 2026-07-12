@@ -1,0 +1,21 @@
+extra_includes:
+- wpi/util/sendable/SendableBuilder.hpp
+
+classes:
+  wpi::DigitalOutput:
+    ignored_bases:
+    - wpi::util::SendableHelper<DigitalOutput>
+    methods:
+      DigitalOutput:
+      Set:
+      Get:
+      GetChannel:
+      Pulse:
+      IsPulsing:
+      SetPWMRate:
+      EnablePPS:
+      EnablePWM:
+      DisablePWM:
+      UpdateDutyCycle:
+      SetSimDevice:
+      InitSendable:

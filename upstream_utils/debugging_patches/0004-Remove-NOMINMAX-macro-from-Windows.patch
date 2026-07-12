@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Thu, 21 Nov 2024 18:49:53 -0800
-Subject: [PATCH 4/4] Remove NOMINMAX macro from Windows
+Subject: [PATCH 4/5] Remove NOMINMAX macro from Windows
 
 ---
  src/windows.cxx | 1 -

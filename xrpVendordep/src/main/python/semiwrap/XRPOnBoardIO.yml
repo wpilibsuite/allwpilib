@@ -1,0 +1,10 @@
+classes:
+  wpi::xrp::XRPOnBoardIO:
+    attributes:
+      kMessageInterval:
+      m_nextMessageTime:
+    methods:
+      XRPOnBoardIO:
+      GetUserButtonPressed:
+      SetLed:
+      GetLed:

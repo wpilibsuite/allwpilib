@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "motorcontrol/MockMotorController.h"
+#include "motorcontrol/MockMotorController.hpp"
 
-using namespace frc;
+using namespace wpi;
 
-void MockMotorController::Set(double speed) {
-  m_speed = m_isInverted ? -speed : speed;
+void MockMotorController::SetThrottle(double throttle) {
+  m_throttle = m_isInverted ? -throttle : throttle;
 }
 
-double MockMotorController::Get() const {
-  return m_speed;
+double MockMotorController::GetThrottle() const {
+  return m_throttle;
 }
 
 void MockMotorController::SetInverted(bool isInverted) {
@@ -23,9 +23,5 @@ bool MockMotorController::GetInverted() const {
 }
 
 void MockMotorController::Disable() {
-  m_speed = 0;
-}
-
-void MockMotorController::StopMotor() {
-  Disable();
+  m_throttle = 0;
 }

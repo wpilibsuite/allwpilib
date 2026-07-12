@@ -42,6 +42,26 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Packet pfrexp_generic_get_biased_exponent(
 template <typename Packet>
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Packet pldexp_generic(const Packet& a, const Packet& exponent);
 
+// Explicitly multiplies
+//    a * (2^e)
+// clamping e to the range
+// [NumTraits<Scalar>::min_exponent()-2, NumTraits<Scalar>::max_exponent()]
+//
+// This is approx 7x faster than pldexp_impl, but will prematurely over/underflow
+// if 2^e doesn't fit into a normal floating-point Scalar.
+//
+// Assumes IEEE floating point format
+template <typename Packet>
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Packet pldexp_fast(const Packet& a, const Packet& exponent);
+
+/** \internal \returns cbrt(x) for single precision float */
+template <typename Packet>
+EIGEN_DEFINE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet pcbrt_float(const Packet& x_in);
+
+/** \internal \returns cbrt(x) for double precision float */
+template <typename Packet>
+EIGEN_DEFINE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet pcbrt_double(const Packet& x_in);
+
 /** \internal \returns log(x) for single precision float */
 template <typename Packet>
 EIGEN_DEFINE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet plog_float(const Packet _x);
@@ -183,6 +203,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Packet generic_round(const Packet& a);
   EIGEN_FLOAT_PACKET_FUNCTION(log, PACKET)                 \
   EIGEN_FLOAT_PACKET_FUNCTION(log2, PACKET)                \
   EIGEN_FLOAT_PACKET_FUNCTION(exp, PACKET)                 \
+  EIGEN_FLOAT_PACKET_FUNCTION(cbrt, PACKET)                \
   EIGEN_GENERIC_PACKET_FUNCTION(expm1, PACKET)             \
   EIGEN_GENERIC_PACKET_FUNCTION(exp2, PACKET)              \
   EIGEN_GENERIC_PACKET_FUNCTION(log1p, PACKET)             \
@@ -196,6 +217,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Packet generic_round(const Packet& a);
   EIGEN_DOUBLE_PACKET_FUNCTION(log2, PACKET)                \
   EIGEN_DOUBLE_PACKET_FUNCTION(exp, PACKET)                 \
   EIGEN_DOUBLE_PACKET_FUNCTION(tanh, PACKET)                \
+  EIGEN_DOUBLE_PACKET_FUNCTION(cbrt, PACKET)                \
   EIGEN_GENERIC_PACKET_FUNCTION(atan, PACKET)               \
   EIGEN_GENERIC_PACKET_FUNCTION(exp2, PACKET)
 

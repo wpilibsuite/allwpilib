@@ -1,21 +1,21 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:17:19 -0400
-Subject: [PATCH 04/36] Threading updates
+Subject: [PATCH 04/33] Threading updates
 
 - Remove guards for threads and exception
-- Prefer scope gaurd over lock gaurd
+- Replace std::lock_guard with std::scoped_lock
 ---
  llvm/include/llvm/Support/Compiler.h |  6 -----
- llvm/lib/Support/ErrorHandling.cpp   | 38 +++++-----------------------
- llvm/lib/Support/ManagedStatic.cpp   | 10 ++++----
- 3 files changed, 11 insertions(+), 43 deletions(-)
+ llvm/lib/Support/ErrorHandling.cpp   | 39 +++++-----------------------
+ llvm/lib/Support/ManagedStatic.cpp   | 10 +++----
+ 3 files changed, 11 insertions(+), 44 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index 6789f0413d8dc94cb465b6e66506b036449ee186..e608f8ea3a837a04d9c29c8bb7a1fab527d512bb 100644
+index a160164a33903408d60d6e8a57462a3b8c8623e2..f2b356ef04be557795afe9c356acc4af53fcdf52 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
-@@ -555,7 +555,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -665,7 +665,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  /// initialize to some constant value. In almost all circumstances this is most
  /// appropriate for use with a pointer, integer, or small aggregation of
  /// pointers and integers.
@@ -23,7 +23,7 @@ index 6789f0413d8dc94cb465b6e66506b036449ee186..e608f8ea3a837a04d9c29c8bb7a1fab5
  #if __has_feature(cxx_thread_local) || defined(_MSC_VER)
  #define LLVM_THREAD_LOCAL thread_local
  #else
-@@ -563,11 +562,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -673,11 +672,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  // we only need the restricted functionality that provides.
  #define LLVM_THREAD_LOCAL __thread
  #endif
@@ -36,10 +36,18 @@ index 6789f0413d8dc94cb465b6e66506b036449ee186..e608f8ea3a837a04d9c29c8bb7a1fab5
  /// \macro LLVM_ENABLE_EXCEPTIONS
  /// Whether LLVM is built with exception support.
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 0aa13a0f78eb370b2a673ca4a773f26820575052..637b669a7d0dae69ef4b34955f21a9fb8ba1276e 100644
+index fc9d118e85508cdf86553bb63cce4a1c567045b7..7ab8a97bb85929615fc751a1eda1fee62004a26f 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -44,7 +44,6 @@ static void *ErrorHandlerUserData = nullptr;
+@@ -15,7 +15,6 @@
+ #include "llvm-c/ErrorHandling.h"
+ #include "llvm/ADT/SmallVector.h"
+ #include "llvm/Config/config.h"
+-#include "llvm/Config/llvm-config.h" // for LLVM_ENABLE_THREADS
+ #include "llvm/Support/Debug.h"
+ #include "llvm/Support/Errc.h"
+ #include "llvm/Support/Errno.h"
+@@ -46,7 +45,6 @@ static void *ErrorHandlerUserData = nullptr;
  static fatal_error_handler_t BadAllocErrorHandler = nullptr;
  static void *BadAllocErrorHandlerUserData = nullptr;
  
@@ -47,11 +55,15 @@ index 0aa13a0f78eb370b2a673ca4a773f26820575052..637b669a7d0dae69ef4b34955f21a9fb
  // Mutexes to synchronize installing error handlers and calling error handlers.
  // Do not use ManagedStatic, or that may allocate memory while attempting to
  // report an OOM.
-@@ -58,22 +57,17 @@ static void *BadAllocErrorHandlerUserData = nullptr;
+@@ -60,7 +58,6 @@ static void *BadAllocErrorHandlerUserData = nullptr;
  // builds. We can remove these ifdefs if that script goes away.
  static std::mutex ErrorHandlerMutex;
  static std::mutex BadAllocErrorHandlerMutex;
 -#endif
+ 
+ static bool write_retry(int fd, const char *buf, size_t count) {
+   while (count > 0) {
+@@ -75,18 +72,14 @@ static bool write_retry(int fd, const char *buf, size_t count) {
  
  void llvm::install_fatal_error_handler(fatal_error_handler_t handler,
                                         void *user_data) {
@@ -72,7 +84,7 @@ index 0aa13a0f78eb370b2a673ca4a773f26820575052..637b669a7d0dae69ef4b34955f21a9fb
    ErrorHandler = nullptr;
    ErrorHandlerUserData = nullptr;
  }
-@@ -92,9 +86,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
+@@ -105,9 +98,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
    {
      // Only acquire the mutex while reading the handler, so as not to invoke a
      // user-supplied callback under a lock.
@@ -83,7 +95,7 @@ index 0aa13a0f78eb370b2a673ca4a773f26820575052..637b669a7d0dae69ef4b34955f21a9fb
      handler = ErrorHandler;
      handlerData = ErrorHandlerUserData;
    }
-@@ -126,18 +118,14 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
+@@ -157,9 +148,7 @@ void llvm::reportFatalUsageError(std::string_view reason) {
  
  void llvm::install_bad_alloc_error_handler(fatal_error_handler_t handler,
                                             void *user_data) {
@@ -91,9 +103,10 @@ index 0aa13a0f78eb370b2a673ca4a773f26820575052..637b669a7d0dae69ef4b34955f21a9fb
 -  std::lock_guard<std::mutex> Lock(BadAllocErrorHandlerMutex);
 -#endif
 +  std::scoped_lock Lock(BadAllocErrorHandlerMutex);
-   assert(!ErrorHandler && "Bad alloc error handler already registered!\n");
+   assert(!BadAllocErrorHandler &&
+          "Bad alloc error handler already registered!\n");
    BadAllocErrorHandler = handler;
-   BadAllocErrorHandlerUserData = user_data;
+@@ -167,9 +156,7 @@ void llvm::install_bad_alloc_error_handler(fatal_error_handler_t handler,
  }
  
  void llvm::remove_bad_alloc_error_handler() {
@@ -104,7 +117,7 @@ index 0aa13a0f78eb370b2a673ca4a773f26820575052..637b669a7d0dae69ef4b34955f21a9fb
    BadAllocErrorHandler = nullptr;
    BadAllocErrorHandlerUserData = nullptr;
  }
-@@ -148,9 +136,7 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+@@ -180,9 +167,7 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
    {
      // Only acquire the mutex while reading the handler, so as not to invoke a
      // user-supplied callback under a lock.
@@ -115,7 +128,7 @@ index 0aa13a0f78eb370b2a673ca4a773f26820575052..637b669a7d0dae69ef4b34955f21a9fb
      Handler = BadAllocErrorHandler;
      HandlerData = BadAllocErrorHandlerUserData;
    }
-@@ -160,10 +146,6 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+@@ -192,10 +177,6 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
      llvm_unreachable("bad alloc handler should not return");
    }
  
@@ -126,9 +139,9 @@ index 0aa13a0f78eb370b2a673ca4a773f26820575052..637b669a7d0dae69ef4b34955f21a9fb
    // Don't call the normal error handler. It may allocate memory. Directly write
    // an OOM to stderr and abort.
    const char *OOMMessage = "LLVM ERROR: out of memory\n";
-@@ -172,15 +154,8 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
-   (void)!::write(2, Reason, strlen(Reason));
-   (void)!::write(2, Newline, strlen(Newline));
+@@ -204,15 +185,8 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+   write_retry(2, Reason, strlen(Reason));
+   write_retry(2, Newline, strlen(Newline));
    abort();
 -#endif
  }
@@ -142,7 +155,7 @@ index 0aa13a0f78eb370b2a673ca4a773f26820575052..637b669a7d0dae69ef4b34955f21a9fb
  // Causes crash on allocation failure. It is called prior to the handler set by
  // 'install_bad_alloc_error_handler'.
  static void out_of_memory_new_handler() {
-@@ -195,7 +170,6 @@ void llvm::install_out_of_memory_new_handler() {
+@@ -227,7 +201,6 @@ void llvm::install_out_of_memory_new_handler() {
    assert((old == nullptr || old == out_of_memory_new_handler) &&
           "new-handler already installed");
  }

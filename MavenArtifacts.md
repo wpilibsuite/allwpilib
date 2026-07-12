@@ -14,58 +14,31 @@ The development repository is where development releases of every commit to [mai
 ## Artifact classifiers
 We provide two base types of artifacts.
 
-The first types are Java artifacts. These are usually published as `jar` files. Usually, the actual jar file is published with no classifier. The sources are published with the `-sources` classifier, and the javadocs are published with the `-javadoc` classifier.
-
-The second types are native artifacts. These are usually published as `zip` files (except for the `JNI` artifact types, which are `jar` files. See below for information on this). The `-sources` and `-headers` classifiers contain the sources and headers respectively for the library. Each artifact also contains a classifier for each platform we publish. This platform is in the format `{os}{arch}`. The platform artifact only contains the binaries for a specific platform. In addition, we provide a `-all` classifier. This classifier combines all of the platform artifacts into a single artifact. This is useful for tools that cannot determine what version to use during builds. However, we recommend using the platform specific classifier when possible. Note that the binary artifacts never contain the headers, you always need the `-headers` classifier to get those.
-
-## Artifact Names
-
-WPILib builds four different types of artifacts.
-
-##### C++ Only Libraries
-When we publish C++ only libraries, they are published with the base artifact name as their artifact name, with a `-cpp` extension. All dependencies for the library are linked as shared libraries to the binary.
-
+The first types are Java artifacts. These are usually published as `jar` files. Usually, the actual jar file is published with no classifier. The sources are published with the `-sources` classifier, and the javadocs are published with the `-javadoc` classifier. These artifacts are published with the base artifact name as their artifact ID, with a `-java` extension.
 
 Example:
 ```
-edu.wpi.first.wpilibc:wpilibc-cpp:version:classifier@zip
+org.wpilib.wpilibj:wpilibj-java:version
 ```
 
-#### Java Only Libraries
-When we publish Java only libraries, they are published with the base artifact name as their artifact name, with a `-java` extension.
+The second types are native artifacts. These are usually published as `zip` files. The `-sources` and `-headers` classifiers contain the sources and headers respectively for the library. Each artifact also contains a classifier for each platform we publish. This platform is in the format `{os}{arch}`. The full list of supported platforms can be found in [native-utils in the Platforms nested class](https://github.com/wpilibsuite/native-utils/blob/main/src/main/java/org/wpilib/nativeutils/WPINativeUtilsExtension.java). If the library is built statically, it will have `static` appended to the classifier. Additionally, if the library was built in debug mode, `debug` will be appended to the classifier. The platform artifact only contains the binaries for a specific platform. Note that the binary artifacts never contain the headers, you always need the `-headers` classifier to get those.
+
+If the library is Java and C++ and has a JNI component, the native artifact will have a shared library containing JNI entrypoints alongside the C++ shared library. This JNI shared library will have a `jni` suffix in the file name.
+
+Native artifacts are published with the base artifact name as their artifact ID, with a `-cpp` extension.
 
 Example:
 ```
-edu.wpi.first.wpilibj:wpilibj-java:version
-```
-
-#### C++/Java Libraries without JNI
-For libraries that are both C++ and Java, but without a JNI component, the C++ component is published with the `basename-cpp` artifact name, and the Java component is published with the `basename-java` artifact name.
-
-Example:
-```
-edu.wpi.first.wpiutil:wpiutil-cpp:version:classifier@zip (C++)
-edu.wpi.first.wpiutil:wpiutil-java:version (Java)
-```
-
-#### C++/Java Libraries with JNI
-For libraries that are both C++ and Java with a JNI component there are three different artifact names. For Java, the component is published as `basename-java`. For C++, the `basename-cpp` artifact contains the C++ artifacts with all dependencies linked as shared libraries to the binary. These binaries DO contain the JNI entry points. The `basename-jni` artifact contains identical C++ binaries to the `-cpp` artifact, however all of its dependencies are statically linked, and only the JNI and C entry points are exported.
-
-The `-jni` artifact should only be used in cases where you want to create a self contained Java application where the native artifacts are embedded in the jar. Note in an extraction scenario, extending off of the library is never supported, which is why the C++ entry points are not exposed. The name of the library is randomly generated during extraction. For pretty much all cases, and if you ever want to extend from a native library, you should use the `-cpp` artifacts. GradleRIO uses the `-cpp` artifacts for all platforms, even desktop, for this reason.
-
-Example:
-```
-edu.wpi.first.ntcore:ntcore-cpp:version:classifier@zip (C++)
-edu.wpi.first.ntcore:ntcore-jni:version:classifier (JNI jar library)
-edu.wpi.first.ntcore:ntcore-java:version (Java)
+org.wpilib.wpimath:wpimath-cpp:version:classifier@zip
+org.wpilib.wpimath:wpimath-cpp:version:windowsx86-64staticdebug@zip
 ```
 
 ## Provided Artifacts
-This repository provides the following artifacts. Below each artifact is its dependencies. Note if ever using the `-jni` artifacts, no dependencies are needed for native binaries.
+This repository provides the following artifacts. Below each artifact is its dependencies.
 
 For C++, if building with static dependencies, the listed order should be the link order in your linker.
 
-All artifacts are based at `edu.wpi.first.artifactname` in the repository.
+All artifacts are based at `org.wpilib.artifactname` in the repository.
 
 * wpiutil
 
@@ -79,32 +52,33 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * wpiutil
 
 * ntcore
-  * wpiutil
   * wpinet
+  * wpiutil
 
 * glass/libglass
-  * wpiutil
-  * wpimath
   * wpigui
+  * wpimath
+  * wpiutil
 
 * glass/libglassnt
-  * wpiutil
-  * wpinet
-  * ntcore
-  * wpimath
   * wpigui
+  * ntcore
+  * wpinet
+  * wpimath
+  * wpiutil
 
 * hal
+  * ntcore
   * wpiutil
 
 * halsim
-  * wpiutil
-  * wpinet
+  * libglassnt
+  * libglass
   * ntcore
   * wpimath
   * wpigui
-  * libglass
-  * libglassnt
+  * wpinet
+  * wpiutil
 
 * cscore
   * opencv
@@ -135,7 +109,7 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * wpinet
   * wpiutil
 
-* wpilibNewCommands
+* commandsv2
   * wpilibc
   * hal
   * cameraserver
@@ -153,12 +127,16 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
 
 ### Third Party Artifacts
 
-This repository provides the builds of the following third party software.
+This repository provides the builds of the following third party software:
 
-All artifacts are based at `edu.wpi.first.thirdparty.frcYEAR` in the repository.
-
-* apriltaglib
 * googletest
 * imgui
-* opencv
-* libssh
+
+Other software can be found in their corresponding GitHub repositories:
+
+* ceres: https://github.com/wpilibsuite/thirdparty-ceres
+* gtsam: https://github.com/wpilibsuite/thirdparty-gtsam
+* opencv: https://github.com/wpilibsuite/thirdparty-opencv
+* libssh: https://github.com/wpilibsuite/thirdparty-libssh
+
+All artifacts are based at `org.wpilib.thirdparty` in the repository.

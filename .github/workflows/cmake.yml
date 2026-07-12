@@ -16,19 +16,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             name: Linux
-            container: wpilib/roborio-cross-ubuntu:2025-22.04
-            flags: "--preset with-java-and-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
-          - os: macOS-14
+            container: wpilib/systemcore-cross-debian:trixie
+            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON"
+          - os: macOS-15
             name: macOS
             container: ""
-            env: "PATH=\"/opt/homebrew/opt/protobuf@3/bin:$PATH\""
-            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON -DCMAKE_LIBRARY_PATH=/opt/homebrew/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/opt/homebrew/opt/protobuf@3/include -DProtobuf_PROTOC_EXECUTABLE=/opt/homebrew/opt/protobuf@3/bin/protoc"
+            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON"
           - os: windows-2022
             name: Windows
             container: ""
-            flags: '--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE="$Env:RUNNER_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release'
+            flags: '--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON -DWPILIB_USE_SYSTEM_LIBUV=ON -DWPILIB_USE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE="$Env:RUNNER_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release'
 
     name: "Build - ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
@@ -36,11 +35,17 @@ jobs:
     steps:
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java libprotobuf-dev protobuf-compiler ninja-build
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev ninja-build
+
+      - name: Setup avahi-daemon
+        if: runner.os == 'Linux'
+        run: |
+          sudo service dbus start
+          sudo avahi-daemon -D
 
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
-        run: brew install opencv protobuf@3 ninja
+        run: brew install opencv ninja
 
       - uses: ilammy/msvc-dev-cmd@v1.13.0
         if: runner.os == 'Windows'
@@ -50,16 +55,16 @@ jobs:
         uses: lukka/get-cmake@v3.29.3
 
       - name: Install sccache
-        uses: mozilla-actions/sccache-action@v0.0.5
+        uses: mozilla-actions/sccache-action@v0.0.10
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Run vcpkg (Windows only)
         if: runner.os == 'Windows'
         uses: lukka/run-vcpkg@v11.5
         with:
           vcpkgDirectory: ${{ runner.workspace }}/vcpkg
-          vcpkgGitCommitId: 37c3e63a1306562f7f59c4c3c8892ddd50fdf992 # HEAD on 2024-02-24
+          vcpkgGitCommitId: 74e6536215718009aae747d86d84b78376bf9e09 # HEAD on 2025-10-17
 
       - name: configure
         run: cmake ${{ matrix.flags }}

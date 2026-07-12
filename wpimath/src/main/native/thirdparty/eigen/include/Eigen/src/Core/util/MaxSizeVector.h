@@ -13,7 +13,7 @@
 namespace Eigen {
 
 /** \class MaxSizeVector
- * \ingroup Core
+ * \ingroup Core_Module
  *
  * \brief The MaxSizeVector class.
  *

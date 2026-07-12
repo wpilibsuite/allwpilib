@@ -1,0 +1,7 @@
+extra_includes:
+- wpi/util/sendable/SendableBuilder.hpp
+
+classes:
+  wpi::Spark:
+    methods:
+      Spark:

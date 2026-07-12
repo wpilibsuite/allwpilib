@@ -2,17 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/hardware/LEDDisplay.h"
+#include "wpi/glass/hardware/LEDDisplay.hpp"
 
 #include <vector>
 
-#include <wpi/SmallVector.h>
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/support/ExtraGuiWidgets.hpp"
+#include "wpi/util/SmallVector.hpp"
 
-#include "glass/Context.h"
-#include "glass/Storage.h"
-#include "glass/support/ExtraGuiWidgets.h"
-
-using namespace glass;
+using namespace wpi::glass;
 
 namespace {
 struct IndicatorData {
@@ -21,11 +20,10 @@ struct IndicatorData {
 };
 }  // namespace
 
-void glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
-  wpi::SmallVector<LEDDisplayModel::Data, 64> dataBuf;
+void wpi::glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
+  wpi::util::SmallVector<LEDDisplayModel::Data, 64> dataBuf;
   auto data = model->GetData(dataBuf);
   int length = data.size();
-  bool running = model->IsRunning();
   auto& storage = GetStorage();
 
   int& numColumns = storage.GetInt("columns", 10);
@@ -33,9 +31,8 @@ void glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
   int& order = storage.GetInt("order", LEDConfig::RowMajor);
   int& start = storage.GetInt("start", LEDConfig::UpperLeft);
 
-  ImGui::PushItemWidth(ImGui::GetFontSize() * 6);
+  ImGui::PushItemWidth(ImGui::GetFontSize() * 7);
   ImGui::LabelText("Length", "%d", length);
-  ImGui::LabelText("Running", "%s", running ? "Yes" : "No");
   ImGui::InputInt("Columns", &numColumns);
   {
     static const char* options[] = {"Row Major", "Column Major"};
@@ -64,16 +61,9 @@ void glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
   if (length > static_cast<int>(iData->colors.size())) {
     iData->colors.resize(length);
   }
-  if (!running) {
-    iData->colors[0] = IM_COL32(128, 128, 128, 255);
-    for (int j = 0; j < length; ++j) {
-      iData->values[j] = -1;
-    }
-  } else {
-    for (int j = 0; j < length; ++j) {
-      iData->values[j] = j + 1;
-      iData->colors[j] = IM_COL32(data[j].r, data[j].g, data[j].b, 255);
-    }
+  for (int j = 0; j < length; ++j) {
+    iData->values[j] = j + 1;
+    iData->colors[j] = IM_COL32(data[j].r, data[j].g, data[j].b, 255);
   }
 
   LEDConfig config;
@@ -85,7 +75,7 @@ void glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
            config);
 }
 
-void glass::DisplayLEDDisplays(LEDDisplaysModel* model) {
+void wpi::glass::DisplayLEDDisplays(LEDDisplaysModel* model) {
   bool hasAny = false;
 
   model->ForEachLEDDisplay([&](LEDDisplayModel& display, int i) {

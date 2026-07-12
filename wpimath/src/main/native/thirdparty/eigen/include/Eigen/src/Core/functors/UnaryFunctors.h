@@ -558,11 +558,15 @@ struct functor_traits<scalar_sqrt_op<bool>> {
 template <typename Scalar>
 struct scalar_cbrt_op {
   EIGEN_DEVICE_FUNC inline const Scalar operator()(const Scalar& a) const { return numext::cbrt(a); }
+  template <typename Packet>
+  EIGEN_DEVICE_FUNC inline Packet packetOp(const Packet& a) const {
+    return internal::pcbrt(a);
+  }
 };
 
 template <typename Scalar>
 struct functor_traits<scalar_cbrt_op<Scalar>> {
-  enum { Cost = 5 * NumTraits<Scalar>::MulCost, PacketAccess = false };
+  enum { Cost = 20 * NumTraits<Scalar>::MulCost, PacketAccess = packet_traits<Scalar>::HasCbrt };
 };
 
 /** \internal
@@ -1292,7 +1296,7 @@ struct scalar_logistic_op<float> {
     p = pmadd(r2, p, p_low);
 
     // 4. Undo subtractive range reduction exp(m*ln(2) + r) = 2^m * exp(r).
-    Packet e = pldexp_fast_impl<Packet>::run(p, m);
+    Packet e = pldexp_fast(p, m);
 
     // 5. Undo multiplicative range reduction by using exp(r) = exp(r/2)^2.
     e = pmul(e, e);

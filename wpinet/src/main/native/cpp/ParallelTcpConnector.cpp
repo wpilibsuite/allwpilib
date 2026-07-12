@@ -2,29 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/ParallelTcpConnector.h"
+#include "wpi/net/ParallelTcpConnector.hpp"
 
 #include <cstring>
+#include <format>
 #include <functional>
 #include <memory>
 #include <string>
 #include <utility>
 
-#include <fmt/format.h>
-#include <wpi/Logger.h>
+#include "wpi/net/uv/GetAddrInfo.hpp"
+#include "wpi/net/uv/Loop.hpp"
+#include "wpi/net/uv/Tcp.hpp"
+#include "wpi/net/uv/Timer.hpp"
+#include "wpi/net/uv/util.hpp"
+#include "wpi/util/Logger.hpp"
 
-#include "wpinet/uv/GetAddrInfo.h"
-#include "wpinet/uv/Loop.h"
-#include "wpinet/uv/Tcp.h"
-#include "wpinet/uv/Timer.h"
-#include "wpinet/uv/util.h"
-
-using namespace wpi;
+using namespace wpi::net;
 
 ParallelTcpConnector::ParallelTcpConnector(
-    wpi::uv::Loop& loop, wpi::uv::Timer::Time reconnectRate,
-    wpi::Logger& logger, std::function<void(wpi::uv::Tcp& tcp)> connected,
-    bool ipv4Only, const private_init&)
+    wpi::net::uv::Loop& loop, wpi::net::uv::Timer::Time reconnectRate,
+    wpi::util::Logger& logger,
+    std::function<void(wpi::net::uv::Tcp& tcp)> connected, bool ipv4Only,
+    const private_init&)
     : m_loop{loop},
       m_logger{logger},
       m_reconnectRate{reconnectRate},
@@ -141,7 +141,7 @@ void ParallelTcpConnector::Connect() {
             auto connreq = std::make_shared<uv::TcpConnectReq>();
             connreq->connected.connect(
                 [this, tcp = tcp.get()] {
-                  if (m_logger.min_level() <= wpi::WPI_LOG_DEBUG4) {
+                  if (m_logger.min_level() <= wpi::util::WPI_LOG_DEBUG4) {
                     std::string ip;
                     unsigned int port = 0;
                     uv::AddrToName(tcp->GetPeer(), &ip, &port);
@@ -167,7 +167,7 @@ void ParallelTcpConnector::Connect() {
               }
             };
 
-            if (m_logger.min_level() <= wpi::WPI_LOG_DEBUG4) {
+            if (m_logger.min_level() <= wpi::util::WPI_LOG_DEBUG4) {
               std::string ip;
               unsigned int port = 0;
               uv::AddrToName(*reinterpret_cast<sockaddr_storage*>(ai->ai_addr),
@@ -198,12 +198,12 @@ void ParallelTcpConnector::Connect() {
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_NUMERICSERV | AI_ADDRCONFIG;
-    uv::GetAddrInfo(m_loop, req, server.first, fmt::format("{}", server.second),
+    uv::GetAddrInfo(m_loop, req, server.first, std::format("{}", server.second),
                     hints);
   }
 }
 
-void ParallelTcpConnector::CancelAll(wpi::uv::Tcp* except) {
+void ParallelTcpConnector::CancelAll(wpi::net::uv::Tcp* except) {
   WPI_DEBUG4(m_logger, "canceling previous attempts");
   for (auto&& resolverWeak : m_resolvers) {
     if (auto resolver = resolverWeak.lock()) {

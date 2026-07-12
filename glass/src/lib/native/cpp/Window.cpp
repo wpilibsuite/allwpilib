@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/Window.h"
+#include "wpi/glass/Window.hpp"
 
+#include <format>
 #include <string>
 
-#include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 
-#include "glass/Context.h"
-#include "glass/Storage.h"
-#include "glass/support/ExtraGuiWidgets.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/support/ExtraGuiWidgets.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 Window::Window(Storage& storage, std::string_view id,
                Visibility defaultVisibility)
@@ -57,12 +57,22 @@ void Window::Display() {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_padding);
   }
 
-  std::string label;
+  std::string* name = &m_name;
   if (m_name.empty()) {
-    label = fmt::format("{}###{}", m_defaultName, m_id);
-  } else {
-    label = fmt::format("{}###{}", m_name, m_id);
+    name = &m_defaultName;
   }
+  std::string label = std::format("{}###{}", *name, m_id);
+
+  // Accounts for size of title, collapse button, and close button
+  float minWidth =
+      ImGui::CalcTextSize(name->c_str()).x + ImGui::GetFontSize() * 2 +
+      ImGui::GetStyle().ItemInnerSpacing.x * 3 +
+      ImGui::GetStyle().FramePadding.x * 2 + ImGui::GetStyle().WindowBorderSize;
+  // Accounts for size of hamburger button
+  if (m_renamePopupEnabled || m_view->HasSettings()) {
+    minWidth += ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.x;
+  }
+  ImGui::SetNextWindowSizeConstraints({minWidth, 0}, ImVec2{FLT_MAX, FLT_MAX});
 
   if (Begin(label.c_str(), &m_visible, m_flags)) {
     if (m_renamePopupEnabled || m_view->HasSettings()) {

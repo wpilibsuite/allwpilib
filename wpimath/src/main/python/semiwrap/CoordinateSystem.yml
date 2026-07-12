@@ -1,0 +1,13 @@
+classes:
+  wpi::math::CoordinateSystem:
+    methods:
+      CoordinateSystem:
+      NWU:
+      EDN:
+      NED:
+      Convert:
+        overloads:
+          const Translation3d&, const CoordinateSystem&, const CoordinateSystem&:
+          const Rotation3d&, const CoordinateSystem&, const CoordinateSystem&:
+          const Pose3d&, const CoordinateSystem&, const CoordinateSystem&:
+          const Transform3d&, const CoordinateSystem&, const CoordinateSystem&:

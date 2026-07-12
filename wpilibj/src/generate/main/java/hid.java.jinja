@@ -6,14 +6,18 @@
 {% macro capitalize_first(string) -%}
 {{ string[0]|capitalize + string[1:] }}
 {%- endmacro %}
-package edu.wpi.first.wpilibj;
+package org.wpilib.driverstation;
 
-{{ "// " if SkipReporting }}import edu.wpi.first.hal.FRCNetComm.tResourceType;
-{{ "// " if SkipReporting }}import edu.wpi.first.hal.HAL;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.event.BooleanEvent;
-import edu.wpi.first.wpilibj.event.EventLoop;
+import java.util.EnumSet;
+import java.util.Objects;
+import org.wpilib.driverstation.GenericHID.HIDType;
+import org.wpilib.driverstation.GenericHID.RumbleType;
+import org.wpilib.driverstation.GenericHID.SupportedOutput;
+import org.wpilib.event.BooleanEvent;
+import org.wpilib.event.EventLoop;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
 
 /**
  * Handle input from {{ ConsoleName }} controllers connected to the Driver Station.
@@ -26,7 +30,7 @@ import edu.wpi.first.wpilibj.event.EventLoop;
  * only through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any
  * 3rd party controllers.
  */
-public class {{ ConsoleName }}Controller extends GenericHID implements Sendable {
+public class {{ ConsoleName }}Controller implements HIDDevice, Sendable {
   /** Represents a digital button on a {{ ConsoleName }}Controller. */
   public enum Button {
 {%- for button in buttons %}
@@ -92,23 +96,44 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
     }
   }
 
+  private final GenericHID m_hid;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  @Override
+  public GenericHID getHID() {
+    return m_hid;
+  }
+
   /**
    * Construct an instance of a controller.
    *
    * @param port The port index on the Driver Station that the controller is plugged into (0-5).
    */
   public {{ ConsoleName }}Controller(final int port) {
-    super(port);
-    {{ "// " if SkipReporting }}HAL.report(tResourceType.kResourceType_{{ ConsoleName }}Controller, port + 1);
+    this(DriverStation.getGenericHID(port));
+  }
+
+  /**
+   * Construct an instance of a controller with a GenericHID object.
+   *
+   * @param hid The GenericHID object to use for this controller.
+   */
+  public {{ ConsoleName }}Controller(final GenericHID hid) {
+    m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
+    HAL.reportUsage("HID", hid.getPort(), "{{ ConsoleName }}Controller");
   }
 {% for stick in sticks %}
   /**
-   * Get the {{ stick.NameParts[1] }} axis value of {{ stick.NameParts[0] }} side of the controller.
+   * Get the {{ stick.NameParts[1] }} axis value of {{ stick.NameParts[0] }} side of the controller. {{ stick.PositiveDirection }} is positive.
    *
    * @return The axis value.
    */
   public double get{{ stick.NameParts|map("capitalize")|join }}() {
-    return getRawAxis(Axis.k{{ stick.NameParts|map("capitalize")|join }}.value);
+    return m_hid.getRawAxis(Axis.k{{ stick.NameParts|map("capitalize")|join }}.value);
   }
 {% endfor -%}
 {% for trigger in triggers %}
@@ -119,7 +144,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return The axis value.
    */
   public double get{{ capitalize_first(trigger.name) }}Axis() {
-    return getRawAxis(Axis.k{{ capitalize_first(trigger.name) }}.value);
+    return m_hid.getRawAxis(Axis.k{{ capitalize_first(trigger.name) }}.value);
   }
 {% if trigger.UseThresholdMethods %}
   /**
@@ -133,7 +158,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    *     threshold, attached to the given event loop
    */
   public BooleanEvent {{ trigger.name }}(double threshold, EventLoop loop) {
-    return axisGreaterThan(Axis.k{{ capitalize_first(trigger.name) }}.value, threshold, loop);
+    return m_hid.axisGreaterThan(Axis.k{{ capitalize_first(trigger.name) }}.value, threshold, loop);
   }
 
   /**
@@ -156,7 +181,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return The state of the button.
    */
   public boolean get{{ capitalize_first(button.name) }}Button() {
-    return getRawButton(Button.k{{ capitalize_first(button.name) }}.value);
+    return m_hid.getRawButton(Button.k{{ capitalize_first(button.name) }}.value);
   }
 
   /**
@@ -165,7 +190,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return Whether the button was pressed since the last check.
    */
   public boolean get{{ capitalize_first(button.name) }}ButtonPressed() {
-    return getRawButtonPressed(Button.k{{ capitalize_first(button.name) }}.value);
+    return m_hid.getRawButtonPressed(Button.k{{ capitalize_first(button.name) }}.value);
   }
 
   /**
@@ -174,7 +199,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return Whether the button was released since the last check.
    */
   public boolean get{{ capitalize_first(button.name) }}ButtonReleased() {
-    return getRawButtonReleased(Button.k{{ capitalize_first(button.name) }}.value);
+    return m_hid.getRawButtonReleased(Button.k{{ capitalize_first(button.name) }}.value);
   }
 
   /**
@@ -185,131 +210,73 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    *     attached to the given loop.
    */
   public BooleanEvent {{ button.name }}(EventLoop loop) {
-    return button(Button.k{{ capitalize_first(button.name) }}.value, loop);
+    return m_hid.button(Button.k{{ capitalize_first(button.name) }}.value, loop);
   }
-{% endfor -%}
-{% if ConsoleName == "Xbox" or ConsoleName == "Stadia" %}
+{% endfor %}
   /**
-   * Read the value of the left bumper (LB) button on the controller.
+   * Get if the controller is connected.
    *
-   * @return The state of the button.
-   * @deprecated Use {@link getLeftBumperButton} instead. This function is deprecated for removal
-   *     to make function names consistent to allow the HID classes to be automatically generated.
+   * @return true if the controller is connected
    */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getLeftBumper() {
-    return getRawButton(Button.kLeftBumper.value);
+  public boolean isConnected() {
+    return m_hid.isConnected();
   }
 
   /**
-   * Read the value of the right bumper (RB) button on the controller.
+   * Get the type of the controller.
    *
-   * @return The state of the button.
-   * @deprecated Use {@link getRightBumperButton} instead. This function is deprecated for removal
-   *     to make function names consistent to allow the HID classes to be automatically generated.
+   * @return the type of the controller.
    */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getRightBumper() {
-    return getRawButton(Button.kRightBumper.value);
+  public HIDType getGamepadType() {
+    return m_hid.getGamepadType();
   }
 
   /**
-   * Whether the left bumper (LB) was pressed since the last check.
+   * Get the supported outputs of the controller.
    *
-   * @return Whether the button was pressed since the last check.
-   * @deprecated Use {@link getLeftBumperButtonPressed} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
+   * @return the supported outputs of the controller.
    */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getLeftBumperPressed() {
-    return getRawButtonPressed(Button.kLeftBumper.value);
+  public EnumSet<SupportedOutput> getSupportedOutputs() {
+    return m_hid.getSupportedOutputs();
   }
 
   /**
-   * Whether the right bumper (RB) was pressed since the last check.
+   * Get the name of the controller.
    *
-   * @return Whether the button was pressed since the last check.
-   * @deprecated Use {@link getRightBumperButtonPressed} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
+   * @return the name of the controller.
    */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getRightBumperPressed() {
-    return getRawButtonPressed(Button.kRightBumper.value);
+  public String getName() {
+    return m_hid.getName();
   }
 
   /**
-   * Whether the left bumper (LB) was released since the last check.
+   * Get the port number of the controller.
    *
-   * @return Whether the button was released since the last check.
-   * @deprecated Use {@link getLeftBumperButtonReleased} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
+   * @return The port number of the controller.
    */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getLeftBumperReleased() {
-    return getRawButtonReleased(Button.kLeftBumper.value);
+  public int getPort() {
+    return m_hid.getPort();
   }
 
   /**
-   * Whether the right bumper (RB) was released since the last check.
+   * Set the rumble output for the HID.
    *
-   * @return Whether the button was released since the last check.
-   * @deprecated Use {@link getRightBumperButtonReleased} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getRightBumperReleased() {
-    return getRawButtonReleased(Button.kRightBumper.value);
-  }
-{%- elif ConsoleName == "PS4" or ConsoleName == "PS5" %}
-  /**
-   * Read the value of the touchpad on the controller.
+   * <p>The DS currently supports 4 rumble values: left rumble, right rumble, left trigger rumble,
+   * and right trigger rumble.
    *
-   * @return The state of the touchpad.
-   * @deprecated Use {@link getTouchpadButton} instead. This function is deprecated for removal to
-   *     make function names consistent to allow the HID classes to be automatically generated.
+   * @param type Which rumble value to set
+   * @param value The normalized value (0 to 1) to set the rumble to
    */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getTouchpad() {
-    return getRawButton(Button.kTouchpad.value);
+  public void setRumble(RumbleType type, double value) {
+    m_hid.setRumble(type, value);
   }
-
-  /**
-   * Whether the touchpad was pressed since the last check.
-   *
-   * @return Whether the touchpad was pressed since the last check.
-   * @deprecated Use {@link getTouchpadButtonPressed} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getTouchpadPressed() {
-    return getRawButtonPressed(Button.kTouchpad.value);
-  }
-
-  /**
-   * Whether the touchpad was released since the last check.
-   *
-   * @return Whether the touchpad was released since the last check.
-   * @deprecated Use {@link getTouchpadButtonReleased} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getTouchpadReleased() {
-    return getRawButtonReleased(Button.kTouchpad.value);
-  }
-{%- endif %}
 
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("HID");
     builder.publishConstString("ControllerType", "{{ ConsoleName }}");
 {%- for trigger in triggers %}
-    builder.addDoubleProperty("{{ capitalize_first(trigger.name) }}", this::get{{ capitalize_first(trigger.name) }}Axis, null);
+    builder.addDoubleProperty("{{ capitalize_first(trigger.name) }} Axis", this::get{{ capitalize_first(trigger.name) }}Axis, null);
 {%- endfor -%}
 {% for stick in sticks %}
     builder.addDoubleProperty("{{ stick.NameParts|map("capitalize")|join }}", this::get{{ stick.NameParts|map("capitalize")|join }}, null);

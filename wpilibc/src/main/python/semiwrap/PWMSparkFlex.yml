@@ -1,0 +1,4 @@
+classes:
+  wpi::PWMSparkFlex:
+    methods:
+      PWMSparkFlex:

@@ -10,20 +10,20 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/SmallString.h"
+#include "wpi/util/SmallString.hpp"
 #include "gtest/gtest.h"
 #include <climits>
 #include <cstring>
 #include <stdarg.h>
 
-using namespace wpi;
+using namespace wpi::util;
 
 namespace {
 
 // Test fixture class
 class SmallStringTest : public testing::Test {
 protected:
-  typedef SmallString<40> StringType;
+  using StringType = SmallString<40>;
 
   StringType theString;
 

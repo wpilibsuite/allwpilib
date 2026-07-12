@@ -224,8 +224,6 @@ class Matrix : public PlainObjectBase<Matrix<Scalar_, Rows_, Cols_, Options_, Ma
     return Base::_set(other);
   }
 
-  /* Here, doxygen failed to copy the brief information when using \copydoc */
-
   /**
    * \brief Copies the generic expression \a other into *this.
    * \copydetails DenseBase::operator=(const EigenBase<OtherDerived> &other)
@@ -255,14 +253,26 @@ class Matrix : public PlainObjectBase<Matrix<Scalar_, Rows_, Cols_, Options_, Ma
 #else
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Matrix() = default;
 #endif
+  /** \brief Move constructor */
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Matrix(Matrix&&) = default;
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Matrix& operator=(Matrix&& other)
-      EIGEN_NOEXCEPT_IF(std::is_nothrow_move_assignable<Scalar>::value) {
+  /** \brief Moves the matrix into the other one.
+   *
+   */
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Matrix& operator=(Matrix&& other) noexcept(
+      std::is_nothrow_move_assignable<Scalar>::value) {
     Base::operator=(std::move(other));
     return *this;
   }
 
-  /** \copydoc PlainObjectBase(const Scalar&, const Scalar&, const Scalar&,  const Scalar&, const ArgTypes&... args)
+  /** \brief Construct a row of column vector with fixed size from an arbitrary number of coefficients.
+   *
+   * \only_for_vectors
+   *
+   * This constructor is for 1D array or vectors with more than 4 coefficients.
+   *
+   * \warning To construct a column (resp. row) vector of fixed length, the number of values passed to this
+   * constructor must match the the fixed number of rows (resp. columns) of \c *this.
+   *
    *
    * Example: \include Matrix_variadic_ctor_cxx11.cpp
    * Output: \verbinclude Matrix_variadic_ctor_cxx11.out
@@ -276,6 +286,7 @@ class Matrix : public PlainObjectBase<Matrix<Scalar_, Rows_, Cols_, Options_, Ma
 
   /** \brief Constructs a Matrix and initializes it from the coefficients given as initializer-lists grouped by row.
    * \cpp11
+   * \anchor matrix_initializer_list
    *
    * In the general case, the constructor takes a list of rows, each row being represented as a list of coefficients:
    *
@@ -382,8 +393,8 @@ class Matrix : public PlainObjectBase<Matrix<Scalar_, Rows_, Cols_, Options_, Ma
   template <typename OtherDerived>
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Matrix(const EigenBase<OtherDerived>& other) : Base(other.derived()) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index innerStride() const EIGEN_NOEXCEPT { return 1; }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index outerStride() const EIGEN_NOEXCEPT { return this->innerSize(); }
+  EIGEN_DEVICE_FUNC constexpr Index innerStride() const noexcept { return 1; }
+  EIGEN_DEVICE_FUNC constexpr Index outerStride() const noexcept { return this->innerSize(); }
 
   /////////// Geometry module ///////////
 

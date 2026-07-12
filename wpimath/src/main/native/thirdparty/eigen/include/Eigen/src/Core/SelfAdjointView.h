@@ -73,10 +73,10 @@ class SelfAdjointView : public TriangularBase<SelfAdjointView<MatrixType_, UpLo>
 
   EIGEN_DEVICE_FUNC explicit inline SelfAdjointView(MatrixType& matrix) : m_matrix(matrix) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index rows() const EIGEN_NOEXCEPT { return m_matrix.rows(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index cols() const EIGEN_NOEXCEPT { return m_matrix.cols(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index outerStride() const EIGEN_NOEXCEPT { return m_matrix.outerStride(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index innerStride() const EIGEN_NOEXCEPT { return m_matrix.innerStride(); }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const noexcept { return m_matrix.rows(); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const noexcept { return m_matrix.cols(); }
+  EIGEN_DEVICE_FUNC constexpr Index outerStride() const noexcept { return m_matrix.outerStride(); }
+  EIGEN_DEVICE_FUNC constexpr Index innerStride() const noexcept { return m_matrix.innerStride(); }
 
   /** \sa MatrixBase::coeff()
    * \warning the coordinates must fit into the referenced triangular part

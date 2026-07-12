@@ -30,14 +30,14 @@
 #ifndef SPARSELU_COLUMN_DFS_H
 #define SPARSELU_COLUMN_DFS_H
 
-template <typename Scalar, typename StorageIndex>
-class SparseLUImpl;
 // IWYU pragma: private
 #include "./InternalHeaderCheck.h"
 
 namespace Eigen {
-
 namespace internal {
+
+template <typename Scalar, typename StorageIndex>
+class SparseLUImpl;
 
 template <typename IndexVector, typename ScalarVector>
 struct column_dfs_traits : no_assignment_operator {

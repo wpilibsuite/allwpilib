@@ -31,7 +31,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#include "wpi/Signal.h"  // NOLINT(build/include_order)
+#include "wpi/util/Signal.h"
 
 #include <cmath>
 #include <sstream>
@@ -40,7 +40,7 @@ SOFTWARE.
 
 #include <gtest/gtest.h>
 
-using namespace wpi::sig;
+using namespace wpi::util::sig;
 
 namespace {
 
@@ -99,7 +99,7 @@ struct o8 {
 
 }  // namespace
 
-namespace wpi {
+namespace wpi::util {
 
 TEST(SignalTest, FreeConnection) {
   sum = 0;
@@ -539,4 +539,4 @@ TEST(SignalTest, Loop) {
   ASSERT_EQ(i2.val(), 1);
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

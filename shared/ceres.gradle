@@ -1,0 +1,15 @@
+nativeUtils {
+    nativeDependencyContainer {
+        ceres(getNativeDependencyTypeClass('WPIStaticMavenDependency')) {
+            groupId = "edu.wpi.first.thirdparty.frc2026.ceres"
+            artifactId = "ceres-cpp"
+            headerClassifier = "headers"
+            sourceClassifier = "sources"
+            ext = "zip"
+            // Keep in sync with shared/bazel/thirdparty/integrity_helper.py
+            version = '2.2-1'
+            targetPlatforms.addAll(nativeUtils.wpi.platforms.desktopPlatforms)
+            targetPlatforms.addAll("linuxarm32", "linuxarm64")
+        }
+    }
+}

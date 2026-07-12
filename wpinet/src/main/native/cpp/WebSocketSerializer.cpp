@@ -2,18 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WebSocketSerializer.h"
+#include "WebSocketSerializer.hpp"
 
 #include <random>
 
-using namespace wpi::detail;
+#include "wpi/util/mutex.hpp"
 
-static constexpr uint8_t kFlagMasking = 0x80;
-static constexpr size_t kWriteAllocSize = 4096;
+using namespace wpi::net::detail;
+
+static constexpr uint8_t FLAG_MASKING = 0x80;
+static constexpr size_t WRITE_ALLOC_SIZE = 4096;
 
 static std::span<uint8_t> BuildHeader(std::span<uint8_t, 10> header,
                                       bool server,
-                                      const wpi::WebSocket::Frame& frame) {
+                                      const wpi::net::WebSocket::Frame& frame) {
   uint8_t* pHeader = header.data();
 
   // opcode (includes FIN bit)
@@ -25,13 +27,13 @@ static std::span<uint8_t> BuildHeader(std::span<uint8_t, 10> header,
     size += buf.len;
   }
   if (size < 126) {
-    *pHeader++ = (server ? 0x00 : kFlagMasking) | size;
+    *pHeader++ = (server ? 0x00 : FLAG_MASKING) | size;
   } else if (size <= 0xffff) {
-    *pHeader++ = (server ? 0x00 : kFlagMasking) | 126;
+    *pHeader++ = (server ? 0x00 : FLAG_MASKING) | 126;
     *pHeader++ = (size >> 8) & 0xff;
     *pHeader++ = size & 0xff;
   } else {
-    *pHeader++ = (server ? 0x00 : kFlagMasking) | 127;
+    *pHeader++ = (server ? 0x00 : FLAG_MASKING) | 127;
     *pHeader++ = (size >> 56) & 0xff;
     *pHeader++ = (size >> 48) & 0xff;
     *pHeader++ = (size >> 40) & 0xff;
@@ -63,10 +65,14 @@ size_t SerializedFrames::AddClientFrame(const WebSocket::Frame& frame) {
   // generate masking key
   static std::random_device rd;
   static std::default_random_engine gen{rd()};
+  static wpi::util::mutex genMutex;
   std::uniform_int_distribution<unsigned int> dist(0, 255);
   uint8_t key[4];
-  for (uint8_t& v : key) {
-    v = dist(gen);
+  {
+    std::scoped_lock lock{genMutex};
+    for (uint8_t& v : key) {
+      v = dist(gen);
+    }
   }
   std::memcpy(internalBuf, key, 4);
   internalBuf += 4;
@@ -90,8 +96,8 @@ size_t SerializedFrames::AddServerFrame(const WebSocket::Frame& frame) {
 
   // manage allocBufs to efficiently store header
   if (m_allocBufs.empty() ||
-      (m_allocBufPos + header.size()) > kWriteAllocSize) {
-    m_allocBufs.emplace_back(uv::Buffer::Allocate(kWriteAllocSize));
+      (m_allocBufPos + header.size()) > WRITE_ALLOC_SIZE) {
+    m_allocBufs.emplace_back(uv::Buffer::Allocate(WRITE_ALLOC_SIZE));
     m_allocBufPos = 0;
   }
   char* internalBuf = m_allocBufs.back().data().data() + m_allocBufPos;

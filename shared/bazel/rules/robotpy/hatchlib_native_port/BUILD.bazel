@@ -1,0 +1,12 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_binary")
+
+py_binary(
+    name = "generate_native_lib_files",
+    srcs = glob(["*.py"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//shared/bazel/rules/robotpy:hack_pkgcfgs",
+        requirement("semiwrap"),
+    ],
+)

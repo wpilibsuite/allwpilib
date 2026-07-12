@@ -1,0 +1,227 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+#include "wpi/framework/RobotBase.hpp"
+#include "wpi/system/Watchdog.hpp"
+#include "wpi/units/time.hpp"
+
+namespace wpi {
+
+/**
+ * IterativeRobotBase implements a specific type of robot program framework,
+ * extending the RobotBase class.
+ *
+ * The IterativeRobotBase class does not implement StartCompetition(), so it
+ * should not be used by teams directly.
+ *
+ * This class provides the following functions which are called by the main
+ * loop, StartCompetition(), at the appropriate times:
+ *
+ * DriverStationConnected() -- provide for initialization the first time the DS
+ * is connected
+ *
+ * Init() functions -- each of the following functions is called once when the
+ * appropriate mode is entered:
+ *
+ * \li DisabledInit() -- called each and every time disabled is entered from
+ *   another mode
+ * \li AutonomousInit() -- called each and every time autonomous is entered from
+ *   another mode
+ * \li TeleopInit() -- called each and every time teleop is entered from another
+ *   mode
+ * \li UtilityInit() -- called each and every time utility is entered from
+ * another mode
+ *
+ * Periodic() functions -- each of these functions is called on an interval:
+ *
+ * \li RobotPeriodic()
+ * \li DisabledPeriodic()
+ * \li AutonomousPeriodic()
+ * \li TeleopPeriodic()
+ * \li UtilityPeriodic()
+ *
+ * Exit() functions -- each of the following functions is called once when the
+ * appropriate mode is exited:
+ *
+ * \li DisabledExit() -- called each and every time disabled is exited
+ * \li AutonomousExit() -- called each and every time autonomous is exited
+ * \li TeleopExit() -- called each and every time teleop is exited
+ * \li UtilityExit() -- called each and every time utility is exited
+ */
+class IterativeRobotBase : public RobotBase {
+ public:
+  /**
+   * Code that needs to know the DS state should go here.
+   *
+   * Users should override this method for initialization that needs to occur
+   * after the DS is connected, such as needing the alliance information.
+   */
+  virtual void DriverStationConnected();
+
+  /**
+   * Robot-wide simulation initialization code should go here.
+   *
+   * Users should override this method for default Robot-wide simulation
+   * related initialization which will be called when the robot is first
+   * started. It will be called exactly one time after the robot class
+   * constructor is called only when the robot is in simulation.
+   */
+  virtual void SimulationInit();
+
+  /**
+   * Initialization code for disabled mode should go here.
+   *
+   * Users should override this method for initialization code which will be
+   * called each time
+   * the robot enters disabled mode.
+   */
+  virtual void DisabledInit();
+
+  /**
+   * Initialization code for autonomous mode should go here.
+   *
+   * Users should override this method for initialization code which will be
+   * called each time the robot enters autonomous mode.
+   */
+  virtual void AutonomousInit();
+
+  /**
+   * Initialization code for teleop mode should go here.
+   *
+   * Users should override this method for initialization code which will be
+   * called each time the robot enters teleop mode.
+   */
+  virtual void TeleopInit();
+
+  /**
+   * Initialization code for utility mode should go here.
+   *
+   * Users should override this method for initialization code which will be
+   * called each time the robot enters utility mode.
+   */
+  virtual void UtilityInit();
+
+  /**
+   * Periodic code for all modes should go here.
+   *
+   * This function is called each time a new packet is received from the driver
+   * station.
+   */
+  virtual void RobotPeriodic();
+
+  /**
+   * Periodic simulation code should go here.
+   *
+   * This function is called in a simulated robot after user code executes.
+   */
+  virtual void SimulationPeriodic();
+
+  /**
+   * Periodic code for disabled mode should go here.
+   *
+   * Users should override this method for code which will be called each time a
+   * new packet is received from the driver station and the robot is in disabled
+   * mode.
+   */
+  virtual void DisabledPeriodic();
+
+  /**
+   * Periodic code for autonomous mode should go here.
+   *
+   * Users should override this method for code which will be called each time a
+   * new packet is received from the driver station and the robot is in
+   * autonomous mode.
+   */
+  virtual void AutonomousPeriodic();
+
+  /**
+   * Periodic code for teleop mode should go here.
+   *
+   * Users should override this method for code which will be called each time a
+   * new packet is received from the driver station and the robot is in teleop
+   * mode.
+   */
+  virtual void TeleopPeriodic();
+
+  /**
+   * Periodic code for utility mode should go here.
+   *
+   * Users should override this method for code which will be called each time a
+   * new packet is received from the driver station and the robot is in utility
+   * mode.
+   */
+  virtual void UtilityPeriodic();
+
+  /**
+   * Exit code for disabled mode should go here.
+   *
+   * Users should override this method for code which will be called each time
+   * the robot exits disabled mode.
+   */
+  virtual void DisabledExit();
+
+  /**
+   * Exit code for autonomous mode should go here.
+   *
+   * Users should override this method for code which will be called each time
+   * the robot exits autonomous mode.
+   */
+  virtual void AutonomousExit();
+
+  /**
+   * Exit code for teleop mode should go here.
+   *
+   * Users should override this method for code which will be called each time
+   * the robot exits teleop mode.
+   */
+  virtual void TeleopExit();
+
+  /**
+   * Exit code for utility mode should go here.
+   *
+   * Users should override this method for code which will be called each time
+   * the robot exits utility mode.
+   */
+  virtual void UtilityExit();
+
+  /**
+   * Gets time period between calls to Periodic() functions.
+   */
+  wpi::units::second_t GetPeriod() const;
+
+  /**
+   * Prints list of epochs added so far and their times.
+   */
+  void PrintWatchdogEpochs();
+
+  /**
+   * Constructor for IterativeRobotBase.
+   *
+   * @param period Period.
+   */
+  explicit IterativeRobotBase(wpi::units::second_t period);
+
+  ~IterativeRobotBase() override = default;
+
+ protected:
+  IterativeRobotBase(IterativeRobotBase&&) = default;
+  IterativeRobotBase& operator=(IterativeRobotBase&&) = default;
+
+  /**
+   * Loop function.
+   */
+  void LoopFunc();
+
+ private:
+  int m_lastMode = -1;
+  wpi::units::second_t m_period;
+  Watchdog m_watchdog;
+  bool m_calledDsConnected = false;
+
+  void PrintLoopOverrunMessage();
+};
+
+}  // namespace wpi

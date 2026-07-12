@@ -2,22 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <cmath>
 #include <random>
 
 #include <gtest/gtest.h>
 
-#include "frc/EigenCore.h"
-#include "frc/controller/LinearPlantInversionFeedforward.h"
-#include "frc/controller/LinearQuadraticRegulator.h"
-#include "frc/estimator/KalmanFilter.h"
-#include "frc/system/LinearSystem.h"
-#include "frc/system/LinearSystemLoop.h"
-#include "frc/system/plant/DCMotor.h"
-#include "frc/system/plant/LinearSystemId.h"
-#include "units/time.h"
+#include "wpi/math/controller/LinearQuadraticRegulator.hpp"
+#include "wpi/math/estimator/KalmanFilter.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/system/DCMotor.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
+#include "wpi/math/system/LinearSystemLoop.hpp"
+#include "wpi/math/system/Models.hpp"
+#include "wpi/units/time.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 constexpr double kPositionStddev = 0.0001;
 constexpr auto kDt = 0.00505_s;
@@ -36,7 +34,8 @@ class StateSpaceTest : public testing::Test {
     // Gear ratio
     constexpr double G = 40.0 / 40.0;
 
-    return frc::LinearSystemId::ElevatorSystem(motors, m, r, G).Slice(0);
+    return wpi::math::Models::ElevatorFromPhysicalConstants(motors, m, r, G)
+        .Slice(0);
   }();
   LinearQuadraticRegulator<2, 1> controller{plant, {0.02, 0.4}, {12.0}, kDt};
   KalmanFilter<2, 1, 1> observer{plant, {0.05, 1.0}, {0.0001}, kDt};
@@ -67,4 +66,4 @@ TEST_F(StateSpaceTest, CorrectPredictLoop) {
   EXPECT_NEAR(loop.Xhat(1), 0.0, 0.5);
 }
 
-}  // namespace frc
+}  // namespace wpi::math

@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/controller/DifferentialDriveAccelerationLimiter.h"
+#include "wpi/math/controller/DifferentialDriveAccelerationLimiter.hpp"
 
 #include <Eigen/QR>
 
-using namespace frc;
+using namespace wpi::math;
 
 DifferentialDriveWheelVoltages DifferentialDriveAccelerationLimiter::Calculate(
-    units::meters_per_second_t leftVelocity,
-    units::meters_per_second_t rightVelocity, units::volt_t leftVoltage,
-    units::volt_t rightVoltage) {
+    wpi::units::meters_per_second_t leftVelocity,
+    wpi::units::meters_per_second_t rightVelocity,
+    wpi::units::volt_t leftVoltage, wpi::units::volt_t rightVoltage) {
   Vectord<2> u{leftVoltage.value(), rightVoltage.value()};
 
   // Find unconstrained wheel accelerations
@@ -56,5 +56,5 @@ DifferentialDriveWheelVoltages DifferentialDriveAccelerationLimiter::Calculate(
   // u = B⁻¹(dx/dt - Ax)
   u = m_system.B().householderQr().solve(dxdt - m_system.A() * x);
 
-  return {units::volt_t{u(0)}, units::volt_t{u(1)}};
+  return {wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)}};
 }

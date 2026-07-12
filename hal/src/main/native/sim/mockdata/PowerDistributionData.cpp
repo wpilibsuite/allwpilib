@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "../PortsInternal.h"
-#include "PowerDistributionDataInternal.h"
+#include "../PortsInternal.hpp"
+#include "PowerDistributionDataInternal.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializePowerDistributionData() {
   static PowerDistributionData spd[kNumPDSimModules];
-  ::hal::SimPowerDistributionData = spd;
+  ::wpi::hal::SimPowerDistributionData = spd;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-PowerDistributionData* hal::SimPowerDistributionData;
+PowerDistributionData* wpi::hal::SimPowerDistributionData;
 void PowerDistributionData::ResetData() {
   initialized.Reset(false);
   temperature.Reset(0.0);

@@ -31,7 +31,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#include "wpi/Signal.h"  // NOLINT(build/include_order)
+// clang-format off
+#include "wpi/util/Signal.h"
+// clang-format on
 
 #include <cmath>
 #include <memory>
@@ -40,7 +42,7 @@ SOFTWARE.
 
 #include <gtest/gtest.h>
 
-using namespace wpi::sig;
+using namespace wpi::util::sig;
 
 namespace {
 
@@ -71,7 +73,7 @@ static_assert(trait::is_callable_v<trait::typelist<int>, decltype(&s::f1),
 
 }  // namespace
 
-namespace wpi {
+namespace wpi::util {
 
 TEST(SignalTest, TrackShared) {
   sum = 0;
@@ -178,4 +180,4 @@ TEST(SignalTest, TrackGenericLambda) {
   ASSERT_EQ(s.str(), "1foo4.1");
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

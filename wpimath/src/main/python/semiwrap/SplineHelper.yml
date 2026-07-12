@@ -1,0 +1,8 @@
+classes:
+  wpi::math::SplineHelper:
+    methods:
+      CubicControlVectorsFromWaypoints:
+      QuinticSplinesFromWaypoints:
+      CubicSplinesFromControlVectors:
+      QuinticSplinesFromControlVectors:
+      OptimizeCurvature:

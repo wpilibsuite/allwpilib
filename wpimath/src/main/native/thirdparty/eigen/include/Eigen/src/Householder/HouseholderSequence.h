@@ -183,7 +183,7 @@ class HouseholderSequence : public EigenBase<HouseholderSequence<VectorsType, Co
    * \returns Number of rows
    * \details This equals the dimension of the space that the transformation acts on.
    */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index rows() const EIGEN_NOEXCEPT {
+  EIGEN_DEVICE_FUNC constexpr Index rows() const noexcept {
     return Side == OnTheLeft ? m_vectors.rows() : m_vectors.cols();
   }
 
@@ -191,7 +191,7 @@ class HouseholderSequence : public EigenBase<HouseholderSequence<VectorsType, Co
    * \returns Number of columns
    * \details This equals the dimension of the space that the transformation acts on.
    */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index cols() const EIGEN_NOEXCEPT { return rows(); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const noexcept { return rows(); }
 
   /** \brief Essential part of a Householder vector.
    * \param[in]  k  Index of Householder reflection
@@ -476,7 +476,8 @@ typename internal::matrix_type_times_scalar_type<typename VectorsType::Scalar, O
   return res;
 }
 
-/** \ingroup Householder_Module \householder_module
+/** \ingroup Householder_Module
+ * \householder_module
  * \brief Convenience function for constructing a Householder sequence.
  * \returns A HouseholderSequence constructed from the specified arguments.
  */
@@ -485,7 +486,8 @@ HouseholderSequence<VectorsType, CoeffsType> householderSequence(const VectorsTy
   return HouseholderSequence<VectorsType, CoeffsType, OnTheLeft>(v, h);
 }
 
-/** \ingroup Householder_Module \householder_module
+/** \ingroup Householder_Module
+ * \householder_module
  * \brief Convenience function for constructing a Householder sequence.
  * \returns A HouseholderSequence constructed from the specified arguments.
  * \details This function differs from householderSequence() in that the template argument \p OnTheSide of

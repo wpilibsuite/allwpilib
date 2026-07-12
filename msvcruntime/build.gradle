@@ -1,6 +1,5 @@
 import org.gradle.nativeplatform.toolchain.internal.msvcpp.VisualStudioLocator
 import org.gradle.internal.os.OperatingSystem
-import org.gradle.util.VersionNumber
 
 plugins {
     id 'cpp'
@@ -11,8 +10,8 @@ if (OperatingSystem.current().isWindows()) {
     def outputsFolder = file("$buildDir/outputs")
 
     def baseArtifactId = 'runtime'
-    def artifactGroupId = "edu.wpi.first.msvc"
-    def zipBaseName = "_GROUP_edu_wpi_first_msvc_ID_runtime_CLS"
+    def artifactGroupId = "org.wpilib.msvc"
+    def zipBaseName = makeZipBaseName(artifactGroupId, baseArtifactId)
 
     def vsLocator = gradle.services.get(VisualStudioLocator)
 
@@ -50,27 +49,61 @@ if (OperatingSystem.current().isWindows()) {
             }
         }
 
-        def x64ZipTask = tasks.create('x64RuntimeZip', Zip) {
-            destinationDirectory = outputsFolder
-            archiveBaseName = zipBaseName
-            archiveClassifier = 'x64'
+        def x64ZipTask = null
 
-            from x64Folder
+        if (x64Folder != null) {
+            x64ZipTask = tasks.create('x64RuntimeZip', Zip) {
+                destinationDirectory = outputsFolder
+                archiveBaseName = zipBaseName
+                archiveClassifier = 'x64'
+
+                from x64Folder
+            }
+
+            addTaskToCopyAllOutputs(x64ZipTask)
+            build.dependsOn x64ZipTask
         }
 
-        addTaskToCopyAllOutputs(x64ZipTask)
+        def arm64Folder = null
+        def arm64Dir = file("$runtimeLocation\\arm64")
+        if (arm64Dir.exists()) {
+            arm64Dir.eachFile {
+                if (it.name.endsWith('.CRT')) {
+                    arm64Folder = it
+                }
+            }
+        }
 
-        build.dependsOn x64ZipTask
+        def arm64ZipTask = null
+
+        if (arm64Folder != null) {
+            arm64ZipTask = tasks.create('arm64RuntimeZip', Zip) {
+                destinationDirectory = outputsFolder
+                archiveBaseName = zipBaseName
+                archiveClassifier = 'arm64'
+
+                from arm64Folder
+            }
+
+            addTaskToCopyAllOutputs(arm64ZipTask)
+            build.dependsOn arm64ZipTask
+        }
 
         publishing {
             publications {
 
                 runtime(MavenPublication) {
-                    artifact x64ZipTask
+                    if (x64ZipTask != null) {
+                        artifact x64ZipTask
+                    }
+
+                    if (arm64ZipTask != null) {
+                        artifact arm64ZipTask
+                    }
 
                     artifactId = "${baseArtifactId}"
-                    groupId artifactGroupId
-                    version wpilibVersioning.version.get()
+                    groupId = artifactGroupId
+                    version = wpilibVersioning.version.get()
                 }
             }
         }

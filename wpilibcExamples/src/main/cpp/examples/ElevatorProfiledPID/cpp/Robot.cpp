@@ -4,67 +4,66 @@
 
 #include <numbers>
 
-#include <frc/Encoder.h>
-#include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
-#include <frc/controller/ElevatorFeedforward.h>
-#include <frc/controller/ProfiledPIDController.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc/trajectory/TrapezoidProfile.h>
-#include <units/acceleration.h>
-#include <units/length.h>
-#include <units/time.h>
-#include <units/velocity.h>
-#include <units/voltage.h>
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/math/controller/ElevatorFeedforward.hpp"
+#include "wpi/math/controller/ProfiledPIDController.hpp"
+#include "wpi/math/trajectory/TrapezoidProfile.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
-  static constexpr units::second_t kDt = 20_ms;
+  static constexpr wpi::units::second_t kDt = 20_ms;
 
   Robot() {
-    m_encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * std::numbers::pi * 1.5);
+    encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * std::numbers::pi * 1.5);
   }
 
   void TeleopPeriodic() override {
-    if (m_joystick.GetRawButtonPressed(2)) {
-      m_controller.SetGoal(5_m);
-    } else if (m_joystick.GetRawButtonPressed(3)) {
-      m_controller.SetGoal(0_m);
+    if (joystick.GetRawButtonPressed(2)) {
+      controller.SetGoal(5_m);
+    } else if (joystick.GetRawButtonPressed(3)) {
+      controller.SetGoal(0_m);
     }
 
     // Run controller and update motor output
-    m_motor.SetVoltage(
-        units::volt_t{
-            m_controller.Calculate(units::meter_t{m_encoder.GetDistance()})} +
-        m_feedforward.Calculate(m_controller.GetSetpoint().velocity));
+    motor.SetVoltage(wpi::units::volt_t{controller.Calculate(
+                         wpi::units::meter_t{encoder.GetDistance()})} +
+                     feedforward.Calculate(controller.GetSetpoint().velocity));
   }
 
  private:
-  static constexpr units::meters_per_second_t kMaxVelocity = 1.75_mps;
-  static constexpr units::meters_per_second_squared_t kMaxAcceleration =
+  static constexpr wpi::units::meters_per_second_t kMaxVelocity = 1.75_mps;
+  static constexpr wpi::units::meters_per_second_squared_t kMaxAcceleration =
       0.75_mps_sq;
   static constexpr double kP = 1.3;
   static constexpr double kI = 0.0;
   static constexpr double kD = 0.7;
-  static constexpr units::volt_t kS = 1.1_V;
-  static constexpr units::volt_t kG = 1.2_V;
+  static constexpr wpi::units::volt_t kS = 1.1_V;
+  static constexpr wpi::units::volt_t kG = 1.2_V;
   static constexpr auto kV = 1.3_V / 1_mps;
 
-  frc::Joystick m_joystick{1};
-  frc::Encoder m_encoder{1, 2};
-  frc::PWMSparkMax m_motor{1};
+  wpi::Joystick joystick{1};
+  wpi::Encoder encoder{1, 2};
+  wpi::PWMSparkMax motor{1};
 
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
-  frc::TrapezoidProfile<units::meters>::Constraints m_constraints{
+  wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints constraints{
       kMaxVelocity, kMaxAcceleration};
-  frc::ProfiledPIDController<units::meters> m_controller{kP, kI, kD,
-                                                         m_constraints, kDt};
-  frc::ElevatorFeedforward m_feedforward{kS, kG, kV};
+  wpi::math::ProfiledPIDController<wpi::units::meters> controller{
+      kP, kI, kD, constraints, kDt};
+  wpi::math::ElevatorFeedforward feedforward{kS, kG, kV};
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

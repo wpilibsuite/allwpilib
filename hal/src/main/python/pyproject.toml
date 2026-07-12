@@ -1,0 +1,99 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "semiwrap~=0.6.0",
+    "hatch-meson~=0.1.2",
+    "hatchling",
+    "pyntcore==0.0.0",
+    "robotpy-native-wpihal==0.0.0",
+    "robotpy-wpiutil==0.0.0",
+]
+
+[project]
+name = "robotpy-hal"
+version = "0.0.0"
+description = "Binary wrapper for WPILib HAL"
+requires-python = ">=3.11"
+authors = [
+    {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
+]
+license = "BSD-3-Clause"
+dependencies = [
+    "pyntcore==0.0.0",
+    "robotpy-native-wpihal==0.0.0",
+    "robotpy-wpiutil==0.0.0",
+]
+
+[project.urls]
+"Source code" = "https://github.com/robotpy/mostrobotpy"
+
+
+[tool.hatch.build.hooks.robotpy]
+version_file = "hal/version.py"
+
+[tool.hatch.build.hooks.semiwrap]
+
+[tool.hatch.build.hooks.meson]
+
+[tool.hatch.build.targets.wheel]
+packages = ["hal"]
+
+
+[tool.semiwrap]
+update_init = []
+
+# NOTE: By default we ignore all HAL APIs, as most of them are exposed in WPILib
+# somewhere. If you find something that you need, file a bug and we can add it!
+
+scan_headers_ignore = [
+    "wpi/hal/*",
+
+    # TODO: might want this in the future
+    "mrc/*",
+    "mrclib/*",
+
+    "src/ds_types_fmt.h",
+    "sim_cb.h",
+    "sim_value_cb.h",
+]
+
+[tool.semiwrap.name_transform]
+default = "snake_case"
+enum_value = "CAPS_CASE"
+known_words = ["3V3", "5V", "CAN", "CPU", "DS", "FMS", "FPGA", "HAL", "HTTP", "I2C", "IMU", "JNI", "JSON", "mDNS", "NT", "OpMode", "PCM", "PDH", "PDP", "PID", "POVs", "PWM", "RIO", "SPI", "URI", "URL", "USB", "VIn"]
+
+[tool.semiwrap.extension_modules."hal._wpi_hal"]
+name = "wpihal"
+wraps = ["robotpy-native-wpihal"]
+depends = ["wpiutil", "ntcore"]
+
+[tool.semiwrap.extension_modules."hal._wpi_hal".headers]
+# hal
+CANAPITypes = "wpi/hal/CANAPITypes.h"
+DriverStation_c = "wpi/hal/DriverStation.h"
+DriverStation = "wpi/hal/DriverStation.hpp"
+DriverStationTypes_c = "wpi/hal/DriverStationTypes.h"
+DriverStationTypes = "wpi/hal/DriverStationTypes.hpp"
+Extensions = "wpi/hal/Extensions.h"
+HAL = "wpi/hal/HAL.h"
+Main = "wpi/hal/Main.h"
+Notifier_c = "wpi/hal/Notifier.h"
+Notifier = "wpi/hal/Notifier.hpp"
+SimDevice_c = "wpi/hal/SimDevice.h"
+SimDevice = "wpi/hal/SimDevice.hpp"
+Threads = "wpi/hal/Threads.h"
+UsageReporting = "wpi/hal/UsageReporting.hpp"
+
+[tool.semiwrap.extension_modules."hal.simulation._simulation"]
+name = "hal_simulation"
+wraps = ["robotpy-native-wpihal"]
+depends = ["wpiutil", "ntcore"]
+yaml_path = "semiwrap/simulation"
+
+[tool.semiwrap.extension_modules."hal.simulation._simulation".headers]
+DriverStationData = "wpi/hal/simulation/DriverStationData.h"
+MockHooks_c = "wpi/hal/simulation/MockHooks.h"
+MockHooks = "wpi/hal/simulation/MockHooks.hpp"
+NotifierData = "wpi/hal/simulation/NotifierData.h"
+Reset = "wpi/hal/simulation/Reset.h"
+SimDeviceData = "wpi/hal/simulation/SimDeviceData.h"

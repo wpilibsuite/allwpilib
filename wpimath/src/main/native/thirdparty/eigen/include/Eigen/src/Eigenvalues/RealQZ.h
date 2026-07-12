@@ -69,7 +69,7 @@ class RealQZ {
     MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime
   };
   typedef typename MatrixType::Scalar Scalar;
-  typedef std::complex<typename NumTraits<Scalar>::Real> ComplexScalar;
+  typedef internal::make_complex_t<Scalar> ComplexScalar;
   typedef Eigen::Index Index;  ///< \deprecated since Eigen 3.3
 
   typedef Matrix<ComplexScalar, ColsAtCompileTime, 1, Options & ~RowMajor, MaxColsAtCompileTime, 1> EigenvalueType;
@@ -449,23 +449,23 @@ inline void RealQZ<MatrixType>::step(Index f, Index l, Index iter) {
       Index lr = (std::min)(k + 4, dim);  // last row to update
       Map<Matrix<Scalar, Dynamic, 1> > tmp(m_workspace.data(), lr);
       // S
-      tmp = m_S.template middleCols<2>(k).topRows(lr) * essential2;
+      tmp.noalias() = m_S.template middleCols<2>(k).topRows(lr) * essential2;
       tmp += m_S.col(k + 2).head(lr);
       m_S.col(k + 2).head(lr) -= tau * tmp;
-      m_S.template middleCols<2>(k).topRows(lr) -= (tau * tmp) * essential2.adjoint();
+      m_S.template middleCols<2>(k).topRows(lr).noalias() -= (tau * tmp) * essential2.adjoint();
       // T
       tmp = m_T.template middleCols<2>(k).topRows(lr) * essential2;
       tmp += m_T.col(k + 2).head(lr);
       m_T.col(k + 2).head(lr) -= tau * tmp;
-      m_T.template middleCols<2>(k).topRows(lr) -= (tau * tmp) * essential2.adjoint();
+      m_T.template middleCols<2>(k).topRows(lr).noalias() -= (tau * tmp) * essential2.adjoint();
     }
     if (m_computeQZ) {
       // Z
       Map<Matrix<Scalar, 1, Dynamic> > tmp(m_workspace.data(), dim);
-      tmp = essential2.adjoint() * (m_Z.template middleRows<2>(k));
+      tmp.noalias() = essential2.adjoint() * (m_Z.template middleRows<2>(k));
       tmp += m_Z.row(k + 2);
       m_Z.row(k + 2) -= tau * tmp;
-      m_Z.template middleRows<2>(k) -= essential2 * (tau * tmp);
+      m_Z.template middleRows<2>(k).noalias() -= essential2 * (tau * tmp);
     }
     m_T.coeffRef(k + 2, k) = m_T.coeffRef(k + 2, k + 1) = Scalar(0.0);
 

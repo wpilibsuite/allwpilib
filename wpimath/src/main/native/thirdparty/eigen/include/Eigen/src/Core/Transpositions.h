@@ -293,9 +293,9 @@ class Transpose<TranspositionsBase<TranspositionsDerived> > {
  public:
   explicit Transpose(const TranspositionType& t) : m_transpositions(t) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index size() const EIGEN_NOEXCEPT { return m_transpositions.size(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index rows() const EIGEN_NOEXCEPT { return m_transpositions.size(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index cols() const EIGEN_NOEXCEPT { return m_transpositions.size(); }
+  EIGEN_DEVICE_FUNC constexpr Index size() const noexcept { return m_transpositions.size(); }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const noexcept { return m_transpositions.size(); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const noexcept { return m_transpositions.size(); }
 
   /** \returns the \a matrix with the inverse transpositions applied to the columns.
    */

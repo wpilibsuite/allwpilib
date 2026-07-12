@@ -2,20 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "HALProvider.h"
+#include "wpi/halsim/gui/HALProvider.hpp"
 
 #include <string>
 #include <utility>
 
-#include <glass/Model.h>
-#include <glass/Storage.h>
-#include <hal/simulation/DriverStationData.h>
+#include "wpi/glass/Model.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/hal/simulation/DriverStationData.h"
 
 using namespace halsimgui;
 
 static bool gDisableOutputsOnDSDisable = true;
 
-HALProvider::HALProvider(glass::Storage& storage) : Provider{storage} {
+HALProvider::HALProvider(wpi::glass::Storage& storage) : Provider{storage} {
   storage.SetCustomApply([this] {
     for (auto&& childIt : m_storage.GetChildren()) {
       auto it = FindViewEntry(childIt.key());
@@ -65,7 +65,7 @@ void HALProvider::DisplayMenu() {
   }
 }
 
-glass::Model* HALProvider::GetModel(std::string_view name) {
+wpi::glass::Model* HALProvider::GetModel(std::string_view name) {
   auto it = FindModelEntry(name);
   if (it == m_modelEntries.end() || (*it)->name != name) {
     return nullptr;
@@ -79,7 +79,7 @@ glass::Model* HALProvider::GetModel(std::string_view name) {
   return entry->model.get();
 }
 
-void HALProvider::Show(ViewEntry* entry, glass::Window* window) {
+void HALProvider::Show(ViewEntry* entry, wpi::glass::Window* window) {
   // if there's already a window, we're done
   if (entry->window) {
     return;
@@ -95,9 +95,9 @@ void HALProvider::Show(ViewEntry* entry, glass::Window* window) {
 
   // the window might exist and we're just not associated to it yet
   if (!window) {
-    window = GetOrAddWindow(
-        entry->name, true,
-        entry->showDefault ? glass::Window::kShow : glass::Window::kHide);
+    window = GetOrAddWindow(entry->name, true,
+                            entry->showDefault ? wpi::glass::Window::kShow
+                                               : wpi::glass::Window::kHide);
   }
   if (!window) {
     return;

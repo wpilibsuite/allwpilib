@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 
-import os
 import shutil
+from pathlib import Path
 
-from upstream_utils import Lib, walk_cwd_and_copy_if
+from upstream_utils import Lib, has_prefix, walk_cwd_and_copy_if
 
 
-def copy_upstream_src(wpilib_root):
-    wpimath = os.path.join(wpilib_root, "wpimath")
+def copy_upstream_src(wpilib_root: Path):
+    wpimath = wpilib_root / "wpimath"
 
     # Delete old install
     for d in [
         "src/main/native/thirdparty/gcem/include",
     ]:
-        shutil.rmtree(os.path.join(wpimath, d), ignore_errors=True)
+        shutil.rmtree(wpimath / d, ignore_errors=True)
 
     # Copy gcem include files into allwpilib
     walk_cwd_and_copy_if(
-        lambda dp, f: dp.startswith(os.path.join(".", "include")),
-        os.path.join(wpimath, "src/main/native/thirdparty/gcem"),
+        lambda dp, f: has_prefix(dp, Path("include")),
+        wpimath / "src/main/native/thirdparty/gcem",
     )
 
 

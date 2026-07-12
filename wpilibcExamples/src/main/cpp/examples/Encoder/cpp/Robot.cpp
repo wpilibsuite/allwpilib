@@ -4,9 +4,9 @@
 
 #include <numbers>
 
-#include <frc/Encoder.h>
-#include <frc/TimedRobot.h>
-#include <frc/smartdashboard/SmartDashboard.h>
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 
 /**
  * Sample program displaying the value of a quadrature encoder on the
@@ -27,36 +27,36 @@
  * distance that the robot drives can be precisely controlled during the
  * autonomous mode.
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {
     /* Defines the number of samples to average when determining the rate.
      * On a quadrature encoder, values range from 1-255; larger values result in
      * smoother but potentially less accurate rates than lower values.
      */
-    m_encoder.SetSamplesToAverage(5);
+    encoder.SetSamplesToAverage(5);
 
     /* Defines how far the mechanism attached to the encoder moves per pulse. In
      * this case, we assume that a 360 count encoder is directly attached to a 3
      * inch diameter (1.5inch radius) wheel, and that we want to measure
      * distance in inches.
      */
-    m_encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * std::numbers::pi * 1.5);
+    encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * std::numbers::pi * 1.5);
 
     /* Defines the lowest rate at which the encoder will not be considered
      * stopped, for the purposes of the GetStopped() method. Units are in
      * distance / second, where distance refers to the units of distance that
      * you are using, in this case inches.
      */
-    m_encoder.SetMinRate(1.0);
+    encoder.SetMinRate(1.0);
   }
 
   void TeleopPeriodic() override {
     // Retrieve the net displacement of the Encoder since the last Reset.
-    frc::SmartDashboard::PutNumber("Encoder Distance", m_encoder.GetDistance());
+    wpi::SmartDashboard::PutNumber("Encoder Distance", encoder.GetDistance());
 
     // Retrieve the current rate of the encoder.
-    frc::SmartDashboard::PutNumber("Encoder Rate", m_encoder.GetRate());
+    wpi::SmartDashboard::PutNumber("Encoder Rate", encoder.GetRate());
   }
 
  private:
@@ -72,15 +72,15 @@ class Robot : public frc::TimedRobot {
    * set this parameter to true, the direction of the encoder will  be reversed,
    * in case it makes more sense mechanically.
    *
-   * The final (optional) parameter specifies encoding rate (k1X, k2X, or k4X)
-   * and defaults to k4X. Faster (k4X) encoding gives greater positional
+   * The final (optional) parameter specifies encoding rate (X1, X2, or X4)
+   * and defaults to X4. Faster (X4) encoding gives greater positional
    * precision but more noise in the rate.
    */
-  frc::Encoder m_encoder{1, 2, false, frc::Encoder::k4X};
+  wpi::Encoder encoder{1, 2, false, wpi::Encoder::EncodingType::X4};
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

@@ -1,0 +1,52 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "wpi/hal/UsageReporting.h"
+
+#include <stdint.h>
+
+#include <format>
+
+#include "SystemServerInternal.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/StringTopic.hpp"
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/string.hpp"
+
+namespace {
+struct SystemServerUsageReporting {
+  wpi::nt::NetworkTableInstance ntInst;
+  wpi::util::StringMap<wpi::nt::StringPublisher> publishers;
+
+  explicit SystemServerUsageReporting(wpi::nt::NetworkTableInstance inst)
+      : ntInst{inst} {}
+};
+
+}  // namespace
+
+static ::SystemServerUsageReporting* systemServerUsage;
+
+extern "C" {
+
+void HAL_ReportUsage(const struct WPI_String* resource,
+                     const struct WPI_String* data) {
+  auto resourceStr = wpi::util::to_string_view(resource);
+  auto& publisher = systemServerUsage->publishers[resourceStr];
+  if (!publisher) {
+    publisher =
+        systemServerUsage->ntInst
+            .GetStringTopic(std::format("/UsageReporting/{}", resourceStr))
+            .Publish();
+  }
+  publisher.Set(wpi::util::to_string_view(data));
+}
+
+}  // extern "C"
+
+namespace wpi::hal::init {
+void InitializeUsageReporting() {
+  systemServerUsage =
+      new ::SystemServerUsageReporting{wpi::hal::GetSystemServer()};
+}
+}  // namespace wpi::hal::init

@@ -1,0 +1,123 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package org.wpilib.networktables;
+
+/** NetworkTables publish/subscribe options. */
+public class PubSubOptions {
+  /**
+   * Construct from a list of options.
+   *
+   * @param options options
+   */
+  public PubSubOptions(PubSubOption... options) {
+    for (PubSubOption option : options) {
+      switch (option) {
+        case PubSubOption.Periodic p -> periodic = p.period();
+        case PubSubOption.SendAll s -> sendAll = s.enabled();
+        case PubSubOption.TopicsOnly t -> topicsOnly = t.enabled();
+        case PubSubOption.PollStorage p -> pollStorage = p.depth();
+        case PubSubOption.KeepDuplicates k -> keepDuplicates = k.enabled();
+        case PubSubOption.DisableRemote d -> disableRemote = d.disabled();
+        case PubSubOption.DisableLocal l -> disableLocal = l.disabled();
+        case PubSubOption.ExcludePublisher e ->
+            excludePublisher = e.publisher() == null ? 0 : e.publisher().getHandle();
+        case PubSubOption.ExcludePublisherHandle e -> excludePublisher = e.publisher();
+        case PubSubOption.ExcludeSelf s -> excludeSelf = s.enabled();
+        case PubSubOption.Hidden h -> hidden = h.enabled();
+        case PubSubOption.DisableSignal s -> disableSignal = s.disabled();
+      }
+    }
+  }
+
+  PubSubOptions(
+      int pollStorage,
+      double periodic,
+      int excludePublisher,
+      boolean sendAll,
+      boolean topicsOnly,
+      boolean keepDuplicates,
+      boolean prefixMatch,
+      boolean disableRemote,
+      boolean disableLocal,
+      boolean excludeSelf,
+      boolean hidden,
+      boolean disableSignal) {
+    this.pollStorage = pollStorage;
+    this.periodic = periodic;
+    this.excludePublisher = excludePublisher;
+    this.sendAll = sendAll;
+    this.topicsOnly = topicsOnly;
+    this.keepDuplicates = keepDuplicates;
+    this.prefixMatch = prefixMatch;
+    this.disableRemote = disableRemote;
+    this.disableLocal = disableLocal;
+    this.excludeSelf = excludeSelf;
+    this.hidden = hidden;
+    this.disableSignal = disableSignal;
+  }
+
+  /** Default value of periodic. */
+  public static final double DEFAULT_PERIODIC = 0.1;
+
+  /**
+   * Polling storage size for a subscription. Specifies the maximum number of updates NetworkTables
+   * should store between calls to the subscriber's readQueue() function. If zero, defaults to 1 if
+   * sendAll is false, 20 if sendAll is true.
+   */
+  public int pollStorage;
+
+  /**
+   * How frequently changes will be sent over the network, in seconds. NetworkTables may send more
+   * frequently than this (e.g. use a combined minimum period for all values) or apply a restricted
+   * range to this value. The default is 100 ms.
+   */
+  public double periodic = DEFAULT_PERIODIC;
+
+  /**
+   * For subscriptions, if non-zero, value updates for readQueue() are not queued for this
+   * publisher.
+   */
+  public int excludePublisher;
+
+  /** Send all value changes over the network. */
+  public boolean sendAll;
+
+  /** For subscriptions, don't ask for value changes (only topic announcements). */
+  public boolean topicsOnly;
+
+  /** Preserve duplicate value changes (rather than ignoring them). */
+  public boolean keepDuplicates;
+
+  /**
+   * Perform prefix match on subscriber topic names. Is ignored/overridden by subscribe() functions;
+   * only present in struct for the purposes of getting information about subscriptions.
+   */
+  public boolean prefixMatch;
+
+  /**
+   * For subscriptions, if remote value updates should not be queued for readQueue(). See also
+   * disableLocal.
+   */
+  public boolean disableRemote;
+
+  /**
+   * For subscriptions, if local value updates should not be queued for readQueue(). See also
+   * disableRemote.
+   */
+  public boolean disableLocal;
+
+  /** For entries, don't queue (for readQueue) value updates for the entry's internal publisher. */
+  public boolean excludeSelf;
+
+  /**
+   * For subscriptions, don't share the existence of the subscription with the network. Note this
+   * means updates will not be received from the network unless another subscription overlaps with
+   * this one, and the subscription will not appear in metatopics.
+   */
+  public boolean hidden;
+
+  /** For subscriptions, don't signal the local handle when value updates are queued. */
+  public boolean disableSignal;
+}

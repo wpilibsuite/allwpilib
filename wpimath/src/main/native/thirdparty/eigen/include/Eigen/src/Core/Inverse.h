@@ -51,8 +51,8 @@ class Inverse : public InverseImpl<XprType, typename internal::traits<XprType>::
 
   explicit EIGEN_DEVICE_FUNC Inverse(const XprType& xpr) : m_xpr(xpr) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index rows() const EIGEN_NOEXCEPT { return m_xpr.cols(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index cols() const EIGEN_NOEXCEPT { return m_xpr.rows(); }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const noexcept { return m_xpr.cols(); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const noexcept { return m_xpr.rows(); }
 
   EIGEN_DEVICE_FUNC const XprTypeNestedCleaned& nestedExpression() const { return m_xpr; }
 

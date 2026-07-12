@@ -3,8 +3,8 @@ apply plugin: 'maven-publish'
 def outputsFolder = file("$buildDir/outputs")
 
 def baseArtifactId = nativeName
-def artifactGroupId = "edu.wpi.first.${nativeName}"
-def zipBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-cpp_CLS"
+def artifactGroupId = "org.wpilib.${nativeName}"
+def zipBaseName = makeZipBaseName(artifactGroupId, "${baseArtifactId}-cpp")
 
 def licenseFile = file("$rootDir/license.md")
 
@@ -21,6 +21,9 @@ task cppSourcesZip(type: Zip) {
         into '/'
     }
     from("$buildDir/generated/cpp") {
+        into '/'
+    }
+    from("src/generated/main/native/cpp") {
         into '/'
     }
 }
@@ -47,8 +50,10 @@ task cppHeadersZip(type: Zip) {
 }
 
 artifacts {
-    archives cppHeadersZip
-    archives cppSourcesZip
+    tasks.named("assemble") {
+        dependsOn(cppHeadersZip)
+        dependsOn(cppSourcesZip)
+    }
 }
 
 addTaskToCopyAllOutputs(cppSourcesZip)
@@ -67,8 +72,8 @@ model {
                 artifact cppSourcesZip
 
                 artifactId = "${baseArtifactId}-cpp"
-                groupId artifactGroupId
-                version wpilibVersioning.version.get()
+                groupId = artifactGroupId
+                version = wpilibVersioning.version.get()
             }
         }
     }

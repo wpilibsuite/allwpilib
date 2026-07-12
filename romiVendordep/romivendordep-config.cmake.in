@@ -1,5 +1,6 @@
 include(CMakeFindDependencyMacro)
 @WPIUTIL_DEP_REPLACE@
+@DATALOG_DEP_REPLACE@
 @NTCORE_DEP_REPLACE@
 @CSCORE_DEP_REPLACE@
 @CAMERASERVER_DEP_REPLACE@
@@ -9,6 +10,3 @@ include(CMakeFindDependencyMacro)
 
 @FILENAME_DEP_REPLACE@
 include(${SELF_DIR}/romivendordep.cmake)
-if(@WITH_JAVA@)
-    include(${SELF_DIR}/romiVendordep_jar.cmake)
-endif()

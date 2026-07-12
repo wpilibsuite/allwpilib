@@ -240,8 +240,8 @@ EIGEN_STRONG_INLINE Packet4d pcast<Packet4l, Packet4d>(const Packet4l& a) {
 #if defined(EIGEN_VECTORIZE_AVX512DQ) && defined(EIGEN_VECTORIZE_AVS512VL)
   return _mm256_cvtepi64_pd(a);
 #else
-  EIGEN_ALIGN16 int64_t aux[4];
-  pstore(aux, a);
+  int64_t aux[4];
+  pstoreu(aux, a);
   return _mm256_set_pd(static_cast<double>(aux[3]), static_cast<double>(aux[2]), static_cast<double>(aux[1]),
                        static_cast<double>(aux[0]));
 #endif
@@ -279,19 +279,21 @@ EIGEN_STRONG_INLINE Packet2l preinterpret<Packet2l, Packet4l>(const Packet4l& a)
 }
 #endif
 
+#ifndef EIGEN_VECTORIZE_AVX512FP16
 template <>
 EIGEN_STRONG_INLINE Packet8f pcast<Packet8h, Packet8f>(const Packet8h& a) {
   return half2float(a);
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet8f pcast<Packet8bf, Packet8f>(const Packet8bf& a) {
-  return Bf16ToF32(a);
-}
-
-template <>
 EIGEN_STRONG_INLINE Packet8h pcast<Packet8f, Packet8h>(const Packet8f& a) {
   return float2half(a);
+}
+#endif
+
+template <>
+EIGEN_STRONG_INLINE Packet8f pcast<Packet8bf, Packet8f>(const Packet8bf& a) {
+  return Bf16ToF32(a);
 }
 
 template <>

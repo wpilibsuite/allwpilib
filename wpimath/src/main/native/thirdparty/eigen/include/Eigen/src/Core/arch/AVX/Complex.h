@@ -475,19 +475,11 @@ EIGEN_STRONG_INLINE Packet4cf pmsub(const Packet4cf& a, const Packet4cf& b, cons
 }
 template <>
 EIGEN_STRONG_INLINE Packet4cf pnmadd(const Packet4cf& a, const Packet4cf& b, const Packet4cf& c) {
-  __m256 a_odd = _mm256_movehdup_ps(a.v);
-  __m256 a_even = _mm256_moveldup_ps(a.v);
-  __m256 b_swap = _mm256_permute_ps(b.v, _MM_SHUFFLE(2, 3, 0, 1));
-  __m256 result = _mm256_fmaddsub_ps(a_odd, b_swap, _mm256_fmaddsub_ps(a_even, b.v, c.v));
-  return Packet4cf(result);
+  return pnegate(pmsub(a, b, c));
 }
 template <>
 EIGEN_STRONG_INLINE Packet4cf pnmsub(const Packet4cf& a, const Packet4cf& b, const Packet4cf& c) {
-  __m256 a_odd = _mm256_movehdup_ps(a.v);
-  __m256 a_even = _mm256_moveldup_ps(a.v);
-  __m256 b_swap = _mm256_permute_ps(b.v, _MM_SHUFFLE(2, 3, 0, 1));
-  __m256 result = _mm256_fmaddsub_ps(a_odd, b_swap, _mm256_fmsubadd_ps(a_even, b.v, c.v));
-  return Packet4cf(result);
+  return pnegate(pmadd(a, b, c));
 }
 // std::complex<double>
 template <>
@@ -508,21 +500,64 @@ EIGEN_STRONG_INLINE Packet2cd pmsub(const Packet2cd& a, const Packet2cd& b, cons
 }
 template <>
 EIGEN_STRONG_INLINE Packet2cd pnmadd(const Packet2cd& a, const Packet2cd& b, const Packet2cd& c) {
-  __m256d a_odd = _mm256_permute_pd(a.v, 0xF);
-  __m256d a_even = _mm256_movedup_pd(a.v);
-  __m256d b_swap = _mm256_permute_pd(b.v, 0x5);
-  __m256d result = _mm256_fmaddsub_pd(a_odd, b_swap, _mm256_fmaddsub_pd(a_even, b.v, c.v));
-  return Packet2cd(result);
+  return pnegate(pmsub(a, b, c));
 }
 template <>
 EIGEN_STRONG_INLINE Packet2cd pnmsub(const Packet2cd& a, const Packet2cd& b, const Packet2cd& c) {
-  __m256d a_odd = _mm256_permute_pd(a.v, 0xF);
-  __m256d a_even = _mm256_movedup_pd(a.v);
-  __m256d b_swap = _mm256_permute_pd(b.v, 0x5);
-  __m256d result = _mm256_fmaddsub_pd(a_odd, b_swap, _mm256_fmsubadd_pd(a_even, b.v, c.v));
-  return Packet2cd(result);
+  return pnegate(pmadd(a, b, c));
 }
 #endif
+
+/*---------------- load/store segment support ----------------*/
+
+/*---------------- std::complex<float> ----------------*/
+
+template <>
+struct has_packet_segment<Packet2cf> : std::true_type {};
+
+template <>
+struct has_packet_segment<Packet4cf> : std::true_type {};
+
+template <>
+inline Packet2cf ploaduSegment<Packet2cf>(const std::complex<float>* from, Index begin, Index count) {
+  return (Packet2cf)_mm_maskload_ps(&numext::real_ref(*from), segment_mask_2x64(begin, count));
+}
+
+template <>
+inline void pstoreuSegment<std::complex<float>, Packet2cf>(std::complex<float>* to, const Packet2cf& from, Index begin,
+                                                           Index count) {
+  _mm_maskstore_ps(&numext::real_ref(*to), segment_mask_2x64(begin, count), from.v);
+}
+
+template <>
+inline Packet4cf ploaduSegment<Packet4cf>(const std::complex<float>* from, Index begin, Index count) {
+  return (Packet4cf)_mm256_maskload_ps(&numext::real_ref(*from), segment_mask_4x64(begin, count));
+}
+
+template <>
+inline void pstoreuSegment<std::complex<float>, Packet4cf>(std::complex<float>* to, const Packet4cf& from, Index begin,
+                                                           Index count) {
+  _mm256_maskstore_ps(&numext::real_ref(*to), segment_mask_4x64(begin, count), from.v);
+}
+
+/*---------------- std::complex<double> ----------------*/
+
+template <>
+struct has_packet_segment<Packet2cd> : std::true_type {};
+
+template <>
+inline Packet2cd ploaduSegment<Packet2cd>(const std::complex<double>* from, Index begin, Index count) {
+  return (Packet2cd)_mm256_maskload_pd(&numext::real_ref(*from), segment_mask_4x64(2 * begin, 2 * count));
+}
+
+template <>
+inline void pstoreuSegment<std::complex<double>, Packet2cd>(std::complex<double>* to, const Packet2cd& from,
+                                                            Index begin, Index count) {
+  _mm256_maskstore_pd(&numext::real_ref(*to), segment_mask_4x64(2 * begin, 2 * count), from.v);
+}
+
+/*---------------- end load/store segment support ----------------*/
+
 }  // end namespace internal
 
 }  // end namespace Eigen

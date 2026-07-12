@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'wpilibsuite/allwpilib' && github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - uses: jfrog/setup-jfrog-cli@v4
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'wpilibsuite/allwpilib' && github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - uses: jfrog/setup-jfrog-cli@v4

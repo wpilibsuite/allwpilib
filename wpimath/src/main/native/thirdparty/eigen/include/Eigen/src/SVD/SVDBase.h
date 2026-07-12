@@ -379,7 +379,7 @@ void SVDBase<Derived>::_solve_impl(const RhsType& rhs, DstType& dst) const {
   Index l_rank = rank();
   tmp.noalias() = m_matrixU.leftCols(l_rank).adjoint() * rhs;
   tmp = m_singularValues.head(l_rank).asDiagonal().inverse() * tmp;
-  dst = m_matrixV.leftCols(l_rank) * tmp;
+  dst.noalias() = m_matrixV.leftCols(l_rank) * tmp;
 }
 
 template <typename Derived>

@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Robot.h"
+#include "Robot.hpp"
 
 Robot::Robot() {
   // Configure default commands and condition bindings on robot startup
-  m_robot.ConfigureBindings();
+  robot.ConfigureBindings();
 }
 
 void Robot::RobotPeriodic() {
@@ -15,7 +15,7 @@ void Robot::RobotPeriodic() {
   // finished or interrupted commands, and running subsystem Periodic() methods.
   // This must be called from the robot's periodic block in order for anything
   // in the Command-based framework to work.
-  frc2::CommandScheduler::GetInstance().Run();
+  wpi::cmd::CommandScheduler::GetInstance().Run();
 }
 
 void Robot::DisabledInit() {}
@@ -23,10 +23,11 @@ void Robot::DisabledInit() {}
 void Robot::DisabledPeriodic() {}
 
 void Robot::AutonomousInit() {
-  m_autonomousCommand = m_robot.GetAutonomousCommand();
+  autonomousCommand = robot.GetAutonomousCommand();
 
-  if (m_autonomousCommand) {
-    m_autonomousCommand->Schedule();
+  if (autonomousCommand) {
+    wpi::cmd::CommandScheduler::GetInstance().Schedule(
+        autonomousCommand.value());
   }
 }
 
@@ -37,22 +38,22 @@ void Robot::TeleopInit() {
   // teleop starts running. If you want the autonomous to
   // continue until interrupted by another command, remove
   // this line or comment it out.
-  if (m_autonomousCommand) {
-    m_autonomousCommand->Cancel();
+  if (autonomousCommand) {
+    autonomousCommand->Cancel();
   }
 }
 
 void Robot::TeleopPeriodic() {}
 
-void Robot::TestInit() {
-  // Cancels all running commands at the start of test mode.
-  frc2::CommandScheduler::GetInstance().CancelAll();
+void Robot::UtilityInit() {
+  // Cancels all running commands at the start of utility mode.
+  wpi::cmd::CommandScheduler::GetInstance().CancelAll();
 }
 
-void Robot::TestPeriodic() {}
+void Robot::UtilityPeriodic() {}
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

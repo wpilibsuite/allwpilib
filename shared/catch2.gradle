@@ -1,0 +1,10 @@
+model {
+    binaries {
+        withType(GoogleTestTestSuiteBinarySpec).all {
+            if (!it.name.contains('Catch2')) {
+                return;
+            }
+            lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
+        }
+    }
+}

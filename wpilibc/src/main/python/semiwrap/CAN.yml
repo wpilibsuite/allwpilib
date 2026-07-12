@@ -1,0 +1,20 @@
+classes:
+  wpi::CAN:
+    attributes:
+      TEAM_MANUFACTURER:
+      TEAM_DEVICE_TYPE:
+    methods:
+      CAN:
+        overloads:
+          CANBusMap, int:
+          CANBusMap, int, int, int:
+      WritePacket:
+      WritePacketNoError:
+      WritePacketRepeating:
+      WritePacketRepeatingNoError:
+      WriteRTRFrame:
+      WriteRTRFrameNoError:
+      StopPacketRepeating:
+      ReadPacketNew:
+      ReadPacketLatest:
+      ReadPacketTimeout:

@@ -1,6 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 
-if (project.hasProperty('onlylinuxathena')) {
+if (project.hasProperty('onlylinuxsystemcore')) {
     return;
 }
 
@@ -9,7 +9,7 @@ if (OperatingSystem.current().isMacOsX()) {
     apply plugin: 'objective-cpp'
 }
 apply plugin: 'visual-studio'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 
 ext {
     nativeName = 'wpigui'
@@ -35,8 +35,8 @@ model {
                 }
             }
             binaries.all {
-                lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                     it.buildable = false
                     return
                 }
@@ -99,13 +99,13 @@ model {
             }
             binaries.all {
                 lib library: 'wpigui'
-                lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
             }
         }
     }
     binaries {
         all {
-            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                 it.buildable = false
                 return
             }

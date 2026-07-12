@@ -2,43 +2,43 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NTMecanumDrive.h"
+#include "wpi/glass/networktables/NTMecanumDrive.hpp"
 
+#include <format>
 #include <utility>
 
-#include <fmt/format.h>
 #include <imgui.h>
-#include <wpi/MathExtras.h>
-#include <wpi/StringExtras.h>
 
-using namespace glass;
+#include "wpi/util/StringExtras.hpp"
+
+using namespace wpi::glass;
 
 NTMecanumDriveModel::NTMecanumDriveModel(std::string_view path)
-    : NTMecanumDriveModel(nt::NetworkTableInstance::GetDefault(), path) {}
+    : NTMecanumDriveModel(wpi::nt::NetworkTableInstance::GetDefault(), path) {}
 
-NTMecanumDriveModel::NTMecanumDriveModel(nt::NetworkTableInstance inst,
+NTMecanumDriveModel::NTMecanumDriveModel(wpi::nt::NetworkTableInstance inst,
                                          std::string_view path)
     : m_inst{inst},
-      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
-      m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
+      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
+      m_controllable{inst.GetBooleanTopic(std::format("{}/.controllable", path))
                          .Subscribe(0)},
       m_flPercent{
-          inst.GetDoubleTopic(fmt::format("{}/Front Left Motor Speed", path))
+          inst.GetDoubleTopic(std::format("{}/Front Left Motor Velocity", path))
               .GetEntry(0)},
-      m_frPercent{
-          inst.GetDoubleTopic(fmt::format("{}/Front Right Motor Speed", path))
-              .GetEntry(0)},
+      m_frPercent{inst.GetDoubleTopic(
+                          std::format("{}/Front Right Motor Velocity", path))
+                      .GetEntry(0)},
       m_rlPercent{
-          inst.GetDoubleTopic(fmt::format("{}/Rear Left Motor Speed", path))
+          inst.GetDoubleTopic(std::format("{}/Rear Left Motor Velocity", path))
               .GetEntry(0)},
       m_rrPercent{
-          inst.GetDoubleTopic(fmt::format("{}/Rear Right Motor Speed", path))
+          inst.GetDoubleTopic(std::format("{}/Rear Right Motor Velocity", path))
               .GetEntry(0)},
-      m_nameValue{wpi::rsplit(path, '/').second},
-      m_flPercentData{fmt::format("NTMcnmDriveFL:{}", path)},
-      m_frPercentData{fmt::format("NTMcnmDriveFR:{}", path)},
-      m_rlPercentData{fmt::format("NTMcnmDriveRL:{}", path)},
-      m_rrPercentData{fmt::format("NTMcnmDriveRR:{}", path)} {
+      m_nameValue{wpi::util::rsplit(path, '/').second},
+      m_flPercentData{std::format("NTMcnmDriveFL:{}", path)},
+      m_frPercentData{std::format("NTMcnmDriveFR:{}", path)},
+      m_rlPercentData{std::format("NTMcnmDriveRL:{}", path)},
+      m_rrPercentData{std::format("NTMcnmDriveRR:{}", path)} {
   m_wheels.emplace_back("FL % Output", &m_flPercentData,
                         [this](auto value) { m_flPercent.Set(value); });
 
@@ -77,7 +77,7 @@ void NTMecanumDriveModel::Update() {
   double rl = m_rlPercentData.GetValue();
   double rr = m_rrPercentData.GetValue();
 
-  m_speedVector =
+  m_velocityVector =
       ImVec2((fl - fr - rl + rr) / 4.0f, -(fl + fr + rl + rr) / 4.0f);
   m_rotation = -(-fl + fr - rl + rr) / 4;
 }

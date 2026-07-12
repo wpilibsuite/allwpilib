@@ -4,12 +4,12 @@
 
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
-#include "frc/apriltag/AprilTagFieldLayout.h"
-#include "frc/apriltag/AprilTagFields.h"
+#include "wpi/apriltag/AprilTagFieldLayout.hpp"
+#include "wpi/apriltag/AprilTagFields.hpp"
 
-namespace frc {
+namespace wpi::apriltag {
 
 std::vector<AprilTagField> GetAllFields() {
   std::vector<AprilTagField> output;
@@ -21,45 +21,46 @@ std::vector<AprilTagField> GetAllFields() {
   return output;
 }
 
-TEST(AprilTagFieldsTest, TestLoad2022RapidReact) {
+TEST_CASE("AprilTagFieldsTest TestLoad2022RapidReact",
+          "[apriltag][field-layout]") {
   AprilTagFieldLayout layout =
       AprilTagFieldLayout::LoadField(AprilTagField::k2022RapidReact);
 
   // Blue Hangar Truss - Hub
   auto expectedPose =
-      Pose3d{127.272_in, 216.01_in, 67.932_in, Rotation3d{0_deg, 0_deg, 0_deg}};
+      wpi::math::Pose3d{127.272_in, 216.01_in, 67.932_in,
+                        wpi::math::Rotation3d{0_deg, 0_deg, 0_deg}};
   auto maybePose = layout.GetTagPose(1);
-  EXPECT_TRUE(maybePose);
-  EXPECT_EQ(expectedPose, *maybePose);
+  REQUIRE(maybePose);
+  CHECK(expectedPose == *maybePose);
 
   // Blue Terminal Near Station
-  expectedPose = Pose3d{4.768_in, 67.631_in, 35.063_in,
-                        Rotation3d{0_deg, 0_deg, 46.25_deg}};
+  expectedPose =
+      wpi::math::Pose3d{4.768_in, 67.631_in, 35.063_in,
+                        wpi::math::Rotation3d{0_deg, 0_deg, 46.25_deg}};
   maybePose = layout.GetTagPose(5);
-  EXPECT_TRUE(maybePose);
-  EXPECT_EQ(expectedPose, *maybePose);
+  REQUIRE(maybePose);
+  CHECK(expectedPose == *maybePose);
 
   // Upper Hub Blue-Near
-  expectedPose = Pose3d{332.321_in, 183.676_in, 95.186_in,
-                        Rotation3d{0_deg, 26.75_deg, 69_deg}};
+  expectedPose =
+      wpi::math::Pose3d{332.321_in, 183.676_in, 95.186_in,
+                        wpi::math::Rotation3d{0_deg, 26.75_deg, 69_deg}};
   maybePose = layout.GetTagPose(53);
-  EXPECT_TRUE(maybePose);
-  EXPECT_EQ(expectedPose, *maybePose);
+  REQUIRE(maybePose);
+  CHECK(expectedPose == *maybePose);
 
   // Doesn't exist
   maybePose = layout.GetTagPose(54);
-  EXPECT_FALSE(maybePose);
+  CHECK_FALSE(maybePose);
 }
 
 // Test all of the fields in the enum
-class AllFieldsFixtureTest : public ::testing::TestWithParam<AprilTagField> {};
-
-TEST_P(AllFieldsFixtureTest, CheckEntireEnum) {
-  AprilTagField field = GetParam();
-  EXPECT_NO_THROW(AprilTagFieldLayout::LoadField(field));
+TEST_CASE("AprilTagFieldsTest CheckEntireEnum", "[apriltag][field-layout]") {
+  for (auto field : GetAllFields()) {
+    CAPTURE(field);
+    CHECK_NOTHROW(AprilTagFieldLayout::LoadField(field));
+  }
 }
 
-INSTANTIATE_TEST_SUITE_P(ValuesEnumTestInstTests, AllFieldsFixtureTest,
-                         ::testing::ValuesIn(GetAllFields()));
-
-}  // namespace frc
+}  // namespace wpi::apriltag

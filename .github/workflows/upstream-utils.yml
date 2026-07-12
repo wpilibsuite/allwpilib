@@ -1,6 +1,7 @@
 name: Upstream utils
 
 on:
+  merge_group:
   pull_request:
   push:
     branches-ignore:
@@ -13,9 +14,9 @@ concurrency:
 jobs:
   update:
     name: "Update"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Fetch all history and metadata
@@ -23,7 +24,7 @@ jobs:
           git checkout -b pr
           git branch -f main origin/main
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Configure committer identity
@@ -42,24 +43,24 @@ jobs:
           ./argparse_lib.py clone
           ./argparse_lib.py copy-src
           ./argparse_lib.py format-patch
+      - name: Run benchmark.py
+        run: |
+          cd upstream_utils
+          ./benchmark.py clone
+          ./benchmark.py copy-src
+          ./benchmark.py format-patch
+      - name: Run double-conversion.py
+        run: |
+          cd upstream_utils
+          ./double-conversion.py clone
+          ./double-conversion.py copy-src
+          ./double-conversion.py format-patch
       - name: Run eigen.py
         run: |
           cd upstream_utils
           ./eigen.py clone
           ./eigen.py copy-src
           ./eigen.py format-patch
-      - name: Run expected.py
-        run: |
-          cd upstream_utils
-          ./expected.py clone
-          ./expected.py copy-src
-          ./expected.py format-patch
-      - name: Run fmt.py
-        run: |
-          cd upstream_utils
-          ./fmt.py clone
-          ./fmt.py copy-src
-          ./fmt.py format-patch
       - name: Run gcem.py
         run: |
           cd upstream_utils
@@ -120,24 +121,6 @@ jobs:
           ./mpack.py clone
           ./mpack.py copy-src
           ./mpack.py format-patch
-      - name: Run stack_walker.py
-        run: |
-          cd upstream_utils
-          ./stack_walker.py clone
-          ./stack_walker.py copy-src
-          ./stack_walker.py format-patch
-      - name: Run memory.py
-        run: |
-          cd upstream_utils
-          ./memory.py clone
-          ./memory.py copy-src
-          ./memory.py format-patch
-      - name: Run protobuf.py
-        run: |
-          cd upstream_utils
-          ./protobuf.py clone
-          ./protobuf.py copy-src
-          ./protobuf.py format-patch
       - name: Run sleipnir.py
         run: |
           cd upstream_utils
@@ -150,7 +133,20 @@ jobs:
           ./stb.py clone
           ./stb.py copy-src
           ./stb.py format-patch
+      - name: Run upb.py
+        run: |
+          cd upstream_utils
+          ./upb.py clone
+          ./upb.py copy-src
+          ./upb.py format-patch
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output
-        run: git --no-pager diff --exit-code HEAD ':!*.bazel'
+        run: |
+          set +e
+          git --no-pager diff --exit-code HEAD ':!*.bazel'
+          git_exit_code=$?
+          if test "$git_exit_code" -ne "0"; then
+            echo "::error ::upstream_utils check failed. This is usually caused by a bad script or the copied files differing from what the script outputs. You can learn more about using upstream_utils to modify thirdparty libraries at https://github.com/wpilibsuite/allwpilib/blob/main/upstream_utils/README.md"
+            exit $git_exit_code
+          fi

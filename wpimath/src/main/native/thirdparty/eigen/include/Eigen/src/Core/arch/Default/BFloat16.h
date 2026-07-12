@@ -673,6 +673,11 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 fmax(const bfloat16& a, const bfl
   return bfloat16(::fmaxf(f1, f2));
 }
 
+EIGEN_DEVICE_FUNC inline bfloat16 fma(const bfloat16& a, const bfloat16& b, const bfloat16& c) {
+  // Emulate FMA via float.
+  return bfloat16(numext::fma(static_cast<float>(a), static_cast<float>(b), static_cast<float>(c)));
+}
+
 #ifndef EIGEN_NO_IO
 EIGEN_ALWAYS_INLINE std::ostream& operator<<(std::ostream& os, const bfloat16& v) {
   os << static_cast<float>(v);
@@ -786,6 +791,12 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 nextafter(const bfloat16& from, c
     --from_bits;
   }
   return numext::bit_cast<bfloat16>(from_bits);
+}
+
+// Specialize multiply-add to match packet operations and reduce conversions to/from float.
+template<>
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Eigen::bfloat16 madd<Eigen::bfloat16>(const Eigen::bfloat16& x, const Eigen::bfloat16& y, const Eigen::bfloat16& z) {
+  return Eigen::bfloat16(static_cast<float>(x) * static_cast<float>(y) + static_cast<float>(z));
 }
 
 }  // namespace numext

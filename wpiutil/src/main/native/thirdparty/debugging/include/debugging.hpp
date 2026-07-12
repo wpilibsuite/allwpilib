@@ -3,7 +3,7 @@
 
 #include <debugging/detail/psnip_debug_trap.h>
 
-namespace wpi {
+namespace wpi::util {
 
 bool is_debugger_present() noexcept;
 
@@ -24,6 +24,6 @@ inline void breakpoint_if_debugging() noexcept
 	if (is_debugger_present()) breakpoint();
 }
 
-} // namespace wpi
+} // namespace wpi::util
 
 #endif

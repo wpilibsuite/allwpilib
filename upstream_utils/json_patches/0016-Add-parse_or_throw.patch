@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Fri, 3 Apr 2026 22:40:25 -0700
+Subject: [PATCH 16/25] Add parse_or_throw
+
+---
+ json.cpp | 10 ++++++++++
+ json.h   |  1 +
+ 2 files changed, 11 insertions(+)
+
+diff --git a/json.cpp b/json.cpp
+index 11f2ccde854aed19724c991b36905b221e71ae84..84712da562ee6b1966bae788fbf32876eaec4cef 100644
+--- a/json.cpp
++++ b/json.cpp
+@@ -1276,6 +1276,16 @@ json::parse(std::string_view s)
+     return j;
+ }
+ 
++json
++json::parse_or_throw(std::string_view s)
++{
++    auto result = parse(s);
++    if (!result) {
++        ON_LOGIC_ERROR(result.error());
++    }
++    return *result;
++}
++
+ const char*
+ json::StatusToString(json::Status status)
+ {
+diff --git a/json.h b/json.h
+index 1553eecb7251d509622ab00a4ade4a672252845e..c5f39687e68289adadb988df9cfd81c031266859 100644
+--- a/json.h
++++ b/json.h
+@@ -96,6 +96,7 @@ class json
+ 
+   public:
+     static std::expected<json, const char*> parse(std::string_view);
++    static json parse_or_throw(std::string_view);
+ 
+     json(const json&);
+     json(json&&);

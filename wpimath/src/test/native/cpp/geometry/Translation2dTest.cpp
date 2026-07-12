@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/geometry/Translation2d.hpp"
+
 #include <cmath>
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Translation2d.h"
-
-using namespace frc;
+using namespace wpi::math;
 
 TEST(Translation2dTest, Sum) {
   const Translation2d one{1_m, 3_m};
@@ -35,7 +35,16 @@ TEST(Translation2dTest, RotateBy) {
   const auto rotated = another.RotateBy(90_deg);
 
   EXPECT_NEAR(0.0, rotated.X().value(), 1e-9);
-  EXPECT_DOUBLE_EQ(3.0, rotated.Y().value());
+  EXPECT_NEAR(3.0, rotated.Y().value(), 1e-9);
+}
+
+TEST(Translation2dTest, RotateAround) {
+  const Translation2d translation{2_m, 1_m};
+  const Translation2d other{3_m, 2_m};
+  const auto rotated = translation.RotateAround(other, 180_deg);
+
+  EXPECT_NEAR(4.0, rotated.X().value(), 1e-9);
+  EXPECT_NEAR(3.0, rotated.Y().value(), 1e-9);
 }
 
 TEST(Translation2dTest, Multiplication) {
@@ -59,10 +68,21 @@ TEST(Translation2dTest, Norm) {
   EXPECT_DOUBLE_EQ(std::hypot(3.0, 5.0), one.Norm().value());
 }
 
+TEST(Translation2dTest, SquaredNorm) {
+  const Translation2d one{3_m, 5_m};
+  EXPECT_DOUBLE_EQ(34.0, one.SquaredNorm().value());
+}
+
 TEST(Translation2dTest, Distance) {
   const Translation2d one{1_m, 1_m};
   const Translation2d two{6_m, 6_m};
   EXPECT_DOUBLE_EQ(5.0 * std::sqrt(2.0), one.Distance(two).value());
+}
+
+TEST(Translation2dTest, SquaredDistance) {
+  const Translation2d one{1_m, 1_m};
+  const Translation2d two{6_m, 6_m};
+  EXPECT_DOUBLE_EQ(50.0, one.SquaredDistance(two).value());
 }
 
 TEST(Translation2dTest, UnaryMinus) {
@@ -152,4 +172,16 @@ TEST(Translation2dTest, Constexpr) {
   static_assert(negated.X() == (-1_m));
   static_assert(multiplied.X() == 2_m);
   static_assert(divided.Y() == 1_m);
+}
+
+TEST(Translation2dTest, Dot) {
+  const Translation2d one{2_m, 3_m};
+  const Translation2d two{3_m, 4_m};
+  EXPECT_DOUBLE_EQ(18.0, one.Dot(two).value());
+}
+
+TEST(Translation2dTest, Cross) {
+  const Translation2d one{2_m, 3_m};
+  const Translation2d two{3_m, 4_m};
+  EXPECT_DOUBLE_EQ(-1.0, one.Cross(two).value());
 }

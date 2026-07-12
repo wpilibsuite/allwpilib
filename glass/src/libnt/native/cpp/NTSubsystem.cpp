@@ -2,25 +2,24 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NTSubsystem.h"
+#include "wpi/glass/networktables/NTSubsystem.hpp"
 
+#include <format>
 #include <utility>
 
-#include <fmt/format.h>
-
-using namespace glass;
+using namespace wpi::glass;
 
 NTSubsystemModel::NTSubsystemModel(std::string_view path)
-    : NTSubsystemModel(nt::NetworkTableInstance::GetDefault(), path) {}
+    : NTSubsystemModel(wpi::nt::NetworkTableInstance::GetDefault(), path) {}
 
-NTSubsystemModel::NTSubsystemModel(nt::NetworkTableInstance inst,
+NTSubsystemModel::NTSubsystemModel(wpi::nt::NetworkTableInstance inst,
                                    std::string_view path)
     : m_inst{inst},
-      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
+      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
       m_defaultCommand{
-          inst.GetStringTopic(fmt::format("{}/.default", path)).Subscribe("")},
+          inst.GetStringTopic(std::format("{}/.default", path)).Subscribe("")},
       m_currentCommand{
-          inst.GetStringTopic(fmt::format("{}/.command", path)).Subscribe("")} {
+          inst.GetStringTopic(std::format("{}/.command", path)).Subscribe("")} {
 }
 
 void NTSubsystemModel::Update() {

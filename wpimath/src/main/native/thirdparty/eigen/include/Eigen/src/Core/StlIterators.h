@@ -36,11 +36,11 @@ class indexed_based_stl_iterator_base {
   typedef Index difference_type;
   typedef std::random_access_iterator_tag iterator_category;
 
-  indexed_based_stl_iterator_base() EIGEN_NO_THROW : mp_xpr(0), m_index(0) {}
-  indexed_based_stl_iterator_base(XprType& xpr, Index index) EIGEN_NO_THROW : mp_xpr(&xpr), m_index(index) {}
+  indexed_based_stl_iterator_base() noexcept : mp_xpr(0), m_index(0) {}
+  indexed_based_stl_iterator_base(XprType& xpr, Index index) noexcept : mp_xpr(&xpr), m_index(index) {}
 
-  indexed_based_stl_iterator_base(const non_const_iterator& other) EIGEN_NO_THROW : mp_xpr(other.mp_xpr),
-                                                                                    m_index(other.m_index) {}
+  indexed_based_stl_iterator_base(const non_const_iterator& other) noexcept
+      : mp_xpr(other.mp_xpr), m_index(other.m_index) {}
 
   indexed_based_stl_iterator_base& operator=(const non_const_iterator& other) {
     mp_xpr = other.mp_xpr;
@@ -325,7 +325,7 @@ class pointer_based_stl_iterator {
  public:
   typedef Index difference_type;
   typedef typename XprType::Scalar value_type;
-#if EIGEN_CPLUSPLUS >= 202002L
+#if EIGEN_COMP_CXXVER >= 20 && defined(__cpp_lib_concepts) && __cpp_lib_concepts >= 202002L
   typedef std::conditional_t<XprType::InnerStrideAtCompileTime == 1, std::contiguous_iterator_tag,
                              std::random_access_iterator_tag>
       iterator_category;
@@ -335,15 +335,14 @@ class pointer_based_stl_iterator {
   typedef std::conditional_t<bool(is_lvalue), value_type*, const value_type*> pointer;
   typedef std::conditional_t<bool(is_lvalue), value_type&, const value_type&> reference;
 
-  pointer_based_stl_iterator() EIGEN_NO_THROW : m_ptr(0) {}
-  pointer_based_stl_iterator(XprType& xpr, Index index) EIGEN_NO_THROW : m_incr(xpr.innerStride()) {
+  pointer_based_stl_iterator() noexcept : m_ptr(0) {}
+  pointer_based_stl_iterator(XprType& xpr, Index index) noexcept : m_incr(xpr.innerStride()) {
     m_ptr = xpr.data() + index * m_incr.value();
   }
 
-  pointer_based_stl_iterator(const non_const_iterator& other) EIGEN_NO_THROW : m_ptr(other.m_ptr),
-                                                                               m_incr(other.m_incr) {}
+  pointer_based_stl_iterator(const non_const_iterator& other) noexcept : m_ptr(other.m_ptr), m_incr(other.m_incr) {}
 
-  pointer_based_stl_iterator& operator=(const non_const_iterator& other) EIGEN_NO_THROW {
+  pointer_based_stl_iterator& operator=(const non_const_iterator& other) noexcept {
     m_ptr = other.m_ptr;
     m_incr.setValue(other.m_incr);
     return *this;

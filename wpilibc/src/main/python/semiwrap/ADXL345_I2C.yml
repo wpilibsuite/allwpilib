@@ -1,0 +1,27 @@
+extra_includes:
+- wpi/nt/NTSendableBuilder.hpp
+
+classes:
+  wpi::ADXL345_I2C:
+    ignored_bases:
+    - wpi::util::SendableHelper<ADXL345_I2C>
+    enums:
+      Axis:
+    attributes:
+      DEFAULT_ADDRESS:
+    methods:
+      ADXL345_I2C:
+      GetI2CPort:
+      GetI2CDeviceAddress:
+      SetRange:
+      GetX:
+      GetY:
+      GetZ:
+      GetAcceleration:
+      GetAccelerations:
+      InitSendable:
+  wpi::ADXL345_I2C::AllAxes:
+    attributes:
+      x:
+      y:
+      z:

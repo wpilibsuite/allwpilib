@@ -1,0 +1,61 @@
+extra_includes:
+- wpi/event/BooleanEvent.hpp
+
+classes:
+  wpi::GenericHID:
+    force_no_trampoline: true
+    enums:
+      RumbleType:
+      SupportedOutputs:
+        arithmetic: true
+      HIDType:
+    methods:
+      GetRawButton:
+      GetRawButtonPressed:
+      GetRawButtonReleased:
+      Button:
+      GetRawAxis:
+      GetPOV:
+      POV:
+        overloads:
+          POVDirection, EventLoop* [const]:
+          int, POVDirection, EventLoop* [const]:
+      POVUp:
+      POVUpRight:
+      POVRight:
+      POVDownRight:
+      POVDown:
+      POVDownLeft:
+      POVLeft:
+      POVUpLeft:
+      POVCenter:
+      AxisLessThan:
+      AxisGreaterThan:
+      IsConnected:
+      GetGamepadType:
+      GetSupportedOutputs:
+      GetName:
+      GetPort:
+      SetLeds:
+      SetRumble:
+      GetAxesMaximumIndex:
+      GetAxesAvailable:
+      GetPOVsMaximumIndex:
+      GetPOVsAvailable:
+      GetButtonsMaximumIndex:
+      GetButtonsAvailable:
+      GetTouchpadFingerAvailable:
+      GetTouchpadFinger:
+      GetHID:
+        overloads:
+          "":
+            return_value_policy: reference_internal
+          '[const]':
+            ignore: true
+inline_code: |
+  cls_GenericHID
+    .def("__repr__", [](py::handle self) {
+      py::object type_name = self.get_type().attr("__qualname__");
+      int port = self.cast<GenericHID&>().GetPort();
+      return py::str("<{} {}>").format(type_name, port);
+    });

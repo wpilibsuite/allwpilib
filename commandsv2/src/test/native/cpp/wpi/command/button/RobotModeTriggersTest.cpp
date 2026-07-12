@@ -1,0 +1,49 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "wpi/commands2/button/RobotModeTriggers.hpp"
+
+#include "../CommandTestBase.hpp"
+#include "wpi/commands2/button/Trigger.hpp"
+#include "wpi/hal/DriverStationTypes.h"
+#include "wpi/simulation/DriverStationSim.hpp"
+
+using namespace wpi::cmd;
+using namespace wpi::sim;
+class RobotModeTriggersTest : public CommandTestBase {};
+
+TEST(RobotModeTriggersTest, Autonomous) {
+  DriverStationSim::ResetData();
+  DriverStationSim::SetRobotMode(wpi::hal::RobotMode::AUTONOMOUS);
+  DriverStationSim::SetEnabled(true);
+  DriverStationSim::NotifyNewData();
+  Trigger autonomous = RobotModeTriggers::Autonomous();
+  EXPECT_TRUE(autonomous.Get());
+}
+
+TEST(RobotModeTriggersTest, Teleop) {
+  DriverStationSim::ResetData();
+  DriverStationSim::SetRobotMode(wpi::hal::RobotMode::TELEOPERATED);
+  DriverStationSim::SetEnabled(true);
+  DriverStationSim::NotifyNewData();
+  Trigger teleop = RobotModeTriggers::Teleop();
+  EXPECT_TRUE(teleop.Get());
+}
+
+TEST(RobotModeTriggersTest, Disabled) {
+  DriverStationSim::ResetData();
+  DriverStationSim::SetEnabled(false);
+  DriverStationSim::NotifyNewData();
+  Trigger disabled = RobotModeTriggers::Disabled();
+  EXPECT_TRUE(disabled.Get());
+}
+
+TEST(RobotModeTriggersTest, UtilityMode) {
+  DriverStationSim::ResetData();
+  DriverStationSim::SetRobotMode(wpi::hal::RobotMode::UTILITY);
+  DriverStationSim::SetEnabled(true);
+  DriverStationSim::NotifyNewData();
+  Trigger test = RobotModeTriggers::Utility();
+  EXPECT_TRUE(test.Get());
+}

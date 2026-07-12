@@ -1,0 +1,100 @@
+classes:
+  wpi::sim::DifferentialDrivetrainSim:
+    typealias:
+    - wpi::math::DCMotor
+    - template <int S, int I, int O> using LinearSystem = wpi::math::LinearSystem<S, I, O>
+    methods:
+      DifferentialDrivetrainSim:
+        overloads:
+          ? wpi::math::LinearSystem<2, 2, 2>, wpi::units::meter_t, wpi::math::DCMotor, double, wpi::units::meter_t, const std::array<double, 7>&
+          : param_override:
+              measurementStdDevs:
+                default: std::array<double, 7>{}
+          ? wpi::math::DCMotor, double, wpi::units::kilogram_square_meter_t, wpi::units::kilogram_t, wpi::units::meter_t, wpi::units::meter_t, const std::array<double, 7>&
+          : param_override:
+              measurementStdDevs:
+                default: std::array<double, 7>{}
+      ClampInput:
+      SetInputs:
+      SetGearing:
+      Update:
+      GetGearing:
+      GetHeading:
+      GetPose:
+      GetRightPosition:
+      GetRightVelocity:
+      GetLeftPosition:
+      GetLeftVelocity:
+      GetRightCurrentDraw:
+      GetLeftCurrentDraw:
+      GetCurrentDraw:
+      SetState:
+      SetPose:
+      Dynamics:
+      CreateKitbotSim:
+        overloads:
+          wpi::math::DCMotor, double, wpi::units::meter_t, const std::array<double, 7>&:
+            param_override:
+              measurementStdDevs:
+                default: std::array<double, 7>{}
+          wpi::math::DCMotor, double, wpi::units::meter_t, wpi::units::kilogram_square_meter_t, const std::array<double, 7>&:
+            param_override:
+              measurementStdDevs:
+                default: std::array<double, 7>{}
+      GetState:
+        overloads:
+          int [const]:
+          '[const]':
+  wpi::sim::DifferentialDrivetrainSim::State:
+    attributes:
+      X:
+      Y:
+      HEADING:
+      LEFT_VELOCITY:
+      RIGHT_VELOCITY:
+      LEFT_POSITION:
+      RIGHT_POSITION:
+  wpi::sim::DifferentialDrivetrainSim::KitbotGearing:
+    attributes:
+      RATIO_12P75:
+      RATIO_10P71:
+      RATIO_8P45:
+      RATIO_7P31:
+      RATIO_5P95:
+  wpi::sim::DifferentialDrivetrainSim::KitbotMotor:
+    attributes:
+      SINGLE_CIM_PER_SIDE:
+      DUAL_CIM_PER_SIDE:
+      SINGLE_MINI_CIM_PER_SIDE:
+      DUAL_MINI_CIM_PER_SIDE:
+      SINGLE_FALCON_500_PER_SIDE:
+      DUAL_FALCON_500_PER_SIDE:
+      SINGLE_NEO_PER_SIDE:
+      DUAL_NEO_PER_SIDE:
+  wpi::sim::DifferentialDrivetrainSim::KitbotWheelSize:
+    attributes:
+      SIX_INCH:
+      EIGHT_INCH:
+      TEN_INCH:
+
+inline_code: |-
+  cls_DifferentialDrivetrainSim
+    .def("get_left_position_feet", [](DifferentialDrivetrainSim * self) -> wpi::units::foot_t {
+      return self->GetLeftPosition();
+    })
+    .def("get_left_position_inches", [](DifferentialDrivetrainSim * self) -> wpi::units::inch_t {
+      return self->GetLeftPosition();
+    })
+    .def("get_left_velocity_fps", [](DifferentialDrivetrainSim * self) -> wpi::units::feet_per_second_t {
+      return self->GetLeftVelocity();
+    })
+    .def("get_right_position_feet", [](DifferentialDrivetrainSim * self) -> wpi::units::foot_t {
+      return self->GetRightPosition();
+    })
+    .def("get_right_position_inches", [](DifferentialDrivetrainSim * self) -> wpi::units::inch_t {
+      return self->GetRightPosition();
+    })
+    .def("get_right_velocity_fps", [](DifferentialDrivetrainSim * self) -> wpi::units::feet_per_second_t {
+      return self->GetRightVelocity();
+    })
+  ;

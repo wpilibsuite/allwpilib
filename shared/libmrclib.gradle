@@ -1,0 +1,14 @@
+nativeUtils {
+    nativeDependencyContainer {
+        mrclib(getNativeDependencyTypeClass('WPISharedMavenDependency')) {
+            groupId = "org.wpilib.mrclib"
+            artifactId = "mrclib-cpp"
+            headerClassifier = "headers"
+            ext = "zip"
+            version = '2027.1.0-alpha-1-69-gc4dd18d'
+            skipAtRuntimePlatforms.add(nativeUtils.wpi.platforms.systemcore)
+            targetPlatforms.addAll(nativeUtils.wpi.platforms.allPlatforms)
+            noDebugSplit = true
+        }
+    }
+}

@@ -2,29 +2,31 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/filter/SlewRateLimiter.hpp"
+
 #include <gtest/gtest.h>
-#include <wpi/timestamp.h>
 
-#include "frc/filter/SlewRateLimiter.h"
-#include "units/length.h"
-#include "units/time.h"
-#include "units/velocity.h"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/util/timestamp.h"
 
-static units::second_t now = 0_s;
+static wpi::units::second_t now = 0_s;
 
 class SlewRateLimiterTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
+    WPI_SetNowImpl(
+        [] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
   }
 
   void TearDown() override { WPI_SetNowImpl(nullptr); }
 };
 
 TEST_F(SlewRateLimiterTest, SlewRateLimit) {
-  WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
+  WPI_SetNowImpl([] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
 
-  frc::SlewRateLimiter<units::meters> limiter(1_mps);
+  wpi::math::SlewRateLimiter<wpi::units::meters> limiter(1_mps);
 
   now += 1_s;
 
@@ -32,7 +34,7 @@ TEST_F(SlewRateLimiterTest, SlewRateLimit) {
 }
 
 TEST_F(SlewRateLimiterTest, SlewRateNoLimit) {
-  frc::SlewRateLimiter<units::meters> limiter(1_mps);
+  wpi::math::SlewRateLimiter<wpi::units::meters> limiter(1_mps);
 
   now += 1_s;
 
@@ -40,7 +42,7 @@ TEST_F(SlewRateLimiterTest, SlewRateNoLimit) {
 }
 
 TEST_F(SlewRateLimiterTest, SlewRatePositiveNegativeLimit) {
-  frc::SlewRateLimiter<units::meters> limiter(1_mps, -0.5_mps);
+  wpi::math::SlewRateLimiter<wpi::units::meters> limiter(1_mps, -0.5_mps);
 
   now += 1_s;
 

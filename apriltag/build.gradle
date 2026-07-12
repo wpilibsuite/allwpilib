@@ -4,15 +4,16 @@ apply plugin: 'c'
 
 ext {
     nativeName = 'apriltag'
-    devMain = 'edu.wpi.first.apriltag.DevMain'
+    devMain = 'org.wpilib.vision.apriltag.DevMain'
+    nativeTestSuiteName = "${nativeName}Catch2Test"
     useJava = true
     useCpp = true
     sharedCvConfigs = [
         apriltagDev : [],
-        apriltagTest: []]
+        (nativeTestSuiteName): []]
     staticCvConfigs = []
 
-    def generateTask = createGenerateResourcesTask('main', 'APRILTAG', 'frc', project)
+    def generateTask = createGenerateResourcesTask('main', 'APRILTAG', 'wpi::apriltag', project)
 
     tasks.withType(CppCompile) {
         dependsOn generateTask
@@ -46,6 +47,7 @@ apply from: "${rootDir}/shared/opencv.gradle"
 
 dependencies {
     implementation project(':wpimath')
+    annotationProcessor libs.avaje.jsonb.generator
 }
 
 sourceSets {
@@ -103,14 +105,8 @@ model {
                 return
             }
             it.cppCompiler.define 'WPILIB_EXPORTS'
-
-            if (it.component.name == "${nativeName}JNI") {
-                lib project: ':wpimath', library: 'wpimath', linkage: 'static'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-            } else {
-                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-            }
+            lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
         }
     }
     tasks {

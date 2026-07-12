@@ -133,8 +133,8 @@ EIGEN_DEVICE_FUNC inline Matrix<typename MatrixBase<Derived>::Scalar, 3, 1> Matr
  * \sa class AngleAxis
  */
 template <typename Derived>
-EIGEN_DEPRECATED EIGEN_DEVICE_FUNC inline Matrix<typename MatrixBase<Derived>::Scalar, 3, 1>
-MatrixBase<Derived>::eulerAngles(Index a0, Index a1, Index a2) const {
+EIGEN_DEVICE_FUNC inline Matrix<typename MatrixBase<Derived>::Scalar, 3, 1> MatrixBase<Derived>::eulerAngles(
+    Index a0, Index a1, Index a2) const {
   /* Implemented from Graphics Gems IV */
   EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(Derived, 3, 3)
 

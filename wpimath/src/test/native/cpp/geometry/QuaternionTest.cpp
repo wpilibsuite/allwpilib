@@ -2,15 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/geometry/Quaternion.hpp"
+
 #include <numbers>
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Quaternion.h"
-#include "units/angle.h"
-#include "units/math.h"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/math.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 TEST(QuaternionTest, Init) {
   // Identity
@@ -94,8 +95,8 @@ TEST(QuaternionTest, ScalarDivision) {
 
 TEST(QuaternionTest, Multiply) {
   // 90° CCW rotations around each axis
-  double c = units::math::cos(90_deg / 2.0);
-  double s = units::math::sin(90_deg / 2.0);
+  double c = wpi::units::math::cos(90_deg / 2.0);
+  double s = wpi::units::math::sin(90_deg / 2.0);
   Quaternion xRot{c, s, 0.0, 0.0};
   Quaternion yRot{c, 0.0, s, 0.0};
   Quaternion zRot{c, 0.0, 0.0, s};
@@ -176,6 +177,7 @@ TEST(QuaternionTest, Logarithm) {
   Quaternion k{0, 0, 0, 1};
   Quaternion ln_half{std::log(0.5), -std::numbers::pi, 0, 0};
 
+  EXPECT_EQ(zero, zero.Log());
   EXPECT_EQ(zero, one.Log());
   EXPECT_EQ(i * std::numbers::pi / 2, i.Log());
   EXPECT_EQ(j * std::numbers::pi / 2, j.Log());
@@ -199,8 +201,8 @@ TEST(QuaternionTest, LogarithmAndExponentialInverse) {
   Quaternion start{1, 2, 3, 4};
   Quaternion expect{5, 6, 7, 8};
 
-  auto twist = start.Log(expect);
-  auto actual = start.Exp(twist);
+  auto twist = (expect * start.Inverse()).Log();
+  auto actual = twist.Exp() * start;
 
   EXPECT_EQ(expect, actual);
 }

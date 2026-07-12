@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: sciencewhiz <sciencewhiz@users.noreply.github.com>
+Date: Sat, 24 Jan 2026 10:38:45 -0800
+Subject: [PATCH 4/4] Fix supress warnings to be in input file
+
+---
+ src/mappings.h    | 8 ++++++++
+ src/mappings.h.in | 8 ++++++++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/src/mappings.h b/src/mappings.h
+index 47d154f96d0bf4dbb4506ec43a59f2a374612551..f1914c74e4ab309ad2ce07d3ff3094a063a554a3 100644
+--- a/src/mappings.h
++++ b/src/mappings.h
+@@ -58,6 +58,11 @@
+ //
+ // 3. This notice may not be removed or altered from any source distribution.
+ 
++#ifdef __GNUC__
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wpedantic"
++#endif
++
+ const char* _glfwDefaultMappings[] =
+ {
+ #if defined(GLFW_BUILD_WIN32_MAPPINGS)
+@@ -1936,3 +1941,6 @@ const char* _glfwDefaultMappings[] =
+ #endif // GLFW_BUILD_LINUX_MAPPINGS
+ };
+ 
++#ifdef __GNUC__
++#pragma GCC diagnostic pop
++#endif
+diff --git a/src/mappings.h.in b/src/mappings.h.in
+index f2604390a4388381136d5aec734395675e56d1b9..6ce5c953d051ec0bc7aa1e1788bda21eee9cfb7f 100644
+--- a/src/mappings.h.in
++++ b/src/mappings.h.in
+@@ -58,6 +58,11 @@
+ //
+ // 3. This notice may not be removed or altered from any source distribution.
+ 
++#ifdef __GNUC__
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wpedantic"
++#endif
++
+ const char* _glfwDefaultMappings[] =
+ {
+ #if defined(GLFW_BUILD_WIN32_MAPPINGS)
+@@ -80,3 +85,6 @@ const char* _glfwDefaultMappings[] =
+ #endif // GLFW_BUILD_LINUX_MAPPINGS
+ };
+ 
++#ifdef __GNUC__
++#pragma GCC diagnostic pop
++#endif

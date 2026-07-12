@@ -1,4 +1,4 @@
-import edu.wpi.first.toolchain.*
+import org.wpilib.toolchain.*
 
 buildscript {
     repositories {
@@ -10,17 +10,23 @@ buildscript {
 
 plugins {
     id 'base'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2023.0.1'
-    id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
-    id 'edu.wpi.first.NativeUtils' apply false
-    id 'edu.wpi.first.GradleJni' version '1.1.0'
-    id 'edu.wpi.first.GradleVsCode'
     id 'idea'
     id 'visual-studio'
-    id 'net.ltgt.errorprone' version '3.1.0' apply false
-    id 'com.gradleup.shadow' version '8.3.4' apply false
-    id 'com.diffplug.spotless' version '6.20.0' apply false
-    id 'com.github.spotbugs' version '6.0.2' apply false
+
+    alias(libs.plugins.wpilib.versioning)
+    alias(libs.plugins.wpilib.repositories)
+    // NativeUtils and GradleVsCode are on the classpath for buildSrc, which doesn't carry version information.
+    // We're forced to use the string-based syntax here instead.
+    id 'org.wpilib.NativeUtils' apply false
+    id 'org.wpilib.GradleVsCode' apply false
+    // alias(libs.plugins.wpilib.native.utils) apply false
+    // alias(libs.plugins.wpilib.gradle.vscode)
+    alias(libs.plugins.wpilib.gradle.jni)
+
+    alias(libs.plugins.build.shadow) apply false
+    alias(libs.plugins.lint.errorprone) apply false
+    alias(libs.plugins.lint.spotbugs) apply false
+    alias(libs.plugins.lint.spotless) apply false
 }
 
 wpilibVersioning.buildServerMode = project.hasProperty('buildServer')
@@ -32,18 +38,22 @@ allprojects {
         url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
     }
     }
+    wpilibRepositories.use2027Repos()
     if (project.hasProperty('releaseMode')) {
         wpilibRepositories.addAllReleaseRepositories(it)
     } else {
         wpilibRepositories.addAllDevelopmentRepositories(it)
     }
+    tasks.withType(AbstractTestTask).configureEach {
+        failOnNoDiscoveredTests = false
+    }
 }
 
-buildScan {
-    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
-    termsOfServiceAgree = 'yes'
-
-    publishAlways()
+develocity {
+    buildScan {
+        termsOfUseUrl = "https://gradle.com/help/legal-terms-of-use"
+        termsOfUseAgree = "yes"
+    }
 }
 
 import com.github.spotbugs.snom.Effort
@@ -81,7 +91,7 @@ task libraryBuild() {}
 build.dependsOn outputVersions
 
 task copyAllOutputs(type: Copy) {
-    destinationDir outputsFolder
+    destinationDir = outputsFolder
 }
 
 build.dependsOn copyAllOutputs
@@ -98,6 +108,10 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archiveFile
 }
 
+ext.makeZipBaseName = { group, artifactId ->
+    return "_GROUP_${group.replace(".", "_")}_ID_${artifactId}_CLS"
+}
+
 subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
@@ -110,8 +124,8 @@ subprojects {
 
     plugins.withType(JavaPlugin) {
         java {
-            sourceCompatibility = 17
-            targetCompatibility = 17
+            sourceCompatibility = 25
+            targetCompatibility = 25
         }
     }
 
@@ -131,11 +145,13 @@ subprojects {
         options.encoding = 'UTF-8'
     }
 
-    // Enables UTF-8 support in Javadoc
+    // Enables UTF-8 support in Javadoc, disables 4 MB of fonts being added to every Javadoc JAR, add our styles
     tasks.withType(Javadoc) {
         options.addStringOption("charset", "utf-8")
         options.addStringOption("docencoding", "utf-8")
         options.addStringOption("encoding", "utf-8")
+        options.addBooleanOption("-no-fonts", true)
+        options.addStringOption("-add-stylesheet", "${rootDir}/docs/javadoc.css")
     }
 
     // Sign outputs with Developer ID
@@ -149,19 +165,26 @@ subprojects {
                 doLast {
                     // Get path to binary.
                     String path = task.getLinkedFile().getAsFile().get().getAbsolutePath()
-                    exec {
-                        workingDir rootDir
+                    providers.exec {
+                        setWorkingDir(rootDir)
                         def args = [
                             "sh",
                             "-c",
                             "codesign --force --strict --timestamp --options=runtime " +
                             "--verbose -s ${project.findProperty("developerID")} ${path}"
                         ]
-                        commandLine args
-                    }
+                        commandLine(args)
+                    }.result.get()
                 }
             }
         }
+    }
+
+    tasks.withType(AbstractArchiveTask).configureEach {
+        // Use file timestamps from the file system
+        preserveFileTimestamps = true
+        // Use permissions from the file system
+        useFileSystemPermissions()
     }
 }
 
@@ -170,5 +193,5 @@ ext.getCurrentArch = {
 }
 
 wrapper {
-    gradleVersion = '8.11'
+    gradleVersion = '9.4.1'
 }

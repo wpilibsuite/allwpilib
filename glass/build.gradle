@@ -1,14 +1,15 @@
 import org.gradle.internal.os.OperatingSystem
 
-if (project.hasProperty('onlylinuxathena')) {
+if (project.hasProperty('onlylinuxsystemcore')) {
     return;
 }
 
 description = "A different kind of dashboard"
 
 apply plugin: 'cpp'
+apply plugin: 'google-test-test-suite'
 apply plugin: 'visual-studio'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 
 if (OperatingSystem.current().isWindows()) {
     apply plugin: 'windows-resources'
@@ -16,10 +17,13 @@ if (OperatingSystem.current().isWindows()) {
 
 ext {
     nativeName = 'glass'
+    staticGtestConfigs = [:]
 }
+staticGtestConfigs["${nativeName}Catch2Test"] = []
 
 apply from: "${rootDir}/shared/resources.gradle"
 apply from: "${rootDir}/shared/config.gradle"
+apply from: "${rootDir}/shared/catch2.gradle"
 
 def wpilibVersionFileInput = file("src/app/generate/WPILibVersion.cpp.in")
 def wpilibVersionFileOutput = file("$buildDir/generated/app/cpp/WPILibVersion.cpp")
@@ -59,7 +63,8 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
     }
 }
 
-def generateTask = createGenerateResourcesTask('app', 'GLASS', 'glass', project)
+def generateTask = createGenerateResourcesTask('app', 'GLASS', 'wpi::glass', project)
+def mrccommIncludeDir = file('src/lib/native/thirdparty/mrccomm/include').absolutePath
 
 project(':').libraryBuild.dependsOn build
 tasks.withType(CppCompile) {
@@ -77,7 +82,7 @@ model {
         "${nativeName}"(NativeLibrarySpec) {
             sources.cpp {
                 source {
-                    srcDirs 'src/lib/native/cpp'
+                    srcDirs 'src/lib/native/cpp', 'src/lib/native/thirdparty/mrccomm/src'
                     include '**/*.cpp'
                 }
                 exportedHeaders {
@@ -85,7 +90,7 @@ model {
                 }
             }
             binaries.all {
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                     it.buildable = false
                     return
                 }
@@ -93,11 +98,18 @@ model {
                     it.buildable = false
                     return
                 }
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+
+                if (it.targetPlatform.operatingSystem.isWindows()) {
+                    it.cppCompiler.args.add("/I${mrccommIncludeDir}".toString())
+                } else {
+                    it.cppCompiler.args.add("-I${mrccommIncludeDir}".toString())
+                }
+
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                lib project: ':fieldImages', library: 'fieldImages', linkage: 'shared'
-                lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
+                lib project: ':fields', library: 'fields', linkage: 'shared'
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
             appendDebugPathToBinaries(binaries)
         }
@@ -112,7 +124,7 @@ model {
                 }
             }
             binaries.all {
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                     it.buildable = false
                     return
                 }
@@ -123,11 +135,11 @@ model {
                 lib library: nativeName, linkage: 'static'
                 project(':ntcore').addNtcoreDependency(it, 'shared')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                lib project: ':fieldImages', library: 'fieldImages', linkage: 'shared'
-                lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
+                lib project: ':fields', library: 'fields', linkage: 'shared'
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
             appendDebugPathToBinaries(binaries)
         }
@@ -153,7 +165,7 @@ model {
                 }
             }
             binaries.all {
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                     it.buildable = false
                     return
                 }
@@ -162,12 +174,12 @@ model {
                 lib library: nativeName, linkage: 'static'
                 project(':ntcore').addNtcoreDependency(it, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                lib project: ':fieldImages', library: 'fieldImages', linkage: 'static'
+                lib project: ':fields', library: 'fields', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
-                lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                     it.linker.args << '/DELAYLOAD:MF.dll' << '/DELAYLOAD:MFReadWrite.dll' << '/DELAYLOAD:MFPlat.dll' << '/delay:nobind'
@@ -179,6 +191,51 @@ model {
                         it.linker.args << '-lGL'
                     }
                 }
+            }
+        }
+    }
+    testSuites {
+        "${nativeName}Catch2Test"(GoogleTestTestSuiteSpec) {
+            for (NativeComponentSpec c : $.components) {
+                if (c.name == nativeName) {
+                    testing c
+                    break
+                }
+            }
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/test/native/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/test/native/include',
+                                'src/lib/native/include'
+                    }
+                }
+            }
+        }
+    }
+    binaries {
+        withType(GoogleTestTestSuiteBinarySpec) {
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                it.buildable = false
+                return
+            }
+            lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
+            lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+            lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+            lib project: ':fields', library: 'fields', linkage: 'static'
+            lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            if (it.targetPlatform.operatingSystem.isWindows()) {
+                it.cppCompiler.args.add("/I${mrccommIncludeDir}".toString())
+                it.linker.args << 'kernel32.lib' << 'Gdi32.lib' << 'User32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
+            } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                it.cppCompiler.args.add("-I${mrccommIncludeDir}".toString())
+                it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
+            } else {
+                it.cppCompiler.args.add("-I${mrccommIncludeDir}".toString())
             }
         }
     }

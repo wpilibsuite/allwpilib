@@ -1,0 +1,39 @@
+strip_prefixes:
+- HAL_
+
+extra_includes:
+- src/ds_types_fmt.h
+- wpystruct.h
+
+enums:
+  AllianceStationID:
+  RobotMode:
+classes:
+  wpi::hal::ControlWord:
+    methods:
+      ControlWord:
+        overloads:
+          "":
+          int64_t, RobotMode, bool, bool, bool, bool:
+          HAL_ControlWord:
+      Update:
+        overloads:
+          int64_t, RobotMode, bool, bool, bool, bool:
+          HAL_ControlWord:
+      IsEnabled:
+      GetRobotMode:
+      GetOpModeId:
+      SetOpModeId:
+      IsEStopped:
+      IsFMSAttached:
+      IsDSAttached:
+      IsAutonomous:
+      IsAutonomousEnabled:
+      IsTeleop:
+      IsTeleopEnabled:
+      IsUtility:
+      IsUtilityEnabled:
+      GetValue:
+
+inline_code: |
+  SetupWPyStruct<wpi::hal::ControlWord>(cls_ControlWord);

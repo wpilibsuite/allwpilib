@@ -4,19 +4,19 @@
 
 #include <limits>
 
-#include "../PortsInternal.h"
-#include "EncoderDataInternal.h"
+#include "../PortsInternal.hpp"
+#include "EncoderDataInternal.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeEncoderData() {
   static EncoderData sed[kNumEncoders];
-  ::hal::SimEncoderData = sed;
+  ::wpi::hal::SimEncoderData = sed;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-EncoderData* hal::SimEncoderData;
+EncoderData* wpi::hal::SimEncoderData;
 void EncoderData::ResetData() {
   digitalChannelA = 0;
   digitalChannelB = 0;

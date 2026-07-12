@@ -78,6 +78,14 @@ class SolverBase : public EigenBase<Derived> {
   template <typename Derived_>
   friend struct internal::solve_assertion;
 
+  ComputationInfo info() const {
+    // CRTP static dispatch: Calls the 'info()' method on the derived class.
+    // Derived must implement 'ComputationInfo info() const'.
+    // If not implemented, name lookup falls back to this base method, causing
+    // infinite recursion (detectable by -Winfinite-recursion).
+    return derived().info();
+  }
+
   enum {
     RowsAtCompileTime = internal::traits<Derived>::RowsAtCompileTime,
     ColsAtCompileTime = internal::traits<Derived>::ColsAtCompileTime,

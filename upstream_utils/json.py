@@ -1,61 +1,46 @@
 #!/usr/bin/env python3
 
-import os
 import shutil
+from pathlib import Path
 
-from upstream_utils import Lib, walk_if
+from upstream_utils import Lib
 
 
-def copy_upstream_src(wpilib_root):
-    wpiutil = os.path.join(wpilib_root, "wpiutil")
+def copy_upstream_src(wpilib_root: Path):
+    wpiutil = wpilib_root / "wpiutil"
 
     # Delete old install
     for d in [
+        "src/main/native/thirdparty/json/cpp",
         "src/main/native/thirdparty/json/include",
     ]:
-        shutil.rmtree(os.path.join(wpiutil, d), ignore_errors=True)
+        shutil.rmtree(wpiutil / d, ignore_errors=True)
 
     # Create lists of source and destination files
-    os.chdir("include/nlohmann")
-    files = walk_if(".", lambda dp, f: True)
-    src_include_files = [os.path.abspath(f) for f in files]
-    wpiutil_json_root = os.path.join(
-        wpiutil, "src/main/native/thirdparty/json/include/wpi"
-    )
-    dest_include_files = [
-        os.path.join(wpiutil_json_root, f.replace(".hpp", ".h")) for f in files
-    ]
+    src_include_files = ["json.h"]
+    src_src_files = ["json.cpp", "jtckdint.h"]
+    wpiutil_json_root = wpiutil / "src/main/native/thirdparty/json/include/wpi/util"
+    dest_include_files = [wpiutil_json_root / "json.hpp"]
 
     # Copy json header files into allwpilib
     for i in range(len(src_include_files)):
-        dest_dir = os.path.dirname(dest_include_files[i])
-        if not os.path.exists(dest_dir):
-            os.makedirs(dest_dir)
+        dest_dir = dest_include_files[i].parent
+        if not dest_dir.exists():
+            dest_dir.mkdir(parents=True)
         shutil.copyfile(src_include_files[i], dest_include_files[i])
 
-    for include_file in dest_include_files:
-        with open(include_file) as f:
-            content = f.read()
-
-        # Rename namespace from nlohmann to wpi
-        content = content.replace("namespace nlohmann", "namespace wpi")
-        content = content.replace("nlohmann::", "wpi::")
-
-        # Fix internal includes
-        content = content.replace(".hpp>", ".h>")
-        content = content.replace("include <nlohmann/", "include <wpi/")
-
-        # Fix include guards and other #defines
-        content = content.replace("NLOHMANN_", "WPI_")
-
-        with open(include_file, "w") as f:
-            f.write(content)
+    # Copy json src files into allwpilib
+    for i in range(len(src_src_files)):
+        dest_dir = wpiutil / "src/main/native/thirdparty/json/src"
+        if not dest_dir.exists():
+            dest_dir.mkdir(parents=True)
+        shutil.copyfile(src_src_files[i], dest_dir / src_src_files[i])
 
 
 def main():
     name = "json"
-    url = "https://github.com/nlohmann/json"
-    tag = "v3.11.3"
+    url = "https://github.com/jart/json.cpp.git"
+    tag = "6ec4e44a5bbaadbe677473378c3d2133644c58a1"
 
     patch_options = {
         "use_threeway": True,

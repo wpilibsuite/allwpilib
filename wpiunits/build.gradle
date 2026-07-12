@@ -2,10 +2,10 @@ ext {
     useJava = true
     useCpp = false
     baseId = 'wpiunits'
-    groupId = 'edu.wpi.first.wpiunits'
+    groupId = 'org.wpilib.wpiunits'
 
     nativeName = 'wpiunits'
-    devMain = 'edu.wpi.first.units.DevMain'
+    devMain = 'org.wpilib.units.DevMain'
 }
 
 apply from: "${rootDir}/shared/java/javacommon.gradle"

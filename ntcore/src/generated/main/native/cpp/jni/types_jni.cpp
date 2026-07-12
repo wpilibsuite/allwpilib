@@ -6,12 +6,12 @@
 
 #include <jni.h>
 
-#include <wpi/jni_util.h>
+#include "wpi/util/jni_util.hpp"
 
-#include "edu_wpi_first_networktables_NetworkTablesJNI.h"
-#include "ntcore.h"
+#include "org_wpilib_networktables_NetworkTablesJNI.h"
+#include "wpi/nt/ntcore.h"
 
-using namespace wpi::java;
+using namespace wpi::util::java;
 
 //
 // Globals and load/unload
@@ -39,17 +39,17 @@ static JException indexOobEx;
 static JException nullPointerEx;
 
 static const JClassInit classes[] = {
-    {"edu/wpi/first/networktables/TimestampedBoolean", &timestampedBooleanCls},
-    {"edu/wpi/first/networktables/TimestampedInteger", &timestampedIntegerCls},
-    {"edu/wpi/first/networktables/TimestampedFloat", &timestampedFloatCls},
-    {"edu/wpi/first/networktables/TimestampedDouble", &timestampedDoubleCls},
-    {"edu/wpi/first/networktables/TimestampedString", &timestampedStringCls},
-    {"edu/wpi/first/networktables/TimestampedRaw", &timestampedRawCls},
-    {"edu/wpi/first/networktables/TimestampedBooleanArray", &timestampedBooleanArrayCls},
-    {"edu/wpi/first/networktables/TimestampedIntegerArray", &timestampedIntegerArrayCls},
-    {"edu/wpi/first/networktables/TimestampedFloatArray", &timestampedFloatArrayCls},
-    {"edu/wpi/first/networktables/TimestampedDoubleArray", &timestampedDoubleArrayCls},
-    {"edu/wpi/first/networktables/TimestampedStringArray", &timestampedStringArrayCls},
+    {"org/wpilib/networktables/TimestampedBoolean", &timestampedBooleanCls},
+    {"org/wpilib/networktables/TimestampedInteger", &timestampedIntegerCls},
+    {"org/wpilib/networktables/TimestampedFloat", &timestampedFloatCls},
+    {"org/wpilib/networktables/TimestampedDouble", &timestampedDoubleCls},
+    {"org/wpilib/networktables/TimestampedString", &timestampedStringCls},
+    {"org/wpilib/networktables/TimestampedRaw", &timestampedRawCls},
+    {"org/wpilib/networktables/TimestampedBooleanArray", &timestampedBooleanArrayCls},
+    {"org/wpilib/networktables/TimestampedIntegerArray", &timestampedIntegerArrayCls},
+    {"org/wpilib/networktables/TimestampedFloatArray", &timestampedFloatArrayCls},
+    {"org/wpilib/networktables/TimestampedDoubleArray", &timestampedDoubleArrayCls},
+    {"org/wpilib/networktables/TimestampedStringArray", &timestampedStringArrayCls},
     {"[B", &jbyteArrayCls},
     {"[Z", &jbooleanArrayCls},
     {"[J", &jlongArrayCls},
@@ -64,7 +64,7 @@ static const JExceptionInit exceptions[] = {
     {"java/lang/NullPointerException", &nullPointerEx},
 };
 
-namespace nt {
+namespace wpi::nt {
 
 bool JNI_LoadTypes(JNIEnv* env) {
   // Cache references to classes
@@ -95,7 +95,7 @@ void JNI_UnloadTypes(JNIEnv* env) {
   }
 }
 
-}  // namespace nt
+}  // namespace wpi::nt
 
 static std::vector<int> FromJavaBooleanArray(JNIEnv* env, jbooleanArray jarr) {
   CriticalJSpan<const jboolean> ref{env, jarr};
@@ -128,7 +128,7 @@ static std::vector<std::string> FromJavaStringArray(JNIEnv* env, jobjectArray ja
 }
 
 
-static jobject MakeJObject(JNIEnv* env, nt::TimestampedBoolean value) {
+static jobject MakeJObject(JNIEnv* env, wpi::nt::TimestampedBoolean value) {
   static jmethodID constructor = env->GetMethodID(
       timestampedBooleanCls, "<init>", "(JJZ)V");
   return env->NewObject(timestampedBooleanCls, constructor,
@@ -137,7 +137,7 @@ static jobject MakeJObject(JNIEnv* env, nt::TimestampedBoolean value) {
                         static_cast<jboolean>(value.value));
 }
 
-static jobject MakeJObject(JNIEnv* env, nt::TimestampedInteger value) {
+static jobject MakeJObject(JNIEnv* env, wpi::nt::TimestampedInteger value) {
   static jmethodID constructor = env->GetMethodID(
       timestampedIntegerCls, "<init>", "(JJJ)V");
   return env->NewObject(timestampedIntegerCls, constructor,
@@ -146,7 +146,7 @@ static jobject MakeJObject(JNIEnv* env, nt::TimestampedInteger value) {
                         static_cast<jlong>(value.value));
 }
 
-static jobject MakeJObject(JNIEnv* env, nt::TimestampedFloat value) {
+static jobject MakeJObject(JNIEnv* env, wpi::nt::TimestampedFloat value) {
   static jmethodID constructor = env->GetMethodID(
       timestampedFloatCls, "<init>", "(JJF)V");
   return env->NewObject(timestampedFloatCls, constructor,
@@ -155,7 +155,7 @@ static jobject MakeJObject(JNIEnv* env, nt::TimestampedFloat value) {
                         static_cast<jfloat>(value.value));
 }
 
-static jobject MakeJObject(JNIEnv* env, nt::TimestampedDouble value) {
+static jobject MakeJObject(JNIEnv* env, wpi::nt::TimestampedDouble value) {
   static jmethodID constructor = env->GetMethodID(
       timestampedDoubleCls, "<init>", "(JJD)V");
   return env->NewObject(timestampedDoubleCls, constructor,
@@ -164,7 +164,7 @@ static jobject MakeJObject(JNIEnv* env, nt::TimestampedDouble value) {
                         static_cast<jdouble>(value.value));
 }
 
-static jobject MakeJObject(JNIEnv* env, nt::TimestampedString value) {
+static jobject MakeJObject(JNIEnv* env, wpi::nt::TimestampedString value) {
   static jmethodID constructor = env->GetMethodID(
       timestampedStringCls, "<init>", "(JJLjava/lang/String;)V");
   JLocal<jstring> val{env, MakeJString(env, value.value)};
@@ -173,7 +173,7 @@ static jobject MakeJObject(JNIEnv* env, nt::TimestampedString value) {
                         static_cast<jlong>(value.serverTime), val.obj());
 }
 
-static jobject MakeJObject(JNIEnv* env, nt::TimestampedRaw value) {
+static jobject MakeJObject(JNIEnv* env, wpi::nt::TimestampedRaw value) {
   static jmethodID constructor = env->GetMethodID(
       timestampedRawCls, "<init>", "(JJ[B)V");
   JLocal<jbyteArray> val{env, MakeJByteArray(env, value.value)};
@@ -182,7 +182,7 @@ static jobject MakeJObject(JNIEnv* env, nt::TimestampedRaw value) {
                         static_cast<jlong>(value.serverTime), val.obj());
 }
 
-static jobject MakeJObject(JNIEnv* env, nt::TimestampedBooleanArray value) {
+static jobject MakeJObject(JNIEnv* env, wpi::nt::TimestampedBooleanArray value) {
   static jmethodID constructor = env->GetMethodID(
       timestampedBooleanArrayCls, "<init>", "(JJ[Z)V");
   JLocal<jbooleanArray> val{env, MakeJBooleanArray(env, value.value)};
@@ -191,7 +191,7 @@ static jobject MakeJObject(JNIEnv* env, nt::TimestampedBooleanArray value) {
                         static_cast<jlong>(value.serverTime), val.obj());
 }
 
-static jobject MakeJObject(JNIEnv* env, nt::TimestampedIntegerArray value) {
+static jobject MakeJObject(JNIEnv* env, wpi::nt::TimestampedIntegerArray value) {
   static jmethodID constructor = env->GetMethodID(
       timestampedIntegerArrayCls, "<init>", "(JJ[J)V");
   JLocal<jlongArray> val{env, MakeJLongArray(env, value.value)};
@@ -200,7 +200,7 @@ static jobject MakeJObject(JNIEnv* env, nt::TimestampedIntegerArray value) {
                         static_cast<jlong>(value.serverTime), val.obj());
 }
 
-static jobject MakeJObject(JNIEnv* env, nt::TimestampedFloatArray value) {
+static jobject MakeJObject(JNIEnv* env, wpi::nt::TimestampedFloatArray value) {
   static jmethodID constructor = env->GetMethodID(
       timestampedFloatArrayCls, "<init>", "(JJ[F)V");
   JLocal<jfloatArray> val{env, MakeJFloatArray(env, value.value)};
@@ -209,7 +209,7 @@ static jobject MakeJObject(JNIEnv* env, nt::TimestampedFloatArray value) {
                         static_cast<jlong>(value.serverTime), val.obj());
 }
 
-static jobject MakeJObject(JNIEnv* env, nt::TimestampedDoubleArray value) {
+static jobject MakeJObject(JNIEnv* env, wpi::nt::TimestampedDoubleArray value) {
   static jmethodID constructor = env->GetMethodID(
       timestampedDoubleArrayCls, "<init>", "(JJ[D)V");
   JLocal<jdoubleArray> val{env, MakeJDoubleArray(env, value.value)};
@@ -218,7 +218,7 @@ static jobject MakeJObject(JNIEnv* env, nt::TimestampedDoubleArray value) {
                         static_cast<jlong>(value.serverTime), val.obj());
 }
 
-static jobject MakeJObject(JNIEnv* env, nt::TimestampedStringArray value) {
+static jobject MakeJObject(JNIEnv* env, wpi::nt::TimestampedStringArray value) {
   static jmethodID constructor = env->GetMethodID(
       timestampedStringArrayCls, "<init>", "(JJ[Ljava/lang/Object;)V");
   JLocal<jobjectArray> val{env, MakeJStringArray(env, value.value)};
@@ -228,7 +228,7 @@ static jobject MakeJObject(JNIEnv* env, nt::TimestampedStringArray value) {
 }
 
 static jobjectArray MakeJObject(JNIEnv* env,
-                                std::span<const nt::TimestampedBoolean> arr) {
+                                std::span<const wpi::nt::TimestampedBoolean> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), timestampedBooleanCls, nullptr);
   if (!jarr) {
@@ -242,7 +242,7 @@ static jobjectArray MakeJObject(JNIEnv* env,
 }
 
 static jobjectArray MakeJObject(JNIEnv* env,
-                                std::span<const nt::TimestampedInteger> arr) {
+                                std::span<const wpi::nt::TimestampedInteger> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), timestampedIntegerCls, nullptr);
   if (!jarr) {
@@ -256,7 +256,7 @@ static jobjectArray MakeJObject(JNIEnv* env,
 }
 
 static jobjectArray MakeJObject(JNIEnv* env,
-                                std::span<const nt::TimestampedFloat> arr) {
+                                std::span<const wpi::nt::TimestampedFloat> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), timestampedFloatCls, nullptr);
   if (!jarr) {
@@ -270,7 +270,7 @@ static jobjectArray MakeJObject(JNIEnv* env,
 }
 
 static jobjectArray MakeJObject(JNIEnv* env,
-                                std::span<const nt::TimestampedDouble> arr) {
+                                std::span<const wpi::nt::TimestampedDouble> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), timestampedDoubleCls, nullptr);
   if (!jarr) {
@@ -284,7 +284,7 @@ static jobjectArray MakeJObject(JNIEnv* env,
 }
 
 static jobjectArray MakeJObject(JNIEnv* env,
-                                std::span<const nt::TimestampedString> arr) {
+                                std::span<const wpi::nt::TimestampedString> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), timestampedStringCls, nullptr);
   if (!jarr) {
@@ -298,7 +298,7 @@ static jobjectArray MakeJObject(JNIEnv* env,
 }
 
 static jobjectArray MakeJObject(JNIEnv* env,
-                                std::span<const nt::TimestampedRaw> arr) {
+                                std::span<const wpi::nt::TimestampedRaw> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), timestampedRawCls, nullptr);
   if (!jarr) {
@@ -312,7 +312,7 @@ static jobjectArray MakeJObject(JNIEnv* env,
 }
 
 static jobjectArray MakeJObject(JNIEnv* env,
-                                std::span<const nt::TimestampedBooleanArray> arr) {
+                                std::span<const wpi::nt::TimestampedBooleanArray> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), timestampedBooleanArrayCls, nullptr);
   if (!jarr) {
@@ -326,7 +326,7 @@ static jobjectArray MakeJObject(JNIEnv* env,
 }
 
 static jobjectArray MakeJObject(JNIEnv* env,
-                                std::span<const nt::TimestampedIntegerArray> arr) {
+                                std::span<const wpi::nt::TimestampedIntegerArray> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), timestampedIntegerArrayCls, nullptr);
   if (!jarr) {
@@ -340,7 +340,7 @@ static jobjectArray MakeJObject(JNIEnv* env,
 }
 
 static jobjectArray MakeJObject(JNIEnv* env,
-                                std::span<const nt::TimestampedFloatArray> arr) {
+                                std::span<const wpi::nt::TimestampedFloatArray> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), timestampedFloatArrayCls, nullptr);
   if (!jarr) {
@@ -354,7 +354,7 @@ static jobjectArray MakeJObject(JNIEnv* env,
 }
 
 static jobjectArray MakeJObject(JNIEnv* env,
-                                std::span<const nt::TimestampedDoubleArray> arr) {
+                                std::span<const wpi::nt::TimestampedDoubleArray> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), timestampedDoubleArrayCls, nullptr);
   if (!jarr) {
@@ -368,7 +368,7 @@ static jobjectArray MakeJObject(JNIEnv* env,
 }
 
 static jobjectArray MakeJObject(JNIEnv* env,
-                                std::span<const nt::TimestampedStringArray> arr) {
+                                std::span<const wpi::nt::TimestampedStringArray> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), timestampedStringArrayCls, nullptr);
   if (!jarr) {
@@ -463,359 +463,359 @@ static jobjectArray MakeJObjectArray(JNIEnv* env, std::span<const std::vector<st
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getAtomicBoolean
- * Signature: (IZ)Ledu/wpi/first/networktables/TimestampedBoolean;
+ * Signature: (IZ)Lorg/wpilib/networktables/TimestampedBoolean;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getAtomicBoolean
+Java_org_wpilib_networktables_NetworkTablesJNI_getAtomicBoolean
   (JNIEnv* env, jclass, jint subentry, jboolean defaultValue)
 {
-  return MakeJObject(env, nt::GetAtomicBoolean(subentry, defaultValue != JNI_FALSE));
+  return MakeJObject(env, wpi::nt::GetAtomicBoolean(subentry, defaultValue != JNI_FALSE));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueBoolean
- * Signature: (I)[Ledu/wpi/first/networktables/TimestampedBoolean;
+ * Signature: (I)[Lorg/wpilib/networktables/TimestampedBoolean;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueBoolean
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueBoolean
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObject(env, nt::ReadQueueBoolean(subentry));
+  return MakeJObject(env, wpi::nt::ReadQueueBoolean(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueValuesBoolean
  * Signature: (I)[Z
  */
 JNIEXPORT jbooleanArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueValuesBoolean
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueValuesBoolean
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJBooleanArray(env, nt::ReadQueueValuesBoolean(subentry));
+  return MakeJBooleanArray(env, wpi::nt::ReadQueueValuesBoolean(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setBoolean
  * Signature: (IJZ)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setBoolean
+Java_org_wpilib_networktables_NetworkTablesJNI_setBoolean
   (JNIEnv*, jclass, jint entry, jlong time, jboolean value)
 {
-  return nt::SetBoolean(entry, value != JNI_FALSE, time);
+  return wpi::nt::SetBoolean(entry, value != JNI_FALSE, time);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getBoolean
  * Signature: (IZ)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getBoolean
+Java_org_wpilib_networktables_NetworkTablesJNI_getBoolean
   (JNIEnv*, jclass, jint entry, jboolean defaultValue)
 {
-  return nt::GetBoolean(entry, defaultValue);
+  return wpi::nt::GetBoolean(entry, defaultValue);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDefaultBoolean
  * Signature: (IJZ)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultBoolean
+Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultBoolean
   (JNIEnv*, jclass, jint entry, jlong, jboolean defaultValue)
 {
-  return nt::SetDefaultBoolean(entry, defaultValue != JNI_FALSE);
+  return wpi::nt::SetDefaultBoolean(entry, defaultValue != JNI_FALSE);
 }
 
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getAtomicInteger
- * Signature: (IJ)Ledu/wpi/first/networktables/TimestampedInteger;
+ * Signature: (IJ)Lorg/wpilib/networktables/TimestampedInteger;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getAtomicInteger
+Java_org_wpilib_networktables_NetworkTablesJNI_getAtomicInteger
   (JNIEnv* env, jclass, jint subentry, jlong defaultValue)
 {
-  return MakeJObject(env, nt::GetAtomicInteger(subentry, defaultValue));
+  return MakeJObject(env, wpi::nt::GetAtomicInteger(subentry, defaultValue));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueInteger
- * Signature: (I)[Ledu/wpi/first/networktables/TimestampedInteger;
+ * Signature: (I)[Lorg/wpilib/networktables/TimestampedInteger;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueInteger
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueInteger
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObject(env, nt::ReadQueueInteger(subentry));
+  return MakeJObject(env, wpi::nt::ReadQueueInteger(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueValuesInteger
  * Signature: (I)[J
  */
 JNIEXPORT jlongArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueValuesInteger
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueValuesInteger
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJLongArray(env, nt::ReadQueueValuesInteger(subentry));
+  return MakeJLongArray(env, wpi::nt::ReadQueueValuesInteger(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setInteger
  * Signature: (IJJ)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setInteger
+Java_org_wpilib_networktables_NetworkTablesJNI_setInteger
   (JNIEnv*, jclass, jint entry, jlong time, jlong value)
 {
-  return nt::SetInteger(entry, value, time);
+  return wpi::nt::SetInteger(entry, value, time);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getInteger
  * Signature: (IJ)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getInteger
+Java_org_wpilib_networktables_NetworkTablesJNI_getInteger
   (JNIEnv*, jclass, jint entry, jlong defaultValue)
 {
-  return nt::GetInteger(entry, defaultValue);
+  return wpi::nt::GetInteger(entry, defaultValue);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDefaultInteger
  * Signature: (IJJ)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultInteger
+Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultInteger
   (JNIEnv*, jclass, jint entry, jlong, jlong defaultValue)
 {
-  return nt::SetDefaultInteger(entry, defaultValue);
+  return wpi::nt::SetDefaultInteger(entry, defaultValue);
 }
 
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getAtomicFloat
- * Signature: (IF)Ledu/wpi/first/networktables/TimestampedFloat;
+ * Signature: (IF)Lorg/wpilib/networktables/TimestampedFloat;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getAtomicFloat
+Java_org_wpilib_networktables_NetworkTablesJNI_getAtomicFloat
   (JNIEnv* env, jclass, jint subentry, jfloat defaultValue)
 {
-  return MakeJObject(env, nt::GetAtomicFloat(subentry, defaultValue));
+  return MakeJObject(env, wpi::nt::GetAtomicFloat(subentry, defaultValue));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueFloat
- * Signature: (I)[Ledu/wpi/first/networktables/TimestampedFloat;
+ * Signature: (I)[Lorg/wpilib/networktables/TimestampedFloat;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueFloat
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueFloat
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObject(env, nt::ReadQueueFloat(subentry));
+  return MakeJObject(env, wpi::nt::ReadQueueFloat(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueValuesFloat
  * Signature: (I)[F
  */
 JNIEXPORT jfloatArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueValuesFloat
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueValuesFloat
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJFloatArray(env, nt::ReadQueueValuesFloat(subentry));
+  return MakeJFloatArray(env, wpi::nt::ReadQueueValuesFloat(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setFloat
  * Signature: (IJF)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setFloat
+Java_org_wpilib_networktables_NetworkTablesJNI_setFloat
   (JNIEnv*, jclass, jint entry, jlong time, jfloat value)
 {
-  return nt::SetFloat(entry, value, time);
+  return wpi::nt::SetFloat(entry, value, time);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getFloat
  * Signature: (IF)F
  */
 JNIEXPORT jfloat JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getFloat
+Java_org_wpilib_networktables_NetworkTablesJNI_getFloat
   (JNIEnv*, jclass, jint entry, jfloat defaultValue)
 {
-  return nt::GetFloat(entry, defaultValue);
+  return wpi::nt::GetFloat(entry, defaultValue);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDefaultFloat
  * Signature: (IJF)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultFloat
+Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultFloat
   (JNIEnv*, jclass, jint entry, jlong, jfloat defaultValue)
 {
-  return nt::SetDefaultFloat(entry, defaultValue);
+  return wpi::nt::SetDefaultFloat(entry, defaultValue);
 }
 
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getAtomicDouble
- * Signature: (ID)Ledu/wpi/first/networktables/TimestampedDouble;
+ * Signature: (ID)Lorg/wpilib/networktables/TimestampedDouble;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getAtomicDouble
+Java_org_wpilib_networktables_NetworkTablesJNI_getAtomicDouble
   (JNIEnv* env, jclass, jint subentry, jdouble defaultValue)
 {
-  return MakeJObject(env, nt::GetAtomicDouble(subentry, defaultValue));
+  return MakeJObject(env, wpi::nt::GetAtomicDouble(subentry, defaultValue));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueDouble
- * Signature: (I)[Ledu/wpi/first/networktables/TimestampedDouble;
+ * Signature: (I)[Lorg/wpilib/networktables/TimestampedDouble;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueDouble
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueDouble
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObject(env, nt::ReadQueueDouble(subentry));
+  return MakeJObject(env, wpi::nt::ReadQueueDouble(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueValuesDouble
  * Signature: (I)[D
  */
 JNIEXPORT jdoubleArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueValuesDouble
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueValuesDouble
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJDoubleArray(env, nt::ReadQueueValuesDouble(subentry));
+  return MakeJDoubleArray(env, wpi::nt::ReadQueueValuesDouble(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDouble
  * Signature: (IJD)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setDouble
+Java_org_wpilib_networktables_NetworkTablesJNI_setDouble
   (JNIEnv*, jclass, jint entry, jlong time, jdouble value)
 {
-  return nt::SetDouble(entry, value, time);
+  return wpi::nt::SetDouble(entry, value, time);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getDouble
  * Signature: (ID)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getDouble
+Java_org_wpilib_networktables_NetworkTablesJNI_getDouble
   (JNIEnv*, jclass, jint entry, jdouble defaultValue)
 {
-  return nt::GetDouble(entry, defaultValue);
+  return wpi::nt::GetDouble(entry, defaultValue);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDefaultDouble
  * Signature: (IJD)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultDouble
+Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultDouble
   (JNIEnv*, jclass, jint entry, jlong, jdouble defaultValue)
 {
-  return nt::SetDefaultDouble(entry, defaultValue);
+  return wpi::nt::SetDefaultDouble(entry, defaultValue);
 }
 
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getAtomicString
- * Signature: (ILjava/lang/String;)Ledu/wpi/first/networktables/TimestampedString;
+ * Signature: (ILjava/lang/String;)Lorg/wpilib/networktables/TimestampedString;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getAtomicString
+Java_org_wpilib_networktables_NetworkTablesJNI_getAtomicString
   (JNIEnv* env, jclass, jint subentry, jstring defaultValue)
 {
-  return MakeJObject(env, nt::GetAtomicString(subentry, JStringRef{env, defaultValue}));
+  return MakeJObject(env, wpi::nt::GetAtomicString(subentry, JStringRef{env, defaultValue}));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueString
- * Signature: (I)[Ledu/wpi/first/networktables/TimestampedString;
+ * Signature: (I)[Lorg/wpilib/networktables/TimestampedString;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueString
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueString
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObject(env, nt::ReadQueueString(subentry));
+  return MakeJObject(env, wpi::nt::ReadQueueString(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueValuesString
  * Signature: (I)[Ljava/lang/String;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueValuesString
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueValuesString
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJStringArray(env, nt::ReadQueueValuesString(subentry));
+  return MakeJStringArray(env, wpi::nt::ReadQueueValuesString(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setString
  * Signature: (IJLjava/lang/String;)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setString
+Java_org_wpilib_networktables_NetworkTablesJNI_setString
   (JNIEnv* env, jclass, jint entry, jlong time, jstring value)
 {
   if (!value) {
     nullPointerEx.Throw(env, "value cannot be null");
     return false;
   }
-  return nt::SetString(entry, JStringRef{env, value}, time);
+  return wpi::nt::SetString(entry, JStringRef{env, value}, time);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getString
  * Signature: (ILjava/lang/String;)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getString
+Java_org_wpilib_networktables_NetworkTablesJNI_getString
   (JNIEnv* env, jclass, jint entry, jstring defaultValue)
 {
-  auto val = nt::GetEntryValue(entry);
+  auto val = wpi::nt::GetEntryValue(entry);
   if (!val || !val.IsString()) {
     return defaultValue;
   }
@@ -823,65 +823,65 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getString
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDefaultString
  * Signature: (IJLjava/lang/String;)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultString
+Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultString
   (JNIEnv* env, jclass, jint entry, jlong, jstring defaultValue)
 {
   if (!defaultValue) {
     nullPointerEx.Throw(env, "defaultValue cannot be null");
     return false;
   }
-  return nt::SetDefaultString(entry, JStringRef{env, defaultValue});
+  return wpi::nt::SetDefaultString(entry, JStringRef{env, defaultValue});
 }
 
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getAtomicRaw
- * Signature: (I[B)Ledu/wpi/first/networktables/TimestampedRaw;
+ * Signature: (I[B)Lorg/wpilib/networktables/TimestampedRaw;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getAtomicRaw
+Java_org_wpilib_networktables_NetworkTablesJNI_getAtomicRaw
   (JNIEnv* env, jclass, jint subentry, jbyteArray defaultValue)
 {
-  return MakeJObject(env, nt::GetAtomicRaw(subentry, CriticalJSpan<const jbyte>{env, defaultValue}.uarray()));
+  return MakeJObject(env, wpi::nt::GetAtomicRaw(subentry, CriticalJSpan<const jbyte>{env, defaultValue}.uarray()));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueRaw
- * Signature: (I)[Ledu/wpi/first/networktables/TimestampedRaw;
+ * Signature: (I)[Lorg/wpilib/networktables/TimestampedRaw;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueRaw
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueRaw
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObject(env, nt::ReadQueueRaw(subentry));
+  return MakeJObject(env, wpi::nt::ReadQueueRaw(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueValuesRaw
  * Signature: (I)[[B
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueValuesRaw
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueValuesRaw
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObjectArray(env, nt::ReadQueueValuesRaw(subentry));
+  return MakeJObjectArray(env, wpi::nt::ReadQueueValuesRaw(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setRaw
  * Signature: (IJ[BII)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setRaw
+Java_org_wpilib_networktables_NetworkTablesJNI_setRaw
   (JNIEnv* env, jclass, jint entry, jlong time, jbyteArray value, jint start, jint len)
 {
   if (!value) {
@@ -901,16 +901,16 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setRaw
     indexOobEx.Throw(env, "start + len must be smaller than array length");
     return false;
   }
-  return nt::SetRaw(entry, cvalue.uarray().subspan(start, len), time);
+  return wpi::nt::SetRaw(entry, cvalue.uarray().subspan(start, len), time);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setRawBuffer
  * Signature: (IJLjava/nio/ByteBuffer;II)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setRawBuffer
+Java_org_wpilib_networktables_NetworkTablesJNI_setRawBuffer
   (JNIEnv* env, jclass, jint entry, jlong time, jobject value, jint start, jint len)
 {
   if (!value) {
@@ -930,19 +930,19 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setRawBuffer
     illegalArgEx.Throw(env, "value must be a native ByteBuffer");
     return false;
   }
-  return nt::SetRaw(entry, cvalue.uarray().subspan(start, len), time);
+  return wpi::nt::SetRaw(entry, cvalue.uarray().subspan(start, len), time);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getRaw
  * Signature: (I[B)[B
  */
 JNIEXPORT jbyteArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getRaw
+Java_org_wpilib_networktables_NetworkTablesJNI_getRaw
   (JNIEnv* env, jclass, jint entry, jbyteArray defaultValue)
 {
-  auto val = nt::GetEntryValue(entry);
+  auto val = wpi::nt::GetEntryValue(entry);
   if (!val || !val.IsRaw()) {
     return defaultValue;
   }
@@ -950,12 +950,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getRaw
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDefaultRaw
  * Signature: (IJ[BII)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultRaw
+Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultRaw
   (JNIEnv* env, jclass, jint entry, jlong, jbyteArray defaultValue, jint start, jint len)
 {
   if (!defaultValue) {
@@ -975,16 +975,16 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultRaw
     indexOobEx.Throw(env, "start + len must be smaller than array length");
     return false;
   }
-  return nt::SetDefaultRaw(entry, cvalue.uarray().subspan(start, len));
+  return wpi::nt::SetDefaultRaw(entry, cvalue.uarray().subspan(start, len));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDefaultRawBuffer
  * Signature: (IJLjava/nio/ByteBuffer;II)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultRawBuffer
+Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultRawBuffer
   (JNIEnv* env, jclass, jint entry, jlong, jobject defaultValue, jint start, jint len)
 {
   if (!defaultValue) {
@@ -1004,72 +1004,72 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultRawBuffer
     illegalArgEx.Throw(env, "value must be a native ByteBuffer");
     return false;
   }
-  return nt::SetDefaultRaw(entry, cvalue.uarray().subspan(start, len));
+  return wpi::nt::SetDefaultRaw(entry, cvalue.uarray().subspan(start, len));
 }
 
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getAtomicBooleanArray
- * Signature: (I[Z)Ledu/wpi/first/networktables/TimestampedBooleanArray;
+ * Signature: (I[Z)Lorg/wpilib/networktables/TimestampedBooleanArray;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getAtomicBooleanArray
+Java_org_wpilib_networktables_NetworkTablesJNI_getAtomicBooleanArray
   (JNIEnv* env, jclass, jint subentry, jbooleanArray defaultValue)
 {
-  return MakeJObject(env, nt::GetAtomicBooleanArray(subentry, FromJavaBooleanArray(env, defaultValue)));
+  return MakeJObject(env, wpi::nt::GetAtomicBooleanArray(subentry, FromJavaBooleanArray(env, defaultValue)));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueBooleanArray
- * Signature: (I)[Ledu/wpi/first/networktables/TimestampedBooleanArray;
+ * Signature: (I)[Lorg/wpilib/networktables/TimestampedBooleanArray;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueBooleanArray
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueBooleanArray
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObject(env, nt::ReadQueueBooleanArray(subentry));
+  return MakeJObject(env, wpi::nt::ReadQueueBooleanArray(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueValuesBooleanArray
  * Signature: (I)[[Z
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueValuesBooleanArray
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueValuesBooleanArray
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObjectArray(env, nt::ReadQueueValuesBooleanArray(subentry));
+  return MakeJObjectArray(env, wpi::nt::ReadQueueValuesBooleanArray(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setBooleanArray
  * Signature: (IJ[Z)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setBooleanArray
+Java_org_wpilib_networktables_NetworkTablesJNI_setBooleanArray
   (JNIEnv* env, jclass, jint entry, jlong time, jbooleanArray value)
 {
   if (!value) {
     nullPointerEx.Throw(env, "value cannot be null");
     return false;
   }
-  return nt::SetBooleanArray(entry, FromJavaBooleanArray(env, value), time);
+  return wpi::nt::SetBooleanArray(entry, FromJavaBooleanArray(env, value), time);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getBooleanArray
  * Signature: (I[Z)[Z
  */
 JNIEXPORT jbooleanArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getBooleanArray
+Java_org_wpilib_networktables_NetworkTablesJNI_getBooleanArray
   (JNIEnv* env, jclass, jint entry, jbooleanArray defaultValue)
 {
-  auto val = nt::GetEntryValue(entry);
+  auto val = wpi::nt::GetEntryValue(entry);
   if (!val || !val.IsBooleanArray()) {
     return defaultValue;
   }
@@ -1077,84 +1077,84 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getBooleanArray
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDefaultBooleanArray
  * Signature: (IJ[Z)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultBooleanArray
+Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultBooleanArray
   (JNIEnv* env, jclass, jint entry, jlong, jbooleanArray defaultValue)
 {
   if (!defaultValue) {
     nullPointerEx.Throw(env, "defaultValue cannot be null");
     return false;
   }
-  return nt::SetDefaultBooleanArray(entry, FromJavaBooleanArray(env, defaultValue));
+  return wpi::nt::SetDefaultBooleanArray(entry, FromJavaBooleanArray(env, defaultValue));
 }
 
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getAtomicIntegerArray
- * Signature: (I[J)Ledu/wpi/first/networktables/TimestampedIntegerArray;
+ * Signature: (I[J)Lorg/wpilib/networktables/TimestampedIntegerArray;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getAtomicIntegerArray
+Java_org_wpilib_networktables_NetworkTablesJNI_getAtomicIntegerArray
   (JNIEnv* env, jclass, jint subentry, jlongArray defaultValue)
 {
-  return MakeJObject(env, nt::GetAtomicIntegerArray(subentry, CriticalJSpan<const jlong>{env, defaultValue}));
+  return MakeJObject(env, wpi::nt::GetAtomicIntegerArray(subentry, CriticalJSpan<const jlong>{env, defaultValue}));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueIntegerArray
- * Signature: (I)[Ledu/wpi/first/networktables/TimestampedIntegerArray;
+ * Signature: (I)[Lorg/wpilib/networktables/TimestampedIntegerArray;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueIntegerArray
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueIntegerArray
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObject(env, nt::ReadQueueIntegerArray(subentry));
+  return MakeJObject(env, wpi::nt::ReadQueueIntegerArray(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueValuesIntegerArray
  * Signature: (I)[[J
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueValuesIntegerArray
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueValuesIntegerArray
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObjectArray(env, nt::ReadQueueValuesIntegerArray(subentry));
+  return MakeJObjectArray(env, wpi::nt::ReadQueueValuesIntegerArray(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setIntegerArray
  * Signature: (IJ[J)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setIntegerArray
+Java_org_wpilib_networktables_NetworkTablesJNI_setIntegerArray
   (JNIEnv* env, jclass, jint entry, jlong time, jlongArray value)
 {
   if (!value) {
     nullPointerEx.Throw(env, "value cannot be null");
     return false;
   }
-  return nt::SetIntegerArray(entry, CriticalJSpan<const jlong>{env, value}, time);
+  return wpi::nt::SetIntegerArray(entry, CriticalJSpan<const jlong>{env, value}, time);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getIntegerArray
  * Signature: (I[J)[J
  */
 JNIEXPORT jlongArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getIntegerArray
+Java_org_wpilib_networktables_NetworkTablesJNI_getIntegerArray
   (JNIEnv* env, jclass, jint entry, jlongArray defaultValue)
 {
-  auto val = nt::GetEntryValue(entry);
+  auto val = wpi::nt::GetEntryValue(entry);
   if (!val || !val.IsIntegerArray()) {
     return defaultValue;
   }
@@ -1162,84 +1162,84 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getIntegerArray
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDefaultIntegerArray
  * Signature: (IJ[J)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultIntegerArray
+Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultIntegerArray
   (JNIEnv* env, jclass, jint entry, jlong, jlongArray defaultValue)
 {
   if (!defaultValue) {
     nullPointerEx.Throw(env, "defaultValue cannot be null");
     return false;
   }
-  return nt::SetDefaultIntegerArray(entry, CriticalJSpan<const jlong>{env, defaultValue});
+  return wpi::nt::SetDefaultIntegerArray(entry, CriticalJSpan<const jlong>{env, defaultValue});
 }
 
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getAtomicFloatArray
- * Signature: (I[F)Ledu/wpi/first/networktables/TimestampedFloatArray;
+ * Signature: (I[F)Lorg/wpilib/networktables/TimestampedFloatArray;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getAtomicFloatArray
+Java_org_wpilib_networktables_NetworkTablesJNI_getAtomicFloatArray
   (JNIEnv* env, jclass, jint subentry, jfloatArray defaultValue)
 {
-  return MakeJObject(env, nt::GetAtomicFloatArray(subentry, CriticalJSpan<const jfloat>{env, defaultValue}));
+  return MakeJObject(env, wpi::nt::GetAtomicFloatArray(subentry, CriticalJSpan<const jfloat>{env, defaultValue}));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueFloatArray
- * Signature: (I)[Ledu/wpi/first/networktables/TimestampedFloatArray;
+ * Signature: (I)[Lorg/wpilib/networktables/TimestampedFloatArray;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueFloatArray
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueFloatArray
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObject(env, nt::ReadQueueFloatArray(subentry));
+  return MakeJObject(env, wpi::nt::ReadQueueFloatArray(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueValuesFloatArray
  * Signature: (I)[[F
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueValuesFloatArray
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueValuesFloatArray
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObjectArray(env, nt::ReadQueueValuesFloatArray(subentry));
+  return MakeJObjectArray(env, wpi::nt::ReadQueueValuesFloatArray(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setFloatArray
  * Signature: (IJ[F)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setFloatArray
+Java_org_wpilib_networktables_NetworkTablesJNI_setFloatArray
   (JNIEnv* env, jclass, jint entry, jlong time, jfloatArray value)
 {
   if (!value) {
     nullPointerEx.Throw(env, "value cannot be null");
     return false;
   }
-  return nt::SetFloatArray(entry, CriticalJSpan<const jfloat>{env, value}, time);
+  return wpi::nt::SetFloatArray(entry, CriticalJSpan<const jfloat>{env, value}, time);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getFloatArray
  * Signature: (I[F)[F
  */
 JNIEXPORT jfloatArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getFloatArray
+Java_org_wpilib_networktables_NetworkTablesJNI_getFloatArray
   (JNIEnv* env, jclass, jint entry, jfloatArray defaultValue)
 {
-  auto val = nt::GetEntryValue(entry);
+  auto val = wpi::nt::GetEntryValue(entry);
   if (!val || !val.IsFloatArray()) {
     return defaultValue;
   }
@@ -1247,84 +1247,84 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getFloatArray
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDefaultFloatArray
  * Signature: (IJ[F)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultFloatArray
+Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultFloatArray
   (JNIEnv* env, jclass, jint entry, jlong, jfloatArray defaultValue)
 {
   if (!defaultValue) {
     nullPointerEx.Throw(env, "defaultValue cannot be null");
     return false;
   }
-  return nt::SetDefaultFloatArray(entry, CriticalJSpan<const jfloat>{env, defaultValue});
+  return wpi::nt::SetDefaultFloatArray(entry, CriticalJSpan<const jfloat>{env, defaultValue});
 }
 
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getAtomicDoubleArray
- * Signature: (I[D)Ledu/wpi/first/networktables/TimestampedDoubleArray;
+ * Signature: (I[D)Lorg/wpilib/networktables/TimestampedDoubleArray;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getAtomicDoubleArray
+Java_org_wpilib_networktables_NetworkTablesJNI_getAtomicDoubleArray
   (JNIEnv* env, jclass, jint subentry, jdoubleArray defaultValue)
 {
-  return MakeJObject(env, nt::GetAtomicDoubleArray(subentry, CriticalJSpan<const jdouble>{env, defaultValue}));
+  return MakeJObject(env, wpi::nt::GetAtomicDoubleArray(subentry, CriticalJSpan<const jdouble>{env, defaultValue}));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueDoubleArray
- * Signature: (I)[Ledu/wpi/first/networktables/TimestampedDoubleArray;
+ * Signature: (I)[Lorg/wpilib/networktables/TimestampedDoubleArray;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueDoubleArray
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueDoubleArray
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObject(env, nt::ReadQueueDoubleArray(subentry));
+  return MakeJObject(env, wpi::nt::ReadQueueDoubleArray(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueValuesDoubleArray
  * Signature: (I)[[D
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueValuesDoubleArray
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueValuesDoubleArray
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObjectArray(env, nt::ReadQueueValuesDoubleArray(subentry));
+  return MakeJObjectArray(env, wpi::nt::ReadQueueValuesDoubleArray(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDoubleArray
  * Signature: (IJ[D)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setDoubleArray
+Java_org_wpilib_networktables_NetworkTablesJNI_setDoubleArray
   (JNIEnv* env, jclass, jint entry, jlong time, jdoubleArray value)
 {
   if (!value) {
     nullPointerEx.Throw(env, "value cannot be null");
     return false;
   }
-  return nt::SetDoubleArray(entry, CriticalJSpan<const jdouble>{env, value}, time);
+  return wpi::nt::SetDoubleArray(entry, CriticalJSpan<const jdouble>{env, value}, time);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getDoubleArray
  * Signature: (I[D)[D
  */
 JNIEXPORT jdoubleArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getDoubleArray
+Java_org_wpilib_networktables_NetworkTablesJNI_getDoubleArray
   (JNIEnv* env, jclass, jint entry, jdoubleArray defaultValue)
 {
-  auto val = nt::GetEntryValue(entry);
+  auto val = wpi::nt::GetEntryValue(entry);
   if (!val || !val.IsDoubleArray()) {
     return defaultValue;
   }
@@ -1332,84 +1332,84 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getDoubleArray
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDefaultDoubleArray
  * Signature: (IJ[D)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultDoubleArray
+Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultDoubleArray
   (JNIEnv* env, jclass, jint entry, jlong, jdoubleArray defaultValue)
 {
   if (!defaultValue) {
     nullPointerEx.Throw(env, "defaultValue cannot be null");
     return false;
   }
-  return nt::SetDefaultDoubleArray(entry, CriticalJSpan<const jdouble>{env, defaultValue});
+  return wpi::nt::SetDefaultDoubleArray(entry, CriticalJSpan<const jdouble>{env, defaultValue});
 }
 
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getAtomicStringArray
- * Signature: (I[Ljava/lang/Object;)Ledu/wpi/first/networktables/TimestampedStringArray;
+ * Signature: (I[Ljava/lang/Object;)Lorg/wpilib/networktables/TimestampedStringArray;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getAtomicStringArray
+Java_org_wpilib_networktables_NetworkTablesJNI_getAtomicStringArray
   (JNIEnv* env, jclass, jint subentry, jobjectArray defaultValue)
 {
-  return MakeJObject(env, nt::GetAtomicStringArray(subentry, FromJavaStringArray(env, defaultValue)));
+  return MakeJObject(env, wpi::nt::GetAtomicStringArray(subentry, FromJavaStringArray(env, defaultValue)));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueStringArray
- * Signature: (I)[Ledu/wpi/first/networktables/TimestampedStringArray;
+ * Signature: (I)[Lorg/wpilib/networktables/TimestampedStringArray;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueStringArray
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueStringArray
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObject(env, nt::ReadQueueStringArray(subentry));
+  return MakeJObject(env, wpi::nt::ReadQueueStringArray(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueValuesStringArray
  * Signature: (I)[[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueValuesStringArray
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueValuesStringArray
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObjectArray(env, nt::ReadQueueValuesStringArray(subentry));
+  return MakeJObjectArray(env, wpi::nt::ReadQueueValuesStringArray(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setStringArray
  * Signature: (IJ[Ljava/lang/Object;)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setStringArray
+Java_org_wpilib_networktables_NetworkTablesJNI_setStringArray
   (JNIEnv* env, jclass, jint entry, jlong time, jobjectArray value)
 {
   if (!value) {
     nullPointerEx.Throw(env, "value cannot be null");
     return false;
   }
-  return nt::SetStringArray(entry, FromJavaStringArray(env, value), time);
+  return wpi::nt::SetStringArray(entry, FromJavaStringArray(env, value), time);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getStringArray
  * Signature: (I[Ljava/lang/Object;)[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getStringArray
+Java_org_wpilib_networktables_NetworkTablesJNI_getStringArray
   (JNIEnv* env, jclass, jint entry, jobjectArray defaultValue)
 {
-  auto val = nt::GetEntryValue(entry);
+  auto val = wpi::nt::GetEntryValue(entry);
   if (!val || !val.IsStringArray()) {
     return defaultValue;
   }
@@ -1417,19 +1417,19 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getStringArray
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDefaultStringArray
  * Signature: (IJ[Ljava/lang/Object;)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultStringArray
+Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultStringArray
   (JNIEnv* env, jclass, jint entry, jlong, jobjectArray defaultValue)
 {
   if (!defaultValue) {
     nullPointerEx.Throw(env, "defaultValue cannot be null");
     return false;
   }
-  return nt::SetDefaultStringArray(entry, FromJavaStringArray(env, defaultValue));
+  return wpi::nt::SetDefaultStringArray(entry, FromJavaStringArray(env, defaultValue));
 }
 
 

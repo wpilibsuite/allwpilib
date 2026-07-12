@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/other/Field2D.h"
+#include "wpi/glass/other/Field2D.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -13,33 +13,31 @@
 #include <utility>
 #include <vector>
 
-#include <fields/fields.h>
-#include <frc/geometry/Pose2d.h>
-#include <frc/geometry/Rotation2d.h>
-#include <frc/geometry/Translation2d.h>
-
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
-#include <portable-file-dialogs.h>
-#include <units/angle.h>
-#include <units/length.h>
-#include <wpi/MemoryBuffer.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/StringMap.h>
-#include <wpi/fs.h>
-#include <wpi/json.h>
-#include <wpi/print.h>
-#include <wpigui.h>
 
-#include "glass/Context.h"
-#include "glass/Storage.h"
-#include "glass/support/ColorSetting.h"
-#include "glass/support/EnumSetting.h"
+#include "wpi/fields/fields.hpp"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/support/ColorSetting.hpp"
+#include "wpi/glass/support/EnumSetting.hpp"
+#include "wpi/gui/portable-file-dialogs.h"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/json.hpp"
+#include "wpi/util/print.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 namespace gui = wpi::gui;
 
@@ -49,12 +47,13 @@ enum DisplayUnits { kDisplayMeters = 0, kDisplayFeet, kDisplayInches };
 
 // Per-frame field data (not persistent)
 struct FieldFrameData {
-  frc::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
-    return {
-        units::meter_t{(std::clamp(cursor.x, min.x, max.x) - min.x) / scale},
-        units::meter_t{(max.y - std::clamp(cursor.y, min.y, max.y)) / scale}};
+  wpi::math::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
+    return {wpi::units::meter_t{(std::clamp(cursor.x, min.x, max.x) - min.x) /
+                                scale},
+            wpi::units::meter_t{(max.y - std::clamp(cursor.y, min.y, max.y)) /
+                                scale}};
   }
-  ImVec2 GetScreenFromPos(const frc::Translation2d& pos) const {
+  ImVec2 GetScreenFromPos(const wpi::math::Translation2d& pos) const {
     return {min.x + scale * pos.X().to<float>(),
             max.y - scale * pos.Y().to<float>()};
   }
@@ -73,7 +72,7 @@ struct SelectedTargetInfo {
   FieldObjectModel* objModel = nullptr;
   std::string name;
   size_t index;
-  units::radian_t rot;
+  wpi::units::radian_t rot;
   ImVec2 poseCenter;  // center of the pose (screen coordinates)
   ImVec2 center;      // center of the target (screen coordinates)
   float radius;       // target radius
@@ -85,18 +84,20 @@ struct SelectedTargetInfo {
 struct PoseDragState {
   SelectedTargetInfo target;
   ImVec2 initialOffset;
-  units::radian_t initialAngle = 0_rad;
+  wpi::units::radian_t initialAngle = 0_rad;
 };
 
 // Popup edit state
 class PopupState {
  public:
-  void Open(SelectedTargetInfo* target, const frc::Translation2d& pos);
+  void Open(SelectedTargetInfo* target, const wpi::math::Translation2d& pos);
   void Close();
 
   SelectedTargetInfo* GetTarget() { return &m_target; }
   FieldObjectModel* GetInsertModel() { return m_insertModel; }
-  std::span<const frc::Pose2d> GetInsertPoses() const { return m_insertPoses; }
+  std::span<const wpi::math::Pose2d> GetInsertPoses() const {
+    return m_insertPoses;
+  }
 
   void Display(Field2DModel* model, const FieldFrameData& ffd);
 
@@ -108,7 +109,7 @@ class PopupState {
 
   // for insert
   FieldObjectModel* m_insertModel;
-  std::vector<frc::Pose2d> m_insertPoses;
+  std::vector<wpi::math::Pose2d> m_insertPoses;
   std::string m_insertName;
   int m_insertIndex;
 };
@@ -135,8 +136,8 @@ struct DisplayOptions {
   float weight = kDefaultWeight;
   int color = kDefaultColor;
 
-  units::meter_t width = kDefaultWidth;
-  units::meter_t length = kDefaultLength;
+  wpi::units::meter_t width = kDefaultWidth;
+  wpi::units::meter_t length = kDefaultLength;
 
   bool arrows = kDefaultArrows;
   int arrowSize = kDefaultArrowSize;
@@ -151,13 +152,13 @@ struct DisplayOptions {
 // Per-frame pose data (not persistent)
 class PoseFrameData {
  public:
-  explicit PoseFrameData(const frc::Pose2d& pose, FieldObjectModel& model,
+  explicit PoseFrameData(const wpi::math::Pose2d& pose, FieldObjectModel& model,
                          size_t index, const FieldFrameData& ffd,
                          const DisplayOptions& displayOptions);
-  void SetPosition(const frc::Translation2d& pos);
-  void SetRotation(units::radian_t rot);
-  const frc::Rotation2d& GetRotation() const { return m_pose.Rotation(); }
-  const frc::Pose2d& GetPose() const { return m_pose; }
+  void SetPosition(const wpi::math::Translation2d& pos);
+  void SetRotation(wpi::units::radian_t rot);
+  const wpi::math::Rotation2d& GetRotation() const { return m_pose.Rotation(); }
+  const wpi::math::Pose2d& GetPose() const { return m_pose; }
   float GetHitRadius() const { return m_hitRadius; }
   void UpdateFrameData();
   std::pair<int, float> IsHovered(const ImVec2& cursor) const;
@@ -183,7 +184,7 @@ class PoseFrameData {
 
   float m_hitRadius;
 
-  frc::Pose2d m_pose;
+  wpi::math::Pose2d m_pose;
 };
 
 class ObjectInfo {
@@ -224,8 +225,8 @@ class ObjectInfo {
 
 class FieldInfo {
  public:
-  static constexpr auto kDefaultWidth = 16.541052_m;
-  static constexpr auto kDefaultHeight = 8.211_m;
+  static constexpr auto kDefaultWidth = 17.5483_m;
+  static constexpr auto kDefaultHeight = 8.0519_m;
 
   explicit FieldInfo(Storage& storage);
 
@@ -235,7 +236,7 @@ class FieldInfo {
   FieldFrameData GetFrameData(ImVec2 min, ImVec2 max) const;
   void Draw(ImDrawList* drawList, const FieldFrameData& frameData) const;
 
-  wpi::StringMap<ObjectInfo> m_objects;
+  wpi::util::StringMap<ObjectInfo> m_objects;
 
  private:
   void Reset();
@@ -268,37 +269,38 @@ static PoseDragState gDragState;
 static PopupState gPopupState;
 static DisplayUnits gDisplayUnits = kDisplayMeters;
 
-static double ConvertDisplayLength(units::meter_t v) {
+static double ConvertDisplayLength(wpi::units::meter_t v) {
   switch (gDisplayUnits) {
     case kDisplayFeet:
-      return v.convert<units::feet>().value();
+      return v.convert<wpi::units::feet>().value();
     case kDisplayInches:
-      return v.convert<units::inches>().value();
+      return v.convert<wpi::units::inches>().value();
     case kDisplayMeters:
     default:
       return v.value();
   }
 }
 
-static double ConvertDisplayAngle(units::degree_t v) {
+static double ConvertDisplayAngle(wpi::units::degree_t v) {
   return v.value();
 }
 
-static bool InputLength(const char* label, units::meter_t* v, double step = 0.0,
-                        double step_fast = 0.0, const char* format = "%.6f",
+static bool InputLength(const char* label, wpi::units::meter_t* v,
+                        double step = 0.0, double step_fast = 0.0,
+                        const char* format = "%.6f",
                         ImGuiInputTextFlags flags = 0) {
   double dv = ConvertDisplayLength(*v);
   if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
     switch (gDisplayUnits) {
       case kDisplayFeet:
-        *v = units::foot_t{dv};
+        *v = wpi::units::foot_t{dv};
         break;
       case kDisplayInches:
-        *v = units::inch_t{dv};
+        *v = wpi::units::inch_t{dv};
         break;
       case kDisplayMeters:
       default:
-        *v = units::meter_t{dv};
+        *v = wpi::units::meter_t{dv};
         break;
     }
     return true;
@@ -310,7 +312,7 @@ static bool InputFloatLength(const char* label, float* v, double step = 0.0,
                              double step_fast = 0.0,
                              const char* format = "%.3f",
                              ImGuiInputTextFlags flags = 0) {
-  units::meter_t uv{*v};
+  wpi::units::meter_t uv{*v};
   if (InputLength(label, &uv, step, step_fast, format, flags)) {
     *v = uv.to<float>();
     return true;
@@ -318,18 +320,19 @@ static bool InputFloatLength(const char* label, float* v, double step = 0.0,
   return false;
 }
 
-static bool InputAngle(const char* label, units::degree_t* v, double step = 0.0,
-                       double step_fast = 0.0, const char* format = "%.6f",
+static bool InputAngle(const char* label, wpi::units::degree_t* v,
+                       double step = 0.0, double step_fast = 0.0,
+                       const char* format = "%.6f",
                        ImGuiInputTextFlags flags = 0) {
   double dv = ConvertDisplayAngle(*v);
   if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
-    *v = units::degree_t{dv};
+    *v = wpi::units::degree_t{dv};
     return true;
   }
   return false;
 }
 
-static bool InputPose(frc::Pose2d* pose) {
+static bool InputPose(wpi::math::Pose2d* pose) {
   auto x = pose->X();
   auto y = pose->Y();
   auto rot = pose->Rotation().Degrees();
@@ -339,13 +342,13 @@ static bool InputPose(frc::Pose2d* pose) {
   changed = InputLength("y", &y) || changed;
   changed = InputAngle("rot", &rot) || changed;
   if (changed) {
-    *pose = frc::Pose2d{x, y, rot};
+    *pose = wpi::math::Pose2d{x, y, rot};
   }
   return changed;
 }
 
 FieldInfo::FieldInfo(Storage& storage)
-    : m_builtin{storage.GetString("builtin", "2024 Crescendo")},
+    : m_builtin{storage.GetString("builtin", "Custom")},
       m_filename{storage.GetString("image")},
       m_width{storage.GetFloat("width", kDefaultWidth.to<float>())},
       m_height{storage.GetFloat("height", kDefaultHeight.to<float>())},
@@ -361,7 +364,7 @@ void FieldInfo::DisplaySettings() {
     if (ImGui::Selectable("Custom", m_builtin.empty())) {
       Reset();
     }
-    for (auto&& field : fields::GetFields()) {
+    for (auto&& field : wpi::fields::GetFields()) {
       bool selected = field.name == m_builtin;
       if (ImGui::Selectable(field.name, selected)) {
         Reset();
@@ -373,13 +376,13 @@ void FieldInfo::DisplaySettings() {
     }
     ImGui::EndCombo();
   }
-  if (m_builtin.empty() && ImGui::Button("Load image...")) {
+  if (m_builtin.empty() && ImGui::Button("Load JSON/image...")) {
     m_fileOpener = std::make_unique<pfd::open_file>(
-        "Choose field image", "",
-        std::vector<std::string>{"Image File",
+        "Choose field JSON/image", "",
+        std::vector<std::string>{"Field Image JSON File", "*.json",
+                                 "Image File",
                                  "*.jpg *.jpeg *.png *.bmp *.psd *.tga *.gif "
-                                 "*.hdr *.pic *.ppm *.pgm",
-                                 "PathWeaver JSON File", "*.json"});
+                                 "*.hdr *.pic *.ppm *.pgm"});
   }
   if (ImGui::Button("Reset image")) {
     Reset();
@@ -408,7 +411,7 @@ void FieldInfo::LoadImage() {
   if (m_fileOpener && m_fileOpener->ready(0)) {
     auto result = m_fileOpener->result();
     if (!result.empty()) {
-      if (wpi::ends_with(result[0], ".json")) {
+      if (wpi::util::ends_with(result[0], ".json")) {
         LoadJsonFile(result[0]);
       } else {
         LoadImageImpl(result[0].c_str());
@@ -422,7 +425,7 @@ void FieldInfo::LoadImage() {
   }
   if (!m_texture) {
     if (!m_builtin.empty()) {
-      for (auto&& field : fields::GetFields()) {
+      for (auto&& field : wpi::fields::GetFields()) {
         if (field.name == m_builtin) {
           auto jsonstr = field.getJson();
           auto imagedata = field.getImage();
@@ -448,16 +451,14 @@ void FieldInfo::LoadImage() {
 
 bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
   // parse file
-  wpi::json j;
-  try {
-    j = wpi::json::parse(is);
-  } catch (const wpi::json::parse_error& e) {
-    wpi::print(stderr, "GUI: JSON: could not parse: {}\n", e.what());
+  auto j = wpi::util::json::parse({is.data(), is.size()});
+  if (!j) {
+    wpi::util::print(stderr, "GUI: JSON: could not parse: {}\n", j.error());
     return false;
   }
 
   // top level must be an object
-  if (!j.is_object()) {
+  if (!j->is_object()) {
     std::fputs("GUI: JSON: does not contain a top object\n", stderr);
     return false;
   }
@@ -465,22 +466,23 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
   // image filename
   std::string image;
   try {
-    image = j.at("field-image").get<std::string>();
-  } catch (const wpi::json::exception& e) {
-    wpi::print(stderr, "GUI: JSON: could not read field-image: {}\n", e.what());
+    image = j->at("field-image").get_string();
+  } catch (const std::logic_error& e) {
+    wpi::util::print(stderr, "GUI: JSON: could not read field-image: {}\n",
+                     e.what());
     return false;
   }
 
   // corners
   int top, left, bottom, right;
   try {
-    top = j.at("field-corners").at("top-left").at(1).get<int>();
-    left = j.at("field-corners").at("top-left").at(0).get<int>();
-    bottom = j.at("field-corners").at("bottom-right").at(1).get<int>();
-    right = j.at("field-corners").at("bottom-right").at(0).get<int>();
-  } catch (const wpi::json::exception& e) {
-    wpi::print(stderr, "GUI: JSON: could not read field-corners: {}\n",
-               e.what());
+    top = j->at("field-corners").at("top-left").at(1).get_int();
+    left = j->at("field-corners").at("top-left").at(0).get_int();
+    bottom = j->at("field-corners").at("bottom-right").at(1).get_int();
+    right = j->at("field-corners").at("bottom-right").at(0).get_int();
+  } catch (const std::logic_error& e) {
+    wpi::util::print(stderr, "GUI: JSON: could not read field-corners: {}\n",
+                     e.what());
     return false;
   }
 
@@ -488,36 +490,38 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
   float width;
   float height;
   try {
-    width = j.at("field-size").at(0).get<float>();
-    height = j.at("field-size").at(1).get<float>();
-  } catch (const wpi::json::exception& e) {
-    wpi::print(stderr, "GUI: JSON: could not read field-size: {}\n", e.what());
+    width = j->at("field-size").at(0).get_number();
+    height = j->at("field-size").at(1).get_number();
+  } catch (const std::logic_error& e) {
+    wpi::util::print(stderr, "GUI: JSON: could not read field-size: {}\n",
+                     e.what());
     return false;
   }
 
   // units for size
   std::string unit;
   try {
-    unit = j.at("field-unit").get<std::string>();
-  } catch (const wpi::json::exception& e) {
-    wpi::print(stderr, "GUI: JSON: could not read field-unit: {}\n", e.what());
+    unit = j->at("field-unit").get_string();
+  } catch (const std::logic_error& e) {
+    wpi::util::print(stderr, "GUI: JSON: could not read field-unit: {}\n",
+                     e.what());
     return false;
   }
 
   // convert size units to meters
   if (unit == "foot" || unit == "feet") {
-    width = units::convert<units::feet, units::meters>(width);
-    height = units::convert<units::feet, units::meters>(height);
+    width = wpi::units::convert<wpi::units::feet, wpi::units::meters>(width);
+    height = wpi::units::convert<wpi::units::feet, wpi::units::meters>(height);
   }
 
   // check scaling
   int fieldWidth = m_right - m_left;
   int fieldHeight = m_bottom - m_top;
   if (std::abs((fieldWidth / width) - (fieldHeight / height)) > 0.3) {
-    wpi::print(stderr,
-               "GUI: Field X and Y scaling substantially different: "
-               "xscale={} yscale={}\n",
-               (fieldWidth / width), (fieldHeight / height));
+    wpi::util::print(stderr,
+                     "GUI: Field X and Y scaling substantially different: "
+                     "xscale={} yscale={}\n",
+                     (fieldWidth / width), (fieldHeight / height));
   }
 
   if (!filename.empty()) {
@@ -542,7 +546,7 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
 }
 
 void FieldInfo::LoadJsonFile(std::string_view jsonfile) {
-  auto fileBuffer = wpi::MemoryBuffer::GetFile(jsonfile);
+  auto fileBuffer = wpi::util::MemoryBuffer::GetFile(jsonfile);
   if (!fileBuffer) {
     std::fputs("GUI: could not open field JSON file\n", stderr);
     return;
@@ -553,7 +557,7 @@ void FieldInfo::LoadJsonFile(std::string_view jsonfile) {
 }
 
 bool FieldInfo::LoadImageImpl(const std::string& fn) {
-  wpi::print("GUI: loading field image '{}'\n", fn);
+  wpi::util::print("GUI: loading field image '{}'\n", fn);
   auto texture = gui::Texture::CreateFromFile(fn.c_str());
   if (!texture) {
     std::puts("GUI: could not read field image");
@@ -586,17 +590,29 @@ FieldFrameData FieldInfo::GetFrameData(ImVec2 min, ImVec2 max) const {
     max.x -= (m_imageWidth - m_right) * scale;
     max.y -= (m_imageHeight - m_bottom) * scale;
   } else if ((max.x - min.x) > 40 && (max.y - min.y > 40)) {
+    // scale padding to be proportional to aspect ratio
+    float width = max.x - min.x;
+    float height = max.y - min.y;
+    float padX, padY;
+    if (width > height) {
+      padX = 20 * width / height;
+      padY = 20;
+    } else {
+      padX = 20;
+      padY = 20 * height / width;
+    }
+
     // ensure there's some padding
-    min.x += 20;
-    max.x -= 20;
-    min.y += 20;
-    max.y -= 20;
+    min.x += padX;
+    max.x -= padX;
+    min.y += padY;
+    max.y -= padY;
 
     // also pad the image so it's the same size as the box
-    ffd.imageMin.x += 20;
-    ffd.imageMax.x -= 20;
-    ffd.imageMin.y += 20;
-    ffd.imageMax.y -= 20;
+    ffd.imageMin.x += padX;
+    ffd.imageMax.x -= padX;
+    ffd.imageMin.y += padY;
+    ffd.imageMax.y -= padY;
   }
 
   ffd.min = min;
@@ -615,8 +631,8 @@ void FieldInfo::Draw(ImDrawList* drawList, const FieldFrameData& ffd) const {
 }
 
 ObjectInfo::ObjectInfo(Storage& storage)
-    : m_width{storage.GetFloat("width",
-                               DisplayOptions::kDefaultWidth.to<float>())},
+    : m_width{
+          storage.GetFloat("width", DisplayOptions::kDefaultWidth.to<float>())},
       m_length{storage.GetFloat("length",
                                 DisplayOptions::kDefaultLength.to<float>())},
       m_style{storage.GetString("style"),
@@ -641,8 +657,8 @@ DisplayOptions ObjectInfo::GetDisplayOptions() const {
   rv.style = static_cast<DisplayOptions::Style>(m_style.GetValue());
   rv.weight = m_weight;
   rv.color = ImGui::ColorConvertFloat4ToU32(m_color.GetColor());
-  rv.width = units::meter_t{m_width};
-  rv.length = units::meter_t{m_length};
+  rv.width = wpi::units::meter_t{m_width};
+  rv.length = wpi::units::meter_t{m_length};
   rv.arrows = m_arrows;
   rv.arrowSize = m_arrowSize;
   rv.arrowWeight = m_arrowWeight;
@@ -751,7 +767,7 @@ void ObjectInfo::LoadImage() {
 }
 
 bool ObjectInfo::LoadImageImpl(const std::string& fn) {
-  wpi::print("GUI: loading object image '{}'\n", fn);
+  wpi::util::print("GUI: loading object image '{}'\n", fn);
   auto texture = gui::Texture::CreateFromFile(fn.c_str());
   if (!texture) {
     std::fputs("GUI: could not read object image\n", stderr);
@@ -762,8 +778,9 @@ bool ObjectInfo::LoadImageImpl(const std::string& fn) {
   return true;
 }
 
-PoseFrameData::PoseFrameData(const frc::Pose2d& pose, FieldObjectModel& model,
-                             size_t index, const FieldFrameData& ffd,
+PoseFrameData::PoseFrameData(const wpi::math::Pose2d& pose,
+                             FieldObjectModel& model, size_t index,
+                             const FieldFrameData& ffd,
                              const DisplayOptions& displayOptions)
     : m_model{model},
       m_index{index},
@@ -776,13 +793,13 @@ PoseFrameData::PoseFrameData(const frc::Pose2d& pose, FieldObjectModel& model,
   UpdateFrameData();
 }
 
-void PoseFrameData::SetPosition(const frc::Translation2d& pos) {
-  m_pose = frc::Pose2d{pos, m_pose.Rotation()};
+void PoseFrameData::SetPosition(const wpi::math::Translation2d& pos) {
+  m_pose = wpi::math::Pose2d{pos, m_pose.Rotation()};
   m_model.SetPose(m_index, m_pose);
 }
 
-void PoseFrameData::SetRotation(units::radian_t rot) {
-  m_pose = frc::Pose2d{m_pose.Translation(), rot};
+void PoseFrameData::SetRotation(wpi::units::radian_t rot) {
+  m_pose = wpi::math::Pose2d{m_pose.Translation(), rot};
   m_model.SetPose(m_index, m_pose);
 }
 
@@ -886,7 +903,7 @@ void PoseFrameData::HandleDrag(const ImVec2& cursor) {
   } else {
     ImVec2 off = cursor - m_center;
     SetRotation(gDragState.initialAngle -
-                units::radian_t{std::atan2(off.y, off.x)});
+                wpi::units::radian_t{std::atan2(off.y, off.x)});
     gDragState.target.center = m_corners[gDragState.target.corner - 2];
     gDragState.target.rot = GetRotation().Radians();
   }
@@ -925,7 +942,7 @@ void PoseFrameData::Draw(ImDrawList* drawList, std::vector<ImVec2>* center,
   }
 }
 
-void glass::DisplayField2DSettings(Field2DModel* model) {
+void wpi::glass::DisplayField2DSettings(Field2DModel* model) {
   auto& storage = GetStorage();
   auto field = storage.GetData<FieldInfo>();
   if (!field) {
@@ -953,7 +970,7 @@ void glass::DisplayField2DSettings(Field2DModel* model) {
     }
     PushID(name);
 
-    wpi::SmallString<64> nameBuf{name};
+    wpi::util::SmallString<64> nameBuf{name};
     if (ImGui::CollapsingHeader(nameBuf.c_str())) {
       auto& obj =
           field->m_objects.try_emplace(name, GetStorage()).first->second;
@@ -1075,8 +1092,8 @@ void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
       gDragState.initialOffset = m_mousePos - target->poseCenter;
       if (target->corner != 1) {
         gDragState.initialAngle =
-            units::radian_t{std::atan2(gDragState.initialOffset.y,
-                                       gDragState.initialOffset.x)} +
+            wpi::units::radian_t{std::atan2(gDragState.initialOffset.y,
+                                            gDragState.initialOffset.x)} +
             target->rot;
       }
     }
@@ -1142,7 +1159,7 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
 }
 
 void PopupState::Open(SelectedTargetInfo* target,
-                      const frc::Translation2d& pos) {
+                      const wpi::math::Translation2d& pos) {
   if (target) {
     m_target = *target;
   } else {
@@ -1172,7 +1189,8 @@ void PopupState::Display(Field2DModel* model, const FieldFrameData& ffd) {
 void PopupState::DisplayTarget(Field2DModel* model, const FieldFrameData& ffd) {
   ImGui::Text("%s[%d]", m_target.name.c_str(),
               static_cast<int>(m_target.index));
-  frc::Pose2d pose{ffd.GetPosFromScreen(m_target.poseCenter), m_target.rot};
+  wpi::math::Pose2d pose{ffd.GetPosFromScreen(m_target.poseCenter),
+                         m_target.rot};
   if (InputPose(&pose)) {
     m_target.poseCenter = ffd.GetScreenFromPos(pose.Translation());
     m_target.rot = pose.Rotation().Radians();
@@ -1180,7 +1198,7 @@ void PopupState::DisplayTarget(Field2DModel* model, const FieldFrameData& ffd) {
   }
   if (ImGui::Button("Delete Pose")) {
     auto posesRef = m_target.objModel->GetPoses();
-    std::vector<frc::Pose2d> poses{posesRef.begin(), posesRef.end()};
+    std::vector<wpi::math::Pose2d> poses{posesRef.begin(), posesRef.end()};
     if (m_target.index < poses.size()) {
       poses.erase(poses.begin() + m_target.index);
       m_target.objModel->SetPoses(poses);
@@ -1267,7 +1285,8 @@ void PopupState::DisplayInsert(Field2DModel* model) {
   }
 }
 
-void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
+void wpi::glass::DisplayField2D(Field2DModel* model,
+                                const ImVec2& contentSize) {
   auto& storage = GetStorage();
   auto field = storage.GetData<FieldInfo>();
   if (!field) {

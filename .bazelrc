@@ -1,38 +1,48 @@
-try-import %workspace%/bazel_auth.rc
 try-import %workspace%/user.bazelrc
 
-common --noenable_bzlmod
+common --enable_bzlmod
+# Resolves to --config=linux on Linux, --config=macos on Mac, --windows on windows
+common --enable_platform_specific_config
 
-build --java_language_version=17
-build --java_runtime_version=roboriojdk_17
-build --tool_java_language_version=17
-build --tool_java_runtime_version=remotejdk_17
+# Make bazel 8 work for us.
+build --experimental_cc_static_library
+build --experimental_cc_shared_library
+
+build --java_language_version=25
+build --java_runtime_version=remotejdk_25
+build --tool_java_language_version=25
+build --tool_java_runtime_version=remotejdk_25
 
 test --test_output=errors
 test --test_verbose_timeout_warnings
 
-import shared/bazel/compiler_flags/sanitizers.rc
-import shared/bazel/compiler_flags/base_linux_flags.rc
-import shared/bazel/compiler_flags/linux_flags.rc
-import shared/bazel/compiler_flags/osx_flags.rc
-import shared/bazel/compiler_flags/roborio_flags.rc
-import shared/bazel/compiler_flags/windows_flags.rc
-import shared/bazel/compiler_flags/coverage_flags.rc
+import %workspace%/shared/bazel/compiler_flags/sanitizers.rc
+import %workspace%/shared/bazel/compiler_flags/linux_flags.rc
+import %workspace%/shared/bazel/compiler_flags/osx_flags.rc
+import %workspace%/shared/bazel/compiler_flags/systemcore_flags.rc
+import %workspace%/shared/bazel/compiler_flags/windows_flags.rc
+import %workspace%/shared/bazel/compiler_flags/coverage_flags.rc
 
 build:build_java --test_tag_filters=allwpilib-build-java --build_tag_filters=allwpilib-build-java
 build:build_cpp --test_tag_filters=+allwpilib-build-cpp --build_tag_filters=+allwpilib-build-cpp
 build:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
 test:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
+common:skip_robotpy --test_tag_filters=-robotpy --build_tag_filters=-robotpy
+
+# Build Buddy BES Setup
+build:build_buddy_bes --bes_results_url=https://app.buildbuddy.io/invocation/
+build:build_buddy_bes --bes_backend=grpcs://remote.buildbuddy.io
+
+# Common Cache Settings
+build:common_cache --remote_timeout=3600
+build:common_cache --remote_cache_compression
+build:common_cache --experimental_remote_cache_compression_threshold=100
+common:common_cache --experimental_remote_merkle_tree_cache
 
 # Build Buddy Cache Setup
-build:build_buddy --bes_results_url=https://app.buildbuddy.io/invocation/
-build:build_buddy --bes_backend=grpcs://remote.buildbuddy.io
+build:build_buddy --config=common_cache
+build:build_buddy --config=build_buddy_bes
 build:build_buddy --remote_cache=grpcs://remote.buildbuddy.io
-build:build_buddy --remote_timeout=3600
-
-# Additional suggestions from buildbuddy for speed
-build:build_buddy --experimental_remote_cache_compression
-build:build_buddy --experimental_remote_cache_compression_threshold=100
 build:build_buddy --noslim_profile
 build:build_buddy --experimental_profile_include_target_label
 build:build_buddy --experimental_profile_include_primary_output
@@ -40,12 +50,59 @@ build:build_buddy --nolegacy_important_outputs
 
 common:build_buddy_readonly --noremote_upload_local_results
 
+# Bazel-remote cache setup
+build:remote_cache --config=common_cache
+build:remote_cache --remote_cache=grpcs://gitlib-bazel.wpi.edu
+
+common:remote_cache_readonly --noremote_upload_local_results
+
+# Stubs for remote execution.
+build:remote --strategy=TsProject=remote,sandboxed
+build --strategy=CopyFile=remote,standalone
+build --strategy=CopyDirectory=remote,standalone
+build --strategy=CopyToDirectory=remote,standalone
+build --strategy=PyWriteBuildData=remote,standalone
+# All tests have a strategy of TestRunner.  Enable standalone for only tests.
+# See the following for more details:
+# https://github.com/bazelbuild/bazel/issues/7480
+build:linux --strategy=TestRunner=remote,sandboxed,standalone
+build:macos --strategy=TestRunner=remote,sandboxed,standalone
+build:linux --strategy=NpmLifecycleHook=remote,sandboxed,standalone
+build:macos --strategy=NpmLifecycleHook=remote,sandboxed,standalone
+
+common:remote --config=common_cache
+build:remote --incompatible_strict_action_env --experimental_inmemory_dotd_files --experimental_inmemory_jdeps_files --experimental_remote_merkle_tree_cache --incompatible_allow_tags_propagation
+# Specify your cluster as follows:
+# build:remote --remote_executor=grpcs://engflow.example.com --bes_backend=grpcs://engflow.example.com --bes_results_url=https://engflow.example.com/invocation/
+build:remote --jobs=100
+build:remote --remote_timeout=1500
+build:remote --spawn_strategy=remote,sandboxed
+build:remote --grpc_keepalive_time=30s
+
 # This config should be used locally. It downloads more than the CI version
-build:remote_user --config=build_buddy
-build:remote_user --config=build_buddy_readonly
+build:remote_user --config=remote_cache
+build:remote_user --config=remote_cache_readonly
 build:remote_user --remote_download_toplevel
 
-build:ci --config=build_buddy
+common:ci --color=yes
 build:ci --remote_download_minimal
+build:ci --progress_report_interval=60 --show_progress_rate_limit=60
 
 build --build_metadata=REPO_URL=https://github.com/wpilibsuite/allwpilib.git
+
+common --define="WPILIB_VERSION=2025.424242.3.1-unknown"
+common --define="ROBOTPY_VERSION=2025.424242.3.1"
+
+# List of artifact types to build in CI.
+# Anything else gets skipped to speed up CI.
+common:ci --repo_env="WPI_PUBLISH_CLASSIFIER_FILTER=headers,sources,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug,linuxx86-64,linuxx86-64debug,linuxx86-64static,linuxx86-64staticdebug,osxuniversal,osxuniversaldebug,osxuniversalstatic,osxuniversalstaticdebug,windowsarm64,windowsarm64debug,windowsarm64static,windowsarm64staticdebug,windowsx86-64,windowsx86-64debug,windowsx86-64static,windowsx86-64staticdebug"
+
+# The 2 configurations for windows are very slow to build each time.
+# Instead, skip the cross transition for ARM on x86, and the reverse on x86.
+common:ci_windows_x86 --repo_env="WPI_PUBLISH_CLASSIFIER_FILTER=headers,sources,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug,linuxx86-64,linuxx86-64debug,linuxx86-64static,linuxx86-64staticdebug,osxuniversal,osxuniversaldebug,osxuniversalstatic,osxuniversalstaticdebug,windowsx86-64,windowsx86-64debug,windowsx86-64static,windowsx86-64staticdebug"
+common:ci_windows_arm --repo_env="WPI_PUBLISH_CLASSIFIER_FILTER=headers,sources,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug,linuxx86-64,linuxx86-64debug,linuxx86-64static,linuxx86-64staticdebug,osxuniversal,osxuniversaldebug,osxuniversalstatic,osxuniversalstaticdebug,windowsarm64,windowsarm64debug,windowsarm64static,windowsarm64staticdebug"
+
+build --@rules_python//python/config_settings:bootstrap_impl=script
+build --@rules_python//python/config_settings:venvs_use_declare_symlink=no
+
+try-import %workspace%/bazel_auth.rc

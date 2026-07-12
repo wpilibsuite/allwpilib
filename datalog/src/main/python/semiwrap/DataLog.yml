@@ -1,0 +1,431 @@
+# defaults:
+#   ignore: true
+#   report_ignored_missing: false
+enums:
+  ControlRecordType:
+classes:
+  wpi::log::DataLog:
+    attributes:
+      kBlockSize:
+      s_defaultMessageLog:
+        ignore: true
+      m_msglog:
+        ignore: true
+    methods:
+      DataLog:
+        ignore: true
+      Flush:
+      Pause:
+      Resume:
+      Stop:
+      HasSchema:
+      AddSchema:
+        overloads:
+          std::string_view, std::string_view, std::span<const uint8_t>, int64_t:
+          std::string_view, std::string_view, std::string_view, int64_t:
+      AddProtobufSchema:
+        ignore: true
+      AddStructSchema:
+        param_override:
+          info:
+            name: type
+        cpp_code: |
+          [](DataLog &self, const py::type &t, int64_t timestamp) {
+            WPyStructInfo info(t);
+            return self.AddStructSchema<WPyStruct, WPyStructInfo>(info, timestamp);
+          }
+
+      Start:
+      Finish:
+      SetMetadata:
+      AppendRaw:
+      AppendRaw2:
+      AppendBoolean:
+      AppendInteger:
+      AppendFloat:
+      AppendDouble:
+      AppendString:
+      AppendBooleanArray:
+        overloads:
+          int, std::span<const bool>, int64_t:
+          int, std::span<const int>, int64_t:
+            ignore: true
+          int, std::span<const uint8_t>, int64_t:
+            ignore: true
+      AppendIntegerArray:
+      AppendFloatArray:
+      AppendDoubleArray:
+      AppendStringArray:
+        overloads:
+          int, std::span<const std::string>, int64_t:
+            ignore: true
+          int, std::span<const std::string_view>, int64_t:
+          int, std::span<const struct WPI_String>, int64_t:
+            ignore: true
+      StartFile:
+      FlushBufs:
+        ignore: true
+      ReleaseBufs:
+        ignore: true
+      BufferHalfFull:
+      BufferFull:
+  wpi::log::DataLogEntry:
+    force_no_trampoline: true
+    methods:
+      SetMetadata:
+      Finish:
+  wpi::log::DataLogValueEntryImpl:
+    template_params:
+    - T
+    force_no_trampoline: true
+    attributes:
+      m_mutex:
+        ignore: true
+      m_lastValue:
+        ignore: true
+    methods:
+      HasLastValue:
+      GetLastValue:
+      DataLogValueEntryImpl:
+        overloads:
+          "":
+            ignore: true
+          DataLog&, std::string_view, std::string_view, std::string_view, int64_t:
+  wpi::log::RawLogEntry:
+    force_no_trampoline: true
+    attributes:
+      kDataType:
+    methods:
+      RawLogEntry:
+        overloads:
+          "":
+            ignore: true
+          DataLog&, std::string_view, int64_t:
+          DataLog&, std::string_view, std::string_view, int64_t:
+          DataLog&, std::string_view, std::string_view, std::string_view, int64_t:
+      Append:
+      Update:
+  wpi::log::BooleanLogEntry:
+    force_no_trampoline: true
+    attributes:
+      kDataType:
+    methods:
+      BooleanLogEntry:
+        overloads:
+          "":
+            ignore: true
+          DataLog&, std::string_view, int64_t:
+          DataLog&, std::string_view, std::string_view, int64_t:
+      Append:
+      Update:
+  wpi::log::IntegerLogEntry:
+    force_no_trampoline: true
+    attributes:
+      kDataType:
+    methods:
+      IntegerLogEntry:
+        overloads:
+          "":
+            ignore: true
+          DataLog&, std::string_view, int64_t:
+          DataLog&, std::string_view, std::string_view, int64_t:
+      Append:
+      Update:
+  wpi::log::FloatLogEntry:
+    force_no_trampoline: true
+    attributes:
+      kDataType:
+    methods:
+      FloatLogEntry:
+        overloads:
+          "":
+            ignore: true
+          DataLog&, std::string_view, int64_t:
+          DataLog&, std::string_view, std::string_view, int64_t:
+      Append:
+      Update:
+  wpi::log::DoubleLogEntry:
+    force_no_trampoline: true
+    attributes:
+      kDataType:
+    methods:
+      DoubleLogEntry:
+        overloads:
+          "":
+            ignore: true
+          DataLog&, std::string_view, int64_t:
+          DataLog&, std::string_view, std::string_view, int64_t:
+      Append:
+      Update:
+  wpi::log::StringLogEntry:
+    force_no_trampoline: true
+    attributes:
+      kDataType:
+    methods:
+      StringLogEntry:
+        overloads:
+          "":
+            ignore: true
+          DataLog&, std::string_view, int64_t:
+          DataLog&, std::string_view, std::string_view, int64_t:
+          DataLog&, std::string_view, std::string_view, std::string_view, int64_t:
+      Append:
+      Update:
+  wpi::log::BooleanArrayLogEntry:
+    force_no_trampoline: true
+    attributes:
+      kDataType:
+    methods:
+      BooleanArrayLogEntry:
+        overloads:
+          "":
+            ignore: true
+          DataLog&, std::string_view, int64_t:
+          DataLog&, std::string_view, std::string_view, int64_t:
+      Append:
+        overloads:
+          std::span<const bool>, int64_t:
+          std::initializer_list<bool>, int64_t:
+            ignore: true
+          std::span<const int>, int64_t:
+            ignore: true
+          std::initializer_list<int>, int64_t:
+            ignore: true
+          std::span<const uint8_t>, int64_t:
+            ignore: true
+      Update:
+        overloads:
+          std::span<const bool>, int64_t:
+          std::initializer_list<bool>, int64_t:
+            ignore: true
+          std::span<const int>, int64_t:
+          std::initializer_list<int>, int64_t:
+            ignore: true
+          std::span<const uint8_t>, int64_t:
+            ignore: true
+  wpi::log::IntegerArrayLogEntry:
+    force_no_trampoline: true
+    attributes:
+      kDataType:
+    methods:
+      IntegerArrayLogEntry:
+        overloads:
+          "":
+            ignore: true
+          DataLog&, std::string_view, int64_t:
+          DataLog&, std::string_view, std::string_view, int64_t:
+      Append:
+        overloads:
+          std::span<const int64_t>, int64_t:
+          std::initializer_list<int64_t>, int64_t:
+            ignore: true
+      Update:
+        overloads:
+          std::span<const int64_t>, int64_t:
+          std::initializer_list<int64_t>, int64_t:
+            ignore: true
+  wpi::log::FloatArrayLogEntry:
+    force_no_trampoline: true
+    attributes:
+      kDataType:
+    methods:
+      FloatArrayLogEntry:
+        overloads:
+          "":
+            ignore: true
+          DataLog&, std::string_view, int64_t:
+          DataLog&, std::string_view, std::string_view, int64_t:
+      Append:
+        overloads:
+          std::span<const float>, int64_t:
+          std::initializer_list<float>, int64_t:
+            ignore: true
+      Update:
+        overloads:
+          std::span<const float>, int64_t:
+          std::initializer_list<float>, int64_t:
+            ignore: true
+  wpi::log::DoubleArrayLogEntry:
+    force_no_trampoline: true
+    attributes:
+      kDataType:
+    methods:
+      DoubleArrayLogEntry:
+        overloads:
+          "":
+            ignore: true
+          DataLog&, std::string_view, int64_t:
+          DataLog&, std::string_view, std::string_view, int64_t:
+      Append:
+        overloads:
+          std::span<const double>, int64_t:
+          std::initializer_list<double>, int64_t:
+            ignore: true
+      Update:
+        overloads:
+          std::span<const double>, int64_t:
+          std::initializer_list<double>, int64_t:
+            ignore: true
+  wpi::log::StringArrayLogEntry:
+    force_no_trampoline: true
+    attributes:
+      kDataType:
+    methods:
+      StringArrayLogEntry:
+        overloads:
+          "":
+            ignore: true
+          DataLog&, std::string_view, int64_t:
+          DataLog&, std::string_view, std::string_view, int64_t:
+      Append:
+        overloads:
+          std::span<const std::string>, int64_t:
+            ignore: true
+          std::span<const std::string_view>, int64_t:
+          std::initializer_list<std::string_view>, int64_t:
+            ignore: true
+      Update:
+        overloads:
+          std::span<const std::string>, int64_t:
+            ignore: true
+          std::span<const std::string_view>, int64_t:
+          std::initializer_list<std::string_view>, int64_t:
+            ignore: true
+  wpi::log::StructLogEntry:
+    force_no_trampoline: true
+    template_params:
+    - T
+    - I
+    methods:
+      StructLogEntry:
+        overloads:
+          "":
+            ignore: true
+          DataLog&, std::string_view, I..., int64_t:
+            param_override:
+              info:
+                name: type
+            cpp_code: |
+              [](DataLog &log, std::string_view name, const py::type &t, int64_t timestamp) {
+                WPyStructInfo info(t);
+                return std::make_shared<StructLogEntry<WPyStruct, WPyStructInfo>>(log, name, info, timestamp);
+              }
+          DataLog&, std::string_view, std::string_view, I..., int64_t:
+            param_override:
+              info:
+                name: type
+            cpp_code: |
+              [](DataLog &log, std::string_view name, std::string_view metadata, const py::type &t, int64_t timestamp) {
+                WPyStructInfo info(t);
+                return std::make_shared<StructLogEntry<WPyStruct, WPyStructInfo>>(log, name, metadata, info, timestamp);
+              }
+      Append:
+      Update:
+      HasLastValue:
+      GetLastValue:
+  wpi::log::StructArrayLogEntry:
+    force_no_trampoline: true
+    template_params:
+    - T
+    - I
+    methods:
+      StructArrayLogEntry:
+        overloads:
+          "":
+            ignore: true
+          DataLog&, std::string_view, I..., int64_t:
+            param_override:
+              info:
+                name: type
+            cpp_code: |
+              [](DataLog &log, std::string_view name, const py::type &t, int64_t timestamp) {
+                WPyStructInfo info(t);
+                return std::make_shared<StructArrayLogEntry<WPyStruct, WPyStructInfo>>(log, name, info, timestamp);
+              }
+          DataLog&, std::string_view, std::string_view, I..., int64_t:
+            param_override:
+              info:
+                name: type
+            cpp_code: |
+              [](DataLog &log, std::string_view name, std::string_view metadata, const py::type &t, int64_t timestamp) {
+                WPyStructInfo info(t);
+                return std::make_shared<StructArrayLogEntry<WPyStruct, WPyStructInfo>>(log, name, metadata, info, timestamp);
+              }
+      Append:
+        overloads:
+          U&&, int64_t:
+            ignore: true
+          std::span<const T>, int64_t:
+      Update:
+      HasLastValue:
+      GetLastValue:
+  wpi::log::ProtobufLogEntry:
+    force_no_trampoline: true
+    ignore: true
+    methods:
+      ProtobufLogEntry:
+        overloads:
+          "":
+          DataLog&, std::string_view, int64_t:
+          DataLog&, std::string_view, std::string_view, int64_t:
+      Append:
+      Update:
+      HasLastValue:
+      GetLastValue:
+
+templates:
+  StructLogEntry:
+    qualname: wpi::log::StructLogEntry
+    params:
+    - WPyStruct
+    - WPyStructInfo
+  StructArrayLogEntry:
+    qualname: wpi::log::StructArrayLogEntry
+    params:
+    - WPyStruct
+    - WPyStructInfo
+
+  _RawLogEntryImpl:
+    qualname: wpi::log::DataLogValueEntryImpl
+    params:
+    - std::vector<uint8_t>
+  _BooleanLogEntryImpl:
+    qualname: wpi::log::DataLogValueEntryImpl
+    params:
+    - bool
+  _IntegerLogEntryImpl:
+    qualname: wpi::log::DataLogValueEntryImpl
+    params:
+    - int64_t
+  _FloatLogEntryImpl:
+    qualname: wpi::log::DataLogValueEntryImpl
+    params:
+    - float
+  _DoubleLogEntryImpl:
+    qualname: wpi::log::DataLogValueEntryImpl
+    params:
+    - double
+  _StringLogEntryImpl:
+    qualname: wpi::log::DataLogValueEntryImpl
+    params:
+    - std::string
+  _BooleanArrayLogEntryImpl:
+    qualname: wpi::log::DataLogValueEntryImpl
+    params:
+    - std::vector<int>
+  _IntegerArrayLogEntryImpl:
+    qualname: wpi::log::DataLogValueEntryImpl
+    params:
+    - std::vector<int64_t>
+  _FloatArrayLogEntryImpl:
+    qualname: wpi::log::DataLogValueEntryImpl
+    params:
+    - std::vector<float>
+  _DoubleArrayLogEntryImpl:
+    qualname: wpi::log::DataLogValueEntryImpl
+    params:
+    - std::vector<double>
+  _StringArrayLogEntryImpl:
+    qualname: wpi::log::DataLogValueEntryImpl
+    params:
+    - std::vector<std::string>

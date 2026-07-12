@@ -2,47 +2,50 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/geometry/Rotation3d.hpp"
+
 #include <cmath>
 #include <numbers>
 
 #include <Eigen/Core>
 #include <gtest/gtest.h>
-#include <wpi/MathExtras.h>
 
-#include "frc/geometry/Rotation3d.h"
+#include "wpi/util/MathExtras.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 TEST(Rotation3dTest, GimbalLockAccuracy) {
-  auto rot1 = Rotation3d{0_rad, 0_rad, units::radian_t{std::numbers::pi / 2}};
-  auto rot2 = Rotation3d{units::radian_t{std::numbers::pi}, 0_rad, 0_rad};
-  auto rot3 = Rotation3d{-units::radian_t{std::numbers::pi / 2}, 0_rad, 0_rad};
-  const auto result1 = rot1 + rot2 + rot3;
+  auto rot1 =
+      Rotation3d{0_rad, 0_rad, wpi::units::radian_t{std::numbers::pi / 2}};
+  auto rot2 = Rotation3d{wpi::units::radian_t{std::numbers::pi}, 0_rad, 0_rad};
+  auto rot3 =
+      Rotation3d{-wpi::units::radian_t{std::numbers::pi / 2}, 0_rad, 0_rad};
+  const auto result1 = rot1.RotateBy(rot2).RotateBy(rot3);
   const auto expected1 =
-      Rotation3d{0_rad, -units::radian_t{std::numbers::pi / 2},
-                 units::radian_t{std::numbers::pi / 2}};
+      Rotation3d{0_rad, -wpi::units::radian_t{std::numbers::pi / 2},
+                 wpi::units::radian_t{std::numbers::pi / 2}};
   EXPECT_EQ(expected1, result1);
   EXPECT_DOUBLE_EQ(std::numbers::pi / 2, (result1.X() + result1.Z()).value());
   EXPECT_NEAR(-std::numbers::pi / 2, result1.Y().value(), 1e-7);
 
-  rot1 = Rotation3d{0_rad, 0_rad, units::radian_t{std::numbers::pi / 2}};
-  rot2 = Rotation3d{units::radian_t{-std::numbers::pi}, 0_rad, 0_rad};
-  rot3 = Rotation3d{units::radian_t{std::numbers::pi / 2}, 0_rad, 0_rad};
-  const auto result2 = rot1 + rot2 + rot3;
+  rot1 = Rotation3d{0_rad, 0_rad, wpi::units::radian_t{std::numbers::pi / 2}};
+  rot2 = Rotation3d{wpi::units::radian_t{-std::numbers::pi}, 0_rad, 0_rad};
+  rot3 = Rotation3d{wpi::units::radian_t{std::numbers::pi / 2}, 0_rad, 0_rad};
+  const auto result2 = rot1.RotateBy(rot2).RotateBy(rot3);
   const auto expected2 =
-      Rotation3d{0_rad, units::radian_t{std::numbers::pi / 2},
-                 units::radian_t{std::numbers::pi / 2}};
+      Rotation3d{0_rad, wpi::units::radian_t{std::numbers::pi / 2},
+                 wpi::units::radian_t{std::numbers::pi / 2}};
   EXPECT_EQ(expected2, result2);
   EXPECT_DOUBLE_EQ(std::numbers::pi / 2, (result2.Z() - result2.X()).value());
   EXPECT_NEAR(std::numbers::pi / 2, result2.Y().value(), 1e-7);
 
-  rot1 = Rotation3d{0_rad, 0_rad, units::radian_t{std::numbers::pi / 2}};
-  rot2 = Rotation3d{0_rad, units::radian_t{std::numbers::pi / 3}, 0_rad};
-  rot3 = Rotation3d{-units::radian_t{std::numbers::pi / 2}, 0_rad, 0_rad};
-  const auto result3 = rot1 + rot2 + rot3;
+  rot1 = Rotation3d{0_rad, 0_rad, wpi::units::radian_t{std::numbers::pi / 2}};
+  rot2 = Rotation3d{0_rad, wpi::units::radian_t{std::numbers::pi / 3}, 0_rad};
+  rot3 = Rotation3d{-wpi::units::radian_t{std::numbers::pi / 2}, 0_rad, 0_rad};
+  const auto result3 = rot1.RotateBy(rot2).RotateBy(rot3);
   const auto expected3 =
-      Rotation3d{0_rad, units::radian_t{std::numbers::pi / 2},
-                 units::radian_t{std::numbers::pi / 6}};
+      Rotation3d{0_rad, wpi::units::radian_t{std::numbers::pi / 2},
+                 wpi::units::radian_t{std::numbers::pi / 6}};
   EXPECT_EQ(expected3, result3);
   EXPECT_DOUBLE_EQ(std::numbers::pi / 6, (result3.Z() - result3.X()).value());
   EXPECT_DOUBLE_EQ(std::numbers::pi / 2, result3.Y().value());
@@ -50,22 +53,25 @@ TEST(Rotation3dTest, GimbalLockAccuracy) {
 
 TEST(Rotation3dTest, InitAxisAngleAndRollPitchYaw) {
   const Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
-  const Rotation3d rot1{xAxis, units::radian_t{std::numbers::pi / 3}};
-  const Rotation3d rot2{units::radian_t{std::numbers::pi / 3}, 0_rad, 0_rad};
+  const Rotation3d rot1{xAxis, wpi::units::radian_t{std::numbers::pi / 3}};
+  const Rotation3d rot2{wpi::units::radian_t{std::numbers::pi / 3}, 0_rad,
+                        0_rad};
   const Rotation3d rvec1{Eigen::Vector3d{xAxis * std::numbers::pi / 3}};
   EXPECT_EQ(rot1, rot2);
   EXPECT_EQ(rot1, rvec1);
 
   const Eigen::Vector3d yAxis{0.0, 1.0, 0.0};
-  const Rotation3d rot3{yAxis, units::radian_t{std::numbers::pi / 3}};
-  const Rotation3d rot4{0_rad, units::radian_t{std::numbers::pi / 3}, 0_rad};
+  const Rotation3d rot3{yAxis, wpi::units::radian_t{std::numbers::pi / 3}};
+  const Rotation3d rot4{0_rad, wpi::units::radian_t{std::numbers::pi / 3},
+                        0_rad};
   const Rotation3d rvec2{Eigen::Vector3d{yAxis * std::numbers::pi / 3}};
   EXPECT_EQ(rot3, rot4);
   EXPECT_EQ(rot3, rvec2);
 
   const Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
-  const Rotation3d rot5{zAxis, units::radian_t{std::numbers::pi / 3}};
-  const Rotation3d rot6{0_rad, 0_rad, units::radian_t{std::numbers::pi / 3}};
+  const Rotation3d rot5{zAxis, wpi::units::radian_t{std::numbers::pi / 3}};
+  const Rotation3d rot6{0_rad, 0_rad,
+                        wpi::units::radian_t{std::numbers::pi / 3}};
   const Rotation3d rvec3{Eigen::Vector3d{zAxis * std::numbers::pi / 3}};
   EXPECT_EQ(rot5, rot6);
   EXPECT_EQ(rot5, rvec3);
@@ -102,12 +108,14 @@ TEST(Rotation3dTest, InitTwoVector) {
 
   // 90 degree CW rotation around y-axis
   const Rotation3d rot1{xAxis, zAxis};
-  const Rotation3d expected1{yAxis, units::radian_t{-std::numbers::pi / 2.0}};
+  const Rotation3d expected1{yAxis,
+                             wpi::units::radian_t{-std::numbers::pi / 2.0}};
   EXPECT_EQ(expected1, rot1);
 
   // 45 degree CCW rotation around z-axis
   const Rotation3d rot2{xAxis, Eigen::Vector3d{1.0, 1.0, 0.0}};
-  const Rotation3d expected2{zAxis, units::radian_t{std::numbers::pi / 4.0}};
+  const Rotation3d expected2{zAxis,
+                             wpi::units::radian_t{std::numbers::pi / 4.0}};
   EXPECT_EQ(expected2, rot2);
 
   // 0 degree rotation of x-axes
@@ -148,15 +156,15 @@ TEST(Rotation3dTest, InitTwoVector) {
 TEST(Rotation3dTest, RadiansToDegrees) {
   const Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
-  const Rotation3d rot1{zAxis, units::radian_t{std::numbers::pi / 3}};
+  const Rotation3d rot1{zAxis, wpi::units::radian_t{std::numbers::pi / 3}};
   EXPECT_DOUBLE_EQ(0.0, rot1.X().value());
   EXPECT_DOUBLE_EQ(0.0, rot1.Y().value());
-  EXPECT_DOUBLE_EQ(units::radian_t{60_deg}.value(), rot1.Z().value());
+  EXPECT_DOUBLE_EQ(wpi::units::radian_t{60_deg}.value(), rot1.Z().value());
 
-  const Rotation3d rot2{zAxis, units::radian_t{std::numbers::pi / 4}};
+  const Rotation3d rot2{zAxis, wpi::units::radian_t{std::numbers::pi / 4}};
   EXPECT_DOUBLE_EQ(0.0, rot2.X().value());
   EXPECT_DOUBLE_EQ(0.0, rot2.Y().value());
-  EXPECT_DOUBLE_EQ(units::radian_t{45_deg}.value(), rot2.Z().value());
+  EXPECT_DOUBLE_EQ(wpi::units::radian_t{45_deg}.value(), rot2.Z().value());
 }
 
 TEST(Rotation3dTest, DegreesToRadians) {
@@ -176,20 +184,20 @@ TEST(Rotation3dTest, DegreesToRadians) {
 TEST(Rotation3dTest, RotationLoop) {
   Rotation3d rot;
 
-  rot = rot + Rotation3d{90_deg, 0_deg, 0_deg};
+  rot = rot.RotateBy(Rotation3d{90_deg, 0_deg, 0_deg});
   Rotation3d expected{90_deg, 0_deg, 0_deg};
   EXPECT_EQ(expected, rot);
 
-  rot = rot + Rotation3d{0_deg, 90_deg, 0_deg};
+  rot = rot.RotateBy(Rotation3d{0_deg, 90_deg, 0_deg});
   expected = Rotation3d{
       {1.0 / std::sqrt(3), 1.0 / std::sqrt(3), -1.0 / std::sqrt(3)}, 120_deg};
   EXPECT_EQ(expected, rot);
 
-  rot = rot + Rotation3d{0_deg, 0_deg, 90_deg};
+  rot = rot.RotateBy(Rotation3d{0_deg, 0_deg, 90_deg});
   expected = Rotation3d{0_deg, 90_deg, 0_deg};
   EXPECT_EQ(expected, rot);
 
-  rot = rot + Rotation3d{0_deg, -90_deg, 0_deg};
+  rot = rot.RotateBy(Rotation3d{0_deg, -90_deg, 0_deg});
   EXPECT_EQ(Rotation3d{}, rot);
 }
 
@@ -197,7 +205,7 @@ TEST(Rotation3dTest, RotateByFromZeroX) {
   const Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
 
   const Rotation3d zero;
-  auto rotated = zero + Rotation3d{xAxis, 90_deg};
+  auto rotated = zero.RotateBy(Rotation3d{xAxis, 90_deg});
 
   Rotation3d expected{xAxis, 90_deg};
   EXPECT_EQ(expected, rotated);
@@ -207,7 +215,7 @@ TEST(Rotation3dTest, RotateByFromZeroY) {
   const Eigen::Vector3d yAxis{0.0, 1.0, 0.0};
 
   const Rotation3d zero;
-  auto rotated = zero + Rotation3d{yAxis, 90_deg};
+  auto rotated = zero.RotateBy(Rotation3d{yAxis, 90_deg});
 
   Rotation3d expected{yAxis, 90_deg};
   EXPECT_EQ(expected, rotated);
@@ -217,7 +225,7 @@ TEST(Rotation3dTest, RotateByFromZeroZ) {
   const Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
   const Rotation3d zero;
-  auto rotated = zero + Rotation3d{zAxis, 90_deg};
+  auto rotated = zero.RotateBy(Rotation3d{zAxis, 90_deg});
 
   Rotation3d expected{zAxis, 90_deg};
   EXPECT_EQ(expected, rotated);
@@ -227,7 +235,7 @@ TEST(Rotation3dTest, RotateByNonZeroX) {
   const Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
 
   auto rot = Rotation3d{xAxis, 90_deg};
-  rot = rot + Rotation3d{xAxis, 30_deg};
+  rot = rot.RotateBy(Rotation3d{xAxis, 30_deg});
 
   Rotation3d expected{xAxis, 120_deg};
   EXPECT_EQ(expected, rot);
@@ -237,7 +245,7 @@ TEST(Rotation3dTest, RotateByNonZeroY) {
   const Eigen::Vector3d yAxis{0.0, 1.0, 0.0};
 
   auto rot = Rotation3d{yAxis, 90_deg};
-  rot = rot + Rotation3d{yAxis, 30_deg};
+  rot = rot.RotateBy(Rotation3d{yAxis, 30_deg});
 
   Rotation3d expected{yAxis, 120_deg};
   EXPECT_EQ(expected, rot);
@@ -247,19 +255,25 @@ TEST(Rotation3dTest, RotateByNonZeroZ) {
   const Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
   auto rot = Rotation3d{zAxis, 90_deg};
-  rot = rot + Rotation3d{zAxis, 30_deg};
+  rot = rot.RotateBy(Rotation3d{zAxis, 30_deg});
 
   Rotation3d expected{zAxis, 120_deg};
   EXPECT_EQ(expected, rot);
 }
 
-TEST(Rotation3dTest, Minus) {
+TEST(Rotation3dTest, RelativeTo) {
+  const Eigen::Vector3d yAxis{0.0, 1.0, 0.0};
   const Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
-  const auto rot1 = Rotation3d{zAxis, 70_deg};
-  const auto rot2 = Rotation3d{zAxis, 30_deg};
+  auto start = Rotation3d{yAxis, -90_deg};
+  auto end = Rotation3d{zAxis, 90_deg};
 
-  EXPECT_DOUBLE_EQ(40.0, units::degree_t{(rot1 - rot2).Z()}.value());
+  const Eigen::Vector3d intrinsicAxis{1.0, 1.0, 1.0};
+  auto expected = Rotation3d{intrinsicAxis, 120_deg};
+
+  auto result = end.RelativeTo(start);
+
+  EXPECT_EQ(expected, result);
 }
 
 TEST(Rotation3dTest, AxisAngle) {
@@ -308,8 +322,13 @@ TEST(Rotation3dTest, Inequality) {
 }
 
 TEST(Rotation3dTest, ToMatrix) {
+#if __GNUC__ <= 11
   Rotation3d before{10_deg, 20_deg, 30_deg};
   Rotation3d after{before.ToMatrix()};
+#else
+  constexpr Rotation3d before{10_deg, 20_deg, 30_deg};
+  constexpr Rotation3d after{before.ToMatrix()};
+#endif
 
   EXPECT_EQ(before, after);
 }
@@ -322,48 +341,76 @@ TEST(Rotation3dTest, Interpolate) {
   // 50 + (70 - 50) * 0.5 = 60
   auto rot1 = Rotation3d{xAxis, 50_deg};
   auto rot2 = Rotation3d{xAxis, 70_deg};
-  auto interpolated = wpi::Lerp(rot1, rot2, 0.5);
-  EXPECT_DOUBLE_EQ(60.0, units::degree_t{interpolated.X()}.value());
-  EXPECT_DOUBLE_EQ(0.0, units::degree_t{interpolated.Y()}.value());
-  EXPECT_DOUBLE_EQ(0.0, units::degree_t{interpolated.Z()}.value());
+  auto interpolated = wpi::util::Lerp(rot1, rot2, 0.5);
+  EXPECT_DOUBLE_EQ(60.0, wpi::units::degree_t{interpolated.X()}.value());
+  EXPECT_DOUBLE_EQ(0.0, wpi::units::degree_t{interpolated.Y()}.value());
+  EXPECT_DOUBLE_EQ(0.0, wpi::units::degree_t{interpolated.Z()}.value());
 
   // -160 minus half distance between 170 and -160 (15) = -175
   rot1 = Rotation3d{xAxis, 170_deg};
   rot2 = Rotation3d{xAxis, -160_deg};
-  interpolated = wpi::Lerp(rot1, rot2, 0.5);
-  EXPECT_DOUBLE_EQ(-175.0, units::degree_t{interpolated.X()}.value());
-  EXPECT_DOUBLE_EQ(0.0, units::degree_t{interpolated.Y()}.value());
-  EXPECT_DOUBLE_EQ(0.0, units::degree_t{interpolated.Z()}.value());
+  interpolated = wpi::util::Lerp(rot1, rot2, 0.5);
+  EXPECT_DOUBLE_EQ(-175.0, wpi::units::degree_t{interpolated.X()}.value());
+  EXPECT_DOUBLE_EQ(0.0, wpi::units::degree_t{interpolated.Y()}.value());
+  EXPECT_DOUBLE_EQ(0.0, wpi::units::degree_t{interpolated.Z()}.value());
 
   // 50 + (70 - 50) * 0.5 = 60
   rot1 = Rotation3d{yAxis, 50_deg};
   rot2 = Rotation3d{yAxis, 70_deg};
-  interpolated = wpi::Lerp(rot1, rot2, 0.5);
-  EXPECT_DOUBLE_EQ(0.0, units::degree_t{interpolated.X()}.value());
-  EXPECT_DOUBLE_EQ(60.0, units::degree_t{interpolated.Y()}.value());
-  EXPECT_DOUBLE_EQ(0.0, units::degree_t{interpolated.Z()}.value());
+  interpolated = wpi::util::Lerp(rot1, rot2, 0.5);
+  EXPECT_DOUBLE_EQ(0.0, wpi::units::degree_t{interpolated.X()}.value());
+  EXPECT_DOUBLE_EQ(60.0, wpi::units::degree_t{interpolated.Y()}.value());
+  EXPECT_DOUBLE_EQ(0.0, wpi::units::degree_t{interpolated.Z()}.value());
 
   // -160 plus half distance between 170 and -160 (165) = 5
   rot1 = Rotation3d{yAxis, 170_deg};
   rot2 = Rotation3d{yAxis, -160_deg};
-  interpolated = wpi::Lerp(rot1, rot2, 0.5);
-  EXPECT_DOUBLE_EQ(180.0, units::degree_t{interpolated.X()}.value());
-  EXPECT_DOUBLE_EQ(-5.0, units::degree_t{interpolated.Y()}.value());
-  EXPECT_DOUBLE_EQ(180.0, units::degree_t{interpolated.Z()}.value());
+  interpolated = wpi::util::Lerp(rot1, rot2, 0.5);
+  EXPECT_DOUBLE_EQ(180.0, wpi::units::degree_t{interpolated.X()}.value());
+  EXPECT_NEAR(-5.0, wpi::units::degree_t{interpolated.Y()}.value(), 1e-9);
+  EXPECT_DOUBLE_EQ(180.0, wpi::units::degree_t{interpolated.Z()}.value());
 
   // 50 + (70 - 50) * 0.5 = 60
   rot1 = Rotation3d{zAxis, 50_deg};
   rot2 = Rotation3d{zAxis, 70_deg};
-  interpolated = wpi::Lerp(rot1, rot2, 0.5);
-  EXPECT_DOUBLE_EQ(0.0, units::degree_t{interpolated.X()}.value());
-  EXPECT_DOUBLE_EQ(0.0, units::degree_t{interpolated.Y()}.value());
-  EXPECT_DOUBLE_EQ(60.0, units::degree_t{interpolated.Z()}.value());
+  interpolated = wpi::util::Lerp(rot1, rot2, 0.5);
+  EXPECT_DOUBLE_EQ(0.0, wpi::units::degree_t{interpolated.X()}.value());
+  EXPECT_DOUBLE_EQ(0.0, wpi::units::degree_t{interpolated.Y()}.value());
+  EXPECT_DOUBLE_EQ(60.0, wpi::units::degree_t{interpolated.Z()}.value());
 
   // -160 minus half distance between 170 and -160 (15) = -175
   rot1 = Rotation3d{zAxis, 170_deg};
   rot2 = Rotation3d{zAxis, -160_deg};
-  interpolated = wpi::Lerp(rot1, rot2, 0.5);
-  EXPECT_DOUBLE_EQ(0.0, units::degree_t{interpolated.X()}.value());
-  EXPECT_DOUBLE_EQ(0.0, units::degree_t{interpolated.Y()}.value());
-  EXPECT_DOUBLE_EQ(-175.0, units::degree_t{interpolated.Z()}.value());
+  interpolated = wpi::util::Lerp(rot1, rot2, 0.5);
+  EXPECT_DOUBLE_EQ(0.0, wpi::units::degree_t{interpolated.X()}.value());
+  EXPECT_DOUBLE_EQ(0.0, wpi::units::degree_t{interpolated.Y()}.value());
+  EXPECT_DOUBLE_EQ(-175.0, wpi::units::degree_t{interpolated.Z()}.value());
+
+  // t value of 0 should always produce the start
+  rot1 = Rotation3d{yAxis, -90_deg};
+  rot2 = Rotation3d{zAxis, 90_deg};
+  interpolated = wpi::util::Lerp(rot1, rot2, 0.0);
+  EXPECT_DOUBLE_EQ(rot1.X().value(), interpolated.X().value());
+  EXPECT_DOUBLE_EQ(rot1.Y().value(), interpolated.Y().value());
+  EXPECT_DOUBLE_EQ(rot1.Z().value(), interpolated.Z().value());
+
+  // The full rotation from rot1 to rot2 is 120 degrees around extrinsic
+  // <-1.0, 1.0, 1.0>
+  const Eigen::Vector3d extrinsicAxis{-1.0, 1.0, 1.0};
+  rot1 = Rotation3d{yAxis, -90_deg};
+  rot2 = Rotation3d{zAxis, 90_deg};
+  EXPECT_EQ(rot2, rot1.RotateBy(Rotation3d{extrinsicAxis, 120_deg}));
+  interpolated = wpi::util::Lerp(rot1, rot2, 0.5);
+  auto expected = rot1.RotateBy(Rotation3d{extrinsicAxis, 60_deg});
+  EXPECT_DOUBLE_EQ(expected.X().value(), interpolated.X().value());
+  EXPECT_DOUBLE_EQ(expected.Y().value(), interpolated.Y().value());
+  EXPECT_DOUBLE_EQ(expected.Z().value(), interpolated.Z().value());
+
+  // t value of 1 should always produce the end
+  rot1 = Rotation3d{yAxis, -90_deg};
+  rot2 = Rotation3d{zAxis, 90_deg};
+  interpolated = wpi::util::Lerp(rot1, rot2, 1.0);
+  EXPECT_NEAR(rot2.X().value(), interpolated.X().value(), 1e-9);
+  EXPECT_NEAR(rot2.Y().value(), interpolated.Y().value(), 1e-9);
+  EXPECT_NEAR(rot2.Z().value(), interpolated.Z().value(), 1e-9);
 }

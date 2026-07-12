@@ -5,9 +5,8 @@
 #include <cstdio>
 #include <memory>
 
-#include <hal/Extensions.h>
-
-#include "HALSimXRPClient.h"
+#include "wpi/hal/Extensions.h"
+#include "wpi/halsim/xrp/HALSimXRPClient.hpp"
 
 #if defined(Win32) || defined(_WIN32)
 #pragma comment(lib, "Ws2_32.lib")
@@ -25,7 +24,7 @@ extern "C" {
 __declspec(dllexport)
 #endif
 
-    int HALSIM_InitExtension(void) {
+int HALSIM_InitExtension(void) {
   std::puts("HALSim XRP Extension Initializing");
 
   HAL_OnShutdown(nullptr, [](void*) { gClient.reset(); });

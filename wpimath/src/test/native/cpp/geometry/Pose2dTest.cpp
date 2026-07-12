@@ -2,14 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/geometry/Pose2d.hpp"
+
 #include <cmath>
-#include <cstdlib>
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose2d.h"
-
-using namespace frc;
+using namespace wpi::math;
 
 TEST(Pose2dTest, RotateBy) {
   constexpr auto x = 1_m;
@@ -49,6 +48,17 @@ TEST(Pose2dTest, RelativeTo) {
   EXPECT_NEAR(5.0 * std::sqrt(2.0), finalRelativeToInitial.X().value(), 1e-9);
   EXPECT_NEAR(0.0, finalRelativeToInitial.Y().value(), 1e-9);
   EXPECT_NEAR(0.0, finalRelativeToInitial.Rotation().Degrees().value(), 1e-9);
+}
+
+TEST(Pose2dTest, RotateAround) {
+  const Pose2d initial{5_m, 0_m, 0_deg};
+  const Translation2d point{0_m, 0_m};
+
+  const auto rotated = initial.RotateAround(point, Rotation2d{180_deg});
+
+  EXPECT_NEAR(-5.0, rotated.X().value(), 1e-9);
+  EXPECT_NEAR(0.0, rotated.Y().value(), 1e-9);
+  EXPECT_NEAR(180.0, rotated.Rotation().Degrees().value(), 1e-9);
 }
 
 TEST(Pose2dTest, Equality) {

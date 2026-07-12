@@ -255,3 +255,14 @@ bazel_auth.rc
 
 # ctest
 /Testing/
+
+# Meson
+.meson-subproject*
+
+# Copybara user config
+shared/bazel/copybara/.copybara.json
+
+# Nix files
+shell.nix
+flake.nix
+flake.lock

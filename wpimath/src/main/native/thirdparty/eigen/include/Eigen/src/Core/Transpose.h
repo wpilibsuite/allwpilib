@@ -65,8 +65,8 @@ class Transpose : public TransposeImpl<MatrixType, typename internal::traits<Mat
 
   EIGEN_INHERIT_ASSIGNMENT_OPERATORS(Transpose)
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index rows() const EIGEN_NOEXCEPT { return m_matrix.cols(); }
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index cols() const EIGEN_NOEXCEPT { return m_matrix.rows(); }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index rows() const noexcept { return m_matrix.cols(); }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index cols() const noexcept { return m_matrix.rows(); }
 
   /** \returns the nested expression */
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const internal::remove_all_t<MatrixTypeNested>& nestedExpression() const {

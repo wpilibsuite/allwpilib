@@ -41,14 +41,10 @@ class ForceAlignedAccess : public internal::dense_xpr_base<ForceAlignedAccess<Ex
 
   EIGEN_DEVICE_FUNC explicit inline ForceAlignedAccess(const ExpressionType& matrix) : m_expression(matrix) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index rows() const EIGEN_NOEXCEPT { return m_expression.rows(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index cols() const EIGEN_NOEXCEPT { return m_expression.cols(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index outerStride() const EIGEN_NOEXCEPT {
-    return m_expression.outerStride();
-  }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index innerStride() const EIGEN_NOEXCEPT {
-    return m_expression.innerStride();
-  }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const noexcept { return m_expression.rows(); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const noexcept { return m_expression.cols(); }
+  EIGEN_DEVICE_FUNC constexpr Index outerStride() const noexcept { return m_expression.outerStride(); }
+  EIGEN_DEVICE_FUNC constexpr Index innerStride() const noexcept { return m_expression.innerStride(); }
 
   EIGEN_DEVICE_FUNC inline const CoeffReturnType coeff(Index row, Index col) const {
     return m_expression.coeff(row, col);

@@ -11,11 +11,12 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/ErrorHandling.h"
-#include "wpi/SmallVector.h"
-#include "wpi/Errc.h"
-#include "wpi/WindowsError.h"
-#include "wpi/print.h"
+#include "wpi/util/ErrorHandling.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/Errc.hpp"
+#include "wpi/util/Errno.hpp"
+#include "wpi/util/WindowsError.hpp"
+#include "wpi/util/print.hpp"
 #include <cassert>
 #include <cstdlib>
 #include <mutex>
@@ -24,11 +25,11 @@
 #ifndef _WIN32
 #include <unistd.h>
 #endif
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 #include <io.h>
 #endif
 
-using namespace wpi;
+using namespace wpi::util;
 
 static fatal_error_handler_t ErrorHandler = nullptr;
 static void *ErrorHandlerUserData = nullptr;
@@ -50,7 +51,22 @@ static void *BadAllocErrorHandlerUserData = nullptr;
 static std::mutex ErrorHandlerMutex;
 static std::mutex BadAllocErrorHandlerMutex;
 
-void wpi::install_fatal_error_handler(fatal_error_handler_t handler,
+static bool write_retry(int fd, const char *buf, size_t count) {
+  while (count > 0) {
+#ifdef _WIN32
+    int written = sys::RetryAfterSignal(-1, ::_write, fd, buf, count);
+#else
+    ssize_t written = sys::RetryAfterSignal(-1, ::write, fd, buf, count);
+#endif
+    if (written <= 0)
+      return false;
+    buf += written;
+    count -= written;
+  }
+  return true;
+}
+
+void wpi::util::install_fatal_error_handler(fatal_error_handler_t handler,
                                        void *user_data) {
   std::scoped_lock Lock(ErrorHandlerMutex);
   assert(!ErrorHandler && "Error handler already registered!\n");
@@ -58,22 +74,22 @@ void wpi::install_fatal_error_handler(fatal_error_handler_t handler,
   ErrorHandlerUserData = user_data;
 }
 
-void wpi::remove_fatal_error_handler() {
+void wpi::util::remove_fatal_error_handler() {
   std::scoped_lock Lock(ErrorHandlerMutex);
   ErrorHandler = nullptr;
   ErrorHandlerUserData = nullptr;
 }
 
-void wpi::report_fatal_error(const char *Reason, bool GenCrashDiag) {
+void wpi::util::report_fatal_error(const char *Reason, bool GenCrashDiag) {
   report_fatal_error(std::string_view(Reason), GenCrashDiag);
 }
 
-void wpi::report_fatal_error(const std::string &Reason, bool GenCrashDiag) {
+void wpi::util::report_fatal_error(const std::string &Reason, bool GenCrashDiag) {
   report_fatal_error(std::string_view(Reason), GenCrashDiag);
 }
 
-void wpi::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
-  wpi::fatal_error_handler_t handler = nullptr;
+void wpi::util::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
+  wpi::util::fatal_error_handler_t handler = nullptr;
   void* handlerData = nullptr;
   {
     // Only acquire the mutex while reading the handler, so as not to invoke a
@@ -86,27 +102,47 @@ void wpi::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
   if (handler) {
     handler(handlerData, std::string{Reason}.c_str(), GenCrashDiag);
   } else {
-    wpi::print(stderr, "LLVM ERROR: {}\n", Reason);
+    wpi::util::print(stderr, "LLVM ERROR: {}\n", Reason);
   }
 
   exit(1);
 }
 
-void wpi::install_bad_alloc_error_handler(fatal_error_handler_t handler,
+void wpi::util::reportFatalInternalError(const char *reason) {
+  report_fatal_error(reason, /*GenCrashDiag=*/true);
+}
+void wpi::util::reportFatalInternalError(const std::string& reason) {
+  report_fatal_error(reason, /*GenCrashDiag=*/true);
+}
+void wpi::util::reportFatalInternalError(std::string_view reason) {
+  report_fatal_error(reason, /*GenCrashDiag=*/true);
+}
+void wpi::util::reportFatalUsageError(const char *reason) {
+  report_fatal_error(reason, /*GenCrashDiag=*/false);
+}
+void wpi::util::reportFatalUsageError(const std::string& reason) {
+  report_fatal_error(reason, /*GenCrashDiag=*/false);
+}
+void wpi::util::reportFatalUsageError(std::string_view reason) {
+  report_fatal_error(reason, /*GenCrashDiag=*/false);
+}
+
+void wpi::util::install_bad_alloc_error_handler(fatal_error_handler_t handler,
                                            void *user_data) {
   std::scoped_lock Lock(BadAllocErrorHandlerMutex);
-  assert(!ErrorHandler && "Bad alloc error handler already registered!\n");
+  assert(!BadAllocErrorHandler &&
+         "Bad alloc error handler already registered!\n");
   BadAllocErrorHandler = handler;
   BadAllocErrorHandlerUserData = user_data;
 }
 
-void wpi::remove_bad_alloc_error_handler() {
+void wpi::util::remove_bad_alloc_error_handler() {
   std::scoped_lock Lock(BadAllocErrorHandlerMutex);
   BadAllocErrorHandler = nullptr;
   BadAllocErrorHandlerUserData = nullptr;
 }
 
-void wpi::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+void wpi::util::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
   fatal_error_handler_t Handler = nullptr;
   void *HandlerData = nullptr;
   {
@@ -126,44 +162,38 @@ void wpi::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
   // an OOM to stderr and abort.
   const char *OOMMessage = "LLVM ERROR: out of memory\n";
   const char *Newline = "\n";
-#ifdef _WIN32
-  (void)!::_write(2, OOMMessage, strlen(OOMMessage));
-  (void)!::_write(2, Reason, strlen(Reason));
-  (void)!::_write(2, Newline, strlen(Newline));
-#else
-  (void)!::write(2, OOMMessage, strlen(OOMMessage));
-  (void)!::write(2, Reason, strlen(Reason));
-  (void)!::write(2, Newline, strlen(Newline));
-#endif
+  write_retry(2, OOMMessage, strlen(OOMMessage));
+  write_retry(2, Reason, strlen(Reason));
+  write_retry(2, Newline, strlen(Newline));
   abort();
 }
 
 // Causes crash on allocation failure. It is called prior to the handler set by
 // 'install_bad_alloc_error_handler'.
 static void out_of_memory_new_handler() {
-  wpi::report_bad_alloc_error("Allocation failed");
+  wpi::util::report_bad_alloc_error("Allocation failed");
 }
 
 // Installs new handler that causes crash on allocation failure. It is called by
 // InitLLVM.
-void wpi::install_out_of_memory_new_handler() {
+void wpi::util::install_out_of_memory_new_handler() {
   std::new_handler old = std::set_new_handler(out_of_memory_new_handler);
   (void)old;
   assert((old == nullptr || old == out_of_memory_new_handler) &&
          "new-handler already installed");
 }
 
-void wpi::wpi_unreachable_internal(const char *msg, const char *file,
+void wpi::util::wpi_unreachable_internal(const char *msg, const char *file,
                                      unsigned line) {
   // This code intentionally doesn't call the ErrorHandler callback, because
   // wpi_unreachable is intended to be used to indicate "impossible"
   // situations, and not legitimate runtime errors.
   if (msg)
-    wpi::print(stderr, "{}\n", msg);
+    wpi::util::print(stderr, "{}\n", msg);
   std::fputs("UNREACHABLE executed", stderr);
   if (file)
-    wpi::print(stderr, " at {}:{}", file, line);
-  wpi::print(stderr, "!\n");
+    wpi::util::print(stderr, " at {}:{}", file, line);
+  wpi::util::print(stderr, "!\n");
   abort();
 #ifdef LLVM_BUILTIN_UNREACHABLE
   // Windows systems and possibly others don't declare abort() to be noreturn,
@@ -174,14 +204,32 @@ void wpi::wpi_unreachable_internal(const char *msg, const char *file,
 
 #ifdef _WIN32
 
+// mingw-w64 tends to define it as 0x0502 in its headers.
+#undef _WIN32_WINNT
+
+// Require at least Windows 7 API.
+#define _WIN32_WINNT 0x0601
+#define WIN32_LEAN_AND_MEAN
+#define WIN32_NO_STATUS
+#include <windows.h>
+#undef WIN32_NO_STATUS
+#include <ntstatus.h>
 #include <winerror.h>
+
+// This function obtains the last error code and maps it. It may call
+// RtlGetLastNtStatus, which is a lower level API that can return a
+// more specific error code than GetLastError.
+std::error_code wpi::util::mapLastWindowsError() {
+  unsigned EV = ::GetLastError();
+  return mapWindowsError(EV);
+}
 
 // I'd rather not double the line count of the following.
 #define MAP_ERR_TO_COND(x, y)                                                  \
   case x:                                                                      \
     return std::make_error_code(std::errc::y)
 
-std::error_code wpi::mapWindowsError(unsigned EV) {
+std::error_code wpi::util::mapWindowsError(unsigned EV) {
   switch (EV) {
     MAP_ERR_TO_COND(ERROR_ACCESS_DENIED, permission_denied);
     MAP_ERR_TO_COND(ERROR_ALREADY_EXISTS, file_exists);

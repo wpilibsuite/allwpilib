@@ -215,10 +215,10 @@ class ReshapedImpl_dense<XprType, Rows, Cols, Order, true> : public MapBase<Resh
   EIGEN_DEVICE_FUNC XprType& nestedExpression() { return m_xpr; }
 
   /** \sa MapBase::innerStride() */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index innerStride() const { return m_xpr.innerStride(); }
+  EIGEN_DEVICE_FUNC constexpr Index innerStride() const { return m_xpr.innerStride(); }
 
   /** \sa MapBase::outerStride() */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index outerStride() const {
+  EIGEN_DEVICE_FUNC constexpr Index outerStride() const {
     return (((Flags & RowMajorBit) == RowMajorBit) ? this->cols() : this->rows()) * m_xpr.innerStride();
   }
 

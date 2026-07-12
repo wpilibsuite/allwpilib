@@ -1,29 +1,36 @@
 #!/usr/bin/env python3
 
-import os
+import re
 import shutil
+from pathlib import Path
 
 from upstream_utils import Lib
 
 
-def run_global_replacements(wpiutil_llvm_files):
+def run_global_replacements(wpiutil_llvm_files: list[Path]):
     for wpi_file in wpiutil_llvm_files:
         with open(wpi_file) as f:
             content = f.read()
 
         # Rename namespace from llvm to wpi
-        content = content.replace("namespace llvm", "namespace wpi")
-        content = content.replace("llvm::", "wpi::")
+        content = content.replace("namespace llvm", "namespace wpi::util")
+        content = content.replace("llvm:", "wpi::util:")
 
         # Fix #includes
-        content = content.replace('include "llvm/ADT', 'include "wpi')
-        content = content.replace('include "llvm/Config', 'include "wpi')
-        content = content.replace('include "llvm/Support', 'include "wpi')
+        content = content.replace('include "llvm/ADT', 'include "wpi/util')
+        content = content.replace('include "llvm/Config', 'include "wpi/util')
+        content = content.replace('include "llvm/Support', 'include "wpi/util')
+        content = content.replace(
+            'include "CountCopyAndMove.h"', 'include "CountCopyAndMove.hpp"'
+        )
+        content = content.replace(
+            'include "Windows/WindowsSupport.h"', 'include "Windows/WindowsSupport.hpp"'
+        )
 
         # Fix uses of span
         content = content.replace("span", "std::span")
         content = content.replace("include <std::span>", "include <span>")
-        if wpi_file.endswith("ConvertUTFWrapper.cpp"):
+        if wpi_file.name == "ConvertUTFWrapper.cpp":
             content = content.replace(
                 "const UTF16 *Src = reinterpret_cast<const UTF16 *>(SrcBytes.begin());",
                 "const UTF16 *Src = reinterpret_cast<const UTF16 *>(&*SrcBytes.begin());",
@@ -43,20 +50,23 @@ def run_global_replacements(wpiutil_llvm_files):
 
         # Remove unused headers
         content = content.replace('#include "llvm-c/ErrorHandling.h"\n', "")
-        content = content.replace('#include "wpi/Debug.h"\n', "")
-        content = content.replace('#include "wpi/Error.h"\n', "")
-        content = content.replace('#include "wpi/Format.h"\n', "")
-        content = content.replace('#include "wpi/FormatVariadic.h"\n', "")
-        content = content.replace('#include "wpi/NativeFormatting.h"\n', "")
-        content = content.replace('#include "wpi/Threading.h"\n', "")
-        content = content.replace('#include "wpi/DataTypes.h"\n', "")
-        content = content.replace('#include "wpi/llvm-config.h"\n', "")
-        content = content.replace('#include "wpi/abi-breaking.h"\n', "")
-        content = content.replace('#include "wpi/config.h"\n', "")
-        content = content.replace('#include "wpi/Signals.h"\n', "")
-        content = content.replace('#include "wpi/Process.h"\n', "")
-        content = content.replace('#include "wpi/Path.h"\n', "")
-        content = content.replace('#include "wpi/Program.h"\n', "")
+        content = content.replace('#include "wpi/util/Debug.h"\n', "")
+        content = content.replace('#include "wpi/util/Error.h"\n', "")
+        content = content.replace('#include "wpi/util/Format.h"\n', "")
+        content = content.replace('#include "wpi/util/FormatVariadic.h"\n', "")
+        content = content.replace('#include "wpi/util/Hashing.h"\n', "")
+        content = content.replace('#include "wpi/util/NativeFormatting.h"\n', "")
+        content = content.replace('#include "wpi/util/Threading.h"\n', "")
+        content = content.replace('#include "wpi/util/DataTypes.h"\n', "")
+        content = content.replace('#include "wpi/util/llvm-config.h"\n', "")
+        content = content.replace('#include "wpi/util/abi-breaking.h"\n', "")
+        content = content.replace('#include "wpi/util/bit.h"\n', "")
+        content = content.replace('#include "wpi/util/config.h"\n', "")
+        content = content.replace('#include "wpi/util/Signals.h"\n', "")
+        content = content.replace('#include "wpi/util/Process.h"\n', "")
+        content = content.replace('#include "wpi/util/Path.h"\n', "")
+        content = content.replace('#include "wpi/util/Program.h"\n', "")
+        content = content.replace('#include "wpi/util/SwapByteOrder.h"\n', "")
 
         # Fix include guards
         content = content.replace("LLVM_ADT_", "WPIUTIL_WPI_")
@@ -69,7 +79,9 @@ def run_global_replacements(wpiutil_llvm_files):
         content = content.replace("sys::fs::", "fs::")
 
         # Replace wpi/FileSystem.h with wpi/fs.h
-        content = content.replace('include "wpi/FileSystem.h"', 'include "wpi/fs.h"')
+        content = content.replace(
+            'include "wpi/util/FileSystem.h"', 'include "wpi/util/fs.hpp"'
+        )
 
         # Replace llvm_unreachable() with wpi_unreachable()
         content = content.replace("llvm_unreachable", "wpi_unreachable")
@@ -77,70 +89,83 @@ def run_global_replacements(wpiutil_llvm_files):
         content = content.replace("llvm_is_multithreaded()", "1")
 
         # Revert message in copyright header
-        content = content.replace("/// Defines the wpi::", "/// Defines the llvm::")
-        content = content.replace("// end llvm namespace", "// end wpi namespace")
-        content = content.replace("// end namespace llvm", "// end namespace wpi")
-        content = content.replace("// End llvm namespace", "// End wpi namespace")
+        content = content.replace(
+            "/// Defines the wpi::util::", "/// Defines the llvm::"
+        )
+        content = content.replace("// end llvm namespace", "// end wpi::util namespace")
+        content = content.replace("// end namespace llvm", "// end namespace wpi::util")
+        content = content.replace("// End llvm namespace", "// End wpi::util namespace")
 
         content = content.replace("fs::openFileForRead", "fs::OpenFileForRead")
+
+        # Handle move from .h -> .hpp
+        content = re.sub(
+            '#include "wpi/util/(.*).h"', r'#include "wpi/util/\1.hpp"', content
+        )
 
         with open(wpi_file, "w") as f:
             f.write(content)
 
 
-def flattened_llvm_files(llvm, dirs_to_keep):
-    file_lookup = {}
+def flattened_llvm_files(llvm: Path, dirs_to_keep: list[Path]):
+    file_lookup: dict[str, Path] = {}
 
     for dir_to_keep in dirs_to_keep:
-        dir_to_crawl = os.path.join(llvm, dir_to_keep)
-        for root, _, files in os.walk(dir_to_crawl):
+        dir_to_crawl = llvm / dir_to_keep
+        for root, _, files in dir_to_crawl.walk():
             for f in files:
-                file_lookup[f] = os.path.join(root, f)
+                file_lookup[f] = root / f
 
     return file_lookup
 
 
-def find_wpiutil_llvm_files(wpiutil_root, subfolder):
+def find_wpiutil_llvm_files(wpiutil_root: Path, subfolder: str):
     # These files have substantial changes, not worth managing with the patching process
     ignore_list = [
-        "StringExtras.h",
+        "StringExtras.hpp",
         "StringExtras.cpp",
         "MemoryBuffer.cpp",
-        "MemoryBuffer.h",
-        "SmallVectorMemoryBuffer.h",
+        "MemoryBuffer.hpp",
+        "SmallVectorMemoryBuffer.hpp",
     ]
 
-    wpiutil_files = []
-    for root, _, files in os.walk(os.path.join(wpiutil_root, subfolder)):
+    wpiutil_files: list[Path] = []
+    for root, _, files in (wpiutil_root / subfolder).walk():
         for f in files:
             if f not in ignore_list:
-                full_file = os.path.join(root, f)
+                full_file = root / f
                 wpiutil_files.append(full_file)
 
     return wpiutil_files
 
 
-def overwrite_files(wpiutil_files, llvm_files):
+def overwrite_files(wpiutil_files: list[Path], llvm_files: dict[str, Path]):
     # Very sparse rips from LLVM sources. Not worth tyring to make match upstream
     unmatched_files_whitelist = ["fs.h", "fs.cpp", "function_ref.h"]
 
     for wpi_file in wpiutil_files:
-        wpi_base_name = os.path.basename(wpi_file)
+        wpi_base_name = wpi_file.name
+        if wpi_file.suffix == ".hpp":
+            wpi_base_name = wpi_file.with_suffix(".h").name
+
         if wpi_base_name in llvm_files:
-            shutil.copyfile(llvm_files[wpi_base_name], wpi_file)
+            if wpi_file.suffix == ".h":
+                shutil.copyfile(llvm_files[wpi_base_name], wpi_file.with_suffix(".hpp"))
+            else:
+                shutil.copyfile(llvm_files[wpi_base_name], wpi_file)
 
         elif wpi_base_name not in unmatched_files_whitelist:
             print(f"No file match for {wpi_file}, check if LLVM deleted it")
 
 
-def overwrite_source(wpiutil_root, llvm_root):
+def overwrite_source(wpiutil_root: Path, llvm_root: Path):
     llvm_files = flattened_llvm_files(
         llvm_root,
         [
-            "llvm/include/llvm/ADT/",
-            "llvm/include/llvm/Config",
-            "llvm/include/llvm/Support/",
-            "llvm/lib/Support/",
+            Path("llvm/include/llvm/ADT/"),
+            Path("llvm/include/llvm/Config/"),
+            Path("llvm/include/llvm/Support/"),
+            Path("llvm/lib/Support/"),
         ],
     )
     wpi_files = find_wpiutil_llvm_files(
@@ -153,10 +178,14 @@ def overwrite_source(wpiutil_root, llvm_root):
     run_global_replacements(wpi_files)
 
 
-def overwrite_tests(wpiutil_root, llvm_root):
+def overwrite_tests(wpiutil_root: Path, llvm_root: Path):
     llvm_files = flattened_llvm_files(
         llvm_root,
-        ["llvm/unittests/ADT/", "llvm/unittests/Config", "llvm/unittests/Support/"],
+        [
+            Path("llvm/unittests/ADT/"),
+            Path("llvm/unittests/Config/"),
+            Path("llvm/unittests/Support/"),
+        ],
     )
     wpi_files = find_wpiutil_llvm_files(wpiutil_root, "src/test/native/cpp/llvm")
 
@@ -164,9 +193,9 @@ def overwrite_tests(wpiutil_root, llvm_root):
     run_global_replacements(wpi_files)
 
 
-def copy_upstream_src(wpilib_root):
-    upstream_root = os.path.abspath(".")
-    wpiutil = os.path.join(wpilib_root, "wpiutil")
+def copy_upstream_src(wpilib_root: Path):
+    upstream_root = Path(".").absolute()
+    wpiutil = wpilib_root / "wpiutil"
 
     overwrite_source(wpiutil, upstream_root)
     overwrite_tests(wpiutil, upstream_root)
@@ -175,7 +204,7 @@ def copy_upstream_src(wpilib_root):
 def main():
     name = "llvm"
     url = "https://github.com/llvm/llvm-project"
-    tag = "llvmorg-18.1.8"
+    tag = "llvmorg-22.1.6"
 
     patch_options = {
         "use_threeway": True,

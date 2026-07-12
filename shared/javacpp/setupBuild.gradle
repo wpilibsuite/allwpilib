@@ -1,7 +1,7 @@
 apply plugin: 'cpp'
 apply plugin: 'google-test-test-suite'
 apply plugin: 'visual-studio'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 apply plugin: SingleNativeBuild
 apply plugin: ExtraTasks
 
@@ -9,7 +9,7 @@ apply from: "${rootDir}/shared/config.gradle"
 
 ext {
     baseId = nativeName
-    groupId = "edu.wpi.first.${nativeName}"
+    groupId = "org.wpilib.${nativeName}"
 }
 
 apply from: "${rootDir}/shared/java/javacommon.gradle"
@@ -20,9 +20,11 @@ ext {
     staticGtestConfigs = [:]
 }
 
-staticGtestConfigs["${nativeName}Test"] = []
+def nativeTestSuiteName = project.findProperty('nativeTestSuiteName') ?: "${nativeName}Test"
+staticGtestConfigs[nativeTestSuiteName] = []
 
 apply from: "${rootDir}/shared/googletest.gradle"
+apply from: "${rootDir}/shared/catch2.gradle"
 
 model {
     components {
@@ -82,9 +84,6 @@ model {
                 lib library: nativeName, linkage: 'shared'
                 if (!project.hasProperty('noWpiutil')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                        nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
-                    }
                 }
                 if (project.hasProperty('exeSplitSetup')) {
                     exeSplitSetup(it)
@@ -106,7 +105,7 @@ model {
         }
     }
     testSuites {
-        "${nativeName}Test"(GoogleTestTestSuiteSpec) {
+        "${nativeTestSuiteName}"(GoogleTestTestSuiteSpec) {
             for(NativeComponentSpec c : $.components) {
                 if (c.name == nativeName) {
                     testing c
@@ -124,6 +123,11 @@ model {
                     }
                 }
             }
+            if (nativeTestSuiteName.contains('Catch2')) {
+                binaries.all {
+                    lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
+                }
+            }
         }
     }
     binaries {
@@ -133,9 +137,6 @@ model {
             if (!project.hasProperty('noWpiutil')) {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilTestLib', linkage: 'shared'
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
-                }
             }
             if (project.hasProperty('exeSplitSetup')) {
                 exeSplitSetup(it)
@@ -174,10 +175,4 @@ model {
 }
 
 apply from: "${rootDir}/shared/cppJavaDesktopTestTask.gradle"
-
-tasks.withType(RunTestExecutable) {
-    args "--gtest_output=xml:test_detail.xml"
-    outputs.dir outputDir
-}
-
 apply from: "${rootDir}/shared/javacpp/publish.gradle"

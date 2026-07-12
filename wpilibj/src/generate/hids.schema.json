@@ -24,10 +24,6 @@
         "description": "The manufacturer of the console",
         "type": "string"
       },
-      "SkipReporting": {
-        "description": "Whether or not to skip the usage reporting call",
-        "type": "boolean"
-      },
       "AxisNameSuffix": {
         "description": "The suffix of an axis that shouldn't have Axis appended to its name",
         "type": "string"
@@ -66,7 +62,8 @@
           "type": "object",
           "required": [
             "NameParts",
-            "value"
+            "value",
+            "PositiveDirection"
           ],
           "properties": {
             "NameParts": {
@@ -80,6 +77,10 @@
             "value": {
               "description": "The axis value",
               "type": "integer"
+            },
+            "PositiveDirection": {
+              "description": "The positive direction of the axis.",
+              "type": "string"
             }
           }
         }

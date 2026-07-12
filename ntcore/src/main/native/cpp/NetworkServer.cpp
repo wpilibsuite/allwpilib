@@ -2,11 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "NetworkServer.h"
+#include "NetworkServer.hpp"
 
 #include <stdint.h>
 
 #include <atomic>
+#include <format>
 #include <memory>
 #include <span>
 #include <string>
@@ -14,30 +15,28 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/MemoryBuffer.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fs.h>
-#include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
-#include <wpi/timestamp.h>
-#include <wpinet/HttpUtil.h>
-#include <wpinet/HttpWebSocketServerConnection.h>
-#include <wpinet/UrlParser.h>
-#include <wpinet/uv/Tcp.h>
-#include <wpinet/uv/Work.h>
-#include <wpinet/uv/util.h>
+#include "IConnectionList.hpp"
+#include "InstanceImpl.hpp"
+#include "Log.hpp"
+#include "net/WebSocketConnection.hpp"
+#include "net/WireDecoder.hpp"
+#include "net/WireEncoder.hpp"
+#include "wpi/net/HttpUtil.hpp"
+#include "wpi/net/HttpWebSocketServerConnection.hpp"
+#include "wpi/net/UrlParser.hpp"
+#include "wpi/net/uv/Tcp.hpp"
+#include "wpi/net/uv/Work.hpp"
+#include "wpi/net/uv/util.hpp"
+#include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/raw_ostream.hpp"
+#include "wpi/util/timestamp.h"
 
-#include "IConnectionList.h"
-#include "InstanceImpl.h"
-#include "Log.h"
-#include "net/WebSocketConnection.h"
-#include "net/WireDecoder.h"
-#include "net/WireEncoder.h"
-#include "net3/UvStreamConnection3.h"
-
-using namespace nt;
-namespace uv = wpi::uv;
+using namespace wpi::nt;
+namespace uv = wpi::net::uv;
 
 // use a larger max message size for websockets
 static constexpr size_t kMaxMessageSize = 2 * 1024 * 1024;
@@ -47,9 +46,9 @@ static constexpr size_t kClientProcessMessageCountMax = 16;
 class NetworkServer::ServerConnection {
  public:
   ServerConnection(NetworkServer& server, std::string_view addr,
-                   unsigned int port, wpi::Logger& logger)
+                   unsigned int port, wpi::util::Logger& logger)
       : m_server{server},
-        m_connInfo{fmt::format("{}:{}", addr, port)},
+        m_connInfo{std::format("{}:{}", addr, port)},
         m_logger{logger} {
     m_info.remote_ip = addr;
     m_info.remote_port = port;
@@ -65,30 +64,20 @@ class NetworkServer::ServerConnection {
   NetworkServer& m_server;
   ConnectionInfo m_info;
   std::string m_connInfo;
-  wpi::Logger& m_logger;
+  wpi::util::Logger& m_logger;
   int m_clientId;
 
  private:
   std::shared_ptr<uv::Timer> m_outgoingTimer;
 };
 
-class NetworkServer::ServerConnection3 : public ServerConnection {
- public:
-  ServerConnection3(std::shared_ptr<uv::Stream> stream, NetworkServer& server,
-                    std::string_view addr, unsigned int port,
-                    wpi::Logger& logger);
-
- private:
-  std::shared_ptr<net3::UvStreamConnection3> m_wire;
-};
-
 class NetworkServer::ServerConnection4 final
     : public ServerConnection,
-      public wpi::HttpWebSocketServerConnection<ServerConnection4> {
+      public wpi::net::HttpWebSocketServerConnection<ServerConnection4> {
  public:
   ServerConnection4(std::shared_ptr<uv::Stream> stream, NetworkServer& server,
                     std::string_view addr, unsigned int port,
-                    wpi::Logger& logger)
+                    wpi::util::Logger& logger)
       : ServerConnection{server, addr, port, logger},
         HttpWebSocketServerConnection(
             stream,
@@ -134,59 +123,10 @@ void NetworkServer::ServerConnection::ConnectionClosed() {
   m_outgoingTimer->Close();
 }
 
-NetworkServer::ServerConnection3::ServerConnection3(
-    std::shared_ptr<uv::Stream> stream, NetworkServer& server,
-    std::string_view addr, unsigned int port, wpi::Logger& logger)
-    : ServerConnection{server, addr, port, logger},
-      m_wire{std::make_shared<net3::UvStreamConnection3>(*stream)} {
-  m_info.remote_ip = addr;
-  m_info.remote_port = port;
-
-  // TODO: set local flag appropriately
-  m_clientId = m_server.m_serverImpl.AddClient3(
-      m_connInfo, false, *m_wire,
-      [this](std::string_view name, uint16_t proto) {
-        m_info.remote_id = name;
-        m_info.protocol_version = proto;
-        m_server.AddConnection(this, m_info);
-        INFO("CONNECTED NT3 client '{}' (from {})", name, m_connInfo);
-      },
-      [this](uint32_t repeatMs) { UpdateOutgoingTimer(repeatMs); });
-
-  stream->error.connect([this](uv::Error err) {
-    if (!m_wire->GetDisconnectReason().empty()) {
-      return;
-    }
-    m_wire->Disconnect(fmt::format("stream error: {}", err.name()));
-    m_wire->GetStream().Shutdown([this] { m_wire->GetStream().Close(); });
-  });
-  stream->end.connect([this] {
-    if (!m_wire->GetDisconnectReason().empty()) {
-      return;
-    }
-    m_wire->Disconnect("remote end closed connection");
-    m_wire->GetStream().Shutdown([this] { m_wire->GetStream().Close(); });
-  });
-  stream->closed.connect([this] {
-    INFO("DISCONNECTED NT3 client '{}' (from {}): {}", m_info.remote_id,
-         m_connInfo, m_wire->GetDisconnectReason());
-    ConnectionClosed();
-  });
-  stream->data.connect([this](uv::Buffer& buf, size_t size) {
-    if (m_server.m_serverImpl.ProcessIncomingBinary(
-            m_clientId, {reinterpret_cast<const uint8_t*>(buf.base), size})) {
-      m_server.m_idle->Start();
-    }
-  });
-  stream->StartRead();
-
-  SetupOutgoingTimer();
-}
-
 void NetworkServer::ServerConnection4::ProcessRequest() {
   DEBUG1("HTTP request: '{}'", m_request.GetUrl());
-  wpi::UrlParser url{m_request.GetUrl(),
-                     m_request.GetMethod() == wpi::HTTP_CONNECT};
+  wpi::net::UrlParser url{m_request.GetUrl(),
+                          m_request.GetMethod() == wpi::net::HTTP_CONNECT};
   if (!url.IsValid()) {
     // failed to parse URL
     SendError(400);
@@ -205,7 +145,7 @@ void NetworkServer::ServerConnection4::ProcessRequest() {
   }
   DEBUG4("query: \"{}\"\n", query);
 
-  const bool isGET = m_request.GetMethod() == wpi::HTTP_GET;
+  const bool isGET = m_request.GetMethod() == wpi::net::HTTP_GET;
   if (isGET && path == "/") {
     // build HTML root page
     SendResponse(200, "OK", "text/html",
@@ -222,24 +162,24 @@ void NetworkServer::ServerConnection4::ProcessRequest() {
 
 void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
   // get name from URL
-  wpi::UrlParser url{m_request.GetUrl(), false};
+  wpi::net::UrlParser url{m_request.GetUrl(), false};
   std::string_view path;
   if (url.HasPath()) {
     path = url.GetPath();
   }
   DEBUG4("path: '{}'", path);
 
-  wpi::SmallString<128> nameBuf;
+  wpi::util::SmallString<128> nameBuf;
   std::string_view name;
   bool err = false;
-  if (auto uri = wpi::remove_prefix(path, "/nt/")) {
-    name = wpi::UnescapeURI(*uri, nameBuf, &err);
+  if (auto uri = wpi::util::remove_prefix(path, "/nt/")) {
+    name = wpi::net::UnescapeURI(*uri, nameBuf, &err);
   }
   if (err || name.empty()) {
     INFO("invalid path '{}' (from {}), must match /nt/[clientId], closing",
          path, m_connInfo);
     m_websocket->Fail(
-        404, fmt::format("invalid path '{}', must match /nt/[clientId]", path));
+        404, std::format("invalid path '{}', must match /nt/[clientId]", path));
     return;
   }
 
@@ -261,14 +201,14 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
           Value value;
           std::string error;
           if (!net::WireDecodeBinary(&data, &pubuid, &value, &error, 0)) {
-            m_wire->Disconnect(fmt::format("binary decode error: {}", error));
+            m_wire->Disconnect(std::format("binary decode error: {}", error));
             break;
           }
 
           // respond to RTT ping
           if (pubuid == -1) {
             m_wire->SendBinary([&](auto& os) {
-              net::WireEncodeBinary(os, -1, wpi::Now(), value);
+              net::WireEncodeBinary(os, -1, wpi::util::Now(), value);
             });
           }
         }
@@ -281,10 +221,10 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
       return;
     }
 
-    // TODO: set local flag appropriately
+    bool local = wpi::util::starts_with(m_info.remote_ip, "127.");
     std::string dedupName;
     std::tie(dedupName, m_clientId) = m_server.m_serverImpl.AddClient(
-        name, m_connInfo, false, *m_wire,
+        name, m_connInfo, local, *m_wire,
         [this](uint32_t repeatMs) { UpdateOutgoingTimer(repeatMs); });
     INFO("CONNECTED NT4 client '{}' (from {})", dedupName, m_connInfo);
     m_info.remote_id = dedupName;
@@ -311,19 +251,20 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
 }
 
 NetworkServer::NetworkServer(std::string_view persistentFilename,
-                             std::string_view listenAddress, unsigned int port3,
-                             unsigned int port4,
+                             std::string_view listenAddress,
+                             std::string_view mdnsService, unsigned int port,
                              net::ILocalStorage& localStorage,
-                             IConnectionList& connList, wpi::Logger& logger,
-                             std::function<void()> initDone)
+                             IConnectionList& connList,
+                             wpi::util::Logger& logger,
+                             std::function<void(bool)> initDone)
     : m_localStorage{localStorage},
       m_connList{connList},
       m_logger{logger},
       m_initDone{std::move(initDone)},
       m_persistentFilename{persistentFilename},
-      m_listenAddress{wpi::trim(listenAddress)},
-      m_port3{port3},
-      m_port4{port4},
+      m_listenAddress{wpi::util::trim(listenAddress)},
+      m_mdnsService{wpi::util::trim(mdnsService)},
+      m_port{port},
       m_serverImpl{logger},
       m_localQueue{logger},
       m_loop(*m_loopRunner.GetLoop()) {
@@ -362,7 +303,22 @@ void NetworkServer::ProcessAllLocal() {
 }
 
 void NetworkServer::LoadPersistent() {
-  auto fileBuffer = wpi::MemoryBuffer::GetFile(m_persistentFilename);
+  // check if SavePersistent was interrupted and left a backup file;
+  // if so, try to restore it
+  auto bak = std::format("{}.bck", m_persistentFilename);
+  if (!fs::exists(m_persistentFilename) && fs::exists(bak)) {
+    INFO(
+        "restoring persistent file from backup '{}', since original '{}' is "
+        "missing",
+        bak, m_persistentFilename);
+    std::error_code ec;
+    fs::rename(bak, m_persistentFilename, ec);
+    if (ec.value() != 0) {
+      INFO("failed to restore backup: {}", ec.message());
+    }
+  }
+
+  auto fileBuffer = wpi::util::MemoryBuffer::GetFile(m_persistentFilename);
   if (!fileBuffer) {
     INFO(
         "could not open persistent file '{}': {} "
@@ -373,7 +329,7 @@ void NetworkServer::LoadPersistent() {
     fs::copy_file(m_persistentFilename, m_persistentFilename + ".bak",
                   std::filesystem::copy_options::overwrite_existing, ec);
     // try to write an empty file so it doesn't happen again
-    wpi::raw_fd_ostream os{m_persistentFilename, ec, fs::F_Text};
+    wpi::util::raw_fd_ostream os{m_persistentFilename, ec, fs::F_Text};
     if (ec.value() == 0) {
       os << "[]\n";
       os.close();
@@ -388,9 +344,9 @@ void NetworkServer::LoadPersistent() {
 void NetworkServer::SavePersistent(std::string_view filename,
                                    std::string_view data) {
   // write to temporary file
-  auto tmp = fmt::format("{}.tmp", filename);
+  auto tmp = std::format("{}.tmp", filename);
   std::error_code ec;
-  wpi::raw_fd_ostream os{tmp, ec, fs::F_Text};
+  wpi::util::raw_fd_ostream os{tmp, ec, fs::F_Text};
   if (ec.value() != 0) {
     INFO("could not open persistent file '{}' for write: {}", tmp,
          ec.message());
@@ -404,7 +360,7 @@ void NetworkServer::SavePersistent(std::string_view filename,
   }
 
   // move to real file
-  auto bak = fmt::format("{}.bck", filename);
+  auto bak = std::format("{}.bck", filename);
   fs::remove(bak, ec);
   fs::rename(filename, bak, ec);
   fs::rename(tmp, filename, ec);
@@ -485,46 +441,14 @@ void NetworkServer::Init() {
     });
   }
 
-  INFO("Listening on NT3 port {}, NT4 port {}", m_port3, m_port4);
+  INFO("Listening on port {}", m_port);
 
-  if (m_port3 != 0) {
-    auto tcp3 = uv::Tcp::Create(m_loop);
-    tcp3->error.connect([logger = &m_logger](uv::Error err) {
-      WPI_INFO(*logger, "NT3 server socket error: {}", err.str());
-    });
-    tcp3->Bind(m_listenAddress, m_port3);
-
-    // when we get a NT3 connection, accept it and start reading
-    tcp3->connection.connect([this, srv = tcp3.get()] {
-      auto tcp = srv->Accept();
-      if (!tcp) {
-        return;
-      }
-      tcp->error.connect([logger = &m_logger](uv::Error err) {
-        WPI_INFO(*logger, "NT3 socket error: {}", err.str());
-      });
-      tcp->SetNoDelay(true);
-      std::string peerAddr;
-      unsigned int peerPort = 0;
-      if (uv::AddrToName(tcp->GetPeer(), &peerAddr, &peerPort) == 0) {
-        INFO("Got a NT3 connection from {} port {}", peerAddr, peerPort);
-      } else {
-        INFO("Got a NT3 connection from unknown");
-      }
-      auto conn = std::make_shared<ServerConnection3>(tcp, *this, peerAddr,
-                                                      peerPort, m_logger);
-      tcp->SetData(conn);
-    });
-
-    tcp3->Listen();
-  }
-
-  if (m_port4 != 0) {
+  if (m_port != 0) {
     auto tcp4 = uv::Tcp::Create(m_loop);
     tcp4->error.connect([logger = &m_logger](uv::Error err) {
       WPI_INFO(*logger, "NT4 server socket error: {}", err.str());
     });
-    tcp4->Bind(m_listenAddress, m_port4);
+    tcp4->Bind(m_listenAddress, m_port);
 
     // when we get a NT4 connection, accept it and start reading
     tcp4->connection.connect([this, srv = tcp4.get()] {
@@ -552,9 +476,23 @@ void NetworkServer::Init() {
     tcp4->Listen();
   }
 
+  bool announcingmDNS = false;
+  if (!m_mdnsService.empty()) {
+    m_mdnsAnnouncer.emplace(m_mdnsService, "_networktables._tcp", m_port);
+    if (!m_mdnsAnnouncer->HasImplementation()) {
+      WARN("mDNS service announcer not available; cannot announce '{}'",
+           m_mdnsService);
+      m_mdnsAnnouncer.reset();
+    } else {
+      m_mdnsAnnouncer->Start();
+      announcingmDNS = true;
+      INFO("mDNS announcing as service '{}' on port {}", m_mdnsService, m_port);
+    }
+  }
+
   if (m_initDone) {
     DEBUG4("NetworkServer initDone()");
-    m_initDone();
+    m_initDone(announcingmDNS);
     m_initDone = nullptr;
   }
 }

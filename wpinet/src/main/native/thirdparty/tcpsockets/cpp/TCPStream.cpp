@@ -21,7 +21,7 @@
    limitations under the License.
 */
 
-#include "wpinet/TCPStream.h"
+#include "wpi/net/TCPStream.h"
 
 #include <fcntl.h>
 
@@ -36,9 +36,9 @@
 
 #include <cerrno>
 
-#include <wpi/StringExtras.h>
+#include "wpi/util/StringExtras.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
 TCPStream::TCPStream(int sd, sockaddr_in* address)
     : m_sd(sd), m_blocking(true) {
@@ -65,7 +65,7 @@ TCPStream::~TCPStream() {
 
 size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
   if (m_sd < 0) {
-    *err = kConnectionClosed;
+    *err = Error::CONNECTION_CLOSED;
     return 0;
   }
 #ifdef _WIN32
@@ -80,18 +80,18 @@ size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
       break;
     }
     if (!m_blocking) {
-      *err = kWouldBlock;
+      *err = Error::WOULD_BLOCK;
       return 0;
     }
     Sleep(1);
   }
   if (!result) {
     char Buffer[128];
-    wpi::format_to_n_c_str(Buffer, sizeof(Buffer),
+    wpi::util::format_to_n_c_str(Buffer, sizeof(Buffer),
                            "Send() failed: WSA error={}\n", WSAGetLastError());
 
     OutputDebugStringA(Buffer);
-    *err = kConnectionReset;
+    *err = Error::CONNECTION_RESET;
     return 0;
   }
 #else
@@ -103,9 +103,9 @@ size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
 #endif
   if (rv < 0) {
     if (!m_blocking && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-      *err = kWouldBlock;
+      *err = Error::WOULD_BLOCK;
     } else {
-      *err = kConnectionReset;
+      *err = Error::CONNECTION_RESET;
     }
     return 0;
   }
@@ -115,7 +115,7 @@ size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
 
 size_t TCPStream::receive(char* buffer, size_t len, Error* err, int timeout) {
   if (m_sd < 0) {
-    *err = kConnectionClosed;
+    *err = Error::CONNECTION_CLOSED;
     return 0;
   }
 #ifdef _WIN32
@@ -136,7 +136,7 @@ size_t TCPStream::receive(char* buffer, size_t len, Error* err, int timeout) {
     rv = read(m_sd, buffer, len);
 #endif
   } else {
-    *err = kConnectionTimedOut;
+    *err = Error::CONNECTION_TIMED_OUT;
     return 0;
   }
   if (rv < 0) {
@@ -145,9 +145,9 @@ size_t TCPStream::receive(char* buffer, size_t len, Error* err, int timeout) {
 #else
     if (!m_blocking && (errno == EAGAIN || errno == EWOULDBLOCK)) {
 #endif
-      *err = kWouldBlock;
+      *err = Error::WOULD_BLOCK;
     } else {
-      *err = kConnectionReset;
+      *err = Error::CONNECTION_RESET;
     }
     return 0;
   }

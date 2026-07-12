@@ -1,0 +1,707 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include <array>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <catch2/catch_test_macros.hpp>
+
+#include "wpi/datalog/DataLogWriter.hpp"
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/raw_ostream.hpp"
+
+namespace {
+struct ThingA {
+  int x = 0;
+};
+
+inline bool operator==(const ThingA& a, const ThingA& b) {
+  return a.x == b.x;
+}
+
+struct ThingB {
+  int x = 0;
+};
+
+struct ThingC {
+  int x = 0;
+};
+
+struct Info1 {
+  int info = 0;
+};
+
+struct Info2 {
+  int info = 0;
+};
+}  // namespace
+
+template <>
+struct wpi::util::Struct<ThingA> {
+  static constexpr std::string_view GetTypeName() { return "ThingA"; }
+  static constexpr size_t GetSize() { return 1; }
+  static constexpr std::string_view GetSchema() { return "uint8 value"; }
+  static ThingA Unpack(std::span<const uint8_t> data) {
+    return ThingA{.x = data[0]};
+  }
+  static void Pack(std::span<uint8_t> data, const ThingA& value) {
+    data[0] = value.x;
+  }
+};
+
+template <>
+struct wpi::util::Struct<ThingB, Info1> {
+  static constexpr std::string_view GetTypeName(const Info1&) {
+    return "ThingB";
+  }
+  static constexpr size_t GetSize(const Info1&) { return 1; }
+  static constexpr std::string_view GetSchema(const Info1&) {
+    return "uint8 value";
+  }
+  static ThingB Unpack(std::span<const uint8_t> data, const Info1&) {
+    return ThingB{.x = data[0]};
+  }
+  static void Pack(std::span<uint8_t> data, const ThingB& value, const Info1&) {
+    data[0] = value.x;
+  }
+};
+
+template <>
+struct wpi::util::Struct<ThingC> {
+  static constexpr std::string_view GetTypeName() { return "ThingC"; }
+  static constexpr size_t GetSize() { return 1; }
+  static constexpr std::string_view GetSchema() { return "uint8 value"; }
+  static ThingC Unpack(std::span<const uint8_t> data) {
+    return ThingC{.x = data[0]};
+  }
+  static void Pack(std::span<uint8_t> data, const ThingC& value) {
+    data[0] = value.x;
+  }
+};
+
+template <>
+struct wpi::util::Struct<ThingC, Info1> {
+  static constexpr std::string_view GetTypeName(const Info1&) {
+    return "ThingC";
+  }
+  static constexpr size_t GetSize(const Info1&) { return 1; }
+  static constexpr std::string_view GetSchema(const Info1&) {
+    return "uint8 value";
+  }
+  static ThingC Unpack(std::span<const uint8_t> data, const Info1&) {
+    return ThingC{.x = data[0]};
+  }
+  static void Pack(std::span<uint8_t> data, const ThingC& value, const Info1&) {
+    data[0] = value.x;
+  }
+};
+
+template <>
+struct wpi::util::Struct<ThingC, Info2> {
+  static constexpr std::string_view GetTypeName(const Info2&) {
+    return "ThingC";
+  }
+  static constexpr size_t GetSize(const Info2&) { return 1; }
+  static constexpr std::string_view GetSchema(const Info2&) {
+    return "uint8 value";
+  }
+  static ThingC Unpack(std::span<const uint8_t> data, const Info2&) {
+    return ThingC{.x = data[0]};
+  }
+  static void Pack(std::span<uint8_t> data, const ThingC& value, const Info2&) {
+    data[0] = value.x;
+  }
+};
+
+static_assert(wpi::util::StructSerializable<ThingA>);
+static_assert(!wpi::util::StructSerializable<ThingA, Info1>);
+
+static_assert(!wpi::util::StructSerializable<ThingB>);
+static_assert(wpi::util::StructSerializable<ThingB, Info1>);
+static_assert(!wpi::util::StructSerializable<ThingB, Info2>);
+
+static_assert(wpi::util::StructSerializable<ThingC>);
+static_assert(wpi::util::StructSerializable<ThingC, Info1>);
+static_assert(wpi::util::StructSerializable<ThingC, Info2>);
+
+class DataLogTest {
+ public:
+  wpi::util::Logger msglog;
+  std::vector<uint8_t> data;
+  wpi::log::DataLogWriter log{
+      msglog, std::make_unique<wpi::util::raw_uvector_ostream>(data)};
+};
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest SimpleInt", "[datalog][data-log]") {
+  int entry = log.Start("test", "int64", "", 1);
+  log.AppendInteger(entry, 1, 2);
+  log.Flush();
+  REQUIRE(data.size() == 54u);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest BooleanAppend",
+                 "[datalog][data-log]") {
+  wpi::log::BooleanLogEntry entry{log, "a", 5};
+  entry.Append(false, 7);
+  log.Flush();
+  REQUIRE(data.size() == 46u);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest BooleanUpdate",
+                 "[datalog][data-log]") {
+  wpi::log::BooleanLogEntry entry{log, "a", 5};
+  REQUIRE_FALSE(entry.GetLastValue().has_value());
+  entry.Update(false, 7);
+  log.Flush();
+  REQUIRE(data.size() == 46u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == false);
+  entry.Update(false, 8);
+  log.Flush();
+  REQUIRE(data.size() == 46u);
+  entry.Update(true, 9);
+  log.Flush();
+  REQUIRE(data.size() == 51u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == true);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest IntegerAppend",
+                 "[datalog][data-log]") {
+  wpi::log::IntegerLogEntry entry{log, "a", 5};
+  entry.Append(5, 7);
+  log.Flush();
+  REQUIRE(data.size() == 51u);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest IntegerUpdate",
+                 "[datalog][data-log]") {
+  wpi::log::IntegerLogEntry entry{log, "a", 5};
+  REQUIRE_FALSE(entry.GetLastValue().has_value());
+  entry.Update(0, 7);
+  log.Flush();
+  REQUIRE(data.size() == 51u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == 0);
+  entry.Update(0, 8);
+  log.Flush();
+  REQUIRE(data.size() == 51u);
+  entry.Update(2, 9);
+  log.Flush();
+  REQUIRE(data.size() == 63u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == 2);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest FloatAppend",
+                 "[datalog][data-log]") {
+  wpi::log::FloatLogEntry entry{log, "a", 5};
+  entry.Append(5.0, 7);
+  log.Flush();
+  REQUIRE(data.size() == 47u);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest FloatUpdate",
+                 "[datalog][data-log]") {
+  wpi::log::FloatLogEntry entry{log, "a", 5};
+  REQUIRE_FALSE(entry.GetLastValue().has_value());
+  entry.Update(0.0f, 7);
+  log.Flush();
+  REQUIRE(data.size() == 47u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == 0.0f);
+  entry.Update(0.0f, 8);
+  log.Flush();
+  REQUIRE(data.size() == 47u);
+  entry.Update(0.1f, 9);
+  log.Flush();
+  REQUIRE(data.size() == 55u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == 0.1f);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest DoubleAppend",
+                 "[datalog][data-log]") {
+  wpi::log::DoubleLogEntry entry{log, "a", 5};
+  entry.Append(5.0, 7);
+  log.Flush();
+  REQUIRE(data.size() == 52u);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest DoubleUpdate",
+                 "[datalog][data-log]") {
+  wpi::log::DoubleLogEntry entry{log, "a", 5};
+  REQUIRE_FALSE(entry.GetLastValue().has_value());
+  entry.Update(0.0, 7);
+  log.Flush();
+  REQUIRE(data.size() == 52u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == 0.0);
+  entry.Update(0.0, 8);
+  log.Flush();
+  REQUIRE(data.size() == 52u);
+  entry.Update(0.1, 9);
+  log.Flush();
+  REQUIRE(data.size() == 64u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == 0.1);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest StringAppend",
+                 "[datalog][data-log]") {
+  wpi::log::StringLogEntry entry{log, "a", 5};
+  entry.Append("x", 7);
+  log.Flush();
+  REQUIRE(data.size() == 45u);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest StringUpdate",
+                 "[datalog][data-log]") {
+  wpi::log::StringLogEntry entry{log, "a", 5};
+  REQUIRE_FALSE(entry.HasLastValue());
+
+  entry.Update("x", 7);
+  log.Flush();
+  REQUIRE(data.size() == 45u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == "x");
+
+  entry.Update("x", 8);
+  log.Flush();
+  REQUIRE(data.size() == 45u);
+
+  entry.Update("y", 9);
+  log.Flush();
+  REQUIRE(data.size() == 50u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == "y");
+
+  entry.Update("yy", 10);
+  log.Flush();
+  REQUIRE(data.size() == 56u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == "yy");
+
+  entry.Update("", 11);
+  log.Flush();
+  REQUIRE(data.size() == 60u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == "");
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest RawAppend", "[datalog][data-log]") {
+  wpi::log::RawLogEntry entry{log, "a", 5};
+  entry.Append({{5}}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 42u);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest RawUpdate", "[datalog][data-log]") {
+  wpi::log::RawLogEntry entry{log, "a", 5};
+  REQUIRE_FALSE(entry.HasLastValue());
+
+  entry.Update({{5}}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 42u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<uint8_t>{5});
+
+  entry.Update({{5}}, 8);
+  log.Flush();
+  REQUIRE(data.size() == 42u);
+
+  entry.Update({{6}}, 9);
+  log.Flush();
+  REQUIRE(data.size() == 47u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<uint8_t>{6});
+
+  entry.Update({{6, 6}}, 9);
+  log.Flush();
+  REQUIRE(data.size() == 53u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == (std::vector<uint8_t>{6, 6}));
+
+  entry.Update(std::span<const uint8_t>{}, 10);
+  log.Flush();
+  REQUIRE(data.size() == 57u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<uint8_t>{});
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest BooleanArrayAppendEmpty",
+                 "[datalog][data-log]") {
+  wpi::log::BooleanArrayLogEntry entry{log, "a", 5};
+  entry.Append(std::span<const bool>{}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 47u);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest BooleanArrayAppend",
+                 "[datalog][data-log]") {
+  wpi::log::BooleanArrayLogEntry entry{log, "a", 5};
+  entry.Append({false}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 48u);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest BooleanArrayUpdate",
+                 "[datalog][data-log]") {
+  wpi::log::BooleanArrayLogEntry entry{log, "a", 5};
+  REQUIRE_FALSE(entry.GetLastValue().has_value());
+  entry.Update({false}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 48u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<int>{false});
+  entry.Update({false}, 8);
+  log.Flush();
+  REQUIRE(data.size() == 48u);
+  entry.Update({true}, 9);
+  log.Flush();
+  REQUIRE(data.size() == 53u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<int>{true});
+  entry.Update(std::span<const bool>{}, 10);
+  log.Flush();
+  REQUIRE(data.size() == 57u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<int>{});
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest IntegerArrayAppendEmpty",
+                 "[datalog][data-log]") {
+  wpi::log::IntegerArrayLogEntry entry{log, "a", 5};
+  entry.Append(std::span<const int64_t>{}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 45u);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest IntegerArrayAppend",
+                 "[datalog][data-log]") {
+  wpi::log::IntegerArrayLogEntry entry{log, "a", 5};
+  entry.Append({1}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 53u);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest IntegerArrayUpdate",
+                 "[datalog][data-log]") {
+  wpi::log::IntegerArrayLogEntry entry{log, "a", 5};
+  REQUIRE_FALSE(entry.GetLastValue().has_value());
+  entry.Update({1}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 53u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<int64_t>{1});
+  entry.Update({1}, 8);
+  log.Flush();
+  REQUIRE(data.size() == 53u);
+  entry.Update({2}, 9);
+  log.Flush();
+  REQUIRE(data.size() == 65u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<int64_t>{2});
+  entry.Update(std::span<const int64_t>{}, 10);
+  log.Flush();
+  REQUIRE(data.size() == 69u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<int64_t>{});
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest DoubleArrayAppendEmpty",
+                 "[datalog][data-log]") {
+  wpi::log::DoubleArrayLogEntry entry{log, "a", 5};
+  entry.Append(std::span<const double>{}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 46u);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest DoubleArrayAppend",
+                 "[datalog][data-log]") {
+  wpi::log::DoubleArrayLogEntry entry{log, "a", 5};
+  entry.Append({1.0}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 54u);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest DoubleArrayUpdate",
+                 "[datalog][data-log]") {
+  wpi::log::DoubleArrayLogEntry entry{log, "a", 5};
+  REQUIRE_FALSE(entry.GetLastValue().has_value());
+  entry.Update({1.0}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 54u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<double>{1.0});
+  entry.Update({1.0}, 8);
+  log.Flush();
+  REQUIRE(data.size() == 54u);
+  entry.Update({2.0}, 9);
+  log.Flush();
+  REQUIRE(data.size() == 66u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<double>{2});
+  entry.Update(std::span<const double>{}, 10);
+  log.Flush();
+  REQUIRE(data.size() == 70u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<double>{});
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest FloatArrayAppendEmpty",
+                 "[datalog][data-log]") {
+  wpi::log::FloatArrayLogEntry entry{log, "a", 5};
+  entry.Append(std::span<const float>{}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 45u);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest FloatArrayAppend",
+                 "[datalog][data-log]") {
+  wpi::log::FloatArrayLogEntry entry{log, "a", 5};
+  entry.Append({1.0f}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 49u);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest FloatArrayUpdate",
+                 "[datalog][data-log]") {
+  wpi::log::FloatArrayLogEntry entry{log, "a", 5};
+  REQUIRE_FALSE(entry.GetLastValue().has_value());
+  entry.Update({1.0f}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 49u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<float>{1.0f});
+  entry.Update({1.0f}, 8);
+  log.Flush();
+  REQUIRE(data.size() == 49u);
+  entry.Update({2.0f}, 9);
+  log.Flush();
+  REQUIRE(data.size() == 57u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<float>{2.0f});
+  entry.Update(std::span<const float>{}, 10);
+  log.Flush();
+  REQUIRE(data.size() == 61u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<float>{});
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest StringArrayAppendEmpty",
+                 "[datalog][data-log]") {
+  wpi::log::StringArrayLogEntry entry{log, "a", 5};
+  entry.Append(std::span<const std::string>{}, 7);
+  entry.Append(std::span<const std::string_view>{}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 58u);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest StringArrayAppend",
+                 "[datalog][data-log]") {
+  wpi::log::StringArrayLogEntry entry{log, "a", 5};
+  entry.Append({"x"}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 55u);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest StringArrayUpdate",
+                 "[datalog][data-log]") {
+  wpi::log::StringArrayLogEntry entry{log, "a", 5};
+  REQUIRE_FALSE(entry.GetLastValue().has_value());
+  entry.Update({"x"}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 55u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<std::string>{"x"});
+  entry.Update({"x"}, 8);
+  log.Flush();
+  REQUIRE(data.size() == 55u);
+  entry.Update({"y"}, 9);
+  log.Flush();
+  REQUIRE(data.size() == 68u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<std::string>{"y"});
+  entry.Update(std::span<const std::string_view>{}, 10);
+  log.Flush();
+  REQUIRE(data.size() == 76u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<std::string>{});
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest StructA", "[datalog][data-log]") {
+  [[maybe_unused]]
+  wpi::log::StructLogEntry<ThingA> entry0;
+  wpi::log::StructLogEntry<ThingA> entry{log, "a", 5};
+  entry.Append(ThingA{});
+  entry.Append(ThingA{}, 7);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest StructUpdate",
+                 "[datalog][data-log]") {
+  wpi::log::StructLogEntry<ThingA> entry{log, "a", 5};
+  REQUIRE_FALSE(entry.GetLastValue().has_value());
+
+  entry.Update(ThingA{}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 122u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == ThingA{});
+
+  entry.Update(ThingA{}, 8);
+  log.Flush();
+  REQUIRE(data.size() == 122u);
+
+  entry.Update(ThingA{.x = 1}, 9);
+  log.Flush();
+  REQUIRE(data.size() == 127u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == ThingA{.x = 1});
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest StructArrayA",
+                 "[datalog][data-log]") {
+  [[maybe_unused]]
+  wpi::log::StructArrayLogEntry<ThingA> entry0;
+  wpi::log::StructArrayLogEntry<ThingA> entry{log, "a", 5};
+  entry.Append({{ThingA{}, ThingA{}}});
+  entry.Append({{ThingA{}, ThingA{}}}, 7);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest StructArrayUpdate",
+                 "[datalog][data-log]") {
+  wpi::log::StructArrayLogEntry<ThingA> entry{log, "a", 5};
+  REQUIRE_FALSE(entry.GetLastValue().has_value());
+
+  entry.Update({{ThingA{}, ThingA{.x = 1}}}, 7);
+  log.Flush();
+  REQUIRE(data.size() == 125u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() ==
+          (std::vector<ThingA>{ThingA{}, ThingA{.x = 1}}));
+
+  entry.Update({{ThingA{}, ThingA{.x = 1}}}, 8);
+  log.Flush();
+  REQUIRE(data.size() == 125u);
+
+  entry.Update({{ThingA{}, ThingA{.x = 2}}}, 9);
+  log.Flush();
+  REQUIRE(data.size() == 131u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() ==
+          (std::vector<ThingA>{ThingA{}, ThingA{.x = 2}}));
+
+  entry.Update(std::span<const ThingA>{}, 10);
+  log.Flush();
+  REQUIRE(data.size() == 135u);
+  REQUIRE(entry.GetLastValue().has_value());
+  REQUIRE(entry.GetLastValue().value() == std::vector<ThingA>{});
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest StructFixedArrayA",
+                 "[datalog][data-log]") {
+  [[maybe_unused]]
+  wpi::log::StructArrayLogEntry<std::array<ThingA, 2>> entry0;
+  wpi::log::StructLogEntry<std::array<ThingA, 2>> entry{log, "a", 5};
+  std::array<ThingA, 2> arr;
+  entry.Append(arr);
+  entry.Append(arr, 7);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest StructB", "[datalog][data-log]") {
+  Info1 info;
+  [[maybe_unused]]
+  wpi::log::StructLogEntry<ThingB, Info1> entry0;
+  wpi::log::StructLogEntry<ThingB, Info1> entry{log, "b", info, 5};
+  entry.Append(ThingB{});
+  entry.Append(ThingB{}, 7);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest StructArrayB",
+                 "[datalog][data-log]") {
+  Info1 info;
+  [[maybe_unused]]
+  wpi::log::StructArrayLogEntry<ThingB, Info1> entry0;
+  wpi::log::StructArrayLogEntry<ThingB, Info1> entry{log, "a", info, 5};
+  entry.Append({{ThingB{}, ThingB{}}});
+  entry.Append({{ThingB{}, ThingB{}}}, 7);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest StructFixedArrayB",
+                 "[datalog][data-log]") {
+  Info1 info;
+  wpi::log::StructLogEntry<std::array<ThingB, 2>, Info1> entry{log, "a", info,
+                                                               5};
+  std::array<ThingB, 2> arr;
+  entry.Append(arr);
+  entry.Append(arr, 7);
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest StructC", "[datalog][data-log]") {
+  {
+    wpi::log::StructLogEntry<ThingC> entry{log, "c", 5};
+    entry.Append(ThingC{});
+    entry.Append(ThingC{}, 7);
+  }
+  {
+    Info1 info;
+    wpi::log::StructLogEntry<ThingC, Info1> entry{log, "c1", info, 5};
+    entry.Append(ThingC{});
+    entry.Append(ThingC{}, 7);
+  }
+  {
+    Info2 info;
+    wpi::log::StructLogEntry<ThingC, Info2> entry{log, "c2", info, 5};
+    entry.Append(ThingC{});
+    entry.Append(ThingC{}, 7);
+  }
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest StructArrayC",
+                 "[datalog][data-log]") {
+  {
+    wpi::log::StructArrayLogEntry<ThingC> entry{log, "c", 5};
+    entry.Append({{ThingC{}, ThingC{}}});
+    entry.Append({{ThingC{}, ThingC{}}}, 7);
+  }
+  {
+    Info1 info;
+    wpi::log::StructArrayLogEntry<ThingC, Info1> entry{log, "c1", info, 5};
+    entry.Append({{ThingC{}, ThingC{}}});
+    entry.Append({{ThingC{}, ThingC{}}}, 7);
+  }
+  {
+    Info2 info;
+    wpi::log::StructArrayLogEntry<ThingC, Info2> entry{log, "c2", info, 5};
+    entry.Append({{ThingC{}, ThingC{}}});
+    entry.Append({{ThingC{}, ThingC{}}}, 7);
+  }
+}
+
+TEST_CASE_METHOD(DataLogTest, "DataLogTest StructFixedArrayC",
+                 "[datalog][data-log]") {
+  std::array<ThingC, 2> arr;
+  {
+    wpi::log::StructLogEntry<std::array<ThingC, 2>> entry{log, "c", 5};
+    entry.Append(arr);
+    entry.Append(arr, 7);
+  }
+  {
+    Info1 info;
+    wpi::log::StructLogEntry<std::array<ThingC, 2>, Info1> entry{log, "c1",
+                                                                 info, 5};
+    entry.Append(arr);
+    entry.Append(arr, 7);
+  }
+  {
+    Info2 info;
+    wpi::log::StructLogEntry<std::array<ThingC, 2>, Info2> entry{log, "c2",
+                                                                 info, 5};
+    entry.Append(arr);
+    entry.Append(arr, 7);
+  }
+}

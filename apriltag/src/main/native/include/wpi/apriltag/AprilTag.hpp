@@ -1,0 +1,39 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/util/RawFrame.hpp"
+#include "wpi/util/SymbolExports.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
+
+namespace wpi::apriltag {
+
+/**
+ * Represents an AprilTag's metadata.
+ */
+struct WPILIB_DLLEXPORT AprilTag {
+  /// The tag's ID.
+  int ID;
+
+  /// The tag's pose.
+  wpi::math::Pose3d pose;
+
+  bool operator==(const AprilTag&) const = default;
+
+  static bool Generate36h11AprilTagImage(wpi::util::RawFrame* frame, int id);
+  static bool Generate16h5AprilTagImage(wpi::util::RawFrame* frame, int id);
+};
+
+WPILIB_DLLEXPORT
+void to_json(wpi::util::json& json, const AprilTag& apriltag);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::util::json& json, AprilTag& apriltag);
+
+}  // namespace wpi::apriltag

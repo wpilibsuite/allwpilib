@@ -14,14 +14,15 @@
 #define _CRT_NONSTDC_NO_WARNINGS
 #endif
 
-#include "wpi/raw_ostream.h"
-#include "wpi/SmallString.h"
-#include "wpi/SmallVector.h"
-#include "wpi/StringExtras.h"
-#include "wpi/Compiler.h"
-#include "wpi/ErrorHandling.h"
-#include "wpi/fs.h"
-#include "wpi/MathExtras.h"
+#include "wpi/util/raw_ostream.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/Compiler.hpp"
+#include "wpi/util/ErrorHandling.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/IOSandbox.hpp"
+#include "wpi/util/MathExtras.hpp"
 #include <algorithm>
 #include <cerrno>
 #include <cstdio>
@@ -53,30 +54,21 @@
 #endif
 
 #ifdef _WIN32
-#include "wpi/ConvertUTF.h"
-#include "Windows/WindowsSupport.h"
+#include "wpi/util/ConvertUTF.hpp"
+// mingw-w64 tends to define it as 0x0502 in its headers.
+#undef _WIN32_WINNT
+
+// Require at least Windows 7 API.
+#define _WIN32_WINNT 0x0601
+#define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#define WIN32_NO_STATUS
+#include <windows.h>
 #endif
 
-using namespace wpi;
-
-constexpr raw_ostream::Colors raw_ostream::BLACK;
-constexpr raw_ostream::Colors raw_ostream::RED;
-constexpr raw_ostream::Colors raw_ostream::GREEN;
-constexpr raw_ostream::Colors raw_ostream::YELLOW;
-constexpr raw_ostream::Colors raw_ostream::BLUE;
-constexpr raw_ostream::Colors raw_ostream::MAGENTA;
-constexpr raw_ostream::Colors raw_ostream::CYAN;
-constexpr raw_ostream::Colors raw_ostream::WHITE;
-constexpr raw_ostream::Colors raw_ostream::SAVEDCOLOR;
-constexpr raw_ostream::Colors raw_ostream::RESET;
-
-namespace {
-// Find the length of an array.
-template <class T, std::size_t N>
-constexpr inline size_t array_lengthof(T (&)[N]) {
-  return N;
-}
-}  // namespace
+using namespace wpi::util;
 
 raw_ostream::~raw_ostream() {
   // raw_ostream's subclasses should take care to flush the buffer
@@ -172,7 +164,7 @@ void raw_ostream::flush_nonempty() {
   assert(OutBufCur > OutBufStart && "Invalid call to flush_nonempty.");
   size_t Length = OutBufCur - OutBufStart;
   OutBufCur = OutBufStart;
-  flush_tied_then_write(OutBufStart, Length);
+  write_impl(OutBufStart, Length);
 }
 
 raw_ostream &raw_ostream::write(unsigned char C) {
@@ -180,7 +172,7 @@ raw_ostream &raw_ostream::write(unsigned char C) {
   if (LLVM_UNLIKELY(OutBufCur >= OutBufEnd)) {
     if (LLVM_UNLIKELY(!OutBufStart)) {
       if (BufferMode == BufferKind::Unbuffered) {
-        flush_tied_then_write(reinterpret_cast<char *>(&C), 1);
+        write_impl(reinterpret_cast<char *>(&C), 1);
         return *this;
       }
       // Set up a buffer and start over.
@@ -200,7 +192,7 @@ raw_ostream &raw_ostream::write(const char *Ptr, size_t Size) {
   if (LLVM_UNLIKELY(size_t(OutBufEnd - OutBufCur) < Size)) {
     if (LLVM_UNLIKELY(!OutBufStart)) {
       if (BufferMode == BufferKind::Unbuffered) {
-        flush_tied_then_write(Ptr, Size);
+        write_impl(Ptr, Size);
         return *this;
       }
       // Set up a buffer and start over.
@@ -216,7 +208,7 @@ raw_ostream &raw_ostream::write(const char *Ptr, size_t Size) {
     if (LLVM_UNLIKELY(OutBufCur == OutBufStart)) {
       assert(NumBytes != 0 && "undefined behavior");
       size_t BytesToWrite = Size - (Size % NumBytes);
-      flush_tied_then_write(Ptr, BytesToWrite);
+      write_impl(Ptr, BytesToWrite);
       size_t BytesRemaining = Size - BytesToWrite;
       if (BytesRemaining > size_t(OutBufEnd - OutBufCur)) {
         // Too much left over to copy into our buffer.
@@ -255,12 +247,6 @@ void raw_ostream::copy_to_buffer(const char *Ptr, size_t Size) {
   }
 
   OutBufCur += Size;
-}
-
-void raw_ostream::flush_tied_then_write(const char *Ptr, size_t Size) {
-  if (TiedStream)
-    TiedStream->flush();
-  write_impl(Ptr, Size);
 }
 
 template <char C>
@@ -302,6 +288,9 @@ void raw_ostream::anchor() {}
 static int getFD(std::string_view Filename, std::error_code &EC,
                  fs::CreationDisposition Disp, fs::FileAccess Access,
                  fs::OpenFlags Flags) {
+  // FIXME(sandboxing): Remove this by adopting `wpi::util::vfs::OutputBackend`.
+  auto BypassSandbox = sys::sandbox::scopedDisable();
+
   assert((Access & fs::FA_Write) &&
          "Cannot make a raw_ostream from a read-only descriptor!");
 
@@ -361,6 +350,9 @@ raw_fd_ostream::raw_fd_ostream(std::string_view Filename, std::error_code &EC,
 raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
                                OStreamKind K)
     : raw_pwrite_stream(unbuffered, K), FD(fd), ShouldClose(shouldClose) {
+  // FIXME(sandboxing): Remove this by adopting `wpi::util::vfs::OutputBackend`.
+  auto BypassSandbox = sys::sandbox::scopedDisable();
+
   if (FD < 0 ) {
     ShouldClose = false;
     return;
@@ -416,8 +408,7 @@ raw_fd_ostream::~raw_fd_ostream() {
   // has_error() and clear the error flag with clear_error() before
   // destructing raw_ostream objects which may have errors.
   if (has_error())
-    report_fatal_error("IO failure on output stream: " + error().message(),
-                       /*gen_crash_diag=*/false);
+    reportFatalUsageError("IO failure on output stream: " + error().message());
 }
 
 #if defined(_WIN32)
@@ -442,11 +433,7 @@ static bool write_console_impl(int FD, std::string_view Data) {
   if (auto EC = sys::windows::UTF8ToUTF16(Data, WideText))
     return false;
 
-  // On Windows 7 and earlier, WriteConsoleW has a low maximum amount of data
-  // that can be written to the console at a time.
   size_t MaxWriteSize = WideText.size();
-  if (!RunningWindows8OrGreater())
-    MaxWriteSize = 32767;
 
   size_t WCharsWritten = 0;
   do {
@@ -471,6 +458,9 @@ static bool write_console_impl(int FD, std::string_view Data) {
 #endif
 
 void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+  if (TiedStream)
+    TiedStream->flush();
+
   assert(FD >= 0 && "File already closed.");
   pos += Size;
 
@@ -578,6 +568,10 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
   if (IsWindowsConsole)
     return 0;
   return raw_ostream::preferred_buffer_size();
+#elif defined(__MVS__)
+  // The buffer size on z/OS is defined with macro BUFSIZ, which can be
+  // retrieved by invoking function raw_ostream::preferred_buffer_size().
+  return raw_ostream::preferred_buffer_size();
 #else
   assert(FD >= 0 && "File not yet open!");
   struct stat statbuf;
@@ -600,22 +594,23 @@ void raw_fd_ostream::anchor() {}
 //  outs(), errs(), nulls()
 //===----------------------------------------------------------------------===//
 
-raw_fd_ostream &wpi::outs() {
+raw_fd_ostream &wpi::util::outs() {
   // Set buffer settings to model stdout behavior.
   std::error_code EC;
+
   static raw_fd_ostream* S = new raw_fd_ostream("-", EC, fs::OF_None);
   assert(!EC);
   return *S;
 }
 
-raw_fd_ostream &wpi::errs() {
+raw_fd_ostream &wpi::util::errs() {
   // Set standard error to be unbuffered and tied to outs() by default.
   static raw_fd_ostream* S = new raw_fd_ostream(STDERR_FILENO, false, true);
   return *S;
 }
 
 /// nulls() - This returns a reference to a raw_ostream which discards output.
-raw_ostream &wpi::nulls() {
+raw_ostream &wpi::util::nulls() {
   static raw_null_ostream S;
   return S;
 }
@@ -661,6 +656,10 @@ void raw_svector_ostream::write_impl(const char *Ptr, size_t Size) {
 void raw_svector_ostream::pwrite_impl(const char *Ptr, size_t Size,
                                       uint64_t Offset) {
   memcpy(OS.data() + Offset, Ptr, Size);
+}
+
+bool raw_svector_ostream::classof(const raw_ostream *OS) {
+  return OS->get_kind() == OStreamKind::OK_SVecStream;
 }
 
 //===----------------------------------------------------------------------===//

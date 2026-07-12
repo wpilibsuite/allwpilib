@@ -1,13 +1,13 @@
 import org.gradle.internal.os.OperatingSystem
 
-if (project.hasProperty('onlylinuxathena')) {
+if (project.hasProperty('onlylinuxsystemcore')) {
     return;
 }
 
 apply plugin: 'c'
 apply plugin: 'cpp'
 apply plugin: 'visual-studio'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 
 if (OperatingSystem.current().isMacOsX()) {
     apply plugin: 'objective-c'
@@ -25,7 +25,7 @@ nativeUtils.platformConfigs.named('osxuniversal') {
 
 model {
     components {
-        imgui(NativeLibrarySpec) {
+        imguiSuite(NativeLibrarySpec) {
             sources {
                 cpp {
                     source {
@@ -49,7 +49,7 @@ model {
                 }
             }
             binaries.all {
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                     it.buildable = false
                     return
                 }

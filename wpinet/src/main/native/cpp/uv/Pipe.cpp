@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/uv/Pipe.h"
+#include "wpi/net/uv/Pipe.hpp"
 
 #include <cstdlib>
 #include <functional>
@@ -10,9 +10,9 @@
 #include <string>
 #include <utility>
 
-#include <wpi/SmallString.h>
+#include "wpi/util/SmallString.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 std::shared_ptr<Pipe> Pipe::Create(Loop& loop, bool ipc) {
   if (loop.IsClosing()) {
@@ -70,7 +70,7 @@ Pipe* Pipe::DoAccept() {
 }
 
 void Pipe::Bind(std::string_view name) {
-  SmallString<128> nameBuf{name};
+  wpi::util::SmallString<128> nameBuf{name};
   Invoke(&uv_pipe_bind, GetRaw(), nameBuf.c_str());
 }
 
@@ -79,7 +79,7 @@ void Pipe::Connect(std::string_view name,
   if (IsLoopClosing()) {
     return;
   }
-  SmallString<128> nameBuf{name};
+  wpi::util::SmallString<128> nameBuf{name};
   uv_pipe_connect(req->GetRaw(), GetRaw(), nameBuf.c_str(),
                   [](uv_connect_t* req, int status) {
                     auto& h = *static_cast<PipeConnectReq*>(req->data);
@@ -145,4 +145,4 @@ std::string Pipe::GetPeer() {
   return std::string{};
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

@@ -330,7 +330,7 @@ class MatrixLogarithmReturnValue : public ReturnByValue<MatrixLogarithmReturnVal
     typedef typename internal::nested_eval<Derived, 10>::type DerivedEvalType;
     typedef internal::remove_all_t<DerivedEvalType> DerivedEvalTypeClean;
     typedef internal::traits<DerivedEvalTypeClean> Traits;
-    typedef std::complex<typename NumTraits<Scalar>::Real> ComplexScalar;
+    typedef internal::make_complex_t<Scalar> ComplexScalar;
     typedef Matrix<ComplexScalar, Dynamic, Dynamic, 0, Traits::RowsAtCompileTime, Traits::ColsAtCompileTime>
         DynMatrixType;
     typedef internal::MatrixLogarithmAtomic<DynMatrixType> AtomicType;

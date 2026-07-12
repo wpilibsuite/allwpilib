@@ -305,7 +305,8 @@ inline bool useSpecificBlockingSizes(Index& k, Index& m, Index& n) {
  * \param[in,out] k Input: the third dimension of the product. Output: the blocking size along the same dimension.
  * \param[in,out] m Input: the number of rows of the left hand side. Output: the blocking size along the same dimension.
  * \param[in,out] n Input: the number of columns of the right hand side. Output: the blocking size along the same
- * dimension.
+ *                         dimension.
+ * \param[in] num_threads Input: the number of threads used for the computation.
  *
  * Given a m x k times k x n matrix product of scalar types \c LhsScalar and \c RhsScalar,
  * this function computes the blocking size parameters along the respective dimensions
@@ -1117,7 +1118,7 @@ struct lhs_process_one_packet {
     // loops on each largest micro horizontal panel of lhs
     // (LhsProgress x depth)
     for (Index i = peelStart; i < peelEnd; i += LhsProgress) {
-#if EIGEN_ARCH_ARM64
+#if EIGEN_ARCH_ARM64 || EIGEN_ARCH_LOONGARCH64
       EIGEN_IF_CONSTEXPR(nr >= 8) {
         for (Index j2 = 0; j2 < packet_cols8; j2 += 8) {
           const LhsScalar* blA = &blockA[i * strideA + offsetA * (LhsProgress)];
@@ -1467,7 +1468,7 @@ EIGEN_DONT_INLINE void gebp_kernel<LhsScalar, RhsScalar, Index, DataMapper, mr, 
                                                 (depth * sizeof(LhsScalar) * 3 * LhsProgress)));
     for (Index i1 = 0; i1 < peeled_mc3; i1 += actual_panel_rows) {
       const Index actual_panel_end = (std::min)(i1 + actual_panel_rows, peeled_mc3);
-#if EIGEN_ARCH_ARM64
+#if EIGEN_ARCH_ARM64 || EIGEN_ARCH_LOONGARCH64
       EIGEN_IF_CONSTEXPR(nr >= 8) {
         for (Index j2 = 0; j2 < packet_cols8; j2 += 8) {
           for (Index i = i1; i < actual_panel_end; i += 3 * LhsProgress) {
@@ -1935,7 +1936,7 @@ EIGEN_DONT_INLINE void gebp_kernel<LhsScalar, RhsScalar, Index, DataMapper, mr, 
 
     for (Index i1 = peeled_mc3; i1 < peeled_mc2; i1 += actual_panel_rows) {
       Index actual_panel_end = (std::min)(i1 + actual_panel_rows, peeled_mc2);
-#if EIGEN_ARCH_ARM64
+#if EIGEN_ARCH_ARM64 || EIGEN_ARCH_LOONGARCH64
       EIGEN_IF_CONSTEXPR(nr >= 8) {
         for (Index j2 = 0; j2 < packet_cols8; j2 += 8) {
           for (Index i = i1; i < actual_panel_end; i += 2 * LhsProgress) {
@@ -2326,7 +2327,7 @@ EIGEN_DONT_INLINE void gebp_kernel<LhsScalar, RhsScalar, Index, DataMapper, mr, 
   }
   //---------- Process remaining rows, 1 at once ----------
   if (peeled_mc_quarter < rows) {
-#if EIGEN_ARCH_ARM64
+#if EIGEN_ARCH_ARM64 || EIGEN_ARCH_LOONGARCH64
     EIGEN_IF_CONSTEXPR(nr >= 8) {
       // loop on each panel of the rhs
       for (Index j2 = 0; j2 < packet_cols8; j2 += 8) {
@@ -2852,7 +2853,7 @@ EIGEN_DONT_INLINE void gemm_pack_rhs<Scalar, Index, DataMapper, nr, ColMajor, Co
   Index count = 0;
   const Index peeled_k = (depth / PacketSize) * PacketSize;
 
-#if EIGEN_ARCH_ARM64
+#if EIGEN_ARCH_ARM64 || EIGEN_ARCH_LOONGARCH64
   EIGEN_IF_CONSTEXPR(nr >= 8) {
     for (Index j2 = 0; j2 < packet_cols8; j2 += 8) {
       // skip what we have before
@@ -3035,7 +3036,7 @@ struct gemm_pack_rhs<Scalar, Index, DataMapper, nr, RowMajor, Conjugate, PanelMo
     Index packet_cols4 = nr >= 4 ? (cols / 4) * 4 : 0;
     Index count = 0;
 
-#if EIGEN_ARCH_ARM64
+#if EIGEN_ARCH_ARM64 || EIGEN_ARCH_LOONGARCH64
     EIGEN_IF_CONSTEXPR(nr >= 8) {
       for (Index j2 = 0; j2 < packet_cols8; j2 += 8) {
         // skip what we have before

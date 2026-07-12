@@ -1,0 +1,13 @@
+classes:
+  wpi::UpDownCounter:
+    ignored_bases:
+    - wpi::util::SendableHelper<UpDownCounter>
+    methods:
+      UpDownCounter:
+        overloads:
+          DigitalSource&, DigitalSource&:
+          std::shared_ptr<DigitalSource>, std::shared_ptr<DigitalSource>:
+      GetCount:
+      Reset:
+      InitSendable:
+      SetEdgeConfiguration:

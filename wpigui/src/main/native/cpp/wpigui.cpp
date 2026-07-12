@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpigui.h"
+#include "wpi/gui/wpigui.hpp"
 
 #include <stdint.h>
 
@@ -32,7 +32,7 @@
 #include <implot.h>
 #include <stb_image.h>
 
-#include "wpigui_internal.h"
+#include "wpi/gui/wpigui_internal.hpp"
 
 using namespace wpi::gui;
 
@@ -98,7 +98,7 @@ static void IniReadLine(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
     impl->xPos = num;
   } else if (std::strncmp(lineStr, "ypos=", 5) == 0) {
     impl->yPos = num;
-  } else if (std::strncmp(lineStr, "userScale=", 10) == 0) {
+  } else if (std::strncmp(lineStr, "userScaling=", 12) == 0) {
     impl->userScale = num;
   } else if (std::strncmp(lineStr, "style=", 6) == 0) {
     impl->style = num;
@@ -116,7 +116,7 @@ static void IniWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
   }
   out_buf->appendf(
       "[MainWindow][GLOBAL]\nwidth=%d\nheight=%d\nmaximized=%d\n"
-      "xpos=%d\nypos=%d\nuserScale=%d\nstyle=%d\nfont=%s\nfps=%d\n\n",
+      "xpos=%d\nypos=%d\nuserScaling=%d\nstyle=%d\nfont=%s\nfps=%d\n\n",
       gContext->width, gContext->height, gContext->maximized ? 1 : 0,
       gContext->xPos, gContext->yPos, gContext->userScale, gContext->style,
       gContext->defaultFontName.c_str(), gContext->fps);
@@ -169,53 +169,43 @@ void gui::DestroyContext() {
   gContext = nullptr;
 }
 
+Context* gui::GetCurrentContext() {
+  return gContext;
+}
+
+void gui::SetCurrentContext(Context* context) {
+  gContext = context;
+}
+
+ImFont* Context::FontMaker::GetFont() const {
+  if (!font) {
+    auto& io = ImGui::GetIO();
+
+    ImFontConfig cfg;
+    std::snprintf(cfg.Name, sizeof(cfg.Name), "%s", name.c_str());
+    font = func(io, 0, &cfg);
+
+    // Merge font awesome solid
+    ImFontConfig icons_cfg;
+    icons_cfg.MergeMode = true;
+    icons_cfg.PixelSnapH = true;
+    ImGui::AddFontFontAwesomeSolid(io, 0, &icons_cfg);
+  }
+  return font;
+}
+
 static void UpdateFontScale() {
   // Scale based on OS window content scaling
   float windowScale = 1.0;
 #ifndef __APPLE__
   glfwGetWindowContentScale(gContext->window, &windowScale, nullptr);
 #endif
-  // map to closest font size: 0 = 0.5x, 1 = 0.75x, 2 = 1.0x, 3 = 1.25x,
-  // 4 = 1.5x, 5 = 1.75x, 6 = 2x
-  int fontScale =
-      gContext->userScale + static_cast<int>((windowScale - 1.0) * 4);
-  if (fontScale < 0) {
-    fontScale = 0;
+  float fontScale = gContext->userScale / 100.0 * windowScale;
+  if (fontScale < 0.5) {
+    fontScale = 0.5;
   }
-  if (gContext->fontScale != fontScale) {
-    gContext->reloadFonts = true;
-    gContext->fontScale = fontScale;
-  }
-}
-
-// the range is based on 13px being the "nominal" 100% size and going from
-// ~0.5x (7px) to ~2.0x (25px)
-static void ReloadFonts() {
-  auto& io = ImGui::GetIO();
-  io.Fonts->Clear();
-  gContext->fonts.clear();
-  float size = 7.0f + gContext->fontScale * 3.0f;
-  for (auto&& makeFont : gContext->makeFonts) {
-    if (makeFont.func) {
-      ImFontConfig cfg;
-      std::snprintf(cfg.Name, sizeof(cfg.Name), "%s", makeFont.name.c_str());
-      bool isDefault = makeFont.name == gContext->defaultFontName;
-      if (!makeFont.defaultOnly || isDefault) {
-        ImFont* font = makeFont.func(io, size, &cfg);
-        if (isDefault) {
-          // Merge font awesome solid into default font
-          static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA,
-                                                 0};
-          ImFontConfig icons_cfg;
-          icons_cfg.MergeMode = true;
-          icons_cfg.PixelSnapH = true;
-          ImGui::AddFontFontAwesomeSolid(io, size, &icons_cfg, icons_ranges);
-          ImGui::GetIO().FontDefault = font;
-        }
-        gContext->fonts.emplace_back(font);
-      }
-    }
-  }
+  ImGui::GetStyle().FontSizeBase = 13;
+  ImGui::GetStyle().FontScaleDpi = fontScale;
 }
 
 bool gui::Initialize(const char* title, int width, int height,
@@ -374,8 +364,6 @@ bool gui::Initialize(const char* title, int width, int height,
 
   // Load Fonts
   UpdateFontScale();
-  ReloadFonts();
-  gContext->reloadFonts = false;  // init renderer will do this
 
   if (!PlatformInitRenderer()) {
     return false;
@@ -393,10 +381,6 @@ void gui::Main() {
     glfwPollEvents();
     gContext->isPlatformRendering = true;
     UpdateFontScale();
-    if (gContext->reloadFonts) {
-      ReloadFonts();
-      // PlatformRenderFrame() will clear reloadFonts flag
-    }
     PlatformRenderFrame();
     gContext->isPlatformRendering = false;
 
@@ -519,22 +503,12 @@ bool gui::AddIcon(const unsigned char* data, int len) {
   return true;
 }
 
-int gui::AddFont(
-    const char* name,
-    std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>
-        makeFont) {
-  if (makeFont) {
-    gContext->makeFonts.emplace_back(name, false, std::move(makeFont));
-  }
-  return gContext->makeFonts.size() - 1;
-}
-
 void gui::AddDefaultFont(
     const char* name,
     std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>
         makeFont) {
   if (makeFont) {
-    gContext->makeFonts.emplace_back(name, true, std::move(makeFont));
+    gContext->makeFonts.emplace_back(name, std::move(makeFont));
   }
 }
 
@@ -625,16 +599,16 @@ static void StyleColorsDeepDark() {
 void gui::SetStyle(Style style) {
   gContext->style = static_cast<int>(style);
   switch (style) {
-    case kStyleClassic:
+    case Style::CLASSIC:
       ImGui::StyleColorsClassic();
       break;
-    case kStyleDark:
+    case Style::DARK:
       ImGui::StyleColorsDark();
       break;
-    case kStyleLight:
+    case Style::LIGHT:
       ImGui::StyleColorsLight();
       break;
-    case kStyleDeepDark:
+    case Style::DEEP_DARK:
       StyleColorsDeepDark();
       break;
   }
@@ -679,40 +653,41 @@ void gui::EmitViewMenu() {
   if (ImGui::BeginMenu("View")) {
     if (ImGui::BeginMenu("Style")) {
       bool selected;
-      selected = gContext->style == kStyleClassic;
+      selected = gContext->style == static_cast<int>(Style::CLASSIC);
       if (ImGui::MenuItem("Classic", nullptr, &selected, true)) {
-        SetStyle(kStyleClassic);
+        SetStyle(Style::CLASSIC);
       }
-      selected = gContext->style == kStyleDark;
+      selected = gContext->style == static_cast<int>(Style::DARK);
       if (ImGui::MenuItem("Dark", nullptr, &selected, true)) {
-        SetStyle(kStyleDark);
+        SetStyle(Style::DARK);
       }
-      selected = gContext->style == kStyleLight;
+      selected = gContext->style == static_cast<int>(Style::LIGHT);
       if (ImGui::MenuItem("Light", nullptr, &selected, true)) {
-        SetStyle(kStyleLight);
+        SetStyle(Style::LIGHT);
       }
-      selected = gContext->style == kStyleDeepDark;
+      selected = gContext->style == static_cast<int>(Style::DEEP_DARK);
       if (ImGui::MenuItem("Deep Dark", nullptr, &selected, true)) {
-        SetStyle(kStyleDeepDark);
+        SetStyle(Style::DEEP_DARK);
       }
       ImGui::EndMenu();
     }
 
     if (ImGui::BeginMenu("Font")) {
       for (auto&& makeFont : gContext->makeFonts) {
-        bool selected = gContext->defaultFontName == makeFont.name;
-        if (ImGui::MenuItem(makeFont.name.c_str(), nullptr, &selected)) {
-          gContext->defaultFontName = makeFont.name;
-          gContext->reloadFonts = true;
+        auto& name = makeFont.GetName();
+        bool selected = gContext->defaultFontName == name;
+        if (ImGui::MenuItem(name.c_str(), nullptr, &selected)) {
+          ImGui::GetIO().FontDefault = makeFont.GetFont();
+          gContext->defaultFontName = name;
         }
       }
       ImGui::EndMenu();
     }
 
     if (ImGui::BeginMenu("Zoom")) {
-      for (int i = 0; i < kFontScaledLevels && (25 * (i + 2)) <= 200; ++i) {
+      for (int i = 50; i <= 200; i += 25) {
         char label[20];
-        std::snprintf(label, sizeof(label), "%d%%", 25 * (i + 2));
+        std::snprintf(label, sizeof(label), "%d%%", i);
         bool selected = gContext->userScale == i;
         if (ImGui::MenuItem(label, nullptr, &selected)) {
           gContext->userScale = i;
@@ -756,14 +731,14 @@ bool gui::UpdateTextureFromImage(ImTextureID* texture, int width, int height,
   int height2 = 0;
   unsigned char* imgData =
       stbi_load_from_memory(data, len, &width2, &height2, nullptr, 4);
-  if (!data) {
+  if (!imgData) {
     return false;
   }
 
   if (width2 == width && height2 == height) {
-    UpdateTexture(texture, kPixelRGBA, width2, height2, imgData);
+    UpdateTexture(*texture, PixelFormat::RGBA, width2, height2, imgData);
   } else {
-    *texture = CreateTexture(kPixelRGBA, width2, height2, imgData);
+    *texture = CreateTexture(PixelFormat::RGBA, width2, height2, imgData);
   }
 
   stbi_image_free(imgData);
@@ -781,7 +756,7 @@ bool gui::CreateTextureFromFile(const char* filename, ImTextureID* out_texture,
     return false;
   }
 
-  *out_texture = CreateTexture(kPixelRGBA, width, height, data);
+  *out_texture = CreateTexture(PixelFormat::RGBA, width, height, data);
   if (out_width) {
     *out_width = width;
   }
@@ -806,7 +781,7 @@ bool gui::CreateTextureFromImage(const unsigned char* data, int len,
     return false;
   }
 
-  *out_texture = CreateTexture(kPixelRGBA, width, height, imgData);
+  *out_texture = CreateTexture(PixelFormat::RGBA, width, height, imgData);
   if (out_width) {
     *out_width = width;
   }

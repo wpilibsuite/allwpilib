@@ -289,13 +289,9 @@ class BlockImpl_dense : public internal::dense_xpr_base<Block<XprType, BlockRows
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE XprType& nestedExpression() { return m_xpr; }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR StorageIndex startRow() const EIGEN_NOEXCEPT {
-    return m_startRow.value();
-  }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr StorageIndex startRow() const noexcept { return m_startRow.value(); }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR StorageIndex startCol() const EIGEN_NOEXCEPT {
-    return m_startCol.value();
-  }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr StorageIndex startCol() const noexcept { return m_startCol.value(); }
 
  protected:
   XprTypeNested m_xpr;
@@ -319,8 +315,7 @@ class BlockImpl_dense<XprType, BlockRows, BlockCols, InnerPanel, true>
    * Adding an offset to nullptr is undefined behavior, so we must avoid it.
    */
   template <typename Scalar>
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR EIGEN_ALWAYS_INLINE static Scalar* add_to_nullable_pointer(Scalar* base,
-                                                                                               Index offset) {
+  EIGEN_DEVICE_FUNC constexpr EIGEN_ALWAYS_INLINE static Scalar* add_to_nullable_pointer(Scalar* base, Index offset) {
     return base != nullptr ? base + offset : nullptr;
   }
 
@@ -378,30 +373,25 @@ class BlockImpl_dense<XprType, BlockRows, BlockCols, InnerPanel, true>
     init();
   }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const internal::remove_all_t<XprTypeNested>& nestedExpression() const
-      EIGEN_NOEXCEPT {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const internal::remove_all_t<XprTypeNested>& nestedExpression() const noexcept {
     return m_xpr;
   }
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE XprType& nestedExpression() { return m_xpr; }
 
   /** \sa MapBase::innerStride() */
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index innerStride() const EIGEN_NOEXCEPT {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index innerStride() const noexcept {
     return internal::traits<BlockType>::HasSameStorageOrderAsXprType ? m_xpr.innerStride() : m_xpr.outerStride();
   }
 
   /** \sa MapBase::outerStride() */
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index outerStride() const EIGEN_NOEXCEPT {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index outerStride() const noexcept {
     return internal::traits<BlockType>::HasSameStorageOrderAsXprType ? m_xpr.outerStride() : m_xpr.innerStride();
   }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR StorageIndex startRow() const EIGEN_NOEXCEPT {
-    return m_startRow.value();
-  }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr StorageIndex startRow() const noexcept { return m_startRow.value(); }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR StorageIndex startCol() const EIGEN_NOEXCEPT {
-    return m_startCol.value();
-  }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr StorageIndex startCol() const noexcept { return m_startCol.value(); }
 
 #ifndef __SUNPRO_CC
   // FIXME sunstudio is not friendly with the above friend...

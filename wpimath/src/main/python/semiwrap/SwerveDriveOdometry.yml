@@ -1,0 +1,24 @@
+classes:
+  wpi::math::SwerveDriveOdometry:
+    force_no_trampoline: true
+    template_params:
+    - size_t NumModules
+    methods:
+      SwerveDriveOdometry:
+templates:
+  SwerveDrive2Odometry:
+    qualname: wpi::math::SwerveDriveOdometry
+    params:
+    - 2
+  SwerveDrive3Odometry:
+    qualname: wpi::math::SwerveDriveOdometry
+    params:
+    - 3
+  SwerveDrive4Odometry:
+    qualname: wpi::math::SwerveDriveOdometry
+    params:
+    - 4
+  SwerveDrive6Odometry:
+    qualname: wpi::math::SwerveDriveOdometry
+    params:
+    - 6

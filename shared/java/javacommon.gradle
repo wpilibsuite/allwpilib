@@ -4,7 +4,7 @@ apply plugin: 'jacoco'
 
 def baseArtifactId = project.baseId
 def artifactGroupId = project.groupId
-def javaBaseName = "_GROUP_${project.groupId.replace('.', '_')}_ID_${project.baseId}-java_CLS"
+def javaBaseName = makeZipBaseName(artifactGroupId, "${baseArtifactId}-java")
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -39,11 +39,13 @@ task outputJavadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 artifacts {
-    archives sourcesJar
-    archives javadocJar
-    archives outputJar
-    archives outputSourcesJar
-    archives outputJavadocJar
+    tasks.named("assemble") {
+        dependsOn(sourcesJar)
+        dependsOn(javadocJar)
+        dependsOn(outputJar)
+        dependsOn(outputSourcesJar)
+        dependsOn(outputJavadocJar)
+    }
 }
 
 addTaskToCopyAllOutputs(outputSourcesJar)
@@ -65,23 +67,24 @@ publishing {
             artifact javadocJar
 
             artifactId = "${baseArtifactId}-java"
-            groupId artifactGroupId
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupId
+            version = wpilibVersioning.version.get()
         }
     }
 }
 
 test {
+    jvmArgs '--enable-native-access=ALL-UNNAMED'
     useJUnitPlatform()
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
     testLogging {
         events "failed"
-        exceptionFormat "full"
+        exceptionFormat = "full"
     }
     finalizedBy jacocoTestReport
 }
 
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
+if (project.hasProperty('onlylinuxsystemcore') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
     test.enabled = false
 }
 
@@ -103,7 +106,7 @@ configurations {
 tasks.withType(JavaCompile).configureEach {
     options.compilerArgs = [
         '--release',
-        '17',
+        '25',
         '-encoding',
         'UTF8',
         "-Werror",
@@ -118,8 +121,8 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation libs.junit.api
+    testRuntimeOnly libs.junit.launcher
 
     devImplementation sourceSets.main.output
 }
@@ -133,7 +136,7 @@ task run(type: JavaExec) {
 build.dependsOn devClasses
 
 jacoco {
-    toolVersion = "0.8.10"
+    toolVersion = "0.8.14"
 }
 
 jacocoTestReport {

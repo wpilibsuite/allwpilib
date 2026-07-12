@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/TimedRobot.h"  // NOLINT(build/include_order)
+#include "wpi/framework/TimedRobot.hpp"
 
 #include <stdint.h>
 
@@ -11,44 +11,49 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/livewindow/LiveWindow.h"
-#include "frc/simulation/DriverStationSim.h"
-#include "frc/simulation/SimHooks.h"
+#include "wpi/hal/DriverStationTypes.h"
+#include "wpi/simulation/DriverStationSim.hpp"
+#include "wpi/simulation/SimHooks.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 inline constexpr auto kPeriod = 20_ms;
 
 namespace {
-class TimedRobotTest : public ::testing::TestWithParam<bool> {
+class TimedRobotTest : public ::testing::Test {
  protected:
-  void SetUp() override { frc::sim::PauseTiming(); }
+  void SetUp() override {
+    wpi::sim::PauseTiming();
+    wpi::sim::SetProgramStarted(false);
+  }
 
-  void TearDown() override { frc::sim::ResumeTiming(); }
+  void TearDown() override {
+    wpi::sim::ResumeTiming();
+    wpi::nt::ResetInstance(wpi::nt::GetDefaultInstance());
+  }
 };
 
 class MockRobot : public TimedRobot {
  public:
-  std::atomic<uint32_t> m_robotInitCount{0};
   std::atomic<uint32_t> m_simulationInitCount{0};
   std::atomic<uint32_t> m_disabledInitCount{0};
   std::atomic<uint32_t> m_autonomousInitCount{0};
   std::atomic<uint32_t> m_teleopInitCount{0};
-  std::atomic<uint32_t> m_testInitCount{0};
+  std::atomic<uint32_t> m_utilityInitCount{0};
 
   std::atomic<uint32_t> m_disabledExitCount{0};
   std::atomic<uint32_t> m_autonomousExitCount{0};
   std::atomic<uint32_t> m_teleopExitCount{0};
-  std::atomic<uint32_t> m_testExitCount{0};
+  std::atomic<uint32_t> m_utilityExitCount{0};
 
   std::atomic<uint32_t> m_robotPeriodicCount{0};
   std::atomic<uint32_t> m_simulationPeriodicCount{0};
   std::atomic<uint32_t> m_disabledPeriodicCount{0};
   std::atomic<uint32_t> m_autonomousPeriodicCount{0};
   std::atomic<uint32_t> m_teleopPeriodicCount{0};
-  std::atomic<uint32_t> m_testPeriodicCount{0};
+  std::atomic<uint32_t> m_utilityPeriodicCount{0};
 
-  MockRobot() : TimedRobot{kPeriod} { m_robotInitCount++; }
+  MockRobot() : TimedRobot{kPeriod} {}
 
   void SimulationInit() override { m_simulationInitCount++; }
 
@@ -58,7 +63,7 @@ class MockRobot : public TimedRobot {
 
   void TeleopInit() override { m_teleopInitCount++; }
 
-  void TestInit() override { m_testInitCount++; }
+  void UtilityInit() override { m_utilityInitCount++; }
 
   void RobotPeriodic() override { m_robotPeriodicCount++; }
 
@@ -70,7 +75,7 @@ class MockRobot : public TimedRobot {
 
   void TeleopPeriodic() override { m_teleopPeriodicCount++; }
 
-  void TestPeriodic() override { m_testPeriodicCount++; }
+  void UtilityPeriodic() override { m_utilityPeriodicCount++; }
 
   void DisabledExit() override { m_disabledExitCount++; }
 
@@ -78,7 +83,7 @@ class MockRobot : public TimedRobot {
 
   void TeleopExit() override { m_teleopExitCount++; }
 
-  void TestExit() override { m_testExitCount++; }
+  void UtilityExit() override { m_utilityExitCount++; }
 };
 }  // namespace
 
@@ -86,71 +91,68 @@ TEST_F(TimedRobotTest, DisabledMode) {
   MockRobot robot;
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
 
-  frc::sim::DriverStationSim::SetEnabled(false);
-  frc::sim::DriverStationSim::NotifyNewData();
-  frc::sim::StepTiming(0_ms);  // Wait for Notifiers
+  wpi::sim::DriverStationSim::SetEnabled(false);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
-  EXPECT_EQ(0u, robot.m_testInitCount);
+  EXPECT_EQ(0u, robot.m_utilityInitCount);
 
   EXPECT_EQ(0u, robot.m_robotPeriodicCount);
   EXPECT_EQ(0u, robot.m_simulationPeriodicCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(0u, robot.m_autonomousPeriodicCount);
   EXPECT_EQ(0u, robot.m_teleopPeriodicCount);
-  EXPECT_EQ(0u, robot.m_testPeriodicCount);
+  EXPECT_EQ(0u, robot.m_utilityPeriodicCount);
 
   EXPECT_EQ(0u, robot.m_disabledExitCount);
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
-  EXPECT_EQ(0u, robot.m_testExitCount);
+  EXPECT_EQ(0u, robot.m_utilityExitCount);
 
-  frc::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(kPeriod);
 
-  EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
   EXPECT_EQ(1u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
-  EXPECT_EQ(0u, robot.m_testInitCount);
+  EXPECT_EQ(0u, robot.m_utilityInitCount);
 
   EXPECT_EQ(1u, robot.m_robotPeriodicCount);
   EXPECT_EQ(1u, robot.m_simulationPeriodicCount);
   EXPECT_EQ(1u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(0u, robot.m_autonomousPeriodicCount);
   EXPECT_EQ(0u, robot.m_teleopPeriodicCount);
-  EXPECT_EQ(0u, robot.m_testPeriodicCount);
+  EXPECT_EQ(0u, robot.m_utilityPeriodicCount);
 
   EXPECT_EQ(0u, robot.m_disabledExitCount);
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
-  EXPECT_EQ(0u, robot.m_testExitCount);
+  EXPECT_EQ(0u, robot.m_utilityExitCount);
 
-  frc::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(kPeriod);
 
-  EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
   EXPECT_EQ(1u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
-  EXPECT_EQ(0u, robot.m_testInitCount);
+  EXPECT_EQ(0u, robot.m_utilityInitCount);
 
   EXPECT_EQ(2u, robot.m_robotPeriodicCount);
   EXPECT_EQ(2u, robot.m_simulationPeriodicCount);
   EXPECT_EQ(2u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(0u, robot.m_autonomousPeriodicCount);
   EXPECT_EQ(0u, robot.m_teleopPeriodicCount);
-  EXPECT_EQ(0u, robot.m_testPeriodicCount);
+  EXPECT_EQ(0u, robot.m_utilityPeriodicCount);
 
   EXPECT_EQ(0u, robot.m_disabledExitCount);
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
-  EXPECT_EQ(0u, robot.m_testExitCount);
+  EXPECT_EQ(0u, robot.m_utilityExitCount);
 
   robot.EndCompetition();
   robotThread.join();
@@ -160,73 +162,69 @@ TEST_F(TimedRobotTest, AutonomousMode) {
   MockRobot robot;
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
 
-  frc::sim::DriverStationSim::SetEnabled(true);
-  frc::sim::DriverStationSim::SetAutonomous(true);
-  frc::sim::DriverStationSim::SetTest(false);
-  frc::sim::DriverStationSim::NotifyNewData();
-  frc::sim::StepTiming(0_ms);  // Wait for Notifiers
+  wpi::sim::DriverStationSim::SetEnabled(true);
+  wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::AUTONOMOUS);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
-  EXPECT_EQ(0u, robot.m_testInitCount);
+  EXPECT_EQ(0u, robot.m_utilityInitCount);
 
   EXPECT_EQ(0u, robot.m_robotPeriodicCount);
   EXPECT_EQ(0u, robot.m_simulationPeriodicCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(0u, robot.m_autonomousPeriodicCount);
   EXPECT_EQ(0u, robot.m_teleopPeriodicCount);
-  EXPECT_EQ(0u, robot.m_testPeriodicCount);
+  EXPECT_EQ(0u, robot.m_utilityPeriodicCount);
 
   EXPECT_EQ(0u, robot.m_disabledExitCount);
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
-  EXPECT_EQ(0u, robot.m_testExitCount);
+  EXPECT_EQ(0u, robot.m_utilityExitCount);
 
-  frc::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(kPeriod);
 
-  EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(1u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
-  EXPECT_EQ(0u, robot.m_testInitCount);
+  EXPECT_EQ(0u, robot.m_utilityInitCount);
 
   EXPECT_EQ(1u, robot.m_robotPeriodicCount);
   EXPECT_EQ(1u, robot.m_simulationPeriodicCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(1u, robot.m_autonomousPeriodicCount);
   EXPECT_EQ(0u, robot.m_teleopPeriodicCount);
-  EXPECT_EQ(0u, robot.m_testPeriodicCount);
+  EXPECT_EQ(0u, robot.m_utilityPeriodicCount);
 
   EXPECT_EQ(0u, robot.m_disabledExitCount);
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
-  EXPECT_EQ(0u, robot.m_testExitCount);
+  EXPECT_EQ(0u, robot.m_utilityExitCount);
 
-  frc::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(kPeriod);
 
-  EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(1u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
-  EXPECT_EQ(0u, robot.m_testInitCount);
+  EXPECT_EQ(0u, robot.m_utilityInitCount);
 
   EXPECT_EQ(2u, robot.m_robotPeriodicCount);
   EXPECT_EQ(2u, robot.m_simulationPeriodicCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(2u, robot.m_autonomousPeriodicCount);
   EXPECT_EQ(0u, robot.m_teleopPeriodicCount);
-  EXPECT_EQ(0u, robot.m_testPeriodicCount);
+  EXPECT_EQ(0u, robot.m_utilityPeriodicCount);
 
   EXPECT_EQ(0u, robot.m_disabledExitCount);
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
-  EXPECT_EQ(0u, robot.m_testExitCount);
+  EXPECT_EQ(0u, robot.m_utilityExitCount);
 
   robot.EndCompetition();
   robotThread.join();
@@ -236,182 +234,162 @@ TEST_F(TimedRobotTest, TeleopMode) {
   MockRobot robot;
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
 
-  frc::sim::DriverStationSim::SetEnabled(true);
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetTest(false);
-  frc::sim::DriverStationSim::NotifyNewData();
-  frc::sim::StepTiming(0_ms);  // Wait for Notifiers
+  wpi::sim::DriverStationSim::SetEnabled(true);
+  wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::TELEOPERATED);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
-  EXPECT_EQ(0u, robot.m_testInitCount);
+  EXPECT_EQ(0u, robot.m_utilityInitCount);
 
   EXPECT_EQ(0u, robot.m_robotPeriodicCount);
   EXPECT_EQ(0u, robot.m_simulationPeriodicCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(0u, robot.m_autonomousPeriodicCount);
   EXPECT_EQ(0u, robot.m_teleopPeriodicCount);
-  EXPECT_EQ(0u, robot.m_testPeriodicCount);
+  EXPECT_EQ(0u, robot.m_utilityPeriodicCount);
 
   EXPECT_EQ(0u, robot.m_disabledExitCount);
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
-  EXPECT_EQ(0u, robot.m_testExitCount);
+  EXPECT_EQ(0u, robot.m_utilityExitCount);
 
-  frc::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(kPeriod);
 
-  EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(1u, robot.m_teleopInitCount);
-  EXPECT_EQ(0u, robot.m_testInitCount);
+  EXPECT_EQ(0u, robot.m_utilityInitCount);
 
   EXPECT_EQ(1u, robot.m_robotPeriodicCount);
   EXPECT_EQ(1u, robot.m_simulationPeriodicCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(0u, robot.m_autonomousPeriodicCount);
   EXPECT_EQ(1u, robot.m_teleopPeriodicCount);
-  EXPECT_EQ(0u, robot.m_testPeriodicCount);
+  EXPECT_EQ(0u, robot.m_utilityPeriodicCount);
 
   EXPECT_EQ(0u, robot.m_disabledExitCount);
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
-  EXPECT_EQ(0u, robot.m_testExitCount);
+  EXPECT_EQ(0u, robot.m_utilityExitCount);
 
-  frc::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(kPeriod);
 
-  EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(1u, robot.m_teleopInitCount);
-  EXPECT_EQ(0u, robot.m_testInitCount);
+  EXPECT_EQ(0u, robot.m_utilityInitCount);
 
   EXPECT_EQ(2u, robot.m_robotPeriodicCount);
   EXPECT_EQ(2u, robot.m_simulationPeriodicCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(0u, robot.m_autonomousPeriodicCount);
   EXPECT_EQ(2u, robot.m_teleopPeriodicCount);
-  EXPECT_EQ(0u, robot.m_testPeriodicCount);
+  EXPECT_EQ(0u, robot.m_utilityPeriodicCount);
 
   EXPECT_EQ(0u, robot.m_disabledExitCount);
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
-  EXPECT_EQ(0u, robot.m_testExitCount);
+  EXPECT_EQ(0u, robot.m_utilityExitCount);
 
   robot.EndCompetition();
   robotThread.join();
 }
 
-TEST_P(TimedRobotTest, TestMode) {
-  bool isTestLW = GetParam();
-
+TEST_F(TimedRobotTest, UtilityMode) {
   MockRobot robot;
-  robot.EnableLiveWindowInTest(isTestLW);
-
   std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
 
-  frc::sim::DriverStationSim::SetEnabled(true);
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetTest(true);
-  frc::sim::DriverStationSim::NotifyNewData();
-  frc::sim::StepTiming(0_ms);  // Wait for Notifiers
+  wpi::sim::DriverStationSim::SetEnabled(true);
+  wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::UTILITY);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
-  EXPECT_EQ(0u, robot.m_testInitCount);
-  EXPECT_FALSE(frc::LiveWindow::IsEnabled());
+  EXPECT_EQ(0u, robot.m_utilityInitCount);
 
   EXPECT_EQ(0u, robot.m_robotPeriodicCount);
   EXPECT_EQ(0u, robot.m_simulationPeriodicCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(0u, robot.m_autonomousPeriodicCount);
   EXPECT_EQ(0u, robot.m_teleopPeriodicCount);
-  EXPECT_EQ(0u, robot.m_testPeriodicCount);
+  EXPECT_EQ(0u, robot.m_utilityPeriodicCount);
 
   EXPECT_EQ(0u, robot.m_disabledExitCount);
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
-  EXPECT_EQ(0u, robot.m_testExitCount);
+  EXPECT_EQ(0u, robot.m_utilityExitCount);
 
-  frc::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(kPeriod);
 
-  EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
-  EXPECT_EQ(1u, robot.m_testInitCount);
-  EXPECT_EQ(isTestLW, frc::LiveWindow::IsEnabled());
-
-  EXPECT_THROW(robot.EnableLiveWindowInTest(isTestLW), std::runtime_error);
+  EXPECT_EQ(1u, robot.m_utilityInitCount);
 
   EXPECT_EQ(1u, robot.m_robotPeriodicCount);
   EXPECT_EQ(1u, robot.m_simulationPeriodicCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(0u, robot.m_autonomousPeriodicCount);
   EXPECT_EQ(0u, robot.m_teleopPeriodicCount);
-  EXPECT_EQ(1u, robot.m_testPeriodicCount);
+  EXPECT_EQ(1u, robot.m_utilityPeriodicCount);
 
   EXPECT_EQ(0u, robot.m_disabledExitCount);
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
-  EXPECT_EQ(0u, robot.m_testExitCount);
+  EXPECT_EQ(0u, robot.m_utilityExitCount);
 
-  frc::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(kPeriod);
 
-  EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
-  EXPECT_EQ(1u, robot.m_testInitCount);
+  EXPECT_EQ(1u, robot.m_utilityInitCount);
 
   EXPECT_EQ(2u, robot.m_robotPeriodicCount);
   EXPECT_EQ(2u, robot.m_simulationPeriodicCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(0u, robot.m_autonomousPeriodicCount);
   EXPECT_EQ(0u, robot.m_teleopPeriodicCount);
-  EXPECT_EQ(2u, robot.m_testPeriodicCount);
+  EXPECT_EQ(2u, robot.m_utilityPeriodicCount);
 
   EXPECT_EQ(0u, robot.m_disabledExitCount);
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
-  EXPECT_EQ(0u, robot.m_testExitCount);
+  EXPECT_EQ(0u, robot.m_utilityExitCount);
 
-  frc::sim::DriverStationSim::SetEnabled(false);
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetTest(false);
-  frc::sim::DriverStationSim::NotifyNewData();
-  frc::sim::StepTiming(20_ms);  // Wait for Notifiers
+  wpi::sim::DriverStationSim::SetEnabled(false);
+  wpi::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::StepTiming(20_ms);  // Wait for Notifiers
 
-  EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
   EXPECT_EQ(1u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
-  EXPECT_EQ(1u, robot.m_testInitCount);
-  EXPECT_FALSE(frc::LiveWindow::IsEnabled());
+  EXPECT_EQ(1u, robot.m_utilityInitCount);
 
   EXPECT_EQ(3u, robot.m_robotPeriodicCount);
   EXPECT_EQ(3u, robot.m_simulationPeriodicCount);
   EXPECT_EQ(1u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(0u, robot.m_autonomousPeriodicCount);
   EXPECT_EQ(0u, robot.m_teleopPeriodicCount);
-  EXPECT_EQ(2u, robot.m_testPeriodicCount);
+  EXPECT_EQ(2u, robot.m_utilityPeriodicCount);
 
   EXPECT_EQ(0u, robot.m_disabledExitCount);
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
-  EXPECT_EQ(1u, robot.m_testExitCount);
+  EXPECT_EQ(1u, robot.m_utilityExitCount);
 
   robot.EndCompetition();
   robotThread.join();
@@ -421,107 +399,100 @@ TEST_F(TimedRobotTest, ModeChange) {
   MockRobot robot;
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
 
   // Start in disabled
-  frc::sim::DriverStationSim::SetEnabled(false);
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetTest(false);
-  frc::sim::DriverStationSim::NotifyNewData();
-  frc::sim::StepTiming(0_ms);  // Wait for Notifiers
+  wpi::sim::DriverStationSim::SetEnabled(false);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
-  EXPECT_EQ(0u, robot.m_testInitCount);
+  EXPECT_EQ(0u, robot.m_utilityInitCount);
 
   EXPECT_EQ(0u, robot.m_disabledExitCount);
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
-  EXPECT_EQ(0u, robot.m_testExitCount);
+  EXPECT_EQ(0u, robot.m_utilityExitCount);
 
-  frc::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(1u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
-  EXPECT_EQ(0u, robot.m_testInitCount);
+  EXPECT_EQ(0u, robot.m_utilityInitCount);
 
   EXPECT_EQ(0u, robot.m_disabledExitCount);
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
-  EXPECT_EQ(0u, robot.m_testExitCount);
+  EXPECT_EQ(0u, robot.m_utilityExitCount);
 
   // Transition to autonomous
-  frc::sim::DriverStationSim::SetEnabled(true);
-  frc::sim::DriverStationSim::SetAutonomous(true);
-  frc::sim::DriverStationSim::SetTest(false);
-  frc::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::DriverStationSim::SetEnabled(true);
+  wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::AUTONOMOUS);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
-  frc::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(1u, robot.m_disabledInitCount);
   EXPECT_EQ(1u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
-  EXPECT_EQ(0u, robot.m_testInitCount);
+  EXPECT_EQ(0u, robot.m_utilityInitCount);
 
   EXPECT_EQ(1u, robot.m_disabledExitCount);
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
-  EXPECT_EQ(0u, robot.m_testExitCount);
+  EXPECT_EQ(0u, robot.m_utilityExitCount);
 
   // Transition to teleop
-  frc::sim::DriverStationSim::SetEnabled(true);
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetTest(false);
-  frc::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::DriverStationSim::SetEnabled(true);
+  wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::TELEOPERATED);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
-  frc::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(1u, robot.m_disabledInitCount);
   EXPECT_EQ(1u, robot.m_autonomousInitCount);
   EXPECT_EQ(1u, robot.m_teleopInitCount);
-  EXPECT_EQ(0u, robot.m_testInitCount);
+  EXPECT_EQ(0u, robot.m_utilityInitCount);
 
   EXPECT_EQ(1u, robot.m_disabledExitCount);
   EXPECT_EQ(1u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
-  EXPECT_EQ(0u, robot.m_testExitCount);
+  EXPECT_EQ(0u, robot.m_utilityExitCount);
 
-  // Transition to test
-  frc::sim::DriverStationSim::SetEnabled(true);
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetTest(true);
-  frc::sim::DriverStationSim::NotifyNewData();
+  // Transition to utility
+  wpi::sim::DriverStationSim::SetEnabled(true);
+  wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::UTILITY);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
-  frc::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(1u, robot.m_disabledInitCount);
   EXPECT_EQ(1u, robot.m_autonomousInitCount);
   EXPECT_EQ(1u, robot.m_teleopInitCount);
-  EXPECT_EQ(1u, robot.m_testInitCount);
+  EXPECT_EQ(1u, robot.m_utilityInitCount);
 
   EXPECT_EQ(1u, robot.m_disabledExitCount);
   EXPECT_EQ(1u, robot.m_autonomousExitCount);
   EXPECT_EQ(1u, robot.m_teleopExitCount);
-  EXPECT_EQ(0u, robot.m_testExitCount);
+  EXPECT_EQ(0u, robot.m_utilityExitCount);
 
   // Transition to disabled
-  frc::sim::DriverStationSim::SetEnabled(false);
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetTest(false);
-  frc::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::DriverStationSim::SetEnabled(false);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
-  frc::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(2u, robot.m_disabledInitCount);
   EXPECT_EQ(1u, robot.m_autonomousInitCount);
   EXPECT_EQ(1u, robot.m_teleopInitCount);
-  EXPECT_EQ(1u, robot.m_testInitCount);
+  EXPECT_EQ(1u, robot.m_utilityInitCount);
 
   EXPECT_EQ(1u, robot.m_disabledExitCount);
   EXPECT_EQ(1u, robot.m_autonomousExitCount);
   EXPECT_EQ(1u, robot.m_teleopExitCount);
-  EXPECT_EQ(1u, robot.m_testExitCount);
+  EXPECT_EQ(1u, robot.m_utilityExitCount);
 
   robot.EndCompetition();
   robotThread.join();
@@ -534,22 +505,22 @@ TEST_F(TimedRobotTest, AddPeriodic) {
   robot.AddPeriodic([&] { callbackCount++; }, kPeriod / 2.0);
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
 
-  frc::sim::DriverStationSim::SetEnabled(false);
-  frc::sim::DriverStationSim::NotifyNewData();
-  frc::sim::StepTiming(0_ms);  // Wait for Notifiers
+  wpi::sim::DriverStationSim::SetEnabled(false);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(0u, callbackCount);
 
-  frc::sim::StepTiming(kPeriod / 2.0);
+  wpi::sim::StepTiming(kPeriod / 2.0);
 
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(1u, callbackCount);
 
-  frc::sim::StepTiming(kPeriod / 2.0);
+  wpi::sim::StepTiming(kPeriod / 2.0);
 
   EXPECT_EQ(1u, robot.m_disabledInitCount);
   EXPECT_EQ(1u, robot.m_disabledPeriodicCount);
@@ -573,34 +544,34 @@ TEST_F(TimedRobotTest, AddPeriodicWithOffset) {
   //    2p |    1.25p
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
 
-  frc::sim::DriverStationSim::SetEnabled(false);
-  frc::sim::DriverStationSim::NotifyNewData();
-  frc::sim::StepTiming(0_ms);  // Wait for Notifiers
-
-  EXPECT_EQ(0u, robot.m_disabledInitCount);
-  EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
-  EXPECT_EQ(0u, callbackCount);
-
-  frc::sim::StepTiming(kPeriod * 3.0 / 8.0);
+  wpi::sim::DriverStationSim::SetEnabled(false);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(0u, callbackCount);
 
-  frc::sim::StepTiming(kPeriod * 3.0 / 8.0);
+  wpi::sim::StepTiming(kPeriod * 3.0 / 8.0);
+
+  EXPECT_EQ(0u, robot.m_disabledInitCount);
+  EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
+  EXPECT_EQ(0u, callbackCount);
+
+  wpi::sim::StepTiming(kPeriod * 3.0 / 8.0);
 
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(1u, callbackCount);
 
-  frc::sim::StepTiming(kPeriod / 4.0);
+  wpi::sim::StepTiming(kPeriod / 4.0);
 
   EXPECT_EQ(1u, robot.m_disabledInitCount);
   EXPECT_EQ(1u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(1u, callbackCount);
 
-  frc::sim::StepTiming(kPeriod / 4.0);
+  wpi::sim::StepTiming(kPeriod / 4.0);
 
   EXPECT_EQ(1u, robot.m_disabledInitCount);
   EXPECT_EQ(1u, robot.m_disabledPeriodicCount);
@@ -609,5 +580,3 @@ TEST_F(TimedRobotTest, AddPeriodicWithOffset) {
   robot.EndCompetition();
   robotThread.join();
 }
-
-INSTANTIATE_TEST_SUITE_P(TimedRobotTests, TimedRobotTest, testing::Bool());

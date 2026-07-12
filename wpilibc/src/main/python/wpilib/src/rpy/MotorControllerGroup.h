@@ -1,0 +1,46 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+#include <functional>
+#include <memory>
+#include <vector>
+
+#include "wpi/hardware/motor/MotorController.hpp"
+#include "wpi/util/sendable/Sendable.hpp"
+#include "wpi/util/sendable/SendableHelper.hpp"
+
+namespace wpi {
+
+class PyMotorControllerGroup
+    : public wpi::util::Sendable,
+      public MotorController,
+      public wpi::util::SendableHelper<PyMotorControllerGroup> {
+ public:
+  explicit PyMotorControllerGroup(
+      std::vector<std::shared_ptr<wpi::MotorController>>&& args)
+      : m_motorControllers(args) {}
+  ~PyMotorControllerGroup() override = default;
+
+  PyMotorControllerGroup(PyMotorControllerGroup&&) = default;
+  PyMotorControllerGroup& operator=(PyMotorControllerGroup&&) = default;
+
+  void SetThrottle(double throttle) override;
+  void SetVoltage(wpi::units::volt_t voltage) override;
+  double GetThrottle() const override;
+  void SetInverted(bool isInverted) override;
+  bool GetInverted() const override;
+  void Disable() override;
+
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
+
+ private:
+  void Initialize();
+
+  bool m_isInverted = false;
+  std::vector<std::shared_ptr<wpi::MotorController>> m_motorControllers;
+};
+
+}  // namespace wpi

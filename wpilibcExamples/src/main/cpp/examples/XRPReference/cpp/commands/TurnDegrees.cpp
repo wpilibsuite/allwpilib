@@ -2,24 +2,24 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "commands/TurnDegrees.h"
+#include "commands/TurnDegrees.hpp"
 
 #include <numbers>
 
-#include <units/math.h>
+#include "wpi/units/math.hpp"
 
 void TurnDegrees::Initialize() {
   // Set motors to stop, read encoder values for starting point
-  m_drive->ArcadeDrive(0, 0);
-  m_drive->ResetEncoders();
+  drive->ArcadeDrive(0, 0);
+  drive->ResetEncoders();
 }
 
 void TurnDegrees::Execute() {
-  m_drive->ArcadeDrive(0, m_speed);
+  drive->ArcadeDrive(0, velocity);
 }
 
 void TurnDegrees::End(bool interrupted) {
-  m_drive->ArcadeDrive(0, 0);
+  drive->ArcadeDrive(0, 0);
 }
 
 bool TurnDegrees::IsFinished() {
@@ -30,11 +30,11 @@ bool TurnDegrees::IsFinished() {
   static auto inchPerDegree = (6.102_in * std::numbers::pi) / 360_deg;
 
   // Compare distance traveled from start to distance based on degree turn.
-  return GetAverageTurningDistance() >= inchPerDegree * m_angle;
+  return GetAverageTurningDistance() >= inchPerDegree * angle;
 }
 
-units::meter_t TurnDegrees::GetAverageTurningDistance() {
-  auto l = units::math::abs(m_drive->GetLeftDistance());
-  auto r = units::math::abs(m_drive->GetRightDistance());
+wpi::units::meter_t TurnDegrees::GetAverageTurningDistance() {
+  auto l = wpi::units::math::abs(drive->GetLeftDistance());
+  auto r = wpi::units::math::abs(drive->GetRightDistance());
   return (l + r) / 2;
 }

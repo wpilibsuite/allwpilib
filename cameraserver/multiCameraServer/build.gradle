@@ -5,7 +5,7 @@ plugins {
     id 'visual-studio'
 }
 
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 
 apply from: "${rootDir}/shared/config.gradle"
 
@@ -19,7 +19,7 @@ ext {
 apply from: "${rootDir}/shared/opencv.gradle"
 
 application {
-    mainClass = 'edu.wpi.Main'
+    mainClass = 'org.wpilib.Main'
 }
 
 apply plugin: 'com.gradleup.shadow'
@@ -31,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation libs.gson
 
     implementation project(':wpiutil')
     implementation project(':wpinet')
@@ -61,9 +61,6 @@ model {
                 lib project: ':cscore', library: 'cscore', linkage: 'static'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
-                }
             }
         }
     }

@@ -248,15 +248,15 @@ namespace internal {
 #endif
 
 template <std::size_t I_, class T, std::size_t N>
-constexpr inline T& array_get(std::array<T, N>& a) {
+constexpr T& array_get(std::array<T, N>& a) {
   return (T&)STD_GET_ARR_HACK;
 }
 template <std::size_t I_, class T, std::size_t N>
-constexpr inline T&& array_get(std::array<T, N>&& a) {
+constexpr T&& array_get(std::array<T, N>&& a) {
   return (T&&)STD_GET_ARR_HACK;
 }
 template <std::size_t I_, class T, std::size_t N>
-constexpr inline T const& array_get(std::array<T, N> const& a) {
+constexpr T const& array_get(std::array<T, N> const& a) {
   return (T const&)STD_GET_ARR_HACK;
 }
 

@@ -10,26 +10,31 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validation:
+    name: "Validation"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: gradle/actions/wrapper-validation@v5
+
   build-docker:
     if: (github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/main') || github.event_name != 'schedule'
     strategy:
       fail-fast: false
       matrix:
         include:
-          - container: wpilib/roborio-cross-ubuntu:2025-22.04
-            artifact-name: Athena
-            build-options: "-Ponlylinuxathena"
-          - container: wpilib/raspbian-cross-ubuntu:bookworm-22.04
-            artifact-name: Arm32
-            build-options: "-Ponlylinuxarm32"
-          - container: wpilib/aarch64-cross-ubuntu:bookworm-22.04
+          - container: wpilib/systemcore-cross-debian:trixie
+            artifact-name: Systemcore
+            build-options: "-Ponlylinuxsystemcore"
+          - container: wpilib/aarch64-cross-debian:trixie
             artifact-name: Arm64
             build-options: "-Ponlylinuxarm64"
-          - container: wpilib/ubuntu-base:22.04
+          - container: wpilib/systemcore-cross-debian:trixie
             artifact-name: Linux
             build-options: "-Ponlylinuxx86-64"
     name: "Build - ${{ matrix.artifact-name }}"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
+    needs: [validation]
     steps:
       - name: Free Disk Space
         uses: jlumbroso/free-disk-space@main
@@ -41,18 +46,22 @@ jobs:
           large-packages: false
           docker-images: false
           swap-storage: false
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Build with Gradle
-        uses: addnab/docker-run-action@v3
+        uses: wpilibsuite/docker-run-action@v4
         with:
           image: ${{ matrix.container }}
           options: -v ${{ github.workspace }}:/work -w /work -e GITHUB_REF -e CI
-          run: df . && rm -f semicolon_delimited_script && echo $GITHUB_REF && ./gradlew build -PbuildServer -PskipJavaFormat ${{ matrix.build-options }}
+          # Start avahi-daemon and build
+          run: |
+            service dbus start
+            avahi-daemon -D
+            ./gradlew build -PbuildServer -PskipJavaFormat ${{ matrix.build-options }}
       - name: Check free disk space
         run: df .
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact-name }}
           path: build/allOutputs
@@ -89,29 +98,31 @@ jobs:
             build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64"
             task: "copyAllOutputs"
             outputs: "build/allOutputs"
-          - os: macOS-14
+          - os: macOS-15
             artifact-name: macOS
             architecture: aarch64
             task: "build"
             outputs: "build/allOutputs"
           - os: windows-2022
-            artifact-name: Win32
-            architecture: x86
+            artifact-name: Win64FFI
+            architecture: x64
             task: ":ntcoreffi:build"
+            build-options: "-Pntcoreffibuild -Pbuildwinarm64"
             outputs: "ntcoreffi/build/outputs"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
+    needs: [validation]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 25
           architecture: ${{ matrix.architecture }}
       - name: Import Developer ID Certificate
-        uses: wpilibsuite/import-signing-certificate@v2
+        uses: wpilibsuite/import-signing-certificate@v3
         with:
           certificate-data: ${{ secrets.APPLE_CERTIFICATE_DATA }}
           certificate-passphrase: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
@@ -122,16 +133,14 @@ jobs:
         run: security set-keychain-settings -lut 21600
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/main')
-      - name: Set Java Heap Size
-        run: sed -i 's/-Xmx2g/-Xmx1g/g' gradle.properties
-        if: matrix.artifact-name == 'Win32'
       - name: Check disk free space (Windows)
+        if: runner.os == 'Windows'
         run: wmic logicaldisk get caption, freespace
-        if: matrix.os == 'windows-2022'
       - name: Check disk free space pre-cleanup (macOS)
+        if: runner.os == 'macOS'
         run: df -h .
-        if: matrix.os == 'macOS-14'
       - name: Cleanup disk space
+        if: runner.os == 'macOS'
         # CodeQL: 5G
         # go: 748M
         # Android: 12G
@@ -139,10 +148,9 @@ jobs:
           rm -rf /Users/runner/hostedtoolcache/CodeQL
           rm -rf /Users/runner/hostedtoolcache/go
           rm -rf /Users/runner/Library/Android
-        if: matrix.os == 'macOS-14'
       - name: Check disk free space post-cleanup (macOS)
+        if: runner.os == 'macOS'
         run: df -h .
-        if: matrix.os == 'macOS-14'
       - name: Build with Gradle
         run: ./gradlew ${{ matrix.task }} -PbuildServer -PskipJavaFormat ${{ matrix.build-options }}
       - name: Sign Libraries with Developer ID
@@ -150,12 +158,12 @@ jobs:
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/main')
       - name: Check disk free space (Windows)
+        if: runner.os == 'Windows'
         run: wmic logicaldisk get caption, freespace
-        if: matrix.os == 'windows-2022'
       - name: Check disk free space (macOS)
+        if: runner.os == 'macOS'
         run: df -h .
-        if: matrix.os == 'macOS-14'
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact-name }}
           path: ${{ matrix.outputs }}

@@ -44,7 +44,6 @@ Utilizing tagged data blocks allows us to send multiple pieces of data in a sing
 | 0x14 | [DIO](#dio)                   |
 | 0x15 | [AnalogIn](#analogin)         |
 | 0x16 | [XRPGyro](#xrpgyro)           |
-| 0x17 | [BuiltInAccel](#builtinaccel) |
 | 0x18 | [Encoder](#encoder)           |
 
 
@@ -100,14 +99,6 @@ IDs:
 | 3     | _float_   | angle_x (deg) |
 | 4     | _float_   | angle_y (deg) |
 | 5     | _float_   | angle_z (deg) |
-
-#### BuiltInAccel
-
-| Order | Data Type | Description |
-|-------|-----------|-------------|
-| 0     | _float_   | accel_x (g) |
-| 1     | _float_   | accel_y (g) |
-| 2     | _float_   | accel_z (g) |
 
 #### Encoder
 

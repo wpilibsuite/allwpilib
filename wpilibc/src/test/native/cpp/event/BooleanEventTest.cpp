@@ -2,14 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <atomic>
+#include "wpi/event/BooleanEvent.hpp"
 
 #include <gtest/gtest.h>
 
-#include "frc/event/BooleanEvent.h"
-#include "frc/event/EventLoop.h"
+#include "wpi/event/EventLoop.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 TEST(BooleanEventTest, BinaryCompositions) {
   EventLoop loop;

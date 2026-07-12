@@ -1,0 +1,298 @@
+MOSTROBOTPY_PROJECTS = [
+    struct(
+        wpilib_name = "apriltag",
+        robotpy_name = "robotpy-apriltag",
+        native_robotpy_name = "robotpy-native-apriltag",
+        has_tests = True,
+    ),
+    struct(
+        wpilib_name = "commandsv2",
+        robotpy_name = "robotpy-commands-v2",
+        native_robotpy_name = None,
+        has_tests = True,
+    ),
+    struct(
+        wpilib_name = "datalog",
+        robotpy_name = "robotpy-wpilog",
+        native_robotpy_name = "robotpy-native-datalog",
+        has_tests = True,
+    ),
+    struct(
+        wpilib_name = "hal",
+        robotpy_name = "robotpy-hal",
+        native_robotpy_name = "robotpy-native-wpihal",
+        has_tests = True,
+    ),
+    struct(
+        wpilib_name = "ntcore",
+        robotpy_name = "pyntcore",
+        native_robotpy_name = "robotpy-native-ntcore",
+        has_tests = True,
+    ),
+    struct(
+        wpilib_name = "romiVendordep",
+        robotpy_name = "robotpy-romi",
+        native_robotpy_name = "robotpy-native-romi",
+        has_tests = True,
+    ),
+    struct(
+        wpilib_name = "wpilibc",
+        robotpy_name = "robotpy-wpilib",
+        native_robotpy_name = "robotpy-native-wpilib",
+        has_tests = True,
+    ),
+    struct(
+        wpilib_name = "wpimath",
+        robotpy_name = "robotpy-wpimath",
+        native_robotpy_name = "robotpy-native-wpimath",
+        has_tests = True,
+    ),
+    struct(
+        wpilib_name = "wpinet",
+        robotpy_name = "robotpy-wpinet",
+        native_robotpy_name = "robotpy-native-wpinet",
+        has_tests = True,
+    ),
+    struct(
+        wpilib_name = "wpiutil",
+        robotpy_name = "robotpy-wpiutil",
+        native_robotpy_name = "robotpy-native-wpiutil",
+        has_tests = True,
+    ),
+    struct(
+        wpilib_name = "xrpVendordep",
+        robotpy_name = "robotpy-xrp",
+        native_robotpy_name = "robotpy-native-xrp",
+        has_tests = True,
+    ),
+    struct(
+        wpilib_name = "simulation/halsim_ds_socket",
+        robotpy_name = "robotpy-halsim-ds-socket",
+        native_robotpy_name = None,
+        has_tests = True,
+    ),
+    struct(
+        wpilib_name = "simulation/halsim_gui",
+        robotpy_name = "robotpy-halsim-gui",
+        native_robotpy_name = None,
+        has_tests = True,
+    ),
+    struct(
+        wpilib_name = "simulation/halsim_ws_core",
+        robotpy_name = "robotpy-halsim-ws",
+        native_robotpy_name = None,
+        has_tests = True,
+    ),
+]
+
+IGNORED_MOSTROBOTPY_PROJECTS = [
+    "subprojects/robotpy-cscore",
+]
+
+def define_mostrobotpy_to_allwpilib():
+    origin_files = []
+    destination_files = []
+    transformations = []
+
+    rename_transforms = []
+
+    # "Zero Out" high churn values. These get replaced automatically in the
+    # allwpilib -> mostrobotpy direction
+    rename_transforms.append(core.replace(
+        before = 'version = "${version}"',
+        after = 'version = "0.0.0"',
+        regex_groups = {"version": ".*"},
+        paths = glob(["**/*.toml"]),
+    ))
+    rename_transforms.append(core.replace(
+        before = 'repo_url = "${repo_url}"',
+        after = 'repo_url = ""',
+        regex_groups = {"repo_url": ".*"},
+        paths = glob(["**/*.toml"]),
+    ))
+
+    EXCLUDES = ["**/meson.build", "**/.gitignore", "**/requirements.txt", "**/.gittrack", "**/.gittrackexclude", "**/run_tests.py"]
+
+    for project_info in MOSTROBOTPY_PROJECTS:
+        project_excludes = EXCLUDES
+        if project_info.wpilib_name == "commandsv2":
+            project_excludes = project_excludes + ["subprojects/robotpy-commands-v2/tools/hids/**"]
+
+        origin_files += glob([
+            "subprojects/" + project_info.robotpy_name + "/**",
+        ], exclude = project_excludes)
+
+        rename_transforms.append(core.replace(
+            before = '"' + project_info.robotpy_name + '==${version}"',
+            after = '"{}==0.0.0"'.format(project_info.robotpy_name),
+            regex_groups = {"version": ".*"},
+            paths = glob(["**/*.toml"]),
+        ))
+
+        if project_info.native_robotpy_name:
+            origin_files += glob([
+                "subprojects/" + project_info.native_robotpy_name + "/pyproject.toml",
+            ], exclude = EXCLUDES)
+
+            rename_transforms.append(core.replace(
+                before = '"' + project_info.native_robotpy_name + '==${version}"',
+                after = '"{}==0.0.0"'.format(project_info.native_robotpy_name),
+                regex_groups = {"version": ".*"},
+                paths = glob(["**/*.toml"]),
+            ))
+
+        destination_files += glob([
+            project_info.wpilib_name + "/src/main/python/**",
+            project_info.wpilib_name + "/src/test/python/**",
+        ], exclude = [project_info.wpilib_name + "/src/main/python/examples/**"])
+
+        if project_info.has_tests:
+            transformations.append(core.move("subprojects/" + project_info.robotpy_name + "/tests", project_info.wpilib_name + "/src/test/python"))
+        if project_info.native_robotpy_name:
+            transformations.append(core.move("subprojects/" + project_info.native_robotpy_name + "/pyproject.toml", "subprojects/" + project_info.native_robotpy_name + "/native-pyproject.toml"))
+        transformations.append(core.move("subprojects/" + project_info.robotpy_name, project_info.wpilib_name + "/src/main/python"))
+        if project_info.native_robotpy_name:
+            transformations.append(core.move("subprojects/" + project_info.native_robotpy_name + "/native-pyproject.toml", project_info.wpilib_name + "/src/main/python/native-pyproject.toml"))
+
+        rename_transforms.append(core.replace(
+            before = '"wpilib==${version}"',
+            after = '"wpilib==0.0.0"',
+            regex_groups = {"version": ".*"},
+            paths = glob(["**/*.toml"]),
+        ))
+
+        rename_transforms.append(core.replace(
+            before = 'version = "0.0.0"',
+            after = 'version = "0.0.1"',
+            paths = ["subprojects/robotpy-wpiutil/tests/cpp/pyproject.toml"],
+        ))
+        rename_transforms.append(core.replace(
+            before = 'version = "0.0.0"',
+            after = 'version = "0.1"',
+            paths = ["subprojects/robotpy-wpimath/tests/cpp/pyproject.toml"],
+        ))
+
+        transformations = [core.transform(rename_transforms, noop_behavior = "IGNORE_NOOP", reversal = [])] + transformations
+
+    # Examples aren't as complicated
+    origin_files += glob([
+        "examples/robot/**",
+    ], exclude = EXCLUDES)
+    destination_files += glob(["robotpyExamples/**"], exclude = ["robotpyExamples/define_examples.bzl", "robotpyExamples/example_projects.bzl", "robotpyExamples/generate_bazel_files.py", "robotpyExamples/BUILD.bazel"])
+    transformations.append(core.move("examples/robot/", "robotpyExamples/examples"))
+
+    origin_files += glob([
+        "snippets/robot/**",
+    ], exclude = EXCLUDES)
+    destination_files += glob(["robotpyExamples/**"], exclude = ["robotpyExamples/define_examples.bzl", "robotpyExamples/example_projects.bzl", "robotpyExamples/generate_bazel_files.py", "robotpyExamples/BUILD.bazel"])
+    transformations.append(core.move("snippets/robot/", "robotpyExamples/snippets"))
+
+    # Some tests seem to fail in mostrobotpy, but don't in allwpilib
+    # We will leave them turned on in allwpilib, and mark them as xfail in mostrobotpy.
+    transformations.append(core.replace(
+        before = '@pytest.mark.xfail(reason="wpilib bug")',
+        after = '# @pytest.mark.xfail(reason="wpilib bug")',
+        paths = glob(["**/src/test/python**/*.py"]),
+    ))
+
+    core.workflow(
+        name = "mostrobotpy_to_allwpilib",
+        origin = git.origin(
+            url = "https://github.com/robotpy/mostrobotpy.git",
+            ref = "main",
+        ),
+        destination = git.destination(
+            url = "https://github.com/OVERRIDE_ME/OVERRIDE_ME",
+            fetch = "main",
+            push = "copybara_mostrobotpy_to_allwpilib",
+        ),
+        destination_files = destination_files,
+        origin_files = origin_files,
+        authoring = authoring.pass_thru("Default email <default@default.com>"),
+        transformations = transformations,
+    )
+
+def define_allwpilib_to_mostrobotpy():
+    ignored_project_exclude = [p + "/**" for p in IGNORED_MOSTROBOTPY_PROJECTS] + [p + "/examples/**" for p in IGNORED_MOSTROBOTPY_PROJECTS]
+    origin_files = []
+    destination_files = glob(["**"], exclude = ["*", ".github/**", "docs/**", "**/.gitignore", "**/meson.build", "**/requirements.txt", "devtools/**", "examples/cscore/**", "examples/datalog/**", "examples/ntcore/**", "examples/wpinet/**", "examples/robot/.gitignore", "subprojects/robotpy-commands-v2/tools/hids/**", "examples/CONTRIBUTING.md", "examples/check_header.py", "**/run_tests.py", "subprojects/robotpy-native-wpihal/tests/test_imports.py"] + ignored_project_exclude)
+    transformations = []
+
+    for project_info in MOSTROBOTPY_PROJECTS:
+        origin_files += glob([
+            project_info.wpilib_name + "/src/main/python/**",
+            project_info.wpilib_name + "/src/test/python/**",
+        ], exclude = [
+            project_info.wpilib_name + "/src/main/python/examples/**",
+        ])
+
+        if project_info.has_tests:
+            transformations.append(core.move(project_info.wpilib_name + "/src/test/python", "subprojects/" + project_info.robotpy_name + "/tests"))
+        transformations.append(core.move(project_info.wpilib_name + "/src/main/python", "subprojects/" + project_info.robotpy_name))
+        if project_info.native_robotpy_name:
+            transformations.append(core.move("subprojects/" + project_info.robotpy_name + "/native-pyproject.toml", "subprojects/" + project_info.native_robotpy_name + "/pyproject.toml"))
+
+    origin_files += [
+        "commandsv2/generate_hids.py",
+        "commandsv2/src/generate/main/python/first_ds_commandhid.py.jinja",
+        "wpilibj/src/generate/first_ds_hids.json",
+        "wpilibj/src/generate/first_ds_hids.schema.json",
+    ]
+    destination_files += [
+        "subprojects/robotpy-commands-v2/tools/hids/generate_hids.py",
+        "subprojects/robotpy-commands-v2/tools/hids/templates/main/python/first_ds_commandhid.py.jinja",
+        "subprojects/robotpy-commands-v2/tools/hids/first_ds_hids.json",
+        "subprojects/robotpy-commands-v2/tools/hids/first_ds_hids.schema.json",
+    ]
+    transformations.append(core.move(
+        "commandsv2/generate_hids.py",
+        "subprojects/robotpy-commands-v2/tools/hids/generate_hids.py",
+    ))
+    transformations.append(core.move(
+        "commandsv2/src/generate/main/python/first_ds_commandhid.py.jinja",
+        "subprojects/robotpy-commands-v2/tools/hids/templates/main/python/first_ds_commandhid.py.jinja",
+    ))
+    transformations.append(core.move(
+        "wpilibj/src/generate/first_ds_hids.json",
+        "subprojects/robotpy-commands-v2/tools/hids/first_ds_hids.json",
+    ))
+    transformations.append(core.move(
+        "wpilibj/src/generate/first_ds_hids.schema.json",
+        "subprojects/robotpy-commands-v2/tools/hids/first_ds_hids.schema.json",
+    ))
+
+    origin_files += glob([
+        "robotpyExamples/**",
+    ], exclude = ["robotpyExamples/BUILD.bazel", "robotpyExamples/define_examples.bzl", "robotpyExamples/example_projects.bzl", "robotpyExamples/generate_bazel_files.py"])
+    destination_files += glob(["examples/robot/**"], exclude = ["examples/robot/.gitignore"])
+    destination_files += glob(["examples/snippets/**"], exclude = ["examples/snippets/.gitignore"])
+    transformations.append(core.move("robotpyExamples/examples", "examples/robot/"))
+    transformations.append(core.move("robotpyExamples/snippets", "snippets/robot/"))
+
+    # Some tests seem to fail in mostrobotpy, but don't in allwpilib
+    # We will leave them turned on in allwpilib, and mark them as xfail in mostrobotpy.
+    transformations.append(core.replace(
+        before = '# @pytest.mark.xfail(reason="wpilib bug")',
+        after = '@pytest.mark.xfail(reason="wpilib bug")',
+        paths = glob(["**/tests**/*.py"]),
+    ))
+
+    core.workflow(
+        name = "allwpilib_to_mostrobotpy",
+        origin = git.origin(
+            url = "https://github.com/wpilibsuite/allwpilib.git",
+            ref = "main",
+        ),
+        destination = git.github_destination(
+            url = "https://github.com/OVERRIDE_ME/OVERRIDE_ME",
+            fetch = "main",
+            push = "copybara_allwpilib_to_mostrobotpy",
+        ),
+        destination_files = destination_files,
+        origin_files = origin_files,
+        authoring = authoring.pass_thru("Default email <default@default.com>"),
+        transformations = transformations,
+    )
+
+define_mostrobotpy_to_allwpilib()
+define_allwpilib_to_mostrobotpy()

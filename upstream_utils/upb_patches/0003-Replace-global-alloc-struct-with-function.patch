@@ -1,0 +1,73 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Sat, 24 May 2025 23:17:42 -0400
+Subject: [PATCH 3/5] Replace global alloc struct with function
+
+---
+ upb/mem/alloc.c | 5 ++++-
+ upb/mem/alloc.h | 8 ++++----
+ upb/mem/arena.h | 4 ++--
+ 3 files changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/upb/mem/alloc.c b/upb/mem/alloc.c
+index 3d70ee768c2473f84129e32c24c6cf3a7f78abef..bb1a635d2926fafa3b4f7dad677dbea482cea2ed 100644
+--- a/upb/mem/alloc.c
++++ b/upb/mem/alloc.c
+@@ -25,4 +25,7 @@ static void* upb_global_allocfunc(upb_alloc* alloc, void* ptr, size_t oldsize,
+   }
+ }
+ 
+-upb_alloc upb_alloc_global = {&upb_global_allocfunc};
++upb_alloc alloc = {&upb_global_allocfunc};
++upb_alloc* upb_alloc_global(void) {
++  return &alloc;
++}
+diff --git a/upb/mem/alloc.h b/upb/mem/alloc.h
+index 04da2337b498cd204b6d196e8b3ddc6ec9e66a7a..d4d7142569469868fd9a241bb0f0169b9918129f 100644
+--- a/upb/mem/alloc.h
++++ b/upb/mem/alloc.h
+@@ -76,7 +76,7 @@ UPB_INLINE void upb_free_sized(upb_alloc* alloc, void* ptr, size_t size) {
+ 
+ // The global allocator used by upb. Uses the standard malloc()/free().
+ 
+-extern upb_alloc upb_alloc_global;
++upb_alloc* upb_alloc_global(void);
+ 
+ /* Functions that hard-code the global malloc.
+  *
+@@ -84,14 +84,14 @@ extern upb_alloc upb_alloc_global;
+  * allocator, like injecting out-of-memory faults in debug/testing builds. */
+ 
+ UPB_INLINE void* upb_gmalloc(size_t size) {
+-  return upb_malloc(&upb_alloc_global, size);
++  return upb_malloc(upb_alloc_global(), size);
+ }
+ 
+ UPB_INLINE void* upb_grealloc(void* ptr, size_t oldsize, size_t size) {
+-  return upb_realloc(&upb_alloc_global, ptr, oldsize, size);
++  return upb_realloc(upb_alloc_global(), ptr, oldsize, size);
+ }
+ 
+-UPB_INLINE void upb_gfree(void* ptr) { upb_free(&upb_alloc_global, ptr); }
++UPB_INLINE void upb_gfree(void* ptr) { upb_free(upb_alloc_global(), ptr); }
+ 
+ #ifdef __cplusplus
+ } /* extern "C" */
+diff --git a/upb/mem/arena.h b/upb/mem/arena.h
+index 614ac2e043296a8993f0ac055040ea821c130fd9..24dd3830c2b0b6d403df132062e7a78903c201af 100644
+--- a/upb/mem/arena.h
++++ b/upb/mem/arena.h
+@@ -78,11 +78,11 @@ uintptr_t upb_Arena_SpaceAllocated(const upb_Arena* a, size_t* fused_count);
+ uint32_t upb_Arena_DebugRefCount(const upb_Arena* a);
+ 
+ UPB_API_INLINE upb_Arena* upb_Arena_New(void) {
+-  return upb_Arena_Init(NULL, 0, &upb_alloc_global);
++  return upb_Arena_Init(NULL, 0, upb_alloc_global());
+ }
+ 
+ UPB_API_INLINE upb_Arena* upb_Arena_NewSized(size_t size_hint) {
+-  return upb_Arena_Init(NULL, size_hint, &upb_alloc_global);
++  return upb_Arena_Init(NULL, size_hint, upb_alloc_global());
+ }
+ 
+ UPB_API_INLINE void* upb_Arena_Malloc(struct upb_Arena* a, size_t size);
