@@ -249,7 +249,7 @@ bool SaveWindowStorageImpl(const std::string& filename) {
                    ec.message().c_str());
     return false;
   }
-  WindowToJson().marshal(os, true, 2);
+  WindowToJson().marshal(os, true);
   os << '\n';
   return true;
 }
@@ -263,7 +263,7 @@ static bool SaveStorageRootImpl(Context* ctx, const std::string& filename,
                    ec.message().c_str());
     return false;
   }
-  storage.ToJson().marshal(os, true, 2);
+  storage.ToJson().marshal(os, true);
   os << '\n';
   return true;
 }
