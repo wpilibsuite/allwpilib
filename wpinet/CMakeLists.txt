@@ -26,6 +26,7 @@ list(REMOVE_ITEM wpinet_native_src ${wpinet_jni_src})
 file(GLOB_RECURSE wpinet_unix_src src/main/native/unix/*.cpp)
 file(GLOB_RECURSE wpinet_linux_src src/main/native/linux/*.cpp)
 file(GLOB_RECURSE wpinet_macos_src src/main/native/macOS/*.cpp src/main/native/macOS/*.mm)
+file(GLOB_RECURSE wpinet_macos_objcxx_src src/main/native/macOS/*.mm)
 file(GLOB_RECURSE wpinet_windows_src src/main/native/windows/*.cpp)
 
 file(GLOB uv_native_src src/main/native/thirdparty/libuv/src/*.cpp)
@@ -128,10 +129,14 @@ endif()
 
 if(MSVC)
     target_sources(wpinet PRIVATE ${wpinet_windows_src})
+    target_link_libraries(wpinet PUBLIC windowsapp)
 else()
     target_sources(wpinet PRIVATE ${wpinet_unix_src})
     if(APPLE)
-        target_compile_options(wpinet PRIVATE -fobjc-arc)
+        set_source_files_properties(
+            ${wpinet_macos_objcxx_src}
+            PROPERTIES COMPILE_FLAGS "-fobjc-arc"
+        )
         set_target_properties(
             wpinet
             PROPERTIES LINK_FLAGS "-framework CoreBluetooth -framework Foundation"

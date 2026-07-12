@@ -8,8 +8,11 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <algorithm>
+#include <array>
 #include <cerrno>
 #include <cstring>
+#include <limits>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -37,6 +40,28 @@ constexpr int kBtSecurity = 4;
 constexpr uint8_t kBtSecurityLow = 1;
 constexpr uint8_t kBdaddrLePublic = 0x01;
 constexpr uint8_t kBdaddrLeRandom = 0x02;
+constexpr uint16_t kL2capCidAtt = 0x0004;
+
+constexpr uint16_t kDefaultAttMtu = 23;
+constexpr uint16_t kMaxAttMtu = 517;
+constexpr uint8_t kAttOpErrorResponse = 0x01;
+constexpr uint8_t kAttOpExchangeMtuRequest = 0x02;
+constexpr uint8_t kAttOpExchangeMtuResponse = 0x03;
+constexpr uint8_t kAttOpFindInformationRequest = 0x04;
+constexpr uint8_t kAttOpFindInformationResponse = 0x05;
+constexpr uint8_t kAttOpFindByTypeValueRequest = 0x06;
+constexpr uint8_t kAttOpFindByTypeValueResponse = 0x07;
+constexpr uint8_t kAttOpReadByTypeRequest = 0x08;
+constexpr uint8_t kAttOpReadByTypeResponse = 0x09;
+constexpr uint8_t kAttOpWriteRequest = 0x12;
+constexpr uint8_t kAttOpWriteResponse = 0x13;
+constexpr uint8_t kAttOpNotification = 0x1b;
+constexpr uint8_t kAttOpWriteCommand = 0x52;
+constexpr uint8_t kAttErrorAttributeNotFound = 0x0a;
+
+constexpr uint16_t kGattPrimaryServiceUuid = 0x2800;
+constexpr uint16_t kGattCharacteristicUuid = 0x2803;
+constexpr uint16_t kGattClientCharacteristicConfigUuid = 0x2902;
 
 #ifndef MSG_NOSIGNAL
 constexpr int MSG_NOSIGNAL = 0;
@@ -106,6 +131,44 @@ bool ParseBluetoothAddress(std::string_view address, bdaddr_t* out) {
   return true;
 }
 
+bool ParseUuid128(std::string_view uuid, std::array<uint8_t, 16>* out) {
+  if (uuid.size() != 36) {
+    return false;
+  }
+
+  std::array<uint8_t, 16> bigEndian{};
+  size_t byteIndex = 0;
+  for (size_t i = 0; i < uuid.size();) {
+    if (i == 8 || i == 13 || i == 18 || i == 23) {
+      if (uuid[i] != '-') {
+        return false;
+      }
+      ++i;
+      continue;
+    }
+
+    if (i + 1 >= uuid.size() || byteIndex >= bigEndian.size()) {
+      return false;
+    }
+
+    int high = HexDigit(uuid[i]);
+    int low = HexDigit(uuid[i + 1]);
+    if (high < 0 || low < 0) {
+      return false;
+    }
+
+    bigEndian[byteIndex++] = static_cast<uint8_t>((high << 4) | low);
+    i += 2;
+  }
+
+  if (byteIndex != bigEndian.size()) {
+    return false;
+  }
+
+  std::reverse_copy(bigEndian.begin(), bigEndian.end(), out->begin());
+  return true;
+}
+
 int SetCloseOnExecAndNonBlock(int fd) {
   int flags = fcntl(fd, F_GETFD, 0);
   if (flags < 0 || fcntl(fd, F_SETFD, flags | FD_CLOEXEC) < 0) {
@@ -126,6 +189,44 @@ std::string ErrnoString(std::string_view prefix) {
   error.append(std::strerror(errno));
   return error;
 }
+
+uint16_t ReadLe16(const uint8_t* data) {
+  return static_cast<uint16_t>(data[0]) | static_cast<uint16_t>(data[1] << 8);
+}
+
+void AppendLe16(std::vector<uint8_t>* data, uint16_t value) {
+  data->push_back(static_cast<uint8_t>(value & 0xff));
+  data->push_back(static_cast<uint8_t>(value >> 8));
+}
+
+void AppendUuid16(std::vector<uint8_t>* data, uint16_t uuid) {
+  AppendLe16(data, uuid);
+}
+
+bool Uuid128Equals(std::span<const uint8_t> value,
+                   const std::array<uint8_t, 16>& uuid) {
+  return value.size() == uuid.size() &&
+         std::equal(value.begin(), value.end(), uuid.begin());
+}
+
+enum class LinuxBluetoothTransport { kNone, kL2CAP, kGATT };
+
+enum class GattDiscoveryState {
+  kIdle,
+  kWaitMtuResponse,
+  kWaitServiceResponse,
+  kWaitCharacteristicResponse,
+  kWaitDescriptorResponse,
+  kWaitCccdWriteResponse,
+  kConnected
+};
+
+struct GattCharacteristicInfo {
+  uint16_t declarationHandle = 0;
+  uint16_t valueHandle = 0;
+  bool hasUuid128 = false;
+  std::array<uint8_t, 16> uuid128{};
+};
 
 }  // namespace
 
@@ -164,7 +265,7 @@ class BluetoothL2CAPClient::Impl
       SetError("No Bluetooth address configured");
       return false;
     }
-    if (config.psm == 0) {
+    if (config.preferL2CAP && config.psm == 0) {
       SetError("No Bluetooth L2CAP PSM configured");
       return false;
     }
@@ -176,9 +277,11 @@ class BluetoothL2CAPClient::Impl
       m_status.addressType = config.addressType;
       m_status.targetConfigured = true;
       m_status.error.clear();
-      m_status.status = "Connecting";
+      m_status.status =
+          config.preferL2CAP ? "Connecting (L2CAP)" : "Connecting (GATT)";
       m_status.connecting = true;
       m_status.connected = false;
+      m_status.transport = BluetoothPacketTransport::kNone;
     }
     PublishStatus();
 
@@ -236,19 +339,19 @@ class BluetoothL2CAPClient::Impl
       SetError("Bluetooth address must use the form AA:BB:CC:DD:EE:FF");
       return;
     }
+    m_remoteAddress = remoteAddress;
 
-    int fd = ::socket(kAfBluetooth, SOCK_SEQPACKET, kBluetoothProtocolL2cap);
-    if (fd < 0) {
-      SetError(ErrnoString("Failed to create Bluetooth L2CAP socket"));
-      return;
+    if (config.preferL2CAP) {
+      ConnectL2CAPOnLoop(config, remoteAddress);
+    } else {
+      ConnectGattOnLoop(config, remoteAddress);
     }
+  }
 
-    m_socket = fd;
-
+  bool ConfigureBluetoothSocket(int fd, std::string_view transportName) {
     if (SetCloseOnExecAndNonBlock(fd) < 0) {
       SetError(ErrnoString("Failed to configure Bluetooth socket"));
-      CloseOnLoop("Disconnected");
-      return;
+      return false;
     }
 
     bt_security security{};
@@ -256,17 +359,69 @@ class BluetoothL2CAPClient::Impl
     if (::setsockopt(fd, kSolBluetooth, kBtSecurity, &security,
                      sizeof(security)) < 0) {
       SetError(ErrnoString("Failed to configure Bluetooth security"));
-      CloseOnLoop("Disconnected");
-      return;
+      return false;
     }
 
     sockaddr_l2 localAddr{};
     localAddr.l2_family = kAfBluetooth;
     localAddr.l2_bdaddr_type = kBdaddrLePublic;
+    if (m_activeTransport == LinuxBluetoothTransport::kGATT) {
+      localAddr.l2_cid = HostToLe16(kL2capCidAtt);
+    }
     if (::bind(fd, reinterpret_cast<sockaddr*>(&localAddr), sizeof(localAddr)) <
         0) {
-      SetError(ErrnoString("Failed to bind Bluetooth socket"));
-      CloseOnLoop("Disconnected");
+      SetError(ErrnoString(std::string{"Failed to bind Bluetooth "}
+                               .append(transportName)
+                               .append(" socket")));
+      return false;
+    }
+
+    return true;
+  }
+
+  bool StartSocketPoll(int fd) {
+    m_poll = uv::Poll::Create(m_loop, fd);
+    if (!m_poll) {
+      SetError("Failed to create Bluetooth socket poll handle");
+      return false;
+    }
+
+    auto self = shared_from_this();
+    m_poll->pollEvent.connect([self](int events) {
+      if ((events & UV_DISCONNECT) != 0) {
+        self->CloseOnLoop("Bluetooth connection closed");
+        return;
+      }
+      if ((events & UV_WRITABLE) != 0) {
+        self->CheckConnect();
+      }
+      if ((events & UV_READABLE) != 0) {
+        if (self->m_activeTransport == LinuxBluetoothTransport::kGATT) {
+          self->ReadGattPackets();
+        } else {
+          self->ReadPackets();
+        }
+      }
+    });
+
+    return true;
+  }
+
+  void ConnectL2CAPOnLoop(const BluetoothL2CAPClientConfig& config,
+                          const bdaddr_t& remoteAddress) {
+    m_activeTransport = LinuxBluetoothTransport::kL2CAP;
+
+    int fd = ::socket(kAfBluetooth, SOCK_SEQPACKET, kBluetoothProtocolL2cap);
+    if (fd < 0) {
+      BeginGattFallback(ErrnoString("Failed to create Bluetooth L2CAP socket"),
+                        config, remoteAddress);
+      return;
+    }
+
+    m_socket = fd;
+
+    if (!ConfigureBluetoothSocket(fd, "L2CAP")) {
+      BeginGattFallback(GetStatus().error, config, remoteAddress);
       return;
     }
 
@@ -281,33 +436,17 @@ class BluetoothL2CAPClient::Impl
     int result = ::connect(fd, reinterpret_cast<sockaddr*>(&remoteAddr),
                            sizeof(remoteAddr));
     if (result < 0 && errno != EINPROGRESS) {
-      SetError(ErrnoString("Failed to connect Bluetooth L2CAP socket"));
-      CloseOnLoop("Disconnected");
+      BeginGattFallback(ErrnoString("Failed to connect Bluetooth L2CAP socket"),
+                        config, remoteAddress);
       return;
     }
 
-    m_poll = uv::Poll::Create(m_loop, fd);
-    if (!m_poll) {
-      SetError("Failed to create Bluetooth socket poll handle");
-      CloseOnLoop("Disconnected");
+    if (!StartSocketPoll(fd)) {
+      BeginGattFallback(GetStatus().error, config, remoteAddress);
       return;
     }
 
-    auto self = shared_from_this();
-    m_poll->pollEvent.connect([self](int events) {
-      if ((events & UV_DISCONNECT) != 0) {
-        self->CloseOnLoop("Bluetooth connection closed");
-        return;
-      }
-      if ((events & UV_WRITABLE) != 0) {
-        self->CheckConnect();
-      }
-      if ((events & UV_READABLE) != 0) {
-        self->ReadPackets();
-      }
-    });
-
-    SetConnecting();
+    SetConnecting("Connecting (L2CAP)");
 
     if (result == 0) {
       CheckConnect();
@@ -316,7 +455,78 @@ class BluetoothL2CAPClient::Impl
     }
   }
 
-  void CloseOnLoop(std::string_view reason) {
+  void ConnectGattOnLoop(const BluetoothL2CAPClientConfig& config,
+                         const bdaddr_t& remoteAddress) {
+    if (!ParseUuid128(config.gattServiceUuid, &m_gattServiceUuid) ||
+        !ParseUuid128(config.gattControlCharacteristicUuid,
+                      &m_gattControlCharacteristicUuid) ||
+        !ParseUuid128(config.gattStatusCharacteristicUuid,
+                      &m_gattStatusCharacteristicUuid)) {
+      SetError("Bluetooth GATT UUIDs must use 128-bit UUID string form");
+      return;
+    }
+
+    m_activeTransport = LinuxBluetoothTransport::kGATT;
+    ResetGattDiscovery();
+
+    int fd = ::socket(kAfBluetooth, SOCK_SEQPACKET, kBluetoothProtocolL2cap);
+    if (fd < 0) {
+      SetError(ErrnoString("Failed to create Bluetooth GATT socket"));
+      return;
+    }
+
+    m_socket = fd;
+
+    if (!ConfigureBluetoothSocket(fd, "GATT")) {
+      CloseSocket();
+      return;
+    }
+
+    sockaddr_l2 remoteAddr{};
+    remoteAddr.l2_family = kAfBluetooth;
+    remoteAddr.l2_cid = HostToLe16(kL2capCidAtt);
+    remoteAddr.l2_bdaddr = remoteAddress;
+    remoteAddr.l2_bdaddr_type =
+        config.addressType == BluetoothAddressType::kPublic ? kBdaddrLePublic
+                                                            : kBdaddrLeRandom;
+
+    int result = ::connect(fd, reinterpret_cast<sockaddr*>(&remoteAddr),
+                           sizeof(remoteAddr));
+    if (result < 0 && errno != EINPROGRESS) {
+      SetError(ErrnoString("Failed to connect Bluetooth GATT socket"));
+      CloseSocket();
+      return;
+    }
+
+    if (!StartSocketPoll(fd)) {
+      CloseSocket();
+      return;
+    }
+
+    SetConnecting("Connecting (GATT)");
+
+    if (result == 0) {
+      CheckConnect();
+    } else {
+      m_poll->Start(UV_WRITABLE | UV_DISCONNECT);
+    }
+  }
+
+  void BeginGattFallback(std::string_view l2capError,
+                         const BluetoothL2CAPClientConfig& config,
+                         const bdaddr_t& remoteAddress) {
+    CloseSocket();
+    UpdateStatus([&](auto& status) {
+      status.connecting = true;
+      status.connected = false;
+      status.transport = BluetoothPacketTransport::kNone;
+      status.error = l2capError;
+      status.status = "L2CAP unavailable; connecting GATT";
+    });
+    ConnectGattOnLoop(config, remoteAddress);
+  }
+
+  void CloseSocket() {
     if (m_poll) {
       if (!m_poll->IsClosing()) {
         m_poll->Stop();
@@ -330,10 +540,18 @@ class BluetoothL2CAPClient::Impl
       m_socket = -1;
     }
 
+    m_activeTransport = LinuxBluetoothTransport::kNone;
+    m_gattState = GattDiscoveryState::kIdle;
+  }
+
+  void CloseOnLoop(std::string_view reason) {
+    CloseSocket();
+
     if (!reason.empty()) {
       UpdateStatus([&](auto& status) {
         status.connecting = false;
         status.connected = false;
+        status.transport = BluetoothPacketTransport::kNone;
         status.status = reason;
       });
     }
@@ -348,28 +566,47 @@ class BluetoothL2CAPClient::Impl
     socklen_t socketErrorLen = sizeof(socketError);
     if (::getsockopt(m_socket, SOL_SOCKET, SO_ERROR, &socketError,
                      &socketErrorLen) < 0) {
-      SetError(ErrnoString("Failed to query Bluetooth connection"));
-      CloseOnLoop("Disconnected");
+      std::string error = ErrnoString("Failed to query Bluetooth connection");
+      if (m_activeTransport == LinuxBluetoothTransport::kL2CAP) {
+        BeginGattFallback(error, m_config, m_remoteAddress);
+      } else {
+        SetError(error);
+        CloseSocket();
+      }
       return;
     }
 
     if (socketError != 0) {
       errno = socketError;
-      SetError(ErrnoString("Failed to connect Bluetooth L2CAP socket"));
-      CloseOnLoop("Disconnected");
+      std::string error =
+          m_activeTransport == LinuxBluetoothTransport::kGATT
+              ? ErrnoString("Failed to connect Bluetooth GATT socket")
+              : ErrnoString("Failed to connect Bluetooth L2CAP socket");
+      if (m_activeTransport == LinuxBluetoothTransport::kL2CAP) {
+        BeginGattFallback(error, m_config, m_remoteAddress);
+      } else {
+        SetError(error);
+        CloseSocket();
+      }
+      return;
+    }
+
+    if (m_poll) {
+      m_poll->Start(UV_READABLE | UV_DISCONNECT);
+    }
+
+    if (m_activeTransport == LinuxBluetoothTransport::kGATT) {
+      StartGattDiscovery();
       return;
     }
 
     UpdateStatus([](auto& status) {
       status.connecting = false;
       status.connected = true;
-      status.status = "Connected";
+      status.transport = BluetoothPacketTransport::kL2CAP;
+      status.status = "Connected (L2CAP)";
       status.error.clear();
     });
-
-    if (m_poll) {
-      m_poll->Start(UV_READABLE | UV_DISCONNECT);
-    }
   }
 
   void ReadPackets() {
@@ -404,8 +641,446 @@ class BluetoothL2CAPClient::Impl
     }
   }
 
+  void ResetGattDiscovery() {
+    m_gattState = GattDiscoveryState::kIdle;
+    m_gattRequestedMtu = kDefaultAttMtu;
+    m_gattMtu = kDefaultAttMtu;
+    m_gattServiceStartHandle = 0;
+    m_gattServiceEndHandle = 0;
+    m_gattControlValueHandle = 0;
+    m_gattStatusDeclarationHandle = 0;
+    m_gattStatusValueHandle = 0;
+    m_gattStatusCccdHandle = 0;
+    m_gattSearchStartHandle = 0;
+    m_gattDescriptorEndHandle = 0;
+    m_gattCharacteristics.clear();
+  }
+
+  void FailGatt(std::string_view error) {
+    SetError(error);
+    CloseSocket();
+  }
+
+  bool SendGattPdu(std::span<const uint8_t> pdu) {
+    if (m_socket < 0) {
+      return false;
+    }
+
+    ssize_t sent = ::send(m_socket, pdu.data(), pdu.size(), MSG_NOSIGNAL);
+    if (sent == static_cast<ssize_t>(pdu.size())) {
+      return true;
+    }
+
+    if (sent < 0) {
+      FailGatt(ErrnoString("Bluetooth GATT send failed"));
+    } else {
+      FailGatt("Bluetooth GATT send was truncated");
+    }
+    return false;
+  }
+
+  void StartGattDiscovery() {
+    UpdateStatus([](auto& status) {
+      status.status = "Negotiating Bluetooth GATT MTU";
+      status.connecting = true;
+      status.connected = false;
+      status.transport = BluetoothPacketTransport::kNone;
+    });
+
+    m_gattRequestedMtu = static_cast<uint16_t>(std::min<size_t>(
+        kMaxAttMtu,
+        std::max<size_t>(kDefaultAttMtu, m_config.maxPacketSize + 3)));
+
+    std::vector<uint8_t> request;
+    request.push_back(kAttOpExchangeMtuRequest);
+    AppendLe16(&request, m_gattRequestedMtu);
+    m_gattState = GattDiscoveryState::kWaitMtuResponse;
+    SendGattPdu(request);
+  }
+
+  void SendGattFindServiceRequest() {
+    UpdateStatus([](auto& status) {
+      status.status = "Discovering Bluetooth GATT service";
+    });
+
+    std::vector<uint8_t> request;
+    request.push_back(kAttOpFindByTypeValueRequest);
+    AppendLe16(&request, 0x0001);
+    AppendLe16(&request, 0xffff);
+    AppendUuid16(&request, kGattPrimaryServiceUuid);
+    request.insert(request.end(), m_gattServiceUuid.begin(),
+                   m_gattServiceUuid.end());
+    m_gattState = GattDiscoveryState::kWaitServiceResponse;
+    SendGattPdu(request);
+  }
+
+  void SendGattReadCharacteristicsRequest() {
+    UpdateStatus([](auto& status) {
+      status.status = "Discovering Bluetooth GATT characteristics";
+    });
+
+    std::vector<uint8_t> request;
+    request.push_back(kAttOpReadByTypeRequest);
+    AppendLe16(&request, m_gattSearchStartHandle);
+    AppendLe16(&request, m_gattServiceEndHandle);
+    AppendUuid16(&request, kGattCharacteristicUuid);
+    m_gattState = GattDiscoveryState::kWaitCharacteristicResponse;
+    SendGattPdu(request);
+  }
+
+  void SendGattFindDescriptorRequest() {
+    UpdateStatus([](auto& status) {
+      status.status = "Discovering Bluetooth GATT notification descriptor";
+    });
+
+    std::vector<uint8_t> request;
+    request.push_back(kAttOpFindInformationRequest);
+    AppendLe16(&request, m_gattSearchStartHandle);
+    AppendLe16(&request, m_gattDescriptorEndHandle);
+    m_gattState = GattDiscoveryState::kWaitDescriptorResponse;
+    SendGattPdu(request);
+  }
+
+  void SendGattWriteCccdRequest() {
+    UpdateStatus([](auto& status) {
+      status.status = "Enabling Bluetooth GATT notifications";
+    });
+
+    std::vector<uint8_t> request;
+    request.push_back(kAttOpWriteRequest);
+    AppendLe16(&request, m_gattStatusCccdHandle);
+    AppendLe16(&request, 0x0001);
+    m_gattState = GattDiscoveryState::kWaitCccdWriteResponse;
+    SendGattPdu(request);
+  }
+
+  void HandleGattError(std::span<const uint8_t> pdu) {
+    if (pdu.size() < 5) {
+      FailGatt("Malformed Bluetooth GATT error response");
+      return;
+    }
+
+    uint8_t requestOpcode = pdu[1];
+    uint8_t errorCode = pdu[4];
+    if (m_gattState == GattDiscoveryState::kWaitMtuResponse &&
+        requestOpcode == kAttOpExchangeMtuRequest) {
+      m_gattMtu = kDefaultAttMtu;
+      SendGattFindServiceRequest();
+      return;
+    }
+
+    if (m_gattState == GattDiscoveryState::kWaitCharacteristicResponse &&
+        requestOpcode == kAttOpReadByTypeRequest &&
+        errorCode == kAttErrorAttributeNotFound &&
+        !m_gattCharacteristics.empty()) {
+      FinishGattCharacteristicDiscovery();
+      return;
+    }
+
+    if (m_gattState == GattDiscoveryState::kWaitDescriptorResponse &&
+        requestOpcode == kAttOpFindInformationRequest &&
+        errorCode == kAttErrorAttributeNotFound) {
+      FailGatt("Bluetooth GATT status notification descriptor was not found");
+      return;
+    }
+
+    FailGatt("Bluetooth GATT discovery failed");
+  }
+
+  void HandleGattMtuResponse(std::span<const uint8_t> pdu) {
+    if (m_gattState != GattDiscoveryState::kWaitMtuResponse) {
+      return;
+    }
+    if (pdu.size() < 3) {
+      FailGatt("Malformed Bluetooth GATT MTU response");
+      return;
+    }
+
+    uint16_t serverMtu = ReadLe16(pdu.data() + 1);
+    m_gattMtu = std::max<uint16_t>(
+        kDefaultAttMtu, std::min<uint16_t>(m_gattRequestedMtu, serverMtu));
+    SendGattFindServiceRequest();
+  }
+
+  void HandleGattServiceResponse(std::span<const uint8_t> pdu) {
+    if (m_gattState != GattDiscoveryState::kWaitServiceResponse) {
+      return;
+    }
+    if (pdu.size() < 5 || ((pdu.size() - 1) % 4) != 0) {
+      FailGatt("Malformed Bluetooth GATT service response");
+      return;
+    }
+
+    m_gattServiceStartHandle = ReadLe16(pdu.data() + 1);
+    m_gattServiceEndHandle = ReadLe16(pdu.data() + 3);
+    if (m_gattServiceStartHandle == 0 ||
+        m_gattServiceStartHandle > m_gattServiceEndHandle) {
+      FailGatt("Bluetooth GATT service has an invalid handle range");
+      return;
+    }
+
+    m_gattSearchStartHandle = m_gattServiceStartHandle;
+    SendGattReadCharacteristicsRequest();
+  }
+
+  void HandleGattCharacteristicResponse(std::span<const uint8_t> pdu) {
+    if (m_gattState != GattDiscoveryState::kWaitCharacteristicResponse) {
+      return;
+    }
+    if (pdu.size() < 2) {
+      FailGatt("Malformed Bluetooth GATT characteristic response");
+      return;
+    }
+
+    size_t entryLength = pdu[1];
+    if (entryLength < 7 || ((pdu.size() - 2) % entryLength) != 0) {
+      FailGatt("Malformed Bluetooth GATT characteristic entry");
+      return;
+    }
+
+    uint16_t lastDeclarationHandle = 0;
+    for (size_t offset = 2; offset + entryLength <= pdu.size();
+         offset += entryLength) {
+      GattCharacteristicInfo characteristic;
+      characteristic.declarationHandle = ReadLe16(pdu.data() + offset);
+      characteristic.valueHandle = ReadLe16(pdu.data() + offset + 3);
+      if (entryLength == 21) {
+        characteristic.hasUuid128 = true;
+        std::copy_n(pdu.begin() + offset + 5, characteristic.uuid128.size(),
+                    characteristic.uuid128.begin());
+      }
+
+      if (characteristic.declarationHandle == 0 ||
+          characteristic.valueHandle == 0) {
+        FailGatt("Bluetooth GATT characteristic has an invalid handle");
+        return;
+      }
+
+      if (characteristic.hasUuid128) {
+        if (Uuid128Equals(characteristic.uuid128,
+                          m_gattControlCharacteristicUuid)) {
+          m_gattControlValueHandle = characteristic.valueHandle;
+        } else if (Uuid128Equals(characteristic.uuid128,
+                                 m_gattStatusCharacteristicUuid)) {
+          m_gattStatusDeclarationHandle = characteristic.declarationHandle;
+          m_gattStatusValueHandle = characteristic.valueHandle;
+        }
+      }
+
+      lastDeclarationHandle = characteristic.declarationHandle;
+      m_gattCharacteristics.emplace_back(characteristic);
+    }
+
+    if (lastDeclarationHandle == 0 ||
+        lastDeclarationHandle >= m_gattServiceEndHandle) {
+      FinishGattCharacteristicDiscovery();
+      return;
+    }
+
+    m_gattSearchStartHandle = lastDeclarationHandle + 1;
+    SendGattReadCharacteristicsRequest();
+  }
+
+  void FinishGattCharacteristicDiscovery() {
+    if (m_gattControlValueHandle == 0 || m_gattStatusValueHandle == 0) {
+      FailGatt("Bluetooth GATT packet characteristics were not found");
+      return;
+    }
+
+    std::sort(m_gattCharacteristics.begin(), m_gattCharacteristics.end(),
+              [](const auto& a, const auto& b) {
+                return a.declarationHandle < b.declarationHandle;
+              });
+
+    uint16_t descriptorEndHandle = m_gattServiceEndHandle;
+    for (const auto& characteristic : m_gattCharacteristics) {
+      if (characteristic.declarationHandle > m_gattStatusDeclarationHandle) {
+        descriptorEndHandle = characteristic.declarationHandle - 1;
+        break;
+      }
+    }
+
+    if (m_gattStatusValueHandle == std::numeric_limits<uint16_t>::max() ||
+        m_gattStatusValueHandle + 1 > descriptorEndHandle) {
+      FailGatt("Bluetooth GATT status notification descriptor was not found");
+      return;
+    }
+
+    m_gattSearchStartHandle = m_gattStatusValueHandle + 1;
+    m_gattDescriptorEndHandle = descriptorEndHandle;
+    SendGattFindDescriptorRequest();
+  }
+
+  void HandleGattDescriptorResponse(std::span<const uint8_t> pdu) {
+    if (m_gattState != GattDiscoveryState::kWaitDescriptorResponse) {
+      return;
+    }
+    if (pdu.size() < 2) {
+      FailGatt("Malformed Bluetooth GATT descriptor response");
+      return;
+    }
+
+    uint8_t format = pdu[1];
+    size_t entryLength = format == 0x01 ? 4 : 18;
+    if ((format != 0x01 && format != 0x02) ||
+        ((pdu.size() - 2) % entryLength) != 0) {
+      FailGatt("Malformed Bluetooth GATT descriptor entry");
+      return;
+    }
+
+    uint16_t lastHandle = 0;
+    for (size_t offset = 2; offset + entryLength <= pdu.size();
+         offset += entryLength) {
+      uint16_t handle = ReadLe16(pdu.data() + offset);
+      if (format == 0x01) {
+        uint16_t uuid = ReadLe16(pdu.data() + offset + 2);
+        if (uuid == kGattClientCharacteristicConfigUuid) {
+          m_gattStatusCccdHandle = handle;
+          SendGattWriteCccdRequest();
+          return;
+        }
+      }
+      lastHandle = handle;
+    }
+
+    if (lastHandle == 0 || lastHandle >= m_gattDescriptorEndHandle) {
+      FailGatt("Bluetooth GATT status notification descriptor was not found");
+      return;
+    }
+
+    m_gattSearchStartHandle = lastHandle + 1;
+    SendGattFindDescriptorRequest();
+  }
+
+  void HandleGattWriteResponse(std::span<const uint8_t> pdu) {
+    (void)pdu;
+    if (m_gattState != GattDiscoveryState::kWaitCccdWriteResponse) {
+      return;
+    }
+
+    m_gattState = GattDiscoveryState::kConnected;
+    UpdateStatus([](auto& status) {
+      status.connecting = false;
+      status.connected = true;
+      status.transport = BluetoothPacketTransport::kGATT;
+      status.status = "Connected (GATT)";
+      status.error.clear();
+    });
+  }
+
+  void HandleGattNotification(std::span<const uint8_t> pdu) {
+    if (pdu.size() < 3) {
+      return;
+    }
+    uint16_t handle = ReadLe16(pdu.data() + 1);
+    if (handle != m_gattStatusValueHandle) {
+      return;
+    }
+
+    auto packet = pdu.subspan(3);
+    if (packet.empty()) {
+      return;
+    }
+
+    UpdateStatus([](auto& status) { ++status.packetsReceived; });
+    m_packetCallback(packet);
+  }
+
+  void HandleGattPdu(std::span<const uint8_t> pdu) {
+    if (pdu.empty()) {
+      return;
+    }
+
+    switch (pdu[0]) {
+      case kAttOpErrorResponse:
+        HandleGattError(pdu);
+        break;
+      case kAttOpExchangeMtuResponse:
+        HandleGattMtuResponse(pdu);
+        break;
+      case kAttOpFindByTypeValueResponse:
+        HandleGattServiceResponse(pdu);
+        break;
+      case kAttOpReadByTypeResponse:
+        HandleGattCharacteristicResponse(pdu);
+        break;
+      case kAttOpFindInformationResponse:
+        HandleGattDescriptorResponse(pdu);
+        break;
+      case kAttOpWriteResponse:
+        HandleGattWriteResponse(pdu);
+        break;
+      case kAttOpNotification:
+        HandleGattNotification(pdu);
+        break;
+      default:
+        FailGatt("Unexpected Bluetooth GATT response");
+        break;
+    }
+  }
+
+  void ReadGattPackets() {
+    if (m_socket < 0) {
+      return;
+    }
+
+    std::vector<uint8_t> pdu(
+        std::max<size_t>(m_gattMtu, m_config.maxPacketSize + 3));
+    while (true) {
+      ssize_t received = ::recv(m_socket, pdu.data(), pdu.size(), 0);
+      if (received > 0) {
+        HandleGattPdu({pdu.data(), static_cast<size_t>(received)});
+        continue;
+      }
+
+      if (received == 0) {
+        CloseOnLoop("Bluetooth connection closed");
+        return;
+      }
+
+      if (errno == EINTR) {
+        continue;
+      }
+      if (errno == EAGAIN || errno == EWOULDBLOCK) {
+        return;
+      }
+
+      SetError(ErrnoString("Bluetooth GATT receive failed"));
+      CloseOnLoop("Disconnected");
+      return;
+    }
+  }
+
   void SendOnLoop(std::span<const uint8_t> packet) {
     if (m_socket < 0) {
+      return;
+    }
+
+    if (m_activeTransport == LinuxBluetoothTransport::kGATT) {
+      if (m_gattState != GattDiscoveryState::kConnected ||
+          m_gattControlValueHandle == 0) {
+        return;
+      }
+
+      if (packet.size() + 3 > m_gattMtu) {
+        SetError("Packet is larger than Bluetooth GATT write MTU");
+        return;
+      }
+
+      std::vector<uint8_t> pdu;
+      pdu.reserve(packet.size() + 3);
+      pdu.push_back(kAttOpWriteCommand);
+      AppendLe16(&pdu, m_gattControlValueHandle);
+      pdu.insert(pdu.end(), packet.begin(), packet.end());
+
+      ssize_t sent = ::send(m_socket, pdu.data(), pdu.size(), MSG_NOSIGNAL);
+      if (sent == static_cast<ssize_t>(pdu.size())) {
+        UpdateStatus([](auto& status) { ++status.packetsSent; });
+      } else if (sent < 0 && errno != EAGAIN && errno != EWOULDBLOCK &&
+                 errno != EINTR) {
+        SetError(ErrnoString("Bluetooth GATT send failed"));
+        CloseOnLoop("Disconnected");
+      }
       return;
     }
 
@@ -419,11 +1094,12 @@ class BluetoothL2CAPClient::Impl
     }
   }
 
-  void SetConnecting() {
-    UpdateStatus([](auto& status) {
+  void SetConnecting(std::string_view text) {
+    UpdateStatus([&](auto& status) {
       status.connecting = true;
       status.connected = false;
-      status.status = "Connecting";
+      status.status = text;
+      status.transport = BluetoothPacketTransport::kNone;
     });
   }
 
@@ -433,6 +1109,7 @@ class BluetoothL2CAPClient::Impl
       status.status = error;
       status.connecting = false;
       status.connected = false;
+      status.transport = BluetoothPacketTransport::kNone;
     });
   }
 
@@ -475,6 +1152,24 @@ class BluetoothL2CAPClient::Impl
 
   std::shared_ptr<uv::Poll> m_poll;
   int m_socket = -1;
+  bdaddr_t m_remoteAddress{};
+  LinuxBluetoothTransport m_activeTransport = LinuxBluetoothTransport::kNone;
+
+  std::array<uint8_t, 16> m_gattServiceUuid{};
+  std::array<uint8_t, 16> m_gattControlCharacteristicUuid{};
+  std::array<uint8_t, 16> m_gattStatusCharacteristicUuid{};
+  GattDiscoveryState m_gattState = GattDiscoveryState::kIdle;
+  uint16_t m_gattRequestedMtu = kDefaultAttMtu;
+  uint16_t m_gattMtu = kDefaultAttMtu;
+  uint16_t m_gattServiceStartHandle = 0;
+  uint16_t m_gattServiceEndHandle = 0;
+  uint16_t m_gattControlValueHandle = 0;
+  uint16_t m_gattStatusDeclarationHandle = 0;
+  uint16_t m_gattStatusValueHandle = 0;
+  uint16_t m_gattStatusCccdHandle = 0;
+  uint16_t m_gattSearchStartHandle = 0;
+  uint16_t m_gattDescriptorEndHandle = 0;
+  std::vector<GattCharacteristicInfo> m_gattCharacteristics;
 };
 
 std::shared_ptr<BluetoothL2CAPClient> BluetoothL2CAPClient::Create(

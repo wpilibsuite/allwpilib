@@ -1,10 +1,10 @@
 # HAL XRP Client
 
-This is an extension that provides a client version of the XRP protocol for transmitting robot hardware interface state to an XRP robot over Bluetooth LE L2CAP Credit-Based Mode.
+This is an extension that provides a client version of the XRP protocol for transmitting robot hardware interface state to an XRP robot over Bluetooth LE.
 
 ## Configuration
 
-The XRP client can be configured through the XRP Bluetooth window in the simulator GUI. On Linux, the window can use `bluetoothctl` to scan for cached devices and pair/trust the selected XRP before opening the L2CAP channel.
+The XRP client can be configured through the XRP Bluetooth window in the simulator GUI. On Linux, the window can use `bluetoothctl` to scan for cached devices and pair/trust the selected XRP before connecting.
 
 The client also has environment variable configuration for headless use.
 
@@ -12,9 +12,15 @@ The client also has environment variable configuration for headless use.
 
 ``HALSIMXRP_BT_ADDRESS_TYPE``: The Bluetooth LE address type. Supported values are `public` and `random`. Defaults to `random`.
 
-The firmware advertises a device name of the form `WPIXRP-AAAA-BBBB` and accepts LE L2CAP Credit-Based Mode connections on PSM `0x0081`. Each L2CAP SDU contains one XRP protocol packet.
+The firmware advertises a device name of the form `WPIXRP-AAAA-BBBB`, exposes a custom GATT packet service, and accepts LE L2CAP Credit-Based Mode connections on PSM `0x0081`. Each GATT write value, GATT notification value, or L2CAP SDU contains one XRP protocol packet.
 
-The native Bluetooth L2CAP transport is implemented for Linux and macOS. Windows reports the transport as unsupported because the Windows desktop Bluetooth socket API does not expose Bluetooth LE L2CAP Credit-Based Mode.
+GATT service UUID: `7d2ea28a-f7bd-485d-9d6a-2c3f0b214a3f`
+
+GATT control characteristic UUID: `7d2ea28b-f7bd-485d-9d6a-2c3f0b214a3f`
+
+GATT status characteristic UUID: `7d2ea28c-f7bd-485d-9d6a-2c3f0b214a3f`
+
+The native Bluetooth packet transport prefers LE L2CAP Credit-Based Mode on Linux and macOS. Linux and macOS fall back to GATT if the L2CAP channel cannot be opened. Windows uses GATT Write Without Response and notifications.
 
 ## XRP Protocol
 
