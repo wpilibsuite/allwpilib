@@ -495,7 +495,7 @@ bool Storage::FromJson(const wpi::util::json& json, const char* filename) {
         break;
       case wpi::util::json::Type::Double:
         valuePtr->Reset(Value::kDouble);
-        valuePtr->doubleVal = jvalue.get_number();
+        valuePtr->doubleVal = jvalue.get_double();
         break;
       case wpi::util::json::Type::Int:
         valuePtr->Reset(Value::kInt64);
