@@ -708,7 +708,7 @@ static void UpdateJsonValueSource(NetworkTablesModel& model,
       out->UpdateFromValue(model, name, "");
       break;
     case wpi::util::json::Type::Float:
-      out->value = wpi::nt::Value::MakeDouble(j.get_number(), time);
+      out->value = wpi::nt::Value::MakeDouble(j.get_double(), time);
       out->UpdateFromValue(model, name, "");
       break;
     default:
