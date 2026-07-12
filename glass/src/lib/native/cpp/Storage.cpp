@@ -421,7 +421,7 @@ static bool JsonArrayToStorage(Storage::Value* valuePtr,
         break;
       case wpi::util::json::Type::Double:
         if (valuePtr->type == Storage::Value::kDoubleArray) {
-          valuePtr->doubleArray->push_back(jvalue.get_number());
+          valuePtr->doubleArray->push_back(jvalue.get_double());
         } else {
           goto error;
         }
