@@ -16,7 +16,7 @@ void wpi::math::to_json(wpi::util::json& json, const HolonomicSample& sample) {
 
 void wpi::math::from_json(const wpi::util::json& json,
                           HolonomicSample& sample) {
-  sample = HolonomicSample{wpi::units::second_t{json.at("time").get_double()},
+  sample = HolonomicSample{wpi::units::second_t{json.at("time").get_number()},
                            json.at("pose").get<Pose2d>(),
                            json.at("velocity").get<ChassisVelocities>(),
                            json.at("acceleration").get<ChassisAccelerations>()};

@@ -16,7 +16,7 @@ void wpi::math::to_json(wpi::util::json& json,
 void wpi::math::from_json(const wpi::util::json& json,
                           ChassisVelocities& velocities) {
   velocities = ChassisVelocities{
-      wpi::units::meters_per_second_t{json.at("vx").get_double()},
-      wpi::units::meters_per_second_t{json.at("vy").get_double()},
-      wpi::units::radians_per_second_t{json.at("omega").get_double()}};
+      wpi::units::meters_per_second_t{json.at("vx").get_number()},
+      wpi::units::meters_per_second_t{json.at("vy").get_number()},
+      wpi::units::radians_per_second_t{json.at("omega").get_number()}};
 }
