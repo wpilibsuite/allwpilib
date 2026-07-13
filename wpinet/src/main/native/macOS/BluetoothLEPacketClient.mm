@@ -239,10 +239,9 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 @end
 
 @interface WPINetMacBluetoothLEPacketClient
-    : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate, NSStreamDelegate>
+    : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
 - (instancetype)initWithImpl:(BluetoothLEPacketClient::Impl*)impl;
 - (void)connectWithTarget:(NSString*)target
-                      psm:(CBL2CAPPSM)psm
               serviceUuid:(NSString*)serviceUuid
               controlUuid:(NSString*)controlUuid
                statusUuid:(NSString*)statusUuid
@@ -257,21 +256,13 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   dispatch_queue_t _queue;
   CBCentralManager* _central;
   CBPeripheral* _peripheral;
-  CBL2CAPChannel* _channel;
-  NSInputStream* _inputStream;
-  NSOutputStream* _outputStream;
   CBCharacteristic* _controlCharacteristic;
   CBCharacteristic* _statusCharacteristic;
   NSString* _target;
   CBUUID* _serviceUuid;
   CBUUID* _controlUuid;
   CBUUID* _statusUuid;
-  CBL2CAPPSM _psm;
   NSUInteger _maxPacketSize;
-  NSMutableArray<NSData*>* _pendingWrites;
-  NSData* _currentWrite;
-  NSUInteger _currentWriteOffset;
-  BOOL _usingGatt;
 }
 
 - (instancetype)initWithImpl:(BluetoothLEPacketClient::Impl*)impl {
@@ -283,14 +274,12 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     dispatch_queue_set_specific(_queue, &MAC_BLUETOOTH_QUEUE_KEY,
                                 (__bridge void*)self, nullptr);
     _central = [[CBCentralManager alloc] initWithDelegate:self queue:_queue];
-    _pendingWrites = [[NSMutableArray alloc] init];
     _maxPacketSize = 512;
   }
   return self;
 }
 
 - (void)connectWithTarget:(NSString*)target
-                      psm:(CBL2CAPPSM)psm
               serviceUuid:(NSString*)serviceUuid
               controlUuid:(NSString*)controlUuid
                statusUuid:(NSString*)statusUuid
@@ -300,14 +289,9 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     _serviceUuid = [CBUUID UUIDWithString:serviceUuid];
     _controlUuid = [CBUUID UUIDWithString:controlUuid];
     _statusUuid = [CBUUID UUIDWithString:statusUuid];
-    _psm = psm;
     _maxPacketSize = maxPacketSize;
-    _usingGatt = NO;
     _controlCharacteristic = nil;
     _statusCharacteristic = nil;
-    dispatch_async(dispatch_get_main_queue(), ^{
-      [self closeStreams];
-    });
     if (_peripheral != nil) {
       [_central cancelPeripheralConnection:_peripheral];
       _peripheral = nil;
@@ -319,14 +303,12 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 - (void)disconnectWithReason:(NSString*)reason {
   dispatch_async(_queue, ^{
     [_central stopScan];
-    _usingGatt = NO;
     if (_peripheral != nil) {
       [_central cancelPeripheralConnection:_peripheral];
       _peripheral = nil;
     }
-    dispatch_async(dispatch_get_main_queue(), ^{
-      [self closeStreams];
-    });
+    _controlCharacteristic = nil;
+    _statusCharacteristic = nil;
     if (_impl != nullptr) {
       _impl->SetDisconnected(ToString(reason));
     }
@@ -335,48 +317,38 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 
 - (void)sendPacket:(NSData*)packet {
   dispatch_async(_queue, ^{
-    if (_usingGatt) {
-      if (_peripheral == nil || _controlCharacteristic == nil) {
-        return;
-      }
-      NSUInteger maxWriteLength =
-          [_peripheral maximumWriteValueLengthForType:
-                           CBCharacteristicWriteWithoutResponse];
-      if (packet.length > maxWriteLength) {
-        if (_impl != nullptr) {
-          _impl->SetError("Packet is larger than Bluetooth GATT write MTU");
-        }
-        return;
-      }
-      [_peripheral writeValue:packet
-            forCharacteristic:_controlCharacteristic
-                         type:CBCharacteristicWriteWithoutResponse];
+    if (_peripheral == nil || _controlCharacteristic == nil) {
+      return;
+    }
+    NSUInteger maxWriteLength =
+        [_peripheral maximumWriteValueLengthForType:
+                         CBCharacteristicWriteWithoutResponse];
+    if (packet.length > maxWriteLength) {
       if (_impl != nullptr) {
-        _impl->DidSendPacket();
+        _impl->SetError("Packet is larger than Bluetooth GATT write MTU");
       }
       return;
     }
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-      [_pendingWrites addObject:packet];
-      [self writeAvailablePackets];
-    });
+    [_peripheral writeValue:packet
+          forCharacteristic:_controlCharacteristic
+                       type:CBCharacteristicWriteWithoutResponse];
+    if (_impl != nullptr) {
+      _impl->DidSendPacket();
+    }
   });
 }
 
 - (void)invalidate {
   dispatch_block_t block = ^{
     [_central stopScan];
-    _usingGatt = NO;
     if (_peripheral != nil) {
       [_central cancelPeripheralConnection:_peripheral];
       _peripheral = nil;
     }
     _central.delegate = nil;
     _impl = nullptr;
-    dispatch_async(dispatch_get_main_queue(), ^{
-      [self closeStreams];
-    });
+    _controlCharacteristic = nil;
+    _statusCharacteristic = nil;
   };
   if (dispatch_get_specific(&MAC_BLUETOOTH_QUEUE_KEY) == (__bridge void*)self) {
     block();
@@ -448,100 +420,6 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
          [name hasPrefix:_target];
 }
 
-- (void)setupStreamsForChannel:(CBL2CAPChannel*)channel {
-  _channel = channel;
-  _inputStream = channel.inputStream;
-  _outputStream = channel.outputStream;
-  _inputStream.delegate = self;
-  _outputStream.delegate = self;
-  [_inputStream scheduleInRunLoop:NSRunLoop.mainRunLoop
-                          forMode:NSDefaultRunLoopMode];
-  [_outputStream scheduleInRunLoop:NSRunLoop.mainRunLoop
-                           forMode:NSDefaultRunLoopMode];
-  [_inputStream open];
-  [_outputStream open];
-}
-
-- (void)closeStreams {
-  _inputStream.delegate = nil;
-  _outputStream.delegate = nil;
-  [_inputStream removeFromRunLoop:NSRunLoop.mainRunLoop
-                          forMode:NSDefaultRunLoopMode];
-  [_outputStream removeFromRunLoop:NSRunLoop.mainRunLoop
-                           forMode:NSDefaultRunLoopMode];
-  [_inputStream close];
-  [_outputStream close];
-  _inputStream = nil;
-  _outputStream = nil;
-  _channel = nil;
-  [_pendingWrites removeAllObjects];
-  _currentWrite = nil;
-  _currentWriteOffset = 0;
-}
-
-- (void)writeAvailablePackets {
-  if (_outputStream == nil || !_outputStream.hasSpaceAvailable) {
-    return;
-  }
-
-  while (_outputStream.hasSpaceAvailable) {
-    if (_currentWrite == nil) {
-      if (_pendingWrites.count == 0) {
-        return;
-      }
-      _currentWrite = _pendingWrites.firstObject;
-      [_pendingWrites removeObjectAtIndex:0];
-      _currentWriteOffset = 0;
-    }
-
-    const uint8_t* bytes =
-        static_cast<const uint8_t*>(_currentWrite.bytes) + _currentWriteOffset;
-    NSUInteger remaining = _currentWrite.length - _currentWriteOffset;
-    NSInteger written = [_outputStream write:bytes maxLength:remaining];
-    if (written > 0) {
-      _currentWriteOffset += static_cast<NSUInteger>(written);
-      if (_currentWriteOffset == _currentWrite.length) {
-        _currentWrite = nil;
-        _currentWriteOffset = 0;
-        if (_impl != nullptr) {
-          _impl->DidSendPacket();
-        }
-      }
-      continue;
-    }
-
-    if (written < 0 && _impl != nullptr) {
-      _impl->SetError(std::string{"Bluetooth send failed: "} +
-                      ToString(_outputStream.streamError));
-    }
-    return;
-  }
-}
-
-- (void)readAvailablePackets {
-  if (_inputStream == nil) {
-    return;
-  }
-
-  std::vector<uint8_t> packet(_maxPacketSize);
-  while (_inputStream.hasBytesAvailable) {
-    NSInteger received =
-        [_inputStream read:packet.data() maxLength:packet.size()];
-    if (received > 0) {
-      if (_impl != nullptr) {
-        _impl->DidReceivePacket({packet.data(), static_cast<size_t>(received)});
-      }
-      continue;
-    }
-
-    if (received < 0 && _impl != nullptr) {
-      _impl->SetError(std::string{"Bluetooth receive failed: "} +
-                      ToString(_inputStream.streamError));
-    }
-    return;
-  }
-}
-
 - (void)centralManagerDidUpdateState:(CBCentralManager*)central {
   (void)central;
   [self startConnectIfReady];
@@ -561,11 +439,10 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 - (void)centralManager:(CBCentralManager*)central
   didConnectPeripheral:(CBPeripheral*)peripheral {
   (void)central;
-  if (_impl != nullptr) {
-    _impl->SetStatus("Opening Bluetooth L2CAP channel");
-  }
   peripheral.delegate = self;
-  [peripheral openL2CAPChannel:_psm];
+  // CoreBluetooth exposes L2CAP as NSStream, which does not preserve XRP packet
+  // boundaries. Use GATT unless the protocol gains explicit stream framing.
+  [self discoverGattService];
 }
 
 - (void)centralManager:(CBCentralManager*)central
@@ -584,10 +461,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
                       error:(NSError*)error {
   (void)central;
   (void)peripheral;
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [self closeStreams];
-  });
-  _usingGatt = NO;
+  _controlCharacteristic = nil;
+  _statusCharacteristic = nil;
   if (_impl != nullptr) {
     if (error != nil) {
       _impl->SetError(std::string{"Bluetooth connection closed: "} +
@@ -596,23 +471,6 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
       _impl->SetDisconnected("Bluetooth connection closed");
     }
   }
-}
-
-- (void)peripheral:(CBPeripheral*)peripheral
-    didOpenL2CAPChannel:(CBL2CAPChannel*)channel
-                  error:(NSError*)error {
-  (void)peripheral;
-  if (error != nil) {
-    if (_impl != nullptr) {
-      _impl->SetStatus("L2CAP unavailable; discovering GATT service");
-    }
-    [self discoverGattService];
-    return;
-  }
-
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [self setupStreamsForChannel:channel];
-  });
 }
 
 - (void)discoverGattService {
@@ -705,8 +563,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     return;
   }
 
-  _usingGatt = characteristic.isNotifying;
-  if (_usingGatt && _impl != nullptr) {
+  if (characteristic.isNotifying && _impl != nullptr) {
     _impl->SetConnected(BluetoothPacketTransport::GATT);
   }
 }
@@ -730,38 +587,6 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   if (value.length > 0 && _impl != nullptr) {
     _impl->DidReceivePacket(
         {static_cast<const uint8_t*>(value.bytes), value.length});
-  }
-}
-
-- (void)stream:(NSStream*)stream handleEvent:(NSStreamEvent)eventCode {
-  switch (eventCode) {
-    case NSStreamEventOpenCompleted:
-      if (_inputStream.streamStatus == NSStreamStatusOpen &&
-          _outputStream.streamStatus == NSStreamStatusOpen &&
-          _impl != nullptr) {
-        _impl->SetConnected(BluetoothPacketTransport::L2CAP);
-      }
-      break;
-    case NSStreamEventHasBytesAvailable:
-      [self readAvailablePackets];
-      break;
-    case NSStreamEventHasSpaceAvailable:
-      [self writeAvailablePackets];
-      break;
-    case NSStreamEventErrorOccurred:
-      if (_impl != nullptr) {
-        _impl->SetError(std::string{"Bluetooth stream error: "} +
-                        ToString(stream.streamError));
-      }
-      break;
-    case NSStreamEventEndEncountered:
-      if (_impl != nullptr) {
-        _impl->SetDisconnected("Bluetooth connection closed");
-      }
-      [self closeStreams];
-      break;
-    default:
-      break;
   }
 }
 
@@ -803,8 +628,10 @@ bool BluetoothLEPacketClient::Impl::Connect(
     SetError("No Bluetooth target configured");
     return false;
   }
-  if (config.psm == 0) {
-    SetError("No Bluetooth L2CAP PSM configured");
+  if (config.gattServiceUuid.empty() ||
+      config.gattControlCharacteristicUuid.empty() ||
+      config.gattStatusCharacteristicUuid.empty()) {
+    SetError("No Bluetooth GATT UUIDs configured");
     return false;
   }
 
@@ -822,7 +649,6 @@ bool BluetoothLEPacketClient::Impl::Connect(
   PostStatus(GetStatus());
 
   [m_client connectWithTarget:ToNSString(config.address)
-                          psm:static_cast<CBL2CAPPSM>(config.psm)
                   serviceUuid:ToNSString(config.gattServiceUuid)
                   controlUuid:ToNSString(config.gattControlCharacteristicUuid)
                    statusUuid:ToNSString(config.gattStatusCharacteristicUuid)
