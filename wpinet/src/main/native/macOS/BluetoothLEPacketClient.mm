@@ -502,6 +502,9 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 - (void)centralManager:(CBCentralManager*)central
   didConnectPeripheral:(CBPeripheral*)peripheral {
   (void)central;
+  if (peripheral != _peripheral) {
+    return;
+  }
   peripheral.delegate = self;
   // CoreBluetooth exposes L2CAP as NSStream, which does not preserve XRP packet
   // boundaries. Use GATT unless the protocol gains explicit stream framing.
@@ -512,7 +515,12 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     didFailToConnectPeripheral:(CBPeripheral*)peripheral
                          error:(NSError*)error {
   (void)central;
-  (void)peripheral;
+  if (peripheral != _peripheral) {
+    return;
+  }
+  _peripheral = nil;
+  _controlCharacteristic = nil;
+  _statusCharacteristic = nil;
   if (_bridge) {
     _bridge.SetError(std::format("Failed to connect Bluetooth device: {}",
                                  ToString(error)));
@@ -523,7 +531,10 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     didDisconnectPeripheral:(CBPeripheral*)peripheral
                       error:(NSError*)error {
   (void)central;
-  (void)peripheral;
+  if (peripheral != _peripheral) {
+    return;
+  }
+  _peripheral = nil;
   _controlCharacteristic = nil;
   _statusCharacteristic = nil;
   if (_bridge) {
@@ -550,6 +561,9 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didDiscoverServices:(NSError*)error {
+  if (peripheral != _peripheral) {
+    return;
+  }
   if (error != nil) {
     if (_bridge) {
       _bridge.SetError(
@@ -579,6 +593,9 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     didDiscoverCharacteristicsForService:(CBService*)service
                                    error:(NSError*)error {
   (void)service;
+  if (peripheral != _peripheral) {
+    return;
+  }
   if (error != nil) {
     if (_bridge) {
       _bridge.SetError(
@@ -614,7 +631,9 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 - (void)peripheral:(CBPeripheral*)peripheral
     didUpdateNotificationStateForCharacteristic:(CBCharacteristic*)characteristic
                                           error:(NSError*)error {
-  (void)peripheral;
+  if (peripheral != _peripheral) {
+    return;
+  }
   if (![characteristic.UUID isEqual:_statusUuid]) {
     return;
   }
@@ -635,7 +654,9 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 - (void)peripheral:(CBPeripheral*)peripheral
     didUpdateValueForCharacteristic:(CBCharacteristic*)characteristic
                               error:(NSError*)error {
-  (void)peripheral;
+  if (peripheral != _peripheral) {
+    return;
+  }
   if (![characteristic.UUID isEqual:_statusUuid]) {
     return;
   }
