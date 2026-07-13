@@ -209,6 +209,19 @@ std::vector<dev::DeviceInformation> FindKnownBluetoothDevices() {
   return result;
 }
 
+std::vector<dev::DeviceInformation> FindUnpairedBluetoothDevices() {
+  auto devices =
+      dev::DeviceInformation::FindAllAsync(
+          bt::BluetoothLEDevice::GetDeviceSelectorFromPairingState(false))
+          .get();
+  std::vector<dev::DeviceInformation> result;
+  result.reserve(devices.Size());
+  for (auto const& info : devices) {
+    result.emplace_back(info);
+  }
+  return result;
+}
+
 void AppendUniqueDevice(std::vector<dev::DeviceInformation>* devices,
                         dev::DeviceInformation const& info) {
   std::string id = winrt::to_string(info.Id());
@@ -715,9 +728,10 @@ BluetoothLEPairingResult BluetoothLEPacketClient::PairDevice(
   result.supported = true;
   try {
     EnsureWinrtApartment();
-    auto devices = dev::DeviceInformation::FindAllAsync(
-                       bt::BluetoothLEDevice::GetDeviceSelector())
-                       .get();
+    auto devices = FindKnownBluetoothDevices();
+    for (auto const& info : FindUnpairedBluetoothDevices()) {
+      AppendUniqueDevice(&devices, info);
+    }
     for (auto const& info : devices) {
       if (!DeviceMatchesTarget(info, target)) {
         continue;
