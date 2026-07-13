@@ -22,6 +22,7 @@
 #include <atomic>
 #include <cctype>
 #include <chrono>
+#include <condition_variable>
 #include <cstdio>
 #include <format>
 #include <memory>
@@ -194,6 +195,91 @@ std::vector<uint8_t> FromBuffer(streams::IBuffer const& buffer) {
         winrt::array_view<uint8_t>{data.data(), data.data() + data.size()});
   }
   return data;
+}
+
+std::vector<dev::DeviceInformation> FindKnownBluetoothDevices() {
+  auto devices = dev::DeviceInformation::FindAllAsync(
+                     bt::BluetoothLEDevice::GetDeviceSelector())
+                     .get();
+  std::vector<dev::DeviceInformation> result;
+  result.reserve(devices.Size());
+  for (auto const& info : devices) {
+    result.emplace_back(info);
+  }
+  return result;
+}
+
+void AppendUniqueDevice(std::vector<dev::DeviceInformation>* devices,
+                        dev::DeviceInformation const& info) {
+  std::string id = winrt::to_string(info.Id());
+  auto duplicate =
+      std::find_if(devices->begin(), devices->end(), [&](auto const& existing) {
+        return winrt::to_string(existing.Id()) == id;
+      });
+  if (duplicate == devices->end()) {
+    devices->emplace_back(info);
+  }
+}
+
+struct BluetoothDeviceScanState {
+  std::vector<dev::DeviceInformation> devices;
+  std::vector<std::string> deviceIds;
+  std::mutex mutex;
+  std::condition_variable cv;
+  bool stopped = false;
+};
+
+std::vector<dev::DeviceInformation> ScanBluetoothDevices(
+    std::chrono::milliseconds timeout) {
+  auto state = std::make_shared<BluetoothDeviceScanState>();
+
+  auto watcher = dev::DeviceInformation::CreateWatcher(
+      bt::BluetoothLEDevice::GetDeviceSelectorFromPairingState(false));
+  auto addedToken = watcher.Added(
+      [state](dev::DeviceWatcher const&, dev::DeviceInformation const& info) {
+        std::scoped_lock lock{state->mutex};
+        std::string id = winrt::to_string(info.Id());
+        if (std::find(state->deviceIds.begin(), state->deviceIds.end(), id) !=
+            state->deviceIds.end()) {
+          return;
+        }
+        state->deviceIds.emplace_back(std::move(id));
+        state->devices.emplace_back(info);
+      });
+  auto stoppedToken =
+      watcher.Stopped([state](dev::DeviceWatcher const&,
+                              winrt::Windows::Foundation::IInspectable const&) {
+        {
+          std::scoped_lock lock{state->mutex};
+          state->stopped = true;
+        }
+        state->cv.notify_all();
+      });
+
+  watcher.Start();
+  {
+    std::unique_lock lock{state->mutex};
+    state->cv.wait_for(lock, timeout, [&] { return state->stopped; });
+  }
+
+  auto status = watcher.Status();
+  if (status == dev::DeviceWatcherStatus::Started ||
+      status == dev::DeviceWatcherStatus::EnumerationCompleted) {
+    watcher.Stop();
+  }
+  if (status == dev::DeviceWatcherStatus::Started ||
+      status == dev::DeviceWatcherStatus::EnumerationCompleted ||
+      status == dev::DeviceWatcherStatus::Stopping) {
+    std::unique_lock lock{state->mutex};
+    state->cv.wait_for(lock, std::chrono::seconds{2},
+                       [&] { return state->stopped; });
+  }
+
+  watcher.Added(addedToken);
+  watcher.Stopped(stoppedToken);
+
+  std::scoped_lock lock{state->mutex};
+  return state->devices;
 }
 
 }  // namespace
@@ -545,14 +631,16 @@ bool BluetoothLEPacketClient::IsPairingSupported() {
 
 BluetoothLEDeviceScanResult BluetoothLEPacketClient::ScanDevices(
     std::chrono::milliseconds timeout) {
-  (void)timeout;
   BluetoothLEDeviceScanResult result;
   result.supported = true;
   try {
     EnsureWinrtApartment();
-    auto devices = dev::DeviceInformation::FindAllAsync(
-                       bt::BluetoothLEDevice::GetDeviceSelector())
-                       .get();
+    auto devices = FindKnownBluetoothDevices();
+    if (timeout > std::chrono::milliseconds{0}) {
+      for (auto const& info : ScanBluetoothDevices(timeout)) {
+        AppendUniqueDevice(&devices, info);
+      }
+    }
     for (auto const& info : devices) {
       std::string target = GetDeviceTarget(info);
       if (target.empty()) {
