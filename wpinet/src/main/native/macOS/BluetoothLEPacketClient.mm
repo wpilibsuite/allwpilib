@@ -298,6 +298,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
                statusUuid:(NSString*)statusUuid
             maxPacketSize:(NSUInteger)maxPacketSize;
 - (void)disconnectWithReason:(NSString*)reason;
+- (void)cancelCurrentConnection;
 - (void)sendPacket:(NSData*)packet;
 - (void)invalidate;
 @end
@@ -364,6 +365,23 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
       _bridge.SetDisconnected(ToString(reason));
     }
   });
+}
+
+- (void)cancelCurrentConnection {
+  dispatch_block_t block = ^{
+    [_central stopScan];
+    if (_peripheral != nil) {
+      [_central cancelPeripheralConnection:_peripheral];
+      _peripheral = nil;
+    }
+    _controlCharacteristic = nil;
+    _statusCharacteristic = nil;
+  };
+  if (dispatch_get_specific(&MAC_BLUETOOTH_QUEUE_KEY) == (__bridge void*)self) {
+    block();
+  } else {
+    dispatch_async(_queue, block);
+  }
 }
 
 - (void)sendPacket:(NSData*)packet {
@@ -799,6 +817,7 @@ void BluetoothLEPacketClient::Impl::SetStatus(std::string_view status) {
 }
 
 void BluetoothLEPacketClient::Impl::SetError(std::string_view error) {
+  [m_client cancelCurrentConnection];
   UpdateStatus([&](auto& status) {
     status.error = error;
     status.status = error;
