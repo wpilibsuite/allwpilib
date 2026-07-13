@@ -288,9 +288,13 @@ class BluetoothLEPacketClient::Impl
     {
       std::scoped_lock lock{m_gattMutex};
       if (m_statusCharacteristic && m_valueChangedToken.value != 0) {
-        m_statusCharacteristic.ValueChanged(m_valueChangedToken);
-        m_valueChangedToken = {};
+        try {
+          EnsureWinrtApartment();
+          m_statusCharacteristic.ValueChanged(m_valueChangedToken);
+        } catch (winrt::hresult_error const&) {
+        }
       }
+      m_valueChangedToken = {};
       m_controlCharacteristic = nullptr;
       m_statusCharacteristic = nullptr;
       m_device = nullptr;
