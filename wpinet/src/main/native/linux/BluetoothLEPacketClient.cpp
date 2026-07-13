@@ -1279,10 +1279,6 @@ BluetoothLEPacketClient::BluetoothLEPacketClient(std::shared_ptr<Impl> impl)
 
 BluetoothLEPacketClient::~BluetoothLEPacketClient() = default;
 
-bool BluetoothLEPacketClient::IsSupported() {
-  return true;
-}
-
 bool BluetoothLEPacketClient::IsPairingSupported() {
   return true;
 }
