@@ -413,11 +413,13 @@ class BluetoothLEPacketClient::Impl
       auto controlCharacteristic = controlResult.Characteristics().GetAt(0);
       auto statusCharacteristic = statusResult.Characteristics().GetAt(0);
 
-      auto self = shared_from_this();
+      auto weak = weak_from_this();
       auto token = statusCharacteristic.ValueChanged(
-          [self](gatt::GattCharacteristic const&,
+          [weak](gatt::GattCharacteristic const&,
                  gatt::GattValueChangedEventArgs const& args) {
-            self->DidReceivePacket(args.CharacteristicValue());
+            if (auto self = weak.lock()) {
+              self->DidReceivePacket(args.CharacteristicValue());
+            }
           });
 
       auto notifyStatus =
