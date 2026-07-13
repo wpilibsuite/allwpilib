@@ -177,7 +177,6 @@ wpilib_cc_library(
         "//wpiutil",
     ] + select({
         "@platforms//os:osx": [":wpinet-mac-bluetooth"],
-        "@platforms//os:linux": ["@system_dbus//:dbus"],
         "//conditions:default": [],
     }),
 )
