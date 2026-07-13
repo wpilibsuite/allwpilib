@@ -38,14 +38,12 @@ class SystemCoreResolverClient
       wpi::net::uv::Loop& loop, wpi::util::Logger& logger,
       std::string_view team, unsigned int port);
 
-  SystemCoreResolverClient(wpi::net::uv::Loop& loop,
-                           wpi::util::Logger& logger,
+  SystemCoreResolverClient(wpi::net::uv::Loop& loop, wpi::util::Logger& logger,
                            std::optional<std::string> team, unsigned int port,
                            const private_init&);
   ~SystemCoreResolverClient();
   SystemCoreResolverClient(const SystemCoreResolverClient&) = delete;
-  SystemCoreResolverClient& operator=(const SystemCoreResolverClient&) =
-      delete;
+  SystemCoreResolverClient& operator=(const SystemCoreResolverClient&) = delete;
 
   void Close();
 

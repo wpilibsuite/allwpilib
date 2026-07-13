@@ -27,8 +27,8 @@ static std::string Ipv4AddressToString(uint32_t address) {
                      address & 0xff);
 }
 
-static bool HasMatchingTeam(
-    const MulticastResolverClient::ServiceData& data, std::string_view team) {
+static bool HasMatchingTeam(const MulticastResolverClient::ServiceData& data,
+                            std::string_view team) {
   for (auto&& [key, value] : data.txt) {
     if (key == "team") {
       return wpi::util::trim(value) == team;
@@ -48,8 +48,8 @@ std::shared_ptr<SystemCoreResolverClient> SystemCoreResolverClient::Create(
 }
 
 std::shared_ptr<SystemCoreResolverClient> SystemCoreResolverClient::Create(
-    wpi::net::uv::Loop& loop, wpi::util::Logger& logger,
-    std::string_view team, unsigned int port) {
+    wpi::net::uv::Loop& loop, wpi::util::Logger& logger, std::string_view team,
+    unsigned int port) {
   auto client = std::make_shared<SystemCoreResolverClient>(
       loop, logger, std::string{wpi::util::trim(team)}, port, private_init{});
   if (!client->Init()) {
@@ -61,10 +61,7 @@ std::shared_ptr<SystemCoreResolverClient> SystemCoreResolverClient::Create(
 SystemCoreResolverClient::SystemCoreResolverClient(
     wpi::net::uv::Loop& loop, wpi::util::Logger& logger,
     std::optional<std::string> team, unsigned int port, const private_init&)
-    : m_loop{loop},
-      m_logger{logger},
-      m_team{std::move(team)},
-      m_port{port} {}
+    : m_loop{loop}, m_logger{logger}, m_team{std::move(team)}, m_port{port} {}
 
 SystemCoreResolverClient::~SystemCoreResolverClient() = default;
 
