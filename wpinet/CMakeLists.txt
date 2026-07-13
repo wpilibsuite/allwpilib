@@ -81,8 +81,6 @@ target_compile_features(wpinet PUBLIC cxx_std_23)
 wpilib_target_warnings(wpinet)
 target_link_libraries(wpinet PUBLIC wpiutil)
 
-set(DBUS_DEP_REPLACE "")
-
 if(WPILIB_USE_LINKED_AVAHI)
     find_library(AVAHI_COMMON REQUIRED NAMES avahi-common)
     if(AVAHI_COMMON)
@@ -145,12 +143,7 @@ else()
         )
         target_sources(wpinet PRIVATE ${wpinet_macos_src})
     else()
-        find_package(PkgConfig REQUIRED)
-        pkg_check_modules(DBUS REQUIRED IMPORTED_TARGET dbus-1)
-        target_link_libraries(wpinet PUBLIC PkgConfig::DBUS)
-        set(DBUS_DEP_REPLACE
-            "find_dependency(PkgConfig)\npkg_check_modules(DBUS REQUIRED IMPORTED_TARGET dbus-1)"
-        )
+        target_link_libraries(wpinet PUBLIC ${CMAKE_DL_LIBS})
         target_sources(wpinet PRIVATE ${wpinet_linux_src})
     endif()
 endif()
