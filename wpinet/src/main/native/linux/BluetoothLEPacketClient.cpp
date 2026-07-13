@@ -1072,6 +1072,7 @@ class BluetoothLEPacketClient::Impl
 
       if (packet.size() + 3 > m_gattMtu) {
         SetError("Packet is larger than Bluetooth GATT write MTU");
+        CloseOnLoop("Disconnected");
         return;
       }
 
