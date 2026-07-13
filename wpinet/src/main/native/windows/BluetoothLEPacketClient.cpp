@@ -251,7 +251,14 @@ class BluetoothLEPacketClient::Impl
   void Disconnect(std::string_view reason) {
     m_cancelConnect = true;
     if (m_connectThread.joinable()) {
-      m_connectThread.join();
+      if (m_connectThread.get_id() == std::this_thread::get_id()) {
+        // If the connection thread holds the last Impl reference, ~Impl() runs
+        // on this thread. Detach here so std::thread's destructor won't
+        // terminate on a self-joinable thread.
+        m_connectThread.detach();
+      } else {
+        m_connectThread.join();
+      }
     }
 
     {
