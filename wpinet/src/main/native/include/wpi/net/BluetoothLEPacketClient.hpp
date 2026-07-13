@@ -127,13 +127,6 @@ class BluetoothLEPacketClient {
   BluetoothLEPacketClient& operator=(const BluetoothLEPacketClient&) = delete;
 
   /**
-   * Returns whether this platform has an implementation for the transport.
-   *
-   * @return true if the platform implementation is available.
-   */
-  static bool IsSupported();
-
-  /**
    * Returns whether this platform implementation supports explicit pairing.
    *
    * @return true if PairDevice() can pair devices on this platform.
