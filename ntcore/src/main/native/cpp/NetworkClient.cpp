@@ -36,7 +36,7 @@ static constexpr uv::Timer::Time kWebsocketHandshakeTimeout{500};
 static constexpr size_t kMaxMessageSize = 2 * 1024 * 1024;
 
 static std::string Ipv4AddressToString(unsigned int address) {
-  return fmt::format("{}.{}.{}.{}", (address >> 24) & 0xff,
+  return std::format("{}.{}.{}.{}", (address >> 24) & 0xff,
                      (address >> 16) & 0xff, (address >> 8) & 0xff,
                      address & 0xff);
 }

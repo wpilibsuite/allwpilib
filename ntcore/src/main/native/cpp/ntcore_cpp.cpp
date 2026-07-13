@@ -776,11 +776,7 @@ void SetServerFixed(NT_Inst inst, std::string_view team, unsigned int port) {
     AddWifiServer(servers, port);
 
     // robot.local
-<<<<<<< HEAD
     servers.emplace_back("robot.local", port);
-=======
-    servers.emplace_back(std::format("robot.local", team), port);
->>>>>>> wpilibsuite/main
 
     INetworkClient::ServerResolver resolver = MakeSystemCoreResolver(port);
 

@@ -6,12 +6,11 @@
 
 #include <stdint.h>
 
+#include <format>
 #include <memory>
 #include <optional>
 #include <string>
 #include <utility>
-
-#include <fmt/format.h>
 
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/util/Logger.hpp"
@@ -23,7 +22,7 @@ static constexpr std::string_view kSystemCoreServiceType = "_SystemCore._tcp";
 static constexpr std::string_view kSystemCoreServicePrefix = "SystemCore-FIRST";
 
 static std::string Ipv4AddressToString(uint32_t address) {
-  return fmt::format("{}.{}.{}.{}", (address >> 24) & 0xff,
+  return std::format("{}.{}.{}.{}", (address >> 24) & 0xff,
                      (address >> 16) & 0xff, (address >> 8) & 0xff,
                      address & 0xff);
 }
