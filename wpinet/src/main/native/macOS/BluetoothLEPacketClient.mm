@@ -8,6 +8,7 @@
 #include <chrono>
 #include <memory>
 #include <mutex>
+#include <span>
 #include <string>
 #include <utility>
 #include <vector>
@@ -64,7 +65,6 @@ class BluetoothLEPacketClient::Impl
 
   void PostStatus(const BluetoothLEPacketConnectionStatus& status);
 
-  uv::Loop& m_loop;
   PacketCallback m_packetCallback;
   StatusCallback m_statusCallback;
   std::shared_ptr<UvExecFunc> m_exec;
@@ -79,6 +79,56 @@ class BluetoothLEPacketClient::Impl
 namespace {
 
 char MAC_BLUETOOTH_QUEUE_KEY;
+
+struct MacBluetoothLEPacketClientBridge {
+  void* context = nullptr;
+  void (*setStatus)(void* context, std::string_view status) = nullptr;
+  void (*setError)(void* context, std::string_view error) = nullptr;
+  void (*setConnected)(void* context, BluetoothPacketTransport transport) =
+      nullptr;
+  void (*setDisconnected)(void* context, std::string_view reason) = nullptr;
+  void (*didReceivePacket)(void* context, std::span<const uint8_t> packet) =
+      nullptr;
+  void (*didSendPacket)(void* context) = nullptr;
+
+  explicit operator bool() const { return context != nullptr; }
+
+  void SetStatus(std::string_view status) const {
+    if (setStatus != nullptr) {
+      setStatus(context, status);
+    }
+  }
+
+  void SetError(std::string_view error) const {
+    if (setError != nullptr) {
+      setError(context, error);
+    }
+  }
+
+  void SetConnected(BluetoothPacketTransport transport) const {
+    if (setConnected != nullptr) {
+      setConnected(context, transport);
+    }
+  }
+
+  void SetDisconnected(std::string_view reason) const {
+    if (setDisconnected != nullptr) {
+      setDisconnected(context, reason);
+    }
+  }
+
+  void DidReceivePacket(std::span<const uint8_t> packet) const {
+    if (didReceivePacket != nullptr) {
+      didReceivePacket(context, packet);
+    }
+  }
+
+  void DidSendPacket() const {
+    if (didSendPacket != nullptr) {
+      didSendPacket(context);
+    }
+  }
+};
 
 NSString* ToNSString(std::string_view value) {
   return [[NSString alloc] initWithBytes:value.data()
@@ -240,7 +290,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 
 @interface WPINetMacBluetoothLEPacketClient
     : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
-- (instancetype)initWithImpl:(BluetoothLEPacketClient::Impl*)impl;
+- (instancetype)initWithBridge:(MacBluetoothLEPacketClientBridge)bridge;
 - (void)connectWithTarget:(NSString*)target
               serviceUuid:(NSString*)serviceUuid
               controlUuid:(NSString*)controlUuid
@@ -252,7 +302,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 @end
 
 @implementation WPINetMacBluetoothLEPacketClient {
-  BluetoothLEPacketClient::Impl* _impl;
+  MacBluetoothLEPacketClientBridge _bridge;
   dispatch_queue_t _queue;
   CBCentralManager* _central;
   CBPeripheral* _peripheral;
@@ -265,10 +315,10 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   NSUInteger _maxPacketSize;
 }
 
-- (instancetype)initWithImpl:(BluetoothLEPacketClient::Impl*)impl {
+- (instancetype)initWithBridge:(MacBluetoothLEPacketClientBridge)bridge {
   self = [super init];
   if (self != nil) {
-    _impl = impl;
+    _bridge = bridge;
     _queue =
         dispatch_queue_create("edu.wpi.first.wpinet.bluetooth", DISPATCH_QUEUE_SERIAL);
     dispatch_queue_set_specific(_queue, &MAC_BLUETOOTH_QUEUE_KEY,
@@ -309,8 +359,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     }
     _controlCharacteristic = nil;
     _statusCharacteristic = nil;
-    if (_impl != nullptr) {
-      _impl->SetDisconnected(ToString(reason));
+    if (_bridge) {
+      _bridge.SetDisconnected(ToString(reason));
     }
   });
 }
@@ -324,16 +374,16 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
         [_peripheral maximumWriteValueLengthForType:
                          CBCharacteristicWriteWithoutResponse];
     if (packet.length > maxWriteLength) {
-      if (_impl != nullptr) {
-        _impl->SetError("Packet is larger than Bluetooth GATT write MTU");
+      if (_bridge) {
+        _bridge.SetError("Packet is larger than Bluetooth GATT write MTU");
       }
       return;
     }
     [_peripheral writeValue:packet
           forCharacteristic:_controlCharacteristic
                        type:CBCharacteristicWriteWithoutResponse];
-    if (_impl != nullptr) {
-      _impl->DidSendPacket();
+    if (_bridge) {
+      _bridge.DidSendPacket();
     }
   });
 }
@@ -346,7 +396,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
       _peripheral = nil;
     }
     _central.delegate = nil;
-    _impl = nullptr;
+    _bridge = {};
     _controlCharacteristic = nil;
     _statusCharacteristic = nil;
   };
@@ -358,17 +408,17 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 }
 
 - (void)startConnectIfReady {
-  if (_impl == nullptr) {
+  if (!_bridge) {
     return;
   }
 
   if (_central.state != CBManagerStatePoweredOn) {
-    _impl->SetStatus("Waiting for Bluetooth to power on");
+    _bridge.SetStatus("Waiting for Bluetooth to power on");
     return;
   }
 
   if (_target.length == 0) {
-    _impl->SetError("No Bluetooth target configured");
+    _bridge.SetError("No Bluetooth target configured");
     return;
   }
 
@@ -382,7 +432,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     }
   }
 
-  _impl->SetStatus("Scanning for Bluetooth device");
+  _bridge.SetStatus("Scanning for Bluetooth device");
   [_central scanForPeripheralsWithServices:nil
                                    options:@{
                                      CBCentralManagerScanOptionAllowDuplicatesKey : @NO
@@ -390,12 +440,12 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 }
 
 - (void)connectPeripheral:(CBPeripheral*)peripheral {
-  if (_impl == nullptr) {
+  if (!_bridge) {
     return;
   }
   [_central stopScan];
   _peripheral = peripheral;
-  _impl->SetStatus("Connecting");
+  _bridge.SetStatus("Connecting");
   [_central connectPeripheral:peripheral options:nil];
 }
 
@@ -450,9 +500,9 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
                          error:(NSError*)error {
   (void)central;
   (void)peripheral;
-  if (_impl != nullptr) {
-    _impl->SetError(std::string{"Failed to connect Bluetooth device: "} +
-                    ToString(error));
+  if (_bridge) {
+    _bridge.SetError(std::string{"Failed to connect Bluetooth device: "} +
+                     ToString(error));
   }
 }
 
@@ -463,42 +513,43 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   (void)peripheral;
   _controlCharacteristic = nil;
   _statusCharacteristic = nil;
-  if (_impl != nullptr) {
+  if (_bridge) {
     if (error != nil) {
-      _impl->SetError(std::string{"Bluetooth connection closed: "} +
-                      ToString(error));
+      _bridge.SetError(std::string{"Bluetooth connection closed: "} +
+                       ToString(error));
     } else {
-      _impl->SetDisconnected("Bluetooth connection closed");
+      _bridge.SetDisconnected("Bluetooth connection closed");
     }
   }
 }
 
 - (void)discoverGattService {
   if (_peripheral == nil || _serviceUuid == nil) {
-    if (_impl != nullptr) {
-      _impl->SetError("No Bluetooth GATT service configured");
+    if (_bridge) {
+      _bridge.SetError("No Bluetooth GATT service configured");
     }
     return;
   }
-  if (_impl != nullptr) {
-    _impl->SetStatus("Discovering Bluetooth GATT service");
+  if (_bridge) {
+    _bridge.SetStatus("Discovering Bluetooth GATT service");
   }
   [_peripheral discoverServices:@[ _serviceUuid ]];
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didDiscoverServices:(NSError*)error {
   if (error != nil) {
-    if (_impl != nullptr) {
-      _impl->SetError(std::string{"Failed to discover Bluetooth GATT service: "} +
-                      ToString(error));
+    if (_bridge) {
+      _bridge.SetError(
+          std::string{"Failed to discover Bluetooth GATT service: "} +
+          ToString(error));
     }
     return;
   }
 
   for (CBService* service in peripheral.services) {
     if ([service.UUID isEqual:_serviceUuid]) {
-      if (_impl != nullptr) {
-        _impl->SetStatus("Discovering Bluetooth GATT characteristics");
+      if (_bridge) {
+        _bridge.SetStatus("Discovering Bluetooth GATT characteristics");
       }
       [peripheral discoverCharacteristics:@[ _controlUuid, _statusUuid ]
                                 forService:service];
@@ -506,8 +557,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     }
   }
 
-  if (_impl != nullptr) {
-    _impl->SetError("Bluetooth GATT service was not found");
+  if (_bridge) {
+    _bridge.SetError("Bluetooth GATT service was not found");
   }
 }
 
@@ -516,8 +567,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
                                    error:(NSError*)error {
   (void)service;
   if (error != nil) {
-    if (_impl != nullptr) {
-      _impl->SetError(
+    if (_bridge) {
+      _bridge.SetError(
           std::string{"Failed to discover Bluetooth GATT characteristics: "} +
           ToString(error));
     }
@@ -535,14 +586,14 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   }
 
   if (_controlCharacteristic == nil || _statusCharacteristic == nil) {
-    if (_impl != nullptr) {
-      _impl->SetError("Bluetooth GATT packet characteristics were not found");
+    if (_bridge) {
+      _bridge.SetError("Bluetooth GATT packet characteristics were not found");
     }
     return;
   }
 
-  if (_impl != nullptr) {
-    _impl->SetStatus("Enabling Bluetooth GATT notifications");
+  if (_bridge) {
+    _bridge.SetStatus("Enabling Bluetooth GATT notifications");
   }
   [peripheral setNotifyValue:YES forCharacteristic:_statusCharacteristic];
 }
@@ -555,16 +606,16 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     return;
   }
   if (error != nil) {
-    if (_impl != nullptr) {
-      _impl->SetError(
+    if (_bridge) {
+      _bridge.SetError(
           std::string{"Failed to enable Bluetooth GATT notifications: "} +
           ToString(error));
     }
     return;
   }
 
-  if (characteristic.isNotifying && _impl != nullptr) {
-    _impl->SetConnected(BluetoothPacketTransport::GATT);
+  if (characteristic.isNotifying && _bridge) {
+    _bridge.SetConnected(BluetoothPacketTransport::GATT);
   }
 }
 
@@ -576,16 +627,16 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     return;
   }
   if (error != nil) {
-    if (_impl != nullptr) {
-      _impl->SetError(std::string{"Bluetooth GATT notification failed: "} +
-                      ToString(error));
+    if (_bridge) {
+      _bridge.SetError(std::string{"Bluetooth GATT notification failed: "} +
+                       ToString(error));
     }
     return;
   }
 
   NSData* value = characteristic.value;
-  if (value.length > 0 && _impl != nullptr) {
-    _impl->DidReceivePacket(
+  if (value.length > 0 && _bridge) {
+    _bridge.DidReceivePacket(
         {static_cast<const uint8_t*>(value.bytes), value.length});
   }
 }
@@ -602,17 +653,38 @@ std::shared_ptr<BluetoothLEPacketClient::Impl> BluetoothLEPacketClient::Impl::Cr
     return nullptr;
   }
   impl->m_exec->wakeup.connect([](auto func) { func(); });
+  MacBluetoothLEPacketClientBridge bridge;
+  bridge.context = impl.get();
+  bridge.setStatus = [](void* context, std::string_view status) {
+    static_cast<Impl*>(context)->SetStatus(status);
+  };
+  bridge.setError = [](void* context, std::string_view error) {
+    static_cast<Impl*>(context)->SetError(error);
+  };
+  bridge.setConnected = [](void* context, BluetoothPacketTransport transport) {
+    static_cast<Impl*>(context)->SetConnected(transport);
+  };
+  bridge.setDisconnected = [](void* context, std::string_view reason) {
+    static_cast<Impl*>(context)->SetDisconnected(reason);
+  };
+  bridge.didReceivePacket = [](void* context,
+                               std::span<const uint8_t> packet) {
+    static_cast<Impl*>(context)->DidReceivePacket(packet);
+  };
+  bridge.didSendPacket = [](void* context) {
+    static_cast<Impl*>(context)->DidSendPacket();
+  };
   impl->m_client =
-      [[WPINetMacBluetoothLEPacketClient alloc] initWithImpl:impl.get()];
+      [[WPINetMacBluetoothLEPacketClient alloc] initWithBridge:bridge];
   return impl;
 }
 
 BluetoothLEPacketClient::Impl::Impl(uv::Loop& loop,
                                  PacketCallback packetCallback,
                                  StatusCallback statusCallback)
-    : m_loop{loop},
-      m_packetCallback{std::move(packetCallback)},
+    : m_packetCallback{std::move(packetCallback)},
       m_statusCallback{std::move(statusCallback)} {
+  (void)loop;
   m_status.supported = true;
   m_status.status = "Waiting for Bluetooth target";
 }
