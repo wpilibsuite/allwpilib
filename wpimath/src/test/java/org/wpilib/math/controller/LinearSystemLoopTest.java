@@ -69,11 +69,10 @@ class LinearSystemLoopTest {
     m_loop.setNextR(references);
 
     var constraints = new TrapezoidProfile.Constraints(4, 3);
+    var profile = new TrapezoidProfile(constraints);
 
-    TrapezoidProfile profile;
-    TrapezoidProfile.State state = new TrapezoidProfile.State(m_loop.getXHat(0), m_loop.getXHat(1));
+    var state = new TrapezoidProfile.State(m_loop.getXHat(0), m_loop.getXHat(1));
     for (int i = 0; i < 1000; i++) {
-      profile = new TrapezoidProfile(constraints);
       state =
           profile.calculate(
               kDt, state, new TrapezoidProfile.State(references.get(0, 0), references.get(1, 0)));
