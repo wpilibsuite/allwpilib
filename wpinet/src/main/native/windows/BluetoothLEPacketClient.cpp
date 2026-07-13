@@ -56,6 +56,9 @@ using namespace wpi::net;
 
 namespace {
 
+constexpr const wchar_t* BLUETOOTH_DEVICE_ADDRESS_PROPERTY =
+    L"System.Devices.Aep.DeviceAddress";
+
 uint8_t HexDigit(char ch) {
   if (ch >= '0' && ch <= '9') {
     return ch - '0';
@@ -106,6 +109,40 @@ std::string FormatBluetoothAddress(uint64_t address) {
   return formatted;
 }
 
+std::string ExtractBluetoothAddress(std::string_view value) {
+  for (size_t i = 0; i + 17 <= value.size(); ++i) {
+    uint64_t address = 0;
+    if (ParseBluetoothAddress(value.substr(i, 17), &address)) {
+      return FormatBluetoothAddress(address);
+    }
+  }
+
+  for (size_t i = 0; i + 12 <= value.size(); ++i) {
+    if (i > 0 && HexDigit(value[i - 1]) != 0xff) {
+      continue;
+    }
+    if (i + 12 < value.size() && HexDigit(value[i + 12]) != 0xff) {
+      continue;
+    }
+
+    uint64_t address = 0;
+    bool valid = true;
+    for (size_t j = 0; j < 12; ++j) {
+      uint8_t digit = HexDigit(value[i + j]);
+      if (digit == 0xff) {
+        valid = false;
+        break;
+      }
+      address = (address << 4) | digit;
+    }
+    if (valid) {
+      return FormatBluetoothAddress(address);
+    }
+  }
+
+  return {};
+}
+
 void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   std::stable_sort(devices->begin(), devices->end(),
                    [](const auto& a, const auto& b) {
@@ -120,15 +157,28 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
                    });
 }
 
+winrt::Windows::Foundation::Collections::IVector<winrt::hstring>
+GetBluetoothDeviceProperties() {
+  return winrt::single_threaded_vector<winrt::hstring>(
+      {winrt::hstring{BLUETOOTH_DEVICE_ADDRESS_PROPERTY}});
+}
+
 std::string GetDeviceTarget(dev::DeviceInformation const& info) {
   try {
-    auto device = bt::BluetoothLEDevice::FromIdAsync(info.Id()).get();
-    if (device) {
-      return FormatBluetoothAddress(device.BluetoothAddress());
+    auto properties = info.Properties();
+    winrt::hstring addressProperty{BLUETOOTH_DEVICE_ADDRESS_PROPERTY};
+    if (properties.HasKey(addressProperty)) {
+      auto address = properties.Lookup(addressProperty);
+      std::string target = ExtractBluetoothAddress(
+          winrt::to_string(winrt::unbox_value<winrt::hstring>(address)));
+      if (!target.empty()) {
+        return target;
+      }
     }
   } catch (winrt::hresult_error const&) {
   }
-  return {};
+
+  return ExtractBluetoothAddress(winrt::to_string(info.Id()));
 }
 
 bool DeviceMatchesTarget(dev::DeviceInformation const& info,
@@ -199,7 +249,8 @@ std::vector<uint8_t> FromBuffer(streams::IBuffer const& buffer) {
 
 std::vector<dev::DeviceInformation> FindKnownBluetoothDevices() {
   auto devices = dev::DeviceInformation::FindAllAsync(
-                     bt::BluetoothLEDevice::GetDeviceSelector())
+                     bt::BluetoothLEDevice::GetDeviceSelector(),
+                     GetBluetoothDeviceProperties())
                      .get();
   std::vector<dev::DeviceInformation> result;
   result.reserve(devices.Size());
@@ -212,7 +263,8 @@ std::vector<dev::DeviceInformation> FindKnownBluetoothDevices() {
 std::vector<dev::DeviceInformation> FindUnpairedBluetoothDevices() {
   auto devices =
       dev::DeviceInformation::FindAllAsync(
-          bt::BluetoothLEDevice::GetDeviceSelectorFromPairingState(false))
+          bt::BluetoothLEDevice::GetDeviceSelectorFromPairingState(false),
+          GetBluetoothDeviceProperties())
           .get();
   std::vector<dev::DeviceInformation> result;
   result.reserve(devices.Size());
@@ -247,7 +299,8 @@ std::vector<dev::DeviceInformation> ScanBluetoothDevices(
   auto state = std::make_shared<BluetoothDeviceScanState>();
 
   auto watcher = dev::DeviceInformation::CreateWatcher(
-      bt::BluetoothLEDevice::GetDeviceSelectorFromPairingState(false));
+      bt::BluetoothLEDevice::GetDeviceSelectorFromPairingState(false),
+      GetBluetoothDeviceProperties());
   auto addedToken = watcher.Added(
       [state](dev::DeviceWatcher const&, dev::DeviceInformation const& info) {
         std::scoped_lock lock{state->mutex};
