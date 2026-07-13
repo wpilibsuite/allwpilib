@@ -1,5 +1,43 @@
 import org.gradle.internal.os.OperatingSystem
 
+def findWindowsCppWinrtIncludeDir = {
+    def candidates = []
+    def sdkDir = System.getenv('WindowsSdkDir')
+    def sdkVersions = [
+        System.getenv('WindowsSDKVersion'),
+        System.getenv('WindowsTargetPlatformVersion'),
+        System.getenv('WindowsSDKLibVersion')
+    ].findAll { it != null && !it.isEmpty() }
+
+    if (sdkDir != null && !sdkDir.isEmpty()) {
+        sdkVersions.each {
+            candidates << new File(new File(new File(sdkDir), 'Include'), it)
+                .toPath()
+                .normalize()
+                .toFile()
+        }
+    }
+
+    def programFilesX86 = System.getenv('ProgramFiles(x86)')
+    if (programFilesX86 != null && !programFilesX86.isEmpty()) {
+        def includeRoot = new File(programFilesX86, 'Windows Kits/10/Include')
+        if (includeRoot.isDirectory()) {
+            def versionDirs = includeRoot.listFiles({ File file -> file.isDirectory() } as FileFilter)
+            if (versionDirs != null) {
+                versionDirs.sort { a, b -> b.name <=> a.name }.each {
+                    candidates << it
+                }
+            }
+        }
+    }
+
+    return candidates.collect {
+        new File(it, 'cppwinrt')
+    }.find {
+        new File(it, 'winrt/base.h').isFile()
+    }
+}
+
 if (OperatingSystem.current().isMacOsX()) {
     apply plugin: 'objective-cpp'
 }
@@ -80,6 +118,10 @@ ext {
             }
         }
         if (it.targetPlatform.operatingSystem.isWindows()) {
+            def cppWinrtIncludeDir = findWindowsCppWinrtIncludeDir()
+            if (cppWinrtIncludeDir != null) {
+                it.cppCompiler.args << "/I${cppWinrtIncludeDir.absolutePath}"
+            }
             if (it in SharedLibraryBinarySpec) {
                 it.cppCompiler.define 'BUILDING_UV_SHARED'
             }
