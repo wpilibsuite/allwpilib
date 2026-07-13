@@ -43,6 +43,9 @@ if (OperatingSystem.current().isMacOsX()) {
 }
 
 def addWpinetPlatformLinkerArgs = { binary ->
+    if (binary instanceof StaticLibraryBinarySpec) {
+        return
+    }
     if (binary.targetPlatform.operatingSystem.isWindows()) {
         binary.linker.args << 'windowsapp.lib'
     } else if (binary.targetPlatform.operatingSystem.isMacOsX()) {
