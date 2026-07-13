@@ -413,9 +413,21 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     return;
   }
 
-  if (_central.state != CBManagerStatePoweredOn) {
-    _bridge.SetStatus("Waiting for Bluetooth to power on");
-    return;
+  switch (_central.state) {
+    case CBManagerStatePoweredOn:
+      break;
+    case CBManagerStatePoweredOff:
+      _bridge.SetError("Bluetooth is powered off");
+      return;
+    case CBManagerStateUnsupported:
+      _bridge.SetError("Bluetooth LE is unsupported on this Mac");
+      return;
+    case CBManagerStateUnauthorized:
+      _bridge.SetError("Bluetooth permission was denied");
+      return;
+    default:
+      _bridge.SetStatus("Waiting for Bluetooth to power on");
+      return;
   }
 
   if (_target.length == 0) {
