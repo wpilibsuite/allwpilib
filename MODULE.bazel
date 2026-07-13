@@ -95,6 +95,30 @@ local_path_override(
 bazel_dep(name = "rules_license", version = "1.0.0")
 
 http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+new_local_repository = use_repo_rule(
+    "@bazel_tools//tools/build_defs/repo:local.bzl",
+    "new_local_repository",
+)
+
+new_local_repository(
+    name = "system_dbus",
+    build_file_content = """
+cc_library(
+    name = "dbus",
+    hdrs = glob([
+        "include/dbus-1.0/dbus/**/*.h",
+        "lib/x86_64-linux-gnu/dbus-1.0/include/dbus/**/*.h",
+    ]),
+    includes = [
+        "include/dbus-1.0",
+        "lib/x86_64-linux-gnu/dbus-1.0/include",
+    ],
+    linkopts = ["-ldbus-1"],
+    visibility = ["//visibility:public"],
+)
+""",
+    path = "/usr",
+)
 
 http_file(
     name = "quickbuffer_protoc_linux",
