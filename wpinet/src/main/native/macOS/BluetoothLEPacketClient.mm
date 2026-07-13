@@ -315,6 +315,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   CBUUID* _controlUuid;
   CBUUID* _statusUuid;
   NSUInteger _maxPacketSize;
+  BOOL _connectRequested;
 }
 
 - (instancetype)initWithBridge:(MacBluetoothLEPacketClientBridge)bridge {
@@ -342,6 +343,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     _controlUuid = [CBUUID UUIDWithString:controlUuid];
     _statusUuid = [CBUUID UUIDWithString:statusUuid];
     _maxPacketSize = maxPacketSize;
+    _connectRequested = YES;
     _controlCharacteristic = nil;
     _statusCharacteristic = nil;
     if (_peripheral != nil) {
@@ -355,6 +357,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 - (void)disconnectWithReason:(NSString*)reason {
   dispatch_async(_queue, ^{
     [_central stopScan];
+    _connectRequested = NO;
+    _target = nil;
     if (_peripheral != nil) {
       [_central cancelPeripheralConnection:_peripheral];
       _peripheral = nil;
@@ -370,6 +374,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 - (void)cancelCurrentConnection {
   dispatch_block_t block = ^{
     [_central stopScan];
+    _connectRequested = NO;
+    _target = nil;
     if (_peripheral != nil) {
       [_central cancelPeripheralConnection:_peripheral];
       _peripheral = nil;
@@ -414,6 +420,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
       [_central cancelPeripheralConnection:_peripheral];
       _peripheral = nil;
     }
+    _connectRequested = NO;
+    _target = nil;
     _central.delegate = nil;
     _bridge = {};
     _controlCharacteristic = nil;
@@ -427,7 +435,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 }
 
 - (void)startConnectIfReady {
-  if (!_bridge) {
+  if (!_bridge || !_connectRequested) {
     return;
   }
 
@@ -471,7 +479,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 }
 
 - (void)connectPeripheral:(CBPeripheral*)peripheral {
-  if (!_bridge) {
+  if (!_bridge || !_connectRequested) {
     return;
   }
   [_central stopScan];
@@ -483,6 +491,9 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 - (BOOL)peripheralMatchesTarget:(CBPeripheral*)peripheral
               advertisementData:(NSDictionary<NSString*, id>*)advertisementData {
   if (_target.length == 0) {
+    return NO;
+  }
+  if (!_connectRequested) {
     return NO;
   }
 
@@ -536,6 +547,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   if (peripheral != _peripheral) {
     return;
   }
+  _connectRequested = NO;
+  _target = nil;
   _peripheral = nil;
   _controlCharacteristic = nil;
   _statusCharacteristic = nil;
@@ -552,6 +565,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   if (peripheral != _peripheral) {
     return;
   }
+  _connectRequested = NO;
+  _target = nil;
   _peripheral = nil;
   _controlCharacteristic = nil;
   _statusCharacteristic = nil;
