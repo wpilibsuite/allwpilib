@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <format>
 #include <memory>
 #include <mutex>
 #include <span>
@@ -214,8 +215,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 
   SortBluetoothDevices(&result.devices);
   if (result.error.empty()) {
-    result.status = "Discovered " + std::to_string(result.devices.size()) +
-                    " Bluetooth LE devices";
+    result.status =
+        std::format("Discovered {} Bluetooth LE devices", result.devices.size());
   }
   return result;
 }
@@ -501,8 +502,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   (void)central;
   (void)peripheral;
   if (_bridge) {
-    _bridge.SetError(std::string{"Failed to connect Bluetooth device: "} +
-                     ToString(error));
+    _bridge.SetError(std::format("Failed to connect Bluetooth device: {}",
+                                 ToString(error)));
   }
 }
 
@@ -515,8 +516,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   _statusCharacteristic = nil;
   if (_bridge) {
     if (error != nil) {
-      _bridge.SetError(std::string{"Bluetooth connection closed: "} +
-                       ToString(error));
+      _bridge.SetError(
+          std::format("Bluetooth connection closed: {}", ToString(error)));
     } else {
       _bridge.SetDisconnected("Bluetooth connection closed");
     }
@@ -540,8 +541,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   if (error != nil) {
     if (_bridge) {
       _bridge.SetError(
-          std::string{"Failed to discover Bluetooth GATT service: "} +
-          ToString(error));
+          std::format("Failed to discover Bluetooth GATT service: {}",
+                      ToString(error)));
     }
     return;
   }
@@ -569,8 +570,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   if (error != nil) {
     if (_bridge) {
       _bridge.SetError(
-          std::string{"Failed to discover Bluetooth GATT characteristics: "} +
-          ToString(error));
+          std::format("Failed to discover Bluetooth GATT characteristics: {}",
+                      ToString(error)));
     }
     return;
   }
@@ -608,8 +609,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   if (error != nil) {
     if (_bridge) {
       _bridge.SetError(
-          std::string{"Failed to enable Bluetooth GATT notifications: "} +
-          ToString(error));
+          std::format("Failed to enable Bluetooth GATT notifications: {}",
+                      ToString(error)));
     }
     return;
   }
@@ -628,8 +629,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   }
   if (error != nil) {
     if (_bridge) {
-      _bridge.SetError(std::string{"Bluetooth GATT notification failed: "} +
-                       ToString(error));
+      _bridge.SetError(
+          std::format("Bluetooth GATT notification failed: {}", ToString(error)));
     }
     return;
   }

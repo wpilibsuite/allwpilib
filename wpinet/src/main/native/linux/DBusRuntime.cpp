@@ -6,6 +6,7 @@
 
 #include <dlfcn.h>
 
+#include <format>
 #include <mutex>
 #include <string>
 
@@ -45,11 +46,11 @@ void* DBusApi::LoadSymbol(const char* name, std::string* error) {
   const char* dlsymError = dlerror();
   if (dlsymError != nullptr) {
     *error =
-        std::string{"Failed to load "} + name + " from libdbus: " + dlsymError;
+        std::format("Failed to load {} from libdbus: {}", name, dlsymError);
     return nullptr;
   }
   if (symbol == nullptr) {
-    *error = std::string{"Failed to load "} + name + " from libdbus";
+    *error = std::format("Failed to load {} from libdbus", name);
   }
   return symbol;
 }
@@ -60,7 +61,7 @@ bool DBusApi::Load(std::string* error) {
     m_handle = dlopen("libdbus-1.so", RTLD_NOW | RTLD_LOCAL);
   }
   if (m_handle == nullptr) {
-    *error = std::string{"Failed to load libdbus-1: "} + dlerror();
+    *error = std::format("Failed to load libdbus-1: {}", dlerror());
     return false;
   }
 

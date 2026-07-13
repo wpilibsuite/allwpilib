@@ -14,6 +14,7 @@
 #include <chrono>
 #include <cstdint>
 #include <cstring>
+#include <format>
 #include <functional>
 #include <limits>
 #include <memory>
@@ -374,9 +375,8 @@ class BluetoothLEPacketClient::Impl
     }
     if (::bind(fd, reinterpret_cast<sockaddr*>(&localAddr), sizeof(localAddr)) <
         0) {
-      SetError(ErrnoString(std::string{"Failed to bind Bluetooth "}
-                               .append(transportName)
-                               .append(" socket")));
+      SetError(ErrnoString(
+          std::format("Failed to bind Bluetooth {} socket", transportName)));
       return false;
     }
 
