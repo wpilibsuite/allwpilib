@@ -4,6 +4,8 @@
 
 #include "wpi/net/BluetoothLEPacketClient.hpp"
 
+#include <algorithm>
+#include <chrono>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -99,7 +101,142 @@ std::string ToString(NSError* error) {
   return ToString(error.localizedDescription);
 }
 
+void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
+  std::stable_sort(devices->begin(), devices->end(),
+                   [](const auto& a, const auto& b) {
+                     std::string_view aKey =
+                         a.name.empty() ? std::string_view{a.target} : a.name;
+                     std::string_view bKey =
+                         b.name.empty() ? std::string_view{b.target} : b.name;
+                     if (aKey != bKey) {
+                       return aKey < bKey;
+                     }
+                     return a.target < b.target;
+                   });
+}
+
 }  // namespace
+
+@interface WPINetMacBluetoothLEDeviceScanner : NSObject <CBCentralManagerDelegate>
+- (BluetoothLEDeviceScanResult)scanForDuration:(NSTimeInterval)duration;
+@end
+
+@implementation WPINetMacBluetoothLEDeviceScanner {
+  dispatch_queue_t _queue;
+  CBCentralManager* _central;
+  dispatch_semaphore_t _done;
+  BOOL _finished;
+  BOOL _startedScan;
+  NSTimeInterval _duration;
+  std::vector<BluetoothLEDeviceInfo> _devices;
+  std::string _error;
+}
+
+- (instancetype)init {
+  self = [super init];
+  if (self != nil) {
+    _queue = dispatch_queue_create("edu.wpi.first.wpinet.bluetooth.scan",
+                                   DISPATCH_QUEUE_SERIAL);
+  }
+  return self;
+}
+
+- (BluetoothLEDeviceScanResult)scanForDuration:(NSTimeInterval)duration {
+  _duration = duration > 0.0 ? duration : 2.0;
+  _done = dispatch_semaphore_create(0);
+  _finished = NO;
+  _startedScan = NO;
+  _devices.clear();
+  _error.clear();
+  _central = [[CBCentralManager alloc] initWithDelegate:self queue:_queue];
+
+  dispatch_time_t deadline = dispatch_time(
+      DISPATCH_TIME_NOW, static_cast<int64_t>((_duration + 5.0) * NSEC_PER_SEC));
+  dispatch_semaphore_wait(_done, deadline);
+
+  BluetoothLEDeviceScanResult result;
+  result.supported = true;
+  dispatch_sync(_queue, ^{
+    [self finishLocked];
+  });
+  result.devices = _devices;
+  result.error = _error;
+
+  SortBluetoothDevices(&result.devices);
+  if (result.error.empty()) {
+    result.status = "Discovered " + std::to_string(result.devices.size()) +
+                    " Bluetooth LE devices";
+  }
+  return result;
+}
+
+- (void)finishLocked {
+  if (_finished) {
+    return;
+  }
+  _finished = YES;
+  [_central stopScan];
+  _central.delegate = nil;
+  _central = nil;
+  dispatch_semaphore_signal(_done);
+}
+
+- (void)centralManagerDidUpdateState:(CBCentralManager*)central {
+  if (central.state == CBManagerStatePoweredOn) {
+    if (_startedScan) {
+      return;
+    }
+    _startedScan = YES;
+    [_central scanForPeripheralsWithServices:nil
+                                     options:@{
+                                       CBCentralManagerScanOptionAllowDuplicatesKey : @NO
+                                     }];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW,
+                                 static_cast<int64_t>(_duration * NSEC_PER_SEC)),
+                   _queue, ^{
+      [self finishLocked];
+    });
+    return;
+  }
+
+  if (central.state == CBManagerStatePoweredOff) {
+    _error = "Bluetooth is powered off";
+    [self finishLocked];
+  } else if (central.state == CBManagerStateUnsupported) {
+    _error = "Bluetooth LE is unsupported on this Mac";
+    [self finishLocked];
+  } else if (central.state == CBManagerStateUnauthorized) {
+    _error = "Bluetooth permission was denied";
+    [self finishLocked];
+  }
+}
+
+- (void)centralManager:(CBCentralManager*)central
+    didDiscoverPeripheral:(CBPeripheral*)peripheral
+        advertisementData:(NSDictionary<NSString*, id>*)advertisementData
+                     RSSI:(NSNumber*)RSSI {
+  (void)central;
+  (void)RSSI;
+
+  BluetoothLEDeviceInfo device;
+  device.target = ToString(peripheral.identifier.UUIDString);
+  NSString* advertisedName = advertisementData[CBAdvertisementDataLocalNameKey];
+  NSString* name = advertisedName.length > 0 ? advertisedName : peripheral.name;
+  device.name = ToString(name);
+  device.addressType = BluetoothAddressType::RANDOM;
+  device.pairable = false;
+
+  auto it = std::find_if(_devices.begin(), _devices.end(), [&](const auto& d) {
+    return d.target == device.target;
+  });
+  if (it == _devices.end()) {
+    _devices.emplace_back(std::move(device));
+  } else if (it->name.empty() && !device.name.empty()) {
+    it->name = std::move(device.name);
+  }
+}
+
+@end
 
 @interface WPINetMacBluetoothLEPacketClient
     : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate, NSStreamDelegate>
@@ -803,6 +940,27 @@ BluetoothLEPacketClient::~BluetoothLEPacketClient() = default;
 
 bool BluetoothLEPacketClient::IsSupported() {
   return true;
+}
+
+bool BluetoothLEPacketClient::IsPairingSupported() {
+  return false;
+}
+
+BluetoothLEDeviceScanResult BluetoothLEPacketClient::ScanDevices(
+    std::chrono::milliseconds timeout) {
+  WPINetMacBluetoothLEDeviceScanner* scanner =
+      [[WPINetMacBluetoothLEDeviceScanner alloc] init];
+  return [scanner scanForDuration:timeout.count() / 1000.0];
+}
+
+BluetoothLEPairingResult BluetoothLEPacketClient::PairDevice(
+    std::string_view target) {
+  (void)target;
+  BluetoothLEPairingResult result;
+  result.supported = false;
+  result.status =
+      "macOS pairs Bluetooth LE devices during connection when required";
+  return result;
 }
 
 bool BluetoothLEPacketClient::Connect(BluetoothLEPacketClientConfig config) {

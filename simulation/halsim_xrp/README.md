@@ -4,11 +4,11 @@ This is an extension that provides a client version of the XRP protocol for tran
 
 ## Configuration
 
-The XRP client can be configured through the XRP Bluetooth window in the simulator GUI. On Linux, the window can use `bluetoothctl` to scan for cached devices and pair/trust the selected XRP before connecting.
+The XRP client can be configured through the XRP Bluetooth window in the simulator GUI. The window can scan for nearby XRP Bluetooth LE devices on supported platforms and pair with the selected target where the platform exposes explicit pairing.
 
 The client also has environment variable configuration for headless use.
 
-``HALSIMXRP_BT_ADDRESS``: The Bluetooth target to connect to. On Linux, this is the Bluetooth device address. On macOS, this can be the CoreBluetooth UUID or advertised XRP device name. No default.
+``HALSIMXRP_BT_ADDRESS``: The Bluetooth target to connect to. On Linux and Windows, this is the Bluetooth device address. On macOS, this can be the CoreBluetooth UUID or advertised XRP device name. No default.
 
 ``HALSIMXRP_BT_ADDRESS_TYPE``: The Bluetooth LE address type. Supported values are `public` and `random`. Defaults to `random`.
 
