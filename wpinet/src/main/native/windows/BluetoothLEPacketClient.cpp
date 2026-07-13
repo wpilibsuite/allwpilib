@@ -371,20 +371,7 @@ class BluetoothLEPacketClient::Impl
       }
     }
 
-    {
-      std::scoped_lock lock{m_gattMutex};
-      if (m_statusCharacteristic && m_valueChangedToken.value != 0) {
-        try {
-          EnsureWinrtApartment();
-          m_statusCharacteristic.ValueChanged(m_valueChangedToken);
-        } catch (winrt::hresult_error const&) {
-        }
-      }
-      m_valueChangedToken = {};
-      m_controlCharacteristic = nullptr;
-      m_statusCharacteristic = nullptr;
-      m_device = nullptr;
-    }
+    ClearGattState();
 
     if (!reason.empty()) {
       UpdateStatus([&](auto& status) {
@@ -411,7 +398,7 @@ class BluetoothLEPacketClient::Impl
       tooLarge = packet.size() > m_config.maxPacketSize;
     }
     if (tooLarge) {
-      SetError("Packet is larger than Bluetooth transport MTU");
+      FailConnectedGatt("Packet is larger than Bluetooth transport MTU");
       return false;
     }
 
@@ -434,9 +421,10 @@ class BluetoothLEPacketClient::Impl
         UpdateStatus([](auto& current) { ++current.packetsSent; });
         return true;
       }
-      SetError("Bluetooth GATT write failed");
+      FailConnectedGatt("Bluetooth GATT write failed");
     } catch (winrt::hresult_error const& error) {
-      SetError(std::format("Bluetooth GATT write failed: {}", ToString(error)));
+      FailConnectedGatt(
+          std::format("Bluetooth GATT write failed: {}", ToString(error)));
     }
     return false;
   }
@@ -552,6 +540,26 @@ class BluetoothLEPacketClient::Impl
         callback(packet);
       });
     }
+  }
+
+  void ClearGattState() {
+    std::scoped_lock lock{m_gattMutex};
+    if (m_statusCharacteristic && m_valueChangedToken.value != 0) {
+      try {
+        EnsureWinrtApartment();
+        m_statusCharacteristic.ValueChanged(m_valueChangedToken);
+      } catch (winrt::hresult_error const&) {
+      }
+    }
+    m_valueChangedToken = {};
+    m_controlCharacteristic = nullptr;
+    m_statusCharacteristic = nullptr;
+    m_device = nullptr;
+  }
+
+  void FailConnectedGatt(std::string_view error) {
+    ClearGattState();
+    SetError(error);
   }
 
   void SetError(std::string_view error) {
