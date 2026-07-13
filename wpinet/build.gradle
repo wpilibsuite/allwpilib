@@ -12,9 +12,9 @@ def findWindowsCppWinrtIncludeDir = {
     if (sdkDir != null && !sdkDir.isEmpty()) {
         sdkVersions.each {
             candidates << new File(new File(new File(sdkDir), 'Include'), it)
-                .toPath()
-                .normalize()
-                .toFile()
+                    .toPath()
+                    .normalize()
+                    .toFile()
         }
     }
 
