@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/net/BluetoothL2CAPClient.hpp"
+#include "wpi/net/BluetoothLEPacketClient.hpp"
 
 #include <memory>
 #include <mutex>
@@ -20,10 +20,10 @@ namespace uv = wpi::net::uv;
 
 using namespace wpi::net;
 
-@class WPINetMacBluetoothL2CAPClient;
+@class WPINetMacBluetoothLEPacketClient;
 
-class BluetoothL2CAPClient::Impl
-    : public std::enable_shared_from_this<BluetoothL2CAPClient::Impl> {
+class BluetoothLEPacketClient::Impl
+    : public std::enable_shared_from_this<BluetoothLEPacketClient::Impl> {
  public:
   using LoopFunc = std::function<void()>;
   using UvExecFunc = uv::Async<LoopFunc>;
@@ -36,10 +36,10 @@ class BluetoothL2CAPClient::Impl
        StatusCallback statusCallback);
   ~Impl();
 
-  bool Connect(BluetoothL2CAPClientConfig config);
+  bool Connect(BluetoothLEPacketClientConfig config);
   void Disconnect(std::string_view reason);
   bool Send(std::span<const uint8_t> packet);
-  BluetoothL2CAPConnectionStatus GetStatus() const;
+  BluetoothLEPacketConnectionStatus GetStatus() const;
 
   void SetStatus(std::string_view status);
   void SetError(std::string_view error);
@@ -51,7 +51,7 @@ class BluetoothL2CAPClient::Impl
  private:
   template <typename F>
   void UpdateStatus(F&& func) {
-    BluetoothL2CAPConnectionStatus snapshot;
+    BluetoothLEPacketConnectionStatus snapshot;
     {
       std::scoped_lock lock{m_statusMutex};
       func(m_status);
@@ -60,18 +60,18 @@ class BluetoothL2CAPClient::Impl
     PostStatus(snapshot);
   }
 
-  void PostStatus(const BluetoothL2CAPConnectionStatus& status);
+  void PostStatus(const BluetoothLEPacketConnectionStatus& status);
 
   uv::Loop& m_loop;
   PacketCallback m_packetCallback;
   StatusCallback m_statusCallback;
   std::shared_ptr<UvExecFunc> m_exec;
 
-  __strong WPINetMacBluetoothL2CAPClient* m_client = nil;
+  __strong WPINetMacBluetoothLEPacketClient* m_client = nil;
 
   mutable std::mutex m_statusMutex;
-  BluetoothL2CAPConnectionStatus m_status;
-  BluetoothL2CAPClientConfig m_config;
+  BluetoothLEPacketConnectionStatus m_status;
+  BluetoothLEPacketClientConfig m_config;
 };
 
 namespace {
@@ -101,9 +101,9 @@ std::string ToString(NSError* error) {
 
 }  // namespace
 
-@interface WPINetMacBluetoothL2CAPClient
+@interface WPINetMacBluetoothLEPacketClient
     : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate, NSStreamDelegate>
-- (instancetype)initWithImpl:(BluetoothL2CAPClient::Impl*)impl;
+- (instancetype)initWithImpl:(BluetoothLEPacketClient::Impl*)impl;
 - (void)connectWithTarget:(NSString*)target
                       psm:(CBL2CAPPSM)psm
               serviceUuid:(NSString*)serviceUuid
@@ -115,8 +115,8 @@ std::string ToString(NSError* error) {
 - (void)invalidate;
 @end
 
-@implementation WPINetMacBluetoothL2CAPClient {
-  BluetoothL2CAPClient::Impl* _impl;
+@implementation WPINetMacBluetoothLEPacketClient {
+  BluetoothLEPacketClient::Impl* _impl;
   dispatch_queue_t _queue;
   CBCentralManager* _central;
   CBPeripheral* _peripheral;
@@ -137,7 +137,7 @@ std::string ToString(NSError* error) {
   BOOL _usingGatt;
 }
 
-- (instancetype)initWithImpl:(BluetoothL2CAPClient::Impl*)impl {
+- (instancetype)initWithImpl:(BluetoothLEPacketClient::Impl*)impl {
   self = [super init];
   if (self != nil) {
     _impl = impl;
@@ -630,7 +630,7 @@ std::string ToString(NSError* error) {
 
 @end
 
-std::shared_ptr<BluetoothL2CAPClient::Impl> BluetoothL2CAPClient::Impl::Create(
+std::shared_ptr<BluetoothLEPacketClient::Impl> BluetoothLEPacketClient::Impl::Create(
     uv::Loop& loop, PacketCallback packetCallback,
     StatusCallback statusCallback) {
   auto impl = std::make_shared<Impl>(loop, std::move(packetCallback),
@@ -641,11 +641,11 @@ std::shared_ptr<BluetoothL2CAPClient::Impl> BluetoothL2CAPClient::Impl::Create(
   }
   impl->m_exec->wakeup.connect([](auto func) { func(); });
   impl->m_client =
-      [[WPINetMacBluetoothL2CAPClient alloc] initWithImpl:impl.get()];
+      [[WPINetMacBluetoothLEPacketClient alloc] initWithImpl:impl.get()];
   return impl;
 }
 
-BluetoothL2CAPClient::Impl::Impl(uv::Loop& loop,
+BluetoothLEPacketClient::Impl::Impl(uv::Loop& loop,
                                  PacketCallback packetCallback,
                                  StatusCallback statusCallback)
     : m_loop{loop},
@@ -655,13 +655,13 @@ BluetoothL2CAPClient::Impl::Impl(uv::Loop& loop,
   m_status.status = "Waiting for Bluetooth target";
 }
 
-BluetoothL2CAPClient::Impl::~Impl() {
+BluetoothLEPacketClient::Impl::~Impl() {
   [m_client invalidate];
   m_client = nil;
 }
 
-bool BluetoothL2CAPClient::Impl::Connect(
-    BluetoothL2CAPClientConfig config) {
+bool BluetoothLEPacketClient::Impl::Connect(
+    BluetoothLEPacketClientConfig config) {
   if (config.address.empty()) {
     SetError("No Bluetooth target configured");
     return false;
@@ -693,11 +693,11 @@ bool BluetoothL2CAPClient::Impl::Connect(
   return true;
 }
 
-void BluetoothL2CAPClient::Impl::Disconnect(std::string_view reason) {
+void BluetoothLEPacketClient::Impl::Disconnect(std::string_view reason) {
   [m_client disconnectWithReason:ToNSString(reason)];
 }
 
-bool BluetoothL2CAPClient::Impl::Send(std::span<const uint8_t> packet) {
+bool BluetoothLEPacketClient::Impl::Send(std::span<const uint8_t> packet) {
   if (packet.empty()) {
     return false;
   }
@@ -720,16 +720,16 @@ bool BluetoothL2CAPClient::Impl::Send(std::span<const uint8_t> packet) {
   return true;
 }
 
-BluetoothL2CAPConnectionStatus BluetoothL2CAPClient::Impl::GetStatus() const {
+BluetoothLEPacketConnectionStatus BluetoothLEPacketClient::Impl::GetStatus() const {
   std::scoped_lock lock{m_statusMutex};
   return m_status;
 }
 
-void BluetoothL2CAPClient::Impl::SetStatus(std::string_view status) {
+void BluetoothLEPacketClient::Impl::SetStatus(std::string_view status) {
   UpdateStatus([&](auto& current) { current.status = status; });
 }
 
-void BluetoothL2CAPClient::Impl::SetError(std::string_view error) {
+void BluetoothLEPacketClient::Impl::SetError(std::string_view error) {
   UpdateStatus([&](auto& status) {
     status.error = error;
     status.status = error;
@@ -739,7 +739,7 @@ void BluetoothL2CAPClient::Impl::SetError(std::string_view error) {
   });
 }
 
-void BluetoothL2CAPClient::Impl::SetConnected(
+void BluetoothLEPacketClient::Impl::SetConnected(
     BluetoothPacketTransport transport) {
   UpdateStatus([&](auto& status) {
     status.connecting = false;
@@ -752,7 +752,7 @@ void BluetoothL2CAPClient::Impl::SetConnected(
   });
 }
 
-void BluetoothL2CAPClient::Impl::SetDisconnected(std::string_view reason) {
+void BluetoothLEPacketClient::Impl::SetDisconnected(std::string_view reason) {
   UpdateStatus([&](auto& status) {
     status.connecting = false;
     status.connected = false;
@@ -761,7 +761,7 @@ void BluetoothL2CAPClient::Impl::SetDisconnected(std::string_view reason) {
   });
 }
 
-void BluetoothL2CAPClient::Impl::DidReceivePacket(
+void BluetoothLEPacketClient::Impl::DidReceivePacket(
     std::span<const uint8_t> packet) {
   std::vector<uint8_t> packetCopy{packet.begin(), packet.end()};
   UpdateStatus([](auto& status) { ++status.packetsReceived; });
@@ -773,18 +773,18 @@ void BluetoothL2CAPClient::Impl::DidReceivePacket(
   }
 }
 
-void BluetoothL2CAPClient::Impl::DidSendPacket() {
+void BluetoothLEPacketClient::Impl::DidSendPacket() {
   UpdateStatus([](auto& status) { ++status.packetsSent; });
 }
 
-void BluetoothL2CAPClient::Impl::PostStatus(
-    const BluetoothL2CAPConnectionStatus& status) {
+void BluetoothLEPacketClient::Impl::PostStatus(
+    const BluetoothLEPacketConnectionStatus& status) {
   if (m_statusCallback) {
     m_exec->Send([callback = m_statusCallback, status] { callback(status); });
   }
 }
 
-std::shared_ptr<BluetoothL2CAPClient> BluetoothL2CAPClient::Create(
+std::shared_ptr<BluetoothLEPacketClient> BluetoothLEPacketClient::Create(
     wpi::net::uv::Loop& loop, PacketCallback packetCallback,
     StatusCallback statusCallback) {
   auto impl = Impl::Create(loop, std::move(packetCallback),
@@ -792,31 +792,31 @@ std::shared_ptr<BluetoothL2CAPClient> BluetoothL2CAPClient::Create(
   if (!impl) {
     return nullptr;
   }
-  return std::shared_ptr<BluetoothL2CAPClient>(
-      new BluetoothL2CAPClient{std::move(impl)});
+  return std::shared_ptr<BluetoothLEPacketClient>(
+      new BluetoothLEPacketClient{std::move(impl)});
 }
 
-BluetoothL2CAPClient::BluetoothL2CAPClient(std::shared_ptr<Impl> impl)
+BluetoothLEPacketClient::BluetoothLEPacketClient(std::shared_ptr<Impl> impl)
     : m_impl{std::move(impl)} {}
 
-BluetoothL2CAPClient::~BluetoothL2CAPClient() = default;
+BluetoothLEPacketClient::~BluetoothLEPacketClient() = default;
 
-bool BluetoothL2CAPClient::IsSupported() {
+bool BluetoothLEPacketClient::IsSupported() {
   return true;
 }
 
-bool BluetoothL2CAPClient::Connect(BluetoothL2CAPClientConfig config) {
+bool BluetoothLEPacketClient::Connect(BluetoothLEPacketClientConfig config) {
   return m_impl->Connect(std::move(config));
 }
 
-void BluetoothL2CAPClient::Disconnect(std::string_view reason) {
+void BluetoothLEPacketClient::Disconnect(std::string_view reason) {
   m_impl->Disconnect(reason);
 }
 
-bool BluetoothL2CAPClient::Send(std::span<const uint8_t> packet) {
+bool BluetoothLEPacketClient::Send(std::span<const uint8_t> packet) {
   return m_impl->Send(packet);
 }
 
-BluetoothL2CAPConnectionStatus BluetoothL2CAPClient::GetStatus() const {
+BluetoothLEPacketConnectionStatus BluetoothLEPacketClient::GetStatus() const {
   return m_impl->GetStatus();
 }

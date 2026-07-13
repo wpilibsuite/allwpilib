@@ -6,7 +6,7 @@
 #define UNICODE
 #endif
 
-#include "wpi/net/BluetoothL2CAPClient.hpp"
+#include "wpi/net/BluetoothLEPacketClient.hpp"
 
 #include <Windows.h>
 
@@ -122,8 +122,8 @@ std::vector<uint8_t> FromBuffer(streams::IBuffer const& buffer) {
 
 }  // namespace
 
-class BluetoothL2CAPClient::Impl
-    : public std::enable_shared_from_this<BluetoothL2CAPClient::Impl> {
+class BluetoothLEPacketClient::Impl
+    : public std::enable_shared_from_this<BluetoothLEPacketClient::Impl> {
  public:
   using LoopFunc = std::function<void()>;
   using UvExecFunc = uv::Async<LoopFunc>;
@@ -152,7 +152,7 @@ class BluetoothL2CAPClient::Impl
 
   ~Impl() { Disconnect("Disconnected"); }
 
-  bool Connect(BluetoothL2CAPClientConfig config) {
+  bool Connect(BluetoothLEPacketClientConfig config) {
     if (config.address.empty()) {
       SetError("No Bluetooth address configured");
       return false;
@@ -267,13 +267,13 @@ class BluetoothL2CAPClient::Impl
     return false;
   }
 
-  BluetoothL2CAPConnectionStatus GetStatus() const {
+  BluetoothLEPacketConnectionStatus GetStatus() const {
     std::scoped_lock lock{m_statusMutex};
     return m_status;
   }
 
  private:
-  void ConnectThreadMain(const BluetoothL2CAPClientConfig& config,
+  void ConnectThreadMain(const BluetoothLEPacketClientConfig& config,
                          uint64_t bluetoothAddress) {
     try {
       winrt::init_apartment(winrt::apartment_type::multi_threaded);
@@ -389,7 +389,7 @@ class BluetoothL2CAPClient::Impl
   }
 
   void PublishStatus() {
-    BluetoothL2CAPConnectionStatus snapshot;
+    BluetoothLEPacketConnectionStatus snapshot;
     {
       std::scoped_lock lock{m_statusMutex};
       snapshot = m_status;
@@ -401,7 +401,7 @@ class BluetoothL2CAPClient::Impl
 
   template <typename F>
   void UpdateStatus(F&& func) {
-    BluetoothL2CAPConnectionStatus snapshot;
+    BluetoothLEPacketConnectionStatus snapshot;
     {
       std::scoped_lock lock{m_statusMutex};
       func(m_status);
@@ -419,8 +419,8 @@ class BluetoothL2CAPClient::Impl
   std::shared_ptr<UvExecFunc> m_exec;
 
   mutable std::mutex m_statusMutex;
-  BluetoothL2CAPConnectionStatus m_status;
-  BluetoothL2CAPClientConfig m_config;
+  BluetoothLEPacketConnectionStatus m_status;
+  BluetoothLEPacketClientConfig m_config;
 
   std::mutex m_gattMutex;
   bt::BluetoothLEDevice m_device{nullptr};
@@ -432,7 +432,7 @@ class BluetoothL2CAPClient::Impl
   std::thread m_connectThread;
 };
 
-std::shared_ptr<BluetoothL2CAPClient> BluetoothL2CAPClient::Create(
+std::shared_ptr<BluetoothLEPacketClient> BluetoothLEPacketClient::Create(
     wpi::net::uv::Loop& loop, PacketCallback packetCallback,
     StatusCallback statusCallback) {
   auto impl =
@@ -440,32 +440,32 @@ std::shared_ptr<BluetoothL2CAPClient> BluetoothL2CAPClient::Create(
   if (!impl) {
     return nullptr;
   }
-  return std::shared_ptr<BluetoothL2CAPClient>(
-      new BluetoothL2CAPClient{std::move(impl)});
+  return std::shared_ptr<BluetoothLEPacketClient>(
+      new BluetoothLEPacketClient{std::move(impl)});
 }
 
-BluetoothL2CAPClient::BluetoothL2CAPClient(std::shared_ptr<Impl> impl)
+BluetoothLEPacketClient::BluetoothLEPacketClient(std::shared_ptr<Impl> impl)
     : m_impl{std::move(impl)} {}
 
-BluetoothL2CAPClient::~BluetoothL2CAPClient() = default;
+BluetoothLEPacketClient::~BluetoothLEPacketClient() = default;
 
-bool BluetoothL2CAPClient::IsSupported() {
+bool BluetoothLEPacketClient::IsSupported() {
   return true;
 }
 
-bool BluetoothL2CAPClient::Connect(BluetoothL2CAPClientConfig config) {
+bool BluetoothLEPacketClient::Connect(BluetoothLEPacketClientConfig config) {
   config.preferL2CAP = false;
   return m_impl->Connect(std::move(config));
 }
 
-void BluetoothL2CAPClient::Disconnect(std::string_view reason) {
+void BluetoothLEPacketClient::Disconnect(std::string_view reason) {
   m_impl->Disconnect(reason);
 }
 
-bool BluetoothL2CAPClient::Send(std::span<const uint8_t> packet) {
+bool BluetoothLEPacketClient::Send(std::span<const uint8_t> packet) {
   return m_impl->Send(packet);
 }
 
-BluetoothL2CAPConnectionStatus BluetoothL2CAPClient::GetStatus() const {
+BluetoothLEPacketConnectionStatus BluetoothLEPacketClient::GetStatus() const {
   return m_impl->GetStatus();
 }

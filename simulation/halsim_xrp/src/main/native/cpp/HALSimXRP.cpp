@@ -68,7 +68,7 @@ bool HALSimXRP::Initialize() {
   }
 
   auto weakSelf = weak_from_this();
-  m_bluetoothClient = wpi::net::BluetoothL2CAPClient::Create(
+  m_bluetoothClient = wpi::net::BluetoothLEPacketClient::Create(
       m_loop,
       [weakSelf](std::span<const uint8_t> packet) {
         if (auto self = weakSelf.lock()) {
@@ -162,7 +162,7 @@ void HALSimXRP::RegisterSimProviders() {
 
 void HALSimXRP::ConnectBluetooth(std::string address,
                                  XRPBluetoothAddressType type) {
-  wpi::net::BluetoothL2CAPClientConfig config;
+  wpi::net::BluetoothLEPacketClientConfig config;
   {
     std::scoped_lock lock(m_statusMutex);
     m_targetAddress = std::move(address);
