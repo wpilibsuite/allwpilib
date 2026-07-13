@@ -40,6 +40,9 @@ struct CommandResult {
   int exitCode = -1;
   std::string output;
   std::vector<wpi::net::BluetoothLEDeviceInfo> devices;
+  std::string targetAddress;
+  XRPBluetoothAddressType addressType = XRPBluetoothAddressType::RANDOM;
+  bool rememberTarget = false;
 };
 
 enum class CommandKind { NONE, REFRESH, SCAN, PAIR };
@@ -56,27 +59,27 @@ struct GuiState {
   std::string commandOutput;
 };
 
-std::weak_ptr<HALSimXRP> gSimXRP;
-GetImguiContextFn gGetImguiContext = nullptr;
-bool gListenerRegistered = false;
-bool gLateExecuteRegistered = false;
-GuiState gGui;
+static std::weak_ptr<HALSimXRP> gSimXRP;
+static GetImguiContextFn gGetImguiContext = nullptr;
+static bool gListenerRegistered = false;
+static bool gLateExecuteRegistered = false;
+static GuiState gGui;
 
-void SetAddress(std::string_view address) {
+static void SetAddress(std::string_view address) {
   std::snprintf(gGui.address, sizeof(gGui.address), "%.*s",
                 static_cast<int>(address.size()), address.data());
 }
 
-bool IsXRPDevice(const wpi::net::BluetoothLEDeviceInfo& device) {
+static bool IsXRPDevice(const wpi::net::BluetoothLEDeviceInfo& device) {
   return device.name.rfind(XRP_DEVICE_NAME_PREFIX, 0) == 0;
 }
 
-std::string_view GetDeviceSortKey(
+static std::string_view GetDeviceSortKey(
     const wpi::net::BluetoothLEDeviceInfo& device) {
   return device.name.empty() ? std::string_view{device.target} : device.name;
 }
 
-void FilterAndSortXRPDevices(
+static void FilterAndSortXRPDevices(
     std::vector<wpi::net::BluetoothLEDeviceInfo>* devices) {
   std::erase_if(*devices,
                 [](const auto& device) { return !IsXRPDevice(device); });
@@ -91,7 +94,7 @@ void FilterAndSortXRPDevices(
                    });
 }
 
-CommandResult ScanDevices(std::chrono::milliseconds timeout) {
+static CommandResult ScanDevices(std::chrono::milliseconds timeout) {
   CommandResult result;
   auto scan = wpi::net::BluetoothLEPacketClient::ScanDevices(timeout);
   result.devices = std::move(scan.devices);
@@ -102,21 +105,27 @@ CommandResult ScanDevices(std::chrono::milliseconds timeout) {
   return result;
 }
 
-CommandResult RefreshDevices() {
+static CommandResult RefreshDevices() {
   return ScanDevices(0ms);
 }
 
-CommandResult PairDevice(std::string target) {
+static CommandResult PairDevice(std::string_view target,
+                                XRPBluetoothAddressType addressType) {
   CommandResult result;
   auto pairing = wpi::net::BluetoothLEPacketClient::PairDevice(target);
   result.exitCode = pairing.paired ? 0 : 1;
   result.output = pairing.error.empty() ? std::move(pairing.status)
                                         : std::move(pairing.error);
+  if (pairing.paired) {
+    result.targetAddress = target;
+    result.addressType = addressType;
+    result.rememberTarget = true;
+  }
   return result;
 }
 
-void StartCommand(CommandKind kind, std::string status,
-                  std::function<CommandResult()> command) {
+static void StartCommand(CommandKind kind, std::string status,
+                         std::function<CommandResult()> command) {
   if (gGui.pendingCommand.valid()) {
     return;
   }
@@ -128,7 +137,7 @@ void StartCommand(CommandKind kind, std::string status,
       std::launch::async, [command = std::move(command)] { return command(); });
 }
 
-void UpdatePendingCommand() {
+static void UpdatePendingCommand(HALSimXRP& simXRP) {
   if (!gGui.pendingCommand.valid() ||
       gGui.pendingCommand.wait_for(0s) != std::future_status::ready) {
     return;
@@ -148,6 +157,10 @@ void UpdatePendingCommand() {
 
   if (result.exitCode == 0) {
     gGui.commandStatus = "Ready";
+    if (result.rememberTarget) {
+      simXRP.RememberBluetoothTarget(std::move(result.targetAddress),
+                                     result.addressType);
+    }
   } else if (!gGui.commandOutput.empty()) {
     gGui.commandStatus = "Command finished with output";
   } else {
@@ -156,7 +169,7 @@ void UpdatePendingCommand() {
   gGui.pendingKind = CommandKind::NONE;
 }
 
-void InitializeFromConnection(const XRPConnectionStatus& status) {
+static void InitializeFromConnection(const XRPConnectionStatus& status) {
   if (gGui.initializedFromConnection) {
     return;
   }
@@ -167,7 +180,7 @@ void InitializeFromConnection(const XRPConnectionStatus& status) {
   gGui.initializedFromConnection = true;
 }
 
-std::string SelectedDeviceLabel() {
+static std::string SelectedDeviceLabel() {
   if (gGui.selectedDevice < 0 ||
       gGui.selectedDevice >= static_cast<int>(gGui.devices.size())) {
     return "Select device";
@@ -180,7 +193,7 @@ std::string SelectedDeviceLabel() {
   return device.name + " (" + device.target + ")";
 }
 
-void DrawDeviceControls(bool commandRunning) {
+static void DrawDeviceControls(bool commandRunning) {
   ImGui::BeginDisabled(commandRunning);
   if (ImGui::Button("Refresh")) {
     StartCommand(CommandKind::REFRESH, "Refreshing devices", RefreshDevices);
@@ -214,20 +227,26 @@ void DrawDeviceControls(bool commandRunning) {
   ImGui::Combo("Address type", &gGui.addressType, addressTypes, 2);
 }
 
-void DrawConnectionControls(HALSimXRP& simXRP,
-                            const XRPConnectionStatus& status,
-                            bool commandRunning) {
+static void DrawConnectionControls(HALSimXRP& simXRP,
+                                   const XRPConnectionStatus& status,
+                                   bool commandRunning) {
   bool targetValid = gGui.address[0] != '\0';
   bool pairingSupported =
       wpi::net::BluetoothLEPacketClient::IsPairingSupported();
-  ImGui::BeginDisabled(commandRunning || !targetValid || !pairingSupported);
-  if (ImGui::Button("Pair")) {
-    std::string target = gGui.address;
-    StartCommand(CommandKind::PAIR, "Pairing device",
-                 [target] { return PairDevice(target); });
+  if (pairingSupported) {
+    ImGui::BeginDisabled(commandRunning || !targetValid);
+    if (ImGui::Button("Pair")) {
+      std::string target = gGui.address;
+      XRPBluetoothAddressType addressType =
+          gGui.addressType == 0 ? XRPBluetoothAddressType::PUBLIC
+                                : XRPBluetoothAddressType::RANDOM;
+      StartCommand(CommandKind::PAIR, "Pairing device", [target, addressType] {
+        return PairDevice(target, addressType);
+      });
+    }
+    ImGui::EndDisabled();
+    ImGui::SameLine();
   }
-  ImGui::EndDisabled();
-  ImGui::SameLine();
   ImGui::BeginDisabled(commandRunning || !targetValid);
   if (ImGui::Button("Connect")) {
     simXRP.ConnectBluetooth(
@@ -244,13 +263,13 @@ void DrawConnectionControls(HALSimXRP& simXRP,
   ImGui::EndDisabled();
 }
 
-void DrawGuiImpl() {
+static void DrawGuiImpl() {
   auto simXRP = gSimXRP.lock();
   if (!simXRP) {
     return;
   }
 
-  UpdatePendingCommand();
+  UpdatePendingCommand(*simXRP);
 
   auto status = simXRP->GetConnectionStatus();
   InitializeFromConnection(status);
@@ -294,7 +313,7 @@ void DrawGuiImpl() {
   ImGui::End();
 }
 
-void DrawGui() {
+static void DrawGui() {
   if (!gGetImguiContext) {
     return;
   }
@@ -310,7 +329,7 @@ void DrawGui() {
   ImGui::SetCurrentContext(previousContext);
 }
 
-void ExtensionListener(void*, const char* name, void* data) {
+static void ExtensionListener(void*, const char* name, void* data) {
   std::string_view nameView{name};
   if (nameView == ADD_GUI_LATE_EXECUTE_NAME && !gLateExecuteRegistered) {
     auto addGuiLateExecute = reinterpret_cast<AddGuiLateExecuteFn>(data);
