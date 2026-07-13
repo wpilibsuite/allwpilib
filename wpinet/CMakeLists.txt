@@ -137,9 +137,8 @@ else()
             ${wpinet_macos_objcxx_src}
             PROPERTIES COMPILE_FLAGS "-fobjc-arc"
         )
-        set_target_properties(
-            wpinet
-            PROPERTIES LINK_FLAGS "-framework CoreBluetooth -framework Foundation"
+        target_link_libraries(
+            wpinet PUBLIC "-framework CoreBluetooth" "-framework Foundation"
         )
         target_sources(wpinet PRIVATE ${wpinet_macos_src})
     else()
