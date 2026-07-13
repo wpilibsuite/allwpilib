@@ -64,9 +64,11 @@ class LinearSystemLoopTest {
   @SuppressWarnings("unchecked")
   void testStateSpaceEnabled() {
     m_loop.reset(VecBuilder.fill(0, 0));
+
     Matrix<N2, N1> references = VecBuilder.fill(2.0, 0.0);
-    var constraints = new TrapezoidProfile.Constraints(4, 3);
     m_loop.setNextR(references);
+
+    var constraints = new TrapezoidProfile.Constraints(4, 3);
 
     TrapezoidProfile profile;
     TrapezoidProfile.State state = new TrapezoidProfile.State(m_loop.getXHat(0), m_loop.getXHat(1));
@@ -127,6 +129,7 @@ class LinearSystemLoopTest {
 
       loop.correct(y);
       loop.predict(kDt);
+
       var u = loop.getU(0);
 
       assertTrue(u >= -12.1 && u <= 12.1, "U out of bounds! Got " + u);

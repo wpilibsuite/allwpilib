@@ -347,7 +347,7 @@ bool SourceImpl::SetConfigJson(const wpi::util::json& config,
 std::string SourceImpl::GetConfigJson(CS_Status* status) {
   std::string rv;
   wpi::util::raw_string_ostream os(rv);
-  GetConfigJsonObject(status).marshal(os, true, 4);
+  GetConfigJsonObject(status).marshal(os, true);
   return rv;
 }
 

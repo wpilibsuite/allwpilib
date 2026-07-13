@@ -257,13 +257,13 @@ void SaveCalibratedField(const wpi::apriltag::AprilTagFieldLayout& field,
     wpi::util::raw_fd_ostream out(saveDir + "/" + outputName + ".json", ec,
                                   fs::OF_Text);
     if (!ec) {
-      wpi::util::json{field}.marshal(out, true, 4);
+      wpi::util::json{field}.marshal(out, true);
     }
 
     wpi::util::raw_fd_ostream fmap(saveDir + "/" + outputName + ".fmap", ec,
                                    fs::OF_Text);
     if (!ec) {
-      wpi::util::json{fmap::Fieldmap(field)}.marshal(fmap, true, 4);
+      wpi::util::json{fmap::Fieldmap(field)}.marshal(fmap, true);
     }
 
     saveDir.clear();
@@ -324,7 +324,7 @@ void CalibrateCamera() {
         wpi::util::raw_fd_ostream output_file(outputPath.string(), ec,
                                               fs::OF_Text);
         if (!ec) {
-          wpi::util::json{gCameraModel}.marshal(output_file, true, 4);
+          wpi::util::json{gCameraModel}.marshal(output_file, true);
         }
         ImGui::CloseCurrentPopup();
         calibrating = false;

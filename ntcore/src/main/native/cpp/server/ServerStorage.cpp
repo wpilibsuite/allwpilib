@@ -355,7 +355,7 @@ void ServerStorage::DumpPersistent(wpi::util::raw_ostream& os) {
     os << ",\n    \"value\": ";
     DumpValue(os, topic->lastValue);
     os << ",\n    \"properties\": ";
-    topic->properties.marshal(os, true, 2);
+    topic->properties.marshal(os, true);
     os << "\n  }";
   }
   os << "\n]\n";
