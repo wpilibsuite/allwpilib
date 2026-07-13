@@ -42,6 +42,16 @@ if (OperatingSystem.current().isMacOsX()) {
     apply plugin: 'objective-cpp'
 }
 
+def addWpinetPlatformLinkerArgs = { binary ->
+    if (binary.targetPlatform.operatingSystem.isWindows()) {
+        binary.linker.args << 'windowsapp.lib'
+    } else if (binary.targetPlatform.operatingSystem.isMacOsX()) {
+        binary.linker.args << '-framework' << 'CoreBluetooth' << '-framework' << 'Foundation'
+    } else {
+        binary.linker.args << '-ldl'
+    }
+}
+
 ext {
     baseId = 'wpinet'
     groupId = 'org.wpilib.net'
@@ -146,7 +156,6 @@ ext {
                     }
                 }
             }
-            it.linker.args << 'windowsapp.lib'
         } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
             it.sources {
                 libuvMacCpp(CppSourceSet) {
@@ -186,7 +195,6 @@ ext {
                     }
                 }
             }
-            it.linker.args << '-framework' << 'CoreBluetooth' << '-framework' << 'Foundation'
         } else {
             it.sources {
                 libuvLinuxCpp(CppSourceSet) {
@@ -214,8 +222,8 @@ ext {
                     }
                 }
             }
-            it.linker.args << '-ldl'
         }
+        addWpinetPlatformLinkerArgs(it)
     }
 }
 
@@ -258,6 +266,16 @@ model {
                 it.exportedHeaders {
                     srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/tcpsockets/include', 'src/main/native/thirdparty/libuv/src'
                 }
+            }
+        }
+    }
+}
+
+model {
+    binaries {
+        all {
+            if (it.component.name == nativeName) {
+                addWpinetPlatformLinkerArgs(it)
             }
         }
     }
