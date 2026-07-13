@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cstring>
+#include <format>
 #include <functional>
 #include <string>
 #include <thread>
@@ -726,8 +727,8 @@ BluetoothLEDeviceScanResult ScanBlueZDevices(
     result.devices.emplace_back(std::move(device.device));
   }
   SortBluetoothDevices(&result.devices);
-  result.status = "Discovered " + std::to_string(result.devices.size()) +
-                  " Bluetooth LE devices";
+  result.status =
+      std::format("Discovered {} Bluetooth LE devices", result.devices.size());
   return result;
 }
 

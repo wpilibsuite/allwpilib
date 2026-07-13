@@ -23,6 +23,7 @@
 #include <cctype>
 #include <chrono>
 #include <cstdio>
+#include <format>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -158,7 +159,8 @@ winrt::guid ParseUuid(std::string_view uuid) {
 std::string ToString(winrt::hresult_error const& error) {
   std::string result = winrt::to_string(error.message());
   if (result.empty()) {
-    result = "HRESULT 0x" + std::to_string(static_cast<uint32_t>(error.code()));
+    result =
+        std::format("HRESULT 0x{:08X}", static_cast<uint32_t>(error.code()));
   }
   return result;
 }
@@ -344,7 +346,7 @@ class BluetoothLEPacketClient::Impl
       }
       SetError("Bluetooth GATT write failed");
     } catch (winrt::hresult_error const& error) {
-      SetError(std::string{"Bluetooth GATT write failed: "} + ToString(error));
+      SetError(std::format("Bluetooth GATT write failed: {}", ToString(error)));
     }
     return false;
   }
@@ -442,8 +444,8 @@ class BluetoothLEPacketClient::Impl
         status.error.clear();
       });
     } catch (winrt::hresult_error const& error) {
-      SetError(std::string{"Bluetooth GATT connection failed: "} +
-               ToString(error));
+      SetError(
+          std::format("Bluetooth GATT connection failed: {}", ToString(error)));
     }
   }
 
@@ -561,11 +563,11 @@ BluetoothLEDeviceScanResult BluetoothLEPacketClient::ScanDevices(
     }
 
     SortBluetoothDevices(&result.devices);
-    result.status = "Discovered " + std::to_string(result.devices.size()) +
-                    " Bluetooth LE devices";
+    result.status = std::format("Discovered {} Bluetooth LE devices",
+                                result.devices.size());
   } catch (winrt::hresult_error const& error) {
     result.error =
-        std::string{"Bluetooth LE device scan failed: "} + ToString(error);
+        std::format("Bluetooth LE device scan failed: {}", ToString(error));
   }
   return result;
 }
@@ -608,7 +610,7 @@ BluetoothLEPairingResult BluetoothLEPacketClient::PairDevice(
 
     result.error = "Bluetooth device was not found";
   } catch (winrt::hresult_error const& error) {
-    result.error = std::string{"Bluetooth pairing failed: "} + ToString(error);
+    result.error = std::format("Bluetooth pairing failed: {}", ToString(error));
   }
   return result;
 }
