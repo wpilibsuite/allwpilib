@@ -31,7 +31,7 @@ enum class BluetoothPacketTransport { NONE, L2CAP, GATT };
 /**
  * Connection status for a Bluetooth LE packet client.
  */
-struct BluetoothL2CAPConnectionStatus {
+struct BluetoothLEPacketConnectionStatus {
   bool supported = false;
   bool targetConfigured = false;
   bool connecting = false;
@@ -48,7 +48,7 @@ struct BluetoothL2CAPConnectionStatus {
 /**
  * Connection configuration for a Bluetooth LE packet client.
  */
-struct BluetoothL2CAPClientConfig {
+struct BluetoothLEPacketClientConfig {
   std::string address;
   BluetoothAddressType addressType = BluetoothAddressType::RANDOM;
   uint16_t psm = 0;
@@ -66,11 +66,11 @@ struct BluetoothL2CAPClientConfig {
  * transport. Each packet callback receives one packet from a GATT notification
  * value or L2CAP SDU.
  */
-class BluetoothL2CAPClient {
+class BluetoothLEPacketClient {
  public:
   using PacketCallback = std::function<void(std::span<const uint8_t> packet)>;
   using StatusCallback =
-      std::function<void(const BluetoothL2CAPConnectionStatus& status)>;
+      std::function<void(const BluetoothLEPacketConnectionStatus& status)>;
 
   /**
    * Creates a Bluetooth LE packet client.
@@ -81,17 +81,17 @@ class BluetoothL2CAPClient {
    * @return client instance, or nullptr if the loop callback channel could not
    *         be created.
    */
-  static std::shared_ptr<BluetoothL2CAPClient> Create(
+  static std::shared_ptr<BluetoothLEPacketClient> Create(
       wpi::net::uv::Loop& loop, PacketCallback packetCallback,
       StatusCallback statusCallback = {});
 
   /**
    * Destroys the client and closes any active connection.
    */
-  ~BluetoothL2CAPClient();
+  ~BluetoothLEPacketClient();
 
-  BluetoothL2CAPClient(const BluetoothL2CAPClient&) = delete;
-  BluetoothL2CAPClient& operator=(const BluetoothL2CAPClient&) = delete;
+  BluetoothLEPacketClient(const BluetoothLEPacketClient&) = delete;
+  BluetoothLEPacketClient& operator=(const BluetoothLEPacketClient&) = delete;
 
   /**
    * Returns whether this platform has an implementation for the transport.
@@ -106,7 +106,7 @@ class BluetoothL2CAPClient {
    * @param config connection configuration.
    * @return true if the request was accepted.
    */
-  bool Connect(BluetoothL2CAPClientConfig config);
+  bool Connect(BluetoothLEPacketClientConfig config);
 
   /**
    * Disconnects the active connection, if any.
@@ -128,12 +128,12 @@ class BluetoothL2CAPClient {
    *
    * @return current connection status.
    */
-  BluetoothL2CAPConnectionStatus GetStatus() const;
+  BluetoothLEPacketConnectionStatus GetStatus() const;
 
  private:
   class Impl;
 
-  explicit BluetoothL2CAPClient(std::shared_ptr<Impl> impl);
+  explicit BluetoothLEPacketClient(std::shared_ptr<Impl> impl);
 
   std::shared_ptr<Impl> m_impl;
 };

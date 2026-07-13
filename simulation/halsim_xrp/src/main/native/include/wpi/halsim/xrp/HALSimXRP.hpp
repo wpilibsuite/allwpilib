@@ -16,7 +16,7 @@
 #include "wpi/halsim/ws_core/WSProviderContainer.hpp"
 #include "wpi/halsim/ws_core/WSProvider_SimDevice.hpp"
 #include "wpi/halsim/xrp/XRP.hpp"
-#include "wpi/net/BluetoothL2CAPClient.hpp"
+#include "wpi/net/BluetoothLEPacketClient.hpp"
 #include "wpi/net/uv/Async.hpp"
 #include "wpi/net/uv/Buffer.hpp"
 #include "wpi/net/uv/Loop.hpp"
@@ -28,7 +28,7 @@ class json;
 namespace wpilibxrp {
 
 using XRPBluetoothAddressType = wpi::net::BluetoothAddressType;
-using XRPConnectionStatus = wpi::net::BluetoothL2CAPConnectionStatus;
+using XRPConnectionStatus = wpi::net::BluetoothLEPacketConnectionStatus;
 
 // This masquerades as a "WebSocket" so that we can reuse the
 // stuff in halsim_ws_core
@@ -67,7 +67,7 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
 
   wpi::net::uv::Loop& m_loop;
   std::shared_ptr<UvExecFunc> m_exec;
-  std::shared_ptr<wpi::net::BluetoothL2CAPClient> m_bluetoothClient;
+  std::shared_ptr<wpi::net::BluetoothLEPacketClient> m_bluetoothClient;
 
   wpilibws::ProviderContainer& m_providers;
   wpilibws::HALSimWSProviderSimDevices& m_simDevicesProvider;
