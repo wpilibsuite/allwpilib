@@ -679,7 +679,11 @@ std::shared_ptr<BluetoothLEPacketClient> BluetoothLEPacketClient::Create(
 BluetoothLEPacketClient::BluetoothLEPacketClient(std::shared_ptr<Impl> impl)
     : m_impl{std::move(impl)} {}
 
-BluetoothLEPacketClient::~BluetoothLEPacketClient() = default;
+BluetoothLEPacketClient::~BluetoothLEPacketClient() {
+  if (m_impl) {
+    m_impl->Disconnect({});
+  }
+}
 
 bool BluetoothLEPacketClient::IsPairingSupported() {
   return true;
