@@ -5,11 +5,9 @@
 #include "wpi/halsim/xrp/HALSimXRPGui.hpp"
 
 #include <algorithm>
-#include <array>
 #include <chrono>
 #include <cinttypes>
 #include <cstdio>
-#include <cstring>
 #include <functional>
 #include <future>
 #include <memory>
@@ -22,6 +20,7 @@
 
 #include "wpi/hal/Extensions.h"
 #include "wpi/halsim/xrp/HALSimXRP.hpp"
+#include "wpi/net/BluetoothLEPacketClient.hpp"
 
 using namespace wpilibxrp;
 using namespace std::chrono_literals;
@@ -32,19 +31,15 @@ constexpr std::string_view ADD_GUI_LATE_EXECUTE_NAME =
     "halsimgui::AddGuiLateExecute";
 constexpr std::string_view GET_IMGUI_CONTEXT_NAME =
     "halsimgui::GetImguiContext";
+constexpr std::string_view XRP_DEVICE_NAME_PREFIX = "WPIXRP-";
 
 using AddGuiLateExecuteFn = void (*)(std::function<void()> execute);
 using GetImguiContextFn = ImGuiContext* (*)();
 
-struct BluetoothDevice {
-  std::string address;
-  std::string name;
-};
-
 struct CommandResult {
   int exitCode = -1;
   std::string output;
-  std::vector<BluetoothDevice> devices;
+  std::vector<wpi::net::BluetoothLEDeviceInfo> devices;
 };
 
 enum class CommandKind { NONE, REFRESH, SCAN, PAIR };
@@ -54,7 +49,7 @@ struct GuiState {
   char address[128] = "";
   int addressType = 1;
   int selectedDevice = -1;
-  std::vector<BluetoothDevice> devices;
+  std::vector<wpi::net::BluetoothLEDeviceInfo> devices;
   std::future<CommandResult> pendingCommand;
   CommandKind pendingKind = CommandKind::NONE;
   std::string commandStatus;
@@ -67,115 +62,56 @@ bool gListenerRegistered = false;
 bool gLateExecuteRegistered = false;
 GuiState gGui;
 
-int HexDigit(char ch) {
-  if (ch >= '0' && ch <= '9') {
-    return ch - '0';
-  }
-  if (ch >= 'a' && ch <= 'f') {
-    return ch - 'a' + 10;
-  }
-  if (ch >= 'A' && ch <= 'F') {
-    return ch - 'A' + 10;
-  }
-  return -1;
-}
-
-bool IsBluetoothAddress(std::string_view address) {
-  if (address.size() != 17) {
-    return false;
-  }
-
-  for (int i = 0; i < 6; ++i) {
-    size_t pos = static_cast<size_t>(i * 3);
-    if (HexDigit(address[pos]) < 0 || HexDigit(address[pos + 1]) < 0) {
-      return false;
-    }
-    if (i < 5 && address[pos + 2] != ':') {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 void SetAddress(std::string_view address) {
   std::snprintf(gGui.address, sizeof(gGui.address), "%.*s",
                 static_cast<int>(address.size()), address.data());
 }
 
-std::vector<BluetoothDevice> ParseDevices(std::string_view output) {
-  std::vector<BluetoothDevice> devices;
-  size_t pos = 0;
-  while (pos < output.size()) {
-    size_t end = output.find('\n', pos);
-    if (end == std::string_view::npos) {
-      end = output.size();
-    }
-    std::string_view line = output.substr(pos, end - pos);
-    pos = end + 1;
-
-    size_t devicePos = line.find("Device ");
-    if (devicePos == std::string_view::npos) {
-      continue;
-    }
-
-    size_t addressPos = devicePos + 7;
-    if (addressPos + 17 > line.size()) {
-      continue;
-    }
-
-    std::string address{line.substr(addressPos, 17)};
-    if (!IsBluetoothAddress(address)) {
-      continue;
-    }
-
-    std::string name;
-    if (addressPos + 18 < line.size()) {
-      name = std::string{line.substr(addressPos + 18)};
-    }
-
-    devices.emplace_back(std::move(address), std::move(name));
-  }
-
-  std::stable_sort(devices.begin(), devices.end(),
-                   [](const BluetoothDevice& a, const BluetoothDevice& b) {
-                     bool aIsXRP = a.name.rfind("WPIXRP-", 0) == 0;
-                     bool bIsXRP = b.name.rfind("WPIXRP-", 0) == 0;
-                     if (aIsXRP != bIsXRP) {
-                       return aIsXRP;
-                     }
-                     return a.name < b.name;
-                   });
-  return devices;
+bool IsXRPDevice(const wpi::net::BluetoothLEDeviceInfo& device) {
+  return device.name.rfind(XRP_DEVICE_NAME_PREFIX, 0) == 0;
 }
 
-CommandResult RunCommand(std::string command) {
+std::string_view GetDeviceSortKey(
+    const wpi::net::BluetoothLEDeviceInfo& device) {
+  return device.name.empty() ? std::string_view{device.target} : device.name;
+}
+
+void FilterAndSortXRPDevices(
+    std::vector<wpi::net::BluetoothLEDeviceInfo>* devices) {
+  std::erase_if(*devices,
+                [](const auto& device) { return !IsXRPDevice(device); });
+  std::stable_sort(devices->begin(), devices->end(),
+                   [](const auto& a, const auto& b) {
+                     auto aKey = GetDeviceSortKey(a);
+                     auto bKey = GetDeviceSortKey(b);
+                     if (aKey != bKey) {
+                       return aKey < bKey;
+                     }
+                     return a.target < b.target;
+                   });
+}
+
+CommandResult ScanDevices(std::chrono::milliseconds timeout) {
   CommandResult result;
-#ifdef __linux__
-  command.append(" 2>&1");
-  FILE* pipe = popen(command.c_str(), "r");
-  if (!pipe) {
-    result.output = "Failed to launch bluetoothctl";
-    return result;
-  }
-
-  std::array<char, 256> buffer{};
-  while (std::fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
-    result.output.append(buffer.data());
-  }
-
-  result.exitCode = pclose(pipe);
-#else
+  auto scan = wpi::net::BluetoothLEPacketClient::ScanDevices(timeout);
+  result.devices = std::move(scan.devices);
+  FilterAndSortXRPDevices(&result.devices);
+  result.exitCode = scan.error.empty() ? 0 : 1;
   result.output =
-      "Bluetooth pairing commands are only available on Linux. Enter the "
-      "platform Bluetooth identifier or advertised XRP name to connect.";
-#endif
+      scan.error.empty() ? std::move(scan.status) : std::move(scan.error);
   return result;
 }
 
 CommandResult RefreshDevices() {
-  CommandResult result = RunCommand("bluetoothctl devices");
-  result.devices = ParseDevices(result.output);
+  return ScanDevices(0ms);
+}
+
+CommandResult PairDevice(std::string target) {
+  CommandResult result;
+  auto pairing = wpi::net::BluetoothLEPacketClient::PairDevice(target);
+  result.exitCode = pairing.paired ? 0 : 1;
+  result.output = pairing.error.empty() ? std::move(pairing.status)
+                                        : std::move(pairing.error);
   return result;
 }
 
@@ -239,9 +175,9 @@ std::string SelectedDeviceLabel() {
 
   const auto& device = gGui.devices[gGui.selectedDevice];
   if (device.name.empty()) {
-    return device.address;
+    return device.target;
   }
-  return device.name + " (" + device.address + ")";
+  return device.name + " (" + device.target + ")";
 }
 
 void DrawDeviceControls(bool commandRunning) {
@@ -251,10 +187,8 @@ void DrawDeviceControls(bool commandRunning) {
   }
   ImGui::SameLine();
   if (ImGui::Button("Scan")) {
-    StartCommand(CommandKind::SCAN, "Scanning for Bluetooth devices", [] {
-      RunCommand("bluetoothctl --timeout 8 scan on");
-      return RefreshDevices();
-    });
+    StartCommand(CommandKind::SCAN, "Scanning for Bluetooth devices",
+                 [] { return ScanDevices(8s); });
   }
   ImGui::EndDisabled();
 
@@ -263,17 +197,19 @@ void DrawDeviceControls(bool commandRunning) {
     for (int i = 0; i < static_cast<int>(gGui.devices.size()); ++i) {
       const auto& device = gGui.devices[i];
       std::string label = device.name.empty()
-                              ? device.address
-                              : device.name + " (" + device.address + ")";
+                              ? device.target
+                              : device.name + " (" + device.target + ")";
       if (ImGui::Selectable(label.c_str(), gGui.selectedDevice == i)) {
         gGui.selectedDevice = i;
-        SetAddress(device.address);
+        SetAddress(device.target);
+        gGui.addressType =
+            device.addressType == XRPBluetoothAddressType::PUBLIC ? 0 : 1;
       }
     }
     ImGui::EndCombo();
   }
 
-  ImGui::InputText("Address / identifier", gGui.address, sizeof(gGui.address));
+  ImGui::InputText("Target", gGui.address, sizeof(gGui.address));
   const char* addressTypes[] = {"Public", "Random"};
   ImGui::Combo("Address type", &gGui.addressType, addressTypes, 2);
 }
@@ -281,15 +217,14 @@ void DrawDeviceControls(bool commandRunning) {
 void DrawConnectionControls(HALSimXRP& simXRP,
                             const XRPConnectionStatus& status,
                             bool commandRunning) {
-  bool addressValid = IsBluetoothAddress(gGui.address);
   bool targetValid = gGui.address[0] != '\0';
-  ImGui::BeginDisabled(commandRunning || !addressValid);
-  if (ImGui::Button("Pair & Trust")) {
-    std::string address = gGui.address;
-    StartCommand(CommandKind::PAIR, "Pairing device", [address] {
-      return RunCommand("bluetoothctl pair " + address +
-                        " && bluetoothctl trust " + address);
-    });
+  bool pairingSupported =
+      wpi::net::BluetoothLEPacketClient::IsPairingSupported();
+  ImGui::BeginDisabled(commandRunning || !targetValid || !pairingSupported);
+  if (ImGui::Button("Pair")) {
+    std::string target = gGui.address;
+    StartCommand(CommandKind::PAIR, "Pairing device",
+                 [target] { return PairDevice(target); });
   }
   ImGui::EndDisabled();
   ImGui::SameLine();

@@ -10,8 +10,11 @@
 
 #include <Windows.h>
 
+#include <algorithm>
 #include <atomic>
 #include <cctype>
+#include <chrono>
+#include <cstdio>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -22,6 +25,7 @@
 #include <combaseapi.h>
 #include <winrt/Windows.Devices.Bluetooth.GenericAttributeProfile.h>
 #include <winrt/Windows.Devices.Bluetooth.h>
+#include <winrt/Windows.Devices.Enumeration.h>
 #include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Storage.Streams.h>
@@ -34,6 +38,7 @@
 
 namespace uv = wpi::net::uv;
 namespace bt = winrt::Windows::Devices::Bluetooth;
+namespace dev = winrt::Windows::Devices::Enumeration;
 namespace gatt = winrt::Windows::Devices::Bluetooth::GenericAttributeProfile;
 namespace streams = winrt::Windows::Storage::Streams;
 
@@ -77,6 +82,53 @@ bool ParseBluetoothAddress(std::string_view address, uint64_t* out) {
 
   *out = parsed;
   return true;
+}
+
+std::string FormatBluetoothAddress(uint64_t address) {
+  char formatted[18];
+  std::snprintf(formatted, sizeof(formatted), "%02X:%02X:%02X:%02X:%02X:%02X",
+                static_cast<unsigned>((address >> 40) & 0xff),
+                static_cast<unsigned>((address >> 32) & 0xff),
+                static_cast<unsigned>((address >> 24) & 0xff),
+                static_cast<unsigned>((address >> 16) & 0xff),
+                static_cast<unsigned>((address >> 8) & 0xff),
+                static_cast<unsigned>(address & 0xff));
+  return formatted;
+}
+
+void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
+  std::stable_sort(devices->begin(), devices->end(),
+                   [](const auto& a, const auto& b) {
+                     std::string_view aKey =
+                         a.name.empty() ? std::string_view{a.target} : a.name;
+                     std::string_view bKey =
+                         b.name.empty() ? std::string_view{b.target} : b.name;
+                     if (aKey != bKey) {
+                       return aKey < bKey;
+                     }
+                     return a.target < b.target;
+                   });
+}
+
+std::string GetDeviceTarget(dev::DeviceInformation const& info) {
+  try {
+    auto device = bt::BluetoothLEDevice::FromIdAsync(info.Id()).get();
+    if (device) {
+      return FormatBluetoothAddress(device.BluetoothAddress());
+    }
+  } catch (winrt::hresult_error const&) {
+  }
+  return {};
+}
+
+bool DeviceMatchesTarget(dev::DeviceInformation const& info,
+                         std::string_view target) {
+  std::string deviceTarget = GetDeviceTarget(info);
+  if (!deviceTarget.empty() && deviceTarget == target) {
+    return true;
+  }
+  return winrt::to_string(info.Id()) == target ||
+         winrt::to_string(info.Name()) == target;
 }
 
 winrt::guid ParseUuid(std::string_view uuid) {
@@ -451,6 +503,88 @@ BluetoothLEPacketClient::~BluetoothLEPacketClient() = default;
 
 bool BluetoothLEPacketClient::IsSupported() {
   return true;
+}
+
+bool BluetoothLEPacketClient::IsPairingSupported() {
+  return true;
+}
+
+BluetoothLEDeviceScanResult BluetoothLEPacketClient::ScanDevices(
+    std::chrono::milliseconds timeout) {
+  (void)timeout;
+  BluetoothLEDeviceScanResult result;
+  result.supported = true;
+  try {
+    winrt::init_apartment(winrt::apartment_type::multi_threaded);
+    auto devices = dev::DeviceInformation::FindAllAsync(
+                       bt::BluetoothLEDevice::GetDeviceSelector())
+                       .get();
+    for (auto const& info : devices) {
+      std::string target = GetDeviceTarget(info);
+      if (target.empty()) {
+        continue;
+      }
+
+      BluetoothLEDeviceInfo device;
+      device.target = std::move(target);
+      device.name = winrt::to_string(info.Name());
+      device.addressType = BluetoothAddressType::RANDOM;
+      device.paired = info.Pairing().IsPaired();
+      device.pairable = info.Pairing().CanPair();
+      result.devices.emplace_back(std::move(device));
+    }
+
+    SortBluetoothDevices(&result.devices);
+    result.status = "Discovered " + std::to_string(result.devices.size()) +
+                    " Bluetooth LE devices";
+  } catch (winrt::hresult_error const& error) {
+    result.error =
+        std::string{"Bluetooth LE device scan failed: "} + ToString(error);
+  }
+  return result;
+}
+
+BluetoothLEPairingResult BluetoothLEPacketClient::PairDevice(
+    std::string_view target) {
+  BluetoothLEPairingResult result;
+  result.supported = true;
+  try {
+    winrt::init_apartment(winrt::apartment_type::multi_threaded);
+    auto devices = dev::DeviceInformation::FindAllAsync(
+                       bt::BluetoothLEDevice::GetDeviceSelector())
+                       .get();
+    for (auto const& info : devices) {
+      if (!DeviceMatchesTarget(info, target)) {
+        continue;
+      }
+
+      if (info.Pairing().IsPaired()) {
+        result.paired = true;
+        result.status = "Bluetooth device is already paired";
+        return result;
+      }
+      if (!info.Pairing().CanPair()) {
+        result.error = "Bluetooth device is not pairable";
+        return result;
+      }
+
+      auto pairResult = info.Pairing().PairAsync().get();
+      auto status = pairResult.Status();
+      result.paired = status == dev::DevicePairingResultStatus::Paired ||
+                      status == dev::DevicePairingResultStatus::AlreadyPaired;
+      if (result.paired) {
+        result.status = "Bluetooth device paired";
+      } else {
+        result.error = "Bluetooth pairing failed";
+      }
+      return result;
+    }
+
+    result.error = "Bluetooth device was not found";
+  } catch (winrt::hresult_error const& error) {
+    result.error = std::string{"Bluetooth pairing failed: "} + ToString(error);
+  }
+  return result;
 }
 
 bool BluetoothLEPacketClient::Connect(BluetoothLEPacketClientConfig config) {

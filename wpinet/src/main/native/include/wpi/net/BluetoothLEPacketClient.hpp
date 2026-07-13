@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -11,6 +12,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace wpi::net::uv {
 class Loop;
@@ -27,6 +29,37 @@ enum class BluetoothAddressType { PUBLIC, RANDOM };
  * Active Bluetooth packet transport.
  */
 enum class BluetoothPacketTransport { NONE, L2CAP, GATT };
+
+/**
+ * Discovered Bluetooth LE device.
+ */
+struct BluetoothLEDeviceInfo {
+  std::string target;
+  std::string name;
+  BluetoothAddressType addressType = BluetoothAddressType::RANDOM;
+  bool paired = false;
+  bool pairable = false;
+};
+
+/**
+ * Bluetooth LE device discovery result.
+ */
+struct BluetoothLEDeviceScanResult {
+  bool supported = false;
+  std::string status;
+  std::string error;
+  std::vector<BluetoothLEDeviceInfo> devices;
+};
+
+/**
+ * Bluetooth LE pairing result.
+ */
+struct BluetoothLEPairingResult {
+  bool supported = false;
+  bool paired = false;
+  std::string status;
+  std::string error;
+};
 
 /**
  * Connection status for a Bluetooth LE packet client.
@@ -99,6 +132,31 @@ class BluetoothLEPacketClient {
    * @return true if the platform implementation is available.
    */
   static bool IsSupported();
+
+  /**
+   * Returns whether this platform implementation supports explicit pairing.
+   *
+   * @return true if PairDevice() can pair devices on this platform.
+   */
+  static bool IsPairingSupported();
+
+  /**
+   * Scans for Bluetooth LE devices.
+   *
+   * @param timeout active scan duration. A zero duration returns cached devices
+   *        on platforms that support cached discovery.
+   * @return scan result, including discovered connection targets.
+   */
+  static BluetoothLEDeviceScanResult ScanDevices(
+      std::chrono::milliseconds timeout);
+
+  /**
+   * Attempts to pair with a Bluetooth LE device.
+   *
+   * @param target platform-specific device target from ScanDevices().
+   * @return pairing result.
+   */
+  static BluetoothLEPairingResult PairDevice(std::string_view target);
 
   /**
    * Starts connecting to a Bluetooth LE packet transport.

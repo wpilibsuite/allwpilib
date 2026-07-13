@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <array>
 #include <cerrno>
+#include <chrono>
+#include <cstdio>
 #include <cstring>
 #include <limits>
 #include <memory>
@@ -129,6 +131,89 @@ bool ParseBluetoothAddress(std::string_view address, bdaddr_t* out) {
 
   *out = parsed;
   return true;
+}
+
+bool IsBluetoothAddress(std::string_view address) {
+  bdaddr_t parsed{};
+  return ParseBluetoothAddress(address, &parsed);
+}
+
+struct CommandResult {
+  int exitCode = -1;
+  std::string output;
+};
+
+CommandResult RunCommand(std::string command) {
+  CommandResult result;
+  command.append(" 2>&1");
+  FILE* pipe = popen(command.c_str(), "r");
+  if (!pipe) {
+    result.output = "Failed to launch bluetoothctl";
+    return result;
+  }
+
+  std::array<char, 256> buffer{};
+  while (std::fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
+    result.output.append(buffer.data());
+  }
+
+  result.exitCode = pclose(pipe);
+  return result;
+}
+
+void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
+  std::stable_sort(devices->begin(), devices->end(),
+                   [](const auto& a, const auto& b) {
+                     std::string_view aKey =
+                         a.name.empty() ? std::string_view{a.target} : a.name;
+                     std::string_view bKey =
+                         b.name.empty() ? std::string_view{b.target} : b.name;
+                     if (aKey != bKey) {
+                       return aKey < bKey;
+                     }
+                     return a.target < b.target;
+                   });
+}
+
+std::vector<BluetoothLEDeviceInfo> ParseBluetoothctlDevices(
+    std::string_view output) {
+  std::vector<BluetoothLEDeviceInfo> devices;
+  size_t pos = 0;
+  while (pos < output.size()) {
+    size_t end = output.find('\n', pos);
+    if (end == std::string_view::npos) {
+      end = output.size();
+    }
+    std::string_view line = output.substr(pos, end - pos);
+    pos = end + 1;
+
+    size_t devicePos = line.find("Device ");
+    if (devicePos == std::string_view::npos) {
+      continue;
+    }
+
+    size_t addressPos = devicePos + 7;
+    if (addressPos + 17 > line.size()) {
+      continue;
+    }
+
+    std::string address{line.substr(addressPos, 17)};
+    if (!IsBluetoothAddress(address)) {
+      continue;
+    }
+
+    BluetoothLEDeviceInfo device;
+    device.target = address;
+    device.addressType = BluetoothAddressType::RANDOM;
+    device.pairable = true;
+    if (addressPos + 18 < line.size()) {
+      device.name = std::string{line.substr(addressPos + 18)};
+    }
+    devices.emplace_back(std::move(device));
+  }
+
+  SortBluetoothDevices(&devices);
+  return devices;
 }
 
 bool ParseUuid128(std::string_view uuid, std::array<uint8_t, 16>* out) {
@@ -1196,6 +1281,62 @@ BluetoothLEPacketClient::~BluetoothLEPacketClient() = default;
 
 bool BluetoothLEPacketClient::IsSupported() {
   return true;
+}
+
+bool BluetoothLEPacketClient::IsPairingSupported() {
+  return true;
+}
+
+BluetoothLEDeviceScanResult BluetoothLEPacketClient::ScanDevices(
+    std::chrono::milliseconds timeout) {
+  BluetoothLEDeviceScanResult result;
+  result.supported = true;
+
+  if (timeout > std::chrono::milliseconds{0}) {
+    auto seconds = std::max<int64_t>(
+        1, std::chrono::duration_cast<std::chrono::seconds>(timeout).count());
+    CommandResult scan = RunCommand("bluetoothctl --timeout " +
+                                    std::to_string(seconds) + " scan on");
+    result.status = scan.output;
+  }
+
+  CommandResult devices = RunCommand("bluetoothctl devices");
+  if (!devices.output.empty()) {
+    result.status.append(devices.output);
+  }
+  if (devices.exitCode != 0) {
+    result.error = result.status.empty() ? "Failed to list Bluetooth devices"
+                                         : result.status;
+    return result;
+  }
+
+  result.devices = ParseBluetoothctlDevices(devices.output);
+  if (result.status.empty()) {
+    result.status = "Discovered " + std::to_string(result.devices.size()) +
+                    " Bluetooth devices";
+  }
+  return result;
+}
+
+BluetoothLEPairingResult BluetoothLEPacketClient::PairDevice(
+    std::string_view target) {
+  BluetoothLEPairingResult result;
+  result.supported = true;
+  if (!IsBluetoothAddress(target)) {
+    result.error = "Linux pairing requires a Bluetooth address";
+    return result;
+  }
+
+  std::string address{target};
+  CommandResult pair = RunCommand("bluetoothctl pair " + address +
+                                  " && bluetoothctl trust " + address);
+  result.status = std::move(pair.output);
+  result.paired = pair.exitCode == 0;
+  if (!result.paired) {
+    result.error = result.status.empty() ? "Failed to pair Bluetooth device"
+                                         : result.status;
+  }
+  return result;
 }
 
 bool BluetoothLEPacketClient::Connect(BluetoothLEPacketClientConfig config) {
