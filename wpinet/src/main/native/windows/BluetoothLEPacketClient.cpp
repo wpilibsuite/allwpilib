@@ -155,6 +155,20 @@ std::string ToString(winrt::hresult_error const& error) {
   return result;
 }
 
+void EnsureWinrtApartment() {
+  APTTYPE type;
+  APTTYPEQUALIFIER qualifier;
+  HRESULT hr = ::CoGetApartmentType(&type, &qualifier);
+  if (SUCCEEDED(hr)) {
+    return;
+  }
+  if (hr == CO_E_NOTINITIALIZED) {
+    winrt::init_apartment(winrt::apartment_type::multi_threaded);
+    return;
+  }
+  winrt::throw_hresult(hr);
+}
+
 streams::IBuffer ToBuffer(std::span<const uint8_t> packet) {
   streams::DataWriter writer;
   writer.WriteBytes(winrt::array_view<const uint8_t>{
@@ -310,6 +324,7 @@ class BluetoothLEPacketClient::Impl
     }
 
     try {
+      EnsureWinrtApartment();
       auto status =
           controlCharacteristic
               .WriteValueAsync(ToBuffer(packet),
@@ -335,7 +350,7 @@ class BluetoothLEPacketClient::Impl
   void ConnectThreadMain(const BluetoothLEPacketClientConfig& config,
                          uint64_t bluetoothAddress) {
     try {
-      winrt::init_apartment(winrt::apartment_type::multi_threaded);
+      EnsureWinrtApartment();
 
       auto device =
           bt::BluetoothLEDevice::FromBluetoothAddressAsync(bluetoothAddress)
@@ -518,7 +533,7 @@ BluetoothLEDeviceScanResult BluetoothLEPacketClient::ScanDevices(
   BluetoothLEDeviceScanResult result;
   result.supported = true;
   try {
-    winrt::init_apartment(winrt::apartment_type::multi_threaded);
+    EnsureWinrtApartment();
     auto devices = dev::DeviceInformation::FindAllAsync(
                        bt::BluetoothLEDevice::GetDeviceSelector())
                        .get();
@@ -552,7 +567,7 @@ BluetoothLEPairingResult BluetoothLEPacketClient::PairDevice(
   BluetoothLEPairingResult result;
   result.supported = true;
   try {
-    winrt::init_apartment(winrt::apartment_type::multi_threaded);
+    EnsureWinrtApartment();
     auto devices = dev::DeviceInformation::FindAllAsync(
                        bt::BluetoothLEDevice::GetDeviceSelector())
                        .get();
