@@ -10,6 +10,10 @@
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
+
 namespace wpi::math {
 /**
  * Represents robot chassis velocities.
@@ -201,6 +205,13 @@ struct WPILIB_DLLEXPORT ChassisVelocities {
    */
   constexpr bool operator==(const ChassisVelocities& other) const = default;
 };
+
+WPILIB_DLLEXPORT
+void to_json(wpi::util::json& json, const ChassisVelocities& velocities);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::util::json& json, ChassisVelocities& velocities);
+
 }  // namespace wpi::math
 
 #include "wpi/math/kinematics/proto/ChassisVelocitiesProto.hpp"

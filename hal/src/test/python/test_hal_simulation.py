@@ -21,16 +21,18 @@ def test_value_changed_callback():
     dev = hal.SimDevice("simd")
 
     # Must keep the returned value alive or the callback will be unregistered
-    devunused = hal.simulation.registerSimValueCreatedCallback(dev, created_cb, True)
+    devunused = hal.simulation.register_sim_value_created_callback(
+        dev, created_cb, True
+    )
     assert recv is None
 
-    val = dev.createInt("answer", hal.SimDevice.Direction.INPUT, 42)
+    val = dev.create_int("answer", hal.SimDevice.Direction.INPUT, 42)
 
     assert recv == (True, "answer", 42)
     recv = None
 
     # Must keep the returned value alive or the callback will be unregistered
-    unused = hal.simulation.registerSimValueChangedCallback(val, cb, True)
+    unused = hal.simulation.register_sim_value_changed_callback(val, cb, True)
 
     assert recv == (False, "answer", 42)
     recv = None
@@ -39,3 +41,8 @@ def test_value_changed_callback():
 
     assert recv == (False, "answer", 84)
     recv = None
+
+
+def test_reset_global_handles_snake_case():
+    hal.simulation.reset_global_handles()
+    assert not hasattr(hal.simulation, "resetGlobalHandles")

@@ -7,19 +7,19 @@ import wpilib
 
 def test_sendable_chooser():
     chooser = wpilib.SendableChooser()
-    assert chooser.getSelected() is None
+    assert chooser.get_selected() is None
 
-    chooser.setDefaultOption("option", True)
-    assert chooser.getSelected() is True
+    chooser.set_default_option("option", True)
+    assert chooser.get_selected() is True
 
 
 def test_smart_dashboard_putdata():
     t = wpilib.Talon(4)
     ref = weakref.ref(t)
-    wpilib.SmartDashboard.putData("talon", t)
+    wpilib.SmartDashboard.put_data("talon", t)
     del t
     assert bool(ref) is True
-    assert wpilib.SmartDashboard.getData("talon") is ref()
+    assert wpilib.SmartDashboard.get_data("talon") is ref()
 
 
 def test_motorcontrollergroup():
@@ -27,13 +27,13 @@ def test_motorcontrollergroup():
     t2 = wpilib.Talon(8)
     g = wpilib.MotorControllerGroup(t1, t2)
 
-    g.setThrottle(1)
-    assert t1.getThrottle() == pytest.approx(1)
-    assert t2.getThrottle() == pytest.approx(1)
+    g.set_throttle(1)
+    assert t1.get_throttle() == pytest.approx(1)
+    assert t2.get_throttle() == pytest.approx(1)
 
-    g.setThrottle(-1)
-    assert t1.getThrottle() == pytest.approx(-1)
-    assert t2.getThrottle() == pytest.approx(-1)
+    g.set_throttle(-1)
+    assert t1.get_throttle() == pytest.approx(-1)
+    assert t2.get_throttle() == pytest.approx(-1)
 
 
 def test_motorcontrollergroup_error():

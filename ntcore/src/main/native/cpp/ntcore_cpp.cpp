@@ -8,12 +8,11 @@
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
+#include <format>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "Handle.hpp"
 #include "InstanceImpl.hpp"
@@ -727,7 +726,7 @@ static void AddTeamServer(
 
   // 10.te.am.2
   servers.emplace_back(
-      fmt::format("10.{}.{}.2", static_cast<int>(*parsedTeam / 100),
+      std::format("10.{}.{}.2", static_cast<int>(*parsedTeam / 100),
                   static_cast<int>(*parsedTeam % 100)),
       port);
 }
@@ -777,7 +776,11 @@ void SetServerFixed(NT_Inst inst, std::string_view team, unsigned int port) {
     AddWifiServer(servers, port);
 
     // robot.local
+<<<<<<< HEAD
     servers.emplace_back("robot.local", port);
+=======
+    servers.emplace_back(std::format("robot.local", team), port);
+>>>>>>> wpilibsuite/main
 
     INetworkClient::ServerResolver resolver = MakeSystemCoreResolver(port);
 

@@ -4,17 +4,16 @@
 
 #include "wpi/util/protobuf/Protobuf.hpp"
 
+#include <format>
 #include <string>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "wpi/util/SmallVector.hpp"
 
 using namespace wpi::util;
 
 std::string detail::GetTypeString(const pb_msgdesc_t* msg) {
-  return fmt::format("proto:{}", msg->proto_name);
+  return std::format("proto:{}", msg->proto_name);
 }
 
 void detail::ForEachProtobufDescriptor(
@@ -23,7 +22,7 @@ void detail::ForEachProtobufDescriptor(
     function_ref<void(std::string_view filename,
                       std::span<const uint8_t> descriptor)>
         fn) {
-  std::string name = fmt::format("proto:{}", msg->file_descriptor.file_name);
+  std::string name = std::format("proto:{}", msg->file_descriptor.file_name);
   if (exists(name)) {
     return;
   }

@@ -44,6 +44,7 @@ from ._wpilib import (
     FieldObject2d,
     GameCubeController,
     Gamepad,
+    DSGamepadChooser,
     GenericHID,
     HIDDevice,
     I2C,
@@ -120,13 +121,13 @@ from ._wpilib import (
     VictorSP,
     Watchdog,
     XboxController,
-    getCurrentThreadPriority,
-    getDeployDirectory,
-    getErrorMessage,
-    getOperatingDirectory,
-    getPOVAngle,
-    getSystemTime,
-    setCurrentThreadPriority,
+    get_current_thread_priority,
+    get_deploy_directory,
+    get_error_message,
+    get_operating_directory,
+    get_pov_angle,
+    get_system_time,
+    set_current_thread_priority,
     wait,
 )
 
@@ -173,6 +174,7 @@ __all__ = [
     "FieldObject2d",
     "GameCubeController",
     "Gamepad",
+    "DSGamepadChooser",
     "GenericHID",
     "HIDDevice",
     "I2C",
@@ -249,20 +251,20 @@ __all__ = [
     "VictorSP",
     "Watchdog",
     "XboxController",
-    "getCurrentThreadPriority",
-    "getDeployDirectory",
-    "getErrorMessage",
-    "getOperatingDirectory",
-    "getPOVAngle",
-    "getSystemTime",
-    "setCurrentThreadPriority",
+    "get_current_thread_priority",
+    "get_deploy_directory",
+    "get_error_message",
+    "get_operating_directory",
+    "get_pov_angle",
+    "get_system_time",
+    "set_current_thread_priority",
     "wait",
 ]
 
 # Error reporting
-from ._impl.report_error import reportError, reportWarning
+from ._impl.report_error import report_error, report_warning
 
-__all__ += ["reportError", "reportWarning"]
+__all__ += ["report_error", "report_warning"]
 
 del _init__wpilib
 
@@ -271,7 +273,7 @@ from .opmoderobot import OpModeRobot
 __all__ += ["OpModeRobot"]
 
 from .cameraserver import CameraServer
-from .deployinfo import getDeployData
+from .deployinfo import get_deploy_data
 
 try:
     from .version import version as __version__

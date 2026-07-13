@@ -14,8 +14,6 @@
 #include <cstring>
 #include <string>
 
-#include <fmt/format.h>
-
 #include "HALInitializer.hpp"
 #include "mockdata/DriverStationDataInternal.hpp"
 #include "wpi/hal/DriverStationTypes.h"
@@ -25,6 +23,7 @@
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/util/EventVector.hpp"
 #include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
 #include "wpi/util/string.hpp"
 
 using namespace wpi::hal;
@@ -249,7 +248,7 @@ int32_t MrcLibDsSimImpl::sendConsoleLine(const struct WPI_String* line) {
   if (handler) {
     return handler(line);
   }
-  fmt::print("{}\n", wpi::util::to_string_view(line));
+  wpi::util::print("{}\n", wpi::util::to_string_view(line));
   std::fflush(stdout);
   return 0;
 }
@@ -257,10 +256,10 @@ int32_t MrcLibDsSimImpl::sendConsoleLine(const struct WPI_String* line) {
 int32_t MrcLibDsSimImpl::sendProgramCrash(const struct WPI_String* details,
                                           const struct WPI_String* location,
                                           const struct WPI_String* callStack) {
-  fmt::print(stderr, "Program Crash: {}\nLocation: {}\nCall Stack:\n{}\n",
-             wpi::util::to_string_view(details),
-             wpi::util::to_string_view(location),
-             wpi::util::to_string_view(callStack));
+  wpi::util::print(stderr, "Program Crash: {}\nLocation: {}\nCall Stack:\n{}\n",
+                   wpi::util::to_string_view(details),
+                   wpi::util::to_string_view(location),
+                   wpi::util::to_string_view(callStack));
   std::fflush(stderr);
   return 0;
 }

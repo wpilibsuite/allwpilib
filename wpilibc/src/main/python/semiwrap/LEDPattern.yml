@@ -50,10 +50,10 @@ classes:
       Rainbow:
       MapIndex:
     inline_code: |
-      .def("applyTo", [](const wpi::LEDPattern& self, wpi::AddressableLEDBuffer& data) {
+      .def("apply_to", [](const wpi::LEDPattern& self, wpi::AddressableLEDBuffer& data) {
         self.ApplyTo(static_cast<std::span<wpi::AddressableLED::LEDData>>(data));
       }, py::arg("data"), release_gil())
-      .def("applyTo", [](const wpi::LEDPattern& self, wpi::AddressableLEDBuffer& data,
+      .def("apply_to", [](const wpi::LEDPattern& self, wpi::AddressableLEDBuffer& data,
                          std::function<void (int, wpi::util::Color)> writer) {
         self.ApplyTo(static_cast<std::span<wpi::AddressableLED::LEDData>>(data), std::move(writer));
       }, py::arg("data"), py::arg("writer").none(false), release_gil())

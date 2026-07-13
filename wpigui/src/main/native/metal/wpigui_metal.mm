@@ -108,9 +108,9 @@ void gui::PlatformFramebufferSizeChanged(int, int) {}
 
 static inline MTLPixelFormat MetalPixelFormat(PixelFormat format) {
   switch (format) {
-    case kPixelRGBA:
+    case PixelFormat::RGBA:
       return MTLPixelFormatRGBA8Unorm;
-    case kPixelBGRA:
+    case PixelFormat::BGRA:
       return MTLPixelFormatBGRA8Unorm;
     default:
       return MTLPixelFormatRGBA8Unorm;

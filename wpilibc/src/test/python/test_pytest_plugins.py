@@ -16,38 +16,38 @@ class DummyRobot(wpilib.TimedRobot):
 
 
 class AutonomousPeriodicFailed(wpilib.TimedRobot):
-    def autonomousPeriodic(self):
+    def autonomous_periodic(self):
         assert False
 
 
 class TeleopPeriodicFailed(wpilib.TimedRobot):
-    def teleopPeriodic(self):
+    def teleop_periodic(self):
         assert False
 
 
 class TeleopInitFailed(wpilib.TimedRobot):
-    def teleopInit(self):
+    def teleop_init(self):
         assert False
 
 
 class IterativeStateRobot(wpilib.TimedRobot):
 
-    def disabledInit(self):
+    def disabled_init(self):
         self.did_disabled_init = True
 
-    def disabledPeriodic(self):
+    def disabled_periodic(self):
         self.did_disabled_periodic = True
 
-    def autonomousInit(self):
+    def autonomous_init(self):
         self.did_auto_init = True
 
-    def autonomousPeriodic(self):
+    def autonomous_periodic(self):
         self.did_auto_periodic = True
 
-    def teleopInit(self):
+    def teleop_init(self):
         self.did_teleop_init = True
 
-    def teleopPeriodic(self):
+    def teleop_periodic(self):
         self.did_teleop_periodic = True
 
 """)

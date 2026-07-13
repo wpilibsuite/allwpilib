@@ -4,6 +4,8 @@
 
 #include "wpi/hardware/rotation/Encoder.hpp"
 
+#include <format>
+
 #include "wpi/hal/Encoder.h"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
@@ -179,7 +181,7 @@ void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
       type = "Encoder:4x";
       break;
   }
-  HAL_ReportUsage(fmt::format("IO[{},{}]", aChannel, bChannel), type);
+  HAL_ReportUsage(std::format("IO[{},{}]", aChannel, bChannel), type);
   // wpi::util::SendableRegistry::Add(this, "Encoder", m_aSource->GetChannel());
 }
 

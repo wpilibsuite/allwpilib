@@ -1,6 +1,6 @@
 # THIS FILE IS AUTO GENERATED
 
-load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
+load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "copy_native_file", "generate_native_files", "robotpy_library")
 
 def define_native_wrapper(name, pyproject_toml = None):
@@ -12,7 +12,6 @@ def define_native_wrapper(name, pyproject_toml = None):
             "src/main/native/thirdparty/argparse/include/**",
             "src/main/native/thirdparty/debugging/include/**",
             "src/main/native/thirdparty/double-conversion/include/**",
-            "src/main/native/thirdparty/fmtlib/include/**",
             "src/main/native/thirdparty/json/include/**",
             "src/main/native/thirdparty/llvm/include/**",
             "src/main/native/thirdparty/mpack/include/**",
@@ -28,7 +27,6 @@ def define_native_wrapper(name, pyproject_toml = None):
             "wpiutil/src/main/native/thirdparty/argparse/include": "",
             "wpiutil/src/main/native/thirdparty/debugging/include": "",
             "wpiutil/src/main/native/thirdparty/double-conversion/include": "",
-            "wpiutil/src/main/native/thirdparty/fmtlib/include": "",
             "wpiutil/src/main/native/thirdparty/json/include": "",
             "wpiutil/src/main/native/thirdparty/llvm/include": "",
             "wpiutil/src/main/native/thirdparty/mpack/include": "",

@@ -20,7 +20,7 @@
 #include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 
 namespace {
@@ -115,7 +115,7 @@ TEST(S3UKFTest, DriveConvergence) {
   auto waypoints = std::vector<wpi::math::Pose2d>{
       wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
       wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
-  auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
+  auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
   wpi::math::Vectord<5> r = wpi::math::Vectord<5>::Zero();
@@ -132,13 +132,13 @@ TEST(S3UKFTest, DriveConvergence) {
 
   auto trueXhat = observer.Xhat();
 
-  auto totalTime = trajectory.TotalTime();
-  for (size_t i = 0; i < (totalTime / dt).value(); ++i) {
-    auto ref = trajectory.Sample(dt * i);
+  auto duration = trajectory.Duration();
+  for (size_t i = 0; i < (duration / dt).value(); ++i) {
+    auto ref = trajectory.SampleAt(dt * i);
     wpi::units::meters_per_second_t vl =
-        ref.velocity * (1 - (ref.curvature * rb).value());
+        ref.ForwardVelocity() * (1 - (ref.curvature * rb).value());
     wpi::units::meters_per_second_t vr =
-        ref.velocity * (1 + (ref.curvature * rb).value());
+        ref.ForwardVelocity() * (1 + (ref.curvature * rb).value());
 
     wpi::math::Vectord<5> nextR{
         ref.pose.Translation().X().value(), ref.pose.Translation().Y().value(),
@@ -170,7 +170,7 @@ TEST(S3UKFTest, DriveConvergence) {
 
   );
 
-  auto finalPosition = trajectory.Sample(trajectory.TotalTime());
+  auto finalPosition = trajectory.SampleAt(trajectory.Duration());
   EXPECT_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
               0.055);
   EXPECT_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),

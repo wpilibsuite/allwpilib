@@ -77,10 +77,10 @@ public final class CANAPITypes {
     BROADCAST(0),
     /** National Instruments. */
     NI(1),
-    /** Luminary Micro. */
-    LM(2),
-    /** DEKA Research and Development Corp. */
-    DEKA(3),
+    /** Limelight. */
+    LIMELIGHT(2),
+    /** FIRST. */
+    FIRST(3),
     /** Cross the Road Electronics. */
     CTRE(4),
     /** REV Robotics. */

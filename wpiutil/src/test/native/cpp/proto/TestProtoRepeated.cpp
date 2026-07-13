@@ -10,7 +10,7 @@
 
 #include "TestProtoInner.hpp"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpiutil.npb.h"
+#include "wpiutil_test.npb.h"
 
 struct RepeatedTestProto {
   std::vector<double> double_msg;

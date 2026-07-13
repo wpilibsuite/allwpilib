@@ -16,28 +16,28 @@ void onInstanceStart(wpi::nt::NetworkTableInstance* instance) {
 
   py::module::import("ntcore._logutil")
       .attr("NtLogForwarder")
-      .attr("onInstanceStart")(instance);
+      .attr("on_instance_start")(instance);
 }
 
 void onInstancePreReset(wpi::nt::NetworkTableInstance* instance) {
   py::module::import("ntcore._logutil")
       .attr("NtLogForwarder")
-      .attr("onInstanceDestroy")(instance);
+      .attr("on_instance_destroy")(instance);
 }
 
 void onInstancePostReset(wpi::nt::NetworkTableInstance* instance) {
   py::module::import("ntcore.util")
       .attr("_NtProperty")
-      .attr("onInstancePostReset")(instance);
+      .attr("on_instance_post_reset")(instance);
 }
 
 void onInstanceDestroy(wpi::nt::NetworkTableInstance* instance) {
   py::module::import("ntcore._logutil")
       .attr("NtLogForwarder")
-      .attr("onInstanceDestroy")(instance);
+      .attr("on_instance_destroy")(instance);
   py::module::import("ntcore.util")
       .attr("_NtProperty")
-      .attr("onInstanceDestroy")(instance);
+      .attr("on_instance_destroy")(instance);
 
   g_known_instances.erase(instance->GetHandle());
 }

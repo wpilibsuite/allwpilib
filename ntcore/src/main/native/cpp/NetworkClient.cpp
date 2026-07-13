@@ -8,13 +8,12 @@
 
 #include <algorithm>
 #include <atomic>
+#include <format>
 #include <memory>
 #include <span>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "IConnectionList.hpp"
 #include "Log.hpp"
@@ -368,7 +367,7 @@ void NetworkClient::TcpConnected(uv::Tcp& tcp) {
   options.handshakeTimeout = kWebsocketHandshakeTimeout;
   wpi::util::SmallString<128> idBuf;
   auto ws = wpi::net::WebSocket::CreateClient(
-      tcp, fmt::format("/nt/{}", wpi::net::EscapeURI(m_id, idBuf)), "",
+      tcp, std::format("/nt/{}", wpi::net::EscapeURI(m_id, idBuf)), "",
       {"v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu"},
       options);
   ws->SetMaxMessageSize(kMaxMessageSize);

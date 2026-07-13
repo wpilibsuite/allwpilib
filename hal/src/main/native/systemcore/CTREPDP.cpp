@@ -7,9 +7,8 @@
 #include <stdint.h>
 
 #include <cstring>
+#include <format>
 #include <string>
-
-#include <fmt/format.h>
 
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
@@ -232,7 +231,7 @@ double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
                                 int32_t* status) {
   if (!HAL_CheckPDPChannel(channel)) {
     *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
-                        fmt::format("Invalid pdp channel {}", channel));
+                        std::format("Invalid pdp channel {}", channel));
     return 0;
   }
 

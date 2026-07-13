@@ -6,12 +6,11 @@
 
 #include <stdint.h>
 
+#include <format>
 #include <limits>
 #include <memory>
 #include <string_view>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "wpi/glass/DataSource.hpp"
 #include "wpi/glass/hardware/Encoder.hpp"
@@ -28,12 +27,12 @@ class EncoderSimModel : public wpi::glass::EncoderModel {
  public:
   EncoderSimModel(std::string_view id, int32_t index, int channelA,
                   int channelB)
-      : m_distancePerPulse(fmt::format("{} Dist/Count", id)),
-        m_count(fmt::format("{} Count", id)),
-        m_period(fmt::format("{} Period", id)),
-        m_direction(fmt::format("{} Direction", id)),
-        m_distance(fmt::format("{} Distance", id)),
-        m_rate(fmt::format("{} Rate", id)),
+      : m_distancePerPulse(std::format("{} Dist/Count", id)),
+        m_count(std::format("{} Count", id)),
+        m_period(std::format("{} Period", id)),
+        m_direction(std::format("{} Direction", id)),
+        m_distance(std::format("{} Distance", id)),
+        m_rate(std::format("{} Rate", id)),
         m_index{index},
         m_channelA{channelA},
         m_channelB{channelB},
@@ -48,7 +47,7 @@ class EncoderSimModel : public wpi::glass::EncoderModel {
             index, DirectionCallbackFunc, this, true)} {}
 
   EncoderSimModel(int32_t index, int channelA, int channelB)
-      : EncoderSimModel(fmt::format("Encoder[{},{}]", channelA, channelB),
+      : EncoderSimModel(std::format("Encoder[{},{}]", channelA, channelB),
                         index, channelA, channelB) {}
 
   explicit EncoderSimModel(int32_t index)

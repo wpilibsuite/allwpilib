@@ -25,12 +25,12 @@ class CommandGenericHID:
                     or the GenericHID object to use for this command HID.
         """
         if isinstance(hid, int):
-            self._hid = DriverStation.getGenericHID(hid)
+            self._hid = DriverStation.get_generic_hid(hid)
         else:
             self._hid = hid
 
     @classmethod
-    def getCommandGenericHID(cls, port: int) -> "CommandGenericHID":
+    def get_command_generic_hid(cls, port: int) -> "CommandGenericHID":
         """
         Gets the CommandGenericHID object for the given port.
         """
@@ -41,7 +41,7 @@ class CommandGenericHID:
                 cls._hids[port] = hid
             return hid
 
-    def getHID(self) -> GenericHID:
+    def get_hid(self) -> GenericHID:
         """
         Get the underlying GenericHID object.
         """
@@ -53,13 +53,13 @@ class CommandGenericHID:
 
         :param button: The button index
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: A trigger instance attached to the event loop
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getRawButton(button))
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_raw_button(button))
 
     def pov(
         self, angle: int, *, pov: int = 0, loop: Optional[EventLoop] = None
@@ -73,96 +73,96 @@ class CommandGenericHID:
         :param angle: POV angle in degrees, or -1 for the center / not pressed.
         :param pov: index of the POV to read (starting at 0). Defaults to 0.
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance based around this angle of a POV on the HID.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getPOV(pov) == angle)
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_pov(pov) == angle)
 
-    def povUp(self) -> Trigger:
+    def pov_up(self) -> Trigger:
         """
         Constructs a Trigger instance based around the 0 degree angle (up) of the default (index 0) POV
-        on the HID, attached to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+        on the HID, attached to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance based around the 0 degree angle of a POV on the HID.
         """
         return self.pov(0)
 
-    def povUpRight(self) -> Trigger:
+    def pov_up_right(self) -> Trigger:
         """
         Constructs a Trigger instance based around the 45 degree angle (right up) of the default (index
-        0) POV on the HID, attached to :func:`commands2.CommandScheduler.getDefaultButtonLoop`.
+        0) POV on the HID, attached to :func:`commands2.CommandScheduler.get_default_button_loop`.
 
         :returns: a Trigger instance based around the 45 degree angle of a POV on the HID.
         """
         return self.pov(45)
 
-    def povRight(self) -> Trigger:
+    def pov_right(self) -> Trigger:
         """
         Constructs a Trigger instance based around the 90 degree angle (right) of the default (index 0)
-        POV on the HID, attached to :func:`commands2.CommandScheduler.getDefaultButtonLoop`.
+        POV on the HID, attached to :func:`commands2.CommandScheduler.get_default_button_loop`.
 
         :returns: a Trigger instance based around the 90 degree angle of a POV on the HID.
         """
         return self.pov(90)
 
-    def povDownRight(self) -> Trigger:
+    def pov_down_right(self) -> Trigger:
         """
         Constructs a Trigger instance based around the 135 degree angle (right down) of the default
-        (index 0) POV on the HID, attached to :func:`commands2.CommandScheduler.getDefaultButtonLoop`.
+        (index 0) POV on the HID, attached to :func:`commands2.CommandScheduler.get_default_button_loop`.
 
         :returns: a Trigger instance based around the 135 degree angle of a POV on the HID.
         """
         return self.pov(135)
 
-    def povDown(self) -> Trigger:
+    def pov_down(self) -> Trigger:
         """
         Constructs a Trigger instance based around the 180 degree angle (down) of the default (index 0)
-        POV on the HID, attached to :func:`commands2.CommandScheduler.getDefaultButtonLoop`.
+        POV on the HID, attached to :func:`commands2.CommandScheduler.get_default_button_loop`.
 
         :returns: a Trigger instance based around the 180 degree angle of a POV on the HID.
         """
         return self.pov(180)
 
-    def povDownLeft(self) -> Trigger:
+    def pov_down_left(self) -> Trigger:
         """
         Constructs a Trigger instance based around the 225 degree angle (down left) of the default
-        (index 0) POV on the HID, attached to :func:`commands2.CommandScheduler.getDefaultButtonLoop`.
+        (index 0) POV on the HID, attached to :func:`commands2.CommandScheduler.get_default_button_loop`.
 
         :returns: a Trigger instance based around the 225 degree angle of a POV on the HID.
         """
         return self.pov(225)
 
-    def povLeft(self) -> Trigger:
+    def pov_left(self) -> Trigger:
         """
         Constructs a Trigger instance based around the 270 degree angle (left) of the default (index 0)
-        POV on the HID, attached to :func:`commands2.CommandScheduler.getDefaultButtonLoop`.
+        POV on the HID, attached to :func:`commands2.CommandScheduler.get_default_button_loop`.
 
         :returns: a Trigger instance based around the 270 degree angle of a POV on the HID.
         """
         return self.pov(270)
 
-    def povUpLeft(self) -> Trigger:
+    def pov_up_left(self) -> Trigger:
         """
         Constructs a Trigger instance based around the 315 degree angle (left up) of the default (index
-        0) POV on the HID, attached to :func:`commands2.CommandScheduler.getDefaultButtonLoop`.
+        0) POV on the HID, attached to :func:`commands2.CommandScheduler.get_default_button_loop`.
 
         :returns: a Trigger instance based around the 315 degree angle of a POV on the HID.
         """
         return self.pov(315)
 
-    def povCenter(self) -> Trigger:
+    def pov_center(self) -> Trigger:
         """
         Constructs a Trigger instance based around the center (not pressed) position of the default
-        (index 0) POV on the HID, attached to :func:`commands2.CommandScheduler.getDefaultButtonLoop`.
+        (index 0) POV on the HID, attached to :func:`commands2.CommandScheduler.get_default_button_loop`.
 
         :returns: a Trigger instance based around the center position of a POV on the HID.
         """
         return self.pov(-1)
 
-    def axisLessThan(
+    def axis_less_than(
         self, axis: int, threshold: float, loop: Optional[EventLoop] = None
     ) -> Trigger:
         """
@@ -177,10 +177,10 @@ class CommandGenericHID:
                   threshold.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getRawAxis(axis) < threshold)
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_raw_axis(axis) < threshold)
 
-    def axisGreaterThan(
+    def axis_greater_than(
         self, axis: int, threshold: float, loop: Optional[EventLoop] = None
     ) -> Trigger:
         """
@@ -195,10 +195,10 @@ class CommandGenericHID:
                   threshold.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getRawAxis(axis) > threshold)
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_raw_axis(axis) > threshold)
 
-    def axisMagnitudeGreaterThan(
+    def axis_magnitude_greater_than(
         self, axis: int, threshold: float, loop: Optional[EventLoop] = None
     ) -> Trigger:
         """
@@ -213,19 +213,19 @@ class CommandGenericHID:
                   threshold.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: abs(self._hid.getRawAxis(axis)) > threshold)
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: abs(self._hid.get_raw_axis(axis)) > threshold)
 
-    def getRawAxis(self, axis: int) -> float:
+    def get_raw_axis(self, axis: int) -> float:
         """
         Get the value of the axis.
 
         :param axis: The axis to read, starting at 0.
         :returns: The value of the axis.
         """
-        return self._hid.getRawAxis(axis)
+        return self._hid.get_raw_axis(axis)
 
-    def setRumble(self, type: GenericHID.RumbleType, value: float):
+    def set_rumble(self, type: GenericHID.RumbleType, value: float):
         """
         Set the rumble output for the HID.
         The DS currently supports 2 rumble values, left rumble and right rumble.
@@ -233,17 +233,17 @@ class CommandGenericHID:
         :param type: Which rumble value to set.
         :param value: The normalized value (0 to 1) to set the rumble to.
         """
-        self._hid.setRumble(type, value)
+        self._hid.set_rumble(type, value)
 
-    def isConnected(self):
+    def is_connected(self):
         """
         Get if the HID is connected.
 
         :returns: True if the HID is connected.
         """
-        return self._hid.isConnected()
+        return self._hid.is_connected()
 
 
-def _resetCommandGenericHIDData() -> None:
+def _reset_command_generic_hid_data() -> None:
     with CommandGenericHID._hids_lock:
         CommandGenericHID._hids.clear()

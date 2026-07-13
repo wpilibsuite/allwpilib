@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#include <fmt/format.h>
+#include <format>
 
 #include "SystemServerInternal.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
@@ -36,7 +36,7 @@ void HAL_ReportUsage(const struct WPI_String* resource,
   if (!publisher) {
     publisher =
         systemServerUsage->ntInst
-            .GetStringTopic(fmt::format("/UsageReporting/{}", resourceStr))
+            .GetStringTopic(std::format("/UsageReporting/{}", resourceStr))
             .Publish();
   }
   publisher.Set(wpi::util::to_string_view(data));

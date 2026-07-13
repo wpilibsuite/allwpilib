@@ -16,8 +16,8 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.TrajectoryConfig;
-import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.math.util.Units;
 
 class SwerveDriveOdometry3dTest {
@@ -142,7 +142,7 @@ class SwerveDriveOdometry3dTest {
     SwerveModulePosition br = new SwerveModulePosition();
 
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
                 new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
@@ -158,15 +158,15 @@ class SwerveDriveOdometry3dTest {
 
     double maxError = Double.NEGATIVE_INFINITY;
     double errorSum = 0;
-    while (t <= trajectory.getTotalTime()) {
-      var groundTruthState = trajectory.sample(t);
+    while (t <= trajectory.duration) {
+      var groundTruthState = trajectory.sampleAt(t);
 
       var moduleVelocities =
           kinematics.toSwerveModuleVelocities(
               new ChassisVelocities(
-                  groundTruthState.velocity,
+                  groundTruthState.forwardVelocity(),
                   0.0,
-                  groundTruthState.velocity * groundTruthState.curvature));
+                  groundTruthState.forwardVelocity() * groundTruthState.curvature));
       for (var moduleVelocity : moduleVelocities) {
         moduleVelocity.angle =
             moduleVelocity.angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
@@ -214,7 +214,7 @@ class SwerveDriveOdometry3dTest {
         10 * Math.PI / 180,
         "Incorrect Final Theta");
 
-    assertEquals(0.0, errorSum / (trajectory.getTotalTime() / dt), 0.05, "Incorrect mean error");
+    assertEquals(0.0, errorSum / (trajectory.duration / dt), 0.05, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.125, "Incorrect max error");
   }
 
@@ -236,7 +236,7 @@ class SwerveDriveOdometry3dTest {
     SwerveModulePosition br = new SwerveModulePosition();
 
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
                 new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
@@ -252,13 +252,21 @@ class SwerveDriveOdometry3dTest {
 
     double maxError = Double.NEGATIVE_INFINITY;
     double errorSum = 0;
-    while (t <= trajectory.getTotalTime()) {
-      var groundTruthState = trajectory.sample(t);
+    while (t <= trajectory.duration) {
+      var groundTruthState = trajectory.sampleAt(t);
 
-      fl.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
-      fr.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
-      bl.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
-      br.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
+      fl.distance +=
+          groundTruthState.forwardVelocity() * dt
+              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
+      fr.distance +=
+          groundTruthState.forwardVelocity() * dt
+              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
+      bl.distance +=
+          groundTruthState.forwardVelocity() * dt
+              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
+      br.distance +=
+          groundTruthState.forwardVelocity() * dt
+              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
 
       fl.angle = groundTruthState.pose.getRotation();
       fr.angle = groundTruthState.pose.getRotation();
@@ -292,7 +300,7 @@ class SwerveDriveOdometry3dTest {
         10 * Math.PI / 180,
         "Incorrect Final Theta");
 
-    assertEquals(0.0, errorSum / (trajectory.getTotalTime() / dt), 0.06, "Incorrect mean error");
+    assertEquals(0.0, errorSum / (trajectory.duration / dt), 0.06, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.125, "Incorrect max error");
   }
 

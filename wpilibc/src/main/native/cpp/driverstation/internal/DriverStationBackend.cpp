@@ -8,14 +8,13 @@
 
 #include <array>
 #include <atomic>
+#include <format>
 #include <functional>
 #include <memory>
 #include <span>
 #include <string>
 #include <string_view>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "wpi/datalog/DataLog.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
@@ -80,7 +79,7 @@ class MatchDataSenderEntry {
   typename Topic::ValueType prevVal;
 };
 
-static constexpr std::string_view kSmartDashboardType = "FMSInfo";
+static constexpr std::string_view kSmartDashboardType = "DriverStation";
 
 struct MatchDataSender {
   MatchDataSender()
@@ -92,7 +91,7 @@ struct MatchDataSender {
   }
 
   std::shared_ptr<wpi::nt::NetworkTable> table =
-      wpi::nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo");
+      wpi::nt::NetworkTableInstance::GetDefault().GetTable("DriverStation");
   MatchDataSenderEntry<wpi::nt::StringTopic> typeMetaData{
       table, ".type", kSmartDashboardType,
       wpi::util::json::object("SmartDashboard", kSmartDashboardType)};
@@ -184,7 +183,7 @@ struct Instance {
     if (it != opModes.end()) {
       return std::string{wpi::util::to_string_view(&it->second.name)};
     }
-    return fmt::format("<{}>", id);
+    return std::format("<{}>", id);
   }
 };
 }  // namespace
@@ -201,7 +200,7 @@ static void SendMatchData();
 template <typename S, typename... Args>
 static inline void ReportJoystickError(int stick, const S& format,
                                        Args&&... args) {
-  ReportJoystickErrorV(stick, format, fmt::make_format_args(args...));
+  ReportJoystickErrorV(stick, format, std::make_format_args(args...));
 }
 
 /**
@@ -209,13 +208,13 @@ static inline void ReportJoystickError(int stick, const S& format,
  *
  * Throttles the errors so that they don't overwhelm the DS.
  */
-static void ReportJoystickWarningV(int stick, fmt::string_view format,
-                                   fmt::format_args args);
+static void ReportJoystickWarningV(int stick, std::string_view format,
+                                   std::format_args args);
 
 template <typename S, typename... Args>
 static inline void ReportJoystickWarning(int stick, const S& format,
                                          Args&&... args) {
-  ReportJoystickWarningV(stick, format, fmt::make_format_args(args...));
+  ReportJoystickWarningV(stick, format, std::make_format_args(args...));
 }
 
 Instance::Instance() {
@@ -887,8 +886,8 @@ void DriverStationBackend::StartDataLog(wpi::log::DataLog& log,
   }
 }
 
-void ReportJoystickWarningV(int stick, fmt::string_view format,
-                            fmt::format_args args) {
+void ReportJoystickWarningV(int stick, std::string_view format,
+                            std::format_args args) {
   auto& inst = GetInstance();
   if (DriverStationBackend::IsFMSAttached() || !inst.silenceJoystickWarning) {
     auto currentTime = Timer::GetTimestamp();
@@ -977,11 +976,11 @@ void JoystickLogSender::Init(wpi::log::DataLog& log, unsigned int stick,
   m_stick = stick;
 
   m_logButtons = wpi::log::BooleanArrayLogEntry{
-      log, fmt::format("DS:joystick{}/buttons", stick), timestamp};
+      log, std::format("DS:joystick{}/buttons", stick), timestamp};
   m_logAxes = wpi::log::FloatArrayLogEntry{
-      log, fmt::format("DS:joystick{}/axes", stick), timestamp};
+      log, std::format("DS:joystick{}/axes", stick), timestamp};
   m_logPOVs = wpi::log::IntegerArrayLogEntry{
-      log, fmt::format("DS:joystick{}/povs", stick), timestamp};
+      log, std::format("DS:joystick{}/povs", stick), timestamp};
 
   HAL_GetJoystickButtons(m_stick, &m_prevButtons);
   HAL_GetJoystickAxes(m_stick, &m_prevAxes);

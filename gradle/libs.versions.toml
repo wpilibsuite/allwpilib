@@ -1,6 +1,6 @@
 [versions]
 avaje = "3.14"
-ejml = "0.44.0"
+ejml = "0.46.0"
 jmh = "1.37"
 opencv = "2027-4.13.0-3"
 quickbuf = "1.4"
@@ -9,7 +9,7 @@ quickbuf = "1.4"
 # General runtime dependencies
 avaje-jsonb = { module = "io.avaje:avaje-jsonb", version.ref = "avaje" }
 avaje-jsonb-generator = { module = "io.avaje:avaje-jsonb-generator", version.ref = "avaje" }
-ejml-simple = { module = "org.ejml:ejml-simple", version.ref = "ejml" } # also pulls in other EJML modules as transitive dependencies
+ejml-java9module = { module = "org.ejml:ejml-java9module", version.ref = "ejml" } # single uberjar with all the ejml libraries bundled together
 gson = { module = "com.google.code.gson:gson", version = "2.13.1" }
 quickbuf-runtime = { module = "us.hebi.quickbuf:quickbuf-runtime", version.ref = "quickbuf" }
 thirdparty-opencv = { module = "org.wpilib.thirdparty.opencv:opencv-java", version.ref = "opencv" }
@@ -29,7 +29,7 @@ wpilib-gradle-vscode = { module = "org.wpilib:gradle-cpp-vscode", version = "202
 wpilib-native-utils = { module = "org.wpilib:native-utils", version = "2027.10.0" }
 
 [bundles]
-ejml = ["ejml-simple"]
+ejml = ["ejml-java9module"]
 mockito = ["mockito-core"]
 # junit api and launcher artifacts are different dependency types (implementation and runtime, respectively),
 # so it doesn't make sense to bundle them in a single "junit" bundle

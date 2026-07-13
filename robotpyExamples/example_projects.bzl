@@ -14,6 +14,7 @@ EXAMPLE_PROJECTS = [
     "examples/Encoder",
     "examples/GettingStarted",
     "examples/Gyro",
+    "examples/DSGamepadChooser",
     "examples/HatchbotInlined",
     "examples/HatchbotTraditional",
     "examples/MecanumBot",

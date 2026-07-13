@@ -8,21 +8,21 @@ robotpy_logger = logging.getLogger("robotpy")
 user_logger = logging.getLogger("your.robot")
 
 
-def reportErrorInternal(
+def report_error_internal(
     error: str,
-    printTrace: bool = False,
-    fromUser: bool = False,
-    isWarning: bool = True,
+    print_trace: bool = False,
+    from_user: bool = False,
+    is_warning: bool = True,
     code: int = 1,
 ) -> None:
-    traceString = ""
+    trace_string = ""
 
-    if fromUser:
+    if from_user:
         log = user_logger
     else:
         log = robotpy_logger
 
-    if printTrace:
+    if print_trace:
         exc_info = sys.exc_info()
 
         exc = exc_info[0]
@@ -31,7 +31,7 @@ def reportErrorInternal(
         else:
             tb = traceback.extract_tb(exc_info[2])
 
-        locString = "%s.%s:%s" % (tb[-1][0], tb[-1][1], tb[-1][2])
+        loc_string = "%s.%s:%s" % (tb[-1][0], tb[-1][1], tb[-1][2])
 
         trc = "Traceback (most recent call last):\n"
         stackstr = trc + "".join(traceback.format_list(tb))
@@ -39,52 +39,52 @@ def reportErrorInternal(
             stackstr += "  " + ("".join(traceback.format_exception(*exc_info))).lstrip(
                 trc
             )
-        traceString += "\n" + stackstr
+        trace_string += "\n" + stackstr
 
         if exc is None:
-            log.error(error + "\n" + traceString)
+            log.error(error + "\n" + trace_string)
         else:
             log.error(error, exc_info=exc_info)
     else:
-        if isWarning:
+        if is_warning:
             log.warning(error)
         else:
             log.error(error)
 
         try:
             frame = inspect.stack(context=2)[-1]
-            locString = f"{frame.filename}:{frame.lineno}"
+            loc_string = f"{frame.filename}:{frame.lineno}"
         except Exception:
-            locString = "<unknown location>"
+            loc_string = "<unknown location>"
 
     if not hal.__hal_simulation__:
-        hal.sendError(
-            not isWarning,
+        hal.send_error(
+            not is_warning,
             code,
             error,
-            locString,
-            traceString,
+            loc_string,
+            trace_string,
             True,
         )
 
 
-def reportError(error: str, printTrace: bool = False) -> None:
+def report_error(error: str, print_trace: bool = False) -> None:
     """
     Report error to Driver Station, and also prints error to ``sys.stderr``.
     Optionally appends stack trace to error message.
 
     :param error: message to show
-    :param printTrace: If True, appends stack trace to error string
+    :param print_trace: If True, appends stack trace to error string
     """
-    reportErrorInternal(error, printTrace, fromUser=True)
+    report_error_internal(error, print_trace, from_user=True)
 
 
-def reportWarning(error: str, printTrace: bool = False) -> None:
+def report_warning(error: str, print_trace: bool = False) -> None:
     """
     Report warning to Driver Station, and also prints error to ``sys.stderr``.
     Optionally appends stack trace to error message.
 
     :param error: message to show
-    :param printTrace: If True, appends stack trace to error string
+    :param print_trace: If True, appends stack trace to error string
     """
-    reportErrorInternal(error, printTrace, fromUser=True, isWarning=True)
+    report_error_internal(error, print_trace, from_user=True, is_warning=True)

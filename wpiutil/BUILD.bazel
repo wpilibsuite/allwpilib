@@ -1,5 +1,5 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
@@ -22,7 +22,6 @@ filegroup(
         "src/main/native/thirdparty/argparse/include/**/*",
         "src/main/native/thirdparty/debugging/include/**/*",
         "src/main/native/thirdparty/double-conversion/include/**/*",
-        "src/main/native/thirdparty/fmtlib/include/**/*",
         "src/main/native/thirdparty/json/include/**/*",
         "src/main/native/thirdparty/llvm/include/**/*",
         "src/main/native/thirdparty/mpack/include/**/*",
@@ -105,13 +104,6 @@ third_party_cc_lib_helper(
 )
 
 third_party_cc_lib_helper(
-    name = "fmtlib",
-    include_root = "src/main/native/thirdparty/fmtlib/include",
-    src_root = "src/main/native/thirdparty/fmtlib/src",
-    visibility = ["//visibility:public"],
-)
-
-third_party_cc_lib_helper(
     name = "json",
     include_root = "src/main/native/thirdparty/json/include",
     src_root = "src/main/native/thirdparty/json/src",
@@ -187,7 +179,6 @@ wpilib_cc_library(
     third_party_libraries = [
         ":debugging",
         ":double-conversion",
-        ":fmtlib",
         ":json",
         ":llvm",
         ":mpack",
@@ -221,11 +212,9 @@ cc_library(
     hdrs = glob([
         "src/main/native/include/**",
         "src/main/native/thirdparty/llvm/include/**",
-        "src/main/native/thirdparty/fmtlib/include/**",
     ]),
     includes = [
         "src/main/native/include",
-        "src/main/native/thirdparty/fmtlib/include",
         "src/main/native/thirdparty/llvm/include",
     ],
 )
@@ -358,7 +347,6 @@ generate_robotpy_native_wrapper_build_info(
         "argparse",
         "debugging",
         "double-conversion",
-        "fmtlib",
         "json",
         "llvm",
         "mpack",

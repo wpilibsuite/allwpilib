@@ -11,7 +11,7 @@
 
 #include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/units/math.hpp"
 
@@ -70,10 +70,11 @@ TEST(LTVDifferentialDriveControllerTest, ReachesReference) {
   wpi::math::LTVDifferentialDriveController controller{
       plant, kTrackwidth, {0.0625, 0.125, 2.5, 0.95, 0.95}, {12.0, 12.0}, kDt};
   wpi::math::Pose2d robotPose{2.7_m, 23_m, 0_deg};
+  wpi::math::DifferentialDriveKinematics kinematics{kTrackwidth};
 
   auto waypoints = std::vector{wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
                                wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
-  auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
+  auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
   wpi::math::Vectord<5> x = wpi::math::Vectord<5>::Zero();
@@ -81,9 +82,10 @@ TEST(LTVDifferentialDriveControllerTest, ReachesReference) {
   x(State::kY) = robotPose.Y().value();
   x(State::kHeading) = robotPose.Rotation().Radians().value();
 
-  auto totalTime = trajectory.TotalTime();
-  for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {
-    auto state = trajectory.Sample(kDt * i);
+  auto duration = trajectory.Duration();
+  for (size_t i = 0; i < (duration / kDt).value(); ++i) {
+    wpi::math::DifferentialSample state{trajectory.SampleAt(kDt * i),
+                                        kinematics};
     robotPose = wpi::math::Pose2d{wpi::units::meter_t{x(State::kX)},
                                   wpi::units::meter_t{x(State::kY)},
                                   wpi::units::radian_t{x(State::kHeading)}};
@@ -96,7 +98,7 @@ TEST(LTVDifferentialDriveControllerTest, ReachesReference) {
         wpi::math::Vectord<2>{leftVoltage.value(), rightVoltage.value()}, kDt);
   }
 
-  auto& endPose = trajectory.States().back().pose;
+  auto& endPose = trajectory.Samples().back().pose;
   EXPECT_NEAR_UNITS(endPose.X(), robotPose.X(), kTolerance);
   EXPECT_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
   EXPECT_NEAR_UNITS(wpi::math::AngleModulus(endPose.Rotation().Radians() -

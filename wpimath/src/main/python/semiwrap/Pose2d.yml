@@ -20,7 +20,7 @@ classes:
           Translation2d, Rotation2d:
           wpi::units::meter_t, wpi::units::meter_t, Rotation2d:
           const Eigen::Matrix3d&:
-            rename: fromMatrix
+            rename: from_matrix
             keepalive: []
       Translation:
       Rotation:
@@ -44,10 +44,10 @@ classes:
 
 inline_code: |
   cls_Pose2d
-    .def_static("fromFeet", [](wpi::units::foot_t x, wpi::units::foot_t y, Rotation2d r) {
+    .def_static("from_feet", [](wpi::units::foot_t x, wpi::units::foot_t y, Rotation2d r) {
       return std::make_unique<Pose2d>(x, y, r);
     }, py::arg("x"), py::arg("y"), py::arg("r"))
-    .def_static("fromFeet", [](wpi::units::foot_t x, wpi::units::foot_t y, wpi::units::radian_t angle) {
+    .def_static("from_feet", [](wpi::units::foot_t x, wpi::units::foot_t y, wpi::units::radian_t angle) {
       return std::make_unique<Pose2d>(x, y, Rotation2d(angle));
     }, py::arg("x"), py::arg("y"), py::arg("angle"))
     .def(py::init([](wpi::units::meter_t x, wpi::units::meter_t y, wpi::units::radian_t angle) {

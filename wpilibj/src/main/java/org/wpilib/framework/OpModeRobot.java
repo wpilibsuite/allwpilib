@@ -385,7 +385,9 @@ public abstract class OpModeRobot extends RobotBase {
     String className = name.replace('/', '.').substring(0, name.length() - 6);
     Class<? extends OpMode> cls;
     try {
-      cls = Class.forName(className).asSubclass(OpMode.class);
+      cls =
+          Class.forName(className, false, Thread.currentThread().getContextClassLoader())
+              .asSubclass(OpMode.class);
     } catch (ClassNotFoundException | ClassCastException e) {
       return;
     }

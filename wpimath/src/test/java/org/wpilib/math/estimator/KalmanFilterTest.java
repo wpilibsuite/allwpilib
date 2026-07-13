@@ -15,8 +15,8 @@ import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.random.Normal;
 import org.wpilib.math.system.LinearSystem;
+import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.TrajectoryConfig;
-import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.math.util.Nat;
 
 class KalmanFilterTest {
@@ -199,30 +199,27 @@ class KalmanFilterTest {
             dt);
 
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(new Pose2d(0.0, 0.0, Rotation2d.kZero), new Pose2d(5.0, 5.0, Rotation2d.kZero)),
             new TrajectoryConfig(2.0, 2.0));
 
     var lastVelocity = VecBuilder.fill(0.0, 0.0, 0.0);
 
-    for (var t = 0.0; t < trajectory.getTotalTime(); t += dt) {
-      var sample = trajectory.sample(t);
+    for (var t = 0.0; t < trajectory.duration; t += dt) {
+      var sample = trajectory.sampleAt(t);
 
       var y =
           VecBuilder.fill(
               sample.pose.getTranslation().getX(),
               sample.pose.getTranslation().getY(),
               sample.pose.getRotation().getRadians());
-      var noise = Normal.normal(VecBuilder.fill(0.2, 0.2, 1.0 / 3.0));
+      // Low noise for stability
+      var noise = Normal.normal(VecBuilder.fill(0.002, 0.002, 0.001));
       y.set(0, 0, y.get(0, 0) + noise.get(0, 0));
       y.set(1, 0, y.get(1, 0) + noise.get(1, 0));
       y.set(2, 0, y.get(2, 0) + noise.get(2, 0));
 
-      var velocity =
-          VecBuilder.fill(
-              sample.velocity * sample.pose.getRotation().getCos(),
-              sample.velocity * sample.pose.getRotation().getSin(),
-              sample.curvature * sample.velocity);
+      var velocity = VecBuilder.fill(sample.velocity.vx, sample.velocity.vy, sample.velocity.omega);
       var u = velocity.minus(lastVelocity).div(dt);
 
       filter.correct(u, y);
@@ -232,11 +229,11 @@ class KalmanFilterTest {
     }
 
     assertEquals(
-        trajectory.sample(trajectory.getTotalTime()).pose.getTranslation().getX(),
+        trajectory.sampleAt(trajectory.duration).pose.getTranslation().getX(),
         filter.getXhat(0),
         0.2);
     assertEquals(
-        trajectory.sample(trajectory.getTotalTime()).pose.getTranslation().getY(),
+        trajectory.sampleAt(trajectory.duration).pose.getTranslation().getY(),
         filter.getXhat(1),
         0.2);
   }

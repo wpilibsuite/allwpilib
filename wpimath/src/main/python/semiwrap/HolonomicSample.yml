@@ -1,0 +1,29 @@
+functions:
+  to_json:
+    overloads:
+      wpi::util::json&, const HolonomicSample&:
+        ignore: true
+      wpi::util::json&, const std::vector<HolonomicSample>&:
+        ignore: true
+  from_json:
+    overloads:
+      const wpi::util::json&, HolonomicSample&:
+        ignore: true
+      const wpi::util::json&, std::vector<HolonomicSample>&:
+        ignore: true
+  KinematicInterpolate:
+classes:
+  wpi::math::HolonomicSample:
+    force_no_trampoline: true
+    attributes:
+      pose:
+      velocity:
+      acceleration:
+    methods:
+      HolonomicSample:
+        overloads:
+          "":
+          wpi::units::second_t, const Pose2d&, const ChassisVelocities&, const ChassisAccelerations&:
+      operator==:
+      Transform:
+      RelativeTo:

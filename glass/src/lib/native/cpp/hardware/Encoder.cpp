@@ -4,9 +4,9 @@
 
 #include "wpi/glass/hardware/Encoder.hpp"
 
+#include <format>
 #include <string>
 
-#include <fmt/format.h>
 #include <imgui.h>
 
 #include "wpi/glass/Context.hpp"
@@ -38,22 +38,22 @@ void EncoderModel::SetName(std::string_view name) {
     }
   } else {
     if (auto distancePerPulse = GetDistancePerPulseData()) {
-      distancePerPulse->SetName(fmt::format("{} Distance/Count", name));
+      distancePerPulse->SetName(std::format("{} Distance/Count", name));
     }
     if (auto count = GetCountData()) {
-      count->SetName(fmt::format("{} Count", name));
+      count->SetName(std::format("{} Count", name));
     }
     if (auto period = GetPeriodData()) {
-      period->SetName(fmt::format("{} Period", name));
+      period->SetName(std::format("{} Period", name));
     }
     if (auto direction = GetDirectionData()) {
-      direction->SetName(fmt::format("{} Direction", name));
+      direction->SetName(std::format("{} Direction", name));
     }
     if (auto distance = GetDistanceData()) {
-      distance->SetName(fmt::format("{} Distance", name));
+      distance->SetName(std::format("{} Distance", name));
     }
     if (auto rate = GetRateData()) {
-      rate->SetName(fmt::format("{} Rate", name));
+      rate->SetName(std::format("{} Rate", name));
     }
   }
 }

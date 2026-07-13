@@ -138,8 +138,12 @@ bool GenericHID::IsConnected() const {
 }
 
 GenericHID::HIDType GenericHID::GetGamepadType() const {
-  return static_cast<HIDType>(
-      wpi::internal::DriverStationBackend::GetJoystickGamepadType(m_port));
+  int type =
+      wpi::internal::DriverStationBackend::GetJoystickGamepadType(m_port);
+  if (type < 0 || type >= static_cast<int>(HIDType::COUNT)) {
+    return HIDType::UNKNOWN;
+  }
+  return static_cast<HIDType>(type);
 }
 
 GenericHID::SupportedOutputs GenericHID::GetSupportedOutputs() const {

@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.3.0",
+    "semiwrap~=0.6.0",
     "hatch-meson~=0.1.2",
     "hatch-robotpy~=0.2.1",
     "hatchling",
@@ -78,6 +78,11 @@ scan_headers_ignore = [
     "rpy/SmartDashboardData.h",
 ]
 
+[tool.semiwrap.name_transform]
+default = "snake_case"
+enum_value = "CAPS_CASE"
+known_words = ["3V3", "5V", "CAN", "CPU", "DS", "FMS", "FPGA", "HAL", "HTTP", "I2C", "IMU", "JNI", "JSON", "mDNS", "NT", "OpMode", "PCM", "PDH", "PDP", "PID", "POVs", "PWM", "RIO", "SPI", "URI", "URL", "USB", "VIn"]
+
 [tool.semiwrap.extension_modules."wpilib._wpilib"]
 name = "wpilib"
 wraps = ["robotpy-native-wpilib"]
@@ -119,6 +124,7 @@ POVDirection = "wpi/driverstation/POVDirection.hpp"
 RobotState = "wpi/driverstation/RobotState.hpp"
 TouchpadFinger = "wpi/driverstation/TouchpadFinger.hpp"
 Gamepad = "wpi/driverstation/Gamepad.hpp"
+DSGamepadChooser = "wpi/driverstation/DSGamepadChooser.hpp"
 GenericHID = "wpi/driverstation/GenericHID.hpp"
 HIDDevice = "wpi/driverstation/HIDDevice.hpp"
 Joystick = "wpi/driverstation/Joystick.hpp"

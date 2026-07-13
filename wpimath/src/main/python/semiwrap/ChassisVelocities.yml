@@ -1,6 +1,11 @@
 extra_includes:
 - wpystruct.h
 
+functions:
+  to_json:
+    ignore: true
+  from_json:
+    ignore: true
 classes:
   wpi::math::ChassisVelocities:
     force_no_default_constructor: true
@@ -34,7 +39,7 @@ inline_code: |
       >(),
       py::arg("vx") = 0, py::arg("vy") = 0, py::arg("omega") = 0
     )
-    .def_static("fromFeet", [](wpi::units::feet_per_second_t vx, wpi::units::feet_per_second_t vy, wpi::units::radians_per_second_t omega){
+    .def_static("from_feet", [](wpi::units::feet_per_second_t vx, wpi::units::feet_per_second_t vy, wpi::units::radians_per_second_t omega){
       return ChassisVelocities{vx, vy, omega};
     }, py::arg("vx") = 0, py::arg("vy") = 0, py::arg("omega") = 0)
     .def_property("vx_fps",
