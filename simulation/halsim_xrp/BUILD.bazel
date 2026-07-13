@@ -19,6 +19,7 @@ wpilib_cc_library(
     deps = [
         "//simulation/halsim_ws_core",
         "//thirdparty/imgui_suite",
+        "//wpigui",
         "//wpinet",
     ],
 )
@@ -42,6 +43,7 @@ wpilib_cc_library(
     deps = [
         "//simulation/halsim_ws_core",
         "//thirdparty/imgui_suite",
+        "//wpigui",
         "//wpinet",
     ],
 )
@@ -64,6 +66,7 @@ wpilib_cc_static_library(
     static_deps = [
         "//thirdparty/imgui_suite:static/imguiSuite",
         "//wpinet:static/wpinet",
+        "//wpigui:static/wpigui",
         "//hal:static/wpiHal",
         "//simulation/halsim_ws_core:static/halsim_ws_core",
     ],

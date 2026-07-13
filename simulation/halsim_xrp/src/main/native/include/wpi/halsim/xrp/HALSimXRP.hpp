@@ -50,6 +50,15 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
   void DisconnectBluetooth();
   XRPConnectionStatus GetConnectionStatus() const;
 
+  /**
+   * Remembers the Bluetooth target without starting a connection.
+   *
+   * @param address platform-specific Bluetooth target address.
+   * @param type Bluetooth address type.
+   */
+  void RememberBluetoothTarget(std::string address,
+                               XRPBluetoothAddressType type);
+
   void ParsePacket(std::span<const uint8_t> packet);
   void OnNetValueChanged(const wpi::util::json& msg);
   void OnSimValueChanged(const wpi::util::json& simData) override;
