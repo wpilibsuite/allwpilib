@@ -207,6 +207,13 @@ winrt::guid ParseUuid(std::string_view uuid) {
   return parsed;
 }
 
+bt::BluetoothAddressType ToWinrtBluetoothAddressType(
+    BluetoothAddressType addressType) {
+  return addressType == BluetoothAddressType::PUBLIC
+             ? bt::BluetoothAddressType::Public
+             : bt::BluetoothAddressType::Random;
+}
+
 std::string ToString(winrt::hresult_error const& error) {
   std::string result = winrt::to_string(error.message());
   if (result.empty()) {
@@ -521,7 +528,8 @@ class BluetoothLEPacketClient::Impl
       EnsureWinrtApartment();
 
       auto device =
-          bt::BluetoothLEDevice::FromBluetoothAddressAsync(bluetoothAddress)
+          bt::BluetoothLEDevice::FromBluetoothAddressAsync(
+              bluetoothAddress, ToWinrtBluetoothAddressType(config.addressType))
               .get();
       if (IsConnectCanceled(generation)) {
         return;
