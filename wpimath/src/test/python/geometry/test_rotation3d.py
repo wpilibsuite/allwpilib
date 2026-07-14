@@ -249,6 +249,29 @@ def test_rotate_by_non_zero_z():
     assert expected == rot
 
 
+def test_integrate():
+    rot = Rotation3d(0, 0, math.radians(90))
+
+    integrated1 = rot.integrate(0, 0, math.radians(20), 1)
+    expected1 = Rotation3d(0, 0, math.radians(110))
+    assert expected1 == integrated1
+
+    integrated2 = rot.integrate(0, math.radians(20), 0, 1)
+    expected2 = Rotation3d(0, math.radians(20), math.radians(90))
+    assert expected2 == integrated2
+
+    integrated3 = rot.integrate(0, math.radians(20), math.radians(20), 1)
+    expected3 = Rotation3d(
+        Quaternion(
+            0.5635121137168105,
+            -0.12216409746525868,
+            0.1221640974652587,
+            0.8078403086473278,
+        )
+    )
+    assert expected3 == integrated3
+
+
 def test_axis_angle():
     x_axis = np.array([1.0, 0.0, 0.0])
     y_axis = np.array([0.0, 1.0, 0.0])

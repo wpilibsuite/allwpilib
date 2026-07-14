@@ -413,6 +413,7 @@ public abstract class RobotBase implements AutoCloseable {
 
     HAL.reportUsage("Language", "Java");
     HAL.reportUsage("WPILibVersion", WPILibVersion.Version);
+    HAL.publishWpilibVersion(WPILibVersion.Version + " (Java)");
 
     if (HAL.hasMain()) {
       Thread thread =

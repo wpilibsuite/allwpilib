@@ -1,3 +1,6 @@
+extra_includes:
+- wpystruct.h
+
 functions:
   to_json:
     overloads:
@@ -27,3 +30,6 @@ classes:
       operator==:
       Transform:
       RelativeTo:
+
+inline_code: |
+  SetupWPyStruct<wpi::math::HolonomicSample>(cls_HolonomicSample);

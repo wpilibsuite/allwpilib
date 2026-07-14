@@ -1,3 +1,6 @@
+extra_includes:
+- wpystruct.h
+
 functions:
   to_json:
     overloads:
@@ -22,3 +25,6 @@ classes:
           "":
           wpi::units::second_t:
       operator==:
+
+inline_code: |
+  SetupWPyStruct<wpi::math::TrajectorySample>(cls_TrajectorySample);
