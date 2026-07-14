@@ -7,8 +7,14 @@
 #include <gcem.hpp>
 
 #include "wpi/math/geometry/Rotation3d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/base.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/velocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {

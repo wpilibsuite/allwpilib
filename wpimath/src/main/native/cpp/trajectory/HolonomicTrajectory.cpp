@@ -4,9 +4,12 @@
 
 #include "wpi/math/trajectory/HolonomicTrajectory.hpp"
 
+#include <cstddef>
 #include <utility>
 #include <vector>
 
+#include "wpi/math/geometry/Transform2d.hpp"
+#include "wpi/math/trajectory/HolonomicSample.hpp"
 #include "wpi/util/json.hpp"
 
 using namespace wpi::math;

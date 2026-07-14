@@ -6,6 +6,12 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
+#include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+
 TEST(ComputerVisionUtilTest, ObjectToRobotPose) {
   wpi::math::Pose3d robot{1_m, 2_m, 0_m,
                           wpi::math::Rotation3d{0_deg, 0_deg, 30_deg}};

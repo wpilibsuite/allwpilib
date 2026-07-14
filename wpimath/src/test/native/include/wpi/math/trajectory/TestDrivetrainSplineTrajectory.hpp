@@ -4,12 +4,15 @@
 
 #pragma once
 
-#include <memory>
-#include <utility>
 #include <vector>
 
+#include "wpi/math/geometry/Transform2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
 #include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 
 namespace wpi::math {
 class TestDrivetrainSplineTrajectory {

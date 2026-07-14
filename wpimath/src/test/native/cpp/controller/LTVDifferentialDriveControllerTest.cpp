@@ -5,15 +5,27 @@
 #include "wpi/math/controller/LTVDifferentialDriveController.hpp"
 
 #include <cmath>
+#include <cstddef>
 #include <numbers>
+#include <vector>
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/math/trajectory/DifferentialSample.hpp"
 #include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 #include "wpi/math/util/MathUtil.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)

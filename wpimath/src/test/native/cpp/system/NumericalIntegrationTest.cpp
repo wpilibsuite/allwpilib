@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/units/time.hpp"
 
 // Test that integrating dx/dt = eˣ works
 TEST(NumericalIntegrationTest, Exponential) {

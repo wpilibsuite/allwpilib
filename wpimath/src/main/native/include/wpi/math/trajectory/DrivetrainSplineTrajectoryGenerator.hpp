@@ -8,9 +8,13 @@
 #include <utility>
 #include <vector>
 
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/spline/Spline.hpp"
 #include "wpi/math/spline/SplineParameterizer.hpp"
 #include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/units/curvature.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {

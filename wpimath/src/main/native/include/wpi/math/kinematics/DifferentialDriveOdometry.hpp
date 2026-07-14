@@ -5,7 +5,9 @@
 #pragma once
 
 #include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp"
 #include "wpi/math/kinematics/Odometry.hpp"
