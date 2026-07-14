@@ -38,6 +38,8 @@ classes:
 
         class Robot(wpilib.TimedRobot):
             def __init__(self) -> None:
+                super().__init__()
+
                 self.front_left = wpilib.PWMVictorSPX(1)
                 self.rear_left = wpilib.PWMVictorSPX(2)
                 self.left = wpilib.MotorControllerGroup(self.front_left, self.rear_left)
@@ -54,6 +56,8 @@ classes:
 
         class Robot(wpilib.TimedRobot):
             def __init__(self) -> None:
+                super().__init__()
+
                 self.front_left = wpilib.PWMVictorSPX(1)
                 self.mid_left = wpilib.PWMVictorSPX(2)
                 self.rear_left = wpilib.PWMVictorSPX(3)
