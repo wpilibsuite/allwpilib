@@ -5,8 +5,8 @@
 package org.wpilib.math.trajectory.proto;
 
 import org.wpilib.math.proto.ProtobufHolonomicTrajectory;
+import org.wpilib.math.trajectory.HolonomicSample;
 import org.wpilib.math.trajectory.HolonomicTrajectory;
-import org.wpilib.math.trajectory.TrajectorySample;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
@@ -29,11 +29,11 @@ public class HolonomicTrajectoryProto
 
   @Override
   public HolonomicTrajectory unpack(ProtobufHolonomicTrajectory msg) {
-    return new HolonomicTrajectory(Protobuf.unpackList(msg.getSamples(), TrajectorySample.proto));
+    return new HolonomicTrajectory(Protobuf.unpackList(msg.getSamples(), HolonomicSample.proto));
   }
 
   @Override
   public void pack(ProtobufHolonomicTrajectory msg, HolonomicTrajectory value) {
-    Protobuf.packList(msg.getMutableSamples(), value.getSamples(), TrajectorySample.proto);
+    Protobuf.packList(msg.getMutableSamples(), value.getSamples(), HolonomicSample.proto);
   }
 }

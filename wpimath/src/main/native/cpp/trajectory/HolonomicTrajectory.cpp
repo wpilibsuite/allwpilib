@@ -4,16 +4,19 @@
 
 #include "wpi/math/trajectory/HolonomicTrajectory.hpp"
 
+#include <cstddef>
 #include <utility>
 #include <vector>
 
+#include "wpi/math/geometry/Transform2d.hpp"
+#include "wpi/math/trajectory/HolonomicSample.hpp"
 #include "wpi/util/json.hpp"
 
 using namespace wpi::math;
 
-TrajectorySample HolonomicTrajectory::Interpolate(const TrajectorySample& start,
-                                                  const TrajectorySample& end,
-                                                  double t) const {
+HolonomicSample HolonomicTrajectory::Interpolate(const HolonomicSample& start,
+                                                 const HolonomicSample& end,
+                                                 double t) const {
   return KinematicInterpolate(start, end, t);
 }
 
@@ -22,19 +25,19 @@ HolonomicTrajectory HolonomicTrajectory::TransformBy(
   const Pose2d& firstPose = Start().pose;
   Pose2d transformedFirstPose = firstPose.TransformBy(transform);
 
-  std::vector<TrajectorySample> transformedSamples;
+  std::vector<HolonomicSample> transformedSamples;
   transformedSamples.reserve(Samples().size());
 
   // Transform first sample
   transformedSamples.push_back(
-      TrajectorySample(Start().timestamp, transformedFirstPose,
-                       Start().velocity, Start().acceleration));
+      HolonomicSample(Start().time, transformedFirstPose, Start().velocity,
+                      Start().acceleration));
 
   // Transform remaining samples
   for (size_t i = 1; i < Samples().size(); ++i) {
     const auto& sample = Samples()[i];
-    transformedSamples.push_back(TrajectorySample(
-        sample.timestamp, transformedFirstPose + (sample.pose - firstPose),
+    transformedSamples.push_back(HolonomicSample(
+        sample.time, transformedFirstPose + (sample.pose - firstPose),
         sample.velocity, sample.acceleration));
   }
 
@@ -57,7 +60,7 @@ void wpi::math::to_json(wpi::util::json& json,
 
 void wpi::math::from_json(const wpi::util::json& json,
                           HolonomicTrajectory& trajectory) {
-  std::vector<TrajectorySample> samples;
+  std::vector<HolonomicSample> samples;
   from_json(json.at("samples"), samples);
   trajectory = HolonomicTrajectory{std::move(samples)};
 }

@@ -1,3 +1,6 @@
+extra_includes:
+- wpystruct.h
+
 functions:
   to_json:
     overloads:
@@ -15,20 +18,22 @@ classes:
   wpi::math::DifferentialSample:
     force_no_trampoline: true
     attributes:
-      leftSpeed:
-      rightSpeed:
+      leftVelocity:
+      rightVelocity:
     methods:
       DifferentialSample:
         overloads:
           "":
-          const TrajectorySample&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t:
-          const TrajectorySample&, const DifferentialDriveKinematics&:
-          const SplineSample&, const DifferentialDriveKinematics&:
           ? wpi::units::second_t, const Pose2d&, const ChassisVelocities&, const ChassisAccelerations&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t
           :
           ? wpi::units::second_t, const Pose2d&, const ChassisVelocities&, const ChassisAccelerations&, const DifferentialDriveKinematics&
           :
+          const HolonomicSample&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t:
+          const HolonomicSample&, const DifferentialDriveKinematics&:
+          const DrivetrainSplineSample&, const DifferentialDriveKinematics&:
       Transform:
       RelativeTo:
-      WithNewTimestamp:
       operator==:
+
+inline_code: |
+  SetupWPyStruct<wpi::math::DifferentialSample>(cls_DifferentialSample);

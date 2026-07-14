@@ -1,5 +1,5 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//commandsv3:generate.bzl", "generate_commandsv3")
@@ -71,9 +71,17 @@ wpilib_java_library(
 wpilib_java_junit5_test(
     name = "commandsv3-java-test",
     srcs = glob(["src/test/java/**/*.java"]),
+    jvm_flags = [
+        "--add-opens",
+        "java.base/jdk.internal.vm=ALL-UNNAMED",
+        "--add-opens",
+        "java.base/java.lang=ALL-UNNAMED",
+    ],
     plugins = [
         "//epilogue-processor:plugin",
     ],
+    resource_strip_prefix = "commandsv3/src/test/resources",
+    resources = glob(["src/test/resources/**"]),
     deps = [
         ":commandsv3-java",
         "//epilogue-runtime:epilogue-java",

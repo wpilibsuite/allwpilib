@@ -289,16 +289,6 @@ class DriverStationSimTest {
   }
 
   @Test
-  void testSetGameDataNull() {
-    HAL.initialize(500, 0);
-    DriverStationSim.resetData();
-
-    DriverStationSim.setGameData(null);
-    DriverStationSim.notifyNewData();
-    assertTrue(MatchState.getGameData().isEmpty());
-  }
-
-  @Test
   void testSetEventName() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();

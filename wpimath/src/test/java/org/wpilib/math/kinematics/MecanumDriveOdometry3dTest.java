@@ -16,8 +16,8 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.TrajectoryConfig;
-import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.math.util.Units;
 
 class MecanumDriveOdometry3dTest {
@@ -129,7 +129,7 @@ class MecanumDriveOdometry3dTest {
         new MecanumDriveOdometry3d(kinematics, Rotation3d.kZero, wheelPositions, Pose3d.kZero);
 
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 Pose2d.kZero,
                 new Pose2d(20, 20, Rotation2d.kZero),
@@ -220,7 +220,7 @@ class MecanumDriveOdometry3dTest {
         new MecanumDriveOdometry3d(kinematics, Rotation3d.kZero, wheelPositions, Pose3d.kZero);
 
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 Pose2d.kZero,
                 new Pose2d(20, 20, Rotation2d.kZero),

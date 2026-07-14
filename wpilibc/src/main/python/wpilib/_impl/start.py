@@ -156,6 +156,7 @@ class RobotStarter:
 
     def _start(self, robot_cls: wpilib.RobotBase) -> bool:
         hal.report_usage("Language", "Python")
+        hal.publish_wpilib_version(f"{wpilib.__version__} (Python)")
 
         is_simulation = wpilib.RobotBase.is_simulation()
 

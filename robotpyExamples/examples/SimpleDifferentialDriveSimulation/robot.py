@@ -26,7 +26,7 @@ class MyRobot(wpilib.TimedRobot):
         self.timer = wpilib.Timer()
 
         # Called once at the beginning of the robot program.
-        self.trajectory = wpimath.TrajectoryGenerator.generate_trajectory(
+        self.trajectory = wpimath.DrivetrainSplineTrajectoryGenerator.generate(
             wpimath.Pose2d(2, 2, wpimath.Rotation2d()),
             [],
             wpimath.Pose2d(6, 4, wpimath.Rotation2d()),

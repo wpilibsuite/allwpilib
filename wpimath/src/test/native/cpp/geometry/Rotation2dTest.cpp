@@ -8,6 +8,8 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/units/angle.hpp"
+
 using namespace wpi::math;
 
 TEST(Rotation2dTest, RadiansToDegrees) {
@@ -87,13 +89,8 @@ TEST(Rotation2dTest, Inequality) {
 }
 
 TEST(Rotation2dTest, ToMatrix) {
-#if __GNUC__ <= 11
-  Rotation2d before{20_deg};
-  Rotation2d after{before.ToMatrix()};
-#else
   constexpr Rotation2d before{20_deg};
   constexpr Rotation2d after{before.ToMatrix()};
-#endif
 
   EXPECT_EQ(before, after);
 }

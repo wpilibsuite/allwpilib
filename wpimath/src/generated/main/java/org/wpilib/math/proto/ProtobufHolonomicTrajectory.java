@@ -24,9 +24,9 @@ public final class ProtobufHolonomicTrajectory extends ProtoMessage<ProtobufHolo
   private static final long serialVersionUID = 0L;
 
   /**
-   * <code>repeated .wpi.proto.ProtobufTrajectorySample samples = 1;</code>
+   * <code>repeated .wpi.proto.ProtobufHolonomicSample samples = 1;</code>
    */
-  private final RepeatedMessage<ProtobufTrajectorySample> samples = RepeatedMessage.newEmptyInstance(ProtobufTrajectorySample.getFactory());
+  private final RepeatedMessage<ProtobufHolonomicSample> samples = RepeatedMessage.newEmptyInstance(ProtobufHolonomicSample.getFactory());
 
   private ProtobufHolonomicTrajectory() {
   }
@@ -39,7 +39,7 @@ public final class ProtobufHolonomicTrajectory extends ProtoMessage<ProtobufHolo
   }
 
   /**
-   * <code>repeated .wpi.proto.ProtobufTrajectorySample samples = 1;</code>
+   * <code>repeated .wpi.proto.ProtobufHolonomicSample samples = 1;</code>
    * @return whether the samples field is set
    */
   public boolean hasSamples() {
@@ -47,7 +47,7 @@ public final class ProtobufHolonomicTrajectory extends ProtoMessage<ProtobufHolo
   }
 
   /**
-   * <code>repeated .wpi.proto.ProtobufTrajectorySample samples = 1;</code>
+   * <code>repeated .wpi.proto.ProtobufHolonomicSample samples = 1;</code>
    * @return this
    */
   public ProtobufHolonomicTrajectory clearSamples() {
@@ -57,7 +57,7 @@ public final class ProtobufHolonomicTrajectory extends ProtoMessage<ProtobufHolo
   }
 
   /**
-   * <code>repeated .wpi.proto.ProtobufTrajectorySample samples = 1;</code>
+   * <code>repeated .wpi.proto.ProtobufHolonomicSample samples = 1;</code>
    *
    * This method returns the internal storage object without modifying any has state.
    * The returned object should not be modified and be treated as read-only.
@@ -66,12 +66,12 @@ public final class ProtobufHolonomicTrajectory extends ProtoMessage<ProtobufHolo
    *
    * @return internal storage object for reading
    */
-  public RepeatedMessage<ProtobufTrajectorySample> getSamples() {
+  public RepeatedMessage<ProtobufHolonomicSample> getSamples() {
     return samples;
   }
 
   /**
-   * <code>repeated .wpi.proto.ProtobufTrajectorySample samples = 1;</code>
+   * <code>repeated .wpi.proto.ProtobufHolonomicSample samples = 1;</code>
    *
    * This method returns the internal storage object and sets the corresponding
    * has state. The returned object will become part of this message and its
@@ -79,28 +79,28 @@ public final class ProtobufHolonomicTrajectory extends ProtoMessage<ProtobufHolo
    *
    * @return internal storage object for modifications
    */
-  public RepeatedMessage<ProtobufTrajectorySample> getMutableSamples() {
+  public RepeatedMessage<ProtobufHolonomicSample> getMutableSamples() {
     bitField0_ |= 0x00000001;
     return samples;
   }
 
   /**
-   * <code>repeated .wpi.proto.ProtobufTrajectorySample samples = 1;</code>
+   * <code>repeated .wpi.proto.ProtobufHolonomicSample samples = 1;</code>
    * @param value the samples to add
    * @return this
    */
-  public ProtobufHolonomicTrajectory addSamples(final ProtobufTrajectorySample value) {
+  public ProtobufHolonomicTrajectory addSamples(final ProtobufHolonomicSample value) {
     bitField0_ |= 0x00000001;
     samples.add(value);
     return this;
   }
 
   /**
-   * <code>repeated .wpi.proto.ProtobufTrajectorySample samples = 1;</code>
+   * <code>repeated .wpi.proto.ProtobufHolonomicSample samples = 1;</code>
    * @param values the samples to add
    * @return this
    */
-  public ProtobufHolonomicTrajectory addAllSamples(final ProtobufTrajectorySample... values) {
+  public ProtobufHolonomicTrajectory addAllSamples(final ProtobufHolonomicSample... values) {
     bitField0_ |= 0x00000001;
     samples.addAll(values);
     return this;

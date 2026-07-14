@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/units/base.hpp"
 #include "wpi/units/time.hpp"
 
 namespace wpi::math {

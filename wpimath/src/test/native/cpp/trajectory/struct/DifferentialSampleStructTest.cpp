@@ -27,7 +27,7 @@ TEST(DifferentialSampleStructTest, Roundtrip) {
 
   DifferentialSample unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.timestamp.value(), unpacked_data.timestamp.value());
+  EXPECT_EQ(kExpectedData.time.value(), unpacked_data.time.value());
   EXPECT_EQ(kExpectedData.pose, unpacked_data.pose);
   EXPECT_EQ(kExpectedData.velocity.vx.value(),
             unpacked_data.velocity.vx.value());
@@ -41,6 +41,8 @@ TEST(DifferentialSampleStructTest, Roundtrip) {
             unpacked_data.acceleration.ay.value());
   EXPECT_EQ(kExpectedData.acceleration.alpha.value(),
             unpacked_data.acceleration.alpha.value());
-  EXPECT_EQ(kExpectedData.leftSpeed.value(), unpacked_data.leftSpeed.value());
-  EXPECT_EQ(kExpectedData.rightSpeed.value(), unpacked_data.rightSpeed.value());
+  EXPECT_EQ(kExpectedData.leftVelocity.value(),
+            unpacked_data.leftVelocity.value());
+  EXPECT_EQ(kExpectedData.rightVelocity.value(),
+            unpacked_data.rightVelocity.value());
 }

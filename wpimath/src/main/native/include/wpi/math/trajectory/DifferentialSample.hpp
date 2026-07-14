@@ -12,8 +12,8 @@
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp"
-#include "wpi/math/trajectory/SplineSample.hpp"
-#include "wpi/math/trajectory/TrajectorySample.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
+#include "wpi/math/trajectory/HolonomicSample.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
@@ -23,17 +23,17 @@ namespace wpi::math {
 /**
  * Represents a single sample in a differential drive trajectory.
  */
-class DifferentialSample : public TrajectorySample {
+class DifferentialSample : public HolonomicSample {
  public:
   /**
-   * The left wheel speed at this sample.
+   * The left wheel velocity at this sample.
    */
-  wpi::units::meters_per_second_t leftSpeed{0_mps};
+  wpi::units::meters_per_second_t leftVelocity{0_mps};
 
   /**
-   * The right wheel speed at this sample.
+   * The right wheel velocity at this sample.
    */
-  wpi::units::meters_per_second_t rightSpeed{0_mps};
+  wpi::units::meters_per_second_t rightVelocity{0_mps};
 
   /** Constructs a default DifferentialSample with all zero values. */
   constexpr DifferentialSample() = default;
@@ -41,31 +41,28 @@ class DifferentialSample : public TrajectorySample {
   /**
    * Constructs a DifferentialSample.
    *
-   * @param timestamp The timestamp of the sample relative to the trajectory
-   *                  start.
+   * @param time The time of the sample relative to the trajectory start.
    * @param pose The robot pose at this sample (in the field reference frame).
    * @param velocity The robot velocity at this sample (in the field reference
    *                 frame).
    * @param acceleration The robot acceleration at this sample (in the field
    *                     reference frame).
-   * @param leftSpeed The left wheel speed at this sample.
-   * @param rightSpeed The right wheel speed at this sample.
+   * @param leftVelocity The left wheel velocity at this sample.
+   * @param rightVelocity The right wheel velocity at this sample.
    */
-  constexpr DifferentialSample(wpi::units::second_t timestamp,
-                               const Pose2d& pose,
+  constexpr DifferentialSample(wpi::units::second_t time, const Pose2d& pose,
                                const ChassisVelocities& velocity,
                                const ChassisAccelerations& acceleration,
-                               wpi::units::meters_per_second_t leftSpeed,
-                               wpi::units::meters_per_second_t rightSpeed)
-      : TrajectorySample{timestamp, pose, velocity, acceleration},
-        leftSpeed{leftSpeed},
-        rightSpeed{rightSpeed} {}
+                               wpi::units::meters_per_second_t leftVelocity,
+                               wpi::units::meters_per_second_t rightVelocity)
+      : HolonomicSample{time, pose, velocity, acceleration},
+        leftVelocity{leftVelocity},
+        rightVelocity{rightVelocity} {}
 
   /**
    * Constructs a DifferentialSample.
    *
-   * @param timestamp The timestamp of the sample relative to the trajectory
-   *                  start.
+   * @param time The time of the sample relative to the trajectory start.
    * @param pose The robot pose at this sample (in the field reference frame).
    * @param velocity The robot velocity at this sample (in the field reference
    *                 frame).
@@ -73,31 +70,30 @@ class DifferentialSample : public TrajectorySample {
    *                     reference frame).
    * @param kinematics The kinematics of the drivetrain.
    */
-  constexpr DifferentialSample(wpi::units::second_t timestamp,
-                               const Pose2d& pose,
+  constexpr DifferentialSample(wpi::units::second_t time, const Pose2d& pose,
                                const ChassisVelocities& velocity,
                                const ChassisAccelerations& acceleration,
                                const DifferentialDriveKinematics& kinematics)
-      : TrajectorySample{timestamp, pose, velocity, acceleration} {
-    // Wheel speeds are derived from the robot-relative velocity.
-    auto wheelSpeeds =
+      : HolonomicSample{time, pose, velocity, acceleration} {
+    // Wheel velocitys are derived from the robot-relative velocity.
+    auto wheelVelocitys =
         kinematics.ToWheelVelocities(velocity.ToRobotRelative(pose.Rotation()));
-    leftSpeed = wheelSpeeds.left;
-    rightSpeed = wheelSpeeds.right;
+    leftVelocity = wheelVelocitys.left;
+    rightVelocity = wheelVelocitys.right;
   }
 
   /**
    * Constructs a DifferentialSample from a TrajectorySample.
    *
    * @param sample The TrajectorySample to copy.
-   * @param leftSpeed The left wheel speed at this sample.
-   * @param rightSpeed The right wheel speed at this sample.
+   * @param leftVelocity The left wheel velocity at this sample.
+   * @param rightVelocity The right wheel velocity at this sample.
    */
-  constexpr DifferentialSample(const TrajectorySample& sample,
-                               wpi::units::meters_per_second_t leftSpeed,
-                               wpi::units::meters_per_second_t rightSpeed)
-      : DifferentialSample{sample.timestamp,    sample.pose, sample.velocity,
-                           sample.acceleration, leftSpeed,   rightSpeed} {}
+  constexpr DifferentialSample(const HolonomicSample& sample,
+                               wpi::units::meters_per_second_t leftVelocity,
+                               wpi::units::meters_per_second_t rightVelocity)
+      : DifferentialSample{sample.time,         sample.pose,  sample.velocity,
+                           sample.acceleration, leftVelocity, rightVelocity} {}
 
   /**
    * Constructs a DifferentialSample from a TrajectorySample.
@@ -105,9 +101,9 @@ class DifferentialSample : public TrajectorySample {
    * @param sample The TrajectorySample to copy.
    * @param kinematics The kinematics of the drivetrain.
    */
-  constexpr DifferentialSample(const TrajectorySample& sample,
+  constexpr DifferentialSample(const HolonomicSample& sample,
                                const DifferentialDriveKinematics& kinematics)
-      : DifferentialSample{sample.timestamp, sample.pose, sample.velocity,
+      : DifferentialSample{sample.time, sample.pose, sample.velocity,
                            sample.acceleration, kinematics} {}
 
   /**
@@ -116,18 +112,18 @@ class DifferentialSample : public TrajectorySample {
    * @param sample The SplineSample to copy.
    * @param kinematics The kinematics of the drivetrain.
    */
-  constexpr DifferentialSample(const SplineSample& sample,
+  constexpr DifferentialSample(const DrivetrainSplineSample& sample,
                                const DifferentialDriveKinematics& kinematics)
-      : TrajectorySample{sample.timestamp, sample.pose, sample.velocity,
-                         sample.acceleration},
-        leftSpeed{kinematics
-                      .ToWheelVelocities(sample.velocity.ToRobotRelative(
-                          sample.pose.Rotation()))
-                      .left},
-        rightSpeed{kinematics
-                       .ToWheelVelocities(sample.velocity.ToRobotRelative(
-                           sample.pose.Rotation()))
-                       .right} {}
+      : HolonomicSample{sample.time, sample.pose, sample.velocity,
+                        sample.acceleration},
+        leftVelocity{kinematics
+                         .ToWheelVelocities(sample.velocity.ToRobotRelative(
+                             sample.pose.Rotation()))
+                         .left},
+        rightVelocity{kinematics
+                          .ToWheelVelocities(sample.velocity.ToRobotRelative(
+                              sample.pose.Rotation()))
+                          .right} {}
 
   /**
    * Transforms the pose of this sample by the given transform.
@@ -137,12 +133,12 @@ class DifferentialSample : public TrajectorySample {
    */
   constexpr DifferentialSample Transform(const Transform2d& transform) const {
     return DifferentialSample{
-        timestamp,
+        time,
         pose.TransformBy(transform),
         velocity.ToFieldRelative(transform.Rotation()),
         acceleration.ToFieldRelative(transform.Rotation()),
-        leftSpeed,
-        rightSpeed};
+        leftVelocity,
+        rightVelocity};
   }
 
   /**
@@ -152,24 +148,12 @@ class DifferentialSample : public TrajectorySample {
    * @return A new sample with the relative pose.
    */
   constexpr DifferentialSample RelativeTo(const Pose2d& other) const {
-    return DifferentialSample{timestamp,
+    return DifferentialSample{time,
                               pose.RelativeTo(other),
                               velocity.ToRobotRelative(other.Rotation()),
                               acceleration.ToRobotRelative(other.Rotation()),
-                              leftSpeed,
-                              rightSpeed};
-  }
-
-  /**
-   * Creates a new sample with the given timestamp.
-   *
-   * @param newTimestamp The new timestamp.
-   * @return A new sample with the given timestamp.
-   */
-  constexpr DifferentialSample WithNewTimestamp(
-      wpi::units::second_t newTimestamp) const {
-    return DifferentialSample{newTimestamp, pose,      velocity,
-                              acceleration, leftSpeed, rightSpeed};
+                              leftVelocity,
+                              rightVelocity};
   }
 
   /**

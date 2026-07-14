@@ -55,7 +55,17 @@
 
 #ifdef _WIN32
 #include "wpi/util/ConvertUTF.hpp"
-#include "Windows/WindowsSupport.hpp"
+// mingw-w64 tends to define it as 0x0502 in its headers.
+#undef _WIN32_WINNT
+
+// Require at least Windows 7 API.
+#define _WIN32_WINNT 0x0601
+#define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#define WIN32_NO_STATUS
+#include <windows.h>
 #endif
 
 using namespace wpi::util;
@@ -423,11 +433,7 @@ static bool write_console_impl(int FD, std::string_view Data) {
   if (auto EC = sys::windows::UTF8ToUTF16(Data, WideText))
     return false;
 
-  // On Windows 7 and earlier, WriteConsoleW has a low maximum amount of data
-  // that can be written to the console at a time.
   size_t MaxWriteSize = WideText.size();
-  if (!RunningWindows8OrGreater())
-    MaxWriteSize = 32767;
 
   size_t WCharsWritten = 0;
   do {

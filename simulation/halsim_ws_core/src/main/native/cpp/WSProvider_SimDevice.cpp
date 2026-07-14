@@ -76,7 +76,7 @@ void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::util::json& json) {
           break;
         case HAL_DOUBLE:
           if (jvalue.is_number()) {
-            value.data.v_double = jvalue.get_double();
+            value.data.v_double = jvalue.get_number();
             value.data.v_double -= vd->second.doubleOffset;
           }
           break;

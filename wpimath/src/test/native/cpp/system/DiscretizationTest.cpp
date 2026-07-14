@@ -11,6 +11,7 @@
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/units/time.hpp"
 
 // Check that for a simple second-order system that we can easily analyze
 // analytically,

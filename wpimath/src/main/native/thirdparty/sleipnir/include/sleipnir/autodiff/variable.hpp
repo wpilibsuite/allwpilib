@@ -58,7 +58,7 @@ class Variable : public SleipnirBase {
   Variable() = default;
 
   /// Constructs an empty Variable.
-  explicit Variable(std::nullptr_t) : expr{nullptr} {}
+  explicit constexpr Variable(std::nullptr_t) : expr{nullptr} {}
 
   /// Constructs a Variable from a scalar type.
   ///
@@ -101,7 +101,7 @@ class Variable : public SleipnirBase {
   /// Constructs a Variable pointing to the specified expression.
   ///
   /// @param expr The autodiff variable.
-  explicit Variable(detail::ExpressionPtr<Scalar>&& expr)
+  explicit constexpr Variable(detail::ExpressionPtr<Scalar>&& expr)
       : expr{std::move(expr)} {}
 
   /// Assignment operator for scalar.

@@ -23,19 +23,21 @@ class SampleJsonTest {
   void testBaseSample(@TempDir Path tempDir) throws IOException {
     HolonomicTrajectory trajectory =
         new HolonomicTrajectory(
-            TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).getSamples().stream()
-                .map(s -> new TrajectorySample(s.timestamp, s.pose, s.velocity, s.acceleration))
-                .toArray(TrajectorySample[]::new));
+            DrivetrainSplineTrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
+                .getSamples()
+                .stream()
+                .map(s -> new HolonomicSample(s.time, s.pose, s.velocity, s.acceleration))
+                .toArray(HolonomicSample[]::new));
 
     int index = 0;
-    for (TrajectorySample sample : trajectory.samples) {
+    for (HolonomicSample sample : trajectory.samples) {
       Path tempFile = tempDir.resolve("base_sample_" + index + ".json");
 
       jsonb.toJson(sample, Files.newOutputStream(tempFile));
-      TrajectorySample deserializedSample =
-          jsonb.type(TrajectorySample.class).fromJson(Files.newInputStream(tempFile));
+      HolonomicSample deserializedSample =
+          jsonb.type(HolonomicSample.class).fromJson(Files.newInputStream(tempFile));
 
-      assertEquals(sample.timestamp, deserializedSample.timestamp, 1e-9);
+      assertEquals(sample.time, deserializedSample.time, 1e-9);
       assertEquals(sample.pose, deserializedSample.pose);
       assertEquals(sample.velocity.vx, deserializedSample.velocity.vx, 1e-9);
       assertEquals(sample.velocity.vy, deserializedSample.velocity.vy, 1e-9);
@@ -53,7 +55,7 @@ class SampleJsonTest {
     Trajectory<DifferentialSample> trajectory =
         new DifferentialTrajectory(
             new DifferentialDriveKinematics(0.5),
-            TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
+            DrivetrainSplineTrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
 
     int index = 0;
     for (DifferentialSample sample : trajectory.samples) {
@@ -64,7 +66,7 @@ class SampleJsonTest {
           jsonb.type(DifferentialSample.class).fromJson(Files.newInputStream(tempFile));
 
       assertAll(
-          () -> assertEquals(sample.timestamp, deserializedSample.timestamp, 1e-9),
+          () -> assertEquals(sample.time, deserializedSample.time, 1e-9),
           () -> assertEquals(sample.pose, deserializedSample.pose),
           () -> assertEquals(sample.velocity.vx, deserializedSample.velocity.vx, 1e-9),
           () -> assertEquals(sample.velocity.vy, deserializedSample.velocity.vy, 1e-9),
@@ -73,8 +75,8 @@ class SampleJsonTest {
           () -> assertEquals(sample.acceleration.ay, deserializedSample.acceleration.ay, 1e-9),
           () ->
               assertEquals(sample.acceleration.alpha, deserializedSample.acceleration.alpha, 1e-9),
-          () -> assertEquals(sample.leftSpeed, deserializedSample.leftSpeed, 1e-9),
-          () -> assertEquals(sample.rightSpeed, deserializedSample.rightSpeed, 1e-9));
+          () -> assertEquals(sample.leftVelocity, deserializedSample.leftVelocity, 1e-9),
+          () -> assertEquals(sample.rightVelocity, deserializedSample.rightVelocity, 1e-9));
 
       index++;
     }

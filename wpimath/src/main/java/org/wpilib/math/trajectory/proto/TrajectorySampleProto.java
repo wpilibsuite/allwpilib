@@ -4,9 +4,6 @@
 
 package org.wpilib.math.trajectory.proto;
 
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.kinematics.ChassisAccelerations;
-import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.proto.ProtobufTrajectorySample;
 import org.wpilib.math.trajectory.TrajectorySample;
 import org.wpilib.util.protobuf.Protobuf;
@@ -30,18 +27,11 @@ public class TrajectorySampleProto implements Protobuf<TrajectorySample, Protobu
 
   @Override
   public TrajectorySample unpack(ProtobufTrajectorySample msg) {
-    return new TrajectorySample(
-        msg.getTimestamp(),
-        Pose2d.proto.unpack(msg.getPose()),
-        ChassisVelocities.proto.unpack(msg.getVelocities()),
-        ChassisAccelerations.proto.unpack(msg.getAccelerations()));
+    return new TrajectorySample(msg.getTime());
   }
 
   @Override
   public void pack(ProtobufTrajectorySample msg, TrajectorySample value) {
-    msg.setTimestamp(value.timestamp);
-    Pose2d.proto.pack(msg.getMutablePose(), value.pose);
-    ChassisVelocities.proto.pack(msg.getMutableVelocities(), value.velocity);
-    ChassisAccelerations.proto.pack(msg.getMutableAccelerations(), value.acceleration);
+    msg.setTime(value.time);
   }
 }

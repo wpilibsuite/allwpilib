@@ -4,6 +4,10 @@
 
 #include "wpi/math/estimator/MerweUKF.hpp"
 
+#include "wpi/math/estimator/MerweScaledSigmaPoints.hpp"
+#include "wpi/math/estimator/UnscentedKalmanFilter.hpp"
+#include "wpi/util/SymbolExports.hpp"
+
 namespace wpi::math {
 
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)

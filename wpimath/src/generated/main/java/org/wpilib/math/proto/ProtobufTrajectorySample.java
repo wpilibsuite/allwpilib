@@ -24,24 +24,9 @@ public final class ProtobufTrajectorySample extends ProtoMessage<ProtobufTraject
   private static final long serialVersionUID = 0L;
 
   /**
-   * <code>optional double timestamp = 1;</code>
+   * <code>optional double time = 1;</code>
    */
-  private double timestamp;
-
-  /**
-   * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
-   */
-  private final ProtobufPose2d pose = ProtobufPose2d.newInstance();
-
-  /**
-   * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
-   */
-  private final ProtobufChassisVelocities velocities = ProtobufChassisVelocities.newInstance();
-
-  /**
-   * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
-   */
-  private final ProtobufChassisAccelerations accelerations = ProtobufChassisAccelerations.newInstance();
+  private double time;
 
   private ProtobufTrajectorySample() {
   }
@@ -54,210 +39,39 @@ public final class ProtobufTrajectorySample extends ProtoMessage<ProtobufTraject
   }
 
   /**
-   * <code>optional double timestamp = 1;</code>
-   * @return whether the timestamp field is set
+   * <code>optional double time = 1;</code>
+   * @return whether the time field is set
    */
-  public boolean hasTimestamp() {
+  public boolean hasTime() {
     return (bitField0_ & 0x00000001) != 0;
   }
 
   /**
-   * <code>optional double timestamp = 1;</code>
+   * <code>optional double time = 1;</code>
    * @return this
    */
-  public ProtobufTrajectorySample clearTimestamp() {
+  public ProtobufTrajectorySample clearTime() {
     bitField0_ &= ~0x00000001;
-    timestamp = 0D;
+    time = 0D;
     return this;
   }
 
   /**
-   * <code>optional double timestamp = 1;</code>
-   * @return the timestamp
+   * <code>optional double time = 1;</code>
+   * @return the time
    */
-  public double getTimestamp() {
-    return timestamp;
+  public double getTime() {
+    return time;
   }
 
   /**
-   * <code>optional double timestamp = 1;</code>
-   * @param value the timestamp to set
+   * <code>optional double time = 1;</code>
+   * @param value the time to set
    * @return this
    */
-  public ProtobufTrajectorySample setTimestamp(final double value) {
+  public ProtobufTrajectorySample setTime(final double value) {
     bitField0_ |= 0x00000001;
-    timestamp = value;
-    return this;
-  }
-
-  /**
-   * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
-   * @return whether the pose field is set
-   */
-  public boolean hasPose() {
-    return (bitField0_ & 0x00000002) != 0;
-  }
-
-  /**
-   * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
-   * @return this
-   */
-  public ProtobufTrajectorySample clearPose() {
-    bitField0_ &= ~0x00000002;
-    pose.clear();
-    return this;
-  }
-
-  /**
-   * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
-   *
-   * This method returns the internal storage object without modifying any has state.
-   * The returned object should not be modified and be treated as read-only.
-   *
-   * Use {@link #getMutablePose()} if you want to modify it.
-   *
-   * @return internal storage object for reading
-   */
-  public ProtobufPose2d getPose() {
-    return pose;
-  }
-
-  /**
-   * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
-   *
-   * This method returns the internal storage object and sets the corresponding
-   * has state. The returned object will become part of this message and its
-   * contents may be modified as long as the has state is not cleared.
-   *
-   * @return internal storage object for modifications
-   */
-  public ProtobufPose2d getMutablePose() {
-    bitField0_ |= 0x00000002;
-    return pose;
-  }
-
-  /**
-   * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
-   * @param value the pose to set
-   * @return this
-   */
-  public ProtobufTrajectorySample setPose(final ProtobufPose2d value) {
-    bitField0_ |= 0x00000002;
-    pose.copyFrom(value);
-    return this;
-  }
-
-  /**
-   * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
-   * @return whether the velocities field is set
-   */
-  public boolean hasVelocities() {
-    return (bitField0_ & 0x00000004) != 0;
-  }
-
-  /**
-   * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
-   * @return this
-   */
-  public ProtobufTrajectorySample clearVelocities() {
-    bitField0_ &= ~0x00000004;
-    velocities.clear();
-    return this;
-  }
-
-  /**
-   * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
-   *
-   * This method returns the internal storage object without modifying any has state.
-   * The returned object should not be modified and be treated as read-only.
-   *
-   * Use {@link #getMutableVelocities()} if you want to modify it.
-   *
-   * @return internal storage object for reading
-   */
-  public ProtobufChassisVelocities getVelocities() {
-    return velocities;
-  }
-
-  /**
-   * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
-   *
-   * This method returns the internal storage object and sets the corresponding
-   * has state. The returned object will become part of this message and its
-   * contents may be modified as long as the has state is not cleared.
-   *
-   * @return internal storage object for modifications
-   */
-  public ProtobufChassisVelocities getMutableVelocities() {
-    bitField0_ |= 0x00000004;
-    return velocities;
-  }
-
-  /**
-   * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
-   * @param value the velocities to set
-   * @return this
-   */
-  public ProtobufTrajectorySample setVelocities(final ProtobufChassisVelocities value) {
-    bitField0_ |= 0x00000004;
-    velocities.copyFrom(value);
-    return this;
-  }
-
-  /**
-   * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
-   * @return whether the accelerations field is set
-   */
-  public boolean hasAccelerations() {
-    return (bitField0_ & 0x00000008) != 0;
-  }
-
-  /**
-   * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
-   * @return this
-   */
-  public ProtobufTrajectorySample clearAccelerations() {
-    bitField0_ &= ~0x00000008;
-    accelerations.clear();
-    return this;
-  }
-
-  /**
-   * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
-   *
-   * This method returns the internal storage object without modifying any has state.
-   * The returned object should not be modified and be treated as read-only.
-   *
-   * Use {@link #getMutableAccelerations()} if you want to modify it.
-   *
-   * @return internal storage object for reading
-   */
-  public ProtobufChassisAccelerations getAccelerations() {
-    return accelerations;
-  }
-
-  /**
-   * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
-   *
-   * This method returns the internal storage object and sets the corresponding
-   * has state. The returned object will become part of this message and its
-   * contents may be modified as long as the has state is not cleared.
-   *
-   * @return internal storage object for modifications
-   */
-  public ProtobufChassisAccelerations getMutableAccelerations() {
-    bitField0_ |= 0x00000008;
-    return accelerations;
-  }
-
-  /**
-   * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
-   * @param value the accelerations to set
-   * @return this
-   */
-  public ProtobufTrajectorySample setAccelerations(final ProtobufChassisAccelerations value) {
-    bitField0_ |= 0x00000008;
-    accelerations.copyFrom(value);
+    time = value;
     return this;
   }
 
@@ -266,10 +80,7 @@ public final class ProtobufTrajectorySample extends ProtoMessage<ProtobufTraject
     cachedSize = other.cachedSize;
     if ((bitField0_ | other.bitField0_) != 0) {
       bitField0_ = other.bitField0_;
-      timestamp = other.timestamp;
-      pose.copyFrom(other.pose);
-      velocities.copyFrom(other.velocities);
-      accelerations.copyFrom(other.accelerations);
+      time = other.time;
     }
     return this;
   }
@@ -280,17 +91,8 @@ public final class ProtobufTrajectorySample extends ProtoMessage<ProtobufTraject
       return this;
     }
     cachedSize = -1;
-    if (other.hasTimestamp()) {
-      setTimestamp(other.timestamp);
-    }
-    if (other.hasPose()) {
-      getMutablePose().mergeFrom(other.pose);
-    }
-    if (other.hasVelocities()) {
-      getMutableVelocities().mergeFrom(other.velocities);
-    }
-    if (other.hasAccelerations()) {
-      getMutableAccelerations().mergeFrom(other.accelerations);
+    if (other.hasTime()) {
+      setTime(other.time);
     }
     return this;
   }
@@ -302,10 +104,7 @@ public final class ProtobufTrajectorySample extends ProtoMessage<ProtobufTraject
     }
     cachedSize = -1;
     bitField0_ = 0;
-    timestamp = 0D;
-    pose.clear();
-    velocities.clear();
-    accelerations.clear();
+    time = 0D;
     return this;
   }
 
@@ -316,9 +115,6 @@ public final class ProtobufTrajectorySample extends ProtoMessage<ProtobufTraject
     }
     cachedSize = -1;
     bitField0_ = 0;
-    pose.clearQuick();
-    velocities.clearQuick();
-    accelerations.clearQuick();
     return this;
   }
 
@@ -332,29 +128,14 @@ public final class ProtobufTrajectorySample extends ProtoMessage<ProtobufTraject
     }
     ProtobufTrajectorySample other = (ProtobufTrajectorySample) o;
     return bitField0_ == other.bitField0_
-      && (!hasTimestamp() || ProtoUtil.isEqual(timestamp, other.timestamp))
-      && (!hasPose() || pose.equals(other.pose))
-      && (!hasVelocities() || velocities.equals(other.velocities))
-      && (!hasAccelerations() || accelerations.equals(other.accelerations));
+      && (!hasTime() || ProtoUtil.isEqual(time, other.time));
   }
 
   @Override
   public void writeTo(final ProtoSink output) throws IOException {
     if ((bitField0_ & 0x00000001) != 0) {
       output.writeRawByte((byte) 9);
-      output.writeDoubleNoTag(timestamp);
-    }
-    if ((bitField0_ & 0x00000002) != 0) {
-      output.writeRawByte((byte) 18);
-      output.writeMessageNoTag(pose);
-    }
-    if ((bitField0_ & 0x00000004) != 0) {
-      output.writeRawByte((byte) 26);
-      output.writeMessageNoTag(velocities);
-    }
-    if ((bitField0_ & 0x00000008) != 0) {
-      output.writeRawByte((byte) 34);
-      output.writeMessageNoTag(accelerations);
+      output.writeDoubleNoTag(time);
     }
   }
 
@@ -363,15 +144,6 @@ public final class ProtobufTrajectorySample extends ProtoMessage<ProtobufTraject
     int size = 0;
     if ((bitField0_ & 0x00000001) != 0) {
       size += 9;
-    }
-    if ((bitField0_ & 0x00000002) != 0) {
-      size += 1 + ProtoSink.computeMessageSizeNoTag(pose);
-    }
-    if ((bitField0_ & 0x00000004) != 0) {
-      size += 1 + ProtoSink.computeMessageSizeNoTag(velocities);
-    }
-    if ((bitField0_ & 0x00000008) != 0) {
-      size += 1 + ProtoSink.computeMessageSizeNoTag(accelerations);
     }
     return size;
   }
@@ -384,36 +156,9 @@ public final class ProtobufTrajectorySample extends ProtoMessage<ProtobufTraject
     while (true) {
       switch (tag) {
         case 9: {
-          // timestamp
-          timestamp = input.readDouble();
+          // time
+          time = input.readDouble();
           bitField0_ |= 0x00000001;
-          tag = input.readTag();
-          if (tag != 18) {
-            break;
-          }
-        }
-        case 18: {
-          // pose
-          input.readMessage(pose);
-          bitField0_ |= 0x00000002;
-          tag = input.readTag();
-          if (tag != 26) {
-            break;
-          }
-        }
-        case 26: {
-          // velocities
-          input.readMessage(velocities);
-          bitField0_ |= 0x00000004;
-          tag = input.readTag();
-          if (tag != 34) {
-            break;
-          }
-        }
-        case 34: {
-          // accelerations
-          input.readMessage(accelerations);
-          bitField0_ |= 0x00000008;
           tag = input.readTag();
           if (tag != 0) {
             break;
@@ -437,16 +182,7 @@ public final class ProtobufTrajectorySample extends ProtoMessage<ProtobufTraject
   public void writeTo(final JsonSink output) throws IOException {
     output.beginObject();
     if ((bitField0_ & 0x00000001) != 0) {
-      output.writeDouble(FieldNames.timestamp, timestamp);
-    }
-    if ((bitField0_ & 0x00000002) != 0) {
-      output.writeMessage(FieldNames.pose, pose);
-    }
-    if ((bitField0_ & 0x00000004) != 0) {
-      output.writeMessage(FieldNames.velocities, velocities);
-    }
-    if ((bitField0_ & 0x00000008) != 0) {
-      output.writeMessage(FieldNames.accelerations, accelerations);
+      output.writeDouble(FieldNames.time, time);
     }
     output.endObject();
   }
@@ -458,44 +194,11 @@ public final class ProtobufTrajectorySample extends ProtoMessage<ProtobufTraject
     }
     while (!input.isAtEnd()) {
       switch (input.readFieldHash()) {
-        case 55126294: {
-          if (input.isAtField(FieldNames.timestamp)) {
+        case 3560141: {
+          if (input.isAtField(FieldNames.time)) {
             if (!input.trySkipNullValue()) {
-              timestamp = input.readDouble();
+              time = input.readDouble();
               bitField0_ |= 0x00000001;
-            }
-          } else {
-            input.skipUnknownField();
-          }
-          break;
-        }
-        case 3446929: {
-          if (input.isAtField(FieldNames.pose)) {
-            if (!input.trySkipNullValue()) {
-              input.readMessage(pose);
-              bitField0_ |= 0x00000002;
-            }
-          } else {
-            input.skipUnknownField();
-          }
-          break;
-        }
-        case -1969599941: {
-          if (input.isAtField(FieldNames.velocities)) {
-            if (!input.trySkipNullValue()) {
-              input.readMessage(velocities);
-              bitField0_ |= 0x00000004;
-            }
-          } else {
-            input.skipUnknownField();
-          }
-          break;
-        }
-        case 303643635: {
-          if (input.isAtField(FieldNames.accelerations)) {
-            if (!input.trySkipNullValue()) {
-              input.readMessage(accelerations);
-              bitField0_ |= 0x00000008;
             }
           } else {
             input.skipUnknownField();
@@ -562,12 +265,6 @@ public final class ProtobufTrajectorySample extends ProtoMessage<ProtobufTraject
    * Contains name constants used for serializing JSON
    */
   static class FieldNames {
-    static final FieldName timestamp = FieldName.forField("timestamp");
-
-    static final FieldName pose = FieldName.forField("pose");
-
-    static final FieldName velocities = FieldName.forField("velocities");
-
-    static final FieldName accelerations = FieldName.forField("accelerations");
+    static final FieldName time = FieldName.forField("time");
   }
 }

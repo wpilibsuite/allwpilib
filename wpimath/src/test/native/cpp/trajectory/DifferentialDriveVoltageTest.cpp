@@ -6,13 +6,17 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/trajectory/DifferentialSample.hpp"
-#include "wpi/math/trajectory/TestTrajectory.hpp"
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveVoltageConstraint.hpp"
 #include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
@@ -31,15 +35,15 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
   config.AddConstraint(
       DifferentialDriveVoltageConstraint(feedforward, kinematics, maxVoltage));
 
-  auto trajectory = TestTrajectory::GetTrajectory(config);
+  auto trajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
   constexpr wpi::units::second_t dt = 20_ms;
   for (auto t = 0_s; t < trajectory.Duration(); t += dt) {
     auto point = trajectory.SampleAt(t);
 
     DifferentialSample differentialSample{point, kinematics};
-    auto left = differentialSample.leftSpeed;
-    auto right = differentialSample.rightSpeed;
+    auto left = differentialSample.leftVelocity;
+    auto right = differentialSample.rightVelocity;
 
     auto acceleration = point.ForwardAcceleration();
 
@@ -71,13 +75,13 @@ TEST(DifferentialDriveVoltageConstraintTest, HighCurvature) {
   config.AddConstraint(
       DifferentialDriveVoltageConstraint(feedforward, kinematics, maxVoltage));
 
-  EXPECT_NO_FATAL_FAILURE(TrajectoryGenerator::GenerateTrajectory(
+  EXPECT_NO_FATAL_FAILURE(DrivetrainSplineTrajectoryGenerator::Generate(
       Pose2d{1_m, 0_m, 90_deg}, std::vector<Translation2d>{},
       Pose2d{0_m, 1_m, 180_deg}, config));
 
   config.SetReversed(true);
 
-  EXPECT_NO_FATAL_FAILURE(TrajectoryGenerator::GenerateTrajectory(
+  EXPECT_NO_FATAL_FAILURE(DrivetrainSplineTrajectoryGenerator::Generate(
       Pose2d{0_m, 1_m, 180_deg}, std::vector<Translation2d>{},
       Pose2d{1_m, 0_m, 90_deg}, config));
 }

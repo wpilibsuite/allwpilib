@@ -9,19 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.kinematics.ChassisAccelerations;
-import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.trajectory.TrajectorySample;
 
 class TrajectorySampleStructTest {
-  private static final TrajectorySample DATA =
-      new TrajectorySample(
-          1.23,
-          new Pose2d(1.1, 2.2, Rotation2d.fromDegrees(33.3)),
-          new ChassisVelocities(3.3, 4.4, 5.5),
-          new ChassisAccelerations(6.6, 7.7, 8.8));
+  private static final TrajectorySample DATA = new TrajectorySample(1.23);
 
   @Test
   void testRoundtrip() {

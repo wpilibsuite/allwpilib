@@ -16,7 +16,7 @@ std::optional<wpi::math::DifferentialSample> wpi::util::Protobuf<
   wpi::util::UnpackCallback<wpi::math::ChassisVelocities> velocity;
   wpi::util::UnpackCallback<wpi::math::ChassisAccelerations> acceleration;
   wpi_proto_ProtobufDifferentialSample msg{
-      .timestamp = 0,
+      .time = 0,
       .pose = pose.Callback(),
       .velocities = velocity.Callback(),
       .accelerations = acceleration.Callback(),
@@ -36,7 +36,7 @@ std::optional<wpi::math::DifferentialSample> wpi::util::Protobuf<
   }
 
   return wpi::math::DifferentialSample{
-      wpi::units::second_t{msg.timestamp},
+      wpi::units::second_t{msg.time},
       iPose[0],
       iVel[0],
       iAccel[0],
@@ -51,12 +51,12 @@ bool wpi::util::Protobuf<wpi::math::DifferentialSample>::Pack(
   wpi::util::PackCallback velocity{&value.velocity};
   wpi::util::PackCallback acceleration{&value.acceleration};
   wpi_proto_ProtobufDifferentialSample msg{
-      .timestamp = value.timestamp.value(),
+      .time = value.time.value(),
       .pose = pose.Callback(),
       .velocities = velocity.Callback(),
       .accelerations = acceleration.Callback(),
-      .left_velocity = value.leftSpeed.value(),
-      .right_velocity = value.rightSpeed.value(),
+      .left_velocity = value.leftVelocity.value(),
+      .right_velocity = value.rightVelocity.value(),
   };
   return stream.Encode(msg);
 }

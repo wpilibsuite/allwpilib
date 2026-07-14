@@ -98,6 +98,7 @@ model {
                     return
                 }
                 lib project: ':glass', library: 'glass', linkage: 'static'
+                lib project: ':fields', library: 'fields', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':datalog', library: 'datalog', linkage: 'static'

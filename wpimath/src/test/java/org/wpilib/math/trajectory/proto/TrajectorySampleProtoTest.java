@@ -7,19 +7,10 @@ package org.wpilib.math.trajectory.proto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.kinematics.ChassisAccelerations;
-import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.trajectory.TrajectorySample;
 
 class TrajectorySampleProtoTest {
-  private static final TrajectorySample DATA =
-      new TrajectorySample(
-          1.5,
-          new Pose2d(1.1, 2.2, Rotation2d.fromDegrees(30)),
-          new ChassisVelocities(1.0, 2.0, 3.0),
-          new ChassisAccelerations(4.0, 5.0, 6.0));
+  private static final TrajectorySample DATA = new TrajectorySample(1.5);
 
   @Test
   void testRoundtrip() {

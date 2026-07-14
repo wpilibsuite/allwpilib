@@ -4,7 +4,12 @@
 
 #include "wpi/math/estimator/S3SigmaPoints.hpp"
 
+#include <cmath>
+#include <cstddef>
+
 #include <gtest/gtest.h>
+
+#include "wpi/math/linalg/EigenCore.hpp"
 
 TEST(S3SigmaPointsTest, Simplex) {
   constexpr double alpha = 1e-3;

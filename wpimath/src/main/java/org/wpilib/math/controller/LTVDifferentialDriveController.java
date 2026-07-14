@@ -232,7 +232,7 @@ public class LTVDifferentialDriveController {
         leftVelocity,
         rightVelocity,
         desiredState.pose,
-        desiredState.leftSpeed,
-        desiredState.rightSpeed);
+        desiredState.leftVelocity,
+        desiredState.rightVelocity);
   }
 }

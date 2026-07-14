@@ -21,8 +21,8 @@ import org.wpilib.math.random.Normal;
 import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.NumericalIntegration;
 import org.wpilib.math.system.NumericalJacobian;
+import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.TrajectoryConfig;
-import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.StateSpaceUtil;
 
@@ -117,7 +117,7 @@ class ExtendedKalmanFilterTest {
             new Pose2d(2.75, 22.521, Rotation2d.kZero),
             new Pose2d(24.73, 19.68, Rotation2d.fromRadians(5.846)));
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(waypoints, new TrajectoryConfig(8.8, 0.1));
+        DrivetrainSplineTrajectoryGenerator.generate(waypoints, new TrajectoryConfig(8.8, 0.1));
 
     Matrix<N5, N1> r = new Matrix<>(Nat.N5(), Nat.N1());
 
