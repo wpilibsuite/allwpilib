@@ -70,7 +70,7 @@ write_source_files(
 
 generate_version_file(
     name = "generate-version",
-    output_file = "WPILibVersion.java",
+    output_file = "org/wpilib/system/WPILibVersion.java",
     template = "src/generate/WPILibVersion.java.in",
 )
 
@@ -85,7 +85,9 @@ wpilib_java_library(
         ":generate-version",
         ":generated_java",
     ] + glob(["src/main/java/**/*.java"]),
-    javacopts = ["--patch-module=wpilib.code=wpilibj/src/generated/main/java"],
+    javacopts = [
+        "--patch-module=wpilib.core=wpilibj/src/generated/main/java:wpilibj/src/main/java:.",
+    ],
     extra_source_pkgs = ["generated_version_files"],
     maven_artifact_name = "wpilibj-java",
     maven_group_id = "org.wpilib.wpilibj",
@@ -109,7 +111,7 @@ pkg_files(
     srcs = [
         ":generate-version",
     ],
-    prefix = "edu/wpi/first/wpilibj/preferences/",
+    prefix = "org/wpilib/system/",
 )
 
 wpilib_java_junit5_test(
