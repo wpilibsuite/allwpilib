@@ -19,9 +19,9 @@ import us.hebi.quickbuf.ProtoSource;
 public final class ProtobufBuffer<T, MessageType extends ProtoMessage<?>> {
   private ProtobufBuffer(Protobuf<T, MessageType> proto) {
     m_buf = ByteBuffer.allocateDirect(1024);
-    m_sink = ProtoSink.newDirectSink();
+    m_sink = ProtoSink.newBufferSink();
     m_sink.setOutput(m_buf);
-    m_source = ProtoSource.newDirectSource();
+    m_source = ProtoSource.newBufferSource();
     m_msg = proto.createMessage();
     m_proto = proto;
   }
