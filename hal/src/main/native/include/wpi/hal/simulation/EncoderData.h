@@ -34,6 +34,11 @@ void HALSIM_CancelEncoderCountCallback(int32_t index, int32_t uid);
 int32_t HALSIM_GetEncoderCount(int32_t index);
 void HALSIM_SetEncoderCount(int32_t index, int32_t count);
 
+int32_t HALSIM_RegisterEncoderRateCallback(int32_t index,
+                                           HAL_NotifyCallback callback,
+                                           void* param, HAL_Bool initialNotify);
+void HALSIM_CancelEncoderRateCallback(int32_t index, int32_t uid);
+
 int32_t HALSIM_RegisterEncoderResetCallback(int32_t index,
                                             HAL_NotifyCallback callback,
                                             void* param,

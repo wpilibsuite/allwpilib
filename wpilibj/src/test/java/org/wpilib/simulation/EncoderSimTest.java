@@ -26,8 +26,13 @@ class EncoderSimTest {
 
       encoder.setDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
 
-      sim.setRate(1.91);
-      assertEquals(1.91, sim.getRate());
+      DoubleCallback callback = new DoubleCallback();
+      try (CallbackStore cb = sim.registerRateCallback(callback, false)) {
+        sim.setRate(1.91);
+        assertEquals(1.91, sim.getRate());
+        assertTrue(callback.wasTriggered());
+        assertEquals(1.91, callback.getSetValue());
+      }
     }
   }
 

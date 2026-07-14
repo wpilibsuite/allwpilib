@@ -73,12 +73,11 @@ bool IsValidEncodingType(HAL_EncoderEncodingType encodingType) {
 }
 
 bool IsValidChannelPair(int32_t aChannel, int32_t bChannel) {
-  return aChannel >= 0 && aChannel < kNumSmartIo &&
-         aChannel % 2 == 0 && bChannel == aChannel + 1;
+  return aChannel >= 0 && aChannel < kNumSmartIo && aChannel % 2 == 0 &&
+         bChannel == aChannel + 1;
 }
 
-std::shared_ptr<Encoder> GetEncoder(HAL_EncoderHandle handle,
-                                    int32_t* status) {
+std::shared_ptr<Encoder> GetEncoder(HAL_EncoderHandle handle, int32_t* status) {
   auto encoder = encoderHandles->Get(handle, HAL_HandleEnum::ENCODER);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -157,8 +156,8 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
     return HAL_INVALID_HANDLE;
   }
   if (!IsValidEncodingType(encodingType)) {
-    *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
-                        "Invalid encoder encoding type");
+    *status =
+        MakeError(HAL_PARAMETER_OUT_OF_RANGE, "Invalid encoder encoding type");
     return HAL_INVALID_HANDLE;
   }
 
@@ -210,6 +209,7 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
     smartIoHandles->Free(aPortHandle, HAL_HandleEnum::ENCODER);
     return HAL_INVALID_HANDLE;
   }
+  aPort->closeOnDestroy = true;
 
   int32_t count = 0;
   *status = aPort->GetQuadrature(&count);
@@ -223,8 +223,6 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
   }
   encoder->lastRawCount = count;
   encoder->hasLastCount = true;
-
-  aPort->closeOnDestroy = true;
 
   return handle;
 }
@@ -345,8 +343,7 @@ double HAL_GetEncoderRate(HAL_EncoderHandle encoderHandle, int32_t* status) {
   }
 
   double scaledRate = static_cast<double>(rate) *
-                      DecodingScaleFactor(*encoder) *
-                      encoder->distancePerPulse;
+                      DecodingScaleFactor(*encoder) * encoder->distancePerPulse;
   return encoder->reverseDirection ? -scaledRate : scaledRate;
 }
 
@@ -357,8 +354,8 @@ void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
     return;
   }
   if (distancePerPulse == 0.0) {
-    *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
-                        "distancePerPulse must not be 0");
+    *status =
+        MakeError(HAL_PARAMETER_OUT_OF_RANGE, "distancePerPulse must not be 0");
     return;
   }
 
@@ -419,6 +416,6 @@ int32_t HAL_GetEncoderFPGAIndex(HAL_EncoderHandle encoderHandle,
   }
 
   *status = 0;
-  return getHandleIndex(encoder->aPortHandle);
+  return getHandleIndex(encoder->aPortHandle) / 2;
 }
 }  // extern "C"

@@ -291,6 +291,9 @@ components:
             ">count":
               type: integer
               description: "Accumulated count (pulses)"
+            ">rate":
+              type: number
+              description: "Encoder rate in distance units per second"
             "<reverse_direction":
               type: boolean
               description: "If the encoder direction should be inverted"

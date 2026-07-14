@@ -17,6 +17,7 @@ classes:
       RegisterCountCallback:
       GetCount:
       SetCount:
+      RegisterRateCallback:
       RegisterResetCallback:
       GetReset:
       SetReset:

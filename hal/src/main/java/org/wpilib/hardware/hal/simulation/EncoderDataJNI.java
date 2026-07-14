@@ -26,6 +26,11 @@ public class EncoderDataJNI extends JNIWrapper {
 
   public static native void setCount(int index, int count);
 
+  public static native int registerRateCallback(
+      int index, NotifyCallback callback, boolean initialNotify);
+
+  public static native void cancelRateCallback(int index, int uid);
+
   public static native int registerResetCallback(
       int index, NotifyCallback callback, boolean initialNotify);
 

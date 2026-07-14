@@ -36,7 +36,6 @@ class Robot : public wpi::TimedRobot {
      * distance in inches.
      */
     encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * std::numbers::pi * 1.5);
-
   }
 
   void TeleopPeriodic() override {

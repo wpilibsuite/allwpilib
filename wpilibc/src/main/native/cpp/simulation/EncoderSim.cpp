@@ -62,6 +62,15 @@ void EncoderSim::SetCount(int count) {
   HALSIM_SetEncoderCount(m_index, count);
 }
 
+std::unique_ptr<CallbackStore> EncoderSim::RegisterRateCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      m_index, -1, callback, &HALSIM_CancelEncoderRateCallback);
+  store->SetUid(HALSIM_RegisterEncoderRateCallback(m_index, &CallbackStoreThunk,
+                                                   store.get(), initialNotify));
+  return store;
+}
+
 std::unique_ptr<CallbackStore> EncoderSim::RegisterResetCallback(
     NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(

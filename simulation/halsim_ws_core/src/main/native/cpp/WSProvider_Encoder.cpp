@@ -58,6 +58,7 @@ void HALSimWSProviderEncoder::RegisterCallbacks() {
             static_cast<int32_t>(value->data.v_int + provider->m_countOffset)));
       },
       this, true);
+  m_rateCbKey = REGISTER(Rate, ">rate", double, double);
   m_resetCbKey = HALSIM_RegisterEncoderResetCallback(
       m_channel,
       [](const char* name, void* param, const struct HAL_Value* value) {
@@ -80,12 +81,14 @@ void HALSimWSProviderEncoder::CancelCallbacks() {
 void HALSimWSProviderEncoder::DoCancelCallbacks() {
   HALSIM_CancelEncoderInitializedCallback(m_channel, m_initCbKey);
   HALSIM_CancelEncoderCountCallback(m_channel, m_countCbKey);
+  HALSIM_CancelEncoderRateCallback(m_channel, m_rateCbKey);
   HALSIM_CancelEncoderResetCallback(m_channel, m_resetCbKey);
   HALSIM_CancelEncoderReverseDirectionCallback(m_channel,
                                                m_reverseDirectionCbKey);
 
   m_initCbKey = 0;
   m_countCbKey = 0;
+  m_rateCbKey = 0;
   m_resetCbKey = 0;
   m_reverseDirectionCbKey = 0;
 }
@@ -94,7 +97,9 @@ void HALSimWSProviderEncoder::OnNetValueChanged(const wpi::util::json& json) {
   if (auto val = json.lookup(">count"); val && val->is_int()) {
     HALSIM_SetEncoderCount(m_channel, val->get_int() - m_countOffset);
   }
-
+  if (auto val = json.lookup(">rate"); val && val->is_number()) {
+    HALSIM_SetEncoderRate(m_channel, val->get_number());
+  }
 }
 
 }  // namespace wpilibws

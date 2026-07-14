@@ -39,6 +39,8 @@ class EncoderSimModel : public wpi::glass::EncoderModel {
                 index, DistancePerPulseCallbackFunc, this, true)},
         m_countCallback{HALSIM_RegisterEncoderCountCallback(
             index, CountCallbackFunc, this, true)},
+        m_rateCallback{HALSIM_RegisterEncoderRateCallback(
+            index, RateCallbackFunc, this, true)},
         m_directionCallback{HALSIM_RegisterEncoderDirectionCallback(
             index, DirectionCallbackFunc, this, true)} {}
 
@@ -58,8 +60,11 @@ class EncoderSimModel : public wpi::glass::EncoderModel {
     if (m_countCallback != 0) {
       HALSIM_CancelEncoderCountCallback(m_index, m_countCallback);
     }
+    if (m_rateCallback != 0) {
+      HALSIM_CancelEncoderRateCallback(m_index, m_rateCallback);
+    }
     if (m_directionCallback != 0) {
-      HALSIM_CancelEncoderCountCallback(m_index, m_directionCallback);
+      HALSIM_CancelEncoderDirectionCallback(m_index, m_directionCallback);
     }
   }
 
@@ -139,6 +144,14 @@ class EncoderSimModel : public wpi::glass::EncoderModel {
     }
   }
 
+  static void RateCallbackFunc(const char*, void* param,
+                               const HAL_Value* value) {
+    if (value->type == HAL_DOUBLE) {
+      static_cast<EncoderSimModel*>(param)->m_rate.SetValue(
+          value->data.v_double);
+    }
+  }
+
   wpi::glass::DoubleSource m_distancePerPulse;
   wpi::glass::IntegerSource m_count;
   wpi::glass::BooleanSource m_direction;
@@ -150,6 +163,7 @@ class EncoderSimModel : public wpi::glass::EncoderModel {
   int m_channelB;
   int32_t m_distancePerPulseCallback;
   int32_t m_countCallback;
+  int32_t m_rateCallback;
   int32_t m_directionCallback;
 };
 

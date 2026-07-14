@@ -42,8 +42,12 @@ TEST(EncoderSimTest, Rate) {
 
   encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
 
+  DoubleCallback callback;
+  auto cb = sim.RegisterRateCallback(callback.GetCallback(), false);
   sim.SetRate(1.91);
   EXPECT_EQ(1.91, sim.GetRate());
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(1.91, callback.GetLastValue());
 }
 
 TEST(EncoderSimTest, Count) {

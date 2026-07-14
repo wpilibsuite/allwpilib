@@ -114,6 +114,18 @@ public class EncoderSim {
   }
 
   /**
+   * Register a callback on the rate of the encoder.
+   *
+   * @param callback the callback that will be called whenever the rate is changed
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback.
+   */
+  public CallbackStore registerRateCallback(NotifyCallback callback, boolean initialNotify) {
+    int uid = EncoderDataJNI.registerRateCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, EncoderDataJNI::cancelRateCallback);
+  }
+
+  /**
    * Register a callback to be called whenever the encoder is reset.
    *
    * @param callback the callback

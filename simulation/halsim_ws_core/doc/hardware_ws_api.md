@@ -176,6 +176,7 @@ A relative encoder.  For absolute encoders, use ``"DutyCycle"``.
 | ``"<channel_a"``         | Integer | Digital channel number for “A” phase                |
 | ``"<channel_b"``         | Integer | Digital channel number for “B” phase                |
 | ``">count"``             | Integer | Accumulated count (pulses)                          |
+| ``">rate"``              | Float   | Encoder rate in distance units per second           |
 | ``"<reverse_direction"`` | Boolean | If the encoder direction should be inverted         |
 
 #### Gyro ("Gyro")

@@ -63,6 +63,7 @@ HAL_SimDeviceHandle HALSIM_GetEncoderSimDevice(int32_t index) {
                                SimEncoderData, LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, Initialized, initialized)
+DEFINE_CAPI(double, Rate, rate)
 DEFINE_CAPI(HAL_Bool, Reset, reset)
 DEFINE_CAPI(HAL_Bool, Direction, direction)
 DEFINE_CAPI(HAL_Bool, ReverseDirection, reverseDirection)
@@ -100,14 +101,6 @@ double HALSIM_GetEncoderDistance(int32_t index) {
   return simData.count * simData.distancePerPulse;
 }
 
-void HALSIM_SetEncoderRate(int32_t index, double rate) {
-  SimEncoderData[index].rate = rate;
-}
-
-double HALSIM_GetEncoderRate(int32_t index) {
-  return SimEncoderData[index].rate;
-}
-
 #define REGISTER(NAME) \
   SimEncoderData[index].NAME.RegisterCallback(callback, param, initialNotify)
 
@@ -116,6 +109,7 @@ void HALSIM_RegisterEncoderAllCallbacks(int32_t index,
                                         void* param, HAL_Bool initialNotify) {
   REGISTER(initialized);
   REGISTER(count);
+  REGISTER(rate);
   REGISTER(reset);
   REGISTER(direction);
   REGISTER(reverseDirection);

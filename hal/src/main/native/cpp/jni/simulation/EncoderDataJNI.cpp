@@ -114,6 +114,32 @@ Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_setCount
 
 /*
  * Class:     org_wpilib_hardware_hal_simulation_EncoderDataJNI
+ * Method:    registerRateCallback
+ * Signature: (ILjava/lang/Object;Z)I
+ */
+JNIEXPORT jint JNICALL
+Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_registerRateCallback
+  (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
+{
+  return sim::AllocateCallback(env, index, callback, initialNotify,
+                               &HALSIM_RegisterEncoderRateCallback);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_EncoderDataJNI
+ * Method:    cancelRateCallback
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_cancelRateCallback
+  (JNIEnv* env, jclass, jint index, jint handle)
+{
+  return sim::FreeCallback(env, handle, index,
+                           &HALSIM_CancelEncoderRateCallback);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_EncoderDataJNI
  * Method:    registerResetCallback
  * Signature: (ILjava/lang/Object;Z)I
  */

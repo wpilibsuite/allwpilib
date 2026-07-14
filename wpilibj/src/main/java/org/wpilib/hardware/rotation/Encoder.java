@@ -28,8 +28,6 @@ import org.wpilib.util.sendable.SendableRegistry;
  * before use.
  */
 public class Encoder implements CounterBase, Sendable, AutoCloseable {
-  private final EncodingType m_encodingType;
-
   int m_encoder; // the HAL encoder object
 
   /**
@@ -108,7 +106,6 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
       final EncodingType encodingType) {
     requireNonNullParam(encodingType, "encodingType", "Encoder");
 
-    m_encodingType = encodingType;
     // SendableRegistry.addChild(this, m_aSource);
     // SendableRegistry.addChild(this, m_bSource);
     initEncoder(channelA, channelB, reverseDirection, encodingType);
@@ -269,11 +266,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    * @return decoding scale factor
    */
   public double getDecodingScaleFactor() {
-    return switch (m_encodingType) {
-      case X1 -> 1.0;
-      case X2 -> 0.5;
-      case X4 -> 0.25;
-    };
+    return EncoderJNI.getEncoderDecodingScaleFactor(m_encoder);
   }
 
   @Override
