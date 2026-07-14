@@ -6,3 +6,12 @@ functions:
     overloads:
       std::string_view, std::string_view:
       std::string_view, int, std::string_view:
+  HAL_PublishCanVersion:
+    overloads:
+      uint8_t, uint32_t, std::string_view, std::string_view:
+  HAL_PublishVersion:
+    overloads:
+      std::string_view, std::string_view:
+  HAL_PublishWpilibVersion:
+    overloads:
+      std::string_view:

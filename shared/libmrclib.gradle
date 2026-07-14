@@ -5,10 +5,22 @@ nativeUtils {
             artifactId = "mrclib-cpp"
             headerClassifier = "headers"
             ext = "zip"
-            version = '2027.1.0-alpha-1-69-gc4dd18d'
+            version = '2027.1.0-alpha-1-90-g5172481'
             skipAtRuntimePlatforms.add(nativeUtils.wpi.platforms.systemcore)
             targetPlatforms.addAll(nativeUtils.wpi.platforms.allPlatforms)
             noDebugSplit = true
         }
+        // This is commented out for Thad to be able to develop easier.
+        // mrclib(getNativeDependencyTypeClass('WPIOnDiskDependency')) {
+        //     headers = project.file("C:\\Users\\thadh\\Documents\\GitHub\\thadhouse\\mrccomm\\shipped\\mrclib\\include")
+        //     buildDependencies = [
+        //         "$nativeUtils.wpi.platforms.systemcore": [project.file("C:\\Users\\thadh\\Documents\\GitHub\\thadhouse\\mrccomm\\buildmrc\\bin\\libMrcLib.so")],
+        //         "$nativeUtils.wpi.platforms.windowsx64": [project.file("C:\\Users\\thadh\\Documents\\GitHub\\thadhouse\\mrccomm\\build\\bin\\MrcLib.lib")],
+        //     ]
+        //     runtimeDependencies = [
+        //         "$nativeUtils.wpi.platforms.systemcore": [],
+        //         "$nativeUtils.wpi.platforms.windowsx64": [project.file("C:\\Users\\thadh\\Documents\\GitHub\\thadhouse\\mrccomm\\build\\bin\\MrcLib.dll")],
+        //     ]
+        // }
     }
 }

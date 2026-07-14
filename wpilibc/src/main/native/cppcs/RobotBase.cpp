@@ -48,6 +48,7 @@ int wpi::RunHALInitialization() {
   wpi::internal::DriverStationBackend::RefreshData();
   HAL_ReportUsage("Language", "C++");
   HAL_ReportUsage("WPILibVersion", GetWPILibVersion());
+  HAL_PublishWpilibVersion(std::format("{} (C++)", GetWPILibVersion()));
 
   std::puts("\n********** Robot program starting **********");
   return 0;

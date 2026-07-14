@@ -233,5 +233,39 @@ public final class HAL extends JNIWrapper {
     reportUsage(resource + "[" + instanceNumber + "]", data);
   }
 
+  /**
+   * Publishes a version for a device on a CAN bus.
+   *
+   * @param busId bus containing the device
+   * @param deviceId device identifier
+   * @param name version name
+   * @param version version string
+   * @return status of the operation
+   */
+  public static int publishCanVersion(int busId, int deviceId, String name, String version) {
+    return UsageReportingJNI.publishCanVersion(busId, deviceId, name, version);
+  }
+
+  /**
+   * Publishes a version without a bus or device identifier.
+   *
+   * @param name version name
+   * @param version version string
+   * @return status of the operation
+   */
+  public static int publishVersion(String name, String version) {
+    return UsageReportingJNI.publishVersion(name, version);
+  }
+
+  /**
+   * Publishes the WPILib version.
+   *
+   * @param version WPILib version string
+   * @return status of the operation
+   */
+  public static int publishWpilibVersion(String version) {
+    return UsageReportingJNI.publishWpilibVersion(version);
+  }
+
   private HAL() {}
 }
