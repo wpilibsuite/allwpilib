@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 open module wpilib.examples {
+  requires wpilib;
   requires wpilib.apriltag;
   requires wpilib.cameraserver;
   requires wpilib.command2;
