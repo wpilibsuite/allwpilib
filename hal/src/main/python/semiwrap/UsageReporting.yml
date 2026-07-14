@@ -9,9 +9,22 @@ functions:
   HAL_PublishCanVersion:
     overloads:
       uint8_t, uint32_t, std::string_view, std::string_view:
+        cpp_code: |
+          [](uint8_t busId, uint32_t deviceId, std::string_view name,
+             std::string_view version) {
+            return HAL_PublishCanVersion(busId, deviceId, name, version);
+          }
   HAL_PublishVersion:
     overloads:
       std::string_view, std::string_view:
+        cpp_code: |
+          [](std::string_view name, std::string_view version) {
+            return HAL_PublishVersion(name, version);
+          }
   HAL_PublishWpilibVersion:
     overloads:
       std::string_view:
+        cpp_code: |
+          [](std::string_view version) {
+            return HAL_PublishWpilibVersion(version);
+          }
