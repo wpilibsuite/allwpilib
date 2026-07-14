@@ -48,8 +48,8 @@ filegroup(
 wpilib_java_library(
     name = "commandsv3-java",
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
-    javacopts = ["--patch-module=wpilib.command3=commandsv3/src/generated/main/java"],
     exported_plugins = ["//javacPlugin:plugin"],
+    javacopts = ["--patch-module=wpilib.command3=commandsv3/src/generated/main/java"],
     maven_artifact_name = "commands3-java",
     maven_group_id = "org.wpilib",
     plugins = ["//javacPlugin:plugin"],

@@ -85,10 +85,10 @@ wpilib_java_library(
         ":generate-version",
         ":generated_java",
     ] + glob(["src/main/java/**/*.java"]),
+    extra_source_pkgs = ["generated_version_files"],
     javacopts = [
         "--patch-module=wpilib.core=wpilibj/src/generated/main/java:wpilibj/src/main/java:.",
     ],
-    extra_source_pkgs = ["generated_version_files"],
     maven_artifact_name = "wpilibj-java",
     maven_group_id = "org.wpilib.wpilibj",
     visibility = ["//visibility:public"],
