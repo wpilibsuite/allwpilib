@@ -66,7 +66,7 @@ maven.install(
         "io.avaje:avaje-jsonb-generator:3.14",
         "us.hebi.quickbuf:quickbuf-runtime:1.4",
         "com.google.code.gson:gson:2.13.1",
-        "org.wpilib.thirdparty.opencv:opencv-java:2027-4.13.0-1",
+        "org.wpilib.thirdparty.opencv:opencv-java:2027-4.13.0-4",
         "org.junit.jupiter:junit-jupiter:5.10.1",
         "org.junit.platform:junit-platform-console:1.10.1",
         "org.junit.platform:junit-platform-launcher:1.10.1",
@@ -82,7 +82,6 @@ maven.install(
     repositories = [
         "https://repo1.maven.org/maven2",
         "https://frcmaven.wpi.edu/artifactory/release/",
-        "file:///home/sam/.m2/repository/",
     ],
 )
 use_repo(maven, "maven", "unpinned_maven")

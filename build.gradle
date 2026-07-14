@@ -37,8 +37,6 @@ allprojects {
         maven {
             url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
         }
-        // For testing local EJML uberjar builds
-        mavenLocal()
     }
     wpilibRepositories.use2027Repos()
     if (project.hasProperty('releaseMode')) {
