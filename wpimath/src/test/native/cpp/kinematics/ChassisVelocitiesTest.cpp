@@ -8,6 +8,14 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Twist2d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+
 static constexpr double kEpsilon = 1E-9;
 
 TEST(ChassisVelocitiesTest, Discretize) {

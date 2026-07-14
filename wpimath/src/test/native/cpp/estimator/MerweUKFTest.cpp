@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <numbers>
 #include <vector>
 
@@ -13,6 +14,9 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/estimator/AngleStatistics.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/random/Normal.hpp"
 #include "wpi/math/system/DCMotor.hpp"
@@ -20,8 +24,23 @@
 #include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
 #include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/math/util/StateSpaceUtil.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/base.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/mass.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
+#include "wpi/util/array.hpp"
 
 namespace {
 

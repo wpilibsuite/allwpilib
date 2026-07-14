@@ -5,7 +5,9 @@
 #pragma once
 
 #include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelVelocities.hpp"
 #include "wpi/math/kinematics/Odometry3d.hpp"

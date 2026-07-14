@@ -4,13 +4,22 @@
 
 #include "wpi/math/controller/LTVUnicycleController.hpp"
 
+#include <cstddef>
 #include <numbers>
+#include <vector>
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 #include "wpi/math/util/MathUtil.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)

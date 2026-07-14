@@ -8,8 +8,12 @@
 
 #include "wpi/math/trajectory/DifferentialSample.hpp"
 #include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 
 using namespace wpi::math;
 

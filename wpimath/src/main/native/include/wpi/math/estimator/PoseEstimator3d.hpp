@@ -4,9 +4,12 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <map>
 #include <optional>
+#include <utility>
 #include <vector>
 
 #include <Eigen/Core>
@@ -20,6 +23,8 @@
 #include "wpi/math/kinematics/Odometry3d.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"

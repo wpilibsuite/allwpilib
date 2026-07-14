@@ -6,11 +6,14 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/geometry/Ellipse2d.hpp"
 #include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
 #include "wpi/math/trajectory/constraint/MaxVelocityConstraint.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
+#include "wpi/units/math.hpp"
 #include "wpi/units/velocity.hpp"
 
 using namespace wpi::math;

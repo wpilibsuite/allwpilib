@@ -8,6 +8,7 @@
 #include <utility>
 
 #include <Eigen/Cholesky>
+#include <Eigen/Core>
 
 #include "wpi/math/estimator/SigmaPoints.hpp"
 #include "wpi/math/estimator/UnscentedTransform.hpp"

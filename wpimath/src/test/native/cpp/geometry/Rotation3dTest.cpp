@@ -6,11 +6,13 @@
 
 #include <cmath>
 #include <numbers>
+#include <stdexcept>
 
 #include <Eigen/Core>
 #include <gtest/gtest.h>
 
 #include "wpi/math/geometry/Quaternion.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/time.hpp"

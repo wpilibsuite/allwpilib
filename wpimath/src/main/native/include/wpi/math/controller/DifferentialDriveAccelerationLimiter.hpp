@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <stdexcept>
 #include <utility>
 
 #include <Eigen/Core>

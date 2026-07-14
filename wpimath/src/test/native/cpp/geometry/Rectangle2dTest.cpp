@@ -6,6 +6,11 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+
 TEST(Rectangle2dTest, NewWithCorners) {
   constexpr wpi::math::Translation2d cornerA{1_m, 2_m};
   constexpr wpi::math::Translation2d cornerB{4_m, 6_m};

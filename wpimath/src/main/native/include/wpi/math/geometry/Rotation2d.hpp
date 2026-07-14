@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <type_traits>
+#include <stdexcept>
 #include <utility>
 
 #include <Eigen/Core>
