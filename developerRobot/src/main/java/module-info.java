@@ -5,4 +5,6 @@
 // needs to be open for wpilib to reflectively access robot class constructors
 open module wpilib.developerrobot {
   requires wpilib;
+  requires wpilib.command2;
+  requires wpilib.command3;
 }
