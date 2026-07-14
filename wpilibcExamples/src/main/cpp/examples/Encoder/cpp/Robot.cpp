@@ -51,7 +51,7 @@ class Robot : public wpi::TimedRobot {
    * The Encoder object is constructed with 4 parameters, the last two being
    * optional.
    *
-   * The first two parameters (0, 1 in this case) refer to the ports on the
+   * The first two parameters (2, 3 in this case) refer to the ports on the
    * roboRIO which the encoder uses. Because a quadrature encoder has two signal
    * wires, the signal from two DIO ports on the roboRIO are used.
    *
@@ -63,7 +63,7 @@ class Robot : public wpi::TimedRobot {
    * and defaults to X4. Faster (X4) encoding gives greater positional
    * precision but more noise in the rate.
    */
-  wpi::Encoder encoder{0, 1, false, wpi::Encoder::EncodingType::X4};
+  wpi::Encoder encoder{2, 3, false, wpi::Encoder::EncodingType::X4};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

@@ -24,7 +24,7 @@ import org.wpilib.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
   /**
    * The Encoder object is constructed with 4 parameters, the last two being optional. The first two
-   * parameters (0, 1 in this case) refer to the ports on Systemcore which the encoder uses. Because
+   * parameters (2, 3 in this case) refer to the ports on Systemcore which the encoder uses. Because
    * a quadrature encoder has two signal wires, the signal from two DIO ports on Systemcore are
    * used. The third (optional) parameter is a boolean which defaults to false. If you set this
    * parameter to true, the direction of the encoder will be reversed, in case it makes more sense
@@ -32,7 +32,7 @@ public class Robot extends TimedRobot {
    * defaults to k4X. Faster (k4X) encoding gives greater positional precision but more noise in the
    * rate.
    */
-  private final Encoder encoder = new Encoder(0, 1, false, CounterBase.EncodingType.X4);
+  private final Encoder encoder = new Encoder(2, 3, false, CounterBase.EncodingType.X4);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
