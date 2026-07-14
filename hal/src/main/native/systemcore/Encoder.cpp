@@ -4,13 +4,154 @@
 
 #include "wpi/hal/Encoder.h"
 
+#include <chrono>
+#include <cstdint>
+#include <cstdio>
+#include <limits>
+#include <memory>
+#include <thread>
+
 #include "HALInitializer.hpp"
+#include "PortsInternal.hpp"
+#include "SmartIo.hpp"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
+#include "wpi/hal/handles/DigitalHandleResource.hpp"
+#include "wpi/hal/monotonic_clock.hpp"
 
 using namespace wpi::hal;
 
+namespace {
+struct Encoder {
+  HAL_EncoderHandle handle{HAL_INVALID_HANDLE};
+  HAL_DigitalHandle aPortHandle{HAL_INVALID_HANDLE};
+  HAL_DigitalHandle bPortHandle{HAL_INVALID_HANDLE};
+  std::shared_ptr<SmartIo> aPort;
+  std::shared_ptr<SmartIo> bPort;
+
+  HAL_EncoderEncodingType encodingType{HAL_ENCODER_4X_ENCODING};
+  bool reverseDirection{false};
+  double distancePerPulse{1.0};
+  double maxPeriod{0.0};
+  int32_t samplesToAverage{0};
+
+  int32_t resetCount{0};
+  int32_t lastRawCount{0};
+  wpi::hal::monotonic_clock::time_point lastCountTime;
+  double period{std::numeric_limits<double>::max()};
+  bool hasLastCount{false};
+  bool direction{false};
+};
+
+DigitalHandleResource<HAL_EncoderHandle, Encoder, kNumSmartIo>* encoderHandles;
+
+int EncodingScaleFactor(const Encoder& encoder) {
+  switch (encoder.encodingType) {
+    case HAL_ENCODER_1X_ENCODING:
+      return 1;
+    case HAL_ENCODER_2X_ENCODING:
+      return 2;
+    case HAL_ENCODER_4X_ENCODING:
+      return 4;
+    default:
+      return 0;
+  }
+}
+
+double DecodingScaleFactor(const Encoder& encoder) {
+  switch (encoder.encodingType) {
+    case HAL_ENCODER_1X_ENCODING:
+      return 1.0 / 4.0;
+    case HAL_ENCODER_2X_ENCODING:
+      return 1.0 / 2.0;
+    case HAL_ENCODER_4X_ENCODING:
+      return 1.0;
+    default:
+      return 0.0;
+  }
+}
+
+bool IsValidEncodingType(HAL_EncoderEncodingType encodingType) {
+  return encodingType == HAL_ENCODER_1X_ENCODING ||
+         encodingType == HAL_ENCODER_2X_ENCODING ||
+         encodingType == HAL_ENCODER_4X_ENCODING;
+}
+
+bool IsValidChannelPair(int32_t aChannel, int32_t bChannel) {
+  return aChannel >= 0 && aChannel < kNumSmartIo &&
+         aChannel % 2 == 0 && bChannel == aChannel + 1;
+}
+
+std::shared_ptr<Encoder> GetEncoder(HAL_EncoderHandle handle,
+                                    int32_t* status) {
+  auto encoder = encoderHandles->Get(handle, HAL_HandleEnum::ENCODER);
+  if (encoder == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+  }
+  return encoder;
+}
+
+int32_t ReadRawCount(Encoder& encoder, int32_t* status) {
+  int32_t count = 0;
+  *status = encoder.aPort->GetQuadrature(&count);
+  if (*status != 0) {
+    return 0;
+  }
+
+  auto now = wpi::hal::monotonic_clock::now();
+  if (encoder.hasLastCount && count != encoder.lastRawCount) {
+    int64_t delta = static_cast<int64_t>(count) - encoder.lastRawCount;
+    encoder.period =
+        std::chrono::duration<double>(now - encoder.lastCountTime).count();
+    encoder.direction = delta > 0;
+    if (encoder.reverseDirection) {
+      encoder.direction = !encoder.direction;
+    }
+    encoder.lastCountTime = now;
+  } else if (!encoder.hasLastCount) {
+    encoder.lastCountTime = now;
+  }
+  encoder.lastRawCount = count;
+  encoder.hasLastCount = true;
+
+  int64_t rawCount = static_cast<int64_t>(count) - encoder.resetCount;
+  if (encoder.reverseDirection) {
+    rawCount = -rawCount;
+  }
+  return static_cast<int32_t>(rawCount);
+}
+
+void ReleaseEncoderPorts(const std::shared_ptr<Encoder>& encoder) {
+  auto aPort = encoder->aPort;
+  auto bPort = encoder->bPort;
+  auto aPortHandle = encoder->aPortHandle;
+  auto bPortHandle = encoder->bPortHandle;
+
+  encoder->aPort.reset();
+  encoder->bPort.reset();
+  encoderHandles->Free(encoder->handle, HAL_HandleEnum::ENCODER);
+
+  smartIoHandles->Free(aPortHandle, HAL_HandleEnum::ENCODER);
+  smartIoHandles->Free(bPortHandle, HAL_HandleEnum::ENCODER);
+
+  auto start = wpi::hal::monotonic_clock::now();
+  while (aPort.use_count() != 1 || bPort.use_count() != 1) {
+    auto current = wpi::hal::monotonic_clock::now();
+    if (start + std::chrono::seconds(1) < current) {
+      std::puts("Encoder handle free timeout");
+      std::fflush(stdout);
+      break;
+    }
+    std::this_thread::yield();
+  }
+}
+}  // namespace
+
 namespace wpi::hal::init {
-void InitializeEncoder() {}
+void InitializeEncoder() {
+  static DigitalHandleResource<HAL_EncoderHandle, Encoder, kNumSmartIo> eH;
+  encoderHandles = &eH;
+}
 }  // namespace wpi::hal::init
 
 extern "C" {
@@ -19,123 +160,333 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
                                         HAL_EncoderEncodingType encodingType,
                                         int32_t* status) {
   wpi::hal::init::CheckInit();
-  *status = HAL_HANDLE_ERROR;
-  return HAL_INVALID_HANDLE;
+
+  if (!IsValidChannelPair(aChannel, bChannel)) {
+    *status = MakeError(
+        HAL_PARAMETER_OUT_OF_RANGE,
+        "Encoder channels must be paired as 0/1, 2/3, or 4/5 with the lower "
+        "channel as A");
+    return HAL_INVALID_HANDLE;
+  }
+  if (!IsValidEncodingType(encodingType)) {
+    *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
+                        "Invalid encoder encoding type");
+    return HAL_INVALID_HANDLE;
+  }
+
+  auto aResource =
+      smartIoHandles->Allocate(aChannel, HAL_HandleEnum::ENCODER, "Encoder");
+  if (!aResource) {
+    *status = aResource.error();
+    return HAL_INVALID_HANDLE;
+  }
+  auto [aPortHandle, aPort] = *aResource;
+  aPort->channel = aChannel;
+  aPort->closeOnDestroy = false;
+
+  auto bResource =
+      smartIoHandles->Allocate(bChannel, HAL_HandleEnum::ENCODER, "Encoder");
+  if (!bResource) {
+    *status = bResource.error();
+    smartIoHandles->Free(aPortHandle, HAL_HandleEnum::ENCODER);
+    return HAL_INVALID_HANDLE;
+  }
+  auto [bPortHandle, bPort] = *bResource;
+  bPort->channel = bChannel;
+  bPort->closeOnDestroy = false;
+
+  auto encoderResource =
+      encoderHandles->Allocate(aChannel, HAL_HandleEnum::ENCODER, "Encoder");
+  if (!encoderResource) {
+    *status = encoderResource.error();
+    smartIoHandles->Free(bPortHandle, HAL_HandleEnum::ENCODER);
+    smartIoHandles->Free(aPortHandle, HAL_HandleEnum::ENCODER);
+    return HAL_INVALID_HANDLE;
+  }
+
+  auto [handle, encoder] = *encoderResource;
+  encoder->handle = handle;
+  encoder->aPortHandle = aPortHandle;
+  encoder->bPortHandle = bPortHandle;
+  encoder->aPort = aPort;
+  encoder->bPort = bPort;
+  encoder->encodingType = encodingType;
+  encoder->reverseDirection = reverseDirection;
+
+  *status = aPort->InitializeMode(MRC_SmartIOMode::MRC_SmartIOMode_Quadrature);
+  if (*status != 0) {
+    encoder->aPort.reset();
+    encoder->bPort.reset();
+    encoderHandles->Free(handle, HAL_HandleEnum::ENCODER);
+    smartIoHandles->Free(bPortHandle, HAL_HandleEnum::ENCODER);
+    smartIoHandles->Free(aPortHandle, HAL_HandleEnum::ENCODER);
+    return HAL_INVALID_HANDLE;
+  }
+  aPort->closeOnDestroy = true;
+
+  return handle;
 }
 
-void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle) {}
+void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle) {
+  auto encoder = encoderHandles->Get(encoderHandle, HAL_HandleEnum::ENCODER);
+  if (encoder == nullptr) {
+    return;
+  }
+  ReleaseEncoderPorts(encoder);
+}
 
 void HAL_SetEncoderSimDevice(HAL_EncoderHandle handle,
                              HAL_SimDeviceHandle device) {}
 
 int32_t HAL_GetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return 0;
+  }
+
+  int32_t rawCount = ReadRawCount(*encoder, status);
+  return static_cast<int32_t>(rawCount * DecodingScaleFactor(*encoder));
 }
 
 int32_t HAL_GetEncoderRaw(HAL_EncoderHandle encoderHandle, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return 0;
+  }
+
+  return ReadRawCount(*encoder, status);
 }
 
 int32_t HAL_GetEncoderEncodingScale(HAL_EncoderHandle encoderHandle,
                                     int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return 0;
+  }
+
+  *status = 0;
+  return EncodingScaleFactor(*encoder);
 }
 
 void HAL_ResetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return;
+  }
+
+  int32_t count = 0;
+  *status = encoder->aPort->GetQuadrature(&count);
+  if (*status != 0) {
+    return;
+  }
+  encoder->resetCount = count;
+  encoder->lastRawCount = count;
+  encoder->lastCountTime = wpi::hal::monotonic_clock::now();
+  encoder->period = std::numeric_limits<double>::max();
+  encoder->hasLastCount = true;
+  encoder->direction = false;
 }
 
 double HAL_GetEncoderPeriod(HAL_EncoderHandle encoderHandle, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return 0;
+  }
+
+  int32_t unused = ReadRawCount(*encoder, status);
+  (void)unused;
+  if (*status != 0) {
+    return 0;
+  }
+  return encoder->period;
 }
 
 void HAL_SetEncoderMaxPeriod(HAL_EncoderHandle encoderHandle, double maxPeriod,
                              int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return;
+  }
+
+  encoder->maxPeriod = maxPeriod;
+  *status = 0;
 }
 
 HAL_Bool HAL_GetEncoderStopped(HAL_EncoderHandle encoderHandle,
                                int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return false;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return false;
+  }
+
+  int32_t unused = ReadRawCount(*encoder, status);
+  (void)unused;
+  if (*status != 0) {
+    return false;
+  }
+  return encoder->period > encoder->maxPeriod;
 }
 
 HAL_Bool HAL_GetEncoderDirection(HAL_EncoderHandle encoderHandle,
                                  int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return false;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return false;
+  }
+
+  int32_t unused = ReadRawCount(*encoder, status);
+  (void)unused;
+  if (*status != 0) {
+    return false;
+  }
+  return encoder->direction;
 }
 
 double HAL_GetEncoderDistance(HAL_EncoderHandle encoderHandle,
                               int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return 0;
+  }
+
+  int32_t rawCount = ReadRawCount(*encoder, status);
+  if (*status != 0) {
+    return 0;
+  }
+  return static_cast<double>(rawCount) * DecodingScaleFactor(*encoder) *
+         encoder->distancePerPulse;
 }
 
 double HAL_GetEncoderRate(HAL_EncoderHandle encoderHandle, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return 0;
+  }
+
+  int32_t rate = 0;
+  *status = encoder->aPort->GetQuadratureRate(&rate);
+  if (*status != 0) {
+    return 0;
+  }
+
+  double scaledRate = static_cast<double>(rate) *
+                      DecodingScaleFactor(*encoder) *
+                      encoder->distancePerPulse;
+  return encoder->reverseDirection ? -scaledRate : scaledRate;
 }
 
 void HAL_SetEncoderMinRate(HAL_EncoderHandle encoderHandle, double minRate,
                            int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return;
+  }
+  if (minRate == 0.0) {
+    *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
+                        "minRate must not be 0");
+    return;
+  }
+
+  encoder->maxPeriod = encoder->distancePerPulse / minRate;
+  *status = 0;
 }
 
 void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
                                     double distancePerPulse, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return;
+  }
+  if (distancePerPulse == 0.0) {
+    *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
+                        "distancePerPulse must not be 0");
+    return;
+  }
+
+  encoder->distancePerPulse = distancePerPulse;
+  *status = 0;
 }
 
 void HAL_SetEncoderReverseDirection(HAL_EncoderHandle encoderHandle,
                                     HAL_Bool reverseDirection,
                                     int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return;
+  }
+
+  encoder->reverseDirection = reverseDirection;
+  *status = 0;
 }
 
 void HAL_SetEncoderSamplesToAverage(HAL_EncoderHandle encoderHandle,
                                     int32_t samplesToAverage, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return;
+  }
+  if (samplesToAverage < 1 || samplesToAverage > 127) {
+    *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
+                        "samplesToAverage must be between 1 and 127");
+    return;
+  }
+
+  encoder->samplesToAverage = samplesToAverage;
+  *status = 0;
 }
 
 int32_t HAL_GetEncoderSamplesToAverage(HAL_EncoderHandle encoderHandle,
                                        int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return 0;
+  }
+
+  *status = 0;
+  return encoder->samplesToAverage;
 }
 
 double HAL_GetEncoderDecodingScaleFactor(HAL_EncoderHandle encoderHandle,
                                          int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return 0;
+  }
+
+  *status = 0;
+  return DecodingScaleFactor(*encoder);
 }
 
 double HAL_GetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
                                       int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return 0;
+  }
+
+  *status = 0;
+  return encoder->distancePerPulse;
 }
 
 HAL_EncoderEncodingType HAL_GetEncoderEncodingType(
     HAL_EncoderHandle encoderHandle, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return HAL_ENCODER_4X_ENCODING;
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return HAL_ENCODER_4X_ENCODING;
+  }
+
+  *status = 0;
+  return encoder->encodingType;
 }
 
 int32_t HAL_GetEncoderFPGAIndex(HAL_EncoderHandle encoderHandle,
                                 int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return 0;
+  }
 
+  *status = 0;
+  return getHandleIndex(encoder->aPortHandle);
+}
 }  // extern "C"
