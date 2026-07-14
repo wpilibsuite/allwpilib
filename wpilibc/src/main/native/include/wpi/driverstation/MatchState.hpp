@@ -9,7 +9,7 @@
 
 #include "wpi/driverstation/Alliance.hpp"
 #include "wpi/driverstation/MatchType.hpp"
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
+#include "wpi/units/time.hpp"
 
 namespace wpi {
 
@@ -39,9 +39,7 @@ class MatchState final {
    *
    * @return Time remaining in current match period (auto or teleop) in seconds
    */
-  static wpi::units::second_t GetMatchTime() {
-    return wpi::internal::DriverStationBackend::GetMatchTime();
-  }
+  static wpi::units::second_t GetMatchTime();
 
   /**
    * Get the current alliance from the FMS.
@@ -52,9 +50,7 @@ class MatchState final {
    * @return The alliance (red or blue) or an empty optional if the alliance is
    * invalid
    */
-  static std::optional<Alliance> GetAlliance() {
-    return wpi::internal::DriverStationBackend::GetAlliance();
-  }
+  static std::optional<Alliance> GetAlliance();
 
   /**
    * Return the driver station location from the FMS.
@@ -66,9 +62,7 @@ class MatchState final {
    *
    * @return The location of the driver station (1-3, 0 for invalid)
    */
-  static std::optional<int> GetLocation() {
-    return wpi::internal::DriverStationBackend::GetLocation();
-  }
+  static std::optional<int> GetLocation();
 
   /**
    * Returns the number of times the current match has been replayed from the
@@ -76,18 +70,14 @@ class MatchState final {
    *
    * @return The number of replays
    */
-  static int GetReplayNumber() {
-    return wpi::internal::DriverStationBackend::GetReplayNumber();
-  }
+  static int GetReplayNumber();
 
   /**
    * Returns the match number provided by the FMS.
    *
    * @return The number of the match
    */
-  static int GetMatchNumber() {
-    return wpi::internal::DriverStationBackend::GetMatchNumber();
-  }
+  static int GetMatchNumber();
 
   /**
    * Returns the type of match being played provided by the FMS.
@@ -95,18 +85,14 @@ class MatchState final {
    * @return The match type enum (NONE, PRACTICE, QUALIFICATION,
    *         ELIMINATION)
    */
-  static MatchType GetMatchType() {
-    return wpi::internal::DriverStationBackend::GetMatchType();
-  }
+  static MatchType GetMatchType();
 
   /**
    * Returns the name of the competition event provided by the FMS.
    *
    * @return A string containing the event name
    */
-  static std::string GetEventName() {
-    return wpi::internal::DriverStationBackend::GetEventName();
-  }
+  static std::string GetEventName();
 
   /**
    * Returns the game specific message provided by the FMS.
@@ -116,9 +102,7 @@ class MatchState final {
    *
    * @return A string containing the game specific message.
    */
-  static std::optional<std::string> GetGameData() {
-    return wpi::internal::DriverStationBackend::GetGameData();
-  }
+  static std::optional<std::string> GetGameData();
 };
 
 }  // namespace wpi
