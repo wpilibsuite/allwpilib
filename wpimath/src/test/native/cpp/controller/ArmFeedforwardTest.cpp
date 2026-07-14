@@ -11,10 +11,13 @@
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/units/angle.hpp"
 #include "wpi/units/angular_acceleration.hpp"
 #include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/voltage.hpp"
+#include "wpi/util/MathExtras.hpp"
 
 namespace {
 

@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <stdexcept>
+
+#include <Eigen/Core>
 #include <gcem.hpp>
 
 #include "wpi/math/geometry/CoordinateAxis.hpp"

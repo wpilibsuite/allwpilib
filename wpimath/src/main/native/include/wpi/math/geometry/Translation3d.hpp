@@ -10,6 +10,7 @@
 
 #include <Eigen/Core>
 
+#include "wpi/math/geometry/Quaternion.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/units/area.hpp"

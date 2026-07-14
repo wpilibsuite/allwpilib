@@ -5,7 +5,7 @@
 #pragma once
 
 #include <numbers>
-#include <type_traits>
+#include <stdexcept>
 
 #include <Eigen/Core>
 #include <gcem.hpp>

@@ -8,6 +8,8 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/units/angle.hpp"
+
 using namespace wpi::math;
 
 TEST(Rotation2dTest, RadiansToDegrees) {

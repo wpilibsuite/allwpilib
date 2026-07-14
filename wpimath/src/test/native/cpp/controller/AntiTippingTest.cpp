@@ -6,6 +6,11 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/geometry/Rotation3d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/base.hpp"
+#include "wpi/units/velocity.hpp"
+
 static constexpr double kTolerance = 1e-6;
 
 // Shared constructor parameters used by all tests

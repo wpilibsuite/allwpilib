@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <string>
 #include <type_traits>
 
 #include <gcem.hpp>

@@ -5,16 +5,19 @@
 #pragma once
 
 #include <limits>
-#include <type_traits>
+#include <string>
 
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
+#include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/MathUtil.hpp"
+#include "wpi/units/base.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/util/sendable/SendableRegistry.hpp"
 
 namespace wpi::math {
 namespace detail {

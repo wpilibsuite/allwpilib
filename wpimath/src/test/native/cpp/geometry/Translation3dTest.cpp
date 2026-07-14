@@ -6,7 +6,13 @@
 
 #include <cmath>
 
+#include <Eigen/Core>
 #include <gtest/gtest.h>
+
+#include "wpi/math/geometry/Rotation3d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 
 using namespace wpi::math;
 

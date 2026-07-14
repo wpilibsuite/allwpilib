@@ -6,9 +6,15 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
 #include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
-#include "wpi/math/trajectory/Trajectory.hpp"
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 
 void TestSameShapedTrajectory(
     const std::vector<wpi::math::DrivetrainSplineSample>& statesA,
