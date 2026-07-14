@@ -50,6 +50,24 @@ TEST(EncoderSimTest, Rate) {
   EXPECT_EQ(1.91, callback.GetLastValue());
 }
 
+TEST(EncoderSimTest, ResetDataClearsRateCallbacks) {
+  HAL_Initialize(500, 0);
+
+  Encoder encoder(0, 1);
+  EncoderSim sim(encoder);
+  sim.ResetData();
+
+  DoubleCallback callback;
+  auto cb = sim.RegisterRateCallback(callback.GetCallback(), false);
+  sim.SetRate(1.91);
+  ASSERT_TRUE(callback.WasTriggered());
+
+  callback.Reset();
+  sim.ResetData();
+  sim.SetRate(2.53);
+  EXPECT_FALSE(callback.WasTriggered());
+}
+
 TEST(EncoderSimTest, Count) {
   HAL_Initialize(500, 0);
 

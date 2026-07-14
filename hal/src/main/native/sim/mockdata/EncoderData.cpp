@@ -21,7 +21,7 @@ void EncoderData::ResetData() {
   initialized.Reset(false);
   simDevice = 0;
   count.Reset(0);
-  rate = 0;
+  rate.Reset(0);
   reset.Reset(false);
   direction.Reset(false);
   reverseDirection.Reset(false);

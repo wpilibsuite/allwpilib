@@ -5,6 +5,7 @@
 package org.wpilib.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,27 @@ class EncoderSimTest {
         assertEquals(1.91, sim.getRate());
         assertTrue(callback.wasTriggered());
         assertEquals(1.91, callback.getSetValue());
+      }
+    }
+  }
+
+  @Test
+  void testResetDataClearsRateCallbacks() {
+    HAL.initialize(500, 0);
+
+    try (Encoder encoder = new Encoder(0, 1)) {
+      EncoderSim sim = new EncoderSim(encoder);
+      sim.resetData();
+
+      DoubleCallback callback = new DoubleCallback();
+      try (CallbackStore cb = sim.registerRateCallback(callback, false)) {
+        sim.setRate(1.91);
+        assertTrue(callback.wasTriggered());
+
+        callback.reset();
+        sim.resetData();
+        sim.setRate(2.53);
+        assertFalse(callback.wasTriggered());
       }
     }
   }

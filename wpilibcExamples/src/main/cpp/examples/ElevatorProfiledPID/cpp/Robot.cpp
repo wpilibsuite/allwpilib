@@ -50,7 +50,7 @@ class Robot : public wpi::TimedRobot {
   static constexpr auto kV = 1.3_V / 1_mps;
 
   wpi::Joystick joystick{1};
-  wpi::Encoder encoder{1, 2};
+  wpi::Encoder encoder{0, 1};
   wpi::PWMSparkMax motor{1};
 
   // Create a PID controller whose setpoint's change is subject to maximum

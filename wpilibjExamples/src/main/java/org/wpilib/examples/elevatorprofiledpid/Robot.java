@@ -24,7 +24,7 @@ public class Robot extends TimedRobot {
   private static double kV = 1.3;
 
   private final Joystick joystick = new Joystick(1);
-  private final Encoder encoder = new Encoder(1, 2);
+  private final Encoder encoder = new Encoder(0, 1);
   private final PWMSparkMax motor = new PWMSparkMax(1);
 
   // Create a PID controller whose setpoint's change is subject to maximum

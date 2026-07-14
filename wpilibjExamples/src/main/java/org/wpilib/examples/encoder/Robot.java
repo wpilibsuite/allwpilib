@@ -24,15 +24,15 @@ import org.wpilib.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
   /**
    * The Encoder object is constructed with 4 parameters, the last two being optional. The first two
-   * parameters (1, 2 in this case) refer to the ports on the roboRIO which the encoder uses.
-   * Because a quadrature encoder has two signal wires, the signal from two DIO ports on the roboRIO
+   * parameters (0, 1 in this case) refer to the ports on Systemcore which the encoder uses.
+   * Because a quadrature encoder has two signal wires, the signal from two DIO ports on Systemcore
    * are used. The third (optional) parameter is a boolean which defaults to false. If you set this
    * parameter to true, the direction of the encoder will be reversed, in case it makes more sense
    * mechanically. The final (optional) parameter specifies encoding rate (k1X, k2X, or k4X) and
    * defaults to k4X. Faster (k4X) encoding gives greater positional precision but more noise in the
    * rate.
    */
-  private final Encoder encoder = new Encoder(1, 2, false, CounterBase.EncodingType.X4);
+  private final Encoder encoder = new Encoder(0, 1, false, CounterBase.EncodingType.X4);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
@@ -43,7 +43,6 @@ public class Robot extends TimedRobot {
      * and that we want to measure distance in inches.
      */
     encoder.setDistancePerPulse(1.0 / 360.0 * 2.0 * Math.PI * 1.5);
-
   }
 
   @Override
