@@ -10,7 +10,7 @@
 open module wpilib.cameraserver {
   requires transitive wpilib.cscore;
   requires transitive wpilib.ntcore;
-  requires transitive org.opencv;
+  requires org.opencv;
   requires wpilib.util;
 
   exports org.wpilib.vision.process;

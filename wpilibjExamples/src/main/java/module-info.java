@@ -13,4 +13,5 @@ open module wpilib.examples {
   requires wpilib.ntcore;
   requires wpilib.romi;
   requires wpilib.xrp;
+  requires org.opencv;
 }

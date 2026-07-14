@@ -2,9 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-@SuppressWarnings("requires-transitive-automatic")
 open module wpilib.apriltag {
-  requires transitive org.opencv;
+  requires org.opencv; // not transitive; users can import the opencv module explicitly
   requires wpilib.math;
   requires wpilib.util;
   requires io.avaje.json;

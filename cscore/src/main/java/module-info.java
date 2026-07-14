@@ -7,7 +7,7 @@
  * connected to the robot and for configuring those cameras.
  */
 open module wpilib.cscore {
-  requires transitive org.opencv;
+  requires org.opencv;
   requires wpilib.util;
 
   exports org.wpilib.vision.camera;
