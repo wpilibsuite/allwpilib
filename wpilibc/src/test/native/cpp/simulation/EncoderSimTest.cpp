@@ -180,6 +180,7 @@ TEST(EncoderSimTest, Reset) {
 
   sim.SetCount(3504);
   sim.SetDistance(229.191);
+  sim.SetDirection(true);
 
   encoder.Reset();
   EXPECT_TRUE(sim.GetReset());
@@ -190,6 +191,8 @@ TEST(EncoderSimTest, Reset) {
   EXPECT_EQ(0, encoder.Get());
   EXPECT_EQ(0, sim.GetDistance());
   EXPECT_EQ(0, encoder.GetDistance());
+  EXPECT_TRUE(sim.GetDirection());
+  EXPECT_TRUE(encoder.GetDirection());
 }
 
 }  // namespace wpi::sim

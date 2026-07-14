@@ -115,22 +115,28 @@ void ReleaseEncoderPorts(const std::shared_ptr<Encoder>& encoder) {
 
   encoderHandles->Free(encoder->handle, HAL_HandleEnum::ENCODER);
 
-  smartIoHandles->Free(aPortHandle, HAL_HandleEnum::ENCODER);
-  smartIoHandles->Free(bPortHandle, HAL_HandleEnum::ENCODER);
-
   // Wait for no other object to hold this encoder handle. The Encoder object
   // retains the ports until the last shared reference is released, so getters
   // already in progress can finish safely.
   auto start = wpi::hal::monotonic_clock::now();
+  bool timeoutReported = false;
   while (encoder.use_count() != 1) {
     auto current = wpi::hal::monotonic_clock::now();
-    if (start + std::chrono::seconds(1) < current) {
-      std::puts("Encoder handle free timeout");
+    if (!timeoutReported && start + std::chrono::seconds(1) < current) {
+      std::puts("Encoder handle free taking longer than expected");
       std::fflush(stdout);
-      break;
+      timeoutReported = true;
     }
     std::this_thread::yield();
   }
+
+  // Release the SmartIO objects before making their handles available for
+  // reallocation. This ensures their destructors cannot close a newly
+  // allocated resource on the same channels.
+  encoder->aPort.reset();
+  encoder->bPort.reset();
+  smartIoHandles->Free(aPortHandle, HAL_HandleEnum::ENCODER);
+  smartIoHandles->Free(bPortHandle, HAL_HandleEnum::ENCODER);
 }
 }  // namespace
 
@@ -282,7 +288,6 @@ void HAL_ResetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
   encoder->resetCount = count;
   encoder->lastRawCount = count;
   encoder->hasLastCount = true;
-  encoder->direction = false;
 }
 
 HAL_Bool HAL_GetEncoderStopped(HAL_EncoderHandle encoderHandle,
