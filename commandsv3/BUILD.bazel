@@ -70,9 +70,17 @@ wpilib_java_library(
 wpilib_java_junit5_test(
     name = "commandsv3-java-test",
     srcs = glob(["src/test/java/**/*.java"]),
+    jvm_flags = [
+        "--add-opens",
+        "java.base/jdk.internal.vm=ALL-UNNAMED",
+        "--add-opens",
+        "java.base/java.lang=ALL-UNNAMED",
+    ],
     plugins = [
         "//epilogue-processor:plugin",
     ],
+    resource_strip_prefix = "commandsv3/src/test/resources",
+    resources = glob(["src/test/resources/**"]),
     deps = [
         ":commandsv3-java",
         "//epilogue-runtime:epilogue-java",
