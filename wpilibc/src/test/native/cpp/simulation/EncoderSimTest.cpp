@@ -79,49 +79,6 @@ TEST(EncoderSimTest, Distance) {
   EXPECT_EQ(229.174, encoder.GetDistance());
 }
 
-TEST(EncoderSimTest, Period) {
-  HAL_Initialize(500, 0);
-
-  Encoder encoder(0, 1);
-  EncoderSim sim(encoder);
-  sim.ResetData();
-
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
-
-  DoubleCallback callback;
-  auto cb = sim.RegisterPeriodCallback(callback.GetCallback(), false);
-  sim.SetPeriod(123.456);
-  EXPECT_EQ(123.456, sim.GetPeriod());
-  WPI_IGNORE_DEPRECATED
-  EXPECT_EQ(123.456, encoder.GetPeriod().value());
-  WPI_UNIGNORE_DEPRECATED
-  EXPECT_EQ(kDefaultDistancePerPulse / 123.456, encoder.GetRate());
-
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(123.456, callback.GetLastValue());
-}
-
-TEST(EncoderSimTest, SetMaxPeriod) {
-  HAL_Initialize(500, 0);
-
-  Encoder encoder(0, 1);
-  EncoderSim sim(encoder);
-  sim.ResetData();
-
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
-
-  DoubleCallback callback;
-  auto cb = sim.RegisterMaxPeriodCallback(callback.GetCallback(), false);
-
-  WPI_IGNORE_DEPRECATED
-  encoder.SetMaxPeriod(123.456_s);
-  WPI_UNIGNORE_DEPRECATED
-  EXPECT_EQ(123.456, sim.GetMaxPeriod());
-
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(123.456, callback.GetLastValue());
-}
-
 TEST(EncoderSimTest, SetDirection) {
   HAL_Initialize(500, 0);
 
@@ -168,25 +125,6 @@ TEST(EncoderSimTest, SetReverseDirection) {
   EXPECT_FALSE(sim.GetReverseDirection());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_FALSE(callback.GetLastValue());
-}
-
-TEST(EncoderSimTest, SetSamplesToAverage) {
-  HAL_Initialize(500, 0);
-
-  Encoder encoder(0, 1);
-  EncoderSim sim(encoder);
-  sim.ResetData();
-
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
-
-  IntCallback callback;
-  auto cb = sim.RegisterSamplesToAverageCallback(callback.GetCallback(), false);
-
-  encoder.SetSamplesToAverage(57);
-  EXPECT_EQ(57, sim.GetSamplesToAverage());
-  EXPECT_EQ(57, encoder.GetSamplesToAverage());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(57, callback.GetLastValue());
 }
 
 TEST(EncoderSimTest, SetDistancePerPulse) {

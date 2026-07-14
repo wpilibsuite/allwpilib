@@ -30,12 +30,9 @@ HAL_SimDeviceHandle HALSIM_GetEncoderSimDevice(int32_t index) {
 
 DEFINE_CAPI(HAL_Bool, Initialized, false)
 DEFINE_CAPI(int32_t, Count, 0)
-DEFINE_CAPI(double, Period, 0)
 DEFINE_CAPI(HAL_Bool, Reset, false)
-DEFINE_CAPI(double, MaxPeriod, 0)
 DEFINE_CAPI(HAL_Bool, Direction, false)
 DEFINE_CAPI(HAL_Bool, ReverseDirection, false)
-DEFINE_CAPI(int32_t, SamplesToAverage, 0)
 DEFINE_CAPI(double, DistancePerPulse, 0)
 
 void HALSIM_SetEncoderDistance(int32_t index, double distance) {}

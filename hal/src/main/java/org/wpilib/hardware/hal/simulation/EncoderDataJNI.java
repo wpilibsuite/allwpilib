@@ -26,15 +26,6 @@ public class EncoderDataJNI extends JNIWrapper {
 
   public static native void setCount(int index, int count);
 
-  public static native int registerPeriodCallback(
-      int index, NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelPeriodCallback(int index, int uid);
-
-  public static native double getPeriod(int index);
-
-  public static native void setPeriod(int index, double period);
-
   public static native int registerResetCallback(
       int index, NotifyCallback callback, boolean initialNotify);
 
@@ -43,15 +34,6 @@ public class EncoderDataJNI extends JNIWrapper {
   public static native boolean getReset(int index);
 
   public static native void setReset(int index, boolean reset);
-
-  public static native int registerMaxPeriodCallback(
-      int index, NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelMaxPeriodCallback(int index, int uid);
-
-  public static native double getMaxPeriod(int index);
-
-  public static native void setMaxPeriod(int index, double maxPeriod);
 
   public static native int registerDirectionCallback(
       int index, NotifyCallback callback, boolean initialNotify);
@@ -70,15 +52,6 @@ public class EncoderDataJNI extends JNIWrapper {
   public static native boolean getReverseDirection(int index);
 
   public static native void setReverseDirection(int index, boolean reverseDirection);
-
-  public static native int registerSamplesToAverageCallback(
-      int index, NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelSamplesToAverageCallback(int index, int uid);
-
-  public static native int getSamplesToAverage(int index);
-
-  public static native void setSamplesToAverage(int index, int samplesToAverage);
 
   public static native int registerDistancePerPulseCallback(
       int index, NotifyCallback callback, boolean initialNotify);

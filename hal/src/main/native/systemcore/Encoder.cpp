@@ -7,7 +7,6 @@
 #include <chrono>
 #include <cstdint>
 #include <cstdio>
-#include <limits>
 #include <memory>
 #include <thread>
 
@@ -32,13 +31,9 @@ struct Encoder {
   HAL_EncoderEncodingType encodingType{HAL_ENCODER_4X_ENCODING};
   bool reverseDirection{false};
   double distancePerPulse{1.0};
-  double maxPeriod{0.0};
-  int32_t samplesToAverage{0};
 
   int32_t resetCount{0};
   int32_t lastRawCount{0};
-  wpi::hal::monotonic_clock::time_point lastCountTime;
-  double period{std::numeric_limits<double>::max()};
   bool hasLastCount{false};
   bool direction{false};
 };
@@ -98,18 +93,12 @@ int32_t ReadRawCount(Encoder& encoder, int32_t* status) {
     return 0;
   }
 
-  auto now = wpi::hal::monotonic_clock::now();
   if (encoder.hasLastCount && count != encoder.lastRawCount) {
     int64_t delta = static_cast<int64_t>(count) - encoder.lastRawCount;
-    encoder.period =
-        std::chrono::duration<double>(now - encoder.lastCountTime).count();
     encoder.direction = delta > 0;
     if (encoder.reverseDirection) {
       encoder.direction = !encoder.direction;
     }
-    encoder.lastCountTime = now;
-  } else if (!encoder.hasLastCount) {
-    encoder.lastCountTime = now;
   }
   encoder.lastRawCount = count;
   encoder.hasLastCount = true;
@@ -122,20 +111,19 @@ int32_t ReadRawCount(Encoder& encoder, int32_t* status) {
 }
 
 void ReleaseEncoderPorts(const std::shared_ptr<Encoder>& encoder) {
-  auto aPort = encoder->aPort;
-  auto bPort = encoder->bPort;
   auto aPortHandle = encoder->aPortHandle;
   auto bPortHandle = encoder->bPortHandle;
 
-  encoder->aPort.reset();
-  encoder->bPort.reset();
   encoderHandles->Free(encoder->handle, HAL_HandleEnum::ENCODER);
 
   smartIoHandles->Free(aPortHandle, HAL_HandleEnum::ENCODER);
   smartIoHandles->Free(bPortHandle, HAL_HandleEnum::ENCODER);
 
+  // Wait for no other object to hold this encoder handle. The Encoder object
+  // retains the ports until the last shared reference is released, so getters
+  // already in progress can finish safely.
   auto start = wpi::hal::monotonic_clock::now();
-  while (aPort.use_count() != 1 || bPort.use_count() != 1) {
+  while (encoder.use_count() != 1) {
     auto current = wpi::hal::monotonic_clock::now();
     if (start + std::chrono::seconds(1) < current) {
       std::puts("Encoder handle free timeout");
@@ -222,6 +210,20 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
     smartIoHandles->Free(aPortHandle, HAL_HandleEnum::ENCODER);
     return HAL_INVALID_HANDLE;
   }
+
+  int32_t count = 0;
+  *status = aPort->GetQuadrature(&count);
+  if (*status != 0) {
+    encoder->aPort.reset();
+    encoder->bPort.reset();
+    encoderHandles->Free(handle, HAL_HandleEnum::ENCODER);
+    smartIoHandles->Free(bPortHandle, HAL_HandleEnum::ENCODER);
+    smartIoHandles->Free(aPortHandle, HAL_HandleEnum::ENCODER);
+    return HAL_INVALID_HANDLE;
+  }
+  encoder->lastRawCount = count;
+  encoder->hasLastCount = true;
+
   aPort->closeOnDestroy = true;
 
   return handle;
@@ -281,35 +283,8 @@ void HAL_ResetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
   }
   encoder->resetCount = count;
   encoder->lastRawCount = count;
-  encoder->lastCountTime = wpi::hal::monotonic_clock::now();
-  encoder->period = std::numeric_limits<double>::max();
   encoder->hasLastCount = true;
   encoder->direction = false;
-}
-
-double HAL_GetEncoderPeriod(HAL_EncoderHandle encoderHandle, int32_t* status) {
-  auto encoder = GetEncoder(encoderHandle, status);
-  if (encoder == nullptr) {
-    return 0;
-  }
-
-  int32_t unused = ReadRawCount(*encoder, status);
-  (void)unused;
-  if (*status != 0) {
-    return 0;
-  }
-  return encoder->period;
-}
-
-void HAL_SetEncoderMaxPeriod(HAL_EncoderHandle encoderHandle, double maxPeriod,
-                             int32_t* status) {
-  auto encoder = GetEncoder(encoderHandle, status);
-  if (encoder == nullptr) {
-    return;
-  }
-
-  encoder->maxPeriod = maxPeriod;
-  *status = 0;
 }
 
 HAL_Bool HAL_GetEncoderStopped(HAL_EncoderHandle encoderHandle,
@@ -319,12 +294,12 @@ HAL_Bool HAL_GetEncoderStopped(HAL_EncoderHandle encoderHandle,
     return false;
   }
 
-  int32_t unused = ReadRawCount(*encoder, status);
-  (void)unused;
+  int32_t rate = 0;
+  *status = encoder->aPort->GetQuadratureRate(&rate);
   if (*status != 0) {
     return false;
   }
-  return encoder->period > encoder->maxPeriod;
+  return rate == 0;
 }
 
 HAL_Bool HAL_GetEncoderDirection(HAL_EncoderHandle encoderHandle,
@@ -375,22 +350,6 @@ double HAL_GetEncoderRate(HAL_EncoderHandle encoderHandle, int32_t* status) {
   return encoder->reverseDirection ? -scaledRate : scaledRate;
 }
 
-void HAL_SetEncoderMinRate(HAL_EncoderHandle encoderHandle, double minRate,
-                           int32_t* status) {
-  auto encoder = GetEncoder(encoderHandle, status);
-  if (encoder == nullptr) {
-    return;
-  }
-  if (minRate == 0.0) {
-    *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
-                        "minRate must not be 0");
-    return;
-  }
-
-  encoder->maxPeriod = encoder->distancePerPulse / minRate;
-  *status = 0;
-}
-
 void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
                                     double distancePerPulse, int32_t* status) {
   auto encoder = GetEncoder(encoderHandle, status);
@@ -417,33 +376,6 @@ void HAL_SetEncoderReverseDirection(HAL_EncoderHandle encoderHandle,
 
   encoder->reverseDirection = reverseDirection;
   *status = 0;
-}
-
-void HAL_SetEncoderSamplesToAverage(HAL_EncoderHandle encoderHandle,
-                                    int32_t samplesToAverage, int32_t* status) {
-  auto encoder = GetEncoder(encoderHandle, status);
-  if (encoder == nullptr) {
-    return;
-  }
-  if (samplesToAverage < 1 || samplesToAverage > 127) {
-    *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
-                        "samplesToAverage must be between 1 and 127");
-    return;
-  }
-
-  encoder->samplesToAverage = samplesToAverage;
-  *status = 0;
-}
-
-int32_t HAL_GetEncoderSamplesToAverage(HAL_EncoderHandle encoderHandle,
-                                       int32_t* status) {
-  auto encoder = GetEncoder(encoderHandle, status);
-  if (encoder == nullptr) {
-    return 0;
-  }
-
-  *status = 0;
-  return encoder->samplesToAverage;
 }
 
 double HAL_GetEncoderDecodingScaleFactor(HAL_EncoderHandle encoderHandle,

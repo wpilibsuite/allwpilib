@@ -2,8 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <limits>
-
 #include "../PortsInternal.hpp"
 #include "EncoderDataInternal.hpp"
 
@@ -23,12 +21,10 @@ void EncoderData::ResetData() {
   initialized.Reset(false);
   simDevice = 0;
   count.Reset(0);
-  period.Reset(std::numeric_limits<double>::max());
+  rate = 0;
   reset.Reset(false);
-  maxPeriod.Reset(0);
   direction.Reset(false);
   reverseDirection.Reset(false);
-  samplesToAverage.Reset(0);
   distancePerPulse.Reset(1);
 }
 
@@ -67,12 +63,9 @@ HAL_SimDeviceHandle HALSIM_GetEncoderSimDevice(int32_t index) {
                                SimEncoderData, LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, Initialized, initialized)
-DEFINE_CAPI(double, Period, period)
 DEFINE_CAPI(HAL_Bool, Reset, reset)
-DEFINE_CAPI(double, MaxPeriod, maxPeriod)
 DEFINE_CAPI(HAL_Bool, Direction, direction)
 DEFINE_CAPI(HAL_Bool, ReverseDirection, reverseDirection)
-DEFINE_CAPI(int32_t, SamplesToAverage, samplesToAverage)
 DEFINE_CAPI(double, DistancePerPulse, distancePerPulse)
 
 int32_t HALSIM_RegisterEncoderCountCallback(int32_t index,
@@ -108,19 +101,11 @@ double HALSIM_GetEncoderDistance(int32_t index) {
 }
 
 void HALSIM_SetEncoderRate(int32_t index, double rate) {
-  auto& simData = SimEncoderData[index];
-  if (rate == 0) {
-    simData.period = std::numeric_limits<double>::infinity();
-    return;
-  }
-
-  simData.period = simData.distancePerPulse / rate;
+  SimEncoderData[index].rate = rate;
 }
 
 double HALSIM_GetEncoderRate(int32_t index) {
-  auto& simData = SimEncoderData[index];
-
-  return simData.distancePerPulse / simData.period;
+  return SimEncoderData[index].rate;
 }
 
 #define REGISTER(NAME) \
@@ -131,12 +116,9 @@ void HALSIM_RegisterEncoderAllCallbacks(int32_t index,
                                         void* param, HAL_Bool initialNotify) {
   REGISTER(initialized);
   REGISTER(count);
-  REGISTER(period);
   REGISTER(reset);
-  REGISTER(maxPeriod);
   REGISTER(direction);
   REGISTER(reverseDirection);
-  REGISTER(samplesToAverage);
   REGISTER(distancePerPulse);
 }
 }  // extern "C"

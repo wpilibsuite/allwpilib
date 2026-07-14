@@ -183,42 +183,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * Returns the period of the most recent pulse. Returns the period of the most recent Encoder
-   * pulse in seconds. This method compensates for the decoding type.
-   *
-   * <p><b>Warning:</b> This returns unscaled periods. Use getRate() for rates that are scaled using
-   * the value from setDistancePerPulse().
-   *
-   * @return Period in seconds of the most recent pulse.
-   * @deprecated Use getRate() in favor of this method.
-   */
-  @Override
-  @Deprecated
-  public double getPeriod() {
-    return EncoderJNI.getEncoderPeriod(m_encoder);
-  }
-
-  /**
-   * Sets the maximum period for stopped detection. Sets the value that represents the maximum
-   * period of the Encoder before it will assume that the attached device is stopped. This timeout
-   * allows users to determine if the wheels or other shaft has stopped rotating. This method
-   * compensates for the decoding type.
-   *
-   * @param maxPeriod The maximum time between rising and falling edges before the FPGA will report
-   *     the device stopped. This is expressed in seconds.
-   * @deprecated Use setMinRate() in favor of this method. This takes unscaled periods and
-   *     setMinRate() scales using value from setDistancePerPulse().
-   */
-  @Override
-  @Deprecated
-  public void setMaxPeriod(double maxPeriod) {
-    EncoderJNI.setEncoderMaxPeriod(m_encoder, maxPeriod);
-  }
-
-  /**
-   * Determine if the encoder is stopped. Using the MaxPeriod value, a boolean is returned that is
-   * true if the encoder is considered stopped and false if it is still moving. A stopped encoder is
-   * one where the most recent pulse width exceeds the MaxPeriod.
+   * Determine if the encoder is stopped. The encoder is stopped when its current rate is zero.
    *
    * @return True if the encoder is considered stopped.
    */
@@ -258,16 +223,6 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * Set the minimum rate of the device before the hardware reports it stopped.
-   *
-   * @param minRate The minimum rate. The units are in distance per second as scaled by the value
-   *     from setDistancePerPulse().
-   */
-  public void setMinRate(double minRate) {
-    EncoderJNI.setEncoderMinRate(m_encoder, minRate);
-  }
-
-  /**
    * Set the distance per pulse for this encoder. This sets the multiplier used to determine the
    * distance driven based on the count value from the encoder. Do not include the decoding type in
    * this scale. The library already compensates for the decoding type. Set this value based on the
@@ -297,28 +252,6 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    */
   public void setReverseDirection(boolean reverseDirection) {
     EncoderJNI.setEncoderReverseDirection(m_encoder, reverseDirection);
-  }
-
-  /**
-   * Set the Samples to Average which specifies the number of samples of the timer to average when
-   * calculating the period. Perform averaging to account for mechanical imperfections or as
-   * oversampling to increase resolution.
-   *
-   * @param samplesToAverage The number of samples to average from 1 to 127.
-   */
-  public void setSamplesToAverage(int samplesToAverage) {
-    EncoderJNI.setEncoderSamplesToAverage(m_encoder, samplesToAverage);
-  }
-
-  /**
-   * Get the Samples to Average which specifies the number of samples of the timer to average when
-   * calculating the period. Perform averaging to account for mechanical imperfections or as
-   * oversampling to increase resolution.
-   *
-   * @return SamplesToAverage The number of samples being averaged (from 1 to 127)
-   */
-  public int getSamplesToAverage() {
-    return EncoderJNI.getEncoderSamplesToAverage(m_encoder);
   }
 
   /**

@@ -25,10 +25,8 @@ class HALSimWSProviderEncoder : public HALSimWSHalChanProvider {
  private:
   int32_t m_initCbKey = 0;
   int32_t m_countCbKey = 0;
-  int32_t m_periodCbKey = 0;
   int32_t m_resetCbKey = 0;
   int32_t m_reverseDirectionCbKey = 0;
-  int32_t m_samplesCbKey = 0;
 
   int32_t m_countOffset = 0;
 };

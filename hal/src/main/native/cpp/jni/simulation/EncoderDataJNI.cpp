@@ -114,56 +114,6 @@ Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_setCount
 
 /*
  * Class:     org_wpilib_hardware_hal_simulation_EncoderDataJNI
- * Method:    registerPeriodCallback
- * Signature: (ILjava/lang/Object;Z)I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_registerPeriodCallback
-  (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
-{
-  return sim::AllocateCallback(env, index, callback, initialNotify,
-                               &HALSIM_RegisterEncoderPeriodCallback);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_EncoderDataJNI
- * Method:    cancelPeriodCallback
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_cancelPeriodCallback
-  (JNIEnv* env, jclass, jint index, jint handle)
-{
-  return sim::FreeCallback(env, handle, index,
-                           &HALSIM_CancelEncoderPeriodCallback);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_EncoderDataJNI
- * Method:    getPeriod
- * Signature: (I)D
- */
-JNIEXPORT jdouble JNICALL
-Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_getPeriod
-  (JNIEnv*, jclass, jint index)
-{
-  return HALSIM_GetEncoderPeriod(index);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_EncoderDataJNI
- * Method:    setPeriod
- * Signature: (ID)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_setPeriod
-  (JNIEnv*, jclass, jint index, jdouble value)
-{
-  HALSIM_SetEncoderPeriod(index, value);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_EncoderDataJNI
  * Method:    registerResetCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
@@ -210,56 +160,6 @@ Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_setReset
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetEncoderReset(index, value);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_EncoderDataJNI
- * Method:    registerMaxPeriodCallback
- * Signature: (ILjava/lang/Object;Z)I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_registerMaxPeriodCallback
-  (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
-{
-  return sim::AllocateCallback(env, index, callback, initialNotify,
-                               &HALSIM_RegisterEncoderMaxPeriodCallback);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_EncoderDataJNI
- * Method:    cancelMaxPeriodCallback
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_cancelMaxPeriodCallback
-  (JNIEnv* env, jclass, jint index, jint handle)
-{
-  return sim::FreeCallback(env, handle, index,
-                           &HALSIM_CancelEncoderMaxPeriodCallback);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_EncoderDataJNI
- * Method:    getMaxPeriod
- * Signature: (I)D
- */
-JNIEXPORT jdouble JNICALL
-Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_getMaxPeriod
-  (JNIEnv*, jclass, jint index)
-{
-  return HALSIM_GetEncoderMaxPeriod(index);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_EncoderDataJNI
- * Method:    setMaxPeriod
- * Signature: (ID)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_setMaxPeriod
-  (JNIEnv*, jclass, jint index, jdouble value)
-{
-  HALSIM_SetEncoderMaxPeriod(index, value);
 }
 
 /*
@@ -360,56 +260,6 @@ Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_setReverseDirection
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetEncoderReverseDirection(index, value);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_EncoderDataJNI
- * Method:    registerSamplesToAverageCallback
- * Signature: (ILjava/lang/Object;Z)I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_registerSamplesToAverageCallback
-  (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
-{
-  return sim::AllocateCallback(env, index, callback, initialNotify,
-                               &HALSIM_RegisterEncoderSamplesToAverageCallback);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_EncoderDataJNI
- * Method:    cancelSamplesToAverageCallback
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_cancelSamplesToAverageCallback
-  (JNIEnv* env, jclass, jint index, jint handle)
-{
-  return sim::FreeCallback(env, handle, index,
-                           &HALSIM_CancelEncoderSamplesToAverageCallback);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_EncoderDataJNI
- * Method:    getSamplesToAverage
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_getSamplesToAverage
-  (JNIEnv*, jclass, jint index)
-{
-  return HALSIM_GetEncoderSamplesToAverage(index);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_EncoderDataJNI
- * Method:    setSamplesToAverage
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_EncoderDataJNI_setSamplesToAverage
-  (JNIEnv*, jclass, jint index, jint value)
-{
-  HALSIM_SetEncoderSamplesToAverage(index, value);
 }
 
 /*

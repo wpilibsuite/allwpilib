@@ -98,32 +98,6 @@ class EncoderSim {
   void SetCount(int count);
 
   /**
-   * Register a callback on the period of the encoder.
-   *
-   * @param callback the callback that will be called whenever the period is
-   *                 changed
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]]
-  std::unique_ptr<CallbackStore> RegisterPeriodCallback(NotifyCallback callback,
-                                                        bool initialNotify);
-
-  /**
-   * Read the period of the encoder.
-   *
-   * @return the encoder period
-   */
-  double GetPeriod() const;
-
-  /**
-   * Change the encoder period.
-   *
-   * @param period the new period
-   */
-  void SetPeriod(double period);
-
-  /**
    * Register a callback to be called whenever the encoder is reset.
    *
    * @param callback the callback
@@ -147,32 +121,6 @@ class EncoderSim {
    * @param reset the new value
    */
   void SetReset(bool reset);
-
-  /**
-   * Register a callback to be run whenever the max period of the encoder is
-   * changed.
-   *
-   * @param callback the callback
-   * @param initialNotify whether to run the callback on the initial value
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]]
-  std::unique_ptr<CallbackStore> RegisterMaxPeriodCallback(
-      NotifyCallback callback, bool initialNotify);
-
-  /**
-   * Get the max period of the encoder.
-   *
-   * @return the max period of the encoder
-   */
-  double GetMaxPeriod() const;
-
-  /**
-   * Change the max period of the encoder.
-   *
-   * @param maxPeriod the new value
-   */
-  void SetMaxPeriod(double maxPeriod);
 
   /**
    * Register a callback on the direction of the encoder.
@@ -225,32 +173,6 @@ class EncoderSim {
    * @param reverseDirection the new value
    */
   void SetReverseDirection(bool reverseDirection);
-
-  /**
-   * Register a callback on the samples-to-average value of this encoder.
-   *
-   * @param callback the callback that will be called whenever the
-   *                 samples-to-average is changed
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]]
-  std::unique_ptr<CallbackStore> RegisterSamplesToAverageCallback(
-      NotifyCallback callback, bool initialNotify);
-
-  /**
-   * Get the samples-to-average value.
-   *
-   * @return the samples-to-average value
-   */
-  int GetSamplesToAverage() const;
-
-  /**
-   * Set the samples-to-average value.
-   *
-   * @param samplesToAverage the new value
-   */
-  void SetSamplesToAverage(int samplesToAverage);
 
   /**
    * Register a callback on the distance per pulse value of this encoder.

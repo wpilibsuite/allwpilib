@@ -115,43 +115,13 @@ int32_t HAL_GetEncoderEncodingScale(HAL_EncoderHandle encoderHandle,
 void HAL_ResetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status);
 
 /**
- * Gets the Period of the most recent count.
- *
- * Returns the time interval of the most recent count. This can be used for
- * velocity calculations to determine shaft velocity.
- *
- * @param[in] encoderHandle the encoder handle
- * @param[out] status       Error status variable. 0 on success.
- * @returns the period of the last two pulses in units of seconds
- */
-double HAL_GetEncoderPeriod(HAL_EncoderHandle encoderHandle, int32_t* status);
-
-/**
- * Sets the maximum period where the device is still considered "moving".
- *
- * Sets the maximum period where the device is considered moving. This value is
- * used to determine the "stopped" state of the encoder using the
- * HAL_GetEncoderStopped method.
- *
- * @param[in] encoderHandle the encoder handle
- * @param[in] maxPeriod     the maximum period where the counted device is
- *                          considered moving in seconds
- * @param[out] status       Error status variable. 0 on success.
- */
-void HAL_SetEncoderMaxPeriod(HAL_EncoderHandle encoderHandle, double maxPeriod,
-                             int32_t* status);
-
-/**
  * Determines if the clock is stopped.
  *
- * Determines if the clocked input is stopped based on the MaxPeriod value set
- * using the SetMaxPeriod method. If the clock exceeds the MaxPeriod, then the
- * device (and encoder) are assumed to be stopped and it returns true.
+ * Determines if the encoder's current rate is zero.
  *
  * @param[in] encoderHandle the encoder handle
  * @param[out] status       Error status variable. 0 on success.
- * @return true if the most recent encoder period exceeds the MaxPeriod value
- *         set by SetMaxPeriod
+ * @return true if the encoder's current rate is zero
  */
 HAL_Bool HAL_GetEncoderStopped(HAL_EncoderHandle encoderHandle,
                                int32_t* status);
@@ -182,7 +152,7 @@ double HAL_GetEncoderDistance(HAL_EncoderHandle encoderHandle, int32_t* status);
 /**
  * Gets the current rate of the encoder.
  *
- * This is the encoder period scaled by the distance per pulse set for the
+ * This is the encoder rate scaled by the distance per pulse set for the
  * encoder.
  *
  * @param[in] encoderHandle the encoder handle
@@ -191,22 +161,6 @@ double HAL_GetEncoderDistance(HAL_EncoderHandle encoderHandle, int32_t* status);
  *         HAL_SetEncoderDistancePerPulse, time value is seconds)
  */
 double HAL_GetEncoderRate(HAL_EncoderHandle encoderHandle, int32_t* status);
-
-/**
- * Sets the minimum rate to be considered moving by the encoder.
- *
- * Units need to match what is set by HAL_SetEncoderDistancePerPulse, with time
- * as seconds.
- *
- * @param[in] encoderHandle the encoder handle
- * @param[in] minRate       the minimum rate to be considered moving (units are
- *                          determined by the units passed to
- *                          HAL_SetEncoderDistancePerPulse, time value is
- *                          seconds)
- * @param[out] status       Error status variable. 0 on success.
- */
-void HAL_SetEncoderMinRate(HAL_EncoderHandle encoderHandle, double minRate,
-                           int32_t* status);
 
 /**
  * Sets the distance traveled per encoder pulse. This is used as a scaling
@@ -231,26 +185,6 @@ void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
  */
 void HAL_SetEncoderReverseDirection(HAL_EncoderHandle encoderHandle,
                                     HAL_Bool reverseDirection, int32_t* status);
-
-/**
- * Sets the number of encoder samples to average when calculating encoder rate.
- *
- * @param[in] encoderHandle    the encoder handle
- * @param[in] samplesToAverage the number of samples to average
- * @param[out] status          Error status variable. 0 on success.
- */
-void HAL_SetEncoderSamplesToAverage(HAL_EncoderHandle encoderHandle,
-                                    int32_t samplesToAverage, int32_t* status);
-
-/**
- * Gets the current samples to average value.
- *
- * @param[in] encoderHandle the encoder handle
- * @param[out] status       Error status variable. 0 on success.
- * @return the current samples to average value
- */
-int32_t HAL_GetEncoderSamplesToAverage(HAL_EncoderHandle encoderHandle,
-                                       int32_t* status);
 
 /**
  * Gets the FPGA index of the encoder.
