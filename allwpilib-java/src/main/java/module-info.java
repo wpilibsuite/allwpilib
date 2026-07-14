@@ -35,6 +35,7 @@
  * }
  */
 open module wpilib {
+  requires transitive wpilib.apriltag;
   requires transitive wpilib.cameraserver;
   requires transitive wpilib.core;
   requires transitive wpilib.cscore;

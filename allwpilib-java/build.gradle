@@ -12,6 +12,7 @@ apply from: "${rootDir}/shared/java/javacommon.gradle"
 apply from: "${rootDir}/shared/opencv.gradle"
 
 dependencies {
+    implementation project(":apriltag")
     implementation project(":cameraserver")
     implementation project(":cscore")
     implementation project(":datalog")
