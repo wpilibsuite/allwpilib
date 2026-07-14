@@ -61,6 +61,7 @@ maven.install(
     name = "maven",
     artifacts = [
         "org.ejml:ejml-java9module:0.46.0",
+        "io.avaje:avaje-inject:12.5",
         "io.avaje:avaje-jsonb:3.14",
         "io.avaje:avaje-jsonb-generator:3.14",
         "us.hebi.quickbuf:quickbuf-runtime:1.4",

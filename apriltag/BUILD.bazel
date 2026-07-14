@@ -150,6 +150,7 @@ wpilib_jni_java_library(
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
         "@bzlmodrio-opencv//libraries/java/opencv",
+        "@maven//:io_avaje_avaje_inject",
         "@maven//:io_avaje_avaje_json_core",
         "@maven//:io_avaje_avaje_jsonb",
     ],
