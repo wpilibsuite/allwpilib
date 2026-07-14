@@ -236,6 +236,7 @@ wpilib_jni_java_library(
     exported_plugins = ["//javacPlugin:plugin"],
     javacopts = [
         "-Xep:UnicodeInCode:OFF",
+        "--patch-module=wpilib.math=wpimath/src/generated/main/java",
     ],
     maven_artifact_name = "wpimath-java",
     maven_group_id = "org.wpilib.wpimath",

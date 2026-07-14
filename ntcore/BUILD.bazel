@@ -165,6 +165,7 @@ wpilib_cc_shared_library(
 wpilib_jni_java_library(
     name = "ntcore-java",
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
+    javacopts = ["--patch-module=wpilib.ntcore=ntcore/src/generated/main/java"],
     maven_artifact_name = "ntcore-java",
     maven_group_id = "org.wpilib.ntcore",
     native_libs = [":ntcorejni"],
