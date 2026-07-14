@@ -210,6 +210,19 @@ def test_user_tuple_array_unpack():
     ) == VectorStruct((1.0, 2.0, 3.0))
 
 
+@wpistruct.make_wpistruct
+@dataclasses.dataclass
+class TupleArrayNameCollisionStruct:
+    data: tuple[int, int]
+    data_0: int
+
+
+def test_user_tuple_array_unpack_does_not_collide_with_similar_field_names():
+    v = TupleArrayNameCollisionStruct((1, 2), 3)
+
+    assert wpistruct.unpack(TupleArrayNameCollisionStruct, wpistruct.pack(v)) == v
+
+
 def test_user_tuple_array_rejects_mixed_types():
     with pytest.raises(
         TypeError,

@@ -146,7 +146,7 @@ def _process_class(cls, struct_name: typing.Optional[str]):
 
     ctx: typing.Dict[str, typing.Any] = {"cls": cls}
 
-    for name, ftype in resolved_field_types.items():
+    for field_idx, (name, ftype) in enumerate(resolved_field_types.items()):
         if ftype in _type_to_fmt:
             fmt, stype = _type_to_fmt[ftype]
 
@@ -159,7 +159,7 @@ def _process_class(cls, struct_name: typing.Optional[str]):
         elif array_info := _get_fixed_tuple_array_info(cls_name, name, ftype):
             element_type, array_len = array_info
             argn = f"arg_{name}"
-            unpack_args = [f"{argn}_{i}" for i in range(array_len)]
+            unpack_args = [f"arg{field_idx}_{i}" for i in range(array_len)]
 
             if element_type in _type_to_fmt:
                 fmt, stype = _type_to_fmt[element_type]
