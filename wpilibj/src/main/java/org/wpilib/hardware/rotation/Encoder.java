@@ -121,9 +121,9 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * Used to divide raw edge counts down to spec'd counts.
+   * Used to divide raw encoder counts down to the values returned by get().
    *
-   * @return The encoding scale factor 1x, 2x, or 4x, per the requested encoding type.
+   * @return the scale factor used to convert raw encoder counts to scaled count values
    */
   public int getEncodingScale() {
     return EncoderJNI.getEncoderEncodingScale(m_encoder);

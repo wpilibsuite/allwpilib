@@ -43,11 +43,11 @@ DigitalHandleResource<HAL_EncoderHandle, Encoder, kNumSmartIo>* encoderHandles;
 int EncodingScaleFactor(const Encoder& encoder) {
   switch (encoder.encodingType) {
     case HAL_ENCODER_1X_ENCODING:
-      return 1;
+      return 4;
     case HAL_ENCODER_2X_ENCODING:
       return 2;
     case HAL_ENCODER_4X_ENCODING:
-      return 4;
+      return 1;
     default:
       return 0;
   }

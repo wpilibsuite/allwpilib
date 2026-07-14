@@ -105,9 +105,9 @@ class Encoder : public CounterBase,
   int GetRaw() const;
 
   /**
-   * The encoding scale factor 1x, 2x, or 4x, per the requested encodingType.
+   * The scale factor used to convert raw encoder counts to scaled count values.
    *
-   * Used to divide raw edge counts down to spec'd counts.
+   * Used to divide raw encoder counts down to the values returned by Get().
    */
   int GetEncodingScale() const;
 

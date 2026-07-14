@@ -92,9 +92,9 @@ int32_t HAL_GetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status);
 int32_t HAL_GetEncoderRaw(HAL_EncoderHandle encoderHandle, int32_t* status);
 
 /**
- * Gets the encoder scale value.
+ * Gets the scale value used to convert raw encoder counts to scaled counts.
  *
- * This is set by the value passed during initialization to encodingType.
+ * Raw counts divided by this value produce the scaled encoder count.
  *
  * @param[in] encoderHandle the encoder handle
  * @param[out] status       Error status variable. 0 on success.

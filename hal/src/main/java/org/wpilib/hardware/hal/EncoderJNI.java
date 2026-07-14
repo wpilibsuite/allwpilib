@@ -63,9 +63,9 @@ public class EncoderJNI extends JNIWrapper {
   public static native int getEncoderRaw(int encoderHandle);
 
   /**
-   * Gets the encoder scale value.
+   * Gets the scale value used to convert raw encoder counts to scaled counts.
    *
-   * <p>This is set by the value passed during initialization to encodingType.
+   * <p>Raw counts divided by this value produce the scaled encoder count.
    *
    * @param encoderHandle the encoder handle
    * @return the encoder scale value
@@ -159,9 +159,9 @@ public class EncoderJNI extends JNIWrapper {
   public static native int getEncoderFPGAIndex(int encoderHandle);
 
   /**
-   * Gets the encoder scale value.
+   * Gets the scale value used to convert raw encoder counts to scaled counts.
    *
-   * <p>This is set by the value passed during initialization to encodingType.
+   * <p>Raw counts divided by this value produce the scaled encoder count.
    *
    * @param encoderHandle the encoder handle
    * @return the encoder scale value
