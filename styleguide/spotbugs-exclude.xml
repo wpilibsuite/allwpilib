@@ -14,6 +14,7 @@
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
     <Or>
       <Class name="org.wpilib.driverstation.internal.DriverStationBackend" />
+      <Class name="org.wpilib.driverstation.RobotState" />
       <Class name="org.wpilib.driverstation.GenericHID" />
       <Class name="org.wpilib.command2.CommandScheduler" />
     </Or>
@@ -129,7 +130,7 @@
     Not a common case we expect to hit.
     -->
     <Bug pattern="SBSC_USE_STRINGBUFFER_CONCATENATION" />
-    <Class name="org.wpilib.driverstation.internal.DriverStationBackend" />
+    <Class name="org.wpilib.driverstation.RobotState" />
   </Match>
   <Match>
     <Bug pattern="SC_START_IN_CTOR" />
