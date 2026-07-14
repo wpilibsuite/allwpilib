@@ -773,7 +773,7 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     // Tell the DS that the robot is ready to be enabled
-    DriverStationBackend.observeUserProgramStarting();
+    RobotState.observeUserProgramStarting();
 
     // Loop forever, calling the callback system which handles periodic functions
     while (true) {

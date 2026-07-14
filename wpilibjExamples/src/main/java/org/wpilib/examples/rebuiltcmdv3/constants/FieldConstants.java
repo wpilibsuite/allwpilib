@@ -5,7 +5,7 @@
 package org.wpilib.examples.rebuiltcmdv3.constants;
 
 import java.util.Optional;
-import org.wpilib.driverstation.internal.DriverStationBackend;
+import org.wpilib.driverstation.MatchState;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rectangle2d;
 import org.wpilib.math.geometry.Translation2d;
@@ -27,7 +27,7 @@ public final class FieldConstants {
    * @return The location of our hub.
    */
   public static Optional<Pose2d> targetHub() {
-    return DriverStationBackend.getAlliance()
+    return MatchState.getAlliance()
         .map(
             a -> {
               return switch (a) {
