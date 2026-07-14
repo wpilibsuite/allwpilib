@@ -37,9 +37,10 @@ Java_org_wpilib_hardware_hal_UsageReportingJNI_report
  * Signature: (IILjava/lang/String;Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_UsageReportingJNI_publishCanVersion(
-    JNIEnv* env, jclass, jint busId, jint deviceId, jstring name,
-    jstring version) {
+Java_org_wpilib_hardware_hal_UsageReportingJNI_publishCanVersion
+  (JNIEnv* env, jclass, jint busId, jint deviceId, jstring name,
+   jstring version)
+{
   JStringRef nameStr{env, name};
   JStringRef versionStr{env, version};
   WPI_String nameWpiStr = wpi::util::make_string(nameStr);
@@ -55,8 +56,9 @@ Java_org_wpilib_hardware_hal_UsageReportingJNI_publishCanVersion(
  * Signature: (Ljava/lang/String;Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_UsageReportingJNI_publishVersion(
-    JNIEnv* env, jclass, jstring name, jstring version) {
+Java_org_wpilib_hardware_hal_UsageReportingJNI_publishVersion
+  (JNIEnv* env, jclass, jstring name, jstring version)
+{
   JStringRef nameStr{env, name};
   JStringRef versionStr{env, version};
   WPI_String nameWpiStr = wpi::util::make_string(nameStr);
@@ -70,8 +72,9 @@ Java_org_wpilib_hardware_hal_UsageReportingJNI_publishVersion(
  * Signature: (Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_UsageReportingJNI_publishWpilibVersion(
-    JNIEnv* env, jclass, jstring version) {
+Java_org_wpilib_hardware_hal_UsageReportingJNI_publishWpilibVersion
+  (JNIEnv* env, jclass, jstring version)
+{
   JStringRef versionStr{env, version};
   WPI_String versionWpiStr = wpi::util::make_string(versionStr);
   return HAL_PublishWpilibVersion(&versionWpiStr);
