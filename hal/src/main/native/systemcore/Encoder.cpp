@@ -36,6 +36,7 @@ struct Encoder {
   int32_t lastRawCount{0};
   bool hasLastCount{false};
   bool direction{false};
+  bool hasDirection{false};
 };
 
 DigitalHandleResource<HAL_EncoderHandle, Encoder, kNumSmartIo>* encoderHandles;
@@ -98,6 +99,7 @@ int32_t ReadRawCount(Encoder& encoder, int32_t* status) {
     if (encoder.reverseDirection) {
       encoder.direction = !encoder.direction;
     }
+    encoder.hasDirection = true;
   }
   encoder.lastRawCount = count;
   encoder.hasLastCount = true;
@@ -107,6 +109,10 @@ int32_t ReadRawCount(Encoder& encoder, int32_t* status) {
     rawCount = -rawCount;
   }
   return static_cast<int32_t>(rawCount);
+}
+
+int32_t GetScaledCount(const Encoder& encoder, int32_t rawCount) {
+  return static_cast<int32_t>(rawCount * DecodingScaleFactor(encoder));
 }
 
 void ReleaseEncoderPorts(const std::shared_ptr<Encoder>& encoder) {
@@ -251,7 +257,7 @@ int32_t HAL_GetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
   }
 
   int32_t rawCount = ReadRawCount(*encoder, status);
-  return static_cast<int32_t>(rawCount * DecodingScaleFactor(*encoder));
+  return GetScaledCount(*encoder, rawCount);
 }
 
 int32_t HAL_GetEncoderRaw(HAL_EncoderHandle encoderHandle, int32_t* status) {
@@ -331,7 +337,7 @@ double HAL_GetEncoderDistance(HAL_EncoderHandle encoderHandle,
   if (*status != 0) {
     return 0;
   }
-  return static_cast<double>(rawCount) * DecodingScaleFactor(*encoder) *
+  return static_cast<double>(GetScaledCount(*encoder, rawCount)) *
          encoder->distancePerPulse;
 }
 
@@ -376,6 +382,10 @@ void HAL_SetEncoderReverseDirection(HAL_EncoderHandle encoderHandle,
     return;
   }
 
+  if (encoder->hasDirection &&
+      encoder->reverseDirection != reverseDirection) {
+    encoder->direction = !encoder->direction;
+  }
   encoder->reverseDirection = reverseDirection;
   *status = 0;
 }

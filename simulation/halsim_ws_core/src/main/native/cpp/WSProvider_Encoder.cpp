@@ -99,6 +99,12 @@ void HALSimWSProviderEncoder::OnNetValueChanged(const wpi::util::json& json) {
   }
   if (auto val = json.lookup(">rate"); val && val->is_number()) {
     HALSIM_SetEncoderRate(m_channel, val->get_number());
+  } else if (auto val = json.lookup(">period"); val && val->is_number()) {
+    // Compatibility with older clients such as HALSim XRP, which send the
+    // period between encoder pulses instead of the current rate field.
+    HALSIM_SetEncoderRate(
+        m_channel,
+        HALSIM_GetEncoderDistancePerPulse(m_channel) / val->get_number());
   }
 }
 
