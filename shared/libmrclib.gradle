@@ -5,7 +5,7 @@ nativeUtils {
             artifactId = "mrclib-cpp"
             headerClassifier = "headers"
             ext = "zip"
-            version = '2027.1.0-alpha-1-90-g5172481'
+            version = '2027.1.0-alpha-1-91-gb154ee9'
             skipAtRuntimePlatforms.add(nativeUtils.wpi.platforms.systemcore)
             targetPlatforms.addAll(nativeUtils.wpi.platforms.allPlatforms)
             noDebugSplit = true
