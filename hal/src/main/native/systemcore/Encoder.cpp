@@ -382,8 +382,7 @@ void HAL_SetEncoderReverseDirection(HAL_EncoderHandle encoderHandle,
     return;
   }
 
-  if (encoder->hasDirection &&
-      encoder->reverseDirection != reverseDirection) {
+  if (encoder->hasDirection && encoder->reverseDirection != reverseDirection) {
     encoder->direction = !encoder->direction;
   }
   encoder->reverseDirection = reverseDirection;
