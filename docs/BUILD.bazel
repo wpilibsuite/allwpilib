@@ -148,6 +148,10 @@ javadoc(
         "//wpiutil:wpiutil-java",
         "//xrpVendordep:xrpVendordep-java",
     ],
+    # Workaround to effectively exclude module-info files
+    included_packages = [
+        "org.wpilib.*"
+    ]
 )
 
 copy_file(
