@@ -11,6 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.framework.RobotBase;
+import org.wpilib.hardware.hal.HAL;
 import org.wpilib.networktables.BooleanEntry;
 import org.wpilib.networktables.BooleanPublisher;
 import org.wpilib.networktables.IntegerEntry;
@@ -526,6 +529,40 @@ public final class CameraServer {
   }
 
   private CameraServer() {}
+
+  /**
+   * Initializes CameraServer integration with WPILib robot code.
+   *
+   * <p>Call this once from robot code before using CameraServer or VisionRunner APIs when using the
+   * CameraServer vendordep. This enables HAL usage reporting, Driver Station error reporting, and
+   * main robot thread detection for vision processing helpers.
+   */
+  public static synchronized void initialize() {
+    CameraServerShared shared =
+        new CameraServerShared() {
+          @Override
+          public void reportUsage(String resource, String data) {
+            HAL.reportUsage(resource, data);
+          }
+
+          @Override
+          public void reportDriverStationError(String error) {
+            DriverStationErrors.reportError(error, true);
+          }
+
+          @Override
+          public Long getRobotMainThreadId() {
+            return RobotBase.getMainThreadId();
+          }
+
+          @Override
+          public boolean isSystemcore() {
+            return !RobotBase.isSimulation();
+          }
+        };
+
+    CameraServerSharedStore.setCameraServerShared(shared);
+  }
 
   /**
    * Start automatically capturing images to send to the dashboard.

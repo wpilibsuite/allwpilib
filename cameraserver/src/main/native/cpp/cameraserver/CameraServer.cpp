@@ -14,6 +14,8 @@
 #include "wpi/cameraserver/CameraServerShared.hpp"
 #include "wpi/cs/VideoEvent.hpp"
 #include "wpi/cs/VideoListener.hpp"
+#include "wpi/framework/RobotBase.hpp"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
 #include "wpi/nt/NetworkTable.hpp"
@@ -21,6 +23,7 @@
 #include "wpi/nt/StringArrayTopic.hpp"
 #include "wpi/nt/StringTopic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/system/Errors.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
@@ -34,6 +37,33 @@ static constexpr char const* kPublishName = "/CameraPublisher";
 namespace {
 
 struct Instance;
+
+class WPILibCameraServerShared : public wpi::CameraServerShared {
+ public:
+  void ReportUsage(std::string_view resource, std::string_view data) override {
+    HAL_ReportUsage(resource, data);
+  }
+
+  void SetCameraServerErrorV(std::string_view format,
+                             std::format_args args) override {
+    ReportErrorV(err::CameraServerError, __FILE__, __LINE__, __FUNCTION__,
+                 format, args);
+  }
+
+  void SetVisionRunnerErrorV(std::string_view format,
+                             std::format_args args) override {
+    ReportErrorV(err::Error, __FILE__, __LINE__, __FUNCTION__, format, args);
+  }
+
+  void ReportDriverStationErrorV(std::string_view format,
+                                 std::format_args args) override {
+    ReportErrorV(err::Error, __FILE__, __LINE__, __FUNCTION__, format, args);
+  }
+
+  std::pair<std::thread::id, bool> GetRobotMainThreadId() const override {
+    return std::pair{RobotBase::GetThreadId(), true};
+  }
+};
 
 struct PropertyPublisher {
   PropertyPublisher(nt::NetworkTable& table, const cs::VideoEvent& event);
@@ -469,6 +499,10 @@ Instance::Instance() {
         }
       },
       0x4fff, true};
+}
+
+void CameraServer::Initialize() {
+  CameraServer_SetCameraServerShared(new WPILibCameraServerShared{});
 }
 
 cs::UsbCamera CameraServer::StartAutomaticCapture() {

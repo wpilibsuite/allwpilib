@@ -6,10 +6,6 @@
 
 #include <stdint.h>
 
-#ifdef __FIRST_SYSTEMCORE__
-#include <dlfcn.h>
-#endif
-
 #include <cstdio>
 #include <format>
 #include <memory>
@@ -17,7 +13,6 @@
 #include <string_view>
 #include <utility>
 
-#include "wpi/cameraserver/CameraServerShared.hpp"
 #include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/HAL.h"
@@ -35,8 +30,6 @@ static_assert(wpi::RuntimeType::SYSTEMCORE ==
               static_cast<wpi::RuntimeType>(HAL_RUNTIME_SYSTEMCORE));
 static_assert(wpi::RuntimeType::SIMULATION ==
               static_cast<wpi::RuntimeType>(HAL_RUNTIME_SIMULATION));
-
-using SetCameraServerSharedFP = void (*)(wpi::CameraServerShared*);
 
 using namespace wpi;
 
@@ -57,28 +50,6 @@ int wpi::RunHALInitialization() {
 std::thread::id RobotBase::m_threadId;
 
 namespace {
-class WPILibCameraServerShared : public wpi::CameraServerShared {
- public:
-  void ReportUsage(std::string_view resource, std::string_view data) override {
-    HAL_ReportUsage(resource, data);
-  }
-  void SetCameraServerErrorV(std::string_view format,
-                             std::format_args args) override {
-    ReportErrorV(err::CameraServerError, __FILE__, __LINE__, __FUNCTION__,
-                 format, args);
-  }
-  void SetVisionRunnerErrorV(std::string_view format,
-                             std::format_args args) override {
-    ReportErrorV(err::Error, __FILE__, __LINE__, __FUNCTION__, format, args);
-  }
-  void ReportDriverStationErrorV(std::string_view format,
-                                 std::format_args args) override {
-    ReportErrorV(err::Error, __FILE__, __LINE__, __FUNCTION__, format, args);
-  }
-  std::pair<std::thread::id, bool> GetRobotMainThreadId() const override {
-    return std::pair{RobotBase::GetThreadId(), true};
-  }
-};
 class WPILibMathShared : public wpi::math::MathShared {
  public:
   void ReportErrorV(std::string_view format, std::format_args args) override {
@@ -100,37 +71,6 @@ class WPILibMathShared : public wpi::math::MathShared {
   }
 };
 }  // namespace
-
-static void SetupCameraServerShared() {
-#ifdef __FIRST_SYSTEMCORE__
-#ifdef DYNAMIC_CAMERA_SERVER
-#ifdef DYNAMIC_CAMERA_SERVER_DEBUG
-  auto cameraServerLib = dlopen("libcameraserverd.so", RTLD_NOW);
-#else
-  auto cameraServerLib = dlopen("libcameraserver.so", RTLD_NOW);
-#endif
-
-  if (!cameraServerLib) {
-    std::puts("Camera Server Library Not Found");
-    std::fflush(stdout);
-    return;
-  }
-  auto symbol = dlsym(cameraServerLib, "CameraServer_SetCameraServerShared");
-  if (symbol) {
-    auto setCameraServerShared = (SetCameraServerSharedFP)symbol;
-    setCameraServerShared(new WPILibCameraServerShared{});
-  } else {
-    std::puts("Camera Server Shared Symbol Missing");
-    std::fflush(stdout);
-  }
-#else
-  CameraServer_SetCameraServerShared(new WPILibCameraServerShared{});
-#endif
-#else
-  std::puts("Not loading CameraServerShared");
-  std::fflush(stdout);
-#endif
-}
 
 static void SetupMathShared() {
   wpi::math::MathSharedStore::SetMathShared(
@@ -188,7 +128,6 @@ RuntimeType RobotBase::GetRuntimeType() {
 RobotBase::RobotBase() {
   m_threadId = std::this_thread::get_id();
 
-  SetupCameraServerShared();
   SetupMathShared();
 
   auto inst = wpi::nt::NetworkTableInstance::GetDefault();

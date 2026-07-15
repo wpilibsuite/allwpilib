@@ -27,6 +27,16 @@ class CameraServer {
   static constexpr uint16_t kBasePort = 1181;
 
   /**
+   * Initializes CameraServer integration with WPILib robot code.
+   *
+   * Call this once from robot code before using CameraServer or VisionRunner
+   * APIs when using the CameraServer vendordep. This enables HAL usage
+   * reporting, Driver Station error reporting, and main robot thread detection
+   * for vision processing helpers.
+   */
+  static void Initialize();
+
+  /**
    * Start automatically capturing images to send to the dashboard.
    *
    * You should call this method to see a camera feed on the dashboard. If you

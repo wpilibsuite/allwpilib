@@ -86,25 +86,27 @@ All artifacts are based at `org.wpilib.artifactname` in the repository.
   * wpiutil
 
 * cameraserver
-  * ntcore
   * cscore
+  * hal
+  * ntcore
   * opencv
+  * wpilibc
+  * wpilibj
   * wpinet
   * wpiutil
 
 * wpilibj
   * hal
-  * cameraserver
+  * datalog
   * ntcore
-  * cscore
+  * wpimath
   * wpinet
   * wpiutil
 
 * wpilibc
   * hal
-  * cameraserver
+  * datalog
   * ntcore
-  * cscore
   * wpimath
   * wpinet
   * wpiutil
@@ -112,9 +114,7 @@ All artifacts are based at `org.wpilib.artifactname` in the repository.
 * commandsv2
   * wpilibc
   * hal
-  * cameraserver
   * ntcore
-  * cscore
   * wpimath
   * wpinet
   * wpiutil

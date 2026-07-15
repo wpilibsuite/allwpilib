@@ -1354,7 +1354,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
         name_transforms = NAME_TRANSFORMS,
-        generation_defines = ["DYNAMIC_CAMERA_SERVER 1"],
     )
 
     create_pybind_library(
@@ -1386,7 +1385,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         extra_hdrs = extra_hdrs,
         extra_srcs = srcs,
         includes = includes,
-        local_defines = ["DYNAMIC_CAMERA_SERVER=1"],
     )
 
     native.filegroup(

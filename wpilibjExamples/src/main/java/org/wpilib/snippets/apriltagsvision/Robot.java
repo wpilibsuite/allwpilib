@@ -32,6 +32,7 @@ import org.wpilib.vision.stream.CameraServer;
 public class Robot extends TimedRobot {
   /** Called once at the beginning of the robot program. */
   public Robot() {
+    CameraServer.initialize();
     var visionThread = new Thread(this::apriltagVisionThreadProc);
     visionThread.setDaemon(true);
     visionThread.start();

@@ -90,8 +90,6 @@ wpilib_java_library(
     maven_group_id = "org.wpilib.wpilibj",
     visibility = ["//visibility:public"],
     deps = [
-        "//cameraserver:cameraserver-java",
-        "//cscore:cscore-java",
         "//datalog:datalog-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",

@@ -1,0 +1,76 @@
+{
+  "fileName": "CameraServer.json",
+  "name": "CameraServer",
+  "version": "1.0.0",
+  "uuid": "19049c8a-7635-4aca-aa7d-1fdde2c10eed",
+  "wpilibYear": "2027_alpha5",
+  "mavenUrls": [],
+  "jsonUrl": "",
+  "javaDependencies": [
+    {
+      "groupId": "org.wpilib.cscore",
+      "artifactId": "cscore-java",
+      "version": "wpilib"
+    },
+    {
+      "groupId": "org.wpilib.cameraserver",
+      "artifactId": "cameraserver-java",
+      "version": "wpilib"
+    }
+  ],
+  "jniDependencies": [
+    {
+      "groupId": "org.wpilib.cscore",
+      "artifactId": "cscore-cpp",
+      "version": "wpilib",
+      "skipInvalidPlatforms": true,
+      "isJar": false,
+      "validPlatforms": [
+        "linuxsystemcore",
+        "linuxarm64",
+        "windowsx86-64",
+        "windowsarm64",
+        "linuxx86-64",
+        "osxuniversal"
+      ]
+    }
+  ],
+  "cppDependencies": [
+    {
+      "groupId": "org.wpilib.cscore",
+      "artifactId": "cscore-cpp",
+      "version": "wpilib",
+      "libName": "cscore",
+      "headerClassifier": "headers",
+      "sourcesClassifier": "sources",
+      "sharedLibrary": true,
+      "skipInvalidPlatforms": true,
+      "binaryPlatforms": [
+        "linuxsystemcore",
+        "linuxarm64",
+        "windowsx86-64",
+        "windowsarm64",
+        "linuxx86-64",
+        "osxuniversal"
+      ]
+    },
+    {
+      "groupId": "org.wpilib.cameraserver",
+      "artifactId": "cameraserver-cpp",
+      "version": "wpilib",
+      "libName": "cameraserver",
+      "headerClassifier": "headers",
+      "sourcesClassifier": "sources",
+      "sharedLibrary": true,
+      "skipInvalidPlatforms": true,
+      "binaryPlatforms": [
+        "linuxsystemcore",
+        "linuxarm64",
+        "windowsx86-64",
+        "windowsarm64",
+        "linuxx86-64",
+        "osxuniversal"
+      ]
+    }
+  ]
+}
