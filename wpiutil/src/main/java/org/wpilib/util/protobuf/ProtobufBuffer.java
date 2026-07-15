@@ -58,8 +58,8 @@ public final class ProtobufBuffer<T, MessageType extends ProtoMessage<?>> {
   }
 
   /**
-   * Serializes a value to a ByteBuffer. The returned ByteBuffer has its
-   * position set to the end of the serialized data.
+   * Serializes a value to a ByteBuffer. The returned ByteBuffer has its position set to the end of
+   * the serialized data.
    *
    * @param value value
    * @return byte buffer
