@@ -6,6 +6,8 @@ ext {
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':cscore')
 evaluationDependsOn(':hal')
+evaluationDependsOn(':wpilibc')
+evaluationDependsOn(':wpilibj')
 
 apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
 
@@ -13,7 +15,9 @@ dependencies {
     implementation project(':wpiutil')
     implementation project(':wpinet')
     implementation project(':ntcore')
-    implementation project(':cscore')
+    implementation project(':hal')
+    api project(':cscore')
+    implementation project(':wpilibj')
 }
 
 ext {
@@ -41,7 +45,9 @@ model {
                 return
             }
             project(':ntcore').addNtcoreDependency(it, 'shared')
+            project(':hal').addHalDependency(it, 'shared')
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
+            lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
         }

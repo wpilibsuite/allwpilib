@@ -25,7 +25,9 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cscore",
+        "//hal:wpiHal",
         "//ntcore",
+        "//wpilibc",
     ],
 )
 
@@ -33,7 +35,9 @@ wpilib_cc_shared_library(
     name = "shared/cameraserver",
     dynamic_deps = [
         "//cscore:shared/cscore",
+        "//hal:shared/wpiHal",
         "//ntcore:shared/ntcore",
+        "//wpilibc:shared/wpilibc",
         "//wpiutil:shared/wpiutil",
     ] + opencv_shared_libraries,
     visibility = ["//visibility:public"],
@@ -45,6 +49,7 @@ wpilib_cc_static_library(
     static_deps = [
         "//cscore:static/cscore",
         "//ntcore:static/ntcore",
+        "//wpilibc:static/wpilibc",
     ],
     visibility = ["//visibility:public"],
     deps = [":cameraserver"],
@@ -60,6 +65,7 @@ wpilib_java_library(
         "//cscore:cscore-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
+        "//wpilibj:wpilibj-java",
         "//wpimath:wpimath-java",
         "//wpinet:wpinet-java",
         "//wpiutil:wpiutil-java",
