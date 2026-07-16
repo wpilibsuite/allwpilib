@@ -85,22 +85,20 @@ class ElevatorSimTest {
             0.0,
             1.0,
             true,
-            0.0,
-            0.01,
             0.0);
 
     for (int i = 0; i < 100; i++) {
       sim.setInput(VecBuilder.fill(0));
       sim.update(0.020);
       var height = sim.getPosition();
-      assertTrue(height >= -0.05);
+      assertTrue(height >= 0.0);
     }
 
     for (int i = 0; i < 100; i++) {
       sim.setInput(VecBuilder.fill(12.0));
       sim.update(0.020);
       var height = sim.getPosition();
-      assertTrue(height <= 1.05);
+      assertTrue(height <= 1.0);
     }
   }
 
