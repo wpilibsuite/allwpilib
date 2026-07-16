@@ -57,9 +57,6 @@ sourceSets {
         resources {
             srcDirs 'src/main/native/resources'
         }
-        java {
-            srcDir "${buildDir}/generated/sources/annotationProcessor/java/main"
-        }
     }
 }
 
