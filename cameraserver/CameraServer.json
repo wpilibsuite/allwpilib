@@ -8,6 +8,11 @@
   "jsonUrl": "",
   "javaDependencies": [
     {
+      "groupId": "org.wpilib.thirdparty.opencv",
+      "artifactId": "opencv-java",
+      "version": "2027-4.13.0-3"
+    },
+    {
       "groupId": "org.wpilib.cscore",
       "artifactId": "cscore-java",
       "version": "wpilib"
@@ -19,6 +24,21 @@
     }
   ],
   "jniDependencies": [
+    {
+      "groupId": "org.wpilib.thirdparty.opencv",
+      "artifactId": "opencv-cpp",
+      "version": "2027-4.13.0-3",
+      "skipInvalidPlatforms": true,
+      "isJar": false,
+      "validPlatforms": [
+        "linuxsystemcore",
+        "linuxarm64",
+        "windowsx86-64",
+        "windowsarm64",
+        "linuxx86-64",
+        "osxuniversal"
+      ]
+    },
     {
       "groupId": "org.wpilib.cscore",
       "artifactId": "cscore-cpp",
