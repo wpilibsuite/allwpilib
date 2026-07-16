@@ -27,7 +27,9 @@ static constexpr size_t kAllocSize = kMTU - 10;
 static constexpr size_t kNewFrameThresholdBytes = kAllocSize - 50;
 static constexpr size_t kFlushThresholdFrames = 32;
 static constexpr size_t kFlushThresholdBytes = 16384;
+#ifndef __SANITIZE_ADDRESS__
 static constexpr size_t kMaxPoolSize = 32;
+#endif
 
 class WebSocketConnection::Stream final : public wpi::util::raw_ostream {
  public:
