@@ -3,7 +3,7 @@ load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//commandsv3:generate.bzl", "generate_commandsv3")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
+load("//shared/bazel/rules:java_rules.bzl", "patch_module", "wpilib_java_junit5_test", "wpilib_java_library")
 
 py_binary(
     name = "generate_files",
@@ -49,7 +49,10 @@ wpilib_java_library(
     name = "commandsv3-java",
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
     exported_plugins = ["//javacPlugin:plugin"],
-    javacopts = ["--patch-module=wpilib.command3=commandsv3/src/generated/main/java"],
+    javacopts = patch_module(
+        "wpilib.command3",
+        ["commandsv3/src/generated/main/java"],
+    ),
     maven_artifact_name = "commands3-java",
     maven_group_id = "org.wpilib",
     plugins = ["//javacPlugin:plugin"],
