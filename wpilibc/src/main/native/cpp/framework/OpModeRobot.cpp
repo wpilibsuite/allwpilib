@@ -5,12 +5,11 @@
 #include "wpi/framework/OpModeRobot.hpp"
 
 #include <cstdlib>
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
@@ -25,13 +24,14 @@
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/util/SafeThread.hpp"
+#include "wpi/util/print.hpp"
 
 using namespace wpi;
 
 OpModeRobotBase::OpModeRobotBase(wpi::units::second_t period)
     : m_period{period},
       m_loopOverrunAlert{
-          fmt::format("Loop time of {:.6f}s overrun", m_period.value()),
+          std::format("Loop time of {:.6f}s overrun", m_period.value()),
           Alert::Level::MEDIUM},
       m_watchdog{period, [this] { m_loopOverrunAlert.Set(true); }} {
   // Create our own notifier and callback queue
@@ -85,8 +85,8 @@ void OpModeRobotBase::LoopFunc() {
     if (data.factory) {
       // Instantiate the new opmode
       m_currentOpModeName = data.name;
-      fmt::print("********** Creating OpMode {} **********\n",
-                 m_currentOpModeName);
+      wpi::util::print("********** Creating OpMode {} **********\n",
+                       m_currentOpModeName);
       m_currentOpMode = data.factory();
       if (m_currentOpMode) {
         // Register the opmode's additional periodic callbacks immediately on
@@ -185,7 +185,7 @@ void OpModeRobotBase::LoopFunc() {
 }
 
 void OpModeRobotBase::StartCompetition() {
-  fmt::print("********** Robot program startup complete **********\n");
+  wpi::util::print("********** Robot program startup complete **********\n");
 
   if constexpr (IsSimulation()) {
     SimulationInit();
@@ -251,7 +251,7 @@ void OpModeRobotBase::StartCurrentOpMode() {
     return;
   }
 
-  fmt::print("********** Starting OpMode {} **********\n", m_currentOpModeName);
+  std::print("********** Starting OpMode {} **********\n", m_currentOpModeName);
 
   // Register the main opmode periodic callback. Capture a weak_ptr so a queued
   // callback can never resurrect or outlive a destroyed opmode.
@@ -275,7 +275,7 @@ void OpModeRobotBase::EndCurrentOpMode() {
 
   // If the opmode was started, end it and remove its main periodic callback.
   if (m_opmodePeriodic) {
-    fmt::print("********** Ending OpMode {} **********\n", m_currentOpModeName);
+    std::print("********** Ending OpMode {} **********\n", m_currentOpModeName);
 
     m_currentOpMode->End();
     m_watchdog.AddEpoch("OpMode::End()");
@@ -293,6 +293,6 @@ void OpModeRobotBase::EndCurrentOpMode() {
   m_activeOpModeCallbacks.clear();
 
   // Regardless of whether opmode was started, destroy it
-  fmt::print("********** Closing OpMode {} **********\n", m_currentOpModeName);
+  std::print("********** Closing OpMode {} **********\n", m_currentOpModeName);
   m_currentOpMode.reset();
 }

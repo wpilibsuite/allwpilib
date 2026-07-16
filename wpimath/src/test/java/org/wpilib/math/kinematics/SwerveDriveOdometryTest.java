@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.TrajectoryConfig;
-import org.wpilib.math.trajectory.TrajectoryGenerator;
 
 class SwerveDriveOdometryTest {
   private final Translation2d m_fl = new Translation2d(12, 12);
@@ -165,7 +165,7 @@ class SwerveDriveOdometryTest {
     SwerveModulePosition br = new SwerveModulePosition();
 
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
                 new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
@@ -250,7 +250,7 @@ class SwerveDriveOdometryTest {
     SwerveModulePosition br = new SwerveModulePosition();
 
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
                 new Pose2d(3, 0, Rotation2d.kCW_Pi_2),

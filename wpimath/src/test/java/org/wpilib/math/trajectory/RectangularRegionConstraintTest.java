@@ -24,7 +24,7 @@ class RectangularRegionConstraintTest {
             new Translation2d(Units.feetToMeters(5.0), Units.feetToMeters(27.0)));
 
     var trajectory =
-        TrajectoryGeneratorTest.getTrajectory(
+        DrivetrainSplineTrajectoryGeneratorTest.getTrajectory(
             List.of(
                 new RectangularRegionConstraint(
                     rectangle, new MaxVelocityConstraint(maxVelocity))));

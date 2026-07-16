@@ -15,8 +15,8 @@ import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.random.Normal;
 import org.wpilib.math.system.LinearSystem;
+import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.TrajectoryConfig;
-import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.math.util.Nat;
 
 class KalmanFilterTest {
@@ -199,7 +199,7 @@ class KalmanFilterTest {
             dt);
 
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(new Pose2d(0.0, 0.0, Rotation2d.kZero), new Pose2d(5.0, 5.0, Rotation2d.kZero)),
             new TrajectoryConfig(2.0, 2.0));
 

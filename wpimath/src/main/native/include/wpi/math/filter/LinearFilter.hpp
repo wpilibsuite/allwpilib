@@ -5,10 +5,11 @@
 #pragma once
 
 #include <algorithm>
+#include <cstddef>
 #include <initializer_list>
 #include <span>
 #include <stdexcept>
-#include <type_traits>
+#include <string>
 #include <vector>
 
 #include <Eigen/QR>

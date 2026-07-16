@@ -10,80 +10,80 @@ import wpimath.units
 
 
 class DriveConstants:
-    kLeftMotor1Port = 0
-    kLeftMotor2Port = 1
-    kRightMotor1Port = 2
-    kRightMotor2Port = 3
+    LEFT_MOTOR1_PORT = 0
+    LEFT_MOTOR2_PORT = 1
+    RIGHT_MOTOR1_PORT = 2
+    RIGHT_MOTOR2_PORT = 3
 
-    kLeftEncoderPorts = (0, 1)
-    kRightEncoderPorts = (2, 3)
-    kLeftEncoderReversed = False
-    kRightEncoderReversed = True
+    LEFT_ENCODER_PORTS = (0, 1)
+    RIGHT_ENCODER_PORTS = (2, 3)
+    LEFT_ENCODER_REVERSED = False
+    RIGHT_ENCODER_REVERSED = True
 
-    kEncoderCPR = 1024
-    kWheelDiameter = wpimath.units.inchesToMeters(6)
-    kEncoderDistancePerPulse = (kWheelDiameter * math.pi) / kEncoderCPR
+    ENCODER_CPR = 1024
+    WHEEL_DIAMETER = wpimath.units.inches_to_meters(6)
+    ENCODER_DISTANCE_PER_PULSE = (WHEEL_DIAMETER * math.pi) / ENCODER_CPR
 
     # These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     # These values MUST be determined either experimentally or theoretically for *your* robot's
     # drive. The SysId tool provides a convenient method for obtaining feedback and feedforward
     # values for your robot.
-    kTurnP = 1.0
-    kTurnI = 0.0
-    kTurnD = 0.0
+    TURN_P = 1.0
+    TURN_I = 0.0
+    TURN_D = 0.0
 
-    kTurnToleranceDeg = 5.0
-    kTurnRateToleranceDegPerS = 10.0  # degrees per second
+    TURN_TOLERANCE_DEG = 5.0
+    TURN_RATE_TOLERANCE_DEG_PER_S = 10.0  # degrees per second
 
-    kMaxTurnRateDegPerS = 100
-    kMaxTurnAccelerationDegPerSSquared = 300
+    MAX_TURN_RATE_DEG_PER_S = 100
+    MAX_TURN_ACCELERATION_DEG_PER_S_SQUARED = 300
 
-    kS = 1.0  # V
-    kV = 0.8  # V/(deg/s)
-    kA = 0.15  # V/(deg/s^2)
+    S = 1.0  # V
+    V = 0.8  # V/(deg/s)
+    A = 0.15  # V/(deg/s^2)
 
 
 class ShooterConstants:
-    kEncoderPorts = (4, 5)
-    kEncoderReversed = False
-    kEncoderCPR = 1024
+    ENCODER_PORTS = (4, 5)
+    ENCODER_REVERSED = False
+    ENCODER_CPR = 1024
     # Distance units will be rotations
-    kEncoderDistancePerPulse = 1.0 / kEncoderCPR
+    ENCODER_DISTANCE_PER_PULSE = 1.0 / ENCODER_CPR
 
-    kShooterMotorPort = 4
-    kFeederMotorPort = 5
+    SHOOTER_MOTOR_PORT = 4
+    FEEDER_MOTOR_PORT = 5
 
-    kShooterFreeRPS = 5300.0
-    kShooterTargetRPS = 4000.0
-    kShooterToleranceRPS = 50.0
+    SHOOTER_FREE_RPS = 5300.0
+    SHOOTER_TARGET_RPS = 4000.0
+    SHOOTER_TOLERANCE_RPS = 50.0
 
     # These are not real PID gains, and will have to be tuned for your specific robot.
-    kP = 1.0
+    P = 1.0
 
     # On a real robot the feedforward constants should be empirically determined; these are
     # reasonable guesses.
-    kS = 0.05  # V
+    S = 0.05  # V
     # Should have value 12V at free velocity
-    kV = 12.0 / kShooterFreeRPS  # V/(rot/s)
+    V = 12.0 / SHOOTER_FREE_RPS  # V/(rot/s)
 
-    kFeederVelocity = 0.5
+    FEEDER_VELOCITY = 0.5
 
 
 class IntakeConstants:
-    kMotorPort = 6
-    kSolenoidPorts = (2, 3)
+    MOTOR_PORT = 6
+    SOLENOID_PORTS = (2, 3)
 
 
 class StorageConstants:
-    kMotorPort = 7
-    kBallSensorPort = 6
+    MOTOR_PORT = 7
+    BALL_SENSOR_PORT = 6
 
 
 class AutoConstants:
-    kTimeout = 3
-    kDriveDistance = 2.0  # m
-    kDriveVelocity = 0.5
+    TIMEOUT = 3
+    DRIVE_DISTANCE = 2.0  # m
+    DRIVE_VELOCITY = 0.5
 
 
 class OIConstants:
-    kDriverControllerPort = 0
+    DRIVER_CONTROLLER_PORT = 0

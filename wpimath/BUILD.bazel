@@ -1,5 +1,5 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
@@ -175,6 +175,7 @@ wpilib_cc_library(
 
 generate_def_windows(
     name = "wpimath_def",
+    dll_name = "wpimath",
     filters = [
         ".pb.obj",
         ".npb.obj",
@@ -239,7 +240,7 @@ wpilib_jni_java_library(
     ],
     maven_artifact_name = "wpimath-java",
     maven_group_id = "org.wpilib.wpimath",
-    native_libs = [":wpimathjni"],
+    native_libs = [":shared/wpimathjni"],
     plugins = [
         "//:avaje_jsonb_generator",
     ],
@@ -252,9 +253,7 @@ wpilib_jni_java_library(
         "//wpiutil:wpiutil-java",
         "@maven//:io_avaje_avaje_json_core",
         "@maven//:io_avaje_avaje_jsonb",
-        "@maven//:org_ejml_ejml_core",
-        "@maven//:org_ejml_ejml_ddense",
-        "@maven//:org_ejml_ejml_simple",
+        "@maven//:org_ejml_ejml_java9module",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
@@ -292,9 +291,7 @@ wpilib_java_junit5_test(
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
         "@maven//:io_avaje_avaje_jsonb",
-        "@maven//:org_ejml_ejml_core",
-        "@maven//:org_ejml_ejml_ddense",
-        "@maven//:org_ejml_ejml_simple",
+        "@maven//:org_ejml_ejml_java9module",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )

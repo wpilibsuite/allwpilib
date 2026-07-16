@@ -19,8 +19,8 @@ class CentripetalAccelerationConstraintTest {
     double maxCentripetalAcceleration = Units.feetToMeters(7.0); // 7 feet per second squared
     var constraint = new CentripetalAccelerationConstraint(maxCentripetalAcceleration);
 
-    Trajectory<SplineSample> trajectory =
-        TrajectoryGenerator.generateTrajectory(
+    Trajectory<DrivetrainSplineSample> trajectory =
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(new Pose2d(0, 0, Rotation2d.kZero), new Pose2d(1, 0, Rotation2d.kZero)),
             new TrajectoryConfig(1, 1).addConstraint(constraint));
 

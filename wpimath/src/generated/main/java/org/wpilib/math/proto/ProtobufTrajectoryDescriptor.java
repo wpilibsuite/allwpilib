@@ -9,48 +9,52 @@ import us.hebi.quickbuf.ProtoUtil;
 import us.hebi.quickbuf.RepeatedByte;
 
 public final class ProtobufTrajectoryDescriptor {
-  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(1811,
-    "ChB0cmFqZWN0b3J5LnByb3RvEgl3cGkucHJvdG8aEGdlb21ldHJ5MmQucHJvdG8aEGtpbmVtYXRpY3Mu" + 
-    "cHJvdG8i/AEKGFByb3RvYnVmVHJhamVjdG9yeVNhbXBsZRIcCgl0aW1lc3RhbXAYASABKAFSCXRpbWVz" + 
-    "dGFtcBItCgRwb3NlGAIgASgLMhkud3BpLnByb3RvLlByb3RvYnVmUG9zZTJkUgRwb3NlEkQKCnZlbG9j" + 
-    "aXRpZXMYAyABKAsyJC53cGkucHJvdG8uUHJvdG9idWZDaGFzc2lzVmVsb2NpdGllc1IKdmVsb2NpdGll" + 
-    "cxJNCg1hY2NlbGVyYXRpb25zGAQgASgLMicud3BpLnByb3RvLlByb3RvYnVmQ2hhc3Npc0FjY2VsZXJh" + 
-    "dGlvbnNSDWFjY2VsZXJhdGlvbnMiygIKGlByb3RvYnVmRGlmZmVyZW50aWFsU2FtcGxlEhwKCXRpbWVz" + 
-    "dGFtcBgBIAEoAVIJdGltZXN0YW1wEi0KBHBvc2UYAiABKAsyGS53cGkucHJvdG8uUHJvdG9idWZQb3Nl" + 
-    "MmRSBHBvc2USRAoKdmVsb2NpdGllcxgDIAEoCzIkLndwaS5wcm90by5Qcm90b2J1ZkNoYXNzaXNWZWxv" + 
-    "Y2l0aWVzUgp2ZWxvY2l0aWVzEk0KDWFjY2VsZXJhdGlvbnMYBCABKAsyJy53cGkucHJvdG8uUHJvdG9i" + 
-    "dWZDaGFzc2lzQWNjZWxlcmF0aW9uc1INYWNjZWxlcmF0aW9ucxIjCg1sZWZ0X3ZlbG9jaXR5GAUgASgB" + 
-    "UgxsZWZ0VmVsb2NpdHkSJQoOcmlnaHRfdmVsb2NpdHkYBiABKAFSDXJpZ2h0VmVsb2NpdHkiXAobUHJv" + 
-    "dG9idWZIb2xvbm9taWNUcmFqZWN0b3J5Ej0KB3NhbXBsZXMYASADKAsyIy53cGkucHJvdG8uUHJvdG9i" + 
-    "dWZUcmFqZWN0b3J5U2FtcGxlUgdzYW1wbGVzImEKHlByb3RvYnVmRGlmZmVyZW50aWFsVHJhamVjdG9y" + 
-    "eRI/CgdzYW1wbGVzGAEgAygLMiUud3BpLnByb3RvLlByb3RvYnVmRGlmZmVyZW50aWFsU2FtcGxlUgdz" + 
-    "YW1wbGVzQjcKFW9yZy53cGlsaWIubWF0aC5wcm90b0IcUHJvdG9idWZUcmFqZWN0b3J5RGVzY3JpcHRv" + 
-    "clABSoEHCgYSBAAAIwEKCAoBDBIDAAASCggKAQISAwIAEgoJCgIDABIDBAAaCgkKAgMBEgMFABoKCAoB" + 
-    "CBIDBwAuCgkKAggBEgMHAC4KCAoBCBIDCQA9CgkKAggIEgMJAD0KCAoBCBIDCwAiCgkKAggKEgMLACIK" + 
-    "CgoCBAASBA0AEgEKCgoDBAABEgMNCCAKCwoEBAACABIDDgIXCgwKBQQAAgAFEgMOAggKDAoFBAACAAES" + 
-    "Aw4JEgoMCgUEAAIAAxIDDhUWCgsKBAQAAgESAw8CGgoMCgUEAAIBBhIDDwIQCgwKBQQAAgEBEgMPERUK" + 
-    "DAoFBAACAQMSAw8YGQoLCgQEAAICEgMQAisKDAoFBAACAgYSAxACGwoMCgUEAAICARIDEBwmCgwKBQQA",
-    "AgIDEgMQKSoKCwoEBAACAxIDEQIxCgwKBQQAAgMGEgMRAh4KDAoFBAACAwESAxEfLAoMCgUEAAIDAxID" + 
-    "ES8wCgoKAgQBEgQUABsBCgoKAwQBARIDFAgiCgsKBAQBAgASAxUCFwoMCgUEAQIABRIDFQIICgwKBQQB" + 
-    "AgABEgMVCRIKDAoFBAECAAMSAxUVFgoLCgQEAQIBEgMWAhoKDAoFBAECAQYSAxYCEAoMCgUEAQIBARID" + 
-    "FhEVCgwKBQQBAgEDEgMWGBkKCwoEBAECAhIDFwIrCgwKBQQBAgIGEgMXAhsKDAoFBAECAgESAxccJgoM" + 
-    "CgUEAQICAxIDFykqCgsKBAQBAgMSAxgCMQoMCgUEAQIDBhIDGAIeCgwKBQQBAgMBEgMYHywKDAoFBAEC" + 
-    "AwMSAxgvMAoLCgQEAQIEEgMZAhsKDAoFBAECBAUSAxkCCAoMCgUEAQIEARIDGQkWCgwKBQQBAgQDEgMZ" + 
-    "GRoKCwoEBAECBRIDGgIcCgwKBQQBAgUFEgMaAggKDAoFBAECBQESAxoJFwoMCgUEAQIFAxIDGhobCgoK" + 
-    "AgQCEgQdAB8BCgoKAwQCARIDHQgjCgsKBAQCAgASAx4CMAoMCgUEAgIABBIDHgIKCgwKBQQCAgAGEgMe" + 
-    "CyMKDAoFBAICAAESAx4kKwoMCgUEAgIAAxIDHi4vCgoKAgQDEgQhACMBCgoKAwQDARIDIQgmCgsKBAQD" + 
-    "AgASAyICMgoMCgUEAwIABBIDIgIKCgwKBQQDAgAGEgMiCyUKDAoFBAMCAAESAyImLQoMCgUEAwIAAxID" + 
-    "IjAxYgZwcm90bzM=");
+  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(1967,
+    "CiF3cGltYXRoL3Byb3RvYnVmL3RyYWplY3RvcnkucHJvdG8SCXdwaS5wcm90bxohd3BpbWF0aC9wcm90" + 
+    "b2J1Zi9nZW9tZXRyeTJkLnByb3RvGiF3cGltYXRoL3Byb3RvYnVmL2tpbmVtYXRpY3MucHJvdG8iLgoY" + 
+    "UHJvdG9idWZUcmFqZWN0b3J5U2FtcGxlEhIKBHRpbWUYASABKAFSBHRpbWUi8QEKF1Byb3RvYnVmSG9s" + 
+    "b25vbWljU2FtcGxlEhIKBHRpbWUYASABKAFSBHRpbWUSLQoEcG9zZRgCIAEoCzIZLndwaS5wcm90by5Q" + 
+    "cm90b2J1ZlBvc2UyZFIEcG9zZRJECgp2ZWxvY2l0aWVzGAMgASgLMiQud3BpLnByb3RvLlByb3RvYnVm" + 
+    "Q2hhc3Npc1ZlbG9jaXRpZXNSCnZlbG9jaXRpZXMSTQoNYWNjZWxlcmF0aW9ucxgEIAEoCzInLndwaS5w" + 
+    "cm90by5Qcm90b2J1ZkNoYXNzaXNBY2NlbGVyYXRpb25zUg1hY2NlbGVyYXRpb25zIsACChpQcm90b2J1" + 
+    "ZkRpZmZlcmVudGlhbFNhbXBsZRISCgR0aW1lGAEgASgBUgR0aW1lEi0KBHBvc2UYAiABKAsyGS53cGku" + 
+    "cHJvdG8uUHJvdG9idWZQb3NlMmRSBHBvc2USRAoKdmVsb2NpdGllcxgDIAEoCzIkLndwaS5wcm90by5Q" + 
+    "cm90b2J1ZkNoYXNzaXNWZWxvY2l0aWVzUgp2ZWxvY2l0aWVzEk0KDWFjY2VsZXJhdGlvbnMYBCABKAsy" + 
+    "Jy53cGkucHJvdG8uUHJvdG9idWZDaGFzc2lzQWNjZWxlcmF0aW9uc1INYWNjZWxlcmF0aW9ucxIjCg1s" + 
+    "ZWZ0X3ZlbG9jaXR5GAUgASgBUgxsZWZ0VmVsb2NpdHkSJQoOcmlnaHRfdmVsb2NpdHkYBiABKAFSDXJp" + 
+    "Z2h0VmVsb2NpdHkiWwobUHJvdG9idWZIb2xvbm9taWNUcmFqZWN0b3J5EjwKB3NhbXBsZXMYASADKAsy" + 
+    "Ii53cGkucHJvdG8uUHJvdG9idWZIb2xvbm9taWNTYW1wbGVSB3NhbXBsZXMiYQoeUHJvdG9idWZEaWZm" + 
+    "ZXJlbnRpYWxUcmFqZWN0b3J5Ej8KB3NhbXBsZXMYASADKAsyJS53cGkucHJvdG8uUHJvdG9idWZEaWZm" + 
+    "ZXJlbnRpYWxTYW1wbGVSB3NhbXBsZXNCNwoVb3JnLndwaWxpYi5tYXRoLnByb3RvQhxQcm90b2J1ZlRy" + 
+    "YWplY3RvcnlEZXNjcmlwdG9yUAFK0AcKBhIEAAAnAQoICgEMEgMAABIKCAoBAhIDAgASCgkKAgMAEgME" + 
+    "ACsKCQoCAwESAwUAKwoICgEIEgMHAC4KCQoCCAESAwcALgoICgEIEgMJAD0KCQoCCAgSAwkAPQoICgEI" + 
+    "EgMLACIKCQoCCAoSAwsAIgoKCgIEABIEDQAPAQoKCgMEAAESAw0IIAoLCgQEAAIAEgMOAhIKDAoFBAAC" + 
+    "AAUSAw4CCAoMCgUEAAIAARIDDgkNCgwKBQQAAgADEgMOEBEKCgoCBAESBBEAFgEKCgoDBAEBEgMRCB8K",
+    "CwoEBAECABIDEgISCgwKBQQBAgAFEgMSAggKDAoFBAECAAESAxIJDQoMCgUEAQIAAxIDEhARCgsKBAQB" + 
+    "AgESAxMCGgoMCgUEAQIBBhIDEwIQCgwKBQQBAgEBEgMTERUKDAoFBAECAQMSAxMYGQoLCgQEAQICEgMU" + 
+    "AisKDAoFBAECAgYSAxQCGwoMCgUEAQICARIDFBwmCgwKBQQBAgIDEgMUKSoKCwoEBAECAxIDFQIxCgwK" + 
+    "BQQBAgMGEgMVAh4KDAoFBAECAwESAxUfLAoMCgUEAQIDAxIDFS8wCgoKAgQCEgQYAB8BCgoKAwQCARID" + 
+    "GAgiCgsKBAQCAgASAxkCEgoMCgUEAgIABRIDGQIICgwKBQQCAgABEgMZCQ0KDAoFBAICAAMSAxkQEQoL" + 
+    "CgQEAgIBEgMaAhoKDAoFBAICAQYSAxoCEAoMCgUEAgIBARIDGhEVCgwKBQQCAgEDEgMaGBkKCwoEBAIC" + 
+    "AhIDGwIrCgwKBQQCAgIGEgMbAhsKDAoFBAICAgESAxscJgoMCgUEAgICAxIDGykqCgsKBAQCAgMSAxwC" + 
+    "MQoMCgUEAgIDBhIDHAIeCgwKBQQCAgMBEgMcHywKDAoFBAICAwMSAxwvMAoLCgQEAgIEEgMdAhsKDAoF" + 
+    "BAICBAUSAx0CCAoMCgUEAgIEARIDHQkWCgwKBQQCAgQDEgMdGRoKCwoEBAICBRIDHgIcCgwKBQQCAgUF" + 
+    "EgMeAggKDAoFBAICBQESAx4JFwoMCgUEAgIFAxIDHhobCgoKAgQDEgQhACMBCgoKAwQDARIDIQgjCgsK" + 
+    "BAQDAgASAyICLwoMCgUEAwIABBIDIgIKCgwKBQQDAgAGEgMiCyIKDAoFBAMCAAESAyIjKgoMCgUEAwIA" + 
+    "AxIDIi0uCgoKAgQEEgQlACcBCgoKAwQEARIDJQgmCgsKBAQEAgASAyYCMgoMCgUEBAIABBIDJgIKCgwK" + 
+    "BQQEAgAGEgMmCyUKDAoFBAQCAAESAyYmLQoMCgUEBAIAAxIDJjAxYgZwcm90bzM=");
 
-  static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("trajectory.proto", "wpi.proto", descriptorData, ProtobufGeometry2dDescriptor.getDescriptor(), ProtobufKinematicsDescriptor.getDescriptor());
+  static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("wpimath/protobuf/trajectory.proto", "wpi.proto", descriptorData, ProtobufGeometry2dDescriptor.getDescriptor(), ProtobufKinematicsDescriptor.getDescriptor());
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufTrajectorySample_descriptor = descriptor.internalContainedType(68, 252, "ProtobufTrajectorySample", "wpi.proto.ProtobufTrajectorySample");
+  static final Descriptors.Descriptor wpi_proto_ProtobufTrajectorySample_descriptor = descriptor.internalContainedType(118, 46, "ProtobufTrajectorySample", "wpi.proto.ProtobufTrajectorySample");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialSample_descriptor = descriptor.internalContainedType(323, 330, "ProtobufDifferentialSample", "wpi.proto.ProtobufDifferentialSample");
+  static final Descriptors.Descriptor wpi_proto_ProtobufHolonomicSample_descriptor = descriptor.internalContainedType(167, 241, "ProtobufHolonomicSample", "wpi.proto.ProtobufHolonomicSample");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufHolonomicTrajectory_descriptor = descriptor.internalContainedType(655, 92, "ProtobufHolonomicTrajectory", "wpi.proto.ProtobufHolonomicTrajectory");
+  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialSample_descriptor = descriptor.internalContainedType(411, 320, "ProtobufDifferentialSample", "wpi.proto.ProtobufDifferentialSample");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialTrajectory_descriptor = descriptor.internalContainedType(749, 97, "ProtobufDifferentialTrajectory", "wpi.proto.ProtobufDifferentialTrajectory");
+  static final Descriptors.Descriptor wpi_proto_ProtobufHolonomicTrajectory_descriptor = descriptor.internalContainedType(733, 91, "ProtobufHolonomicTrajectory", "wpi.proto.ProtobufHolonomicTrajectory");
+
+  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialTrajectory_descriptor = descriptor.internalContainedType(826, 97, "ProtobufDifferentialTrajectory", "wpi.proto.ProtobufDifferentialTrajectory");
 
   /**
    * @return this proto file's descriptor.

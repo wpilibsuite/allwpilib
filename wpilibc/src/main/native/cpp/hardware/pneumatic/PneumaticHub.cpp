@@ -6,10 +6,9 @@
 
 #include <array>
 #include <cstdio>
+#include <format>
 #include <memory>
 #include <string>
-
-#include <fmt/format.h>
 
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/REVPH.h"
@@ -433,7 +432,7 @@ Compressor PneumaticHub::MakeCompressor() {
 }
 
 void PneumaticHub::ReportUsage(std::string_view device, std::string_view data) {
-  HAL_ReportUsage(fmt::format("PH[{}]/{}", m_module, device), data);
+  HAL_ReportUsage(std::format("PH[{}]/{}", m_module, device), data);
 }
 
 std::shared_ptr<PneumaticsBase> PneumaticHub::GetForModule(int busId,

@@ -4,10 +4,9 @@
 
 #include "wpi/commands2/ProxyCommand.hpp"
 
+#include <format>
 #include <string>
 #include <utility>
-
-#include <fmt/format.h>
 
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
@@ -15,11 +14,11 @@ using namespace wpi::cmd;
 
 ProxyCommand::ProxyCommand(Command* command)
     : m_supplier([command] { return command; }) {
-  SetName(fmt::format("Proxy({})", command->GetName()));
+  SetName(std::format("Proxy({})", command->GetName()));
 }
 
 ProxyCommand::ProxyCommand(std::unique_ptr<Command> command) {
-  SetName(fmt::format("Proxy({})", command->GetName()));
+  SetName(std::format("Proxy({})", command->GetName()));
   m_supplier = [command = std::move(command)] { return command.get(); };
 }
 

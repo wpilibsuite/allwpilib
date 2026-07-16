@@ -141,8 +141,8 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
       wpi::units::meters_per_second_t rightVelocity,
       const DifferentialSample& desiredState) {
     return Calculate(currentPose, leftVelocity, rightVelocity,
-                     desiredState.pose, desiredState.leftSpeed,
-                     desiredState.rightSpeed);
+                     desiredState.pose, desiredState.leftVelocity,
+                     desiredState.rightVelocity);
   }
 
  private:

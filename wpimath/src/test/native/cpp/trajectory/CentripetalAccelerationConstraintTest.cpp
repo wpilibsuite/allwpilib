@@ -6,9 +6,12 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/math/trajectory/TestTrajectory.hpp"
+#include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
+#include "wpi/units/base.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 
 using namespace wpi::math;
@@ -20,7 +23,7 @@ TEST(CentripetalAccelerationConstraintTest, Constraint) {
   config.AddConstraint(
       CentripetalAccelerationConstraint(maxCentripetalAcceleration));
 
-  auto trajectory = TestTrajectory::GetTrajectory(config);
+  auto trajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
   for (auto t = 0_s; t < trajectory.Duration(); t += 20_ms) {
     auto point = trajectory.SampleAt(t);

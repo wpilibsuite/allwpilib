@@ -41,6 +41,6 @@ SEMIWRAP_PYBIND11_MODULE(m) {
   setup_safethread_gil();
 
   m.def("_setup_stack_trace_hook", &setup_stack_trace_hook);
-  m.def("SetNowImpl", &set_now_impl);
+  m.def("set_now_impl", &set_now_impl);
   m.add_object("_st_cleanup", cleanup);
 }

@@ -5,6 +5,7 @@
 package org.wpilib;
 
 import org.wpilib.framework.RobotBase;
+import org.wpilib.util.ConstructorMatch;
 
 /** This is the executor to launch template projects. */
 public final class Executor {
@@ -18,10 +19,18 @@ public final class Executor {
 
     System.out.println("Loading robot class: " + packagePath);
 
-    Class<?> robotClass = classLoader.loadClass(packagePath);
+    Class<? extends RobotBase> robotClass =
+        classLoader.loadClass(packagePath).asSubclass(RobotBase.class);
 
     System.out.println("Starting robot: " + robotClass.getName());
 
-    RobotBase.startRobot(robotClass.asSubclass(RobotBase.class));
+    RobotBase.startRobot(
+        () -> {
+          try {
+            return ConstructorMatch.findBestConstructor(robotClass).get().newInstance();
+          } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("Failed to construct robot", e.getCause());
+          }
+        });
   }
 }

@@ -599,16 +599,16 @@ static void StyleColorsDeepDark() {
 void gui::SetStyle(Style style) {
   gContext->style = static_cast<int>(style);
   switch (style) {
-    case kStyleClassic:
+    case Style::CLASSIC:
       ImGui::StyleColorsClassic();
       break;
-    case kStyleDark:
+    case Style::DARK:
       ImGui::StyleColorsDark();
       break;
-    case kStyleLight:
+    case Style::LIGHT:
       ImGui::StyleColorsLight();
       break;
-    case kStyleDeepDark:
+    case Style::DEEP_DARK:
       StyleColorsDeepDark();
       break;
   }
@@ -653,21 +653,21 @@ void gui::EmitViewMenu() {
   if (ImGui::BeginMenu("View")) {
     if (ImGui::BeginMenu("Style")) {
       bool selected;
-      selected = gContext->style == kStyleClassic;
+      selected = gContext->style == static_cast<int>(Style::CLASSIC);
       if (ImGui::MenuItem("Classic", nullptr, &selected, true)) {
-        SetStyle(kStyleClassic);
+        SetStyle(Style::CLASSIC);
       }
-      selected = gContext->style == kStyleDark;
+      selected = gContext->style == static_cast<int>(Style::DARK);
       if (ImGui::MenuItem("Dark", nullptr, &selected, true)) {
-        SetStyle(kStyleDark);
+        SetStyle(Style::DARK);
       }
-      selected = gContext->style == kStyleLight;
+      selected = gContext->style == static_cast<int>(Style::LIGHT);
       if (ImGui::MenuItem("Light", nullptr, &selected, true)) {
-        SetStyle(kStyleLight);
+        SetStyle(Style::LIGHT);
       }
-      selected = gContext->style == kStyleDeepDark;
+      selected = gContext->style == static_cast<int>(Style::DEEP_DARK);
       if (ImGui::MenuItem("Deep Dark", nullptr, &selected, true)) {
-        SetStyle(kStyleDeepDark);
+        SetStyle(Style::DEEP_DARK);
       }
       ImGui::EndMenu();
     }
@@ -736,9 +736,9 @@ bool gui::UpdateTextureFromImage(ImTextureID* texture, int width, int height,
   }
 
   if (width2 == width && height2 == height) {
-    UpdateTexture(*texture, kPixelRGBA, width2, height2, imgData);
+    UpdateTexture(*texture, PixelFormat::RGBA, width2, height2, imgData);
   } else {
-    *texture = CreateTexture(kPixelRGBA, width2, height2, imgData);
+    *texture = CreateTexture(PixelFormat::RGBA, width2, height2, imgData);
   }
 
   stbi_image_free(imgData);
@@ -756,7 +756,7 @@ bool gui::CreateTextureFromFile(const char* filename, ImTextureID* out_texture,
     return false;
   }
 
-  *out_texture = CreateTexture(kPixelRGBA, width, height, data);
+  *out_texture = CreateTexture(PixelFormat::RGBA, width, height, data);
   if (out_width) {
     *out_width = width;
   }
@@ -781,7 +781,7 @@ bool gui::CreateTextureFromImage(const unsigned char* data, int len,
     return false;
   }
 
-  *out_texture = CreateTexture(kPixelRGBA, width, height, imgData);
+  *out_texture = CreateTexture(PixelFormat::RGBA, width, height, imgData);
   if (out_width) {
     *out_width = width;
   }

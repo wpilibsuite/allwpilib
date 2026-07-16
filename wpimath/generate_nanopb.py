@@ -16,21 +16,20 @@ def generate_nanopb(nanopb: Path, output_directory: Path, proto_dir: Path):
     shutil.rmtree(output_directory.absolute(), ignore_errors=True)
     os.makedirs(output_directory.absolute())
 
-    proto_files = proto_dir.glob("*.proto")
+    proto_files = proto_dir.glob("**/*.proto")
     for path in proto_files:
-        absolute_filename = path.absolute()
         subprocess.check_call(
             ([sys.executable] if nanopb.endswith(".py") else [])
             + [
                 nanopb,
-                f"-I{absolute_filename.parent}",
+                f"-I{proto_dir.absolute()}",
                 f"-D{output_directory.absolute()}",
                 "-S.cpp",
                 "-e.npb",
-                absolute_filename,
+                path.absolute(),
             ],
         )
-    java_files = (output_directory).glob("*")
+    java_files = (output_directory).glob("**/*.*")
     for java_file in java_files:
         with (java_file).open(encoding="utf-8") as f:
             content = f.read()
@@ -69,7 +68,7 @@ def main():
     parser.add_argument(
         "--output_directory",
         help="Optional. If set, will output the generated files to this directory, otherwise it will use a path relative to the script",
-        default=dirname / "src/generated/main/native/cpp/wpimath/protobuf",
+        default=dirname / "src/generated/main/native/cpp",
         type=Path,
     )
     parser.add_argument(

@@ -5,9 +5,6 @@
 package org.wpilib.math.trajectory.struct;
 
 import java.nio.ByteBuffer;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.kinematics.ChassisAccelerations;
-import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.trajectory.TrajectorySample;
 import org.wpilib.util.struct.Struct;
 
@@ -24,36 +21,22 @@ public class TrajectorySampleStruct implements Struct<TrajectorySample> {
 
   @Override
   public int getSize() {
-    return DOUBLE_SIZE
-        + Pose2d.struct.getSize()
-        + ChassisVelocities.struct.getSize()
-        + ChassisAccelerations.struct.getSize();
+    return DOUBLE_SIZE;
   }
 
   @Override
   public String getSchema() {
-    return "double timestamp;Pose2d pose;ChassisVelocities vel;ChassisAccelerations accel";
-  }
-
-  @Override
-  public Struct<?>[] getNested() {
-    return new Struct<?>[] {Pose2d.struct, ChassisVelocities.struct, ChassisAccelerations.struct};
+    return "double time";
   }
 
   @Override
   public TrajectorySample unpack(ByteBuffer bb) {
-    double timestamp = bb.getDouble();
-    Pose2d pose = Pose2d.struct.unpack(bb);
-    ChassisVelocities vel = ChassisVelocities.struct.unpack(bb);
-    ChassisAccelerations accel = ChassisAccelerations.struct.unpack(bb);
-    return new TrajectorySample(timestamp, pose, vel, accel);
+    double time = bb.getDouble();
+    return new TrajectorySample(time);
   }
 
   @Override
   public void pack(ByteBuffer bb, TrajectorySample value) {
-    bb.putDouble(value.timestamp);
-    Pose2d.struct.pack(bb, value.pose);
-    ChassisVelocities.struct.pack(bb, value.velocity);
-    ChassisAccelerations.struct.pack(bb, value.acceleration);
+    bb.putDouble(value.time);
   }
 }

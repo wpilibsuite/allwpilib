@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.3.0",
+    "semiwrap~=0.6.0",
     "hatch-meson~=0.1.2",
     "hatch-robotpy~=0.2.1",
     "hatchling",
@@ -9,6 +9,7 @@ requires = [
     "robotpy-wpimath==0.0.0",
     "robotpy-hal==0.0.0",
     "pyntcore==0.0.0",
+    "robotpy-native-halsim-gui==0.0.0",
 ]
 
 [project]
@@ -25,6 +26,7 @@ dependencies = [
     "robotpy-wpimath==0.0.0",
     "robotpy-hal==0.0.0",
     "pyntcore==0.0.0",
+    "robotpy-native-halsim-gui==0.0.0",
 ]
 
 [project.urls]
@@ -34,16 +36,6 @@ dependencies = [
 [tool.hatch.build.hooks.robotpy]
 version_file = "halsim_gui/version.py"
 
-[[tool.hatch.build.hooks.robotpy.maven_lib_download]]
-artifact_id = "halsim_gui"
-group_id = "org.wpilib.halsim"
-repo_url = ""
-version = "0.0.0"
-use_headers = true
-
-libs = ["halsim_gui"]
-extract_to = "halsim_gui"
-
 [tool.hatch.build.hooks.semiwrap]
 
 [tool.hatch.build.hooks.meson]
@@ -51,8 +43,17 @@ extract_to = "halsim_gui"
 [tool.hatch.build.targets.wheel]
 packages = ["halsim_gui"]
 
-
 [tool.semiwrap]
+scan_headers_ignore = [
+    "wpi/halsim/gui/*",
+]
+
+[tool.semiwrap.name_transform]
+default = "snake_case"
+enum_value = "CAPS_CASE"
+known_words = ["3V3", "5V", "CAN", "CPU", "DS", "FMS", "FPGA", "HAL", "HTTP", "I2C", "IMU", "JNI", "JSON", "mDNS", "NT", "OpMode", "PCM", "PDH", "PDP", "PID", "POVs", "PWM", "RIO", "SPI", "URI", "URL", "USB", "VIn"]
+
 [tool.semiwrap.extension_modules."halsim_gui._ext._halsim_gui_ext"]
 name = "halsim_gui_ext"
+wraps = ["robotpy-native-halsim-gui"]
 depends = ["wpihal", "wpimath", "ntcore"]

@@ -164,9 +164,9 @@ void gui::PlatformFramebufferSizeChanged(int width, int height) {
 
 static inline DXGI_FORMAT DXPixelFormat(PixelFormat format) {
   switch (format) {
-    case kPixelRGBA:
+    case PixelFormat::RGBA:
       return DXGI_FORMAT_R8G8B8A8_UNORM;
-    case kPixelBGRA:
+    case PixelFormat::BGRA:
       return DXGI_FORMAT_B8G8R8A8_UNORM;
     default:
       return DXGI_FORMAT_R8G8B8A8_UNORM;

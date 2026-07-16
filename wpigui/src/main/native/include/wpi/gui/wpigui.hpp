@@ -159,7 +159,7 @@ void AddDefaultFont(
     std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>
         makeFont);
 
-enum Style { kStyleClassic = 0, kStyleDark, kStyleLight, kStyleDeepDark };
+enum class Style { CLASSIC = 0, DARK, LIGHT, DEEP_DARK };
 
 /**
  * Sets the ImGui style.  Using this function makes this setting persistent.
@@ -208,7 +208,7 @@ void EmitViewMenu();
 /**
  * Pixel formats for texture pixel data.
  */
-enum PixelFormat { kPixelRGBA, kPixelBGRA };
+enum class PixelFormat { RGBA, BGRA };
 
 /**
  * Creates a texture from pixel data.
@@ -433,7 +433,7 @@ class Texture {
 
  private:
   ImTextureID m_texture = ImTextureID_Invalid;
-  PixelFormat m_format = kPixelRGBA;
+  PixelFormat m_format = PixelFormat::RGBA;
   int m_width = 0;
   int m_height = 0;
 };

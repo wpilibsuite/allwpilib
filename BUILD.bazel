@@ -1,4 +1,4 @@
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@buildifier_prebuilt//:rules.bzl", "buildifier")
 load("@rules_java//java:java_binary.bzl", "java_binary")
 load("@rules_java//java:java_plugin.bzl", "java_plugin")
@@ -70,7 +70,6 @@ java_binary(
 write_source_files(
     name = "write_pregenerated_files",
     additional_update_targets = [
-        "//hal:write_hal",
         "//ntcore:write_ntcore",
         "//wpilibc:write_wpilibc",
         "//wpilibcExamples:write_example_project_list",

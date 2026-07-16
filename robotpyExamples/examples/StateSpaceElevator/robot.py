@@ -10,22 +10,22 @@ import wpilib
 import wpimath
 import wpimath.units
 
-kMotorPort = 0
-kEncoderAChannel = 0
-kEncoderBChannel = 1
-kJoystickPort = 0
-kHighGoalPosition = wpimath.units.feetToMeters(3)
-kLowGoalPosition = wpimath.units.feetToMeters(0)
+MOTOR_PORT = 0
+ENCODER_A_CHANNEL = 0
+ENCODER_B_CHANNEL = 1
+JOYSTICK_PORT = 0
+HIGH_GOAL_POSITION = wpimath.units.feet_to_meters(3)
+LOW_GOAL_POSITION = wpimath.units.feet_to_meters(0)
 
-kCarriageMass = 4.5
+CARRIAGE_MASS = 4.5
 # kilograms
 
 # A 1.5in diameter drum has a radius of 0.75in, or 0.019in.
-kDrumRadius = 1.5 / 2.0 * 25.4 / 1000.0
+DRUM_RADIUS = 1.5 / 2.0 * 25.4 / 1000.0
 
 # Reduction between motors and encoder, as output over input. If the elevator spins slower than
 # the motors, this number should be greater than one.
-kElevatorGearing = 6.0
+ELEVATOR_GEARING = 6.0
 
 
 class MyRobot(wpilib.TimedRobot):
@@ -38,14 +38,14 @@ class MyRobot(wpilib.TimedRobot):
 
         self.profile = wpimath.TrapezoidProfile(
             wpimath.TrapezoidProfile.Constraints(
-                wpimath.units.feetToMeters(3.0),
-                wpimath.units.feetToMeters(
+                wpimath.units.feet_to_meters(3.0),
+                wpimath.units.feet_to_meters(
                     6.0
                 ),  # Max elevator velocity and acceleration.
             )
         )
 
-        self.lastProfiledReference = wpimath.TrapezoidProfile.State()
+        self.last_profiled_reference = wpimath.TrapezoidProfile.State()
 
         # The plant holds a state-space model of our elevator. This system has the following properties:
 
@@ -54,19 +54,19 @@ class MyRobot(wpilib.TimedRobot):
         # Outputs (what we can measure): [position], in meters.
 
         # This elevator is driven by two NEO motors.
-        self.elevatorPlant = wpimath.Models.elevatorFromPhysicalConstants(
-            wpimath.DCMotor.NEO(2),
-            kCarriageMass,
-            kDrumRadius,
-            kElevatorGearing,
+        self.elevator_plant = wpimath.Models.elevator_from_physical_constants(
+            wpimath.DCMotor.neo(2),
+            CARRIAGE_MASS,
+            DRUM_RADIUS,
+            ELEVATOR_GEARING,
         ).slice(0)
 
         # The observer fuses our encoder data and voltage inputs to reject noise.
         self.observer = wpimath.KalmanFilter_2_1_1(
-            self.elevatorPlant,
+            self.elevator_plant,
             (
-                wpimath.units.inchesToMeters(2),
-                wpimath.units.inchesToMeters(40),
+                wpimath.units.inches_to_meters(2),
+                wpimath.units.inches_to_meters(40),
             ),  # How accurate we think our model is, in meters and meters/second.
             (
                 0.001,
@@ -76,13 +76,13 @@ class MyRobot(wpilib.TimedRobot):
 
         # A LQR uses feedback to create voltage commands.
         self.controller = wpimath.LinearQuadraticRegulator_2_1(
-            self.elevatorPlant,
+            self.elevator_plant,
             # qelms. State error tolerance, in meters and meters per second.
             # Decrease this to more heavily penalize state excursion, or make the
             # controller behave more aggressively.
             (
-                wpimath.units.inchesToMeters(1.0),
-                wpimath.units.inchesToMeters(10.0),
+                wpimath.units.inches_to_meters(1.0),
+                wpimath.units.inches_to_meters(10.0),
             ),
             # relms. Control effort (voltage) tolerance. Decrease this to more
             # heavily penalize control effort, or make the controller less
@@ -96,51 +96,54 @@ class MyRobot(wpilib.TimedRobot):
 
         # The state-space loop combines a controller, observer, feedforward and plant for easy control.
         self.loop = wpimath.LinearSystemLoop_2_1_1(
-            self.elevatorPlant, self.controller, self.observer, 12.0, 0.020
+            self.elevator_plant, self.controller, self.observer, 12.0, 0.020
         )
 
         # An encoder set up to measure elevator height in meters.
-        self.encoder = wpilib.Encoder(kEncoderAChannel, kEncoderBChannel)
+        self.encoder = wpilib.Encoder(ENCODER_A_CHANNEL, ENCODER_B_CHANNEL)
 
-        self.motor = wpilib.PWMSparkMax(kMotorPort)
+        self.motor = wpilib.PWMSparkMax(MOTOR_PORT)
 
         # A joystick to read the trigger from.
-        self.joystick = wpilib.Joystick(kJoystickPort)
+        self.joystick = wpilib.Joystick(JOYSTICK_PORT)
 
         # Circumference = pi * d, so distance per click = pi * d / counts
-        self.encoder.setDistancePerPulse(math.tau * kDrumRadius / 4096)
+        self.encoder.set_distance_per_pulse(math.tau * DRUM_RADIUS / 4096)
 
-    def teleopInit(self) -> None:
+    def teleop_init(self) -> None:
         # Reset our loop to make sure it's in a known state.
-        self.loop.reset([self.encoder.getDistance(), self.encoder.getRate()])
+        self.loop.reset([self.encoder.get_distance(), self.encoder.get_rate()])
 
         # Reset our last reference to the current state.
-        self.lastProfiledReference = wpimath.TrapezoidProfile.State(
-            self.encoder.getDistance(), self.encoder.getRate()
+        self.last_profiled_reference = wpimath.TrapezoidProfile.State(
+            self.encoder.get_distance(), self.encoder.get_rate()
         )
 
-    def teleopPeriodic(self) -> None:
+    def teleop_periodic(self) -> None:
         # Sets the target position of our arm. This is similar to setting the setpoint of a
         # PID controller.
 
-        if self.joystick.getTrigger():
+        if self.joystick.get_trigger():
             # the trigger is pressed, so we go to the high goal.
-            goal = wpimath.TrapezoidProfile.State(kHighGoalPosition, 0.0)
+            goal = wpimath.TrapezoidProfile.State(HIGH_GOAL_POSITION, 0.0)
 
         else:
             # Otherwise, we go to the low goal
-            goal = wpimath.TrapezoidProfile.State(kLowGoalPosition, 0.0)
+            goal = wpimath.TrapezoidProfile.State(LOW_GOAL_POSITION, 0.0)
 
         # Step our TrapezoidalProfile forward 20ms and set it as our next reference
-        self.lastProfiledReference = self.profile.calculate(
-            0.020, self.lastProfiledReference, goal
+        self.last_profiled_reference = self.profile.calculate(
+            0.020, self.last_profiled_reference, goal
         )
-        self.loop.setNextR(
-            [self.lastProfiledReference.position, self.lastProfiledReference.velocity]
+        self.loop.set_next_r(
+            [
+                self.last_profiled_reference.position,
+                self.last_profiled_reference.velocity,
+            ]
         )
 
         # Correct our Kalman filter's state vector estimate with encoder data.
-        self.loop.correct([self.encoder.getDistance()])
+        self.loop.correct([self.encoder.get_distance()])
 
         # Update our LQR to generate new voltage commands and use the voltages to predict the next
         # state with out Kalman filter.
@@ -149,5 +152,5 @@ class MyRobot(wpilib.TimedRobot):
         # Send the new calculated voltage to the motors.
         # voltage = duty cycle * battery voltage, so
         # duty cycle = voltage / battery voltage
-        nextVoltage = self.loop.U(0)
-        self.motor.setVoltage(nextVoltage)
+        next_voltage = self.loop.u(0)
+        self.motor.set_voltage(next_voltage)

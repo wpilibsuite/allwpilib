@@ -5,11 +5,11 @@
 #include "wpi/glass/Context.hpp"
 
 #include <filesystem>
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 
-#include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
@@ -167,10 +167,10 @@ static bool LoadStorageImpl(Context* ctx, std::string_view dir,
     std::string filename;
     auto& rootName = root.first;
     if (rootName.empty()) {
-      filename = (fs::path{dir} / fmt::format("{}.json", name)).string();
+      filename = (fs::path{dir} / std::format("{}.json", name)).string();
     } else {
       filename =
-          (fs::path{dir} / fmt::format("{}-{}.json", name, rootName)).string();
+          (fs::path{dir} / std::format("{}-{}.json", name, rootName)).string();
     }
     if (!LoadStorageRootImpl(ctx, filename, rootName)) {
       rv = false;
@@ -249,7 +249,7 @@ bool SaveWindowStorageImpl(const std::string& filename) {
                    ec.message().c_str());
     return false;
   }
-  WindowToJson().marshal(os, true, 2);
+  WindowToJson().marshal(os, true);
   os << '\n';
   return true;
 }
@@ -263,7 +263,7 @@ static bool SaveStorageRootImpl(Context* ctx, const std::string& filename,
                    ec.message().c_str());
     return false;
   }
-  storage.ToJson().marshal(os, true, 2);
+  storage.ToJson().marshal(os, true);
   os << '\n';
   return true;
 }
@@ -280,27 +280,27 @@ static bool SaveStorageImpl(Context* ctx, std::string_view dir,
 
   // handle erasing save files on exit if requested
   if (exiting && wpi::gui::gContext->resetOnExit) {
-    fs::remove(dirPath / fmt::format("{}-window.json", name), ec);
+    fs::remove(dirPath / std::format("{}-window.json", name), ec);
     for (auto&& root : ctx->storageRoots) {
       auto& rootName = root.first;
       if (rootName.empty()) {
-        fs::remove(dirPath / fmt::format("{}.json", name), ec);
+        fs::remove(dirPath / std::format("{}.json", name), ec);
       } else {
-        fs::remove(dirPath / fmt::format("{}-{}.json", name, rootName), ec);
+        fs::remove(dirPath / std::format("{}-{}.json", name, rootName), ec);
       }
     }
   }
 
   bool rv = SaveWindowStorageImpl(
-      (dirPath / fmt::format("{}-window.json", name)).string());
+      (dirPath / std::format("{}-window.json", name)).string());
 
   for (auto&& root : ctx->storageRoots) {
     auto& rootName = root.first;
     std::string filename;
     if (rootName.empty()) {
-      filename = (dirPath / fmt::format("{}.json", name)).string();
+      filename = (dirPath / std::format("{}.json", name)).string();
     } else {
-      filename = (dirPath / fmt::format("{}-{}.json", name, rootName)).string();
+      filename = (dirPath / std::format("{}-{}.json", name, rootName)).string();
     }
     if (!SaveStorageRootImpl(ctx, filename, root.second)) {
       rv = false;
@@ -319,7 +319,7 @@ Context::Context()
       [this] { LoadStorageImpl(this, storageLoadDir, storageName); },
       [this] {
         LoadWindowStorageImpl((fs::path{storageLoadDir} /
-                               fmt::format("{}-window.json", storageName))
+                               std::format("{}-window.json", storageName))
                                   .string());
       },
       [this](bool exiting) {
@@ -406,7 +406,7 @@ bool wpi::glass::LoadStorage(std::string_view dir) {
   SetStorageDir(dir);
   WorkspaceResetImpl();
   LoadWindowStorageImpl((fs::path{gContext->storageLoadDir} /
-                         fmt::format("{}-window.json", gContext->storageName))
+                         std::format("{}-window.json", gContext->storageName))
                             .string());
   return LoadStorageImpl(gContext, dir, gContext->storageName);
 }

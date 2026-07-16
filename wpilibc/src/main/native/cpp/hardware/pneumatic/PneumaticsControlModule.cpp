@@ -4,10 +4,9 @@
 
 #include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
 
+#include <format>
 #include <memory>
 #include <string>
-
-#include <fmt/format.h>
 
 #include "wpi/hal/CTREPCM.h"
 #include "wpi/hal/Ports.h"
@@ -301,7 +300,7 @@ Compressor PneumaticsControlModule::MakeCompressor() {
 
 void PneumaticsControlModule::ReportUsage(std::string_view device,
                                           std::string_view data) {
-  HAL_ReportUsage(fmt::format("PCM[{}]/{}", m_module, device), data);
+  HAL_ReportUsage(std::format("PCM[{}]/{}", m_module, device), data);
 }
 
 std::shared_ptr<PneumaticsBase> PneumaticsControlModule::GetForModule(

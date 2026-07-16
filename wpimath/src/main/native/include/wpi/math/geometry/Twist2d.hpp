@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <gcem.hpp>
+
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"

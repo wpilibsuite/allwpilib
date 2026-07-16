@@ -4,7 +4,9 @@
 
 #include "wpi/cameraserver/CameraServerShared.hpp"
 
+#include <format>
 #include <memory>
+#include <string_view>
 #include <utility>
 
 #include "wpi/util/mutex.hpp"
@@ -13,12 +15,12 @@ namespace {
 class DefaultCameraServerShared : public wpi::CameraServerShared {
  public:
   void ReportUsage(std::string_view resource, std::string_view data) override {}
-  void SetCameraServerErrorV(fmt::string_view format,
-                             fmt::format_args args) override {}
-  void SetVisionRunnerErrorV(fmt::string_view format,
-                             fmt::format_args args) override {}
-  void ReportDriverStationErrorV(fmt::string_view format,
-                                 fmt::format_args args) override {}
+  void SetCameraServerErrorV(std::string_view format,
+                             std::format_args args) override {}
+  void SetVisionRunnerErrorV(std::string_view format,
+                             std::format_args args) override {}
+  void ReportDriverStationErrorV(std::string_view format,
+                                 std::format_args args) override {}
   std::pair<std::thread::id, bool> GetRobotMainThreadId() const override {
     return std::pair{std::thread::id(), false};
   }

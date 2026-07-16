@@ -14,12 +14,12 @@ struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::DifferentialSample> {
     return "DifferentialSample";
   }
   static constexpr size_t GetSize() {
-    return wpi::util::GetStructSize<wpi::math::TrajectorySample>() + 8 + 8;
+    return wpi::util::GetStructSize<wpi::math::HolonomicSample>() + 8 + 8;
   }
   static constexpr std::string_view GetSchema() {
-    return "double timestamp;Pose2d pose;ChassisVelocities "
-           "velocity;ChassisAccelerations acceleration;double leftSpeed;double "
-           "rightSpeed";
+    return "double time;Pose2d pose;ChassisVelocities velocity;"
+           "ChassisAccelerations acceleration;double leftVelocity;"
+           "double rightVelocity";
   }
 
   static wpi::math::DifferentialSample Unpack(std::span<const uint8_t> data);
@@ -27,7 +27,7 @@ struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::DifferentialSample> {
                    const wpi::math::DifferentialSample& value);
   static void ForEachNested(
       std::invocable<std::string_view, std::string_view> auto fn) {
-    wpi::util::ForEachStructSchema<wpi::math::TrajectorySample>(fn);
+    wpi::util::ForEachStructSchema<wpi::math::HolonomicSample>(fn);
   }
 };
 

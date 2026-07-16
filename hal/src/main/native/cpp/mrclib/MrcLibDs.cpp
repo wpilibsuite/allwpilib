@@ -7,11 +7,10 @@
 #include <algorithm>
 #include <cstring>
 #include <exception>
+#include <format>
 #include <span>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "mrclib/ApiVersion.h"
 #include "mrclib/Console.h"
@@ -19,10 +18,12 @@
 #include "mrclib/DsComms.hpp"
 #include "mrclib/DsCommsControl.h"
 #include "mrclib/MrcString.hpp"
+#include "mrclib/Systemcore.h"
 #include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/util/EventVector.hpp"
 #include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
 
 using namespace wpi::hal;
 
@@ -308,7 +309,7 @@ MrcLibDsImpl::MrcLibDsImpl() {
   }
 
   if (!MRC_CHECK_API_VERSION()) {
-    fmt::print(
+    wpi::util::print(
         stderr,
         "Error: MRC API version mismatch. Restarting app and retrying...");
 
@@ -318,27 +319,33 @@ MrcLibDsImpl::MrcLibDsImpl() {
   // Initialize control first, making sure its properly checked for errors
   MRC_Status controlInitStatus = MRC_DsCommsControl_Initialize();
   if (controlInitStatus == MRC_STATUS_MULTIPLE_USER_PROGRAMS) {
-    fmt::print(stderr,
-               "Warning: Multiple user programs detected. Restarting app and "
-               "retrying...\n");
+    wpi::util::print(
+        stderr,
+        "Warning: Multiple user programs detected. Restarting app and "
+        "retrying...\n");
     std::terminate();
   }
   if (controlInitStatus != MRC_STATUS_SUCCESS) {
-    fmt::print(stderr,
-               "Error: MRC_DsCommsControl_Initialize failed with status {}. "
-               "Restarting app and retrying...\n",
-               controlInitStatus);
+    wpi::util::print(
+        stderr,
+        "Error: MRC_DsCommsControl_Initialize failed with status {}. "
+        "Restarting app and retrying...\n",
+        controlInitStatus);
     std::terminate();
   }
   MRC_DsComms_Initialize();
 
   MRC_Console_Initialize();
 
+  // Used in Power.cpp to get battery voltage
+  MRC_Systemcore_Initialize();
+
   // Wait for 10 seconds for the system server to be ready.
   if (!MRC_DsComms_WaitForSystemServer(10000)) {
-    fmt::print(stderr,
-               "Error: Waiting for server ready failed. Restarting app and "
-               "retrying...");
+    wpi::util::print(
+        stderr,
+        "Error: Waiting for server ready failed. Restarting app and "
+        "retrying...");
 
     std::terminate();
   }

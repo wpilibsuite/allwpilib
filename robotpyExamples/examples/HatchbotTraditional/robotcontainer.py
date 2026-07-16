@@ -32,8 +32,8 @@ class RobotContainer:
 
     def __init__(self) -> None:
         # The driver's controller
-        # self.driverController = wpilib.NiDsXboxController(constants.kDriverControllerPort)
-        self.driverController = wpilib.Joystick(constants.kDriverControllerPort)
+        # self.driver_controller = wpilib.NiDsXboxController(constants.DRIVER_CONTROLLER_PORT)
+        self.driver_controller = wpilib.Joystick(constants.DRIVER_CONTROLLER_PORT)
 
         # The robot's subsystems
         self.drive = DriveSubsystem()
@@ -42,52 +42,54 @@ class RobotContainer:
         # Autonomous routines
 
         # A simple auto routine that drives forward a specified distance, and then stops.
-        self.simpleAuto = DriveDistance(
-            constants.kAutoDriveDistanceInches, constants.kAutoDriveVelocity, self.drive
+        self.simple_auto = DriveDistance(
+            constants.AUTO_DRIVE_DISTANCE_INCHES,
+            constants.AUTO_DRIVE_VELOCITY,
+            self.drive,
         )
 
         # A complex auto routine that drives forward, drops a hatch, and then drives backward.
-        self.complexAuto = ComplexAuto(self.drive, self.hatch)
+        self.complex_auto = ComplexAuto(self.drive, self.hatch)
 
         # Chooser
         self.chooser = wpilib.SendableChooser()
 
         # Add commands to the autonomous command chooser
-        self.chooser.setDefaultOption("Simple Auto", self.simpleAuto)
-        self.chooser.addOption("Complex Auto", self.complexAuto)
+        self.chooser.set_default_option("Simple Auto", self.simple_auto)
+        self.chooser.add_option("Complex Auto", self.complex_auto)
 
         # Put the chooser on the dashboard
-        wpilib.SmartDashboard.putData("Autonomous", self.chooser)
+        wpilib.SmartDashboard.put_data("Autonomous", self.chooser)
 
-        self.configureButtonBindings()
+        self.configure_button_bindings()
 
         # set up default drive command
-        self.drive.setDefaultCommand(
+        self.drive.set_default_command(
             DefaultDrive(
                 self.drive,
-                lambda: -self.driverController.getY(),
-                lambda: self.driverController.getX(),
+                lambda: -self.driver_controller.get_y(),
+                lambda: self.driver_controller.get_x(),
             )
         )
 
-    def configureButtonBindings(self):
+    def configure_button_bindings(self):
         """
         Use this method to define your button->command mappings. Buttons can be created by
         instantiating a wpilib.GenericHID or one of its subclasses (Joystick or XboxController),
         and then passing it to a JoystickButton.
         """
 
-        commands2.button.JoystickButton(self.driverController, 1).onTrue(
+        commands2.button.JoystickButton(self.driver_controller, 1).on_true(
             GrabHatch(self.hatch)
         )
 
-        commands2.button.JoystickButton(self.driverController, 2).onTrue(
+        commands2.button.JoystickButton(self.driver_controller, 2).on_true(
             ReleaseHatch(self.hatch)
         )
 
-        commands2.button.JoystickButton(self.driverController, 3).whileTrue(
+        commands2.button.JoystickButton(self.driver_controller, 3).while_true(
             HalveDriveVelocity(self.drive)
         )
 
-    def getAutonomousCommand(self) -> commands2.Command:
-        return self.chooser.getSelected()
+    def get_autonomous_command(self) -> commands2.Command:
+        return self.chooser.get_selected()

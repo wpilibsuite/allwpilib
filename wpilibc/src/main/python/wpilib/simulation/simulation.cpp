@@ -30,7 +30,7 @@ void resetMotorSafety() {}
 SEMIWRAP_PYBIND11_MODULE(m) {
   initWrapper(m);
 
-  m.def("_resetWpilibSimulationData", &resetWpilibSimulationData,
+  m.def("_reset_wpilib_simulation_data", &resetWpilibSimulationData,
         release_gil());
-  m.def("_resetMotorSafety", &resetMotorSafety, release_gil());
+  m.def("_reset_motor_safety", &resetMotorSafety, release_gil());
 }

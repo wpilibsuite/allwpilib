@@ -6,9 +6,8 @@
 
 #include <stdint.h>
 
+#include <format>
 #include <utility>
-
-#include <fmt/format.h>
 
 #include "wpi/util/Endian.hpp"
 
@@ -30,19 +29,19 @@ NTDSModel::NTDSModel(std::string_view path)
 NTDSModel::NTDSModel(wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
       m_gameDataSubscriber{
-          inst.GetStringTopic(fmt::format("{}/GameData", path)).Subscribe("")},
+          inst.GetStringTopic(std::format("{}/GameData", path)).Subscribe("")},
       m_allianceStation{
-          inst.GetIntegerTopic(fmt::format("{}/AllianceStationID", path))
+          inst.GetIntegerTopic(std::format("{}/AllianceStationID", path))
               .Subscribe(0)},
-      m_controlWord{inst.GetRawTopic(fmt::format("{}/ControlWord", path))
+      m_controlWord{inst.GetRawTopic(std::format("{}/ControlWord", path))
                         .Subscribe("struct:ControlWord", {})},
-      m_fmsAttached{fmt::format("NT_DS:FMSAttached:{}", path)},
-      m_dsAttached{fmt::format("NT_DS:DSAttached:{}", path)},
-      m_allianceStationId{fmt::format("NT_DS:AllianceStationID:{}", path)},
-      m_estop{fmt::format("NT_DS:EStop:{}", path)},
-      m_enabled{fmt::format("NT_DS:RobotEnabled:{}", path)},
-      m_robotMode{fmt::format("NT_DS:RobotMode:{}", path)},
-      m_gameData{fmt::format("NT_DS:GameData:{}", path)} {}
+      m_fmsAttached{std::format("NT_DS:FMSAttached:{}", path)},
+      m_dsAttached{std::format("NT_DS:DSAttached:{}", path)},
+      m_allianceStationId{std::format("NT_DS:AllianceStationID:{}", path)},
+      m_estop{std::format("NT_DS:EStop:{}", path)},
+      m_enabled{std::format("NT_DS:RobotEnabled:{}", path)},
+      m_robotMode{std::format("NT_DS:RobotMode:{}", path)},
+      m_gameData{std::format("NT_DS:GameData:{}", path)} {}
 
 void NTDSModel::Update() {
   for (auto&& v : m_allianceStation.ReadQueue()) {

@@ -23,7 +23,7 @@ classes:
     enums:
       ColorOrder:
     inline_code: |
-      .def("setData", [](wpi::AddressableLED& self, const wpi::AddressableLEDBuffer& data) {
+      .def("set_data", [](wpi::AddressableLED& self, const wpi::AddressableLEDBuffer& data) {
             return self.SetData(data);
           }, release_gil(), py::prepend());
   wpi::AddressableLED::LEDData:

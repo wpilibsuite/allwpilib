@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.3.0",
+    "semiwrap~=0.6.0",
     "hatch-meson~=0.1.2",
     "hatch-robotpy~=0.2.1",
     "hatchling",
@@ -95,6 +95,11 @@ scan_headers_ignore = [
     "PyTrajectoryConstraint.h",
     "_units_base_type_caster.h",
 ]
+
+[tool.semiwrap.name_transform]
+default = "snake_case"
+enum_value = "CAPS_CASE"
+known_words = ["3V3", "5V", "CAN", "CPU", "DS", "FMS", "FPGA", "HAL", "HTTP", "I2C", "IMU", "JNI", "JSON", "mDNS", "NT", "OpMode", "PCM", "PDH", "PDP", "PID", "POVs", "PWM", "RIO", "SPI", "URI", "URL", "USB", "VIn"]
 
 [tool.semiwrap.export_type_casters.wpimath-casters]
 pypackage = "wpimath"
@@ -1574,14 +1579,15 @@ NumericalJacobian = "wpi/math/system/NumericalJacobian.hpp"
 # wpi/math/trajectory
 DifferentialSample = "wpi/math/trajectory/DifferentialSample.hpp"
 DifferentialTrajectory = "wpi/math/trajectory/DifferentialTrajectory.hpp"
+DrivetrainSplineSample = "wpi/math/trajectory/DrivetrainSplineSample.hpp"
+DrivetrainSplineTrajectory = "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
+DrivetrainSplineTrajectoryGenerator = "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
+DrivetrainSplineTrajectoryParameterizer = "wpi/math/trajectory/DrivetrainSplineTrajectoryParameterizer.hpp"
 ExponentialProfile = "wpi/math/trajectory/ExponentialProfile.hpp"
+HolonomicSample = "wpi/math/trajectory/HolonomicSample.hpp"
 HolonomicTrajectory = "wpi/math/trajectory/HolonomicTrajectory.hpp"
-SplineSample = "wpi/math/trajectory/SplineSample.hpp"
-SplineTrajectory = "wpi/math/trajectory/SplineTrajectory.hpp"
 Trajectory = "wpi/math/trajectory/Trajectory.hpp"
 TrajectoryConfig = "wpi/math/trajectory/TrajectoryConfig.hpp"
-TrajectoryGenerator = "wpi/math/trajectory/TrajectoryGenerator.hpp"
-TrajectoryParameterizer = "wpi/math/trajectory/TrajectoryParameterizer.hpp"
 TrajectorySample = "wpi/math/trajectory/TrajectorySample.hpp"
 TrapezoidProfile = "wpi/math/trajectory/TrapezoidProfile.hpp"
 

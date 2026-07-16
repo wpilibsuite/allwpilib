@@ -4,6 +4,8 @@
 
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angular_acceleration.hpp"
 #include "wpi/util/json.hpp"
 
 void wpi::math::to_json(wpi::util::json& json,
@@ -15,7 +17,7 @@ void wpi::math::to_json(wpi::util::json& json,
 void wpi::math::from_json(const wpi::util::json& json,
                           ChassisAccelerations& accel) {
   accel = ChassisAccelerations{
-      units::meters_per_second_squared_t{json.at("ax").get_double()},
-      units::meters_per_second_squared_t{json.at("ay").get_double()},
-      units::radians_per_second_squared_t{json.at("alpha").get_double()}};
+      units::meters_per_second_squared_t{json.at("ax").get_number()},
+      units::meters_per_second_squared_t{json.at("ay").get_number()},
+      units::radians_per_second_squared_t{json.at("alpha").get_number()}};
 }
