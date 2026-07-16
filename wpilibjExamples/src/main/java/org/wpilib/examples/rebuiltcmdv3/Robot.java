@@ -11,7 +11,7 @@ import org.wpilib.command3.Command;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.command3.button.CommandGamepad;
-import org.wpilib.epilogue.Epilogue;
+import org.wpilib.epilogue.generated.Epilogue;
 import org.wpilib.epilogue.Logged;
 import org.wpilib.examples.rebuiltcmdv3.mechanisms.Intake;
 import org.wpilib.examples.rebuiltcmdv3.mechanisms.Shooter;
