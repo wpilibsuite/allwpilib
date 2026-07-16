@@ -26,5 +26,11 @@ dependencies {
     implementation project(":wpiutil")
 }
 
+// Spotbugs breaks if there aren't any Java source files to analyze.
+// Apparently it's unaware of module-info files.
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
+    enabled = false
+}
+
 // Nothing to document
 tasks.withType(Javadoc).all { enabled = false }
