@@ -57,6 +57,24 @@
   ],
   "cppDependencies": [
     {
+      "groupId": "org.wpilib.thirdparty.opencv",
+      "artifactId": "opencv-cpp",
+      "version": "2027-4.13.0-3",
+      "libName": "opencv",
+      "headerClassifier": "headers",
+      "sourcesClassifier": "sources",
+      "sharedLibrary": true,
+      "skipInvalidPlatforms": true,
+      "binaryPlatforms": [
+        "linuxsystemcore",
+        "linuxarm64",
+        "windowsx86-64",
+        "windowsarm64",
+        "linuxx86-64",
+        "osxuniversal"
+      ]
+    },
+    {
       "groupId": "org.wpilib.cscore",
       "artifactId": "cscore-cpp",
       "version": "wpilib",
