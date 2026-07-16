@@ -87,8 +87,8 @@ public class TwoDeadWheelOdometry extends Odometry<TwoDeadWheelPositions> {
   /**
    * Converts measured wheel velocities to chassis velocities using inverse kinematics.
    *
-   * @param vx    The velocity of the forward-facing wheel, in meters per second.
-   * @param vy    The velocity of the sideways-facing wheel, in meters per second.
+   * @param vx The velocity of the forward-facing wheel, in meters per second.
+   * @param vy The velocity of the sideways-facing wheel, in meters per second.
    * @param omega The angular velocity of the robot as reported by the gyro, in radians per second.
    * @return The velocity of the chassis.
    */
