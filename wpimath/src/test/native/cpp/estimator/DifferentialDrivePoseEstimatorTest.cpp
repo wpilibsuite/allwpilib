@@ -4,8 +4,10 @@
 
 #include "wpi/math/estimator/DifferentialDrivePoseEstimator.hpp"
 
+#include <functional>
 #include <limits>
 #include <numbers>
+#include <optional>
 #include <random>
 #include <tuple>
 #include <utility>
@@ -15,11 +17,19 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
 #include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
+#include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 #include "wpi/util/print.hpp"
 
 void testFollowTrajectory(

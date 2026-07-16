@@ -4,6 +4,8 @@
 
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
 
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/velocity.hpp"
 #include "wpi/util/json.hpp"
 
 void wpi::math::to_json(wpi::util::json& json,

@@ -4,6 +4,11 @@
 
 #include "wpi/math/kinematics/MecanumDriveOdometry3d.hpp"
 
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
+#include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
+#include "wpi/math/kinematics/Odometry3d.hpp"
 #include "wpi/math/util/MathShared.hpp"
 
 using namespace wpi::math;

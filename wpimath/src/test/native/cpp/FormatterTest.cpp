@@ -5,6 +5,8 @@
 #include <format>
 #include <vector>
 
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
 #include <gtest/gtest.h>
 
 #include "wpi/math/fmt/Eigen.hpp"

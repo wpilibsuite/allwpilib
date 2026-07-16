@@ -4,9 +4,13 @@
 
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 
+#include <cmath>
+
 #include <gtest/gtest.h>
 
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
 #include "wpi/units/angular_acceleration.hpp"
 
 using namespace wpi::math;

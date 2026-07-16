@@ -4,6 +4,8 @@
 
 #include "wpi/math/random/Normal.hpp"
 
+#include <vector>
+
 #include <Eigen/Core>
 #include <gtest/gtest.h>
 

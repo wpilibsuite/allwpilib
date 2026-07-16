@@ -4,13 +4,12 @@
 
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
 
-#include <cmath>
-
 #include <gtest/gtest.h>
 
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 
 static constexpr auto kDt = 10_ms;

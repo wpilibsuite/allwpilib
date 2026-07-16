@@ -5,17 +5,28 @@
 #include "wpi/math/estimator/ExtendedKalmanFilter.hpp"
 
 #include <cmath>
+#include <cstddef>
 #include <vector>
 
 #include <Eigen/QR>
 #include <gtest/gtest.h>
 
+#include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/random/Normal.hpp"
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
 #include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
+#include "wpi/math/util/StateSpaceUtil.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/base.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/mass.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
 namespace {
 

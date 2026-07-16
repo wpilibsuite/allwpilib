@@ -63,9 +63,9 @@ public class EncoderJNI extends JNIWrapper {
   public static native int getEncoderRaw(int encoderHandle);
 
   /**
-   * Gets the encoder scale value.
+   * Gets the scale value used to convert raw encoder counts to scaled counts.
    *
-   * <p>This is set by the value passed during initialization to encodingType.
+   * <p>Raw counts divided by this value produce the scaled encoder count.
    *
    * @param encoderHandle the encoder handle
    * @return the encoder scale value
@@ -85,38 +85,12 @@ public class EncoderJNI extends JNIWrapper {
   public static native void resetEncoder(int encoderHandle);
 
   /**
-   * Gets the Period of the most recent count.
-   *
-   * <p>Returns the time interval of the most recent count. This can be used for velocity
-   * calculations to determine shaft velocity.
-   *
-   * @param encoderHandle the encoder handle
-   * @return the period of the last two pulses in units of seconds
-   * @see "HAL_GetEncoderPeriod"
-   */
-  public static native double getEncoderPeriod(int encoderHandle);
-
-  /**
-   * Sets the maximum period where the device is still considered "moving".
-   *
-   * <p>Sets the maximum period where the device is considered moving. This value is used to
-   * determine the "stopped" state of the encoder using the getEncoderStopped method.
-   *
-   * @param encoderHandle the encoder handle
-   * @param maxPeriod the maximum period where the counted device is considered moving in seconds
-   * @see "HAL_SetEncoderMaxPeriod"
-   */
-  public static native void setEncoderMaxPeriod(int encoderHandle, double maxPeriod);
-
-  /**
    * Determines if the clock is stopped.
    *
-   * <p>Determines if the clocked input is stopped based on the MaxPeriod value set using the
-   * SetMaxPeriod method. If the clock exceeds the MaxPeriod, then the device (and encoder) are
-   * assumed to be stopped and it returns true.
+   * <p>Determines if the encoder's current rate is zero.
    *
    * @param encoderHandle the encoder handle
-   * @return true if the most recent encoder period exceeds the MaxPeriod value set by SetMaxPeriod
+   * @return true if the encoder's current rate is zero
    * @see "HAL_GetEncoderStopped"
    */
   public static native boolean getEncoderStopped(int encoderHandle);
@@ -145,7 +119,7 @@ public class EncoderJNI extends JNIWrapper {
   /**
    * Gets the current rate of the encoder.
    *
-   * <p>This is the encoder period scaled by the distance per pulse set for the encoder.
+   * <p>This is the encoder rate scaled by the distance per pulse set for the encoder.
    *
    * @param encoderHandle the encoder handle
    * @return the encoder rate (units are determined by the units passed to
@@ -153,18 +127,6 @@ public class EncoderJNI extends JNIWrapper {
    * @see "HAL_GetEncoderRate"
    */
   public static native double getEncoderRate(int encoderHandle);
-
-  /**
-   * Sets the minimum rate to be considered moving by the encoder.
-   *
-   * <p>Units need to match what is set by setEncoderDistancePerPulse, with time as seconds.
-   *
-   * @param encoderHandle the encoder handle
-   * @param minRate the minimum rate to be considered moving (units are determined by the units
-   *     passed to setEncoderDistancePerPulse, time value is seconds)
-   * @see "HAL_SetEncoderMinRate"
-   */
-  public static native void setEncoderMinRate(int encoderHandle, double minRate);
 
   /**
    * Sets the distance traveled per encoder pulse. This is used as a scaling factor for the rate and
@@ -188,24 +150,6 @@ public class EncoderJNI extends JNIWrapper {
   public static native void setEncoderReverseDirection(int encoderHandle, boolean reverseDirection);
 
   /**
-   * Sets the number of encoder samples to average when calculating encoder rate.
-   *
-   * @param encoderHandle the encoder handle
-   * @param samplesToAverage the number of samples to average
-   * @see "HAL_SetEncoderSamplesToAverage"
-   */
-  public static native void setEncoderSamplesToAverage(int encoderHandle, int samplesToAverage);
-
-  /**
-   * Gets the current samples to average value.
-   *
-   * @param encoderHandle the encoder handle
-   * @return the current samples to average value
-   * @see "HAL_GetEncoderSamplesToAverage"
-   */
-  public static native int getEncoderSamplesToAverage(int encoderHandle);
-
-  /**
    * Gets the FPGA index of the encoder.
    *
    * @param encoderHandle the encoder handle
@@ -215,9 +159,9 @@ public class EncoderJNI extends JNIWrapper {
   public static native int getEncoderFPGAIndex(int encoderHandle);
 
   /**
-   * Gets the encoder scale value.
+   * Gets the scale value used to convert raw encoder counts to scaled counts.
    *
-   * <p>This is set by the value passed during initialization to encodingType.
+   * <p>Raw counts divided by this value produce the scaled encoder count.
    *
    * @param encoderHandle the encoder handle
    * @return the encoder scale value

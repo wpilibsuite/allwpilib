@@ -4,9 +4,11 @@
 
 #include <array>
 #include <chrono>
+#include <cmath>
 #ifdef UNIT_LIB_ENABLE_IOSTREAM
 #include <iostream>
 #endif
+#include <ratio>
 #include <string>
 #include <type_traits>
 
@@ -18,6 +20,7 @@
 #include "wpi/units/angular_jerk.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/area.hpp"
+#include "wpi/units/base.hpp"
 #include "wpi/units/capacitance.hpp"
 #include "wpi/units/charge.hpp"
 #include "wpi/units/concentration.hpp"

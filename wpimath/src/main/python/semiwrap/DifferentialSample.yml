@@ -1,3 +1,6 @@
+extra_includes:
+- wpystruct.h
+
 functions:
   to_json:
     overloads:
@@ -31,3 +34,6 @@ classes:
       Transform:
       RelativeTo:
       operator==:
+
+inline_code: |
+  SetupWPyStruct<wpi::math::DifferentialSample>(cls_DifferentialSample);

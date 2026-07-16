@@ -4,10 +4,14 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/math/trajectory/DifferentialTrajectory.hpp"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/trajectory/DifferentialSample.hpp"
 #include "wpi/math/trajectory/HolonomicSample.hpp"
-#include "wpi/math/trajectory/HolonomicTrajectory.hpp"
 #include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/velocity.hpp"
 #include "wpi/util/json.hpp"
 
 using namespace wpi::math;

@@ -6,6 +6,7 @@
 
 #include <numbers>
 
+#include <Eigen/Core>
 #include <gtest/gtest.h>
 
 #include "wpi/math/linalg/EigenCore.hpp"
