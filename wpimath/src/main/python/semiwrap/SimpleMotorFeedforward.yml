@@ -37,18 +37,13 @@ classes:
       SetKa:
 
 templates:
-  # Unfortunately this is broken because calculate requires an SI unit
-  # SimpleMotorFeedforward:
-  #   qualname: wpi::math::SimpleMotorFeedforward
-  #   params:
-  #     - wpi::units::dimensionless::scalar
+  SimpleMotorFeedforward:
+    qualname: wpi::math::SimpleMotorFeedforward
+    params:
+    - wpi::units::dimensionless::scalar
 
+  # needed for DifferentialDriveVoltageConstraint
   SimpleMotorFeedforwardMeters:
     qualname: wpi::math::SimpleMotorFeedforward
     params:
     - wpi::units::meter
-
-  SimpleMotorFeedforwardRadians:
-    qualname: wpi::math::SimpleMotorFeedforward
-    params:
-    - wpi::units::radian

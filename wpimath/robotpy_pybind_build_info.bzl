@@ -264,8 +264,8 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
             header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/controller/SimpleMotorFeedforward.hpp",
             tmpl_class_names = [
-                ("SimpleMotorFeedforward_tmpl1", "SimpleMotorFeedforwardMeters"),
-                ("SimpleMotorFeedforward_tmpl2", "SimpleMotorFeedforwardRadians"),
+                ("SimpleMotorFeedforward_tmpl1", "SimpleMotorFeedforward"),
+                ("SimpleMotorFeedforward_tmpl2", "SimpleMotorFeedforwardMeters"),
             ],
             trampolines = [
                 ("wpi::math::SimpleMotorFeedforward", "wpi__math__SimpleMotorFeedforward.hpp"),
