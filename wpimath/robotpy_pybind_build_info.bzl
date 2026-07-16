@@ -1124,7 +1124,7 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
             header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/ExponentialProfile.hpp",
             tmpl_class_names = [
-                ("ExponentialProfile_tmpl1", "ExponentialProfileMeterVolts"),
+                ("ExponentialProfile_tmpl1", "ExponentialProfile"),
             ],
             trampolines = [
                 ("wpi::math::ExponentialProfile", "wpi__math__ExponentialProfile.hpp"),

@@ -17,15 +17,15 @@ class Elevator:
         # This gearbox represents a gearbox containing 4 Vex 775pro motors.
         self.elevator_gearbox = wpimath.DCMotor.neo(2)
 
-        self.profile = wpimath.ExponentialProfileMeterVolts(
-            wpimath.ExponentialProfileMeterVolts.Constraints.from_characteristics(
+        self.profile = wpimath.ExponentialProfile(
+            wpimath.ExponentialProfile.Constraints.from_characteristics(
                 constants.ELEVATOR_MAX_V,
                 constants.ELEVATOR_KV,
                 constants.ELEVATOR_KA,
             )
         )
 
-        self.setpoint = wpimath.ExponentialProfileMeterVolts.State(0, 0)
+        self.setpoint = wpimath.ExponentialProfile.State(0, 0)
 
         # Standard classes for controlling our elevator
         self.pid_controller = wpimath.PIDController(
@@ -104,7 +104,7 @@ class Elevator:
 
         :param goal: the position to maintain
         """
-        goal_state = wpimath.ExponentialProfileMeterVolts.State(goal, 0)
+        goal_state = wpimath.ExponentialProfile.State(goal, 0)
 
         next_state = self.profile.calculate(0.020, self.setpoint, goal_state)
 
@@ -126,9 +126,7 @@ class Elevator:
 
     def reset(self) -> None:
         """Reset Exponential profile to begin from current position on enable."""
-        self.setpoint = wpimath.ExponentialProfileMeterVolts.State(
-            self.encoder.get_distance(), 0
-        )
+        self.setpoint = wpimath.ExponentialProfile.State(self.encoder.get_distance(), 0)
 
     def update_telemetry(self) -> None:
         """Update telemetry, including the mechanism visualization."""
