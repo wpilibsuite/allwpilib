@@ -62,7 +62,7 @@ TEST_F(TwoDeadWheelOdometryTest, GyroAngleReset) {
 
 TEST_F(TwoDeadWheelOdometryTest, StraightForwardsForwardKinematics) {
   auto wheelVelocities =
-      odometry.ToChassisVelocities(0_rad_per_s, 5_mps, 0_mps);
+      odometry.ToChassisVelocities(5_mps, 0_mps, 0_rad_per_s);
 
   EXPECT_NEAR(wheelVelocities.vx.value(), 5.0, 0.1);
   EXPECT_NEAR(wheelVelocities.vy.value(), 0.0, 0.1);
@@ -71,7 +71,7 @@ TEST_F(TwoDeadWheelOdometryTest, StraightForwardsForwardKinematics) {
 
 TEST_F(TwoDeadWheelOdometryTest, StraightLeftForwardKinematics) {
   auto wheelVelocities =
-      odometry.ToChassisVelocities(0_rad_per_s, 0_mps, 5_mps);
+      odometry.ToChassisVelocities(0_mps, 5_mps, 0_rad_per_s);
 
   EXPECT_NEAR(wheelVelocities.vx.value(), 0.0, 0.1);
   EXPECT_NEAR(wheelVelocities.vy.value(), 5.0, 0.1);
@@ -80,7 +80,7 @@ TEST_F(TwoDeadWheelOdometryTest, StraightLeftForwardKinematics) {
 
 TEST_F(TwoDeadWheelOdometryTest, SpinInPlaceForwardKinematics) {
   auto wheelVelocities =
-      odometry.ToChassisVelocities(5_rad_per_s, -5_mps, 5_mps);
+      odometry.ToChassisVelocities(-5_mps, 5_mps, 5_rad_per_s);
 
   EXPECT_NEAR(wheelVelocities.vx.value(), 0.0, 0.1);
   EXPECT_NEAR(wheelVelocities.vy.value(), 0.0, 0.1);
@@ -89,7 +89,7 @@ TEST_F(TwoDeadWheelOdometryTest, SpinInPlaceForwardKinematics) {
 
 TEST_F(TwoDeadWheelOdometryTest, MixedMotionForwardKinematics) {
   auto wheelVelocities =
-      odometry.ToChassisVelocities(5_rad_per_s, 1_mps, -1_mps);
+      odometry.ToChassisVelocities(1_mps, -1_mps, 5_rad_per_s);
 
   EXPECT_NEAR(wheelVelocities.vx.value(), 6.0, 0.1);
   EXPECT_NEAR(wheelVelocities.vy.value(), -6.0, 0.1);

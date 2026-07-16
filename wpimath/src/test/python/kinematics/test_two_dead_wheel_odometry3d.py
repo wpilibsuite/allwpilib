@@ -79,7 +79,7 @@ def test_gyro_angle_reset():
 def test_straight_forwards_forward_kinematics():
     odometry = _make_odometry()
 
-    wheel_velocities = odometry.to_chassis_velocities(0, 5, 0)
+    wheel_velocities = odometry.to_chassis_velocities(5, 0, 0)
 
     assert wheel_velocities.vx == pytest.approx(5.0, abs=0.1)
     assert wheel_velocities.vy == pytest.approx(0.0, abs=0.1)
@@ -89,7 +89,7 @@ def test_straight_forwards_forward_kinematics():
 def test_straight_left_forward_kinematics():
     odometry = _make_odometry()
 
-    wheel_velocities = odometry.to_chassis_velocities(0, 0, 5)
+    wheel_velocities = odometry.to_chassis_velocities(0, 5, 0)
 
     assert wheel_velocities.vx == pytest.approx(0.0, abs=0.1)
     assert wheel_velocities.vy == pytest.approx(5.0, abs=0.1)
@@ -99,7 +99,7 @@ def test_straight_left_forward_kinematics():
 def test_spin_in_place_forward_kinematics():
     odometry = _make_odometry()
 
-    wheel_velocities = odometry.to_chassis_velocities(5, -5, 5)
+    wheel_velocities = odometry.to_chassis_velocities(-5, 5, 5)
 
     assert wheel_velocities.vx == pytest.approx(0.0, abs=0.1)
     assert wheel_velocities.vy == pytest.approx(0.0, abs=0.1)
@@ -109,7 +109,7 @@ def test_spin_in_place_forward_kinematics():
 def test_mixed_motion_forward_kinematics():
     odometry = _make_odometry()
 
-    wheel_velocities = odometry.to_chassis_velocities(5, 1, -1)
+    wheel_velocities = odometry.to_chassis_velocities(1, -1, 5)
 
     assert wheel_velocities.vx == pytest.approx(6.0, abs=0.1)
     assert wheel_velocities.vy == pytest.approx(-6.0, abs=0.1)

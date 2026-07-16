@@ -68,7 +68,7 @@ class TwoDeadWheelOdometryTest {
 
   @Test
   void testStraightForwardsForwardKinematics() {
-    var wheelVelocities = m_odometry.toChassisVelocities(0, 5, 0);
+    var wheelVelocities = m_odometry.toChassisVelocities(5, 0, 0);
 
     assertAll(
         () -> assertEquals(5.0, wheelVelocities.vx, 0.1),
@@ -78,7 +78,7 @@ class TwoDeadWheelOdometryTest {
 
   @Test
   void testStraightLeftForwardKinematics() {
-    var wheelVelocities = m_odometry.toChassisVelocities(0, 0, 5);
+    var wheelVelocities = m_odometry.toChassisVelocities(0, 5, 0);
 
     assertAll(
         () -> assertEquals(0.0, wheelVelocities.vx, 0.1),
@@ -88,7 +88,7 @@ class TwoDeadWheelOdometryTest {
 
   @Test
   void testSpinInPlaceForwardKinematics() {
-    var wheelVelocities = m_odometry.toChassisVelocities(5, -5, 5);
+    var wheelVelocities = m_odometry.toChassisVelocities(-5, 5, 5);
 
     assertAll(
         () -> assertEquals(0.0, wheelVelocities.vx, 0.1),
@@ -98,7 +98,7 @@ class TwoDeadWheelOdometryTest {
 
   @Test
   void testMixedMotionForwardKinematics() {
-    var wheelVelocities = m_odometry.toChassisVelocities(5, 1, -1);
+    var wheelVelocities = m_odometry.toChassisVelocities(1, -1, 5);
 
     assertAll(
         () -> assertEquals(6.0, wheelVelocities.vx, 0.1),

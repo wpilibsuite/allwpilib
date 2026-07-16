@@ -74,15 +74,14 @@ class WPILIB_DLLEXPORT TwoDeadWheelOdometry
    * Converts measured wheel velocities to chassis velocities using inverse
    * kinematics.
    *
-   * @param omega The angular velocity of the robot as reported by the gyro.
    * @param vx The velocity of the forward-facing wheel.
    * @param vy The velocity of the sideways-facing wheel.
+   * @param omega The angular velocity of the robot as reported by the gyro.
    * @return The velocity of the chassis.
    */
   constexpr ChassisVelocities ToChassisVelocities(
-      wpi::units::radians_per_second_t omega,
-      wpi::units::meters_per_second_t vx,
-      wpi::units::meters_per_second_t vy) const {
+      wpi::units::meters_per_second_t vx, wpi::units::meters_per_second_t vy,
+      wpi::units::radians_per_second_t omega) const {
     auto vxCorrection =
         wpi::units::meters_per_second_t{m_xWheelYPos.value() * omega.value()};
     auto vyCorrection =
