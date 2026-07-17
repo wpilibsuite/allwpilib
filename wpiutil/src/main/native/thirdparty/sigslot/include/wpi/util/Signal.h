@@ -794,7 +794,14 @@ private:
           s2->next = slots->m_slots;
           s->next = s2;
           slots->m_slots = s;
+#if __GNUC__ >= 16
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
         }
+#if __GNUC__ >= 16
+#pragma GCC diagnostic pop
+#endif
     }
 
     void clear() {
