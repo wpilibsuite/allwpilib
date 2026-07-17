@@ -54,6 +54,8 @@ def copy_upstream_src(wpilib_root: Path):
         content = content.replace("__attribute__((unused))", "")
         with open(f, "w") as file:
             file.write(content)
+        if f.suffix == ".pl":
+            f.chmod(0o755)
 
 
 def main():
