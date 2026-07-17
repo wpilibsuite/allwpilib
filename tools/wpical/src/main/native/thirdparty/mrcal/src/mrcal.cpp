@@ -4483,7 +4483,7 @@ void optimizer_callback(// input state
 
                        const callback_context_t* ctx)
 {
-    double norm2_error = 0.0;
+    [[maybe_unused]] double norm2_error = 0.0;
 
     int    iJacobian          = 0;
     int    iMeasurement       = 0;
@@ -4703,7 +4703,7 @@ void optimizer_callback(// input state
 
         int splined_intrinsics_grad_irun = 0;
 
-        bool camera_at_identity = icam_extrinsics < 0;  
+        bool camera_at_identity = icam_extrinsics < 0;
         project(q_hypothesis.data(),
 
                 ctx->problem_selections.do_optimize_intrinsics_core || ctx->problem_selections.do_optimize_intrinsics_distortions ?

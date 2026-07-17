@@ -7,7 +7,7 @@ from upstream_utils import Lib, has_prefix, walk_cwd_and_copy_if
 
 
 def copy_upstream_src(wpilib_root: Path):
-    wpical = wpilib_root / "wpical"
+    wpical = wpilib_root / "tools/wpical"
 
     # Delete old install
     for d in [
