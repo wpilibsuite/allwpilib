@@ -10,6 +10,7 @@
 #include "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp"
+#include "wpi/math/kinematics/Kinematics.hpp"
 #include "wpi/math/kinematics/Odometry.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
@@ -28,7 +29,8 @@ namespace wpi::math {
  * Any subsequent pose resets also require the encoders to be reset to zero.
  */
 class WPILIB_DLLEXPORT DifferentialDriveOdometry
-    : public Odometry<DifferentialDriveWheelPositions,
+    : public Odometry<DifferentialDriveKinematics,
+                      DifferentialDriveWheelPositions,
                       DifferentialDriveWheelVelocities,
                       DifferentialDriveWheelAccelerations> {
  public:
