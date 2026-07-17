@@ -12,7 +12,6 @@
 #include <mfidl.h>
 #include <mfreadwrite.h>
 
-#include <atomic>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -26,11 +25,8 @@
 #include "UsbCameraProperty.hpp"
 #include "WindowsMessagePump.hpp"
 #include "wpi/util/PixelFormat.hpp"
-#include "wpi/util/SmallVector.hpp"
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
-#include "wpi/util/raw_istream.hpp"
-#include "wpi/util/raw_ostream.hpp"
 
 namespace wpi::cs {
 

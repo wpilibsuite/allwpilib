@@ -24,16 +24,16 @@ class RectangularRegionConstraintTest {
             new Translation2d(Units.feetToMeters(5.0), Units.feetToMeters(27.0)));
 
     var trajectory =
-        TrajectoryGeneratorTest.getTrajectory(
+        DrivetrainSplineTrajectoryGeneratorTest.getTrajectory(
             List.of(
                 new RectangularRegionConstraint(
                     rectangle, new MaxVelocityConstraint(maxVelocity))));
 
     boolean exceededConstraintOutsideRegion = false;
-    for (var point : trajectory.getStates()) {
+    for (var point : trajectory.samples) {
       if (rectangle.contains(point.pose.getTranslation())) {
-        assertTrue(Math.abs(point.velocity) < maxVelocity + 0.05);
-      } else if (Math.abs(point.velocity) >= maxVelocity + 0.05) {
+        assertTrue(Math.abs(point.forwardVelocity()) < maxVelocity + 0.05);
+      } else if (Math.abs(point.forwardVelocity()) >= maxVelocity + 0.05) {
         exceededConstraintOutsideRegion = true;
       }
     }

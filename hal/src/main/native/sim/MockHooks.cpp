@@ -21,6 +21,7 @@ static std::atomic<int64_t> programState{0};
 static std::atomic<uint64_t> programStartTime{0};
 static std::atomic<uint64_t> programPauseTime{0};
 static std::atomic<uint64_t> programStepTime{0};
+static std::atomic<uint64_t> programStartNotifierAlarmCount{0};
 
 namespace wpi::hal::init {
 void InitializeMockHooks() {
@@ -67,6 +68,7 @@ uint64_t GetMonotonicTime() {
 }
 
 void SetProgramStarted(bool started) {
+  programStartNotifierAlarmCount = GetNotifierAlarmSetCount();
   programStarted = started;
 }
 bool GetProgramStarted() {
@@ -77,12 +79,25 @@ bool GetProgramStarted() {
 using namespace wpi::hal;
 
 extern "C" {
-void HALSIM_WaitForProgramStart(void) {
+void HALSIM_WaitForProgramStart(HAL_Bool waitForFirstNotifier) {
   int count = 0;
   while (!programStarted) {
     count++;
     if (count % 10 == 0) {
       wpi::util::print("Waiting for program start signal: {}\n", count);
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
+
+  // Frameworks observe program start before arming their first notifier alarm.
+  // Wait for an alarm armed after that program-start edge so a stale notifier
+  // cannot satisfy this check.
+  while (waitForFirstNotifier &&
+         (GetNotifierAlarmSetCount() == programStartNotifierAlarmCount ||
+          HALSIM_GetNextNotifierTimeout() == UINT64_MAX)) {
+    count++;
+    if (count % 10 == 0) {
+      wpi::util::print("Waiting for first notifier alarm: {}\n", count);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
@@ -128,12 +143,20 @@ void HALSIM_StepTiming(uint64_t delta) {
   while (delta > 0) {
     uint64_t curTime = HAL_GetMonotonicTime();
     uint64_t nextTimeout = HALSIM_GetNextNotifierTimeout();
-    uint64_t step = (std::min)(delta, nextTimeout - curTime);
+    // If a notifier is already due, process it at the current simulated time
+    // instead of underflowing nextTimeout - curTime.
+    uint64_t step =
+        nextTimeout <= curTime ? 0 : (std::min)(delta, nextTimeout - curTime);
 
     StepTiming(step);
     delta -= step;
 
     WakeupWaitNotifiers();
+
+    // Guard against notifiers that keep rearming at or before the same time.
+    if (step == 0 && HALSIM_GetNextNotifierTimeout() <= curTime) {
+      break;
+    }
   }
 }
 

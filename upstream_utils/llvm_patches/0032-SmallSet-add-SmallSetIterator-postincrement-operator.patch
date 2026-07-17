@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: crueter <crueter@eden-emu.dev>
+Date: Wed, 6 May 2026 12:42:53 -0400
+Subject: [PATCH 32/33] SmallSet: add SmallSetIterator postincrement operator
+
+Required for Xcode 26.4
+---
+ llvm/include/llvm/ADT/SmallSet.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/llvm/include/llvm/ADT/SmallSet.h b/llvm/include/llvm/ADT/SmallSet.h
+index 2bc8ed01ff84671b5246a0dee42a76f086bb4687..1221621b7d1123831710ce74e5de4d0ab5f30422 100644
+--- a/llvm/include/llvm/ADT/SmallSet.h
++++ b/llvm/include/llvm/ADT/SmallSet.h
+@@ -122,6 +122,12 @@ public:
+     return *this;
+   }
+ 
++  SmallSetIterator operator++(int) { // Postincrement
++    SmallSetIterator Copy = *this;
++    ++(*this);
++    return Copy;
++  }
++
+   const T &operator*() const { return IsSmall ? *VecIter : *SetIter; }
+ };
+ 

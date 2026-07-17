@@ -2,11 +2,74 @@
 
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
-load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "robotpy_library")
+load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "create_pybind_library", "robotpy_library")
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "publish_casters", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
 def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
+    NAME_TRANSFORMS = [
+        "--name-transform-default",
+        "snake_case",
+        "--name-transform-enum-value",
+        "CAPS_CASE",
+        "--name-transform-known-word",
+        "3V3",
+        "--name-transform-known-word",
+        "5V",
+        "--name-transform-known-word",
+        "CAN",
+        "--name-transform-known-word",
+        "CPU",
+        "--name-transform-known-word",
+        "DS",
+        "--name-transform-known-word",
+        "FMS",
+        "--name-transform-known-word",
+        "FPGA",
+        "--name-transform-known-word",
+        "HAL",
+        "--name-transform-known-word",
+        "HTTP",
+        "--name-transform-known-word",
+        "I2C",
+        "--name-transform-known-word",
+        "IMU",
+        "--name-transform-known-word",
+        "JNI",
+        "--name-transform-known-word",
+        "JSON",
+        "--name-transform-known-word",
+        "mDNS",
+        "--name-transform-known-word",
+        "NT",
+        "--name-transform-known-word",
+        "OpMode",
+        "--name-transform-known-word",
+        "PCM",
+        "--name-transform-known-word",
+        "PDH",
+        "--name-transform-known-word",
+        "PDP",
+        "--name-transform-known-word",
+        "PID",
+        "--name-transform-known-word",
+        "POVs",
+        "--name-transform-known-word",
+        "PWM",
+        "--name-transform-known-word",
+        "RIO",
+        "--name-transform-known-word",
+        "SPI",
+        "--name-transform-known-word",
+        "URI",
+        "--name-transform-known-word",
+        "URL",
+        "--name-transform-known-word",
+        "USB",
+        "--name-transform-known-word",
+        "VIn",
+    ]
+
     WPIMATH_HEADER_GEN = [
         struct(
             class_name = "ComputerVisionUtil",
@@ -23,6 +86,16 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/util/MathUtil.hpp",
             tmpl_class_names = [],
             trampolines = [],
+        ),
+        struct(
+            class_name = "AntiTipping",
+            yml_file = "semiwrap/AntiTipping.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/controller/AntiTipping.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::AntiTipping", "wpi__math__AntiTipping.hpp"),
+            ],
         ),
         struct(
             class_name = "ArmFeedforward",
@@ -331,6 +404,17 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
             trampolines = [
                 ("wpi::math::SwerveDrivePoseEstimator3d", "wpi__math__SwerveDrivePoseEstimator3d.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "BiquadFilter",
+            yml_file = "semiwrap/BiquadFilter.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/filter/BiquadFilter.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::BiquadFilter", "wpi__math__BiquadFilter.hpp"),
+                ("wpi::math::BiquadFilter::Section", "wpi__math__BiquadFilter__Section.hpp"),
             ],
         ),
         struct(
@@ -975,12 +1059,72 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             trampolines = [],
         ),
         struct(
+            class_name = "DifferentialSample",
+            yml_file = "semiwrap/DifferentialSample.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/DifferentialSample.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::DifferentialSample", "wpi__math__DifferentialSample.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "DifferentialTrajectory",
+            yml_file = "semiwrap/DifferentialTrajectory.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/DifferentialTrajectory.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::DifferentialTrajectory", "wpi__math__DifferentialTrajectory.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "DrivetrainSplineSample",
+            yml_file = "semiwrap/DrivetrainSplineSample.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/DrivetrainSplineSample.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::DrivetrainSplineSample", "wpi__math__DrivetrainSplineSample.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "DrivetrainSplineTrajectory",
+            yml_file = "semiwrap/DrivetrainSplineTrajectory.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/DrivetrainSplineTrajectory.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::DrivetrainSplineTrajectory", "wpi__math__DrivetrainSplineTrajectory.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "DrivetrainSplineTrajectoryGenerator",
+            yml_file = "semiwrap/DrivetrainSplineTrajectoryGenerator.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::DrivetrainSplineTrajectoryGenerator", "wpi__math__DrivetrainSplineTrajectoryGenerator.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "DrivetrainSplineTrajectoryParameterizer",
+            yml_file = "semiwrap/DrivetrainSplineTrajectoryParameterizer.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/DrivetrainSplineTrajectoryParameterizer.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::DrivetrainSplineTrajectoryParameterizer", "wpi__math__DrivetrainSplineTrajectoryParameterizer.hpp"),
+            ],
+        ),
+        struct(
             class_name = "ExponentialProfile",
             yml_file = "semiwrap/ExponentialProfile.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
             header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/ExponentialProfile.hpp",
             tmpl_class_names = [
-                ("ExponentialProfile_tmpl1", "ExponentialProfileMeterVolts"),
+                ("ExponentialProfile_tmpl1", "ExponentialProfile"),
             ],
             trampolines = [
                 ("wpi::math::ExponentialProfile", "wpi__math__ExponentialProfile.hpp"),
@@ -990,14 +1134,37 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
+            class_name = "HolonomicSample",
+            yml_file = "semiwrap/HolonomicSample.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/HolonomicSample.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::HolonomicSample", "wpi__math__HolonomicSample.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "HolonomicTrajectory",
+            yml_file = "semiwrap/HolonomicTrajectory.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/HolonomicTrajectory.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::HolonomicTrajectory", "wpi__math__HolonomicTrajectory.hpp"),
+            ],
+        ),
+        struct(
             class_name = "Trajectory",
             yml_file = "semiwrap/Trajectory.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
             header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/Trajectory.hpp",
-            tmpl_class_names = [],
+            tmpl_class_names = [
+                ("Trajectory_tmpl1", "DifferentialTrajectoryBase"),
+                ("Trajectory_tmpl2", "DrivetrainSplineTrajectoryBase"),
+                ("Trajectory_tmpl3", "HolonomicTrajectoryBase"),
+            ],
             trampolines = [
                 ("wpi::math::Trajectory", "wpi__math__Trajectory.hpp"),
-                ("wpi::math::Trajectory::State", "wpi__math__Trajectory__State.hpp"),
             ],
         ),
         struct(
@@ -1011,23 +1178,13 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
-            class_name = "TrajectoryGenerator",
-            yml_file = "semiwrap/TrajectoryGenerator.yml",
+            class_name = "TrajectorySample",
+            yml_file = "semiwrap/TrajectorySample.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/TrajectoryGenerator.hpp",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/TrajectorySample.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::math::TrajectoryGenerator", "wpi__math__TrajectoryGenerator.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "TrajectoryParameterizer",
-            yml_file = "semiwrap/TrajectoryParameterizer.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/TrajectoryParameterizer.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::TrajectoryParameterizer", "wpi__math__TrajectoryParameterizer.hpp"),
+                ("wpi::math::TrajectorySample", "wpi__math__TrajectorySample.hpp"),
             ],
         ),
         struct(
@@ -1043,6 +1200,7 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
                 ("wpi::math::TrapezoidProfile", "wpi__math__TrapezoidProfile.hpp"),
                 ("wpi::math::TrapezoidProfile::Constraints", "wpi__math__TrapezoidProfile__Constraints.hpp"),
                 ("wpi::math::TrapezoidProfile::State", "wpi__math__TrapezoidProfile__State.hpp"),
+                ("wpi::math::TrapezoidProfile::ProfileTiming", "wpi__math__TrapezoidProfile__ProfileTiming.hpp"),
             ],
         ),
         struct(
@@ -1188,6 +1346,7 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
+        name_transforms = NAME_TRANSFORMS,
     )
 
     create_pybind_library(
@@ -1281,6 +1440,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
+        distribution = "robotpy-wpimath",
         srcs = native.glob(["src/main/python/wpimath/**/*.py"]) + [
             "src/main/python/wpimath/_init__wpimath.py",
             "{}.generate_version".format(name),
@@ -1301,6 +1461,7 @@ def define_pybind_library(name, pkgcfgs = []):
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
         requires = ["robotpy-native-wpimath==0.0.0", "robotpy-wpiutil==0.0.0"],
+        python_requires = ">=3.11",
         entry_points = {
             "pkg_config": ["wpimath-casters = wpimath", "wpimath = wpimath"],
         },

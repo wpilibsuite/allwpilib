@@ -5,12 +5,11 @@
 #include "wpi/framework/OpModeRobot.hpp"
 
 #include <cstdlib>
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
@@ -25,13 +24,14 @@
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/util/SafeThread.hpp"
+#include "wpi/util/print.hpp"
 
 using namespace wpi;
 
 OpModeRobotBase::OpModeRobotBase(wpi::units::second_t period)
     : m_period{period},
       m_loopOverrunAlert{
-          fmt::format("Loop time of {:.6f}s overrun", m_period.value()),
+          std::format("Loop time of {:.6f}s overrun", m_period.value()),
           Alert::Level::MEDIUM},
       m_watchdog{period, [this] { m_loopOverrunAlert.Set(true); }} {
   // Create our own notifier and callback queue
@@ -91,7 +91,8 @@ void OpModeRobotBase::LoopFunc() {
       auto data = m_opModes.lookup(modeId);
       if (data.factory) {
         // Instantiate the new opmode
-        fmt::print("********** Starting OpMode {} **********\n", data.name);
+        wpi::util::print("********** Starting OpMode {} **********\n",
+                         data.name);
         m_currentOpMode = data.factory();
         if (m_currentOpMode) {
           // Ensure disabledPeriodic is called at least once
@@ -189,7 +190,7 @@ void OpModeRobotBase::LoopFunc() {
 }
 
 void OpModeRobotBase::StartCompetition() {
-  fmt::print("********** Robot program startup complete **********\n");
+  wpi::util::print("********** Robot program startup complete **********\n");
 
   if constexpr (IsSimulation()) {
     SimulationInit();

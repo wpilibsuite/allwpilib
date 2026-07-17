@@ -28,7 +28,7 @@ class ProxyCommand(Command):
         """
         super().__init__()
 
-        self.setName(f"Proxy({command.getName()})")
+        self.set_name(f"Proxy({command.get_name()})")
         self._command = command
 
     def initialize(self):
@@ -43,13 +43,13 @@ class ProxyCommand(Command):
     def execute(self):
         pass
 
-    def isFinished(self) -> bool:
+    def is_finished(self) -> bool:
         # because we're between `initialize` and `end`, `self._command` is necessarily not None
         # but if called otherwise and m_command is None,
         # it's UB, so we can do whatever we want -- like return true.
-        return self._command is None or not self._command.isScheduled()
+        return self._command is None or not self._command.is_scheduled()
 
-    def runsWhenDisabled(self) -> bool:
+    def runs_when_disabled(self) -> bool:
         """
         Whether the given command should run when the robot is disabled. Override to return true if the
         command should run when disabled.
@@ -58,10 +58,10 @@ class ProxyCommand(Command):
         """
         return True
 
-    def initSendable(self, builder: SendableBuilder):
-        super().initSendable(builder)
-        builder.addStringProperty(
+    def init_sendable(self, builder: SendableBuilder):
+        super().init_sendable(builder)
+        builder.add_string_property(
             "proxied",
-            lambda: "null" if self._command is None else self._command.getName(),
+            lambda: "null" if self._command is None else self._command.get_name(),
             lambda _: None,
         )

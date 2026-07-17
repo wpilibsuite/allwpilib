@@ -13,7 +13,7 @@
 #ifndef WPIUTIL_WPI_MATHEXTRAS_H
 #define WPIUTIL_WPI_MATHEXTRAS_H
 
-#include "wpi/util/bit.hpp"
+#include "wpi/util/STLForwardCompat.hpp"
 #include "wpi/util/Compiler.hpp"
 #include <bit>
 #include <cassert>
@@ -43,7 +43,7 @@ using common_sint =
 
 /// Create a bitmask with the N right-most bits set to 1, and all other
 /// bits set to 0.  Only unsigned types are allowed.
-template <typename T> T maskTrailingOnes(unsigned N) {
+template <typename T> constexpr T maskTrailingOnes(unsigned N) {
   static_assert(std::is_unsigned_v<T>, "Invalid type!");
   const unsigned Bits = CHAR_BIT * sizeof(T);
   assert(N <= Bits && "Invalid bit index");
@@ -54,19 +54,19 @@ template <typename T> T maskTrailingOnes(unsigned N) {
 
 /// Create a bitmask with the N left-most bits set to 1, and all other
 /// bits set to 0.  Only unsigned types are allowed.
-template <typename T> T maskLeadingOnes(unsigned N) {
+template <typename T> constexpr T maskLeadingOnes(unsigned N) {
   return ~maskTrailingOnes<T>(CHAR_BIT * sizeof(T) - N);
 }
 
 /// Create a bitmask with the N right-most bits set to 0, and all other
 /// bits set to 1.  Only unsigned types are allowed.
-template <typename T> T maskTrailingZeros(unsigned N) {
+template <typename T> constexpr T maskTrailingZeros(unsigned N) {
   return maskLeadingOnes<T>(CHAR_BIT * sizeof(T) - N);
 }
 
 /// Create a bitmask with the N left-most bits set to 0, and all other
 /// bits set to 1.  Only unsigned types are allowed.
-template <typename T> T maskLeadingZeros(unsigned N) {
+template <typename T> constexpr T maskLeadingZeros(unsigned N) {
   return maskTrailingOnes<T>(CHAR_BIT * sizeof(T) - N);
 }
 
@@ -84,7 +84,7 @@ static const unsigned char BitReverseTable256[256] = {
 };
 
 /// Reverse the bits in \p Val.
-template <typename T> T reverseBits(T Val) {
+template <typename T> constexpr T reverseBits(T Val) {
 #if __has_builtin(__builtin_bitreverse8)
   if constexpr (std::is_same_v<T, uint8_t>)
     return __builtin_bitreverse8(Val);
@@ -156,16 +156,8 @@ constexpr bool isShiftedInt(int64_t x) {
 
 /// Checks if an unsigned integer fits into the given bit width.
 template <unsigned N> constexpr bool isUInt(uint64_t x) {
-  if constexpr (N == 0)
-    return 0 == x;
-  if constexpr (N == 8)
-    return static_cast<uint8_t>(x) == x;
-  if constexpr (N == 16)
-    return static_cast<uint16_t>(x) == x;
-  if constexpr (N == 32)
-    return static_cast<uint32_t>(x) == x;
   if constexpr (N < 64)
-    return x < (UINT64_C(1) << (N));
+    return (x >> N) == 0;
   (void)x; // MSVC v19.25 warns that x is unused.
   return true;
 }
@@ -181,7 +173,7 @@ constexpr bool isShiftedUInt(uint64_t x) {
 }
 
 /// Gets the maximum value for a N-bit unsigned integer.
-inline uint64_t maxUIntN(uint64_t N) {
+inline constexpr uint64_t maxUIntN(uint64_t N) {
   assert(N <= 64 && "integer width out of range");
 
   // uint64_t(1) << 64 is undefined behavior, so we can't do
@@ -202,12 +194,12 @@ inline uint64_t maxUIntN(uint64_t N) {
 #endif
 
 /// Gets the minimum value for a N-bit signed integer.
-inline int64_t minIntN(int64_t N) {
+inline constexpr int64_t minIntN(int64_t N) {
   assert(N >= 0 && N <= 64 && "integer width out of range");
 
   if (N == 0)
     return 0;
-  return UINT64_C(1) + ~(UINT64_C(1) << (N - 1));
+  return UINT64_MAX << (N - 1);
 }
 
 #ifdef _WIN32
@@ -215,7 +207,7 @@ inline int64_t minIntN(int64_t N) {
 #endif
 
 /// Gets the maximum value for a N-bit signed integer.
-inline int64_t maxIntN(int64_t N) {
+inline constexpr int64_t maxIntN(int64_t N) {
   assert(N >= 0 && N <= 64 && "integer width out of range");
 
   // This relies on two's complement wraparound when N == 64, so we convert to
@@ -226,12 +218,12 @@ inline int64_t maxIntN(int64_t N) {
 }
 
 /// Checks if an unsigned integer fits into the given (dynamic) bit width.
-inline bool isUIntN(unsigned N, uint64_t x) {
-  return N >= 64 || x <= maxUIntN(N);
+inline constexpr bool isUIntN(unsigned N, uint64_t x) {
+  return N >= 64 || (x >> N) == 0;
 }
 
 /// Checks if an signed integer fits into the given (dynamic) bit width.
-inline bool isIntN(unsigned N, int64_t x) {
+inline constexpr bool isIntN(unsigned N, int64_t x) {
   return N >= 64 || (minIntN(N) <= x && x <= maxIntN(N));
 }
 
@@ -300,13 +292,16 @@ inline bool isShiftedMask_64(uint64_t Value, unsigned &MaskIdx,
 
 /// Compile time Log2.
 /// Valid only for positive powers of two.
-template <size_t kValue> constexpr size_t CTLog2() {
-  static_assert(kValue > 0 && wpi::util::isPowerOf2_64(kValue),
-                "Value is not a valid power of 2");
-  return 1 + CTLog2<kValue / 2>();
+template <size_t kValue> constexpr size_t ConstantLog2() {
+  static_assert(wpi::util::isPowerOf2_64(kValue), "Value is not a valid power of 2");
+  return std::countr_zero(kValue);
 }
 
-template <> constexpr size_t CTLog2<1>() { return 0; }
+template <size_t kValue>
+LLVM_DEPRECATED("Use ConstantLog2 instead", "ConstantLog2")
+constexpr size_t CTLog2() {
+  return ConstantLog2<kValue>();
+}
 
 /// Return the floor log base 2 of the specified value, -1 if the value is zero.
 /// (32 bit edition.)
@@ -568,6 +563,15 @@ inline int64_t SignExtend64(uint64_t X, unsigned B) {
   return int64_t(X << (64 - B)) >> (64 - B);
 }
 
+/// Return the absolute value of a signed integer, converted to the
+/// corresponding unsigned integer type. Avoids undefined behavior in std::abs
+/// when you pass it INT_MIN or similar.
+template <typename T, typename U = std::make_unsigned_t<T>>
+constexpr U AbsoluteValue(T X) {
+  // If X is negative, cast it to the unsigned type _before_ negating it.
+  return X < 0 ? -static_cast<U>(X) : X;
+}
+
 /// Subtract two unsigned integers, X and Y, of type T and return the absolute
 /// value of the result.
 template <typename U, typename V, typename T = common_uint<U, V>>
@@ -667,7 +671,7 @@ SaturatingMultiplyAdd(T X, T Y, T A, bool *ResultOverflowed = nullptr) {
 }
 
 /// Use this rather than HUGE_VALF; the latter causes warnings on MSVC.
-extern const float huge_valf;
+LLVM_ABI extern const float huge_valf;
 
 /// Add two signed integers, computing the two's complement truncated result,
 /// returning true if overflow occurred.
@@ -696,7 +700,7 @@ std::enable_if_t<std::is_signed_v<T>, T> AddOverflow(T X, T Y, T &Result) {
 }
 
 /// Subtract two signed integers, computing the two's complement truncated
-/// result, returning true if an overflow ocurred.
+/// result, returning true if an overflow occurred.
 template <typename T>
 std::enable_if_t<std::is_signed_v<T>, T> SubOverflow(T X, T Y, T &Result) {
 #if __has_builtin(__builtin_sub_overflow)
@@ -722,7 +726,7 @@ std::enable_if_t<std::is_signed_v<T>, T> SubOverflow(T X, T Y, T &Result) {
 }
 
 /// Multiply two signed integers, computing the two's complement truncated
-/// result, returning true if an overflow ocurred.
+/// result, returning true if an overflow occurred.
 template <typename T>
 std::enable_if_t<std::is_signed_v<T>, T> MulOverflow(T X, T Y, T &Result) {
 #if __has_builtin(__builtin_mul_overflow)

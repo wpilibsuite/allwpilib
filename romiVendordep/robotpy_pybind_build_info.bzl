@@ -1,11 +1,74 @@
 # THIS FILE IS AUTO GENERATED
 
 load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
-load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "robotpy_library")
+load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "create_pybind_library", "robotpy_library")
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
 def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
+    NAME_TRANSFORMS = [
+        "--name-transform-default",
+        "snake_case",
+        "--name-transform-enum-value",
+        "CAPS_CASE",
+        "--name-transform-known-word",
+        "3V3",
+        "--name-transform-known-word",
+        "5V",
+        "--name-transform-known-word",
+        "CAN",
+        "--name-transform-known-word",
+        "CPU",
+        "--name-transform-known-word",
+        "DS",
+        "--name-transform-known-word",
+        "FMS",
+        "--name-transform-known-word",
+        "FPGA",
+        "--name-transform-known-word",
+        "HAL",
+        "--name-transform-known-word",
+        "HTTP",
+        "--name-transform-known-word",
+        "I2C",
+        "--name-transform-known-word",
+        "IMU",
+        "--name-transform-known-word",
+        "JNI",
+        "--name-transform-known-word",
+        "JSON",
+        "--name-transform-known-word",
+        "mDNS",
+        "--name-transform-known-word",
+        "NT",
+        "--name-transform-known-word",
+        "OpMode",
+        "--name-transform-known-word",
+        "PCM",
+        "--name-transform-known-word",
+        "PDH",
+        "--name-transform-known-word",
+        "PDP",
+        "--name-transform-known-word",
+        "PID",
+        "--name-transform-known-word",
+        "POVs",
+        "--name-transform-known-word",
+        "PWM",
+        "--name-transform-known-word",
+        "RIO",
+        "--name-transform-known-word",
+        "SPI",
+        "--name-transform-known-word",
+        "URI",
+        "--name-transform-known-word",
+        "URL",
+        "--name-transform-known-word",
+        "USB",
+        "--name-transform-known-word",
+        "VIn",
+    ]
+
     ROMI_HEADER_GEN = [
         struct(
             class_name = "OnBoardIO",
@@ -35,6 +98,16 @@ def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::romi::RomiMotor", "wpi__romi__RomiMotor.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "RomiServo",
+            yml_file = "semiwrap/RomiServo.yml",
+            header_root = "$(execpath :robotpy-native-romi.copy_headers)",
+            header_file = "$(execpath :robotpy-native-romi.copy_headers)/wpi/romi/RomiServo.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::romi::RomiServo", "wpi__romi__RomiServo.hpp"),
             ],
         ),
     ]
@@ -86,6 +159,7 @@ def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes
             "//wpinet:robotpy-native-wpinet.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
+        name_transforms = NAME_TRANSFORMS,
     )
 
     create_pybind_library(
@@ -160,6 +234,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
+        distribution = "robotpy-romi",
         srcs = native.glob(["src/main/python/romi/**/*.py"]) + [
             "src/main/python/romi/_init__romi.py",
             "{}.generate_version".format(name),
@@ -181,6 +256,7 @@ def define_pybind_library(name, pkgcfgs = []):
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
         requires = ["robotpy-native-romi==0.0.0", "wpilib==0.0.0", "robotpy-halsim-ws==0.0.0"],
+        python_requires = ">=3.11",
         entry_points = {
             "pkg_config": ["romi = romi"],
             "robotpy_cli.2027": ["run-romi = romi.cli:RunRomi"],

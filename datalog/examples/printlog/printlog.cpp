@@ -3,16 +3,14 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <chrono>
+#include <format>
 #include <utility>
 #include <vector>
-
-#include <fmt/chrono.h>
-#include <fmt/format.h>
-#include <fmt/ranges.h>
 
 #include "wpi/datalog/DataLogReader.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/print.hpp"
 
 int main(int argc, const char** argv) {
@@ -95,7 +93,7 @@ int main(int argc, const char** argv) {
         if (record.GetInteger(&val)) {
           auto timeval = std::chrono::system_clock::time_point(
               std::chrono::microseconds(val));
-          wpi::util::print("  {:%Y-%m-%d %H:%M:%S}.{:06}\n", timeval,
+          wpi::util::print("  {:%Y-%m-%d %H:%M:%OS}.{:06}\n", timeval,
                            val % 1000000);
         } else {
           wpi::util::print("  invalid\n");
@@ -132,35 +130,35 @@ int main(int argc, const char** argv) {
       } else if (entry->second.type == "boolean[]") {
         std::vector<int> val;
         if (record.GetBooleanArray(&val)) {
-          wpi::util::print("  {}\n", fmt::join(val, ", "));
+          wpi::util::print("  {}\n", wpi::util::join(val, ", "));
         } else {
           wpi::util::print("  invalid\n");
         }
       } else if (entry->second.type == "double[]") {
         std::vector<double> val;
         if (record.GetDoubleArray(&val)) {
-          wpi::util::print("  {}\n", fmt::join(val, ", "));
+          wpi::util::print("  {}\n", wpi::util::join(val, ", "));
         } else {
           wpi::util::print("  invalid\n");
         }
       } else if (entry->second.type == "float[]") {
         std::vector<float> val;
         if (record.GetFloatArray(&val)) {
-          wpi::util::print("  {}\n", fmt::join(val, ", "));
+          wpi::util::print("  {}\n", wpi::util::join(val, ", "));
         } else {
           wpi::util::print("  invalid\n");
         }
       } else if (entry->second.type == "int64[]") {
         std::vector<int64_t> val;
         if (record.GetIntegerArray(&val)) {
-          wpi::util::print("  {}\n", fmt::join(val, ", "));
+          wpi::util::print("  {}\n", wpi::util::join(val, ", "));
         } else {
           wpi::util::print("  invalid\n");
         }
       } else if (entry->second.type == "string[]") {
         std::vector<std::string_view> val;
         if (record.GetStringArray(&val)) {
-          wpi::util::print("  {}\n", fmt::join(val, ", "));
+          wpi::util::print("  {}\n", wpi::util::join(val, ", "));
         } else {
           wpi::util::print("  invalid\n");
         }

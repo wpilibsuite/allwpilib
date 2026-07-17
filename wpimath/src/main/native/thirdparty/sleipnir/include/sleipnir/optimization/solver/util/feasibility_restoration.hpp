@@ -33,7 +33,7 @@ ExitStatus interior_point(
     Eigen::Vector<Scalar, Eigen::Dynamic>& x,
     Eigen::Vector<Scalar, Eigen::Dynamic>& s,
     Eigen::Vector<Scalar, Eigen::Dynamic>& y,
-    Eigen::Vector<Scalar, Eigen::Dynamic>& z, Scalar& μ);
+    Eigen::Vector<Scalar, Eigen::Dynamic>& z, Scalar& μ, int& iterations);
 
 /// Computes initial values for p and n in feasibility restoration.
 ///
@@ -96,8 +96,6 @@ compute_p_n(const Eigen::Vector<Scalar, Eigen::Dynamic>& c, Scalar ρ,
   return {std::move(p), std::move(n)};
 }
 
-// @cond Suppress Doxygen
-
 /// Finds the iterate that minimizes the constraint violation while not
 /// deviating too far from the starting point. This is a fallback procedure when
 /// the normal Sequential Quadratic Programming method fails to converge to a
@@ -111,6 +109,7 @@ compute_p_n(const Eigen::Vector<Scalar, Eigen::Dynamic>& c, Scalar ρ,
 /// @param[in,out] x The decision variables from the normal solve.
 /// @param[in,out] y The equality constraint dual variables from the normal
 ///     solve.
+/// @param[in,out] iterations The iteration counter.
 /// @return The exit status.
 template <typename Scalar>
 ExitStatus feasibility_restoration(
@@ -118,7 +117,7 @@ ExitStatus feasibility_restoration(
     std::span<std::function<bool(const IterationInfo<Scalar>& info)>>
         iteration_callbacks,
     const Options& options, Eigen::Vector<Scalar, Eigen::Dynamic>& x,
-    Eigen::Vector<Scalar, Eigen::Dynamic>& y) {
+    Eigen::Vector<Scalar, Eigen::Dynamic>& y, int& iterations) {
   // Feasibility restoration
   //
   //        min  ρ Σ (pₑ + nₑ) + ζ/2 (x - xᵣ)ᵀDᵣ(x - xᵣ)
@@ -148,12 +147,14 @@ ExitStatus feasibility_restoration(
 
   constexpr Scalar ρ(1e3);
   const Scalar μ(options.tolerance / 10.0);
-  const Scalar ζ = sqrt(μ);
 
   const DenseVector c_e = matrices.c_e(x);
 
+  Scalar fr_μ = std::max(μ, c_e.template lpNorm<Eigen::Infinity>());
+  const Scalar ζ = sqrt(fr_μ);
+
   const auto& x_r = x;
-  const auto [p_e_0, n_e_0] = compute_p_n(c_e, ρ, μ);
+  const auto [p_e_0, n_e_0] = compute_p_n(c_e, ρ, fr_μ);
 
   // Dᵣ = diag(min(1, 1/xᵣ[i]²) for i in x.rows())
   const DiagonalMatrix D_r =
@@ -166,10 +167,15 @@ ExitStatus feasibility_restoration(
 
   DenseVector fr_y = DenseVector::Zero(num_eq);
 
+  // Force the duals to start with perfect complementarity with the slacks
   DenseVector fr_z{2 * num_eq};
-  fr_z << μ * p_e_0.cwiseInverse(), μ * n_e_0.cwiseInverse();
+  fr_z << fr_μ * p_e_0.cwiseInverse(), fr_μ * n_e_0.cwiseInverse();
 
-  Scalar fr_μ = std::max(μ, c_e.template lpNorm<Eigen::Infinity>());
+  // Inherit the parent problem's scaling for the constraints, and use no
+  // scaling for the cost function since it has changed. The new rows introduced
+  // are not scaled.
+  const ProblemScaling<Scalar> fr_scaling{Scalar(1), matrices.scaling.c_e,
+                                          DenseVector::Ones(2 * num_eq)};
 
   InteriorPointMatrixCallbacks<Scalar> fr_matrix_callbacks{
       static_cast<int>(fr_x.rows()),
@@ -289,14 +295,15 @@ ExitStatus feasibility_restoration(
         SparseMatrix A_i_p{2 * num_eq, x_p.rows()};
         A_i_p.setFromSortedTriplets(triplets.begin(), triplets.end());
         return A_i_p;
-      }};
+      },
+      fr_scaling};
 
-  auto status = interior_point<Scalar>(fr_matrix_callbacks, iteration_callbacks,
-                                       options, true,
+  auto status = interior_point<Scalar>(
+      fr_matrix_callbacks, iteration_callbacks, options, true,
 #ifdef SLEIPNIR_ENABLE_BOUND_PROJECTION
-                                       {},
+      Eigen::ArrayX<bool>::Constant(2 * num_eq, true),
 #endif
-                                       fr_x, fr_s, fr_y, fr_z, fr_μ);
+      fr_x, fr_s, fr_y, fr_z, fr_μ, iterations);
 
   x = fr_x.segment(0, x.rows());
 
@@ -331,16 +338,21 @@ ExitStatus feasibility_restoration(
 /// @param[in,out] z The current inequality constraint duals from the normal
 ///     solve.
 /// @param[in] μ Barrier parameter.
+/// @param[in,out] iterations The iteration counter.
 /// @return The exit status.
 template <typename Scalar>
 ExitStatus feasibility_restoration(
     const InteriorPointMatrixCallbacks<Scalar>& matrix_callbacks,
     std::span<std::function<bool(const IterationInfo<Scalar>& info)>>
         iteration_callbacks,
-    const Options& options, Eigen::Vector<Scalar, Eigen::Dynamic>& x,
+    const Options& options,
+#ifdef SLEIPNIR_ENABLE_BOUND_PROJECTION
+    const Eigen::ArrayX<bool>& bound_constraint_mask,
+#endif
+    Eigen::Vector<Scalar, Eigen::Dynamic>& x,
     Eigen::Vector<Scalar, Eigen::Dynamic>& s,
     Eigen::Vector<Scalar, Eigen::Dynamic>& y,
-    Eigen::Vector<Scalar, Eigen::Dynamic>& z, Scalar μ) {
+    Eigen::Vector<Scalar, Eigen::Dynamic>& z, Scalar μ, int& iterations) {
   // Feasibility restoration
   //
   //        min  ρ Σ (pₑ + nₑ + pᵢ + nᵢ) + ζ/2 (x - xᵣ)ᵀDᵣ(x - xᵣ)
@@ -374,14 +386,17 @@ ExitStatus feasibility_restoration(
   const auto& num_ineq = matrices.num_inequality_constraints;
 
   constexpr Scalar ρ(1e3);
-  const Scalar ζ = sqrt(μ);
 
   const DenseVector c_e = matrices.c_e(x);
   const DenseVector c_i = matrices.c_i(x);
 
+  Scalar fr_μ = std::max({μ, c_e.template lpNorm<Eigen::Infinity>(),
+                          (c_i - s).template lpNorm<Eigen::Infinity>()});
+  const Scalar ζ = sqrt(fr_μ);
+
   const auto& x_r = x;
-  const auto [p_e_0, n_e_0] = compute_p_n(c_e, ρ, μ);
-  const auto [p_i_0, n_i_0] = compute_p_n((c_i - s).eval(), ρ, μ);
+  const auto [p_e_0, n_e_0] = compute_p_n(c_e, ρ, fr_μ);
+  const auto [p_i_0, n_i_0] = compute_p_n((c_i - s).eval(), ρ, fr_μ);
 
   // Dᵣ = diag(min(1, 1/xᵣ[i]²) for i in x.rows())
   const DiagonalMatrix D_r =
@@ -396,12 +411,20 @@ ExitStatus feasibility_restoration(
 
   DenseVector fr_y = DenseVector::Zero(c_e.rows());
 
+  // Force the duals to start with perfect complementarity with the slacks
   DenseVector fr_z{c_i.rows() + 2 * num_eq + 2 * num_ineq};
-  fr_z << z.cwiseMin(ρ), μ * p_e_0.cwiseInverse(), μ * n_e_0.cwiseInverse(),
-      μ * p_i_0.cwiseInverse(), μ * n_i_0.cwiseInverse();
+  fr_z << fr_μ * s.cwiseInverse(), fr_μ * p_e_0.cwiseInverse(),
+      fr_μ * n_e_0.cwiseInverse(), fr_μ * p_i_0.cwiseInverse(),
+      fr_μ * n_i_0.cwiseInverse();
 
-  Scalar fr_μ = std::max({μ, c_e.template lpNorm<Eigen::Infinity>(),
-                          (c_i - s).template lpNorm<Eigen::Infinity>()});
+  // Inherit the parent problem's scaling for the constraints, and use no
+  // scaling for the cost function since it has changed. The new rows introduced
+  // are not scaled.
+  DenseVector fr_d_c_i{c_i.rows() + 2 * num_eq + 2 * num_ineq};
+  fr_d_c_i << matrices.scaling.c_i,
+      DenseVector::Ones(2 * num_eq + 2 * num_ineq);
+  const ProblemScaling<Scalar> fr_scaling{Scalar(1), matrices.scaling.c_e,
+                                          fr_d_c_i};
 
   InteriorPointMatrixCallbacks<Scalar> fr_matrix_callbacks{
       static_cast<int>(fr_x.rows()),
@@ -564,14 +587,21 @@ ExitStatus feasibility_restoration(
         SparseMatrix A_i_p{2 * num_eq + 3 * num_ineq, x_p.rows()};
         A_i_p.setFromSortedTriplets(triplets.begin(), triplets.end());
         return A_i_p;
-      }};
+      },
+      fr_scaling};
 
-  auto status = interior_point<Scalar>(fr_matrix_callbacks, iteration_callbacks,
-                                       options, true,
 #ifdef SLEIPNIR_ENABLE_BOUND_PROJECTION
-                                       {},
+  Eigen::ArrayX<bool> fr_bound_constraint_mask{2 * num_eq + 3 * num_ineq};
+  fr_bound_constraint_mask.segment(0, num_ineq) = bound_constraint_mask;
+  fr_bound_constraint_mask.segment(num_ineq, 2 * num_eq + 2 * num_ineq) = true;
 #endif
-                                       fr_x, fr_s, fr_y, fr_z, fr_μ);
+
+  auto status = interior_point<Scalar>(
+      fr_matrix_callbacks, iteration_callbacks, options, true,
+#ifdef SLEIPNIR_ENABLE_BOUND_PROJECTION
+      fr_bound_constraint_mask,
+#endif
+      fr_x, fr_s, fr_y, fr_z, fr_μ, iterations);
 
   x = fr_x.segment(0, x.rows());
   s = fr_s.segment(0, s.rows());
@@ -593,8 +623,6 @@ ExitStatus feasibility_restoration(
     return ExitStatus::FEASIBILITY_RESTORATION_FAILED;
   }
 }
-
-// @endcond
 
 }  // namespace slp
 

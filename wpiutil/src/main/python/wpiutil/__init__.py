@@ -9,8 +9,12 @@ from ._wpiutil import (
     SendableBuilder,
     SendableRegistry,
     TimestampSource,
-    getStackTrace,
-    getStackTraceDefault,
+    get_stack_trace,
+    set_now_impl,
+    get_stack_trace_default,
+    get_system_time,
+    now,
+    now_default,
 )
 
 __all__ = [
@@ -21,8 +25,12 @@ __all__ = [
     "SendableBuilder",
     "SendableRegistry",
     "TimestampSource",
-    "getStackTrace",
-    "getStackTraceDefault",
+    "get_stack_trace",
+    "set_now_impl",
+    "get_stack_trace_default",
+    "get_system_time",
+    "now",
+    "now_default",
 ]
 
 # Imported for side effects only

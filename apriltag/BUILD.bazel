@@ -47,7 +47,7 @@ cc_library(
             "/wd4267",
             "/wd4996",
         ],
-        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": [
+        "@wpilib_toolchains//constraints/combined:is_linux": [
             "-Wno-format-nonliteral",
             "-Wno-maybe-uninitialized",
             "-Wno-sign-compare",
@@ -139,7 +139,7 @@ wpilib_jni_java_library(
     extra_source_pkgs = ["resources"],
     maven_artifact_name = "apriltag-java",
     maven_group_id = "org.wpilib.apriltag",
-    native_libs = [":apriltagjni"],
+    native_libs = [":shared/apriltagjni"],
     plugins = [
         "//:avaje_jsonb_generator",
     ],
@@ -164,13 +164,13 @@ pkg_files(
 cc_test(
     name = "apriltag-cpp-test",
     size = "small",
-    srcs = glob(["src/test/native/cpp/**"]),
+    srcs = glob(["src/test/native/cpp/**/*.cpp"]),
     tags = [
         "no-asan",
     ],
     deps = [
         ":apriltag",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 
@@ -209,7 +209,7 @@ py_binary(
     name = "convert_apriltag_layouts",
     srcs = ["convert_apriltag_layouts.py"],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
 )

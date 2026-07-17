@@ -4,10 +4,17 @@
 
 #include "wpi/math/geometry/CoordinateSystem.hpp"
 
+#include <stdexcept>
+
 #include <gtest/gtest.h>
 
+#include "wpi/math/geometry/CoordinateAxis.hpp"
 #include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Transform3d.hpp"
+#include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 
 using namespace wpi::math;
 

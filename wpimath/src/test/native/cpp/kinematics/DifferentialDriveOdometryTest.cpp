@@ -8,6 +8,9 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+
 static constexpr double kEpsilon = 1E-9;
 
 using namespace wpi::math;

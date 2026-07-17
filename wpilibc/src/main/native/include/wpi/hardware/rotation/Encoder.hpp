@@ -5,8 +5,8 @@
 #pragma once
 
 #include "wpi/hal/Encoder.h"
-#include "wpi/hal/Types.hpp"
 #include "wpi/hardware/discrete/CounterBase.hpp"
+#include "wpi/util/Handle.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -79,46 +79,9 @@ class Encoder : public CounterBase,
   void Reset() override;
 
   /**
-   * Returns the period of the most recent pulse.
-   *
-   * Returns the period of the most recent Encoder pulse in seconds. This method
-   * compensates for the decoding type.
-   *
-   * Warning: This returns unscaled periods. Use GetRate() for rates that are
-   * scaled using the value from SetDistancePerPulse().
-   *
-   * @return Period in seconds of the most recent pulse.
-   * @deprecated Use getRate() in favor of this method.
-   */
-  [[deprecated("Use GetRate() in favor of this method")]]
-  wpi::units::second_t GetPeriod() const override;
-
-  /**
-   * Sets the maximum period for stopped detection.
-   *
-   * Sets the value that represents the maximum period of the Encoder before it
-   * will assume that the attached device is stopped. This timeout allows users
-   * to determine if the wheels or other shaft has stopped rotating.
-   * This method compensates for the decoding type.
-   *
-   * @param maxPeriod The maximum time between rising and falling edges before
-   *                  the FPGA will report the device stopped. This is expressed
-   *                  in seconds.
-   * @deprecated Use SetMinRate() in favor of this method.  This takes unscaled
-   *             periods and SetMinRate() scales using value from
-   *             SetDistancePerPulse().
-   */
-  [[deprecated(
-      "Use SetMinRate() in favor of this method.  This takes unscaled periods "
-      "and SetMinRate() scales using value from SetDistancePerPulse().")]]
-  void SetMaxPeriod(wpi::units::second_t maxPeriod) override;
-
-  /**
    * Determine if the encoder is stopped.
    *
-   * Using the MaxPeriod value, a boolean is returned that is true if the
-   * encoder is considered stopped and false if it is still moving. A stopped
-   * encoder is one where the most recent pulse width exceeds the MaxPeriod.
+   * The encoder is stopped when its current rate is zero.
    *
    * @return True if the encoder is considered stopped.
    */
@@ -142,9 +105,9 @@ class Encoder : public CounterBase,
   int GetRaw() const;
 
   /**
-   * The encoding scale factor 1x, 2x, or 4x, per the requested encodingType.
+   * The scale factor used to convert raw encoder counts to scaled count values.
    *
-   * Used to divide raw edge counts down to spec'd counts.
+   * Used to divide raw encoder counts down to the values returned by Get().
    */
   int GetEncodingScale() const;
 
@@ -165,14 +128,6 @@ class Encoder : public CounterBase,
    * @return The current rate of the encoder.
    */
   double GetRate() const;
-
-  /**
-   * Set the minimum rate of the device before the hardware reports it stopped.
-   *
-   * @param minRate The minimum rate.  The units are in distance per second as
-   *                scaled by the value from SetDistancePerPulse().
-   */
-  void SetMinRate(double minRate);
 
   /**
    * Set the distance per pulse for this encoder.
@@ -210,28 +165,6 @@ class Encoder : public CounterBase,
    * @param reverseDirection true if the encoder direction should be reversed
    */
   void SetReverseDirection(bool reverseDirection);
-
-  /**
-   * Set the Samples to Average which specifies the number of samples of the
-   * timer to average when calculating the period.
-   *
-   * Perform averaging to account for mechanical imperfections or as
-   * oversampling to increase resolution.
-   *
-   * @param samplesToAverage The number of samples to average from 1 to 127.
-   */
-  void SetSamplesToAverage(int samplesToAverage);
-
-  /**
-   * Get the Samples to Average which specifies the number of samples of the
-   * timer to average when calculating the period.
-   *
-   * Perform averaging to account for mechanical imperfections or as
-   * oversampling to increase resolution.
-   *
-   * @return The number of samples being averaged (from 1 to 127)
-   */
-  int GetSamplesToAverage() const;
 
   /**
    * Indicates this encoder is used by a simulated device.
@@ -272,7 +205,7 @@ class Encoder : public CounterBase,
    */
   double DecodingScaleFactor() const;
 
-  wpi::hal::Handle<HAL_EncoderHandle, HAL_FreeEncoder> m_encoder;
+  wpi::util::Handle<HAL_EncoderHandle, HAL_FreeEncoder> m_encoder;
 };
 
 }  // namespace wpi

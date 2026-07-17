@@ -1,10 +1,13 @@
 # THIS FILE IS AUTO GENERATED
 
 load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
-load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "copy_native_file", "create_pybind_library", "robotpy_library")
+load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "create_pybind_library", "robotpy_library")
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "resolve_casters", "run_header_gen")
 
 def halsim_gui_ext_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
+    NAME_TRANSFORMS = [
+    ]
+
     HALSIM_GUI_EXT_HEADER_GEN = [
     ]
 
@@ -18,7 +21,7 @@ def halsim_gui_ext_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = []
     gen_libinit(
         name = "halsim_gui_ext.gen_lib_init",
         output_file = "src/main/python/halsim_gui/_ext/_init__halsim_gui_ext.py",
-        modules = ["hal._init__wpiHal", "wpimath._init__wpimath", "ntcore._init__ntcore"],
+        modules = ["native.halsim_gui._init_robotpy_native_halsim_gui", "hal._init__wpi_hal", "wpimath._init__wpimath", "ntcore._init__ntcore"],
     )
 
     gen_pkgconf(
@@ -46,7 +49,15 @@ def halsim_gui_ext_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = []
         trampoline_subpath = "src/main/python/halsim_gui/_ext",
         deps = header_to_dat_deps,
         local_native_libraries = [
+            "//datalog:robotpy-native-datalog.copy_headers",
+            "//hal:robotpy-native-wpihal.copy_headers",
+            "//ntcore:robotpy-native-ntcore.copy_headers",
+            "//simulation/halsim_gui:robotpy-native-halsim-gui.copy_headers",
+            "//wpimath:robotpy-native-wpimath.copy_headers",
+            "//wpinet:robotpy-native-wpinet.copy_headers",
+            "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
+        name_transforms = NAME_TRANSFORMS,
     )
 
     create_pybind_library(
@@ -122,14 +133,9 @@ def define_pybind_library(name, pkgcfgs = []):
         template = "//shared/bazel/rules/robotpy:version_template.in",
     )
 
-    copy_native_file(
-        name = "halsim_gui",
-        library = ":shared/halsim_gui",
-        base_path = "src/main/python/halsim_gui/",
-    )
-
     robotpy_library(
         name = name,
+        distribution = "robotpy-halsim-gui",
         srcs = native.glob(["src/main/python/halsim_gui/**/*.py"]) + [
             "src/main/python/halsim_gui/_ext/_init__halsim_gui_ext.py",
             "{}.generate_version".format(name),
@@ -139,11 +145,11 @@ def define_pybind_library(name, pkgcfgs = []):
             "{}.extra_files".format(name),
             ":src/main/python/halsim_gui/_ext/_halsim_gui_ext",
             ":halsim_gui_ext.trampoline_hdr_files",
-            ":halsim_gui.copy_lib",
         ],
         imports = ["src/main/python"],
         deps = [
             "//hal:robotpy-hal",
+            "//simulation/halsim_gui:robotpy-native-halsim-gui",
             "//ntcore:pyntcore",
             "//wpimath:robotpy-wpimath",
             "//wpiutil:robotpy-wpiutil",
@@ -152,7 +158,8 @@ def define_pybind_library(name, pkgcfgs = []):
         summary = "WPILib simulation GUI",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
-        requires = ["robotpy-wpiutil==0.0.0", "robotpy-wpimath==0.0.0", "robotpy-hal==0.0.0", "pyntcore==0.0.0"],
+        requires = ["robotpy-wpiutil==0.0.0", "robotpy-wpimath==0.0.0", "robotpy-hal==0.0.0", "pyntcore==0.0.0", "robotpy-native-halsim-gui==0.0.0"],
+        python_requires = ">=3.11",
         entry_points = {
             "pkg_config": ["halsim_gui_ext = halsim_gui._ext"],
         },

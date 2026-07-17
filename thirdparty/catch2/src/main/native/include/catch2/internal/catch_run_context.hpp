@@ -102,8 +102,6 @@ namespace Catch {
 
         void handleFatalErrorCondition( StringRef message ) override;
 
-        bool lastAssertionPassed() override;
-
     public:
         // !TBD We need to do this another way!
         bool aborting() const;
@@ -125,7 +123,7 @@ namespace Catch {
                     ITransientExpression const *expr,
                     bool negated );
 
-        void populateReaction( AssertionReaction& reaction, bool has_normal_disposition );
+        void populateReaction( AssertionReaction& reaction, bool has_normal_disposition ) const;
 
         // Creates dummy info for unexpected exceptions/fatal errors,
         // where we do not have the access to one, but we still need

@@ -4,7 +4,10 @@
 
 #include "wpi/math/util/MathShared.hpp"
 
+#include <format>
 #include <memory>
+#include <mutex>
+#include <string_view>
 #include <utility>
 
 #include "wpi/units/time.hpp"
@@ -16,8 +19,8 @@ using namespace wpi::math;
 namespace {
 class DefaultMathShared : public MathShared {
  public:
-  void ReportErrorV(fmt::string_view format, fmt::format_args args) override {}
-  void ReportWarningV(fmt::string_view format, fmt::format_args args) override {
+  void ReportErrorV(std::string_view format, std::format_args args) override {}
+  void ReportWarningV(std::string_view format, std::format_args args) override {
   }
   void ReportUsage(std::string_view resource, std::string_view data) override {}
   wpi::units::second_t GetTimestamp() override {

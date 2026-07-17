@@ -17,7 +17,6 @@
 
 #include "sleipnir/util/print.hpp"
 #include "sleipnir/util/profiler.hpp"
-#include "sleipnir/util/to_underlying.hpp"
 
 namespace slp {
 
@@ -25,10 +24,8 @@ namespace slp {
 enum class IterationType : uint8_t {
   /// Normal iteration.
   NORMAL,
-  /// Accepted second-order correction iteration.
-  ACCEPTED_SOC,
-  /// Rejected second-order correction iteration.
-  REJECTED_SOC,
+  /// Second-order correction iteration.
+  SECOND_ORDER_CORRECTION,
   /// Feasibility restoration iteration.
   FEASIBILITY_RESTORATION
 };
@@ -73,8 +70,8 @@ std::string power_of_10(Scalar value) {
       if (exponent < 0) {
         output += "⁻";
       }
-      constexpr std::array strs = {"⁰", "¹", "²", "³", "⁴",
-                                   "⁵", "⁶", "⁷", "⁸", "⁹"};
+      constexpr std::array strs{"⁰", "¹", "²", "³", "⁴",
+                                "⁵", "⁶", "⁷", "⁸", "⁹"};
       for (const auto& digit : digits | std::views::reverse) {
         output += strs[digit];
       }
@@ -183,6 +180,9 @@ inline void print_bound_constraint_global_infeasibility_error(
 /// @param complementarity The complementarity.
 /// @param μ The barrier parameter.
 /// @param δ The Hessian regularization factor.
+/// @param γ The constraint Jacobian regularization factor.
+/// @param full_primal_step_inf_norm The infinity norm of the full primal step.
+/// @param full_dual_step_inf_norm The infinity norm of the full dual step.
 /// @param primal_α The primal step size.
 /// @param primal_α_max The max primal step size.
 /// @param α_reduction_factor Factor by which primal_α is reduced during
@@ -193,33 +193,23 @@ void print_iteration_diagnostics(int iterations, IterationType type,
                                  const std::chrono::duration<Rep, Period>& time,
                                  Scalar error, Scalar cost,
                                  Scalar infeasibility, Scalar complementarity,
-                                 Scalar μ, Scalar δ, Scalar primal_α,
-                                 Scalar primal_α_max, Scalar α_reduction_factor,
-                                 Scalar dual_α) {
+                                 Scalar μ, Scalar δ, Scalar γ,
+                                 Scalar full_primal_step_inf_norm,
+                                 Scalar full_dual_step_inf_norm,
+                                 Scalar primal_α, Scalar primal_α_max,
+                                 Scalar α_reduction_factor, Scalar dual_α) {
   if (iterations % 20 == 0) {
     if (iterations == 0) {
-      slp::print("┏");
+      slp::println("┏{:━^119}┓", "");
     } else {
-      slp::print("┢");
-    }
-    slp::print(
-        "{:━^4}┯{:━^4}┯{:━^9}┯{:━^12}┯{:━^13}┯{:━^12}┯{:━^12}┯{:━^8}┯{:━^5}┯"
-        "{:━^8}┯{:━^8}┯{:━^2}",
-        "", "", "", "", "", "", "", "", "", "", "", "");
-    if (iterations == 0) {
-      slp::println("┓");
-    } else {
-      slp::println("┪");
+      slp::println("┢{:━^119}┪", "");
     }
     slp::println(
-        "┃{:^4}│{:^4}│{:^9}│{:^12}│{:^13}│{:^12}│{:^12}│{:^8}│{:^5}│{:^8}│{:^8}"
-        "│{:^2}┃",
-        "iter", "type", "time (ms)", "error", "cost", "infeas.", "complement.",
-        "μ", "reg", "primal α", "dual α", "↩");
-    slp::println(
-        "┡{:━^4}┷{:━^4}┷{:━^9}┷{:━^12}┷{:━^13}┷{:━^12}┷{:━^12}┷{:━^8}┷{:━^5}┷"
-        "{:━^8}┷{:━^8}┷{:━^2}┩",
-        "", "", "", "", "", "", "", "", "", "", "", "");
+        "┃{:^4}   {:^9} {:^10} {:^11} {:^10} {:^8} {:^8} {:^5} {:^5} {:^8} "
+        "{:^8} {:^8} {:^8} {:^2}┃",
+        "iter", "duration", "error", "cost", "infeas.", "complem.", "μ", "δ",
+        "γ", "|p_pr|", "|p_du|", "α_pr", "α_du", "↩");
+    slp::println("┡{:━^119}┩", "");
   }
 
   // For the number of backtracks, we want x such that:
@@ -236,12 +226,13 @@ void print_iteration_diagnostics(int iterations, IterationType type,
   int backtracks =
       static_cast<int>(log(primal_α / primal_α_max) / log(α_reduction_factor));
 
-  constexpr std::array ITERATION_TYPES = {"norm", "✓SOC", "XSOC", "rest"};
+  constexpr std::array ITERATION_TYPES{" ", "s", "r"};
   slp::println(
-      "│{:4} {:4} {:9.3f} {:12e} {:13e} {:12e} {:12e} {:.2e} {:<5} {:.2e} "
-      "{:.2e} {:2d}│",
-      iterations, ITERATION_TYPES[slp::to_underlying(type)], to_ms(time), error,
-      cost, infeasibility, complementarity, μ, power_of_10(δ), primal_α, dual_α,
+      "│{:4} {:1} {:9.3f} {:10.4e} {:11.4e} {:10.4e} {:8.2e} {:8.2e} {:<5} "
+      "{:<5} {:8.2e} {:8.2e} {:8.2e} {:8.2e} {:2d}│",
+      iterations, ITERATION_TYPES[std::to_underlying(type)], to_ms(time), error,
+      cost, infeasibility, complementarity, μ, power_of_10(δ), power_of_10(γ),
+      full_primal_step_inf_norm, full_dual_step_inf_norm, primal_α, dual_α,
       backtracks);
 }
 #else
@@ -251,7 +242,7 @@ void print_iteration_diagnostics(int iterations, IterationType type,
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
 /// Prints bottom of iteration diagnostics table.
 inline void print_bottom_iteration_diagnostics() {
-  slp::println("└{:─^108}┘", "");
+  slp::println("└{:─^119}┘", "");
 }
 #else
 #define print_bottom_iteration_diagnostics(...)
@@ -269,7 +260,7 @@ std::string histogram(double value) {
   double ipart;
   int fpart = static_cast<int>(std::modf(value * Width, &ipart) * 8);
 
-  constexpr std::array strs = {" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█"};
+  constexpr std::array strs{" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█"};
   std::string hist;
 
   int index = 0;
@@ -297,10 +288,10 @@ inline void print_solver_diagnostics(
     const gch::small_vector<SolveProfiler>& solve_profilers) {
   auto solve_duration = to_ms(solve_profilers[0].total_duration());
 
-  slp::println("┏{:━^21}┯{:━^18}┯{:━^10}┯{:━^9}┯{:━^4}┓", "", "", "", "", "");
-  slp::println("┃{:^21}│{:^18}│{:^10}│{:^9}│{:^4}┃", "solver trace", "percent",
-               "total (ms)", "each (ms)", "runs");
-  slp::println("┡{:━^21}┷{:━^18}┷{:━^10}┷{:━^9}┷{:━^4}┩", "", "", "", "", "");
+  slp::println("┏{:━^66}┓", "");
+  slp::println("┃{:^21} {:^18} {:^10} {:^9} {:^4}┃", "time trace", "percentage",
+               "total", "each", "runs");
+  slp::println("┡{:━^66}┩", "");
 
   for (auto& profiler : solve_profilers) {
     double norm = solve_duration == 0.0
@@ -326,23 +317,26 @@ inline void print_setup_diagnostics(
     const gch::small_vector<SetupProfiler>& setup_profilers) {
   auto setup_duration = to_ms(setup_profilers[0].duration());
 
+  // Print link to diagnostic output description
+  slp::println(
+      "See https://sleipnirgroup.github.io/Sleipnir/md_usage.html#output for "
+      "diagnostic output description.\n");
+
   // Print heading
-  slp::println("┏{:━^21}┯{:━^18}┯{:━^10}┯{:━^9}┯{:━^4}┓", "", "", "", "", "");
-  slp::println("┃{:^21}│{:^18}│{:^10}│{:^9}│{:^4}┃", "setup trace", "percent",
-               "total (ms)", "each (ms)", "runs");
-  slp::println("┡{:━^21}┷{:━^18}┷{:━^10}┷{:━^9}┷{:━^4}┩", "", "", "", "", "");
+  slp::println("┏{:━^50}┓", "");
+  slp::println("┃{:^21} {:^18} {:^9}┃", "time trace", "percentage", "duration");
+  slp::println("┡{:━^50}┩", "");
 
   // Print setup profilers
   for (auto& profiler : setup_profilers) {
     double norm = setup_duration == 0.0
                       ? (&profiler == &setup_profilers[0] ? 1.0 : 0.0)
                       : to_ms(profiler.duration()) / setup_duration;
-    slp::println("│{:<21} {:>6.2f}%▕{}▏ {:>10.3f} {:>9.3f} {:>4}│",
-                 profiler.name(), norm * 100.0, histogram<9>(norm),
-                 to_ms(profiler.duration()), to_ms(profiler.duration()), "1");
+    slp::println("│{:<21} {:>6.2f}%▕{}▏ {:>9.3f}│", profiler.name(),
+                 norm * 100.0, histogram<9>(norm), to_ms(profiler.duration()));
   }
 
-  slp::println("└{:─^66}┘", "");
+  slp::println("└{:─^50}┘", "");
 }
 #else
 #define print_setup_diagnostics(...)

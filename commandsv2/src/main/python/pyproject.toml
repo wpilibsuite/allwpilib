@@ -7,7 +7,7 @@ name = "robotpy-commands-v2"
 version = "0.0.0"
 description = "WPILib command framework v2"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = "BSD-3-Clause"
 license-files = ["LICENSE"]
 dependencies = [
@@ -24,7 +24,7 @@ name = "RobotPy Development Team"
 email = "robotpy@googlegroups.com"
 
 [project.urls]
-"Source code" = "https://github.com/robotpy/robotpy-commands-v2"
+"Source code" = "https://github.com/robotpy/mostrobotpy"
 
 [tool.hatch.version]
 source = "vcs"

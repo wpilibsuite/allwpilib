@@ -47,7 +47,6 @@ void InitializeHAL() {
   InitializeDIO();
   InitializeDutyCycle();
   InitializeEncoder();
-  InitializeFIRSTDriverStation();
   InitializeI2C();
   InitializeIMU();
   InitializeMain();
@@ -60,7 +59,6 @@ void InitializeHAL() {
   InitializeSerialPort();
   InitializeSmartIo();
   InitializeThreads();
-  InitializeUsageReporting();
 }
 }  // namespace init
 

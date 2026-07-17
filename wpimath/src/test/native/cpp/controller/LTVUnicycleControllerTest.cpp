@@ -4,13 +4,22 @@
 
 #include "wpi/math/controller/LTVUnicycleController.hpp"
 
+#include <cstddef>
 #include <numbers>
+#include <vector>
 
 #include <gtest/gtest.h>
 
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Twist2d.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 #include "wpi/math/util/MathUtil.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
@@ -28,12 +37,12 @@ TEST(LTVUnicycleControllerTest, ReachesReference) {
 
   auto waypoints = std::vector{wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
                                wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
-  auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
+  auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
-  auto totalTime = trajectory.TotalTime();
-  for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {
-    auto state = trajectory.Sample(kDt * i);
+  auto duration = trajectory.Duration();
+  for (size_t i = 0; i < (duration / kDt).value(); ++i) {
+    auto state = trajectory.SampleAt(kDt * i);
     auto [vx, vy, omega] = controller.Calculate(robotPose, state);
     static_cast<void>(vy);
 
@@ -41,7 +50,7 @@ TEST(LTVUnicycleControllerTest, ReachesReference) {
         robotPose + wpi::math::Twist2d{vx * kDt, 0_m, omega * kDt}.Exp();
   }
 
-  auto& endPose = trajectory.States().back().pose;
+  auto& endPose = trajectory.Samples().back().pose;
   EXPECT_NEAR_UNITS(endPose.X(), robotPose.X(), kTolerance);
   EXPECT_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
   EXPECT_NEAR_UNITS(wpi::math::AngleModulus(endPose.Rotation().Radians() -

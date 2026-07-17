@@ -8,7 +8,7 @@
 #include <string>
 #include <thread>
 
-#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/DriverStation.hpp"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/Main.h"
 #include "wpi/nt/NetworkTable.hpp"
@@ -17,6 +17,7 @@
 #include "wpi/util/RuntimeCheck.h"
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
 #include "wpi/util/string.h"
 
 namespace wpi {
@@ -47,7 +48,7 @@ void RunRobot(wpi::util::mutex& m, Robot** robot) {
         "  See https://wpilib.org/stacktrace for more information.\n");
     throw;
   } catch (const std::exception& e) {
-    HAL_SendError(1, err::Error, 0, e.what(), "", "", 1);
+    wpi::hal::SendError(1, err::Error, e.what(), "", "", 1);
     throw;
   }
 }
@@ -64,9 +65,9 @@ int StartRobot() {
   if (!WPI_IsRuntimeValid(&foundMajor, &foundMinor, &expectedMajor,
                           &expectedMinor, &runtimePath)) {
     // We could make this error better, however unlike Java, there is only a
-    // single scenario that could be occuring. The entirety of VS is too out
+    // single scenario that could be occurring. The entirety of VS is too out
     // of date. In most cases the linker should detect this, but not always.
-    fmt::println(
+    wpi::util::println(
         "Your copy of Visual Studio is out of date. Please update it.\n");
     return 1;
   }

@@ -45,7 +45,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
   auto [handle, port] = *resource;
   port->channel = channel;
 
-  *status = port->InitializeMode(SmartIoMode::AnalogInput);
+  *status = port->InitializeMode(MRC_SmartIOMode::MRC_SmartIOMode_AnalogInput);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::ANALOG_INPUT);
     return HAL_INVALID_HANDLE;

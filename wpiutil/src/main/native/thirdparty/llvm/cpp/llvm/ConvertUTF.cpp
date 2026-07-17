@@ -62,6 +62,7 @@
 ------------------------------------------------------------------------ */
 
 #include "wpi/util/ConvertUTF.hpp"
+#include "wpi/util/SmallVector.hpp"
 #ifdef CVTUTF_DEBUG
 #include <stdio.h>
 #endif
@@ -69,7 +70,16 @@
 
 #ifdef _WIN32
 #include "wpi/util/WindowsError.hpp"
-#include "Windows/WindowsSupport.hpp"
+// mingw-w64 tends to define it as 0x0502 in its headers.
+#undef _WIN32_WINNT
+
+// Require at least Windows 7 API.
+#define _WIN32_WINNT 0x0601
+#define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
 #endif
 
 /*
@@ -84,7 +94,7 @@
 #  define ConvertUTF_RESTORE_WARNINGS \
     _Pragma("clang diagnostic pop")
 # endif
-#elif defined(__GNUC__) && __GNUC__ > 6
+#elif defined(__GNUC__)
 # define ConvertUTF_DISABLE_WARNINGS \
    _Pragma("GCC diagnostic push")    \
    _Pragma("GCC diagnostic ignored \"-Wimplicit-fallthrough\"")
@@ -597,14 +607,14 @@ ConversionResult ConvertUTF8toUTF16 (
             case 1: ch += *source++; ch <<= 6;
             case 0: ch += *source++;
         }
-        #if defined(__GNUC__) && !defined(__clang__)
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Warray-bounds"
-        #endif
+#if __GNUC__ >= 16
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
         ch -= offsetsFromUTF8[extraBytesToRead];
-        #if defined (__GNUC__) && !defined(__clang__)
-        #pragma GCC diagnostic pop
-        #endif
+#if __GNUC__ >= 16
+#pragma GCC diagnostic pop
+#endif
 
         if (target >= targetEnd) {
             source -= (extraBytesToRead+1); /* Back up source pointer! */
@@ -708,14 +718,14 @@ static ConversionResult ConvertUTF8toUTF32Impl(
             case 1: ch += *source++; ch <<= 6;
             case 0: ch += *source++;
         }
-        #if defined(__GNUC__) && !defined(__clang__)
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Warray-bounds"
-        #endif
+#if __GNUC__ >= 16
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
         ch -= offsetsFromUTF8[extraBytesToRead];
-        #if defined (__GNUC__) && !defined(__clang__)
-        #pragma GCC diagnostic pop
-        #endif
+#if __GNUC__ >= 16
+#pragma GCC diagnostic pop
+#endif
 
         if (ch <= UNI_MAX_LEGAL_UTF32) {
             /*

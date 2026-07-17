@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <filesystem>
+#include <format>
 #include <map>
 #include <memory>
 #include <optional>
@@ -10,8 +11,6 @@
 #include <vector>
 
 #include <GLFW/glfw3.h>
-#include <fmt/format.h>
-#include <fmt/ranges.h>
 #include <imgui.h>
 
 #include "cameracalibration.hpp"
@@ -25,8 +24,8 @@
 #include "wpi/gui/portable-file-dialogs.h"
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/gui/wpigui_openurl.hpp"
-#include "wpi/math/util/MathUtil.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/raw_ostream.hpp"
@@ -258,13 +257,13 @@ void SaveCalibratedField(const wpi::apriltag::AprilTagFieldLayout& field,
     wpi::util::raw_fd_ostream out(saveDir + "/" + outputName + ".json", ec,
                                   fs::OF_Text);
     if (!ec) {
-      wpi::util::json{field}.marshal(out, true, 4);
+      wpi::util::json{field}.marshal(out, true);
     }
 
     wpi::util::raw_fd_ostream fmap(saveDir + "/" + outputName + ".fmap", ec,
                                    fs::OF_Text);
     if (!ec) {
-      wpi::util::json{fmap::Fieldmap(field)}.marshal(fmap, true, 4);
+      wpi::util::json{fmap::Fieldmap(field)}.marshal(fmap, true);
     }
 
     saveDir.clear();
@@ -325,7 +324,7 @@ void CalibrateCamera() {
         wpi::util::raw_fd_ostream output_file(outputPath.string(), ec,
                                               fs::OF_Text);
         if (!ec) {
-          wpi::util::json{gCameraModel}.marshal(output_file, true, 4);
+          wpi::util::json{gCameraModel}.marshal(output_file, true);
         }
         ImGui::CloseCurrentPopup();
         calibrating = false;
@@ -339,7 +338,7 @@ void CalibrateCamera() {
         } else {
           ImGui::ProgressBar(
               processed / total, ImVec2(0.0f, 0.0f),
-              fmt::format("{}/{} frames", processed, total).c_str());
+              std::format("{}/{} frames", processed, total).c_str());
         }
       } else {
         ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
@@ -425,9 +424,9 @@ void CombineCalibrations() {
         for (auto& tags : layout.GetTags()) {
           tagIds.push_back(tags.ID);
         }
-        auto text = fmt::format("{} tags: {}",
+        auto text = std::format("{} tags: {}",
                                 std::filesystem::path(file).filename().string(),
-                                fmt::join(tagIds, ", "));
+                                wpi::util::join(tagIds, ", "));
         ImGui::Selectable(text.c_str(), false,
                           ImGuiSelectableFlags_DontClosePopups);
         if (ImGui::BeginDragDropSource()) {
@@ -442,7 +441,7 @@ void CombineCalibrations() {
       // be pulled from the dragged JSON field layout
       for (auto& [tagId, filePath] : combinerMap) {
         if (!filePath.empty()) {
-          auto text = fmt::format("Tag ID {}: {}", tagId, filePath);
+          auto text = std::format("Tag ID {}: {}", tagId, filePath);
           ImGui::TextUnformatted(text.c_str());
         } else {
           ImGui::Text("Tag ID %i: <none, using ideal field layout (DROP HERE)>",

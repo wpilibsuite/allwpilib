@@ -4,9 +4,8 @@
 
 #include "wpi/glass/networktables/NTCommandSelector.hpp"
 
+#include <format>
 #include <utility>
-
-#include <fmt/format.h>
 
 #include "wpi/util/StringExtras.hpp"
 
@@ -19,10 +18,10 @@ NTCommandSelectorModel::NTCommandSelectorModel(std::string_view path)
 NTCommandSelectorModel::NTCommandSelectorModel(
     wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
-      m_running{inst.GetBooleanTopic(fmt::format("{}/running", path))
+      m_running{inst.GetBooleanTopic(std::format("{}/running", path))
                     .GetEntry(false)},
-      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
-      m_runningData{fmt::format("NTCmd:{}", path)},
+      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
+      m_runningData{std::format("NTCmd:{}", path)},
       m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
 void NTCommandSelectorModel::SetRunning(bool run) {

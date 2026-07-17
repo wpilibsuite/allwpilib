@@ -5,7 +5,9 @@
 #include "wpi/hardware/expansionhub/ExpansionHub.hpp"
 
 #include <chrono>
+#include <format>
 #include <memory>
+#include <string>
 #include <thread>
 
 #include "wpi/framework/RobotBase.hpp"
@@ -29,7 +31,7 @@ class ExpansionHub::DataStore {
     auto systemServer = SystemServer::GetSystemServer();
 
     m_hubConnectedSubscriber =
-        systemServer.GetBooleanTopic(fmt::format("/rhsp/{}/connected", usbId))
+        systemServer.GetBooleanTopic(std::format("/rhsp/{}/connected", usbId))
             .Subscribe(false);
 
     // Wait up to half a second for connected to come up, using a poll loop to
@@ -50,11 +52,19 @@ class ExpansionHub::DataStore {
   DataStore& operator=(DataStore&) = delete;
   DataStore& operator=(DataStore&&) = delete;
 
+  void validateFollowerConfiguration();
+  void validateRootFollower(int baseChannel, int channel,
+                            std::array<int, NumMotorPorts>& followerVisited);
+  std::string getFollowerStringCycle(
+      int baseChannel, std::array<int, NumMotorPorts>& followerVisited);
+
   wpi::nt::BooleanSubscriber m_hubConnectedSubscriber;
 
   uint32_t m_reservedMotorMask{0};
   uint32_t m_reservedServoMask{0};
   wpi::util::mutex m_reservedLock;
+
+  std::optional<int> followerConfiguration[NumMotorPorts];
 
   int m_usbId;
 };
@@ -124,9 +134,59 @@ void ExpansionHub::UnreserveMotor(int channel) {
   int mask = 1 << channel;
   std::scoped_lock lock{m_dataStore->m_reservedLock};
   m_dataStore->m_reservedMotorMask &= ~mask;
+  m_dataStore->followerConfiguration[channel].reset();
 }
 
 void ExpansionHub::ReportUsage(std::string_view device, std::string_view data) {
   HAL_ReportUsage(
-      fmt::format("ExpansionHub[{}]/{}", m_dataStore->m_usbId, device), data);
+      std::format("ExpansionHub[{}]/{}", m_dataStore->m_usbId, device), data);
+}
+
+std::string ExpansionHub::DataStore::getFollowerStringCycle(
+    int baseChannel, std::array<int, NumMotorPorts>& followerVisited) {
+  std::string result = std::format("{}", baseChannel);
+  int current = baseChannel;
+  while (followerVisited[current] != baseChannel) {
+    current = followerVisited[current];
+    result += std::format(" -> {}", current);
+  }
+  result += std::format(" -> {}", followerVisited[current]);
+  return result;
+}
+
+void ExpansionHub::DataStore::validateRootFollower(
+    int baseChannel, int channel,
+    std::array<int, NumMotorPorts>& followerVisited) {
+  if (followerVisited[channel] != -1) {
+    throw WPILIB_MakeError(
+        err::ParameterOutOfRange, "Follower cycle detected on hub {}: {}",
+        m_usbId, getFollowerStringCycle(baseChannel, followerVisited));
+  }
+  auto leader = followerConfiguration[channel];
+  if (!leader.has_value()) {
+    return;
+  }
+  followerVisited[channel] = *leader;
+  validateRootFollower(baseChannel, *leader, followerVisited);
+}
+
+void ExpansionHub::DataStore::validateFollowerConfiguration() {
+  std::array<int, NumMotorPorts> followerVisited;
+  for (int i = 0; i < NumMotorPorts; i++) {
+    for (int j = 0; j < NumMotorPorts; j++) {
+      followerVisited[j] = -1;
+    }
+    validateRootFollower(i, i, followerVisited);
+  }
+}
+
+void ExpansionHub::AddFollower(int leaderChannel, int followerChannel) {
+  std::scoped_lock lock{m_dataStore->m_reservedLock};
+  m_dataStore->followerConfiguration[followerChannel] = leaderChannel;
+  m_dataStore->validateFollowerConfiguration();
+}
+
+void ExpansionHub::RemoveFollower(int followerChannel) {
+  std::scoped_lock lock{m_dataStore->m_reservedLock};
+  m_dataStore->followerConfiguration[followerChannel].reset();
 }

@@ -4,6 +4,7 @@
 
 #include "wpi/math/geometry/Quaternion.hpp"
 
+#include <cmath>
 #include <numbers>
 
 #include <gtest/gtest.h>
@@ -177,6 +178,7 @@ TEST(QuaternionTest, Logarithm) {
   Quaternion k{0, 0, 0, 1};
   Quaternion ln_half{std::log(0.5), -std::numbers::pi, 0, 0};
 
+  EXPECT_EQ(zero, zero.Log());
   EXPECT_EQ(zero, one.Log());
   EXPECT_EQ(i * std::numbers::pi / 2, i.Log());
   EXPECT_EQ(j * std::numbers::pi / 2, j.Log());

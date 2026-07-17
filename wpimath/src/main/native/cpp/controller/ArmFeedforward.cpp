@@ -5,13 +5,22 @@
 #include "wpi/math/controller/ArmFeedforward.hpp"
 
 #include <algorithm>
+#include <cmath>
+#include <cstddef>
 #include <limits>
 
+#include <Eigen/SparseCore>
 #include <sleipnir/autodiff/gradient.hpp>
 #include <sleipnir/autodiff/hessian.hpp>
+#include <sleipnir/autodiff/variable.hpp>
+#include <sleipnir/autodiff/variable_matrix.hpp>
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/units/base.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/units/voltage.hpp"
+#include "wpi/util/MathExtras.hpp"
 
 using namespace wpi::math;
 

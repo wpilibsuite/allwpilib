@@ -13,176 +13,166 @@
 
 #include <sys/types.h>
 
+#include <algorithm>
 #include <atomic>
 #include <cstdio>
 #include <cstring>
 #include <exception>
+#include <format>
 #include <memory>
 #include <string_view>
 
+#include "mrclib/ApiVersion.h"
+#include "mrclib/DsComms.hpp"
+#include "mrclib/SimSystemServer.h"
 #include "wpi/hal/DashboardOpMode.hpp"
+#include "wpi/hal/DriverStation.h"
 #include "wpi/hal/Extensions.h"
-#include "wpi/halsim/ds_socket/DSCommPacket.hpp"
-#include "wpi/net/EventLoopRunner.hpp"
-#include "wpi/net/raw_uv_ostream.hpp"
-#include "wpi/net/uv/Tcp.hpp"
-#include "wpi/net/uv/Timer.hpp"
-#include "wpi/net/uv/Udp.hpp"
-#include "wpi/net/uv/util.hpp"
+#include "wpi/hal/cpp/MrcLibDs.hpp"
+#include "wpi/hal/simulation/DriverStationData.h"
+#include "wpi/util/SafeThread.hpp"
 #include "wpi/util/print.hpp"
 
-#if defined(Win32) || defined(_WIN32)
-#pragma comment(lib, "Ws2_32.lib")
-#endif
+static_assert(MRCLIB_MAX_AXES == HAL_MAX_JOYSTICK_AXES);
+static_assert(MRCLIB_MAX_POVS == HAL_MAX_JOYSTICK_POVS);
+static_assert(MRCLIB_MAX_JOYSTICKS == HAL_MAX_JOYSTICKS);
+static_assert(MRCLIB_MAX_TOUCHPADS == HAL_MAX_JOYSTICK_TOUCHPADS);
+static_assert(MRCLIB_MAX_TOUCHPAD_FINGERS == HAL_MAX_JOYSTICK_TOUCHPAD_FINGERS);
+static_assert(MRCLIB_MAX_JOYSTICK_NAME_LENGTH ==
+              sizeof(HAL_JoystickDescriptor::name) - 1);
 
-using namespace wpi::net::uv;
-
-static std::unique_ptr<Buffer> singleByte;
-static std::atomic<bool> gDSConnected = false;
+static void WriteSimBackend();
 
 namespace {
-struct DataStore {
-  wpi::util::SmallVector<uint8_t, 128> m_frame;
-  size_t m_frameSize = (std::numeric_limits<size_t>::max)();
-  halsim::DSCommPacket* dsPacket;
+class Thread : public wpi::util::SafeThread {
+ public:
+  Thread() {}
+  void Main() override;
 };
+
+void Thread::Main() {
+  wpi::util::Event event{false, false};
+  HAL_ProvideNewDataEventHandle(event.GetHandle());
+
+  while (m_active) {
+    bool timedOut = false;
+    wpi::util::WaitForObject(event.GetHandle(), 1.0, &timedOut);
+    WriteSimBackend();
+  }
+
+  HAL_RemoveNewDataEventHandle(event.GetHandle());
+}
 }  // namespace
 
-static SimpleBufferPool<4>& GetBufferPool() {
-  static SimpleBufferPool<4> bufferPool;
-  return bufferPool;
-}
+static std::atomic<bool> gDSConnected = true;
 
-static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
-  std::string_view data{buf.base, size};
-  while (!data.empty()) {
-    if (store.m_frameSize == (std::numeric_limits<size_t>::max)()) {
-      if (store.m_frame.size() < 2u) {
-        size_t toCopy = (std::min)(2u - store.m_frame.size(), data.size());
-        store.m_frame.append(data.data(), data.data() + toCopy);
-        data.remove_prefix(toCopy);
-        if (store.m_frame.size() < 2u) {
-          return;  // need more data
+static void WriteSimBackend() {
+  MRC_Joysticks joysticks;
+  MRC_ControlData controlData;
+
+  int32_t status =
+      MRC_DsComms_GetControlDataWithJoysticks(&controlData, &joysticks);
+  if (status != 0) {
+    return;
+  }
+
+  HALSIM_SetDriverStationOpMode(controlData.currentOpMode);
+  HALSIM_SetDriverStationAllianceStationId(static_cast<HAL_AllianceStationID>(
+      mrclib::GetAlliance(controlData.controlFlags) + 1));
+  HALSIM_SetDriverStationMatchTime(controlData.matchTime);
+  HALSIM_SetDriverStationRobotMode(static_cast<HAL_RobotMode>(
+      mrclib::GetRobotMode(controlData.controlFlags)));
+  HALSIM_SetDriverStationDsAttached(
+      mrclib::GetDsConnected(controlData.controlFlags));
+  HALSIM_SetDriverStationFmsAttached(
+      mrclib::GetFmsConnected(controlData.controlFlags));
+  HALSIM_SetDriverStationEnabled(mrclib::GetEnabled(controlData.controlFlags));
+  HALSIM_SetDriverStationEStop(mrclib::GetEStop(controlData.controlFlags));
+
+  HAL_GameData gameData;
+  auto gameDataSize = controlData.gameDataLength;
+  if (gameDataSize > MRCLIB_MAX_GAMEDATA_LENGTH) {
+    gameDataSize = MRCLIB_MAX_GAMEDATA_LENGTH;
+  }
+  std::memcpy(gameData.gameData, controlData.gameData, gameDataSize);
+  gameData.gameData[gameDataSize] = '\0';
+  HALSIM_SetGameData(&gameData);
+
+  for (int i = 0; i < MRCLIB_MAX_JOYSTICKS; ++i) {
+    HAL_JoystickAxes axes{};
+    HAL_JoystickPOVs povs{};
+    HAL_JoystickButtons buttons{};
+    HAL_JoystickTouchpads touchpads{};
+
+    if (i < joysticks.count) {
+      auto& joystick = joysticks.joysticks[i];
+
+      axes.available = joystick.availableAxes;
+      for (size_t j = 0; j < MRCLIB_MAX_AXES; ++j) {
+        auto raw = joystick.axes[j];
+        axes.raw[j] = raw;
+        if (raw < 0) {
+          axes.axes[j] = raw / 32768.0f;
+        } else {
+          axes.axes[j] = raw / 32767.0f;
         }
       }
-      store.m_frameSize = (static_cast<uint16_t>(store.m_frame[0]) << 8) |
-                          static_cast<uint16_t>(store.m_frame[1]);
-    }
-    if (store.m_frameSize != (std::numeric_limits<size_t>::max)()) {
-      size_t need = store.m_frameSize - (store.m_frame.size() - 2);
-      size_t toCopy = (std::min)(need, data.size());
-      store.m_frame.append(data.data(), data.data() + toCopy);
-      data.remove_prefix(toCopy);
-      need -= toCopy;
-      if (need == 0) {
-        auto ds = store.dsPacket;
-        ds->DecodeTCP(store.m_frame);
-        store.m_frame.clear();
-        store.m_frameSize = (std::numeric_limits<size_t>::max)();
+
+      povs.available = joystick.availablePovs;
+      for (size_t j = 0; j < MRCLIB_MAX_POVS; ++j) {
+        povs.povs[j] = static_cast<HAL_JoystickPOV>(joystick.povs[j]);
+      }
+
+      buttons.available = joystick.availableButtons;
+      buttons.buttons = joystick.buttons;
+
+      touchpads.count = joystick.touchpadCount;
+      for (size_t j = 0; j < MRCLIB_MAX_TOUCHPADS; ++j) {
+        touchpads.touchpads[j].count = joystick.touchpads[j].count;
+        for (size_t k = 0; k < MRCLIB_MAX_TOUCHPAD_FINGERS; ++k) {
+          auto& finger = joystick.touchpads[j].fingers[k];
+          touchpads.touchpads[j].fingers[k].down = finger.down ? 1 : 0;
+          touchpads.touchpads[j].fingers[k].x = finger.x / 65535.0f;
+          touchpads.touchpads[j].fingers[k].y = finger.y / 65535.0f;
+        }
       }
     }
+
+    HALSIM_SetJoystickAxes(i, &axes);
+    HALSIM_SetJoystickPOVs(i, &povs);
+    HALSIM_SetJoystickButtons(i, &buttons);
+    HALSIM_SetJoystickTouchpads(i, &touchpads);
   }
-}
 
-static void SetupTcp(wpi::net::uv::Loop& loop) {
-  auto tcp = Tcp::Create(loop);
-  auto tcpWaitTimer = Timer::Create(loop);
+  MRC_JoystickDescriptors descriptors;
+  status = MRC_DsComms_GetJoystickDescriptors(&descriptors);
+  if (status == 0) {
+    for (int i = 0; i < MRCLIB_MAX_JOYSTICKS; ++i) {
+      HAL_JoystickDescriptor descriptor{};
 
-  auto recStore = std::make_shared<DataStore>();
-  recStore->dsPacket = loop.GetData<halsim::DSCommPacket>().get();
+      if (i < descriptors.count) {
+        auto& mrcDescriptor = descriptors.descriptors[i];
 
-  tcp->SetData(recStore);
+        descriptor.isGamepad = mrcDescriptor.isGamepad ? 1 : 0;
+        descriptor.gamepadType = mrcDescriptor.gamepadType;
+        descriptor.supportedOutputs = mrcDescriptor.supportedOutputs;
 
-  tcp->Bind("0.0.0.0", 1740);
-
-  tcp->Listen([t = tcp.get()] {
-    auto client = t->Accept();
-    gDSConnected = true;
-    wpi::hal::EnableDashboardOpMode();
-
-    client->data.connect([t](Buffer& buf, size_t len) {
-      HandleTcpDataStream(buf, len, *t->GetData<DataStore>());
-    });
-    client->StartRead();
-    client->end.connect([c = client.get()] {
-      c->Close();
-      gDSConnected = false;
-    });
-  });
-}
-
-static void SetupUdp(wpi::net::uv::Loop& loop) {
-  auto udp = wpi::net::uv::Udp::Create(loop);
-  udp->Bind("0.0.0.0", 1110);
-
-  // Simulation mode packet
-  auto simLoopTimer = Timer::Create(loop);
-  struct sockaddr_in simAddr;
-  NameToAddr("127.0.0.1", 1135, &simAddr);
-  simLoopTimer->timeout.connect([udpLocal = udp.get(), simAddr] {
-    udpLocal->Send(simAddr, {singleByte.get(), 1}, [](auto buf, Error err) {
-      if (err) {
-        wpi::util::print(stderr, "{}\n", err.str());
-        std::fflush(stderr);
+        auto nameLength = std::min<size_t>(mrcDescriptor.nameLength,
+                                           sizeof(descriptor.name) - 1);
+        std::memcpy(descriptor.name, mrcDescriptor.name, nameLength);
+        descriptor.name[nameLength] = '\0';
       }
-    });
-  });
-  simLoopTimer->Start(Timer::Time{100}, Timer::Time{100});
-  // DS Timeout
-  int timeoutMs = 100;
-  if (auto envTimeout = std::getenv("DS_TIMEOUT_MS")) {
-    try {
-      timeoutMs = std::stoi(envTimeout);
-    } catch (const std::exception& e) {
-      wpi::util::print(stderr, "Error parsing DS_TIMEOUT_MS: {}\n", e.what());
+
+      HALSIM_SetJoystickDescriptor(i, &descriptor);
     }
   }
-  auto autoDisableTimer = Timer::Create(loop);
-  autoDisableTimer->timeout.connect([] { HALSIM_SetDriverStationEnabled(0); });
 
-  // UDP Receive then send
-  udp->received.connect(
-      [udpLocal = udp.get(), autoDisableTimer, timeoutMs](
-          Buffer& buf, size_t len, const sockaddr& recSock, unsigned int port) {
-        autoDisableTimer->Start(Timer::Time(timeoutMs));
-        auto ds = udpLocal->GetLoop()->GetData<halsim::DSCommPacket>();
-        ds->DecodeUDP({reinterpret_cast<uint8_t*>(buf.base), len});
-
-        struct sockaddr_in outAddr;
-        std::memcpy(&outAddr, &recSock, sizeof(sockaddr_in));
-        outAddr.sin_family = PF_INET;
-        outAddr.sin_port = htons(1150);
-
-        wpi::util::SmallVector<wpi::net::uv::Buffer, 4> sendBufs;
-        wpi::net::raw_uv_ostream stream{
-            sendBufs, [] { return GetBufferPool().Allocate(); }};
-        ds->SetupSendBuffer(stream);
-
-        udpLocal->Send(outAddr, sendBufs, [](auto bufs, Error err) {
-          GetBufferPool().Release(bufs);
-          if (err) {
-            wpi::util::print(stderr, "{}\n", err.str());
-            std::fflush(stderr);
-          }
-        });
-        ds->SendUDPToHALSim();
-      });
-
-  udp->StartRecv();
+  HALSIM_NotifyDriverStationNewData();
 }
 
-static void SetupEventLoop(wpi::net::uv::Loop& loop) {
-  auto loopData = std::make_shared<halsim::DSCommPacket>();
-  loop.SetData(loopData);
-  SetupUdp(loop);
-  SetupTcp(loop);
-}
-
-static std::unique_ptr<wpi::net::EventLoopRunner> eventLoopRunner;
-
-void ThisIsAHackDontCallThis() {
-  eventLoopRunner = std::make_unique<wpi::net::EventLoopRunner>();
-  eventLoopRunner->ExecAsync(SetupEventLoop);
+static void SetupBackend() {
+  static wpi::util::SafeThreadOwner<Thread> thread;
+  thread.Start();
 }
 
 /*----------------------------------------------------------------------------
@@ -206,7 +196,22 @@ int HALSIM_InitExtension(void) {
 
   HAL_RegisterExtension("ds_socket", &gDSConnected);
 
-  singleByte = std::make_unique<Buffer>("0");
+  // Before initializing, we need to set up the fake system server
+  if (!MRC_CHECK_API_VERSION()) {
+    wpi::util::print(
+        stderr,
+        "Error: MRC API version mismatch. Restarting app and retrying...");
+
+    std::terminate();
+  }
+
+  MRC_SimSystemServer_Initialize();
+
+  wpi::hal::ForceDsInstance(wpi::hal::GetMrcLibDs());
+
+  WriteSimBackend();
+
+  SetupBackend();
 
   std::puts("DriverStationSocket Initialized!");
   return 0;

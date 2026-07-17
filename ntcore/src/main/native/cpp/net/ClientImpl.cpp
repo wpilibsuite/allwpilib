@@ -4,14 +4,13 @@
 
 #include "ClientImpl.hpp"
 
+#include <cmath>
 #include <memory>
 #include <numeric>
 #include <optional>
 #include <string>
 #include <utility>
 #include <variant>
-
-#include <fmt/format.h>
 
 #include "Log.hpp"
 #include "Message.hpp"

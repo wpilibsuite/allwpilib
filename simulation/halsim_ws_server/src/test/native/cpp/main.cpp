@@ -6,10 +6,12 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_session.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "WebServerClientTest.hpp"
 #include "wpi/hal/DriverStation.h"
@@ -25,8 +27,7 @@ using namespace wpilibws;
 
 static const int POLLING_SPEED = 10;  // 10 ms polling
 
-class WebServerIntegrationTest : public ::testing::Test {
- public:
+struct WebServerIntegrationTest {
   WebServerIntegrationTest() {
     // Initialize server
     m_server.Initialize();
@@ -40,25 +41,42 @@ class WebServerIntegrationTest : public ::testing::Test {
 
   bool IsConnectedClientWS() { return m_webserverClient->IsConnectedWS(); }
 
- protected:
   std::shared_ptr<WebServerClientTest> m_webserverClient;
   HALSimWSServer m_server;
 };
 
-TEST_F(WebServerIntegrationTest, DISABLED_DigitalOutput) {
+namespace {
+
+bool IsCatchListCommand(int argc, char** argv) {
+  for (int i = 1; i < argc; ++i) {
+    std::string_view arg{argv[i]};
+    if (arg == "--list-tests" || arg == "--list-tags" ||
+        arg == "--list-reporters" || arg == "--list-listeners") {
+      return true;
+    }
+  }
+  return false;
+}
+
+}  // namespace
+
+TEST_CASE("WebServerIntegrationTest DigitalOutput",
+          "[simulation][halsim_ws_server][.]") {
+  WebServerIntegrationTest test;
+
   // Create expected results
   const bool EXPECTED_VALUE = false;
   const int PIN = 0;
   bool done = false;
 
   // Attach timer to loop for test function
-  m_server.runner.ExecSync([&](auto& loop) {
+  test.m_server.runner.ExecSync([&](auto& loop) {
     auto timer = wpi::net::uv::Timer::Create(loop);
     timer->timeout.connect([&] {
       if (done) {
         return;
       }
-      if (IsConnectedClientWS()) {
+      if (test.IsConnectedClientWS()) {
         wpi::util::print("***** Setting DIO value for pin {} to {}\n", PIN,
                          (EXPECTED_VALUE ? "true" : "false"));
         HALSIM_SetDIOValue(PIN, EXPECTED_VALUE);
@@ -78,7 +96,7 @@ TEST_F(WebServerIntegrationTest, DISABLED_DigitalOutput) {
   std::string test_device;
   bool test_value = true;  // Default value from HAL initialization
   try {
-    auto& msg = m_webserverClient->GetLastMessage();
+    auto& msg = test.m_webserverClient->GetLastMessage();
     test_type = msg.at("type").get_string();
     test_device = msg.at("device").get_string();
     auto& data = msg.at("data");
@@ -90,31 +108,34 @@ TEST_F(WebServerIntegrationTest, DISABLED_DigitalOutput) {
   }
 
   // Compare results
-  EXPECT_EQ("DIO", test_type);
-  EXPECT_EQ(std::to_string(PIN), test_device);
-  EXPECT_EQ(EXPECTED_VALUE, test_value);
+  CHECK("DIO" == test_type);
+  CHECK(std::to_string(PIN) == test_device);
+  CHECK(EXPECTED_VALUE == test_value);
 }
 
-TEST_F(WebServerIntegrationTest, DISABLED_DigitalInput) {
+TEST_CASE("WebServerIntegrationTest DigitalInput",
+          "[simulation][halsim_ws_server][.]") {
+  WebServerIntegrationTest test;
+
   // Create expected results
   const bool EXPECTED_VALUE = false;
   const int PIN = 0;
   bool done = false;
 
   // Attach timer to loop for test function
-  m_server.runner.ExecSync([&](auto& loop) {
+  test.m_server.runner.ExecSync([&](auto& loop) {
     auto timer = wpi::net::uv::Timer::Create(loop);
     timer->timeout.connect([&] {
       if (done) {
         return;
       }
-      if (IsConnectedClientWS()) {
+      if (test.IsConnectedClientWS()) {
         wpi::util::json msg = wpi::util::json::object();
         msg["type"] = "DIO";
         msg["device"] = std::to_string(PIN);
         msg["data"] = wpi::util::json::object("<>value", EXPECTED_VALUE);
         wpi::util::print("***** Input JSON: {}\n", msg.to_string());
-        m_webserverClient->SendMessage(msg);
+        test.m_webserverClient->SendMessage(msg);
         done = true;
       }
     });
@@ -128,22 +149,25 @@ TEST_F(WebServerIntegrationTest, DISABLED_DigitalInput) {
 
   // Compare results
   bool test_value = HALSIM_GetDIOValue(PIN);
-  EXPECT_EQ(EXPECTED_VALUE, test_value);
+  CHECK(EXPECTED_VALUE == test_value);
 }
 
-TEST_F(WebServerIntegrationTest, DriverStation) {
+TEST_CASE("WebServerIntegrationTest DriverStation",
+          "[simulation][halsim_ws_server]") {
+  WebServerIntegrationTest test;
+
   // Create expected results
   const bool EXPECTED_VALUE = true;
   bool done = false;
 
   // Attach timer to loop for test function
-  m_server.runner.ExecSync([&](auto& loop) {
+  test.m_server.runner.ExecSync([&](auto& loop) {
     auto timer = wpi::net::uv::Timer::Create(loop);
     timer->timeout.connect([&] {
       if (done) {
         return;
       }
-      if (IsConnectedClientWS()) {
+      if (test.IsConnectedClientWS()) {
         auto data = wpi::util::json::object();
         data[">enabled"] = EXPECTED_VALUE;
         data[">new_data"] = true;
@@ -152,7 +176,7 @@ TEST_F(WebServerIntegrationTest, DriverStation) {
         msg["device"] = "";
         msg["data"] = std::move(data);
         wpi::util::print("***** Input JSON: {}\n", msg.to_string());
-        m_webserverClient->SendMessage(msg);
+        test.m_webserverClient->SendMessage(msg);
         done = true;
       }
     });
@@ -170,12 +194,12 @@ TEST_F(WebServerIntegrationTest, DriverStation) {
   HAL_ControlWord cw;
   HAL_GetControlWord(&cw);
   bool test_value = HAL_ControlWord_IsEnabled(cw);
-  EXPECT_EQ(EXPECTED_VALUE, test_value);
+  CHECK(EXPECTED_VALUE == test_value);
 }
 
 int main(int argc, char* argv[]) {
-  ::testing::InitGoogleTest(&argc, argv);
-  HAL_Initialize(500, 0);
-  int ret = RUN_ALL_TESTS();
-  return ret;
+  if (!IsCatchListCommand(argc, argv)) {
+    HAL_Initialize(500, 0);
+  }
+  return Catch::Session().run(argc, argv);
 }

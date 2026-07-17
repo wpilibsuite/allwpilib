@@ -6,20 +6,21 @@
 #include <thread>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 
 #include "TestPrinters.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/Synchronization.hpp"
 #include "wpi/util/mutex.hpp"
 
-class ConnectionListenerTest : public ::testing::Test {
+class ConnectionListenerTest {
  public:
   ConnectionListenerTest()
       : server_inst(wpi::nt::CreateInstance()),
         client_inst(wpi::nt::CreateInstance()) {}
 
-  ~ConnectionListenerTest() override {
+  ~ConnectionListenerTest() {
     wpi::nt::DestroyInstance(server_inst);
     wpi::nt::DestroyInstance(client_inst);
   }
@@ -42,32 +43,33 @@ void ConnectionListenerTest::Connect(const char* address, unsigned int port4) {
   while (!wpi::nt::IsConnected(client_inst)) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     if (++count > 30) {
-      FAIL() << "timed out waiting for client to start";
+      FAIL("timed out waiting for client to start");
     }
   }
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
-TEST_F(ConnectionListenerTest, Polled) {
+TEST_CASE_METHOD(ConnectionListenerTest, "ConnectionListenerTest Polled",
+                 "[ntcore][connection-listener]") {
   // set up the poller
   NT_ListenerPoller poller = wpi::nt::CreateListenerPoller(server_inst);
-  ASSERT_NE(poller, 0u);
+  REQUIRE(poller != 0);
   NT_Listener handle = wpi::nt::AddPolledListener(
       poller, server_inst, wpi::nt::EventFlags::CONNECTION);
-  ASSERT_NE(handle, 0u);
+  REQUIRE(handle != 0);
 
   // trigger a connect event
   Connect("127.0.0.1", 10020);
 
   // get the event
   bool timed_out = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timed_out));
-  ASSERT_FALSE(timed_out);
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timed_out));
+  REQUIRE_FALSE(timed_out);
   auto result = wpi::nt::ReadListenerQueue(poller);
-  ASSERT_EQ(result.size(), 1u);
-  EXPECT_EQ(handle, result[0].listener);
-  EXPECT_TRUE(result[0].GetConnectionInfo());
-  EXPECT_EQ(result[0].flags, wpi::nt::EventFlags::CONNECTED);
+  REQUIRE(result.size() == 1u);
+  CHECK(handle == result[0].listener);
+  CHECK(result[0].GetConnectionInfo());
+  CHECK(result[0].flags == wpi::nt::EventFlags::CONNECTED);
 
   // trigger a disconnect event
   wpi::nt::StopClient(client_inst);
@@ -75,20 +77,19 @@ TEST_F(ConnectionListenerTest, Polled) {
 
   // get the event
   timed_out = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timed_out));
-  ASSERT_FALSE(timed_out);
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timed_out));
+  REQUIRE_FALSE(timed_out);
   result = wpi::nt::ReadListenerQueue(poller);
-  ASSERT_EQ(result.size(), 1u);
-  EXPECT_EQ(handle, result[0].listener);
-  EXPECT_TRUE(result[0].GetConnectionInfo());
-  EXPECT_EQ(result[0].flags, wpi::nt::EventFlags::DISCONNECTED);
+  REQUIRE(result.size() == 1u);
+  CHECK(handle == result[0].listener);
+  CHECK(result[0].GetConnectionInfo());
+  CHECK(result[0].flags == wpi::nt::EventFlags::DISCONNECTED);
 }
 
-class ConnectionListenerVariantTest
-    : public ConnectionListenerTest,
-      public ::testing::WithParamInterface<std::pair<const char*, int>> {};
-
-TEST_P(ConnectionListenerVariantTest, Threaded) {
+TEST_CASE_METHOD(ConnectionListenerTest, "ConnectionListenerTest Threaded",
+                 "[ntcore][connection-listener]") {
+  auto param = GENERATE(std::pair{"127.0.0.1", 0}, std::pair{"127.0.0.1 ", 1},
+                        std::pair{" 127.0.0.1 ", 2});
   wpi::util::mutex m;
   std::vector<wpi::nt::Event> result;
   auto handle = wpi::nt::AddListener(
@@ -98,19 +99,19 @@ TEST_P(ConnectionListenerVariantTest, Threaded) {
       });
 
   // trigger a connect event
-  Connect(GetParam().first, 20001 + GetParam().second);
+  Connect(param.first, 20001 + param.second);
 
   bool timed_out = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(handle, 1.0, &timed_out));
-  ASSERT_FALSE(timed_out);
+  REQUIRE(wpi::util::WaitForObject(handle, 1.0, &timed_out));
+  REQUIRE_FALSE(timed_out);
 
   // get the event
   {
     std::scoped_lock lock{m};
-    ASSERT_EQ(result.size(), 1u);
-    EXPECT_EQ(handle, result[0].listener);
-    EXPECT_TRUE(result[0].GetConnectionInfo());
-    EXPECT_EQ(result[0].flags, wpi::nt::EventFlags::CONNECTED);
+    REQUIRE(result.size() == 1u);
+    CHECK(handle == result[0].listener);
+    CHECK(result[0].GetConnectionInfo());
+    CHECK(result[0].flags == wpi::nt::EventFlags::CONNECTED);
     result.clear();
   }
 
@@ -124,15 +125,9 @@ TEST_P(ConnectionListenerVariantTest, Threaded) {
   // get the event
   {
     std::scoped_lock lock{m};
-    ASSERT_EQ(result.size(), 1u);
-    EXPECT_EQ(handle, result[0].listener);
-    EXPECT_TRUE(result[0].GetConnectionInfo());
-    EXPECT_EQ(result[0].flags, wpi::nt::EventFlags::DISCONNECTED);
+    REQUIRE(result.size() == 1u);
+    CHECK(handle == result[0].listener);
+    CHECK(result[0].GetConnectionInfo());
+    CHECK(result[0].flags == wpi::nt::EventFlags::DISCONNECTED);
   }
 }
-
-INSTANTIATE_TEST_SUITE_P(ConnectionListenerVariantTests,
-                         ConnectionListenerVariantTest,
-                         testing::Values(std::pair{"127.0.0.1", 0},
-                                         std::pair{"127.0.0.1 ", 1},
-                                         std::pair{" 127.0.0.1 ", 2}));

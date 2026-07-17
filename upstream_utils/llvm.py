@@ -60,11 +60,13 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
         content = content.replace('#include "wpi/util/DataTypes.h"\n', "")
         content = content.replace('#include "wpi/util/llvm-config.h"\n', "")
         content = content.replace('#include "wpi/util/abi-breaking.h"\n', "")
+        content = content.replace('#include "wpi/util/bit.h"\n', "")
         content = content.replace('#include "wpi/util/config.h"\n', "")
         content = content.replace('#include "wpi/util/Signals.h"\n', "")
         content = content.replace('#include "wpi/util/Process.h"\n', "")
         content = content.replace('#include "wpi/util/Path.h"\n', "")
         content = content.replace('#include "wpi/util/Program.h"\n', "")
+        content = content.replace('#include "wpi/util/SwapByteOrder.h"\n', "")
 
         # Fix include guards
         content = content.replace("LLVM_ADT_", "WPIUTIL_WPI_")
@@ -202,7 +204,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "llvm"
     url = "https://github.com/llvm/llvm-project"
-    tag = "llvmorg-20.1.7"
+    tag = "llvmorg-22.1.6"
 
     patch_options = {
         "use_threeway": True,

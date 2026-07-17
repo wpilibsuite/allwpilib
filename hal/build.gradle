@@ -1,16 +1,8 @@
 ext {
-    addHalDependency = { binary, shared->
-        binary.lib project: ':hal', library: 'hal', linkage: shared
-    }
-
-    addHalJniDependency = { binary->
-        binary.lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
-    }
-
     nativeName = 'hal'
     setBaseName = 'wpiHal'
     devMain = 'org.wpilib.hardware.hal.DevMain'
-    generatedHeaders = "src/generated/main/native/include"
+    nativeTestSuiteName = "${nativeName}Catch2Test"
     splitSetup = {
         if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
             it.sources {
@@ -21,9 +13,6 @@ ext {
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
-                        srcDir generatedHeaders
-                        srcDir 'src/mrc/include'
-                        srcDir 'src/generated/main/native/cpp/mrc/protobuf'
                     }
                 }
             }
@@ -36,20 +25,7 @@ ext {
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
-                        srcDir generatedHeaders
-                        srcDir 'src/mrc/include'
                     }
-                }
-            }
-        }
-        it.sources {
-            nanopbCpp(CppSourceSet) {
-                source {
-                    srcDirs 'src/generated/main/native/cpp'
-                    include '**/*.cpp'
-                }
-                exportedHeaders {
-                    srcDirs 'src/generated/main/native/cpp'
                 }
             }
         }
@@ -60,28 +36,27 @@ ext {
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
-sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
+apply from: "${rootDir}/shared/libmrclib.gradle"
 
-cppSourcesZip {
-    from('src/main/native/athena') {
-        into '/athena'
+ext {
+    addHalDependency = { binary, shared->
+        nativeUtils.useRequiredLibrary(binary, 'mrclib')
+        binary.lib project: ':hal', library: 'hal', linkage: shared
     }
 
+    addHalJniDependency = { binary->
+        nativeUtils.useRequiredLibrary(binary, 'mrclib')
+        binary.lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
+    }
+}
+
+cppSourcesZip {
     from('src/main/native/systemcore') {
         into '/systemcore'
     }
 
     from('src/main/native/sim') {
         into '/sim'
-    }
-}
-
-cppHeadersZip {
-    from(generatedHeaders) {
-        into '/'
-    }
-    from('src/mrc/include') {
-        into '/'
     }
 }
 
@@ -98,21 +73,12 @@ nativeUtils.exportsConfigs {
 }
 
 model {
-    components {
-        all {
-            it.sources.each {
-                it.exportedHeaders {
-                    srcDirs 'src/mrc/include',
-                            'src/generated/main/native/cpp/mrc/protobuf'
-                }
-            }
-        }
-    }
     binaries {
         all {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {
                 return
             }
+            nativeUtils.useRequiredLibrary(it, 'mrclib')
             if (it.component.name == "${nativeName}JNI") {
                 project(':ntcore').addNtcoreDependency(it, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'

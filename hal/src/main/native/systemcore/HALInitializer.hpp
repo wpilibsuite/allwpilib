@@ -29,7 +29,6 @@ extern void InitializeDigitalInternal();
 extern void InitializeDIO();
 extern void InitializeDutyCycle();
 extern void InitializeEncoder();
-extern void InitializeFIRSTDriverStation();
 extern void InitializeHAL();
 extern void InitializeI2C();
 extern void InitializeIMU();
@@ -43,5 +42,4 @@ extern void InitializePWM();
 extern void InitializeSerialPort();
 extern void InitializeSmartIo();
 extern void InitializeThreads();
-extern void InitializeUsageReporting();
 }  // namespace wpi::hal::init

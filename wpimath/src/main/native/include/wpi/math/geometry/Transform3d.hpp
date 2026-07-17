@@ -4,10 +4,18 @@
 
 #pragma once
 
+#include <stdexcept>
 #include <utility>
 
+#include <Eigen/Core>
+#include <gcem.hpp>
+
+#include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/math/linalg/ct_matrix.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -264,7 +272,7 @@ constexpr Twist3d Transform3d::Log() const {
                    wpi::units::radian_t{rvec(2)}};
   };
 
-  if (std::is_constant_evaluated()) {
+  if consteval {
     return impl.template operator()<ct_matrix3d, ct_vector3d>();
   }
   return impl.template operator()<Eigen::Matrix3d, Eigen::Vector3d>();

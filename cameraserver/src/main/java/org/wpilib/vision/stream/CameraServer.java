@@ -413,9 +413,9 @@ public final class CameraServer {
       values[j] = "mjpg:" + values[j];
     }
 
-    if (CameraServerSharedStore.getCameraServerShared().isRoboRIO()) {
+    if (CameraServerSharedStore.getCameraServerShared().isSystemcore()) {
       // Look to see if we have a passthrough server for this source
-      // Only do this on the roboRIO
+      // Only do this on the Systemcore
       for (VideoSink i : m_sinks.values()) {
         int sink = i.getHandle();
         int sinkSource = CameraServerJNI.getSinkSource(sink);
@@ -531,7 +531,7 @@ public final class CameraServer {
    * Start automatically capturing images to send to the dashboard.
    *
    * <p>You should call this method to see a camera feed on the dashboard. If you also want to
-   * perform vision processing on the roboRIO, use getVideo() to get access to the camera images.
+   * perform vision processing on the Systemcore, use getVideo() to get access to the camera images.
    *
    * <p>The first time this overload is called, it calls {@link #startAutomaticCapture(int)} with
    * device 0, creating a camera named "USB Camera 0". Subsequent calls increment the device number
@@ -621,7 +621,7 @@ public final class CameraServer {
 
   /**
    * Get OpenCV access to the primary camera feed. This allows you to get images from the camera for
-   * image processing on the roboRIO.
+   * image processing on the Systemcore.
    *
    * <p>This is only valid to call after a camera feed has been added with startAutomaticCapture()
    * or addServer().
@@ -644,7 +644,7 @@ public final class CameraServer {
 
   /**
    * Get OpenCV access to the specified camera. This allows you to get images from the camera for
-   * image processing on the roboRIO.
+   * image processing on the Systemcore.
    *
    * @param camera Camera (e.g. as returned by startAutomaticCapture).
    * @return OpenCV sink for the specified camera
@@ -671,7 +671,7 @@ public final class CameraServer {
 
   /**
    * Get OpenCV access to the specified camera. This allows you to get images from the camera for
-   * image processing on the roboRIO.
+   * image processing on the Systemcore.
    *
    * @param camera Camera (e.g. as returned by startAutomaticCapture).
    * @param pixelFormat Desired pixelFormat of the camera
@@ -699,7 +699,7 @@ public final class CameraServer {
 
   /**
    * Get OpenCV access to the specified camera. This allows you to get images from the camera for
-   * image processing on the roboRIO.
+   * image processing on the Systemcore.
    *
    * @param name Camera name
    * @return OpenCV sink for the specified camera

@@ -1,6 +1,6 @@
 [versions]
-avaje = "3.11"
-ejml = "0.44.0"
+avaje = "3.14"
+ejml = "0.46.0"
 jmh = "1.37"
 opencv = "2027-4.13.0-3"
 quickbuf = "1.4"
@@ -9,7 +9,7 @@ quickbuf = "1.4"
 # General runtime dependencies
 avaje-jsonb = { module = "io.avaje:avaje-jsonb", version.ref = "avaje" }
 avaje-jsonb-generator = { module = "io.avaje:avaje-jsonb-generator", version.ref = "avaje" }
-ejml-simple = { module = "org.ejml:ejml-simple", version.ref = "ejml" } # also pulls in other EJML modules as transitive dependencies
+ejml-java9module = { module = "org.ejml:ejml-java9module", version.ref = "ejml" } # single uberjar with all the ejml libraries bundled together
 gson = { module = "com.google.code.gson:gson", version = "2.13.1" }
 quickbuf-runtime = { module = "us.hebi.quickbuf:quickbuf-runtime", version.ref = "quickbuf" }
 thirdparty-opencv = { module = "org.wpilib.thirdparty.opencv:opencv-java", version.ref = "opencv" }
@@ -26,10 +26,10 @@ mockito-core = { module = "org.mockito:mockito-core", version = "4.1.0" }
 # Note that these are also Gradle plugins and cannot be used with the plugin specification
 # due to their presence on the classpath without version information.
 wpilib-gradle-vscode = { module = "org.wpilib:gradle-cpp-vscode", version = "2027.0.0" }
-wpilib-native-utils = { module = "org.wpilib:native-utils", version = "2027.7.1" }
+wpilib-native-utils = { module = "org.wpilib:native-utils", version = "2027.11.0" }
 
 [bundles]
-ejml = ["ejml-simple"]
+ejml = ["ejml-java9module"]
 mockito = ["mockito-core"]
 # junit api and launcher artifacts are different dependency types (implementation and runtime, respectively),
 # so it doesn't make sense to bundle them in a single "junit" bundle
@@ -45,6 +45,6 @@ wpilib-gradle-jni = { id = "org.wpilib.GradleJni", version = "2027.0.0" }
 # Note: these plugins can't be used. Their JARs are on the classpath for buildSrc,
 # which doesn't retain version information.
 # wpilib-gradle-vscode = { id = "org.wpilib.GradleVsCode", version = "2027.0.0" }
-# wpilib-native-utils = { id = "org.wpilib.NativeUtils", version = "2027.7.1" }
+# wpilib-native-utils = { id = "org.wpilib.NativeUtils", version = "2027.11.0" }
 wpilib-repositories = { id = "org.wpilib.WPILibRepositoriesPlugin", version = "2027.0.0" }
 wpilib-versioning = { id = "org.wpilib.WPILibVersioningPlugin", version = "2027.0.1" }

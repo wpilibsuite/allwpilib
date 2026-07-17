@@ -4,7 +4,11 @@
 
 #include "wpi/math/kinematics/DifferentialDriveOdometry.hpp"
 
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/kinematics/Odometry.hpp"
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/units/length.hpp"
 
 using namespace wpi::math;
 

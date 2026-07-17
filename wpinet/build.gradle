@@ -4,6 +4,7 @@ ext {
 
     nativeName = 'wpinet'
     devMain = 'org.wpilib.net.DevMain'
+    nativeTestSuiteName = "${nativeName}Catch2Test"
 
     splitSetup = {
         it.sources {
@@ -148,7 +149,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/fmtlib/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
                         include '**/*.h'
                     }
                 }

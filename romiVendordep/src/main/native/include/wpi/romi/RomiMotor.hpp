@@ -4,7 +4,11 @@
 
 #pragma once
 
-#include "wpi/hardware/motor/PWMMotorController.hpp"
+#include <string>
+
+#include "wpi/hal/SimDevice.hpp"
+#include "wpi/hardware/motor/MotorController.hpp"
+#include "wpi/hardware/motor/MotorSafety.hpp"
 
 namespace wpi::romi {
 
@@ -14,22 +18,36 @@ namespace wpi::romi {
  */
 
 /**
- * RomiMotor
+ * RomiMotor.
  *
- * A general use PWM motor controller representing the motors on a Romi robot
+ * <p>A SimDevice based motor controller representing the motors on a Romi robot
  */
-class RomiMotor : public wpi::PWMMotorController {
+class RomiMotor : public wpi::MotorController, public wpi::MotorSafety {
  public:
   /**
-   * Constructor for a RomiMotor.
+   * Constructs a RomiMotor.
    *
    * @param channel The PWM channel that the RomiMotor is attached to.
    *                0 is left, 1 is right
    */
   explicit RomiMotor(int channel);
 
-  RomiMotor(RomiMotor&&) = default;
-  RomiMotor& operator=(RomiMotor&&) = default;
+  void SetThrottle(double throttle) override;
+  double GetThrottle() const override;
+
+  void SetInverted(bool isInverted) override;
+  bool GetInverted() const override;
+
+  void Disable() override;
+
+  void StopMotor() override;
+  std::string GetDescription() const override;
+
+ private:
+  hal::SimDevice m_simDevice;
+  hal::SimDouble m_simSpeed;
+  std::string m_deviceName;
+  bool m_inverted = false;
 };
 
 /** @} */

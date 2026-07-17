@@ -18,7 +18,7 @@ class TrajectoryTransformTest {
   void testTransformBy() {
     var config = new TrajectoryConfig(3, 3);
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             Pose2d.kZero, List.of(), new Pose2d(1, 1, Rotation2d.kCCW_Pi_2), config);
 
     var transformedTrajectory =
@@ -27,16 +27,17 @@ class TrajectoryTransformTest {
 
     // Test initial pose.
     assertEquals(
-        new Pose2d(1, 2, Rotation2d.fromDegrees(30)), transformedTrajectory.sample(0).pose);
+        new Pose2d(1, 2, Rotation2d.fromDegrees(30)), transformedTrajectory.sampleAt(0).pose);
 
-    testSameShapedTrajectory(trajectory.getStates(), transformedTrajectory.getStates());
+    testSameShapedTrajectory(trajectory.samples, transformedTrajectory.samples);
+    testSameForwardScalars(trajectory.samples, transformedTrajectory.samples);
   }
 
   @Test
   void testRelativeTo() {
     var config = new TrajectoryConfig(3, 3);
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             new Pose2d(1, 2, Rotation2d.fromDegrees(30.0)),
             List.of(),
             new Pose2d(5, 7, Rotation2d.kCCW_Pi_2),
@@ -45,12 +46,28 @@ class TrajectoryTransformTest {
     var transformedTrajectory = trajectory.relativeTo(new Pose2d(1, 2, Rotation2d.fromDegrees(30)));
 
     // Test initial pose.
-    assertEquals(Pose2d.kZero, transformedTrajectory.sample(0).pose);
+    assertEquals(Pose2d.kZero, transformedTrajectory.sampleAt(0).pose);
 
-    testSameShapedTrajectory(trajectory.getStates(), transformedTrajectory.getStates());
+    testSameShapedTrajectory(trajectory.samples, transformedTrajectory.samples);
+    testSameForwardScalars(trajectory.samples, transformedTrajectory.samples);
   }
 
-  void testSameShapedTrajectory(List<Trajectory.State> statesA, List<Trajectory.State> statesB) {
+  // A rigid transform rotates both the heading and the field-relative velocity/acceleration by the
+  // same amount, so the heading-relative forward scalars (and curvature) are invariant. This would
+  // fail if transformBy/relativeTo rotated the pose but not the velocity/acceleration.
+  void testSameForwardScalars(
+      List<DrivetrainSplineSample> statesA, List<DrivetrainSplineSample> statesB) {
+    assertEquals(statesA.size(), statesB.size());
+    for (int i = 0; i < statesA.size(); i++) {
+      assertEquals(statesA.get(i).forwardVelocity(), statesB.get(i).forwardVelocity(), 1e-9);
+      assertEquals(
+          statesA.get(i).forwardAcceleration(), statesB.get(i).forwardAcceleration(), 1e-9);
+      assertEquals(statesA.get(i).curvature, statesB.get(i).curvature, 1e-9);
+    }
+  }
+
+  void testSameShapedTrajectory(
+      List<DrivetrainSplineSample> statesA, List<DrivetrainSplineSample> statesB) {
     for (int i = 0; i < statesA.size() - 1; i++) {
       var a1 = statesA.get(i).pose;
       var a2 = statesA.get(i + 1).pose;
@@ -58,7 +75,14 @@ class TrajectoryTransformTest {
       var b1 = statesB.get(i).pose;
       var b2 = statesB.get(i + 1).pose;
 
-      assertEquals(a2.relativeTo(a1), b2.relativeTo(b1));
+      var expectedRel = a2.relativeTo(a1);
+      var actualRel = b2.relativeTo(b1);
+
+      assertEquals(
+          expectedRel,
+          actualRel,
+          String.format(
+              "pose mismatch at index %d: expected %s, actual %s", i, expectedRel, actualRel));
     }
   }
 }

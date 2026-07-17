@@ -4,7 +4,11 @@
 
 #include "wpi/math/geometry/Ellipse2d.hpp"
 
+#include <sleipnir/autodiff/variable.hpp>
 #include <sleipnir/optimization/problem.hpp>
+
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/units/length.hpp"
 
 using namespace wpi::math;
 

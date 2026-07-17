@@ -9,7 +9,7 @@ import org.wpilib.hardware.accelerometer.ADXL345_I2C;
 import org.wpilib.hardware.bus.I2C;
 
 /**
- * ADXL345, 362 Accelerometer snippets for frc-docs.
+ * ADXL345, 362 Accelerometer snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
 public class Robot extends TimedRobot {

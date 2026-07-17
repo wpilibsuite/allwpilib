@@ -17,20 +17,20 @@ classes:
       Initialization::
 
         constraints = TrapezoidProfile.Constraints(kMaxV, kMaxA)
-        previousProfiledReference = initialReference
+        previous_profiled_reference = initial_reference
 
       Run on update::
 
-        profile = TrapezoidProfile(constraints, unprofiledReference, previousProfiledReference)
-        previousProfiledReference = profile.calculate(timeSincePreviousUpdate)
+        profile = TrapezoidProfile(constraints, unprofiled_reference, previous_profiled_reference)
+        previous_profiled_reference = profile.calculate(time_since_previous_update)
 
-      where ``unprofiledReference`` is free to change between calls. Note that
+      where ``unprofiled_reference`` is free to change between calls. Note that
       when the unprofiled reference is within the constraints,
       :meth:`calculate` returns the unprofiled reference unchanged.
 
       Otherwise, a timer can be started to provide monotonic values for
       ``calculate()`` and to determine when the profile has completed via
-      :meth:`isFinished`.
+      :meth:`is_finished`.
     methods:
       TrapezoidProfile:
         param_override:
@@ -42,7 +42,7 @@ classes:
             x_type: typename TrapezoidProfile<Distance>::State
       Calculate:
       TimeLeftUntil:
-      TotalTime:
+      Duration:
       IsFinished:
     template_inline_code: |
       {
@@ -51,8 +51,8 @@ classes:
       cls_Constraints
         .def("__repr__", [clsNameCopy](const Constraints &self) {
           return clsNameCopy + ".Constraints("
-            "maxVelocity=" + std::to_string(self.maxVelocity()) + ", "
-            "maxAcceleration=" + std::to_string(self.maxAcceleration()) + ")";
+            "max_velocity=" + std::to_string(self.maxVelocity()) + ", "
+            "max_acceleration=" + std::to_string(self.maxAcceleration()) + ")";
         });
 
       cls_State
@@ -90,6 +90,13 @@ classes:
     methods:
       operator==:
         cpp_code: py::self == State()
+  wpi::math::TrapezoidProfile::ProfileTiming:
+    attributes:
+      t_1:
+      t_2:
+      t_3:
+    methods:
+      operator==:
 templates:
   TrapezoidProfile:
     qualname: wpi::math::TrapezoidProfile
