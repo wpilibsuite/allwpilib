@@ -589,15 +589,8 @@ public:
         } else {
           using slot_t = detail::Slot<Callable, arg_list>;
           auto s = std::make_shared<slot_t>(std::forward<Callable>(c));
-#if __GNUC__ >= 16
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Warray-bounds"
-#endif
           add_slot(s);
         }
-#if __GNUC__ >= 16
-#pragma GCC diagnostic pop
-#endif
     }
 
     /**
@@ -794,14 +787,7 @@ private:
           s2->next = slots->m_slots;
           s->next = s2;
           slots->m_slots = s;
-#if __GNUC__ >= 16
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Warray-bounds"
-#endif
         }
-#if __GNUC__ >= 16
-#pragma GCC diagnostic pop
-#endif
     }
 
     void clear() {

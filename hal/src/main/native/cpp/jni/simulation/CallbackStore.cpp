@@ -98,14 +98,7 @@ SIM_JniHandle sim::AllocateCallback(JNIEnv* env, jint index, jobject callback,
                                     RegisterCallbackFunc createCallback) {
   auto callbackStore = std::make_shared<CallbackStore>();
 
-#if __GNUC__ >= 16
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Warray-bounds"
-#endif
   auto handle = callbackHandles->Allocate(callbackStore);
-#if __GNUC__ >= 16
-#pragma GCC diagnostic pop
-#endif
 
   if (handle == HAL_INVALID_HANDLE) {
     return -1;
@@ -133,14 +126,7 @@ SIM_JniHandle sim::AllocateCallback(JNIEnv* env, jint index, jobject callback,
   callbackStore->setCallbackId(id);
 
   return handle;
-#if __GNUC__ >= 16
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Warray-bounds"
-#endif
 }
-#if __GNUC__ >= 16
-#pragma GCC diagnostic pop
-#endif
 
 void sim::FreeCallback(JNIEnv* env, SIM_JniHandle handle, jint index,
                        FreeCallbackFunc freeCallback) {
@@ -154,14 +140,7 @@ SIM_JniHandle sim::AllocateChannelCallback(
     jboolean initialNotify, RegisterChannelCallbackFunc createCallback) {
   auto callbackStore = std::make_shared<CallbackStore>();
 
-#if __GNUC__ >= 16
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Warray-bounds"
-#endif
   auto handle = callbackHandles->Allocate(callbackStore);
-#if __GNUC__ >= 16
-#pragma GCC diagnostic pop
-#endif
 
   if (handle == HAL_INVALID_HANDLE) {
     return -1;
@@ -190,14 +169,7 @@ SIM_JniHandle sim::AllocateChannelCallback(
   callbackStore->setCallbackId(id);
 
   return handle;
-#if __GNUC__ >= 16
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Warray-bounds"
-#endif
 }
-#if __GNUC__ >= 16
-#pragma GCC diagnostic pop
-#endif
 
 void sim::FreeChannelCallback(JNIEnv* env, SIM_JniHandle handle, jint index,
                               jint channel,
@@ -210,16 +182,9 @@ void sim::FreeChannelCallback(JNIEnv* env, SIM_JniHandle handle, jint index,
 SIM_JniHandle sim::AllocateCallbackNoIndex(
     JNIEnv* env, jobject callback, jboolean initialNotify,
     RegisterCallbackNoIndexFunc createCallback) {
-#if __GNUC__ >= 16
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Warray-bounds"
-#endif
   auto callbackStore = std::make_shared<CallbackStore>();
 
   auto handle = callbackHandles->Allocate(callbackStore);
-#if __GNUC__ >= 16
-#pragma GCC diagnostic pop
-#endif
 
   if (handle == HAL_INVALID_HANDLE) {
     return -1;
@@ -247,14 +212,7 @@ SIM_JniHandle sim::AllocateCallbackNoIndex(
   callbackStore->setCallbackId(id);
 
   return handle;
-#if __GNUC__ >= 16
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Warray-bounds"
-#endif
 }
-#if __GNUC__ >= 16
-#pragma GCC diagnostic pop
-#endif
 
 void sim::FreeCallbackNoIndex(JNIEnv* env, SIM_JniHandle handle,
                               FreeCallbackNoIndexFunc freeCallback) {

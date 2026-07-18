@@ -89,14 +89,7 @@ SIM_JniHandle sim::AllocateBufferCallback(
     RegisterBufferCallbackFunc createCallback) {
   auto callbackStore = std::make_shared<BufferCallbackStore>();
 
-#if __GNUC__ >= 16
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Warray-bounds"
-#endif
   auto handle = callbackHandles->Allocate(callbackStore);
-#if __GNUC__ >= 16
-#pragma GCC diagnostic pop
-#endif
 
   if (handle == HAL_INVALID_HANDLE) {
     return -1;
@@ -124,14 +117,7 @@ SIM_JniHandle sim::AllocateBufferCallback(
   callbackStore->setCallbackId(id);
 
   return handle;
-#if __GNUC__ >= 16
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Warray-bounds"
-#endif
 }
-#if __GNUC__ >= 16
-#pragma GCC diagnostic pop
-#endif
 
 void sim::FreeBufferCallback(JNIEnv* env, SIM_JniHandle handle, jint index,
                              FreeBufferCallbackFunc freeCallback) {

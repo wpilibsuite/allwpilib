@@ -77,16 +77,9 @@ void OpModeOptionsCallbackStore::free(JNIEnv* env) {
 SIM_JniHandle sim::AllocateOpModeOptionsCallback(
     JNIEnv* env, jobject callback, jboolean initialNotify,
     RegisterOpModeOptionsCallbackFunc createCallback) {
-#if __GNUC__ >= 16
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Warray-bounds"
-#endif
   auto callbackStore = std::make_shared<OpModeOptionsCallbackStore>();
 
   auto handle = callbackHandles->Allocate(callbackStore);
-#if __GNUC__ >= 16
-#pragma GCC diagnostic pop
-#endif
 
   if (handle == HAL_INVALID_HANDLE) {
     return -1;
@@ -114,14 +107,7 @@ SIM_JniHandle sim::AllocateOpModeOptionsCallback(
   callbackStore->setCallbackId(id);
 
   return handle;
-#if __GNUC__ >= 16
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Warray-bounds"
-#endif
 }
-#if __GNUC__ >= 16
-#pragma GCC diagnostic pop
-#endif
 
 void sim::FreeOpModeOptionsCallback(
     JNIEnv* env, SIM_JniHandle handle,

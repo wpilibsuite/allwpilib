@@ -10,7 +10,7 @@ Subject: [PATCH 14/33] Windows support
  3 files changed, 128 insertions(+), 16 deletions(-)
 
 diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
-index 4a34d8ba31731a7a4694b59a324bd7befd07e7f1..0b641570179ac129945a0430a9c3ef3fcceb3f5b 100644
+index 63f92631d5b473cf9a69a06eddf4271304e8c730..835fdf2fd178b1e03596fd5e64bfddf93904e766 100644
 --- a/llvm/lib/Support/ConvertUTF.cpp
 +++ b/llvm/lib/Support/ConvertUTF.cpp
 @@ -62,11 +62,26 @@
@@ -40,7 +40,7 @@ index 4a34d8ba31731a7a4694b59a324bd7befd07e7f1..0b641570179ac129945a0430a9c3ef3f
  /*
   * This code extensively uses fall-through switches.
   * Keep the compiler from warning about that.
-@@ -773,6 +788,96 @@ ConversionResult ConvertUTF8toUTF32(const UTF8 **sourceStart,
+@@ -759,6 +774,96 @@ ConversionResult ConvertUTF8toUTF32(const UTF8 **sourceStart,
  
     --------------------------------------------------------------------- */
  

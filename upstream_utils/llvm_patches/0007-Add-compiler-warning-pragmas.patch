@@ -8,13 +8,12 @@ Subject: [PATCH 07/33] Add compiler warning pragmas
  llvm/include/llvm/ADT/SmallVector.h       | 16 ++++++++++++++++
  llvm/include/llvm/Support/MathExtras.h    |  9 +++++++++
  llvm/include/llvm/Support/MemAlloc.h      | 13 +++++++++++++
- llvm/lib/Support/ConvertUTF.cpp           | 14 ++++++++++++++
  llvm/lib/Support/raw_ostream.cpp          |  4 ++++
  llvm/unittests/ADT/DenseMapTest.cpp       |  4 ++++
  llvm/unittests/ADT/FunctionExtrasTest.cpp |  6 ++++++
  llvm/unittests/ADT/SmallVectorTest.cpp    |  4 ++++
  llvm/unittests/Support/AlignOfTest.cpp    |  7 +++----
- 10 files changed, 84 insertions(+), 4 deletions(-)
+ 9 files changed, 70 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
 index c4d0821076d63842927d2abeef4a5189cdf325e7..730822d37c62b992316c850021dc5edb8ff13c36 100644
@@ -136,40 +135,6 @@ index 3b086cb171806f3f216a9bac7de46a29da3c5481..9205299d1cc7ddc93d2d5781e7443056
 +#endif
 +
  #endif
-diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
-index 63f92631d5b473cf9a69a06eddf4271304e8c730..4a34d8ba31731a7a4694b59a324bd7befd07e7f1 100644
---- a/llvm/lib/Support/ConvertUTF.cpp
-+++ b/llvm/lib/Support/ConvertUTF.cpp
-@@ -592,7 +592,14 @@ ConversionResult ConvertUTF8toUTF16 (
-             case 1: ch += *source++; ch <<= 6;
-             case 0: ch += *source++;
-         }
-+#if __GNUC__ >= 16
-+#pragma GCC diagnostic push
-+#pragma GCC diagnostic ignored "-Warray-bounds"
-+#endif
-         ch -= offsetsFromUTF8[extraBytesToRead];
-+#if __GNUC__ >= 16
-+#pragma GCC diagnostic pop
-+#endif
- 
-         if (target >= targetEnd) {
-             source -= (extraBytesToRead+1); /* Back up source pointer! */
-@@ -696,7 +703,14 @@ static ConversionResult ConvertUTF8toUTF32Impl(
-             case 1: ch += *source++; ch <<= 6;
-             case 0: ch += *source++;
-         }
-+#if __GNUC__ >= 16
-+#pragma GCC diagnostic push
-+#pragma GCC diagnostic ignored "-Warray-bounds"
-+#endif
-         ch -= offsetsFromUTF8[extraBytesToRead];
-+#if __GNUC__ >= 16
-+#pragma GCC diagnostic pop
-+#endif
- 
-         if (ch <= UNI_MAX_LEGAL_UTF32) {
-             /*
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
 index bf5d06018979474cf6166fed61be93eede0dece1..5496df7f6f83debb8b13bb9b828cdbddab91b07b 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
