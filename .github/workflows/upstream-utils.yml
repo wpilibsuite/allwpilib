@@ -121,6 +121,12 @@ jobs:
           ./mpack.py clone
           ./mpack.py copy-src
           ./mpack.py format-patch
+      - name: Run mrcal.py
+        run: |
+          cd upstream_utils
+          ./mrcal.py clone
+          ./mrcal.py copy-src
+          ./mrcal.py format-patch
       - name: Run sleipnir.py
         run: |
           cd upstream_utils
