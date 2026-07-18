@@ -10,7 +10,6 @@
 #include "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp"
-#include "wpi/math/kinematics/Kinematics.hpp"
 #include "wpi/math/kinematics/Odometry.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
@@ -86,8 +85,5 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry
                        wpi::units::meter_t rightDistance) {
     return Odometry::Update(gyroAngle, {leftDistance, rightDistance});
   }
-
- private:
-  DifferentialDriveKinematics m_kinematicsImpl{wpi::units::meter_t{1}};
 };
 }  // namespace wpi::math
