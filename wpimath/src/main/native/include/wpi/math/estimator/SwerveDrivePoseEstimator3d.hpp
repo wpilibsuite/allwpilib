@@ -37,6 +37,7 @@ namespace wpi::math {
 template <size_t NumModules>
 class SwerveDrivePoseEstimator3d
     : public PoseEstimator3d<
+          SwerveDriveKinematics<NumModules>,
           wpi::util::array<SwerveModulePosition, NumModules>,
           wpi::util::array<SwerveModuleVelocity, NumModules>,
           wpi::util::array<SwerveModuleAcceleration, NumModules>> {
