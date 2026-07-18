@@ -18,7 +18,7 @@ public class Robot extends TimedRobot {
   // Initializes an analog encoder on DIO pins 0 to return a value of 4 for
   // a full rotation, with the encoder reporting 0 half way through rotation (2
   // out of 4)
-  AnalogEncoder encoderFR = new AnalogEncoder(0, 4.0, 2.0);
+  AnalogEncoder encoderFR = new AnalogEncoder(1, 4.0, 2.0);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {}
