@@ -91,7 +91,7 @@ class WPILIB_DLLEXPORT Transform3d final {
 
   /**
    * Constructs a 3D transform from a 2D transform in the X-Y plane.
-   **
+   *
    * @param transform The 2D transform.
    * @see Rotation3d(Rotation2d)
    * @see Translation3d(Translation2d)
