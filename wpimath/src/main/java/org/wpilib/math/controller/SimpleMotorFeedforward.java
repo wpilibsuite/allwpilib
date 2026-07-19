@@ -150,10 +150,10 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Calculates the feedforward from the gains and velocity setpoint assuming continuous control
+   * Calculates the feedforward from the gains and velocity reference assuming continuous control
    * (acceleration is assumed to be zero).
    *
-   * @param velocity The velocity setpoint.
+   * @param velocity The velocity reference.
    * @return The computed feedforward.
    */
   public double calculate(double velocity) {
@@ -161,12 +161,12 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming discrete control.
+   * Calculates the feedforward from the gains and references assuming discrete control.
    *
    * <p>Note this method is inaccurate when the velocity crosses 0.
    *
-   * @param currentVelocity The current velocity setpoint.
-   * @param nextVelocity The next velocity setpoint.
+   * @param currentVelocity The current velocity reference.
+   * @param nextVelocity The next velocity reference.
    * @return The computed feedforward.
    */
   public double calculate(double currentVelocity, double nextVelocity) {
