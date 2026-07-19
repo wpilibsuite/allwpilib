@@ -243,6 +243,20 @@ class ProfiledPIDController
   constexpr State GetSetpoint() const { return m_setpoint; }
 
   /**
+   * Returns the next setpoint of the ProfiledPIDController, one controller
+   * period after the current setpoint.
+   *
+   * This is useful with the feedforward Calculate() overloads that take a next
+   * velocity, which are more accurate for discrete systems.
+   *
+   * @return The next setpoint.
+   */
+  constexpr State GetNextSetpoint() const {
+    return TrapezoidProfile<Distance>{m_constraints}.Calculate(
+        GetPeriod(), m_setpoint, m_goal);
+  }
+
+  /**
    * Returns true if the error is within the tolerance of the error.
    *
    * Currently this just reports on target as the actual value passes through
