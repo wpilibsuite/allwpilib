@@ -185,12 +185,20 @@ class ElevatorFeedforward {
   /**
    * Sets the static gain.
    *
+   * <p>This setter is intended for online tuning only. Feedforward gains are
+   * assumed constant, so gain scheduling means the system was not correctly
+   * modeled.
+   *
    * @param kS The static gain.
    */
   constexpr void SetKs(wpi::units::volt_t kS) { this->kS = kS; }
 
   /**
    * Sets the gravity gain.
+   *
+   * <p>This setter is intended for online tuning only. Feedforward gains are
+   * assumed constant, so gain scheduling means the system was not correctly
+   * modeled.
    *
    * @param kG The gravity gain.
    */
@@ -199,12 +207,20 @@ class ElevatorFeedforward {
   /**
    * Sets the velocity gain.
    *
+   * <p>This setter is intended for online tuning only. Feedforward gains are
+   * assumed constant, so gain scheduling means the system was not correctly
+   * modeled.
+   *
    * @param kV The velocity gain.
    */
   constexpr void SetKv(wpi::units::unit_t<kv_unit> kV) { this->kV = kV; }
 
   /**
    * Sets the acceleration gain.
+   *
+   * <p>This setter is intended for online tuning only. Feedforward gains are
+   * assumed constant, so gain scheduling means the system was not correctly
+   * modeled.
    *
    * @param kA The acceleration gain.
    */

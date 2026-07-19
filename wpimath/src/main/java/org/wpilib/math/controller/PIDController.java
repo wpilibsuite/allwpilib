@@ -123,6 +123,8 @@ public class PIDController implements Sendable, AutoCloseable {
    *
    * <p>Set the proportional, integral, and differential coefficients.
    *
+   * <p>This setter is intended for online tuning.
+   *
    * @param kp The proportional coefficient.
    * @param ki The integral coefficient.
    * @param kd The derivative coefficient.
@@ -136,6 +138,8 @@ public class PIDController implements Sendable, AutoCloseable {
   /**
    * Sets the Proportional coefficient of the PID controller gain.
    *
+   * <p>This setter is intended for online tuning.
+   *
    * @param kp The proportional coefficient. Must be &gt;= 0.
    */
   public void setP(double kp) {
@@ -145,6 +149,8 @@ public class PIDController implements Sendable, AutoCloseable {
   /**
    * Sets the Integral coefficient of the PID controller gain.
    *
+   * <p>This setter is intended for online tuning.
+   *
    * @param ki The integral coefficient. Must be &gt;= 0.
    */
   public void setI(double ki) {
@@ -153,6 +159,8 @@ public class PIDController implements Sendable, AutoCloseable {
 
   /**
    * Sets the Differential coefficient of the PID controller gain.
+   *
+   * <p>This setter is intended for online tuning.
    *
    * @param kd The differential coefficient. Must be &gt;= 0.
    */
