@@ -88,13 +88,13 @@ find_package(CHOLMOD CONFIG REQUIRED)
 find_package(SuiteSparse_config CONFIG REQUIRED)
 
 # use static libs for CHOLMOD/SuiteSparse if possible
-if (TARGET SuiteSparse::CHOLMOD_static)
+if(TARGET SuiteSparse::CHOLMOD_static)
     set(cholmod_target SuiteSparse::CHOLMOD_static)
 else()
     set(cholmod_target SuiteSparse::CHOLMOD)
 endif()
 
-if (TARGET SuiteSparse::CHOLMOD_static)
+if(TARGET SuiteSparse::CHOLMOD_static)
     set(suitesparse_target SuiteSparse::SuiteSparseConfig_static)
 else()
     set(suitesparse_target SuiteSparse::SuiteSparseConfig)
