@@ -75,6 +75,11 @@ public interface OpMode extends AutoCloseable {
    * intervals. The callbacks are executed by the robot framework at their scheduled times, in
    * addition to the primary {@link #periodic()} callback.
    *
+   * <p><b>Registration timing</b>: The callbacks returned by this method are registered with the
+   * framework immediately when the OpMode is constructed and begin executing as soon as they are
+   * registered. To restrict execution to only when the robot is enabled, callbacks should include
+   * an if (RobotState.isEnabled()) check at the beginning.
+   *
    * @return A set of custom callbacks to execute, or an empty set if no custom callbacks are
    *     needed. The default implementation returns an empty set.
    */
