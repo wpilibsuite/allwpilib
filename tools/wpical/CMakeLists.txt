@@ -79,12 +79,26 @@ else()
         -Wno-missing-field-initializers
     )
 endif()
-set_target_properties(${wpical_thirdparty_src} PROPERTIES COMPILE_FLAGS ${compile_flags})
+
+set_source_files_properties(${wpical_thirdparty_src} PROPERTIES COMPILE_FLAGS ${compile_flags})
 
 find_package(OpenCV REQUIRED)
 find_package(Ceres CONFIG REQUIRED)
 find_package(CHOLMOD CONFIG REQUIRED)
 find_package(SuiteSparse_config CONFIG REQUIRED)
+
+# use static libs for CHOLMOD/SuiteSparse if possible
+if (TARGET SuiteSparse::CHOLMOD_static)
+    set(cholmod_target SuiteSparse::CHOLMOD_static)
+else()
+    set(cholmod_target SuiteSparse::CHOLMOD)
+endif()
+
+if (TARGET SuiteSparse::CHOLMOD_static)
+    set(suitesparse_target SuiteSparse::SuiteSparseConfig_static)
+else()
+    set(suitesparse_target SuiteSparse::SuiteSparseConfig)
+endif()
 
 target_link_libraries(
     wpical
@@ -94,8 +108,8 @@ target_link_libraries(
     libglass
     wpigui
     wpiutil
-    SuiteSparse::CHOLMOD_static
-    SuiteSparse::SuiteSparseConfig_static
+    ${cholmod_target}
+    ${suitesparse_target}
     Ceres::ceres
 )
 
@@ -132,8 +146,8 @@ if(WPILIB_WITH_TESTS)
         libglass
         wpigui
         wpiutil
-        SuiteSparse::CHOLMOD_static
-        SuiteSparse::SuiteSparseConfig_static
+        ${cholmod_target}
+        ${suitesparse_target}
         Ceres::ceres
     )
 endif()
