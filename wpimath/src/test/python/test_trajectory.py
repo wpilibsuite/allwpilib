@@ -2,6 +2,9 @@ import math
 
 from wpimath import (
     CubicHermiteSpline,
+    DrivetrainSplineTrajectory,
+    DrivetrainSplineTrajectoryGenerator,
+    DrivetrainSplineTrajectoryParameterizer,
     Ellipse2d,
     EllipticalRegionConstraint,
     MaxVelocityConstraint,
@@ -10,17 +13,14 @@ from wpimath import (
     RectangularRegionConstraint,
     Rotation2d,
     SplineHelper,
-    TrajectoryConstraint,
-    SplineTrajectory,
     TrajectoryConfig,
-    TrajectoryGenerator,
-    TrajectoryParameterizer,
+    TrajectoryConstraint,
     Transform2d,
     Translation2d,
 )
 
 
-def get_test_trajectory(config: TrajectoryConfig) -> SplineTrajectory:
+def get_test_trajectory(config: TrajectoryConfig) -> DrivetrainSplineTrajectory:
     # 2018 cross scale auto waypoints
     side_start = Pose2d.from_feet(1.54, 23.23, Rotation2d.from_degrees(180))
     cross_scale = Pose2d.from_feet(23.7, 6.8, Rotation2d.from_degrees(-160))
@@ -39,9 +39,33 @@ def get_test_trajectory(config: TrajectoryConfig) -> SplineTrajectory:
         ).translation(),
     ]
 
-    return TrajectoryGenerator.generate_trajectory(
+    return DrivetrainSplineTrajectoryGenerator.generate(
         side_start, vector, cross_scale, config
     )
+
+
+#
+# DrivetrainSplineTrajectoryParameterizer
+#
+
+
+def test_drivetrain_spline_trajectory_parameterizer():
+    start = Pose2d(1, 1, 0)
+    end = Pose2d(2, 2, math.pi / 2)
+
+    # generate the spline from start and end poses
+    vec1, vec2 = SplineHelper.cubic_control_vectors_from_waypoints(start, [], end)
+    spline = CubicHermiteSpline(vec1.x, vec2.x, vec1.y, vec2.y)
+
+    # sample the pose and curvature along the spline
+    points: list[tuple[Pose2d, float]] = []
+    for i in range(100):
+        points.append(spline.get_point(i / 100))
+
+    trajectory = DrivetrainSplineTrajectoryParameterizer.parameterize(
+        points, [], 0, 0, 4, 3, False
+    )
+    assert trajectory is not None
 
 
 #
@@ -120,27 +144,3 @@ def test_trajectory_constraint_min_max():
         repr(min_max)
         == "TrajectoryConstraint.MinMax(min_acceleration=0.0, max_acceleration=1.0)"
     )
-
-
-#
-# TrajectoryParameterizer
-#
-
-
-def test_trajectory_parameterizer():
-    start = Pose2d(1, 1, 0)
-    end = Pose2d(2, 2, math.pi / 2)
-
-    # generate the spline from start and end poses
-    vec1, vec2 = SplineHelper.cubic_control_vectors_from_waypoints(start, [], end)
-    spline = CubicHermiteSpline(vec1.x, vec2.x, vec1.y, vec2.y)
-
-    # sample the pose and curvature along the spline
-    points: list[tuple[Pose2d, float]] = []
-    for i in range(100):
-        points.append(spline.get_point(i / 100))
-
-    trajectory = TrajectoryParameterizer.time_parameterize_trajectory(
-        points, [], 0, 0, 4, 3, False
-    )
-    assert trajectory is not None

@@ -69,6 +69,12 @@ class OpMode {
    * framework at their scheduled times, in addition to the primary Periodic()
    * callback.
    *
+   * <p><b>Registration timing</b>: The callbacks returned by this method are
+   * registered with the framework immediately when the OpMode is constructed
+   * and begin executing as soon as they are registered. To restrict execution
+   * to only when the robot is enabled, callbacks should include an
+   * if (RobotState.isEnabled()) check at the beginning.
+   *
    * @return A vector of custom callbacks to execute, or an empty vector if no
    *         custom callbacks are needed. The default implementation returns an
    *         empty vector.

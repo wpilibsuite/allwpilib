@@ -348,4 +348,22 @@ void HAL_ReportUsage(const struct WPI_String* resource,
   // Do nothing for now
 }
 
+int32_t HAL_PublishCanVersion(uint8_t busId, uint32_t deviceId,
+                              const struct WPI_String* name,
+                              const struct WPI_String* version) {
+  // Do nothing for now
+  return 0;
+}
+
+int32_t HAL_PublishVersion(const struct WPI_String* name,
+                           const struct WPI_String* version) {
+  // Do nothing for now
+  return 0;
+}
+
+int32_t HAL_PublishWpilibVersion(const struct WPI_String* version) {
+  // Do nothing for now
+  return 0;
+}
+
 }  // extern "C"

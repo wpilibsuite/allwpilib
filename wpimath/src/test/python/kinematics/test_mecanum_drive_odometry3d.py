@@ -4,6 +4,7 @@ import random
 
 from wpimath import (
     ChassisVelocities,
+    DrivetrainSplineTrajectoryGenerator,
     MecanumDriveKinematics,
     MecanumDriveOdometry3d,
     MecanumDriveWheelPositions,
@@ -11,7 +12,6 @@ from wpimath import (
     Pose3d,
     Rotation2d,
     Rotation3d,
-    TrajectoryGenerator,
     TrajectoryConfig,
     Translation2d,
 )
@@ -137,7 +137,7 @@ def test_accuracy_facing_trajectory():
 
     odometry = MecanumDriveOdometry3d(kinematics, Rotation3d(), wheel_positions)
 
-    trajectory = TrajectoryGenerator.generate_trajectory(
+    trajectory = DrivetrainSplineTrajectoryGenerator.generate(
         [
             Pose2d(x=0, y=0, rotation=Rotation2d.from_degrees(45)),
             Pose2d(x=3, y=0, rotation=Rotation2d.from_degrees(-90)),
@@ -208,7 +208,7 @@ def test_accuracy_facing_x_axis():
 
     odometry = MecanumDriveOdometry3d(kinematics, Rotation3d(), wheel_positions)
 
-    trajectory = TrajectoryGenerator.generate_trajectory(
+    trajectory = DrivetrainSplineTrajectoryGenerator.generate(
         [
             Pose2d(x=0, y=0, rotation=Rotation2d(45)),
             Pose2d(x=3, y=0, rotation=Rotation2d(-90)),

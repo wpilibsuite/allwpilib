@@ -7,12 +7,15 @@
 #include <cstddef>
 
 #include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/kinematics/Odometry.hpp"
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+#include "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
 #include "wpi/math/kinematics/SwerveModulePosition.hpp"
 #include "wpi/math/kinematics/SwerveModuleVelocity.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/array.hpp"
 
 namespace wpi::math {
 
@@ -27,9 +30,11 @@ namespace wpi::math {
  */
 template <size_t NumModules>
 class SwerveDriveOdometry
-    : public Odometry<wpi::util::array<SwerveModulePosition, NumModules>> {
+    : public Odometry<SwerveDriveKinematics<NumModules>,
+                      wpi::util::array<SwerveModulePosition, NumModules>,
+                      wpi::util::array<SwerveModuleVelocity, NumModules>,
+                      wpi::util::array<SwerveModuleAcceleration, NumModules>> {
  public:
-  using Base = Odometry<wpi::util::array<SwerveModulePosition, NumModules>>;
   /**
    * Constructs a SwerveDriveOdometry object.
    *
@@ -42,33 +47,10 @@ class SwerveDriveOdometry
       SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
       const wpi::util::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose2d& initialPose = Pose2d{})
-      : Base(gyroAngle, initialPose),
-        m_kinematics(kinematics),
-        m_previousWheelPositions(modulePositions) {
+      : SwerveDriveOdometry::Odometry(kinematics, gyroAngle, modulePositions,
+                                      initialPose) {
     wpi::math::MathSharedStore::ReportUsage("SwerveDriveOdometry", "");
   }
-
-  void ResetPosition(
-      const Rotation2d& gyroAngle,
-      const wpi::util::array<SwerveModulePosition, NumModules>& modulePositions,
-      const Pose2d& pose) override {
-    m_previousWheelPositions = modulePositions;
-    Base::ResetPosition(gyroAngle, pose);
-  }
-
-  const Pose2d& Update(const Rotation2d& gyroAngle,
-                       const wpi::util::array<SwerveModulePosition, NumModules>&
-                           modulePositions) override {
-    auto twist =
-        m_kinematics.ToTwist2d(m_previousWheelPositions, modulePositions);
-    m_previousWheelPositions = modulePositions;
-    return Base::Update(gyroAngle, twist);
-  }
-
- private:
-  SwerveDriveKinematics<NumModules> m_kinematics;
-
-  wpi::util::array<SwerveModulePosition, NumModules> m_previousWheelPositions;
 };
 
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)

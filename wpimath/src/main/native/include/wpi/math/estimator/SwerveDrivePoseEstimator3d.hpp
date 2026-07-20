@@ -4,11 +4,16 @@
 
 #pragma once
 
+#include <cstddef>
+
 #include "wpi/math/estimator/PoseEstimator3d.hpp"
 #include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 #include "wpi/math/kinematics/SwerveDriveOdometry3d.hpp"
+#include "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
+#include "wpi/math/kinematics/SwerveModulePosition.hpp"
+#include "wpi/math/kinematics/SwerveModuleVelocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
@@ -32,7 +37,10 @@ namespace wpi::math {
 template <size_t NumModules>
 class SwerveDrivePoseEstimator3d
     : public PoseEstimator3d<
-          wpi::util::array<SwerveModulePosition, NumModules>> {
+          SwerveDriveKinematics<NumModules>,
+          wpi::util::array<SwerveModulePosition, NumModules>,
+          wpi::util::array<SwerveModuleVelocity, NumModules>,
+          wpi::util::array<SwerveModuleAcceleration, NumModules>> {
  public:
   /**
    * Constructs a SwerveDrivePoseEstimator3d with default standard deviations
@@ -86,7 +94,7 @@ class SwerveDrivePoseEstimator3d
       const wpi::util::array<double, 4>& stateStdDevs,
       const wpi::util::array<double, 4>& visionMeasurementStdDevs)
       : SwerveDrivePoseEstimator3d::PoseEstimator3d(
-            m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
+            kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
         m_odometryImpl{kinematics, gyroAngle, modulePositions, initialPose} {
     this->ResetPose(initialPose);
   }

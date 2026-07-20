@@ -41,20 +41,6 @@ public interface CounterBase {
   void reset();
 
   /**
-   * Get the time between the last two edges counted.
-   *
-   * @return the time between the last two ticks in seconds
-   */
-  double getPeriod();
-
-  /**
-   * Set the maximum time between edges to be considered stalled.
-   *
-   * @param maxPeriod the maximum period in seconds
-   */
-  void setMaxPeriod(double maxPeriod);
-
-  /**
    * Determine if the counter is not moving.
    *
    * @return true if the counter has not changed for the max period

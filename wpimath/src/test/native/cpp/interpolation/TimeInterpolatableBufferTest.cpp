@@ -10,6 +10,8 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 
 TEST(TimeInterpolatableBufferTest, AddSample) {

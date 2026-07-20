@@ -6,7 +6,11 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
@@ -207,10 +211,10 @@ struct WPILIB_DLLEXPORT ChassisVelocities {
 };
 
 WPILIB_DLLEXPORT
-void to_json(wpi::util::json& json, const ChassisVelocities& speeds);
+void to_json(wpi::util::json& json, const ChassisVelocities& velocities);
 
 WPILIB_DLLEXPORT
-void from_json(const wpi::util::json& json, ChassisVelocities& speeds);
+void from_json(const wpi::util::json& json, ChassisVelocities& velocities);
 
 }  // namespace wpi::math
 

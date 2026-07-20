@@ -4,10 +4,12 @@
 
 #include "wpi/math/estimator/MecanumDrivePoseEstimator3d.hpp"
 
-#include "wpi/math/estimator/AngleStatistics.hpp"
-#include "wpi/math/util/MathShared.hpp"
-#include "wpi/math/util/StateSpaceUtil.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/math/estimator/PoseEstimator3d.hpp"
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
+#include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
+#include "wpi/util/array.hpp"
 
 using namespace wpi::math;
 

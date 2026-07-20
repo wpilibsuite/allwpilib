@@ -23,22 +23,20 @@ class MyRobot(wpilib.TimedRobot):
 
         # Create a motion profile with the given maximum voltage and characteristics kV, kA
         # These gains should match your feedforward kV, kA for best results.
-        self.profile = wpimath.ExponentialProfileMeterVolts(
-            wpimath.ExponentialProfileMeterVolts.Constraints.from_characteristics(
-                10, 1, 1
-            )
+        self.profile = wpimath.ExponentialProfile(
+            wpimath.ExponentialProfile.Constraints.from_characteristics(10, 1, 1)
         )
-        self.goal = wpimath.ExponentialProfileMeterVolts.State(0, 0)
-        self.setpoint = wpimath.ExponentialProfileMeterVolts.State(0, 0)
+        self.goal = wpimath.ExponentialProfile.State(0, 0)
+        self.setpoint = wpimath.ExponentialProfile.State(0, 0)
 
         # Note: These gains are fake, and will have to be tuned for your robot.
         self.motor.set_pid(1.3, 0.0, 0.7)
 
     def teleop_periodic(self) -> None:
         if self.joystick.get_raw_button_pressed(2):
-            self.goal = wpimath.ExponentialProfileMeterVolts.State(5, 0)
+            self.goal = wpimath.ExponentialProfile.State(5, 0)
         elif self.joystick.get_raw_button_pressed(3):
-            self.goal = wpimath.ExponentialProfileMeterVolts.State(0, 0)
+            self.goal = wpimath.ExponentialProfile.State(0, 0)
 
         # Retrieve the profiled setpoint for the next timestep. This setpoint moves
         # toward the goal while obeying the constraints.

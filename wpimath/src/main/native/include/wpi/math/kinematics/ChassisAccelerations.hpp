@@ -8,6 +8,7 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::util {

@@ -4,14 +4,19 @@
 
 #include "wpi/math/kinematics/DifferentialDriveOdometry3d.hpp"
 
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/kinematics/Odometry3d.hpp"
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/units/length.hpp"
 
 using namespace wpi::math;
 
 DifferentialDriveOdometry3d::DifferentialDriveOdometry3d(
     const Rotation3d& gyroAngle, wpi::units::meter_t leftDistance,
     wpi::units::meter_t rightDistance, const Pose3d& initialPose)
-    : Odometry3d(gyroAngle, initialPose),
-      m_previousWheelPositions{leftDistance, rightDistance} {
+    : Odometry3d(DifferentialDriveKinematics{1_m}, gyroAngle,
+                 {leftDistance, rightDistance}, initialPose) {
   wpi::math::MathSharedStore::ReportUsage("DifferentialDriveOdometry3d", "");
 }

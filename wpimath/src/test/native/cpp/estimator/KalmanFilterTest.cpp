@@ -9,8 +9,8 @@
 
 #include "wpi/math/random/Normal.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/units/time.hpp"
 
 TEST(KalmanFilterTest, SwerveStationary) {
@@ -107,7 +107,7 @@ TEST(KalmanFilterTest, SwerveMovingOverTrajectory) {
   wpi::math::KalmanFilter<6, 3, 3> filter{
       plant, {0.1, 0.1, 0.1, 0.1, 0.1, 0.1}, {0.2, 0.2, 1.0 / 3.0}, dt};
 
-  auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
+  auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
       {wpi::math::Pose2d{0_m, 0_m, 0_rad}, wpi::math::Pose2d{5_m, 5_m, 0_rad}},
       wpi::math::TrajectoryConfig{2_mps, 2_mps_sq});
 

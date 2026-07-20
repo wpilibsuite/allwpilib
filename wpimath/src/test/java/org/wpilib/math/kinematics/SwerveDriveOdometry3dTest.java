@@ -16,8 +16,8 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.TrajectoryConfig;
-import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.math.util.Units;
 
 class SwerveDriveOdometry3dTest {
@@ -142,7 +142,7 @@ class SwerveDriveOdometry3dTest {
     SwerveModulePosition br = new SwerveModulePosition();
 
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
                 new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
@@ -236,7 +236,7 @@ class SwerveDriveOdometry3dTest {
     SwerveModulePosition br = new SwerveModulePosition();
 
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
                 new Pose2d(3, 0, Rotation2d.kCW_Pi_2),

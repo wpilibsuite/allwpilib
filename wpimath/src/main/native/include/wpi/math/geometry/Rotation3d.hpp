@@ -5,7 +5,7 @@
 #pragma once
 
 #include <numbers>
-#include <type_traits>
+#include <stdexcept>
 
 #include <Eigen/Core>
 #include <gcem.hpp>
@@ -14,7 +14,9 @@
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/linalg/ct_matrix.hpp"
 #include "wpi/units/angle.hpp"
+#include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
@@ -380,6 +382,27 @@ class WPILIB_DLLEXPORT Rotation3d final {
       delta = Quaternion{-delta.W(), -delta.X(), -delta.Y(), -delta.Z()};
     }
     return Rotation3d{delta.Pow(t) * q0};
+  }
+
+  /**
+   * Projects the rotation forward by integrating the given body rates over
+   * time.
+   *
+   * @param rollRate The body roll rate.
+   * @param pitchRate The body pitch rate.
+   * @param yawRate The body yaw rate.
+   * @param dt The time over which to integrate.
+   * @return The rotation in the world frame projected forward.
+   */
+  constexpr Rotation3d Integrate(units::radians_per_second_t rollRate,
+                                 units::radians_per_second_t pitchRate,
+                                 units::radians_per_second_t yawRate,
+                                 units::second_t dt) const {
+    // qₖ₊₁ = qₖ exp(1/2 W dt) where W = 0 + ω_x î + ω_y ĵ + ω_z k̂
+    //
+    // https://math.stackexchange.com/a/2099673
+    Quaternion W{0.0, rollRate.value(), pitchRate.value(), yawRate.value()};
+    return Rotation3d{m_q * (W * (0.5 * dt.value())).Exp()};
   }
 
   /**

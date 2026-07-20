@@ -18,7 +18,7 @@ class TrajectoryTransformTest {
   void testTransformBy() {
     var config = new TrajectoryConfig(3, 3);
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             Pose2d.kZero, List.of(), new Pose2d(1, 1, Rotation2d.kCCW_Pi_2), config);
 
     var transformedTrajectory =
@@ -37,7 +37,7 @@ class TrajectoryTransformTest {
   void testRelativeTo() {
     var config = new TrajectoryConfig(3, 3);
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             new Pose2d(1, 2, Rotation2d.fromDegrees(30.0)),
             List.of(),
             new Pose2d(5, 7, Rotation2d.kCCW_Pi_2),
@@ -55,7 +55,8 @@ class TrajectoryTransformTest {
   // A rigid transform rotates both the heading and the field-relative velocity/acceleration by the
   // same amount, so the heading-relative forward scalars (and curvature) are invariant. This would
   // fail if transformBy/relativeTo rotated the pose but not the velocity/acceleration.
-  void testSameForwardScalars(List<SplineSample> statesA, List<SplineSample> statesB) {
+  void testSameForwardScalars(
+      List<DrivetrainSplineSample> statesA, List<DrivetrainSplineSample> statesB) {
     assertEquals(statesA.size(), statesB.size());
     for (int i = 0; i < statesA.size(); i++) {
       assertEquals(statesA.get(i).forwardVelocity(), statesB.get(i).forwardVelocity(), 1e-9);
@@ -65,7 +66,8 @@ class TrajectoryTransformTest {
     }
   }
 
-  void testSameShapedTrajectory(List<SplineSample> statesA, List<SplineSample> statesB) {
+  void testSameShapedTrajectory(
+      List<DrivetrainSplineSample> statesA, List<DrivetrainSplineSample> statesB) {
     for (int i = 0; i < statesA.size() - 1; i++) {
       var a1 = statesA.get(i).pose;
       var a2 = statesA.get(i + 1).pose;

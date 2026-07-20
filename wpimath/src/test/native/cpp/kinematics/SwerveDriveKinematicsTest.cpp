@@ -4,12 +4,25 @@
 
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 
+#include <cmath>
+#include <cstddef>
 #include <numbers>
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
+#include "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
+#include "wpi/math/kinematics/SwerveModulePosition.hpp"
+#include "wpi/math/kinematics/SwerveModuleVelocity.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
 #include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/util/array.hpp"
 
 using namespace wpi::math;
 

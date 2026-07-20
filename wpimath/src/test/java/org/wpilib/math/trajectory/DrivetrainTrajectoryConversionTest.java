@@ -27,7 +27,7 @@ class DrivetrainTrajectoryConversionTest {
    *
    * @return A spline trajectory for testing.
    */
-  static Trajectory<SplineSample> generateTestTrajectory() {
+  static Trajectory<DrivetrainSplineSample> generateTestTrajectory() {
     final double maxVelocity = feetToMeters(12.0);
     final double maxAccel = feetToMeters(12);
 
@@ -50,7 +50,7 @@ class DrivetrainTrajectoryConversionTest {
 
     TrajectoryConfig config = new TrajectoryConfig(maxVelocity, maxAccel).setReversed(true);
 
-    return TrajectoryGenerator.generateTrajectory(waypoints, config);
+    return DrivetrainSplineTrajectoryGenerator.generate(waypoints, config);
   }
 
   /**
@@ -58,7 +58,7 @@ class DrivetrainTrajectoryConversionTest {
    *
    * @return A simple trajectory for testing.
    */
-  static Trajectory<SplineSample> generateStraightTrajectory() {
+  static Trajectory<DrivetrainSplineSample> generateStraightTrajectory() {
     var waypoints =
         List.of(
             new Pose2d(0, 0, Rotation2d.kZero),
@@ -67,7 +67,7 @@ class DrivetrainTrajectoryConversionTest {
 
     TrajectoryConfig config = new TrajectoryConfig(2.0, 2.0);
 
-    return TrajectoryGenerator.generateTrajectory(waypoints, config);
+    return DrivetrainSplineTrajectoryGenerator.generate(waypoints, config);
   }
 
   /**
@@ -75,7 +75,7 @@ class DrivetrainTrajectoryConversionTest {
    *
    * @return A circular trajectory for testing.
    */
-  static Trajectory<SplineSample> generateCircularTrajectory() {
+  static Trajectory<DrivetrainSplineSample> generateCircularTrajectory() {
     var waypoints =
         List.of(
             new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
@@ -86,13 +86,13 @@ class DrivetrainTrajectoryConversionTest {
 
     TrajectoryConfig config = new TrajectoryConfig(2.0, 2.0);
 
-    return TrajectoryGenerator.generateTrajectory(waypoints, config);
+    return DrivetrainSplineTrajectoryGenerator.generate(waypoints, config);
   }
 
   @Test
   void testDifferentialTrajectoryConversionCrossScale() {
     // Generate base trajectory
-    Trajectory<SplineSample> baseTrajectory = generateTestTrajectory();
+    Trajectory<DrivetrainSplineSample> baseTrajectory = generateTestTrajectory();
 
     // Create differential drive kinematics with 0.6m trackwidth
     DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(0.6);
@@ -104,68 +104,68 @@ class DrivetrainTrajectoryConversionTest {
     // Verify all samples have correct wheel speeds
     for (DifferentialSample sample : diffTrajectory.samples) {
       // Calculate expected wheel speeds from chassis speeds using kinematics
-      DifferentialDriveWheelVelocities expectedWheelSpeeds =
+      DifferentialDriveWheelVelocities expectedWheelVelocities =
           kinematics.toWheelVelocities(sample.velocity.toRobotRelative(sample.pose.getRotation()));
 
       // Assert the sample's wheel speeds match the kinematics calculation
       assertAll(
           () ->
               assertEquals(
-                  expectedWheelSpeeds.left,
-                  sample.leftSpeed,
+                  expectedWheelVelocities.left,
+                  sample.leftVelocity,
                   kEpsilon,
-                  "Left wheel speed mismatch at t=" + sample.timestamp),
+                  "Left wheel speed mismatch at t=" + sample.time),
           () ->
               assertEquals(
-                  expectedWheelSpeeds.right,
-                  sample.rightSpeed,
+                  expectedWheelVelocities.right,
+                  sample.rightVelocity,
                   kEpsilon,
-                  "Right wheel speed mismatch at t=" + sample.timestamp));
+                  "Right wheel speed mismatch at t=" + sample.time));
 
       // Verify inverse: wheel speeds should produce the original chassis speeds
-      ChassisVelocities reconstructedSpeeds =
+      ChassisVelocities reconstructedVelocities =
           kinematics.toChassisVelocities(
-              new DifferentialDriveWheelVelocities(sample.leftSpeed, sample.rightSpeed));
+              new DifferentialDriveWheelVelocities(sample.leftVelocity, sample.rightVelocity));
 
       assertAll(
           () ->
               assertEquals(
                   sample.velocity.toRobotRelative(sample.pose.getRotation()).vx,
-                  reconstructedSpeeds.vx,
+                  reconstructedVelocities.vx,
                   kEpsilon,
-                  "Reconstructed vx mismatch at t=" + sample.timestamp),
+                  "Reconstructed vx mismatch at t=" + sample.time),
           () ->
               assertEquals(
                   sample.velocity.toRobotRelative(sample.pose.getRotation()).vy,
-                  reconstructedSpeeds.vy,
+                  reconstructedVelocities.vy,
                   kEpsilon,
-                  "Reconstructed vy mismatch at t=" + sample.timestamp),
+                  "Reconstructed vy mismatch at t=" + sample.time),
           () ->
               assertEquals(
                   sample.velocity.toRobotRelative(sample.pose.getRotation()).omega,
-                  reconstructedSpeeds.omega,
+                  reconstructedVelocities.omega,
                   kEpsilon,
-                  "Reconstructed omega mismatch at t=" + sample.timestamp));
+                  "Reconstructed omega mismatch at t=" + sample.time));
     }
   }
 
   @Test
   void testDifferentialTrajectoryConversionStraight() {
-    Trajectory<SplineSample> baseTrajectory = generateStraightTrajectory();
+    Trajectory<DrivetrainSplineSample> baseTrajectory = generateStraightTrajectory();
     DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(0.7);
 
     DifferentialTrajectory diffTrajectory =
         new DifferentialTrajectory(kinematics, baseTrajectory.samples);
 
     for (DifferentialSample sample : diffTrajectory.samples) {
-      DifferentialDriveWheelVelocities expectedWheelSpeeds =
+      DifferentialDriveWheelVelocities expectedWheelVelocities =
           kinematics.toWheelVelocities(sample.velocity.toRobotRelative(sample.pose.getRotation()));
 
-      assertEquals(expectedWheelSpeeds.left, sample.leftSpeed, kEpsilon);
-      assertEquals(expectedWheelSpeeds.right, sample.rightSpeed, kEpsilon);
+      assertEquals(expectedWheelVelocities.left, sample.leftVelocity, kEpsilon);
+      assertEquals(expectedWheelVelocities.right, sample.rightVelocity, kEpsilon);
 
       // For straight motion, left and right speeds should be approximately equal
-      assertEquals(sample.leftSpeed, sample.rightSpeed, 0.01);
+      assertEquals(sample.leftVelocity, sample.rightVelocity, 0.01);
     }
   }
 }

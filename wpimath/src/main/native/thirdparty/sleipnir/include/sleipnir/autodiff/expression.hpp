@@ -34,7 +34,7 @@ struct Expression;
 template <typename Scalar>
 constexpr void inc_ref_count(Expression<Scalar>* expr);
 template <typename Scalar>
-void dec_ref_count(Expression<Scalar>* expr);
+constexpr void dec_ref_count(Expression<Scalar>* expr);
 
 /// Typedef for intrusive shared pointer to Expression.
 ///
@@ -727,7 +727,7 @@ constexpr void inc_ref_count(Expression<Scalar>* expr) {
 /// @tparam Scalar Scalar type.
 /// @param expr The shared pointer's managed object.
 template <typename Scalar>
-void dec_ref_count(Expression<Scalar>* expr) {
+constexpr void dec_ref_count(Expression<Scalar>* expr) {
   // If a deeply nested tree is being deallocated all at once, calling the
   // Expression destructor when expr's refcount reaches zero can cause a stack
   // overflow. Instead, we iterate over its children to decrement their

@@ -27,10 +27,10 @@ MPack                 wpiutil/src/main/native/thirdparty/mpack
 units                 wpimath/src/main/native/include/wpi/units/
 Eigen                 wpimath/src/main/native/thirdparty/eigen/include/
 Team 254 Library      wpimath/src/main/java/org/wpilib/math/spline/SplineParameterizer.java
-                      wpimath/src/main/java/org/wpilib/math/trajectory/TrajectoryParameterizer.java
+                      wpimath/src/main/java/org/wpilib/math/trajectory/DrivetrainSplineTrajectoryParameterizer.java
                       wpimath/src/main/native/include/wpi/math/spline/SplineParameterizer.hpp
-                      wpimath/src/main/native/include/wpi/math/trajectory/TrajectoryParameterizer.hpp
-                      wpimath/src/main/native/cpp/trajectory/TrajectoryParameterizer.cpp
+                      wpimath/src/main/native/include/wpi/math/trajectory/DrivetrainSplineTrajectoryParameterizer.hpp
+                      wpimath/src/main/native/cpp/trajectory/DrivetrainSplineTrajectoryParameterizer.cpp
 Portable File Dialogs wpigui/src/main/native/include/wpi/gui/portable-file-dialogs.h
 V8 export-template    wpiutil/src/main/native/include/wpi/SymbolExports.hpp
 GCEM                  wpimath/src/main/native/thirdparty/gcem/include/

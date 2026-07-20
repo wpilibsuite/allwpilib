@@ -63,7 +63,7 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
    *     internally.
    */
   public DifferentialTrajectory(
-      DifferentialDriveKinematics kinematics, List<? extends TrajectorySample> samples) {
+      DifferentialDriveKinematics kinematics, List<? extends HolonomicSample> samples) {
     this(samples.stream().map(s -> new DifferentialSample(s, kinematics)).toList());
   }
 
@@ -79,27 +79,27 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
   @Override
   public DifferentialSample interpolate(
       DifferentialSample start, DifferentialSample end, double t) {
-    double interpTime = MathUtil.lerp(start.timestamp, end.timestamp, t);
+    double interpTime = MathUtil.lerp(start.time, end.time, t);
 
-    double interpDt = interpTime - start.timestamp;
+    double interpDt = interpTime - start.time;
 
-    // The integration state holds wheel speeds (vₗ, vᵣ), which are
+    // The integration state holds wheel velocities (vₗ, vᵣ), which are
     // frame-invariant; the field-relative chassis velocity is reconstructed from
-    // the integrated wheel speeds and heading below.
+    // the integrated wheel velocities and heading below.
     Matrix<N6, N1> initialState =
         VecBuilder.fill(
             start.pose.getX(),
             start.pose.getY(),
             start.pose.getRotation().getRadians(),
-            start.leftSpeed,
-            start.rightSpeed,
+            start.leftVelocity,
+            start.rightVelocity,
             start.velocity.omega);
 
     // Wheel and angular accelerations are computed by finite difference between
     // the two samples (frame-independent, so no kinematics/trackwidth is needed).
-    double segmentDt = end.timestamp - start.timestamp;
-    double leftAccel = segmentDt == 0 ? 0 : (end.leftSpeed - start.leftSpeed) / segmentDt;
-    double rightAccel = segmentDt == 0 ? 0 : (end.rightSpeed - start.rightSpeed) / segmentDt;
+    double segmentDt = end.time - start.time;
+    double leftAccel = segmentDt == 0 ? 0 : (end.leftVelocity - start.leftVelocity) / segmentDt;
+    double rightAccel = segmentDt == 0 ? 0 : (end.rightVelocity - start.rightVelocity) / segmentDt;
     double angularAccel =
         segmentDt == 0 ? 0 : (end.velocity.omega - start.velocity.omega) / segmentDt;
     Vector<N3> initialInput = VecBuilder.fill(leftAccel, rightAccel, angularAccel);
@@ -121,7 +121,7 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
     double ay = MathUtil.lerp(start.acceleration.ay, end.acceleration.ay, t);
     double alpha = MathUtil.lerp(start.acceleration.alpha, end.acceleration.alpha, t);
 
-    // Reconstruct the field-relative velocity from robot-relative forward speed.
+    // Reconstruct the field-relative velocity from robot-relative forward velocity.
     Rotation2d heading = Rotation2d.fromRadians(theta);
     ChassisVelocities fieldVelocity =
         new ChassisVelocities(vx, 0.0, omega).toFieldRelative(heading);
@@ -174,12 +174,12 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
 
     DifferentialSample transformedFirstSample =
         new DifferentialSample(
-            start().timestamp,
+            start().time,
             transformedFirstPose,
             start().velocity.toFieldRelative(rotation),
             start().acceleration.toFieldRelative(rotation),
-            start().leftSpeed,
-            start().rightSpeed);
+            start().leftVelocity,
+            start().rightVelocity);
 
     Stream<DifferentialSample> transformedSamples =
         samples.stream()
@@ -187,12 +187,12 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
             .map(
                 sample ->
                     new DifferentialSample(
-                        sample.timestamp,
+                        sample.time,
                         transformedFirstPose.plus(sample.pose.minus(firstPose)),
                         sample.velocity.toFieldRelative(rotation),
                         sample.acceleration.toFieldRelative(rotation),
-                        sample.leftSpeed,
-                        sample.rightSpeed));
+                        sample.leftVelocity,
+                        sample.rightVelocity));
 
     return new DifferentialTrajectory(
         Stream.concat(Stream.of(transformedFirstSample), transformedSamples).toList());
@@ -210,10 +210,19 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
       return this;
     }
 
-    var withNewTimestamp =
-        other.samples.stream().map(s -> s.withNewTimestamp(s.timestamp + this.duration));
+    var timeShifted =
+        other.samples.stream()
+            .map(
+                s ->
+                    new DifferentialSample(
+                        s.time + this.duration,
+                        s.pose,
+                        s.velocity,
+                        s.acceleration,
+                        s.leftVelocity,
+                        s.rightVelocity));
 
-    return new DifferentialTrajectory(Stream.concat(samples.stream(), withNewTimestamp).toList());
+    return new DifferentialTrajectory(Stream.concat(samples.stream(), timeShifted).toList());
   }
 
   /**

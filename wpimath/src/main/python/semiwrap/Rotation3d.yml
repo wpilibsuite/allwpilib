@@ -32,6 +32,7 @@ classes:
       operator==:
       RotateBy:
       Interpolate:
+      Integrate:
       GetQuaternion:
       X:
       Y:

@@ -7,8 +7,10 @@
 #include <algorithm>
 #include <initializer_list>
 #include <span>
+#include <stdexcept>
 #include <utility>
 
+#include <Eigen/Core>
 #include <gcem.hpp>
 
 #include "wpi/math/geometry/Rotation2d.hpp"

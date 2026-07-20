@@ -8,7 +8,7 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
-#include "wpi/math/trajectory/SplineSample.hpp"
+#include "wpi/math/trajectory/HolonomicSample.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/math.hpp"
@@ -120,11 +120,12 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    *                     from a trajectory.
    */
   ChassisVelocities Calculate(const Pose2d& currentPose,
-                              const SplineSample& desiredState) {
+                              const HolonomicSample& desiredState) {
     // The sample velocity is field-relative; the controller needs the
     // robot-relative forward (linear) velocity.
-    return Calculate(currentPose, desiredState.pose,
-                     desiredState.ForwardVelocity(),
+    auto linearVelocity =
+        desiredState.velocity.ToRobotRelative(desiredState.pose.Rotation()).vx;
+    return Calculate(currentPose, desiredState.pose, linearVelocity,
                      desiredState.velocity.omega);
   }
 

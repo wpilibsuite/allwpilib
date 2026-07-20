@@ -131,7 +131,7 @@ class Drivetrain {
   wpi::apriltag::AprilTagFieldLayout aprilTagFieldLayout{
       wpi::apriltag::AprilTagFieldLayout::LoadField(
           wpi::apriltag::AprilTagField::k2024Crescendo)};
-  wpi::math::Pose3d objectInField{aprilTagFieldLayout.GetTagPose(0).value()};
+  wpi::math::Pose3d objectInField{aprilTagFieldLayout.GetTagPose(1).value()};
 
   wpi::PWMSparkMax leftLeader{1};
   wpi::PWMSparkMax leftFollower{2};

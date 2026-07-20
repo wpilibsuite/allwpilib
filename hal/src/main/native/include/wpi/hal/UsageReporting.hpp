@@ -24,6 +24,29 @@ inline void HAL_ReportUsage(std::string_view resource, std::string_view data) {
   HAL_ReportUsage(&resourceStr, &dataStr);
 }
 
+/** Publishes a version for a device on a CAN bus. */
+inline int32_t HAL_PublishCanVersion(uint8_t busId, uint32_t deviceId,
+                                     std::string_view name,
+                                     std::string_view version) {
+  WPI_String nameStr = wpi::util::make_string(name);
+  WPI_String versionStr = wpi::util::make_string(version);
+  return HAL_PublishCanVersion(busId, deviceId, &nameStr, &versionStr);
+}
+
+/** Publishes a version without a bus or device identifier. */
+inline int32_t HAL_PublishVersion(std::string_view name,
+                                  std::string_view version) {
+  WPI_String nameStr = wpi::util::make_string(name);
+  WPI_String versionStr = wpi::util::make_string(version);
+  return HAL_PublishVersion(&nameStr, &versionStr);
+}
+
+/** Publishes the WPILib version. */
+inline int32_t HAL_PublishWpilibVersion(std::string_view version) {
+  WPI_String versionStr = wpi::util::make_string(version);
+  return HAL_PublishWpilibVersion(&versionStr);
+}
+
 /**
  * Reports usage of a resource of interest.  Repeated calls for the same
  * resource name replace the previous report.

@@ -10,6 +10,8 @@
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_acceleration.hpp"
 #include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
 
 TEST(ProfiledPIDInputOutputTest, ContinuousInput1) {
   wpi::math::ProfiledPIDController<wpi::units::degree> controller{

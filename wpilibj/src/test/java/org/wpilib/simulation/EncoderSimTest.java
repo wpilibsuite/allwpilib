@@ -5,6 +5,7 @@
 package org.wpilib.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -26,8 +27,34 @@ class EncoderSimTest {
 
       encoder.setDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
 
-      sim.setRate(1.91);
-      assertEquals(1.91, sim.getRate());
+      DoubleCallback callback = new DoubleCallback();
+      try (CallbackStore cb = sim.registerRateCallback(callback, false)) {
+        sim.setRate(1.91);
+        assertEquals(1.91, sim.getRate());
+        assertTrue(callback.wasTriggered());
+        assertEquals(1.91, callback.getSetValue());
+      }
+    }
+  }
+
+  @Test
+  void testResetDataClearsRateCallbacks() {
+    HAL.initialize(500, 0);
+
+    try (Encoder encoder = new Encoder(0, 1)) {
+      EncoderSim sim = new EncoderSim(encoder);
+      sim.resetData();
+
+      DoubleCallback callback = new DoubleCallback();
+      try (CallbackStore cb = sim.registerRateCallback(callback, false)) {
+        sim.setRate(1.91);
+        assertTrue(callback.wasTriggered());
+
+        callback.reset();
+        sim.resetData();
+        sim.setRate(2.53);
+        assertFalse(callback.wasTriggered());
+      }
     }
   }
 
@@ -66,27 +93,6 @@ class EncoderSimTest {
       sim.setDistance(229.174);
       assertEquals(229.174, sim.getDistance());
       assertEquals(229.174, encoder.getDistance());
-    }
-  }
-
-  @SuppressWarnings("deprecation") // Encoder.getPeriod()
-  @Test
-  void testPeriod() {
-    HAL.initialize(500, 0);
-
-    try (Encoder encoder = new Encoder(0, 1)) {
-      EncoderSim sim = new EncoderSim(encoder);
-      sim.resetData();
-
-      encoder.setDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
-
-      DoubleCallback callback = new DoubleCallback();
-      try (CallbackStore cb = sim.registerPeriodCallback(callback, false)) {
-        sim.setPeriod(123.456);
-        assertEquals(123.456, sim.getPeriod());
-        assertEquals(123.456, encoder.getPeriod());
-        assertEquals(DEFAULT_DISTANCE_PER_PULSE / 123.456, encoder.getRate());
-      }
     }
   }
 

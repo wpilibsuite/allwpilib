@@ -32,19 +32,6 @@ void Encoder::Reset() {
   WPILIB_CheckErrorStatus(status, "Reset");
 }
 
-wpi::units::second_t Encoder::GetPeriod() const {
-  int32_t status = 0;
-  double value = HAL_GetEncoderPeriod(m_encoder, &status);
-  WPILIB_CheckErrorStatus(status, "GetPeriod");
-  return wpi::units::second_t{value};
-}
-
-void Encoder::SetMaxPeriod(wpi::units::second_t maxPeriod) {
-  int32_t status = 0;
-  HAL_SetEncoderMaxPeriod(m_encoder, maxPeriod.value(), &status);
-  WPILIB_CheckErrorStatus(status, "SetMaxPeriod");
-}
-
 bool Encoder::GetStopped() const {
   int32_t status = 0;
   bool value = HAL_GetEncoderStopped(m_encoder, &status);
@@ -87,12 +74,6 @@ double Encoder::GetRate() const {
   return value;
 }
 
-void Encoder::SetMinRate(double minRate) {
-  int32_t status = 0;
-  HAL_SetEncoderMinRate(m_encoder, minRate, &status);
-  WPILIB_CheckErrorStatus(status, "SetMinRate");
-}
-
 void Encoder::SetDistancePerPulse(double distancePerPulse) {
   int32_t status = 0;
   HAL_SetEncoderDistancePerPulse(m_encoder, distancePerPulse, &status);
@@ -110,25 +91,6 @@ void Encoder::SetReverseDirection(bool reverseDirection) {
   int32_t status = 0;
   HAL_SetEncoderReverseDirection(m_encoder, reverseDirection, &status);
   WPILIB_CheckErrorStatus(status, "SetReverseDirection");
-}
-
-void Encoder::SetSamplesToAverage(int samplesToAverage) {
-  if (samplesToAverage < 1 || samplesToAverage > 127) {
-    throw WPILIB_MakeError(
-        err::ParameterOutOfRange,
-        "Average counter values must be between 1 and 127, got {}",
-        samplesToAverage);
-  }
-  int32_t status = 0;
-  HAL_SetEncoderSamplesToAverage(m_encoder, samplesToAverage, &status);
-  WPILIB_CheckErrorStatus(status, "SetSamplesToAverage");
-}
-
-int Encoder::GetSamplesToAverage() const {
-  int32_t status = 0;
-  int result = HAL_GetEncoderSamplesToAverage(m_encoder, &status);
-  WPILIB_CheckErrorStatus(status, "GetSamplesToAverage");
-  return result;
 }
 
 void Encoder::SetSimDevice(HAL_SimDeviceHandle device) {

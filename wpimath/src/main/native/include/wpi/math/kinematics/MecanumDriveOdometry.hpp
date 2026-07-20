@@ -5,7 +5,9 @@
 #pragma once
 
 #include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelVelocities.hpp"
 #include "wpi/math/kinematics/Odometry.hpp"
@@ -23,7 +25,9 @@ namespace wpi::math {
  * when using computer-vision systems.
  */
 class WPILIB_DLLEXPORT MecanumDriveOdometry
-    : public Odometry<MecanumDriveWheelPositions> {
+    : public Odometry<MecanumDriveKinematics, MecanumDriveWheelPositions,
+                      MecanumDriveWheelVelocities,
+                      MecanumDriveWheelAccelerations> {
  public:
   /**
    * Constructs a MecanumDriveOdometry object.
@@ -37,27 +41,6 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry
       MecanumDriveKinematics kinematics, const Rotation2d& gyroAngle,
       const MecanumDriveWheelPositions& wheelPositions,
       const Pose2d& initialPose = Pose2d{});
-
-  void ResetPosition(const Rotation2d& gyroAngle,
-                     const MecanumDriveWheelPositions& wheelPositions,
-                     const Pose2d& pose) override {
-    m_previousWheelPositions = wheelPositions;
-    Odometry::ResetPosition(gyroAngle, pose);
-  }
-
-  const Pose2d& Update(
-      const Rotation2d& gyroAngle,
-      const MecanumDriveWheelPositions& wheelPositions) override {
-    auto twist =
-        m_kinematics.ToTwist2d(m_previousWheelPositions, wheelPositions);
-    m_previousWheelPositions = wheelPositions;
-    return Odometry::Update(gyroAngle, twist);
-  }
-
- private:
-  MecanumDriveKinematics m_kinematics;
-
-  MecanumDriveWheelPositions m_previousWheelPositions;
 };
 
 }  // namespace wpi::math

@@ -7,11 +7,15 @@
 #include <cstddef>
 
 #include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/kinematics/Odometry3d.hpp"
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+#include "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
 #include "wpi/math/kinematics/SwerveModulePosition.hpp"
 #include "wpi/math/kinematics/SwerveModuleVelocity.hpp"
+#include "wpi/math/util/MathShared.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/array.hpp"
 
 namespace wpi::math {
 
@@ -26,7 +30,11 @@ namespace wpi::math {
  */
 template <size_t NumModules>
 class SwerveDriveOdometry3d
-    : public Odometry3d<wpi::util::array<SwerveModulePosition, NumModules>> {
+    : public Odometry3d<
+          SwerveDriveKinematics<NumModules>,
+          wpi::util::array<SwerveModulePosition, NumModules>,
+          wpi::util::array<SwerveModuleVelocity, NumModules>,
+          wpi::util::array<SwerveModuleAcceleration, NumModules>> {
  public:
   /**
    * Constructs a SwerveDriveOdometry3d object.
@@ -36,44 +44,14 @@ class SwerveDriveOdometry3d
    * @param modulePositions The wheel positions reported by each module.
    * @param initialPose The starting position of the robot on the field.
    */
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif  // defined(__GNUC__) && !defined(__clang__)
   SwerveDriveOdometry3d(
       SwerveDriveKinematics<NumModules> kinematics, const Rotation3d& gyroAngle,
       const wpi::util::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose3d& initialPose = Pose3d{})
-      : SwerveDriveOdometry3d::Odometry3d(gyroAngle, initialPose),
-        m_kinematics(kinematics),
-        m_previousWheelPositions(modulePositions) {
+      : SwerveDriveOdometry3d::Odometry3d(kinematics, gyroAngle,
+                                          modulePositions, initialPose) {
     wpi::math::MathSharedStore::ReportUsage("SwerveDriveOdometry3d", "");
   }
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif  // defined(__GNUC__) && !defined(__clang__)
-
-  void ResetPosition(
-      const Rotation3d& gyroAngle,
-      const wpi::util::array<SwerveModulePosition, NumModules>& modulePositions,
-      const Pose3d& pose) override {
-    m_previousWheelPositions = modulePositions;
-    SwerveDriveOdometry3d::Odometry3d::ResetPosition(gyroAngle, pose);
-  }
-
-  const Pose3d& Update(const Rotation3d& gyroAngle,
-                       const wpi::util::array<SwerveModulePosition, NumModules>&
-                           modulePositions) override {
-    auto twist =
-        m_kinematics.ToTwist2d(m_previousWheelPositions, modulePositions);
-    m_previousWheelPositions = modulePositions;
-    return SwerveDriveOdometry3d::Odometry3d::Update(gyroAngle, twist);
-  }
-
- private:
-  SwerveDriveKinematics<NumModules> m_kinematics;
-
-  wpi::util::array<SwerveModulePosition, NumModules> m_previousWheelPositions;
 };
 
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)

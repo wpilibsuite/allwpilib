@@ -4,13 +4,13 @@ import random
 
 from wpimath import (
     ChassisVelocities,
+    DrivetrainSplineTrajectoryGenerator,
     Pose2d,
     Rotation2d,
     SwerveDrive4Kinematics,
     SwerveDrive4Odometry,
     SwerveModuleVelocity,
     SwerveModulePosition,
-    TrajectoryGenerator,
     TrajectoryConfig,
     Translation2d,
 )
@@ -134,7 +134,7 @@ def test_accuracy_facing_trajectory():
     bl = SwerveModulePosition()
     br = SwerveModulePosition()
 
-    trajectory = TrajectoryGenerator.generate_trajectory(
+    trajectory = DrivetrainSplineTrajectoryGenerator.generate(
         [
             Pose2d(x=0, y=0, rotation=Rotation2d.from_degrees(45)),
             Pose2d(x=3, y=0, rotation=Rotation2d.from_degrees(-90)),
@@ -207,7 +207,7 @@ def test_accuracy_facing_x_axis():
     bl = SwerveModulePosition()
     br = SwerveModulePosition()
 
-    trajectory = TrajectoryGenerator.generate_trajectory(
+    trajectory = DrivetrainSplineTrajectoryGenerator.generate(
         [
             Pose2d(x=0, y=0, rotation=Rotation2d.from_degrees(45)),
             Pose2d(x=3, y=0, rotation=Rotation2d.from_degrees(-90)),

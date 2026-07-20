@@ -4,7 +4,12 @@
 
 #include "wpi/math/estimator/DifferentialDrivePoseEstimator.hpp"
 
-#include <vector>
+#include "wpi/math/estimator/PoseEstimator.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/util/array.hpp"
 
 using namespace wpi::math;
 

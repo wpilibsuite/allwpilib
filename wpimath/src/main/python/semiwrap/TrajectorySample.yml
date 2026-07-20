@@ -1,5 +1,7 @@
+extra_includes:
+- wpystruct.h
+
 functions:
-  KinematicInterpolate:
   to_json:
     overloads:
       wpi::util::json&, const TrajectorySample&:
@@ -14,17 +16,15 @@ functions:
         ignore: true
 classes:
   wpi::math::TrajectorySample:
+    force_no_trampoline: true
     attributes:
-      timestamp:
-      pose:
-      velocity:
-      acceleration:
+      time:
     methods:
       TrajectorySample:
         overloads:
           "":
-          wpi::units::second_t, const Pose2d&, const ChassisVelocities&, const ChassisAccelerations&:
+          wpi::units::second_t:
       operator==:
-      Transform:
-      RelativeTo:
-      WithNewTimestamp:
+
+inline_code: |
+  SetupWPyStruct<wpi::math::TrajectorySample>(cls_TrajectorySample);

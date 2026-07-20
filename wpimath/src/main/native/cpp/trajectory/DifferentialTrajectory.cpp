@@ -32,29 +32,30 @@ using namespace wpi::math;
 DifferentialSample DifferentialTrajectory::Interpolate(
     const DifferentialSample& start, const DifferentialSample& end,
     double t) const {
-  wpi::units::second_t interpTime =
-      wpi::util::Lerp(start.timestamp, end.timestamp, t);
-  auto interpDt = interpTime - start.timestamp;
+  wpi::units::second_t interpTime = wpi::util::Lerp(start.time, end.time, t);
+  auto interpDt = interpTime - start.time;
 
-  // The integration state holds wheel speeds (vₗ, vᵣ), which are
+  // The integration state holds wheel velocities (vₗ, vᵣ), which are
   // frame-invariant; the field-relative chassis velocity is reconstructed from
-  // the integrated wheel speeds and heading below.
+  // the integrated wheel velocities and heading below.
   Eigen::Vector<double, 6> initialState{
       {start.pose.X().value()},
       {start.pose.Y().value()},
       {start.pose.Rotation().Radians().value()},
-      {start.leftSpeed.value()},
-      {start.rightSpeed.value(), start.velocity.omega.value()}};
+      {start.leftVelocity.value()},
+      {start.rightVelocity.value(), start.velocity.omega.value()}};
 
   // Wheel and angular accelerations are computed by finite difference between
   // the two samples (frame-independent, so no kinematics/trackwidth is needed).
-  double segmentDt = (end.timestamp - start.timestamp).value();
+  double segmentDt = (end.time - start.time).value();
   double leftAccel =
-      segmentDt == 0 ? 0
-                     : (end.leftSpeed - start.leftSpeed).value() / segmentDt;
+      segmentDt == 0
+          ? 0
+          : (end.leftVelocity - start.leftVelocity).value() / segmentDt;
   double rightAccel =
-      segmentDt == 0 ? 0
-                     : (end.rightSpeed - start.rightSpeed).value() / segmentDt;
+      segmentDt == 0
+          ? 0
+          : (end.rightVelocity - start.rightVelocity).value() / segmentDt;
   double angularAccel =
       segmentDt == 0
           ? 0
@@ -103,7 +104,8 @@ DifferentialSample DifferentialTrajectory::Interpolate(
 
   Rotation2d heading{wpi::units::radian_t{theta}};
 
-  // Reconstruct the field-relative velocity from robot-relative forward speed.
+  // Reconstruct the field-relative velocity from robot-relative forward
+  // velocity.
   ChassisVelocities fieldVelocity = ChassisVelocities{
       wpi::units::meters_per_second_t{vx}, 0_mps,
       wpi::units::radians_per_second_t{
@@ -133,19 +135,19 @@ DifferentialTrajectory DifferentialTrajectory::TransformBy(
 
   // Transform first sample
   transformedSamples.push_back(
-      DifferentialSample(Start().timestamp, transformedFirstPose,
+      DifferentialSample(Start().time, transformedFirstPose,
                          Start().velocity.ToFieldRelative(rotation),
                          Start().acceleration.ToFieldRelative(rotation),
-                         Start().leftSpeed, Start().rightSpeed));
+                         Start().leftVelocity, Start().rightVelocity));
 
   // Transform remaining samples
   for (size_t i = 1; i < Samples().size(); ++i) {
     const auto& sample = Samples()[i];
     transformedSamples.push_back(DifferentialSample(
-        sample.timestamp, transformedFirstPose + (sample.pose - firstPose),
+        sample.time, transformedFirstPose + (sample.pose - firstPose),
         sample.velocity.ToFieldRelative(rotation),
-        sample.acceleration.ToFieldRelative(rotation), sample.leftSpeed,
-        sample.rightSpeed));
+        sample.acceleration.ToFieldRelative(rotation), sample.leftVelocity,
+        sample.rightVelocity));
   }
 
   return DifferentialTrajectory(std::move(transformedSamples));

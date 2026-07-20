@@ -1,6 +1,6 @@
 name: Gradle
 
-on: [pull_request, push]
+on: [merge_group, pull_request, push]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}

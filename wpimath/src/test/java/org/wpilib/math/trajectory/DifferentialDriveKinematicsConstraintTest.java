@@ -23,8 +23,8 @@ class DifferentialDriveKinematicsConstraintTest {
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(27));
     var constraint = new DifferentialDriveKinematicsConstraint(kinematics, maxVelocity);
 
-    Trajectory<SplineSample> trajectory =
-        TrajectoryGenerator.generateTrajectory(
+    Trajectory<DrivetrainSplineSample> trajectory =
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(new Pose2d(0, 0, Rotation2d.kZero), new Pose2d(1, 0, Rotation2d.kZero)),
             new TrajectoryConfig(1, 1).addConstraint(constraint));
     var duration = trajectory.duration;
