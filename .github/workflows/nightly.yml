@@ -18,20 +18,20 @@ jobs:
           - os: ubuntu-latest
             name: "Arch Linux"
             container: ghcr.io/pkgforge-dev/archlinux:latest
-            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
+            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON"
           # - os: ubuntu-24.04-arm
           #   name: "Arch Linux ARM"
           #   container: ghcr.io/pkgforge-dev/archlinux:latest
-          #   flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
+          #   flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON"
           - os: macos-latest
             name: macOS
-            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
+            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON"
           - os: windows-latest
             name: Windows
-            flags: '--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE="$Env:RUNNER_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release'
+            flags: '--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON -DWPILIB_USE_SYSTEM_LIBUV=ON -DWPILIB_USE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE="$Env:RUNNER_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release'
           # - os: windows-11-arm
           #   name: "Windows ARM"
-          #   flags: '--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE="$Env:RUNNER_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=arm64-windows-release -DVCPKG_HOST_TRIPLET=arm64-windows-release'
+          #   flags: '--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON -DWPILIB_USE_SYSTEM_LIBUV=ON -DWPILIB_USE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE="$Env:RUNNER_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=arm64-windows-release -DVCPKG_HOST_TRIPLET=arm64-windows-release'
 
     name: "Build CMake - ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
