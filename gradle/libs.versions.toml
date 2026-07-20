@@ -1,7 +1,11 @@
 [versions]
 avaje = "3.14"
+ceres = "2.2-1"
 ejml = "0.46.0"
+gson = "2.13.1"
+libssh = "2027-0.120-1"
 jmh = "1.37"
+mrclib = "2027.1.0-alpha-1-91-gb154ee9"
 opencv = "2027-4.13.0-3"
 quickbuf = "1.4"
 
@@ -10,7 +14,7 @@ quickbuf = "1.4"
 avaje-jsonb = { module = "io.avaje:avaje-jsonb", version.ref = "avaje" }
 avaje-jsonb-generator = { module = "io.avaje:avaje-jsonb-generator", version.ref = "avaje" }
 ejml-java9module = { module = "org.ejml:ejml-java9module", version.ref = "ejml" } # single uberjar with all the ejml libraries bundled together
-gson = { module = "com.google.code.gson:gson", version = "2.13.1" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 quickbuf-runtime = { module = "us.hebi.quickbuf:quickbuf-runtime", version.ref = "quickbuf" }
 thirdparty-opencv = { module = "org.wpilib.thirdparty.opencv:opencv-java", version.ref = "opencv" }
 

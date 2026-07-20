@@ -2,7 +2,14 @@ import base64
 import hashlib
 import os
 import tempfile
+import tomllib
+from pathlib import Path
 from urllib.request import urlopen
+
+
+versions_file = Path(__file__).resolve().parents[3] / "gradle" / "libs.versions.toml"
+with versions_file.open("rb") as f:
+    VERSIONS = tomllib.load(f)["versions"]
 
 
 def __try_download_sha(base_url, use_base64):
@@ -97,9 +104,8 @@ def download_integrities(
 
 
 def update_ceres():
-    # Keep in sync with shared/ceres.gradle
     year = "frc2026"
-    version = "2.2-1"
+    version = VERSIONS["ceres"]
 
     has_headers = True
     classifiers = [
@@ -128,8 +134,7 @@ def update_ceres():
 
 
 def update_libssh():
-    # Keep in sync with shared/libssh.gradle
-    version = "2027-0.120-1"
+    version = VERSIONS["libssh"]
 
     has_headers = True
     classifiers = [
@@ -156,8 +161,7 @@ def update_libssh():
 
 
 def update_mrclib():
-    # Keep in sync with shared/libmrclib.gradle
-    version = "2027.1.0-alpha-1-91-gb154ee9"
+    version = VERSIONS["mrclib"]
 
     has_headers = True
     classifiers = [
