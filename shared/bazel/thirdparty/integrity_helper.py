@@ -7,11 +7,6 @@ from pathlib import Path
 from urllib.request import urlopen
 
 
-versions_file = Path(__file__).resolve().parents[3] / "gradle" / "libs.versions.toml"
-with versions_file.open("rb") as f:
-    VERSIONS = tomllib.load(f)["versions"]
-
-
 def __try_download_sha(base_url, use_base64):
     url = base_url + ".sha256"
     print(f"Loading {url}")
@@ -103,9 +98,9 @@ def download_integrities(
     # print(updated_contents)
 
 
-def update_ceres():
+def update_ceres(versions):
     year = "frc2026"
-    version = VERSIONS["ceres"]
+    version = versions["ceres"]
 
     has_headers = True
     classifiers = [
@@ -133,8 +128,8 @@ def update_ceres():
     )
 
 
-def update_libssh():
-    version = VERSIONS["libssh"]
+def update_libssh(versions):
+    version = versions["libssh"]
 
     has_headers = True
     classifiers = [
@@ -160,8 +155,8 @@ def update_libssh():
     )
 
 
-def update_mrclib():
-    version = VERSIONS["mrclib"]
+def update_mrclib(versions):
+    version = versions["mrclib"]
 
     has_headers = True
     classifiers = [
@@ -184,9 +179,13 @@ def update_mrclib():
 
 
 def main():
-    update_ceres()
-    update_libssh()
-    update_mrclib()
+    versions_file = Path(__file__).resolve().parents[3] / "gradle" / "libs.versions.toml"
+    with versions_file.open("rb") as f:
+        versions = tomllib.load(f)["versions"]
+
+    update_ceres(versions)
+    update_libssh(versions)
+    update_mrclib(versions)
 
 
 if __name__ == "__main__":
