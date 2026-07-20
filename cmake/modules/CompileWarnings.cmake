@@ -57,6 +57,11 @@ macro(wpilib_target_warnings target)
         endif()
     endif()
 
+    # Suppress -Warray-bounds
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+        target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wno-array-bounds>)
+    endif()
+
     # Compress debug info with GCC
     if(
         (${CMAKE_BUILD_TYPE} STREQUAL "Debug" OR ${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
