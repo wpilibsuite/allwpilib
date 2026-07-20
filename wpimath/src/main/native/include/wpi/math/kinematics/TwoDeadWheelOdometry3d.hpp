@@ -17,30 +17,34 @@
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
-class WPILIB_DLLEXPORT TwoDeadWheelOdometry3d
-    : public Odometry3d<TwoDeadWheelPositions> {
+class WPILIB_DLLEXPORT TwoDeadWheelOdometry3d {
  public:
   TwoDeadWheelOdometry3d(wpi::units::meter_t xWheelYPos,
                          wpi::units::meter_t yWheelXPos,
                          const Rotation3d& gyroAngle,
                          const TwoDeadWheelPositions& wheelPositions,
                          const Pose3d& initialPose = Pose3d{})
-      : Odometry3d(gyroAngle, initialPose),
-        m_xWheelYPos(xWheelYPos),
-        m_yWheelXPos(yWheelXPos),
-        m_previousAngle(gyroAngle),
-        m_previousWheelPositions(wheelPositions) {}
+  : m_pose(initialPose),
+    m_xWheelYPos(xWheelYPos),
+    m_yWheelXPos(yWheelXPos),
+    m_previousWheelPositions(wheelPositions) {
+    m_previousAngle = m_pose.Rotation();
+    m_gyroOffset = gyroAngle.Inverse().RotateBy(m_pose.Rotation());
+  }
 
   void ResetPosition(const Rotation3d& gyroAngle,
                      const TwoDeadWheelPositions& wheelPositions,
-                     const Pose3d& pose) override {
-    m_previousAngle = gyroAngle;
+                     const Pose3d& pose) {
+    m_pose = pose;
+    m_previousAngle = pose.Rotation();
+    // When applied extrinsically, m_gyroOffset cancels the
+    // current gyroAngle and then rotates to m_pose.Rotation()
+    m_gyroOffset = gyroAngle.Inverse().RotateBy(m_pose.Rotation());
     m_previousWheelPositions = wheelPositions;
-    Odometry3d::ResetPosition(gyroAngle, pose);
   }
 
   const Pose3d& Update(const Rotation3d& gyroAngle,
-                       const TwoDeadWheelPositions& wheelPositions) override {
+                       const TwoDeadWheelPositions& wheelPositions) {
     auto deltaAngle = gyroAngle.RelativeTo(m_previousAngle);
     auto deltaTheta = deltaAngle.ToRotation2d().Radians();
     auto deltaX = wheelPositions.x - m_previousWheelPositions.x +
@@ -73,7 +77,10 @@ class WPILIB_DLLEXPORT TwoDeadWheelOdometry3d
   wpi::units::meter_t m_xWheelYPos;
   wpi::units::meter_t m_yWheelXPos;
 
+  Pose3d m_pose;
+
   Rotation3d m_previousAngle;
+  Rotation3d m_gyroOffset;
   TwoDeadWheelPositions m_previousWheelPositions;
 };
 }  // namespace wpi::math

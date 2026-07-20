@@ -22,8 +22,7 @@ namespace wpi::math {
  * robot's position on the field using readings from two dead wheels and a
  * gyroscope.
  */
-class WPILIB_DLLEXPORT TwoDeadWheelOdometry
-    : public Odometry<TwoDeadWheelPositions> {
+class WPILIB_DLLEXPORT TwoDeadWheelOdometry {
  public:
   /**
    * Constructs a TwoDeadWheelOdometry object.
@@ -41,22 +40,25 @@ class WPILIB_DLLEXPORT TwoDeadWheelOdometry
                        const Rotation2d& gyroAngle,
                        const TwoDeadWheelPositions& wheelPositions,
                        const Pose2d& initialPose = Pose2d{})
-      : Odometry(gyroAngle, initialPose),
+      : m_pose(initialPose),
         m_xWheelYPos(xWheelYPos),
         m_yWheelXPos(yWheelXPos),
-        m_previousAngle(gyroAngle),
-        m_previousWheelPositions(wheelPositions) {}
+        m_previousWheelPositions(wheelPositions) {
+    m_previousAngle = m_pose.Rotation();
+    m_gyroOffset = (-gyroAngle).RotateBy(m_pose.Rotation());
+  }
 
   void ResetPosition(const Rotation2d& gyroAngle,
                      const TwoDeadWheelPositions& wheelPositions,
-                     const Pose2d& pose) override {
-    m_previousAngle = gyroAngle;
+                     const Pose2d& pose) {
+    m_pose = pose;
+    m_previousAngle = pose.Rotation();
+    m_gyroOffset = (-gyroAngle).RotateBy(m_pose.Rotation());
     m_previousWheelPositions = wheelPositions;
-    Odometry::ResetPosition(gyroAngle, pose);
   }
 
   const Pose2d& Update(const Rotation2d& gyroAngle,
-                       const TwoDeadWheelPositions& wheelPositions) override {
+                       const TwoDeadWheelPositions& wheelPositions) {
     auto deltaTheta = (gyroAngle - m_previousAngle).Radians();
     auto deltaX =
         wheelPositions.x - m_previousWheelPositions.x +
@@ -65,9 +67,15 @@ class WPILIB_DLLEXPORT TwoDeadWheelOdometry
         wheelPositions.y - m_previousWheelPositions.y -
         wpi::units::meter_t{m_yWheelXPos.value() * deltaTheta.value()};
     Twist2d twist{deltaX, deltaY, deltaTheta};
-    m_previousAngle = gyroAngle;
+
+    auto angle = gyroAngle.RotateBy(m_gyroOffset);
+    auto newPose = m_pose + twist.Exp();
+
+    m_previousAngle = angle;
     m_previousWheelPositions = wheelPositions;
-    return Odometry::Update(gyroAngle, twist);
+    m_pose = {newPose.Translation(), angle};
+
+    return m_pose;
   }
 
   /**
@@ -93,7 +101,10 @@ class WPILIB_DLLEXPORT TwoDeadWheelOdometry
   wpi::units::meter_t m_xWheelYPos;
   wpi::units::meter_t m_yWheelXPos;
 
+  Pose2d m_pose;
+
   Rotation2d m_previousAngle;
+  Rotation2d m_gyroOffset;
   TwoDeadWheelPositions m_previousWheelPositions;
 };
 }  // namespace wpi::math
