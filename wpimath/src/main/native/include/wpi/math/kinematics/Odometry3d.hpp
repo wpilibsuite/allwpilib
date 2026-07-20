@@ -7,7 +7,9 @@
 #include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
-#include "wpi/math/kinematics/Kinematics.hpp"
+#include "wpi/math/geometry/Twist3d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -22,12 +24,13 @@ namespace wpi::math {
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
  *
+ * @tparam Kinematics type.
  * @tparam WheelPositions Wheel positions type.
  * @tparam WheelVelocities Wheel velocities type.
  * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename WheelPositions, typename WheelVelocities,
-          typename WheelAccelerations>
+template <typename Kinematics, typename WheelPositions,
+          typename WheelVelocities, typename WheelAccelerations>
 class WPILIB_DLLEXPORT Odometry3d {
  public:
   /**
@@ -38,9 +41,7 @@ class WPILIB_DLLEXPORT Odometry3d {
    * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit Odometry3d(const Kinematics<WheelPositions, WheelVelocities,
-                                       WheelAccelerations>& kinematics,
-                      const Rotation3d& gyroAngle,
+  explicit Odometry3d(const Kinematics& kinematics, const Rotation3d& gyroAngle,
                       const WheelPositions& wheelPositions,
                       const Pose3d& initialPose = Pose3d{})
       : m_kinematics(kinematics),
@@ -148,8 +149,7 @@ class WPILIB_DLLEXPORT Odometry3d {
   }
 
  private:
-  const Kinematics<WheelPositions, WheelVelocities, WheelAccelerations>&
-      m_kinematics;
+  Kinematics m_kinematics;
   Pose3d m_pose;
 
   WheelPositions m_previousWheelPositions;

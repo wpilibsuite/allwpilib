@@ -31,6 +31,7 @@ namespace wpi::math {
 template <size_t NumModules>
 class SwerveDriveOdometry3d
     : public Odometry3d<
+          SwerveDriveKinematics<NumModules>,
           wpi::util::array<SwerveModulePosition, NumModules>,
           wpi::util::array<SwerveModuleVelocity, NumModules>,
           wpi::util::array<SwerveModuleAcceleration, NumModules>> {
@@ -43,25 +44,14 @@ class SwerveDriveOdometry3d
    * @param modulePositions The wheel positions reported by each module.
    * @param initialPose The starting position of the robot on the field.
    */
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif  // defined(__GNUC__) && !defined(__clang__)
   SwerveDriveOdometry3d(
       SwerveDriveKinematics<NumModules> kinematics, const Rotation3d& gyroAngle,
       const wpi::util::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose3d& initialPose = Pose3d{})
-      : SwerveDriveOdometry3d::Odometry3d(m_kinematicsImpl, gyroAngle,
-                                          modulePositions, initialPose),
-        m_kinematicsImpl(kinematics) {
+      : SwerveDriveOdometry3d::Odometry3d(kinematics, gyroAngle,
+                                          modulePositions, initialPose) {
     wpi::math::MathSharedStore::ReportUsage("SwerveDriveOdometry3d", "");
   }
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif  // defined(__GNUC__) && !defined(__clang__)
-
- private:
-  SwerveDriveKinematics<NumModules> m_kinematicsImpl;
 };
 
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
