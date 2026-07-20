@@ -41,7 +41,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           pacman -Syu --noconfirm opencv ninja avahi cmake sccache \
-            jdk25-openjdk gcc xorg-xrandr libxinerama qt6-base vtk
+            jdk25-openjdk gcc xorg-xrandr libxinerama qt6-base vtk hdf5
 
       - name: Setup avahi-daemon
         if: runner.os == 'Linux'
