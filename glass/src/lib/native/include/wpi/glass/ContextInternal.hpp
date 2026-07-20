@@ -8,6 +8,7 @@
 
 #include <functional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "wpi/glass/Context.hpp"
@@ -18,6 +19,24 @@
 namespace wpi::glass {
 
 class DataSource;
+
+inline constexpr std::string_view kTimestampDisplayModeZeroStart = "zeroStart";
+inline constexpr std::string_view kTimestampDisplayModeActual = "actual";
+
+/**
+ * Timestamp display mode.
+ */
+enum class TimestampDisplayMode {
+  /**
+   * Display timestamps relative to the configured start time.
+   */
+  ZERO_START,
+
+  /**
+   * Display timestamps in their native time base.
+   */
+  ACTUAL
+};
 
 class Context {
  public:
@@ -36,7 +55,10 @@ class Context {
   wpi::util::StringMap<bool> deviceHidden;
   wpi::util::StringMap<DataSource*> sources;
   Storage& sourceNameStorage;
-  uint64_t zeroTime = 0;
+  std::string& timestampDisplayModeStorage;
+  uint64_t timestampDisplayStartTime = 0;
+  bool timestampDisplayStartTimeOverride = false;
+  TimestampDisplayMode timestampDisplayMode = TimestampDisplayMode::ZERO_START;
   bool isPlatformSaveDir = false;
 };
 
