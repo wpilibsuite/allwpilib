@@ -25,10 +25,10 @@ class Robot : public wpi::TimedRobot {
   // Initializes a duty cycle encoder on DIO pins 0
   wpi::DutyCycleEncoder encoder{0};
 
-  // Initializes a duty cycle encoder on DIO pins 0 to return a value of 4 for
+  // Initializes a duty cycle encoder on DIO pin 1 to return a value of 4 for
   // a full rotation, with the encoder reporting 0 half way through rotation (2
   // out of 4)
-  wpi::DutyCycleEncoder encoderFR{0, 4.0, 2.0};
+  wpi::DutyCycleEncoder encoderFR{1, 4.0, 2.0};
 };
 
 #ifndef RUNNING_WPILIB_TESTS
