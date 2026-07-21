@@ -1,10 +1,10 @@
 # validated: 2024-01-20 DS 92149efa11fa button/CommandGamepad.java
 from typing import Optional, Union
-
 from wpilib import DriverStation, EventLoop, Gamepad
 
-from .commandgenerichid import CommandGenericHID
 from .trigger import Trigger
+from .. import Commands
+from ..subsystembase import SubsystemBase
 
 
 def _enum_value(value) -> int:
@@ -193,3 +193,82 @@ class CommandGamepad:
 
     def get_right_trigger_axis(self) -> float:
         return self._gamepad.get_right_trigger_axis()
+
+    def _rumble(self, subsystem: SubsystemBase, rumble_type: GenericHID.RumbleType, value: float):
+        """
+        Create a rumble command that manages rumble via a subsystem mutex.
+        """
+        return Commands.start_end(
+            lambda: self.set_rumble(rumble_type, value),
+            lambda: self.set_rumble(rumble_type, 0),
+            {subsystem}
+        )
+
+    def rumble_left(self, value: float):
+        """
+        Run the left rumble motor. On most controllers, this is the low-frequency motor.
+
+        :param value: The normalized value (0 to 1) to set the rumble to
+        :returns: A command that will run the left rumble motor at the given value until interrupted.
+        """
+        return self._rumble(self._left_rumble, GenericHID.RumbleType.kLeftRumble, value)
+
+    def rumble_right(self, value: float):
+        """
+        Run the right rumble motor. On most controllers, this is the high-frequency motor.
+
+        :param value: The normalized value (0 to 1) to set the rumble to
+        :returns: A command that will run the right rumble motor at the given value until interrupted.
+        """
+        return self._rumble(self._right_rumble, GenericHID.RumbleType.kRightRumble, value)
+
+    def rumble_both(self, value: float):
+        """
+        Run both rumble motors.
+
+        :param value: The normalized value (0 to 1) to set the rumble to
+        :returns: A command that will run the rumble motors at the given value until interrupted.
+        """
+        return Commands.parallel(self.rumble_left(value), self.rumble_right(value)).with_name("Both Rumble")
+
+    def rumble_left_trigger(self, value: float):
+        """
+        Run the left trigger rumble motor, on controllers that have one.
+
+        :param value: The normalized value (0 to 1) to set the rumble to
+        :returns: A command that will run the left trigger rumble motor at the given value until interrupted.
+        """
+        return self._rumble(self._left_trigger_rumble, GenericHID.RumbleType.kLeftTriggerRumble, value)
+
+    def rumble_right_trigger(self, value: float):
+        """
+        Run the right trigger rumble motor, on controllers that have one.
+
+        :param value: The normalized value (0 to 1) to set the rumble to
+        :returns: A command that will run the right trigger rumble motor at the given value until interrupted.
+        """
+        return self._rumble(self._right_trigger_rumble, GenericHID.RumbleType.kRightTriggerRumble, value)
+
+    def rumble_triggers(self, value: float):
+        """
+        Run both trigger rumble motors, on controllers that have them.
+
+        :param value: The normalized value (0 to 1) to set the rumble to
+        :returns: A command that will run both trigger rumble motors at the given value until interrupted.
+        """
+        return Commands.parallel(self.rumble_left_trigger(value), self.rumble_right_trigger(value)).with_name("Both Trigger Rumble")
+
+    def set_leds(self, r: int, g: int, b: int):
+        """
+        Set the LEDs, on controllers that have them.
+
+        :param r: The red value (0-255)
+        :param g: The green value (0-255)
+        :param b: The blue value (0-255)
+        :returns: A command that will set the LEDs to the given values until interrupted.
+        """
+        return Commands.start_end(
+            lambda: self._hid.set_leds(r, g, b),
+            lambda: self._hid.set_leds(0, 0, 0),
+            {self._leds}
+        ).with_name(f"Set LEDs ({r}, {g}, {b})")
