@@ -16,22 +16,21 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            name: "Arch Linux"
+            name: "Arch Linux (GCC)"
             container: ghcr.io/pkgforge-dev/archlinux:latest
-            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON"
-          # - os: ubuntu-24.04-arm
-          #   name: "Arch Linux ARM"
-          #   container: ghcr.io/pkgforge-dev/archlinux:latest
-          #   flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON"
+            cc: gcc
+            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++"
+          - os: ubuntu-latest
+            name: "Arch Linux (Clang)"
+            container: ghcr.io/pkgforge-dev/archlinux:latest
+            cc: clang
+            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++"
           - os: macos-latest
             name: macOS
             flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON"
           - os: windows-latest
             name: Windows
             flags: '--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON -DWPILIB_USE_SYSTEM_LIBUV=ON -DWPILIB_USE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE="$Env:RUNNER_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release'
-          # - os: windows-11-arm
-          #   name: "Windows ARM"
-          #   flags: '--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON -DWPILIB_USE_SYSTEM_LIBUV=ON -DWPILIB_USE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE="$Env:RUNNER_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=arm64-windows-release -DVCPKG_HOST_TRIPLET=arm64-windows-release'
 
     name: "Build CMake - ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
@@ -41,7 +40,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           pacman -Syu --noconfirm opencv ninja avahi cmake sccache \
-            jdk25-openjdk gcc xorg-xrandr libxinerama qt6-base vtk hdf5
+            jdk25-openjdk ${{ matrix.cc }} xorg-xrandr libxinerama qt6-base vtk hdf5
 
       - name: Setup avahi-daemon
         if: runner.os == 'Linux'
@@ -59,9 +58,9 @@ jobs:
         if: runner.os == 'macOS'
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: latest-stable
+          xcode-version: latest
 
-      - uses: ilammy/msvc-dev-cmd@v1.13.0
+      - uses: TheMrMilchmann/setup-msvc-dev@v4
         if: runner.os == 'Windows'
 
       - name: Install CMake (Windows only)
@@ -75,7 +74,7 @@ jobs:
 
       - name: Run vcpkg (Windows only)
         if: runner.os == 'Windows'
-        uses: lukka/run-vcpkg@v11.5
+        uses: lukka/run-vcpkg@v11.6
         with:
           vcpkgDirectory: ${{ runner.workspace }}/vcpkg
           vcpkgGitCommitId: 74e6536215718009aae747d86d84b78376bf9e09 # HEAD on 2025-10-17
@@ -103,38 +102,28 @@ jobs:
         # UnitTest_test segfaults on exit occasionally
         run: ctest --output-on-failure -E 'UnitTest'
 
-  gradle-docker:
+  gradle:
     strategy:
       fail-fast: false
       matrix:
         include:
-          # - os: ubuntu-24.04-arm
-          #   container: ghcr.io/pkgforge-dev/archlinux:latest
-          #   artifact-name: ArchLinuxArm64
-          #   build-options: "-Ponlylinuxarm64"
           - os: ubuntu-latest
             container: ghcr.io/pkgforge-dev/archlinux:latest
-            artifact-name: ArchLinux
+            name: "Arch Linux"
             build-options: "-Ponlylinuxx86-64"
           - os: windows-latest
-            artifact-name: Win64
+            name: Windows
             architecture: x64
             build-options: "-PciReleaseOnly"
             task: "copyAllOutputs"
             outputs: "build/allOutputs"
-          # - os: windows-11-arm
-          #   artifact-name: WinArm64Release
-          #   architecture: arm64
-          #   build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64"
-          #   task: "copyAllOutputs"
-          #   outputs: "build/allOutputs"
           - os: macos-latest
-            artifact-name: macOS
+            name: macOS
             architecture: aarch64
             task: "build"
             outputs: "build/allOutputs"
 
-    name: "Build Gradle - ${{ matrix.artifact-name }}"
+    name: "Build Gradle - ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -172,7 +161,7 @@ jobs:
         if: runner.os == 'macOS'
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: latest-stable
+          xcode-version: latest
 
       - name: Checkout
         uses: actions/checkout@v6
@@ -211,12 +200,6 @@ jobs:
         env:
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: ${{ matrix.artifact-name }}
-          path: build/allOutputs
 
       - name: Check disk free space
         if: always()
