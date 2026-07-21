@@ -254,3 +254,15 @@ double CommandSteamController::GetLeftTrigger() const {
 double CommandSteamController::GetRightTrigger() const {
   return m_controller->GetRightTrigger();
 }
+
+CommandPtr CommandSteamController::RumbleLeft(double value) {
+  return m_hid->RumbleLeft(value);
+}
+
+CommandPtr CommandSteamController::RumbleRight(double value) {
+  return m_hid->RumbleRight(value);
+}
+
+CommandPtr CommandSteamController::RumbleBoth(double value) {
+  return m_hid->RumbleBoth(value);
+}

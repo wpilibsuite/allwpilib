@@ -365,7 +365,7 @@ class CommandSwitchN64Controller {
    */
   double GetZR() const;
 
- private:
+private:
   std::unique_ptr<CommandGenericHID> m_ownedHid;
   CommandGenericHID* m_hid = nullptr;
   std::unique_ptr<wpi::SwitchN64Controller> m_ownedController;

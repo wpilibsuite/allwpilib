@@ -63,6 +63,7 @@ public final class CommandGenericHID {
         new SubsystemBase("Controller " + m_hid.getPort() + "Left Trigger Rumble") {};
     m_rightTriggerRumble =
         new SubsystemBase("Controller " + m_hid.getPort() + "Right Trigger Rumble") {};
+    m_leds = new SubsystemBase("Controller " + m_hid.getPort() + "LEDs") {};
   }
 
   /**
@@ -445,7 +446,7 @@ public final class CommandGenericHID {
   }
 
   // LED mutex
-  private final SubsystemBase m_leds = new SubsystemBase() {};
+  private final SubsystemBase m_leds;
 
   /**
    * Set the LEDs, on controllers that have them. If only mono is supported, the system will use the

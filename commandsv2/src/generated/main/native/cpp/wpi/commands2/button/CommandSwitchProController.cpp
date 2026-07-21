@@ -194,3 +194,19 @@ double CommandSwitchProController::GetZL() const {
 double CommandSwitchProController::GetZR() const {
   return m_controller->GetZR();
 }
+
+CommandPtr CommandSwitchProController::RumbleLeft(double value) {
+  return m_hid->RumbleLeft(value);
+}
+
+CommandPtr CommandSwitchProController::RumbleRight(double value) {
+  return m_hid->RumbleRight(value);
+}
+
+CommandPtr CommandSwitchProController::RumbleBoth(double value) {
+  return m_hid->RumbleBoth(value);
+}
+
+CommandPtr CommandSwitchProController::SetLed(int value) {
+  return m_hid->SetLeds(value, value, value);
+}

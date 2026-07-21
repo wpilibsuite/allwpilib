@@ -212,3 +212,15 @@ double CommandSwitch2ProController::GetZL() const {
 double CommandSwitch2ProController::GetZR() const {
   return m_controller->GetZR();
 }
+
+CommandPtr CommandSwitch2ProController::RumbleLeft(double value) {
+  return m_hid->RumbleLeft(value);
+}
+
+CommandPtr CommandSwitch2ProController::RumbleRight(double value) {
+  return m_hid->RumbleRight(value);
+}
+
+CommandPtr CommandSwitch2ProController::RumbleBoth(double value) {
+  return m_hid->RumbleBoth(value);
+}

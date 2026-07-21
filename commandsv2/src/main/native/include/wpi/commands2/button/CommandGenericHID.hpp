@@ -347,8 +347,8 @@ class CommandGenericHID final {
   bool IsConnected() const;
 
  private:
-  CommandPtr Rumble(SubsystemBase& subsystem, wpi::GenericHID::RumbleType type,
-                    double value);
+  CommandPtr Rumble(SubsystemBase& subsystem, std::string_view name,
+                    wpi::GenericHID::RumbleType type, double value);
 
   // Rumble mutexes
   SubsystemBase m_leftRumble;

@@ -194,3 +194,19 @@ double CommandDualShock4Controller::GetL2() const {
 double CommandDualShock4Controller::GetR2() const {
   return m_controller->GetR2();
 }
+
+CommandPtr CommandDualShock4Controller::RumbleLeft(double value) {
+  return m_hid->RumbleLeft(value);
+}
+
+CommandPtr CommandDualShock4Controller::RumbleRight(double value) {
+  return m_hid->RumbleRight(value);
+}
+
+CommandPtr CommandDualShock4Controller::RumbleBoth(double value) {
+  return m_hid->RumbleBoth(value);
+}
+
+CommandPtr CommandDualShock4Controller::SetLeds(int r, int g, int b) {
+  return m_hid->SetLeds(r, g, b);
+}

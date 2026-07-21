@@ -397,7 +397,7 @@ class CommandLogitechF310Controller {
    */
   double GetRightTrigger() const;
 
- private:
+private:
   std::unique_ptr<CommandGenericHID> m_ownedHid;
   CommandGenericHID* m_hid = nullptr;
   std::unique_ptr<wpi::LogitechF310Controller> m_ownedController;

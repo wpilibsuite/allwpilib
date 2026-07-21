@@ -224,3 +224,31 @@ double CommandDualSenseEdgeController::GetL2() const {
 double CommandDualSenseEdgeController::GetR2() const {
   return m_controller->GetR2();
 }
+
+CommandPtr CommandDualSenseEdgeController::RumbleLeft(double value) {
+  return m_hid->RumbleLeft(value);
+}
+
+CommandPtr CommandDualSenseEdgeController::RumbleRight(double value) {
+  return m_hid->RumbleRight(value);
+}
+
+CommandPtr CommandDualSenseEdgeController::RumbleBoth(double value) {
+  return m_hid->RumbleBoth(value);
+}
+
+CommandPtr CommandDualSenseEdgeController::RumbleLeftTrigger(double value) {
+  return m_hid->RumbleLeftTrigger(value);
+}
+
+CommandPtr CommandDualSenseEdgeController::RumbleRightTrigger(double value) {
+  return m_hid->RumbleRightTrigger(value);
+}
+
+CommandPtr CommandDualSenseEdgeController::RumbleTriggers(double value) {
+  return m_hid->RumbleTriggers(value);
+}
+
+CommandPtr CommandDualSenseEdgeController::SetLeds(int r, int g, int b) {
+  return m_hid->SetLeds(r, g, b);
+}

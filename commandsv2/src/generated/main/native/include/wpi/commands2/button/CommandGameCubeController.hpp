@@ -358,7 +358,7 @@ class CommandGameCubeController {
    */
   double GetRTrigger() const;
 
- private:
+private:
   std::unique_ptr<CommandGenericHID> m_ownedHid;
   CommandGenericHID* m_hid = nullptr;
   std::unique_ptr<wpi::GameCubeController> m_ownedController;

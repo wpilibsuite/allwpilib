@@ -410,7 +410,45 @@ class CommandSwitchProController {
    */
   double GetZR() const;
 
- private:
+
+  /**
+   * Run the left rumble motor. On most controllers, this is the low-frequency
+   * motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the left rumble motor at the given value
+   * until interrupted.
+   */
+  CommandPtr RumbleLeft(double value);
+
+  /**
+   * Run the right rumble motor. On most controllers, this is the
+   * high-frequency motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the right rumble motor at the given value
+   * until interrupted.
+   */
+  CommandPtr RumbleRight(double value);
+
+  /**
+   * Run both rumble motors.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the rumble motors at the given value until
+   * interrupted.
+   */
+  CommandPtr RumbleBoth(double value);
+
+    /**
+     * Set the LED.
+     *
+     * @param value The brightness value (0-255)
+     * @return A command that will set the LED to the given value until
+     * interrupted.
+     */
+    CommandPtr SetLed(int value);
+private:
   std::unique_ptr<CommandGenericHID> m_ownedHid;
   CommandGenericHID* m_hid = nullptr;
   std::unique_ptr<wpi::SwitchProController> m_ownedController;

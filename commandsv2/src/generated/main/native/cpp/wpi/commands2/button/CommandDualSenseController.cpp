@@ -200,3 +200,31 @@ double CommandDualSenseController::GetL2() const {
 double CommandDualSenseController::GetR2() const {
   return m_controller->GetR2();
 }
+
+CommandPtr CommandDualSenseController::RumbleLeft(double value) {
+  return m_hid->RumbleLeft(value);
+}
+
+CommandPtr CommandDualSenseController::RumbleRight(double value) {
+  return m_hid->RumbleRight(value);
+}
+
+CommandPtr CommandDualSenseController::RumbleBoth(double value) {
+  return m_hid->RumbleBoth(value);
+}
+
+CommandPtr CommandDualSenseController::RumbleLeftTrigger(double value) {
+  return m_hid->RumbleLeftTrigger(value);
+}
+
+CommandPtr CommandDualSenseController::RumbleRightTrigger(double value) {
+  return m_hid->RumbleRightTrigger(value);
+}
+
+CommandPtr CommandDualSenseController::RumbleTriggers(double value) {
+  return m_hid->RumbleTriggers(value);
+}
+
+CommandPtr CommandDualSenseController::SetLeds(int r, int g, int b) {
+  return m_hid->SetLeds(r, g, b);
+}

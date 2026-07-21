@@ -444,4 +444,4 @@ class CommandSwitchProController:
         :param value: The brightness value (0-255)
         :returns: A command that will set the LED to the given value until interrupted.
         """
-        return self._hid.set_leds(value, 0, 0)
+        return self._hid.set_leds(value, value, value)

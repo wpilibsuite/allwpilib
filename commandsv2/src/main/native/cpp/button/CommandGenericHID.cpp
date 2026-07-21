@@ -121,19 +121,23 @@ bool CommandGenericHID::IsConnected() const {
 }
 
 CommandPtr CommandGenericHID::Rumble(SubsystemBase& subsystem,
+                                     std::string_view name,
                                      wpi::GenericHID::RumbleType type,
                                      double value) {
-  return StartEnd([this, type, value] { SetRumble(type, value); },
-                  [this, type] { SetRumble(type, 0); }, {subsystem});
+  return subsystem
+      .StartEnd([this, type, value] { SetRumble(type, value); },
+                [this, type] { SetRumble(type, 0); })
+      .WithName(name);
 }
 
 CommandPtr CommandGenericHID::RumbleLeft(double value) {
-  return Rumble(m_leftRumble, wpi::GenericHID::RumbleType::LEFT_RUMBLE, value);
+  return Rumble(m_leftRumble, "Rumble Left",
+                wpi::GenericHID::RumbleType::LEFT_RUMBLE, value);
 }
 
 CommandPtr CommandGenericHID::RumbleRight(double value) {
-  return Rumble(m_rightRumble, wpi::GenericHID::RumbleType::RIGHT_RUMBLE,
-                value);
+  return Rumble(m_rightRumble, "Rumble Right",
+                wpi::GenericHID::RumbleType::RIGHT_RUMBLE, value);
 }
 
 CommandPtr CommandGenericHID::RumbleBoth(double value) {
@@ -142,12 +146,12 @@ CommandPtr CommandGenericHID::RumbleBoth(double value) {
 }
 
 CommandPtr CommandGenericHID::RumbleLeftTrigger(double value) {
-  return Rumble(m_leftTriggerRumble,
+  return Rumble(m_leftTriggerRumble, "Rumble Left Trigger",
                 wpi::GenericHID::RumbleType::LEFT_TRIGGER_RUMBLE, value);
 }
 
 CommandPtr CommandGenericHID::RumbleRightTrigger(double value) {
-  return Rumble(m_rightTriggerRumble,
+  return Rumble(m_rightTriggerRumble, "Rumble Right Trigger",
                 wpi::GenericHID::RumbleType::RIGHT_TRIGGER_RUMBLE, value);
 }
 

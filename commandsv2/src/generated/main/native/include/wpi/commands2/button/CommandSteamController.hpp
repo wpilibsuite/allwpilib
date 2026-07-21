@@ -540,7 +540,36 @@ class CommandSteamController {
    */
   double GetRightTrigger() const;
 
- private:
+
+  /**
+   * Run the left rumble motor. On most controllers, this is the low-frequency
+   * motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the left rumble motor at the given value
+   * until interrupted.
+   */
+  CommandPtr RumbleLeft(double value);
+
+  /**
+   * Run the right rumble motor. On most controllers, this is the
+   * high-frequency motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the right rumble motor at the given value
+   * until interrupted.
+   */
+  CommandPtr RumbleRight(double value);
+
+  /**
+   * Run both rumble motors.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the rumble motors at the given value until
+   * interrupted.
+   */
+  CommandPtr RumbleBoth(double value);
+private:
   std::unique_ptr<CommandGenericHID> m_ownedHid;
   CommandGenericHID* m_hid = nullptr;
   std::unique_ptr<wpi::SteamController> m_ownedController;

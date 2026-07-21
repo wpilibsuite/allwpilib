@@ -114,3 +114,31 @@ double CommandNiDsPS5Controller::GetL2Axis() const {
 double CommandNiDsPS5Controller::GetR2Axis() const {
   return m_controller.GetR2Axis();
 }
+
+CommandPtr CommandNiDsPS5Controller::RumbleLeft(double value) {
+  return m_hid->RumbleLeft(value);
+}
+
+CommandPtr CommandNiDsPS5Controller::RumbleRight(double value) {
+  return m_hid->RumbleRight(value);
+}
+
+CommandPtr CommandNiDsPS5Controller::RumbleBoth(double value) {
+  return m_hid->RumbleBoth(value);
+}
+
+CommandPtr CommandNiDsPS5Controller::RumbleLeftTrigger(double value) {
+  return m_hid->RumbleLeftTrigger(value);
+}
+
+CommandPtr CommandNiDsPS5Controller::RumbleRightTrigger(double value) {
+  return m_hid->RumbleRightTrigger(value);
+}
+
+CommandPtr CommandNiDsPS5Controller::RumbleTriggers(double value) {
+  return m_hid->RumbleTriggers(value);
+}
+
+CommandPtr CommandNiDsPS5Controller::SetLeds(int r, int g, int b) {
+  return m_hid->SetLeds(r, g, b);
+}

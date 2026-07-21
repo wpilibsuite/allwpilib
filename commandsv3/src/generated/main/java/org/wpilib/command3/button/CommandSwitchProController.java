@@ -649,6 +649,6 @@ public class CommandSwitchProController {
    * @return A command that will set the LED to the given value until interrupted.
    */
   public Command setLeds(int value) {
-    return m_hid.setLeds(value, 0, 0);
+    return m_hid.setLeds(value, value, value);
   }
 }

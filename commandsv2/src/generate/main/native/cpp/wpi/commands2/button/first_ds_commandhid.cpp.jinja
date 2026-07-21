@@ -79,3 +79,39 @@ double Command{{ ClassName }}Controller::Get{{ axis.MethodName }}() const {
   return m_controller->Get{{ axis.MethodName }}();
 }
 {% endfor -%}
+{% if supports.rumble %}
+CommandPtr Command{{ ClassName }}Controller::RumbleLeft(double value) {
+  return m_hid->RumbleLeft(value);
+}
+
+CommandPtr Command{{ ClassName }}Controller::RumbleRight(double value) {
+  return m_hid->RumbleRight(value);
+}
+
+CommandPtr Command{{ ClassName }}Controller::RumbleBoth(double value) {
+  return m_hid->RumbleBoth(value);
+}
+{% endif -%}
+{% if supports.triggerRumble %}
+CommandPtr Command{{ ClassName }}Controller::RumbleLeftTrigger(double value) {
+  return m_hid->RumbleLeftTrigger(value);
+}
+
+CommandPtr Command{{ ClassName }}Controller::RumbleRightTrigger(double value) {
+  return m_hid->RumbleRightTrigger(value);
+}
+
+CommandPtr Command{{ ClassName }}Controller::RumbleTriggers(double value) {
+  return m_hid->RumbleTriggers(value);
+}
+{% endif -%}
+{% if supports.monoLed %}
+CommandPtr Command{{ ClassName }}Controller::SetLed(int value) {
+  return m_hid->SetLeds(value, value, value);
+}
+{% endif -%}
+{% if supports.rgbLed %}
+CommandPtr Command{{ ClassName }}Controller::SetLeds(int r, int g, int b) {
+  return m_hid->SetLeds(r, g, b);
+}
+{% endif -%}
