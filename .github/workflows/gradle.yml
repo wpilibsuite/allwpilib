@@ -84,25 +84,25 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: windows-2022
+          - os: windows-2025
             artifact-name: Win64Debug
             architecture: x64
             task: "build"
             build-options: "-PciDebugOnly"
             outputs: "build/allOutputs"
-          - os: windows-2022
+          - os: windows-2025
             artifact-name: Win64Release
             architecture: x64
             build-options: "-PciReleaseOnly"
             task: "copyAllOutputs"
             outputs: "build/allOutputs"
-          - os: windows-2022
+          - os: windows-2025
             artifact-name: WinArm64Debug
             architecture: x64
             task: "build"
             build-options: "-PciDebugOnly -Pbuildwinarm64 -Ponlywindowsarm64"
             outputs: "build/allOutputs"
-          - os: windows-2022
+          - os: windows-2025
             artifact-name: WinArm64Release
             architecture: x64
             build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64"
@@ -113,7 +113,7 @@ jobs:
             architecture: aarch64
             task: "build"
             outputs: "build/allOutputs"
-          - os: windows-2022
+          - os: windows-2025
             artifact-name: Win64FFI
             architecture: x64
             task: ":ntcoreffi:build"
