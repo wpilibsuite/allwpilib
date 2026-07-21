@@ -403,10 +403,30 @@ public final class CommandGenericHID {
   }
 
   // Rumble mutexes
-  private final Mechanism m_leftRumble = new Mechanism() {};
-  private final Mechanism m_rightRumble = new Mechanism() {};
-  private final Mechanism m_leftTriggerRumble = new Mechanism() {};
-  private final Mechanism m_rightTriggerRumble = new Mechanism() {};
+  private final Mechanism m_leftRumble = new Mechanism() {
+    @Override
+    public String getName() {
+      return "Controller " + m_hid.getPort() + " Left Rumble";
+    }
+  };
+  private final Mechanism m_rightRumble = new Mechanism() {
+    @Override
+    public String getName() {
+      return "Controller " + m_hid.getPort() + " Right Rumble";
+    }
+  };
+  private final Mechanism m_leftTriggerRumble = new Mechanism() {
+    @Override
+    public String getName() {
+      return "Controller " + m_hid.getPort() + " Left Trigger Rumble";
+    }
+  };
+  private final Mechanism m_rightTriggerRumble = new Mechanism() {
+    @Override
+    public String getName() {
+      return "Controller " + m_hid.getPort() + " Right Trigger Rumble";
+    }
+  };
 
   /**
    * Run the left rumble motor. On most controllers, this is the low-frequency motor.
@@ -481,7 +501,12 @@ public final class CommandGenericHID {
   }
 
   // LED mutex
-  private final Mechanism m_led = new Mechanism() {};
+  private final Mechanism m_led = new Mechanism() {
+    @Override
+    public String getName() {
+      return "Controller " + m_hid.getPort() + " LED";
+    }
+  };
 
   /**
    * Set the LEDs, on controllers that have them.
