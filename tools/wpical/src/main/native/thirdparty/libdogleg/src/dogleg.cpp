@@ -16,7 +16,7 @@
 #include "dogleg.h"
 
 #if (CHOLMOD_VERSION > (CHOLMOD_VER_CODE(2,2))) && (CHOLMOD_VERSION < (CHOLMOD_VER_CODE(4,0)))
-#include <suitesparse/cholmod_function.h>
+#include <cholmod_function.h>
 #endif
 
 
@@ -2293,10 +2293,10 @@ double dogleg_getOutliernessTrace_newFeature_sparse(const double*            Jqu
   double B00 =  invB11 * det_invB_recip;
   double B11 =  invB00 * det_invB_recip;
 
-  
+
   double B01 = -invB01 * det_invB_recip;
   double traceB = B00 + B11;
-  
+
   double traceBB = B00*B00 + 2.0*B01*B01 + B11*B11;
 
 
