@@ -46,7 +46,7 @@ public final class CommandGenericHID {
    * @param port The port index on the Driver Station that the device is plugged into.
    */
   public CommandGenericHID(int port) {
-    m_hid = DriverStation.getGenericHID(port);
+    this(DriverStation.getGenericHID(port));
   }
 
   /**
@@ -56,6 +56,13 @@ public final class CommandGenericHID {
    */
   public CommandGenericHID(GenericHID hid) {
     m_hid = hid;
+
+    m_leftRumble = new SubsystemBase("Controller " + m_hid.getPort() + "Left Rumble") {};
+    m_rightRumble = new SubsystemBase("Controller " + m_hid.getPort() + "Right Rumble") {};
+    m_leftTriggerRumble =
+        new SubsystemBase("Controller " + m_hid.getPort() + "Left Trigger Rumble") {};
+    m_rightTriggerRumble =
+        new SubsystemBase("Controller " + m_hid.getPort() + "Right Trigger Rumble") {};
   }
 
   /**
@@ -360,10 +367,10 @@ public final class CommandGenericHID {
   }
 
   // Rumble mutexes
-  private final SubsystemBase m_leftRumble = new SubsystemBase() {};
-  private final SubsystemBase m_rightRumble = new SubsystemBase() {};
-  private final SubsystemBase m_leftTriggerRumble = new SubsystemBase() {};
-  private final SubsystemBase m_rightTriggerRumble = new SubsystemBase() {};
+  private final SubsystemBase m_leftRumble;
+  private final SubsystemBase m_rightRumble;
+  private final SubsystemBase m_leftTriggerRumble;
+  private final SubsystemBase m_rightTriggerRumble;
 
   /**
    * Run the left rumble motor. On most controllers, this is the low-frequency motor.
