@@ -421,3 +421,68 @@ class CommandDualSenseController:
         :returns: the axis value.
         """
         return self._controller.get_r2()
+
+    def rumble_left(self, value: float):
+        """
+        Run the left rumble motor. On most controllers, this is the low-frequency motor.
+
+        :param value: The normalized value (0 to 1) to set the rumble to
+        :returns: A command that will run the left rumble motor at the given value until interrupted.
+        """
+        return self._hid.rumble_left(value)
+
+    def rumble_right(self, value: float):
+        """
+        Run the right rumble motor. On most controllers, this is the high-frequency motor.
+
+        :param value: The normalized value (0 to 1) to set the rumble to
+        :returns: A command that will run the right rumble motor at the given value until interrupted.
+        """
+        return self._hid.rumble_right(value)
+
+    def rumble_both(self, value: float):
+        """
+        Run both rumble motors.
+
+        :param value: The normalized value (0 to 1) to set the rumble to
+        :returns: A command that will run the rumble motors at the given value until interrupted.
+        """
+        return self._hid.rumble_both(value)
+
+    def rumble_left_trigger(self, value: float):
+        """
+        Run the left trigger rumble motor.
+
+        :param value: The normalized value (0 to 1) to set the rumble to
+        :returns: A command that will run the left trigger rumble motor at the given value until interrupted.
+        """
+        return self._hid.rumble_left_trigger(value)
+
+    def rumble_right_trigger(self, value: float):
+        """
+        Run the right trigger rumble motor.
+
+        :param value: The normalized value (0 to 1) to set the rumble to
+        :returns: A command that will run the right trigger rumble motor at the given value until interrupted.
+        """
+        return self._hid.rumble_right_trigger(value)
+
+    def rumble_triggers(self, value: float):
+        """
+        Run both trigger rumble motors
+
+        :param value: The normalized value (0 to 1) to set the rumble to
+        :returns: A command that will run both trigger rumble motors at the given value until interrupted.
+        """
+        return self._hid.rumble_triggers(value)
+
+    def set_leds(self, r: int, g: int, b: int):
+        """
+        Set the LEDs.
+
+        :param r: The red value (0-255)
+        :param g: The green value (0-255)
+        :param b: The blue value (0-255)
+        :returns: A command that will set the LEDs to the given values until interrupted.
+        """
+        return self._hid.set_leds(r,g,b)

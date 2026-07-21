@@ -1,10 +1,9 @@
 # validated: 2024-01-20 DS 92149efa11fa button/CommandGamepad.java
 from typing import Optional, Union
-from wpilib import DriverStation, EventLoop, Gamepad
 
+from commandgenerichid import CommandGenericHID
+from wpilib import DriverStation, EventLoop, Gamepad
 from .trigger import Trigger
-from .. import Commands
-from ..subsystembase import SubsystemBase
 
 
 def _enum_value(value) -> int:
@@ -194,16 +193,6 @@ class CommandGamepad:
     def get_right_trigger_axis(self) -> float:
         return self._gamepad.get_right_trigger_axis()
 
-    def _rumble(self, subsystem: SubsystemBase, rumble_type: GenericHID.RumbleType, value: float):
-        """
-        Create a rumble command that manages rumble via a subsystem mutex.
-        """
-        return Commands.start_end(
-            lambda: self.set_rumble(rumble_type, value),
-            lambda: self.set_rumble(rumble_type, 0),
-            {subsystem}
-        )
-
     def rumble_left(self, value: float):
         """
         Run the left rumble motor. On most controllers, this is the low-frequency motor.
@@ -211,7 +200,7 @@ class CommandGamepad:
         :param value: The normalized value (0 to 1) to set the rumble to
         :returns: A command that will run the left rumble motor at the given value until interrupted.
         """
-        return self._rumble(self._left_rumble, GenericHID.RumbleType.kLeftRumble, value)
+        return self._hid.rumble_left(value)
 
     def rumble_right(self, value: float):
         """
@@ -220,7 +209,7 @@ class CommandGamepad:
         :param value: The normalized value (0 to 1) to set the rumble to
         :returns: A command that will run the right rumble motor at the given value until interrupted.
         """
-        return self._rumble(self._right_rumble, GenericHID.RumbleType.kRightRumble, value)
+        return self._hid.rumble_right(value)
 
     def rumble_both(self, value: float):
         """
@@ -229,7 +218,7 @@ class CommandGamepad:
         :param value: The normalized value (0 to 1) to set the rumble to
         :returns: A command that will run the rumble motors at the given value until interrupted.
         """
-        return Commands.parallel(self.rumble_left(value), self.rumble_right(value)).with_name("Both Rumble")
+        return self._hid.rumble_both(value)
 
     def rumble_left_trigger(self, value: float):
         """
@@ -238,7 +227,7 @@ class CommandGamepad:
         :param value: The normalized value (0 to 1) to set the rumble to
         :returns: A command that will run the left trigger rumble motor at the given value until interrupted.
         """
-        return self._rumble(self._left_trigger_rumble, GenericHID.RumbleType.kLeftTriggerRumble, value)
+        return self._hid.rumble_left_trigger(value)
 
     def rumble_right_trigger(self, value: float):
         """
@@ -247,7 +236,7 @@ class CommandGamepad:
         :param value: The normalized value (0 to 1) to set the rumble to
         :returns: A command that will run the right trigger rumble motor at the given value until interrupted.
         """
-        return self._rumble(self._right_trigger_rumble, GenericHID.RumbleType.kRightTriggerRumble, value)
+        return self._hid.rumble_right_trigger(value)
 
     def rumble_triggers(self, value: float):
         """
@@ -256,7 +245,7 @@ class CommandGamepad:
         :param value: The normalized value (0 to 1) to set the rumble to
         :returns: A command that will run both trigger rumble motors at the given value until interrupted.
         """
-        return Commands.parallel(self.rumble_left_trigger(value), self.rumble_right_trigger(value)).with_name("Both Trigger Rumble")
+        return self._hid.rumble_triggers(value)
 
     def set_leds(self, r: int, g: int, b: int):
         """
@@ -267,8 +256,4 @@ class CommandGamepad:
         :param b: The blue value (0-255)
         :returns: A command that will set the LEDs to the given values until interrupted.
         """
-        return Commands.start_end(
-            lambda: self._hid.set_leds(r, g, b),
-            lambda: self._hid.set_leds(0, 0, 0),
-            {self._leds}
-        ).with_name(f"Set LEDs ({r}, {g}, {b})")
+        return self._hid.set_leds(r,g,b)

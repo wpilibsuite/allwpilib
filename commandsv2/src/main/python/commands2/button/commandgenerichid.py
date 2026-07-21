@@ -4,9 +4,9 @@ from typing import ClassVar, Optional, Union, final
 
 from wpilib import DriverStation, EventLoop, GenericHID
 
-from .. import Commands
+from .. import cmd
 from ..commandscheduler import CommandScheduler
-from ..subsystembase import SubsystemBase
+from ..subsystem import Subsystem
 from .trigger import Trigger
 
 
@@ -32,13 +32,20 @@ class CommandGenericHID:
             self._hid = hid
 
         # Rumble mutexes
-        self._left_rumble = SubsystemBase()
-        self._right_rumble = SubsystemBase()
-        self._left_trigger_rumble = SubsystemBase()
-        self._right_trigger_rumble = SubsystemBase()
+        self._left_rumble = Subsystem()
+        self._right_rumble = Subsystem()
+        self._left_trigger_rumble = Subsystem()
+        self._right_trigger_rumble = Subsystem()
+
+        self._left_rumble.set_name("Controller " + self._hid.get_port() + " Left Rumble")
+        self._right_rumble.set_name("Controller " + self._hid.get_port() + " Right Rumble")
+        self._left_trigger_rumble.set_subsystem(
+            "Controller " + self._hid.get_port() + " Left Trigger Rumble")
+        self._right_trigger_rumble.set_subsystem(
+            "Controller " + self._hid.get_port() + " Right Trigger Rumble")
 
         # LED mutex
-        self._leds = SubsystemBase()
+        self._leds = Subsystem()
 
     @classmethod
     def get_command_generic_hid(cls, port: int) -> "CommandGenericHID":
@@ -254,14 +261,13 @@ class CommandGenericHID:
         """
         return self._hid.is_connected()
 
-    def _rumble(self, subsystem: SubsystemBase, rumble_type: GenericHID.RumbleType, value: float):
+    def _rumble(self, subsystem: Subsystem, rumble_type: GenericHID.RumbleType, value: float):
         """
         Create a rumble command that manages rumble via a subsystem mutex.
         """
-        return Commands.start_end(
+        return subsystem.start_end(
             lambda: self.set_rumble(rumble_type, value),
-            lambda: self.set_rumble(rumble_type, 0),
-            {subsystem}
+            lambda: self.set_rumble(rumble_type, 0)
         )
 
     def rumble_left(self, value: float):
@@ -271,7 +277,7 @@ class CommandGenericHID:
         :param value: The normalized value (0 to 1) to set the rumble to
         :returns: A command that will run the left rumble motor at the given value until interrupted.
         """
-        return self._rumble(self._left_rumble, GenericHID.RumbleType.kLeftRumble, value)
+        return self._rumble(self._left_rumble, GenericHID.RumbleType.LEFT_RUMBLE, value)
 
     def rumble_right(self, value: float):
         """
@@ -280,7 +286,7 @@ class CommandGenericHID:
         :param value: The normalized value (0 to 1) to set the rumble to
         :returns: A command that will run the right rumble motor at the given value until interrupted.
         """
-        return self._rumble(self._right_rumble, GenericHID.RumbleType.kRightRumble, value)
+        return self._rumble(self._right_rumble, GenericHID.RumbleType.RIGHT_RUMBLE, value)
 
     def rumble_both(self, value: float):
         """
@@ -289,7 +295,7 @@ class CommandGenericHID:
         :param value: The normalized value (0 to 1) to set the rumble to
         :returns: A command that will run the rumble motors at the given value until interrupted.
         """
-        return Commands.parallel(self.rumble_left(value), self.rumble_right(value)).with_name("Both Rumble")
+        return cmd.parallel(self.rumble_left(value), self.rumble_right(value)).with_name("Both Rumble")
 
     def rumble_left_trigger(self, value: float):
         """
@@ -298,7 +304,8 @@ class CommandGenericHID:
         :param value: The normalized value (0 to 1) to set the rumble to
         :returns: A command that will run the left trigger rumble motor at the given value until interrupted.
         """
-        return self._rumble(self._left_trigger_rumble, GenericHID.RumbleType.kLeftTriggerRumble, value)
+        return self._rumble(self._left_trigger_rumble, GenericHID.RumbleType.LEFT_TRIGGER_RUMBLE,
+                            value)
 
     def rumble_right_trigger(self, value: float):
         """
@@ -307,7 +314,8 @@ class CommandGenericHID:
         :param value: The normalized value (0 to 1) to set the rumble to
         :returns: A command that will run the right trigger rumble motor at the given value until interrupted.
         """
-        return self._rumble(self._right_trigger_rumble, GenericHID.RumbleType.kRightTriggerRumble, value)
+        return self._rumble(self._right_trigger_rumble, GenericHID.RumbleType.RIGHT_TRIGGER_RUMBLE,
+                            value)
 
     def rumble_triggers(self, value: float):
         """
@@ -316,21 +324,21 @@ class CommandGenericHID:
         :param value: The normalized value (0 to 1) to set the rumble to
         :returns: A command that will run both trigger rumble motors at the given value until interrupted.
         """
-        return Commands.parallel(self.rumble_left_trigger(value), self.rumble_right_trigger(value)).with_name("Both Trigger Rumble")
+        return cmd.parallel(self.rumble_left_trigger(value), self.rumble_right_trigger(value)).with_name("Both Trigger Rumble")
 
     def set_leds(self, r: int, g: int, b: int):
         """
-        Set the LEDs, on controllers that have them.
+        Set the LEDs, on controllers that have them. If only mono is supported, the system will use the
+        highest value passed in.
 
         :param r: The red value (0-255)
         :param g: The green value (0-255)
         :param b: The blue value (0-255)
         :returns: A command that will set the LEDs to the given values until interrupted.
         """
-        return Commands.start_end(
+        return self._leds.start_end(
             lambda: self._hid.set_leds(r, g, b),
             lambda: self._hid.set_leds(0, 0, 0),
-            {self._leds}
         ).with_name(f"Set LEDs ({r}, {g}, {b})")
 
 

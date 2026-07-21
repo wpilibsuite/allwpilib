@@ -968,7 +968,8 @@ public class CommandGamepad {
   }
 
   /**
-   * Set the LEDs, on controllers that have them.
+   * Set the LEDs, on controllers that have them. If only mono is supported, the system will use the
+   * highest value passed in.
    *
    * @param r The red value (0-255)
    * @param g The green value (0-255)
