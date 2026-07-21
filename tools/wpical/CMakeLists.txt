@@ -80,7 +80,7 @@ else()
     )
 endif()
 
-set_source_files_properties(${wpical_thirdparty_src} PROPERTIES COMPILE_FLAGS ${compile_flags})
+set_source_files_properties(${wpical_thirdparty_src} PROPERTIES COMPILE_OPTIONS "${compile_flags}")
 
 find_package(OpenCV REQUIRED)
 find_package(CHOLMOD CONFIG REQUIRED)
