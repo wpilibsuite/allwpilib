@@ -52,7 +52,7 @@ jobs:
 
       - name: Install CMake (Windows only)
         if: runner.os == 'Windows'
-        uses: lukka/get-cmake@v4.3.3
+        uses: lukka/get-cmake@v4.4.0
 
       - name: Install sccache
         uses: mozilla-actions/sccache-action@v0.0.10
