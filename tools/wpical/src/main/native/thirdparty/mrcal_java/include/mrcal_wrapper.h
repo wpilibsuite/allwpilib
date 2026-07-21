@@ -1,6 +1,6 @@
 /*
  * Copyright (C) Photon Vision.
- * 
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted.
  *
@@ -21,11 +21,8 @@ extern "C" {
 
 } // extern "C"
 
-// Seems like these people don't properly extern-c their headers either
-extern "C" {
 #include <suitesparse/SuiteSparse_config.h>
 #include <suitesparse/cholmod.h>
-} // extern "C"
 
 #include <memory>
 #include <opencv2/opencv.hpp>
