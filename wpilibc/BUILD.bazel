@@ -113,17 +113,9 @@ wpilib_cc_library(
     srcs = [
         ":generate-version",
     ] + glob([
-        "src/main/native/cppcs/**",
         "src/main/native/cpp/**",
     ]),
     hdrs = glob(["src/main/native/include/**"]),
-    copts = [
-        # TODO(austin): this needs to be different for shared vs dynamic.
-        "-DDYNAMIC_CAMERA_SERVER",
-    ] + select({
-        "//shared/bazel/rules:compilation_mode_dbg": ["-DDYNAMIC_CAMERA_SERVER_DEBUG"],
-        "//conditions:default": [],
-    }),
     extra_src_pkg_files = [
         ":generated_version_files_pkg",
     ],
@@ -134,8 +126,6 @@ wpilib_cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cameraserver:cameraserver-headers",
-        "//cscore:cscore-headers",
         "//datalog",
         "//hal:wpiHal",
         "//ntcore",

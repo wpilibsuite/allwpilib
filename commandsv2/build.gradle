@@ -4,11 +4,9 @@ ext {
 }
 
 evaluationDependsOn(':ntcore')
-evaluationDependsOn(':cscore')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpilibc')
-evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':wpilibj')
 
 apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
@@ -17,7 +15,6 @@ dependencies {
     implementation project(':wpiutil')
     implementation project(':wpinet')
     implementation project(':ntcore')
-    implementation project(':cscore')
     implementation project(':hal')
     implementation project(':wpimath')
     implementation project(':wpilibj')
@@ -72,11 +69,6 @@ model {
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
                 project(':hal').addHalJniDependency(it)
-            }
-
-            if (it instanceof GoogleTestTestSuiteBinarySpec) {
-                nativeUtils.useRequiredLibrary(it, 'opencv_shared')
-                lib project: ':cscore', library: 'cscore', linkage: 'shared'
             }
         }
     }
