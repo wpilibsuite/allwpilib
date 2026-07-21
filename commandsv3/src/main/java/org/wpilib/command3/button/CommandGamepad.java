@@ -927,7 +927,7 @@ public class CommandGamepad {
    *     interrupted.
    */
   public Command rumbleTriggers(double value) {
-    return m_hid.rumbleBoth(value);
+    return m_hid.rumbleTriggers(value);
   }
 
   /**
