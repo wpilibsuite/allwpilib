@@ -39,14 +39,20 @@ class CommandGenericHID:
                 Subsystem(),
                 Subsystem(),
                 Subsystem(),
-                Subsystem()
+                Subsystem(),
             ]
-            subsystems[0].set_name("Controller " + str(self._hid.get_port()) + " Left Rumble")
-            subsystems[1].set_name("Controller " + str(self._hid.get_port()) + " Right Rumble")
-            subsystems[2].set_name("Controller " + str(self._hid.get_port()) +
-                                   " Left Trigger Rumble")
-            subsystems[3].set_name("Controller " + str(self._hid.get_port()) +
-                                   " Right Trigger Rumble")
+            subsystems[0].set_name(
+                "Controller " + str(self._hid.get_port()) + " Left Rumble"
+            )
+            subsystems[1].set_name(
+                "Controller " + str(self._hid.get_port()) + " Right Rumble"
+            )
+            subsystems[2].set_name(
+                "Controller " + str(self._hid.get_port()) + " Left Trigger Rumble"
+            )
+            subsystems[3].set_name(
+                "Controller " + str(self._hid.get_port()) + " Right Trigger Rumble"
+            )
             subsystems[4].set_name("Controller " + str(self._hid.get_port()) + " LEDs")
             CommandGenericHID._subsystems[hid] = subsystems
 
