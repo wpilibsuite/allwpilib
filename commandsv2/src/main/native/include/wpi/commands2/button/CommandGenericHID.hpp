@@ -4,7 +4,9 @@
 
 #pragma once
 
+#include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/commands2/SubsystemBase.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
@@ -271,6 +273,73 @@ class CommandGenericHID final {
   void SetRumble(wpi::GenericHID::RumbleType type, double value);
 
   /**
+   * Run the left rumble motor. On most controllers, this is the low-frequency
+   * motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the left rumble motor at the given value
+   * until interrupted.
+   */
+  CommandPtr RumbleLeft(double value);
+
+  /**
+   * Run the right rumble motor. On most controllers, this is the
+   * high-frequency motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the right rumble motor at the given value
+   * until interrupted.
+   */
+  CommandPtr RumbleRight(double value);
+
+  /**
+   * Run both rumble motors.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the rumble motors at the given value until
+   * interrupted.
+   */
+  CommandPtr RumbleBoth(double value);
+
+  /**
+   * Run the left trigger rumble motor, on controllers that have one.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the left trigger rumble motor at the given
+   * value until interrupted.
+   */
+  CommandPtr RumbleLeftTrigger(double value);
+
+  /**
+   * Run the right trigger rumble motor, on controllers that have one.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the right trigger rumble motor at the given
+   * value until interrupted.
+   */
+  CommandPtr RumbleRightTrigger(double value);
+
+  /**
+   * Run both trigger rumble motors, on controllers that have them.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run both trigger rumble motors at the given
+   * value until interrupted.
+   */
+  CommandPtr RumbleTriggers(double value);
+
+  /**
+   * Set the LEDs, on controllers that have them.
+   *
+   * @param r The red value (0-255)
+   * @param g The green value (0-255)
+   * @param b The blue value (0-255)
+   * @return A command that will set the LEDs to the given values until
+   * interrupted.
+   */
+  CommandPtr SetLeds(int r, int g, int b);
+
+  /**
    * Get if the HID is connected.
    *
    * @return true if the HID is connected
@@ -278,6 +347,18 @@ class CommandGenericHID final {
   bool IsConnected() const;
 
  private:
+  CommandPtr Rumble(SubsystemBase& subsystem, wpi::GenericHID::RumbleType type,
+                    double value);
+
+  // Rumble mutexes
+  SubsystemBase m_leftRumble;
+  SubsystemBase m_rightRumble;
+  SubsystemBase m_leftTriggerRumble;
+  SubsystemBase m_rightTriggerRumble;
+
+  // LED mutex
+  SubsystemBase m_leds;
+
   wpi::GenericHID* m_hid;
 };
 }  // namespace wpi::cmd

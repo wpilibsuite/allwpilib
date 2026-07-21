@@ -438,6 +438,7 @@ public final class CommandGenericHID {
 
   /**
    * Set the LEDs, on controllers that have them.
+   *
    * @param r The red value (0-255)
    * @param g The green value (0-255)
    * @param b The blue value (0-255)

@@ -8,6 +8,8 @@
 #include <memory>
 #include <mutex>
 
+#include "wpi/commands2/Commands.hpp"
+
 using namespace wpi::cmd;
 
 namespace {
@@ -116,4 +118,48 @@ void CommandGenericHID::SetRumble(wpi::GenericHID::RumbleType type,
 
 bool CommandGenericHID::IsConnected() const {
   return m_hid->IsConnected();
+}
+
+CommandPtr CommandGenericHID::Rumble(SubsystemBase& subsystem,
+                                     wpi::GenericHID::RumbleType type,
+                                     double value) {
+  return StartEnd([this, type, value] { SetRumble(type, value); },
+                  [this, type] { SetRumble(type, 0); }, {subsystem});
+}
+
+CommandPtr CommandGenericHID::RumbleLeft(double value) {
+  return Rumble(m_leftRumble, wpi::GenericHID::RumbleType::LEFT_RUMBLE, value);
+}
+
+CommandPtr CommandGenericHID::RumbleRight(double value) {
+  return Rumble(m_rightRumble, wpi::GenericHID::RumbleType::RIGHT_RUMBLE,
+                value);
+}
+
+CommandPtr CommandGenericHID::RumbleBoth(double value) {
+  return Parallel(RumbleLeft(value), RumbleRight(value))
+      .WithName("Both Rumble");
+}
+
+CommandPtr CommandGenericHID::RumbleLeftTrigger(double value) {
+  return Rumble(m_leftTriggerRumble,
+                wpi::GenericHID::RumbleType::LEFT_TRIGGER_RUMBLE, value);
+}
+
+CommandPtr CommandGenericHID::RumbleRightTrigger(double value) {
+  return Rumble(m_rightTriggerRumble,
+                wpi::GenericHID::RumbleType::RIGHT_TRIGGER_RUMBLE, value);
+}
+
+CommandPtr CommandGenericHID::RumbleTriggers(double value) {
+  return Parallel(RumbleLeftTrigger(value), RumbleRightTrigger(value))
+      .WithName("Both Trigger Rumble");
+}
+
+CommandPtr CommandGenericHID::SetLeds(int r, int g, int b) {
+  return m_leds
+      .StartEnd([this, r, g, b] { m_hid->SetLeds(r, g, b); },
+                [this] { m_hid->SetLeds(0, 0, 0); })
+      .WithName("Set LEDs (" + std::to_string(r) + ", " + std::to_string(g) +
+                ", " + std::to_string(b) + ")");
 }
