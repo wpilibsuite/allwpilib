@@ -533,4 +533,4 @@ class CommandDualSenseEdgeController:
         :param b: The blue value (0-255)
         :returns: A command that will set the LEDs to the given values until interrupted.
         """
-        return self._hid.set_leds(r,g,b)
+        return self._hid.set_leds(r, g, b)
