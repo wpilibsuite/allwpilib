@@ -37,7 +37,7 @@ wpilib_link_macos_gui(wpical)
 wpilib_target_warnings(wpical)
 target_include_directories(
     wpical
-    PRIVATE
+    SYSTEM PRIVATE
         src/main/native/include
         src/main/native/thirdparty/libdogleg/include
         src/main/native/thirdparty/mrcal/include
@@ -78,6 +78,9 @@ else()
         -Wno-unused-function
         -Wno-sign-compare
         -Wno-missing-field-initializers
+        -Wno-pedantic
+        -Wno-return-type
+        -Wno-maybe-uninitialized
     )
 endif()
 
@@ -139,7 +142,7 @@ if(WPILIB_WITH_TESTS)
     target_compile_options(wpical_test PRIVATE ${compile_flags})
     target_include_directories(
         wpical_test
-        PRIVATE
+        SYSTEM PRIVATE
             src/main/native/include
             src/main/native/thirdparty/libdogleg/include
             src/main/native/thirdparty/mrcal/include
