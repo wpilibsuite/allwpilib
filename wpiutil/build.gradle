@@ -247,5 +247,6 @@ model {
 dependencies {
     annotationProcessor libs.avaje.jsonb.generator
     api libs.avaje.jsonb
+    implementation libs.avaje.inject
     api libs.quickbuf.runtime
 }

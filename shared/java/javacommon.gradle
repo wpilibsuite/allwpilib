@@ -1,6 +1,7 @@
 apply plugin: 'maven-publish'
 apply plugin: 'java-library'
 apply plugin: 'jacoco'
+apply plugin: 'org.javamodularity.moduleplugin'
 
 def baseArtifactId = project.baseId
 def artifactGroupId = project.groupId
@@ -56,6 +57,13 @@ build.dependsOn outputSourcesJar
 build.dependsOn outputJavadocJar
 build.dependsOn outputJar
 
+// Projects that generate source code with annotation processors (such as avaje serde classes)
+// need to have those generated files on the source path so javadoc can pick them up.
+tasks.named('javadoc').configure {
+    it.dependsOn('compileJava')
+}
+sourceSets.main.java.srcDir "${buildDir}/generated/sources/annotationProcessor/java/main"
+
 project(':').libraryBuild.dependsOn build
 
 publishing {
@@ -74,7 +82,7 @@ publishing {
 }
 
 test {
-    jvmArgs '--enable-native-access=ALL-UNNAMED'
+    jvmArgs '--enable-native-access=org.opencv,wpilib.apriltag,wpilib.hal,wpilib.math,wpilib.ntcore,wpilib.util'
     useJUnitPlatform()
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
     testLogging {
@@ -117,6 +125,16 @@ tasks.withType(JavaCompile).configureEach {
         "-Xlint:-serial",
         // ignore unclaimed annotation warning from annotation processing
         "-Xlint:-processing",
+        "-Xlint:-preview",
+        // ignore modules requiring automatic library modules
+        "-Xlint:-requires-automatic",
+        "-Xlint:-requires-transitive-automatic",
+        "-Xlint:-exports",
+        // Java modules warn about exposing classes without an explicitly declared constructor
+        "-Xlint:-missing-explicit-ctor",
+        // Java modules warn about module names with trailing digits
+        "-Xlint:-module",
+        "-Xlint:-classfile"
     ]
 }
 

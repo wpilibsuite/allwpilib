@@ -12,6 +12,7 @@ java_plugin(
     processor_class = "io.avaje.jsonb.generator.JsonbProcessor",
     visibility = ["//visibility:public"],
     deps = [
+        "@maven//:io_avaje_avaje_inject",
         "@maven//:io_avaje_avaje_jsonb_generator",
     ],
 )

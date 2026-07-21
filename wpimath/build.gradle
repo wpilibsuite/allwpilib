@@ -90,6 +90,7 @@ dependencies {
     annotationProcessor libs.avaje.jsonb.generator
     api project(":wpiunits")
     api libs.avaje.jsonb
+    implementation libs.avaje.inject
     api libs.bundles.ejml
     api libs.quickbuf.runtime
     implementation project(":wpiannotations")

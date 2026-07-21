@@ -1,0 +1,36 @@
+ext {
+    useJava = true
+    useCpp = false
+    baseId = 'allwpilib'
+    groupId = 'org.wpilib.allwpilib'
+
+    nativeName = ''
+    devMain = ''
+}
+
+apply from: "${rootDir}/shared/java/javacommon.gradle"
+apply from: "${rootDir}/shared/opencv.gradle"
+
+dependencies {
+    implementation project(":apriltag")
+    implementation project(":cameraserver")
+    implementation project(":cscore")
+    implementation project(":datalog")
+    implementation project(":epilogue-runtime")
+    implementation project(":hal")
+    implementation project(":ntcore")
+    implementation project(":wpilibj")
+    implementation project(":wpimath")
+    implementation project(":wpinet")
+    implementation project(":wpiunits")
+    implementation project(":wpiutil")
+}
+
+// Spotbugs breaks if there aren't any Java source files to analyze.
+// Apparently it's unaware of module-info files.
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
+    enabled = false
+}
+
+// Nothing to document
+tasks.withType(Javadoc).all { enabled = false }

@@ -53,12 +53,13 @@ public class EpilogueGenerator {
           m_processingEnv.getFiler().createSourceFile("org.wpilib.epilogue.Epilogue");
 
       try (var out = new PrintWriter(centralStore.openOutputStream())) {
-        out.println("package org.wpilib.epilogue;");
+        out.println("package org.wpilib.epilogue.generated;");
         out.println();
 
         out.println("import static org.wpilib.units.Units.Seconds;");
         out.println();
 
+        out.println("import org.wpilib.epilogue.*;");
         out.println("import org.wpilib.hardware.hal.HAL;");
         out.println();
 

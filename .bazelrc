@@ -13,6 +13,9 @@ build --java_runtime_version=remotejdk_25
 build --tool_java_language_version=25
 build --tool_java_runtime_version=remotejdk_25
 
+# Disable bazel's "header" builds. They break modular jars if annotation processors are doing codegen (eg avaje)
+build --nojava_header_compilation
+
 test --test_output=errors
 test --test_verbose_timeout_warnings
 

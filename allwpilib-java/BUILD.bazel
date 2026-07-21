@@ -1,0 +1,27 @@
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
+
+# This is an umbrella project for the sole purpose of providing a
+# single `wpilib` Java module for teams to use. The only "code" it
+# provides is a single module-info class with transitive dependencies
+# on all of WPILib's Java libraries.
+wpilib_java_library(
+    name = "allwpilib-java",
+    srcs = ["src/main/java/module-info.java"],
+    maven_artifact_name = "allwpilib-java",
+    maven_group_id = "org.wpilib.allwpilib",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//apriltag:apriltag-java",
+        "//cameraserver:cameraserver-java",
+        "//cscore:cscore-java",
+        "//datalog:datalog-java",
+        "//epilogue-runtime:epilogue-java",
+        "//hal:hal-java",
+        "//ntcore:ntcore-java",
+        "//wpilibj:wpilibj-java",
+        "//wpimath:wpimath-java",
+        "//wpinet:wpinet-java",
+        "//wpiunits:wpiunits-java",
+        "//wpiutil:wpiutil-java",
+    ],
+)

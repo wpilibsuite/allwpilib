@@ -2,13 +2,14 @@
 avaje = "3.14"
 ejml = "0.46.0"
 jmh = "1.37"
-opencv = "2027-4.13.0-3"
+opencv = "2027-4.13.0-4"
 quickbuf = "1.4"
 
 [libraries]
 # General runtime dependencies
 avaje-jsonb = { module = "io.avaje:avaje-jsonb", version.ref = "avaje" }
 avaje-jsonb-generator = { module = "io.avaje:avaje-jsonb-generator", version.ref = "avaje" }
+avaje-inject = { module = "io.avaje:avaje-inject", version = "12.5" }
 ejml-java9module = { module = "org.ejml:ejml-java9module", version.ref = "ejml" } # single uberjar with all the ejml libraries bundled together
 gson = { module = "com.google.code.gson:gson", version = "2.13.1" }
 quickbuf-runtime = { module = "us.hebi.quickbuf:quickbuf-runtime", version.ref = "quickbuf" }
@@ -16,6 +17,7 @@ thirdparty-opencv = { module = "org.wpilib.thirdparty.opencv:opencv-java", versi
 
 # General test dependencies
 compile-testing = { module = "com.google.testing.compile:compile-testing", version = "0.23.0" }
+guava = { module = "com.google.guava:guava", version = "33.6.0-jre" }
 jmh-annotationprocessor = { module = "org.openjdk.jmh:jmh-generator-annprocess", version.ref = "jmh" }
 jmh-core = { module = "org.openjdk.jmh:jmh-core", version.ref = "jmh" }
 junit-api = { module = "org.junit.jupiter:junit-jupiter", version = "5.13.4" }

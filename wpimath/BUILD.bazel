@@ -5,7 +5,7 @@ load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "generate_def_windows", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+load("//shared/bazel/rules:java_rules.bzl", "patch_module", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project", "pkg_files_headers")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
@@ -237,7 +237,10 @@ wpilib_jni_java_library(
     exported_plugins = ["//javacPlugin:plugin"],
     javacopts = [
         "-Xep:UnicodeInCode:OFF",
-    ],
+    ] + patch_module(
+        "wpilib.math",
+        ["wpimath/src/generated/main/java"],
+    ),
     maven_artifact_name = "wpimath-java",
     maven_group_id = "org.wpilib.wpimath",
     native_libs = [":shared/wpimathjni"],
@@ -251,6 +254,7 @@ wpilib_jni_java_library(
         "//wpiannotations",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
+        "@maven//:io_avaje_avaje_inject",
         "@maven//:io_avaje_avaje_json_core",
         "@maven//:io_avaje_avaje_jsonb",
         "@maven//:org_ejml_ejml_java9module",

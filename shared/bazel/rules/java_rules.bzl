@@ -2,6 +2,18 @@ load("@rules_java//java:defs.bzl", "java_binary", "java_library")
 load("//shared/bazel/rules:packaging.bzl", "zip_java_srcs")
 load("//shared/bazel/rules:publishing.bzl", "wpilib_maven_export")
 
+def patch_module(module_name, patch_dirs):
+    """
+    Returns a platform-aware --patch-module javacopt.
+    """
+    patch_str = ":".join(patch_dirs)
+    patch_str_win = ";".join([d.replace("/", "\\\\") for d in patch_dirs])
+
+    return select({
+        "@bazel_tools//src/conditions:windows": ["--patch-module={}={}".format(module_name, patch_str_win)],
+        "//conditions:default": ["--patch-module={}={}".format(module_name, patch_str)],
+    })
+
 def wpilib_java_library(
         name,
         maven_group_id,
