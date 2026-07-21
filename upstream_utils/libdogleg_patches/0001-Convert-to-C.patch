@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Gold856 <117957790+Gold856@users.noreply.github.com>
 Date: Fri, 29 Nov 2024 19:52:22 -0500
-Subject: [PATCH 1/4] Convert to C++
+Subject: [PATCH 1/3] Convert to C++
 
 ---
  dogleg.c => dogleg.cpp | 0
@@ -18,16 +18,16 @@ index 74337263a89d3448f55e125db6702ebfa7588b97..4a23b669a30642d290549bb94a1c787f
 --- a/dogleg.h
 +++ b/dogleg.h
 @@ -126,7 +126,9 @@ typedef struct
- 
+
  } dogleg_solverContext_t;
- 
+
 -
 +#ifdef __cplusplus
 +extern "C" {
 +#endif
  // Fills in the given structure with the default parameter set
  void dogleg_getDefaultParameters(dogleg_parameters2_t* parameters);
- 
+
 @@ -293,3 +295,7 @@ double dogleg_getOutliernessTrace_newFeature_sparse(const double*            Jqu
                                                      int                      NoutlierFeatures,
                                                      dogleg_operatingPoint_t* point,
