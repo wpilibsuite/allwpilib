@@ -73,9 +73,15 @@ install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
 # glass application
 #
 
-if (WPILIB_WITH_EXECUTABLES)
+if(WPILIB_WITH_EXECUTABLES)
     configure_file(src/app/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
-    generate_resources(src/app/native/resources generated/app/cpp GLASS wpi::glass glass_resources_src)
+    generate_resources(
+        src/app/native/resources
+        generated/app/cpp
+        GLASS
+        wpi::glass
+        glass_resources_src
+    )
 
     file(GLOB glass_src src/app/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
 
@@ -84,7 +90,10 @@ if (WPILIB_WITH_EXECUTABLES)
     elseif(APPLE)
         set(MACOSX_BUNDLE_ICON_FILE glass.icns)
         set(APP_ICON_MACOSX src/app/native/mac/glass.icns)
-        set_source_files_properties(${APP_ICON_MACOSX} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+        set_source_files_properties(
+            ${APP_ICON_MACOSX}
+            PROPERTIES MACOSX_PACKAGE_LOCATION "Resources"
+        )
     endif()
 
     add_executable(glass ${glass_src} ${glass_resources_src} ${glass_rc} ${APP_ICON_MACOSX})

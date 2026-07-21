@@ -33,7 +33,7 @@ else()
     target_sources(wpigui PRIVATE ${wpigui_unix_src})
 endif()
 
-if (WPILIB_WITH_EXECUTABLES)
+if(WPILIB_WITH_EXECUTABLES)
     add_executable(wpiguidev src/dev/native/cpp/main.cpp)
     wpilib_link_macos_gui(wpiguidev)
     wpilib_target_warnings(wpiguidev)

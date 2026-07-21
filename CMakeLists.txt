@@ -290,7 +290,7 @@ if(WPILIB_WITH_GUI)
         add_subdirectory(tools/wpical)
     endif()
 
-    if (WPILIB_WITH_EXECUTABLES)
+    if(WPILIB_WITH_EXECUTABLES)
         add_subdirectory(tools/outlineviewer)
         add_subdirectory(tools/sysid)
         if(LIBSSH_FOUND)
