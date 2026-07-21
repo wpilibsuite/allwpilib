@@ -38,20 +38,22 @@ class CommandGenericHID:
         self._right_trigger_rumble = Subsystem()
 
         self._left_rumble.set_name(
-            "Controller " + self._hid.get_port() + " Left Rumble"
+            "Controller " + str(self._hid.get_port()) + " Left Rumble"
         )
         self._right_rumble.set_name(
-            "Controller " + self._hid.get_port() + " Right Rumble"
+            "Controller " + str(self._hid.get_port()) + " Right Rumble"
         )
-        self._left_trigger_rumble.set_subsystem(
-            "Controller " + self._hid.get_port() + " Left Trigger Rumble"
+        self._left_trigger_rumble.set_name(
+            "Controller " + str(self._hid.get_port()) + " Left Trigger Rumble"
         )
-        self._right_trigger_rumble.set_subsystem(
-            "Controller " + self._hid.get_port() + " Right Trigger Rumble"
+        self._right_trigger_rumble.set_name(
+            "Controller " + str(self._hid.get_port()) + " Right Trigger Rumble"
         )
 
         # LED mutex
         self._leds = Subsystem()
+
+        self._leds.set_name("Controller " + str(self._hid.get_port()) + " LEDs")
 
     @classmethod
     def get_command_generic_hid(cls, port: int) -> "CommandGenericHID":
