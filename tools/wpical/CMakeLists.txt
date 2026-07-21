@@ -60,6 +60,7 @@ if(MSVC)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(compile_flags
         -Wno-format-nonliteral
+        -Wno-format-overflow
         -Wno-unused-variable
         -Wno-missing-field-initializers
         -Wno-gnu-anonymous-struct
@@ -71,10 +72,14 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         -Wno-missing-braces
         -Wno-null-conversion
         -Wno-unused-but-set-variable
+        -Wno-pedantic
+        -Wno-return-type
+        -Wno-maybe-uninitialized
     )
 else()
     set(compile_flags
         -Wno-format-nonliteral
+        -Wno-format-overflow
         -Wno-unused-variable
         -Wno-unused-function
         -Wno-sign-compare

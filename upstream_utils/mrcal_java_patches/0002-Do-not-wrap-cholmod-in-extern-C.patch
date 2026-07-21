@@ -4,11 +4,11 @@ Date: Mon, 20 Jul 2026 23:08:48 -0400
 Subject: [PATCH 2/2] Do not wrap cholmod in extern C
 
 ---
- src/mrcal_wrapper.h | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ src/mrcal_wrapper.h | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/src/mrcal_wrapper.h b/src/mrcal_wrapper.h
-index 0a36d4702d59a06e81d15a139b27c2cb85c6e0e6..4a500804410bd884892c259d780f57f0d84f9721 100644
+index 0a36d4702d59a06e81d15a139b27c2cb85c6e0e6..b71921e5d423f38ad5de138887d0fdac57816ab0 100644
 --- a/src/mrcal_wrapper.h
 +++ b/src/mrcal_wrapper.h
 @@ -21,11 +21,8 @@ extern "C" {

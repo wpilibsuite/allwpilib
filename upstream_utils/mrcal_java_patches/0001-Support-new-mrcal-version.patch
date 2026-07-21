@@ -18,5 +18,5 @@ index 569f5928ba0b389e40476cbfc224a0c09ecd5814..3a9a5519e670b0c867281f1e05aa2046
 -      calobject_warp, stats.Noutliers);
 +      calobject_warp, stats.Noutliers_board);
  }
- 
+
  struct MrcalSolveOptions {
