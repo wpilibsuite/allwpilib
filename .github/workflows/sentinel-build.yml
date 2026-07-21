@@ -133,9 +133,6 @@ jobs:
         run: security set-keychain-settings -lut 21600
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/main')
-      - name: Check disk free space (Windows)
-        if: runner.os == 'Windows'
-        run: wmic logicaldisk get caption, freespace
       - name: Check disk free space pre-cleanup (macOS)
         if: runner.os == 'macOS'
         run: df -h .
@@ -157,9 +154,6 @@ jobs:
         run: ./gradlew copyAllOutputs -PbuildServer -PskipJavaFormat -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }} ${{ matrix.build-options }}
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/main')
-      - name: Check disk free space (Windows)
-        if: runner.os == 'Windows'
-        run: wmic logicaldisk get caption, freespace
       - name: Check disk free space (macOS)
         if: runner.os == 'macOS'
         run: df -h .
