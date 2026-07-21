@@ -1,7 +1,7 @@
 # validated: 2024-01-20 DS 92149efa11fa button/CommandGamepad.java
 from typing import Optional, Union
 
-from commandgenerichid import CommandGenericHID
+from .commandgenerichid import CommandGenericHID
 from wpilib import DriverStation, EventLoop, Gamepad
 from .trigger import Trigger
 
