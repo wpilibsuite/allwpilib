@@ -74,7 +74,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         -Wno-unused-but-set-variable
         -Wno-pedantic
         -Wno-return-type
-        -Wno-maybe-uninitialized
+        -Wno-uninitialized
     )
 else()
     set(compile_flags
