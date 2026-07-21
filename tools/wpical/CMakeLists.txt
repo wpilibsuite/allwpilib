@@ -94,7 +94,7 @@ else()
     set(cholmod_target SuiteSparse::CHOLMOD)
 endif()
 
-if(TARGET SuiteSparse::CHOLMOD_static)
+if(TARGET SuiteSparse::SuiteSparseConfig_static)
     set(suitesparse_target SuiteSparse::SuiteSparseConfig_static)
 else()
     set(suitesparse_target SuiteSparse::SuiteSparseConfig)
