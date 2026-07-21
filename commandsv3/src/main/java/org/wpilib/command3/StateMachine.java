@@ -59,6 +59,7 @@ public final class StateMachine implements Command {
   private final String m_name;
   private State m_initialState = null;
   private final List<State> m_states = new ArrayList<>();
+  private Runnable m_onCancel = () -> {};
 
   /**
    * Creates a new state machine.
@@ -216,6 +217,15 @@ public final class StateMachine implements Command {
     throw new IllegalStateException(
         "The next state does not belong to this state machine. Check the state for "
             + next.command().name());
+  }
+
+  public void whenCanceled(Runnable onCancel) {
+    m_onCancel = onCancel;
+  }
+
+  @Override
+  public void onCancel() {
+    m_onCancel.run();
   }
 
   /**
