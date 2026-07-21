@@ -54,9 +54,9 @@ class CommandGenericHID:
                 "Controller " + str(self._hid.get_port()) + " Right Trigger Rumble"
             )
             subsystems[4].set_name("Controller " + str(self._hid.get_port()) + " LEDs")
-            CommandGenericHID._subsystems[hid] = subsystems
+            CommandGenericHID._subsystems[self._hid] = subsystems
 
-        subsystems = CommandGenericHID._subsystems[hid]
+        subsystems = CommandGenericHID._subsystems[self._hid]
         # Rumble mutexes
         self._left_rumble = subsystems[0]
         self._right_rumble = subsystems[1]
@@ -375,3 +375,4 @@ class CommandGenericHID:
 def _reset_command_generic_hid_data() -> None:
     with CommandGenericHID._hids_lock:
         CommandGenericHID._hids.clear()
+        CommandGenericHID._subsystems.clear()
