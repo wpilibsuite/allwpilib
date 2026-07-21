@@ -22,7 +22,7 @@ extern "C" {
 } // extern "C"
 
 #include <suitesparse/SuiteSparse_config.h>
-#include <suitesparse/cholmod_core.h>
+#include <suitesparse/cholmod.h>
 
 #include <memory>
 #include <opencv2/opencv.hpp>

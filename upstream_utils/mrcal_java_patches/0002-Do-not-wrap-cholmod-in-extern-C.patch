@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: crueter <crueter@eden-emu.dev>
-Date: Mon, 20 Jul 2026 23:03:38 -0400
-Subject: [PATCH 2/2] Don't wrap suitesparse in extern C
+Date: Mon, 20 Jul 2026 23:08:48 -0400
+Subject: [PATCH 2/2] Do not wrap cholmod in extern C
 
 ---
- src/mrcal_wrapper.h | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ src/mrcal_wrapper.h | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
 diff --git a/src/mrcal_wrapper.h b/src/mrcal_wrapper.h
-index 0a36d4702d59a06e81d15a139b27c2cb85c6e0e6..d9df64d412ec08522c4a7eb9df861436a3e46622 100644
+index 0a36d4702d59a06e81d15a139b27c2cb85c6e0e6..4a500804410bd884892c259d780f57f0d84f9721 100644
 --- a/src/mrcal_wrapper.h
 +++ b/src/mrcal_wrapper.h
 @@ -21,11 +21,8 @@ extern "C" {
@@ -18,9 +18,9 @@ index 0a36d4702d59a06e81d15a139b27c2cb85c6e0e6..d9df64d412ec08522c4a7eb9df861436
 -// Seems like these people don't properly extern-c their headers either
 -extern "C" {
  #include <suitesparse/SuiteSparse_config.h>
- #include <suitesparse/cholmod_core.h>
+-#include <suitesparse/cholmod_core.h>
 -} // extern "C"
++#include <suitesparse/cholmod.h>
 
  #include <memory>
  #include <opencv2/opencv.hpp>
-
