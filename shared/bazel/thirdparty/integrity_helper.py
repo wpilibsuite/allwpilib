@@ -98,9 +98,7 @@ def download_integrities(
     # print(updated_contents)
 
 
-def update_ceres(versions):
-    version = versions["ceres"]
-
+def update_ceres(version):
     has_headers = True
     classifiers = [
         "linuxarm64static",
@@ -125,9 +123,7 @@ def update_ceres(versions):
     )
 
 
-def update_libssh(versions):
-    version = versions["libssh"]
-
+def update_libssh(version):
     has_headers = True
     classifiers = [
         "linuxarm64static",
@@ -152,9 +148,7 @@ def update_libssh(versions):
     )
 
 
-def update_mrclib(versions):
-    version = versions["mrclib"]
-
+def update_mrclib(version):
     has_headers = True
     classifiers = [
         "linuxarm64",
@@ -180,9 +174,9 @@ def main():
     with versions_file.open("rb") as f:
         versions = tomllib.load(f)["versions"]
 
-    update_ceres(versions)
-    update_libssh(versions)
-    update_mrclib(versions)
+    update_ceres(versions["ceres"])
+    update_libssh(versions["libssh"])
+    update_mrclib(versions["mrclib"])
 
 
 if __name__ == "__main__":
