@@ -99,13 +99,10 @@ def download_integrities(
 
 
 def update_ceres(versions):
-    year = "frc2026"
     version = versions["ceres"]
 
     has_headers = True
     classifiers = [
-        "linuxarm32static",
-        "linuxarm32staticdebug",
         "linuxarm64static",
         "linuxarm64staticdebug",
         "linuxx86-64static",
@@ -117,14 +114,14 @@ def update_ceres(versions):
         "windowsx86-64static",
         "windowsx86-64staticdebug",
     ]
-    url_base = f"https://frcmaven.wpi.edu/artifactory/development/edu/wpi/first/thirdparty/{year}/ceres/ceres-cpp/{version}/ceres-cpp-{version}-%s.zip"
+    url_base = f"https://frcmaven.wpi.edu/artifactory/development/org/wpilib/thirdparty/ceres/ceres/{version}/ceres-{version}-%s.zip"
 
     download_integrities(
         "shared/bazel/thirdparty/ceres/ceres.MODULE.bazel",
         has_headers,
         classifiers,
         url_base,
-        True,
+        False,
     )
 
 

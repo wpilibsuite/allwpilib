@@ -1,6 +1,6 @@
 [versions]
 avaje = "3.14"
-ceres = "2.2-1"
+ceres = "2027-2.2-2"
 ejml = "0.46.0"
 gson = "2.13.1"
 libssh = "2027-0.120-1"
