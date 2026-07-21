@@ -41,6 +41,7 @@ target_include_directories(
         src/main/native/include
         src/main/native/thirdparty/libdogleg/include
         src/main/native/thirdparty/mrcal/include
+        src/main/native/thirdparty/mrcal/generated
         src/main/native/thirdparty/mrcal_java/include
 )
 
@@ -114,6 +115,7 @@ target_link_libraries(
 )
 
 target_compile_definitions(wpical PUBLIC OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT)
+target_compile_definitions(wpical PUBLIC PROJECT_ROOT_PATH="${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/assets")
 
 if(WIN32)
     set_target_properties(wpical PROPERTIES WIN32_EXECUTABLE YES)
@@ -138,8 +140,13 @@ if(WPILIB_WITH_TESTS)
             src/main/native/include
             src/main/native/thirdparty/libdogleg/include
             src/main/native/thirdparty/mrcal/include
+            src/main/native/thirdparty/mrcal/generated
             src/main/native/thirdparty/mrcal_java/include
     )
+
+    target_compile_definitions(wpical_test PUBLIC OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT)
+    target_compile_definitions(wpical_test PUBLIC PROJECT_ROOT_PATH="${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/assets")
+
     target_link_libraries(
         wpical_test
         apriltag

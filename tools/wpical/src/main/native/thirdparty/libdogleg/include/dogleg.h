@@ -5,7 +5,14 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C++" {
+#endif
 #include <suitesparse/cholmod.h>
+#ifdef __cplusplus
+}
+#endif
+
 #include <stdbool.h>
 
 typedef void (dogleg_callback_t)(const double*   p,
