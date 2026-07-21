@@ -4,6 +4,11 @@
 
 #pragma once
 
+#include <array>
+#include <memory>
+#include <string_view>
+#include <unordered_map>
+
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/SubsystemBase.hpp"
@@ -350,14 +355,24 @@ class CommandGenericHID final {
   CommandPtr Rumble(SubsystemBase& subsystem, std::string_view name,
                     wpi::GenericHID::RumbleType type, double value);
 
+  static std::unordered_map<wpi::GenericHID*,
+                            std::array<std::unique_ptr<SubsystemBase>, 5>>
+      m_subsystems;
+
+  static std::array<std::unique_ptr<SubsystemBase>, 5>& GetSubsystems(
+      wpi::GenericHID& hid);
+
+  CommandGenericHID(wpi::GenericHID& hid,
+                    std::array<std::unique_ptr<SubsystemBase>, 5>& subsystems);
+
   // Rumble mutexes
-  SubsystemBase m_leftRumble;
-  SubsystemBase m_rightRumble;
-  SubsystemBase m_leftTriggerRumble;
-  SubsystemBase m_rightTriggerRumble;
+  SubsystemBase& m_leftRumble;
+  SubsystemBase& m_rightRumble;
+  SubsystemBase& m_leftTriggerRumble;
+  SubsystemBase& m_rightTriggerRumble;
 
   // LED mutex
-  SubsystemBase m_leds;
+  SubsystemBase& m_leds;
 
   wpi::GenericHID* m_hid;
 };

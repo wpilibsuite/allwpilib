@@ -6,7 +6,7 @@
 
 #include <array>
 #include <memory>
-#include <mutex>
+#include <unordered_map>
 
 #include "wpi/commands2/Commands.hpp"
 
@@ -19,10 +19,53 @@ std::array<std::unique_ptr<CommandGenericHID>,
     hids;
 }  // namespace
 
+std::array<std::unique_ptr<SubsystemBase>, 5>& CommandGenericHID::GetSubsystems(
+    wpi::GenericHID& hid) {
+  auto it = m_subsystems.find(&hid);
+  if (it == m_subsystems.end()) {
+    it = m_subsystems
+             .emplace(&hid,
+                      std::array{
+                          std::make_unique<SubsystemBase>(
+                              "Controller " + std::to_string(hid.GetPort()) +
+                              " Left Rumble"),
+                          std::make_unique<SubsystemBase>(
+                              "Controller " + std::to_string(hid.GetPort()) +
+                              " Right Rumble"),
+                          std::make_unique<SubsystemBase>(
+                              "Controller " + std::to_string(hid.GetPort()) +
+                              " Left Trigger Rumble"),
+                          std::make_unique<SubsystemBase>(
+                              "Controller " + std::to_string(hid.GetPort()) +
+                              " Right Trigger Rumble"),
+                          std::make_unique<SubsystemBase>(
+                              "Controller " + std::to_string(hid.GetPort()) +
+                              " LEDs"),
+                      })
+             .first;
+  }
+  return it->second;
+}
+
+std::unordered_map<wpi::GenericHID*,
+                   std::array<std::unique_ptr<SubsystemBase>, 5>>
+    CommandGenericHID::m_subsystems;
+
 CommandGenericHID::CommandGenericHID(int port)
     : CommandGenericHID{wpi::DriverStation::GetGenericHID(port)} {}
 
-CommandGenericHID::CommandGenericHID(wpi::GenericHID& hid) : m_hid{&hid} {}
+CommandGenericHID::CommandGenericHID(wpi::GenericHID& hid)
+    : CommandGenericHID{hid, GetSubsystems(hid)} {}
+
+CommandGenericHID::CommandGenericHID(
+    wpi::GenericHID& hid,
+    std::array<std::unique_ptr<SubsystemBase>, 5>& subsystems)
+    : m_leftRumble{*subsystems[0]},
+      m_rightRumble{*subsystems[1]},
+      m_leftTriggerRumble{*subsystems[2]},
+      m_rightTriggerRumble{*subsystems[3]},
+      m_leds{*subsystems[4]},
+      m_hid{&hid} {}
 
 CommandGenericHID& CommandGenericHID::GetCommandGenericHID(int port) {
   auto& hid = wpi::DriverStation::GetGenericHID(port);

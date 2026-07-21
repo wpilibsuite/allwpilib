@@ -29,6 +29,8 @@ public final class CommandGenericHID {
   private static final Lock m_hidsLock = new ReentrantLock();
   private static final Map<Scheduler, CommandGenericHID[]> m_hids = new IdentityHashMap<>();
 
+  private static final Map<GenericHID, Mechanism[]> m_mechanisms = new IdentityHashMap<>();
+
   private final Scheduler m_scheduler;
   private final GenericHID m_hid;
   private final Map<EventLoop, Map<Integer, Trigger>> m_buttonCache = new HashMap<>();
@@ -47,8 +49,7 @@ public final class CommandGenericHID {
    * @param port The port index on the Driver Station that the device is plugged into.
    */
   public CommandGenericHID(Scheduler scheduler, int port) {
-    m_scheduler = scheduler;
-    m_hid = DriverStation.getGenericHID(port);
+    this(scheduler, DriverStation.getGenericHID(port));
   }
 
   /**
@@ -60,6 +61,49 @@ public final class CommandGenericHID {
   public CommandGenericHID(Scheduler scheduler, GenericHID hid) {
     m_scheduler = scheduler;
     m_hid = hid;
+
+    final var mechanisms =
+        m_mechanisms.computeIfAbsent(
+            hid,
+            _ ->
+                new Mechanism[] {
+                  new Mechanism() {
+                    @Override
+                    public String getName() {
+                      return "Controller " + m_hid.getPort() + " Left Rumble";
+                    }
+                  },
+                  new Mechanism() {
+                    @Override
+                    public String getName() {
+                      return "Controller " + m_hid.getPort() + " Right Rumble";
+                    }
+                  },
+                  new Mechanism() {
+                    @Override
+                    public String getName() {
+                      return "Controller " + m_hid.getPort() + " Left Trigger Rumble";
+                    }
+                  },
+                  new Mechanism() {
+                    @Override
+                    public String getName() {
+                      return "Controller " + m_hid.getPort() + " Right Trigger Rumble";
+                    }
+                  },
+                  new Mechanism() {
+                    @Override
+                    public String getName() {
+                      return "Controller " + m_hid.getPort() + " LED";
+                    }
+                  }
+                });
+
+    m_leftRumble = mechanisms[0];
+    m_rightRumble = mechanisms[1];
+    m_leftTriggerRumble = mechanisms[2];
+    m_rightTriggerRumble = mechanisms[3];
+    m_led = mechanisms[4];
   }
 
   /**
@@ -403,34 +447,10 @@ public final class CommandGenericHID {
   }
 
   // Rumble mutexes
-  private final Mechanism m_leftRumble =
-      new Mechanism() {
-        @Override
-        public String getName() {
-          return "Controller " + m_hid.getPort() + " Left Rumble";
-        }
-      };
-  private final Mechanism m_rightRumble =
-      new Mechanism() {
-        @Override
-        public String getName() {
-          return "Controller " + m_hid.getPort() + " Right Rumble";
-        }
-      };
-  private final Mechanism m_leftTriggerRumble =
-      new Mechanism() {
-        @Override
-        public String getName() {
-          return "Controller " + m_hid.getPort() + " Left Trigger Rumble";
-        }
-      };
-  private final Mechanism m_rightTriggerRumble =
-      new Mechanism() {
-        @Override
-        public String getName() {
-          return "Controller " + m_hid.getPort() + " Right Trigger Rumble";
-        }
-      };
+  private final Mechanism m_leftRumble;
+  private final Mechanism m_rightRumble;
+  private final Mechanism m_leftTriggerRumble;
+  private final Mechanism m_rightTriggerRumble;
 
   /**
    * Run the left rumble motor. On most controllers, this is the low-frequency motor.
@@ -505,13 +525,7 @@ public final class CommandGenericHID {
   }
 
   // LED mutex
-  private final Mechanism m_led =
-      new Mechanism() {
-        @Override
-        public String getName() {
-          return "Controller " + m_hid.getPort() + " LED";
-        }
-      };
+  private final Mechanism m_led;
 
   /**
    * Set the LEDs, on controllers that have them.

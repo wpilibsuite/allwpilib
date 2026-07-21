@@ -5,6 +5,7 @@
 package org.wpilib.command2.button;
 
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -29,6 +30,8 @@ public final class CommandGenericHID {
   private static final Lock m_hidsLock = new ReentrantLock();
   private static final CommandGenericHID[] m_hids =
       new CommandGenericHID[DriverStationBackend.JOYSTICK_PORTS];
+
+  private static final Map<GenericHID, SubsystemBase[]> m_subsystems = new IdentityHashMap<>();
 
   private final GenericHID m_hid;
   private final Map<EventLoop, Map<Integer, Trigger>> m_buttonCache = new HashMap<>();
@@ -57,13 +60,23 @@ public final class CommandGenericHID {
   public CommandGenericHID(GenericHID hid) {
     m_hid = hid;
 
-    m_leftRumble = new SubsystemBase("Controller " + m_hid.getPort() + "Left Rumble") {};
-    m_rightRumble = new SubsystemBase("Controller " + m_hid.getPort() + "Right Rumble") {};
-    m_leftTriggerRumble =
-        new SubsystemBase("Controller " + m_hid.getPort() + "Left Trigger Rumble") {};
-    m_rightTriggerRumble =
-        new SubsystemBase("Controller " + m_hid.getPort() + "Right Trigger Rumble") {};
-    m_leds = new SubsystemBase("Controller " + m_hid.getPort() + "LEDs") {};
+    final var subsystems =
+        m_subsystems.computeIfAbsent(
+            hid,
+            _ ->
+                new SubsystemBase[] {
+                  new SubsystemBase("Controller " + m_hid.getPort() + "Left Rumble") {},
+                  new SubsystemBase("Controller " + m_hid.getPort() + "Right Rumble") {},
+                  new SubsystemBase("Controller " + m_hid.getPort() + "Left Trigger Rumble") {},
+                  new SubsystemBase("Controller " + m_hid.getPort() + "Right Trigger Rumble") {},
+                  new SubsystemBase("Controller " + m_hid.getPort() + "LEDs") {},
+                });
+
+    m_leftRumble = subsystems[0];
+    m_rightRumble = subsystems[1];
+    m_leftTriggerRumble = subsystems[2];
+    m_rightTriggerRumble = subsystems[3];
+    m_leds = subsystems[4];
   }
 
   /**
