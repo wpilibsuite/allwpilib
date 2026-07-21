@@ -12,6 +12,8 @@ from .trigger import Trigger
 
 @final
 class CommandGenericHID:
+    _subsystems = {}
+
     """
     A version of :class:`wpilib.GenericHID` with :class:`.Trigger` factories for command-based.
     """
@@ -31,29 +33,31 @@ class CommandGenericHID:
         else:
             self._hid = hid
 
+        if self._hid not in CommandGenericHID._subsystems:
+            subsystems = [
+                Subsystem(),
+                Subsystem(),
+                Subsystem(),
+                Subsystem(),
+                Subsystem()
+            ]
+            subsystems[0].set_name("Controller " + str(self._hid.get_port()) + " Left Rumble")
+            subsystems[1].set_name("Controller " + str(self._hid.get_port()) + " Right Rumble")
+            subsystems[2].set_name("Controller " + str(self._hid.get_port()) +
+                                   " Left Trigger Rumble")
+            subsystems[3].set_name("Controller " + str(self._hid.get_port()) +
+                                   " Right Trigger Rumble")
+            subsystems[4].set_name("Controller " + str(self._hid.get_port()) + " LEDs")
+            CommandGenericHID._subsystems[hid] = subsystems
+
+        subsystems = CommandGenericHID._subsystems[hid]
         # Rumble mutexes
-        self._left_rumble = Subsystem()
-        self._right_rumble = Subsystem()
-        self._left_trigger_rumble = Subsystem()
-        self._right_trigger_rumble = Subsystem()
-
-        self._left_rumble.set_name(
-            "Controller " + str(self._hid.get_port()) + " Left Rumble"
-        )
-        self._right_rumble.set_name(
-            "Controller " + str(self._hid.get_port()) + " Right Rumble"
-        )
-        self._left_trigger_rumble.set_name(
-            "Controller " + str(self._hid.get_port()) + " Left Trigger Rumble"
-        )
-        self._right_trigger_rumble.set_name(
-            "Controller " + str(self._hid.get_port()) + " Right Trigger Rumble"
-        )
-
+        self._left_rumble = subsystems[0]
+        self._right_rumble = subsystems[1]
+        self._left_trigger_rumble = subsystems[2]
+        self._right_trigger_rumble = subsystems[3]
         # LED mutex
-        self._leds = Subsystem()
-
-        self._leds.set_name("Controller " + str(self._hid.get_port()) + " LEDs")
+        self._leds = subsystems[4]
 
     @classmethod
     def get_command_generic_hid(cls, port: int) -> "CommandGenericHID":
