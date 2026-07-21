@@ -6,6 +6,7 @@
 
 package org.wpilib.command2.button;
 
+import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.NiDsPS5Controller;
 import org.wpilib.event.EventLoop;
@@ -410,5 +411,80 @@ public class CommandNiDsPS5Controller {
    */
   public double getR2Axis() {
     return m_controller.getR2Axis();
+  }
+
+  /**
+   * Run the left rumble motor. On most controllers, this is the low-frequency motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the left rumble motor at the given value until interrupted.
+   */
+  public Command rumbleLeft(double value) {
+    return m_hid.rumbleLeft(value);
+  }
+
+  /**
+   * Run the right rumble motor. On most controllers, this is the high-frequency motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the right rumble motor at the given value until interrupted.
+   */
+  public Command rumbleRight(double value) {
+    return m_hid.rumbleRight(value);
+  }
+
+  /**
+   * Run both rumble motors.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the rumble motors at the given value until interrupted.
+   */
+  public Command rumbleBoth(double value) {
+    return m_hid.rumbleBoth(value);
+  }
+
+  /**
+   * Run the left trigger rumble motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the left trigger rumble motor at the given value until
+   *     interrupted.
+   */
+  public Command rumbleLeftTrigger(double value) {
+    return m_hid.rumbleLeftTrigger(value);
+  }
+
+  /**
+   * Run the right trigger rumble motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the right trigger rumble motor at the given value until
+   *     interrupted.
+   */
+  public Command rumbleRightTrigger(double value) {
+    return m_hid.rumbleRightTrigger(value);
+  }
+
+  /**
+   * Run both trigger rumble motors.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run both trigger rumble motors at the given value until
+   *     interrupted.
+   */
+  public Command rumbleTriggers(double value) {
+    return m_hid.rumbleTriggers(value);
+  }
+
+  /**
+   * Set the LEDs.
+   *
+   * @param r The red value (0-255)
+   * @param g The green value (0-255)
+   * @param b The blue value (0-255)
+   * @return A command that will set the LEDs to the given values until interrupted.
+   */
+  public Command setLeds(int r, int g, int b) {
+    return m_hid.setLeds(r, g, b);
   }
 }

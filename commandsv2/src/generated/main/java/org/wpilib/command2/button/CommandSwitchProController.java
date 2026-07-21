@@ -7,6 +7,7 @@
 package org.wpilib.command2.button;
 
 import java.util.Objects;
+import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.SwitchProController;
 import org.wpilib.event.EventLoop;
@@ -670,5 +671,45 @@ public class CommandSwitchProController {
    */
   public double getZR() {
     return m_controller.getZR();
+  }
+
+  /**
+   * Run the left rumble motor. On most controllers, this is the low-frequency motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the left rumble motor at the given value until interrupted.
+   */
+  public Command rumbleLeft(double value) {
+    return m_hid.rumbleLeft(value);
+  }
+
+  /**
+   * Run the right rumble motor. On most controllers, this is the high-frequency motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the right rumble motor at the given value until interrupted.
+   */
+  public Command rumbleRight(double value) {
+    return m_hid.rumbleRight(value);
+  }
+
+  /**
+   * Run both rumble motors.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the rumble motors at the given value until interrupted.
+   */
+  public Command rumbleBoth(double value) {
+    return m_hid.rumbleBoth(value);
+  }
+
+  /**
+   * Set the LED.
+   *
+   * @param value The brightness value (0-255)
+   * @return A command that will set the LED to the given value until interrupted.
+   */
+  public Command setLeds(int value) {
+    return m_hid.setLeds(value, 0, 0);
   }
 }

@@ -12,6 +12,7 @@
       "Manufacturer",
       "SkipReporting",
       "AxisNameSuffix",
+      "supports",
       "buttons",
       "sticks"
     ],
@@ -27,6 +28,29 @@
       "AxisNameSuffix": {
         "description": "The suffix of an axis that shouldn't have Axis appended to its name",
         "type": "string"
+      },
+      "supports": {
+        "type": "object",
+        "required": [
+          "rumble",
+          "triggerRumble",
+          "monoLed",
+          "rgbLed"
+        ],
+        "properties": {
+          "rumble": {
+            "type": "boolean"
+          },
+          "triggerRumble": {
+            "type": "boolean"
+          },
+          "monoLed": {
+            "type": "boolean"
+          },
+          "rgbLed": {
+            "type": "boolean"
+          }
+        }
       },
       "buttons": {
         "description": "A list of buttons on the controller",

@@ -7,6 +7,7 @@
 package org.wpilib.command3.button;
 
 import java.util.Objects;
+import org.wpilib.command3.Command;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.DualShock4Controller;
@@ -609,5 +610,47 @@ public class CommandDualShock4Controller {
    */
   public double getR2() {
     return m_controller.getR2();
+  }
+
+  /**
+   * Run the left rumble motor. On most controllers, this is the low-frequency motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the left rumble motor at the given value until interrupted.
+   */
+  public Command rumbleLeft(double value) {
+    return m_hid.rumbleLeft(value);
+  }
+
+  /**
+   * Run the right rumble motor. On most controllers, this is the high-frequency motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the right rumble motor at the given value until interrupted.
+   */
+  public Command rumbleRight(double value) {
+    return m_hid.rumbleRight(value);
+  }
+
+  /**
+   * Run both rumble motors.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the rumble motors at the given value until interrupted.
+   */
+  public Command rumbleBoth(double value) {
+    return m_hid.rumbleBoth(value);
+  }
+
+  /**
+   * Set the LEDs.
+   *
+   * @param r The red value (0-255)
+   * @param g The green value (0-255)
+   * @param b The blue value (0-255)
+   * @return A command that will set the LEDs to the given values until interrupted.
+   */
+  public Command setLeds(int r, int g, int b) {
+    return m_hid.setLeds(r, g, b);
   }
 }

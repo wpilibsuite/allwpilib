@@ -3,6 +3,12 @@
     "ConsoleName": "NiDsXbox",
     "Manufacturer": "Microsoft",
     "AxisNameSuffix": "Trigger",
+    "supports": {
+      "rumble": true,
+      "triggerRumble": true,
+      "monoLed": false,
+      "rgbLed": false
+    },
     "buttons": [
       {
         "name": "a",
@@ -106,6 +112,12 @@
     "ConsoleName": "NiDsPS4",
     "Manufacturer": "Sony",
     "AxisNameSuffix": "2",
+    "supports": {
+      "rumble": true,
+      "triggerRumble": false,
+      "monoLed": false,
+      "rgbLed": true
+    },
     "buttons": [
       {
         "name": "square",
@@ -224,6 +236,12 @@
     "ConsoleName": "NiDsPS5",
     "Manufacturer": "Sony",
     "AxisNameSuffix": "2",
+    "supports": {
+      "rumble": true,
+      "triggerRumble": true,
+      "monoLed": false,
+      "rgbLed": true
+    },
     "buttons": [
       {
         "name": "square",
@@ -342,6 +360,12 @@
     "ConsoleName": "NiDsStadia",
     "Manufacturer": "Google",
     "AxisNameSuffix": "Trigger",
+    "supports": {
+      "rumble": true,
+      "triggerRumble": false,
+      "monoLed": false,
+      "rgbLed": false
+    },
     "buttons": [
       {
         "name": "a",
