@@ -62,6 +62,8 @@ jobs:
 
       - uses: TheMrMilchmann/setup-msvc-dev@v4
         if: runner.os == 'Windows'
+        with:
+          arch: x64
 
       - name: Install CMake (Windows only)
         if: runner.os == 'Windows'
