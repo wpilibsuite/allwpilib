@@ -103,6 +103,12 @@ jobs:
           ./json.py clone
           ./json.py copy-src
           ./json.py format-patch
+      - name: Run libdogleg.py
+        run: |
+          cd upstream_utils
+          ./libdogleg.py clone
+          ./libdogleg.py copy-src
+          ./libdogleg.py format-patch
       - name: Run libuv.py
         run: |
           cd upstream_utils
@@ -127,6 +133,12 @@ jobs:
           ./mrcal.py clone
           ./mrcal.py copy-src
           ./mrcal.py format-patch
+      - name: Run mrcal_java.py
+        run: |
+          cd upstream_utils
+          ./mrcal_java.py clone
+          ./mrcal_java.py copy-src
+          ./mrcal_java.py format-patch
       - name: Run sleipnir.py
         run: |
           cd upstream_utils

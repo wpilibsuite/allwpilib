@@ -8,10 +8,10 @@ Subject: [PATCH 9/9] Suppress unused-but-set warning
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/mrcal.cpp b/mrcal.cpp
-index 0b7263f58164bfe9f42447741a08366262195f7c..4c8e56c7984ceee7f3708e031ea308102f605747 100644
+index ce935cd21f2a175111b3163313e6685fbd260156..926705581a2e62003b0d088e677dfa144aef1fbe 100644
 --- a/mrcal.cpp
 +++ b/mrcal.cpp
-@@ -4483,7 +4483,7 @@ void optimizer_callback(// input state
+@@ -4481,7 +4481,7 @@ void optimizer_callback(// input state
  
                         const callback_context_t* ctx)
  {

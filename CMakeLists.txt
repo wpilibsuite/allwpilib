@@ -112,10 +112,6 @@ if(WPILIB_WITH_DOCS)
     add_doxygen_docs()
 endif()
 
-if(WPILIB_WITH_WPICAL)
-    find_package(Ceres CONFIG REQUIRED)
-endif()
-
 find_package(LIBSSH CONFIG 0.7.1)
 
 get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)

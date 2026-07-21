@@ -26,6 +26,11 @@
 #include <stdexcept>
 #include <vector>
 
+#include <opencv2/core/version.hpp>
+#if CV_VERSION_MAJOR >= 5
+#include <opencv2/geometry/3d.hpp>
+#endif
+
 using namespace cv;
 
 class CholmodCtx {
@@ -348,7 +353,7 @@ mrcal_pose_t getSeedPose(const mrcal_point3_t *c_observations_board_pool,
   }
 
   // Initial guess at intrinsics
-  Mat cameraMatrix = (Mat_<double>(3, 3) << fx, 0, cx, 0, fy, cy, 0, 0, 1);
+  Mat cameraMatrix{{3, 3}, {fx, 0.0, cx, 0.0, fy, cy, 0.0, 0.0, 1.0}};
   Mat distCoeffs = Mat(4, 1, CV_64FC1, Scalar(0));
 
   Mat_<double> rvec, tvec;
