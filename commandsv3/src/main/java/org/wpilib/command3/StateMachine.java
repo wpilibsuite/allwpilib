@@ -60,6 +60,7 @@ public final class StateMachine implements Command {
   private State m_initialState = null;
   private final List<State> m_states = new ArrayList<>();
   private Runnable m_onCancel = () -> {};
+  private State m_currentState = null;
 
   /**
    * Creates a new state machine.
@@ -162,6 +163,7 @@ public final class StateMachine implements Command {
 
     outer_loop:
     while (currentState != null) {
+      m_currentState = currentState;
       final var currentCommand = currentState.command();
       coroutine.fork(currentCommand);
       currentState.runEnterCallbacks();
@@ -205,6 +207,7 @@ public final class StateMachine implements Command {
         coroutine.yield();
       }
     }
+    m_currentState = null;
   }
 
   private State verifyState(State next) {
@@ -225,6 +228,9 @@ public final class StateMachine implements Command {
 
   @Override
   public void onCancel() {
+    if (m_currentState != null) {
+      m_currentState.runExitCallbacks();
+    }
     m_onCancel.run();
   }
 
@@ -312,7 +318,7 @@ public final class StateMachine implements Command {
       m_enterCallbacks.forEach(Runnable::run);
     }
 
-    private void runExitCallbacks() {
+    void runExitCallbacks() {
       m_exitCallbacks.forEach(Runnable::run);
     }
 
