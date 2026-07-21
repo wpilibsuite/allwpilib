@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: crueter <crueter@eden-emu.dev>
 Date: Mon, 20 Jul 2026 22:57:56 -0400
-Subject: [PATCH 4/4] restore cholmod to C++ linkage
+Subject: [PATCH 4/4] Use prefixed include for cholmod
 
 ---
  dogleg.h | 10 +++++++++-
@@ -11,19 +11,12 @@ diff --git a/dogleg.h b/dogleg.h
 index 4a23b669a30642d290549bb94a1c787f079d0647..c972b97813538543a8f1823d44a7f7d3e10ae108 100644
 --- a/dogleg.h
 +++ b/dogleg.h
-@@ -5,7 +5,14 @@
+@@ -5,7 +5,7 @@
 
  #pragma once
 
 -#include <cholmod.h>
-+#ifdef __cplusplus
-+extern "C++" {
-+#endif
 +#include <suitesparse/cholmod.h>
-+#ifdef __cplusplus
-+}
-+#endif
-+
  #include <stdbool.h>
 
  typedef void (dogleg_callback_t)(const double*   p,

@@ -8,10 +8,10 @@ Subject: [PATCH 8/9] Fix UB in mrcal
  1 file changed, 16 insertions(+), 11 deletions(-)
 
 diff --git a/mrcal.cpp b/mrcal.cpp
-index d4a2415a5730a48671b2716960bc343cdbd01295..0b7263f58164bfe9f42447741a08366262195f7c 100644
+index 9bf712862c2f0fff25435f7807c0a03005165c3f..ce935cd21f2a175111b3163313e6685fbd260156 100644
 --- a/mrcal.cpp
 +++ b/mrcal.cpp
-@@ -4582,7 +4582,6 @@ void optimizer_callback(// input state
+@@ -4580,7 +4580,6 @@ void optimizer_callback(// input state
          // Construct the FULL intrinsics vector, based on either the
          // optimization vector or the inputs, depending on what we're optimizing
          double* intrinsics_here  = &intrinsics_all[icam_intrinsics][0];
@@ -19,7 +19,7 @@ index d4a2415a5730a48671b2716960bc343cdbd01295..0b7263f58164bfe9f42447741a083662
  
          int i_var_intrinsics =
              mrcal_state_index_intrinsics(icam_intrinsics,
-@@ -4604,15 +4603,20 @@ void optimizer_callback(// input state
+@@ -4602,15 +4601,20 @@ void optimizer_callback(// input state
                          &ctx->intrinsics[ctx->Nintrinsics*icam_intrinsics],
                          Ncore*sizeof(double) );
          }
@@ -48,7 +48,7 @@ index d4a2415a5730a48671b2716960bc343cdbd01295..0b7263f58164bfe9f42447741a083662
      }
      for(int icam_extrinsics=0;
          icam_extrinsics<ctx->Ncameras_extrinsics;
-@@ -4699,6 +4703,7 @@ void optimizer_callback(// input state
+@@ -4697,6 +4701,7 @@ void optimizer_callback(// input state
  
          int splined_intrinsics_grad_irun = 0;
  
@@ -56,7 +56,7 @@ index d4a2415a5730a48671b2716960bc343cdbd01295..0b7263f58164bfe9f42447741a083662
          project(q_hypothesis.data(),
  
                  ctx->problem_selections.do_optimize_intrinsics_core || ctx->problem_selections.do_optimize_intrinsics_distortions ?
-@@ -4720,9 +4725,9 @@ void optimizer_callback(// input state
+@@ -4718,9 +4723,9 @@ void optimizer_callback(// input state
  
                  // input
                  intrinsics_all[icam_intrinsics].data(),

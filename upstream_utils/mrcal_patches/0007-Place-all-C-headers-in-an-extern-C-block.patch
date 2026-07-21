@@ -4,22 +4,14 @@ Date: Wed, 4 Dec 2024 00:58:21 -0500
 Subject: [PATCH 7/9] Place all C headers in an extern "C" block
 
 ---
- mrcal.cpp | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ mrcal.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/mrcal.cpp b/mrcal.cpp
-index 1560cd106ff5bcfe49476f785aa8108119318b3a..d4a2415a5730a48671b2716960bc343cdbd01295 100644
+index 1560cd106ff5bcfe49476f785aa8108119318b3a..9bf712862c2f0fff25435f7807c0a03005165c3f 100644
 --- a/mrcal.cpp
 +++ b/mrcal.cpp
-@@ -14,19 +14,22 @@
- #include <stdlib.h>
- #include <inttypes.h>
- 
-+extern "C" {
- #include <dogleg.h>
-+}
- #include <assert.h>
- #include <stdbool.h>
+@@ -20,13 +20,14 @@
  #include <math.h>
  #include <string.h>
  

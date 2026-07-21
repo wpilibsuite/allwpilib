@@ -14,9 +14,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-extern "C" {
 #include <dogleg.h>
-}
 #include <assert.h>
 #include <stdbool.h>
 #include <math.h>
