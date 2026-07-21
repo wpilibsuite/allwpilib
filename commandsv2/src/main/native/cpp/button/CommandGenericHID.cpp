@@ -5,6 +5,7 @@
 #include "wpi/commands2/button/CommandGenericHID.hpp"
 
 #include <array>
+#include <format>
 #include <memory>
 #include <unordered_map>
 
@@ -21,30 +22,25 @@ std::array<std::unique_ptr<CommandGenericHID>,
 
 std::array<std::unique_ptr<SubsystemBase>, 5>& CommandGenericHID::GetSubsystems(
     wpi::GenericHID& hid) {
-  auto it = m_subsystems.find(&hid);
-  if (it == m_subsystems.end()) {
-    it = m_subsystems
-             .emplace(&hid,
-                      std::array{
-                          std::make_unique<SubsystemBase>(
-                              "Controller " + std::to_string(hid.GetPort()) +
-                              " Left Rumble"),
-                          std::make_unique<SubsystemBase>(
-                              "Controller " + std::to_string(hid.GetPort()) +
-                              " Right Rumble"),
-                          std::make_unique<SubsystemBase>(
-                              "Controller " + std::to_string(hid.GetPort()) +
-                              " Left Trigger Rumble"),
-                          std::make_unique<SubsystemBase>(
-                              "Controller " + std::to_string(hid.GetPort()) +
-                              " Right Trigger Rumble"),
-                          std::make_unique<SubsystemBase>(
-                              "Controller " + std::to_string(hid.GetPort()) +
-                              " LEDs"),
-                      })
-             .first;
+  if (auto it = m_subsystems.find(&hid); it == m_subsystems.end()) {
+    return m_subsystems
+        .emplace(&hid,
+                 std::array{
+                     std::make_unique<SubsystemBase>(std::format(
+                         "Controller {} Left Rumble", hid.GetPort())),
+                     std::make_unique<SubsystemBase>(std::format(
+                         "Controller {} Right Rumble", hid.GetPort())),
+                     std::make_unique<SubsystemBase>(std::format(
+                         "Controller {} Left Trigger Rumble", hid.GetPort())),
+                     std::make_unique<SubsystemBase>(std::format(
+                         "Controller {} Right Trigger Rumble", hid.GetPort())),
+                     std::make_unique<SubsystemBase>(
+                         std::format("Controller {} LEDs", hid.GetPort())),
+                 })
+        .first->second;
+  } else {
+    return it->second;
   }
-  return it->second;
 }
 
 std::unordered_map<wpi::GenericHID*,
