@@ -114,7 +114,10 @@ target_link_libraries(
     wpical
     apriltag
     wpimath
-    ${OpenCV_LIBS}
+    opencv_highgui
+    opencv_imgproc
+    opencv_objdetect
+    opencv_videoio
     libglass
     wpigui
     wpiutil
@@ -167,7 +170,9 @@ if(WPILIB_WITH_TESTS)
         wpical_test
         apriltag
         wpimath
-        ${OpenCV_LIBS}
+        opencv_highgui
+        opencv_objdetect
+        opencv_videoio
         libglass
         wpigui
         wpiutil
