@@ -24,6 +24,14 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 cmake_minimum_required(VERSION 3.21)
+
+# Determine if we're built as a subproject (using add_subdirectory)
+# or if this is the master project.
+set(MASTER_PROJECT OFF)
+if(NOT DEFINED PROJECT_NAME)
+    set(MASTER_PROJECT ON)
+endif()
+
 project(allwpilib)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
@@ -82,6 +90,7 @@ option(WPILIB_WITH_TESTS "Build unit tests (requires internet connection)" ON)
 option(WPILIB_WITH_GUI "Build GUI items" ON)
 option(WPILIB_WITH_SIMULATION_MODULES "Build simulation modules" ON)
 option(WPILIB_WITH_BENCHMARK "Build the benchmark project" ON)
+option(WPILIB_WITH_EXECUTABLES "Build executables" ${MASTER_PROJECT})
 
 # Options for using a package manager (e.g., vcpkg) for certain dependencies.
 option(WPILIB_USE_SYSTEM_EIGEN "Use system Eigen" OFF)
@@ -102,6 +111,14 @@ wpilib_config(OPTIONS WPILIB_WITH_CSCORE REQUIRES WPILIB_WITH_NTCORE)
 wpilib_config(OPTIONS WPILIB_WITH_GUI REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WPIMATH)
 
 wpilib_config(OPTIONS WPILIB_WITH_WPILIB REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WPIMATH)
+
+# These projects build executables
+# TODO: dependent option?
+wpilib_config(OPTIONS WPILIB_WITH_WPICAL REQUIRES WPILIB_WITH_EXECUTABLES)
+wpilib_config(OPTIONS WPILIB_WITH_BENCHMARK REQUIRES WPILIB_WITH_EXECUTABLES)
+wpilib_config(OPTIONS WPILIB_WITH_GUI REQUIRES WPILIB_WITH_EXECUTABLES)
+wpilib_config(OPTIONS WPILIB_WITH_TESTS REQUIRES WPILIB_WITH_EXECUTABLES)
+wpilib_config(OPTIONS WPILIB_WITH_EXAMPLES REQUIRES WPILIB_WITH_EXECUTABLES)
 
 set(include_dest include)
 
