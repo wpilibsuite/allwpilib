@@ -113,6 +113,8 @@ target_link_libraries(
     Ceres::ceres
 )
 
+target_compile_definitions(wpical PUBLIC OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT)
+
 if(WIN32)
     set_target_properties(wpical PROPERTIES WIN32_EXECUTABLE YES)
 elseif(APPLE)
