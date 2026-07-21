@@ -5,6 +5,7 @@
 package org.wpilib.math.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Random;
@@ -137,5 +138,25 @@ class LinearSystemLoopTest {
     }
 
     assertEquals(0.0, loop.getError(0), 0.1);
+  }
+
+  @Test
+  void testAtReference() {
+    m_loop.reset(VecBuilder.fill(0, 0));
+
+    // Default tolerance is zero, so any nonzero error means not at reference.
+    assertTrue(m_loop.atReference());
+
+    m_loop.setTolerance(VecBuilder.fill(0.1, 0.2));
+
+    m_loop.setXHat(VecBuilder.fill(0.05, 0.1));
+    assertTrue(m_loop.atReference());
+
+    m_loop.setXHat(VecBuilder.fill(0.2, 0.1));
+    assertFalse(m_loop.atReference());
+
+    // Error exactly at the tolerance boundary is considered at reference.
+    m_loop.setXHat(VecBuilder.fill(0.1, 0.2));
+    assertTrue(m_loop.atReference());
   }
 }

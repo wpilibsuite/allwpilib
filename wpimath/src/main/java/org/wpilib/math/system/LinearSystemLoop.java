@@ -38,6 +38,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
   private final LinearPlantInversionFeedforward<States, Inputs, Outputs> m_feedforward;
   private final KalmanFilter<States, Inputs, Outputs> m_observer;
   private Matrix<States, N1> m_nextR;
+  private Matrix<States, N1> m_tolerance;
   private Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> m_clampFunction;
 
   /**
@@ -128,6 +129,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
     this.m_clampFunction = clampFunction;
 
     m_nextR = new Matrix<>(new SimpleMatrix(controller.getK().getNumCols(), 1));
+    m_tolerance = new Matrix<>(new SimpleMatrix(controller.getK().getNumCols(), 1));
     reset(m_nextR);
     MathSharedStore.getMathShared().reportUsage("LinearSystemLoop", "");
   }
@@ -291,6 +293,30 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
    */
   public double getError(int index) {
     return getController().getR().minus(m_observer.getXhat()).get(index, 0);
+  }
+
+  /**
+   * Returns true if the error is within the tolerance set by setTolerance() for every state.
+   *
+   * @return True if the error is within tolerance of the reference.
+   */
+  public boolean atReference() {
+    var error = getError();
+    for (int i = 0; i < error.getNumRows(); i++) {
+      if (Math.abs(error.get(i, 0)) > m_tolerance.get(i, 0)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Sets the error which is considered tolerable for use with atReference().
+   *
+   * @param tolerance The tolerable error for each state.
+   */
+  public void setTolerance(Matrix<States, N1> tolerance) {
+    m_tolerance = tolerance;
   }
 
   /**
