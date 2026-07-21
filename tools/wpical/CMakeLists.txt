@@ -110,16 +110,14 @@ else()
     set(suitesparse_target SuiteSparse::SuiteSparseConfig)
 endif()
 
-if(TARGET opencv_world)
-    set(opencv_targets opencv_world)
-else()
-    set(opencv_targets opencv_highgui opencv_imgproc opencv_objdetect opencv_videoio)
-endif()
 target_link_libraries(
     wpical
     apriltag
     wpimath
-    ${opencv_targets}
+    opencv_highgui
+    opencv_imgproc
+    opencv_objdetect
+    opencv_videoio
     libglass
     wpigui
     wpiutil
@@ -168,16 +166,13 @@ if(WPILIB_WITH_TESTS)
         PUBLIC PROJECT_ROOT_PATH="${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/assets"
     )
 
-    if(TARGET opencv_world)
-        set(opencv_targets opencv_world)
-    else()
-        set(opencv_targets opencv_highgui opencv_objdetect opencv_videoio)
-    endif()
     target_link_libraries(
         wpical_test
         apriltag
         wpimath
-        ${opencv_targets}
+        opencv_highgui
+        opencv_objdetect
+        opencv_videoio
         libglass
         wpigui
         wpiutil
