@@ -41,6 +41,7 @@ update_init = [
     "tunable"
 ]
 scan_headers_ignore = [
+    "src/TunablePython.h",
     "wpi/tunable/ComplexTunable.hpp",
     "wpi/tunable/CustomTunable.hpp",
     "wpi/tunable/MockTunableBackend.hpp",

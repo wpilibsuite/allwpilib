@@ -259,7 +259,6 @@ generate_robotpy_pybind_build_info(
         "src/main/python/wpilib/src/rpy/Filesystem.h",
         "src/main/python/wpilib/src/rpy/Notifier.h",
         "src/main/python/wpilib/src/rpy/MotorControllerGroup.h",
-        "src/main/python/wpilib/src/rpy/TelemetryTunable.h",
     ] + [":robotpy-native-wpilib.copy_headers"],
     package_root_file = "src/main/python/wpilib/__init__.py",
     pkgcfgs = PKG_CONFIG_DEPS,

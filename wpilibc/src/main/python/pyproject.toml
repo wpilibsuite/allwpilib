@@ -83,8 +83,6 @@ scan_headers_ignore = [
 
     # Internals
     "rpy/ControlWord.h",
-    "rpy/TelemetryTunable.h",
-    "src/rpy/TelemetryTunable.h",
 ]
 
 [tool.semiwrap.name_transform]

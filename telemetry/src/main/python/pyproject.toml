@@ -41,6 +41,7 @@ update_init = [
     "telemetry"
 ]
 scan_headers_ignore = [
+    "src/TelemetryPython.h",
     "wpi/telemetry/DiscardTelemetryBackend.hpp",
     "wpi/telemetry/MockTelemetryBackend.hpp",
     "wpi/telemetry/Telemetry.hpp",

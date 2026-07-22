@@ -1,26 +1,16 @@
 import pytest
 import re
-import weakref
 
+import telemetry
+import tunable
 import wpilib
 
 
-def test_selectable():
-    chooser = wpilib.Selectable()
-    assert chooser.get_selected() is None
-
-    chooser.add_default("option", True)
-    assert chooser.get_selected() is True
-
-
-def test_tunables_publish_retains_value(nt):
-    value = wpilib.Selectable()
-    value.add_default("option", True)
-    ref = weakref.ref(value)
-    wpilib.Tunables.publish("selectable", value)
-    del value
-    assert bool(ref) is True
-    wpilib.Tunables.remove("selectable")
+def test_telemetry_tunable_flat_namespace():
+    assert wpilib.Telemetry is telemetry.Telemetry
+    assert wpilib.TelemetryRegistry is telemetry.TelemetryRegistry
+    assert wpilib.Tunables is tunable.Tunables
+    assert wpilib.Selectable is tunable.Selectable
 
 
 def test_motorcontrollergroup():
