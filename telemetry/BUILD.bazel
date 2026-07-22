@@ -2,8 +2,9 @@ load("@rules_cc//cc:defs.bzl", "cc_test")
 load("@rules_java//java:defs.bzl", "java_library")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
-load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info")
+load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
 load("//telemetry:robotpy_native_build_info.bzl", "define_native_wrapper")
+load("//telemetry:robotpy_pybind_build_info.bzl", "define_pybind_library", "telemetry_extension")
 
 wpilib_cc_library(
     name = "telemetry",
@@ -89,4 +90,30 @@ generate_robotpy_native_wrapper_build_info(
 define_native_wrapper(
     name = "robotpy-native-telemetry",
     pyproject_toml = "src/main/python/native-pyproject.toml",
+)
+
+PYBIND_PKGCFG_DEPS = [
+    "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
+    "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+    "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
+]
+
+generate_robotpy_pybind_build_info(
+    name = "robotpy-telemetry-generator",
+    additional_srcs = [":robotpy-native-telemetry.copy_headers"],
+    package_root_file = "src/main/python/telemetry/__init__.py",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+    yaml_files = glob(["src/main/python/semiwrap/*.yml"]),
+)
+
+telemetry_extension(
+    srcs = ["src/main/python/telemetry/src/main.cpp"],
+    includes = [
+        "src/main/python/telemetry",
+    ],
+)
+
+define_pybind_library(
+    name = "robotpy-telemetry",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
 )

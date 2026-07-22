@@ -6,6 +6,8 @@ requires = [
     "hatch-robotpy~=0.2.1",
     "hatchling",
     "robotpy-native-wpilib==0.0.0",
+    "robotpy-telemetry==0.0.0",
+    "robotpy-tunable==0.0.0",
     "robotpy-native-telemetry==0.0.0",
     "robotpy-native-tunable==0.0.0",
     "robotpy-wpiutil==0.0.0",
@@ -25,6 +27,8 @@ authors = [
 license = "BSD-3-Clause"
 dependencies = [
     "robotpy-native-wpilib==0.0.0",
+    "robotpy-telemetry==0.0.0",
+    "robotpy-tunable==0.0.0",
     "robotpy-native-telemetry==0.0.0",
     "robotpy-native-tunable==0.0.0",
     "robotpy-wpiutil==0.0.0",
@@ -79,6 +83,8 @@ scan_headers_ignore = [
 
     # Internals
     "rpy/ControlWord.h",
+    "rpy/TelemetryTunable.h",
+    "src/rpy/TelemetryTunable.h",
 ]
 
 [tool.semiwrap.name_transform]
@@ -90,7 +96,7 @@ known_words = ["3V3", "5V", "CAN", "CPU", "DS", "FMS", "FPGA", "HAL", "HTTP", "I
 name = "wpilib"
 wraps = ["robotpy-native-wpilib"]
 depends = [
-    "wpihal", "wpiutil", "ntcore", "wpimath"
+    "wpihal", "wpiutil", "ntcore", "wpimath", "telemetry", "tunable"
 ]
 includes = ["wpilib/src"]
 
@@ -104,6 +110,11 @@ MotorControllerGroup = "rpy/MotorControllerGroup.h"
 Notifier = "rpy/Notifier.h"
 # rpy only
 AddressableLEDBuffer = "rpy/AddressableLEDBuffer.h"
+
+# wpi/backend
+DataLogTelemetryBackend = "wpi/backend/DataLogTelemetryBackend.hpp"
+NetworkTablesTelemetryBackend = "wpi/backend/NetworkTablesTelemetryBackend.hpp"
+NetworkTablesTunableBackend = "wpi/backend/NetworkTablesTunableBackend.hpp"
 
 # wpi/counter
 EdgeConfiguration = "wpi/counter/EdgeConfiguration.hpp"
