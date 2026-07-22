@@ -48,6 +48,7 @@ libdogleg             tools/wpical/src/main/native/thirdparty/libdogleg
 Simd                  hal/src/main/native/systemcore/simd
 AdvantageScope        fields/src/main/native/resources/org/wpilib/fields/ftc
 Avahi                 wpinet/src/main/native/linux/AvahiClient.hpp
+SDL                   thirdparty_libsdl repo
 
 Additionally, nanopb was modified for use in WPILib.
 
