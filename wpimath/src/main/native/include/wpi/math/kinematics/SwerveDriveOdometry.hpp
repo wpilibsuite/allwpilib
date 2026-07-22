@@ -30,7 +30,8 @@ namespace wpi::math {
  */
 template <size_t NumModules>
 class SwerveDriveOdometry
-    : public Odometry<wpi::util::array<SwerveModulePosition, NumModules>,
+    : public Odometry<SwerveDriveKinematics<NumModules>,
+                      wpi::util::array<SwerveModulePosition, NumModules>,
                       wpi::util::array<SwerveModuleVelocity, NumModules>,
                       wpi::util::array<SwerveModuleAcceleration, NumModules>> {
  public:
@@ -46,14 +47,10 @@ class SwerveDriveOdometry
       SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
       const wpi::util::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose2d& initialPose = Pose2d{})
-      : SwerveDriveOdometry::Odometry(m_kinematicsImpl, gyroAngle,
-                                      modulePositions, initialPose),
-        m_kinematicsImpl(kinematics) {
+      : SwerveDriveOdometry::Odometry(kinematics, gyroAngle, modulePositions,
+                                      initialPose) {
     wpi::math::MathSharedStore::ReportUsage("SwerveDriveOdometry", "");
   }
-
- private:
-  SwerveDriveKinematics<NumModules> m_kinematicsImpl;
 };
 
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)

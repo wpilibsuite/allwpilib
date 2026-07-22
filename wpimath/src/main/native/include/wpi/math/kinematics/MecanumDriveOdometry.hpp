@@ -25,7 +25,8 @@ namespace wpi::math {
  * when using computer-vision systems.
  */
 class WPILIB_DLLEXPORT MecanumDriveOdometry
-    : public Odometry<MecanumDriveWheelPositions, MecanumDriveWheelVelocities,
+    : public Odometry<MecanumDriveKinematics, MecanumDriveWheelPositions,
+                      MecanumDriveWheelVelocities,
                       MecanumDriveWheelAccelerations> {
  public:
   /**
@@ -40,9 +41,6 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry
       MecanumDriveKinematics kinematics, const Rotation2d& gyroAngle,
       const MecanumDriveWheelPositions& wheelPositions,
       const Pose2d& initialPose = Pose2d{});
-
- private:
-  MecanumDriveKinematics m_kinematicsImpl;
 };
 
 }  // namespace wpi::math

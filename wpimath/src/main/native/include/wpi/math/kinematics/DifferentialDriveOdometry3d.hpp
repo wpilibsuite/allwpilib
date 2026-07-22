@@ -28,7 +28,8 @@ namespace wpi::math {
  * Any subsequent pose resets also require the encoders to be reset to zero.
  */
 class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
-    : public Odometry3d<DifferentialDriveWheelPositions,
+    : public Odometry3d<DifferentialDriveKinematics,
+                        DifferentialDriveWheelPositions,
                         DifferentialDriveWheelVelocities,
                         DifferentialDriveWheelAccelerations> {
  public:
@@ -84,8 +85,5 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
                        wpi::units::meter_t rightDistance) {
     return Odometry3d::Update(gyroAngle, {leftDistance, rightDistance});
   }
-
- private:
-  DifferentialDriveKinematics m_kinematicsImpl{wpi::units::meter_t{1}};
 };
 }  // namespace wpi::math
