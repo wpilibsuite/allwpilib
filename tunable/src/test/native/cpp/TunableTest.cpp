@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -98,7 +99,6 @@ constexpr CustomTunableType2<T> MakeTunable(const CustomType2<T>& val) {
 
 template <typename T>
 class MyTest : public decltype(MakeTunable(std::declval<T>())) {
-
 };
 
 MyTest<CustomType2<int32_t>> test;

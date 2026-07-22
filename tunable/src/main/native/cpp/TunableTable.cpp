@@ -5,7 +5,9 @@
 #include "wpi/tunable/TunableTable.hpp"
 
 #include <format>
+#include <memory>
 #include <string>
+#include <utility>
 
 #include "wpi/tunable/ComplexTunable.hpp"
 #include "wpi/tunable/TunableRegistry.hpp"

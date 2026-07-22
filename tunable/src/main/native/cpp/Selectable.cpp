@@ -4,6 +4,8 @@
 
 #include "wpi/tunable/Selectable.hpp"
 
+#include <string>
+
 #include "wpi/tunable/TunableConfig.hpp"
 #include "wpi/tunable/TunableTable.hpp"
 

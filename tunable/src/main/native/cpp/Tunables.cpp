@@ -4,6 +4,9 @@
 
 #include "wpi/tunable/Tunables.hpp"
 
+#include <memory>
+#include <utility>
+
 #include "wpi/tunable/TunableTable.hpp"
 
 using namespace wpi;

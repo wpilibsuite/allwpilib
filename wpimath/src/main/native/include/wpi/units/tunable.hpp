@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <memory>
+#include <utility>
+
 #include <wpi/tunable/Tunable.hpp>
 #include <wpi/util/ct_string.hpp>
 
