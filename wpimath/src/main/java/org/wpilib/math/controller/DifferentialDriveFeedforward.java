@@ -63,7 +63,7 @@ public class DifferentialDriveFeedforward implements ProtobufSerializable, Struc
   }
 
   /**
-   * Calculates the differential drive feedforward inputs given velocity setpoints.
+   * Calculates the differential drive feedforward inputs given velocity references.
    *
    * @param currentLeftVelocity The current left velocity of the differential drive in
    *     meters/second.
