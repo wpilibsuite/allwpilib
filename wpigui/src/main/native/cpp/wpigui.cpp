@@ -77,6 +77,7 @@ static bool EqualsIgnoreCase(const char* lhs, const char* rhs) {
   return *lhs == '\0' && *rhs == '\0';
 }
 
+#if defined(__linux__)
 static bool ContainsIgnoreCase(const std::string& value, const char* match) {
   const char* matchEnd = match + std::strlen(match);
   return std::search(value.begin(), value.end(), match, matchEnd,
@@ -85,6 +86,7 @@ static bool ContainsIgnoreCase(const std::string& value, const char* match) {
                               std::tolower(static_cast<unsigned char>(rhs));
                      }) != value.end();
 }
+#endif
 
 static bool IsEnvironmentFlagEnabled(const char* name) {
   const char* value = std::getenv(name);
