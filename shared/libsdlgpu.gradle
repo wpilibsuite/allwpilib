@@ -1,9 +1,5 @@
-ext.libsdlGpuPlatforms = [
-    nativeUtils.wpi.platforms.linuxx64,
+ext.libsdlGpuPlatforms = nativeUtils.wpi.platforms.desktopPlatforms + [
     nativeUtils.wpi.platforms.linuxarm64,
-    nativeUtils.wpi.platforms.windowsx64,
-    nativeUtils.wpi.platforms.windowsarm64,
-    nativeUtils.wpi.platforms.osxuniversal,
 ]
 
 nativeUtils {
