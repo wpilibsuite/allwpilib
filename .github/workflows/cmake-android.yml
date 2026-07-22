@@ -26,7 +26,7 @@ jobs:
     name: "Build - ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: nttld/setup-ndk@v1
         id: setup-ndk
         with:
@@ -34,7 +34,7 @@ jobs:
           add-to-path: false
 
       - name: Install sccache
-        uses: mozilla-actions/sccache-action@v0.0.9
+        uses: mozilla-actions/sccache-action@v0.0.10
 
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y ninja-build
