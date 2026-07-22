@@ -34,6 +34,7 @@ class HeaderToDatConfig:
         self,
         header_to_dat_args: BuildTarget,
         extension_name_transforms: List[Tuple[str, str]],
+        current_bazel_package: str,
     ):
         includes = []
         defines = []
@@ -84,9 +85,18 @@ class HeaderToDatConfig:
             # base_include_root = pathlib.Path(*args[3].relative_to(root_dir).parts[3:])
             base_include_file = args[2].relative_to(include_root)
             base_library = re.search("native/(.*?)/", include_root).groups(1)[0]
+            base_package = fixup_root_package_name(base_library)
+            native_headers_target = (
+                f"{fixup_native_lib_name('robotpy-native-' + base_library)}"
+                ".copy_headers"
+            )
+            if base_package == current_bazel_package:
+                native_headers_label = f":{native_headers_target}"
+            else:
+                native_headers_label = f"//{base_package}:{native_headers_target}"
 
-            self.include_file = f"$(execpath :{fixup_native_lib_name('robotpy-native-' + base_library)}.copy_headers)/{base_include_file}"
-            self.include_root = f"$(execpath :{fixup_native_lib_name('robotpy-native-' + base_library)}.copy_headers)"
+            self.include_file = f"$(execpath {native_headers_label})/{base_include_file}"
+            self.include_root = f"$(execpath {native_headers_label})"
         else:
             root_dir = pathlib.Path.cwd().absolute()
             self.include_file = pathlib.Path(args[2]).absolute().relative_to(root_dir)
@@ -182,6 +192,7 @@ class BazelExtensionModule:
         self,
         extension_module: ExtensionModule,
         additional_extension_targets: Dict[str, BuildTarget],
+        current_bazel_package: str,
     ):
         self.name = extension_module.name
         self.package_name = extension_module.package_name
@@ -189,7 +200,9 @@ class BazelExtensionModule:
 
         self.extension_name_transforms: List[Tuple[str, str]] = []
         self.generation_data = self._extract_header_generation(
-            extension_module.sources, self.extension_name_transforms
+            extension_module.sources,
+            self.extension_name_transforms,
+            current_bazel_package,
         )
         self.resolve_casters = ResolveCastersConfig(
             additional_extension_targets["resolve-casters"]
@@ -273,12 +286,17 @@ class BazelExtensionModule:
                 raise
 
     def _extract_header_generation(
-        self, sources, extension_name_transforms: List[Tuple[str, str]]
+        self,
+        sources,
+        extension_name_transforms: List[Tuple[str, str]],
+        current_bazel_package: str,
     ) -> Dict[str, HeaderToDatConfig]:
         generation_data: Dict[str, HeaderToDatConfig] = {}
 
         def get_h2d_config(target_info: BuildTarget) -> HeaderToDatConfig:
-            config = HeaderToDatConfig(target_info, extension_name_transforms)
+            config = HeaderToDatConfig(
+                target_info, extension_name_transforms, current_bazel_package
+            )
             if config.class_name not in generation_data:
                 generation_data[config.class_name] = config
             return generation_data[config.class_name]
@@ -314,6 +332,15 @@ def generate_pybind_build_file(
     yml_prefix: Union[str, None],
     output_file: pathlib.Path,
 ):
+    project_file_parts = (
+        project_file.resolve().relative_to(pathlib.Path.cwd().resolve()).parts
+        if project_file.is_absolute()
+        else project_file.parts
+    )
+    current_bazel_package = "/".join(
+        project_file_parts[: project_file_parts.index("src")]
+    )
+
     project_dir = project_file.parent
     plan = makeplan(project_dir)
 
@@ -332,7 +359,9 @@ def generate_pybind_build_file(
     for item in plan:
         if isinstance(item, ExtensionModule):
             extension_modules.append(
-                BazelExtensionModule(item, additional_extension_targets)
+                BazelExtensionModule(
+                    item, additional_extension_targets, current_bazel_package
+                )
             )
             additional_extension_targets = {}
         elif isinstance(item, BuildTarget):
