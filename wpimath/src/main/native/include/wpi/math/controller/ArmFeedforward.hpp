@@ -70,7 +70,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoint assuming discrete
+   * Calculates the feedforward from the gains and reference assuming discrete
    * control. Use this method when the velocity does not change.
    *
    * @param currentAngle The current angle. This angle should be measured from
@@ -88,7 +88,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming discrete
+   * Calculates the feedforward from the gains and references assuming discrete
    * control.
    *
    * @param currentAngle The current angle. This angle should be measured from

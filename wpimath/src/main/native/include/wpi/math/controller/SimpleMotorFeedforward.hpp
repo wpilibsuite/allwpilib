@@ -72,11 +72,11 @@ class SimpleMotorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and velocity setpoint assuming
-   * discrete control. Use this method when the velocity setpoint does not
+   * Calculates the feedforward from the gains and velocity reference assuming
+   * discrete control. Use this method when the velocity reference does not
    * change.
    *
-   * @param velocity The velocity setpoint.
+   * @param velocity The velocity reference.
    * @return The computed feedforward, in volts.
    */
   constexpr wpi::units::volt_t Calculate(
@@ -85,13 +85,13 @@ class SimpleMotorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming discrete
+   * Calculates the feedforward from the gains and references assuming discrete
    * control.
    *
    * <p>Note this method is inaccurate when the velocity crosses 0.
    *
-   * @param currentVelocity The current velocity setpoint.
-   * @param nextVelocity    The next velocity setpoint.
+   * @param currentVelocity The current velocity reference.
+   * @param nextVelocity    The next velocity reference.
    * @return The computed feedforward, in volts.
    */
   constexpr wpi::units::volt_t Calculate(

@@ -71,10 +71,10 @@ class ElevatorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoint assuming discrete
-   * control. Use this method when the setpoint does not change.
+   * Calculates the feedforward from the gains and reference assuming discrete
+   * control. Use this method when the reference does not change.
    *
-   * @param currentVelocity The velocity setpoint.
+   * @param currentVelocity The velocity reference.
    * @return The computed feedforward, in volts.
    */
   constexpr wpi::units::volt_t Calculate(
@@ -83,13 +83,13 @@ class ElevatorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming discrete
+   * Calculates the feedforward from the gains and references assuming discrete
    * control.
    *
    * <p>Note this method is inaccurate when the velocity crosses 0.
    *
-   * @param currentVelocity The current velocity setpoint.
-   * @param nextVelocity    The next velocity setpoint.
+   * @param currentVelocity The current velocity reference.
+   * @param nextVelocity    The next velocity reference.
    * @return The computed feedforward, in volts.
    */
   constexpr wpi::units::volt_t Calculate(
