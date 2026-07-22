@@ -23,13 +23,13 @@ void IterativeRobotBase::DriverStationConnected() {}
 
 void IterativeRobotBase::SimulationInit() {}
 
-void IterativeRobotBase::DisabledInit() {}
+void IterativeRobotBase::DisabledEnter() {}
 
-void IterativeRobotBase::AutonomousInit() {}
+void IterativeRobotBase::AutonomousEnter() {}
 
-void IterativeRobotBase::TeleopInit() {}
+void IterativeRobotBase::TeleopEnter() {}
 
-void IterativeRobotBase::UtilityInit() {}
+void IterativeRobotBase::UtilityEnter() {}
 
 void IterativeRobotBase::RobotPeriodic() {
   static bool firstRun = true;
@@ -120,17 +120,17 @@ void IterativeRobotBase::LoopFunc() {
 
     // Call current mode's entry function
     if (mode == RobotMode::UNKNOWN) {
-      DisabledInit();
-      m_watchdog.AddEpoch("DisabledInit()");
+      DisabledEnter();
+      m_watchdog.AddEpoch("DisabledEnter()");
     } else if (mode == RobotMode::AUTONOMOUS) {
-      AutonomousInit();
-      m_watchdog.AddEpoch("AutonomousInit()");
+      AutonomousEnter();
+      m_watchdog.AddEpoch("AutonomousEnter()");
     } else if (mode == RobotMode::TELEOPERATED) {
-      TeleopInit();
-      m_watchdog.AddEpoch("TeleopInit()");
+      TeleopEnter();
+      m_watchdog.AddEpoch("TeleopEnter()");
     } else if (mode == RobotMode::UTILITY) {
-      UtilityInit();
-      m_watchdog.AddEpoch("UtilityInit()");
+      UtilityEnter();
+      m_watchdog.AddEpoch("UtilityEnter()");
     }
 
     m_lastMode = static_cast<int>(mode);
