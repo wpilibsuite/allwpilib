@@ -1,6 +1,6 @@
 name: CMake
 
-on: [pull_request, push]
+on: [merge_group, pull_request, push]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
@@ -18,20 +18,20 @@ jobs:
         include:
           - os: ubuntu-24.04
             name: Linux
-            container: wpilib/systemcore-cross-ubuntu:2027-24.04
-            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
+            container: wpilib/systemcore-cross-debian:trixie
+            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON"
           - os: macOS-15
             name: macOS
             container: ""
-            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
+            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON"
           - os: ubuntu-24.04-arm
             name: Linux ARM
             container: wpilib/debian-base:arm64-trixie
-            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
-          - os: windows-2022
+            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON"
+          - os: windows-2025
             name: Windows
             container: ""
-            flags: '--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE="$Env:RUNNER_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release'
+            flags: '--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON -DWPILIB_USE_SYSTEM_LIBUV=ON -DWPILIB_USE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE="$Env:RUNNER_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release'
 
     name: "Build - ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
@@ -51,21 +51,23 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install opencv ninja
 
-      - uses: ilammy/msvc-dev-cmd@v1.13.0
+      - uses: TheMrMilchmann/setup-msvc-dev@v4
         if: runner.os == 'Windows'
+        with:
+          arch: x64
 
       - name: Install CMake (Windows only)
         if: runner.os == 'Windows'
-        uses: lukka/get-cmake@v3.29.3
+        uses: lukka/get-cmake@v4.4.0
 
       - name: Install sccache
         uses: mozilla-actions/sccache-action@v0.0.10
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Run vcpkg (Windows only)
         if: runner.os == 'Windows'
-        uses: lukka/run-vcpkg@v11.5
+        uses: lukka/run-vcpkg@v11.6
         with:
           vcpkgDirectory: ${{ runner.workspace }}/vcpkg
           vcpkgGitCommitId: 74e6536215718009aae747d86d84b78376bf9e09 # HEAD on 2025-10-17

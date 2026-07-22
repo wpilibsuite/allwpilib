@@ -1,4 +1,5 @@
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@buildifier_prebuilt//:rules.bzl", "buildifier")
 load("@rules_java//java:java_binary.bzl", "java_binary")
 load("@rules_java//java:java_plugin.bzl", "java_plugin")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
@@ -44,12 +45,19 @@ alias(
     name = "quickbuf_protoc",
     actual = select({
         "@platforms//os:windows": "@quickbuffer_protoc_windows//file",
-        "@rules_bzlmodrio_toolchains//conditions:osx_aarch64": "@quickbuffer_protoc_osx_aarch64//file",
-        "@rules_bzlmodrio_toolchains//conditions:osx_x86_64": "@quickbuffer_protoc_osx_x86-64//file",
-        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": "@quickbuffer_protoc_linux//file",
+        "@wpilib_toolchains//conditions:osx_aarch64": "@quickbuffer_protoc_osx_aarch64//file",
+        "@wpilib_toolchains//conditions:osx_x86_64": "@quickbuffer_protoc_osx_x86-64//file",
+        "@wpilib_toolchains//constraints/combined:is_linux": "@quickbuffer_protoc_linux//file",
     }),
     tags = ["pregeneration"],
     visibility = ["//visibility:public"],
+)
+
+buildifier(
+    name = "buildifier.fix",
+    lint_mode = "fix",
+    lint_warnings = ["all"],
+    mode = "fix",
 )
 
 java_binary(
@@ -62,7 +70,6 @@ java_binary(
 write_source_files(
     name = "write_pregenerated_files",
     additional_update_targets = [
-        "//hal:write_hal",
         "//ntcore:write_ntcore",
         "//wpilibc:write_wpilibc",
         "//wpilibcExamples:write_example_project_list",

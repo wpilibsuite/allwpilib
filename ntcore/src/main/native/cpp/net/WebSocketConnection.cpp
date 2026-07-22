@@ -5,6 +5,7 @@
 #include "WebSocketConnection.hpp"
 
 #include <algorithm>
+#include <bit>
 #include <span>
 
 #include "wpi/net/WebSocket.hpp"
@@ -26,7 +27,9 @@ static constexpr size_t kAllocSize = kMTU - 10;
 static constexpr size_t kNewFrameThresholdBytes = kAllocSize - 50;
 static constexpr size_t kFlushThresholdFrames = 32;
 static constexpr size_t kFlushThresholdBytes = 16384;
+#ifndef __SANITIZE_ADDRESS__
 static constexpr size_t kMaxPoolSize = 32;
+#endif
 
 class WebSocketConnection::Stream final : public wpi::util::raw_ostream {
  public:
@@ -124,8 +127,7 @@ void WebSocketConnection::SendPing(uint64_t time) {
   WPI_DEBUG4(m_logger, "conn: sending ping {}", time);
   auto buf = AllocBuf();
   buf.len = 8;
-  wpi::util::support::endian::write64<wpi::util::endianness::native>(buf.base,
-                                                                     time);
+  wpi::util::support::endian::write64<std::endian::native>(buf.base, time);
   m_ws.SendPing({buf}, [selfweak = weak_from_this()](auto bufs, auto err) {
     if (auto self = selfweak.lock()) {
       self->m_err = err;

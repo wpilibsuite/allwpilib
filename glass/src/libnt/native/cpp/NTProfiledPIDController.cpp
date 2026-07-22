@@ -4,9 +4,8 @@
 
 #include "wpi/glass/networktables/NTProfiledPIDController.hpp"
 
+#include <format>
 #include <utility>
-
-#include <fmt/format.h>
 
 #include "wpi/util/StringExtras.hpp"
 
@@ -20,26 +19,26 @@ NTProfiledPIDControllerModel::NTProfiledPIDControllerModel(
 NTProfiledPIDControllerModel::NTProfiledPIDControllerModel(
     wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
-      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
-      m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
+      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
+      m_controllable{inst.GetBooleanTopic(std::format("{}/.controllable", path))
                          .Subscribe(false)},
-      m_p{inst.GetDoubleTopic(fmt::format("{}/p", path)).GetEntry(0)},
-      m_i{inst.GetDoubleTopic(fmt::format("{}/i", path)).GetEntry(0)},
-      m_d{inst.GetDoubleTopic(fmt::format("{}/d", path)).GetEntry(0)},
-      m_iZone{inst.GetDoubleTopic(fmt::format("{}/izone", path)).GetEntry(0)},
+      m_p{inst.GetDoubleTopic(std::format("{}/p", path)).GetEntry(0)},
+      m_i{inst.GetDoubleTopic(std::format("{}/i", path)).GetEntry(0)},
+      m_d{inst.GetDoubleTopic(std::format("{}/d", path)).GetEntry(0)},
+      m_iZone{inst.GetDoubleTopic(std::format("{}/izone", path)).GetEntry(0)},
       m_maxVelocity{
-          inst.GetDoubleTopic(fmt::format("{}/maxVelocity", path)).GetEntry(0)},
+          inst.GetDoubleTopic(std::format("{}/maxVelocity", path)).GetEntry(0)},
       m_maxAcceleration{
-          inst.GetDoubleTopic(fmt::format("{}/maxAcceleration", path))
+          inst.GetDoubleTopic(std::format("{}/maxAcceleration", path))
               .GetEntry(0)},
-      m_goal{inst.GetDoubleTopic(fmt::format("{}/goal", path)).GetEntry(0)},
-      m_pData{fmt::format("NTPIDCtrlP:{}", path)},
-      m_iData{fmt::format("NTPIDCtrlI:{}", path)},
-      m_dData{fmt::format("NTPIDCtrlD:{}", path)},
-      m_iZoneData{fmt::format("NTPIDCtrlIZone:{}", path)},
-      m_maxVelocityData{fmt::format("NTPIDCtrlMaxVelo:{}", path)},
-      m_maxAccelerationData{fmt::format("NTPIDCtrlMaxAccel:{}", path)},
-      m_goalData{fmt::format("NTPIDCtrlGoal:{}", path)},
+      m_goal{inst.GetDoubleTopic(std::format("{}/goal", path)).GetEntry(0)},
+      m_pData{std::format("NTPIDCtrlP:{}", path)},
+      m_iData{std::format("NTPIDCtrlI:{}", path)},
+      m_dData{std::format("NTPIDCtrlD:{}", path)},
+      m_iZoneData{std::format("NTPIDCtrlIZone:{}", path)},
+      m_maxVelocityData{std::format("NTPIDCtrlMaxVelo:{}", path)},
+      m_maxAccelerationData{std::format("NTPIDCtrlMaxAccel:{}", path)},
+      m_goalData{std::format("NTPIDCtrlGoal:{}", path)},
       m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
 void NTProfiledPIDControllerModel::SetP(double value) {

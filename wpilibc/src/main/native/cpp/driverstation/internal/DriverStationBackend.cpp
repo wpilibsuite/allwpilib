@@ -8,6 +8,7 @@
 
 #include <array>
 #include <atomic>
+#include <format>
 #include <functional>
 #include <memory>
 #include <span>
@@ -15,9 +16,8 @@
 #include <string_view>
 #include <vector>
 
-#include <fmt/format.h>
-
 #include "wpi/datalog/DataLog.hpp"
+#include "wpi/driverstation/GenericHID.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HAL.h"
@@ -45,6 +45,10 @@ using namespace wpi::internal;
 
 static constexpr int availableToCount(uint64_t available) {
   return 64 - std::countl_zero(available);
+}
+
+GenericHID DriverStationBackend::ConstructGenericHID(int port) {
+  return GenericHID{port};
 }
 
 namespace {
@@ -75,7 +79,7 @@ class MatchDataSenderEntry {
   typename Topic::ValueType prevVal;
 };
 
-static constexpr std::string_view kSmartDashboardType = "FMSInfo";
+static constexpr std::string_view kSmartDashboardType = "DriverStation";
 
 struct MatchDataSender {
   MatchDataSender()
@@ -87,7 +91,7 @@ struct MatchDataSender {
   }
 
   std::shared_ptr<wpi::nt::NetworkTable> table =
-      wpi::nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo");
+      wpi::nt::NetworkTableInstance::GetDefault().GetTable("DriverStation");
   MatchDataSenderEntry<wpi::nt::StringTopic> typeMetaData{
       table, ".type", kSmartDashboardType,
       wpi::util::json::object("SmartDashboard", kSmartDashboardType)};
@@ -102,6 +106,8 @@ struct MatchDataSender {
                                                        true};
   MatchDataSenderEntry<wpi::nt::IntegerTopic> station{table, "StationNumber",
                                                       1};
+  MatchDataSenderEntry<wpi::nt::IntegerTopic> allianceStation{
+      table, "AllianceStationID", 0};
   wpi::nt::StructPublisher<wpi::hal::ControlWord> controlWord;
   wpi::nt::StringPublisher opMode;
   wpi::hal::ControlWord prevControlWord;
@@ -177,7 +183,7 @@ struct Instance {
     if (it != opModes.end()) {
       return std::string{wpi::util::to_string_view(&it->second.name)};
     }
-    return fmt::format("<{}>", id);
+    return std::format("<{}>", id);
   }
 };
 }  // namespace
@@ -194,7 +200,7 @@ static void SendMatchData();
 template <typename S, typename... Args>
 static inline void ReportJoystickError(int stick, const S& format,
                                        Args&&... args) {
-  ReportJoystickErrorV(stick, format, fmt::make_format_args(args...));
+  ReportJoystickErrorV(stick, format, std::make_format_args(args...));
 }
 
 /**
@@ -202,13 +208,13 @@ static inline void ReportJoystickError(int stick, const S& format,
  *
  * Throttles the errors so that they don't overwhelm the DS.
  */
-static void ReportJoystickWarningV(int stick, fmt::string_view format,
-                                   fmt::format_args args);
+static void ReportJoystickWarningV(int stick, std::string_view format,
+                                   std::format_args args);
 
 template <typename S, typename... Args>
 static inline void ReportJoystickWarning(int stick, const S& format,
                                          Args&&... args) {
-  ReportJoystickWarningV(stick, format, fmt::make_format_args(args...));
+  ReportJoystickWarningV(stick, format, std::make_format_args(args...));
 }
 
 Instance::Instance() {
@@ -880,8 +886,8 @@ void DriverStationBackend::StartDataLog(wpi::log::DataLog& log,
   }
 }
 
-void ReportJoystickWarningV(int stick, fmt::string_view format,
-                            fmt::format_args args) {
+void ReportJoystickWarningV(int stick, std::string_view format,
+                            std::format_args args) {
   auto& inst = GetInstance();
   if (DriverStationBackend::IsFMSAttached() || !inst.silenceJoystickWarning) {
     auto currentTime = Timer::GetTimestamp();
@@ -926,9 +932,13 @@ void SendMatchData() {
       isRedAlliance = true;
       stationNumber = 2;
       break;
-    default:
+    case HAL_ALLIANCE_STATION_RED_3:
       isRedAlliance = true;
       stationNumber = 3;
+      break;
+    default:
+      isRedAlliance = true;
+      stationNumber = 0;
       break;
   }
 
@@ -939,14 +949,15 @@ void SendMatchData() {
   HAL_GetGameData(&tmpGameData);
 
   auto& inst = GetInstance();
-  inst.matchDataSender.alliance.Set(isRedAlliance);
-  inst.matchDataSender.station.Set(stationNumber);
   inst.matchDataSender.eventName.Set(tmpDataStore.eventName);
   inst.matchDataSender.gameData.Set(
       std::string(reinterpret_cast<char*>(tmpGameData.gameData)));
   inst.matchDataSender.matchNumber.Set(tmpDataStore.matchNumber);
   inst.matchDataSender.replayNumber.Set(tmpDataStore.replayNumber);
   inst.matchDataSender.matchType.Set(static_cast<int>(tmpDataStore.matchType));
+  inst.matchDataSender.alliance.Set(isRedAlliance);
+  inst.matchDataSender.station.Set(stationNumber);
+  inst.matchDataSender.allianceStation.Set(alliance);
 
   hal::ControlWord ctlWord = hal::GetControlWord();
   if (ctlWord != inst.matchDataSender.prevControlWord) {
@@ -965,11 +976,11 @@ void JoystickLogSender::Init(wpi::log::DataLog& log, unsigned int stick,
   m_stick = stick;
 
   m_logButtons = wpi::log::BooleanArrayLogEntry{
-      log, fmt::format("DS:joystick{}/buttons", stick), timestamp};
+      log, std::format("DS:joystick{}/buttons", stick), timestamp};
   m_logAxes = wpi::log::FloatArrayLogEntry{
-      log, fmt::format("DS:joystick{}/axes", stick), timestamp};
+      log, std::format("DS:joystick{}/axes", stick), timestamp};
   m_logPOVs = wpi::log::IntegerArrayLogEntry{
-      log, fmt::format("DS:joystick{}/povs", stick), timestamp};
+      log, std::format("DS:joystick{}/povs", stick), timestamp};
 
   HAL_GetJoystickButtons(m_stick, &m_prevButtons);
   HAL_GetJoystickAxes(m_stick, &m_prevAxes);

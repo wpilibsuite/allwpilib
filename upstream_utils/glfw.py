@@ -32,7 +32,7 @@ def copy_upstream_src(wpilib_root: Path):
 
         return False
 
-    src_files = walk_cwd_and_copy_if(
+    walk_cwd_and_copy_if(
         src_filter,
         glfw,
     )

@@ -8,10 +8,8 @@
 
 #include "CommandTestBase.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
-#include "wpi/commands2/RunCommand.hpp"
 #include "wpi/commands2/WaitUntilCommand.hpp"
 #include "wpi/driverstation/Joystick.hpp"
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/simulation/JoystickSim.hpp"
 
 using namespace wpi::cmd;

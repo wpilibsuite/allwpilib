@@ -18,18 +18,18 @@ class MyRobot(wpilib.TimedRobot):
         """Robot initialization function"""
         super().__init__()
 
-        leftMotor = wpilib.PWMSparkMax(0)
-        rightMotor = wpilib.PWMSparkMax(1)
-        self.robotDrive = wpilib.DifferentialDrive(leftMotor, rightMotor)
+        left_motor = wpilib.PWMSparkMax(0)
+        right_motor = wpilib.PWMSparkMax(1)
+        self.robot_drive = wpilib.DifferentialDrive(left_motor, right_motor)
         self.stick = wpilib.Joystick(0)
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's
         # gearbox is constructed, you might have to invert the left side instead.
-        rightMotor.setInverted(True)
+        right_motor.set_inverted(True)
 
-    def teleopPeriodic(self):
+    def teleop_periodic(self):
         # Drive with arcade drive.
         # That means that the Y axis drives forward
         # and backward, and the X turns left and right.
-        self.robotDrive.arcadeDrive(-self.stick.getY(), -self.stick.getX())
+        self.robot_drive.arcade_drive(-self.stick.get_y(), -self.stick.get_x())

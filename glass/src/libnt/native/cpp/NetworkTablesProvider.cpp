@@ -5,10 +5,9 @@
 #include "wpi/glass/networktables/NetworkTablesProvider.hpp"
 
 #include <algorithm>
+#include <format>
 #include <memory>
 #include <utility>
-
-#include <fmt/format.h>
 
 #include "wpi/glass/Storage.hpp"
 #include "wpi/gui/wpigui.hpp"
@@ -45,7 +44,7 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
       }
 
       auto entry = GetOrCreateView(
-          builderIt->second, m_inst.GetTopic(fmt::format("{}/.type", id)), id);
+          builderIt->second, m_inst.GetTopic(std::format("{}/.type", id)), id);
       if (entry) {
         Show(entry, nullptr);
       }
@@ -204,7 +203,7 @@ void NetworkTablesProvider::Show(ViewEntry* entry, Window* window) {
     return;
   }
   if (auto name = wpi::util::remove_prefix(entry->name, "/SmartDashboard/")) {
-    window->SetDefaultName(fmt::format("{} (SmartDashboard)", *name));
+    window->SetDefaultName(std::format("{} (SmartDashboard)", *name));
   }
   entry->window = window;
 

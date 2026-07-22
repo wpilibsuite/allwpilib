@@ -40,23 +40,23 @@ The following build options are available:
 
 * `BUILD_SHARED_LIBS` (ON Default)
   * This option will cause CMake to build static libraries instead of shared libraries.
-* `WITH_CSCORE` (ON Default)
+* `WPILIB_WITH_CSCORE` (ON Default)
   * This option will cause cscore to be built. Turning this off will implicitly disable cameraserver. If this is off, the OpenCV build requirement is removed.
-* `WITH_EXAMPLES` (OFF Default)
+* `WPILIB_WITH_EXAMPLES` (OFF Default)
   * This option will build C++ examples.
-* `WITH_GUI` (ON Default)
-  * This option will build GUI items. If this is off, and `WITH_SIMULATION_MODULES` is on, the simulation GUI will not be built.
-* `WITH_NTCORE` (ON Default)
-  * This option will cause ntcore to be built. Turning this off will implicitly disable wpinet, and will cause an error if `WITH_WPILIB` is enabled.
-* `WITH_SIMULATION_MODULES` (ON Default)
+* `WPILIB_WITH_GUI` (ON Default)
+  * This option will build GUI items. If this is off, and `WPILIB_WITH_SIMULATION_MODULES` is on, the simulation GUI will not be built.
+* `WPILIB_WITH_NTCORE` (ON Default)
+  * This option will cause ntcore to be built. Turning this off will implicitly disable wpinet, and will cause an error if `WPILIB_WITH_WPILIB` is enabled.
+* `WPILIB_WITH_SIMULATION_MODULES` (ON Default)
   * This option will build simulation modules.
-* `WITH_TESTS` (ON Default)
+* `WPILIB_WITH_TESTS` (ON Default)
   * This option will build C++ unit tests. These can be run via `ctest -C <config>`, where `<config>` is the build configuration, e.g. `Debug` or `Release`.
-* `WITH_WPILIB` (ON Default)
+* `WPILIB_WITH_WPILIB` (ON Default)
   * This option will build the HAL and wpilibc during the build. The HAL is the simulation HAL, unless the external HAL options are used. The CMake build has no capability to build for Systemcore.
-* `WITH_WPIMATH` (ON Default)
+* `WPILIB_WITH_WPIMATH` (ON Default)
   * This option will build the wpimath library. This option must be on to build wpilib.
-* `NO_WERROR` (OFF Default)
+* `WPILIB_NO_WERROR` (OFF Default)
   * This option will disable the `-Werror` compilation flag for non-MSVC builds.
 * `WPILIB_TARGET_WARNINGS`
   * Add compiler flags to this option to customize compiler options like warnings.

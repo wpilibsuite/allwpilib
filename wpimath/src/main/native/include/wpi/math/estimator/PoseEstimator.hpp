@@ -4,9 +4,12 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <map>
 #include <optional>
+#include <utility>
 #include <vector>
 
 #include <Eigen/Core>
@@ -16,9 +19,10 @@
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
-#include "wpi/math/kinematics/Kinematics.hpp"
 #include "wpi/math/kinematics/Odometry.hpp"
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
@@ -38,12 +42,13 @@ namespace wpi::math {
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave like regular encoder odometry.
  *
+ * @tparam Kinematics Kinematics type.
  * @tparam WheelPositions Wheel positions type.
  * @tparam WheelVelocities Wheel velocities type.
  * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename WheelPositions, typename WheelVelocities,
-          typename WheelAccelerations>
+template <typename Kinematics, typename WheelPositions,
+          typename WheelVelocities, typename WheelAccelerations>
 class WPILIB_DLLEXPORT PoseEstimator {
  public:
   /**
@@ -63,12 +68,11 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  PoseEstimator(
-      Kinematics<WheelPositions, WheelVelocities, WheelAccelerations>&
-          kinematics,
-      Odometry<WheelPositions, WheelVelocities, WheelAccelerations>& odometry,
-      const wpi::util::array<double, 3>& stateStdDevs,
-      const wpi::util::array<double, 3>& visionMeasurementStdDevs)
+  PoseEstimator(const Kinematics& kinematics,
+                Odometry<Kinematics, WheelPositions, WheelVelocities,
+                         WheelAccelerations>& odometry,
+                const wpi::util::array<double, 3>& stateStdDevs,
+                const wpi::util::array<double, 3>& visionMeasurementStdDevs)
       : m_odometry(odometry) {
     for (size_t i = 0; i < 3; ++i) {
       m_q[i] = stateStdDevs[i] * stateStdDevs[i];
@@ -477,7 +481,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
 
   static constexpr wpi::units::second_t kBufferDuration = 1.5_s;
 
-  Odometry<WheelPositions, WheelVelocities, WheelAccelerations>& m_odometry;
+  Odometry<Kinematics, WheelPositions, WheelVelocities, WheelAccelerations>&
+      m_odometry;
 
   // Diagonal of process noise covariance matrix Q
   wpi::util::array<double, 3> m_q{wpi::util::empty_array};

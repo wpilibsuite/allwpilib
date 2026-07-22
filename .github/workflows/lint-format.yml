@@ -1,6 +1,7 @@
 name: Lint and Format
 
 on:
+  merge_group:
   pull_request:
   push:
     branches-ignore:
@@ -15,14 +16,14 @@ jobs:
     name: "Validation"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: gradle/actions/wrapper-validation@v5
+      - uses: actions/checkout@v7
+      - uses: gradle/actions/wrapper-validation@v6
 
   wpiformat:
     name: "wpiformat"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Fetch all history and metadata
@@ -30,13 +31,13 @@ jobs:
           git checkout -b pr
           git branch -f main origin/main
       - name: Set up Python 3.12
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - name: Install wpiformat
         run: |
           python -m venv ${{ runner.temp }}/wpiformat
-          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2026.57
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2026.64
       - name: Run
         run: ${{ runner.temp }}/wpiformat/bin/wpiformat
       - name: Check output
@@ -61,9 +62,9 @@ jobs:
     name: "clang-tidy"
     runs-on: ubuntu-24.04
     needs: [validation]
-    container: wpilib/ubuntu-base:24.04
+    container: wpilib/debian-base:trixie
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Fetch all history and metadata
@@ -72,16 +73,16 @@ jobs:
           git checkout -b pr
           git branch -f main origin/main
       - name: Set up Python 3.12
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - name: Install wpiformat
         run: |
           python -m venv ${{ runner.temp }}/wpiformat
-          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2026.57
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2026.64
       - name: Create compile_commands.json
         run: |
-          ./gradlew generateCompileCommands -Ptoolchain-optional-roboRio
+          ./gradlew generateCompileCommands -Ptoolchain-optional-Systemcore
           ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64release/compile_commands.json
           ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64debug/compile_commands.json
       - name: List changed files
@@ -94,9 +95,9 @@ jobs:
     name: "Java format"
     runs-on: ubuntu-24.04
     needs: [validation]
-    container: wpilib/systemcore-cross-ubuntu:2027-24.04
+    container: wpilib/debian-base:trixie
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Fetch all history and metadata
@@ -127,7 +128,7 @@ jobs:
   check-spelling:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: misspell
         uses: reviewdog/action-misspell@v1
         with:

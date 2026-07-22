@@ -7,11 +7,10 @@
 #include <algorithm>
 #include <cstring>
 #include <exception>
+#include <format>
 #include <span>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "mrclib/ApiVersion.h"
 #include "mrclib/Console.h"
@@ -19,10 +18,12 @@
 #include "mrclib/DsComms.hpp"
 #include "mrclib/DsCommsControl.h"
 #include "mrclib/MrcString.hpp"
+#include "mrclib/Systemcore.h"
 #include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/util/EventVector.hpp"
 #include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
 
 using namespace wpi::hal;
 
@@ -242,6 +243,8 @@ class MrcLibDsImpl : public MrcLibDs {
 
   int32_t getSystemTimeValid(bool* systemTimeValid) override;
 
+  int32_t writeDisplayAnsi(const struct WPI_String* line) override;
+
   wpi::util::EventVector newDataEvents;
 
  private:
@@ -306,22 +309,43 @@ MrcLibDsImpl::MrcLibDsImpl() {
   }
 
   if (!MRC_CHECK_API_VERSION()) {
-    fmt::print(
+    wpi::util::print(
         stderr,
         "Error: MRC API version mismatch. Restarting app and retrying...");
 
     std::terminate();
   }
 
+  // Initialize control first, making sure its properly checked for errors
+  MRC_Status controlInitStatus = MRC_DsCommsControl_Initialize();
+  if (controlInitStatus == MRC_STATUS_MULTIPLE_USER_PROGRAMS) {
+    wpi::util::print(
+        stderr,
+        "Warning: Multiple user programs detected. Restarting app and "
+        "retrying...\n");
+    std::terminate();
+  }
+  if (controlInitStatus != MRC_STATUS_SUCCESS) {
+    wpi::util::print(
+        stderr,
+        "Error: MRC_DsCommsControl_Initialize failed with status {}. "
+        "Restarting app and retrying...\n",
+        controlInitStatus);
+    std::terminate();
+  }
   MRC_DsComms_Initialize();
-  MRC_DsCommsControl_Initialize();
+
   MRC_Console_Initialize();
+
+  // Used in Power.cpp to get battery voltage
+  MRC_Systemcore_Initialize();
 
   // Wait for 10 seconds for the system server to be ready.
   if (!MRC_DsComms_WaitForSystemServer(10000)) {
-    fmt::print(stderr,
-               "Error: Waiting for server ready failed. Restarting app and "
-               "retrying...");
+    wpi::util::print(
+        stderr,
+        "Error: Waiting for server ready failed. Restarting app and "
+        "retrying...");
 
     std::terminate();
   }
@@ -659,6 +683,11 @@ int32_t MrcLibDsImpl::getSystemTimeValid(bool* systemTimeValid) {
     *systemTimeValid = false;
   }
   return status;
+}
+
+int32_t MrcLibDsImpl::writeDisplayAnsi(const struct WPI_String* line) {
+  MRC_String mrcLine = WPIStringToMRCString(line);
+  return MRC_DsCommsControl_WriteAnsi(&mrcLine);
 }
 
 void MrcLibDsImpl::provideNewDataEventHandle(WPI_EventHandle handle) {

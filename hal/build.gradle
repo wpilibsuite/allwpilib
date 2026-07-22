@@ -2,7 +2,7 @@ ext {
     nativeName = 'hal'
     setBaseName = 'wpiHal'
     devMain = 'org.wpilib.hardware.hal.DevMain'
-    generatedHeaders = "src/generated/main/native/include"
+    nativeTestSuiteName = "${nativeName}Catch2Test"
     splitSetup = {
         if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
             it.sources {
@@ -13,9 +13,6 @@ ext {
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
-                        srcDir generatedHeaders
-                        srcDir 'src/mrc/include'
-                        srcDir 'src/generated/main/native/cpp/mrc/protobuf'
                     }
                 }
             }
@@ -28,20 +25,7 @@ ext {
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
-                        srcDir generatedHeaders
-                        srcDir 'src/mrc/include'
                     }
-                }
-            }
-        }
-        it.sources {
-            nanopbCpp(CppSourceSet) {
-                source {
-                    srcDirs 'src/generated/main/native/cpp'
-                    include '**/*.cpp'
-                }
-                exportedHeaders {
-                    srcDirs 'src/generated/main/native/cpp'
                 }
             }
         }
@@ -66,28 +50,13 @@ ext {
     }
 }
 
-sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
-
 cppSourcesZip {
-    from('src/main/native/athena') {
-        into '/athena'
-    }
-
     from('src/main/native/systemcore') {
         into '/systemcore'
     }
 
     from('src/main/native/sim') {
         into '/sim'
-    }
-}
-
-cppHeadersZip {
-    from(generatedHeaders) {
-        into '/'
-    }
-    from('src/mrc/include') {
-        into '/'
     }
 }
 
@@ -104,16 +73,6 @@ nativeUtils.exportsConfigs {
 }
 
 model {
-    components {
-        all {
-            it.sources.each {
-                it.exportedHeaders {
-                    srcDirs 'src/mrc/include',
-                            'src/generated/main/native/cpp/mrc/protobuf'
-                }
-            }
-        }
-    }
     binaries {
         all {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {

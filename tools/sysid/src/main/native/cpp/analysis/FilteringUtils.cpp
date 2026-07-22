@@ -5,6 +5,7 @@
 #include "wpi/sysid/analysis/FilteringUtils.hpp"
 
 #include <algorithm>
+#include <format>
 #include <functional>
 #include <limits>
 #include <numbers>
@@ -13,11 +14,8 @@
 #include <tuple>
 #include <vector>
 
-#include <fmt/format.h>
-
 #include "wpi/math/filter/LinearFilter.hpp"
 #include "wpi/math/filter/MedianFilter.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/StringExtras.hpp"
 
@@ -36,7 +34,7 @@ static void CheckSize(const std::vector<PreparedData>& data, size_t window,
                       std::string_view operation) {
   if (data.size() < window) {
     throw sysid::InvalidDataError(
-        fmt::format("Not enough data to run {} which has a window size of {}.",
+        std::format("Not enough data to run {} which has a window size of {}.",
                     operation, window));
   }
 }
@@ -311,7 +309,7 @@ static std::string RemoveStr(std::string_view str, std::string_view removeStr) {
   if (idx == std::string_view::npos) {
     return std::string{str};
   } else {
-    return fmt::format("{}{}", str.substr(0, idx),
+    return std::format("{}{}", str.substr(0, idx),
                        str.substr(idx + removeStr.size()));
   }
 }

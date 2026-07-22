@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.VecBuilder;
@@ -20,8 +21,9 @@ import org.wpilib.math.numbers.N5;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.Models;
 import org.wpilib.math.system.NumericalIntegration;
+import org.wpilib.math.trajectory.DifferentialSample;
+import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.TrajectoryConfig;
-import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.math.util.Nat;
 
@@ -69,6 +71,8 @@ class LTVDifferentialDriveControllerTest {
 
   @Test
   void testReachesReference() {
+    final var kinematics = new DifferentialDriveKinematics(kTrackwidth);
+
     final double kDt = 0.02;
 
     final var controller =
@@ -84,7 +88,7 @@ class LTVDifferentialDriveControllerTest {
     waypoints.add(new Pose2d(2.75, 22.521, Rotation2d.kZero));
     waypoints.add(new Pose2d(24.73, 19.68, new Rotation2d(5.846)));
     var config = new TrajectoryConfig(8.8, 0.1);
-    final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
+    final var trajectory = DrivetrainSplineTrajectoryGenerator.generate(waypoints, config);
 
     var x =
         MatBuilder.fill(
@@ -96,15 +100,18 @@ class LTVDifferentialDriveControllerTest {
             0.0,
             0.0);
 
-    final var totalTime = trajectory.getTotalTime();
-    for (int i = 0; i < (totalTime / kDt); ++i) {
-      var state = trajectory.sample(kDt * i);
+    final var duration = trajectory.duration;
+    for (int i = 0; i < (duration / kDt); ++i) {
+      var state = trajectory.sampleAt(kDt * i);
       robotPose =
           new Pose2d(
               x.get(State.kX, 0), x.get(State.kY, 0), new Rotation2d(x.get(State.kHeading, 0)));
       final var output =
           controller.calculate(
-              robotPose, x.get(State.kLeftVelocity, 0), x.get(State.kRightVelocity, 0), state);
+              robotPose,
+              x.get(State.kLeftVelocity, 0),
+              x.get(State.kRightVelocity, 0),
+              new DifferentialSample(state, kinematics));
 
       x =
           NumericalIntegration.rkdp(
@@ -114,8 +121,8 @@ class LTVDifferentialDriveControllerTest {
               kDt);
     }
 
-    final var states = trajectory.getStates();
-    final var endPose = states.get(states.size() - 1).pose;
+    final var states = trajectory.getSamples();
+    final var endPose = states.getLast().pose;
 
     // Java lambdas require local variables referenced from a lambda expression
     // must be final or effectively final.

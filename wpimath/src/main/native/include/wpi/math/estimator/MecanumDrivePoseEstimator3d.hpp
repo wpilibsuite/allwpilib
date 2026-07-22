@@ -9,6 +9,9 @@
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
 #include "wpi/math/kinematics/MecanumDriveOdometry3d.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelVelocities.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
@@ -32,7 +35,7 @@ namespace wpi::math {
  * odometry.
  */
 class WPILIB_DLLEXPORT MecanumDrivePoseEstimator3d
-    : public PoseEstimator3d<MecanumDriveWheelPositions,
+    : public PoseEstimator3d<MecanumDriveKinematics, MecanumDriveWheelPositions,
                              MecanumDriveWheelVelocities,
                              MecanumDriveWheelAccelerations> {
  public:

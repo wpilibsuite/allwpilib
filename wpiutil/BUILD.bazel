@@ -1,5 +1,5 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
@@ -22,8 +22,6 @@ filegroup(
         "src/main/native/thirdparty/argparse/include/**/*",
         "src/main/native/thirdparty/debugging/include/**/*",
         "src/main/native/thirdparty/double-conversion/include/**/*",
-        "src/main/native/thirdparty/expected/include/**/*",
-        "src/main/native/thirdparty/fmtlib/include/**/*",
         "src/main/native/thirdparty/json/include/**/*",
         "src/main/native/thirdparty/llvm/include/**/*",
         "src/main/native/thirdparty/mpack/include/**/*",
@@ -41,8 +39,7 @@ py_binary(
     data = ["src/main/native/thirdparty/nanopb/generator/proto/nanopb.proto"],
     imports = ["src/main/native/thirdparty/nanopb/generator"],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
@@ -59,8 +56,7 @@ py_binary(
         ":nanopb_generator",
     ],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
 )
@@ -104,19 +100,6 @@ third_party_cc_lib_helper(
     name = "double-conversion",
     include_root = "src/main/native/thirdparty/double-conversion/include",
     src_root = "src/main/native/thirdparty/double-conversion/src",
-    visibility = ["//visibility:public"],
-)
-
-third_party_cc_lib_helper(
-    name = "expected",
-    include_root = "src/main/native/thirdparty/expected/include",
-    visibility = ["//visibility:public"],
-)
-
-third_party_cc_lib_helper(
-    name = "fmtlib",
-    include_root = "src/main/native/thirdparty/fmtlib/include",
-    src_root = "src/main/native/thirdparty/fmtlib/src",
     visibility = ["//visibility:public"],
 )
 
@@ -172,7 +155,7 @@ filegroup(
     name = "native-srcs",
     srcs = select({
         "@platforms//os:windows": glob(["src/main/native/windows/*.cpp"]),
-        "@rules_bzlmodrio_toolchains//constraints/combined:is_unix": glob(["src/main/native/unix/*.cpp"]),
+        "@wpilib_toolchains//constraints/combined:is_unix": glob(["src/main/native/unix/*.cpp"]),
     }),
 )
 
@@ -191,13 +174,11 @@ wpilib_cc_library(
     strip_include_prefix = "src/main/native/include",
     third_party_header_only_libraries = [
         ":argparse",
-        ":expected",
         ":sigslot",
     ],
     third_party_libraries = [
         ":debugging",
         ":double-conversion",
-        ":fmtlib",
         ":json",
         ":llvm",
         ":mpack",
@@ -206,7 +187,6 @@ wpilib_cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@bzlmodrio-ni//libraries/cpp/ni:shared"],
         "//conditions:default": [],
     }),
 )
@@ -232,11 +212,9 @@ cc_library(
     hdrs = glob([
         "src/main/native/include/**",
         "src/main/native/thirdparty/llvm/include/**",
-        "src/main/native/thirdparty/fmtlib/include/**",
     ]),
     includes = [
         "src/main/native/include",
-        "src/main/native/thirdparty/fmtlib/include",
         "src/main/native/thirdparty/llvm/include",
     ],
 )
@@ -278,7 +256,7 @@ wpilib_jni_java_library(
     srcs = glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "wpiutil-java",
     maven_group_id = "org.wpilib.wpiutil",
-    native_libs = [":wpiutiljni"],
+    native_libs = [":shared/wpiutiljni"],
     visibility = ["//visibility:public"],
     deps = [
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
@@ -369,8 +347,6 @@ generate_robotpy_native_wrapper_build_info(
         "argparse",
         "debugging",
         "double-conversion",
-        "expected",
-        "fmtlib",
         "json",
         "llvm",
         "mpack",

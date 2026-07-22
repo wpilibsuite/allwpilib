@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <format>
 #include <string>
 #include <thread>
 
@@ -52,7 +53,8 @@ class I2CCommunicationTest : public testing::TestWithParam<T> {
   }
 };
 
-class AllianceTest : public I2CCommunicationTest<HAL_AllianceStationID> {};
+class AllianceTest : public I2CCommunicationTest<wpi::hal::AllianceStationID> {
+};
 
 TEST_P(AllianceTest, Alliance) {
   auto alliance = GetParam();
@@ -65,17 +67,17 @@ TEST_P(AllianceTest, Alliance) {
 
   char expected = 'U';
   switch (alliance) {
-    case HAL_ALLIANCE_STATION_BLUE_1:
-    case HAL_ALLIANCE_STATION_BLUE_2:
-    case HAL_ALLIANCE_STATION_BLUE_3:
+    case wpi::hal::AllianceStationID::BLUE_1:
+    case wpi::hal::AllianceStationID::BLUE_2:
+    case wpi::hal::AllianceStationID::BLUE_3:
       expected = 'B';
       break;
-    case HAL_ALLIANCE_STATION_RED_1:
-    case HAL_ALLIANCE_STATION_RED_2:
-    case HAL_ALLIANCE_STATION_RED_3:
+    case wpi::hal::AllianceStationID::RED_1:
+    case wpi::hal::AllianceStationID::RED_2:
+    case wpi::hal::AllianceStationID::RED_3:
       expected = 'R';
       break;
-    case HAL_ALLIANCE_STATION_UNKNOWN:
+    case wpi::hal::AllianceStationID::UNKNOWN:
       expected = 'U';
       break;
   }
@@ -84,26 +86,27 @@ TEST_P(AllianceTest, Alliance) {
 
 INSTANTIATE_TEST_SUITE_P(
     I2CCommunicationTests, AllianceTest,
-    testing::Values<HAL_AllianceStationID>(
-        HAL_ALLIANCE_STATION_RED_1, HAL_ALLIANCE_STATION_RED_2,
-        HAL_ALLIANCE_STATION_RED_3, HAL_ALLIANCE_STATION_BLUE_1,
-        HAL_ALLIANCE_STATION_BLUE_2, HAL_ALLIANCE_STATION_BLUE_3,
-        HAL_ALLIANCE_STATION_UNKNOWN),
+    testing::Values<wpi::hal::AllianceStationID>(
+        wpi::hal::AllianceStationID::RED_1, wpi::hal::AllianceStationID::RED_2,
+        wpi::hal::AllianceStationID::RED_3, wpi::hal::AllianceStationID::BLUE_1,
+        wpi::hal::AllianceStationID::BLUE_2,
+        wpi::hal::AllianceStationID::BLUE_3,
+        wpi::hal::AllianceStationID::UNKNOWN),
     [](const testing::TestParamInfo<AllianceTest::ParamType>& info) {
       switch (info.param) {
-        case HAL_ALLIANCE_STATION_BLUE_1:
+        case wpi::hal::AllianceStationID::BLUE_1:
           return std::string{"Blue1"};
-        case HAL_ALLIANCE_STATION_BLUE_2:
+        case wpi::hal::AllianceStationID::BLUE_2:
           return std::string{"Blue2"};
-        case HAL_ALLIANCE_STATION_BLUE_3:
+        case wpi::hal::AllianceStationID::BLUE_3:
           return std::string{"Blue3"};
-        case HAL_ALLIANCE_STATION_RED_1:
+        case wpi::hal::AllianceStationID::RED_1:
           return std::string{"Red1"};
-        case HAL_ALLIANCE_STATION_RED_2:
+        case wpi::hal::AllianceStationID::RED_2:
           return std::string{"Red2"};
-        case HAL_ALLIANCE_STATION_RED_3:
+        case wpi::hal::AllianceStationID::RED_3:
           return std::string{"Red3"};
-        case HAL_ALLIANCE_STATION_UNKNOWN:
+        case wpi::hal::AllianceStationID::UNKNOWN:
           return std::string{"Unknown"};
       }
       return std::string{"Error"};
@@ -132,7 +135,8 @@ class AutonomousTest : public I2CCommunicationTest<bool> {};
 TEST_P(AutonomousTest, Autonomous) {
   auto autonomous = GetParam();
   wpi::sim::DriverStationSim::SetRobotMode(
-      autonomous ? HAL_ROBOT_MODE_AUTONOMOUS : HAL_ROBOT_MODE_TELEOPERATED);
+      autonomous ? wpi::hal::RobotMode::AUTONOMOUS
+                 : wpi::hal::RobotMode::TELEOPERATED);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(HALSIM_GetI2CInitialized(port));
@@ -157,7 +161,7 @@ TEST_P(MatchTimeTest, Alert) {
 
   wpi::sim::StepTiming(20_ms);
 
-  std::string expected = fmt::format("{:03}", matchTime);
+  std::string expected = std::format("{:03}", matchTime);
   EXPECT_EQ(expected, gString.substr(3));
 }
 

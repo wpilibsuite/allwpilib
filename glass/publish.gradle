@@ -21,6 +21,8 @@ task libCppSourcesZip(type: Zip) {
 
     from(licenseFile) { into '/' }
     from('src/lib/native/cpp') { into '/' }
+    from('src/lib/native/thirdparty/mrccomm/src') { into '/' }
+    from('src/lib/native/thirdparty/mrccomm/include') { into '/' }
 }
 
 task libCppHeadersZip(type: Zip) {

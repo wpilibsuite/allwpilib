@@ -4,9 +4,8 @@
 
 #include "wpi/glass/networktables/NTDigitalOutput.hpp"
 
+#include <format>
 #include <utility>
-
-#include <fmt/format.h>
 
 using namespace wpi::glass;
 
@@ -17,11 +16,11 @@ NTDigitalOutputModel::NTDigitalOutputModel(wpi::nt::NetworkTableInstance inst,
                                            std::string_view path)
     : m_inst{inst},
       m_value{
-          inst.GetBooleanTopic(fmt::format("{}/Value", path)).GetEntry(false)},
-      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
-      m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
+          inst.GetBooleanTopic(std::format("{}/Value", path)).GetEntry(false)},
+      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
+      m_controllable{inst.GetBooleanTopic(std::format("{}/.controllable", path))
                          .Subscribe(false)},
-      m_valueData{fmt::format("NT_DOut:{}", path)} {}
+      m_valueData{std::format("NT_DOut:{}", path)} {}
 
 void NTDigitalOutputModel::SetValue(bool val) {
   m_value.Set(val);

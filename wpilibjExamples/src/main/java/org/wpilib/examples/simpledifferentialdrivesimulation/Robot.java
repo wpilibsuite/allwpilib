@@ -12,9 +12,10 @@ import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.trajectory.DrivetrainSplineSample;
+import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.Trajectory;
 import org.wpilib.math.trajectory.TrajectoryConfig;
-import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.system.Timer;
 
 public class Robot extends TimedRobot {
@@ -28,12 +29,12 @@ public class Robot extends TimedRobot {
   private final Drivetrain drive = new Drivetrain();
   private final LTVUnicycleController feedback = new LTVUnicycleController(0.020);
   private final Timer timer = new Timer();
-  private final Trajectory trajectory;
+  private final Trajectory<DrivetrainSplineSample> trajectory;
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
     trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             new Pose2d(2, 2, Rotation2d.kZero),
             List.of(),
             new Pose2d(6, 4, Rotation2d.kZero),
@@ -48,13 +49,13 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     timer.restart();
-    drive.resetOdometry(trajectory.getInitialPose());
+    drive.resetOdometry(trajectory.start().pose);
   }
 
   @Override
   public void autonomousPeriodic() {
     double elapsed = timer.get();
-    Trajectory.State reference = trajectory.sample(elapsed);
+    DrivetrainSplineSample reference = trajectory.sampleAt(elapsed);
     ChassisVelocities velocities = feedback.calculate(drive.getPose(), reference);
     drive.drive(velocities.vx, velocities.omega);
   }

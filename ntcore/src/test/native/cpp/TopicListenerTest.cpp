@@ -7,15 +7,17 @@
 #include <thread>
 #include <vector>
 
-#include <gtest/gtest.h>
-
 #include "TestPrinters.hpp"
-#include "ValueMatcher.hpp"
+#undef FAIL
+#undef SUCCEED
+#include <catch2/catch_test_macros.hpp>
+
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/Synchronization.hpp"
+#include "wpi/util/json.hpp"
 
-class TopicListenerTest : public ::testing::Test {
+class TopicListenerTest {
  public:
   TopicListenerTest()
       : m_serverInst(wpi::nt::CreateInstance()),
@@ -34,7 +36,7 @@ class TopicListenerTest : public ::testing::Test {
 #endif
   }
 
-  ~TopicListenerTest() override {
+  ~TopicListenerTest() {
     wpi::nt::DestroyInstance(m_serverInst);
     wpi::nt::DestroyInstance(m_clientInst);
   }
@@ -62,7 +64,7 @@ void TopicListenerTest::Connect(unsigned int port) {
                              wpi::nt::EventFlags::CONNECTED);
   bool timedOut = false;
   if (!wpi::util::WaitForObject(poller, 1.0, &timedOut)) {
-    FAIL() << "client didn't connect to server";
+    FAIL("client didn't connect to server");
   }
 }
 
@@ -75,16 +77,17 @@ void TopicListenerTest::PublishTopics(NT_Inst inst) {
 void TopicListenerTest::CheckEvents(const std::vector<wpi::nt::Event>& events,
                                     NT_Listener handle, unsigned int flags,
                                     std::string_view topicName) {
-  ASSERT_EQ(events.size(), 1u);
-  ASSERT_EQ(events[0].listener, handle);
-  ASSERT_EQ(events[0].flags, flags);
+  REQUIRE(events.size() == 1u);
+  REQUIRE(events[0].listener == handle);
+  REQUIRE(events[0].flags == flags);
   auto topicInfo = events[0].GetTopicInfo();
-  ASSERT_TRUE(topicInfo);
-  ASSERT_EQ(topicInfo->topic, wpi::nt::GetTopic(m_serverInst, topicName));
-  ASSERT_EQ(topicInfo->name, topicName);
+  REQUIRE(topicInfo);
+  REQUIRE(topicInfo->topic == wpi::nt::GetTopic(m_serverInst, topicName));
+  REQUIRE(topicInfo->name == topicName);
 }
 
-TEST_F(TopicListenerTest, TopicNewLocal) {
+TEST_CASE_METHOD(TopicListenerTest, "TopicListenerTest TopicNewLocal",
+                 "[ntcore][topic-listener]") {
   auto poller = wpi::nt::CreateListenerPoller(m_serverInst);
   auto handle = wpi::nt::AddPolledListener(
       poller, wpi::nt::GetTopic(m_serverInst, "/foo"),
@@ -93,16 +96,14 @@ TEST_F(TopicListenerTest, TopicNewLocal) {
   PublishTopics(m_serverInst);
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
   auto events = wpi::nt::ReadListenerQueue(poller);
   CheckEvents(events, handle, wpi::nt::EventFlags::PUBLISH, "/foo");
 }
 
-TEST_F(TopicListenerTest, DISABLED_TopicNewRemote) {
+TEST_CASE_METHOD(TopicListenerTest, "TopicListenerTest TopicNewRemote",
+                 "[ntcore][topic-listener][.]") {
   Connect(10010);
-  if (HasFatalFailure()) {
-    return;
-  }
   auto poller = wpi::nt::CreateListenerPoller(m_serverInst);
   auto handle = wpi::nt::AddPolledListener(
       poller, wpi::nt::GetTopic(m_serverInst, "/foo"),
@@ -114,12 +115,13 @@ TEST_F(TopicListenerTest, DISABLED_TopicNewRemote) {
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
   auto events = wpi::nt::ReadListenerQueue(poller);
   CheckEvents(events, handle, wpi::nt::EventFlags::PUBLISH, "/foo");
 }
 
-TEST_F(TopicListenerTest, TopicPublishImm) {
+TEST_CASE_METHOD(TopicListenerTest, "TopicListenerTest TopicPublishImm",
+                 "[ntcore][topic-listener]") {
   PublishTopics(m_serverInst);
 
   auto poller = wpi::nt::CreateListenerPoller(m_serverInst);
@@ -128,14 +130,15 @@ TEST_F(TopicListenerTest, TopicPublishImm) {
       wpi::nt::EventFlags::PUBLISH | wpi::nt::EventFlags::IMMEDIATE);
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
   auto events = wpi::nt::ReadListenerQueue(poller);
   CheckEvents(events, handle,
               wpi::nt::EventFlags::PUBLISH | wpi::nt::EventFlags::IMMEDIATE,
               "/foo");
 }
 
-TEST_F(TopicListenerTest, TopicUnpublishPropsImm) {
+TEST_CASE_METHOD(TopicListenerTest, "TopicListenerTest TopicUnpublishPropsImm",
+                 "[ntcore][topic-listener]") {
   PublishTopics(m_serverInst);
 
   auto poller = wpi::nt::CreateListenerPoller(m_serverInst);
@@ -145,12 +148,13 @@ TEST_F(TopicListenerTest, TopicUnpublishPropsImm) {
                                  wpi::nt::EventFlags::IMMEDIATE);
 
   bool timedOut = false;
-  ASSERT_FALSE(wpi::util::WaitForObject(poller, 0.02, &timedOut));
+  REQUIRE_FALSE(wpi::util::WaitForObject(poller, 0.02, &timedOut));
   auto events = wpi::nt::ReadListenerQueue(poller);
-  ASSERT_TRUE(events.empty());
+  REQUIRE(events.empty());
 }
 
-TEST_F(TopicListenerTest, TopicUnpublishLocal) {
+TEST_CASE_METHOD(TopicListenerTest, "TopicListenerTest TopicUnpublishLocal",
+                 "[ntcore][topic-listener]") {
   auto topic = wpi::nt::GetTopic(m_serverInst, "/foo");
 
   auto poller = wpi::nt::CreateListenerPoller(m_serverInst);
@@ -161,16 +165,14 @@ TEST_F(TopicListenerTest, TopicUnpublishLocal) {
   wpi::nt::Unpublish(pub);
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
   auto events = wpi::nt::ReadListenerQueue(poller);
   CheckEvents(events, handle, wpi::nt::EventFlags::UNPUBLISH, "/foo");
 }
 
-TEST_F(TopicListenerTest, DISABLED_TopicUnpublishRemote) {
+TEST_CASE_METHOD(TopicListenerTest, "TopicListenerTest TopicUnpublishRemote",
+                 "[ntcore][topic-listener][.]") {
   Connect(10010);
-  if (HasFatalFailure()) {
-    return;
-  }
   auto poller = wpi::nt::CreateListenerPoller(m_serverInst);
   auto handle = wpi::nt::AddPolledListener(
       poller, wpi::nt::GetTopic(m_serverInst, "/foo"),
@@ -187,31 +189,30 @@ TEST_F(TopicListenerTest, DISABLED_TopicUnpublishRemote) {
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
   auto events = wpi::nt::ReadListenerQueue(poller);
   CheckEvents(events, handle, wpi::nt::EventFlags::UNPUBLISH, "/foo");
 }
 
-TEST_F(TopicListenerTest, TopicPropertiesLocal) {
+TEST_CASE_METHOD(TopicListenerTest, "TopicListenerTest TopicPropertiesLocal",
+                 "[ntcore][topic-listener]") {
   auto topic = wpi::nt::GetTopic(m_serverInst, "/foo");
 
   auto poller = wpi::nt::CreateListenerPoller(m_serverInst);
   auto handle = wpi::nt::AddPolledListener(poller, topic,
                                            wpi::nt::EventFlags::PROPERTIES);
 
-  wpi::nt::SetTopicProperty(topic, "foo", 5);
+  wpi::nt::SetTopicProperty(topic, "foo", wpi::util::json{5});
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
   auto events = wpi::nt::ReadListenerQueue(poller);
   CheckEvents(events, handle, wpi::nt::EventFlags::PROPERTIES, "/foo");
 }
 
-TEST_F(TopicListenerTest, DISABLED_TopicPropertiesRemote) {
+TEST_CASE_METHOD(TopicListenerTest, "TopicListenerTest TopicPropertiesRemote",
+                 "[ntcore][topic-listener][.]") {
   Connect(10010);
-  if (HasFatalFailure()) {
-    return;
-  }
   // the topic needs to actually exist
   wpi::nt::Publish(wpi::nt::GetTopic(m_serverInst, "/foo"), NT_BOOLEAN,
                    "boolean");
@@ -222,17 +223,19 @@ TEST_F(TopicListenerTest, DISABLED_TopicPropertiesRemote) {
       wpi::nt::EventFlags::PROPERTIES);
   wpi::nt::FlushLocal(m_serverInst);
 
-  wpi::nt::SetTopicProperty(wpi::nt::GetTopic(m_clientInst, "/foo"), "foo", 5);
+  wpi::nt::SetTopicProperty(wpi::nt::GetTopic(m_clientInst, "/foo"), "foo",
+                            wpi::util::json{5});
   wpi::nt::Flush(m_clientInst);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
   auto events = wpi::nt::ReadListenerQueue(poller);
   CheckEvents(events, handle, wpi::nt::EventFlags::PROPERTIES, "/foo");
 }
 
-TEST_F(TopicListenerTest, PrefixPublishLocal) {
+TEST_CASE_METHOD(TopicListenerTest, "TopicListenerTest PrefixPublishLocal",
+                 "[ntcore][topic-listener]") {
   auto poller = wpi::nt::CreateListenerPoller(m_serverInst);
   auto handle = wpi::nt::AddPolledListener(poller, {{"/foo/"}},
                                            wpi::nt::EventFlags::PUBLISH);
@@ -240,16 +243,14 @@ TEST_F(TopicListenerTest, PrefixPublishLocal) {
   PublishTopics(m_serverInst);
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
   auto events = wpi::nt::ReadListenerQueue(poller);
   CheckEvents(events, handle, wpi::nt::EventFlags::PUBLISH);
 }
 
-TEST_F(TopicListenerTest, DISABLED_PrefixPublishRemote) {
+TEST_CASE_METHOD(TopicListenerTest, "TopicListenerTest PrefixPublishRemote",
+                 "[ntcore][topic-listener][.]") {
   Connect(10011);
-  if (HasFatalFailure()) {
-    return;
-  }
   auto poller = wpi::nt::CreateListenerPoller(m_serverInst);
   auto handle = wpi::nt::AddPolledListener(poller, {{"/foo/"}},
                                            wpi::nt::EventFlags::PUBLISH);
@@ -260,12 +261,13 @@ TEST_F(TopicListenerTest, DISABLED_PrefixPublishRemote) {
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
   auto events = wpi::nt::ReadListenerQueue(poller);
   CheckEvents(events, handle, wpi::nt::EventFlags::PUBLISH);
 }
 
-TEST_F(TopicListenerTest, PrefixPublishImm) {
+TEST_CASE_METHOD(TopicListenerTest, "TopicListenerTest PrefixPublishImm",
+                 "[ntcore][topic-listener]") {
   PublishTopics(m_serverInst);
 
   auto poller = wpi::nt::CreateListenerPoller(m_serverInst);
@@ -274,13 +276,14 @@ TEST_F(TopicListenerTest, PrefixPublishImm) {
       wpi::nt::EventFlags::PUBLISH | wpi::nt::EventFlags::IMMEDIATE);
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
   auto events = wpi::nt::ReadListenerQueue(poller);
   CheckEvents(events, handle,
               wpi::nt::EventFlags::PUBLISH | wpi::nt::EventFlags::IMMEDIATE);
 }
 
-TEST_F(TopicListenerTest, PrefixUnpublishPropsImm) {
+TEST_CASE_METHOD(TopicListenerTest, "TopicListenerTest PrefixUnpublishPropsImm",
+                 "[ntcore][topic-listener]") {
   PublishTopics(m_serverInst);
 
   auto poller = wpi::nt::CreateListenerPoller(m_serverInst);
@@ -290,7 +293,7 @@ TEST_F(TopicListenerTest, PrefixUnpublishPropsImm) {
                                  wpi::nt::EventFlags::IMMEDIATE);
 
   bool timedOut = false;
-  ASSERT_FALSE(wpi::util::WaitForObject(poller, 0.02, &timedOut));
+  REQUIRE_FALSE(wpi::util::WaitForObject(poller, 0.02, &timedOut));
   auto events = wpi::nt::ReadListenerQueue(poller);
-  ASSERT_TRUE(events.empty());
+  REQUIRE(events.empty());
 }

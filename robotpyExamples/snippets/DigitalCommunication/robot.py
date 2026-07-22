@@ -15,35 +15,35 @@ class MyRobot(wpilib.TimedRobot):
     """
 
     # define ports for digitalcommunication with light controller
-    kAlliancePort = 0
-    kEnabledPort = 1
-    kAutonomousPort = 2
-    kAlertPort = 3
+    ALLIANCE_PORT = 0
+    ENABLED_PORT = 1
+    AUTONOMOUS_PORT = 2
+    ALERT_PORT = 3
 
     def __init__(self):
         """Robot initialization function"""
         super().__init__()
 
-        self.allianceOutput = wpilib.DigitalOutput(self.kAlliancePort)
-        self.enabledOutput = wpilib.DigitalOutput(self.kEnabledPort)
-        self.autonomousOutput = wpilib.DigitalOutput(self.kAutonomousPort)
-        self.alertOutput = wpilib.DigitalOutput(self.kAlertPort)
+        self.alliance_output = wpilib.DigitalOutput(self.ALLIANCE_PORT)
+        self.enabled_output = wpilib.DigitalOutput(self.ENABLED_PORT)
+        self.autonomous_output = wpilib.DigitalOutput(self.AUTONOMOUS_PORT)
+        self.alert_output = wpilib.DigitalOutput(self.ALERT_PORT)
 
-    def robotPeriodic(self):
-        setAlliance = False
-        alliance = wpilib.MatchState.getAlliance()
+    def robot_periodic(self):
+        set_alliance = False
+        alliance = wpilib.MatchState.get_alliance()
         if alliance:
-            setAlliance = alliance == wpilib.Alliance.RED
+            set_alliance = alliance == wpilib.Alliance.RED
 
         # pull alliance port high if on red alliance, pull low if on blue alliance
-        self.allianceOutput.set(setAlliance)
+        self.alliance_output.set(set_alliance)
 
         # pull enabled port high if enabled, low if disabled
-        self.enabledOutput.set(wpilib.RobotState.isEnabled())
+        self.enabled_output.set(wpilib.RobotState.is_enabled())
 
         # pull auto port high if in autonomous, low if in teleop (or disabled)
-        self.autonomousOutput.set(wpilib.RobotState.isAutonomous())
+        self.autonomous_output.set(wpilib.RobotState.is_autonomous())
 
         # pull alert port high if match time remaining is between 30 and 25 seconds
-        matchTime = wpilib.MatchState.getMatchTime()
-        self.alertOutput.set(30 >= matchTime >= 25)
+        match_time = wpilib.MatchState.get_match_time()
+        self.alert_output.set(30 >= match_time >= 25)

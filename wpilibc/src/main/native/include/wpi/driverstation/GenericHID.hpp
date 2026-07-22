@@ -8,6 +8,7 @@
 
 #include <string>
 
+#include "wpi/driverstation/HIDDevice.hpp"
 #include "wpi/driverstation/POVDirection.hpp"
 #include "wpi/driverstation/TouchpadFinger.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
@@ -16,7 +17,7 @@ namespace wpi {
 
 class BooleanEvent;
 class EventLoop;
-
+class DriverStation;
 /**
  * Handle input from standard HID devices connected to the Driver Station.
  *
@@ -25,19 +26,24 @@ class EventLoop;
  * single class instance for each device and the mapping of ports to hardware
  * buttons depends on the code in the Driver Station.
  */
-class GenericHID {
+class GenericHID final : public HIDDevice {
  public:
+  friend class DriverStation;
+  friend class internal::DriverStationBackend;
+
   /**
    * Represents a rumble output on the Joystick.
    */
   enum class RumbleType {
-    /// Left rumble motor.
+    /// Left rumble motor. On most controllers, this is the low-frequency
+    /// motor.
     LEFT_RUMBLE,
-    /// Right rumble motor.
+    /// Right rumble motor. On most controllers, this is the high-frequency
+    /// motor.
     RIGHT_RUMBLE,
-    /// Left trigger rumble motor.
+    /// Left trigger rumble motor, on controllers that have one.
     LEFT_TRIGGER_RUMBLE,
-    /// Right trigger rumble motor.
+    /// Right trigger rumble motor, on controllers that have one.
     RIGHT_TRIGGER_RUMBLE,
   };
 
@@ -84,12 +90,33 @@ class GenericHID {
     /// Nintendo Switch Joycon Right controller.
     SWITCH_JOYCON_RIGHT,
     /// Nintendo Switch Joycon controller pair.
-    SWITCH_JOYCON_PAIR
+    SWITCH_JOYCON_PAIR,
+    /// GameCube controller.
+    GAMECUBE,
+    /// Steam Controller.
+    STEAM,
+    /// Count of HID types.
+    COUNT,
   };
 
-  explicit GenericHID(int port);
-  virtual ~GenericHID() = default;
+  ~GenericHID() override = default;
 
+  /**
+   * Get this GenericHID object.
+   *
+   * @return this GenericHID object
+   */
+  GenericHID& GetHID() override { return *this; }
+
+  /**
+   * Get this GenericHID object.
+   *
+   * @return this GenericHID object
+   */
+  const GenericHID& GetHID() const override { return *this; }
+
+  GenericHID(const GenericHID&) = delete;
+  GenericHID& operator=(const GenericHID&) = delete;
   GenericHID(GenericHID&&) = default;
   GenericHID& operator=(GenericHID&&) = default;
 
@@ -389,6 +416,7 @@ class GenericHID {
   TouchpadFinger GetTouchpadFinger(int touchpad, int finger) const;
 
  private:
+  explicit GenericHID(int port);
   int m_port;
   uint16_t m_leftRumble = 0;
   uint16_t m_rightRumble = 0;

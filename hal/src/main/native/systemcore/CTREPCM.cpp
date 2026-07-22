@@ -4,16 +4,24 @@
 
 #include "wpi/hal/CTREPCM.h"
 
-#include <string>
+#include <stdint.h>
 
-#include <fmt/format.h>
+#include <algorithm>
+#include <cstring>
+#include <format>
+#include <mutex>
+#include <string>
 
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
 #include "wpi/hal/CANAPI.h"
+#include "wpi/hal/CANAPITypes.h"
 #include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
+#include "wpi/hal/Types.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/handles/IndexedHandleResource.hpp"
+#include "wpi/util/mutex.hpp"
 
 using namespace wpi::hal;
 
@@ -355,7 +363,7 @@ void HAL_FireCTREPCMOneShot(HAL_CTREPCMHandle handle, int32_t index,
   if (index > 7 || index < 0) {
     *status = MakeError(
         HAL_PARAMETER_OUT_OF_RANGE,
-        fmt::format("Only [0-7] are valid index values. Requested {}", index));
+        std::format("Only [0-7] are valid index values. Requested {}", index));
     return;
   }
 
@@ -386,7 +394,7 @@ void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
   if (index > 7 || index < 0) {
     *status = MakeError(
         HAL_PARAMETER_OUT_OF_RANGE,
-        fmt::format("Only [0-7] are valid index values. Requested {}", index));
+        std::format("Only [0-7] are valid index values. Requested {}", index));
     return;
   }
 

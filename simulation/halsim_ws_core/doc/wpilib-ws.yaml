@@ -288,15 +288,12 @@ components:
             <channel_b:
               type: integer
               description: "Digital channel number for 'B' phase"
-            <samples_to_avg:
-              type: integer
-              description: "Number of samples to average for period measurement"
             ">count":
               type: integer
               description: "Accumulated count (pulses)"
-            ">period":
+            ">rate":
               type: number
-              description: "Period between pulses in seconds"
+              description: "Encoder rate in distance units per second"
             "<reverse_direction":
               type: boolean
               description: "If the encoder direction should be inverted"

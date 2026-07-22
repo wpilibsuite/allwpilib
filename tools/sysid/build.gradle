@@ -1,6 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsystemcore')) {
+if (project.hasProperty('onlylinuxsystemcore')) {
     return;
 }
 
@@ -17,6 +17,7 @@ if (OperatingSystem.current().isWindows()) {
 
 ext {
     nativeName = 'sysid'
+    nativeTestSuiteName = "${nativeName}Catch2Test"
 }
 
 apply from: "${rootDir}/shared/resources.gradle"
@@ -97,6 +98,7 @@ model {
                     return
                 }
                 lib project: ':glass', library: 'glass', linkage: 'static'
+                lib project: ':fields', library: 'fields', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':datalog', library: 'datalog', linkage: 'static'
@@ -120,7 +122,7 @@ model {
         }
     }
     testSuites {
-        "${nativeName}Test"(GoogleTestTestSuiteSpec) {
+        "${nativeTestSuiteName}"(GoogleTestTestSuiteSpec) {
             for (NativeComponentSpec c : $.components) {
                 if (c.name == nativeName) {
                     testing c
@@ -157,7 +159,7 @@ model {
                     }
                 }
 
-                lib project: ':thirdparty:googletest', library: 'googletest', linkage: 'static'
+                lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
                 it.cppCompiler.define("RUNNING_SYSID_TESTS")
             }
         }

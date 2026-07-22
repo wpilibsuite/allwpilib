@@ -1,6 +1,7 @@
 name: Upstream utils
 
 on:
+  merge_group:
   pull_request:
   push:
     branches-ignore:
@@ -15,7 +16,7 @@ jobs:
     name: "Update"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Fetch all history and metadata
@@ -23,7 +24,7 @@ jobs:
           git checkout -b pr
           git branch -f main origin/main
       - name: Set up Python 3.12
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - name: Configure committer identity
@@ -60,18 +61,6 @@ jobs:
           ./eigen.py clone
           ./eigen.py copy-src
           ./eigen.py format-patch
-      - name: Run expected.py
-        run: |
-          cd upstream_utils
-          ./expected.py clone
-          ./expected.py copy-src
-          ./expected.py format-patch
-      - name: Run fmt.py
-        run: |
-          cd upstream_utils
-          ./fmt.py clone
-          ./fmt.py copy-src
-          ./fmt.py format-patch
       - name: Run gcem.py
         run: |
           cd upstream_utils
@@ -114,6 +103,12 @@ jobs:
           ./json.py clone
           ./json.py copy-src
           ./json.py format-patch
+      - name: Run libdogleg.py
+        run: |
+          cd upstream_utils
+          ./libdogleg.py clone
+          ./libdogleg.py copy-src
+          ./libdogleg.py format-patch
       - name: Run libuv.py
         run: |
           cd upstream_utils
@@ -132,6 +127,18 @@ jobs:
           ./mpack.py clone
           ./mpack.py copy-src
           ./mpack.py format-patch
+      - name: Run mrcal.py
+        run: |
+          cd upstream_utils
+          ./mrcal.py clone
+          ./mrcal.py copy-src
+          ./mrcal.py format-patch
+      - name: Run mrcal_java.py
+        run: |
+          cd upstream_utils
+          ./mrcal_java.py clone
+          ./mrcal_java.py copy-src
+          ./mrcal_java.py format-patch
       - name: Run sleipnir.py
         run: |
           cd upstream_utils

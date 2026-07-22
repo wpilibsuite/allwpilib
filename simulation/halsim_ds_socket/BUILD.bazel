@@ -18,8 +18,7 @@ wpilib_cc_library(
     srcs = glob(["src/main/native/cpp/**"]),
     include_license_files = True,
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
@@ -38,8 +37,7 @@ wpilib_cc_library(
     ],
     include_license_files = True,
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
@@ -78,7 +76,7 @@ cc_test(
     srcs = glob(["src/test/native/**/*.cpp"]),
     deps = [
         "//simulation/halsim_ds_socket",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 

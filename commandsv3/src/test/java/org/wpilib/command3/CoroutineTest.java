@@ -5,8 +5,10 @@
 package org.wpilib.command3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.units.Units.Seconds;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -15,8 +17,122 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.junit.jupiter.api.Test;
+import org.wpilib.system.RobotController;
 
 class CoroutineTest extends CommandTestBase {
+  @Test
+  void waitUntilConditionMet() {
+    AtomicBoolean condition = new AtomicBoolean(false);
+    AtomicReference<Coroutine.WaitResult> result = new AtomicReference<>();
+
+    var command =
+        Command.noRequirements(co -> result.set(co.waitUntil(condition::get, Seconds.of(1.0))))
+            .named("Wait Until Condition Met");
+
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+
+    // Condition not met yet, should still be running
+    assertTrue(m_scheduler.isRunning(command));
+
+    condition.set(true);
+    m_scheduler.run();
+
+    // Condition met, should have finished
+    assertEquals(Coroutine.WaitResult.CONDITION_MET, result.get());
+    assertFalse(m_scheduler.isRunning(command));
+  }
+
+  @Test
+  void waitUntilTimeout() {
+    AtomicBoolean condition = new AtomicBoolean(false);
+    AtomicReference<Coroutine.WaitResult> result = new AtomicReference<>();
+    AtomicReference<Long> currentTime = new AtomicReference<>(0L);
+
+    RobotController.setTimeSource(currentTime::get);
+
+    var command =
+        Command.noRequirements(co -> result.set(co.waitUntil(condition::get, Seconds.of(1.0))))
+            .named("Wait Until Timeout");
+
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+
+    // Still running, time is 0
+    assertTrue(m_scheduler.isRunning(command));
+
+    // Advance time to 0.5s
+    currentTime.set(500_000L);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(command));
+
+    // Advance time to 1.1s (past 1.0s timeout)
+    currentTime.set(1_100_000L);
+    m_scheduler.run();
+
+    // Should have timed out
+    assertEquals(Coroutine.WaitResult.TIMED_OUT, result.get());
+    assertFalse(m_scheduler.isRunning(command));
+  }
+
+  @Test
+  void waitUntilImmediateConditionMet() {
+    AtomicReference<Coroutine.WaitResult> result = new AtomicReference<>();
+
+    var command =
+        Command.noRequirements(co -> result.set(co.waitUntil(() -> true, Seconds.of(1.0))))
+            .named("Wait Until Immediate Condition Met");
+
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+
+    // Condition met immediately, should have finished in one run
+    assertEquals(Coroutine.WaitResult.CONDITION_MET, result.get());
+    assertFalse(m_scheduler.isRunning(command));
+  }
+
+  @Test
+  void waitUntilConditionMetExactlyAtTimeout() {
+    AtomicBoolean condition = new AtomicBoolean(false);
+    AtomicReference<Coroutine.WaitResult> result = new AtomicReference<>();
+    AtomicReference<Long> currentTime = new AtomicReference<>(0L);
+
+    RobotController.setTimeSource(currentTime::get);
+
+    var command =
+        Command.noRequirements(co -> result.set(co.waitUntil(condition::get, Seconds.of(1.0))))
+            .named("Wait Until Condition Met Exactly At Timeout");
+
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+
+    // Advance time to exactly 1.0s and set condition
+    currentTime.set(1_000_000L);
+    condition.set(true);
+    m_scheduler.run();
+
+    // Condition met, even though time is exactly at timeout.
+    // The implementation checks the condition BEFORE the timeout in the while loop.
+    assertEquals(Coroutine.WaitResult.CONDITION_MET, result.get());
+    assertFalse(m_scheduler.isRunning(command));
+  }
+
+  @Test
+  void waitUntilNullParamThrows() {
+    var command =
+        Command.noRequirements(
+                co -> {
+                  assertThrows(
+                      NullPointerException.class, () -> co.waitUntil(null, Seconds.of(1.0)));
+                  assertThrows(NullPointerException.class, () -> co.waitUntil(() -> true, null));
+                })
+            .named("Wait Until Null Param Throws");
+
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+    assertFalse(m_scheduler.isRunning(command));
+  }
+
   @Test
   void forkMany() {
     var a = new NullCommand();

@@ -9,6 +9,10 @@
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/kinematics/DifferentialDriveOdometry3d.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
@@ -34,7 +38,8 @@ namespace wpi::math {
  * never call it, then this class will behave like regular encoder odometry.
  */
 class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator3d
-    : public PoseEstimator3d<DifferentialDriveWheelPositions,
+    : public PoseEstimator3d<DifferentialDriveKinematics,
+                             DifferentialDriveWheelPositions,
                              DifferentialDriveWheelVelocities,
                              DifferentialDriveWheelAccelerations> {
  public:

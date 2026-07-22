@@ -282,7 +282,7 @@ def _write_libinit_py(
 
             contents += [
                 "    except FileNotFoundError:",
-                f"        if not exists(lib_path):",
+                "        if not exists(lib_path):",
                 f'            raise FileNotFoundError("{lib.name} was not found on your system. Is this package correctly installed?")',
             ]
 

@@ -6,11 +6,16 @@
 
 #include <cmath>
 #include <numbers>
+#include <stdexcept>
 
 #include <Eigen/Core>
 #include <gtest/gtest.h>
 
-#include "wpi/util/MathExtras.hpp"
+#include "wpi/math/geometry/Quaternion.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/time.hpp"
 
 using namespace wpi::math;
 
@@ -276,6 +281,24 @@ TEST(Rotation3dTest, RelativeTo) {
   EXPECT_EQ(expected, result);
 }
 
+TEST(Rotation3dTest, Integrate) {
+  Rotation3d rot{0_deg, 0_deg, 90_deg};
+
+  auto integrated1 = rot.Integrate(0_deg_per_s, 0_deg_per_s, 20_deg_per_s, 1_s);
+  Rotation3d expected1{0_deg, 0_deg, 110_deg};
+  EXPECT_EQ(expected1, integrated1);
+
+  auto integrated2 = rot.Integrate(0_deg_per_s, 20_deg_per_s, 0_deg_per_s, 1_s);
+  Rotation3d expected2{0_deg, 20_deg, 90_deg};
+  EXPECT_EQ(expected2, integrated2);
+
+  auto integrated3 =
+      rot.Integrate(0_deg_per_s, 20_deg_per_s, 20_deg_per_s, 1_s);
+  Rotation3d expected3{Quaternion{0.5635121137168105, -0.12216409746525868,
+                                  0.1221640974652587, 0.8078403086473278}};
+  EXPECT_EQ(expected3, integrated3);
+}
+
 TEST(Rotation3dTest, AxisAngle) {
   const Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
   const Eigen::Vector3d yAxis{0.0, 1.0, 0.0};
@@ -322,13 +345,8 @@ TEST(Rotation3dTest, Inequality) {
 }
 
 TEST(Rotation3dTest, ToMatrix) {
-#if __GNUC__ <= 11
-  Rotation3d before{10_deg, 20_deg, 30_deg};
-  Rotation3d after{before.ToMatrix()};
-#else
   constexpr Rotation3d before{10_deg, 20_deg, 30_deg};
   constexpr Rotation3d after{before.ToMatrix()};
-#endif
 
   EXPECT_EQ(before, after);
 }

@@ -5,7 +5,9 @@
 #pragma once
 
 #include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelVelocities.hpp"
 #include "wpi/math/kinematics/Odometry3d.hpp"
@@ -23,7 +25,8 @@ namespace wpi::math {
  * when using computer-vision systems.
  */
 class WPILIB_DLLEXPORT MecanumDriveOdometry3d
-    : public Odometry3d<MecanumDriveWheelPositions, MecanumDriveWheelVelocities,
+    : public Odometry3d<MecanumDriveKinematics, MecanumDriveWheelPositions,
+                        MecanumDriveWheelVelocities,
                         MecanumDriveWheelAccelerations> {
  public:
   /**
@@ -38,9 +41,6 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry3d
       MecanumDriveKinematics kinematics, const Rotation3d& gyroAngle,
       const MecanumDriveWheelPositions& wheelPositions,
       const Pose3d& initialPose = Pose3d{});
-
- private:
-  MecanumDriveKinematics m_kinematicsImpl;
 };
 
 }  // namespace wpi::math

@@ -39,7 +39,7 @@ target_include_directories(
     PRIVATE src/main/native/cpp
 )
 wpilib_target_warnings(cscore)
-target_link_libraries(cscore PUBLIC wpinet wpiutil ${OpenCV_LIBS})
+target_link_libraries(cscore PUBLIC wpinet wpiutil opencv_imgcodecs)
 
 set_property(TARGET cscore PROPERTY FOLDER "libraries")
 
@@ -75,7 +75,7 @@ foreach(example ${cscore_examples})
     endif()
 endforeach()
 
-if(WITH_TESTS)
-    wpilib_add_test(cscore src/test/native/cpp)
-    target_link_libraries(cscore_test cscore googletest)
+if(WPILIB_WITH_TESTS)
+    wpilib_add_test_catch2(cscore src/test/native/cpp)
+    target_link_libraries(cscore_test cscore)
 endif()

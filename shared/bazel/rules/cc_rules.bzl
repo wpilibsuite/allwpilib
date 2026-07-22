@@ -441,8 +441,8 @@ def wpilib_cc_shared_library(
     _split_debug_symbols(
         name = name + "-symbolsplit",
         copy = select({
-            "@rules_bzlmodrio_toolchains//conditions:linux_arm64": False,
-            "@rules_bzlmodrio_toolchains//conditions:linux_x86_64": True,
+            "@wpilib_toolchains//conditions:linux_arm64": False,
+            "@wpilib_toolchains//conditions:linux_x86_64": True,
             "//conditions:default": True,
         }),
         use_debug_name = select({
@@ -455,13 +455,13 @@ def wpilib_cc_shared_library(
     pkg_files(
         name = folder + "/lib" + lib + "-shared-files",
         srcs = select({
-            "@rules_bzlmodrio_toolchains//conditions:osx": [universal_name],
+            "@wpilib_toolchains//conditions:osx": [universal_name],
             "//conditions:default": [
                 ":" + name + "-symbolsplit",
             ],
         }),
         strip_prefix = select({
-            "@rules_bzlmodrio_toolchains//conditions:osx": "universal",
+            "@wpilib_toolchains//conditions:osx": "universal",
             "//conditions:default": None,
         }),
         visibility = visibility,
@@ -716,7 +716,8 @@ def _generate_def_windows_impl(ctx):
                     break
 
         if def_parser != None:
-            generated_def_file = generate_def_file(ctx, def_parser, filtered_object_files, ctx.label.name)
+            dll_name = ctx.attr.dll_name if ctx.attr.dll_name else ctx.label.name
+            generated_def_file = generate_def_file(ctx, def_parser, filtered_object_files, dll_name)
 
         win_def_file = [generated_def_file]
 
@@ -735,6 +736,10 @@ _generate_def_windows = rule(
 List of all static libraries to not duplicate .o files from.
 """,
         ),
+        "dll_name": attr.string(
+            default = "",
+            doc = "Override the LIBRARY name in the generated .def file.  Defaults to the rule name.",
+        ),
         "filters": attr.string_list(),
         "_def_parser": attr.label(default = "@bazel_tools//tools/def_parser:def_parser", allow_single_file = True, cfg = "exec"),
     } | CC_TOOLCHAIN_ATTRS,
@@ -742,11 +747,15 @@ List of all static libraries to not duplicate .o files from.
     fragments = ["cpp"],
 )
 
-def generate_def_windows(name, deps = None, **kwargs):
+def generate_def_windows(name, deps = None, dll_name = "", **kwargs):
     """Generates a .def file for linking a windows .dll for the provided cc_library and filters
 
     Args:
       deps: A list of cc_libraries to export symbols from.
+      dll_name: Override the LIBRARY directive in the generated .def file.  If
+                not specified, the rule's own name is used.  Set this to the
+                base name of the output DLL (without .dll extension) so that
+                the LIBRARY directive matches the DLL filename at runtime.
       filters: All object files in the provided cc_libraries (but not their
                dependencies) are checked against this list.  If a string in
                this list appears inside the name of the object file, it is
@@ -755,6 +764,7 @@ def generate_def_windows(name, deps = None, **kwargs):
     _generate_def_windows(
         name = name,
         deps = deps,
+        dll_name = dll_name,
         target_compatible_with = ["@platforms//os:windows"],
         **kwargs
     )

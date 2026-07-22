@@ -5,7 +5,9 @@
 #pragma once
 
 #include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp"
 #include "wpi/math/kinematics/Odometry.hpp"
@@ -26,7 +28,8 @@ namespace wpi::math {
  * Any subsequent pose resets also require the encoders to be reset to zero.
  */
 class WPILIB_DLLEXPORT DifferentialDriveOdometry
-    : public Odometry<DifferentialDriveWheelPositions,
+    : public Odometry<DifferentialDriveKinematics,
+                      DifferentialDriveWheelPositions,
                       DifferentialDriveWheelVelocities,
                       DifferentialDriveWheelAccelerations> {
  public:
@@ -82,8 +85,5 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry
                        wpi::units::meter_t rightDistance) {
     return Odometry::Update(gyroAngle, {leftDistance, rightDistance});
   }
-
- private:
-  DifferentialDriveKinematics m_kinematicsImpl{wpi::units::meter_t{1}};
 };
 }  // namespace wpi::math

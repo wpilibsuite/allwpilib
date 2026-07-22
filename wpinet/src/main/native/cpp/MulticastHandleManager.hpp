@@ -6,8 +6,8 @@
 
 #include <memory>
 
-#include "wpi/net/MulticastServiceAnnouncer.h"
-#include "wpi/net/MulticastServiceResolver.h"
+#include "wpi/net/MulticastServiceAnnouncer.hpp"
+#include "wpi/net/MulticastServiceResolver.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/UidVector.hpp"
 
