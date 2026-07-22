@@ -96,6 +96,9 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   /**
    * Sets the static gain.
    *
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
+   *
    * @param ks The static gain in volts.
    */
   public void setKs(double ks) {
@@ -104,6 +107,9 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
 
   /**
    * Sets the gravity gain.
+   *
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
    *
    * @param kg The gravity gain in volts.
    */
@@ -114,6 +120,9 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   /**
    * Sets the velocity gain.
    *
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
+   *
    * @param kv The velocity gain in V/(rad/s).
    */
   public void setKv(double kv) {
@@ -122,6 +131,9 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
 
   /**
    * Sets the acceleration gain.
+   *
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
    *
    * @param ka The acceleration gain in V/(rad/s²).
    */
