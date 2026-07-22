@@ -27,6 +27,10 @@ struct Twist3d;
  * Represents a transformation for a Pose3d in the pose's frame. Translation is
  * applied before rotation. (The translation is applied in the pose's original
  * frame, not the transformed frame.)
+ *
+ * Transforms are applied intrinsically, i.e. relative to the pose's own frame
+ * rather than the global frame. This is in contrast to the rotation classes,
+ * which apply rotations extrinsically.
  */
 class WPILIB_DLLEXPORT Transform3d final {
  public:
@@ -87,7 +91,7 @@ class WPILIB_DLLEXPORT Transform3d final {
 
   /**
    * Constructs a 3D transform from a 2D transform in the X-Y plane.
-   **
+   *
    * @param transform The 2D transform.
    * @see Rotation3d(Rotation2d)
    * @see Translation3d(Translation2d)
