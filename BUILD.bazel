@@ -165,6 +165,8 @@ write_source_files(
         "//hal:robotpy-native-wpihal-generator.generate_build_info",
         "//ntcore:robotpy-native-ntcore-generator.generate_build_info",
         "//romiVendordep:robotpy-native-xrp-generator.generate_build_info",
+        "//telemetry:robotpy-native-telemetry-generator.generate_build_info",
+        "//tunable:robotpy-native-tunable-generator.generate_build_info",
         "//wpilibc:robotpy-native-wpilib-generator.generate_build_info",
         "//wpinet:robotpy-native-wpinet-generator.generate_build_info",
         "//wpimath:robotpy-native-wpimath-generator.generate_build_info",
