@@ -28,9 +28,9 @@ struct Twist3d;
  * applied before rotation. (The translation is applied in the pose's original
  * frame, not the transformed frame.)
  *
- * <p>Transforms are applied intrinsically, i.e. relative to the pose's own
- * frame rather than the global frame. This is in contrast to the rotation
- * classes, which apply rotations extrinsically.
+ * Transforms are applied intrinsically, i.e. relative to the pose's own frame
+ * rather than the global frame. This is in contrast to the rotation classes,
+ * which apply rotations extrinsically.
  */
 class WPILIB_DLLEXPORT Transform3d final {
  public:
