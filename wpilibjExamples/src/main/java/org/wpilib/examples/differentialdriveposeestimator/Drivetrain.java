@@ -126,7 +126,7 @@ public class Drivetrain {
     cameraToObjectEntry = cameraToObjectTopic.getEntry(defaultVal);
 
     objectInField =
-        AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo).getTagPose(0).get();
+        AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo).getTagPose(1).get();
 
     SmartDashboard.putData("Field", fieldSim);
     SmartDashboard.putData("FieldEstimation", fieldApproximation);

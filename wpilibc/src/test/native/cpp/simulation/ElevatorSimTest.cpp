@@ -55,13 +55,13 @@ TEST(ElevatorSimTest, InitialState) {
 
 TEST(ElevatorSimTest, MinMax) {
   wpi::sim::ElevatorSim sim(wpi::math::DCMotor::Vex775Pro(4), 14.67, 8_kg,
-                            0.75_in, 0_m, 1_m, true, 0_m, {0.01});
+                            0.75_in, 0_m, 1_m, true, 0_m);
   for (size_t i = 0; i < 100; ++i) {
     sim.SetInput(wpi::math::Vectord<1>{0.0});
     sim.Update(20_ms);
 
     auto height = sim.GetPosition();
-    EXPECT_TRUE(height > -0.05_m);
+    EXPECT_GE(height, 0_m);
   }
 
   for (size_t i = 0; i < 100; ++i) {
@@ -69,7 +69,7 @@ TEST(ElevatorSimTest, MinMax) {
     sim.Update(20_ms);
 
     auto height = sim.GetPosition();
-    EXPECT_TRUE(height < 1.05_m);
+    EXPECT_LE(height, 1_m);
   }
 }
 
