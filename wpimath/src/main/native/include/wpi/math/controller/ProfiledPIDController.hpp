@@ -86,7 +86,7 @@ class ProfiledPIDController
    *
    * Sets the proportional, integral, and differential coefficients.
    *
-   * <p>This setter is intended for online tuning.
+   * This setter is intended for online tuning.
    *
    * @param Kp The proportional coefficient. Must be >= 0.
    * @param Ki The integral coefficient. Must be >= 0.
@@ -99,7 +99,7 @@ class ProfiledPIDController
   /**
    * Sets the proportional coefficient of the PID controller gain.
    *
-   * <p>This setter is intended for online tuning.
+   * This setter is intended for online tuning.
    *
    * @param Kp The proportional coefficient. Must be >= 0.
    */
@@ -108,7 +108,7 @@ class ProfiledPIDController
   /**
    * Sets the integral coefficient of the PID controller gain.
    *
-   * <p>This setter is intended for online tuning.
+   * This setter is intended for online tuning.
    *
    * @param Ki The integral coefficient. Must be >= 0.
    */
@@ -117,7 +117,7 @@ class ProfiledPIDController
   /**
    * Sets the differential coefficient of the PID controller gain.
    *
-   * <p>This setter is intended for online tuning.
+   * This setter is intended for online tuning.
    *
    * @param Kd The differential coefficient. Must be >= 0.
    */

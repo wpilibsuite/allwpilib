@@ -85,9 +85,8 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   /**
    * Sets the static gain.
    *
-   * <p>This setter is intended for online tuning only. Feedforward gains are
-   * assumed constant, so gain scheduling means the system was not correctly
-   * modeled.
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
    *
    * @param ks The static gain in volts.
    */
@@ -98,9 +97,8 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   /**
    * Sets the velocity gain.
    *
-   * <p>This setter is intended for online tuning only. Feedforward gains are
-   * assumed constant, so gain scheduling means the system was not correctly
-   * modeled.
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
    *
    * @param kv The velocity gain in V/(units/s).
    */
@@ -111,9 +109,8 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   /**
    * Sets the acceleration gain.
    *
-   * <p>This setter is intended for online tuning only. Feedforward gains are
-   * assumed constant, so gain scheduling means the system was not correctly
-   * modeled.
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
    *
    * @param ka The acceleration gain in V/(units/s²).
    */

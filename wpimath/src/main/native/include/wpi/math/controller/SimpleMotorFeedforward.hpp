@@ -88,7 +88,7 @@ class SimpleMotorFeedforward {
    * Calculates the feedforward from the gains and setpoints assuming discrete
    * control.
    *
-   * <p>Note this method is inaccurate when the velocity crosses 0.
+   * Note this method is inaccurate when the velocity crosses 0.
    *
    * @param currentVelocity The current velocity setpoint.
    * @param nextVelocity    The next velocity setpoint.
@@ -188,7 +188,7 @@ class SimpleMotorFeedforward {
   /**
    * Sets the static gain.
    *
-   * <p>This setter is intended for online tuning only. Feedforward gains are
+   * This setter is intended for online tuning only. Feedforward gains are
    * assumed constant, so gain scheduling means the system was not correctly
    * modeled.
    *
@@ -199,7 +199,7 @@ class SimpleMotorFeedforward {
   /**
    * Sets the velocity gain.
    *
-   * <p>This setter is intended for online tuning only. Feedforward gains are
+   * This setter is intended for online tuning only. Feedforward gains are
    * assumed constant, so gain scheduling means the system was not correctly
    * modeled.
    *
@@ -210,7 +210,7 @@ class SimpleMotorFeedforward {
   /**
    * Sets the acceleration gain.
    *
-   * <p>This setter is intended for online tuning only. Feedforward gains are
+   * This setter is intended for online tuning only. Feedforward gains are
    * assumed constant, so gain scheduling means the system was not correctly
    * modeled.
    *

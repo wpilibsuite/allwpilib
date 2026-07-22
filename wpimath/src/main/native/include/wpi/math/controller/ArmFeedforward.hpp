@@ -205,7 +205,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   /**
    * Sets the static gain.
    *
-   * <p>This setter is intended for online tuning only. Feedforward gains are
+   * This setter is intended for online tuning only. Feedforward gains are
    * assumed constant, so gain scheduling means the system was not correctly
    * modeled.
    *
@@ -216,7 +216,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   /**
    * Sets the gravity gain.
    *
-   * <p>This setter is intended for online tuning only. Feedforward gains are
+   * This setter is intended for online tuning only. Feedforward gains are
    * assumed constant, so gain scheduling means the system was not correctly
    * modeled.
    *
@@ -227,7 +227,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   /**
    * Sets the velocity gain.
    *
-   * <p>This setter is intended for online tuning only. Feedforward gains are
+   * This setter is intended for online tuning only. Feedforward gains are
    * assumed constant, so gain scheduling means the system was not correctly
    * modeled.
    *
@@ -238,7 +238,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   /**
    * Sets the acceleration gain.
    *
-   * <p>This setter is intended for online tuning only. Feedforward gains are
+   * This setter is intended for online tuning only. Feedforward gains are
    * assumed constant, so gain scheduling means the system was not correctly
    * modeled.
    *
