@@ -60,7 +60,7 @@ scan_headers_ignore = [
     "wpi/nt/ntcore_test.hpp",
 
     "src/*",
-    
+
 
     "wpi/nt/NetworkTablesTelemetryBackend.hpp" # TODO(robotpy) Tunable/Telemetry upgrade
 ]

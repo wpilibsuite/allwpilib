@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/backend/NetworkTablesTunableBackend.hpp"
+
 #include <format>
 #include <memory>
 #include <string>
@@ -9,7 +11,6 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/backend/NetworkTablesTunableBackend.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/GenericEntry.hpp"
@@ -111,8 +112,7 @@ TEST_F(NetworkTablesTunableBackendTest, PublishesAndTunesArrayAndRawDataTypes) {
   wpi::TunableInt32Vector ints{std::vector<int32_t>{3, 4}, config};
   wpi::TunableInt64Vector longs{std::vector<int64_t>{5, 6}, config};
   wpi::TunableFloatVector floats{std::vector<float>{7.25f, 8.5f}, config};
-  wpi::TunableDoubleVector doubles{std::vector<double>{9.25, 10.5},
-                                  config};
+  wpi::TunableDoubleVector doubles{std::vector<double>{9.25, 10.5}, config};
   wpi::Tunable<std::vector<std::string>> strings{
       std::vector<std::string>{"a", "b"}, config};
 
@@ -215,18 +215,16 @@ TEST_F(NetworkTablesTunableBackendTest, PublishesAndTunesStruct) {
   wpi::Tunable<wpi::math::Translation2d> value{config, initial};
   wpi::Tunables::Publish("translation", value);
 
-  auto sub =
-      inst.GetStructTopic<wpi::math::Translation2d>(
-              "/Tunables/translation/value")
-          .Subscribe({});
+  auto sub = inst.GetStructTopic<wpi::math::Translation2d>(
+                     "/Tunables/translation/value")
+                 .Subscribe({});
   auto logged = sub.Get();
   EXPECT_EQ(initial.X(), logged.X());
   EXPECT_EQ(initial.Y(), logged.Y());
 
-  auto pub =
-      inst.GetStructTopic<wpi::math::Translation2d>(
-              "/Tunables/translation/tune")
-          .Publish();
+  auto pub = inst.GetStructTopic<wpi::math::Translation2d>(
+                     "/Tunables/translation/tune")
+                 .Publish();
   pub.Set(tuned);
   inst.Flush();
   wpi::TunableRegistry::Update();
@@ -246,18 +244,16 @@ TEST_F(NetworkTablesTunableBackendTest, PublishesAndTunesProtobuf) {
   wpi::detail::TunableProtobuf<wpi::math::Translation2d> value{config, initial};
   wpi::Tunables::Publish("translation", value);
 
-  auto sub =
-      inst.GetProtobufTopic<wpi::math::Translation2d>(
-              "/Tunables/translation/value")
-          .Subscribe({});
+  auto sub = inst.GetProtobufTopic<wpi::math::Translation2d>(
+                     "/Tunables/translation/value")
+                 .Subscribe({});
   auto logged = sub.Get();
   EXPECT_EQ(initial.X(), logged.X());
   EXPECT_EQ(initial.Y(), logged.Y());
 
-  auto pub =
-      inst.GetProtobufTopic<wpi::math::Translation2d>(
-              "/Tunables/translation/tune")
-          .Publish();
+  auto pub = inst.GetProtobufTopic<wpi::math::Translation2d>(
+                     "/Tunables/translation/tune")
+                 .Publish();
   pub.Set(tuned);
   inst.Flush();
   wpi::TunableRegistry::Update();

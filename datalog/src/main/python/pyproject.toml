@@ -47,7 +47,7 @@ scan_headers_ignore = [
     "wpi/datalog/DataLogReaderThread.hpp",
     "wpi/datalog/FileLogger.hpp",
 
-    
+
     "wpi/datalog/DataLogTelemetryBackend.hpp", # TODO(robotpy) Tunable/Telemetry upgrade
 ]
 

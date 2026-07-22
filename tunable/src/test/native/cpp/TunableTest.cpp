@@ -20,9 +20,8 @@ using namespace wpi;
 
 TEST(TunableRegistryTest, ReportWarning) {
   std::string lastWarning;
-  TunableRegistry::SetReportWarning([&lastWarning](std::string_view msg) {
-    lastWarning = msg;
-  });
+  TunableRegistry::SetReportWarning(
+      [&lastWarning](std::string_view msg) { lastWarning = msg; });
   TunableRegistry::ReportWarning("test warning");
   EXPECT_EQ(lastWarning, "test warning");
   TunableRegistry::SetReportWarning(nullptr);
@@ -98,14 +97,15 @@ constexpr CustomTunableType2<T> MakeTunable(const CustomType2<T>& val) {
 }  // namespace
 
 template <typename T>
-class MyTest : public decltype(MakeTunable(std::declval<T>())) {
-};
+class MyTest : public decltype(MakeTunable(std::declval<T>())){};
 
 MyTest<CustomType2<int32_t>> test;
 
-static_assert(std::same_as<decltype(MakeTunable(CustomType2<int32_t>{})), CustomTunableType2<int32_t>>);
+static_assert(std::same_as<decltype(MakeTunable(CustomType2<int32_t>{})),
+                           CustomTunableType2<int32_t>>);
 
-static_assert(std::derived_from<MyTest<CustomType2<int32_t>>, CustomTunableType2<int32_t>>);
+static_assert(std::derived_from<MyTest<CustomType2<int32_t>>,
+                                CustomTunableType2<int32_t>>);
 
 template <>
 class wpi::CustomTunable<CustomType> {
@@ -223,10 +223,8 @@ TEST_F(TunableTest, PrimitiveAndVectorTunables) {
 
 TEST_F(TunableTest, ConfigImmutableAndOnTune) {
   int calls = 0;
-  TunableConfig mutableConfig{.onTune =
-                                  [&](detail::TunableBase&, ComplexTunable*) {
-                                    ++calls;
-                                  }};
+  TunableConfig mutableConfig{
+      .onTune = [&](detail::TunableBase&, ComplexTunable*) { ++calls; }};
   TunableConfig immutableConfig{.isMutable = false,
                                 .onTune = mutableConfig.onTune};
   TunableInt32 mutableTunable{0, mutableConfig};
@@ -252,10 +250,7 @@ TEST_F(TunableTest, TunableConfigOptions) {
       .robust = true,
       .typeString = "UnitTestWidget",
       .isMutable = false,
-      .onTune =
-          [&](detail::TunableBase&, ComplexTunable*) {
-            ++calls;
-          },
+      .onTune = [&](detail::TunableBase&, ComplexTunable*) { ++calls; },
       .alwaysGet = true};
   class InspectableInt : public TunableInt32 {
    public:
@@ -291,14 +286,12 @@ TEST_F(TunableTest, OnTuneReceivesMemberTunableAndParent) {
   bool receivedMember = false;
   bool receivedParent = false;
   MemberComplex complex;
-  TunableConfig config{
-      .onTune =
-          [&](detail::TunableBase& tunable, ComplexTunable* parent) {
-            ++calls;
-            receivedMember =
-                &tunable != static_cast<detail::TunableBase*>(&complex);
-            receivedParent = parent == &complex;
-          }};
+  TunableConfig config{.onTune = [&](detail::TunableBase& tunable,
+                                     ComplexTunable* parent) {
+    ++calls;
+    receivedMember = &tunable != static_cast<detail::TunableBase*>(&complex);
+    receivedParent = parent == &complex;
+  }};
 
   Tunables::Publish("complexOnTune/gain", &complex, &MemberComplex::gain,
                     config);
@@ -393,8 +386,7 @@ TEST_F(TunableTest, RegisterBackendMigratesComplexTunable) {
   auto childBackend = std::make_shared<MockTunableBackend>();
   TunableRegistry::RegisterBackend("/child", childBackend);
 
-  EXPECT_THROW(backend->SetInt32("/child/complex/gain", 2),
-               std::runtime_error);
+  EXPECT_THROW(backend->SetInt32("/child/complex/gain", 2), std::runtime_error);
   childBackend->SetInt32("/child/complex/gain", 4);
   childBackend->SetStruct<TestStruct>("/child/complex/point", {5, 6});
   TunableRegistry::Update();

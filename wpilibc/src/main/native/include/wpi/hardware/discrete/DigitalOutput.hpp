@@ -5,9 +5,9 @@
 #pragma once
 
 #include "wpi/hal/DIO.h"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/Handle.hpp"
-#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 

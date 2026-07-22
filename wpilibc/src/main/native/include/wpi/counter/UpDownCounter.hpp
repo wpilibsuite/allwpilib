@@ -6,8 +6,8 @@
 
 #include "EdgeConfiguration.hpp"
 #include "wpi/hal/Counter.h"
-#include "wpi/util/Handle.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/util/Handle.hpp"
 
 namespace wpi {
 /** Up Down Counter.

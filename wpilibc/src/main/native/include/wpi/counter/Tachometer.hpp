@@ -6,11 +6,11 @@
 
 #include "EdgeConfiguration.hpp"
 #include "wpi/hal/Counter.h"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/Handle.hpp"
-#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 /**

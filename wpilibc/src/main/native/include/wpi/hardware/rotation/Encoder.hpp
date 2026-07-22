@@ -6,8 +6,8 @@
 
 #include "wpi/hal/Encoder.h"
 #include "wpi/hardware/discrete/CounterBase.hpp"
-#include "wpi/util/Handle.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/util/Handle.hpp"
 
 namespace wpi {
 /**

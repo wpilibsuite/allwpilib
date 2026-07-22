@@ -65,8 +65,7 @@ void MockTunableBackend::SetValue(std::string_view path, U value) {
           if (!IsMutable(info)) {
             return;
           }
-          if (auto v = detail::CastTunable<T, false>(info.tunable,
-                                                     info.type)) {
+          if (auto v = detail::CastTunable<T, false>(info.tunable, info.type)) {
             v->Set(std::move(value));
           } else if (auto v = detail::CastTunable<T, true>(info.tunable,
                                                            info.type)) {

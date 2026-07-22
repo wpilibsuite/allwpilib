@@ -20,11 +20,11 @@ MecanumDrive::MecanumDrive(MotorController& frontLeftMotor,
                            MotorController& rearLeftMotor,
                            MotorController& frontRightMotor,
                            MotorController& rearRightMotor)
-    : MecanumDrive{
-          [&](double output) { frontLeftMotor.SetThrottle(output); },
-          [&](double output) { rearLeftMotor.SetThrottle(output); },
-          [&](double output) { frontRightMotor.SetThrottle(output); },
-          [&](double output) { rearRightMotor.SetThrottle(output); }} {}
+    : MecanumDrive{[&](double output) { frontLeftMotor.SetThrottle(output); },
+                   [&](double output) { rearLeftMotor.SetThrottle(output); },
+                   [&](double output) { frontRightMotor.SetThrottle(output); },
+                   [&](double output) { rearRightMotor.SetThrottle(output); }} {
+}
 
 MecanumDrive::MecanumDrive(std::function<void(double)> frontLeftMotor,
                            std::function<void(double)> rearLeftMotor,

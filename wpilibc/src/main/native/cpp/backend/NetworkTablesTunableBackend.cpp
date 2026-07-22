@@ -188,9 +188,8 @@ class NetworkTablesTunableBackend::ValueEntry : public Entry {
       m_subscriber = backend->m_inst.GetTopic(std::format("{}/tune", path))
                          .GenericSubscribe(typeString);
     } else {
-      m_publisher =
-          backend->m_inst.GetTopic(path).GenericPublishEx(typeString,
-                                                          GetProperties(config));
+      m_publisher = backend->m_inst.GetTopic(path).GenericPublishEx(
+          typeString, GetProperties(config));
       m_subscriber =
           backend->m_inst.GetTopic(path).GenericSubscribe(typeString);
     }
@@ -319,8 +318,7 @@ double ValueTunableEntry<double>::GetNtValue(const wpi::nt::Value& value) {
 }
 
 template <>
-void ValueTunableEntry<std::string>::SetNetworkValue(
-    const std::string& value) {
+void ValueTunableEntry<std::string>::SetNetworkValue(const std::string& value) {
   m_publisher.SetString(value);
 }
 
@@ -413,13 +411,15 @@ void ValueTunableEntry<std::vector<std::string>>::SetNetworkValue(
 }
 
 template <>
-std::vector<std::string> ValueTunableEntry<std::vector<std::string>>::GetNtValue(
+std::vector<std::string>
+ValueTunableEntry<std::vector<std::string>>::GetNtValue(
     const wpi::nt::Value& value) {
   auto arr = value.GetStringArray();
   return {arr.begin(), arr.end()};
 }
 
-class StructTunableEntry final : public NetworkTablesTunableBackend::ValueEntry {
+class StructTunableEntry final
+    : public NetworkTablesTunableBackend::ValueEntry {
  public:
   using NetworkTablesTunableBackend::ValueEntry::ValueEntry;
 
@@ -438,8 +438,8 @@ class StructTunableEntry final : public NetworkTablesTunableBackend::ValueEntry 
       tunable->PackStruct(data);
       m_publisher.SetRaw(data);
     } else {
-      auto tunable = static_cast<detail::TunableMemberStructBase*>(
-          info.tunable);
+      auto tunable =
+          static_cast<detail::TunableMemberStructBase*>(info.tunable);
       PublishSchemas(*tunable);
       std::vector<uint8_t> data(tunable->GetStructSize(info.config->parent));
       tunable->PackStruct(info.config->parent, data);
@@ -464,11 +464,11 @@ class StructTunableEntry final : public NetworkTablesTunableBackend::ValueEntry 
     if (m_schemaPublished) {
       return;
     }
-    tunable.ForEachStructSchema([this](std::string_view typeName,
-                                       std::string_view schema) {
-      m_publisher.GetTopic().GetInstance().AddSchema(typeName, "structschema",
-                                                     schema);
-    });
+    tunable.ForEachStructSchema(
+        [this](std::string_view typeName, std::string_view schema) {
+          m_publisher.GetTopic().GetInstance().AddSchema(
+              typeName, "structschema", schema);
+        });
     m_schemaPublished = true;
   }
 
@@ -476,11 +476,11 @@ class StructTunableEntry final : public NetworkTablesTunableBackend::ValueEntry 
     if (m_schemaPublished) {
       return;
     }
-    tunable.ForEachStructSchema([this](std::string_view typeName,
-                                       std::string_view schema) {
-      m_publisher.GetTopic().GetInstance().AddSchema(typeName, "structschema",
-                                                     schema);
-    });
+    tunable.ForEachStructSchema(
+        [this](std::string_view typeName, std::string_view schema) {
+          m_publisher.GetTopic().GetInstance().AddSchema(
+              typeName, "structschema", schema);
+        });
     m_schemaPublished = true;
   }
 
@@ -508,8 +508,8 @@ class ProtobufTunableEntry final
         m_publisher.SetRaw(data);
       }
     } else {
-      auto tunable = static_cast<detail::TunableMemberProtobufBase*>(
-          info.tunable);
+      auto tunable =
+          static_cast<detail::TunableMemberProtobufBase*>(info.tunable);
       PublishSchemas(*tunable);
       if (tunable->PackProtobuf(info.config->parent, data)) {
         m_publisher.SetRaw(data);
@@ -561,12 +561,11 @@ class ProtobufTunableEntry final
 
 class ComplexTunableEntry final : public NetworkTablesTunableBackend::Entry {
  public:
-  ComplexTunableEntry(wpi::nt::NetworkTableInstance inst,
-                      std::string_view path, uint32_t uid,
-                      detail::TunableBase& tunable)
+  ComplexTunableEntry(wpi::nt::NetworkTableInstance inst, std::string_view path,
+                      uint32_t uid, detail::TunableBase& tunable)
       : m_uid{uid},
-        m_typePublisher{inst.GetStringTopic(std::format("{}/.type", path))
-                            .Publish()} {
+        m_typePublisher{
+            inst.GetStringTopic(std::format("{}/.type", path)).Publish()} {
     auto& complex = static_cast<ComplexTunable&>(tunable);
     m_typePublisher.Set(complex.GetTunableType());
   }
@@ -606,28 +605,28 @@ void NetworkTablesTunableBackend::Publish(std::string_view path, uint32_t uid,
   switch (type) {
     case BOOLEAN:
     case MEMBER_BOOLEAN:
-      entry = std::make_unique<ValueTunableEntry<bool>>(
-          this, ntPath, uid, config, "boolean");
+      entry = std::make_unique<ValueTunableEntry<bool>>(this, ntPath, uid,
+                                                        config, "boolean");
       break;
     case INT32:
     case MEMBER_INT32:
-      entry = std::make_unique<ValueTunableEntry<int32_t>>(
-          this, ntPath, uid, config, "int");
+      entry = std::make_unique<ValueTunableEntry<int32_t>>(this, ntPath, uid,
+                                                           config, "int");
       break;
     case INT64:
     case MEMBER_INT64:
-      entry = std::make_unique<ValueTunableEntry<int64_t>>(
-          this, ntPath, uid, config, "int");
+      entry = std::make_unique<ValueTunableEntry<int64_t>>(this, ntPath, uid,
+                                                           config, "int");
       break;
     case FLOAT:
     case MEMBER_FLOAT:
-      entry = std::make_unique<ValueTunableEntry<float>>(
-          this, ntPath, uid, config, "float");
+      entry = std::make_unique<ValueTunableEntry<float>>(this, ntPath, uid,
+                                                         config, "float");
       break;
     case DOUBLE:
     case MEMBER_DOUBLE:
-      entry = std::make_unique<ValueTunableEntry<double>>(
-          this, ntPath, uid, config, "double");
+      entry = std::make_unique<ValueTunableEntry<double>>(this, ntPath, uid,
+                                                          config, "double");
       break;
     case STRING:
     case MEMBER_STRING:

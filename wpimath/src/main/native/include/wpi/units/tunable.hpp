@@ -55,10 +55,10 @@ class TunableMemberValue : public wpi::detail::TunableMemberValueBase<double> {
   using ValueType = unit_t<Units, T, NonLinearScale>;
 
   template <std::derived_from<ComplexTunable> Class>
-  explicit TunableMemberValue(ValueType Class::*member) : m_ptr{member} {}
+  explicit TunableMemberValue(ValueType Class::* member) : m_ptr{member} {}
 
   template <std::derived_from<ComplexTunable> Class>
-  explicit TunableMemberValue(ValueType Class::*member,
+  explicit TunableMemberValue(ValueType Class::* member,
                               const TunableConfig& config)
       : TunableMemberValueBase<double>{config}, m_ptr{member} {}
 
@@ -86,7 +86,7 @@ inline detail::TunableUnit<Units, T, NonLinearScale> GetCustomTunable(
 template <class Units, typename T, template <typename> class NonLinearScale,
           typename Class, typename... Args>
 inline std::unique_ptr<wpi::detail::TunableMemberBase> MakeTunableMember(
-    unit_t<Units, T, NonLinearScale> Class::*member, Args&&... args) {
+    unit_t<Units, T, NonLinearScale> Class::* member, Args&&... args) {
   return std::make_unique<detail::TunableMemberValue<Units, T, NonLinearScale>>(
       member, std::forward<Args>(args)...);
 }

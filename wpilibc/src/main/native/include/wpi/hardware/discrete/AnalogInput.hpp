@@ -7,8 +7,8 @@
 #include <stdint.h>
 
 #include "wpi/hal/AnalogInput.h"
-#include "wpi/util/Handle.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/util/Handle.hpp"
 
 namespace wpi {
 

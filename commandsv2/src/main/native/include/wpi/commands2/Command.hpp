@@ -36,8 +36,7 @@ namespace wpi::cmd {
  * @see CommandScheduler
  * @see CommandHelper
  */
-class Command : public wpi::TelemetryLoggable,
-                public wpi::ComplexTunable {
+class Command : public wpi::TelemetryLoggable, public wpi::ComplexTunable {
  public:
   ~Command() override;
 

@@ -5,10 +5,10 @@
 #pragma once
 
 #include "wpi/hal/DutyCycle.h"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/Handle.hpp"
-#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 /**

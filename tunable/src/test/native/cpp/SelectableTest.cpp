@@ -52,7 +52,7 @@ TEST_P(SelectableParameterizedTest, ReturnsSelected) {
   EXPECT_EQ(GetParam(), chooser.GetSelected());
 }
 
-TEST_F(SelectableFixture, PublishesEntriesAndMetadata) {
+TEST_F(SelectableFixtureTest, PublishesEntriesAndMetadata) {
   wpi::Selectable<int> chooser;
   chooser.Add("one", 1);
   chooser.AddDefault("two", 2);
@@ -91,7 +91,7 @@ TEST(SelectableTest, DefaultConstructableIsReturnedOnNoSelectAndNoDefault) {
   EXPECT_EQ(0, chooser.GetSelected());
 }
 
-TEST_F(SelectableFixture, ChangeListener) {
+TEST_F(SelectableFixtureTest, ChangeListener) {
   wpi::Selectable<int> chooser;
   for (int i = 1; i <= 3; i++) {
     chooser.Add(std::to_string(i), i);
@@ -107,7 +107,7 @@ TEST_F(SelectableFixture, ChangeListener) {
   EXPECT_EQ(3, currentVal);
 }
 
-TEST_F(SelectableFixture, ListenerIsNotCalledForUnknownSelection) {
+TEST_F(SelectableFixtureTest, ListenerIsNotCalledForUnknownSelection) {
   wpi::Selectable<int> chooser;
   chooser.Add("one", 1);
   int currentVal = 0;
@@ -121,7 +121,7 @@ TEST_F(SelectableFixture, ListenerIsNotCalledForUnknownSelection) {
   EXPECT_EQ(0, chooser.GetSelected());
 }
 
-TEST_F(SelectableFixture, ListenerReplacementUsesLatestListener) {
+TEST_F(SelectableFixtureTest, ListenerReplacementUsesLatestListener) {
   wpi::Selectable<int> chooser;
   chooser.Add("one", 1);
   int first = 0;
@@ -137,7 +137,8 @@ TEST_F(SelectableFixture, ListenerReplacementUsesLatestListener) {
   EXPECT_EQ(1, second);
 }
 
-TEST_F(SelectableFixture, DuplicateOptionReplacesValueWithoutDuplicatingOptions) {
+TEST_F(SelectableFixtureTest,
+       DuplicateOptionReplacesValueWithoutDuplicatingOptions) {
   wpi::Selectable<int> chooser;
   chooser.Add("mode", 1);
   chooser.Add("mode", 2);
@@ -149,7 +150,8 @@ TEST_F(SelectableFixture, DuplicateOptionReplacesValueWithoutDuplicatingOptions)
   EXPECT_EQ(2, chooser.GetSelected());
 }
 
-TEST_F(SelectableFixture, ClearResetsOptionsAndDefaultButPreservesSelectionName) {
+TEST_F(SelectableFixtureTest,
+       ClearResetsOptionsAndDefaultButPreservesSelectionName) {
   wpi::Selectable<int> chooser;
   chooser.AddDefault("one", 1);
   chooser.Add("two", 2);

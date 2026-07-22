@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/backend/NetworkTablesTelemetryBackend.hpp"
+
 #include <memory>
 #include <string>
 #include <string_view>
@@ -9,7 +11,6 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/backend/NetworkTablesTelemetryBackend.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/nt/GenericEntry.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
@@ -126,9 +127,9 @@ TEST_F(NetworkTablesTelemetryBackendTest, PublishesArrayAndRawDataTypes) {
 
 TEST_F(NetworkTablesTelemetryBackendTest, PublishesStruct) {
   const wpi::math::Translation2d value{1.25_m, 2.5_m};
-  auto sub = inst.GetStructTopic<wpi::math::Translation2d>(
-                     "/Telemetry/translation")
-                 .Subscribe({});
+  auto sub =
+      inst.GetStructTopic<wpi::math::Translation2d>("/Telemetry/translation")
+          .Subscribe({});
 
   wpi::Telemetry::Log("translation", value);
 
@@ -138,8 +139,7 @@ TEST_F(NetworkTablesTelemetryBackendTest, PublishesStruct) {
 }
 
 TEST_F(NetworkTablesTelemetryBackendTest, PublishesStructArray) {
-  const wpi::math::Translation2d values[] = {{1.25_m, 2.5_m},
-                                             {3.75_m, 4.5_m}};
+  const wpi::math::Translation2d values[] = {{1.25_m, 2.5_m}, {3.75_m, 4.5_m}};
   auto sub = inst.GetStructArrayTopic<wpi::math::Translation2d>(
                      "/Telemetry/translations")
                  .Subscribe({});
@@ -157,9 +157,9 @@ TEST_F(NetworkTablesTelemetryBackendTest, PublishesStructArray) {
 
 TEST_F(NetworkTablesTelemetryBackendTest, PublishesProtobuf) {
   const wpi::math::Translation2d value{3.75_m, 4.5_m};
-  auto sub = inst.GetProtobufTopic<wpi::math::Translation2d>(
-                     "/Telemetry/translation")
-                 .Subscribe({});
+  auto sub =
+      inst.GetProtobufTopic<wpi::math::Translation2d>("/Telemetry/translation")
+          .Subscribe({});
   wpi::util::ProtobufMessage<wpi::math::Translation2d> message;
   wpi::util::SmallVector<uint8_t, 128> buf;
   ASSERT_TRUE(message.Pack(buf, value));

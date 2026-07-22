@@ -32,7 +32,7 @@ template <typename T>
 class TunableMemberPointer {
  public:
   template <std::derived_from<ComplexTunable> Class>
-  explicit TunableMemberPointer(T Class::*member) {
+  explicit TunableMemberPointer(T Class::* member) {
     static_assert(alignof(Storage<Class>) ==
                   alignof(Storage<TunableMemberPointer>));
     static_assert(sizeof(Storage<Class>) <=
@@ -59,14 +59,14 @@ class TunableMemberPointer {
   };
   template <typename Class>
   struct Storage : public StorageBase {
-    explicit Storage(T Class::*member) : m_ptr{member} {}
+    explicit Storage(T Class::* member) : m_ptr{member} {}
     const T& Get(const ComplexTunable* obj) const override {
       return static_cast<const Class*>(obj)->*m_ptr;
     }
     T& Get(ComplexTunable* obj) const override {
       return static_cast<Class*>(obj)->*m_ptr;
     }
-    T Class::*m_ptr;
+    T Class::* m_ptr;
   };
 
   // 2x in case of virtual base classes or similar
@@ -92,10 +92,10 @@ template <TunableValueType T>
 class TunableMemberValue : public TunableMemberValueBase<T> {
  public:
   template <std::derived_from<ComplexTunable> Class>
-  explicit TunableMemberValue(T Class::*member) : m_ptr{member} {}
+  explicit TunableMemberValue(T Class::* member) : m_ptr{member} {}
 
   template <std::derived_from<ComplexTunable> Class>
-  TunableMemberValue(T Class::*member, const TunableConfig& config)
+  TunableMemberValue(T Class::* member, const TunableConfig& config)
       : TunableMemberValueBase<T>{config}, m_ptr{member} {}
 
   const T& Get(const ComplexTunable* obj) const override {
@@ -177,11 +177,11 @@ template <typename T, typename... I>
 class TunableMemberStruct : public detail::TunableMemberStructBase {
  public:
   template <std::derived_from<ComplexTunable> Class>
-  explicit TunableMemberStruct(T Class::*member, I... info)
+  explicit TunableMemberStruct(T Class::* member, I... info)
       : m_ptr{member}, m_info{std::move(info)...} {}
 
   template <std::derived_from<ComplexTunable> Class>
-  explicit TunableMemberStruct(T Class::*member, const TunableConfig& config,
+  explicit TunableMemberStruct(T Class::* member, const TunableConfig& config,
                                I... info)
       : detail::TunableMemberStructBase{config},
         m_ptr{member},
@@ -247,11 +247,11 @@ template <typename T, typename... I>
 class TunableMemberStructVector : public detail::TunableMemberStructBase {
  public:
   template <std::derived_from<ComplexTunable> Class>
-  explicit TunableMemberStructVector(T Class::*member, I... info)
+  explicit TunableMemberStructVector(T Class::* member, I... info)
       : m_ptr{member}, m_info{std::move(info)...} {}
 
   template <std::derived_from<ComplexTunable> Class>
-  explicit TunableMemberStructVector(T Class::*member,
+  explicit TunableMemberStructVector(T Class::* member,
                                      const TunableConfig& config, I... info)
       : detail::TunableMemberStructBase{config},
         m_ptr{member},
@@ -347,10 +347,10 @@ template <wpi::util::ProtobufSerializable T>
 class TunableMemberProtobuf : public detail::TunableMemberProtobufBase {
  public:
   template <std::derived_from<ComplexTunable> Class>
-  explicit TunableMemberProtobuf(T Class::*member) : m_ptr{member} {}
+  explicit TunableMemberProtobuf(T Class::* member) : m_ptr{member} {}
 
   template <std::derived_from<ComplexTunable> Class>
-  explicit TunableMemberProtobuf(T Class::*member, const TunableConfig& config)
+  explicit TunableMemberProtobuf(T Class::* member, const TunableConfig& config)
       : detail::TunableMemberProtobufBase{config}, m_ptr{member} {}
 
   const T& Get(ComplexTunable* obj) const { return m_ptr.Get(obj); }

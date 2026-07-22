@@ -105,7 +105,7 @@ class TunableTable final {
     requires std::convertible_to<
         std::unique_ptr<detail::TunableMemberBase>,
         decltype(MakeTunableMember(std::declval<T Class::*>()))>
-  void Publish(std::string_view name, Class* tunable, T Class::*member,
+  void Publish(std::string_view name, Class* tunable, T Class::* member,
                I&&... info) {
     Publish(name, tunable, MakeTunableMember(member, std::forward<I>(info)...));
   }
@@ -123,7 +123,7 @@ class TunableTable final {
         std::unique_ptr<detail::TunableMemberBase>,
         decltype(MakeTunableMember(std::declval<T Class::*>(),
                                    std::declval<TunableConfig>()))>
-  void Publish(std::string_view name, Class* tunable, T Class::*member,
+  void Publish(std::string_view name, Class* tunable, T Class::* member,
                const TunableConfig& config, I&&... info) {
     Publish(name, tunable,
             MakeTunableMember(member, config, std::forward<I>(info)...));
