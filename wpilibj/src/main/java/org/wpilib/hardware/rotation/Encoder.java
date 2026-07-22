@@ -90,11 +90,11 @@ public class Encoder implements CounterBase, TelemetryLoggable, AutoCloseable {
    * @param channelB The 'b' SmartIO channel.
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
    *     if necessary so forward represents positive values.
-   * @param encodingType either X1, X2, or X4 to indicate 1X, 2X or 4X decoding. If 4X is
-   *     selected, then an encoder FPGA object is used and the returned counts will be 4x the
-   *     encoder spec'd value since all rising and falling edges are counted. If 1X or 2X are
-   *     selected, then a counter object will be used and the returned value will either exactly
-   *     match the spec'd count or be double (2x) the spec'd count.
+   * @param encodingType either X1, X2, or X4 to indicate 1X, 2X or 4X decoding. If 4X is selected,
+   *     then an encoder FPGA object is used and the returned counts will be 4x the encoder spec'd
+   *     value since all rising and falling edges are counted. If 1X or 2X are selected, then a
+   *     counter object will be used and the returned value will either exactly match the spec'd
+   *     count or be double (2x) the spec'd count.
    */
   public Encoder(
       final int channelA,
