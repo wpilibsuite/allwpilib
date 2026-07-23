@@ -255,14 +255,14 @@ double CommandSteamController::GetRightTrigger() const {
   return m_controller->GetRightTrigger();
 }
 
-CommandPtr CommandSteamController::RumbleLeft(double value) {
+CommandPtr CommandSteamController::RumbleLeft(const double value) const {
   return m_hid->RumbleLeft(value);
 }
 
-CommandPtr CommandSteamController::RumbleRight(double value) {
+CommandPtr CommandSteamController::RumbleRight(const double value) const {
   return m_hid->RumbleRight(value);
 }
 
-CommandPtr CommandSteamController::RumbleBoth(double value) {
+CommandPtr CommandSteamController::RumbleBoth(const double value) const {
   return m_hid->RumbleBoth(value);
 }

@@ -195,18 +195,18 @@ double CommandSwitchProController::GetZR() const {
   return m_controller->GetZR();
 }
 
-CommandPtr CommandSwitchProController::RumbleLeft(double value) {
+CommandPtr CommandSwitchProController::RumbleLeft(const double value) const {
   return m_hid->RumbleLeft(value);
 }
 
-CommandPtr CommandSwitchProController::RumbleRight(double value) {
+CommandPtr CommandSwitchProController::RumbleRight(const double value) const {
   return m_hid->RumbleRight(value);
 }
 
-CommandPtr CommandSwitchProController::RumbleBoth(double value) {
+CommandPtr CommandSwitchProController::RumbleBoth(const double value) const {
   return m_hid->RumbleBoth(value);
 }
 
-CommandPtr CommandSwitchProController::SetLed(int value) {
+CommandPtr CommandSwitchProController::SetLed(const int value) const {
   return m_hid->SetLeds(value, value, value);
 }

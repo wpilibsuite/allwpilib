@@ -107,26 +107,26 @@ double CommandNiDsXboxController::GetRightTriggerAxis() const {
   return m_controller.GetRightTriggerAxis();
 }
 
-CommandPtr CommandNiDsXboxController::RumbleLeft(double value) {
+CommandPtr CommandNiDsXboxController::RumbleLeft(const double value) const {
   return m_hid->RumbleLeft(value);
 }
 
-CommandPtr CommandNiDsXboxController::RumbleRight(double value) {
+CommandPtr CommandNiDsXboxController::RumbleRight(const double value) const {
   return m_hid->RumbleRight(value);
 }
 
-CommandPtr CommandNiDsXboxController::RumbleBoth(double value) {
+CommandPtr CommandNiDsXboxController::RumbleBoth(const double value) const {
   return m_hid->RumbleBoth(value);
 }
 
-CommandPtr CommandNiDsXboxController::RumbleLeftTrigger(double value) {
+CommandPtr CommandNiDsXboxController::RumbleLeftTrigger(const double value) const {
   return m_hid->RumbleLeftTrigger(value);
 }
 
-CommandPtr CommandNiDsXboxController::RumbleRightTrigger(double value) {
+CommandPtr CommandNiDsXboxController::RumbleRightTrigger(const double value) const {
   return m_hid->RumbleRightTrigger(value);
 }
 
-CommandPtr CommandNiDsXboxController::RumbleTriggers(double value) {
+CommandPtr CommandNiDsXboxController::RumbleTriggers(const double value) const {
   return m_hid->RumbleTriggers(value);
 }

@@ -196,31 +196,32 @@ double CommandGamepad::GetRightTrigger() const {
   return m_gamepad->GetRightTrigger();
 }
 
-CommandPtr CommandGamepad::RumbleLeft(double value) {
+CommandPtr CommandGamepad::RumbleLeft(const double value) const {
   return m_hid->RumbleLeft(value);
 }
 
-CommandPtr CommandGamepad::RumbleRight(double value) {
+CommandPtr CommandGamepad::RumbleRight(const double value) const {
   return m_hid->RumbleRight(value);
 }
 
-CommandPtr CommandGamepad::RumbleBoth(double value) {
+CommandPtr CommandGamepad::RumbleBoth(const double value) const {
   return m_hid->RumbleBoth(value);
 }
 
-CommandPtr CommandGamepad::RumbleLeftTrigger(double value) {
+CommandPtr CommandGamepad::RumbleLeftTrigger(const double value) const {
   return m_hid->RumbleLeftTrigger(value);
 }
 
-CommandPtr CommandGamepad::RumbleRightTrigger(double value) {
+CommandPtr CommandGamepad::RumbleRightTrigger(const double value) const {
   return m_hid->RumbleRightTrigger(value);
 }
 
-CommandPtr CommandGamepad::RumbleTriggers(double value) {
+CommandPtr CommandGamepad::RumbleTriggers(const double value) const {
   return m_hid->RumbleTriggers(value);
 }
 
-CommandPtr CommandGamepad::SetLeds(int r, int g, int b) const {
+CommandPtr CommandGamepad::SetLeds(const int r, const int g,
+                                   const int b) const {
   return m_hid->SetLeds(r, g, b);
 }
 

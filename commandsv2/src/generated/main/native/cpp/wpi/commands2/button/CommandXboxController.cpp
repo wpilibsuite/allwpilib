@@ -189,26 +189,26 @@ double CommandXboxController::GetRightTrigger() const {
   return m_controller->GetRightTrigger();
 }
 
-CommandPtr CommandXboxController::RumbleLeft(double value) {
+CommandPtr CommandXboxController::RumbleLeft(const double value) const {
   return m_hid->RumbleLeft(value);
 }
 
-CommandPtr CommandXboxController::RumbleRight(double value) {
+CommandPtr CommandXboxController::RumbleRight(const double value) const {
   return m_hid->RumbleRight(value);
 }
 
-CommandPtr CommandXboxController::RumbleBoth(double value) {
+CommandPtr CommandXboxController::RumbleBoth(const double value) const {
   return m_hid->RumbleBoth(value);
 }
 
-CommandPtr CommandXboxController::RumbleLeftTrigger(double value) {
+CommandPtr CommandXboxController::RumbleLeftTrigger(const double value) const {
   return m_hid->RumbleLeftTrigger(value);
 }
 
-CommandPtr CommandXboxController::RumbleRightTrigger(double value) {
+CommandPtr CommandXboxController::RumbleRightTrigger(const double value) const {
   return m_hid->RumbleRightTrigger(value);
 }
 
-CommandPtr CommandXboxController::RumbleTriggers(double value) {
+CommandPtr CommandXboxController::RumbleTriggers(const double value) const {
   return m_hid->RumbleTriggers(value);
 }

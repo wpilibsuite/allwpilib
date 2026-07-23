@@ -357,7 +357,6 @@ class CommandGameCubeController {
    * @return the axis value.
    */
   double GetRTrigger() const;
-
 private:
   std::unique_ptr<CommandGenericHID> m_ownedHid;
   CommandGenericHID* m_hid = nullptr;

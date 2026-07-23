@@ -275,7 +275,7 @@ class CommandGenericHID final {
    * @param type  Which rumble value to set
    * @param value The normalized value (0 to 1) to set the rumble to
    */
-  void SetRumble(wpi::GenericHID::RumbleType type, double value);
+  void SetRumble(wpi::GenericHID::RumbleType type, double value) const;
 
   /**
    * Run the left rumble motor. On most controllers, this is the low-frequency
@@ -285,7 +285,7 @@ class CommandGenericHID final {
    * @return A command that will run the left rumble motor at the given value
    * until interrupted.
    */
-  CommandPtr RumbleLeft(double value);
+  CommandPtr RumbleLeft(double value) const;
 
   /**
    * Run the right rumble motor. On most controllers, this is the
@@ -295,7 +295,7 @@ class CommandGenericHID final {
    * @return A command that will run the right rumble motor at the given value
    * until interrupted.
    */
-  CommandPtr RumbleRight(double value);
+  CommandPtr RumbleRight(double value) const;
 
   /**
    * Run both rumble motors.
@@ -304,7 +304,7 @@ class CommandGenericHID final {
    * @return A command that will run the rumble motors at the given value until
    * interrupted.
    */
-  CommandPtr RumbleBoth(double value);
+  CommandPtr RumbleBoth(double value) const;
 
   /**
    * Run the left trigger rumble motor, on controllers that have one.
@@ -313,7 +313,7 @@ class CommandGenericHID final {
    * @return A command that will run the left trigger rumble motor at the given
    * value until interrupted.
    */
-  CommandPtr RumbleLeftTrigger(double value);
+  CommandPtr RumbleLeftTrigger(double value) const;
 
   /**
    * Run the right trigger rumble motor, on controllers that have one.
@@ -322,7 +322,7 @@ class CommandGenericHID final {
    * @return A command that will run the right trigger rumble motor at the given
    * value until interrupted.
    */
-  CommandPtr RumbleRightTrigger(double value);
+  CommandPtr RumbleRightTrigger(double value) const;
 
   /**
    * Run both trigger rumble motors, on controllers that have them.
@@ -331,11 +331,11 @@ class CommandGenericHID final {
    * @return A command that will run both trigger rumble motors at the given
    * value until interrupted.
    */
-  CommandPtr RumbleTriggers(double value);
+  CommandPtr RumbleTriggers(double value) const;
 
   /**
-    * Set the LEDs, on controllers that have them. If only mono is supported, the system will use
-    * the highest value passed in.
+   * Set the LEDs, on controllers that have them. If only mono is supported, the
+   * system will use the highest value passed in.
    *
    * @param r The red value (0-255)
    * @param g The green value (0-255)
@@ -346,21 +346,21 @@ class CommandGenericHID final {
   CommandPtr SetLeds(int r, int g, int b) const;
 
   /**
-   * Set the LEDs, for controllers that have them. If only mono is supported, the
-   * system will use the highest value passed in.
+   * Set the LEDs, for controllers that have them. If only mono is supported,
+   * the system will use the highest value passed in.
    *
    * @param color The color to use.
-  * @return A command that will set the LEDs to the given values until
+   * @return A command that will set the LEDs to the given values until
    * interrupted.
    */
   CommandPtr SetLeds(const util::Color& color) const;
 
   /**
-   * Set the LEDs, for controllers that have them. If only mono is supported, the
-   * system will use the highest value passed in.
+   * Set the LEDs, for controllers that have them. If only mono is supported,
+   * the system will use the highest value passed in.
    *
    * @param color The color to use.
-  * @return A command that will set the LEDs to the given values until
+   * @return A command that will set the LEDs to the given values until
    * interrupted.
    */
   CommandPtr SetLeds(const util::Color8Bit& color) const;
@@ -374,7 +374,7 @@ class CommandGenericHID final {
 
  private:
   CommandPtr Rumble(SubsystemBase& subsystem, std::string_view name,
-                    wpi::GenericHID::RumbleType type, double value);
+                    wpi::GenericHID::RumbleType type, double value) const;
 
   static std::unordered_map<wpi::GenericHID*,
                             std::array<std::unique_ptr<SubsystemBase>, 5>>

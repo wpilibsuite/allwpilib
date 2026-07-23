@@ -380,8 +380,8 @@ class GenericHID final : public HIDDevice {
   int GetPort() const;
 
   /**
-   * Set the LEDs, for controllers that have them. If only mono is supported, the system will use
-   * the highest value passed in.
+   * Set the LEDs, for controllers that have them. If only mono is supported,
+   * the system will use the highest value passed in.
    *
    * @param r Red value from 0-255
    * @param g Green value from 0-255
@@ -390,16 +390,16 @@ class GenericHID final : public HIDDevice {
   void SetLeds(int r, int g, int b) const;
 
   /**
-   * Set the LEDs, for controllers that have them. If only mono is supported, the
-   * system will use the highest value passed in.
+   * Set the LEDs, for controllers that have them. If only mono is supported,
+   * the system will use the highest value passed in.
    *
    * @param color The color to use.
    */
   void SetLeds(const util::Color& color) const;
 
   /**
-   * Set the LEDs, for controllers that have them. If only mono is supported, the
-   * system will use the highest value passed in.
+   * Set the LEDs, for controllers that have them. If only mono is supported,
+   * the system will use the highest value passed in.
    *
    * @param color The color to use.
    */

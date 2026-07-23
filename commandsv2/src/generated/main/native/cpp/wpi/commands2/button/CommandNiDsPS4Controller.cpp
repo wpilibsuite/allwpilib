@@ -115,19 +115,19 @@ double CommandNiDsPS4Controller::GetR2Axis() const {
   return m_controller.GetR2Axis();
 }
 
-CommandPtr CommandNiDsPS4Controller::RumbleLeft(double value) {
+CommandPtr CommandNiDsPS4Controller::RumbleLeft(const double value) const {
   return m_hid->RumbleLeft(value);
 }
 
-CommandPtr CommandNiDsPS4Controller::RumbleRight(double value) {
+CommandPtr CommandNiDsPS4Controller::RumbleRight(const double value) const {
   return m_hid->RumbleRight(value);
 }
 
-CommandPtr CommandNiDsPS4Controller::RumbleBoth(double value) {
+CommandPtr CommandNiDsPS4Controller::RumbleBoth(const double value) const {
   return m_hid->RumbleBoth(value);
 }
 
-CommandPtr CommandNiDsPS4Controller::SetLeds(int r, int g, int b) const {
+CommandPtr CommandNiDsPS4Controller::SetLeds(const int r, const int g, const int b) const {
   return m_hid->SetLeds(r, g, b);
 }
 

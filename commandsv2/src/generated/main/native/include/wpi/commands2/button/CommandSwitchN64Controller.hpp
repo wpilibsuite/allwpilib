@@ -364,7 +364,6 @@ class CommandSwitchN64Controller {
    * @return the axis value.
    */
   double GetZR() const;
-
 private:
   std::unique_ptr<CommandGenericHID> m_ownedHid;
   CommandGenericHID* m_hid = nullptr;

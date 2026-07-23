@@ -112,14 +112,14 @@ double CommandNiDsStadiaController::GetRightY() const {
   return m_controller.GetRightY();
 }
 
-CommandPtr CommandNiDsStadiaController::RumbleLeft(double value) {
+CommandPtr CommandNiDsStadiaController::RumbleLeft(const double value) const {
   return m_hid->RumbleLeft(value);
 }
 
-CommandPtr CommandNiDsStadiaController::RumbleRight(double value) {
+CommandPtr CommandNiDsStadiaController::RumbleRight(const double value) const {
   return m_hid->RumbleRight(value);
 }
 
-CommandPtr CommandNiDsStadiaController::RumbleBoth(double value) {
+CommandPtr CommandNiDsStadiaController::RumbleBoth(const double value) const {
   return m_hid->RumbleBoth(value);
 }

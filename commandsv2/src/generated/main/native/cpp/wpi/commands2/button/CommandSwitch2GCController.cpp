@@ -195,14 +195,14 @@ double CommandSwitch2GCController::GetRTrigger() const {
   return m_controller->GetRTrigger();
 }
 
-CommandPtr CommandSwitch2GCController::RumbleLeft(double value) {
+CommandPtr CommandSwitch2GCController::RumbleLeft(const double value) const {
   return m_hid->RumbleLeft(value);
 }
 
-CommandPtr CommandSwitch2GCController::RumbleRight(double value) {
+CommandPtr CommandSwitch2GCController::RumbleRight(const double value) const {
   return m_hid->RumbleRight(value);
 }
 
-CommandPtr CommandSwitch2GCController::RumbleBoth(double value) {
+CommandPtr CommandSwitch2GCController::RumbleBoth(const double value) const {
   return m_hid->RumbleBoth(value);
 }

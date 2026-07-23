@@ -80,38 +80,38 @@ double Command{{ ClassName }}Controller::Get{{ axis.MethodName }}() const {
 }
 {% endfor -%}
 {% if supports.rumble %}
-CommandPtr Command{{ ClassName }}Controller::RumbleLeft(double value) {
+CommandPtr Command{{ ClassName }}Controller::RumbleLeft(const double value) const {
   return m_hid->RumbleLeft(value);
 }
 
-CommandPtr Command{{ ClassName }}Controller::RumbleRight(double value) {
+CommandPtr Command{{ ClassName }}Controller::RumbleRight(const double value) const {
   return m_hid->RumbleRight(value);
 }
 
-CommandPtr Command{{ ClassName }}Controller::RumbleBoth(double value) {
+CommandPtr Command{{ ClassName }}Controller::RumbleBoth(const double value) const {
   return m_hid->RumbleBoth(value);
 }
 {% endif -%}
 {% if supports.triggerRumble %}
-CommandPtr Command{{ ClassName }}Controller::RumbleLeftTrigger(double value) {
+CommandPtr Command{{ ClassName }}Controller::RumbleLeftTrigger(const double value) const {
   return m_hid->RumbleLeftTrigger(value);
 }
 
-CommandPtr Command{{ ClassName }}Controller::RumbleRightTrigger(double value) {
+CommandPtr Command{{ ClassName }}Controller::RumbleRightTrigger(const double value) const {
   return m_hid->RumbleRightTrigger(value);
 }
 
-CommandPtr Command{{ ClassName }}Controller::RumbleTriggers(double value) {
+CommandPtr Command{{ ClassName }}Controller::RumbleTriggers(const double value) const {
   return m_hid->RumbleTriggers(value);
 }
 {% endif -%}
 {% if supports.monoLed %}
-CommandPtr Command{{ ClassName }}Controller::SetLed(int value) {
+CommandPtr Command{{ ClassName }}Controller::SetLed(const int value) const {
   return m_hid->SetLeds(value, value, value);
 }
 {% endif -%}
 {% if supports.rgbLed %}
-CommandPtr Command{{ ClassName }}Controller::SetLeds(int r, int g, int b) const {
+CommandPtr Command{{ ClassName }}Controller::SetLeds(const int r, const int g, const int b) const {
   return m_hid->SetLeds(r, g, b);
 }
 

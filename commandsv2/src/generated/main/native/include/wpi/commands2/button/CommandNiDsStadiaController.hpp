@@ -250,7 +250,6 @@ class CommandNiDsStadiaController {
    */
   double GetRightY() const;
 
-
   /**
    * Run the left rumble motor. On most controllers, this is the low-frequency
    * motor.
@@ -259,7 +258,7 @@ class CommandNiDsStadiaController {
    * @return A command that will run the left rumble motor at the given value
    * until interrupted.
    */
-  CommandPtr RumbleLeft(double value);
+  CommandPtr RumbleLeft(double value) const;
 
   /**
    * Run the right rumble motor. On most controllers, this is the
@@ -269,7 +268,7 @@ class CommandNiDsStadiaController {
    * @return A command that will run the right rumble motor at the given value
    * until interrupted.
    */
-  CommandPtr RumbleRight(double value);
+  CommandPtr RumbleRight(double value) const;
 
   /**
    * Run both rumble motors.
@@ -278,7 +277,7 @@ class CommandNiDsStadiaController {
    * @return A command that will run the rumble motors at the given value until
    * interrupted.
    */
-  CommandPtr RumbleBoth(double value);
+  CommandPtr RumbleBoth(double value) const;
 private:
   CommandGenericHID* m_hid;
   wpi::NiDsStadiaController m_controller;

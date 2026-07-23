@@ -150,8 +150,8 @@ Trigger CommandGenericHID::AxisMagnitudeGreaterThan(
   });
 }
 
-void CommandGenericHID::SetRumble(wpi::GenericHID::RumbleType type,
-                                  double value) {
+void CommandGenericHID::SetRumble(const wpi::GenericHID::RumbleType type,
+                                  const double value) const {
   m_hid->SetRumble(type, value);
 }
 
@@ -160,41 +160,41 @@ bool CommandGenericHID::IsConnected() const {
 }
 
 CommandPtr CommandGenericHID::Rumble(SubsystemBase& subsystem,
-                                     std::string_view name,
+                                     const std::string_view name,
                                      wpi::GenericHID::RumbleType type,
-                                     double value) {
+                                     double value) const {
   return subsystem
       .StartEnd([this, type, value] { SetRumble(type, value); },
                 [this, type] { SetRumble(type, 0); })
       .WithName(name);
 }
 
-CommandPtr CommandGenericHID::RumbleLeft(double value) {
+CommandPtr CommandGenericHID::RumbleLeft(const double value) const {
   return Rumble(m_leftRumble, "Rumble Left",
                 wpi::GenericHID::RumbleType::LEFT_RUMBLE, value);
 }
 
-CommandPtr CommandGenericHID::RumbleRight(double value) {
+CommandPtr CommandGenericHID::RumbleRight(const double value) const {
   return Rumble(m_rightRumble, "Rumble Right",
                 wpi::GenericHID::RumbleType::RIGHT_RUMBLE, value);
 }
 
-CommandPtr CommandGenericHID::RumbleBoth(double value) {
+CommandPtr CommandGenericHID::RumbleBoth(const double value) const {
   return Parallel(RumbleLeft(value), RumbleRight(value))
       .WithName("Both Rumble");
 }
 
-CommandPtr CommandGenericHID::RumbleLeftTrigger(double value) {
+CommandPtr CommandGenericHID::RumbleLeftTrigger(const double value) const {
   return Rumble(m_leftTriggerRumble, "Rumble Left Trigger",
                 wpi::GenericHID::RumbleType::LEFT_TRIGGER_RUMBLE, value);
 }
 
-CommandPtr CommandGenericHID::RumbleRightTrigger(double value) {
+CommandPtr CommandGenericHID::RumbleRightTrigger(const double value) const {
   return Rumble(m_rightTriggerRumble, "Rumble Right Trigger",
                 wpi::GenericHID::RumbleType::RIGHT_TRIGGER_RUMBLE, value);
 }
 
-CommandPtr CommandGenericHID::RumbleTriggers(double value) {
+CommandPtr CommandGenericHID::RumbleTriggers(const double value) const {
   return Parallel(RumbleLeftTrigger(value), RumbleRightTrigger(value))
       .WithName("Both Trigger Rumble");
 }

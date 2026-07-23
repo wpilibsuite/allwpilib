@@ -475,7 +475,6 @@ class CommandDualSenseEdgeController {
    */
   double GetR2() const;
 
-
   /**
    * Run the left rumble motor. On most controllers, this is the low-frequency
    * motor.
@@ -484,7 +483,7 @@ class CommandDualSenseEdgeController {
    * @return A command that will run the left rumble motor at the given value
    * until interrupted.
    */
-  CommandPtr RumbleLeft(double value);
+  CommandPtr RumbleLeft(double value) const;
 
   /**
    * Run the right rumble motor. On most controllers, this is the
@@ -494,7 +493,7 @@ class CommandDualSenseEdgeController {
    * @return A command that will run the right rumble motor at the given value
    * until interrupted.
    */
-  CommandPtr RumbleRight(double value);
+  CommandPtr RumbleRight(double value) const;
 
   /**
    * Run both rumble motors.
@@ -503,7 +502,7 @@ class CommandDualSenseEdgeController {
    * @return A command that will run the rumble motors at the given value until
    * interrupted.
    */
-  CommandPtr RumbleBoth(double value);
+  CommandPtr RumbleBoth(double value) const;
 
   /**
    * Run the left trigger rumble motor.
@@ -512,7 +511,7 @@ class CommandDualSenseEdgeController {
    * @return A command that will run the left trigger rumble motor at the given
    * value until interrupted.
    */
-  CommandPtr RumbleLeftTrigger(double value);
+  CommandPtr RumbleLeftTrigger(double value) const;
 
   /**
    * Run the right trigger rumble motor.
@@ -521,7 +520,7 @@ class CommandDualSenseEdgeController {
    * @return A command that will run the right trigger rumble motor at the given
    * value until interrupted.
    */
-  CommandPtr RumbleRightTrigger(double value);
+  CommandPtr RumbleRightTrigger(double value) const;
 
   /**
    * Run both trigger rumble motors.
@@ -530,7 +529,7 @@ class CommandDualSenseEdgeController {
    * @return A command that will run both trigger rumble motors at the given
    * value until interrupted.
    */
-  CommandPtr RumbleTriggers(double value);
+  CommandPtr RumbleTriggers(double value) const;
 
   /**
    * Set the LEDs.

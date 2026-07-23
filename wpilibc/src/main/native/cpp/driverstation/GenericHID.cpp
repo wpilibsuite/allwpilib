@@ -160,9 +160,9 @@ int GenericHID::GetPort() const {
 }
 
 void GenericHID::SetLeds(const int r, const int g, const int b) const {
-  uint32_t value = (static_cast<uint32_t>(r & 0xFF) << 16) |
-                   (static_cast<uint32_t>(g & 0xFF) << 8) |
-                   static_cast<uint32_t>(b & 0xFF);
+  const uint32_t value = (static_cast<uint32_t>(r & 0xFF) << 16) |
+                         (static_cast<uint32_t>(g & 0xFF) << 8) |
+                         static_cast<uint32_t>(b & 0xFF);
   HAL_SetJoystickLeds(m_port, value);
 }
 
@@ -176,9 +176,9 @@ void GenericHID::SetLeds(const util::Color8Bit& color) const {
   SetLeds(color.red, color.green, color.blue);
 }
 
-void GenericHID::SetRumble(RumbleType type, double value) {
+void GenericHID::SetRumble(const RumbleType type, double value) {
   value = std::clamp(value, 0.0, 1.0);
-  double rumbleValue = value * 65535;
+  const double rumbleValue = value * 65535;
 
   if (type == RumbleType::LEFT_RUMBLE) {
     m_leftRumble = rumbleValue;

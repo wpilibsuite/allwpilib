@@ -1231,8 +1231,8 @@ class Gamepad : public HIDDevice,
   int GetPort() const;
 
   /**
-   * Set the LEDs, on gamepads that have them. If only mono is supported, the system will use
-   * the highest value passed in.
+   * Set the LEDs, on gamepads that have them. If only mono is supported, the
+   * system will use the highest value passed in.
    *
    * @param r Red value from 0-255
    * @param g Green value from 0-255
