@@ -135,8 +135,7 @@ public class Command{{ ConsoleName }}Controller {
   public double get{{ capitalize_first(trigger.name) }}Axis() {
     return m_controller.get{{ capitalize_first(trigger.name) }}Axis();
   }
-{% endfor -%}
-
+{% endfor %}
   /**
    * Run the left rumble motor. On most controllers, this is the low-frequency motor.
    *

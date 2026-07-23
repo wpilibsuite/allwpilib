@@ -412,7 +412,8 @@ public class CommandNiDsPS5Controller {
   public double getR2Axis() {
     return m_controller.getR2Axis();
   }
-/**
+
+  /**
    * Run the left rumble motor. On most controllers, this is the low-frequency motor.
    *
    * @param value The normalized value (0 to 1) to set the rumble to

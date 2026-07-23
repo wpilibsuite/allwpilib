@@ -414,7 +414,8 @@ public class CommandNiDsStadiaController {
   public double getRightY() {
     return m_controller.getRightY();
   }
-/**
+
+  /**
    * Run the left rumble motor. On most controllers, this is the low-frequency motor.
    *
    * @param value The normalized value (0 to 1) to set the rumble to
