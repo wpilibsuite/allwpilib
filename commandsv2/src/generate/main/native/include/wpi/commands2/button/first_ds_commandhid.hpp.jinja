@@ -229,7 +229,7 @@ class Command{{ ClassName }}Controller {
    * @return A command that will set the LED to the given value until
    * interrupted.
    */
-    CommandPtr SetLed(int value) const;
+  CommandPtr SetLed(int value) const;
 {% endif -%}
 {% if supports.rgbLed %}
   /**
