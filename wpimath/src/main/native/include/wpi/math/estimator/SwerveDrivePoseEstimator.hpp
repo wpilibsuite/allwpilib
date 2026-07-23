@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "wpi/math/estimator/PoseEstimator.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
