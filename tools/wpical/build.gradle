@@ -244,7 +244,7 @@ model {
                     // advapi32.lib is needed for __imp_RegDeleteKeyA and other __imp_Reg functions for icvLoadWindowPos and the save variant
                     it.linker.args << 'advapi32.lib' << 'Comdlg32.lib' << 'dbghelp.lib'
                 } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
-                    it.linker.args << '-framework' << 'Accelerate'
+                    it.linker.args << '-framework' << 'Accelerate' << '-framework' << 'AVFoundation' << '-framework' << 'CoreMedia'
                 }
             }
         }
