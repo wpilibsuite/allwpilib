@@ -243,8 +243,6 @@ TEST(DifferentialDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
   // The alternative result is that only one vision measurement affects the
   // outcome. If that were the case, after 1000 measurements, the estimated
   // pose would converge to that measurement.
-  wpi::math::DifferentialDriveKinematics kinematics{1.0_m};
-
   wpi::math::DifferentialDrivePoseEstimator estimator{
       wpi::math::Rotation2d{},
       0_m,
