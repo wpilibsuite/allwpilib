@@ -510,8 +510,8 @@ public final class GenericHID implements HIDDevice {
   }
 
   /**
-   * Set the LEDs, on controllers that have them. If only mono is supported, the system will use the highest value
-   * passed in.
+   * Set the LEDs, on controllers that have them. If only mono is supported, the system will use the
+   * highest value passed in.
    *
    * @param r Red value from 0-255
    * @param g Green value from 0-255
@@ -523,8 +523,8 @@ public final class GenericHID implements HIDDevice {
   }
 
   /**
-   * Set the LEDs, on controllers that have them. If only mono is supported, the system will use the highest value
-   * passed in.
+   * Set the LEDs, on controllers that have them. If only mono is supported, the system will use the
+   * highest value passed in.
    *
    * @param color The color to use.
    */
@@ -533,8 +533,8 @@ public final class GenericHID implements HIDDevice {
   }
 
   /**
-   * Set the LEDs, on controllers that have them. If only mono is supported, the system will use the highest value
-   * passed in.
+   * Set the LEDs, on controllers that have them. If only mono is supported, the system will use the
+   * highest value passed in.
    *
    * @param color The color to use.
    */

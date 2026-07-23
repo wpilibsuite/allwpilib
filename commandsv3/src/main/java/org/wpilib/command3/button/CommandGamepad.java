@@ -945,8 +945,8 @@ public class CommandGamepad {
   }
 
   /**
-   * Set the LEDs, on gamepads that have them. If only mono is supported, the system
-   * will use the highest value passed in.
+   * Set the LEDs, on gamepads that have them. If only mono is supported, the system will use the
+   * highest value passed in.
    *
    * @param color The color to use.
    * @return A command that will set the LEDs to the given values until interrupted.
@@ -956,8 +956,8 @@ public class CommandGamepad {
   }
 
   /**
-   * Set the LEDs, on gamepads that have them. If only mono is supported, the system
-   * will use the highest value passed in.
+   * Set the LEDs, on gamepads that have them. If only mono is supported, the system will use the
+   * highest value passed in.
    *
    * @param color The color to use.
    * @return A command that will set the LEDs to the given values until interrupted.
