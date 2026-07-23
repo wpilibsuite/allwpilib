@@ -45,8 +45,14 @@ public class PairJsonAdapter implements JsonAdapter<Pair<?, ?>> {
   @Override
   public Pair<?, ?> fromJson(JsonReader reader) {
     reader.beginArray();
-    Object first = reader.hasNextElement() ? firstAdapter.fromJson(reader) : null;
-    Object second = reader.hasNextElement() ? secondAdapter.fromJson(reader) : null;
+    if (!reader.hasNextElement()) {
+      throw new IllegalStateException("Missing first field of pair");
+    }
+    Object first = firstAdapter.fromJson(reader);
+    if (!reader.hasNextElement()) {
+      throw new IllegalStateException("Missing second field of pair");
+    }
+    Object second = secondAdapter.fromJson(reader);
     reader.endArray();
     return Pair.of(first, second);
   }
