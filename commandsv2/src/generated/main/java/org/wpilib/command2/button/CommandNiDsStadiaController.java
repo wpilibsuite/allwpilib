@@ -10,6 +10,7 @@ import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.NiDsStadiaController;
 import org.wpilib.event.EventLoop;
+
 /**
  * A version of {@link NiDsStadiaController} with {@link Trigger} factories for command-based.
  *
