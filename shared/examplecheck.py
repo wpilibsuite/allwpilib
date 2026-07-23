@@ -35,6 +35,7 @@ TAGS = {
     "Shuffleboard",
     "Sendable",
     "DataLog",
+    "Driver Station",
     # --- Controls ---
     "Exponential Profile",
     "PID",
