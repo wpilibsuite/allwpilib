@@ -471,37 +471,4 @@ public class CommandNiDsXboxController {
   public Command rumbleBoth(double value) {
     return m_hid.rumbleBoth(value);
   }
-
-  /**
-   * Run the left trigger rumble motor.
-   *
-   * @param value The normalized value (0 to 1) to set the rumble to
-   * @return A command that will run the left trigger rumble motor at the given value until
-   *     interrupted.
-   */
-  public Command rumbleLeftTrigger(double value) {
-    return m_hid.rumbleLeftTrigger(value);
-  }
-
-  /**
-   * Run the right trigger rumble motor.
-   *
-   * @param value The normalized value (0 to 1) to set the rumble to
-   * @return A command that will run the right trigger rumble motor at the given value until
-   *     interrupted.
-   */
-  public Command rumbleRightTrigger(double value) {
-    return m_hid.rumbleRightTrigger(value);
-  }
-
-  /**
-   * Run both trigger rumble motors.
-   *
-   * @param value The normalized value (0 to 1) to set the rumble to
-   * @return A command that will run both trigger rumble motors at the given value until
-   *     interrupted.
-   */
-  public Command rumbleTriggers(double value) {
-    return m_hid.rumbleTriggers(value);
-  }
 }

@@ -114,7 +114,6 @@ double CommandNiDsPS4Controller::GetL2Axis() const {
 double CommandNiDsPS4Controller::GetR2Axis() const {
   return m_controller.GetR2Axis();
 }
-
 CommandPtr CommandNiDsPS4Controller::RumbleLeft(const double value) const {
   return m_hid->RumbleLeft(value);
 }
@@ -125,18 +124,4 @@ CommandPtr CommandNiDsPS4Controller::RumbleRight(const double value) const {
 
 CommandPtr CommandNiDsPS4Controller::RumbleBoth(const double value) const {
   return m_hid->RumbleBoth(value);
-}
-
-CommandPtr CommandNiDsPS4Controller::SetLeds(const int r, const int g, const int b) const {
-  return m_hid->SetLeds(r, g, b);
-}
-
-CommandPtr CommandNiDsPS4Controller::SetLeds(const util::Color& color) const {
-  return SetLeds(static_cast<int>(color.red * 255),
-                 static_cast<int>(color.green * 255),
-                 static_cast<int>(color.blue * 255));
-}
-
-CommandPtr CommandNiDsPS4Controller::SetLeds(const util::Color8Bit& color) const {
-  return SetLeds(color.red, color.green, color.blue);
 }

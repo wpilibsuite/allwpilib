@@ -446,7 +446,7 @@ class CommandSwitchProController {
    * @return A command that will set the LED to the given value until
    * interrupted.
    */
-    CommandPtr SetLed(int value) const;
+  CommandPtr SetLed(int value) const;
 private:
   std::unique_ptr<CommandGenericHID> m_ownedHid;
   CommandGenericHID* m_hid = nullptr;

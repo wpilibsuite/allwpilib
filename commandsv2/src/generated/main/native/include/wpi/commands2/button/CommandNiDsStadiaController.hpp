@@ -249,8 +249,7 @@ class CommandNiDsStadiaController {
    * @return The axis value.
    */
   double GetRightY() const;
-
-  /**
+/**
    * Run the left rumble motor. On most controllers, this is the low-frequency
    * motor.
    *
@@ -278,7 +277,8 @@ class CommandNiDsStadiaController {
    * interrupted.
    */
   CommandPtr RumbleBoth(double value) const;
-private:
+
+ private:
   CommandGenericHID* m_hid;
   wpi::NiDsStadiaController m_controller;
 };

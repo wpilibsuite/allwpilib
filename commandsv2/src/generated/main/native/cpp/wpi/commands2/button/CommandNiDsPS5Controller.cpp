@@ -114,7 +114,6 @@ double CommandNiDsPS5Controller::GetL2Axis() const {
 double CommandNiDsPS5Controller::GetR2Axis() const {
   return m_controller.GetR2Axis();
 }
-
 CommandPtr CommandNiDsPS5Controller::RumbleLeft(const double value) const {
   return m_hid->RumbleLeft(value);
 }
@@ -125,30 +124,4 @@ CommandPtr CommandNiDsPS5Controller::RumbleRight(const double value) const {
 
 CommandPtr CommandNiDsPS5Controller::RumbleBoth(const double value) const {
   return m_hid->RumbleBoth(value);
-}
-
-CommandPtr CommandNiDsPS5Controller::RumbleLeftTrigger(const double value) const {
-  return m_hid->RumbleLeftTrigger(value);
-}
-
-CommandPtr CommandNiDsPS5Controller::RumbleRightTrigger(const double value) const {
-  return m_hid->RumbleRightTrigger(value);
-}
-
-CommandPtr CommandNiDsPS5Controller::RumbleTriggers(const double value) const {
-  return m_hid->RumbleTriggers(value);
-}
-
-CommandPtr CommandNiDsPS5Controller::SetLeds(const int r, const int g, const int b) const {
-  return m_hid->SetLeds(r, g, b);
-}
-
-CommandPtr CommandNiDsPS5Controller::SetLeds(const util::Color& color) const {
-  return SetLeds(static_cast<int>(color.red * 255),
-                 static_cast<int>(color.green * 255),
-                 static_cast<int>(color.blue * 255));
-}
-
-CommandPtr CommandNiDsPS5Controller::SetLeds(const util::Color8Bit& color) const {
-  return SetLeds(color.red, color.green, color.blue);
 }

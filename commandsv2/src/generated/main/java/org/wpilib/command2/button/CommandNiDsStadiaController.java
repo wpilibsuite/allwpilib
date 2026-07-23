@@ -10,7 +10,6 @@ import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.NiDsStadiaController;
 import org.wpilib.event.EventLoop;
-
 /**
  * A version of {@link NiDsStadiaController} with {@link Trigger} factories for command-based.
  *
@@ -414,8 +413,7 @@ public class CommandNiDsStadiaController {
   public double getRightY() {
     return m_controller.getRightY();
   }
-
-  /**
+/**
    * Run the left rumble motor. On most controllers, this is the low-frequency motor.
    *
    * @param value The normalized value (0 to 1) to set the rumble to

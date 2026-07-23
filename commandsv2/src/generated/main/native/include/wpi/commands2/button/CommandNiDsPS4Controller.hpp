@@ -253,8 +253,7 @@ class CommandNiDsPS4Controller {
    * @return The axis value.
    */
   double GetR2Axis() const;
-
-  /**
+/**
    * Run the left rumble motor. On most controllers, this is the low-frequency
    * motor.
    *
@@ -283,35 +282,7 @@ class CommandNiDsPS4Controller {
    */
   CommandPtr RumbleBoth(double value) const;
 
-  /**
-   * Set the LEDs.
-   *
-   * @param r The red value (0-255)
-   * @param g The green value (0-255)
-   * @param b The blue value (0-255)
-   * @return A command that will set the LEDs to the given values until
-   * interrupted.
-   */
-  CommandPtr SetLeds(int r, int g, int b) const;
-
-  /**
-   * Set the LEDs.
-   *
-   * @param color The color to use.
-  * @return A command that will set the LEDs to the given values until
-   * interrupted.
-   */
-  CommandPtr SetLeds(const util::Color& color) const;
-
-  /**
-   * Set the LEDs.
-   *
-   * @param color The color to use.
-  * @return A command that will set the LEDs to the given values until
-   * interrupted.
-   */
-  CommandPtr SetLeds(const util::Color8Bit& color) const;
-private:
+ private:
   CommandGenericHID* m_hid;
   wpi::NiDsPS4Controller m_controller;
 };

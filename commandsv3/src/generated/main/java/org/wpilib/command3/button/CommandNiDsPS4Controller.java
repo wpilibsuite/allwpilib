@@ -11,8 +11,6 @@ import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.NiDsPS4Controller;
 import org.wpilib.event.EventLoop;
-import org.wpilib.util.Color;
-import org.wpilib.util.Color8Bit;
 
 /**
  * A version of {@link NiDsPS4Controller} with {@link Trigger} factories for command-based.
@@ -484,37 +482,5 @@ public class CommandNiDsPS4Controller {
    */
   public Command rumbleBoth(double value) {
     return m_hid.rumbleBoth(value);
-  }
-
-  /**
-   * Set the LEDs.
-   *
-   * @param r The red value (0-255)
-   * @param g The green value (0-255)
-   * @param b The blue value (0-255)
-   * @return A command that will set the LEDs to the given values until interrupted.
-   */
-  public Command setLeds(int r, int g, int b) {
-    return m_hid.setLeds(r, g, b);
-  }
-
-  /**
-   * Set the LEDs.
-   *
-   * @param color The color to use.
-   * @return A command that will set the LEDs to the given values until interrupted.
-   */
-  public Command setLeds(Color color) {
-    return setLeds((int) (color.red * 255), (int) (color.green * 255), (int) (color.blue * 255));
-  }
-
-  /**
-   * Set the LEDs.
-   *
-   * @param color The color to use.
-   * @return A command that will set the LEDs to the given values until interrupted.
-   */
-  public Command setLeds(Color8Bit color) {
-    return setLeds(color.red, color.green, color.blue);
   }
 }

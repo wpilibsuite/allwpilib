@@ -253,8 +253,7 @@ class CommandNiDsPS5Controller {
    * @return The axis value.
    */
   double GetR2Axis() const;
-
-  /**
+/**
    * Run the left rumble motor. On most controllers, this is the low-frequency
    * motor.
    *
@@ -283,62 +282,7 @@ class CommandNiDsPS5Controller {
    */
   CommandPtr RumbleBoth(double value) const;
 
-  /**
-   * Run the left trigger rumble motor.
-   *
-   * @param value The normalized value (0 to 1) to set the rumble to
-   * @return A command that will run the left trigger rumble motor at the given
-   * value until interrupted.
-   */
-  CommandPtr RumbleLeftTrigger(double value) const;
-
-  /**
-   * Run the right trigger rumble motor.
-   *
-   * @param value The normalized value (0 to 1) to set the rumble to
-   * @return A command that will run the right trigger rumble motor at the given
-   * value until interrupted.
-   */
-  CommandPtr RumbleRightTrigger(double value) const;
-
-  /**
-   * Run both trigger rumble motors.
-   *
-   * @param value The normalized value (0 to 1) to set the rumble to
-   * @return A command that will run both trigger rumble motors at the given
-   * value until interrupted.
-   */
-  CommandPtr RumbleTriggers(double value) const;
-
-  /**
-   * Set the LEDs.
-   *
-   * @param r The red value (0-255)
-   * @param g The green value (0-255)
-   * @param b The blue value (0-255)
-   * @return A command that will set the LEDs to the given values until
-   * interrupted.
-   */
-  CommandPtr SetLeds(int r, int g, int b) const;
-
-  /**
-   * Set the LEDs.
-   *
-   * @param color The color to use.
-  * @return A command that will set the LEDs to the given values until
-   * interrupted.
-   */
-  CommandPtr SetLeds(const util::Color& color) const;
-
-  /**
-   * Set the LEDs.
-   *
-   * @param color The color to use.
-  * @return A command that will set the LEDs to the given values until
-   * interrupted.
-   */
-  CommandPtr SetLeds(const util::Color8Bit& color) const;
-private:
+ private:
   CommandGenericHID* m_hid;
   wpi::NiDsPS5Controller m_controller;
 };

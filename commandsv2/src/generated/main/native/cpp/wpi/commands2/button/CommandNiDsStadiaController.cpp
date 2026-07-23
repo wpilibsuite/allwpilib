@@ -111,7 +111,6 @@ double CommandNiDsStadiaController::GetLeftY() const {
 double CommandNiDsStadiaController::GetRightY() const {
   return m_controller.GetRightY();
 }
-
 CommandPtr CommandNiDsStadiaController::RumbleLeft(const double value) const {
   return m_hid->RumbleLeft(value);
 }

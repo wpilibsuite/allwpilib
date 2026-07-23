@@ -239,8 +239,7 @@ class CommandNiDsXboxController {
    * @return The axis value.
    */
   double GetRightTriggerAxis() const;
-
-  /**
+/**
    * Run the left rumble motor. On most controllers, this is the low-frequency
    * motor.
    *
@@ -269,33 +268,7 @@ class CommandNiDsXboxController {
    */
   CommandPtr RumbleBoth(double value) const;
 
-  /**
-   * Run the left trigger rumble motor.
-   *
-   * @param value The normalized value (0 to 1) to set the rumble to
-   * @return A command that will run the left trigger rumble motor at the given
-   * value until interrupted.
-   */
-  CommandPtr RumbleLeftTrigger(double value) const;
-
-  /**
-   * Run the right trigger rumble motor.
-   *
-   * @param value The normalized value (0 to 1) to set the rumble to
-   * @return A command that will run the right trigger rumble motor at the given
-   * value until interrupted.
-   */
-  CommandPtr RumbleRightTrigger(double value) const;
-
-  /**
-   * Run both trigger rumble motors.
-   *
-   * @param value The normalized value (0 to 1) to set the rumble to
-   * @return A command that will run both trigger rumble motors at the given
-   * value until interrupted.
-   */
-  CommandPtr RumbleTriggers(double value) const;
-private:
+ private:
   CommandGenericHID* m_hid;
   wpi::NiDsXboxController m_controller;
 };

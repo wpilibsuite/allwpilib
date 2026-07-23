@@ -10,7 +10,6 @@ import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.NiDsXboxController;
 import org.wpilib.event.EventLoop;
-
 /**
  * A version of {@link NiDsXboxController} with {@link Trigger} factories for command-based.
  *
@@ -402,8 +401,7 @@ public class CommandNiDsXboxController {
   public double getRightTriggerAxis() {
     return m_controller.getRightTriggerAxis();
   }
-
-  /**
+/**
    * Run the left rumble motor. On most controllers, this is the low-frequency motor.
    *
    * @param value The normalized value (0 to 1) to set the rumble to
@@ -431,38 +429,5 @@ public class CommandNiDsXboxController {
    */
   public Command rumbleBoth(double value) {
     return m_hid.rumbleBoth(value);
-  }
-
-  /**
-   * Run the left trigger rumble motor.
-   *
-   * @param value The normalized value (0 to 1) to set the rumble to
-   * @return A command that will run the left trigger rumble motor at the given value until
-   *     interrupted.
-   */
-  public Command rumbleLeftTrigger(double value) {
-    return m_hid.rumbleLeftTrigger(value);
-  }
-
-  /**
-   * Run the right trigger rumble motor.
-   *
-   * @param value The normalized value (0 to 1) to set the rumble to
-   * @return A command that will run the right trigger rumble motor at the given value until
-   *     interrupted.
-   */
-  public Command rumbleRightTrigger(double value) {
-    return m_hid.rumbleRightTrigger(value);
-  }
-
-  /**
-   * Run both trigger rumble motors.
-   *
-   * @param value The normalized value (0 to 1) to set the rumble to
-   * @return A command that will run both trigger rumble motors at the given value until
-   *     interrupted.
-   */
-  public Command rumbleTriggers(double value) {
-    return m_hid.rumbleTriggers(value);
   }
 }
