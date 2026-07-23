@@ -291,8 +291,6 @@ TEST(DifferentialDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
 }
 
 TEST(DifferentialDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
-  wpi::math::DifferentialDriveKinematics kinematics{1_m};
-
   wpi::math::DifferentialDrivePoseEstimator estimator{
       wpi::math::Rotation2d{}, 0_m, 0_m, wpi::math::Pose2d{}, {0.1, 0.1, 0.1},
       {0.45, 0.45, 0.45}};
@@ -320,7 +318,6 @@ TEST(DifferentialDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
 }
 
 TEST(DifferentialDrivePoseEstimatorTest, TestSampleAt) {
-  wpi::math::DifferentialDriveKinematics kinematics{1_m};
   wpi::math::DifferentialDrivePoseEstimator estimator{
       wpi::math::Rotation2d{}, 0_m, 0_m, wpi::math::Pose2d{}, {1.0, 1.0, 1.0},
       {1.0, 1.0, 1.0}};
@@ -388,7 +385,6 @@ TEST(DifferentialDrivePoseEstimatorTest, TestSampleAt) {
 }
 
 TEST(DifferentialDrivePoseEstimatorTest, TestReset) {
-  wpi::math::DifferentialDriveKinematics kinematics{1_m};
   wpi::math::DifferentialDrivePoseEstimator estimator{
       wpi::math::Rotation2d{},
       0_m,
