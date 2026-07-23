@@ -159,11 +159,21 @@ int GenericHID::GetPort() const {
   return m_port;
 }
 
-void GenericHID::SetLeds(int r, int g, int b) {
+void GenericHID::SetLeds(const int r, const int g, const int b) const {
   uint32_t value = (static_cast<uint32_t>(r & 0xFF) << 16) |
                    (static_cast<uint32_t>(g & 0xFF) << 8) |
                    static_cast<uint32_t>(b & 0xFF);
   HAL_SetJoystickLeds(m_port, value);
+}
+
+void GenericHID::SetLeds(const util::Color& color) const {
+  SetLeds(static_cast<int>(color.red * 255),
+          static_cast<int>(color.green * 255),
+          static_cast<int>(color.blue * 255));
+}
+
+void GenericHID::SetLeds(const util::Color8Bit& color) const {
+  SetLeds(color.red, color.green, color.blue);
 }
 
 void GenericHID::SetRumble(RumbleType type, double value) {

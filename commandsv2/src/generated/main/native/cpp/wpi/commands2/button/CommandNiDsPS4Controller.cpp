@@ -127,6 +127,16 @@ CommandPtr CommandNiDsPS4Controller::RumbleBoth(double value) {
   return m_hid->RumbleBoth(value);
 }
 
-CommandPtr CommandNiDsPS4Controller::SetLeds(int r, int g, int b) {
+CommandPtr CommandNiDsPS4Controller::SetLeds(int r, int g, int b) const {
   return m_hid->SetLeds(r, g, b);
+}
+
+CommandPtr CommandNiDsPS4Controller::SetLeds(const util::Color& color) const {
+  return SetLeds(static_cast<int>(color.red * 255),
+                 static_cast<int>(color.green * 255),
+                 static_cast<int>(color.blue * 255));
+}
+
+CommandPtr CommandNiDsPS4Controller::SetLeds(const util::Color8Bit& color) const {
+  return SetLeds(color.red, color.green, color.blue);
 }

@@ -14,6 +14,8 @@ import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.math.util.MathUtil;
+import org.wpilib.util.Color;
+import org.wpilib.util.Color8Bit;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 
@@ -1506,8 +1508,8 @@ public class Gamepad implements HIDDevice, Sendable {
   }
 
   /**
-   * Set leds on the gamepad. If only mono is supported, the system will use the highest value
-   * passed in.
+   * Set the LEDs, for gamepads that have them. If only mono is supported, the system
+   * will use the highest value passed in.
    *
    * @param r Red value from 0-255
    * @param g Green value from 0-255
@@ -1515,6 +1517,26 @@ public class Gamepad implements HIDDevice, Sendable {
    */
   public void setLeds(int r, int g, int b) {
     m_hid.setLeds(r, g, b);
+  }
+
+  /**
+   * Set the LEDs, for gamepads that have them. If only mono is supported, the system
+   * will use the highest value passed in.
+   *
+   * @param color The color to use.
+   */
+  public void setLeds(Color color) {
+    setLeds((int) (color.red * 255), (int) (color.green * 255), (int) (color.blue * 255));
+  }
+
+  /**
+   * Set the LEDs, for gamepads that have them. If only mono is supported, the system
+   * will use the highest value passed in.
+   *
+   * @param color The color to use.
+   */
+  public void setLeds(Color8Bit color) {
+    setLeds(color.red, color.green, color.blue);
   }
 
   /**

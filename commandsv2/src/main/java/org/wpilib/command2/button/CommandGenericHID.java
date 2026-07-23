@@ -20,6 +20,8 @@ import org.wpilib.driverstation.POVDirection;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.event.EventLoop;
 import org.wpilib.math.util.Pair;
+import org.wpilib.util.Color;
+import org.wpilib.util.Color8Bit;
 
 /**
  * A version of {@link GenericHID} with {@link Trigger} factories for command-based.
@@ -474,6 +476,28 @@ public final class CommandGenericHID {
     return m_leds
         .startEnd(() -> m_hid.setLeds(r, g, b), () -> m_hid.setLeds(0, 0, 0))
         .withName("Set LEDs (" + r + ", " + g + ", " + b + ")");
+  }
+
+  /**
+   * Set the LEDs, on controllers that have them. If only mono is supported, the system will use the highest value
+   * passed in.
+   *
+   * @param color The color to use.
+   * @return A command that will set the LEDs to the given values until interrupted.
+   */
+  public Command setLeds(Color color) {
+    return setLeds((int) (color.red * 255), (int) (color.green * 255), (int) (color.blue * 255));
+  }
+
+  /**
+   * Set the LEDs, on controllers that have them. If only mono is supported, the system will use the highest value
+   * passed in.
+   *
+   * @param color The color to use.
+   * @return A command that will set the LEDs to the given values until interrupted.
+   */
+  public Command setLeds(Color8Bit color) {
+    return setLeds(color.red, color.green, color.blue);
   }
 
   /**

@@ -199,10 +199,20 @@ CommandPtr CommandGenericHID::RumbleTriggers(double value) {
       .WithName("Both Trigger Rumble");
 }
 
-CommandPtr CommandGenericHID::SetLeds(int r, int g, int b) {
+CommandPtr CommandGenericHID::SetLeds(int r, int g, int b) const {
   return m_leds
       .StartEnd([this, r, g, b] { m_hid->SetLeds(r, g, b); },
                 [this] { m_hid->SetLeds(0, 0, 0); })
       .WithName("Set LEDs (" + std::to_string(r) + ", " + std::to_string(g) +
                 ", " + std::to_string(b) + ")");
+}
+
+CommandPtr CommandGenericHID::SetLeds(const util::Color& color) const {
+  return SetLeds(static_cast<int>(color.red * 255),
+                 static_cast<int>(color.green * 255),
+                 static_cast<int>(color.blue * 255));
+}
+
+CommandPtr CommandGenericHID::SetLeds(const util::Color8Bit& color) const {
+  return SetLeds(color.red, color.green, color.blue);
 }

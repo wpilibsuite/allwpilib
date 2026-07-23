@@ -577,7 +577,8 @@ class CommandGamepad {
   CommandPtr RumbleTriggers(double value);
 
   /**
-   * Set the LEDs, on controllers that have them.
+  * Set the LEDs, on gamepads that have them.  If only mono is supported, the system will use
+   * the highest value passed in.
    *
    * @param r The red value (0-255)
    * @param g The green value (0-255)
@@ -585,7 +586,27 @@ class CommandGamepad {
    * @return A command that will set the LEDs to the given values until
    * interrupted.
    */
-  CommandPtr SetLeds(int r, int g, int b);
+  CommandPtr SetLeds(int r, int g, int b) const;
+
+  /**
+   * Set the LEDs, for controllers that have them. If only mono is supported, the
+   * system will use the highest value passed in.
+   *
+   * @param color The color to use.
+  * @return A command that will set the LEDs to the given values until
+   * interrupted.
+   */
+  CommandPtr SetLeds(const util::Color& color) const;
+
+  /**
+   * Set the LEDs, for controllers that have them. If only mono is supported, the
+   * system will use the highest value passed in.
+   *
+   * @param color The color to use.
+  * @return A command that will set the LEDs to the given values until
+   * interrupted.
+   */
+  CommandPtr SetLeds(const util::Color8Bit& color) const;
 
  private:
   std::unique_ptr<CommandGenericHID> m_ownedHid;

@@ -12,6 +12,8 @@ import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.DualShock4Controller;
 import org.wpilib.event.EventLoop;
+import org.wpilib.util.Color;
+import org.wpilib.util.Color8Bit;
 
 /**
  * A version of {@link DualShock4Controller} with {@link Trigger} factories for command-based.
@@ -652,5 +654,25 @@ public class CommandDualShock4Controller {
    */
   public Command setLeds(int r, int g, int b) {
     return m_hid.setLeds(r, g, b);
+  }
+
+  /**
+   * Set the LEDs.
+   *
+   * @param color The color to use.
+   * @return A command that will set the LEDs to the given values until interrupted.
+   */
+  public Command setLeds(Color color) {
+    return setLeds((int) (color.red * 255), (int) (color.green * 255), (int) (color.blue * 255));
+  }
+
+  /**
+   * Set the LEDs.
+   *
+   * @param color The color to use.
+   * @return A command that will set the LEDs to the given values until interrupted.
+   */
+  public Command setLeds(Color8Bit color) {
+    return setLeds(color.red, color.green, color.blue);
   }
 }

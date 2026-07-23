@@ -220,6 +220,14 @@ CommandPtr CommandGamepad::RumbleTriggers(double value) {
   return m_hid->RumbleTriggers(value);
 }
 
-CommandPtr CommandGamepad::SetLeds(int r, int g, int b) {
+CommandPtr CommandGamepad::SetLeds(int r, int g, int b) const {
   return m_hid->SetLeds(r, g, b);
+}
+
+CommandPtr CommandGamepad::SetLeds(const util::Color& color) const {
+  return m_hid->SetLeds(color);
+}
+
+CommandPtr CommandGamepad::SetLeds(const util::Color8Bit& color) const {
+  return m_hid->SetLeds(color);
 }

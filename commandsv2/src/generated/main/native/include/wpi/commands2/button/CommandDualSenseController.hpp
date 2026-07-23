@@ -489,7 +489,25 @@ class CommandDualSenseController {
    * @return A command that will set the LEDs to the given values until
    * interrupted.
    */
-  CommandPtr SetLeds(int r, int g, int b);
+  CommandPtr SetLeds(int r, int g, int b) const;
+
+  /**
+   * Set the LEDs.
+   *
+   * @param color The color to use.
+  * @return A command that will set the LEDs to the given values until
+   * interrupted.
+   */
+  CommandPtr SetLeds(const util::Color& color) const;
+
+  /**
+   * Set the LEDs.
+   *
+   * @param color The color to use.
+  * @return A command that will set the LEDs to the given values until
+   * interrupted.
+   */
+  CommandPtr SetLeds(const util::Color8Bit& color) const;
 private:
   std::unique_ptr<CommandGenericHID> m_ownedHid;
   CommandGenericHID* m_hid = nullptr;
