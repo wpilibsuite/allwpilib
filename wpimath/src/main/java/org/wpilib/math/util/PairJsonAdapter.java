@@ -27,7 +27,7 @@ public class PairJsonAdapter implements JsonAdapter<Pair<?, ?>> {
       (type, jsonb) -> {
         if (Types.isGenericTypeOf(type, Pair.class)) {
           Type[] args = Types.typeArguments(type);
-          return new PairJsonAdapter(jsonb, args[0], args[1]);
+          return new PairJsonAdapter(jsonb, args[0], args[1]).nullSafe();
         }
         return null;
       };
