@@ -15,8 +15,8 @@ import java.lang.reflect.Type;
 
 @CustomAdapter
 public class PairJsonAdapter implements JsonAdapter<Pair<?, ?>> {
-  private JsonAdapter<Object> firstAdapter;
-  private JsonAdapter<Object> secondAdapter;
+  private final JsonAdapter<Object> firstAdapter;
+  private final JsonAdapter<Object> secondAdapter;
 
   public static final AdapterFactory FACTORY =
       (type, jsonb) -> {
