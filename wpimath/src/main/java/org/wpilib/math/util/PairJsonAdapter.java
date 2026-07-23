@@ -37,7 +37,7 @@ public class PairJsonAdapter implements JsonAdapter<Pair<?, ?>> {
     secondAdapter = jsonb.adapter(second);
   }
 
-  /** Construct using Object for generic type parameters. */
+  // Adapter for raw type, using Object for generic parameters
   public PairJsonAdapter(Jsonb jsonb) {
     this(jsonb, Object.class, Object.class);
   }
