@@ -60,8 +60,24 @@ public class PairJsonAdapter implements JsonAdapter<Pair<?, ?>> {
   @Override
   public void toJson(JsonWriter writer, Pair<?, ?> value) {
     writer.beginArray();
-    firstAdapter.toJson(writer, value.getFirst());
-    secondAdapter.toJson(writer, value.getSecond());
+    if (writer.serializeNulls()) {
+      // If nulls are serialized, the default behavior works
+      firstAdapter.toJson(writer, value.getFirst());
+      secondAdapter.toJson(writer, value.getSecond());
+    } else {
+      // If nulls are not serialized, override the flag to still put fields at the correct index
+      if (value.getFirst() == null) {
+        writer.serializeNulls(true);
+      }
+      firstAdapter.toJson(writer, value.getFirst());
+      if (value.getSecond() == null) {
+        writer.serializeNulls(true);
+      } else {
+        writer.serializeNulls(false);
+      }
+      secondAdapter.toJson(writer, value.getSecond());
+      writer.serializeNulls(false);
+    }
     writer.endArray();
   }
 }
