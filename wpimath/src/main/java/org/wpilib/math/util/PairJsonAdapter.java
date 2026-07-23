@@ -13,6 +13,11 @@ import io.avaje.jsonb.Jsonb;
 import io.avaje.jsonb.Types;
 import java.lang.reflect.Type;
 
+/**
+ * For automated Jsonb use.
+ *
+ * @hidden
+ */
 @CustomAdapter
 public class PairJsonAdapter implements JsonAdapter<Pair<?, ?>> {
   private final JsonAdapter<Object> firstAdapter;
