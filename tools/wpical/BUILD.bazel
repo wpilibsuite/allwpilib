@@ -130,6 +130,10 @@ cxxopts = select({
 mac_linkopts = [
     "-framework",
     "Accelerate",
+    "-framework",
+    "AVFoundation",
+    "-framework",
+    "CoreMedia",
 ]
 
 linkopts = select({
