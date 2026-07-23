@@ -26,4 +26,19 @@ class PairJsonAdapterTest {
 
     assertEquals(expected, actual);
   }
+
+  @Test
+  void testNullJsonRoundtrip() {
+    var expected = new Pair<String, Integer>(null, 3);
+    var pairJsonb =
+        Jsonb.instance().type(Types.newParameterizedType(Pair.class, String.class, Integer.class));
+
+    var json = pairJsonb.toJson(expected);
+
+    assertEquals("[null,3]", json);
+
+    var actual = pairJsonb.fromJson(json);
+
+    assertEquals(expected, actual);
+  }
 }
