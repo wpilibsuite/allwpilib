@@ -37,6 +37,10 @@ classes:
       GetName:
       GetPort:
       SetLeds:
+        overloads:
+          int, int, int [const]:
+          const util::Color& [const]:
+          const util::Color8Bit& [const]:
       SetRumble:
       GetAxesMaximumIndex:
       GetAxesAvailable:

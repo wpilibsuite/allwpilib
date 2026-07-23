@@ -409,3 +409,30 @@ class CommandSwitch2GCController:
         :returns: the axis value.
         """
         return self._controller.get_r_trigger()
+
+    def rumble_left(self, value: float):
+        """
+        Run the left rumble motor. On most controllers, this is the low-frequency motor.
+
+        :param value: The normalized value (0 to 1) to set the rumble to
+        :returns: A command that will run the left rumble motor at the given value until interrupted.
+        """
+        return self._hid.rumble_left(value)
+
+    def rumble_right(self, value: float):
+        """
+        Run the right rumble motor. On most controllers, this is the high-frequency motor.
+
+        :param value: The normalized value (0 to 1) to set the rumble to
+        :returns: A command that will run the right rumble motor at the given value until interrupted.
+        """
+        return self._hid.rumble_right(value)
+
+    def rumble_both(self, value: float):
+        """
+        Run both rumble motors.
+
+        :param value: The normalized value (0 to 1) to set the rumble to
+        :returns: A command that will run the rumble motors at the given value until interrupted.
+        """
+        return self._hid.rumble_both(value)

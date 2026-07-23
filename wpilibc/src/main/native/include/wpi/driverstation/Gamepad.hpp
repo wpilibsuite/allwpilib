@@ -1231,14 +1231,30 @@ class Gamepad : public HIDDevice,
   int GetPort() const;
 
   /**
-   * Set leds on the gamepad. If only mono is supported, the system will use
-   * the highest value passed in.
+   * Set the LEDs, on gamepads that have them. If only mono is supported, the
+   * system will use the highest value passed in.
    *
    * @param r Red value from 0-255
    * @param g Green value from 0-255
    * @param b Blue value from 0-255
    */
-  void SetLeds(int r, int g, int b);
+  void SetLeds(int r, int g, int b) const;
+
+  /**
+   * Set the LEDs, on gamepads that have them. If only mono is supported, the
+   * system will use the highest value passed in.
+   *
+   * @param color The color to use.
+   */
+  void SetLeds(const util::Color& color) const;
+
+  /**
+   * Set the LEDs, on gamepads that have them. If only mono is supported, the
+   * system will use the highest value passed in.
+   *
+   * @param color The color to use.
+   */
+  void SetLeds(const util::Color8Bit& color) const;
 
   /**
    * Set the rumble output for the HID.

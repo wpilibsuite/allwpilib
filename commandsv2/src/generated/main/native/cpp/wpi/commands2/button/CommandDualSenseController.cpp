@@ -200,3 +200,41 @@ double CommandDualSenseController::GetL2() const {
 double CommandDualSenseController::GetR2() const {
   return m_controller->GetR2();
 }
+
+CommandPtr CommandDualSenseController::RumbleLeft(const double value) const {
+  return m_hid->RumbleLeft(value);
+}
+
+CommandPtr CommandDualSenseController::RumbleRight(const double value) const {
+  return m_hid->RumbleRight(value);
+}
+
+CommandPtr CommandDualSenseController::RumbleBoth(const double value) const {
+  return m_hid->RumbleBoth(value);
+}
+
+CommandPtr CommandDualSenseController::RumbleLeftTrigger(const double value) const {
+  return m_hid->RumbleLeftTrigger(value);
+}
+
+CommandPtr CommandDualSenseController::RumbleRightTrigger(const double value) const {
+  return m_hid->RumbleRightTrigger(value);
+}
+
+CommandPtr CommandDualSenseController::RumbleTriggers(const double value) const {
+  return m_hid->RumbleTriggers(value);
+}
+
+CommandPtr CommandDualSenseController::SetLeds(const int r, const int g, const int b) const {
+  return m_hid->SetLeds(r, g, b);
+}
+
+CommandPtr CommandDualSenseController::SetLeds(const util::Color& color) const {
+  return SetLeds(static_cast<int>(color.red * 255),
+                 static_cast<int>(color.green * 255),
+                 static_cast<int>(color.blue * 255));
+}
+
+CommandPtr CommandDualSenseController::SetLeds(const util::Color8Bit& color) const {
+  return SetLeds(color.red, color.green, color.blue);
+}

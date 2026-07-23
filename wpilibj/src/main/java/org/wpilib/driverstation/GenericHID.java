@@ -12,6 +12,8 @@ import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.math.util.Pair;
+import org.wpilib.util.Color;
+import org.wpilib.util.Color8Bit;
 
 /**
  * Handle input from standard HID devices connected to the Driver Station.
@@ -508,8 +510,8 @@ public final class GenericHID implements HIDDevice {
   }
 
   /**
-   * Set leds on the controller. If only mono is supported, the system will use the highest value
-   * passed in.
+   * Set the LEDs, on controllers that have them. If only mono is supported, the system will use the
+   * highest value passed in.
    *
    * @param r Red value from 0-255
    * @param g Green value from 0-255
@@ -518,6 +520,26 @@ public final class GenericHID implements HIDDevice {
   public void setLeds(int r, int g, int b) {
     int value = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
     DriverStationJNI.setJoystickLeds((byte) m_port, value);
+  }
+
+  /**
+   * Set the LEDs, on controllers that have them. If only mono is supported, the system will use the
+   * highest value passed in.
+   *
+   * @param color The color to use.
+   */
+  public void setLeds(Color color) {
+    setLeds((int) (color.red * 255), (int) (color.green * 255), (int) (color.blue * 255));
+  }
+
+  /**
+   * Set the LEDs, on controllers that have them. If only mono is supported, the system will use the
+   * highest value passed in.
+   *
+   * @param color The color to use.
+   */
+  public void setLeds(Color8Bit color) {
+    setLeds(color.red, color.green, color.blue);
   }
 
   /**

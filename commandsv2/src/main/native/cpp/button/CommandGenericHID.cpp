@@ -5,8 +5,11 @@
 #include "wpi/commands2/button/CommandGenericHID.hpp"
 
 #include <array>
+#include <format>
 #include <memory>
-#include <mutex>
+#include <unordered_map>
+
+#include "wpi/commands2/Commands.hpp"
 
 using namespace wpi::cmd;
 
@@ -17,10 +20,48 @@ std::array<std::unique_ptr<CommandGenericHID>,
     hids;
 }  // namespace
 
+std::array<std::unique_ptr<SubsystemBase>, 5>& CommandGenericHID::GetSubsystems(
+    wpi::GenericHID& hid) {
+  if (auto it = m_subsystems.find(&hid); it == m_subsystems.end()) {
+    return m_subsystems
+        .emplace(&hid,
+                 std::array{
+                     std::make_unique<SubsystemBase>(std::format(
+                         "Controller {} Left Rumble", hid.GetPort())),
+                     std::make_unique<SubsystemBase>(std::format(
+                         "Controller {} Right Rumble", hid.GetPort())),
+                     std::make_unique<SubsystemBase>(std::format(
+                         "Controller {} Left Trigger Rumble", hid.GetPort())),
+                     std::make_unique<SubsystemBase>(std::format(
+                         "Controller {} Right Trigger Rumble", hid.GetPort())),
+                     std::make_unique<SubsystemBase>(
+                         std::format("Controller {} LEDs", hid.GetPort())),
+                 })
+        .first->second;
+  } else {
+    return it->second;
+  }
+}
+
+std::unordered_map<wpi::GenericHID*,
+                   std::array<std::unique_ptr<SubsystemBase>, 5>>
+    CommandGenericHID::m_subsystems;
+
 CommandGenericHID::CommandGenericHID(int port)
     : CommandGenericHID{wpi::DriverStation::GetGenericHID(port)} {}
 
-CommandGenericHID::CommandGenericHID(wpi::GenericHID& hid) : m_hid{&hid} {}
+CommandGenericHID::CommandGenericHID(wpi::GenericHID& hid)
+    : CommandGenericHID{hid, GetSubsystems(hid)} {}
+
+CommandGenericHID::CommandGenericHID(
+    wpi::GenericHID& hid,
+    std::array<std::unique_ptr<SubsystemBase>, 5>& subsystems)
+    : m_leftRumble{*subsystems[0]},
+      m_rightRumble{*subsystems[1]},
+      m_leftTriggerRumble{*subsystems[2]},
+      m_rightTriggerRumble{*subsystems[3]},
+      m_leds{*subsystems[4]},
+      m_hid{&hid} {}
 
 CommandGenericHID& CommandGenericHID::GetCommandGenericHID(int port) {
   auto& hid = wpi::DriverStation::GetGenericHID(port);
@@ -109,11 +150,69 @@ Trigger CommandGenericHID::AxisMagnitudeGreaterThan(
   });
 }
 
-void CommandGenericHID::SetRumble(wpi::GenericHID::RumbleType type,
-                                  double value) {
+void CommandGenericHID::SetRumble(const wpi::GenericHID::RumbleType type,
+                                  const double value) const {
   m_hid->SetRumble(type, value);
 }
 
 bool CommandGenericHID::IsConnected() const {
   return m_hid->IsConnected();
+}
+
+CommandPtr CommandGenericHID::Rumble(SubsystemBase& subsystem,
+                                     const std::string_view name,
+                                     wpi::GenericHID::RumbleType type,
+                                     double value) const {
+  return subsystem
+      .StartEnd([this, type, value] { SetRumble(type, value); },
+                [this, type] { SetRumble(type, 0); })
+      .WithName(name);
+}
+
+CommandPtr CommandGenericHID::RumbleLeft(const double value) const {
+  return Rumble(m_leftRumble, "Rumble Left",
+                wpi::GenericHID::RumbleType::LEFT_RUMBLE, value);
+}
+
+CommandPtr CommandGenericHID::RumbleRight(const double value) const {
+  return Rumble(m_rightRumble, "Rumble Right",
+                wpi::GenericHID::RumbleType::RIGHT_RUMBLE, value);
+}
+
+CommandPtr CommandGenericHID::RumbleBoth(const double value) const {
+  return Parallel(RumbleLeft(value), RumbleRight(value))
+      .WithName("Both Rumble");
+}
+
+CommandPtr CommandGenericHID::RumbleLeftTrigger(const double value) const {
+  return Rumble(m_leftTriggerRumble, "Rumble Left Trigger",
+                wpi::GenericHID::RumbleType::LEFT_TRIGGER_RUMBLE, value);
+}
+
+CommandPtr CommandGenericHID::RumbleRightTrigger(const double value) const {
+  return Rumble(m_rightTriggerRumble, "Rumble Right Trigger",
+                wpi::GenericHID::RumbleType::RIGHT_TRIGGER_RUMBLE, value);
+}
+
+CommandPtr CommandGenericHID::RumbleTriggers(const double value) const {
+  return Parallel(RumbleLeftTrigger(value), RumbleRightTrigger(value))
+      .WithName("Both Trigger Rumble");
+}
+
+CommandPtr CommandGenericHID::SetLeds(int r, int g, int b) const {
+  return m_leds
+      .StartEnd([this, r, g, b] { m_hid->SetLeds(r, g, b); },
+                [this] { m_hid->SetLeds(0, 0, 0); })
+      .WithName("Set LEDs (" + std::to_string(r) + ", " + std::to_string(g) +
+                ", " + std::to_string(b) + ")");
+}
+
+CommandPtr CommandGenericHID::SetLeds(const util::Color& color) const {
+  return SetLeds(static_cast<int>(color.red * 255),
+                 static_cast<int>(color.green * 255),
+                 static_cast<int>(color.blue * 255));
+}
+
+CommandPtr CommandGenericHID::SetLeds(const util::Color8Bit& color) const {
+  return SetLeds(color.red, color.green, color.blue);
 }
