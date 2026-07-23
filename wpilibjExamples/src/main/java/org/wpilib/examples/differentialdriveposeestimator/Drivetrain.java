@@ -79,7 +79,6 @@ public class Drivetrain {
   numbers used  below are robot specific, and should be tuned. */
   private final DifferentialDrivePoseEstimator poseEstimator =
       new DifferentialDrivePoseEstimator(
-          kinematics,
           imu.getRotation2d(),
           leftEncoder.getDistance(),
           rightEncoder.getDistance(),

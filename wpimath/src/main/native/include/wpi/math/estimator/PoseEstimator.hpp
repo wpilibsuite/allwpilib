@@ -57,8 +57,6 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * @warning The initial pose estimate will always be the default pose,
    * regardless of the odometry's current pose.
    *
-   * @param kinematics A correctly-configured kinematics object for your
-   *     drivetrain.
    * @param odometry A correctly-configured odometry object for your drivetrain.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in
    *     meters, y position in meters, and heading in radians). Increase these
@@ -68,8 +66,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  PoseEstimator(const Kinematics& kinematics,
-                Odometry<Kinematics, WheelPositions, WheelVelocities,
+  PoseEstimator(Odometry<Kinematics, WheelPositions, WheelVelocities,
                          WheelAccelerations>& odometry,
                 const wpi::util::array<double, 3>& stateStdDevs,
                 const wpi::util::array<double, 3>& visionMeasurementStdDevs)
@@ -115,10 +112,11 @@ class WPILIB_DLLEXPORT PoseEstimator {
   /**
    * Resets the robot's position on the field.
    *
-   * The gyroscope angle does not need to be reset in the user's robot code.
-   * The library automatically takes care of offsetting the gyro angle.
+   * The gyroscope angle does not need to be reset here in the user's robot
+   * code.
    *
-   * @param gyroAngle The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param wheelPositions The distances traveled by the encoders.
    * @param pose The estimated pose of the robot on the field.
    */
@@ -387,7 +385,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * Updates the pose estimator with wheel encoder and gyro information. This
    * should be called every loop.
    *
-   * @param gyroAngle      The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param wheelPositions The distances traveled by the encoders.
    *
    * @return The estimated pose of the robot in meters.
@@ -403,7 +402,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * should be called every loop.
    *
    * @param currentTime   The time at which this method was called.
-   * @param gyroAngle     The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param wheelPositions The distances traveled by the encoders.
    *
    * @return The estimated pose of the robot in meters.

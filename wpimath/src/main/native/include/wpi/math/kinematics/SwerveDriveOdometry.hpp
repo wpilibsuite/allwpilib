@@ -39,7 +39,8 @@ class SwerveDriveOdometry
    * Constructs a SwerveDriveOdometry object.
    *
    * @param kinematics The swerve drive kinematics for your drivetrain.
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param modulePositions The wheel positions reported by each module.
    * @param initialPose The starting position of the robot on the field.
    */

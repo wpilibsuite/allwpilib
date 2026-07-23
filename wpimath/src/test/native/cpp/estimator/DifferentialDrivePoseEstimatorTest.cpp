@@ -165,8 +165,7 @@ void testFollowTrajectory(
 TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
   wpi::math::DifferentialDriveKinematics kinematics{1.0_m};
 
-  wpi::math::DifferentialDrivePoseEstimator estimator{kinematics,
-                                                      wpi::math::Rotation2d{},
+  wpi::math::DifferentialDrivePoseEstimator estimator{wpi::math::Rotation2d{},
                                                       0_m,
                                                       0_m,
                                                       wpi::math::Pose2d{},
@@ -197,8 +196,7 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
 TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
   wpi::math::DifferentialDriveKinematics kinematics{1.0_m};
 
-  wpi::math::DifferentialDrivePoseEstimator estimator{kinematics,
-                                                      wpi::math::Rotation2d{},
+  wpi::math::DifferentialDrivePoseEstimator estimator{wpi::math::Rotation2d{},
                                                       0_m,
                                                       0_m,
                                                       wpi::math::Pose2d{},
@@ -248,7 +246,6 @@ TEST(DifferentialDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
   wpi::math::DifferentialDriveKinematics kinematics{1.0_m};
 
   wpi::math::DifferentialDrivePoseEstimator estimator{
-      kinematics,
       wpi::math::Rotation2d{},
       0_m,
       0_m,
@@ -395,7 +392,6 @@ TEST(DifferentialDrivePoseEstimatorTest, TestSampleAt) {
 TEST(DifferentialDrivePoseEstimatorTest, TestReset) {
   wpi::math::DifferentialDriveKinematics kinematics{1_m};
   wpi::math::DifferentialDrivePoseEstimator estimator{
-      kinematics,
       wpi::math::Rotation2d{},
       0_m,
       0_m,

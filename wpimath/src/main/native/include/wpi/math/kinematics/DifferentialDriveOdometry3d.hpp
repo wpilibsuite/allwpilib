@@ -23,9 +23,6 @@ namespace wpi::math {
  * Teams can use odometry during the autonomous period for complex tasks like
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
- *
- * It is important that you reset your encoders to zero before using this class.
- * Any subsequent pose resets also require the encoders to be reset to zero.
  */
 class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
     : public Odometry3d<DifferentialDriveKinematics,
@@ -39,7 +36,8 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    * IF leftDistance and rightDistance are unspecified,
    * You NEED to reset your encoders (to zero).
    *
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    * @param initialPose The starting position of the robot on the field.
@@ -59,7 +57,8 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    * code. The library automatically takes care of offsetting the gyro angle.
    *
    * @param pose The position on the field that your robot is at.
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    */
@@ -71,11 +70,10 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
 
   /**
    * Updates the robot position on the field using distance measurements from
-   * encoders. This method is more numerically accurate than using velocities to
-   * integrate the pose and is also advantageous for teams that are using lower
-   * CPR encoders.
+   * encoders.
    *
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    * @return The new pose of the robot.
