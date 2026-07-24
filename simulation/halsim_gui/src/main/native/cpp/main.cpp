@@ -154,6 +154,7 @@ int HALSIM_InitExtension(void) {
   });
 
   if (!gui::Initialize("Robot Simulation", 1280, 720,
+                       gui::RendererPreference::PREFER_2D,
                        ImGuiConfigFlags_DockingEnable)) {
     return 0;
   }

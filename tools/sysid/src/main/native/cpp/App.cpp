@@ -203,7 +203,7 @@ void Application(std::string_view saveDir) {
   });
 
   gui::Initialize("System Identification", sysid::kAppWindowSize.x,
-                  sysid::kAppWindowSize.y);
+                  sysid::kAppWindowSize.y, gui::RendererPreference::PREFER_2D);
   gui::Main();
 
   wpi::glass::DestroyContext();

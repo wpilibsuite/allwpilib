@@ -13,6 +13,7 @@
 #include <imgui.h>
 
 struct SDL_Surface;
+struct SDL_GPUDevice;
 struct SDL_Window;
 union SDL_Event;
 
@@ -40,6 +41,7 @@ struct Context : public SavedSettings {
   bool isRendering{false};
 
   SDL_Window* window = nullptr;
+  SDL_GPUDevice* gpuDevice = nullptr;
 
   std::function<void()> loadSettings;
   std::function<void()> loadIniSettings;

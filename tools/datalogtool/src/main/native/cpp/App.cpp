@@ -149,7 +149,7 @@ void Application(std::string_view saveDir) {
 
   gui::AddWindowScaler([](float scale) { gDefaultScale = scale; });
   gui::AddLateExecute(DisplayGui);
-  gui::Initialize("Datalog Tool", 925, 510);
+  gui::Initialize("Datalog Tool", 925, 510, gui::RendererPreference::PREFER_2D);
 
   gDownloadVisible = &wpi::glass::GetStorageRoot()
                           .GetChild("download")
