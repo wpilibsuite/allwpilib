@@ -17,14 +17,30 @@ bool NetworkPing::Send(uint64_t curTimeMs) {
   uint64_t lastData = m_wire.GetLastReceivedTime();
   // DEBUG4("WS ping: lastPing={} curTime={} pongTimeMs={}\n", lastPing,
   //        curTimeMs, m_pongTimeMs);
-  if (lastData == 0) {
-    lastData = m_pongTimeMs;
+
+  // Rely solely on GetLastReceivedTime() for the timeout check.
+  // GetLastReceivedTime() is updated by ALL incoming data including PONG
+  // responses via WebSocket::HandleIncoming(). The old fallback to
+  // m_pongTimeMs was incorrect because m_pongTimeMs reflects ping-send
+  // time (when Send() was called), not pong-receive time. Under a data
+  // flood Send() may be called well before the PING is actually written
+  // to the network, making m_pongTimeMs an unreliable timeout baseline.
+  if (lastData != 0 && m_pongTimeMs != 0 &&
+      curTimeMs > (lastData + kPingTimeoutMs)) {
+    m_wire.Disconnect("connection timed out");
+    return false;
   }
-  if (m_pongTimeMs != 0 && curTimeMs > (lastData + kPingTimeoutMs)) {
+  // When no data has ever been received, fall back to the time of the first
+  // ping as the timeout baseline so half-open connections are still detected.
+  if (lastData == 0 && m_firstPingTimeMs != 0 &&
+      curTimeMs > (m_firstPingTimeMs + kPingTimeoutMs)) {
     m_wire.Disconnect("connection timed out");
     return false;
   }
   m_wire.SendPing(curTimeMs);
+  if (m_firstPingTimeMs == 0) {
+    m_firstPingTimeMs = curTimeMs;
+  }
   m_nextPingTimeMs = curTimeMs + kPingIntervalMs;
   m_pongTimeMs = curTimeMs;
   return true;
