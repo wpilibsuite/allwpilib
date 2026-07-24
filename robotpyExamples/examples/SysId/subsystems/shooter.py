@@ -58,7 +58,7 @@ class Shooter(Subsystem):
         self.shooter_feedback = wpimath.PIDController(ShooterConstants.P, 0, 0)
         # Feedforward controller to run the shooter wheel in closed-loop, set the constants equal to
         # those calculated by SysId
-        self.shooter_feedforward = wpimath.SimpleMotorFeedforwardRadians(
+        self.shooter_feedforward = wpimath.SimpleMotorFeedforward(
             ShooterConstants.S,
             ShooterConstants.V / wpimath.units.rotations_to_radians(1),
             ShooterConstants.A / wpimath.units.rotations_to_radians(1),
