@@ -63,7 +63,7 @@ jobs:
       - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
 
-      - id: Setup_bazel_cache
+      - name: Setup Bazel cache credentials
         uses: ./.github/actions/setup-bazel-cache
         with:
           bazel_remote_username: ${{ secrets.BAZEL_CACHE_USERNAME }}
@@ -80,11 +80,12 @@ jobs:
           sudo service dbus start
           sudo avahi-daemon -D
 
-      - if: runner.os == 'Linux'
+      - name: Setup Bazel
         uses: bazel-contrib/setup-bazel@0.19.0
         with:
           bazelisk-cache: true
           repository-cache: true
+          cache-save: ${{ github.event_name == 'push' }}
           bazelisk-version: 1.x
 
       - name: bazel ${{ matrix.action }}
@@ -95,11 +96,7 @@ jobs:
           else
             TARGETS=...
           fi
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            bazel --output_user_root=D:\\bazelroot ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}'
-          else
-            bazel ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}'
-          fi
+          bazel ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}'
         shell: bash
 
       - name: Check disk free space
@@ -156,7 +153,7 @@ jobs:
       - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
 
-      - id: Setup_bazel_cache
+      - name: Setup Bazel cache credentials
         uses: ./.github/actions/setup-bazel-cache
         with:
           bazel_remote_username: ${{ secrets.BAZEL_CACHE_USERNAME }}
@@ -186,7 +183,7 @@ jobs:
       - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
 
-      - id: Setup_bazel_cache
+      - name: Setup Bazel cache credentials
         uses: ./.github/actions/setup-bazel-cache
         with:
           bazel_remote_username: ${{ secrets.BAZEL_CACHE_USERNAME }}
