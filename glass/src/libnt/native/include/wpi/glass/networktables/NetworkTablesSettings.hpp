@@ -42,6 +42,7 @@ class NetworkTablesSettings {
   std::string& m_clientName;
   int& m_port;
   bool& m_dsClient;
+  bool& m_requireTeamNumberMatch;
 
   class Thread : public wpi::util::SafeThread {
    public:
@@ -58,6 +59,7 @@ class NetworkTablesSettings {
     std::string m_clientName;
     int m_port;
     bool m_dsClient;
+    bool m_requireTeamNumberMatch;
   };
   wpi::util::SafeThreadOwner<Thread> m_thread;
 };

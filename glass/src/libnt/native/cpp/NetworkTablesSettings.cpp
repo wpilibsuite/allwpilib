@@ -58,7 +58,7 @@ void NetworkTablesSettings::Thread::Main() {
     } while (mode != m_mode || dsClient != m_dsClient);
 
     if (m_mode == 1) {
-      std::string_view serverTeam{m_serverTeam};
+      std::string_view serverTeam{wpi::util::trim(m_serverTeam)};
       std::optional<unsigned int> team;
       if (m_mode == 1) {
         wpi::nt::StartClient(m_inst, m_clientName);
@@ -66,7 +66,11 @@ void NetworkTablesSettings::Thread::Main() {
 
       if (!wpi::util::contains(serverTeam, '.') &&
           (team = wpi::util::parse_integer<unsigned int>(serverTeam, 10))) {
-        wpi::nt::SetServerTeam(m_inst, team.value(), m_port);
+        if (m_requireTeamNumberMatch) {
+          wpi::nt::SetServerTeam(m_inst, serverTeam, m_port);
+        } else {
+          wpi::nt::SetServerFixed(m_inst, serverTeam, m_port);
+        }
       } else {
         std::vector<std::pair<std::string_view, unsigned int>> servers;
         wpi::util::split(serverTeam, ',', -1, false, [&](auto serverName) {
@@ -94,7 +98,9 @@ NetworkTablesSettings::NetworkTablesSettings(std::string_view clientName,
       m_listenAddress{storage.GetString("listenAddress")},
       m_clientName{storage.GetString("clientName", clientName)},
       m_port{storage.GetInt("port", NT_DEFAULT_PORT)},
-      m_dsClient{storage.GetBool("dsClient", true)} {
+      m_dsClient{storage.GetBool("dsClient", true)},
+      m_requireTeamNumberMatch{
+          storage.GetBool("requireTeamNumberMatch", true)} {
   m_thread.Start(inst);
 }
 
@@ -114,6 +120,7 @@ void NetworkTablesSettings::Update() {
   thr->m_clientName = m_clientName;
   thr->m_port = m_port;
   thr->m_dsClient = m_dsClient;
+  thr->m_requireTeamNumberMatch = m_requireTeamNumberMatch;
   thr->m_cond.notify_one();
 }
 
@@ -152,6 +159,12 @@ bool NetworkTablesSettings::Display() {
       ImGui::Checkbox("Get Address from DS", &m_dsClient);
       if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
         ImGui::SetTooltip("Attempt to fetch server IP from Driver Station");
+      }
+      ImGui::Checkbox("Require Team Number Match", &m_requireTeamNumberMatch);
+      if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
+        ImGui::SetTooltip(
+            "When Team/IP is a team number, require matching the team-specific "
+            "robot address instead of using fixed robot addresses.");
       }
       break;
     case 2:

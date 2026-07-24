@@ -1216,7 +1216,8 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   /**
-   * Starts a client. Use SetServer or SetServerTeam to set the server name and port.
+   * Starts a client. Use SetServer, SetServerTeam, SetServerFixed, or SetServerMdns to set the
+   * server name and port.
    *
    * @param identity network identity to advertise (cannot be empty string)
    */
@@ -1286,24 +1287,190 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   /**
-   * Sets server addresses and port for client (without restarting client). Changes the port to the
-   * default port. The client will attempt to connect to each server in round robin fashion.
+   * Sets server address and port for client (without restarting client). Connects using a
+   * NetworkTables server announced over mDNS with the specified service name. The mDNS lookup is
+   * used only for the server address; the default NetworkTables port is used.
    *
-   * @param team team number
+   * @param serviceName mDNS service name
    */
-  public void setServerTeam(int team) {
+  public void setServerMdns(String serviceName) {
+    NetworkTablesJNI.setServerMdns(m_handle, serviceName);
+  }
+
+  /**
+   * Sets server address and port for client (without restarting client). Changes the port to the
+   * default port. Connects using the fixed server address and a NetworkTables server announced over
+   * mDNS with the specified service name. The mDNS lookup is used only for the server address; the
+   * default NetworkTables port is used.
+   *
+   * @param serviceName mDNS service name
+   * @param serverName server name
+   */
+  public void setServerMdns(String serviceName, String serverName) {
+    setServerMdns(serviceName, serverName, 0);
+  }
+
+  /**
+   * Sets server address and port for client (without restarting client). Connects using the fixed
+   * server address and a NetworkTables server announced over mDNS with the specified service name.
+   * The mDNS lookup is used only for the server address; the specified port is used.
+   *
+   * @param serviceName mDNS service name
+   * @param serverName server name
+   * @param port port to communicate over (0=default)
+   */
+  public void setServerMdns(String serviceName, String serverName, int port) {
+    NetworkTablesJNI.setServerMdns(m_handle, serviceName, serverName, port);
+  }
+
+  /**
+   * Sets server addresses and port for client (without restarting client). Changes the port to the
+   * default port. Connects using fixed server addresses and a NetworkTables server announced over
+   * mDNS with the specified service name. The mDNS lookup is used only for the server address; the
+   * default NetworkTables port is used.
+   *
+   * @param serviceName mDNS service name
+   * @param serverNames array of server names
+   */
+  public void setServerMdns(String serviceName, String[] serverNames) {
+    setServerMdns(serviceName, serverNames, 0);
+  }
+
+  /**
+   * Sets server addresses and port for client (without restarting client). Connects using fixed
+   * server addresses and a NetworkTables server announced over mDNS with the specified service
+   * name. The mDNS lookup is used only for the server address; the specified port is used.
+   *
+   * @param serviceName mDNS service name
+   * @param serverNames array of server names
+   * @param port port to communicate over (0=default)
+   */
+  public void setServerMdns(String serviceName, String[] serverNames, int port) {
+    int[] ports = new int[serverNames.length];
+    for (int i = 0; i < serverNames.length; i++) {
+      ports[i] = port;
+    }
+    setServerMdns(serviceName, port, serverNames, ports);
+  }
+
+  /**
+   * Sets server addresses and ports for client (without restarting client). Connects using fixed
+   * server addresses and a NetworkTables server announced over mDNS with the specified service
+   * name. The mDNS lookup is used only for the server address; the default NetworkTables port is
+   * used.
+   *
+   * @param serviceName mDNS service name
+   * @param serverNames array of server names
+   * @param ports array of port numbers (0=default)
+   */
+  public void setServerMdns(String serviceName, String[] serverNames, int[] ports) {
+    setServerMdns(serviceName, 0, serverNames, ports);
+  }
+
+  /**
+   * Sets server addresses and ports for client (without restarting client). Connects using fixed
+   * server addresses and a NetworkTables server announced over mDNS with the specified service
+   * name. The mDNS lookup is used only for the server address; the specified mDNS port is used.
+   *
+   * @param serviceName mDNS service name
+   * @param mdnsPort mDNS port to communicate over (0=default)
+   * @param serverNames array of server names
+   * @param ports array of port numbers (0=default)
+   */
+  public void setServerMdns(
+      String serviceName, int mdnsPort, String[] serverNames, int[] ports) {
+    NetworkTablesJNI.setServerMdns(
+        m_handle, serviceName, mdnsPort, serverNames, ports);
+  }
+
+  /**
+   * Sets server addresses and port for client (without restarting client). Changes the port to the
+   * default port.
+   *
+   * <p>Attempts connections to the following addresses in parallel:
+   *
+   * <ul>
+   *   <li>10.TE.AM.2
+   *   <li>172.26.0.1 on Windows, or 172.27.0.1 on other platforms (USB)
+   *   <li>172.30.0.1 (WiFi)
+   * </ul>
+   *
+   * <p>It also connects using matching Systemcore mDNS announcements. The team-specific
+   * 10.TE.AM.2 address is only added if the team string parses as an integer in the range 0
+   * to 25599 inclusive.
+   *
+   * @param team team number string
+   */
+  public void setServerTeam(String team) {
     setServerTeam(team, 0);
   }
 
   /**
-   * Sets server addresses and port for client (without restarting client). Connects using commonly
-   * known robot addresses for the specified team.
+   * Sets server addresses and port for client (without restarting client).
    *
-   * @param team team number
+   * <p>Attempts connections to the following addresses in parallel:
+   *
+   * <ul>
+   *   <li>10.TE.AM.2
+   *   <li>172.26.0.1 on Windows, or 172.27.0.1 on other platforms (USB)
+   *   <li>172.30.0.1 (WiFi)
+   * </ul>
+   *
+   * <p>It also connects using matching Systemcore mDNS announcements. The team-specific
+   * 10.TE.AM.2 address is only added if the team string parses as an integer in the range 0
+   * to 25599 inclusive.
+   *
+   * @param team team number string
    * @param port port to communicate over (0=default)
    */
-  public void setServerTeam(int team, int port) {
+  public void setServerTeam(String team, int port) {
     NetworkTablesJNI.setServerTeam(m_handle, team, port);
+  }
+
+  /**
+   * Sets server addresses and port for client (without restarting client). Changes the port to the
+   * default port.
+   *
+   * <p>Attempts connections to the following static addresses and hostnames in parallel:
+   *
+   * <ul>
+   *   <li>10.TE.AM.2
+   *   <li>172.26.0.1 on Windows, or 172.27.0.1 on other platforms (USB)
+   *   <li>172.30.0.1 (WiFi)
+   *   <li>robot.local
+   * </ul>
+   *
+   * <p>It also connects using all Systemcore mDNS announcements. The team-specific
+   * 10.TE.AM.2 address is only added if the team string parses as an integer in the range 0
+   * to 25599 inclusive.
+   *
+   * @param team team number string
+   */
+  public void setServerFixed(String team) {
+    setServerFixed(team, 0);
+  }
+
+  /**
+   * Sets server addresses and port for client (without restarting client).
+   *
+   * <p>Attempts connections to the following static addresses and hostnames in parallel:
+   *
+   * <ul>
+   *   <li>10.TE.AM.2
+   *   <li>172.26.0.1 on Windows, or 172.27.0.1 on other platforms (USB)
+   *   <li>172.30.0.1 (WiFi)
+   *   <li>robot.local
+   * </ul>
+   *
+   * <p>It also connects using all Systemcore mDNS announcements. The team-specific
+   * 10.TE.AM.2 address is only added if the team string parses as an integer in the range 0
+   * to 25599 inclusive.
+   *
+   * @param team team number string
+   * @param port port to communicate over (0=default)
+   */
+  public void setServerFixed(String team, int port) {
+    NetworkTablesJNI.setServerFixed(m_handle, team, port);
   }
 
   /**

@@ -1160,8 +1160,8 @@ void NT_StartServer(NT_Inst inst, const struct WPI_String* persist_filename,
 void NT_StopServer(NT_Inst inst);
 
 /**
- * Starts a client.  Use NT_SetServer or NT_SetServerTeam to set the server
- * name and port.
+ * Starts a client.  Use NT_SetServer, NT_SetServerTeam, NT_SetServerFixed, or
+ * NT_SetServerMdns to set the server name and port.
  *
  * @param inst      instance handle
  * @param identity  network identity to advertise (cannot be empty string)
@@ -1201,13 +1201,89 @@ void NT_SetServerMulti(NT_Inst inst, size_t count,
 
 /**
  * Sets server addresses and port for client (without restarting client).
- * Connects using commonly known robot addresses for the specified team.
+ * Attempts connections to the following addresses in parallel:
+ * - 10.TE.AM.2
+ * - 172.26.0.1 on Windows, or 172.27.0.1 on other platforms (USB)
+ * - 172.30.0.1 (WiFi)
+ *
+ * It also connects using matching Systemcore mDNS announcements.
+ * The team-specific 10.TE.AM.2 address is only added if the team string
+ * parses as an integer in the range 0 to 25599 inclusive.
  *
  * @param inst        instance handle
- * @param team        team number
+ * @param team        team number string
  * @param port        port to communicate over
  */
-void NT_SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port);
+void NT_SetServerTeam(NT_Inst inst, const struct WPI_String* team,
+                      unsigned int port);
+
+/**
+ * Sets server addresses and port for client (without restarting client).
+ * Attempts connections to the following static addresses and hostnames in
+ * parallel:
+ * - 10.TE.AM.2
+ * - 172.26.0.1 on Windows, or 172.27.0.1 on other platforms (USB)
+ * - 172.30.0.1 (WiFi)
+ * - robot.local
+ *
+ * It also connects using all Systemcore mDNS announcements.
+ * The team-specific 10.TE.AM.2 address is only added if the team string
+ * parses as an integer in the range 0 to 25599 inclusive.
+ *
+ * @param inst        instance handle
+ * @param team        team number string
+ * @param port        port to communicate over
+ */
+void NT_SetServerFixed(NT_Inst inst, const struct WPI_String* team,
+                       unsigned int port);
+
+/**
+ * Sets server address and port for client (without restarting client).
+ * Connects using a NetworkTables server announced over mDNS with the specified
+ * service name.  The mDNS lookup is used only for the server address; the
+ * default NetworkTables port is used.
+ *
+ * @param inst          instance handle
+ * @param service_name  mDNS service name
+ */
+void NT_SetServerMdns(NT_Inst inst, const struct WPI_String* service_name);
+
+/**
+ * Sets server addresses and ports for client (without restarting client).
+ * Connects using fixed server addresses and a NetworkTables server announced
+ * over mDNS with the specified service name.  The mDNS lookup is used only for
+ * the server address; the default NetworkTables port is used.
+ *
+ * @param inst          instance handle
+ * @param service_name  mDNS service name
+ * @param count         length of the server_names and ports arrays
+ * @param server_names  array of server names (each a UTF-8 string, null
+ *                      terminated)
+ * @param ports         array of ports to communicate over (one for each server)
+ */
+void NT_SetServerMdnsMulti(NT_Inst inst, const struct WPI_String* service_name,
+                           size_t count, const struct WPI_String* server_names,
+                           const unsigned int* ports);
+
+/**
+ * Sets server addresses and ports for client (without restarting client).
+ * Connects using fixed server addresses and a NetworkTables server announced
+ * over mDNS with the specified service name.  The mDNS lookup is used only for
+ * the server address; the specified mDNS port is used.
+ *
+ * @param inst          instance handle
+ * @param service_name  mDNS service name
+ * @param mdns_port     mDNS port to communicate over
+ * @param count         length of the server_names and ports arrays
+ * @param server_names  array of server names (each a UTF-8 string, null
+ *                      terminated)
+ * @param ports         array of ports to communicate over (one for each server)
+ */
+void NT_SetServerMdnsMultiPort(NT_Inst inst,
+                               const struct WPI_String* service_name,
+                               unsigned int mdns_port, size_t count,
+                               const struct WPI_String* server_names,
+                               const unsigned int* ports);
 
 /**
  * Disconnects the client if it's running and connected. This will automatically

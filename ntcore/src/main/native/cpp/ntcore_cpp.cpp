@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <format>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -19,6 +20,7 @@
 #include "Types_internal.hpp"
 #include "wpi/nt/ntcore.h"
 #include "wpi/nt/ntcore_c.h"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/timestamp.h"
 
@@ -26,6 +28,8 @@ static std::atomic_bool gNowSet{false};
 static std::atomic<int64_t> gNowTime;
 
 namespace wpi::nt {
+
+static constexpr unsigned int kMaxTeamNumber = 25599;
 
 wpi::util::json TopicInfo::GetProperties() const {
   return wpi::util::json::parse(properties).value_or(wpi::util::json::object());
@@ -684,29 +688,132 @@ void SetServer(
   }
 }
 
-void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
+static INetworkClient::ServerResolver MakeNetworkTablesResolver(
+    std::string_view service_name, unsigned int port) {
+  INetworkClient::ServerResolver resolver;
+  resolver.serviceName = service_name;
+  resolver.port = port;
+  return resolver;
+}
+
+static void AddUsbServer(
+    std::vector<std::pair<std::string, unsigned int>>& servers,
+    unsigned int port) {
+#if defined(WIN32) || defined(_WIN32)
+  // 172.26.0.1 (Windows USB)
+  servers.emplace_back("172.26.0.1", port);
+#else
+  // 172.27.0.1 (Unix USB)
+  servers.emplace_back("172.27.0.1", port);
+#endif
+}
+
+static void AddWifiServer(
+    std::vector<std::pair<std::string, unsigned int>>& servers,
+    unsigned int port) {
+  // 172.30.0.1 (WiFi)
+  servers.emplace_back("172.30.0.1", port);
+}
+
+static void AddTeamServer(
+    std::vector<std::pair<std::string, unsigned int>>& servers,
+    std::string_view team, unsigned int port) {
+  auto parsedTeam =
+      wpi::util::parse_integer<unsigned int>(wpi::util::trim(team), 10);
+  if (!parsedTeam || *parsedTeam > kMaxTeamNumber) {
+    return;
+  }
+
+  // 10.te.am.2
+  servers.emplace_back(
+      std::format("10.{}.{}.2", static_cast<int>(*parsedTeam / 100),
+                  static_cast<int>(*parsedTeam % 100)),
+      port);
+}
+
+static INetworkClient::ServerResolver MakeSystemCoreResolver(
+    unsigned int port) {
+  INetworkClient::ServerResolver resolver;
+  resolver.kind = INetworkClient::ServerResolver::Kind::kSystemCore;
+  resolver.port = port;
+  return resolver;
+}
+
+static INetworkClient::ServerResolver MakeSystemCoreResolver(
+    std::string_view team, unsigned int port) {
+  auto resolver = MakeSystemCoreResolver(port);
+  resolver.team = std::string{wpi::util::trim(team)};
+  return resolver;
+}
+
+void SetServerTeam(NT_Inst inst, std::string_view team, unsigned int port) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     std::vector<std::pair<std::string, unsigned int>> servers;
-    servers.reserve(5);
+    servers.reserve(3);
 
-    // 10.te.am.2
-    servers.emplace_back(std::format("10.{}.{}.2", static_cast<int>(team / 100),
-                                     static_cast<int>(team % 100)),
-                         port);
+    AddTeamServer(servers, team, port);
 
-    // 172.26.0.1 (Windows USB)
-    servers.emplace_back("172.26.0.1", port);
+    AddUsbServer(servers, port);
 
-    // 172.27.0.1 (Unix USB)
-    servers.emplace_back("172.27.0.1", port);
+    AddWifiServer(servers, port);
 
-    // 172.30.0.1 (WiFi)
-    servers.emplace_back("172.30.0.1", port);
+    INetworkClient::ServerResolver resolver =
+        MakeSystemCoreResolver(team, port);
+
+    ii->SetServers(servers, resolver);
+  }
+}
+
+void SetServerFixed(NT_Inst inst, std::string_view team, unsigned int port) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
+    std::vector<std::pair<std::string, unsigned int>> servers;
+    servers.reserve(4);
+
+    AddTeamServer(servers, team, port);
+
+    AddUsbServer(servers, port);
+
+    AddWifiServer(servers, port);
 
     // robot.local
-    servers.emplace_back(std::format("robot.local", team), port);
+    servers.emplace_back("robot.local", port);
 
-    ii->SetServers(servers);
+    INetworkClient::ServerResolver resolver = MakeSystemCoreResolver(port);
+
+    ii->SetServers(servers, resolver);
+  }
+}
+
+void SetServerMdns(NT_Inst inst, std::string_view service_name) {
+  SetServerMdns(inst, service_name,
+                std::span<const std::pair<std::string_view, unsigned int>>{});
+}
+
+void SetServerMdns(NT_Inst inst, std::string_view service_name,
+                   std::string_view server_name, unsigned int port) {
+  SetServerMdns(inst, service_name, port, {{{server_name, port}}});
+}
+
+void SetServerMdns(
+    NT_Inst inst, std::string_view service_name,
+    std::span<const std::pair<std::string_view, unsigned int>> servers) {
+  SetServerMdns(inst, service_name, 0, servers);
+}
+
+void SetServerMdns(
+    NT_Inst inst, std::string_view service_name, unsigned int mdns_port,
+    std::span<const std::pair<std::string_view, unsigned int>> servers) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
+    std::vector<std::pair<std::string, unsigned int>> serversCopy;
+    serversCopy.reserve(servers.size());
+    for (auto&& server : servers) {
+      serversCopy.emplace_back(std::string{server.first}, server.second);
+    }
+
+    INetworkClient::ServerResolver resolver =
+        MakeNetworkTablesResolver(service_name, mdns_port);
+
+    ii->SetServers(serversCopy, resolver);
   }
 }
 
