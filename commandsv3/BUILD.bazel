@@ -51,7 +51,10 @@ wpilib_java_library(
     exported_plugins = ["//javacPlugin:plugin"],
     maven_artifact_name = "commands3-java",
     maven_group_id = "org.wpilib",
-    plugins = ["//javacPlugin:plugin"],
+    plugins = [
+        "//javacPlugin:plugin",
+        "//:avaje_jsonb_generator",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//cscore:cscore-java",
@@ -63,6 +66,8 @@ wpilib_java_library(
         "//wpinet:wpinet-java",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
+        "@maven//:io_avaje_avaje_json_core",
+        "@maven//:io_avaje_avaje_jsonb",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
