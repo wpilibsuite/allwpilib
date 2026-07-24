@@ -7,7 +7,7 @@
 
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/HttpServerConnection.hpp"
-#include "wpi/net/UrlParser.hpp"
+#include "wpi/net/HttpUtil.hpp"
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/Tcp.hpp"
 #include "wpi/util/print.hpp"
@@ -25,27 +25,26 @@ class MyHttpServerConnection : public wpi::net::HttpServerConnection {
 
 void MyHttpServerConnection::ProcessRequest() {
   wpi::util::print(stderr, "HTTP request: '{}'\n", m_request.GetUrl());
-  wpi::net::UrlParser url{m_request.GetUrl(),
-                          m_request.GetMethod() == wpi::net::HTTP_CONNECT};
-  if (!url.IsValid()) {
+  auto url = wpi::net::ParseUrl(m_request.GetUrl());
+  if (!url) {
     // failed to parse URL
     SendError(400);
     return;
   }
 
   std::string_view path;
-  if (url.HasPath()) {
-    path = url.GetPath();
+  if (url->get_pathname_length() > 0) {
+    path = url->get_pathname();
   }
   wpi::util::print(stderr, "path: \"{}\"\n", path);
 
   std::string_view query;
-  if (url.HasQuery()) {
-    query = url.GetQuery();
+  if (url->has_search()) {
+    query = url->get_search();
   }
   wpi::util::print(stderr, "query: \"{}\"\n", query);
 
-  const bool isGET = m_request.GetMethod() == wpi::net::HTTP_GET;
+  const bool isGET = m_request.GetMethod() == HTTP_GET;
   if (isGET && path == "/") {
     // build HTML root page
     SendResponse(200, "OK", "text/html",

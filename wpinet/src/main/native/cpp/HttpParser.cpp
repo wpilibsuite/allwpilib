@@ -4,25 +4,25 @@
 
 #include "wpi/net/HttpParser.hpp"
 
+#include <string>
+
+#include "llhttp.h"
+
 using namespace wpi::net;
 
-uint32_t HttpParser::GetParserVersion() {
-  return static_cast<uint32_t>(http_parser_version());
-}
-
 HttpParser::HttpParser(Type type) {
-  http_parser_init(&m_parser,
-                   static_cast<http_parser_type>(static_cast<int>(type)));
+  llhttp_init(&m_parser, static_cast<llhttp_type>(static_cast<int>(type)),
+              &m_settings);
   m_parser.data = this;
 
-  http_parser_settings_init(&m_settings);
+  llhttp_settings_init(&m_settings);
 
-  // Unlike the underlying http_parser library, we don't perform callbacks
+  // Unlike the underlying llhttp library, we don't perform callbacks
   // (other than body) with partial data; instead we buffer and call the user
   // callback only when the data is complete.
 
   // on_message_begin: initialize our state, call user callback
-  m_settings.on_message_begin = [](http_parser* p) -> int {
+  m_settings.on_message_begin = [](llhttp_t* p) -> int {
     auto& self = *static_cast<HttpParser*>(p->data);
     self.m_urlBuf.clear();
     self.m_state = State::START;
@@ -31,7 +31,7 @@ HttpParser::HttpParser(Type type) {
   };
 
   // on_url: collect into buffer
-  m_settings.on_url = [](http_parser* p, const char* at, size_t length) -> int {
+  m_settings.on_url = [](llhttp_t* p, const char* at, size_t length) -> int {
     auto& self = *static_cast<HttpParser*>(p->data);
     // append to buffer
     if ((self.m_urlBuf.size() + length) > self.m_maxLength) {
@@ -43,8 +43,7 @@ HttpParser::HttpParser(Type type) {
   };
 
   // on_status: collect into buffer, call user URL callback
-  m_settings.on_status = [](http_parser* p, const char* at,
-                            size_t length) -> int {
+  m_settings.on_status = [](llhttp_t* p, const char* at, size_t length) -> int {
     auto& self = *static_cast<HttpParser*>(p->data);
     // use valueBuf for the status
     if ((self.m_valueBuf.size() + length) > self.m_maxLength) {
@@ -56,7 +55,7 @@ HttpParser::HttpParser(Type type) {
   };
 
   // on_header_field: collect into buffer, call user header/status callback
-  m_settings.on_header_field = [](http_parser* p, const char* at,
+  m_settings.on_header_field = [](llhttp_t* p, const char* at,
                                   size_t length) -> int {
     auto& self = *static_cast<HttpParser*>(p->data);
 
@@ -100,7 +99,7 @@ HttpParser::HttpParser(Type type) {
   };
 
   // on_header_field: collect into buffer
-  m_settings.on_header_value = [](http_parser* p, const char* at,
+  m_settings.on_header_value = [](llhttp_t* p, const char* at,
                                   size_t length) -> int {
     auto& self = *static_cast<HttpParser*>(p->data);
 
@@ -119,7 +118,7 @@ HttpParser::HttpParser(Type type) {
   };
 
   // on_headers_complete: call user status/header/complete callback
-  m_settings.on_headers_complete = [](http_parser* p) -> int {
+  m_settings.on_headers_complete = [](llhttp_t* p) -> int {
     auto& self = *static_cast<HttpParser*>(p->data);
 
     // if we previously were in url state, that means we finished the url
@@ -151,38 +150,55 @@ HttpParser::HttpParser(Type type) {
   };
 
   // on_body: call user callback
-  m_settings.on_body = [](http_parser* p, const char* at,
-                          size_t length) -> int {
+  m_settings.on_body = [](llhttp_t* p, const char* at, size_t length) -> int {
     auto& self = *static_cast<HttpParser*>(p->data);
-    self.body(std::string_view{at, length}, self.IsBodyFinal());
+    self.body(std::string_view{at, length});
     return self.m_aborted;
   };
 
   // on_message_complete: call user callback
-  m_settings.on_message_complete = [](http_parser* p) -> int {
+  m_settings.on_message_complete = [](llhttp_t* p) -> int {
     auto& self = *static_cast<HttpParser*>(p->data);
     self.messageComplete(self.ShouldKeepAlive());
     return self.m_aborted;
   };
 
   // on_chunk_header: call user callback
-  m_settings.on_chunk_header = [](http_parser* p) -> int {
+  m_settings.on_chunk_header = [](llhttp_t* p) -> int {
     auto& self = *static_cast<HttpParser*>(p->data);
     self.chunkHeader(p->content_length);
     return self.m_aborted;
   };
 
   // on_chunk_complete: call user callback
-  m_settings.on_chunk_complete = [](http_parser* p) -> int {
+  m_settings.on_chunk_complete = [](llhttp_t* p) -> int {
     auto& self = *static_cast<HttpParser*>(p->data);
     self.chunkComplete();
     return self.m_aborted;
   };
 }
 
+std::string_view HttpParser::Execute(std::string_view in) {
+  if (in.empty()) {
+    auto err = llhttp_finish(&m_parser);
+    if (err == HPE_INVALID_EOF_STATE) {
+      m_invalidEofState = true;
+    }
+    return in;
+  }
+  if (llhttp_execute(&m_parser, in.data(), in.size()) == HPE_OK) {
+    // Parse successful, consume all input
+    in.remove_prefix(in.size());
+  } else {
+    // Otherwise, only consume what was parsed
+    in.remove_prefix(llhttp_get_error_pos(&m_parser) - in.data());
+  }
+  return in;
+}
+
 void HttpParser::Reset(Type type) {
-  http_parser_init(&m_parser,
-                   static_cast<http_parser_type>(static_cast<int>(type)));
+  llhttp_init(&m_parser, static_cast<llhttp_type>(static_cast<int>(type)),
+              &m_settings);
   m_parser.data = this;
   m_maxLength = 1024;
   m_state = State::START;
@@ -190,4 +206,5 @@ void HttpParser::Reset(Type type) {
   m_fieldBuf.clear();
   m_valueBuf.clear();
   m_aborted = false;
+  m_invalidEofState = false;
 }

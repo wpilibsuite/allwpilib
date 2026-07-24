@@ -41,8 +41,8 @@ class WebSocketServerTest : public WebSocketTest {
           if (resp.HasError()) {
             Finish();
           }
-          UNSCOPED_INFO(http_errno_name(resp.GetError()));
-          REQUIRE(resp.GetError() == HPE_OK);
+          UNSCOPED_INFO(llhttp_errno_name(resp.GetError()));
+          REQUIRE(resp.GetError() == HPE_PAUSED_UPGRADE);
           if (data.empty()) {
             return;
           }

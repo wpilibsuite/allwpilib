@@ -1,0 +1,133 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Sat, 27 Jun 2026 01:01:10 -0400
+Subject: [PATCH 2/2] Use std::expected
+
+---
+ include/ada/errors.h             | 2 +-
+ include/ada/implementation-inl.h | 2 +-
+ include/ada/implementation.h     | 8 ++++----
+ include/ada/parser-inl.h         | 2 +-
+ include/ada/parser.h             | 3 +--
+ src/implementation.cpp           | 4 ++--
+ 6 files changed, 10 insertions(+), 11 deletions(-)
+
+diff --git a/include/ada/errors.h b/include/ada/errors.h
+index 79703f0a659180d8dddfab7d463b1c7db095cde6..51292ae2fdc921ebcbc965d006fb652645d0f8a4 100644
+--- a/include/ada/errors.h
++++ b/include/ada/errors.h
+@@ -12,7 +12,7 @@ namespace ada {
+ /**
+  * @brief Error codes for URL parsing operations.
+  *
+- * Used with `tl::expected` to indicate why a URL parsing operation failed.
++ * Used with `std::expected` to indicate why a URL parsing operation failed.
+  */
+ enum class errors : uint8_t {
+   type_error /**< A type error occurred (e.g., invalid URL syntax). */
+diff --git a/include/ada/implementation-inl.h b/include/ada/implementation-inl.h
+index be0af7ab50e4676f2d0ec5db0774dce3c48050ee..b1ef2d0c357b7c50ab84083e66d6d5b402bc75b0 100644
+--- a/include/ada/implementation-inl.h
++++ b/include/ada/implementation-inl.h
+@@ -6,9 +6,9 @@
+ 
+ #include "ada/url_pattern_regex.h"
+ 
+-#include "ada/expected.h"
+ #include "ada/implementation.h"
+ 
++#include <expected>
+ #include <variant>
+ #include <string_view>
+ 
+diff --git a/include/ada/implementation.h b/include/ada/implementation.h
+index 75ff0715e41fa90bae09e785102a55cab1fa90ce..1b1cbb38d44a6d66c9887141b42016cacefda7fd 100644
+--- a/include/ada/implementation.h
++++ b/include/ada/implementation.h
+@@ -25,7 +25,7 @@ namespace ada {
+ /**
+  * Result type for URL parsing operations.
+  *
+- * Uses `tl::expected` to represent either a successfully parsed URL or an
++ * Uses `std::expected` to represent either a successfully parsed URL or an
+  * error. This allows for exception-free error handling.
+  *
+  * @tparam result_type The URL type to return (default: `ada::url_aggregator`)
+@@ -41,7 +41,7 @@ namespace ada {
+  * ```
+  */
+ template <class result_type = ada::url_aggregator>
+-using result = tl::expected<result_type, ada::errors>;
++using result = std::expected<result_type, ada::errors>;
+ 
+ /**
+  * Parses a URL string according to the WHATWG URL Standard.
+@@ -143,13 +143,13 @@ bool can_parse(std::string_view input,
+  *        resolving relative patterns.
+  * @param options Optional pointer to configuration options (e.g., ignore_case).
+  *
+- * @return A `tl::expected` containing either the parsed url_pattern on success,
++ * @return A `std::expected` containing either the parsed url_pattern on success,
+  *         or an error code on failure.
+  *
+  * @see https://urlpattern.spec.whatwg.org
+  */
+ template <url_pattern_regex::regex_concept regex_provider>
+-ada_warn_unused tl::expected<url_pattern<regex_provider>, errors>
++ada_warn_unused std::expected<url_pattern<regex_provider>, errors>
+ parse_url_pattern(std::variant<std::string_view, url_pattern_init>&& input,
+                   const std::string_view* base_url = nullptr,
+                   const url_pattern_options* options = nullptr);
+diff --git a/include/ada/parser-inl.h b/include/ada/parser-inl.h
+index 14de270b8c7624802fd2a5eb7d8b6f165cd4abc9..7881616a561d0d19a637a89b3ad7d7352a31e6bd 100644
+--- a/include/ada/parser-inl.h
++++ b/include/ada/parser-inl.h
+@@ -4,11 +4,11 @@
+ #ifndef ADA_PARSER_INL_H
+ #define ADA_PARSER_INL_H
+ 
+-#include "ada/expected.h"
+ #include "ada/url_pattern.h"
+ #include "ada/url_pattern_helpers.h"
+ #include "ada/parser.h"
+ 
++#include <expected>
+ #include <string>
+ #include <string_view>
+ #include <variant>
+diff --git a/include/ada/parser.h b/include/ada/parser.h
+index 5ffd9233b441f9836d4991e6f3cc45c9759c6b3f..1351988d101afd8f056095a237e7f4cbe32df451 100644
+--- a/include/ada/parser.h
++++ b/include/ada/parser.h
+@@ -11,11 +11,10 @@
+ #ifndef ADA_PARSER_H
+ #define ADA_PARSER_H
+ 
++#include <expected>
+ #include <string_view>
+ #include <variant>
+ 
+-#include "ada/expected.h"
+-
+ #include "ada/url_pattern_regex.h"
+ #include "ada/url_pattern_init.h"
+ 
+diff --git a/src/implementation.cpp b/src/implementation.cpp
+index 70ca6f5bcf60a3203adf4d7f0f35846163ea544b..3007b047faf04dfaf372b6ec49ff234feae12a04 100644
+--- a/src/implementation.cpp
++++ b/src/implementation.cpp
+@@ -10,12 +10,12 @@
+ namespace ada {
+ 
+ template <class result_type>
+-ada_warn_unused tl::expected<result_type, errors> parse(
++ada_warn_unused std::expected<result_type, errors> parse(
+     std::string_view input, const result_type* base_url) {
+   result_type u =
+       ada::parser::parse_url_impl<result_type, true>(input, base_url);
+   if (!u.is_valid) {
+-    return tl::unexpected(errors::type_error);
++    return std::unexpected(errors::type_error);
+   }
+   return u;
+ }

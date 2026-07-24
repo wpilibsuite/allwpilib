@@ -143,8 +143,8 @@ TEST_CASE_METHOD(WebSocketTest, "WebSocketTest CreateClientBasic",
       if (req.HasError()) {
         Finish();
       }
-      UNSCOPED_INFO(http_errno_name(req.GetError()));
-      REQUIRE(req.GetError() == HPE_OK);
+      UNSCOPED_INFO(llhttp_errno_name(req.GetError()));
+      REQUIRE(req.GetError() == HPE_PAUSED_UPGRADE);
     });
   });
   clientPipe->Connect(pipeName, [&]() {
@@ -183,8 +183,8 @@ TEST_CASE_METHOD(WebSocketTest, "WebSocketTest CreateClientExtraHeaders",
       if (req.HasError()) {
         Finish();
       }
-      UNSCOPED_INFO(http_errno_name(req.GetError()));
-      REQUIRE(req.GetError() == HPE_OK);
+      UNSCOPED_INFO(llhttp_errno_name(req.GetError()));
+      REQUIRE(req.GetError() == HPE_PAUSED_UPGRADE);
     });
   });
   clientPipe->Connect(pipeName, [&]() {
@@ -268,8 +268,8 @@ TEST_CASE_METHOD(WebSocketTest, "WebSocketTest CreateServerBasic",
       if (resp.HasError()) {
         Finish();
       }
-      UNSCOPED_INFO(http_errno_name(resp.GetError()));
-      REQUIRE(resp.GetError() == HPE_OK);
+      UNSCOPED_INFO(llhttp_errno_name(resp.GetError()));
+      REQUIRE(resp.GetError() == HPE_PAUSED_UPGRADE);
     });
   });
 
@@ -310,8 +310,8 @@ TEST_CASE_METHOD(WebSocketTest, "WebSocketTest CreateServerProtocol",
       if (resp.HasError()) {
         Finish();
       }
-      UNSCOPED_INFO(http_errno_name(resp.GetError()));
-      REQUIRE(resp.GetError() == HPE_OK);
+      UNSCOPED_INFO(llhttp_errno_name(resp.GetError()));
+      REQUIRE(resp.GetError() == HPE_PAUSED_UPGRADE);
     });
   });
 
@@ -360,7 +360,7 @@ TEST_CASE_METHOD(WebSocketTest, "WebSocketTest CreateServerBadVersion",
       if (resp.HasError()) {
         Finish();
       }
-      UNSCOPED_INFO(http_errno_name(resp.GetError()));
+      UNSCOPED_INFO(llhttp_errno_name(resp.GetError()));
       REQUIRE(resp.GetError() == HPE_OK);
     });
   });
