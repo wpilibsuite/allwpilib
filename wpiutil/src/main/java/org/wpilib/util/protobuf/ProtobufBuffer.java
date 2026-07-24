@@ -18,10 +18,10 @@ import us.hebi.quickbuf.ProtoSource;
  */
 public final class ProtobufBuffer<T, MessageType extends ProtoMessage<?>> {
   private ProtobufBuffer(Protobuf<T, MessageType> proto) {
-    m_buf = ByteBuffer.allocateDirect(1024);
-    m_sink = ProtoSink.newDirectSink();
+    m_buf = new byte[1024];
+    m_sink = ProtoSink.newInstance(m_buf);
     m_sink.setOutput(m_buf);
-    m_source = ProtoSource.newDirectSource();
+    m_source = ProtoSource.newArraySource();
     m_msg = proto.createMessage();
     m_proto = proto;
   }
@@ -58,8 +58,8 @@ public final class ProtobufBuffer<T, MessageType extends ProtoMessage<?>> {
   }
 
   /**
-   * Serializes a value to a ByteBuffer. The returned ByteBuffer is a direct byte buffer with the
-   * position set to the end of the serialized data.
+   * Serializes a value to a ByteBuffer. The returned ByteBuffer has its position set to the end of
+   * the serialized data.
    *
    * @param value value
    * @return byte buffer
@@ -68,15 +68,19 @@ public final class ProtobufBuffer<T, MessageType extends ProtoMessage<?>> {
   public ByteBuffer write(T value) throws IOException {
     m_msg.clearQuick();
     m_proto.pack(m_msg, value);
+
     int size = m_msg.getSerializedSize();
-    if (size > m_buf.capacity()) {
-      m_buf = ByteBuffer.allocateDirect(size * 2);
+    if (size > m_buf.length) {
+      m_buf = new byte[size * 2];
       m_sink.setOutput(m_buf);
     }
+
     m_sink.reset();
     m_msg.writeTo(m_sink);
-    m_buf.position(m_sink.getTotalBytesWritten());
-    return m_buf;
+
+    ByteBuffer byteBuf = ByteBuffer.wrap(m_buf);
+    byteBuf.position(m_sink.getTotalBytesWritten());
+    return byteBuf;
   }
 
   /**
@@ -164,7 +168,7 @@ public final class ProtobufBuffer<T, MessageType extends ProtoMessage<?>> {
     m_proto.unpackInto(out, m_msg);
   }
 
-  private ByteBuffer m_buf;
+  private byte[] m_buf;
   private final ProtoSink m_sink;
   private final ProtoSource m_source;
   private final MessageType m_msg;
