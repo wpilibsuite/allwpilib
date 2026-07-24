@@ -21,7 +21,7 @@ import org.wpilib.simulation.DualSenseControllerSim;
 class DualSenseControllerTest {
   @Test
   void testWrappedHID() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DualSenseController controller = new DualSenseController(2);
     DualSenseControllerSim sim = new DualSenseControllerSim(controller);
     sim.notifyNewData();
@@ -37,7 +37,7 @@ class DualSenseControllerTest {
   @EnumSource(value = DualSenseController.Button.class)
   void testButtons(DualSenseController.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DualSenseController joy = new DualSenseController(2);
     DualSenseControllerSim joysim = new DualSenseControllerSim(joy);
 
@@ -76,7 +76,7 @@ class DualSenseControllerTest {
   @EnumSource(value = DualSenseController.Axis.class)
   void testAxes(DualSenseController.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DualSenseController joy = new DualSenseController(2);
     DualSenseControllerSim joysim = new DualSenseControllerSim(joy);
 

@@ -21,7 +21,7 @@ import org.wpilib.simulation.GameCubeControllerSim;
 class GameCubeControllerTest {
   @Test
   void testWrappedHID() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     GameCubeController controller = new GameCubeController(2);
     GameCubeControllerSim sim = new GameCubeControllerSim(controller);
     sim.notifyNewData();
@@ -37,7 +37,7 @@ class GameCubeControllerTest {
   @EnumSource(value = GameCubeController.Button.class)
   void testButtons(GameCubeController.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     GameCubeController joy = new GameCubeController(2);
     GameCubeControllerSim joysim = new GameCubeControllerSim(joy);
 
@@ -76,7 +76,7 @@ class GameCubeControllerTest {
   @EnumSource(value = GameCubeController.Axis.class)
   void testAxes(GameCubeController.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     GameCubeController joy = new GameCubeController(2);
     GameCubeControllerSim joysim = new GameCubeControllerSim(joy);
 

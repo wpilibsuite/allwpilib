@@ -34,7 +34,7 @@ class I2CCommunicationTest {
 
   @BeforeEach
   void startThread() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SimHooks.pauseTiming();
     SimHooks.setProgramStarted(false);
     DriverStationSim.resetData();

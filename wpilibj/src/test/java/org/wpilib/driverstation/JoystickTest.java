@@ -15,7 +15,7 @@ import org.wpilib.simulation.JoystickSim;
 class JoystickTest {
   @Test
   void testGetX() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     Joystick joy = new Joystick(1);
     JoystickSim joysim = new JoystickSim(joy);
 
@@ -30,7 +30,7 @@ class JoystickTest {
 
   @Test
   void testGetY() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     Joystick joy = new Joystick(1);
     JoystickSim joysim = new JoystickSim(joy);
 
@@ -45,7 +45,7 @@ class JoystickTest {
 
   @Test
   void testGetZ() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     Joystick joy = new Joystick(1);
     JoystickSim joysim = new JoystickSim(joy);
 
@@ -60,7 +60,7 @@ class JoystickTest {
 
   @Test
   void testGetTwist() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     Joystick joy = new Joystick(1);
     JoystickSim joysim = new JoystickSim(joy);
 
@@ -75,7 +75,7 @@ class JoystickTest {
 
   @Test
   void testGetThrottle() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     Joystick joy = new Joystick(1);
     JoystickSim joysim = new JoystickSim(joy);
 
@@ -90,7 +90,7 @@ class JoystickTest {
 
   @Test
   void testGetTrigger() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     Joystick joy = new Joystick(1);
     JoystickSim joysim = new JoystickSim(joy);
 
@@ -105,7 +105,7 @@ class JoystickTest {
 
   @Test
   void testGetTop() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     Joystick joy = new Joystick(1);
     JoystickSim joysim = new JoystickSim(joy);
 
@@ -120,7 +120,7 @@ class JoystickTest {
 
   @Test
   void testGetMagnitude() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     Joystick joy = new Joystick(1);
     JoystickSim joysim = new JoystickSim(joy);
 
@@ -145,7 +145,7 @@ class JoystickTest {
 
   @Test
   void testGetDirection() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     Joystick joy = new Joystick(1);
     JoystickSim joysim = new JoystickSim(joy);
 

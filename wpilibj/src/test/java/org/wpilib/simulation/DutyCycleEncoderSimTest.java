@@ -25,7 +25,7 @@ class DutyCycleEncoderSimTest {
 
   @Test
   void setIsConnectedTest() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (DutyCycleEncoder encoder = new DutyCycleEncoder(0)) {
       DutyCycleEncoderSim sim = new DutyCycleEncoderSim(encoder);

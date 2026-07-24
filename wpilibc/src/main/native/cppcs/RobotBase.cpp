@@ -41,7 +41,7 @@ using SetCameraServerSharedFP = void (*)(wpi::CameraServerShared*);
 using namespace wpi;
 
 int wpi::RunHALInitialization() {
-  if (!HAL_Initialize(500, 0)) {
+  if (!HAL_Initialize()) {
     std::puts("FATAL ERROR: HAL could not be initialized");
     return -1;
   }

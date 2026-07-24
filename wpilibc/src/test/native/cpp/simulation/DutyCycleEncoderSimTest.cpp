@@ -12,7 +12,7 @@
 namespace wpi::sim {
 
 TEST(DutyCycleEncoderSimTest, Set) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   DutyCycleEncoder enc{0, 10, 0};
   DutyCycleEncoderSim sim(enc);
@@ -23,7 +23,7 @@ TEST(DutyCycleEncoderSimTest, Set) {
 }
 
 TEST(DutyCycleEncoderSimTest, SetIsConnected) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   DutyCycleEncoder enc{0};
   DutyCycleEncoderSim sim(enc);

@@ -19,7 +19,7 @@ namespace wpi::sim {
 
 class AlertSimTest : public ::testing::Test {
  public:
-  AlertSimTest() { HAL_Initialize(500, 0); }
+  AlertSimTest() { HAL_Initialize(); }
 
   ~AlertSimTest() override { AlertSim::ResetData(); }
 

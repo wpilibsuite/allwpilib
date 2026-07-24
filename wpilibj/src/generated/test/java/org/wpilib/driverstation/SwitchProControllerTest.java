@@ -21,7 +21,7 @@ import org.wpilib.simulation.SwitchProControllerSim;
 class SwitchProControllerTest {
   @Test
   void testWrappedHID() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SwitchProController controller = new SwitchProController(2);
     SwitchProControllerSim sim = new SwitchProControllerSim(controller);
     sim.notifyNewData();
@@ -37,7 +37,7 @@ class SwitchProControllerTest {
   @EnumSource(value = SwitchProController.Button.class)
   void testButtons(SwitchProController.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SwitchProController joy = new SwitchProController(2);
     SwitchProControllerSim joysim = new SwitchProControllerSim(joy);
 
@@ -76,7 +76,7 @@ class SwitchProControllerTest {
   @EnumSource(value = SwitchProController.Axis.class)
   void testAxes(SwitchProController.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SwitchProController joy = new SwitchProController(2);
     SwitchProControllerSim joysim = new SwitchProControllerSim(joy);
 

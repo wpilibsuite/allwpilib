@@ -21,7 +21,7 @@ import org.wpilib.simulation.{{ ClassName }}ControllerSim;
 class {{ ClassName }}ControllerTest {
   @Test
   void testWrappedHID() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     {{ ClassName }}Controller controller = new {{ ClassName }}Controller(2);
     {{ ClassName }}ControllerSim sim = new {{ ClassName }}ControllerSim(controller);
     sim.notifyNewData();
@@ -37,7 +37,7 @@ class {{ ClassName }}ControllerTest {
   @EnumSource(value = {{ ClassName }}Controller.Button.class)
   void testButtons({{ ClassName }}Controller.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     {{ ClassName }}Controller joy = new {{ ClassName }}Controller(2);
     {{ ClassName }}ControllerSim joysim = new {{ ClassName }}ControllerSim(joy);
 
@@ -76,7 +76,7 @@ class {{ ClassName }}ControllerTest {
   @EnumSource(value = {{ ClassName }}Controller.Axis.class)
   void testAxes({{ ClassName }}Controller.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     {{ ClassName }}Controller joy = new {{ ClassName }}Controller(2);
     {{ ClassName }}ControllerSim joysim = new {{ ClassName }}ControllerSim(joy);
 

@@ -11,7 +11,7 @@
 
 namespace wpi {
 TEST(ExpansionHubMotorTest, FollowerLoopDetection) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   wpi::ExpansionHubMotor motor0{0, 0};
   wpi::ExpansionHubMotor motor1{0, 1};
@@ -25,7 +25,7 @@ TEST(ExpansionHubMotorTest, FollowerLoopDetection) {
       wpi::RuntimeError);
 }
 TEST(ExpansionHubMotorTest, Follower) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   wpi::ExpansionHubMotor motor0{0, 0};
   wpi::ExpansionHubMotor motor1{0, 1};

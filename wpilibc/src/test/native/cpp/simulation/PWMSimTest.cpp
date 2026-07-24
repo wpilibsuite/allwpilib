@@ -13,7 +13,7 @@
 namespace wpi::sim {
 
 TEST(PWMSimTest, Initialize) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   PWMSim sim{0};
   sim.ResetData();
@@ -27,7 +27,7 @@ TEST(PWMSimTest, Initialize) {
 }
 
 TEST(PWMSimTest, SetPulseTime) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   PWMSim sim{0};
   sim.ResetData();
@@ -45,7 +45,7 @@ TEST(PWMSimTest, SetPulseTime) {
 }
 
 TEST(PWMSimTest, SetOutputPeriod) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   PWMSim sim{0};
   sim.ResetData();

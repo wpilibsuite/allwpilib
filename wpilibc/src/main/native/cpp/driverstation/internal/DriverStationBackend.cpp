@@ -218,7 +218,7 @@ static inline void ReportJoystickWarning(int stick, const S& format,
 }
 
 Instance::Instance() {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   // All joysticks should default to having zero axes, povs and buttons, so
   // uninitialized memory doesn't get sent to motor controllers.
