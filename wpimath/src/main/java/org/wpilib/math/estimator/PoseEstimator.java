@@ -12,7 +12,6 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.interpolation.TimeInterpolatableBuffer;
-import org.wpilib.math.kinematics.Kinematics;
 import org.wpilib.math.kinematics.Odometry;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
@@ -59,7 +58,6 @@ public class PoseEstimator<T> {
   /**
    * Constructs a PoseEstimator.
    *
-   * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param odometry A correctly-configured odometry object for your drivetrain.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in meters, y position
    *     in meters, and heading in radians). Increase these numbers to trust your state estimate
@@ -69,10 +67,7 @@ public class PoseEstimator<T> {
    *     the vision pose measurement less.
    */
   public PoseEstimator(
-      Kinematics<T, ?, ?> kinematics,
-      Odometry<T> odometry,
-      Matrix<N3, N1> stateStdDevs,
-      Matrix<N3, N1> visionMeasurementStdDevs) {
+      Odometry<T> odometry, Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionMeasurementStdDevs) {
     m_odometry = odometry;
 
     m_poseEstimate = m_odometry.getPose();
@@ -114,10 +109,10 @@ public class PoseEstimator<T> {
   /**
    * Resets the robot's position on the field.
    *
-   * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
-   * automatically takes care of offsetting the gyro angle.
+   * <p>The gyroscope angle does not need to be reset here in the user's robot code.
    *
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param wheelPositions The current encoder readings.
    * @param pose The position on the field that your robot is at.
    */
@@ -360,7 +355,8 @@ public class PoseEstimator<T> {
    * Updates the pose estimator with wheel encoder and gyro information. This should be called every
    * loop.
    *
-   * @param gyroAngle The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param wheelPositions The current encoder readings.
    * @return The estimated pose of the robot in meters.
    */
@@ -373,7 +369,8 @@ public class PoseEstimator<T> {
    * loop.
    *
    * @param currentTime Time at which this method was called, in seconds.
-   * @param gyroAngle The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param wheelPositions The current encoder readings.
    * @return The estimated pose of the robot in meters.
    */

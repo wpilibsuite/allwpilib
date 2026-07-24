@@ -175,7 +175,6 @@ TEST(DifferentialDrivePoseEstimator3dTest, Accuracy) {
   wpi::math::DifferentialDriveKinematics kinematics{1.0_m};
 
   wpi::math::DifferentialDrivePoseEstimator3d estimator{
-      kinematics,
       wpi::math::Rotation3d{},
       0_m,
       0_m,
@@ -208,7 +207,6 @@ TEST(DifferentialDrivePoseEstimator3dTest, BadInitialPose) {
   wpi::math::DifferentialDriveKinematics kinematics{1.0_m};
 
   wpi::math::DifferentialDrivePoseEstimator3d estimator{
-      kinematics,
       wpi::math::Rotation3d{},
       0_m,
       0_m,
@@ -258,10 +256,7 @@ TEST(DifferentialDrivePoseEstimator3dTest, SimultaneousVisionMeasurements) {
   // The alternative result is that only one vision measurement affects the
   // outcome. If that were the case, after 1000 measurements, the estimated
   // pose would converge to that measurement.
-  wpi::math::DifferentialDriveKinematics kinematics{1.0_m};
-
   wpi::math::DifferentialDrivePoseEstimator3d estimator{
-      kinematics,
       wpi::math::Rotation3d{},
       0_m,
       0_m,
@@ -319,10 +314,7 @@ TEST(DifferentialDrivePoseEstimator3dTest, SimultaneousVisionMeasurements) {
 }
 
 TEST(DifferentialDrivePoseEstimator3dTest, TestDiscardStaleVisionMeasurements) {
-  wpi::math::DifferentialDriveKinematics kinematics{1_m};
-
   wpi::math::DifferentialDrivePoseEstimator3d estimator{
-      kinematics,
       wpi::math::Rotation3d{},
       0_m,
       0_m,
@@ -358,9 +350,7 @@ TEST(DifferentialDrivePoseEstimator3dTest, TestDiscardStaleVisionMeasurements) {
 }
 
 TEST(DifferentialDrivePoseEstimator3dTest, TestSampleAt) {
-  wpi::math::DifferentialDriveKinematics kinematics{1_m};
-  wpi::math::DifferentialDrivePoseEstimator3d estimator{kinematics,
-                                                        wpi::math::Rotation3d{},
+  wpi::math::DifferentialDrivePoseEstimator3d estimator{wpi::math::Rotation3d{},
                                                         0_m,
                                                         0_m,
                                                         wpi::math::Pose3d{},
@@ -435,9 +425,7 @@ TEST(DifferentialDrivePoseEstimator3dTest, TestSampleAt) {
 }
 
 TEST(DifferentialDrivePoseEstimator3dTest, TestReset) {
-  wpi::math::DifferentialDriveKinematics kinematics{1_m};
   wpi::math::DifferentialDrivePoseEstimator3d estimator{
-      kinematics,
       wpi::math::Rotation3d{},
       0_m,
       0_m,

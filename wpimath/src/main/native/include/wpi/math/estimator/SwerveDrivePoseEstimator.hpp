@@ -49,7 +49,8 @@ class SwerveDrivePoseEstimator
    *
    * @param kinematics A correctly-configured kinematics object for your
    *     drivetrain.
-   * @param gyroAngle The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param modulePositions The current distance and rotation measurements of
    *     the swerve modules.
    * @param initialPose The starting pose estimate.
@@ -68,7 +69,8 @@ class SwerveDrivePoseEstimator
    *
    * @param kinematics A correctly-configured kinematics object for your
    *     drivetrain.
-   * @param gyroAngle The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param modulePositions The current distance and rotation measurements of
    *     the swerve modules.
    * @param initialPose The starting pose estimate.
@@ -87,8 +89,8 @@ class SwerveDrivePoseEstimator
       const Pose2d& initialPose,
       const wpi::util::array<double, 3>& stateStdDevs,
       const wpi::util::array<double, 3>& visionMeasurementStdDevs)
-      : SwerveDrivePoseEstimator::PoseEstimator(
-            kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
+      : SwerveDrivePoseEstimator::PoseEstimator(m_odometryImpl, stateStdDevs,
+                                                visionMeasurementStdDevs),
         m_odometryImpl{kinematics, gyroAngle, modulePositions, initialPose} {
     this->ResetPose(initialPose);
   }

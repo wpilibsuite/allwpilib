@@ -20,7 +20,8 @@ public class MecanumDriveOdometry extends Odometry<MecanumDriveWheelPositions> {
    * Constructs a MecanumDriveOdometry object.
    *
    * @param kinematics The mecanum drive kinematics for your drivetrain.
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param wheelPositions The distances driven by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
@@ -37,7 +38,8 @@ public class MecanumDriveOdometry extends Odometry<MecanumDriveWheelPositions> {
    * Constructs a MecanumDriveOdometry object with the default pose at the origin.
    *
    * @param kinematics The mecanum drive kinematics for your drivetrain.
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param wheelPositions The distances driven by each wheel.
    */
   public MecanumDriveOdometry(
