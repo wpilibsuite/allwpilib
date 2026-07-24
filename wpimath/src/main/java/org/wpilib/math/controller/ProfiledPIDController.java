@@ -269,6 +269,19 @@ public class ProfiledPIDController implements Sendable {
   }
 
   /**
+   * Returns the next setpoint of the ProfiledPIDController, one controller period after the current
+   * setpoint.
+   *
+   * <p>This is useful with the feedforward calculate() overloads that take a next velocity, which
+   * are more accurate for discrete systems.
+   *
+   * @return The next setpoint.
+   */
+  public TrapezoidProfile.State getNextSetpoint() {
+    return m_profile.calculate(getPeriod(), m_setpoint, m_goal);
+  }
+
+  /**
    * Returns true if the error is within the tolerance of the error.
    *
    * <p>This will return false until at least one input value has been computed.
