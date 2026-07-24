@@ -4,79 +4,24 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 
-import argparse
-import os
-import shutil
-import subprocess
 import sys
 from pathlib import Path
 
+# When invoked directly, Python puts the script directory on sys.path.
+# Add the repo root so absolute package imports still work.
+sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
-def generate_nanopb(nanopb: Path, output_directory: Path, proto_dir: Path):
-    shutil.rmtree(output_directory.absolute(), ignore_errors=True)
-    os.makedirs(output_directory.absolute())
-
-    proto_files = proto_dir.glob("*.proto")
-    for path in proto_files:
-        absolute_filename = path.absolute()
-        subprocess.check_call(
-            ([sys.executable] if nanopb.endswith(".py") else [])
-            + [
-                nanopb,
-                f"-I{absolute_filename.parent}",
-                f"-D{output_directory.absolute()}",
-                "-S.cpp",
-                "-e.npb",
-                absolute_filename,
-            ],
-        )
-    java_files = (output_directory).glob("*")
-    for java_file in java_files:
-        with (java_file).open(encoding="utf-8") as f:
-            content = f.read()
-
-        java_file.write_text(
-            "// Copyright (c) FIRST and other WPILib contributors.\n// Open Source Software; you can modify and/or share it under the terms of\n// the WPILib BSD license file in the root directory of this project.\n"
-            + content,
-            encoding="utf-8",
-            newline="\n",
-        )
+from shared.generation import make_arg_parser, generate_nanopb, GeneratorTypes
 
 
 def main():
     script_path = Path(__file__).resolve()
     dirname = script_path.parent
 
-    root_path = dirname.parent
-    nanopb_path = os.path.join(
-        root_path,
-        "wpiutil",
-        "src",
-        "main",
-        "native",
-        "thirdparty",
-        "nanopb",
-        "generator",
-        "nanopb_generator.py",
-    )
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--nanopb",
-        help="Nanopb generator command",
-        default=nanopb_path,
-    )
-    parser.add_argument(
-        "--output_directory",
-        help="Optional. If set, will output the generated files to this directory, otherwise it will use a path relative to the script",
-        default=dirname / "src/generated/test/native/cpp",
-        type=Path,
-    )
-    parser.add_argument(
-        "--proto_directory",
-        help="Optional. If set, will use this directory to glob for protobuf files",
-        default=dirname / "src/test/proto",
-        type=Path,
+    parser = make_arg_parser(dirname, dirname.parent, GeneratorTypes.NANOPB)
+    parser.set_defaults(
+        proto_directory=dirname / "src/test/proto",
+        output_directory=dirname / "src/generated/test/native/cpp",
     )
     args = parser.parse_args()
 

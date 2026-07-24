@@ -4,20 +4,23 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 
-import argparse
 import json
 import re
-import subprocess
+import sys
 from pathlib import Path
 
+# When invoked directly, Python puts the script directory on sys.path.
+# Add the repo root so absolute package imports still work.
+sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
+
 from jinja2 import Environment, FileSystemLoader
-
-
-def write_controller_file(output_dir: Path, controller_name: str, contents: str):
-    output_dir.mkdir(parents=True, exist_ok=True)
-    output_file = output_dir / controller_name
-    output_file.write_text(contents, encoding="utf-8", newline="\n")
-    print("Writing to ", output_file)
+from shared.generation import (
+    add_jinja_args,
+    make_arg_parser,
+    generate_quickbuf,
+    write_file,
+    GeneratorTypes,
+)
 
 
 def generate_hids(output_directory: Path, template_directory: Path, schema_file: Path):
@@ -35,8 +38,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
     template = env.get_template("commandhid.java.jinja")
     for controller in controllers:
         controllerName = f"Command{controller['ConsoleName']}Controller.java"
-        output = template.render(controller)
-        write_controller_file(root_path, controllerName, output)
+        write_file(root_path, controllerName, template.render(controller))
 
 
 def _capitalize_first(name: str) -> str:
@@ -130,85 +132,23 @@ def generate_first_ds_hids(
     template = env.get_template("first_ds_commandhid.java.jinja")
     for controller in controllers:
         controller_name = f"Command{controller['ClassName']}Controller.java"
-        output = template.render(controller)
-        write_controller_file(root_path, controller_name, output)
-
-
-def generate_quickbuf(
-    protoc, quickbuf_plugin: Path, output_directory: Path, proto_dir: Path
-):
-    proto_files = proto_dir.glob("*.proto")
-    for path in proto_files:
-        absolute_filename = path.absolute()
-        args = [protoc]
-        if quickbuf_plugin:
-            # Optional on macOS if using protoc-quickbuf
-            args += [f"--plugin=protoc-gen-quickbuf={quickbuf_plugin}"]
-        args += [
-            f"--quickbuf_out=gen_descriptors=true:{output_directory.absolute()}",
-            f"-I{absolute_filename.parent}",
-            absolute_filename,
-        ]
-        subprocess.check_call(args)
-    java_files = (output_directory / "org/wpilib/command3/proto").glob("*.java")
-    for java_file in java_files:
-        with (java_file).open(encoding="utf-8") as f:
-            content = f.read()
-
-        java_file.write_text(
-            "// Copyright (c) FIRST and other WPILib contributors.\n// Open Source Software; you can modify and/or share it under the terms of\n// the WPILib BSD license file in the root directory of this project.\n"
-            + content,
-            encoding="utf-8",
-            newline="\n",
-        )
+        print(root_path, controller_name)
+        write_file(root_path, controller_name, template.render(controller))
 
 
 def main():
     script_path = Path(__file__).resolve()
     dirname = script_path.parent
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--output_directory",
-        help="Optional. If set, will output the generated files to this directory, otherwise it will use a path relative to the script",
-        default=dirname / "src/generated",
-        type=Path,
-    )
-    parser.add_argument(
-        "--template_root",
-        help="Optional. If set, will use this directory as the root for the jinja templates",
-        default=dirname / "src/generate",
-        type=Path,
-    )
-    parser.add_argument(
-        "--schema_file",
-        help="Optional. If set, will use this file for the joystick schema",
-        default="wpilibj/src/generate/hids.json",
-        type=Path,
-    )
+    parser = make_arg_parser(dirname, dirname.parent, GeneratorTypes.QUICKBUF)
+    add_jinja_args(parser, dirname, "wpilibj/src/generate/hids.json")
     parser.add_argument(
         "--first_ds_schema_file",
         help="Optional. If set, will use this file for the FIRST Driver Station HID schema",
         default="wpilibj/src/generate/first_ds_hids.json",
         type=Path,
     )
-    parser.add_argument(
-        "--protoc",
-        help="Protoc executable command",
-        default="protoc",
-    )
-    parser.add_argument(
-        "--quickbuf_plugin",
-        help="Path to the quickbuf protoc plugin",
-    )
-    parser.add_argument(
-        "--proto_directory",
-        help="Optional. If set, will use this directory to glob for protobuf files",
-        default=dirname / "src/main/proto",
-        type=Path,
-    )
     args = parser.parse_args()
-
     generate_hids(args.output_directory, args.template_root, args.schema_file)
     generate_first_ds_hids(
         args.output_directory, args.template_root, args.first_ds_schema_file

@@ -4,17 +4,16 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 
-import argparse
 import json
+import sys
 from pathlib import Path
 
+# When invoked directly, Python puts the script directory on sys.path.
+# Add the repo root so absolute package imports still work.
+sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
+
 from jinja2 import Environment, FileSystemLoader
-
-
-def write_controller_file(output_dir: Path, controller_name: str, contents: str):
-    output_dir.mkdir(parents=True, exist_ok=True)
-    output_file = output_dir / controller_name
-    output_file.write_text(contents, encoding="utf-8", newline="\n")
+from shared.generation import write_file, add_jinja_args, make_arg_parser
 
 
 def generate_hids(output_directory: Path, template_directory: Path, schema_file: Path):
@@ -32,8 +31,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
     template = env.get_template("hid.hpp.jinja")
     for controller in controllers:
         controllerName = f"{controller['ConsoleName']}Controller.hpp"
-        output = template.render(controller)
-        write_controller_file(root_path, controllerName, output)
+        write_file(root_path, controllerName, template.render(controller))
 
     # C++ files
     cpp_subdirectory = "main/native/cpp/driverstation"
@@ -45,8 +43,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
     template = env.get_template("hid.cpp.jinja")
     for controller in controllers:
         controllerName = f"{controller['ConsoleName']}Controller.cpp"
-        output = template.render(controller)
-        write_controller_file(root_path, controllerName, output)
+        write_file(root_path, controllerName, template.render(controller))
 
     # C++ simulation headers
     sim_hdr_subdirectory = "main/native/include/wpi/simulation"
@@ -59,8 +56,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
     template = env.get_template("hidsim.hpp.jinja")
     for controller in controllers:
         controllerName = f"{controller['ConsoleName']}ControllerSim.hpp"
-        output = template.render(controller)
-        write_controller_file(root_path, controllerName, output)
+        write_file(root_path, controllerName, template.render(controller))
 
     # C++ simulation files
     sim_cpp_subdirectory = "main/native/cpp/simulation"
@@ -72,33 +68,15 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
     template = env.get_template("hidsim.cpp.jinja")
     for controller in controllers:
         controllerName = f"{controller['ConsoleName']}ControllerSim.cpp"
-        output = template.render(controller)
-        write_controller_file(root_path, controllerName, output)
+        write_file(root_path, controllerName, template.render(controller))
 
 
 def main():
     script_path = Path(__file__).resolve()
     dirname = script_path.parent
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--output_directory",
-        help="Optional. If set, will output the generated files to this directory, otherwise it will use a path relative to the script",
-        default=dirname / "src/generated",
-        type=Path,
-    )
-    parser.add_argument(
-        "--template_root",
-        help="Optional. If set, will use this directory as the root for the jinja templates",
-        default=dirname / "src/generate",
-        type=Path,
-    )
-    parser.add_argument(
-        "--schema_file",
-        help="Optional. If set, will use this file for the joystick schema",
-        default="wpilibj/src/generate/hids.json",
-        type=Path,
-    )
+    parser = make_arg_parser(dirname, dirname.parent)
+    add_jinja_args(parser, dirname, "wpilibj/src/generate/hids.json")
     args = parser.parse_args()
 
     generate_hids(args.output_directory, args.template_root, args.schema_file)

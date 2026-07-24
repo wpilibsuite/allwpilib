@@ -59,6 +59,9 @@ py_binary(
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
+    deps = [
+        "//:generation",
+    ],
 )
 
 filegroup(

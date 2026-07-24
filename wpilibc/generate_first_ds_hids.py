@@ -4,18 +4,17 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 
-import argparse
 import json
 import re
+import sys
 from pathlib import Path
 
+# When invoked directly, Python puts the script directory on sys.path.
+# Add the repo root so absolute package imports still work.
+sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
+
 from jinja2 import Environment, FileSystemLoader
-
-
-def write_controller_file(output_dir: Path, controller_name: str, contents: str):
-    output_dir.mkdir(parents=True, exist_ok=True)
-    output_file = output_dir / controller_name
-    output_file.write_text(contents, encoding="utf-8", newline="\n")
+from shared.generation import write_file, add_jinja_args, make_arg_parser
 
 
 def _capitalize_first(name: str) -> str:
@@ -133,8 +132,7 @@ def generate_first_ds_hids(
     template = env.get_template("first_ds_hid.hpp.jinja")
     for controller in controllers:
         controller_name = f"{controller['ClassName']}Controller.hpp"
-        output = template.render(controller)
-        write_controller_file(root_path, controller_name, output)
+        write_file(root_path, controller_name, template.render(controller))
 
     cpp_subdirectory = "main/native/cpp/driverstation"
     env = Environment(
@@ -146,8 +144,7 @@ def generate_first_ds_hids(
     template = env.get_template("first_ds_hid.cpp.jinja")
     for controller in controllers:
         controller_name = f"{controller['ClassName']}Controller.cpp"
-        output = template.render(controller)
-        write_controller_file(root_path, controller_name, output)
+        write_file(root_path, controller_name, template.render(controller))
 
     sim_hdr_subdirectory = "main/native/include/wpi/simulation"
     env = Environment(
@@ -159,8 +156,7 @@ def generate_first_ds_hids(
     template = env.get_template("first_ds_hidsim.hpp.jinja")
     for controller in controllers:
         controller_name = f"{controller['ClassName']}ControllerSim.hpp"
-        output = template.render(controller)
-        write_controller_file(root_path, controller_name, output)
+        write_file(root_path, controller_name, template.render(controller))
 
     sim_cpp_subdirectory = "main/native/cpp/simulation"
     env = Environment(
@@ -172,8 +168,7 @@ def generate_first_ds_hids(
     template = env.get_template("first_ds_hidsim.cpp.jinja")
     for controller in controllers:
         controller_name = f"{controller['ClassName']}ControllerSim.cpp"
-        output = template.render(controller)
-        write_controller_file(root_path, controller_name, output)
+        write_file(root_path, controller_name, template.render(controller))
 
     if test_output_directory is not None:
         env = Environment(
@@ -185,33 +180,15 @@ def generate_first_ds_hids(
         template = env.get_template("first_ds_hid_test.cpp.jinja")
         for controller in controllers:
             controller_name = f"{controller['ClassName']}ControllerTest.cpp"
-            output = template.render(controller)
-            write_controller_file(root_path, controller_name, output)
+            write_file(root_path, controller_name, template.render(controller))
 
 
 def main():
     script_path = Path(__file__).resolve()
     dirname = script_path.parent
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--output_directory",
-        help="Optional. If set, will output the generated files to this directory, otherwise it will use a path relative to the script",
-        default=dirname / "src/generated",
-        type=Path,
-    )
-    parser.add_argument(
-        "--template_root",
-        help="Optional. If set, will use this directory as the root for the jinja templates",
-        default=dirname / "src/generate",
-        type=Path,
-    )
-    parser.add_argument(
-        "--schema_file",
-        help="Optional. If set, will use this file for the FIRST Driver Station HID schema",
-        default="wpilibj/src/generate/first_ds_hids.json",
-        type=Path,
-    )
+    parser = make_arg_parser(dirname, dirname.parent)
+    add_jinja_args(parser, dirname, "wpilibj/src/generate/first_ds_hids.json")
     parser.add_argument(
         "--test_output_directory",
         help="Optional. If set, will output generated tests to this directory",

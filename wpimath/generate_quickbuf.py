@@ -4,66 +4,21 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 
-import argparse
-import subprocess
+import sys
 from pathlib import Path
 
+# When invoked directly, Python puts the script directory on sys.path.
+# Add the repo root so absolute package imports still work.
+sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
-def generate_quickbuf(
-    protoc, quickbuf_plugin: Path, output_directory: Path, proto_dir: Path
-):
-    proto_files = proto_dir.glob("**/*.proto")
-    for path in proto_files:
-        absolute_filename = path.absolute()
-        subprocess.check_call(
-            [
-                protoc,
-                f"--plugin=protoc-gen-quickbuf={quickbuf_plugin}",
-                f"--quickbuf_out=gen_descriptors=true:{output_directory.absolute()}",
-                f"-I{proto_dir.absolute()}",
-                absolute_filename,
-            ]
-        )
-    java_files = (output_directory / "org/wpilib/math/proto").glob("*.java")
-    for java_file in java_files:
-        with (java_file).open(encoding="utf-8") as f:
-            content = f.read()
-
-        java_file.write_text(
-            "// Copyright (c) FIRST and other WPILib contributors.\n// Open Source Software; you can modify and/or share it under the terms of\n// the WPILib BSD license file in the root directory of this project.\n"
-            + content,
-            encoding="utf-8",
-            newline="\n",
-        )
+from shared.generation import make_arg_parser, generate_quickbuf, GeneratorTypes
 
 
 def main():
     script_path = Path(__file__).resolve()
     dirname = script_path.parent
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--protoc",
-        help="Protoc executable command",
-        default="protoc",
-    )
-    parser.add_argument(
-        "--quickbuf_plugin",
-        help="Path to the quickbuf protoc plugin",
-        required=True,
-    )
-    parser.add_argument(
-        "--output_directory",
-        help="Optional. If set, will output the generated files to this directory, otherwise it will use a path relative to the script",
-        default=dirname / "src/generated/main/java",
-        type=Path,
-    )
-    parser.add_argument(
-        "--proto_directory",
-        help="Optional. If set, will use this directory to glob for protobuf files",
-        default=dirname / "src/main/proto",
-        type=Path,
-    )
+    parser = make_arg_parser(dirname, dirname.parent, GeneratorTypes.QUICKBUF)
     args = parser.parse_args()
 
     generate_quickbuf(
