@@ -18,7 +18,7 @@ constexpr double kDefaultDistancePerPulse = .0005;
 }  // namespace
 
 TEST(EncoderSimTest, Initialize) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   EncoderSim sim = EncoderSim::CreateForIndex(0);
   sim.ResetData();
@@ -34,7 +34,7 @@ TEST(EncoderSimTest, Initialize) {
 }
 
 TEST(EncoderSimTest, Rate) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -51,7 +51,7 @@ TEST(EncoderSimTest, Rate) {
 }
 
 TEST(EncoderSimTest, ResetDataClearsRateCallbacks) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -69,7 +69,7 @@ TEST(EncoderSimTest, ResetDataClearsRateCallbacks) {
 }
 
 TEST(EncoderSimTest, Count) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -88,7 +88,7 @@ TEST(EncoderSimTest, Count) {
 }
 
 TEST(EncoderSimTest, Distance) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -102,7 +102,7 @@ TEST(EncoderSimTest, Distance) {
 }
 
 TEST(EncoderSimTest, SetDirection) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -127,7 +127,7 @@ TEST(EncoderSimTest, SetDirection) {
 }
 
 TEST(EncoderSimTest, SetReverseDirection) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -150,7 +150,7 @@ TEST(EncoderSimTest, SetReverseDirection) {
 }
 
 TEST(EncoderSimTest, SetDistancePerPulse) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -167,7 +167,7 @@ TEST(EncoderSimTest, SetDistancePerPulse) {
 }
 
 TEST(EncoderSimTest, Reset) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);

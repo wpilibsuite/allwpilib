@@ -14,7 +14,7 @@
 namespace wpi::sim {
 
 TEST(DIOSimTest, Initialization) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   DIOSim sim{2};
   sim.ResetData();
   EXPECT_FALSE(sim.GetInitialized());
@@ -42,7 +42,7 @@ TEST(DIOSimTest, Initialization) {
 }
 
 TEST(DIOSimTest, Input) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   DigitalInput input{0};
   DIOSim sim(input);
@@ -61,7 +61,7 @@ TEST(DIOSimTest, Input) {
 }
 
 TEST(DIOSimTest, Output) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   DigitalOutput output{0};
   DIOSim sim(output);
   EXPECT_FALSE(sim.GetIsInput());
