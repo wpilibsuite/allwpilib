@@ -43,6 +43,24 @@ ExpansionHubPositionConstants::ExpansionHubPositionConstants(int hubNumber,
                                       hubNumber, motorNumber))
           .Publish(options);
 
+  m_gPublisher =
+      systemServer
+          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/position/kg",
+                                      hubNumber, motorNumber))
+          .Publish(options);
+
+  m_cosPublisher = systemServer
+                       .GetDoubleTopic(fmt::format(
+                           "/rhsp/{}/motor{}/constants/position/kcos",
+                           hubNumber, motorNumber))
+                       .Publish(options);
+
+  m_cosRatioPublisher = systemServer
+                            .GetDoubleTopic(fmt::format(
+                                "/rhsp/{}/motor{}/constants/position/kcosRatio",
+                                hubNumber, motorNumber))
+                            .Publish(options);
+
   m_continuousPublisher =
       systemServer
           .GetBooleanTopic(
@@ -76,6 +94,25 @@ ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetPID(double p,
 
 ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetS(double s) {
   m_sPublisher.Set(s);
+  return *this;
+}
+
+ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetG(double g) {
+  m_gPublisher.Set(g);
+  m_cosPublisher.Set(0);
+  return *this;
+}
+
+ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetCos(
+    double cos) {
+  m_cosPublisher.Set(cos);
+  m_gPublisher.Set(0);
+  return *this;
+}
+
+ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetCosRatio(
+    double cosRatio) {
+  m_cosRatioPublisher.Set(cosRatio);
   return *this;
 }
 
