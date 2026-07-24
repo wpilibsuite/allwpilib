@@ -29,6 +29,7 @@ ext {
     skipDev = true
 }
 
+apply from: "${rootDir}/shared/libmrclib.gradle"
 apply from: "${rootDir}/shared/opencv.gradle"
 
 application {
@@ -224,8 +225,9 @@ model {
                 lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
-                project(':hal').addHalDependency(binary, 'shared')
-                project(':hal').addHalJniDependency(binary)
+                nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                lib project: ':hal', library: 'hal', linkage: 'shared'
+                lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
                 project(':ntcore').addNtcoreDependency(binary, 'shared')
                 project(':ntcore').addNtcoreJniDependency(binary)
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
@@ -265,7 +267,8 @@ model {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
                 lib project: ':cscore', library: 'cscore', linkage: 'static'
-                project(':hal').addHalDependency(binary, 'static')
+                nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                lib project: ':hal', library: 'hal', linkage: 'static'
                 project(':ntcore').addNtcoreDependency(binary, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'

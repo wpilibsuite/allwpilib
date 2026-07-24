@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'java-library'
     id "org.ysb33r.doxygen" version "2.0.0"
 }
 
@@ -149,15 +150,36 @@ tasks.register("zipCppDocs", Zip) {
     into '/'
 }
 
-// Java
-configurations {
-    javaSource {
-        transitive = false
-    }
+ext {
+    useJava = true
+    useCpp = false
+    skipDev = true
+}
+
+// Classpath for everything + OpenCV
+apply from: "${rootDir}/shared/opencv.gradle"
+dependencies {
+    api project(':apriltag')
+    api project(':cameraserver')
+    api project(':commandsv3')
+    api project(':cscore')
+    api project(':epilogue-runtime')
+    api project(':hal')
+    api project(':ntcore')
+    api project(':wpiannotations')
+    api project(':commandsv2')
+    api project(':wpilibj')
+    api project(':wpimath')
+    api project(':wpinet')
+    api project(':wpiunits')
+    api project(':wpiutil')
+    api project(':romiVendordep')
+    api project(':xrpVendordep')
+    api project(':datalog')
 }
 
 task generateJavaDocs(type: Javadoc) {
-    classpath += project(":wpilibj").sourceSets.main.compileClasspath
+    classpath = sourceSets.main.compileClasspath
     options.links("https://docs.oracle.com/en/java/javase/25/docs/api/")
     // workaround for opencv site blocking javadoc tool. If the link is changed,
     // docs/opencv/element-list must be redownloaded
@@ -192,7 +214,6 @@ task generateJavaDocs(type: Javadoc) {
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
     options.linkSource(true)
-    dependsOn project(':wpilibj').generateJavaVersion
     source project(':apriltag').sourceSets.main.java
     source project(':cameraserver').sourceSets.main.java
     source project(':commandsv3').sourceSets.main.java
@@ -210,7 +231,6 @@ task generateJavaDocs(type: Javadoc) {
     source project(':romiVendordep').sourceSets.main.java
     source project(':xrpVendordep').sourceSets.main.java
     source project(':datalog').sourceSets.main.java
-    source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'
     failOnError = true
 

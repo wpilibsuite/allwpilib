@@ -67,6 +67,7 @@ ext {
 
 def simModules = ["halsim_gui"]
 
+apply from: "${rootDir}/shared/libmrclib.gradle"
 apply from: "${rootDir}/shared/opencv.gradle"
 
 model {
@@ -85,7 +86,8 @@ model {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 project(':ntcore').addNtcoreDependency(binary, 'shared')
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                project(':hal').addHalDependency(binary, 'shared')
+                nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
@@ -116,7 +118,8 @@ model {
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     project(':ntcore').addNtcoreDependency(binary, 'shared')
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                    project(':hal').addHalDependency(binary, 'shared')
+                    nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                    lib project: ':hal', library: 'hal', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
@@ -164,7 +167,8 @@ model {
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     project(':ntcore').addNtcoreDependency(binary, 'shared')
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                    project(':hal').addHalDependency(binary, 'shared')
+                    nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                    lib project: ':hal', library: 'hal', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
@@ -195,7 +199,8 @@ model {
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     project(':ntcore').addNtcoreDependency(binary, 'shared')
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                    project(':hal').addHalDependency(binary, 'shared')
+                    nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                    lib project: ':hal', library: 'hal', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
@@ -312,7 +317,8 @@ model {
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
-            project(':hal').addHalDependency(it, 'shared')
+            nativeUtils.useRequiredLibrary(it, 'mrclib')
+            lib project: ':hal', library: 'hal', linkage: 'shared'
             lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'

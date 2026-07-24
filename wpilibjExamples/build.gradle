@@ -106,7 +106,7 @@ apply plugin: 'cpp'
 apply plugin: 'org.wpilib.NativeUtils'
 
 apply from: '../shared/config.gradle'
-
+apply from: "${rootDir}/shared/libmrclib.gradle"
 
 model {
     components {
@@ -132,8 +132,9 @@ model {
                 project(':ntcore').addNtcoreJniDependency(binary)
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
-                project(':hal').addHalDependency(binary, 'shared')
-                project(':hal').addHalJniDependency(binary)
+                nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                lib project: ':hal', library: 'hal', linkage: 'shared'
+                lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'

@@ -61,7 +61,8 @@ model {
             }
             lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
-            project(':hal').addHalDependency(it, 'shared')
+            nativeUtils.useRequiredLibrary(it, 'mrclib')
+            lib project: ':hal', library: 'hal', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -71,7 +72,7 @@ model {
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
-                project(':hal').addHalJniDependency(it)
+                lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
             }
 
             if (it instanceof GoogleTestTestSuiteBinarySpec) {
