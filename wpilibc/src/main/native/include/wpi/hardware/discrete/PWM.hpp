@@ -50,6 +50,7 @@ class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
    * Write a microsecond value to a PWM channel.
    *
    * @param time Microsecond PWM value. Range 0 - 4096.
+   * @Common This is one of the commonly used methods for this class
    */
   void SetPulseTime(wpi::units::microsecond_t time);
 

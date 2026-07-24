@@ -42,6 +42,7 @@ class DigitalOutput : public wpi::util::Sendable,
    * Set the value of a digital output to either one (true) or zero (false).
    *
    * @param value 1 (true) for high, 0 (false) for disabled
+   * @Common This is one of the commonly used methods for this class
    */
   void Set(bool value);
 
@@ -64,6 +65,7 @@ class DigitalOutput : public wpi::util::Sendable,
    * specified in seconds. Maximum of 65535 microseconds.
    *
    * @param pulseLength The pulse length in seconds
+   * @Common This is one of the commonly used methods for this class
    */
   void Pulse(wpi::units::second_t pulseLength);
 

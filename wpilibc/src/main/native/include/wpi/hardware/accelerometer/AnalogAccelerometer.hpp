@@ -68,6 +68,7 @@ class AnalogAccelerometer
    * The acceleration is returned units of Gs.
    *
    * @return The current acceleration of the sensor in Gs.
+   * @Common This is one of the commonly used methods for this class
    */
   double GetAcceleration() const;
 
