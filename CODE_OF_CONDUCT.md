@@ -25,7 +25,7 @@ Unacceptable behavior include:
 * Trolling, insulting or derogatory comments, and personal or political attacks
 * Harassment in any form, whether public or private.
 * Sharing private information (e.g., email or physical addresses) without explicit consent.
-
+* Using profanity.
 * Any behavior that is unprofessional, harmful, or exclusionary.
 
 ## Enforcement Responsibilities
