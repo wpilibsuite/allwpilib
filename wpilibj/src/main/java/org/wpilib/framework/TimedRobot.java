@@ -6,7 +6,7 @@ package org.wpilib.framework;
 
 import static org.wpilib.units.Units.Seconds;
 
-import org.wpilib.driverstation.internal.DriverStationBackend;
+import org.wpilib.driverstation.RobotState;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.internal.PeriodicPriorityQueue;
@@ -85,7 +85,7 @@ public class TimedRobot extends IterativeRobotBase {
 
     // Tell the DS that the robot is ready to be enabled
     System.out.println("********** Robot program startup complete **********");
-    DriverStationBackend.observeUserProgramStarting();
+    RobotState.observeUserProgramStarting();
 
     // Loop forever, calling the appropriate mode-dependent function
     while (true) {
