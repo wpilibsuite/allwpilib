@@ -109,6 +109,7 @@ static void DisplayMainMenu() {
     ImGui::Text("Datalog Tool");
     ImGui::Separator();
     ImGui::Text("v%s", GetWPILibVersion());
+    gui::EmitRendererInfo();
     ImGui::Separator();
     ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
     ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,

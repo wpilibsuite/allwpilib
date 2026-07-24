@@ -37,6 +37,7 @@ using namespace halsimgui;
 namespace gui = wpi::gui;
 
 static std::unique_ptr<wpi::glass::PlotProvider> gPlotProvider;
+static bool gAbout = false;
 
 extern "C" {
 #if defined(WIN32) || defined(_WIN32)
@@ -150,6 +151,32 @@ int HALSIM_InitExtension(void) {
     if (HALSimGui::manager->GetNumWindows() > 0 && ImGui::BeginMenu("Window")) {
       HALSimGui::manager->DisplayMenu();
       ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Info")) {
+      if (ImGui::MenuItem("About")) {
+        gAbout = true;
+      }
+      ImGui::EndMenu();
+    }
+  });
+
+  gui::AddLateExecute([] {
+    if (gAbout) {
+      ImGui::OpenPopup("About");
+      gAbout = false;
+    }
+    if (ImGui::BeginPopupModal("About")) {
+      ImGui::Text("Robot Simulation");
+      ImGui::Separator();
+      gui::EmitRendererInfo();
+      ImGui::Separator();
+      ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
+      ImGui::Text("%.3f ms/frame (%.1f FPS)",
+                  1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+      if (ImGui::Button("Close")) {
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::EndPopup();
     }
   });
 

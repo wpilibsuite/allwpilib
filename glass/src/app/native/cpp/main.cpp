@@ -308,6 +308,7 @@ int main(int argc, char** argv) {
       ImGui::Text("Glass: A different kind of dashboard");
       ImGui::Separator();
       ImGui::Text("v%s", GetWPILibVersion());
+      gui::EmitRendererInfo();
       ImGui::Separator();
       ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
       ImGui::Text("%.3f ms/frame (%.1f FPS)",

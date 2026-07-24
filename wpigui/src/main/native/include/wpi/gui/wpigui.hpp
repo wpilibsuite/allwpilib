@@ -253,6 +253,12 @@ void ConfigurePlatformSaveFile(const std::string& name);
 void EmitViewMenu();
 
 /**
+ * Emits renderer information, including the SDL renderer backend when using
+ * the 2D renderer.
+ */
+void EmitRendererInfo();
+
+/**
  * Pixel formats for texture pixel data.
  */
 enum class PixelFormat { RGBA, BGRA };
