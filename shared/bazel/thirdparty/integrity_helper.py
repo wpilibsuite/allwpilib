@@ -155,6 +155,34 @@ def update_libssh():
     )
 
 
+def update_libsdlgpu():
+    # Keep in sync with shared/libsdlgpu.gradle
+    version = "3.4.12-5"
+
+    has_headers = True
+    classifiers = [
+        "linuxarm64static",
+        "linuxarm64staticdebug",
+        "linuxx86-64static",
+        "linuxx86-64staticdebug",
+        "osxuniversalstatic",
+        "osxuniversalstaticdebug",
+        "windowsarm64static",
+        "windowsarm64staticdebug",
+        "windowsx86-64static",
+        "windowsx86-64staticdebug",
+    ]
+    url_base = f"https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/libsdl-gpu/{version}/libsdl-gpu-{version}-%s.zip"
+
+    download_integrities(
+        "shared/bazel/thirdparty/libsdlgpu/libsdlgpu.MODULE.bazel",
+        has_headers,
+        classifiers,
+        url_base,
+        False,
+    )
+
+
 def update_mrclib():
     # Keep in sync with shared/libmrclib.gradle
     version = "2027.1.0-alpha-1-91-gb154ee9"
@@ -182,6 +210,7 @@ def update_mrclib():
 def main():
     update_ceres()
     update_libssh()
+    update_libsdlgpu()
     update_mrclib()
 
 

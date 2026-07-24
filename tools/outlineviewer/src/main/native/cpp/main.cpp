@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-#include <GLFW/glfw3.h>
+#include <SDL3/SDL.h>
 #include <imgui.h>
 
 #include "wpi/glass/Context.hpp"
@@ -97,7 +97,7 @@ static void NtInitialize() {
     }
 
     if (updateTitle) {
-      glfwSetWindowTitle(win, MakeTitle(inst, connectionEvent).c_str());
+      SDL_SetWindowTitle(win, MakeTitle(inst, connectionEvent).c_str());
     }
   });
 
@@ -118,7 +118,7 @@ static void DisplayGui() {
   // fill entire OS window with this window
   ImGui::SetNextWindowPos(ImVec2(0, 0));
   int width, height;
-  glfwGetWindowSize(gui::GetSystemWindow(), &width, &height);
+  SDL_GetWindowSize(gui::GetSystemWindow(), &width, &height);
   ImGui::SetNextWindowSize(
       ImVec2(static_cast<float>(width), static_cast<float>(height)));
 
@@ -262,7 +262,8 @@ int main(int argc, char** argv) {
 
   gui::AddLateExecute(DisplayGui);
 
-  gui::Initialize("OutlineViewer - DISCONNECTED", 600, 400);
+  gui::Initialize("OutlineViewer - DISCONNECTED", 600, 400,
+                  gui::RendererPreference::PREFER_2D);
   gui::Main();
 
   gModel.reset();

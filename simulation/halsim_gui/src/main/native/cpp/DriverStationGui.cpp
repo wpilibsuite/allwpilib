@@ -5,7 +5,9 @@
 #include "DriverStationGui.hpp"
 
 #include <algorithm>
+#include <array>
 #include <atomic>
+#include <cstdint>
 #include <cstring>
 #include <format>
 #include <map>
@@ -14,7 +16,8 @@
 #include <string_view>
 #include <vector>
 
-#include <GLFW/glfw3.h>
+#define SDL_MAIN_HANDLED
+#include <SDL3/SDL.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 
@@ -38,6 +41,9 @@
 using namespace halsimgui;
 
 namespace {
+
+constexpr int kMaxSdlJoysticks = 16;
+constexpr int kKeyboardJoystickBaseIndex = kMaxSdlJoysticks;
 
 struct HALJoystickData {
   HALJoystickData() {
@@ -64,7 +70,7 @@ class SystemJoystick {
   virtual void SettingsDisplay() {}
   virtual void Update() = 0;
   virtual const char* GetName() const = 0;
-  virtual void GetData(HALJoystickData* data, bool mapGamepad) const = 0;
+  virtual void GetData(HALJoystickData* data) const = 0;
   virtual const char* GetGUID() const = 0;
   virtual int GetIndex() const = 0;
 
@@ -74,26 +80,39 @@ class SystemJoystick {
   bool m_isGamepad = false;
 };
 
-class GlfwSystemJoystick : public SystemJoystick {
+class SdlSystemJoystick : public SystemJoystick {
  public:
-  explicit GlfwSystemJoystick(int i) : m_index{i} {}
+  explicit SdlSystemJoystick(int i) : m_index{i} {}
+  ~SdlSystemJoystick() override;
 
   void Update() override;
   const char* GetName() const override { return m_name ? m_name : "(null)"; }
-  void GetData(HALJoystickData* data, bool mapGamepad) const override;
-  const char* GetGUID() const override { return glfwGetJoystickGUID(m_index); }
+  void GetData(HALJoystickData* data) const override;
+  const char* GetGUID() const override { return m_guid.c_str(); }
   int GetIndex() const override { return m_index; }
 
  private:
+  void Close(bool clearMappings = true);
+
   int m_index;
+  SDL_JoystickID m_instanceId = 0;
+  SDL_Joystick* m_joystick = nullptr;
+  SDL_Gamepad* m_gamepad = nullptr;
   int m_axisCount = 0;
-  const float* m_axes = nullptr;
+  std::vector<float> m_axes;
+  std::vector<int16_t> m_rawAxes;
   int m_buttonCount = 0;
-  const unsigned char* m_buttons = nullptr;
+  std::vector<unsigned char> m_buttons;
   int m_hatCount = 0;
-  const unsigned char* m_hats = nullptr;
+  std::vector<unsigned char> m_hats;
   const char* m_name = nullptr;
-  GLFWgamepadstate m_gamepadState;
+  std::string m_guid;
+  std::array<float, SDL_GAMEPAD_AXIS_COUNT> m_gamepadAxes{};
+  std::array<int16_t, SDL_GAMEPAD_AXIS_COUNT> m_gamepadRawAxes{};
+  std::array<unsigned char, SDL_GAMEPAD_BUTTON_COUNT> m_gamepadButtons{};
+  uint16_t m_gamepadAxesAvailable = 0;
+  uint64_t m_gamepadButtonsAvailable = 0;
+  SDL_GamepadType m_gamepadType = SDL_GAMEPAD_TYPE_UNKNOWN;
 };
 
 class KeyboardJoystick : public SystemJoystick {
@@ -103,11 +122,9 @@ class KeyboardJoystick : public SystemJoystick {
   void SettingsDisplay() override;
   void Update() override;
   const char* GetName() const override { return m_name; }
-  void GetData(HALJoystickData* data, bool mapGamepad) const override {
-    *data = m_data;
-  }
+  void GetData(HALJoystickData* data) const override { *data = m_data; }
   const char* GetGUID() const override { return m_guid; }
-  int GetIndex() const override { return m_index + GLFW_JOYSTICK_LAST + 1; }
+  int GetIndex() const override { return m_index + kKeyboardJoystickBaseIndex; }
 
   void ClearKey(int key);
   virtual const char* GetKeyName(int key) const = 0;
@@ -160,9 +177,9 @@ class KeyboardJoystick : public SystemJoystick {
   std::vector<PovConfig> m_povConfig;
 };
 
-class GlfwKeyboardJoystick : public KeyboardJoystick {
+class SdlKeyboardJoystick : public KeyboardJoystick {
  public:
-  GlfwKeyboardJoystick(wpi::glass::Storage& storage, int index);
+  SdlKeyboardJoystick(wpi::glass::Storage& storage, int index);
 
   const char* GetKeyName(int key) const override;
 };
@@ -173,7 +190,6 @@ struct RobotJoystick {
   wpi::glass::NameSetting name;
   std::string& guid;
   const SystemJoystick* sys = nullptr;
-  bool& useGamepad;  // = false;
 
   HALJoystickData data;
 
@@ -271,13 +287,30 @@ class DSSimModel : public wpi::glass::DSModel {
 }  // namespace
 
 // system joysticks
-static std::vector<std::unique_ptr<SystemJoystick>> gGlfwJoysticks;
-static int gNumGlfwJoysticks = 0;
-static std::vector<std::unique_ptr<GlfwKeyboardJoystick>> gKeyboardJoysticks;
+static std::array<SDL_JoystickID, kMaxSdlJoysticks> gSdlJoystickIds{};
+static std::vector<std::unique_ptr<SystemJoystick>> gSdlJoysticks;
+static int gNumSdlJoysticks = 0;
+static std::vector<std::unique_ptr<SdlKeyboardJoystick>> gKeyboardJoysticks;
 
 // robot joysticks
 static std::vector<RobotJoystick> gRobotJoysticks;
 static std::unique_ptr<JoystickModel> gJoystickSources[HAL_MAX_JOYSTICKS];
+
+static void ClearRobotJoystickSystemMappings(const SystemJoystick* sys) {
+  for (auto&& joy : gRobotJoysticks) {
+    if (joy.sys == sys) {
+      joy.sys = nullptr;
+    }
+  }
+}
+
+static void ShutdownSystemJoysticks() {
+  gRobotJoysticks.clear();
+  gSdlJoysticks.clear();
+  gSdlJoystickIds.fill(0);
+  gNumSdlJoysticks = 0;
+  gKeyboardJoysticks.clear();
+}
 
 // DS
 static std::unique_ptr<DSSimModel> gDSModel;
@@ -422,17 +455,165 @@ void JoystickModel::CallbackFunc(const char*, void* param, const HAL_Value*) {
   }
 }
 
-void GlfwSystemJoystick::Update() {
-  bool wasPresent = m_present;
-  m_present = glfwJoystickPresent(m_index);
+static float NormalizeJoystickAxis(Sint16 value) {
+  if (value < 0) {
+    return static_cast<float>(value) / 32768.0f;
+  }
+  return static_cast<float>(value) / 32767.0f;
+}
 
-  if (!m_present) {
+static double GetSdlTime() {
+  static const double frequency = SDL_GetPerformanceFrequency();
+  return static_cast<double>(SDL_GetPerformanceCounter()) / frequency;
+}
+
+static void AddDriverStationGamepadMappings() {
+  static bool mappingsAdded = false;
+  if (mappingsAdded) {
     return;
   }
-  m_axes = glfwGetJoystickAxes(m_index, &m_axisCount);
-  m_buttons = glfwGetJoystickButtons(m_index, &m_buttonCount);
-  m_hats = glfwGetJoystickHats(m_index, &m_hatCount);
-  m_isGamepad = glfwGetGamepadState(m_index, &m_gamepadState);
+  mappingsAdded = true;
+
+  static constexpr const char* mappings[] = {
+      "03000000120c0000170e000000007200,REV USB PS4 Compatible "
+      "Gamepad,a:b0,b:b1,x:b2,y:b3,back:b6,guide:b10,start:b7,"
+      "leftstick:b8,rightstick:b9,leftshoulder:b4,rightshoulder:b5,"
+      "dpup:h0.1,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,leftx:a0,"
+      "lefty:a1,rightx:a2,righty:a3,lefttrigger:a4,righttrigger:a5,"
+      "platform:Windows,",
+      "03000000120c0000170e000014407801,REV USB PS4 Compatible "
+      "Gamepad,a:b0,b:b1,back:b6,dpdown:h0.4,dpleft:h0.8,"
+      "dpright:h0.2,dpup:h0.1,guide:b10,leftshoulder:b4,"
+      "leftstick:b8,lefttrigger:a2,leftx:a0,lefty:a1,rightshoulder:b5,"
+      "rightstick:b9,righttrigger:a5,rightx:a3,righty:a4,start:b7,"
+      "x:b2,y:b3,platform:Windows,",
+      "03000000120c0000182e000011010000,REV USB PS4 Compatible "
+      "Gamepad,a:b1,b:b2,back:b8,dpdown:h0.4,dpleft:h0.8,"
+      "dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b4,"
+      "leftstick:b10,lefttrigger:+a3,leftx:a0,lefty:a1,"
+      "rightshoulder:b5,rightstick:b11,righttrigger:a4,rightx:a2,"
+      "righty:a5,start:b9,touchpad:b13,x:b0,y:b3,platform:Linux,",
+  };
+
+  for (auto mapping : mappings) {
+    SDL_AddGamepadMapping(mapping);
+  }
+}
+
+SdlSystemJoystick::~SdlSystemJoystick() {
+  Close(false);
+}
+
+void SdlSystemJoystick::Close(bool clearMappings) {
+  if (clearMappings) {
+    ClearRobotJoystickSystemMappings(this);
+  }
+  if (m_gamepad) {
+    SDL_CloseGamepad(m_gamepad);
+    m_gamepad = nullptr;
+    m_joystick = nullptr;
+  } else if (m_joystick) {
+    SDL_CloseJoystick(m_joystick);
+    m_joystick = nullptr;
+  }
+  m_instanceId = 0;
+  m_present = false;
+  m_isGamepad = false;
+  m_axisCount = 0;
+  m_buttonCount = 0;
+  m_hatCount = 0;
+  m_axes.clear();
+  m_rawAxes.clear();
+  m_buttons.clear();
+  m_hats.clear();
+  m_name = nullptr;
+  m_guid.clear();
+  m_gamepadAxes.fill(0);
+  m_gamepadRawAxes.fill(0);
+  m_gamepadButtons.fill(0);
+  m_gamepadAxesAvailable = 0;
+  m_gamepadButtonsAvailable = 0;
+  m_gamepadType = SDL_GAMEPAD_TYPE_UNKNOWN;
+}
+
+void SdlSystemJoystick::Update() {
+  SDL_JoystickID instanceId = gSdlJoystickIds[m_index];
+  bool wasPresent = m_present && instanceId == m_instanceId;
+
+  if (instanceId == 0) {
+    if (m_instanceId != 0 || m_present || m_joystick || m_gamepad) {
+      Close();
+    }
+    return;
+  }
+
+  if (instanceId != m_instanceId) {
+    Close();
+    m_instanceId = instanceId;
+    if (SDL_IsGamepad(instanceId)) {
+      m_gamepad = SDL_OpenGamepad(instanceId);
+      m_joystick = m_gamepad ? SDL_GetGamepadJoystick(m_gamepad) : nullptr;
+    }
+    if (m_gamepad && !m_joystick) {
+      SDL_CloseGamepad(m_gamepad);
+      m_gamepad = nullptr;
+    }
+    if (!m_joystick) {
+      m_joystick = SDL_OpenJoystick(instanceId);
+    }
+    if (!m_joystick) {
+      Close();
+      return;
+    }
+  }
+
+  m_present = SDL_JoystickConnected(m_joystick);
+  if (!m_present) {
+    Close();
+    return;
+  }
+
+  m_axisCount = (std::max)(0, SDL_GetNumJoystickAxes(m_joystick));
+  m_buttonCount = (std::max)(0, SDL_GetNumJoystickButtons(m_joystick));
+  m_hatCount = (std::max)(0, SDL_GetNumJoystickHats(m_joystick));
+  m_axes.resize(m_axisCount);
+  m_rawAxes.resize(m_axisCount);
+  m_buttons.resize(m_buttonCount);
+  m_hats.resize(m_hatCount);
+  for (int i = 0; i < m_axisCount; ++i) {
+    auto rawAxis = SDL_GetJoystickAxis(m_joystick, i);
+    m_rawAxes[i] = rawAxis;
+    m_axes[i] = NormalizeJoystickAxis(rawAxis);
+  }
+  for (int i = 0; i < m_buttonCount; ++i) {
+    m_buttons[i] = SDL_GetJoystickButton(m_joystick, i) ? 1 : 0;
+  }
+  for (int i = 0; i < m_hatCount; ++i) {
+    m_hats[i] = SDL_GetJoystickHat(m_joystick, i);
+  }
+
+  m_isGamepad = m_gamepad != nullptr;
+  m_gamepadAxesAvailable = 0;
+  m_gamepadButtonsAvailable = 0;
+  if (m_isGamepad) {
+    m_gamepadType = SDL_GetGamepadType(m_gamepad);
+    for (int i = 0; i < SDL_GAMEPAD_AXIS_COUNT; ++i) {
+      auto axis = static_cast<SDL_GamepadAxis>(i);
+      if (SDL_GamepadHasAxis(m_gamepad, axis)) {
+        m_gamepadAxesAvailable |= 1 << i;
+      }
+      auto rawAxis = SDL_GetGamepadAxis(m_gamepad, axis);
+      m_gamepadRawAxes[i] = rawAxis;
+      m_gamepadAxes[i] = NormalizeJoystickAxis(rawAxis);
+    }
+    for (int i = 0; i < SDL_GAMEPAD_BUTTON_COUNT; ++i) {
+      auto button = static_cast<SDL_GamepadButton>(i);
+      if (SDL_GamepadHasButton(m_gamepad, button)) {
+        m_gamepadButtonsAvailable |= 1ull << i;
+      }
+      m_gamepadButtons[i] = SDL_GetGamepadButton(m_gamepad, button) ? 1 : 0;
+    }
+  }
 
   m_anyButtonPressed = false;
   for (int j = 0; j < m_buttonCount; ++j) {
@@ -442,7 +623,7 @@ void GlfwSystemJoystick::Update() {
     }
   }
   for (int j = 0; j < m_hatCount; ++j) {
-    if (m_hats[j] != GLFW_HAT_CENTERED) {
+    if (m_hats[j] != SDL_HAT_CENTERED) {
       m_anyButtonPressed = true;
       break;
     }
@@ -451,74 +632,74 @@ void GlfwSystemJoystick::Update() {
   if (!m_present || wasPresent) {
     return;
   }
-  m_name = glfwGetJoystickName(m_index);
+  m_name = SDL_GetJoystickName(m_joystick);
 
   // try to find matching GUID
-  if (const char* guid = glfwGetJoystickGUID(m_index)) {
-    for (auto&& joy : gRobotJoysticks) {
-      if (guid == joy.guid) {
-        joy.sys = this;
-        break;
-      }
+  char guid[33];
+  SDL_GUIDToString(SDL_GetJoystickGUID(m_joystick), guid, sizeof(guid));
+  m_guid = guid;
+  for (auto&& joy : gRobotJoysticks) {
+    if (m_guid == joy.guid) {
+      joy.sys = this;
+      break;
     }
   }
 }
 
-void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
+void SdlSystemJoystick::GetData(HALJoystickData* data) const {
   if (!m_present) {
     return;
   }
 
-  // use gamepad mappings if present and enabled
-  const float* sysAxes;
-  const unsigned char* sysButtons;
-  if (m_isGamepad && mapGamepad) {
-    sysAxes = m_gamepadState.axes;
-    // don't remap on windows
-#ifdef _WIN32
-    sysButtons = m_buttons;
-#else
-    sysButtons = m_gamepadState.buttons;
-#endif
-  } else {
-    sysAxes = m_axes;
-    sysButtons = m_buttons;
+  // Use SDL's standardized gamepad mapping when this is a gamepad.
+  const float* sysAxes = m_axes.data();
+  const int16_t* sysRawAxes = m_rawAxes.data();
+  const unsigned char* sysButtons = m_buttons.data();
+  int axesCount = m_axisCount;
+  int buttonCount = m_buttonCount;
+  int povsCount = m_hatCount;
+  uint16_t axesAvailable = 0;
+  uint64_t buttonsAvailable = 0;
+  if (m_isGamepad) {
+    sysAxes = m_gamepadAxes.data();
+    sysRawAxes = m_gamepadRawAxes.data();
+    sysButtons = m_gamepadButtons.data();
+    axesCount = SDL_GAMEPAD_AXIS_COUNT;
+    buttonCount = SDL_GAMEPAD_BUTTON_COUNT;
+    povsCount = 0;
+    axesAvailable = m_gamepadAxesAvailable;
+    buttonsAvailable = m_gamepadButtonsAvailable;
   }
 
   // copy into HAL structures
   data->desc.isGamepad = m_isGamepad ? 1 : 0;
-  data->desc.gamepadType = 1;  // Standard
+  data->desc.gamepadType =
+      m_isGamepad ? static_cast<uint8_t>(m_gamepadType) : 0;
   std::strncpy(data->desc.name, m_name, sizeof(data->desc.name) - 1);
   data->desc.name[sizeof(data->desc.name) - 1] = '\0';
-  int axesCount = (std::min)(m_axisCount, HAL_MAX_JOYSTICK_AXES);
-  int buttonCount = (std::min)(m_buttonCount, 64);
-  int povsCount = (std::min)(m_hatCount, HAL_MAX_JOYSTICK_POVS);
+  axesCount = (std::min)(axesCount, HAL_MAX_JOYSTICK_AXES);
+  buttonCount = (std::min)(buttonCount, 64);
+  povsCount = (std::min)(povsCount, HAL_MAX_JOYSTICK_POVS);
 
-  if (buttonCount < 64) {
-    data->buttons.available = (1ULL << buttonCount) - 1;
-  } else {
-    data->buttons.available = (std::numeric_limits<uint64_t>::max)();
+  if (!m_isGamepad) {
+    axesAvailable = (1 << axesCount) - 1;
+    if (buttonCount < 64) {
+      buttonsAvailable = (1ULL << buttonCount) - 1;
+    } else {
+      buttonsAvailable = (std::numeric_limits<uint64_t>::max)();
+    }
   }
-  data->axes.available = (1 << axesCount) - 1;
+  data->buttons.available = buttonsAvailable;
+  data->axes.available = axesAvailable;
   data->povs.available = (1 << povsCount) - 1;
 
   for (int j = 0; j < buttonCount; ++j) {
-    data->buttons.buttons |= (sysButtons[j] ? 1u : 0u) << j;
+    data->buttons.buttons |= (sysButtons[j] ? 1ull : 0ull) << j;
   }
 
-  if (m_isGamepad && mapGamepad) {
-    // the FIRST DriverStation maps gamepad (XInput) trigger values to 0-1 range
-    // on axis 2 and 3.
-    data->axes.axes[0] = sysAxes[0];
-    data->axes.axes[1] = sysAxes[1];
-    data->axes.axes[2] = 0.5 + sysAxes[4] / 2.0;
-    data->axes.axes[3] = 0.5 + sysAxes[5] / 2.0;
-    data->axes.axes[4] = sysAxes[2];
-    data->axes.axes[5] = sysAxes[3];
-
-  } else {
-    std::memcpy(data->axes.axes, sysAxes,
-                axesCount * sizeof(data->axes.axes[0]));
+  for (int j = 0; j < axesCount; ++j) {
+    data->axes.axes[j] = sysAxes[j];
+    data->axes.raw[j] = sysRawAxes[j];
   }
 
   for (int j = 0; j < povsCount; ++j) {
@@ -526,8 +707,7 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow="
 #endif  // __GNUC__ >= 12
-    // From https://www.glfw.org/docs/latest/group__hat__state.html, GLFW hat
-    // states use the same format
+    // SDL hat states use the same bit layout as HAL joystick POVs.
     data->povs.povs[j] = static_cast<HAL_JoystickPOV>(m_hats[j]);
 #if __GNUC__ >= 12
 #pragma GCC diagnostic pop
@@ -915,8 +1095,8 @@ void KeyboardJoystick::ClearKey(int key) {
   }
 }
 
-GlfwKeyboardJoystick::GlfwKeyboardJoystick(wpi::glass::Storage& storage,
-                                           int index)
+SdlKeyboardJoystick::SdlKeyboardJoystick(wpi::glass::Storage& storage,
+                                         int index)
     : KeyboardJoystick{storage, index} {
   // set up a default keyboard config for 0, 1, and 2
   if (index == 0) {
@@ -1001,7 +1181,7 @@ GlfwKeyboardJoystick::GlfwKeyboardJoystick(wpi::glass::Storage& storage,
   }
 }
 
-const char* GlfwKeyboardJoystick::GetKeyName(int key) const {
+const char* SdlKeyboardJoystick::GetKeyName(int key) const {
   if (key < 0) {
     return "(None)";
   }
@@ -1009,14 +1189,12 @@ const char* GlfwKeyboardJoystick::GetKeyName(int key) const {
 }
 
 RobotJoystick::RobotJoystick(wpi::glass::Storage& storage)
-    : name{storage.GetString("name")},
-      guid{storage.GetString("guid")},
-      useGamepad{storage.GetBool("useGamepad")} {}
+    : name{storage.GetString("name")}, guid{storage.GetString("guid")} {}
 
 void RobotJoystick::Update() {
   Clear();
   if (sys) {
-    sys->GetData(&data, useGamepad);
+    sys->GetData(&data);
   }
 }
 
@@ -1109,14 +1287,47 @@ static void DriverStationExecute() {
     wpi::hal::EnableDashboardOpMode();
   }
 
-  double curTime = glfwGetTime();
+  double curTime = GetSdlTime();
 
   // update system joysticks
-  gNumGlfwJoysticks = 0;
-  for (int i = 0; i <= GLFW_JOYSTICK_LAST; ++i) {
-    gGlfwJoysticks[i]->Update();
-    if (gGlfwJoysticks[i]->IsPresent()) {
-      gNumGlfwJoysticks = i + 1;
+  AddDriverStationGamepadMappings();
+  SDL_UpdateJoysticks();
+  SDL_UpdateGamepads();
+  int joystickCount = 0;
+  SDL_JoystickID* joystickIds = SDL_GetJoysticks(&joystickCount);
+
+  // Keep connected instance IDs in their existing slots so SDL ordering changes
+  // do not silently remap robot joystick ports.
+  for (auto&& slotId : gSdlJoystickIds) {
+    if (slotId != 0 &&
+        (!joystickIds || std::find(joystickIds, joystickIds + joystickCount,
+                                   slotId) == joystickIds + joystickCount)) {
+      slotId = 0;
+    }
+  }
+
+  if (joystickIds) {
+    for (int i = 0; i < joystickCount; ++i) {
+      if (std::find(gSdlJoystickIds.begin(), gSdlJoystickIds.end(),
+                    joystickIds[i]) != gSdlJoystickIds.end()) {
+        continue;
+      }
+
+      auto emptySlot =
+          std::find(gSdlJoystickIds.begin(), gSdlJoystickIds.end(), 0);
+      if (emptySlot == gSdlJoystickIds.end()) {
+        break;
+      }
+      *emptySlot = joystickIds[i];
+    }
+    SDL_free(joystickIds);
+  }
+
+  gNumSdlJoysticks = 0;
+  for (int i = 0; i < kMaxSdlJoysticks; ++i) {
+    gSdlJoysticks[i]->Update();
+    if (gSdlJoysticks[i]->IsPresent()) {
+      gNumSdlJoysticks = i + 1;
     }
   }
   for (auto&& joy : gKeyboardJoysticks) {
@@ -1369,13 +1580,13 @@ static void DisplaySystemJoystick(SystemJoystick& joy, int i) {
 
 static void DisplaySystemJoysticks() {
   ImGui::Text("(Drag and drop to Joysticks)");
-  int numShowJoysticks = gNumGlfwJoysticks < 6 ? 6 : gNumGlfwJoysticks;
+  int numShowJoysticks = gNumSdlJoysticks < 6 ? 6 : gNumSdlJoysticks;
   for (int i = 0; i < numShowJoysticks; ++i) {
-    DisplaySystemJoystick(*gGlfwJoysticks[i], i);
+    DisplaySystemJoystick(*gSdlJoysticks[i], i);
   }
   for (size_t i = 0; i < gKeyboardJoysticks.size(); ++i) {
     auto joy = gKeyboardJoysticks[i].get();
-    DisplaySystemJoystick(*joy, i + GLFW_JOYSTICK_LAST + 1);
+    DisplaySystemJoystick(*joy, i + kKeyboardJoystickBaseIndex);
     if (ImGui::BeginPopupContextItem()) {
       char buf[64];
       wpi::util::format_to_n_c_str(buf, sizeof(buf), "{} Settings",
@@ -1428,9 +1639,6 @@ static void DisplayJoysticks() {
         }
         joy.sys = payload_sys;
         joy.guid = payload_sys->GetGUID();
-        std::string_view name{payload_sys->GetName()};
-        joy.useGamepad = wpi::util::starts_with(name, "Xbox") ||
-                         wpi::util::contains(name, "pad");
       }
       ImGui::EndDragDropTarget();
     }
@@ -1456,10 +1664,6 @@ static void DisplayJoysticks() {
         ImGui::Text("Gamepad: %s", joy.data.desc.isGamepad ? "Yes" : "No");
       } else {
         ImGui::Text("%d: %s", joy.sys->GetIndex(), joy.sys->GetName());
-
-        if (joy.sys->IsGamepad()) {
-          ImGui::Checkbox("Map gamepad", &joy.useGamepad);
-        }
       }
 
       uint8_t axesCount =
@@ -1550,9 +1754,9 @@ void DriverStationGui::GlobalInit() {
   auto& storageRoot = wpi::glass::GetStorageRoot("ds");
   dsManager = std::make_unique<DSManager>(storageRoot);
 
-  // set up system joysticks (both GLFW and keyboard)
-  for (int i = 0; i <= GLFW_JOYSTICK_LAST; ++i) {
-    gGlfwJoysticks.emplace_back(std::make_unique<GlfwSystemJoystick>(i));
+  // set up system joysticks (both SDL and keyboard)
+  for (int i = 0; i < kMaxSdlJoysticks; ++i) {
+    gSdlJoysticks.emplace_back(std::make_unique<SdlSystemJoystick>(i));
   }
 
   dsManager->GlobalInit();
@@ -1567,6 +1771,7 @@ void DriverStationGui::GlobalInit() {
   });
 
   wpi::gui::AddEarlyExecute(DriverStationExecute);
+  wpi::gui::AddExit(ShutdownSystemJoysticks);
 
   storageRoot.SetCustomApply([&storageRoot] {
     gpDisableDS = &storageRoot.GetBool("disable", false);
@@ -1584,7 +1789,7 @@ void DriverStationGui::GlobalInit() {
         keyboardStorage[i] = std::make_unique<wpi::glass::Storage>();
       }
       gKeyboardJoysticks.emplace_back(
-          std::make_unique<GlfwKeyboardJoystick>(*keyboardStorage[i], i));
+          std::make_unique<SdlKeyboardJoystick>(*keyboardStorage[i], i));
     }
 
     auto& robotJoystickStorage = storageRoot.GetChildArray("robotJoysticks");
