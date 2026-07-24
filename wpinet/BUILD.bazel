@@ -5,6 +5,7 @@ load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
+load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
 load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
@@ -109,10 +110,27 @@ third_party_cc_lib_helper(
 filegroup(
     name = "native-srcs",
     srcs = select({
-        "@platforms//os:osx": glob(["src/main/native/macOS/*"]),
+        "@platforms//os:osx": glob(["src/main/native/macOS/*.cpp"]),
         "@platforms//os:windows": glob(["src/main/native/windows/*"]),
         "@wpilib_toolchains//constraints/combined:is_linux": glob(["src/main/native/linux/*"]),
     }),
+)
+
+wpilib_objc_library(
+    name = "wpinet-mac-bluetooth",
+    srcs = glob(["src/main/native/macOS/**/*.mm"]),
+    hdrs = glob(["src/main/native/include/**/*"]),
+    includes = [
+        "src/main/native/include",
+    ],
+    sdk_frameworks = [
+        "CoreBluetooth",
+        "Foundation",
+    ],
+    deps = [
+        ":libuv-headers",
+        "//wpiutil",
+    ],
 )
 
 cc_library(
@@ -143,6 +161,9 @@ wpilib_cc_library(
             "-ldl",
             "-Wl,--pop-state",
         ],
+        "@platforms//os:windows": [
+            "windowsapp.lib",
+        ],
         "//conditions:default": [],
     }),
     strip_include_prefix = "src/main/native/include",
@@ -154,14 +175,34 @@ wpilib_cc_library(
         ":libuv-headers",
         ":private_includes",
         "//wpiutil",
-    ],
+    ] + select({
+        "@platforms//os:osx": [":wpinet-mac-bluetooth"],
+        "//conditions:default": [],
+    }),
 )
+
+sdk_framework_flags = [
+    "-framework",
+    "CoreBluetooth",
+    "-framework",
+    "Foundation",
+]
 
 wpilib_cc_shared_library(
     name = "shared/wpinet",
+    additional_linker_inputs = select({
+        "@platforms//os:osx": [":wpinet-mac-bluetooth"],
+        "//conditions:default": [],
+    }),
     dynamic_deps = [
         "//wpiutil:shared/wpiutil",
     ],
+    user_link_flags = select({
+        "@platforms//os:osx": [
+            "-Wl,-force_load,$(location :wpinet-mac-bluetooth)",
+        ] + sdk_framework_flags,
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [
         ":wpinet",

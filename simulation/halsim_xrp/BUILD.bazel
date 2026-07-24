@@ -18,6 +18,8 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//simulation/halsim_ws_core",
+        "//thirdparty/imgui_suite",
+        "//wpigui",
         "//wpinet",
     ],
 )
@@ -40,17 +42,49 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//simulation/halsim_ws_core",
+        "//thirdparty/imgui_suite",
+        "//wpigui",
         "//wpinet",
     ],
 )
 
 wpilib_cc_shared_library(
     name = "shared/halsim_xrp",
+    additional_linker_inputs = select({
+        "@platforms//os:osx": [
+            "//thirdparty/imgui_suite:glfw_src_darwin",
+            "//thirdparty/imgui_suite:imgui_src_darwin",
+            "//wpigui:wpigui-mac",
+        ],
+        "//conditions:default": [],
+    }),
     auto_export_windows_symbols = False,
     dynamic_deps = [
         "//wpinet:shared/wpinet",
         "//hal:shared/wpiHal",
     ],
+    user_link_flags = select({
+        "@platforms//os:osx": [
+            "-Wl,-force_load,$(location //thirdparty/imgui_suite:glfw_src_darwin)",
+            "-Wl,-force_load,$(location //thirdparty/imgui_suite:imgui_src_darwin)",
+            "-Wl,-force_load,$(location //wpigui:wpigui-mac)",
+            "-framework",
+            "Metal",
+            "-framework",
+            "MetalKit",
+            "-framework",
+            "Cocoa",
+            "-framework",
+            "IOKit",
+            "-framework",
+            "CoreFoundation",
+            "-framework",
+            "CoreVideo",
+            "-framework",
+            "QuartzCore",
+        ],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [
         ":halsim_xrp",
@@ -60,7 +94,9 @@ wpilib_cc_shared_library(
 wpilib_cc_static_library(
     name = "static/halsim_xrp",
     static_deps = [
+        "//thirdparty/imgui_suite:static/imguiSuite",
         "//wpinet:static/wpinet",
+        "//wpigui:static/wpigui",
         "//hal:static/wpiHal",
         "//simulation/halsim_ws_core:static/halsim_ws_core",
     ],

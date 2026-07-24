@@ -5,16 +5,138 @@
 #include "wpi/halsim/xrp/HALSimXRP.hpp"
 
 #include <cstdio>
+#include <cstdlib>
+#include <optional>
+#include <stdexcept>
 #include <string>
+#include <string_view>
+#include <system_error>
+#include <utility>
+#include <vector>
 
+#include "wpi/gui/wpigui.hpp"
 #include "wpi/net/raw_uv_ostream.hpp"
-#include "wpi/net/uv/util.hpp"
+#include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/SmallString.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/json.hpp"
 #include "wpi/util/print.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 namespace uv = wpi::net::uv;
 
 using namespace wpilibxrp;
+
+namespace {
+
+constexpr uint16_t XRP_BLUETOOTH_PSM = 0x0081;
+constexpr size_t MAX_BLUETOOTH_PACKET_SIZE = 512;
+constexpr const char* XRP_GATT_SERVICE_UUID =
+    "7d2ea28a-f7bd-485d-9d6a-2c3f0b214a3f";
+constexpr const char* XRP_GATT_CONTROL_CHARACTERISTIC_UUID =
+    "7d2ea28b-f7bd-485d-9d6a-2c3f0b214a3f";
+constexpr const char* XRP_GATT_STATUS_CHARACTERISTIC_UUID =
+    "7d2ea28c-f7bd-485d-9d6a-2c3f0b214a3f";
+constexpr const char* XRP_BLUETOOTH_SETTINGS_FILE = "WPILibXRPBluetooth.json";
+constexpr const char* XRP_BLUETOOTH_SETTINGS_ADDRESS_KEY = "address";
+constexpr const char* XRP_BLUETOOTH_SETTINGS_ADDRESS_TYPE_KEY = "addressType";
+
+struct SavedBluetoothTarget {
+  std::string address;
+  XRPBluetoothAddressType addressType = XRPBluetoothAddressType::RANDOM;
+};
+
+const char* AddressTypeToString(XRPBluetoothAddressType type) {
+  return type == XRPBluetoothAddressType::PUBLIC ? "public" : "random";
+}
+
+XRPBluetoothAddressType ParseAddressType(std::string_view type) {
+  if (type == "public" || type == "PUBLIC" || type == "Public") {
+    return XRPBluetoothAddressType::PUBLIC;
+  }
+  return XRPBluetoothAddressType::RANDOM;
+}
+
+std::string GetBluetoothSettingsPath() {
+  std::string dir = wpi::gui::GetPlatformSaveFileDir();
+  if (dir.empty()) {
+    return {};
+  }
+  return dir + XRP_BLUETOOTH_SETTINGS_FILE;
+}
+
+std::optional<SavedBluetoothTarget> LoadBluetoothTarget() {
+  std::string path = GetBluetoothSettingsPath();
+  if (path.empty()) {
+    return std::nullopt;
+  }
+
+  auto fileBuffer = wpi::util::MemoryBuffer::GetFile(path);
+  if (!fileBuffer) {
+    return std::nullopt;
+  }
+
+  auto buffer = fileBuffer.value()->GetCharBuffer();
+  auto parsed = wpi::util::json::parse({buffer.data(), buffer.size()});
+  if (!parsed || !parsed->is_object()) {
+    return std::nullopt;
+  }
+
+  const auto* address = parsed->lookup(XRP_BLUETOOTH_SETTINGS_ADDRESS_KEY);
+  if (address == nullptr || !address->is_string() ||
+      address->get_string().empty()) {
+    return std::nullopt;
+  }
+
+  SavedBluetoothTarget target;
+  target.address = address->get_string();
+
+  const auto* addressType =
+      parsed->lookup(XRP_BLUETOOTH_SETTINGS_ADDRESS_TYPE_KEY);
+  if (addressType != nullptr && addressType->is_string()) {
+    target.addressType = ParseAddressType(addressType->get_string());
+  }
+
+  return target;
+}
+
+void SaveBluetoothTarget(std::string_view address,
+                         XRPBluetoothAddressType addressType) {
+  if (address.empty()) {
+    return;
+  }
+
+  std::string path = GetBluetoothSettingsPath();
+  if (path.empty()) {
+    return;
+  }
+
+  std::error_code ec;
+  fs::create_directories(fs::path{path}.parent_path(), ec);
+  if (ec) {
+    wpi::util::print(stderr,
+                     "Failed to create HALSim XRP Bluetooth settings "
+                     "directory: {}\n",
+                     ec.message());
+    return;
+  }
+
+  wpi::util::raw_fd_ostream os{path, ec};
+  if (ec) {
+    wpi::util::print(stderr, "Failed to save HALSim XRP Bluetooth target: {}\n",
+                     ec.message());
+    return;
+  }
+
+  wpi::util::json settings;
+  settings[XRP_BLUETOOTH_SETTINGS_ADDRESS_KEY] = std::string{address};
+  settings[XRP_BLUETOOTH_SETTINGS_ADDRESS_TYPE_KEY] =
+      AddressTypeToString(addressType);
+  settings.marshal(os, true, 2);
+  os << '\n';
+}
+
+}  // namespace
 
 HALSimXRP::HALSimXRP(wpi::net::uv::Loop& loop,
                      wpilibws::ProviderContainer& providers,
@@ -26,36 +148,74 @@ HALSimXRP::HALSimXRP(wpi::net::uv::Loop& loop,
     wpi::util::print(stderr, "HALSim XRP Client libuv Error: {}\n", err.str());
   });
 
-  m_udp_client = uv::Udp::Create(m_loop);
   m_exec = UvExecFunc::Create(m_loop);
   if (m_exec) {
     m_exec->wakeup.connect([](auto func) { func(); });
   }
 }
 
+HALSimXRP::~HALSimXRP() = default;
+
 bool HALSimXRP::Initialize() {
-  if (!m_udp_client || !m_exec) {
+  if (!m_exec) {
     return false;
   }
 
-  const char* host = std::getenv("HALSIMXRP_HOST");
-  if (host != nullptr) {
-    m_host = host;
-  } else {
-    m_host = "localhost";
+  auto weakSelf = weak_from_this();
+  m_bluetoothClient = wpi::net::BluetoothLEPacketClient::Create(
+      m_loop,
+      [weakSelf](std::span<const uint8_t> packet) {
+        if (auto self = weakSelf.lock()) {
+          self->ParsePacket(packet);
+        }
+      },
+      [weakSelf](const XRPConnectionStatus& status) {
+        if (auto self = weakSelf.lock()) {
+          std::scoped_lock lock(self->m_statusMutex);
+          self->m_status = status;
+        }
+      });
+  if (!m_bluetoothClient) {
+    return false;
   }
 
-  const char* port = std::getenv("HALSIMXRP_PORT");
-  if (port != nullptr) {
-    try {
-      m_port = std::stoi(port);
-    } catch (const std::invalid_argument& err) {
-      wpi::util::print(stderr, "Error decoding HALSIMXRP_PORT ({})\n",
-                       err.what());
-      return false;
+  const char* address = std::getenv("HALSIMXRP_BT_ADDRESS");
+  if (address == nullptr) {
+    address = std::getenv("HALSIMXRP_BLUETOOTH_ADDRESS");
+  }
+  bool addressFromEnv = address != nullptr;
+  if (address != nullptr) {
+    m_targetAddress = address;
+  }
+
+  const char* addressType = std::getenv("HALSIMXRP_BT_ADDRESS_TYPE");
+  bool addressTypeFromEnv = addressType != nullptr;
+  if (addressType != nullptr) {
+    m_targetAddressType = ParseAddressType(addressType);
+  }
+
+  if (!addressFromEnv) {
+    if (auto savedTarget = LoadBluetoothTarget()) {
+      m_targetAddress = std::move(savedTarget->address);
+      if (!addressTypeFromEnv) {
+        m_targetAddressType = savedTarget->addressType;
+      }
     }
-  } else {
-    m_port = 3540;
+  }
+
+  {
+    std::scoped_lock lock(m_statusMutex);
+    m_status = m_bluetoothClient->GetStatus();
+    m_status.targetAddress = m_targetAddress;
+    m_status.targetConfigured = !m_targetAddress.empty();
+    m_status.addressType = m_targetAddressType;
+    if (m_status.supported) {
+      m_status.status = m_status.targetConfigured
+                            ? "Ready to connect"
+                            : "Waiting for Bluetooth address";
+    } else if (m_status.status.empty()) {
+      m_status.status = "Bluetooth transport is unsupported on this platform";
+    }
   }
 
   wpilibxrp::WPILibUpdateFunc func = [&](const wpi::util::json& data) {
@@ -64,37 +224,100 @@ bool HALSimXRP::Initialize() {
 
   m_xrp.SetWPILibUpdateFunc(func);
 
-  wpi::util::println("Your XRP's IP Address: {}", m_host);
-  wpi::util::println("Your XRP's Port: {}", m_port);
+  wpi::util::println(
+      "HALSimXRP Bluetooth transport: LE L2CAP Credit-Based Mode PSM 0x{:04x} "
+      "with GATT fallback",
+      XRP_BLUETOOTH_PSM);
+  if (!m_targetAddress.empty()) {
+    wpi::util::println("HALSimXRP Bluetooth target: {} ({})", m_targetAddress,
+                       AddressTypeToString(m_targetAddressType));
+  } else {
+    wpi::util::println(
+        "Set HALSIMXRP_BT_ADDRESS or use the XRP pairing window in the "
+        "simulator GUI.");
+  }
 
   return true;
 }
 
 void HALSimXRP::Start() {
-  // struct sockaddr_in dest;
-  uv::NameToAddr(m_host, m_port, &m_dest);
+  RegisterSimProviders();
 
-  m_udp_client->Connect(m_dest);
+  if (!m_targetAddress.empty() && m_bluetoothClient &&
+      m_bluetoothClient->GetStatus().supported) {
+    ConnectBluetooth(m_targetAddress, m_targetAddressType);
+  }
 
-  m_udp_client->received.connect(
-      [this, socket = m_udp_client.get()](auto data, size_t len, auto rinfo,
-                                          unsigned int flags) {
-        ParsePacket({reinterpret_cast<uint8_t*>(data.base), len});
-      });
+  std::puts("HALSimXRP Initialized");
+}
 
-  m_udp_client->closed.connect([]() { wpi::util::print("Socket Closed\n"); });
+void HALSimXRP::RegisterSimProviders() {
+  if (m_providersConnected) {
+    return;
+  }
 
-  // Fake the OnNetworkConnected call
   auto hws = shared_from_this();
   m_simDevicesProvider.OnNetworkConnected(hws);
   m_providers.ForEach(
       [hws](std::shared_ptr<wpilibws::HALSimWSBaseProvider> provider) {
         provider->OnNetworkConnected(hws);
       });
+  m_providersConnected = true;
+}
 
-  m_udp_client->StartRecv();
+void HALSimXRP::ConnectBluetooth(std::string address,
+                                 XRPBluetoothAddressType type) {
+  wpi::net::BluetoothLEPacketClientConfig config;
+  {
+    std::scoped_lock lock(m_statusMutex);
+    m_targetAddress = std::move(address);
+    m_targetAddressType = type;
+    m_status.targetAddress = m_targetAddress;
+    m_status.addressType = m_targetAddressType;
+    m_status.targetConfigured = !m_targetAddress.empty();
+    m_status.error.clear();
 
-  std::puts("HALSimXRP Initialized");
+    config.address = m_targetAddress;
+    config.addressType = m_targetAddressType;
+    config.psm = XRP_BLUETOOTH_PSM;
+    config.gattServiceUuid = XRP_GATT_SERVICE_UUID;
+    config.gattControlCharacteristicUuid = XRP_GATT_CONTROL_CHARACTERISTIC_UUID;
+    config.gattStatusCharacteristicUuid = XRP_GATT_STATUS_CHARACTERISTIC_UUID;
+    config.maxPacketSize = MAX_BLUETOOTH_PACKET_SIZE;
+  }
+
+  SaveBluetoothTarget(config.address, config.addressType);
+
+  if (m_bluetoothClient) {
+    m_bluetoothClient->Connect(std::move(config));
+  }
+}
+
+void HALSimXRP::RememberBluetoothTarget(std::string address,
+                                        XRPBluetoothAddressType type) {
+  std::string targetAddress;
+  {
+    std::scoped_lock lock(m_statusMutex);
+    m_targetAddress = std::move(address);
+    m_targetAddressType = type;
+    m_status.targetAddress = m_targetAddress;
+    m_status.addressType = m_targetAddressType;
+    m_status.targetConfigured = !m_targetAddress.empty();
+    targetAddress = m_targetAddress;
+  }
+
+  SaveBluetoothTarget(targetAddress, type);
+}
+
+void HALSimXRP::DisconnectBluetooth() {
+  if (m_bluetoothClient) {
+    m_bluetoothClient->Disconnect("Disconnected by user");
+  }
+}
+
+XRPConnectionStatus HALSimXRP::GetConnectionStatus() const {
+  std::scoped_lock lock(m_statusMutex);
+  return m_status;
 }
 
 void HALSimXRP::ParsePacket(std::span<const uint8_t> packet) {
@@ -141,7 +364,7 @@ void HALSimXRP::OnSimValueChanged(const wpi::util::json& simData) {
 }
 
 uv::SimpleBufferPool<4>& HALSimXRP::GetBufferPool() {
-  static uv::SimpleBufferPool<4> bufferPool(128);
+  static uv::SimpleBufferPool<4> bufferPool(MAX_BLUETOOTH_PACKET_SIZE);
   return bufferPool;
 }
 
@@ -153,16 +376,41 @@ void HALSimXRP::SendStateToXRP() {
                                   }};
   m_xrp.SetupXRPSendBuffer(stream);
 
-  m_exec->Send([this, sendBufs]() mutable {
-    m_udp_client->Send(sendBufs, [&](auto bufs, uv::Error err) {
-      {
-        std::lock_guard lock(m_buffer_mutex);
-        GetBufferPool().Release(bufs);
+  auto self = shared_from_this();
+  m_exec->Send([this, self, sendBufs]() mutable {
+    SendPacketToXRP(std::span<uv::Buffer>{sendBufs.data(), sendBufs.size()});
+  });
+}
+
+void HALSimXRP::SendPacketToXRP(std::span<uv::Buffer> sendBufs) {
+  if (m_bluetoothClient) {
+    size_t packetSize = 0;
+    for (const auto& buf : sendBufs) {
+      packetSize += buf.len;
+    }
+
+    if (packetSize <= MAX_BLUETOOTH_PACKET_SIZE) {
+      std::vector<uint8_t> packet;
+      packet.reserve(packetSize);
+      for (const auto& buf : sendBufs) {
+        const auto* data = reinterpret_cast<const uint8_t*>(buf.base);
+        packet.insert(packet.end(), data, data + buf.len);
       }
 
-      if (err) {
-        // no-op
-      }
-    });
-  });
+      m_bluetoothClient->Send(packet);
+    } else {
+      SetError("XRP packet is larger than Bluetooth transport MTU");
+    }
+  }
+
+  std::lock_guard lock(m_buffer_mutex);
+  GetBufferPool().Release(sendBufs);
+}
+
+void HALSimXRP::SetError(std::string_view error) {
+  std::scoped_lock lock(m_statusMutex);
+  m_status.error = error;
+  m_status.status = error;
+  m_status.connecting = false;
+  m_status.connected = false;
 }

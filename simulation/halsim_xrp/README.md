@@ -1,14 +1,26 @@
 # HAL XRP Client
 
-This is an extension that provides a client version of the XRP protocol for transmitting robot hardware interface state to an XRP robot over UDP.
+This is an extension that provides a client version of the XRP protocol for transmitting robot hardware interface state to an XRP robot over Bluetooth LE.
 
 ## Configuration
 
-The XRP client has a number of configuration options available through environment variables.
+The XRP client can be configured through the XRP Bluetooth window in the simulator GUI. The window can scan for nearby XRP Bluetooth LE devices on supported platforms and pair with the selected target where the platform exposes explicit pairing.
 
-``HALSIMXRP_HOST``: The host to connect to.  Defaults to localhost.
+The client also has environment variable configuration for headless use.
 
-``HALSIMXRP_PORT``: The port number to connect to.  Defaults to 3540.
+``HALSIMXRP_BT_ADDRESS``: The Bluetooth target to connect to. On Linux and Windows, this is the Bluetooth device address. On macOS, this can be the CoreBluetooth UUID or advertised XRP device name. No default.
+
+``HALSIMXRP_BT_ADDRESS_TYPE``: The Bluetooth LE address type. Supported values are `public` and `random`. Defaults to `random`.
+
+The firmware advertises a device name of the form `WPIXRP-AAAA-BBBB`, exposes a custom GATT packet service, and accepts LE L2CAP Credit-Based Mode connections on PSM `0x0081`. Each GATT write value, GATT notification value, or L2CAP SDU contains one XRP protocol packet.
+
+GATT service UUID: `7d2ea28a-f7bd-485d-9d6a-2c3f0b214a3f`
+
+GATT control characteristic UUID: `7d2ea28b-f7bd-485d-9d6a-2c3f0b214a3f`
+
+GATT status characteristic UUID: `7d2ea28c-f7bd-485d-9d6a-2c3f0b214a3f`
+
+The native Bluetooth packet transport prefers LE L2CAP Credit-Based Mode on Linux and macOS. Linux and macOS fall back to GATT if the L2CAP channel cannot be opened. Windows uses GATT Write Without Response and notifications.
 
 ## XRP Protocol
 
@@ -35,7 +47,7 @@ The `Tagged Data` section can contain an arbitrary number of data blocks. Each b
 The `size` byte encodes the size of the data block, _excluding_ itself. Thus the smallest block size is 2 bytes, with a size value of 1 (1 size byte, 1 tag byte, 0 payload bytes). Maximum size of the payload is 254 bytes.
 
 
-Utilizing tagged data blocks allows us to send multiple pieces of data in a single UDP packet. The tags currently implemented for the XRP are as follows:
+Utilizing tagged data blocks allows us to send multiple pieces of data in a single transport packet. The tags currently implemented for the XRP are as follows:
 
 | Tag  | Description                   |
 |------|-------------------------------|
