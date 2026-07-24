@@ -42,20 +42,43 @@ Context* GetCurrentContext();
 void SetCurrentContext(Context* context);
 
 /**
+ * Renderer selection policy.
+ */
+enum class RendererPreference {
+  /**
+   * Require SDL GPU rendering. Initialization fails if SDL GPU is unavailable.
+   */
+  REQUIRE_3D,
+
+  /**
+   * Prefer SDL GPU rendering, but fall back to the SDL 2D renderer if SDL GPU
+   * is unavailable.
+   */
+  PREFER_3D,
+
+  /**
+   * Prefer the SDL 2D renderer. SDL GPU rendering is not attempted unless
+   * forced with WPIGUI_FORCE_RENDERER.
+   */
+  PREFER_2D,
+};
+
+/**
  * Initializes the GUI.
  *
- * To bypass SDL GPU initialization and force the SDL 2D renderer, set the
- * WPIGUI_FORCE_2D_RENDERER environment variable to a value other than 0,
- * false, off, or no.
+ * To override renderer selection, set the WPIGUI_FORCE_RENDERER environment
+ * variable to 2d or 3d.
  * To enable SDL GPU debug mode, set the WPIGUI_SDL_GPU_DEBUG environment
  * variable to a value other than 0, false, off, or no.
  *
  * @param title main application window title
  * @param width main application window width
  * @param height main application window height
+ * @param rendererPreference renderer selection policy
  * @param configFlags ImGui configuration flags
  */
 bool Initialize(const char* title, int width, int height,
+                RendererPreference rendererPreference,
                 ImGuiConfigFlags configFlags = ImGuiConfigFlags_None);
 
 /**

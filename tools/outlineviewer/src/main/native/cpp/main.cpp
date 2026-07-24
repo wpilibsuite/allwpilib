@@ -262,7 +262,8 @@ int main(int argc, char** argv) {
 
   gui::AddLateExecute(DisplayGui);
 
-  gui::Initialize("OutlineViewer - DISCONNECTED", 600, 400);
+  gui::Initialize("OutlineViewer - DISCONNECTED", 600, 400,
+                  gui::RendererPreference::PREFER_2D);
   gui::Main();
 
   gModel.reset();

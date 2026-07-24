@@ -51,7 +51,6 @@ namespace {
 enum class RendererBackend { NONE, GPU, SDL_RENDERER };
 
 struct RendererContext {
-  SDL_GPUDevice* gpuDevice = nullptr;
   SDL_GPUTransferBuffer* textureTransferBuffer = nullptr;
   uint32_t textureTransferBufferSize = 0;
   SDL_Renderer* sdlRenderer = nullptr;
@@ -62,8 +61,10 @@ struct RendererContext {
 
 RendererContext gRendererContext;
 
-constexpr const char* WPIGUI_FORCE_2D_RENDERER_ENV = "WPIGUI_FORCE_2D_RENDERER";
+constexpr const char* WPIGUI_FORCE_RENDERER_ENV = "WPIGUI_FORCE_RENDERER";
 constexpr const char* WPIGUI_SDL_GPU_DEBUG_ENV = "WPIGUI_SDL_GPU_DEBUG";
+
+enum class RendererOverride { NONE, FORCE_2D, FORCE_3D };
 
 static bool EqualsIgnoreCase(const char* lhs, const char* rhs) {
   while (*lhs != '\0' && *rhs != '\0') {
@@ -98,12 +99,64 @@ static bool IsEnvironmentFlagEnabled(const char* name) {
          !EqualsIgnoreCase(value, "off") && !EqualsIgnoreCase(value, "no");
 }
 
-static bool Is2DRendererForced() {
-  return IsEnvironmentFlagEnabled(WPIGUI_FORCE_2D_RENDERER_ENV);
+static RendererOverride GetRendererOverride() {
+  const char* value = std::getenv(WPIGUI_FORCE_RENDERER_ENV);
+  if (!value || *value == '\0' || EqualsIgnoreCase(value, "0") ||
+      EqualsIgnoreCase(value, "false") || EqualsIgnoreCase(value, "off") ||
+      EqualsIgnoreCase(value, "no")) {
+    return RendererOverride::NONE;
+  }
+
+  if (EqualsIgnoreCase(value, "2d") || EqualsIgnoreCase(value, "sdl") ||
+      EqualsIgnoreCase(value, "renderer") ||
+      EqualsIgnoreCase(value, "sdlrenderer")) {
+    return RendererOverride::FORCE_2D;
+  }
+
+  if (EqualsIgnoreCase(value, "3d") || EqualsIgnoreCase(value, "gpu") ||
+      EqualsIgnoreCase(value, "sdlgpu")) {
+    return RendererOverride::FORCE_3D;
+  }
+
+  std::fprintf(stderr,
+               "%s has unsupported value \"%s\"; expected 2d or 3d. Ignoring "
+               "renderer override.\n",
+               WPIGUI_FORCE_RENDERER_ENV, value);
+  return RendererOverride::NONE;
 }
 
 static bool IsSdlGpuDebugEnabled() {
   return IsEnvironmentFlagEnabled(WPIGUI_SDL_GPU_DEBUG_ENV);
+}
+
+static bool ApplyRendererOverride(RendererPreference* rendererPreference) {
+  switch (GetRendererOverride()) {
+    case RendererOverride::FORCE_2D:
+      if (*rendererPreference == RendererPreference::REQUIRE_3D) {
+        std::fprintf(stderr,
+                     "%s=2d is set, but this wpigui application requires SDL "
+                     "GPU.\n",
+                     WPIGUI_FORCE_RENDERER_ENV);
+        return false;
+      }
+      std::fprintf(stderr, "%s=2d is set; using SDL 2D renderer for wpigui.\n",
+                   WPIGUI_FORCE_RENDERER_ENV);
+      *rendererPreference = RendererPreference::PREFER_2D;
+      return true;
+    case RendererOverride::FORCE_3D:
+      std::fprintf(stderr, "%s=3d is set; using SDL GPU renderer for wpigui.\n",
+                   WPIGUI_FORCE_RENDERER_ENV);
+      *rendererPreference = RendererPreference::REQUIRE_3D;
+      return true;
+    case RendererOverride::NONE:
+      return true;
+  }
+
+  return true;
+}
+
+static bool ShouldUse2DRenderer(RendererPreference rendererPreference) {
+  return rendererPreference == RendererPreference::PREFER_2D;
 }
 
 static void Update2DRendererVSync() {
@@ -153,15 +206,15 @@ static bool UploadGPUTexture(SDL_GPUTexture* texture, int width, int height,
   }
 
   if (gRendererContext.textureTransferBufferSize < uploadSize) {
-    SDL_ReleaseGPUTransferBuffer(gRendererContext.gpuDevice,
+    SDL_ReleaseGPUTransferBuffer(gContext->gpuDevice,
                                  gRendererContext.textureTransferBuffer);
 
     uint32_t transferSize = static_cast<uint32_t>(uploadSize + 1024);
     SDL_GPUTransferBufferCreateInfo transferBufferInfo = {};
     transferBufferInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
     transferBufferInfo.size = transferSize;
-    gRendererContext.textureTransferBuffer = SDL_CreateGPUTransferBuffer(
-        gRendererContext.gpuDevice, &transferBufferInfo);
+    gRendererContext.textureTransferBuffer =
+        SDL_CreateGPUTransferBuffer(gContext->gpuDevice, &transferBufferInfo);
     if (!gRendererContext.textureTransferBuffer) {
       gRendererContext.textureTransferBufferSize = 0;
       return false;
@@ -170,12 +223,12 @@ static bool UploadGPUTexture(SDL_GPUTexture* texture, int width, int height,
   }
 
   void* texturePtr = SDL_MapGPUTransferBuffer(
-      gRendererContext.gpuDevice, gRendererContext.textureTransferBuffer, true);
+      gContext->gpuDevice, gRendererContext.textureTransferBuffer, true);
   if (!texturePtr) {
     return false;
   }
   std::memcpy(texturePtr, data, static_cast<size_t>(uploadSize));
-  SDL_UnmapGPUTransferBuffer(gRendererContext.gpuDevice,
+  SDL_UnmapGPUTransferBuffer(gContext->gpuDevice,
                              gRendererContext.textureTransferBuffer);
 
   SDL_GPUTextureTransferInfo transferInfo = {};
@@ -189,7 +242,7 @@ static bool UploadGPUTexture(SDL_GPUTexture* texture, int width, int height,
   textureRegion.d = 1;
 
   SDL_GPUCommandBuffer* commandBuffer =
-      SDL_AcquireGPUCommandBuffer(gRendererContext.gpuDevice);
+      SDL_AcquireGPUCommandBuffer(gContext->gpuDevice);
   if (!commandBuffer) {
     return false;
   }
@@ -383,8 +436,8 @@ static bool CreateSDLWindowAnd2DRenderer(SDL_WindowFlags windowFlags) {
 }
 
 static void ShutdownGPURenderer() {
-  if (gRendererContext.gpuDevice) {
-    SDL_WaitForGPUIdle(gRendererContext.gpuDevice);
+  if (gContext && gContext->gpuDevice) {
+    SDL_WaitForGPUIdle(gContext->gpuDevice);
   }
 
   if (gRendererContext.imguiRendererInitialized) {
@@ -392,23 +445,22 @@ static void ShutdownGPURenderer() {
     gRendererContext.imguiRendererInitialized = false;
   }
 
-  if (gRendererContext.gpuDevice) {
-    SDL_ReleaseGPUTransferBuffer(gRendererContext.gpuDevice,
+  if (gContext && gContext->gpuDevice) {
+    SDL_ReleaseGPUTransferBuffer(gContext->gpuDevice,
                                  gRendererContext.textureTransferBuffer);
   }
   gRendererContext.textureTransferBuffer = nullptr;
   gRendererContext.textureTransferBufferSize = 0;
 
   if (gRendererContext.gpuWindowClaimed && gContext && gContext->window &&
-      gRendererContext.gpuDevice) {
-    SDL_ReleaseWindowFromGPUDevice(gRendererContext.gpuDevice,
-                                   gContext->window);
+      gContext->gpuDevice) {
+    SDL_ReleaseWindowFromGPUDevice(gContext->gpuDevice, gContext->window);
   }
   gRendererContext.gpuWindowClaimed = false;
 
-  if (gRendererContext.gpuDevice) {
-    SDL_DestroyGPUDevice(gRendererContext.gpuDevice);
-    gRendererContext.gpuDevice = nullptr;
+  if (gContext && gContext->gpuDevice) {
+    SDL_DestroyGPUDevice(gContext->gpuDevice);
+    gContext->gpuDevice = nullptr;
   }
 }
 
@@ -422,25 +474,24 @@ static void Shutdown2DRenderer() {
 }
 
 static bool TryInitGPURenderer() {
-  gRendererContext.gpuDevice = SDL_CreateGPUDevice(
+  gContext->gpuDevice = SDL_CreateGPUDevice(
       SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXBC |
           SDL_GPU_SHADERFORMAT_DXIL | SDL_GPU_SHADERFORMAT_MSL |
           SDL_GPU_SHADERFORMAT_METALLIB,
       IsSdlGpuDebugEnabled(), nullptr);
-  if (!gRendererContext.gpuDevice) {
+  if (!gContext->gpuDevice) {
     std::fprintf(stderr, "SDL_CreateGPUDevice failed: %s\n", SDL_GetError());
     return false;
   }
 
-  if (!SDL_ClaimWindowForGPUDevice(gRendererContext.gpuDevice,
-                                   gContext->window)) {
+  if (!SDL_ClaimWindowForGPUDevice(gContext->gpuDevice, gContext->window)) {
     std::fprintf(stderr, "SDL_ClaimWindowForGPUDevice failed: %s\n",
                  SDL_GetError());
     ShutdownGPURenderer();
     return false;
   }
   gRendererContext.gpuWindowClaimed = true;
-  SDL_SetGPUSwapchainParameters(gRendererContext.gpuDevice, gContext->window,
+  SDL_SetGPUSwapchainParameters(gContext->gpuDevice, gContext->window,
                                 SDL_GPU_SWAPCHAINCOMPOSITION_SDR,
                                 SDL_GPU_PRESENTMODE_VSYNC);
 
@@ -450,9 +501,9 @@ static bool TryInitGPURenderer() {
   }
 
   ImGui_ImplSDLGPU3_InitInfo initInfo = {};
-  initInfo.Device = gRendererContext.gpuDevice;
-  initInfo.ColorTargetFormat = SDL_GetGPUSwapchainTextureFormat(
-      gRendererContext.gpuDevice, gContext->window);
+  initInfo.Device = gContext->gpuDevice;
+  initInfo.ColorTargetFormat =
+      SDL_GetGPUSwapchainTextureFormat(gContext->gpuDevice, gContext->window);
   initInfo.MSAASamples = SDL_GPU_SAMPLECOUNT_1;
   initInfo.SwapchainComposition = SDL_GPU_SWAPCHAINCOMPOSITION_SDR;
   initInfo.PresentMode = SDL_GPU_PRESENTMODE_VSYNC;
@@ -471,7 +522,7 @@ static bool TryInit2DRenderer() {
   ImGuiIO& io = ImGui::GetIO();
   if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
     std::fprintf(stderr,
-                 "SDL 2D renderer fallback does not support ImGui "
+                 "SDL 2D renderer does not support ImGui "
                  "multi-viewports; disabling viewports.\n");
     io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
   }
@@ -544,7 +595,7 @@ static void RenderGPUFrame(ImDrawData* drawData) {
   }
 
   SDL_GPUCommandBuffer* commandBuffer =
-      SDL_AcquireGPUCommandBuffer(gRendererContext.gpuDevice);
+      SDL_AcquireGPUCommandBuffer(gContext->gpuDevice);
   if (!commandBuffer) {
     return;
   }
@@ -603,12 +654,20 @@ static void Render2DFrame(ImDrawData* drawData) {
   SDL_RenderPresent(gRendererContext.sdlRenderer);
 }
 
-static bool InitRenderer(SDL_WindowFlags windowFlags) {
+static bool InitRenderer(SDL_WindowFlags windowFlags,
+                         RendererPreference rendererPreference) {
   if (gRendererContext.sdlRenderer) {
     return TryInit2DRenderer();
   }
 
   if (!TryInitGPURenderer()) {
+    if (rendererPreference == RendererPreference::REQUIRE_3D) {
+      std::fprintf(stderr,
+                   "SDL GPU is required for this wpigui application; not "
+                   "falling back to the SDL 2D renderer.\n");
+      return false;
+    }
+
     std::fprintf(stderr, "Falling back to SDL 2D renderer for wpigui.\n");
     DestroySDLWindow();
     if (!CreateSDLWindowAnd2DRenderer(windowFlags)) {
@@ -875,12 +934,18 @@ static void CleanupFailedInitialize() {
 }
 
 bool gui::Initialize(const char* title, int width, int height,
+                     RendererPreference rendererPreference,
                      ImGuiConfigFlags configFlags) {
   gContext->title = title;
   gContext->width = width;
   gContext->height = height;
   gContext->defaultWidth = width;
   gContext->defaultHeight = height;
+
+  if (!ApplyRendererOverride(&rendererPreference)) {
+    return false;
+  }
+  bool use2DRenderer = ShouldUse2DRenderer(rendererPreference);
 
   // Setup SDL
   SDL_SetMainReady();
@@ -972,9 +1037,7 @@ bool gui::Initialize(const char* title, int width, int height,
     windowFlags |= SDL_WINDOW_MAXIMIZED;
   }
 
-  if (Is2DRendererForced()) {
-    std::fprintf(stderr, "%s is set; using SDL 2D renderer for wpigui.\n",
-                 WPIGUI_FORCE_2D_RENDERER_ENV);
+  if (use2DRenderer) {
     if (!CreateSDLWindowAnd2DRenderer(windowFlags)) {
       CleanupFailedInitialize();
       return false;
@@ -998,7 +1061,7 @@ bool gui::Initialize(const char* title, int width, int height,
     }
   }
 
-  if (!InitRenderer(windowFlags)) {
+  if (!InitRenderer(windowFlags, rendererPreference)) {
     CleanupFailedInitialize();
     return false;
   }
@@ -1153,13 +1216,13 @@ ImTextureID gui::CreateTexture(PixelFormat format, int width, int height,
     textureInfo.sample_count = SDL_GPU_SAMPLECOUNT_1;
 
     SDL_GPUTexture* texture =
-        SDL_CreateGPUTexture(gRendererContext.gpuDevice, &textureInfo);
+        SDL_CreateGPUTexture(gContext->gpuDevice, &textureInfo);
     if (!texture) {
       return ImTextureID_Invalid;
     }
 
     if (!UploadGPUTexture(texture, width, height, data)) {
-      SDL_ReleaseGPUTexture(gRendererContext.gpuDevice, texture);
+      SDL_ReleaseGPUTexture(gContext->gpuDevice, texture);
       return ImTextureID_Invalid;
     }
 
@@ -1208,7 +1271,7 @@ void gui::DeleteTexture(ImTextureID texture) {
   }
 
   if (gRendererContext.backend == RendererBackend::GPU) {
-    SDL_ReleaseGPUTexture(gRendererContext.gpuDevice,
+    SDL_ReleaseGPUTexture(gContext->gpuDevice,
                           reinterpret_cast<SDL_GPUTexture*>(texture));
   } else if (gRendererContext.backend == RendererBackend::SDL_RENDERER) {
     SDL_DestroyTexture(reinterpret_cast<SDL_Texture*>(texture));

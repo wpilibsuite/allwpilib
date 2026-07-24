@@ -794,7 +794,8 @@ int main(int argc, char** argv) {
 
   wpi::gui::AddLateExecute(DisplayGui);
 
-  wpi::gui::Initialize("WPIcal", 900, 600);
+  wpi::gui::Initialize("WPIcal", 900, 600,
+                       wpi::gui::RendererPreference::PREFER_2D);
   wpi::gui::Main();
 
   wpi::glass::DestroyContext();
