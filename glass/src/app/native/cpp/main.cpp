@@ -362,7 +362,7 @@ int main(int argc, char** argv) {
   });
 
   gui::Initialize("Glass - DISCONNECTED", 1024, 768,
-                  gui::RendererPreference::PREFER_2D,
+                  gui::RendererPreference::PREFER_3D,
                   ImGuiConfigFlags_DockingEnable);
   gEnterKey = &wpi::glass::GetStorageRoot().GetInt("enterKey", SDLK_RETURN);
   gEnterScancode = &wpi::glass::GetStorageRoot().GetInt("enterScancode",
