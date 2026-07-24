@@ -96,7 +96,7 @@ class ParallelDeadlineGroup
 
   Command::InterruptionBehavior GetInterruptionBehavior() const override;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands);

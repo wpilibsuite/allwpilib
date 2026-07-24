@@ -9,6 +9,7 @@ wpilib_java_library(
     deps = [
         "//datalog:datalog-java",
         "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
@@ -20,6 +21,7 @@ wpilib_java_junit5_test(
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":epilogue-java",
+        "//telemetry:telemetry-java",
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",

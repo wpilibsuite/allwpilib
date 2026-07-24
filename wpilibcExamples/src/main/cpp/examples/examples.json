@@ -124,7 +124,8 @@
       "Commandv2",
       "Differential Drive",
       "Encoder",
-      "Sendable",
+      "Telemetry",
+      "Tunable",
       "DataLog",
       "Pneumatics",
       "Gamepad"
@@ -141,7 +142,8 @@
       "Commandv2",
       "Differential Drive",
       "Encoder",
-      "Sendable",
+      "Telemetry",
+      "Tunable",
       "DataLog",
       "Pneumatics",
       "Gamepad"

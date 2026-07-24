@@ -8,7 +8,7 @@
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
 #include "wpi/hal/UsageReporting.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
 
@@ -342,28 +342,30 @@ void LogitechF310Controller::SetRumble(GenericHID::RumbleType type,
 
 
 
-void LogitechF310Controller::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("HID");
-  builder.PublishConstString("ControllerType", "LogitechF310");
-  builder.AddDoubleProperty("LeftX", [this] { return GetLeftX(); }, nullptr);
-  builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);
-  builder.AddDoubleProperty("RightX", [this] { return GetRightX(); }, nullptr);
-  builder.AddDoubleProperty("RightY", [this] { return GetRightY(); }, nullptr);
-  builder.AddDoubleProperty("LeftTrigger", [this] { return GetLeftTrigger(); }, nullptr);
-  builder.AddDoubleProperty("RightTrigger", [this] { return GetRightTrigger(); }, nullptr);
-  builder.AddBooleanProperty("A", [this] { return GetAButton(); }, nullptr);
-  builder.AddBooleanProperty("B", [this] { return GetBButton(); }, nullptr);
-  builder.AddBooleanProperty("X", [this] { return GetXButton(); }, nullptr);
-  builder.AddBooleanProperty("Y", [this] { return GetYButton(); }, nullptr);
-  builder.AddBooleanProperty("Back", [this] { return GetBackButton(); }, nullptr);
-  builder.AddBooleanProperty("Logitech", [this] { return GetLogitechButton(); }, nullptr);
-  builder.AddBooleanProperty("Start", [this] { return GetStartButton(); }, nullptr);
-  builder.AddBooleanProperty("LeftStick", [this] { return GetLeftStickButton(); }, nullptr);
-  builder.AddBooleanProperty("RightStick", [this] { return GetRightStickButton(); }, nullptr);
-  builder.AddBooleanProperty("LeftBumper", [this] { return GetLeftBumperButton(); }, nullptr);
-  builder.AddBooleanProperty("RightBumper", [this] { return GetRightBumperButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadUp", [this] { return GetDpadUpButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadDown", [this] { return GetDpadDownButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadLeft", [this] { return GetDpadLeftButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadRight", [this] { return GetDpadRightButton(); }, nullptr);
+std::string_view LogitechF310Controller::GetTelemetryType() const {
+  return "HID:LogitechF310";
+}
+
+void LogitechF310Controller::LogTo(wpi::TelemetryTable& table) const {
+  table.Log("LeftX", GetLeftX());
+  table.Log("LeftY", GetLeftY());
+  table.Log("RightX", GetRightX());
+  table.Log("RightY", GetRightY());
+  table.Log("LeftTrigger", GetLeftTrigger());
+  table.Log("RightTrigger", GetRightTrigger());
+  table.Log("AButton", GetAButton());
+  table.Log("BButton", GetBButton());
+  table.Log("XButton", GetXButton());
+  table.Log("YButton", GetYButton());
+  table.Log("BackButton", GetBackButton());
+  table.Log("LogitechButton", GetLogitechButton());
+  table.Log("StartButton", GetStartButton());
+  table.Log("LeftStickButton", GetLeftStickButton());
+  table.Log("RightStickButton", GetRightStickButton());
+  table.Log("LeftBumperButton", GetLeftBumperButton());
+  table.Log("RightBumperButton", GetRightBumperButton());
+  table.Log("DpadUpButton", GetDpadUpButton());
+  table.Log("DpadDownButton", GetDpadDownButton());
+  table.Log("DpadLeftButton", GetDpadLeftButton());
+  table.Log("DpadRightButton", GetDpadRightButton());
 }

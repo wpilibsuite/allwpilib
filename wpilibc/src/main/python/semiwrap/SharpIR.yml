@@ -1,10 +1,10 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
+- wpi/telemetry/TelemetryTable.hpp
 
 classes:
   wpi::SharpIR:
     ignored_bases:
-    - wpi::util::SendableHelper<SharpIR>
+    - wpi::TelemetryLoggable  # TODO(telemetry PR)
     methods:
       GP2Y0A02YK0F:
       GP2Y0A21YK0F:
@@ -13,4 +13,5 @@ classes:
       SharpIR:
       GetChannel:
       GetRange:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:

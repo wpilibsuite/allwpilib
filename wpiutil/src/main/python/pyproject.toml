@@ -81,12 +81,6 @@ RawFrame_c = "wpi/util/RawFrame.h"
 RawFrame = "wpi/util/RawFrame.hpp"
 Timestamp = "wpi/util/timestamp.hpp"
 
-# wpi/sendable
-Sendable = "wpi/util/sendable/Sendable.hpp"
-SendableBuilder = "wpi/util/sendable/SendableBuilder.hpp"
-#SendableHelper = "wpi/util/sendable/SendableHelper.hpp"
-SendableRegistry = "wpi/util/sendable/SendableRegistry.hpp"
-
 WPyStruct = "src/wpistruct/wpystruct_fns.h"
 
 [tool.semiwrap.export_type_casters.wpiutil-casters]

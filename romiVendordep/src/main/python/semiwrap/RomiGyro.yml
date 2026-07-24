@@ -1,5 +1,10 @@
+extra_includes:
+- wpi/telemetry/TelemetryTable.hpp
+
 classes:
   wpi::romi::RomiGyro:
+    ignored_bases:
+    - wpi::TelemetryLoggable
     methods:
       RomiGyro:
       GetAngle:
@@ -11,3 +16,5 @@ classes:
       GetAngleY:
       GetAngleZ:
       Reset:
+      LogTo:
+      GetTelemetryType:

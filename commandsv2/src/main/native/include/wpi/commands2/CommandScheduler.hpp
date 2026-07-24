@@ -5,20 +5,21 @@
 #pragma once
 
 #include <concepts>
+#include <cstdint>
 #include <functional>
 #include <initializer_list>
 #include <memory>
 #include <optional>
 #include <span>
 #include <utility>
+#include <vector>
 
 #include "wpi/event/EventLoop.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Watchdog.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/tunable/ComplexTunable.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/util/FunctionExtras.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi::cmd {
 class Command;
@@ -34,9 +35,8 @@ class Subsystem;
  *
  * This class is provided by the Commands v2 VendorDep
  */
-class CommandScheduler final
-    : public wpi::util::Sendable,
-      public wpi::util::SendableHelper<CommandScheduler> {
+class CommandScheduler final : public wpi::TelemetryLoggable,
+                               public wpi::ComplexTunable {
  public:
   /**
    * Returns the Scheduler instance.
@@ -468,7 +468,10 @@ class CommandScheduler final
   void RequireUngroupedAndUnscheduled(
       std::initializer_list<const Command*> commands);
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+  std::string_view GetTelemetryType() const override;
+  void PublishTunable(wpi::TunableTable& table) override;
+  std::string_view GetTunableType() const override;
 
  private:
   // Constructor; private as this is a singleton
@@ -481,6 +484,7 @@ class CommandScheduler final
 
   class Impl;
   std::unique_ptr<Impl> m_impl;
+  std::vector<int64_t> m_toCancel;
 
   wpi::Watchdog m_watchdog;
 

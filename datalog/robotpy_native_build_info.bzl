@@ -25,6 +25,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         name = name,
         pyproject_toml = pyproject_toml,
         pc_deps = [
+            "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
             "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
         ],
         libinit_files = libinit_files,
@@ -47,6 +48,7 @@ def define_native_wrapper(name, pyproject_toml = None):
             "{}.copy_headers".format(name),
         ],
         deps = [
+            "//telemetry:robotpy-native-telemetry",
             "//wpiutil:robotpy-native-wpiutil",
         ],
         summary = "WPILib Utility Library",

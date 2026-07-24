@@ -1,9 +1,8 @@
 # validated: 2024-01-20 DS f29a7d2e501b WaitCommand.java
 from __future__ import annotations
 
-from wpilib import Timer
+from wpilib import TelemetryTable, Timer
 from wpimath import units
-from wpiutil import SendableBuilder
 
 from .command import Command
 
@@ -36,6 +35,6 @@ class WaitCommand(Command):
     def runs_when_disabled(self) -> bool:
         return True
 
-    def init_sendable(self, builder: SendableBuilder) -> None:
-        super().init_sendable(builder)
-        builder.add_double_property("duration", lambda: self._duration, lambda _: None)
+    def log_to(self, table: TelemetryTable) -> None:
+        super().log_to(table)
+        table.log("duration", self._duration)

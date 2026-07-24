@@ -12,7 +12,7 @@
 #include "wpi/event/BooleanEvent.hpp"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
 
@@ -597,108 +597,73 @@ TouchpadFinger Gamepad::GetTouchpadFinger(int touchpad, int finger) const {
   return m_hid->GetTouchpadFinger(touchpad, finger);
 }
 
-double Gamepad::GetAxisForSendable(Axis axis) const {
+double Gamepad::GetAxisForTelemetry(Axis axis) const {
   return wpi::internal::DriverStationBackend::GetStickAxisIfAvailable(
              m_hid->GetPort(), static_cast<int>(axis))
       .value_or(0.0);
 }
 
-bool Gamepad::GetButtonForSendable(Button button) const {
-  return wpi::internal::DriverStationBackend::GetStickButtonIfAvailable(
-             m_hid->GetPort(), static_cast<int>(button))
-      .value_or(false);
+void Gamepad::LogTo(wpi::TelemetryTable& table) const {
+  table.Log("LeftTriggerAxis", GetAxisForTelemetry(Axis::LEFT_TRIGGER));
+  table.Log("RightTriggerAxis", GetAxisForTelemetry(Axis::RIGHT_TRIGGER));
+  table.Log("LeftXAxis", GetAxisForTelemetry(Axis::LEFT_X));
+  table.Log("LeftYAxis", GetAxisForTelemetry(Axis::LEFT_Y));
+  table.Log("RightXAxis", GetAxisForTelemetry(Axis::RIGHT_X));
+  table.Log("RightYAxis", GetAxisForTelemetry(Axis::RIGHT_Y));
+
+  uint64_t buttons =
+      wpi::internal::DriverStationBackend::GetStickButtons(m_hid->GetPort());
+  table.Log("FaceDown",
+            (buttons & (1UL << static_cast<int>(Button::FACE_DOWN))) != 0);
+  table.Log("FaceRight",
+            (buttons & (1UL << static_cast<int>(Button::FACE_RIGHT))) != 0);
+  table.Log("FaceLeft",
+            (buttons & (1UL << static_cast<int>(Button::FACE_LEFT))) != 0);
+  table.Log("FaceUp",
+            (buttons & (1UL << static_cast<int>(Button::FACE_UP))) != 0);
+  table.Log("Back", (buttons & (1UL << static_cast<int>(Button::BACK))) != 0);
+  table.Log("Guide", (buttons & (1UL << static_cast<int>(Button::GUIDE))) != 0);
+  table.Log("Start", (buttons & (1UL << static_cast<int>(Button::START))) != 0);
+  table.Log("LeftStick",
+            (buttons & (1UL << static_cast<int>(Button::LEFT_STICK))) != 0);
+  table.Log("RightStick",
+            (buttons & (1UL << static_cast<int>(Button::RIGHT_STICK))) != 0);
+  table.Log("LeftBumper",
+            (buttons & (1UL << static_cast<int>(Button::LEFT_BUMPER))) != 0);
+  table.Log("RightBumper",
+            (buttons & (1UL << static_cast<int>(Button::RIGHT_BUMPER))) != 0);
+  table.Log("DpadUp",
+            (buttons & (1UL << static_cast<int>(Button::DPAD_UP))) != 0);
+  table.Log("DpadDown",
+            (buttons & (1UL << static_cast<int>(Button::DPAD_DOWN))) != 0);
+  table.Log("DpadLeft",
+            (buttons & (1UL << static_cast<int>(Button::DPAD_LEFT))) != 0);
+  table.Log("DpadRight",
+            (buttons & (1UL << static_cast<int>(Button::DPAD_RIGHT))) != 0);
+  table.Log("Misc1",
+            (buttons & (1UL << static_cast<int>(Button::MISC_1))) != 0);
+  table.Log("RightPaddle1",
+            (buttons & (1UL << static_cast<int>(Button::RIGHT_PADDLE_1))) != 0);
+  table.Log("LeftPaddle1",
+            (buttons & (1UL << static_cast<int>(Button::LEFT_PADDLE_1))) != 0);
+  table.Log("RightPaddle2",
+            (buttons & (1UL << static_cast<int>(Button::RIGHT_PADDLE_2))) != 0);
+  table.Log("LeftPaddle2",
+            (buttons & (1UL << static_cast<int>(Button::LEFT_PADDLE_2))) != 0);
+  table.Log("Touchpad",
+            (buttons & (1UL << static_cast<int>(Button::TOUCHPAD))) != 0);
+  table.Log("Misc2",
+            (buttons & (1UL << static_cast<int>(Button::MISC_2))) != 0);
+  table.Log("Misc3",
+            (buttons & (1UL << static_cast<int>(Button::MISC_3))) != 0);
+  table.Log("Misc4",
+            (buttons & (1UL << static_cast<int>(Button::MISC_4))) != 0);
+  table.Log("Misc5",
+            (buttons & (1UL << static_cast<int>(Button::MISC_5))) != 0);
+  table.Log("Misc6",
+            (buttons & (1UL << static_cast<int>(Button::MISC_6))) != 0);
 }
 
-void Gamepad::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("HID");
-  builder.PublishConstString("ControllerType", "Gamepad");
-  builder.AddDoubleProperty(
-      "LeftTrigger", [this] { return GetAxisForSendable(Axis::LEFT_TRIGGER); },
-      nullptr);
-  builder.AddDoubleProperty(
-      "RightTrigger",
-      [this] { return GetAxisForSendable(Axis::RIGHT_TRIGGER); }, nullptr);
-  builder.AddDoubleProperty(
-      "LeftX", [this] { return GetAxisForSendable(Axis::LEFT_X); }, nullptr);
-  builder.AddDoubleProperty(
-      "LeftY", [this] { return GetAxisForSendable(Axis::LEFT_Y); }, nullptr);
-  builder.AddDoubleProperty(
-      "RightX", [this] { return GetAxisForSendable(Axis::RIGHT_X); }, nullptr);
-  builder.AddDoubleProperty(
-      "RightY", [this] { return GetAxisForSendable(Axis::RIGHT_Y); }, nullptr);
-  builder.AddBooleanProperty(
-      "FaceDown", [this] { return GetButtonForSendable(Button::FACE_DOWN); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "FaceRight", [this] { return GetButtonForSendable(Button::FACE_RIGHT); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "FaceLeft", [this] { return GetButtonForSendable(Button::FACE_LEFT); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "FaceUp", [this] { return GetButtonForSendable(Button::FACE_UP); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "Back", [this] { return GetButtonForSendable(Button::BACK); }, nullptr);
-  builder.AddBooleanProperty(
-      "Guide", [this] { return GetButtonForSendable(Button::GUIDE); }, nullptr);
-  builder.AddBooleanProperty(
-      "Start", [this] { return GetButtonForSendable(Button::START); }, nullptr);
-  builder.AddBooleanProperty(
-      "LeftStick", [this] { return GetButtonForSendable(Button::LEFT_STICK); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "RightStick",
-      [this] { return GetButtonForSendable(Button::RIGHT_STICK); }, nullptr);
-  builder.AddBooleanProperty(
-      "LeftBumper",
-      [this] { return GetButtonForSendable(Button::LEFT_BUMPER); }, nullptr);
-  builder.AddBooleanProperty(
-      "RightBumper",
-      [this] { return GetButtonForSendable(Button::RIGHT_BUMPER); }, nullptr);
-  builder.AddBooleanProperty(
-      "DpadUp", [this] { return GetButtonForSendable(Button::DPAD_UP); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "DpadDown", [this] { return GetButtonForSendable(Button::DPAD_DOWN); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "DpadLeft", [this] { return GetButtonForSendable(Button::DPAD_LEFT); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "DpadRight", [this] { return GetButtonForSendable(Button::DPAD_RIGHT); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "Misc1", [this] { return GetButtonForSendable(Button::MISC_1); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "RightPaddle1",
-      [this] { return GetButtonForSendable(Button::RIGHT_PADDLE_1); }, nullptr);
-  builder.AddBooleanProperty(
-      "LeftPaddle1",
-      [this] { return GetButtonForSendable(Button::LEFT_PADDLE_1); }, nullptr);
-  builder.AddBooleanProperty(
-      "RightPaddle2",
-      [this] { return GetButtonForSendable(Button::RIGHT_PADDLE_2); }, nullptr);
-  builder.AddBooleanProperty(
-      "LeftPaddle2",
-      [this] { return GetButtonForSendable(Button::LEFT_PADDLE_2); }, nullptr);
-  builder.AddBooleanProperty(
-      "Touchpad", [this] { return GetButtonForSendable(Button::TOUCHPAD); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "Misc2", [this] { return GetButtonForSendable(Button::MISC_2); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "Misc3", [this] { return GetButtonForSendable(Button::MISC_3); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "Misc4", [this] { return GetButtonForSendable(Button::MISC_4); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "Misc5", [this] { return GetButtonForSendable(Button::MISC_5); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "Misc6", [this] { return GetButtonForSendable(Button::MISC_6); },
-      nullptr);
+std::string_view Gamepad::GetTelemetryType() const {
+  return "HID:Gamepad";
 }

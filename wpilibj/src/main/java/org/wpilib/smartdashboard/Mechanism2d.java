@@ -7,11 +7,8 @@ package org.wpilib.smartdashboard;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.wpilib.networktables.DoubleArrayPublisher;
-import org.wpilib.networktables.NTSendable;
-import org.wpilib.networktables.NTSendableBuilder;
-import org.wpilib.networktables.NetworkTable;
-import org.wpilib.networktables.StringPublisher;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.util.Color8Bit;
 
 /**
@@ -25,13 +22,10 @@ import org.wpilib.util.Color8Bit;
  * @see MechanismLigament2d
  * @see MechanismRoot2d
  */
-public final class Mechanism2d implements NTSendable, AutoCloseable {
-  private NetworkTable m_table;
+public final class Mechanism2d implements TelemetryLoggable, AutoCloseable {
   private final Map<String, MechanismRoot2d> m_roots;
   private final double[] m_dims = new double[2];
   private String m_color;
-  private DoubleArrayPublisher m_dimsPub;
-  private StringPublisher m_colorPub;
 
   /**
    * Create a new Mechanism2d with the given dimensions and default color (dark blue).
@@ -63,12 +57,6 @@ public final class Mechanism2d implements NTSendable, AutoCloseable {
 
   @Override
   public void close() {
-    if (m_dimsPub != null) {
-      m_dimsPub.close();
-    }
-    if (m_colorPub != null) {
-      m_colorPub.close();
-    }
     for (MechanismRoot2d root : m_roots.values()) {
       root.close();
     }
@@ -92,9 +80,6 @@ public final class Mechanism2d implements NTSendable, AutoCloseable {
 
     var root = new MechanismRoot2d(name, x, y);
     m_roots.put(name, root);
-    if (m_table != null) {
-      root.update(m_table.getSubTable(name));
-    }
     return root;
   }
 
@@ -105,33 +90,21 @@ public final class Mechanism2d implements NTSendable, AutoCloseable {
    */
   public synchronized void setBackgroundColor(Color8Bit color) {
     m_color = color.toHexString();
-    if (m_colorPub != null) {
-      m_colorPub.set(m_color);
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
+    synchronized (this) {
+      table.log("dims", m_dims);
+      table.log("backgroundColor", m_color);
+      for (Entry<String, MechanismRoot2d> entry : m_roots.entrySet()) {
+        table.log(entry.getKey(), entry.getValue());
+      }
     }
   }
 
   @Override
-  public void initSendable(NTSendableBuilder builder) {
-    builder.setSmartDashboardType("Mechanism2d");
-    synchronized (this) {
-      m_table = builder.getTable();
-      if (m_dimsPub != null) {
-        m_dimsPub.close();
-      }
-      m_dimsPub = m_table.getDoubleArrayTopic("dims").publish();
-      m_dimsPub.set(m_dims);
-      if (m_colorPub != null) {
-        m_colorPub.close();
-      }
-      m_colorPub = m_table.getStringTopic("backgroundColor").publish();
-      m_colorPub.set(m_color);
-      for (Entry<String, MechanismRoot2d> entry : m_roots.entrySet()) {
-        String name = entry.getKey();
-        MechanismRoot2d root = entry.getValue();
-        synchronized (root) {
-          root.update(m_table.getSubTable(name));
-        }
-      }
-    }
+  public String getTelemetryType() {
+    return "Mechanism2d";
   }
 }

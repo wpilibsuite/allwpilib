@@ -9,8 +9,8 @@
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/Errors.hpp"
+#include "wpi/tunable/TunableRegistry.hpp"
 #include "wpi/util/print.hpp"
 
 using namespace wpi;
@@ -155,8 +155,8 @@ void IterativeRobotBase::LoopFunc() {
   RobotPeriodic();
   m_watchdog.AddEpoch("RobotPeriodic()");
 
-  SmartDashboard::UpdateValues();
-  m_watchdog.AddEpoch("SmartDashboard::UpdateValues()");
+  TunableRegistry::Update();
+  m_watchdog.AddEpoch("TunableRegistry::Update()");
 
   if constexpr (IsSimulation()) {
     HAL_SimPeriodicBefore();

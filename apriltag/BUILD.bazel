@@ -233,6 +233,8 @@ define_native_wrapper(
 
 PYBIND_PKGCFG_DEPS = [
     "//apriltag:native/apriltag/robotpy-native-apriltag.pc",
+    "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
+    "//tunable:native/tunable/robotpy-native-tunable.pc",
     "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
     "//wpimath:robotpy-wpimath.generated_pkgcfg_files",
     "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",

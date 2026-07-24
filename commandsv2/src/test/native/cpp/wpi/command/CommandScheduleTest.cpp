@@ -2,12 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <memory>
+
 #include "CommandTestBase.hpp"
 #include "wpi/commands2/FunctionalCommand.hpp"
 #include "wpi/commands2/InstantCommand.hpp"
 #include "wpi/commands2/RunCommand.hpp"
-#include "wpi/nt/NetworkTableInstance.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/tunable/MockTunableBackend.hpp"
+#include "wpi/tunable/TunableRegistry.hpp"
+#include "wpi/tunable/Tunables.hpp"
 
 using namespace wpi::cmd;
 class CommandScheduleTest : public CommandTestBase {};
@@ -149,23 +152,23 @@ TEST_F(CommandScheduleTest, NotScheduledCancel) {
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&command));
 }
 
-TEST_F(CommandScheduleTest, SmartDashboardCancel) {
+TEST_F(CommandScheduleTest, TunableCancel) {
   CommandScheduler scheduler = GetScheduler();
-  wpi::SmartDashboard::PutData("Scheduler", &scheduler);
-  wpi::SmartDashboard::UpdateValues();
+  auto backend = std::make_shared<wpi::MockTunableBackend>();
+  wpi::TunableRegistry::RegisterBackend("", backend);
+  wpi::Tunables::Publish("Scheduler", scheduler);
 
   MockCommand command;
   scheduler.Schedule(&command);
   scheduler.Run();
-  wpi::SmartDashboard::UpdateValues();
   EXPECT_TRUE(scheduler.IsScheduled(&command));
 
   uintptr_t ptrTmp = reinterpret_cast<uintptr_t>(&command);
-  wpi::nt::NetworkTableInstance::GetDefault()
-      .GetEntry("/SmartDashboard/Scheduler/Cancel")
-      .SetIntegerArray(
-          std::span<const int64_t>{{static_cast<int64_t>(ptrTmp)}});
-  wpi::SmartDashboard::UpdateValues();
+  backend->SetInt64Vector(
+      "/Scheduler/Cancel",
+      std::span<const int64_t>{{static_cast<int64_t>(ptrTmp)}});
+  wpi::TunableRegistry::Update();
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
+  wpi::TunableRegistry::Reset();
 }

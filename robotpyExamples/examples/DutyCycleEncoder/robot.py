@@ -68,7 +68,7 @@ class MyRobot(wpilib.TimedRobot):
             output, 0 - percent_of_range, FULL_RANGE - percent_of_range
         )
 
-        wpilib.SmartDashboard.put_boolean("Connected", connected)
-        wpilib.SmartDashboard.put_number("Frequency", frequency)
-        wpilib.SmartDashboard.put_number("Output", output)
-        wpilib.SmartDashboard.put_number("ShiftedOutput", shifted_output)
+        wpilib.Telemetry.log("Connected", connected)
+        wpilib.Telemetry.log("Frequency", frequency)
+        wpilib.Telemetry.log("Output", output)
+        wpilib.Telemetry.log("ShiftedOutput", shifted_output)

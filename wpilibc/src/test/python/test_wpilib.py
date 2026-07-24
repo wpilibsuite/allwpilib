@@ -1,25 +1,16 @@
 import pytest
 import re
-import weakref
 
+import telemetry
+import tunable
 import wpilib
 
 
-def test_sendable_chooser():
-    chooser = wpilib.SendableChooser()
-    assert chooser.get_selected() is None
-
-    chooser.set_default_option("option", True)
-    assert chooser.get_selected() is True
-
-
-def test_smart_dashboard_putdata():
-    t = wpilib.Talon(4)
-    ref = weakref.ref(t)
-    wpilib.SmartDashboard.put_data("talon", t)
-    del t
-    assert bool(ref) is True
-    assert wpilib.SmartDashboard.get_data("talon") is ref()
+def test_telemetry_tunable_flat_namespace():
+    assert wpilib.Telemetry is telemetry.Telemetry
+    assert wpilib.TelemetryRegistry is telemetry.TelemetryRegistry
+    assert wpilib.Tunables is tunable.Tunables
+    assert wpilib.Selectable is tunable.Selectable
 
 
 def test_motorcontrollergroup():

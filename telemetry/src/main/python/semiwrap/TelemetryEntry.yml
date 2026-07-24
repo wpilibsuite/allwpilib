@@ -1,0 +1,32 @@
+classes:
+  wpi::TelemetryEntry:
+    force_no_default_constructor: true
+    force_no_trampoline: true
+    methods:
+      TelemetryEntry:
+        ignore: true
+      IsDiscard:
+      KeepDuplicates:
+      SetProperty:
+      LogBoolean:
+      LogInt8:
+      LogInt16:
+      LogInt32:
+      LogInt64:
+      LogFloat:
+      LogDouble:
+      LogString:
+      LogBooleanArray:
+        overloads:
+          std::span<const bool>:
+          std::span<const int>:
+      LogInt16Array:
+      LogInt32Array:
+      LogInt64Array:
+      LogFloatArray:
+      LogDoubleArray:
+      LogStringArray:
+        overloads:
+          std::span<const std::string>:
+          std::span<const std::string_view>:
+      LogRaw:

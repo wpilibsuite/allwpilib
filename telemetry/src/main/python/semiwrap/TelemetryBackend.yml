@@ -1,0 +1,16 @@
+extra_includes:
+- wpi/telemetry/TelemetryEntry.hpp
+
+classes:
+  wpi::TelemetryBackend:
+    force_no_default_constructor: true
+    force_no_trampoline: true
+    methods:
+      TelemetryBackend:
+        ignore: true
+      GetEntry:
+      HasSchema:
+      AddSchema:
+        overloads:
+          std::string_view, std::string_view, std::span<const uint8_t>:
+          std::string_view, std::string_view, std::string_view:

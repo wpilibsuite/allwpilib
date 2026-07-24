@@ -4,7 +4,7 @@
 
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/imu/OnboardIMU.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 #include "wpi/units/acceleration.hpp"
 
 /**
@@ -23,8 +23,8 @@ class Robot : public wpi::TimedRobot {
     prevXAccel = xAccel;
     prevYAccel = yAccel;
 
-    wpi::SmartDashboard::PutNumber("X Jerk", xJerk.value());
-    wpi::SmartDashboard::PutNumber("Y Jerk", yJerk.value());
+    wpi::Telemetry::Log("X Jerk", xJerk);
+    wpi::Telemetry::Log("Y Jerk", yJerk);
   }
 
  private:

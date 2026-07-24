@@ -1,12 +1,12 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
+- wpi/telemetry/TelemetryTable.hpp
 - pybind11/stl.h
 
 classes:
   wpi::PyMotorControllerGroup:
     rename: MotorControllerGroup
     ignored_bases:
-    - wpi::util::SendableHelper<PyMotorControllerGroup>
+    - wpi::TelemetryLoggable
     methods:
       PyMotorControllerGroup:
         cpp_code: |
@@ -39,4 +39,5 @@ classes:
       SetInverted:
       GetInverted:
       Disable:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:

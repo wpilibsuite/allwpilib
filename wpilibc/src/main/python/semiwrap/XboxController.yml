@@ -1,5 +1,5 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
+- wpi/telemetry/TelemetryTable.hpp
 - wpi/driverstation/internal/DriverStationBackend.hpp
 - wpi/event/BooleanEvent.hpp
 
@@ -7,7 +7,7 @@ classes:
   wpi::XboxController:
     force_no_trampoline: true
     ignored_bases:
-    - wpi::util::SendableHelper<XboxController>
+    - wpi::TelemetryLoggable
     enums:
       Button:
       Axis:
@@ -105,6 +105,7 @@ classes:
         rename: button
       SetLeds:
       SetRumble:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:
       GetLeftTrigger:
       GetRightTrigger:

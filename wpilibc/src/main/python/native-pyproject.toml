@@ -9,6 +9,8 @@ requires = [
     "robotpy-native-ntcore==0.0.0",
     "robotpy-native-wpimath==0.0.0",
     "robotpy-native-wpihal==0.0.0",
+    "robotpy-native-telemetry==0.0.0",
+    "robotpy-native-tunable==0.0.0",
 ]
 
 [project]
@@ -24,6 +26,8 @@ dependencies = [
     "robotpy-native-ntcore==0.0.0",
     "robotpy-native-wpimath==0.0.0",
     "robotpy-native-wpihal==0.0.0",
+    "robotpy-native-telemetry==0.0.0",
+    "robotpy-native-tunable==0.0.0",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -45,4 +49,4 @@ name = "wpilib"
 includedir = "src/native/wpilib/include"
 libdir = "src/native/wpilib/lib"
 shared_libraries = ["wpilibc"]
-requires = ["robotpy-native-wpiutil", "robotpy-native-wpinet", "robotpy-native-ntcore", "robotpy-native-wpimath", "robotpy-native-wpihal"]
+requires = ["robotpy-native-wpiutil", "robotpy-native-wpinet", "robotpy-native-ntcore", "robotpy-native-wpimath", "robotpy-native-wpihal", "robotpy-native-telemetry", "robotpy-native-tunable"]

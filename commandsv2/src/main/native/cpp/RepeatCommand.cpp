@@ -7,7 +7,7 @@
 #include <string>
 #include <utility>
 
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi::cmd;
 
@@ -58,8 +58,7 @@ Command::InterruptionBehavior RepeatCommand::GetInterruptionBehavior() const {
   return m_command->GetInterruptionBehavior();
 }
 
-void RepeatCommand::InitSendable(wpi::util::SendableBuilder& builder) {
-  Command::InitSendable(builder);
-  builder.AddStringProperty(
-      "command", [this] { return m_command->GetName(); }, nullptr);
+void RepeatCommand::LogTo(wpi::TelemetryTable& table) const {
+  Command::LogTo(table);
+  table.Log("command", m_command->GetName());
 }

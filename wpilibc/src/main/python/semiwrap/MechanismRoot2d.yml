@@ -15,6 +15,7 @@ classes:
         ignore: true
 
 # keep this in sync with MechanismRoot2d.h
+      LogTo:
 inline_code: |-
   cls_MechanismRoot2d
     .def("get_name", [](MechanismRoot2d *self) { return self->GetName(); }, release_gil())

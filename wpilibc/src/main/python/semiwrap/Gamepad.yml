@@ -1,12 +1,12 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
+- wpi/telemetry/TelemetryTable.hpp
 - wpi/event/BooleanEvent.hpp
 
 classes:
   wpi::Gamepad:
     force_no_trampoline: true
     ignored_bases:
-    - wpi::util::SendableHelper<Gamepad>
+    - wpi::TelemetryLoggable  # TODO(telemetry PR)
     enums:
       Button:
       Axis:
@@ -164,4 +164,5 @@ classes:
       SetRumble:
       GetTouchpadFingerAvailable:
       GetTouchpadFinger:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:

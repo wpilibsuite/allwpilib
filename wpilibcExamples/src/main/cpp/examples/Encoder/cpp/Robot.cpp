@@ -6,11 +6,11 @@
 
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 
 /**
- * Sample program displaying the value of a quadrature encoder on the
- * SmartDashboard.
+ * Sample program displaying the value of a quadrature encoder on a
+ * dashboard.
  *
  * Quadrature Encoders are digital sensors which can detect the amount the
  * encoder has rotated since starting as well as the direction in which the
@@ -40,10 +40,10 @@ class Robot : public wpi::TimedRobot {
 
   void TeleopPeriodic() override {
     // Retrieve the net displacement of the Encoder since the last Reset.
-    wpi::SmartDashboard::PutNumber("Encoder Distance", encoder.GetDistance());
+    wpi::Telemetry::Log("Encoder Distance", encoder.GetDistance());
 
     // Retrieve the current rate of the encoder.
-    wpi::SmartDashboard::PutNumber("Encoder Rate", encoder.GetRate());
+    wpi::Telemetry::Log("Encoder Rate", encoder.GetRate());
   }
 
  private:

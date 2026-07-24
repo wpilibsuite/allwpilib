@@ -9,9 +9,8 @@
 
 #include "wpi/drive/RobotDriveBase.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/angle.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 
@@ -49,9 +48,7 @@ class MotorController;
  * MotorSafety is enabled by default. The DriveCartesian or DrivePolar
  * methods should be called periodically to avoid Motor Safety timeouts.
  */
-class MecanumDrive : public RobotDriveBase,
-                     public wpi::util::Sendable,
-                     public wpi::util::SendableHelper<MecanumDrive> {
+class MecanumDrive : public RobotDriveBase, public wpi::TelemetryLoggable {
  public:
   /**
    * Wheel velocities for a mecanum drive.
@@ -159,7 +156,9 @@ class MecanumDrive : public RobotDriveBase,
   void StopMotor() override;
   std::string GetDescription() const override;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   std::function<void(double)> m_frontLeftMotor;
@@ -167,7 +166,7 @@ class MecanumDrive : public RobotDriveBase,
   std::function<void(double)> m_frontRightMotor;
   std::function<void(double)> m_rearRightMotor;
 
-  // Used for Sendable property getters
+  // Used for telemetry property getters
   double m_frontLeftOutput = 0.0;
   double m_rearLeftOutput = 0.0;
   double m_frontRightOutput = 0.0;

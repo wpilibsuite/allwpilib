@@ -1,5 +1,5 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
+- wpi/telemetry/TelemetryTable.hpp
 
 classes:
   wpi::Talon:

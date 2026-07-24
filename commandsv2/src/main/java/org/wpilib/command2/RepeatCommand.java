@@ -6,7 +6,7 @@ package org.wpilib.command2;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * A command that runs another command repeatedly, restarting it when it ends, until this command is
@@ -83,8 +83,8 @@ public class RepeatCommand extends Command {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
-    builder.addStringProperty("command", m_command::getName, null);
+  public void logTo(TelemetryTable table) {
+    super.logTo(table);
+    table.log("command", m_command.getName());
   }
 }

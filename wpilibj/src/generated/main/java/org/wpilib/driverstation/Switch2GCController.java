@@ -11,8 +11,8 @@ import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Handle input from Switch2GC controllers connected to the Driver Station.
@@ -20,7 +20,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * <p>This class handles Switch2GC input that comes from the Driver Station. Each time a value
  * is requested the most recent value is returned.
  */
-public class Switch2GCController implements HIDDevice, Sendable {
+public class Switch2GCController implements HIDDevice, TelemetryLoggable {
   /** The number of touchpads supported by this controller. */
   public static final int TOUCHPAD_COUNT = 0;
 
@@ -942,30 +942,33 @@ public class Switch2GCController implements HIDDevice, Sendable {
 
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("HID");
-    builder.publishConstString("ControllerType", "Switch2GC");
-    builder.addDoubleProperty("LeftX", this::getLeftX, null);
-    builder.addDoubleProperty("LeftY", this::getLeftY, null);
-    builder.addDoubleProperty("CStickX", this::getCStickX, null);
-    builder.addDoubleProperty("CStickY", this::getCStickY, null);
-    builder.addDoubleProperty("LTrigger", this::getLTrigger, null);
-    builder.addDoubleProperty("RTrigger", this::getRTrigger, null);
-    builder.addBooleanProperty("A", this::getAButton, null);
-    builder.addBooleanProperty("X", this::getXButton, null);
-    builder.addBooleanProperty("B", this::getBButton, null);
-    builder.addBooleanProperty("Y", this::getYButton, null);
-    builder.addBooleanProperty("Home", this::getHomeButton, null);
-    builder.addBooleanProperty("Start", this::getStartButton, null);
-    builder.addBooleanProperty("ZL", this::getZLButton, null);
-    builder.addBooleanProperty("Z", this::getZButton, null);
-    builder.addBooleanProperty("DpadUp", this::getDpadUpButton, null);
-    builder.addBooleanProperty("DpadDown", this::getDpadDownButton, null);
-    builder.addBooleanProperty("DpadLeft", this::getDpadLeftButton, null);
-    builder.addBooleanProperty("DpadRight", this::getDpadRightButton, null);
-    builder.addBooleanProperty("Capture", this::getCaptureButton, null);
-    builder.addBooleanProperty("C", this::getCButton, null);
-    builder.addBooleanProperty("L", this::getLButton, null);
-    builder.addBooleanProperty("R", this::getRButton, null);
+  public String getTelemetryType() {
+    return "HID:Switch2GC";
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
+    table.log("LeftX", getLeftX());
+    table.log("LeftY", getLeftY());
+    table.log("CStickX", getCStickX());
+    table.log("CStickY", getCStickY());
+    table.log("LTrigger", getLTrigger());
+    table.log("RTrigger", getRTrigger());
+    table.log("AButton", getAButton());
+    table.log("XButton", getXButton());
+    table.log("BButton", getBButton());
+    table.log("YButton", getYButton());
+    table.log("HomeButton", getHomeButton());
+    table.log("StartButton", getStartButton());
+    table.log("ZLButton", getZLButton());
+    table.log("ZButton", getZButton());
+    table.log("DpadUpButton", getDpadUpButton());
+    table.log("DpadDownButton", getDpadDownButton());
+    table.log("DpadLeftButton", getDpadLeftButton());
+    table.log("DpadRightButton", getDpadRightButton());
+    table.log("CaptureButton", getCaptureButton());
+    table.log("CButton", getCButton());
+    table.log("LButton", getLButton());
+    table.log("RButton", getRButton());
   }
 }

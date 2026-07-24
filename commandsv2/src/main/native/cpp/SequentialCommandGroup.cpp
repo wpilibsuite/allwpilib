@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi::cmd;
 
@@ -85,8 +85,7 @@ void SequentialCommandGroup::AddCommands(
   }
 }
 
-void SequentialCommandGroup::InitSendable(wpi::util::SendableBuilder& builder) {
-  Command::InitSendable(builder);
-  builder.AddIntegerProperty(
-      "index", [this] { return m_currentCommandIndex; }, nullptr);
+void SequentialCommandGroup::LogTo(wpi::TelemetryTable& table) const {
+  Command::LogTo(table);
+  table.Log("index", m_currentCommandIndex);
 }

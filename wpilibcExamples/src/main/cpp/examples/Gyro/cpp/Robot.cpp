@@ -22,9 +22,6 @@ class Robot : public wpi::TimedRobot {
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
     right.SetInverted(true);
-
-    wpi::util::SendableRegistry::AddChild(&drive, &left);
-    wpi::util::SendableRegistry::AddChild(&drive, &right);
   }
 
   /**

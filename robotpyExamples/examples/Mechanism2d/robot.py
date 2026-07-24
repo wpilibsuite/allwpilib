@@ -46,7 +46,7 @@ class MyRobot(wpilib.TimedRobot):
         )
 
         # post the mechanism to the dashboard
-        wpilib.SmartDashboard.put_data("Mech2d", self.mech)
+        wpilib.Telemetry.log("Mech2d", self.mech)
 
     def robot_periodic(self):
         # update the dashboard mechanism's state

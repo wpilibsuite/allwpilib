@@ -51,29 +51,23 @@ class MyRobot(wpilib.TimedRobot):
         )
 
         # Publish elements to dashboard.
-        wpilib.SmartDashboard.put_data("Single Solenoid", self.solenoid)
-        wpilib.SmartDashboard.put_data("Double Solenoid", self.double_solenoid)
-        wpilib.SmartDashboard.put_data("Compressor", self.compressor)
+        wpilib.Telemetry.log("Single Solenoid", self.solenoid)
+        wpilib.Telemetry.log("Double Solenoid", self.double_solenoid)
+        wpilib.Telemetry.log("Compressor", self.compressor)
 
     def teleop_periodic(self) -> None:
         # Publish some raw data
         # Get the pressure (in PSI) from the analog sensor connected to the PH.
         # This function is supported only on the PH!
         # On a PCM, this function will return 0.
-        wpilib.SmartDashboard.put_number(
-            "PH Pressure [PSI]", self.compressor.get_pressure()
-        )
+        wpilib.Telemetry.log("PH Pressure [PSI]", self.compressor.get_pressure())
         # Get compressor current draw.
-        wpilib.SmartDashboard.put_number(
-            "Compressor Current", self.compressor.get_current()
-        )
+        wpilib.Telemetry.log("Compressor Current", self.compressor.get_current())
         # Get whether the compressor is active.
-        wpilib.SmartDashboard.put_boolean(
-            "Compressor Active", self.compressor.is_enabled()
-        )
+        wpilib.Telemetry.log("Compressor Active", self.compressor.is_enabled())
         # Get the digital pressure switch connected to the PCM/PH.
         # The switch is open when the pressure is over ~120 PSI.
-        wpilib.SmartDashboard.put_boolean(
+        wpilib.Telemetry.log(
             "Pressure Switch", self.compressor.get_pressure_switch_value()
         )
 

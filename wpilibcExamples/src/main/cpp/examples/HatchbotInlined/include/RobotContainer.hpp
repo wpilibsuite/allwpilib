@@ -11,7 +11,7 @@
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/Commands.hpp"
 #include "wpi/commands2/button/CommandGamepad.hpp"
-#include "wpi/smartdashboard/SendableChooser.hpp"
+#include "wpi/tunable/Selectable.hpp"
 
 namespace ac = AutoConstants;
 
@@ -27,6 +27,8 @@ class RobotContainer {
   RobotContainer();
 
   wpi::cmd::Command* GetAutonomousCommand();
+
+  void UpdateTelemetry() const;
 
  private:
   // The driver's controller
@@ -45,7 +47,7 @@ class RobotContainer {
   wpi::cmd::CommandPtr complexAuto = autos::ComplexAuto(&drive, &hatch);
 
   // The chooser for the autonomous routines
-  wpi::SendableChooser<wpi::cmd::Command*> chooser;
+  wpi::Selectable<wpi::cmd::Command*> chooser;
 
   void ConfigureButtonBindings();
 };

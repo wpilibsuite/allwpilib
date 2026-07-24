@@ -111,6 +111,36 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
+            class_name = "DataLogTelemetryBackend",
+            yml_file = "semiwrap/DataLogTelemetryBackend.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/backend/DataLogTelemetryBackend.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::backend::DataLogTelemetryBackend", "wpi__backend__DataLogTelemetryBackend.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "NetworkTablesTelemetryBackend",
+            yml_file = "semiwrap/NetworkTablesTelemetryBackend.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/backend/NetworkTablesTelemetryBackend.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::backend::NetworkTablesTelemetryBackend", "wpi__backend__NetworkTablesTelemetryBackend.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "NetworkTablesTunableBackend",
+            yml_file = "semiwrap/NetworkTablesTunableBackend.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/backend/NetworkTablesTunableBackend.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::backend::NetworkTablesTunableBackend", "wpi__backend__NetworkTablesTunableBackend.hpp"),
+            ],
+        ),
+        struct(
             class_name = "EdgeConfiguration",
             yml_file = "semiwrap/EdgeConfiguration.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -1148,48 +1178,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "SendableBuilderImpl",
-            yml_file = "semiwrap/SendableBuilderImpl.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/smartdashboard/SendableBuilderImpl.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::SendableBuilderImpl", "wpi__SendableBuilderImpl.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "SendableChooser",
-            yml_file = "semiwrap/SendableChooser.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/smartdashboard/SendableChooser.hpp",
-            tmpl_class_names = [
-                ("SendableChooser_tmpl1", "SendableChooser"),
-            ],
-            trampolines = [
-                ("wpi::SendableChooser", "wpi__SendableChooser.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "SendableChooserBase",
-            yml_file = "semiwrap/SendableChooserBase.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/smartdashboard/SendableChooserBase.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::SendableChooserBase", "wpi__SendableChooserBase.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "SmartDashboard",
-            yml_file = "semiwrap/SmartDashboard.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/smartdashboard/SmartDashboard.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::SmartDashboard", "wpi__SmartDashboard.hpp"),
-            ],
-        ),
-        struct(
             class_name = "SysIdRoutineLog",
             yml_file = "semiwrap/SysIdRoutineLog.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -1317,7 +1305,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
     gen_libinit(
         name = "wpilib.gen_lib_init",
         output_file = "src/main/python/wpilib/_init__wpilib.py",
-        modules = ["native.wpilib._init_robotpy_native_wpilib", "hal._init__wpi_hal", "wpiutil._init__wpiutil", "ntcore._init__ntcore", "wpimath._init__wpimath"],
+        modules = ["native.wpilib._init_robotpy_native_wpilib", "hal._init__wpi_hal", "wpiutil._init__wpiutil", "ntcore._init__ntcore", "wpimath._init__wpimath", "telemetry._init__telemetry", "tunable._init__tunable"],
     )
 
     gen_pkgconf(
@@ -1348,6 +1336,8 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             "//datalog:robotpy-native-datalog.copy_headers",
             "//hal:robotpy-native-wpihal.copy_headers",
             "//ntcore:robotpy-native-ntcore.copy_headers",
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunable:robotpy-native-tunable.copy_headers",
             "//wpilibc:robotpy-native-wpilib.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpinet:robotpy-native-wpinet.copy_headers",
@@ -1370,6 +1360,10 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             "//hal:wpihal_pybind_library",
             "//ntcore:ntcore",
             "//ntcore:ntcore_pybind_library",
+            "//telemetry:telemetry",
+            "//telemetry:telemetry_pybind_library",
+            "//tunable:tunable",
+            "//tunable:tunable_pybind_library",
             "//wpilibc:wpilibc",
             "//wpimath:wpimath",
             "//wpimath:wpimath_pybind_library",
@@ -1379,6 +1373,8 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         dynamic_deps = [
             "//hal:shared/wpiHal",
             "//ntcore:shared/ntcore",
+            "//telemetry:shared/telemetry",
+            "//tunable:shared/tunable",
             "//wpilibc:shared/wpilibc",
             "//wpimath:shared/wpimath",
             "//wpiutil:shared/wpiutil",
@@ -1909,16 +1905,6 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             ],
         ),
         struct(
-            class_name = "SendableChooserSim",
-            yml_file = "semiwrap/simulation/SendableChooserSim.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/SendableChooserSim.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::sim::SendableChooserSim", "wpi__sim__SendableChooserSim.hpp"),
-            ],
-        ),
-        struct(
             class_name = "SharpIRSim",
             yml_file = "semiwrap/simulation/SharpIRSim.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -2029,6 +2015,8 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             "//datalog:robotpy-native-datalog.copy_headers",
             "//hal:robotpy-native-wpihal.copy_headers",
             "//ntcore:robotpy-native-ntcore.copy_headers",
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunable:robotpy-native-tunable.copy_headers",
             "//wpilibc:robotpy-native-wpilib.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpinet:robotpy-native-wpinet.copy_headers",
@@ -2050,6 +2038,10 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             "//hal:wpihal_pybind_library",
             "//ntcore:ntcore",
             "//ntcore:ntcore_pybind_library",
+            "//telemetry:telemetry",
+            "//telemetry:telemetry_pybind_library",
+            "//tunable:tunable",
+            "//tunable:tunable_pybind_library",
             "//wpilibc:wpilib_pybind_library",
             "//wpilibc:wpilibc",
             "//wpimath:wpimath",
@@ -2060,6 +2052,8 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
         dynamic_deps = [
             "//hal:shared/wpiHal",
             "//ntcore:shared/ntcore",
+            "//telemetry:shared/telemetry",
+            "//tunable:shared/tunable",
             "//wpilibc:shared/wpilibc",
             "//wpimath:shared/wpimath",
             "//wpiutil:shared/wpiutil",
@@ -2136,6 +2130,10 @@ def define_pybind_library(name, pkgcfgs = []):
         deps = [
             "//hal:robotpy-hal",
             "//ntcore:pyntcore",
+            "//telemetry:robotpy-native-telemetry",
+            "//telemetry:robotpy-telemetry",
+            "//tunable:robotpy-native-tunable",
+            "//tunable:robotpy-tunable",
             "//wpilibc:robotpy-native-wpilib",
             "//wpimath:robotpy-wpimath",
             "//wpiutil:robotpy-wpiutil",
@@ -2147,7 +2145,7 @@ def define_pybind_library(name, pkgcfgs = []):
         summary = "Binary wrapper for WPILib",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
-        requires = ["robotpy-native-wpilib==0.0.0", "robotpy-wpiutil==0.0.0", "robotpy-wpimath==0.0.0", "robotpy-hal==0.0.0", "pyntcore==0.0.0", "robotpy-cli~=2027.0.0a1", "pytest>=3.9", "pytest-reraise"],
+        requires = ["robotpy-native-wpilib==0.0.0", "robotpy-telemetry==0.0.0", "robotpy-tunable==0.0.0", "robotpy-native-telemetry==0.0.0", "robotpy-native-tunable==0.0.0", "robotpy-wpiutil==0.0.0", "robotpy-wpimath==0.0.0", "robotpy-hal==0.0.0", "pyntcore==0.0.0", "robotpy-cli~=2027.0.0a1", "pytest>=3.9", "pytest-reraise"],
         python_requires = ">=3.11",
         entry_points = {
             "pkg_config": ["wpilib = wpilib", "wpilib_simulation = wpilib.simulation"],
@@ -2163,6 +2161,8 @@ def define_pybind_library(name, pkgcfgs = []):
             "//datalog:robotpy-native-datalog.copy_headers",
             "//hal:robotpy-native-wpihal.copy_headers",
             "//ntcore:robotpy-native-ntcore.copy_headers",
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunable:robotpy-native-tunable.copy_headers",
             "//wpilibc:robotpy-native-wpilib.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpinet:robotpy-native-wpinet.copy_headers",
@@ -2177,7 +2177,7 @@ def define_pybind_library(name, pkgcfgs = []):
     scan_headers(
         name = "{}-scan-headers".format(name),
         extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
-            "//wpilibc:robotpy-native-wpilib.copy_headers",
+            "//telemetry:robotpy-native-telemetry.copy_headers","//tunable:robotpy-native-tunable.copy_headers","//wpilibc:robotpy-native-wpilib.copy_headers",
         ],
         package_root_file = "src/main/python/wpilib/__init__.py",
         pkgcfgs = pkgcfgs,

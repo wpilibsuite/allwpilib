@@ -19,7 +19,8 @@
 
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/PrintCommand.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 namespace wpi::cmd {
 /**
@@ -117,19 +118,11 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
     return m_interruptBehavior;
   }
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override {
-    Command::InitSendable(builder);
+  void LogTo(wpi::TelemetryTable& table) const override {
+    Command::LogTo(table);
 
-    builder.AddStringProperty(
-        "selected",
-        [this] {
-          if (m_selectedCommand) {
-            return m_selectedCommand->GetName();
-          } else {
-            return std::string{"null"};
-          }
-        },
-        nullptr);
+    table.Log("selected", m_selectedCommand ? m_selectedCommand->GetName()
+                                            : std::string{"null"});
   }
 
  private:

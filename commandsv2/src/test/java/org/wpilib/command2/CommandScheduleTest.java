@@ -12,8 +12,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
-import org.wpilib.networktables.NetworkTableInstance;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.tunable.MockTunableBackend;
+import org.wpilib.tunable.TunableRegistry;
+import org.wpilib.tunable.Tunables;
 
 class CommandScheduleTest extends CommandTestBase {
   @Test
@@ -120,25 +121,24 @@ class CommandScheduleTest extends CommandTestBase {
   }
 
   @Test
-  void smartDashboardCancelTest() {
-    try (CommandScheduler scheduler = new CommandScheduler();
-        var inst = NetworkTableInstance.create()) {
-      SmartDashboard.setNetworkTableInstance(inst);
-      SmartDashboard.putData("Scheduler", scheduler);
-      SmartDashboard.updateValues();
+  void tunableCancelTest() {
+    var backend = new MockTunableBackend();
+    TunableRegistry.registerBackend("", backend);
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      Tunables.publish("Scheduler", scheduler);
 
       MockCommandHolder holder = new MockCommandHolder(true);
       Command mockCommand = holder.getMock();
       scheduler.schedule(mockCommand);
       scheduler.run();
-      SmartDashboard.updateValues();
       assertTrue(scheduler.isScheduled(mockCommand));
 
-      var table = inst.getTable("SmartDashboard");
-      table.getEntry("Scheduler/Cancel").setIntegerArray(new long[] {mockCommand.hashCode()});
-      SmartDashboard.updateValues();
+      backend.setArray("/Scheduler/Cancel", new long[] {mockCommand.hashCode()});
+      TunableRegistry.update();
       scheduler.run();
       assertFalse(scheduler.isScheduled(mockCommand));
+    } finally {
+      TunableRegistry.reset();
     }
   }
 }

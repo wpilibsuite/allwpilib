@@ -9,15 +9,14 @@ import org.wpilib.hardware.hal.PowerDistributionFaults;
 import org.wpilib.hardware.hal.PowerDistributionJNI;
 import org.wpilib.hardware.hal.PowerDistributionStickyFaults;
 import org.wpilib.hardware.hal.PowerDistributionVersion;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Class for getting voltage, current, temperature, power and energy from the CTRE Power
  * Distribution Panel (PDP) or REV Power Distribution Hub (PDH) over CAN.
  */
-public class PowerDistribution implements Sendable, AutoCloseable {
+public class PowerDistribution implements TelemetryLoggable, AutoCloseable {
   private final int m_handle;
   private final int m_module;
 
@@ -46,7 +45,6 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @param module The CAN ID of the PDP/PDH.
    * @param moduleType Module type (CTRE or REV).
    */
-  @SuppressWarnings("this-escape")
   public PowerDistribution(int busId, int module, ModuleType moduleType) {
     m_handle = PowerDistributionJNI.initialize(busId, module, moduleType.value);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
@@ -56,7 +54,6 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     } else {
       HAL.reportUsage("PDH", m_module, "");
     }
-    SendableRegistry.add(this, "PowerDistribution", m_module);
   }
 
   /**
@@ -66,7 +63,6 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    *
    * @param busId The bus ID
    */
-  @SuppressWarnings("this-escape")
   public PowerDistribution(int busId) {
     m_handle =
         PowerDistributionJNI.initialize(busId, kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);
@@ -77,14 +73,10 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     } else {
       HAL.reportUsage("PowerDistribution", m_module, "Rev");
     }
-
-    SendableRegistry.add(this, "PowerDistribution", m_module);
   }
 
   @Override
-  public void close() {
-    SendableRegistry.remove(this);
-  }
+  public void close() {}
 
   /**
    * Gets the number of channels for this power distribution object.
@@ -131,9 +123,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @return The current of each channel in Amperes
    */
   public double[] getAllCurrents() {
-    double[] currents = new double[getNumChannels()];
-    PowerDistributionJNI.getAllCurrents(m_handle, currents);
-    return currents;
+    return PowerDistributionJNI.getAllCurrents(m_handle);
   }
 
   /**
@@ -254,21 +244,15 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("PowerDistribution");
-    int numChannels = getNumChannels();
-    for (int i = 0; i < numChannels; ++i) {
-      final int chan = i;
-      builder.addDoubleProperty(
-          "Chan" + i, () -> PowerDistributionJNI.getChannelCurrentNoError(m_handle, chan), null);
-    }
-    builder.addDoubleProperty(
-        "Voltage", () -> PowerDistributionJNI.getVoltageNoError(m_handle), null);
-    builder.addDoubleProperty(
-        "TotalCurrent", () -> PowerDistributionJNI.getTotalCurrent(m_handle), null);
-    builder.addBooleanProperty(
-        "SwitchableChannel",
-        () -> PowerDistributionJNI.getSwitchableChannelNoError(m_handle),
-        value -> PowerDistributionJNI.setSwitchableChannel(m_handle, value));
+  public void logTo(TelemetryTable table) {
+    table.log("Current", PowerDistributionJNI.getAllCurrentsNoError(m_handle));
+    table.log("Voltage", PowerDistributionJNI.getVoltageNoError(m_handle));
+    table.log("TotalCurrent", PowerDistributionJNI.getTotalCurrent(m_handle));
+    table.log("SwitchableChannel", PowerDistributionJNI.getSwitchableChannelNoError(m_handle));
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "PowerDistribution";
   }
 }

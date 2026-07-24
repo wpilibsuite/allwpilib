@@ -30,9 +30,10 @@ import org.wpilib.framework.RobotBase;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.system.Watchdog;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.tunable.ComplexTunable;
+import org.wpilib.tunable.TunableTable;
 
 /**
  * The scheduler responsible for running {@link Command}s. A Command-based robot should call {@link
@@ -43,7 +44,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  *
  * <p>This class is provided by the Commands v2 VendorDep
  */
-public final class CommandScheduler implements Sendable, AutoCloseable {
+public final class CommandScheduler implements TelemetryLoggable, ComplexTunable, AutoCloseable {
   /** The Singleton Instance. */
   private static CommandScheduler instance;
 
@@ -98,8 +99,11 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
   CommandScheduler() {
     HAL.reportUsage("CommandScheduler", "");
-    SendableRegistry.add(this, "Scheduler");
   }
+
+  /** Closes this command scheduler. */
+  @Override
+  public void close() {}
 
   /**
    * Changes the period of the loop overrun watchdog. This should be kept in sync with the
@@ -109,11 +113,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    */
   public void setPeriod(double period) {
     m_watchdog.setTimeout(period);
-  }
-
-  @Override
-  public void close() {
-    SendableRegistry.remove(this);
   }
 
   /**
@@ -742,35 +741,35 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Scheduler");
-    builder.addStringArrayProperty(
-        "Names",
-        () -> {
-          String[] names = new String[m_scheduledCommands.size()];
-          int i = 0;
-          for (Command command : m_scheduledCommands) {
-            names[i] = command.getName();
-            i++;
-          }
-          return names;
-        },
-        null);
-    builder.addIntegerArrayProperty(
-        "Ids",
-        () -> {
-          long[] ids = new long[m_scheduledCommands.size()];
-          int i = 0;
-          for (Command command : m_scheduledCommands) {
-            ids[i] = command.hashCode();
-            i++;
-          }
-          return ids;
-        },
-        null);
-    builder.addIntegerArrayProperty(
+  public void logTo(TelemetryTable table) {
+    String[] names = new String[m_scheduledCommands.size()];
+    int i = 0;
+    for (Command command : m_scheduledCommands) {
+      names[i] = command.getName();
+      i++;
+    }
+    table.log("Names", names);
+
+    long[] ids = new long[m_scheduledCommands.size()];
+    i = 0;
+    for (Command command : m_scheduledCommands) {
+      ids[i] = command.hashCode();
+      i++;
+    }
+    table.log("Ids", ids);
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Scheduler";
+  }
+
+  @Override
+  public void publishTunable(TunableTable table) {
+    final long[] empty = {};
+    table.publishValue(
         "Cancel",
-        () -> new long[] {},
+        () -> empty,
         toCancel -> {
           Map<Long, Command> ids = new LinkedHashMap<>();
           for (Command command : m_scheduledCommands) {
@@ -780,6 +779,12 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
           for (long hash : toCancel) {
             cancel(ids.get(hash));
           }
-        });
+        },
+        long[].class);
+  }
+
+  @Override
+  public String getTunableType() {
+    return "Scheduler";
   }
 }

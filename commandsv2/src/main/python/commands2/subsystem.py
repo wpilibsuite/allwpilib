@@ -3,17 +3,17 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable, Optional
+from typing import TYPE_CHECKING, Any, Callable, Optional
 from typing_extensions import Self
 
 if TYPE_CHECKING:
     from .command import Command
     from .commandscheduler import CommandScheduler
 
-from wpiutil import Sendable, SendableBuilder, SendableRegistry
+from wpilib import TelemetryLoggable, TelemetryTable
 
 
-class Subsystem(Sendable):
+class Subsystem(TelemetryLoggable):
     """
     A robot subsystem. Subsystems are the basic unit of robot organization in the Command-based
     framework; they encapsulate low-level hardware objects (motor controllers, sensors, etc.) and
@@ -30,8 +30,8 @@ class Subsystem(Sendable):
 
     def __new__(cls, *arg, **kwargs) -> Self:
         instance = super().__new__(cls)
-        super().__init__(instance)
-        SendableRegistry.add(instance, cls.__name__, cls.__name__)
+        instance._name = cls.__name__
+        instance._subsystem = cls.__name__
         # add to the scheduler
         from .commandscheduler import CommandScheduler
 
@@ -190,13 +190,13 @@ class Subsystem(Sendable):
 
         :returns: Name
         """
-        return SendableRegistry.get_name(self)
+        return self._name
 
     def set_name(self, name: str) -> None:
         """
         Set the name of this Subsystem.
         """
-        SendableRegistry.set_name(self, name)
+        self._name = name
 
     def get_subsystem(self) -> str:
         """
@@ -204,7 +204,7 @@ class Subsystem(Sendable):
 
         :returns: Subsystem name
         """
-        return SendableRegistry.get_subsystem(self)
+        return self._subsystem
 
     def set_subsystem(self, subsystem: str):
         """
@@ -212,25 +212,23 @@ class Subsystem(Sendable):
 
         :param subsystem: subsystem name
         """
-        SendableRegistry.set_subsystem(self, subsystem)
+        self._subsystem = subsystem
 
-    def add_child(self, name: str, child: Sendable) -> None:
+    def add_child(self, name: str, child: Any) -> None:
         """
-        Associates a :class:`wpiutil.Sendable` with this Subsystem. Also update the child's name.
+        Associates a named child with this Subsystem when the child exposes naming methods.
 
         :param name:  name to give child
         :param child: sendable
         """
-        SendableRegistry.add(child, self.get_subsystem(), name)
+        if hasattr(child, "set_name"):
+            child.set_name(name)
+        if hasattr(child, "set_subsystem"):
+            child.set_subsystem(self.get_subsystem())
 
-    def init_sendable(self, builder: SendableBuilder) -> None:
-        builder.set_smart_dashboard_type("Subsystem")
-
-        builder.add_boolean_property(
-            ".hasDefault",
-            lambda: self.get_default_command() is not None,
-            lambda _: None,
-        )
+    def log_to(self, table: TelemetryTable) -> None:
+        default = self.get_default_command()
+        table.log(".hasDefault", default is not None)
 
         def get_default():
             command = self.get_default_command()
@@ -238,12 +236,9 @@ class Subsystem(Sendable):
                 return command.get_name()
             return "none"
 
-        builder.add_string_property(".default", get_default, lambda _: None)
-        builder.add_boolean_property(
-            ".hasCommand",
-            lambda: self.get_current_command() is not None,
-            lambda _: None,
-        )
+        table.log(".default", get_default())
+        current = self.get_current_command()
+        table.log(".hasCommand", current is not None)
 
         def get_current():
             command = self.get_current_command()
@@ -251,4 +246,7 @@ class Subsystem(Sendable):
                 return command.get_name()
             return "none"
 
-        builder.add_string_property(".command", get_current, lambda _: None)
+        table.log(".command", get_current())
+
+    def get_telemetry_type(self) -> str:
+        return "Subsystem"

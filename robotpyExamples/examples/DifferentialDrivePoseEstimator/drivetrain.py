@@ -107,8 +107,8 @@ class Drivetrain:
         self.left_encoder.reset()
         self.right_encoder.reset()
 
-        wpilib.SmartDashboard.put_data("Field", self.field_sim)
-        wpilib.SmartDashboard.put_data("FieldEstimation", self.field_approximation)
+        wpilib.Telemetry.log("Field", self.field_sim)
+        wpilib.Telemetry.log("FieldEstimation", self.field_approximation)
 
     def set_velocities(
         self, velocities: wpimath.DifferentialDriveWheelVelocities

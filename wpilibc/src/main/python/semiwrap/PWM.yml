@@ -1,21 +1,22 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
+- wpi/telemetry/TelemetryTable.hpp
 - wpi/hardware/led/AddressableLED.hpp
 - wpi/util/SmallString.hpp
 
 classes:
   wpi::PWM:
     ignored_bases:
-    - wpi::util::SendableHelper<PWM>
+    - wpi::TelemetryLoggable  # TODO(telemetry PR)
     methods:
       PWM:
       SetPulseTime:
       GetPulseTime:
       SetDisabled:
       GetChannel:
-      InitSendable:
       SetOutputPeriod:
       SetSimDevice:
+      LogTo:
+      GetTelemetryType:
 
 inline_code: |
   cls_PWM

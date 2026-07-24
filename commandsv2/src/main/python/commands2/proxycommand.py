@@ -1,7 +1,7 @@
 # validated: 2024-01-19 DS 192a28af4731 ProxyCommand.java
 from __future__ import annotations
 
-from wpiutil import SendableBuilder
+from wpilib import TelemetryTable
 
 from .command import Command
 
@@ -58,10 +58,9 @@ class ProxyCommand(Command):
         """
         return True
 
-    def init_sendable(self, builder: SendableBuilder):
-        super().init_sendable(builder)
-        builder.add_string_property(
+    def log_to(self, table: TelemetryTable) -> None:
+        super().log_to(table)
+        table.log(
             "proxied",
-            lambda: "null" if self._command is None else self._command.get_name(),
-            lambda _: None,
+            "null" if self._command is None else self._command.get_name(),
         )

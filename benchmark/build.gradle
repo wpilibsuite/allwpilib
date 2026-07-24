@@ -55,6 +55,8 @@ dependencies {
     implementation project(':epilogue-runtime')
     implementation project(':hal')
     implementation project(':ntcore')
+    implementation project(':telemetry')
+    implementation project(':tunable')
     implementation project(':wpilibj')
     implementation project(':commandsv2')
     implementation project(':wpimath')
@@ -230,6 +232,8 @@ model {
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunable', library: 'tunable', linkage: 'shared'
                 if (binary.targetPlatform.operatingSystem.isWindows()) {
                     // Shlwapi.lib is needed for SHGetValueA() inside thirdparty benchmark
                     binary.linker.args << "Shlwapi.lib"
@@ -279,6 +283,8 @@ model {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'static'
+                lib project: ':tunable', library: 'tunable', linkage: 'static'
                 if (binary.targetPlatform.operatingSystem.isWindows()) {
                     // Shlwapi.lib is needed for SHGetValueA() inside thirdparty benchmark
                     binary.linker.args << "Shlwapi.lib"

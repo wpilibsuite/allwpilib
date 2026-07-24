@@ -1,0 +1,134 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:defs.bzl", "cc_test")
+load("@rules_java//java:defs.bzl", "java_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
+load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
+load("//tunable:robotpy_native_build_info.bzl", "define_native_wrapper")
+load("//tunable:robotpy_pybind_build_info.bzl", "define_pybind_library", "tunable_extension")
+
+wpilib_cc_library(
+    name = "tunable",
+    srcs = glob(
+        ["src/main/native/cpp/**"],
+        exclude = ["src/main/native/cpp/jni/**"],
+    ),
+    hdrs = glob(["src/main/native/include/**"]),
+    includes = [
+        "src/main/native/cpp",
+        "src/main/native/include",
+    ],
+    strip_include_prefix = "src/main/native/include",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiutil",
+    ],
+)
+
+java_library(
+    name = "tunable-java",
+    srcs = glob(["src/main/java/**/*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiutil:wpiutil-java",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+    ],
+)
+
+cc_test(
+    name = "tunable-cpp-test",
+    size = "small",
+    srcs = glob(["src/test/native/**/*.cpp"]),
+    tags = [
+        "exclusive",
+        "no-asan",
+        "no-tsan",
+    ],
+    deps = [
+        ":tunable",
+        "//thirdparty/googletest",
+        "//wpiutil:wpiutil-testlib",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/tunable",
+    dynamic_deps = [
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":tunable",
+    ],
+)
+
+wpilib_cc_static_library(
+    name = "static/tunable",
+    static_deps = [
+        "//wpiutil:static/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":tunable",
+    ],
+)
+
+wpilib_java_junit5_test(
+    name = "tunable-java-test",
+    srcs = glob(["src/test/java/**/*.java"]),
+    tags = ["exclusive"],
+    deps = [
+        ":tunable-java",
+        "//wpiutil:wpiutil-java",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+    ],
+)
+
+generate_robotpy_native_wrapper_build_info(
+    name = "robotpy-native-tunable-generator",
+    pyproject_toml = "src/main/python/native-pyproject.toml",
+)
+
+define_native_wrapper(
+    name = "robotpy-native-tunable",
+    pyproject_toml = "src/main/python/native-pyproject.toml",
+)
+
+PYBIND_PKGCFG_DEPS = [
+    "//tunable:native/tunable/robotpy-native-tunable.pc",
+    "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+    "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
+]
+
+generate_robotpy_pybind_build_info(
+    name = "robotpy-tunable-generator",
+    additional_srcs = [":robotpy-native-tunable.copy_headers"],
+    package_root_file = "src/main/python/tunable/__init__.py",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+    yaml_files = glob(["src/main/python/semiwrap/*.yml"]),
+)
+
+tunable_extension(
+    srcs = glob(["src/main/python/tunable/src/**/*.cpp"]),
+    extra_hdrs = glob(["src/main/python/tunable/src/**/*.h"]),
+    includes = [
+        "src/main/python/tunable",
+        "src/main/python/tunable/src",
+    ],
+)
+
+define_pybind_library(
+    name = "robotpy-tunable",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+)
+
+robotpy_py_test(
+    "python_tests",
+    srcs = glob(["src/test/python/**/*.py"]),
+    tags = ["exclusive"],
+    deps = [
+        ":robotpy-tunable",
+        requirement("pytest"),
+    ],
+)

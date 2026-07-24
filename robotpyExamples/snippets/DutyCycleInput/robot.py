@@ -23,5 +23,5 @@ class MyRobot(wpilib.TimedRobot):
         # 1 is fully on, 0 is fully off
         output = self.duty_cycle.get_output()
 
-        wpilib.SmartDashboard.put_number("Frequency", frequency)
-        wpilib.SmartDashboard.put_number("Duty Cycle", output)
+        wpilib.Telemetry.log("Frequency", frequency)
+        wpilib.Telemetry.log("Duty Cycle", output)

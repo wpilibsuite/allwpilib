@@ -6,9 +6,8 @@
 
 #include "wpi/hal/Encoder.h"
 #include "wpi/hardware/discrete/CounterBase.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/util/Handle.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 /**
@@ -26,9 +25,7 @@ namespace wpi {
  * All encoders will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Encoder : public CounterBase,
-                public wpi::util::Sendable,
-                public wpi::util::SendableHelper<Encoder> {
+class Encoder : public CounterBase, public wpi::TelemetryLoggable {
  public:
   /**
    * Encoder constructor.
@@ -175,7 +172,9 @@ class Encoder : public CounterBase,
 
   int GetFPGAIndex() const;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   /**
@@ -206,6 +205,7 @@ class Encoder : public CounterBase,
   double DecodingScaleFactor() const;
 
   wpi::util::Handle<HAL_EncoderHandle, HAL_FreeEncoder> m_encoder;
+  EncodingType m_type;
 };
 
 }  // namespace wpi

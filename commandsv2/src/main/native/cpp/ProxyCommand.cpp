@@ -8,7 +8,7 @@
 #include <string>
 #include <utility>
 
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi::cmd;
 
@@ -41,16 +41,7 @@ bool ProxyCommand::IsFinished() {
   return m_command == nullptr || !m_command->IsScheduled();
 }
 
-void ProxyCommand::InitSendable(wpi::util::SendableBuilder& builder) {
-  Command::InitSendable(builder);
-  builder.AddStringProperty(
-      "proxied",
-      [this] {
-        if (m_command) {
-          return m_command->GetName();
-        } else {
-          return std::string{"null"};
-        }
-      },
-      nullptr);
+void ProxyCommand::LogTo(wpi::TelemetryTable& table) const {
+  Command::LogTo(table);
+  table.Log("proxied", m_command ? m_command->GetName() : std::string{"null"});
 }
