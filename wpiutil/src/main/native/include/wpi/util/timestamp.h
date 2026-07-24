@@ -21,6 +21,11 @@ uint64_t WPI_NowDefault(void);
  * Set the implementation used by WPI_Now().
  * The implementation must return monotonic time in microseconds to maintain
  * the contract of WPI_Now().
+ * The program start time is reset to the current time when this is called by
+ * calling the new implementation.
+ * Passing the WPI_NowDefault function explicitly sets that implementation and
+ * resets the program start time to the current time. To restore the default
+ * implementation and original program start time, pass NULL.
  * @param func Function called by WPI_Now() to return the time.
  */
 void WPI_SetNowImpl(uint64_t (*func)(void));
@@ -31,6 +36,17 @@ void WPI_SetNowImpl(uint64_t (*func)(void));
  * @return Time in microseconds.
  */
 uint64_t WPI_Now(void);
+
+/**
+ * Return the timestamp at which the program started.
+ * This uses the same time base as WPI_Now(), in microseconds.
+ * This is reset to the current time when WPI_SetNowImpl() is called with a
+ * non-NULL implementation; if WPI_SetNowImpl(NULL) is called, it is reset to
+ * the original program start time.
+ *
+ * @return Program start time in microseconds.
+ */
+uint64_t WPI_GetProgramStartTime(void);
 
 /**
  * Return the current system time in microseconds since the Unix epoch

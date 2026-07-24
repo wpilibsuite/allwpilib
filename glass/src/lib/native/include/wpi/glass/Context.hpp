@@ -23,14 +23,30 @@ Context* GetCurrentContext();
 void SetCurrentContext(Context* ctx);
 
 /**
- * Resets zero time to current time.
+ * Resets timestamp display start time to current time.
  */
 void ResetTime();
 
 /**
- * Gets the zero time.
+ * Gets the timestamp display start time.
  */
 uint64_t GetZeroTime();
+
+/**
+ * Converts a timestamp to the current display time base.
+ *
+ * @param time timestamp in microseconds
+ * @return display time in seconds
+ */
+double TimestampToDisplayTime(uint64_t time);
+
+/**
+ * Converts a timestamp to the current display time base.
+ *
+ * @param time timestamp in microseconds
+ * @return display time in seconds
+ */
+double TimestampToDisplayTime(int64_t time);
 
 /**
  * Resets the workspace (all storage except window storage).

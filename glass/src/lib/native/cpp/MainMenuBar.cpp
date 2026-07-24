@@ -46,6 +46,24 @@ void MainMenuBar::Display() {
 
   wpi::gui::EmitViewMenu();
 
+  if (ImGui::BeginMenu("View")) {
+    if (ImGui::BeginMenu("Timestamp Display")) {
+      bool selected =
+          gContext->timestampDisplayMode == TimestampDisplayMode::ZERO_START;
+      if (ImGui::MenuItem("Zero Start", nullptr, &selected)) {
+        gContext->timestampDisplayMode = TimestampDisplayMode::ZERO_START;
+        gContext->timestampDisplayModeStorage = kTimestampDisplayModeZeroStart;
+      }
+      selected = gContext->timestampDisplayMode == TimestampDisplayMode::ACTUAL;
+      if (ImGui::MenuItem("Actual Time", nullptr, &selected)) {
+        gContext->timestampDisplayMode = TimestampDisplayMode::ACTUAL;
+        gContext->timestampDisplayModeStorage = kTimestampDisplayModeActual;
+      }
+      ImGui::EndMenu();
+    }
+    ImGui::EndMenu();
+  }
+
   for (auto&& menu : m_menus) {
     if (menu) {
       menu();

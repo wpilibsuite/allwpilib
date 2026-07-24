@@ -11,6 +11,7 @@
 
 #include <imgui.h>
 
+#include "wpi/glass/Context.hpp"
 #include "wpi/glass/Model.hpp"
 #include "wpi/glass/View.hpp"
 #include "wpi/hal/HAL.h"
@@ -49,7 +50,7 @@ static void DisplayTiming() {
   }
   ImGui::PopButtonRepeat();
   ImGui::PushItemWidth(ImGui::GetFontSize() * 4);
-  ImGui::LabelText("Time", "%.3f", curTime / 1000000.0);
+  ImGui::LabelText("Time", "%.3f", wpi::glass::TimestampToDisplayTime(curTime));
   ImGui::PopItemWidth();
 
   static std::vector<HALSIM_NotifierInfo> notifiers;
@@ -96,7 +97,8 @@ static void DisplayTiming() {
         ImGui::PushStyleVar(
             ImGuiStyleVar_Alpha,
             1.0 - (curGuiTime - notifierFades[i].displayTime) / fadeDuration);
-        ImGui::Text("%.3f", notifierFades[i].alarmTime / 1000000.0);
+        ImGui::Text("%.3f", wpi::glass::TimestampToDisplayTime(
+                                notifierFades[i].alarmTime));
         ImGui::PopStyleVar();
       }
       ImGui::TableNextColumn();

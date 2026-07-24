@@ -18,9 +18,8 @@
 static std::atomic<bool> programStarted{false};
 static std::atomic<int64_t> programState{0};
 
-static std::atomic<uint64_t> programStartTime{0};
-static std::atomic<uint64_t> programPauseTime{0};
-static std::atomic<uint64_t> programStepTime{0};
+static std::atomic<int64_t> programPauseTime{0};
+static std::atomic<int64_t> programOffsetTime{0};
 static std::atomic<uint64_t> programStartNotifierAlarmCount{0};
 
 namespace wpi::hal::init {
@@ -31,11 +30,9 @@ void InitializeMockHooks() {
 
 namespace wpi::hal {
 void RestartTiming() {
-  programStartTime = wpi::util::NowDefault();
-  programStepTime = 0;
-  if (programPauseTime != 0) {
-    programPauseTime = programStartTime.load();
-  }
+  // Reinstall to set the program start time to the current simulated time
+  // without changing the simulated clock or pause state.
+  wpi::util::SetNowImpl(GetMonotonicTime);
 }
 
 void PauseTiming() {
@@ -46,7 +43,7 @@ void PauseTiming() {
 
 void ResumeTiming() {
   if (programPauseTime != 0) {
-    programStartTime += wpi::util::NowDefault() - programPauseTime;
+    programOffsetTime -= wpi::util::NowDefault() - programPauseTime;
     programPauseTime = 0;
   }
 }
@@ -56,15 +53,15 @@ bool IsTimingPaused() {
 }
 
 void StepTiming(uint64_t delta) {
-  programStepTime += delta;
+  programOffsetTime += delta;
 }
 
 uint64_t GetMonotonicTime() {
-  uint64_t curTime = programPauseTime;
+  int64_t curTime = programPauseTime;
   if (curTime == 0) {
     curTime = wpi::util::NowDefault();
   }
-  return curTime + programStepTime - programStartTime;
+  return static_cast<uint64_t>(curTime + programOffsetTime);
 }
 
 void SetProgramStarted(bool started) {

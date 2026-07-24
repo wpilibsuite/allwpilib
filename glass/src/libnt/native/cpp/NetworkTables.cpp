@@ -1977,8 +1977,7 @@ static void EmitEntry(NetworkTablesModel* model,
   if (flags & NetworkTablesFlags_ShowTimestamp) {
     ImGui::TableNextColumn();
     if (entry.value) {
-      ImGui::Text("%f", (entry.value.last_change() * 1.0e-6) -
-                            (GetZeroTime() * 1.0e-6));
+      ImGui::Text("%f", TimestampToDisplayTime(entry.value.last_change()));
     } else {
       ImGui::TextUnformatted("");
     }

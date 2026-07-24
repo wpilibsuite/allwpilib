@@ -133,4 +133,21 @@ class TimerTest {
     double end = Timer.getMonotonicTimestamp();
     assertEquals(start + 0.5, end, 1e-9);
   }
+
+  @Test
+  @ResourceLock("timing")
+  void restartTimingPreservesPausedClockTest() {
+    assertTrue(SimHooks.isTimingPaused());
+
+    SimHooks.stepTiming(0.5);
+    double beforeRestart = Timer.getMonotonicTimestamp();
+
+    SimHooks.restartTiming();
+
+    assertTrue(SimHooks.isTimingPaused());
+    assertEquals(beforeRestart, Timer.getMonotonicTimestamp(), 1e-9);
+
+    SimHooks.stepTiming(0.5);
+    assertEquals(beforeRestart + 0.5, Timer.getMonotonicTimestamp(), 1e-9);
+  }
 }
