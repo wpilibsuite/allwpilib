@@ -2,7 +2,13 @@ load("@rules_java//java:defs.bzl", "java_binary", "java_library")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
-load("//wpilibjExamples:example_projects.bzl", "COMMANDS_V2_FOLDERS", "EXAMPLE_FOLDERS", "EXAMPLE_TESTS_FOLDERS", "SNIPPET_FOLDERS", "SNIPPET_TESTS_FOLDERS", "TEMPLATE_FOLDERS")
+
+def first_level_folders(paths, prefix):
+    output = {}
+    for path in paths:
+        rel = path[len(prefix):]
+        output[rel.split("/", 1)[0]] = True
+    return sorted(output.keys())
 
 def _package_type(package_type):
     pkg_files(
@@ -27,10 +33,10 @@ def _package_type(package_type):
         tags = ["manual"],
     )
 
-def build_examples(halsim_deps):
+def build_examples(folders, halsim_deps):
     _package_type("examples")
 
-    for folder in EXAMPLE_FOLDERS:
+    for folder in folders:
         java_binary(
             name = folder + "-example",
             srcs = native.glob(["src/main/java/org/wpilib/examples/" + folder + "/**/*.java"]),
@@ -58,10 +64,10 @@ def build_examples(halsim_deps):
             tags = ["wpi-example"],
         )
 
-def build_commands():
+def build_commands(folders):
     _package_type("commands")
 
-    for folder in COMMANDS_V2_FOLDERS:
+    for folder in folders:
         java_library(
             name = folder + "-command",
             srcs = native.glob(["src/main/java/org/wpilib/commands/" + folder + "/**/*.java"]),
@@ -74,10 +80,10 @@ def build_commands():
             tags = ["wpi-example"],
         )
 
-def build_snippets():
+def build_snippets(folders):
     _package_type("snippets")
 
-    for folder in SNIPPET_FOLDERS:
+    for folder in folders:
         java_library(
             name = folder + "-snippet",
             srcs = native.glob(["src/main/java/org/wpilib/snippets/" + folder + "/**/*.java"]),
@@ -104,10 +110,10 @@ def build_snippets():
             tags = ["wpi-example"],
         )
 
-def build_templates():
+def build_templates(folders):
     _package_type("templates")
 
-    for folder in TEMPLATE_FOLDERS:
+    for folder in folders:
         java_library(
             name = folder + "-template",
             srcs = native.glob(["src/main/java/org/wpilib/templates/" + folder + "/**/*.java"]),
@@ -128,8 +134,8 @@ def build_templates():
             tags = ["wpi-example"],
         )
 
-def build_tests():
-    for folder in EXAMPLE_TESTS_FOLDERS:
+def build_tests(example_test_folders, snippet_test_folders):
+    for folder in example_test_folders:
         wpilib_java_junit5_test(
             name = folder + "-test",
             srcs = native.glob(["src/test/java/org/wpilib/examples/" + folder + "/**/*.java"]),
@@ -151,7 +157,7 @@ def build_tests():
             tags = ["wpi-example"],
         )
 
-    for folder in SNIPPET_TESTS_FOLDERS:
+    for folder in snippet_test_folders:
         wpilib_java_junit5_test(
             name = folder + "-test",
             srcs = native.glob(["src/test/java/org/wpilib/snippets/" + folder + "/**/*.java"]),
