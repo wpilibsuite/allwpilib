@@ -1,7 +1,7 @@
-load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_binary", "wpilib_java_junit5_test")
 load("//wpilibjExamples:example_projects.bzl", "COMMANDS_V2_FOLDERS", "EXAMPLE_FOLDERS", "EXAMPLE_TESTS_FOLDERS", "SNIPPET_FOLDERS", "SNIPPET_TESTS_FOLDERS", "TEMPLATE_FOLDERS")
 
 def _package_type(package_type):
@@ -31,10 +31,10 @@ def build_examples(halsim_deps):
     _package_type("examples")
 
     for folder in EXAMPLE_FOLDERS:
-        java_binary(
+        wpilib_java_binary(
             name = folder + "-example",
-            srcs = native.glob(["src/main/java/org/wpilib/examples/" + folder + "/**/*.java"]),
-            main_class = "org/wpilib/examples/" + folder + "/Main",
+            srcs = ["src/main/java/org/wpilib/Executor.java"] + native.glob(["src/main/java/org/wpilib/examples/" + folder + "/**/*.java"]),
+            main_class = "org.wpilib.Executor",
             plugins = [
                 "//epilogue-processor:plugin",
             ],
@@ -55,6 +55,9 @@ def build_examples(halsim_deps):
                 "//epilogue-runtime:epilogue-java",
                 "@bzlmodrio-opencv//libraries/java/opencv",
             ],
+            smoke_test = False,  # TODO(pjreiniger) enable smoke test when all examples actually boot correctly
+            halsim_deps = halsim_deps,
+            args = ["org.wpilib.examples." + folder + ".Robot"],
             tags = ["wpi-example"],
         )
 
@@ -74,13 +77,14 @@ def build_commands():
             tags = ["wpi-example"],
         )
 
-def build_snippets():
+def build_snippets(halsim_deps = []):
     _package_type("snippets")
 
     for folder in SNIPPET_FOLDERS:
-        java_library(
+        wpilib_java_binary(
             name = folder + "-snippet",
-            srcs = native.glob(["src/main/java/org/wpilib/snippets/" + folder + "/**/*.java"]),
+            srcs = ["src/main/java/org/wpilib/Executor.java"] + native.glob(["src/main/java/org/wpilib/snippets/" + folder + "/**/*.java"]),
+            main_class = "org.wpilib.Executor",
             plugins = [
                 "//epilogue-processor:plugin",
             ],
@@ -101,7 +105,10 @@ def build_snippets():
                 "//epilogue-runtime:epilogue-java",
                 "@bzlmodrio-opencv//libraries/java/opencv",
             ],
+            smoke_test = False,  # TODO(pjreiniger) enable smoke test when all examples actually boot correctly
+            halsim_deps = halsim_deps,
             tags = ["wpi-example"],
+            args = ["org.wpilib.snippets." + folder + ".Robot"],
         )
 
 def build_templates():
@@ -137,7 +144,11 @@ def build_tests():
                 "//epilogue-processor:plugin",
             ],
             deps = [
-                ":" + folder + "-example",
+                # -example is an sh_binary wrapper (see wpilib_java_binary);
+                # its _java_impl sub-target is the underlying java_binary and
+                # is what actually provides JavaInfo (the Robot class) for
+                # compilation here.
+                ":" + folder + "-example_java_impl",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
                 "//wpilibj:wpilibj-java",
@@ -159,7 +170,11 @@ def build_tests():
                 "//epilogue-processor:plugin",
             ],
             deps = [
-                ":" + folder + "-snippet",
+                # -snippet is an sh_binary wrapper (see wpilib_java_binary);
+                # its _java_impl sub-target is the underlying java_binary and
+                # is what actually provides JavaInfo (the Robot class) for
+                # compilation here.
+                ":" + folder + "-snippet_java_impl",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
                 "//wpilibj:wpilibj-java",

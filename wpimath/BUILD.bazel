@@ -285,6 +285,7 @@ cc_test(
 
 wpilib_java_junit5_test(
     name = "wpimath-java-test",
+    size = "medium",
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":wpimath-java",
