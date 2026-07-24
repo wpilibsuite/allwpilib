@@ -138,23 +138,9 @@ HAL_Bool HAL_GetSystemTimeValid(int32_t* status);
  * any statically initialized variables in a program MUST call this function in
  * their constructors if they want to use other HAL calls.
  *
- * The common parameters are 500 for timeout and 0 for mode.
- *
- * This function is safe to call from any thread, and as many times as you wish.
- * It internally guards from any reentrancy.
- *
- * The applicable modes are:
- *   0: Try to kill an existing HAL from another program, if not successful,
- * error.
- *   1: Force kill a HAL from another program.
- *   2: Just warn if another hal exists and cannot be killed. Will likely result
- * in undefined behavior.
- *
- * @param timeout the initialization timeout (ms)
- * @param mode    the initialization mode (see remarks)
  * @return true if initialization was successful, otherwise false.
  */
-HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode);
+HAL_Bool HAL_Initialize(void);
 
 /**
  * Call this to shut down HAL.

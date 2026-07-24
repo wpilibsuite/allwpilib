@@ -19,7 +19,7 @@ class EncoderSimTest {
 
   @Test
   void testRate() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (Encoder encoder = new Encoder(0, 1)) {
       EncoderSim sim = new EncoderSim(encoder);
@@ -39,7 +39,7 @@ class EncoderSimTest {
 
   @Test
   void testResetDataClearsRateCallbacks() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (Encoder encoder = new Encoder(0, 1)) {
       EncoderSim sim = new EncoderSim(encoder);
@@ -60,7 +60,7 @@ class EncoderSimTest {
 
   @Test
   void testCount() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (Encoder encoder = new Encoder(0, 1)) {
       EncoderSim sim = new EncoderSim(encoder);
@@ -82,7 +82,7 @@ class EncoderSimTest {
 
   @Test
   void testDistance() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (Encoder encoder = new Encoder(0, 1)) {
       EncoderSim sim = new EncoderSim(encoder);
@@ -98,7 +98,7 @@ class EncoderSimTest {
 
   @Test
   void testDistancePerPulse() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (Encoder encoder = new Encoder(0, 1)) {
       EncoderSim sim = new EncoderSim(encoder);

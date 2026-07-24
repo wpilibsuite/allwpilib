@@ -14,7 +14,7 @@ import org.wpilib.simulation.PDPSim;
 class PowerDistributionTest {
   @Test
   void testGetAllCurrents() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     PowerDistribution pdp = new PowerDistribution(0, 1, ModuleType.REV);
     PDPSim sim = new PDPSim(pdp);
 

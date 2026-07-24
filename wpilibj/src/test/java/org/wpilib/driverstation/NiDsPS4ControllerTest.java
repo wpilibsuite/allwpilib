@@ -20,7 +20,7 @@ class NiDsPS4ControllerTest {
   @EnumSource(value = NiDsPS4Controller.Button.class)
   void testButtons(NiDsPS4Controller.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     NiDsPS4Controller joy = new NiDsPS4Controller(2);
     NiDsPS4ControllerSim joysim = new NiDsPS4ControllerSim(joy);
 
@@ -60,7 +60,7 @@ class NiDsPS4ControllerTest {
   @EnumSource(value = NiDsPS4Controller.Axis.class)
   void testAxes(NiDsPS4Controller.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     NiDsPS4Controller joy = new NiDsPS4Controller(2);
     NiDsPS4ControllerSim joysim = new NiDsPS4ControllerSim(joy);
 

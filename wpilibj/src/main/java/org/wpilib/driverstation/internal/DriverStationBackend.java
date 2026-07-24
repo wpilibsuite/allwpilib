@@ -486,7 +486,7 @@ public final class DriverStationBackend {
   private DriverStationBackend() {}
 
   static {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     for (int i = 0; i < JOYSTICK_PORTS; i++) {
       m_joystickButtons[i] = new HALJoystickButtons();

@@ -22,7 +22,7 @@ import org.wpilib.simulation.SimHooks;
 class WaitCommandTest extends CommandTestBase {
   @BeforeEach
   void setup() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SimHooks.pauseTiming();
   }
 

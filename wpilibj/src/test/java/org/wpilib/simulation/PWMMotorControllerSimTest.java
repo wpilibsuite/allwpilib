@@ -13,7 +13,7 @@ import org.wpilib.hardware.motor.Spark;
 class PWMMotorControllerSimTest {
   @Test
   void testMotor() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (Spark spark = new Spark(0)) {
       PWMMotorControllerSim sim = new PWMMotorControllerSim(spark);

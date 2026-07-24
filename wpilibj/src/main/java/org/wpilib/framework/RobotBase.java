@@ -404,7 +404,7 @@ public abstract class RobotBase implements AutoCloseable {
     // Check that the MSVC runtime is valid.
     WPIUtilJNI.checkMsvcRuntime();
 
-    if (!HAL.initialize(500, 0)) {
+    if (!HAL.initialize()) {
       throw new IllegalStateException("Failed to initialize. Terminating");
     }
 

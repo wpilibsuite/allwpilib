@@ -21,7 +21,7 @@ import org.wpilib.simulation.XboxControllerSim;
 class XboxControllerTest {
   @Test
   void testWrappedHID() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     XboxController controller = new XboxController(2);
     XboxControllerSim sim = new XboxControllerSim(controller);
     sim.notifyNewData();
@@ -37,7 +37,7 @@ class XboxControllerTest {
   @EnumSource(value = XboxController.Button.class)
   void testButtons(XboxController.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     XboxController joy = new XboxController(2);
     XboxControllerSim joysim = new XboxControllerSim(joy);
 
@@ -76,7 +76,7 @@ class XboxControllerTest {
   @EnumSource(value = XboxController.Axis.class)
   void testAxes(XboxController.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     XboxController joy = new XboxController(2);
     XboxControllerSim joysim = new XboxControllerSim(joy);
 

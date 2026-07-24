@@ -34,7 +34,7 @@ HAL_RobotMode getDSMode(void) {
 
 int main(void) {
   // Must initialize the HAL, 500ms timeout
-  HAL_Bool initialized = HAL_Initialize(500, 0);
+  HAL_Bool initialized = HAL_Initialize();
   if (!initialized) {
     printf("Failed to initialize the HAL\n");
     return 1;

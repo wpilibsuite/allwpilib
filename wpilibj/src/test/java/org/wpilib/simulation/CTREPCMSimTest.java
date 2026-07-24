@@ -21,7 +21,7 @@ import org.wpilib.simulation.testutils.DoubleCallback;
 class CTREPCMSimTest {
   @Test
   void testInitialization() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     CTREPCMSim sim = new CTREPCMSim(0);
     sim.resetData();
@@ -38,7 +38,7 @@ class CTREPCMSimTest {
 
   @Test
   void solenoidOutputTest() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (PneumaticsControlModule pcm = new PneumaticsControlModule(0);
         DoubleSolenoid doubleSolenoid =
@@ -92,7 +92,7 @@ class CTREPCMSimTest {
 
   @Test
   void setCompressorOnTest() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     CTREPCMSim sim = new CTREPCMSim(0);
     BooleanCallback callback = new BooleanCallback();
@@ -111,7 +111,7 @@ class CTREPCMSimTest {
 
   @Test
   void setEnableDigital() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     CTREPCMSim sim = new CTREPCMSim(0);
     BooleanCallback callback = new BooleanCallback();
@@ -131,7 +131,7 @@ class CTREPCMSimTest {
 
   @Test
   void setPressureSwitchEnabledTest() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     CTREPCMSim sim = new CTREPCMSim(0);
     BooleanCallback callback = new BooleanCallback();
@@ -150,7 +150,7 @@ class CTREPCMSimTest {
 
   @Test
   void setCompressorCurrentTest() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     CTREPCMSim sim = new CTREPCMSim(0);
     DoubleCallback callback = new DoubleCallback();

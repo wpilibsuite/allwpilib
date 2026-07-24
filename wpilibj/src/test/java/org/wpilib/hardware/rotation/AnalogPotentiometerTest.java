@@ -15,7 +15,7 @@ import org.wpilib.simulation.RoboRioSim;
 class AnalogPotentiometerTest {
   @Test
   void testInitializeWithAnalogInput() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (AnalogInput ai = new AnalogInput(0);
         AnalogPotentiometer pot = new AnalogPotentiometer(ai)) {
@@ -29,7 +29,7 @@ class AnalogPotentiometerTest {
 
   @Test
   void testInitializeWithAnalogInputAndScale() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (AnalogInput ai = new AnalogInput(0);
         AnalogPotentiometer pot = new AnalogPotentiometer(ai, 270.0)) {
@@ -49,7 +49,7 @@ class AnalogPotentiometerTest {
 
   @Test
   void testInitializeWithChannel() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (AnalogPotentiometer pot = new AnalogPotentiometer(1)) {
       RoboRioSim.resetData();
@@ -62,7 +62,7 @@ class AnalogPotentiometerTest {
 
   @Test
   void testInitializeWithChannelAndScale() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (AnalogPotentiometer pot = new AnalogPotentiometer(1, 180.0)) {
       RoboRioSim.resetData();

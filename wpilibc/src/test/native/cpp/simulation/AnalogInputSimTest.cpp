@@ -13,7 +13,7 @@
 namespace wpi::sim {
 
 TEST(AnalogInputSimTest, SetInitialized) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   AnalogInputSim sim{5};
   BooleanCallback callback;
@@ -27,7 +27,7 @@ TEST(AnalogInputSimTest, SetInitialized) {
 }
 
 TEST(AnalogInputSimTest, SetVoltage) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   AnalogInputSim sim{5};
   DoubleCallback callback;
