@@ -13,6 +13,7 @@
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/Synchronization.hpp"
 #include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
 
 class ConnectionListenerTest {
  public:
@@ -70,6 +71,16 @@ TEST_CASE_METHOD(ConnectionListenerTest, "ConnectionListenerTest Polled",
   CHECK(handle == result[0].listener);
   CHECK(result[0].GetConnectionInfo());
   CHECK(result[0].flags == wpi::nt::EventFlags::CONNECTED);
+
+  // Check client sees a remote connection
+  {
+    size_t count;
+    auto arr = NT_GetConnections(client_inst, &count);
+    ASSERT_TRUE(count == 1);
+    EXPECT_TRUE(arr[0].local_ip.len > 0U);
+    EXPECT_TRUE(arr[0].local_port > 0U);
+    NT_DisposeConnectionInfoArray(arr, 1);
+  }
 
   // trigger a disconnect event
   wpi::nt::StopClient(client_inst);

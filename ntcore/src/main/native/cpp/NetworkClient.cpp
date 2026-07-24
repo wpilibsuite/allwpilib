@@ -251,10 +251,12 @@ void NetworkClient::WsConnected(wpi::net::WebSocket& ws, uv::Tcp& tcp,
 
   ConnectionInfo connInfo;
   uv::AddrToName(tcp.GetPeer(), &connInfo.remote_ip, &connInfo.remote_port);
+  uv::AddrToName(tcp.GetSock(), &connInfo.local_ip, &connInfo.local_port);
   connInfo.protocol_version =
       protocol == "v4.1.networktables.first.wpi.edu" ? 0x0401 : 0x0400;
 
-  INFO("CONNECTED NT4 to {} port {}", connInfo.remote_ip, connInfo.remote_port);
+  INFO("CONNECTED NT4 from {} port {} to {} port {}", connInfo.local_ip,
+       connInfo.local_port, connInfo.remote_ip, connInfo.remote_port);
   m_connHandle = m_connList.AddConnection(connInfo);
 
   bool local = wpi::util::starts_with(connInfo.remote_ip, "127.");
