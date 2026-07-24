@@ -2,6 +2,8 @@ import base64
 import hashlib
 import os
 import tempfile
+import tomllib
+from pathlib import Path
 from urllib.request import urlopen
 
 
@@ -96,15 +98,9 @@ def download_integrities(
     # print(updated_contents)
 
 
-def update_ceres():
-    # Keep in sync with shared/ceres.gradle
-    year = "frc2026"
-    version = "2.2-1"
-
+def update_ceres(version):
     has_headers = True
     classifiers = [
-        "linuxarm32static",
-        "linuxarm32staticdebug",
         "linuxarm64static",
         "linuxarm64staticdebug",
         "linuxx86-64static",
@@ -116,21 +112,18 @@ def update_ceres():
         "windowsx86-64static",
         "windowsx86-64staticdebug",
     ]
-    url_base = f"https://frcmaven.wpi.edu/artifactory/development/edu/wpi/first/thirdparty/{year}/ceres/ceres-cpp/{version}/ceres-cpp-{version}-%s.zip"
+    url_base = f"https://frcmaven.wpi.edu/artifactory/development/org/wpilib/thirdparty/ceres/ceres/{version}/ceres-{version}-%s.zip"
 
     download_integrities(
         "shared/bazel/thirdparty/ceres/ceres.MODULE.bazel",
         has_headers,
         classifiers,
         url_base,
-        True,
+        False,
     )
 
 
-def update_libssh():
-    # Keep in sync with shared/libssh.gradle
-    version = "2027-0.120-1"
-
+def update_libssh(version):
     has_headers = True
     classifiers = [
         "linuxarm64static",
@@ -155,10 +148,7 @@ def update_libssh():
     )
 
 
-def update_mrclib():
-    # Keep in sync with shared/libmrclib.gradle
-    version = "2027.1.0-alpha-1-91-gb154ee9"
-
+def update_mrclib(version):
     has_headers = True
     classifiers = [
         "linuxarm64",
@@ -180,9 +170,13 @@ def update_mrclib():
 
 
 def main():
-    update_ceres()
-    update_libssh()
-    update_mrclib()
+    versions_file = Path(__file__).resolve().parents[3] / "gradle" / "libs.versions.toml"
+    with versions_file.open("rb") as f:
+        versions = tomllib.load(f)["versions"]
+
+    update_ceres(versions["ceres"])
+    update_libssh(versions["libssh"])
+    update_mrclib(versions["mrclib"])
 
 
 if __name__ == "__main__":
