@@ -1513,6 +1513,27 @@ void gui::ConfigurePlatformSaveFile(const std::string& name) {
   gContext->iniPath = GetPlatformSaveFileDir() + name;
 }
 
+void gui::EmitRendererInfo() {
+  switch (gRendererContext.backend) {
+    case RendererBackend::GPU: {
+      const char* rendererName = SDL_GetGPUDeviceDriver(gContext->gpuDevice);
+      ImGui::Text("Renderer: 3D (%s)",
+                  rendererName && *rendererName ? rendererName : "unknown");
+      break;
+    }
+    case RendererBackend::SDL_RENDERER: {
+      const char* rendererName =
+          SDL_GetRendererName(gRendererContext.sdlRenderer);
+      ImGui::Text("Renderer: 2D (%s)",
+                  rendererName && *rendererName ? rendererName : "unknown");
+      break;
+    }
+    default:
+      ImGui::Text("Renderer: unavailable");
+      break;
+  }
+}
+
 void gui::EmitViewMenu() {
   if (ImGui::BeginMenu("View")) {
     if (ImGui::BeginMenu("Style")) {

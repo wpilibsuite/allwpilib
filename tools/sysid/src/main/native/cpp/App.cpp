@@ -193,6 +193,7 @@ void Application(std::string_view saveDir) {
       ImGui::Text("SysId: System Identification for Robot Mechanisms");
       ImGui::Separator();
       ImGui::Text("v%s", GetWPILibVersion());
+      gui::EmitRendererInfo();
       ImGui::Separator();
       ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
       if (ImGui::Button("Close")) {
