@@ -295,6 +295,7 @@ class RobotBase {
   RobotBase(RobotBase&&) = default;
   RobotBase& operator=(RobotBase&&) = default;
 
+ private:
   static std::thread::id m_threadId;
   wpi::nt::IntegerPublisher m_programStartTimePublisher;
   NT_Listener connListenerHandle;
