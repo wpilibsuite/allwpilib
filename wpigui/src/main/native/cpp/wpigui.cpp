@@ -1099,7 +1099,9 @@ bool gui::Initialize(const char* title, int width, int height,
   }
 
   // Update window settings
-  SDL_GetWindowSize(gContext->window, &gContext->width, &gContext->height);
+  if ((SDL_GetWindowFlags(gContext->window) & SDL_WINDOW_MAXIMIZED) == 0) {
+    SDL_GetWindowSize(gContext->window, &gContext->width, &gContext->height);
+  }
 
   // Set icons
   if (!gContext->icons.empty()) {
