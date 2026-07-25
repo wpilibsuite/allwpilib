@@ -26,7 +26,7 @@
 #include <upb/reflection/stage0/google/protobuf/descriptor.upb.h>
 #include <upb/wire/decode.h>
 
-#include "wpi/glass/Context.hpp"
+#include "wpi/glass/ContextInternal.hpp"
 #include "wpi/glass/DataSource.hpp"
 #include "wpi/glass/Storage.hpp"
 #include "wpi/glass/support/ExtraGuiWidgets.hpp"
@@ -53,6 +53,9 @@ enum ShowCategory {
   ShowTransitory,
   ShowAll,
 };
+
+static constexpr std::string_view PROGRAM_START_TIME_TOPIC =
+    "/Robot/ProgramStartTime";
 }  // namespace
 
 static bool IsVisible(ShowCategory category, bool persistent, bool retained) {
@@ -96,6 +99,7 @@ NetworkTablesModel::NetworkTablesModel(wpi::nt::NetworkTableInstance inst)
   m_poller.AddListener({{"", "$"}}, wpi::nt::EventFlags::TOPIC |
                                         wpi::nt::EventFlags::VALUE_ALL |
                                         wpi::nt::EventFlags::IMMEDIATE);
+  m_poller.AddTimeSyncListener(true);
 }
 
 NetworkTablesModel::Entry::~Entry() {
@@ -976,6 +980,10 @@ void NetworkTablesModel::Update() {
         }
       }
       if (event.flags & wpi::nt::EventFlags::UNPUBLISH) {
+        if (info->name == PROGRAM_START_TIME_TOPIC) {
+          m_serverProgramStartTime.reset();
+          ApplyServerTime();
+        }
         // meta topic handling
         if (wpi::util::starts_with(info->name, '$')) {
           // meta topic handling
@@ -1020,6 +1028,9 @@ void NetworkTablesModel::Update() {
       if (entry) {
         entry->value = std::move(valueData->value);
         entry->UpdateFromValue(*this);
+        if (entry->info.name == PROGRAM_START_TIME_TOPIC) {
+          UpdateProgramStartTime(entry->value);
+        }
         if (wpi::util::starts_with(entry->info.name, '$') &&
             entry->value.IsRaw() && entry->info.type_str == "msgpack") {
           // meta topic handling
@@ -1106,6 +1117,14 @@ void NetworkTablesModel::Update() {
           }
         }
       }
+    } else if (auto timeSyncData = event.GetTimeSyncEventData()) {
+      if (timeSyncData->valid) {
+        m_serverTimeOffset = timeSyncData->serverTimeOffset;
+      } else {
+        m_serverTimeOffset.reset();
+        m_serverProgramStartTime.reset();
+      }
+      ApplyServerTime();
     }
   }
 
@@ -1184,6 +1203,33 @@ void NetworkTablesModel::RebuildTreeImpl(std::vector<TreeNode>* tree,
 
 bool NetworkTablesModel::Exists() {
   return true;
+}
+
+void NetworkTablesModel::UpdateProgramStartTime(const wpi::nt::Value& value) {
+  if (!value.IsInteger()) {
+    m_serverProgramStartTime.reset();
+    ApplyServerTime();
+    return;
+  }
+
+  int64_t programStartTime = value.GetInteger();
+  if (programStartTime < 0) {
+    m_serverProgramStartTime.reset();
+    ApplyServerTime();
+    return;
+  }
+
+  m_serverProgramStartTime = programStartTime;
+  ApplyServerTime();
+}
+
+void NetworkTablesModel::ApplyServerTime() {
+  if (!gContext) {
+    return;
+  }
+
+  gContext->timestampDisplayServerTimeOffset = m_serverTimeOffset;
+  gContext->timestampDisplayServerStartTime = m_serverProgramStartTime;
 }
 
 NetworkTablesModel::Entry* NetworkTablesModel::GetEntry(std::string_view name) {
@@ -1989,7 +2035,8 @@ static void EmitEntry(NetworkTablesModel* model,
       if (entry.value.server_time() == 1) {
         ImGui::TextUnformatted("---");
       } else {
-        ImGui::Text("%f", entry.value.server_time() * 1.0e-6);
+        ImGui::Text("%f",
+                    ServerTimestampToDisplayTime(entry.value.server_time()));
       }
     } else {
       ImGui::TextUnformatted("");

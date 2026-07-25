@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <functional>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -20,23 +21,33 @@ namespace wpi::glass {
 
 class DataSource;
 
-inline constexpr std::string_view kTimestampDisplayModeZeroStart = "zeroStart";
-inline constexpr std::string_view kTimestampDisplayModeActual = "actual";
+inline constexpr std::string_view TIMESTAMP_DISPLAY_MODE_LOCAL = "local";
+inline constexpr std::string_view TIMESTAMP_DISPLAY_MODE_SERVER = "server";
+inline constexpr std::string_view TIMESTAMP_DISPLAY_MODE_SERVER_ZERO_START =
+    "serverZeroStart";
 
 /**
  * Timestamp display mode.
  */
 enum class TimestampDisplayMode {
   /**
-   * Display timestamps relative to the configured start time.
+   * Display timestamps in the local time base.
    */
-  ZERO_START,
+  LOCAL,
 
   /**
-   * Display timestamps in their native time base.
+   * Display timestamps in the server time base.
    */
-  ACTUAL
+  SERVER,
+
+  /**
+   * Display timestamps in the server time base relative to program start.
+   */
+  SERVER_ZERO_START
 };
+
+int64_t GetTimestampDisplayOffset();
+double ServerTimestampToDisplayTime(int64_t time);
 
 class Context {
  public:
@@ -58,7 +69,10 @@ class Context {
   std::string& timestampDisplayModeStorage;
   uint64_t timestampDisplayStartTime = 0;
   bool timestampDisplayStartTimeOverride = false;
-  TimestampDisplayMode timestampDisplayMode = TimestampDisplayMode::ZERO_START;
+  std::optional<int64_t> timestampDisplayServerTimeOffset;
+  std::optional<int64_t> timestampDisplayServerStartTime;
+  TimestampDisplayMode timestampDisplayMode =
+      TimestampDisplayMode::SERVER_ZERO_START;
   bool isPlatformSaveDir = false;
 };
 

@@ -11,6 +11,7 @@
 #include "wpi/hal/DriverStation.hpp"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/Main.h"
+#include "wpi/nt/IntegerTopic.hpp"
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/RuntimeType.hpp"
@@ -295,6 +296,7 @@ class RobotBase {
   RobotBase& operator=(RobotBase&&) = default;
 
   static std::thread::id m_threadId;
+  wpi::nt::IntegerPublisher m_programStartTimePublisher;
   NT_Listener connListenerHandle;
 };
 

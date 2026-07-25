@@ -39,19 +39,6 @@ using namespace wpi::glass;
 
 static constexpr int kAxisCount = 3;
 
-static uint64_t GetTimestampDisplayStartTime() {
-  if (gContext->timestampDisplayStartTimeOverride) {
-    return gContext->timestampDisplayStartTime;
-  }
-  return wpi::util::GetProgramStartTime();
-}
-
-static uint64_t GetTimestampDisplayOffset() {
-  return gContext->timestampDisplayMode == TimestampDisplayMode::ZERO_START
-             ? GetTimestampDisplayStartTime()
-             : 0;
-}
-
 static double GetTimestampDisplayOffsetSeconds() {
   return static_cast<double>(GetTimestampDisplayOffset()) * 1.0e-6;
 }
@@ -194,7 +181,7 @@ class Plot {
   };
   std::vector<PlotAxis> m_axis;
   ImPlotRange m_xaxisRange;  // read from plot, used for lockPrevX
-  uint64_t m_timeOffset = 0;
+  int64_t m_timeOffset = 0;
   bool m_timeOffsetValid = false;
 };
 
@@ -638,7 +625,7 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
   wpi::util::format_to_n_c_str(label, sizeof(label), "{}###plot{}", m_name,
                                static_cast<int>(i));
 
-  uint64_t timeOffsetUs = GetTimestampDisplayOffset();
+  int64_t timeOffsetUs = GetTimestampDisplayOffset();
   double timeOffset = static_cast<double>(timeOffsetUs) * 1.0e-6;
   bool timeOffsetChanged = false;
   if (m_timeOffsetValid) {

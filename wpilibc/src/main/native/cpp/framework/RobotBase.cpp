@@ -153,6 +153,11 @@ RobotBase::RobotBase() {
     }
   }
 
+  m_programStartTimePublisher =
+      inst.GetIntegerTopic("/Robot/ProgramStartTime").Publish();
+  m_programStartTimePublisher.Set(
+      static_cast<int64_t>(wpi::util::GetProgramStartTime()));
+
   connListenerHandle =
       inst.AddConnectionListener(false, [&](const wpi::nt::Event& event) {
         if (event.Is(wpi::nt::EventFlags::CONNECTED)) {

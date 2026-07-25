@@ -23,6 +23,7 @@
 #include "RoboRioSimGui.hpp"
 #include "TimingGui.hpp"
 #include "wpi/glass/Context.hpp"
+#include "wpi/glass/ContextInternal.hpp"
 #include "wpi/glass/Storage.hpp"
 #include "wpi/glass/hardware/Pneumatic.hpp"
 #include "wpi/glass/other/Plot.hpp"
@@ -39,6 +40,31 @@ namespace gui = wpi::gui;
 static std::unique_ptr<wpi::glass::PlotProvider> gPlotProvider;
 static bool gAbout = false;
 
+static void SetTimestampDisplayMode(wpi::glass::TimestampDisplayMode mode,
+                                    std::string_view storageMode) {
+  auto ctx = wpi::glass::gContext;
+  ctx->timestampDisplayMode = mode;
+  ctx->timestampDisplayModeStorage = storageMode;
+}
+
+static void DisplayTimestampMenu() {
+  if (ImGui::BeginMenu("Timestamp Display")) {
+    auto mode = wpi::glass::gContext->timestampDisplayMode;
+    bool selected = mode == wpi::glass::TimestampDisplayMode::LOCAL;
+    if (ImGui::MenuItem("Actual Time", nullptr, &selected)) {
+      SetTimestampDisplayMode(wpi::glass::TimestampDisplayMode::LOCAL,
+                              wpi::glass::TIMESTAMP_DISPLAY_MODE_LOCAL);
+    }
+    selected = mode == wpi::glass::TimestampDisplayMode::SERVER_ZERO_START;
+    if (ImGui::MenuItem("Program Start = 0", nullptr, &selected)) {
+      SetTimestampDisplayMode(
+          wpi::glass::TimestampDisplayMode::SERVER_ZERO_START,
+          wpi::glass::TIMESTAMP_DISPLAY_MODE_SERVER_ZERO_START);
+    }
+    ImGui::EndMenu();
+  }
+}
+
 extern "C" {
 #if defined(WIN32) || defined(_WIN32)
 __declspec(dllexport)
@@ -50,6 +76,13 @@ int HALSIM_InitExtension(void) {
   wpi::glass::CreateContext();
 
   wpi::glass::SetStorageName("simgui");
+  wpi::glass::AddWorkspaceInit([] {
+    if (wpi::glass::gContext->timestampDisplayMode ==
+        wpi::glass::TimestampDisplayMode::SERVER) {
+      SetTimestampDisplayMode(wpi::glass::TimestampDisplayMode::LOCAL,
+                              wpi::glass::TIMESTAMP_DISPLAY_MODE_LOCAL);
+    }
+  });
 
   gui::AddInit([] { ImGui::GetIO().ConfigDockingWithShift = true; });
 
@@ -125,6 +158,10 @@ int HALSIM_InitExtension(void) {
       });
 
   HALSimGui::mainMenu.AddMainMenu([] {
+    if (ImGui::BeginMenu("View")) {
+      DisplayTimestampMenu();
+      ImGui::EndMenu();
+    }
     if (ImGui::BeginMenu("Hardware")) {
       HALSimGui::halProvider->DisplayMenu();
       ImGui::EndMenu();

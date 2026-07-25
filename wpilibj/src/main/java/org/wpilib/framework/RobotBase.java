@@ -13,6 +13,7 @@ import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.HALUtil;
 import org.wpilib.math.util.MathShared;
 import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.networktables.IntegerPublisher;
 import org.wpilib.networktables.MultiSubscriber;
 import org.wpilib.networktables.NetworkTableEvent;
 import org.wpilib.networktables.NetworkTableInstance;
@@ -32,11 +33,14 @@ import org.wpilib.util.WPIUtilJNI;
  * TimedRobot.
  */
 public abstract class RobotBase implements AutoCloseable {
+  private static final String PROGRAM_START_TIME_TOPIC = "/Robot/ProgramStartTime";
+
   /** The ID of the main Java thread. */
   // This is usually 1, but it is best to make sure
   private static long m_threadId = -1;
 
   private final MultiSubscriber m_suball;
+  private final IntegerPublisher m_programStartTimePublisher;
 
   private final int m_connListenerHandle;
 
@@ -94,6 +98,9 @@ public abstract class RobotBase implements AutoCloseable {
       System.err.println("timed out while waiting for NT server to start");
     }
 
+    m_programStartTimePublisher = inst.getIntegerTopic(PROGRAM_START_TIME_TOPIC).publish();
+    m_programStartTimePublisher.set(WPIUtilJNI.getProgramStartTime());
+
     m_connListenerHandle =
         inst.addConnectionListener(
             false,
@@ -116,6 +123,7 @@ public abstract class RobotBase implements AutoCloseable {
   @Override
   public void close() {
     m_suball.close();
+    m_programStartTimePublisher.close();
     NetworkTableInstance.getDefault().removeListener(m_connListenerHandle);
   }
 
