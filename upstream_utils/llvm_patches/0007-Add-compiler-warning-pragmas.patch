@@ -5,7 +5,7 @@ Subject: [PATCH 07/33] Add compiler warning pragmas
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h    | 11 +++++++++++
- llvm/include/llvm/ADT/SmallVector.h       |  9 +++++++++
+ llvm/include/llvm/ADT/SmallVector.h       | 16 ++++++++++++++++
  llvm/include/llvm/Support/MathExtras.h    |  9 +++++++++
  llvm/include/llvm/Support/MemAlloc.h      | 13 +++++++++++++
  llvm/lib/Support/raw_ostream.cpp          |  4 ++++
@@ -13,7 +13,7 @@ Subject: [PATCH 07/33] Add compiler warning pragmas
  llvm/unittests/ADT/FunctionExtrasTest.cpp |  6 ++++++
  llvm/unittests/ADT/SmallVectorTest.cpp    |  4 ++++
  llvm/unittests/Support/AlignOfTest.cpp    |  7 +++----
- 9 files changed, 63 insertions(+), 4 deletions(-)
+ 9 files changed, 70 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
 index c4d0821076d63842927d2abeef4a5189cdf325e7..730822d37c62b992316c850021dc5edb8ff13c36 100644
@@ -45,7 +45,7 @@ index c4d0821076d63842927d2abeef4a5189cdf325e7..730822d37c62b992316c850021dc5edb
  
  #endif // LLVM_ADT_FUNCTIONEXTRAS_H
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index e27d0d71ec6176ee8081660f9ed6ba6672d7828d..913be7105222efb45015485fc04c0ab984dbe638 100644
+index e27d0d71ec6176ee8081660f9ed6ba6672d7828d..9c8369209d4f783087f3033569e666978fe517d8 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -16,6 +16,15 @@
@@ -64,6 +64,21 @@ index e27d0d71ec6176ee8081660f9ed6ba6672d7828d..913be7105222efb45015485fc04c0ab9
  #include "llvm/Support/Compiler.h"
  #include <algorithm>
  #include <cassert>
+@@ -133,7 +142,14 @@ protected:
+   }
+   // Space after 'FirstEl' is clobbered, do not add any instance vars after it.
+ 
++#if __GNUC__ >= 16
++#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
++#pragma GCC diagnostic push
++#endif
+   SmallVectorTemplateCommon(size_t Size) : Base(getFirstEl(), Size) {}
++#if __GNUC__ >= 16
++#pragma GCC diagnostic pop
++#endif
+ 
+   void grow_pod(size_t MinSize, size_t TSize) {
+     Base::grow_pod(getFirstEl(), MinSize, TSize);
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
 index 120a1641110aca97acf2ab9cd3806d94accbb8aa..78c500e18c7639afc02b595b788333b6b9a4e69b 100644
 --- a/llvm/include/llvm/Support/MathExtras.h

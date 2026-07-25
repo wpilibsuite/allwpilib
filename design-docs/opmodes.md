@@ -215,8 +215,8 @@ The lifecycle of an opmode is:
 - When operator selects opmode on DS, a new opmode object is constructed
 - While selected and disabled, `disabledPeriodic()` is called
 - On disabled → enabled transition, `start()` is called once
-- While enabled, `periodic()` is called at `OpModeRobot#getPeriod()`, and additional callbacks from `getCallbacks()` are run at their own configured rates
-- If robot disables or a different opmode is selected while enabled, `end()` is called then `close()` is called (Java), or the object is destroyed (C++/Python); the object is not reused
+- While enabled, `periodic()` is called at `OpModeRobot#getPeriod()`, and additional callbacks from `getCallbacks()` are run at their own configured rates (note: callbacks from `getCallbacks()` are registered immediately when the OpMode is constructed and begin executing as soon as they are registered; to restrict execution to only when enabled, callbacks should include an enabled check)
+- If robot disables or a different opmode is selected while enabled, `end()` is called then `close()` is called (Java), or the object is destroyed (C++/Python); the object is not reused. Note: selecting a different opmode while enabled automatically disables the robot first.
 - If a different opmode is selected while disabled, only `close()` is called (Java), or the object is destroyed (C++); the object is not reused
 
 Following `close()` being called (Java)/the opmode being destroyed (C++), a *new* opmode object is constructed based on the DS teleop/auto/utility/match selector and selected opmode.  In teleop/auto/utility, the drop-down selection will be the same as before the previous enable, so the same opmode class is constructed again.  In match (or when FMS-connected), only the selected auto opmode object is initially constructed; once auto completes, the selected teleop opmode object is constructed.  Thus only zero or one opmode objects will ever be "alive" at any given time.
@@ -258,6 +258,7 @@ public abstract class PeriodicOpMode implements OpMode {
   public Set<PeriodicPriorityQueue.Callback> getCallbacks() {...}
 
   // additional periodic callbacks with custom rates/offsets
+  // callbacks are registered immediately and begin executing as soon as registered
   public final void addPeriodic(Runnable callback, double period) {...}
   public final void addPeriodic(Runnable callback, double period, double offset) {...}
 }

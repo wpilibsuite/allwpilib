@@ -18,7 +18,7 @@ import org.wpilib.simulation.SimHooks;
 class TimerTest {
   @BeforeEach
   void setup() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SimHooks.pauseTiming();
     SimHooks.restartTiming();
   }

@@ -15,7 +15,7 @@
 namespace wpi::sim {
 
 TEST(AddressableLEDSimTest, InitializationCallback) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   BooleanCallback callback;
   AddressableLEDSim sim{0};
@@ -30,7 +30,7 @@ TEST(AddressableLEDSimTest, InitializationCallback) {
 }
 
 TEST(AddressableLEDSimTest, SetStart) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   AddressableLED led{0};
   AddressableLEDSim sim{led};
@@ -50,7 +50,7 @@ TEST(AddressableLEDSimTest, SetStart) {
 }
 
 TEST(AddressableLEDSimTest, SetLength) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   AddressableLED led{0};
   AddressableLEDSim sim{led};

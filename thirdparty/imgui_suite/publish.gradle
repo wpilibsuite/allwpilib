@@ -18,13 +18,6 @@ task cppSourcesZip(type: Zip) {
     from('generated/fonts/src') {
         into '/'
     }
-    from('generated/gl3w/src') {
-        into '/'
-    }
-
-    from('glfw/src') {
-        into '/'
-    }
     from('imgui/cpp') {
         into '/'
     }
@@ -46,12 +39,6 @@ task cppHeadersZip(type: Zip) {
     }
 
     from('generated/fonts/include') {
-        into '/'
-    }
-    from('generated/gl3w/include') {
-        into '/'
-    }
-    from('glfw/include') {
         into '/'
     }
     from('imgui/include') {

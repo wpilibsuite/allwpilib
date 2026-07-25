@@ -13,7 +13,7 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/cameraserver>
 )
 wpilib_target_warnings(cameraserver)
-target_link_libraries(cameraserver PUBLIC ntcore cscore wpiutil ${OpenCV_LIBS})
+target_link_libraries(cameraserver PUBLIC ntcore cscore wpiutil)
 
 set_property(TARGET cameraserver PROPERTY FOLDER "libraries")
 

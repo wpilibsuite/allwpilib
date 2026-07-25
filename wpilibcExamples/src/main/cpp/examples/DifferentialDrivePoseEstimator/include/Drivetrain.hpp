@@ -131,7 +131,7 @@ class Drivetrain {
   wpi::apriltag::AprilTagFieldLayout aprilTagFieldLayout{
       wpi::apriltag::AprilTagFieldLayout::LoadField(
           wpi::apriltag::AprilTagField::k2024Crescendo)};
-  wpi::math::Pose3d objectInField{aprilTagFieldLayout.GetTagPose(0).value()};
+  wpi::math::Pose3d objectInField{aprilTagFieldLayout.GetTagPose(1).value()};
 
   wpi::PWMSparkMax leftLeader{1};
   wpi::PWMSparkMax leftFollower{2};
@@ -151,7 +151,6 @@ class Drivetrain {
   // Gains are for example purposes only - must be determined for your own
   // robot!
   wpi::math::DifferentialDrivePoseEstimator poseEstimator{
-      kinematics,
       imu.GetRotation2d(),
       wpi::units::meter_t{leftEncoder.GetDistance()},
       wpi::units::meter_t{rightEncoder.GetDistance()},

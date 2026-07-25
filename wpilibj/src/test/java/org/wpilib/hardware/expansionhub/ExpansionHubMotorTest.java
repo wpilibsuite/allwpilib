@@ -13,7 +13,7 @@ import org.wpilib.hardware.hal.HAL;
 class ExpansionHubMotorTest {
   @Test
   void testFollower() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     try (ExpansionHubMotor motor0 = new ExpansionHubMotor(0, 0);
         ExpansionHubMotor motor1 = new ExpansionHubMotor(0, 1);
         ExpansionHubMotor motor2 = new ExpansionHubMotor(0, 2); ) {
@@ -24,7 +24,7 @@ class ExpansionHubMotorTest {
 
   @Test
   void testFollowerCycle() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     try (ExpansionHubMotor motor0 = new ExpansionHubMotor(0, 0);
         ExpansionHubMotor motor1 = new ExpansionHubMotor(0, 1);
         ExpansionHubMotor motor2 = new ExpansionHubMotor(0, 2); ) {

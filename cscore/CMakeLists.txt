@@ -39,7 +39,7 @@ target_include_directories(
     PRIVATE src/main/native/cpp
 )
 wpilib_target_warnings(cscore)
-target_link_libraries(cscore PUBLIC wpinet wpiutil ${OpenCV_LIBS})
+target_link_libraries(cscore PUBLIC wpinet wpiutil opencv_imgcodecs)
 
 set_property(TARGET cscore PROPERTY FOLDER "libraries")
 

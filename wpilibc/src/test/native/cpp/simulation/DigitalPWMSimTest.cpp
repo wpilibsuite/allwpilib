@@ -13,7 +13,7 @@
 namespace wpi::sim {
 
 TEST(DigitalPWMSimTest, Initialize) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   DigitalOutput output{0};
   DigitalPWMSim sim(output);
@@ -40,7 +40,7 @@ TEST(DigitalPWMSimTest, Initialize) {
 }
 
 TEST(DigitalPWMSimTest, SetPin) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   DigitalOutput output{2};
   DigitalPWMSim sim(output);

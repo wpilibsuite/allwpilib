@@ -19,7 +19,6 @@
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
-#include "wpi/math/kinematics/Kinematics.hpp"
 #include "wpi/math/kinematics/Odometry.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/angle.hpp"
@@ -43,12 +42,13 @@ namespace wpi::math {
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave like regular encoder odometry.
  *
+ * @tparam Kinematics Kinematics type.
  * @tparam WheelPositions Wheel positions type.
  * @tparam WheelVelocities Wheel velocities type.
  * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename WheelPositions, typename WheelVelocities,
-          typename WheelAccelerations>
+template <typename Kinematics, typename WheelPositions,
+          typename WheelVelocities, typename WheelAccelerations>
 class WPILIB_DLLEXPORT PoseEstimator {
  public:
   /**
@@ -57,8 +57,6 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * @warning The initial pose estimate will always be the default pose,
    * regardless of the odometry's current pose.
    *
-   * @param kinematics A correctly-configured kinematics object for your
-   *     drivetrain.
    * @param odometry A correctly-configured odometry object for your drivetrain.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in
    *     meters, y position in meters, and heading in radians). Increase these
@@ -68,12 +66,10 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  PoseEstimator(
-      Kinematics<WheelPositions, WheelVelocities, WheelAccelerations>&
-          kinematics,
-      Odometry<WheelPositions, WheelVelocities, WheelAccelerations>& odometry,
-      const wpi::util::array<double, 3>& stateStdDevs,
-      const wpi::util::array<double, 3>& visionMeasurementStdDevs)
+  PoseEstimator(Odometry<Kinematics, WheelPositions, WheelVelocities,
+                         WheelAccelerations>& odometry,
+                const wpi::util::array<double, 3>& stateStdDevs,
+                const wpi::util::array<double, 3>& visionMeasurementStdDevs)
       : m_odometry(odometry) {
     for (size_t i = 0; i < 3; ++i) {
       m_q[i] = stateStdDevs[i] * stateStdDevs[i];
@@ -116,10 +112,11 @@ class WPILIB_DLLEXPORT PoseEstimator {
   /**
    * Resets the robot's position on the field.
    *
-   * The gyroscope angle does not need to be reset in the user's robot code.
-   * The library automatically takes care of offsetting the gyro angle.
+   * The gyroscope angle does not need to be reset here in the user's robot
+   * code.
    *
-   * @param gyroAngle The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param wheelPositions The distances traveled by the encoders.
    * @param pose The estimated pose of the robot on the field.
    */
@@ -149,10 +146,6 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *
    * @param translation The pose to translation to.
    */
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif  // defined(__GNUC__) && !defined(__clang__)
   void ResetTranslation(const Translation2d& translation) {
     m_odometry.ResetTranslation(translation);
 
@@ -175,19 +168,12 @@ class WPILIB_DLLEXPORT PoseEstimator {
       m_poseEstimate = m_odometry.GetPose();
     }
   }
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif  // defined(__GNUC__) && !defined(__clang__)
 
   /**
    * Resets the robot's rotation.
    *
    * @param rotation The rotation to reset to.
    */
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif  // defined(__GNUC__) && !defined(__clang__)
   void ResetRotation(const Rotation2d& rotation) {
     m_odometry.ResetRotation(rotation);
 
@@ -210,9 +196,6 @@ class WPILIB_DLLEXPORT PoseEstimator {
       m_poseEstimate = m_odometry.GetPose();
     }
   }
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif  // defined(__GNUC__) && !defined(__clang__)
 
   /**
    * Gets the estimated robot pose.
@@ -388,7 +371,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * Updates the pose estimator with wheel encoder and gyro information. This
    * should be called every loop.
    *
-   * @param gyroAngle      The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param wheelPositions The distances traveled by the encoders.
    *
    * @return The estimated pose of the robot in meters.
@@ -404,7 +388,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * should be called every loop.
    *
    * @param currentTime   The time at which this method was called.
-   * @param gyroAngle     The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param wheelPositions The distances traveled by the encoders.
    *
    * @return The estimated pose of the robot in meters.
@@ -482,7 +467,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
 
   static constexpr wpi::units::second_t kBufferDuration = 1.5_s;
 
-  Odometry<WheelPositions, WheelVelocities, WheelAccelerations>& m_odometry;
+  Odometry<Kinematics, WheelPositions, WheelVelocities, WheelAccelerations>&
+      m_odometry;
 
   // Diagonal of process noise covariance matrix Q
   wpi::util::array<double, 3> m_q{wpi::util::empty_array};

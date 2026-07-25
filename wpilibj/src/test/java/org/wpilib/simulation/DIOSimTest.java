@@ -42,7 +42,7 @@ class DIOSimTest {
 
   @Test
   void testInput() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (DigitalInput input = new DigitalInput(0)) {
       DIOSim sim = new DIOSim(input);
@@ -64,7 +64,7 @@ class DIOSimTest {
 
   @Test
   void testOutput() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     try (DigitalOutput output = new DigitalOutput(0)) {
       DIOSim sim = new DIOSim(output);
       assertFalse(sim.getIsInput());

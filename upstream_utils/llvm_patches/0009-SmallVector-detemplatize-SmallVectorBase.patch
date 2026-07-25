@@ -9,7 +9,7 @@ Subject: [PATCH 09/33] SmallVector: detemplatize SmallVectorBase
  2 files changed, 17 insertions(+), 52 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 913be7105222efb45015485fc04c0ab984dbe638..7f759efc1588bfb6eaef65b822bbdbf4f201ef8b 100644
+index 9c8369209d4f783087f3033569e666978fe517d8..f5483efde17da0a6b352a966a61fb800fa7109bb 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -59,19 +59,19 @@ using EnableIfConvertibleToInputIterator = std::enable_if_t<std::is_convertible<
@@ -80,7 +80,7 @@ index 913be7105222efb45015485fc04c0ab984dbe638..7f759efc1588bfb6eaef65b822bbdbf4
  
  protected:
    /// Find the address of the first element.  For this pointer math to be valid
-@@ -455,7 +450,7 @@ template <typename T, bool TriviallyCopyable>
+@@ -462,7 +457,7 @@ template <typename T, bool TriviallyCopyable>
  T *SmallVectorTemplateBase<T, TriviallyCopyable>::mallocForGrow(
      size_t MinSize, size_t &NewCapacity) {
    return static_cast<T *>(
@@ -89,7 +89,7 @@ index 913be7105222efb45015485fc04c0ab984dbe638..7f759efc1588bfb6eaef65b822bbdbf4
            this->getFirstEl(), MinSize, sizeof(T), NewCapacity));
  }
  
-@@ -1329,12 +1324,6 @@ template <typename Out, typename R> SmallVector<Out> to_vector_of(R &&Range) {
+@@ -1336,12 +1331,6 @@ template <typename Out, typename R> SmallVector<Out> to_vector_of(R &&Range) {
    return {adl_begin(Range), adl_end(Range)};
  }
  

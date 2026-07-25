@@ -25,7 +25,7 @@ target_include_directories(
 wpilib_target_warnings(wpilibc)
 
 if(WPILIB_WITH_CSCORE)
-    target_link_libraries(wpilibc PUBLIC cameraserver cscore ${OpenCV_LIBS})
+    target_link_libraries(wpilibc PUBLIC cameraserver cscore)
 else()
     target_compile_definitions(wpilibc PRIVATE DYNAMIC_CAMERA_SERVER)
     # Add just the camera server include directory

@@ -79,7 +79,6 @@ public class Drivetrain {
   numbers used  below are robot specific, and should be tuned. */
   private final DifferentialDrivePoseEstimator poseEstimator =
       new DifferentialDrivePoseEstimator(
-          kinematics,
           imu.getRotation2d(),
           leftEncoder.getDistance(),
           rightEncoder.getDistance(),
@@ -126,7 +125,7 @@ public class Drivetrain {
     cameraToObjectEntry = cameraToObjectTopic.getEntry(defaultVal);
 
     objectInField =
-        AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo).getTagPose(0).get();
+        AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo).getTagPose(1).get();
 
     SmartDashboard.putData("Field", fieldSim);
     SmartDashboard.putData("FieldEstimation", fieldApproximation);

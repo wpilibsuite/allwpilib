@@ -88,6 +88,9 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
   /**
    * Sets the static gain.
    *
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
+   *
    * @param ks The static gain in volts.
    */
   public void setKs(double ks) {
@@ -96,6 +99,9 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
 
   /**
    * Sets the gravity gain.
+   *
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
    *
    * @param kg The gravity gain in volts.
    */
@@ -106,6 +112,9 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
   /**
    * Sets the velocity gain.
    *
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
+   *
    * @param kv The velocity gain in V/(m/s).
    */
   public void setKv(double kv) {
@@ -114,6 +123,9 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
 
   /**
    * Sets the acceleration gain.
+   *
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
    *
    * @param ka The acceleration gain in V/(m/s²).
    */
@@ -167,10 +179,10 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
   }
 
   /**
-   * Calculates the feedforward from the gains and velocity setpoint assuming continuous control
+   * Calculates the feedforward from the gains and velocity reference assuming continuous control
    * (acceleration is assumed to be zero).
    *
-   * @param velocity The velocity setpoint in meters per second.
+   * @param velocity The velocity reference in meters per second.
    * @return The computed feedforward.
    */
   public double calculate(double velocity) {
@@ -178,12 +190,12 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming discrete control.
+   * Calculates the feedforward from the gains and references assuming discrete control.
    *
    * <p>Note this method is inaccurate when the velocity crosses 0.
    *
-   * @param currentVelocity The current velocity setpoint in meters per second.
-   * @param nextVelocity The next velocity setpoint in meters per second.
+   * @param currentVelocity The current velocity reference in meters per second.
+   * @param nextVelocity The next velocity reference in meters per second.
    * @return The computed feedforward.
    */
   public double calculate(double currentVelocity, double nextVelocity) {

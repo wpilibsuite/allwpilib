@@ -146,6 +146,7 @@ examplesTree.list(new FilenameFilter() {
         }
 
 apply from: "${rootDir}/shared/opencv.gradle"
+apply from: "${rootDir}/shared/libsdlgpu.gradle"
 
 Action<List<String>> symbolFilter = { symbols ->
     symbols.removeIf({ !it.startsWith('CS_') })
@@ -185,16 +186,7 @@ model {
                                 it.buildable = false
                                 return
                             }
-                            if (it.targetPlatform.operatingSystem.isWindows()) {
-                                it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
-                            } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
-                                it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
-                            } else {
-                                it.linker.args << '-lX11'
-                                if (it.targetPlatform.name.startsWith('linuxarm')) {
-                                    it.linker.args << '-lGL'
-                                }
-                            }
+                            project.addLibSdlGpuDependency(it)
                         }
                         sources.cpp.source {
                             srcDirs 'examples/' + "${key}"

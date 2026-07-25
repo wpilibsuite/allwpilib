@@ -70,7 +70,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoint assuming discrete
+   * Calculates the feedforward from the gains and reference assuming discrete
    * control. Use this method when the velocity does not change.
    *
    * @param currentAngle The current angle. This angle should be measured from
@@ -88,7 +88,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming discrete
+   * Calculates the feedforward from the gains and references assuming discrete
    * control.
    *
    * @param currentAngle The current angle. This angle should be measured from
@@ -205,12 +205,20 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   /**
    * Sets the static gain.
    *
+   * This setter is intended for online tuning only. Feedforward gains are
+   * assumed constant, so gain scheduling means the system was not correctly
+   * modeled.
+   *
    * @param kS The static gain.
    */
   constexpr void SetKs(wpi::units::volt_t kS) { this->kS = kS; }
 
   /**
    * Sets the gravity gain.
+   *
+   * This setter is intended for online tuning only. Feedforward gains are
+   * assumed constant, so gain scheduling means the system was not correctly
+   * modeled.
    *
    * @param kG The gravity gain.
    */
@@ -219,12 +227,20 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   /**
    * Sets the velocity gain.
    *
+   * This setter is intended for online tuning only. Feedforward gains are
+   * assumed constant, so gain scheduling means the system was not correctly
+   * modeled.
+   *
    * @param kV The velocity gain.
    */
   constexpr void SetKv(wpi::units::unit_t<kv_unit> kV) { this->kV = kV; }
 
   /**
    * Sets the acceleration gain.
+   *
+   * This setter is intended for online tuning only. Feedforward gains are
+   * assumed constant, so gain scheduling means the system was not correctly
+   * modeled.
    *
    * @param kA The acceleration gain.
    */

@@ -8,6 +8,7 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/driverstation/RobotState.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 #include "wpi/util/Color.hpp"
@@ -21,6 +22,8 @@ class OpModeRobotTest : public ::testing::Test {
   void SetUp() override {
     wpi::sim::PauseTiming();
     wpi::sim::SetProgramStarted(false);
+    wpi::sim::DriverStationSim::ResetData();
+    wpi::RobotState::ClearOpModes();
   }
 
   void TearDown() override {

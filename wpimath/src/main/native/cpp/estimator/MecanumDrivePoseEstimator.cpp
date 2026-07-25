@@ -25,8 +25,7 @@ wpi::math::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
     const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose,
     const wpi::util::array<double, 3>& stateStdDevs,
     const wpi::util::array<double, 3>& visionMeasurementStdDevs)
-    : PoseEstimator(kinematics, m_odometryImpl, stateStdDevs,
-                    visionMeasurementStdDevs),
+    : PoseEstimator(m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
       m_odometryImpl(kinematics, gyroAngle, wheelPositions, initialPose) {
   ResetPose(initialPose);
 }
