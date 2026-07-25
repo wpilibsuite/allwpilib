@@ -119,10 +119,10 @@ class TwoDeadWheelOdometry3d {
     const auto angleDifference = deltaAngle.ToVector();
 
     const auto deltaTheta = deltaAngle.ToRotation2d().Radians();
-    const auto deltaX = xWheelPos - m_previousXWheelPos +
-                        m_xWheelYPos * deltaTheta / 1_rad;
-    const auto deltaY = yWheelPos - m_previousYWheelPos -
-                        m_yWheelXPos * deltaTheta / 1_rad;
+    const auto deltaX =
+        xWheelPos - m_previousXWheelPos + m_xWheelYPos * deltaTheta / 1_rad;
+    const auto deltaY =
+        yWheelPos - m_previousYWheelPos - m_yWheelXPos * deltaTheta / 1_rad;
     Twist3d twist{deltaX,
                   deltaY,
                   0_m,

@@ -92,13 +92,12 @@ TEST_F(TwoDeadWheelOdometry3dTest, AccuracyFacingTrajectory) {
                       wpi::math::Pose2d{10_m, 10_m, 180_deg},
                       wpi::math::Pose2d{30_m, 30_m, 0_deg},
                       wpi::math::Pose2d{20_m, 20_m, 180_deg},
-                      wpi::math::Pose2d{10_m, 10_m, 0_deg}
-          },
+                      wpi::math::Pose2d{10_m, 10_m, 0_deg}},
           wpi::math::TrajectoryConfig(0.5_mps, 2.0_mps_sq));
 
   odometry.ResetPosition(xWheelPos, yWheelPos,
-                        Rotation3d{trajectory.InitialPose().Rotation()},
-                        Pose3d{trajectory.InitialPose()});
+                         Rotation3d{trajectory.InitialPose().Rotation()},
+                         Pose3d{trajectory.InitialPose()});
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
@@ -135,10 +134,10 @@ TEST_F(TwoDeadWheelOdometry3dTest, AccuracyFacingTrajectory) {
 
     auto lastPose = odometry.GetPose();
 
-    // Due to the forward kinematics having a dependency on the gyro angle being accurate, if
-    // the gyro angle is noisy, the error *very* quickly compounds.
-    // The simulated sensor noise in this class's tests are an order of magnitude lower than the
-    // other odometry tests for this reason.
+    // Due to the forward kinematics having a dependency on the gyro angle being
+    // accurate, if the gyro angle is noisy, the error *very* quickly compounds.
+    // The simulated sensor noise in this class's tests are an order of
+    // magnitude lower than the other odometry tests for this reason.
     auto xhat = odometry.Update(
         xWheelPos, yWheelPos,
         wpi::math::Rotation3d{
@@ -171,18 +170,15 @@ TEST_F(TwoDeadWheelOdometry3dTest, AccuracyFacingXAxis) {
 
   wpi::math::DrivetrainSplineTrajectory trajectory =
       wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
-      std::vector{wpi::math::Pose2d{0_m, 0_m, 0_deg},
-                  wpi::math::Pose2d{20_m, 20_m, 45_deg},
-                  wpi::math::Pose2d{10_m, 10_m, -90_deg},
-                  wpi::math::Pose2d{30_m, 30_m, 135_deg},
-                  wpi::math::Pose2d{20_m, 20_m, -90_deg},
-                  wpi::math::Pose2d{10_m, 10_m, 0_deg}
-      },
+          std::vector{wpi::math::Pose2d{0_m, 0_m, 0_deg},
+                      wpi::math::Pose2d{20_m, 20_m, 45_deg},
+                      wpi::math::Pose2d{10_m, 10_m, -90_deg},
+                      wpi::math::Pose2d{30_m, 30_m, 135_deg},
+                      wpi::math::Pose2d{20_m, 20_m, -90_deg},
+                      wpi::math::Pose2d{10_m, 10_m, 0_deg}},
           wpi::math::TrajectoryConfig(0.5_mps, 2.0_mps_sq));
 
-  odometry.ResetPosition(xWheelPos, yWheelPos,
-                         Rotation3d{},
-                         Pose3d{});
+  odometry.ResetPosition(xWheelPos, yWheelPos, Rotation3d{}, Pose3d{});
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
@@ -211,9 +207,9 @@ TEST_F(TwoDeadWheelOdometry3dTest, AccuracyFacingXAxis) {
                             groundTruthState.pose.Rotation().Sin(),
                         0};
 
-    auto xWheelVel = wpi::units::meters_per_second_t{wheelVelocities(0,0)} +
+    auto xWheelVel = wpi::units::meters_per_second_t{wheelVelocities(0, 0)} +
                      distribution(generator) * 0.05_mps;
-    auto yWheelVel = wpi::units::meters_per_second_t{wheelVelocities(1,0)} +
+    auto yWheelVel = wpi::units::meters_per_second_t{wheelVelocities(1, 0)} +
                      distribution(generator) * 0.05_mps;
 
     xWheelPos += xWheelVel * dt;
@@ -221,10 +217,10 @@ TEST_F(TwoDeadWheelOdometry3dTest, AccuracyFacingXAxis) {
 
     auto lastPose = odometry.GetPose();
 
-    // Due to the forward kinematics having a dependency on the gyro angle being accurate, if
-    // the gyro angle is noisy, the error *very* quickly compounds.
-    // The simulated sensor noise in this class's tests are an order of magnitude lower than the
-    // other odometry tests for this reason.
+    // Due to the forward kinematics having a dependency on the gyro angle being
+    // accurate, if the gyro angle is noisy, the error *very* quickly compounds.
+    // The simulated sensor noise in this class's tests are an order of
+    // magnitude lower than the other odometry tests for this reason.
     auto xhat = odometry.Update(
         xWheelPos, yWheelPos,
         wpi::math::Rotation3d{distribution(generator) * 0.001_rad});
