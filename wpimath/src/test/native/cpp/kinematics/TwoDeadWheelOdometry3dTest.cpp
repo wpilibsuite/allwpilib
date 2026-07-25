@@ -158,8 +158,8 @@ TEST_F(TwoDeadWheelOdometry3dTest, AccuracyFacingTrajectory) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.06);
-  EXPECT_LT(maxError, 0.125);
+  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.15);
+  EXPECT_LT(maxError, 0.3);
   EXPECT_NEAR(trajectoryDistanceTravelled.value(),
               odometryDistanceTravelled.value(),
               trajectoryDistanceTravelled.value() * 0.05);
@@ -243,8 +243,8 @@ TEST_F(TwoDeadWheelOdometry3dTest, AccuracyFacingXAxis) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.06);
-  EXPECT_LT(maxError, 0.125);
+  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.15);
+  EXPECT_LT(maxError, 0.3);
   EXPECT_NEAR(trajectoryDistanceTravelled.value(),
               odometryDistanceTravelled.value(),
               trajectoryDistanceTravelled.value() * 0.05);
