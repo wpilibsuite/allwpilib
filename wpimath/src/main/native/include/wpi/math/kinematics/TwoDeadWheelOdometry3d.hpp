@@ -4,13 +4,13 @@
 
 #pragma once
 
+#include "ChassisVelocities.hpp"
 #include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
 #include "wpi/math/geometry/Twist3d.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
 
@@ -43,7 +43,7 @@ class TwoDeadWheelOdometry3d {
                                   const wpi::units::meter_t yWheelXPos,
                                   const wpi::units::meter_t xWheelPos,
                                   const wpi::units::meter_t yWheelPos,
-                                  const Rotation2d& gyroAngle,
+                                  const Rotation3d& gyroAngle,
                                   const Pose2d& initialPose = Pose2d{})
       : m_xWheelYPos(xWheelYPos),
         m_yWheelXPos(yWheelXPos),
@@ -115,7 +115,9 @@ class TwoDeadWheelOdometry3d {
   const Pose3d& Update(const wpi::units::meter_t xWheelPos,
                        const wpi::units::meter_t yWheelPos,
                        const Rotation3d& gyroAngle) {
-    const auto deltaTheta = (gyroAngle - m_previousGyroAngle).Radians();
+    const auto angleDifference = gyroAngle.RelativeTo(m_previousGyroAngle);
+    const auto angleDifferenceVector = angleDifference.ToVector();
+    const auto deltaTheta = angleDifference.ToRotation2d().Radians();
     const auto deltaX = xWheelPos - m_previousXWheelPos +
                         wpi::units::meter_t{m_xWheelYPos * deltaTheta.value()};
     const auto deltaY = yWheelPos - m_previousYWheelPos -
@@ -124,9 +126,9 @@ class TwoDeadWheelOdometry3d {
     Twist3d twist{twist2d.dx,
                   twist2d.dy,
                   0_m,
-                  wpi::units::radian_t{angle_difference(0)},
-                  wpi::units::radian_t{angle_difference(1)},
-                  wpi::units::radian_t{angle_difference(2)}};
+                  wpi::units::radian_t{angleDifferenceVector(0)},
+                  wpi::units::radian_t{angleDifferenceVector(1)},
+                  wpi::units::radian_t{angleDifferenceVector(2)}};
 
     m_pose = m_pose + twist.Exp();
 
@@ -135,6 +137,14 @@ class TwoDeadWheelOdometry3d {
     m_previousGyroAngle = gyroAngle;
 
     return m_pose;
+  }
+
+  ChassisVelocities ToChassisVelocities(
+      const wpi::units::meters_per_second_t vx,
+      const wpi::units::meters_per_second_t vy,
+      const wpi::units::radians_per_second_t omega) const {
+    return {vx + m_xWheelYPos * omega / 1_rad,
+            vy - m_yWheelXPos * omega / 1_rad, omega};
   }
 
  private:

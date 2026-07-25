@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ChassisVelocities.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
@@ -133,6 +134,14 @@ class TwoDeadWheelOdometry {
     m_previousGyroAngle = gyroAngle;
 
     return m_pose;
+  }
+
+  ChassisVelocities ToChassisVelocities(
+      const wpi::units::meters_per_second_t vx,
+      const wpi::units::meters_per_second_t vy,
+      const wpi::units::radians_per_second_t omega) const {
+    return {vx + m_xWheelYPos * omega / 1_rad,
+            vy - m_yWheelXPos * omega / 1_rad, omega};
   }
 
  private:
