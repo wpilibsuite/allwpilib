@@ -29,9 +29,10 @@ std::vector<AlertSim::AlertInfo> AlertSim::GetAll() {
     delete[] cInfos;
     return {};
   }
+  int32_t count = len < allocLen ? len : allocLen;
   std::vector<AlertInfo> infos;
-  infos.reserve(len);
-  for (int32_t i = 0; i < len; ++i) {
+  infos.reserve(count);
+  for (int32_t i = 0; i < count; ++i) {
     const auto& cInfo = cInfos[i];
     infos.emplace_back(std::string{wpi::util::to_string_view(&cInfo.group)},
                        std::string{wpi::util::to_string_view(&cInfo.id)},
@@ -39,7 +40,7 @@ std::vector<AlertSim::AlertInfo> AlertSim::GetAll() {
                        cInfo.activeStartTime,
                        static_cast<wpi::util::Alert::Level>(cInfo.level));
   }
-  WPI_FreeAlerts(cInfos, len < allocLen ? len : allocLen);
+  WPI_FreeAlerts(cInfos, count);
   delete[] cInfos;
   return infos;
 }

@@ -370,11 +370,12 @@ Java_org_wpilib_util_AlertDataJNI_getAlerts
     return env->NewObjectArray(0, alertInfoCls, nullptr);
   }
 
-  jobjectArray ret = env->NewObjectArray(len, alertInfoCls, nullptr);
-  for (int32_t i = 0; i < len; ++i) {
+  int32_t count = len < allocLen ? len : allocLen;
+  jobjectArray ret = env->NewObjectArray(count, alertInfoCls, nullptr);
+  for (int32_t i = 0; i < count; ++i) {
     env->SetObjectArrayElement(ret, i, MakeAlertInfoJava(env, arr[i]));
   }
-  WPI_FreeAlerts(arr, len < allocLen ? len : allocLen);
+  WPI_FreeAlerts(arr, count);
   delete[] arr;
   return ret;
 }

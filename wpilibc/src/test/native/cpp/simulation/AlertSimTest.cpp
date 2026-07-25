@@ -14,8 +14,70 @@
 
 #include "wpi/hal/HAL.h"
 #include "wpi/util/Alert.hpp"
+#include "wpi/util/string.hpp"
 
 namespace wpi::sim {
+
+namespace {
+
+struct GrowingBackendState {
+  int32_t getAlertsLength = 0;
+  int32_t freeAlertsLength = 0;
+};
+
+GrowingBackendState gGrowingBackendState;
+
+int32_t GrowingBackendGetNumAlerts() {
+  return 1;
+}
+
+int32_t GrowingBackendGetAlerts(WPI_AlertInfo* arr, int32_t length) {
+  gGrowingBackendState.getAlertsLength = length;
+  if (length > 0) {
+    arr[0].group = wpi::util::alloc_wpi_string("group");
+    arr[0].id = wpi::util::alloc_wpi_string("id");
+    arr[0].text = wpi::util::alloc_wpi_string("text");
+    arr[0].activeStartTime = 1234;
+    arr[0].level = WPI_ALERT_HIGH;
+  }
+  return 2;
+}
+
+void GrowingBackendFreeAlerts(WPI_AlertInfo* arr, int32_t length) {
+  gGrowingBackendState.freeAlertsLength = length;
+  for (int32_t i = 0; i < length; ++i) {
+    WPI_FreeString(&arr[i].group);
+    WPI_FreeString(&arr[i].id);
+    WPI_FreeString(&arr[i].text);
+  }
+}
+
+const WPI_AlertBackend kGrowingBackend{nullptr,
+                                       nullptr,
+                                       nullptr,
+                                       nullptr,
+                                       nullptr,
+                                       nullptr,
+                                       nullptr,
+                                       GrowingBackendGetNumAlerts,
+                                       GrowingBackendGetAlerts,
+                                       GrowingBackendFreeAlerts,
+                                       nullptr};
+
+class ScopedAlertBackend {
+ public:
+  explicit ScopedAlertBackend(const WPI_AlertBackend* backend)
+      : m_previous{WPI_GetAlertBackend()} {
+    WPI_SetAlertBackend(backend);
+  }
+
+  ~ScopedAlertBackend() { WPI_SetAlertBackend(m_previous); }
+
+ private:
+  const WPI_AlertBackend* m_previous;
+};
+
+}  // namespace
 
 class AlertSimTest : public ::testing::Test {
  public:
@@ -183,6 +245,22 @@ TEST_F(AlertSimTest, GetActive) {
   EXPECT_EQ(active.size(), 1u);
   EXPECT_EQ(all.size(), 3u);
   EXPECT_EQ(active[0].text, "B");
+}
+
+TEST_F(AlertSimTest, GetAllClampsToAllocatedLengthWhenBackendCountGrows) {
+  gGrowingBackendState = {};
+  ScopedAlertBackend backend{&kGrowingBackend};
+
+  auto alerts = AlertSim::GetAll();
+
+  EXPECT_EQ(gGrowingBackendState.getAlertsLength, 1);
+  EXPECT_EQ(gGrowingBackendState.freeAlertsLength, 1);
+  ASSERT_EQ(alerts.size(), 1u);
+  EXPECT_EQ(alerts[0].group, "group");
+  EXPECT_EQ(alerts[0].id, "id");
+  EXPECT_EQ(alerts[0].text, "text");
+  EXPECT_EQ(alerts[0].activeStartTime, 1234);
+  EXPECT_EQ(alerts[0].level, wpi::util::Alert::Level::HIGH);
 }
 
 }  // namespace wpi::sim
