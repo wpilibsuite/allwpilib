@@ -351,8 +351,8 @@ static bool SaveStorageImpl(Context* ctx, std::string_view dir,
 }
 
 Context::Context()
-    : sourceNameStorage{storageRoots.try_emplace("").first->second.GetChild(
-          "sourceNames")},
+    : sourceNameStorage{
+          storageRoots.try_emplace("").first->second.GetChild("sourceNames")},
       timestampDisplayModeStorage{storageRoots[""].GetString(
           TIMESTAMP_DISPLAY_MODE_KEY,
           TIMESTAMP_DISPLAY_MODE_SERVER_ZERO_START)} {
