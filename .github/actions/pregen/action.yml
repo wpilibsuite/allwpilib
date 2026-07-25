@@ -26,7 +26,6 @@ runs:
     - name: Regenerate imgui
       run: |
         ./thirdparty/imgui_suite/generate_fonts.sh
-        ./thirdparty/imgui_suite/generate_gl3w.py
       shell: bash
 
     - name: Regenerate HIDs
