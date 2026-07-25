@@ -114,11 +114,11 @@ TEST_F(TwoDeadWheelOdometryTest, AccuracyFacingTrajectory) {
   wpi::math::DrivetrainSplineTrajectory trajectory =
       wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
-                      wpi::math::Pose2d{3_m, 0_m, -90_deg},
-                      wpi::math::Pose2d{0_m, 0_m, 135_deg},
-                      wpi::math::Pose2d{-3_m, 0_m, -90_deg},
-                      wpi::math::Pose2d{0_m, 0_m, 45_deg}},
-          wpi::math::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+                      wpi::math::Pose2d{20_m, 20_m, -90_deg},
+                      wpi::math::Pose2d{10_m, 10_m, 135_deg},
+                      wpi::math::Pose2d{30_m, 30_m, -90_deg},
+                      wpi::math::Pose2d{20_m, 20_m, 45_deg}},
+          wpi::math::TrajectoryConfig(0.5_mps, 2.0_mps_sq));
 
   odometry.ResetPosition(xWheelPos, yWheelPos,
                          trajectory.InitialPose().Rotation(),
@@ -149,9 +149,9 @@ TEST_F(TwoDeadWheelOdometryTest, AccuracyFacingTrajectory) {
                         groundTruthState.ForwardVelocity().value() *
                             groundTruthState.curvature.value()};
 
-    auto xWheelVel = wpi::units::meters_per_second_t{wheelVelocities(0)} +
+    auto xWheelVel = wpi::units::meters_per_second_t{wheelVelocities(0, 0)} +
                      distribution(generator) * 0.05_mps;
-    auto yWheelVel = wpi::units::meters_per_second_t{wheelVelocities(1)} +
+    auto yWheelVel = wpi::units::meters_per_second_t{wheelVelocities(1, 0)} +
                      distribution(generator) * 0.05_mps;
 
     xWheelPos += xWheelVel * dt;
@@ -192,11 +192,11 @@ TEST_F(TwoDeadWheelOdometryTest, AccuracyFacingXAxis) {
   wpi::math::DrivetrainSplineTrajectory trajectory =
       wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
-                      wpi::math::Pose2d{3_m, 0_m, -90_deg},
-                      wpi::math::Pose2d{0_m, 0_m, 135_deg},
-                      wpi::math::Pose2d{-3_m, 0_m, -90_deg},
-                      wpi::math::Pose2d{0_m, 0_m, 45_deg}},
-          wpi::math::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+                      wpi::math::Pose2d{20_m, 20_m, -90_deg},
+                      wpi::math::Pose2d{10_m, 10_m, 135_deg},
+                      wpi::math::Pose2d{30_m, 30_m, -90_deg},
+                      wpi::math::Pose2d{20_m, 20_m, 45_deg}},
+          wpi::math::TrajectoryConfig(0.5_mps, 2.0_mps_sq));
 
   odometry.ResetPosition(xWheelPos, yWheelPos, Rotation2d{}, Pose2d{});
 
@@ -227,9 +227,9 @@ TEST_F(TwoDeadWheelOdometryTest, AccuracyFacingXAxis) {
                             groundTruthState.pose.Rotation().Sin(),
                         0};
 
-    auto xWheelVel = wpi::units::meters_per_second_t{wheelVelocities(0)} +
+    auto xWheelVel = wpi::units::meters_per_second_t{wheelVelocities(0, 0)} +
                      distribution(generator) * 0.05_mps;
-    auto yWheelVel = wpi::units::meters_per_second_t{wheelVelocities(1)} +
+    auto yWheelVel = wpi::units::meters_per_second_t{wheelVelocities(1, 0)} +
                      distribution(generator) * 0.05_mps;
 
     xWheelPos += xWheelVel * dt;

@@ -116,20 +116,25 @@ class TwoDeadWheelOdometryTest {
     var xWheelPos = 0.0;
     var yWheelPos = 0.0;
 
-    var odometry =
-        new TwoDeadWheelOdometry(
-            m_xWheelYPos, m_yWheelXPos, xWheelPos, yWheelPos, Rotation2d.kZero, Pose2d.kZero);
-
     var trajectory =
         DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 Pose2d.kZero,
-                new Pose2d(20, 20, Rotation2d.kZero),
-                new Pose2d(10, 10, Rotation2d.kPi),
-                new Pose2d(30, 30, Rotation2d.kZero),
-                new Pose2d(20, 20, Rotation2d.kPi),
+                new Pose2d(20, 20, Rotation2d.fromDegrees(45)),
+                new Pose2d(10, 10, Rotation2d.fromDegrees(-90)),
+                new Pose2d(30, 30, Rotation2d.fromDegrees(135)),
+                new Pose2d(20, 20, Rotation2d.fromDegrees(-90)),
                 new Pose2d(10, 10, Rotation2d.kZero)),
             new TrajectoryConfig(0.5, 2));
+
+    var odometry =
+        new TwoDeadWheelOdometry(
+            m_xWheelYPos,
+            m_yWheelXPos,
+            xWheelPos,
+            yWheelPos,
+            trajectory.start().pose.getRotation(),
+            trajectory.start().pose);
 
     var rand = new Random(5190);
 
@@ -202,20 +207,20 @@ class TwoDeadWheelOdometryTest {
     var xWheelPos = 0.0;
     var yWheelPos = 0.0;
 
-    var odometry =
-        new TwoDeadWheelOdometry(
-            m_xWheelYPos, m_yWheelXPos, xWheelPos, yWheelPos, Rotation2d.kZero, Pose2d.kZero);
-
     var trajectory =
         DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 Pose2d.kZero,
-                new Pose2d(20, 20, Rotation2d.kZero),
-                new Pose2d(10, 10, Rotation2d.kPi),
-                new Pose2d(30, 30, Rotation2d.kZero),
-                new Pose2d(20, 20, Rotation2d.kPi),
+                new Pose2d(20, 20, Rotation2d.fromDegrees(45)),
+                new Pose2d(10, 10, Rotation2d.fromDegrees(-90)),
+                new Pose2d(30, 30, Rotation2d.fromDegrees(135)),
+                new Pose2d(20, 20, Rotation2d.fromDegrees(-90)),
                 new Pose2d(10, 10, Rotation2d.kZero)),
             new TrajectoryConfig(0.5, 2));
+
+    var odometry =
+        new TwoDeadWheelOdometry(
+            m_xWheelYPos, m_yWheelXPos, xWheelPos, yWheelPos, Rotation2d.kZero, Pose2d.kZero);
 
     var rand = new Random(5190);
 

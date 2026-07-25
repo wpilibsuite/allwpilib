@@ -219,11 +219,10 @@ public class TwoDeadWheelOdometry3d {
     final var deltaX = xWheelPos - m_previousXWheelPos + deltaTheta * m_xWheelYPos;
     final var deltaY = yWheelPos - m_previousYWheelPos - deltaTheta * m_yWheelXPos;
 
-    var twist2d = new Twist2d(deltaX, deltaY, deltaTheta);
     var twist =
         new Twist3d(
-            twist2d.dx,
-            twist2d.dy,
+            deltaX,
+            deltaY,
             0,
             angle_difference.get(0),
             angle_difference.get(1),

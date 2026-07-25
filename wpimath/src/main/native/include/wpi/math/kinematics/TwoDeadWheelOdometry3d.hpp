@@ -115,20 +115,20 @@ class TwoDeadWheelOdometry3d {
   const Pose3d& Update(const wpi::units::meter_t xWheelPos,
                        const wpi::units::meter_t yWheelPos,
                        const Rotation3d& gyroAngle) {
-    const auto angleDifference = gyroAngle.RelativeTo(m_previousGyroAngle);
-    const auto angleDifferenceVector = angleDifference.ToVector();
-    const auto deltaTheta = angleDifference.ToRotation2d().Radians();
+    const auto deltaAngle = gyroAngle.RelativeTo(m_previousGyroAngle);
+    const auto angleDifference = deltaAngle.ToVector();
+
+    const auto deltaTheta = deltaAngle.ToRotation2d().Radians();
     const auto deltaX = xWheelPos - m_previousXWheelPos +
-                        wpi::units::meter_t{m_xWheelYPos * deltaTheta.value()};
+                        m_xWheelYPos * deltaTheta / 1_rad;
     const auto deltaY = yWheelPos - m_previousYWheelPos -
-                        wpi::units::meter_t{m_yWheelXPos * deltaTheta.value()};
-    const Twist2d twist2d{deltaX, deltaY, deltaTheta};
-    Twist3d twist{twist2d.dx,
-                  twist2d.dy,
+                        m_yWheelXPos * deltaTheta / 1_rad;
+    Twist3d twist{deltaX,
+                  deltaY,
                   0_m,
-                  wpi::units::radian_t{angleDifferenceVector(0)},
-                  wpi::units::radian_t{angleDifferenceVector(1)},
-                  wpi::units::radian_t{angleDifferenceVector(2)}};
+                  wpi::units::radian_t{angleDifference(0)},
+                  wpi::units::radian_t{angleDifference(1)},
+                  wpi::units::radian_t{angleDifference(2)}};
 
     m_pose = m_pose + twist.Exp();
 
