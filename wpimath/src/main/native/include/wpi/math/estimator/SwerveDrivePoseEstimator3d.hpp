@@ -37,7 +37,7 @@ namespace wpi::math {
 template <size_t NumModules>
 class SwerveDrivePoseEstimator3d
     : public PoseEstimator3d<
-          SwerveDriveKinematics<NumModules>,
+          SwerveDriveOdometry3d<NumModules>,
           wpi::util::array<SwerveModulePosition, NumModules>,
           wpi::util::array<SwerveModuleVelocity, NumModules>,
           wpi::util::array<SwerveModuleAcceleration, NumModules>> {
@@ -96,13 +96,11 @@ class SwerveDrivePoseEstimator3d
       const wpi::util::array<double, 4>& stateStdDevs,
       const wpi::util::array<double, 4>& visionMeasurementStdDevs)
       : SwerveDrivePoseEstimator3d::PoseEstimator3d(
-            m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
-        m_odometryImpl{kinematics, gyroAngle, modulePositions, initialPose} {
+            SwerveDriveOdometry3d<NumModules>{kinematics, gyroAngle,
+                                              modulePositions, initialPose},
+            stateStdDevs, visionMeasurementStdDevs) {
     this->ResetPose(initialPose);
   }
-
- private:
-  SwerveDriveOdometry3d<NumModules> m_odometryImpl;
 };
 
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)

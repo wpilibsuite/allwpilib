@@ -7,7 +7,6 @@
 #include "wpi/math/estimator/PoseEstimator.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/kinematics/DifferentialDriveOdometry.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
@@ -34,7 +33,7 @@ namespace wpi::math {
  * never call it, then this class will behave like regular encoder odometry.
  */
 class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
-    : public PoseEstimator<DifferentialDriveKinematics,
+    : public PoseEstimator<DifferentialDriveOdometry,
                            DifferentialDriveWheelPositions,
                            DifferentialDriveWheelVelocities,
                            DifferentialDriveWheelAccelerations> {
@@ -129,9 +128,6 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
     return PoseEstimator::UpdateWithTime(currentTime, gyroAngle,
                                          {leftDistance, rightDistance});
   }
-
- private:
-  DifferentialDriveOdometry m_odometryImpl;
 };
 
 }  // namespace wpi::math
