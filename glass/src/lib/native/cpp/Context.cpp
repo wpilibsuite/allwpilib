@@ -405,11 +405,6 @@ void wpi::glass::SetCurrentContext(Context* ctx) {
   gContext = ctx;
 }
 
-void wpi::glass::ResetTime() {
-  gContext->timestampDisplayStartTime = wpi::util::Now();
-  gContext->timestampDisplayStartTimeOverride = true;
-}
-
 uint64_t wpi::glass::GetZeroTime() {
   return GetTimestampDisplayStartTime(gContext);
 }

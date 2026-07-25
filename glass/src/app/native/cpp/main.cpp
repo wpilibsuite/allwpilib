@@ -24,6 +24,7 @@
 #include "wpi/gui/wpigui_openurl.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/StringExtras.hpp"
+#include "wpi/util/timestamp.hpp"
 
 namespace gui = wpi::gui;
 
@@ -264,7 +265,11 @@ int main(int argc, char** argv) {
   wpi::glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
                                             : saveDir);
   gPlotProvider->GlobalInit();
-  gui::AddInit([] { wpi::glass::ResetTime(); });
+  gui::AddInit([] {
+    auto ctx = wpi::glass::gContext;
+    ctx->timestampDisplayStartTime = wpi::util::Now();
+    ctx->timestampDisplayStartTimeOverride = true;
+  });
   gNtProvider->GlobalInit();
   NtInitialize();
 
@@ -277,9 +282,6 @@ int main(int argc, char** argv) {
       DisplayTimestampMenu();
       if (ImGui::MenuItem("Set Enter Key")) {
         gSetEnterKey = true;
-      }
-      if (ImGui::MenuItem("Reset Time")) {
-        wpi::glass::ResetTime();
       }
       ImGui::EndMenu();
     }

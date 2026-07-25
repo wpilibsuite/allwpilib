@@ -23,11 +23,6 @@ Context* GetCurrentContext();
 void SetCurrentContext(Context* ctx);
 
 /**
- * Resets timestamp display start time to current time.
- */
-void ResetTime();
-
-/**
  * Gets the timestamp display start time.
  */
 uint64_t GetZeroTime();
