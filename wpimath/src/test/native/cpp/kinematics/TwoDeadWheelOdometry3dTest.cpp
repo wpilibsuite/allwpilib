@@ -34,7 +34,7 @@ class TwoDeadWheelOdometry3dTest : public ::testing::Test {
   wpi::units::meter_t m_yWheelXPos = 1_m;
 
   TwoDeadWheelOdometry3d odometry{m_xWheelYPos, m_yWheelXPos, 0_m,
-                                  0_m,          Rotation3d{}, Pose2d{}};
+                                  0_m,          Rotation3d{}, Pose3d{}};
 
   Matrixd<2, 3> m_inverseKinematicsMatrix = Matrixd<2, 3>{
       {1, 0, -m_xWheelYPos.value()}, {0, 1, m_yWheelXPos.value()}};

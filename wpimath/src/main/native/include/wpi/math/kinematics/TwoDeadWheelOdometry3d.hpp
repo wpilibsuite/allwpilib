@@ -44,7 +44,7 @@ class TwoDeadWheelOdometry3d {
                                   const wpi::units::meter_t xWheelPos,
                                   const wpi::units::meter_t yWheelPos,
                                   const Rotation3d& gyroAngle,
-                                  const Pose2d& initialPose = Pose2d{})
+                                  const Pose3d& initialPose = Pose3d{})
       : m_xWheelYPos(xWheelYPos),
         m_yWheelXPos(yWheelXPos),
         m_pose(initialPose),
