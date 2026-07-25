@@ -1,3 +1,9 @@
+functions:
+  CloseAlertHandle:
+    overloads:
+      Alert&:
+        ignore: true
+
 classes:
   wpi::util::Alert:
     enums:
@@ -15,12 +21,12 @@ classes:
     inline_code: |
       .def("close", [](wpi::util::Alert &self) {
         py::gil_scoped_release release;
-        self.Set(false);
-      }, py::doc("Disables the alert"))
+        wpi::util::detail::CloseAlertHandle(self);
+      }, py::doc("Destroys the alert"))
       .def("__enter__", [](wpi::util::Alert &self) -> wpi::util::Alert& {
         return self;
       })
       .def("__exit__", [](wpi::util::Alert &self, py::args args) {
         py::gil_scoped_release release;
-        self.Set(false);
+        wpi::util::detail::CloseAlertHandle(self);
       })

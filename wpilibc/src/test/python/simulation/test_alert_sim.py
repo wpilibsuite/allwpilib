@@ -113,6 +113,18 @@ def test_close_unsets_alert(group_name):
         alert.set(True)
         assert is_alert_active("alert", Alert.Level.MEDIUM)
     assert not is_alert_active("alert", Alert.Level.MEDIUM)
+    assert AlertSim.get_count() == 0
+
+
+def test_close_releases_duplicate_id(group_name):
+    with Alert(group_name, "alert", "first", Alert.Level.HIGH) as first:
+        first.set(True)
+
+    assert AlertSim.get_count() == 0
+
+    with Alert(group_name, "alert", "second", Alert.Level.HIGH) as second:
+        second.set(True)
+        assert is_alert_active("second", Alert.Level.HIGH)
 
 
 def test_set_text_while_unset(group_name):

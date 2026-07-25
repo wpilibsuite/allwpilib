@@ -14,6 +14,16 @@
 
 namespace wpi::util {
 
+class Alert;
+
+namespace detail {
+
+// Used by RobotPy close()/__exit__() without exposing close-style semantics on
+// the C++ Alert API.
+void CloseAlertHandle(Alert& alert);
+
+}  // namespace detail
+
 /**
  * Persistent alert. Alerts are tagged with a type of HIGH, MEDIUM, or LOW to
  * denote urgency. See Alert::Level for suggested usage of each type. Alerts can
@@ -120,7 +130,17 @@ class Alert {
   Level GetLevel() const;
 
  private:
+  friend void detail::CloseAlertHandle(Alert& alert);
+
   Handle<WPI_AlertHandle, WPI_DestroyAlert> m_handle;
 };
+
+namespace detail {
+
+inline void CloseAlertHandle(Alert& alert) {
+  alert.m_handle = WPI_INVALID_HANDLE;
+}
+
+}  // namespace detail
 
 }  // namespace wpi::util
