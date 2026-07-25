@@ -38,28 +38,28 @@ class priority_queue {
   priority_queue() {}
 
   priority_queue(const Compare& comp, const Sequence& c) : c(c), comp(comp) {
-    std::make_heap(c.begin(), c.end(), comp);
+    std::make_heap(this->c.begin(), this->c.end(), comp);
   }
 
   explicit priority_queue(const Compare& comp, Sequence&& c = Sequence{})
       : c(std::move(c)), comp(comp) {
-    std::make_heap(c.begin(), c.end(), comp);
+    std::make_heap(this->c.begin(), this->c.end(), comp);
   }
 
   template <typename InputIterator>
   priority_queue(InputIterator first, InputIterator last, const Compare& comp,
                  const Sequence& c)
       : c(c), comp(comp) {
-    c.insert(c.end(), first, last);
-    std::make_heap(c.begin(), c.end(), comp);
+    this->c.insert(this->c.end(), first, last);
+    std::make_heap(this->c.begin(), this->c.end(), comp);
   }
 
   template <typename InputIterator>
   priority_queue(InputIterator first, InputIterator last,
                  const Compare& comp = Compare{}, Sequence&& c = Sequence{})
       : c(std::move(c)), comp(comp) {
-    c.insert(c.end(), first, last);
-    std::make_heap(c.begin(), c.end(), comp);
+    this->c.insert(this->c.end(), first, last);
+    std::make_heap(this->c.begin(), this->c.end(), comp);
   }
 
   [[nodiscard]]

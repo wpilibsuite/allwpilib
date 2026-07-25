@@ -8,10 +8,9 @@
 
 #include <algorithm>
 #include <cstring>
+#include <format>
 #include <mutex>
 #include <string>
-
-#include <fmt/format.h>
 
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
@@ -364,7 +363,7 @@ void HAL_FireCTREPCMOneShot(HAL_CTREPCMHandle handle, int32_t index,
   if (index > 7 || index < 0) {
     *status = MakeError(
         HAL_PARAMETER_OUT_OF_RANGE,
-        fmt::format("Only [0-7] are valid index values. Requested {}", index));
+        std::format("Only [0-7] are valid index values. Requested {}", index));
     return;
   }
 
@@ -395,7 +394,7 @@ void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
   if (index > 7 || index < 0) {
     *status = MakeError(
         HAL_PARAMETER_OUT_OF_RANGE,
-        fmt::format("Only [0-7] are valid index values. Requested {}", index));
+        std::format("Only [0-7] are valid index values. Requested {}", index));
     return;
   }
 

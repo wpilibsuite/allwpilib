@@ -4,12 +4,11 @@
 
 #pragma once
 
+#include <format>
 #include <memory>
 #include <string_view>
 #include <thread>
 #include <utility>
-
-#include <fmt/format.h>
 
 namespace wpi {
 class CameraServerShared {
@@ -17,27 +16,27 @@ class CameraServerShared {
   virtual ~CameraServerShared() = default;
   virtual void ReportUsage(std::string_view resource,
                            std::string_view data) = 0;
-  virtual void SetCameraServerErrorV(fmt::string_view format,
-                                     fmt::format_args args) = 0;
-  virtual void SetVisionRunnerErrorV(fmt::string_view format,
-                                     fmt::format_args args) = 0;
-  virtual void ReportDriverStationErrorV(fmt::string_view format,
-                                         fmt::format_args args) = 0;
+  virtual void SetCameraServerErrorV(std::string_view format,
+                                     std::format_args args) = 0;
+  virtual void SetVisionRunnerErrorV(std::string_view format,
+                                     std::format_args args) = 0;
+  virtual void ReportDriverStationErrorV(std::string_view format,
+                                         std::format_args args) = 0;
   virtual std::pair<std::thread::id, bool> GetRobotMainThreadId() const = 0;
 
   template <typename S, typename... Args>
   inline void SetCameraServerError(const S& format, Args&&... args) {
-    SetCameraServerErrorV(format, fmt::make_format_args(args...));
+    SetCameraServerErrorV(format, std::make_format_args(args...));
   }
 
   template <typename S, typename... Args>
   inline void SetVisionRunnerError(const S& format, Args&&... args) {
-    SetVisionRunnerErrorV(format, fmt::make_format_args(args...));
+    SetVisionRunnerErrorV(format, std::make_format_args(args...));
   }
 
   template <typename S, typename... Args>
   inline void ReportDriverStationError(const S& format, Args&&... args) {
-    ReportDriverStationErrorV(format, fmt::make_format_args(args...));
+    ReportDriverStationErrorV(format, std::make_format_args(args...));
   }
 };
 

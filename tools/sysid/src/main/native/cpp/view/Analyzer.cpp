@@ -6,13 +6,13 @@
 
 #include <algorithm>
 #include <exception>
+#include <format>
 #include <memory>
 #include <numbers>
 #include <string>
 #include <thread>
 #include <vector>
 
-#include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
@@ -576,7 +576,7 @@ void Analyzer::DisplayFeedforwardGains(float beginX, float beginY) {
       offset = m_feedforwardGains.offset.gain / (2 * std::numbers::pi);
     }
     DisplayDouble(
-        fmt::format("Angle offset to horizontal ({})", GetAbbreviation(unit))
+        std::format("Angle offset to horizontal ({})", GetAbbreviation(unit))
             .c_str(),
         &offset);
     CreateTooltip(
@@ -720,11 +720,11 @@ void Analyzer::DisplayFeedbackGains() {
   if (m_selectedLoopType == 0) {
     std::string unit;
     if (m_state != AnalyzerState::kWaitingForData) {
-      unit = fmt::format(" ({})", GetAbbreviation(m_manager->GetUnit()));
+      unit = std::format(" ({})", GetAbbreviation(m_manager->GetUnit()));
     }
 
     ImGui::SetCursorPosX(ImGui::GetFontSize() * 9);
-    if (DisplayDouble(fmt::format("Max Position Error{}", unit).c_str(),
+    if (DisplayDouble(std::format("Max Position Error{}", unit).c_str(),
                       &m_settings.lqr.qp, false)) {
       if (m_settings.lqr.qp > 0) {
         UpdateFeedbackGains();
@@ -734,11 +734,11 @@ void Analyzer::DisplayFeedbackGains() {
 
   std::string unit;
   if (m_state != AnalyzerState::kWaitingForData) {
-    unit = fmt::format(" ({}/s)", GetAbbreviation(m_manager->GetUnit()));
+    unit = std::format(" ({}/s)", GetAbbreviation(m_manager->GetUnit()));
   }
 
   ImGui::SetCursorPosX(ImGui::GetFontSize() * 9);
-  if (DisplayDouble(fmt::format("Max Velocity Error{}", unit).c_str(),
+  if (DisplayDouble(std::format("Max Velocity Error{}", unit).c_str(),
                     &m_settings.lqr.qv, false)) {
     if (m_settings.lqr.qv > 0) {
       UpdateFeedbackGains();

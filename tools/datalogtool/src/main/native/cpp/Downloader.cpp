@@ -13,11 +13,11 @@
 
 #include <algorithm>
 #include <filesystem>
+#include <format>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <libssh/sftp.h>
@@ -190,7 +190,7 @@ size_t Downloader::DisplayFiles() {
       ImGui::TableNextColumn();
       ImGui::TextUnformatted(file.name.c_str());
       ImGui::TableNextColumn();
-      auto sizeText = fmt::format("{}", file.size);
+      auto sizeText = std::format("{}", file.size);
       ImGui::TextUnformatted(sizeText.c_str());
       ImGui::TableNextColumn();
       if (m_state == kDownload || m_state == kDownloadDone) {
@@ -204,7 +204,7 @@ size_t Downloader::DisplayFiles() {
           ImGui::TextUnformatted(file.status.c_str());
         }
       } else {
-        auto checkboxLabel = fmt::format("##{}", file.name);
+        auto checkboxLabel = std::format("##{}", file.name);
         ImGui::Checkbox(checkboxLabel.c_str(), &file.selected);
       }
     }
@@ -357,7 +357,7 @@ void Downloader::ThreadMain() {
               continue;
             }
 
-            auto remoteFilename = fmt::format(
+            auto remoteFilename = std::format(
                 "{}{}{}", m_remoteDir,
                 wpi::util::ends_with(m_remoteDir, '/') ? "" : "/", file.name);
             auto localFilename = fs::path{m_localDir} / file.name;
@@ -448,7 +448,7 @@ void Downloader::ThreadMain() {
               continue;
             }
 
-            auto remoteFilename = fmt::format(
+            auto remoteFilename = std::format(
                 "{}{}{}", m_remoteDir,
                 wpi::util::ends_with(m_remoteDir, '/') ? "" : "/", file.name);
 

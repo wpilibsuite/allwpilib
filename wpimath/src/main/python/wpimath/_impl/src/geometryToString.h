@@ -87,14 +87,14 @@ inline std::string toString(const wpi::math::Pose3d& self) {
 
 inline std::string toString(const wpi::math::Rectangle2d& self) {
   return "Rectangle2d(center=" + rpy::toString(self.Center()) +
-         ", xWidth=" + std::to_string(self.XWidth()()) +
-         ", yWidth=" + std::to_string(self.YWidth()()) + ")";
+         ", x_width=" + std::to_string(self.XWidth()()) +
+         ", y_width=" + std::to_string(self.YWidth()()) + ")";
 }
 
 inline std::string toString(const wpi::math::Ellipse2d& self) {
   return "Ellipse2d(center=" + rpy::toString(self.Center()) +
-         ", xSemiAxis=" + std::to_string(self.XSemiAxis()()) +
-         ", ySemiAxis=" + std::to_string(self.YSemiAxis()()) + ")";
+         ", x_semi_axis=" + std::to_string(self.XSemiAxis()()) +
+         ", y_semi_axis=" + std::to_string(self.YSemiAxis()()) + ")";
 }
 
 }  // namespace rpy

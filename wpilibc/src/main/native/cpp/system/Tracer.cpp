@@ -4,7 +4,7 @@
 
 #include "wpi/system/Tracer.hpp"
 
-#include <fmt/format.h>
+#include <format>
 
 #include "wpi/system/Errors.hpp"
 #include "wpi/util/SmallString.hpp"
@@ -48,7 +48,7 @@ void Tracer::PrintEpochs(wpi::util::raw_ostream& os) {
   if (now - m_lastEpochsPrintTime > MIN_PRINT_PERIOD) {
     m_lastEpochsPrintTime = now;
     for (const auto& epoch : m_epochs) {
-      os << fmt::format(
+      os << std::format(
           "\t{}: {:.6f}s\n", epoch.first,
           duration_cast<microseconds>(epoch.second).count() / 1.0e6);
     }

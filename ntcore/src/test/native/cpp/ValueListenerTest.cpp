@@ -2,33 +2,30 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
-
 #include "TestPrinters.hpp"
-#include "ValueMatcher.hpp"
+#undef FAIL
+#undef SUCCEED
+#include <catch2/catch_test_macros.hpp>
+
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/Synchronization.hpp"
 
-using ::testing::_;
-using ::testing::AnyNumber;
-using ::testing::IsNull;
-using ::testing::Return;
-
 namespace wpi::nt {
 
 // Test only local here; it's more reliable to mock the network
-class ValueListenerTest : public ::testing::Test {
+class ValueListenerTest {
  public:
   ValueListenerTest() : m_inst{wpi::nt::CreateInstance()} {}
 
-  ~ValueListenerTest() override { wpi::nt::DestroyInstance(m_inst); }
+  ~ValueListenerTest() { wpi::nt::DestroyInstance(m_inst); }
 
  protected:
   NT_Inst m_inst;
 };
 
-TEST_F(ValueListenerTest, MultiPollSub) {
+TEST_CASE_METHOD(ValueListenerTest, "ValueListenerTest MultiPollSub",
+                 "[ntcore][value-listener]") {
   auto topic = wpi::nt::GetTopic(m_inst, "foo");
   auto pub = wpi::nt::Publish(topic, NT_DOUBLE, "double");
   auto sub = wpi::nt::Subscribe(topic, NT_DOUBLE, "double");
@@ -46,45 +43,46 @@ TEST_F(ValueListenerTest, MultiPollSub) {
   wpi::nt::SetDouble(pub, 0);
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller1, 1.0, &timedOut));
-  ASSERT_FALSE(timedOut);
-  ASSERT_TRUE(wpi::util::WaitForObject(poller2, 1.0, &timedOut));
-  ASSERT_FALSE(timedOut);
-  ASSERT_TRUE(wpi::util::WaitForObject(poller3, 1.0, &timedOut));
-  ASSERT_FALSE(timedOut);
+  REQUIRE(wpi::util::WaitForObject(poller1, 1.0, &timedOut));
+  REQUIRE_FALSE(timedOut);
+  REQUIRE(wpi::util::WaitForObject(poller2, 1.0, &timedOut));
+  REQUIRE_FALSE(timedOut);
+  REQUIRE(wpi::util::WaitForObject(poller3, 1.0, &timedOut));
+  REQUIRE_FALSE(timedOut);
   auto results1 = wpi::nt::ReadListenerQueue(poller1);
   auto results2 = wpi::nt::ReadListenerQueue(poller2);
   auto results3 = wpi::nt::ReadListenerQueue(poller3);
 
-  ASSERT_EQ(results1.size(), 1u);
-  EXPECT_EQ(results1[0].flags, wpi::nt::EventFlags::VALUE_LOCAL);
-  EXPECT_EQ(results1[0].listener, h1);
+  REQUIRE(results1.size() == 1u);
+  CHECK(results1[0].flags == wpi::nt::EventFlags::VALUE_LOCAL);
+  CHECK(results1[0].listener == h1);
   auto valueData = results1[0].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->subentry, sub);
-  EXPECT_EQ(valueData->topic, topic);
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(0.0));
+  REQUIRE(valueData);
+  CHECK(valueData->subentry == sub);
+  CHECK(valueData->topic == topic);
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(0.0));
 
-  ASSERT_EQ(results2.size(), 1u);
-  EXPECT_EQ(results2[0].flags, wpi::nt::EventFlags::VALUE_LOCAL);
-  EXPECT_EQ(results2[0].listener, h2);
+  REQUIRE(results2.size() == 1u);
+  CHECK(results2[0].flags == wpi::nt::EventFlags::VALUE_LOCAL);
+  CHECK(results2[0].listener == h2);
   valueData = results2[0].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->subentry, sub);
-  EXPECT_EQ(valueData->topic, topic);
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(0.0));
+  REQUIRE(valueData);
+  CHECK(valueData->subentry == sub);
+  CHECK(valueData->topic == topic);
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(0.0));
 
-  ASSERT_EQ(results3.size(), 1u);
-  EXPECT_EQ(results3[0].flags, wpi::nt::EventFlags::VALUE_LOCAL);
-  EXPECT_EQ(results3[0].listener, h3);
+  REQUIRE(results3.size() == 1u);
+  CHECK(results3[0].flags == wpi::nt::EventFlags::VALUE_LOCAL);
+  CHECK(results3[0].listener == h3);
   valueData = results3[0].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->subentry, sub);
-  EXPECT_EQ(valueData->topic, topic);
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(0.0));
+  REQUIRE(valueData);
+  CHECK(valueData->subentry == sub);
+  CHECK(valueData->topic == topic);
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(0.0));
 }
 
-TEST_F(ValueListenerTest, PollMultiSub) {
+TEST_CASE_METHOD(ValueListenerTest, "ValueListenerTest PollMultiSub",
+                 "[ntcore][value-listener]") {
   auto topic = wpi::nt::GetTopic(m_inst, "foo");
   auto pub = wpi::nt::Publish(topic, NT_DOUBLE, "double");
   auto sub1 = wpi::nt::Subscribe(topic, NT_DOUBLE, "double");
@@ -99,29 +97,30 @@ TEST_F(ValueListenerTest, PollMultiSub) {
   wpi::nt::SetDouble(pub, 0);
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
-  ASSERT_FALSE(timedOut);
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE_FALSE(timedOut);
   auto results = wpi::nt::ReadListenerQueue(poller);
 
-  ASSERT_EQ(results.size(), 2u);
-  EXPECT_EQ(results[0].flags, wpi::nt::EventFlags::VALUE_LOCAL);
-  EXPECT_EQ(results[0].listener, h1);
+  REQUIRE(results.size() == 2u);
+  CHECK(results[0].flags == wpi::nt::EventFlags::VALUE_LOCAL);
+  CHECK(results[0].listener == h1);
   auto valueData = results[0].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->subentry, sub1);
-  EXPECT_EQ(valueData->topic, topic);
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(0.0));
+  REQUIRE(valueData);
+  CHECK(valueData->subentry == sub1);
+  CHECK(valueData->topic == topic);
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(0.0));
 
-  EXPECT_EQ(results[1].flags, wpi::nt::EventFlags::VALUE_LOCAL);
-  EXPECT_EQ(results[1].listener, h2);
+  CHECK(results[1].flags == wpi::nt::EventFlags::VALUE_LOCAL);
+  CHECK(results[1].listener == h2);
   valueData = results[1].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->subentry, sub2);
-  EXPECT_EQ(valueData->topic, topic);
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(0.0));
+  REQUIRE(valueData);
+  CHECK(valueData->subentry == sub2);
+  CHECK(valueData->topic == topic);
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(0.0));
 }
 
-TEST_F(ValueListenerTest, PollMultiSubTopic) {
+TEST_CASE_METHOD(ValueListenerTest, "ValueListenerTest PollMultiSubTopic",
+                 "[ntcore][value-listener]") {
   auto topic1 = wpi::nt::GetTopic(m_inst, "foo");
   auto topic2 = wpi::nt::GetTopic(m_inst, "bar");
   auto pub1 = wpi::nt::Publish(topic1, NT_DOUBLE, "double");
@@ -139,29 +138,30 @@ TEST_F(ValueListenerTest, PollMultiSubTopic) {
   wpi::nt::SetDouble(pub2, 1);
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
-  ASSERT_FALSE(timedOut);
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE_FALSE(timedOut);
   auto results = wpi::nt::ReadListenerQueue(poller);
 
-  ASSERT_EQ(results.size(), 2u);
-  EXPECT_EQ(results[0].flags, wpi::nt::EventFlags::VALUE_LOCAL);
-  EXPECT_EQ(results[0].listener, h1);
+  REQUIRE(results.size() == 2u);
+  CHECK(results[0].flags == wpi::nt::EventFlags::VALUE_LOCAL);
+  CHECK(results[0].listener == h1);
   auto valueData = results[0].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->subentry, sub1);
-  EXPECT_EQ(valueData->topic, topic1);
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(0.0));
+  REQUIRE(valueData);
+  CHECK(valueData->subentry == sub1);
+  CHECK(valueData->topic == topic1);
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(0.0));
 
-  EXPECT_EQ(results[1].flags, wpi::nt::EventFlags::VALUE_LOCAL);
-  EXPECT_EQ(results[1].listener, h2);
+  CHECK(results[1].flags == wpi::nt::EventFlags::VALUE_LOCAL);
+  CHECK(results[1].listener == h2);
   valueData = results[1].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->subentry, sub2);
-  EXPECT_EQ(valueData->topic, topic2);
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(1.0));
+  REQUIRE(valueData);
+  CHECK(valueData->subentry == sub2);
+  CHECK(valueData->topic == topic2);
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(1.0));
 }
 
-TEST_F(ValueListenerTest, PollSubMultiple) {
+TEST_CASE_METHOD(ValueListenerTest, "ValueListenerTest PollSubMultiple",
+                 "[ntcore][value-listener]") {
   auto topic1 = wpi::nt::GetTopic(m_inst, "foo/1");
   auto topic2 = wpi::nt::GetTopic(m_inst, "foo/2");
   auto pub1 = wpi::nt::Publish(topic1, NT_DOUBLE, "double");
@@ -176,29 +176,30 @@ TEST_F(ValueListenerTest, PollSubMultiple) {
   wpi::nt::SetDouble(pub2, 1);
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
-  ASSERT_FALSE(timedOut);
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE_FALSE(timedOut);
   auto results = wpi::nt::ReadListenerQueue(poller);
 
-  ASSERT_EQ(results.size(), 2u);
-  EXPECT_EQ(results[0].flags, wpi::nt::EventFlags::VALUE_LOCAL);
-  EXPECT_EQ(results[0].listener, h);
+  REQUIRE(results.size() == 2u);
+  CHECK(results[0].flags == wpi::nt::EventFlags::VALUE_LOCAL);
+  CHECK(results[0].listener == h);
   auto valueData = results[0].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->subentry, sub);
-  EXPECT_EQ(valueData->topic, topic1);
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(0.0));
+  REQUIRE(valueData);
+  CHECK(valueData->subentry == sub);
+  CHECK(valueData->topic == topic1);
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(0.0));
 
-  EXPECT_EQ(results[1].flags, wpi::nt::EventFlags::VALUE_LOCAL);
-  EXPECT_EQ(results[1].listener, h);
+  CHECK(results[1].flags == wpi::nt::EventFlags::VALUE_LOCAL);
+  CHECK(results[1].listener == h);
   valueData = results[1].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->subentry, sub);
-  EXPECT_EQ(valueData->topic, topic2);
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(1.0));
+  REQUIRE(valueData);
+  CHECK(valueData->subentry == sub);
+  CHECK(valueData->topic == topic2);
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(1.0));
 }
 
-TEST_F(ValueListenerTest, PollSubPrefixCreated) {
+TEST_CASE_METHOD(ValueListenerTest, "ValueListenerTest PollSubPrefixCreated",
+                 "[ntcore][value-listener]") {
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
   auto h = wpi::nt::AddPolledListener(poller, {{"foo"}},
                                       wpi::nt::EventFlags::VALUE_LOCAL);
@@ -215,53 +216,55 @@ TEST_F(ValueListenerTest, PollSubPrefixCreated) {
   wpi::nt::SetDouble(pub3, 1);
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
-  ASSERT_FALSE(timedOut);
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE_FALSE(timedOut);
   auto results = wpi::nt::ReadListenerQueue(poller);
 
-  ASSERT_EQ(results.size(), 2u);
-  EXPECT_EQ(results[0].flags, wpi::nt::EventFlags::VALUE_LOCAL);
-  EXPECT_EQ(results[0].listener, h);
+  REQUIRE(results.size() == 2u);
+  CHECK(results[0].flags == wpi::nt::EventFlags::VALUE_LOCAL);
+  CHECK(results[0].listener == h);
   auto valueData = results[0].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->topic, topic1);
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(0.0));
+  REQUIRE(valueData);
+  CHECK(valueData->topic == topic1);
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(0.0));
 
-  EXPECT_EQ(results[1].flags, wpi::nt::EventFlags::VALUE_LOCAL);
-  EXPECT_EQ(results[1].listener, h);
+  CHECK(results[1].flags == wpi::nt::EventFlags::VALUE_LOCAL);
+  CHECK(results[1].listener == h);
   valueData = results[1].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->topic, topic2);
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(1.0));
+  REQUIRE(valueData);
+  CHECK(valueData->topic == topic2);
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(1.0));
 }
 
-TEST_F(ValueListenerTest, PollEntry) {
+TEST_CASE_METHOD(ValueListenerTest, "ValueListenerTest PollEntry",
+                 "[ntcore][value-listener]") {
   auto entry = wpi::nt::GetEntry(m_inst, "foo");
 
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
   auto h = wpi::nt::AddPolledListener(poller, entry,
                                       wpi::nt::EventFlags::VALUE_LOCAL);
 
-  ASSERT_TRUE(wpi::nt::SetDouble(entry, 0));
+  REQUIRE(wpi::nt::SetDouble(entry, 0));
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
-  ASSERT_FALSE(timedOut);
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE_FALSE(timedOut);
   auto results = wpi::nt::ReadListenerQueue(poller);
 
-  ASSERT_EQ(results.size(), 1u);
-  EXPECT_EQ(results[0].flags, wpi::nt::EventFlags::VALUE_LOCAL);
-  EXPECT_EQ(results[0].listener, h);
+  REQUIRE(results.size() == 1u);
+  CHECK(results[0].flags == wpi::nt::EventFlags::VALUE_LOCAL);
+  CHECK(results[0].listener == h);
   auto valueData = results[0].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->subentry, entry);
-  EXPECT_EQ(valueData->topic, wpi::nt::GetTopic(m_inst, "foo"));
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(0.0));
+  REQUIRE(valueData);
+  CHECK(valueData->subentry == entry);
+  CHECK(valueData->topic == wpi::nt::GetTopic(m_inst, "foo"));
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(0.0));
 }
 
-TEST_F(ValueListenerTest, PollImmediate) {
+TEST_CASE_METHOD(ValueListenerTest, "ValueListenerTest PollImmediate",
+                 "[ntcore][value-listener]") {
   auto entry = wpi::nt::GetEntry(m_inst, "foo");
-  ASSERT_TRUE(wpi::nt::SetDouble(entry, 0));
+  REQUIRE(wpi::nt::SetDouble(entry, 0));
 
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
   auto h = wpi::nt::AddPolledListener(
@@ -269,23 +272,24 @@ TEST_F(ValueListenerTest, PollImmediate) {
       wpi::nt::EventFlags::VALUE_LOCAL | wpi::nt::EventFlags::IMMEDIATE);
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
-  ASSERT_FALSE(timedOut);
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE_FALSE(timedOut);
   auto results = wpi::nt::ReadListenerQueue(poller);
 
-  ASSERT_EQ(results.size(), 1u);
-  EXPECT_EQ(results[0].flags & (wpi::nt::EventFlags::VALUE_LOCAL |
-                                wpi::nt::EventFlags::IMMEDIATE),
-            wpi::nt::EventFlags::VALUE_LOCAL | wpi::nt::EventFlags::IMMEDIATE);
-  EXPECT_EQ(results[0].listener, h);
+  REQUIRE(results.size() == 1u);
+  CHECK((results[0].flags &
+         (wpi::nt::EventFlags::VALUE_LOCAL | wpi::nt::EventFlags::IMMEDIATE)) ==
+        (wpi::nt::EventFlags::VALUE_LOCAL | wpi::nt::EventFlags::IMMEDIATE));
+  CHECK(results[0].listener == h);
   auto valueData = results[0].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->subentry, entry);
-  EXPECT_EQ(valueData->topic, wpi::nt::GetTopic(m_inst, "foo"));
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(0.0));
+  REQUIRE(valueData);
+  CHECK(valueData->subentry == entry);
+  CHECK(valueData->topic == wpi::nt::GetTopic(m_inst, "foo"));
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(0.0));
 }
 
-TEST_F(ValueListenerTest, PollImmediateNoValue) {
+TEST_CASE_METHOD(ValueListenerTest, "ValueListenerTest PollImmediateNoValue",
+                 "[ntcore][value-listener]") {
   auto entry = wpi::nt::GetEntry(m_inst, "foo");
 
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
@@ -294,29 +298,31 @@ TEST_F(ValueListenerTest, PollImmediateNoValue) {
       wpi::nt::EventFlags::VALUE_LOCAL | wpi::nt::EventFlags::IMMEDIATE);
 
   bool timedOut = false;
-  ASSERT_FALSE(wpi::util::WaitForObject(poller, 0.02, &timedOut));
-  ASSERT_TRUE(timedOut);
+  REQUIRE_FALSE(wpi::util::WaitForObject(poller, 0.02, &timedOut));
+  REQUIRE(timedOut);
   auto results = wpi::nt::ReadListenerQueue(poller);
-  ASSERT_TRUE(results.empty());
+  REQUIRE(results.empty());
 
   // now set a value
-  ASSERT_TRUE(wpi::nt::SetDouble(entry, 0));
+  REQUIRE(wpi::nt::SetDouble(entry, 0));
 
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
   results = wpi::nt::ReadListenerQueue(poller);
-  ASSERT_FALSE(timedOut);
+  REQUIRE_FALSE(timedOut);
 
-  ASSERT_EQ(results.size(), 1u);
-  EXPECT_EQ(results[0].flags, wpi::nt::EventFlags::VALUE_LOCAL);
-  EXPECT_EQ(results[0].listener, h);
+  REQUIRE(results.size() == 1u);
+  CHECK(results[0].flags == wpi::nt::EventFlags::VALUE_LOCAL);
+  CHECK(results[0].listener == h);
   auto valueData = results[0].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->subentry, entry);
-  EXPECT_EQ(valueData->topic, wpi::nt::GetTopic(m_inst, "foo"));
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(0.0));
+  REQUIRE(valueData);
+  CHECK(valueData->subentry == entry);
+  CHECK(valueData->topic == wpi::nt::GetTopic(m_inst, "foo"));
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(0.0));
 }
 
-TEST_F(ValueListenerTest, PollImmediateSubMultiple) {
+TEST_CASE_METHOD(ValueListenerTest,
+                 "ValueListenerTest PollImmediateSubMultiple",
+                 "[ntcore][value-listener]") {
   auto topic1 = wpi::nt::GetTopic(m_inst, "foo/1");
   auto topic2 = wpi::nt::GetTopic(m_inst, "foo/2");
   auto pub1 = wpi::nt::Publish(topic1, NT_DOUBLE, "double");
@@ -331,33 +337,34 @@ TEST_F(ValueListenerTest, PollImmediateSubMultiple) {
       wpi::nt::EventFlags::VALUE_LOCAL | wpi::nt::EventFlags::IMMEDIATE);
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
-  ASSERT_FALSE(timedOut);
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE_FALSE(timedOut);
   auto results = wpi::nt::ReadListenerQueue(poller);
 
-  ASSERT_EQ(results.size(), 2u);
-  EXPECT_EQ(results[0].flags & (wpi::nt::EventFlags::VALUE_LOCAL |
-                                wpi::nt::EventFlags::IMMEDIATE),
-            wpi::nt::EventFlags::VALUE_LOCAL | wpi::nt::EventFlags::IMMEDIATE);
-  EXPECT_EQ(results[0].listener, h);
+  REQUIRE(results.size() == 2u);
+  CHECK((results[0].flags &
+         (wpi::nt::EventFlags::VALUE_LOCAL | wpi::nt::EventFlags::IMMEDIATE)) ==
+        (wpi::nt::EventFlags::VALUE_LOCAL | wpi::nt::EventFlags::IMMEDIATE));
+  CHECK(results[0].listener == h);
   auto valueData = results[0].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->subentry, sub);
-  EXPECT_EQ(valueData->topic, topic1);
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(0.0));
+  REQUIRE(valueData);
+  CHECK(valueData->subentry == sub);
+  CHECK(valueData->topic == topic1);
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(0.0));
 
-  EXPECT_EQ(results[1].flags & (wpi::nt::EventFlags::VALUE_LOCAL |
-                                wpi::nt::EventFlags::IMMEDIATE),
-            wpi::nt::EventFlags::VALUE_LOCAL | wpi::nt::EventFlags::IMMEDIATE);
-  EXPECT_EQ(results[1].listener, h);
+  CHECK((results[1].flags &
+         (wpi::nt::EventFlags::VALUE_LOCAL | wpi::nt::EventFlags::IMMEDIATE)) ==
+        (wpi::nt::EventFlags::VALUE_LOCAL | wpi::nt::EventFlags::IMMEDIATE));
+  CHECK(results[1].listener == h);
   valueData = results[1].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->subentry, sub);
-  EXPECT_EQ(valueData->topic, topic2);
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(1.0));
+  REQUIRE(valueData);
+  CHECK(valueData->subentry == sub);
+  CHECK(valueData->topic == topic2);
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(1.0));
 }
 
-TEST_F(ValueListenerTest, TwoSubOneListener) {
+TEST_CASE_METHOD(ValueListenerTest, "ValueListenerTest TwoSubOneListener",
+                 "[ntcore][value-listener]") {
   auto topic = wpi::nt::GetTopic(m_inst, "foo");
   auto pub = wpi::nt::Publish(topic, NT_DOUBLE, "double");
   auto sub1 = wpi::nt::Subscribe(topic, NT_DOUBLE, "double");
@@ -373,22 +380,23 @@ TEST_F(ValueListenerTest, TwoSubOneListener) {
   wpi::nt::SetDouble(pub, 0);
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
-  ASSERT_FALSE(timedOut);
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE_FALSE(timedOut);
   auto results = wpi::nt::ReadListenerQueue(poller);
 
-  ASSERT_EQ(results.size(), 1u);
-  EXPECT_EQ(results[0].flags & wpi::nt::EventFlags::VALUE_LOCAL,
-            wpi::nt::EventFlags::VALUE_LOCAL);
-  EXPECT_EQ(results[0].listener, h);
+  REQUIRE(results.size() == 1u);
+  CHECK((results[0].flags & wpi::nt::EventFlags::VALUE_LOCAL) ==
+        wpi::nt::EventFlags::VALUE_LOCAL);
+  CHECK(results[0].listener == h);
   auto valueData = results[0].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->subentry, sub1);
-  EXPECT_EQ(valueData->topic, topic);
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(0.0));
+  REQUIRE(valueData);
+  CHECK(valueData->subentry == sub1);
+  CHECK(valueData->topic == topic);
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(0.0));
 }
 
-TEST_F(ValueListenerTest, TwoSubOneMultiListener) {
+TEST_CASE_METHOD(ValueListenerTest, "ValueListenerTest TwoSubOneMultiListener",
+                 "[ntcore][value-listener]") {
   auto topic = wpi::nt::GetTopic(m_inst, "foo");
   auto pub = wpi::nt::Publish(topic, NT_DOUBLE, "double");
   auto sub1 = wpi::nt::Subscribe(topic, NT_DOUBLE, "double");
@@ -404,19 +412,19 @@ TEST_F(ValueListenerTest, TwoSubOneMultiListener) {
   wpi::nt::SetDouble(pub, 0);
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
-  ASSERT_FALSE(timedOut);
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE_FALSE(timedOut);
   auto results = wpi::nt::ReadListenerQueue(poller);
 
-  ASSERT_EQ(results.size(), 1u);
-  EXPECT_EQ(results[0].flags & wpi::nt::EventFlags::VALUE_LOCAL,
-            wpi::nt::EventFlags::VALUE_LOCAL);
-  EXPECT_EQ(results[0].listener, h);
+  REQUIRE(results.size() == 1u);
+  CHECK((results[0].flags & wpi::nt::EventFlags::VALUE_LOCAL) ==
+        wpi::nt::EventFlags::VALUE_LOCAL);
+  CHECK(results[0].listener == h);
   auto valueData = results[0].GetValueEventData();
-  ASSERT_TRUE(valueData);
-  EXPECT_EQ(valueData->subentry, sub3);
-  EXPECT_EQ(valueData->topic, topic);
-  EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(0.0));
+  REQUIRE(valueData);
+  CHECK(valueData->subentry == sub3);
+  CHECK(valueData->topic == topic);
+  CHECK(valueData->value == wpi::nt::Value::MakeDouble(0.0));
 }
 
 }  // namespace wpi::nt

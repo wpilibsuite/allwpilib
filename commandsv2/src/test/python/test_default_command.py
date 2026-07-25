@@ -9,65 +9,65 @@ if TYPE_CHECKING:
 import pytest
 
 
-def test_defaultCommandSchedule(scheduler: commands2.CommandScheduler):
-    hasDefaultCommand = commands2.Subsystem()
+def test_default_command_schedule(scheduler: commands2.CommandScheduler):
+    has_default_command = commands2.Subsystem()
 
-    defaultCommand = commands2.Command()
-    defaultCommand.addRequirements(hasDefaultCommand)
+    default_command = commands2.Command()
+    default_command.add_requirements(has_default_command)
 
-    scheduler.setDefaultCommand(hasDefaultCommand, defaultCommand)
+    scheduler.set_default_command(has_default_command, default_command)
     scheduler.run()
 
-    assert scheduler.isScheduled(defaultCommand)
+    assert scheduler.is_scheduled(default_command)
 
 
-def test_defaultCommandInterruptResume(scheduler: commands2.CommandScheduler):
-    hasDefaultCommand = commands2.Subsystem()
+def test_default_command_interrupt_resume(scheduler: commands2.CommandScheduler):
+    has_default_command = commands2.Subsystem()
 
-    defaultCommand = commands2.Command()
-    defaultCommand.addRequirements(hasDefaultCommand)
+    default_command = commands2.Command()
+    default_command.add_requirements(has_default_command)
 
     interrupter = commands2.Command()
-    interrupter.addRequirements(hasDefaultCommand)
+    interrupter.add_requirements(has_default_command)
 
-    scheduler.setDefaultCommand(hasDefaultCommand, defaultCommand)
+    scheduler.set_default_command(has_default_command, default_command)
     scheduler.run()
     scheduler.schedule(interrupter)
 
-    assert not scheduler.isScheduled(defaultCommand)
-    assert scheduler.isScheduled(interrupter)
+    assert not scheduler.is_scheduled(default_command)
+    assert scheduler.is_scheduled(interrupter)
 
     scheduler.cancel(interrupter)
     scheduler.run()
 
-    assert scheduler.isScheduled(defaultCommand)
-    assert not scheduler.isScheduled(interrupter)
+    assert scheduler.is_scheduled(default_command)
+    assert not scheduler.is_scheduled(interrupter)
 
 
-def test_defaultCommandDisableResume(scheduler: commands2.CommandScheduler):
-    hasDefaultCommand = commands2.Subsystem()
+def test_default_command_disable_resume(scheduler: commands2.CommandScheduler):
+    has_default_command = commands2.Subsystem()
 
-    defaultCommand = commands2.Command()
-    defaultCommand.addRequirements(hasDefaultCommand)
-    defaultCommand.runsWhenDisabled = lambda: False
+    default_command = commands2.Command()
+    default_command.add_requirements(has_default_command)
+    default_command.runs_when_disabled = lambda: False
 
-    start_spying_on(defaultCommand)
+    start_spying_on(default_command)
 
-    scheduler.setDefaultCommand(hasDefaultCommand, defaultCommand)
+    scheduler.set_default_command(has_default_command, default_command)
     scheduler.run()
 
-    assert scheduler.isScheduled(defaultCommand)
+    assert scheduler.is_scheduled(default_command)
 
-    DriverStationSim.setEnabled(False)
-    DriverStationSim.notifyNewData()
+    DriverStationSim.set_enabled(False)
+    DriverStationSim.notify_new_data()
     scheduler.run()
 
-    assert not scheduler.isScheduled(defaultCommand)
+    assert not scheduler.is_scheduled(default_command)
 
-    DriverStationSim.setEnabled(True)
-    DriverStationSim.notifyNewData()
+    DriverStationSim.set_enabled(True)
+    DriverStationSim.notify_new_data()
     scheduler.run()
 
-    assert scheduler.isScheduled(defaultCommand)
+    assert scheduler.is_scheduled(default_command)
 
-    assert defaultCommand.end.called_with(True)
+    assert default_command.end.called_with(True)

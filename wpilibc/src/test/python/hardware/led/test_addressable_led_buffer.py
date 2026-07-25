@@ -37,8 +37,8 @@ class TestAddressableLEDBuffer:
     def test_hsv_convert(self, h, s, v, r, g, b):
         """Test HSV to RGB conversion"""
         buffer = AddressableLEDBuffer(length=1)
-        buffer.setHSV(0, h, s, v)
-        color = buffer.getLED8Bit(0)
+        buffer.set_hsv(0, h, s, v)
+        color = buffer.get_led_8bit(0)
         assert color.red == r, "R value didn't match"
         assert color.green == g, "G value didn't match"
         assert color.blue == b, "B value didn't match"
@@ -50,43 +50,43 @@ class TestAddressableLEDBuffer:
         first_blue_color_8bit = Color8Bit(Color.FIRST_BLUE)
         first_red_color_8bit = Color8Bit(Color.FIRST_RED)
 
-        buffer.setLED(0, Color.FIRST_BLUE)
-        buffer.setLED(1, denim_color_8bit)
-        buffer.setLED(2, Color.FIRST_RED)
-        buffer.setLED(3, Color.FIRST_BLUE)
+        buffer.set_led(0, Color.FIRST_BLUE)
+        buffer.set_led(1, denim_color_8bit)
+        buffer.set_led(2, Color.FIRST_RED)
+        buffer.set_led(3, Color.FIRST_BLUE)
 
-        assert buffer.getLED(0) == Color.FIRST_BLUE
-        assert buffer.getLED(1) == Color.DENIM
-        assert buffer.getLED(2) == Color.FIRST_RED
-        assert buffer.getLED(3) == Color.FIRST_BLUE
-        assert buffer.getLED8Bit(0) == first_blue_color_8bit
-        assert buffer.getLED8Bit(1) == denim_color_8bit
-        assert buffer.getLED8Bit(2) == first_red_color_8bit
-        assert buffer.getLED8Bit(3) == first_blue_color_8bit
+        assert buffer.get_led(0) == Color.FIRST_BLUE
+        assert buffer.get_led(1) == Color.DENIM
+        assert buffer.get_led(2) == Color.FIRST_RED
+        assert buffer.get_led(3) == Color.FIRST_BLUE
+        assert buffer.get_led_8bit(0) == first_blue_color_8bit
+        assert buffer.get_led_8bit(1) == denim_color_8bit
+        assert buffer.get_led_8bit(2) == first_red_color_8bit
+        assert buffer.get_led_8bit(3) == first_blue_color_8bit
 
     def test_get_red(self):
         """Test getting red component"""
         buffer = AddressableLEDBuffer(1)
-        buffer.setRGB(0, 127, 128, 129)
-        assert buffer.getRed(0) == 127
+        buffer.set_rgb(0, 127, 128, 129)
+        assert buffer.get_red(0) == 127
 
     def test_get_green(self):
         """Test getting green component"""
         buffer = AddressableLEDBuffer(1)
-        buffer.setRGB(0, 127, 128, 129)
-        assert buffer.getGreen(0) == 128
+        buffer.set_rgb(0, 127, 128, 129)
+        assert buffer.get_green(0) == 128
 
     def test_get_blue(self):
         """Test getting blue component"""
         buffer = AddressableLEDBuffer(1)
-        buffer.setRGB(0, 127, 128, 129)
-        assert buffer.getBlue(0) == 129
+        buffer.set_rgb(0, 127, 128, 129)
+        assert buffer.get_blue(0) == 129
 
     def test_iteration(self):
         buffer = AddressableLEDBuffer(3)
-        buffer.setRGB(0, 1, 2, 3)
-        buffer.setRGB(1, 4, 5, 6)
-        buffer.setRGB(2, 7, 8, 9)
+        buffer.set_rgb(0, 1, 2, 3)
+        buffer.set_rgb(1, 4, 5, 6)
+        buffer.set_rgb(2, 7, 8, 9)
 
         results = []
 
@@ -113,19 +113,19 @@ class TestAddressableLEDBufferView:
         buffer = AddressableLEDBuffer(10)
         view = buffer[5:6]
         color = Color.AQUA
-        view.setLED(0, color)
-        assert buffer.getLED(5) == color
-        assert view.getLED(0) == color
+        view.set_led(0, color)
+        assert buffer.get_led(5) == color
+        assert view.get_led(0) == color
 
     def test_segment(self):
         """Test segment view"""
         buffer = AddressableLEDBuffer(10)
         view = buffer[2:9]
-        view.setLED(0, Color.AQUA)
-        assert buffer.getLED(2) == Color.AQUA
+        view.set_led(0, Color.AQUA)
+        assert buffer.get_led(2) == Color.AQUA
 
-        view.setLED(6, Color.AZURE)
-        assert buffer.getLED(8) == Color.AZURE
+        view.set_led(6, Color.AZURE)
+        assert buffer.get_led(8) == Color.AZURE
 
     @pytest.mark.skip("reversed views are not implemented")
     def test_manual_reversed(self):
@@ -134,31 +134,31 @@ class TestAddressableLEDBufferView:
         view = buffer[8:1:-1]
 
         # LED 0 in the view should write to LED 8 on the real buffer
-        view.setLED(0, Color.AQUA)
-        assert buffer.getLED(8) == Color.AQUA
+        view.set_led(0, Color.AQUA)
+        assert buffer.get_led(8) == Color.AQUA
 
         # LED 6 in the view should write to LED 2 on the real buffer
-        view.setLED(6, Color.AZURE)
-        assert buffer.getLED(2) == Color.AZURE
+        view.set_led(6, Color.AZURE)
+        assert buffer.get_led(2) == Color.AZURE
 
     @pytest.mark.skip("reversed views are not implemented")
     def test_full_manual_reversed(self):
         """Test full manual reversed view"""
         buffer = AddressableLEDBuffer(10)
         view = buffer[9::-1]
-        view.setLED(0, Color.WHITE)
-        assert buffer.getLED(9) == Color.WHITE
+        view.set_led(0, Color.WHITE)
+        assert buffer.get_led(9) == Color.WHITE
 
-        buffer.setLED(8, Color.RED)
-        assert view.getLED(1) == Color.RED
+        buffer.set_led(8, Color.RED)
+        assert view.get_led(1) == Color.RED
 
     @pytest.mark.skip("reversed views are not implemented")
     def test_reversed(self):
         """Test reversed view"""
         buffer = AddressableLEDBuffer(10)
         view = buffer[:].reversed()
-        view.setLED(0, Color.WHITE)
-        assert buffer.getLED(9) == Color.WHITE
+        view.set_led(0, Color.WHITE)
+        assert buffer.get_led(9) == Color.WHITE
 
-        view.setLED(9, Color.RED)
-        assert buffer.getLED(0) == Color.RED
+        view.set_led(9, Color.RED)
+        assert buffer.get_led(0) == Color.RED

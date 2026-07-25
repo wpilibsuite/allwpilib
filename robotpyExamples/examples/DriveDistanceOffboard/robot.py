@@ -24,7 +24,7 @@ project.
 class MyRobot(commands2.TimedCommandRobot):
     """
     Command v2 robots are encouraged to inherit from TimedCommandRobot, which
-    has an implementation of robotPeriodic which runs the scheduler for you
+    has an implementation of robot_periodic which runs the scheduler for you
     """
 
     def __init__(self) -> None:
@@ -33,42 +33,42 @@ class MyRobot(commands2.TimedCommandRobot):
         initialization code.
         """
         super().__init__()
-        self.autonomousCommand: typing.Optional[commands2.Command] = None
+        self.autonomous_command: typing.Optional[commands2.Command] = None
 
         # Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         # autonomous chooser on the dashboard.
         self.container = robotcontainer.RobotContainer()
 
-    def disabledInit(self) -> None:
+    def disabled_init(self) -> None:
         """This function is called once each time the robot enters Disabled mode."""
 
-    def disabledPeriodic(self) -> None:
+    def disabled_periodic(self) -> None:
         """This function is called periodically when disabled"""
 
-    def autonomousInit(self) -> None:
+    def autonomous_init(self) -> None:
         """This autonomous runs the autonomous command selected by your RobotContainer class."""
-        self.autonomousCommand = self.container.getAutonomousCommand()
+        self.autonomous_command = self.container.get_autonomous_command()
 
         # schedule the autonomous command (example)
-        if self.autonomousCommand is not None:
-            self.autonomousCommand.schedule()
+        if self.autonomous_command is not None:
+            self.autonomous_command.schedule()
         else:
             print("no auto command?")
 
-    def autonomousPeriodic(self) -> None:
+    def autonomous_periodic(self) -> None:
         """This function is called periodically during autonomous"""
 
-    def teleopInit(self) -> None:
+    def teleop_init(self) -> None:
         # This makes sure that the autonomous stops running when
         # teleop starts running. If you want the autonomous to
         # continue until interrupted by another command, remove
         # this line or comment it out.
-        if self.autonomousCommand is not None:
-            self.autonomousCommand.cancel()
+        if self.autonomous_command is not None:
+            self.autonomous_command.cancel()
 
-    def teleopPeriodic(self) -> None:
+    def teleop_periodic(self) -> None:
         """This function is called periodically during operator control"""
 
-    def utilityInit(self) -> None:
+    def utility_init(self) -> None:
         # Cancels all running commands at the start of utility mode
-        commands2.CommandScheduler.getInstance().cancelAll()
+        commands2.CommandScheduler.get_instance().cancel_all()

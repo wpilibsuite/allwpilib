@@ -4,8 +4,10 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
 #include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
 
 using namespace wpi::math;
 

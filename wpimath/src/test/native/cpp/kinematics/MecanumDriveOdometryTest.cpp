@@ -6,10 +6,25 @@
 
 #include <limits>
 #include <random>
+#include <vector>
 
 #include <gtest/gtest.h>
 
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 
 using namespace wpi::math;
 
@@ -89,8 +104,8 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingTrajectory) {
   wpi::math::MecanumDriveOdometry odometry{kinematics, wpi::math::Rotation2d{},
                                            wheelPositions};
 
-  wpi::math::Trajectory trajectory =
-      wpi::math::TrajectoryGenerator::GenerateTrajectory(
+  wpi::math::DrivetrainSplineTrajectory trajectory =
+      wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{3_m, 0_m, -90_deg},
                       wpi::math::Pose2d{0_m, 0_m, 135_deg},
@@ -107,12 +122,12 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingTrajectory) {
   double maxError = -std::numeric_limits<double>::max();
   double errorSum = 0;
 
-  while (t < trajectory.TotalTime()) {
-    wpi::math::Trajectory::State groundTruthState = trajectory.Sample(t);
+  while (t < trajectory.Duration()) {
+    wpi::math::DrivetrainSplineSample groundTruthState = trajectory.SampleAt(t);
 
-    auto wheelVelocities = kinematics.ToWheelVelocities(
-        {groundTruthState.velocity, 0_mps,
-         groundTruthState.velocity * groundTruthState.curvature});
+    auto wheelVelocities =
+        kinematics.ToWheelVelocities(groundTruthState.velocity.ToRobotRelative(
+            groundTruthState.pose.Rotation()));
 
     wheelVelocities.frontLeft += distribution(generator) * 0.1_mps;
     wheelVelocities.frontRight += distribution(generator) * 0.1_mps;
@@ -140,7 +155,7 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingTrajectory) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.06);
+  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.06);
   EXPECT_LT(maxError, 0.125);
 }
 
@@ -155,8 +170,8 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingXAxis) {
   wpi::math::MecanumDriveOdometry odometry{kinematics, wpi::math::Rotation2d{},
                                            wheelPositions};
 
-  wpi::math::Trajectory trajectory =
-      wpi::math::TrajectoryGenerator::GenerateTrajectory(
+  wpi::math::DrivetrainSplineTrajectory trajectory =
+      wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{3_m, 0_m, -90_deg},
                       wpi::math::Pose2d{0_m, 0_m, 135_deg},
@@ -173,12 +188,14 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingXAxis) {
   double maxError = -std::numeric_limits<double>::max();
   double errorSum = 0;
 
-  while (t < trajectory.TotalTime()) {
-    wpi::math::Trajectory::State groundTruthState = trajectory.Sample(t);
+  while (t < trajectory.Duration()) {
+    wpi::math::DrivetrainSplineSample groundTruthState = trajectory.SampleAt(t);
 
     auto wheelVelocities = kinematics.ToWheelVelocities(
-        {groundTruthState.velocity * groundTruthState.pose.Rotation().Cos(),
-         groundTruthState.velocity * groundTruthState.pose.Rotation().Sin(),
+        {groundTruthState.ForwardVelocity() *
+             groundTruthState.pose.Rotation().Cos(),
+         groundTruthState.ForwardVelocity() *
+             groundTruthState.pose.Rotation().Sin(),
          0_rad_per_s});
 
     wheelVelocities.frontLeft += distribution(generator) * 0.1_mps;
@@ -206,6 +223,6 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingXAxis) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.06);
+  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.06);
   EXPECT_LT(maxError, 0.125);
 }

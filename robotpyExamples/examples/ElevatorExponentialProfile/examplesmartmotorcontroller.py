@@ -14,9 +14,9 @@ class ExampleSmartMotorController:
     """
 
     class PIDMode(enum.Enum):
-        kPosition = enum.auto()
-        kVelocity = enum.auto()
-        kMovementWitchcraft = enum.auto()
+        POSITION = enum.auto()
+        VELOCITY = enum.auto()
+        MOVEMENT_WITCHCRAFT = enum.auto()
 
     def __init__(self, port: int) -> None:
         """Creates a new ExampleSmartMotorController.
@@ -26,7 +26,7 @@ class ExampleSmartMotorController:
         self._port = port
         self._inverted = False
 
-    def setPID(self, kp: float, ki: float, kd: float) -> None:
+    def set_pid(self, kp: float, ki: float, kd: float) -> None:
         """Example method for setting the PID gains of the smart controller.
 
         :param kp: The proportional gain.
@@ -35,11 +35,11 @@ class ExampleSmartMotorController:
         """
         pass
 
-    def setSetpoint(
+    def set_setpoint(
         self,
         mode: "ExampleSmartMotorController.PIDMode",
         setpoint: float,
-        arbFeedforward: float,
+        arb_feedforward: float,
     ) -> None:
         """Example method for setting the setpoint of the smart controller in PID mode.
 
@@ -56,21 +56,21 @@ class ExampleSmartMotorController:
         """
         pass
 
-    def getEncoderDistance(self) -> float:
+    def get_encoder_distance(self) -> float:
         """Returns the encoder distance.
 
         :returns: The current encoder distance.
         """
         return 0
 
-    def getEncoderRate(self) -> float:
+    def get_encoder_rate(self) -> float:
         """Returns the encoder rate.
 
         :returns: The current encoder rate.
         """
         return 0
 
-    def resetEncoder(self) -> None:
+    def reset_encoder(self) -> None:
         """Resets the encoder to zero distance."""
         pass
 
@@ -80,14 +80,14 @@ class ExampleSmartMotorController:
     def get(self) -> float:
         return 0
 
-    def setInverted(self, isInverted: bool) -> None:
-        self._inverted = isInverted
+    def set_inverted(self, is_inverted: bool) -> None:
+        self._inverted = is_inverted
 
-    def getInverted(self) -> bool:
+    def get_inverted(self) -> bool:
         return self._inverted
 
     def disable(self) -> None:
         pass
 
-    def stopMotor(self) -> None:
+    def stop_motor(self) -> None:
         pass

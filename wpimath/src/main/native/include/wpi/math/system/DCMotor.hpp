@@ -5,6 +5,7 @@
 #pragma once
 
 #include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/base.hpp"
 #include "wpi/units/current.hpp"
 #include "wpi/units/impedance.hpp"
 #include "wpi/units/torque.hpp"

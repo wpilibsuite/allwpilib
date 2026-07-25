@@ -7,13 +7,13 @@
 #include <stdint.h>
 
 #include <array>
+#include <expected>
 #include <memory>
 
 #include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/Types.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
-#include "wpi/util/expected"
 #include "wpi/util/mutex.hpp"
 
 namespace wpi::hal {
@@ -42,9 +42,10 @@ class IndexedClassedHandleResource : public HandleBase {
   IndexedClassedHandleResource& operator=(const IndexedClassedHandleResource&) =
       delete;
 
-  wpi::util::expected<THandle, HAL_Status> Allocate(
-      int16_t index, std::shared_ptr<TStruct> toSet, std::string_view name,
-      int offset = 0);
+  std::expected<THandle, HAL_Status> Allocate(int16_t index,
+                                              std::shared_ptr<TStruct> toSet,
+                                              std::string_view name,
+                                              int offset = 0);
   int16_t GetIndex(THandle handle) {
     return getHandleTypedIndex(handle, enumValue, m_version);
   }
@@ -59,25 +60,25 @@ class IndexedClassedHandleResource : public HandleBase {
 
 template <typename THandle, typename TStruct, int16_t size,
           HAL_HandleEnum enumValue>
-wpi::util::expected<THandle, HAL_Status>
+std::expected<THandle, HAL_Status>
 IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
     int16_t index, std::shared_ptr<TStruct> toSet, std::string_view name,
     int offset) {
   // don't acquire the lock if we can fail early.
   if (index < 0 || index >= size) {
-    return wpi::util::unexpected(
-        MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE, name, offset,
-                                 size + offset, index + offset));
+    return std::unexpected(MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
+                                                    name, offset, size + offset,
+                                                    index + offset));
   }
   std::scoped_lock lock(m_handleMutexes[index]);
   // check for allocation, otherwise allocate and return a valid handle
   if (m_structures[index] != nullptr) {
     if constexpr (detail::HasPreviousAllocation<TStruct>) {
-      return wpi::util::unexpected(MakeErrorPreviouslyAllocated(
+      return std::unexpected(MakeErrorPreviouslyAllocated(
           HAL_RESOURCE_IS_ALLOCATED, name, index + offset,
           m_structures[index]->previousAllocation));
     } else {
-      return wpi::util::unexpected(MakeErrorPreviouslyAllocated(
+      return std::unexpected(MakeErrorPreviouslyAllocated(
           HAL_RESOURCE_IS_ALLOCATED, name, index + offset, "unknown"));
     }
   }

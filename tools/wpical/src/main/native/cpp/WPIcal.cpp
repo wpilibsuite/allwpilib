@@ -3,15 +3,14 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <filesystem>
+#include <format>
 #include <map>
 #include <memory>
 #include <optional>
 #include <string>
 #include <vector>
 
-#include <GLFW/glfw3.h>
-#include <fmt/format.h>
-#include <fmt/ranges.h>
+#include <SDL3/SDL.h>
 #include <imgui.h>
 
 #include "cameracalibration.hpp"
@@ -26,6 +25,7 @@
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/gui/wpigui_openurl.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/raw_ostream.hpp"
@@ -133,7 +133,7 @@ void SelectDirectoryButton(const char* text,
  * Sets up an error modal for the field layout being unable to be loaded.
  */
 void FieldLoadingError() {
-  if (ImGui::BeginPopupModal("AprilTag Field Layout Loading Error", NULL,
+  if (ImGui::BeginPopupModal("AprilTag Field Layout Loading Error", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::Text("Failed to load AprilTag field layout located at");
     ImGui::TextWrapped("%s", gInvalidLayoutPath.c_str());
@@ -151,7 +151,7 @@ void FieldLoadingError() {
  * when combining calibrations.
  */
 void MissingTagInField() {
-  if (ImGui::BeginPopupModal("Tag ID Not In Field", NULL,
+  if (ImGui::BeginPopupModal("Tag ID Not In Field", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::Text("This tag is not available in the field.");
     ImGui::TextWrapped(
@@ -257,13 +257,13 @@ void SaveCalibratedField(const wpi::apriltag::AprilTagFieldLayout& field,
     wpi::util::raw_fd_ostream out(saveDir + "/" + outputName + ".json", ec,
                                   fs::OF_Text);
     if (!ec) {
-      wpi::util::json{field}.marshal(out, true, 4);
+      wpi::util::json{field}.marshal(out, true);
     }
 
     wpi::util::raw_fd_ostream fmap(saveDir + "/" + outputName + ".fmap", ec,
                                    fs::OF_Text);
     if (!ec) {
-      wpi::util::json{fmap::Fieldmap(field)}.marshal(fmap, true, 4);
+      wpi::util::json{fmap::Fieldmap(field)}.marshal(fmap, true);
     }
 
     saveDir.clear();
@@ -282,10 +282,10 @@ void CalibrateCamera() {
   static int boardHeight = 8;
   static int numWorkers = 8;
 
-  if (ImGui::BeginPopupModal("Camera Calibration", NULL,
+  if (ImGui::BeginPopupModal("Camera Calibration", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     // Camera Calibration Error calibration popup window
-    if (ImGui::BeginPopupModal("Camera Calibration Error", NULL,
+    if (ImGui::BeginPopupModal("Camera Calibration Error", nullptr,
                                ImGuiWindowFlags_AlwaysAutoResize)) {
       ImGui::TextWrapped(
           "Camera calibration failed. Please make sure you have uploaded the "
@@ -324,7 +324,7 @@ void CalibrateCamera() {
         wpi::util::raw_fd_ostream output_file(outputPath.string(), ec,
                                               fs::OF_Text);
         if (!ec) {
-          wpi::util::json{gCameraModel}.marshal(output_file, true, 4);
+          wpi::util::json{gCameraModel}.marshal(output_file, true);
         }
         ImGui::CloseCurrentPopup();
         calibrating = false;
@@ -338,7 +338,7 @@ void CalibrateCamera() {
         } else {
           ImGui::ProgressBar(
               processed / total, ImVec2(0.0f, 0.0f),
-              fmt::format("{}/{} frames", processed, total).c_str());
+              std::format("{}/{} frames", processed, total).c_str());
         }
       } else {
         ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
@@ -373,7 +373,7 @@ void CombineCalibrations() {
   static std::map<int, std::string> combinerMap;
   static int currentCombinerTagId = 0;
 
-  if (ImGui::BeginPopupModal("Combine Calibrations", NULL,
+  if (ImGui::BeginPopupModal("Combine Calibrations", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     IdealFieldSelectorButton("Select Ideal Map");
 
@@ -424,9 +424,9 @@ void CombineCalibrations() {
         for (auto& tags : layout.GetTags()) {
           tagIds.push_back(tags.ID);
         }
-        auto text = fmt::format("{} tags: {}",
+        auto text = std::format("{} tags: {}",
                                 std::filesystem::path(file).filename().string(),
-                                fmt::join(tagIds, ", "));
+                                wpi::util::join(tagIds, ", "));
         ImGui::Selectable(text.c_str(), false,
                           ImGuiSelectableFlags_DontClosePopups);
         if (ImGui::BeginDragDropSource()) {
@@ -441,7 +441,7 @@ void CombineCalibrations() {
       // be pulled from the dragged JSON field layout
       for (auto& [tagId, filePath] : combinerMap) {
         if (!filePath.empty()) {
-          auto text = fmt::format("Tag ID {}: {}", tagId, filePath);
+          auto text = std::format("Tag ID {}: {}", tagId, filePath);
           ImGui::TextUnformatted(text.c_str());
         } else {
           ImGui::Text("Tag ID %i: <none, using ideal field layout (DROP HERE)>",
@@ -515,7 +515,7 @@ void VisualizeCalibration() {
   static int referenceTag = 1;
   static std::unique_ptr<pfd::open_file> calibratedFieldLayoutSelector;
   static wpi::apriltag::AprilTagFieldLayout currentCalibrationLayout;
-  if (ImGui::BeginPopupModal("Visualize Calibration", NULL,
+  if (ImGui::BeginPopupModal("Visualize Calibration", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     FieldSelectorButton("Select Calibrated Field Layout",
                         calibratedFieldLayoutSelector,
@@ -605,11 +605,12 @@ static void DisplayMainMenu() {
     ImGui::OpenPopup("About");
     about = false;
   }
-  if (ImGui::BeginPopupModal("About", NULL,
+  if (ImGui::BeginPopupModal("About", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::Text("WPIcal");
     ImGui::Separator();
     ImGui::Text("v%s", GetWPILibVersion());
+    gui::EmitRendererInfo();
     ImGui::Separator();
     ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
     ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
@@ -627,7 +628,7 @@ static void DisplayGui() {
   // fill entire OS window with this window
   ImGui::SetNextWindowPos(ImVec2(0, 0));
   int width, height;
-  glfwGetWindowSize(gui::GetSystemWindow(), &width, &height);
+  SDL_GetWindowSize(gui::GetSystemWindow(), &width, &height);
   ImGui::SetNextWindowSize(
       ImVec2(static_cast<float>(width), static_cast<float>(height)));
 
@@ -718,7 +719,7 @@ static void DisplayGui() {
   }
 
   // error popup window
-  if (ImGui::BeginPopupModal("Field Calibration Error", NULL,
+  if (ImGui::BeginPopupModal("Field Calibration Error", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::Text("Field Calibration Failed - please try again, ensuring that:");
     ImGui::TextWrapped(
@@ -739,7 +740,7 @@ static void DisplayGui() {
     ImGui::EndPopup();
   }
 
-  if (ImGui::BeginPopupModal("Camera Calibration Loading Error", NULL,
+  if (ImGui::BeginPopupModal("Camera Calibration Loading Error", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::Text("Could not load camera calibration JSON. Make sure that:");
     ImGui::TextWrapped("- Your camera calibration is valid JSON");
@@ -794,7 +795,8 @@ int main(int argc, char** argv) {
 
   wpi::gui::AddLateExecute(DisplayGui);
 
-  wpi::gui::Initialize("WPIcal", 900, 600);
+  wpi::gui::Initialize("WPIcal", 900, 600,
+                       wpi::gui::RendererPreference::PREFER_2D);
   wpi::gui::Main();
 
   wpi::glass::DestroyContext();

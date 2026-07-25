@@ -6,6 +6,8 @@
 #include "wpi/math/filter/LinearFilter.hpp"
 // clang-format on
 
+#include <stdint.h>
+
 #include <cmath>
 #include <numbers>
 #include <random>

@@ -4,9 +4,9 @@
 
 #include "wpi/smartdashboard/SendableChooser.hpp"
 
+#include <format>
 #include <string>
 
-#include <fmt/format.h>
 #include <gtest/gtest.h>
 
 #include "wpi/simulation/SendableChooserSim.hpp"
@@ -17,7 +17,7 @@ class SendableChooserTest : public ::testing::TestWithParam<int> {};
 TEST_P(SendableChooserTest, ReturnsSelected) {
   wpi::SendableChooser<int> chooser;
   wpi::sim::SendableChooserSim chooserSim{
-      fmt::format("/SmartDashboard/ReturnsSelectedChooser{}/", GetParam())};
+      std::format("/SmartDashboard/ReturnsSelectedChooser{}/", GetParam())};
 
   for (int i = 1; i <= 3; i++) {
     chooser.AddOption(std::to_string(i), i);
@@ -25,7 +25,7 @@ TEST_P(SendableChooserTest, ReturnsSelected) {
   chooser.SetDefaultOption("0", 0);
 
   wpi::SmartDashboard::PutData(
-      fmt::format("ReturnsSelectedChooser{}", GetParam()), &chooser);
+      std::format("ReturnsSelectedChooser{}", GetParam()), &chooser);
   wpi::SmartDashboard::UpdateValues();
   chooserSim.SetSelected(std::to_string(GetParam()));
   wpi::SmartDashboard::UpdateValues();

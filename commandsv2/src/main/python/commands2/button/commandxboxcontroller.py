@@ -24,13 +24,13 @@ class CommandXboxController:
                     or the XboxController object to use for this controller.
         """
         if isinstance(hid, int):
-            self._hid = CommandGenericHID.getCommandGenericHID(hid)
-            self._controller = XboxController(self._hid.getHID())
+            self._hid = CommandGenericHID.get_command_generic_hid(hid)
+            self._controller = XboxController(self._hid.get_hid())
         else:
-            self._hid = CommandGenericHID(hid.getHID())
+            self._hid = CommandGenericHID(hid.get_hid())
             self._controller = hid
 
-    def getHID(self) -> CommandGenericHID:
+    def get_hid(self) -> CommandGenericHID:
         """
         Get the underlying CommandGenericHID object.
 
@@ -38,7 +38,7 @@ class CommandXboxController:
         """
         return self._hid
 
-    def getController(self) -> XboxController:
+    def get_controller(self) -> XboxController:
         """
         Get the wrapped controller object.
 
@@ -64,7 +64,7 @@ class CommandXboxController:
         Constructs a Trigger instance around the A button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the A button's digital signal
                   attached to the given loop.
@@ -76,7 +76,7 @@ class CommandXboxController:
         Constructs a Trigger instance around the B button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the B button's digital signal
                   attached to the given loop.
@@ -88,7 +88,7 @@ class CommandXboxController:
         Constructs a Trigger instance around the X button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the X button's digital signal
                   attached to the given loop.
@@ -100,7 +100,7 @@ class CommandXboxController:
         Constructs a Trigger instance around the Y button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Y button's digital signal
                   attached to the given loop.
@@ -112,7 +112,7 @@ class CommandXboxController:
         Constructs a Trigger instance around the View button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the View button's digital signal
                   attached to the given loop.
@@ -124,7 +124,7 @@ class CommandXboxController:
         Constructs a Trigger instance around the Xbox button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Xbox button's digital signal
                   attached to the given loop.
@@ -136,110 +136,110 @@ class CommandXboxController:
         Constructs a Trigger instance around the Menu button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Menu button's digital signal
                   attached to the given loop.
         """
         return self.button(XboxController.Button.MENU, loop)
 
-    def leftStick(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def left_stick(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Left Stick button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Left Stick button's digital signal
                   attached to the given loop.
         """
         return self.button(XboxController.Button.LEFT_STICK, loop)
 
-    def rightStick(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def right_stick(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Right Stick button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Right Stick button's digital signal
                   attached to the given loop.
         """
         return self.button(XboxController.Button.RIGHT_STICK, loop)
 
-    def leftBumper(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def left_bumper(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Left Bumper button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Left Bumper button's digital signal
                   attached to the given loop.
         """
         return self.button(XboxController.Button.LEFT_BUMPER, loop)
 
-    def rightBumper(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def right_bumper(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Right Bumper button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Right Bumper button's digital signal
                   attached to the given loop.
         """
         return self.button(XboxController.Button.RIGHT_BUMPER, loop)
 
-    def dpadUp(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def dpad_up(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Dpad Up button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Dpad Up button's digital signal
                   attached to the given loop.
         """
         return self.button(XboxController.Button.DPAD_UP, loop)
 
-    def dpadDown(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def dpad_down(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Dpad Down button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Dpad Down button's digital signal
                   attached to the given loop.
         """
         return self.button(XboxController.Button.DPAD_DOWN, loop)
 
-    def dpadLeft(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def dpad_left(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Dpad Left button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Dpad Left button's digital signal
                   attached to the given loop.
         """
         return self.button(XboxController.Button.DPAD_LEFT, loop)
 
-    def dpadRight(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def dpad_right(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs a Trigger instance around the Dpad Right button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance representing the Dpad Right button's digital signal
                   attached to the given loop.
         """
         return self.button(XboxController.Button.DPAD_RIGHT, loop)
 
-    def leftTrigger(
+    def left_trigger(
         self,
         threshold: float = 0.5,
         loop: Optional[EventLoop] = None,
@@ -251,18 +251,18 @@ class CommandXboxController:
         :param threshold: the minimum axis value for the returned Trigger to be true. This value
                           should be in the range [0, 1] where 0 is the unpressed state of the axis.
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance that is true when the Left Trigger axis exceeds the
                   provided threshold, attached to the given event loop.
         """
-        return self.axisGreaterThan(
+        return self.axis_greater_than(
             XboxController.Axis.LEFT_TRIGGER,
             threshold,
             loop,
         )
 
-    def rightTrigger(
+    def right_trigger(
         self,
         threshold: float = 0.5,
         loop: Optional[EventLoop] = None,
@@ -274,18 +274,18 @@ class CommandXboxController:
         :param threshold: the minimum axis value for the returned Trigger to be true. This value
                           should be in the range [0, 1] where 0 is the unpressed state of the axis.
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: a Trigger instance that is true when the Right Trigger axis exceeds the
                   provided threshold, attached to the given event loop.
         """
-        return self.axisGreaterThan(
+        return self.axis_greater_than(
             XboxController.Axis.RIGHT_TRIGGER,
             threshold,
             loop,
         )
 
-    def axisLessThan(
+    def axis_less_than(
         self,
         axis: XboxController.Axis,
         threshold: float,
@@ -302,9 +302,9 @@ class CommandXboxController:
         :returns: a Trigger instance that is true when the axis value is less than
                   the provided threshold.
         """
-        return self._hid.axisLessThan(axis.value, threshold, loop)
+        return self._hid.axis_less_than(axis.value, threshold, loop)
 
-    def axisGreaterThan(
+    def axis_greater_than(
         self,
         axis: XboxController.Axis,
         threshold: float,
@@ -321,9 +321,9 @@ class CommandXboxController:
         :returns: a Trigger instance that is true when the axis value is greater
                   than the provided threshold.
         """
-        return self._hid.axisGreaterThan(axis.value, threshold, loop)
+        return self._hid.axis_greater_than(axis.value, threshold, loop)
 
-    def axisMagnitudeGreaterThan(
+    def axis_magnitude_greater_than(
         self,
         axis: XboxController.Axis,
         threshold: float,
@@ -340,60 +340,60 @@ class CommandXboxController:
         :returns: a Trigger instance that is true when the axis magnitude is
                   greater than the provided threshold.
         """
-        return self._hid.axisMagnitudeGreaterThan(axis.value, threshold, loop)
+        return self._hid.axis_magnitude_greater_than(axis.value, threshold, loop)
 
-    def getAxis(self, axis: XboxController.Axis) -> float:
+    def get_axis(self, axis: XboxController.Axis) -> float:
         """
         Get the value of the axis.
 
         :param axis: the :class:`wpilib.XboxController.Axis` to read
         """
-        return self._hid.getRawAxis(axis.value)
+        return self._hid.get_raw_axis(axis.value)
 
-    def getLeftX(self) -> float:
+    def get_left_x(self) -> float:
         """
         Get the Left X value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.getLeftX()
+        return self._controller.get_left_x()
 
-    def getLeftY(self) -> float:
+    def get_left_y(self) -> float:
         """
         Get the Left Y value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.getLeftY()
+        return self._controller.get_left_y()
 
-    def getRightX(self) -> float:
+    def get_right_x(self) -> float:
         """
         Get the Right X value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.getRightX()
+        return self._controller.get_right_x()
 
-    def getRightY(self) -> float:
+    def get_right_y(self) -> float:
         """
         Get the Right Y value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.getRightY()
+        return self._controller.get_right_y()
 
-    def getLeftTrigger(self) -> float:
+    def get_left_trigger(self) -> float:
         """
         Get the Left Trigger value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.getLeftTrigger()
+        return self._controller.get_left_trigger()
 
-    def getRightTrigger(self) -> float:
+    def get_right_trigger(self) -> float:
         """
         Get the Right Trigger value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.getRightTrigger()
+        return self._controller.get_right_trigger()

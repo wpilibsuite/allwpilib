@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include <format>
 #include <limits>
 
 #include <Eigen/Core>
-#include <fmt/format.h>
 
 namespace slp {
 
@@ -77,16 +77,14 @@ class Inertia {
 
 }  // namespace slp
 
-// @cond Suppress Doxygen
-
 /// Formatter for Inertia.
 template <>
-struct fmt::formatter<slp::Inertia> {
+struct std::formatter<slp::Inertia> {
   /// Parses format string.
   ///
   /// @param ctx Format parse context.
   /// @return Format parse context iterator.
-  constexpr auto parse(fmt::format_parse_context& ctx) {
+  constexpr auto parse(std::format_parse_context& ctx) {
     return m_underlying.parse(ctx);
   }
 
@@ -97,20 +95,18 @@ struct fmt::formatter<slp::Inertia> {
   /// @param ctx Format context.
   /// @return Format context iterator.
   template <typename FmtContext>
-  constexpr auto format(const slp::Inertia& inertia, FmtContext& ctx) const {
+  auto format(const slp::Inertia& inertia, FmtContext& ctx) const {
     auto out = ctx.out();
 
-    out = fmt::format_to(out, "(");
+    out = std::format_to(out, "(");
     out = m_underlying.format(inertia.positive, ctx);
-    out = fmt::format_to(out, ", ");
+    out = std::format_to(out, ", ");
     out = m_underlying.format(inertia.negative, ctx);
-    out = fmt::format_to(out, ", ");
+    out = std::format_to(out, ", ");
     out = m_underlying.format(inertia.zero, ctx);
-    return fmt::format_to(out, ")");
+    return std::format_to(out, ")");
   }
 
  private:
-  fmt::formatter<int> m_underlying;
+  std::formatter<int> m_underlying;
 };
-
-// @endcond

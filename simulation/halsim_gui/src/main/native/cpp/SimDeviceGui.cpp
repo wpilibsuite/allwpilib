@@ -6,10 +6,9 @@
 
 #include <stdint.h>
 
+#include <format>
 #include <memory>
 #include <utility>
-
-#include <fmt/format.h>
 
 #include "wpi/glass/other/DeviceTree.hpp"
 #include "wpi/hal/SimDevice.hpp"
@@ -27,7 +26,7 @@ namespace {
    public:                                                                 \
     explicit Sim##Type##ValueSource(HAL_SimValueHandle handle,             \
                                     const char* device, const char* name)  \
-        : Type##Source(fmt::format("{}-{}", device, name)),                \
+        : Type##Source(std::format("{}-{}", device, name)),                \
           m_callback{HALSIM_RegisterSimValueChangedCallback(               \
               handle, this, CallbackFunc, true)} {}                        \
     ~Sim##Type##ValueSource() override {                                   \
@@ -55,7 +54,7 @@ class SimIntegerValueSource : public wpi::glass::IntegerSource {
  public:
   explicit SimIntegerValueSource(HAL_SimValueHandle handle, const char* device,
                                  const char* name)
-      : IntegerSource(fmt::format("{}-{}", device, name)),
+      : IntegerSource(std::format("{}-{}", device, name)),
         m_callback{HALSIM_RegisterSimValueChangedCallback(
             handle, this, CallbackFunc, true)} {}
   ~SimIntegerValueSource() override {

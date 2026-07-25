@@ -4,6 +4,8 @@
 
 #include "wpi/math/filter/EdgeCounterFilter.hpp"
 
+#include <stdint.h>
+
 #include <gtest/gtest.h>
 
 #include "wpi/units/time.hpp"

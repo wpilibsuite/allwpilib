@@ -88,7 +88,6 @@ class CameraCalibrator {
   // Ensures that shared state lives until everything else is destroyed
   std::shared_ptr<Data> m_state;
 
-  std::atomic_bool m_isFinished{false};
   std::atomic_int m_totalFrames;
   std::vector<std::shared_ptr<Worker>> m_workers;
 };

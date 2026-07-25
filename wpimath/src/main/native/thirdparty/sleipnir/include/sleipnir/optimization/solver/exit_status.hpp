@@ -4,9 +4,8 @@
 
 #include <stdint.h>
 
-#include <fmt/base.h>
-
-#include "sleipnir/util/unreachable.hpp"
+#include <format>
+#include <utility>
 
 namespace slp {
 
@@ -46,16 +45,14 @@ enum class ExitStatus : int8_t {
 
 }  // namespace slp
 
-// @cond Suppress Doxygen
-
 /// Formatter for ExitStatus.
 template <>
-struct fmt::formatter<slp::ExitStatus> {
+struct std::formatter<slp::ExitStatus> {
   /// Parses format string.
   ///
   /// @param ctx Format parse context.
   /// @return Format parse context iterator.
-  constexpr auto parse(fmt::format_parse_context& ctx) {
+  constexpr auto parse(std::format_parse_context& ctx) {
     return m_underlying.parse(ctx);
   }
 
@@ -66,8 +63,7 @@ struct fmt::formatter<slp::ExitStatus> {
   /// @param ctx Format context.
   /// @return Format context iterator.
   template <typename FmtContext>
-  constexpr auto format(const slp::ExitStatus& exit_status,
-                        FmtContext& ctx) const {
+  auto format(const slp::ExitStatus& exit_status, FmtContext& ctx) const {
     using enum slp::ExitStatus;
 
     switch (exit_status) {
@@ -96,12 +92,10 @@ struct fmt::formatter<slp::ExitStatus> {
       case TIMEOUT:
         return m_underlying.format("timeout", ctx);
       default:
-        slp::unreachable();
+        std::unreachable();
     }
   }
 
  private:
-  fmt::formatter<const char*> m_underlying;
+  std::formatter<const char*> m_underlying;
 };
-
-// @endcond

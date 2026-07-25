@@ -3,7 +3,7 @@ import time
 
 from commands2.button.commandgenerichid import (
     CommandGenericHID,
-    _resetCommandGenericHIDData,
+    _reset_command_generic_hid_data,
 )
 
 
@@ -30,7 +30,7 @@ def test_get_command_generic_hid_is_thread_safe(monkeypatch):
     def worker(index):
         try:
             start.wait()
-            results[index] = CommandGenericHID.getCommandGenericHID(0)
+            results[index] = CommandGenericHID.get_command_generic_hid(0)
         except Exception as exc:
             exceptions.append(exc)
 
@@ -49,6 +49,6 @@ def test_reset_command_generic_hid_data(monkeypatch):
     first = object()
     monkeypatch.setattr(CommandGenericHID, "_hids", {0: first})
 
-    _resetCommandGenericHIDData()
+    _reset_command_generic_hid_data()
 
     assert CommandGenericHID._hids == {}

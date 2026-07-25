@@ -22,6 +22,10 @@ update_init = [
     "wpimath_test wpimath_test._wpimath_test",
 ]
 
+[tool.semiwrap.name_transform]
+default = "snake_case"
+enum_value = "CAPS_CASE"
+
 [tool.semiwrap.extension_modules."wpimath_test._wpimath_test"]
 name = "wpimath_test"
 depends = ["wpimath"]

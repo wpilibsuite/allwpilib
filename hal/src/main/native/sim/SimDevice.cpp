@@ -4,7 +4,7 @@
 
 #include "wpi/hal/SimDevice.hpp"
 
-#include <fmt/format.h>
+#include <format>
 
 #include "HALInitializer.hpp"
 #include "mockdata/SimDeviceDataInternal.hpp"
@@ -69,12 +69,12 @@ void HAL_ResetSimValue(HAL_SimValueHandle handle) {
 }
 
 wpi::hal::SimDevice::SimDevice(const char* name, int index) {
-  m_handle = HAL_CreateSimDevice(fmt::format("{}[{}]", name, index).c_str());
+  m_handle = HAL_CreateSimDevice(std::format("{}[{}]", name, index).c_str());
 }
 
 wpi::hal::SimDevice::SimDevice(const char* name, int index, int channel) {
   m_handle = HAL_CreateSimDevice(
-      fmt::format("{}[{},{}]", name, index, channel).c_str());
+      std::format("{}[{},{}]", name, index, channel).c_str());
 }
 
 }  // extern "C"

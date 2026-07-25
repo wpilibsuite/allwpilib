@@ -9,12 +9,12 @@ if TYPE_CHECKING:
 import pytest
 
 
-def test_schedulerLambdaTestNoInterrupt(scheduler: commands2.CommandScheduler):
+def test_scheduler_lambda_test_no_interrupt(scheduler: commands2.CommandScheduler):
     counter = OOInteger()
 
-    scheduler.onCommandInitialize(lambda _: counter.incrementAndGet())
-    scheduler.onCommandExecute(lambda _: counter.incrementAndGet())
-    scheduler.onCommandFinish(lambda _: counter.incrementAndGet())
+    scheduler.on_command_initialize(lambda _: counter.increment_and_get())
+    scheduler.on_command_execute(lambda _: counter.increment_and_get())
+    scheduler.on_command_finish(lambda _: counter.increment_and_get())
 
     scheduler.schedule(commands2.InstantCommand())
     scheduler.run()
@@ -22,10 +22,10 @@ def test_schedulerLambdaTestNoInterrupt(scheduler: commands2.CommandScheduler):
     assert counter == 3
 
 
-def test_schedulerInterruptLambda(scheduler: commands2.CommandScheduler):
+def test_scheduler_interrupt_lambda(scheduler: commands2.CommandScheduler):
     counter = OOInteger()
 
-    scheduler.onCommandInterrupt(lambda _: counter.incrementAndGet())
+    scheduler.on_command_interrupt(lambda _: counter.increment_and_get())
 
     command = commands2.WaitCommand(10)
 
@@ -40,9 +40,9 @@ def test_scheduler_interrupt_no_cause_lambda(scheduler: commands2.CommandSchedul
 
     def on_interrupt(interrupted, cause):
         assert cause is None
-        counter.incrementAndGet()
+        counter.increment_and_get()
 
-    scheduler.onCommandInterruptWithCause(on_interrupt)
+    scheduler.on_command_interrupt_with_cause(on_interrupt)
 
     command = commands2.cmd.run(lambda: {})
 
@@ -57,13 +57,13 @@ def test_scheduler_interrupt_cause_lambda(scheduler: commands2.CommandScheduler)
 
     subsystem = commands2.Subsystem()
     command = subsystem.run(lambda: None)
-    interruptor = subsystem.runOnce(lambda: None)
+    interruptor = subsystem.run_once(lambda: None)
 
     def on_interrupt(interrupted, cause):
         assert cause is interruptor
-        counter.incrementAndGet()
+        counter.increment_and_get()
 
-    scheduler.onCommandInterruptWithCause(on_interrupt)
+    scheduler.on_command_interrupt_with_cause(on_interrupt)
 
     scheduler.schedule(command)
     scheduler.schedule(interruptor)
@@ -78,17 +78,17 @@ def test_scheduler_interrupt_cause_lambda_in_run_loop(
 
     subsystem = commands2.Subsystem()
     command = subsystem.run(lambda: None)
-    interruptor = subsystem.runOnce(lambda: None)
+    interruptor = subsystem.run_once(lambda: None)
     # This command will schedule interruptor in execute() inside the run loop
-    interruptor_scheduler = commands2.cmd.runOnce(
+    interruptor_scheduler = commands2.cmd.run_once(
         lambda: scheduler.schedule(interruptor)
     )
 
     def on_interrupt(interrupted, cause):
         assert cause is interruptor
-        counter.incrementAndGet()
+        counter.increment_and_get()
 
-    scheduler.onCommandInterruptWithCause(on_interrupt)
+    scheduler.on_command_interrupt_with_cause(on_interrupt)
 
     scheduler.schedule(command)
     scheduler.schedule(interruptor_scheduler)
@@ -98,35 +98,35 @@ def test_scheduler_interrupt_cause_lambda_in_run_loop(
     assert counter.get() == 1
 
 
-def test_unregisterSubsystem(scheduler: commands2.CommandScheduler):
+def test_unregister_subsystem(scheduler: commands2.CommandScheduler):
     system = commands2.Subsystem()
-    scheduler.registerSubsystem(system)
-    scheduler.unregisterSubsystem(system)
+    scheduler.register_subsystem(system)
+    scheduler.unregister_subsystem(system)
 
 
-def test_schedulerCancelAll(scheduler: commands2.CommandScheduler):
+def test_scheduler_cancel_all(scheduler: commands2.CommandScheduler):
     counter = OOInteger()
 
     def on_interrupt(command, interruptor):
         assert interruptor is None
 
-    scheduler.onCommandInterrupt(lambda _: counter.incrementAndGet())
-    scheduler.onCommandInterruptWithCause(on_interrupt)
+    scheduler.on_command_interrupt(lambda _: counter.increment_and_get())
+    scheduler.on_command_interrupt_with_cause(on_interrupt)
 
     command = commands2.WaitCommand(10)
     command2 = commands2.WaitCommand(10)
 
     scheduler.schedule(command)
     scheduler.schedule(command2)
-    scheduler.cancelAll()
+    scheduler.cancel_all()
 
     assert counter == 2
 
 
-def test_scheduleScheduledNoOp(scheduler: commands2.CommandScheduler):
+def test_schedule_scheduled_no_op(scheduler: commands2.CommandScheduler):
     counter = OOInteger()
 
-    command = commands2.cmd.startEnd(counter.incrementAndGet, lambda: None)
+    command = commands2.cmd.start_end(counter.increment_and_get, lambda: None)
 
     scheduler.schedule(command)
     scheduler.schedule(command)

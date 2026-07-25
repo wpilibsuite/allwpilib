@@ -1312,9 +1312,14 @@ class StructLogEntry : public DataLogEntry {
                  I... info, int64_t timestamp = 0)
       : m_info{std::move(info)...} {
     m_log = &log;
-    log.AddStructSchema<T, I...>(info..., timestamp);
-    m_entry = log.Start(name, wpi::util::GetStructTypeString<T>(info...),
+    std::apply(
+        [&](const I&... storedInfo) {
+          log.AddStructSchema<T, I...>(storedInfo..., timestamp);
+          m_entry =
+              log.Start(name, wpi::util::GetStructTypeString<T>(storedInfo...),
                         metadata, timestamp);
+        },
+        m_info);
   }
 
   StructLogEntry(StructLogEntry&& rhs)
@@ -1441,11 +1446,16 @@ class StructArrayLogEntry : public DataLogEntry {
                       int64_t timestamp = 0)
       : m_info{std::move(info)...} {
     m_log = &log;
-    log.AddStructSchema<T, I...>(info..., timestamp);
-    m_entry = log.Start(
-        name,
-        wpi::util::MakeStructArrayTypeString<T, std::dynamic_extent>(info...),
-        metadata, timestamp);
+    std::apply(
+        [&](const I&... storedInfo) {
+          log.AddStructSchema<T, I...>(storedInfo..., timestamp);
+          m_entry = log.Start(
+              name,
+              wpi::util::MakeStructArrayTypeString<T, std::dynamic_extent>(
+                  storedInfo...),
+              metadata, timestamp);
+        },
+        m_info);
   }
 
   StructArrayLogEntry(StructArrayLogEntry&& rhs)

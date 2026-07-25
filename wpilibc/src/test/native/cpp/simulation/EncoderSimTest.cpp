@@ -18,7 +18,7 @@ constexpr double kDefaultDistancePerPulse = .0005;
 }  // namespace
 
 TEST(EncoderSimTest, Initialize) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   EncoderSim sim = EncoderSim::CreateForIndex(0);
   sim.ResetData();
@@ -34,7 +34,7 @@ TEST(EncoderSimTest, Initialize) {
 }
 
 TEST(EncoderSimTest, Rate) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -42,12 +42,34 @@ TEST(EncoderSimTest, Rate) {
 
   encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
 
+  DoubleCallback callback;
+  auto cb = sim.RegisterRateCallback(callback.GetCallback(), false);
   sim.SetRate(1.91);
   EXPECT_EQ(1.91, sim.GetRate());
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(1.91, callback.GetLastValue());
+}
+
+TEST(EncoderSimTest, ResetDataClearsRateCallbacks) {
+  HAL_Initialize();
+
+  Encoder encoder(0, 1);
+  EncoderSim sim(encoder);
+  sim.ResetData();
+
+  DoubleCallback callback;
+  auto cb = sim.RegisterRateCallback(callback.GetCallback(), false);
+  sim.SetRate(1.91);
+  ASSERT_TRUE(callback.WasTriggered());
+
+  callback.Reset();
+  sim.ResetData();
+  sim.SetRate(2.53);
+  EXPECT_FALSE(callback.WasTriggered());
 }
 
 TEST(EncoderSimTest, Count) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -66,7 +88,7 @@ TEST(EncoderSimTest, Count) {
 }
 
 TEST(EncoderSimTest, Distance) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -79,51 +101,8 @@ TEST(EncoderSimTest, Distance) {
   EXPECT_EQ(229.174, encoder.GetDistance());
 }
 
-TEST(EncoderSimTest, Period) {
-  HAL_Initialize(500, 0);
-
-  Encoder encoder(0, 1);
-  EncoderSim sim(encoder);
-  sim.ResetData();
-
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
-
-  DoubleCallback callback;
-  auto cb = sim.RegisterPeriodCallback(callback.GetCallback(), false);
-  sim.SetPeriod(123.456);
-  EXPECT_EQ(123.456, sim.GetPeriod());
-  WPI_IGNORE_DEPRECATED
-  EXPECT_EQ(123.456, encoder.GetPeriod().value());
-  WPI_UNIGNORE_DEPRECATED
-  EXPECT_EQ(kDefaultDistancePerPulse / 123.456, encoder.GetRate());
-
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(123.456, callback.GetLastValue());
-}
-
-TEST(EncoderSimTest, SetMaxPeriod) {
-  HAL_Initialize(500, 0);
-
-  Encoder encoder(0, 1);
-  EncoderSim sim(encoder);
-  sim.ResetData();
-
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
-
-  DoubleCallback callback;
-  auto cb = sim.RegisterMaxPeriodCallback(callback.GetCallback(), false);
-
-  WPI_IGNORE_DEPRECATED
-  encoder.SetMaxPeriod(123.456_s);
-  WPI_UNIGNORE_DEPRECATED
-  EXPECT_EQ(123.456, sim.GetMaxPeriod());
-
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(123.456, callback.GetLastValue());
-}
-
 TEST(EncoderSimTest, SetDirection) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -148,7 +127,7 @@ TEST(EncoderSimTest, SetDirection) {
 }
 
 TEST(EncoderSimTest, SetReverseDirection) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -170,27 +149,8 @@ TEST(EncoderSimTest, SetReverseDirection) {
   EXPECT_FALSE(callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, SetSamplesToAverage) {
-  HAL_Initialize(500, 0);
-
-  Encoder encoder(0, 1);
-  EncoderSim sim(encoder);
-  sim.ResetData();
-
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
-
-  IntCallback callback;
-  auto cb = sim.RegisterSamplesToAverageCallback(callback.GetCallback(), false);
-
-  encoder.SetSamplesToAverage(57);
-  EXPECT_EQ(57, sim.GetSamplesToAverage());
-  EXPECT_EQ(57, encoder.GetSamplesToAverage());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(57, callback.GetLastValue());
-}
-
 TEST(EncoderSimTest, SetDistancePerPulse) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -207,7 +167,7 @@ TEST(EncoderSimTest, SetDistancePerPulse) {
 }
 
 TEST(EncoderSimTest, Reset) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -220,6 +180,7 @@ TEST(EncoderSimTest, Reset) {
 
   sim.SetCount(3504);
   sim.SetDistance(229.191);
+  sim.SetDirection(true);
 
   encoder.Reset();
   EXPECT_TRUE(sim.GetReset());
@@ -230,6 +191,8 @@ TEST(EncoderSimTest, Reset) {
   EXPECT_EQ(0, encoder.Get());
   EXPECT_EQ(0, sim.GetDistance());
   EXPECT_EQ(0, encoder.GetDistance());
+  EXPECT_TRUE(sim.GetDirection());
+  EXPECT_TRUE(encoder.GetDirection());
 }
 
 }  // namespace wpi::sim

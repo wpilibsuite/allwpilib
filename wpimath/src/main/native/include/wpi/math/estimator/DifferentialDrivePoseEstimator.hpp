@@ -9,6 +9,10 @@
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/kinematics/DifferentialDriveOdometry.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
@@ -30,7 +34,8 @@ namespace wpi::math {
  * never call it, then this class will behave like regular encoder odometry.
  */
 class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
-    : public PoseEstimator<DifferentialDriveWheelPositions,
+    : public PoseEstimator<DifferentialDriveKinematics,
+                           DifferentialDriveWheelPositions,
                            DifferentialDriveWheelVelocities,
                            DifferentialDriveWheelAccelerations> {
  public:
@@ -43,15 +48,13 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
    * The default standard deviations of the vision measurements are
    * 0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading.
    *
-   * @param kinematics A correctly-configured kinematics object for your
-   *     drivetrain.
-   * @param gyroAngle The gyro angle of the robot.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    * @param initialPose The estimated initial pose.
    */
-  DifferentialDrivePoseEstimator(DifferentialDriveKinematics& kinematics,
-                                 const Rotation2d& gyroAngle,
+  DifferentialDrivePoseEstimator(const Rotation2d& gyroAngle,
                                  wpi::units::meter_t leftDistance,
                                  wpi::units::meter_t rightDistance,
                                  const Pose2d& initialPose);
@@ -59,9 +62,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
   /**
    * Constructs a DifferentialDrivePoseEstimator.
    *
-   * @param kinematics A correctly-configured kinematics object for your
-   *     drivetrain.
-   * @param gyroAngle The gyro angle of the robot.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    * @param initialPose The estimated initial pose.
@@ -74,9 +76,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
    *     less.
    */
   DifferentialDrivePoseEstimator(
-      DifferentialDriveKinematics& kinematics, const Rotation2d& gyroAngle,
-      wpi::units::meter_t leftDistance, wpi::units::meter_t rightDistance,
-      const Pose2d& initialPose,
+      const Rotation2d& gyroAngle, wpi::units::meter_t leftDistance,
+      wpi::units::meter_t rightDistance, const Pose2d& initialPose,
       const wpi::util::array<double, 3>& stateStdDevs,
       const wpi::util::array<double, 3>& visionMeasurementStdDevs);
 

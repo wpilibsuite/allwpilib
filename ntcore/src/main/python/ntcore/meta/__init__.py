@@ -6,11 +6,11 @@ from .._ntcore.meta import (
     SubscriberOptions,
     TopicPublisher,
     TopicSubscriber,
-    decodeClientPublishers,
-    decodeClientSubscribers,
-    decodeClients,
-    decodeTopicPublishers,
-    decodeTopicSubscribers,
+    decode_client_publishers,
+    decode_client_subscribers,
+    decode_clients,
+    decode_topic_publishers,
+    decode_topic_subscribers,
 )
 
 __all__ = [
@@ -20,9 +20,9 @@ __all__ = [
     "SubscriberOptions",
     "TopicPublisher",
     "TopicSubscriber",
-    "decodeClientPublishers",
-    "decodeClientSubscribers",
-    "decodeClients",
-    "decodeTopicPublishers",
-    "decodeTopicSubscribers",
+    "decode_client_publishers",
+    "decode_client_subscribers",
+    "decode_clients",
+    "decode_topic_publishers",
+    "decode_topic_subscribers",
 ]

@@ -13,8 +13,8 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.TrajectoryConfig;
-import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.math.util.MathUtil;
 
 class LTVUnicycleControllerTest {
@@ -34,18 +34,18 @@ class LTVUnicycleControllerTest {
     waypoints.add(new Pose2d(2.75, 22.521, Rotation2d.kZero));
     waypoints.add(new Pose2d(24.73, 19.68, new Rotation2d(5.846)));
     var config = new TrajectoryConfig(8.8, 0.1);
-    final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
+    final var trajectory = DrivetrainSplineTrajectoryGenerator.generate(waypoints, config);
 
-    final var totalTime = trajectory.getTotalTime();
-    for (int i = 0; i < (totalTime / kDt); ++i) {
-      var state = trajectory.sample(kDt * i);
+    final var duration = trajectory.duration;
+    for (int i = 0; i < (duration / kDt); ++i) {
+      var state = trajectory.sampleAt(kDt * i);
 
       var output = controller.calculate(robotPose, state);
       robotPose = robotPose.plus(new Twist2d(output.vx * kDt, 0, output.omega * kDt).exp());
     }
 
-    final var states = trajectory.getStates();
-    final var endPose = states.get(states.size() - 1).pose;
+    final var states = trajectory.getSamples();
+    final var endPose = states.getLast().pose;
 
     // Java lambdas require local variables referenced from a lambda expression
     // must be final or effectively final.

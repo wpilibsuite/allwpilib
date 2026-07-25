@@ -23,34 +23,34 @@ class MyRobot(wpilib.TimedRobot):
         self.pdp = wpilib.PowerDistribution(0)
 
         # Put the PDP itself to the dashboard
-        wpilib.SmartDashboard.putData("PDP", self.pdp)
+        wpilib.SmartDashboard.put_data("PDP", self.pdp)
 
-    def robotPeriodic(self):
+    def robot_periodic(self):
         # Get the current going through channel 7, in Amperes.
         # The PDP returns the current in increments of 0.125A.
         # At low currents the current readings tend to be less accurate.
-        current7 = self.pdp.getCurrent(7)
-        wpilib.SmartDashboard.putNumber("Current Channel 7", current7)
+        current7 = self.pdp.get_current(7)
+        wpilib.SmartDashboard.put_number("Current Channel 7", current7)
 
         # Get the voltage going into the PDP, in Volts.
         # The PDP returns the voltage in increments of 0.05 Volts.
-        voltage = self.pdp.getVoltage()
-        wpilib.SmartDashboard.putNumber("Voltage", voltage)
+        voltage = self.pdp.get_voltage()
+        wpilib.SmartDashboard.put_number("Voltage", voltage)
 
         # Retrieves the temperature of the PDP, in degrees Celsius.
-        temperatureCelsius = self.pdp.getTemperature()
-        wpilib.SmartDashboard.putNumber("Temperature", temperatureCelsius)
+        temperature_celsius = self.pdp.get_temperature()
+        wpilib.SmartDashboard.put_number("Temperature", temperature_celsius)
 
         # Get the total current of all channels.
-        totalCurrent = self.pdp.getTotalCurrent()
-        wpilib.SmartDashboard.putNumber("Total Current", totalCurrent)
+        total_current = self.pdp.get_total_current()
+        wpilib.SmartDashboard.put_number("Total Current", total_current)
 
         # Get the total power of all channels.
         # Power is the bus voltage multiplied by the current with the units Watts.
-        totalPower = self.pdp.getTotalPower()
-        wpilib.SmartDashboard.putNumber("Total Power", totalPower)
+        total_power = self.pdp.get_total_power()
+        wpilib.SmartDashboard.put_number("Total Power", total_power)
 
         # Get the total energy of all channels.
         # Energy is the power summed over time with units Joules.
-        totalEnergy = self.pdp.getTotalEnergy()
-        wpilib.SmartDashboard.putNumber("Total Energy", totalEnergy)
+        total_energy = self.pdp.get_total_energy()
+        wpilib.SmartDashboard.put_number("Total Energy", total_energy)

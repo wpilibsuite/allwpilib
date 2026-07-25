@@ -4,9 +4,8 @@
 
 #include "Robot.hpp"
 
+#include <format>
 #include <string>
-
-#include <fmt/format.h>
 
 #include "wpi/driverstation/MatchState.hpp"
 #include "wpi/driverstation/RobotState.hpp"
@@ -33,7 +32,7 @@ void Robot::RobotPeriodic() {
     }
   }
 
-  auto string = fmt::format(
+  auto string = std::format(
       "{}{}{}{:03}", allianceString, wpi::RobotState::IsEnabled() ? "E" : "D",
       wpi::RobotState::IsAutonomous() ? "A" : "T",
       static_cast<int>(wpi::Timer::GetMatchTime().value()));

@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <format>
 #include <string>
 #include <thread>
 
@@ -160,7 +161,7 @@ TEST_P(MatchTimeTest, Alert) {
 
   wpi::sim::StepTiming(20_ms);
 
-  std::string expected = fmt::format("{:03}", matchTime);
+  std::string expected = std::format("{:03}", matchTime);
   EXPECT_EQ(expected, gString.substr(3));
 }
 

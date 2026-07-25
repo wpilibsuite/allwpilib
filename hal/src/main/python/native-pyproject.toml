@@ -54,6 +54,11 @@ shared_libraries = ["MrcLib"]
 enable_if = 'platform_machine != "systemcore"'
 
 [[tool.hatch.build.hooks.nativelib.pcfile]]
+pcfile = "src/native/wpihal/robotpy-native-mrclib.pc"
+name = "mrclib"
+enable_if = 'platform_machine == "systemcore"'
+
+[[tool.hatch.build.hooks.nativelib.pcfile]]
 pcfile = "src/native/wpihal/robotpy-native-wpihal.pc"
 name = "wpihal"
 

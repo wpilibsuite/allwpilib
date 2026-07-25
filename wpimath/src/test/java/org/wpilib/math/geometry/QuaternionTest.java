@@ -188,6 +188,7 @@ class QuaternionTest {
     var zero = new Quaternion(0, 0, 0, 0);
     var one = new Quaternion();
 
+    assertEquals(zero, zero.log());
     assertEquals(zero, one.log());
 
     var i = new Quaternion(0, 1, 0, 0);

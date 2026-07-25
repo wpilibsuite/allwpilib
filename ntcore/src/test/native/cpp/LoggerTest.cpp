@@ -4,18 +4,18 @@
 
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "Handle.hpp"
 #include "TestPrinters.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/Synchronization.h"
 
-class LoggerTest : public ::testing::Test {
+class LoggerTest {
  public:
   LoggerTest() : m_inst(wpi::nt::CreateInstance()) {}
 
-  ~LoggerTest() override { wpi::nt::DestroyInstance(m_inst); }
+  ~LoggerTest() { wpi::nt::DestroyInstance(m_inst); }
 
   void Generate();
   void Check(const std::vector<wpi::nt::Event>& events, NT_Listener handle,
@@ -38,27 +38,27 @@ void LoggerTest::Generate() {
 void LoggerTest::Check(const std::vector<wpi::nt::Event>& events,
                        NT_Listener handle, bool infoMsg, bool errMsg) {
   size_t count = (infoMsg ? 1u : 0u) + (errMsg ? 1u : 0u);
-  ASSERT_EQ(events.size(), count);
+  REQUIRE(events.size() == count);
   for (size_t i = 0; i < count; ++i) {
-    ASSERT_EQ(events[i].listener, handle);
-    ASSERT_EQ(events[i].flags & wpi::nt::EventFlags::LOG_MESSAGE,
-              wpi::nt::EventFlags::LOG_MESSAGE);
+    REQUIRE(events[i].listener == handle);
+    REQUIRE((events[i].flags & wpi::nt::EventFlags::LOG_MESSAGE) ==
+            wpi::nt::EventFlags::LOG_MESSAGE);
     auto log = events[i].GetLogMessage();
-    ASSERT_TRUE(log);
+    REQUIRE(log);
     if (infoMsg) {
-      ASSERT_EQ(log->message, "starting network client");
-      ASSERT_EQ(log->level, NT_LOG_INFO);
+      REQUIRE(log->message == "starting network client");
+      REQUIRE(log->level == NT_LOG_INFO);
       infoMsg = false;
     } else if (errMsg) {
-      ASSERT_EQ(log->message,
-                "trying to publish invalid topic handle (386924549)");
-      ASSERT_EQ(log->level, NT_LOG_ERROR);
+      REQUIRE(log->message ==
+              "trying to publish invalid topic handle (386924549)");
+      REQUIRE(log->level == NT_LOG_ERROR);
       errMsg = false;
     }
   }
 }
 
-TEST_F(LoggerTest, DefaultLogRange) {
+TEST_CASE_METHOD(LoggerTest, "LoggerTest DefaultLogRange", "[ntcore][logger]") {
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
   auto handle = wpi::nt::AddPolledListener(poller, m_inst,
                                            wpi::nt::EventFlags::LOG_MESSAGE);
@@ -66,33 +66,33 @@ TEST_F(LoggerTest, DefaultLogRange) {
   Generate();
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
   auto events = wpi::nt::ReadListenerQueue(poller);
 
   Check(events, handle, true, true);
 }
 
-TEST_F(LoggerTest, InfoOnly) {
+TEST_CASE_METHOD(LoggerTest, "LoggerTest InfoOnly", "[ntcore][logger]") {
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
   auto handle = wpi::nt::AddPolledLogger(poller, NT_LOG_INFO, NT_LOG_INFO);
 
   Generate();
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
   auto events = wpi::nt::ReadListenerQueue(poller);
 
   Check(events, handle, true, false);
 }
 
-TEST_F(LoggerTest, Error) {
+TEST_CASE_METHOD(LoggerTest, "LoggerTest Error", "[ntcore][logger]") {
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
   auto handle = wpi::nt::AddPolledLogger(poller, NT_LOG_ERROR, 100);
 
   Generate();
 
   bool timedOut = false;
-  ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
+  REQUIRE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
   auto events = wpi::nt::ReadListenerQueue(poller);
 
   Check(events, handle, false, true);

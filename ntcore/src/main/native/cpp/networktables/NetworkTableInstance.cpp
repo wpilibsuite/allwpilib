@@ -4,6 +4,7 @@
 
 #include "wpi/nt/NetworkTableInstance.hpp"
 
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
@@ -90,7 +91,7 @@ std::shared_ptr<NetworkTable> NetworkTableInstance::GetTable(
     return std::make_shared<NetworkTable>(m_handle, key,
                                           NetworkTable::private_init{});
   } else {
-    return std::make_shared<NetworkTable>(m_handle, fmt::format("/{}", key),
+    return std::make_shared<NetworkTable>(m_handle, std::format("/{}", key),
                                           NetworkTable::private_init{});
   }
 }

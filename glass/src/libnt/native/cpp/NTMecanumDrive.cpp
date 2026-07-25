@@ -4,9 +4,9 @@
 
 #include "wpi/glass/networktables/NTMecanumDrive.hpp"
 
+#include <format>
 #include <utility>
 
-#include <fmt/format.h>
 #include <imgui.h>
 
 #include "wpi/util/StringExtras.hpp"
@@ -19,26 +19,26 @@ NTMecanumDriveModel::NTMecanumDriveModel(std::string_view path)
 NTMecanumDriveModel::NTMecanumDriveModel(wpi::nt::NetworkTableInstance inst,
                                          std::string_view path)
     : m_inst{inst},
-      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
-      m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
+      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
+      m_controllable{inst.GetBooleanTopic(std::format("{}/.controllable", path))
                          .Subscribe(0)},
       m_flPercent{
-          inst.GetDoubleTopic(fmt::format("{}/Front Left Motor Velocity", path))
+          inst.GetDoubleTopic(std::format("{}/Front Left Motor Velocity", path))
               .GetEntry(0)},
       m_frPercent{inst.GetDoubleTopic(
-                          fmt::format("{}/Front Right Motor Velocity", path))
+                          std::format("{}/Front Right Motor Velocity", path))
                       .GetEntry(0)},
       m_rlPercent{
-          inst.GetDoubleTopic(fmt::format("{}/Rear Left Motor Velocity", path))
+          inst.GetDoubleTopic(std::format("{}/Rear Left Motor Velocity", path))
               .GetEntry(0)},
       m_rrPercent{
-          inst.GetDoubleTopic(fmt::format("{}/Rear Right Motor Velocity", path))
+          inst.GetDoubleTopic(std::format("{}/Rear Right Motor Velocity", path))
               .GetEntry(0)},
       m_nameValue{wpi::util::rsplit(path, '/').second},
-      m_flPercentData{fmt::format("NTMcnmDriveFL:{}", path)},
-      m_frPercentData{fmt::format("NTMcnmDriveFR:{}", path)},
-      m_rlPercentData{fmt::format("NTMcnmDriveRL:{}", path)},
-      m_rrPercentData{fmt::format("NTMcnmDriveRR:{}", path)} {
+      m_flPercentData{std::format("NTMcnmDriveFL:{}", path)},
+      m_frPercentData{std::format("NTMcnmDriveFR:{}", path)},
+      m_rlPercentData{std::format("NTMcnmDriveRL:{}", path)},
+      m_rrPercentData{std::format("NTMcnmDriveRR:{}", path)} {
   m_wheels.emplace_back("FL % Output", &m_flPercentData,
                         [this](auto value) { m_flPercent.Set(value); });
 

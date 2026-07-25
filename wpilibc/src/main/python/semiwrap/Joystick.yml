@@ -49,13 +49,13 @@ classes:
       Top:
       GetMagnitude:
       GetDirection:
-        rename: getDirectionRadians
+        rename: get_direction_radians
       GetRawButton:
       GetRawButtonPressed:
       GetRawButtonReleased:
       GetRawAxis:
       GetPOV:
     inline_code: |
-      .def("getDirectionDegrees", [](const Joystick &self) -> wpi::units::degree_t {
+      .def("get_direction_degrees", [](const Joystick &self) -> wpi::units::degree_t {
         return self.GetDirection();
       })

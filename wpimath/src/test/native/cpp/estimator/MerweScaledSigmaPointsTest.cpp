@@ -4,7 +4,11 @@
 
 #include "wpi/math/estimator/MerweScaledSigmaPoints.hpp"
 
+#include <cmath>
+
 #include <gtest/gtest.h>
+
+#include "wpi/math/linalg/EigenCore.hpp"
 
 TEST(MerweScaledSigmaPointsTest, ZeroMean) {
   wpi::math::MerweScaledSigmaPoints<2> sigmaPoints;

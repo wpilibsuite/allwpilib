@@ -5,7 +5,7 @@ runs:
   using: "composite"
   steps:
     - name: Set up Python 3.12
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: '3.12'
     - name: Install jinja and protobuf
@@ -23,14 +23,9 @@ runs:
       run: ./ntcore/generate_topics.py
       shell: bash
 
-    - name: Regenerate mrccomm
-      run: ./hal/generate_nanopb.py
-      shell: bash
-
     - name: Regenerate imgui
       run: |
         ./thirdparty/imgui_suite/generate_fonts.sh
-        ./thirdparty/imgui_suite/generate_gl3w.py
       shell: bash
 
     - name: Regenerate HIDs

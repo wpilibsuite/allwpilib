@@ -1,11 +1,10 @@
 try-import %workspace%/user.bazelrc
 
-common --enable_bzlmod --enable_workspace
+common --enable_bzlmod
 # Resolves to --config=linux on Linux, --config=macos on Mac, --windows on windows
 common --enable_platform_specific_config
 
 # Make bazel 8 work for us.
-common --enable_workspace
 build --experimental_cc_static_library
 build --experimental_cc_shared_library
 
@@ -20,15 +19,9 @@ test --test_verbose_timeout_warnings
 import %workspace%/shared/bazel/compiler_flags/sanitizers.rc
 import %workspace%/shared/bazel/compiler_flags/linux_flags.rc
 import %workspace%/shared/bazel/compiler_flags/osx_flags.rc
-import %workspace%/shared/bazel/compiler_flags/roborio_flags.rc
 import %workspace%/shared/bazel/compiler_flags/systemcore_flags.rc
 import %workspace%/shared/bazel/compiler_flags/windows_flags.rc
 import %workspace%/shared/bazel/compiler_flags/coverage_flags.rc
-
-# Alias toolchain names to what wpilibsuite uses for CI/Artifact naming
-build:athena --config=roborio
-build:linuxarm32 --config=raspibookworm32
-build:linuxarm64 --config=bookworm64
 
 build:build_java --test_tag_filters=allwpilib-build-java --build_tag_filters=allwpilib-build-java
 build:build_cpp --test_tag_filters=+allwpilib-build-cpp --build_tag_filters=+allwpilib-build-cpp
@@ -44,6 +37,7 @@ build:build_buddy_bes --bes_backend=grpcs://remote.buildbuddy.io
 build:common_cache --remote_timeout=3600
 build:common_cache --remote_cache_compression
 build:common_cache --experimental_remote_cache_compression_threshold=100
+common:common_cache --experimental_remote_merkle_tree_cache
 
 # Build Buddy Cache Setup
 build:build_buddy --config=common_cache
@@ -61,6 +55,29 @@ build:remote_cache --config=common_cache
 build:remote_cache --remote_cache=grpcs://gitlib-bazel.wpi.edu
 
 common:remote_cache_readonly --noremote_upload_local_results
+
+# Stubs for remote execution.
+build:remote --strategy=TsProject=remote,sandboxed
+build --strategy=CopyFile=remote,standalone
+build --strategy=CopyDirectory=remote,standalone
+build --strategy=CopyToDirectory=remote,standalone
+build --strategy=PyWriteBuildData=remote,standalone
+# All tests have a strategy of TestRunner.  Enable standalone for only tests.
+# See the following for more details:
+# https://github.com/bazelbuild/bazel/issues/7480
+build:linux --strategy=TestRunner=remote,sandboxed,standalone
+build:macos --strategy=TestRunner=remote,sandboxed,standalone
+build:linux --strategy=NpmLifecycleHook=remote,sandboxed,standalone
+build:macos --strategy=NpmLifecycleHook=remote,sandboxed,standalone
+
+common:remote --config=common_cache
+build:remote --incompatible_strict_action_env --experimental_inmemory_dotd_files --experimental_inmemory_jdeps_files --experimental_remote_merkle_tree_cache --incompatible_allow_tags_propagation
+# Specify your cluster as follows:
+# build:remote --remote_executor=grpcs://engflow.example.com --bes_backend=grpcs://engflow.example.com --bes_results_url=https://engflow.example.com/invocation/
+build:remote --jobs=100
+build:remote --remote_timeout=1500
+build:remote --spawn_strategy=remote,sandboxed
+build:remote --grpc_keepalive_time=30s
 
 # This config should be used locally. It downloads more than the CI version
 build:remote_user --config=remote_cache

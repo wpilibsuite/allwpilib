@@ -5,6 +5,7 @@
 #include "wpi/math/filter/Debouncer.hpp"
 
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/units/time.hpp"
 
 using namespace wpi::math;
 

@@ -24,22 +24,22 @@ def _load_grayscale_image(fname):
 
 def test_1():
     detector = robotpy_apriltag.AprilTagDetector()
-    assert detector.addFamily("tag16h5")
-    assert detector.addFamily("tag36h11")
+    assert detector.add_family("tag16h5")
+    assert detector.add_family("tag36h11")
 
     img = _load_grayscale_image("tag1_640_480.jpg")
     results = detector.detect(img)
 
     assert len(results) == 1
-    assert results[0].getFamily() == "tag36h11"
-    assert results[0].getId() == 1
-    assert results[0].getHamming() == 0
+    assert results[0].get_family() == "tag36h11"
+    assert results[0].get_id() == 1
+    assert results[0].get_hamming() == 0
 
     estimator = robotpy_apriltag.AprilTagPoseEstimator(
         robotpy_apriltag.AprilTagPoseEstimator.Config(0.2, 500, 500, 320, 240)
     )
 
-    est = estimator.estimateOrthogonalIteration(results[0], 50)
+    est = estimator.estimate_orthogonal_iteration(results[0], 50)
     assert est.pose2 == Transform3d()
     pose = estimator.estimate(results[0])
     assert est.pose1 == pose
@@ -52,7 +52,7 @@ def test_pose_rotated_x():
     """
 
     detector = robotpy_apriltag.AprilTagDetector()
-    assert detector.addFamily("tag16h5")
+    assert detector.add_family("tag16h5")
 
     img = _load_grayscale_image("tag2_45deg_X.png")
     results = detector.detect(img)
@@ -64,7 +64,7 @@ def test_pose_rotated_x():
             0.2, 500, 500, img.shape[1] / 2.0, img.shape[0] / 2.0
         )
     )
-    est = estimator.estimateOrthogonalIteration(results[0], 50)
+    est = estimator.estimate_orthogonal_iteration(results[0], 50)
     assert pytest.approx(est.pose1.rotation().x, abs=0.1) == math.radians(45)
     assert pytest.approx(est.pose1.rotation().y, abs=0.1) == math.radians(0)
     assert pytest.approx(est.pose1.rotation().z, abs=0.1) == math.radians(0)
@@ -77,7 +77,7 @@ def test_pose_rotated_y():
     """
 
     detector = robotpy_apriltag.AprilTagDetector()
-    assert detector.addFamily("tag16h5")
+    assert detector.add_family("tag16h5")
 
     img = _load_grayscale_image("tag2_45deg_y.png")
     results = detector.detect(img)
@@ -89,7 +89,7 @@ def test_pose_rotated_y():
             0.2, 500, 500, img.shape[1] / 2.0, img.shape[0] / 2.0
         )
     )
-    est = estimator.estimateOrthogonalIteration(results[0], 50)
+    est = estimator.estimate_orthogonal_iteration(results[0], 50)
     assert pytest.approx(est.pose1.rotation().x, abs=0.1) == math.radians(0)
     assert pytest.approx(est.pose1.rotation().y, abs=0.1) == math.radians(45)
     assert pytest.approx(est.pose1.rotation().z, abs=0.1) == math.radians(0)
@@ -101,7 +101,7 @@ def test_pose_straight_on():
     """
 
     detector = robotpy_apriltag.AprilTagDetector()
-    assert detector.addFamily("tag16h5")
+    assert detector.add_family("tag16h5")
 
     img = _load_grayscale_image("tag2_16h5_straight.png")
     results = detector.detect(img)
@@ -113,7 +113,7 @@ def test_pose_straight_on():
             0.2, 500, 500, img.shape[1] / 2.0, img.shape[0] / 2.0
         )
     )
-    est = estimator.estimateOrthogonalIteration(results[0], 50)
+    est = estimator.estimate_orthogonal_iteration(results[0], 50)
     assert pytest.approx(est.pose1.rotation().x, abs=0.1) == math.radians(0)
     assert pytest.approx(est.pose1.rotation().y, abs=0.1) == math.radians(0)
     assert pytest.approx(est.pose1.rotation().z, abs=0.1) == math.radians(0)

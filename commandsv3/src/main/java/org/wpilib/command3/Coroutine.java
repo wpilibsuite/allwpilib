@@ -296,12 +296,46 @@ public final class Coroutine {
   }
 
   /**
-   * Yields until a condition is met.
+   * Represents the result of a call to {@link Coroutine#waitUntil(BooleanSupplier)} or {@link
+   * Coroutine#waitUntil(BooleanSupplier, Time)}.
+   */
+  public enum WaitResult {
+    /** A call to {@code waitUntil} has met its condition. */
+    CONDITION_MET {
+      @Override
+      public boolean timedOut() {
+        return false;
+      }
+    },
+    /** A call to {@link Coroutine#waitUntil(BooleanSupplier, Time)} has timed out. */
+    TIMED_OUT {
+      @Override
+      public boolean timedOut() {
+        return true;
+      }
+    },
+    ;
+
+    /**
+     * Checks if the wait has timed out.
+     *
+     * @return true if this result was a timeout, false if the condition was met without timing out.
+     */
+    public abstract boolean timedOut();
+  }
+
+  /**
+   * Yields until a condition is met. This method will <b>only</b> return once the condition is met;
+   * if the condition never becomes true or is delayed longer than you expect, this method will
+   * block indefinitely. {@link #waitUntil(BooleanSupplier, Time)} is an alternative that will only
+   * wait up until a maximum duration before exiting.
    *
    * @param condition The condition to wait for
+   * @return {@link WaitResult#CONDITION_MET}
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
+   * @see #waitUntil(BooleanSupplier, Time)
    */
-  public void waitUntil(BooleanSupplier condition) {
+  public WaitResult waitUntil(BooleanSupplier condition) {
     requireMounted();
 
     requireNonNullParam(condition, "condition", "Coroutine.waitUntil");
@@ -309,6 +343,64 @@ public final class Coroutine {
     while (!condition.getAsBoolean()) {
       this.yield();
     }
+
+    return WaitResult.CONDITION_MET;
+  }
+
+  /**
+   * Yields until a condition is met, waiting for up to a specified duration. If the condition is
+   * not met before the timeout duration elapses, this method stops waiting and returns {@link
+   * WaitResult#TIMED_OUT}.
+   *
+   * <p>Teams may use this method for waiting for conditions in autonomous or automated routines to
+   * be resilient to hardware faults (e.g., a mechanism not reaching a target state or a faulty
+   * sensor).
+   *
+   * <pre>{@code
+   * Command.noRequirements(coroutine -> {
+   *   coroutine.fork(elevator.up());
+   *   Coroutine.WaitResult upResult = coroutine.waitUntil(elevator::atTop, Seconds.of(1.25));
+   *   if (upResult.timedOut()) {
+   *     // We've waited 1.25 seconds and the elevator still has not reached the top. It may have
+   *     // jammed or there may be a fault with the sensors. In this example, we set a driverstation
+   *     // alert and exit early - team code may want to take other approaches like retrying the
+   *     // command or falling back to a secondary behavior that doesn't need the elevator to be up.
+   *     elevator.setJamAlert();
+   *     return;
+   *   }
+   *
+   *   // The elevator reached the top within 1.25 seconds. Clear the alert and continue.
+   *   elevator.clearJamAlert();
+   *
+   *   // ... more commands ...
+   * })
+   * }</pre>
+   *
+   * @param condition The condition to wait for
+   * @param timeout The maximum duration to wait
+   * @return {@link WaitResult#CONDITION_MET} if the condition was met within the specified timeout,
+   *     or {@link WaitResult#TIMED_OUT} if the timeout duration elapsed before the condition was
+   *     met.
+   * @see #waitUntil(BooleanSupplier)
+   */
+  public WaitResult waitUntil(BooleanSupplier condition, Time timeout) {
+    requireMounted();
+
+    requireNonNullParam(condition, "condition", "Coroutine.waitUntil");
+    requireNonNullParam(timeout, "timeout", "Coroutine.waitUntil");
+
+    Timer timer = new Timer();
+    timer.start();
+
+    while (!condition.getAsBoolean()) {
+      if (timer.hasElapsed(timeout)) {
+        return WaitResult.TIMED_OUT;
+      } else {
+        this.yield();
+      }
+    }
+
+    return WaitResult.CONDITION_MET;
   }
 
   /**

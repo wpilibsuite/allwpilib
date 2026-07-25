@@ -13,31 +13,31 @@ from constants import IntakeConstants
 class Intake(Subsystem):
     def __init__(self) -> None:
         super().__init__()
-        self.motor = wpilib.PWMSparkMax(IntakeConstants.kMotorPort)
+        self.motor = wpilib.PWMSparkMax(IntakeConstants.MOTOR_PORT)
 
         # Double solenoid connected to two channels of a PCM with the default CAN ID
         self.pistons = wpilib.DoubleSolenoid(
             0,
             wpilib.PneumaticsModuleType.CTRE_PCM,
-            IntakeConstants.kSolenoidPorts[0],
-            IntakeConstants.kSolenoidPorts[1],
+            IntakeConstants.SOLENOID_PORTS[0],
+            IntakeConstants.SOLENOID_PORTS[1],
         )
 
-    def intakeCommand(self) -> Command:
+    def intake_command(self) -> Command:
         """Returns a command that deploys the intake, and then runs the intake motor
         indefinitely.
         """
         return (
-            self.runOnce(lambda: self.pistons.set(wpilib.DoubleSolenoid.Value.FORWARD))
-            .andThen(self.run(lambda: self.motor.set(1.0)))
-            .withName("Intake")
+            self.run_once(lambda: self.pistons.set(wpilib.DoubleSolenoid.Value.FORWARD))
+            .and_then(self.run(lambda: self.motor.set_throttle(1.0)))
+            .with_name("Intake")
         )
 
-    def retractCommand(self) -> Command:
+    def retract_command(self) -> Command:
         """Returns a command that turns off and retracts the intake."""
-        return self.runOnce(
+        return self.run_once(
             lambda: (
                 self.motor.disable(),
                 self.pistons.set(wpilib.DoubleSolenoid.Value.REVERSE),
             )
-        ).withName("Retract")
+        ).with_name("Retract")

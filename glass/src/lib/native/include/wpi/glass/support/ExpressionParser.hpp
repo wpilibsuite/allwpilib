@@ -6,20 +6,16 @@
 
 #include <stdint.h>
 
+#include <expected>
 #include <string>
-
-#include "wpi/util/expected"
 
 namespace wpi::glass::expression {
 
 template <typename V>
-wpi::util::expected<V, std::string> TryParseExpr(const char* expr);
+std::expected<V, std::string> TryParseExpr(const char* expr);
 
-extern template wpi::util::expected<double, std::string> TryParseExpr(
-    const char*);
-extern template wpi::util::expected<float, std::string> TryParseExpr(
-    const char*);
-extern template wpi::util::expected<int64_t, std::string> TryParseExpr(
-    const char*);
+extern template std::expected<double, std::string> TryParseExpr(const char*);
+extern template std::expected<float, std::string> TryParseExpr(const char*);
+extern template std::expected<int64_t, std::string> TryParseExpr(const char*);
 
 }  // namespace wpi::glass::expression

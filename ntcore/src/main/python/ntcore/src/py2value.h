@@ -1,6 +1,7 @@
 #pragma once
 
-#include <fmt/format.h>
+#include <format>
+
 #include <semiwrap.h>
 
 #include "wpi/nt/NetworkTableType.hpp"
@@ -18,7 +19,7 @@ py::function valueFactoryByType(wpi::nt::NetworkTableType type);
 
 inline void ensure_value_is(NT_Type expected, wpi::nt::Value* v) {
   if (v->type() != expected) {
-    throw py::value_error(fmt::format("Value type is {}, not {}",
+    throw py::value_error(std::format("Value type is {}, not {}",
                                       nttype2str(v->type()),
                                       nttype2str(expected)));
   }

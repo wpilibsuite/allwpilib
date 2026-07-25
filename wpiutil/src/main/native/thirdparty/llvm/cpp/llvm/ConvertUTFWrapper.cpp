@@ -9,7 +9,7 @@
 #include "wpi/util/ConvertUTF.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/ErrorHandling.hpp"
-#include "wpi/util/SwapByteOrder.hpp"
+#include <bit>
 #include <span>
 #include <string>
 #include <string_view>
@@ -103,7 +103,7 @@ bool convertUTF16ToUTF8String(std::span<const char> SrcBytes, SmallVectorImpl<ch
   if (Src[0] == UNI_UTF16_BYTE_ORDER_MARK_SWAPPED) {
     ByteSwapped.insert(ByteSwapped.end(), Src, SrcEnd);
     for (UTF16 &I : ByteSwapped)
-      I = wpi::util::byteswap<uint16_t>(I);
+      I = std::byteswap(I);
     Src = &ByteSwapped[0];
     SrcEnd = &ByteSwapped[ByteSwapped.size() - 1] + 1;
   }
@@ -161,7 +161,7 @@ bool convertUTF32ToUTF8String(std::span<const char> SrcBytes, std::string &Out) 
   if (Src[0] == UNI_UTF32_BYTE_ORDER_MARK_SWAPPED) {
     ByteSwapped.insert(ByteSwapped.end(), Src, SrcEnd);
     for (UTF32 &I : ByteSwapped)
-      I = wpi::util::byteswap<uint32_t>(I);
+      I = std::byteswap(I);
     Src = &ByteSwapped[0];
     SrcEnd = &ByteSwapped[ByteSwapped.size() - 1] + 1;
   }
@@ -316,4 +316,3 @@ bool IsSingleCodeUnitUTF32Codepoint(unsigned V) {
 }
 
 } // end namespace wpi::util
-

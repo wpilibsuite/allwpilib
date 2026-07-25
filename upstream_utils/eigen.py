@@ -143,7 +143,7 @@ def copy_upstream_src(wpilib_root: Path):
         "COPYING.BSD",
         "COPYING.MINPACK",
         "COPYING.MPL2",
-        "WORKSPACE",
+        "MODULE.bazel",
     ]:
         shutil.copyfile(
             f,

@@ -4,9 +4,9 @@
 
 #include "wpi/hal/UsageReporting.hpp"
 
-#include <fmt/format.h>
+#include <format>
 
 void HAL_ReportUsage(std::string_view resource, int instanceNumber,
                      std::string_view data) {
-  HAL_ReportUsage(fmt::format("{}[{}]", resource, instanceNumber), data);
+  HAL_ReportUsage(std::format("{}[{}]", resource, instanceNumber), data);
 }

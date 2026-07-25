@@ -64,20 +64,20 @@ class NetworkButton(Trigger):
     def __init__(self, *args, **kwargs) -> None:
         def init_sub(sub: BooleanSubscriber):
             return super(NetworkButton, self).__init__(
-                lambda: sub.getTopic().getInstance().isConnected() and sub.get()
+                lambda: sub.get_topic().get_instance().is_connected() and sub.get()
             )
 
         def init_topic(topic: BooleanTopic):
             init_sub(topic.subscribe(False))
 
         def init_table_field(table: NetworkTable, field: str):
-            init_topic(table.getBooleanTopic(field))
+            init_topic(table.get_boolean_topic(field))
 
         def init_inst_table_field(inst: NetworkTableInstance, table: str, field: str):
-            init_table_field(inst.getTable(table), field)
+            init_table_field(inst.get_table(table), field)
 
         def init_str_table_field(table: str, field: str):
-            init_inst_table_field(NetworkTableInstance.getDefault(), table, field)
+            init_inst_table_field(NetworkTableInstance.get_default(), table, field)
 
         num_args = len(args) + len(kwargs)
 

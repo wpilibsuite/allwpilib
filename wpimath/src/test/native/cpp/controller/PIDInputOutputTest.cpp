@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/controller/PIDController.hpp"
+#include "wpi/units/time.hpp"
 
 TEST(PIDInputOutputTest, ContinuousInput) {
   wpi::math::PIDController controller{0.0, 0.0, 0.0};

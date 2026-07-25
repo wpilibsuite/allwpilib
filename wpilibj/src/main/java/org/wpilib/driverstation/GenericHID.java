@@ -23,13 +23,13 @@ import org.wpilib.math.util.Pair;
 public final class GenericHID implements HIDDevice {
   /** Represents a rumble output on the Joystick. */
   public enum RumbleType {
-    /** Left rumble motor. */
+    /** Left rumble motor. On most controllers, this is the low-frequency motor. */
     LEFT_RUMBLE,
-    /** Right rumble motor. */
+    /** Right rumble motor. On most controllers, this is the high-frequency motor. */
     RIGHT_RUMBLE,
-    /** Left trigger rumble motor. */
+    /** Left trigger rumble motor, on controllers that have one. */
     LEFT_TRIGGER_RUMBLE,
-    /** Right trigger rumble motor. */
+    /** Right trigger rumble motor, on controllers that have one. */
     RIGHT_TRIGGER_RUMBLE,
   }
 
@@ -87,7 +87,11 @@ public final class GenericHID implements HIDDevice {
     /** Switch Joycon Right. */
     SWITCH_JOYCON_RIGHT(9),
     /** Switch Joycon Pair. */
-    SWITCH_JOYCON_PAIR(10);
+    SWITCH_JOYCON_PAIR(10),
+    /** GameCube controller. */
+    GAMECUBE(11),
+    /** Steam Controller. */
+    STEAM(12);
 
     /** HIDType value. */
     public final int value;
@@ -111,7 +115,7 @@ public final class GenericHID implements HIDDevice {
      * @return HIDType with the given value.
      */
     public static HIDType of(int value) {
-      return map.get(value);
+      return map.getOrDefault(value, UNKNOWN);
     }
   }
 

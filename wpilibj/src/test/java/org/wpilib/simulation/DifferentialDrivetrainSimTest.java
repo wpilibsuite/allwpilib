@@ -22,8 +22,8 @@ import org.wpilib.math.numbers.N7;
 import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.Models;
 import org.wpilib.math.system.NumericalIntegration;
+import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.TrajectoryConfig;
-import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.math.trajectory.constraint.DifferentialDriveKinematicsConstraint;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Units;
@@ -56,15 +56,15 @@ class DifferentialDrivetrainSimTest {
     Matrix<N7, N1> groundTruthX = new Vector<>(Nat.N7());
 
     var traj =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             Pose2d.kZero,
             List.of(),
             new Pose2d(2, 2, Rotation2d.kZero),
             new TrajectoryConfig(1, 1)
                 .addConstraint(new DifferentialDriveKinematicsConstraint(kinematics, 1)));
 
-    for (double t = 0; t < traj.getTotalTime(); t += 0.020) {
-      var state = traj.sample(t);
+    for (double t = 0; t < traj.duration; t += 0.020) {
+      var state = traj.sampleAt(t);
       var feedbackOut = feedback.calculate(sim.getPose(), state);
 
       var wheelVelocities = kinematics.toWheelVelocities(feedbackOut);

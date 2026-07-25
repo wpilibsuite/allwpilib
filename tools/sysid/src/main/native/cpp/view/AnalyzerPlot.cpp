@@ -6,12 +6,11 @@
 
 #include <algorithm>
 #include <cmath>
+#include <format>
 #include <functional>
 #include <mutex>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "wpi/sysid/Util.hpp"
 #include "wpi/sysid/analysis/AnalysisManager.hpp"
@@ -109,10 +108,10 @@ void AnalyzerPlot::ResetData() {
 
 void AnalyzerPlot::SetGraphLabels(std::string_view unit) {
   std::string_view abbreviation = GetAbbreviation(unit);
-  m_velocityLabel = fmt::format("Velocity ({}/s)", abbreviation);
-  m_accelerationLabel = fmt::format("Acceleration ({}/s²)", abbreviation);
+  m_velocityLabel = std::format("Velocity ({}/s)", abbreviation);
+  m_accelerationLabel = std::format("Acceleration ({}/s²)", abbreviation);
   m_velPortionAccelLabel =
-      fmt::format("Velocity-Portion Accel ({}/s²)", abbreviation);
+      std::format("Velocity-Portion Accel ({}/s²)", abbreviation);
 }
 
 void AnalyzerPlot::SetRawData(const Storage& data, std::string_view unit,

@@ -7,9 +7,12 @@
 #include <optional>
 #include <utility>
 
+#include <Eigen/Core>
 #include <gcem.hpp>
 
 #include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/units/curvature.hpp"
 #include "wpi/units/length.hpp"

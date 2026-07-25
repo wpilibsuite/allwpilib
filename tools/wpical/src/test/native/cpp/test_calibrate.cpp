@@ -65,7 +65,7 @@ TEST_CASE("CameraCalibrationTest Typical", "[wpical]") {
   std::error_code ec;
   wpi::util::raw_fd_ostream output_file(calSavePath + "/cameracalibration.json",
                                         ec, fs::OF_Text);
-  wpi::util::json(ret).marshal(output_file, true, 4);
+  wpi::util::json(ret).marshal(output_file, true);
 }
 
 TEST_CASE("CameraCalibrationTest Atypical", "[wpical]") {

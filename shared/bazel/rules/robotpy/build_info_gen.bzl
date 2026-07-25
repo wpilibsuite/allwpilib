@@ -1,4 +1,4 @@
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select")
 
 def generate_robotpy_native_wrapper_build_info(name, pyproject_toml, third_party_dirs = []):

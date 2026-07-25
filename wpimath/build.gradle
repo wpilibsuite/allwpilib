@@ -16,7 +16,6 @@ ext {
                 }
                 exportedHeaders {
                     srcDirs 'src/main/native/thirdparty/eigen/include',
-                            'src/main/native/thirdparty/fmt/include',
                             'src/main/native/thirdparty/sleipnir/include',
                             'src/main/native/thirdparty/sleipnir/src'
                 }

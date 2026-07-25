@@ -35,7 +35,7 @@ configure_file(datalog-config.cmake.in ${WPILIB_BINARY_DIR}/datalog-config.cmake
 install(FILES ${WPILIB_BINARY_DIR}/datalog-config.cmake DESTINATION share/datalog)
 install(EXPORT datalog DESTINATION share/datalog)
 
-if(WITH_TESTS)
+if(WPILIB_WITH_TESTS)
     file(GLOB_RECURSE datalog_testlib_src src/test/native/include/*.h)
     add_library(datalog_testlib INTERFACE ${datalog_test_src})
     target_include_directories(datalog_testlib INTERFACE src/test/native/include)

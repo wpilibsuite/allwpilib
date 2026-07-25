@@ -5,10 +5,11 @@
 #pragma once
 
 #include <algorithm>
+#include <cstddef>
 #include <initializer_list>
 #include <span>
 #include <stdexcept>
-#include <type_traits>
+#include <string>
 #include <vector>
 
 #include <Eigen/QR>
@@ -99,7 +100,7 @@ class LinearFilter {
       m_outputs.emplace_front(0.0);
     }
 
-    if (!std::is_constant_evaluated()) {
+    if !consteval {
       ++instances;
       wpi::math::MathSharedStore::ReportUsage("LinearFilter",
                                               std::to_string(instances));

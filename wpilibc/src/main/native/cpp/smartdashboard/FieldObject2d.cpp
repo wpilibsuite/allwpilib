@@ -53,16 +53,6 @@ void FieldObject2d::SetPoses(std::initializer_list<wpi::math::Pose2d> poses) {
   SetPoses({poses.begin(), poses.end()});
 }
 
-void FieldObject2d::SetTrajectory(const wpi::math::Trajectory& trajectory) {
-  std::scoped_lock lock(m_mutex);
-  m_poses.clear();
-  m_poses.reserve(trajectory.States().size());
-  for (auto&& state : trajectory.States()) {
-    m_poses.push_back(state.pose);
-  }
-  UpdateEntry();
-}
-
 std::vector<wpi::math::Pose2d> FieldObject2d::GetPoses() const {
   std::scoped_lock lock(m_mutex);
   UpdateFromEntry();

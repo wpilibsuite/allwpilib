@@ -38,7 +38,7 @@ public class SteamControllerSim extends GenericHIDSim {
     setAxesAvailable(0x3F);
     setButtonsAvailable(0x3FFFFFFL);
     setPOVsAvailable(0);
-    setGamepadType(GenericHID.HIDType.STANDARD);
+    setGamepadType(GenericHID.HIDType.STEAM);
     setSupportedOutputs(SteamController.getSupportedOutputCapabilities());
   }
 

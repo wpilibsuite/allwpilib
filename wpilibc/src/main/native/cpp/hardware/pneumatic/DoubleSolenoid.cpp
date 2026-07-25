@@ -4,6 +4,7 @@
 
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 
+#include <format>
 #include <utility>
 
 #include "wpi/hal/Ports.h"
@@ -50,7 +51,7 @@ DoubleSolenoid::DoubleSolenoid(int busId, int module,
   }
 
   m_module->ReportUsage(
-      fmt::format("Solenoid[{},{}]", m_forwardChannel, m_reverseChannel),
+      std::format("Solenoid[{},{}]", m_forwardChannel, m_reverseChannel),
       "DoubleSolenoid");
 
   wpi::util::SendableRegistry::Add(

@@ -8,11 +8,10 @@
 
 #include <chrono>
 #include <cstring>
+#include <format>
 #include <mutex>
 #include <string>
 #include <thread>
-
-#include <fmt/format.h>
 
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
@@ -604,14 +603,14 @@ void HAL_FireREVPHOneShot(HAL_REVPHHandle handle, int32_t index, int32_t durMs,
   if (index >= kNumREVPHChannels || index < 0) {
     *status = MakeError(
         HAL_PARAMETER_OUT_OF_RANGE,
-        fmt::format("Only [0-15] are valid index values. Requested {}", index));
+        std::format("Only [0-15] are valid index values. Requested {}", index));
     return;
   }
 
   if (!HAL_CheckREVPHPulseTime(durMs)) {
     *status = MakeError(
         HAL_PARAMETER_OUT_OF_RANGE,
-        fmt::format("Time not within expected range [0-65534]. Requested {}",
+        std::format("Time not within expected range [0-65534]. Requested {}",
                     durMs));
     return;
   }

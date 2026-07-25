@@ -6,10 +6,11 @@
 #include <chrono>
 #include <cstdio>
 #include <cstring>
+#include <format>
 #include <functional>
+#include <iterator>
 #include <string>
-
-#include <fmt/format.h>
+#include <vector>
 
 #include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/cpp/MrcLibDs.hpp"
@@ -69,15 +70,15 @@ int32_t DefaultSendErrorImpl(bool isError, int32_t errorCode,
     }
 
     if (printMsg) {
-      fmt::memory_buffer buf;
+      std::vector<char> buf;
       if (!locationView.empty() && locationView[0] != '\0') {
-        fmt::format_to(fmt::appender{buf},
+        std::format_to(std::back_inserter(buf),
                        "{} at {}: ", isError ? "Error" : "Warning",
                        locationView);
       }
-      fmt::format_to(fmt::appender{buf}, "{}\n", detailsView);
+      std::format_to(std::back_inserter(buf), "{}\n", detailsView);
       if (!callStackView.empty() && callStackView[0] != '\0') {
-        fmt::format_to(fmt::appender{buf}, "{}\n", callStackView);
+        std::format_to(std::back_inserter(buf), "{}\n", callStackView);
       }
       auto printError = gPrintErrorImpl.load();
       struct WPI_String line = {buf.data(), buf.size()};

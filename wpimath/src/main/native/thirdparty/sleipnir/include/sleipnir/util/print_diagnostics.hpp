@@ -17,7 +17,6 @@
 
 #include "sleipnir/util/print.hpp"
 #include "sleipnir/util/profiler.hpp"
-#include "sleipnir/util/to_underlying.hpp"
 
 namespace slp {
 
@@ -231,7 +230,7 @@ void print_iteration_diagnostics(int iterations, IterationType type,
   slp::println(
       "│{:4} {:1} {:9.3f} {:10.4e} {:11.4e} {:10.4e} {:8.2e} {:8.2e} {:<5} "
       "{:<5} {:8.2e} {:8.2e} {:8.2e} {:8.2e} {:2d}│",
-      iterations, ITERATION_TYPES[slp::to_underlying(type)], to_ms(time), error,
+      iterations, ITERATION_TYPES[std::to_underlying(type)], to_ms(time), error,
       cost, infeasibility, complementarity, μ, power_of_10(δ), power_of_10(γ),
       full_primal_step_inf_norm, full_dual_step_inf_norm, primal_α, dual_α,
       backtracks);

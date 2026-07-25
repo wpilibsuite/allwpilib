@@ -115,7 +115,7 @@ static inline bool isHandleType(HAL_Handle handle, HAL_HandleEnum handleType) {
 /**
  * Get if the version of the handle is correct.
  *
- * Do not use on the roboRIO, used specifically for the sim to handle resets.
+ * Do not use on the Systemcore, used specifically for the sim to handle resets.
  *
  * @param handle  the handle
  * @param version the handle version to check
@@ -128,7 +128,7 @@ static inline bool isHandleCorrectVersion(HAL_Handle handle, int16_t version) {
 /**
  * Get if the handle is a correct type and version.
  *
- * Note the version is not checked on the roboRIO.
+ * Note the version is not checked on the Systemcore.
  *
  * @param handle     the handle
  * @param enumType   the type to check
@@ -161,7 +161,7 @@ inline int16_t getHandleTypedIndex(HAL_Handle handle, HAL_HandleEnum enumType,
 /**
  * Create a handle for a specific index, type and version.
  *
- * Note the version is not checked on the roboRIO.
+ * Note the version is not checked on the Systemcore.
  *
  * @param index      the index
  * @param handleType the handle type

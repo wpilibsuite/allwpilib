@@ -12,13 +12,13 @@ classes:
 
       Here are two ways to find the names of available devices:
 
-      * The static function :meth:`.enumerateDevices` can give you a list of
+      * The static function :meth:`.enumerate_devices` can give you a list of
         all available devices -- note that the device must be created first
         before this will return any results!
       * When running the WPILib simulation GUI, the names of the 'Other Devices'
         panel are names of devices that you can interact with via this class.
 
-      Once you've created a simulated device, you can use the :meth:`.enumerateValues`
+      Once you've created a simulated device, you can use the :meth:`.enumerate_values`
       method to determine what values you can interact with.
 
 
@@ -65,7 +65,7 @@ classes:
 
 inline_code: |
   cls_SimDeviceSim
-    .def("enumerateValues", [](wpi::sim::SimDeviceSim * that) {
+    .def("enumerate_values", [](wpi::sim::SimDeviceSim * that) {
       std::vector<std::pair<std::string, bool>> values;
       that->EnumerateValues([&values](const char * name, HAL_SimValueHandle handle,
                                HAL_Bool readonly, const struct HAL_Value * value){
@@ -74,7 +74,7 @@ inline_code: |
       return values;
     }, release_gil(),
     "Returns a list of (name, readonly) tuples of available values for this device")
-    .def_static("enumerateDevices", [](const char * prefix) {
+    .def_static("enumerate_devices", [](const char * prefix) {
       std::vector<std::string> devices;
       wpi::sim::SimDeviceSim::EnumerateDevices(prefix, [&devices](const char * name, HAL_SimDeviceHandle handle) {
         devices.push_back(std::string(name));

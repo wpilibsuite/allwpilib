@@ -15,12 +15,12 @@ def test_networkbutton(
     command = commands2.Command()
     start_spying_on(command)
 
-    pub = nt_instance.getTable("TestTable").getBooleanTopic("Test").publish()
+    pub = nt_instance.get_table("TestTable").get_boolean_topic("Test").publish()
 
     button = commands2.button.NetworkButton(nt_instance, "TestTable", "Test")
 
     pub.set(False)
-    button.onTrue(command)
+    button.on_true(command)
     scheduler.run()
     assert command.schedule.times_called == 0
     pub.set(True)

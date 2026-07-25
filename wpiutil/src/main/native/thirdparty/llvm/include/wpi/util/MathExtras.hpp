@@ -14,7 +14,6 @@
 #define WPIUTIL_WPI_MATHEXTRAS_H
 
 #include "wpi/util/STLForwardCompat.hpp"
-#include "wpi/util/bit.hpp"
 #include "wpi/util/Compiler.hpp"
 #include <bit>
 #include <cassert>

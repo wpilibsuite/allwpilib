@@ -5,12 +5,12 @@
 #include "wpi/sysid/view/DataSelector.hpp"
 
 #include <algorithm>
+#include <format>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <imgui.h>
 
 #include "wpi/datalog/DataLogReader.hpp"
@@ -29,7 +29,7 @@ static bool EmitEntryTarget(const char* name, bool isString,
                             const wpi::log::DataLogReaderEntry** entry) {
   if (*entry) {
     auto text =
-        fmt::format("{}: {} ({})", name, (*entry)->name, (*entry)->type);
+        std::format("{}: {} ({})", name, (*entry)->name, (*entry)->type);
     ImGui::TextUnformatted(text.c_str());
   } else {
     ImGui::Text("%s: <none (DROP HERE)> (%s)", name,
@@ -58,10 +58,10 @@ void DataSelector::Display() {
       TestData data = m_testdataFuture.get();
       for (auto&& motordata : data.motorData) {
         m_testdataStats.emplace_back(
-            fmt::format("Test State: {}", motordata.first));
+            std::format("Test State: {}", motordata.first));
         int i = 0;
         for (auto&& run : motordata.second.runs) {
-          m_testdataStats.emplace_back(fmt::format(
+          m_testdataStats.emplace_back(std::format(
               "  Run {} samples: {} Volt {} Pos {} Vel", ++i,
               run.voltage.size(), run.position.size(), run.velocity.size()));
         }

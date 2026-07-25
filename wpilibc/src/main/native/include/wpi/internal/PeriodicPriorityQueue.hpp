@@ -5,6 +5,7 @@
 #pragma once
 
 #include <chrono>
+#include <cstdint>
 #include <functional>
 #include <vector>
 
@@ -48,6 +49,12 @@ class PeriodicPriorityQueue {
     std::chrono::microseconds expirationTime;
 
     /**
+     * The unique id for this callback to allow callbacks to be tracked and
+     * removed from the queue throughout robot operation.
+     */
+    uint64_t id;
+
+    /**
      * Construct a callback container.
      *
      * @param func      The callback to run.
@@ -81,12 +88,13 @@ class PeriodicPriorityQueue {
              wpi::units::second_t period);
 
     bool operator>(const Callback& rhs) const {
+      if (expirationTime == rhs.expirationTime) {
+        return id > rhs.id;
+      }
       return expirationTime > rhs.expirationTime;
     }
 
-    bool operator==(const Callback& rhs) const {
-      return expirationTime == rhs.expirationTime;
-    }
+    bool operator==(const Callback& rhs) const { return id == rhs.id; }
   };
 
   /**

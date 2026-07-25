@@ -13,6 +13,12 @@ load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_mo
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 {% for extension_module in extension_modules%}
 def {{extension_module.name}}_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
+    NAME_TRANSFORMS = [{% for transform in extension_module.extension_name_transforms %}
+        "{{ transform[0] }}",
+        "{{ transform[1] }}",
+        {%- endfor %}
+    ]
+
     {{extension_module.name|upper}}_HEADER_GEN = [
     {%- for header_cfg in extension_module.generation_data.values() %}
         struct(
@@ -84,6 +90,7 @@ def {{extension_module.name}}_extension(srcs = [], header_to_dat_deps = [], extr
             "{{header_path}}",
         {%- endfor %}
         ],
+        name_transforms = NAME_TRANSFORMS,
         {%- if extension_module.get_defines() %}
         generation_defines = [{%-for da in extension_module.get_defines() %}"{{da.replace("=", " ")}}"{% endfor %}],
         {%- endif %}

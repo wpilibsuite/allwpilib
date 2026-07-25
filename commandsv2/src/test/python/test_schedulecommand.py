@@ -9,26 +9,26 @@ if TYPE_CHECKING:
 import pytest
 
 
-def test_scheduleCommandSchedule(scheduler: commands2.CommandScheduler):
+def test_schedule_command_schedule(scheduler: commands2.CommandScheduler):
     command1 = commands2.Command()
     command2 = commands2.Command()
 
     start_spying_on(command1)
     start_spying_on(command2)
 
-    scheduleCommand = commands2.ScheduleCommand(command1, command2)
+    schedule_command = commands2.ScheduleCommand(command1, command2)
 
-    scheduler.schedule(scheduleCommand)
+    scheduler.schedule(schedule_command)
 
     verify(command1).schedule()
     verify(command2).schedule()
 
 
-def test_scheduleCommandDuringRun(scheduler: commands2.CommandScheduler):
-    toSchedule = commands2.InstantCommand()
-    scheduleCommand = commands2.ScheduleCommand(toSchedule)
+def test_schedule_command_during_run(scheduler: commands2.CommandScheduler):
+    to_schedule = commands2.InstantCommand()
+    schedule_command = commands2.ScheduleCommand(to_schedule)
     group = commands2.SequentialCommandGroup(
-        commands2.InstantCommand(), scheduleCommand
+        commands2.InstantCommand(), schedule_command
     )
 
     scheduler.schedule(group)

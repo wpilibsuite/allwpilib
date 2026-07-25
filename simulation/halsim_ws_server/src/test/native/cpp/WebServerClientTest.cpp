@@ -5,10 +5,9 @@
 #include "WebServerClientTest.hpp"
 
 #include <cstdio>
+#include <format>
 #include <memory>
 #include <string>
-
-#include <fmt/format.h>
 
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/net/uv/util.hpp"
@@ -26,7 +25,7 @@ void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
                                               const std::string& uri) {
   wpi::util::print("Will attempt to connect to: {}:{}{}\n", host, port, uri);
   m_websocket = wpi::net::WebSocket::CreateClient(
-      *m_tcp_client.get(), uri, fmt::format("{}:{}", host, port));
+      *m_tcp_client.get(), uri, std::format("{}:{}", host, port));
 
   // Hook up events
   m_websocket->open.connect_extended([this](auto conn, auto) {
@@ -46,7 +45,7 @@ void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
   m_websocket->text.connect([this](auto msg, bool) {
     auto j = wpi::util::json::parse(msg);
     if (!j) {
-      auto err = fmt::format("JSON parse failed: {}", j.error());
+      auto err = std::format("JSON parse failed: {}", j.error());
       wpi::util::print(stderr, "{}\n", err);
       m_websocket->Fail(1003, err);
       return;

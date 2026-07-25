@@ -10,7 +10,7 @@
 
 #include "TestProtoInner.hpp"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpiutil.npb.h"
+#include "wpiutil_test.npb.h"
 
 struct TestProto {
   double double_msg{1};

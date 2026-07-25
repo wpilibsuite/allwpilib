@@ -13,7 +13,10 @@
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/LinearSystemLoop.hpp"
 #include "wpi/math/system/Models.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/mass.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/units/voltage.hpp"
 
 namespace wpi::math {
 

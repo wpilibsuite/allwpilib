@@ -22,22 +22,22 @@ class DriveDistance(commands2.Command):
         self.distance = inches
         self.velocity = velocity
         self.drive = drive
-        self.addRequirements(drive)
+        self.add_requirements(drive)
 
     def initialize(self) -> None:
         """Called when the command is initially scheduled."""
-        self.drive.arcadeDrive(0, 0)
-        self.drive.resetEncoders()
+        self.drive.arcade_drive(0, 0)
+        self.drive.reset_encoders()
 
     def execute(self) -> None:
         """Called every time the scheduler runs while the command is scheduled."""
-        self.drive.arcadeDrive(self.velocity, 0)
+        self.drive.arcade_drive(self.velocity, 0)
 
     def end(self, interrupted: bool) -> None:
         """Called once the command ends or is interrupted."""
-        self.drive.arcadeDrive(0, 0)
+        self.drive.arcade_drive(0, 0)
 
-    def isFinished(self) -> bool:
+    def is_finished(self) -> bool:
         """Returns true when the command should end."""
         # Compare distance travelled from start to desired distance
-        return abs(self.drive.getAverageDistanceInch()) >= self.distance
+        return abs(self.drive.get_average_distance_inch()) >= self.distance

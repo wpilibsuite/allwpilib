@@ -22,26 +22,26 @@ class Drive(Subsystem):
         super().__init__()
 
         # The motors on the left side of the drive.
-        self.left_motor = PWMSparkMax(DriveConstants.kLeftMotor1Port)
+        self.left_motor = PWMSparkMax(DriveConstants.LEFT_MOTOR1_PORT)
 
         # The motors on the right side of the drive.
-        self.right_motor = PWMSparkMax(DriveConstants.kRightMotor1Port)
+        self.right_motor = PWMSparkMax(DriveConstants.RIGHT_MOTOR1_PORT)
 
         # The robot's drive
         self.drive = DifferentialDrive(self.left_motor, self.right_motor)
 
         # The left-side drive encoder
         self.left_encoder = Encoder(
-            DriveConstants.kLeftEncoderPorts[0],
-            DriveConstants.kLeftEncoderPorts[1],
-            DriveConstants.kLeftEncoderReversed,
+            DriveConstants.LEFT_ENCODER_PORTS[0],
+            DriveConstants.LEFT_ENCODER_PORTS[1],
+            DriveConstants.LEFT_ENCODER_REVERSED,
         )
 
         # The right-side drive encoder
         self.right_encoder = Encoder(
-            DriveConstants.kRightEncoderPorts[0],
-            DriveConstants.kRightEncoderPorts[1],
-            DriveConstants.kRightEncoderReversed,
+            DriveConstants.RIGHT_ENCODER_PORTS[0],
+            DriveConstants.RIGHT_ENCODER_PORTS[1],
+            DriveConstants.RIGHT_ENCODER_REVERSED,
         )
 
         # Create a new SysId routine for characterizing the drive.
@@ -50,7 +50,7 @@ class Drive(Subsystem):
             SysIdRoutine.Config(),
             SysIdRoutine.Mechanism(
                 # Tell SysId how to plumb the driving voltage to the motors.
-                self._driveVoltage,
+                self._drive_voltage,
                 # Tell SysId how to record a frame of data for each motor on the mechanism being
                 # characterized.
                 self._log,
@@ -61,39 +61,43 @@ class Drive(Subsystem):
         )
 
         # Add the second motors on each side of the drivetrain
-        self.left_motor.addFollower(PWMSparkMax(DriveConstants.kLeftMotor2Port))
-        self.right_motor.addFollower(PWMSparkMax(DriveConstants.kRightMotor2Port))
+        self.left_motor.add_follower(PWMSparkMax(DriveConstants.LEFT_MOTOR2_PORT))
+        self.right_motor.add_follower(PWMSparkMax(DriveConstants.RIGHT_MOTOR2_PORT))
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's
         # gearbox is constructed, you might have to invert the left side instead.
-        self.right_motor.setInverted(True)
+        self.right_motor.set_inverted(True)
 
         # Sets the distance per pulse for the encoders
-        self.left_encoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse)
-        self.right_encoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse)
+        self.left_encoder.set_distance_per_pulse(
+            DriveConstants.ENCODER_DISTANCE_PER_PULSE
+        )
+        self.right_encoder.set_distance_per_pulse(
+            DriveConstants.ENCODER_DISTANCE_PER_PULSE
+        )
 
-    def _driveVoltage(self, voltage: float) -> None:
-        self.left_motor.setVoltage(voltage)
-        self.right_motor.setVoltage(voltage)
+    def _drive_voltage(self, voltage: float) -> None:
+        self.left_motor.set_voltage(voltage)
+        self.right_motor.set_voltage(voltage)
 
     def _log(self, sys_id_routine: SysIdRoutineLog) -> None:
         # Record a frame for the left motors. Since these share an encoder, we consider
         # the entire group to be one motor.
         sys_id_routine.motor("drive-left").voltage(
-            self.left_motor.get() * RobotController.getBatteryVoltage()
-        ).position(self.left_encoder.getDistance()).velocity(
-            self.left_encoder.getRate()
+            self.left_motor.get_throttle() * RobotController.get_battery_voltage()
+        ).position(self.left_encoder.get_distance()).velocity(
+            self.left_encoder.get_rate()
         )
         # Record a frame for the right motors. Since these share an encoder, we consider
         # the entire group to be one motor.
         sys_id_routine.motor("drive-right").voltage(
-            self.right_motor.get() * RobotController.getBatteryVoltage()
-        ).position(self.right_encoder.getDistance()).velocity(
-            self.right_encoder.getRate()
+            self.right_motor.get_throttle() * RobotController.get_battery_voltage()
+        ).position(self.right_encoder.get_distance()).velocity(
+            self.right_encoder.get_rate()
         )
 
-    def arcadeDriveCommand(
+    def arcade_drive_command(
         self, fwd: Callable[[], float], rot: Callable[[], float]
     ) -> Command:
         """Returns a command that drives the robot with arcade controls.
@@ -104,11 +108,11 @@ class Drive(Subsystem):
 
         # A split-stick arcade command, with forward/backward controlled by the left
         # hand, and turning controlled by the right.
-        return self.run(lambda: self.drive.arcadeDrive(fwd(), rot())).withName(
+        return self.run(lambda: self.drive.arcade_drive(fwd(), rot())).with_name(
             "arcadeDrive"
         )
 
-    def sysIdQuasistatic(self, direction: SysIdRoutine.Direction) -> Command:
+    def sys_id_quasistatic(self, direction: SysIdRoutine.Direction) -> Command:
         """Returns a command that will execute a quasistatic test in the given direction.
 
         :param direction: The direction (forward or reverse) to run the test in
@@ -116,7 +120,7 @@ class Drive(Subsystem):
 
         return self.sys_id_routine.quasistatic(direction)
 
-    def sysIdDynamic(self, direction: SysIdRoutine.Direction) -> Command:
+    def sys_id_dynamic(self, direction: SysIdRoutine.Direction) -> Command:
         """Returns a command that will execute a dynamic test in the given direction.
 
         :param direction: The direction (forward or reverse) to run the test in

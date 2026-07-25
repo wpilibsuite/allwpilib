@@ -55,7 +55,7 @@ public class CANAPIJNI extends JNIWrapper {
    *
    * <p>This ID is 10 bits.
    *
-   * <p>The RoboRIO will automatically repeat the packet at the specified interval
+   * <p>The Systemcore will automatically repeat the packet at the specified interval
    *
    * @param handle the CAN handle
    * @param apiId the ID to write (0-1023)
@@ -105,7 +105,7 @@ public class CANAPIJNI extends JNIWrapper {
    *
    * <p>This ID is 10 bits.
    *
-   * <p>The RoboRIO will automatically repeat the packet at the specified interval
+   * <p>The Systemcore will automatically repeat the packet at the specified interval
    *
    * @param handle the CAN handle
    * @param apiId the ID to write (0-1023)

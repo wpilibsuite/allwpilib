@@ -46,7 +46,9 @@ def main():
     template = env.from_string(BUILD_FILE_TEMPLATE)
 
     nativelib_config = raw_config["tool"]["hatch"]["build"]["hooks"]["nativelib"]
-    project_name = raw_config["project"]["name"].replace("robotpy-native-", "")
+    project_name = (
+        raw_config["project"]["name"].replace("robotpy-native-", "").replace("-", "_")
+    )
     root_package = fixup_root_package_name(project_name)
     pc_files = []
 
@@ -90,7 +92,7 @@ def main():
 
 BUILD_FILE_TEMPLATE = """# THIS FILE IS AUTO GENERATED
 
-load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
+load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "copy_native_file", "generate_native_files", "robotpy_library")
 
 def define_native_wrapper(name, pyproject_toml = None):

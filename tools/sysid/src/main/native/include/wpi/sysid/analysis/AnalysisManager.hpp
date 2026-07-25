@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <array>
 #include <exception>
+#include <format>
 #include <limits>
 #include <numeric>
 #include <string>
@@ -139,7 +140,7 @@ class AnalysisManager {
      * @param path The path of the file attempted to open
      */
     explicit FileReadingError(std::string_view path) {
-      msg = fmt::format("Unable to read: {}", path);
+      msg = std::format("Unable to read: {}", path);
     }
 
     const char* what() const noexcept override { return msg.c_str(); }

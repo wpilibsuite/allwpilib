@@ -11,26 +11,26 @@ class StartEndCommand(FunctionalCommand):
     """
     A command that runs a given Callable when it is initialized, and another Callable when it ends.
     Useful for running and then stopping a motor, or extending and then retracting a solenoid. Has no
-    end condition as-is; either subclass it or use :func:`commands2.Command.withTimeout`
+    end condition as-is; either subclass it or use :func:`commands2.Command.with_timeout`
     or :func:`commands2.Command.until` to give it one.
     """
 
     def __init__(
         self,
-        onInit: Callable[[], Any],
-        onEnd: Callable[[], Any],
+        on_init: Callable[[], Any],
+        on_end: Callable[[], Any],
         *requirements: Subsystem,
     ):
         """
         Creates a new StartEndCommand. Will run the given Callables when the command starts and when it
         ends.
 
-        :param onInit: the Callable to run on command init
-        :param onEnd: the Callable to run on command end
+        :param on_init: the Callable to run on command init
+        :param on_end: the Callable to run on command end
         :param requirements: the subsystems required by this command
         """
-        assert callable(onInit)
-        assert callable(onEnd)
+        assert callable(on_init)
+        assert callable(on_end)
         super().__init__(
-            onInit, lambda: None, lambda _: onEnd(), lambda: False, *requirements
+            on_init, lambda: None, lambda _: on_end(), lambda: False, *requirements
         )

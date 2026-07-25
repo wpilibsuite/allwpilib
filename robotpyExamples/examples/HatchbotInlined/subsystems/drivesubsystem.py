@@ -12,57 +12,59 @@ import constants
 class DriveSubsystem(commands2.Subsystem):
     def __init__(self) -> None:
 
-        self.left1 = wpilib.PWMVictorSPX(constants.kLeftMotor1Port)
-        self.left2 = wpilib.PWMVictorSPX(constants.kLeftMotor2Port)
-        self.right1 = wpilib.PWMVictorSPX(constants.kRightMotor1Port)
-        self.right2 = wpilib.PWMVictorSPX(constants.kRightMotor2Port)
+        self.left1 = wpilib.PWMVictorSPX(constants.LEFT_MOTOR1_PORT)
+        self.left2 = wpilib.PWMVictorSPX(constants.LEFT_MOTOR2_PORT)
+        self.right1 = wpilib.PWMVictorSPX(constants.RIGHT_MOTOR1_PORT)
+        self.right2 = wpilib.PWMVictorSPX(constants.RIGHT_MOTOR2_PORT)
 
-        self.left1.addFollower(self.left2)
-        self.right1.addFollower(self.right2)
+        self.left1.add_follower(self.left2)
+        self.right1.add_follower(self.right2)
 
         # We need to invert one side of the drivetrain so that positive velocities
         # result in both sides moving forward. Depending on how your robot's
         # drivetrain is constructed, you might have to invert the left side instead.
-        self.right1.setInverted(True)
+        self.right1.set_inverted(True)
 
         # The robot's drive
         self.drive = wpilib.DifferentialDrive(self.left1, self.right1)
 
         # The left-side drive encoder
-        self.leftEncoder = wpilib.Encoder(
-            *constants.kLeftEncoderPorts,
-            reverseDirection=constants.kLeftEncoderReversed
+        self.left_encoder = wpilib.Encoder(
+            *constants.LEFT_ENCODER_PORTS,
+            reverse_direction=constants.LEFT_ENCODER_REVERSED
         )
 
         # The right-side drive encoder
-        self.rightEncoder = wpilib.Encoder(
-            *constants.kRightEncoderPorts,
-            reverseDirection=constants.kRightEncoderReversed
+        self.right_encoder = wpilib.Encoder(
+            *constants.RIGHT_ENCODER_PORTS,
+            reverse_direction=constants.RIGHT_ENCODER_REVERSED
         )
 
         # Sets the distance per pulse for the encoders
-        self.leftEncoder.setDistancePerPulse(constants.kEncoderDistancePerPulse)
-        self.rightEncoder.setDistancePerPulse(constants.kEncoderDistancePerPulse)
+        self.left_encoder.set_distance_per_pulse(constants.ENCODER_DISTANCE_PER_PULSE)
+        self.right_encoder.set_distance_per_pulse(constants.ENCODER_DISTANCE_PER_PULSE)
 
-    def arcadeDrive(self, fwd: float, rot: float) -> None:
+    def arcade_drive(self, fwd: float, rot: float) -> None:
         """
         Drives the robot using arcade controls.
 
         :param fwd: the commanded forward movement
         :param rot: the commanded rotation
         """
-        self.drive.arcadeDrive(fwd, rot)
+        self.drive.arcade_drive(fwd, rot)
 
-    def resetEncoders(self) -> None:
+    def reset_encoders(self) -> None:
         """Resets the drive encoders to currently read a position of 0."""
 
-    def getAverageEncoderDistance(self) -> float:
+    def get_average_encoder_distance(self) -> float:
         """Gets the average distance of the TWO encoders."""
-        return (self.leftEncoder.getDistance() + self.rightEncoder.getDistance()) / 2.0
+        return (
+            self.left_encoder.get_distance() + self.right_encoder.get_distance()
+        ) / 2.0
 
-    def setMaxOutput(self, maxOutput: float):
+    def set_max_output(self, max_output: float):
         """
         Sets the max output of the drive. Useful for scaling the
         drive to drive more slowly.
         """
-        self.drive.setMaxOutput(maxOutput)
+        self.drive.set_max_output(max_output)

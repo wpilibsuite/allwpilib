@@ -13,7 +13,7 @@
 namespace wpi {
 using namespace wpi::sim;
 TEST(AnalogPotentiometerTest, InitializeWithAnalogInput) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   AnalogInput ai{0};
   AnalogPotentiometer pot{&ai};
@@ -25,7 +25,7 @@ TEST(AnalogPotentiometerTest, InitializeWithAnalogInput) {
 }
 
 TEST(AnalogPotentiometerTest, InitializeWithAnalogInputAndScale) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   AnalogInput ai{0};
   AnalogPotentiometer pot{&ai, 270.0};
@@ -43,7 +43,7 @@ TEST(AnalogPotentiometerTest, InitializeWithAnalogInputAndScale) {
 }
 
 TEST(AnalogPotentiometerTest, InitializeWithChannel) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   AnalogPotentiometer pot{1};
   AnalogInputSim sim{1};
@@ -53,7 +53,7 @@ TEST(AnalogPotentiometerTest, InitializeWithChannel) {
 }
 
 TEST(AnalogPotentiometerTest, InitializeWithChannelAndScale) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   AnalogPotentiometer pot{1, 180.0};
   RoboRioSim::ResetData();

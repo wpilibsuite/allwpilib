@@ -4,6 +4,9 @@
 
 #include "wpi/math/util/StateSpaceUtil.hpp"
 
+#include <vector>
+
+#include <Eigen/Core>
 #include <gtest/gtest.h>
 
 #include "wpi/math/linalg/EigenCore.hpp"

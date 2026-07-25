@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <cmath>
+#include <cstddef>
+
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/util/array.hpp"
 

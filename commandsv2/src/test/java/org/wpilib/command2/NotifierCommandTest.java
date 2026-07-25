@@ -17,7 +17,7 @@ import org.wpilib.simulation.SimHooks;
 class NotifierCommandTest extends CommandTestBase {
   @BeforeEach
   void setup() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SimHooks.pauseTiming();
   }
 

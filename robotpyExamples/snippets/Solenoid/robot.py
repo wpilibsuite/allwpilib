@@ -7,10 +7,10 @@
 
 import wpilib
 
-kSolenoidButton = 1
-kDoubleSolenoidForwardButton = 2
-kDoubleSolenoidReverseButton = 3
-kCompressorButton = 4
+SOLENOID_BUTTON = 1
+DOUBLE_SOLENOID_FORWARD_BUTTON = 2
+DOUBLE_SOLENOID_REVERSE_BUTTON = 3
+COMPRESSOR_BUTTON = 4
 
 
 class MyRobot(wpilib.TimedRobot):
@@ -33,68 +33,68 @@ class MyRobot(wpilib.TimedRobot):
         # Solenoid corresponds to a single solenoid.
         # In this case, it's connected to channel 0 of a PH with the default CAN ID.
         self.solenoid = wpilib.Solenoid(
-            busId=0, moduleType=wpilib.PneumaticsModuleType.REV_PH, channel=0
+            bus_id=0, module_type=wpilib.PneumaticsModuleType.REV_PH, channel=0
         )
 
         # DoubleSolenoid corresponds to a double solenoid.
         # In this case, it's connected to channels 1 and 2 of a PH with the default CAN ID.
-        self.doubleSolenoid = wpilib.DoubleSolenoid(
-            busId=0,
-            moduleType=wpilib.PneumaticsModuleType.REV_PH,
-            forwardChannel=1,
-            reverseChannel=2,
+        self.double_solenoid = wpilib.DoubleSolenoid(
+            bus_id=0,
+            module_type=wpilib.PneumaticsModuleType.REV_PH,
+            forward_channel=1,
+            reverse_channel=2,
         )
 
         # Compressor connected to a PH with a default CAN ID (1)
         self.compressor = wpilib.Compressor(
-            busId=0, moduleType=wpilib.PneumaticsModuleType.REV_PH
+            bus_id=0, module_type=wpilib.PneumaticsModuleType.REV_PH
         )
 
         # Publish elements to dashboard.
-        wpilib.SmartDashboard.putData("Single Solenoid", self.solenoid)
-        wpilib.SmartDashboard.putData("Double Solenoid", self.doubleSolenoid)
-        wpilib.SmartDashboard.putData("Compressor", self.compressor)
+        wpilib.SmartDashboard.put_data("Single Solenoid", self.solenoid)
+        wpilib.SmartDashboard.put_data("Double Solenoid", self.double_solenoid)
+        wpilib.SmartDashboard.put_data("Compressor", self.compressor)
 
-    def teleopPeriodic(self) -> None:
+    def teleop_periodic(self) -> None:
         # Publish some raw data
         # Get the pressure (in PSI) from the analog sensor connected to the PH.
         # This function is supported only on the PH!
         # On a PCM, this function will return 0.
-        wpilib.SmartDashboard.putNumber(
-            "PH Pressure [PSI]", self.compressor.getPressure()
+        wpilib.SmartDashboard.put_number(
+            "PH Pressure [PSI]", self.compressor.get_pressure()
         )
         # Get compressor current draw.
-        wpilib.SmartDashboard.putNumber(
-            "Compressor Current", self.compressor.getCurrent()
+        wpilib.SmartDashboard.put_number(
+            "Compressor Current", self.compressor.get_current()
         )
         # Get whether the compressor is active.
-        wpilib.SmartDashboard.putBoolean(
-            "Compressor Active", self.compressor.isEnabled()
+        wpilib.SmartDashboard.put_boolean(
+            "Compressor Active", self.compressor.is_enabled()
         )
         # Get the digital pressure switch connected to the PCM/PH.
         # The switch is open when the pressure is over ~120 PSI.
-        wpilib.SmartDashboard.putBoolean(
-            "Pressure Switch", self.compressor.getPressureSwitchValue()
+        wpilib.SmartDashboard.put_boolean(
+            "Pressure Switch", self.compressor.get_pressure_switch_value()
         )
 
-        # The output of GetRawButton is true/false depending on whether
-        # the button is pressed; Set takes a boolean for whether
+        # The output of get_raw_button is true/false depending on whether
+        # the button is pressed; set takes a boolean for whether
         # to retract the solenoid (false) or extend it (true).
-        self.solenoid.set(self.joystick.getRawButton(kSolenoidButton))
+        self.solenoid.set(self.joystick.get_raw_button(SOLENOID_BUTTON))
 
-        # GetRawButtonPressed will only return true once per press.
+        # get_raw_button_pressed will only return true once per press.
         # If a button is pressed, set the solenoid to the respective channel.
 
-        if self.joystick.getRawButtonPressed(kDoubleSolenoidForwardButton):
-            self.doubleSolenoid.set(wpilib.DoubleSolenoid.Value.FORWARD)
-        elif self.joystick.getRawButtonPressed(kDoubleSolenoidReverseButton):
-            self.doubleSolenoid.set(wpilib.DoubleSolenoid.Value.REVERSE)
+        if self.joystick.get_raw_button_pressed(DOUBLE_SOLENOID_FORWARD_BUTTON):
+            self.double_solenoid.set(wpilib.DoubleSolenoid.Value.FORWARD)
+        elif self.joystick.get_raw_button_pressed(DOUBLE_SOLENOID_REVERSE_BUTTON):
+            self.double_solenoid.set(wpilib.DoubleSolenoid.Value.REVERSE)
 
         # On button press, toggle the compressor.
-        if self.joystick.getRawButtonPressed(kCompressorButton):
+        if self.joystick.get_raw_button_pressed(COMPRESSOR_BUTTON):
             # Check whether the compressor is currently enabled.
-            isCompressorEnabled = self.compressor.isEnabled()
-            if isCompressorEnabled:
+            is_compressor_enabled = self.compressor.is_enabled()
+            if is_compressor_enabled:
                 # Disable closed-loop mode on the compressor
                 self.compressor.disable()
             else:
@@ -103,14 +103,14 @@ class MyRobot(wpilib.TimedRobot):
                 if False:
                     # Enable closed-loop mode based on the digital pressure switch connected to the PCM/PH.
                     # The switch is open when the pressure is over ~120 PSI.
-                    self.compressor.enableDigital()
+                    self.compressor.enable_digital()
 
                 if True:
                     # Enable closed-loop mode based on the analog pressure sensor connected to the PH.
                     # The compressor will run while the pressure reported by the sensor is in the
                     # specified range ([70 PSI, 120 PSI] in this example).
                     # Analog mode exists only on the PH! On the PCM, this enables digital control.
-                    self.compressor.enableAnalog(70, 120)
+                    self.compressor.enable_analog(70, 120)
 
                 if False:
                     # Enable closed-loop mode based on both the digital pressure switch AND the analog
@@ -119,4 +119,4 @@ class MyRobot(wpilib.TimedRobot):
                     # specified range ([70 PSI, 120 PSI] in this example) AND the digital switch reports
                     # that the system is not full.
                     # Hybrid mode exists only on the PH! On the PCM, this enables digital control.
-                    self.compressor.enableHybrid(70, 120)
+                    self.compressor.enable_hybrid(70, 120)

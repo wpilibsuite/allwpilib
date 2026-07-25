@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 import pytest
 
 
-def test_commandInMultipleGroups():
+def test_command_in_multiple_groups():
     command1 = commands2.Command()
     command2 = commands2.Command()
 
@@ -18,7 +18,7 @@ def test_commandInMultipleGroups():
         commands2.ParallelCommandGroup(command1, command2)
 
 
-def test_commandInGroupExternallyScheduled(scheduler: commands2.CommandScheduler):
+def test_command_in_group_externally_scheduled(scheduler: commands2.CommandScheduler):
     command1 = commands2.Command()
     command2 = commands2.Command()
 
@@ -28,10 +28,10 @@ def test_commandInGroupExternallyScheduled(scheduler: commands2.CommandScheduler
         scheduler.schedule(command1)
 
 
-def test_redecoratedCommandError(scheduler: commands2.CommandScheduler):
+def test_redecorated_command_error(scheduler: commands2.CommandScheduler):
     command = commands2.InstantCommand()
-    command.withTimeout(10).until(lambda: False)
+    command.with_timeout(10).until(lambda: False)
     with pytest.raises(commands2.IllegalCommandUse):
-        command.withTimeout(10)
-    scheduler.removeComposedCommand(command)
-    command.withTimeout(10)
+        command.with_timeout(10)
+    scheduler.remove_composed_command(command)
+    command.with_timeout(10)

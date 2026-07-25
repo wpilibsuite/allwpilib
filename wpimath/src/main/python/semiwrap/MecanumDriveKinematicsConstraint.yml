@@ -9,8 +9,8 @@ classes:
 
 inline_code: |-
   cls_MecanumDriveKinematicsConstraint
-    .def_static("fromFps", [](const wpi::math::MecanumDriveKinematics& kinematics,
+    .def_static("from_fps", [](const wpi::math::MecanumDriveKinematics& kinematics,
                               wpi::units::feet_per_second_t maxVelocity) {
       return std::make_shared<wpi::math::MecanumDriveKinematicsConstraint>(kinematics, maxVelocity);
-    }, py::arg("kinematics"), py::arg("maxVelocity"))
+    }, py::arg("kinematics"), py::arg("max_velocity"))
   ;

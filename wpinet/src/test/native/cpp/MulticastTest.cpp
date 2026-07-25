@@ -10,8 +10,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include "wpi/net/MulticastServiceAnnouncer.h"
-#include "wpi/net/MulticastServiceResolver.h"
+#include "wpi/net/MulticastServiceAnnouncer.hpp"
+#include "wpi/net/MulticastServiceResolver.hpp"
 
 TEST_CASE("MulticastServiceAnnouncerTest EmptyText",
           "[multicast][service-discovery]") {

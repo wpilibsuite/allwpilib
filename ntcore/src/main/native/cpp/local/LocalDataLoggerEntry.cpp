@@ -4,10 +4,9 @@
 
 #include "LocalDataLoggerEntry.hpp"
 
+#include <format>
 #include <string>
 #include <string_view>
-
-#include <fmt/format.h>
 
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/util/StringExtras.hpp"
@@ -15,7 +14,7 @@
 using namespace wpi::nt::local;
 
 std::string LocalDataLoggerEntry::MakeMetadata(std::string_view properties) {
-  return fmt::format("{{\"properties\":{},\"source\":\"NT\"}}", properties);
+  return std::format("{{\"properties\":{},\"source\":\"NT\"}}", properties);
 }
 
 void LocalDataLoggerEntry::Append(const Value& v) {

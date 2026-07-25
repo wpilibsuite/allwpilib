@@ -7,6 +7,7 @@ def __generate_commandsv3_impl(ctx):
     args = ctx.actions.args()
     args.add("--output_directory", output_dir.path)
     args.add("--template_root", "commandsv3/src/generate")
+    args.add("--proto_directory", "commandsv3/src/main/proto")
     args.add("--protoc", ctx.executable._protoc)
     args.add("--quickbuf_plugin", ctx.executable._quickbuf)
 

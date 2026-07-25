@@ -7,10 +7,9 @@
 #include <jni.h>
 
 #include <algorithm>
+#include <format>
 #include <string>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "org_wpilib_datalog_DataLogJNI.h"
 #include "wpi/datalog/DataLog.hpp"
@@ -678,7 +677,7 @@ Java_org_wpilib_datalog_DataLogJNI_appendStringArray
         env, static_cast<jstring>(env->GetObjectArrayElement(value, i))};
     if (!elem) {
       wpi::ThrowNullPointerException(
-          env, fmt::format("string at element {} is null", i));
+          env, std::format("string at element {} is null", i));
       return;
     }
     arr.emplace_back(JStringRef{env, elem}.str());

@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 /**
- * Gets the roboRIO input voltage.
+ * Gets the Systemcore input voltage.
  *
  * @param[out] status the error code, or 0 for success
  * @return the input voltage (volts)
@@ -81,10 +81,7 @@ void HAL_ResetUserCurrentFaults(int32_t* status);
 double HAL_GetBrownoutVoltage(int32_t* status);
 
 /**
- * Set the voltage the roboRIO will brownout and disable all outputs.
- *
- * Note that this only does anything on the roboRIO 2.
- * On the roboRIO it is a no-op.
+ * Set the voltage the Systemcore will brownout and disable all outputs.
  *
  * @param[in] voltage The brownout voltage
  * @param[out] status the error code, or 0 for success

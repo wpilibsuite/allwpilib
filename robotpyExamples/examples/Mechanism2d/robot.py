@@ -18,43 +18,43 @@ class MyRobot(wpilib.TimedRobot):
     Mechanism2d object.
     """
 
-    kMetersPerPulse = 0.01
-    kElevatorMinimumLength = 0.5
+    METERS_PER_PULSE = 0.01
+    ELEVATOR_MINIMUM_LENGTH = 0.5
 
     def __init__(self):
         super().__init__()
-        self.elevatorMotor = wpilib.PWMSparkMax(0)
-        self.wristMotor = wpilib.PWMSparkMax(1)
-        self.wristPot = wpilib.AnalogPotentiometer(1, 90)
-        self.elevatorEncoder = wpilib.Encoder(0, 1)
+        self.elevator_motor = wpilib.PWMSparkMax(0)
+        self.wrist_motor = wpilib.PWMSparkMax(1)
+        self.wrist_pot = wpilib.AnalogPotentiometer(1, 90)
+        self.elevator_encoder = wpilib.Encoder(0, 1)
         self.joystick = wpilib.Joystick(0)
 
-        self.elevatorEncoder.setDistancePerPulse(self.kMetersPerPulse)
+        self.elevator_encoder.set_distance_per_pulse(self.METERS_PER_PULSE)
 
         # the main mechanism object
         self.mech = wpilib.Mechanism2d(3, 3)
         # the mechanism root node
-        self.root = self.mech.getRoot("climber", 2, 0)
+        self.root = self.mech.get_root("climber", 2, 0)
 
         # MechanismLigament2d objects represent each "section"/"stage" of the mechanism, and are based
         # off the root node or another ligament object
-        self.elevator = self.root.appendLigament(
-            "elevator", self.kElevatorMinimumLength, 90
+        self.elevator = self.root.append_ligament(
+            "elevator", self.ELEVATOR_MINIMUM_LENGTH, 90
         )
-        self.wrist = self.elevator.appendLigament(
+        self.wrist = self.elevator.append_ligament(
             "wrist", 0.5, 90, 6, wpiutil.Color8Bit(wpiutil.Color.PURPLE)
         )
 
         # post the mechanism to the dashboard
-        wpilib.SmartDashboard.putData("Mech2d", self.mech)
+        wpilib.SmartDashboard.put_data("Mech2d", self.mech)
 
-    def robotPeriodic(self):
+    def robot_periodic(self):
         # update the dashboard mechanism's state
-        self.elevator.setLength(
-            self.kElevatorMinimumLength + self.elevatorEncoder.getDistance()
+        self.elevator.set_length(
+            self.ELEVATOR_MINIMUM_LENGTH + self.elevator_encoder.get_distance()
         )
-        self.wrist.setAngle(self.wristPot.get())
+        self.wrist.set_angle(self.wrist_pot.get())
 
-    def teleopPeriodic(self):
-        self.elevatorMotor.setThrottle(self.joystick.getRawAxis(0))
-        self.wristMotor.setThrottle(self.joystick.getRawAxis(1))
+    def teleop_periodic(self):
+        self.elevator_motor.set_throttle(self.joystick.get_raw_axis(0))
+        self.wrist_motor.set_throttle(self.joystick.get_raw_axis(1))

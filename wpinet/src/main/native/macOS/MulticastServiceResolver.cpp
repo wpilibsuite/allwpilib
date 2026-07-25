@@ -4,7 +4,7 @@
 
 #if defined(__APPLE__)
 
-#include "wpi/net/MulticastServiceResolver.h"
+#include "wpi/net/MulticastServiceResolver.hpp"
 
 #include <netinet/in.h>
 #include <poll.h>

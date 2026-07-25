@@ -4,6 +4,8 @@
 
 #include "wpi/math/spline/QuinticHermiteSpline.hpp"
 
+#include <cmath>
+
 #include <gtest/gtest.h>
 
 #include "wpi/math/geometry/Pose2d.hpp"

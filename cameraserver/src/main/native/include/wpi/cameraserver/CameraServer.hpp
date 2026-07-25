@@ -30,7 +30,7 @@ class CameraServer {
    * Start automatically capturing images to send to the dashboard.
    *
    * You should call this method to see a camera feed on the dashboard. If you
-   * also want to perform vision processing on the roboRIO, use getVideo() to
+   * also want to perform vision processing on the Systemcore, use getVideo() to
    * get access to the camera images.
    *
    * The first time this overload is called, it calls StartAutomaticCapture()
@@ -84,7 +84,7 @@ class CameraServer {
 
   /**
    * Get OpenCV access to the primary camera feed.  This allows you to
-   * get images from the camera for image processing on the roboRIO.
+   * get images from the camera for image processing on the Systemcore.
    *
    * <p>This is only valid to call after a camera feed has been added
    * with startAutomaticCapture() or addServer().
@@ -93,7 +93,7 @@ class CameraServer {
 
   /**
    * Get OpenCV access to the specified camera.  This allows you to get
-   * images from the camera for image processing on the roboRIO.
+   * images from the camera for image processing on the Systemcore.
    *
    * @param camera Camera (e.g. as returned by startAutomaticCapture).
    */
@@ -101,7 +101,7 @@ class CameraServer {
 
   /**
    * Get OpenCV access to the specified camera.  This allows you to get
-   * images from the camera for image processing on the roboRIO.
+   * images from the camera for image processing on the Systemcore.
    *
    * @param camera Camera (e.g. as returned by startAutomaticCapture).
    * @param pixelFormat The desired pixelFormat of captured frames from the
@@ -112,7 +112,7 @@ class CameraServer {
 
   /**
    * Get OpenCV access to the specified camera.  This allows you to get
-   * images from the camera for image processing on the roboRIO.
+   * images from the camera for image processing on the Systemcore.
    *
    * @param name Camera name
    */
@@ -120,7 +120,7 @@ class CameraServer {
 
   /**
    * Get OpenCV access to the specified camera.  This allows you to get
-   * images from the camera for image processing on the roboRIO.
+   * images from the camera for image processing on the Systemcore.
    *
    * @param name Camera name
    * @param pixelFormat The desired pixelFormat of captured frames from the

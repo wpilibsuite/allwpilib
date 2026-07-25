@@ -15,21 +15,21 @@ class Storage(Subsystem):
     def __init__(self) -> None:
         """Create a new Storage subsystem."""
         super().__init__()
-        self.motor = wpilib.PWMSparkMax(StorageConstants.kMotorPort)
-        self.ballSensor = wpilib.DigitalInput(StorageConstants.kBallSensorPort)
+        self.motor = wpilib.PWMSparkMax(StorageConstants.MOTOR_PORT)
+        self.ball_sensor = wpilib.DigitalInput(StorageConstants.BALL_SENSOR_PORT)
 
         # Expose trigger from subsystem to improve readability and ease
         # inter-subsystem communications
         # Whether the ball storage is full.
-        self.hasCargo = Trigger(self.ballSensor.get)
+        self.has_cargo = Trigger(self.ball_sensor.get)
 
         # Set default command to turn off the storage motor and then idle
-        self.setDefaultCommand(
-            self.runOnce(self.motor.disable)
-            .andThen(self.run(lambda: None))
-            .withName("Idle")
+        self.set_default_command(
+            self.run_once(self.motor.disable)
+            .and_then(self.run(lambda: None))
+            .with_name("Idle")
         )
 
-    def runCommand(self) -> Command:
+    def run_command(self) -> Command:
         """Returns a command that runs the storage motor indefinitely."""
-        return self.run(lambda: self.motor.set(1)).withName("run")
+        return self.run(lambda: self.motor.set(1)).with_name("run")

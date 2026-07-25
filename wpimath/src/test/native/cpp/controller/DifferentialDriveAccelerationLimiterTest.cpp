@@ -4,10 +4,19 @@
 
 #include "wpi/math/controller/DifferentialDriveAccelerationLimiter.hpp"
 
+#include <stdexcept>
+
 #include <gtest/gtest.h>
 
+#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/Models.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
 namespace wpi::math {
 

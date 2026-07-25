@@ -17,6 +17,7 @@
 #include "wpi/util/RuntimeCheck.h"
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
 #include "wpi/util/string.h"
 
 namespace wpi {
@@ -66,7 +67,7 @@ int StartRobot() {
     // We could make this error better, however unlike Java, there is only a
     // single scenario that could be occurring. The entirety of VS is too out
     // of date. In most cases the linker should detect this, but not always.
-    fmt::println(
+    wpi::util::println(
         "Your copy of Visual Studio is out of date. Please update it.\n");
     return 1;
   }

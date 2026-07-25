@@ -6,6 +6,7 @@ EXAMPLE_FOLDERS = [
     "drivedistanceoffboard",
     "driverstationdisplayansi",
     "driverstationdisplaylines",
+    "dsgamepadchooser",
     "dutycycleencoder",
     "elevatorexponentialprofile",
     "elevatorexponentialsimulation",

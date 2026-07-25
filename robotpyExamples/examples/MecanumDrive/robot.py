@@ -15,36 +15,36 @@ class MyRobot(wpilib.TimedRobot):
     in relation to the starting orientation of the robot (field-oriented controls).
     """
 
-    kFrontLeftChannel = 0
-    kRearLeftChannel = 1
-    kFrontRightChannel = 2
-    kRearRightChannel = 3
-    kIMUMountOrientation = wpilib.OnboardIMU.MountOrientation.FLAT
-    kJoystickPort = 0
+    FRONT_LEFT_CHANNEL = 0
+    REAR_LEFT_CHANNEL = 1
+    FRONT_RIGHT_CHANNEL = 2
+    REAR_RIGHT_CHANNEL = 3
+    IMU_MOUNT_ORIENTATION = wpilib.OnboardIMU.MountOrientation.FLAT
+    JOYSTICK_PORT = 0
 
     def __init__(self) -> None:
         """Robot initialization function"""
         super().__init__()
 
-        self.imu = wpilib.OnboardIMU(self.kIMUMountOrientation)
-        self.joystick = wpilib.Joystick(self.kJoystickPort)
+        self.imu = wpilib.OnboardIMU(self.IMU_MOUNT_ORIENTATION)
+        self.joystick = wpilib.Joystick(self.JOYSTICK_PORT)
 
-        frontLeft = wpilib.PWMSparkMax(self.kFrontLeftChannel)
-        rearLeft = wpilib.PWMSparkMax(self.kRearLeftChannel)
-        frontRight = wpilib.PWMSparkMax(self.kFrontRightChannel)
-        rearRight = wpilib.PWMSparkMax(self.kRearRightChannel)
+        front_left = wpilib.PWMSparkMax(self.FRONT_LEFT_CHANNEL)
+        rear_left = wpilib.PWMSparkMax(self.REAR_LEFT_CHANNEL)
+        front_right = wpilib.PWMSparkMax(self.FRONT_RIGHT_CHANNEL)
+        rear_right = wpilib.PWMSparkMax(self.REAR_RIGHT_CHANNEL)
 
-        frontRight.setInverted(True)
-        rearRight.setInverted(True)
+        front_right.set_inverted(True)
+        rear_right.set_inverted(True)
 
-        self.robotDrive = wpilib.MecanumDrive(
-            frontLeft, rearLeft, frontRight, rearRight
+        self.robot_drive = wpilib.MecanumDrive(
+            front_left, rear_left, front_right, rear_right
         )
 
-    def teleopPeriodic(self) -> None:
-        self.robotDrive.driveCartesian(
-            -self.joystick.getY(),
-            -self.joystick.getX(),
-            -self.joystick.getZ(),
-            self.imu.getRotation2d(),
+    def teleop_periodic(self) -> None:
+        self.robot_drive.drive_cartesian(
+            -self.joystick.get_y(),
+            -self.joystick.get_x(),
+            -self.joystick.get_z(),
+            self.imu.get_rotation2d(),
         )

@@ -6,6 +6,8 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/units/velocity.hpp"
+
 TEST(MecanumDriveWheelVelocitiesTest, Plus) {
   const wpi::math::MecanumDriveWheelVelocities left{1.0_mps, 0.5_mps, 2.0_mps,
                                                     1.5_mps};

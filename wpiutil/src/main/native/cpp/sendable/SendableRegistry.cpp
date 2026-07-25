@@ -4,11 +4,10 @@
 
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
-
-#include <fmt/format.h>
 
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/SmallVector.hpp"
@@ -29,11 +28,11 @@ struct Component {
   wpi::util::SmallVector<std::shared_ptr<void>, 2> data;
 
   void SetName(std::string_view moduleType, int channel) {
-    name = fmt::format("{}[{}]", moduleType, channel);
+    name = std::format("{}[{}]", moduleType, channel);
   }
 
   void SetName(std::string_view moduleType, int moduleNumber, int channel) {
-    name = fmt::format("{}[{},{}]", moduleType, moduleNumber, channel);
+    name = std::format("{}[{},{}]", moduleType, moduleNumber, channel);
   }
 };
 

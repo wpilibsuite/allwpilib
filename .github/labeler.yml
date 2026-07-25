@@ -33,7 +33,7 @@
       - any-glob-to-any-file: epilogue-*/**
 "component: examples":
   - changed-files:
-      - any-glob-to-any-file: wpilib*Examples/**
+      - any-glob-to-any-file: "*Examples/**"
 "component: glass":
   - changed-files:
       - any-glob-to-any-file: glass/**
@@ -90,7 +90,14 @@
       - any-glob-to-any-file: "**/simulation/**"
 "robotpy":
   - changed-files:
-      - any-glob-to-any-file: "**python/**"
+      - any-glob-to-any-file:
+          [
+            "**/python/**",
+            "**/robotpy*",
+            "**/robotpy*/**",
+            "copy.bara.sky",
+            "robotpyExamples/**",
+          ]
 "type: testing":
   - changed-files:
       - any-glob-to-any-file: "**/test/**"

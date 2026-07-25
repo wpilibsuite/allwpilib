@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 import pytest
 
 
-def test_functionalCommandSchedule(scheduler: commands2.CommandScheduler):
+def test_functional_command_schedule(scheduler: commands2.CommandScheduler):
     cond1 = OOBoolean()
     cond2 = OOBoolean()
     cond3 = OOBoolean()
@@ -25,12 +25,12 @@ def test_functionalCommandSchedule(scheduler: commands2.CommandScheduler):
     scheduler.schedule(command)
     scheduler.run()
 
-    assert scheduler.isScheduled(command)
+    assert scheduler.is_scheduled(command)
 
     cond4.set(True)
     scheduler.run()
 
-    assert not scheduler.isScheduled(command)
+    assert not scheduler.is_scheduled(command)
     assert cond1
     assert cond2
     assert cond3

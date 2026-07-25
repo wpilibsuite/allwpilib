@@ -41,5 +41,4 @@ extern void InitializePWM();
 extern void InitializeSerialPort();
 extern void InitializeSmartIo();
 extern void InitializeThreads();
-extern void InitializeUsageReporting();
 }  // namespace wpi::hal::init

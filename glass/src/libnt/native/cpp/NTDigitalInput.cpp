@@ -4,9 +4,8 @@
 
 #include "wpi/glass/networktables/NTDigitalInput.hpp"
 
+#include <format>
 #include <utility>
-
-#include <fmt/format.h>
 
 #include "wpi/util/StringExtras.hpp"
 
@@ -19,9 +18,9 @@ NTDigitalInputModel::NTDigitalInputModel(wpi::nt::NetworkTableInstance inst,
                                          std::string_view path)
     : m_inst{inst},
       m_value{
-          inst.GetBooleanTopic(fmt::format("{}/Value", path)).Subscribe(false)},
-      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
-      m_valueData{fmt::format("NT_DIn:{}", path)},
+          inst.GetBooleanTopic(std::format("{}/Value", path)).Subscribe(false)},
+      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
+      m_valueData{std::format("NT_DIn:{}", path)},
       m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
 void NTDigitalInputModel::Update() {

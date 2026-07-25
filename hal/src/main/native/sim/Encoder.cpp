@@ -4,8 +4,6 @@
 
 #include "wpi/hal/Encoder.h"
 
-#include <limits>
-
 #include "CounterInternal.hpp"
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
@@ -201,26 +199,6 @@ void HAL_ResetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
 
   SimEncoderData[encoder->index].reset = true;
   SimEncoderData[encoder->index].count = 0;
-  SimEncoderData[encoder->index].period = std::numeric_limits<double>::max();
-}
-double HAL_GetEncoderPeriod(HAL_EncoderHandle encoderHandle, int32_t* status) {
-  auto encoder = encoderHandles->Get(encoderHandle);
-  if (encoder == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-
-  return SimEncoderData[encoder->index].period;
-}
-void HAL_SetEncoderMaxPeriod(HAL_EncoderHandle encoderHandle, double maxPeriod,
-                             int32_t* status) {
-  auto encoder = encoderHandles->Get(encoderHandle);
-  if (encoder == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-
-  SimEncoderData[encoder->index].maxPeriod = maxPeriod;
 }
 HAL_Bool HAL_GetEncoderStopped(HAL_EncoderHandle encoderHandle,
                                int32_t* status) {
@@ -230,8 +208,7 @@ HAL_Bool HAL_GetEncoderStopped(HAL_EncoderHandle encoderHandle,
     return 0;
   }
 
-  return SimEncoderData[encoder->index].period >
-         SimEncoderData[encoder->index].maxPeriod;
+  return SimEncoderData[encoder->index].rate == 0;
 }
 HAL_Bool HAL_GetEncoderDirection(HAL_EncoderHandle encoderHandle,
                                  int32_t* status) {
@@ -260,23 +237,7 @@ double HAL_GetEncoderRate(HAL_EncoderHandle encoderHandle, int32_t* status) {
     return 0;
   }
 
-  return encoder->distancePerPulse / SimEncoderData[encoder->index].period;
-}
-void HAL_SetEncoderMinRate(HAL_EncoderHandle encoderHandle, double minRate,
-                           int32_t* status) {
-  auto encoder = encoderHandles->Get(encoderHandle);
-  if (encoder == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-
-  if (minRate == 0.0) {
-    *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE, "minRate must not be 0");
-    return;
-  }
-
-  SimEncoderData[encoder->index].maxPeriod =
-      encoder->distancePerPulse / minRate;
+  return SimEncoderData[encoder->index].rate;
 }
 void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
                                     double distancePerPulse, int32_t* status) {
@@ -305,27 +266,6 @@ void HAL_SetEncoderReverseDirection(HAL_EncoderHandle encoderHandle,
 
   SimEncoderData[encoder->index].reverseDirection = reverseDirection;
 }
-void HAL_SetEncoderSamplesToAverage(HAL_EncoderHandle encoderHandle,
-                                    int32_t samplesToAverage, int32_t* status) {
-  auto encoder = encoderHandles->Get(encoderHandle);
-  if (encoder == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-
-  SimEncoderData[encoder->index].samplesToAverage = samplesToAverage;
-}
-int32_t HAL_GetEncoderSamplesToAverage(HAL_EncoderHandle encoderHandle,
-                                       int32_t* status) {
-  auto encoder = encoderHandles->Get(encoderHandle);
-  if (encoder == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-
-  return SimEncoderData[encoder->index].samplesToAverage;
-}
-
 int32_t HAL_GetEncoderFPGAIndex(HAL_EncoderHandle encoderHandle,
                                 int32_t* status) {
   auto encoder = encoderHandles->Get(encoderHandle);

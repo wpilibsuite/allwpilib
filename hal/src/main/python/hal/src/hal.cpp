@@ -2,7 +2,7 @@
 
 #include "wpi/hal/HAL.h"
 
-#include "semiwrap_init.hal._wpiHal.hpp"
+#include "semiwrap_init.hal._wpi_hal.hpp"
 #include "wpi/hal/DriverStation.hpp"
 #include "wpi/hal/Value.h"
 

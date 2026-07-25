@@ -29,7 +29,9 @@ struct SmartIoInitializer {
 }  // namespace
 
 SmartIo::~SmartIo() noexcept {
-  MRC_SmartIO_Close(channel);
+  if (closeOnDestroy) {
+    MRC_SmartIO_Close(channel);
+  }
 }
 
 int32_t SmartIo::InitializeMode(MRC_SmartIOMode mode) {
@@ -119,6 +121,24 @@ int32_t SmartIo::GetAnalogInput(uint16_t* value) {
 int32_t SmartIo::GetCounter(int32_t* value) {
   int32_t valueInt;
   int32_t status = MRC_SmartIO_GetCounter(channel, &valueInt);
+  if (status == 0) {
+    *value = valueInt;
+  }
+  return status;
+}
+
+int32_t SmartIo::GetQuadrature(int32_t* value) {
+  int32_t valueInt;
+  int32_t status = MRC_SmartIO_GetQuadrature(channel, &valueInt);
+  if (status == 0) {
+    *value = valueInt;
+  }
+  return status;
+}
+
+int32_t SmartIo::GetQuadratureRate(int32_t* value) {
+  int32_t valueInt;
+  int32_t status = MRC_SmartIO_GetQuadratureRate(channel, &valueInt);
   if (status == 0) {
     *value = valueInt;
   }

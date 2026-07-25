@@ -241,46 +241,46 @@ classes:
         };
       }),
         py::kw_only(),
-        py::arg("pollStorage") = 0,
+        py::arg("poll_storage") = 0,
         py::arg("periodic") = wpi::nt::PubSubOptions::DEFAULT_PERIODIC,
-        py::arg("excludePublisher") = std::nullopt,
-        py::arg("sendAll") = false,
-        py::arg("topicsOnly") = false,
-        py::arg("keepDuplicates") = false,
-        py::arg("prefixMatch") = false,
-        py::arg("disableRemote") = false,
-        py::arg("disableLocal") = false,
-        py::arg("excludeSelf") = false,
+        py::arg("exclude_publisher") = std::nullopt,
+        py::arg("send_all") = false,
+        py::arg("topics_only") = false,
+        py::arg("keep_duplicates") = false,
+        py::arg("prefix_match") = false,
+        py::arg("disable_remote") = false,
+        py::arg("disable_local") = false,
+        py::arg("exclude_self") = false,
         py::arg("hidden") = false,
-        py::arg("disableSignal") = false,
+        py::arg("disable_signal") = false,
         R"(
-            :param pollStorage:      Polling storage size for a subscription. Specifies the maximum number of
+            :param poll_storage:     Polling storage size for a subscription. Specifies the maximum number of
                                      updates NetworkTables should store between calls to the subscriber's
-                                     ReadQueue() function. If zero, defaults to 1 if sendAll is false, 20 if
-                                     sendAll is true.
+                                     read_queue() function. If zero, defaults to 1 if send_all is false, 20 if
+                                     send_all is true.
             :param periodic:         How frequently changes will be sent over the network, in seconds.
                                      NetworkTables may send more frequently than this (e.g. use a combined
                                      minimum period for all values) or apply a restricted range to this value.
                                      The default is 100 ms.
-            :param excludePublisher: For subscriptions, if non-zero, value updates for ReadQueue() are not
+            :param exclude_publisher: For subscriptions, if non-zero, value updates for read_queue() are not
                                      queued for this publisher.
-            :param sendAll:          Send all value changes over the network.
-            :param topicsOnly:       For subscriptions, don't ask for value changes (only topic announcements).
-            :param keepDuplicates:   Preserve duplicate value changes (rather than ignoring them).
-            :param prefixMatch:      Perform prefix match on subscriber topic names. Is ignored/overridden by
-                                     Subscribe() functions; only present in struct for the purposes of getting
+            :param send_all:         Send all value changes over the network.
+            :param topics_only:      For subscriptions, don't ask for value changes (only topic announcements).
+            :param keep_duplicates:  Preserve duplicate value changes (rather than ignoring them).
+            :param prefix_match:     Perform prefix match on subscriber topic names. Is ignored/overridden by
+                                     subscribe() functions; only present in struct for the purposes of getting
                                      information about subscriptions.
-            :param disableRemote:    For subscriptions, if remote value updates should not be queued for
-                                     ReadQueue(). See also disableLocal.
-            :param disableLocal:     For subscriptions, if local value updates should not be queued for
-                                     ReadQueue(). See also disableRemote.
-            :param excludeSelf:      For entries, don't queue (for ReadQueue) value updates for the entry's
+            :param disable_remote:   For subscriptions, if remote value updates should not be queued for
+                                     read_queue(). See also disable_local.
+            :param disable_local:    For subscriptions, if local value updates should not be queued for
+                                     read_queue(). See also disable_remote.
+            :param exclude_self:     For entries, don't queue (for read_queue) value updates for the entry's
                                      internal publisher.
             :param hidden:           For subscriptions, don't share the existence of the subscription with the
                                      network. Note this means updates will not be received from the network
                                      unless another subscription overlaps with this one, and the subscription
                                      will not appear in metatopics.
-            :param disableSignal:    For subscriptions, don't signal the local handle when value updates are
+            :param disable_signal:   For subscriptions, don't signal the local handle when value updates are
                                      queued.
         )"
       )

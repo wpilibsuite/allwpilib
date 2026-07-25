@@ -13,26 +13,26 @@ import xrp
 
 
 class Drivetrain(commands2.Subsystem):
-    kGearRatio = (30.0 / 14.0) * (28.0 / 16.0) * (36.0 / 9.0) * (26.0 / 8.0)  #  48.75:1
-    kCountsPerMotorShaftRev = 12.0
-    kCountsPerRevolution = kCountsPerMotorShaftRev * kGearRatio  # 585.0
-    kWheelDiameterInch = 2.3622  # 60 mm
+    GEAR_RATIO = (30.0 / 14.0) * (28.0 / 16.0) * (36.0 / 9.0) * (26.0 / 8.0)  #  48.75:1
+    COUNTS_PER_MOTOR_SHAFT_REV = 12.0
+    COUNTS_PER_REVOLUTION = COUNTS_PER_MOTOR_SHAFT_REV * GEAR_RATIO  # 585.0
+    WHEEL_DIAMETER_INCH = 2.3622  # 60 mm
 
     def __init__(self) -> None:
 
         # The XRP has the left and right motors set to
         # PWM channels 0 and 1 respectively
-        self.leftMotor = xrp.XRPMotor(0)
-        self.rightMotor = xrp.XRPMotor(1)
+        self.left_motor = xrp.XRPMotor(0)
+        self.right_motor = xrp.XRPMotor(1)
 
         # The XRP has onboard encoders that are hardcoded
         # to use DIO pins 4/5 and 6/7 for the left and right
-        self.leftEncoder = wpilib.Encoder(4, 5)
-        self.rightEncoder = wpilib.Encoder(6, 7)
+        self.left_encoder = wpilib.Encoder(4, 5)
+        self.right_encoder = wpilib.Encoder(6, 7)
 
         # Set up the differential drive controller
         self.drive = wpilib.DifferentialDrive(
-            self.leftMotor.setThrottle, self.rightMotor.setThrottle
+            self.left_motor.set_throttle, self.right_motor.set_throttle
         )
 
         # TODO: these don't work
@@ -45,69 +45,69 @@ class Drivetrain(commands2.Subsystem):
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's
         # gearbox is constructed, you might have to invert the left side instead.
-        self.rightMotor.setInverted(True)
+        self.right_motor.set_inverted(True)
 
         # Use inches as unit for encoder distances
-        self.leftEncoder.setDistancePerPulse(
-            (math.pi * self.kWheelDiameterInch) / self.kCountsPerRevolution
+        self.left_encoder.set_distance_per_pulse(
+            (math.pi * self.WHEEL_DIAMETER_INCH) / self.COUNTS_PER_REVOLUTION
         )
-        self.rightEncoder.setDistancePerPulse(
-            (math.pi * self.kWheelDiameterInch) / self.kCountsPerRevolution
+        self.right_encoder.set_distance_per_pulse(
+            (math.pi * self.WHEEL_DIAMETER_INCH) / self.COUNTS_PER_REVOLUTION
         )
-        self.resetEncoders()
+        self.reset_encoders()
 
-    def arcadeDrive(self, xaxisVelocity: float, zaxisRotate: float) -> None:
+    def arcade_drive(self, x_axis_velocity: float, z_axis_rotate: float) -> None:
         """
         Drives the robot using arcade controls.
 
-        :param xaxisVelocity: the commanded forward movement
-        :param zaxisRotate: the commanded rotation
+        :param x_axis_velocity: the commanded forward movement
+        :param z_axis_rotate: the commanded rotation
         """
-        self.drive.arcadeDrive(xaxisVelocity, zaxisRotate)
+        self.drive.arcade_drive(x_axis_velocity, z_axis_rotate)
 
-    def resetEncoders(self) -> None:
+    def reset_encoders(self) -> None:
         """Resets the drive encoders to currently read a position of 0."""
-        self.leftEncoder.reset()
-        self.rightEncoder.reset()
+        self.left_encoder.reset()
+        self.right_encoder.reset()
 
-    def getLeftEncoderCount(self) -> int:
-        return self.leftEncoder.get()
+    def get_left_encoder_count(self) -> int:
+        return self.left_encoder.get()
 
-    def getRightEncoderCount(self) -> int:
-        return self.rightEncoder.get()
+    def get_right_encoder_count(self) -> int:
+        return self.right_encoder.get()
 
-    def getLeftDistanceInch(self) -> float:
-        return self.leftEncoder.getDistance()
+    def get_left_distance_inch(self) -> float:
+        return self.left_encoder.get_distance()
 
-    def getRightDistanceInch(self) -> float:
-        return self.rightEncoder.getDistance()
+    def get_right_distance_inch(self) -> float:
+        return self.right_encoder.get_distance()
 
-    def getAverageDistanceInch(self) -> float:
+    def get_average_distance_inch(self) -> float:
         """Gets the average distance of the TWO encoders."""
-        return (self.getLeftDistanceInch() + self.getRightDistanceInch()) / 2.0
+        return (self.get_left_distance_inch() + self.get_right_distance_inch()) / 2.0
 
-    def getGyroAngleX(self) -> float:
+    def get_gyro_angle_x(self) -> float:
         """Current angle of the Romi around the X-axis.
 
         :returns: The current angle of the Romi in degrees
         """
-        return self.gyro.getAngleX()
+        return self.gyro.get_angle_x()
 
-    def getGyroAngleY(self) -> float:
+    def get_gyro_angle_y(self) -> float:
         """Current angle of the Romi around the Y-axis.
 
         :returns: The current angle of the Romi in degrees
         """
-        return self.gyro.getAngleY()
+        return self.gyro.get_angle_y()
 
-    def getGyroAngleZ(self) -> float:
+    def get_gyro_angle_z(self) -> float:
         """Current angle of the Romi around the Z-axis.
 
         :returns: The current angle of the Romi in degrees
         """
-        return self.gyro.getAngleZ()
+        return self.gyro.get_angle_z()
 
-    def resetGyro(self) -> None:
+    def reset_gyro(self) -> None:
         """Reset the gyro"""
         self.gyro.reset()
 

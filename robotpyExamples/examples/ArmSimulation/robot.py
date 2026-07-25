@@ -17,22 +17,22 @@ class MyRobot(wpilib.TimedRobot):
     def __init__(self) -> None:
         super().__init__()
         self.arm = Arm()
-        self.joystick = wpilib.Joystick(Constants.kJoystickPort)
+        self.joystick = wpilib.Joystick(Constants.JOYSTICK_PORT)
 
-    def simulationPeriodic(self) -> None:
-        self.arm.simulationPeriodic()
+    def simulation_periodic(self) -> None:
+        self.arm.simulation_periodic()
 
-    def teleopInit(self) -> None:
-        self.arm.loadPreferences()
+    def teleop_init(self) -> None:
+        self.arm.load_preferences()
 
-    def teleopPeriodic(self) -> None:
-        if self.joystick.getTrigger():
+    def teleop_periodic(self) -> None:
+        if self.joystick.get_trigger():
             # Here, we run PID control like normal.
-            self.arm.reachSetpoint()
+            self.arm.reach_setpoint()
         else:
             # Otherwise, we disable the motor.
             self.arm.stop()
 
-    def disabledInit(self) -> None:
+    def disabled_init(self) -> None:
         # This just makes sure that our simulation code knows that the motor's off.
         self.arm.stop()

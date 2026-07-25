@@ -4,6 +4,8 @@
 
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 
+#include "wpi/util/SymbolExports.hpp"
+
 namespace wpi::math {
 
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)

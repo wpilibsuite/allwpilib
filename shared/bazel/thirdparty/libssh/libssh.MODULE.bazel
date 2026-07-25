@@ -13,10 +13,10 @@ _LIB_ARTIFACTS = {
     "linuxx86-64staticdebug": ("linux", "**/*.a", "d7c75fabd584a6c155d3d784b8edeffa75296a96c03417a9fc0b4a5106c88210"),
     "osxuniversalstatic": ("osx", "**/*.a", "7acdb5f49fb3aa5fcea9cf4b1d806a42ea845f9dd628d72dec55837de09f3d3e"),
     "osxuniversalstaticdebug": ("osx", "**/*.a", "41863cf0a73256df147e6f72ead07b34111e13219dbdbabb082dea1ded8ece10"),
-    "windowsx86-64static": ("windows", "**/*.lib", "849be403d4785a432d377a0392332839d8e293401c0509bcf3a8ea0b8a9255cc"),
-    "windowsx86-64staticdebug": ("windows", "**/*.lib", "347116aa6173a916fbb3362634ccd996c771499a564ef2b455212e38e07b267d"),
     "windowsarm64static": ("windows", "**/*.lib", "6d42d0854a6343ec30e7d569bddbfcefcafefcde8ed68f697ba7a0bc60446f2b"),
     "windowsarm64staticdebug": ("windows", "**/*.lib", "51dd10884606d839ede280bafa1ffdcefc466ac034a24e600aac3aeddf9d0d02"),
+    "windowsx86-64static": ("windows", "**/*.lib", "849be403d4785a432d377a0392332839d8e293401c0509bcf3a8ea0b8a9255cc"),
+    "windowsx86-64staticdebug": ("windows", "**/*.lib", "347116aa6173a916fbb3362634ccd996c771499a564ef2b455212e38e07b267d"),
 }
 # End auto-gen
 ################################################################################

@@ -58,17 +58,17 @@ from ._simulation import (
     SwitchN64ControllerSim,
     SwitchProControllerSim,
     XboxControllerSim,
-    getProgramStarted,
-    getProgramState,
-    isTimingPaused,
-    pauseTiming,
-    restartTiming,
-    resumeTiming,
-    setProgramStarted,
-    setProgramState,
-    setRuntimeType,
-    stepTiming,
-    stepTimingAsync,
+    get_program_started,
+    get_program_state,
+    is_timing_paused,
+    pause_timing,
+    restart_timing,
+    resume_timing,
+    set_program_started,
+    set_program_state,
+    set_runtime_type,
+    step_timing,
+    step_timing_async,
 )
 
 __all__ = [
@@ -128,21 +128,21 @@ __all__ = [
     "SwitchN64ControllerSim",
     "SwitchProControllerSim",
     "XboxControllerSim",
-    "getProgramStarted",
-    "getProgramState",
-    "isTimingPaused",
-    "pauseTiming",
-    "restartTiming",
-    "resumeTiming",
-    "setProgramStarted",
-    "setProgramState",
-    "setRuntimeType",
-    "stepTiming",
-    "stepTimingAsync",
+    "get_program_started",
+    "get_program_state",
+    "is_timing_paused",
+    "pause_timing",
+    "restart_timing",
+    "resume_timing",
+    "set_program_started",
+    "set_program_state",
+    "set_runtime_type",
+    "step_timing",
+    "step_timing_async",
 ]
 
 del _init__simulation
 
-from hal.simulation import waitForProgramStart
+from hal.simulation import wait_for_program_start
 
-__all__ += ["waitForProgramStart"]
+__all__ += ["wait_for_program_start"]

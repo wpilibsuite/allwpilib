@@ -10,6 +10,10 @@
 
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angular_acceleration.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/velocity.hpp"

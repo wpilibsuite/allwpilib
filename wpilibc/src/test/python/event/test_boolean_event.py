@@ -15,8 +15,8 @@ def test_binary_compositions():
     assert and_counter["value"] == 0
     assert or_counter["value"] == 0
 
-    BooleanEvent(loop, lambda: True).and_(lambda: False).ifHigh(inc_and)
-    BooleanEvent(loop, lambda: True).or_(lambda: False).ifHigh(inc_or)
+    BooleanEvent(loop, lambda: True).and_(lambda: False).if_high(inc_and)
+    BooleanEvent(loop, lambda: True).or_(lambda: False).if_high(inc_or)
 
     loop.poll()
 
@@ -39,8 +39,8 @@ def test_binary_compositions_with_edge_decorators():
     event2 = BooleanEvent(loop, lambda: bool2["value"]).rising()
     event3 = BooleanEvent(loop, lambda: bool3["value"]).rising()
     event4 = BooleanEvent(loop, lambda: bool4["value"]).rising()
-    event1.and_(event2).ifHigh(inc)
-    event3.or_(event4).ifHigh(inc)
+    event1.and_(event2).if_high(inc)
+    event3.or_(event4).if_high(inc)
     assert counter["value"] == 0
 
     bool1["value"] = True
@@ -120,11 +120,11 @@ def test_binary_composition_loop_semantics():
 
     BooleanEvent(loop1, lambda: bool1["value"]).and_(
         BooleanEvent(loop2, lambda: bool2["value"])
-    ).ifHigh(inc1)
+    ).if_high(inc1)
 
     BooleanEvent(loop2, lambda: bool2["value"]).and_(
         BooleanEvent(loop1, lambda: bool1["value"])
-    ).ifHigh(inc2)
+    ).if_high(inc2)
 
     assert counter1["value"] == 0
     assert counter2["value"] == 0
@@ -207,7 +207,7 @@ def test_poll_ordering():
             counter["value"] += 1
             assert counter["value"] % 3 == 0
 
-    BooleanEvent(loop, action1).and_(BooleanEvent(loop, action2)).ifHigh(action3)
+    BooleanEvent(loop, action1).and_(BooleanEvent(loop, action2)).if_high(action3)
     enable_assert["value"] = True
     loop.poll()
     loop.poll()
@@ -226,8 +226,8 @@ def test_edge_decorators():
     def dec():
         counter["value"] -= 1
 
-    BooleanEvent(loop, lambda: flag["value"]).falling().ifHigh(dec)
-    BooleanEvent(loop, lambda: flag["value"]).rising().ifHigh(inc)
+    BooleanEvent(loop, lambda: flag["value"]).falling().if_high(dec)
+    BooleanEvent(loop, lambda: flag["value"]).rising().if_high(inc)
 
     assert counter["value"] == 0
 
@@ -261,8 +261,8 @@ def test_edge_reuse():
         counter["value"] += 1
 
     event = BooleanEvent(loop, lambda: flag["value"]).rising()
-    event.ifHigh(inc)
-    event.ifHigh(inc)
+    event.if_high(inc)
+    event.if_high(inc)
 
     assert counter["value"] == 0
 
@@ -299,8 +299,8 @@ def test_edge_reconstruct():
         counter["value"] += 1
 
     event = BooleanEvent(loop, lambda: flag["value"])
-    event.rising().ifHigh(inc)
-    event.rising().ifHigh(inc)
+    event.rising().if_high(inc)
+    event.rising().if_high(inc)
 
     assert counter["value"] == 0
 
@@ -342,8 +342,8 @@ def test_mid_loop_boolean_change():
         flag["value"] = False
         counter["value"] += 1
 
-    event.ifHigh(first_action)
-    event.ifHigh(inc)
+    event.if_high(first_action)
+    event.if_high(inc)
 
     assert counter["value"] == 0
 
@@ -392,19 +392,19 @@ def test_mid_loop_boolean_change_with_composed_events():
         bool3["value"] = False
         counter["value"] += 1
 
-    event1.ifHigh(action1)
+    event1.if_high(action1)
 
     def action2():
         bool1["value"] = False
         counter["value"] += 1
 
-    event3.or_(event4).ifHigh(action2)
+    event3.or_(event4).if_high(action2)
 
     def action3():
         bool4["value"] = False
         counter["value"] += 1
 
-    event1.and_(event2).ifHigh(action3)
+    event1.and_(event2).if_high(action3)
 
     assert counter["value"] == 0
 
@@ -452,7 +452,7 @@ def test_negation():
     def inc():
         counter["value"] += 1
 
-    BooleanEvent(loop, lambda: flag["value"]).negate().ifHigh(inc)
+    BooleanEvent(loop, lambda: flag["value"]).negate().if_high(inc)
 
     assert counter["value"] == 0
 

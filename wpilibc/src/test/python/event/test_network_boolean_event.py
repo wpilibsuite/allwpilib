@@ -7,12 +7,12 @@ from wpilib import EventLoop, NetworkBooleanEvent
 def nt_inst(wpilib_state):
     import ntcore
 
-    inst = ntcore.NetworkTableInstance.getDefault()
-    inst.startLocal()
+    inst = ntcore.NetworkTableInstance.get_default()
+    inst.start_local()
     try:
         yield inst
     finally:
-        inst.stopLocal()
+        inst.stop_local()
         inst._reset()
 
 
@@ -24,9 +24,9 @@ def test_set(nt_inst):
         nonlocal counter
         counter += 1
 
-    pub = nt_inst.getTable("TestTable").getBooleanTopic("Test").publish()
+    pub = nt_inst.get_table("TestTable").get_boolean_topic("Test").publish()
 
-    NetworkBooleanEvent(loop, nt_inst, "TestTable", "Test").ifHigh(on_high)
+    NetworkBooleanEvent(loop, nt_inst, "TestTable", "Test").if_high(on_high)
 
     pub.set(False)
     loop.poll()

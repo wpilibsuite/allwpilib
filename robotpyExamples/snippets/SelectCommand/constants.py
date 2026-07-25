@@ -7,4 +7,4 @@
 
 class OIConstants:
     # Example: the port of the driver's controller
-    kDriverControllerPort = 0
+    DRIVER_CONTROLLER_PORT = 0

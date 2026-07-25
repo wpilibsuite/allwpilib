@@ -35,13 +35,15 @@ class GenericHID final : public HIDDevice {
    * Represents a rumble output on the Joystick.
    */
   enum class RumbleType {
-    /// Left rumble motor.
+    /// Left rumble motor. On most controllers, this is the low-frequency
+    /// motor.
     LEFT_RUMBLE,
-    /// Right rumble motor.
+    /// Right rumble motor. On most controllers, this is the high-frequency
+    /// motor.
     RIGHT_RUMBLE,
-    /// Left trigger rumble motor.
+    /// Left trigger rumble motor, on controllers that have one.
     LEFT_TRIGGER_RUMBLE,
-    /// Right trigger rumble motor.
+    /// Right trigger rumble motor, on controllers that have one.
     RIGHT_TRIGGER_RUMBLE,
   };
 
@@ -88,7 +90,13 @@ class GenericHID final : public HIDDevice {
     /// Nintendo Switch Joycon Right controller.
     SWITCH_JOYCON_RIGHT,
     /// Nintendo Switch Joycon controller pair.
-    SWITCH_JOYCON_PAIR
+    SWITCH_JOYCON_PAIR,
+    /// GameCube controller.
+    GAMECUBE,
+    /// Steam Controller.
+    STEAM,
+    /// Count of HID types.
+    COUNT,
   };
 
   ~GenericHID() override = default;

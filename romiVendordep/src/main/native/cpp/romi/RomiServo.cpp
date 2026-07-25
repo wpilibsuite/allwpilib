@@ -4,10 +4,10 @@
 
 #include "wpi/romi/RomiServo.hpp"
 
+#include <format>
 #include <numbers>
 #include <string>
 
-#include "fmt/format.h"
 #include "wpi/romi/OnBoardIO.hpp"
 #include "wpi/units/angle.hpp"
 
@@ -16,7 +16,7 @@ using namespace wpi::romi;
 RomiServo::RomiServo(int channel) {
   OnBoardIO::AllocatePWM(channel);
 
-  std::string deviceName = fmt::format("PWM:{}", channel);
+  std::string deviceName = std::format("PWM:{}", channel);
   m_simDevice = hal::SimDevice(deviceName.c_str());
 
   if (m_simDevice) {

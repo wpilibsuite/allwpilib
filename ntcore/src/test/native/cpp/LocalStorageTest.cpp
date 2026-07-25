@@ -4,56 +4,31 @@
 
 #include "LocalStorage.hpp"
 
+#include <algorithm>
+#include <span>
 #include <string>
+#include <string_view>
+#include <type_traits>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
+#include "MockAssertions.hpp"
 #include "MockListenerStorage.hpp"
 #include "MockLogger.hpp"
-#include "PubSubOptionsMatcher.hpp"
 #include "TestPrinters.hpp"
-#include "ValueMatcher.hpp"
-#include "gmock/gmock.h"
 #include "net/MockMessageHandler.hpp"
 #include "net/MockNetworkInterface.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
-#include "wpi/util/SpanMatcher.hpp"
-#include "wpi/util/Synchronization.hpp"
-
-using ::testing::_;
-using ::testing::AllOf;
-using ::testing::ElementsAre;
-using ::testing::Field;
-using ::testing::IsEmpty;
-using ::testing::Property;
-using ::testing::Return;
 
 namespace wpi::nt {
 
-::testing::Matcher<const PubSubOptionsImpl&> IsPubSubOptions(
-    const PubSubOptionsImpl& good) {
-  return AllOf(
-      Field("periodic", &PubSubOptionsImpl::periodicMs, good.periodicMs),
-      Field("pollStorage", &PubSubOptionsImpl::pollStorage, good.pollStorage),
-      Field("sendAll", &PubSubOptionsImpl::sendAll, good.sendAll),
-      Field("keepDuplicates", &PubSubOptionsImpl::keepDuplicates,
-            good.keepDuplicates),
-      Field("disableSignal", &PubSubOptionsImpl::disableSignal,
-            good.disableSignal));
-}
-
-::testing::Matcher<const PubSubOptionsImpl&> IsDefaultPubSubOptions() {
-  static constexpr PubSubOptionsImpl kDefaultPubSubOptionsImpl;
-  return IsPubSubOptions(kDefaultPubSubOptionsImpl);
-}
-
-class LocalStorageTest : public ::testing::Test {
+class LocalStorageTest {
  public:
   LocalStorageTest() { storage.StartNetwork(&network); }
 
-  ::testing::StrictMock<net::MockClientMessageHandler> network;
+  net::MockClientMessageHandler network;
   wpi::MockLogger logger;
   MockListenerStorage listenerStorage;
   LocalStorage storage{0, listenerStorage, logger};
@@ -62,539 +37,548 @@ class LocalStorageTest : public ::testing::Test {
   NT_Topic bazTopic{storage.GetTopic("baz")};
 };
 
-TEST_F(LocalStorageTest, GetTopicsUnpublished) {
-  EXPECT_TRUE(storage.GetTopics("", 0).empty());
-  EXPECT_TRUE(storage.GetTopics("", {}).empty());
-  EXPECT_TRUE(storage.GetTopicInfo("", 0).empty());
-  EXPECT_TRUE(storage.GetTopicInfo("", {}).empty());
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest GetTopicsUnpublished",
+                 "[ntcore][local-storage]") {
+  CHECK(storage.GetTopics("", 0).empty());
+  CHECK(storage.GetTopics("", {}).empty());
+  CHECK(storage.GetTopicInfo("", 0).empty());
+  CHECK(storage.GetTopicInfo("", {}).empty());
 }
 
-TEST_F(LocalStorageTest, GetTopic2) {
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest GetTopic2",
+                 "[ntcore][local-storage]") {
   auto foo2 = storage.GetTopic("foo");
-  EXPECT_EQ(fooTopic, foo2);
-  EXPECT_NE(fooTopic, barTopic);
+  CHECK(fooTopic == foo2);
+  CHECK(fooTopic != barTopic);
 }
 
-TEST_F(LocalStorageTest, GetTopicEmptyName) {
-  EXPECT_EQ(storage.GetTopic(""), 0);
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest GetTopicEmptyName",
+                 "[ntcore][local-storage]") {
+  CHECK(storage.GetTopic("") == 0);
 }
 
-TEST_F(LocalStorageTest, GetEntryEmptyName) {
-  EXPECT_EQ(storage.GetEntry(""), 0);
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest GetEntryEmptyName",
+                 "[ntcore][local-storage]") {
+  CHECK(storage.GetEntry("") == 0);
 }
 
-TEST_F(LocalStorageTest, GetEntryCached) {
-  EXPECT_CALL(network,
-              ClientSubscribe(_, wpi::util::SpanEq({std::string{"tocache"}}),
-                              IsDefaultPubSubOptions()));
-
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest GetEntryCached",
+                 "[ntcore][local-storage]") {
   auto entry1 = storage.GetEntry("tocache");
-  EXPECT_EQ(entry1, storage.GetEntry("tocache"));
+  CHECK(entry1 == storage.GetEntry("tocache"));
+
+  CheckNetworkCounts(network, 0, 1, 0);
+  CheckSubscribe(network.subscribeCalls[0], {"tocache"});
 }
 
-TEST_F(LocalStorageTest, GetTopicName) {
-  EXPECT_EQ(storage.GetTopicName(fooTopic), "foo");
-  EXPECT_EQ(storage.GetTopicName(barTopic), "bar");
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest GetTopicName",
+                 "[ntcore][local-storage]") {
+  CHECK(storage.GetTopicName(fooTopic) == "foo");
+  CHECK(storage.GetTopicName(barTopic) == "bar");
 }
 
-TEST_F(LocalStorageTest, GetTopicInfoUnpublished) {
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest GetTopicInfoUnpublished",
+                 "[ntcore][local-storage]") {
   auto info = storage.GetTopicInfo(fooTopic);
-  EXPECT_EQ(info.topic, fooTopic);
-  EXPECT_EQ(info.name, "foo");
-  EXPECT_EQ(info.type, NT_UNASSIGNED);
-  EXPECT_TRUE(info.type_str.empty());
-  EXPECT_EQ(info.properties, "{}");
+  CHECK(info.topic == fooTopic);
+  CHECK(info.name == "foo");
+  CHECK(info.type == NT_UNASSIGNED);
+  CHECK(info.type_str.empty());
+  CHECK(info.properties == "{}");
 
-  EXPECT_EQ(storage.GetTopicType(fooTopic), NT_UNASSIGNED);
-  EXPECT_TRUE(storage.GetTopicTypeString(fooTopic).empty());
-  EXPECT_FALSE(storage.GetTopicExists(fooTopic));
+  CHECK(storage.GetTopicType(fooTopic) == NT_UNASSIGNED);
+  CHECK(storage.GetTopicTypeString(fooTopic).empty());
+  CHECK_FALSE(storage.GetTopicExists(fooTopic));
 }
 
-TEST_F(LocalStorageTest, DefaultProps) {
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest DefaultProps",
+                 "[ntcore][local-storage]") {
   storage.Publish(fooTopic, NT_BOOLEAN, "boolean", wpi::util::json::object(),
                   {});
 
-  EXPECT_FALSE(storage.GetTopicPersistent(fooTopic));
-  EXPECT_FALSE(storage.GetTopicRetained(fooTopic));
-  EXPECT_TRUE(storage.GetTopicCached(fooTopic));
+  CHECK_FALSE(storage.GetTopicPersistent(fooTopic));
+  CHECK_FALSE(storage.GetTopicRetained(fooTopic));
+  CHECK(storage.GetTopicCached(fooTopic));
+
+  CheckNetworkCounts(network, 1, 0, 0);
+  CheckPublish(network.publishCalls[0], "foo", "boolean",
+               wpi::util::json::object());
 }
 
-TEST_F(LocalStorageTest, PublishNewNoProps) {
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest PublishNewNoProps",
+                 "[ntcore][local-storage]") {
   storage.Publish(fooTopic, NT_BOOLEAN, "boolean", wpi::util::json::object(),
                   {});
 
   auto info = storage.GetTopicInfo(fooTopic);
-  EXPECT_EQ(info.properties, "{}");
+  CHECK(info.properties == "{}");
+
+  CheckNetworkCounts(network, 1, 0, 0);
+  CheckPublish(network.publishCalls[0], "foo", "boolean",
+               wpi::util::json::object());
 }
 
-TEST_F(LocalStorageTest, PublishNewNoPropsNull) {
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest PublishNewNoPropsNull",
+                 "[ntcore][local-storage]") {
   storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
 
   auto info = storage.GetTopicInfo(fooTopic);
-  EXPECT_EQ(info.properties, "{}");
+  CHECK(info.properties == "{}");
+
+  CheckNetworkCounts(network, 1, 0, 0);
+  CheckPublish(network.publishCalls[0], "foo", "boolean",
+               wpi::util::json::object());
 }
 
-TEST_F(LocalStorageTest, PublishNew) {
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest PublishNew",
+                 "[ntcore][local-storage]") {
   auto properties = wpi::util::json::object("persistent", true);
-  EXPECT_CALL(network, ClientPublish(_, std::string_view{"foo"},
-                                     std::string_view{"boolean"}, properties,
-                                     IsDefaultPubSubOptions()));
   storage.Publish(fooTopic, NT_BOOLEAN, "boolean",
                   wpi::util::json::object("persistent", true), {});
 
   auto info = storage.GetTopicInfo(fooTopic);
-  EXPECT_EQ(info.topic, fooTopic);
-  EXPECT_EQ(info.name, "foo");
-  EXPECT_EQ(info.type, NT_BOOLEAN);
-  EXPECT_EQ(info.type_str, "boolean");
-  EXPECT_EQ(info.properties, "{\"persistent\":true}");
+  CHECK(info.topic == fooTopic);
+  CHECK(info.name == "foo");
+  CHECK(info.type == NT_BOOLEAN);
+  CHECK(info.type_str == "boolean");
+  CHECK(info.properties == "{\"persistent\":true}");
 
-  EXPECT_EQ(storage.GetTopicType(fooTopic), NT_BOOLEAN);
-  EXPECT_EQ(storage.GetTopicTypeString(fooTopic), "boolean");
-  EXPECT_TRUE(storage.GetTopicExists(fooTopic));
+  CHECK(storage.GetTopicType(fooTopic) == NT_BOOLEAN);
+  CHECK(storage.GetTopicTypeString(fooTopic) == "boolean");
+  CHECK(storage.GetTopicExists(fooTopic));
+
+  CheckNetworkCounts(network, 1, 0, 0);
+  CheckPublish(network.publishCalls[0], "foo", "boolean", properties);
 }
 
-TEST_F(LocalStorageTest, SubscribeNoTypeLocalPubPost) {
-  EXPECT_CALL(network,
-              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
-                              IsDefaultPubSubOptions()));
+TEST_CASE_METHOD(LocalStorageTest,
+                 "LocalStorageTest SubscribeNoTypeLocalPubPost",
+                 "[ntcore][local-storage]") {
   auto sub = storage.Subscribe(fooTopic, NT_UNASSIGNED, "", {});
-
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   auto pub = storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
 
   auto val = Value::MakeBoolean(true, 5);
-  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val));
   storage.SetEntryValue(pub, val);
 
-  EXPECT_EQ(storage.GetTopicType(fooTopic), NT_BOOLEAN);
-  EXPECT_EQ(storage.GetTopicTypeString(fooTopic), "boolean");
-  EXPECT_TRUE(storage.GetTopicExists(fooTopic));
+  CHECK(storage.GetTopicType(fooTopic) == NT_BOOLEAN);
+  CHECK(storage.GetTopicTypeString(fooTopic) == "boolean");
+  CHECK(storage.GetTopicExists(fooTopic));
 
   auto value = storage.GetEntryValue(sub);
-  ASSERT_TRUE(value.IsBoolean());
-  EXPECT_EQ(value.GetBoolean(), true);
-  EXPECT_EQ(value.time(), 5);
+  REQUIRE(value.IsBoolean());
+  CHECK(value.GetBoolean() == true);
+  CHECK(value.time() == 5);
 
   auto vals = storage.ReadQueue<bool>(sub);
-  ASSERT_EQ(vals.size(), 1u);
-  EXPECT_EQ(vals[0].value, true);
-  EXPECT_EQ(vals[0].time, 5);
+  REQUIRE(vals.size() == 1u);
+  CHECK(vals[0].value == true);
+  CHECK(vals[0].time == 5);
 
   val = Value::MakeBoolean(false, 6);
-  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val));
   storage.SetEntryValue(pub, val);
 
   auto vals2 = storage.ReadQueue<int64_t>(sub);  // mismatched type
-  ASSERT_TRUE(vals2.empty());
+  REQUIRE(vals2.empty());
+
+  CheckNetworkCounts(network, 1, 1, 2);
+  CheckSubscribe(network.subscribeCalls[0], {"foo"});
+  CheckPublish(network.publishCalls[0], "foo", "boolean",
+               wpi::util::json::object());
+  CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(),
+                Value::MakeBoolean(true, 5));
+  CheckSetValue(network.setValueCalls[1], Handle{pub}.GetIndex(),
+                Value::MakeBoolean(false, 6));
 }
 
-TEST_F(LocalStorageTest, SubscribeNoTypeLocalPubPre) {
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
+TEST_CASE_METHOD(LocalStorageTest,
+                 "LocalStorageTest SubscribeNoTypeLocalPubPre",
+                 "[ntcore][local-storage]") {
   auto pub = storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
 
   auto val = Value::MakeBoolean(true, 5);
-  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val));
   storage.SetEntryValue(pub, val);
-
-  EXPECT_CALL(network,
-              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
-                              IsDefaultPubSubOptions()));
   auto sub = storage.Subscribe(fooTopic, NT_UNASSIGNED, "", {});
 
-  EXPECT_EQ(storage.GetTopicType(fooTopic), NT_BOOLEAN);
-  EXPECT_EQ(storage.GetTopicTypeString(fooTopic), "boolean");
-  EXPECT_TRUE(storage.GetTopicExists(fooTopic));
+  CHECK(storage.GetTopicType(fooTopic) == NT_BOOLEAN);
+  CHECK(storage.GetTopicTypeString(fooTopic) == "boolean");
+  CHECK(storage.GetTopicExists(fooTopic));
 
   auto value = storage.GetEntryValue(sub);
-  ASSERT_TRUE(value.IsBoolean());
-  EXPECT_EQ(value.GetBoolean(), true);
-  EXPECT_EQ(value.time(), 5);
+  REQUIRE(value.IsBoolean());
+  CHECK(value.GetBoolean() == true);
+  CHECK(value.time() == 5);
+
+  CheckNetworkCounts(network, 1, 1, 1);
+  CheckPublish(network.publishCalls[0], "foo", "boolean",
+               wpi::util::json::object());
+  CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(), val);
+  CheckSubscribe(network.subscribeCalls[0], {"foo"});
 }
 
-TEST_F(LocalStorageTest, EntryNoTypeLocalSet) {
-  EXPECT_CALL(network,
-              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
-                              IsDefaultPubSubOptions()));
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest EntryNoTypeLocalSet",
+                 "[ntcore][local-storage]") {
   auto entry = storage.GetEntry(fooTopic, NT_UNASSIGNED, "", {});
 
   // results in a publish and value set
   auto val = Value::MakeBoolean(true, 5);
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
-  EXPECT_CALL(network, ClientSetValue(_, val));
-  EXPECT_TRUE(storage.SetEntryValue(entry, val));
+  CHECK(storage.SetEntryValue(entry, val));
 
-  EXPECT_EQ(storage.GetTopicType(fooTopic), NT_BOOLEAN);
-  EXPECT_EQ(storage.GetTopicTypeString(fooTopic), "boolean");
-  EXPECT_TRUE(storage.GetTopicExists(fooTopic));
+  CHECK(storage.GetTopicType(fooTopic) == NT_BOOLEAN);
+  CHECK(storage.GetTopicTypeString(fooTopic) == "boolean");
+  CHECK(storage.GetTopicExists(fooTopic));
 
   auto value = storage.GetEntryValue(entry);
-  ASSERT_TRUE(value.IsBoolean());
-  EXPECT_EQ(value.GetBoolean(), true);
-  EXPECT_EQ(value.time(), 5);
+  REQUIRE(value.IsBoolean());
+  CHECK(value.GetBoolean() == true);
+  CHECK(value.time() == 5);
 
   auto vals = storage.ReadQueue<bool>(entry);
-  ASSERT_EQ(vals.size(), 1u);
-  EXPECT_EQ(vals[0].value, true);
-  EXPECT_EQ(vals[0].time, 5);
+  REQUIRE(vals.size() == 1u);
+  CHECK(vals[0].value == true);
+  CHECK(vals[0].time == 5);
 
   // normal set with same type
   val = Value::MakeBoolean(false, 6);
-  EXPECT_CALL(network, ClientSetValue(_, val));
-  EXPECT_TRUE(storage.SetEntryValue(entry, val));
+  CHECK(storage.SetEntryValue(entry, val));
 
   auto vals2 = storage.ReadQueue<int64_t>(entry);  // mismatched type
-  ASSERT_TRUE(vals2.empty());
+  REQUIRE(vals2.empty());
 
   // cannot change type; won't generate network message
-  EXPECT_FALSE(storage.SetEntryValue(entry, Value::MakeInteger(5, 7)));
+  CHECK_FALSE(storage.SetEntryValue(entry, Value::MakeInteger(5, 7)));
 
   // should not change type or generate queue items
-  EXPECT_EQ(storage.GetTopicType(fooTopic), NT_BOOLEAN);
-  EXPECT_EQ(storage.GetTopicTypeString(fooTopic), "boolean");
+  CHECK(storage.GetTopicType(fooTopic) == NT_BOOLEAN);
+  CHECK(storage.GetTopicTypeString(fooTopic) == "boolean");
 
   auto vals3 = storage.ReadQueue<int64_t>(entry);  // mismatched type
-  ASSERT_TRUE(vals3.empty());
+  REQUIRE(vals3.empty());
+
+  CheckNetworkCounts(network, 1, 1, 2);
+  CheckSubscribe(network.subscribeCalls[0], {"foo"});
+  CheckPublish(network.publishCalls[0], "foo", "boolean",
+               wpi::util::json::object());
+  CheckSetValue(network.setValueCalls[0], network.publishCalls[0].pubuid,
+                Value::MakeBoolean(true, 5));
+  CheckSetValue(network.setValueCalls[1], network.publishCalls[0].pubuid,
+                Value::MakeBoolean(false, 6));
 }
 
-TEST_F(LocalStorageTest, PubUnpubPub) {
-  EXPECT_CALL(network,
-              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
-                              IsDefaultPubSubOptions()));
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest PubUnpubPub",
+                 "[ntcore][local-storage]") {
   auto sub = storage.Subscribe(fooTopic, NT_INTEGER, "int", {});
-
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
-  EXPECT_CALL(logger,
-              Call(NT_LOG_INFO, _, _,
-                   std::string_view{
-                       "local subscribe to 'foo' disabled due to type "
-                       "mismatch (wanted 'int', published as 'boolean')"}));
   auto pub = storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
 
   auto val = Value::MakeBoolean(true, 5);
-  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val));
-  EXPECT_TRUE(storage.SetEntryValue(pub, val));
+  CHECK(storage.SetEntryValue(pub, val));
 
-  EXPECT_EQ(storage.GetTopicType(fooTopic), NT_BOOLEAN);
-  EXPECT_EQ(storage.GetTopicTypeString(fooTopic), "boolean");
-  EXPECT_TRUE(storage.GetTopicExists(fooTopic));
+  CHECK(storage.GetTopicType(fooTopic) == NT_BOOLEAN);
+  CHECK(storage.GetTopicTypeString(fooTopic) == "boolean");
+  CHECK(storage.GetTopicExists(fooTopic));
 
-  EXPECT_TRUE(storage.ReadQueue<int64_t>(sub).empty());
-
-  EXPECT_CALL(network, ClientUnpublish(Handle{pub}.GetIndex()));
+  CHECK(storage.ReadQueue<int64_t>(sub).empty());
   storage.Unpublish(pub);
 
-  EXPECT_EQ(storage.GetTopicType(fooTopic), NT_UNASSIGNED);
-  EXPECT_EQ(storage.GetTopicTypeString(fooTopic), "");
-  EXPECT_FALSE(storage.GetTopicExists(fooTopic));
-
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"int"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
+  CHECK(storage.GetTopicType(fooTopic) == NT_UNASSIGNED);
+  CHECK(storage.GetTopicTypeString(fooTopic) == "");
+  CHECK_FALSE(storage.GetTopicExists(fooTopic));
   pub = storage.Publish(fooTopic, NT_INTEGER, "int", {}, {});
 
   val = Value::MakeInteger(3, 5);
-  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val));
-  EXPECT_TRUE(storage.SetEntryValue(pub, val));
+  CHECK(storage.SetEntryValue(pub, val));
 
-  EXPECT_EQ(storage.GetTopicType(fooTopic), NT_INTEGER);
-  EXPECT_EQ(storage.GetTopicTypeString(fooTopic), "int");
-  EXPECT_TRUE(storage.GetTopicExists(fooTopic));
+  CHECK(storage.GetTopicType(fooTopic) == NT_INTEGER);
+  CHECK(storage.GetTopicTypeString(fooTopic) == "int");
+  CHECK(storage.GetTopicExists(fooTopic));
 
-  EXPECT_EQ(storage.ReadQueue<int64_t>(sub).size(), 1u);
+  CHECK(storage.ReadQueue<int64_t>(sub).size() == 1u);
+
+  CheckNetworkCounts(network, 2, 1, 2, 1);
+  CheckSubscribe(network.subscribeCalls[0], {"foo"});
+  CheckPublish(network.publishCalls[0], "foo", "boolean",
+               wpi::util::json::object());
+  CheckPublish(network.publishCalls[1], "foo", "int",
+               wpi::util::json::object());
+  CHECK(network.unpublishCalls[0] == network.publishCalls[0].pubuid);
+  CheckSetValue(network.setValueCalls[0], network.publishCalls[0].pubuid,
+                Value::MakeBoolean(true, 5));
+  CheckSetValue(network.setValueCalls[1], Handle{pub}.GetIndex(),
+                Value::MakeInteger(3, 5));
+  logger.CheckMessage(
+      NT_LOG_INFO,
+      "local subscribe to 'foo' disabled due to type mismatch (wanted 'int', "
+      "published as 'boolean')");
 }
 
-TEST_F(LocalStorageTest, LocalPubConflict) {
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest LocalPubConflict",
+                 "[ntcore][local-storage]") {
   auto pub1 = storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
-
-  EXPECT_CALL(
-      logger,
-      Call(NT_LOG_INFO, _, _,
-           std::string_view{"local publish to 'foo' disabled due to type "
-                            "mismatch (wanted 'int', currently 'boolean')"}));
   auto pub2 = storage.Publish(fooTopic, NT_INTEGER, "int", {}, {});
 
-  EXPECT_EQ(storage.GetTopicType(fooTopic), NT_BOOLEAN);
-  EXPECT_EQ(storage.GetTopicTypeString(fooTopic), "boolean");
-  EXPECT_TRUE(storage.GetTopicExists(fooTopic));
+  CHECK(storage.GetTopicType(fooTopic) == NT_BOOLEAN);
+  CHECK(storage.GetTopicTypeString(fooTopic) == "boolean");
+  CHECK(storage.GetTopicExists(fooTopic));
 
-  EXPECT_CALL(network, ClientSetValue(Handle{pub1}.GetIndex(), _));
-
-  EXPECT_TRUE(storage.SetEntryValue(pub1, Value::MakeBoolean(true, 5)));
-  EXPECT_FALSE(storage.SetEntryValue(pub2, Value::MakeInteger(3, 5)));
+  CHECK(storage.SetEntryValue(pub1, Value::MakeBoolean(true, 5)));
+  CHECK_FALSE(storage.SetEntryValue(pub2, Value::MakeInteger(3, 5)));
 
   // unpublishing pub1 will publish pub2 to the network
-  EXPECT_CALL(network, ClientUnpublish(Handle{pub1}.GetIndex()));
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"int"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   storage.Unpublish(pub1);
 
-  EXPECT_EQ(storage.GetTopicType(fooTopic), NT_INTEGER);
-  EXPECT_EQ(storage.GetTopicTypeString(fooTopic), "int");
-  EXPECT_TRUE(storage.GetTopicExists(fooTopic));
+  CHECK(storage.GetTopicType(fooTopic) == NT_INTEGER);
+  CHECK(storage.GetTopicTypeString(fooTopic) == "int");
+  CHECK(storage.GetTopicExists(fooTopic));
 
-  EXPECT_CALL(network, ClientSetValue(Handle{pub2}.GetIndex(), _));
+  CHECK_FALSE(storage.SetEntryValue(pub1, Value::MakeBoolean(true, 5)));
+  CHECK(storage.SetEntryValue(pub2, Value::MakeInteger(3, 5)));
 
-  EXPECT_FALSE(storage.SetEntryValue(pub1, Value::MakeBoolean(true, 5)));
-  EXPECT_TRUE(storage.SetEntryValue(pub2, Value::MakeInteger(3, 5)));
+  CheckNetworkCounts(network, 2, 0, 2, 1);
+  CheckPublish(network.publishCalls[0], "foo", "boolean",
+               wpi::util::json::object());
+  CheckPublish(network.publishCalls[1], "foo", "int",
+               wpi::util::json::object());
+  CHECK(network.unpublishCalls[0] == static_cast<int>(Handle{pub1}.GetIndex()));
+  CheckSetValue(network.setValueCalls[0], Handle{pub1}.GetIndex(),
+                Value::MakeBoolean(true, 5));
+  CheckSetValue(network.setValueCalls[1], Handle{pub2}.GetIndex(),
+                Value::MakeInteger(3, 5));
+  logger.CheckMessage(
+      NT_LOG_INFO,
+      "local publish to 'foo' disabled due to type mismatch (wanted 'int', "
+      "currently 'boolean')");
 }
 
-TEST_F(LocalStorageTest, LocalSubConflict) {
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest LocalSubConflict",
+                 "[ntcore][local-storage]") {
   storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
-
-  EXPECT_CALL(network,
-              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
-                              IsDefaultPubSubOptions()));
-  EXPECT_CALL(logger,
-              Call(NT_LOG_INFO, _, _,
-                   std::string_view{
-                       "local subscribe to 'foo' disabled due to type "
-                       "mismatch (wanted 'int', published as 'boolean')"}));
   storage.Subscribe(fooTopic, NT_INTEGER, "int", {});
+
+  CheckNetworkCounts(network, 1, 1, 0);
+  CheckPublish(network.publishCalls[0], "foo", "boolean",
+               wpi::util::json::object());
+  CheckSubscribe(network.subscribeCalls[0], {"foo"});
+  logger.CheckMessage(
+      NT_LOG_INFO,
+      "local subscribe to 'foo' disabled due to type mismatch (wanted 'int', "
+      "published as 'boolean')");
 }
 
-TEST_F(LocalStorageTest, RemotePubConflict) {
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
-
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest RemotePubConflict",
+                 "[ntcore][local-storage]") {
   storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
-
-  EXPECT_CALL(logger,
-              Call(NT_LOG_INFO, _, _,
-                   std::string_view{
-                       "network announce of 'foo' overriding local publish "
-                       "(was 'boolean', now 'int')"}));
 
   auto id = storage.ServerAnnounce("foo", 0, "int", wpi::util::json::object(),
                                    std::nullopt);
 
   // network overrides local
-  EXPECT_EQ(storage.GetTopicType(fooTopic), NT_INTEGER);
-  EXPECT_EQ(storage.GetTopicTypeString(fooTopic), "int");
-  EXPECT_TRUE(storage.GetTopicExists(fooTopic));
-
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
+  CHECK(storage.GetTopicType(fooTopic) == NT_INTEGER);
+  CHECK(storage.GetTopicTypeString(fooTopic) == "int");
+  CHECK(storage.GetTopicExists(fooTopic));
 
   storage.ServerUnannounce("foo", id);
 
-  EXPECT_EQ(storage.GetTopicType(fooTopic), NT_BOOLEAN);
-  EXPECT_EQ(storage.GetTopicTypeString(fooTopic), "boolean");
-  EXPECT_TRUE(storage.GetTopicExists(fooTopic));
+  CHECK(storage.GetTopicType(fooTopic) == NT_BOOLEAN);
+  CHECK(storage.GetTopicTypeString(fooTopic) == "boolean");
+  CHECK(storage.GetTopicExists(fooTopic));
+
+  CheckNetworkCounts(network, 2, 0, 0);
+  CheckPublish(network.publishCalls[0], "foo", "boolean",
+               wpi::util::json::object());
+  CheckPublish(network.publishCalls[1], "foo", "boolean",
+               wpi::util::json::object());
+  logger.CheckMessage(
+      NT_LOG_INFO,
+      "network announce of 'foo' overriding local publish (was 'boolean', now "
+      "'int')");
 }
 
-TEST_F(LocalStorageTest, SubNonExist) {
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SubNonExist",
+                 "[ntcore][local-storage]") {
   // makes sure no warning is emitted
-  EXPECT_CALL(network,
-              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
-                              IsDefaultPubSubOptions()));
   storage.Subscribe(fooTopic, NT_BOOLEAN, "boolean", {});
+
+  CheckNetworkCounts(network, 0, 1, 0);
+  CheckSubscribe(network.subscribeCalls[0], {"foo"});
+  logger.CheckMessages({});
 }
 
-TEST_F(LocalStorageTest, SetDefaultSubscribe) {
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetDefaultSubscribe",
+                 "[ntcore][local-storage]") {
   // no publish, no value on wire, this is just handled locally
-  EXPECT_CALL(network,
-              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
-                              IsDefaultPubSubOptions()));
   auto sub = storage.Subscribe(fooTopic, NT_BOOLEAN, "boolean", {});
-  EXPECT_TRUE(storage.SetDefaultEntryValue(sub, Value::MakeBoolean(true)));
+  CHECK(storage.SetDefaultEntryValue(sub, Value::MakeBoolean(true)));
   auto val = storage.GetEntryValue(sub);
-  ASSERT_TRUE(val.IsBoolean());
-  ASSERT_TRUE(val.GetBoolean());
-  ASSERT_EQ(val.time(), 0);
+  REQUIRE(val.IsBoolean());
+  REQUIRE(val.GetBoolean());
+  REQUIRE(val.time() == 0);
+
+  CheckNetworkCounts(network, 0, 1, 0);
+  CheckSubscribe(network.subscribeCalls[0], {"foo"});
 }
 
-TEST_F(LocalStorageTest, SetDefaultPublish) {
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetDefaultPublish",
+                 "[ntcore][local-storage]") {
   auto pub = storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
 
   // expect a value across the wire
   auto expectVal = Value::MakeBoolean(true, 0);
-  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), expectVal));
-  EXPECT_TRUE(storage.SetDefaultEntryValue(pub, Value::MakeBoolean(true)));
-
-  EXPECT_CALL(network, ClientSubscribe(_, _, IsDefaultPubSubOptions()));
+  CHECK(storage.SetDefaultEntryValue(pub, Value::MakeBoolean(true)));
   auto sub = storage.Subscribe(fooTopic, NT_BOOLEAN, "boolean", {});
   auto val = storage.GetEntryValue(sub);
-  ASSERT_TRUE(val.IsBoolean());
-  ASSERT_TRUE(val.GetBoolean());
-  ASSERT_EQ(val.time(), 0);
+  REQUIRE(val.IsBoolean());
+  REQUIRE(val.GetBoolean());
+  REQUIRE(val.time() == 0);
+
+  CheckNetworkCounts(network, 1, 1, 1);
+  CheckPublish(network.publishCalls[0], "foo", "boolean",
+               wpi::util::json::object());
+  CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(), expectVal);
+  CheckSubscribe(network.subscribeCalls[0], {"foo"});
 }
 
-TEST_F(LocalStorageTest, SetDefaultEntry) {
-  EXPECT_CALL(network,
-              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
-                              IsDefaultPubSubOptions()));
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetDefaultEntry",
+                 "[ntcore][local-storage]") {
   auto entry = storage.GetEntry(fooTopic, NT_BOOLEAN, "boolean", {});
 
   // expect a publish and value
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   auto expectVal = Value::MakeBoolean(true, 0);
-  EXPECT_CALL(network, ClientSetValue(_, expectVal));
-  EXPECT_TRUE(storage.SetDefaultEntryValue(entry, Value::MakeBoolean(true)));
+  CHECK(storage.SetDefaultEntryValue(entry, Value::MakeBoolean(true)));
 
   auto val = storage.GetEntryValue(entry);
-  ASSERT_TRUE(val.IsBoolean());
-  ASSERT_TRUE(val.GetBoolean());
-  ASSERT_EQ(val.time(), 0);
+  REQUIRE(val.IsBoolean());
+  REQUIRE(val.GetBoolean());
+  REQUIRE(val.time() == 0);
+
+  CheckNetworkCounts(network, 1, 1, 1);
+  CheckSubscribe(network.subscribeCalls[0], {"foo"});
+  CheckPublish(network.publishCalls[0], "foo", "boolean",
+               wpi::util::json::object());
+  CheckSetValue(network.setValueCalls[0], network.publishCalls[0].pubuid,
+                expectVal);
 }
 
-TEST_F(LocalStorageTest, SetDefaultEntryUnassigned) {
-  EXPECT_CALL(network,
-              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
-                              IsDefaultPubSubOptions()));
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetDefaultEntryUnassigned",
+                 "[ntcore][local-storage]") {
   auto entry = storage.GetEntry(fooTopic, NT_UNASSIGNED, "", {});
 
   // expect a publish and value
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   auto expectVal = Value::MakeBoolean(true, 0);
-  EXPECT_CALL(network, ClientSetValue(_, expectVal));
-  EXPECT_TRUE(storage.SetDefaultEntryValue(entry, Value::MakeBoolean(true)));
+  CHECK(storage.SetDefaultEntryValue(entry, Value::MakeBoolean(true)));
 
-  ASSERT_EQ(storage.GetTopicType(fooTopic), NT_BOOLEAN);
+  REQUIRE(storage.GetTopicType(fooTopic) == NT_BOOLEAN);
   auto val = storage.GetEntryValue(entry);
-  ASSERT_TRUE(val.IsBoolean());
-  ASSERT_TRUE(val.GetBoolean());
-  ASSERT_EQ(val.time(), 0);
+  REQUIRE(val.IsBoolean());
+  REQUIRE(val.GetBoolean());
+  REQUIRE(val.time() == 0);
+
+  CheckNetworkCounts(network, 1, 1, 1);
+  CheckSubscribe(network.subscribeCalls[0], {"foo"});
+  CheckPublish(network.publishCalls[0], "foo", "boolean",
+               wpi::util::json::object());
+  CheckSetValue(network.setValueCalls[0], network.publishCalls[0].pubuid,
+                expectVal);
 }
 
-TEST_F(LocalStorageTest, SetDefaultEntryDiffType) {
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"string"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetDefaultEntryDiffType",
+                 "[ntcore][local-storage]") {
   auto pub = storage.Publish(fooTopic, NT_STRING, "string", {}, {});
 
-  EXPECT_FALSE(storage.SetDefaultEntryValue(pub, Value::MakeBoolean(true)));
-  ASSERT_EQ(storage.GetTopicType(fooTopic), NT_STRING);
+  CHECK_FALSE(storage.SetDefaultEntryValue(pub, Value::MakeBoolean(true)));
+  REQUIRE(storage.GetTopicType(fooTopic) == NT_STRING);
+
+  CheckNetworkCounts(network, 1, 0, 0);
+  CheckPublish(network.publishCalls[0], "foo", "string",
+               wpi::util::json::object());
 }
 
-TEST_F(LocalStorageTest, SetValueEmptyValue) {
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"string"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetValueEmptyValue",
+                 "[ntcore][local-storage]") {
   auto pub = storage.Publish(fooTopic, NT_STRING, "string", {}, {});
 
-  EXPECT_FALSE(storage.SetEntryValue(pub, {}));
+  CHECK_FALSE(storage.SetEntryValue(pub, {}));
+
+  CheckNetworkCounts(network, 1, 0, 0);
+  CheckPublish(network.publishCalls[0], "foo", "string",
+               wpi::util::json::object());
 }
 
-TEST_F(LocalStorageTest, SetValueEmptyUntypedEntry) {
-  EXPECT_CALL(network,
-              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
-                              IsDefaultPubSubOptions()));
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetValueEmptyUntypedEntry",
+                 "[ntcore][local-storage]") {
   auto entry = storage.GetEntry(fooTopic, NT_UNASSIGNED, "", {});
-  EXPECT_FALSE(storage.SetEntryValue(entry, {}));
+  CHECK_FALSE(storage.SetEntryValue(entry, {}));
+
+  CheckNetworkCounts(network, 0, 1, 0);
+  CheckSubscribe(network.subscribeCalls[0], {"foo"});
 }
 
-TEST_F(LocalStorageTest, PublishUntyped) {
-  EXPECT_CALL(logger,
-              Call(NT_LOG_ERROR, _, _,
-                   std::string_view{"cannot publish 'foo' with an unassigned "
-                                    "type or empty type string"}));
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest PublishUntyped",
+                 "[ntcore][local-storage]") {
+  CHECK(storage.Publish(fooTopic, NT_UNASSIGNED, "", {}, {}) == 0);
 
-  EXPECT_EQ(storage.Publish(fooTopic, NT_UNASSIGNED, "", {}, {}), 0);
+  CheckNoClientCalls(network);
+  logger.CheckMessage(
+      NT_LOG_ERROR,
+      "cannot publish 'foo' with an unassigned type or empty type string");
 }
 
-TEST_F(LocalStorageTest, SetValueInvalidHandle) {
-  EXPECT_FALSE(storage.SetEntryValue(0, {}));
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SetValueInvalidHandle",
+                 "[ntcore][local-storage]") {
+  CHECK_FALSE(storage.SetEntryValue(0, {}));
+  CheckNoClientCalls(network);
 }
 
-TEST_F(LocalStorageTest, DisableSignalSubscriberQueuesWithoutSignaling) {
+TEST_CASE_METHOD(
+    LocalStorageTest,
+    "LocalStorageTest DisableSignalSubscriberQueuesWithoutSignaling",
+    "[ntcore][local-storage]") {
   PubSubOptionsImpl subOptions;
   subOptions.disableSignal = true;
-  EXPECT_CALL(network,
-              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
-                              IsPubSubOptions(subOptions)));
   auto sub =
       storage.Subscribe(fooTopic, NT_DOUBLE, "double", {.disableSignal = true});
 
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"double"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
 
   auto val = Value::MakeDouble(1.0, 50);
-  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val));
   storage.SetEntryValue(pub, val);
 
   bool timedOut = false;
-  EXPECT_FALSE(wpi::util::WaitForObject(sub, 0, &timedOut));
-  EXPECT_TRUE(timedOut);
+  CHECK_FALSE(wpi::util::WaitForObject(sub, 0, &timedOut));
+  CHECK(timedOut);
   auto values = storage.ReadQueue<double>(sub);
-  ASSERT_EQ(values.size(), 1u);
-  EXPECT_EQ(values[0].value, 1.0);
-  EXPECT_EQ(values[0].time, 50);
+  REQUIRE(values.size() == 1u);
+  CHECK(values[0].value == 1.0);
+  CHECK(values[0].time == 50);
+
+  CheckNetworkCounts(network, 1, 1, 1);
+  CheckSubscribe(network.subscribeCalls[0], {"foo"}, subOptions);
+  CheckPublish(network.publishCalls[0], "foo", "double",
+               wpi::util::json::object());
+  CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(), val);
 }
 
-TEST_F(LocalStorageTest, DisableSignalMultiSubscriberDoesNotSignalHandle) {
+TEST_CASE_METHOD(
+    LocalStorageTest,
+    "LocalStorageTest DisableSignalMultiSubscriberDoesNotSignalHandle",
+    "[ntcore][local-storage]") {
   PubSubOptionsImpl subOptions;
   subOptions.disableSignal = true;
-  EXPECT_CALL(network, ClientSubscribe(_, _, IsPubSubOptions(subOptions)));
+  subOptions.prefixMatch = true;
   auto sub = storage.SubscribeMultiple({{""}}, {.disableSignal = true});
 
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"double"},
-                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
 
   auto val = Value::MakeDouble(1.0, 50);
-  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val));
   storage.SetEntryValue(pub, val);
 
   bool timedOut = false;
-  EXPECT_FALSE(wpi::util::WaitForObject(sub, 0, &timedOut));
-  EXPECT_TRUE(timedOut);
+  CHECK_FALSE(wpi::util::WaitForObject(sub, 0, &timedOut));
+  CHECK(timedOut);
+
+  CheckNetworkCounts(network, 1, 1, 1);
+  CheckSubscribe(network.subscribeCalls[0], {""}, subOptions);
+  CheckPublish(network.publishCalls[0], "foo", "double",
+               wpi::util::json::object());
+  CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(), val);
 }
 
 class LocalStorageDuplicatesTest : public LocalStorageTest {
@@ -610,91 +594,119 @@ class LocalStorageDuplicatesTest : public LocalStorageTest {
 };
 
 void LocalStorageDuplicatesTest::SetupPubSub(bool keepPub, bool keepSub) {
+  auto publishCount = network.publishCalls.size();
+  auto unpublishCount = network.unpublishCalls.size();
+  auto setPropertiesCount = network.setPropertiesCalls.size();
+  auto subscribeCount = network.subscribeCalls.size();
+  auto unsubscribeCount = network.unsubscribeCalls.size();
+  auto setValueCount = network.setValueCalls.size();
+
   PubSubOptionsImpl pubOptions;
   pubOptions.keepDuplicates = keepPub;
-  EXPECT_CALL(
-      network,
-      ClientPublish(_, std::string_view{"foo"}, std::string_view{"double"},
-                    wpi::util::json::object(), IsPubSubOptions(pubOptions)));
   pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {},
                         {.keepDuplicates = keepPub});
 
   PubSubOptionsImpl subOptions;
   subOptions.pollStorage = 10;
   subOptions.keepDuplicates = keepSub;
-  EXPECT_CALL(network,
-              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
-                              IsPubSubOptions(subOptions)));
   sub = storage.Subscribe(fooTopic, NT_DOUBLE, "double",
                           {.pollStorage = 10, .keepDuplicates = keepSub});
+
+  CheckClientMessageCounts(network, {
+                                        .publish = publishCount + 1,
+                                        .unpublish = unpublishCount,
+                                        .setProperties = setPropertiesCount,
+                                        .subscribe = subscribeCount + 1,
+                                        .unsubscribe = unsubscribeCount,
+                                        .setValue = setValueCount,
+                                    });
+  CheckPublish(network.publishCalls[publishCount], "foo", "double",
+               wpi::util::json::object(), pubOptions);
+  CheckSubscribe(network.subscribeCalls[subscribeCount], {"foo"}, subOptions);
 }
 
 void LocalStorageDuplicatesTest::SetValues(bool expectDuplicates) {
   storage.SetEntryValue(pub, val1);
   storage.SetEntryValue(pub, val2);
   // verify the timestamp was updated (or not)
-  EXPECT_EQ(storage.GetEntryLastChange(sub),
-            expectDuplicates ? val2.time() : val1.time());
+  CHECK(storage.GetEntryLastChange(sub) ==
+        (expectDuplicates ? val2.time() : val1.time()));
   storage.SetEntryValue(pub, val3);
 }
 
-TEST_F(LocalStorageDuplicatesTest, Defaults) {
+TEST_CASE_METHOD(LocalStorageDuplicatesTest,
+                 "LocalStorageDuplicatesTest Defaults",
+                 "[ntcore][local-storage]") {
   SetupPubSub(false, false);
-
-  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val1));
-  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val3));
   SetValues(false);
 
   // verify 2nd update was dropped locally
   auto values = storage.ReadQueue<double>(sub);
-  ASSERT_EQ(values.size(), 2u);
-  ASSERT_EQ(values[0].value, val1.GetDouble());
-  ASSERT_EQ(values[0].time, val1.time());
-  ASSERT_EQ(values[1].value, val3.GetDouble());
-  ASSERT_EQ(values[1].time, val3.time());
+  REQUIRE(values.size() == 2u);
+  REQUIRE(values[0].value == val1.GetDouble());
+  REQUIRE(values[0].time == val1.time());
+  REQUIRE(values[1].value == val3.GetDouble());
+  REQUIRE(values[1].time == val3.time());
+
+  CheckNetworkCounts(network, 1, 1, 2);
+  CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(), val1);
+  CheckSetValue(network.setValueCalls[1], Handle{pub}.GetIndex(), val3);
 }
 
-TEST_F(LocalStorageDuplicatesTest, KeepPub) {
+TEST_CASE_METHOD(LocalStorageDuplicatesTest,
+                 "LocalStorageDuplicatesTest KeepPub",
+                 "[ntcore][local-storage]") {
   SetupPubSub(true, false);
-
-  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val1)).Times(2);
-  // EXPECT_CALL(network, SetValue(pub, val2));
-  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val3));
   SetValues(true);
 
   // verify only 2 updates were received locally
   auto values = storage.ReadQueue<double>(sub);
-  ASSERT_EQ(values.size(), 2u);
+  REQUIRE(values.size() == 2u);
+
+  CheckNetworkCounts(network, 1, 1, 3);
+  CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(), val1);
+  CheckSetValue(network.setValueCalls[1], Handle{pub}.GetIndex(), val2);
+  CheckSetValue(network.setValueCalls[2], Handle{pub}.GetIndex(), val3);
 }
 
-TEST_F(LocalStorageDuplicatesTest, KeepSub) {
+TEST_CASE_METHOD(LocalStorageDuplicatesTest,
+                 "LocalStorageDuplicatesTest KeepSub",
+                 "[ntcore][local-storage]") {
   SetupPubSub(false, true);
 
   // second update should NOT go to the network
-  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val1));
-  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val3));
   SetValues(false);
 
   // verify 2 updates were received locally
   auto values = storage.ReadQueue<double>(sub);
-  ASSERT_EQ(values.size(), 2u);
+  REQUIRE(values.size() == 2u);
+
+  CheckNetworkCounts(network, 1, 1, 2);
+  CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(), val1);
+  CheckSetValue(network.setValueCalls[1], Handle{pub}.GetIndex(), val3);
 }
 
-TEST_F(LocalStorageDuplicatesTest, KeepPubSub) {
+TEST_CASE_METHOD(LocalStorageDuplicatesTest,
+                 "LocalStorageDuplicatesTest KeepPubSub",
+                 "[ntcore][local-storage]") {
   SetupPubSub(true, true);
 
   // second update SHOULD go to the network
-  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val1)).Times(2);
-  // EXPECT_CALL(network, SetValue(pub, val2));
-  EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val3));
   SetValues(true);
 
   // verify all 3 updates were received locally
   auto values = storage.ReadQueue<double>(sub);
-  ASSERT_EQ(values.size(), 3u);
+  REQUIRE(values.size() == 3u);
+
+  CheckNetworkCounts(network, 1, 1, 3);
+  CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(), val1);
+  CheckSetValue(network.setValueCalls[1], Handle{pub}.GetIndex(), val2);
+  CheckSetValue(network.setValueCalls[2], Handle{pub}.GetIndex(), val3);
 }
 
-TEST_F(LocalStorageDuplicatesTest, FromNetworkDefault) {
+TEST_CASE_METHOD(LocalStorageDuplicatesTest,
+                 "LocalStorageDuplicatesTest FromNetworkDefault",
+                 "[ntcore][local-storage]") {
   SetupPubSub(false, false);
 
   // incoming from the network are treated like a normal local publish
@@ -703,19 +715,23 @@ TEST_F(LocalStorageDuplicatesTest, FromNetworkDefault) {
   storage.ServerSetValue(topic, val1);
   storage.ServerSetValue(topic, val2);
   // verify the timestamp was updated
-  EXPECT_EQ(storage.GetEntryLastChange(sub), val2.time());
+  CHECK(storage.GetEntryLastChange(sub) == val2.time());
   storage.ServerSetValue(topic, val3);
 
   // verify 2nd update was dropped for local subscriber
   auto values = storage.ReadQueue<double>(sub);
-  ASSERT_EQ(values.size(), 2u);
-  ASSERT_EQ(values[0].value, val1.GetDouble());
-  ASSERT_EQ(values[0].time, val1.time());
-  ASSERT_EQ(values[1].value, val3.GetDouble());
-  ASSERT_EQ(values[1].time, val3.time());
+  REQUIRE(values.size() == 2u);
+  REQUIRE(values[0].value == val1.GetDouble());
+  REQUIRE(values[0].time == val1.time());
+  REQUIRE(values[1].value == val3.GetDouble());
+  REQUIRE(values[1].time == val3.time());
+
+  CheckNetworkCounts(network, 1, 1, 0);
 }
 
-TEST_F(LocalStorageDuplicatesTest, FromNetworkKeepPub) {
+TEST_CASE_METHOD(LocalStorageDuplicatesTest,
+                 "LocalStorageDuplicatesTest FromNetworkKeepPub",
+                 "[ntcore][local-storage]") {
   SetupPubSub(true, false);
 
   // incoming from the network are treated like a normal local publish
@@ -724,18 +740,22 @@ TEST_F(LocalStorageDuplicatesTest, FromNetworkKeepPub) {
   storage.ServerSetValue(topic, val1);
   storage.ServerSetValue(topic, val2);
   // verify the timestamp was updated
-  EXPECT_EQ(storage.GetEntryLastChange(sub), val2.time());
+  CHECK(storage.GetEntryLastChange(sub) == val2.time());
   storage.ServerSetValue(topic, val3);
 
   // verify 2nd update was dropped for local subscriber
   auto values = storage.ReadQueue<double>(sub);
-  ASSERT_EQ(values.size(), 2u);
-  ASSERT_EQ(values[0].value, val1.GetDouble());
-  ASSERT_EQ(values[0].time, val1.time());
-  ASSERT_EQ(values[1].value, val3.GetDouble());
-  ASSERT_EQ(values[1].time, val3.time());
+  REQUIRE(values.size() == 2u);
+  REQUIRE(values[0].value == val1.GetDouble());
+  REQUIRE(values[0].time == val1.time());
+  REQUIRE(values[1].value == val3.GetDouble());
+  REQUIRE(values[1].time == val3.time());
+
+  CheckNetworkCounts(network, 1, 1, 0);
 }
-TEST_F(LocalStorageDuplicatesTest, FromNetworkKeepSub) {
+TEST_CASE_METHOD(LocalStorageDuplicatesTest,
+                 "LocalStorageDuplicatesTest FromNetworkKeepSub",
+                 "[ntcore][local-storage]") {
   SetupPubSub(false, true);
 
   // incoming from the network are treated like a normal local publish
@@ -744,21 +764,25 @@ TEST_F(LocalStorageDuplicatesTest, FromNetworkKeepSub) {
   storage.ServerSetValue(topic, val1);
   storage.ServerSetValue(topic, val2);
   // verify the timestamp was updated
-  EXPECT_EQ(storage.GetEntryLastChange(sub), val2.time());
+  CHECK(storage.GetEntryLastChange(sub) == val2.time());
   storage.ServerSetValue(topic, val3);
 
   // verify 2nd update was received by local subscriber
   auto values = storage.ReadQueue<double>(sub);
-  ASSERT_EQ(values.size(), 3u);
-  ASSERT_EQ(values[0].value, val1.GetDouble());
-  ASSERT_EQ(values[0].time, val1.time());
-  ASSERT_EQ(values[1].value, val2.GetDouble());
-  ASSERT_EQ(values[1].time, val2.time());
-  ASSERT_EQ(values[2].value, val3.GetDouble());
-  ASSERT_EQ(values[2].time, val3.time());
+  REQUIRE(values.size() == 3u);
+  REQUIRE(values[0].value == val1.GetDouble());
+  REQUIRE(values[0].time == val1.time());
+  REQUIRE(values[1].value == val2.GetDouble());
+  REQUIRE(values[1].time == val2.time());
+  REQUIRE(values[2].value == val3.GetDouble());
+  REQUIRE(values[2].time == val3.time());
+
+  CheckNetworkCounts(network, 1, 1, 0);
 }
 
-TEST_F(LocalStorageDuplicatesTest, FromNetworkKeepPubSub) {
+TEST_CASE_METHOD(LocalStorageDuplicatesTest,
+                 "LocalStorageDuplicatesTest FromNetworkKeepPubSub",
+                 "[ntcore][local-storage]") {
   SetupPubSub(true, true);
 
   // incoming from the network are treated like a normal local publish
@@ -767,18 +791,20 @@ TEST_F(LocalStorageDuplicatesTest, FromNetworkKeepPubSub) {
   storage.ServerSetValue(topic, val1);
   storage.ServerSetValue(topic, val2);
   // verify the timestamp was updated
-  EXPECT_EQ(storage.GetEntryLastChange(sub), val2.time());
+  CHECK(storage.GetEntryLastChange(sub) == val2.time());
   storage.ServerSetValue(topic, val3);
 
   // verify 2nd update was received by local subscriber
   auto values = storage.ReadQueue<double>(sub);
-  ASSERT_EQ(values.size(), 3u);
-  ASSERT_EQ(values[0].value, val1.GetDouble());
-  ASSERT_EQ(values[0].time, val1.time());
-  ASSERT_EQ(values[1].value, val2.GetDouble());
-  ASSERT_EQ(values[1].time, val2.time());
-  ASSERT_EQ(values[2].value, val3.GetDouble());
-  ASSERT_EQ(values[2].time, val3.time());
+  REQUIRE(values.size() == 3u);
+  REQUIRE(values[0].value == val1.GetDouble());
+  REQUIRE(values[0].time == val1.time());
+  REQUIRE(values[1].value == val2.GetDouble());
+  REQUIRE(values[1].time == val2.time());
+  REQUIRE(values[2].value == val3.GetDouble());
+  REQUIRE(values[2].time == val3.time());
+
+  CheckNetworkCounts(network, 1, 1, 0);
 }
 
 class LocalStorageNumberVariantsTest : public LocalStorageTest {
@@ -809,11 +835,6 @@ void LocalStorageNumberVariantsTest::CreateSubscriber(
 }
 
 void LocalStorageNumberVariantsTest::CreateSubscribers() {
-  EXPECT_CALL(logger,
-              Call(NT_LOG_INFO, _, _,
-                   std::string_view{
-                       "local subscribe to 'foo' disabled due to type "
-                       "mismatch (wanted 'boolean', published as 'double')"}));
   CreateSubscriber(&sub1, "subDouble", NT_DOUBLE, "double");
   CreateSubscriber(&sub2, "subInteger", NT_INTEGER, "int");
   CreateSubscriber(&sub3, "subFloat", NT_FLOAT, "float");
@@ -823,12 +844,6 @@ void LocalStorageNumberVariantsTest::CreateSubscribers() {
 }
 
 void LocalStorageNumberVariantsTest::CreateSubscribersArray() {
-  EXPECT_CALL(
-      logger,
-      Call(NT_LOG_INFO, _, _,
-           std::string_view{
-               "local subscribe to 'foo' disabled due to type "
-               "mismatch (wanted 'boolean[]', published as 'double[]')"}));
   CreateSubscriber(&sub1, "subDouble", NT_DOUBLE_ARRAY, "double[]");
   CreateSubscriber(&sub2, "subInteger", NT_INTEGER_ARRAY, "int[]");
   CreateSubscriber(&sub3, "subFloat", NT_FLOAT_ARRAY, "float[]");
@@ -837,160 +852,213 @@ void LocalStorageNumberVariantsTest::CreateSubscribersArray() {
   subentries.emplace_back(entry, NT_UNASSIGNED, "entry");
 }
 
-TEST_F(LocalStorageNumberVariantsTest, GetEntryPubAfter) {
-  EXPECT_CALL(network, ClientSubscribe(_, _, _)).Times(5);
-  EXPECT_CALL(network, ClientPublish(_, _, _, _, _)).Times(1);
-  EXPECT_CALL(network, ClientSetValue(_, _)).Times(1);
+TEST_CASE_METHOD(LocalStorageNumberVariantsTest,
+                 "LocalStorageNumberVariantsTest GetEntryPubAfter",
+                 "[ntcore][local-storage]") {
   CreateSubscribers();
   auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
   storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
   // all subscribers get the actual type and time
   for (auto&& subentry : subentries) {
-    SCOPED_TRACE(subentry.name);
-    EXPECT_EQ(storage.GetEntryType(subentry.subentry), NT_DOUBLE);
-    EXPECT_EQ(storage.GetEntryLastChange(subentry.subentry), 50);
+    INFO(subentry.name);
+    CHECK(storage.GetEntryType(subentry.subentry) == NT_DOUBLE);
+    CHECK(storage.GetEntryLastChange(subentry.subentry) == 50);
   }
   // for subscribers, they get a converted value or nothing on mismatch
-  EXPECT_EQ(storage.GetEntryValue(sub1), Value::MakeDouble(1.0, 50));
-  EXPECT_EQ(storage.GetEntryValue(sub2), Value::MakeInteger(1, 50));
-  EXPECT_EQ(storage.GetEntryValue(sub3), Value::MakeFloat(1.0, 50));
-  EXPECT_EQ(storage.GetEntryValue(sub4), Value{});
+  CHECK(storage.GetEntryValue(sub1) == Value::MakeDouble(1.0, 50));
+  CHECK(storage.GetEntryValue(sub2) == Value::MakeInteger(1, 50));
+  CHECK(storage.GetEntryValue(sub3) == Value::MakeFloat(1.0, 50));
+  CHECK(storage.GetEntryValue(sub4) == Value{});
   // entries just get whatever the value is
-  EXPECT_EQ(storage.GetEntryValue(entry), Value::MakeDouble(1.0, 50));
+  CHECK(storage.GetEntryValue(entry) == Value::MakeDouble(1.0, 50));
+
+  CheckNetworkCounts(network, 1, 5, 1);
+  CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(),
+                Value::MakeDouble(1.0, 50));
+  logger.CheckMessage(
+      NT_LOG_INFO,
+      "local subscribe to 'foo' disabled due to type mismatch (wanted "
+      "'boolean', published as 'double')");
 }
 
-TEST_F(LocalStorageNumberVariantsTest, GetEntryPubBefore) {
-  EXPECT_CALL(network, ClientSubscribe(_, _, _)).Times(5);
-  EXPECT_CALL(network, ClientPublish(_, _, _, _, _)).Times(1);
-  EXPECT_CALL(network, ClientSetValue(_, _)).Times(1);
+TEST_CASE_METHOD(LocalStorageNumberVariantsTest,
+                 "LocalStorageNumberVariantsTest GetEntryPubBefore",
+                 "[ntcore][local-storage]") {
   auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
   CreateSubscribers();
   storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
   // all subscribers get the actual type and time
   for (auto&& subentry : subentries) {
-    SCOPED_TRACE(subentry.name);
-    EXPECT_EQ(storage.GetEntryType(subentry.subentry), NT_DOUBLE);
-    EXPECT_EQ(storage.GetEntryLastChange(subentry.subentry), 50);
+    INFO(subentry.name);
+    CHECK(storage.GetEntryType(subentry.subentry) == NT_DOUBLE);
+    CHECK(storage.GetEntryLastChange(subentry.subentry) == 50);
   }
   // for subscribers, they get a converted value or nothing on mismatch
-  EXPECT_EQ(storage.GetEntryValue(sub1), Value::MakeDouble(1.0, 50));
-  EXPECT_EQ(storage.GetEntryValue(sub2), Value::MakeInteger(1, 50));
-  EXPECT_EQ(storage.GetEntryValue(sub3), Value::MakeFloat(1.0, 50));
-  EXPECT_EQ(storage.GetEntryValue(sub4), Value{});
+  CHECK(storage.GetEntryValue(sub1) == Value::MakeDouble(1.0, 50));
+  CHECK(storage.GetEntryValue(sub2) == Value::MakeInteger(1, 50));
+  CHECK(storage.GetEntryValue(sub3) == Value::MakeFloat(1.0, 50));
+  CHECK(storage.GetEntryValue(sub4) == Value{});
   // entries just get whatever the value is
-  EXPECT_EQ(storage.GetEntryValue(entry), Value::MakeDouble(1.0, 50));
-}
+  CHECK(storage.GetEntryValue(entry) == Value::MakeDouble(1.0, 50));
 
-template <typename T>
-::testing::Matcher<const T&> TSEq(auto value, int64_t time) {
-  return AllOf(Field("value", &T::value, value), Field("time", &T::time, time));
-}
-
-TEST_F(LocalStorageNumberVariantsTest, GetAtomic) {
-  EXPECT_CALL(network, ClientSubscribe(_, _, _)).Times(5);
-  EXPECT_CALL(network, ClientPublish(_, _, _, _, _)).Times(1);
-  EXPECT_CALL(network, ClientSetValue(_, _)).Times(1);
-  auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
-  CreateSubscribers();
-  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
-
-  for (auto&& subentry : subentries) {
-    SCOPED_TRACE(subentry.name);
-    EXPECT_THAT(storage.GetAtomic<double>(subentry.subentry, 0),
-                TSEq<TimestampedDouble>(1.0, 50));
-    EXPECT_THAT(storage.GetAtomic<int64_t>(subentry.subentry, 0),
-                TSEq<TimestampedInteger>(1, 50));
-    EXPECT_THAT(storage.GetAtomic<float>(subentry.subentry, 0),
-                TSEq<TimestampedFloat>(1.0, 50));
-    EXPECT_THAT(storage.GetAtomic<bool>(subentry.subentry, false),
-                TSEq<TimestampedBoolean>(false, 0));
-  }
+  CheckNetworkCounts(network, 1, 5, 1);
+  CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(),
+                Value::MakeDouble(1.0, 50));
+  logger.CheckMessage(
+      NT_LOG_INFO,
+      "local subscribe to 'foo' disabled due to type mismatch (wanted "
+      "'boolean', published as 'double')");
 }
 
 template <typename T, typename U>
-::testing::Matcher<const T&> TSSpanEq(std::span<U> value, int64_t time) {
-  return AllOf(
-      Field("value", &T::value, wpi::util::SpanEq(std::span<const U>(value))),
-      Field("time", &T::time, time));
+bool TimestampedEq(const T& actual, U value, int64_t time) {
+  return actual.value == value && actual.time == time;
 }
 
-TEST_F(LocalStorageNumberVariantsTest, GetAtomicArray) {
-  EXPECT_CALL(network, ClientSubscribe(_, _, _)).Times(5);
-  EXPECT_CALL(network, ClientPublish(_, _, _, _, _)).Times(1);
-  EXPECT_CALL(network, ClientSetValue(_, _)).Times(1);
+TEST_CASE_METHOD(LocalStorageNumberVariantsTest,
+                 "LocalStorageNumberVariantsTest GetAtomic",
+                 "[ntcore][local-storage]") {
+  auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
+  CreateSubscribers();
+  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
+
+  for (auto&& subentry : subentries) {
+    INFO(subentry.name);
+    CHECK(TimestampedEq(storage.GetAtomic<double>(subentry.subentry, 0), 1.0,
+                        50));
+    CHECK(
+        TimestampedEq(storage.GetAtomic<int64_t>(subentry.subentry, 0), 1, 50));
+    CHECK(TimestampedEq(storage.GetAtomic<float>(subentry.subentry, 0), 1.0f,
+                        50));
+    CHECK(TimestampedEq(storage.GetAtomic<bool>(subentry.subentry, false),
+                        false, 0));
+  }
+
+  CheckNetworkCounts(network, 1, 5, 1);
+  CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(),
+                Value::MakeDouble(1.0, 50));
+  logger.CheckMessage(
+      NT_LOG_INFO,
+      "local subscribe to 'foo' disabled due to type mismatch (wanted "
+      "'boolean', published as 'double')");
+}
+
+template <typename T, typename U>
+bool TimestampedSpanEq(const T& actual, std::span<U> value, int64_t time) {
+  if (actual.time != time || actual.value.size() != value.size()) {
+    return false;
+  }
+
+  using ActualValue = std::remove_cvref_t<decltype(actual.value[0])>;
+  using ExpectedValue = std::remove_cvref_t<decltype(value[0])>;
+  using CommonValue = std::common_type_t<ActualValue, ExpectedValue>;
+  for (size_t i = 0; i < value.size(); ++i) {
+    if (static_cast<CommonValue>(actual.value[i]) !=
+        static_cast<CommonValue>(value[i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+template <typename T, typename U>
+bool SingleTimestampedEq(const T& actual, U value, int64_t time) {
+  return actual.size() == 1 && TimestampedEq(actual[0], value, time);
+}
+
+TEST_CASE_METHOD(LocalStorageNumberVariantsTest,
+                 "LocalStorageNumberVariantsTest GetAtomicArray",
+                 "[ntcore][local-storage]") {
   auto pub = storage.Publish(fooTopic, NT_DOUBLE_ARRAY, "double[]", {}, {});
   CreateSubscribersArray();
   storage.SetEntryValue(pub, Value::MakeDoubleArray({1.0}, 50));
 
   for (auto&& subentry : subentries) {
-    SCOPED_TRACE(subentry.name);
+    INFO(subentry.name);
     double doubleVal = 1.0;
-    EXPECT_THAT(storage.GetAtomic<double[]>(subentry.subentry, {}),
-                TSSpanEq<TimestampedDoubleArray>(std::span{&doubleVal, 1}, 50));
+    CHECK(TimestampedSpanEq(storage.GetAtomic<double[]>(subentry.subentry, {}),
+                            std::span{&doubleVal, 1}, 50));
     int64_t intVal = 1;
-    EXPECT_THAT(storage.GetAtomic<int64_t[]>(subentry.subentry, {}),
-                TSSpanEq<TimestampedIntegerArray>(std::span{&intVal, 1}, 50));
+    CHECK(TimestampedSpanEq(storage.GetAtomic<int64_t[]>(subentry.subentry, {}),
+                            std::span{&intVal, 1}, 50));
     float floatVal = 1.0;
-    EXPECT_THAT(storage.GetAtomic<float[]>(subentry.subentry, {}),
-                TSSpanEq<TimestampedFloatArray>(std::span{&floatVal, 1}, 50));
-    EXPECT_THAT(storage.GetAtomic<bool[]>(subentry.subentry, {}),
-                TSSpanEq<TimestampedBooleanArray>(std::span<int>{}, 0));
+    CHECK(TimestampedSpanEq(storage.GetAtomic<float[]>(subentry.subentry, {}),
+                            std::span{&floatVal, 1}, 50));
+    CHECK(TimestampedSpanEq(storage.GetAtomic<bool[]>(subentry.subentry, {}),
+                            std::span<const bool>{}, 0));
   }
+
+  CheckNetworkCounts(network, 1, 5, 1);
+  CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(),
+                Value::MakeDoubleArray({1.0}, 50));
+  logger.CheckMessage(
+      NT_LOG_INFO,
+      "local subscribe to 'foo' disabled due to type mismatch (wanted "
+      "'boolean[]', published as 'double[]')");
 }
 
-TEST_F(LocalStorageNumberVariantsTest, ReadQueue) {
-  EXPECT_CALL(network, ClientSubscribe(_, _, _)).Times(5);
-  EXPECT_CALL(network, ClientPublish(_, _, _, _, _)).Times(1);
-  EXPECT_CALL(network, ClientSetValue(_, _)).Times(4);
+TEST_CASE_METHOD(LocalStorageNumberVariantsTest,
+                 "LocalStorageNumberVariantsTest ReadQueue",
+                 "[ntcore][local-storage]") {
   auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
   CreateSubscribers();
 
   storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
   for (auto&& subentry : subentries) {
-    SCOPED_TRACE(subentry.name);
+    INFO(subentry.name);
     if (subentry.type == NT_BOOLEAN) {
-      EXPECT_THAT(storage.ReadQueue<double>(subentry.subentry), IsEmpty());
+      CHECK(storage.ReadQueue<double>(subentry.subentry).empty());
     } else {
-      EXPECT_THAT(storage.ReadQueue<double>(subentry.subentry),
-                  ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
+      CHECK(SingleTimestampedEq(storage.ReadQueue<double>(subentry.subentry),
+                                1.0, 50));
     }
   }
 
   storage.SetEntryValue(pub, Value::MakeDouble(2.0, 50));
   for (auto&& subentry : subentries) {
-    SCOPED_TRACE(subentry.name);
+    INFO(subentry.name);
     if (subentry.type == NT_BOOLEAN) {
-      EXPECT_THAT(storage.ReadQueue<int64_t>(subentry.subentry), IsEmpty());
+      CHECK(storage.ReadQueue<int64_t>(subentry.subentry).empty());
     } else {
-      EXPECT_THAT(storage.ReadQueue<int64_t>(subentry.subentry),
-                  ElementsAre(TSEq<TimestampedInteger>(2, 50)));
+      CHECK(SingleTimestampedEq(storage.ReadQueue<int64_t>(subentry.subentry),
+                                2, 50));
     }
   }
 
   storage.SetEntryValue(pub, Value::MakeDouble(3.0, 50));
   for (auto&& subentry : subentries) {
-    SCOPED_TRACE(subentry.name);
+    INFO(subentry.name);
     if (subentry.type == NT_BOOLEAN) {
-      EXPECT_THAT(storage.ReadQueue<float>(subentry.subentry), IsEmpty());
+      CHECK(storage.ReadQueue<float>(subentry.subentry).empty());
     } else {
-      EXPECT_THAT(storage.ReadQueue<float>(subentry.subentry),
-                  ElementsAre(TSEq<TimestampedFloat>(3.0, 50)));
+      CHECK(SingleTimestampedEq(storage.ReadQueue<float>(subentry.subentry),
+                                3.0f, 50));
     }
   }
 
   storage.SetEntryValue(pub, Value::MakeDouble(4.0, 50));
   for (auto&& subentry : subentries) {
-    SCOPED_TRACE(subentry.name);
-    EXPECT_THAT(storage.ReadQueue<bool>(subentry.subentry), IsEmpty());
+    INFO(subentry.name);
+    CHECK(storage.ReadQueue<bool>(subentry.subentry).empty());
   }
+
+  CheckNetworkCounts(network, 1, 5, 4);
+  CheckSetValue(network.setValueCalls[0], Handle{pub}.GetIndex(),
+                Value::MakeDouble(1.0, 50));
+  CheckSetValue(network.setValueCalls[1], Handle{pub}.GetIndex(),
+                Value::MakeDouble(2.0, 50));
+  CheckSetValue(network.setValueCalls[2], Handle{pub}.GetIndex(),
+                Value::MakeDouble(3.0, 50));
+  CheckSetValue(network.setValueCalls[3], Handle{pub}.GetIndex(),
+                Value::MakeDouble(4.0, 50));
+  logger.CheckMessage(
+      NT_LOG_INFO,
+      "local subscribe to 'foo' disabled due to type mismatch (wanted "
+      "'boolean', published as 'double')");
 }
 
-TEST_F(LocalStorageTest, MultiSubSpecial) {
-  EXPECT_CALL(network, ClientSubscribe(_, _, _)).Times(2);
-  EXPECT_CALL(network, ClientPublish(_, _, _, _, _)).Times(2);
-  EXPECT_CALL(network, ClientSetValue(_, _)).Times(2);
-  EXPECT_CALL(listenerStorage, Activate(_, _, _)).Times(2);
-
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest MultiSubSpecial",
+                 "[ntcore][local-storage]") {
   auto subnormal = storage.SubscribeMultiple({{""}}, {});
   auto subspecial = storage.SubscribeMultiple({{"", "$"}}, {});
   auto pubnormal = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
@@ -998,43 +1066,37 @@ TEST_F(LocalStorageTest, MultiSubSpecial) {
   auto pubspecial = storage.Publish(specialTopic, NT_DOUBLE, "double", {}, {});
   storage.AddListener(1, subnormal, NT_EVENT_VALUE_ALL);
   storage.AddListener(2, subspecial, NT_EVENT_VALUE_ALL);
-
-  EXPECT_CALL(
-      listenerStorage,
-      Notify(wpi::util::SpanEq(std::span<const NT_Listener>{{2}}), _, _, _, _));
   storage.SetEntryValue(pubspecial, Value::MakeDouble(1.0, 30));
-
-  EXPECT_CALL(
-      listenerStorage,
-      Notify(wpi::util::SpanEq(std::span<const NT_Listener>{{1}}), _, _, _, _));
-  EXPECT_CALL(
-      listenerStorage,
-      Notify(wpi::util::SpanEq(std::span<const NT_Listener>{{2}}), _, _, _, _));
   storage.SetEntryValue(pubnormal, Value::MakeDouble(2.0, 40));
+
+  CheckNetworkCounts(network, 2, 2, 2);
+  CheckListenerStorageCounts(listenerStorage,
+                             {.activate = 2, .valueNotify = 3});
+  CheckValueNotifyHandles(listenerStorage.valueNotifyCalls[0], {2});
+  CheckValueNotifyHandles(listenerStorage.valueNotifyCalls[1], {1});
+  CheckValueNotifyHandles(listenerStorage.valueNotifyCalls[2], {2});
 }
 
-TEST_F(LocalStorageTest, NetworkDuplicateDetect) {
-  EXPECT_CALL(network, ClientPublish(_, _, _, _, _));
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest NetworkDuplicateDetect",
+                 "[ntcore][local-storage]") {
   auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
   auto remoteTopic = storage.ServerAnnounce(
       "foo", 0, "double", wpi::util::json::object(), std::nullopt);
 
   // local set
-  EXPECT_CALL(network, ClientSetValue(_, _));
   storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
   // 2nd local set with same value - no SetValue call to network
   storage.SetEntryValue(pub, Value::MakeDouble(1.0, 60));
   // network set with different value
   storage.ServerSetValue(remoteTopic, Value::MakeDouble(2.0, 70));
   // 3rd local set with same value generates a SetValue call to network
-  EXPECT_CALL(network, ClientSetValue(_, _));
   storage.SetEntryValue(pub, Value::MakeDouble(1.0, 80));
+
+  CheckNetworkCounts(network, 1, 0, 2);
 }
 
-TEST_F(LocalStorageTest, ReadQueueLocalRemote) {
-  EXPECT_CALL(network, ClientSubscribe(_, _, _)).Times(3);
-  EXPECT_CALL(network, ClientPublish(_, _, _, _, _)).Times(1);
-
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest ReadQueueLocalRemote",
+                 "[ntcore][local-storage]") {
   auto subBoth =
       storage.Subscribe(fooTopic, NT_DOUBLE, "double", DEFAULT_PUB_SUB_OPTIONS);
   auto subLocal =
@@ -1046,27 +1108,22 @@ TEST_F(LocalStorageTest, ReadQueueLocalRemote) {
       "foo", 0, "double", wpi::util::json::object(), std::nullopt);
 
   // local set
-  EXPECT_CALL(network, ClientSetValue(_, _));
   storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
-  EXPECT_THAT(storage.ReadQueue<double>(subBoth),
-              ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
-  EXPECT_THAT(storage.ReadQueue<double>(subLocal),
-              ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
-  EXPECT_THAT(storage.ReadQueue<double>(subRemote), IsEmpty());
+  CHECK(SingleTimestampedEq(storage.ReadQueue<double>(subBoth), 1.0, 50));
+  CHECK(SingleTimestampedEq(storage.ReadQueue<double>(subLocal), 1.0, 50));
+  CHECK(storage.ReadQueue<double>(subRemote).empty());
 
   // network set
   storage.ServerSetValue(remoteTopic, Value::MakeDouble(2.0, 60));
-  EXPECT_THAT(storage.ReadQueue<double>(subBoth),
-              ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
-  EXPECT_THAT(storage.ReadQueue<double>(subRemote),
-              ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
-  EXPECT_THAT(storage.ReadQueue<double>(subLocal), IsEmpty());
+  CHECK(SingleTimestampedEq(storage.ReadQueue<double>(subBoth), 2.0, 60));
+  CHECK(SingleTimestampedEq(storage.ReadQueue<double>(subRemote), 2.0, 60));
+  CHECK(storage.ReadQueue<double>(subLocal).empty());
+
+  CheckNetworkCounts(network, 1, 3, 1);
 }
 
-TEST_F(LocalStorageTest, SubExcludePub) {
-  EXPECT_CALL(network, ClientSubscribe(_, _, _)).Times(2);
-  EXPECT_CALL(network, ClientPublish(_, _, _, _, _)).Times(1);
-
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest SubExcludePub",
+                 "[ntcore][local-storage]") {
   auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
   auto subActive = storage.Subscribe(fooTopic, NT_DOUBLE, "double", {});
   auto subExclude = storage.Subscribe(fooTopic, NT_DOUBLE, "double",
@@ -1075,45 +1132,38 @@ TEST_F(LocalStorageTest, SubExcludePub) {
       "foo", 0, "double", wpi::util::json::object(), std::nullopt);
 
   // local set
-  EXPECT_CALL(network, ClientSetValue(_, _));
   storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
-  EXPECT_THAT(storage.ReadQueue<double>(subActive),
-              ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
-  EXPECT_THAT(storage.ReadQueue<double>(subExclude), IsEmpty());
+  CHECK(SingleTimestampedEq(storage.ReadQueue<double>(subActive), 1.0, 50));
+  CHECK(storage.ReadQueue<double>(subExclude).empty());
 
   // network set
   storage.ServerSetValue(remoteTopic, Value::MakeDouble(2.0, 60));
-  EXPECT_THAT(storage.ReadQueue<double>(subActive),
-              ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
-  EXPECT_THAT(storage.ReadQueue<double>(subExclude),
-              ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
+  CHECK(SingleTimestampedEq(storage.ReadQueue<double>(subActive), 2.0, 60));
+  CHECK(SingleTimestampedEq(storage.ReadQueue<double>(subExclude), 2.0, 60));
+
+  CheckNetworkCounts(network, 1, 2, 1);
 }
 
-TEST_F(LocalStorageTest, EntryExcludeSelf) {
-  EXPECT_CALL(network, ClientSubscribe(_, _, _));
-
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest EntryExcludeSelf",
+                 "[ntcore][local-storage]") {
   auto entry =
       storage.GetEntry(fooTopic, NT_DOUBLE, "double", {.excludeSelf = true});
   auto remoteTopic = storage.ServerAnnounce(
       "foo", 0, "double", wpi::util::json::object(), std::nullopt);
 
   // local set
-  EXPECT_CALL(network, ClientPublish(_, _, _, _, _));
-  EXPECT_CALL(network, ClientSetValue(_, _));
   storage.SetEntryValue(entry, Value::MakeDouble(1.0, 50));
-  EXPECT_THAT(storage.ReadQueue<double>(entry), IsEmpty());
+  CHECK(storage.ReadQueue<double>(entry).empty());
 
   // network set
   storage.ServerSetValue(remoteTopic, Value::MakeDouble(2.0, 60));
-  EXPECT_THAT(storage.ReadQueue<double>(entry),
-              ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
+  CHECK(SingleTimestampedEq(storage.ReadQueue<double>(entry), 2.0, 60));
+
+  CheckNetworkCounts(network, 1, 1, 1);
 }
 
-TEST_F(LocalStorageTest, ReadQueueInitialLocal) {
-  EXPECT_CALL(network, ClientPublish(_, _, _, _, _));
-  EXPECT_CALL(network, ClientSetValue(_, _));
-  EXPECT_CALL(network, ClientSubscribe(_, _, _)).Times(3);
-
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest ReadQueueInitialLocal",
+                 "[ntcore][local-storage]") {
   auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
   storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
 
@@ -1124,16 +1174,15 @@ TEST_F(LocalStorageTest, ReadQueueInitialLocal) {
   auto subRemote =
       storage.Subscribe(fooTopic, NT_DOUBLE, "double", {.disableLocal = true});
 
-  EXPECT_THAT(storage.ReadQueue<double>(subBoth),
-              ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
-  EXPECT_THAT(storage.ReadQueue<double>(subLocal),
-              ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
-  EXPECT_THAT(storage.ReadQueue<double>(subRemote), IsEmpty());
+  CHECK(SingleTimestampedEq(storage.ReadQueue<double>(subBoth), 1.0, 50));
+  CHECK(SingleTimestampedEq(storage.ReadQueue<double>(subLocal), 1.0, 50));
+  CHECK(storage.ReadQueue<double>(subRemote).empty());
+
+  CheckNetworkCounts(network, 1, 3, 1);
 }
 
-TEST_F(LocalStorageTest, ReadQueueInitialRemote) {
-  EXPECT_CALL(network, ClientSubscribe(_, _, _)).Times(3);
-
+TEST_CASE_METHOD(LocalStorageTest, "LocalStorageTest ReadQueueInitialRemote",
+                 "[ntcore][local-storage]") {
   auto remoteTopic = storage.ServerAnnounce(
       "foo", 0, "double", wpi::util::json::object(), std::nullopt);
   storage.ServerSetValue(remoteTopic, Value::MakeDouble(2.0, 60));
@@ -1146,11 +1195,11 @@ TEST_F(LocalStorageTest, ReadQueueInitialRemote) {
       storage.Subscribe(fooTopic, NT_DOUBLE, "double", {.disableLocal = true});
 
   // network set
-  EXPECT_THAT(storage.ReadQueue<double>(subBoth),
-              ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
-  EXPECT_THAT(storage.ReadQueue<double>(subRemote),
-              ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
-  EXPECT_THAT(storage.ReadQueue<double>(subLocal), IsEmpty());
+  CHECK(SingleTimestampedEq(storage.ReadQueue<double>(subBoth), 2.0, 60));
+  CHECK(SingleTimestampedEq(storage.ReadQueue<double>(subRemote), 2.0, 60));
+  CHECK(storage.ReadQueue<double>(subLocal).empty());
+
+  CheckNetworkCounts(network, 0, 3, 0);
 }
 
 }  // namespace wpi::nt

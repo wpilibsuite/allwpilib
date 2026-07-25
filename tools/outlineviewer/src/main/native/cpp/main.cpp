@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <format>
 #include <memory>
 #include <string>
 
-#include <GLFW/glfw3.h>
-#include <fmt/format.h>
+#include <SDL3/SDL.h>
 #include <imgui.h>
 
 #include "wpi/glass/Context.hpp"
@@ -49,11 +49,11 @@ static std::string MakeTitle(NT_Inst inst, wpi::nt::Event event) {
   auto mode = wpi::nt::GetNetworkMode(inst);
   if (mode & NT_NET_MODE_SERVER) {
     auto numClients = wpi::nt::GetConnections(inst).size();
-    return fmt::format("OutlineViewer - {} Client{} Connected", numClients,
+    return std::format("OutlineViewer - {} Client{} Connected", numClients,
                        (numClients == 1 ? "" : "s"));
   } else if (mode & NT_NET_MODE_CLIENT) {
     if (event.Is(NT_EVENT_CONNECTED)) {
-      return fmt::format("OutlineViewer - Connected ({})",
+      return std::format("OutlineViewer - Connected ({})",
                          event.GetConnectionInfo()->remote_ip);
     }
   }
@@ -91,13 +91,13 @@ static void NtInitialize() {
         } else if (msg->level >= NT_LOG_WARNING) {
           level = "WARNING: ";
         }
-        gLog.Append(fmt::format("{}{} ({}:{})\n", level, msg->message,
+        gLog.Append(std::format("{}{} ({}:{})\n", level, msg->message,
                                 msg->filename, msg->line));
       }
     }
 
     if (updateTitle) {
-      glfwSetWindowTitle(win, MakeTitle(inst, connectionEvent).c_str());
+      SDL_SetWindowTitle(win, MakeTitle(inst, connectionEvent).c_str());
     }
   });
 
@@ -118,7 +118,7 @@ static void DisplayGui() {
   // fill entire OS window with this window
   ImGui::SetNextWindowPos(ImVec2(0, 0));
   int width, height;
-  glfwGetWindowSize(gui::GetSystemWindow(), &width, &height);
+  SDL_GetWindowSize(gui::GetSystemWindow(), &width, &height);
   ImGui::SetNextWindowSize(
       ImVec2(static_cast<float>(width), static_cast<float>(height)));
 
@@ -212,6 +212,7 @@ static void DisplayGui() {
     ImGui::Text("OutlineViewer");
     ImGui::Separator();
     ImGui::Text("v%s", GetWPILibVersion());
+    gui::EmitRendererInfo();
     ImGui::Separator();
     ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
     ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
@@ -262,7 +263,8 @@ int main(int argc, char** argv) {
 
   gui::AddLateExecute(DisplayGui);
 
-  gui::Initialize("OutlineViewer - DISCONNECTED", 600, 400);
+  gui::Initialize("OutlineViewer - DISCONNECTED", 600, 400,
+                  gui::RendererPreference::PREFER_2D);
   gui::Main();
 
   gModel.reset();

@@ -2,6 +2,9 @@ import math
 
 from wpimath import (
     CubicHermiteSpline,
+    DrivetrainSplineTrajectory,
+    DrivetrainSplineTrajectoryGenerator,
+    DrivetrainSplineTrajectoryParameterizer,
     Ellipse2d,
     EllipticalRegionConstraint,
     MaxVelocityConstraint,
@@ -10,36 +13,59 @@ from wpimath import (
     RectangularRegionConstraint,
     Rotation2d,
     SplineHelper,
-    TrajectoryConstraint,
-    Trajectory,
     TrajectoryConfig,
-    TrajectoryGenerator,
-    TrajectoryParameterizer,
+    TrajectoryConstraint,
     Transform2d,
     Translation2d,
 )
 
 
-def getTestTrajectory(config: TrajectoryConfig) -> Trajectory:
+def get_test_trajectory(config: TrajectoryConfig) -> DrivetrainSplineTrajectory:
     # 2018 cross scale auto waypoints
-    sideStart = Pose2d.fromFeet(1.54, 23.23, Rotation2d.fromDegrees(180))
-    crossScale = Pose2d.fromFeet(23.7, 6.8, Rotation2d.fromDegrees(-160))
+    side_start = Pose2d.from_feet(1.54, 23.23, Rotation2d.from_degrees(180))
+    cross_scale = Pose2d.from_feet(23.7, 6.8, Rotation2d.from_degrees(-160))
 
-    config.setReversed(True)
+    config.set_reversed(True)
 
     vector = [
         (
-            sideStart + Transform2d(Translation2d.fromFeet(-13, 0), Rotation2d())
+            side_start + Transform2d(Translation2d.from_feet(-13, 0), Rotation2d())
         ).translation(),
         (
-            sideStart
+            side_start
             + Transform2d(
-                Translation2d.fromFeet(-19.5, 5.0), Rotation2d.fromDegrees(-90)
+                Translation2d.from_feet(-19.5, 5.0), Rotation2d.from_degrees(-90)
             )
         ).translation(),
     ]
 
-    return TrajectoryGenerator.generateTrajectory(sideStart, vector, crossScale, config)
+    return DrivetrainSplineTrajectoryGenerator.generate(
+        side_start, vector, cross_scale, config
+    )
+
+
+#
+# DrivetrainSplineTrajectoryParameterizer
+#
+
+
+def test_drivetrain_spline_trajectory_parameterizer():
+    start = Pose2d(1, 1, 0)
+    end = Pose2d(2, 2, math.pi / 2)
+
+    # generate the spline from start and end poses
+    vec1, vec2 = SplineHelper.cubic_control_vectors_from_waypoints(start, [], end)
+    spline = CubicHermiteSpline(vec1.x, vec2.x, vec1.y, vec2.y)
+
+    # sample the pose and curvature along the spline
+    points: list[tuple[Pose2d, float]] = []
+    for i in range(100):
+        points.append(spline.get_point(i / 100))
+
+    trajectory = DrivetrainSplineTrajectoryParameterizer.parameterize(
+        points, [], 0, 0, 4, 3, False
+    )
+    assert trajectory is not None
 
 
 #
@@ -48,23 +74,23 @@ def getTestTrajectory(config: TrajectoryConfig) -> Trajectory:
 
 
 def test_elliptical_region_constraint():
-    maxVelocity = 2
-    ellipse = Ellipse2d.fromFeet(Pose2d.fromFeet(5, 2.5, math.radians(180)), 5, 2.5)
+    max_velocity = 2
+    ellipse = Ellipse2d.from_feet(Pose2d.from_feet(5, 2.5, math.radians(180)), 5, 2.5)
 
-    config = TrajectoryConfig.fromFps(13, 13)
-    maxVelConstraint = MaxVelocityConstraint.fromFps(maxVelocity)
-    regionConstraint = EllipticalRegionConstraint(ellipse, maxVelConstraint)
+    config = TrajectoryConfig.from_fps(13, 13)
+    max_vel_constraint = MaxVelocityConstraint.from_fps(max_velocity)
+    region_constraint = EllipticalRegionConstraint(ellipse, max_vel_constraint)
 
-    config.addConstraint(regionConstraint)
+    config.add_constraint(region_constraint)
 
-    trajectory = getTestTrajectory(config)
+    trajectory = get_test_trajectory(config)
 
-    exceededConstraintOutsideRegion = False
-    for point in trajectory.states():
+    exceeded_constraint_outside_region = False
+    for point in trajectory.samples():
         if ellipse.contains(point.pose.translation()):
-            assert abs(point.velocity_fps) < maxVelocity + 0.05
-        elif abs(point.velocity_fps) >= maxVelocity + 0.05:
-            exceededConstraintOutsideRegion = True
+            assert abs(point.forward_velocity()) < max_velocity + 0.05
+        elif abs(point.forward_velocity()) >= max_velocity + 0.05:
+            exceeded_constraint_outside_region = True
 
         # translation = point.pose.translation()
         # if translation.x_feet < 10 and translation.y_feet < 5:
@@ -72,7 +98,7 @@ def test_elliptical_region_constraint():
         # elif abs(point.velocity_fps) >= maxVelocity + 0.05:
         #     exceededConstraintOutsideRegion = True
 
-    assert exceededConstraintOutsideRegion
+    assert exceeded_constraint_outside_region
 
 
 #
@@ -81,25 +107,27 @@ def test_elliptical_region_constraint():
 
 
 def test_rectangular_region_constraint():
-    maxVelocity = 2
-    rectangle = Rectangle2d(Translation2d.fromFeet(1, 1), Translation2d.fromFeet(5, 27))
+    max_velocity = 2
+    rectangle = Rectangle2d(
+        Translation2d.from_feet(1, 1), Translation2d.from_feet(5, 27)
+    )
 
-    config = TrajectoryConfig.fromFps(13, 13)
-    maxVelConstraint = MaxVelocityConstraint.fromFps(maxVelocity)
-    regionConstraint = RectangularRegionConstraint(rectangle, maxVelConstraint)
+    config = TrajectoryConfig.from_fps(13, 13)
+    max_vel_constraint = MaxVelocityConstraint.from_fps(max_velocity)
+    region_constraint = RectangularRegionConstraint(rectangle, max_vel_constraint)
 
-    config.addConstraint(regionConstraint)
+    config.add_constraint(region_constraint)
 
-    trajectory = getTestTrajectory(config)
+    trajectory = get_test_trajectory(config)
 
-    exceededConstraintOutsideRegion = False
-    for point in trajectory.states():
+    exceeded_constraint_outside_region = False
+    for point in trajectory.samples():
         if rectangle.contains(point.pose.translation()):
-            assert abs(point.velocity_fps) < maxVelocity + 0.05
-        elif abs(point.velocity_fps) >= maxVelocity + 0.05:
-            exceededConstraintOutsideRegion = True
+            assert abs(point.forward_velocity()) < max_velocity + 0.05
+        elif abs(point.forward_velocity()) >= max_velocity + 0.05:
+            exceeded_constraint_outside_region = True
 
-    assert exceededConstraintOutsideRegion
+    assert exceeded_constraint_outside_region
 
 
 #
@@ -111,32 +139,8 @@ def test_trajectory_constraint_min_max():
     min_max = TrajectoryConstraint.MinMax()
     _, _ = min_max
 
-    min_max = TrajectoryConstraint.MinMax(minAcceleration=0, maxAcceleration=1)
+    min_max = TrajectoryConstraint.MinMax(min_acceleration=0, max_acceleration=1)
     assert (
         repr(min_max)
-        == "TrajectoryConstraint.MinMax(minAcceleration=0.0, maxAcceleration=1.0)"
+        == "TrajectoryConstraint.MinMax(min_acceleration=0.0, max_acceleration=1.0)"
     )
-
-
-#
-# TrajectoryParameterizer
-#
-
-
-def test_trajectory_parameterizer():
-    start = Pose2d(1, 1, 0)
-    end = Pose2d(2, 2, math.pi / 2)
-
-    # generate the spline from start and end poses
-    vec1, vec2 = SplineHelper.cubicControlVectorsFromWaypoints(start, [], end)
-    spline = CubicHermiteSpline(vec1.x, vec2.x, vec1.y, vec2.y)
-
-    # sample the pose and curvature along the spline
-    points: list[tuple[Pose2d, float]] = []
-    for i in range(100):
-        points.append(spline.getPoint(i / 100))
-
-    trajectory = TrajectoryParameterizer.timeParameterizeTrajectory(
-        points, [], 0, 0, 4, 3, False
-    )
-    assert trajectory is not None

@@ -33,7 +33,7 @@ elseif(APPLE)
     set_target_properties(sysid PROPERTIES MACOSX_BUNDLE YES OUTPUT_NAME "SysId")
 endif()
 
-if(WITH_TESTS)
+if(WPILIB_WITH_TESTS)
     wpilib_add_test_catch2(sysid src/test/native/cpp)
     wpilib_link_macos_gui(sysid_test)
     target_sources(sysid_test PRIVATE ${sysid_src})

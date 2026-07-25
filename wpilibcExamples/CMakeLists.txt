@@ -30,7 +30,10 @@ foreach(example ${EXAMPLES})
     )
     add_dependencies(wpilibcExamples ${example})
 
-    if(WITH_TESTS AND EXISTS ${CMAKE_SOURCE_DIR}/wpilibcExamples/src/test/cpp/examples/${example})
+    if(
+        WPILIB_WITH_TESTS
+        AND EXISTS ${CMAKE_SOURCE_DIR}/wpilibcExamples/src/test/cpp/examples/${example}
+    )
         wpilib_add_test(Example_${example} src/test/cpp/examples/${example}/cpp)
         target_sources(Example_${example}_test PRIVATE ${sources})
         target_include_directories(
@@ -85,7 +88,10 @@ foreach(snippet ${SNIPPETS})
     )
     add_dependencies(wpilibcExamples_snippets snippet${snippet})
 
-    if(WITH_TESTS AND EXISTS ${CMAKE_SOURCE_DIR}/wpilibcExamples/src/test/cpp/snippets/${snippet})
+    if(
+        WPILIB_WITH_TESTS
+        AND EXISTS ${CMAKE_SOURCE_DIR}/wpilibcExamples/src/test/cpp/snippets/${snippet}
+    )
         wpilib_add_test(Snippet_${snippet} src/test/cpp/snippets/${snippet}/cpp)
         target_sources(Snippet_${snippet}_test PRIVATE ${sources})
         target_include_directories(

@@ -5,16 +5,19 @@
 #pragma once
 
 #include <limits>
-#include <type_traits>
+#include <string>
 
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
+#include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/MathUtil.hpp"
+#include "wpi/units/base.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/util/sendable/SendableRegistry.hpp"
 
 namespace wpi::math {
 namespace detail {
@@ -61,7 +64,7 @@ class ProfiledPIDController
       : m_controller{Kp, Ki, Kd, period},
         m_constraints{constraints},
         m_profile{m_constraints} {
-    if (!std::is_constant_evaluated()) {
+    if !consteval {
       int instances = detail::IncrementAndGetProfiledPIDControllerInstances();
       wpi::math::MathSharedStore::ReportUsage("ProfiledPIDController",
                                               std::to_string(instances));
@@ -83,6 +86,8 @@ class ProfiledPIDController
    *
    * Sets the proportional, integral, and differential coefficients.
    *
+   * This setter is intended for online tuning.
+   *
    * @param Kp The proportional coefficient. Must be >= 0.
    * @param Ki The integral coefficient. Must be >= 0.
    * @param Kd The differential coefficient. Must be >= 0.
@@ -94,6 +99,8 @@ class ProfiledPIDController
   /**
    * Sets the proportional coefficient of the PID controller gain.
    *
+   * This setter is intended for online tuning.
+   *
    * @param Kp The proportional coefficient. Must be >= 0.
    */
   constexpr void SetP(double Kp) { m_controller.SetP(Kp); }
@@ -101,12 +108,16 @@ class ProfiledPIDController
   /**
    * Sets the integral coefficient of the PID controller gain.
    *
+   * This setter is intended for online tuning.
+   *
    * @param Ki The integral coefficient. Must be >= 0.
    */
   constexpr void SetI(double Ki) { m_controller.SetI(Ki); }
 
   /**
    * Sets the differential coefficient of the PID controller gain.
+   *
+   * This setter is intended for online tuning.
    *
    * @param Kd The differential coefficient. Must be >= 0.
    */

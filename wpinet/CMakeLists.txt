@@ -80,7 +80,7 @@ target_compile_features(wpinet PUBLIC cxx_std_23)
 wpilib_target_warnings(wpinet)
 target_link_libraries(wpinet PUBLIC wpiutil)
 
-if(USE_LINKED_AVAHI)
+if(WPILIB_USE_LINKED_AVAHI)
     find_library(AVAHI_COMMON REQUIRED NAMES avahi-common)
     if(AVAHI_COMMON)
         message(STATUS "Found avahi common: ${AVAHI_COMMON}")
@@ -95,7 +95,7 @@ if(USE_LINKED_AVAHI)
     target_compile_definitions(wpinet PRIVATE DIRECT_LINK_AVAHI)
 endif()
 
-if(NOT USE_SYSTEM_LIBUV)
+if(NOT WPILIB_USE_SYSTEM_LIBUV)
     target_sources(wpinet PRIVATE ${uv_native_src})
     install(
         DIRECTORY src/main/native/thirdparty/libuv/include/
@@ -186,7 +186,7 @@ target_link_libraries(netconsoleTee wpinet)
 set_property(TARGET netconsoleServer PROPERTY FOLDER "examples")
 set_property(TARGET netconsoleTee PROPERTY FOLDER "examples")
 
-if(WITH_TESTS)
+if(WPILIB_WITH_TESTS)
     wpilib_add_test_catch2(wpinet src/test/native/cpp)
     target_include_directories(wpinet_test PRIVATE src/test/native/include src/main/native/cpp)
     target_link_libraries(wpinet_test wpinet ${LIBUTIL} wpiutil_testlib)

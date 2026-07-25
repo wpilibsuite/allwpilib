@@ -1,0 +1,51 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Thu, 5 May 2022 18:09:45 -0400
+Subject: [PATCH 11/33] MathExtras: delete numbers
+
+---
+ llvm/include/llvm/Support/MathExtras.h | 31 --------------------------
+ 1 file changed, 31 deletions(-)
+
+diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
+index 78c500e18c7639afc02b595b788333b6b9a4e69b..b8e858f9c530e31430f824cc2d93ff1cc78a92f7 100644
+--- a/llvm/include/llvm/Support/MathExtras.h
++++ b/llvm/include/llvm/Support/MathExtras.h
+@@ -41,37 +41,6 @@ template <typename T, typename U, typename = enableif_int<T, U>>
+ using common_sint =
+     std::common_type_t<std::make_signed_t<T>, std::make_signed_t<U>>;
+ 
+-/// Mathematical constants.
+-namespace numbers {
+-// clang-format off
+-inline constexpr float ef          = e_v<float>;
+-inline constexpr float egammaf     = egamma_v<float>;
+-inline constexpr float ln2f        = ln2_v<float>;
+-inline constexpr float ln10f       = ln10_v<float>;
+-inline constexpr float log2ef      = log2e_v<float>;
+-inline constexpr float log10ef     = log10e_v<float>;
+-inline constexpr float pif         = pi_v<float>;
+-inline constexpr float inv_pif     = inv_pi_v<float>;
+-inline constexpr float inv_sqrtpif = inv_sqrtpi_v<float>;
+-inline constexpr float sqrt2f      = sqrt2_v<float>;
+-inline constexpr float inv_sqrt2f  = inv_sqrt2_v<float>;
+-inline constexpr float sqrt3f      = sqrt3_v<float>;
+-inline constexpr float inv_sqrt3f  = inv_sqrt3_v<float>;
+-inline constexpr float phif        = phi_v<float>;
+-
+-// sqrtpi is not in C++20 std::numbers.
+-template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
+-inline constexpr T sqrtpi_v = T(0x1.c5bf891b4ef6bP+0); // (1.7724538509055160273) https://oeis.org/A002161
+-inline constexpr double sqrtpi  = sqrtpi_v<double>;
+-inline constexpr float  sqrtpif = sqrtpi_v<float>;
+-
+-// These string literals are taken from below:
+-// https://github.com/bminor/glibc/blob/8543577b04ded6d979ffcc5a818930e4d74d0645/math/math.h#L1215-L1229
+-constexpr const char *pis     = "3.141592653589793238462643383279502884",
+-                     *inv_pis = "0.318309886183790671537767526745028724";
+-// clang-format on
+-} // namespace numbers
+-
+ /// Create a bitmask with the N right-most bits set to 1, and all other
+ /// bits set to 0.  Only unsigned types are allowed.
+ template <typename T> constexpr T maskTrailingOnes(unsigned N) {

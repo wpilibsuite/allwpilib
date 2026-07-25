@@ -50,7 +50,7 @@ def main(argv):
     generate_numbers(args.output_directory, args.template_root)
     generate_nanopb(
         args.nanopb_generator,
-        args.output_directory / "main/native/cpp/wpimath/protobuf",
+        args.output_directory / "main/native/cpp",
         args.proto_directory,
     )
     generate_quickbuf(

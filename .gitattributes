@@ -1,4 +1,6 @@
 *.adoc text eol=lf
+*.bzl text eol=lf
+*.bazel text eol=lf
 *.c text eol=lf
 *.clang-format text eol=lf
 *.clang-tidy text eol=lf
@@ -20,6 +22,8 @@
 *.plist text eol=lf
 *.proto text eol=lf
 *.py text eol=lf
+*.rc text eol=lf
+*.sky text eol=lf
 *.txt text eol=lf
 *.wpiformat text eol=lf
 *.wpiformat-license text eol=lf

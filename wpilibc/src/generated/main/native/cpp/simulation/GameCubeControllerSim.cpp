@@ -15,7 +15,7 @@ GameCubeControllerSim::GameCubeControllerSim(const GameCubeController& joystick)
   SetAxesAvailable(0x3F);
   SetButtonsAvailable(0xC07C4FULL);
   SetPOVsAvailable(0);
-  SetGamepadType(GenericHID::HIDType::STANDARD);
+  SetGamepadType(GenericHID::HIDType::GAMECUBE);
   SetSupportedOutputs(GameCubeController::SUPPORTED_OUTPUTS);
 }
 
@@ -23,7 +23,7 @@ GameCubeControllerSim::GameCubeControllerSim(int port) : GenericHIDSim{port} {
   SetAxesAvailable(0x3F);
   SetButtonsAvailable(0xC07C4FULL);
   SetPOVsAvailable(0);
-  SetGamepadType(GenericHID::HIDType::STANDARD);
+  SetGamepadType(GenericHID::HIDType::GAMECUBE);
   SetSupportedOutputs(GameCubeController::SUPPORTED_OUTPUTS);
 }
 

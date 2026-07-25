@@ -35,52 +35,52 @@ class SelectCommand(Command):
 
         assert callable(selector)
 
-        self._defaultCommand = PrintCommand(
+        self._default_command = PrintCommand(
             "SelectCommand selector value does not correspond to any command!"
         )
 
         self._commands = commands
         self._selector = selector
         # This is slightly different than Java but avoids UB
-        self._selectedCommand = self._defaultCommand
-        self._runsWhenDisabled = True
-        self._interruptBehavior = InterruptionBehavior.kCancelIncoming
+        self._selected_command = self._default_command
+        self._runs_when_disabled = True
+        self._interrupt_behavior = InterruptionBehavior.CANCEL_INCOMING
 
-        scheduler = CommandScheduler.getInstance()
-        scheduler.registerComposedCommands([self._defaultCommand])
-        scheduler.registerComposedCommands(commands.values())
+        scheduler = CommandScheduler.get_instance()
+        scheduler.register_composed_commands([self._default_command])
+        scheduler.register_composed_commands(commands.values())
 
         for command in commands.values():
-            self.addRequirements(*command.getRequirements())
-            self._runsWhenDisabled = (
-                self._runsWhenDisabled and command.runsWhenDisabled()
+            self.add_requirements(*command.get_requirements())
+            self._runs_when_disabled = (
+                self._runs_when_disabled and command.runs_when_disabled()
             )
-            if command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf:
-                self._interruptBehavior = InterruptionBehavior.kCancelSelf
+            if command.get_interruption_behavior() == InterruptionBehavior.CANCEL_SELF:
+                self._interrupt_behavior = InterruptionBehavior.CANCEL_SELF
 
     def initialize(self):
-        self._selectedCommand = self._commands.get(
-            self._selector(), self._defaultCommand
+        self._selected_command = self._commands.get(
+            self._selector(), self._default_command
         )
-        self._selectedCommand.initialize()
+        self._selected_command.initialize()
 
     def execute(self):
-        self._selectedCommand.execute()
+        self._selected_command.execute()
 
     def end(self, interrupted: bool):
-        self._selectedCommand.end(interrupted)
+        self._selected_command.end(interrupted)
 
-    def isFinished(self) -> bool:
-        return self._selectedCommand.isFinished()
+    def is_finished(self) -> bool:
+        return self._selected_command.is_finished()
 
-    def runsWhenDisabled(self) -> bool:
-        return self._runsWhenDisabled
+    def runs_when_disabled(self) -> bool:
+        return self._runs_when_disabled
 
-    def getInterruptionBehavior(self) -> InterruptionBehavior:
-        return self._interruptBehavior
+    def get_interruption_behavior(self) -> InterruptionBehavior:
+        return self._interrupt_behavior
 
-    def initSendable(self, builder: SendableBuilder) -> None:
-        super().initSendable(builder)
-        builder.addStringProperty(
-            "selected", lambda: self._defaultCommand.getName(), lambda _: None
+    def init_sendable(self, builder: SendableBuilder) -> None:
+        super().init_sendable(builder)
+        builder.add_string_property(
+            "selected", lambda: self._default_command.get_name(), lambda _: None
         )

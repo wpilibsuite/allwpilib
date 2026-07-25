@@ -12,7 +12,7 @@ from pathlib import Path
 def generate_quickbuf(
     protoc, quickbuf_plugin: Path, output_directory: Path, proto_dir: Path
 ):
-    proto_files = proto_dir.glob("*.proto")
+    proto_files = proto_dir.glob("**/*.proto")
     for path in proto_files:
         absolute_filename = path.absolute()
         subprocess.check_call(
@@ -20,7 +20,7 @@ def generate_quickbuf(
                 protoc,
                 f"--plugin=protoc-gen-quickbuf={quickbuf_plugin}",
                 f"--quickbuf_out=gen_descriptors=true:{output_directory.absolute()}",
-                f"-I{absolute_filename.parent}",
+                f"-I{proto_dir.absolute()}",
                 absolute_filename,
             ]
         )

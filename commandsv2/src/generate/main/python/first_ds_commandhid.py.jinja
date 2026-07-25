@@ -24,13 +24,13 @@ class Command{{ ClassName }}Controller:
                     or the {{ ClassName }}Controller object to use for this controller.
         """
         if isinstance(hid, int):
-            self._hid = CommandGenericHID.getCommandGenericHID(hid)
-            self._controller = {{ ClassName }}Controller(self._hid.getHID())
+            self._hid = CommandGenericHID.get_command_generic_hid(hid)
+            self._controller = {{ ClassName }}Controller(self._hid.get_hid())
         else:
-            self._hid = CommandGenericHID(hid.getHID())
+            self._hid = CommandGenericHID(hid.get_hid())
             self._controller = hid
 
-    def getHID(self) -> CommandGenericHID:
+    def get_hid(self) -> CommandGenericHID:
         """
         Get the underlying CommandGenericHID object.
 
@@ -38,7 +38,7 @@ class Command{{ ClassName }}Controller:
         """
         return self._hid
 
-    def getController(self) -> {{ ClassName }}Controller:
+    def get_controller(self) -> {{ ClassName }}Controller:
         """
         Get the wrapped controller object.
 
@@ -59,43 +59,43 @@ class Command{{ ClassName }}Controller:
         """
         return self._hid.button(button.value, loop)
 {% for button in buttons %}
-    def {{ button.Name }}(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def {{ button.PythonName }}(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
-        Constructs a Trigger instance around the {{ button.DocName }} button's digital signal.
+        Constructs a Trigger instance around the {{ button.PythonDocName }} button's digital signal.
 
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
-        :returns: a Trigger instance representing the {{ button.DocName }} button's digital signal
+        :returns: a Trigger instance representing the {{ button.PythonDocName }} button's digital signal
                   attached to the given loop.
         """
         return self.button({{ ClassName }}Controller.Button.{{ button.ConstantName }}, loop)
 {% endfor -%}
 {% for trigger in triggerAxes %}
-    def {{ trigger.Name }}(
+    def {{ trigger.PythonName }}(
         self,
         threshold: float{% if trigger.HasDefaultThresholdMethod %} = 0.5{% endif %},
         loop: Optional[EventLoop] = None,
     ) -> Trigger:
         """
-        Constructs a Trigger instance around the {{ trigger.DocName }} axis value. The returned
+        Constructs a Trigger instance around the {{ trigger.PythonDocName }} axis value. The returned
         Trigger will be true when the axis value is greater than ``threshold``.
 
         :param threshold: the minimum axis value for the returned Trigger to be true. This value
                           should be in the range [0, 1] where 0 is the unpressed state of the axis.
         :param loop: the event loop instance to attach the Trigger to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
-        :returns: a Trigger instance that is true when the {{ trigger.DocName }} axis exceeds the
+        :returns: a Trigger instance that is true when the {{ trigger.PythonDocName }} axis exceeds the
                   provided threshold, attached to the given event loop.
         """
-        return self.axisGreaterThan(
+        return self.axis_greater_than(
             {{ ClassName }}Controller.Axis.{{ trigger.AxisConstantName }},
             threshold,
             loop,
         )
 {% endfor %}
-    def axisLessThan(
+    def axis_less_than(
         self,
         axis: {{ ClassName }}Controller.Axis,
         threshold: float,
@@ -112,9 +112,9 @@ class Command{{ ClassName }}Controller:
         :returns: a Trigger instance that is true when the axis value is less than
                   the provided threshold.
         """
-        return self._hid.axisLessThan(axis.value, threshold, loop)
+        return self._hid.axis_less_than(axis.value, threshold, loop)
 
-    def axisGreaterThan(
+    def axis_greater_than(
         self,
         axis: {{ ClassName }}Controller.Axis,
         threshold: float,
@@ -131,9 +131,9 @@ class Command{{ ClassName }}Controller:
         :returns: a Trigger instance that is true when the axis value is greater
                   than the provided threshold.
         """
-        return self._hid.axisGreaterThan(axis.value, threshold, loop)
+        return self._hid.axis_greater_than(axis.value, threshold, loop)
 
-    def axisMagnitudeGreaterThan(
+    def axis_magnitude_greater_than(
         self,
         axis: {{ ClassName }}Controller.Axis,
         threshold: float,
@@ -150,21 +150,21 @@ class Command{{ ClassName }}Controller:
         :returns: a Trigger instance that is true when the axis magnitude is
                   greater than the provided threshold.
         """
-        return self._hid.axisMagnitudeGreaterThan(axis.value, threshold, loop)
+        return self._hid.axis_magnitude_greater_than(axis.value, threshold, loop)
 
-    def getAxis(self, axis: {{ ClassName }}Controller.Axis) -> float:
+    def get_axis(self, axis: {{ ClassName }}Controller.Axis) -> float:
         """
         Get the value of the axis.
 
         :param axis: the :class:`wpilib.{{ ClassName }}Controller.Axis` to read
         """
-        return self._hid.getRawAxis(axis.value)
+        return self._hid.get_raw_axis(axis.value)
 {% for axis in axes %}
-    def get{{ axis.MethodName }}(self) -> float:
+    def get_{{ axis.PythonName }}(self) -> float:
         """
-        Get the {{ axis.DocName }} value of the controller.
+        Get the {{ axis.PythonDocName }} value of the controller.
 
         :returns: the axis value.
         """
-        return self._controller.get{{ axis.MethodName }}()
+        return self._controller.get_{{ axis.PythonName }}()
 {% endfor -%}

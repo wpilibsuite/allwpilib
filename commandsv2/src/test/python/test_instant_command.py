@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 import pytest
 
 
-def test_instantCommandSchedule(scheduler: commands2.CommandScheduler):
+def test_instant_command_schedule(scheduler: commands2.CommandScheduler):
     cond = OOBoolean()
 
     command = commands2.InstantCommand(lambda: cond.set(True))
@@ -18,4 +18,4 @@ def test_instantCommandSchedule(scheduler: commands2.CommandScheduler):
     scheduler.run()
 
     assert cond
-    assert not scheduler.isScheduled(command)
+    assert not scheduler.is_scheduled(command)

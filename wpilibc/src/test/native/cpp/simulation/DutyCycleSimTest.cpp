@@ -13,7 +13,7 @@
 namespace wpi::sim {
 
 TEST(DutyCycleSimTest, Initialization) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   DutyCycleSim sim = DutyCycleSim::CreateForChannel(2);
   EXPECT_FALSE(sim.GetInitialized());
 
@@ -32,7 +32,7 @@ TEST(DutyCycleSimTest, Initialization) {
 }
 
 TEST(DutyCycleSimTest, SetFrequency) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   DutyCycle dc{2};
   DutyCycleSim sim(dc);
@@ -48,7 +48,7 @@ TEST(DutyCycleSimTest, SetFrequency) {
 }
 
 TEST(DutyCycleSimTest, SetOutput) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   DutyCycle dc{2};
   DutyCycleSim sim(dc);

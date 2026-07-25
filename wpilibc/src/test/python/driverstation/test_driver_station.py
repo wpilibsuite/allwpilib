@@ -1,7 +1,7 @@
 import pytest
 
 from wpilib import DriverStationBackend, Joystick
-from wpilib.simulation import DriverStationSim, stepTiming
+from wpilib.simulation import DriverStationSim, step_timing
 
 
 @pytest.mark.parametrize(
@@ -16,12 +16,12 @@ from wpilib.simulation import DriverStationSim, stepTiming
     ],
 )
 def test_is_joystick_connected(wpilib_state, axes_max, buttons_max, povs_max, expected):
-    DriverStationSim.setJoystickAxesMaximumIndex(1, axes_max)
-    DriverStationSim.setJoystickButtonsMaximumIndex(1, buttons_max)
-    DriverStationSim.setJoystickPOVsMaximumIndex(1, povs_max)
-    DriverStationSim.notifyNewData()
+    DriverStationSim.set_joystick_axes_maximum_index(1, axes_max)
+    DriverStationSim.set_joystick_buttons_maximum_index(1, buttons_max)
+    DriverStationSim.set_joystick_povs_maximum_index(1, povs_max)
+    DriverStationSim.notify_new_data()
 
-    assert DriverStationBackend.isJoystickConnected(1) == expected
+    assert DriverStationBackend.is_joystick_connected(1) == expected
 
 
 @pytest.mark.parametrize(
@@ -51,16 +51,17 @@ def test_is_joystick_connected(wpilib_state, axes_max, buttons_max, povs_max, ex
 def test_joystick_connection_warnings(
     wpilib_state, fms_attached, silenced, expected_silenced, expected_warning, capsys
 ):
-    DriverStationSim.setFmsAttached(fms_attached)
-    DriverStationSim.notifyNewData()
-    DriverStationBackend.silenceJoystickConnectionWarning(silenced)
+    DriverStationSim.set_fms_attached(fms_attached)
+    DriverStationSim.notify_new_data()
+    DriverStationBackend.silence_joystick_connection_warning(silenced)
 
     joystick = Joystick(0)
-    joystick.getRawButton(1)
+    joystick.get_raw_button(1)
 
-    stepTiming(1.0)
+    step_timing(1.0)
     assert (
-        DriverStationBackend.isJoystickConnectionWarningSilenced() == expected_silenced
+        DriverStationBackend.is_joystick_connection_warning_silenced()
+        == expected_silenced
     )
 
     # Capture stderr to check for warnings

@@ -24,23 +24,23 @@ class DriveTime(commands2.Command):
         self.velocity = velocity
         self.duration = time
         self.drive = drive
-        self.addRequirements(drive)
+        self.add_requirements(drive)
 
-        self.startTime = 0.0
+        self.start_time = 0.0
 
     def initialize(self) -> None:
         """Called when the command is initially scheduled."""
-        self.startTime = wpilib.Timer.getTimestamp()
-        self.drive.arcadeDrive(0, 0)
+        self.start_time = wpilib.Timer.get_timestamp()
+        self.drive.arcade_drive(0, 0)
 
     def execute(self) -> None:
         """Called every time the scheduler runs while the command is scheduled."""
-        self.drive.arcadeDrive(self.velocity, 0)
+        self.drive.arcade_drive(self.velocity, 0)
 
     def end(self, interrupted: bool) -> None:
         """Called once the command ends or is interrupted."""
-        self.drive.arcadeDrive(0, 0)
+        self.drive.arcade_drive(0, 0)
 
-    def isFinished(self) -> bool:
+    def is_finished(self) -> bool:
         """Returns true when the command should end"""
-        return wpilib.Timer.getTimestamp() - self.startTime >= self.duration
+        return wpilib.Timer.get_timestamp() - self.start_time >= self.duration

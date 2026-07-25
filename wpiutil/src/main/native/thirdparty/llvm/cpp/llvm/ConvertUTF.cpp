@@ -62,6 +62,7 @@
 ------------------------------------------------------------------------ */
 
 #include "wpi/util/ConvertUTF.hpp"
+#include "wpi/util/SmallVector.hpp"
 #ifdef CVTUTF_DEBUG
 #include <stdio.h>
 #endif
@@ -69,7 +70,16 @@
 
 #ifdef _WIN32
 #include "wpi/util/WindowsError.hpp"
-#include "Windows/WindowsSupport.hpp"
+// mingw-w64 tends to define it as 0x0502 in its headers.
+#undef _WIN32_WINNT
+
+// Require at least Windows 7 API.
+#define _WIN32_WINNT 0x0601
+#define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
 #endif
 
 /*

@@ -6,6 +6,7 @@
 
 #include <array>
 #include <concepts>
+#include <cstddef>
 #include <random>
 #include <span>
 

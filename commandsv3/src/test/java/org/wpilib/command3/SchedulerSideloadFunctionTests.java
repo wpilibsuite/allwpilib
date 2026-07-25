@@ -40,6 +40,21 @@ class SchedulerSideloadFunctionTests extends CommandTestBase {
   }
 
   @Test
+  void multiplePeriodicSideloads() {
+    int periodicCount = 4;
+    AtomicInteger count = new AtomicInteger(0);
+    for (int i = 0; i < periodicCount; i++) {
+      m_scheduler.addPeriodic(count::incrementAndGet);
+    }
+    assertEquals(0, count.get());
+
+    m_scheduler.run();
+    assertEquals(periodicCount, count.get());
+    m_scheduler.run();
+    assertEquals(periodicCount * 2, count.get());
+  }
+
+  @Test
   void sideloadSchedulingCommand() {
     var command = Command.noRequirements(Coroutine::park).named("Command");
     // one-shot sideload forks a command and immediately exits

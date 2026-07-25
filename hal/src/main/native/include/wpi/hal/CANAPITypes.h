@@ -62,10 +62,10 @@ HAL_ENUM(HAL_CANManufacturer) {
   HAL_CAN_MAN_BROADCAST = 0,
   /// National Instruments.
   HAL_CAN_MAN_NI = 1,
-  /// Luminary Micro.
-  HAL_CAN_MAN_LM = 2,
-  /// DEKA Research and Development Corp.
-  HAL_CAN_MAN_DEKA = 3,
+  /// Limelight.
+  HAL_CAN_MAN_LIMELIGHT = 2,
+  /// FIRST.
+  HAL_CAN_MAN_FIRST = 3,
   /// Cross the Road Electronics.
   HAL_CAN_MAN_CTRE = 4,
   /// REV robotics.

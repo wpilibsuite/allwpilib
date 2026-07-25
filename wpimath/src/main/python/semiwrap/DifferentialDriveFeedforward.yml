@@ -1,3 +1,6 @@
+extra_includes:
+- wpystruct.h
+
 classes:
   wpi::math::DifferentialDriveFeedforward:
     force_type_casters:
@@ -39,3 +42,6 @@ classes:
           #     kAAngular:
           #       x_type: decltype(1_V / 1_mps_sq)
       Calculate:
+
+inline_code: |
+  SetupWPyStruct<wpi::math::DifferentialDriveFeedforward>(cls_DifferentialDriveFeedforward);

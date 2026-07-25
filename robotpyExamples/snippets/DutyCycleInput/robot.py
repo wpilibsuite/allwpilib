@@ -13,15 +13,15 @@ class MyRobot(wpilib.TimedRobot):
         """Robot initialization function"""
         super().__init__()
 
-        self.dutyCycle = wpilib.DutyCycle(0)
+        self.duty_cycle = wpilib.DutyCycle(0)
 
-    def robotPeriodic(self):
+    def robot_periodic(self):
         # Duty Cycle Frequency in Hz
-        frequency = self.dutyCycle.getFrequency()
+        frequency = self.duty_cycle.get_frequency()
 
         # Output of duty cycle, ranging from 0 to 1
         # 1 is fully on, 0 is fully off
-        output = self.dutyCycle.getOutput()
+        output = self.duty_cycle.get_output()
 
-        wpilib.SmartDashboard.putNumber("Frequency", frequency)
-        wpilib.SmartDashboard.putNumber("Duty Cycle", output)
+        wpilib.SmartDashboard.put_number("Frequency", frequency)
+        wpilib.SmartDashboard.put_number("Duty Cycle", output)

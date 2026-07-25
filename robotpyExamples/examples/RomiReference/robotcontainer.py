@@ -29,7 +29,7 @@ class RobotContainer:
     def __init__(self) -> None:
         # The robot's subsystems and commands are defined here...
         self.drivetrain = Drivetrain()
-        self.onboardIO = romi.OnBoardIO(
+        self.onboard_io = romi.OnBoardIO(
             romi.OnBoardIO.ChannelMode.INPUT, romi.OnBoardIO.ChannelMode.INPUT
         )
 
@@ -50,9 +50,9 @@ class RobotContainer:
         #
         # Your subsystem configuration should take the overlays into account
 
-        self._configureButtonBindings()
+        self._configure_button_bindings()
 
-    def _configureButtonBindings(self):
+    def _configure_button_bindings(self):
         """Use this method to define your button->command mappings. Buttons can be created by
         instantiating a :class:`.GenericHID` or one of its subclasses (:class`.Joystick or
         :class:`.XboxController`), and then passing it to a :class:`.JoystickButton`.
@@ -60,31 +60,33 @@ class RobotContainer:
 
         # Default command is arcade drive. This will run unless another command
         # is scheduler over it
-        self.drivetrain.setDefaultCommand(self.getArcadeDriveCommand())
+        self.drivetrain.set_default_command(self.get_arcade_drive_command())
 
         # Example of how to use the onboard IO
-        onboardButtonA = commands2.button.Trigger(self.onboardIO.getButtonAPressed)
-        onboardButtonA.onTrue(commands2.PrintCommand("Button A Pressed")).onFalse(
+        onboard_button_a = commands2.button.Trigger(
+            self.onboard_io.get_button_a_pressed
+        )
+        onboard_button_a.on_true(commands2.PrintCommand("Button A Pressed")).on_false(
             commands2.PrintCommand("Button A Released")
         )
 
         # Setup SmartDashboard options
-        self.chooser.setDefaultOption(
+        self.chooser.set_default_option(
             "Auto Routine Distance", AutonomousDistance(self.drivetrain)
         )
-        self.chooser.addOption("Auto Routine Time", AutonomousTime(self.drivetrain))
-        wpilib.SmartDashboard.putData(self.chooser)
+        self.chooser.add_option("Auto Routine Time", AutonomousTime(self.drivetrain))
+        wpilib.SmartDashboard.put_data(self.chooser)
 
-    def getAutonomousCommand(self) -> typing.Optional[commands2.Command]:
-        return self.chooser.getSelected()
+    def get_autonomous_command(self) -> typing.Optional[commands2.Command]:
+        return self.chooser.get_selected()
 
-    def getArcadeDriveCommand(self) -> ArcadeDrive:
+    def get_arcade_drive_command(self) -> ArcadeDrive:
         """Use this to pass the teleop command to the main robot class.
 
         :returns: the command to run in teleop
         """
         return ArcadeDrive(
             self.drivetrain,
-            lambda: -self.controller.getRawAxis(1),
-            lambda: -self.controller.getRawAxis(2),
+            lambda: -self.controller.get_raw_axis(1),
+            lambda: -self.controller.get_raw_axis(2),
         )

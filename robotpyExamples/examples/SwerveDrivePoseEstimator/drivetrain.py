@@ -17,97 +17,97 @@ from exampleglobalmeasurementsensor import ExampleGlobalMeasurementSensor
 class Drivetrain:
     """Represents a swerve drive style drivetrain."""
 
-    kMaxVelocity = 3.0  # 3 meters per second
-    kMaxAngularVelocity = math.pi  # 1/2 rotation per second
+    MAX_VELOCITY = 3.0  # 3 meters per second
+    MAX_ANGULAR_VELOCITY = math.pi  # 1/2 rotation per second
 
     def __init__(self) -> None:
-        self.frontLeftLocation = wpimath.Translation2d(0.381, 0.381)
-        self.frontRightLocation = wpimath.Translation2d(0.381, -0.381)
-        self.backLeftLocation = wpimath.Translation2d(-0.381, 0.381)
-        self.backRightLocation = wpimath.Translation2d(-0.381, -0.381)
+        self.front_left_location = wpimath.Translation2d(0.381, 0.381)
+        self.front_right_location = wpimath.Translation2d(0.381, -0.381)
+        self.back_left_location = wpimath.Translation2d(-0.381, 0.381)
+        self.back_right_location = wpimath.Translation2d(-0.381, -0.381)
 
-        self.frontLeft = swervemodule.SwerveModule(1, 2, 0, 1, 2, 3)
-        self.frontRight = swervemodule.SwerveModule(3, 4, 4, 5, 6, 7)
-        self.backLeft = swervemodule.SwerveModule(5, 6, 8, 9, 10, 11)
-        self.backRight = swervemodule.SwerveModule(7, 8, 12, 13, 14, 15)
+        self.front_left = swervemodule.SwerveModule(1, 2, 0, 1, 2, 3)
+        self.front_right = swervemodule.SwerveModule(3, 4, 4, 5, 6, 7)
+        self.back_left = swervemodule.SwerveModule(5, 6, 8, 9, 10, 11)
+        self.back_right = swervemodule.SwerveModule(7, 8, 12, 13, 14, 15)
 
         self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.FLAT)
 
         self.kinematics = wpimath.SwerveDrive4Kinematics(
-            self.frontLeftLocation,
-            self.frontRightLocation,
-            self.backLeftLocation,
-            self.backRightLocation,
+            self.front_left_location,
+            self.front_right_location,
+            self.back_left_location,
+            self.back_right_location,
         )
 
         # Here we use SwerveDrivePoseEstimator so that we can fuse odometry readings. The numbers
         # used below are robot specific, and should be tuned.
-        self.poseEstimator = wpimath.SwerveDrive4PoseEstimator(
+        self.pose_estimator = wpimath.SwerveDrive4PoseEstimator(
             self.kinematics,
-            self.imu.getRotation2d(),
+            self.imu.get_rotation2d(),
             (
-                self.frontLeft.getPosition(),
-                self.frontRight.getPosition(),
-                self.backLeft.getPosition(),
-                self.backRight.getPosition(),
+                self.front_left.get_position(),
+                self.front_right.get_position(),
+                self.back_left.get_position(),
+                self.back_right.get_position(),
             ),
             wpimath.Pose2d(),
-            (0.05, 0.05, wpimath.units.degreesToRadians(5)),
-            (0.5, 0.5, wpimath.units.degreesToRadians(30)),
+            (0.05, 0.05, wpimath.units.degrees_to_radians(5)),
+            (0.5, 0.5, wpimath.units.degrees_to_radians(30)),
         )
 
-        self.imu.resetYaw()
+        self.imu.reset_yaw()
 
     def drive(
         self,
-        xVelocity: float,
-        yVelocity: float,
+        x_velocity: float,
+        y_velocity: float,
         rot: float,
-        fieldRelative: bool,
+        field_relative: bool,
         period: float,
     ) -> None:
         """Method to drive the robot using joystick info.
 
-        :param xVelocity: Velocity of the robot in the x direction (forward).
-        :param yVelocity: Velocity of the robot in the y direction (sideways).
+        :param x_velocity: Velocity of the robot in the x direction (forward).
+        :param y_velocity: Velocity of the robot in the y direction (sideways).
         :param rot: Angular rate of the robot.
-        :param fieldRelative: Whether the provided x and y velocities are relative to the field.
+        :param field_relative: Whether the provided x and y velocities are relative to the field.
         """
-        chassisVelocities = wpimath.ChassisVelocities(xVelocity, yVelocity, rot)
-        if fieldRelative:
-            chassisVelocities = chassisVelocities.toRobotRelative(
-                self.poseEstimator.getEstimatedPosition().rotation()
+        chassis_velocities = wpimath.ChassisVelocities(x_velocity, y_velocity, rot)
+        if field_relative:
+            chassis_velocities = chassis_velocities.to_robot_relative(
+                self.pose_estimator.get_estimated_position().rotation()
             )
 
-        chassisVelocities = chassisVelocities.discretize(period)
+        chassis_velocities = chassis_velocities.discretize(period)
 
-        velocities = wpimath.SwerveDrive4Kinematics.desaturateWheelVelocities(
-            self.kinematics.toSwerveModuleVelocities(chassisVelocities),
-            self.kMaxVelocity,
+        velocities = wpimath.SwerveDrive4Kinematics.desaturate_wheel_velocities(
+            self.kinematics.to_swerve_module_velocities(chassis_velocities),
+            self.MAX_VELOCITY,
         )
 
-        self.frontLeft.setDesiredVelocity(velocities[0])
-        self.frontRight.setDesiredVelocity(velocities[1])
-        self.backLeft.setDesiredVelocity(velocities[2])
-        self.backRight.setDesiredVelocity(velocities[3])
+        self.front_left.set_desired_velocity(velocities[0])
+        self.front_right.set_desired_velocity(velocities[1])
+        self.back_left.set_desired_velocity(velocities[2])
+        self.back_right.set_desired_velocity(velocities[3])
 
-    def updateOdometry(self) -> None:
+    def update_odometry(self) -> None:
         """Updates the field relative position of the robot."""
-        self.poseEstimator.update(
-            self.imu.getRotation2d(),
+        self.pose_estimator.update(
+            self.imu.get_rotation2d(),
             (
-                self.frontLeft.getPosition(),
-                self.frontRight.getPosition(),
-                self.backLeft.getPosition(),
-                self.backRight.getPosition(),
+                self.front_left.get_position(),
+                self.front_right.get_position(),
+                self.back_left.get_position(),
+                self.back_right.get_position(),
             ),
         )
 
         # Also apply vision measurements. We use 0.3 seconds in the past as an example -- on
         # a real robot, this must be calculated based either on latency or timestamps.
-        self.poseEstimator.addVisionMeasurement(
-            ExampleGlobalMeasurementSensor.getEstimatedGlobalPose(
-                self.poseEstimator.getEstimatedPosition()
+        self.pose_estimator.add_vision_measurement(
+            ExampleGlobalMeasurementSensor.get_estimated_global_pose(
+                self.pose_estimator.get_estimated_position()
             ),
-            wpilib.Timer.getTimestamp() - 0.3,
+            wpilib.Timer.get_timestamp() - 0.3,
         )

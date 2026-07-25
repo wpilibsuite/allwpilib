@@ -1,0 +1,231 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 3 May 2022 20:22:38 -0400
+Subject: [PATCH 14/33] Windows support
+
+---
+ llvm/lib/Support/ConvertUTF.cpp    | 105 +++++++++++++++++++++++++++++
+ llvm/lib/Support/ErrorHandling.cpp |  22 +++---
+ llvm/lib/Support/raw_ostream.cpp   |  17 +++--
+ 3 files changed, 128 insertions(+), 16 deletions(-)
+
+diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
+index 63f92631d5b473cf9a69a06eddf4271304e8c730..835fdf2fd178b1e03596fd5e64bfddf93904e766 100644
+--- a/llvm/lib/Support/ConvertUTF.cpp
++++ b/llvm/lib/Support/ConvertUTF.cpp
+@@ -62,11 +62,26 @@
+ ------------------------------------------------------------------------ */
+ 
+ #include "llvm/Support/ConvertUTF.h"
++#include "wpi/util/SmallVector.hpp"
+ #ifdef CVTUTF_DEBUG
+ #include <stdio.h>
+ #endif
+ #include <assert.h>
+ 
++#ifdef _WIN32
++#include "wpi/util/WindowsError.hpp"
++// mingw-w64 tends to define it as 0x0502 in its headers.
++#undef _WIN32_WINNT
++
++// Require at least Windows 7 API.
++#define _WIN32_WINNT 0x0601
++#define WIN32_LEAN_AND_MEAN
++#ifndef NOMINMAX
++#define NOMINMAX
++#endif
++#include <windows.h>
++#endif
++
+ /*
+  * This code extensively uses fall-through switches.
+  * Keep the compiler from warning about that.
+@@ -759,6 +774,96 @@ ConversionResult ConvertUTF8toUTF32(const UTF8 **sourceStart,
+ 
+    --------------------------------------------------------------------- */
+ 
++#ifdef _WIN32
++
++namespace sys {
++namespace windows {
++std::error_code CodePageToUTF16(unsigned codepage,
++                                std::string_view original,
++                                wpi::util::SmallVectorImpl<wchar_t> &utf16) {
++  if (!original.empty()) {
++    int len = ::MultiByteToWideChar(codepage, MB_ERR_INVALID_CHARS, original.data(),
++                                    original.size(), utf16.begin(), 0);
++
++    if (len == 0) {
++      return mapWindowsError(::GetLastError());
++    }
++
++    utf16.reserve(len + 1);
++    utf16.resize_for_overwrite(len);
++
++    len = ::MultiByteToWideChar(codepage, MB_ERR_INVALID_CHARS, original.data(),
++                                original.size(), utf16.begin(), utf16.size());
++
++    if (len == 0) {
++      return mapWindowsError(::GetLastError());
++    }
++  }
++
++  // Make utf16 null terminated.
++  utf16.push_back(0);
++  utf16.pop_back();
++
++  return std::error_code();
++}
++
++std::error_code UTF8ToUTF16(std::string_view utf8,
++                            wpi::util::SmallVectorImpl<wchar_t> &utf16) {
++  return CodePageToUTF16(CP_UTF8, utf8, utf16);
++}
++
++std::error_code CurCPToUTF16(std::string_view curcp,
++                            wpi::util::SmallVectorImpl<wchar_t> &utf16) {
++  return CodePageToUTF16(CP_ACP, curcp, utf16);
++}
++
++static
++std::error_code UTF16ToCodePage(unsigned codepage, const wchar_t *utf16,
++                                size_t utf16_len,
++                                wpi::util::SmallVectorImpl<char> &converted) {
++  if (utf16_len) {
++    // Get length.
++    int len = ::WideCharToMultiByte(codepage, 0, utf16, utf16_len, converted.begin(),
++                                    0, NULL, NULL);
++
++    if (len == 0) {
++      return mapWindowsError(::GetLastError());
++    }
++
++    converted.reserve(len);
++    converted.resize_for_overwrite(len);
++
++    // Now do the actual conversion.
++    len = ::WideCharToMultiByte(codepage, 0, utf16, utf16_len, converted.data(),
++                                converted.size(), NULL, NULL);
++
++    if (len == 0) {
++      return mapWindowsError(::GetLastError());
++    }
++  }
++
++  // Make the new string null terminated.
++  converted.push_back(0);
++  converted.pop_back();
++
++  return std::error_code();
++}
++
++std::error_code UTF16ToUTF8(const wchar_t *utf16, size_t utf16_len,
++                            wpi::util::SmallVectorImpl<char> &utf8) {
++  return UTF16ToCodePage(CP_UTF8, utf16, utf16_len, utf8);
++}
++
++std::error_code UTF16ToCurCP(const wchar_t *utf16, size_t utf16_len,
++                             wpi::util::SmallVectorImpl<char> &curcp) {
++  return UTF16ToCodePage(CP_ACP, utf16, utf16_len, curcp);
++}
++
++} // end namespace windows
++} // end namespace sys
++
++#endif  // _WIN32
++
+ } // namespace llvm
+ 
+ ConvertUTF_RESTORE_WARNINGS
+diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+index fd5b46a2c7633391f6c7407483255963210aa056..0a7d0c3953994618043ca3058c321ef43eb1394f 100644
+--- a/llvm/lib/Support/ErrorHandling.cpp
++++ b/llvm/lib/Support/ErrorHandling.cpp
+@@ -60,7 +60,11 @@ static std::mutex BadAllocErrorHandlerMutex;
+ 
+ static bool write_retry(int fd, const char *buf, size_t count) {
+   while (count > 0) {
++#ifdef _WIN32
++    int written = sys::RetryAfterSignal(-1, ::_write, fd, buf, count);
++#else
+     ssize_t written = sys::RetryAfterSignal(-1, ::write, fd, buf, count);
++#endif
+     if (written <= 0)
+       return false;
+     buf += written;
+@@ -115,15 +119,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
+     write_retry(2, MessageStr.data(), MessageStr.size());
+   }
+ 
+-  // If we reached here, we are failing ungracefully. Run the interrupt handlers
+-  // to make sure any special cleanups get done, in particular that we remove
+-  // files registered with RemoveFileOnSignal.
+-  sys::RunInterruptHandlers();
+-
+-  if (GenCrashDiag)
+-    abort();
+-  else
+-    exit(1);
++  exit(1);
+ }
+ 
+ void llvm::reportFatalInternalError(const char *reason) {
+@@ -238,8 +234,14 @@ void LLVMResetFatalErrorHandler() {
+ 
+ #ifdef _WIN32
+ 
++// mingw-w64 tends to define it as 0x0502 in its headers.
++#undef _WIN32_WINNT
++
++// Require at least Windows 7 API.
++#define _WIN32_WINNT 0x0601
++#define WIN32_LEAN_AND_MEAN
+ #define WIN32_NO_STATUS
+-#include "llvm/Support/Windows/WindowsSupport.h"
++#include <windows.h>
+ #undef WIN32_NO_STATUS
+ #include <ntstatus.h>
+ #include <winerror.h>
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index 475ac02b5f06f83ee125e02473d17f3a677a2e4c..f8c0a38f6ccd82c844e69b4ffb6aefad223772e3 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -63,7 +63,17 @@
+ #ifdef _WIN32
+ #include "llvm/Support/ConvertUTF.h"
+ #include "llvm/Support/Signals.h"
+-#include "llvm/Support/Windows/WindowsSupport.h"
++// mingw-w64 tends to define it as 0x0502 in its headers.
++#undef _WIN32_WINNT
++
++// Require at least Windows 7 API.
++#define _WIN32_WINNT 0x0601
++#define WIN32_LEAN_AND_MEAN
++#ifndef NOMINMAX
++#define NOMINMAX
++#endif
++#define WIN32_NO_STATUS
++#include <windows.h>
+ #endif
+ 
+ using namespace llvm;
+@@ -440,11 +450,7 @@ static bool write_console_impl(int FD, std::string_view Data) {
+   if (auto EC = sys::windows::UTF8ToUTF16(Data, WideText))
+     return false;
+ 
+-  // On Windows 7 and earlier, WriteConsoleW has a low maximum amount of data
+-  // that can be written to the console at a time.
+   size_t MaxWriteSize = WideText.size();
+-  if (!RunningWindows8OrGreater())
+-    MaxWriteSize = 32767;
+ 
+   size_t WCharsWritten = 0;
+   do {
+@@ -519,7 +525,6 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+       DWORD WinLastError = GetLastError();
+       if (WinLastError == ERROR_BROKEN_PIPE ||
+           (WinLastError == ERROR_NO_DATA && errno == EINVAL)) {
+-        llvm::sys::CallOneShotPipeSignalHandler();
+         errno = EPIPE;
+       }
+ #endif

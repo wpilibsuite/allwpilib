@@ -6,11 +6,10 @@
 
 #include <algorithm>
 #include <concepts>
+#include <format>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "Message.hpp"
 #include "MessageHandler.hpp"
@@ -45,11 +44,11 @@ static std::string* ObjGetString(wpi::util::json& obj, std::string_view key,
                                  std::string* error) {
   auto val = obj.lookup(key);
   if (!val) {
-    *error = fmt::format("no {} key", key);
+    *error = std::format("no {} key", key);
     return nullptr;
   }
   if (!val->is_string()) {
-    *error = fmt::format("{} must be a string", key);
+    *error = std::format("{} must be a string", key);
     return nullptr;
   }
   return &val->get_string();
@@ -59,11 +58,11 @@ static bool ObjGetNumber(wpi::util::json& obj, std::string_view key,
                          std::string* error, int64_t* num) {
   auto val = obj.lookup(key);
   if (!val) {
-    *error = fmt::format("no {} key", key);
+    *error = std::format("no {} key", key);
     return false;
   }
   if (!GetNumber(*val, num)) {
-    *error = fmt::format("{} must be a number", key);
+    *error = std::format("{} must be a number", key);
     return false;
   }
   return true;
@@ -75,11 +74,11 @@ static bool ObjGetStringArray(wpi::util::json& obj, std::string_view key,
   // prefixes
   auto val = obj.lookup(key);
   if (!val) {
-    *error = fmt::format("no {} key", key);
+    *error = std::format("no {} key", key);
     return false;
   }
   if (!val->is_array()) {
-    *error = fmt::format("{} must be an array", key);
+    *error = std::format("{} must be an array", key);
     return false;
   }
   auto& arr = val->get_array();
@@ -87,19 +86,13 @@ static bool ObjGetStringArray(wpi::util::json& obj, std::string_view key,
   out->reserve(arr.size());
   for (auto&& jval : arr) {
     if (!jval.is_string()) {
-      *error = fmt::format("{}/{} must be a string", key, out->size());
+      *error = std::format("{}/{} must be a string", key, out->size());
       return false;
     }
     out->emplace_back(jval.get_string());
   }
   return true;
 }
-
-// avoid a fmtlib "unused type alias 'char_type'" warning false positive
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-local-typedef"
-#endif
 
 template <typename T>
   requires(std::same_as<T, ClientMessageHandler> ||
@@ -310,7 +303,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           out.ClientUnsubscribe(subuid);
           rv = true;
         } else {
-          error = fmt::format("unrecognized method '{}'", *method);
+          error = std::format("unrecognized method '{}'", *method);
           goto err;
         }
       } else if constexpr (std::same_as<T, ServerMessageHandler>) {
@@ -424,7 +417,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           // complete
           out.ServerPropertiesUpdate(*name, *update, ack);
         } else {
-          error = fmt::format("unrecognized method '{}'", *method);
+          error = std::format("unrecognized method '{}'", *method);
           goto err;
         }
       }
@@ -436,10 +429,6 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
 
   return rv;
 }
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 bool wpi::nt::net::WireDecodeText(std::string_view in,
                                   ClientMessageHandler& out,
@@ -580,7 +569,7 @@ bool wpi::nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
       break;
     }
     default:
-      *error = fmt::format("unrecognized type {}", type);
+      *error = std::format("unrecognized type {}", type);
       mpack_done_array(&reader);
       mpack_reader_destroy(&reader);
       return false;

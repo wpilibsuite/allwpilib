@@ -8,7 +8,7 @@ from wpilib import SendableChooser, SmartDashboard
 def chooser() -> SendableChooser:
     chooser = SendableChooser()
     for i in range(1, 4):
-        chooser.addOption(str(i), i)
+        chooser.add_option(str(i), i)
     return chooser
 
 
@@ -16,29 +16,29 @@ def chooser() -> SendableChooser:
 def test_returns_selected(
     nt: NetworkTableInstance, chooser: SendableChooser, value: int
 ):
-    chooser.setDefaultOption("0", 0)
+    chooser.set_default_option("0", 0)
 
-    with nt.getStringTopic(
+    with nt.get_string_topic(
         "/SmartDashboard/ReturnsSelectedChooser/selected"
     ).publish() as pub:
-        SmartDashboard.putData("ReturnsSelectedChooser", chooser)
-        SmartDashboard.updateValues()
+        SmartDashboard.put_data("ReturnsSelectedChooser", chooser)
+        SmartDashboard.update_values()
         print("set", value)
         pub.set(str(value))
-        SmartDashboard.updateValues()
-        print("get", chooser.getSelected())
-        assert value == chooser.getSelected()
+        SmartDashboard.update_values()
+        print("get", chooser.get_selected())
+        assert value == chooser.get_selected()
 
 
 def test_default_is_returned_on_no_select(chooser: SendableChooser):
-    chooser.setDefaultOption("4", 4)
-    assert 4 == chooser.getSelected()
+    chooser.set_default_option("4", 4)
+    assert 4 == chooser.get_selected()
 
 
 def test_default_constructable_is_returned_on_no_select_and_no_default(
     chooser: SendableChooser,
 ):
-    assert chooser.getSelected() is None
+    assert chooser.get_selected() is None
 
 
 def test_change_listener(nt: NetworkTableInstance, chooser: SendableChooser):
@@ -47,9 +47,9 @@ def test_change_listener(nt: NetworkTableInstance, chooser: SendableChooser):
     def on_change(val):
         current_val[0] = val
 
-    chooser.onChange(on_change)
-    SmartDashboard.putData("ChangeListenerChooser", chooser)
-    SmartDashboard.updateValues()
-    SmartDashboard.putString("ChangeListenerChooser/selected", "3")
-    SmartDashboard.updateValues()
+    chooser.on_change(on_change)
+    SmartDashboard.put_data("ChangeListenerChooser", chooser)
+    SmartDashboard.update_values()
+    SmartDashboard.put_string("ChangeListenerChooser/selected", "3")
+    SmartDashboard.update_values()
     assert 3 == current_val[0]

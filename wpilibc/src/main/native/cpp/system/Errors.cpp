@@ -4,8 +4,11 @@
 
 #include "wpi/system/Errors.hpp"
 
+#include <format>
+#include <iterator>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "wpi/hal/DriverStation.hpp"
 #include "wpi/hal/HAL.h"
@@ -27,7 +30,7 @@ RuntimeError::RuntimeError(int32_t code, const char* fileName, int lineNumber,
                            std::string&& message)
     : RuntimeError{
           code,
-          fmt::format("{} [{}:{}]", funcName,
+          std::format("{} [{}:{}]", funcName,
                       fs::path{fileName}.filename().string(), lineNumber),
           std::move(stack), std::move(message)} {}
 
@@ -54,14 +57,14 @@ const char* wpi::GetErrorMessage(int32_t* code) {
 }
 
 void wpi::ReportErrorV(int32_t status, const char* fileName, int lineNumber,
-                       const char* funcName, fmt::string_view format,
-                       fmt::format_args args) {
+                       const char* funcName, std::string_view format,
+                       std::format_args args) {
   if (status == 0) {
     return;
   }
-  fmt::memory_buffer out;
-  fmt::format_to(fmt::appender{out}, "{}: ", GetErrorMessage(&status));
-  fmt::vformat_to(fmt::appender{out}, format, args);
+  std::vector<char> out;
+  std::format_to(std::back_inserter(out), "{}: ", GetErrorMessage(&status));
+  std::vformat_to(std::back_inserter(out), format, args);
   out.push_back('\0');
   wpi::hal::SendError(status < 0, status, out.data(), funcName,
                       wpi::util::GetStackTrace(2).c_str(), 1);
@@ -69,14 +72,14 @@ void wpi::ReportErrorV(int32_t status, const char* fileName, int lineNumber,
 
 RuntimeError wpi::MakeErrorV(int32_t status, const char* fileName,
                              int lineNumber, const char* funcName,
-                             fmt::string_view format, fmt::format_args args) {
-  fmt::memory_buffer out;
-  fmt::format_to(fmt::appender{out}, "{}: ", GetErrorMessage(&status));
-  fmt::vformat_to(fmt::appender{out}, format, args);
+                             std::string_view format, std::format_args args) {
+  std::vector<char> out;
+  std::format_to(std::back_inserter(out), "{}: ", GetErrorMessage(&status));
+  std::vformat_to(std::back_inserter(out), format, args);
   return RuntimeError{status,
                       fileName,
                       lineNumber,
                       funcName,
                       wpi::util::GetStackTrace(2),
-                      fmt::to_string(out)};
+                      std::string(out.begin(), out.end())};
 }

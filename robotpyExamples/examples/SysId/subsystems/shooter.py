@@ -25,16 +25,16 @@ class Shooter(Subsystem):
         super().__init__()
 
         # The motor on the shooter wheel .
-        self.shooter_motor = PWMSparkMax(ShooterConstants.kShooterMotorPort)
+        self.shooter_motor = PWMSparkMax(ShooterConstants.SHOOTER_MOTOR_PORT)
 
         # The motor on the feeder wheels.
-        self.feeder_motor = PWMSparkMax(ShooterConstants.kFeederMotorPort)
+        self.feeder_motor = PWMSparkMax(ShooterConstants.FEEDER_MOTOR_PORT)
 
         # The shooter wheel encoder
         self.shooter_encoder = Encoder(
-            ShooterConstants.kEncoderPorts[0],
-            ShooterConstants.kEncoderPorts[1],
-            ShooterConstants.kEncoderReversed,
+            ShooterConstants.ENCODER_PORTS[0],
+            ShooterConstants.ENCODER_PORTS[1],
+            ShooterConstants.ENCODER_REVERSED,
         )
 
         # Create a new SysId routine for characterizing the shooter.
@@ -43,7 +43,7 @@ class Shooter(Subsystem):
             SysIdRoutine.Config(),
             SysIdRoutine.Mechanism(
                 # Tell SysId how to plumb the driving voltage to the motor(s).
-                self.shooter_motor.setVoltage,
+                self.shooter_motor.set_voltage,
                 # Tell SysId how to record a frame of data for each motor on the mechanism being
                 # characterized.
                 self._log,
@@ -55,29 +55,29 @@ class Shooter(Subsystem):
 
         # PID controller to run the shooter wheel in closed-loop, set the constants equal to those
         # calculated by SysId
-        self.shooter_feedback = wpimath.PIDController(ShooterConstants.kP, 0, 0)
+        self.shooter_feedback = wpimath.PIDController(ShooterConstants.P, 0, 0)
         # Feedforward controller to run the shooter wheel in closed-loop, set the constants equal to
         # those calculated by SysId
         self.shooter_feedforward = wpimath.SimpleMotorFeedforwardRadians(
-            ShooterConstants.kS,
-            ShooterConstants.kV / wpimath.units.rotationsToRadians(1),
-            ShooterConstants.kA / wpimath.units.rotationsToRadians(1),
+            ShooterConstants.S,
+            ShooterConstants.V / wpimath.units.rotations_to_radians(1),
+            ShooterConstants.A / wpimath.units.rotations_to_radians(1),
         )
 
         # Sets the distance per pulse for the encoders
-        self.shooter_encoder.setDistancePerPulse(
-            ShooterConstants.kEncoderDistancePerPulse
+        self.shooter_encoder.set_distance_per_pulse(
+            ShooterConstants.ENCODER_DISTANCE_PER_PULSE
         )
 
     def _log(self, sys_id_routine: SysIdRoutineLog) -> None:
         # Record a frame for the shooter motor.
         sys_id_routine.motor("shooter-wheel").voltage(
-            self.shooter_motor.get() * RobotController.getBatteryVoltage()
-        ).angularPosition(self.shooter_encoder.getDistance()).angularVelocity(
-            self.shooter_encoder.getRate()
+            self.shooter_motor.get() * RobotController.get_battery_voltage()
+        ).angular_position(self.shooter_encoder.get_distance()).angular_velocity(
+            self.shooter_encoder.get_rate()
         )
 
-    def runShooter(self, shooterVelocity: Callable[[], float]) -> Command:
+    def run_shooter(self, shooter_velocity: Callable[[], float]) -> Command:
         """Returns a command that runs the shooter at a specifc velocity.
 
         :param shooterVelocity: The commanded shooter wheel velocity in rotations per second
@@ -85,23 +85,25 @@ class Shooter(Subsystem):
 
         # Run shooter wheel at the desired velocity using a PID controller and feedforward.
         def _run_shooter() -> None:
-            target_velocity = shooterVelocity()
-            target_velocity_radians = wpimath.units.rotationsToRadians(target_velocity)
-            self.shooter_motor.setVoltage(
+            target_velocity = shooter_velocity()
+            target_velocity_radians = wpimath.units.rotations_to_radians(
+                target_velocity
+            )
+            self.shooter_motor.set_voltage(
                 self.shooter_feedback.calculate(
-                    self.shooter_encoder.getRate(), target_velocity
+                    self.shooter_encoder.get_rate(), target_velocity
                 )
                 + self.shooter_feedforward.calculate(target_velocity_radians)
             )
-            self.feeder_motor.setThrottle(ShooterConstants.kFeederVelocity)
+            self.feeder_motor.set_throttle(ShooterConstants.FEEDER_VELOCITY)
 
         def _stop_motors(interrupted: bool) -> None:
-            self.shooter_motor.stopMotor()
-            self.feeder_motor.stopMotor()
+            self.shooter_motor.stop_motor()
+            self.feeder_motor.stop_motor()
 
-        return self.run(_run_shooter).finallyDo(_stop_motors).withName("runShooter")
+        return self.run(_run_shooter).finally_do(_stop_motors).with_name("runShooter")
 
-    def sysIdQuasistatic(self, direction: SysIdRoutine.Direction) -> Command:
+    def sys_id_quasistatic(self, direction: SysIdRoutine.Direction) -> Command:
         """Returns a command that will execute a quasistatic test in the given direction.
 
         :param direction: The direction (forward or reverse) to run the test in
@@ -109,7 +111,7 @@ class Shooter(Subsystem):
 
         return self.sys_id_routine.quasistatic(direction)
 
-    def sysIdDynamic(self, direction: SysIdRoutine.Direction) -> Command:
+    def sys_id_dynamic(self, direction: SysIdRoutine.Direction) -> Command:
         """Returns a command that will execute a dynamic test in the given direction.
 
         :param direction: The direction (forward or reverse) to run the test in

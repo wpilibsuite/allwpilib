@@ -4,7 +4,7 @@
 
 #include "LocalDataLogger.hpp"
 
-#include <fmt/format.h>
+#include <format>
 
 #include "wpi/datalog/DataLog.hpp"
 #include "wpi/util/StringExtras.hpp"
@@ -20,7 +20,7 @@ int LocalDataLogger::Start(std::string_view name, std::string_view typeStr,
     typeStr = "int64[]";
   }
   return log.Start(
-      fmt::format("{}{}", logPrefix,
+      std::format("{}{}", logPrefix,
                   wpi::util::remove_prefix(name, prefix).value_or(name)),
       typeStr, metadata, time);
 }

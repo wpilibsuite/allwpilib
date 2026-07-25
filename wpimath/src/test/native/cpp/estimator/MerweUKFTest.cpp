@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <numbers>
 #include <vector>
 
@@ -13,6 +14,9 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/estimator/AngleStatistics.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/random/Normal.hpp"
 #include "wpi/math/system/DCMotor.hpp"
@@ -20,8 +24,23 @@
 #include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/math/util/StateSpaceUtil.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/base.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/mass.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
+#include "wpi/util/array.hpp"
 
 namespace {
 
@@ -115,7 +134,7 @@ TEST(MerweUKFTest, DriveConvergence) {
   auto waypoints = std::vector<wpi::math::Pose2d>{
       wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
       wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
-  auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
+  auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
   wpi::math::Vectord<5> r = wpi::math::Vectord<5>::Zero();
@@ -132,13 +151,13 @@ TEST(MerweUKFTest, DriveConvergence) {
 
   auto trueXhat = observer.Xhat();
 
-  auto totalTime = trajectory.TotalTime();
-  for (size_t i = 0; i < (totalTime / dt).value(); ++i) {
-    auto ref = trajectory.Sample(dt * i);
+  auto duration = trajectory.Duration();
+  for (size_t i = 0; i < (duration / dt).value(); ++i) {
+    auto ref = trajectory.SampleAt(dt * i);
     wpi::units::meters_per_second_t vl =
-        ref.velocity * (1 - (ref.curvature * rb).value());
+        ref.ForwardVelocity() * (1 - (ref.curvature * rb).value());
     wpi::units::meters_per_second_t vr =
-        ref.velocity * (1 + (ref.curvature * rb).value());
+        ref.ForwardVelocity() * (1 + (ref.curvature * rb).value());
 
     wpi::math::Vectord<5> nextR{
         ref.pose.Translation().X().value(), ref.pose.Translation().Y().value(),
@@ -170,13 +189,13 @@ TEST(MerweUKFTest, DriveConvergence) {
 
   );
 
-  auto finalPosition = trajectory.Sample(trajectory.TotalTime());
+  auto finalPosition = trajectory.SampleAt(trajectory.Duration());
   EXPECT_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
               0.055);
   EXPECT_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),
               0.15);
   EXPECT_NEAR(finalPosition.pose.Rotation().Radians().value(), observer.Xhat(2),
-              0.000005);
+              0.00005);
   EXPECT_NEAR(0.0, observer.Xhat(3), 0.1);
   EXPECT_NEAR(0.0, observer.Xhat(4), 0.1);
 }

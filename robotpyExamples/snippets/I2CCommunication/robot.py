@@ -23,14 +23,14 @@ class MyRobot(wpilib.TimedRobot):
 
         self.arduino = wpilib.I2C(self.PORT, self.DEVICE_ADDRESS)
 
-    def writeString(self, s: str):
+    def write_string(self, s: str):
         # Creates a char array from the input string
         chars = s.encode("ascii")
 
         # Writes bytes over I2C
-        self.arduino.writeBulk(chars)
+        self.arduino.write_bulk(chars)
 
-    def robotPeriodic(self):
+    def robot_periodic(self):
         # Creates a string to hold current robot state information, including
         # alliance, enabled state, operation mode, and match time. The message
         # is sent in format "AEM###" where A is the alliance color, (R)ed or
@@ -40,15 +40,17 @@ class MyRobot(wpilib.TimedRobot):
         #
         # For example, "RET043" would indicate that the robot is on the red
         # alliance, enabled in teleop mode, with 43 seconds left in the match.
-        allianceString = "U"
-        alliance = wpilib.MatchState.getAlliance()
+        alliance_string = "U"
+        alliance = wpilib.MatchState.get_alliance()
         if alliance is not None:
-            allianceString = "R" if alliance == wpilib.Alliance.RED else "B"
+            alliance_string = "R" if alliance == wpilib.Alliance.RED else "B"
 
-        enabledString = "E" if wpilib.RobotState.isEnabled() else "D"
-        autoString = "A" if wpilib.RobotState.isAutonomous() else "T"
-        matchTime = wpilib.MatchState.getMatchTime()
+        enabled_string = "E" if wpilib.RobotState.is_enabled() else "D"
+        auto_string = "A" if wpilib.RobotState.is_autonomous() else "T"
+        match_time = wpilib.MatchState.get_match_time()
 
-        stateMessage = f"{allianceString}{enabledString}{autoString}{matchTime:03f}"
+        state_message = (
+            f"{alliance_string}{enabled_string}{auto_string}{match_time:03f}"
+        )
 
-        self.writeString(stateMessage)
+        self.write_string(state_message)

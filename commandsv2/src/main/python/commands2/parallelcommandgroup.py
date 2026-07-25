@@ -28,11 +28,11 @@ class ParallelCommandGroup(Command):
         """
         super().__init__()
         self._commands: Dict[Command, bool] = {}
-        self._runsWhenDisabled = True
-        self._interruptBehavior = InterruptionBehavior.kCancelIncoming
-        self.addCommands(*commands)
+        self._runs_when_disabled = True
+        self._interrupt_behavior = InterruptionBehavior.CANCEL_INCOMING
+        self.add_commands(*commands)
 
-    def addCommands(self, *commands: Command):
+    def add_commands(self, *commands: Command):
         """
         Adds the given commands to the group.
 
@@ -44,10 +44,10 @@ class ParallelCommandGroup(Command):
                 "Commands cannot be added to a composition while it is running"
             )
 
-        CommandScheduler.getInstance().registerComposedCommands(commands)
+        CommandScheduler.get_instance().register_composed_commands(commands)
 
         for command in commands:
-            in_common = command.getRequirements().intersection(self.requirements)
+            in_common = command.get_requirements().intersection(self.requirements)
             if in_common:
                 raise IllegalCommandUse(
                     "Multiple commands in a parallel composition cannot require the same subsystems.",
@@ -55,13 +55,13 @@ class ParallelCommandGroup(Command):
                 )
 
             self._commands[command] = False
-            self.requirements.update(command.getRequirements())
-            self._runsWhenDisabled = (
-                self._runsWhenDisabled and command.runsWhenDisabled()
+            self.requirements.update(command.get_requirements())
+            self._runs_when_disabled = (
+                self._runs_when_disabled and command.runs_when_disabled()
             )
 
-            if command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf:
-                self._interruptBehavior = InterruptionBehavior.kCancelSelf
+            if command.get_interruption_behavior() == InterruptionBehavior.CANCEL_SELF:
+                self._interrupt_behavior = InterruptionBehavior.CANCEL_SELF
 
     def initialize(self):
         for command in self._commands:
@@ -69,27 +69,27 @@ class ParallelCommandGroup(Command):
             self._commands[command] = True
 
     def execute(self):
-        for command, isRunning in self._commands.items():
-            if not isRunning:
+        for command, is_running in self._commands.items():
+            if not is_running:
                 continue
             command.execute()
-            if command.isFinished():
+            if command.is_finished():
                 command.end(False)
                 self._commands[command] = False
 
     def end(self, interrupted: bool):
         if interrupted:
-            for command, isRunning in self._commands.items():
-                if not isRunning:
+            for command, is_running in self._commands.items():
+                if not is_running:
                     continue
                 command.end(True)
                 self._commands[command] = False
 
-    def isFinished(self) -> bool:
+    def is_finished(self) -> bool:
         return True not in self._commands.values()
 
-    def runsWhenDisabled(self) -> bool:
-        return self._runsWhenDisabled
+    def runs_when_disabled(self) -> bool:
+        return self._runs_when_disabled
 
-    def getInterruptionBehavior(self) -> InterruptionBehavior:
-        return self._interruptBehavior
+    def get_interruption_behavior(self) -> InterruptionBehavior:
+        return self._interrupt_behavior

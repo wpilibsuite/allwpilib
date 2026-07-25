@@ -20,17 +20,17 @@ class Intake:
         )
 
     def deploy(self) -> None:
-        self.piston.setThrottle(wpilib.DoubleSolenoid.Value.FORWARD)
+        self.piston.set(wpilib.DoubleSolenoid.Value.FORWARD)
 
     def retract(self) -> None:
-        self.piston.setThrottle(wpilib.DoubleSolenoid.Value.REVERSE)
-        self.motor.setThrottle(0)  # turn off the motor
+        self.piston.set(wpilib.DoubleSolenoid.Value.REVERSE)
+        self.motor.set_throttle(0)  # turn off the motor
 
     def activate(self, velocity: float) -> None:
-        if self.isDeployed():
-            self.motor.setThrottle(velocity)
+        if self.is_deployed():
+            self.motor.set_throttle(velocity)
         else:  # if piston isn't open, do nothing
-            self.motor.setThrottle(0)
+            self.motor.set_throttle(0)
 
-    def isDeployed(self) -> bool:
+    def is_deployed(self) -> bool:
         return self.piston.get() == wpilib.DoubleSolenoid.Value.FORWARD

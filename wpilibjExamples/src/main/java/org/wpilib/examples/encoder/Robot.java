@@ -24,26 +24,18 @@ import org.wpilib.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
   /**
    * The Encoder object is constructed with 4 parameters, the last two being optional. The first two
-   * parameters (1, 2 in this case) refer to the ports on the roboRIO which the encoder uses.
-   * Because a quadrature encoder has two signal wires, the signal from two DIO ports on the roboRIO
-   * are used. The third (optional) parameter is a boolean which defaults to false. If you set this
+   * parameters (2, 3 in this case) refer to the ports on Systemcore which the encoder uses. Because
+   * a quadrature encoder has two signal wires, the signal from two DIO ports on Systemcore are
+   * used. The third (optional) parameter is a boolean which defaults to false. If you set this
    * parameter to true, the direction of the encoder will be reversed, in case it makes more sense
    * mechanically. The final (optional) parameter specifies encoding rate (k1X, k2X, or k4X) and
    * defaults to k4X. Faster (k4X) encoding gives greater positional precision but more noise in the
    * rate.
    */
-  private final Encoder encoder = new Encoder(1, 2, false, CounterBase.EncodingType.X4);
+  private final Encoder encoder = new Encoder(2, 3, false, CounterBase.EncodingType.X4);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    /*
-     * Defines the number of samples to average when determining the rate.
-     * On a quadrature encoder, values range from 1-255;
-     * larger values result in smoother but potentially
-     * less accurate rates than lower values.
-     */
-    encoder.setSamplesToAverage(5);
-
     /*
      * Defines how far the mechanism attached to the encoder moves per pulse. In
      * this case, we assume that a 360 count encoder is directly
@@ -51,15 +43,6 @@ public class Robot extends TimedRobot {
      * and that we want to measure distance in inches.
      */
     encoder.setDistancePerPulse(1.0 / 360.0 * 2.0 * Math.PI * 1.5);
-
-    /*
-     * Defines the lowest rate at which the encoder will
-     * not be considered stopped, for the purposes of
-     * the GetStopped() method. Units are in distance / second,
-     * where distance refers to the units of distance
-     * that you are using, in this case inches.
-     */
-    encoder.setMinRate(1.0);
   }
 
   @Override

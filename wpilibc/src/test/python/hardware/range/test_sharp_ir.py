@@ -5,14 +5,14 @@ from wpilib.simulation import SharpIRSim
 
 
 def test_sim_devices(wpilib_state):
-    s = SharpIR.GP2Y0A02YK0F(1)
+    s = SharpIR.gp2y0a02yk0f(1)
     sim = SharpIRSim(s)
 
-    assert s.getRange() == pytest.approx(0.2)
+    assert s.get_range() == pytest.approx(0.2)
 
-    sim.setRange(0.3)
-    assert s.getRange() == pytest.approx(0.3)
+    sim.set_range(0.3)
+    assert s.get_range() == pytest.approx(0.3)
 
     # Clamped to max range of 1.5 m for GP2Y0A02YK0F
-    sim.setRange(3.0)
-    assert s.getRange() == pytest.approx(1.5)
+    sim.set_range(3.0)
+    assert s.get_range() == pytest.approx(1.5)

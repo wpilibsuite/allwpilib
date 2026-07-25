@@ -26,15 +26,15 @@ class EllipticalRegionConstraintTest {
             Units.feetToMeters(2.5));
 
     var trajectory =
-        TrajectoryGeneratorTest.getTrajectory(
+        DrivetrainSplineTrajectoryGeneratorTest.getTrajectory(
             List.of(
                 new EllipticalRegionConstraint(ellipse, new MaxVelocityConstraint(maxVelocity))));
 
     boolean exceededConstraintOutsideRegion = false;
-    for (var point : trajectory.getStates()) {
+    for (var point : trajectory.samples) {
       if (ellipse.contains(point.pose.getTranslation())) {
-        assertTrue(Math.abs(point.velocity) < maxVelocity + 0.05);
-      } else if (Math.abs(point.velocity) >= maxVelocity + 0.05) {
+        assertTrue(Math.abs(point.forwardVelocity()) < maxVelocity + 0.05);
+      } else if (Math.abs(point.forwardVelocity()) >= maxVelocity + 0.05) {
         exceededConstraintOutsideRegion = true;
       }
     }
