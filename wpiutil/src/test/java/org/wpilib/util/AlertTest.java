@@ -99,6 +99,24 @@ class AlertTest {
   }
 
   @Test
+  void staleAlertAfterResetDoesNotAffectNewAlert() {
+    Alert stale = new Alert("group", "id", "stale", Alert.Level.HIGH);
+    AlertDataJNI.resetData();
+
+    try (Alert current = new Alert("group", "id", "current", Alert.Level.HIGH)) {
+      assertThrows(AlertException.class, () -> stale.set(true));
+      stale.close();
+
+      AlertDataJNI.AlertInfo[] infos = AlertDataJNI.getAlerts();
+      assertEquals(1, infos.length);
+      assertEquals("id", infos[0].id);
+      assertEquals("current", infos[0].text);
+    }
+
+    stale.close();
+  }
+
+  @Test
   void getActiveAndAllAlertsThroughDataJni() {
     try (Alert a = new Alert("group", "A", "A", Alert.Level.HIGH);
         Alert b = new Alert("group", "B", "B", Alert.Level.HIGH);

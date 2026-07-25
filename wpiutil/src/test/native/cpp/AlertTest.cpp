@@ -5,6 +5,7 @@
 #include "wpi/util/Alert.hpp"
 
 #include <algorithm>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -240,6 +241,47 @@ TEST_F(AlertTest, CApiSetGetAndReset) {
   active = 1;
   EXPECT_NE(WPI_IsAlertActive(handle, &active), 0);
   EXPECT_EQ(active, 0);
+}
+
+TEST_F(AlertTest, CApiStaleHandleAfterResetDoesNotAffectNewAlert) {
+  WPI_AlertHandle stale =
+      CreateAlert("resetGroup", "id", "stale", WPI_ALERT_HIGH);
+
+  WPI_ResetAlertData();
+
+  WPI_AlertHandle current =
+      CreateAlert("resetGroup", "id", "current", WPI_ALERT_HIGH);
+  EXPECT_NE(stale, current);
+
+  WPI_String staleText = wpi::util::make_string("stale update");
+  EXPECT_NE(WPI_SetAlertText(stale, &staleText), 0);
+  WPI_DestroyAlert(stale);
+
+  EXPECT_EQ(WPI_GetNumAlerts(), 1);
+  WPI_AlertInfo info;
+  ASSERT_EQ(WPI_GetAlerts(&info, 1), 1);
+  EXPECT_EQ(ToString(info.id), "id");
+  EXPECT_EQ(ToString(info.text), "current");
+  WPI_FreeAlerts(&info, 1);
+
+  WPI_DestroyAlert(current);
+}
+
+TEST_F(AlertTest, CppWrapperStaleAlertAfterResetDoesNotAffectNewAlert) {
+  auto stale =
+      std::make_unique<Alert>("resetGroup", "id", "stale", Alert::Level::HIGH);
+
+  WPI_ResetAlertData();
+
+  Alert current{"resetGroup", "id", "current", Alert::Level::HIGH};
+  current.Set(true);
+
+  stale->SetText("stale update");
+  stale.reset();
+
+  EXPECT_EQ(WPI_GetNumAlerts(), 1);
+  EXPECT_TRUE(current.Get());
+  EXPECT_EQ(current.GetText(), "current");
 }
 
 TEST_F(AlertTest, CApiInvalidArgumentsAndHandlesReturnErrors) {

@@ -20,16 +20,19 @@ static_assert(WPI_ALERT_LOW == MRC_ALERT_LOW);
 namespace {
 
 struct AlertData {
-  explicit AlertData(MRC_AlertHandle handle) : mrcHandle{handle} {}
+  AlertData(MRC_AlertHandle handle, uint8_t generation)
+      : mrcHandle{handle}, generation{generation} {}
 
   explicit operator bool() const { return mrcHandle != nullptr; }
 
   MRC_AlertHandle mrcHandle = nullptr;
+  uint8_t generation = 0;
 };
 
 struct AlertManager {
   wpi::util::mutex mutex;
   wpi::util::UidVector<std::shared_ptr<AlertData>, 8> alerts;
+  uint8_t nextGeneration = 0;
 };
 
 AlertManager& GetManager() {
@@ -37,12 +40,27 @@ AlertManager& GetManager() {
   return manager;
 }
 
-WPI_AlertHandle MakeHandle(size_t index) {
-  return (ALERT_HANDLE_TYPE << 24) | (index & 0xffffff);
+constexpr size_t ALERT_INDEX_MASK = 0xffff;
+constexpr uint32_t ALERT_GENERATION_MASK = 0xff;
+constexpr int ALERT_GENERATION_SHIFT = 16;
+
+WPI_AlertHandle MakeHandle(size_t index, uint8_t generation) {
+  return (ALERT_HANDLE_TYPE << 24) |
+         (static_cast<WPI_AlertHandle>(generation) << ALERT_GENERATION_SHIFT) |
+         (index & ALERT_INDEX_MASK);
 }
 
 bool IsAlertHandle(WPI_AlertHandle handle) {
-  return (handle >> 24) == ALERT_HANDLE_TYPE;
+  return (static_cast<uint32_t>(handle) >> 24) == ALERT_HANDLE_TYPE;
+}
+
+size_t GetHandleIndex(WPI_AlertHandle handle) {
+  return static_cast<uint32_t>(handle) & ALERT_INDEX_MASK;
+}
+
+uint8_t GetHandleGeneration(WPI_AlertHandle handle) {
+  return (static_cast<uint32_t>(handle) >> ALERT_GENERATION_SHIFT) &
+         ALERT_GENERATION_MASK;
 }
 
 std::shared_ptr<AlertData> GetAlert(WPI_AlertHandle handle) {
@@ -51,11 +69,15 @@ std::shared_ptr<AlertData> GetAlert(WPI_AlertHandle handle) {
   }
   auto& manager = GetManager();
   std::scoped_lock lock{manager.mutex};
-  size_t index = handle & 0xffffff;
+  size_t index = GetHandleIndex(handle);
   if (index >= manager.alerts.size()) {
     return nullptr;
   }
-  return manager.alerts[index];
+  const auto& alert = manager.alerts[index];
+  if (!alert || alert->generation != GetHandleGeneration(handle)) {
+    return nullptr;
+  }
+  return alert;
 }
 
 std::shared_ptr<AlertData> GetAndDeleteAlert(WPI_AlertHandle handle) {
@@ -64,7 +86,15 @@ std::shared_ptr<AlertData> GetAndDeleteAlert(WPI_AlertHandle handle) {
   }
   auto& manager = GetManager();
   std::scoped_lock lock{manager.mutex};
-  return manager.alerts.erase(handle & 0xffffff);
+  size_t index = GetHandleIndex(handle);
+  if (index >= manager.alerts.size()) {
+    return nullptr;
+  }
+  const auto& alert = manager.alerts[index];
+  if (!alert || alert->generation != GetHandleGeneration(handle)) {
+    return nullptr;
+  }
+  return manager.alerts.erase(index);
 }
 
 static MRC_String WPIStringToMRCString(const struct WPI_String* wpiStr) {
@@ -110,9 +140,16 @@ static int32_t MrcLibCreateAlert(const struct WPI_String* group,
 
   auto& manager = GetManager();
   std::scoped_lock lock{manager.mutex};
-  auto index =
-      manager.alerts.emplace_back(std::make_shared<AlertData>(mrcHandle));
-  *handle = MakeHandle(index);
+  uint8_t generation = manager.nextGeneration++;
+  auto index = manager.alerts.emplace_back(
+      std::make_shared<AlertData>(mrcHandle, generation));
+  if (index > ALERT_INDEX_MASK) {
+    manager.alerts.erase(index);
+    (void)MRC_Alert_DestroyAlert(mrcHandle);
+    *handle = WPI_INVALID_HANDLE;
+    return ALERT_ERROR;
+  }
+  *handle = MakeHandle(index, generation);
   return 0;
 }
 
