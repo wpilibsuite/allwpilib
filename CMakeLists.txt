@@ -12,7 +12,7 @@ endif()
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Windows SDK version checks
-if(WIN32)
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     set(sdk_minimum 10.0.18362.0)
 
     # If no CMAKE_SYSTEM_VERSION is set, warn the user and set a default
