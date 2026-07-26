@@ -396,7 +396,7 @@ class TwoDeadWheelPoseEstimator3d {
    * be offset to match the robot's orientation on the field.
    * @return The updated pose.
    */
-  const Pose3d& Update(const wpi::units::meter_t xWheelPos,
+  Pose3d Update(const wpi::units::meter_t xWheelPos,
                        const wpi::units::meter_t yWheelPos,
                        const Rotation3d& gyroAngle) {
     return UpdateWithTime(wpi::math::MathSharedStore::GetTimestamp(), xWheelPos,
@@ -415,7 +415,7 @@ class TwoDeadWheelPoseEstimator3d {
    * be offset to match the robot's orientation on the field.
    * @return The updated pose.
    */
-  const Pose3d& UpdateWithTime(const wpi::units::second_t currentTime,
+  Pose3d UpdateWithTime(const wpi::units::second_t currentTime,
                                const wpi::units::meter_t xWheelPos,
                                const wpi::units::meter_t yWheelPos,
                                const Rotation3d& gyroAngle) {
