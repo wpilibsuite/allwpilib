@@ -10,7 +10,9 @@
 namespace wpi::fields {
 
 struct Field {
-  const char* name;
+  const std::string_view year;
+  const std::string_view program;
+  const std::string_view name;
   std::string_view (*getJson)();
   std::string_view (*getImage)();
 };
