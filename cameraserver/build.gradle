@@ -5,9 +5,11 @@ ext {
 
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':cscore')
+evaluationDependsOn(':datalog')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
+evaluationDependsOn(':wpimath')
 
 apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
 
@@ -17,7 +19,9 @@ dependencies {
     implementation project(':ntcore')
     implementation project(':hal')
     api project(':cscore')
+    implementation project(':datalog')
     implementation project(':wpilibj')
+    implementation project(':wpimath')
 }
 
 ext {
@@ -48,7 +52,9 @@ model {
             project(':hal').addHalDependency(it, 'shared')
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
             lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+            lib project: ':datalog', library: 'datalog', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+            lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
         }
     }
