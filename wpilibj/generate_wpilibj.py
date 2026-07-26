@@ -39,5 +39,7 @@ def main():
     generate_first_ds_hids(
         args.output_directory, args.template_root, test_output_directory
     )
+
+
 if __name__ == "__main__":
     main()

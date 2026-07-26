@@ -8,8 +8,8 @@
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/SubsystemBase.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
-#include "wpi/hardware/discrete/DigitalInput.hpp"
 #include "wpi/drivers/motor/PWMSparkMax.hpp"
+#include "wpi/hardware/discrete/DigitalInput.hpp"
 
 class Storage : wpi::cmd::SubsystemBase {
  public:

@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/drive/DifferentialDrive.hpp"
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/driverstation/Gamepad.hpp"
 #include "wpi/framework/TimedRobot.hpp"
-#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/system/Timer.hpp"
 
 class Robot : public wpi::TimedRobot {

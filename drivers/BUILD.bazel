@@ -10,10 +10,13 @@ load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 
 filegroup(
     name = "doxygen-files",
-    srcs = glob([
-        "src/generated/main/native/include/**/*",
-        "src/main/native/include/**/*",
-    ], allow_empty = True),
+    srcs = glob(
+        [
+            "src/generated/main/native/include/**/*",
+            "src/main/native/include/**/*",
+        ],
+        allow_empty = True,
+    ),
     visibility = ["//visibility:public"],
 )
 
@@ -60,8 +63,14 @@ filegroup(
 
 wpilib_cc_library(
     name = "drivers",
-    srcs = glob(["src/main/native/cpp/**"], allow_empty = True),
-    hdrs = glob(["src/main/native/include/**"], allow_empty = True),
+    srcs = glob(
+        ["src/main/native/cpp/**"],
+        allow_empty = True,
+    ),
+    hdrs = glob(
+        ["src/main/native/include/**"],
+        allow_empty = True,
+    ),
     includes = ["src/main/native/include"],
     strip_include_prefix = "src/main/native/include",
     third_party_libraries = [
@@ -105,7 +114,10 @@ wpilib_cc_static_library(
 
 wpilib_java_library(
     name = "drivers-java",
-    srcs = glob(["src/main/java/**/*.java"], allow_empty = True) + [":generated_java"],
+    srcs = glob(
+        ["src/main/java/**/*.java"],
+        allow_empty = True,
+    ) + [":generated_java"],
     maven_artifact_name = "drivers-java",
     maven_group_id = "org.wpilib.drivers",
     visibility = ["//visibility:public"],

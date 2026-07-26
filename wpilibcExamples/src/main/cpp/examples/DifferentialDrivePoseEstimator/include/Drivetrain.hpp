@@ -8,8 +8,8 @@
 
 #include "wpi/apriltag/AprilTagFieldLayout.hpp"
 #include "wpi/apriltag/AprilTagFields.hpp"
-#include "wpi/hardware/imu/OnboardIMU.hpp"
 #include "wpi/drivers/motor/PWMSparkMax.hpp"
+#include "wpi/hardware/imu/OnboardIMU.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"

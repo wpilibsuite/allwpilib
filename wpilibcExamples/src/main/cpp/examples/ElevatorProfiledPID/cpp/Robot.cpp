@@ -4,9 +4,9 @@
 
 #include <numbers>
 
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/driverstation/Joystick.hpp"
 #include "wpi/framework/TimedRobot.hpp"
-#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/ElevatorFeedforward.hpp"
 #include "wpi/math/controller/ProfiledPIDController.hpp"

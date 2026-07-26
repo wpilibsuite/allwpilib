@@ -3,11 +3,7 @@ project(drivers)
 include(AddTest)
 include(CompileWarnings)
 
-file(
-    GLOB_RECURSE drivers_native_src
-    src/main/native/cpp/*.cpp
-    src/generated/main/native/cpp/*.cpp
-)
+file(GLOB_RECURSE drivers_native_src src/main/native/cpp/*.cpp src/generated/main/native/cpp/*.cpp)
 add_library(drivers ${drivers_native_src})
 set_target_properties(drivers PROPERTIES DEBUG_POSTFIX "d")
 set_property(TARGET drivers PROPERTY FOLDER "libraries")

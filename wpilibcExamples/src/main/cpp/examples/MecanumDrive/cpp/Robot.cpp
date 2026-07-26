@@ -3,10 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/drive/MecanumDrive.hpp"
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/driverstation/Joystick.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/imu/OnboardIMU.hpp"
-#include "wpi/drivers/motor/PWMSparkMax.hpp"
 
 /**
  * This is a sample program that uses mecanum drive with a gyro sensor to
