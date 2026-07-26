@@ -14,6 +14,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Windows SDK version checks
 if(WIN32)
     set(sdk_minimum 10.0.18362.0)
+
     # If no CMAKE_SYSTEM_VERSION is set, warn the user and set a default
     # If it's set but below the defined minimum, warn the user but don't change it
     if(NOT DEFINED CMAKE_SYSTEM_VERSION)
@@ -22,17 +23,12 @@ if(WIN32)
     elseif(CMAKE_SYSTEM_VERSION VERSION_LESS sdk_minimum)
         message(
             WARNING
-            "Current Windows SDK target ${CMAKE_SYSTEM_VERSION} is below the recommended minimum"
-            "of ${sdk_minimum}. Some features may be limited or unavailable."
-            "If this is incorrect, manually set CMAKE_SYSTEM_VERSION to a higher target."
+            "Current Windows SDK target ${CMAKE_SYSTEM_VERSION} is below the recommended"
+            "minimum target of ${sdk_minimum}. Some features may be limited or unavailable."
+            "If this is incorrect, you may need to manually set CMAKE_SYSTEM_VERSION"
+            "to a higher target."
         )
     endif()
-endif()
-
-if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
-    set(CMAKE_SYSTEM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
-    set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
-    message(STATUS "Platform version: ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
 endif()
 
 # Set default build type to release with debug info (i.e. release mode optimizations
