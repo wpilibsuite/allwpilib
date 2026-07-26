@@ -251,7 +251,7 @@ set(DATALOG_DEP_REPLACE "find_dependency(datalog)")
 
 add_subdirectory(wpiutil)
 
-if (WPILIB_WITH_NTCORE OR WPILIB_WITH_GUI OR WPILIB_WITH_WPILIB)
+if(WPILIB_WITH_NTCORE OR WPILIB_WITH_GUI OR WPILIB_WITH_WPILIB)
     add_subdirectory(datalog)
 endif()
 
