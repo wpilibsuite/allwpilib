@@ -254,11 +254,8 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     auto odometryEstimate = m_odometryPoseBuffer.Sample(timestamp);
 
     // Step 5: Apply the vision compensation to the odometry pose.
-    // TODO Replace with std::optional::transform() in C++23
-    if (odometryEstimate) {
-      return visionUpdate.Compensate(*odometryEstimate);
-    }
-    return std::nullopt;
+    return odometryEstimate.transform(
+        [&](const auto& o) { return visionUpdate.Compensate(o); });
   }
 
   /**
