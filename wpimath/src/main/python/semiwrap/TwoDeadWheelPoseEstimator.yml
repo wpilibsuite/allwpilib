@@ -1,0 +1,17 @@
+classes:
+  wpi::math::TwoDeadWheelPoseEstimator:
+    methods:
+      TwoDeadWheelPoseEstimator:
+      SetVisionMeasurementStdDevs:
+      ResetPosition:
+      ResetPose:
+      ResetTranslation:
+      ResetRotation:
+      GetEstimatedPosition:
+      SampleAt:
+      AddVisionMeasurement:
+        overloads:
+          const Pose2d&, wpi::units::second_t:
+          const Pose2d&, wpi::units::second_t, const wpi::util::array<double, 3>&:
+      Update:
+      UpdateWithTime:

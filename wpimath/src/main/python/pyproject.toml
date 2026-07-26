@@ -1498,6 +1498,8 @@ SwerveDrivePoseEstimator = "wpi/math/estimator/SwerveDrivePoseEstimator.hpp"
 SwerveDrivePoseEstimator3d = "wpi/math/estimator/SwerveDrivePoseEstimator3d.hpp"
 # UnscentedKalmanFilter = "wpi/math/estimator/UnscentedKalmanFilter.hpp"
 # UnscentedTransform = "wpi/math/estimator/UnscentedTransform.hpp"
+TwoDeadWheelPoseEstimator = "wpi/math/estimator/TwoDeadWheelPoseEstimator.hpp"
+TwoDeadWheelPoseEstimator3d = "wpi/math/estimator/TwoDeadWheelPoseEstimator3d.hpp"
 
 # wpi/math/filter
 BiquadFilter = "wpi/math/filter/BiquadFilter.hpp"
