@@ -365,7 +365,8 @@ void FieldInfo::DisplaySettings() {
       Reset();
     }
     for (auto&& field : wpi::fields::GetFields()) {
-      const std::string name = std::format("{} {} {}", field.year, field.program, field.name);
+      const std::string name =
+          std::format("{} {} {}", field.year, field.program, field.name);
       bool selected = name == m_builtin;
       if (ImGui::Selectable(name.c_str(), selected)) {
         Reset();
@@ -427,7 +428,8 @@ void FieldInfo::LoadImage() {
   if (!m_texture) {
     if (!m_builtin.empty()) {
       for (auto&& field : wpi::fields::GetFields()) {
-        const std::string name = std::format("{} {} {}", field.year, field.program, field.name);
+        const std::string name =
+            std::format("{} {} {}", field.year, field.program, field.name);
         if (name == m_builtin) {
           auto jsonstr = field.getJson();
           auto imagedata = field.getImage();
