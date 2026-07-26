@@ -79,6 +79,7 @@ option(WPILIB_WITH_WPIMATH "Build wpimath" ON)
 option(WPILIB_WITH_WPILIB "Build hal, wpilibc/j, and developerRobot (needs OpenCV)" ON)
 option(WPILIB_WITH_EXAMPLES "Build examples" OFF)
 option(WPILIB_WITH_TESTS "Build unit tests (requires internet connection)" ON)
+option(WPILIB_WITH_FIELDS "Build the fields target" OFF)
 option(WPILIB_WITH_GUI "Build GUI items (needs SDL3)" OFF)
 option(WPILIB_WITH_SIMULATION_MODULES "Build simulation modules" ON)
 option(WPILIB_WITH_BENCHMARK "Build the benchmark project" ON)
@@ -99,7 +100,7 @@ wpilib_config(
 
 wpilib_config(OPTIONS WPILIB_WITH_CSCORE REQUIRES WPILIB_WITH_NTCORE)
 
-wpilib_config(OPTIONS WPILIB_WITH_GUI REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WPIMATH)
+wpilib_config(OPTIONS WPILIB_WITH_GUI REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WPIMATH WPILIB_WITH_FIELDS)
 
 wpilib_config(OPTIONS WPILIB_WITH_WPILIB REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WPIMATH)
 
@@ -265,9 +266,12 @@ if(WPILIB_WITH_WPIMATH)
     add_subdirectory(wpimath)
 endif()
 
+if(WPILIB_WITH_FIELDS)
+    add_subdirectory(fields)
+endif()
+
 if(WPILIB_WITH_GUI)
     find_package(SDL3 CONFIG REQUIRED)
-    add_subdirectory(fields)
     add_subdirectory(thirdparty/imgui_suite)
     add_subdirectory(wpigui)
     add_subdirectory(glass)
