@@ -21,8 +21,6 @@ import org.wpilib.system.RuntimeType;
 import org.wpilib.system.Timer;
 import org.wpilib.system.WPILibVersion;
 import org.wpilib.util.WPIUtilJNI;
-import org.wpilib.vision.stream.CameraServerShared;
-import org.wpilib.vision.stream.CameraServerSharedStore;
 
 /**
  * Implement a Robot Program framework. The RobotBase class is intended to be subclassed to create a
@@ -41,33 +39,6 @@ public abstract class RobotBase implements AutoCloseable {
   private final MultiSubscriber m_suball;
 
   private final int m_connListenerHandle;
-
-  private static void setupCameraServerShared() {
-    CameraServerShared shared =
-        new CameraServerShared() {
-          @Override
-          public void reportUsage(String resource, String data) {
-            HAL.reportUsage(resource, data);
-          }
-
-          @Override
-          public void reportDriverStationError(String error) {
-            DriverStationErrors.reportError(error, true);
-          }
-
-          @Override
-          public Long getRobotMainThreadId() {
-            return RobotBase.getMainThreadId();
-          }
-
-          @Override
-          public boolean isSystemcore() {
-            return !RobotBase.isSimulation();
-          }
-        };
-
-    CameraServerSharedStore.setCameraServerShared(shared);
-  }
 
   private static void setupMathShared() {
     MathSharedStore.setMathShared(
@@ -100,7 +71,6 @@ public abstract class RobotBase implements AutoCloseable {
   protected RobotBase() {
     final NetworkTableInstance inst = NetworkTableInstance.getDefault();
     m_threadId = Thread.currentThread().threadId();
-    setupCameraServerShared();
     setupMathShared();
     // subscribe to "" to force persistent values to propagate to local
     m_suball = new MultiSubscriber(inst, new String[] {""}, PubSubOption.DISABLE_SIGNAL);
