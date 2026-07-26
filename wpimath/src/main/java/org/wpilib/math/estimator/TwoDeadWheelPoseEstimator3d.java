@@ -37,10 +37,10 @@ import org.wpilib.math.util.MathSharedStore;
  */
 public class TwoDeadWheelPoseEstimator3d {
   /*
-   * This class uses logic cloned from PoseEstimator3d.java. It does not extend PoseEstimator3d because the
-   * structure of the kinematics and odometry classes assume that the gyro angle is independent from
-   * the kinematics, while in a two-dead-wheel configuration, the gyro is required to do the
-   * kinematics, as otherwise the forward kinematics is rank-deficient.
+   * This class uses logic cloned from PoseEstimator3d.java. It does not extend PoseEstimator3d
+   * because the structure of the kinematics and odometry classes assume that the gyro angle is
+   * independent from the kinematics, while in a two-dead-wheel configuration, the gyro is
+   * required to do the kinematics, as otherwise the forward kinematics is rank-deficient.
    */
 
   private final TwoDeadWheelOdometry3d m_odometry;
