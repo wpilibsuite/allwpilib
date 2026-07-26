@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/framework/TimedRobot.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/ProfiledPIDController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"

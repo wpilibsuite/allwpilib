@@ -42,6 +42,7 @@ def build_examples(halsim_deps):
                 "//apriltag:apriltag-java",
                 "//cameraserver:cameraserver-java",
                 "//cscore:cscore-java",
+                "//drivers:drivers-java",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
                 "//wpimath:wpimath-java",
@@ -66,6 +67,7 @@ def build_commands():
             name = folder + "-command",
             srcs = native.glob(["src/main/java/org/wpilib/commands/" + folder + "/**/*.java"]),
             deps = [
+                "//drivers:drivers-java",
                 "//hal:hal-java",
                 "//wpilibj:wpilibj-java",
                 "//commandsv2:commandsv2-java",
@@ -88,6 +90,7 @@ def build_snippets():
                 "//apriltag:apriltag-java",
                 "//cameraserver:cameraserver-java",
                 "//cscore:cscore-java",
+                "//drivers:drivers-java",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
                 "//wpimath:wpimath-java",
@@ -115,6 +118,7 @@ def build_templates():
                 "//epilogue-processor:plugin",
             ],
             deps = [
+                "//drivers:drivers-java",
                 "//hal:hal-java",
                 "//wpilibj:wpilibj-java",
                 "//commandsv2:commandsv2-java",
@@ -138,6 +142,7 @@ def build_tests():
             ],
             deps = [
                 ":" + folder + "-example",
+                "//drivers:drivers-java",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
                 "//wpilibj:wpilibj-java",
@@ -160,6 +165,7 @@ def build_tests():
             ],
             deps = [
                 ":" + folder + "-snippet",
+                "//drivers:drivers-java",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
                 "//wpilibj:wpilibj-java",

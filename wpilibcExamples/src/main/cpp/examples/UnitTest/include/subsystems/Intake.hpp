@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Constants.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 
 class Intake {

@@ -21,6 +21,7 @@ evaluationDependsOn(':wpiutil')
 evaluationDependsOn(':romiVendordep')
 evaluationDependsOn(':xrpVendordep')
 evaluationDependsOn(':datalog')
+evaluationDependsOn(':drivers')
 
 def baseArtifactIdCpp = 'documentation'
 def artifactGroupIdCpp = 'org.wpilib.wpilibc'
@@ -48,6 +49,7 @@ cppProjectZips.add(project(':wpiutil').cppHeadersZip)
 cppProjectZips.add(project(':romiVendordep').cppHeadersZip)
 cppProjectZips.add(project(':xrpVendordep').cppHeadersZip)
 cppProjectZips.add(project(':datalog').cppHeadersZip)
+cppProjectZips.add(project(':drivers').cppHeadersZip)
 
 doxygen {
     // Doxygen binaries are only provided for x86_64 platforms. Other platforms
@@ -174,6 +176,7 @@ def javaDocProjects = [
     project(':romiVendordep'),
     project(':xrpVendordep'),
     project(':datalog'),
+    project(':drivers'),
 ]
 
 task generateJavaDocs(type: Javadoc) {

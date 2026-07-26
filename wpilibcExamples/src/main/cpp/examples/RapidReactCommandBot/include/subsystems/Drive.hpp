@@ -11,7 +11,7 @@
 #include "wpi/commands2/SubsystemBase.hpp"
 #include "wpi/drive/DifferentialDrive.hpp"
 #include "wpi/hardware/imu/OnboardIMU.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/ProfiledPIDController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"

@@ -8,6 +8,7 @@ apply plugin: 'org.wpilib.NativeUtils'
 apply plugin: ExtraTasks
 
 evaluationDependsOn(':hal')
+evaluationDependsOn(':drivers')
 
 apply from: '../shared/config.gradle'
 apply from: "${rootDir}/shared/googletest.gradle"
@@ -82,6 +83,7 @@ model {
                 lib project: ':xrpVendordep', library: 'xrpVendordep', linkage: 'shared'
                 lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                lib project: ':drivers', library: 'drivers', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 project(':ntcore').addNtcoreDependency(binary, 'shared')
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
@@ -112,6 +114,7 @@ model {
                     lib project: ':romiVendordep', library: 'romiVendordep', linkage: 'shared'
                     lib project: ':xrpVendordep', library: 'xrpVendordep', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':drivers', library: 'drivers', linkage: 'shared'
                     lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     project(':ntcore').addNtcoreDependency(binary, 'shared')
@@ -160,6 +163,7 @@ model {
                     lib project: ':romiVendordep', library: 'romiVendordep', linkage: 'shared'
                     lib project: ':xrpVendordep', library: 'xrpVendordep', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':drivers', library: 'drivers', linkage: 'shared'
                     lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     project(':ntcore').addNtcoreDependency(binary, 'shared')
@@ -191,6 +195,7 @@ model {
                     lib project: ':romiVendordep', library: 'romiVendordep', linkage: 'shared'
                     lib project: ':xrpVendordep', library: 'xrpVendordep', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':drivers', library: 'drivers', linkage: 'shared'
                     lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     project(':ntcore').addNtcoreDependency(binary, 'shared')
@@ -308,6 +313,7 @@ model {
             lib project: ':romiVendordep', library: 'romiVendordep', linkage: 'shared'
             lib project: ':xrpVendordep', library: 'xrpVendordep', linkage: 'shared'
             lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+            lib project: ':drivers', library: 'drivers', linkage: 'shared'
             lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')

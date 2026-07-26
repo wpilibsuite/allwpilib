@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/hardware/motor/PWMVictorSPX.hpp"
+#include "motorcontrol/TestPWMMotorController.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
@@ -27,7 +27,7 @@ TEST(StateSpaceSimTest, FlywheelSim) {
       0_V, 0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq};
   wpi::Encoder encoder{0, 1};
   wpi::sim::EncoderSim encoderSim{encoder};
-  wpi::PWMVictorSPX motor{0};
+  wpi::TestPWMMotorController motor{0};
 
   wpi::sim::RoboRioSim::ResetData();
   encoderSim.ResetData();

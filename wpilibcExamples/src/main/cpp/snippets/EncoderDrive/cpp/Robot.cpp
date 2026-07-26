@@ -4,7 +4,7 @@
 
 #include "wpi/drive/DifferentialDrive.hpp"
 #include "wpi/framework/TimedRobot.hpp"
-#include "wpi/hardware/motor/Spark.hpp"
+#include "wpi/drivers/motor/Spark.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 
 /**

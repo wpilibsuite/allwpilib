@@ -5,7 +5,7 @@
 #include "wpi/drive/DifferentialDrive.hpp"
 #include "wpi/driverstation/Gamepad.hpp"
 #include "wpi/framework/TimedRobot.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class.

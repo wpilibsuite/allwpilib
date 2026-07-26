@@ -6,7 +6,7 @@ package org.wpilib.templates.romicommandv2.subsystems;
 
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.hardware.motor.Spark;
+import org.wpilib.drivers.motor.Spark;
 import org.wpilib.hardware.rotation.Encoder;
 
 public class RomiDrivetrain extends SubsystemBase {

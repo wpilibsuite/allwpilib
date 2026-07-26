@@ -4,7 +4,7 @@
 
 #include "wpi/driverstation/Joystick.hpp"
 #include "wpi/framework/TimedRobot.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/AnalogPotentiometer.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/smartdashboard/Mechanism2d.hpp"

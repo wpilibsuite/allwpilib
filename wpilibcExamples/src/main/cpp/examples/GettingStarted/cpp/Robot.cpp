@@ -5,7 +5,7 @@
 #include "wpi/drive/DifferentialDrive.hpp"
 #include "wpi/driverstation/Gamepad.hpp"
 #include "wpi/framework/TimedRobot.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/system/Timer.hpp"
 
 class Robot : public wpi::TimedRobot {

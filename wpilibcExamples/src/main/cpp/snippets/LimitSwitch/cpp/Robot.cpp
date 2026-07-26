@@ -5,7 +5,7 @@
 #include "wpi/driverstation/Joystick.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/discrete/DigitalInput.hpp"
-#include "wpi/hardware/motor/PWMVictorSPX.hpp"
+#include "wpi/drivers/motor/PWMVictorSPX.hpp"
 
 /**
  * Limit Switch snippets for wpilib-docs.

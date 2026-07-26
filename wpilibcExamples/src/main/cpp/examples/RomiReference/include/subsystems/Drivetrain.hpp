@@ -6,7 +6,7 @@
 
 #include "wpi/commands2/SubsystemBase.hpp"
 #include "wpi/drive/DifferentialDrive.hpp"
-#include "wpi/hardware/motor/Spark.hpp"
+#include "wpi/drivers/motor/Spark.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/romi/RomiGyro.hpp"
 #include "wpi/units/angle.hpp"

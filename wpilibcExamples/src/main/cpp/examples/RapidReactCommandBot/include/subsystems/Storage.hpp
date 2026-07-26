@@ -9,7 +9,7 @@
 #include "wpi/commands2/SubsystemBase.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/hardware/discrete/DigitalInput.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 
 class Storage : wpi::cmd::SubsystemBase {
  public:
