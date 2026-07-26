@@ -195,8 +195,8 @@ TEST_F(AlertTest, CApiDuplicateRulesAndPartialListing) {
   WPI_String id = wpi::util::make_string("id");
   WPI_String text = wpi::util::make_string("duplicate");
   WPI_AlertHandle duplicate = 0;
-  EXPECT_NE(WPI_CreateAlert(&group, &id, &text, WPI_ALERT_MEDIUM, &duplicate),
-            0);
+  EXPECT_EQ(WPI_CreateAlert(&group, &id, &text, WPI_ALERT_MEDIUM, &duplicate),
+            ALERT_ALREADY_ALLOCATED);
   EXPECT_EQ(duplicate, WPI_INVALID_HANDLE);
 
   WPI_AlertInfo oneInfo;

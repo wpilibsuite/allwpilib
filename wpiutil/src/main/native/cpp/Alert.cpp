@@ -132,7 +132,7 @@ int32_t DefaultCreateAlert(const WPI_String* group, const WPI_String* id,
   std::scoped_lock lock{manager.mutex};
   if (AlertExists(groupView, idView, level)) {
     *handle = WPI_INVALID_HANDLE;
-    return ALERT_ERROR;
+    return ALERT_ALREADY_ALLOCATED;
   }
 
   uint8_t generation = manager.nextGeneration++;

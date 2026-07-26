@@ -18,6 +18,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 class AlertTest {
+  private static final int ALERT_ALREADY_ALLOCATED = -2;
+
   @AfterEach
   void resetAlerts() {
     AlertDataJNI.resetData();
@@ -73,8 +75,12 @@ class AlertTest {
         Alert low = new Alert("group", "id", "low", Alert.Level.LOW)) {
       assertEquals(2, AlertDataJNI.getNumAlerts());
 
-      assertThrows(
-          AlertException.class, () -> new Alert("group", "id", "duplicate", Alert.Level.HIGH));
+      AlertException ex =
+          assertThrows(
+              AlertException.class,
+              () -> new Alert("group", "id", "duplicate", Alert.Level.HIGH));
+      assertEquals(ALERT_ALREADY_ALLOCATED, ex.getReason());
+      assertEquals("Alert already allocated", ex.getMessage());
 
       AlertDataJNI.AlertInfo[] infos = AlertDataJNI.getAlerts();
       assertEquals(2, infos.length);
