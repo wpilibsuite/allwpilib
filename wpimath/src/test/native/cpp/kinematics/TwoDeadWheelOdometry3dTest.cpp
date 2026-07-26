@@ -118,7 +118,7 @@ TEST_F(TwoDeadWheelOdometry3dTest, AccuracyFacingTrajectory) {
         groundTruthState.ForwardVelocity() * dt +
         0.5 * groundTruthState.ForwardAcceleration() * dt * dt;
 
-    auto wheelVelocities =
+    Eigen::Vector2d wheelVelocities =
         m_inverseKinematicsMatrix *
         Eigen::Vector3d{groundTruthState.ForwardVelocity().value(), 0,
                         groundTruthState.ForwardVelocity().value() *
@@ -199,7 +199,7 @@ TEST_F(TwoDeadWheelOdometry3dTest, AccuracyFacingXAxis) {
         groundTruthState.ForwardVelocity() * dt +
         0.5 * groundTruthState.ForwardAcceleration() * dt * dt;
 
-    auto wheelVelocities =
+    Eigen::Vector2d wheelVelocities =
         m_inverseKinematicsMatrix *
         Eigen::Vector3d{groundTruthState.ForwardVelocity().value() *
                             groundTruthState.pose.Rotation().Cos(),
