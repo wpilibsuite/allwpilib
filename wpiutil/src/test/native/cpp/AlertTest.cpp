@@ -288,7 +288,8 @@ TEST_F(AlertTest, CApiInvalidArgumentsAndHandlesReturnErrors) {
   WPI_String group = wpi::util::make_string("group");
   WPI_String id = wpi::util::make_string("id");
   WPI_String text = wpi::util::make_string("text");
-  EXPECT_NE(WPI_CreateAlert(&group, &id, &text, WPI_ALERT_HIGH, nullptr), 0);
+  EXPECT_EQ(WPI_CreateAlert(&group, &id, &text, WPI_ALERT_HIGH, nullptr),
+            ALERT_ERROR);
 
   EXPECT_NE(WPI_GetAlerts(nullptr, 1), 0);
   EXPECT_NE(WPI_GetAlerts(nullptr, -1), 0);
@@ -309,6 +310,20 @@ TEST_F(AlertTest, CApiInvalidArgumentsAndHandlesReturnErrors) {
   int32_t level = 42;
   EXPECT_NE(WPI_GetAlertLevel(invalid, &level), 0);
   EXPECT_EQ(level, 0);
+}
+
+TEST_F(AlertTest, CApiNullCreateHandleRejectedBeforeBackend) {
+  gBackendState = BackendState{};
+  WPI_SetAlertBackend(&kTestBackend);
+
+  WPI_String group = wpi::util::make_string("backendGroup");
+  WPI_String id = wpi::util::make_string("backendId");
+  WPI_String text = wpi::util::make_string("backendText");
+  EXPECT_EQ(WPI_CreateAlert(&group, &id, &text, WPI_ALERT_MEDIUM, nullptr),
+            ALERT_ERROR);
+
+  EXPECT_EQ(gBackendState.createdHandle, WPI_INVALID_HANDLE);
+  EXPECT_EQ(gBackendState.group, "");
 }
 
 TEST_F(AlertTest, CustomBackendDispatchesAllOperations) {

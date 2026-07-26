@@ -331,11 +331,12 @@ extern "C" {
 int32_t WPI_CreateAlert(const WPI_String* group, const WPI_String* id,
                         const WPI_String* text, int32_t level,
                         WPI_AlertHandle* handle) {
+  if (!handle) {
+    return ALERT_ERROR;
+  }
   auto b = backend.load();
   if (!b || !b->createAlert) {
-    if (handle) {
-      *handle = WPI_INVALID_HANDLE;
-    }
+    *handle = WPI_INVALID_HANDLE;
     return ALERT_ERROR;
   }
   return b->createAlert(group, id, text, level, handle);
