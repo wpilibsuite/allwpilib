@@ -337,7 +337,15 @@ MrcLibDsImpl::MrcLibDsImpl() {
   MRC_DsComms_Initialize();
 
   MRC_Console_Initialize();
-  wpi::hal::SetMrcLibAlertBackend();
+  int32_t alertBackendStatus = wpi::hal::SetMrcLibAlertBackend();
+  if (alertBackendStatus != 0) {
+    wpi::util::print(
+        stderr,
+        "Error: MRC alert backend unavailable with status {}. Restarting app "
+        "and retrying...\n",
+        alertBackendStatus);
+    std::terminate();
+  }
 
   // Used in Power.cpp to get battery voltage
   MRC_Systemcore_Initialize();
