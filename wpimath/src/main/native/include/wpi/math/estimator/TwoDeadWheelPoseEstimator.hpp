@@ -106,8 +106,8 @@ class TwoDeadWheelPoseEstimator {
       const Pose2d& initialPose,
       const wpi::util::array<double, 3>& stateStdDevs,
       const wpi::util::array<double, 3>& visionMeasurementStdDevs)
-      : m_odometry({xWheelYPos, yWheelXPos, xWheelPos, yWheelPos, gyroAngle,
-                    initialPose}),
+      : m_odometry{xWheelYPos, yWheelXPos, xWheelPos, yWheelPos, gyroAngle,
+                    initialPose},
         m_poseEstimate(initialPose) {
     for (size_t i = 0; i < 3; ++i) {
       m_q[i] = stateStdDevs[i] * stateStdDevs[i];
@@ -522,7 +522,7 @@ class TwoDeadWheelPoseEstimator {
 
   static constexpr wpi::units::second_t kBufferDuration = 1.5_s;
 
-  TwoDeadWheelOdometry& m_odometry;
+  TwoDeadWheelOdometry m_odometry;
 
   // Diagonal of process noise covariance matrix Q
   wpi::util::array<double, 3> m_q{wpi::util::empty_array};

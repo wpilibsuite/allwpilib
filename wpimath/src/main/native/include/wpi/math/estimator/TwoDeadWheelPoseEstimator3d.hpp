@@ -19,13 +19,12 @@
 #include "wpi/math/geometry/Transform3d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
 #include "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
-#include "wpi/math/kinematics/Odometry3d.hpp"
+#include "wpi/math/kinematics/TwoDeadWheelOdometry3d.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -104,8 +103,8 @@ class TwoDeadWheelPoseEstimator3d {
       const Pose3d& initialPose,
       const wpi::util::array<double, 4>& stateStdDevs,
       const wpi::util::array<double, 4>& visionMeasurementStdDevs)
-      : m_odometry({xWheelYPos, yWheelXPos, xWheelPos, yWheelPos, gyroAngle,
-                    initialPose}),
+      : m_odometry{xWheelYPos, yWheelXPos, xWheelPos, yWheelPos, gyroAngle,
+                    initialPose},
         m_poseEstimate(initialPose) {
     for (size_t i = 0; i < 4; ++i) {
       m_q[i] = stateStdDevs[i] * stateStdDevs[i];
@@ -529,14 +528,14 @@ class TwoDeadWheelPoseEstimator3d {
 
   static constexpr wpi::units::second_t kBufferDuration = 1.5_s;
 
-  TwoDeadWheelOdometry3d& m_odometry;
+  TwoDeadWheelOdometry3d m_odometry;
 
   // Diagonal of process noise covariance matrix Q
   wpi::util::array<double, 4> m_q{wpi::util::empty_array};
 
   // Kalman gain matrix K
-  Eigen::DiagonalMatrix<double, 4> m_vision_K =
-      Eigen::DiagonalMatrix<double, 4>::Zero();
+  Eigen::DiagonalMatrix<double, 6> m_vision_K =
+      Eigen::DiagonalMatrix<double, 6>::Zero();
 
   // Maps timestamps to odometry-only pose estimates
   TimeInterpolatableBuffer<Pose3d> m_odometryPoseBuffer{kBufferDuration};
