@@ -24,7 +24,7 @@ The goal is for the Steering Council to formally exercise these powers as little
 
 The Steering Council is composed of 3 members representing the diverse groups with substantial interest in the development of WPILib:
 
-FIRST – 1 individual representing FIRSTs interest in WPILib through its use as the core programming library in the *FIRST* Robotics Competition and *FIRST* Tech Challenge (FTC) programs.
+FIRST – 1 individual representing the interests of FIRST in WPILib through its use as the core programming library in the *FIRST* Robotics Competition and *FIRST* Tech Challenge (FTC) programs.
 
 WPI – 1 individual representing the interests of Worcester Polytechnic University (WPI) which drove initial library development, continues to be reflected in the library name, and supplies a number of resources to support project activities.
 
@@ -36,9 +36,9 @@ The FIRST and WPI representatives will be selected by their respective organizat
 
 The current membership of the Steering Council is as follows:
 
-FIRST Representative – Kevin O’Connor
-WPI Representative – Amanda Bessette
-WPILib Developer Rep – Peter Johnson
+- FIRST Representative – Kevin O’Connor
+- WPI Representative – Amanda Bessette
+- WPILib Developer Rep – Peter Johnson
 
 ## ***FIRST*** **Control System Advisory Group**
 
@@ -69,9 +69,9 @@ The WPILib Slack workspace is the primary internal coordination resource for WPI
 
 WPILib Core Developers are allowed and encouraged to interact with the broader community of users and developers through any number of unofficial avenues including:
 
-\-            In person interaction with teams via mentoring and/or event volunteering
-\-            Forums such as the FTC Forum and Chief Delphi
-\-            Chat platforms such as various Slack and Discord spaces
+- In person interaction with teams via mentoring and/or event volunteering
+- Forums such as the FTC Forum and Chief Delphi
+- Chat platforms such as various Slack and Discord spaces
 
 Core Developers should recognize that their interaction in these spaces may reflect on WPILib as a whole and should conduct themselves accordingly.
 
@@ -85,10 +85,10 @@ This section aims to provide general guidelines on the development process for W
 
 While there is no clear hard delineation between these categories, generally:
 
-\-            Bug Fixes: fix unintended behavior of the library and cause little to no breakage to user code.
-\-            Minor Changes: add API methods or classes that complement existing methods and classes in the same project and do not cause significant breakage to user code or change to user experience.
-\-            Significant Changes: either affect a large number of files or lines of code in an internal way, or may cause significant breaking changes to user code scoped to one small area of the library consisting of several classes or less, or narrowly scoped changes to user experience (e.g. reorganize one subsection of documentation, or change one set of buttons or workflow in a particular application).
-\-            Major changes: include things such as substantial new features, large re-writes of existing functionality, addition or removal of tools, or other changes with large implications on user code or experience.
+- Bug Fixes: fix unintended behavior of the library and cause little to no breakage to user code.
+- Minor Changes: add API methods or classes that complement existing methods and classes in the same project and do not cause significant breakage to user code or change to user experience.
+- Significant Changes: either affect a large number of files or lines of code in an internal way, or may cause significant breaking changes to user code scoped to one small area of the library consisting of several classes or less, or narrowly scoped changes to user experience (e.g. reorganize one subsection of documentation, or change one set of buttons or workflow in a particular application).
+- Major changes: include things such as substantial new features, large re-writes of existing functionality, addition or removal of tools, or other changes with large implications on user code or experience.
 
 ### **Bug Fixes**
 
@@ -102,15 +102,15 @@ Minor changes may be made by any developer, approved by any Core Developer with 
 
 Significant changes proposed by non-Core Developers are recommended to solicit feedback via Issue or Discussion prior to performing any significant amount of work in order to ensure the proposed changes are aligned with the desired project direction. Significant changes, regardless of source, are encouraged to be submitted as Draft PRs in order to solicit feedback as early in the process as possible. Significant changes are encouraged to remain open for a minimum of:
 
-\-            24 hours after being marked as ready if feedback has been provided on the Draft and appears to be in consensus
-\-            72 hours if no feedback has yet been provided or if the feedback does not appear to be in consensus.
+- 24 hours after being marked as ready if feedback has been provided on the Draft and appears to be in consensus
+- 72 hours if no feedback has yet been provided or if the feedback does not appear to be in consensus.
 
 ### **Major Changes**
 
 Major changes should generally be developed using the following process:
 
-\-            Proposed via GitHub Discussion, Core Team discussion on Slack or during meetings, or Steering Council discussion during meetings
-\-            Tracked via [Github Project board](https://github.com/orgs/wpilibsuite/projects)
-\-            Documented as a design doc in the [allwpilib repo](https://github.com/wpilibsuite/allwpilib/tree/main/design-docs) or other appropriate location for development and feedback. This should also include the proposed transition plan (timeline, deprecation vs hard-switch, etc.)
+1.  Proposed via GitHub Discussion, Core Team discussion on Slack or during meetings, or Steering Council discussion during meetings
+2. Tracked via [Github Project board](https://github.com/orgs/wpilibsuite/projects)
+3. Documented as a design doc in the [allwpilib repo](https://github.com/wpilibsuite/allwpilib/tree/main/design-docs) or other appropriate location for development and feedback. This should also include the proposed transition plan (timeline, deprecation vs hard-switch, etc.)
 
 Because of the larger scope and implications on team experience Major Changes may take significantly longer to decide on, develop implementation, and reach readiness for incorporation than the other categories. It is not uncommon for Major Changes to take months or even multiple seasons to be fully implemented.
