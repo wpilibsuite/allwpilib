@@ -12,7 +12,7 @@ This document aims to formalize some of the top level project governance process
 
 The Steering Council will be the ultimate authoritative decision-making body in the WPILib project for the purpose of:
 
-* Setting broad project direction including long-term roadmaps, approving proposed Major changes each year, etc. 
+* Setting broad project direction including long-term roadmaps, approving proposed Major changes each year, etc.
 * Managing membership of the Core Developers
 * Approving changes to core project guidelines such as Code of Conduct, Governance, Mission, and Privacy Policy
 * Resolving any disputes
@@ -73,7 +73,7 @@ WPILib Core Developers are allowed and encouraged to interact with the broader c
 \-            Forums such as the FTC Forum and Chief Delphi
 \-            Chat platforms such as various Slack and Discord spaces
 
-Core Developers should recognize that their interaction in these spaces may reflect on WPILib as a whole and should conduct themselves accordingly. 
+Core Developers should recognize that their interaction in these spaces may reflect on WPILib as a whole and should conduct themselves accordingly.
 
 Official communication with developers is done through the WPILib Github Organization and its various projects including the use of Issues, Discussions and comments on Pull Requests.
 
