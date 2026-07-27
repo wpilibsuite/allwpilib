@@ -109,6 +109,7 @@ T RKDP(F&& f, T x, U u, wpi::units::second_t dt, double maxError = 1e-6) {
 
   T newX;
   double truncationError;
+  double hUsed;
 
   double dtElapsed = 0.0;
   double h = dt.value();
@@ -118,6 +119,7 @@ T RKDP(F&& f, T x, U u, wpi::units::second_t dt, double maxError = 1e-6) {
     do {
       // Only allow us to advance up to the dt remaining
       h = (std::min)(h, dt.value() - dtElapsed);
+      hUsed = h;
 
       // clang-format off
       T k1 = f(x, u);
@@ -147,7 +149,7 @@ T RKDP(F&& f, T x, U u, wpi::units::second_t dt, double maxError = 1e-6) {
       }
     } while (truncationError > maxError);
 
-    dtElapsed += h;
+    dtElapsed += hUsed;
     x = newX;
   }
 
@@ -196,6 +198,7 @@ T RKDP(F&& f, wpi::units::second_t t, T y, wpi::units::second_t dt,
 
   T newY;
   double truncationError;
+  double hUsed;
 
   double dtElapsed = 0.0;
   double h = dt.value();
@@ -205,6 +208,7 @@ T RKDP(F&& f, wpi::units::second_t t, T y, wpi::units::second_t dt,
     do {
       // Only allow us to advance up to the dt remaining
       h = std::min(h, dt.value() - dtElapsed);
+      hUsed = h;
 
       // clang-format off
       T k1 = f(t, y);
@@ -230,7 +234,7 @@ T RKDP(F&& f, wpi::units::second_t t, T y, wpi::units::second_t dt,
       h *= 0.9 * std::pow(maxError / truncationError, 1.0 / 5.0);
     } while (truncationError > maxError);
 
-    dtElapsed += h;
+    dtElapsed += hUsed;
     y = newY;
   }
 

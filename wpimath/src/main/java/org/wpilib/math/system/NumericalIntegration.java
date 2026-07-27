@@ -223,6 +223,7 @@ public final class NumericalIntegration {
 
     Matrix<States, N1> newX;
     double truncationError;
+    double hUsed;
 
     double dtElapsed = 0.0;
     double h = dt;
@@ -232,6 +233,10 @@ public final class NumericalIntegration {
       do {
         // Only allow us to advance up to the dt remaining
         h = Math.min(h, dt - dtElapsed);
+
+        // Record the step size actually used for this attempt, since h is
+        // overwritten below with the proposal for the next step.
+        hUsed = h;
 
         var k1 = f.apply(x, u);
         var k2 = f.apply(x.plus(k1.times(A[0][0]).times(h)), u);
@@ -291,7 +296,7 @@ public final class NumericalIntegration {
         }
       } while (truncationError > maxError);
 
-      dtElapsed += h;
+      dtElapsed += hUsed;
       x = newX;
     }
 
@@ -350,6 +355,7 @@ public final class NumericalIntegration {
 
     Matrix<Rows, Cols> newY;
     double truncationError;
+    double hUsed;
 
     double dtElapsed = 0.0;
     double h = dt;
@@ -359,6 +365,7 @@ public final class NumericalIntegration {
       do {
         // Only allow us to advance up to the dt remaining
         h = Math.min(h, dt - dtElapsed);
+        hUsed = h;
 
         var k1 = f.apply(t, y);
         var k2 = f.apply(t + h * c[0], y.plus(k1.times(A[0][0]).times(h)));
@@ -418,7 +425,7 @@ public final class NumericalIntegration {
         }
       } while (truncationError > maxError);
 
-      dtElapsed += h;
+      dtElapsed += hUsed;
       y = newY;
     }
 
