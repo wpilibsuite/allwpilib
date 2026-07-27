@@ -165,6 +165,7 @@ write_source_files(
     additional_update_targets = [
         "//apriltag:robotpy-native-apriltag-generator.generate_build_info",
         "//datalog:robotpy-native-datalog-generator.generate_build_info",
+        "//drivers:robotpy-native-drivers-generator.generate_build_info",
         "//hal:robotpy-native-wpihal-generator.generate_build_info",
         "//ntcore:robotpy-native-ntcore-generator.generate_build_info",
         "//romiVendordep:robotpy-native-xrp-generator.generate_build_info",
@@ -186,6 +187,7 @@ write_source_files(
     additional_update_targets = [
         "//apriltag:robotpy-apriltag-generator.generate_build_info",
         "//datalog:robotpy-datalog-generator.generate_build_info",
+        "//drivers:robotpy-drivers-generator.generate_build_info",
         "//hal:robotpy-hal-generator.generate_build_info",
         "//ntcore:pyntcore-generator.generate_build_info",
         "//romiVendordep:robotpy-romi-generator.generate_build_info",
@@ -208,6 +210,7 @@ write_source_files(
     additional_update_targets = [
         "//apriltag:write_robotpy-apriltag-update-yaml",
         "//datalog:write_robotpy-wpilog-update-yaml",
+        "//drivers:write_robotpy-drivers-update-yaml",
         "//hal:write_robotpy-hal-update-yaml",
         "//ntcore:write_pyntcore-update-yaml",
         "//romiVendordep:write_robotpy-romi-update-yaml",
@@ -231,6 +234,7 @@ write_source_files(
     additional_update_targets = [
         "//apriltag:robotpy-apriltag-create-imports",
         "//datalog:robotpy-wpilog-create-imports",
+        "//drivers:robotpy-drivers-create-imports",
         "//hal:robotpy-hal-create-imports",
         "//ntcore:pyntcore-create-imports",
         "//romiVendordep:robotpy-romi-create-imports",
@@ -280,6 +284,7 @@ filegroup(
     srcs = [
         "//apriltag:robotpy-apriltag.generated_files",
         "//datalog:robotpy-wpilog.generated_files",
+        "//drivers:robotpy-drivers.generated_files",
         "//hal:robotpy-hal.generated_files",
         "//ntcore:pyntcore.generated_files",
         "//wpilibc:robotpy-wpilib.generated_files",

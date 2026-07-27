@@ -1,5 +1,6 @@
 import argparse
 import json
+import pathlib
 
 import tomli
 from jinja2 import BaseLoader, Environment
@@ -42,7 +43,9 @@ def main():
     env.filters["double_quotes"] = double_quotes
     env.filters["get_pc_dep"] = get_pc_dep
     env.filters["get_python_dep"] = get_python_dep
-    env.filters["strip_src_prefix"] = lambda x: str(x).removeprefix("src/")
+    env.filters["strip_src_prefix"] = (
+        lambda x: pathlib.PurePath(x).as_posix().removeprefix("src/")
+    )
     template = env.from_string(BUILD_FILE_TEMPLATE)
 
     nativelib_config = raw_config["tool"]["hatch"]["build"]["hooks"]["nativelib"]
@@ -75,7 +78,7 @@ def main():
     maven_downloads = raw_config["tool"]["hatch"]["build"]["hooks"]["robotpy"][
         "maven_lib_download"
     ]
-    with open(args.output_file, "w") as f:
+    with open(args.output_file, "w", newline="\n") as f:
         f.write(
             template.render(
                 raw_project_config=raw_config["project"],
@@ -100,7 +103,7 @@ def define_native_wrapper(name, pyproject_toml = None):
 
     copy_to_directory(
         name = "{}.copy_headers".format(name),
-        srcs = native.glob(["src/main/native/include/**"]) + native.glob(["src/generated/main/native/include/**"], allow_empty = True){% if third_party_dirs %} + native.glob([
+        srcs = native.glob(["src/main/native/include/**"], allow_empty = True) + native.glob(["src/generated/main/native/include/**"], allow_empty = True){% if third_party_dirs %} + native.glob([
         {%- for dir in third_party_dirs %}
             "src/main/native/thirdparty/{{dir}}/include/**",
         {%- endfor %}

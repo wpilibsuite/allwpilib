@@ -6,6 +6,7 @@
 #
 
 import wpilib
+import wpilib_drivers
 import wpiutil
 
 
@@ -23,8 +24,8 @@ class MyRobot(wpilib.TimedRobot):
 
     def __init__(self):
         super().__init__()
-        self.elevator_motor = wpilib.PWMSparkMax(0)
-        self.wrist_motor = wpilib.PWMSparkMax(1)
+        self.elevator_motor = wpilib_drivers.PWMSparkMax(0)
+        self.wrist_motor = wpilib_drivers.PWMSparkMax(1)
         self.wrist_pot = wpilib.AnalogPotentiometer(1, 90)
         self.elevator_encoder = wpilib.Encoder(0, 1)
         self.joystick = wpilib.Joystick(0)

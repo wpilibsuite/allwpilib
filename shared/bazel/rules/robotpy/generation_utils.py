@@ -19,6 +19,8 @@ def fixup_root_package_name(name):
         return "wpimath"
     if name == "robotpy_apriltag":
         return "apriltag"
+    if name == "wpilib_drivers":
+        return "drivers"
     return name
 
 
