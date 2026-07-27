@@ -23,7 +23,7 @@ apply from: "${rootDir}/shared/config.gradle"
 apply from: "${rootDir}/shared/libsdlgpu.gradle"
 
 def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
-def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
+def wpilibVersionFileOutput = file("$buildDir/generated/mainVersion/cpp/WPILibVersion.cpp")
 
 task generateCppVersion() {
     description = 'Generates the wpilib version class'
@@ -77,7 +77,7 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/native/cpp', "$buildDir/generated/main/cpp"
+                        srcDirs 'src/main/native/cpp', "$buildDir/generated/main/cpp", "$buildDir/generated/mainVersion/cpp"
                         include '**/*.cpp'
                     }
                     exportedHeaders {
@@ -100,9 +100,11 @@ model {
                 lib project: ':glass', library: 'glass', linkage: 'static'
                 project(':ntcore').addNtcoreDependency(it, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
+                lib project: ':fields', library: 'fields', linkage: 'static'
+                lib project: ':fields', library: 'fieldimages', linkage: 'static'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                lib project: ':fields', library: 'fields', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 project.addLibSdlGpuDependency(it)
             }

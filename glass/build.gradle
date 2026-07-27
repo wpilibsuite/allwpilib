@@ -27,7 +27,7 @@ apply from: "${rootDir}/shared/catch2.gradle"
 apply from: "${rootDir}/shared/libsdlgpu.gradle"
 
 def wpilibVersionFileInput = file("src/app/generate/WPILibVersion.cpp.in")
-def wpilibVersionFileOutput = file("$buildDir/generated/app/cpp/WPILibVersion.cpp")
+def wpilibVersionFileOutput = file("$buildDir/generated/appVersion/cpp/WPILibVersion.cpp")
 
 task generateCppVersion() {
     description = 'Generates the wpilib version class'
@@ -109,6 +109,7 @@ model {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':fields', library: 'fields', linkage: 'shared'
+                lib project: ':fields', library: 'fieldimages', linkage: 'shared'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
@@ -139,6 +140,7 @@ model {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':fields', library: 'fields', linkage: 'shared'
+                lib project: ':fields', library: 'fieldimages', linkage: 'shared'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
@@ -151,7 +153,7 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/app/native/cpp', "$buildDir/generated/app/cpp"
+                        srcDirs 'src/app/native/cpp', "$buildDir/generated/app/cpp", "$buildDir/generated/appVersion/cpp"
                         include '**/*.cpp'
                     }
                     exportedHeaders {
@@ -175,9 +177,10 @@ model {
                 lib library: nativeName, linkage: 'static'
                 project(':ntcore').addNtcoreDependency(it, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
+                lib project: ':fields', library: 'fields', linkage: 'static'
+                lib project: ':fields', library: 'fieldimages', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                lib project: ':fields', library: 'fields', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
@@ -217,9 +220,10 @@ model {
                 return
             }
             lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
+            lib project: ':fields', library: 'fields', linkage: 'static'
+            lib project: ':fields', library: 'fieldimages', linkage: 'static'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-            lib project: ':fields', library: 'fields', linkage: 'static'
             lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             project.addLibSdlGpuDependency(it)

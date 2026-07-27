@@ -3,10 +3,13 @@ apply plugin: 'maven-publish'
 def baseArtifactId = project.nativeName
 def artifactGroupId = project.groupId
 def cppZipBaseName = makeZipBaseName(artifactGroupId, "${baseArtifactId}-cpp")
+def cppImagesZipBaseName = makeZipBaseName(artifactGroupId, "${baseArtifactId}-images-cpp")
 
 def outputsFolder = file("$project.buildDir/outputs")
 
 task cppSourcesZip(type: Zip) {
+    dependsOn tasks.named("generateResources-main")
+
     destinationDirectory = outputsFolder
     archiveBaseName = cppZipBaseName
     archiveClassifier = "sources"
@@ -15,10 +18,16 @@ task cppSourcesZip(type: Zip) {
         into '/'
     }
 
-    from('src/main/native/cpp') {
+    from('src/generated/main/native/cpp/fields') {
+        include 'fields.cpp'
         into '/'
     }
-    from("$buildDir/generated/cpp") {
+    from('src/main/native/cpp') {
+        include 'FieldTag.cpp', 'FieldImage.cpp', 'Field.cpp'
+        into '/'
+    }
+    from("$buildDir/generated/main/cpp") {
+        include '*.json.cpp'
         into '/'
     }
 }
@@ -26,6 +35,48 @@ task cppSourcesZip(type: Zip) {
 task cppHeadersZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = cppZipBaseName
+    archiveClassifier = "headers"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    ext.includeDirs = [
+        project.file('src/main/native/include'),
+        project.file('src/generated/main/native/include')
+    ]
+
+    ext.includeDirs.each {
+        from(it) {
+            into '/'
+        }
+    }
+}
+
+task cppImageSourcesZip(type: Zip) {
+    dependsOn tasks.named("generateResources-mainImages")
+
+    destinationDirectory = outputsFolder
+    archiveBaseName = cppImagesZipBaseName
+    archiveClassifier = "sources"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/generated/main/native/cpp/fieldimages') {
+        include 'field_images.cpp'
+        into '/'
+    }
+    from("$buildDir/generated/mainImages/cpp") {
+        include '*.jpg.cpp', '*.jpeg.cpp', '*.png.cpp'
+        into '/'
+    }
+}
+
+task cppImageHeadersZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = cppImagesZipBaseName
     archiveClassifier = "headers"
 
     from(licenseFile) {
@@ -45,13 +96,18 @@ task cppHeadersZip(type: Zip) {
 
 build.dependsOn cppHeadersZip
 build.dependsOn cppSourcesZip
+build.dependsOn cppImageHeadersZip
+build.dependsOn cppImageSourcesZip
 
 addTaskToCopyAllOutputs(cppHeadersZip)
 addTaskToCopyAllOutputs(cppSourcesZip)
+addTaskToCopyAllOutputs(cppImageHeadersZip)
+addTaskToCopyAllOutputs(cppImageSourcesZip)
 
 model {
     publishing {
         def wpilibCTaskList = createComponentZipTasks($.components, ['fields'], cppZipBaseName, Zip, project, includeStandardZipFormat)
+        def fieldImagesTaskList = createComponentZipTasks($.components, ['fieldimages'], cppImagesZipBaseName, Zip, project, includeStandardZipFormat)
 
         publications {
             cpp(MavenPublication) {
@@ -63,6 +119,19 @@ model {
                 artifact cppSourcesZip
 
                 artifactId = "${baseArtifactId}-cpp"
+                groupId = artifactGroupId
+                version = wpilibVersioning.version.get()
+            }
+
+            fieldImagesCpp(MavenPublication) {
+                fieldImagesTaskList.each {
+                    artifact it
+                }
+
+                artifact cppImageHeadersZip
+                artifact cppImageSourcesZip
+
+                artifactId = "${baseArtifactId}-images-cpp"
                 groupId = artifactGroupId
                 version = wpilibVersioning.version.get()
             }

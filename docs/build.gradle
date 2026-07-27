@@ -8,6 +8,7 @@ evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':commandsv3')
 evaluationDependsOn(':cscore')
 evaluationDependsOn(':epilogue-runtime')
+evaluationDependsOn(':fields')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':wpiannotations')
@@ -38,6 +39,7 @@ def cppIncludeRoots = []
 cppProjectZips.add(project(':apriltag').cppHeadersZip)
 cppProjectZips.add(project(':cameraserver').cppHeadersZip)
 cppProjectZips.add(project(':cscore').cppHeadersZip)
+cppProjectZips.add(project(':fields').cppHeadersZip)
 cppProjectZips.add(project(':hal').cppHeadersZip)
 cppProjectZips.add(project(':ntcore').cppHeadersZip)
 cppProjectZips.add(project(':commandsv2').cppHeadersZip)
@@ -159,6 +161,7 @@ def javaDocProjects = [
     project(':commandsv3'),
     project(':cscore'),
     project(':epilogue-runtime'),
+    project(':fields'),
     project(':hal'),
     project(':ntcore'),
     project(':wpiannotations'),

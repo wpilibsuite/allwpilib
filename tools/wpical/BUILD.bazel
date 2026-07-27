@@ -172,6 +172,7 @@ wpilib_cc_library(
     deps = [
         ":headers",
         "//apriltag",
+        "//fields",
         "//shared/bazel/thirdparty/ceres",
         "//wpigui",
         "//wpiutil",

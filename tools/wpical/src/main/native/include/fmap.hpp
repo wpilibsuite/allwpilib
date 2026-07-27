@@ -9,7 +9,7 @@
 
 #include <Eigen/Core>
 
-#include "wpi/apriltag/AprilTagFieldLayout.hpp"
+#include "wpi/fields/Field.hpp"
 #include "wpi/util/json.hpp"
 
 namespace fmap {
@@ -26,7 +26,7 @@ class Fieldmap {
   Fieldmap() = default;
   Fieldmap(std::string type, std::vector<Fiducial> fiducials);
 
-  explicit Fieldmap(const wpi::apriltag::AprilTagFieldLayout& layout);
+  explicit Fieldmap(const wpi::fields::Field& field);
 
   std::string type;
   std::vector<Fiducial> fiducials;

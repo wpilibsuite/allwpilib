@@ -14,6 +14,7 @@ apply from: "${rootDir}/shared/opencv.gradle"
 dependencies {
     implementation project(':wpilibj')
     implementation project(':apriltag')
+    implementation project(':fields')
     implementation project(':wpimath')
     implementation project(':hal')
     implementation project(':wpiutil')

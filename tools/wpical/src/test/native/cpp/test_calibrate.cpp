@@ -14,8 +14,7 @@
 #include "cameracalibration.hpp"
 #include "fieldcalibration.hpp"
 #include "path_lookup.hpp"
-#include "wpi/apriltag/AprilTagFieldLayout.hpp"
-#include "wpi/apriltag/AprilTagFields.hpp"
+#include "wpi/fields/fields.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/raw_ostream.hpp"
@@ -81,58 +80,52 @@ TEST_CASE("CameraCalibrationTest Atypical", "[wpical]") {
 
 TEST_CASE("FieldCalibrationTest Typical", "[wpical]") {
   auto model = GetCameraModel();
-  auto ret =
-      wpical::calibrate(LookupPath(projectRootPath + videoLocation), model,
-                        wpi::apriltag::AprilTagFieldLayout::LoadField(
-                            wpi::apriltag::AprilTagField::k2024Crescendo),
-                        3, false);
+  auto ret = wpical::calibrate(
+      LookupPath(projectRootPath + videoLocation), model,
+      wpi::fields::GetField(wpi::fields::FieldId::FRC_2024_CRESCENDO), 3,
+      false);
   REQUIRE(ret != std::nullopt);
 }
 
 TEST_CASE("FieldCalibrationTest Atypical_Bad_Camera_Model", "[wpical]") {
   wpical::CameraModel model{};
-  auto ret =
-      wpical::calibrate(LookupPath(projectRootPath + videoLocation), model,
-                        wpi::apriltag::AprilTagFieldLayout::LoadField(
-                            wpi::apriltag::AprilTagField::k2024Crescendo),
-                        3, false);
+  auto ret = wpical::calibrate(
+      LookupPath(projectRootPath + videoLocation), model,
+      wpi::fields::GetField(wpi::fields::FieldId::FRC_2024_CRESCENDO), 3,
+      false);
   CHECK(ret == std::nullopt);
 }
 
 TEST_CASE("FieldCalibrationTest Atypical_Bad_Field_Layout", "[wpical]") {
   auto model = GetCameraModel();
-  auto ret =
-      wpical::calibrate(LookupPath(projectRootPath + videoLocation), model,
-                        wpi::apriltag::AprilTagFieldLayout{}, 3, false);
+  auto ret = wpical::calibrate(LookupPath(projectRootPath + videoLocation),
+                               model, wpi::fields::Field{}, 3, false);
   CHECK(ret == std::nullopt);
 }
 
 TEST_CASE("FieldCalibrationTest Atypical_Bad_Input_Directory", "[wpical]") {
   auto model = GetCameraModel();
-  auto ret =
-      wpical::calibrate(LookupPath(projectRootPath), model,
-                        wpi::apriltag::AprilTagFieldLayout::LoadField(
-                            wpi::apriltag::AprilTagField::k2024Crescendo),
-                        3, false);
+  auto ret = wpical::calibrate(
+      LookupPath(projectRootPath), model,
+      wpi::fields::GetField(wpi::fields::FieldId::FRC_2024_CRESCENDO), 3,
+      false);
   CHECK(ret == std::nullopt);
 }
 
 TEST_CASE("FieldCalibrationTest Atypical_Bad_Pinned_Tag", "[wpical]") {
   auto model = GetCameraModel();
-  auto ret =
-      wpical::calibrate(LookupPath(projectRootPath + videoLocation), model,
-                        wpi::apriltag::AprilTagFieldLayout::LoadField(
-                            wpi::apriltag::AprilTagField::k2024Crescendo),
-                        42, false);
+  auto ret = wpical::calibrate(
+      LookupPath(projectRootPath + videoLocation), model,
+      wpi::fields::GetField(wpi::fields::FieldId::FRC_2024_CRESCENDO), 42,
+      false);
   CHECK(ret == std::nullopt);
 }
 
 TEST_CASE("FieldCalibrationTest Atypical_Bad_Pinned_Tag_Negative", "[wpical]") {
   auto model = GetCameraModel();
-  auto ret =
-      wpical::calibrate(LookupPath(projectRootPath + videoLocation), model,
-                        wpi::apriltag::AprilTagFieldLayout::LoadField(
-                            wpi::apriltag::AprilTagField::k2024Crescendo),
-                        -1, false);
+  auto ret = wpical::calibrate(
+      LookupPath(projectRootPath + videoLocation), model,
+      wpi::fields::GetField(wpi::fields::FieldId::FRC_2024_CRESCENDO), -1,
+      false);
   CHECK(ret == std::nullopt);
 }

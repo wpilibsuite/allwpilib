@@ -11,7 +11,6 @@ import wpilib
 import wpilib.simulation
 import wpimath
 import wpimath.units
-import robotpy_apriltag
 
 
 class Drivetrain:
@@ -48,10 +47,12 @@ class Drivetrain:
         self.default_val = [0.0] * 7
         self.camera_to_object_entry = camera_to_object_topic.get_entry(self.default_val)
 
-        layout = robotpy_apriltag.AprilTagFieldLayout.load_field(
-            robotpy_apriltag.AprilTagField.K2024_CRESCENDO
+        self.object_in_field = wpimath.Pose3d(
+            wpimath.Translation3d(15.079471999999997, 0.24587199999999998, 1.355852),
+            wpimath.Rotation3d(
+                wpimath.Quaternion(0.5000000000000001, 0.0, 0.0, 0.8660254037844386)
+            ),
         )
-        self.object_in_field = layout.get_tag_pose(0) or wpimath.Pose3d()
 
         self.field_sim = wpilib.Field2d()
         self.field_approximation = wpilib.Field2d()

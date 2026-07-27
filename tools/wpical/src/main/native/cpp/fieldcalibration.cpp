@@ -23,10 +23,10 @@
 #include <opencv2/videoio.hpp>
 
 #include "cameracalibration.hpp"
-#include "wpi/apriltag/AprilTag.hpp"
 #include "wpi/apriltag/AprilTagDetector.hpp"
 #include "wpi/apriltag/AprilTagDetector_cv.hpp"
-#include "wpi/apriltag/AprilTagFieldLayout.hpp"
+#include "wpi/fields/Field.hpp"
+#include "wpi/fields/FieldTag.hpp"
 #include "wpi/math/geometry/Pose3d.hpp"
 
 struct Pose {
@@ -298,9 +298,9 @@ wpical::FieldCalibrator::~FieldCalibrator() {
   }
 }
 
-std::optional<wpi::apriltag::AprilTagFieldLayout> wpical::calibrate(
+std::optional<wpi::fields::Field> wpical::calibrate(
     std::string inputDirPath, wpical::CameraModel& cameraModel,
-    const wpi::apriltag::AprilTagFieldLayout& idealLayout, int pinnedTagId,
+    const wpi::fields::Field& idealLayout, int pinnedTagId,
     bool showDebugWindow) {
   // Silence OpenCV logging
   cv::utils::logging::setLogLevel(
@@ -386,7 +386,7 @@ std::optional<wpi::apriltag::AprilTagFieldLayout> wpical::calibrate(
   Eigen::Matrix4d pinnedTagTransform =
       idealLayout.GetTagPose(pinnedTagId)->ToMatrix();
 
-  std::vector<wpi::apriltag::AprilTag> tags;
+  std::vector<wpi::fields::FieldTag> tags;
   for (const auto& [tagId, pose] : poses) {
     // Transformation from pinned tag
     Eigen::Matrix4d transform = Eigen::Matrix4d::Identity();
@@ -398,9 +398,11 @@ std::optional<wpi::apriltag::AprilTagFieldLayout> wpical::calibrate(
     Eigen::Matrix4d correctedTransform =
         pinnedTagTransform * correctionA * transform * correctionB;
     // TODO: remove variable when clang 16 is available on Mac
-    wpi::apriltag::AprilTag tag{tagId, wpi::math::Pose3d{correctedTransform}};
+    wpi::fields::FieldTag tag{tagId, wpi::math::Pose3d{correctedTransform}};
     tags.emplace_back(tag);
   }
-  return wpi::apriltag::AprilTagFieldLayout{tags, idealLayout.GetFieldLength(),
-                                            idealLayout.GetFieldWidth()};
+  return wpi::fields::Field{idealLayout.GetName(),    idealLayout.GetSeason(),
+                            idealLayout.GetGame(),    idealLayout.GetImage(),
+                            idealLayout.GetLength(),  idealLayout.GetWidth(),
+                            idealLayout.GetProgram(), std::move(tags)};
 }
