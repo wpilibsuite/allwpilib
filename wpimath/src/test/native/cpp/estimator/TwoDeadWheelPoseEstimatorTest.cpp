@@ -54,7 +54,7 @@ void testFollowTrajectory(
   estimator.ResetPosition(xWheelPos, yWheelPos, wpi::math::Rotation2d{},
                           startingPose);
 
-  std::default_random_engine generator;
+  std::mt19937 generator{5190};
   std::normal_distribution<double> distribution(0.0, 1.0);
 
   wpi::units::second_t t = 0_s;
