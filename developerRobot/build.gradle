@@ -33,6 +33,7 @@ apply from: "${rootDir}/shared/opencv.gradle"
 
 application {
     mainClass = 'wpilib.robot.Main'
+    mainModule = 'wpilib.developerrobot'
 }
 
 apply plugin: 'com.gradleup.shadow'
@@ -44,6 +45,7 @@ repositories {
 }
 
 dependencies {
+    implementation project(':allwpilib-java')
     implementation project(':wpilibj')
     implementation project(':wpimath')
     implementation project(':hal')
