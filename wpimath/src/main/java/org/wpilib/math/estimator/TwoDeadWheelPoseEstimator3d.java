@@ -17,6 +17,7 @@ import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.interpolation.TimeInterpolatableBuffer;
 import org.wpilib.math.kinematics.TwoDeadWheelOdometry3d;
 import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N4;
 import org.wpilib.math.util.MathSharedStore;
@@ -63,6 +64,34 @@ public class TwoDeadWheelPoseEstimator3d {
   private final NavigableMap<Double, VisionUpdate> m_visionUpdates = new TreeMap<>();
 
   private Pose3d m_poseEstimate;
+
+  /**
+   * Constructs a TwoDeadWheelPoseEstimator3d.
+   *
+   *
+   * <p>The default standard deviations of the model states are 0.1 meters for x, 0.1 meters for y,
+   * 0.1 meters for z, and 0.1 radians for angle. The default standard deviations of the vision
+   * measurements are 0.9 meters for x, 0.9 meters for y, 0.9 meters for z, and 0.9 radians for
+   * angle.
+
+   * @param xWheelYPos The y-position of the forward-facing wheel relative to the center of the
+   *     robot in meters.
+   * @param yWheelXPos The x-position of the left-facing wheel relative to the center of the robot
+   *     in meters.
+   * @param xWheelPos The distance traveled by the forward-facing wheel, in meters.
+   * @param yWheelPos The distance traveled by the left-facing wheel, in meters.
+   * @param gyroAngle The current gyro angle.
+   * @param initialPose The starting pose estimate.
+   */
+  public TwoDeadWheelPoseEstimator3d(double xWheelYPos,
+      double yWheelXPos,
+      double xWheelPos,
+      double yWheelPos,
+      Rotation3d gyroAngle,
+      Pose3d initialPose) {
+    this(xWheelYPos, yWheelXPos, xWheelPos, yWheelPos, gyroAngle, initialPose,
+      VecBuilder.fill(0.1, 0.1, 0.1, 0.1), VecBuilder.fill(0.9, 0.9, 0.9, 0.9));
+  }
 
   /**
    * Constructs a TwoDeadWheelPoseEstimator3d.

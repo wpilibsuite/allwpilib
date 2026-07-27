@@ -2,6 +2,11 @@ classes:
   wpi::math::TwoDeadWheelPoseEstimator:
     methods:
       TwoDeadWheelPoseEstimator:
+        overloads:
+          ? const wpi::units::meter_t, const wpi::units::meter_t, const wpi::units::meter_t, const wpi::units::meter_t, const Pose2d&, const Rotation2d&
+          :
+          ? const wpi::units::meter_t, const wpi::units::meter_t, const wpi::units::meter_t, const wpi::units::meter_t, const Rotation2d&, const Pose2d&, const wpi::util::array<double, 3>&, const wpi::util::array<double, 3>&
+          :
       SetVisionMeasurementStdDevs:
       ResetPosition:
       ResetPose:

@@ -48,12 +48,47 @@ namespace wpi::math {
 class TwoDeadWheelPoseEstimator3d {
  public:
   /**
-   * Constructs a PoseEstimator3d.
+   * Constructs a TwoDeadWheelPoseEstimator.
    *
-   * @warning The initial pose estimate will always be the default pose,
-   * regardless of the odometry's current pose.
+   * The default standard deviations of the model states are
+   * 0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading.
+   * The default standard deviations of the vision measurements are
+   * 0.9 meters for x, 0.9 meters for y, and 0.9 radians for heading.
    *
-   * @param odometry A correctly-configured odometry object for your drivetrain.
+   * @param xWheelYPos The y-position of the forward-facing wheel relative to
+   * the center of the robot in meters.
+   * @param yWheelXPos The x-position of the left-facing wheel relative to the
+   * center of the robot in meters.
+   * @param xWheelPos The distance traveled by the forward-facing wheel, in
+   * meters.
+   * @param initialPose The starting position of the robot on the field.
+   * @param yWheelPos The distance traveled by the left-facing wheel, in meters.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
+   */
+  TwoDeadWheelPoseEstimator3d(const wpi::units::meter_t xWheelYPos,
+                              const wpi::units::meter_t yWheelXPos,
+                              const wpi::units::meter_t xWheelPos,
+                              const wpi::units::meter_t yWheelPos,
+                              const Pose3d& initialPose,
+                              const Rotation3d& gyroAngle)
+      : TwoDeadWheelPoseEstimator3d(
+            xWheelYPos, yWheelXPos, xWheelPos, yWheelPos, gyroAngle,
+            initialPose, {0.1, 0.1, 0.1, 0.1}, {0.9, 0.9, 0.9, 0.9}) {}
+
+  /**
+   * Constructs a TwoDeadWheelPoseEstimator3d.
+   *
+   * @param xWheelYPos The y-position of the forward-facing wheel relative to
+   * the center of the robot in meters.
+   * @param yWheelXPos The x-position of the left-facing wheel relative to the
+   * center of the robot in meters.
+   * @param xWheelPos The distance traveled by the forward-facing wheel, in
+   * meters.
+   * @param yWheelPos The distance traveled by the left-facing wheel, in meters.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
+   * @param initialPose The starting position of the robot on the field.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in
    *     meters, y position in meters, and heading in radians). Increase these
    *     numbers to trust your state estimate less.
@@ -63,11 +98,16 @@ class TwoDeadWheelPoseEstimator3d {
    *     less.
    */
   TwoDeadWheelPoseEstimator3d(
-      TwoDeadWheelOdometry3d& odometry,
-      const wpi::util::array<double, 3>& stateStdDevs,
-      const wpi::util::array<double, 3>& visionMeasurementStdDevs)
-      : m_odometry(odometry) {
-    for (size_t i = 0; i < 3; ++i) {
+      const wpi::units::meter_t xWheelYPos,
+      const wpi::units::meter_t yWheelXPos, const wpi::units::meter_t xWheelPos,
+      const wpi::units::meter_t yWheelPos, const Rotation3d& gyroAngle,
+      const Pose3d& initialPose,
+      const wpi::util::array<double, 4>& stateStdDevs,
+      const wpi::util::array<double, 4>& visionMeasurementStdDevs)
+      : m_odometry({xWheelYPos, yWheelXPos, xWheelPos, yWheelPos, gyroAngle,
+                    initialPose}),
+        m_poseEstimate(initialPose) {
+    for (size_t i = 0; i < 4; ++i) {
       m_q[i] = stateStdDevs[i] * stateStdDevs[i];
     }
 
@@ -397,8 +437,8 @@ class TwoDeadWheelPoseEstimator3d {
    * @return The updated pose.
    */
   Pose3d Update(const wpi::units::meter_t xWheelPos,
-                       const wpi::units::meter_t yWheelPos,
-                       const Rotation3d& gyroAngle) {
+                const wpi::units::meter_t yWheelPos,
+                const Rotation3d& gyroAngle) {
     return UpdateWithTime(wpi::math::MathSharedStore::GetTimestamp(), xWheelPos,
                           yWheelPos, gyroAngle);
   }
@@ -416,9 +456,9 @@ class TwoDeadWheelPoseEstimator3d {
    * @return The updated pose.
    */
   Pose3d UpdateWithTime(const wpi::units::second_t currentTime,
-                               const wpi::units::meter_t xWheelPos,
-                               const wpi::units::meter_t yWheelPos,
-                               const Rotation3d& gyroAngle) {
+                        const wpi::units::meter_t xWheelPos,
+                        const wpi::units::meter_t yWheelPos,
+                        const Rotation3d& gyroAngle) {
     auto odometryEstimate = m_odometry.Update(xWheelPos, yWheelPos, gyroAngle);
 
     m_odometryPoseBuffer.AddSample(currentTime, odometryEstimate);
