@@ -60,17 +60,17 @@ class TwoDeadWheelPoseEstimator3d {
    * center of the robot in meters.
    * @param xWheelPos The distance traveled by the forward-facing wheel, in
    * meters.
-   * @param initialPose The starting position of the robot on the field.
    * @param yWheelPos The distance traveled by the left-facing wheel, in meters.
    * @param gyroAngle The angle reported by the gyroscope. This does not need to
    * be offset to match the robot's orientation on the field.
+   * @param initialPose The starting position of the robot on the field.
    */
   TwoDeadWheelPoseEstimator3d(const wpi::units::meter_t xWheelYPos,
                               const wpi::units::meter_t yWheelXPos,
                               const wpi::units::meter_t xWheelPos,
                               const wpi::units::meter_t yWheelPos,
-                              const Pose3d& initialPose,
-                              const Rotation3d& gyroAngle)
+                              const Rotation3d& gyroAngle,
+                              const Pose3d& initialPose)
       : TwoDeadWheelPoseEstimator3d(
             xWheelYPos, yWheelXPos, xWheelPos, yWheelPos, gyroAngle,
             initialPose, {0.1, 0.1, 0.1, 0.1}, {0.9, 0.9, 0.9, 0.9}) {}
