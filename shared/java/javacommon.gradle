@@ -81,7 +81,7 @@ publishing {
 }
 
 test {
-    jvmArgs '--enable-native-access=ALL-UNNAMED'
+    jvmArgs '--enable-native-access=org.opencv,wpilib.apriltag,wpilib.hal,wpilib.math,wpilib.ntcore,wpilib.util,ALL-UNNAMED'
     useJUnitPlatform()
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
     testLogging {
@@ -130,6 +130,16 @@ tasks.withType(JavaCompile).configureEach {
         "-Xlint:-serial",
         // ignore unclaimed annotation warning from annotation processing
         "-Xlint:-processing",
+        "-Xlint:-preview",
+        // ignore modules requiring automatic library modules
+        "-Xlint:-requires-automatic",
+        "-Xlint:-requires-transitive-automatic",
+        "-Xlint:-exports",
+        // Java modules warn about exposing classes without an explicitly declared constructor
+        "-Xlint:-missing-explicit-ctor",
+        // Java modules warn about module names with trailing digits
+        "-Xlint:-module",
+        "-Xlint:-classfile"
     ]
 }
 
