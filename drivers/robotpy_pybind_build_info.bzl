@@ -184,7 +184,7 @@ def drivers_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
 
     resolve_casters(
         name = "drivers.resolve_casters",
-        caster_deps = [],
+        caster_deps = ["//wpimath:src/main/python/wpimath/wpimath-casters.pybind11.json", "//wpiutil:src/main/python/wpiutil/wpiutil-casters.pybind11.json"],
         casters_pkl_file = "drivers.casters.pkl",
         dep_file = "drivers.casters.d",
     )

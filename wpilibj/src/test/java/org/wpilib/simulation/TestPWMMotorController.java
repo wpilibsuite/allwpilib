@@ -7,6 +7,7 @@ package org.wpilib.simulation;
 import org.wpilib.hardware.motor.PWMMotorController;
 
 /** Test-only concrete PWM motor controller. */
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
 final class TestPWMMotorController extends PWMMotorController {
   @SuppressWarnings("this-escape")
   TestPWMMotorController(int channel) {
