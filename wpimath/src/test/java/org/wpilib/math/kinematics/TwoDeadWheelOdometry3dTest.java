@@ -11,11 +11,14 @@ import java.util.List;
 import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
-import org.wpilib.math.geometry.*;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 
-public class TwoDeadWheelOdometry3dTest {
+class TwoDeadWheelOdometry3dTest {
   private static final double m_xWheelYPos = 1;
   private static final double m_yWheelXPos = 1;
 

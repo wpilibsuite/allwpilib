@@ -20,7 +20,6 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
-import org.wpilib.math.kinematics.SwerveModulePosition;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.trajectory.DrivetrainSplineSample;
 import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
@@ -383,7 +382,6 @@ class TwoDeadWheelPoseEstimatorTest {
             assertEquals(0, estimator.getEstimatedPosition().getRotation().getRadians(), kEpsilon));
 
     // Test orientation and wheel positions
-    var modulePosition = new SwerveModulePosition(2, Rotation2d.kZero);
     estimator.update(2, 0, Rotation2d.kZero);
 
     assertAll(
