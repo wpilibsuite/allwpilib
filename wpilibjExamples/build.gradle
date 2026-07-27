@@ -12,6 +12,7 @@ ext {
 apply from: "${rootDir}/shared/opencv.gradle"
 
 dependencies {
+    implementation project(':allwpilib-java')
     implementation project(':wpilibj')
     implementation project(':apriltag')
     implementation project(':wpimath')
