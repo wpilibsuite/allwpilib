@@ -33,12 +33,13 @@ def build_examples(halsim_deps):
     for folder in EXAMPLE_FOLDERS:
         java_binary(
             name = folder + "-example",
-            srcs = native.glob(["src/main/java/org/wpilib/examples/" + folder + "/**/*.java"]),
+            srcs = native.glob(["src/main/java/org/wpilib/examples/" + folder + "/**/*.java"]) + native.glob(["**/module-info.java"]),
             main_class = "org/wpilib/examples/" + folder + "/Main",
             plugins = [
                 "//epilogue-processor:plugin",
             ],
             deps = [
+                "//allwpilib-java:allwpilib-java",
                 "//apriltag:apriltag-java",
                 "//cameraserver:cameraserver-java",
                 "//cscore:cscore-java",
@@ -64,12 +65,24 @@ def build_commands():
     for folder in COMMANDS_V2_FOLDERS:
         java_library(
             name = folder + "-command",
-            srcs = native.glob(["src/main/java/org/wpilib/commands/" + folder + "/**/*.java"]),
+            srcs = native.glob(["src/main/java/org/wpilib/commands/" + folder + "/**/*.java"]) + native.glob(["**/module-info.java"]),
             deps = [
+                "//allwpilib-java:allwpilib-java",
+                "//apriltag:apriltag-java",
+                "//cameraserver:cameraserver-java",
+                "//cscore:cscore-java",
                 "//hal:hal-java",
+                "//ntcore:ntcore-java",
+                "//wpimath:wpimath-java",
                 "//wpilibj:wpilibj-java",
                 "//commandsv2:commandsv2-java",
-                "//wpimath:wpimath-java",
+                "//commandsv3:commandsv3-java",
+                "//wpiutil:wpiutil-java",
+                "//romiVendordep:romiVendordep-java",
+                "//xrpVendordep:xrpVendordep-java",
+                "//wpiunits:wpiunits-java",
+                "//epilogue-runtime:epilogue-java",
+                "@bzlmodrio-opencv//libraries/java/opencv",
             ],
             tags = ["wpi-example"],
         )
@@ -80,11 +93,12 @@ def build_snippets():
     for folder in SNIPPET_FOLDERS:
         java_library(
             name = folder + "-snippet",
-            srcs = native.glob(["src/main/java/org/wpilib/snippets/" + folder + "/**/*.java"]),
+            srcs = native.glob(["src/main/java/org/wpilib/snippets/" + folder + "/**/*.java"]) + native.glob(["**/module-info.java"]),
             plugins = [
                 "//epilogue-processor:plugin",
             ],
             deps = [
+                "//allwpilib-java:allwpilib-java",
                 "//apriltag:apriltag-java",
                 "//cameraserver:cameraserver-java",
                 "//cscore:cscore-java",
@@ -110,11 +124,12 @@ def build_templates():
     for folder in TEMPLATE_FOLDERS:
         java_library(
             name = folder + "-template",
-            srcs = native.glob(["src/main/java/org/wpilib/templates/" + folder + "/**/*.java"]),
+            srcs = native.glob(["src/main/java/org/wpilib/templates/" + folder + "/**/*.java"]) + native.glob(["**/module-info.java"]),
             plugins = [
                 "//epilogue-processor:plugin",
             ],
             deps = [
+                "//allwpilib-java:allwpilib-java",
                 "//hal:hal-java",
                 "//wpilibj:wpilibj-java",
                 "//commandsv2:commandsv2-java",
@@ -122,6 +137,7 @@ def build_templates():
                 "//wpimath:wpimath-java",
                 "//wpiutil:wpiutil-java",
                 "//epilogue-runtime:epilogue-java",
+                "//romiVendordep:romiVendordep-java",
                 "//xrpVendordep:xrpVendordep-java",
                 "//wpiunits:wpiunits-java",
             ],
@@ -138,6 +154,7 @@ def build_tests():
             ],
             deps = [
                 ":" + folder + "-example",
+                "//allwpilib-java:allwpilib-java",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
                 "//wpilibj:wpilibj-java",
@@ -146,6 +163,8 @@ def build_tests():
                 "//wpimath:wpimath-java",
                 "//wpiutil:wpiutil-java",
                 "//epilogue-runtime:epilogue-java",
+                "//romiVendordep:romiVendordep-java",
+                "//xrpVendordep:xrpVendordep-java",
                 "//wpiunits:wpiunits-java",
             ],
             tags = ["wpi-example"],
@@ -160,6 +179,7 @@ def build_tests():
             ],
             deps = [
                 ":" + folder + "-snippet",
+                "//allwpilib-java:allwpilib-java",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
                 "//wpilibj:wpilibj-java",
@@ -168,6 +188,8 @@ def build_tests():
                 "//wpimath:wpimath-java",
                 "//wpiutil:wpiutil-java",
                 "//epilogue-runtime:epilogue-java",
+                "//romiVendordep:romiVendordep-java",
+                "//xrpVendordep:xrpVendordep-java",
                 "//wpiunits:wpiunits-java",
             ],
             tags = ["wpi-example"],

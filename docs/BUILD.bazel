@@ -131,6 +131,10 @@ maven_export(
 
 javadoc(
     name = "javadoc",
+    # Workaround to effectively exclude module-info files
+    included_packages = [
+        "org.wpilib.*",
+    ],
     deps = [
         "//apriltag:apriltag-java",
         "//cameraserver:cameraserver-java",
