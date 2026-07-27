@@ -101,6 +101,12 @@ sourceSets {
 
 configurations {
     devImplementation.extendsFrom(implementation)
+    configureEach {
+        // avaje has incorrectly listed io.avaje:avaje-jsonb-inject-plugin as a dependency of io.avaje:avaje-jsonb,
+        // which results in runtime crashes when `--add-modules ALL-MODULE-PATH` is used.
+        // We don't use or care about avaje's dependency injection library, so we manually exclude the bridge library.
+        exclude(group: 'io.avaje', module: 'avaje-jsonb-inject-plugin')
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
