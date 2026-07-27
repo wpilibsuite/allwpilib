@@ -106,8 +106,8 @@ class TwoDeadWheelPoseEstimator {
       const Pose2d& initialPose,
       const wpi::util::array<double, 3>& stateStdDevs,
       const wpi::util::array<double, 3>& visionMeasurementStdDevs)
-      : m_odometry{xWheelYPos, yWheelXPos, xWheelPos, yWheelPos, gyroAngle,
-                    initialPose},
+      : m_odometry{xWheelYPos, yWheelXPos, xWheelPos,
+                   yWheelPos,  gyroAngle,  initialPose},
         m_poseEstimate(initialPose) {
     for (size_t i = 0; i < 3; ++i) {
       m_q[i] = stateStdDevs[i] * stateStdDevs[i];

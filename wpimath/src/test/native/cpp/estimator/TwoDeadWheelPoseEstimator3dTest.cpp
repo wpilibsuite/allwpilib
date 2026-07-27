@@ -96,7 +96,8 @@ void testFollowTrajectory(
     if (!visionPoses.empty() &&
         visionPoses.front().first + kVisionUpdateDelay < t) {
       auto visionEntry = visionPoses.front();
-      estimator.AddVisionMeasurement(wpi::math::Pose3d{visionEntry.second}, visionEntry.first);
+      estimator.AddVisionMeasurement(wpi::math::Pose3d{visionEntry.second},
+                                     visionEntry.first);
       visionPoses.erase(visionPoses.begin());
       visionLog.push_back({t, visionEntry.first, visionEntry.second});
     }
@@ -119,7 +120,8 @@ void testFollowTrajectory(
 
     auto xhat = estimator.UpdateWithTime(
         t, xWheelPos, yWheelPos,
-        wpi::math::Rotation3d{groundTruthState.pose.Rotation() +
+        wpi::math::Rotation3d{
+            groundTruthState.pose.Rotation() +
             wpi::math::Rotation2d{distribution(generator) * 0.001_rad} -
             trajectory.InitialPose().Rotation()});
 
@@ -164,7 +166,11 @@ void testFollowTrajectory(
   EXPECT_NEAR(endingPose.Y().value(),
               estimator.GetEstimatedPosition().Y().value(), 0.08);
   EXPECT_NEAR(endingPose.Rotation().Radians().value(),
-              estimator.GetEstimatedPosition().Rotation().ToRotation2d().Radians().value(),
+              estimator.GetEstimatedPosition()
+                  .Rotation()
+                  .ToRotation2d()
+                  .Radians()
+                  .value(),
               0.15);
 
   if (checkError) {
@@ -176,13 +182,13 @@ void testFollowTrajectory(
 
 TEST(TwoDeadWheelPoseEstimator3dTest, AccuracyFacingTrajectory) {
   wpi::math::TwoDeadWheelPoseEstimator3d estimator{1_m,
-                                                 1_m,
-                                                 0_m,
-                                                 0_m,
-                                                 wpi::math::Rotation3d{},
-                                                 wpi::math::Pose3d{},
-                                                 {0.1, 0.1, 0.1, 0.1},
-                                                 {0.45, 0.45, 0.45, 0.45}};
+                                                   1_m,
+                                                   0_m,
+                                                   0_m,
+                                                   wpi::math::Rotation3d{},
+                                                   wpi::math::Pose3d{},
+                                                   {0.1, 0.1, 0.1, 0.1},
+                                                   {0.45, 0.45, 0.45, 0.45}};
 
   wpi::math::DrivetrainSplineTrajectory trajectory =
       wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
@@ -208,13 +214,13 @@ TEST(TwoDeadWheelPoseEstimator3dTest, AccuracyFacingTrajectory) {
 
 TEST(TwoDeadWheelPoseEstimator3dTest, BadInitialPose) {
   wpi::math::TwoDeadWheelPoseEstimator3d estimator{1_m,
-                                                 1_m,
-                                                 0_m,
-                                                 0_m,
-                                                 wpi::math::Rotation3d{},
-                                                 wpi::math::Pose3d{},
-                                                 {0.1, 0.1, 0.1, 0.1},
-                                                 {0.9, 0.9, 0.9, 0.9}};
+                                                   1_m,
+                                                   0_m,
+                                                   0_m,
+                                                   wpi::math::Rotation3d{},
+                                                   wpi::math::Pose3d{},
+                                                   {0.1, 0.1, 0.1, 0.1},
+                                                   {0.9, 0.9, 0.9, 0.9}};
 
   wpi::math::DrivetrainSplineTrajectory trajectory =
       wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
@@ -264,7 +270,8 @@ TEST(TwoDeadWheelPoseEstimator3dTest, SimultaneousVisionMeasurements) {
       0_m,
       0_m,
       wpi::math::Rotation3d{},
-      wpi::math::Pose3d{1_m, 2_m, 0_m, wpi::math::Rotation3d{0_deg, 0_deg, 270_deg}},
+      wpi::math::Pose3d{1_m, 2_m, 0_m,
+                        wpi::math::Rotation3d{0_deg, 0_deg, 270_deg}},
       {0.1, 0.1, 0.1, 0.1},
       {0.45, 0.45, 0.45, 0.45}};
 
@@ -272,18 +279,25 @@ TEST(TwoDeadWheelPoseEstimator3dTest, SimultaneousVisionMeasurements) {
 
   for (int i = 0; i < 1000; i++) {
     estimator.AddVisionMeasurement(
-        wpi::math::Pose3d{0_m, 0_m, 0_m, wpi::math::Rotation3d{0_deg, 0_deg, 0_deg}}, 0_s);
+        wpi::math::Pose3d{0_m, 0_m, 0_m,
+                          wpi::math::Rotation3d{0_deg, 0_deg, 0_deg}},
+        0_s);
     estimator.AddVisionMeasurement(
-        wpi::math::Pose3d{3_m, 1_m, 0_m, wpi::math::Rotation3d{0_deg, 0_deg, 90_deg}}, 0_s);
+        wpi::math::Pose3d{3_m, 1_m, 0_m,
+                          wpi::math::Rotation3d{0_deg, 0_deg, 90_deg}},
+        0_s);
     estimator.AddVisionMeasurement(
-        wpi::math::Pose3d{2_m, 4_m, 0_m, wpi::math::Rotation3d{0_deg, 0_deg, 180_deg}}, 0_s);
+        wpi::math::Pose3d{2_m, 4_m, 0_m,
+                          wpi::math::Rotation3d{0_deg, 0_deg, 180_deg}},
+        0_s);
   }
 
   {
     auto dx = wpi::units::math::abs(estimator.GetEstimatedPosition().X() - 0_m);
     auto dy = wpi::units::math::abs(estimator.GetEstimatedPosition().Y() - 0_m);
     auto dtheta = wpi::units::math::abs(
-        estimator.GetEstimatedPosition().Rotation().ToRotation2d().Radians() - 0_deg);
+        estimator.GetEstimatedPosition().Rotation().ToRotation2d().Radians() -
+        0_deg);
 
     EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
   }
@@ -292,7 +306,8 @@ TEST(TwoDeadWheelPoseEstimator3dTest, SimultaneousVisionMeasurements) {
     auto dx = wpi::units::math::abs(estimator.GetEstimatedPosition().X() - 3_m);
     auto dy = wpi::units::math::abs(estimator.GetEstimatedPosition().Y() - 1_m);
     auto dtheta = wpi::units::math::abs(
-        estimator.GetEstimatedPosition().Rotation().ToRotation2d().Radians() - 90_deg);
+        estimator.GetEstimatedPosition().Rotation().ToRotation2d().Radians() -
+        90_deg);
 
     EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
   }
@@ -301,7 +316,8 @@ TEST(TwoDeadWheelPoseEstimator3dTest, SimultaneousVisionMeasurements) {
     auto dx = wpi::units::math::abs(estimator.GetEstimatedPosition().X() - 2_m);
     auto dy = wpi::units::math::abs(estimator.GetEstimatedPosition().Y() - 4_m);
     auto dtheta = wpi::units::math::abs(
-        estimator.GetEstimatedPosition().Rotation().ToRotation2d().Radians() - 180_deg);
+        estimator.GetEstimatedPosition().Rotation().ToRotation2d().Radians() -
+        180_deg);
 
     EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
   }
@@ -309,13 +325,13 @@ TEST(TwoDeadWheelPoseEstimator3dTest, SimultaneousVisionMeasurements) {
 
 TEST(TwoDeadWheelPoseEstimator3dTest, TestDiscardStaleVisionMeasurements) {
   wpi::math::TwoDeadWheelPoseEstimator3d estimator{1_m,
-                                                 1_m,
-                                                 0_m,
-                                                 0_m,
-                                                 wpi::math::Rotation3d{},
-                                                 wpi::math::Pose3d{},
-                                                 {0.1, 0.1, 0.1, 0.1},
-                                                 {0.45, 0.45, 0.45, 0.45}};
+                                                   1_m,
+                                                   0_m,
+                                                   0_m,
+                                                   wpi::math::Rotation3d{},
+                                                   wpi::math::Pose3d{},
+                                                   {0.1, 0.1, 0.1, 0.1},
+                                                   {0.45, 0.45, 0.45, 0.45}};
 
   // Add enough measurements to fill up the buffer
   for (auto time = 0_s; time < 4_s; time += 20_ms) {
@@ -335,7 +351,7 @@ TEST(TwoDeadWheelPoseEstimator3dTest, TestDiscardStaleVisionMeasurements) {
   EXPECT_NEAR(odometryPose.Y().value(),
               estimator.GetEstimatedPosition().Y().value(), 1e-6);
   EXPECT_NEAR(odometryPose.Z().value(),
-      estimator.GetEstimatedPosition().Z().value(), 1e-6);
+              estimator.GetEstimatedPosition().Z().value(), 1e-6);
   EXPECT_NEAR(odometryPose.Rotation().X().value(),
               estimator.GetEstimatedPosition().Rotation().X().value(), 1e-6);
   EXPECT_NEAR(odometryPose.Rotation().Y().value(),
@@ -346,13 +362,13 @@ TEST(TwoDeadWheelPoseEstimator3dTest, TestDiscardStaleVisionMeasurements) {
 
 TEST(TwoDeadWheelPoseEstimator3dTest, TestSampleAt) {
   wpi::math::TwoDeadWheelPoseEstimator3d estimator{1_m,
-                                                 1_m,
-                                                 0_m,
-                                                 0_m,
-                                                 wpi::math::Rotation3d{},
-                                                 wpi::math::Pose3d{},
-                                                 {1.0, 1.0, 1.0, 1.0},
-                                                 {1.0, 1.0, 1.0, 1.0}};
+                                                   1_m,
+                                                   0_m,
+                                                   0_m,
+                                                   wpi::math::Rotation3d{},
+                                                   wpi::math::Pose3d{},
+                                                   {1.0, 1.0, 1.0, 1.0},
+                                                   {1.0, 1.0, 1.0, 1.0}};
 
   // Returns empty when null
   EXPECT_EQ(std::nullopt, estimator.SampleAt(1_s));
@@ -367,26 +383,28 @@ TEST(TwoDeadWheelPoseEstimator3dTest, TestSampleAt) {
   }
 
   // Sample at an added time
-  EXPECT_EQ(
-      std::optional(wpi::math::Pose3d{1.02_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
-      estimator.SampleAt(1.02_s));
+  EXPECT_EQ(std::optional(
+                wpi::math::Pose3d{1.02_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
+            estimator.SampleAt(1.02_s));
   // Sample between updates (test interpolation)
-  EXPECT_EQ(
-      std::optional(wpi::math::Pose3d{1.01_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
-      estimator.SampleAt(1.01_s));
+  EXPECT_EQ(std::optional(
+                wpi::math::Pose3d{1.01_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
+            estimator.SampleAt(1.01_s));
   // Sampling before the oldest value returns the oldest value
-  EXPECT_EQ(std::optional(wpi::math::Pose3d{1_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
-            estimator.SampleAt(0.5_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose3d{1_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
+      estimator.SampleAt(0.5_s));
   // Sampling after the newest value returns the newest value
-  EXPECT_EQ(std::optional(wpi::math::Pose3d{2_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
-            estimator.SampleAt(2.5_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose3d{2_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
+      estimator.SampleAt(2.5_s));
 
   // Add a vision measurement after the odometry measurements (while keeping all
   // of the old odometry measurements)
-    estimator.AddVisionMeasurement(
-        wpi::math::Pose3d{2_m, 0_m, 0_m,
-                          wpi::math::Rotation3d{0_rad, 0_rad, 1_rad}},
-        2.2_s);
+  estimator.AddVisionMeasurement(
+      wpi::math::Pose3d{2_m, 0_m, 0_m,
+                        wpi::math::Rotation3d{0_rad, 0_rad, 1_rad}},
+      2.2_s);
 
   // Make sure nothing changed (except the newest value)
   EXPECT_EQ(std::optional(
@@ -401,8 +419,8 @@ TEST(TwoDeadWheelPoseEstimator3dTest, TestSampleAt) {
 
   // Add a vision measurement before the odometry measurements that's still in
   // the buffer
-    estimator.AddVisionMeasurement(
-        wpi::math::Pose3d{1_m, 0.2_m, 0_m, wpi::math::Rotation3d{}}, 0.9_s);
+  estimator.AddVisionMeasurement(
+      wpi::math::Pose3d{1_m, 0.2_m, 0_m, wpi::math::Rotation3d{}}, 0.9_s);
 
   // Everything should be the same except Y is 0.1 (halfway between 0 and 0.2)
   EXPECT_EQ(std::optional(
@@ -426,8 +444,8 @@ TEST(TwoDeadWheelPoseEstimator3dTest, TestReset) {
       0_m,
       0_m,
       wpi::math::Rotation3d{},
-      wpi::math::Pose3d{-1_m, -1_m, -1_m, wpi::math::Rotation3d{0_rad, 0_rad,
-        1_rad}},
+      wpi::math::Pose3d{-1_m, -1_m, -1_m,
+                        wpi::math::Rotation3d{0_rad, 0_rad, 1_rad}},
       {1.0, 1.0, 1.0, 1.0},
       {1.0, 1.0, 1.0, 1.0}};
 
@@ -440,8 +458,9 @@ TEST(TwoDeadWheelPoseEstimator3dTest, TestReset) {
   EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().Rotation().Z().value());
 
   // Test reset position
-  estimator.ResetPosition(1_m, 0_m, wpi::math::Rotation3d{},
-                          wpi::math::Pose3d{1_m, 0_m, 0_m, wpi::math::Rotation3d{}});
+  estimator.ResetPosition(
+      1_m, 0_m, wpi::math::Rotation3d{},
+      wpi::math::Pose3d{1_m, 0_m, 0_m, wpi::math::Rotation3d{}});
 
   EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().X().value());
   EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
