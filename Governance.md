@@ -2,7 +2,7 @@
 
 ## **Background**
 
-WPILib was originally developed by Brad Miller for the 2004-2005 IFI Robot Controllers used in *FIRST* Robotics Competition (FRC) as a library to abstract some of the low level detail of programming robots to allow students to tackle higher level challenges. The library was officially adopted by *FIRST* as a base provided to all teams programming in C++ starting with the NI cRIO control system in 2009\. While the source of the library was available in this era, development was still largely the product of Brad, WPI students, NI and *FIRST*. External contribution started to pick up in the roboRIO era, circa 2015, and accelerated to the state today where the vast majority of WPILib contribution comes from community developers. 
+WPILib was originally developed by Brad Miller for the 2004-2005 IFI Robot Controllers used in *FIRST* Robotics Competition (FRC) as a library to abstract some of the low level detail of programming robots to allow students to tackle higher level challenges. The library was officially adopted by *FIRST* as a base provided to all teams programming in C++ starting with the NI cRIO control system in 2009\. While the source of the library was available in this era, development was still largely the product of Brad, WPI students, NI and *FIRST*. External contribution started to pick up in the roboRIO era, circa 2015, and accelerated to the state today where the vast majority of WPILib contribution comes from community developers.
 
 This document aims to formalize some of the top level project governance processes without overly burdening the project with additional procedure or bureaucracy. The overall vision is to keep WPILib as an open source project driven by a robust community of developers, with top level guidance from *FIRST* and WPI to keep the project aligned with both the programs which serve as the primary use and with an overall view of the direction of robotics education.
 
@@ -12,9 +12,9 @@ This document aims to formalize some of the top level project governance process
 
 The Steering Council will be the ultimate authoritative decision-making body in the WPILib project for the purpose of:
 
-* Setting broad project direction including long-term roadmaps, approving proposed Major changes each year, etc.  
-* Managing membership of the Core Developers  
-* Approving changes to core project guidelines such as Mission, Code of Conduct and Governance  
+* Setting broad project direction including long-term roadmaps, approving proposed Major changes each year, etc. 
+* Managing membership of the Core Developers
+* Approving changes to core project guidelines such as Code of Conduct, Governance, Mission, and Privacy Policy
 * Resolving any disputes
 
 
@@ -37,10 +37,8 @@ The FIRST and WPI representatives will be selected by their respective organizat
 The current membership of the Steering Council is as follows:
 
 FIRST Representative – Kevin O’Connor
-
-WPILib Developer Rep – Peter Johnson
-
 WPI Representative – Amanda Bessette
+WPILib Developer Rep – Peter Johnson
 
 ## ***FIRST*** **Control System Advisory Group**
 
@@ -50,28 +48,29 @@ This group will meet approximately weekly to track status updates of various har
 
 WPILib Core Developers are the group of individuals doing most of the day-to-day work on WPILib development as well as developers of 3rd party projects which may be bundled with WPILib. This group of individuals will have access to the WPILib Slack workspace and may have review or commit permissions on one or more WPILib repositories either directly or as part of one or more individual area/project teams. Overall membership of this group, as well as membership of any area/project teams and specific permissions on any WPILib repositories is overseen by the Steering Council. Generally Core Developers must be over 18 though exceptions may be made in extraordinary circumstances. Members may be added to this group for reasons including but not limited to:
 
-* Contribution to WPILib projects  
-* “Sponsored” developers such as *FIRST* interns, WPI student developers, etc.  
-* Contribution to 3rd party projects which are being incorporated into or distributed with WPILib  
+* Contribution to WPILib projects
+* “Sponsored” developers such as *FIRST* interns, WPI student developers, etc.
+* Contribution to 3rd party projects which are being incorporated into or distributed with WPILib
 * Invitation by the Steering Council in order to increase developer capacity in a specific area of need or proposed strategic target
 
 In order to maintain project stability and security, a small amount of “real world” vetting of Core Developers will be done by the Steering Council:
 
-* Real name known by the Steering Council  
+* Real name known by the Steering Council
+* Youth Protection Policy Requirements compliant within *FIRST* Dashboard.
 * Validation that they are who they say they are within the community. This may be via direct interaction with Steering Council or other Core Developers or indirectly via other known and trusted community members (e.g. Steering Council knows and trusts Mentor Susan who is in the same region as this candidate and validates they are who they say)
 
 Core Developers meet \~weekly to discuss project status, current blocking items, etc.
 
 ## **WPILib Slack**
 
-The WPILib Slack workspace is the primary internal coordination resource for WPILib development. This is a closed Slack Workspace whose membership consists of the Core Developers identified above along with members from other ecosystem partners who need to closely coordinate with WPILib (e.g. companies and third parties producing vendor libraries for use with WPILib). While this is a closed workspace, members will not generally be removed simply for becoming inactive as Core Developers. Members may be removed after becoming inactive in the workspace for greater than 1 year, or “for cause” if their continued participation in the workspace is deemed to be disruptive to WPILib by the Steering Council.
+The WPILib Slack workspace is the primary internal coordination resource for WPILib development. This is a closed Slack Workspace whose membership consists of the Core Developers identified above along with members from other ecosystem partners who need to closely coordinate with WPILib (e.g. companies and third parties producing vendor libraries for use with WPILib). While this is a closed workspace, members will not generally be removed simply for becoming inactive as Core Developers. Members may be removed after becoming inactive in the workspace for greater than 1 year, or “for cause” if their continued participation in the workspace is deemed to be disruptive or detrimental to WPILib by the Steering Council.
 
 ## **Community Interaction**
 
 WPILib Core Developers are allowed and encouraged to interact with the broader community of users and developers through any number of unofficial avenues including:
 
-\-            In person interaction with teams via mentoring and/or event volunteering  
-\-            Forums such as the FTC Forum and Chief Delphi  
+\-            In person interaction with teams via mentoring and/or event volunteering
+\-            Forums such as the FTC Forum and Chief Delphi
 \-            Chat platforms such as various Slack and Discord spaces
 
 Core Developers should recognize that their interaction in these spaces may reflect on WPILib as a whole and should conduct themselves accordingly. 
@@ -86,9 +85,9 @@ This section aims to provide general guidelines on the development process for W
 
 While there is no clear hard delineation between these categories, generally:
 
-\-            Bug Fixes: fix unintended behavior of the library and cause little to no breakage to user code.  
-\-            Minor Changes: add API methods or classes that complement existing methods and classes in the same project and do not cause significant breakage to user code or change to user experience.  
-\-            Significant Changes: either affect a large number of files or lines of code in an internal way, or may cause significant breaking changes to user code scoped to one small area of the library consisting of several classes or less, or narrowly scoped changes to user experience (e.g. reorganize one subsection of documentation, or change one set of buttons or workflow in a particular application).  
+\-            Bug Fixes: fix unintended behavior of the library and cause little to no breakage to user code.
+\-            Minor Changes: add API methods or classes that complement existing methods and classes in the same project and do not cause significant breakage to user code or change to user experience.
+\-            Significant Changes: either affect a large number of files or lines of code in an internal way, or may cause significant breaking changes to user code scoped to one small area of the library consisting of several classes or less, or narrowly scoped changes to user experience (e.g. reorganize one subsection of documentation, or change one set of buttons or workflow in a particular application).
 \-            Major changes: include things such as substantial new features, large re-writes of existing functionality, addition or removal of tools, or other changes with large implications on user code or experience.
 
 ### **Bug Fixes**
@@ -103,18 +102,15 @@ Minor changes may be made by any developer, approved by any Core Developer with 
 
 Significant changes proposed by non-Core Developers are recommended to solicit feedback via Issue or Discussion prior to performing any significant amount of work in order to ensure the proposed changes are aligned with the desired project direction. Significant changes, regardless of source, are encouraged to be submitted as Draft PRs in order to solicit feedback as early in the process as possible. Significant changes are encouraged to remain open for a minimum of:
 
-\-            24 hours after being marked as ready if feedback has been provided on the Draft and appears to be in consensus  
+\-            24 hours after being marked as ready if feedback has been provided on the Draft and appears to be in consensus
 \-            72 hours if no feedback has yet been provided or if the feedback does not appear to be in consensus.
 
 ### **Major Changes**
 
 Major changes should generally be developed using the following process:
 
-\-            Proposed via GitHub Discussion, Core Team discussion on Slack or during meetings, or Steering Council discussion during meetings  
-\-            Tracked via [Github Project board](https://github.com/orgs/wpilibsuite/projects)  
+\-            Proposed via GitHub Discussion, Core Team discussion on Slack or during meetings, or Steering Council discussion during meetings
+\-            Tracked via [Github Project board](https://github.com/orgs/wpilibsuite/projects)
 \-            Documented as a design doc in the [allwpilib repo](https://github.com/wpilibsuite/allwpilib/tree/main/design-docs) or other appropriate location for development and feedback. This should also include the proposed transition plan (timeline, deprecation vs hard-switch, etc.)
 
 Because of the larger scope and implications on team experience Major Changes may take significantly longer to decide on, develop implementation, and reach readiness for incorporation than the other categories. It is not uncommon for Major Changes to take months or even multiple seasons to be fully implemented.
-
- 
-
