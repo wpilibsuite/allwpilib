@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A set of selectable options controlled by a {@link Gamepad}.
@@ -21,12 +20,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * buttons change the selected option in the active selectable.
  */
 public class DSGamepadChooser {
-  private static final AtomicInteger s_instances = new AtomicInteger();
-
   private final Gamepad m_gamepad;
   private final List<GamepadSelectable> m_selectables = new ArrayList<>();
   private final Map<String, GamepadSelectable> m_selectableMap = new LinkedHashMap<>();
-  private final String m_captionPrefix;
   private int m_selectedSelectable;
 
   /**
@@ -45,7 +41,6 @@ public class DSGamepadChooser {
    */
   public DSGamepadChooser(Gamepad gamepad) {
     m_gamepad = requireNonNullParam(gamepad, "gamepad", "DSGamepadChooser");
-    m_captionPrefix = "DSGamepadChooser/" + s_instances.getAndIncrement() + "/";
   }
 
   /**
@@ -183,7 +178,7 @@ public class DSGamepadChooser {
     for (int i = 0; i < m_selectables.size(); i++) {
       GamepadSelectable displaySelectable = m_selectables.get(i);
       DriverStationDisplay.addData(
-          m_captionPrefix + displaySelectable.getName(),
+          displaySelectable.getName(),
           formatDisplayLine(displaySelectable, i == m_selectedSelectable));
     }
   }
@@ -271,9 +266,9 @@ public class DSGamepadChooser {
 
   private static String formatDisplayLine(GamepadSelectable selectable, boolean selected) {
     if (selected) {
-      return "> " + selectable.getName() + " : " + selectable.getSelected() + " <";
+      return "> " + selectable.getSelected() + " <";
     }
-    return "  " + selectable.getName() + " : " + selectable.getSelected();
+    return "  " + selectable.getSelected();
   }
 
   /** A single named set of selectable options. */

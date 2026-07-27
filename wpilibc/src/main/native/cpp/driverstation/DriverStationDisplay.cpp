@@ -79,16 +79,20 @@ void DriverStationDisplay::AddData(std::string_view caption,
     return;
   }
 
+  std::string text{caption};
+  text += " : ";
+  text += line;
+
   uint32_t lineNum;
   auto it = storage.lineMap.find(caption);
   if (it == storage.lineMap.end()) {
     lineNum = storage.lines.size();
     storage.lineMap[caption] = lineNum;
-    storage.lines.emplace_back(line);
+    storage.lines.emplace_back(std::move(text));
   } else {
     lineNum = it->second;
     if (lineNum < storage.lines.size()) {
-      storage.lines[lineNum] = line;
+      storage.lines[lineNum] = std::move(text);
     }
   }
 }

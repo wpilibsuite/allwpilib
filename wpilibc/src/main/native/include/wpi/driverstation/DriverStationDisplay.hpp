@@ -39,8 +39,10 @@ class DriverStationDisplay final {
    * Adds display data in line mode.
    *
    * Repeated calls with the same caption before UpdateLines() replace the
-   * previous line. The caption is used to identify the line and is not
-   * displayed. Empty or whitespace-only captions always append a new line.
+   * previous line. The caption is used to identify the line and is
+   * displayed before the line contents, separated by " : ". Empty or
+   * whitespace-only captions always append a new line and are not
+   * displayed.
    *
    * @param caption Line caption.
    * @param line Line contents.

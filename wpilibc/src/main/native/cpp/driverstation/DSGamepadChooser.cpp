@@ -4,7 +4,6 @@
 
 #include "wpi/driverstation/DSGamepadChooser.hpp"
 
-#include <atomic>
 #include <cctype>
 #include <cmath>
 #include <cstdint>
@@ -22,8 +21,6 @@
 #include "wpi/driverstation/Gamepad.hpp"
 
 using namespace wpi;
-
-static std::atomic_int instances;
 
 static std::string FormatDouble(double value) {
   std::ostringstream stream;
@@ -70,10 +67,7 @@ void DSGamepadChooser::GamepadSelectable::SelectNext() {
 DSGamepadChooser::DSGamepadChooser(int port)
     : DSGamepadChooser{DriverStation::GetGamepad(port)} {}
 
-DSGamepadChooser::DSGamepadChooser(Gamepad& gamepad)
-    : m_gamepad{&gamepad},
-      m_captionPrefix{"DSGamepadChooser/" + std::to_string(instances++) + "/"} {
-}
+DSGamepadChooser::DSGamepadChooser(Gamepad& gamepad) : m_gamepad{&gamepad} {}
 
 Gamepad& DSGamepadChooser::GetGamepad() {
   return *m_gamepad;
@@ -191,7 +185,7 @@ void DSGamepadChooser::Update() {
   for (size_t i = 0; i < m_selectables.size(); i++) {
     const GamepadSelectable& displaySelectable = *m_selectables[i];
     DriverStationDisplay::AddData(
-        m_captionPrefix + std::string{displaySelectable.GetName()},
+        displaySelectable.GetName(),
         FormatDisplayLine(displaySelectable,
                           i == static_cast<size_t>(m_selectedSelectable)));
   }
@@ -272,9 +266,7 @@ int DSGamepadChooser::Wrap(int value, int size) {
 std::string DSGamepadChooser::FormatDisplayLine(
     const GamepadSelectable& selectable, bool selected) {
   if (selected) {
-    return "> " + std::string{selectable.GetName()} + " : " +
-           std::string{selectable.GetSelected()} + " <";
+    return "> " + std::string{selectable.GetSelected()} + " <";
   }
-  return "  " + std::string{selectable.GetName()} + " : " +
-         std::string{selectable.GetSelected()};
+  return "  " + std::string{selectable.GetSelected()};
 }

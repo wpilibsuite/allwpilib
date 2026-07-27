@@ -71,8 +71,9 @@ public final class DriverStationDisplay {
    * Adds display data in line mode.
    *
    * <p>Repeated calls with the same caption before {@link #updateLines()} replace the previous
-   * line. The caption is used to identify the line and is not displayed. Empty or whitespace-only
-   * captions always append a new line.
+   * line. The caption is used to identify the line and is displayed before the line contents,
+   * separated by " : ". Empty or whitespace-only captions always append a new line and are not
+   * displayed.
    *
    * @param caption Line caption.
    * @param line Line contents.
@@ -90,8 +91,9 @@ public final class DriverStationDisplay {
    * Adds display data in line mode.
    *
    * <p>Repeated calls with the same caption before {@link #updateLines()} replace the previous
-   * line. The caption is used to identify the line and is not displayed. Empty or whitespace-only
-   * captions always append a new line.
+   * line. The caption is used to identify the line and is displayed before the line contents,
+   * separated by " : ". Empty or whitespace-only captions always append a new line and are not
+   * displayed.
    *
    * <p>The value is converted to text with {@link String#valueOf(Object)}.
    *
@@ -106,8 +108,9 @@ public final class DriverStationDisplay {
    * Adds formatted display data in line mode.
    *
    * <p>Repeated calls with the same caption before {@link #updateLines()} replace the previous
-   * line. The caption is used to identify the line and is not displayed. Empty or whitespace-only
-   * captions always append a new line.
+   * line. The caption is used to identify the line and is displayed before the line contents,
+   * separated by " : ". Empty or whitespace-only captions always append a new line and are not
+   * displayed.
    *
    * @param caption Line caption.
    * @param format Format string.
@@ -130,12 +133,14 @@ public final class DriverStationDisplay {
       return;
     }
 
+    String text = captionText + " : " + lineText;
+
     Integer lineNum = lineMap.get(captionText);
     if (lineNum == null) {
       lineMap.put(captionText, lines.size());
-      lines.add(lineText);
+      lines.add(text);
     } else if (lineNum < lines.size()) {
-      lines.set(lineNum, lineText);
+      lines.set(lineNum, text);
     }
   }
 
