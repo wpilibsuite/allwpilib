@@ -1,0 +1,22 @@
+classes:
+  wpi::Watchdog:
+    methods:
+      Watchdog:
+        overloads:
+          wpi::units::second_t, std::function<void ()>:
+          wpi::units::second_t, Callable&&, Arg&&, Args&&...:
+            ignore: true
+      GetTime:
+      SetTimeout:
+        overloads:
+          double:
+            ignore: true
+          wpi::units::second_t:
+      GetTimeout:
+      IsExpired:
+      AddEpoch:
+      PrintEpochs:
+      Reset:
+      Enable:
+      Disable:
+      SuppressTimeoutMessage:

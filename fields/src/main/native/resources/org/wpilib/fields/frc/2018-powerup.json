@@ -1,0 +1,20 @@
+{
+  "game": "2018 FRC Power Up",
+  "field-image": "2018-powerup.jpg",
+  "field-corners": {
+    "top-left": [
+      133,
+      23
+    ],
+    "bottom-right": [
+      835,
+      373
+    ]
+  },
+  "field-size": [
+    54,
+    27
+  ],
+  "field-unit": "foot",
+  "program": "frc"
+}

@@ -1,0 +1,20 @@
+{
+  "game": "2019 FRC Destination: Deep Space",
+  "field-image": "2019-deepspace.jpg",
+  "field-corners": {
+    "top-left": [
+      220,
+      41
+    ],
+    "bottom-right": [
+      1375,
+      616
+    ]
+  },
+  "field-size": [
+    54,
+    27
+  ],
+  "field-unit": "foot",
+  "program": "frc"
+}

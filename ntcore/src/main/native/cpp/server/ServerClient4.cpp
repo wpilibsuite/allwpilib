@@ -2,24 +2,23 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ServerClient4.h"
+#include "ServerClient4.hpp"
 
 #include <string>
 
-#include <wpi/timestamp.h>
+#include "Log.hpp"
+#include "net/WireDecoder.hpp"
+#include "server/ServerStorage.hpp"
+#include "server/ServerTopic.hpp"
+#include "wpi/util/timestamp.hpp"
 
-#include "Log.h"
-#include "net/WireDecoder.h"
-#include "server/ServerStorage.h"
-#include "server/ServerTopic.h"
-
-using namespace nt::server;
+using namespace wpi::nt::server;
 
 ServerClient4::ServerClient4(std::string_view name, std::string_view connInfo,
                              bool local, net::WireConnection& wire,
                              SetPeriodicFunc setPeriodic,
                              ServerStorage& storage, int id,
-                             wpi::Logger& logger)
+                             wpi::util::Logger& logger)
     : ServerClient4Base{name,    connInfo, local, setPeriodic,
                         storage, id,       logger},
       m_wire{wire},
@@ -27,8 +26,8 @@ ServerClient4::ServerClient4(std::string_view name, std::string_view connInfo,
       m_incoming{logger},
       m_outgoing{wire, local} {
   // create client meta topics
-  m_metaPub = storage.CreateMetaTopic(fmt::format("$clientpub${}", name));
-  m_metaSub = storage.CreateMetaTopic(fmt::format("$clientsub${}", name));
+  m_metaPub = storage.CreateMetaTopic(std::format("$clientpub${}", name));
+  m_metaSub = storage.CreateMetaTopic(std::format("$clientsub${}", name));
 
   // update meta topics
   UpdateMetaClientPub();
@@ -62,13 +61,13 @@ bool ServerClient4::ProcessIncomingBinary(std::span<const uint8_t> data) {
     Value value;
     std::string error;
     if (!net::WireDecodeBinary(&data, &pubuid, &value, &error, 0)) {
-      m_wire.Disconnect(fmt::format("binary decode error: {}", error));
+      m_wire.Disconnect(std::format("binary decode error: {}", error));
       break;
     }
 
     // respond to RTT ping
     if (pubuid == -1) {
-      auto now = wpi::Now();
+      auto now = wpi::util::Now();
       DEBUG4("RTT ping from {}, responding with time={}", m_id, now);
       m_wire.SendBinary(
           [&](auto& os) { net::WireEncodeBinary(os, -1, now, value); });
@@ -143,7 +142,8 @@ void ServerClient4::SendUnannounce(ServerTopic* topic) {
 }
 
 void ServerClient4::SendPropertiesUpdate(ServerTopic* topic,
-                                         const wpi::json& update, bool ack) {
+                                         const wpi::util::json& update,
+                                         bool ack) {
   if (!m_announceSent.lookup(topic)) {
     return;
   }

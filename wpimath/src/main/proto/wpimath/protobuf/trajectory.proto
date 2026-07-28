@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package wpi.proto;
+
+import "wpimath/protobuf/geometry2d.proto";
+import "wpimath/protobuf/kinematics.proto";
+
+option java_package = "org.wpilib.math.proto";
+
+option java_outer_classname = "ProtobufTrajectoryDescriptor";
+
+option java_multiple_files = true;
+
+message ProtobufTrajectorySample {
+  double time = 1;
+}
+
+message ProtobufHolonomicSample {
+  double time = 1;
+  ProtobufPose2d pose = 2;
+  ProtobufChassisVelocities velocities = 3;
+  ProtobufChassisAccelerations accelerations = 4;
+}
+
+message ProtobufDifferentialSample {
+  double time = 1;
+  ProtobufPose2d pose = 2;
+  ProtobufChassisVelocities velocities = 3;
+  ProtobufChassisAccelerations accelerations = 4;
+  double left_velocity = 5;
+  double right_velocity = 6;
+}
+
+message ProtobufHolonomicTrajectory {
+  repeated ProtobufHolonomicSample samples = 1;
+}
+
+message ProtobufDifferentialTrajectory {
+  repeated ProtobufDifferentialSample samples = 1;
+}

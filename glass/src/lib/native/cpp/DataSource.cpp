@@ -2,27 +2,28 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/DataSource.h"
+#include "wpi/glass/DataSource.hpp"
 
-#include <fmt/format.h>
+#include <cstdio>
+#include <format>
+#include <string>
 
-#include "glass/ContextInternal.h"
+#include <imgui.h>
 
-using namespace glass;
+#include "wpi/glass/ContextInternal.hpp"
 
-wpi::sig::Signal<const char*, DataSource*> DataSource::sourceCreated;
+using namespace wpi::glass;
 
-DataSource::DataSource(std::string_view id)
-    : m_id{id}, m_name{gContext->sourceNameStorage.GetString(m_id)} {
-  gContext->sources.try_emplace(m_id, this);
-  sourceCreated(m_id.c_str(), this);
+wpi::util::sig::Signal<const char*, DataSource*> DataSource::sourceCreated;
+
+std::string wpi::glass::MakeSourceId(std::string_view id, int index) {
+  return std::format("{}[{}]", id, index);
 }
 
-DataSource::DataSource(std::string_view id, int index)
-    : DataSource{fmt::format("{}[{}]", id, index)} {}
-
-DataSource::DataSource(std::string_view id, int index, int index2)
-    : DataSource{fmt::format("{}[{},{}]", id, index, index2)} {}
+std::string wpi::glass::MakeSourceId(std::string_view id, int index,
+                                     int index2) {
+  return std::format("{}[{},{}]", id, index, index2);
+}
 
 DataSource::~DataSource() {
   if (!gContext) {
@@ -99,10 +100,11 @@ bool DataSource::InputInt(const char* label, int* v, int step, int step_fast,
 
 void DataSource::EmitDrag(ImGuiDragDropFlags flags) const {
   if (ImGui::BeginDragDropSource(flags)) {
+    char buf[32];
+    std::snprintf(buf, sizeof(buf), "DataSource:%s", GetType());
     auto self = this;
-    ImGui::SetDragDropPayload("DataSource", &self, sizeof(self));  // NOLINT
-    const char* name = GetName().c_str();
-    ImGui::TextUnformatted(name[0] == '\0' ? m_id.c_str() : name);
+    ImGui::SetDragDropPayload(buf, &self, sizeof(self));  // NOLINT
+    DragDropTooltip();
     ImGui::EndDragDropSource();
   }
 }
@@ -113,4 +115,39 @@ DataSource* DataSource::Find(std::string_view id) {
     return nullptr;
   }
   return it->second;
+}
+
+std::string& DataSource::GetNameStorage(std::string_view id) {
+  return gContext->sourceNameStorage.GetString(id);
+}
+
+void DataSource::Register() {
+  gContext->sources.insert_or_assign(m_id, this);
+  sourceCreated(m_id.c_str(), this);
+}
+
+void DataSource::DragDropTooltip() const {
+  const char* name = GetName().c_str();
+  ImGui::TextUnformatted(name[0] == '\0' ? m_id.c_str() : name);
+  ImGui::Text("(%s)", GetType());
+}
+
+const char* BooleanSource::GetType() const {
+  return kType;
+}
+
+const char* DoubleSource::GetType() const {
+  return kType;
+}
+
+const char* FloatSource::GetType() const {
+  return kType;
+}
+
+const char* IntegerSource::GetType() const {
+  return kType;
+}
+
+const char* StringSource::GetType() const {
+  return kType;
 }

@@ -1,0 +1,70 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package org.wpilib.examples.mechanism2d;
+
+import org.wpilib.driverstation.Joystick;
+import org.wpilib.framework.TimedRobot;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.hardware.rotation.AnalogPotentiometer;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.smartdashboard.Mechanism2d;
+import org.wpilib.smartdashboard.MechanismLigament2d;
+import org.wpilib.smartdashboard.MechanismRoot2d;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.util.Color;
+import org.wpilib.util.Color8Bit;
+
+/**
+ * This sample program shows how to use Mechanism2d - a visual representation of arms, elevators,
+ * and other mechanisms on dashboards; driven by a node-based API.
+ *
+ * <p>Ligaments are based on other ligaments or roots, and roots are contained in the base
+ * Mechanism2d object.
+ */
+public class Robot extends TimedRobot {
+  private static final double kMetersPerPulse = 0.01;
+  private static final double kElevatorMinimumLength = 0.5;
+
+  private final PWMSparkMax elevatorMotor = new PWMSparkMax(0);
+  private final PWMSparkMax wristMotor = new PWMSparkMax(1);
+  private final AnalogPotentiometer wristPot = new AnalogPotentiometer(1, 90);
+  private final Encoder elevatorEncoder = new Encoder(0, 1);
+  private final Joystick joystick = new Joystick(0);
+
+  private final MechanismLigament2d elevator;
+  private final MechanismLigament2d wrist;
+
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
+    elevatorEncoder.setDistancePerPulse(kMetersPerPulse);
+
+    // the main mechanism object
+    Mechanism2d mech = new Mechanism2d(3, 3);
+    // the mechanism root node
+    MechanismRoot2d root = mech.getRoot("climber", 2, 0);
+
+    // MechanismLigament2d objects represent each "section"/"stage" of the mechanism, and are based
+    // off the root node or another ligament object
+    elevator = root.append(new MechanismLigament2d("elevator", kElevatorMinimumLength, 90));
+    wrist =
+        elevator.append(new MechanismLigament2d("wrist", 0.5, 90, 6, new Color8Bit(Color.PURPLE)));
+
+    // post the mechanism to the dashboard
+    SmartDashboard.putData("Mech2d", mech);
+  }
+
+  @Override
+  public void robotPeriodic() {
+    // update the dashboard mechanism's state
+    elevator.setLength(kElevatorMinimumLength + elevatorEncoder.getDistance());
+    wrist.setAngle(wristPot.get());
+  }
+
+  @Override
+  public void teleopPeriodic() {
+    elevatorMotor.setThrottle(joystick.getRawAxis(0));
+    wristMotor.setThrottle(joystick.getRawAxis(1));
+  }
+}

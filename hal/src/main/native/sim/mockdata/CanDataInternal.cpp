@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "CanDataInternal.h"
+#include "CanDataInternal.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeCanData() {
   static CanData scd;
-  ::hal::SimCanData = &scd;
+  ::wpi::hal::SimCanData = &scd;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-CanData* hal::SimCanData;
+CanData* wpi::hal::SimCanData;
 
 void CanData::ResetData() {
   sendMessage.Reset();

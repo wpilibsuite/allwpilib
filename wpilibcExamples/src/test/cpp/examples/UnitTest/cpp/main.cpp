@@ -3,13 +3,14 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <hal/HALBase.h>
+
+#include "wpi/hal/HAL.h"
 
 /**
  * Runs all unit tests.
  */
 int main(int argc, char** argv) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
   return ret;

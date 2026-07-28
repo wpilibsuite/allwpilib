@@ -555,7 +555,8 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
    * \deprecated Will be removed in the next major Eigen version. Options should
    * be specified in the \a Options template parameter.
    */
-  EIGEN_DEPRECATED JacobiSVD(Index rows, Index cols, unsigned int computationOptions) {
+  EIGEN_DEPRECATED_WITH_REASON("Options should be specified using the class template parameter.")
+  JacobiSVD(Index rows, Index cols, unsigned int computationOptions) {
     internal::check_svd_options_assertions<MatrixType, Options>(computationOptions, rows, cols);
     allocate(rows, cols, computationOptions);
   }
@@ -567,6 +568,11 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
    */
   template <typename Derived>
   explicit JacobiSVD(const MatrixBase<Derived>& matrix) {
+    compute_impl(matrix, internal::get_computation_options(Options));
+  }
+
+  template <typename Derived>
+  explicit JacobiSVD(const TriangularBase<Derived>& matrix) {
     compute_impl(matrix, internal::get_computation_options(Options));
   }
 
@@ -600,6 +606,11 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
     return compute_impl(matrix, m_computationOptions);
   }
 
+  template <typename Derived>
+  JacobiSVD& compute(const TriangularBase<Derived>& matrix) {
+    return compute_impl(matrix, m_computationOptions);
+  }
+
   /** \brief Method performing the decomposition of given matrix, as specified by
    *         the `computationOptions` parameter.
    *
@@ -610,7 +621,8 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
    * be specified in the \a Options template parameter.
    */
   template <typename Derived>
-  EIGEN_DEPRECATED JacobiSVD& compute(const MatrixBase<Derived>& matrix, unsigned int computationOptions) {
+  EIGEN_DEPRECATED_WITH_REASON("Options should be specified using the class template parameter.")
+  JacobiSVD& compute(const MatrixBase<Derived>& matrix, unsigned int computationOptions) {
     internal::check_svd_options_assertions<MatrixBase<Derived>, Options>(m_computationOptions, matrix.rows(),
                                                                          matrix.cols());
     return compute_impl(matrix, computationOptions);
@@ -636,6 +648,8 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
   }
 
  private:
+  template <typename Derived>
+  JacobiSVD& compute_impl(const TriangularBase<Derived>& matrix, unsigned int computationOptions);
   template <typename Derived>
   JacobiSVD& compute_impl(const MatrixBase<Derived>& matrix, unsigned int computationOptions);
 
@@ -673,6 +687,13 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
       m_qr_precond_morerows;
   WorkMatrixType m_workMatrix;
 };
+
+template <typename MatrixType, int Options>
+template <typename Derived>
+JacobiSVD<MatrixType, Options>& JacobiSVD<MatrixType, Options>::compute_impl(const TriangularBase<Derived>& matrix,
+                                                                             unsigned int computationOptions) {
+  return compute_impl(matrix.toDenseMatrix(), computationOptions);
+}
 
 template <typename MatrixType, int Options>
 template <typename Derived>

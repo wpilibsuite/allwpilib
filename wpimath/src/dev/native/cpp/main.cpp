@@ -4,8 +4,8 @@
 
 #include <numbers>
 
-#include <wpi/print.h>
+#include "wpi/util/print.hpp"
 
 int main() {
-  wpi::print("{}\n", std::numbers::pi);
+  wpi::util::print("{}\n", std::numbers::pi);
 }

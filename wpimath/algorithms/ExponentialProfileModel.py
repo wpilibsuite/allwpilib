@@ -1,5 +1,18 @@
-from sympy import *
-from sympy.logic.boolalg import *
+#!/usr/bin/env python3
+
+from sympy import (
+    Eq,
+    Function,
+    dsolve,
+    exp,
+    expand,
+    init_printing,
+    log,
+    simplify,
+    solve,
+    symbols,
+)
+from sympy.logic.boolalg import SOPform
 
 init_printing()
 

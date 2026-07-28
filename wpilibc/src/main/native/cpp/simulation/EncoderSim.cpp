@@ -2,17 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/EncoderSim.h"
+#include "wpi/simulation/EncoderSim.hpp"
 
 #include <memory>
 #include <stdexcept>
 
-#include <hal/simulation/EncoderData.h>
+#include "wpi/hal/simulation/EncoderData.h"
+#include "wpi/hardware/rotation/Encoder.hpp"
 
-#include "frc/Encoder.h"
-
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 EncoderSim::EncoderSim(const Encoder& encoder)
     : m_index{encoder.GetFPGAIndex()} {}
@@ -63,21 +62,13 @@ void EncoderSim::SetCount(int count) {
   HALSIM_SetEncoderCount(m_index, count);
 }
 
-std::unique_ptr<CallbackStore> EncoderSim::RegisterPeriodCallback(
+std::unique_ptr<CallbackStore> EncoderSim::RegisterRateCallback(
     NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
-      m_index, -1, callback, &HALSIM_CancelEncoderPeriodCallback);
-  store->SetUid(HALSIM_RegisterEncoderPeriodCallback(
-      m_index, &CallbackStoreThunk, store.get(), initialNotify));
+      m_index, -1, callback, &HALSIM_CancelEncoderRateCallback);
+  store->SetUid(HALSIM_RegisterEncoderRateCallback(m_index, &CallbackStoreThunk,
+                                                   store.get(), initialNotify));
   return store;
-}
-
-double EncoderSim::GetPeriod() const {
-  return HALSIM_GetEncoderPeriod(m_index);
-}
-
-void EncoderSim::SetPeriod(double period) {
-  HALSIM_SetEncoderPeriod(m_index, period);
 }
 
 std::unique_ptr<CallbackStore> EncoderSim::RegisterResetCallback(
@@ -95,23 +86,6 @@ bool EncoderSim::GetReset() const {
 
 void EncoderSim::SetReset(bool reset) {
   HALSIM_SetEncoderReset(m_index, reset);
-}
-
-std::unique_ptr<CallbackStore> EncoderSim::RegisterMaxPeriodCallback(
-    NotifyCallback callback, bool initialNotify) {
-  auto store = std::make_unique<CallbackStore>(
-      m_index, -1, callback, &HALSIM_CancelEncoderMaxPeriodCallback);
-  store->SetUid(HALSIM_RegisterEncoderMaxPeriodCallback(
-      m_index, &CallbackStoreThunk, store.get(), initialNotify));
-  return store;
-}
-
-double EncoderSim::GetMaxPeriod() const {
-  return HALSIM_GetEncoderMaxPeriod(m_index);
-}
-
-void EncoderSim::SetMaxPeriod(double maxPeriod) {
-  HALSIM_SetEncoderMaxPeriod(m_index, maxPeriod);
 }
 
 std::unique_ptr<CallbackStore> EncoderSim::RegisterDirectionCallback(
@@ -146,23 +120,6 @@ bool EncoderSim::GetReverseDirection() const {
 
 void EncoderSim::SetReverseDirection(bool reverseDirection) {
   HALSIM_SetEncoderReverseDirection(m_index, reverseDirection);
-}
-
-std::unique_ptr<CallbackStore> EncoderSim::RegisterSamplesToAverageCallback(
-    NotifyCallback callback, bool initialNotify) {
-  auto store = std::make_unique<CallbackStore>(
-      m_index, -1, callback, &HALSIM_CancelEncoderSamplesToAverageCallback);
-  store->SetUid(HALSIM_RegisterEncoderSamplesToAverageCallback(
-      m_index, &CallbackStoreThunk, store.get(), initialNotify));
-  return store;
-}
-
-int EncoderSim::GetSamplesToAverage() const {
-  return HALSIM_GetEncoderSamplesToAverage(m_index);
-}
-
-void EncoderSim::SetSamplesToAverage(int samplesToAverage) {
-  HALSIM_SetEncoderSamplesToAverage(m_index, samplesToAverage);
 }
 
 std::unique_ptr<CallbackStore> EncoderSim::RegisterDistancePerPulseCallback(

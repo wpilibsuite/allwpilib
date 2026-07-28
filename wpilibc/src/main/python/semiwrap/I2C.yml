@@ -1,0 +1,26 @@
+classes:
+  wpi::I2C:
+    enums:
+      Port:
+    methods:
+      I2C:
+      GetPort:
+      GetDeviceAddress:
+      Transaction:
+        buffers:
+        - {type: IN, src: dataToSend, len: sendSize}
+        - {type: OUT, src: dataReceived, len: receiveSize}
+      AddressOnly:
+      Write:
+      WriteBulk:
+        buffers:
+        - {type: IN, src: data, len: count}
+      Read:
+        buffers:
+        - {type: OUT, src: data, len: count}
+      ReadOnly:
+        buffers:
+        - {type: OUT, src: buffer, len: count}
+      VerifySensor:
+        buffers:
+        - {type: IN, src: expected, len: count}

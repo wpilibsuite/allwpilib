@@ -10,8 +10,9 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/SmallVector.h"
-#include "wpi/Compiler.h"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/Compiler.hpp"
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <array>
 #include <list>
@@ -22,7 +23,7 @@
 #pragma GCC diagnostic ignored "-Wpedantic"
 #endif
 
-using namespace wpi;
+using namespace wpi::util;
 
 namespace {
 
@@ -132,24 +133,24 @@ public:
     return c0.getValue() == c1.getValue();
   }
 
-  friend bool LLVM_ATTRIBUTE_UNUSED operator!=(const Constructable &c0,
-                                               const Constructable &c1) {
+  [[maybe_unused]] friend bool operator!=(const Constructable &c0,
+                                          const Constructable &c1) {
     return c0.getValue() != c1.getValue();
   }
 
   friend bool operator<(const Constructable &c0, const Constructable &c1) {
     return c0.getValue() < c1.getValue();
   }
-  friend bool LLVM_ATTRIBUTE_UNUSED operator<=(const Constructable &c0,
-                                               const Constructable &c1) {
+  [[maybe_unused]] friend bool operator<=(const Constructable &c0,
+                                          const Constructable &c1) {
     return c0.getValue() <= c1.getValue();
   }
-  friend bool LLVM_ATTRIBUTE_UNUSED operator>(const Constructable &c0,
-                                              const Constructable &c1) {
+  [[maybe_unused]] friend bool operator>(const Constructable &c0,
+                                         const Constructable &c1) {
     return c0.getValue() > c1.getValue();
   }
-  friend bool LLVM_ATTRIBUTE_UNUSED operator>=(const Constructable &c0,
-                                               const Constructable &c1) {
+  [[maybe_unused]] friend bool operator>=(const Constructable &c0,
+                                          const Constructable &c1) {
     return c0.getValue() >= c1.getValue();
   }
 };
@@ -163,7 +164,7 @@ int Constructable::numCopyAssignmentCalls;
 int Constructable::numMoveAssignmentCalls;
 
 struct NonCopyable {
-  NonCopyable() {}
+  NonCopyable() = default;
   NonCopyable(NonCopyable &&) {}
   NonCopyable &operator=(NonCopyable &&) { return *this; }
 private:
@@ -230,13 +231,10 @@ protected:
   VectorT otherVector;
 };
 
-
-typedef ::testing::Types<SmallVector<Constructable, 0>,
-                         SmallVector<Constructable, 1>,
-                         SmallVector<Constructable, 2>,
-                         SmallVector<Constructable, 4>,
-                         SmallVector<Constructable, 5>
-                         > SmallVectorTestTypes;
+using SmallVectorTestTypes = ::testing::Types<
+    SmallVector<Constructable, 0>, SmallVector<Constructable, 1>,
+    SmallVector<Constructable, 2>, SmallVector<Constructable, 4>,
+    SmallVector<Constructable, 5>>;
 TYPED_TEST_SUITE(SmallVectorTest, SmallVectorTestTypes, );
 
 // Constructor test.
@@ -541,11 +539,11 @@ TYPED_TEST(SmallVectorTest, AppendNonIterTest) {
 }
 
 struct output_iterator {
-  typedef std::output_iterator_tag iterator_category;
-  typedef int value_type;
-  typedef int difference_type;
-  typedef value_type *pointer;
-  typedef value_type &reference;
+  using iterator_category = std::output_iterator_tag;
+  using value_type = int;
+  using difference_type = int;
+  using pointer = value_type *;
+  using reference = value_type &;
   operator int() { return 2; }
   operator Constructable() { return 7; }
 };
@@ -602,6 +600,15 @@ TYPED_TEST(SmallVectorTest, AssignSmallVector) {
   V.push_back(Constructable(1));
   V.assign(otherVector);
   assertValuesInOrder(V, 2u, 7, 7);
+}
+
+TYPED_TEST(SmallVectorTest, AssignSpan) {
+  SCOPED_TRACE("AssignSpan");
+  auto &V = this->theVector;
+  Constructable Other[] = {7, 8, 9};
+  V.push_back(Constructable(1));
+  V.assign(std::span<const Constructable>(Other));
+  assertValuesInOrder(V, 3u, 7, 8, 9);
 }
 
 // Move-assign test
@@ -891,7 +898,7 @@ protected:
   VectorT2 otherVector;
 };
 
-typedef ::testing::Types<
+using DualSmallVectorTestTypes = ::testing::Types<
     // Small mode -> Small mode.
     std::pair<SmallVector<Constructable, 4>, SmallVector<Constructable, 4>>,
     // Small mode -> Big mode.
@@ -899,8 +906,7 @@ typedef ::testing::Types<
     // Big mode -> Small mode.
     std::pair<SmallVector<Constructable, 2>, SmallVector<Constructable, 4>>,
     // Big mode -> Big mode.
-    std::pair<SmallVector<Constructable, 2>, SmallVector<Constructable, 2>>
-  > DualSmallVectorTestTypes;
+    std::pair<SmallVector<Constructable, 2>, SmallVector<Constructable, 2>>>;
 
 TYPED_TEST_SUITE(DualSmallVectorsTest, DualSmallVectorTestTypes, );
 
@@ -1134,6 +1140,17 @@ TEST(SmallVectorTest, DefaultInlinedElements) {
   EXPECT_EQ(NestedV[0][0][0], 42);
 }
 
+namespace namespace_with_adl {
+struct MyVector {
+  std::vector<int> data;
+};
+
+std::vector<int>::const_iterator begin(const MyVector &V) {
+  return V.data.begin();
+}
+std::vector<int>::const_iterator end(const MyVector &V) { return V.data.end(); }
+} // namespace namespace_with_adl
+
 TEST(SmallVectorTest, ToVector) {
   {
     std::vector<char> v = {'a', 'b', 'c'};
@@ -1150,6 +1167,15 @@ TEST(SmallVectorTest, ToVector) {
     ASSERT_EQ(3u, Vector.size());
     for (size_t I = 0; I < v.size(); ++I)
       EXPECT_EQ(v[I], Vector[I]);
+  }
+  {
+    // Check that to_vector and to_vector_of work with types that require ADL
+    // for being/end iterators.
+    namespace_with_adl::MyVector V = {{1, 2, 3}};
+    auto IntVector = to_vector(V);
+    EXPECT_THAT(IntVector, testing::ElementsAre(1, 2, 3));
+    IntVector = to_vector<3>(V);
+    EXPECT_THAT(IntVector, testing::ElementsAre(1, 2, 3));
   }
 }
 
@@ -1175,14 +1201,14 @@ TEST(SmallVectorTest, ConstructFromSpanOfConvertibleType) {
   std::vector<From> StdVector = {From(to1), From(to2), From(to3)};
   std::span<const From> Array = StdVector;
   {
-    wpi::SmallVector<To> Vector(Array);
+    wpi::util::SmallVector<To> Vector(Array);
 
     ASSERT_EQ(Array.size(), Vector.size());
     for (size_t I = 0; I < Array.size(); ++I)
       EXPECT_EQ(Array[I], Vector[I]);
   }
   {
-    wpi::SmallVector<To, 4> Vector(Array);
+    wpi::util::SmallVector<To, 4> Vector(Array);
 
     ASSERT_EQ(Array.size(), Vector.size());
     ASSERT_EQ(4u, NumBuiltinElts(Vector));
@@ -1195,19 +1221,28 @@ TEST(SmallVectorTest, ToVectorOf) {
   To to1{1}, to2{2}, to3{3};
   std::vector<From> StdVector = {From(to1), From(to2), From(to3)};
   {
-    wpi::SmallVector<To> Vector = wpi::to_vector_of<To>(StdVector);
+    wpi::util::SmallVector<To> Vector = wpi::util::to_vector_of<To>(StdVector);
 
     ASSERT_EQ(StdVector.size(), Vector.size());
     for (size_t I = 0; I < StdVector.size(); ++I)
       EXPECT_EQ(StdVector[I], Vector[I]);
   }
   {
-    auto Vector = wpi::to_vector_of<To, 4>(StdVector);
+    auto Vector = wpi::util::to_vector_of<To, 4>(StdVector);
 
     ASSERT_EQ(StdVector.size(), Vector.size());
     static_assert(NumBuiltinElts(Vector) == 4u);
     for (size_t I = 0; I < StdVector.size(); ++I)
       EXPECT_EQ(StdVector[I], Vector[I]);
+  }
+  {
+    // Check that to_vector works with types that require ADL for being/end
+    // iterators.
+    namespace_with_adl::MyVector V = {{1, 2, 3}};
+    auto UnsignedVector = to_vector_of<unsigned>(V);
+    EXPECT_THAT(UnsignedVector, testing::ElementsAre(1u, 2u, 3u));
+    UnsignedVector = to_vector_of<unsigned, 3>(V);
+    EXPECT_THAT(UnsignedVector, testing::ElementsAre(1u, 2u, 3u));
   }
 }
 

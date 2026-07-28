@@ -2,64 +2,38 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/internal/DriverStationModeThread.h"
+#include "wpi/internal/DriverStationModeThread.hpp"
 
-#include <hal/DriverStation.h>
-#include <wpi/Synchronization.h>
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/util/Synchronization.hpp"
 
-#include "frc/DriverStation.h"
+using namespace wpi::internal;
 
-using namespace frc::internal;
-
-DriverStationModeThread::DriverStationModeThread() {
+DriverStationModeThread::DriverStationModeThread(wpi::hal::ControlWord word)
+    : m_userControlWord{word.GetValue().value} {
+  HAL_ProvideNewDataEventHandle(m_event.GetHandle());
   m_keepAlive = true;
-  m_thread = std::thread{[&] { Run(); }};
+  m_thread = std::thread{[this] { Run(); }};
 }
 
 DriverStationModeThread::~DriverStationModeThread() {
+  HAL_RemoveNewDataEventHandle(m_event.GetHandle());
   m_keepAlive = false;
+  m_event.Set();
   if (m_thread.joinable()) {
     m_thread.join();
   }
 }
 
-void DriverStationModeThread::InDisabled(bool entering) {
-  m_userInDisabled = entering;
-}
-
-void DriverStationModeThread::InAutonomous(bool entering) {
-  m_userInAutonomous = entering;
-}
-
-void DriverStationModeThread::InTeleop(bool entering) {
-  m_userInTeleop = entering;
-}
-
-void DriverStationModeThread::InTest(bool entering) {
-  m_userInTest = entering;
-}
-
 void DriverStationModeThread::Run() {
-  wpi::Event event{false, false};
-  HAL_ProvideNewDataEventHandle(event.GetHandle());
-
-  while (m_keepAlive.load()) {
+  for (;;) {
     bool timedOut = false;
-    wpi::WaitForObject(event.GetHandle(), 0.1, &timedOut);
-    frc::DriverStation::RefreshData();
-    if (m_userInDisabled) {
-      HAL_ObserveUserProgramDisabled();
+    wpi::util::WaitForObject(m_event.GetHandle(), 0.1, &timedOut);
+    if (!m_keepAlive) {
+      break;
     }
-    if (m_userInAutonomous) {
-      HAL_ObserveUserProgramAutonomous();
-    }
-    if (m_userInTeleop) {
-      HAL_ObserveUserProgramTeleop();
-    }
-    if (m_userInTest) {
-      HAL_ObserveUserProgramTest();
-    }
+    wpi::internal::DriverStationBackend::RefreshData();
+    HAL_ObserveUserProgram({.value = m_userControlWord});
   }
-
-  HAL_RemoveNewDataEventHandle(event.GetHandle());
 }

@@ -27,14 +27,16 @@ def copy_upstream_src(wpilib_root: Path):
         shutil.rmtree(third_party_root / d, ignore_errors=True)
 
     walk_cwd_and_copy_if(
-        lambda dp, f: has_prefix(dp, Path("googlemock/src"))
-        and f not in EXCLUDED_FILES,
+        lambda dp, f: (
+            has_prefix(dp, Path("googlemock/src")) and f not in EXCLUDED_FILES
+        ),
         third_party_root / "src",
     )
 
     walk_cwd_and_copy_if(
-        lambda dp, f: has_prefix(dp, Path("googletest/src"))
-        and f not in EXCLUDED_FILES,
+        lambda dp, f: (
+            has_prefix(dp, Path("googletest/src")) and f not in EXCLUDED_FILES
+        ),
         third_party_root / "src",
     )
 
@@ -54,7 +56,8 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "googletest"
     url = "https://github.com/google/googletest.git"
-    tag = "v1.14.0"
+    # main on 2026-04-11
+    tag = "d72f9c8aea6817cdf1ca0ac10887f328de7f3da2"
 
     googletest = Lib(name, url, tag, copy_upstream_src)
     googletest.main()

@@ -65,7 +65,7 @@ struct default_packet_traits {
     HasAbsDiff = 0,
     HasBlend = 0,
     // This flag is used to indicate whether packet comparison is supported.
-    // pcmp_eq, pcmp_lt and pcmp_le should be defined for it to be true.
+    // pcmp_eq and pcmp_lt should be defined for it to be true.
     HasCmp = 0,
 
     HasDiv = 0,
@@ -432,30 +432,6 @@ EIGEN_DEVICE_FUNC inline Packet pzero(const Packet& a) {
   return pzero_impl<Packet>::run(a);
 }
 
-/** \internal \returns a <= b as a bit mask */
-template <typename Packet>
-EIGEN_DEVICE_FUNC inline Packet pcmp_le(const Packet& a, const Packet& b) {
-  return a <= b ? ptrue(a) : pzero(a);
-}
-
-/** \internal \returns a < b as a bit mask */
-template <typename Packet>
-EIGEN_DEVICE_FUNC inline Packet pcmp_lt(const Packet& a, const Packet& b) {
-  return a < b ? ptrue(a) : pzero(a);
-}
-
-/** \internal \returns a == b as a bit mask */
-template <typename Packet>
-EIGEN_DEVICE_FUNC inline Packet pcmp_eq(const Packet& a, const Packet& b) {
-  return a == b ? ptrue(a) : pzero(a);
-}
-
-/** \internal \returns a < b or a==NaN or b==NaN as a bit mask */
-template <typename Packet>
-EIGEN_DEVICE_FUNC inline Packet pcmp_lt_or_nan(const Packet& a, const Packet& b) {
-  return a >= b ? pzero(a) : ptrue(a);
-}
-
 template <typename T>
 struct bit_and {
   EIGEN_DEVICE_FUNC constexpr EIGEN_ALWAYS_INLINE T operator()(const T& a, const T& b) const { return a & b; }
@@ -580,6 +556,30 @@ EIGEN_DEVICE_FUNC inline Packet pnot(const Packet& a) {
 template <typename Packet>
 EIGEN_DEVICE_FUNC inline Packet pandnot(const Packet& a, const Packet& b) {
   return pand(a, pnot(b));
+}
+
+/** \internal \returns a < b as a bit mask */
+template <typename Packet>
+EIGEN_DEVICE_FUNC inline Packet pcmp_lt(const Packet& a, const Packet& b) {
+  return a < b ? ptrue(a) : pzero(a);
+}
+
+/** \internal \returns a == b as a bit mask */
+template <typename Packet>
+EIGEN_DEVICE_FUNC inline Packet pcmp_eq(const Packet& a, const Packet& b) {
+  return a == b ? ptrue(a) : pzero(a);
+}
+
+/** \internal \returns a <= b as a bit mask */
+template <typename Packet>
+EIGEN_DEVICE_FUNC inline Packet pcmp_le(const Packet& a, const Packet& b) {
+  return por(pcmp_eq(a, b), pcmp_lt(a, b));
+}
+
+/** \internal \returns a < b or a==NaN or b==NaN as a bit mask */
+template <typename Packet>
+EIGEN_DEVICE_FUNC inline Packet pcmp_lt_or_nan(const Packet& a, const Packet& b) {
+  return a >= b ? pzero(a) : ptrue(a);
 }
 
 // In the general case, use bitwise select.

@@ -2,20 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "LocalDataLoggerEntry.h"
+#include "LocalDataLoggerEntry.hpp"
 
+#include <format>
 #include <string>
 #include <string_view>
 
-#include <fmt/format.h>
-#include <wpi/StringExtras.h>
+#include "wpi/nt/NetworkTableValue.hpp"
+#include "wpi/util/StringExtras.hpp"
 
-#include "networktables/NetworkTableValue.h"
-
-using namespace nt::local;
+using namespace wpi::nt::local;
 
 std::string LocalDataLoggerEntry::MakeMetadata(std::string_view properties) {
-  return fmt::format("{{\"properties\":{},\"source\":\"NT\"}}", properties);
+  return std::format("{{\"properties\":{},\"source\":\"NT\"}}", properties);
 }
 
 void LocalDataLoggerEntry::Append(const Value& v) {

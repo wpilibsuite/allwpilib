@@ -2,17 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "InstanceImpl.h"
+#include "InstanceImpl.hpp"
 
 #include <memory>
 #include <string>
 #include <utility>
 
-using namespace nt;
+using namespace wpi::nt;
 
 std::atomic<int> InstanceImpl::s_default{-1};
 std::atomic<InstanceImpl*> InstanceImpl::s_instances[kNumInstances];
-wpi::mutex InstanceImpl::s_mutex;
+wpi::util::mutex InstanceImpl::s_mutex;
+InstanceImpl::Cleanup InstanceImpl::s_cleanup;
 
 using namespace std::placeholders;
 
@@ -102,19 +103,23 @@ void InstanceImpl::StopLocal() {
 
 void InstanceImpl::StartServer(std::string_view persistFilename,
                                std::string_view listenAddress,
-                               unsigned int port3, unsigned int port4) {
+                               std::string_view mdnsService,
+                               unsigned int port) {
   std::scoped_lock lock{m_mutex};
   if (networkMode != NT_NET_MODE_NONE) {
     return;
   }
   m_networkServer = std::make_shared<NetworkServer>(
-      persistFilename, listenAddress, port3, port4, localStorage,
-      connectionList, logger, [this] {
+      persistFilename, listenAddress, mdnsService, port, localStorage,
+      connectionList, logger, [this](bool announcingmDNS) {
         std::scoped_lock lock{m_mutex};
         networkMode &= ~NT_NET_MODE_STARTING;
+        if (announcingmDNS) {
+          networkMode |= NT_NET_MODE_MDNS_ANNOUNCING;
+        }
       });
   networkMode = NT_NET_MODE_SERVER | NT_NET_MODE_STARTING;
-  listenerStorage.NotifyTimeSync({}, NT_EVENT_TIMESYNC, 0, 0, true);
+  listenerStorage.NotifyTimeSync({}, NT_EVENT_TIME_SYNC, 0, 0, true);
   m_serverTimeOffset = 0;
   m_rtt2 = 0;
 }
@@ -128,26 +133,13 @@ void InstanceImpl::StopServer() {
     }
     server = std::move(m_networkServer);
     networkMode = NT_NET_MODE_NONE;
-    listenerStorage.NotifyTimeSync({}, NT_EVENT_TIMESYNC, 0, 0, false);
+    listenerStorage.NotifyTimeSync({}, NT_EVENT_TIME_SYNC, 0, 0, false);
     m_serverTimeOffset.reset();
     m_rtt2 = 0;
   }
 }
 
-void InstanceImpl::StartClient3(std::string_view identity) {
-  std::scoped_lock lock{m_mutex};
-  if (networkMode != NT_NET_MODE_NONE) {
-    return;
-  }
-  m_networkClient = std::make_shared<NetworkClient3>(
-      m_inst, identity, localStorage, connectionList, logger);
-  if (!m_servers.empty()) {
-    m_networkClient->SetServers(m_servers);
-  }
-  networkMode = NT_NET_MODE_CLIENT3;
-}
-
-void InstanceImpl::StartClient4(std::string_view identity) {
+void InstanceImpl::StartClient(std::string_view identity) {
   std::scoped_lock lock{m_mutex};
   if (networkMode != NT_NET_MODE_NONE) {
     return;
@@ -156,7 +148,7 @@ void InstanceImpl::StartClient4(std::string_view identity) {
       m_inst, identity, localStorage, connectionList, logger,
       [this](int64_t serverTimeOffset, int64_t rtt2, bool valid) {
         std::scoped_lock lock{m_mutex};
-        listenerStorage.NotifyTimeSync({}, NT_EVENT_TIMESYNC, serverTimeOffset,
+        listenerStorage.NotifyTimeSync({}, NT_EVENT_TIME_SYNC, serverTimeOffset,
                                        rtt2, valid);
         if (valid) {
           m_serverTimeOffset = serverTimeOffset;
@@ -169,14 +161,14 @@ void InstanceImpl::StartClient4(std::string_view identity) {
   if (!m_servers.empty()) {
     m_networkClient->SetServers(m_servers);
   }
-  networkMode = NT_NET_MODE_CLIENT4;
+  networkMode = NT_NET_MODE_CLIENT;
 }
 
 void InstanceImpl::StopClient() {
   std::shared_ptr<INetworkClient> client;
   {
     std::scoped_lock lock{m_mutex};
-    if ((networkMode & (NT_NET_MODE_CLIENT3 | NT_NET_MODE_CLIENT4)) == 0) {
+    if ((networkMode & NT_NET_MODE_CLIENT) == 0) {
       return;
     }
     client = std::move(m_networkClient);
@@ -185,7 +177,7 @@ void InstanceImpl::StopClient() {
   client.reset();
   {
     std::scoped_lock lock{m_mutex};
-    listenerStorage.NotifyTimeSync({}, NT_EVENT_TIMESYNC, 0, 0, false);
+    listenerStorage.NotifyTimeSync({}, NT_EVENT_TIME_SYNC, 0, 0, false);
     m_serverTimeOffset.reset();
     m_rtt2 = 0;
   }
@@ -218,13 +210,13 @@ std::optional<int64_t> InstanceImpl::GetServerTimeOffset() {
 void InstanceImpl::AddTimeSyncListener(NT_Listener listener,
                                        unsigned int eventMask) {
   std::scoped_lock lock{m_mutex};
-  eventMask &= (NT_EVENT_TIMESYNC | NT_EVENT_IMMEDIATE);
+  eventMask &= (NT_EVENT_TIME_SYNC | NT_EVENT_IMMEDIATE);
   listenerStorage.Activate(listener, eventMask);
-  if ((eventMask & (NT_EVENT_TIMESYNC | NT_EVENT_IMMEDIATE)) ==
-          (NT_EVENT_TIMESYNC | NT_EVENT_IMMEDIATE) &&
+  if ((eventMask & (NT_EVENT_TIME_SYNC | NT_EVENT_IMMEDIATE)) ==
+          (NT_EVENT_TIME_SYNC | NT_EVENT_IMMEDIATE) &&
       m_serverTimeOffset) {
     listenerStorage.NotifyTimeSync({&listener, 1},
-                                   NT_EVENT_TIMESYNC | NT_EVENT_IMMEDIATE,
+                                   NT_EVENT_TIME_SYNC | NT_EVENT_IMMEDIATE,
                                    *m_serverTimeOffset, m_rtt2, true);
   }
 }

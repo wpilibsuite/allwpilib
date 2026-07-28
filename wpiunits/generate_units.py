@@ -79,11 +79,9 @@ UNIT_CONFIGURATIONS = {
         "base_unit": "RadiansPerSecond",
         "multiply": {"Time": "Angle", "Frequency": "AngularAcceleration"},
         "divide": {"Time": "AngularAcceleration"},
-        "extra": inspect.cleandoc(
-            """
-          default Frequency asFrequency() { return Hertz.of(baseUnitMagnitude()); }
-        """
-        ),
+        "extra": inspect.cleandoc("""
+          public Frequency asFrequency() { return Hertz.of(baseUnitMagnitude()); }
+        """),
     },
     "Current": {
         "base_unit": "Amps",
@@ -161,12 +159,10 @@ UNIT_CONFIGURATIONS = {
             "AngularVelocity": "AngularAcceleration",
         },
         "divide": {},
-        "extra": inspect.cleandoc(
-            """
+        "extra": inspect.cleandoc("""
           /** Converts this frequency to the time period between cycles. */
-          default Time asPeriod() { return Seconds.of(1 / baseUnitMagnitude()); }
-        """
-        ),
+          public Time asPeriod() { return Seconds.of(1 / baseUnitMagnitude()); }
+        """),
     },
     "LinearAcceleration": {
         "base_unit": "MetersPerSecondPerSecond",
@@ -204,18 +200,16 @@ UNIT_CONFIGURATIONS = {
         "generics": {"Dividend": {"extends": "Unit"}, "Divisor": {"extends": "Unit"}},
         "multiply": {},
         "divide": {},
-        "extra": inspect.cleandoc(
-            """
-          default Measure<Dividend> timesDivisor(Measure<? extends Divisor> multiplier) {
+        "extra": inspect.cleandoc("""
+          public Measure<Dividend> timesDivisor(Measure<? extends Divisor> multiplier) {
             return (Measure<Dividend>) baseUnit().numerator().ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
           }
 
-          default Measure<? extends PerUnit<Divisor, Dividend>> reciprocal() {
+          public Measure<? extends PerUnit<Divisor, Dividend>> reciprocal() {
             // May return a velocity if Divisor == TimeUnit, so we can't guarantee a "Per" instance
             return baseUnit().reciprocal().ofBaseUnits(1 / baseUnitMagnitude());
           }
-        """
-        ),
+        """),
     },
     "Power": {
         "base_unit": "Watts",
@@ -250,11 +244,9 @@ UNIT_CONFIGURATIONS = {
             # `Velocity<TimeUnit>` (i.e. a time per unit time ratio)
             "Time": "Dimensionless"
         },
-        "extra": inspect.cleandoc(
-            """
-          default Frequency asFrequency() { return Hertz.of(1 / baseUnitMagnitude()); }
-        """
-        ),
+        "extra": inspect.cleandoc("""
+          public Frequency asFrequency() { return Hertz.of(1 / baseUnitMagnitude()); }
+        """),
     },
     "Torque": {
         "base_unit": "NewtonMeters",
@@ -266,14 +258,12 @@ UNIT_CONFIGURATIONS = {
         "generics": {"D": {"extends": "Unit"}},
         "multiply": {
             "Time": {
-                "implementation": inspect.cleandoc(
-                    """
+                "implementation": inspect.cleandoc("""
                   @Override
-                  default Measure<D> times(Time multiplier) {
+                  public Measure<D> times(Time multiplier) {
                     return (Measure<D>) unit().numerator().ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
                   }
-                """
-                )
+                """)
             }
         },
         "divide": {},
@@ -352,10 +342,8 @@ def generate_units(output_directory: Path, template_directory: Path):
         keep_trailing_newline=True,
     )
 
-    interfaceTemplate = env.get_template("Measure-interface.java.jinja")
-    immutableTemplate = env.get_template("Measure-immutable.java.jinja")
-    mutableTemplate = env.get_template("Measure-mutable.java.jinja")
-    rootPath = output_directory / "main/java/edu/wpi/first/units"
+    interfaceTemplate = env.get_template("Measure-implementation.java.jinja")
+    rootPath = output_directory / "main/java/org/wpilib/units"
 
     helpers = {
         "type_decl": type_decl,
@@ -373,22 +361,8 @@ def generate_units(output_directory: Path, template_directory: Path):
             config=UNIT_CONFIGURATIONS,
             helpers=helpers,
         )
-        immutableContents = immutableTemplate.render(
-            name=unit_name,
-            units=MATH_OPERATION_UNITS,
-            config=UNIT_CONFIGURATIONS,
-            helpers=helpers,
-        )
-        mutableContents = mutableTemplate.render(
-            name=unit_name,
-            units=MATH_OPERATION_UNITS,
-            config=UNIT_CONFIGURATIONS,
-            helpers=helpers,
-        )
 
         output(rootPath / "measure", f"{unit_name}.java", interfaceContents)
-        output(rootPath / "measure", f"Immutable{unit_name}.java", immutableContents)
-        output(rootPath / "measure", f"Mut{unit_name}.java", mutableContents)
 
 
 def main():

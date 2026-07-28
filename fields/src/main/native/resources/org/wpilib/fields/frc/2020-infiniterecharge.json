@@ -1,0 +1,20 @@
+{
+  "game": "2020 FRC Infinite Recharge",
+  "field-image": "2020-infiniterecharge.png",
+  "field-corners": {
+    "top-left": [
+      94,
+      26
+    ],
+    "bottom-right": [
+      1038,
+      515
+    ]
+  },
+  "field-size": [
+    52.4375,
+    26.9375
+  ],
+  "field-unit": "foot",
+  "program": "frc"
+}

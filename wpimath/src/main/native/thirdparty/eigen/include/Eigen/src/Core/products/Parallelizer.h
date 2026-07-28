@@ -47,7 +47,7 @@ inline void manage_multi_threading(Action action, int* v);
 // Public APIs.
 
 /** Must be call first when calling Eigen from multiple threads */
-EIGEN_DEPRECATED inline void initParallel() {}
+EIGEN_DEPRECATED_WITH_REASON("Initialization is no longer needed.") inline void initParallel() {}
 
 /** \returns the max number of threads reserved for Eigen
  * \sa setNbThreads */

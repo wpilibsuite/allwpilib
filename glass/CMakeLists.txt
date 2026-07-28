@@ -1,13 +1,14 @@
 project(glass)
 
 include(CompileWarnings)
+include(AddTest)
 include(GenResources)
 include(LinkMacOSGUI)
 
 #
 # libglass
 #
-file(GLOB_RECURSE libglass_src src/lib/native/cpp/*.cpp)
+file(GLOB_RECURSE libglass_src src/lib/native/cpp/*.cpp src/lib/native/thirdparty/mrccomm/src/*.cpp)
 
 add_library(libglass STATIC ${libglass_src})
 set_target_properties(libglass PROPERTIES DEBUG_POSTFIX "d")
@@ -19,18 +20,27 @@ endif()
 set_property(TARGET libglass PROPERTY FOLDER "libraries")
 
 wpilib_target_warnings(libglass)
-target_link_libraries(libglass PUBLIC wpigui wpimath wpiutil fieldImages)
+target_link_libraries(libglass PUBLIC wpigui wpimath wpiutil fields)
 
 target_include_directories(
     libglass
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lib/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lib/native/thirdparty/mrccomm/include>
         $<INSTALL_INTERFACE:${include_dest}/glass>
 )
 
 install(TARGETS libglass EXPORT libglass)
 export(TARGETS libglass FILE libglass.cmake NAMESPACE libglass::)
-install(DIRECTORY src/lib/native/include/ DESTINATION "${include_dest}/glass")
+install(
+    DIRECTORY src/lib/native/include/ src/lib/native/thirdparty/mrccomm/include/
+    DESTINATION "${include_dest}/glass"
+)
+
+if(WPILIB_WITH_TESTS)
+    wpilib_add_test_catch2(glass src/test/native/cpp)
+    target_link_libraries(glass_test libglass)
+endif()
 
 #
 # libglassnt
@@ -64,7 +74,7 @@ install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
 #
 
 configure_file(src/app/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
-generate_resources(src/app/native/resources generated/app/cpp GLASS glass glass_resources_src)
+generate_resources(src/app/native/resources generated/app/cpp GLASS wpi::glass glass_resources_src)
 
 file(GLOB glass_src src/app/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
 

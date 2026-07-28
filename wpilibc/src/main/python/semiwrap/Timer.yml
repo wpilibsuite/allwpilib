@@ -1,0 +1,18 @@
+functions:
+  Wait:
+  GetSystemTime:
+classes:
+  wpi::Timer:
+    methods:
+      Timer:
+      Get:
+      Reset:
+      Start:
+      Restart:
+      Stop:
+      GetMonotonicTimestamp:
+      GetMatchTime:
+      HasElapsed:
+      AdvanceIfElapsed:
+      IsRunning:
+      GetTimestamp:

@@ -2,29 +2,28 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ServerImpl.h"
+#include "ServerImpl.hpp"
 
 #include <stdint.h>
 
 #include <cmath>
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <wpi/MessagePack.h>
+#include "Log.hpp"
+#include "server/MessagePackWriter.hpp"
+#include "server/ServerClient4.hpp"
+#include "server/ServerClientLocal.hpp"
+#include "wpi/util/MessagePack.hpp"
 
-#include "Log.h"
-#include "server/MessagePackWriter.h"
-#include "server/ServerClient3.h"
-#include "server/ServerClient4.h"
-#include "server/ServerClientLocal.h"
-
-using namespace nt;
-using namespace nt::server;
+using namespace wpi::nt;
+using namespace wpi::nt::server;
 using namespace mpack;
 
-ServerImpl::ServerImpl(wpi::Logger& logger)
+ServerImpl::ServerImpl(wpi::util::Logger& logger)
     : m_logger{logger},
       m_storage{logger, [this](ServerTopic* topic, ServerClient* client) {
                   SendAnnounce(topic, client);
@@ -49,7 +48,7 @@ std::pair<std::string, int> ServerImpl::AddClient(std::string_view name,
   size_t index = GetEmptyClientSlot();
 
   // ensure name is unique by suffixing index
-  std::string dedupName = fmt::format("{}@{}", name, index);
+  std::string dedupName = std::format("{}@{}", name, index);
 
   auto& clientData = m_clients[index];
   clientData = std::make_unique<ServerClient4>(dedupName, connInfo, local, wire,
@@ -58,20 +57,6 @@ std::pair<std::string, int> ServerImpl::AddClient(std::string_view name,
 
   DEBUG3("AddClient('{}', '{}') -> {}", name, connInfo, index);
   return {std::move(dedupName), index};
-}
-
-int ServerImpl::AddClient3(std::string_view connInfo, bool local,
-                           net3::WireConnection3& wire,
-                           Connected3Func connected,
-                           SetPeriodicFunc setPeriodic) {
-  size_t index = GetEmptyClientSlot();
-
-  m_clients[index] = std::make_unique<ServerClient3>(
-      connInfo, local, wire, std::move(connected), std::move(setPeriodic),
-      m_storage, index, m_logger);
-
-  DEBUG3("AddClient3('{}') -> {}", connInfo, index);
-  return index;
 }
 
 std::shared_ptr<void> ServerImpl::RemoveClient(int clientId) {
@@ -103,7 +88,7 @@ void ServerImpl::SendAnnounce(ServerTopic* topic, ServerClient* client) {
     }
 
     // look for subscriber matching prefixes
-    wpi::SmallVector<ServerSubscriber*, 16> subscribersBuf;
+    wpi::util::SmallVector<ServerSubscriber*, 16> subscribersBuf;
     auto subscribers =
         aClient->GetSubscribers(topic->name, topic->special, subscribersBuf);
 
@@ -127,7 +112,8 @@ void ServerImpl::SendAnnounce(ServerTopic* topic, ServerClient* client) {
       continue;  // don't announce to requesting client again
     }
 
-    DEBUG4("client {}: announce {}", aClient->GetId(), topic->name);
+    DEBUG4("client {}: announce {} properties {}", aClient->GetId(),
+           topic->name, topic->properties.to_string());
     aClient->SendAnnounce(topic, std::nullopt);
   }
 }
@@ -140,7 +126,7 @@ void ServerImpl::UpdateMetaClients(const std::vector<ConnectionInfo>& conns) {
     mpack_write_str(&w, "id");
     mpack_write_str(&w, conn.remote_id);
     mpack_write_str(&w, "conn");
-    mpack_write_str(&w, fmt::format("{}:{}", conn.remote_ip, conn.remote_port));
+    mpack_write_str(&w, std::format("{}:{}", conn.remote_ip, conn.remote_port));
     mpack_write_str(&w, "ver");
     mpack_write_u16(&w, conn.protocol_version);
     mpack_finish_map(&w);
@@ -209,7 +195,7 @@ bool ServerImpl::ProcessLocalMessages(size_t max) {
 
 std::string ServerImpl::DumpPersistent() {
   std::string rv;
-  wpi::raw_string_ostream os{rv};
+  wpi::util::raw_string_ostream os{rv};
   m_storage.DumpPersistent(os);
   os.flush();
   return rv;

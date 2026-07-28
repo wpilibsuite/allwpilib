@@ -2,62 +2,35 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "RobotContainer.h"
+#include "RobotContainer.hpp"
 
-#include <frc/shuffleboard/Shuffleboard.h>
-#include <frc2/command/button/JoystickButton.h>
-
-#include "commands/DefaultDrive.h"
-#include "commands/GrabHatch.h"
-#include "commands/HalveDriveSpeed.h"
-#include "commands/ReleaseHatch.h"
+#include "commands/DefaultDrive.hpp"
+#include "commands/GrabHatch.hpp"
+#include "commands/HalveDriveVelocity.hpp"
+#include "commands/ReleaseHatch.hpp"
+#include "wpi/commands2/button/GamepadButton.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
   // Add commands to the autonomous command chooser
-  m_chooser.SetDefaultOption("Simple Auto", &m_simpleAuto);
-  m_chooser.AddOption("Complex Auto", &m_complexAuto);
+  chooser.SetDefaultOption("Simple Auto", &simpleAuto);
+  chooser.AddOption("Complex Auto", &complexAuto);
 
   // Put the chooser on the dashboard
-  frc::Shuffleboard::GetTab("Autonomous").Add(m_chooser);
+  wpi::SmartDashboard::PutData("Autonomous", &chooser);
   // Put subsystems to dashboard.
-  frc::Shuffleboard::GetTab("Drivetrain").Add(m_drive);
-  frc::Shuffleboard::GetTab("HatchSubsystem").Add(m_hatch);
-
-  // Log Shuffleboard events for command initialize, execute, finish, interrupt
-  frc2::CommandScheduler::GetInstance().OnCommandInitialize(
-      [](const frc2::Command& command) {
-        frc::Shuffleboard::AddEventMarker(
-            "Command initialized", command.GetName(),
-            frc::ShuffleboardEventImportance::kNormal);
-      });
-  frc2::CommandScheduler::GetInstance().OnCommandExecute(
-      [](const frc2::Command& command) {
-        frc::Shuffleboard::AddEventMarker(
-            "Command executed", command.GetName(),
-            frc::ShuffleboardEventImportance::kNormal);
-      });
-  frc2::CommandScheduler::GetInstance().OnCommandFinish(
-      [](const frc2::Command& command) {
-        frc::Shuffleboard::AddEventMarker(
-            "Command finished", command.GetName(),
-            frc::ShuffleboardEventImportance::kNormal);
-      });
-  frc2::CommandScheduler::GetInstance().OnCommandInterrupt(
-      [](const frc2::Command& command) {
-        frc::Shuffleboard::AddEventMarker(
-            "Command interrupted", command.GetName(),
-            frc::ShuffleboardEventImportance::kNormal);
-      });
+  wpi::SmartDashboard::PutData("Drivetrain", &drive);
+  wpi::SmartDashboard::PutData("HatchSubsystem", &hatch);
 
   // Configure the button bindings
   ConfigureButtonBindings();
 
   // Set up default drive command
-  m_drive.SetDefaultCommand(DefaultDrive(
-      &m_drive, [this] { return -m_driverController.GetLeftY(); },
-      [this] { return -m_driverController.GetRightX(); }));
+  drive.SetDefaultCommand(DefaultDrive(
+      &drive, [this] { return -driverController.GetLeftY(); },
+      [this] { return -driverController.GetRightX(); }));
 }
 
 void RobotContainer::ConfigureButtonBindings() {
@@ -66,19 +39,18 @@ void RobotContainer::ConfigureButtonBindings() {
   // NOTE: since we're binding a CommandPtr, command ownership here is moved to
   // the scheduler thus, no memory leaks!
 
-  // Grab the hatch when the 'A' button is pressed.
-  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
-      .OnTrue(GrabHatch(&m_hatch).ToPtr());
-  // Release the hatch when the 'B' button is pressed.
-  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
-      .OnTrue(ReleaseHatch(&m_hatch).ToPtr());
-  // While holding the shoulder button, drive at half speed
-  frc2::JoystickButton(&m_driverController,
-                       frc::XboxController::Button::kRightBumper)
-      .WhileTrue(HalveDriveSpeed(&m_drive).ToPtr());
+  // Grab the hatch when the 'Face Down' button is pressed.
+  wpi::cmd::GamepadButton(&driverController, wpi::Gamepad::Button::FACE_DOWN)
+      .OnTrue(GrabHatch(&hatch).ToPtr());
+  // Release the hatch when the 'Face Right' button is pressed.
+  wpi::cmd::GamepadButton(&driverController, wpi::Gamepad::Button::FACE_RIGHT)
+      .OnTrue(ReleaseHatch(&hatch).ToPtr());
+  // While holding the bumper button, drive at half velocity
+  wpi::cmd::GamepadButton(&driverController, wpi::Gamepad::Button::RIGHT_BUMPER)
+      .WhileTrue(HalveDriveVelocity(&drive).ToPtr());
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
-  return m_chooser.GetSelected();
+  return chooser.GetSelected();
 }

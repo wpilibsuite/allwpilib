@@ -1,0 +1,9 @@
+classes:
+  wpi::math::EdgeCounterFilter:
+    methods:
+      EdgeCounterFilter:
+      Calculate:
+      SetWindowTime:
+      GetWindowTime:
+      SetRequiredEdges:
+      GetRequiredEdges:

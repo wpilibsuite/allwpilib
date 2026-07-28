@@ -2,194 +2,241 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "net/WireDecoder.hpp"
+
 #include <string>
 
-#include <gtest/gtest.h>
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
+#include <catch2/catch_test_macros.hpp>
 
-#include "../MockLogger.h"
-#include "../PubSubOptionsMatcher.h"
-#include "../TestPrinters.h"
-#include "MockMessageHandler.h"
-#include "PubSubOptions.h"
-#include "gmock/gmock.h"
-#include "net/MessageHandler.h"
-#include "net/WireDecoder.h"
-#include "networktables/NetworkTableValue.h"
+#include "../MockAssertions.hpp"
+#include "../MockLogger.hpp"
+#include "../TestPrinters.hpp"
+#include "MockMessageHandler.hpp"
+#include "PubSubOptions.hpp"
+#include "net/MessageHandler.hpp"
+#include "wpi/nt/NetworkTableValue.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 using namespace std::string_view_literals;
-using testing::_;
-using testing::MockFunction;
-using testing::StrictMock;
 
-namespace nt {
+namespace wpi::nt {
 
-class WireDecodeTextClientTest : public ::testing::Test {
+class WireDecodeTextClientTest {
  public:
-  StrictMock<net::MockClientMessageHandler> handler;
-  StrictMock<wpi::MockLogger> logger;
+  net::MockClientMessageHandler handler;
+  wpi::MockLogger logger;
 };
 
-class WireDecodeTextServerTest : public ::testing::Test {
+class WireDecodeTextServerTest {
  public:
-  StrictMock<net::MockServerMessageHandler> handler;
-  StrictMock<wpi::MockLogger> logger;
+  net::MockServerMessageHandler handler;
+  wpi::MockLogger logger;
 };
 
-TEST_F(WireDecodeTextClientTest, EmptyArray) {
+TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest EmptyArray",
+                 "[ntcore][wire][decoder]") {
   net::WireDecodeText("[]", handler, logger);
+  logger.CheckMessages({});
+  CheckNoClientCalls(handler);
 }
 
-TEST_F(WireDecodeTextClientTest, ErrorEmpty) {
-  EXPECT_CALL(
-      logger,
-      Call(_, _, _,
-           "could not decode JSON message: [json.exception.parse_error.101] "
-           "parse error at line 1, column 1: attempting to parse an empty "
-           "input; check that your input string or stream contains the "
-           "expected JSON"sv));
+TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest ErrorEmpty",
+                 "[ntcore][wire][decoder]") {
   net::WireDecodeText("", handler, logger);
+  logger.CheckMessage(NT_LOG_WARNING,
+                      "could not decode JSON message: absent_value"sv);
+  CheckNoClientCalls(handler);
 }
 
-TEST_F(WireDecodeTextClientTest, ErrorBadJson1) {
-  EXPECT_CALL(
-      logger,
-      Call(_, _, _,
-           "could not decode JSON message: [json.exception.parse_error.101] "
-           "parse error at line 1, column 2: syntax error while parsing value "
-           "- unexpected end of input; expected '[', '{', or a literal"sv));
+TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest ErrorBadJson1",
+                 "[ntcore][wire][decoder]") {
   net::WireDecodeText("[", handler, logger);
+  logger.CheckMessage(NT_LOG_WARNING,
+                      "could not decode JSON message: unexpected_eof"sv);
+  CheckNoClientCalls(handler);
 }
 
-TEST_F(WireDecodeTextClientTest, ErrorBadJson2) {
-  EXPECT_CALL(
-      logger,
-      Call(_, _, _,
-           "could not decode JSON message: [json.exception.parse_error.101] "
-           "parse error at line 1, column 3: syntax error while parsing object "
-           "key - unexpected end of input; expected string literal"sv));
+TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest ErrorBadJson2",
+                 "[ntcore][wire][decoder]") {
   net::WireDecodeText("[{", handler, logger);
+  logger.CheckMessage(NT_LOG_WARNING,
+                      "could not decode JSON message: unexpected_eof"sv);
+  CheckNoClientCalls(handler);
 }
 
-TEST_F(WireDecodeTextClientTest, ErrorNotArray) {
-  EXPECT_CALL(logger, Call(_, _, _, "expected JSON array at top level"sv));
+TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest ErrorNotArray",
+                 "[ntcore][wire][decoder]") {
   net::WireDecodeText("{}", handler, logger);
+  logger.CheckMessage(NT_LOG_WARNING, "expected JSON array at top level"sv);
+  CheckNoClientCalls(handler);
 }
 
-TEST_F(WireDecodeTextClientTest, ErrorMessageNotObject) {
-  EXPECT_CALL(logger, Call(_, _, _, "0: expected message to be an object"sv));
+TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest ErrorMessageNotObject",
+                 "[ntcore][wire][decoder]") {
   net::WireDecodeText("[5]", handler, logger);
+  logger.CheckMessage(NT_LOG_WARNING, "0: expected message to be an object"sv);
+  CheckNoClientCalls(handler);
 }
 
-TEST_F(WireDecodeTextClientTest, ErrorNoMethodKey) {
-  EXPECT_CALL(logger, Call(_, _, _, "0: no method key"sv));
+TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest ErrorNoMethodKey",
+                 "[ntcore][wire][decoder]") {
   net::WireDecodeText("[{}]", handler, logger);
+  logger.CheckMessage(NT_LOG_WARNING, "0: no method key"sv);
+  CheckNoClientCalls(handler);
 }
 
-TEST_F(WireDecodeTextClientTest, ErrorMethodNotString) {
-  EXPECT_CALL(logger, Call(_, _, _, "0: method must be a string"sv));
+TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest ErrorMethodNotString",
+                 "[ntcore][wire][decoder]") {
   net::WireDecodeText("[{\"method\":5}]", handler, logger);
+  logger.CheckMessage(NT_LOG_WARNING, "0: method must be a string"sv);
+  CheckNoClientCalls(handler);
 }
 
-TEST_F(WireDecodeTextClientTest, ErrorNoParamsKey) {
-  EXPECT_CALL(logger, Call(_, _, _, "0: no params key"sv));
+TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest ErrorNoParamsKey",
+                 "[ntcore][wire][decoder]") {
   net::WireDecodeText("[{\"method\":\"a\"}]", handler, logger);
+  logger.CheckMessage(NT_LOG_WARNING, "0: no params key"sv);
+  CheckNoClientCalls(handler);
 }
 
-TEST_F(WireDecodeTextClientTest, ErrorParamsNotObject) {
-  EXPECT_CALL(logger, Call(_, _, _, "0: params must be an object"sv));
+TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest ErrorParamsNotObject",
+                 "[ntcore][wire][decoder]") {
   net::WireDecodeText("[{\"method\":\"a\",\"params\":5}]", handler, logger);
+  logger.CheckMessage(NT_LOG_WARNING, "0: params must be an object"sv);
+  CheckNoClientCalls(handler);
 }
 
-TEST_F(WireDecodeTextClientTest, ErrorUnknownMethod) {
-  EXPECT_CALL(logger, Call(_, _, _, "0: unrecognized method 'a'"sv));
+TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest ErrorUnknownMethod",
+                 "[ntcore][wire][decoder]") {
   net::WireDecodeText("[{\"method\":\"a\",\"params\":{}}]", handler, logger);
+  logger.CheckMessage(NT_LOG_WARNING, "0: unrecognized method 'a'"sv);
+  CheckNoClientCalls(handler);
 }
 
-TEST_F(WireDecodeTextClientTest, PublishPropsEmpty) {
-  EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
-                                     std::string_view{"double"},
-                                     wpi::json::object(), PubSubOptionsEq({})));
+TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest PublishPropsEmpty",
+                 "[ntcore][wire][decoder]") {
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"properties\":{},\"pubuid\":5,\"type\":\"double\"}}]",
       handler, logger);
+  logger.CheckMessages({});
+  CheckClientMessageCounts(handler, {.publish = 1});
+  CheckPublish(handler.publishCalls.back(), 5, "test", "double",
+               wpi::util::json::object());
 
-  EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
-                                     std::string_view{"double"},
-                                     wpi::json::object(), PubSubOptionsEq({})));
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"pubuid\":5,\"type\":\"double\"}}]",
       handler, logger);
+  logger.CheckMessages({});
+  CheckClientMessageCounts(handler, {.publish = 2});
+  CheckPublish(handler.publishCalls.back(), 5, "test", "double",
+               wpi::util::json::object());
 }
 
-TEST_F(WireDecodeTextClientTest, PublishProps) {
-  wpi::json props = {{"k", 6}};
-  EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
-                                     std::string_view{"double"}, props,
-                                     PubSubOptionsEq({})));
+TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest PublishProps",
+                 "[ntcore][wire][decoder]") {
+  auto props = wpi::util::json::object("k", 6);
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"properties\":{\"k\":6},"
       "\"pubuid\":5,\"type\":\"double\"}}]",
       handler, logger);
+  logger.CheckMessages({});
+  CheckClientMessageCounts(handler, {.publish = 1});
+  CheckPublish(handler.publishCalls[0], 5, "test", "double", props);
 }
 
-TEST_F(WireDecodeTextClientTest, PublishPropsError) {
-  EXPECT_CALL(logger, Call(_, _, _, "0: properties must be an object"sv));
+TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest PublishPropsError",
+                 "[ntcore][wire][decoder]") {
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"properties\":[\"k\"],"
       "\"pubuid\":5,\"type\":\"double\"}}]",
       handler, logger);
+  logger.CheckMessage(NT_LOG_WARNING, "0: properties must be an object"sv);
+  CheckNoClientCalls(handler);
 }
 
-TEST_F(WireDecodeTextClientTest, PublishError) {
-  EXPECT_CALL(logger, Call(_, _, _, "0: no name key"sv));
+TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest PublishError",
+                 "[ntcore][wire][decoder]") {
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"pubuid\":5,\"type\":\"double\"}}]",
       handler, logger);
+  logger.CheckMessage(NT_LOG_WARNING, "0: no name key"sv);
+  CheckNoClientCalls(handler);
 
-  EXPECT_CALL(logger, Call(_, _, _, "0: no type key"sv));
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"pubuid\":5}}]",
       handler, logger);
+  logger.CheckMessages({{NT_LOG_WARNING, "0: no name key"sv},
+                        {NT_LOG_WARNING, "0: no type key"sv}});
+  CheckNoClientCalls(handler);
 
-  EXPECT_CALL(logger, Call(_, _, _, "0: no pubuid key"sv));
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"type\":\"double\"}}]",
       handler, logger);
+  logger.CheckMessages({{NT_LOG_WARNING, "0: no name key"sv},
+                        {NT_LOG_WARNING, "0: no type key"sv},
+                        {NT_LOG_WARNING, "0: no pubuid key"sv}});
+  CheckNoClientCalls(handler);
 }
 
-TEST_F(WireDecodeTextClientTest, Unpublish) {
-  EXPECT_CALL(handler, ClientUnpublish(5));
+TEST_CASE_METHOD(WireDecodeTextClientTest, "WireDecodeTextClientTest Unpublish",
+                 "[ntcore][wire][decoder]") {
   net::WireDecodeText("[{\"method\":\"unpublish\",\"params\":{\"pubuid\":5}}]",
                       handler, logger);
+  logger.CheckMessages({});
+  CheckClientMessageCounts(handler, {.unpublish = 1});
+  CHECK(handler.unpublishCalls[0] == 5);
 }
 
-TEST_F(WireDecodeTextClientTest, UnpublishMultiple) {
-  EXPECT_CALL(handler, ClientUnpublish(5));
-  EXPECT_CALL(handler, ClientUnpublish(6));
+TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest UnpublishMultiple",
+                 "[ntcore][wire][decoder]") {
   net::WireDecodeText(
       "[{\"method\":\"unpublish\",\"params\":{\"pubuid\":5}},{\"method\":"
       "\"unpublish\",\"params\":{\"pubuid\":6}}]",
       handler, logger);
+  logger.CheckMessages({});
+  CheckClientMessageCounts(handler, {.unpublish = 2});
+  CHECK(handler.unpublishCalls[0] == 5);
+  CHECK(handler.unpublishCalls[1] == 6);
 }
 
-TEST_F(WireDecodeTextClientTest, UnpublishError) {
-  EXPECT_CALL(logger, Call(_, _, _, "0: no pubuid key"sv));
+TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest UnpublishError",
+                 "[ntcore][wire][decoder]") {
   net::WireDecodeText("[{\"method\":\"unpublish\",\"params\":{}}]", handler,
                       logger);
+  logger.CheckMessage(NT_LOG_WARNING, "0: no pubuid key"sv);
+  CheckNoClientCalls(handler);
 
-  EXPECT_CALL(logger, Call(_, _, _, "0: pubuid must be a number"sv));
   net::WireDecodeText(
       "[{\"method\":\"unpublish\",\"params\":{\"pubuid\":\"5\"}}]", handler,
       logger);
+  logger.CheckMessages({{NT_LOG_WARNING, "0: no pubuid key"sv},
+                        {NT_LOG_WARNING, "0: pubuid must be a number"sv}});
+  CheckNoClientCalls(handler);
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

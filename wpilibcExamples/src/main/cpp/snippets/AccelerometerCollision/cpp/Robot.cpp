@@ -2,39 +2,39 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/BuiltInAccelerometer.h>
-#include <frc/TimedRobot.h>
-#include <frc/smartdashboard/SmartDashboard.h>
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/hardware/imu/OnboardIMU.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/units/acceleration.hpp"
 
 /**
- * Collision detection snippets for frc-docs.
+ * Collision detection snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   void RobotPeriodic() override {
     // Gets the current accelerations in the X and Y directions
-    double xAccel = m_accelerometer.GetX();
-    double yAccel = m_accelerometer.GetY();
+    auto xAccel = accelerometer.GetAccelX();
+    auto yAccel = accelerometer.GetAccelY();
     // Calculates the jerk in the X and Y directions
-    // Divides by .02 because default loop timing is 20ms
-    double xJerk = (xAccel - m_prevXAccel) / 0.02;
-    double yJerk = (yAccel - m_prevYAccel) / 0.02;
-    m_prevXAccel = xAccel;
-    m_prevYAccel = yAccel;
+    auto xJerk = (xAccel - prevXAccel) / GetPeriod();
+    auto yJerk = (yAccel - prevYAccel) / GetPeriod();
+    prevXAccel = xAccel;
+    prevYAccel = yAccel;
 
-    frc::SmartDashboard::PutNumber("X Jerk", xJerk);
-    frc::SmartDashboard::PutNumber("Y Jerk", yJerk);
+    wpi::SmartDashboard::PutNumber("X Jerk", xJerk.value());
+    wpi::SmartDashboard::PutNumber("Y Jerk", yJerk.value());
   }
 
  private:
-  double m_prevXAccel = 0.0;
-  double m_prevYAccel = 0.0;
-  frc::BuiltInAccelerometer m_accelerometer;
+  wpi::units::meters_per_second_squared_t prevXAccel = 0.0_mps_sq;
+  wpi::units::meters_per_second_squared_t prevYAccel = 0.0_mps_sq;
+  wpi::OnboardIMU accelerometer{wpi::OnboardIMU::MountOrientation::FLAT};
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

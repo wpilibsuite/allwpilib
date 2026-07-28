@@ -211,8 +211,14 @@ struct scalar_inner_product_op {
   static constexpr bool PacketAccess = false;
 };
 
+// Partial specialization for packet access if and only if
+// LhsScalar == RhsScalar == ScalarBinaryOpTraits<LhsScalar, RhsScalar>::ReturnType.
 template <typename Scalar, bool Conj>
-struct scalar_inner_product_op<Scalar, Scalar, Conj> {
+struct scalar_inner_product_op<
+    Scalar,
+    typename std::enable_if<internal::is_same<typename ScalarBinaryOpTraits<Scalar, Scalar>::ReturnType, Scalar>::value,
+                            Scalar>::type,
+    Conj> {
   using result_type = Scalar;
   using conj_helper = conditional_conj<Scalar, Conj>;
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar coeff(const Scalar& a, const Scalar& b) const {

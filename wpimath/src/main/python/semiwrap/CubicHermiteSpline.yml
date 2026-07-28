@@ -1,0 +1,16 @@
+extra_includes:
+- wpystruct.h
+
+classes:
+  wpi::math::CubicHermiteSpline:
+    force_no_trampoline: true
+    methods:
+      CubicHermiteSpline:
+      Coefficients:
+        # otherwise we have to depend on numpy
+        ignore: true
+      GetInitialControlVector:
+      GetFinalControlVector:
+
+inline_code: |
+  SetupWPyStruct<wpi::math::CubicHermiteSpline>(cls_CubicHermiteSpline);

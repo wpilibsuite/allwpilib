@@ -2,21 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Robot.h"
+#include "Robot.hpp"
 
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <wpi/print.h>
+#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/util/print.hpp"
 
 Robot::Robot() {
-  m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
-  m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
-  frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+  chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
+  chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
+  wpi::SmartDashboard::PutData("Auto Modes", &chooser);
 }
 
 /**
  * This function is called every 20 ms, no matter the mode. Use
  * this for items like diagnostics that you want ran during disabled,
- * autonomous, teleoperated and test.
+ * autonomous, teleoperated and utility.
  *
  * <p> This runs after the mode specific periodic functions, but before
  * LiveWindow and SmartDashboard integrated updating.
@@ -35,12 +35,12 @@ void Robot::RobotPeriodic() {}
  * make sure to add them to the chooser code above as well.
  */
 void Robot::AutonomousInit() {
-  m_autoSelected = m_chooser.GetSelected();
-  // m_autoSelected = SmartDashboard::GetString("Auto Selector",
+  autoSelected = chooser.GetSelected();
+  // autoSelected = SmartDashboard::GetString("Auto Selector",
   //     kAutoNameDefault);
-  wpi::print("Auto selected: {}\n", m_autoSelected);
+  wpi::util::print("Auto selected: {}\n", autoSelected);
 
-  if (m_autoSelected == kAutoNameCustom) {
+  if (autoSelected == kAutoNameCustom) {
     // Custom Auto goes here
   } else {
     // Default Auto goes here
@@ -48,7 +48,7 @@ void Robot::AutonomousInit() {
 }
 
 void Robot::AutonomousPeriodic() {
-  if (m_autoSelected == kAutoNameCustom) {
+  if (autoSelected == kAutoNameCustom) {
     // Custom Auto goes here
   } else {
     // Default Auto goes here
@@ -63,16 +63,16 @@ void Robot::DisabledInit() {}
 
 void Robot::DisabledPeriodic() {}
 
-void Robot::TestInit() {}
+void Robot::UtilityInit() {}
 
-void Robot::TestPeriodic() {}
+void Robot::UtilityPeriodic() {}
 
 void Robot::SimulationInit() {}
 
 void Robot::SimulationPeriodic() {}
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

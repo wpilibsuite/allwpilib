@@ -2,13 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/controller/ControlAffinePlantInversionFeedforward.hpp"
+
 #include <gtest/gtest.h>
 
-#include "frc/EigenCore.h"
-#include "frc/controller/ControlAffinePlantInversionFeedforward.h"
-#include "units/time.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/units/time.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 Vectord<2> Dynamics(const Vectord<2>& x, const Vectord<1>& u) {
   return Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}} * x +
@@ -20,8 +21,8 @@ Vectord<2> StateDynamics(const Vectord<2>& x) {
 }
 
 TEST(ControlAffinePlantInversionFeedforwardTest, Calculate) {
-  frc::ControlAffinePlantInversionFeedforward<2, 1> feedforward{&Dynamics,
-                                                                20_ms};
+  wpi::math::ControlAffinePlantInversionFeedforward<2, 1> feedforward{&Dynamics,
+                                                                      20_ms};
 
   Vectord<2> r{2, 2};
   Vectord<2> nextR{3, 3};
@@ -30,7 +31,7 @@ TEST(ControlAffinePlantInversionFeedforwardTest, Calculate) {
 }
 
 TEST(ControlAffinePlantInversionFeedforwardTest, CalculateState) {
-  frc::ControlAffinePlantInversionFeedforward<2, 1> feedforward{
+  wpi::math::ControlAffinePlantInversionFeedforward<2, 1> feedforward{
       &StateDynamics, Matrixd<2, 1>{{0.0}, {1.0}}, 20_ms};
 
   Vectord<2> r{2, 2};
@@ -39,4 +40,4 @@ TEST(ControlAffinePlantInversionFeedforwardTest, CalculateState) {
   EXPECT_NEAR(48, feedforward.Calculate(r, nextR)(0, 0), 1e-6);
 }
 
-}  // namespace frc
+}  // namespace wpi::math

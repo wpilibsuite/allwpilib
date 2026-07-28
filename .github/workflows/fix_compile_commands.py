@@ -31,6 +31,9 @@ def main():
             # Replace GCC warning argument with one Clang recognizes
             elif arg == "-Wno-maybe-uninitialized":
                 out_args.append("-Wno-uninitialized")
+            # Skip GCC-specific warning argument
+            elif arg == "-Wno-error=restrict":
+                pass
             else:
                 out_args.append(arg)
 

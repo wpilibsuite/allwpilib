@@ -1,0 +1,196 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+#include "wpi/hardware/expansionhub/ExpansionHub.hpp"
+#include "wpi/hardware/expansionhub/ExpansionHubPositionConstants.hpp"
+#include "wpi/hardware/expansionhub/ExpansionHubVelocityConstants.hpp"
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/DoubleTopic.hpp"
+#include "wpi/nt/IntegerTopic.hpp"
+#include "wpi/units/current.hpp"
+#include "wpi/units/voltage.hpp"
+
+namespace wpi {
+
+/** This class controls a specific motor and encoder hooked up to an
+ * ExpansionHub. */
+class ExpansionHubMotor {
+ public:
+  /** The direction to follow a leader motor in when using the follow method. */
+  enum class FollowDirection {
+    /** Follow the leader motor in the same direction. */
+    Aligned,
+    /** Follow the leader motor in the opposite direction. */
+    Opposed
+  };
+
+  /**
+   * Constructs a motor at the requested channel on a specific USB port.
+   *
+   * @param usbId The USB port ID the hub is connected to
+   * @param channel The motor channel
+   */
+  ExpansionHubMotor(int usbId, int channel);
+
+  ~ExpansionHubMotor() noexcept;
+
+  /**
+   * Neutral mode applied when the motor output is commanded to 0.
+   */
+  enum class NeutralMode {
+    /** Allow the motor to coast when output is zero. */
+    COAST,
+    /** Actively brake the motor when output is zero. */
+    BRAKE
+  };
+
+  /**
+   * Sets the throttle.
+   *
+   * @param throttle The throttle where -1 indicates full reverse and 1
+   *     indicates full forward.
+   */
+  void SetThrottle(double throttle);
+
+  /**
+   * Sets the voltage to run the motor at. This value will be continuously
+   * scaled to match the input voltage.
+   *
+   * @param voltage The voltage to drive the motor at
+   */
+  void SetVoltage(wpi::units::volt_t voltage);
+
+  /**
+   * Command the motor to drive to a specific position setpoint. This value will
+   * be scaled by SetDistancePerCount and influenced by the PID constants.
+   *
+   * @param setpoint The position setpoint to drive the motor to
+   */
+  void SetPositionSetpoint(double setpoint);
+
+  /**
+   * Command the motor to drive to a specific velocity setpoint. This value will
+   * be scaled by SetDistancePerCount and influenced by the PID constants.
+   *
+   * @param setpoint The velocity setpoint to drive the motor to
+   */
+  void SetVelocitySetpoint(double setpoint);
+
+  /**
+   * Sets if the motor output is enabled or not. Defaults to false.
+   *
+   * @param enabled True to enable, false to disable
+   */
+  void SetEnabled(bool enabled);
+
+  /**
+   * Sets if the motor should brake or coast when 0 is commanded. Defaults to
+   * BRAKE mode.
+   *
+   * @param mode Neutral mode to apply when output is zero.
+   */
+  void SetNeutralMode(NeutralMode mode);
+
+  /**
+   * Gets the current being pulled by the motor.
+   *
+   * @return Motor current
+   */
+  wpi::units::ampere_t GetCurrent() const;
+
+  /**
+   * Sets the distance per count of the encoder. Used to scale encoder readings.
+   *
+   * @param perCount The distance moved per count of the encoder
+   */
+  void SetDistancePerCount(double perCount);
+
+  /**
+   * Gets the current velocity of the motor encoder. Scaled into
+   * distancePerCount units.
+   *
+   * @return Encoder velocity
+   */
+  double GetEncoderVelocity() const;
+
+  /**
+   * Gets the current position of the motor encoder. Scaled into
+   * distancePerCount units.
+   *
+   * @return Encoder position
+   */
+  double GetEncoderPosition() const;
+
+  /**
+   * Sets if the motor and encoder should be reversed.
+   *
+   * @param reversed True to reverse encoder, false otherwise
+   */
+  void SetReversed(bool reversed);
+
+  /** Reset the encoder count to 0. */
+  void ResetEncoder();
+
+  /**
+   * Gets the PID constants object for velocity PID.
+   *
+   * @return Velocity PID constants object
+   */
+  ExpansionHubVelocityConstants& GetVelocityConstants();
+
+  /**
+   * Gets the PID constants object for position PID.
+   *
+   * @return Position PID constants object
+   */
+  ExpansionHubPositionConstants& GetPositionConstants();
+
+  /**
+   * Gets if the underlying ExpansionHub is connected.
+   *
+   * @return True if hub is connected, otherwise false
+   */
+  bool IsHubConnected() { return m_hub.IsHubConnected(); }
+
+  /**
+   * Sets this motor to follow another motor on the same hub.
+   *
+   * This does not support following motors that are also followers.
+   * Additionally, the direction of both motors will be the same.
+   *
+   * @param leader The motor to follow
+   * @param direction The direction to follow the leader
+   */
+  void Follow(const ExpansionHubMotor& leader, FollowDirection direction);
+
+  /**
+   * Stops following the currently set leader motor.
+   */
+  void Unfollow();
+
+ private:
+  ExpansionHub m_hub;
+  int m_channel;
+
+  wpi::nt::DoubleSubscriber m_encoderSubscriber;
+  wpi::nt::DoubleSubscriber m_encoderVelocitySubscriber;
+  wpi::nt::DoubleSubscriber m_currentSubscriber;
+
+  wpi::nt::DoublePublisher m_setpointPublisher;
+  wpi::nt::BooleanPublisher m_floatOn0Publisher;
+  wpi::nt::BooleanPublisher m_enabledPublisher;
+
+  wpi::nt::IntegerPublisher m_modePublisher;
+
+  wpi::nt::BooleanPublisher m_reversedPublisher;
+  wpi::nt::BooleanPublisher m_resetEncoderPublisher;
+
+  wpi::nt::DoublePublisher m_distancePerCountPublisher;
+
+  ExpansionHubVelocityConstants m_velocityConstants;
+  ExpansionHubPositionConstants m_positionConstants;
+};
+}  // namespace wpi

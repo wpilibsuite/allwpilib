@@ -6,15 +6,15 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/PointerUnion.h"
+#include "wpi/util/PointerUnion.hpp"
 #include "gtest/gtest.h"
-using namespace wpi;
+using namespace wpi::util;
 
 namespace {
 
-typedef PointerUnion<int *, float *> PU;
-typedef PointerUnion<int *, float *, long long *> PU3;
-typedef PointerUnion<int *, float *, long long *, double *> PU4;
+using PU = PointerUnion<int *, float *>;
+using PU3 = PointerUnion<int *, float *, long long *>;
+using PU4 = PointerUnion<int *, float *, long long *, double *>;
 
 struct PointerUnionTest : public testing::Test {
   float f;
@@ -116,9 +116,9 @@ TEST_F(PointerUnionTest, Get) {
 
 template<int I> struct alignas(8) Aligned {};
 
-typedef PointerUnion<Aligned<0> *, Aligned<1> *, Aligned<2> *, Aligned<3> *,
-                     Aligned<4> *, Aligned<5> *, Aligned<6> *, Aligned<7> *>
-    PU8;
+using PU8 =
+    PointerUnion<Aligned<0> *, Aligned<1> *, Aligned<2> *, Aligned<3> *,
+                 Aligned<4> *, Aligned<5> *, Aligned<6> *, Aligned<7> *>;
 
 TEST_F(PointerUnionTest, ManyElements) {
   Aligned<0> a0;

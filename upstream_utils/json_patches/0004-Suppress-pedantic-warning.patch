@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Wed, 1 Apr 2026 07:31:40 -0700
+Subject: [PATCH 04/25] Suppress pedantic warning
+
+---
+ jtckdint.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/jtckdint.h b/jtckdint.h
+index 4c71d9990ca233017332f3ede71b092da48b474f..ac6a52e5aab04116defe1d06b3831d3509fea8a2 100644
+--- a/jtckdint.h
++++ b/jtckdint.h
+@@ -57,6 +57,10 @@
+ #ifndef JTCKDINT_H_
+ #define JTCKDINT_H_
+ 
++#ifdef __GNUC__
++#pragma GCC diagnostic ignored "-Wpedantic"
++#endif
++
+ #ifdef __has_include
+ #define __ckd_has_include(x) __has_include(x)
+ #else

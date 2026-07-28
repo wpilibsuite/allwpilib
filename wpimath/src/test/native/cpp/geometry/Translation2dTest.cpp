@@ -2,13 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/geometry/Translation2d.hpp"
+
 #include <cmath>
 
+#include <Eigen/Core>
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Translation2d.h"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 TEST(Translation2dTest, Sum) {
   const Translation2d one{1_m, 3_m};

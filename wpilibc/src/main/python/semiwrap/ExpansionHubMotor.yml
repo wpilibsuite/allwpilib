@@ -1,0 +1,24 @@
+classes:
+  wpi::ExpansionHubMotor:
+    methods:
+      ExpansionHubMotor:
+      SetThrottle:
+      SetVoltage:
+      SetPositionSetpoint:
+      SetVelocitySetpoint:
+      SetEnabled:
+      GetCurrent:
+      SetDistancePerCount:
+      GetEncoderVelocity:
+      GetEncoderPosition:
+      SetReversed:
+      ResetEncoder:
+      IsHubConnected:
+      Follow:
+      Unfollow:
+      GetVelocityConstants:
+      GetPositionConstants:
+      SetNeutralMode:
+    enums:
+      NeutralMode:
+      FollowDirection:

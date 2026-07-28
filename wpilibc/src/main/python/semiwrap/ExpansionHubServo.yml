@@ -1,0 +1,13 @@
+classes:
+  wpi::ExpansionHubServo:
+    methods:
+      ExpansionHubServo:
+      SetPosition:
+      SetAngle:
+      SetPulseWidth:
+      SetEnabled:
+      SetFramePeriod:
+      IsHubConnected:
+      SetAngleRange:
+      SetPWMRange:
+      SetReversed:

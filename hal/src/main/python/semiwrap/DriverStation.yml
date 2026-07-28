@@ -1,0 +1,6 @@
+functions:
+  GetControlWord:
+  GetUncachedControlWord:
+  SendError:
+  SendConsoleLine:
+  SendProgramCrash:

@@ -1,0 +1,13 @@
+classes:
+  wpi::romi::RomiGyro:
+    methods:
+      RomiGyro:
+      GetAngle:
+      GetRate:
+      GetRateX:
+      GetRateY:
+      GetRateZ:
+      GetAngleX:
+      GetAngleY:
+      GetAngleZ:
+      Reset:

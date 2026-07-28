@@ -1,0 +1,621 @@
+[
+  {
+    "name": "Getting Started",
+    "description": "A differential-drive robot with split-stick Xbox arcade drive with a simple time-based autonomous.",
+    "tags": [
+      "Basic Robot"
+    ],
+    "foldername": "gettingstarted",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Commands v3 - REBUILT Robot",
+    "description": "A robot with a drivetrain, intake, and shooter subsystems controlled by the commands v3 framework",
+    "tags": [
+      "Complete Robot",
+      "Commandv3",
+      "DataLog",
+      "Joystick",
+      "Swerve Drive",
+      "OpMode"
+    ],
+    "foldername": "rebuiltcmdv3",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 3
+  },
+  {
+    "name": "Encoder",
+    "description": "View values from a quadrature encoder.",
+    "tags": [
+      "Hardware",
+      "Encoder",
+      "SmartDashboard"
+    ],
+    "foldername": "encoder",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Expansion Hub Sample",
+    "description": "Sample the functionality of the Expansion Hub motors.",
+    "tags": [
+      "Hardware",
+      "ExpansionHub",
+      "FTC",
+      "OpModes",
+      "SmartDashboard"
+    ],
+    "foldername": "expansionhubsample",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Elevator with trapezoid profiled PID",
+    "description": "Reach elevator position setpoints with trapezoid profiles and smart motor controller PID.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Trapezoid Profile",
+      "Smart Motor Controller",
+      "Joystick"
+    ],
+    "foldername": "elevatortrapezoidprofile",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Elevator with exponential profile",
+    "description": "Reach elevator position setpoints with exponential profiles and smart motor controller PID.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Exponential Profile",
+      "Smart Motor Controller",
+      "Joystick"
+    ],
+    "foldername": "elevatorexponentialprofile",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Elevator with profiled PID controller",
+    "description": "Reach elevator position setpoints with an encoder and profiled PID control.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Profiled PID",
+      "Joystick"
+    ],
+    "foldername": "elevatorprofiledpid",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Gyro",
+    "description": "Drive a differential drive straight with a gyro sensor.",
+    "tags": [
+      "Basic Robot",
+      "Differential Drive",
+      "PID",
+      "Gyro",
+      "Joystick"
+    ],
+    "foldername": "gyro",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Mecanum Drive",
+    "description": "Drive a mecanum drivetrain using field-oriented controls with a joystick.",
+    "tags": [
+      "Basic Robot",
+      "Mecanum Drive",
+      "Gyro",
+      "Joystick"
+    ],
+    "foldername": "mecanumdrive",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Mechanism2d",
+    "description": "Display mechanism states on a dashboard with Mechanism2d.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Arm",
+      "Analog",
+      "Joystick",
+      "SmartDashboard",
+      "Mechanism2d"
+    ],
+    "foldername": "mechanism2d",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "'Traditional' Hatchbot",
+    "description": "A fully-functional Commandv2 hatchbot for the 2019 game, written in the 'traditional' style, i.e. commands are given their own classes.",
+    "tags": [
+      "Complete Robot",
+      "Commandv2",
+      "Differential Drive",
+      "Encoder",
+      "Pneumatics",
+      "Sendable",
+      "DataLog",
+      "Gamepad"
+    ],
+    "foldername": "hatchbottraditional",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "'Inlined' Hatchbot",
+    "description": "A fully-functional Commandv2 hatchbot for the 2019 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
+    "tags": [
+      "Complete Robot",
+      "Commandv2",
+      "Differential Drive",
+      "Encoder",
+      "Pneumatics",
+      "Sendable",
+      "DataLog",
+      "Gamepad"
+    ],
+    "foldername": "hatchbotinlined",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Hatchbot Commandsv3",
+    "description": "A fully-functional Commandv3 hatchbot for the 2019 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
+    "tags": [
+      "Complete Robot",
+      "Commandv3",
+      "Differential Drive",
+      "Encoder",
+      "Pneumatics",
+      "Sendable",
+      "DataLog",
+      "Gamepad"
+    ],
+    "foldername": "hatchbotcmdv3",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 3
+  },
+  {
+    "name": "Rapid React Command Bot",
+    "description": "A fully-functional Commandv2 fender bot for the 2022 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
+    "tags": [
+      "Complete Robot",
+      "Commandv2",
+      "Differential Drive",
+      "Intake",
+      "Flywheel",
+      "Encoder",
+      "Pneumatics",
+      "Digital Input",
+      "PID",
+      "Gyro",
+      "Profiled PID",
+      "Gamepad"
+    ],
+    "foldername": "rapidreactcommandbot",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "SwerveBot",
+    "description": "Use kinematics and odometry with a swerve drive.",
+    "tags": [
+      "Swerve Drive",
+      "Odometry",
+      "Gamepad",
+      "Gyro",
+      "Encoder"
+    ],
+    "foldername": "swervebot",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "MecanumBot",
+    "description": "Use kinematics and odometry with a mecanum drive.",
+    "tags": [
+      "Mecanum Drive",
+      "Odometry",
+      "Encoder",
+      "Gyro",
+      "Gamepad"
+    ],
+    "foldername": "mecanumbot",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "DifferentialDriveBot",
+    "description": "Use kinematics and odometry with a differential drive.",
+    "tags": [
+      "Differential Drive",
+      "Odometry",
+      "Encoder",
+      "Gyro",
+      "Gamepad"
+    ],
+    "foldername": "differentialdrivebot",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Arcade Drive Xbox Controller",
+    "description": "Control a differential drive with split-stick arcade drive in teleop.",
+    "tags": [
+      "Basic Robot",
+      "Differential Drive",
+      "Gamepad"
+    ],
+    "foldername": "arcadedrivegamepad",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Tank Drive Gamepad",
+    "description": "Control a differential drive with Xbox tank drive in teleop.",
+    "tags": [
+      "Basic Robot",
+      "Differential Drive",
+      "Gamepad"
+    ],
+    "foldername": "tankdrivegamepad",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Duty Cycle Encoder",
+    "description": "View values from a duty-cycle encoder.",
+    "tags": [
+      "Hardware",
+      "Duty Cycle",
+      "Encoder",
+      "SmartDashboard"
+    ],
+    "foldername": "dutycycleencoder",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "DS Gamepad Chooser",
+    "description": "Use a gamepad-controlled Driver Station display selector to configure separate autonomous opmodes.",
+    "tags": [
+      "Basic Robot",
+      "Driver Station",
+      "Gamepad",
+      "OpMode"
+    ],
+    "foldername": "dsgamepadchooser",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Driver Station Display Lines",
+    "description": "Display lines on the Driver Station display and update them every robot loop.",
+    "tags": [
+      "Basic Robot",
+      "Driver Station"
+    ],
+    "foldername": "driverstationdisplaylines",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Driver Station Display ANSI",
+    "description": "Stream ANSI text to the Driver Station display and update a value in place once per second.",
+    "tags": [
+      "Basic Robot",
+      "Driver Station"
+    ],
+    "foldername": "driverstationdisplayansi",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "DriveDistanceOffboard",
+    "description": "Drive a differential drivetrain a set distance using TrapezoidProfile and smart motor controller PID.",
+    "tags": [
+      "Commandv2",
+      "Differential Drive",
+      "Trapezoid Profile",
+      "Smart Motor Controller",
+      "Gamepad"
+    ],
+    "foldername": "drivedistanceoffboard",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "StateSpaceFlywheel",
+    "description": "Control a flywheel using a state-space model (based on values from CAD), with a Kalman Filter and LQR.",
+    "tags": [
+      "Basic Robot",
+      "Flywheel",
+      "State-Space",
+      "LQR",
+      "Encoder",
+      "Joystick"
+    ],
+    "foldername": "statespaceflywheel",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "StateSpaceFlywheelSysId",
+    "description": "Control a flywheel using a state-space model (based on values from SysId), with a Kalman Filter and LQR.",
+    "tags": [
+      "Basic Robot",
+      "Flywheel",
+      "SysId",
+      "State-Space",
+      "LQR",
+      "Encoder",
+      "Joystick"
+    ],
+    "foldername": "statespaceflywheelsysid",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "StateSpaceElevator",
+    "description": "Control an elevator using a state-space model (based on values from CAD), with a Kalman Filter and LQR.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "State-Space",
+      "LQR",
+      "Encoder",
+      "Joystick"
+    ],
+    "foldername": "statespaceelevator",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "StateSpaceArm",
+    "description": "Control an arm using a state-space model (based on values from CAD), with a Kalman Filter and LQR.",
+    "tags": [
+      "Basic Robot",
+      "Arm",
+      "State-Space",
+      "LQR",
+      "Encoder",
+      "Joystick"
+    ],
+    "foldername": "statespacearm",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "SimpleDifferentialDriveSimulation",
+    "description": "Simulate a differential drivetrain and follow trajectories with LTVUnicycleController (non-Commandv2).",
+    "tags": [
+      "Differential Drive",
+      "State-Space",
+      "LTVUnicycleController",
+      "Path Following",
+      "Trajectory",
+      "Encoder",
+      "Gamepad",
+      "Simulation"
+    ],
+    "foldername": "simpledifferentialdrivesimulation",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "ElevatorSimulation",
+    "description": "Simulate an elevator.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "State-Space",
+      "Simulation",
+      "Mechanism2d",
+      "Profiled PID"
+    ],
+    "foldername": "elevatorsimulation",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2,
+    "hasunittests": true
+  },
+  {
+    "name": "Elevator Exponential Profile Simulation",
+    "description": "Simulate an elevator.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "State-Space",
+      "Simulation",
+      "Mechanism2d",
+      "PID",
+      "Exponential Profile"
+    ],
+    "foldername": "elevatorexponentialsimulation",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "ArmSimulation",
+    "description": "Simulate a single-jointed arm.",
+    "tags": [
+      "Basic Robot",
+      "Arm",
+      "State-Space",
+      "Simulation",
+      "Mechanism2d",
+      "Preferences"
+    ],
+    "foldername": "armsimulation",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2,
+    "hasunittests": true
+  },
+  {
+    "name": "UnitTesting",
+    "description": "Test a robot project with basic unit tests in simulation.",
+    "tags": [
+      "Intake",
+      "Pneumatics"
+    ],
+    "foldername": "unittest",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2,
+    "hasunittests": true
+  },
+  {
+    "name": "DifferentialDrivePoseEstimator",
+    "description": "Combine differential-drive odometry with vision data using DifferentialDrivePoseEstimator.",
+    "tags": [
+      "Differential Drive",
+      "State-Space",
+      "Pose Estimator",
+      "Vision",
+      "PID",
+      "Gamepad"
+    ],
+    "foldername": "differentialdriveposeestimator",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "MecanumDrivePoseEstimator",
+    "description": "Combine mecanum-drive odometry with vision data using MecanumDrivePoseEstimator.",
+    "tags": [
+      "Mecanum Drive",
+      "State-Space",
+      "Pose Estimator",
+      "Vision",
+      "PID",
+      "Gamepad"
+    ],
+    "foldername": "mecanumdriveposeestimator",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "SwerveDrivePoseEstimator",
+    "description": "Combine swerve-drive odometry with vision data using SwerveDrivePoseEstimator.",
+    "tags": [
+      "Swerve Drive",
+      "State-Space",
+      "Pose Estimator",
+      "Vision",
+      "PID",
+      "Gamepad"
+    ],
+    "foldername": "swervedriveposeestimator",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "RomiReference",
+    "description": "An example Commandv2 robot program that can be used with the Romi reference robot design.",
+    "tags": [
+      "Romi",
+      "Commandv2",
+      "Differential Drive",
+      "Digital Input",
+      "Joystick"
+    ],
+    "foldername": "romireference",
+    "gradlebase": "javaromi",
+    "robotclass": "Robot",
+    "commandversion": 2,
+    "extravendordeps": [
+      "romi"
+    ]
+  },
+  {
+    "name": "XRP Reference",
+    "description": "An example Commandv2 robot program that can be used with the XRP reference robot design.",
+    "tags": [
+      "XRP",
+      "Commandv2",
+      "Differential Drive",
+      "Digital Input",
+      "Joystick"
+    ],
+    "foldername": "xrpreference",
+    "gradlebase": "javaxrp",
+    "robotclass": "Robot",
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
+  },
+  {
+    "name": "XRP Timed",
+    "description": "An very basic timed robot program that can be used with the XRP reference robot design.",
+    "tags": [
+      "XRP",
+      "Differential Drive",
+      "Joystick"
+    ],
+    "foldername": "xrptimed",
+    "gradlebase": "javaxrp",
+    "robotclass": "Robot",
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
+  },
+  {
+    "name": "SysIdRoutine",
+    "description": "A sample Commandv2 robot demonstrating use of the SysIdRoutine command factory",
+    "tags": [
+      "SysId",
+      "Commandv2",
+      "DataLog"
+    ],
+    "foldername": "sysidroutine",
+    "gradlebase": "java",
+    "commandversion": 2,
+    "robotclass": "Robot"
+  }
+]

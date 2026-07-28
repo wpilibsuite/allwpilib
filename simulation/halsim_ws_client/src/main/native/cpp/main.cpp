@@ -5,9 +5,8 @@
 #include <cstdio>
 #include <memory>
 
-#include <hal/Extensions.h>
-
-#include "HALSimWSClient.h"
+#include "wpi/hal/Extensions.h"
+#include "wpi/halsim/ws_client/HALSimWSClient.hpp"
 
 using namespace wpilibws;
 
@@ -18,7 +17,7 @@ extern "C" {
 __declspec(dllexport)
 #endif
 
-    int HALSIM_InitExtension(void) {
+int HALSIM_InitExtension(void) {
   std::puts("HALSim WS Client Extension Initializing");
 
   HAL_OnShutdown(nullptr, [](void*) { gClient.reset(); });

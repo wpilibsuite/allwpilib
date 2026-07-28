@@ -2,56 +2,87 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/hal/Main.h"
+
 #include <cstdio>
 #include <memory>
 #include <string_view>
 
-#include <glass/Context.h>
-#include <glass/Storage.h>
-#include <glass/hardware/Pneumatic.h>
-#include <glass/other/Plot.h>
-#include <hal/Extensions.h>
-#include <hal/Main.h>
 #include <imgui.h>
-#include <wpigui.h>
 
-#include "AccelerometerSimGui.h"
-#include "AddressableLEDGui.h"
-#include "AnalogGyroSimGui.h"
-#include "AnalogInputSimGui.h"
-#include "AnalogOutputSimGui.h"
-#include "DIOSimGui.h"
-#include "DriverStationGui.h"
-#include "EncoderSimGui.h"
-#include "HALSimGui.h"
-#include "HALSimGuiExt.h"
-#include "NetworkTablesSimGui.h"
-#include "PCMSimGui.h"
-#include "PHSimGui.h"
-#include "PWMSimGui.h"
-#include "PowerDistributionSimGui.h"
-#include "RelaySimGui.h"
-#include "RoboRioSimGui.h"
-#include "SimDeviceGui.h"
-#include "TimingGui.h"
+#include "AddressableLEDGui.hpp"
+#include "AnalogInputSimGui.hpp"
+#include "DIOSimGui.hpp"
+#include "DriverStationGui.hpp"
+#include "EncoderSimGui.hpp"
+#include "NetworkTablesSimGui.hpp"
+#include "PCMSimGui.hpp"
+#include "PHSimGui.hpp"
+#include "PWMSimGui.hpp"
+#include "PowerDistributionSimGui.hpp"
+#include "RoboRioSimGui.hpp"
+#include "TimingGui.hpp"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/ContextInternal.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/hardware/Pneumatic.hpp"
+#include "wpi/glass/other/Plot.hpp"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/hal/Extensions.h"
+#include "wpi/halsim/gui/HALSimGui.hpp"
+#include "wpi/halsim/gui/HALSimGuiExt.hpp"
+#include "wpi/halsim/gui/SimDeviceGui.hpp"
 
 using namespace halsimgui;
 
 namespace gui = wpi::gui;
 
-static std::unique_ptr<glass::PlotProvider> gPlotProvider;
+static std::unique_ptr<wpi::glass::PlotProvider> gPlotProvider;
+static bool gAbout = false;
+
+static void SetTimestampDisplayMode(wpi::glass::TimestampDisplayMode mode,
+                                    std::string_view storageMode) {
+  auto ctx = wpi::glass::gContext;
+  ctx->timestampDisplayMode = mode;
+  ctx->timestampDisplayModeStorage = storageMode;
+}
+
+static void DisplayTimestampMenu() {
+  if (ImGui::BeginMenu("Timestamp Display")) {
+    auto mode = wpi::glass::gContext->timestampDisplayMode;
+    bool selected = mode == wpi::glass::TimestampDisplayMode::LOCAL;
+    if (ImGui::MenuItem("Actual Time", nullptr, &selected)) {
+      SetTimestampDisplayMode(wpi::glass::TimestampDisplayMode::LOCAL,
+                              wpi::glass::TIMESTAMP_DISPLAY_MODE_LOCAL);
+    }
+    selected = mode == wpi::glass::TimestampDisplayMode::SERVER_ZERO_START;
+    if (ImGui::MenuItem("Program Start = 0", nullptr, &selected)) {
+      SetTimestampDisplayMode(
+          wpi::glass::TimestampDisplayMode::SERVER_ZERO_START,
+          wpi::glass::TIMESTAMP_DISPLAY_MODE_SERVER_ZERO_START);
+    }
+    ImGui::EndMenu();
+  }
+}
 
 extern "C" {
 #if defined(WIN32) || defined(_WIN32)
 __declspec(dllexport)
 #endif
-    int HALSIM_InitExtension(void) {
+int HALSIM_InitExtension(void) {
   std::puts("Simulator GUI Initializing.");
 
   gui::CreateContext();
-  glass::CreateContext();
+  wpi::glass::CreateContext();
 
-  glass::SetStorageName("simgui");
+  wpi::glass::SetStorageName("simgui");
+  wpi::glass::AddWorkspaceInit([] {
+    if (wpi::glass::gContext->timestampDisplayMode ==
+        wpi::glass::TimestampDisplayMode::SERVER) {
+      SetTimestampDisplayMode(wpi::glass::TimestampDisplayMode::LOCAL,
+                              wpi::glass::TIMESTAMP_DISPLAY_MODE_LOCAL);
+    }
+  });
 
   gui::AddInit([] { ImGui::GetIO().ConfigDockingWithShift = true; });
 
@@ -68,31 +99,27 @@ __declspec(dllexport)
   HAL_RegisterExtension(
       HALSIMGUI_EXT_GETGUICONTEXT,
       reinterpret_cast<void*>((GetGuiContextFn)&gui::GetCurrentContext));
-  HAL_RegisterExtension(
-      HALSIMGUI_EXT_GETGLASSCONTEXT,
-      reinterpret_cast<void*>((GetGlassContextFn)&glass::GetCurrentContext));
+  HAL_RegisterExtension(HALSIMGUI_EXT_GETGLASSCONTEXT,
+                        reinterpret_cast<void*>(
+                            (GetGlassContextFn)&wpi::glass::GetCurrentContext));
 
   HALSimGui::GlobalInit();
   DriverStationGui::GlobalInit();
-  gPlotProvider = std::make_unique<glass::PlotProvider>(
-      glass::GetStorageRoot().GetChild("Plot"));
+  gPlotProvider = std::make_unique<wpi::glass::PlotProvider>(
+      wpi::glass::GetStorageRoot().GetChild("Plot"));
   gPlotProvider->GlobalInit();
 
   // These need to initialize first
   EncoderSimGui::Initialize();
   SimDeviceGui::Initialize();
 
-  AccelerometerSimGui::Initialize();
   AddressableLEDGui::Initialize();
-  AnalogGyroSimGui::Initialize();
   AnalogInputSimGui::Initialize();
-  AnalogOutputSimGui::Initialize();
   DIOSimGui::Initialize();
   NetworkTablesSimGui::Initialize();
   PCMSimGui::Initialize();
   PowerDistributionSimGui::Initialize();
   PWMSimGui::Initialize();
-  RelaySimGui::Initialize();
   PHSimGui::Initialize();
   RoboRioSimGui::Initialize();
   TimingGui::Initialize();
@@ -103,34 +130,38 @@ __declspec(dllexport)
         return PCMSimGui::PCMsAnyInitialized() || PHSimGui::PHsAnyInitialized();
       },
       [] {
-        return std::make_unique<glass::AllPneumaticControlsModel>(
+        return std::make_unique<wpi::glass::AllPneumaticControlsModel>(
             PCMSimGui::GetPCMsModel(), PHSimGui::GetPHsModel());
       });
 
   HALSimGui::halProvider->RegisterView(
       "Solenoids", "AllPneumaticControls",
-      [](glass::Model* model) {
+      [](wpi::glass::Model* model) {
         auto pneumaticModel =
-            static_cast<glass::AllPneumaticControlsModel*>(model);
+            static_cast<wpi::glass::AllPneumaticControlsModel*>(model);
         return PCMSimGui::PCMsAnySolenoids(pneumaticModel->pcms.get()) ||
                PHSimGui::PHsAnySolenoids(pneumaticModel->phs.get());
       },
-      [](glass::Window* win, glass::Model* model) {
+      [](wpi::glass::Window* win, wpi::glass::Model* model) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         win->SetDefaultPos(290, 20);
-        return glass::MakeFunctionView([=] {
+        return wpi::glass::MakeFunctionView([=] {
           auto pneumaticModel =
-              static_cast<glass::AllPneumaticControlsModel*>(model);
-          glass::DisplayPneumaticControlsSolenoids(
+              static_cast<wpi::glass::AllPneumaticControlsModel*>(model);
+          wpi::glass::DisplayPneumaticControlsSolenoids(
               pneumaticModel->pcms.get(),
               HALSimGui::halProvider->AreOutputsEnabled());
-          glass::DisplayPneumaticControlsSolenoids(
+          wpi::glass::DisplayPneumaticControlsSolenoids(
               pneumaticModel->phs.get(),
               HALSimGui::halProvider->AreOutputsEnabled());
         });
       });
 
   HALSimGui::mainMenu.AddMainMenu([] {
+    if (ImGui::BeginMenu("View")) {
+      DisplayTimestampMenu();
+      ImGui::EndMenu();
+    }
     if (ImGui::BeginMenu("Hardware")) {
       HALSimGui::halProvider->DisplayMenu();
       ImGui::EndMenu();
@@ -158,9 +189,36 @@ __declspec(dllexport)
       HALSimGui::manager->DisplayMenu();
       ImGui::EndMenu();
     }
+    if (ImGui::BeginMenu("Info")) {
+      if (ImGui::MenuItem("About")) {
+        gAbout = true;
+      }
+      ImGui::EndMenu();
+    }
+  });
+
+  gui::AddLateExecute([] {
+    if (gAbout) {
+      ImGui::OpenPopup("About");
+      gAbout = false;
+    }
+    if (ImGui::BeginPopupModal("About")) {
+      ImGui::Text("Robot Simulation");
+      ImGui::Separator();
+      gui::EmitRendererInfo();
+      ImGui::Separator();
+      ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
+      ImGui::Text("%.3f ms/frame (%.1f FPS)",
+                  1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+      if (ImGui::Button("Close")) {
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::EndPopup();
+    }
   });
 
   if (!gui::Initialize("Robot Simulation", 1280, 720,
+                       gui::RendererPreference::PREFER_3D,
                        ImGuiConfigFlags_DockingEnable)) {
     return 0;
   }
@@ -177,7 +235,7 @@ __declspec(dllexport)
       nullptr,
       [](void*) {
         gui::Main();
-        glass::DestroyContext();
+        wpi::glass::DestroyContext();
         gui::DestroyContext();
       },
       [](void*) { gui::Exit(); });

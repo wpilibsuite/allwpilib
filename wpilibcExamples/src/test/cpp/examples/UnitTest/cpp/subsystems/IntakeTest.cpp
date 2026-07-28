@@ -2,21 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/DoubleSolenoid.h>
-#include <frc/simulation/DoubleSolenoidSim.h>
-#include <frc/simulation/PWMSim.h>
+#include "subsystems/Intake.hpp"
+
 #include <gtest/gtest.h>
 
-#include "Constants.h"
-#include "subsystems/Intake.h"
+#include "Constants.hpp"
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+#include "wpi/simulation/DoubleSolenoidSim.hpp"
+#include "wpi/simulation/PWMMotorControllerSim.hpp"
 
 class IntakeTest : public testing::Test {
  protected:
   Intake intake;  // create our intake
-  frc::sim::PWMSim simMotor{
+  wpi::sim::PWMMotorControllerSim simMotor{
       IntakeConstants::kMotorPort};  // create our simulation PWM
-  frc::sim::DoubleSolenoidSim simPiston{
-      frc::PneumaticsModuleType::CTREPCM, IntakeConstants::kPistonFwdChannel,
+  wpi::sim::DoubleSolenoidSim simPiston{
+      wpi::PneumaticsModuleType::CTRE_PCM, IntakeConstants::kPistonFwdChannel,
       IntakeConstants::kPistonRevChannel};  // create our simulation solenoid
 };
 
@@ -25,21 +26,22 @@ TEST_F(IntakeTest, DoesntWorkWhenClosed) {
   intake.Activate(0.5);  // try to activate the motor
   EXPECT_DOUBLE_EQ(
       0.0,
-      simMotor.GetSpeed());  // make sure that the value set to the motor is 0
+      simMotor
+          .GetThrottle());  // make sure that the value set to the motor is 0
 }
 
 TEST_F(IntakeTest, WorksWhenOpen) {
   intake.Deploy();
   intake.Activate(0.5);
-  EXPECT_DOUBLE_EQ(0.5, simMotor.GetSpeed());
+  EXPECT_DOUBLE_EQ(0.5, simMotor.GetThrottle());
 }
 
 TEST_F(IntakeTest, Retract) {
   intake.Retract();
-  EXPECT_EQ(frc::DoubleSolenoid::Value::kReverse, simPiston.Get());
+  EXPECT_EQ(wpi::DoubleSolenoid::Value::REVERSE, simPiston.Get());
 }
 
 TEST_F(IntakeTest, Deploy) {
   intake.Deploy();
-  EXPECT_EQ(frc::DoubleSolenoid::Value::kForward, simPiston.Get());
+  EXPECT_EQ(wpi::DoubleSolenoid::Value::FORWARD, simPiston.Get());
 }

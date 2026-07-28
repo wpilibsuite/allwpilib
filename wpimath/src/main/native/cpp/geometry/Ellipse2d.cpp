@@ -2,11 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/geometry/Ellipse2d.h"
+#include "wpi/math/geometry/Ellipse2d.hpp"
 
+#include <sleipnir/autodiff/variable.hpp>
 #include <sleipnir/optimization/problem.hpp>
 
-using namespace frc;
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/units/length.hpp"
+
+using namespace wpi::math;
 
 Translation2d Ellipse2d::Nearest(const Translation2d& point) const {
   // Check if already in ellipse
@@ -20,7 +24,7 @@ Translation2d Ellipse2d::Nearest(const Translation2d& point) const {
 
   // Find nearest point
   {
-    slp::Problem problem;
+    slp::Problem<double> problem;
 
     // Point on ellipse
     auto x = problem.decision_variable();
@@ -41,8 +45,8 @@ Translation2d Ellipse2d::Nearest(const Translation2d& point) const {
 
     problem.solve();
 
-    rotPoint = frc::Translation2d{units::meter_t{x.value()},
-                                  units::meter_t{y.value()}};
+    rotPoint = wpi::math::Translation2d{wpi::units::meter_t{x.value()},
+                                        wpi::units::meter_t{y.value()}};
   }
 
   // Undo rotation

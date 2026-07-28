@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/priority_mutex.h>  // NOLINT(build/include_order)
+#include "wpi/util/priority_mutex.hpp"
 
 #include <atomic>
 #include <condition_variable>
@@ -10,7 +10,7 @@
 
 #include <gtest/gtest.h>
 
-namespace wpi {
+namespace wpi::util {
 
 #ifdef WPI_HAVE_PRIORITY_MUTEX
 
@@ -265,4 +265,4 @@ TEST(MutexTest, ReentrantTryLock) {
 
 #endif  // WPI_HAVE_PRIORITY_MUTEX
 
-}  // namespace wpi
+}  // namespace wpi::util

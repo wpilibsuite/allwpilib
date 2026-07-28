@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/event/BooleanEvent.h"
+#include "wpi/event/BooleanEvent.hpp"
 
 #include <memory>
 #include <utility>
 
-using namespace frc;
+using namespace wpi;
 
 BooleanEvent::BooleanEvent(EventLoop* loop, std::function<bool()> condition)
     : m_loop(loop), m_signal(std::move(condition)) {
@@ -67,10 +67,10 @@ BooleanEvent BooleanEvent::Falling() {
                       });
 }
 
-BooleanEvent BooleanEvent::Debounce(units::second_t debounceTime,
-                                    frc::Debouncer::DebounceType type) {
+BooleanEvent BooleanEvent::Debounce(wpi::units::second_t debounceTime,
+                                    wpi::math::Debouncer::DebounceType type) {
   return BooleanEvent(
       this->m_loop,
-      [debouncer = frc::Debouncer(debounceTime, type),
+      [debouncer = wpi::math::Debouncer(debounceTime, type),
        state = m_state]() mutable { return debouncer.Calculate(*state); });
 }

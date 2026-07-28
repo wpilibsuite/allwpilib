@@ -1,0 +1,25 @@
+classes:
+  wpi::sim::GenericHIDSim:
+    methods:
+      GenericHIDSim:
+        overloads:
+          const GenericHID&:
+          int:
+      NotifyNewData:
+      SetRawButton:
+      SetRawAxis:
+      SetPOV:
+        overloads:
+          int, POVDirection:
+          POVDirection:
+      SetGamepadType:
+      SetSupportedOutputs:
+      SetName:
+      GetLeds:
+      GetRumble:
+      SetAxesMaximumIndex:
+      SetAxesAvailable:
+      SetPOVsMaximumIndex:
+      SetPOVsAvailable:
+      SetButtonsMaximumIndex:
+      SetButtonsAvailable:

@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/hardware/RoboRio.h"
+#include "wpi/glass/hardware/RoboRio.hpp"
 
 #include <imgui.h>
 
-#include "glass/Context.h"
-#include "glass/DataSource.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/DataSource.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 static void DisplayRail(RoboRioRailModel& rail, const char* name) {
   if (CollapsingHeader(name)) {
@@ -46,10 +46,7 @@ static void DisplayRail(RoboRioRailModel& rail, const char* name) {
   }
 }
 
-void glass::DisplayRoboRio(RoboRioModel* model) {
-  ImGui::Button("User Button");
-  model->SetUserButton(ImGui::IsItemActive());
-
+void wpi::glass::DisplayRoboRio(RoboRioModel* model) {
   ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
 
   if (CollapsingHeader("RoboRIO Input")) {
@@ -60,22 +57,9 @@ void glass::DisplayRoboRio(RoboRioModel* model) {
         model->SetVInVoltage(val);
       }
     }
-
-    if (auto data = model->GetVInCurrentData()) {
-      double val = data->GetValue();
-      if (data->InputDouble("Current (A)", &val)) {
-        model->SetVInCurrent(val);
-      }
-    }
     ImGui::PopID();
   }
 
-  if (auto rail = model->GetUser6VRail()) {
-    DisplayRail(*rail, "6V Rail");
-  }
-  if (auto rail = model->GetUser5VRail()) {
-    DisplayRail(*rail, "5V Rail");
-  }
   if (auto rail = model->GetUser3V3Rail()) {
     DisplayRail(*rail, "3.3V Rail");
   }

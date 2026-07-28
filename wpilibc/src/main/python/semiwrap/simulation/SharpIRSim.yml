@@ -1,0 +1,8 @@
+classes:
+  wpi::SharpIRSim:
+    methods:
+      SharpIRSim:
+        overloads:
+          const SharpIR&:
+          int:
+      SetRange:

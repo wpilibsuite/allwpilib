@@ -6,9 +6,7 @@
 
 namespace slp {
 
-/**
- * Enum describing a type of system dynamics constraints.
- */
+/// Enum describing a type of system dynamics constraints.
 enum class DynamicsType : uint8_t {
   /// The dynamics are a function in the form dx/dt = f(t, x, u).
   EXPLICIT_ODE,

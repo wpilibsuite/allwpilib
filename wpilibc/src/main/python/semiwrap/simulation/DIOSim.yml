@@ -1,0 +1,30 @@
+extra_includes:
+- wpi/hardware/discrete/DigitalInput.hpp
+- wpi/hardware/discrete/DigitalOutput.hpp
+
+classes:
+  wpi::sim::DIOSim:
+    force_type_casters:
+    - std::function
+    methods:
+      DIOSim:
+        overloads:
+          const DigitalInput&:
+          const DigitalOutput&:
+          int:
+      RegisterInitializedCallback:
+      GetInitialized:
+      SetInitialized:
+      RegisterValueCallback:
+      GetValue:
+      SetValue:
+      RegisterPulseLengthCallback:
+      GetPulseLength:
+      SetPulseLength:
+      RegisterIsInputCallback:
+      GetIsInput:
+      SetIsInput:
+      RegisterFilterIndexCallback:
+      GetFilterIndex:
+      SetFilterIndex:
+      ResetData:

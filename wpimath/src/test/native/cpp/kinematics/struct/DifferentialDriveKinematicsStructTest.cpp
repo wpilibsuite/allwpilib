@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/DifferentialDriveKinematics.h"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<frc::DifferentialDriveKinematics>;
+using StructType = wpi::util::Struct<wpi::math::DifferentialDriveKinematics>;
 const DifferentialDriveKinematics kExpectedData{
     DifferentialDriveKinematics{1.74_m}};
 }  // namespace
@@ -22,5 +22,5 @@ TEST(DifferentialDriveKinematicsStructTest, Roundtrip) {
 
   DifferentialDriveKinematics unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.trackWidth.value(), unpacked_data.trackWidth.value());
+  EXPECT_EQ(kExpectedData.trackwidth.value(), unpacked_data.trackwidth.value());
 }

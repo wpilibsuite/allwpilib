@@ -1,0 +1,790 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Tue, 11 Jul 2023 22:56:09 -0700
+Subject: [PATCH 24/33] Use C++20 <bit> header
+
+---
+ llvm/include/llvm/ADT/DenseMap.h       |   1 +
+ llvm/include/llvm/ADT/PointerUnion.h   |   2 +-
+ llvm/include/llvm/ADT/SmallPtrSet.h    |   6 +-
+ llvm/include/llvm/Support/Endian.h     | 159 +++++++++++++------------
+ llvm/include/llvm/Support/MathExtras.h |  23 ++--
+ llvm/lib/Support/ConvertUTFWrapper.cpp |   5 +-
+ llvm/unittests/Support/EndianTest.cpp  |  60 ++++------
+ 7 files changed, 125 insertions(+), 131 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
+index 41199ac39da56994d9086600e6dfc1dad2c93ce0..2c23fa2d268d34429faa0ed7b1d889c2c5ea4f9c 100644
+--- a/llvm/include/llvm/ADT/DenseMap.h
++++ b/llvm/include/llvm/ADT/DenseMap.h
+@@ -26,6 +26,7 @@
+ #include "llvm/Support/ReverseIteration.h"
+ #include "llvm/Support/type_traits.h"
+ #include <algorithm>
++#include <bit>
+ #include <cassert>
+ #include <cstddef>
+ #include <cstring>
+diff --git a/llvm/include/llvm/ADT/PointerUnion.h b/llvm/include/llvm/ADT/PointerUnion.h
+index 02d11537e3823a43301295e4645d84357df63703..be3bbb6ac65588626b746ce83aa3ed65ac9dc856 100644
+--- a/llvm/include/llvm/ADT/PointerUnion.h
++++ b/llvm/include/llvm/ADT/PointerUnion.h
+@@ -76,7 +76,7 @@ namespace pointer_union_detail {
+   /// Determine the number of bits required to store integers with values < n.
+   /// This is ceil(log2(n)).
+   constexpr int bitsRequired(unsigned n) {
+-    return n == 0 ? 0 : llvm::bit_width_constexpr(n - 1);
++    return n == 0 ? 0 : std::bit_width(n - 1);
+   }
+ 
+   template <typename... Ts> constexpr int lowBitsAvailable() {
+diff --git a/llvm/include/llvm/ADT/SmallPtrSet.h b/llvm/include/llvm/ADT/SmallPtrSet.h
+index c07de1a110479ed625b112cc5b30d0bd5d56430f..474aa405d789e8c291d3bfc16a653ad043365883 100644
+--- a/llvm/include/llvm/ADT/SmallPtrSet.h
++++ b/llvm/include/llvm/ADT/SmallPtrSet.h
+@@ -81,7 +81,7 @@ protected:
+   explicit SmallPtrSetImplBase(const void **SmallStorage, unsigned SmallSize)
+       : CurArray(SmallStorage), CurArraySize(SmallSize), NumEntries(0),
+         NumTombstones(0), IsSmall(true) {
+-    assert(llvm::has_single_bit(SmallSize) &&
++    assert(std::has_single_bit(SmallSize) &&
+            "Initial size must be a power of two!");
+   }
+ 
+@@ -129,7 +129,7 @@ public:
+     // We must Grow -- find the size where we'd be 75% full, then round up to
+     // the next power of two.
+     size_type NewSize = NewNumEntries + (NewNumEntries / 3);
+-    NewSize = llvm::bit_ceil(NewSize);
++    NewSize = std::bit_ceil(NewSize);
+     // Like insert_imp_big, always allocate at least 128 elements.
+     NewSize = (std::max)(128u, NewSize);
+     Grow(NewSize);
+@@ -533,7 +533,7 @@ class SmallPtrSet : public SmallPtrSetImpl<PtrType> {
+   using BaseT = SmallPtrSetImpl<PtrType>;
+ 
+   // Make sure that SmallSize is a power of two, round up if not.
+-  static constexpr size_t SmallSizePowTwo = llvm::bit_ceil_constexpr(SmallSize);
++  static constexpr size_t SmallSizePowTwo = std::bit_ceil(SmallSize);
+   /// SmallStorage - Fixed size storage used in 'small mode'.
+   const void *SmallStorage[SmallSizePowTwo];
+ 
+diff --git a/llvm/include/llvm/Support/Endian.h b/llvm/include/llvm/Support/Endian.h
+index f5f4381c1003572024223da4825363d93a60aad9..1c5e447374e5dc1738a1e3fc6511395ef0829820 100644
+--- a/llvm/include/llvm/Support/Endian.h
++++ b/llvm/include/llvm/Support/Endian.h
+@@ -16,6 +16,7 @@
+ #include "llvm/ADT/bit.h"
+ #include "llvm/Support/Compiler.h"
+ #include "llvm/Support/SwapByteOrder.h"
++#include <bit>
+ #include <cassert>
+ #include <cstddef>
+ #include <cstdint>
+@@ -41,25 +42,25 @@ struct PickAlignment {
+ namespace endian {
+ 
+ template <typename value_type>
+-[[nodiscard]] inline value_type byte_swap(value_type value, endianness endian) {
+-  if (endian != llvm::endianness::native)
+-    sys::swapByteOrder(value);
++[[nodiscard]] inline value_type byte_swap(value_type value, std::endian endian) {
++  if (endian != std::endian::native)
++    return std::byteswap(value);
+   return value;
+ }
+ 
+ /// Swap the bytes of value to match the given endianness.
+-template <typename value_type, endianness endian>
++template <typename value_type, std::endian endian>
+ [[nodiscard]]
+ LLVM_DEPRECATED("Pass endian as a function argument instead",
+                 "byte_swap") inline value_type byte_swap(value_type value) {
+-  if constexpr (endian != llvm::endianness::native)
+-    sys::swapByteOrder(value);
++  if constexpr (endian != std::endian::native)
++    return std::byteswap(value);
+   return value;
+ }
+ 
+ /// Read a value of a particular endianness from memory.
+ template <typename value_type, std::size_t alignment = unaligned>
+-[[nodiscard]] inline value_type read(const void *memory, endianness endian) {
++[[nodiscard]] inline value_type read(const void *memory, std::endian endian) {
+   value_type ret;
+ 
+   memcpy(static_cast<void *>(&ret),
+@@ -69,7 +70,7 @@ template <typename value_type, std::size_t alignment = unaligned>
+   return byte_swap<value_type>(ret, endian);
+ }
+ 
+-template <typename value_type, endianness endian, std::size_t alignment>
++template <typename value_type, std::endian endian, std::size_t alignment>
+ [[nodiscard]] LLVM_DEPRECATED("Pass endian as a function argument instead",
+                               "read") inline value_type
+     read(const void *memory) {
+@@ -81,13 +82,13 @@ template <typename value_type, endianness endian, std::size_t alignment>
+ template <typename value_type, std::size_t alignment = unaligned,
+           typename CharT>
+ [[nodiscard]] inline value_type readNext(const CharT *&memory,
+-                                         endianness endian) {
++                                         std::endian endian) {
+   value_type ret = read<value_type, alignment>(memory, endian);
+   memory += sizeof(value_type);
+   return ret;
+ }
+ 
+-template <typename value_type, endianness endian,
++template <typename value_type, std::endian endian,
+           std::size_t alignment = unaligned, typename CharT>
+ [[nodiscard]] inline value_type readNext(const CharT *&memory) {
+   return readNext<value_type, alignment, CharT>(memory, endian);
+@@ -95,14 +96,14 @@ template <typename value_type, endianness endian,
+ 
+ /// Write a value to memory with a particular endianness.
+ template <typename value_type, std::size_t alignment = unaligned>
+-inline void write(void *memory, value_type value, endianness endian) {
++inline void write(void *memory, value_type value, std::endian endian) {
+   value = byte_swap<value_type>(value, endian);
+   memcpy(LLVM_ASSUME_ALIGNED(
+              memory, (detail::PickAlignment<value_type, alignment>::value)),
+          &value, sizeof(value_type));
+ }
+ 
+-template <typename value_type, endianness endian, std::size_t alignment>
++template <typename value_type, std::endian endian, std::size_t alignment>
+ LLVM_DEPRECATED("Pass endian as a function argument instead", "write")
+ inline void write(void *memory, value_type value) {
+   write<value_type, alignment>(memory, value, endian);
+@@ -112,12 +113,12 @@ inline void write(void *memory, value_type value) {
+ /// value.
+ template <typename value_type, std::size_t alignment = unaligned,
+           typename CharT>
+-inline void writeNext(CharT *&memory, value_type value, endianness endian) {
++inline void writeNext(CharT *&memory, value_type value, std::endian endian) {
+   write(memory, value, endian);
+   memory += sizeof(value_type);
+ }
+ 
+-template <typename value_type, endianness endian,
++template <typename value_type, std::endian endian,
+           std::size_t alignment = unaligned, typename CharT>
+ inline void writeNext(CharT *&memory, value_type value) {
+   writeNext<value_type, alignment, CharT>(memory, value, endian);
+@@ -128,7 +129,7 @@ using make_unsigned_t = std::make_unsigned_t<value_type>;
+ 
+ /// Read a value of a particular endianness from memory, for a location
+ /// that starts at the given bit offset within the first byte.
+-template <typename value_type, endianness endian, std::size_t alignment>
++template <typename value_type, std::endian endian, std::size_t alignment>
+ [[nodiscard]] inline value_type readAtBitAlignment(const void *memory,
+                                                    uint64_t startBit) {
+   assert(startBit < 8);
+@@ -163,7 +164,7 @@ template <typename value_type, endianness endian, std::size_t alignment>
+ 
+ /// Write a value to memory with a particular endianness, for a location
+ /// that starts at the given bit offset within the first byte.
+-template <typename value_type, endianness endian, std::size_t alignment>
++template <typename value_type, std::endian endian, std::size_t alignment>
+ inline void writeAtBitAlignment(void *memory, value_type value,
+                                 uint64_t startBit) {
+   assert(startBit < 8);
+@@ -217,11 +218,11 @@ inline void writeAtBitAlignment(void *memory, value_type value,
+ 
+ namespace detail {
+ 
+-template <typename ValueType, endianness Endian, std::size_t Alignment,
++template <typename ValueType, std::endian Endian, std::size_t Alignment,
+           std::size_t ALIGN = PickAlignment<ValueType, Alignment>::value>
+ struct packed_endian_specific_integral {
+   using value_type = ValueType;
+-  static constexpr endianness endian = Endian;
++  static constexpr std::endian endian = Endian;
+   static constexpr std::size_t alignment = Alignment;
+ 
+   packed_endian_specific_integral() = default;
+@@ -284,210 +285,210 @@ public:
+ } // end namespace detail
+ 
+ using ulittle8_t =
+-    detail::packed_endian_specific_integral<uint8_t, llvm::endianness::little,
++    detail::packed_endian_specific_integral<uint8_t, std::endian::little,
+                                             unaligned>;
+ using ulittle16_t =
+-    detail::packed_endian_specific_integral<uint16_t, llvm::endianness::little,
++    detail::packed_endian_specific_integral<uint16_t, std::endian::little,
+                                             unaligned>;
+ using ulittle32_t =
+-    detail::packed_endian_specific_integral<uint32_t, llvm::endianness::little,
++    detail::packed_endian_specific_integral<uint32_t, std::endian::little,
+                                             unaligned>;
+ using ulittle64_t =
+-    detail::packed_endian_specific_integral<uint64_t, llvm::endianness::little,
++    detail::packed_endian_specific_integral<uint64_t, std::endian::little,
+                                             unaligned>;
+ 
+ using little16_t =
+-    detail::packed_endian_specific_integral<int16_t, llvm::endianness::little,
++    detail::packed_endian_specific_integral<int16_t, std::endian::little,
+                                             unaligned>;
+ using little32_t =
+-    detail::packed_endian_specific_integral<int32_t, llvm::endianness::little,
++    detail::packed_endian_specific_integral<int32_t, std::endian::little,
+                                             unaligned>;
+ using little64_t =
+-    detail::packed_endian_specific_integral<int64_t, llvm::endianness::little,
++    detail::packed_endian_specific_integral<int64_t, std::endian::little,
+                                             unaligned>;
+ 
+ using aligned_ulittle16_t =
+-    detail::packed_endian_specific_integral<uint16_t, llvm::endianness::little,
++    detail::packed_endian_specific_integral<uint16_t, std::endian::little,
+                                             aligned>;
+ using aligned_ulittle32_t =
+-    detail::packed_endian_specific_integral<uint32_t, llvm::endianness::little,
++    detail::packed_endian_specific_integral<uint32_t, std::endian::little,
+                                             aligned>;
+ using aligned_ulittle64_t =
+-    detail::packed_endian_specific_integral<uint64_t, llvm::endianness::little,
++    detail::packed_endian_specific_integral<uint64_t, std::endian::little,
+                                             aligned>;
+ 
+ using aligned_little16_t =
+-    detail::packed_endian_specific_integral<int16_t, llvm::endianness::little,
++    detail::packed_endian_specific_integral<int16_t, std::endian::little,
+                                             aligned>;
+ using aligned_little32_t =
+-    detail::packed_endian_specific_integral<int32_t, llvm::endianness::little,
++    detail::packed_endian_specific_integral<int32_t, std::endian::little,
+                                             aligned>;
+ using aligned_little64_t =
+-    detail::packed_endian_specific_integral<int64_t, llvm::endianness::little,
++    detail::packed_endian_specific_integral<int64_t, std::endian::little,
+                                             aligned>;
+ 
+ using ubig16_t =
+-    detail::packed_endian_specific_integral<uint16_t, llvm::endianness::big,
++    detail::packed_endian_specific_integral<uint16_t, std::endian::big,
+                                             unaligned>;
+ using ubig32_t =
+-    detail::packed_endian_specific_integral<uint32_t, llvm::endianness::big,
++    detail::packed_endian_specific_integral<uint32_t, std::endian::big,
+                                             unaligned>;
+ using ubig64_t =
+-    detail::packed_endian_specific_integral<uint64_t, llvm::endianness::big,
++    detail::packed_endian_specific_integral<uint64_t, std::endian::big,
+                                             unaligned>;
+ 
+ using big16_t =
+-    detail::packed_endian_specific_integral<int16_t, llvm::endianness::big,
++    detail::packed_endian_specific_integral<int16_t, std::endian::big,
+                                             unaligned>;
+ using big32_t =
+-    detail::packed_endian_specific_integral<int32_t, llvm::endianness::big,
++    detail::packed_endian_specific_integral<int32_t, std::endian::big,
+                                             unaligned>;
+ using big64_t =
+-    detail::packed_endian_specific_integral<int64_t, llvm::endianness::big,
++    detail::packed_endian_specific_integral<int64_t, std::endian::big,
+                                             unaligned>;
+ 
+ using aligned_ubig16_t =
+-    detail::packed_endian_specific_integral<uint16_t, llvm::endianness::big,
++    detail::packed_endian_specific_integral<uint16_t, std::endian::big,
+                                             aligned>;
+ using aligned_ubig32_t =
+-    detail::packed_endian_specific_integral<uint32_t, llvm::endianness::big,
++    detail::packed_endian_specific_integral<uint32_t, std::endian::big,
+                                             aligned>;
+ using aligned_ubig64_t =
+-    detail::packed_endian_specific_integral<uint64_t, llvm::endianness::big,
++    detail::packed_endian_specific_integral<uint64_t, std::endian::big,
+                                             aligned>;
+ 
+ using aligned_big16_t =
+-    detail::packed_endian_specific_integral<int16_t, llvm::endianness::big,
++    detail::packed_endian_specific_integral<int16_t, std::endian::big,
+                                             aligned>;
+ using aligned_big32_t =
+-    detail::packed_endian_specific_integral<int32_t, llvm::endianness::big,
++    detail::packed_endian_specific_integral<int32_t, std::endian::big,
+                                             aligned>;
+ using aligned_big64_t =
+-    detail::packed_endian_specific_integral<int64_t, llvm::endianness::big,
++    detail::packed_endian_specific_integral<int64_t, std::endian::big,
+                                             aligned>;
+ 
+ using unaligned_uint16_t =
+-    detail::packed_endian_specific_integral<uint16_t, llvm::endianness::native,
++    detail::packed_endian_specific_integral<uint16_t, std::endian::native,
+                                             unaligned>;
+ using unaligned_uint32_t =
+-    detail::packed_endian_specific_integral<uint32_t, llvm::endianness::native,
++    detail::packed_endian_specific_integral<uint32_t, std::endian::native,
+                                             unaligned>;
+ using unaligned_uint64_t =
+-    detail::packed_endian_specific_integral<uint64_t, llvm::endianness::native,
++    detail::packed_endian_specific_integral<uint64_t, std::endian::native,
+                                             unaligned>;
+ 
+ using unaligned_int16_t =
+-    detail::packed_endian_specific_integral<int16_t, llvm::endianness::native,
++    detail::packed_endian_specific_integral<int16_t, std::endian::native,
+                                             unaligned>;
+ using unaligned_int32_t =
+-    detail::packed_endian_specific_integral<int32_t, llvm::endianness::native,
++    detail::packed_endian_specific_integral<int32_t, std::endian::native,
+                                             unaligned>;
+ using unaligned_int64_t =
+-    detail::packed_endian_specific_integral<int64_t, llvm::endianness::native,
++    detail::packed_endian_specific_integral<int64_t, std::endian::native,
+                                             unaligned>;
+ 
+ template <typename T>
+ using little_t =
+-    detail::packed_endian_specific_integral<T, llvm::endianness::little,
++    detail::packed_endian_specific_integral<T, std::endian::little,
+                                             unaligned>;
+ template <typename T>
+-using big_t = detail::packed_endian_specific_integral<T, llvm::endianness::big,
++using big_t = detail::packed_endian_specific_integral<T, std::endian::big,
+                                                       unaligned>;
+ 
+ template <typename T>
+ using aligned_little_t =
+-    detail::packed_endian_specific_integral<T, llvm::endianness::little,
++    detail::packed_endian_specific_integral<T, std::endian::little,
+                                             aligned>;
+ template <typename T>
+ using aligned_big_t =
+-    detail::packed_endian_specific_integral<T, llvm::endianness::big, aligned>;
++    detail::packed_endian_specific_integral<T, std::endian::big, aligned>;
+ 
+ namespace endian {
+ 
+-template <typename T, endianness E> [[nodiscard]] inline T read(const void *P) {
++template <typename T, std::endian E> [[nodiscard]] inline T read(const void *P) {
+   return *(const detail::packed_endian_specific_integral<T, E, unaligned> *)P;
+ }
+ 
+-[[nodiscard]] inline uint16_t read16(const void *P, endianness E) {
++[[nodiscard]] inline uint16_t read16(const void *P, std::endian E) {
+   return read<uint16_t>(P, E);
+ }
+-[[nodiscard]] inline uint32_t read32(const void *P, endianness E) {
++[[nodiscard]] inline uint32_t read32(const void *P, std::endian E) {
+   return read<uint32_t>(P, E);
+ }
+-[[nodiscard]] inline uint64_t read64(const void *P, endianness E) {
++[[nodiscard]] inline uint64_t read64(const void *P, std::endian E) {
+   return read<uint64_t>(P, E);
+ }
+ 
+-template <endianness E> [[nodiscard]] inline uint16_t read16(const void *P) {
++template <std::endian E> [[nodiscard]] inline uint16_t read16(const void *P) {
+   return read<uint16_t, E>(P);
+ }
+-template <endianness E> [[nodiscard]] inline uint32_t read32(const void *P) {
++template <std::endian E> [[nodiscard]] inline uint32_t read32(const void *P) {
+   return read<uint32_t, E>(P);
+ }
+-template <endianness E> [[nodiscard]] inline uint64_t read64(const void *P) {
++template <std::endian E> [[nodiscard]] inline uint64_t read64(const void *P) {
+   return read<uint64_t, E>(P);
+ }
+ 
+ [[nodiscard]] inline uint16_t read16le(const void *P) {
+-  return read16<llvm::endianness::little>(P);
++  return read16<std::endian::little>(P);
+ }
+ [[nodiscard]] inline uint32_t read32le(const void *P) {
+-  return read32<llvm::endianness::little>(P);
++  return read32<std::endian::little>(P);
+ }
+ [[nodiscard]] inline uint64_t read64le(const void *P) {
+-  return read64<llvm::endianness::little>(P);
++  return read64<std::endian::little>(P);
+ }
+ [[nodiscard]] inline uint16_t read16be(const void *P) {
+-  return read16<llvm::endianness::big>(P);
++  return read16<std::endian::big>(P);
+ }
+ [[nodiscard]] inline uint32_t read32be(const void *P) {
+-  return read32<llvm::endianness::big>(P);
++  return read32<std::endian::big>(P);
+ }
+ [[nodiscard]] inline uint64_t read64be(const void *P) {
+-  return read64<llvm::endianness::big>(P);
++  return read64<std::endian::big>(P);
+ }
+ 
+-template <typename T, endianness E> inline void write(void *P, T V) {
++template <typename T, std::endian E> inline void write(void *P, T V) {
+   *(detail::packed_endian_specific_integral<T, E, unaligned> *)P = V;
+ }
+ 
+-inline void write16(void *P, uint16_t V, endianness E) {
++inline void write16(void *P, uint16_t V, std::endian E) {
+   write<uint16_t>(P, V, E);
+ }
+-inline void write32(void *P, uint32_t V, endianness E) {
++inline void write32(void *P, uint32_t V, std::endian E) {
+   write<uint32_t>(P, V, E);
+ }
+-inline void write64(void *P, uint64_t V, endianness E) {
++inline void write64(void *P, uint64_t V, std::endian E) {
+   write<uint64_t>(P, V, E);
+ }
+ 
+-template <endianness E> inline void write16(void *P, uint16_t V) {
++template <std::endian E> inline void write16(void *P, uint16_t V) {
+   write<uint16_t, E>(P, V);
+ }
+-template <endianness E> inline void write32(void *P, uint32_t V) {
++template <std::endian E> inline void write32(void *P, uint32_t V) {
+   write<uint32_t, E>(P, V);
+ }
+-template <endianness E> inline void write64(void *P, uint64_t V) {
++template <std::endian E> inline void write64(void *P, uint64_t V) {
+   write<uint64_t, E>(P, V);
+ }
+ 
+ inline void write16le(void *P, uint16_t V) {
+-  write16<llvm::endianness::little>(P, V);
++  write16<std::endian::little>(P, V);
+ }
+ inline void write32le(void *P, uint32_t V) {
+-  write32<llvm::endianness::little>(P, V);
++  write32<std::endian::little>(P, V);
+ }
+ inline void write64le(void *P, uint64_t V) {
+-  write64<llvm::endianness::little>(P, V);
++  write64<std::endian::little>(P, V);
+ }
+ inline void write16be(void *P, uint16_t V) {
+-  write16<llvm::endianness::big>(P, V);
++  write16<std::endian::big>(P, V);
+ }
+ inline void write32be(void *P, uint32_t V) {
+-  write32<llvm::endianness::big>(P, V);
++  write32<std::endian::big>(P, V);
+ }
+ inline void write64be(void *P, uint64_t V) {
+-  write64<llvm::endianness::big>(P, V);
++  write64<std::endian::big>(P, V);
+ }
+ 
+ } // end namespace endian
+diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
+index 0735d9c9f756349a19c5aa2ec34ceca5d8274f16..38b1486c54be5102025192b3b90e86e54ab347c0 100644
+--- a/llvm/include/llvm/Support/MathExtras.h
++++ b/llvm/include/llvm/Support/MathExtras.h
+@@ -16,6 +16,7 @@
+ #include "llvm/ADT/STLForwardCompat.h"
+ #include "llvm/ADT/bit.h"
+ #include "llvm/Support/Compiler.h"
++#include <bit>
+ #include <cassert>
+ #include <climits>
+ #include <cstdint>
+@@ -255,12 +256,12 @@ constexpr bool isShiftedMask_64(uint64_t Value) {
+ /// Return true if the argument is a power of two > 0.
+ /// Ex. isPowerOf2_32(0x00100000U) == true (32 bit edition.)
+ constexpr bool isPowerOf2_32(uint32_t Value) {
+-  return llvm::has_single_bit(Value);
++  return std::has_single_bit(Value);
+ }
+ 
+ /// Return true if the argument is a power of two > 0 (64 bit edition.)
+ constexpr bool isPowerOf2_64(uint64_t Value) {
+-  return llvm::has_single_bit(Value);
++  return std::has_single_bit(Value);
+ }
+ 
+ /// Return true if the argument contains a non-empty sequence of ones with the
+@@ -272,8 +273,8 @@ inline bool isShiftedMask_32(uint32_t Value, unsigned &MaskIdx,
+                              unsigned &MaskLen) {
+   if (!isShiftedMask_32(Value))
+     return false;
+-  MaskIdx = llvm::countr_zero(Value);
+-  MaskLen = llvm::popcount(Value);
++  MaskIdx = std::countr_zero(Value);
++  MaskLen = std::popcount(Value);
+   return true;
+ }
+ 
+@@ -285,8 +286,8 @@ inline bool isShiftedMask_64(uint64_t Value, unsigned &MaskIdx,
+                              unsigned &MaskLen) {
+   if (!isShiftedMask_64(Value))
+     return false;
+-  MaskIdx = llvm::countr_zero(Value);
+-  MaskLen = llvm::popcount(Value);
++  MaskIdx = std::countr_zero(Value);
++  MaskLen = std::popcount(Value);
+   return true;
+ }
+ 
+@@ -294,7 +295,7 @@ inline bool isShiftedMask_64(uint64_t Value, unsigned &MaskIdx,
+ /// Valid only for positive powers of two.
+ template <size_t kValue> constexpr size_t ConstantLog2() {
+   static_assert(llvm::isPowerOf2_64(kValue), "Value is not a valid power of 2");
+-  return llvm::countr_zero_constexpr(kValue);
++  return std::countr_zero(kValue);
+ }
+ 
+ template <size_t kValue>
+@@ -307,26 +308,26 @@ constexpr size_t CTLog2() {
+ /// (32 bit edition.)
+ /// Ex. Log2_32(32) == 5, Log2_32(1) == 0, Log2_32(0) == -1, Log2_32(6) == 2
+ inline unsigned Log2_32(uint32_t Value) {
+-  return static_cast<unsigned>(31 - llvm::countl_zero(Value));
++  return static_cast<unsigned>(31 - std::countl_zero(Value));
+ }
+ 
+ /// Return the floor log base 2 of the specified value, -1 if the value is zero.
+ /// (64 bit edition.)
+ inline unsigned Log2_64(uint64_t Value) {
+-  return static_cast<unsigned>(63 - llvm::countl_zero(Value));
++  return static_cast<unsigned>(63 - std::countl_zero(Value));
+ }
+ 
+ /// Return the ceil log base 2 of the specified value, 32 if the value is zero.
+ /// (32 bit edition).
+ /// Ex. Log2_32_Ceil(32) == 5, Log2_32_Ceil(1) == 0, Log2_32_Ceil(6) == 3
+ inline unsigned Log2_32_Ceil(uint32_t Value) {
+-  return static_cast<unsigned>(32 - llvm::countl_zero(Value - 1));
++  return static_cast<unsigned>(32 - std::countl_zero(Value - 1));
+ }
+ 
+ /// Return the ceil log base 2 of the specified value, 64 if the value is zero.
+ /// (64 bit edition.)
+ inline unsigned Log2_64_Ceil(uint64_t Value) {
+-  return static_cast<unsigned>(64 - llvm::countl_zero(Value - 1));
++  return static_cast<unsigned>(64 - std::countl_zero(Value - 1));
+ }
+ 
+ /// A and B are either alignments or offsets. Return the minimum alignment that
+diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
+index 17b2760fe5c579a61e85188d482cbc9ec28f6c09..7f5d8958230414edf9db69ff08dd36d02c00f37d 100644
+--- a/llvm/lib/Support/ConvertUTFWrapper.cpp
++++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
+@@ -9,6 +9,7 @@
+ #include "llvm/Support/ConvertUTF.h"
+ #include "llvm/Support/SmallVector.h"
+ #include "llvm/Support/ErrorHandling.h"
++#include <bit>
+ #include <span>
+ #include <string>
+ #include <string_view>
+@@ -102,7 +103,7 @@ bool convertUTF16ToUTF8String(span<const char> SrcBytes, SmallVectorImpl<char> &
+   if (Src[0] == UNI_UTF16_BYTE_ORDER_MARK_SWAPPED) {
+     ByteSwapped.insert(ByteSwapped.end(), Src, SrcEnd);
+     for (UTF16 &I : ByteSwapped)
+-      I = llvm::byteswap<uint16_t>(I);
++      I = std::byteswap(I);
+     Src = &ByteSwapped[0];
+     SrcEnd = &ByteSwapped[ByteSwapped.size() - 1] + 1;
+   }
+@@ -160,7 +161,7 @@ bool convertUTF32ToUTF8String(span<const char> SrcBytes, std::string &Out) {
+   if (Src[0] == UNI_UTF32_BYTE_ORDER_MARK_SWAPPED) {
+     ByteSwapped.insert(ByteSwapped.end(), Src, SrcEnd);
+     for (UTF32 &I : ByteSwapped)
+-      I = llvm::byteswap<uint32_t>(I);
++      I = std::byteswap(I);
+     Src = &ByteSwapped[0];
+     SrcEnd = &ByteSwapped[ByteSwapped.size() - 1] + 1;
+   }
+diff --git a/llvm/unittests/Support/EndianTest.cpp b/llvm/unittests/Support/EndianTest.cpp
+index 0ee631db74ac1f70ca5e9bb4cf6cdcb1d2205e57..d707fdb55c7c97b21310b48bf3c23e328dd644aa 100644
+--- a/llvm/unittests/Support/EndianTest.cpp
++++ b/llvm/unittests/Support/EndianTest.cpp
+@@ -24,33 +24,32 @@ TEST(Endian, Read) {
+   unsigned char littleval[] = {0x00, 0x04, 0x03, 0x02, 0x01};
+   int32_t BigAsHost = 0x00010203;
+   EXPECT_EQ(BigAsHost,
+-            (endian::read<int32_t, unaligned>(bigval, llvm::endianness::big)));
++            (endian::read<int32_t, unaligned>(bigval, std::endian::big)));
+   int32_t LittleAsHost = 0x02030400;
+   EXPECT_EQ(LittleAsHost, (endian::read<int32_t, unaligned>(
+-                              littleval, llvm::endianness::little)));
++                              littleval, std::endian::little)));
+ 
+   EXPECT_EQ(
+-      (endian::read<int32_t, unaligned>(bigval + 1, llvm::endianness::big)),
+-      (endian::read<int32_t, unaligned>(littleval + 1,
+-                                        llvm::endianness::little)));
++      (endian::read<int32_t, unaligned>(bigval + 1, std::endian::big)),
++      (endian::read<int32_t, unaligned>(littleval + 1, std::endian::little)));
+ }
+ 
+ TEST(Endian, WriteNext) {
+   unsigned char bigval[] = {0x00, 0x00}, *p = bigval;
+-  endian::writeNext<int16_t, llvm::endianness::big>(p, short(0xaabb));
++  endian::writeNext<int16_t, std::endian::big>(p, short(0xaabb));
+   EXPECT_EQ(bigval[0], 0xaa);
+   EXPECT_EQ(bigval[1], 0xbb);
+   EXPECT_EQ(p, bigval + 2);
+ 
+   char littleval[8] = {}, *q = littleval;
+-  endian::writeNext<uint32_t, llvm::endianness::little>(q, 0x44556677);
++  endian::writeNext<uint32_t, std::endian::little>(q, 0x44556677);
+   EXPECT_EQ(littleval[0], 0x77);
+   EXPECT_EQ(littleval[1], 0x66);
+   EXPECT_EQ(littleval[2], 0x55);
+   EXPECT_EQ(littleval[3], 0x44);
+   EXPECT_EQ(q, littleval + 4);
+ 
+-  endian::writeNext<uint32_t>(q, 0x11223344, llvm::endianness::little);
++  endian::writeNext<uint32_t>(q, 0x11223344, std::endian::little);
+   EXPECT_EQ(littleval[4], 0x44);
+   EXPECT_EQ(littleval[5], 0x33);
+   EXPECT_EQ(littleval[6], 0x22);
+@@ -63,10 +62,10 @@ TEST(Endian, ReadBitAligned) {
+   unsigned char littleval[] = {0x3f, 0x00, 0x00, 0x00, 0xc0, 0xff, 0xff, 0xff};
+   unsigned char bigval[] = {0x00, 0x00, 0x00, 0x3f, 0xff, 0xff, 0xff, 0xc0};
+   EXPECT_EQ(
+-      (endian::readAtBitAlignment<int, llvm::endianness::little, unaligned>(
++      (endian::readAtBitAlignment<int, std::endian::little, unaligned>(
+           &littleval[0], 6)),
+       0x0);
+-  EXPECT_EQ((endian::readAtBitAlignment<int, llvm::endianness::big, unaligned>(
++  EXPECT_EQ((endian::readAtBitAlignment<int, std::endian::big, unaligned>(
+                 &bigval[0], 6)),
+             0x0);
+   // Test to make sure that signed right shift of 0xf0000000 is masked
+@@ -74,18 +73,18 @@ TEST(Endian, ReadBitAligned) {
+   unsigned char littleval2[] = {0x00, 0x00, 0x00, 0xf0, 0x00, 0x00, 0x00, 0x00};
+   unsigned char bigval2[] = {0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+   EXPECT_EQ(
+-      (endian::readAtBitAlignment<int, llvm::endianness::little, unaligned>(
++      (endian::readAtBitAlignment<int, std::endian::little, unaligned>(
+           &littleval2[0], 4)),
+       0x0f000000);
+-  EXPECT_EQ((endian::readAtBitAlignment<int, llvm::endianness::big, unaligned>(
++  EXPECT_EQ((endian::readAtBitAlignment<int, std::endian::big, unaligned>(
+                 &bigval2[0], 4)),
+             0x0f000000);
+   // Test to make sure left shift of start bit doesn't overflow.
+   EXPECT_EQ(
+-      (endian::readAtBitAlignment<int, llvm::endianness::little, unaligned>(
++      (endian::readAtBitAlignment<int, std::endian::little, unaligned>(
+           &littleval2[0], 1)),
+       0x78000000);
+-  EXPECT_EQ((endian::readAtBitAlignment<int, llvm::endianness::big, unaligned>(
++  EXPECT_EQ((endian::readAtBitAlignment<int, std::endian::big, unaligned>(
+                 &bigval2[0], 1)),
+             0x78000000);
+   // Test to make sure 64-bit int doesn't overflow.
+@@ -94,11 +93,11 @@ TEST(Endian, ReadBitAligned) {
+   unsigned char bigval3[] = {0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+   EXPECT_EQ(
+-      (endian::readAtBitAlignment<int64_t, llvm::endianness::little, unaligned>(
++      (endian::readAtBitAlignment<int64_t, std::endian::little, unaligned>(
+           &littleval3[0], 4)),
+       0x0f00000000000000);
+   EXPECT_EQ(
+-      (endian::readAtBitAlignment<int64_t, llvm::endianness::big, unaligned>(
++      (endian::readAtBitAlignment<int64_t, std::endian::big, unaligned>(
+           &bigval3[0], 4)),
+       0x0f00000000000000);
+ }
+@@ -107,7 +106,7 @@ TEST(Endian, WriteBitAligned) {
+   // This test ensures that signed right shift of 0xffffaa is masked
+   // properly.
+   unsigned char bigval[8] = {0x00};
+-  endian::writeAtBitAlignment<int32_t, llvm::endianness::big, unaligned>(
++  endian::writeAtBitAlignment<int32_t, std::endian::big, unaligned>(
+       bigval, (int)0xffffaaaa, 4);
+   EXPECT_EQ(bigval[0], 0xff);
+   EXPECT_EQ(bigval[1], 0xfa);
+@@ -119,7 +118,7 @@ TEST(Endian, WriteBitAligned) {
+   EXPECT_EQ(bigval[7], 0x0f);
+ 
+   unsigned char littleval[8] = {0x00};
+-  endian::writeAtBitAlignment<int32_t, llvm::endianness::little, unaligned>(
++  endian::writeAtBitAlignment<int32_t, std::endian::little, unaligned>(
+       littleval, (int)0xffffaaaa, 4);
+   EXPECT_EQ(littleval[0], 0xa0);
+   EXPECT_EQ(littleval[1], 0xaa);
+@@ -133,7 +132,7 @@ TEST(Endian, WriteBitAligned) {
+   // This test makes sure 1<<31 doesn't overflow.
+   // Test to make sure left shift of start bit doesn't overflow.
+   unsigned char bigval2[8] = {0x00};
+-  endian::writeAtBitAlignment<int32_t, llvm::endianness::big, unaligned>(
++  endian::writeAtBitAlignment<int32_t, std::endian::big, unaligned>(
+       bigval2, (int)0xffffffff, 1);
+   EXPECT_EQ(bigval2[0], 0xff);
+   EXPECT_EQ(bigval2[1], 0xff);
+@@ -145,7 +144,7 @@ TEST(Endian, WriteBitAligned) {
+   EXPECT_EQ(bigval2[7], 0x01);
+ 
+   unsigned char littleval2[8] = {0x00};
+-  endian::writeAtBitAlignment<int32_t, llvm::endianness::little, unaligned>(
++  endian::writeAtBitAlignment<int32_t, std::endian::little, unaligned>(
+       littleval2, (int)0xffffffff, 1);
+   EXPECT_EQ(littleval2[0], 0xfe);
+   EXPECT_EQ(littleval2[1], 0xff);
+@@ -158,7 +157,7 @@ TEST(Endian, WriteBitAligned) {
+ 
+   // Test to make sure 64-bit int doesn't overflow.
+   unsigned char bigval64[16] = {0x00};
+-  endian::writeAtBitAlignment<int64_t, llvm::endianness::big, unaligned>(
++  endian::writeAtBitAlignment<int64_t, std::endian::big, unaligned>(
+       bigval64, (int64_t)0xffffffffffffffff, 1);
+   EXPECT_EQ(bigval64[0], 0xff);
+   EXPECT_EQ(bigval64[1], 0xff);
+@@ -178,7 +177,7 @@ TEST(Endian, WriteBitAligned) {
+   EXPECT_EQ(bigval64[15], 0x01);
+ 
+   unsigned char littleval64[16] = {0x00};
+-  endian::writeAtBitAlignment<int64_t, llvm::endianness::little, unaligned>(
++  endian::writeAtBitAlignment<int64_t, std::endian::little, unaligned>(
+       littleval64, (int64_t)0xffffffffffffffff, 1);
+   EXPECT_EQ(littleval64[0], 0xfe);
+   EXPECT_EQ(littleval64[1], 0xff);
+@@ -200,26 +199,26 @@ TEST(Endian, WriteBitAligned) {
+ 
+ TEST(Endian, Write) {
+   unsigned char data[5];
+-  endian::write<int32_t, unaligned>(data, -1362446643, llvm::endianness::big);
++  endian::write<int32_t, unaligned>(data, -1362446643, std::endian::big);
+   EXPECT_EQ(data[0], 0xAE);
+   EXPECT_EQ(data[1], 0xCA);
+   EXPECT_EQ(data[2], 0xB6);
+   EXPECT_EQ(data[3], 0xCD);
+   endian::write<int32_t, unaligned>(data + 1, -1362446643,
+-                                    llvm::endianness::big);
++                                    std::endian::big);
+   EXPECT_EQ(data[1], 0xAE);
+   EXPECT_EQ(data[2], 0xCA);
+   EXPECT_EQ(data[3], 0xB6);
+   EXPECT_EQ(data[4], 0xCD);
+ 
+   endian::write<int32_t, unaligned>(data, -1362446643,
+-                                    llvm::endianness::little);
++                                    std::endian::little);
+   EXPECT_EQ(data[0], 0xCD);
+   EXPECT_EQ(data[1], 0xB6);
+   EXPECT_EQ(data[2], 0xCA);
+   EXPECT_EQ(data[3], 0xAE);
+   endian::write<int32_t, unaligned>(data + 1, -1362446643,
+-                                    llvm::endianness::little);
++                                    std::endian::little);
+   EXPECT_EQ(data[1], 0xCD);
+   EXPECT_EQ(data[2], 0xB6);
+   EXPECT_EQ(data[3], 0xCA);
+@@ -239,13 +238,4 @@ TEST(Endian, PackedEndianSpecificIntegral) {
+   EXPECT_EQ(big_val->value(), little_val->value());
+ }
+ 
+-TEST(Endian, PacketEndianSpecificIntegralAsEnum) {
+-  enum class Test : uint16_t { ONETWO = 0x0102, TWOONE = 0x0201 };
+-  unsigned char bytes[] = {0x01, 0x02};
+-  using LittleTest = little_t<Test>;
+-  using BigTest = big_t<Test>;
+-  EXPECT_EQ(Test::TWOONE, *reinterpret_cast<LittleTest *>(bytes));
+-  EXPECT_EQ(Test::ONETWO, *reinterpret_cast<BigTest *>(bytes));
+-}
+-
+ } // end anon namespace

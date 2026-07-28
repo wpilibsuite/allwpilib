@@ -2,29 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "commands/DriveDistance.h"
+#include "commands/DriveDistance.hpp"
 
 #include <cmath>
 
-DriveDistance::DriveDistance(double inches, double speed,
+DriveDistance::DriveDistance(double inches, double velocity,
                              DriveSubsystem* subsystem)
-    : m_drive(subsystem), m_distance(inches), m_speed(speed) {
+    : drive(subsystem), distance(inches), velocity(velocity) {
   AddRequirements(subsystem);
 }
 
 void DriveDistance::Initialize() {
-  m_drive->ResetEncoders();
-  m_drive->ArcadeDrive(m_speed, 0);
+  drive->ResetEncoders();
+  drive->ArcadeDrive(velocity, 0);
 }
 
 void DriveDistance::Execute() {
-  m_drive->ArcadeDrive(m_speed, 0);
+  drive->ArcadeDrive(velocity, 0);
 }
 
 void DriveDistance::End(bool interrupted) {
-  m_drive->ArcadeDrive(0, 0);
+  drive->ArcadeDrive(0, 0);
 }
 
 bool DriveDistance::IsFinished() {
-  return std::abs(m_drive->GetAverageEncoderDistance()) >= m_distance;
+  return std::abs(drive->GetAverageEncoderDistance()) >= distance;
 }

@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/optimization/SimulatedAnnealing.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <random>
 
 #include <gtest/gtest.h>
-
-#include "frc/optimization/SimulatedAnnealing.h"
 
 TEST(SimulatedAnnealingTest, DoubleFunctionOptimizationHeartBeat) {
   auto function = [](double x) {
@@ -21,7 +21,7 @@ TEST(SimulatedAnnealingTest, DoubleFunctionOptimizationHeartBeat) {
   std::mt19937 gen{rd()};
   std::uniform_real_distribution<> distr{0.0, 1.0};
 
-  frc::SimulatedAnnealing<double> simulatedAnnealing{
+  wpi::math::SimulatedAnnealing<double> simulatedAnnealing{
       2.0,
       [&](const double& x) {
         return std::clamp(x + (distr(gen) - 0.5) * stepSize, -3.0, 3.0);
@@ -44,7 +44,7 @@ TEST(SimulatedAnnealingTest, DoubleFunctionOptimizationMultimodal) {
   std::mt19937 gen{rd()};
   std::uniform_real_distribution<> distr{0.0, 1.0};
 
-  frc::SimulatedAnnealing<double> simulatedAnnealing{
+  wpi::math::SimulatedAnnealing<double> simulatedAnnealing{
       2.0,
       [&](const double& x) {
         return std::clamp(x + (distr(gen) - 0.5) * stepSize, 0.0, 7.0);

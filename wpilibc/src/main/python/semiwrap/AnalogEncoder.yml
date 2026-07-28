@@ -1,0 +1,28 @@
+extra_includes:
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/hardware/discrete/AnalogInput.hpp
+
+classes:
+  wpi::AnalogEncoder:
+    ignored_bases:
+    - wpi::util::SendableHelper<AnalogEncoder>
+    methods:
+      AnalogEncoder:
+        overloads:
+          int:
+          AnalogInput&:
+            ignore: true
+          AnalogInput*:
+            ignore: true
+          std::shared_ptr<AnalogInput>:
+          int, double, double:
+          AnalogInput&, double, double:
+            ignore: true
+          AnalogInput*, double, double:
+            ignore: true
+          std::shared_ptr<AnalogInput>, double, double:
+      Get:
+      GetChannel:
+      SetVoltagePercentageRange:
+      SetInverted:
+      InitSendable:

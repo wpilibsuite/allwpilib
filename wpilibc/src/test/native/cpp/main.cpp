@@ -3,20 +3,21 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <hal/HALBase.h>
 
-#ifndef __FRC_ROBORIO__
-namespace frc::impl {
+#include "wpi/hal/HAL.h"
+
+#ifndef __FIRST_SYSTEMCORE__
+namespace wpi::impl {
 void ResetMotorSafety();
 }
 #endif
 
 int main(int argc, char** argv) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
-#ifndef __FRC_ROBORIO__
-  frc::impl::ResetMotorSafety();
+#ifndef __FIRST_SYSTEMCORE__
+  wpi::impl::ResetMotorSafety();
 #endif
   return ret;
 }
