@@ -83,7 +83,7 @@ class DifferentialDrivetrainSimTest {
     }
 
     // 2 inch tolerance is OK since our ground truth is an approximation of the
-    // ODE solution using tsit5 anyway
+    // ODE solution using Tsit5 anyway
     assertEquals(
         groundTruthX.get(DifferentialDrivetrainSim.State.X.value, 0),
         sim.getState(DifferentialDrivetrainSim.State.X),
