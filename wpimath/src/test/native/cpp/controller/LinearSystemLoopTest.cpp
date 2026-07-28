@@ -125,7 +125,7 @@ TEST_CASE("LinearSystemLoopTest FlywheelEnabled", "[wpimath]") {
   CHECK_NEAR(0.0, loop.Error().value(), 0.1);
 }
 
-TEST(LinearSystemLoopTest, AtReference) {
+TEST_CASE("LinearSystemLoopTest AtReference", "[wpimath]") {
   wpi::math::LinearSystem<2, 1, 2> plant{
       wpi::math::Models::ElevatorFromPhysicalConstants(
           wpi::math::DCMotor::Vex775Pro(2), 5_kg, 0.0181864_m, 1.0)};
@@ -142,18 +142,25 @@ TEST(LinearSystemLoopTest, AtReference) {
                                             12_V, kDt};
   loop.Reset({0, 0});
 
-  // Default tolerance is zero, so any nonzero error means not at reference.
-  EXPECT_TRUE(loop.AtReference());
+  // Default tolerance is zero and the error is zero, so the loop is at
+  // reference.
+  CHECK(loop.AtReference());
 
   loop.SetTolerance({0.1, 0.2});
+  loop.SetNextR({0, 0});
 
+  // AtReference() delegates to the controller, whose error is snapshotted
+  // during Predict() as nextR - xHat.
   loop.SetXhat({0.05, 0.1});
-  EXPECT_TRUE(loop.AtReference());
+  loop.Predict(kDt);
+  CHECK(loop.AtReference());
 
   loop.SetXhat({0.2, 0.1});
-  EXPECT_FALSE(loop.AtReference());
+  loop.Predict(kDt);
+  CHECK_FALSE(loop.AtReference());
 
   // Error exactly at the tolerance boundary is considered at reference.
   loop.SetXhat({0.1, 0.2});
-  EXPECT_TRUE(loop.AtReference());
+  loop.Predict(kDt);
+  CHECK(loop.AtReference());
 }

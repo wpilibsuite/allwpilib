@@ -144,19 +144,25 @@ class LinearSystemLoopTest {
   void testAtReference() {
     m_loop.reset(VecBuilder.fill(0, 0));
 
-    // Default tolerance is zero, so any nonzero error means not at reference.
+    // Default tolerance is zero and the error is zero, so the loop is at reference.
     assertTrue(m_loop.atReference());
 
     m_loop.setTolerance(VecBuilder.fill(0.1, 0.2));
+    m_loop.setNextR(VecBuilder.fill(0, 0));
 
+    // atReference() delegates to the controller, whose error is snapshotted during
+    // predict() as nextR - xHat.
     m_loop.setXHat(VecBuilder.fill(0.05, 0.1));
+    m_loop.predict(kDt);
     assertTrue(m_loop.atReference());
 
     m_loop.setXHat(VecBuilder.fill(0.2, 0.1));
+    m_loop.predict(kDt);
     assertFalse(m_loop.atReference());
 
     // Error exactly at the tolerance boundary is considered at reference.
     m_loop.setXHat(VecBuilder.fill(0.1, 0.2));
+    m_loop.predict(kDt);
     assertTrue(m_loop.atReference());
   }
 }

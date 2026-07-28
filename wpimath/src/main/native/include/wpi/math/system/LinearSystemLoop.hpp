@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <cmath>
 #include <functional>
 
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
@@ -132,7 +131,6 @@ class LinearSystemLoop {
         m_observer(&observer),
         m_clampFunc(clampFunction) {
     m_nextR.setZero();
-    m_tolerance.setZero();
     Reset(m_nextR);
     wpi::math::MathSharedStore::ReportUsage("LinearSystemLoop", "");
   }
@@ -246,22 +244,16 @@ class LinearSystemLoop {
    * Returns true if the error is within the tolerance set by SetTolerance()
    * for every state.
    */
-  bool AtReference() const {
-    const StateVector error = Error();
-    for (int i = 0; i < error.rows(); ++i) {
-      if (std::abs(error(i)) > m_tolerance(i)) {
-        return false;
-      }
-    }
-    return true;
-  }
+  bool AtReference() const { return m_controller->AtReference(); }
 
   /**
    * Sets the error which is considered tolerable for use with AtReference().
    *
    * @param tolerance The tolerable error for each state.
    */
-  void SetTolerance(const StateVector& tolerance) { m_tolerance = tolerance; }
+  void SetTolerance(const StateVector& tolerance) {
+    m_controller->SetTolerance(tolerance);
+  }
 
   /**
    * Correct the state estimate x-hat using the measurements in y.
@@ -306,9 +298,6 @@ class LinearSystemLoop {
 
   // Reference to go to in the next cycle (used by feedforward controller).
   StateVector m_nextR;
-
-  // Tolerable error for use with AtReference().
-  StateVector m_tolerance;
 
   // These are accessible from non-templated subclasses.
   static constexpr int kStates = States;
