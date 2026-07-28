@@ -88,12 +88,13 @@ TEST(NumericalIntegrationTest, ExponentialTsit5) {
 //
 //   x(t) = 12eᵗ/(eᵗ + 1)²
 TEST(NumericalIntegrationTest, Tsit5TimeVarying) {
-  wpi::math::Vectord<1> y0{12.0 * std::exp(5.0) / std::pow(std::exp(5.0) + 1.0, 2.0)};
+  wpi::math::Vectord<1> y0{12.0 * std::exp(5.0) /
+                           std::pow(std::exp(5.0) + 1.0, 2.0)};
 
   wpi::math::Vectord<1> y1 = wpi::math::Tsit5(
       [](wpi::units::second_t t, const wpi::math::Vectord<1>& x) {
         return wpi::math::Vectord<1>{x(0) *
-                               (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
+                                     (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
       },
       5_s, y0, 1_s, 1e-12);
   EXPECT_NEAR(y1(0), 12.0 * std::exp(6.0) / std::pow(std::exp(6.0) + 1.0, 2.0),
