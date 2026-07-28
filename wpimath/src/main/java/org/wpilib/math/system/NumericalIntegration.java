@@ -163,7 +163,7 @@ public final class NumericalIntegration {
    * @param f The function to integrate. It must take two arguments x and u.
    * @param x The initial value of x.
    * @param u The value u held constant over the integration period.
-   * @param dtSeconds The time over which to integrate.
+   * @param dt The time over which to integrate in seconds.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
   @SuppressWarnings("overloads")
@@ -171,8 +171,8 @@ public final class NumericalIntegration {
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
       Matrix<States, N1> x,
       Matrix<Inputs, N1> u,
-      double dtSeconds) {
-    return tsit5(f, x, u, dtSeconds, 1e-6);
+      double dt) {
+    return tsit5(f, x, u, dt, 1e-6);
   }
 
   /**
@@ -183,7 +183,7 @@ public final class NumericalIntegration {
    * @param f The function to integrate. It must take two arguments x and u.
    * @param x The initial value of x.
    * @param u The value u held constant over the integration period.
-   * @param dtSeconds The time over which to integrate.
+   * @param dt The time over which to integrate in seconds.
    * @param maxError The maximum acceptable truncation error. Usually a small number like 1e-6.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
@@ -192,7 +192,7 @@ public final class NumericalIntegration {
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
       Matrix<States, N1> x,
       Matrix<Inputs, N1> u,
-      double dtSeconds,
+      double dt,
       double maxError) {
     // See http://users.uoa.gr/~tsitourasc/RK54_new_v2.pdf Table 1 for the
     // Butcher tableau the following arrays came from.
@@ -242,78 +242,72 @@ public final class NumericalIntegration {
       1.0 / 66.0
     };
 
-    Matrix<States, N1> newX;
-    double truncationError;
-
+    // Loop until dt has elapsed
     double dtElapsed = 0.0;
-    double h = dtSeconds;
+    double h = dt;
+    while (dtElapsed < dt) {
+      var k1 = f.apply(x, u);
+      var k2 = f.apply(x.plus(k1.times(A[0][0]).times(h)), u);
+      var k3 = f.apply(x.plus(k1.times(A[1][0]).plus(k2.times(A[1][1])).times(h)), u);
+      var k4 =
+          f.apply(
+              x.plus(k1.times(A[2][0]).plus(k2.times(A[2][1])).plus(k3.times(A[2][2])).times(h)),
+              u);
+      var k5 =
+          f.apply(
+              x.plus(
+                  k1.times(A[3][0])
+                      .plus(k2.times(A[3][1]))
+                      .plus(k3.times(A[3][2]))
+                      .plus(k4.times(A[3][3]))
+                      .times(h)),
+              u);
+      var k6 =
+          f.apply(
+              x.plus(
+                  k1.times(A[4][0])
+                      .plus(k2.times(A[4][1]))
+                      .plus(k3.times(A[4][2]))
+                      .plus(k4.times(A[4][3]))
+                      .plus(k5.times(A[4][4]))
+                      .times(h)),
+              u);
 
-    // Loop until we've gotten to our desired dt
-    while (dtElapsed < dtSeconds) {
-      do {
-        // Only allow us to advance up to the dt remaining
-        h = Math.min(h, dtSeconds - dtElapsed);
+      // Since the final row of A and the array b1 have the same coefficients
+      // and k7 has no effect on newX, we can reuse the calculation.
+      var newX =
+          x.plus(
+              k1.times(A[5][0])
+                  .plus(k2.times(A[5][1]))
+                  .plus(k3.times(A[5][2]))
+                  .plus(k4.times(A[5][3]))
+                  .plus(k5.times(A[5][4]))
+                  .plus(k6.times(A[5][5]))
+                  .times(h));
+      var k7 = f.apply(newX, u);
 
-        var k1 = f.apply(x, u);
-        var k2 = f.apply(x.plus(k1.times(A[0][0]).times(h)), u);
-        var k3 = f.apply(x.plus(k1.times(A[1][0]).plus(k2.times(A[1][1])).times(h)), u);
-        var k4 =
-            f.apply(
-                x.plus(k1.times(A[2][0]).plus(k2.times(A[2][1])).plus(k3.times(A[2][2])).times(h)),
-                u);
-        var k5 =
-            f.apply(
-                x.plus(
-                    k1.times(A[3][0])
-                        .plus(k2.times(A[3][1]))
-                        .plus(k3.times(A[3][2]))
-                        .plus(k4.times(A[3][3]))
-                        .times(h)),
-                u);
-        var k6 =
-            f.apply(
-                x.plus(
-                    k1.times(A[4][0])
-                        .plus(k2.times(A[4][1]))
-                        .plus(k3.times(A[4][2]))
-                        .plus(k4.times(A[4][3]))
-                        .plus(k5.times(A[4][4]))
-                        .times(h)),
-                u);
+      double truncationError =
+          (k1.times(b2[0])
+                  .plus(k2.times(b2[1]))
+                  .plus(k3.times(b2[2]))
+                  .plus(k4.times(b2[3]))
+                  .plus(k5.times(b2[4]))
+                  .plus(k6.times(b2[5]))
+                  .plus(k7.times(b2[6]))
+                  .times(h))
+              .normF();
 
-        // Since the final row of A and the array b1 have the same coefficients
-        // and k7 has no effect on newX, we can reuse the calculation.
-        newX =
-            x.plus(
-                k1.times(A[5][0])
-                    .plus(k2.times(A[5][1]))
-                    .plus(k3.times(A[5][2]))
-                    .plus(k4.times(A[5][3]))
-                    .plus(k5.times(A[5][4]))
-                    .plus(k6.times(A[5][5]))
-                    .times(h));
-        var k7 = f.apply(newX, u);
+      if (truncationError <= maxError) {
+        // Accept the step
+        x = newX;
+        dtElapsed += h;
+      }
 
-        truncationError =
-            (k1.times(b2[0])
-                    .plus(k2.times(b2[1]))
-                    .plus(k3.times(b2[2]))
-                    .plus(k4.times(b2[3]))
-                    .plus(k5.times(b2[4]))
-                    .plus(k6.times(b2[5]))
-                    .plus(k7.times(b2[6]))
-                    .times(h))
-                .normF();
-
-        if (truncationError == 0.0) {
-          h = dtSeconds - dtElapsed;
-        } else {
-          h *= 0.9 * Math.pow(maxError / truncationError, 1.0 / 5.0);
-        }
-      } while (truncationError > maxError);
-
-      dtElapsed += h;
-      x = newX;
+      if (truncationError == 0.0) {
+        h = dt - dtElapsed;
+      } else {
+        h = Math.min(0.9 * h * Math.pow(maxError / truncationError, 0.2), dt - dtElapsed);
+      }
     }
 
     return x;
@@ -328,7 +322,7 @@ public final class NumericalIntegration {
    * @param f The function to integrate. It must take two arguments t and y.
    * @param t The initial value of t.
    * @param y The initial value of y.
-   * @param dtSeconds The time over which to integrate.
+   * @param dt The time over which to integrate in seconds.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
   @SuppressWarnings("overloads")
@@ -336,8 +330,8 @@ public final class NumericalIntegration {
       BiFunction<Double, Matrix<Rows, Cols>, Matrix<Rows, Cols>> f,
       double t,
       Matrix<Rows, Cols> y,
-      double dtSeconds) {
-    return tsit5(f, t, y, dtSeconds, 1e-6);
+      double dt) {
+    return tsit5(f, t, y, dt, 1e-6);
   }
 
   /**
@@ -348,7 +342,7 @@ public final class NumericalIntegration {
    * @param f The function to integrate. It must take two arguments t and y.
    * @param t The initial value of t.
    * @param y The initial value of y.
-   * @param dtSeconds The time over which to integrate.
+   * @param dt The time over which to integrate in seconds.
    * @param maxError The maximum acceptable truncation error. Usually a small number like 1e-6.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
@@ -357,7 +351,7 @@ public final class NumericalIntegration {
       BiFunction<Double, Matrix<Rows, Cols>, Matrix<Rows, Cols>> f,
       double t,
       Matrix<Rows, Cols> y,
-      double dtSeconds,
+      double dt,
       double maxError) {
     // See http://users.uoa.gr/~tsitourasc/RK54_new_v2.pdf Table 1 for the
     // Butcher tableau the following arrays came from.
@@ -410,79 +404,72 @@ public final class NumericalIntegration {
     // final double[6]
     final double[] c = {0.161, 0.327, 0.9, 0.9800255409045097, 1.0, 1.0};
 
-    Matrix<Rows, Cols> newY;
-    double truncationError;
-
+    // Loop until dt has elapsed
     double dtElapsed = 0.0;
-    double h = dtSeconds;
+    double h = dt;
+    while (dtElapsed < dt) {
+      var k1 = f.apply(t, y);
+      var k2 = f.apply(t + h * c[0], y.plus(k1.times(A[0][0]).times(h)));
+      var k3 = f.apply(t + h * c[1], y.plus(k1.times(A[1][0]).plus(k2.times(A[1][1])).times(h)));
+      var k4 =
+          f.apply(
+              t + h * c[2],
+              y.plus(k1.times(A[2][0]).plus(k2.times(A[2][1])).plus(k3.times(A[2][2])).times(h)));
+      var k5 =
+          f.apply(
+              t + h * c[3],
+              y.plus(
+                  k1.times(A[3][0])
+                      .plus(k2.times(A[3][1]))
+                      .plus(k3.times(A[3][2]))
+                      .plus(k4.times(A[3][3]))
+                      .times(h)));
+      var k6 =
+          f.apply(
+              t + h * c[4],
+              y.plus(
+                  k1.times(A[4][0])
+                      .plus(k2.times(A[4][1]))
+                      .plus(k3.times(A[4][2]))
+                      .plus(k4.times(A[4][3]))
+                      .plus(k5.times(A[4][4]))
+                      .times(h)));
 
-    // Loop until we've gotten to our desired dt
-    while (dtElapsed < dtSeconds) {
-      do {
-        // Only allow us to advance up to the dt remaining
-        h = Math.min(h, dtSeconds - dtElapsed);
+      // Since the final row of A and the array b1 have the same coefficients
+      // and k7 has no effect on newY, we can reuse the calculation.
+      var newY =
+          y.plus(
+              k1.times(A[5][0])
+                  .plus(k2.times(A[5][1]))
+                  .plus(k3.times(A[5][2]))
+                  .plus(k4.times(A[5][3]))
+                  .plus(k5.times(A[5][4]))
+                  .plus(k6.times(A[5][5]))
+                  .times(h));
+      var k7 = f.apply(t + h * c[5], newY);
 
-        var k1 = f.apply(t, y);
-        var k2 = f.apply(t + h * c[0], y.plus(k1.times(A[0][0]).times(h)));
-        var k3 = f.apply(t + h * c[1], y.plus(k1.times(A[1][0]).plus(k2.times(A[1][1])).times(h)));
-        var k4 =
-            f.apply(
-                t + h * c[2],
-                y.plus(k1.times(A[2][0]).plus(k2.times(A[2][1])).plus(k3.times(A[2][2])).times(h)));
-        var k5 =
-            f.apply(
-                t + h * c[3],
-                y.plus(
-                    k1.times(A[3][0])
-                        .plus(k2.times(A[3][1]))
-                        .plus(k3.times(A[3][2]))
-                        .plus(k4.times(A[3][3]))
-                        .times(h)));
-        var k6 =
-            f.apply(
-                t + h * c[4],
-                y.plus(
-                    k1.times(A[4][0])
-                        .plus(k2.times(A[4][1]))
-                        .plus(k3.times(A[4][2]))
-                        .plus(k4.times(A[4][3]))
-                        .plus(k5.times(A[4][4]))
-                        .times(h)));
+      double truncationError =
+          (k1.times(b2[0])
+                  .plus(k2.times(b2[1]))
+                  .plus(k3.times(b2[2]))
+                  .plus(k4.times(b2[3]))
+                  .plus(k5.times(b2[4]))
+                  .plus(k6.times(b2[5]))
+                  .plus(k7.times(b2[6]))
+                  .times(h))
+              .normF();
 
-        // Since the final row of A and the array b1 have the same coefficients
-        // and k7 has no effect on newY, we can reuse the calculation.
-        newY =
-            y.plus(
-                k1.times(A[5][0])
-                    .plus(k2.times(A[5][1]))
-                    .plus(k3.times(A[5][2]))
-                    .plus(k4.times(A[5][3]))
-                    .plus(k5.times(A[5][4]))
-                    .plus(k6.times(A[5][5]))
-                    .times(h));
-        var k7 = f.apply(t + h * c[5], newY);
+      if (truncationError <= maxError) {
+        // Accept the step
+        y = newY;
+        dtElapsed += h;
+      }
 
-        truncationError =
-            (k1.times(b2[0])
-                    .plus(k2.times(b2[1]))
-                    .plus(k3.times(b2[2]))
-                    .plus(k4.times(b2[3]))
-                    .plus(k5.times(b2[4]))
-                    .plus(k6.times(b2[5]))
-                    .plus(k7.times(b2[6]))
-                    .times(h))
-                .normF();
-
-        if (truncationError == 0.0) {
-          h = dtSeconds - dtElapsed;
-        } else {
-          h *= 0.9 * Math.pow(maxError / truncationError, 1.0 / 5.0);
-        }
-
-      } while (truncationError > maxError);
-
-      dtElapsed += h;
-      y = newY;
+      if (truncationError == 0.0) {
+        h = dt - dtElapsed;
+      } else {
+        h = Math.min(0.9 * h * Math.pow(maxError / truncationError, 0.2), dt - dtElapsed);
+      }
     }
 
     return y;
