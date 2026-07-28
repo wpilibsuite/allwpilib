@@ -33,9 +33,22 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The
    *     second element is for velocity.
+   * @throws IllegalArgumentException if the plant's A(1, 1) or B(1, 0) entry is zero, which leaves
+   *     the gearing and moment of inertia undetermined. A(1, 1) is zero for a plant built from
+   *     SysId constants with kV = 0.
    */
   public DCMotorSim(LinearSystem<N2, N1, N2> plant, DCMotor gearbox, double... measurementStdDevs) {
     super(plant, measurementStdDevs);
+
+    if (plant.getA(1, 1) == 0.0) {
+      throw new IllegalArgumentException(
+          "plant must have nonzero velocity damping A(1, 1); a plant built with kV = 0 doesn't "
+              + "determine the gearing.");
+    }
+    if (plant.getB(1, 0) == 0.0) {
+      throw new IllegalArgumentException("plant must have nonzero input gain B(1, 0).");
+    }
+
     m_gearbox = gearbox;
 
     // By theorem 6.10.1 of https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
@@ -74,7 +87,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * @param angularPosition The new position in radians.
    */
   public void setAngle(double angularPosition) {
-    setState(angularPosition, getAngularVelocity());
+    setState(angularPosition, m_x.get(1, 0));
   }
 
   /**
@@ -83,13 +96,13 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * @param angularVelocity The new velocity in radians per second.
    */
   public void setAngularVelocity(double angularVelocity) {
-    setState(getAngularPosition(), angularVelocity);
+    setState(m_x.get(0, 0), angularVelocity);
   }
 
   /**
    * Returns the gear ratio of the DC motor.
    *
-   * @return the DC motor's gear ratio.
+   * @return The DC motor's gear ratio.
    */
   public double getGearing() {
     return m_gearing;
@@ -142,7 +155,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Returns the DC motor's torque in.
+   * Returns the DC motor's torque.
    *
    * @return The DC motor's torque in Newton-meters.
    */
@@ -153,14 +166,30 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Returns the DC motor's current draw.
    *
+   * <p>This is the current drawn from the battery, which differs from the current through the motor
+   * by the duty cycle the motor controller is applying. A negative value means the motor is
+   * regenerating and returning current to the battery.
+   *
    * @return The DC motor's current draw in amps.
    */
   public double getCurrentDraw() {
-    // I = V / R - omega / (Kv * R)
-    // Reductions are output over input, so a reduction of 2:1 means the motor is spinning
-    // 2x faster than the output
-    return m_gearbox.getCurrent(m_x.get(1, 0) * m_gearing, m_u.get(0, 0))
-        * Math.signum(m_u.get(0, 0));
+    // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is
+    // spinning 10x faster than the output.
+    //
+    // The current through the motor is I = V/R - ω/(KᵥR), where V is the voltage across
+    // the motor terminals.
+    //
+    // The motor controller produces V by PWMing the battery voltage at duty cycle
+    // D = V/V_batt. An ideal H-bridge conserves power, so V_batt·I_supply = V·I, giving
+    //
+    //   I_supply = D·I
+    //
+    // Scaling by D also makes the result continuous through V = 0, where the motor is
+    // braking and its circulating current isn't drawn from the battery.
+    double motorVelocity = m_x.get(1, 0) * m_gearing;
+    var appliedVoltage = m_u.get(0, 0);
+    var dutyCycle = appliedVoltage / RobotController.getBatteryVoltage();
+    return m_gearbox.getCurrent(motorVelocity, appliedVoltage) * dutyCycle;
   }
 
   /**

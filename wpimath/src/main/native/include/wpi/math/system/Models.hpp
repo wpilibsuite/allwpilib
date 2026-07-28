@@ -178,6 +178,9 @@ class WPILIB_DLLEXPORT Models {
    * The states are [angle, angular velocity], the inputs are [voltage], and the
    * outputs are [angle, angular velocity].
    *
+   * This model contains no gravity term, so it also describes a generic
+   * rotational position system such as a DC motor driving an inertial load.
+   *
    * @param motor The motor (or gearbox) attached to the arm.
    * @param J The moment of inertia J of the arm.
    * @param gearing Gear ratio from motor to arm (greater than 1 is a
@@ -210,6 +213,9 @@ class WPILIB_DLLEXPORT Models {
    *
    * The states are [position, velocity], the inputs are [voltage], and the
    * outputs are [position, velocity].
+   *
+   * This model contains no gravity term, so it also describes a generic
+   * rotational position system such as a DC motor driving an inertial load.
    *
    * @param kV The velocity gain, in volts/(unit/sec).
    * @param kA The acceleration gain, in volts/(unit/sec²).

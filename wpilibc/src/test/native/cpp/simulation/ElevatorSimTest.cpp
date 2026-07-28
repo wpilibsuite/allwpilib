@@ -12,6 +12,7 @@
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/Models.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
+#include "wpi/simulation/RoboRioSim.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/units/time.hpp"
 
@@ -19,8 +20,12 @@
   EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
 
 TEST(ElevatorSimTest, StateSpaceSim) {
-  wpi::sim::ElevatorSim sim(wpi::math::DCMotor::Vex775Pro(4), 14.67, 8_kg,
-                            0.75_in, 0_m, 3_m, true, 0_m, {0.01});
+  auto gearbox = wpi::math::DCMotor::Vex775Pro(4);
+  auto plant = wpi::math::Models::ElevatorFromPhysicalConstants(gearbox, 8_kg,
+                                                                0.75_in, 14.67);
+  wpi::sim::ElevatorSim sim(plant, gearbox, 14.67,
+                            wpi::units::volt_t{9.8 / plant.B(1, 0)}, 0_m, 3_m,
+                            0_m, {0.01, 0.0});
   wpi::math::PIDController controller(10, 0.0, 0.0);
 
   wpi::PWMVictorSPX motor(0);
@@ -46,16 +51,25 @@ TEST(ElevatorSimTest, StateSpaceSim) {
 
 TEST(ElevatorSimTest, InitialState) {
   constexpr auto startingHeight = 0.5_m;
-  wpi::sim::ElevatorSim sim(wpi::math::DCMotor::KrakenX60(2), 20, 8_kg, 0.1_m,
-                            0_m, 1_m, true, startingHeight, {0.01, 0.0});
+  auto gearbox = wpi::math::DCMotor::KrakenX60(2);
+  auto plant = wpi::math::Models::ElevatorFromPhysicalConstants(gearbox, 8_kg,
+                                                                0.1_m, 20);
+  wpi::sim::ElevatorSim sim(plant, gearbox, 20,
+                            wpi::units::volt_t{9.8 / plant.B(1, 0)}, 0_m, 1_m,
+                            startingHeight, {0.01, 0.0});
 
   EXPECT_DOUBLE_EQ(startingHeight.value(), sim.GetPosition().value());
   EXPECT_DOUBLE_EQ(0, sim.GetVelocity().value());
 }
 
 TEST(ElevatorSimTest, MinMax) {
-  wpi::sim::ElevatorSim sim(wpi::math::DCMotor::Vex775Pro(4), 14.67, 8_kg,
-                            0.75_in, 0_m, 1_m, true, 0_m);
+  auto gearbox = wpi::math::DCMotor::Vex775Pro(4);
+  auto plant = wpi::math::Models::ElevatorFromPhysicalConstants(gearbox, 8_kg,
+                                                                0.75_in, 14.67);
+  wpi::sim::ElevatorSim sim(plant, gearbox, 14.67,
+                            wpi::units::volt_t{9.8 / plant.B(1, 0)}, 0_m, 1_m,
+                            0_m);
+
   for (size_t i = 0; i < 100; ++i) {
     sim.SetInput(wpi::math::Vectord<1>{0.0});
     sim.Update(20_ms);
@@ -74,14 +88,10 @@ TEST(ElevatorSimTest, MinMax) {
 }
 
 TEST(ElevatorSimTest, Stability) {
-  wpi::sim::ElevatorSim sim{wpi::math::DCMotor::Vex775Pro(4),
-                            100,
-                            4_kg,
-                            0.5_in,
-                            0_m,
-                            10_m,
-                            false,
-                            0_m};
+  auto gearbox = wpi::math::DCMotor::Vex775Pro(4);
+  auto plant = wpi::math::Models::ElevatorFromPhysicalConstants(gearbox, 4_kg,
+                                                                0.5_in, 100);
+  wpi::sim::ElevatorSim sim{plant, gearbox, 100, 0_V, 0_m, 10_m, 0_m};
 
   sim.SetState(wpi::math::Vectord<2>{0.0, 0.0});
   sim.SetInput(wpi::math::Vectord<1>{12.0});
@@ -89,24 +99,38 @@ TEST(ElevatorSimTest, Stability) {
     sim.Update(20_ms);
   }
 
-  wpi::math::LinearSystem<2, 1, 1> system =
-      wpi::math::Models::ElevatorFromPhysicalConstants(
-          wpi::math::DCMotor::Vex775Pro(4), 4_kg, 0.5_in, 100)
-          .Slice(0);
-  EXPECT_NEAR_UNITS(wpi::units::meter_t{system.CalculateX(
-                        wpi::math::Vectord<2>{0.0, 0.0},
-                        wpi::math::Vectord<1>{12.0}, 20_ms * 50)(0)},
-                    sim.GetPosition(), 1_cm);
+  // This plant's velocity pole is near -22000, so its time constant is far
+  // shorter than the 20 ms timestep. The sim must stay stable and settle at the
+  // steady-state velocity -B₁,₀u/A₁,₁ rather than diverging.
+  wpi::units::meters_per_second_t steadyStateVelocity{-plant.B(1, 0) * 12.0 /
+                                                      plant.A(1, 1)};
+  EXPECT_NEAR_UNITS(steadyStateVelocity, sim.GetVelocity(), 1e-6_mps);
+  EXPECT_NEAR_UNITS(steadyStateVelocity * (20_ms * 50), sim.GetPosition(),
+                    1_cm);
 }
 
 TEST(ElevatorSimTest, CurrentDraw) {
+  wpi::sim::RoboRioSim::ResetData();
+
   constexpr auto motor = wpi::math::DCMotor::KrakenX60(2);
-  wpi::sim::ElevatorSim sim(motor, 20, 8_kg, 0.1_m, 0_m, 1_m, true, 0_m,
-                            {0.01, 0.0});
+  auto plant =
+      wpi::math::Models::ElevatorFromPhysicalConstants(motor, 8_kg, 0.1_m, 20);
+  wpi::sim::ElevatorSim sim(plant, motor, 20,
+                            wpi::units::volt_t{9.8 / plant.B(1, 0)}, 0_m, 1_m,
+                            0_m, {0.01, 0.0});
 
   EXPECT_DOUBLE_EQ(0.0, sim.GetCurrentDraw().value());
-  sim.SetInputVoltage(motor.Voltage(motor.Torque(60_A), 0_rad_per_s));
+
+  // Apply the voltage that pushes 60 A through the motor at zero velocity.
+  // GetCurrentDraw() reports battery-side current, so the expected draw is that
+  // scaled by the duty cycle.
+  auto appliedVoltage = motor.Voltage(motor.Torque(60_A), 0_rad_per_s);
+  double dutyCycle = appliedVoltage / wpi::RobotController::GetBatteryVoltage();
+  sim.SetInputVoltage(appliedVoltage);
+  EXPECT_NEAR(60.0 * dutyCycle, sim.GetCurrentDraw().value(), 1e-9);
+
+  // Current draw decreases as the back-EMF catches up.
   sim.Update(100_ms);
-  // Current draw should start at 60 A and decrease as the back-EMF catches up
-  EXPECT_TRUE(0_A < sim.GetCurrentDraw() && sim.GetCurrentDraw() < 60_A);
+  EXPECT_TRUE(0_A < sim.GetCurrentDraw() &&
+              sim.GetCurrentDraw() < wpi::units::ampere_t{60.0 * dutyCycle});
 }

@@ -25,18 +25,10 @@ class ElevatorSimTest {
     @SuppressWarnings("resource")
     var controller = new PIDController(10, 0, 0);
 
+    var gearbox = DCMotor.getVex775Pro(4);
+    var plant = Models.elevatorFromPhysicalConstants(gearbox, 8, 0.75 * 25.4 / 1000.0, 14.67);
     var sim =
-        new ElevatorSim(
-            DCMotor.getVex775Pro(4),
-            14.67,
-            8,
-            0.75 * 25.4 / 1000.0,
-            0.0,
-            3.0,
-            true,
-            0.0,
-            0.01,
-            0.0);
+        new ElevatorSim(plant, gearbox, 14.67, 9.8 / plant.getB(1, 0), 0.0, 3.0, 0.0, 0.01, 0.0);
 
     try (var motor = new PWMVictorSPX(0);
         var encoder = new Encoder(0, 1)) {
@@ -66,9 +58,11 @@ class ElevatorSimTest {
   @Test
   void testInitialState() {
     double startingHeightMeters = 0.5;
+    var gearbox = DCMotor.getKrakenX60(2);
+    var plant = Models.elevatorFromPhysicalConstants(gearbox, 8.0, 0.1, 20);
     var sim =
         new ElevatorSim(
-            DCMotor.getKrakenX60(2), 20, 8.0, 0.1, 0.0, 1.0, true, startingHeightMeters, 0.01, 0.0);
+            plant, gearbox, 20, 9.8 / plant.getB(1, 0), 0.0, 1.0, startingHeightMeters, 0.01, 0.0);
 
     assertEquals(startingHeightMeters, sim.getPosition());
     assertEquals(0, sim.getVelocity());
@@ -76,9 +70,9 @@ class ElevatorSimTest {
 
   @Test
   void testMinMax() {
-    var sim =
-        new ElevatorSim(
-            DCMotor.getVex775Pro(4), 14.67, 8.0, 0.75 * 25.4 / 1000.0, 0.0, 1.0, true, 0.0);
+    var gearbox = DCMotor.getVex775Pro(4);
+    var plant = Models.elevatorFromPhysicalConstants(gearbox, 8.0, 0.75 * 25.4 / 1000.0, 14.67);
+    var sim = new ElevatorSim(plant, gearbox, 14.67, 9.8 / plant.getB(1, 0), 0.0, 1.0, 0.0);
 
     for (int i = 0; i < 100; i++) {
       sim.setInput(VecBuilder.fill(0));
@@ -97,9 +91,9 @@ class ElevatorSimTest {
 
   @Test
   void testStability() {
-    var sim =
-        new ElevatorSim(
-            DCMotor.getVex775Pro(4), 100, 4, Units.inchesToMeters(0.5), 0, 10, false, 0.0);
+    var gearbox = DCMotor.getVex775Pro(4);
+    var plant = Models.elevatorFromPhysicalConstants(gearbox, 4, Units.inchesToMeters(0.5), 100);
+    var sim = new ElevatorSim(plant, gearbox, 100, 0.0, 0, 10, 0.0);
 
     sim.setState(VecBuilder.fill(0, 0));
     sim.setInput(12);
@@ -107,24 +101,33 @@ class ElevatorSimTest {
       sim.update(0.02);
     }
 
-    var system =
-        Models.elevatorFromPhysicalConstants(
-            DCMotor.getVex775Pro(4), 4, Units.inchesToMeters(0.5), 100);
-    assertEquals(
-        system.calculateX(VecBuilder.fill(0, 0), VecBuilder.fill(12), 0.02 * 50.0).get(0, 0),
-        sim.getPosition(),
-        0.01);
+    // This plant's velocity pole is near -22000, so its time constant is far shorter than the
+    // 20 ms timestep. The sim must stay stable and settle at the steady-state velocity
+    // -B₁,₀u/A₁,₁ rather than diverging.
+    double steadyStateVelocity = -plant.getB(1, 0) * 12.0 / plant.getA(1, 1);
+    assertEquals(steadyStateVelocity, sim.getVelocity(), 1e-6);
+    assertEquals(steadyStateVelocity * 0.02 * 50.0, sim.getPosition(), 0.01);
   }
 
   @Test
   void testCurrentDraw() {
+    RoboRioSim.resetData();
+
     var motor = DCMotor.getKrakenX60(2);
-    var sim = new ElevatorSim(motor, 20, 8.0, 0.1, 0.0, 1.0, true, 0.0, 0.01, 0.0);
+    var plant = Models.elevatorFromPhysicalConstants(motor, 8.0, 0.1, 20);
+    var sim = new ElevatorSim(plant, motor, 20, 9.8 / plant.getB(1, 0), 0.0, 1.0, 0.0, 0.01, 0.0);
 
     assertEquals(0.0, sim.getCurrentDraw());
-    sim.setInputVoltage(motor.getVoltage(motor.getTorque(60.0), 0.0));
+
+    // Apply the voltage that pushes 60 A through the motor at zero velocity. getCurrentDraw()
+    // reports battery-side current, so the expected draw is that scaled by the duty cycle.
+    double appliedVoltage = motor.getVoltage(motor.getTorque(60.0), 0.0);
+    double dutyCycle = appliedVoltage / RobotController.getBatteryVoltage();
+    sim.setInputVoltage(appliedVoltage);
+    assertEquals(60.0 * dutyCycle, sim.getCurrentDraw(), 1e-9);
+
+    // Current draw decreases as the back-EMF catches up.
     sim.update(0.100);
-    // Current draw should start at 60 A and decrease as the back-EMF catches up
-    assertTrue(0.0 < sim.getCurrentDraw() && sim.getCurrentDraw() < 60.0);
+    assertTrue(0.0 < sim.getCurrentDraw() && sim.getCurrentDraw() < 60.0 * dutyCycle);
   }
 }

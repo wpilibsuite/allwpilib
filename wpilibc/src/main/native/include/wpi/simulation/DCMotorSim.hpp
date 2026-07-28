@@ -28,6 +28,9 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
    *     wpi::math::Models::SingleJointedArmFromSysId().
    * @param gearbox The type of and number of motors in the DC motor gearbox.
    * @param measurementStdDevs The standard deviation of the measurement noise.
+   * @throws std::domain_error if the plant's A(1, 1) or B(1, 0) entry is zero,
+   *     which leaves the gearing and moment of inertia undetermined. A(1, 1) is
+   *     zero for a plant built from SysId constants with kV = 0.
    */
   DCMotorSim(const wpi::math::LinearSystem<2, 1, 2>& plant,
              const wpi::math::DCMotor& gearbox,
@@ -89,6 +92,11 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Returns the DC motor current draw.
    *
+   * This is the current drawn from the battery, which differs from the current
+   * through the motor by the duty cycle the motor controller is applying. A
+   * negative value means the motor is regenerating and returning current to the
+   * battery.
+   *
    * @return The DC motor current draw.
    */
   wpi::units::ampere_t GetCurrentDraw() const;
@@ -108,17 +116,23 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
   void SetInputVoltage(wpi::units::volt_t voltage);
 
   /**
-   * Returns the gearbox.
+   * Returns the gearbox for the DC motor.
+   *
+   * @return The DC motor's gearbox.
    */
   const wpi::math::DCMotor& GetGearbox() const;
 
   /**
-   * Returns the gearing;
+   * Returns the gear ratio of the DC motor.
+   *
+   * @return The DC motor's gear ratio.
    */
   double GetGearing() const;
 
   /**
-   * Returns the moment of inertia
+   * Returns the moment of inertia of the DC motor.
+   *
+   * @return The DC motor's moment of inertia.
    */
   wpi::units::kilogram_square_meter_t GetJ() const;
 

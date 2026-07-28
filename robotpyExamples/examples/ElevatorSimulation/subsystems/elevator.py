@@ -37,17 +37,23 @@ class Elevator:
         self.motor = wpilib.PWMSparkMax(constants.MOTOR_PORT)
 
         # Simulation classes help us simulate what's going on, including gravity.
-        self.elevator_sim = wpilib.simulation.ElevatorSim(
+        self.elevator_plant = wpimath.Models.elevator_from_physical_constants(
             self.elevator_gearbox,
-            constants.ELEVATOR_GEARING,
             constants.CARRIAGE_MASS,
             constants.ELEVATOR_DRUM_RADIUS,
+            constants.ELEVATOR_GEARING,
+        )
+        self.elevator_sim = wpilib.simulation.ElevatorSim(
+            self.elevator_plant,
+            self.elevator_gearbox,
+            constants.ELEVATOR_GEARING,
+            constants.ELEVATOR_KG,
             constants.MIN_ELEVATOR_HEIGHT,
             constants.MAX_ELEVATOR_HEIGHT,
-            True,
             0,
             [0.01, 0.0],
         )
+
         self.encoder_sim = wpilib.simulation.EncoderSim(self.encoder)
         self.motor_sim = wpilib.simulation.PWMMotorControllerSim(self.motor)
 

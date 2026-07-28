@@ -7,24 +7,28 @@ classes:
     methods:
       ElevatorSim:
         overloads:
-          ? const wpi::math::LinearSystem<2, 1, 2>&, const wpi::math::DCMotor&, wpi::units::meter_t, wpi::units::meter_t, bool, wpi::units::meter_t, const std::array<double, 2>&
+          ? const wpi::math::LinearSystem<2, 1, 2>&, const wpi::math::DCMotor&, double, wpi::units::volt_t, wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, const std::array<double, 2>&
           : param_override:
               measurementStdDevs:
                 default: std::array<double, 2>{0.0, 0.0}
-          ? const wpi::math::DCMotor&, double, wpi::units::kilogram_t, wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, bool, wpi::units::meter_t, const std::array<double, 2>&
-          : param_override:
-              measurementStdDevs:
-                default: std::array<double, 2>{0.0}
-          ? decltype(1_V/Velocity_t<Distance> (1)), decltype(1_V/Acceleration_t<Distance> (1)), const wpi::math::DCMotor&, wpi::units::meter_t, wpi::units::meter_t, bool, wpi::units::meter_t, const std::array<double, 2>&
-          : ignore: true
       SetState:
+      SetPosition:
+      SetVelocity:
       WouldHitLowerLimit:
       WouldHitUpperLimit:
       HasHitLowerLimit:
       HasHitUpperLimit:
+      GetGearbox:
+      GetGearing:
+      GetDrumRadius:
+      GetCarriageMass:
+      GetKg:
       GetPosition:
       GetVelocity:
+      GetAcceleration:
+      GetForce:
       GetCurrentDraw:
+      GetInputVoltage:
       SetInputVoltage:
       UpdateX:
 

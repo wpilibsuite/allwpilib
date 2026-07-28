@@ -6,11 +6,7 @@ classes:
     methods:
       FlywheelSim:
         overloads:
-          const wpi::math::LinearSystem<1, 1, 1>&, const wpi::math::DCMotor&, double, const std::array<double, 1>&:
-            param_override:
-              measurementStdDevs:
-                default: std::array<double, 1>{0.0}
-          const wpi::math::DCMotor&, double, wpi::units::kilogram_square_meter_t, const std::array<double, 1>&:
+          const wpi::math::LinearSystem<1, 1, 1>&, const wpi::math::DCMotor&, const std::array<double, 1>&:
             param_override:
               measurementStdDevs:
                 default: std::array<double, 1>{0.0}

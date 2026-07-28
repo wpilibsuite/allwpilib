@@ -4,8 +4,9 @@
 
 #include "wpi/simulation/DCMotorSim.hpp"
 
+#include <stdexcept>
+
 #include "wpi/system/RobotController.hpp"
-#include "wpi/util/MathExtras.hpp"
 
 using namespace wpi;
 using namespace wpi::sim;
@@ -17,7 +18,7 @@ DCMotorSim::DCMotorSim(const wpi::math::LinearSystem<2, 1, 2>& plant,
       m_gearbox(gearbox),
       // By theorem 6.10.1 of
       // https://file.tavsys.net/control/controls-engineering-in-frc.pdf, the
-      // flywheel state-space model is:
+      // DC motor state-space model is:
       //
       //   dx/dt = -G²Kₜ/(KᵥRJ)x + (GKₜ)/(RJ)u
       //   A = -G²Kₜ/(KᵥRJ)
@@ -34,7 +35,16 @@ DCMotorSim::DCMotorSim(const wpi::math::LinearSystem<2, 1, 2>& plant,
       //   J = GKₜ/(RB)
       m_gearing(-gearbox.Kv.value() * m_plant.A(1, 1) / m_plant.B(1, 0)),
       m_j(m_gearing * gearbox.Kt.value() /
-          (gearbox.R.value() * m_plant.B(1, 0))) {}
+          (gearbox.R.value() * m_plant.B(1, 0))) {
+  if (plant.A(1, 1) == 0.0) {
+    throw std::domain_error(
+        "plant must have nonzero velocity damping A(1, 1); a plant built with "
+        "kV = 0 doesn't determine the gearing.");
+  }
+  if (plant.B(1, 0) == 0.0) {
+    throw std::domain_error("plant must have nonzero input gain B(1, 0).");
+  }
+}
 
 void DCMotorSim::SetState(wpi::units::radian_t angularPosition,
                           wpi::units::radians_per_second_t angularVelocity) {
@@ -42,12 +52,12 @@ void DCMotorSim::SetState(wpi::units::radian_t angularPosition,
 }
 
 void DCMotorSim::SetAngle(wpi::units::radian_t angularPosition) {
-  SetState(angularPosition, GetAngularVelocity());
+  SetState(angularPosition, wpi::units::radians_per_second_t{m_x(1)});
 }
 
 void DCMotorSim::SetAngularVelocity(
     wpi::units::radians_per_second_t angularVelocity) {
-  SetState(GetAngularPosition(), angularVelocity);
+  SetState(wpi::units::radian_t{m_x(0)}, angularVelocity);
 }
 
 wpi::units::radian_t DCMotorSim::GetAngularPosition() const {
@@ -70,12 +80,25 @@ wpi::units::newton_meter_t DCMotorSim::GetTorque() const {
 }
 
 wpi::units::ampere_t DCMotorSim::GetCurrentDraw() const {
-  // I = V / R - omega / (Kv * R)
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output.
+  //
+  // The current through the motor is I = V/R - ω/(KᵥR), where V is the voltage
+  // across the motor terminals.
+  //
+  // The motor controller produces V by PWMing the battery voltage at duty cycle
+  // D = V/V_batt. An ideal H-bridge conserves power, so V_batt·I_supply = V·I,
+  // giving
+  //
+  //   I_supply = D·I
+  //
+  // Scaling by D also makes the result continuous through V = 0, where the
+  // motor is braking and its circulating current isn't drawn from the battery.
+  wpi::units::volt_t appliedVoltage{m_u(0)};
+  double dutyCycle = appliedVoltage / wpi::RobotController::GetBatteryVoltage();
   return m_gearbox.Current(wpi::units::radians_per_second_t{m_x(1)} * m_gearing,
-                           wpi::units::volt_t{m_u(0)}) *
-         wpi::util::sgn(m_u(0));
+                           appliedVoltage) *
+         dutyCycle;
 }
 
 wpi::units::volt_t DCMotorSim::GetInputVoltage() const {
