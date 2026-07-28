@@ -537,39 +537,39 @@ default_arg_cast = false
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_force_type_caster.h"
 types = [
-    "wpi::units::dyne_t",
-    "wpi::units::kilonewton_t",
-    "wpi::units::kilopond_t",
-    "wpi::units::micronewton_t",
-    "wpi::units::millinewton_t",
-    "wpi::units::nanonewton_t",
+    "wpi::units::force::dyne_t",
+    "wpi::units::force::kilonewton_t",
+    "wpi::units::force::kilopond_t",
+    "wpi::units::force::micronewton_t",
+    "wpi::units::force::millinewton_t",
+    "wpi::units::force::nanonewton_t",
+    "wpi::units::force::pound_t",
+    "wpi::units::force::poundal_t",
     "wpi::units::newton_t",
-    "wpi::units::pound_t",
-    "wpi::units::poundal_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_force_type_caster.h"
 types = [
-    "wpi::units::dyne",
-    "wpi::units::dynes",
-    "wpi::units::kilonewton",
-    "wpi::units::kilonewtons",
-    "wpi::units::kilopond",
-    "wpi::units::kiloponds",
-    "wpi::units::micronewton",
-    "wpi::units::micronewtons",
-    "wpi::units::millinewton",
-    "wpi::units::millinewtons",
-    "wpi::units::nanonewton",
-    "wpi::units::nanonewtons",
+    "wpi::units::force::dyne",
+    "wpi::units::force::dynes",
+    "wpi::units::force::kilonewton",
+    "wpi::units::force::kilonewtons",
+    "wpi::units::force::kilopond",
+    "wpi::units::force::kiloponds",
+    "wpi::units::force::micronewton",
+    "wpi::units::force::micronewtons",
+    "wpi::units::force::millinewton",
+    "wpi::units::force::millinewtons",
+    "wpi::units::force::nanonewton",
+    "wpi::units::force::nanonewtons",
+    "wpi::units::force::pound",
+    "wpi::units::force::poundal",
+    "wpi::units::force::poundals",
+    "wpi::units::force::pounds",
     "wpi::units::newton",
     "wpi::units::newtons",
-    "wpi::units::pound",
-    "wpi::units::poundal",
-    "wpi::units::poundals",
-    "wpi::units::pounds",
 ]
 default_arg_cast = false
 
