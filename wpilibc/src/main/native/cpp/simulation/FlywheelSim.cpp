@@ -90,7 +90,7 @@ wpi::units::ampere_t FlywheelSim::GetCurrentDraw() const {
     return 0_A;
   }
 
-  double ratio = appliedVoltage / batteryVoltage;
+  double ratio = appliedVoltage.value() / batteryVoltage.value();
   double dutyCycle = std::clamp(ratio, -1.0, 1.0);
   return m_gearbox.Current(wpi::units::radians_per_second_t{m_x(0)} * m_gearing,
                            appliedVoltage) *

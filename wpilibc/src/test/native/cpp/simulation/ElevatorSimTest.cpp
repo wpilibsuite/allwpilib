@@ -125,7 +125,8 @@ TEST(ElevatorSimTest, CurrentDraw) {
   // GetCurrentDraw() reports battery-side current, so the expected draw is that
   // scaled by the duty cycle.
   auto appliedVoltage = motor.Voltage(motor.Torque(60_A), 0_rad_per_s);
-  double dutyCycle = appliedVoltage / wpi::RobotController::GetBatteryVoltage();
+  double dutyCycle = appliedVoltage.value() /
+                     wpi::RobotController::GetBatteryVoltage().value();
   sim.SetInputVoltage(appliedVoltage);
   EXPECT_NEAR(60.0 * dutyCycle, sim.GetCurrentDraw().value(), 1e-9);
 

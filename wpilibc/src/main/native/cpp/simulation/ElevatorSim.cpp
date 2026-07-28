@@ -160,7 +160,7 @@ wpi::units::ampere_t ElevatorSim::GetCurrentDraw() const {
     return 0_A;
   }
 
-  double ratio = appliedVoltage / batteryVoltage;
+  double ratio = appliedVoltage.value() / batteryVoltage.value();
   double dutyCycle = std::clamp(ratio, -1.0, 1.0);
   return m_gearbox.Current(motorVelocity, appliedVoltage) * dutyCycle;
 }
