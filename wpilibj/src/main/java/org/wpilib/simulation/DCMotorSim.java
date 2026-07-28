@@ -187,8 +187,15 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
     // Scaling by D also makes the result continuous through V = 0, where the motor is
     // braking and its circulating current isn't drawn from the battery.
     double motorVelocity = m_x.get(1, 0) * m_gearing;
-    var appliedVoltage = m_u.get(0, 0);
-    var dutyCycle = appliedVoltage / RobotController.getBatteryVoltage();
+    double appliedVoltage = m_u.get(0, 0);
+    double batteryVoltage = RobotController.getBatteryVoltage();
+
+    // With no battery voltage the controller can't apply any duty cycle, so nothing is drawn.
+    if (batteryVoltage == 0.0) {
+      return 0.0;
+    }
+
+    double dutyCycle = Math.clamp(appliedVoltage / batteryVoltage, -1.0, 1.0);
     return m_gearbox.getCurrent(motorVelocity, appliedVoltage) * dutyCycle;
   }
 

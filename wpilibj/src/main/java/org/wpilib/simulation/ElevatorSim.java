@@ -263,11 +263,24 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * @return The acceleration of the elevator in m/s².
    */
   public double getAcceleration() {
-    return m_plant
-        .getA()
-        .times(m_x)
-        .plus(m_plant.getB().times(m_u.minus(VecBuilder.fill(m_kG))))
-        .get(1, 0);
+    double acceleration =
+        m_plant
+            .getA()
+            .times(m_x)
+            .plus(m_plant.getB().times(m_u.minus(VecBuilder.fill(m_kG))))
+            .get(1, 0);
+
+    // updateX() pins the state at a hard stop with zero velocity, so acceleration that points
+    // farther into a stop the carriage is already resting against is motion the sim prevents.
+    // The stop absorbs it.
+    if (wouldHitLowerLimit(m_x.get(0, 0)) && acceleration < 0.0) {
+      return 0.0;
+    }
+    if (wouldHitUpperLimit(m_x.get(0, 0)) && acceleration > 0.0) {
+      return 0.0;
+    }
+
+    return acceleration;
   }
 
   /**
@@ -303,8 +316,15 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
     // Scaling by D also makes the result continuous through V = 0, where the motor is
     // braking and its circulating current isn't drawn from the battery.
     double motorVelocity = m_x.get(1, 0) * m_gearing / m_drumRadius;
-    var appliedVoltage = m_u.get(0, 0);
-    var dutyCycle = appliedVoltage / RobotController.getBatteryVoltage();
+    double appliedVoltage = m_u.get(0, 0);
+    double batteryVoltage = RobotController.getBatteryVoltage();
+
+    // With no battery voltage the controller can't apply any duty cycle, so nothing is drawn.
+    if (batteryVoltage == 0.0) {
+      return 0.0;
+    }
+
+    double dutyCycle = Math.clamp(appliedVoltage / batteryVoltage, -1.0, 1.0);
     return m_gearbox.getCurrent(motorVelocity, appliedVoltage) * dutyCycle;
   }
 

@@ -111,9 +111,22 @@ wpi::units::meters_per_second_t ElevatorSim::GetVelocity() const {
 }
 
 wpi::units::meters_per_second_squared_t ElevatorSim::GetAcceleration() const {
-  return wpi::units::meters_per_second_squared_t{
+  wpi::units::meters_per_second_squared_t acceleration{
       (m_plant.A() * m_x +
        m_plant.B() * (m_u - wpi::math::Vectord<1>{m_kG.value()}))(1, 0)};
+
+  // UpdateX() pins the state at a hard stop with zero velocity, so acceleration
+  // pointing farther into a stop the carriage is already resting against is
+  // motion the sim prevents. The stop absorbs it.
+  wpi::units::meter_t position{m_x(0)};
+  if (WouldHitLowerLimit(position) && acceleration < 0_mps_sq) {
+    return 0_mps_sq;
+  }
+  if (WouldHitUpperLimit(position) && acceleration > 0_mps_sq) {
+    return 0_mps_sq;
+  }
+
+  return acceleration;
 }
 
 wpi::units::newton_t ElevatorSim::GetForce() const {
@@ -139,7 +152,16 @@ wpi::units::ampere_t ElevatorSim::GetCurrentDraw() const {
   wpi::units::radians_per_second_t motorVelocity{m_x(1) * m_gearing /
                                                  m_drumRadius.value()};
   wpi::units::volt_t appliedVoltage{m_u(0)};
-  double dutyCycle = appliedVoltage / wpi::RobotController::GetBatteryVoltage();
+  wpi::units::volt_t batteryVoltage = wpi::RobotController::GetBatteryVoltage();
+
+  // With no battery voltage the controller can't apply any duty cycle, so
+  // nothing is drawn.
+  if (batteryVoltage == 0_V) {
+    return 0_A;
+  }
+
+  double ratio = appliedVoltage / batteryVoltage;
+  double dutyCycle = std::clamp(ratio, -1.0, 1.0);
   return m_gearbox.Current(motorVelocity, appliedVoltage) * dutyCycle;
 }
 

@@ -4,6 +4,7 @@
 
 #include "wpi/simulation/FlywheelSim.hpp"
 
+#include <algorithm>
 #include <stdexcept>
 
 #include "wpi/system/RobotController.hpp"
@@ -81,7 +82,16 @@ wpi::units::ampere_t FlywheelSim::GetCurrentDraw() const {
   // Scaling by D also makes the result continuous through V = 0, where the
   // motor is braking and its circulating current isn't drawn from the battery.
   wpi::units::volt_t appliedVoltage{m_u(0)};
-  double dutyCycle = appliedVoltage / wpi::RobotController::GetBatteryVoltage();
+  wpi::units::volt_t batteryVoltage = wpi::RobotController::GetBatteryVoltage();
+
+  // With no battery voltage the controller can't apply any duty cycle, so
+  // nothing is drawn.
+  if (batteryVoltage == 0_V) {
+    return 0_A;
+  }
+
+  double ratio = appliedVoltage / batteryVoltage;
+  double dutyCycle = std::clamp(ratio, -1.0, 1.0);
   return m_gearbox.Current(wpi::units::radians_per_second_t{m_x(0)} * m_gearing,
                            appliedVoltage) *
          dutyCycle;
