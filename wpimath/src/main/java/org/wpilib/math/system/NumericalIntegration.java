@@ -276,7 +276,7 @@ public final class NumericalIntegration {
                   .times(h))
               .normF();
 
-      if (truncationError <= maxError || h <= Math.ulp(1.0)) {
+      if (truncationError <= maxError) {
         // Accept the step
         x = newX;
         dtElapsed += h;
