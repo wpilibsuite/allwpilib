@@ -494,16 +494,6 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
-            class_name = "Ellipse2d",
-            yml_file = "semiwrap/Ellipse2d.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/shape/Ellipse2d.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::Ellipse2d", "wpi__math__Ellipse2d.hpp"),
-            ],
-        ),
-        struct(
             class_name = "Pose2d",
             yml_file = "semiwrap/Pose2d.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
@@ -531,16 +521,6 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::math::Quaternion", "wpi__math__Quaternion.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "Rectangle2d",
-            yml_file = "semiwrap/Rectangle2d.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/shape/Rectangle2d.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::Rectangle2d", "wpi__math__Rectangle2d.hpp"),
             ],
         ),
         struct(
@@ -621,6 +601,26 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::math::Twist3d", "wpi__math__Twist3d.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "Ellipse2d",
+            yml_file = "semiwrap/Ellipse2d.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/shape/Ellipse2d.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::Ellipse2d", "wpi__math__Ellipse2d.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "Rectangle2d",
+            yml_file = "semiwrap/Rectangle2d.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/shape/Rectangle2d.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::Rectangle2d", "wpi__math__Rectangle2d.hpp"),
             ],
         ),
         struct(
