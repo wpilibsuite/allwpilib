@@ -44,10 +44,10 @@ class TwoDeadWheelOdometry {
    * be offset to match the robot's orientation on the field.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit TwoDeadWheelOdometry(const wpi::units::meter_t xWheelYPos,
-                                const wpi::units::meter_t yWheelXPos,
-                                const wpi::units::meter_t xWheelPos,
-                                const wpi::units::meter_t yWheelPos,
+  explicit TwoDeadWheelOdometry(wpi::units::meter_t xWheelYPos,
+                                wpi::units::meter_t yWheelXPos,
+                                wpi::units::meter_t xWheelPos,
+                                wpi::units::meter_t yWheelPos,
                                 const Rotation2d& gyroAngle,
                                 const Pose2d& initialPose = Pose2d{})
       : m_xWheelYPos(xWheelYPos),
@@ -67,8 +67,8 @@ class TwoDeadWheelOdometry {
    * be offset to match the robot's orientation on the field.
    * @param pose The new position of the robot on the field.
    */
-  void ResetPosition(const wpi::units::meter_t xWheelPos,
-                     const wpi::units::meter_t yWheelPos,
+  void ResetPosition(wpi::units::meter_t xWheelPos,
+                     wpi::units::meter_t yWheelPos,
                      const Rotation2d& gyroAngle, const Pose2d& pose) {
     m_previousGyroAngle = gyroAngle;
     m_previousXWheelPos = xWheelPos;
@@ -117,8 +117,8 @@ class TwoDeadWheelOdometry {
    * be offset to match the robot's orientation on the field.
    * @return The updated pose.
    */
-  const Pose2d& Update(const wpi::units::meter_t xWheelPos,
-                       const wpi::units::meter_t yWheelPos,
+  const Pose2d& Update(wpi::units::meter_t xWheelPos,
+                       wpi::units::meter_t yWheelPos,
                        const Rotation2d& gyroAngle) {
     const auto deltaTheta = (gyroAngle - m_previousGyroAngle).Radians();
     const auto deltaX = xWheelPos - m_previousXWheelPos +
@@ -136,10 +136,18 @@ class TwoDeadWheelOdometry {
     return m_pose;
   }
 
+  /**
+   * Converts measured wheel velocities to chassis velocities using inverse kinematics.
+   *
+   * @param vx The velocity of the forward-facing wheel.
+   * @param vy The velocity of the sideways-facing wheel.
+   * @param omega The angular velocity of the robot as reported by the gyro.
+   * @return The velocity of the chassis.
+   */
   ChassisVelocities ToChassisVelocities(
-      const wpi::units::meters_per_second_t vx,
-      const wpi::units::meters_per_second_t vy,
-      const wpi::units::radians_per_second_t omega) const {
+    wpi::units::meters_per_second_t vx,
+    wpi::units::meters_per_second_t vy,
+    wpi::units::radians_per_second_t omega) const {
     return {vx + m_xWheelYPos * omega / 1_rad,
             vy - m_yWheelXPos * omega / 1_rad, omega};
   }

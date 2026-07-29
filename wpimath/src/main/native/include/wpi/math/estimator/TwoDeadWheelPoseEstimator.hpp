@@ -68,10 +68,10 @@ class TwoDeadWheelPoseEstimator {
    * be offset to match the robot's orientation on the field.
    * @param initialPose The starting position of the robot on the field.
    */
-  TwoDeadWheelPoseEstimator(const wpi::units::meter_t xWheelYPos,
-                            const wpi::units::meter_t yWheelXPos,
-                            const wpi::units::meter_t xWheelPos,
-                            const wpi::units::meter_t yWheelPos,
+  TwoDeadWheelPoseEstimator(wpi::units::meter_t xWheelYPos,
+                            wpi::units::meter_t yWheelXPos,
+                            wpi::units::meter_t xWheelPos,
+                            wpi::units::meter_t yWheelPos,
                             const Rotation2d& gyroAngle,
                             const Pose2d& initialPose)
       : TwoDeadWheelPoseEstimator(xWheelYPos, yWheelXPos, xWheelPos, yWheelPos,
@@ -100,9 +100,9 @@ class TwoDeadWheelPoseEstimator {
    *     less.
    */
   TwoDeadWheelPoseEstimator(
-      const wpi::units::meter_t xWheelYPos,
-      const wpi::units::meter_t yWheelXPos, const wpi::units::meter_t xWheelPos,
-      const wpi::units::meter_t yWheelPos, const Rotation2d& gyroAngle,
+      wpi::units::meter_t xWheelYPos,
+      wpi::units::meter_t yWheelXPos, wpi::units::meter_t xWheelPos,
+      wpi::units::meter_t yWheelPos, const Rotation2d& gyroAngle,
       const Pose2d& initialPose,
       const wpi::util::array<double, 3>& stateStdDevs,
       const wpi::util::array<double, 3>& visionMeasurementStdDevs)
@@ -156,8 +156,8 @@ class TwoDeadWheelPoseEstimator {
    * be offset to match the robot's orientation on the field.
    * @param pose The new position of the robot on the field.
    */
-  void ResetPosition(const wpi::units::meter_t xWheelPos,
-                     const wpi::units::meter_t yWheelPos,
+  void ResetPosition(wpi::units::meter_t xWheelPos,
+                     wpi::units::meter_t yWheelPos,
                      const Rotation2d& gyroAngle, const Pose2d& pose) {
     // Reset state estimate and error covariance
     m_odometry.ResetPosition(xWheelPos, yWheelPos, gyroAngle, pose);
@@ -429,8 +429,8 @@ class TwoDeadWheelPoseEstimator {
    * be offset to match the robot's orientation on the field.
    * @return The updated pose.
    */
-  Pose2d Update(const wpi::units::meter_t xWheelPos,
-                const wpi::units::meter_t yWheelPos,
+  Pose2d Update(wpi::units::meter_t xWheelPos,
+                wpi::units::meter_t yWheelPos,
                 const Rotation2d& gyroAngle) {
     return UpdateWithTime(wpi::math::MathSharedStore::GetTimestamp(), xWheelPos,
                           yWheelPos, gyroAngle);
@@ -448,9 +448,9 @@ class TwoDeadWheelPoseEstimator {
    * be offset to match the robot's orientation on the field.
    * @return The updated pose.
    */
-  Pose2d UpdateWithTime(const wpi::units::second_t currentTime,
-                        const wpi::units::meter_t xWheelPos,
-                        const wpi::units::meter_t yWheelPos,
+  Pose2d UpdateWithTime(wpi::units::second_t currentTime,
+                        wpi::units::meter_t xWheelPos,
+                        wpi::units::meter_t yWheelPos,
                         const Rotation2d& gyroAngle) {
     auto odometryEstimate = m_odometry.Update(xWheelPos, yWheelPos, gyroAngle);
 
