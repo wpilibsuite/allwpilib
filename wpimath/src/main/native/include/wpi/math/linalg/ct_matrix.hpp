@@ -6,7 +6,6 @@
 
 #include <concepts>
 #include <initializer_list>
-#include <type_traits>
 
 #include <Eigen/Core>
 #include <gcem.hpp>

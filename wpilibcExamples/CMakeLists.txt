@@ -11,6 +11,8 @@ add_custom_target(wpilibcExamples)
 add_custom_target(wpilibcExamples_test)
 add_custom_target(wpilibcExamples_snippets)
 
+set(camera_server_snippets AprilTagsVision HttpCamera IntermediateVision QuickVision)
+
 foreach(example ${EXAMPLES})
     file(
         GLOB_RECURSE sources
@@ -70,6 +72,14 @@ foreach(template ${TEMPLATES})
 endforeach()
 
 foreach(snippet ${SNIPPETS})
+    set(snippet_extra_libs)
+    if(snippet IN_LIST camera_server_snippets)
+        if(NOT TARGET cameraserver)
+            continue()
+        endif()
+        list(APPEND snippet_extra_libs cameraserver)
+    endif()
+
     file(
         GLOB_RECURSE sources
         src/main/cpp/snippets/${snippet}/cpp/*.cpp
@@ -85,6 +95,7 @@ foreach(snippet ${SNIPPETS})
         commandsv2
         romiVendordep
         xrpVendordep
+        ${snippet_extra_libs}
     )
     add_dependencies(wpilibcExamples_snippets snippet${snippet})
 

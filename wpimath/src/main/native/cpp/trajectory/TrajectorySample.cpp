@@ -6,6 +6,7 @@
 
 #include <vector>
 
+#include "wpi/units/time.hpp"
 #include "wpi/util/json.hpp"
 
 void wpi::math::to_json(wpi::util::json& json, const TrajectorySample& sample) {

@@ -12,8 +12,11 @@
 #include <gtest/gtest.h>
 
 #include "wpi/hal/DriverStationTypes.h"
+#include "wpi/nt/IntegerTopic.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi;
 
@@ -156,6 +159,16 @@ TEST_F(TimedRobotTest, DisabledMode) {
 
   robot.EndCompetition();
   robotThread.join();
+}
+
+TEST_F(TimedRobotTest, ConstructorPublishesProgramStartTime) {
+  auto sub = wpi::nt::NetworkTableInstance::GetDefault()
+                 .GetIntegerTopic("/Robot/ProgramStartTime")
+                 .Subscribe(-1);
+  MockRobot robot;
+
+  EXPECT_EQ(static_cast<int64_t>(wpi::util::GetProgramStartTime()),
+            sub.Get(-1));
 }
 
 TEST_F(TimedRobotTest, AutonomousMode) {

@@ -8,10 +8,10 @@ Subject: [PATCH 30/33] SmallVector: add erase_if()
  1 file changed, 8 insertions(+)
 
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 7f759efc1588bfb6eaef65b822bbdbf4f201ef8b..e51771928717625a218981ccd5b9068b63329b02 100644
+index f5483efde17da0a6b352a966a61fb800fa7109bb..d99edbbf0260bd41fd64a60fbef6a1c3d39e721d 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -1344,6 +1344,14 @@ template <typename T, unsigned N> struct DenseMapInfo<llvm::SmallVector<T, N>> {
+@@ -1351,6 +1351,14 @@ template <typename T, unsigned N> struct DenseMapInfo<llvm::SmallVector<T, N>> {
    }
  };
  

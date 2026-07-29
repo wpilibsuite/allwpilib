@@ -9,14 +9,9 @@
 #include <vector>
 
 #include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"
-#include "wpi/math/kinematics/ChassisAccelerations.hpp"
-#include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
-#include "wpi/units/math.hpp"
-#include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {

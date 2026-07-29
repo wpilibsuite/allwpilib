@@ -28,11 +28,21 @@
 
 #include "wpi/math/trajectory/DrivetrainSplineTrajectoryParameterizer.hpp"
 
+#include <cstddef>
 #include <format>
+#include <memory>
+#include <stdexcept>
 #include <vector>
 
+#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
 #include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
+#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/base.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 
 using namespace wpi::math;
 

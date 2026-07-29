@@ -107,48 +107,43 @@ T RKDP(F&& f, T x, U u, wpi::units::second_t dt, double maxError = 1e-6) {
                                         -92097.0 / 339200.0, 187.0 / 2100.0,
                                         1.0 / 40.0};
 
-  T newX;
-  double truncationError;
-
+  // Loop until dt has elapsed
   double dtElapsed = 0.0;
   double h = dt.value();
-
-  // Loop until we've gotten to our desired dt
   while (dtElapsed < dt.value()) {
-    do {
-      // Only allow us to advance up to the dt remaining
-      h = (std::min)(h, dt.value() - dtElapsed);
+    // clang-format off
+    T k1 = f(x, u);
+    T k2 = f(x + h * (A[0][0] * k1), u);
+    T k3 = f(x + h * (A[1][0] * k1 + A[1][1] * k2), u);
+    T k4 = f(x + h * (A[2][0] * k1 + A[2][1] * k2 + A[2][2] * k3), u);
+    T k5 = f(x + h * (A[3][0] * k1 + A[3][1] * k2 + A[3][2] * k3 + A[3][3] * k4), u);
+    T k6 = f(x + h * (A[4][0] * k1 + A[4][1] * k2 + A[4][2] * k3 + A[4][3] * k4 + A[4][4] * k5), u);
+    // clang-format on
 
-      // clang-format off
-      T k1 = f(x, u);
-      T k2 = f(x + h * (A[0][0] * k1), u);
-      T k3 = f(x + h * (A[1][0] * k1 + A[1][1] * k2), u);
-      T k4 = f(x + h * (A[2][0] * k1 + A[2][1] * k2 + A[2][2] * k3), u);
-      T k5 = f(x + h * (A[3][0] * k1 + A[3][1] * k2 + A[3][2] * k3 + A[3][3] * k4), u);
-      T k6 = f(x + h * (A[4][0] * k1 + A[4][1] * k2 + A[4][2] * k3 + A[4][3] * k4 + A[4][4] * k5), u);
-      // clang-format on
-
-      // Since the final row of A and the array b1 have the same coefficients
-      // and k7 has no effect on newX, we can reuse the calculation.
-      newX = x + h * (A[5][0] * k1 + A[5][1] * k2 + A[5][2] * k3 +
+    // Since the final row of A and the array b1 have the same coefficients and
+    // k7 has no effect on newX, we can reuse the calculation.
+    T newX = x + h * (A[5][0] * k1 + A[5][1] * k2 + A[5][2] * k3 +
                       A[5][3] * k4 + A[5][4] * k5 + A[5][5] * k6);
-      T k7 = f(newX, u);
+    T k7 = f(newX, u);
 
-      truncationError = (h * ((b1[0] - b2[0]) * k1 + (b1[1] - b2[1]) * k2 +
-                              (b1[2] - b2[2]) * k3 + (b1[3] - b2[3]) * k4 +
-                              (b1[4] - b2[4]) * k5 + (b1[5] - b2[5]) * k6 +
-                              (b1[6] - b2[6]) * k7))
-                            .norm();
+    double truncationError = (h * ((b1[0] - b2[0]) * k1 + (b1[1] - b2[1]) * k2 +
+                                   (b1[2] - b2[2]) * k3 + (b1[3] - b2[3]) * k4 +
+                                   (b1[4] - b2[4]) * k5 + (b1[5] - b2[5]) * k6 +
+                                   (b1[6] - b2[6]) * k7))
+                                 .norm();
 
-      if (truncationError == 0.0) {
-        h = dt.value() - dtElapsed;
-      } else {
-        h *= 0.9 * std::pow(maxError / truncationError, 1.0 / 5.0);
-      }
-    } while (truncationError > maxError);
+    if (truncationError <= maxError) {
+      // Accept the step
+      x = newX;
+      dtElapsed += h;
+    }
 
-    dtElapsed += h;
-    x = newX;
+    if (truncationError == 0.0) {
+      h = dt.value() - dtElapsed;
+    } else {
+      h = (std::min)(0.9 * h * std::pow(maxError / truncationError, 0.2),
+                     dt.value() - dtElapsed);
+    }
   }
 
   return x;
@@ -194,44 +189,43 @@ T RKDP(F&& f, wpi::units::second_t t, T y, wpi::units::second_t dt,
   constexpr std::array<double, kDim - 1> c{1.0 / 5.0, 3.0 / 10.0, 4.0 / 5.0,
                                            8.0 / 9.0, 1.0,        1.0};
 
-  T newY;
-  double truncationError;
-
+  // Loop until dt has elapsed
   double dtElapsed = 0.0;
   double h = dt.value();
-
-  // Loop until we've gotten to our desired dt
   while (dtElapsed < dt.value()) {
-    do {
-      // Only allow us to advance up to the dt remaining
-      h = std::min(h, dt.value() - dtElapsed);
+    // clang-format off
+    T k1 = f(t, y);
+    T k2 = f(t + wpi::units::second_t{h} * c[0], y + h * (A[0][0] * k1));
+    T k3 = f(t + wpi::units::second_t{h} * c[1], y + h * (A[1][0] * k1 + A[1][1] * k2));
+    T k4 = f(t + wpi::units::second_t{h} * c[2], y + h * (A[2][0] * k1 + A[2][1] * k2 + A[2][2] * k3));
+    T k5 = f(t + wpi::units::second_t{h} * c[3], y + h * (A[3][0] * k1 + A[3][1] * k2 + A[3][2] * k3 + A[3][3] * k4));
+    T k6 = f(t + wpi::units::second_t{h} * c[4], y + h * (A[4][0] * k1 + A[4][1] * k2 + A[4][2] * k3 + A[4][3] * k4 + A[4][4] * k5));
+    // clang-format on
 
-      // clang-format off
-      T k1 = f(t, y);
-      T k2 = f(t + wpi::units::second_t{h} * c[0], y + h * (A[0][0] * k1));
-      T k3 = f(t + wpi::units::second_t{h} * c[1], y + h * (A[1][0] * k1 + A[1][1] * k2));
-      T k4 = f(t + wpi::units::second_t{h} * c[2], y + h * (A[2][0] * k1 + A[2][1] * k2 + A[2][2] * k3));
-      T k5 = f(t + wpi::units::second_t{h} * c[3], y + h * (A[3][0] * k1 + A[3][1] * k2 + A[3][2] * k3 + A[3][3] * k4));
-      T k6 = f(t + wpi::units::second_t{h} * c[4], y + h * (A[4][0] * k1 + A[4][1] * k2 + A[4][2] * k3 + A[4][3] * k4 + A[4][4] * k5));
-      // clang-format on
-
-      // Since the final row of A and the array b1 have the same coefficients
-      // and k7 has no effect on newY, we can reuse the calculation.
-      newY = y + h * (A[5][0] * k1 + A[5][1] * k2 + A[5][2] * k3 +
+    // Since the final row of A and the array b1 have the same coefficients and
+    // k7 has no effect on newY, we can reuse the calculation.
+    T newY = y + h * (A[5][0] * k1 + A[5][1] * k2 + A[5][2] * k3 +
                       A[5][3] * k4 + A[5][4] * k5 + A[5][5] * k6);
-      T k7 = f(t + wpi::units::second_t{h} * c[5], newY);
+    T k7 = f(t + wpi::units::second_t{h} * c[5], newY);
 
-      truncationError = (h * ((b1[0] - b2[0]) * k1 + (b1[1] - b2[1]) * k2 +
-                              (b1[2] - b2[2]) * k3 + (b1[3] - b2[3]) * k4 +
-                              (b1[4] - b2[4]) * k5 + (b1[5] - b2[5]) * k6 +
-                              (b1[6] - b2[6]) * k7))
-                            .norm();
+    double truncationError = (h * ((b1[0] - b2[0]) * k1 + (b1[1] - b2[1]) * k2 +
+                                   (b1[2] - b2[2]) * k3 + (b1[3] - b2[3]) * k4 +
+                                   (b1[4] - b2[4]) * k5 + (b1[5] - b2[5]) * k6 +
+                                   (b1[6] - b2[6]) * k7))
+                                 .norm();
 
-      h *= 0.9 * std::pow(maxError / truncationError, 1.0 / 5.0);
-    } while (truncationError > maxError);
+    if (truncationError <= maxError) {
+      // Accept the step
+      y = newY;
+      dtElapsed += h;
+    }
 
-    dtElapsed += h;
-    y = newY;
+    if (truncationError == 0.0) {
+      h = dt.value() - dtElapsed;
+    } else {
+      h = (std::min)(0.9 * h * std::pow(maxError / truncationError, 0.2),
+                     dt.value() - dtElapsed);
+    }
   }
 
   return y;

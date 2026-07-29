@@ -4,6 +4,7 @@
 
 #include <jni.h>
 
+#include <chrono>
 #include <vector>
 
 #include <sleipnir/optimization/problem.hpp>

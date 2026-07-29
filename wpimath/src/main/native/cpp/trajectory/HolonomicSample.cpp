@@ -6,6 +6,10 @@
 
 #include <vector>
 
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/kinematics/ChassisAccelerations.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/util/json.hpp"
 
 void wpi::math::to_json(wpi::util::json& json, const HolonomicSample& sample) {

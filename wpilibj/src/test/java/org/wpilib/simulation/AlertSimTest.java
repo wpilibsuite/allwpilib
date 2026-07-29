@@ -23,7 +23,7 @@ class AlertSimTest {
 
   @BeforeEach
   void setup(TestInfo info) {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     m_groupName = "AlertTest_" + info.getDisplayName();
   }
 

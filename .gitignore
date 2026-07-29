@@ -239,11 +239,6 @@ ipch/
 # compile_commands
 compile_commands.json
 
-# clang configuration and clangd cache
-.clang
-.clangd
-.cache/
-
 imgui.ini
 
 # Bazel

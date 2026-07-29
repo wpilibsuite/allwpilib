@@ -16,7 +16,7 @@
 namespace wpi::sim {
 
 TEST(PowerDistributionSimTest, Initialize) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   PowerDistributionSim sim{2};
   EXPECT_FALSE(sim.GetInitialized());
 
@@ -35,7 +35,7 @@ TEST(PowerDistributionSimTest, Initialize) {
 }
 
 TEST(PowerDistributionSimTest, SetTemperature) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   PowerDistribution pdp{0, 2, wpi::PowerDistribution::ModuleType::CTRE};
   PowerDistributionSim sim(pdp);
 
@@ -50,7 +50,7 @@ TEST(PowerDistributionSimTest, SetTemperature) {
 }
 
 TEST(PowerDistributionSimTest, SetVoltage) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   PowerDistribution pdp{0, 2, wpi::PowerDistribution::ModuleType::CTRE};
   PowerDistributionSim sim(pdp);
 
@@ -65,7 +65,7 @@ TEST(PowerDistributionSimTest, SetVoltage) {
 }
 
 TEST(PowerDistributionSimTest, SetCurrent) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   PowerDistribution pdp{0, 2, wpi::PowerDistribution::ModuleType::CTRE};
   PowerDistributionSim sim(pdp);
 
@@ -84,7 +84,7 @@ TEST(PowerDistributionSimTest, SetCurrent) {
 }
 
 TEST(PowerDistributionSimTest, GetAllCurrents) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   PowerDistribution pdp{0, 2, wpi::PowerDistribution::ModuleType::REV};
   PowerDistributionSim sim(pdp);
 

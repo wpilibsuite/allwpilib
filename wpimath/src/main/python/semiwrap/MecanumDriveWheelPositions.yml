@@ -1,3 +1,6 @@
+extra_includes:
+- wpystruct.h
+
 classes:
   wpi::math::MecanumDriveWheelPositions:
     force_no_default_constructor: true
@@ -16,3 +19,6 @@ classes:
         >(),
         py::arg("front_left") = 0, py::arg("front_right") = 0, py::arg("rear_left") = 0, py::arg("rear_right") = 0
       )
+
+inline_code: |
+  SetupWPyStruct<wpi::math::MecanumDriveWheelPositions>(cls_MecanumDriveWheelPositions);

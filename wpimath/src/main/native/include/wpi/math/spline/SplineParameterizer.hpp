@@ -29,9 +29,11 @@
 #pragma once
 
 #include <stack>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
+#include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/spline/Spline.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/curvature.hpp"

@@ -4,6 +4,7 @@
 
 #include "wpi/math/geometry/Quaternion.hpp"
 
+#include <cmath>
 #include <numbers>
 
 #include <gtest/gtest.h>

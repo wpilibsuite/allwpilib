@@ -2,6 +2,7 @@ extra_includes:
 - geometryToString.h
 - wpystruct.h
 - pybind11/eigen.h
+- units_numpy_type_caster.h
 
 functions:
   to_json:

@@ -6,8 +6,14 @@
 
 #include <cmath>
 
+#include <Eigen/Core>
 #include <gtest/gtest.h>
 
+#include "wpi/math/geometry/Quaternion.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
+#include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/util/array.hpp"
 
 using namespace wpi::math;

@@ -12,6 +12,7 @@
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/units/base.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/util/SymbolExports.hpp"

@@ -20,7 +20,7 @@ class NiDsPS5ControllerTest {
   @EnumSource(value = NiDsPS5Controller.Button.class)
   void testButtons(NiDsPS5Controller.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     NiDsPS5Controller joy = new NiDsPS5Controller(2);
     NiDsPS5ControllerSim joysim = new NiDsPS5ControllerSim(joy);
 
@@ -60,7 +60,7 @@ class NiDsPS5ControllerTest {
   @EnumSource(value = NiDsPS5Controller.Axis.class)
   void testAxes(NiDsPS5Controller.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     NiDsPS5Controller joy = new NiDsPS5Controller(2);
     NiDsPS5ControllerSim joysim = new NiDsPS5ControllerSim(joy);
 

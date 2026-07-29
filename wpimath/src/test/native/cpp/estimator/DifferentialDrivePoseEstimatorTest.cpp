@@ -4,8 +4,10 @@
 
 #include "wpi/math/estimator/DifferentialDrivePoseEstimator.hpp"
 
+#include <functional>
 #include <limits>
 #include <numbers>
+#include <optional>
 #include <random>
 #include <tuple>
 #include <utility>
@@ -15,11 +17,19 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
 #include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
+#include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 #include "wpi/util/print.hpp"
 
 void testFollowTrajectory(
@@ -155,8 +165,7 @@ void testFollowTrajectory(
 TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
   wpi::math::DifferentialDriveKinematics kinematics{1.0_m};
 
-  wpi::math::DifferentialDrivePoseEstimator estimator{kinematics,
-                                                      wpi::math::Rotation2d{},
+  wpi::math::DifferentialDrivePoseEstimator estimator{wpi::math::Rotation2d{},
                                                       0_m,
                                                       0_m,
                                                       wpi::math::Pose2d{},
@@ -187,8 +196,7 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
 TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
   wpi::math::DifferentialDriveKinematics kinematics{1.0_m};
 
-  wpi::math::DifferentialDrivePoseEstimator estimator{kinematics,
-                                                      wpi::math::Rotation2d{},
+  wpi::math::DifferentialDrivePoseEstimator estimator{wpi::math::Rotation2d{},
                                                       0_m,
                                                       0_m,
                                                       wpi::math::Pose2d{},
@@ -235,10 +243,7 @@ TEST(DifferentialDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
   // The alternative result is that only one vision measurement affects the
   // outcome. If that were the case, after 1000 measurements, the estimated
   // pose would converge to that measurement.
-  wpi::math::DifferentialDriveKinematics kinematics{1.0_m};
-
   wpi::math::DifferentialDrivePoseEstimator estimator{
-      kinematics,
       wpi::math::Rotation2d{},
       0_m,
       0_m,
@@ -286,11 +291,9 @@ TEST(DifferentialDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
 }
 
 TEST(DifferentialDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
-  wpi::math::DifferentialDriveKinematics kinematics{1_m};
-
   wpi::math::DifferentialDrivePoseEstimator estimator{
-      kinematics,      wpi::math::Rotation2d{}, 0_m, 0_m, wpi::math::Pose2d{},
-      {0.1, 0.1, 0.1}, {0.45, 0.45, 0.45}};
+      wpi::math::Rotation2d{}, 0_m, 0_m, wpi::math::Pose2d{}, {0.1, 0.1, 0.1},
+      {0.45, 0.45, 0.45}};
 
   // Add enough measurements to fill up the buffer
   for (auto time = 0_s; time < 4_s; time += 20_ms) {
@@ -315,10 +318,9 @@ TEST(DifferentialDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
 }
 
 TEST(DifferentialDrivePoseEstimatorTest, TestSampleAt) {
-  wpi::math::DifferentialDriveKinematics kinematics{1_m};
   wpi::math::DifferentialDrivePoseEstimator estimator{
-      kinematics,      wpi::math::Rotation2d{}, 0_m, 0_m, wpi::math::Pose2d{},
-      {1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
+      wpi::math::Rotation2d{}, 0_m, 0_m, wpi::math::Pose2d{}, {1.0, 1.0, 1.0},
+      {1.0, 1.0, 1.0}};
 
   // Returns empty when null
   EXPECT_EQ(std::nullopt, estimator.SampleAt(1_s));
@@ -383,9 +385,7 @@ TEST(DifferentialDrivePoseEstimatorTest, TestSampleAt) {
 }
 
 TEST(DifferentialDrivePoseEstimatorTest, TestReset) {
-  wpi::math::DifferentialDriveKinematics kinematics{1_m};
   wpi::math::DifferentialDrivePoseEstimator estimator{
-      kinematics,
       wpi::math::Rotation2d{},
       0_m,
       0_m,

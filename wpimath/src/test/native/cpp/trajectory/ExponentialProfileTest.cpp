@@ -13,6 +13,7 @@
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
 

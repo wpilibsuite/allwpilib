@@ -6,13 +6,17 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/trajectory/DifferentialSample.hpp"
 #include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 #include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveVoltageConstraint.hpp"
 #include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"

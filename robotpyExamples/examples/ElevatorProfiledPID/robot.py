@@ -25,7 +25,7 @@ class MyRobot(wpilib.TimedRobot):
     def __init__(self) -> None:
         super().__init__()
         self.joystick = wpilib.Joystick(1)
-        self.encoder = wpilib.Encoder(1, 2)
+        self.encoder = wpilib.Encoder(2, 3)
         self.motor = wpilib.PWMSparkMax(1)
 
         # Create a PID controller whose setpoint's change is subject to maximum

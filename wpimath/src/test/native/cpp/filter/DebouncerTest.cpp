@@ -4,6 +4,8 @@
 
 #include "wpi/math/filter/Debouncer.hpp"
 
+#include <stdint.h>
+
 #include <gtest/gtest.h>
 
 #include "wpi/units/time.hpp"

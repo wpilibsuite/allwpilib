@@ -5,12 +5,7 @@ include(AddTest)
 
 configure_file(src/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
 
-file(
-    GLOB_RECURSE wpilibc_native_src
-    src/main/native/cpp/*.cpp
-    src/main/native/cppcs/*.cpp
-    src/generated/main/native/cpp/*.cpp
-)
+file(GLOB_RECURSE wpilibc_native_src src/main/native/cpp/*.cpp src/generated/main/native/cpp/*.cpp)
 
 add_library(wpilibc ${wpilibc_native_src} ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
 set_target_properties(wpilibc PROPERTIES DEBUG_POSTFIX "d")
@@ -23,18 +18,6 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/wpilibc>
 )
 wpilib_target_warnings(wpilibc)
-
-if(WPILIB_WITH_CSCORE)
-    target_link_libraries(wpilibc PUBLIC cameraserver cscore ${OpenCV_LIBS})
-else()
-    target_compile_definitions(wpilibc PRIVATE DYNAMIC_CAMERA_SERVER)
-    # Add just the camera server include directory
-    target_include_directories(
-        wpilibc
-        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../cameraserver/src/main/native/include
-    )
-endif()
-
 target_link_libraries(wpilibc PUBLIC hal ntcore wpimath datalog)
 
 set_property(TARGET wpilibc PROPERTY FOLDER "libraries")
@@ -54,12 +37,4 @@ if(WPILIB_WITH_TESTS)
     target_sources(wpilibc_test PRIVATE ${wpilibc_generated_test_src})
     target_include_directories(wpilibc_test PRIVATE src/test/native/include)
     target_link_libraries(wpilibc_test wpilibc googletest)
-    if(NOT WPILIB_WITH_CSCORE)
-        target_compile_definitions(wpilibc_test PRIVATE DYNAMIC_CAMERA_SERVER)
-        # Add just the camera server include directory
-        target_include_directories(
-            wpilibc_test
-            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../cameraserver/src/main/native/include
-        )
-    endif()
 endif()

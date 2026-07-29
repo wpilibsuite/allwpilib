@@ -8,6 +8,7 @@
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/Models.hpp"
 #include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
 #include "wpi/units/angular_acceleration.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/length.hpp"
@@ -73,7 +74,7 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
 
   /**
    * Calculates the differential drive feedforward inputs given velocity
-   * setpoints.
+   * references.
    *
    * @param currentLeftVelocity The current left velocity of the differential
    * drive in meters/second.

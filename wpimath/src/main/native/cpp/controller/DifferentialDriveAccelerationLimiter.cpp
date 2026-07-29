@@ -6,6 +6,11 @@
 
 #include <Eigen/QR>
 
+#include "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
+
 using namespace wpi::math;
 
 DifferentialDriveWheelVoltages DifferentialDriveAccelerationLimiter::Calculate(

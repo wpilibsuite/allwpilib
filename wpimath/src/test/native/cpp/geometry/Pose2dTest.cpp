@@ -8,6 +8,11 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+
 using namespace wpi::math;
 
 TEST(Pose2dTest, RotateBy) {

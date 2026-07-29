@@ -4,7 +4,10 @@
 
 #include "wpi/math/system/NumericalJacobian.hpp"
 
+#include <Eigen/Core>
 #include <gtest/gtest.h>
+
+#include "wpi/math/linalg/EigenCore.hpp"
 
 wpi::math::Matrixd<4, 4> A{
     {1, 2, 4, 1}, {5, 2, 3, 4}, {5, 1, 3, 2}, {1, 1, 3, 7}};

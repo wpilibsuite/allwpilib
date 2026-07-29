@@ -6,9 +6,10 @@
 
 #include <algorithm>
 #include <concepts>
+#include <cstddef>
 #include <stdexcept>
-#include <type_traits>
 
+#include <Eigen/Core>
 #include <gcem.hpp>
 
 #include "wpi/math/linalg/EigenCore.hpp"

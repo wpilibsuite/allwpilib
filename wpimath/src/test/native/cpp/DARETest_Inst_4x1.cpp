@@ -4,6 +4,8 @@
 
 #include <expected>
 
+#include <Eigen/Core>
+
 #include "wpi/math/linalg/DARE.hpp"
 
 template std::expected<Eigen::Matrix<double, 4, 4>, wpi::math::DAREError>

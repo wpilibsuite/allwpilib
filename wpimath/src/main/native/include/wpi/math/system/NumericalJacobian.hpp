@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <Eigen/Core>
+
 #include "wpi/math/linalg/EigenCore.hpp"
 
 namespace wpi::math {

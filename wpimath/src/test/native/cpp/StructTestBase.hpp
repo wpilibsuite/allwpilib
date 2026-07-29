@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <stdint.h>
+
+#include <cstring>
+
 #include <gtest/gtest.h>
 
 #include "wpi/util/struct/Struct.hpp"

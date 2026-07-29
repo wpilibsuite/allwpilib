@@ -24,9 +24,6 @@ void EncoderModel::SetName(std::string_view name) {
     if (auto count = GetCountData()) {
       count->SetName("");
     }
-    if (auto period = GetPeriodData()) {
-      period->SetName("");
-    }
     if (auto direction = GetDirectionData()) {
       direction->SetName("");
     }
@@ -42,9 +39,6 @@ void EncoderModel::SetName(std::string_view name) {
     }
     if (auto count = GetCountData()) {
       count->SetName(std::format("{} Count", name));
-    }
-    if (auto period = GetPeriodData()) {
-      period->SetName(std::format("{} Period", name));
     }
     if (auto direction = GetDirectionData()) {
       direction->SetName(std::format("{} Direction", name));
@@ -112,20 +106,6 @@ void wpi::glass::DisplayEncoder(EncoderModel* model) {
     ImGui::SameLine();
     ImGui::Selectable("Count");
     countData->EmitDrag();
-  }
-
-  // max period
-  {
-    double maxPeriod = model->GetMaxPeriod();
-    ImGui::LabelText("Max Period", "%.6f", maxPeriod);
-  }
-
-  // period
-  if (auto periodData = model->GetPeriodData()) {
-    double value = periodData->GetValue();
-    if (periodData->InputDouble("Period", &value, 0, 0, "%.6g")) {
-      model->SetPeriod(value);
-    }
   }
 
   // reverse direction

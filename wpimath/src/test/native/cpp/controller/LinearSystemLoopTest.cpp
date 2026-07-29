@@ -55,21 +55,15 @@ TEST(LinearSystemLoopTest, StateSpaceEnabled) {
 
   wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints constraints{
       4_mps, 3_mps_sq};
+  wpi::math::TrapezoidProfile<wpi::units::meters> profile{constraints};
 
+  wpi::math::TrapezoidProfile<wpi::units::meters>::State state{
+      wpi::units::meter_t{loop.Xhat(0)},
+      wpi::units::meters_per_second_t{loop.Xhat(1)}};
   for (int i = 0; i < 1000; ++i) {
-    wpi::math::TrapezoidProfile<wpi::units::meters> profile{constraints};
-
-    wpi::math::TrapezoidProfile<wpi::units::meters>::State current{
-        wpi::units::meter_t{loop.Xhat(0)},
-        wpi::units::meters_per_second_t{loop.Xhat(1)}};
-
-    wpi::math::TrapezoidProfile<wpi::units::meters>::State goal{
-        wpi::units::meter_t{references(0)},
-        wpi::units::meters_per_second_t{references(1)}};
-
-    wpi::math::TrapezoidProfile<wpi::units::meters>::State state{
-        profile.Calculate(kDt, current, goal)};
-
+    state = profile.Calculate(kDt, state,
+                              {wpi::units::meter_t{references(0)},
+                               wpi::units::meters_per_second_t{references(1)}});
     loop.SetNextR({state.position.value(), state.velocity.value()});
 
     wpi::math::Matrixd<1, 1> y{

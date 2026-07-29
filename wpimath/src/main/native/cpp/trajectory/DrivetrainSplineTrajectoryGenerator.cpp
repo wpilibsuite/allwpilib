@@ -4,14 +4,24 @@
 
 #include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 
+#include <functional>
 #include <utility>
 #include <vector>
 
+#include "wpi/math/geometry/Transform2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
+#include "wpi/math/spline/Spline.hpp"
 #include "wpi/math/spline/SplineHelper.hpp"
 #include "wpi/math/spline/SplineParameterizer.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
 #include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
 #include "wpi/math/trajectory/DrivetrainSplineTrajectoryParameterizer.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/curvature.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/util/print.hpp"
 
 using namespace wpi::math;

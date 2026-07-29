@@ -17,7 +17,7 @@ using namespace wpi;
 using namespace wpi::sim;
 
 TEST(DriverStationTest, Enabled) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   DriverStationSim::ResetData();
 
   EXPECT_FALSE(RobotState::IsEnabled());
@@ -34,7 +34,7 @@ TEST(DriverStationTest, Enabled) {
 }
 
 TEST(DriverStationTest, AutonomousMode) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   DriverStationSim::ResetData();
 
   EXPECT_FALSE(RobotState::IsAutonomous());
@@ -51,7 +51,7 @@ TEST(DriverStationTest, AutonomousMode) {
 }
 
 TEST(DriverStationTest, Mode) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   DriverStationSim::ResetData();
 
   EXPECT_FALSE(RobotState::IsUtility());
@@ -68,7 +68,7 @@ TEST(DriverStationTest, Mode) {
 }
 
 TEST(DriverStationTest, Estop) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   DriverStationSim::ResetData();
 
   EXPECT_FALSE(RobotState::IsEStopped());
@@ -84,7 +84,7 @@ TEST(DriverStationTest, Estop) {
 }
 
 TEST(DriverStationTest, FmsAttached) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   DriverStationSim::ResetData();
 
   EXPECT_FALSE(RobotState::IsFMSAttached());
@@ -100,7 +100,7 @@ TEST(DriverStationTest, FmsAttached) {
 }
 
 TEST(DriverStationTest, DsAttached) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   DriverStationSim::ResetData();
   wpi::internal::DriverStationBackend::RefreshData();
 
@@ -122,7 +122,7 @@ TEST(DriverStationTest, DsAttached) {
 }
 
 TEST(DriverStationTest, AllianceStationId) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   DriverStationSim::ResetData();
 
   EnumCallback callback;
@@ -212,7 +212,7 @@ TEST(DriverStationTest, AllianceStationId) {
 }
 
 TEST(DriverStationTest, ReplayNumber) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   DriverStationSim::ResetData();
 
   DriverStationSim::SetReplayNumber(4);
@@ -221,7 +221,7 @@ TEST(DriverStationTest, ReplayNumber) {
 }
 
 TEST(DriverStationTest, MatchNumber) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   DriverStationSim::ResetData();
 
   DriverStationSim::SetMatchNumber(3);
@@ -230,7 +230,7 @@ TEST(DriverStationTest, MatchNumber) {
 }
 
 TEST(DriverStationTest, MatchTime) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   DriverStationSim::ResetData();
 
   DoubleCallback callback;
@@ -246,7 +246,7 @@ TEST(DriverStationTest, MatchTime) {
 }
 
 TEST(DriverStationTest, SetGameData) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   DriverStationSim::ResetData();
 
   constexpr auto message = "Hello";
@@ -258,7 +258,7 @@ TEST(DriverStationTest, SetGameData) {
 }
 
 TEST(DriverStationTest, SetGameDataEmpty) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   DriverStationSim::ResetData();
 
   DriverStationSim::SetGameData("");
@@ -268,7 +268,7 @@ TEST(DriverStationTest, SetGameDataEmpty) {
 }
 
 TEST(DriverStationTest, SetEventName) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   DriverStationSim::ResetData();
 
   constexpr auto message = "The Best Event";

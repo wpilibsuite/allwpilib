@@ -139,7 +139,7 @@ wpilib_jni_java_library(
     extra_source_pkgs = ["resources"],
     maven_artifact_name = "apriltag-java",
     maven_group_id = "org.wpilib.apriltag",
-    native_libs = [":apriltagjni"],
+    native_libs = [":shared/apriltagjni"],
     plugins = [
         "//:avaje_jsonb_generator",
     ],

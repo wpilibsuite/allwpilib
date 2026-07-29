@@ -6,6 +6,9 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+
 TEST(SwerveModulePositionTest, Equality) {
   wpi::math::SwerveModulePosition position1{2_m, 90_deg};
   wpi::math::SwerveModulePosition position2{2_m, 90_deg};

@@ -6,6 +6,7 @@
 
 #include <format>
 #include <memory>
+#include <string_view>
 
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"

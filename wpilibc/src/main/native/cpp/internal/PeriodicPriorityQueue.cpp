@@ -4,6 +4,8 @@
 
 #include "wpi/internal/PeriodicPriorityQueue.hpp"
 
+#include <atomic>
+#include <cstdint>
 #include <utility>
 
 #include "wpi/hal/Notifier.h"
@@ -12,6 +14,12 @@
 #include "wpi/util/Synchronization.h"
 
 using namespace wpi::internal;
+
+namespace {
+// Monotonic source of stable callback identities. Shared across all callbacks
+// so each fresh construction gets a unique id; copies preserve their id.
+std::atomic<uint64_t> gNextCallbackId{1};
+}  // namespace
 
 PeriodicPriorityQueue::Callback::Callback(std::function<void()> func,
                                           std::chrono::microseconds startTime,
@@ -23,7 +31,8 @@ PeriodicPriorityQueue::Callback::Callback(std::function<void()> func,
           startTime + offset + period +
           (std::chrono::microseconds{RobotController::GetMonotonicTime()} -
            startTime) /
-              period * period) {}
+              period * period),
+      id{gNextCallbackId.fetch_add(1, std::memory_order_relaxed)} {}
 
 PeriodicPriorityQueue::Callback::Callback(std::function<void()> func,
                                           std::chrono::microseconds startTime,

@@ -58,7 +58,7 @@ void HALSimWSProviderEncoder::RegisterCallbacks() {
             static_cast<int32_t>(value->data.v_int + provider->m_countOffset)));
       },
       this, true);
-  m_periodCbKey = REGISTER(Period, ">period", double, double);
+  m_rateCbKey = REGISTER(Rate, ">rate", double, double);
   m_resetCbKey = HALSIM_RegisterEncoderResetCallback(
       m_channel,
       [](const char* name, void* param, const struct HAL_Value* value) {
@@ -72,7 +72,6 @@ void HALSimWSProviderEncoder::RegisterCallbacks() {
       this, true);
   m_reverseDirectionCbKey =
       REGISTER(ReverseDirection, "<reverse_direction", bool, boolean);
-  m_samplesCbKey = REGISTER(SamplesToAverage, "<samples_to_avg", int32_t, int);
 }
 
 void HALSimWSProviderEncoder::CancelCallbacks() {
@@ -82,27 +81,30 @@ void HALSimWSProviderEncoder::CancelCallbacks() {
 void HALSimWSProviderEncoder::DoCancelCallbacks() {
   HALSIM_CancelEncoderInitializedCallback(m_channel, m_initCbKey);
   HALSIM_CancelEncoderCountCallback(m_channel, m_countCbKey);
-  HALSIM_CancelEncoderPeriodCallback(m_channel, m_periodCbKey);
+  HALSIM_CancelEncoderRateCallback(m_channel, m_rateCbKey);
   HALSIM_CancelEncoderResetCallback(m_channel, m_resetCbKey);
   HALSIM_CancelEncoderReverseDirectionCallback(m_channel,
                                                m_reverseDirectionCbKey);
-  HALSIM_CancelEncoderSamplesToAverageCallback(m_channel, m_samplesCbKey);
 
   m_initCbKey = 0;
   m_countCbKey = 0;
-  m_periodCbKey = 0;
+  m_rateCbKey = 0;
   m_resetCbKey = 0;
   m_reverseDirectionCbKey = 0;
-  m_samplesCbKey = 0;
 }
 
 void HALSimWSProviderEncoder::OnNetValueChanged(const wpi::util::json& json) {
   if (auto val = json.lookup(">count"); val && val->is_int()) {
     HALSIM_SetEncoderCount(m_channel, val->get_int() - m_countOffset);
   }
-
-  if (auto val = json.lookup(">period"); val && val->is_number()) {
-    HALSIM_SetEncoderPeriod(m_channel, val->get_number());
+  if (auto val = json.lookup(">rate"); val && val->is_number()) {
+    HALSIM_SetEncoderRate(m_channel, val->get_number());
+  } else if (auto val = json.lookup(">period"); val && val->is_number()) {
+    // Compatibility with older clients such as HALSim XRP, which send the
+    // period between encoder pulses instead of the current rate field.
+    HALSIM_SetEncoderRate(
+        m_channel,
+        HALSIM_GetEncoderDistancePerPulse(m_channel) / val->get_number());
   }
 }
 

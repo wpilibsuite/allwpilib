@@ -31,13 +31,13 @@ static bool filter(std::vector<cv::Point2f> charucoCorners,
     return false;
   }
 
-  for (int i = 0; i < charucoIds.size(); i++) {
+  for (size_t i = 0; i < charucoIds.size(); i++) {
     if (charucoIds.at(i) > (boardWidth - 1) * (boardHeight - 1) - 1) {
       return false;
     }
   }
 
-  for (int i = 0; i < markerIds.size(); i++) {
+  for (size_t i = 0; i < markerIds.size(); i++) {
     if (markerIds.at(i) > ((boardWidth * boardHeight) / 2) - 1) {
       return false;
     }
@@ -192,14 +192,14 @@ void Worker::ProcessNextImage(cv::Mat image) {
   m_charucoBoard.matchImagePoints(charucoCorners, charucoIds, objPoints,
                                   imgPoints);
 
-  for (int i = 0; i < charucoIds.size(); i++) {
+  for (size_t i = 0; i < charucoIds.size(); i++) {
     int id = charucoIds.at(i);
     points[id].x = imgPoints.at(i).x;
     points[id].y = imgPoints.at(i).y;
     points[id].z = 1.0f;
   }
 
-  for (int i = 0; i < points.size(); i++) {
+  for (size_t i = 0; i < points.size(); i++) {
     if (points[i].z != 1.0f) {
       points[i].x = -1.0f;
       points[i].y = -1.0f;

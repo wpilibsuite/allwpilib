@@ -10,7 +10,6 @@
 
 #include "internal/AnalogPrototypes.hpp"
 #include "internal/BilinearTransform.hpp"
-#include "internal/Zpk.hpp"
 #include "wpi/math/filter/BiquadFilter.hpp"
 
 // Public design factories. Each classical-IIR factory (Butterworth,

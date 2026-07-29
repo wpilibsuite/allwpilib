@@ -4,13 +4,11 @@
 
 import pytest
 
-from wpimath import ExponentialProfileMeterVolts, SimpleMotorFeedforwardMeters
+from wpimath import ExponentialProfile, SimpleMotorFeedforwardMeters
 
 kDt = 0.01
 feedforward = SimpleMotorFeedforwardMeters(0, 2.5629, 0.43277, kDt)
-constraints = ExponentialProfileMeterVolts.Constraints.from_characteristics(
-    12, 2.5629, 0.43277
-)
+constraints = ExponentialProfile.Constraints.from_characteristics(12, 2.5629, 0.43277)
 
 
 def assert_near(val1, val2, eps):
@@ -25,9 +23,9 @@ def assert_near_state(val1, val2, eps):
 
 
 def check_dynamics(
-    profile: ExponentialProfileMeterVolts,
-    current: ExponentialProfileMeterVolts.State,
-    goal: ExponentialProfileMeterVolts.State,
+    profile: ExponentialProfile,
+    current: ExponentialProfile.State,
+    goal: ExponentialProfile.State,
 ):
     next_state = profile.calculate(kDt, current, goal)
 
@@ -40,12 +38,12 @@ def check_dynamics(
 
 @pytest.fixture
 def profile():
-    return ExponentialProfileMeterVolts(constraints)
+    return ExponentialProfile(constraints)
 
 
 def test_reaches_goal(profile):
-    goal = ExponentialProfileMeterVolts.State(10, 0)
-    state = ExponentialProfileMeterVolts.State(0, 0)
+    goal = ExponentialProfile.State(10, 0)
+    state = ExponentialProfile.State(0, 0)
 
     for _ in range(450):
         state = check_dynamics(profile, state, goal)
@@ -54,13 +52,13 @@ def test_reaches_goal(profile):
 
 
 def test_pos_continuous_under_vel_change(profile):
-    goal = ExponentialProfileMeterVolts.State(10, 0)
-    state = ExponentialProfileMeterVolts.State(0, 0)
+    goal = ExponentialProfile.State(10, 0)
+    state = ExponentialProfile.State(0, 0)
 
     for i in range(300):
         if i == 150:
-            profile = ExponentialProfileMeterVolts(
-                ExponentialProfileMeterVolts.Constraints.from_state_space(
+            profile = ExponentialProfile(
+                ExponentialProfile.Constraints.from_state_space(
                     9, constraints.a, constraints.b
                 )
             )
@@ -71,13 +69,13 @@ def test_pos_continuous_under_vel_change(profile):
 
 
 def test_pos_continuous_under_vel_change_backward(profile):
-    goal = ExponentialProfileMeterVolts.State(-10, 0)
-    state = ExponentialProfileMeterVolts.State(0, 0)
+    goal = ExponentialProfile.State(-10, 0)
+    state = ExponentialProfile.State(0, 0)
 
     for i in range(300):
         if i == 150:
-            profile = ExponentialProfileMeterVolts(
-                ExponentialProfileMeterVolts.Constraints.from_state_space(
+            profile = ExponentialProfile(
+                ExponentialProfile.Constraints.from_state_space(
                     9, constraints.a, constraints.b
                 )
             )
@@ -88,8 +86,8 @@ def test_pos_continuous_under_vel_change_backward(profile):
 
 
 def test_backwards(profile):
-    goal = ExponentialProfileMeterVolts.State(-10, 0)
-    state = ExponentialProfileMeterVolts.State(0, 0)
+    goal = ExponentialProfile.State(-10, 0)
+    state = ExponentialProfile.State(0, 0)
 
     for _ in range(400):
         state = check_dynamics(profile, state, goal)
@@ -98,15 +96,15 @@ def test_backwards(profile):
 
 
 def test_switch_goal_in_middle(profile):
-    goal = ExponentialProfileMeterVolts.State(-10, 0)
-    state = ExponentialProfileMeterVolts.State(0, 0)
+    goal = ExponentialProfile.State(-10, 0)
+    state = ExponentialProfile.State(0, 0)
 
     for _ in range(50):
         state = check_dynamics(profile, state, goal)
 
     assert state != goal
 
-    goal = ExponentialProfileMeterVolts.State(0.0, 0.0)
+    goal = ExponentialProfile.State(0.0, 0.0)
     for _ in range(100):
         state = check_dynamics(profile, state, goal)
 
@@ -114,8 +112,8 @@ def test_switch_goal_in_middle(profile):
 
 
 def test_top_velocity(profile):
-    goal = ExponentialProfileMeterVolts.State(40, 0)
-    state = ExponentialProfileMeterVolts.State(0, 0)
+    goal = ExponentialProfile.State(40, 0)
+    state = ExponentialProfile.State(0, 0)
 
     max_velocity = 0
     for _ in range(900):
@@ -127,8 +125,8 @@ def test_top_velocity(profile):
 
 
 def test_top_velocity_backward(profile):
-    goal = ExponentialProfileMeterVolts.State(-40, 0)
-    state = ExponentialProfileMeterVolts.State(0, 0)
+    goal = ExponentialProfile.State(-40, 0)
+    state = ExponentialProfile.State(0, 0)
 
     max_velocity = 0
     for _ in range(900):
@@ -140,8 +138,8 @@ def test_top_velocity_backward(profile):
 
 
 def test_large_initial_velocity(profile):
-    goal = ExponentialProfileMeterVolts.State(40, 0)
-    state = ExponentialProfileMeterVolts.State(0, 8)
+    goal = ExponentialProfile.State(40, 0)
+    state = ExponentialProfile.State(0, 8)
 
     for _ in range(900):
         state = check_dynamics(profile, state, goal)
@@ -150,8 +148,8 @@ def test_large_initial_velocity(profile):
 
 
 def test_large_negative_initial_velocity(profile):
-    goal = ExponentialProfileMeterVolts.State(-40, 0)
-    state = ExponentialProfileMeterVolts.State(0, -8)
+    goal = ExponentialProfile.State(-40, 0)
+    state = ExponentialProfile.State(0, -8)
 
     for _ in range(900):
         state = check_dynamics(profile, state, goal)
@@ -169,104 +167,104 @@ class ETestCase:
 def test_heuristic(profile):
     test_cases = [
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.0, -4),
-            ExponentialProfileMeterVolts.State(0.75, -4),
-            ExponentialProfileMeterVolts.State(1.3758, 4.4304),
+            ExponentialProfile.State(0.0, -4),
+            ExponentialProfile.State(0.75, -4),
+            ExponentialProfile.State(1.3758, 4.4304),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.0, -4),
-            ExponentialProfileMeterVolts.State(1.4103, 4),
-            ExponentialProfileMeterVolts.State(1.3758, 4.4304),
+            ExponentialProfile.State(0.0, -4),
+            ExponentialProfile.State(1.4103, 4),
+            ExponentialProfile.State(1.3758, 4.4304),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.6603, 4),
-            ExponentialProfileMeterVolts.State(0.75, -4),
-            ExponentialProfileMeterVolts.State(1.3758, 4.4304),
+            ExponentialProfile.State(0.6603, 4),
+            ExponentialProfile.State(0.75, -4),
+            ExponentialProfile.State(1.3758, 4.4304),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.6603, 4),
-            ExponentialProfileMeterVolts.State(1.4103, 4),
-            ExponentialProfileMeterVolts.State(1.3758, 4.4304),
+            ExponentialProfile.State(0.6603, 4),
+            ExponentialProfile.State(1.4103, 4),
+            ExponentialProfile.State(1.3758, 4.4304),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.0, -4),
-            ExponentialProfileMeterVolts.State(0.5, -2),
-            ExponentialProfileMeterVolts.State(0.4367, 3.7217),
+            ExponentialProfile.State(0.0, -4),
+            ExponentialProfile.State(0.5, -2),
+            ExponentialProfile.State(0.4367, 3.7217),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.0, -4),
-            ExponentialProfileMeterVolts.State(0.546, 2),
-            ExponentialProfileMeterVolts.State(0.4367, 3.7217),
+            ExponentialProfile.State(0.0, -4),
+            ExponentialProfile.State(0.546, 2),
+            ExponentialProfile.State(0.4367, 3.7217),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.6603, 4),
-            ExponentialProfileMeterVolts.State(0.5, -2),
-            ExponentialProfileMeterVolts.State(0.5560, -2.9616),
+            ExponentialProfile.State(0.6603, 4),
+            ExponentialProfile.State(0.5, -2),
+            ExponentialProfile.State(0.5560, -2.9616),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.6603, 4),
-            ExponentialProfileMeterVolts.State(0.546, 2),
-            ExponentialProfileMeterVolts.State(0.5560, -2.9616),
+            ExponentialProfile.State(0.6603, 4),
+            ExponentialProfile.State(0.546, 2),
+            ExponentialProfile.State(0.5560, -2.9616),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.0, -4),
-            ExponentialProfileMeterVolts.State(-0.75, -4),
-            ExponentialProfileMeterVolts.State(-0.7156, -4.4304),
+            ExponentialProfile.State(0.0, -4),
+            ExponentialProfile.State(-0.75, -4),
+            ExponentialProfile.State(-0.7156, -4.4304),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.0, -4),
-            ExponentialProfileMeterVolts.State(-0.0897, 4),
-            ExponentialProfileMeterVolts.State(-0.7156, -4.4304),
+            ExponentialProfile.State(0.0, -4),
+            ExponentialProfile.State(-0.0897, 4),
+            ExponentialProfile.State(-0.7156, -4.4304),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.6603, 4),
-            ExponentialProfileMeterVolts.State(-0.75, -4),
-            ExponentialProfileMeterVolts.State(-0.7156, -4.4304),
+            ExponentialProfile.State(0.6603, 4),
+            ExponentialProfile.State(-0.75, -4),
+            ExponentialProfile.State(-0.7156, -4.4304),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.6603, 4),
-            ExponentialProfileMeterVolts.State(-0.0897, 4),
-            ExponentialProfileMeterVolts.State(-0.7156, -4.4304),
+            ExponentialProfile.State(0.6603, 4),
+            ExponentialProfile.State(-0.0897, 4),
+            ExponentialProfile.State(-0.7156, -4.4304),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.0, -4),
-            ExponentialProfileMeterVolts.State(-0.5, -4.5),
-            ExponentialProfileMeterVolts.State(1.095, 4.314),
+            ExponentialProfile.State(0.0, -4),
+            ExponentialProfile.State(-0.5, -4.5),
+            ExponentialProfile.State(1.095, 4.314),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.0, -4),
-            ExponentialProfileMeterVolts.State(1.0795, 4.5),
-            ExponentialProfileMeterVolts.State(-0.5122, -4.351),
+            ExponentialProfile.State(0.0, -4),
+            ExponentialProfile.State(1.0795, 4.5),
+            ExponentialProfile.State(-0.5122, -4.351),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.6603, 4),
-            ExponentialProfileMeterVolts.State(-0.5, -4.5),
-            ExponentialProfileMeterVolts.State(1.095, 4.314),
+            ExponentialProfile.State(0.6603, 4),
+            ExponentialProfile.State(-0.5, -4.5),
+            ExponentialProfile.State(1.095, 4.314),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.6603, 4),
-            ExponentialProfileMeterVolts.State(1.0795, 4.5),
-            ExponentialProfileMeterVolts.State(-0.5122, -4.351),
+            ExponentialProfile.State(0.6603, 4),
+            ExponentialProfile.State(1.0795, 4.5),
+            ExponentialProfile.State(-0.5122, -4.351),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.0, -8),
-            ExponentialProfileMeterVolts.State(0, 0),
-            ExponentialProfileMeterVolts.State(-0.1384, 3.342),
+            ExponentialProfile.State(0.0, -8),
+            ExponentialProfile.State(0, 0),
+            ExponentialProfile.State(-0.1384, 3.342),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.0, -8),
-            ExponentialProfileMeterVolts.State(-1, 0),
-            ExponentialProfileMeterVolts.State(-0.562, -6.792),
+            ExponentialProfile.State(0.0, -8),
+            ExponentialProfile.State(-1, 0),
+            ExponentialProfile.State(-0.562, -6.792),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.0, 8),
-            ExponentialProfileMeterVolts.State(1, 0),
-            ExponentialProfileMeterVolts.State(0.562, 6.792),
+            ExponentialProfile.State(0.0, 8),
+            ExponentialProfile.State(1, 0),
+            ExponentialProfile.State(0.562, 6.792),
         ),
         ETestCase(
-            ExponentialProfileMeterVolts.State(0.0, 8),
-            ExponentialProfileMeterVolts.State(-1, 0),
-            ExponentialProfileMeterVolts.State(-0.785, -4.346),
+            ExponentialProfile.State(0.0, 8),
+            ExponentialProfile.State(-1, 0),
+            ExponentialProfile.State(-0.785, -4.346),
         ),
     ]
 
@@ -276,8 +274,8 @@ def test_heuristic(profile):
 
 
 def test_timing_to_current(profile):
-    goal = ExponentialProfileMeterVolts.State(2, 0)
-    state = ExponentialProfileMeterVolts.State(0, 0)
+    goal = ExponentialProfile.State(2, 0)
+    state = ExponentialProfile.State(0, 0)
 
     for _ in range(400):
         state = check_dynamics(profile, state, goal)
@@ -285,8 +283,8 @@ def test_timing_to_current(profile):
 
 
 def test_timing_to_goal(profile):
-    goal = ExponentialProfileMeterVolts.State(2, 0)
-    state = ExponentialProfileMeterVolts.State(0, 0)
+    goal = ExponentialProfile.State(2, 0)
+    state = ExponentialProfile.State(0, 0)
 
     predicted_time_left = profile.time_left_until(state, goal)
     reached_goal = False
@@ -302,8 +300,8 @@ def test_timing_to_goal(profile):
 
 
 def test_timing_to_negative_goal(profile):
-    goal = ExponentialProfileMeterVolts.State(-2, 0)
-    state = ExponentialProfileMeterVolts.State(0, 0)
+    goal = ExponentialProfile.State(-2, 0)
+    state = ExponentialProfile.State(0, 0)
 
     predicted_time_left = profile.time_left_until(state, goal)
     reached_goal = False

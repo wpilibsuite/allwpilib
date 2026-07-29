@@ -137,7 +137,14 @@ protected:
   }
   // Space after 'FirstEl' is clobbered, do not add any instance vars after it.
 
+#if __GNUC__ >= 16
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#pragma GCC diagnostic push
+#endif
   SmallVectorTemplateCommon(size_t Size) : Base(getFirstEl(), Size) {}
+#if __GNUC__ >= 16
+#pragma GCC diagnostic pop
+#endif
 
   void grow_pod(size_t MinSize, size_t TSize) {
     Base::grow_pod(getFirstEl(), MinSize, TSize);

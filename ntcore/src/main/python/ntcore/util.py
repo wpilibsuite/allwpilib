@@ -3,7 +3,13 @@ import weakref
 
 from typing import Callable, Dict, Optional, Sequence
 
-from ._ntcore import NetworkTableInstance, NetworkTableEntry, NetworkTableType, Value
+from ._ntcore import (
+    EventFlags,
+    NetworkTableInstance,
+    NetworkTableEntry,
+    NetworkTableType,
+    Value,
+)
 
 __all__ = ["ntproperty", "ChooserControl"]
 
@@ -176,14 +182,18 @@ class ChooserControl:
 
         self.on_choices = on_choices
         self.on_selected = on_selected
+        self._listener = None
 
         if on_choices or on_selected:
-            self.subtable.add_table_listener(self._on_change, True)
+            self._listener = self.subtable.add_listener(
+                EventFlags.IMMEDIATE | EventFlags.VALUE_ALL, self._on_change
+            )
 
     def close(self) -> None:
         """Stops listening for changes to the ``SendableChooser``"""
-        if self.on_choices or self.on_selected:
-            self.subtable.remove_table_listener(self._on_change)
+        if self._listener is not None:
+            self.subtable.remove_listener(self._listener)
+            self._listener = None
 
     def get_choices(self) -> Sequence[str]:
         """
@@ -209,7 +219,9 @@ class ChooserControl:
         """
         self.subtable.put_string("selected", selection)
 
-    def _on_change(self, table, key, value, is_new):
+    def _on_change(self, table, key, event):
+        value = event.data.value.value()
+
         if key == "options":
             if self.on_choices is not None:
                 self.on_choices(value)

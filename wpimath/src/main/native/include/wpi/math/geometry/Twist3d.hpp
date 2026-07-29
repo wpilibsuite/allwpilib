@@ -4,6 +4,12 @@
 
 #pragma once
 
+#include <Eigen/Core>
+#include <gcem.hpp>
+
+#include "wpi/math/geometry/Rotation3d.hpp"
+#include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/math/linalg/ct_matrix.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"

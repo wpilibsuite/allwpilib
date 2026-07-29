@@ -2,6 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <expected>
+
+#include <Eigen/Core>
+
 #include "wpi/math/linalg/DARE.hpp"
 
 template std::expected<Eigen::Matrix<double, 2, 2>, wpi::math::DAREError>

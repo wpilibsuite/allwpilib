@@ -6,6 +6,8 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/units/velocity.hpp"
+
 TEST(DifferentialDriveWheelVelocitiesTest, Plus) {
   const wpi::math::DifferentialDriveWheelVelocities left{1.0_mps, 0.5_mps};
   const wpi::math::DifferentialDriveWheelVelocities right{2.0_mps, 1.5_mps};

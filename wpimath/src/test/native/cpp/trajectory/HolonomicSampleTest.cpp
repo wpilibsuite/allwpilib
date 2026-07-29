@@ -26,7 +26,6 @@
 #include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
-#include "wpi/util/MathExtras.hpp"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)

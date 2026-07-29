@@ -22,21 +22,10 @@ public final class HAL extends JNIWrapper {
    * variables in a program MUST call this function in their constructors if they want to use other
    * HAL calls.
    *
-   * <p>The common parameters are 500 for timeout and 0 for mode.
-   *
-   * <p>This function is safe to call from any thread, and as many times as you wish. It internally
-   * guards from any reentrancy.
-   *
-   * <p>The applicable modes are: 0: Try to kill an existing HAL from another program, if not
-   * successful, error. 1: Force kill a HAL from another program. 2: Just warn if another hal exists
-   * and cannot be killed. Will likely result in undefined behavior.
-   *
-   * @param timeout the initialization timeout (ms)
-   * @param mode the initialization mode (see remarks)
    * @return true if initialization was successful, otherwise false.
    * @see "HAL_Initialize"
    */
-  public static native boolean initialize(int timeout, int mode);
+  public static native boolean initialize();
 
   /**
    * Call this to shut down HAL.
@@ -231,6 +220,40 @@ public final class HAL extends JNIWrapper {
    */
   public static void reportUsage(String resource, int instanceNumber, String data) {
     reportUsage(resource + "[" + instanceNumber + "]", data);
+  }
+
+  /**
+   * Publishes a version for a device on a CAN bus.
+   *
+   * @param busId bus containing the device
+   * @param deviceId device identifier
+   * @param name version name
+   * @param version version string
+   * @return status of the operation
+   */
+  public static int publishCanVersion(int busId, int deviceId, String name, String version) {
+    return UsageReportingJNI.publishCanVersion(busId, deviceId, name, version);
+  }
+
+  /**
+   * Publishes a version without a bus or device identifier.
+   *
+   * @param name version name
+   * @param version version string
+   * @return status of the operation
+   */
+  public static int publishVersion(String name, String version) {
+    return UsageReportingJNI.publishVersion(name, version);
+  }
+
+  /**
+   * Publishes the WPILib version.
+   *
+   * @param version WPILib version string
+   * @return status of the operation
+   */
+  public static int publishWpilibVersion(String version) {
+    return UsageReportingJNI.publishWpilibVersion(version);
   }
 
   private HAL() {}

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cstddef>
 #include <map>
 #include <stdexcept>
 #include <utility>

@@ -4,9 +4,11 @@
 
 #include "wpi/math/util/MathUtil.hpp"
 
+#include <cmath>
 #include <limits>
 #include <numbers>
 
+#include <Eigen/Core>
 #include <gtest/gtest.h>
 
 #include "wpi/math/geometry/Translation2d.hpp"

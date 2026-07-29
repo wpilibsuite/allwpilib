@@ -21,7 +21,7 @@ import org.wpilib.simulation.SteamControllerSim;
 class SteamControllerTest {
   @Test
   void testWrappedHID() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SteamController controller = new SteamController(2);
     SteamControllerSim sim = new SteamControllerSim(controller);
     sim.notifyNewData();
@@ -37,7 +37,7 @@ class SteamControllerTest {
   @EnumSource(value = SteamController.Button.class)
   void testButtons(SteamController.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SteamController joy = new SteamController(2);
     SteamControllerSim joysim = new SteamControllerSim(joy);
 
@@ -76,7 +76,7 @@ class SteamControllerTest {
   @EnumSource(value = SteamController.Axis.class)
   void testAxes(SteamController.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SteamController joy = new SteamController(2);
     SteamControllerSim joysim = new SteamControllerSim(joy);
 

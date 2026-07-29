@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <string>
 #include <type_traits>
 
 #include <gcem.hpp>
@@ -91,6 +92,8 @@ class WPILIB_DLLEXPORT PIDController
    *
    * Sets the proportional, integral, and differential coefficients.
    *
+   * This setter is intended for online tuning.
+   *
    * @param Kp The proportional coefficient. Must be >= 0.
    * @param Ki The integral coefficient. Must be >= 0.
    * @param Kd The differential coefficient. Must be >= 0.
@@ -104,6 +107,8 @@ class WPILIB_DLLEXPORT PIDController
   /**
    * Sets the proportional coefficient of the PID controller gain.
    *
+   * This setter is intended for online tuning.
+   *
    * @param Kp The proportional coefficient. Must be >= 0.
    */
   constexpr void SetP(double Kp) { m_Kp = Kp; }
@@ -111,12 +116,16 @@ class WPILIB_DLLEXPORT PIDController
   /**
    * Sets the integral coefficient of the PID controller gain.
    *
+   * This setter is intended for online tuning.
+   *
    * @param Ki The integral coefficient. Must be >= 0.
    */
   constexpr void SetI(double Ki) { m_Ki = Ki; }
 
   /**
    * Sets the differential coefficient of the PID controller gain.
+   *
+   * This setter is intended for online tuning.
    *
    * @param Kd The differential coefficient. Must be >= 0.
    */

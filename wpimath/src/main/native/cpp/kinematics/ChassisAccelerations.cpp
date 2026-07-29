@@ -4,6 +4,8 @@
 
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angular_acceleration.hpp"
 #include "wpi/util/json.hpp"
 
 void wpi::math::to_json(wpi::util::json& json,

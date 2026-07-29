@@ -8,6 +8,7 @@
 #include <concepts>
 #include <cstddef>
 
+#include <Eigen/Core>
 #include <Eigen/QR>
 
 #include "wpi/math/geometry/Rotation2d.hpp"
@@ -21,6 +22,13 @@
 #include "wpi/math/kinematics/SwerveModuleVelocity.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/base.hpp"
+#include "wpi/units/dimensionless.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/SymbolExports.hpp"

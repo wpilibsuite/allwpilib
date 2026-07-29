@@ -150,3 +150,36 @@ def test_chooser_control(nt: NetworkTableInstance):
 
     t.put_string_array("options", ("option1", "option2"))
     assert c.get_choices() == ["option1", "option2"]
+
+
+def test_chooser_control_callbacks(nt: NetworkTableInstance):
+    choices = []
+    selected = []
+
+    c = ChooserControl(
+        "Autonomous Mode",
+        on_choices=choices.append,
+        on_selected=selected.append,
+        inst=nt,
+    )
+
+    t = nt.get_table("/SmartDashboard/Autonomous Mode")
+    t.put_string("default", "option1")
+    nt.wait_for_listener_queue(1.0)
+
+    assert selected == ["option1"]
+
+    t.put_string_array("options", ("option1", "option2"))
+    t.put_string("selected", "option2")
+    nt.wait_for_listener_queue(1.0)
+
+    assert choices == [["option1", "option2"]]
+    assert selected == ["option1", "option2"]
+
+    c.close()
+    c.close()
+
+    t.put_string("selected", "option1")
+    nt.wait_for_listener_queue(1.0)
+
+    assert selected == ["option1", "option2"]

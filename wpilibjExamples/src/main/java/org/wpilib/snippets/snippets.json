@@ -193,7 +193,10 @@
     ],
     "foldername": "apriltagsvision",
     "gradlebase": "java",
-    "robotclass": "Robot"
+    "robotclass": "Robot",
+    "extravendordeps": [
+      "cameraserver"
+    ]
   },
   {
     "name": "PDP CAN Monitoring",
@@ -263,7 +266,10 @@
     ],
     "foldername": "httpcamera",
     "gradlebase": "java",
-    "robotclass": "Robot"
+    "robotclass": "Robot",
+    "extravendordeps": [
+      "cameraserver"
+    ]
   },
   {
     "name": "I2C Communication Sample",
@@ -285,7 +291,10 @@
     ],
     "foldername": "intermediatevision",
     "gradlebase": "java",
-    "robotclass": "Robot"
+    "robotclass": "Robot",
+    "extravendordeps": [
+      "cameraserver"
+    ]
   },
   {
     "name": "Motor Control",
@@ -319,7 +328,10 @@
     ],
     "foldername": "quickvision",
     "gradlebase": "java",
-    "robotclass": "Robot"
+    "robotclass": "Robot",
+    "extravendordeps": [
+      "cameraserver"
+    ]
   },
   {
     "name": "Solenoids",

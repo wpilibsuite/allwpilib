@@ -6,6 +6,11 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+
 TEST(Ellipse2dTest, FocalPoints) {
   constexpr wpi::math::Pose2d center{1_m, 2_m, 0_deg};
   constexpr wpi::math::Ellipse2d ellipse{center, 5_m, 4_m};

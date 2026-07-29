@@ -4,9 +4,13 @@
 
 #include "wpi/math/kinematics/SwerveModuleVelocity.hpp"
 
+#include <cmath>
+
 #include <gtest/gtest.h>
 
 #include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/velocity.hpp"
 
 static constexpr double kEpsilon = 1E-9;
 
