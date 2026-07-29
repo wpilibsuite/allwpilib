@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 /**
- * The WPILib networking module. This defines APIs for sending and receiving data over the robot
- * network for communication with coprocessors and the driver station.
+ * Defines APIs for sending and receiving data over the robot network for communication with
+ * coprocessors and the driver station.
  */
 open module wpilib.ntcore {
   requires wpilib.util;

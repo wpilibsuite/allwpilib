@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 /**
- * The WPILib cscore module. This defines APIs for connecting to and reading images from cameras
- * connected to the robot and for configuring those cameras.
+ * Defines APIs for connecting to and reading images from cameras connected to the robot and for
+ * configuring those cameras.
  */
 open module wpilib.cscore {
   requires org.opencv;

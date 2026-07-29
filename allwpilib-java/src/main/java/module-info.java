@@ -4,10 +4,10 @@
 
 /**
  * The WPILib module. This provides no APIs or libraries, but has transitive requirements for every
- * WPILib submodule, such as {@code wpilib.core} and {@link wpilib.math}. Robot programs can require
- * just the `wpilib` module to get access to all the WPILib APIs. Submodules that are distributed as
- * vendor deps - like the command framework - are <i>not</i> included, and must be required
- * separately.
+ * WPILib submodule, such as {@link wpilib.core} and {@link wpilib.math}. Robot programs can require
+ * just the {@code wpilib} module to get access to all the WPILib APIs. Submodules that are
+ * distributed as vendor deps - like the command frameworks - are <i>not</i> included, and must be
+ * required separately.
  *
  * <p>An example robot program's {@code module-info.java} file could look like this:
  *

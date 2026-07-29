@@ -4,6 +4,7 @@
 
 import javax.annotation.processing.Processor;
 
+/** Defines the Epilogue annotation processor module for compile-time telemetry code generation. */
 open module wpilib.epilogue.processor {
   requires java.compiler;
   requires jdk.compiler;

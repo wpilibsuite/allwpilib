@@ -3,9 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 /**
- * The WPILib HAL module. This defines APIs for interacting with hardware through the native C++
- * layer and JNI bindings. Most robot programs don't need to use this directly and should use the
- * {@code wpilib} module instead.
+ * Defines APIs for interacting with hardware through the native C++ layer and JNI bindings. Most
+ * robot programs don't need to use this directly and should use the {@code wpilib} module instead.
  */
 open module wpilib.hal {
   requires wpilib.util;

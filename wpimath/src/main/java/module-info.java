@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 /**
- * The WPILib math module. This defines APIs for geometry, kinematics, odometry, path planning,
- * control algorithms, and physics simulators for simple mechanisms.
+ * Defines APIs for geometry, kinematics, odometry, path planning, control algorithms, and physics
+ * simulators for simple mechanisms.
  */
 @SuppressWarnings("requires-transitive-automatic")
 open module wpilib.math {
