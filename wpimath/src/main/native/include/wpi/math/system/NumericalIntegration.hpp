@@ -128,8 +128,8 @@ T Tsit5(F&& f, T x, U u, wpi::units::second_t dt, double maxError = 1e-6) {
     T k6 = f(x + h * (A[4][0] * k1 + A[4][1] * k2 + A[4][2] * k3 + A[4][3] * k4 + A[4][4] * k5), u);
     // clang-format on
 
-    // Since the final row of A and the array b1 have the same coefficients
-    // and k7 has no effect on newX, we can reuse the calculation.
+    // Since the final row of A and the array b1 have the same coefficients and
+    // k7 has no effect on newX, we can reuse the calculation.
     T newX = x + h * (A[5][0] * k1 + A[5][1] * k2 + A[5][2] * k3 +
                       A[5][3] * k4 + A[5][4] * k5 + A[5][5] * k6);
     T k7 = f(newX, u);
@@ -148,8 +148,8 @@ T Tsit5(F&& f, T x, U u, wpi::units::second_t dt, double maxError = 1e-6) {
     if (truncationError == 0.0) {
       h = dt.value() - dtElapsed;
     } else {
-      h *= (std::min)(0.9 * std::pow(maxError / truncationError, 1.0 / 5.0),
-                      dt.value() - dtElapsed);
+      h = (std::min)(0.9 * h * std::pow(maxError / truncationError, 0.2),
+                     dt.value() - dtElapsed);
     }
   }
 
@@ -214,8 +214,8 @@ T Tsit5(F&& f, wpi::units::second_t t, T y, wpi::units::second_t dt,
     T k6 = f(t + wpi::units::second_t{h} * c[4], y + h * (A[4][0] * k1 + A[4][1] * k2 + A[4][2] * k3 + A[4][3] * k4 + A[4][4] * k5));
     // clang-format on
 
-    // Since the final row of A and the array b1 have the same coefficients
-    // and k7 has no effect on newY, we can reuse the calculation.
+    // Since the final row of A and the array b1 have the same coefficients and
+    // k7 has no effect on newY, we can reuse the calculation.
     T newY = y + h * (A[5][0] * k1 + A[5][1] * k2 + A[5][2] * k3 +
                       A[5][3] * k4 + A[5][4] * k5 + A[5][5] * k6);
     T k7 = f(t + wpi::units::second_t{h} * c[5], newY);
@@ -235,8 +235,8 @@ T Tsit5(F&& f, wpi::units::second_t t, T y, wpi::units::second_t dt,
     if (truncationError == 0.0) {
       h = dt.value() - dtElapsed;
     } else {
-      h *= (std::min)(0.9 * std::pow(maxError / truncationError, 1.0 / 5.0),
-                      dt.value() - dtElapsed);
+      h = (std::min)(0.9 * h * std::pow(maxError / truncationError, 0.2),
+                     dt.value() - dtElapsed);
     }
   }
 
