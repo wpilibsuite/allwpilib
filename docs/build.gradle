@@ -201,6 +201,8 @@ task generateJavaDocs(type: Javadoc) {
             "-org.wpilib.math.kinematics.struct," +
             "-org.wpilib.math.linalg.proto," +
             "-org.wpilib.math.linalg.struct," +
+            "-org.wpilib.math.shape.proto," +
+            "-org.wpilib.math.shape.struct," +
             "-org.wpilib.math.spline.proto," +
             "-org.wpilib.math.spline.struct," +
             "-org.wpilib.math.system.proto," +
