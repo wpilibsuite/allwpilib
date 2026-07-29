@@ -28,7 +28,7 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
   if (channel < 0 || channel >= kNumAddressableLEDs) {
     *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for AddressableLED", 0,
-                                       kNumAddressableLEDs, channel);
+                                       kNumAddressableLEDs - 1, channel);
     return HAL_INVALID_HANDLE;
   }
 
