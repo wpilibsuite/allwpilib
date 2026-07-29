@@ -9,6 +9,8 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import org.wpilib.command3.Command;
+import org.wpilib.command3.Mechanism;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.DriverStation;
@@ -17,6 +19,8 @@ import org.wpilib.driverstation.POVDirection;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.event.EventLoop;
 import org.wpilib.math.util.Pair;
+import org.wpilib.util.Color;
+import org.wpilib.util.Color8Bit;
 
 /**
  * A version of {@link GenericHID} with {@link Trigger} factories for command-based.
@@ -26,6 +30,8 @@ import org.wpilib.math.util.Pair;
 public final class CommandGenericHID {
   private static final Lock m_hidsLock = new ReentrantLock();
   private static final Map<Scheduler, CommandGenericHID[]> m_hids = new IdentityHashMap<>();
+
+  private static final Map<GenericHID, Mechanism[]> m_mechanisms = new IdentityHashMap<>();
 
   private final Scheduler m_scheduler;
   private final GenericHID m_hid;
@@ -45,8 +51,7 @@ public final class CommandGenericHID {
    * @param port The port index on the Driver Station that the device is plugged into.
    */
   public CommandGenericHID(Scheduler scheduler, int port) {
-    m_scheduler = scheduler;
-    m_hid = DriverStation.getGenericHID(port);
+    this(scheduler, DriverStation.getGenericHID(port));
   }
 
   /**
@@ -58,6 +63,49 @@ public final class CommandGenericHID {
   public CommandGenericHID(Scheduler scheduler, GenericHID hid) {
     m_scheduler = scheduler;
     m_hid = hid;
+
+    final var mechanisms =
+        m_mechanisms.computeIfAbsent(
+            hid,
+            _ ->
+                new Mechanism[] {
+                  new Mechanism() {
+                    @Override
+                    public String getName() {
+                      return "Controller " + m_hid.getPort() + " Left Rumble";
+                    }
+                  },
+                  new Mechanism() {
+                    @Override
+                    public String getName() {
+                      return "Controller " + m_hid.getPort() + " Right Rumble";
+                    }
+                  },
+                  new Mechanism() {
+                    @Override
+                    public String getName() {
+                      return "Controller " + m_hid.getPort() + " Left Trigger Rumble";
+                    }
+                  },
+                  new Mechanism() {
+                    @Override
+                    public String getName() {
+                      return "Controller " + m_hid.getPort() + " Right Trigger Rumble";
+                    }
+                  },
+                  new Mechanism() {
+                    @Override
+                    public String getName() {
+                      return "Controller " + m_hid.getPort() + " LED";
+                    }
+                  }
+                });
+
+    m_leftRumble = mechanisms[0];
+    m_rightRumble = mechanisms[1];
+    m_leftTriggerRumble = mechanisms[2];
+    m_rightTriggerRumble = mechanisms[3];
+    m_led = mechanisms[4];
   }
 
   /**
@@ -386,6 +434,141 @@ public final class CommandGenericHID {
    */
   public void setRumble(GenericHID.RumbleType type, double value) {
     m_hid.setRumble(type, value);
+  }
+
+  private Command rumble(
+      Mechanism mechanism, String name, GenericHID.RumbleType type, double value) {
+    return mechanism
+        .run(
+            coroutine -> {
+              setRumble(type, value);
+              coroutine.park();
+            })
+        .whenCanceled(() -> setRumble(type, 0))
+        .named(name);
+  }
+
+  // Rumble mutexes
+  private final Mechanism m_leftRumble;
+  private final Mechanism m_rightRumble;
+  private final Mechanism m_leftTriggerRumble;
+  private final Mechanism m_rightTriggerRumble;
+
+  /**
+   * Run the left rumble motor. On most controllers, this is the low-frequency motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the left rumble motor at the given value until interrupted.
+   */
+  public Command rumbleLeft(double value) {
+    return rumble(m_leftRumble, "Left Rumble", GenericHID.RumbleType.LEFT_RUMBLE, value);
+  }
+
+  /**
+   * Run the right rumble motor. On most controllers, this is the high-frequency motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the right rumble motor at the given value until interrupted.
+   */
+  public Command rumbleRight(double value) {
+    return rumble(m_rightRumble, "Right Rumble", GenericHID.RumbleType.RIGHT_RUMBLE, value);
+  }
+
+  /**
+   * Run both rumble motors.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the rumble motors at the given value until interrupted.
+   */
+  public Command rumbleBoth(double value) {
+    return Command.parallel(rumbleLeft(value), rumbleRight(value)).named("Both Rumble");
+  }
+
+  /**
+   * Run the left trigger rumble motor, on controllers that have one.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the left trigger rumble motor at the given value until
+   *     interrupted.
+   */
+  public Command rumbleLeftTrigger(double value) {
+    return rumble(
+        m_leftTriggerRumble,
+        "Left Trigger Rumble",
+        GenericHID.RumbleType.LEFT_TRIGGER_RUMBLE,
+        value);
+  }
+
+  /**
+   * Run the right trigger rumble motor, on controllers that have one.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the right trigger rumble motor at the given value until
+   *     interrupted.
+   */
+  public Command rumbleRightTrigger(double value) {
+    return rumble(
+        m_rightTriggerRumble,
+        "Right Trigger Rumble",
+        GenericHID.RumbleType.RIGHT_TRIGGER_RUMBLE,
+        value);
+  }
+
+  /**
+   * Run both trigger rumble motors, on controllers that have them.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run both trigger rumble motors at the given value until
+   *     interrupted.
+   */
+  public Command rumbleTriggers(double value) {
+    return Command.parallel(rumbleLeftTrigger(value), rumbleRightTrigger(value))
+        .named("Both Trigger Rumble");
+  }
+
+  // LED mutex
+  private final Mechanism m_led;
+
+  /**
+   * Set the LEDs, on controllers that have them. If only mono is supported, the system will use the
+   * highest value passed in.
+   *
+   * @param r The red value (0-255)
+   * @param g The green value (0-255)
+   * @param b The blue value (0-255)
+   * @return A command that will set the LEDs to the given values until interrupted.
+   */
+  public Command setLeds(int r, int g, int b) {
+    return m_led
+        .run(
+            coroutine -> {
+              m_hid.setLeds(r, g, b);
+              coroutine.park();
+            })
+        .whenCanceled(() -> m_hid.setLeds(0, 0, 0))
+        .named("Set LED (" + r + ", " + g + ", " + b + ")");
+  }
+
+  /**
+   * Set the LEDs, on controllers that have them. If only mono is supported, the system will use the
+   * highest value passed in.
+   *
+   * @param color The color to use.
+   * @return A command that will set the LEDs to the given values until interrupted.
+   */
+  public Command setLeds(Color color) {
+    return setLeds((int) (color.red * 255), (int) (color.green * 255), (int) (color.blue * 255));
+  }
+
+  /**
+   * Set the LEDs, on controllers that have them. If only mono is supported, the system will use the
+   * highest value passed in.
+   *
+   * @param color The color to use.
+   * @return A command that will set the LEDs to the given values until interrupted.
+   */
+  public Command setLeds(Color8Bit color) {
+    return setLeds(color.red, color.green, color.blue);
   }
 
   /**

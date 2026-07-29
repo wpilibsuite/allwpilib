@@ -6,6 +6,7 @@
 
 package org.wpilib.command3.button;
 
+import org.wpilib.command3.Command;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.NiDsStadiaController;
@@ -455,5 +456,35 @@ public class CommandNiDsStadiaController {
    */
   public double getRightY() {
     return m_controller.getRightY();
+  }
+
+  /**
+   * Run the left rumble motor. On most controllers, this is the low-frequency motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the left rumble motor at the given value until interrupted.
+   */
+  public Command rumbleLeft(double value) {
+    return m_hid.rumbleLeft(value);
+  }
+
+  /**
+   * Run the right rumble motor. On most controllers, this is the high-frequency motor.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the right rumble motor at the given value until interrupted.
+   */
+  public Command rumbleRight(double value) {
+    return m_hid.rumbleRight(value);
+  }
+
+  /**
+   * Run both rumble motors.
+   *
+   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return A command that will run the rumble motors at the given value until interrupted.
+   */
+  public Command rumbleBoth(double value) {
+    return m_hid.rumbleBoth(value);
   }
 }

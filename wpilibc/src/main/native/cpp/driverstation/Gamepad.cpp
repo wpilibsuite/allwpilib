@@ -581,8 +581,18 @@ int Gamepad::GetPort() const {
   return m_hid->GetPort();
 }
 
-void Gamepad::SetLeds(int r, int g, int b) {
+void Gamepad::SetLeds(const int r, const int g, const int b) const {
   m_hid->SetLeds(r, g, b);
+}
+
+void Gamepad::SetLeds(const util::Color& color) const {
+  SetLeds(static_cast<int>(color.red * 255),
+          static_cast<int>(color.green * 255),
+          static_cast<int>(color.blue * 255));
+}
+
+void Gamepad::SetLeds(const util::Color8Bit& color) const {
+  SetLeds(color.red, color.green, color.blue);
 }
 
 void Gamepad::SetRumble(GenericHID::RumbleType type, double value) {

@@ -12,6 +12,7 @@
 #include "wpi/driverstation/POVDirection.hpp"
 #include "wpi/driverstation/TouchpadFinger.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
+#include "wpi/util/Color8Bit.hpp"
 
 namespace wpi {
 
@@ -379,14 +380,30 @@ class GenericHID final : public HIDDevice {
   int GetPort() const;
 
   /**
-   * Set leds on the controller. If only mono is supported, the system will use
-   * the highest value passed in.
+   * Set the LEDs, for controllers that have them. If only mono is supported,
+   * the system will use the highest value passed in.
    *
    * @param r Red value from 0-255
    * @param g Green value from 0-255
    * @param b Blue value from 0-255
    */
-  void SetLeds(int r, int g, int b);
+  void SetLeds(int r, int g, int b) const;
+
+  /**
+   * Set the LEDs, for controllers that have them. If only mono is supported,
+   * the system will use the highest value passed in.
+   *
+   * @param color The color to use.
+   */
+  void SetLeds(const util::Color& color) const;
+
+  /**
+   * Set the LEDs, for controllers that have them. If only mono is supported,
+   * the system will use the highest value passed in.
+   *
+   * @param color The color to use.
+   */
+  void SetLeds(const util::Color8Bit& color) const;
 
   /**
    * Set the rumble output for the HID.

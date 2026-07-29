@@ -114,3 +114,14 @@ double CommandNiDsPS5Controller::GetL2Axis() const {
 double CommandNiDsPS5Controller::GetR2Axis() const {
   return m_controller.GetR2Axis();
 }
+CommandPtr CommandNiDsPS5Controller::RumbleLeft(const double value) const {
+  return m_hid->RumbleLeft(value);
+}
+
+CommandPtr CommandNiDsPS5Controller::RumbleRight(const double value) const {
+  return m_hid->RumbleRight(value);
+}
+
+CommandPtr CommandNiDsPS5Controller::RumbleBoth(const double value) const {
+  return m_hid->RumbleBoth(value);
+}

@@ -61,7 +61,6 @@ class SubsystemBase : public Subsystem,
    */
   void AddChild(std::string name, wpi::util::Sendable* child);
 
- protected:
   /**
    * Constructor.  Telemetry/log name defaults to the classname.
    */
