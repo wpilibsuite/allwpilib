@@ -103,8 +103,7 @@ public final class DriverStationDisplay {
 
     if (captionText.isBlank()) {
       addKeyedLine(captionText, lineText);
-    }
-    else {
+    } else {
       addKeyedLine(captionText, captionText + " : " + lineText);
     }
   }
@@ -167,8 +166,8 @@ public final class DriverStationDisplay {
   /**
    * Adds an uncaptioned display line in line mode.
    *
-   * <p>This is equivalent to calling {@link #addKeyedLine(String, String)} with an empty key,
-   * which always appends a new line.
+   * <p>This is equivalent to calling {@link #addKeyedLine(String, String)} with an empty key, which
+   * always appends a new line.
    *
    * @param line Line contents.
    */
