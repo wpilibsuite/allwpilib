@@ -100,10 +100,9 @@ class TwoDeadWheelPoseEstimator {
    *     less.
    */
   TwoDeadWheelPoseEstimator(
-      wpi::units::meter_t xWheelYPos,
-      wpi::units::meter_t yWheelXPos, wpi::units::meter_t xWheelPos,
-      wpi::units::meter_t yWheelPos, const Rotation2d& gyroAngle,
-      const Pose2d& initialPose,
+      wpi::units::meter_t xWheelYPos, wpi::units::meter_t yWheelXPos,
+      wpi::units::meter_t xWheelPos, wpi::units::meter_t yWheelPos,
+      const Rotation2d& gyroAngle, const Pose2d& initialPose,
       const wpi::util::array<double, 3>& stateStdDevs,
       const wpi::util::array<double, 3>& visionMeasurementStdDevs)
       : m_odometry{xWheelYPos, yWheelXPos, xWheelPos,
@@ -157,8 +156,8 @@ class TwoDeadWheelPoseEstimator {
    * @param pose The new position of the robot on the field.
    */
   void ResetPosition(wpi::units::meter_t xWheelPos,
-                     wpi::units::meter_t yWheelPos,
-                     const Rotation2d& gyroAngle, const Pose2d& pose) {
+                     wpi::units::meter_t yWheelPos, const Rotation2d& gyroAngle,
+                     const Pose2d& pose) {
     // Reset state estimate and error covariance
     m_odometry.ResetPosition(xWheelPos, yWheelPos, gyroAngle, pose);
     m_odometryPoseBuffer.Clear();
@@ -429,8 +428,7 @@ class TwoDeadWheelPoseEstimator {
    * be offset to match the robot's orientation on the field.
    * @return The updated pose.
    */
-  Pose2d Update(wpi::units::meter_t xWheelPos,
-                wpi::units::meter_t yWheelPos,
+  Pose2d Update(wpi::units::meter_t xWheelPos, wpi::units::meter_t yWheelPos,
                 const Rotation2d& gyroAngle) {
     return UpdateWithTime(wpi::math::MathSharedStore::GetTimestamp(), xWheelPos,
                           yWheelPos, gyroAngle);

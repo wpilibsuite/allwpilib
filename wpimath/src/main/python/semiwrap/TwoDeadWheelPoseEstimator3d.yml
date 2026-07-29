@@ -3,9 +3,8 @@ classes:
     methods:
       TwoDeadWheelPoseEstimator3d:
         overloads:
-          ? const wpi::units::meter_t, const wpi::units::meter_t, const wpi::units::meter_t, const wpi::units::meter_t, const Rotation3d&, const Pose3d&, const wpi::util::array<double, 4>&, const wpi::util::array<double, 4>&
-          :
-          ? const wpi::units::meter_t, const wpi::units::meter_t, const wpi::units::meter_t, const wpi::units::meter_t, const Rotation3d&, const Pose3d&
+          wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, const Rotation3d&, const Pose3d&:
+          ? wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, const Rotation3d&, const Pose3d&, const wpi::util::array<double, 4>&, const wpi::util::array<double, 4>&
           :
       SetVisionMeasurementStdDevs:
       ResetPosition:

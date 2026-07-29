@@ -63,8 +63,8 @@ class TwoDeadWheelOdometry3d {
    * @param pose The new position of the robot on the field.
    */
   void ResetPosition(wpi::units::meter_t xWheelPos,
-                     wpi::units::meter_t yWheelPos,
-                     const Rotation3d& gyroAngle, const Pose3d& pose) {
+                     wpi::units::meter_t yWheelPos, const Rotation3d& gyroAngle,
+                     const Pose3d& pose) {
     m_previousGyroAngle = gyroAngle;
     m_previousXWheelPos = xWheelPos;
     m_previousYWheelPos = yWheelPos;
@@ -140,7 +140,8 @@ class TwoDeadWheelOdometry3d {
   }
 
   /**
-   * Converts measured wheel velocities to chassis velocities using inverse kinematics.
+   * Converts measured wheel velocities to chassis velocities using inverse
+   * kinematics.
    *
    * @param vx The velocity of the forward-facing wheel.
    * @param vy The velocity of the sideways-facing wheel.
@@ -148,8 +149,7 @@ class TwoDeadWheelOdometry3d {
    * @return The velocity of the chassis.
    */
   ChassisVelocities ToChassisVelocities(
-      wpi::units::meters_per_second_t vx,
-      wpi::units::meters_per_second_t vy,
+      wpi::units::meters_per_second_t vx, wpi::units::meters_per_second_t vy,
       wpi::units::radians_per_second_t omega) const {
     return {vx + m_xWheelYPos * omega / 1_rad,
             vy - m_yWheelXPos * omega / 1_rad, omega};
