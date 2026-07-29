@@ -64,7 +64,6 @@ model {
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-            lib library: pluginName, linkage: 'shared'
         }
     }
 }
