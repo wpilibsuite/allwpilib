@@ -83,7 +83,7 @@ cmake_dependent_option(
     WPILIB_WITH_FIELDS
     "Build the fields target"
     OFF
-    WPILIB_WITH_GUI
+    NOT WPILIB_WITH_GUI
     ON
 )
 option(WPILIB_WITH_GUI "Build GUI items (needs SDL3)" OFF)
