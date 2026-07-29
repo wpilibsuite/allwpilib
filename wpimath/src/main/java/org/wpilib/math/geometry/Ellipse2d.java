@@ -12,8 +12,8 @@ import java.util.Objects;
 import org.wpilib.math.geometry.proto.Ellipse2dProto;
 import org.wpilib.math.geometry.struct.Ellipse2dStruct;
 import org.wpilib.math.optimization.Problem;
-import org.wpilib.math.util.Pair;
 import org.wpilib.units.measure.Distance;
+import org.wpilib.util.Pair;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
