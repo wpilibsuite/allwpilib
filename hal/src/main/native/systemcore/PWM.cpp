@@ -32,7 +32,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
 
   if (channel < 0 || channel >= kNumSmartIo) {
     *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
-                                       "Invalid Index for PWM", 0, 
+                                       "Invalid Index for PWM", 0,
                                        kNumSmartIo - 1, channel);
     return HAL_INVALID_HANDLE;
   }
