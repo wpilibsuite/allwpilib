@@ -11,6 +11,7 @@
 #include <imgui.h>
 
 #include "wpi/glass/Context.hpp"
+#include "wpi/glass/ContextInternal.hpp"
 #include "wpi/glass/MainMenuBar.hpp"
 #include "wpi/glass/Storage.hpp"
 #include "wpi/glass/View.hpp"
@@ -23,6 +24,7 @@
 #include "wpi/gui/wpigui_openurl.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/StringExtras.hpp"
+#include "wpi/util/timestamp.hpp"
 
 namespace gui = wpi::gui;
 
@@ -58,6 +60,34 @@ static int* gEnterKey;
 static int* gEnterScancode;
 static bool gNetworkTablesDebugLog = false;
 static unsigned int gPrevMode = NT_NET_MODE_NONE;
+
+static void DisplayTimestampMenu() {
+  if (ImGui::BeginMenu("Timestamp Display")) {
+    auto ctx = wpi::glass::gContext;
+    wpi::glass::TimestampDisplayMode mode = ctx->timestampDisplayMode;
+    bool selected = mode == wpi::glass::TimestampDisplayMode::LOCAL;
+    if (ImGui::MenuItem("Local Time", nullptr, &selected)) {
+      ctx->timestampDisplayMode = wpi::glass::TimestampDisplayMode::LOCAL;
+      ctx->timestampDisplayModeStorage =
+          wpi::glass::TIMESTAMP_DISPLAY_MODE_LOCAL;
+    }
+    selected = mode == wpi::glass::TimestampDisplayMode::SERVER;
+    if (ImGui::MenuItem("Server Time", nullptr, &selected)) {
+      ctx->timestampDisplayMode = wpi::glass::TimestampDisplayMode::SERVER;
+      ctx->timestampDisplayModeStorage =
+          wpi::glass::TIMESTAMP_DISPLAY_MODE_SERVER;
+    }
+    selected = mode == wpi::glass::TimestampDisplayMode::SERVER_ZERO_START;
+    if (ImGui::MenuItem("Server Time (Program Start = 0)", nullptr,
+                        &selected)) {
+      ctx->timestampDisplayMode =
+          wpi::glass::TimestampDisplayMode::SERVER_ZERO_START;
+      ctx->timestampDisplayModeStorage =
+          wpi::glass::TIMESTAMP_DISPLAY_MODE_SERVER_ZERO_START;
+    }
+    ImGui::EndMenu();
+  }
+}
 
 static void RemapEnterKeyEvent(SDL_Event& event) {
   if (event.type != SDL_EVENT_KEY_DOWN && event.type != SDL_EVENT_KEY_UP) {
@@ -235,7 +265,11 @@ int main(int argc, char** argv) {
   wpi::glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
                                             : saveDir);
   gPlotProvider->GlobalInit();
-  gui::AddInit([] { wpi::glass::ResetTime(); });
+  gui::AddInit([] {
+    auto ctx = wpi::glass::gContext;
+    ctx->timestampDisplayStartTime = wpi::util::Now();
+    ctx->timestampDisplayStartTimeOverride = true;
+  });
   gNtProvider->GlobalInit();
   NtInitialize();
 
@@ -245,11 +279,9 @@ int main(int argc, char** argv) {
 
   gMainMenu.AddMainMenu([] {
     if (ImGui::BeginMenu("View")) {
+      DisplayTimestampMenu();
       if (ImGui::MenuItem("Set Enter Key")) {
         gSetEnterKey = true;
-      }
-      if (ImGui::MenuItem("Reset Time")) {
-        wpi::glass::ResetTime();
       }
       ImGui::EndMenu();
     }

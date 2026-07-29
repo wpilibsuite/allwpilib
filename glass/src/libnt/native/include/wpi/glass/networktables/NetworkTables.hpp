@@ -4,9 +4,12 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <functional>
 #include <map>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -186,6 +189,8 @@ class NetworkTablesModel : public Model {
   void RebuildTree();
   void RebuildTreeImpl(std::vector<TreeNode>* tree, int category);
   void UpdateClients(std::span<const uint8_t> data);
+  void UpdateProgramStartTime(const wpi::nt::Value& value);
+  void ApplyServerTime();
 
   wpi::nt::NetworkTableInstance m_inst;
   wpi::nt::NetworkTableListenerPoller m_poller;
@@ -201,6 +206,8 @@ class NetworkTablesModel : public Model {
 
   std::map<std::string, Client, std::less<>> m_clients;
   Client m_server;
+  std::optional<int64_t> m_serverProgramStartTime;
+  std::optional<int64_t> m_serverTimeOffset;
 
   wpi::util::StructDescriptorDatabase m_structDb;
   upb_DefPool* m_protoPool = upb_DefPool_New();
