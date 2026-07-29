@@ -6,6 +6,7 @@
 
 #include <cctype>
 #include <cstdint>
+#include <format>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -59,46 +60,54 @@ void DriverStationDisplay::SetMode(Mode mode) {
   }
 }
 
-void DriverStationDisplay::AddData(std::string_view caption,
-                                   std::string_view line) {
+static bool IsBlank(std::string_view s) {
+  for (char ch : s) {
+    if (!std::isspace(static_cast<unsigned char>(ch))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void DriverStationDisplay::AddKeyedLine(std::string_view key,
+                                        std::string_view line) {
   auto& storage = GetDisplayStorage();
   std::scoped_lock lock(storage.mutex);
   if (storage.rawMode) {
     return;
   }
 
-  bool hasCaption = false;
-  for (char ch : caption) {
-    if (!std::isspace(static_cast<unsigned char>(ch))) {
-      hasCaption = true;
-      break;
-    }
-  }
-  if (!hasCaption) {
+  if (IsBlank(key)) {
     storage.lines.emplace_back(line);
     return;
   }
 
-  std::string text{caption};
-  text += " : ";
-  text += line;
-
   uint32_t lineNum;
-  auto it = storage.lineMap.find(caption);
+  auto it = storage.lineMap.find(key);
   if (it == storage.lineMap.end()) {
     lineNum = storage.lines.size();
-    storage.lineMap[caption] = lineNum;
-    storage.lines.emplace_back(std::move(text));
+    storage.lineMap[key] = lineNum;
+    storage.lines.emplace_back(line);
   } else {
     lineNum = it->second;
     if (lineNum < storage.lines.size()) {
-      storage.lines[lineNum] = std::move(text);
+      storage.lines[lineNum] = line;
     }
   }
 }
 
+void DriverStationDisplay::AddData(std::string_view caption,
+                                   std::string_view line) {
+  if (IsBlank(caption)) {
+    AddKeyedLine(caption, line);
+    return;
+  }
+
+  AddKeyedLine(caption, std::format("{} : {}", caption, line));
+}
+
 void DriverStationDisplay::AddLine(std::string_view line) {
-  AddData({}, line);
+  AddKeyedLine({}, line);
 }
 
 void DriverStationDisplay::UpdateLines() {

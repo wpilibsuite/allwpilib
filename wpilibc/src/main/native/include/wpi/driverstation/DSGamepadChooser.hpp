@@ -227,6 +227,7 @@ class DSGamepadChooser {
   Gamepad* m_gamepad;
   std::vector<std::unique_ptr<GamepadSelectable>> m_selectables;
   std::unordered_map<std::string, GamepadSelectable*> m_selectableMap;
+  std::string m_captionPrefix;
   int m_selectedSelectable = 0;
 };
 

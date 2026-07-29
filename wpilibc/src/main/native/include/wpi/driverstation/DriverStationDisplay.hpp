@@ -36,13 +36,26 @@ class DriverStationDisplay final {
   static void SetMode(Mode mode);
 
   /**
+   * Adds display data in line mode, keyed by an identifier that is not
+   * displayed.
+   *
+   * Repeated calls with the same key before UpdateLines() replace the
+   * previous line. The key is used only to identify the line for
+   * replacement and is not displayed. Empty or whitespace-only keys always
+   * append a new line.
+   *
+   * @param key Line key.
+   * @param line Line contents.
+   */
+  static void AddKeyedLine(std::string_view key, std::string_view line);
+
+  /**
    * Adds display data in line mode.
    *
    * Repeated calls with the same caption before UpdateLines() replace the
-   * previous line. The caption is used to identify the line and is
-   * displayed before the line contents, separated by " : ". Empty or
-   * whitespace-only captions always append a new line and are not
-   * displayed.
+   * previous line. The caption is displayed before the line contents,
+   * separated by " : ". Empty or whitespace-only captions always append a
+   * new line and are not displayed.
    *
    * @param caption Line caption.
    * @param line Line contents.
@@ -52,8 +65,8 @@ class DriverStationDisplay final {
   /**
    * Adds an uncaptioned display line in line mode.
    *
-   * This is equivalent to calling AddData() with an empty caption, which always
-   * appends a new line.
+   * This is equivalent to calling AddKeyedLine() with an empty key, which
+   * always appends a new line.
    *
    * @param line Line contents.
    */
