@@ -426,7 +426,7 @@ public final class ProtobufRectangle2d extends ProtoMessage<ProtobufRectangle2d>
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return ProtobufGeometry2dDescriptor.wpi_proto_ProtobufRectangle2d_descriptor;
+    return ProtobufShapeDescriptor.wpi_proto_ProtobufRectangle2d_descriptor;
   }
 
   private enum ProtobufRectangle2dFactory implements MessageFactory<ProtobufRectangle2d> {
