@@ -144,8 +144,8 @@ int32_t WPI_GetAlertLevel(WPI_AlertHandle alertHandle, int32_t* level);
 /**
  * Gets the number of alerts. Note: this is not guaranteed to be consistent
  * with the number of alerts returned by WPI_GetAlerts, so the latter's
- * return value should be used to determine how many alerts were actually filled
- * in.
+ * return value and the supplied capacity should be used to determine how many
+ * alerts were actually filled in.
  *
  * @return the number of alerts
  */
@@ -157,7 +157,8 @@ int32_t WPI_GetNumAlerts(void);
  * @param arr array of information to be filled
  * @param length length of arr
  * @return Number of alerts; note: may be larger or smaller than passed-in
- * length
+ * length. The number of elements filled in arr is the lesser of this return
+ * value and length.
  */
 int32_t WPI_GetAlerts(struct WPI_AlertInfo* arr, int32_t length);
 
@@ -165,7 +166,9 @@ int32_t WPI_GetAlerts(struct WPI_AlertInfo* arr, int32_t length);
  * Frees an array of alert information returned by WPI_GetAlerts.
  *
  * @param arr array to free
- * @param length number of alerts in arr (as returned by WPI_GetAlerts)
+ * @param length number of initialized alerts in arr; this must be no larger
+ * than the capacity passed to WPI_GetAlerts. If WPI_GetAlerts returned a value
+ * larger than that capacity, pass the capacity instead.
  */
 void WPI_FreeAlerts(struct WPI_AlertInfo* arr, int32_t length);
 
