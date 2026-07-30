@@ -13,7 +13,7 @@ import org.wpilib.hardware.hal.HAL;
 class EncoderTest {
   @Test
   void testDecodingScaleFactorUsesHal() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (Encoder x1 = new Encoder(0, 1, false, Encoder.EncodingType.X1);
         Encoder x2 = new Encoder(2, 3, false, Encoder.EncodingType.X2);

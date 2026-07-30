@@ -18,7 +18,7 @@ import org.wpilib.simulation.SimHooks;
 class TimerTest {
   @BeforeEach
   void setup() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SimHooks.pauseTiming();
     SimHooks.restartTiming();
   }
@@ -132,5 +132,22 @@ class TimerTest {
     SimHooks.stepTiming(0.5);
     double end = Timer.getMonotonicTimestamp();
     assertEquals(start + 0.5, end, 1e-9);
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void restartTimingPreservesPausedClockTest() {
+    assertTrue(SimHooks.isTimingPaused());
+
+    SimHooks.stepTiming(0.5);
+    double beforeRestart = Timer.getMonotonicTimestamp();
+
+    SimHooks.restartTiming();
+
+    assertTrue(SimHooks.isTimingPaused());
+    assertEquals(beforeRestart, Timer.getMonotonicTimestamp(), 1e-9);
+
+    SimHooks.stepTiming(0.5);
+    assertEquals(beforeRestart + 0.5, Timer.getMonotonicTimestamp(), 1e-9);
   }
 }

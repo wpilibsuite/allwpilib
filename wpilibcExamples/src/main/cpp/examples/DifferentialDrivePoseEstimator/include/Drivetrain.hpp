@@ -151,7 +151,6 @@ class Drivetrain {
   // Gains are for example purposes only - must be determined for your own
   // robot!
   wpi::math::DifferentialDrivePoseEstimator poseEstimator{
-      kinematics,
       imu.GetRotation2d(),
       wpi::units::meter_t{leftEncoder.GetDistance()},
       wpi::units::meter_t{rightEncoder.GetDistance()},

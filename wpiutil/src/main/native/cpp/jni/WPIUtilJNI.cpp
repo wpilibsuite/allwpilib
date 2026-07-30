@@ -135,6 +135,7 @@ Java_org_wpilib_util_WPIUtilJNI_enableMockTime
                    "WPIUtil: Mocking time is not available on systemcore\n");
 #else
   mockTimeEnabled = true;
+  mockNow = 0;
   wpi::util::SetNowImpl([] { return mockNow; });
 #endif
 }
@@ -178,6 +179,18 @@ Java_org_wpilib_util_WPIUtilJNI_now
   } else {
     return wpi::util::Now();
   }
+}
+
+/*
+ * Class:     org_wpilib_util_WPIUtilJNI
+ * Method:    getProgramStartTime
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL
+Java_org_wpilib_util_WPIUtilJNI_getProgramStartTime
+  (JNIEnv*, jclass)
+{
+  return wpi::util::GetProgramStartTime();
 }
 
 /*

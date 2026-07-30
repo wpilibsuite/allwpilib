@@ -24,7 +24,7 @@ class IntakeTest {
 
   @BeforeEach // this method will run before each test
   void setup() {
-    assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
+    assert HAL.initialize(); // initialize the HAL, crash if failed
     intake = new Intake(); // create our intake
     simMotor =
         new PWMMotorControllerSim(

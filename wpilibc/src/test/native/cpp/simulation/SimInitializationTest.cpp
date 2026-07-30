@@ -22,7 +22,7 @@
 using namespace wpi::sim;
 
 TEST(SimInitializationTest, AllInitialize) {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   AnalogInputSim aisim{0};
   EXPECT_THROW(DigitalPWMSim::CreateForChannel(0), std::out_of_range);
   DIOSim diosim{0};

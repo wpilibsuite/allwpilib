@@ -21,7 +21,7 @@ import org.wpilib.simulation.SwitchN64ControllerSim;
 class SwitchN64ControllerTest {
   @Test
   void testWrappedHID() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SwitchN64Controller controller = new SwitchN64Controller(2);
     SwitchN64ControllerSim sim = new SwitchN64ControllerSim(controller);
     sim.notifyNewData();
@@ -37,7 +37,7 @@ class SwitchN64ControllerTest {
   @EnumSource(value = SwitchN64Controller.Button.class)
   void testButtons(SwitchN64Controller.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SwitchN64Controller joy = new SwitchN64Controller(2);
     SwitchN64ControllerSim joysim = new SwitchN64ControllerSim(joy);
 
@@ -76,7 +76,7 @@ class SwitchN64ControllerTest {
   @EnumSource(value = SwitchN64Controller.Axis.class)
   void testAxes(SwitchN64Controller.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SwitchN64Controller joy = new SwitchN64Controller(2);
     SwitchN64ControllerSim joysim = new SwitchN64ControllerSim(joy);
 
