@@ -23,6 +23,15 @@ struct AlertData {
   AlertData(MRC_AlertHandle handle, uint8_t generation)
       : mrcHandle{handle}, generation{generation} {}
 
+  AlertData(const AlertData&) = delete;
+  AlertData& operator=(const AlertData&) = delete;
+
+  ~AlertData() {
+    if (mrcHandle) {
+      (void)MRC_Alert_DestroyAlert(mrcHandle);
+    }
+  }
+
   explicit operator bool() const { return mrcHandle != nullptr; }
 
   MRC_AlertHandle mrcHandle = nullptr;
@@ -145,7 +154,6 @@ static int32_t MrcLibCreateAlert(const struct WPI_String* group,
       std::make_shared<AlertData>(mrcHandle, generation));
   if (index > ALERT_INDEX_MASK) {
     manager.alerts.erase(index);
-    (void)MRC_Alert_DestroyAlert(mrcHandle);
     *handle = WPI_INVALID_HANDLE;
     return ALERT_ERROR;
   }
@@ -158,8 +166,6 @@ static void MrcLibDestroyAlert(WPI_AlertHandle alertHandle) {
   if (!alert) {
     return;
   }
-
-  (void)MRC_Alert_DestroyAlert(alert->mrcHandle);
 }
 
 static int32_t MrcLibSetAlertActive(WPI_AlertHandle alertHandle,
@@ -307,14 +313,6 @@ static void MrcLibFreeAlerts(WPI_AlertInfo* arr, int32_t length) {
 static void MrcLibResetAlertData() {
   auto& manager = GetManager();
   std::scoped_lock lock{manager.mutex};
-  // Enumerate through the alerts and destroy them in MRC, then clear the
-  // vector.
-  for (size_t i = 0; i < manager.alerts.size(); ++i) {
-    const auto& alert = manager.alerts[i];
-    if (alert) {
-      MRC_Alert_DestroyAlert(alert->mrcHandle);
-    }
-  }
   manager.alerts.clear();
 }
 
