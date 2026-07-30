@@ -3,11 +3,17 @@ description: Setup, build, and test with CMake
 
 inputs:
   shell:
+    description: The shell to use for configure, build, and test steps
     required: true
   configure-flags:
+    description: Flags to pass to the CMake configure command
     required: false
   cc:
+    description: Compiler to install (Arch Linux only)
     required: false
+  cmake-version:
+    description: CMake version to install (Windows only)
+    required: true
   artifactory-username:
     required: true
   artifactory-password:
@@ -22,14 +28,15 @@ runs:
       run: |
           # Arch Linux
           if command -v pacman >/dev/null 2>&1; then
-            pacman -Syu --noconfirm opencv ninja avahi cmake sccache \
-              jdk25-openjdk ${{ inputs.cc }} xorg-xrandr libxinerama
+            pacman -Syu --noconfirm avahi cmake ${{ inputs.cc }} jdk25-openjdk \
+              libxinerama ninja opencv sccache xorg-xrandr
           # Debian
           elif command -v apt >/dev/null 2>&1; then
-            sudo apt-get update && sudo apt-get install -y libopencv-dev ninja-build
+            sudo apt-get update
+            sudo apt-get install -y libopencv-dev ninja-build
           # macOS
           else
-            brew install opencv ninja
+            brew install ninja opencv
           fi
 
     - name: Setup avahi-daemon
@@ -41,12 +48,6 @@ runs:
           dbus-daemon --system --address=unix:path=/var/run/dbus/system_bus_socket
           avahi-daemon -D
 
-    - name: Setup Latest Xcode (macOS)
-      if: runner.os == 'macOS'
-      uses: maxim-lobanov/setup-xcode@v1
-      with:
-          xcode-version: latest
-
     - uses: TheMrMilchmann/setup-msvc-dev@v4
       if: runner.os == 'Windows'
       with:
@@ -55,6 +56,8 @@ runs:
     - name: Install CMake (Windows)
       if: runner.os == 'Windows'
       uses: lukka/get-cmake@latest
+      with:
+        cmakeVersion: ${{ inputs.cmake-version }}
 
     - name: Install sccache
       uses: mozilla-actions/sccache-action@v0.0.10
