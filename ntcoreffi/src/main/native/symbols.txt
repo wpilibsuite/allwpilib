@@ -260,6 +260,7 @@ WPI_DestroySemaphore
 WPI_DestroySignalObject
 WPI_FreeString
 WPI_FreeStringArray
+WPI_GetProgramStartTime
 WPI_GetSystemTime
 WPI_InitString
 WPI_InitStringWithLength

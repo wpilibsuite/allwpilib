@@ -16,6 +16,7 @@
 class Robot : public wpi::TimedRobot {
  public:
   Robot() {
+    wpi::CameraServer::Initialize();
 #if defined(__linux__) || defined(_WIN32)
     wpi::CameraServer::StartAutomaticCapture();
 #else

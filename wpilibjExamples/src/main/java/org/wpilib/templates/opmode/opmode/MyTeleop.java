@@ -19,7 +19,7 @@ public class MyTeleop extends PeriodicOpMode {
 
   @Override
   public void disabledPeriodic() {
-    /* Called periodically (on every DS packet) while the robot is disabled. */
+    /* Called on every robot period while the robot is disabled. */
   }
 
   @Override
@@ -29,7 +29,7 @@ public class MyTeleop extends PeriodicOpMode {
 
   @Override
   public void periodic() {
-    /* Called periodically (set time interval) while the robot is enabled. */
+    /* Called on every robot period while the robot is enabled. */
   }
 
   @Override

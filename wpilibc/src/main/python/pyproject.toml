@@ -91,9 +91,6 @@ depends = [
 ]
 includes = ["wpilib/src"]
 
-[tool.semiwrap.extension_modules."wpilib._wpilib".defines]
-DYNAMIC_CAMERA_SERVER = 1
-
 [tool.semiwrap.extension_modules."wpilib._wpilib".headers]
 # rpy
 Filesystem = "rpy/Filesystem.h"

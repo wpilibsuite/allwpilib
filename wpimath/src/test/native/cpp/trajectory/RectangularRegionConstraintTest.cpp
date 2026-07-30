@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/math/geometry/Rectangle2d.hpp"
+#include "wpi/math/shape/Rectangle2d.hpp"
 #include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
 #include "wpi/math/trajectory/constraint/MaxVelocityConstraint.hpp"

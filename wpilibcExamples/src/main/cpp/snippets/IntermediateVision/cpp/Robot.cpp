@@ -21,6 +21,7 @@
 class Robot : public wpi::TimedRobot {
  public:
   Robot() {
+    wpi::CameraServer::Initialize();
     // We need to run our vision program in a separate thread. If not, our robot
     // program will not run.
 #if defined(__linux__) || defined(_WIN32)

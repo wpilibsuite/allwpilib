@@ -8,6 +8,7 @@
 #include <format>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include <imgui.h>
@@ -27,6 +28,46 @@
 using namespace wpi::glass;
 
 Context* wpi::glass::gContext;
+
+static constexpr std::string_view TIMESTAMP_DISPLAY_MODE_KEY =
+    "timestampDisplayMode";
+
+static TimestampDisplayMode TimestampDisplayModeFromString(
+    std::string_view mode) {
+  if (mode == TIMESTAMP_DISPLAY_MODE_LOCAL || mode == "actual") {
+    return TimestampDisplayMode::LOCAL;
+  }
+  if (mode == TIMESTAMP_DISPLAY_MODE_SERVER) {
+    return TimestampDisplayMode::SERVER;
+  }
+  return TimestampDisplayMode::SERVER_ZERO_START;
+}
+
+static uint64_t GetTimestampDisplayStartTime(Context* ctx) {
+  if (ctx->timestampDisplayStartTimeOverride) {
+    return ctx->timestampDisplayStartTime;
+  }
+  return wpi::util::GetProgramStartTime();
+}
+
+static int64_t GetTimestampDisplayOffset(Context* ctx) {
+  switch (ctx->timestampDisplayMode) {
+    case TimestampDisplayMode::LOCAL:
+      return 0;
+    case TimestampDisplayMode::SERVER:
+      return ctx->timestampDisplayServerTimeOffset
+                 ? -*ctx->timestampDisplayServerTimeOffset
+                 : 0;
+    case TimestampDisplayMode::SERVER_ZERO_START:
+      if (ctx->timestampDisplayServerStartTime) {
+        return *ctx->timestampDisplayServerStartTime -
+               ctx->timestampDisplayServerTimeOffset.value_or(0);
+      }
+      return static_cast<int64_t>(GetTimestampDisplayStartTime(ctx));
+    default:
+      return 0;
+  }
+}
 
 static void WorkspaceResetImpl() {
   // call reset functions
@@ -311,8 +352,15 @@ static bool SaveStorageImpl(Context* ctx, std::string_view dir,
 
 Context::Context()
     : sourceNameStorage{
-          storageRoots.try_emplace("").first->second.GetChild("sourceNames")} {
+          storageRoots.try_emplace("").first->second.GetChild("sourceNames")},
+      timestampDisplayModeStorage{storageRoots[""].GetString(
+          TIMESTAMP_DISPLAY_MODE_KEY,
+          TIMESTAMP_DISPLAY_MODE_SERVER_ZERO_START)} {
   storageStack.emplace_back(&storageRoots[""]);
+  workspaceInit.emplace_back([this] {
+    timestampDisplayMode =
+        TimestampDisplayModeFromString(timestampDisplayModeStorage);
+  });
 
   // override ImGui ini saving
   wpi::gui::ConfigureCustomSaveSettings(
@@ -357,12 +405,39 @@ void wpi::glass::SetCurrentContext(Context* ctx) {
   gContext = ctx;
 }
 
-void wpi::glass::ResetTime() {
-  gContext->zeroTime = wpi::util::Now();
+uint64_t wpi::glass::GetZeroTime() {
+  return GetTimestampDisplayStartTime(gContext);
 }
 
-uint64_t wpi::glass::GetZeroTime() {
-  return gContext->zeroTime;
+int64_t wpi::glass::GetTimestampDisplayOffset() {
+  return ::GetTimestampDisplayOffset(gContext);
+}
+
+double wpi::glass::TimestampToDisplayTime(uint64_t time) {
+  return (static_cast<double>(time) -
+          static_cast<double>(GetTimestampDisplayOffset())) *
+         1.0e-6;
+}
+
+double wpi::glass::TimestampToDisplayTime(int64_t time) {
+  return (static_cast<double>(time) -
+          static_cast<double>(GetTimestampDisplayOffset())) *
+         1.0e-6;
+}
+
+double wpi::glass::ServerTimestampToDisplayTime(int64_t time) {
+  if (gContext->timestampDisplayMode ==
+      TimestampDisplayMode::SERVER_ZERO_START) {
+    if (gContext->timestampDisplayServerStartTime) {
+      time -= *gContext->timestampDisplayServerStartTime;
+    } else {
+      if (gContext->timestampDisplayServerTimeOffset) {
+        time -= *gContext->timestampDisplayServerTimeOffset;
+      }
+      time -= static_cast<int64_t>(GetTimestampDisplayStartTime(gContext));
+    }
+  }
+  return static_cast<double>(time) * 1.0e-6;
 }
 
 void wpi::glass::WorkspaceReset() {

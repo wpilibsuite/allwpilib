@@ -15,8 +15,8 @@ import org.wpilib.math.system.NumericalJacobian;
 import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
-import org.wpilib.math.util.Pair;
 import org.wpilib.math.util.StateSpaceUtil;
+import org.wpilib.util.Pair;
 
 /**
  * A Kalman filter combines predictions from a model and measurements to give an estimate of the
