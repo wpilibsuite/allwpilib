@@ -43,5 +43,6 @@ jobs:
         with:
           shell: ${{ matrix.shell }}
           configure-flags: ${{ matrix.flags }}
+          cmake-version: 4.4.0
           artifactory-username: ${{ secrets.ARTIFACTORY_USERNAME }}
           artifactory-password: ${{ secrets.ARTIFACTORY_PASSWORD }}
