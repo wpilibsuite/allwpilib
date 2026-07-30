@@ -1510,11 +1510,9 @@ SlewRateLimiter = "wpi/math/filter/SlewRateLimiter.hpp"
 # wpi/math/geometry
 CoordinateAxis = "wpi/math/geometry/CoordinateAxis.hpp"
 CoordinateSystem = "wpi/math/geometry/CoordinateSystem.hpp"
-Ellipse2d = "wpi/math/geometry/Ellipse2d.hpp"
 Pose2d = "wpi/math/geometry/Pose2d.hpp"
 Pose3d = "wpi/math/geometry/Pose3d.hpp"
 Quaternion = "wpi/math/geometry/Quaternion.hpp"
-Rectangle2d = "wpi/math/geometry/Rectangle2d.hpp"
 Rotation2d = "wpi/math/geometry/Rotation2d.hpp"
 Rotation3d = "wpi/math/geometry/Rotation3d.hpp"
 Transform2d = "wpi/math/geometry/Transform2d.hpp"
@@ -1523,6 +1521,10 @@ Translation2d = "wpi/math/geometry/Translation2d.hpp"
 Translation3d = "wpi/math/geometry/Translation3d.hpp"
 Twist2d = "wpi/math/geometry/Twist2d.hpp"
 Twist3d = "wpi/math/geometry/Twist3d.hpp"
+
+# wpi/math/shape
+Ellipse2d = "wpi/math/shape/Ellipse2d.hpp"
+Rectangle2d = "wpi/math/shape/Rectangle2d.hpp"
 
 # wpi/math/interpolation
 TimeInterpolatableBuffer = "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
