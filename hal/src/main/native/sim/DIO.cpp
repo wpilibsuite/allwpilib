@@ -40,7 +40,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
   if (channel < 0 || channel >= kNumDigitalChannels) {
     *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for DIO", 0,
-                                       kNumDigitalChannels, channel);
+                                       kNumDigitalChannels - 1, channel);
     return HAL_INVALID_HANDLE;
   }
 
