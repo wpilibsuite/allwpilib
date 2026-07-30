@@ -7,15 +7,6 @@ package org.wpilib.math.jni;
 /** Eigen JNI. */
 public final class EigenJNI extends WPIMathJNI {
   /**
-   * Computes the matrix exp.
-   *
-   * @param src Array of elements of the matrix to be exponentiated.
-   * @param rows How many rows there are.
-   * @param dst Array where the result will be stored.
-   */
-  public static native void exp(double[] src, int rows, double[] dst);
-
-  /**
    * Computes the matrix pow.
    *
    * @param src Array of elements of the matrix to be raised to a power.
