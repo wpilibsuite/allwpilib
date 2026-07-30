@@ -5,8 +5,8 @@
 package org.wpilib.math.shape.proto;
 
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.proto.ProtobufEllipse2d;
 import org.wpilib.math.shape.Ellipse2d;
+import org.wpilib.math.shape.proto.detail.ProtobufEllipse2d;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
