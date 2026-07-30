@@ -6,10 +6,12 @@
 
 #include "CartPoleBenchmark.hpp"
 #include "DAREBenchmark.hpp"
+#include "MatrixExpBenchmark.hpp"
 #include "TravelingSalesmanBenchmark.hpp"
 
 BENCHMARK(BM_CartPole);
 BENCHMARK(BM_DARE);
+BENCHMARK(BM_MatrixExp);
 BENCHMARK(BM_TravelingSalesman_Transform);
 BENCHMARK(BM_TravelingSalesman_Twist);
 
