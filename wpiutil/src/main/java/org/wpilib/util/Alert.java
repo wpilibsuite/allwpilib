@@ -15,7 +15,7 @@ package org.wpilib.util;
  *
  * <pre>
  * class Robot {
- *   Alert alert = new Alert("Something went wrong", Alert.Level.MEDIUM);
+ *   Alert alert = new Alert("somethingWrong", "Something went wrong", Alert.Level.MEDIUM);
  *
  *   periodic() {
  *     alert.set(...);
@@ -27,7 +27,7 @@ package org.wpilib.util;
  *
  * <pre>
  * public Robot() {
- *   new Alert("Failed to load auto paths", Alert.Level.HIGH).set(true);
+ *   new Alert("autoPathsFailed", "Failed to load auto paths", Alert.Level.HIGH).set(true);
  * }
  * </pre>
  */

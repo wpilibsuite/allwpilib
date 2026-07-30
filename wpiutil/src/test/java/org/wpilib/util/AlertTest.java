@@ -77,8 +77,7 @@ class AlertTest {
 
       AlertException ex =
           assertThrows(
-              AlertException.class,
-              () -> new Alert("group", "id", "duplicate", Alert.Level.HIGH));
+              AlertException.class, () -> new Alert("group", "id", "duplicate", Alert.Level.HIGH));
       assertEquals(ALERT_ALREADY_ALLOCATED, ex.getReason());
       assertEquals("Alert already allocated", ex.getMessage());
 
