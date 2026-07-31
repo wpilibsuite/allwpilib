@@ -7,7 +7,7 @@ ext.createGenerateResourcesTask = { name, prefix, namespace, project ->
 
     if (!prefix.isEmpty()) prefix += '_'
 
-    def task = project.tasks.create("generateResources-$name") {
+    def task = project.tasks.register("generateResources-$name") {
         outputs.dir generatedOutputDir
         inputs.dir inputDir
 

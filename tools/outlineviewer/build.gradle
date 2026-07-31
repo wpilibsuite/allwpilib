@@ -63,7 +63,7 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
 def generateTask = createGenerateResourcesTask('main', 'OV', 'ov', project)
 
 project(':').libraryBuild.dependsOn build
-tasks.withType(CppCompile) {
+tasks.withType(CppCompile).configureEach {
     dependsOn generateTask
     dependsOn generateCppVersion
 }

@@ -15,7 +15,7 @@ ext {
 
     def generateTask = createGenerateResourcesTask('main', 'APRILTAG', 'wpi::apriltag', project)
 
-    tasks.withType(CppCompile) {
+    tasks.withType(CppCompile).configureEach {
         dependsOn generateTask
     }
     splitSetup = {

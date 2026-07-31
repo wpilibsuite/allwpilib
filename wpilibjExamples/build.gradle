@@ -177,9 +177,9 @@ model {
                             project.tasks.create("runCpp", Exec) { task ->
                                 dependsOn it.tasks.install
                                 commandLine it.tasks.install.runScriptFile.get().asFile.toString()
+                                test.dependsOn it.tasks.install
+                                test.systemProperty 'java.library.path', filePath
                             }
-                            test.dependsOn it.tasks.install
-                            test.systemProperty 'java.library.path', filePath
 
                             new groovy.json.JsonSlurper().parseText(exampleFile.text).each { entry ->
                                 project.tasks.create("run${entry.foldername}", JavaExec) { run ->
@@ -226,8 +226,8 @@ model {
                                     if (project.hasProperty('onlylinuxsystemcore') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
                                         testTask.enabled = false
                                     }
+                                    test.dependsOn(testTask)
                                 }
-                                test.dependsOn("test${entry.foldername}")
                             }
                             new groovy.json.JsonSlurper().parseText(snippetsFile.text).each { entry ->
                                 project.tasks.create("runSnippet${entry.foldername}", JavaExec) { run ->
@@ -270,8 +270,8 @@ model {
                                     if (project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
                                         testTask.enabled = false
                                     }
+                                    test.dependsOn(testTask)
                                 }
-                                test.dependsOn("testSnippet${entry.foldername}")
                             }
 
                             found = true

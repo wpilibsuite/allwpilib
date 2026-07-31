@@ -173,7 +173,7 @@ def javaDocProjects = [
     project(':datalog'),
 ]
 
-task generateJavaDocs(type: Javadoc) {
+tasks.register('generateJavaDocs', Javadoc) {
     javaDocProjects.each {
         classpath += it.sourceSets.main.compileClasspath
     }

@@ -87,7 +87,7 @@ model {
 apply plugin: DisableBuildingGTest
 
 if (project.hasProperty('buildServer')) {
-    tasks.withType(org.gradle.nativeplatform.test.tasks.RunTestExecutable) {
+    tasks.withType(org.gradle.nativeplatform.test.tasks.RunTestExecutable).configureEach {
         def exeFile = file(it.executable)
         def folder = exeFile.parentFile
 
