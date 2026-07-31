@@ -42,8 +42,6 @@ classes:
       SetText:
       GetText:
       GetLevel:
-      operator bool:
-        ignore: true
     inline_code: |
       .def("__bool__", [](const wpi::util::Alert &self) {
         return static_cast<bool>(self);
