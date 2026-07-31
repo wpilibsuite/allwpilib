@@ -131,6 +131,8 @@ If you have installed the WPILib Toolchain to a directory other than the default
 ./gradlew build -PtoolChainPath=some/path/to/wpilib/toolchain/bin
 ```
 
+Linux desktop builds use `gcc-14` and `g++-14` by default. To use Gradle's default Linux toolchain discovery instead, pass `-PuseDefaultLinuxGcc` or set `WPILIB_USE_DEFAULT_LINUX_GCC=1`.
+
 ### Formatting/linting
 
 Once a PR has been submitted, formatting can be run in CI by commenting `/format` on the PR. A new commit will be pushed with the formatting changes.
