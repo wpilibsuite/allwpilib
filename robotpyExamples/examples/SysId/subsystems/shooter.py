@@ -98,8 +98,8 @@ class Shooter(Subsystem):
             self.feeder_motor.set_throttle(ShooterConstants.FEEDER_VELOCITY)
 
         def _stop_motors(interrupted: bool) -> None:
-            self.shooter_motor.stop_motor()
-            self.feeder_motor.stop_motor()
+            self.shooter_motor.set_throttle(0.0)
+            self.feeder_motor.set_throttle(0.0)
 
         return self.run(_run_shooter).finally_do(_stop_motors).with_name("runShooter")
 

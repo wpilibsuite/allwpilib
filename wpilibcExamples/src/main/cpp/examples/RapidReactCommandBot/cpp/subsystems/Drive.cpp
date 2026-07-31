@@ -57,7 +57,7 @@ wpi::cmd::CommandPtr Drive::DriveDistanceCommand(wpi::units::meter_t distance,
                    wpi::units::meter_t(rightEncoder.GetDistance())) >= distance;
       })
       // Stop the drive when the command ends
-      .FinallyDo([this](bool interrupted) { drive.StopMotor(); });
+      .FinallyDo([this](bool interrupted) { drive.ArcadeDrive(0.0, 0.0); });
 }
 
 wpi::cmd::CommandPtr Drive::TurnToAngleCommand(wpi::units::degree_t angle) {

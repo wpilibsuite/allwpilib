@@ -117,7 +117,7 @@ class Drive(Subsystem):
                 )
                 >= distance
             )
-            .finally_do(lambda interrupted: self.drive.stop_motor())
+            .finally_do(lambda interrupted: self.drive.arcade_drive(0, 0))
         )
 
     def turn_to_angle_command(self, angle_deg: float) -> Command:
