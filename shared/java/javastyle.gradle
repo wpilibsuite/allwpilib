@@ -20,6 +20,12 @@ pmd {
     ruleSets = []
 }
 
+tasks.withType(Pmd) {
+    exclude { details ->
+        details.file.toPath().startsWith(project.file("src/generated").toPath())
+    }
+}
+
 apply plugin: 'com.diffplug.spotless'
 
 spotless {
