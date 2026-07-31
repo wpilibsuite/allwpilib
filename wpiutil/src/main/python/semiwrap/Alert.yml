@@ -1,3 +1,7 @@
+extra_includes:
+- memory
+- stdexcept
+
 functions:
   CloseAlertHandle:
     overloads:
@@ -12,7 +16,27 @@ classes:
       Alert:
         overloads:
           std::string_view, std::string_view, Level:
+            cpp_code: |
+              [](std::string_view id, std::string_view text,
+                 wpi::util::Alert::Level level) {
+                auto alert =
+                    std::make_unique<wpi::util::Alert>(id, text, level);
+                if (!static_cast<bool>(*alert)) {
+                  throw std::runtime_error("Alert already allocated");
+                }
+                return alert;
+              }
           std::string_view, std::string_view, std::string_view, Level:
+            cpp_code: |
+              [](std::string_view group, std::string_view id,
+                 std::string_view text, wpi::util::Alert::Level level) {
+                auto alert = std::make_unique<wpi::util::Alert>(group, id, text,
+                                                                level);
+                if (!static_cast<bool>(*alert)) {
+                  throw std::runtime_error("Alert already allocated");
+                }
+                return alert;
+              }
       Set:
       Get:
       SetText:
