@@ -51,7 +51,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 - C++ compiler
     - On Linux, install GCC 14
     - On Windows, install [Visual Studio Community 2026](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio)
-    - On macOS, install the Xcode command-line build tools via `xcode-select --install`. Xcode 15 or later is required.
+    - On macOS, install the Xcode command-line build tools via `xcode-select --install`. Xcode 15.3 or later is required.
 - Raspberry Pi toolchain (optional)
     - Run `./gradlew installArm64Toolchain` after cloning this repository
 - Systemcore toolchain (required for Systemcore development)
