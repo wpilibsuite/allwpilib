@@ -14,6 +14,7 @@
 
 #include "wpi/util/Alert.h"
 #include "wpi/util/string.hpp"
+#include "wpi/util/timestamp.h"
 
 namespace {
 
@@ -59,6 +60,21 @@ struct BackendState {
 };
 
 BackendState gBackendState;
+uint64_t gMockNow = 0;
+
+uint64_t MockNow() {
+  return gMockNow;
+}
+
+class ScopedNowImpl {
+ public:
+  explicit ScopedNowImpl(uint64_t now) {
+    gMockNow = now;
+    WPI_SetNowImpl(MockNow);
+  }
+
+  ~ScopedNowImpl() { WPI_SetNowImpl(nullptr); }
+};
 
 int32_t BackendCreateAlert(const WPI_String* group, const WPI_String* id,
                            const WPI_String* text, int32_t level,
@@ -241,6 +257,24 @@ TEST_F(AlertTest, CApiSetGetAndReset) {
   active = 1;
   EXPECT_NE(WPI_IsAlertActive(handle, &active), 0);
   EXPECT_EQ(active, 0);
+}
+
+TEST_F(AlertTest, CApiSetActiveAtZeroTimeReportsActive) {
+  ScopedNowImpl now{0};
+  WPI_AlertHandle handle =
+      CreateAlert("zeroGroup", "zeroId", "zero", WPI_ALERT_HIGH);
+
+  EXPECT_EQ(WPI_SetAlertActive(handle, 1), 0);
+  int32_t active = 0;
+  EXPECT_EQ(WPI_IsAlertActive(handle, &active), 0);
+  EXPECT_EQ(active, 1);
+
+  WPI_AlertInfo info;
+  ASSERT_EQ(WPI_GetAlerts(&info, 1), 1);
+  EXPECT_NE(info.activeStartTime, 0);
+  WPI_FreeAlerts(&info, 1);
+
+  WPI_DestroyAlert(handle);
 }
 
 TEST_F(AlertTest, CApiStaleHandleAfterResetDoesNotAffectNewAlert) {

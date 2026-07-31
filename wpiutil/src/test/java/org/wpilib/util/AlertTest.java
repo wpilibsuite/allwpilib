@@ -23,6 +23,7 @@ class AlertTest {
   @AfterEach
   void resetAlerts() {
     AlertDataJNI.resetData();
+    WPIUtilJNI.disableMockTime();
   }
 
   @Test
@@ -100,6 +101,20 @@ class AlertTest {
       assertEquals(0, AlertDataJNI.getNumAlerts());
       assertEquals(0, AlertDataJNI.getAlerts().length);
       assertThrows(AlertException.class, () -> alert.get());
+    }
+  }
+
+  @Test
+  void setActiveAtZeroMockTimeReportsActive() {
+    WPIUtilJNI.enableMockTime();
+
+    try (Alert alert = new Alert("group", "id", "text", Alert.Level.HIGH)) {
+      alert.set(true);
+      assertTrue(alert.get());
+
+      AlertDataJNI.AlertInfo[] infos = AlertDataJNI.getAlerts();
+      assertEquals(1, infos.length);
+      assertNotEquals(0, infos[0].activeStartTime);
     }
   }
 

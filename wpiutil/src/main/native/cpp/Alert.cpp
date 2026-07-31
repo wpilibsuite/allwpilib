@@ -158,6 +158,10 @@ int32_t DefaultSetAlertActive(WPI_AlertHandle alertHandle, int32_t active) {
   }
   if (active) {
     int64_t now = wpi::util::Now();
+    // activeStartTime uses 0 as the inactive sentinel.
+    if (now == 0) {
+      now = 1;
+    }
     int64_t expected = 0;
     alert->activeStartTime.compare_exchange_strong(expected, now);
   } else {
