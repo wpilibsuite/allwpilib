@@ -1,5 +1,19 @@
 nativeUtils.skipInstallPdb = project.hasProperty('buildServer')
 
+def isBuildFlagEnabled = { propertyName, environmentName ->
+    if (project.hasProperty(propertyName)) {
+        def propertyValue = project.findProperty(propertyName)
+        return propertyValue == null || propertyValue.toString().isBlank() || propertyValue.toString().toBoolean()
+    }
+
+    def environmentValue = System.getenv(environmentName)
+    return environmentValue != null && !environmentValue.isBlank() && environmentValue.toBoolean()
+}
+
+if (isBuildFlagEnabled('useDefaultLinuxGcc', 'WPILIB_USE_DEFAULT_LINUX_GCC')) {
+    nativeUtils.requireVersionedLinuxGcc = false
+}
+
 if (project.hasProperty('ciDebugOnly')) {
     toolchainsPlugin.registerReleaseBuildType = false
 }
