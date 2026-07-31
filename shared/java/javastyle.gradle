@@ -20,6 +20,14 @@ pmd {
     ruleSets = []
 }
 
+tasks.withType(Pmd).configureEach {
+    exclude { details ->
+        def path = details.file.toPath()
+        path.startsWith(project.file("src/generated").toPath()) ||
+            path.startsWith(project.file("build/generated").toPath())
+    }
+}
+
 apply plugin: 'com.diffplug.spotless'
 
 spotless {
@@ -88,6 +96,6 @@ task javaFormat {
     dependsOn 'spotlessApply'
 }
 
-tasks.withType(Checkstyle) {
+tasks.withType(Checkstyle).configureEach {
     it.mustRunAfter 'spotlessApply'
 }
