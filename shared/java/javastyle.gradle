@@ -22,7 +22,9 @@ pmd {
 
 tasks.withType(Pmd) {
     exclude { details ->
-        details.file.toPath().startsWith(project.file("src/generated").toPath())
+        def path = details.file.toPath()
+        path.startsWith(project.file("src/generated").toPath()) ||
+            path.startsWith(project.file("build/generated").toPath())
     }
 }
 
