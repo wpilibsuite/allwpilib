@@ -74,8 +74,7 @@ class Alert {
   };
 
   /**
-   * Creates a new alert in the default group - "Alerts". If this is the first
-   * to be instantiated, the appropriate entries will be added to NetworkTables.
+   * Creates a new alert in the default group - "Alerts".
    *
    * @param text Text to be displayed when the alert is active.
    * @param id Alert identifier. This should be unique within the group.
@@ -84,10 +83,9 @@ class Alert {
   Alert(std::string_view id, std::string_view text, Level level);
 
   /**
-   * Creates a new alert. If this is the first to be instantiated in its group,
-   * the appropriate entries will be added to NetworkTables.
+   * Creates a new alert.
    *
-   * @param group Group identifier, used as the entry name in NetworkTables.
+   * @param group Group identifier
    * @param id Alert identifier. This should be unique within the group.
    * @param text Text to be displayed when the alert is active.
    * @param level Alert urgency level.
