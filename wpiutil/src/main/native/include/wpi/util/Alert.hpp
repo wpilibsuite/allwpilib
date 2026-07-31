@@ -96,6 +96,13 @@ class Alert {
         Level level);
 
   /**
+   * Checks whether this alert is valid.
+   *
+   * @return true if this alert is valid.
+   */
+  explicit operator bool() const;
+
+  /**
    * Sets whether the alert should currently be displayed. This method can be
    * safely called periodically.
    *

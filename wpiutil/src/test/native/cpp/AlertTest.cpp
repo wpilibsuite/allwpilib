@@ -203,6 +203,20 @@ TEST_F(AlertTest, CppWrapperDefaultGroupAndDestructor) {
   EXPECT_EQ(WPI_GetNumAlerts(), 0);
 }
 
+TEST_F(AlertTest, CppWrapperDuplicateIsInvalid) {
+  Alert alert{"group", "id", "text", Alert::Level::HIGH};
+  EXPECT_TRUE(alert);
+
+  Alert duplicate{"group", "id", "duplicate", Alert::Level::HIGH};
+  EXPECT_FALSE(duplicate);
+
+  EXPECT_EQ(WPI_GetNumAlerts(), 1);
+  EXPECT_FALSE(alert.Get());
+  duplicate.Set(true);
+  EXPECT_FALSE(duplicate.Get());
+  EXPECT_EQ(WPI_GetNumAlerts(), 1);
+}
+
 TEST_F(AlertTest, CApiDuplicateRulesAndPartialListing) {
   WPI_AlertHandle first = CreateAlert("group", "id", "one", WPI_ALERT_MEDIUM);
   WPI_AlertHandle second = CreateAlert("group", "id", "two", WPI_ALERT_LOW);

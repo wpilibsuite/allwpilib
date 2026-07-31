@@ -294,9 +294,16 @@ Alert::Alert(std::string_view group, std::string_view id, std::string_view text,
   WPI_String wpiId = make_string(id);
   WPI_String wpiText = make_string(text);
   WPI_AlertHandle handle = WPI_INVALID_HANDLE;
-  WPI_CreateAlert(&wpiGroup, &wpiId, &wpiText, static_cast<int32_t>(level),
-                  &handle);
+  int32_t status = WPI_CreateAlert(&wpiGroup, &wpiId, &wpiText,
+                                   static_cast<int32_t>(level), &handle);
+  if (status != 0) {
+    handle = WPI_INVALID_HANDLE;
+  }
   m_handle = handle;
+}
+
+Alert::operator bool() const {
+  return m_handle != WPI_INVALID_HANDLE;
 }
 
 void Alert::Set(bool active) {

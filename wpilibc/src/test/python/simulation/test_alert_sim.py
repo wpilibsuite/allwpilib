@@ -127,6 +127,17 @@ def test_close_releases_duplicate_id(group_name):
         assert is_alert_active("second", Alert.Level.HIGH)
 
 
+def test_duplicate_id_is_invalid(group_name):
+    with Alert(group_name, "alert", "first", Alert.Level.HIGH) as first:
+        first.set(True)
+
+        duplicate = Alert(group_name, "alert", "duplicate", Alert.Level.HIGH)
+
+        assert not duplicate
+        assert AlertSim.get_count() == 1
+        assert is_alert_active("first", Alert.Level.HIGH)
+
+
 def test_set_text_while_unset(group_name):
     with Alert(group_name, "BEFORE", "BEFORE", Alert.Level.LOW) as alert:
         assert alert.get_text() == "BEFORE"
