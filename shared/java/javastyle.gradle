@@ -20,7 +20,7 @@ pmd {
     ruleSets = []
 }
 
-tasks.withType(Pmd) {
+tasks.withType(Pmd).configureEach {
     exclude { details ->
         def path = details.file.toPath()
         path.startsWith(project.file("src/generated").toPath()) ||
@@ -96,6 +96,6 @@ task javaFormat {
     dependsOn 'spotlessApply'
 }
 
-tasks.withType(Checkstyle) {
+tasks.withType(Checkstyle).configureEach {
     it.mustRunAfter 'spotlessApply'
 }
