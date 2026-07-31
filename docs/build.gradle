@@ -191,23 +191,30 @@ task generateJavaDocs(type: Javadoc) {
             "-org.wpilib.hardware.hal.simulation," +
             // TODO: ^ Document these, then remove them from the list
             "-org.wpilib.hardware.hal.struct," +
-            "-org.wpilib.math.proto," +
             "-org.wpilib.math.struct," +
             "-org.wpilib.math.controller.proto," +
+            "-org.wpilib.math.controller.proto.detail," +
             "-org.wpilib.math.controller.struct," +
             "-org.wpilib.math.geometry.proto," +
+            "-org.wpilib.math.geometry.proto.detail," +
             "-org.wpilib.math.geometry.struct," +
             "-org.wpilib.math.kinematics.proto," +
+            "-org.wpilib.math.kinematics.proto.detail," +
             "-org.wpilib.math.kinematics.struct," +
             "-org.wpilib.math.linalg.proto," +
+            "-org.wpilib.math.linalg.proto.detail," +
             "-org.wpilib.math.linalg.struct," +
             "-org.wpilib.math.shape.proto," +
+            "-org.wpilib.math.shape.proto.detail," +
             "-org.wpilib.math.shape.struct," +
             "-org.wpilib.math.spline.proto," +
+            "-org.wpilib.math.spline.proto.detail," +
             "-org.wpilib.math.spline.struct," +
             "-org.wpilib.math.system.proto," +
+            "-org.wpilib.math.system.proto.detail," +
             "-org.wpilib.math.system.struct," +
             "-org.wpilib.math.trajectory.proto," +
+            "-org.wpilib.math.trajectory.proto.detail," +
             "-org.wpilib.math.trajectory.struct," +
             "-org.wpilib.command3.proto," +
             // The .measure package contains generated source files for which automatic javadoc

@@ -5,8 +5,8 @@
 package org.wpilib.math.shape.proto;
 
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.proto.ProtobufRectangle2d;
 import org.wpilib.math.shape.Rectangle2d;
+import org.wpilib.math.shape.proto.detail.ProtobufRectangle2d;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 

@@ -9,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.proto.ProtobufEllipse2d;
 import org.wpilib.math.shape.Ellipse2d;
+import org.wpilib.math.shape.proto.detail.ProtobufEllipse2d;
 
 class Ellipse2dProtoTest {
   private static final Ellipse2d DATA =

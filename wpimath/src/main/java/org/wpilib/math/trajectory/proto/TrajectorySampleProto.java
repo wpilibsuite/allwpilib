@@ -4,8 +4,8 @@
 
 package org.wpilib.math.trajectory.proto;
 
-import org.wpilib.math.proto.ProtobufTrajectorySample;
 import org.wpilib.math.trajectory.TrajectorySample;
+import org.wpilib.math.trajectory.proto.detail.ProtobufTrajectorySample;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
