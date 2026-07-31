@@ -5,7 +5,7 @@
 #include "wpi/math/shape/proto/Ellipse2dProto.hpp"
 
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpimath/protobuf/geometry2d.npb.h"
+#include "wpimath/protobuf/shape.npb.h"
 
 std::optional<wpi::math::Ellipse2d>
 wpi::util::Protobuf<wpi::math::Ellipse2d>::Unpack(InputStream& stream) {

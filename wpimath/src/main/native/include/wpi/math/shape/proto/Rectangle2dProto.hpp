@@ -7,7 +7,7 @@
 #include "wpi/math/shape/Rectangle2d.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpimath/protobuf/geometry2d.npb.h"
+#include "wpimath/protobuf/shape.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Rectangle2d> final {
