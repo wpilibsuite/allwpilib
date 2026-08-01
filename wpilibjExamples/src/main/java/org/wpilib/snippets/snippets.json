@@ -195,6 +195,7 @@
     "gradlebase": "java",
     "robotclass": "Robot",
     "extravendordeps": [
+      "apriltag",
       "cameraserver"
     ]
   },
