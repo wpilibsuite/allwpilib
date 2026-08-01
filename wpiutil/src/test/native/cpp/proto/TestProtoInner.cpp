@@ -58,7 +58,7 @@ TEST_CASE("TestProtoInnerTest RoundtripNanopb", "[wpiutil][proto]") {
   REQUIRE(message.Pack(buf, kExpectedData));
   std::optional<TestProtoInner> unpacked_data = message.Unpack(buf);
   REQUIRE(unpacked_data.has_value());
-  CHECK((kExpectedData.msg) == (unpacked_data->msg));
+  CHECK(kExpectedData.msg == unpacked_data->msg);
 }
 
 TEST_CASE("TestProtoInnerTest RoundtripNanopbEmpty", "[wpiutil][proto]") {
@@ -70,5 +70,5 @@ TEST_CASE("TestProtoInnerTest RoundtripNanopbEmpty", "[wpiutil][proto]") {
   REQUIRE(message.Pack(buf, kExpectedData));
   auto unpacked_data = message.Unpack(buf);
   REQUIRE(unpacked_data.has_value());
-  CHECK((kExpectedData.msg) == (unpacked_data->msg));
+  CHECK(kExpectedData.msg == unpacked_data->msg);
 }

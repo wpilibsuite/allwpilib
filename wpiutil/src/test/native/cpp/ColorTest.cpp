@@ -35,9 +35,9 @@ TEST_CASE("ColorTest ConstructFromDoubles", "[wpiutil]") {
     constexpr wpi::util::Color color{1.0, 0.0, 0.0};
 
     // Check for exact match to ensure round-and-clamp is correct
-    CHECK((1.0) == (color.red));
-    CHECK((0.0) == (color.green));
-    CHECK((0.0) == (color.blue));
+    CHECK(1.0 == color.red);
+    CHECK(0.0 == color.green);
+    CHECK(0.0 == color.blue);
   }
 }
 
@@ -126,20 +126,20 @@ TEST_CASE("ColorTest FromHSVExactRgbValues", "[wpiutil]") {
                              << ")");
     wpi::util::Color8Bit color{
         wpi::util::Color::FromHSV(test.h, test.s, test.v)};
-    CHECK((test.r) == (color.red));
-    CHECK((test.g) == (color.green));
-    CHECK((test.b) == (color.blue));
+    CHECK(test.r == color.red);
+    CHECK(test.g == color.green);
+    CHECK(test.b == color.blue);
   }
 }
 
 TEST_CASE("ColorTest ToHexString", "[wpiutil]") {
   constexpr wpi::util::Color color1{255, 128, 64};
-  CHECK(("#FF8040") == (color1.HexString()));
+  CHECK("#FF8040" == color1.HexString());
 
   // Ensure conversion to std::string works
   [[maybe_unused]]
   std::string str = color1.HexString();
 
   wpi::util::Color color2{255, 128, 64};
-  CHECK(("#FF8040") == (color2.HexString()));
+  CHECK("#FF8040" == color2.HexString());
 }

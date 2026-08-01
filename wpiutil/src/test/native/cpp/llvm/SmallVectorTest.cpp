@@ -237,19 +237,19 @@ LLVM_ATTRIBUTE_USED void CompileTest() {
 
 TEST_CASE("SmallVectorTest ConstructNonCopyableTest", "[wpiutil][llvm]") {
   SmallVector<NonCopyable, 0> V(42);
-  CHECK((V.size()) == ((size_t)42));
+  CHECK(V.size() == (size_t)42);
 }
 
 // Assert that v contains the specified values, in order.
 template <typename VectorT>
 void assertValuesInOrder(VectorT &v, size_t size, ...) {
-  CHECK((size) == (v.size()));
+  CHECK(size == v.size());
 
   va_list ap;
   va_start(ap, size);
   for (size_t i = 0; i < size; ++i) {
     int value = va_arg(ap, int);
-    CHECK((value) == (v[i].getValue()));
+    CHECK(value == v[i].getValue());
   }
 
   va_end(ap);
@@ -257,7 +257,7 @@ void assertValuesInOrder(VectorT &v, size_t size, ...) {
 
 template <typename VectorT> void assertEmpty(VectorT &v) {
   // Size tests
-  CHECK((0u) == (v.size()));
+  CHECK(0u == v.size());
   CHECK(v.empty());
 
   // Iterator tests
@@ -320,7 +320,7 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest ConstructorFromSpanS
   auto &V = this->theVector;
   V = SmallVector<Constructable, 4>(Array);
   assertValuesInOrder(V, 3u, 1, 2, 3);
-  REQUIRE((NumBuiltinElts(TestType{})) == (NumBuiltinElts(V)));
+  REQUIRE(NumBuiltinElts(TestType{}) == NumBuiltinElts(V));
 }
 
 // New vector test.
@@ -329,8 +329,8 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest EmptyVectorTest", "[
   auto &V = this->theVector;
   assertEmpty(V);
   CHECK(V.rbegin() == V.rend());
-  CHECK((0) == (Constructable::getNumConstructorCalls()));
-  CHECK((0) == (Constructable::getNumDestructorCalls()));
+  CHECK(0 == Constructable::getNumConstructorCalls());
+  CHECK(0 == Constructable::getNumDestructorCalls());
 }
 
 // Simple insertions and deletions.
@@ -370,13 +370,13 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest PushPopTest", "[wpiu
   // one for the argument to push_back, one for the argument to insert,
   // and one for the list element itself.
   if (!RequiresGrowth) {
-    CHECK((5) == (Constructable::getNumConstructorCalls()));
-    CHECK((5) == (Constructable::getNumDestructorCalls()));
+    CHECK(5 == Constructable::getNumConstructorCalls());
+    CHECK(5 == Constructable::getNumDestructorCalls());
   } else {
     // If we had to grow the vector, these only have a lower bound, but should
     // always be equal.
-    CHECK((5) <= (Constructable::getNumConstructorCalls()));
-    CHECK((Constructable::getNumConstructorCalls()) == (Constructable::getNumDestructorCalls()));
+    CHECK(5 <= Constructable::getNumConstructorCalls());
+    CHECK(Constructable::getNumConstructorCalls() == Constructable::getNumDestructorCalls());
   }
 }
 
@@ -389,8 +389,8 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest ClearTest", "[wpiuti
   V.clear();
 
   assertEmpty(V);
-  CHECK((4) == (Constructable::getNumConstructorCalls()));
-  CHECK((4) == (Constructable::getNumDestructorCalls()));
+  CHECK(4 == Constructable::getNumConstructorCalls());
+  CHECK(4 == Constructable::getNumDestructorCalls());
 }
 
 // Resize smaller test.
@@ -402,8 +402,8 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest ResizeShrinkTest", "
   V.resize(1);
 
   assertValuesInOrder(V, 1u, 1);
-  CHECK((6) == (Constructable::getNumConstructorCalls()));
-  CHECK((5) == (Constructable::getNumDestructorCalls()));
+  CHECK(6 == Constructable::getNumConstructorCalls());
+  CHECK(5 == Constructable::getNumDestructorCalls());
 }
 
 // Truncate test.
@@ -415,21 +415,21 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest TruncateTest", "[wpi
   V.truncate(1);
 
   assertValuesInOrder(V, 1u, 1);
-  CHECK((6) == (Constructable::getNumConstructorCalls()));
-  CHECK((5) == (Constructable::getNumDestructorCalls()));
+  CHECK(6 == Constructable::getNumConstructorCalls());
+  CHECK(5 == Constructable::getNumDestructorCalls());
 
 #if !defined(NDEBUG) && GTEST_HAS_DEATH_TEST
   CHECK_DEATH(V.truncate(2), "Cannot increase size");
 #endif
   V.truncate(1);
   assertValuesInOrder(V, 1u, 1);
-  CHECK((6) == (Constructable::getNumConstructorCalls()));
-  CHECK((5) == (Constructable::getNumDestructorCalls()));
+  CHECK(6 == Constructable::getNumConstructorCalls());
+  CHECK(5 == Constructable::getNumDestructorCalls());
 
   V.truncate(0);
   assertEmpty(V);
-  CHECK((6) == (Constructable::getNumConstructorCalls()));
-  CHECK((6) == (Constructable::getNumDestructorCalls()));
+  CHECK(6 == Constructable::getNumConstructorCalls());
+  CHECK(6 == Constructable::getNumDestructorCalls());
 }
 
 // Resize bigger test.
@@ -438,9 +438,9 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest ResizeGrowTest", "[w
   auto &V = this->theVector;
   V.resize(2);
 
-  CHECK((2) == (Constructable::getNumConstructorCalls()));
-  CHECK((0) == (Constructable::getNumDestructorCalls()));
-  CHECK((2u) == (V.size()));
+  CHECK(2 == Constructable::getNumConstructorCalls());
+  CHECK(0 == Constructable::getNumDestructorCalls());
+  CHECK(2u == V.size());
 }
 
 TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest ResizeWithElementsTest", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_SmallVectorTest) {
@@ -474,10 +474,10 @@ TEST_CASE("SmallVectorTest ResizeForOverwrite", "[wpiutil][llvm]") {
     V.push_back(5U);
     V.pop_back();
     V.resize_for_overwrite(V.size() + 1U);
-    CHECK((5U) == (V.back()));
+    CHECK(5U == V.back());
     V.pop_back();
     V.resize(V.size() + 1);
-    CHECK((0U) == (V.back()));
+    CHECK(0U == V.back());
   }
   {
     // Inline storage.
@@ -485,10 +485,10 @@ TEST_CASE("SmallVectorTest ResizeForOverwrite", "[wpiutil][llvm]") {
     V.push_back(5U);
     V.pop_back();
     V.resize_for_overwrite(V.size() + 1U);
-    CHECK((5U) == (V.back()));
+    CHECK(5U == V.back());
     V.pop_back();
     V.resize(V.size() + 1);
-    CHECK((0U) == (V.back()));
+    CHECK(0U == V.back());
   }
 }
 
@@ -500,9 +500,9 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest OverflowTest", "[wpi
   makeSequence(V, 1, 10);
 
   // Test size and values.
-  CHECK((10u) == (V.size()));
+  CHECK(10u == V.size());
   for (int i = 0; i < 10; ++i) {
-    CHECK((i + 1) == (V[i].getValue()));
+    CHECK(i + 1 == V[i].getValue());
   }
 
   // Now resize back to fixed size.
@@ -520,35 +520,35 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest IterationTest", "[wp
   typename TestType::iterator it = V.begin();
   CHECK(*it == V.front());
   CHECK(*it == V[0]);
-  CHECK((1) == (it->getValue()));
+  CHECK(1 == it->getValue());
   ++it;
   CHECK(*it == V[1]);
   CHECK(*it == V.back());
-  CHECK((2) == (it->getValue()));
+  CHECK(2 == it->getValue());
   ++it;
   CHECK(it == V.end());
   --it;
   CHECK(*it == V[1]);
-  CHECK((2) == (it->getValue()));
+  CHECK(2 == it->getValue());
   --it;
   CHECK(*it == V[0]);
-  CHECK((1) == (it->getValue()));
+  CHECK(1 == it->getValue());
 
   // Reverse Iteration
   typename TestType::reverse_iterator rit = V.rbegin();
   CHECK(*rit == V[1]);
-  CHECK((2) == (rit->getValue()));
+  CHECK(2 == rit->getValue());
   ++rit;
   CHECK(*rit == V[0]);
-  CHECK((1) == (rit->getValue()));
+  CHECK(1 == rit->getValue());
   ++rit;
   CHECK(rit == V.rend());
   --rit;
   CHECK(*rit == V[0]);
-  CHECK((1) == (rit->getValue()));
+  CHECK(1 == rit->getValue());
   --rit;
   CHECK(*rit == V[1]);
-  CHECK((2) == (rit->getValue()));
+  CHECK(2 == rit->getValue());
 }
 
 // Swap test.
@@ -689,11 +689,11 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest MoveAssignTest", "[w
   // Make sure the # of constructor/destructor calls line up. There
   // are two live objects after clearing the other vector.
   U.clear();
-  CHECK((Constructable::getNumConstructorCalls()-2) == (Constructable::getNumDestructorCalls()));
+  CHECK(Constructable::getNumConstructorCalls()-2 == Constructable::getNumDestructorCalls());
 
   // There shouldn't be any live objects any more.
   V.clear();
-  CHECK((Constructable::getNumConstructorCalls()) == (Constructable::getNumDestructorCalls()));
+  CHECK(Constructable::getNumConstructorCalls() == Constructable::getNumDestructorCalls());
 }
 
 // Erase a single element
@@ -722,7 +722,7 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest InsertTest", "[wpiut
   auto &V = this->theVector;
   makeSequence(V, 1, 3);
   typename TestType::iterator I = V.insert(V.begin() + 1, Constructable(77));
-  CHECK((V.begin() + 1) == (I));
+  CHECK(V.begin() + 1 == I);
   assertValuesInOrder(V, 4u, 1, 77, 2, 3);
 }
 
@@ -733,7 +733,7 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest InsertCopy", "[wpiut
   makeSequence(V, 1, 3);
   Constructable C(77);
   typename TestType::iterator I = V.insert(V.begin() + 1, C);
-  CHECK((V.begin() + 1) == (I));
+  CHECK(V.begin() + 1 == I);
   assertValuesInOrder(V, 4u, 1, 77, 2, 3);
 }
 
@@ -752,12 +752,12 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest InsertRepeatedTest",
   CHECK((Constructable::getNumMoveConstructorCalls() == 2 ||
          Constructable::getNumMoveConstructorCalls() == 6));
   // Move assign the next two to shift them up and make a gap.
-  CHECK((1) == (Constructable::getNumMoveAssignmentCalls()));
+  CHECK(1 == Constructable::getNumMoveAssignmentCalls());
   // Copy construct the two new elements from the parameter.
-  CHECK((2) == (Constructable::getNumCopyAssignmentCalls()));
+  CHECK(2 == Constructable::getNumCopyAssignmentCalls());
   // All without any copy construction.
-  CHECK((0) == (Constructable::getNumCopyConstructorCalls()));
-  CHECK((V.begin() + 1) == (I));
+  CHECK(0 == Constructable::getNumCopyConstructorCalls());
+  CHECK(V.begin() + 1 == I);
   assertValuesInOrder(V, 6u, 1, 16, 16, 2, 3, 4);
 }
 
@@ -767,7 +767,7 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest InsertRepeatedNonIte
   makeSequence(V, 1, 4);
   Constructable::reset();
   auto I = V.insert(V.begin() + 1, 2, 7);
-  CHECK((V.begin() + 1) == (I));
+  CHECK(V.begin() + 1 == I);
   assertValuesInOrder(V, 6u, 1, 7, 7, 2, 3, 4);
 }
 
@@ -778,15 +778,15 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest InsertRepeatedAtEndT
   Constructable::reset();
   auto I = V.insert(V.end(), 2, Constructable(16));
   // Just copy construct them into newly allocated space
-  CHECK((2) == (Constructable::getNumCopyConstructorCalls()));
+  CHECK(2 == Constructable::getNumCopyConstructorCalls());
   // Move everything across if reallocation is needed.
   CHECK((Constructable::getNumMoveConstructorCalls() == 0 ||
          Constructable::getNumMoveConstructorCalls() == 4));
   // Without ever moving or copying anything else.
-  CHECK((0) == (Constructable::getNumCopyAssignmentCalls()));
-  CHECK((0) == (Constructable::getNumMoveAssignmentCalls()));
+  CHECK(0 == Constructable::getNumCopyAssignmentCalls());
+  CHECK(0 == Constructable::getNumMoveAssignmentCalls());
 
-  CHECK((V.begin() + 4) == (I));
+  CHECK(V.begin() + 4 == I);
   assertValuesInOrder(V, 6u, 1, 2, 3, 4, 16, 16);
 }
 
@@ -796,8 +796,8 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest InsertRepeatedEmptyT
   makeSequence(V, 10, 15);
 
   // Empty insert.
-  CHECK((V.end()) == (V.insert(V.end(), 0, Constructable(42))));
-  CHECK((V.begin() + 1) == (V.insert(V.begin() + 1, 0, Constructable(42))));
+  CHECK(V.end() == V.insert(V.end(), 0, Constructable(42)));
+  CHECK(V.begin() + 1 == V.insert(V.begin() + 1, 0, Constructable(42)));
 }
 
 // Insert range.
@@ -818,10 +818,10 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest InsertRangeTest", "[
   CHECK((Constructable::getNumMoveConstructorCalls() == 2 ||
          Constructable::getNumMoveConstructorCalls() == 5));
   // Copy assign the lower 2 new elements into existing space.
-  CHECK((2) == (Constructable::getNumCopyAssignmentCalls()));
+  CHECK(2 == Constructable::getNumCopyAssignmentCalls());
   // Copy construct the third element into newly allocated space.
-  CHECK((1) == (Constructable::getNumCopyConstructorCalls()));
-  CHECK((V.begin() + 1) == (I));
+  CHECK(1 == Constructable::getNumCopyConstructorCalls());
+  CHECK(V.begin() + 1 == I);
   assertValuesInOrder(V, 6u, 1, 77, 77, 77, 2, 3);
 }
 
@@ -838,15 +838,15 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest InsertRangeAtEndTest
   Constructable::reset();
   auto I = V.insert(V.end(), Arr, Arr + 3);
   // Copy construct the 3 elements into new space at the top.
-  CHECK((3) == (Constructable::getNumCopyConstructorCalls()));
+  CHECK(3 == Constructable::getNumCopyConstructorCalls());
   // Don't copy/move anything else.
-  CHECK((0) == (Constructable::getNumCopyAssignmentCalls()));
+  CHECK(0 == Constructable::getNumCopyAssignmentCalls());
   // Reallocation might occur, causing all elements to be moved into the new
   // buffer.
   CHECK((Constructable::getNumMoveConstructorCalls() == 0 ||
          Constructable::getNumMoveConstructorCalls() == 3));
-  CHECK((0) == (Constructable::getNumMoveAssignmentCalls()));
-  CHECK((V.begin() + 3) == (I));
+  CHECK(0 == Constructable::getNumMoveAssignmentCalls());
+  CHECK(V.begin() + 3 == I);
   assertValuesInOrder(V, 6u, 1, 2, 3, 77, 77, 77);
 }
 
@@ -856,8 +856,8 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest InsertEmptyRangeTest
   makeSequence(V, 1, 3);
 
   // Empty insert.
-  CHECK((V.end()) == (V.insert(V.end(), V.begin(), V.begin())));
-  CHECK((V.begin() + 1) == (V.insert(V.begin() + 1, V.begin(), V.begin())));
+  CHECK(V.end() == V.insert(V.end(), V.begin(), V.begin()));
+  CHECK(V.begin() + 1 == V.insert(V.begin() + 1, V.begin(), V.begin()));
 }
 
 // Comparison tests.
@@ -913,7 +913,7 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest ComparisonLessThanTe
 TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest ConstVectorTest", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_SmallVectorTest) {
   const TestType constVector;
 
-  CHECK((0u) == (constVector.size()));
+  CHECK(0u == constVector.size());
   CHECK(constVector.empty());
   CHECK(constVector.begin() == constVector.end());
 }
@@ -921,20 +921,20 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest ConstVectorTest", "[
 // Direct array access.
 TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest DirectVectorTest", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_SmallVectorTest) {
   auto &V = this->theVector;
-  CHECK((0u) == (V.size()));
+  CHECK(0u == V.size());
   V.reserve(4);
-  CHECK((4u) <= (V.capacity()));
-  CHECK((0) == (Constructable::getNumConstructorCalls()));
+  CHECK(4u <= V.capacity());
+  CHECK(0 == Constructable::getNumConstructorCalls());
   V.push_back(1);
   V.push_back(2);
   V.push_back(3);
   V.push_back(4);
-  CHECK((4u) == (V.size()));
-  CHECK((8) == (Constructable::getNumConstructorCalls()));
-  CHECK((1) == (V[0].getValue()));
-  CHECK((2) == (V[1].getValue()));
-  CHECK((3) == (V[2].getValue()));
-  CHECK((4) == (V[3].getValue()));
+  CHECK(4u == V.size());
+  CHECK(8 == Constructable::getNumConstructorCalls());
+  CHECK(1 == V[0].getValue());
+  CHECK(2 == V[1].getValue());
+  CHECK(3 == V[2].getValue());
+  CHECK(4 == V[3].getValue());
 }
 
 TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest IteratorTest", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_SmallVectorTest) {
@@ -977,7 +977,7 @@ TEMPLATE_TEST_CASE_METHOD(DualSmallVectorsTest, "DualSmallVectorsTest MoveAssign
   // Make sure the # of constructor/destructor calls line up. There
   // are two live objects after clearing the other vector.
   U.clear();
-  CHECK((Constructable::getNumConstructorCalls()-4) == (Constructable::getNumDestructorCalls()));
+  CHECK(Constructable::getNumConstructorCalls()-4 == Constructable::getNumDestructorCalls());
 
   // If the source vector (otherVector) was in small-mode, assert that we just
   // moved the data pointer over.
@@ -985,10 +985,10 @@ TEMPLATE_TEST_CASE_METHOD(DualSmallVectorsTest, "DualSmallVectorsTest MoveAssign
 
   // There shouldn't be any live objects any more.
   V.clear();
-  CHECK((Constructable::getNumConstructorCalls()) == (Constructable::getNumDestructorCalls()));
+  CHECK(Constructable::getNumConstructorCalls() == Constructable::getNumDestructorCalls());
 
   // We shouldn't have copied anything in this whole process.
-  CHECK((Constructable::getNumCopyConstructorCalls()) == (0));
+  CHECK(Constructable::getNumCopyConstructorCalls() == 0);
 }
 
 struct notassignable {
@@ -1001,7 +1001,7 @@ TEST_CASE("SmallVectorCustomTest NoAssignTest", "[wpiutil][llvm]") {
   SmallVector<notassignable, 2> vec;
   vec.push_back(notassignable(x));
   x = 42;
-  CHECK((42) == (vec.pop_back_val().x));
+  CHECK(42 == vec.pop_back_val().x);
 }
 
 struct MovedFrom {
@@ -1164,9 +1164,9 @@ TEST_CASE("SmallVectorTest EmplaceBack", "[wpiutil][llvm]") {
     SmallVector<int, 1> V;
     V.emplace_back();
     V.emplace_back(42);
-    CHECK((2U) == (V.size()));
-    CHECK((0) == (V[0]));
-    CHECK((42) == (V[1]));
+    CHECK(2U == V.size());
+    CHECK(0 == V[0]);
+    CHECK(42 == V[1]);
   }
 }
 
@@ -1174,7 +1174,7 @@ TEST_CASE("SmallVectorTest DefaultInlinedElements", "[wpiutil][llvm]") {
   SmallVector<int> V;
   CHECK(V.empty());
   V.push_back(7);
-  CHECK((V[0]) == (7));
+  CHECK(V[0] == 7);
 
   // Check that at least a couple layers of nested SmallVector<T>'s are allowed
   // by the default inline elements policy. This pattern happens in practice
@@ -1183,7 +1183,7 @@ TEST_CASE("SmallVectorTest DefaultInlinedElements", "[wpiutil][llvm]") {
   // "preferred" maximum sizeof.
   SmallVector<SmallVector<SmallVector<int>>> NestedV;
   NestedV.emplace_back().emplace_back().emplace_back(42);
-  CHECK((NestedV[0][0][0]) == (42));
+  CHECK(NestedV[0][0][0] == 42);
 }
 
 namespace namespace_with_adl {
@@ -1202,17 +1202,17 @@ TEST_CASE("SmallVectorTest ToVector", "[wpiutil][llvm]") {
     std::vector<char> v = {'a', 'b', 'c'};
     auto Vector = to_vector<4>(v);
     static_assert(NumBuiltinElts(Vector) == 4u);
-    REQUIRE((3u) == (Vector.size()));
+    REQUIRE(3u == Vector.size());
     for (size_t I = 0; I < v.size(); ++I)
-      CHECK((v[I]) == (Vector[I]));
+      CHECK(v[I] == Vector[I]);
   }
   {
     std::vector<char> v = {'a', 'b', 'c'};
     auto Vector = to_vector(v);
     static_assert(NumBuiltinElts(Vector) != 4u);
-    REQUIRE((3u) == (Vector.size()));
+    REQUIRE(3u == Vector.size());
     for (size_t I = 0; I < v.size(); ++I)
-      CHECK((v[I]) == (Vector[I]));
+      CHECK(v[I] == Vector[I]);
   }
   {
     // Check that to_vector and to_vector_of work with types that require ADL
@@ -1249,17 +1249,17 @@ TEST_CASE("SmallVectorTest ConstructFromSpanOfConvertibleType", "[wpiutil][llvm]
   {
     wpi::util::SmallVector<To> Vector(Array);
 
-    REQUIRE((Array.size()) == (Vector.size()));
+    REQUIRE(Array.size() == Vector.size());
     for (size_t I = 0; I < Array.size(); ++I)
-      CHECK((Array[I]) == (Vector[I]));
+      CHECK(Array[I] == Vector[I]);
   }
   {
     wpi::util::SmallVector<To, 4> Vector(Array);
 
-    REQUIRE((Array.size()) == (Vector.size()));
-    REQUIRE((4u) == (NumBuiltinElts(Vector)));
+    REQUIRE(Array.size() == Vector.size());
+    REQUIRE(4u == NumBuiltinElts(Vector));
     for (size_t I = 0; I < Array.size(); ++I)
-      CHECK((Array[I]) == (Vector[I]));
+      CHECK(Array[I] == Vector[I]);
   }
 }
 
@@ -1269,17 +1269,17 @@ TEST_CASE("SmallVectorTest ToVectorOf", "[wpiutil][llvm]") {
   {
     wpi::util::SmallVector<To> Vector = wpi::util::to_vector_of<To>(StdVector);
 
-    REQUIRE((StdVector.size()) == (Vector.size()));
+    REQUIRE(StdVector.size() == Vector.size());
     for (size_t I = 0; I < StdVector.size(); ++I)
-      CHECK((StdVector[I]) == (Vector[I]));
+      CHECK(StdVector[I] == Vector[I]);
   }
   {
     auto Vector = wpi::util::to_vector_of<To, 4>(StdVector);
 
-    REQUIRE((StdVector.size()) == (Vector.size()));
+    REQUIRE(StdVector.size() == Vector.size());
     static_assert(NumBuiltinElts(Vector) == 4u);
     for (size_t I = 0; I < StdVector.size(); ++I)
-      CHECK((StdVector[I]) == (Vector[I]));
+      CHECK(StdVector[I] == Vector[I]);
   }
   {
     // Check that to_vector works with types that require ADL for being/end
@@ -1325,10 +1325,10 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
 
   // Push back a reference to last element when growing from small storage.
   V.push_back(V.back());
-  CHECK((N) == (V.back()));
+  CHECK(N == V.back());
 
   // Check that the old value is still there (not moved away).
-  CHECK((N) == (V[V.size() - 2]));
+  CHECK(N == V[V.size() - 2]);
 
   // Fill storage again.
   V.back() = V.size();
@@ -1337,7 +1337,7 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
 
   // Push back a reference to last element when growing from large storage.
   V.push_back(V.back());
-  CHECK((int(V.size()) - 1) == (V.back()));
+  CHECK(int(V.size()) - 1 == V.back());
 }
 
 TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorReferenceInvalidationTest PushBackMoved", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_SmallVectorReferenceInvalidationTest) {
@@ -1347,10 +1347,10 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
 
   // Push back a reference to last element when growing from small storage.
   V.push_back(std::move(V.back()));
-  CHECK((N) == (V.back()));
+  CHECK(N == V.back());
   if (this->template isValueType<Constructable>()) {
     // Check that the value was moved (not copied).
-    CHECK((0) == (V[V.size() - 2]));
+    CHECK(0 == V[V.size() - 2]);
   }
 
   // Fill storage again.
@@ -1362,10 +1362,10 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
   V.push_back(std::move(V.back()));
 
   // Check the values.
-  CHECK((int(V.size()) - 1) == (V.back()));
+  CHECK(int(V.size()) - 1 == V.back());
   if (this->template isValueType<Constructable>()) {
     // Check the value got moved out.
-    CHECK((0) == (V[V.size() - 2]));
+    CHECK(0 == V[V.size() - 2]);
   }
 }
 
@@ -1374,13 +1374,13 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
   (void)V;
   int N = NumBuiltinElts(V);
   V.resize(N + 1, V.back());
-  CHECK((N) == (V.back()));
+  CHECK(N == V.back());
 
   // Resize to add enough elements that V will grow again. If reference
   // invalidation breaks in the future, sanitizers should be able to catch a
   // use-after-free here.
   V.resize(V.capacity() + 1, V.front());
-  CHECK((1) == (V.back()));
+  CHECK(1 == V.back());
 }
 
 TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorReferenceInvalidationTest Append", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_SmallVectorReferenceInvalidationTest) {
@@ -1388,7 +1388,7 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
   (void)V;
   V.append(1, V.back());
   int N = NumBuiltinElts(V);
-  CHECK((N) == (V[N - 1]));
+  CHECK(N == V[N - 1]);
 
   // Append enough more elements that V will grow again. This tests growing
   // when already in large mode.
@@ -1396,7 +1396,7 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
   // If reference invalidation breaks in the future, sanitizers should be able
   // to catch a use-after-free here.
   V.append(V.capacity() - V.size() + 1, V.front());
-  CHECK((1) == (V.back()));
+  CHECK(1 == V.back());
 }
 
 TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorReferenceInvalidationTest AppendRange", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_SmallVectorReferenceInvalidationTest) {
@@ -1405,10 +1405,10 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
 #if !defined(NDEBUG) && GTEST_HAS_DEATH_TEST
   CHECK_DEATH(V.append(V.begin(), V.begin() + 1), this->AssertionMessage);
 
-  REQUIRE((3u) == (NumBuiltinElts(V)));
-  REQUIRE((3u) == (V.size()));
+  REQUIRE(3u == NumBuiltinElts(V));
+  REQUIRE(3u == V.size());
   V.pop_back();
-  REQUIRE((2u) == (V.size()));
+  REQUIRE(2u == V.size());
 
   // Confirm this checks for growth when there's more than one element
   // appended.
@@ -1421,29 +1421,29 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
   auto &V = this->V;
   (void)V;
   int N = NumBuiltinElts(V);
-  REQUIRE((unsigned(N)) == (V.size()));
-  REQUIRE((unsigned(N)) == (V.capacity()));
+  REQUIRE(unsigned(N) == V.size());
+  REQUIRE(unsigned(N) == V.capacity());
 
   // Check assign that shrinks in small mode.
   V.assign(1, V.back());
-  CHECK((1u) == (V.size()));
-  CHECK((N) == (V[0]));
+  CHECK(1u == V.size());
+  CHECK(N == V[0]);
 
   // Check assign that grows within small mode.
-  REQUIRE((V.size()) < (V.capacity()));
+  REQUIRE(V.size() < V.capacity());
   V.assign(V.capacity(), V.back());
   for (int I = 0, E = V.size(); I != E; ++I) {
-    CHECK((N) == (V[I]));
+    CHECK(N == V[I]);
 
     // Reset to [1, 2, ...].
     V[I] = I + 1;
   }
 
   // Check assign that grows to large mode.
-  REQUIRE((2) == (V[1]));
+  REQUIRE(2 == V[1]);
   V.assign(V.capacity() + 1, V[1]);
   for (int I = 0, E = V.size(); I != E; ++I) {
-    CHECK((2) == (V[I]));
+    CHECK(2 == V[I]);
 
     // Reset to [1, 2, ...].
     V[I] = I + 1;
@@ -1451,7 +1451,7 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
 
   // Check assign that shrinks in large mode.
   V.assign(1, V[1]);
-  CHECK((2) == (V[0]));
+  CHECK(2 == V[0]);
 }
 
 TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorReferenceInvalidationTest AssignRange", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_SmallVectorReferenceInvalidationTest) {
@@ -1473,8 +1473,8 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
   // push_back()), growing out of small mode. Confirm the value was copied out
   // (moving out Constructable sets it to 0).
   V.insert(V.begin(), V.back());
-  CHECK((int(V.size() - 1)) == (V.front()));
-  CHECK((int(V.size() - 1)) == (V.back()));
+  CHECK(int(V.size() - 1) == V.front());
+  CHECK(int(V.size() - 1) == V.back());
 
   // Fill up the vector again.
   while (V.size() < V.capacity())
@@ -1482,8 +1482,8 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
 
   // Grow again from large storage to large storage.
   V.insert(V.begin(), V.back());
-  CHECK((int(V.size() - 1)) == (V.front()));
-  CHECK((int(V.size() - 1)) == (V.back()));
+  CHECK(int(V.size() - 1) == V.front());
+  CHECK(int(V.size() - 1) == V.back());
 }
 
 TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorReferenceInvalidationTest InsertMoved", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_SmallVectorReferenceInvalidationTest) {
@@ -1495,10 +1495,10 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
   // push_back()), growing out of small mode. Confirm the value was copied out
   // (moving out Constructable sets it to 0).
   V.insert(V.begin(), std::move(V.back()));
-  CHECK((int(V.size() - 1)) == (V.front()));
+  CHECK(int(V.size() - 1) == V.front());
   if (this->template isValueType<Constructable>()) {
     // Check the value got moved out.
-    CHECK((0) == (V.back()));
+    CHECK(0 == V.back());
   }
 
   // Fill up the vector again.
@@ -1507,10 +1507,10 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
 
   // Grow again from large storage to large storage.
   V.insert(V.begin(), std::move(V.back()));
-  CHECK((int(V.size() - 1)) == (V.front()));
+  CHECK(int(V.size() - 1) == V.front());
   if (this->template isValueType<Constructable>()) {
     // Check the value got moved out.
-    CHECK((0) == (V.back()));
+    CHECK(0 == V.back());
   }
 }
 
@@ -1521,7 +1521,7 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
   // Cover NumToInsert <= this->end() - I.
   V.insert(V.begin() + 1, 1, V.back());
   int N = NumBuiltinElts(V);
-  CHECK((N) == (V[1]));
+  CHECK(N == V[1]);
 
   // Cover NumToInsert > this->end() - I, inserting enough elements that V will
   // also grow again; V.capacity() will be more elements than necessary but
@@ -1530,7 +1530,7 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
   // If reference invalidation breaks in the future, sanitizers should be able
   // to catch a use-after-free here.
   V.insert(V.begin(), V.capacity(), V.front());
-  CHECK((1) == (V.front()));
+  CHECK(1 == V.front());
 }
 
 TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorReferenceInvalidationTest InsertRange", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_SmallVectorReferenceInvalidationTest) {
@@ -1539,10 +1539,10 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
 #if !defined(NDEBUG) && GTEST_HAS_DEATH_TEST
   CHECK_DEATH(V.insert(V.begin(), V.begin(), V.begin() + 1), this->AssertionMessage);
 
-  REQUIRE((3u) == (NumBuiltinElts(V)));
-  REQUIRE((3u) == (V.size()));
+  REQUIRE(3u == NumBuiltinElts(V));
+  REQUIRE(3u == V.size());
   V.pop_back();
-  REQUIRE((2u) == (V.size()));
+  REQUIRE(2u == V.size());
 
   // Confirm this checks for growth when there's more than one element
   // inserted.
@@ -1557,10 +1557,10 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
 
   // Push back a reference to last element when growing from small storage.
   V.emplace_back(V.back());
-  CHECK((N) == (V.back()));
+  CHECK(N == V.back());
 
   // Check that the old value is still there (not moved away).
-  CHECK((N) == (V[V.size() - 2]));
+  CHECK(N == V[V.size() - 2]);
 
   // Fill storage again.
   V.back() = V.size();
@@ -1569,7 +1569,7 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
 
   // Push back a reference to last element when growing from large storage.
   V.emplace_back(V.back());
-  CHECK((int(V.size()) - 1) == (V.back()));
+  CHECK(int(V.size()) - 1 == V.back());
 }
 
 template <class VectorT>
@@ -1601,12 +1601,12 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorInternalReferenceInvalidationTest, "SmallVe
 
   // Push back a reference to last element when growing from small storage.
   V.emplace_back(V.back().first, V.back().second);
-  CHECK((N) == (V.back().first));
-  CHECK((N) == (V.back().second));
+  CHECK(N == V.back().first);
+  CHECK(N == V.back().second);
 
   // Check that the old value is still there (not moved away).
-  CHECK((N) == (V[V.size() - 2].first));
-  CHECK((N) == (V[V.size() - 2].second));
+  CHECK(N == V[V.size() - 2].first);
+  CHECK(N == V[V.size() - 2].second);
 
   // Fill storage again.
   V.back().first = V.back().second = V.size();
@@ -1615,8 +1615,8 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorInternalReferenceInvalidationTest, "SmallVe
 
   // Push back a reference to last element when growing from large storage.
   V.emplace_back(V.back().first, V.back().second);
-  CHECK((int(V.size()) - 1) == (V.back().first));
-  CHECK((int(V.size()) - 1) == (V.back().second));
+  CHECK(int(V.size()) - 1 == V.back().first);
+  CHECK(int(V.size()) - 1 == V.back().second);
 }
 
 } // end namespace

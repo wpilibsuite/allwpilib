@@ -20,7 +20,7 @@ TEST_CASE("FutureTest Then", "[wpiutil]") {
       inPromise.get_future().then([](bool v) { return v ? 5 : 6; });
 
   inPromise.set_value(true);
-  REQUIRE((outFuture.get()) == (5));
+  REQUIRE(outFuture.get() == 5);
 }
 
 TEST_CASE("FutureTest ThenSame", "[wpiutil]") {
@@ -29,7 +29,7 @@ TEST_CASE("FutureTest ThenSame", "[wpiutil]") {
       inPromise.get_future().then([](bool v) { return !v; });
 
   inPromise.set_value(true);
-  REQUIRE((outFuture.get()) == (false));
+  REQUIRE(outFuture.get() == false);
 }
 
 TEST_CASE("FutureTest ThenFromVoid", "[wpiutil]") {
@@ -37,7 +37,7 @@ TEST_CASE("FutureTest ThenFromVoid", "[wpiutil]") {
   future<int> outFuture = inPromise.get_future().then([] { return 5; });
 
   inPromise.set_value();
-  REQUIRE((outFuture.get()) == (5));
+  REQUIRE(outFuture.get() == 5);
 }
 
 TEST_CASE("FutureTest ThenToVoid", "[wpiutil]") {
@@ -61,7 +61,7 @@ TEST_CASE("FutureTest Implicit", "[wpiutil]") {
   future<int> outFuture = inPromise.get_future();
 
   inPromise.set_value(true);
-  REQUIRE((outFuture.get()) == (1));
+  REQUIRE(outFuture.get() == 1);
 }
 
 TEST_CASE("FutureTest MoveSame", "[wpiutil]") {
@@ -70,7 +70,7 @@ TEST_CASE("FutureTest MoveSame", "[wpiutil]") {
   future<bool> outFuture(std::move(outFuture1));
 
   inPromise.set_value(true);
-  REQUIRE((outFuture.get()) == (true));
+  REQUIRE(outFuture.get() == true);
 }
 
 TEST_CASE("FutureTest MoveVoid", "[wpiutil]") {

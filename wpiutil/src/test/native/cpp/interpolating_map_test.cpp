@@ -20,22 +20,22 @@ TEST_CASE("InterpolatingMapTest Insert", "[wpiutil]") {
   table.insert(326, 650);
 
   // Key below minimum gives smallest value
-  CHECK((450) == (table[100]));
+  CHECK(450 == table[100]);
 
   // Minimum key gives exact value
-  CHECK((450) == (table[125]));
+  CHECK(450 == table[125]);
 
   // Key gives interpolated value
-  CHECK((480) == (table[162.5]));
+  CHECK(480 == table[162.5]);
 
   // Key at right of interpolation range gives exact value
-  CHECK((510) == (table[200]));
+  CHECK(510 == table[200]);
 
   // Maximum key gives exact value
-  CHECK((650) == (table[326]));
+  CHECK(650 == table[326]);
 
   // Key above maximum gives largest value
-  CHECK((650) == (table[400]));
+  CHECK(650 == table[400]);
 }
 
 TEST_CASE("InterpolatingMapTest Clear", "[wpiutil]") {
@@ -52,5 +52,5 @@ TEST_CASE("InterpolatingMapTest Clear", "[wpiutil]") {
   table.insert(100, 250);
   table.insert(200, 500);
 
-  CHECK((375) == (table[150]));
+  CHECK(375 == table[150]);
 }

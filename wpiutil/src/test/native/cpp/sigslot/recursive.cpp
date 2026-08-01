@@ -78,7 +78,7 @@ TEST_CASE("SignalTest Recursive", "[wpiutil][sigslot]") {
 
   i1.inc_val(0);
 
-  REQUIRE((i1.v) == (i2.v));
+  REQUIRE(i1.v == i2.v);
 }
 
 TEST_CASE("SignalTest SelfRecursive", "[wpiutil][sigslot]") {
@@ -94,7 +94,7 @@ TEST_CASE("SignalTest SelfRecursive", "[wpiutil][sigslot]") {
 
   s(0);
 
-  REQUIRE((i) == (10));
+  REQUIRE(i == 10);
 }
 
 }  // namespace wpi::util

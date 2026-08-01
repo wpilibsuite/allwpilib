@@ -15,33 +15,33 @@
 TEST_CASE("Color8BitTest ConstructDefault", "[wpiutil]") {
   constexpr wpi::util::Color8Bit color;
 
-  CHECK((0) == (color.red));
-  CHECK((0) == (color.green));
-  CHECK((0) == (color.blue));
+  CHECK(0 == color.red);
+  CHECK(0 == color.green);
+  CHECK(0 == color.blue);
 }
 
 TEST_CASE("Color8BitTest ConstructFromInts", "[wpiutil]") {
   constexpr wpi::util::Color8Bit color{255, 128, 64};
 
-  CHECK((255) == (color.red));
-  CHECK((128) == (color.green));
-  CHECK((64) == (color.blue));
+  CHECK(255 == color.red);
+  CHECK(128 == color.green);
+  CHECK(64 == color.blue);
 }
 
 TEST_CASE("Color8BitTest ConstructFromColor", "[wpiutil]") {
   constexpr wpi::util::Color8Bit color{wpi::util::Color{255, 128, 64}};
 
-  CHECK((255) == (color.red));
-  CHECK((128) == (color.green));
-  CHECK((64) == (color.blue));
+  CHECK(255 == color.red);
+  CHECK(128 == color.green);
+  CHECK(64 == color.blue);
 }
 
 TEST_CASE("Color8BitTest ConstructFromHexString", "[wpiutil]") {
   constexpr wpi::util::Color8Bit color{"#FF8040"};
 
-  CHECK((255) == (color.red));
-  CHECK((128) == (color.green));
-  CHECK((64) == (color.blue));
+  CHECK(255 == color.red);
+  CHECK(128 == color.green);
+  CHECK(64 == color.blue);
 
   // No leading #
   CHECK_THROWS_AS(wpi::util::Color8Bit{"112233"}, std::invalid_argument);
@@ -63,12 +63,12 @@ TEST_CASE("Color8BitTest ImplicitConversionToColor", "[wpiutil]") {
 
 TEST_CASE("Color8BitTest ToHexString", "[wpiutil]") {
   constexpr wpi::util::Color8Bit color1{255, 128, 64};
-  CHECK(("#FF8040") == (color1.HexString()));
+  CHECK("#FF8040" == color1.HexString());
 
   // Ensure conversion to std::string works
   [[maybe_unused]]
   std::string str = color1.HexString();
 
   wpi::util::Color8Bit color2{255, 128, 64};
-  CHECK(("#FF8040") == (color2.HexString()));
+  CHECK("#FF8040" == color2.HexString());
 }

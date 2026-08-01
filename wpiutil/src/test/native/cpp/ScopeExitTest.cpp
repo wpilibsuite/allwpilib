@@ -18,10 +18,10 @@ TEST_CASE("ScopeExitTest ScopeExit", "[wpiutil]") {
   {
     wpi::util::scope_exit exit{[&] { ++exitCount; }};
 
-    CHECK((0) == (exitCount));
+    CHECK(0 == exitCount);
   }
 
-  CHECK((1) == (exitCount));
+  CHECK(1 == exitCount);
 }
 
 TEST_CASE("ScopeExitTest Release", "[wpiutil]") {
@@ -32,13 +32,13 @@ TEST_CASE("ScopeExitTest Release", "[wpiutil]") {
     wpi::util::scope_exit exit2 = std::move(exit1);
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.Move)
     wpi::util::scope_exit exit3 = std::move(exit1);
-    CHECK((0) == (exitCount));
+    CHECK(0 == exitCount);
   }
-  CHECK((1) == (exitCount));
+  CHECK(1 == exitCount);
 
   {
     wpi::util::scope_exit exit{[&] { ++exitCount; }};
     exit.release();
   }
-  CHECK((1) == (exitCount));
+  CHECK(1 == exitCount);
 }

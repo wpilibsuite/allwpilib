@@ -57,31 +57,31 @@ TEST_CASE("Base64Test EncodeStdString", "[wpiutil][base64]") {
   const auto& param = GENERATE_REF(Catch::Generators::from_range(testParams));
   std::string s;
   Base64Encode(GetPlain(param), &s);
-  REQUIRE((param.encoded) == (s));
+  REQUIRE(param.encoded == s);
 
   // text already in s
   Base64Encode(GetPlain(param), &s);
-  REQUIRE((param.encoded) == (s));
+  REQUIRE(param.encoded == s);
 }
 
 TEST_CASE("Base64Test EncodeSmallString", "[wpiutil][base64]") {
   const auto& param = GENERATE_REF(Catch::Generators::from_range(testParams));
   SmallString<128> buf;
-  REQUIRE((param.encoded) == (Base64Encode(GetPlain(param), buf)));
+  REQUIRE(param.encoded == Base64Encode(GetPlain(param), buf));
   // reuse buf
-  REQUIRE((param.encoded) == (Base64Encode(GetPlain(param), buf)));
+  REQUIRE(param.encoded == Base64Encode(GetPlain(param), buf));
 }
 
 TEST_CASE("Base64Test DecodeStdString", "[wpiutil][base64]") {
   const auto& param = GENERATE_REF(Catch::Generators::from_range(testParams));
   std::string s;
   std::string_view encoded = param.encoded;
-  CHECK((encoded.size()) == (Base64Decode(encoded, &s)));
-  REQUIRE((GetPlain(param)) == (s));
+  CHECK(encoded.size() == Base64Decode(encoded, &s));
+  REQUIRE(GetPlain(param) == s);
 
   // text already in s
   Base64Decode(encoded, &s);
-  REQUIRE((GetPlain(param)) == (s));
+  REQUIRE(GetPlain(param) == s);
 }
 
 TEST_CASE("Base64Test DecodeSmallString", "[wpiutil][base64]") {
@@ -90,12 +90,12 @@ TEST_CASE("Base64Test DecodeSmallString", "[wpiutil][base64]") {
   std::string_view encoded = param.encoded;
   size_t len;
   std::string_view plain = Base64Decode(encoded, &len, buf);
-  CHECK((encoded.size()) == (len));
-  REQUIRE((GetPlain(param)) == (plain));
+  CHECK(encoded.size() == len);
+  REQUIRE(GetPlain(param) == plain);
 
   // reuse buf
   plain = Base64Decode(encoded, &len, buf);
-  REQUIRE((GetPlain(param)) == (plain));
+  REQUIRE(GetPlain(param) == plain);
 }
 
 }  // namespace wpi::util

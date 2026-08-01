@@ -43,56 +43,56 @@ TEST_CASE("RotatedSpanTest Constexpr", "[wpiutil]") {
 TEST_CASE("RotatedSpanTest ConstructConst", "[wpiutil]") {
   {
     wpi::util::rotated_span<const int, 10> sp{csarr_values};
-    CHECK((sp[5]) == (sarr_values[5]));
+    CHECK(sp[5] == sarr_values[5]);
   }
   {
     wpi::util::rotated_span<const int> sp{csarr_values};
-    CHECK((sp[5]) == (sarr_values[5]));
+    CHECK(sp[5] == sarr_values[5]);
   }
   {
     wpi::util::rotated_span<const int, 10> sp{carr_values};
-    CHECK((sp[5]) == (arr_values[5]));
+    CHECK(sp[5] == arr_values[5]);
   }
   {
     wpi::util::rotated_span<const int> sp{carr_values};
-    CHECK((sp[5]) == (arr_values[5]));
+    CHECK(sp[5] == arr_values[5]);
   }
   {
     wpi::util::rotated_span<const int> sp{cvec_values.begin(),
                                           cvec_values.end()};
-    CHECK((sp[5]) == (vec_values[5]));
+    CHECK(sp[5] == vec_values[5]);
   }
   {
     wpi::util::rotated_span<const int> sp{cvec_values.data(),
                                           cvec_values.size()};
-    CHECK((sp[5]) == (vec_values[5]));
+    CHECK(sp[5] == vec_values[5]);
   }
 }
 
 TEST_CASE("RotatedSpanTest ConstructNonConst", "[wpiutil]") {
   {
     wpi::util::rotated_span<int, 10> sp{sarr_values};
-    CHECK((sp[5]) == (sarr_values[5]));
+    CHECK(sp[5] == sarr_values[5]);
   }
   {
     wpi::util::rotated_span<int> sp{sarr_values};
-    CHECK((sp[5]) == (sarr_values[5]));
+    CHECK(sp[5] == sarr_values[5]);
   }
   {
     wpi::util::rotated_span<int, 10> sp{arr_values};
-    CHECK((sp[5]) == (arr_values[5]));
+    CHECK(sp[5] == arr_values[5]);
   }
   {
     wpi::util::rotated_span<int> sp{arr_values};
-    CHECK((sp[5]) == (arr_values[5]));
+    CHECK(sp[5] == arr_values[5]);
   }
   {
     wpi::util::rotated_span<int> sp{vec_values.begin(), vec_values.end()};
-    CHECK((sp[5]) == (vec_values[5]));
+    CHECK(sp[5] == vec_values[5]);
   }
   {
     wpi::util::rotated_span<int> sp{vec_values.data(), vec_values.size()};
-    CHECK((sp[5]) == (vec_values[5]));
+    CHECK(sp[5] == vec_values[5]);
   }
 }
 
@@ -179,14 +179,14 @@ TEST_CASE("RotatedSpanTest IteratorConst", "[wpiutil]") {
   // iterator
   int i = 0;
   for (auto& elem : sp_sarr) {
-    CHECK((sarr_values[i]) == (elem));
+    CHECK(sarr_values[i] == elem);
     ++i;
   }
 
   // const_iterator
   i = 0;
   for (const auto& elem : sp_sarr) {
-    CHECK((sarr_values[i]) == (elem));
+    CHECK(sarr_values[i] == elem);
     ++i;
   }
 }
@@ -197,14 +197,14 @@ TEST_CASE("RotatedSpanTest IteratorNonConst", "[wpiutil]") {
   // iterator
   int i = 0;
   for (auto& elem : sp_sarr) {
-    CHECK((sarr_values[i]) == (elem));
+    CHECK(sarr_values[i] == elem);
     ++i;
   }
 
   // const_iterator
   i = 0;
   for (const auto& elem : sp_sarr) {
-    CHECK((sarr_values[i]) == (elem));
+    CHECK(sarr_values[i] == elem);
     ++i;
   }
 }

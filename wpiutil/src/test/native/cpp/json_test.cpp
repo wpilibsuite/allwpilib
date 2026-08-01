@@ -15,12 +15,12 @@ namespace wpi::util {
 TEST_CASE("JsonTest ParseMaxUint64", "[wpiutil]") {
   auto j = json::parse_or_throw("18446744073709551615");
   CHECK(j.is_uint());
-  CHECK((j.get_uint()) == (18446744073709551615ull));
+  CHECK(j.get_uint() == 18446744073709551615ull);
 }
 
 TEST_CASE("JsonTest MarshalMaxUint64", "[wpiutil]") {
   json j{18446744073709551615ull};
-  CHECK((j.to_string()) == ("18446744073709551615"));
+  CHECK(j.to_string() == "18446744073709551615");
 }
 
 TEST_CASE("JsonTest AssignBool", "[wpiutil]") {

@@ -31,11 +31,11 @@ TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest Empty",
                  "[wpiutil][struct]") {
   auto desc = db.Add("test", "", &err);
   REQUIRE(desc);
-  REQUIRE((desc->GetName()) == ("test"));
-  REQUIRE((desc->GetSchema()) == (""));
+  REQUIRE(desc->GetName() == "test");
+  REQUIRE(desc->GetSchema() == "");
   REQUIRE(desc->GetFields().empty());
   REQUIRE(desc->IsValid());
-  REQUIRE((desc->GetSize()) == (0u));
+  REQUIRE(desc->GetSize() == 0u);
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest NestedStruct",
@@ -46,7 +46,7 @@ TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest NestedStruct",
   auto desc2 = db.Add("test2", "test a", &err);
   REQUIRE(desc2);
   REQUIRE(desc2->IsValid());
-  REQUIRE((desc2->GetSize()) == (4u));
+  REQUIRE(desc2->GetSize() == 4u);
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest DelayedValid",
@@ -64,11 +64,11 @@ TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest DelayedValid",
   REQUIRE(desc4);
   REQUIRE(desc4->IsValid());
   REQUIRE(desc->IsValid());
-  REQUIRE((desc->GetSize()) == (4u));
+  REQUIRE(desc->GetSize() == 4u);
   REQUIRE(desc2->IsValid());
-  REQUIRE((desc2->GetSize()) == (8u));
+  REQUIRE(desc2->GetSize() == 8u);
   REQUIRE(desc3->IsValid());
-  REQUIRE((desc3->GetSize()) == (8u));
+  REQUIRE(desc3->GetSize() == 8u);
 }
 
 TEST_CASE_METHOD(DynamicStructTest,
@@ -80,34 +80,34 @@ TEST_CASE_METHOD(DynamicStructTest,
   REQUIRE(desc->IsValid());
   REQUIRE(desc2);
   REQUIRE(desc2->IsValid());
-  REQUIRE((desc2->GetSize()) == (16u));
+  REQUIRE(desc2->GetSize() == 16u);
   auto fields = desc2->GetFields();
-  REQUIRE((fields[0].GetOffset()) == (0u));
-  REQUIRE((fields[0].GetName()) == ("a"));
-  REQUIRE((fields[1].GetOffset()) == (8u));
-  REQUIRE((fields[1].GetName()) == ("b"));
+  REQUIRE(fields[0].GetOffset() == 0u);
+  REQUIRE(fields[0].GetName() == "a");
+  REQUIRE(fields[1].GetOffset() == 8u);
+  REQUIRE(fields[1].GetName() == "b");
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest InvalidBitfield",
                  "[wpiutil][struct]") {
   auto desc = db.Add("test", "float a:1", &err);
   CHECK_FALSE(desc);
-  CHECK((err) == ("field a: type float cannot be bitfield"));
+  CHECK(err == "field a: type float cannot be bitfield");
 
   desc = db.Add("test", "double a:1", &err);
   CHECK_FALSE(desc);
-  CHECK((err) == ("field a: type double cannot be bitfield"));
+  CHECK(err == "field a: type double cannot be bitfield");
 
   desc = db.Add("test", "foo a:1", &err);
   CHECK_FALSE(desc);
-  CHECK((err) == ("field a: type foo cannot be bitfield"));
+  CHECK(err == "field a: type foo cannot be bitfield");
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest CircularStructReference",
                  "[wpiutil][struct]") {
   auto desc = db.Add("test", "test a", &err);
   REQUIRE_FALSE(desc);
-  REQUIRE((err) == ("field a: recursive struct reference"));
+  REQUIRE(err == "field a: recursive struct reference");
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest NestedCircularStructRef",
@@ -118,7 +118,7 @@ TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest NestedCircularStructRef",
   REQUIRE(desc2);
   auto desc3 = db.Add("bar", "test a", &err);
   REQUIRE_FALSE(desc3);
-  REQUIRE((err) == ("circular struct reference: bar <- foo <- test"));
+  REQUIRE(err == "circular struct reference: bar <- foo <- test");
 
   // ok
   auto desc4 = db.Add("baz", "bar a", &err);
@@ -135,190 +135,190 @@ TEST_CASE_METHOD(DynamicStructTest,
   REQUIRE(desc2);
   auto desc3 = db.Add("foo", "bar a", &err);
   REQUIRE_FALSE(desc3);
-  REQUIRE((err) == ("circular struct reference: foo <- test <- bar"));
+  REQUIRE(err == "circular struct reference: foo <- test <- bar");
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest BitfieldBasic",
                  "[wpiutil][struct]") {
   auto desc = db.Add("test", "int32 a:2; uint32 b:30", &err);
   REQUIRE(desc);
-  CHECK((desc->GetSize()) == (4u));
+  CHECK(desc->GetSize() == 4u);
   auto& fields = desc->GetFields();
-  REQUIRE((fields.size()) == (2u));
-  CHECK((fields[0].GetBitWidth()) == (2u));
-  CHECK((fields[0].GetBitShift()) == (0u));
-  CHECK((fields[0].GetBitMask()) == (0x3u));
-  CHECK((fields[0].GetOffset()) == (0u));
-  CHECK((fields[0].GetSize()) == (4u));
-  CHECK((fields[1].GetBitWidth()) == (30u));
-  CHECK((fields[1].GetBitShift()) == (2u));
-  CHECK((fields[1].GetBitMask()) == (0x3fffffffu));
-  CHECK((fields[1].GetOffset()) == (0u));
-  CHECK((fields[1].GetSize()) == (4u));
+  REQUIRE(fields.size() == 2u);
+  CHECK(fields[0].GetBitWidth() == 2u);
+  CHECK(fields[0].GetBitShift() == 0u);
+  CHECK(fields[0].GetBitMask() == 0x3u);
+  CHECK(fields[0].GetOffset() == 0u);
+  CHECK(fields[0].GetSize() == 4u);
+  CHECK(fields[1].GetBitWidth() == 30u);
+  CHECK(fields[1].GetBitShift() == 2u);
+  CHECK(fields[1].GetBitMask() == 0x3fffffffu);
+  CHECK(fields[1].GetOffset() == 0u);
+  CHECK(fields[1].GetSize() == 4u);
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest BitfieldDiffType",
                  "[wpiutil][struct]") {
   auto desc = db.Add("test", "int32 a:2; int16 b:2", &err);
   REQUIRE(desc);
-  CHECK((desc->GetSize()) == (6u));
+  CHECK(desc->GetSize() == 6u);
   auto& fields = desc->GetFields();
-  REQUIRE((fields.size()) == (2u));
-  CHECK((fields[0].GetBitWidth()) == (2u));
-  CHECK((fields[0].GetBitShift()) == (0u));
-  CHECK((fields[0].GetBitMask()) == (0x3u));
-  CHECK((fields[0].GetOffset()) == (0u));
-  CHECK((fields[0].GetSize()) == (4u));
-  CHECK((fields[1].GetBitWidth()) == (2u));
-  CHECK((fields[1].GetBitShift()) == (0u));
-  CHECK((fields[1].GetBitMask()) == (0x3u));
-  CHECK((fields[1].GetOffset()) == (4u));
-  CHECK((fields[1].GetSize()) == (2u));
+  REQUIRE(fields.size() == 2u);
+  CHECK(fields[0].GetBitWidth() == 2u);
+  CHECK(fields[0].GetBitShift() == 0u);
+  CHECK(fields[0].GetBitMask() == 0x3u);
+  CHECK(fields[0].GetOffset() == 0u);
+  CHECK(fields[0].GetSize() == 4u);
+  CHECK(fields[1].GetBitWidth() == 2u);
+  CHECK(fields[1].GetBitShift() == 0u);
+  CHECK(fields[1].GetBitMask() == 0x3u);
+  CHECK(fields[1].GetOffset() == 4u);
+  CHECK(fields[1].GetSize() == 2u);
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest BitfieldOverflow",
                  "[wpiutil][struct]") {
   auto desc = db.Add("test", "int8 a:4; int8 b:5", &err);
   REQUIRE(desc);
-  CHECK((desc->GetSize()) == (2u));
+  CHECK(desc->GetSize() == 2u);
   auto& fields = desc->GetFields();
-  REQUIRE((fields.size()) == (2u));
-  CHECK((fields[0].GetBitWidth()) == (4u));
-  CHECK((fields[0].GetBitShift()) == (0u));
-  CHECK((fields[0].GetBitMask()) == (0xfu));
-  CHECK((fields[0].GetOffset()) == (0u));
-  CHECK((fields[0].GetSize()) == (1u));
-  CHECK((fields[1].GetBitWidth()) == (5u));
-  CHECK((fields[1].GetBitMask()) == (0x1fu));
-  CHECK((fields[1].GetBitShift()) == (0u));
-  CHECK((fields[1].GetOffset()) == (1u));
-  CHECK((fields[1].GetSize()) == (1u));
+  REQUIRE(fields.size() == 2u);
+  CHECK(fields[0].GetBitWidth() == 4u);
+  CHECK(fields[0].GetBitShift() == 0u);
+  CHECK(fields[0].GetBitMask() == 0xfu);
+  CHECK(fields[0].GetOffset() == 0u);
+  CHECK(fields[0].GetSize() == 1u);
+  CHECK(fields[1].GetBitWidth() == 5u);
+  CHECK(fields[1].GetBitMask() == 0x1fu);
+  CHECK(fields[1].GetBitShift() == 0u);
+  CHECK(fields[1].GetOffset() == 1u);
+  CHECK(fields[1].GetSize() == 1u);
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest BitfieldBoolBegin8",
                  "[wpiutil][struct]") {
   auto desc = db.Add("test", "bool a:1; int8 b:5", &err);
   REQUIRE(desc);
-  CHECK((desc->GetSize()) == (1u));
+  CHECK(desc->GetSize() == 1u);
   auto& fields = desc->GetFields();
-  REQUIRE((fields.size()) == (2u));
-  CHECK((fields[0].GetBitWidth()) == (1u));
-  CHECK((fields[0].GetBitShift()) == (0u));
-  CHECK((fields[0].GetBitMask()) == (0x1u));
-  CHECK((fields[0].GetOffset()) == (0u));
-  CHECK((fields[0].GetSize()) == (1u));
-  CHECK((fields[1].GetBitWidth()) == (5u));
-  CHECK((fields[1].GetBitMask()) == (0x1fu));
-  CHECK((fields[1].GetBitShift()) == (1u));
-  CHECK((fields[1].GetOffset()) == (0u));
-  CHECK((fields[1].GetSize()) == (1u));
+  REQUIRE(fields.size() == 2u);
+  CHECK(fields[0].GetBitWidth() == 1u);
+  CHECK(fields[0].GetBitShift() == 0u);
+  CHECK(fields[0].GetBitMask() == 0x1u);
+  CHECK(fields[0].GetOffset() == 0u);
+  CHECK(fields[0].GetSize() == 1u);
+  CHECK(fields[1].GetBitWidth() == 5u);
+  CHECK(fields[1].GetBitMask() == 0x1fu);
+  CHECK(fields[1].GetBitShift() == 1u);
+  CHECK(fields[1].GetOffset() == 0u);
+  CHECK(fields[1].GetSize() == 1u);
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest BitfieldBoolBegin16",
                  "[wpiutil][struct]") {
   auto desc = db.Add("test", "bool a:1; int16 b:5", &err);
   REQUIRE(desc);
-  CHECK((desc->GetSize()) == (3u));
+  CHECK(desc->GetSize() == 3u);
   auto& fields = desc->GetFields();
-  REQUIRE((fields.size()) == (2u));
-  CHECK((fields[0].GetBitWidth()) == (1u));
-  CHECK((fields[0].GetBitShift()) == (0u));
-  CHECK((fields[0].GetBitMask()) == (0x1u));
-  CHECK((fields[0].GetOffset()) == (0u));
-  CHECK((fields[0].GetSize()) == (1u));
-  CHECK((fields[1].GetBitWidth()) == (5u));
-  CHECK((fields[1].GetBitMask()) == (0x1fu));
-  CHECK((fields[1].GetBitShift()) == (0u));
-  CHECK((fields[1].GetOffset()) == (1u));
-  CHECK((fields[1].GetSize()) == (2u));
+  REQUIRE(fields.size() == 2u);
+  CHECK(fields[0].GetBitWidth() == 1u);
+  CHECK(fields[0].GetBitShift() == 0u);
+  CHECK(fields[0].GetBitMask() == 0x1u);
+  CHECK(fields[0].GetOffset() == 0u);
+  CHECK(fields[0].GetSize() == 1u);
+  CHECK(fields[1].GetBitWidth() == 5u);
+  CHECK(fields[1].GetBitMask() == 0x1fu);
+  CHECK(fields[1].GetBitShift() == 0u);
+  CHECK(fields[1].GetOffset() == 1u);
+  CHECK(fields[1].GetSize() == 2u);
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest BitfieldBoolMid",
                  "[wpiutil][struct]") {
   auto desc = db.Add("test", "int16 a:2; bool b:1; bool c:1; uint16 d:5", &err);
   REQUIRE(desc);
-  CHECK((desc->GetSize()) == (2u));
+  CHECK(desc->GetSize() == 2u);
   auto& fields = desc->GetFields();
-  REQUIRE((fields.size()) == (4u));
-  CHECK((fields[0].GetBitWidth()) == (2u));
-  CHECK((fields[0].GetBitShift()) == (0u));
-  CHECK((fields[0].GetBitMask()) == (0x3u));
-  CHECK((fields[0].GetOffset()) == (0u));
-  CHECK((fields[0].GetSize()) == (2u));
-  CHECK((fields[1].GetBitWidth()) == (1u));
-  CHECK((fields[1].GetBitMask()) == (0x1u));
-  CHECK((fields[1].GetBitShift()) == (2u));
-  CHECK((fields[1].GetOffset()) == (0u));
-  CHECK((fields[1].GetSize()) == (2u));
-  CHECK((fields[2].GetBitWidth()) == (1u));
-  CHECK((fields[2].GetBitMask()) == (0x1u));
-  CHECK((fields[2].GetBitShift()) == (3u));
-  CHECK((fields[2].GetOffset()) == (0u));
-  CHECK((fields[2].GetSize()) == (2u));
-  CHECK((fields[3].GetBitWidth()) == (5u));
-  CHECK((fields[3].GetBitMask()) == (0x1fu));
-  CHECK((fields[3].GetBitShift()) == (4u));
-  CHECK((fields[3].GetOffset()) == (0u));
-  CHECK((fields[3].GetSize()) == (2u));
+  REQUIRE(fields.size() == 4u);
+  CHECK(fields[0].GetBitWidth() == 2u);
+  CHECK(fields[0].GetBitShift() == 0u);
+  CHECK(fields[0].GetBitMask() == 0x3u);
+  CHECK(fields[0].GetOffset() == 0u);
+  CHECK(fields[0].GetSize() == 2u);
+  CHECK(fields[1].GetBitWidth() == 1u);
+  CHECK(fields[1].GetBitMask() == 0x1u);
+  CHECK(fields[1].GetBitShift() == 2u);
+  CHECK(fields[1].GetOffset() == 0u);
+  CHECK(fields[1].GetSize() == 2u);
+  CHECK(fields[2].GetBitWidth() == 1u);
+  CHECK(fields[2].GetBitMask() == 0x1u);
+  CHECK(fields[2].GetBitShift() == 3u);
+  CHECK(fields[2].GetOffset() == 0u);
+  CHECK(fields[2].GetSize() == 2u);
+  CHECK(fields[3].GetBitWidth() == 5u);
+  CHECK(fields[3].GetBitMask() == 0x1fu);
+  CHECK(fields[3].GetBitShift() == 4u);
+  CHECK(fields[3].GetOffset() == 0u);
+  CHECK(fields[3].GetSize() == 2u);
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest BitfieldBoolEnd",
                  "[wpiutil][struct]") {
   auto desc = db.Add("test", "int16 a:15; bool b:1", &err);
   REQUIRE(desc);
-  CHECK((desc->GetSize()) == (2u));
+  CHECK(desc->GetSize() == 2u);
   auto& fields = desc->GetFields();
-  REQUIRE((fields.size()) == (2u));
-  CHECK((fields[0].GetBitWidth()) == (15u));
-  CHECK((fields[0].GetBitShift()) == (0u));
-  CHECK((fields[0].GetBitMask()) == (0x7fffu));
-  CHECK((fields[0].GetOffset()) == (0u));
-  CHECK((fields[0].GetSize()) == (2u));
-  CHECK((fields[1].GetBitWidth()) == (1u));
-  CHECK((fields[1].GetBitMask()) == (0x1u));
-  CHECK((fields[1].GetBitShift()) == (15u));
-  CHECK((fields[1].GetOffset()) == (0u));
-  CHECK((fields[1].GetSize()) == (2u));
+  REQUIRE(fields.size() == 2u);
+  CHECK(fields[0].GetBitWidth() == 15u);
+  CHECK(fields[0].GetBitShift() == 0u);
+  CHECK(fields[0].GetBitMask() == 0x7fffu);
+  CHECK(fields[0].GetOffset() == 0u);
+  CHECK(fields[0].GetSize() == 2u);
+  CHECK(fields[1].GetBitWidth() == 1u);
+  CHECK(fields[1].GetBitMask() == 0x1u);
+  CHECK(fields[1].GetBitShift() == 15u);
+  CHECK(fields[1].GetOffset() == 0u);
+  CHECK(fields[1].GetSize() == 2u);
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest BitfieldBoolEnd2",
                  "[wpiutil][struct]") {
   auto desc = db.Add("test", "int16 a:16; bool b:1", &err);
   REQUIRE(desc);
-  CHECK((desc->GetSize()) == (3u));
+  CHECK(desc->GetSize() == 3u);
   auto& fields = desc->GetFields();
-  REQUIRE((fields.size()) == (2u));
-  CHECK((fields[0].GetBitWidth()) == (16u));
-  CHECK((fields[0].GetBitShift()) == (0u));
-  CHECK((fields[0].GetBitMask()) == (0xffffu));
-  CHECK((fields[0].GetOffset()) == (0u));
-  CHECK((fields[0].GetSize()) == (2u));
-  CHECK((fields[1].GetBitWidth()) == (1u));
-  CHECK((fields[1].GetBitMask()) == (0x1u));
-  CHECK((fields[1].GetBitShift()) == (0u));
-  CHECK((fields[1].GetOffset()) == (2u));
-  CHECK((fields[1].GetSize()) == (1u));
+  REQUIRE(fields.size() == 2u);
+  CHECK(fields[0].GetBitWidth() == 16u);
+  CHECK(fields[0].GetBitShift() == 0u);
+  CHECK(fields[0].GetBitMask() == 0xffffu);
+  CHECK(fields[0].GetOffset() == 0u);
+  CHECK(fields[0].GetSize() == 2u);
+  CHECK(fields[1].GetBitWidth() == 1u);
+  CHECK(fields[1].GetBitMask() == 0x1u);
+  CHECK(fields[1].GetBitShift() == 0u);
+  CHECK(fields[1].GetOffset() == 2u);
+  CHECK(fields[1].GetSize() == 1u);
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest BitfieldBoolWrongSize",
                  "[wpiutil][struct]") {
   auto desc = db.Add("test", "bool a:2", &err);
   REQUIRE_FALSE(desc);
-  REQUIRE((err) == ("field a: bit width must be 1 for bool type"));
+  REQUIRE(err == "field a: bit width must be 1 for bool type");
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest BitfieldTooBig",
                  "[wpiutil][struct]") {
   auto desc = db.Add("test", "int16 a:17", &err);
   REQUIRE_FALSE(desc);
-  REQUIRE((err) == ("field a: bit width 17 exceeds type size"));
+  REQUIRE(err == "field a: bit width 17 exceeds type size");
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest DuplicateFieldName",
                  "[wpiutil][struct]") {
   auto desc = db.Add("test", "int16 a; int8 a", &err);
   REQUIRE_FALSE(desc);
-  REQUIRE((err) == ("duplicate field a"));
+  REQUIRE(err == "duplicate field a");
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest StringAllZeros",
@@ -326,10 +326,10 @@ TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest StringAllZeros",
   auto desc = db.Add("test", "char a[32]", &err);
   uint8_t data[32];
   std::memset(data, 0, sizeof(data));
-  REQUIRE((desc->GetSize()) == (sizeof(data) / sizeof(data[0])));
+  REQUIRE(desc->GetSize() == sizeof(data) / sizeof(data[0]));
   wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
-  CHECK((dynamic.GetStringField(field)) == (""));
+  CHECK(dynamic.GetStringField(field) == "");
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest StringRoundTrip",
@@ -337,11 +337,11 @@ TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest StringRoundTrip",
   auto desc = db.Add("test", "char a[32]", &err);
   uint8_t data[32];
   std::memset(data, 0, sizeof(data));
-  REQUIRE((desc->GetSize()) == (sizeof(data) / sizeof(data[0])));
+  REQUIRE(desc->GetSize() == sizeof(data) / sizeof(data[0]));
   wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   CHECK(dynamic.SetStringField(field, "abc"));
-  CHECK((dynamic.GetStringField(field)) == ("abc"));
+  CHECK(dynamic.GetStringField(field) == "abc");
 }
 
 TEST_CASE_METHOD(DynamicStructTest,
@@ -350,15 +350,15 @@ TEST_CASE_METHOD(DynamicStructTest,
   auto desc = db.Add("test", "char a[32]", &err);
   uint8_t data[32];
   std::memset(data, 0, sizeof(data));
-  REQUIRE((desc->GetSize()) == (sizeof(data) / sizeof(data[0])));
+  REQUIRE(desc->GetSize() == sizeof(data) / sizeof(data[0]));
   wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   std::string check{"ab\0c", 4};
-  REQUIRE((check.size()) == (4u));
+  REQUIRE(check.size() == 4u);
   CHECK(dynamic.SetStringField(field, check));
   auto get = dynamic.GetStringField(field);
-  CHECK((get) == (check));
-  CHECK((4u) == (get.size()));
+  CHECK(get == check);
+  CHECK(4u == get.size());
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest StringRoundTripTooLong",
@@ -366,13 +366,13 @@ TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest StringRoundTripTooLong",
   auto desc = db.Add("test", "char a[2]", &err);
   uint8_t data[2];
   std::memset(data, 0, sizeof(data));
-  REQUIRE((desc->GetSize()) == (sizeof(data) / sizeof(data[0])));
+  REQUIRE(desc->GetSize() == sizeof(data) / sizeof(data[0]));
   wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   CHECK_FALSE(dynamic.SetStringField(field, "abc"));
   auto get = dynamic.GetStringField(field);
-  CHECK((get) == ("ab"));
-  CHECK((2u) == (get.size()));
+  CHECK(get == "ab");
+  CHECK(2u == get.size());
 }
 
 TEST_CASE_METHOD(DynamicStructTest,
@@ -381,13 +381,13 @@ TEST_CASE_METHOD(DynamicStructTest,
   auto desc = db.Add("test", "char a[2]", &err);
   uint8_t data[2];
   std::memset(data, 0, sizeof(data));
-  REQUIRE((desc->GetSize()) == (sizeof(data) / sizeof(data[0])));
+  REQUIRE(desc->GetSize() == sizeof(data) / sizeof(data[0]));
   wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   CHECK_FALSE(dynamic.SetStringField(field, "a\u0234"));
   auto get = dynamic.GetStringField(field);
-  CHECK((get) == ("a"));
-  CHECK((1u) == (get.size()));
+  CHECK(get == "a");
+  CHECK(1u == get.size());
 }
 
 TEST_CASE_METHOD(DynamicStructTest,
@@ -396,13 +396,13 @@ TEST_CASE_METHOD(DynamicStructTest,
   auto desc = db.Add("test", "char a[3]", &err);
   uint8_t data[3];
   std::memset(data, 0, sizeof(data));
-  REQUIRE((desc->GetSize()) == (sizeof(data) / sizeof(data[0])));
+  REQUIRE(desc->GetSize() == sizeof(data) / sizeof(data[0]));
   wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   CHECK(dynamic.SetStringField(field, "a\u0234"));
   auto get = dynamic.GetStringField(field);
-  CHECK((get) == ("a\u0234"));
-  CHECK((3u) == (get.size()));
+  CHECK(get == "a\u0234");
+  CHECK(3u == get.size());
 }
 
 TEST_CASE_METHOD(DynamicStructTest,
@@ -411,13 +411,13 @@ TEST_CASE_METHOD(DynamicStructTest,
   auto desc = db.Add("test", "char a[4]", &err);
   uint8_t data[4];
   std::memset(data, 0, sizeof(data));
-  REQUIRE((desc->GetSize()) == (sizeof(data) / sizeof(data[0])));
+  REQUIRE(desc->GetSize() == sizeof(data) / sizeof(data[0]));
   wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   CHECK(dynamic.SetStringField(field, "a\u1234"));
   auto get = dynamic.GetStringField(field);
-  CHECK((get) == ("a\u1234"));
-  CHECK((4u) == (get.size()));
+  CHECK(get == "a\u1234");
+  CHECK(4u == get.size());
 }
 
 TEST_CASE_METHOD(DynamicStructTest,
@@ -426,13 +426,13 @@ TEST_CASE_METHOD(DynamicStructTest,
   auto desc = db.Add("test", "char a[2]", &err);
   uint8_t data[2];
   std::memset(data, 0, sizeof(data));
-  REQUIRE((desc->GetSize()) == (sizeof(data) / sizeof(data[0])));
+  REQUIRE(desc->GetSize() == sizeof(data) / sizeof(data[0]));
   wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   CHECK_FALSE(dynamic.SetStringField(field, "a\u1234"));
   auto get = dynamic.GetStringField(field);
-  CHECK((get) == ("a"));
-  CHECK((1u) == (get.size()));
+  CHECK(get == "a");
+  CHECK(1u == get.size());
 }
 
 TEST_CASE_METHOD(DynamicStructTest,
@@ -441,13 +441,13 @@ TEST_CASE_METHOD(DynamicStructTest,
   auto desc = db.Add("test", "char a[3]", &err);
   uint8_t data[3];
   std::memset(data, 0, sizeof(data));
-  REQUIRE((desc->GetSize()) == (sizeof(data) / sizeof(data[0])));
+  REQUIRE(desc->GetSize() == sizeof(data) / sizeof(data[0]));
   wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   CHECK_FALSE(dynamic.SetStringField(field, "a\u1234"));
   auto get = dynamic.GetStringField(field);
-  CHECK((get) == ("a"));
-  CHECK((1u) == (get.size()));
+  CHECK(get == "a");
+  CHECK(1u == get.size());
 }
 
 // MSVC and GCC do surrogate pairs differently.
@@ -463,13 +463,13 @@ TEST_CASE_METHOD(DynamicStructTest,
   auto desc = db.Add("test", "char a[5]", &err);
   uint8_t data[5];
   std::memset(data, 0, sizeof(data));
-  REQUIRE((desc->GetSize()) == (sizeof(data) / sizeof(data[0])));
+  REQUIRE(desc->GetSize() == sizeof(data) / sizeof(data[0]));
   wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   CHECK(dynamic.SetStringField(field, fourByteUtf8String));
   auto get = dynamic.GetStringField(field);
-  CHECK((get) == (fourByteUtf8String));
-  CHECK((5u) == (get.size()));
+  CHECK(get == fourByteUtf8String);
+  CHECK(5u == get.size());
 }
 
 TEST_CASE_METHOD(DynamicStructTest,
@@ -478,13 +478,13 @@ TEST_CASE_METHOD(DynamicStructTest,
   auto desc = db.Add("test", "char a[2]", &err);
   uint8_t data[2];
   std::memset(data, 0, sizeof(data));
-  REQUIRE((desc->GetSize()) == (sizeof(data) / sizeof(data[0])));
+  REQUIRE(desc->GetSize() == sizeof(data) / sizeof(data[0]));
   wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   CHECK_FALSE(dynamic.SetStringField(field, fourByteUtf8String));
   auto get = dynamic.GetStringField(field);
-  CHECK((get) == ("a"));
-  CHECK((1u) == (get.size()));
+  CHECK(get == "a");
+  CHECK(1u == get.size());
 }
 
 TEST_CASE_METHOD(DynamicStructTest,
@@ -493,13 +493,13 @@ TEST_CASE_METHOD(DynamicStructTest,
   auto desc = db.Add("test", "char a[3]", &err);
   uint8_t data[3];
   std::memset(data, 0, sizeof(data));
-  REQUIRE((desc->GetSize()) == (sizeof(data) / sizeof(data[0])));
+  REQUIRE(desc->GetSize() == sizeof(data) / sizeof(data[0]));
   wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   CHECK_FALSE(dynamic.SetStringField(field, fourByteUtf8String));
   auto get = dynamic.GetStringField(field);
-  CHECK((get) == ("a"));
-  CHECK((1u) == (get.size()));
+  CHECK(get == "a");
+  CHECK(1u == get.size());
 }
 
 TEST_CASE_METHOD(DynamicStructTest,
@@ -508,13 +508,13 @@ TEST_CASE_METHOD(DynamicStructTest,
   auto desc = db.Add("test", "char a[4]", &err);
   uint8_t data[4];
   std::memset(data, 0, sizeof(data));
-  REQUIRE((desc->GetSize()) == (sizeof(data) / sizeof(data[0])));
+  REQUIRE(desc->GetSize() == sizeof(data) / sizeof(data[0]));
   wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   CHECK_FALSE(dynamic.SetStringField(field, fourByteUtf8String));
   auto get = dynamic.GetStringField(field);
-  CHECK((get) == ("a"));
-  CHECK((1u) == (get.size()));
+  CHECK(get == "a");
+  CHECK(1u == get.size());
 }
 
 struct SimpleTestParam {
@@ -538,21 +538,21 @@ static void CheckSimpleStruct(const SimpleTestParam& param) {
   std::string err;
   auto desc = db.Add("test", param.schema, &err);
   REQUIRE(desc);
-  REQUIRE((desc->GetName()) == ("test"));
-  REQUIRE((desc->GetSchema()) == (param.schema));
+  REQUIRE(desc->GetName() == "test");
+  REQUIRE(desc->GetSchema() == param.schema);
   auto& fields = desc->GetFields();
-  REQUIRE((fields.size()) == (1u));
-  CHECK((fields[0].GetParent()) == (desc));
-  CHECK((fields[0].GetName()) == ("a"));
-  CHECK((fields[0].IsInt()) == (param.isInt));
-  CHECK((fields[0].IsUint()) == (param.isUint));
+  REQUIRE(fields.size() == 1u);
+  CHECK(fields[0].GetParent() == desc);
+  CHECK(fields[0].GetName() == "a");
+  CHECK(fields[0].IsInt() == param.isInt);
+  CHECK(fields[0].IsUint() == param.isUint);
   CHECK_FALSE(fields[0].IsArray());
   if (param.type != StructFieldType::STRUCT) {
     REQUIRE(desc->IsValid());
-    REQUIRE((desc->GetSize()) == (param.size));
-    REQUIRE((fields[0].GetSize()) == (param.size));
-    REQUIRE((fields[0].GetBitWidth()) == (param.bitWidth));
-    REQUIRE((fields[0].GetBitMask()) == (param.bitMask));
+    REQUIRE(desc->GetSize() == param.size);
+    REQUIRE(fields[0].GetSize() == param.size);
+    REQUIRE(fields[0].GetBitWidth() == param.bitWidth);
+    REQUIRE(fields[0].GetBitMask() == param.bitMask);
   } else {
     REQUIRE_FALSE(desc->IsValid());
     REQUIRE(fields[0].GetStruct());
@@ -564,19 +564,19 @@ static void CheckSimpleStructArray(const SimpleTestParam& param) {
   std::string err;
   auto desc = db.Add("test", param.schema + std::string{"[2]"}, &err);
   REQUIRE(desc);
-  REQUIRE((desc->GetName()) == ("test"));
-  REQUIRE((desc->GetSchema()) == (param.schema + std::string{"[2]"}));
+  REQUIRE(desc->GetName() == "test");
+  REQUIRE(desc->GetSchema() == (param.schema + std::string{"[2]"}));
   auto& fields = desc->GetFields();
-  REQUIRE((fields.size()) == (1u));
-  CHECK((fields[0].GetParent()) == (desc));
-  CHECK((fields[0].GetName()) == ("a"));
-  CHECK((fields[0].IsInt()) == (param.isInt));
-  CHECK((fields[0].IsUint()) == (param.isUint));
+  REQUIRE(fields.size() == 1u);
+  CHECK(fields[0].GetParent() == desc);
+  CHECK(fields[0].GetName() == "a");
+  CHECK(fields[0].IsInt() == param.isInt);
+  CHECK(fields[0].IsUint() == param.isUint);
   CHECK(fields[0].IsArray());
-  CHECK((fields[0].GetArraySize()) == (2u));
+  CHECK(fields[0].GetArraySize() == 2u);
   if (param.type != StructFieldType::STRUCT) {
     REQUIRE(desc->IsValid());
-    REQUIRE((desc->GetSize()) == (param.size * 2u));
+    REQUIRE(desc->GetSize() == param.size * 2u);
   } else {
     REQUIRE_FALSE(desc->IsValid());
     REQUIRE(fields[0].GetStruct());
@@ -613,23 +613,23 @@ static void CheckSimpleStructIntRoundTrip(const SimpleTestParam& param) {
     {
       int64_t value = SignExtend(param.minVal, field->GetSize());
       dynamic.SetIntField(field, value);
-      CHECK((dynamic.GetIntField(field)) == (value));
+      CHECK(dynamic.GetIntField(field) == value);
     }
     {
       int64_t value = SignExtend(param.maxVal, field->GetSize());
       dynamic.SetIntField(field, value);
-      CHECK((dynamic.GetIntField(field)) == (value));
+      CHECK(dynamic.GetIntField(field) == value);
     }
   } else if (param.isUint) {
     {
       uint64_t value = param.minVal;
       dynamic.SetUintField(field, value);
-      CHECK((dynamic.GetUintField(field)) == (value));
+      CHECK(dynamic.GetUintField(field) == value);
     }
     {
       uint64_t value = param.maxVal;
       dynamic.SetUintField(field, value);
-      CHECK((dynamic.GetUintField(field)) == (value));
+      CHECK(dynamic.GetUintField(field) == value);
     }
   } else if (param.type == StructFieldType::BOOL) {
     dynamic.SetBoolField(field, false);

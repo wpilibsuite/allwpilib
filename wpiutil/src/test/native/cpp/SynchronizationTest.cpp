@@ -19,7 +19,7 @@ TEST_CASE("EventTest AutoReset", "[wpiutil]") {
   thr.join();
   bool timedOut;
   wpi::util::WaitForObject(event, 0, &timedOut);
-  REQUIRE((timedOut) == (true));
+  REQUIRE(timedOut == true);
 }
 
 TEST_CASE("EventTest ManualReset", "[wpiutil]") {
@@ -31,17 +31,17 @@ TEST_CASE("EventTest ManualReset", "[wpiutil]") {
   });
   wpi::util::WaitForObject(event);
   thr.join();
-  REQUIRE((done) == (1));
+  REQUIRE(done == 1);
   bool timedOut;
   wpi::util::WaitForObject(event, 0, &timedOut);
-  REQUIRE((timedOut) == (false));
+  REQUIRE(timedOut == false);
 }
 
 TEST_CASE("EventTest InitialSet", "[wpiutil]") {
   auto event = wpi::util::MakeEvent(false, true);
   bool timedOut;
   wpi::util::WaitForObject(event, 0, &timedOut);
-  REQUIRE((timedOut) == (false));
+  REQUIRE(timedOut == false);
 }
 
 TEST_CASE("EventTest WaitMultiple", "[wpiutil]") {
@@ -51,11 +51,11 @@ TEST_CASE("EventTest WaitMultiple", "[wpiutil]") {
   WPI_Handle signaled[2];
   auto result1 = wpi::util::WaitForObjects({event1, event2}, signaled);
   thr.join();
-  REQUIRE((result1.size()) == (1u));
-  REQUIRE((result1[0]) == (event2));
+  REQUIRE(result1.size() == 1u);
+  REQUIRE(result1[0] == event2);
   bool timedOut;
   auto result2 =
       wpi::util::WaitForObjects({event1, event2}, signaled, 0, &timedOut);
-  REQUIRE((timedOut) == (true));
-  REQUIRE((result2.size()) == (0u));
+  REQUIRE(timedOut == true);
+  REQUIRE(result2.size() == 0u);
 }

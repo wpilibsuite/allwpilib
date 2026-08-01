@@ -104,7 +104,7 @@ TEST_CASE("SignalTest ThreadedEmission", "[wpiutil][sigslot]") {
     t.join();
   }
 
-  REQUIRE((sum) == (100000));
+  REQUIRE(sum == 100000);
 }
 
 }  // namespace wpi::util

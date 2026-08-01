@@ -16,27 +16,27 @@
 using namespace wpi::util::sys;
 
 TEST_CASE("ErrnoTest RetryAfterSignal", "[wpiutil][llvm]") {
-  CHECK((1) == (RetryAfterSignal(-1, [] { return 1; })));
+  CHECK(1 == RetryAfterSignal(-1, [] { return 1; }));
 
-  CHECK((-1) == (RetryAfterSignal(-1, [] {
+  CHECK(-1 == RetryAfterSignal(-1, [] {
     errno = EAGAIN;
     return -1;
-  })));
-  CHECK((EAGAIN) == (errno));
+  }));
+  CHECK(EAGAIN == errno);
 
   unsigned calls = 0;
-  CHECK((1) == (RetryAfterSignal(-1, [&calls] {
+  CHECK(1 == RetryAfterSignal(-1, [&calls] {
               errno = EINTR;
               ++calls;
               return calls == 1 ? -1 : 1;
-            })));
-  CHECK((2u) == (calls));
+            }));
+  CHECK(2u == calls);
 
-  CHECK((1) == (RetryAfterSignal(-1, [](int x) { return x; }, 1)));
+  CHECK(1 == RetryAfterSignal(-1, [](int x) { return x; }, 1));
 
   std::unique_ptr<int> P(RetryAfterSignal(nullptr, [] { return new int(47); }));
-  CHECK((47) == (*P));
+  CHECK(47 == *P);
 
   errno = EINTR;
-  CHECK((-1) == (RetryAfterSignal(-1, [] { return -1; })));
+  CHECK(-1 == RetryAfterSignal(-1, [] { return -1; }));
 }

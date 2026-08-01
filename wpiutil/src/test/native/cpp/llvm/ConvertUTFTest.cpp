@@ -27,7 +27,7 @@ TEST_CASE("ConvertUTFTest ConvertUTF16LittleEndianToUTF8String", "[wpiutil][llvm
   bool Success = convertUTF16ToUTF8String(Ref, Result);
   CHECK(Success);
   std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
-  CHECK((Expected) == (std::string{Result}));
+  CHECK(Expected == std::string{Result});
 }
 
 TEST_CASE("ConvertUTFTest ConvertUTF32LittleEndianToUTF8String", "[wpiutil][llvm]") {
@@ -39,7 +39,7 @@ TEST_CASE("ConvertUTFTest ConvertUTF32LittleEndianToUTF8String", "[wpiutil][llvm
   bool Success = convertUTF32ToUTF8String(Ref, Result);
   CHECK(Success);
   std::string Expected("\xE0\xB2\xA0_\xE0\xB2\xA0");
-  CHECK((Expected) == (Result));
+  CHECK(Expected == Result);
 }
 
 TEST_CASE("ConvertUTFTest ConvertUTF16BigEndianToUTF8String", "[wpiutil][llvm]") {
@@ -50,7 +50,7 @@ TEST_CASE("ConvertUTFTest ConvertUTF16BigEndianToUTF8String", "[wpiutil][llvm]")
   bool Success = convertUTF16ToUTF8String(Ref, Result);
   CHECK(Success);
   std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
-  CHECK((Expected) == (std::string{Result}));
+  CHECK(Expected == std::string{Result});
 }
 
 TEST_CASE("ConvertUTFTest ConvertUTF32BigEndianToUTF8String", "[wpiutil][llvm]") {
@@ -62,7 +62,7 @@ TEST_CASE("ConvertUTFTest ConvertUTF32BigEndianToUTF8String", "[wpiutil][llvm]")
   bool Success = convertUTF32ToUTF8String(Ref, Result);
   CHECK(Success);
   std::string Expected("\xE0\xB2\xA0_\xE0\xB2\xA0");
-  CHECK((Expected) == (Result));
+  CHECK(Expected == Result);
 }
 
 TEST_CASE("ConvertUTFTest ConvertUTF8ToUTF16String", "[wpiutil][llvm]") {
@@ -73,9 +73,9 @@ TEST_CASE("ConvertUTFTest ConvertUTF8ToUTF16String", "[wpiutil][llvm]") {
   bool Success = convertUTF8ToUTF16String(Ref, Result);
   CHECK(Success);
   static const UTF16 Expected[] = {0x0CA0, 0x005f, 0x0CA0, 0};
-  REQUIRE((3u) == (Result.size()));
+  REQUIRE(3u == Result.size());
   for (int I = 0, E = 3; I != E; ++I)
-    CHECK((Expected[I]) == (Result[I]));
+    CHECK(Expected[I] == Result[I]);
 }
 
 TEST_CASE("ConvertUTFTest OddLengthInput", "[wpiutil][llvm]") {
@@ -116,7 +116,7 @@ TEST_CASE("ConvertUTFTest UTF16WrappersForConvertUTF16ToUTF8String", "[wpiutil][
   bool Success = convertUTF16ToUTF8String(SrcRef, Result);
   CHECK(Success);
   std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
-  CHECK((Expected) == (std::string{Result}));
+  CHECK(Expected == std::string{Result});
 }
 
 TEST_CASE("ConvertUTFTest ConvertUTF8toWide", "[wpiutil][llvm]") {
@@ -126,11 +126,11 @@ TEST_CASE("ConvertUTFTest ConvertUTF8toWide", "[wpiutil][llvm]") {
   bool Success = ConvertUTF8toWide((const char*)Src, Result);
   CHECK(Success);
   std::wstring Expected(L"\x0ca0_\x0ca0");
-  CHECK((Expected) == (Result));
+  CHECK(Expected == Result);
   Result.clear();
   Success = ConvertUTF8toWide(Src, Result);
   CHECK(Success);
-  CHECK((Expected) == (Result));
+  CHECK(Expected == Result);
 }
 
 TEST_CASE("ConvertUTFTest convertWideToUTF8", "[wpiutil][llvm]") {
@@ -140,7 +140,7 @@ TEST_CASE("ConvertUTFTest convertWideToUTF8", "[wpiutil][llvm]") {
   bool Success = convertWideToUTF8(Src, Result);
   CHECK(Success);
   std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
-  CHECK((Expected) == (std::string{Result}));
+  CHECK(Expected == std::string{Result});
 }
 
 struct ConvertUTFResultContainer {

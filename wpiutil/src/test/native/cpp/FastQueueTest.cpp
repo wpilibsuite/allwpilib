@@ -17,5 +17,5 @@ TEST_CASE("FastQueueTest Basic", "[wpiutil]") {
   int item;
   bool found = q.try_dequeue(item);
   CHECK(found);
-  CHECK((item) == (25));
+  CHECK(item == 25);
 }

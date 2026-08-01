@@ -18,5 +18,5 @@ TEST_CASE("ArgparseTest Basic", "[wpiutil]") {
   constexpr const char* args[] = {"foo", "42"};
   CHECK_NOTHROW(program.parse_args(2, args));
   auto result = program.get<int>("test");
-  CHECK((42) == (result));
+  CHECK(42 == result);
 }

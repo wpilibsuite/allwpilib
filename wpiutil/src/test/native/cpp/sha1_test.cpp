@@ -38,13 +38,13 @@ namespace wpi::util {
 TEST_CASE("SHA1Test Standard1", "[wpiutil]") {
   SHA1 checksum;
   checksum.Update("abc");
-  REQUIRE((checksum.Final()) == ("a9993e364706816aba3e25717850c26c9cd0d89d"));
+  REQUIRE(checksum.Final() == "a9993e364706816aba3e25717850c26c9cd0d89d");
 }
 
 TEST_CASE("SHA1Test Standard2", "[wpiutil]") {
   SHA1 checksum;
   checksum.Update("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq");
-  REQUIRE((checksum.Final()) == ("84983e441c3bd26ebaae4aa1f95129e5e54670f1"));
+  REQUIRE(checksum.Final() == "84983e441c3bd26ebaae4aa1f95129e5e54670f1");
 }
 
 TEST_CASE("SHA1Test Standard3", "[wpiutil]") {
@@ -57,7 +57,7 @@ TEST_CASE("SHA1Test Standard3", "[wpiutil]") {
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
   }
-  REQUIRE((checksum.Final()) == ("34aa973cd4c4daa4f61eeb2bdbad27316534016f"));
+  REQUIRE(checksum.Final() == "34aa973cd4c4daa4f61eeb2bdbad27316534016f");
 }
 
 /*
@@ -66,29 +66,29 @@ TEST_CASE("SHA1Test Standard3", "[wpiutil]") {
 
 TEST_CASE("SHA1Test OtherNoString", "[wpiutil]") {
   SHA1 checksum;
-  REQUIRE((checksum.Final()) == ("da39a3ee5e6b4b0d3255bfef95601890afd80709"));
+  REQUIRE(checksum.Final() == "da39a3ee5e6b4b0d3255bfef95601890afd80709");
 }
 
 TEST_CASE("SHA1Test OtherEmptyString", "[wpiutil]") {
   SHA1 checksum;
   checksum.Update("");
-  REQUIRE((checksum.Final()) == ("da39a3ee5e6b4b0d3255bfef95601890afd80709"));
+  REQUIRE(checksum.Final() == "da39a3ee5e6b4b0d3255bfef95601890afd80709");
 }
 
 TEST_CASE("SHA1Test OtherABCDE", "[wpiutil]") {
   SHA1 checksum;
   checksum.Update("abcde");
-  REQUIRE((checksum.Final()) == ("03de6c570bfe24bfc328ccd7ca46b76eadaf4334"));
+  REQUIRE(checksum.Final() == "03de6c570bfe24bfc328ccd7ca46b76eadaf4334");
 }
 
 TEST_CASE("SHA1Test Concurrent", "[wpiutil]") {
   // Two concurrent checksum calculations
   SHA1 checksum1, checksum2;
   checksum1.Update("abc");
-  REQUIRE((checksum2.Final()) ==
-          ("da39a3ee5e6b4b0d3255bfef95601890afd80709")); /* "" */
-  REQUIRE((checksum1.Final()) ==
-          ("a9993e364706816aba3e25717850c26c9cd0d89d")); /* "abc" */
+  REQUIRE(checksum2.Final() ==
+          "da39a3ee5e6b4b0d3255bfef95601890afd80709"); /* "" */
+  REQUIRE(checksum1.Final() ==
+          "a9993e364706816aba3e25717850c26c9cd0d89d"); /* "abc" */
 }
 
 }  // namespace wpi::util

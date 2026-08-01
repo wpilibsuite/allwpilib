@@ -53,8 +53,8 @@ void SetProcessorAffinity(int32_t core_id) {
   CPU_SET(core_id, &cpuset);
 
   pthread_t current_thread = pthread_self();
-  REQUIRE((pthread_setaffinity_np(current_thread, sizeof(cpu_set_t),
-                                  &cpuset)) == (0));
+  REQUIRE(pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset) ==
+          0);
 }
 
 void SetThreadRealtimePriorityOrDie(int32_t priority) {
@@ -62,7 +62,7 @@ void SetThreadRealtimePriorityOrDie(int32_t priority) {
   // Set real-time priority for this thread
   param.sched_priority = priority + sched_get_priority_min(SCHED_RR);
   UNSCOPED_INFO(": Failed to set scheduler priority.");
-  REQUIRE((pthread_setschedparam(pthread_self(), SCHED_RR, &param)) == (0));
+  REQUIRE(pthread_setschedparam(pthread_self(), SCHED_RR, &param) == 0);
 }
 
 // This thread holds the mutex and spins until signaled to release it and stop.

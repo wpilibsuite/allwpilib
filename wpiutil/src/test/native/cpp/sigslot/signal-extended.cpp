@@ -80,9 +80,9 @@ TEST_CASE("SignalExtendedTest FreeConnection", "[wpiutil][sigslot]") {
   sig.connect_extended(f);
 
   sig(1);
-  REQUIRE((sum) == (1));
+  REQUIRE(sum == 1);
   sig(1);
-  REQUIRE((sum) == (1));
+  REQUIRE(sum == 1);
 }
 
 TEST_CASE("SignalExtendedTest StaticConnection", "[wpiutil][sigslot]") {
@@ -91,9 +91,9 @@ TEST_CASE("SignalExtendedTest StaticConnection", "[wpiutil][sigslot]") {
   sig.connect_extended(&s::sf);
 
   sig(1);
-  REQUIRE((sum) == (1));
+  REQUIRE(sum == 1);
   sig(1);
-  REQUIRE((sum) == (1));
+  REQUIRE(sum == 1);
 }
 
 TEST_CASE("SignalExtendedTest PmfConnection", "[wpiutil][sigslot]") {
@@ -103,9 +103,9 @@ TEST_CASE("SignalExtendedTest PmfConnection", "[wpiutil][sigslot]") {
   sig.connect_extended(&s::f, &p);
 
   sig(1);
-  REQUIRE((sum) == (1));
+  REQUIRE(sum == 1);
   sig(1);
-  REQUIRE((sum) == (1));
+  REQUIRE(sum == 1);
 }
 
 TEST_CASE("SignalExtendedTest FunctionObjectConnection", "[wpiutil][sigslot]") {
@@ -114,9 +114,9 @@ TEST_CASE("SignalExtendedTest FunctionObjectConnection", "[wpiutil][sigslot]") {
   sig.connect_extended(o{});
 
   sig(1);
-  REQUIRE((sum) == (1));
+  REQUIRE(sum == 1);
   sig(1);
-  REQUIRE((sum) == (1));
+  REQUIRE(sum == 1);
 }
 
 TEST_CASE("SignalExtendedTest LambdaConnection", "[wpiutil][sigslot]") {
@@ -128,16 +128,16 @@ TEST_CASE("SignalExtendedTest LambdaConnection", "[wpiutil][sigslot]") {
     c.disconnect();
   });
   sig(1);
-  REQUIRE((sum) == (1));
+  REQUIRE(sum == 1);
 
   sig.connect_extended([&](Connection& c, int i) mutable {
     sum += 2 * i;
     c.disconnect();
   });
   sig(1);
-  REQUIRE((sum) == (3));
+  REQUIRE(sum == 3);
   sig(1);
-  REQUIRE((sum) == (3));
+  REQUIRE(sum == 3);
 }
 
 }  // namespace wpi::util

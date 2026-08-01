@@ -37,7 +37,7 @@ TEST_CASE("SmallPtrSetTest Assignment", "[wpiutil][llvm]") {
   (s2 = static_cast<SmallPtrSet<int *, 4> &>(s2)).insert(&buf[3]);
 
   s1 = s2;
-  CHECK((4U) == (s1.size()));
+  CHECK(4U == s1.size());
   for (int i = 0; i < 8; ++i)
     if (i < 4)
       CHECK(s1.count(&buf[i]));
@@ -67,12 +67,12 @@ TEST_CASE("SmallPtrSetTest GrowthTest", "[wpiutil][llvm]") {
   s.insert(&buf[1]);
   s.insert(&buf[2]);
   s.insert(&buf[3]);
-  CHECK((4U) == (s.size()));
+  CHECK(4U == s.size());
 
   i = 0;
   for(iter I=s.begin(), E=s.end(); I!=E; ++I, ++i)
       (**I)++;
-  CHECK((4) == (i));
+  CHECK(4 == i);
   for(i=0; i<8; ++i)
       CHECK((i < 4 ? 1 : 0) == buf[i]);
 
@@ -84,28 +84,28 @@ TEST_CASE("SmallPtrSetTest GrowthTest", "[wpiutil][llvm]") {
   i = 0;
   for(iter I=s.begin(), E=s.end(); I!=E; ++I, ++i)
       (**I)++;
-  CHECK((8) == (i));
+  CHECK(8 == i);
   s.erase(&buf[4]);
   s.erase(&buf[5]);
   s.erase(&buf[6]);
   s.erase(&buf[7]);
-  CHECK((4U) == (s.size()));
+  CHECK(4U == s.size());
 
   i = 0;
   for(iter I=s.begin(), E=s.end(); I!=E; ++I, ++i)
       (**I)++;
-  CHECK((4) == (i));
+  CHECK(4 == i);
   for(i=0; i<8; ++i)
       CHECK((i < 4 ? 3 : 1) == buf[i]);
 
   s.clear();
   for(i=0; i<8; ++i) buf[i]=0;
   for(i=0; i<128; ++i) s.insert(&buf[i%8]); // test repeated entires
-  CHECK((8U) == (s.size()));
+  CHECK(8U == s.size());
   for(iter I=s.begin(), E=s.end(); I!=E; ++I, ++i)
       (**I)++;
   for(i=0; i<8; ++i)
-      CHECK((1) == (buf[i]));
+      CHECK(1 == buf[i]);
 }
 
 TEST_CASE("SmallPtrSetTest CopyAndMoveTest", "[wpiutil][llvm]") {
@@ -118,7 +118,7 @@ TEST_CASE("SmallPtrSetTest CopyAndMoveTest", "[wpiutil][llvm]") {
   s1.insert(&buf[1]);
   s1.insert(&buf[2]);
   s1.insert(&buf[3]);
-  CHECK((4U) == (s1.size()));
+  CHECK(4U == s1.size());
   for (int i = 0; i < 8; ++i)
     if (i < 4)
       CHECK(s1.count(&buf[i]));
@@ -126,7 +126,7 @@ TEST_CASE("SmallPtrSetTest CopyAndMoveTest", "[wpiutil][llvm]") {
       CHECK_FALSE(s1.count(&buf[i]));
 
   SmallPtrSet<int *, 4> s2(s1);
-  CHECK((4U) == (s2.size()));
+  CHECK(4U == s2.size());
   for (int i = 0; i < 8; ++i)
     if (i < 4)
       CHECK(s2.count(&buf[i]));
@@ -134,8 +134,8 @@ TEST_CASE("SmallPtrSetTest CopyAndMoveTest", "[wpiutil][llvm]") {
       CHECK_FALSE(s2.count(&buf[i]));
 
   s1 = s2;
-  CHECK((4U) == (s1.size()));
-  CHECK((4U) == (s2.size()));
+  CHECK(4U == s1.size());
+  CHECK(4U == s2.size());
   for (int i = 0; i < 8; ++i)
     if (i < 4)
       CHECK(s1.count(&buf[i]));
@@ -143,7 +143,7 @@ TEST_CASE("SmallPtrSetTest CopyAndMoveTest", "[wpiutil][llvm]") {
       CHECK_FALSE(s1.count(&buf[i]));
 
   SmallPtrSet<int *, 4> s3(std::move(s1));
-  CHECK((4U) == (s3.size()));
+  CHECK(4U == s3.size());
   CHECK(s1.empty());
   for (int i = 0; i < 8; ++i)
     if (i < 4)
@@ -158,15 +158,15 @@ TEST_CASE("SmallPtrSetTest CopyAndMoveTest", "[wpiutil][llvm]") {
   s3.insert(&buf[6]);
   s3.insert(&buf[7]);
   s1 = std::move(s3);
-  CHECK((8U) == (s1.size()));
+  CHECK(8U == s1.size());
   CHECK(s3.empty());
   for (int i = 0; i < 8; ++i)
     CHECK(s1.count(&buf[i]));
 
   // Copy assign into a moved-from object.
   s3 = s1;
-  CHECK((8U) == (s3.size()));
-  CHECK((8U) == (s1.size()));
+  CHECK(8U == s3.size());
+  CHECK(8U == s1.size());
   for (int i = 0; i < 8; ++i)
     CHECK(s3.count(&buf[i]));
 }
@@ -181,8 +181,8 @@ TEST_CASE("SmallPtrSetTest SwapTest", "[wpiutil][llvm]") {
   a.insert(&buf[1]);
   b.insert(&buf[2]);
 
-  CHECK((2U) == (a.size()));
-  CHECK((1U) == (b.size()));
+  CHECK(2U == a.size());
+  CHECK(1U == b.size());
   CHECK(a.count(&buf[0]));
   CHECK(a.count(&buf[1]));
   CHECK_FALSE(a.count(&buf[2]));
@@ -194,8 +194,8 @@ TEST_CASE("SmallPtrSetTest SwapTest", "[wpiutil][llvm]") {
 
   std::swap(a, b);
 
-  CHECK((1U) == (a.size()));
-  CHECK((2U) == (b.size()));
+  CHECK(1U == a.size());
+  CHECK(2U == b.size());
   CHECK_FALSE(a.count(&buf[0]));
   CHECK_FALSE(a.count(&buf[1]));
   CHECK(a.count(&buf[2]));
@@ -208,8 +208,8 @@ TEST_CASE("SmallPtrSetTest SwapTest", "[wpiutil][llvm]") {
   b.insert(&buf[3]);
   std::swap(a, b);
 
-  CHECK((3U) == (a.size()));
-  CHECK((1U) == (b.size()));
+  CHECK(3U == a.size());
+  CHECK(1U == b.size());
   CHECK(a.count(&buf[0]));
   CHECK(a.count(&buf[1]));
   CHECK_FALSE(a.count(&buf[2]));
@@ -221,8 +221,8 @@ TEST_CASE("SmallPtrSetTest SwapTest", "[wpiutil][llvm]") {
 
   std::swap(a, b);
 
-  CHECK((1U) == (a.size()));
-  CHECK((3U) == (b.size()));
+  CHECK(1U == a.size());
+  CHECK(3U == b.size());
   CHECK_FALSE(a.count(&buf[0]));
   CHECK_FALSE(a.count(&buf[1]));
   CHECK(a.count(&buf[2]));
@@ -238,8 +238,8 @@ TEST_CASE("SmallPtrSetTest SwapTest", "[wpiutil][llvm]") {
 
   std::swap(b, a);
 
-  CHECK((3U) == (a.size()));
-  CHECK((4U) == (b.size()));
+  CHECK(3U == a.size());
+  CHECK(4U == b.size());
   CHECK(b.count(&buf[2]));
   CHECK(b.count(&buf[4]));
   CHECK(b.count(&buf[5]));
@@ -254,8 +254,8 @@ TEST_CASE("SmallPtrSetTest dereferenceAndIterate", "[wpiutil][llvm]") {
   int Ints[] = {0, 1, 2, 3, 4, 5, 6, 7};
   SmallPtrSet<const int *, 4> S;
   for (int &I : Ints) {
-    CHECK((&I) == (*S.insert(&I).first));
-    CHECK((&I) == (*S.find(&I)));
+    CHECK(&I == *S.insert(&I).first);
+    CHECK(&I == *S.find(&I));
   }
 
   // Iterate from each and count how many times each element is found.
@@ -268,7 +268,7 @@ TEST_CASE("SmallPtrSetTest dereferenceAndIterate", "[wpiutil][llvm]") {
   // times.
   std::sort(std::begin(Found), std::end(Found));
   for (auto F = std::begin(Found), E = std::end(Found); F != E; ++F)
-    CHECK((F - Found + 1) == (*F));
+    CHECK(F - Found + 1 == *F);
 }
 
 // Verify that const pointers work for count and find even when the underlying
@@ -279,8 +279,8 @@ TEST_CASE("SmallPtrSetTest ConstTest", "[wpiutil][llvm]") {
   int *B = &A;
   const int *C = &A;
   IntSet.insert(B);
-  CHECK((IntSet.count(B)) == (1u));
-  CHECK((IntSet.count(C)) == (1u));
+  CHECK(IntSet.count(B) == 1u);
+  CHECK(IntSet.count(C) == 1u);
   CHECK(IntSet.contains(B));
   CHECK(IntSet.contains(C));
 }
@@ -294,7 +294,7 @@ TEST_CASE("SmallPtrSetTest ConstNonPtrTest", "[wpiutil][llvm]") {
   int A[1];
   TestPair Pair(&A[0], 1);
   IntSet.insert(Pair);
-  CHECK((IntSet.count(Pair)) == (1u));
+  CHECK(IntSet.count(Pair) == 1u);
   CHECK(IntSet.contains(Pair));
 }
 
@@ -324,16 +324,16 @@ TEST_CASE("SmallPtrSetTest EqualityComparison", "[wpiutil][llvm]") {
   e.insert(&buf[1]);
   e.insert(&buf[2]);
 
-  CHECK((a) == (b));
-  CHECK((b) == (a));
-  CHECK((b) != (c));
-  CHECK((c) != (a));
-  CHECK((d) != (a));
-  CHECK((a) != (d));
-  CHECK((a) != (e));
-  CHECK((e) != (a));
-  CHECK((c) != (e));
-  CHECK((e) != (d));
+  CHECK(a == b);
+  CHECK(b == a);
+  CHECK(b != c);
+  CHECK(c != a);
+  CHECK(d != a);
+  CHECK(a != d);
+  CHECK(a != e);
+  CHECK(e != a);
+  CHECK(c != e);
+  CHECK(e != d);
 }
 
 TEST_CASE("SmallPtrSetTest Contains", "[wpiutil][llvm]") {
@@ -392,7 +392,7 @@ TEST_CASE("SmallPtrSetTest RemoveIf", "[wpiutil][llvm]") {
   bool Removed = Set.remove_if([](int *Ptr) { return *Ptr % 2 != 0; });
   // We should only have element 2 left now.
   CHECK(Removed);
-  CHECK((Set.size()) == (1u));
+  CHECK(Set.size() == 1u);
   CHECK(Set.contains(&Vals[2]));
 
   // Switch to big regime.
@@ -407,7 +407,7 @@ TEST_CASE("SmallPtrSetTest RemoveIf", "[wpiutil][llvm]") {
   Removed = Set.remove_if([](int *Ptr) { return *Ptr % 2 != 0; });
   // We should only have elements 2 and 4 left now.
   CHECK(Removed);
-  CHECK((Set.size()) == (2u));
+  CHECK(Set.size() == 2u);
   CHECK(Set.contains(&Vals[2]));
   CHECK(Set.contains(&Vals[4]));
 
@@ -443,7 +443,7 @@ TEST_CASE("SmallPtrSetTest Reserve", "[wpiutil][llvm]") {
 
   // We shouldn't reallocate when this happens.
   Set.reserve(4);
-  CHECK((Set.capacity()) == (4u));
+  CHECK(Set.capacity() == 4u);
 
   Set.insert(&Vals[1]);
   Set.insert(&Vals[2]);
@@ -451,16 +451,16 @@ TEST_CASE("SmallPtrSetTest Reserve", "[wpiutil][llvm]") {
 
   // We shouldn't reallocate this time either.
   Set.reserve(4);
-  CHECK((Set.capacity()) == (4u));
-  CHECK((Set.size()) == (4u));
+  CHECK(Set.capacity() == 4u);
+  CHECK(Set.size() == 4u);
   CHECK_THAT(Set,
              UnorderedRangeEquals({&Vals[0], &Vals[1], &Vals[2], &Vals[3]}));
 
   // Reserving further should lead to a reallocation. And matching the existing
   // insertion approach, we immediately allocate up to 128 elements.
   Set.reserve(5);
-  CHECK((Set.capacity()) == (128u));
-  CHECK((Set.size()) == (4u));
+  CHECK(Set.capacity() == 128u);
+  CHECK(Set.size() == 4u);
   CHECK_THAT(Set,
              UnorderedRangeEquals({&Vals[0], &Vals[1], &Vals[2], &Vals[3]}));
 
@@ -471,17 +471,17 @@ TEST_CASE("SmallPtrSetTest Reserve", "[wpiutil][llvm]") {
 
   // Calling a smaller reserve size should have no effect.
   Set.reserve(1);
-  CHECK((Set.capacity()) == (128u));
-  CHECK((Set.size()) == (6u));
+  CHECK(Set.capacity() == 128u);
+  CHECK(Set.size() == 6u);
 
   // Reserving zero should have no effect either.
   Set.reserve(0);
-  CHECK((Set.capacity()) == (128u));
-  CHECK((Set.size()) == (6u));
+  CHECK(Set.capacity() == 128u);
+  CHECK(Set.size() == 6u);
   CHECK_THAT(Set, UnorderedRangeEquals({&Vals[0], &Vals[1], &Vals[2],
                                         &Vals[3], &Vals[4], &Vals[5]}));
 
   // Reserving 192 should result in 256 buckets.
   Set.reserve(192);
-  CHECK((Set.capacity()) == (256u));
+  CHECK(Set.capacity() == 256u);
 }

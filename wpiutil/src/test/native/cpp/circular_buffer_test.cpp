@@ -30,7 +30,7 @@ TEST_CASE("CircularBufferTest PushFront", "[wpiutil]") {
   }
 
   for (size_t i = 0; i < pushFrontOut.size(); ++i) {
-    CHECK((pushFrontOut[i]) == (queue[i]));
+    CHECK(pushFrontOut[i] == queue[i]);
   }
 }
 
@@ -42,7 +42,7 @@ TEST_CASE("CircularBufferTest PushBack", "[wpiutil]") {
   }
 
   for (size_t i = 0; i < pushBackOut.size(); ++i) {
-    CHECK((pushBackOut[i]) == (queue[i]));
+    CHECK(pushBackOut[i] == queue[i]);
   }
 }
 
@@ -54,7 +54,7 @@ TEST_CASE("CircularBufferTest EmplaceFront", "[wpiutil]") {
   }
 
   for (size_t i = 0; i < pushFrontOut.size(); ++i) {
-    CHECK((pushFrontOut[i]) == (queue[i]));
+    CHECK(pushFrontOut[i] == queue[i]);
   }
 }
 
@@ -66,7 +66,7 @@ TEST_CASE("CircularBufferTest EmplaceBack", "[wpiutil]") {
   }
 
   for (size_t i = 0; i < pushBackOut.size(); ++i) {
-    CHECK((pushBackOut[i]) == (queue[i]));
+    CHECK(pushBackOut[i] == queue[i]);
   }
 }
 
@@ -78,9 +78,9 @@ TEST_CASE("CircularBufferTest PushPop", "[wpiutil]") {
   queue.push_back(2.0);
   queue.push_back(3.0);
 
-  CHECK((1.0) == (queue[0]));
-  CHECK((2.0) == (queue[1]));
-  CHECK((3.0) == (queue[2]));
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
+  CHECK(3.0 == queue[2]);
 
   /*
    * The buffer is full now, so pushing subsequent elements will overwrite the
@@ -90,27 +90,27 @@ TEST_CASE("CircularBufferTest PushPop", "[wpiutil]") {
   queue.push_back(4.0);  // Overwrite 1 with 4
 
   // The buffer now contains 2, 3 and 4
-  CHECK((2.0) == (queue[0]));
-  CHECK((3.0) == (queue[1]));
-  CHECK((4.0) == (queue[2]));
+  CHECK(2.0 == queue[0]);
+  CHECK(3.0 == queue[1]);
+  CHECK(4.0 == queue[2]);
 
   queue.push_back(5.0);  // Overwrite 2 with 5
 
   // The buffer now contains 3, 4 and 5
-  CHECK((3.0) == (queue[0]));
-  CHECK((4.0) == (queue[1]));
-  CHECK((5.0) == (queue[2]));
+  CHECK(3.0 == queue[0]);
+  CHECK(4.0 == queue[1]);
+  CHECK(5.0 == queue[2]);
 
-  CHECK((5.0) == (queue.pop_back()));  // 5 is removed
+  CHECK(5.0 == queue.pop_back());  // 5 is removed
 
   // The buffer now contains 3 and 4
-  CHECK((3.0) == (queue[0]));
-  CHECK((4.0) == (queue[1]));
+  CHECK(3.0 == queue[0]);
+  CHECK(4.0 == queue[1]);
 
-  CHECK((3.0) == (queue.pop_front()));  // 3 is removed
+  CHECK(3.0 == queue.pop_front());  // 3 is removed
 
   // Leaving only one element with value == 4
-  CHECK((4.0) == (queue[0]));
+  CHECK(4.0 == queue[0]);
 }
 
 TEST_CASE("CircularBufferTest Reset", "[wpiutil]") {
@@ -122,7 +122,7 @@ TEST_CASE("CircularBufferTest Reset", "[wpiutil]") {
 
   queue.reset();
 
-  CHECK((queue.size()) == (size_t{0}));
+  CHECK(queue.size() == size_t{0});
 }
 
 TEST_CASE("CircularBufferTest Resize", "[wpiutil]") {
@@ -136,12 +136,12 @@ TEST_CASE("CircularBufferTest Resize", "[wpiutil]") {
   queue.push_back(3.0);
 
   queue.resize(2);
-  CHECK((1.0) == (queue[0]));
-  CHECK((2.0) == (queue[1]));
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.resize(5);
-  CHECK((1.0) == (queue[0]));
-  CHECK((2.0) == (queue[1]));
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.reset();
 
@@ -155,12 +155,12 @@ TEST_CASE("CircularBufferTest Resize", "[wpiutil]") {
   queue.pop_front();
 
   queue.resize(2);
-  CHECK((1.0) == (queue[0]));
-  CHECK((2.0) == (queue[1]));
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.resize(5);
-  CHECK((1.0) == (queue[0]));
-  CHECK((2.0) == (queue[1]));
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.reset();
 
@@ -176,12 +176,12 @@ TEST_CASE("CircularBufferTest Resize", "[wpiutil]") {
   queue.pop_front();
 
   queue.resize(2);
-  CHECK((1.0) == (queue[0]));
-  CHECK((2.0) == (queue[1]));
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.resize(5);
-  CHECK((1.0) == (queue[0]));
-  CHECK((2.0) == (queue[1]));
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.reset();
 
@@ -193,12 +193,12 @@ TEST_CASE("CircularBufferTest Resize", "[wpiutil]") {
   queue.push_front(1.0);
 
   queue.resize(2);
-  CHECK((1.0) == (queue[0]));
-  CHECK((2.0) == (queue[1]));
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.resize(5);
-  CHECK((1.0) == (queue[0]));
-  CHECK((2.0) == (queue[1]));
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.reset();
 
@@ -210,25 +210,25 @@ TEST_CASE("CircularBufferTest Resize", "[wpiutil]") {
   queue.push_front(1.0);
 
   queue.resize(2);
-  CHECK((1.0) == (queue[0]));
-  CHECK((2.0) == (queue[1]));
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.resize(5);
-  CHECK((1.0) == (queue[0]));
-  CHECK((2.0) == (queue[1]));
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   // Test push_back() after resize
   queue.push_back(3.0);
-  CHECK((1.0) == (queue[0]));
-  CHECK((2.0) == (queue[1]));
-  CHECK((3.0) == (queue[2]));
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
+  CHECK(3.0 == queue[2]);
 
   // Test push_front() after resize
   queue.push_front(4.0);
-  CHECK((4.0) == (queue[0]));
-  CHECK((1.0) == (queue[1]));
-  CHECK((2.0) == (queue[2]));
-  CHECK((3.0) == (queue[3]));
+  CHECK(4.0 == queue[0]);
+  CHECK(1.0 == queue[1]);
+  CHECK(2.0 == queue[2]);
+  CHECK(3.0 == queue[3]);
 }
 
 TEST_CASE("CircularBufferTest Iterator", "[wpiutil]") {
@@ -245,28 +245,28 @@ TEST_CASE("CircularBufferTest Iterator", "[wpiutil]") {
   // iterator
   int i = 0;
   for (auto& elem : queue) {
-    CHECK((values[i]) == (elem));
+    CHECK(values[i] == elem);
     ++i;
   }
 
   // const_iterator
   i = 0;
   for (const auto& elem : queue) {
-    CHECK((values[i]) == (elem));
+    CHECK(values[i] == elem);
     ++i;
   }
 
   // reverse_iterator
   i = 2;
   for (auto it = queue.rbegin(); it != queue.rend(); ++it) {
-    CHECK((values[i]) == (*it));
+    CHECK(values[i] == *it);
     --i;
   }
 
   // const_reverse_iterator
   i = 2;
   for (auto it = queue.crbegin(); it != queue.crend(); ++it) {
-    CHECK((values[i]) == (*it));
+    CHECK(values[i] == *it);
     --i;
   }
 }

@@ -30,9 +30,9 @@ class ResetNowImpl {
 TEST_CASE("TimestampTest ProgramStartTimeIsStable", "[wpiutil]") {
   uint64_t startTime = wpi::util::GetProgramStartTime();
 
-  CHECK((startTime) == (wpi::util::GetProgramStartTime()));
-  CHECK((startTime) == (WPI_GetProgramStartTime()));
-  CHECK((startTime) <= (wpi::util::NowDefault()));
+  CHECK(startTime == wpi::util::GetProgramStartTime());
+  CHECK(startTime == WPI_GetProgramStartTime());
+  CHECK(startTime <= wpi::util::NowDefault());
 }
 
 TEST_CASE("TimestampTest SetNowImplUpdatesProgramStartTime", "[wpiutil]") {
@@ -42,17 +42,17 @@ TEST_CASE("TimestampTest SetNowImplUpdatesProgramStartTime", "[wpiutil]") {
   mockTime = 1234;
   wpi::util::SetNowImpl(MockNow);
 
-  CHECK((1234u) == (wpi::util::Now()));
-  CHECK((1234u) == (wpi::util::GetProgramStartTime()));
+  CHECK(1234u == wpi::util::Now());
+  CHECK(1234u == wpi::util::GetProgramStartTime());
 
   mockTime = 5678;
 
-  CHECK((5678u) == (wpi::util::Now()));
-  CHECK((1234u) == (wpi::util::GetProgramStartTime()));
+  CHECK(5678u == wpi::util::Now());
+  CHECK(1234u == wpi::util::GetProgramStartTime());
 
   wpi::util::SetNowImpl(nullptr);
 
-  CHECK((originalStartTime) == (wpi::util::GetProgramStartTime()));
+  CHECK(originalStartTime == wpi::util::GetProgramStartTime());
 }
 
 TEST_CASE("TimestampTest WPISetNowImplNullRestoresProgramStartTime",
@@ -63,10 +63,10 @@ TEST_CASE("TimestampTest WPISetNowImplNullRestoresProgramStartTime",
   mockTime = 4321;
   WPI_SetNowImpl(MockNow);
 
-  CHECK((4321u) == (WPI_Now()));
-  CHECK((4321u) == (WPI_GetProgramStartTime()));
+  CHECK(4321u == WPI_Now());
+  CHECK(4321u == WPI_GetProgramStartTime());
 
   WPI_SetNowImpl(nullptr);
 
-  CHECK((originalStartTime) == (WPI_GetProgramStartTime()));
+  CHECK(originalStartTime == WPI_GetProgramStartTime());
 }

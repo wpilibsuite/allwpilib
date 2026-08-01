@@ -47,24 +47,24 @@ struct wpi::util::Struct<TestStruct> {
 
 TEST_CASE("StructTest Basic", "[wpiutil][struct]") {
   constexpr auto typeName = GetStructTypeName<TestStruct>();
-  CHECK((typeName) == ("TestStruct"));
+  CHECK(typeName == "TestStruct");
 
   constexpr auto typeString = GetStructTypeString<TestStruct>();
-  CHECK((typeString) == ("struct:TestStruct"));
+  CHECK(typeString == "struct:TestStruct");
 
   constexpr auto schema = GetStructSchema<TestStruct>();
-  CHECK((schema) == ("int32 a;int32 b"));
+  CHECK(schema == "int32 a;int32 b");
 
   constexpr auto arrayTypeName = MakeStructArrayTypeName<TestStruct, 5>();
-  CHECK((arrayTypeName) == ("TestStruct[5]"));
+  CHECK(arrayTypeName == "TestStruct[5]");
 
   constexpr auto arrayTypeString = MakeStructArrayTypeString<TestStruct, 5>();
-  CHECK((arrayTypeString) == ("struct:TestStruct[5]"));
+  CHECK(arrayTypeString == "struct:TestStruct[5]");
 
   TestStruct s{12345, 67890};
   std::array<uint8_t, 8> data;
   Struct<TestStruct>::Pack(data, s);
   auto s2 = Struct<TestStruct>::Unpack(data);
-  CHECK((s.a) == (s2.a));
-  CHECK((s.b) == (s2.b));
+  CHECK(s.a == s2.a);
+  CHECK(s.b == s2.b);
 }

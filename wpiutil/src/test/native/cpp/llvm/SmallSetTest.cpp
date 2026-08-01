@@ -71,22 +71,22 @@ TEST_CASE("SmallSetTest Insert", "[wpiutil][llvm]") {
 
   for (int i = 0; i < 4; i++) {
     auto InsertResult = s1.insert(i);
-    CHECK((*InsertResult.first) == (i));
-    CHECK((InsertResult.second) == (true));
+    CHECK(*InsertResult.first == i);
+    CHECK(InsertResult.second == true);
   }
 
   for (int i = 0; i < 4; i++) {
     auto InsertResult = s1.insert(i);
-    CHECK((*InsertResult.first) == (i));
-    CHECK((InsertResult.second) == (false));
+    CHECK(*InsertResult.first == i);
+    CHECK(InsertResult.second == false);
   }
 
-  CHECK((4u) == (s1.size()));
+  CHECK(4u == s1.size());
 
   for (int i = 0; i < 4; i++)
-    CHECK((1u) == (s1.count(i)));
+    CHECK(1u == s1.count(i));
 
-  CHECK((0u) == (s1.count(4)));
+  CHECK(0u == s1.count(4));
 }
 
 TEST_CASE("SmallSetTest InsertPerfectFwd", "[wpiutil][llvm]") {
@@ -106,20 +106,20 @@ TEST_CASE("SmallSetTest InsertPerfectFwd", "[wpiutil][llvm]") {
     Value V1(1), V2(2);
 
     S.insert(V1);
-    CHECK((V1.Moved) == (false));
+    CHECK(V1.Moved == false);
 
     S.insert(std::move(V2));
-    CHECK((V2.Moved) == (true));
+    CHECK(V2.Moved == true);
   }
   {
     SmallSet<Value, 1> S;
     Value V1(1), V2(2);
 
     S.insert(V1);
-    CHECK((V1.Moved) == (false));
+    CHECK(V1.Moved == false);
 
     S.insert(std::move(V2));
-    CHECK((V2.Moved) == (true));
+    CHECK(V2.Moved == true);
   }
 }
 
@@ -141,22 +141,22 @@ TEST_CASE("SmallSetTest Grow", "[wpiutil][llvm]") {
 
   for (int i = 0; i < 8; i++) {
     auto InsertResult = s1.insert(i);
-    CHECK((*InsertResult.first) == (i));
-    CHECK((InsertResult.second) == (true));
+    CHECK(*InsertResult.first == i);
+    CHECK(InsertResult.second == true);
   }
 
   for (int i = 0; i < 8; i++) {
     auto InsertResult = s1.insert(i);
-    CHECK((*InsertResult.first) == (i));
-    CHECK((InsertResult.second) == (false));
+    CHECK(*InsertResult.first == i);
+    CHECK(InsertResult.second == false);
   }
 
-  CHECK((8u) == (s1.size()));
+  CHECK(8u == s1.size());
 
   for (int i = 0; i < 8; i++)
-    CHECK((1u) == (s1.count(i)));
+    CHECK(1u == s1.count(i));
 
-  CHECK((0u) == (s1.count(8)));
+  CHECK(0u == s1.count(8));
 }
 
 TEST_CASE("SmallSetTest Erase", "[wpiutil][llvm]") {
@@ -165,19 +165,19 @@ TEST_CASE("SmallSetTest Erase", "[wpiutil][llvm]") {
   for (int i = 0; i < 8; i++)
     s1.insert(i);
 
-  CHECK((8u) == (s1.size()));
+  CHECK(8u == s1.size());
 
   // Remove elements one by one and check if all other elements are still there.
   for (int i = 0; i < 8; i++) {
-    CHECK((1u) == (s1.count(i)));
+    CHECK(1u == s1.count(i));
     CHECK(s1.erase(i));
-    CHECK((0u) == (s1.count(i)));
-    CHECK((8u - i - 1) == (s1.size()));
+    CHECK(0u == s1.count(i));
+    CHECK(8u - i - 1 == s1.size());
     for (int j = i + 1; j < 8; j++)
-      CHECK((1u) == (s1.count(j)));
+      CHECK(1u == s1.count(j));
   }
 
-  CHECK((0u) == (s1.count(8)));
+  CHECK(0u == s1.count(8));
 }
 
 TEST_CASE("SmallSetTest IteratorInt", "[wpiutil][llvm]") {
@@ -191,7 +191,7 @@ TEST_CASE("SmallSetTest IteratorInt", "[wpiutil][llvm]") {
   // Make sure the elements are in the expected order.
   std::sort(V.begin(), V.end());
   for (int i = 0; i < 3; i++)
-    CHECK((i) == (V[i]));
+    CHECK(i == V[i]);
 
   // Test the 'big' case by adding a few more elements to switch to std::set
   // internally.
@@ -202,7 +202,7 @@ TEST_CASE("SmallSetTest IteratorInt", "[wpiutil][llvm]") {
   // Make sure the elements are in the expected order.
   std::sort(V.begin(), V.end());
   for (int i = 0; i < 6; i++)
-    CHECK((i) == (V[i]));
+    CHECK(i == V[i]);
 }
 
 TEST_CASE("SmallSetTest IteratorString", "[wpiutil][llvm]") {
@@ -216,9 +216,9 @@ TEST_CASE("SmallSetTest IteratorString", "[wpiutil][llvm]") {
 
   std::vector<std::string> V(s1.begin(), s1.end());
   std::sort(V.begin(), V.end());
-  CHECK((2u) == (s1.size()));
-  CHECK(("str 1") == (V[0]));
-  CHECK(("str 2") == (V[1]));
+  CHECK(2u == s1.size());
+  CHECK("str 1" == V[0]);
+  CHECK("str 2" == V[1]);
 
   s1.insert("str 4");
   s1.insert("str 0");
@@ -227,11 +227,11 @@ TEST_CASE("SmallSetTest IteratorString", "[wpiutil][llvm]") {
   V.assign(s1.begin(), s1.end());
   // Make sure the elements are in the expected order.
   std::sort(V.begin(), V.end());
-  CHECK((4u) == (s1.size()));
-  CHECK(("str 0") == (V[0]));
-  CHECK(("str 1") == (V[1]));
-  CHECK(("str 2") == (V[2]));
-  CHECK(("str 4") == (V[3]));
+  CHECK(4u == s1.size());
+  CHECK("str 0" == V[0]);
+  CHECK("str 1" == V[1]);
+  CHECK("str 2" == V[2]);
+  CHECK("str 4" == V[3]);
 }
 
 TEST_CASE("SmallSetTest IteratorIncMoveCopy", "[wpiutil][llvm]") {
@@ -243,15 +243,15 @@ TEST_CASE("SmallSetTest IteratorIncMoveCopy", "[wpiutil][llvm]") {
   s1.insert("str 2");
 
   auto Iter = s1.begin();
-  CHECK(("str 1") == (*Iter));
+  CHECK("str 1" == *Iter);
   ++Iter;
-  CHECK(("str 2") == (*Iter));
+  CHECK("str 2" == *Iter);
 
   s1.insert("str 4");
   s1.insert("str 0");
   auto Iter2 = s1.begin();
   Iter = std::move(Iter2);
-  CHECK(("str 0") == (*Iter));
+  CHECK("str 0" == *Iter);
 }
 
 TEST_CASE("SmallSetTest EqualityComparisonTest", "[wpiutil][llvm]") {
@@ -268,15 +268,15 @@ TEST_CASE("SmallSetTest EqualityComparisonTest", "[wpiutil][llvm]") {
   for (int i = 1; i < 11; i++)
     s4large.insert(i);
 
-  CHECK((s1small) == (s1small));
-  CHECK((s3large) == (s3large));
+  CHECK(s1small == s1small);
+  CHECK(s3large == s3large);
 
-  CHECK((s1small) == (s2small));
-  CHECK((s1small) == (s3large));
-  CHECK((s2small) == (s3large));
+  CHECK(s1small == s2small);
+  CHECK(s1small == s3large);
+  CHECK(s2small == s3large);
 
-  CHECK((s1small) != (s4large));
-  CHECK((s4large) != (s3large));
+  CHECK(s1small != s4large);
+  CHECK(s4large != s3large);
 }
 
 TEST_CASE("SmallSetTest Contains", "[wpiutil][llvm]") {

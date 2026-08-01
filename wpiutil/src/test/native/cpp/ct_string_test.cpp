@@ -22,7 +22,7 @@ TEST_CASE("CtStringTest Concat", "[wpiutil]") {
           astring},
       "["_ct_string, wpi::util::NumToCtString<arrsize>(), "]"_ct_string);
   static_assert(str.size() == 7);
-  REQUIRE((std::string{str}) == ("name[5]"));
+  REQUIRE(std::string{str} == "name[5]");
 }
 
 TEST_CASE("CtStringTest OperatorPlus", "[wpiutil]") {
@@ -33,12 +33,12 @@ TEST_CASE("CtStringTest OperatorPlus", "[wpiutil]") {
           astring} +
       "[]"_ct_string;
   static_assert(str.size() == 6);
-  REQUIRE((std::string{str}) == ("name[]"));
+  REQUIRE(std::string{str} == "name[]");
 }
 
 TEST_CASE("CtStringTest StringViewConversion", "[wpiutil]") {
   using namespace wpi::util::literals;
   constexpr auto str = "[]"_ct_string;
   std::string_view sv = str;
-  REQUIRE((sv) == ("[]"));
+  REQUIRE(sv == "[]");
 }

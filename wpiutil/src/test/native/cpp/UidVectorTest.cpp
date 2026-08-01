@@ -45,9 +45,9 @@ TEST_CASE("UidVectorTest Iterate", "[wpiutil]") {
   for (auto&& val : v) {
     out.push_back(val);
   }
-  REQUIRE((out.size()) == (2u));
-  CHECK((out[0]) == (2));
-  CHECK((out[1]) == (1));
+  REQUIRE(out.size() == 2u);
+  CHECK(out[0] == 2);
+  CHECK(out[1] == 1);
 }
 
 }  // namespace wpi::util

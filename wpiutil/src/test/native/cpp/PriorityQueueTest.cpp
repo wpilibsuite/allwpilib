@@ -19,7 +19,7 @@ TEST_CASE(
   wpi::util::priority_queue<int> queue{std::less<int>{},
                                        std::vector<int>{1, 3, 2}};
 
-  CHECK((3) == (queue.top()));
+  CHECK(3 == queue.top());
 }
 
 TEST_CASE(
@@ -30,8 +30,8 @@ TEST_CASE(
                                        std::less<int>{},
                                        std::vector<int>{1, 3, 2}};
 
-  CHECK((5) == (queue.top()));
-  CHECK((5u) == (queue.size()));
+  CHECK(5 == queue.top());
+  CHECK(5u == queue.size());
 }
 
 TEST_CASE("PriorityQueueTest ConstContainerConstructorsUseStoredContainer",
@@ -39,12 +39,12 @@ TEST_CASE("PriorityQueueTest ConstContainerConstructorsUseStoredContainer",
   const std::vector<int> base{1, 3, 2};
   wpi::util::priority_queue<int> queue{std::less<int>{}, base};
 
-  CHECK((3) == (queue.top()));
+  CHECK(3 == queue.top());
 
   std::vector<int> values{4, 5};
   wpi::util::priority_queue<int> rangeQueue{values.begin(), values.end(),
                                             std::less<int>{}, base};
 
-  CHECK((5) == (rangeQueue.top()));
-  CHECK((5u) == (rangeQueue.size()));
+  CHECK(5 == rangeQueue.top());
+  CHECK(5u == rangeQueue.size());
 }
