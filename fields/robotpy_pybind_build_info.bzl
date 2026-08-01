@@ -244,7 +244,7 @@ def define_pybind_library(name, pkgcfgs = []):
             "//wpimath:robotpy-wpimath",
             "//wpiutil:robotpy-wpiutil",
         ],
-        strip_path_prefixes = ["robotpy_fields/src/main/python", "robotpy_fields"],
+        strip_path_prefixes = ["fields/src/main/python", "fields"],
         summary = "RobotPy bindings for WPILib's fields library",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
