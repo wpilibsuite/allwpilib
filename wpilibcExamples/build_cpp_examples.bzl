@@ -113,7 +113,7 @@ def build_tests():
             deps = [
                 "//commandsv2",
                 ":{}-examples-headers".format(folder),
-                "//thirdparty/googletest",
+                "//thirdparty/catch2",
             ],
             defines = ["RUNNING_WPILIB_TESTS=1"],
             tags = ["wpi-example", "no-tsan", "no-asan", "no-ubsan", "exclusive"],
@@ -128,7 +128,7 @@ def build_tests():
             deps = [
                 "//commandsv2",
                 ":{}-snippets-headers".format(folder),
-                "//thirdparty/googletest",
+                "//thirdparty/catch2",
             ],
             defines = ["RUNNING_WPILIB_TESTS=1"],
             tags = ["wpi-example", "no-tsan", "no-asan", "no-ubsan", "exclusive"],
