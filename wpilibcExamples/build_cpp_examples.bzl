@@ -29,7 +29,7 @@ def _package_type(package_type):
 def build_examples(halsim_deps = []):
     _package_type("examples")
 
-    for folder in EXAMPLE_FOLDERS:
+    for folder, (vendordeps, dynamic_deps) in EXAMPLE_FOLDERS.items():
         cc_library(
             name = folder + "-examples-headers",
             hdrs = native.glob(["src/main/cpp/examples/" + folder + "/include/**/*.hpp"], allow_empty = True),
@@ -39,12 +39,20 @@ def build_examples(halsim_deps = []):
         cc_binary(
             name = folder + "-example",
             srcs = native.glob(["src/main/cpp/examples/" + folder + "/cpp/**/*.cpp", "src/main/cpp/examples/" + folder + "/c/**/*.c"], allow_empty = True),
-            deps = [
+            deps = vendordeps + [
                 "//apriltag",
-                "//commandsv2",
-                "//romiVendordep",
-                "//xrpVendordep",
+                "//wpilibc",
                 ":{}-examples-headers".format(folder),
+            ],
+            dynamic_deps = dynamic_deps + [
+                "//apriltag:shared/apriltag",
+                "//datalog:shared/datalog",
+                "//hal:shared/wpiHal",
+                "//ntcore:shared/ntcore",
+                "//wpilibc:shared/wpilibc",
+                "//wpimath:shared/wpimath",
+                "//wpinet:shared/wpinet",
+                "//wpiutil:shared/wpiutil",
             ],
             tags = ["wpi-example"],
         )
@@ -52,13 +60,13 @@ def build_examples(halsim_deps = []):
 def build_commands():
     _package_type("commands")
 
-    for folder in COMMANDS_V2_FOLDERS:
+    for folder, (vendordeps, dynamic_deps) in COMMANDS_V2_FOLDERS.items():
         cc_library(
             name = folder + "-command",
             srcs = native.glob(["src/main/cpp/commands/" + folder + "/**/*.cpp"]),
             hdrs = native.glob(["src/main/cpp/commands/" + folder + "/**/*.hpp"]),
-            deps = [
-                "//commandsv2",
+            deps = vendordeps + [
+                "//wpilibc",
             ],
             strip_include_prefix = "src/main/cpp/commands/" + folder,
             tags = ["wpi-example"],
@@ -67,36 +75,44 @@ def build_commands():
 def build_snippets():
     _package_type("snippets")
 
-    for folder in SNIPPET_FOLDERS:
+    for folder, (vendordeps, dynamic_deps) in SNIPPET_FOLDERS.items():
         cc_library(
             name = folder + "-snippets-headers",
             hdrs = native.glob(["src/main/cpp/snippets/" + folder + "/include/**/*.hpp"], allow_empty = True),
             strip_include_prefix = "src/main/cpp/snippets/" + folder + "/include",
             tags = ["wpi-example"],
         )
-        cc_library(
+        cc_binary(
             name = folder + "-snippet",
             srcs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.cpp"]),
-            deps = [
+            deps = vendordeps + [
                 "//apriltag",
-                "//commandsv2",
-                "//cameraserver",
+                "//wpilibc",
                 ":{}-snippets-headers".format(folder),
             ],
-            strip_include_prefix = "src/main/cpp/snippets/" + folder + "/include",
+            dynamic_deps = dynamic_deps + [
+                "//apriltag:shared/apriltag",
+                "//datalog:shared/datalog",
+                "//hal:shared/wpiHal",
+                "//ntcore:shared/ntcore",
+                "//wpilibc:shared/wpilibc",
+                "//wpimath:shared/wpimath",
+                "//wpinet:shared/wpinet",
+                "//wpiutil:shared/wpiutil",
+            ],
             tags = ["wpi-example"],
         )
 
 def build_templates():
     _package_type("templates")
 
-    for folder in TEMPLATE_FOLDERS:
+    for folder, (vendordeps, dynamic_deps) in TEMPLATE_FOLDERS.items():
         cc_library(
             name = folder + "-template",
             srcs = native.glob(["src/main/cpp/templates/" + folder + "/**/*.cpp"]),
             hdrs = native.glob(["src/main/cpp/templates/" + folder + "/**/*.hpp"]),
-            deps = [
-                "//commandsv2",
+            deps = vendordeps + [
+                "//wpilibc",
             ],
             strip_include_prefix = "src/main/cpp/templates/" + folder + "/include",
             tags = ["wpi-example"],
@@ -111,7 +127,7 @@ def build_tests():
             size = "small",
             srcs = native.glob([example_test_folder + "/**/*.cpp", example_src_folder + "/cpp/**/*.cpp", example_src_folder + "/c/**/*.c"], allow_empty = True),
             deps = [
-                "//commandsv2",
+                "//wpilibc",
                 ":{}-examples-headers".format(folder),
                 "//thirdparty/googletest",
             ],
@@ -126,7 +142,7 @@ def build_tests():
             size = "small",
             srcs = native.glob([snippet_test_folder + "/**/*.cpp", snippet_src_folder + "/**/*.cpp"], allow_empty = True),
             deps = [
-                "//commandsv2",
+                "//wpilibc",
                 ":{}-snippets-headers".format(folder),
                 "//thirdparty/googletest",
             ],
