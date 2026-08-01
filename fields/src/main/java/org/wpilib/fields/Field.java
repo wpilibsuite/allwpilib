@@ -120,10 +120,14 @@ public class Field {
         season,
         game,
         fieldImage,
-        fieldDimensions == null ? 0.0 : fieldDimensions.length,
-        fieldDimensions == null ? 0.0 : fieldDimensions.width,
+        requireFieldDimensions(fieldDimensions).length,
+        requireFieldDimensions(fieldDimensions).width,
         program,
         tags);
+  }
+
+  private static FieldDimensions requireFieldDimensions(FieldDimensions fieldDimensions) {
+    return Objects.requireNonNull(fieldDimensions, "field-dimensions");
   }
 
   /**

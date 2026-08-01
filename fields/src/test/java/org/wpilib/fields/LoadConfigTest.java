@@ -59,6 +59,23 @@ class LoadConfigTest {
   }
 
   @Test
+  void testLoadFieldWithoutDimensionsFails(@TempDir Path tempDir) throws IOException {
+    String json =
+        """
+        {
+          "name": "2027 FRC Dimensionless Field",
+          "season": "2027",
+          "game": "Dimensionless Field",
+          "program": "frc"
+        }
+        """;
+    Path file = tempDir.resolve("dimensionless.json");
+    Files.writeString(file, json);
+
+    Assertions.assertThrows(RuntimeException.class, () -> Field.loadFromFile(file));
+  }
+
+  @Test
   void testLoadFieldWithoutImage(@TempDir Path tempDir) throws IOException {
     String json =
         """
