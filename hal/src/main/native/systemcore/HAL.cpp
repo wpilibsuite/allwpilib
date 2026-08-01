@@ -39,7 +39,6 @@ void InitializeHAL() {
   InitializeCTREPCM();
   InitializeREVPH();
   InitializeAddressableLED();
-  InitializeAlert();
   InitializeAnalogInput();
   InitializeCAN();
   InitializeCANAPI();

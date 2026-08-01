@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include <jni.h>
+#include <stdint.h>
 
-namespace wpi::hal::sim {
-bool InitializeAlertDataJNI(JNIEnv* env);
-void FreeAlertDataJNI(JNIEnv* env);
-}  // namespace wpi::hal::sim
+namespace wpi::hal {
+int32_t SetMrcLibAlertBackend();
+}  // namespace wpi::hal

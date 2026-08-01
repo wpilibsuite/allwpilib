@@ -4,20 +4,31 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <string>
 #include <string_view>
 
-#include "wpi/hal/Alert.h"
+#include "wpi/util/Alert.h"
 #include "wpi/util/Handle.hpp"
 
-namespace wpi {
+namespace wpi::util {
+
+class Alert;
+
+namespace detail {
+
+// Used by RobotPy close()/__exit__() without exposing close-style semantics on
+// the C++ Alert API.
+void CloseAlertHandle(Alert& alert);
+
+}  // namespace detail
 
 /**
- * Persistent alert to be sent to the driver station. Alerts are tagged with a
- * type of HIGH, MEDIUM, or LOW to denote urgency. See
- * Alert::Level for suggested usage of each type. Alerts can be displayed on
- * supported dashboards, and are shown in a priority order based on type and
- * recency of activation, with newly activated alerts first.
+ * Persistent alert. Alerts are tagged with a type of HIGH, MEDIUM, or LOW to
+ * denote urgency. See Alert::Level for suggested usage of each type. Alerts can
+ * be displayed on supported dashboards, and are shown in a priority order based
+ * on type and recency of activation, with newly activated alerts first.
  *
  * Alerts should be created once and stored persistently, then updated to
  * "active" or "inactive" as necessary. Set(bool) can be safely called
@@ -25,7 +36,8 @@ namespace wpi {
  *
  * <pre>
  * class Robot {
- *   wpi::Alert alert{"Something went wrong", wpi::Alert::Level::MEDIUM};
+ *   wpi::util::Alert alert{"Something went wrong",
+ *                          wpi::util::Alert::Level::MEDIUM};
  * }
  *
  * Robot::periodic() {
@@ -44,41 +56,49 @@ class Alert {
      * symbol. Use this type for problems which will seriously affect the
      * robot's functionality and thus require immediate attention.
      */
-    HIGH = HAL_ALERT_HIGH,
+    HIGH = WPI_ALERT_HIGH,
 
     /**
      * Medium priority alert - displayed second with a yellow "!" symbol.
      * Use this type for problems which could affect the robot's functionality
      * but do not necessarily require immediate attention.
      */
-    MEDIUM = HAL_ALERT_MEDIUM,
+    MEDIUM = WPI_ALERT_MEDIUM,
 
     /**
      * Low priority alert - displayed last with a green "i" symbol. Use this
      * type for problems which are unlikely to affect the robot's functionality,
      * or any other alerts which do not fall under the other categories.
      */
-    LOW = HAL_ALERT_LOW,
+    LOW = WPI_ALERT_LOW,
   };
 
   /**
-   * Creates a new alert in the default group - "Alerts". If this is the first
-   * to be instantiated, the appropriate entries will be added to NetworkTables.
+   * Creates a new alert in the default group - "Alerts".
    *
    * @param text Text to be displayed when the alert is active.
+   * @param id Alert identifier. This should be unique within the group.
    * @param level Alert urgency level.
    */
-  Alert(std::string_view text, Level level);
+  Alert(std::string_view id, std::string_view text, Level level);
 
   /**
-   * Creates a new alert. If this is the first to be instantiated in its group,
-   * the appropriate entries will be added to NetworkTables.
+   * Creates a new alert.
    *
-   * @param group Group identifier, used as the entry name in NetworkTables.
+   * @param group Group identifier
+   * @param id Alert identifier. This should be unique within the group.
    * @param text Text to be displayed when the alert is active.
    * @param level Alert urgency level.
    */
-  Alert(std::string_view group, std::string_view text, Level level);
+  Alert(std::string_view group, std::string_view id, std::string_view text,
+        Level level);
+
+  /**
+   * Checks whether this alert is valid.
+   *
+   * @return true if this alert is valid.
+   */
+  explicit operator bool() const;
 
   /**
    * Sets whether the alert should currently be displayed. This method can be
@@ -109,14 +129,23 @@ class Alert {
   std::string GetText() const;
 
   /**
-   * Get the type of this alert.
-   * @return the type
+   * Get the level of this alert.
+   * @return the level
    */
-  Level GetType() const { return m_type; }
+  Level GetLevel() const;
 
  private:
-  Level m_type;
-  wpi::util::Handle<HAL_AlertHandle, HAL_DestroyAlert> m_handle;
+  friend void detail::CloseAlertHandle(Alert& alert);
+
+  Handle<WPI_AlertHandle, WPI_DestroyAlert> m_handle;
 };
 
-}  // namespace wpi
+namespace detail {
+
+inline void CloseAlertHandle(Alert& alert) {
+  alert.m_handle = WPI_INVALID_HANDLE;
+}
+
+}  // namespace detail
+
+}  // namespace wpi::util
