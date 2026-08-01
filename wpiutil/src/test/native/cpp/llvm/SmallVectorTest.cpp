@@ -18,6 +18,7 @@
 #include <catch2/matchers/catch_matchers_vector.hpp>
 #include <catch2/catch_template_test_macros.hpp>
 #include <array>
+#include <csignal>
 #include <cstdlib>
 #include <list>
 #include <regex>
@@ -39,9 +40,11 @@ using namespace wpi::util;
 namespace {
 
 #ifdef _WIN32
+#define WPIUTIL_HAS_DEATH_TEST 0
 #define CHECK_DEATH(statement, matcher) \
   SKIP("death tests are not supported by Catch2 on Windows")
 #else
+#define WPIUTIL_HAS_DEATH_TEST 1
 template <typename F>
 bool CheckDeathImpl(F&& func, std::string_view matcher) {
   int pipeFds[2];
@@ -51,6 +54,12 @@ bool CheckDeathImpl(F&& func, std::string_view matcher) {
 
   pid_t pid = fork();
   if (pid == 0) {
+    std::signal(SIGABRT, SIG_DFL);
+    std::signal(SIGBUS, SIG_DFL);
+    std::signal(SIGFPE, SIG_DFL);
+    std::signal(SIGILL, SIG_DFL);
+    std::signal(SIGSEGV, SIG_DFL);
+
     close(pipeFds[0]);
     dup2(pipeFds[1], STDERR_FILENO);
     close(pipeFds[1]);
@@ -418,7 +427,7 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest TruncateTest", "[wpi
   CHECK(6 == Constructable::getNumConstructorCalls());
   CHECK(5 == Constructable::getNumDestructorCalls());
 
-#if !defined(NDEBUG) && GTEST_HAS_DEATH_TEST
+#if !defined(NDEBUG) && WPIUTIL_HAS_DEATH_TEST
   CHECK_DEATH(V.truncate(2), "Cannot increase size");
 #endif
   V.truncate(1);
@@ -1402,7 +1411,7 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
 TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorReferenceInvalidationTest AppendRange", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_SmallVectorReferenceInvalidationTest) {
   auto &V = this->V;
   (void)V;
-#if !defined(NDEBUG) && GTEST_HAS_DEATH_TEST
+#if !defined(NDEBUG) && WPIUTIL_HAS_DEATH_TEST
   CHECK_DEATH(V.append(V.begin(), V.begin() + 1), this->AssertionMessage);
 
   REQUIRE(3u == NumBuiltinElts(V));
@@ -1456,7 +1465,7 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
 
 TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorReferenceInvalidationTest AssignRange", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_SmallVectorReferenceInvalidationTest) {
   auto &V = this->V;
-#if !defined(NDEBUG) && GTEST_HAS_DEATH_TEST
+#if !defined(NDEBUG) && WPIUTIL_HAS_DEATH_TEST
   CHECK_DEATH(V.assign(V.begin(), V.end()), this->AssertionMessage);
   CHECK_DEATH(V.assign(V.begin(), V.end() - 1), this->AssertionMessage);
 #endif
@@ -1536,7 +1545,7 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorRefe
 TEMPLATE_TEST_CASE_METHOD(SmallVectorReferenceInvalidationTest, "SmallVectorReferenceInvalidationTest InsertRange", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_SmallVectorReferenceInvalidationTest) {
   auto &V = this->V;
   (void)V;
-#if !defined(NDEBUG) && GTEST_HAS_DEATH_TEST
+#if !defined(NDEBUG) && WPIUTIL_HAS_DEATH_TEST
   CHECK_DEATH(V.insert(V.begin(), V.begin(), V.begin() + 1), this->AssertionMessage);
 
   REQUIRE(3u == NumBuiltinElts(V));
