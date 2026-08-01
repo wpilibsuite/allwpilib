@@ -2,10 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <optional>
 #include <string>
 #include <thread>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 
 #include "Robot.hpp"
 #include "wpi/hal/DriverStationTypes.h"
@@ -14,8 +16,7 @@
 #include "wpi/simulation/SimHooks.hpp"
 #include "wpi/units/time.hpp"
 
-template <typename T>
-class DigitalCommunicationTest : public testing::TestWithParam<T> {
+class DigitalCommunicationTest {
  public:
   wpi::sim::DIOSim allianceOutput{Robot::kAlliancePort};
   wpi::sim::DIOSim enabledOutput{Robot::kEnabledPort};
@@ -24,7 +25,7 @@ class DigitalCommunicationTest : public testing::TestWithParam<T> {
   Robot robot;
   std::optional<std::thread> thread;
 
-  void SetUp() override {
+  DigitalCommunicationTest() {
     wpi::sim::PauseTiming();
     wpi::sim::SetProgramStarted(false);
     wpi::sim::DriverStationSim::ResetData();
@@ -33,7 +34,7 @@ class DigitalCommunicationTest : public testing::TestWithParam<T> {
     wpi::sim::WaitForProgramStart();
   }
 
-  void TearDown() override {
+  ~DigitalCommunicationTest() {
     robot.EndCompetition();
     thread->join();
     allianceOutput.ResetData();
@@ -43,16 +44,18 @@ class DigitalCommunicationTest : public testing::TestWithParam<T> {
   }
 };
 
-class AllianceTest
-    : public DigitalCommunicationTest<wpi::hal::AllianceStationID> {};
-
-TEST_P(AllianceTest, Alliance) {
-  auto alliance = GetParam();
+TEST_CASE_METHOD(DigitalCommunicationTest, "DigitalCommunication alliance",
+                 "[wpilibcExamples][snippets][dio]") {
+  auto alliance = GENERATE(
+      wpi::hal::AllianceStationID::RED_1, wpi::hal::AllianceStationID::RED_2,
+      wpi::hal::AllianceStationID::RED_3, wpi::hal::AllianceStationID::BLUE_1,
+      wpi::hal::AllianceStationID::BLUE_2, wpi::hal::AllianceStationID::BLUE_3,
+      wpi::hal::AllianceStationID::UNKNOWN);
   wpi::sim::DriverStationSim::SetAllianceStationId(alliance);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_TRUE(allianceOutput.GetInitialized());
-  EXPECT_FALSE(allianceOutput.GetIsInput());
+  CHECK(allianceOutput.GetInitialized());
+  CHECK_FALSE(allianceOutput.GetIsInput());
 
   wpi::sim::StepTiming(20_ms);
 
@@ -70,92 +73,49 @@ TEST_P(AllianceTest, Alliance) {
       isRed = true;
       break;
   }
-  EXPECT_EQ(isRed, allianceOutput.GetValue());
+  CHECK(isRed == allianceOutput.GetValue());
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    DigitalCommunicationTests, AllianceTest,
-    testing::Values<wpi::hal::AllianceStationID>(
-        wpi::hal::AllianceStationID::RED_1, wpi::hal::AllianceStationID::RED_2,
-        wpi::hal::AllianceStationID::RED_3, wpi::hal::AllianceStationID::BLUE_1,
-        wpi::hal::AllianceStationID::BLUE_2,
-        wpi::hal::AllianceStationID::BLUE_3,
-        wpi::hal::AllianceStationID::UNKNOWN),
-    [](const testing::TestParamInfo<AllianceTest::ParamType>& info) {
-      switch (info.param) {
-        case wpi::hal::AllianceStationID::BLUE_1:
-          return std::string{"Blue1"};
-        case wpi::hal::AllianceStationID::BLUE_2:
-          return std::string{"Blue2"};
-        case wpi::hal::AllianceStationID::BLUE_3:
-          return std::string{"Blue3"};
-        case wpi::hal::AllianceStationID::RED_1:
-          return std::string{"Red1"};
-        case wpi::hal::AllianceStationID::RED_2:
-          return std::string{"Red2"};
-        case wpi::hal::AllianceStationID::RED_3:
-          return std::string{"Red3"};
-        case wpi::hal::AllianceStationID::UNKNOWN:
-          return std::string{"Unknown"};
-      }
-      return std::string{"Error"};
-    });
-
-class EnabledTest : public DigitalCommunicationTest<bool> {};
-
-TEST_P(EnabledTest, Enabled) {
-  auto enabled = GetParam();
+TEST_CASE_METHOD(DigitalCommunicationTest, "DigitalCommunication enabled",
+                 "[wpilibcExamples][snippets][dio]") {
+  auto enabled = GENERATE(false, true);
   wpi::sim::DriverStationSim::SetEnabled(enabled);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_TRUE(enabledOutput.GetInitialized());
-  EXPECT_FALSE(enabledOutput.GetIsInput());
+  CHECK(enabledOutput.GetInitialized());
+  CHECK_FALSE(enabledOutput.GetIsInput());
 
   wpi::sim::StepTiming(20_ms);
 
-  EXPECT_EQ(enabled, enabledOutput.GetValue());
+  CHECK(enabled == enabledOutput.GetValue());
 }
 
-INSTANTIATE_TEST_SUITE_P(DigitalCommunicationTests, EnabledTest,
-                         testing::Bool(), testing::PrintToStringParamName());
-
-class AutonomousTest : public DigitalCommunicationTest<bool> {};
-
-TEST_P(AutonomousTest, Autonomous) {
-  auto autonomous = GetParam();
+TEST_CASE_METHOD(DigitalCommunicationTest, "DigitalCommunication autonomous",
+                 "[wpilibcExamples][snippets][dio]") {
+  auto autonomous = GENERATE(false, true);
   wpi::sim::DriverStationSim::SetRobotMode(
       autonomous ? wpi::hal::RobotMode::AUTONOMOUS
                  : wpi::hal::RobotMode::TELEOPERATED);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_TRUE(autonomousOutput.GetInitialized());
-  EXPECT_FALSE(autonomousOutput.GetIsInput());
+  CHECK(autonomousOutput.GetInitialized());
+  CHECK_FALSE(autonomousOutput.GetIsInput());
 
   wpi::sim::StepTiming(20_ms);
 
-  EXPECT_EQ(autonomous, autonomousOutput.GetValue());
+  CHECK(autonomous == autonomousOutput.GetValue());
 }
 
-INSTANTIATE_TEST_SUITE_P(DigitalCommunicationTests, AutonomousTest,
-                         testing::Bool(), testing::PrintToStringParamName());
-
-class AlertTest : public DigitalCommunicationTest<double> {};
-
-TEST_P(AlertTest, Alert) {
-  auto matchTime = GetParam();
+TEST_CASE_METHOD(DigitalCommunicationTest, "DigitalCommunication alert",
+                 "[wpilibcExamples][snippets][dio]") {
+  auto matchTime = GENERATE(45.0, 27.0, 23.0);
   wpi::sim::DriverStationSim::SetMatchTime(matchTime);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_TRUE(alertOutput.GetInitialized());
-  EXPECT_FALSE(alertOutput.GetIsInput());
+  CHECK(alertOutput.GetInitialized());
+  CHECK_FALSE(alertOutput.GetIsInput());
 
   wpi::sim::StepTiming(20_ms);
 
-  EXPECT_EQ(matchTime <= 30 && matchTime >= 25, alertOutput.GetValue());
+  CHECK((matchTime <= 30 && matchTime >= 25) == alertOutput.GetValue());
 }
-
-INSTANTIATE_TEST_SUITE_P(
-    DigitalCommunicationTests, AlertTest, testing::Values(45.0, 27.0, 23.0),
-    [](const testing::TestParamInfo<double>& info) {
-      return testing::PrintToString(info.param).append("_s");
-    });
