@@ -7,6 +7,7 @@ package org.wpilib.command3;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.command3.proto.ProtobufCommands.ProtobufCommand;
@@ -78,6 +79,8 @@ class SchedulerTelemetryTests extends CommandTestBase {
     if (m_scheduler.isRunning(command)) {
       assertAll(
           commandName + " timing",
+          () -> assertTrue(message.hasLastTimeMs(), "lastTimeMs"),
+          () -> assertTrue(message.hasTotalTimeMs(), "totalTimeMs"),
           () ->
               assertEquals(
                   m_scheduler.lastCommandRuntimeMs(command),
