@@ -31,10 +31,23 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * @param gearbox The type of and number of motors in the flywheel gearbox.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for velocity.
+   * @throws IllegalArgumentException if the plant's A(0, 0) or B(0, 0) entry is zero, which leaves
+   *     the gearing and moment of inertia undetermined. A(0, 0) is zero for a plant built from
+   *     SysId constants with kV = 0.
    */
   public FlywheelSim(
       LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double... measurementStdDevs) {
     super(plant, measurementStdDevs);
+
+    if (plant.getA(0, 0) == 0.0) {
+      throw new IllegalArgumentException(
+          "plant must have nonzero velocity damping A(0, 0); a plant built with kV = 0 doesn't "
+              + "determine the gearing.");
+    }
+    if (plant.getB(0, 0) == 0.0) {
+      throw new IllegalArgumentException("plant must have nonzero input gain B(0, 0).");
+    }
+
     m_gearbox = gearbox;
 
     // By theorem 6.10.1 of https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
@@ -69,7 +82,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   /**
    * Returns the gear ratio of the flywheel.
    *
-   * @return the flywheel's gear ratio.
+   * @return The flywheel's gear ratio.
    */
   public double getGearing() {
     return m_gearing;
@@ -124,14 +137,37 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   /**
    * Returns the flywheel's current draw.
    *
+   * <p>This is the current drawn from the battery, which differs from the current through the motor
+   * by the duty cycle the motor controller is applying. A negative value means the flywheel is
+   * regenerating and returning current to the battery.
+   *
    * @return The flywheel's current draw in amps.
    */
   public double getCurrentDraw() {
-    // I = V / R - omega / (Kv * R)
-    // Reductions are output over input, so a reduction of 2:1 means the motor is spinning
-    // 2x faster than the flywheel
-    return m_gearbox.getCurrent(m_x.get(0, 0) * m_gearing, m_u.get(0, 0))
-        * Math.signum(m_u.get(0, 0));
+    // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is
+    // spinning 10x faster than the output.
+    //
+    // The current through the motor is I = V/R - ω/(KᵥR), where V is the voltage across
+    // the motor terminals.
+    //
+    // The motor controller produces V by PWMing the battery voltage at duty cycle
+    // D = V/V_batt. An ideal H-bridge conserves power, so V_batt·I_supply = V·I, giving
+    //
+    //   I_supply = D·I
+    //
+    // Scaling by D also makes the result continuous through V = 0, where the motor is
+    // braking and its circulating current isn't drawn from the battery.
+    double motorVelocity = m_x.get(0, 0) * m_gearing;
+    double appliedVoltage = m_u.get(0, 0);
+    double batteryVoltage = RobotController.getBatteryVoltage();
+
+    // With no battery voltage the controller can't apply any duty cycle, so nothing is drawn.
+    if (batteryVoltage == 0.0) {
+      return 0.0;
+    }
+
+    double dutyCycle = Math.clamp(appliedVoltage / batteryVoltage, -1.0, 1.0);
+    return m_gearbox.getCurrent(motorVelocity, appliedVoltage) * dutyCycle;
   }
 
   /**

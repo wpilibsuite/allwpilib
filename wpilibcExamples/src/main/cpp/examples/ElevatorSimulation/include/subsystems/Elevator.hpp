@@ -10,6 +10,7 @@
 #include "wpi/math/controller/ElevatorFeedforward.hpp"
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/controller/ProfiledPIDController.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/simulation/BatterySim.hpp"
 #include "wpi/simulation/ElevatorSim.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
@@ -48,15 +49,19 @@ class Elevator {
   wpi::sim::PWMMotorControllerSim motorSim{motor};
 
   // Simulation classes help us simulate what's going on, including gravity.
-  wpi::sim::ElevatorSim elevatorSim{elevatorGearbox,
+  wpi::math::LinearSystem<2, 1, 2> elevatorPlant =
+      wpi::math::Models::ElevatorFromPhysicalConstants(
+          elevatorGearbox, Constants::kCarriageMass,
+          Constants::kElevatorDrumRadius, Constants::kElevatorGearing);
+  wpi::sim::ElevatorSim elevatorSim{elevatorPlant,
+                                    elevatorGearbox,
                                     Constants::kElevatorGearing,
-                                    Constants::kCarriageMass,
-                                    Constants::kElevatorDrumRadius,
+                                    Constants::kElevatorkG,
                                     Constants::kMinElevatorHeight,
                                     Constants::kMaxElevatorHeight,
-                                    true,
                                     0_m,
                                     {0.01}};
+
   wpi::sim::EncoderSim encoderSim{encoder};
 
   // Create a Mechanism2d display of an elevator

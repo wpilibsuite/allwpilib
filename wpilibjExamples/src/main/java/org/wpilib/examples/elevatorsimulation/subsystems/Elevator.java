@@ -9,7 +9,11 @@ import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.ElevatorFeedforward;
 import org.wpilib.math.controller.ProfiledPIDController;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N2;
 import org.wpilib.math.system.DCMotor;
+import org.wpilib.math.system.LinearSystem;
+import org.wpilib.math.system.Models;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.simulation.BatterySim;
 import org.wpilib.simulation.ElevatorSim;
@@ -44,18 +48,24 @@ public class Elevator implements AutoCloseable {
   private final PWMSparkMax motor = new PWMSparkMax(Constants.kMotorPort);
 
   // Simulation classes help us simulate what's going on, including gravity.
-  private final ElevatorSim elevatorSim =
-      new ElevatorSim(
+  private final LinearSystem<N2, N1, N2> elevatorPlant =
+      Models.elevatorFromPhysicalConstants(
           elevatorGearbox,
-          Constants.kElevatorGearing,
           Constants.kCarriageMass,
           Constants.kElevatorDrumRadius,
+          Constants.kElevatorGearing);
+  private final ElevatorSim elevatorSim =
+      new ElevatorSim(
+          elevatorPlant,
+          elevatorGearbox,
+          Constants.kElevatorGearing,
+          Constants.kElevatorkG,
           Constants.kMinElevatorHeight,
           Constants.kMaxElevatorHeight,
-          true,
           0,
           0.01,
           0.0);
+
   private final EncoderSim encoderSim = new EncoderSim(encoder);
   private final PWMMotorControllerSim motorSim = new PWMMotorControllerSim(motor);
 

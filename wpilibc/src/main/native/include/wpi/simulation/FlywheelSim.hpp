@@ -26,6 +26,9 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    *     wpi::math::Models::FlywheelFromSysId().
    * @param gearbox The type of and number of motors in the flywheel gearbox.
    * @param measurementStdDevs The standard deviation of the measurement noise.
+   * @throws std::domain_error if the plant's A(0, 0) or B(0, 0) entry is zero,
+   *     which leaves the gearing and moment of inertia undetermined. A(0, 0) is
+   *     zero for a plant built from SysId constants with kV = 0.
    */
   FlywheelSim(const wpi::math::LinearSystem<1, 1, 1>& plant,
               const wpi::math::DCMotor& gearbox,
@@ -64,6 +67,11 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
   /**
    * Returns the flywheel's current draw.
    *
+   * This is the current drawn from the battery, which differs from the current
+   * through the motor by the duty cycle the motor controller is applying. A
+   * negative value means the flywheel is regenerating and returning current to
+   * the battery.
+   *
    * @return The flywheel's current draw.
    */
   wpi::units::ampere_t GetCurrentDraw() const;
@@ -83,17 +91,23 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
   void SetInputVoltage(wpi::units::volt_t voltage);
 
   /**
-   * Returns the gearbox.
+   * Returns the gearbox for the flywheel.
+   *
+   * @return The flywheel's gearbox.
    */
   wpi::math::DCMotor Gearbox() const { return m_gearbox; }
 
   /**
-   * Returns the gearing;
+   * Returns the gear ratio of the flywheel.
+   *
+   * @return The flywheel's gear ratio.
    */
   double Gearing() const { return m_gearing; }
 
   /**
-   * Returns the moment of inertia
+   * Returns the moment of inertia of the flywheel.
+   *
+   * @return The flywheel's moment of inertia.
    */
   wpi::units::kilogram_square_meter_t J() const { return m_j; }
 
