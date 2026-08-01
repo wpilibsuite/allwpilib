@@ -339,7 +339,7 @@ public final class Field {
    *
    * @param origin The predefined origin.
    */
-  public final void setOrigin(OriginPosition origin) {
+  public void setOrigin(OriginPosition origin) {
     var pose =
         switch (origin) {
           case BLUE_ALLIANCE_WALL_RIGHT_SIDE -> Pose3d.kZero;
@@ -357,7 +357,7 @@ public final class Field {
    *
    * @param origin The new origin for tag transformations.
    */
-  public final void setOrigin(Pose3d origin) {
+  public void setOrigin(Pose3d origin) {
     m_origin = origin;
   }
 
