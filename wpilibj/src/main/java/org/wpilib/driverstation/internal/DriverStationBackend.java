@@ -601,6 +601,7 @@ public final class DriverStationBackend {
     }
   }
 
+  private static final ReentrantLock m_joystickAlertMutex = new ReentrantLock();
   private static boolean m_silenceJoystickAlerts;
   private static final JoystickAlerts[] m_joystickAlerts = new JoystickAlerts[JOYSTICK_PORTS];
 
@@ -1830,9 +1831,14 @@ public final class DriverStationBackend {
    * @param silence Whether joystick connection alerts should be silenced.
    */
   public static void silenceJoystickConnectionAlert(boolean silence) {
-    m_silenceJoystickAlerts = silence;
-    if (silence && !isFMSAttached()) {
-      clearJoystickAlerts();
+    m_joystickAlertMutex.lock();
+    try {
+      m_silenceJoystickAlerts = silence;
+      if (silence && !isFMSAttached()) {
+        clearJoystickAlertsLocked();
+      }
+    } finally {
+      m_joystickAlertMutex.unlock();
     }
   }
 
@@ -1843,7 +1849,12 @@ public final class DriverStationBackend {
    * @return Whether joystick connection alerts are silenced.
    */
   public static boolean isJoystickConnectionAlertSilenced() {
-    return !isFMSAttached() && m_silenceJoystickAlerts;
+    m_joystickAlertMutex.lock();
+    try {
+      return !isFMSAttached() && m_silenceJoystickAlerts;
+    } finally {
+      m_joystickAlertMutex.unlock();
+    }
   }
 
   /**
@@ -1988,7 +1999,7 @@ public final class DriverStationBackend {
     m_refreshEvents.remove(handle);
   }
 
-  private static JoystickAlerts getJoystickAlerts(int stick) {
+  private static JoystickAlerts getJoystickAlertsLocked(int stick) {
     JoystickAlerts alerts = m_joystickAlerts[stick];
     if (alerts == null) {
       alerts = new JoystickAlerts(stick);
@@ -1997,237 +2008,266 @@ public final class DriverStationBackend {
     return alerts;
   }
 
-  private static JoystickAlerts getJoystickAlertsIfInitialized(int stick) {
+  private static JoystickAlerts getJoystickAlertsIfInitializedLocked(int stick) {
     return m_joystickAlerts[stick];
   }
 
-  private static JoystickAlerts recreateJoystickAlerts(int stick) {
+  private static JoystickAlerts recreateJoystickAlertsLocked(int stick) {
     JoystickAlerts alerts = new JoystickAlerts(stick);
     m_joystickAlerts[stick] = alerts;
     return alerts;
   }
 
-  private static JoystickAlerts getJoystickAlertsForReport(int stick) {
+  private static JoystickAlerts getJoystickAlertsForReportLocked(int stick) {
     if (!isFMSAttached() && m_silenceJoystickAlerts) {
       return null;
     }
 
     if (isJoystickConnected(stick)) {
-      JoystickAlerts alerts = getJoystickAlerts(stick);
+      JoystickAlerts alerts = getJoystickAlertsLocked(stick);
       if (!alerts.setConnectionAlert(false)) {
-        alerts = recreateJoystickAlerts(stick);
+        alerts = recreateJoystickAlertsLocked(stick);
       }
       return alerts;
     }
 
-    clearJoystickResourceAlerts(stick);
-    setJoystickConnectionAlert(stick, true);
+    clearJoystickResourceAlertsLocked(stick);
+    setJoystickConnectionAlertLocked(stick, true);
     return null;
   }
 
   private static void reportJoystickButtonWarning(int stick, int button) {
-    JoystickAlerts alerts = getJoystickAlertsForReport(stick);
-    if (alerts == null) {
-      return;
-    }
+    m_joystickAlertMutex.lock();
+    try {
+      JoystickAlerts alerts = getJoystickAlertsForReportLocked(stick);
+      if (alerts == null) {
+        return;
+      }
 
-    String text = "Joystick Button " + button + " on port " + stick + " not available";
-    alerts.buttonAlertButton = button;
-    if (!alerts.setButtonAlert(true, text)) {
-      alerts = recreateJoystickAlerts(stick);
+      String text = "Joystick Button " + button + " on port " + stick + " not available";
       alerts.buttonAlertButton = button;
-      alerts.setButtonAlert(true, text);
+      if (!alerts.setButtonAlert(true, text)) {
+        alerts = recreateJoystickAlertsLocked(stick);
+        alerts.buttonAlertButton = button;
+        alerts.setButtonAlert(true, text);
+      }
+    } finally {
+      m_joystickAlertMutex.unlock();
     }
   }
 
   private static void reportJoystickAxisWarning(int stick, int axis) {
-    JoystickAlerts alerts = getJoystickAlertsForReport(stick);
-    if (alerts == null) {
-      return;
-    }
+    m_joystickAlertMutex.lock();
+    try {
+      JoystickAlerts alerts = getJoystickAlertsForReportLocked(stick);
+      if (alerts == null) {
+        return;
+      }
 
-    String text = "Joystick axis " + axis + " on port " + stick + " not available";
-    alerts.axisAlertAxis = axis;
-    if (!alerts.setAxisAlert(true, text)) {
-      alerts = recreateJoystickAlerts(stick);
+      String text = "Joystick axis " + axis + " on port " + stick + " not available";
       alerts.axisAlertAxis = axis;
-      alerts.setAxisAlert(true, text);
+      if (!alerts.setAxisAlert(true, text)) {
+        alerts = recreateJoystickAlertsLocked(stick);
+        alerts.axisAlertAxis = axis;
+        alerts.setAxisAlert(true, text);
+      }
+    } finally {
+      m_joystickAlertMutex.unlock();
     }
   }
 
   private static void reportJoystickPOVWarning(int stick, int pov) {
-    JoystickAlerts alerts = getJoystickAlertsForReport(stick);
-    if (alerts == null) {
-      return;
-    }
+    m_joystickAlertMutex.lock();
+    try {
+      JoystickAlerts alerts = getJoystickAlertsForReportLocked(stick);
+      if (alerts == null) {
+        return;
+      }
 
-    String text = "Joystick POV " + pov + " on port " + stick + " not available";
-    alerts.povAlertPOV = pov;
-    if (!alerts.setPOVAlert(true, text)) {
-      alerts = recreateJoystickAlerts(stick);
+      String text = "Joystick POV " + pov + " on port " + stick + " not available";
       alerts.povAlertPOV = pov;
-      alerts.setPOVAlert(true, text);
+      if (!alerts.setPOVAlert(true, text)) {
+        alerts = recreateJoystickAlertsLocked(stick);
+        alerts.povAlertPOV = pov;
+        alerts.setPOVAlert(true, text);
+      }
+    } finally {
+      m_joystickAlertMutex.unlock();
     }
   }
 
   private static void reportJoystickTouchpadFingerWarning(int stick, int touchpad, int finger) {
-    JoystickAlerts alerts = getJoystickAlertsForReport(stick);
-    if (alerts == null) {
-      return;
-    }
+    m_joystickAlertMutex.lock();
+    try {
+      JoystickAlerts alerts = getJoystickAlertsForReportLocked(stick);
+      if (alerts == null) {
+        return;
+      }
 
-    String text =
-        "Joystick touchpad finger "
-            + finger
-            + " on touchpad "
-            + touchpad
-            + " on port "
-            + stick
-            + " not available";
-    alerts.touchpadFingerAlertTouchpad = touchpad;
-    alerts.touchpadFingerAlertFinger = finger;
-    if (!alerts.setTouchpadFingerAlert(true, text)) {
-      alerts = recreateJoystickAlerts(stick);
+      String text =
+          "Joystick touchpad finger "
+              + finger
+              + " on touchpad "
+              + touchpad
+              + " on port "
+              + stick
+              + " not available";
       alerts.touchpadFingerAlertTouchpad = touchpad;
       alerts.touchpadFingerAlertFinger = finger;
-      alerts.setTouchpadFingerAlert(true, text);
+      if (!alerts.setTouchpadFingerAlert(true, text)) {
+        alerts = recreateJoystickAlertsLocked(stick);
+        alerts.touchpadFingerAlertTouchpad = touchpad;
+        alerts.touchpadFingerAlertFinger = finger;
+        alerts.setTouchpadFingerAlert(true, text);
+      }
+    } finally {
+      m_joystickAlertMutex.unlock();
     }
   }
 
   private static void clearJoystickAlerts() {
+    m_joystickAlertMutex.lock();
+    try {
+      clearJoystickAlertsLocked();
+    } finally {
+      m_joystickAlertMutex.unlock();
+    }
+  }
+
+  private static void clearJoystickAlertsLocked() {
     if (!isFMSAttached() && m_silenceJoystickAlerts) {
-      clearAllJoystickAlerts();
+      clearAllJoystickAlertsLocked();
       return;
     }
 
     for (int stick = 0; stick < JOYSTICK_PORTS; stick++) {
-      JoystickAlerts alerts = getJoystickAlertsIfInitialized(stick);
+      JoystickAlerts alerts = getJoystickAlertsIfInitializedLocked(stick);
       if (alerts == null) {
         continue;
       }
 
       if (!isJoystickConnected(stick)) {
-        clearJoystickResourceAlerts(stick);
+        clearJoystickResourceAlertsLocked(stick);
         continue;
       }
 
       if (alerts.connectionAlertActive) {
-        setJoystickConnectionAlert(stick, false);
+        setJoystickConnectionAlertLocked(stick, false);
       }
 
       int axesAvailable = getStickAxesAvailable(stick);
       if (alerts.axisAlertActive && (axesAvailable & (1 << alerts.axisAlertAxis)) != 0) {
-        setJoystickAxisAlert(stick, false);
+        setJoystickAxisAlertLocked(stick, false);
       }
 
       long buttonsAvailable = getStickButtonsAvailable(stick);
       if (alerts.buttonAlertActive && (buttonsAvailable & (1L << alerts.buttonAlertButton)) != 0) {
-        setJoystickButtonAlert(stick, false);
+        setJoystickButtonAlertLocked(stick, false);
       }
 
       int povsAvailable = getStickPOVsAvailable(stick);
       if (alerts.povAlertActive && (povsAvailable & (1 << alerts.povAlertPOV)) != 0) {
-        setJoystickPOVAlert(stick, false);
+        setJoystickPOVAlertLocked(stick, false);
       }
 
       if (alerts.touchpadFingerAlertActive
           && getStickTouchpadFingerAvailable(
               stick, alerts.touchpadFingerAlertTouchpad, alerts.touchpadFingerAlertFinger)) {
-        setJoystickTouchpadFingerAlert(stick, false);
+        setJoystickTouchpadFingerAlertLocked(stick, false);
       }
     }
   }
 
-  private static void clearAllJoystickAlerts() {
+  private static void clearAllJoystickAlertsLocked() {
     for (int stick = 0; stick < JOYSTICK_PORTS; stick++) {
-      if (getJoystickAlertsIfInitialized(stick) != null) {
-        setJoystickConnectionAlert(stick, false);
-        clearJoystickResourceAlerts(stick);
+      if (getJoystickAlertsIfInitializedLocked(stick) != null) {
+        setJoystickConnectionAlertLocked(stick, false);
+        clearJoystickResourceAlertsLocked(stick);
       }
     }
   }
 
-  private static void clearJoystickResourceAlerts(int stick) {
-    setJoystickButtonAlert(stick, false);
-    setJoystickAxisAlert(stick, false);
-    setJoystickPOVAlert(stick, false);
-    setJoystickTouchpadFingerAlert(stick, false);
+  private static void clearJoystickResourceAlertsLocked(int stick) {
+    setJoystickButtonAlertLocked(stick, false);
+    setJoystickAxisAlertLocked(stick, false);
+    setJoystickPOVAlertLocked(stick, false);
+    setJoystickTouchpadFingerAlertLocked(stick, false);
   }
 
-  private static void setJoystickConnectionAlert(int stick, boolean active) {
+  private static void setJoystickConnectionAlertLocked(int stick, boolean active) {
     JoystickAlerts alerts =
-        active ? getJoystickAlerts(stick) : getJoystickAlertsIfInitialized(stick);
+        active ? getJoystickAlertsLocked(stick) : getJoystickAlertsIfInitializedLocked(stick);
     if (alerts == null) {
       return;
     }
 
     if (!alerts.setConnectionAlert(active)) {
       if (active) {
-        recreateJoystickAlerts(stick).setConnectionAlert(true);
+        recreateJoystickAlertsLocked(stick).setConnectionAlert(true);
       } else {
         m_joystickAlerts[stick] = null;
       }
     }
   }
 
-  private static void setJoystickButtonAlert(int stick, boolean active) {
+  private static void setJoystickButtonAlertLocked(int stick, boolean active) {
     JoystickAlerts alerts =
-        active ? getJoystickAlerts(stick) : getJoystickAlertsIfInitialized(stick);
+        active ? getJoystickAlertsLocked(stick) : getJoystickAlertsIfInitializedLocked(stick);
     if (alerts == null) {
       return;
     }
 
     if (!alerts.setButtonAlert(active, "")) {
       if (active) {
-        recreateJoystickAlerts(stick).setButtonAlert(true, "");
+        recreateJoystickAlertsLocked(stick).setButtonAlert(true, "");
       } else {
         m_joystickAlerts[stick] = null;
       }
     }
   }
 
-  private static void setJoystickAxisAlert(int stick, boolean active) {
+  private static void setJoystickAxisAlertLocked(int stick, boolean active) {
     JoystickAlerts alerts =
-        active ? getJoystickAlerts(stick) : getJoystickAlertsIfInitialized(stick);
+        active ? getJoystickAlertsLocked(stick) : getJoystickAlertsIfInitializedLocked(stick);
     if (alerts == null) {
       return;
     }
 
     if (!alerts.setAxisAlert(active, "")) {
       if (active) {
-        recreateJoystickAlerts(stick).setAxisAlert(true, "");
+        recreateJoystickAlertsLocked(stick).setAxisAlert(true, "");
       } else {
         m_joystickAlerts[stick] = null;
       }
     }
   }
 
-  private static void setJoystickPOVAlert(int stick, boolean active) {
+  private static void setJoystickPOVAlertLocked(int stick, boolean active) {
     JoystickAlerts alerts =
-        active ? getJoystickAlerts(stick) : getJoystickAlertsIfInitialized(stick);
+        active ? getJoystickAlertsLocked(stick) : getJoystickAlertsIfInitializedLocked(stick);
     if (alerts == null) {
       return;
     }
 
     if (!alerts.setPOVAlert(active, "")) {
       if (active) {
-        recreateJoystickAlerts(stick).setPOVAlert(true, "");
+        recreateJoystickAlertsLocked(stick).setPOVAlert(true, "");
       } else {
         m_joystickAlerts[stick] = null;
       }
     }
   }
 
-  private static void setJoystickTouchpadFingerAlert(int stick, boolean active) {
+  private static void setJoystickTouchpadFingerAlertLocked(int stick, boolean active) {
     JoystickAlerts alerts =
-        active ? getJoystickAlerts(stick) : getJoystickAlertsIfInitialized(stick);
+        active ? getJoystickAlertsLocked(stick) : getJoystickAlertsIfInitializedLocked(stick);
     if (alerts == null) {
       return;
     }
 
     if (!alerts.setTouchpadFingerAlert(active, "")) {
       if (active) {
-        recreateJoystickAlerts(stick).setTouchpadFingerAlert(true, "");
+        recreateJoystickAlertsLocked(stick).setTouchpadFingerAlert(true, "");
       } else {
         m_joystickAlerts[stick] = null;
       }
