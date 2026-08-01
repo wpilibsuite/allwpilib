@@ -4,32 +4,36 @@
 
 #include "wpi/util/StringExtras.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
-TEST(StringExtrasTest, RemovePrefix) {
+TEST_CASE("StringExtrasTest RemovePrefix", "[wpiutil]") {
   std::string_view original = "wpilib";
   auto modified = wpi::util::remove_prefix(original, "wpi");
-  EXPECT_EQ(original, "wpilib");
-  EXPECT_EQ(modified, std::optional{"lib"});
+  CHECK((original) == ("wpilib"));
+  CHECK((modified) == (std::optional{"lib"}));
 }
 
-TEST(StringExtrasTest, RemoveSuffix) {
+TEST_CASE("StringExtrasTest RemoveSuffix", "[wpiutil]") {
   std::string_view original = "wpilib";
   auto modified = wpi::util::remove_suffix(original, "lib");
-  EXPECT_EQ(original, "wpilib");
-  EXPECT_EQ(modified, std::optional{"wpi"});
+  CHECK((original) == ("wpilib"));
+  CHECK((modified) == (std::optional{"wpi"}));
 }
 
-TEST(StringExtrasTest, RemovePrefixNoMatch) {
+TEST_CASE("StringExtrasTest RemovePrefixNoMatch", "[wpiutil]") {
   std::string_view original = "wpilib";
   auto modified = wpi::util::remove_prefix(original, "foo");
-  EXPECT_EQ(original, "wpilib");
-  EXPECT_EQ(modified, std::nullopt);
+  CHECK((original) == ("wpilib"));
+  CHECK((modified) == (std::nullopt));
 }
 
-TEST(StringExtrasTest, RemoveSuffixNoMatch) {
+TEST_CASE("StringExtrasTest RemoveSuffixNoMatch", "[wpiutil]") {
   std::string_view original = "wpilib";
   auto modified = wpi::util::remove_suffix(original, "foo");
-  EXPECT_EQ(original, "wpilib");
-  EXPECT_EQ(modified, std::nullopt);
+  CHECK((original) == ("wpilib"));
+  CHECK((modified) == (std::nullopt));
 }

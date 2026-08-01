@@ -5,8 +5,11 @@
 #include "wpi/util/Base64.hpp"
 
 #include <string>
+#include <string_view>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+#include <catch2/generators/catch_generators_range.hpp>
 
 #include "wpi/util/SmallString.hpp"
 
@@ -24,59 +27,15 @@ std::ostream& operator<<(std::ostream& os, const Base64TestParam& param) {
   return os;
 }
 
-class Base64Test : public ::testing::TestWithParam<Base64TestParam> {
- protected:
-  std::string_view GetPlain() {
-    if (GetParam().plain_len < 0) {
-      return GetParam().plain;
-    } else {
-      return std::string_view(GetParam().plain, GetParam().plain_len);
-    }
+std::string_view GetPlain(const Base64TestParam& param) {
+  if (param.plain_len < 0) {
+    return param.plain;
+  } else {
+    return std::string_view(param.plain, param.plain_len);
   }
-};
-
-TEST_P(Base64Test, EncodeStdString) {
-  std::string s;
-  Base64Encode(GetPlain(), &s);
-  ASSERT_EQ(GetParam().encoded, s);
-
-  // text already in s
-  Base64Encode(GetPlain(), &s);
-  ASSERT_EQ(GetParam().encoded, s);
 }
 
-TEST_P(Base64Test, EncodeSmallString) {
-  SmallString<128> buf;
-  ASSERT_EQ(GetParam().encoded, Base64Encode(GetPlain(), buf));
-  // reuse buf
-  ASSERT_EQ(GetParam().encoded, Base64Encode(GetPlain(), buf));
-}
-
-TEST_P(Base64Test, DecodeStdString) {
-  std::string s;
-  std::string_view encoded = GetParam().encoded;
-  EXPECT_EQ(encoded.size(), Base64Decode(encoded, &s));
-  ASSERT_EQ(GetPlain(), s);
-
-  // text already in s
-  Base64Decode(encoded, &s);
-  ASSERT_EQ(GetPlain(), s);
-}
-
-TEST_P(Base64Test, DecodeSmallString) {
-  SmallString<128> buf;
-  std::string_view encoded = GetParam().encoded;
-  size_t len;
-  std::string_view plain = Base64Decode(encoded, &len, buf);
-  EXPECT_EQ(encoded.size(), len);
-  ASSERT_EQ(GetPlain(), plain);
-
-  // reuse buf
-  plain = Base64Decode(encoded, &len, buf);
-  ASSERT_EQ(GetPlain(), plain);
-}
-
-static Base64TestParam sample[] = {
+static Base64TestParam testParams[] = {
     {-1, "Send reinforcements", "U2VuZCByZWluZm9yY2VtZW50cw=="},
     {-1, "Now is the time for all good coders\n to learn C++",
      "Tm93IGlzIHRoZSB0aW1lIGZvciBhbGwgZ29vZCBjb2RlcnMKIHRvIGxlYXJuIEMrKw=="},
@@ -84,12 +43,6 @@ static Base64TestParam sample[] = {
      "This is line one\nThis is line two\nThis is line three\nAnd so on...\n",
      "VGhpcyBpcyBsaW5lIG9uZQpUaGlzIGlzIGxpbmUgdHdvClRoaXMgaXMgbGluZSB0aHJlZQpBb"
      "mQgc28gb24uLi4K"},
-};
-
-INSTANTIATE_TEST_SUITE_P(Base64SampleTests, Base64Test,
-                         ::testing::ValuesIn(sample));
-
-static Base64TestParam standard[] = {
     {0, "", ""},
     {1, "\0", "AA=="},
     {2, "\0\0", "AAA="},
@@ -100,7 +53,49 @@ static Base64TestParam standard[] = {
     {2, "\xff\xef", "/+8="},
 };
 
-INSTANTIATE_TEST_SUITE_P(Base64StandardTests, Base64Test,
-                         ::testing::ValuesIn(standard));
+TEST_CASE("Base64Test EncodeStdString", "[wpiutil][base64]") {
+  const auto& param = GENERATE_REF(Catch::Generators::from_range(testParams));
+  std::string s;
+  Base64Encode(GetPlain(param), &s);
+  REQUIRE((param.encoded) == (s));
+
+  // text already in s
+  Base64Encode(GetPlain(param), &s);
+  REQUIRE((param.encoded) == (s));
+}
+
+TEST_CASE("Base64Test EncodeSmallString", "[wpiutil][base64]") {
+  const auto& param = GENERATE_REF(Catch::Generators::from_range(testParams));
+  SmallString<128> buf;
+  REQUIRE((param.encoded) == (Base64Encode(GetPlain(param), buf)));
+  // reuse buf
+  REQUIRE((param.encoded) == (Base64Encode(GetPlain(param), buf)));
+}
+
+TEST_CASE("Base64Test DecodeStdString", "[wpiutil][base64]") {
+  const auto& param = GENERATE_REF(Catch::Generators::from_range(testParams));
+  std::string s;
+  std::string_view encoded = param.encoded;
+  CHECK((encoded.size()) == (Base64Decode(encoded, &s)));
+  REQUIRE((GetPlain(param)) == (s));
+
+  // text already in s
+  Base64Decode(encoded, &s);
+  REQUIRE((GetPlain(param)) == (s));
+}
+
+TEST_CASE("Base64Test DecodeSmallString", "[wpiutil][base64]") {
+  const auto& param = GENERATE_REF(Catch::Generators::from_range(testParams));
+  SmallString<128> buf;
+  std::string_view encoded = param.encoded;
+  size_t len;
+  std::string_view plain = Base64Decode(encoded, &len, buf);
+  CHECK((encoded.size()) == (len));
+  REQUIRE((GetPlain(param)) == (plain));
+
+  // reuse buf
+  plain = Base64Decode(encoded, &len, buf);
+  REQUIRE((GetPlain(param)) == (plain));
+}
 
 }  // namespace wpi::util

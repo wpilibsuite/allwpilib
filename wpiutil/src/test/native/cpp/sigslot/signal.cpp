@@ -38,7 +38,11 @@ SOFTWARE.
 #include <string>
 #include <utility>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 using namespace wpi::util::sig;
 
@@ -101,33 +105,33 @@ struct o8 {
 
 namespace wpi::util {
 
-TEST(SignalTest, FreeConnection) {
+TEST_CASE("SignalTest FreeConnection", "[wpiutil][sigslot]") {
   sum = 0;
   Signal<int> sig;
 
   auto c1 = sig.connect_connection(f1);
   sig(1);
-  ASSERT_EQ(sum, 1);
+  REQUIRE((sum) == (1));
 
   sig.connect(f2);
   sig(1);
-  ASSERT_EQ(sum, 4);
+  REQUIRE((sum) == (4));
 }
 
-TEST(SignalTest, StaticConnection) {
+TEST_CASE("SignalTest StaticConnection", "[wpiutil][sigslot]") {
   sum = 0;
   Signal<int> sig;
 
   sig.connect(&s::s1);
   sig(1);
-  ASSERT_EQ(sum, 1);
+  REQUIRE((sum) == (1));
 
   sig.connect(&s::s2);
   sig(1);
-  ASSERT_EQ(sum, 4);
+  REQUIRE((sum) == (4));
 }
 
-TEST(SignalTest, PmfConnection) {
+TEST_CASE("SignalTest PmfConnection", "[wpiutil][sigslot]") {
   sum = 0;
   Signal<int> sig;
   s p;
@@ -142,10 +146,10 @@ TEST(SignalTest, PmfConnection) {
   sig.connect(&s::f8, &p);
 
   sig(1);
-  ASSERT_EQ(sum, 8);
+  REQUIRE((sum) == (8));
 }
 
-TEST(SignalTest, ConstPmfConnection) {
+TEST_CASE("SignalTest ConstPmfConnection", "[wpiutil][sigslot]") {
   sum = 0;
   Signal<int> sig;
   const s p;
@@ -156,10 +160,10 @@ TEST(SignalTest, ConstPmfConnection) {
   sig.connect(&s::f8, &p);
 
   sig(1);
-  ASSERT_EQ(sum, 4);
+  REQUIRE((sum) == (4));
 }
 
-TEST(SignalTest, FunctionObjectConnection) {
+TEST_CASE("SignalTest FunctionObjectConnection", "[wpiutil][sigslot]") {
   sum = 0;
   Signal<int> sig;
 
@@ -173,37 +177,38 @@ TEST(SignalTest, FunctionObjectConnection) {
   sig.connect(o8{});
 
   sig(1);
-  ASSERT_EQ(sum, 8);
+  REQUIRE((sum) == (8));
 }
 
-TEST(SignalTest, OverloadedFunctionObjectConnection) {
+TEST_CASE("SignalTest OverloadedFunctionObjectConnection",
+          "[wpiutil][sigslot]") {
   sum = 0;
   Signal<int> sig;
   Signal<double> sig1;
 
   sig.connect(oo{});
   sig(1);
-  ASSERT_EQ(sum, 1);
+  REQUIRE((sum) == (1));
 
   sig1.connect(oo{});
   sig1(1);
-  ASSERT_EQ(sum, 5);
+  REQUIRE((sum) == (5));
 }
 
-TEST(SignalTest, LambdaConnection) {
+TEST_CASE("SignalTest LambdaConnection", "[wpiutil][sigslot]") {
   sum = 0;
   Signal<int> sig;
 
   sig.connect([&](int i) { sum += i; });
   sig(1);
-  ASSERT_EQ(sum, 1);
+  REQUIRE((sum) == (1));
 
   sig.connect([&](int i) mutable { sum += 2 * i; });
   sig(1);
-  ASSERT_EQ(sum, 4);
+  REQUIRE((sum) == (4));
 }
 
-TEST(SignalTest, GenericLambdaConnection) {
+TEST_CASE("SignalTest GenericLambdaConnection", "[wpiutil][sigslot]") {
   std::stringstream s;
 
   auto f = [&](auto a, auto... args) {
@@ -227,37 +232,37 @@ TEST(SignalTest, GenericLambdaConnection) {
   sig2("foo");
   sig3(4.1);
 
-  ASSERT_EQ(s.str(), "1foo4.1");
+  REQUIRE((s.str()) == ("1foo4.1"));
 }
 
-TEST(SignalTest, LvalueEmission) {
+TEST_CASE("SignalTest LvalueEmission", "[wpiutil][sigslot]") {
   sum = 0;
   Signal<int> sig;
 
   auto c1 = sig.connect_connection(f1);
   int v = 1;
   sig(v);
-  ASSERT_EQ(sum, 1);
+  REQUIRE((sum) == (1));
 
   sig.connect(f2);
   sig(v);
-  ASSERT_EQ(sum, 4);
+  REQUIRE((sum) == (4));
 }
 
-TEST(SignalTest, Mutation) {
+TEST_CASE("SignalTest Mutation", "[wpiutil][sigslot]") {
   int res = 0;
   Signal<int&> sig;
 
   sig.connect([](int& r) { r += 1; });
   sig(res);
-  ASSERT_EQ(res, 1);
+  REQUIRE((res) == (1));
 
   sig.connect([](int& r) mutable { r += 2; });
   sig(res);
-  ASSERT_EQ(res, 4);
+  REQUIRE((res) == (4));
 }
 
-TEST(SignalTest, CompatibleArgs) {
+TEST_CASE("SignalTest CompatibleArgs", "[wpiutil][sigslot]") {
   long ll = 0;  // NOLINT(runtime/int)
   std::string ss;
   short ii = 0;  // NOLINT(runtime/int)
@@ -272,12 +277,12 @@ TEST(SignalTest, CompatibleArgs) {
   sig.connect(f);
   sig('0', "foo", true);
 
-  ASSERT_EQ(ll, 48);
-  ASSERT_EQ(ss, "foo");
-  ASSERT_EQ(ii, 1);
+  REQUIRE((ll) == (48));
+  REQUIRE((ss) == ("foo"));
+  REQUIRE((ii) == (1));
 }
 
-TEST(SignalTest, Disconnection) {
+TEST_CASE("SignalTest Disconnection", "[wpiutil][sigslot]") {
   // test removing only connected
   {
     sum = 0;
@@ -285,11 +290,11 @@ TEST(SignalTest, Disconnection) {
 
     auto sc = sig.connect_connection(f1);
     sig(1);
-    ASSERT_EQ(sum, 1);
+    REQUIRE((sum) == (1));
 
     sc.disconnect();
     sig(1);
-    ASSERT_EQ(sum, 1);
+    REQUIRE((sum) == (1));
   }
 
   // test removing first connected
@@ -299,15 +304,15 @@ TEST(SignalTest, Disconnection) {
 
     auto sc = sig.connect_connection(f1);
     sig(1);
-    ASSERT_EQ(sum, 1);
+    REQUIRE((sum) == (1));
 
     sig.connect(f2);
     sig(1);
-    ASSERT_EQ(sum, 4);
+    REQUIRE((sum) == (4));
 
     sc.disconnect();
     sig(1);
-    ASSERT_EQ(sum, 6);
+    REQUIRE((sum) == (6));
   }
 
   // test removing last connected
@@ -317,121 +322,121 @@ TEST(SignalTest, Disconnection) {
 
     sig.connect(f1);
     sig(1);
-    ASSERT_EQ(sum, 1);
+    REQUIRE((sum) == (1));
 
     auto sc = sig.connect_connection(f2);
     sig(1);
-    ASSERT_EQ(sum, 4);
+    REQUIRE((sum) == (4));
 
     sc.disconnect();
     sig(1);
-    ASSERT_EQ(sum, 5);
+    REQUIRE((sum) == (5));
   }
 }
 
-TEST(SignalTest, ScopedConnection) {
+TEST_CASE("SignalTest ScopedConnection", "[wpiutil][sigslot]") {
   sum = 0;
   Signal<int> sig;
 
   {
     auto sc1 = sig.connect_scoped(f1);
     sig(1);
-    ASSERT_EQ(sum, 1);
+    REQUIRE((sum) == (1));
 
     auto sc2 = sig.connect_scoped(f2);
     sig(1);
-    ASSERT_EQ(sum, 4);
+    REQUIRE((sum) == (4));
   }
 
   sig(1);
-  ASSERT_EQ(sum, 4);
+  REQUIRE((sum) == (4));
 
   sum = 0;
 
   {
     ScopedConnection sc1 = sig.connect_connection(f1);
     sig(1);
-    ASSERT_EQ(sum, 1);
+    REQUIRE((sum) == (1));
 
     ScopedConnection sc2 = sig.connect_connection(f2);
     sig(1);
-    ASSERT_EQ(sum, 4);
+    REQUIRE((sum) == (4));
   }
 
   sig(1);
-  ASSERT_EQ(sum, 4);
+  REQUIRE((sum) == (4));
 }
 
-TEST(SignalTest, ConnectionBlocking) {
+TEST_CASE("SignalTest ConnectionBlocking", "[wpiutil][sigslot]") {
   sum = 0;
   Signal<int> sig;
 
   auto c1 = sig.connect_connection(f1);
   sig.connect(f2);
   sig(1);
-  ASSERT_EQ(sum, 3);
+  REQUIRE((sum) == (3));
 
   c1.block();
   sig(1);
-  ASSERT_EQ(sum, 5);
+  REQUIRE((sum) == (5));
 
   c1.unblock();
   sig(1);
-  ASSERT_EQ(sum, 8);
+  REQUIRE((sum) == (8));
 }
 
-TEST(SignalTest, ConnectionBlocker) {
+TEST_CASE("SignalTest ConnectionBlocker", "[wpiutil][sigslot]") {
   sum = 0;
   Signal<int> sig;
 
   auto c1 = sig.connect_connection(f1);
   sig.connect(f2);
   sig(1);
-  ASSERT_EQ(sum, 3);
+  REQUIRE((sum) == (3));
 
   {
     auto cb = c1.blocker();
     sig(1);
-    ASSERT_EQ(sum, 5);
+    REQUIRE((sum) == (5));
   }
 
   sig(1);
-  ASSERT_EQ(sum, 8);
+  REQUIRE((sum) == (8));
 }
 
-TEST(SignalTest, SignalBlocking) {
+TEST_CASE("SignalTest SignalBlocking", "[wpiutil][sigslot]") {
   sum = 0;
   Signal<int> sig;
 
   sig.connect(f1);
   sig.connect(f2);
   sig(1);
-  ASSERT_EQ(sum, 3);
+  REQUIRE((sum) == (3));
 
   sig.block();
   sig(1);
-  ASSERT_EQ(sum, 3);
+  REQUIRE((sum) == (3));
 
   sig.unblock();
   sig(1);
-  ASSERT_EQ(sum, 6);
+  REQUIRE((sum) == (6));
 }
 
-TEST(SignalTest, AllDisconnection) {
+TEST_CASE("SignalTest AllDisconnection", "[wpiutil][sigslot]") {
   sum = 0;
   Signal<int> sig;
 
   sig.connect(f1);
   sig.connect(f2);
   sig(1);
-  ASSERT_EQ(sum, 3);
+  REQUIRE((sum) == (3));
 
   sig.disconnect_all();
   sig(1);
-  ASSERT_EQ(sum, 3);
+  REQUIRE((sum) == (3));
 }
 
-TEST(SignalTest, ConnectionCopyingMoving) {
+TEST_CASE("SignalTest ConnectionCopyingMoving", "[wpiutil][sigslot]") {
   sum = 0;
   Signal<int> sig;
 
@@ -445,48 +450,48 @@ TEST(SignalTest, ConnectionCopyingMoving) {
   auto sc6{std::move(sc4)};
 
   sig(1);
-  ASSERT_EQ(sum, 3);
+  REQUIRE((sum) == (3));
 
   sc5.block();
   sig(1);
-  ASSERT_EQ(sum, 5);
+  REQUIRE((sum) == (5));
 
   sc1.unblock();
   sig(1);
-  ASSERT_EQ(sum, 8);
+  REQUIRE((sum) == (8));
 
   sc6.disconnect();
   sig(1);
-  ASSERT_EQ(sum, 9);
+  REQUIRE((sum) == (9));
 }
 
-TEST(SignalTest, ScopedConnectionMoving) {
+TEST_CASE("SignalTest ScopedConnectionMoving", "[wpiutil][sigslot]") {
   sum = 0;
   Signal<int> sig;
 
   {
     auto sc1 = sig.connect_scoped(f1);
     sig(1);
-    ASSERT_EQ(sum, 1);
+    REQUIRE((sum) == (1));
 
     auto sc2 = sig.connect_scoped(f2);
     sig(1);
-    ASSERT_EQ(sum, 4);
+    REQUIRE((sum) == (4));
 
     auto sc3 = std::move(sc1);
     sig(1);
-    ASSERT_EQ(sum, 7);
+    REQUIRE((sum) == (7));
 
     auto sc4{std::move(sc2)};
     sig(1);
-    ASSERT_EQ(sum, 10);
+    REQUIRE((sum) == (10));
   }
 
   sig(1);
-  ASSERT_EQ(sum, 10);
+  REQUIRE((sum) == (10));
 }
 
-TEST(SignalTest, SignalMoving) {
+TEST_CASE("SignalTest SignalMoving", "[wpiutil][sigslot]") {
   sum = 0;
   Signal<int> sig;
 
@@ -494,15 +499,15 @@ TEST(SignalTest, SignalMoving) {
   sig.connect(f2);
 
   sig(1);
-  ASSERT_EQ(sum, 3);
+  REQUIRE((sum) == (3));
 
   auto sig2 = std::move(sig);
   sig2(1);
-  ASSERT_EQ(sum, 6);
+  REQUIRE((sum) == (6));
 
   auto sig3 = std::move(sig2);
   sig3(1);
-  ASSERT_EQ(sum, 9);
+  REQUIRE((sum) == (9));
 }
 
 template <typename T>
@@ -526,7 +531,7 @@ struct object {
   Signal<T> s;
 };
 
-TEST(SignalTest, Loop) {
+TEST_CASE("SignalTest Loop", "[wpiutil][sigslot]") {
   object<int> i1(0);
   object<int> i2(3);
 
@@ -535,8 +540,8 @@ TEST(SignalTest, Loop) {
 
   i1.set_val(1);
 
-  ASSERT_EQ(i1.val(), 1);
-  ASSERT_EQ(i2.val(), 1);
+  REQUIRE((i1.val()) == (1));
+  REQUIRE((i2.val()) == (1));
 }
 
 }  // namespace wpi::util

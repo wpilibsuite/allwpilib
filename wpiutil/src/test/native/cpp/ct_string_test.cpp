@@ -7,9 +7,13 @@
 #include <string>
 #include <string_view>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
-TEST(CtStringTest, Concat) {
+TEST_CASE("CtStringTest Concat", "[wpiutil]") {
   using namespace wpi::util::literals;
   constexpr std::string_view astring = "name";
   constexpr int arrsize = 5;
@@ -18,10 +22,10 @@ TEST(CtStringTest, Concat) {
           astring},
       "["_ct_string, wpi::util::NumToCtString<arrsize>(), "]"_ct_string);
   static_assert(str.size() == 7);
-  ASSERT_EQ(std::string{str}, "name[5]");
+  REQUIRE((std::string{str}) == ("name[5]"));
 }
 
-TEST(CtStringTest, OperatorPlus) {
+TEST_CASE("CtStringTest OperatorPlus", "[wpiutil]") {
   using namespace wpi::util::literals;
   constexpr std::string_view astring = "name";
   constexpr auto str =
@@ -29,12 +33,12 @@ TEST(CtStringTest, OperatorPlus) {
           astring} +
       "[]"_ct_string;
   static_assert(str.size() == 6);
-  ASSERT_EQ(std::string{str}, "name[]");
+  REQUIRE((std::string{str}) == ("name[]"));
 }
 
-TEST(CtStringTest, StringViewConversion) {
+TEST_CASE("CtStringTest StringViewConversion", "[wpiutil]") {
   using namespace wpi::util::literals;
   constexpr auto str = "[]"_ct_string;
   std::string_view sv = str;
-  ASSERT_EQ(sv, "[]");
+  REQUIRE((sv) == ("[]"));
 }

@@ -37,7 +37,11 @@ SOFTWARE.
 
 #include <type_traits>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 using namespace wpi::util::sig::trait;
 
@@ -118,7 +122,7 @@ static_assert(is_callable_v<t, o8>, "");
 
 namespace wpi::util {
 
-TEST(SignalTest, FunctionTraits) {
+TEST_CASE("SignalTest FunctionTraits", "[wpiutil][sigslot]") {
   auto l1 = [](int, char, float) {};
   auto l2 = [&](int, char, float) mutable {};
   auto l3 = [&](auto...) mutable {};

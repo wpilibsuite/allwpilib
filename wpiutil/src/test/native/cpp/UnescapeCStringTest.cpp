@@ -2,7 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
@@ -11,65 +15,65 @@ using namespace wpi::util;
 
 namespace {
 
-TEST(UnescapeCStringTest, Basic) {
+TEST_CASE("UnescapeCStringTest Basic", "[wpiutil]") {
   SmallString<64> buf;
   auto [out, rem] = UnescapeCString("abc\\\\\\a\\b\\f\\n\\r\\t\\v\\", buf);
-  EXPECT_EQ(out, "abc\\\a\b\f\n\r\t\v\\");
-  EXPECT_TRUE(rem.empty());
+  CHECK((out) == ("abc\\\a\b\f\n\r\t\v\\"));
+  CHECK(rem.empty());
 }
 
-TEST(UnescapeCStringTest, QuoteEnd) {
+TEST_CASE("UnescapeCStringTest QuoteEnd", "[wpiutil]") {
   SmallString<64> buf;
   auto [out, rem] = UnescapeCString("abc\\\"\"123", buf);
-  EXPECT_EQ(out, "abc\"");
-  EXPECT_EQ(rem, "\"123");
+  CHECK((out) == ("abc\""));
+  CHECK((rem) == ("\"123"));
 }
 
-TEST(UnescapeCStringTest, Hex) {
+TEST_CASE("UnescapeCStringTest Hex", "[wpiutil]") {
   SmallString<64> buf;
   auto [out, rem] = UnescapeCString("\\xfe\\xFE\\x01", buf);
-  EXPECT_EQ(out, "\xfe\xFE\x01");
-  EXPECT_TRUE(rem.empty());
+  CHECK((out) == ("\xfe\xFE\x01"));
+  CHECK(rem.empty());
 }
 
-TEST(UnescapeCStringTest, HexPartial) {
+TEST_CASE("UnescapeCStringTest HexPartial", "[wpiutil]") {
   SmallString<64> buf;
   auto [out, rem] = UnescapeCString("\\xz\\x5z\\x2", buf);
-  EXPECT_EQ(out, "xz\x05z\x02");
-  EXPECT_TRUE(rem.empty());
+  CHECK((out) == ("xz\x05z\x02"));
+  CHECK(rem.empty());
 }
 
-TEST(UnescapeCStringTest, HexPartial2) {
+TEST_CASE("UnescapeCStringTest HexPartial2", "[wpiutil]") {
   SmallString<64> buf;
   auto [out, rem] = UnescapeCString("\\x", buf);
-  EXPECT_EQ(out, "x");
-  EXPECT_TRUE(rem.empty());
+  CHECK((out) == ("x"));
+  CHECK(rem.empty());
 }
 
-TEST(UnescapeCStringTest, Octal) {
+TEST_CASE("UnescapeCStringTest Octal", "[wpiutil]") {
   SmallString<64> buf;
   auto [out, rem] = UnescapeCString("\\3\\11\\222\\4", buf);
-  EXPECT_EQ(out, "\3\11\222\4");
-  EXPECT_TRUE(rem.empty());
+  CHECK((out) == ("\3\11\222\4"));
+  CHECK(rem.empty());
 }
 
-TEST(UnescapeCStringTest, EmptyString) {
+TEST_CASE("UnescapeCStringTest EmptyString", "[wpiutil]") {
   SmallString<64> buf;
   auto [out, rem] = UnescapeCString("", buf);
-  EXPECT_EQ(out, "");
+  CHECK((out) == (""));
 }
 
-TEST(UnescapeCStringTest, ShortString) {
+TEST_CASE("UnescapeCStringTest ShortString", "[wpiutil]") {
   SmallString<64> buf;
   auto [out, rem] = UnescapeCString("a", buf);
-  EXPECT_EQ(out, "a");
+  CHECK((out) == ("a"));
 }
 
-TEST(UnescapeCStringTest, NoEscapesString) {
+TEST_CASE("UnescapeCStringTest NoEscapesString", "[wpiutil]") {
   SmallString<64> buf;
   std::string_view input = "abcdefghijklmnopqrstuvwxyz1234567890";
   auto [out, rem] = UnescapeCString(input, buf);
-  EXPECT_EQ(out, input);
+  CHECK((out) == (input));
 }
 
 }  // namespace

@@ -8,7 +8,11 @@
 
 #include "wpi/util/STLForwardCompat.hpp"
 #include "CountCopyAndMove.hpp"
-#include "gtest/gtest.h"
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
+#include <catch2/catch_template_test_macros.hpp>
 
 #include <optional>
 #include <type_traits>
@@ -17,39 +21,28 @@
 namespace {
 
 template <typename T>
-class STLForwardCompatRemoveCVRefTest : public ::testing::Test {};
+class STLForwardCompatRemoveCVRefTest {};
 
-using STLForwardCompatRemoveCVRefTestTypes = ::testing::Types<
-    // clang-format off
-    std::pair<int, int>,
-    std::pair<int &, int>,
-    std::pair<const int, int>,
-    std::pair<volatile int, int>,
-    std::pair<const volatile int &, int>,
-    std::pair<int *, int *>,
-    std::pair<int *const, int *>,
-    std::pair<const int *, const int *>,
-    std::pair<int *&, int *>
-    // clang-format on
-    >;
+#define WPIUTIL_TEST_TYPES_STLForwardCompatRemoveCVRefTest \
+  (std::pair<int, int>), (std::pair<int&, int>), \
+      (std::pair<const int, int>), (std::pair<volatile int, int>), \
+      (std::pair<const volatile int&, int>), (std::pair<int*, int*>), \
+      (std::pair<int* const, int*>), (std::pair<const int*, const int*>), \
+      (std::pair<int*&, int*>)
 
-TYPED_TEST_SUITE(STLForwardCompatRemoveCVRefTest,
-                 STLForwardCompatRemoveCVRefTestTypes, );
-
-TYPED_TEST(STLForwardCompatRemoveCVRefTest, RemoveCVRef) {
-  using From = typename TypeParam::first_type;
-  using To = typename TypeParam::second_type;
-  EXPECT_TRUE(
-      (std::is_same<typename wpi::util::remove_cvref<From>::type, To>::value));
+TEMPLATE_TEST_CASE_METHOD(STLForwardCompatRemoveCVRefTest, "STLForwardCompatRemoveCVRefTest RemoveCVRef", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_STLForwardCompatRemoveCVRefTest) {
+  using From = typename TestType::first_type;
+  using To = typename TestType::second_type;
+  CHECK((std::is_same<typename wpi::util::remove_cvref<From>::type, To>::value));
 }
 
-TYPED_TEST(STLForwardCompatRemoveCVRefTest, RemoveCVRefT) {
-  using From = typename TypeParam::first_type;
-  EXPECT_TRUE((std::is_same<typename wpi::util::remove_cvref<From>::type,
+TEMPLATE_TEST_CASE_METHOD(STLForwardCompatRemoveCVRefTest, "STLForwardCompatRemoveCVRefTest RemoveCVRefT", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_STLForwardCompatRemoveCVRefTest) {
+  using From = typename TestType::first_type;
+  CHECK((std::is_same<typename wpi::util::remove_cvref<From>::type,
                             wpi::util::remove_cvref_t<From>>::value));
 }
 
-template <typename T> class TypeIdentityTest : public ::testing::Test {
+template <typename T> class TypeIdentityTest {
 public:
   using TypeIdentity = wpi::util::type_identity<T>;
 };
@@ -57,30 +50,26 @@ public:
 struct A {
   struct B {};
 };
-using TypeIdentityTestTypes =
-    ::testing::Types<int, volatile int, A, const A::B>;
+#define WPIUTIL_TEST_TYPES_TypeIdentityTest int, volatile int, A, const A::B
 
-TYPED_TEST_SUITE(TypeIdentityTest, TypeIdentityTestTypes, /*NameGenerator*/);
-
-TYPED_TEST(TypeIdentityTest, Identity) {
-  // TestFixture is the instantiated TypeIdentityTest.
-  EXPECT_TRUE(
-      (std::is_same_v<TypeParam, typename TestFixture::TypeIdentity::type>));
+TEMPLATE_TEST_CASE_METHOD(TypeIdentityTest, "TypeIdentityTest Identity", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_TypeIdentityTest) {
+  // TypeIdentityTest<TestType> is the instantiated TypeIdentityTest.
+  CHECK((std::is_same_v<TestType, typename TypeIdentityTest<TestType>::TypeIdentity::type>));
 }
 
-TEST(TransformTest, TransformStd) {
+TEST_CASE("TransformTest TransformStd", "[wpiutil][llvm]") {
   std::optional<int> A;
 
   std::optional<int> B = wpi::util::transformOptional(A, [&](int N) { return N + 1; });
-  EXPECT_FALSE(B.has_value());
+  CHECK_FALSE(B.has_value());
 
   A = 3;
   std::optional<int> C = wpi::util::transformOptional(A, [&](int N) { return N + 1; });
-  EXPECT_TRUE(C.has_value());
-  EXPECT_EQ(4, *C);
+  CHECK(C.has_value());
+  CHECK((4) == (*C));
 }
 
-TEST(TransformTest, MoveTransformStd) {
+TEST_CASE("TransformTest MoveTransformStd", "[wpiutil][llvm]") {
   using wpi::util::CountCopyAndMove;
 
   std::optional<CountCopyAndMove> A;
@@ -88,39 +77,39 @@ TEST(TransformTest, MoveTransformStd) {
   CountCopyAndMove::ResetCounts();
   std::optional<int> B = wpi::util::transformOptional(
       std::move(A), [&](const CountCopyAndMove &M) { return M.val + 2; });
-  EXPECT_FALSE(B.has_value());
-  EXPECT_EQ(0, CountCopyAndMove::TotalCopies());
-  EXPECT_EQ(0, CountCopyAndMove::MoveConstructions);
-  EXPECT_EQ(0, CountCopyAndMove::MoveAssignments);
-  EXPECT_EQ(0, CountCopyAndMove::Destructions);
+  CHECK_FALSE(B.has_value());
+  CHECK((0) == (CountCopyAndMove::TotalCopies()));
+  CHECK((0) == (CountCopyAndMove::MoveConstructions));
+  CHECK((0) == (CountCopyAndMove::MoveAssignments));
+  CHECK((0) == (CountCopyAndMove::Destructions));
 
   A = CountCopyAndMove(5);
   CountCopyAndMove::ResetCounts();
   std::optional<int> C = wpi::util::transformOptional(
       std::move(A), [&](const CountCopyAndMove &M) { return M.val + 2; });
-  EXPECT_TRUE(C.has_value());
-  EXPECT_EQ(7, *C);
-  EXPECT_EQ(0, CountCopyAndMove::TotalCopies());
-  EXPECT_EQ(0, CountCopyAndMove::MoveConstructions);
-  EXPECT_EQ(0, CountCopyAndMove::MoveAssignments);
-  EXPECT_EQ(0, CountCopyAndMove::Destructions);
+  CHECK(C.has_value());
+  CHECK((7) == (*C));
+  CHECK((0) == (CountCopyAndMove::TotalCopies()));
+  CHECK((0) == (CountCopyAndMove::MoveConstructions));
+  CHECK((0) == (CountCopyAndMove::MoveAssignments));
+  CHECK((0) == (CountCopyAndMove::Destructions));
 }
 
-TEST(TransformTest, TransformLlvm) {
+TEST_CASE("TransformTest TransformLlvm", "[wpiutil][llvm]") {
   std::optional<int> A;
 
   std::optional<int> B =
       wpi::util::transformOptional(A, [&](int N) { return N + 1; });
-  EXPECT_FALSE(B.has_value());
+  CHECK_FALSE(B.has_value());
 
   A = 3;
   std::optional<int> C =
       wpi::util::transformOptional(A, [&](int N) { return N + 1; });
-  EXPECT_TRUE(C.has_value());
-  EXPECT_EQ(4, *C);
+  CHECK(C.has_value());
+  CHECK((4) == (*C));
 }
 
-TEST(TransformTest, MoveTransformLlvm) {
+TEST_CASE("TransformTest MoveTransformLlvm", "[wpiutil][llvm]") {
   using wpi::util::CountCopyAndMove;
 
   std::optional<CountCopyAndMove> A;
@@ -128,25 +117,25 @@ TEST(TransformTest, MoveTransformLlvm) {
   CountCopyAndMove::ResetCounts();
   std::optional<int> B = wpi::util::transformOptional(
       std::move(A), [&](const CountCopyAndMove &M) { return M.val + 2; });
-  EXPECT_FALSE(B.has_value());
-  EXPECT_EQ(0, CountCopyAndMove::TotalCopies());
-  EXPECT_EQ(0, CountCopyAndMove::MoveConstructions);
-  EXPECT_EQ(0, CountCopyAndMove::MoveAssignments);
-  EXPECT_EQ(0, CountCopyAndMove::Destructions);
+  CHECK_FALSE(B.has_value());
+  CHECK((0) == (CountCopyAndMove::TotalCopies()));
+  CHECK((0) == (CountCopyAndMove::MoveConstructions));
+  CHECK((0) == (CountCopyAndMove::MoveAssignments));
+  CHECK((0) == (CountCopyAndMove::Destructions));
 
   A = CountCopyAndMove(5);
   CountCopyAndMove::ResetCounts();
   std::optional<int> C = wpi::util::transformOptional(
       std::move(A), [&](const CountCopyAndMove &M) { return M.val + 2; });
-  EXPECT_TRUE(C.has_value());
-  EXPECT_EQ(7, *C);
-  EXPECT_EQ(0, CountCopyAndMove::TotalCopies());
-  EXPECT_EQ(0, CountCopyAndMove::MoveConstructions);
-  EXPECT_EQ(0, CountCopyAndMove::MoveAssignments);
-  EXPECT_EQ(0, CountCopyAndMove::Destructions);
+  CHECK(C.has_value());
+  CHECK((7) == (*C));
+  CHECK((0) == (CountCopyAndMove::TotalCopies()));
+  CHECK((0) == (CountCopyAndMove::MoveConstructions));
+  CHECK((0) == (CountCopyAndMove::MoveAssignments));
+  CHECK((0) == (CountCopyAndMove::Destructions));
 }
 
-TEST(TransformTest, TransformCategory) {
+TEST_CASE("TransformTest TransformCategory", "[wpiutil][llvm]") {
   struct StructA {
     int x;
   };
@@ -156,17 +145,17 @@ TEST(TransformTest, TransformCategory) {
 
   std::optional<StructA> A{StructA{}};
   wpi::util::transformOptional(A, [](auto &&s) {
-    EXPECT_FALSE(std::is_rvalue_reference_v<decltype(s)>);
+    CHECK_FALSE(std::is_rvalue_reference_v<decltype(s)>);
     return StructB{std::move(s)};
   });
 
   wpi::util::transformOptional(std::move(A), [](auto &&s) {
-    EXPECT_TRUE(std::is_rvalue_reference_v<decltype(s)>);
+    CHECK(std::is_rvalue_reference_v<decltype(s)>);
     return StructB{std::move(s)};
   });
 }
 
-TEST(TransformTest, ToUnderlying) {
+TEST_CASE("TransformTest ToUnderlying", "[wpiutil][llvm]") {
   enum E { A1 = 0, B1 = -1 };
   static_assert(wpi::util::to_underlying(A1) == 0);
   static_assert(wpi::util::to_underlying(B1) == -1);
@@ -183,21 +172,21 @@ TEST(TransformTest, ToUnderlying) {
   static_assert(wpi::util::to_underlying(E3::B3) == 0);
 }
 
-TEST(STLForwardCompatTest, IdentityCxx20) {
+TEST_CASE("STLForwardCompatTest IdentityCxx20", "[wpiutil][llvm]") {
   wpi::util::identity identity;
 
   // Test with an lvalue.
   int X = 42;
   int &Y = identity(X);
-  EXPECT_EQ(&X, &Y);
+  CHECK((&X) == (&Y));
 
   // Test with a const lvalue.
   const int CX = 10;
   const int &CY = identity(CX);
-  EXPECT_EQ(&CX, &CY);
+  CHECK((&CX) == (&CY));
 
   // Test with an rvalue.
-  EXPECT_EQ(identity(123), 123);
+  CHECK((identity(123)) == (123));
 
   // Test perfect forwarding.
   static_assert(std::is_same_v<int &, decltype(identity(X))>);

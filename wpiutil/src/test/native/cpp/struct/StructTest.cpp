@@ -10,7 +10,11 @@
 #include <string>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 using namespace wpi::util;
 
@@ -41,26 +45,26 @@ struct wpi::util::Struct<TestStruct> {
   }
 };
 
-TEST(StructTest, Basic) {
+TEST_CASE("StructTest Basic", "[wpiutil][struct]") {
   constexpr auto typeName = GetStructTypeName<TestStruct>();
-  EXPECT_EQ(typeName, "TestStruct");
+  CHECK((typeName) == ("TestStruct"));
 
   constexpr auto typeString = GetStructTypeString<TestStruct>();
-  EXPECT_EQ(typeString, "struct:TestStruct");
+  CHECK((typeString) == ("struct:TestStruct"));
 
   constexpr auto schema = GetStructSchema<TestStruct>();
-  EXPECT_EQ(schema, "int32 a;int32 b");
+  CHECK((schema) == ("int32 a;int32 b"));
 
   constexpr auto arrayTypeName = MakeStructArrayTypeName<TestStruct, 5>();
-  EXPECT_EQ(arrayTypeName, "TestStruct[5]");
+  CHECK((arrayTypeName) == ("TestStruct[5]"));
 
   constexpr auto arrayTypeString = MakeStructArrayTypeString<TestStruct, 5>();
-  EXPECT_EQ(arrayTypeString, "struct:TestStruct[5]");
+  CHECK((arrayTypeString) == ("struct:TestStruct[5]"));
 
   TestStruct s{12345, 67890};
   std::array<uint8_t, 8> data;
   Struct<TestStruct>::Pack(data, s);
   auto s2 = Struct<TestStruct>::Unpack(data);
-  EXPECT_EQ(s.a, s2.a);
-  EXPECT_EQ(s.b, s2.b);
+  CHECK((s.a) == (s2.a));
+  CHECK((s.b) == (s2.b));
 }

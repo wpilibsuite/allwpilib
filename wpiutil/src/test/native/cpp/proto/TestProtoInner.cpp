@@ -7,7 +7,11 @@
 #include <string>
 #include <utility>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 #include "wpiutil_test.npb.h"
@@ -45,26 +49,26 @@ namespace {
 using ProtoType = wpi::util::Protobuf<TestProtoInner>;
 }  // namespace
 
-TEST(TestProtoInnerTest, RoundtripNanopb) {
+TEST_CASE("TestProtoInnerTest RoundtripNanopb", "[wpiutil][proto]") {
   const TestProtoInner kExpectedData = TestProtoInner{"Hello!"};
 
   wpi::util::ProtobufMessage<TestProtoInner> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, kExpectedData));
   std::optional<TestProtoInner> unpacked_data = message.Unpack(buf);
-  ASSERT_TRUE(unpacked_data.has_value());
-  EXPECT_EQ(kExpectedData.msg, unpacked_data->msg);
+  REQUIRE(unpacked_data.has_value());
+  CHECK((kExpectedData.msg) == (unpacked_data->msg));
 }
 
-TEST(TestProtoInnerTest, RoundtripNanopbEmpty) {
+TEST_CASE("TestProtoInnerTest RoundtripNanopbEmpty", "[wpiutil][proto]") {
   const TestProtoInner kExpectedData = TestProtoInner{"Hello!"};
 
   wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, kExpectedData));
   auto unpacked_data = message.Unpack(buf);
-  ASSERT_TRUE(unpacked_data.has_value());
-  EXPECT_EQ(kExpectedData.msg, unpacked_data->msg);
+  REQUIRE(unpacked_data.has_value());
+  CHECK((kExpectedData.msg) == (unpacked_data->msg));
 }

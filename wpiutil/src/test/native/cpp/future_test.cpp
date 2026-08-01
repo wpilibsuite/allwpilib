@@ -6,76 +6,80 @@
 
 #include <utility>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 namespace wpi::util {
 
-TEST(FutureTest, Then) {
+TEST_CASE("FutureTest Then", "[wpiutil]") {
   promise<bool> inPromise;
   future<int> outFuture =
       inPromise.get_future().then([](bool v) { return v ? 5 : 6; });
 
   inPromise.set_value(true);
-  ASSERT_EQ(outFuture.get(), 5);
+  REQUIRE((outFuture.get()) == (5));
 }
 
-TEST(FutureTest, ThenSame) {
+TEST_CASE("FutureTest ThenSame", "[wpiutil]") {
   promise<bool> inPromise;
   future<bool> outFuture =
       inPromise.get_future().then([](bool v) { return !v; });
 
   inPromise.set_value(true);
-  ASSERT_EQ(outFuture.get(), false);
+  REQUIRE((outFuture.get()) == (false));
 }
 
-TEST(FutureTest, ThenFromVoid) {
+TEST_CASE("FutureTest ThenFromVoid", "[wpiutil]") {
   promise<void> inPromise;
   future<int> outFuture = inPromise.get_future().then([] { return 5; });
 
   inPromise.set_value();
-  ASSERT_EQ(outFuture.get(), 5);
+  REQUIRE((outFuture.get()) == (5));
 }
 
-TEST(FutureTest, ThenToVoid) {
+TEST_CASE("FutureTest ThenToVoid", "[wpiutil]") {
   promise<bool> inPromise;
   future<void> outFuture = inPromise.get_future().then([](bool v) {});
 
   inPromise.set_value(true);
-  ASSERT_TRUE(outFuture.is_ready());
+  REQUIRE(outFuture.is_ready());
 }
 
-TEST(FutureTest, ThenVoidVoid) {
+TEST_CASE("FutureTest ThenVoidVoid", "[wpiutil]") {
   promise<void> inPromise;
   future<void> outFuture = inPromise.get_future().then([] {});
 
   inPromise.set_value();
-  ASSERT_TRUE(outFuture.is_ready());
+  REQUIRE(outFuture.is_ready());
 }
 
-TEST(FutureTest, Implicit) {
+TEST_CASE("FutureTest Implicit", "[wpiutil]") {
   promise<bool> inPromise;
   future<int> outFuture = inPromise.get_future();
 
   inPromise.set_value(true);
-  ASSERT_EQ(outFuture.get(), 1);
+  REQUIRE((outFuture.get()) == (1));
 }
 
-TEST(FutureTest, MoveSame) {
+TEST_CASE("FutureTest MoveSame", "[wpiutil]") {
   promise<bool> inPromise;
   future<bool> outFuture1 = inPromise.get_future();
   future<bool> outFuture(std::move(outFuture1));
 
   inPromise.set_value(true);
-  ASSERT_EQ(outFuture.get(), true);
+  REQUIRE((outFuture.get()) == (true));
 }
 
-TEST(FutureTest, MoveVoid) {
+TEST_CASE("FutureTest MoveVoid", "[wpiutil]") {
   promise<void> inPromise;
   future<void> outFuture1 = inPromise.get_future();
   future<void> outFuture(std::move(outFuture1));
 
   inPromise.set_value();
-  ASSERT_TRUE(outFuture.is_ready());
+  REQUIRE(outFuture.is_ready());
 }
 
 }  // namespace wpi::util
