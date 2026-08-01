@@ -163,7 +163,7 @@ class DriverStationTest {
     return Arrays.stream(AlertSim.getActive())
         .anyMatch(
             alert ->
-                alert.group.equals("DriverStation")
+                "DriverStation".equals(alert.group)
                     && alert.id.equals(id)
                     && alert.text.equals(text)
                     && alert.level == level);
