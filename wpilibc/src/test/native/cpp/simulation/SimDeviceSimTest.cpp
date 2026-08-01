@@ -6,27 +6,28 @@
 
 #include <string_view>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/hal/SimDevice.h"
 
 using namespace wpi::sim;
 
-TEST(SimDeviceSimTest, Basic) {
+TEST_CASE("SimDeviceSimTest Basic", "[wpilibc][simulation]") {
   wpi::hal::SimDevice dev{"test"};
   wpi::hal::SimBoolean devBool =
       dev.CreateBoolean("bool", wpi::hal::SimDevice::Direction::INPUT, false);
 
   SimDeviceSim sim{"test"};
   wpi::hal::SimBoolean simBool = sim.GetBoolean("bool");
-  EXPECT_FALSE(simBool.Get());
+  CHECK_FALSE(simBool.Get());
   simBool.Set(true);
-  EXPECT_TRUE(devBool.Get());
+  CHECK(devBool.Get());
 
-  EXPECT_EQ(sim.GetName(), "test");
+  CHECK((sim.GetName()) == ("test"));
 }
 
-TEST(SimDeviceSimTest, EnumerateDevices) {
+TEST_CASE("SimDeviceSimTest EnumerateDevices", "[wpilibc][simulation]") {
   wpi::hal::SimDevice dev{"test"};
 
   bool foundit = false;
@@ -36,5 +37,5 @@ TEST(SimDeviceSimTest, EnumerateDevices) {
           foundit = true;
         }
       });
-  EXPECT_TRUE(foundit);
+  CHECK(foundit);
 }

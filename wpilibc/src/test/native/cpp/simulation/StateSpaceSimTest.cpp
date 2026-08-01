@@ -2,7 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/hardware/motor/PWMVictorSPX.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
@@ -17,7 +18,7 @@
 #include "wpi/units/angular_acceleration.hpp"
 #include "wpi/units/angular_velocity.hpp"
 
-TEST(StateSpaceSimTest, FlywheelSim) {
+TEST_CASE("StateSpaceSimTest FlywheelSim", "[wpilibc][simulation]") {
   const wpi::math::LinearSystem<1, 1, 1> plant =
       wpi::math::Models::FlywheelFromSysId(0.02_V / 1_rad_per_s,
                                            0.01_V / 1_rad_per_s_sq);
@@ -47,5 +48,5 @@ TEST(StateSpaceSimTest, FlywheelSim) {
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }
 
-  ASSERT_TRUE(std::abs(200 - encoder.GetRate()) < 0.1);
+  REQUIRE((std::abs(200 - encoder.GetRate())) < (0.1));
 }

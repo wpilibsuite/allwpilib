@@ -4,14 +4,15 @@
 
 #include "wpi/simulation/DutyCycleEncoderSim.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/hal/HAL.h"
 #include "wpi/hardware/rotation/DutyCycleEncoder.hpp"
 
 namespace wpi::sim {
 
-TEST(DutyCycleEncoderSimTest, Set) {
+TEST_CASE("DutyCycleEncoderSimTest Set", "[wpilibc][simulation]") {
   HAL_Initialize();
 
   DutyCycleEncoder enc{0, 10, 0};
@@ -19,18 +20,18 @@ TEST(DutyCycleEncoderSimTest, Set) {
 
   constexpr double kTestValue{5.67};
   sim.Set(kTestValue);
-  EXPECT_EQ(kTestValue, enc.Get());
+  CHECK((kTestValue) == (enc.Get()));
 }
 
-TEST(DutyCycleEncoderSimTest, SetIsConnected) {
+TEST_CASE("DutyCycleEncoderSimTest SetIsConnected", "[wpilibc][simulation]") {
   HAL_Initialize();
 
   DutyCycleEncoder enc{0};
   DutyCycleEncoderSim sim(enc);
   sim.SetConnected(true);
-  EXPECT_TRUE(enc.IsConnected());
+  CHECK(enc.IsConnected());
   sim.SetConnected(false);
-  EXPECT_FALSE(enc.IsConnected());
+  CHECK_FALSE(enc.IsConnected());
 }
 
 }  // namespace wpi::sim

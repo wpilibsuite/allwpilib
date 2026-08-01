@@ -7,7 +7,8 @@
 #include <thread>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/driverstation/RobotState.hpp"
 #include "wpi/framework/OpModeRobot.hpp"
@@ -34,12 +35,12 @@ class LifecycleOpMode : public wpi::OpMode {
     m_counts.constructed++;
   }
 
-  ~LifecycleOpMode() override { m_counts.destructed++; }
+  ~LifecycleOpMode() { m_counts.destructed++; }
 
-  void DisabledPeriodic() override { m_counts.disabledPeriodic++; }
-  void Start() override { m_counts.start++; }
-  void Periodic() override { m_counts.periodic++; }
-  void End() override { m_counts.end++; }
+  void DisabledPeriodic() { m_counts.disabledPeriodic++; }
+  void Start() { m_counts.start++; }
+  void Periodic() { m_counts.periodic++; }
+  void End() { m_counts.end++; }
 
  private:
   Counts& m_counts;
@@ -58,8 +59,7 @@ class CallbackOpMode : public wpi::OpMode {
   explicit CallbackOpMode(std::atomic<uint32_t>& callbackCount)
       : m_callbackCount(callbackCount) {}
 
-  std::vector<wpi::internal::PeriodicPriorityQueue::Callback> GetCallbacks()
-      override {
+  std::vector<wpi::internal::PeriodicPriorityQueue::Callback> GetCallbacks() {
     std::vector<wpi::internal::PeriodicPriorityQueue::Callback> callbacks;
     callbacks.emplace_back([&count = m_callbackCount] { count++; },
                            std::chrono::microseconds{0}, 20_ms);
@@ -70,9 +70,9 @@ class CallbackOpMode : public wpi::OpMode {
   std::atomic<uint32_t>& m_callbackCount;
 };
 
-class OpModeLifecycleTest : public ::testing::Test {
- protected:
-  void SetUp() override {
+class OpModeLifecycleTest {
+ public:
+  OpModeLifecycleTest() {
     wpi::sim::PauseTiming();
     wpi::sim::SetProgramStarted(false);
     wpi::sim::DriverStationSim::ResetData();
@@ -81,15 +81,17 @@ class OpModeLifecycleTest : public ::testing::Test {
     wpi::RobotState::ClearOpModes();
   }
 
-  void TearDown() override { wpi::sim::ResumeTiming(); }
+  ~OpModeLifecycleTest() { wpi::sim::ResumeTiming(); }
 
+ protected:
   static int64_t MakeOpModeId(wpi::RobotMode mode, std::string_view name) {
     return HAL_MakeOpModeId(static_cast<HAL_RobotMode>(mode),
                             std::hash<std::string_view>{}(name));
   }
 };
 
-TEST_F(OpModeLifecycleTest, EnabledTransition) {
+TEST_CASE_METHOD(OpModeLifecycleTest, "OpModeLifecycleTest EnabledTransition",
+                 "[wpilibc]") {
   Counts counts;
   LifecycleRobot robot;
   robot.AddOpModeFactory(
@@ -111,30 +113,31 @@ TEST_F(OpModeLifecycleTest, EnabledTransition) {
       MakeOpModeId(wpi::RobotMode::TELEOPERATED, "TestOpMode"));
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);
-  EXPECT_EQ(counts.constructed.load(), 1u);
-  EXPECT_EQ(counts.disabledPeriodic.load(), 1u);
-  EXPECT_EQ(counts.periodic.load(), 0u);
+  CHECK((counts.constructed.load()) == (1u));
+  CHECK((counts.disabledPeriodic.load()) == (1u));
+  CHECK((counts.periodic.load()) == (0u));
 
   // 2. Transition to enabled
   wpi::sim::DriverStationSim::SetEnabled(true);
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(
       40_ms);  // Step twice like Java test to get periodic callback
-  EXPECT_EQ(counts.start.load(), 1u);
-  EXPECT_EQ(counts.periodic.load(), 1u);
+  CHECK((counts.start.load()) == (1u));
+  CHECK((counts.periodic.load()) == (1u));
 
   // 3. Transition to disabled
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);
-  EXPECT_EQ(counts.end.load(), 1u);
-  EXPECT_EQ(counts.destructed.load(), 1u);
+  CHECK((counts.end.load()) == (1u));
+  CHECK((counts.destructed.load()) == (1u));
 
   robot.EndCompetition();
   robotThread.join();
 }
 
-TEST_F(OpModeLifecycleTest, OpModeChangeWhileEnabled) {
+TEST_CASE_METHOD(OpModeLifecycleTest,
+                 "OpModeLifecycleTest OpModeChangeWhileEnabled", "[wpilibc]") {
   Counts counts1;
   Counts counts2;
   LifecycleRobot robot;
@@ -160,9 +163,9 @@ TEST_F(OpModeLifecycleTest, OpModeChangeWhileEnabled) {
   wpi::sim::DriverStationSim::SetEnabled(true);
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(40_ms);  // Need two iterations for periodic callback
-  EXPECT_EQ(counts1.constructed.load(), 1u);
-  EXPECT_EQ(counts1.start.load(), 1u);
-  EXPECT_EQ(counts1.periodic.load(), 1u);
+  CHECK((counts1.constructed.load()) == (1u));
+  CHECK((counts1.start.load()) == (1u));
+  CHECK((counts1.periodic.load()) == (1u));
 
   // 2. Switch to OpMode2 while enabled. Selecting a different opmode while
   // enabled disables the robot first, so the DS sends disabled + new opmode.
@@ -172,26 +175,27 @@ TEST_F(OpModeLifecycleTest, OpModeChangeWhileEnabled) {
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);
   // OpMode1 should be ended and destructed
-  EXPECT_EQ(counts1.end.load(), 1u);
-  EXPECT_EQ(counts1.destructed.load(), 1u);
+  CHECK((counts1.end.load()) == (1u));
+  CHECK((counts1.destructed.load()) == (1u));
   // OpMode2 should be constructed exactly once and persist while disabled
-  EXPECT_EQ(counts2.constructed.load(), 1u);
-  EXPECT_EQ(counts2.start.load(), 0u);
+  CHECK((counts2.constructed.load()) == (1u));
+  CHECK((counts2.start.load()) == (0u));
 
   // 3. Re-enable. The same OpMode2 instance is started; it is not
   // reconstructed.
   wpi::sim::DriverStationSim::SetEnabled(true);
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(40_ms);
-  EXPECT_EQ(counts2.constructed.load(), 1u);
-  EXPECT_EQ(counts2.start.load(), 1u);
-  EXPECT_EQ(counts2.periodic.load(), 1u);
+  CHECK((counts2.constructed.load()) == (1u));
+  CHECK((counts2.start.load()) == (1u));
+  CHECK((counts2.periodic.load()) == (1u));
 
   robot.EndCompetition();
   robotThread.join();
 }
 
-TEST_F(OpModeLifecycleTest, OpModeChangeWhileDisabled) {
+TEST_CASE_METHOD(OpModeLifecycleTest,
+                 "OpModeLifecycleTest OpModeChangeWhileDisabled", "[wpilibc]") {
   Counts counts1;
   Counts counts2;
   LifecycleRobot robot;
@@ -215,8 +219,8 @@ TEST_F(OpModeLifecycleTest, OpModeChangeWhileDisabled) {
       MakeOpModeId(wpi::RobotMode::TELEOPERATED, "OpMode1"));
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);
-  EXPECT_EQ(counts1.constructed.load(), 1u);
-  EXPECT_EQ(counts1.disabledPeriodic.load(), 1u);
+  CHECK((counts1.constructed.load()) == (1u));
+  CHECK((counts1.disabledPeriodic.load()) == (1u));
 
   // 2. Change to OpMode2 while disabled
   wpi::sim::DriverStationSim::SetOpMode(
@@ -224,17 +228,19 @@ TEST_F(OpModeLifecycleTest, OpModeChangeWhileDisabled) {
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);
   // OpMode1 should be destructed, but NOT ended
-  EXPECT_EQ(counts1.destructed.load(), 1u);
-  EXPECT_EQ(counts1.end.load(), 0u);
+  CHECK((counts1.destructed.load()) == (1u));
+  CHECK((counts1.end.load()) == (0u));
   // OpMode2 should be selected
-  EXPECT_EQ(counts2.constructed.load(), 1u);
-  EXPECT_EQ(counts2.disabledPeriodic.load(), 1u);
+  CHECK((counts2.constructed.load()) == (1u));
+  CHECK((counts2.disabledPeriodic.load()) == (1u));
 
   robot.EndCompetition();
   robotThread.join();
 }
 
-TEST_F(OpModeLifecycleTest, GetCallbacksRunImmediatelyWhileDisabled) {
+TEST_CASE_METHOD(OpModeLifecycleTest,
+                 "OpModeLifecycleTest GetCallbacksRunImmediatelyWhileDisabled",
+                 "[wpilibc]") {
   std::atomic<uint32_t> callbackCount{0};
   LifecycleRobot robot;
   robot.AddOpModeFactory(
@@ -254,7 +260,7 @@ TEST_F(OpModeLifecycleTest, GetCallbacksRunImmediatelyWhileDisabled) {
       MakeOpModeId(wpi::RobotMode::TELEOPERATED, "CallbackOpMode"));
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(100_ms);
-  EXPECT_GE(callbackCount.load(), 1u);
+  CHECK((callbackCount.load()) >= (1u));
 
   // Deselecting the opmode tears it down and removes its callbacks, so the
   // callback must stop running.
@@ -263,13 +269,14 @@ TEST_F(OpModeLifecycleTest, GetCallbacksRunImmediatelyWhileDisabled) {
   wpi::sim::StepTiming(100_ms);  // let teardown settle
   uint32_t countAfterTeardown = callbackCount.load();
   wpi::sim::StepTiming(100_ms);
-  EXPECT_EQ(callbackCount.load(), countAfterTeardown);
+  CHECK((callbackCount.load()) == (countAfterTeardown));
 
   robot.EndCompetition();
   robotThread.join();
 }
 
-TEST_F(OpModeLifecycleTest, InitialEnabledState) {
+TEST_CASE_METHOD(OpModeLifecycleTest, "OpModeLifecycleTest InitialEnabledState",
+                 "[wpilibc]") {
   Counts counts;
   LifecycleRobot robot;
   robot.AddOpModeFactory(
@@ -291,16 +298,17 @@ TEST_F(OpModeLifecycleTest, InitialEnabledState) {
 
   // Should construct, call disabledPeriodic once (since it's a new opmode),
   // then start and periodic
-  EXPECT_EQ(counts.constructed.load(), 1u);
-  EXPECT_EQ(counts.disabledPeriodic.load(), 1u);
-  EXPECT_EQ(counts.start.load(), 1u);
-  EXPECT_EQ(counts.periodic.load(), 1u);
+  CHECK((counts.constructed.load()) == (1u));
+  CHECK((counts.disabledPeriodic.load()) == (1u));
+  CHECK((counts.start.load()) == (1u));
+  CHECK((counts.periodic.load()) == (1u));
 
   robot.EndCompetition();
   robotThread.join();
 }
 
-TEST_F(OpModeLifecycleTest, ReconstructionOnDisable) {
+TEST_CASE_METHOD(OpModeLifecycleTest,
+                 "OpModeLifecycleTest ReconstructionOnDisable", "[wpilibc]") {
   Counts counts;
   LifecycleRobot robot;
   robot.AddOpModeFactory(
@@ -321,34 +329,35 @@ TEST_F(OpModeLifecycleTest, ReconstructionOnDisable) {
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(40_ms);
 
-  EXPECT_EQ(counts.constructed.load(), 1u);
-  EXPECT_EQ(counts.start.load(), 1u);
+  CHECK((counts.constructed.load()) == (1u));
+  CHECK((counts.start.load()) == (1u));
 
   // 2. Disable
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(40_ms);
 
-  EXPECT_EQ(counts.end.load(), 1u);
-  EXPECT_EQ(counts.destructed.load(), 1u);
-  EXPECT_EQ(counts.constructed.load(), 2u);
-  EXPECT_GE(counts.disabledPeriodic.load(), 1u);
-  EXPECT_EQ(counts.start.load(), 1u);
+  CHECK((counts.end.load()) == (1u));
+  CHECK((counts.destructed.load()) == (1u));
+  CHECK((counts.constructed.load()) == (2u));
+  CHECK((counts.disabledPeriodic.load()) >= (1u));
+  CHECK((counts.start.load()) == (1u));
 
   // 3. Re-enable
   wpi::sim::DriverStationSim::SetEnabled(true);
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(40_ms);
 
-  EXPECT_EQ(counts.constructed.load(), 2u);
-  EXPECT_EQ(counts.start.load(), 2u);
-  EXPECT_EQ(counts.end.load(), 1u);
+  CHECK((counts.constructed.load()) == (2u));
+  CHECK((counts.start.load()) == (2u));
+  CHECK((counts.end.load()) == (1u));
 
   robot.EndCompetition();
   robotThread.join();
 }
 
-TEST_F(OpModeLifecycleTest, DeselectOpMode) {
+TEST_CASE_METHOD(OpModeLifecycleTest, "OpModeLifecycleTest DeselectOpMode",
+                 "[wpilibc]") {
   Counts counts;
   LifecycleRobot robot;
   robot.AddOpModeFactory(
@@ -367,21 +376,22 @@ TEST_F(OpModeLifecycleTest, DeselectOpMode) {
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);
 
-  EXPECT_EQ(counts.constructed.load(), 1u);
+  CHECK((counts.constructed.load()) == (1u));
 
   // Deselect opmode
   wpi::sim::DriverStationSim::SetOpMode(0);
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);
 
-  EXPECT_EQ(counts.destructed.load(), 1u);
-  EXPECT_EQ(counts.constructed.load(), 1u);
+  CHECK((counts.destructed.load()) == (1u));
+  CHECK((counts.constructed.load()) == (1u));
 
   robot.EndCompetition();
   robotThread.join();
 }
 
-TEST_F(OpModeLifecycleTest, DsDisconnect) {
+TEST_CASE_METHOD(OpModeLifecycleTest, "OpModeLifecycleTest DsDisconnect",
+                 "[wpilibc]") {
   Counts counts;
   LifecycleRobot robot;
   robot.AddOpModeFactory(
@@ -400,17 +410,17 @@ TEST_F(OpModeLifecycleTest, DsDisconnect) {
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(40_ms);
 
-  EXPECT_EQ(counts.constructed.load(), 1u);
-  EXPECT_EQ(counts.start.load(), 1u);
+  CHECK((counts.constructed.load()) == (1u));
+  CHECK((counts.start.load()) == (1u));
 
   // DS Disconnect
   wpi::sim::DriverStationSim::SetDsAttached(false);
   // wpi::sim::DriverStationSim::NotifyNewData(); // DON'T DO THIS
   wpi::sim::StepTiming(40_ms);
 
-  EXPECT_EQ(counts.end.load(), 1u);
-  EXPECT_EQ(counts.destructed.load(), 1u);
-  EXPECT_EQ(counts.constructed.load(), 1u);
+  CHECK((counts.end.load()) == (1u));
+  CHECK((counts.destructed.load()) == (1u));
+  CHECK((counts.constructed.load()) == (1u));
 
   robot.EndCompetition();
   robotThread.join();

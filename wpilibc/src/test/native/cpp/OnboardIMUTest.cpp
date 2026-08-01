@@ -4,28 +4,29 @@
 
 #include "wpi/hardware/imu/OnboardIMU.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/simulation/OnboardIMUSim.hpp"
 
 using namespace wpi;
 
-TEST(OnboardIMUTest, SimDevices) {
+TEST_CASE("OnboardIMUTest SimDevices", "[wpilibc]") {
   OnboardIMU imu{OnboardIMU::FLAT};
 
-  EXPECT_EQ(0.0, imu.GetAngleX().value());
-  EXPECT_EQ(0.0, imu.GetAngleY().value());
-  EXPECT_EQ(0.0, imu.GetAngleZ().value());
+  CHECK((0.0) == (imu.GetAngleX().value()));
+  CHECK((0.0) == (imu.GetAngleY().value()));
+  CHECK((0.0) == (imu.GetAngleZ().value()));
 
-  EXPECT_EQ(0.0, imu.GetGyroRateX().value());
-  EXPECT_EQ(0.0, imu.GetGyroRateY().value());
-  EXPECT_EQ(0.0, imu.GetGyroRateZ().value());
+  CHECK((0.0) == (imu.GetGyroRateX().value()));
+  CHECK((0.0) == (imu.GetGyroRateY().value()));
+  CHECK((0.0) == (imu.GetGyroRateZ().value()));
 
-  EXPECT_EQ(0.0, imu.GetAccelX().value());
-  EXPECT_EQ(0.0, imu.GetAccelY().value());
-  EXPECT_EQ(0.0, imu.GetAccelZ().value());
+  CHECK((0.0) == (imu.GetAccelX().value()));
+  CHECK((0.0) == (imu.GetAccelY().value()));
+  CHECK((0.0) == (imu.GetAccelZ().value()));
 
-  EXPECT_EQ(0.0, imu.GetYaw().value());
+  CHECK((0.0) == (imu.GetYaw().value()));
 
   sim::OnboardIMUSim sim{};
 
@@ -43,17 +44,17 @@ TEST(OnboardIMUTest, SimDevices) {
 
   sim.SetYaw(wpi::units::radian_t{1.234});
 
-  EXPECT_EQ(1.0, imu.GetAngleX().value());
-  EXPECT_EQ(2.0, imu.GetAngleY().value());
-  EXPECT_EQ(3.0, imu.GetAngleZ().value());
+  CHECK((1.0) == (imu.GetAngleX().value()));
+  CHECK((2.0) == (imu.GetAngleY().value()));
+  CHECK((3.0) == (imu.GetAngleZ().value()));
 
-  EXPECT_EQ(3.504, imu.GetGyroRateX().value());
-  EXPECT_EQ(1.91, imu.GetGyroRateY().value());
-  EXPECT_EQ(22.9, imu.GetGyroRateZ().value());
+  CHECK((3.504) == (imu.GetGyroRateX().value()));
+  CHECK((1.91) == (imu.GetGyroRateY().value()));
+  CHECK((22.9) == (imu.GetGyroRateZ().value()));
 
-  EXPECT_EQ(-1.0, imu.GetAccelX().value());
-  EXPECT_EQ(-2.0, imu.GetAccelY().value());
-  EXPECT_EQ(-3.0, imu.GetAccelZ().value());
+  CHECK((-1.0) == (imu.GetAccelX().value()));
+  CHECK((-2.0) == (imu.GetAccelY().value()));
+  CHECK((-3.0) == (imu.GetAccelZ().value()));
 
-  EXPECT_EQ(1.234, imu.GetYaw().value());
+  CHECK((1.234) == (imu.GetYaw().value()));
 }

@@ -4,7 +4,8 @@
 
 #include "wpi/simulation/DutyCycleSim.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
 #include "wpi/hal/HAL.h"
@@ -12,26 +13,26 @@
 
 namespace wpi::sim {
 
-TEST(DutyCycleSimTest, Initialization) {
+TEST_CASE("DutyCycleSimTest Initialization", "[wpilibc][simulation]") {
   HAL_Initialize();
   DutyCycleSim sim = DutyCycleSim::CreateForChannel(2);
-  EXPECT_FALSE(sim.GetInitialized());
+  CHECK_FALSE(sim.GetInitialized());
 
   BooleanCallback callback;
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
 
   DutyCycle dc{2};
-  EXPECT_TRUE(sim.GetInitialized());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  CHECK(sim.GetInitialized());
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue());
 
   callback.Reset();
   sim.SetInitialized(false);
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_FALSE(callback.GetLastValue());
+  CHECK(callback.WasTriggered());
+  CHECK_FALSE(callback.GetLastValue());
 }
 
-TEST(DutyCycleSimTest, SetFrequency) {
+TEST_CASE("DutyCycleSimTest SetFrequency", "[wpilibc][simulation]") {
   HAL_Initialize();
 
   DutyCycle dc{2};
@@ -41,13 +42,13 @@ TEST(DutyCycleSimTest, SetFrequency) {
   auto cb = sim.RegisterFrequencyCallback(callback.GetCallback(), false);
 
   sim.SetFrequency(191_Hz);
-  EXPECT_EQ(191_Hz, sim.GetFrequency());
-  EXPECT_EQ(191_Hz, dc.GetFrequency());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(191, callback.GetLastValue());
+  CHECK((191_Hz) == (sim.GetFrequency()));
+  CHECK((191_Hz) == (dc.GetFrequency()));
+  CHECK(callback.WasTriggered());
+  CHECK((191) == (callback.GetLastValue()));
 }
 
-TEST(DutyCycleSimTest, SetOutput) {
+TEST_CASE("DutyCycleSimTest SetOutput", "[wpilibc][simulation]") {
   HAL_Initialize();
 
   DutyCycle dc{2};
@@ -57,10 +58,10 @@ TEST(DutyCycleSimTest, SetOutput) {
   auto cb = sim.RegisterOutputCallback(callback.GetCallback(), false);
 
   sim.SetOutput(229.174);
-  EXPECT_EQ(229.174, sim.GetOutput());
-  EXPECT_EQ(229.174, dc.GetOutput());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(229.174, callback.GetLastValue());
+  CHECK((229.174) == (sim.GetOutput()));
+  CHECK((229.174) == (dc.GetOutput()));
+  CHECK(callback.WasTriggered());
+  CHECK((229.174) == (callback.GetLastValue()));
 }
 
 }  // namespace wpi::sim
