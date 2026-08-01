@@ -22,6 +22,10 @@ namespace detail {
 // the C++ Alert API.
 void CloseAlertHandle(Alert& alert);
 
+// Used by process-lifetime alerts that must not call back into the Alert
+// backend during static destruction.
+void ReleaseAlertHandle(Alert& alert);
+
 }  // namespace detail
 
 /**
@@ -72,6 +76,13 @@ class Alert {
      */
     LOW = WPI_ALERT_LOW,
   };
+
+  /**
+   * Creates an invalid alert.
+   *
+   * The alert can be assigned a valid Alert later.
+   */
+  Alert() = default;
 
   /**
    * Creates a new alert in the default group - "Alerts".
@@ -136,6 +147,7 @@ class Alert {
 
  private:
   friend void detail::CloseAlertHandle(Alert& alert);
+  friend void detail::ReleaseAlertHandle(Alert& alert);
 
   Handle<WPI_AlertHandle, WPI_DestroyAlert> m_handle;
 };
@@ -144,6 +156,10 @@ namespace detail {
 
 inline void CloseAlertHandle(Alert& alert) {
   alert.m_handle = WPI_INVALID_HANDLE;
+}
+
+inline void ReleaseAlertHandle(Alert& alert) {
+  alert.m_handle.Release();
 }
 
 }  // namespace detail
