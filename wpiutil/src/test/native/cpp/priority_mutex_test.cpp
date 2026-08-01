@@ -226,7 +226,7 @@ class InversionTestRunner {
 // TODO: Fix roborio permissions to run as root.
 
 // Priority inversion test.
-TEST_CASE("MutexTest DISABLED_PriorityInversion", "[wpiutil]") {
+TEST_CASE("MutexTest DISABLED_PriorityInversion", "[wpiutil][.]") {
   InversionTestRunner<priority_mutex> runner;
   std::thread runner_thread(std::ref(runner));
   runner_thread.join();
@@ -234,7 +234,7 @@ TEST_CASE("MutexTest DISABLED_PriorityInversion", "[wpiutil]") {
 }
 
 // Verify that the non-priority inversion mutex doesn't pass the test.
-TEST_CASE("MutexTest DISABLED_StdMutexPriorityInversion", "[wpiutil]") {
+TEST_CASE("MutexTest DISABLED_StdMutexPriorityInversion", "[wpiutil][.]") {
   InversionTestRunner<std::mutex> runner;
   std::thread runner_thread(std::ref(runner));
   runner_thread.join();
@@ -251,7 +251,7 @@ TEST_CASE("MutexTest TryLock", "[wpiutil]") {
 }
 
 // Priority inversion test.
-TEST_CASE("MutexTest DISABLED_ReentrantPriorityInversion", "[wpiutil]") {
+TEST_CASE("MutexTest DISABLED_ReentrantPriorityInversion", "[wpiutil][.]") {
   InversionTestRunner<priority_recursive_mutex> runner;
   std::thread runner_thread(std::ref(runner));
   runner_thread.join();
