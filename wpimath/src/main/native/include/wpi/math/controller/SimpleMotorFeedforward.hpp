@@ -21,7 +21,9 @@ namespace wpi::math {
  * permanent-magnet DC motor.
  */
 template <class Distance>
-  requires wpi::units::length_unit<Distance> || wpi::units::angle_unit<Distance>
+  requires wpi::units::length_unit<Distance> ||
+           wpi::units::angle_unit<Distance> ||
+           wpi::units::dimensionless_unit<Distance>
 class SimpleMotorFeedforward {
  public:
   using Velocity =
