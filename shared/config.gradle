@@ -54,6 +54,11 @@ nativeUtils.platformConfigs.each {
         // Make warning from Google Benchmark not an error
         it.cppCompiler.args.add("-Wno-error=restrict")
     } else {
+        // /d2prunedbinfo removes unused debug info from PDBs, which saves space in wpimath PDBs
+        // See https://devblogs.microsoft.com/cppblog/linker-throughput-improvement-in-visual-studio-2019/#debug-info-pruning
+        // and https://github.com/wpilibsuite/allwpilib/pull/9195
+        it.cCompiler.args.add("/d2prunedbinfo")
+        it.cppCompiler.args.add("/d2prunedbinfo")
         // On windows, for ntcoreffi, use static runtime
         if (project.hasProperty('ntcoreffibuild')) {
             it.cCompiler.releaseArgs.remove('/MD')
