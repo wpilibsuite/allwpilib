@@ -36,7 +36,8 @@ import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.networktables.StringPublisher;
 import org.wpilib.networktables.StringTopic;
 import org.wpilib.networktables.StructPublisher;
-import org.wpilib.system.Timer;
+import org.wpilib.util.Alert;
+import org.wpilib.util.AlertException;
 import org.wpilib.util.Color;
 import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.util.concurrent.EventVector;
@@ -131,9 +132,6 @@ public final class DriverStationBackend {
       }
     }
   }
-
-  private static final double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
-  private static double m_nextMessageTime;
 
   private static String opModeToString(long id) {
     if (id == 0) {
@@ -471,7 +469,140 @@ public final class DriverStationBackend {
 
   private static final ReentrantLock m_cacheDataMutex = new ReentrantLock();
 
-  private static boolean m_silenceJoystickWarning;
+  private static final class JoystickAlerts {
+    final String connectionText;
+    final Alert connectionAlert;
+    final Alert buttonAlert;
+    final Alert axisAlert;
+    final Alert povAlert;
+    final Alert touchpadFingerAlert;
+    boolean connectionAlertActive;
+    boolean buttonAlertActive;
+    boolean axisAlertActive;
+    boolean povAlertActive;
+    boolean touchpadFingerAlertActive;
+    int buttonAlertButton;
+    int axisAlertAxis;
+    int povAlertPOV;
+    int touchpadFingerAlertTouchpad;
+    int touchpadFingerAlertFinger;
+
+    JoystickAlerts(int stick) {
+      connectionText =
+          "Joystick on port " + stick + " not available, check if controller is plugged in";
+      connectionAlert =
+          new Alert(
+              "DriverStation",
+              "joystick" + stick + "Disconnected",
+              connectionText,
+              Alert.Level.HIGH);
+      buttonAlert =
+          new Alert(
+              "DriverStation", "joystick" + stick + "ButtonUnavailable", "", Alert.Level.MEDIUM);
+      axisAlert =
+          new Alert(
+              "DriverStation", "joystick" + stick + "AxisUnavailable", "", Alert.Level.MEDIUM);
+      povAlert =
+          new Alert("DriverStation", "joystick" + stick + "POVUnavailable", "", Alert.Level.MEDIUM);
+      touchpadFingerAlert =
+          new Alert(
+              "DriverStation",
+              "joystick" + stick + "TouchpadFingerUnavailable",
+              "",
+              Alert.Level.MEDIUM);
+    }
+
+    boolean setConnectionAlert(boolean active) {
+      if (!active && !connectionAlertActive) {
+        return true;
+      }
+
+      try {
+        if (active) {
+          connectionAlert.setText(connectionText);
+        }
+        connectionAlert.set(active);
+        if (active && !connectionAlert.get()) {
+          return false;
+        }
+      } catch (AlertException ex) {
+        return false;
+      }
+      connectionAlertActive = active;
+      return true;
+    }
+
+    boolean setButtonAlert(boolean active, String text) {
+      if (!active && !buttonAlertActive) {
+        return true;
+      }
+
+      try {
+        if (active) {
+          buttonAlert.setText(text);
+        }
+        buttonAlert.set(active);
+      } catch (AlertException ex) {
+        return false;
+      }
+      buttonAlertActive = active;
+      return true;
+    }
+
+    boolean setAxisAlert(boolean active, String text) {
+      if (!active && !axisAlertActive) {
+        return true;
+      }
+
+      try {
+        if (active) {
+          axisAlert.setText(text);
+        }
+        axisAlert.set(active);
+      } catch (AlertException ex) {
+        return false;
+      }
+      axisAlertActive = active;
+      return true;
+    }
+
+    boolean setPOVAlert(boolean active, String text) {
+      if (!active && !povAlertActive) {
+        return true;
+      }
+
+      try {
+        if (active) {
+          povAlert.setText(text);
+        }
+        povAlert.set(active);
+      } catch (AlertException ex) {
+        return false;
+      }
+      povAlertActive = active;
+      return true;
+    }
+
+    boolean setTouchpadFingerAlert(boolean active, String text) {
+      if (!active && !touchpadFingerAlertActive) {
+        return true;
+      }
+
+      try {
+        if (active) {
+          touchpadFingerAlert.setText(text);
+        }
+        touchpadFingerAlert.set(active);
+      } catch (AlertException ex) {
+        return false;
+      }
+      touchpadFingerAlertActive = active;
+      return true;
+    }
+  }
+
+  private static boolean m_silenceJoystickAlerts;
+  private static final JoystickAlerts[] m_joystickAlerts = new JoystickAlerts[JOYSTICK_PORTS];
 
   private static boolean m_userProgramStarted = false;
   private static final Map<Long, OpModeOption> m_opModes = new HashMap<>();
@@ -647,8 +778,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(
-        stick, "Joystick Button " + button + " on port " + stick + " not available");
+    reportJoystickButtonWarning(stick, button);
     return false;
   }
 
@@ -712,8 +842,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(
-        stick, "Joystick Button " + button + " on port " + stick + " not available");
+    reportJoystickButtonWarning(stick, button);
     return false;
   }
 
@@ -749,8 +878,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(
-        stick, "Joystick Button " + button + " on port " + stick + " not available");
+    reportJoystickButtonWarning(stick, button);
     return false;
   }
 
@@ -781,7 +909,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(stick, "Joystick axis " + axis + " on port " + stick + " not available");
+    reportJoystickAxisWarning(stick, axis);
     return 0.0;
   }
 
@@ -819,15 +947,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(
-        stick,
-        "Joystick touchpad finger "
-            + finger
-            + " on touchpad "
-            + touchpad
-            + " on port "
-            + stick
-            + " not available");
+    reportJoystickTouchpadFingerWarning(stick, touchpad, finger);
     return new TouchpadFinger(false, 0.0f, 0.0f);
   }
 
@@ -923,7 +1043,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(stick, "Joystick POV " + pov + " on port " + stick + " not available");
+    reportJoystickPOVWarning(stick, pov);
     return POVDirection.CENTER;
   }
 
@@ -1704,24 +1824,26 @@ public final class DriverStationBackend {
   }
 
   /**
-   * Allows the user to specify whether they want joystick connection warnings to be printed to the
-   * console. This setting is ignored when the FMS is connected -- warnings will always be on in
-   * that scenario.
+   * Allows the user to specify whether they want joystick connection alerts to be shown. This
+   * setting is ignored when the FMS is connected -- alerts will always be on in that scenario.
    *
-   * @param silence Whether warning messages should be silenced.
+   * @param silence Whether joystick connection alerts should be silenced.
    */
-  public static void silenceJoystickConnectionWarning(boolean silence) {
-    m_silenceJoystickWarning = silence;
+  public static void silenceJoystickConnectionAlert(boolean silence) {
+    m_silenceJoystickAlerts = silence;
+    if (silence && !isFMSAttached()) {
+      clearJoystickAlerts();
+    }
   }
 
   /**
-   * Returns whether joystick connection warnings are silenced. This will always return false when
+   * Returns whether joystick connection alerts are silenced. This will always return false when
    * connected to the FMS.
    *
-   * @return Whether joystick connection warnings are silenced.
+   * @return Whether joystick connection alerts are silenced.
    */
-  public static boolean isJoystickConnectionWarningSilenced() {
-    return !isFMSAttached() && m_silenceJoystickWarning;
+  public static boolean isJoystickConnectionAlertSilenced() {
+    return !isFMSAttached() && m_silenceJoystickAlerts;
   }
 
   /**
@@ -1838,6 +1960,8 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
+    clearJoystickAlerts();
+
     m_refreshEvents.wakeup();
 
     m_matchDataSender.sendMatchData();
@@ -1864,25 +1988,248 @@ public final class DriverStationBackend {
     m_refreshEvents.remove(handle);
   }
 
-  /**
-   * Reports errors related to joystick availability. Throttles the errors so that they don't
-   * overwhelm the DS.
-   *
-   * @param stick The joystick port.
-   * @param message The message to report if the joystick is connected.
-   */
-  private static void reportJoystickWarning(int stick, String message) {
-    if (isFMSAttached() || !m_silenceJoystickWarning) {
-      double currentTime = Timer.getTimestamp();
-      if (currentTime > m_nextMessageTime) {
-        if (isJoystickConnected(stick)) {
-          reportWarning(message, false);
-        } else {
-          reportWarning(
-              "Joystick on port " + stick + " not available, check if controller is plugged in",
-              false);
-        }
-        m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
+  private static JoystickAlerts getJoystickAlerts(int stick) {
+    JoystickAlerts alerts = m_joystickAlerts[stick];
+    if (alerts == null) {
+      alerts = new JoystickAlerts(stick);
+      m_joystickAlerts[stick] = alerts;
+    }
+    return alerts;
+  }
+
+  private static JoystickAlerts getJoystickAlertsIfInitialized(int stick) {
+    return m_joystickAlerts[stick];
+  }
+
+  private static JoystickAlerts recreateJoystickAlerts(int stick) {
+    JoystickAlerts alerts = new JoystickAlerts(stick);
+    m_joystickAlerts[stick] = alerts;
+    return alerts;
+  }
+
+  private static JoystickAlerts getJoystickAlertsForReport(int stick) {
+    if (!isFMSAttached() && m_silenceJoystickAlerts) {
+      return null;
+    }
+
+    if (isJoystickConnected(stick)) {
+      JoystickAlerts alerts = getJoystickAlerts(stick);
+      if (!alerts.setConnectionAlert(false)) {
+        alerts = recreateJoystickAlerts(stick);
+      }
+      return alerts;
+    }
+
+    clearJoystickResourceAlerts(stick);
+    setJoystickConnectionAlert(stick, true);
+    return null;
+  }
+
+  private static void reportJoystickButtonWarning(int stick, int button) {
+    JoystickAlerts alerts = getJoystickAlertsForReport(stick);
+    if (alerts == null) {
+      return;
+    }
+
+    String text = "Joystick Button " + button + " on port " + stick + " not available";
+    alerts.buttonAlertButton = button;
+    if (!alerts.setButtonAlert(true, text)) {
+      alerts = recreateJoystickAlerts(stick);
+      alerts.buttonAlertButton = button;
+      alerts.setButtonAlert(true, text);
+    }
+  }
+
+  private static void reportJoystickAxisWarning(int stick, int axis) {
+    JoystickAlerts alerts = getJoystickAlertsForReport(stick);
+    if (alerts == null) {
+      return;
+    }
+
+    String text = "Joystick axis " + axis + " on port " + stick + " not available";
+    alerts.axisAlertAxis = axis;
+    if (!alerts.setAxisAlert(true, text)) {
+      alerts = recreateJoystickAlerts(stick);
+      alerts.axisAlertAxis = axis;
+      alerts.setAxisAlert(true, text);
+    }
+  }
+
+  private static void reportJoystickPOVWarning(int stick, int pov) {
+    JoystickAlerts alerts = getJoystickAlertsForReport(stick);
+    if (alerts == null) {
+      return;
+    }
+
+    String text = "Joystick POV " + pov + " on port " + stick + " not available";
+    alerts.povAlertPOV = pov;
+    if (!alerts.setPOVAlert(true, text)) {
+      alerts = recreateJoystickAlerts(stick);
+      alerts.povAlertPOV = pov;
+      alerts.setPOVAlert(true, text);
+    }
+  }
+
+  private static void reportJoystickTouchpadFingerWarning(int stick, int touchpad, int finger) {
+    JoystickAlerts alerts = getJoystickAlertsForReport(stick);
+    if (alerts == null) {
+      return;
+    }
+
+    String text =
+        "Joystick touchpad finger "
+            + finger
+            + " on touchpad "
+            + touchpad
+            + " on port "
+            + stick
+            + " not available";
+    alerts.touchpadFingerAlertTouchpad = touchpad;
+    alerts.touchpadFingerAlertFinger = finger;
+    if (!alerts.setTouchpadFingerAlert(true, text)) {
+      alerts = recreateJoystickAlerts(stick);
+      alerts.touchpadFingerAlertTouchpad = touchpad;
+      alerts.touchpadFingerAlertFinger = finger;
+      alerts.setTouchpadFingerAlert(true, text);
+    }
+  }
+
+  private static void clearJoystickAlerts() {
+    if (!isFMSAttached() && m_silenceJoystickAlerts) {
+      clearAllJoystickAlerts();
+      return;
+    }
+
+    for (int stick = 0; stick < JOYSTICK_PORTS; stick++) {
+      JoystickAlerts alerts = getJoystickAlertsIfInitialized(stick);
+      if (alerts == null) {
+        continue;
+      }
+
+      if (!isJoystickConnected(stick)) {
+        clearJoystickResourceAlerts(stick);
+        continue;
+      }
+
+      if (alerts.connectionAlertActive) {
+        setJoystickConnectionAlert(stick, false);
+      }
+
+      int axesAvailable = getStickAxesAvailable(stick);
+      if (alerts.axisAlertActive && (axesAvailable & (1 << alerts.axisAlertAxis)) != 0) {
+        setJoystickAxisAlert(stick, false);
+      }
+
+      long buttonsAvailable = getStickButtonsAvailable(stick);
+      if (alerts.buttonAlertActive && (buttonsAvailable & (1L << alerts.buttonAlertButton)) != 0) {
+        setJoystickButtonAlert(stick, false);
+      }
+
+      int povsAvailable = getStickPOVsAvailable(stick);
+      if (alerts.povAlertActive && (povsAvailable & (1 << alerts.povAlertPOV)) != 0) {
+        setJoystickPOVAlert(stick, false);
+      }
+
+      if (alerts.touchpadFingerAlertActive
+          && getStickTouchpadFingerAvailable(
+              stick, alerts.touchpadFingerAlertTouchpad, alerts.touchpadFingerAlertFinger)) {
+        setJoystickTouchpadFingerAlert(stick, false);
+      }
+    }
+  }
+
+  private static void clearAllJoystickAlerts() {
+    for (int stick = 0; stick < JOYSTICK_PORTS; stick++) {
+      if (getJoystickAlertsIfInitialized(stick) != null) {
+        setJoystickConnectionAlert(stick, false);
+        clearJoystickResourceAlerts(stick);
+      }
+    }
+  }
+
+  private static void clearJoystickResourceAlerts(int stick) {
+    setJoystickButtonAlert(stick, false);
+    setJoystickAxisAlert(stick, false);
+    setJoystickPOVAlert(stick, false);
+    setJoystickTouchpadFingerAlert(stick, false);
+  }
+
+  private static void setJoystickConnectionAlert(int stick, boolean active) {
+    JoystickAlerts alerts =
+        active ? getJoystickAlerts(stick) : getJoystickAlertsIfInitialized(stick);
+    if (alerts == null) {
+      return;
+    }
+
+    if (!alerts.setConnectionAlert(active)) {
+      if (active) {
+        recreateJoystickAlerts(stick).setConnectionAlert(true);
+      } else {
+        m_joystickAlerts[stick] = null;
+      }
+    }
+  }
+
+  private static void setJoystickButtonAlert(int stick, boolean active) {
+    JoystickAlerts alerts =
+        active ? getJoystickAlerts(stick) : getJoystickAlertsIfInitialized(stick);
+    if (alerts == null) {
+      return;
+    }
+
+    if (!alerts.setButtonAlert(active, "")) {
+      if (active) {
+        recreateJoystickAlerts(stick).setButtonAlert(true, "");
+      } else {
+        m_joystickAlerts[stick] = null;
+      }
+    }
+  }
+
+  private static void setJoystickAxisAlert(int stick, boolean active) {
+    JoystickAlerts alerts =
+        active ? getJoystickAlerts(stick) : getJoystickAlertsIfInitialized(stick);
+    if (alerts == null) {
+      return;
+    }
+
+    if (!alerts.setAxisAlert(active, "")) {
+      if (active) {
+        recreateJoystickAlerts(stick).setAxisAlert(true, "");
+      } else {
+        m_joystickAlerts[stick] = null;
+      }
+    }
+  }
+
+  private static void setJoystickPOVAlert(int stick, boolean active) {
+    JoystickAlerts alerts =
+        active ? getJoystickAlerts(stick) : getJoystickAlertsIfInitialized(stick);
+    if (alerts == null) {
+      return;
+    }
+
+    if (!alerts.setPOVAlert(active, "")) {
+      if (active) {
+        recreateJoystickAlerts(stick).setPOVAlert(true, "");
+      } else {
+        m_joystickAlerts[stick] = null;
+      }
+    }
+  }
+
+  private static void setJoystickTouchpadFingerAlert(int stick, boolean active) {
+    JoystickAlerts alerts =
+        active ? getJoystickAlerts(stick) : getJoystickAlertsIfInitialized(stick);
+    if (alerts == null) {
+      return;
+    }
+
+    if (!alerts.setTouchpadFingerAlert(active, "")) {
+      if (active) {
+        recreateJoystickAlerts(stick).setTouchpadFingerAlert(true, "");
+      } else {
+        m_joystickAlerts[stick] = null;
       }
     }
   }
