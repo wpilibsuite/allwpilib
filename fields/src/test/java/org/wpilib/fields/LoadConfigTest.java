@@ -76,6 +76,33 @@ class LoadConfigTest {
   }
 
   @Test
+  void testLoadFieldImageWithoutPathFails(@TempDir Path tempDir) throws IOException {
+    String json =
+        """
+        {
+          "name": "2027 FRC Pathless Image Field",
+          "season": "2027",
+          "game": "Pathless Image Field",
+          "field-dimensions": {
+            "length": 3.0,
+            "width": 2.0
+          },
+          "field-image": {
+            "top": 10,
+            "left": 20,
+            "bottom": 30,
+            "right": 40
+          },
+          "program": "frc"
+        }
+        """;
+    Path file = tempDir.resolve("pathless-image.json");
+    Files.writeString(file, json);
+
+    Assertions.assertThrows(RuntimeException.class, () -> Field.loadFromFile(file));
+  }
+
+  @Test
   void testLoadFieldWithoutImage(@TempDir Path tempDir) throws IOException {
     String json =
         """

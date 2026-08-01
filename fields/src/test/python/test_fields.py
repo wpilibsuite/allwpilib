@@ -244,6 +244,33 @@ def test_load_field_without_dimensions_fails(tmp_path):
         robotpy_fields.Field(str(path))
 
 
+def test_load_field_image_without_path_fails(tmp_path):
+    path = tmp_path / "pathless-image.json"
+    path.write_text(
+        """{
+  "name": "2027 FRC Pathless Image Field",
+  "season": "2027",
+  "game": "Pathless Image Field",
+  "field-dimensions": {
+    "length": 3.0,
+    "width": 2.0
+  },
+  "field-image": {
+    "top": 10,
+    "left": 20,
+    "bottom": 30,
+    "right": 40
+  },
+  "program": "frc"
+}
+""",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(Exception):
+        robotpy_fields.Field(str(path))
+
+
 def test_load_field_without_image(tmp_path):
     field_json = """{
   "name": "2027 FRC Imageless Field",

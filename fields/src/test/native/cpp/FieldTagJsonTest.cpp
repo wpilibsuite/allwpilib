@@ -82,3 +82,25 @@ TEST_CASE("FieldJsonTest DeserializeWithoutImage", "[field][json]") {
   CHECK_FALSE(field.HasTags());
   CHECK(field.GetTags().empty());
 }
+
+TEST_CASE("FieldJsonTest DeserializeImageWithoutPathFails", "[field][json]") {
+  auto json = wpi::util::json::parse(R"({
+    "name": "2027 FRC Pathless Image Field",
+    "season": "2027",
+    "game": "Pathless Image Field",
+    "field-dimensions": {
+      "length": 3.0,
+      "width": 2.0
+    },
+    "field-image": {
+      "top": 10,
+      "left": 20,
+      "bottom": 30,
+      "right": 40
+    },
+    "program": "frc"
+  })")
+                  .value();
+
+  CHECK_THROWS(json.get<Field>());
+}

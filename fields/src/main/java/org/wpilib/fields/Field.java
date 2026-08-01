@@ -130,6 +130,13 @@ public final class Field {
     return Objects.requireNonNull(fieldDimensions, "field-dimensions");
   }
 
+  private static FieldImage requireFieldImagePath(FieldImage fieldImage) {
+    if (fieldImage != null) {
+      Objects.requireNonNull(fieldImage.path, "field-image.path");
+    }
+    return fieldImage;
+  }
+
   /**
    * Constructs a field object.
    *
@@ -168,7 +175,7 @@ public final class Field {
     this.name = name;
     this.season = season;
     this.game = game;
-    this.fieldImage = fieldImage;
+    this.fieldImage = requireFieldImagePath(fieldImage);
     this.length = fieldLength;
     this.width = fieldWidth;
     this.program = program;
