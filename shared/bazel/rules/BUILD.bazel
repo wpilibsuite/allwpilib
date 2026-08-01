@@ -1,6 +1,10 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 
+exports_files([
+    "java_executable_wrapper.sh",
+])
+
 # Generate this because otherwise the linter wants to change the format.
 write_file(
     name = "manifest_write",

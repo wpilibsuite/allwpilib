@@ -81,6 +81,7 @@ def wpilib_jni_java_library(
         visibility = visibility,
         testonly = testonly,
         tags = tags,
+        native_libs = native_libs,
         **java_library_args
     )
 
