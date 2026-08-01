@@ -382,7 +382,7 @@ public class Matrix<R extends Num, C extends Num>
    * will otherwise throw an {@link MatrixDimensionException}.
    *
    * @param exponent The exponent.
-   * @return The exponential of A.
+   * @return The power of A.
    */
   public final Matrix<R, C> pow(double exponent) {
     if (this.getNumRows() != this.getNumCols()) {
