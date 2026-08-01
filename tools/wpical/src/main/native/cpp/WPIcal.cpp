@@ -252,7 +252,7 @@ static wpi::fields::Field MakeFieldWithTags(
     const wpi::fields::Field& idealField,
     std::vector<wpi::fields::FieldTag> tags) {
   return {idealField.GetName(),    idealField.GetSeason(),
-          idealField.GetGame(),    idealField.GetImage(),
+          idealField.GetGame(),    std::nullopt,
           idealField.GetLength(),  idealField.GetWidth(),
           idealField.GetProgram(), std::move(tags)};
 }

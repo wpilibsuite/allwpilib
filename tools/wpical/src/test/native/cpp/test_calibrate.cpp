@@ -85,6 +85,7 @@ TEST_CASE("FieldCalibrationTest Typical", "[wpical]") {
       wpi::fields::GetField(wpi::fields::FieldId::FRC_2024_CRESCENDO), 3,
       false);
   REQUIRE(ret != std::nullopt);
+  CHECK_FALSE(ret->HasImage());
 }
 
 TEST_CASE("FieldCalibrationTest Atypical_Bad_Camera_Model", "[wpical]") {

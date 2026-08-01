@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <functional>
 #include <map>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -402,7 +403,7 @@ std::optional<wpi::fields::Field> wpical::calibrate(
     tags.emplace_back(tag);
   }
   return wpi::fields::Field{idealLayout.GetName(),    idealLayout.GetSeason(),
-                            idealLayout.GetGame(),    idealLayout.GetImage(),
+                            idealLayout.GetGame(),    std::nullopt,
                             idealLayout.GetLength(),  idealLayout.GetWidth(),
                             idealLayout.GetProgram(), std::move(tags)};
 }
