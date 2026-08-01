@@ -15,11 +15,14 @@
 *.java text eol=lf
 *.jinja text eol=lf
 *.json text eol=lf
+*.jpg binary
+*.jpeg binary
 *.m text eol=lf
 *.md text eol=lf
 *.mm text eol=lf
 *.patch text eol=lf
 *.plist text eol=lf
+*.png binary
 *.proto text eol=lf
 *.py text eol=lf
 *.rc text eol=lf
