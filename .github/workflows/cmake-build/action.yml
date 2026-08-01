@@ -60,7 +60,7 @@ runs:
         cmakeVersion: ${{ inputs.cmake-version }}
 
     - name: Install sccache
-      uses: mozilla-actions/sccache-action@v0.0.10
+      uses: mozilla-actions/sccache-action@v0.0.11
 
     - uses: actions/checkout@v7
 
