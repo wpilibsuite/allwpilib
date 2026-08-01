@@ -28,22 +28,22 @@ TEST_CASE_METHOD(TimerTest, "TimerTest StartStop", "[wpilibc]") {
   Timer timer;
 
   // Verify timer is initialized as stopped
-  CHECK((timer.Get()) == (0_s));
+  CHECK(timer.Get() == 0_s);
   CHECK_FALSE(timer.IsRunning());
   wpi::sim::StepTiming(500_ms);
-  CHECK((timer.Get()) == (0_s));
+  CHECK(timer.Get() == 0_s);
   CHECK_FALSE(timer.IsRunning());
 
   // Verify timer increments after it's started
   timer.Start();
   wpi::sim::StepTiming(500_ms);
-  CHECK((timer.Get()) == (500_ms));
+  CHECK(timer.Get() == 500_ms);
   CHECK(timer.IsRunning());
 
   // Verify timer stops incrementing after it's stopped
   timer.Stop();
   wpi::sim::StepTiming(500_ms);
-  CHECK((timer.Get()) == (500_ms));
+  CHECK(timer.Get() == 500_ms);
   CHECK_FALSE(timer.IsRunning());
 }
 
@@ -52,23 +52,23 @@ TEST_CASE_METHOD(TimerTest, "TimerTest Reset", "[wpilibc]") {
   timer.Start();
 
   // Advance timer to 500 ms
-  CHECK((timer.Get()) == (0_s));
+  CHECK(timer.Get() == 0_s);
   wpi::sim::StepTiming(500_ms);
-  CHECK((timer.Get()) == (500_ms));
+  CHECK(timer.Get() == 500_ms);
 
   // Verify timer reports 0 ms after reset
   timer.Reset();
-  CHECK((timer.Get()) == (0_s));
+  CHECK(timer.Get() == 0_s);
 
   // Verify timer continues incrementing
   wpi::sim::StepTiming(500_ms);
-  CHECK((timer.Get()) == (500_ms));
+  CHECK(timer.Get() == 500_ms);
 
   // Verify timer doesn't start incrementing after reset if it was stopped
   timer.Stop();
   timer.Reset();
   wpi::sim::StepTiming(500_ms);
-  CHECK((timer.Get()) == (0_ms));
+  CHECK(timer.Get() == 0_ms);
 }
 
 TEST_CASE_METHOD(TimerTest, "TimerTest HasElapsed", "[wpilibc]") {
@@ -117,7 +117,7 @@ TEST_CASE_METHOD(TimerTest, "TimerTest GetMonotonicTimestamp", "[wpilibc]") {
   auto start = wpi::Timer::GetMonotonicTimestamp();
   wpi::sim::StepTiming(500_ms);
   auto end = wpi::Timer::GetMonotonicTimestamp();
-  CHECK((start + 500_ms) == (end));
+  CHECK(start + 500_ms == end);
 }
 
 TEST_CASE_METHOD(TimerTest, "TimerTest RestartTimingPreservesPausedClock",
@@ -130,8 +130,8 @@ TEST_CASE_METHOD(TimerTest, "TimerTest RestartTimingPreservesPausedClock",
   wpi::sim::RestartTiming();
 
   CHECK(wpi::sim::IsTimingPaused());
-  CHECK((beforeRestart) == (wpi::Timer::GetMonotonicTimestamp()));
+  CHECK(beforeRestart == wpi::Timer::GetMonotonicTimestamp());
 
   wpi::sim::StepTiming(500_ms);
-  CHECK((beforeRestart + 500_ms) == (wpi::Timer::GetMonotonicTimestamp()));
+  CHECK(beforeRestart + 500_ms == wpi::Timer::GetMonotonicTimestamp());
 }

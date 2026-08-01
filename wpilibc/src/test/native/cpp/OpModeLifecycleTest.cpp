@@ -113,24 +113,24 @@ TEST_CASE_METHOD(OpModeLifecycleTest, "OpModeLifecycleTest EnabledTransition",
       MakeOpModeId(wpi::RobotMode::TELEOPERATED, "TestOpMode"));
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);
-  CHECK((counts.constructed.load()) == (1u));
-  CHECK((counts.disabledPeriodic.load()) == (1u));
-  CHECK((counts.periodic.load()) == (0u));
+  CHECK(counts.constructed.load() == 1u);
+  CHECK(counts.disabledPeriodic.load() == 1u);
+  CHECK(counts.periodic.load() == 0u);
 
   // 2. Transition to enabled
   wpi::sim::DriverStationSim::SetEnabled(true);
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(
       40_ms);  // Step twice like Java test to get periodic callback
-  CHECK((counts.start.load()) == (1u));
-  CHECK((counts.periodic.load()) == (1u));
+  CHECK(counts.start.load() == 1u);
+  CHECK(counts.periodic.load() == 1u);
 
   // 3. Transition to disabled
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);
-  CHECK((counts.end.load()) == (1u));
-  CHECK((counts.destructed.load()) == (1u));
+  CHECK(counts.end.load() == 1u);
+  CHECK(counts.destructed.load() == 1u);
 
   robot.EndCompetition();
   robotThread.join();
@@ -163,9 +163,9 @@ TEST_CASE_METHOD(OpModeLifecycleTest,
   wpi::sim::DriverStationSim::SetEnabled(true);
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(40_ms);  // Need two iterations for periodic callback
-  CHECK((counts1.constructed.load()) == (1u));
-  CHECK((counts1.start.load()) == (1u));
-  CHECK((counts1.periodic.load()) == (1u));
+  CHECK(counts1.constructed.load() == 1u);
+  CHECK(counts1.start.load() == 1u);
+  CHECK(counts1.periodic.load() == 1u);
 
   // 2. Switch to OpMode2 while enabled. Selecting a different opmode while
   // enabled disables the robot first, so the DS sends disabled + new opmode.
@@ -175,20 +175,20 @@ TEST_CASE_METHOD(OpModeLifecycleTest,
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);
   // OpMode1 should be ended and destructed
-  CHECK((counts1.end.load()) == (1u));
-  CHECK((counts1.destructed.load()) == (1u));
+  CHECK(counts1.end.load() == 1u);
+  CHECK(counts1.destructed.load() == 1u);
   // OpMode2 should be constructed exactly once and persist while disabled
-  CHECK((counts2.constructed.load()) == (1u));
-  CHECK((counts2.start.load()) == (0u));
+  CHECK(counts2.constructed.load() == 1u);
+  CHECK(counts2.start.load() == 0u);
 
   // 3. Re-enable. The same OpMode2 instance is started; it is not
   // reconstructed.
   wpi::sim::DriverStationSim::SetEnabled(true);
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(40_ms);
-  CHECK((counts2.constructed.load()) == (1u));
-  CHECK((counts2.start.load()) == (1u));
-  CHECK((counts2.periodic.load()) == (1u));
+  CHECK(counts2.constructed.load() == 1u);
+  CHECK(counts2.start.load() == 1u);
+  CHECK(counts2.periodic.load() == 1u);
 
   robot.EndCompetition();
   robotThread.join();
@@ -219,8 +219,8 @@ TEST_CASE_METHOD(OpModeLifecycleTest,
       MakeOpModeId(wpi::RobotMode::TELEOPERATED, "OpMode1"));
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);
-  CHECK((counts1.constructed.load()) == (1u));
-  CHECK((counts1.disabledPeriodic.load()) == (1u));
+  CHECK(counts1.constructed.load() == 1u);
+  CHECK(counts1.disabledPeriodic.load() == 1u);
 
   // 2. Change to OpMode2 while disabled
   wpi::sim::DriverStationSim::SetOpMode(
@@ -228,11 +228,11 @@ TEST_CASE_METHOD(OpModeLifecycleTest,
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);
   // OpMode1 should be destructed, but NOT ended
-  CHECK((counts1.destructed.load()) == (1u));
-  CHECK((counts1.end.load()) == (0u));
+  CHECK(counts1.destructed.load() == 1u);
+  CHECK(counts1.end.load() == 0u);
   // OpMode2 should be selected
-  CHECK((counts2.constructed.load()) == (1u));
-  CHECK((counts2.disabledPeriodic.load()) == (1u));
+  CHECK(counts2.constructed.load() == 1u);
+  CHECK(counts2.disabledPeriodic.load() == 1u);
 
   robot.EndCompetition();
   robotThread.join();
@@ -260,7 +260,7 @@ TEST_CASE_METHOD(OpModeLifecycleTest,
       MakeOpModeId(wpi::RobotMode::TELEOPERATED, "CallbackOpMode"));
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(100_ms);
-  CHECK((callbackCount.load()) >= (1u));
+  CHECK(callbackCount.load() >= 1u);
 
   // Deselecting the opmode tears it down and removes its callbacks, so the
   // callback must stop running.
@@ -269,7 +269,7 @@ TEST_CASE_METHOD(OpModeLifecycleTest,
   wpi::sim::StepTiming(100_ms);  // let teardown settle
   uint32_t countAfterTeardown = callbackCount.load();
   wpi::sim::StepTiming(100_ms);
-  CHECK((callbackCount.load()) == (countAfterTeardown));
+  CHECK(callbackCount.load() == countAfterTeardown);
 
   robot.EndCompetition();
   robotThread.join();
@@ -298,10 +298,10 @@ TEST_CASE_METHOD(OpModeLifecycleTest, "OpModeLifecycleTest InitialEnabledState",
 
   // Should construct, call disabledPeriodic once (since it's a new opmode),
   // then start and periodic
-  CHECK((counts.constructed.load()) == (1u));
-  CHECK((counts.disabledPeriodic.load()) == (1u));
-  CHECK((counts.start.load()) == (1u));
-  CHECK((counts.periodic.load()) == (1u));
+  CHECK(counts.constructed.load() == 1u);
+  CHECK(counts.disabledPeriodic.load() == 1u);
+  CHECK(counts.start.load() == 1u);
+  CHECK(counts.periodic.load() == 1u);
 
   robot.EndCompetition();
   robotThread.join();
@@ -329,28 +329,28 @@ TEST_CASE_METHOD(OpModeLifecycleTest,
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(40_ms);
 
-  CHECK((counts.constructed.load()) == (1u));
-  CHECK((counts.start.load()) == (1u));
+  CHECK(counts.constructed.load() == 1u);
+  CHECK(counts.start.load() == 1u);
 
   // 2. Disable
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(40_ms);
 
-  CHECK((counts.end.load()) == (1u));
-  CHECK((counts.destructed.load()) == (1u));
-  CHECK((counts.constructed.load()) == (2u));
-  CHECK((counts.disabledPeriodic.load()) >= (1u));
-  CHECK((counts.start.load()) == (1u));
+  CHECK(counts.end.load() == 1u);
+  CHECK(counts.destructed.load() == 1u);
+  CHECK(counts.constructed.load() == 2u);
+  CHECK(counts.disabledPeriodic.load() >= 1u);
+  CHECK(counts.start.load() == 1u);
 
   // 3. Re-enable
   wpi::sim::DriverStationSim::SetEnabled(true);
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(40_ms);
 
-  CHECK((counts.constructed.load()) == (2u));
-  CHECK((counts.start.load()) == (2u));
-  CHECK((counts.end.load()) == (1u));
+  CHECK(counts.constructed.load() == 2u);
+  CHECK(counts.start.load() == 2u);
+  CHECK(counts.end.load() == 1u);
 
   robot.EndCompetition();
   robotThread.join();
@@ -376,15 +376,15 @@ TEST_CASE_METHOD(OpModeLifecycleTest, "OpModeLifecycleTest DeselectOpMode",
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);
 
-  CHECK((counts.constructed.load()) == (1u));
+  CHECK(counts.constructed.load() == 1u);
 
   // Deselect opmode
   wpi::sim::DriverStationSim::SetOpMode(0);
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);
 
-  CHECK((counts.destructed.load()) == (1u));
-  CHECK((counts.constructed.load()) == (1u));
+  CHECK(counts.destructed.load() == 1u);
+  CHECK(counts.constructed.load() == 1u);
 
   robot.EndCompetition();
   robotThread.join();
@@ -410,17 +410,17 @@ TEST_CASE_METHOD(OpModeLifecycleTest, "OpModeLifecycleTest DsDisconnect",
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(40_ms);
 
-  CHECK((counts.constructed.load()) == (1u));
-  CHECK((counts.start.load()) == (1u));
+  CHECK(counts.constructed.load() == 1u);
+  CHECK(counts.start.load() == 1u);
 
   // DS Disconnect
   wpi::sim::DriverStationSim::SetDsAttached(false);
   // wpi::sim::DriverStationSim::NotifyNewData(); // DON'T DO THIS
   wpi::sim::StepTiming(40_ms);
 
-  CHECK((counts.end.load()) == (1u));
-  CHECK((counts.destructed.load()) == (1u));
-  CHECK((counts.constructed.load()) == (1u));
+  CHECK(counts.end.load() == 1u);
+  CHECK(counts.destructed.load() == 1u);
+  CHECK(counts.constructed.load() == 1u);
 
   robot.EndCompetition();
   robotThread.join();

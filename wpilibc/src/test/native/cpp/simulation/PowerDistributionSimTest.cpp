@@ -45,8 +45,8 @@ TEST_CASE("PowerDistributionSimTest SetTemperature", "[wpilibc][simulation]") {
   auto cb = sim.RegisterTemperatureCallback(callback.GetCallback(), false);
 
   sim.SetTemperature(35.04);
-  CHECK((35.04) == (sim.GetTemperature()));
-  CHECK((35.04) == (pdp.GetTemperature()));
+  CHECK(35.04 == sim.GetTemperature());
+  CHECK(35.04 == pdp.GetTemperature());
   CHECK(callback.WasTriggered());
   CHECK(callback.GetLastValue());
 }
@@ -60,8 +60,8 @@ TEST_CASE("PowerDistributionSimTest SetVoltage", "[wpilibc][simulation]") {
   auto cb = sim.RegisterVoltageCallback(callback.GetCallback(), false);
 
   sim.SetVoltage(35.04);
-  CHECK((35.04) == (sim.GetVoltage()));
-  CHECK((35.04) == (pdp.GetVoltage()));
+  CHECK(35.04 == sim.GetVoltage());
+  CHECK(35.04 == pdp.GetVoltage());
   CHECK(callback.WasTriggered());
   CHECK(callback.GetLastValue());
 }
@@ -78,8 +78,8 @@ TEST_CASE("PowerDistributionSimTest SetCurrent", "[wpilibc][simulation]") {
 
     const double kTestCurrent = 35.04 + channel;
     sim.SetCurrent(channel, kTestCurrent);
-    CHECK((kTestCurrent) == (sim.GetCurrent(channel)));
-    CHECK((kTestCurrent) == (pdp.GetCurrent(channel)));
+    CHECK(kTestCurrent == sim.GetCurrent(channel));
+    CHECK(kTestCurrent == pdp.GetCurrent(channel));
     CHECK(callback.WasTriggered());
     CHECK(callback.GetLastValue());
   }
@@ -102,7 +102,7 @@ TEST_CASE("PowerDistributionSimTest GetAllCurrents", "[wpilibc][simulation]") {
   // verify
   for (int channel = 0; channel < pdp.GetNumChannels(); ++channel) {
     const double kTestCurrent = 24 - channel;
-    CHECK((kTestCurrent) == (currents[channel]));
+    CHECK(kTestCurrent == currents[channel]);
   }
 }
 

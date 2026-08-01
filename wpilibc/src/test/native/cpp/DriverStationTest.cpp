@@ -31,10 +31,10 @@ class StderrCapture {
   StderrCapture() {
     std::fflush(stderr);
     m_file = std::tmpfile();
-    REQUIRE((m_file) != (nullptr));
+    REQUIRE(m_file != nullptr);
     m_originalStderr = Dup(Fileno(stderr));
-    REQUIRE((m_originalStderr) >= (0));
-    REQUIRE((Dup2(Fileno(m_file), Fileno(stderr))) >= (0));
+    REQUIRE(m_originalStderr >= 0);
+    REQUIRE(Dup2(Fileno(m_file), Fileno(stderr)) >= 0);
   }
 
   StderrCapture(const StderrCapture&) = delete;
@@ -53,7 +53,7 @@ class StderrCapture {
 
   std::string Stop() {
     std::fflush(stderr);
-    REQUIRE((Dup2(m_originalStderr, Fileno(stderr))) >= (0));
+    REQUIRE(Dup2(m_originalStderr, Fileno(stderr)) >= 0);
     Close(m_originalStderr);
     m_originalStderr = -1;
 
@@ -157,8 +157,8 @@ TEST_CASE("DriverStation joystick connected", "[wpilibc][driverstation]") {
   wpi::sim::DriverStationSim::SetJoystickPOVsMaximumIndex(1, povs);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  REQUIRE((expected) ==
-          (wpi::internal::DriverStationBackend::IsJoystickConnected(1)));
+  REQUIRE(expected ==
+          wpi::internal::DriverStationBackend::IsJoystickConnected(1));
 }
 
 TEST_CASE("DriverStation joystick connection alerts",
@@ -182,10 +182,10 @@ TEST_CASE("DriverStation joystick connection alerts",
   joystick.GetHID().GetRawButton(1);
 
   wpi::sim::StepTiming(1_s);
-  CHECK((wpi::internal::DriverStationBackend::
-             IsJoystickConnectionAlertSilenced()) == (expectedSilenced));
-  CHECK((IsJoystickDisconnectedAlertActive(0)) == (expectedAlert));
-  CHECK((capture.Stop()) == (""));
+  CHECK(wpi::internal::DriverStationBackend::
+            IsJoystickConnectionAlertSilenced() == expectedSilenced);
+  CHECK(IsJoystickDisconnectedAlertActive(0) == expectedAlert);
+  CHECK(capture.Stop() == "");
 
   ResetJoystickAlerts();
 }
@@ -223,7 +223,7 @@ TEST_CASE("DriverStation joystick resource alerts",
       "Joystick touchpad finger 1 on touchpad 0 on port 0 not available",
       wpi::util::Alert::Level::MEDIUM));
   CHECK_FALSE(IsJoystickDisconnectedAlertActive(0));
-  CHECK((capture.Stop()) == (""));
+  CHECK(capture.Stop() == "");
 
   ResetJoystickAlerts();
 }
@@ -247,18 +247,18 @@ TEST_CASE(
     StderrCapture capture;
 
     CHECK_FALSE(wpi::internal::DriverStationBackend::GetStickButton(0, 2));
-    CHECK((capture.Stop()) == (""));
+    CHECK(capture.Stop() == "");
 
     auto alerts = wpi::sim::AlertSim::GetAll();
-    REQUIRE((alerts.size()) == (1u));
-    CHECK((alerts[0].group) == ("DriverStation"));
-    CHECK((alerts[0].id) == ("joystick0AxisUnavailable"));
-    CHECK((alerts[0].text) == ("collision"));
-    CHECK((alerts[0].level) == (wpi::util::Alert::Level::MEDIUM));
+    REQUIRE(alerts.size() == 1u);
+    CHECK(alerts[0].group == "DriverStation");
+    CHECK(alerts[0].id == "joystick0AxisUnavailable");
+    CHECK(alerts[0].text == "collision");
+    CHECK(alerts[0].level == wpi::util::Alert::Level::MEDIUM);
     CHECK_FALSE(alerts[0].isActive());
 
-    CHECK((wpi::internal::DriverStationBackend::GetStickAxis(0, 1)) == (0.0));
-    CHECK((wpi::sim::AlertSim::GetAll().size()) == (1u));
+    CHECK(wpi::internal::DriverStationBackend::GetStickAxis(0, 1) == 0.0);
+    CHECK(wpi::sim::AlertSim::GetAll().size() == 1u);
   }
 
   CHECK_FALSE(wpi::internal::DriverStationBackend::GetStickButton(0, 2));

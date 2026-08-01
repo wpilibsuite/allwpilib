@@ -17,12 +17,12 @@ TEST_CASE("PWMMotorControllerSimTest TestMotor", "[wpilibc][simulation]") {
   wpi::sim::PWMMotorControllerSim sim{spark};
 
   spark.SetThrottle(0);
-  CHECK((0) == (sim.GetThrottle()));
+  CHECK(0 == sim.GetThrottle());
 
   spark.SetThrottle(0.354);
-  CHECK((0.354) == (sim.GetThrottle()));
+  CHECK(0.354 == sim.GetThrottle());
 
   spark.SetThrottle(-0.785);
-  CHECK((-0.785) == (sim.GetThrottle()));
+  CHECK(-0.785 == sim.GetThrottle());
 }
 }  // namespace wpi::sim

@@ -42,10 +42,10 @@ TEST_CASE("DutyCycleSimTest SetFrequency", "[wpilibc][simulation]") {
   auto cb = sim.RegisterFrequencyCallback(callback.GetCallback(), false);
 
   sim.SetFrequency(191_Hz);
-  CHECK((191_Hz) == (sim.GetFrequency()));
-  CHECK((191_Hz) == (dc.GetFrequency()));
+  CHECK(191_Hz == sim.GetFrequency());
+  CHECK(191_Hz == dc.GetFrequency());
   CHECK(callback.WasTriggered());
-  CHECK((191) == (callback.GetLastValue()));
+  CHECK(191 == callback.GetLastValue());
 }
 
 TEST_CASE("DutyCycleSimTest SetOutput", "[wpilibc][simulation]") {
@@ -58,10 +58,10 @@ TEST_CASE("DutyCycleSimTest SetOutput", "[wpilibc][simulation]") {
   auto cb = sim.RegisterOutputCallback(callback.GetCallback(), false);
 
   sim.SetOutput(229.174);
-  CHECK((229.174) == (sim.GetOutput()));
-  CHECK((229.174) == (dc.GetOutput()));
+  CHECK(229.174 == sim.GetOutput());
+  CHECK(229.174 == dc.GetOutput());
   CHECK(callback.WasTriggered());
-  CHECK((229.174) == (callback.GetLastValue()));
+  CHECK(229.174 == callback.GetLastValue());
 }
 
 }  // namespace wpi::sim

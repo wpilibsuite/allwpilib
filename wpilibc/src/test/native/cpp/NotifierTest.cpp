@@ -37,11 +37,11 @@ TEST_CASE_METHOD(NotifierTest, "NotifierTest StartPeriodicAndStop",
   sim::StepTiming(10.5_s);
 
   notifier.Stop();
-  CHECK((10u) == (counter));
+  CHECK(10u == counter);
 
   sim::StepTiming(3_s);
 
-  CHECK((10u) == (counter));
+  CHECK(10u == counter);
 }
 
 TEST_CASE_METHOD(NotifierTest, "NotifierTest StartSingle", "[wpilibc]") {
@@ -52,5 +52,5 @@ TEST_CASE_METHOD(NotifierTest, "NotifierTest StartSingle", "[wpilibc]") {
 
   sim::StepTiming(10.5_s);
 
-  CHECK((1u) == (counter));
+  CHECK(1u == counter);
 }

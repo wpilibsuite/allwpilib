@@ -96,7 +96,7 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest AddOpMode", "[wpilibc]") {
   MyMockRobot robot;
 
   auto options = wpi::sim::DriverStationSim::GetOpModeOptions();
-  REQUIRE((options.size()) == (4u));
+  REQUIRE(options.size() == 4u);
   int indexes[4] = {-1, -1, -1, -1};
   for (size_t i = 0; i < options.size(); ++i) {
     auto name = wpi::util::to_string_view(&options[i].name);
@@ -112,34 +112,32 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest AddOpMode", "[wpilibc]") {
   }
 
   int i = indexes[0];
-  REQUIRE((i) != (-1));
-  CHECK((wpi::util::to_string_view(&options[i].group)) == ("Group"));
-  CHECK((wpi::util::to_string_view(&options[i].description)) ==
-        ("Description"));
-  CHECK((options[i].textColor) == (0xffffff));
-  CHECK((options[i].backgroundColor) == (0x000000));
+  REQUIRE(i != -1);
+  CHECK(wpi::util::to_string_view(&options[i].group) == "Group");
+  CHECK(wpi::util::to_string_view(&options[i].description) == "Description");
+  CHECK(options[i].textColor == 0xffffff);
+  CHECK(options[i].backgroundColor == 0x000000);
 
   i = indexes[1];
-  REQUIRE((i) != (-1));
-  CHECK((wpi::util::to_string_view(&options[i].group)) == ("Group"));
-  CHECK((wpi::util::to_string_view(&options[i].description)) ==
-        ("Description"));
-  CHECK((options[i].textColor) == (0xffffff));
-  CHECK((options[i].backgroundColor) == (0x000000));
+  REQUIRE(i != -1);
+  CHECK(wpi::util::to_string_view(&options[i].group) == "Group");
+  CHECK(wpi::util::to_string_view(&options[i].description) == "Description");
+  CHECK(options[i].textColor == 0xffffff);
+  CHECK(options[i].backgroundColor == 0x000000);
 
   i = indexes[2];
-  REQUIRE((i) != (-1));
-  CHECK((wpi::util::to_string_view(&options[i].group)) == (""));
-  CHECK((wpi::util::to_string_view(&options[i].description)) == (""));
-  CHECK((options[i].textColor) == (-1));
-  CHECK((options[i].backgroundColor) == (-1));
+  REQUIRE(i != -1);
+  CHECK(wpi::util::to_string_view(&options[i].group) == "");
+  CHECK(wpi::util::to_string_view(&options[i].description) == "");
+  CHECK(options[i].textColor == -1);
+  CHECK(options[i].backgroundColor == -1);
 
   i = indexes[3];
-  REQUIRE((i) != (-1));
-  CHECK((wpi::util::to_string_view(&options[i].group)) == (""));
-  CHECK((wpi::util::to_string_view(&options[i].description)) == (""));
-  CHECK((options[i].textColor) == (-1));
-  CHECK((options[i].backgroundColor) == (-1));
+  REQUIRE(i != -1);
+  CHECK(wpi::util::to_string_view(&options[i].group) == "");
+  CHECK(wpi::util::to_string_view(&options[i].description) == "");
+  CHECK(options[i].textColor == -1);
+  CHECK(options[i].backgroundColor == -1);
 }
 
 TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest ClearOpModes", "[wpilibc]") {
@@ -170,8 +168,8 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest RemoveOpMode", "[wpilibc]") {
   robot.RemoveOpMode(wpi::RobotMode::TELEOPERATED, "NoArgOpMode");
   robot.PublishOpModes();
   auto options = wpi::sim::DriverStationSim::GetOpModeOptions();
-  REQUIRE((options.size()) == (1u));
-  CHECK((wpi::util::to_string_view(&options[0].name)) == ("OneArgOpMode"));
+  REQUIRE(options.size() == 1u);
+  CHECK(wpi::util::to_string_view(&options[0].name) == "OneArgOpMode");
 }
 
 TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest NonePeriodic", "[wpilibc]") {
@@ -189,7 +187,7 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest NonePeriodic", "[wpilibc]") {
 
   // Time step to get periodic calls on 20 ms robot loop
   wpi::sim::StepTiming(110_ms);
-  CHECK((robot.m_nonePeriodicCount.load()) == (5u));
+  CHECK(robot.m_nonePeriodicCount.load() == 5u);
 
   robot.EndCompetition();
   robotThread.join();
@@ -209,15 +207,15 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest RobotPeriodic",
   wpi::sim::WaitForProgramStart();
 
   // RobotPeriodic should be called regardless of state
-  CHECK((robot.m_robotPeriodicCount.load()) == (0u));
+  CHECK(robot.m_robotPeriodicCount.load() == 0u);
 
   // Step timing to allow callbacks to execute
   wpi::sim::StepTiming(kPeriod);
-  CHECK((robot.m_robotPeriodicCount.load()) == (1u));
+  CHECK(robot.m_robotPeriodicCount.load() == 1u);
 
   // Additional time steps should continue calling RobotPeriodic
   wpi::sim::StepTiming(kPeriod);
-  CHECK((robot.m_robotPeriodicCount.load()) == (2u));
+  CHECK(robot.m_robotPeriodicCount.load() == 2u);
 
   robot.EndCompetition();
   robotThread.join();

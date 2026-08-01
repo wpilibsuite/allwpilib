@@ -46,9 +46,9 @@ TEST_CASE("EncoderSimTest Rate", "[wpilibc][simulation]") {
   DoubleCallback callback;
   auto cb = sim.RegisterRateCallback(callback.GetCallback(), false);
   sim.SetRate(1.91);
-  CHECK((1.91) == (sim.GetRate()));
+  CHECK(1.91 == sim.GetRate());
   CHECK(callback.WasTriggered());
-  CHECK((1.91) == (callback.GetLastValue()));
+  CHECK(1.91 == callback.GetLastValue());
 }
 
 TEST_CASE("EncoderSimTest ResetDataClearsRateCallbacks",
@@ -82,11 +82,11 @@ TEST_CASE("EncoderSimTest Count", "[wpilibc][simulation]") {
   IntCallback callback;
   auto cb = sim.RegisterCountCallback(callback.GetCallback(), false);
   sim.SetCount(3504);
-  CHECK((3504) == (sim.GetCount()));
+  CHECK(3504 == sim.GetCount());
 
   CHECK(callback.WasTriggered());
-  CHECK((3504) == (encoder.Get()));
-  CHECK((3504) == (callback.GetLastValue()));
+  CHECK(3504 == encoder.Get());
+  CHECK(3504 == callback.GetLastValue());
 }
 
 TEST_CASE("EncoderSimTest Distance", "[wpilibc][simulation]") {
@@ -99,8 +99,8 @@ TEST_CASE("EncoderSimTest Distance", "[wpilibc][simulation]") {
   encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
 
   sim.SetDistance(229.174);
-  CHECK((229.174) == (sim.GetDistance()));
-  CHECK((229.174) == (encoder.GetDistance()));
+  CHECK(229.174 == sim.GetDistance());
+  CHECK(229.174 == encoder.GetDistance());
 }
 
 TEST_CASE("EncoderSimTest SetDirection", "[wpilibc][simulation]") {
@@ -162,10 +162,10 @@ TEST_CASE("EncoderSimTest SetDistancePerPulse", "[wpilibc][simulation]") {
   auto cb = sim.RegisterDistancePerPulseCallback(callback.GetCallback(), false);
 
   sim.SetDistancePerPulse(.03405);
-  CHECK((.03405) == (sim.GetDistancePerPulse()));
-  CHECK((.03405) == (encoder.GetDistancePerPulse()));
+  CHECK(.03405 == sim.GetDistancePerPulse());
+  CHECK(.03405 == encoder.GetDistancePerPulse());
   CHECK(callback.WasTriggered());
-  CHECK((.03405) == (callback.GetLastValue()));
+  CHECK(.03405 == callback.GetLastValue());
 }
 
 TEST_CASE("EncoderSimTest Reset", "[wpilibc][simulation]") {
@@ -189,10 +189,10 @@ TEST_CASE("EncoderSimTest Reset", "[wpilibc][simulation]") {
   CHECK(callback.WasTriggered());
   CHECK(callback.GetLastValue());
 
-  CHECK((0) == (sim.GetCount()));
-  CHECK((0) == (encoder.Get()));
-  CHECK((0) == (sim.GetDistance()));
-  CHECK((0) == (encoder.GetDistance()));
+  CHECK(0 == sim.GetCount());
+  CHECK(0 == encoder.Get());
+  CHECK(0 == sim.GetDistance());
+  CHECK(0 == encoder.GetDistance());
   CHECK(sim.GetDirection());
   CHECK(encoder.GetDirection());
 }

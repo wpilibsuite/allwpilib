@@ -50,11 +50,11 @@ TEST_CASE_METHOD(DSGamepadChooserTest,
   DSGamepadChooser::GamepadSelectable& selectable =
       chooser.AddOptions("Auto", {"Left", "Center", "Right"});
 
-  CHECK((std::string_view{"Left"}) == (selectable.GetSelected()));
-  CHECK((std::string_view{"Left"}) == (chooser.GetSelected("Auto")));
-  CHECK((0) == (chooser.GetSelectedIndex("Auto")));
+  CHECK(std::string_view{"Left"} == selectable.GetSelected());
+  CHECK(std::string_view{"Left"} == chooser.GetSelected("Auto"));
+  CHECK(0 == chooser.GetSelectedIndex("Auto"));
   CHECK(std::vector<std::string>{"Auto"} == chooser.GetSelectableNames());
-  CHECK((&selectable) == (chooser.GetSelectedSelectable()));
+  CHECK(&selectable == chooser.GetSelectedSelectable());
 }
 
 TEST_CASE_METHOD(DSGamepadChooserTest,
@@ -65,10 +65,10 @@ TEST_CASE_METHOD(DSGamepadChooserTest,
   DSGamepadChooser::GamepadSelectable& selectable =
       chooser.AddIntegerOptions("Delay", -2, 3, 2);
 
-  CHECK(((std::vector<std::string>{"-2", "0", "2", "3"})) ==
-        (selectable.GetOptions()));
-  CHECK((std::string_view{"-2"}) == (selectable.GetSelected()));
-  CHECK((-2) == (chooser.GetSelectedInteger("Delay")));
+  CHECK(std::vector<std::string>{"-2", "0", "2", "3"} ==
+        selectable.GetOptions());
+  CHECK(std::string_view{"-2"} == selectable.GetSelected());
+  CHECK(-2 == chooser.GetSelectedInteger("Delay"));
 }
 
 TEST_CASE_METHOD(DSGamepadChooserTest,
@@ -79,10 +79,10 @@ TEST_CASE_METHOD(DSGamepadChooserTest,
   DSGamepadChooser::GamepadSelectable& selectable =
       chooser.AddDoubleOptions("Speed", 0.0, 1.0, 0.3);
 
-  CHECK(((std::vector<std::string>{"0.0", "0.3", "0.6", "0.9", "1.0"})) ==
-        (selectable.GetOptions()));
-  CHECK((std::string_view{"0.0"}) == (selectable.GetSelected()));
-  CHECK((0.0) == (chooser.GetSelectedDouble("Speed")));
+  CHECK(std::vector<std::string>{"0.0", "0.3", "0.6", "0.9", "1.0"} ==
+        selectable.GetOptions());
+  CHECK(std::string_view{"0.0"} == selectable.GetSelected());
+  CHECK(0.0 == chooser.GetSelectedDouble("Speed"));
 }
 
 TEST_CASE_METHOD(DSGamepadChooserTest,
@@ -97,30 +97,28 @@ TEST_CASE_METHOD(DSGamepadChooserTest,
       chooser.AddIntegerOptions("Delay", 0, 2, 1);
 
   Tap(sim, chooser, Gamepad::Button::DPAD_RIGHT);
-  CHECK((std::string_view{"Center"}) == (autoSelectable.GetSelected()));
-  CHECK((std::string_view{"0"}) == (delay.GetSelected()));
-  CHECK((std::string_view{"Auto"}) ==
-        (chooser.GetSelectedSelectable()->GetName()));
+  CHECK(std::string_view{"Center"} == autoSelectable.GetSelected());
+  CHECK(std::string_view{"0"} == delay.GetSelected());
+  CHECK(std::string_view{"Auto"} == chooser.GetSelectedSelectable()->GetName());
 
   Tap(sim, chooser, Gamepad::Button::DPAD_DOWN);
-  CHECK((std::string_view{"Delay"}) ==
-        (chooser.GetSelectedSelectable()->GetName()));
+  CHECK(std::string_view{"Delay"} ==
+        chooser.GetSelectedSelectable()->GetName());
 
   Tap(sim, chooser, Gamepad::Button::DPAD_RIGHT);
-  CHECK((std::string_view{"1"}) == (delay.GetSelected()));
-  CHECK((std::string_view{"Center"}) == (autoSelectable.GetSelected()));
+  CHECK(std::string_view{"1"} == delay.GetSelected());
+  CHECK(std::string_view{"Center"} == autoSelectable.GetSelected());
 
   Tap(sim, chooser, Gamepad::Button::DPAD_LEFT);
   Tap(sim, chooser, Gamepad::Button::DPAD_LEFT);
-  CHECK((std::string_view{"2"}) == (delay.GetSelected()));
+  CHECK(std::string_view{"2"} == delay.GetSelected());
 
   Tap(sim, chooser, Gamepad::Button::DPAD_UP);
-  CHECK((std::string_view{"Auto"}) ==
-        (chooser.GetSelectedSelectable()->GetName()));
+  CHECK(std::string_view{"Auto"} == chooser.GetSelectedSelectable()->GetName());
 
   Tap(sim, chooser, Gamepad::Button::DPAD_LEFT);
   Tap(sim, chooser, Gamepad::Button::DPAD_LEFT);
-  CHECK((std::string_view{"Right"}) == (autoSelectable.GetSelected()));
+  CHECK(std::string_view{"Right"} == autoSelectable.GetSelected());
 }
 
 TEST_CASE_METHOD(DSGamepadChooserTest,

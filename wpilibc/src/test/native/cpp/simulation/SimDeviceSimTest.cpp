@@ -24,7 +24,7 @@ TEST_CASE("SimDeviceSimTest Basic", "[wpilibc][simulation]") {
   simBool.Set(true);
   CHECK(devBool.Get());
 
-  CHECK((sim.GetName()) == ("test"));
+  CHECK(sim.GetName() == "test");
 }
 
 TEST_CASE("SimDeviceSimTest EnumerateDevices", "[wpilibc][simulation]") {

@@ -23,12 +23,12 @@ TEST_CASE("Mechanism2dTest Canvas", "[wpilibc][smartdashboard]") {
       "/SmartDashboard/mechanism/backgroundColor");
   wpi::SmartDashboard::PutData("mechanism", &mechanism);
   wpi::SmartDashboard::UpdateValues();
-  CHECK((5.0) == (dimsEntry.GetDoubleArray({})[0]));
-  CHECK((10.0) == (dimsEntry.GetDoubleArray({})[1]));
-  CHECK(("#000020") == (colorEntry.GetString("")));
+  CHECK(5.0 == dimsEntry.GetDoubleArray({})[0]);
+  CHECK(10.0 == dimsEntry.GetDoubleArray({})[1]);
+  CHECK("#000020" == colorEntry.GetString(""));
   mechanism.SetBackgroundColor({255, 255, 255});
   wpi::SmartDashboard::UpdateValues();
-  CHECK(("#FFFFFF") == (colorEntry.GetString("")));
+  CHECK("#FFFFFF" == colorEntry.GetString(""));
 }
 
 TEST_CASE("Mechanism2dTest Root", "[wpilibc][smartdashboard]") {
@@ -40,12 +40,12 @@ TEST_CASE("Mechanism2dTest Root", "[wpilibc][smartdashboard]") {
   wpi::MechanismRoot2d* root = mechanism.GetRoot("root", 1, 2);
   wpi::SmartDashboard::PutData("mechanism", &mechanism);
   wpi::SmartDashboard::UpdateValues();
-  CHECK((1.0) == (xEntry.GetDouble(0.0)));
-  CHECK((2.0) == (yEntry.GetDouble(0.0)));
+  CHECK(1.0 == xEntry.GetDouble(0.0));
+  CHECK(2.0 == yEntry.GetDouble(0.0));
   root->SetPosition(2, 4);
   wpi::SmartDashboard::UpdateValues();
-  CHECK((2.0) == (xEntry.GetDouble(0.0)));
-  CHECK((4.0) == (yEntry.GetDouble(0.0)));
+  CHECK(2.0 == xEntry.GetDouble(0.0));
+  CHECK(4.0 == yEntry.GetDouble(0.0));
 }
 
 TEST_CASE("Mechanism2dTest Ligament", "[wpilibc][smartdashboard]") {

@@ -40,15 +40,15 @@ TEST_CASE("AddressableLEDSimTest SetStart", "[wpilibc][simulation]") {
 
   auto cb = sim.RegisterStartCallback(callback.GetCallback(), false);
 
-  CHECK((0) == (sim.GetStart()));  // Defaults to 0
+  CHECK(0 == sim.GetStart());  // Defaults to 0
 
   std::array<AddressableLED::LEDData, 50> ledData;
   led.SetStart(1);
   led.SetData(ledData);
 
-  CHECK((1) == (sim.GetStart()));
+  CHECK(1 == sim.GetStart());
   CHECK(callback.WasTriggered());
-  CHECK((1) == (callback.GetLastValue()));
+  CHECK(1 == callback.GetLastValue());
 }
 
 TEST_CASE("AddressableLEDSimTest SetLength", "[wpilibc][simulation]") {
@@ -60,15 +60,15 @@ TEST_CASE("AddressableLEDSimTest SetLength", "[wpilibc][simulation]") {
 
   auto cb = sim.RegisterLengthCallback(callback.GetCallback(), false);
 
-  CHECK((0) == (sim.GetLength()));  // Defaults to 0 leds
+  CHECK(0 == sim.GetLength());  // Defaults to 0 leds
 
   std::array<AddressableLED::LEDData, 50> ledData;
   led.SetLength(ledData.max_size());
   led.SetData(ledData);
 
-  CHECK((50) == (sim.GetLength()));
+  CHECK(50 == sim.GetLength());
   CHECK(callback.WasTriggered());
-  CHECK((50) == (callback.GetLastValue()));
+  CHECK(50 == callback.GetLastValue());
 }
 
 TEST_CASE("AddressableLEDSimTest SetData", "[wpilibc][simulation]") {
@@ -79,18 +79,18 @@ TEST_CASE("AddressableLEDSimTest SetData", "[wpilibc][simulation]") {
   std::array<AddressableLED::LEDData, 3> setData;
   auto cb = sim.RegisterDataCallback(
       [&](std::string_view, const unsigned char* buffer, unsigned int count) {
-        REQUIRE((count) == (9u));
-        CHECK((255u) == (buffer[0]));
-        CHECK((0) == (buffer[1]));
-        CHECK((0) == (buffer[2]));
+        REQUIRE(count == 9u);
+        CHECK(255u == buffer[0]);
+        CHECK(0 == buffer[1]);
+        CHECK(0 == buffer[2]);
 
-        CHECK((0) == (buffer[3]));
-        CHECK((255u) == (buffer[4]));
-        CHECK((0) == (buffer[5]));
+        CHECK(0 == buffer[3]);
+        CHECK(255u == buffer[4]);
+        CHECK(0 == buffer[5]);
 
-        CHECK((0) == (buffer[6]));
-        CHECK((0) == (buffer[7]));
-        CHECK((255u) == (buffer[8]));
+        CHECK(0 == buffer[6]);
+        CHECK(0 == buffer[7]);
+        CHECK(255u == buffer[8]);
 
         callbackHit = true;
       },
@@ -109,17 +109,17 @@ TEST_CASE("AddressableLEDSimTest SetData", "[wpilibc][simulation]") {
   std::array<HAL_AddressableLEDData, 3> simData;
   sim.GetData(simData.data());
 
-  CHECK((0xFF) == (simData[0].r));
-  CHECK((0x00) == (simData[0].g));
-  CHECK((0x00) == (simData[0].b));
+  CHECK(0xFF == simData[0].r);
+  CHECK(0x00 == simData[0].g);
+  CHECK(0x00 == simData[0].b);
 
-  CHECK((0x00) == (simData[1].r));
-  CHECK((0xFF) == (simData[1].g));
-  CHECK((0x00) == (simData[1].b));
+  CHECK(0x00 == simData[1].r);
+  CHECK(0xFF == simData[1].g);
+  CHECK(0x00 == simData[1].b);
 
-  CHECK((0x00) == (simData[2].r));
-  CHECK((0x00) == (simData[2].g));
-  CHECK((0xFF) == (simData[2].b));
+  CHECK(0x00 == simData[2].r);
+  CHECK(0x00 == simData[2].g);
+  CHECK(0xFF == simData[2].b);
 }
 
 }  // namespace wpi::sim

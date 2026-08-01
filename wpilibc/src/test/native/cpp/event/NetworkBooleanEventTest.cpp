@@ -37,11 +37,11 @@ TEST_CASE_METHOD(NetworkBooleanEventTest, "NetworkBooleanEventTest Set",
   });
   pub.Set(false);
   loop.Poll();
-  CHECK((0) == (counter));
+  CHECK(0 == counter);
   pub.Set(true);
   loop.Poll();
-  CHECK((1) == (counter));
+  CHECK(1 == counter);
   pub.Set(false);
   loop.Poll();
-  CHECK((1) == (counter));
+  CHECK(1 == counter);
 }

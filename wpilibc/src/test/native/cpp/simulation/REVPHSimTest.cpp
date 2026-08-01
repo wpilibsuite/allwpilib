@@ -51,8 +51,8 @@ TEST_CASE("REVPHSimTest SolenoidOutput", "[wpilibc][simulation]") {
   CHECK(callback4.GetLastValue());
   CHECK_FALSE(sim.GetSolenoidOutput(3));
   CHECK(sim.GetSolenoidOutput(4));
-  CHECK((0b00010000) == (ph.GetSolenoids()));
-  CHECK((0b00010000) == (sim.GetAllSolenoidOutputs()));
+  CHECK(0b00010000 == ph.GetSolenoids());
+  CHECK(0b00010000 == sim.GetAllSolenoidOutputs());
 
   callback3.Reset();
   callback4.Reset();
@@ -63,8 +63,8 @@ TEST_CASE("REVPHSimTest SolenoidOutput", "[wpilibc][simulation]") {
   CHECK_FALSE(callback4.GetLastValue());
   CHECK(sim.GetSolenoidOutput(3));
   CHECK_FALSE(sim.GetSolenoidOutput(4));
-  CHECK((0b00001000) == (ph.GetSolenoids()));
-  CHECK((0b00001000) == (sim.GetAllSolenoidOutputs()));
+  CHECK(0b00001000 == ph.GetSolenoids());
+  CHECK(0b00001000 == sim.GetAllSolenoidOutputs());
 
   callback3.Reset();
   callback4.Reset();
@@ -75,8 +75,8 @@ TEST_CASE("REVPHSimTest SolenoidOutput", "[wpilibc][simulation]") {
   CHECK_FALSE(callback4.GetLastValue());
   CHECK_FALSE(sim.GetSolenoidOutput(3));
   CHECK_FALSE(sim.GetSolenoidOutput(4));
-  CHECK((0b00000000) == (ph.GetSolenoids()));
-  CHECK((0b00000000) == (sim.GetAllSolenoidOutputs()));
+  CHECK(0b00000000 == ph.GetSolenoids());
+  CHECK(0b00000000 == sim.GetAllSolenoidOutputs());
 }
 
 TEST_CASE("REVPHSimTest SetCompressorOn", "[wpilibc][simulation]") {
@@ -106,15 +106,15 @@ TEST_CASE("REVPHSimTest SetEnableDigital", "[wpilibc][simulation]") {
       sim.RegisterCompressorConfigTypeCallback(callback.GetCallback(), false);
 
   ph.DisableCompressor();
-  CHECK((ph.GetCompressorConfigType()) == (CompressorConfigType::DISABLED));
+  CHECK(ph.GetCompressorConfigType() == CompressorConfigType::DISABLED);
 
   ph.EnableCompressorDigital();
-  CHECK((sim.GetCompressorConfigType()) ==
-        (static_cast<int>(CompressorConfigType::DIGITAL)));
-  CHECK((ph.GetCompressorConfigType()) == (CompressorConfigType::DIGITAL));
+  CHECK(sim.GetCompressorConfigType() ==
+        static_cast<int>(CompressorConfigType::DIGITAL));
+  CHECK(ph.GetCompressorConfigType() == CompressorConfigType::DIGITAL);
   CHECK(callback.WasTriggered());
-  CHECK((callback.GetLastValue()) ==
-        (static_cast<int>(CompressorConfigType::DIGITAL)));
+  CHECK(callback.GetLastValue() ==
+        static_cast<int>(CompressorConfigType::DIGITAL));
 }
 
 TEST_CASE("REVPHSimTest SetEnableAnalog", "[wpilibc][simulation]") {
@@ -127,15 +127,15 @@ TEST_CASE("REVPHSimTest SetEnableAnalog", "[wpilibc][simulation]") {
       sim.RegisterCompressorConfigTypeCallback(callback.GetCallback(), false);
 
   ph.DisableCompressor();
-  CHECK((ph.GetCompressorConfigType()) == (CompressorConfigType::DISABLED));
+  CHECK(ph.GetCompressorConfigType() == CompressorConfigType::DISABLED);
 
   ph.EnableCompressorAnalog(1_psi, 2_psi);
-  CHECK((sim.GetCompressorConfigType()) ==
-        (static_cast<int>(CompressorConfigType::ANALOG)));
-  CHECK((ph.GetCompressorConfigType()) == (CompressorConfigType::ANALOG));
+  CHECK(sim.GetCompressorConfigType() ==
+        static_cast<int>(CompressorConfigType::ANALOG));
+  CHECK(ph.GetCompressorConfigType() == CompressorConfigType::ANALOG);
   CHECK(callback.WasTriggered());
-  CHECK((callback.GetLastValue()) ==
-        (static_cast<int>(CompressorConfigType::ANALOG)));
+  CHECK(callback.GetLastValue() ==
+        static_cast<int>(CompressorConfigType::ANALOG));
 }
 
 TEST_CASE("REVPHSimTest SetEnableHybrid", "[wpilibc][simulation]") {
@@ -148,15 +148,15 @@ TEST_CASE("REVPHSimTest SetEnableHybrid", "[wpilibc][simulation]") {
       sim.RegisterCompressorConfigTypeCallback(callback.GetCallback(), false);
 
   ph.DisableCompressor();
-  CHECK((ph.GetCompressorConfigType()) == (CompressorConfigType::DISABLED));
+  CHECK(ph.GetCompressorConfigType() == CompressorConfigType::DISABLED);
 
   ph.EnableCompressorHybrid(1_psi, 2_psi);
-  CHECK((sim.GetCompressorConfigType()) ==
-        (static_cast<int>(CompressorConfigType::HYBRID)));
-  CHECK((ph.GetCompressorConfigType()) == (CompressorConfigType::HYBRID));
+  CHECK(sim.GetCompressorConfigType() ==
+        static_cast<int>(CompressorConfigType::HYBRID));
+  CHECK(ph.GetCompressorConfigType() == CompressorConfigType::HYBRID);
   CHECK(callback.WasTriggered());
-  CHECK((callback.GetLastValue()) ==
-        (static_cast<int>(CompressorConfigType::HYBRID)));
+  CHECK(callback.GetLastValue() ==
+        static_cast<int>(CompressorConfigType::HYBRID));
 }
 
 TEST_CASE("REVPHSimTest SetPressureSwitchEnabled", "[wpilibc][simulation]") {
@@ -186,9 +186,9 @@ TEST_CASE("REVPHSimTest SetCompressorCurrent", "[wpilibc][simulation]") {
       sim.RegisterCompressorCurrentCallback(callback.GetCallback(), false);
 
   sim.SetCompressorCurrent(35.04);
-  CHECK((35.04) == (sim.GetCompressorCurrent()));
-  CHECK((35.04_A) == (ph.GetCompressorCurrent()));
+  CHECK(35.04 == sim.GetCompressorCurrent());
+  CHECK(35.04_A == ph.GetCompressorCurrent());
   CHECK(callback.WasTriggered());
-  CHECK((35.04) == (callback.GetLastValue()));
+  CHECK(35.04 == callback.GetLastValue());
 }
 }  // namespace wpi::sim

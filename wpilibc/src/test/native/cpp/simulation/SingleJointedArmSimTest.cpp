@@ -31,6 +31,6 @@ TEST_CASE("SingleJointedArmTest InitialState", "[wpilibc][simulation]") {
                                     3_kg_sq_m, 30_in, 0_deg, 90_deg, true,
                                     startingAngle);
 
-  CHECK((startingAngle) == (sim.GetAngle()));
+  CHECK(startingAngle == sim.GetAngle());
   CHECK_THAT(0, Catch::Matchers::WithinULP(sim.GetVelocity().value(), 4));
 }

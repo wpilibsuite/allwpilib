@@ -413,9 +413,9 @@ TEST_CASE("LEDPatternTest LEDDataSetHSVExactRgbValues", "[wpilibc]") {
     AddressableLED::LEDData data;
     data.SetHSV(test.h, test.s, test.v);
 
-    CHECK((test.r) == (data.r & 0xFF));
-    CHECK((test.g) == (data.g & 0xFF));
-    CHECK((test.b) == (data.b & 0xFF));
+    CHECK(test.r == (data.r & 0xFF));
+    CHECK(test.g == (data.g & 0xFF));
+    CHECK(test.b == (data.b & 0xFF));
   }
 }
 
@@ -437,9 +437,9 @@ TEST_CASE("LEDPatternTest RainbowFullSizeExactRgbValues", "[wpilibc]") {
 
   for (const auto& test : kCases) {
     UNSCOPED_INFO("LED " << test.index);
-    CHECK((test.r) == (buffer[test.index].r & 0xFF));
-    CHECK((test.g) == (buffer[test.index].g & 0xFF));
-    CHECK((test.b) == (buffer[test.index].b & 0xFF));
+    CHECK(test.r == (buffer[test.index].r & 0xFF));
+    CHECK(test.g == (buffer[test.index].g & 0xFF));
+    CHECK(test.b == (buffer[test.index].b & 0xFF));
   }
 }
 
@@ -1132,9 +1132,9 @@ void AssertIndexColor(std::span<AddressableLED::LEDData> data, int index,
                       wpi::util::Color color) {
   wpi::util::Color8Bit color8bit{color};
 
-  CHECK((color8bit.red) == (data[index].r & 0xFF));
-  CHECK((color8bit.green) == (data[index].g & 0xFF));
-  CHECK((color8bit.blue) == (data[index].b & 0xFF));
+  CHECK(color8bit.red == (data[index].r & 0xFF));
+  CHECK(color8bit.green == (data[index].g & 0xFF));
+  CHECK(color8bit.blue == (data[index].b & 0xFF));
 }
 
 wpi::util::Color LerpColors(wpi::util::Color a, wpi::util::Color b, double t) {

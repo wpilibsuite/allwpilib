@@ -28,7 +28,7 @@ TEST_CASE("AnalogPotentiometerTest InitializeWithAnalogInput", "[wpilibc]") {
   AnalogInputSim sim{ai};
 
   sim.SetVoltage(2.8);
-  CHECK((2.8 / 3.3) == (pot.Get()));
+  CHECK(2.8 / 3.3 == pot.Get());
 }
 
 TEST_CASE("AnalogPotentiometerTest InitializeWithAnalogInputAndScale",
@@ -41,13 +41,13 @@ TEST_CASE("AnalogPotentiometerTest InitializeWithAnalogInputAndScale",
   AnalogInputSim sim{ai};
 
   sim.SetVoltage(3.3);
-  CHECK((270.0) == (pot.Get()));
+  CHECK(270.0 == pot.Get());
 
   sim.SetVoltage(2.5);
-  CHECK(((2.5 / 3.3) * 270.0) == (pot.Get()));
+  CHECK(2.5 / 3.3 * 270.0 == pot.Get());
 
   sim.SetVoltage(0.0);
-  CHECK((0.0) == (pot.Get()));
+  CHECK(0.0 == pot.Get());
 }
 
 TEST_CASE("AnalogPotentiometerTest InitializeWithChannel", "[wpilibc]") {
@@ -58,7 +58,7 @@ TEST_CASE("AnalogPotentiometerTest InitializeWithChannel", "[wpilibc]") {
   AnalogInputSim sim{1};
 
   sim.SetVoltage(3.3);
-  CHECK((1.0) == (pot.Get()));
+  CHECK(1.0 == pot.Get());
 }
 
 TEST_CASE("AnalogPotentiometerTest InitializeWithChannelAndScale",
@@ -70,10 +70,10 @@ TEST_CASE("AnalogPotentiometerTest InitializeWithChannelAndScale",
   AnalogInputSim sim{1};
 
   sim.SetVoltage(3.3);
-  CHECK((180.0) == (pot.Get()));
+  CHECK(180.0 == pot.Get());
 
   sim.SetVoltage(0.0);
-  CHECK((0.0) == (pot.Get()));
+  CHECK(0.0 == pot.Get());
 }
 
 TEST_CASE("AnalogPotentiometerTest WithModifiedBatteryVoltage", "[wpilibc]") {
@@ -85,21 +85,21 @@ TEST_CASE("AnalogPotentiometerTest WithModifiedBatteryVoltage", "[wpilibc]") {
 
   // Test at 3.3v
   sim.SetVoltage(3.3);
-  CHECK((270) == (pot.Get()));
+  CHECK(270 == pot.Get());
 
   sim.SetVoltage(0.0);
-  CHECK((90) == (pot.Get()));
+  CHECK(90 == pot.Get());
 
   // Simulate a lower battery voltage
   RoboRioSim::SetUserVoltage3V3(wpi::units::volt_t{2.5});
 
   sim.SetVoltage(2.5);
-  CHECK((270.0) == (pot.Get()));
+  CHECK(270.0 == pot.Get());
 
   sim.SetVoltage(2.0);
-  CHECK((234.0) == (pot.Get()));
+  CHECK(234.0 == pot.Get());
 
   sim.SetVoltage(0.0);
-  CHECK((90.0) == (pot.Get()));
+  CHECK(90.0 == pot.Get());
 }
 }  // namespace wpi

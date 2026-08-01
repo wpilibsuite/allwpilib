@@ -48,7 +48,7 @@ TEST_CASE("AnalogInputSimTest SetVoltage", "[wpilibc][simulation]") {
     // 0 -> 0 isn't a change, so callback not called
     if (i > 2) {
       CHECK(callback.WasTriggered());
-      CHECK((0) == (callback.GetLastValue()));
+      CHECK(0 == callback.GetLastValue());
     }
 
     callback.Reset();
@@ -59,7 +59,7 @@ TEST_CASE("AnalogInputSimTest SetVoltage", "[wpilibc][simulation]") {
     // 0 -> 0 isn't a change, so callback not called
     if (i != 0) {
       CHECK(callback.WasTriggered());
-      CHECK((voltage) == (callback.GetLastValue()));
+      CHECK(voltage == callback.GetLastValue());
     }
   }
 }

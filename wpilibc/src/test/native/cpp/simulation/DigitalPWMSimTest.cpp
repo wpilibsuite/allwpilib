@@ -35,9 +35,9 @@ TEST_CASE("DigitalPWMSimTest Initialize", "[wpilibc][simulation]") {
   CHECK(initializeCallback.WasTriggered());
   CHECK(initializeCallback.GetLastValue());
 
-  CHECK((kTestDutyCycle) == (sim.GetDutyCycle()));
+  CHECK(kTestDutyCycle == sim.GetDutyCycle());
   CHECK(dutyCycleCallback.WasTriggered());
-  CHECK((kTestDutyCycle) == (dutyCycleCallback.GetLastValue()));
+  CHECK(kTestDutyCycle == dutyCycleCallback.GetLastValue());
 }
 
 TEST_CASE("DigitalPWMSimTest SetPin", "[wpilibc][simulation]") {
@@ -50,9 +50,9 @@ TEST_CASE("DigitalPWMSimTest SetPin", "[wpilibc][simulation]") {
   auto cb = sim.RegisterPinCallback(callback.GetCallback(), false);
 
   sim.SetPin(191);
-  CHECK((191) == (sim.GetPin()));
+  CHECK(191 == sim.GetPin());
   CHECK(callback.WasTriggered());
-  CHECK((191) == (callback.GetLastValue()));
+  CHECK(191 == callback.GetLastValue());
 }
 
 }  // namespace wpi::sim

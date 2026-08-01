@@ -39,10 +39,10 @@ TEST_CASE("PWMSimTest SetPulseTime", "[wpilibc][simulation]") {
   auto cb = sim.RegisterPulseMicrosecondCallback(callback.GetCallback(), false);
   PWM pwm{0};
   sim.SetPulseMicrosecond(2290);
-  CHECK((2290) == (sim.GetPulseMicrosecond()));
-  CHECK((2290) == (std::lround(pwm.GetPulseTime().value())));
+  CHECK(2290 == sim.GetPulseMicrosecond());
+  CHECK(2290 == std::lround(pwm.GetPulseTime().value()));
   CHECK(callback.WasTriggered());
-  CHECK((2290) == (callback.GetLastValue()));
+  CHECK(2290 == callback.GetLastValue());
 }
 
 TEST_CASE("PWMSimTest SetOutputPeriod", "[wpilibc][simulation]") {
@@ -57,9 +57,9 @@ TEST_CASE("PWMSimTest SetOutputPeriod", "[wpilibc][simulation]") {
   auto cb = sim.RegisterOutputPeriodCallback(callback.GetCallback(), false);
   PWM pwm{0};
   sim.SetOutputPeriod(3504);
-  CHECK((3504) == (sim.GetOutputPeriod()));
+  CHECK(3504 == sim.GetOutputPeriod());
   CHECK(callback.WasTriggered());
-  CHECK((3504) == (callback.GetLastValue()));
+  CHECK(3504 == callback.GetLastValue());
 }
 
 }  // namespace wpi::sim

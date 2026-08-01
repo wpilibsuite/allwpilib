@@ -94,19 +94,19 @@ TEST_CASE("DifferentialDrivetrainSimTest Current", "[wpilibc][simulation]") {
   for (int i = 0; i < 10; ++i) {
     sim.Update(20_ms);
   }
-  CHECK((sim.GetCurrentDraw()) > (0_A));
+  CHECK(sim.GetCurrentDraw() > 0_A);
 
   sim.SetInputs(12_V, 12_V);
   for (int i = 0; i < 20; ++i) {
     sim.Update(20_ms);
   }
-  CHECK((sim.GetCurrentDraw()) > (0_A));
+  CHECK(sim.GetCurrentDraw() > 0_A);
 
   sim.SetInputs(-12_V, 12_V);
   for (int i = 0; i < 30; ++i) {
     sim.Update(20_ms);
   }
-  CHECK((sim.GetCurrentDraw()) > (0_A));
+  CHECK(sim.GetCurrentDraw() > 0_A);
 }
 
 TEST_CASE("DifferentialDrivetrainSimTest ModelStability",
@@ -125,5 +125,5 @@ TEST_CASE("DifferentialDrivetrainSimTest ModelStability",
     sim.Update(20_ms);
   }
 
-  CHECK((wpi::units::math::abs(sim.GetPose().Translation().Norm())) < (100_m));
+  CHECK(wpi::units::math::abs(sim.GetPose().Translation().Norm()) < 100_m);
 }

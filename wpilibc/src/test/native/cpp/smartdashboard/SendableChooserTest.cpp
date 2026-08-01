@@ -30,7 +30,7 @@ TEST_CASE("SendableChooserTest returns selected", "[wpilibc][smartdashboard]") {
   wpi::SmartDashboard::UpdateValues();
   chooserSim.SetSelected(std::to_string(selected));
   wpi::SmartDashboard::UpdateValues();
-  CHECK((selected) == (chooser.GetSelected()));
+  CHECK(selected == chooser.GetSelected());
 }
 
 TEST_CASE("SendableChooserTest default is returned on no select",
@@ -44,7 +44,7 @@ TEST_CASE("SendableChooserTest default is returned on no select",
   // Use 4 here rather than 0 to make sure it's not default-init int.
   chooser.SetDefaultOption("4", 4);
 
-  CHECK((4) == (chooser.GetSelected()));
+  CHECK(4 == chooser.GetSelected());
 }
 
 TEST_CASE(
@@ -57,7 +57,7 @@ TEST_CASE(
     chooser.AddOption(std::to_string(i), i);
   }
 
-  CHECK((0) == (chooser.GetSelected()));
+  CHECK(0 == chooser.GetSelected());
 }
 
 TEST_CASE("SendableChooserTest change listener", "[wpilibc][smartdashboard]") {
@@ -76,5 +76,5 @@ TEST_CASE("SendableChooserTest change listener", "[wpilibc][smartdashboard]") {
   chooserSim.SetSelected("3");
   wpi::SmartDashboard::UpdateValues();
 
-  CHECK((3) == (currentVal));
+  CHECK(3 == currentVal);
 }

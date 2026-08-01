@@ -69,27 +69,27 @@ TEST_CASE_METHOD(TimesliceRobotTest, "TimesliceRobotTest Schedule",
   // robotPeriodic()).
   wpi::sim::StepTiming(5_ms);
 
-  CHECK((0u) == (robot.m_robotPeriodicCount));
-  CHECK((0u) == (callbackCount1));
-  CHECK((0u) == (callbackCount2));
+  CHECK(0u == robot.m_robotPeriodicCount);
+  CHECK(0u == callbackCount1);
+  CHECK(0u == callbackCount2);
 
   // Step to 1.5 ms
   wpi::sim::StepTiming(1.5_ms);
-  CHECK((0u) == (robot.m_robotPeriodicCount));
-  CHECK((0u) == (callbackCount1));
-  CHECK((0u) == (callbackCount2));
+  CHECK(0u == robot.m_robotPeriodicCount);
+  CHECK(0u == callbackCount1);
+  CHECK(0u == callbackCount2);
 
   // Step to 2.25 ms
   wpi::sim::StepTiming(0.75_ms);
-  CHECK((0u) == (robot.m_robotPeriodicCount));
-  CHECK((1u) == (callbackCount1));
-  CHECK((0u) == (callbackCount2));
+  CHECK(0u == robot.m_robotPeriodicCount);
+  CHECK(1u == callbackCount1);
+  CHECK(0u == callbackCount2);
 
   // Step to 2.75 ms
   wpi::sim::StepTiming(0.5_ms);
-  CHECK((0u) == (robot.m_robotPeriodicCount));
-  CHECK((1u) == (callbackCount1));
-  CHECK((1u) == (callbackCount2));
+  CHECK(0u == robot.m_robotPeriodicCount);
+  CHECK(1u == callbackCount1);
+  CHECK(1u == callbackCount2);
 
   robot.EndCompetition();
   robotThread.join();

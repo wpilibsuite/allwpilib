@@ -14,19 +14,19 @@ using namespace wpi;
 TEST_CASE("OnboardIMUTest SimDevices", "[wpilibc]") {
   OnboardIMU imu{OnboardIMU::FLAT};
 
-  CHECK((0.0) == (imu.GetAngleX().value()));
-  CHECK((0.0) == (imu.GetAngleY().value()));
-  CHECK((0.0) == (imu.GetAngleZ().value()));
+  CHECK(0.0 == imu.GetAngleX().value());
+  CHECK(0.0 == imu.GetAngleY().value());
+  CHECK(0.0 == imu.GetAngleZ().value());
 
-  CHECK((0.0) == (imu.GetGyroRateX().value()));
-  CHECK((0.0) == (imu.GetGyroRateY().value()));
-  CHECK((0.0) == (imu.GetGyroRateZ().value()));
+  CHECK(0.0 == imu.GetGyroRateX().value());
+  CHECK(0.0 == imu.GetGyroRateY().value());
+  CHECK(0.0 == imu.GetGyroRateZ().value());
 
-  CHECK((0.0) == (imu.GetAccelX().value()));
-  CHECK((0.0) == (imu.GetAccelY().value()));
-  CHECK((0.0) == (imu.GetAccelZ().value()));
+  CHECK(0.0 == imu.GetAccelX().value());
+  CHECK(0.0 == imu.GetAccelY().value());
+  CHECK(0.0 == imu.GetAccelZ().value());
 
-  CHECK((0.0) == (imu.GetYaw().value()));
+  CHECK(0.0 == imu.GetYaw().value());
 
   sim::OnboardIMUSim sim{};
 
@@ -44,17 +44,17 @@ TEST_CASE("OnboardIMUTest SimDevices", "[wpilibc]") {
 
   sim.SetYaw(wpi::units::radian_t{1.234});
 
-  CHECK((1.0) == (imu.GetAngleX().value()));
-  CHECK((2.0) == (imu.GetAngleY().value()));
-  CHECK((3.0) == (imu.GetAngleZ().value()));
+  CHECK(1.0 == imu.GetAngleX().value());
+  CHECK(2.0 == imu.GetAngleY().value());
+  CHECK(3.0 == imu.GetAngleZ().value());
 
-  CHECK((3.504) == (imu.GetGyroRateX().value()));
-  CHECK((1.91) == (imu.GetGyroRateY().value()));
-  CHECK((22.9) == (imu.GetGyroRateZ().value()));
+  CHECK(3.504 == imu.GetGyroRateX().value());
+  CHECK(1.91 == imu.GetGyroRateY().value());
+  CHECK(22.9 == imu.GetGyroRateZ().value());
 
-  CHECK((-1.0) == (imu.GetAccelX().value()));
-  CHECK((-2.0) == (imu.GetAccelY().value()));
-  CHECK((-3.0) == (imu.GetAccelZ().value()));
+  CHECK(-1.0 == imu.GetAccelX().value());
+  CHECK(-2.0 == imu.GetAccelY().value());
+  CHECK(-3.0 == imu.GetAccelZ().value());
 
-  CHECK((1.234) == (imu.GetYaw().value()));
+  CHECK(1.234 == imu.GetYaw().value());
 }

@@ -51,8 +51,8 @@ TEST_CASE("CTREPCMSimTest SolenoidOutput", "[wpilibc][simulation]") {
   CHECK(callback4.GetLastValue());
   CHECK_FALSE(sim.GetSolenoidOutput(3));
   CHECK(sim.GetSolenoidOutput(4));
-  CHECK((0b00010000) == (pcm.GetSolenoids()));
-  CHECK((0b00010000) == (sim.GetAllSolenoidOutputs()));
+  CHECK(0b00010000 == pcm.GetSolenoids());
+  CHECK(0b00010000 == sim.GetAllSolenoidOutputs());
 
   callback3.Reset();
   callback4.Reset();
@@ -63,8 +63,8 @@ TEST_CASE("CTREPCMSimTest SolenoidOutput", "[wpilibc][simulation]") {
   CHECK_FALSE(callback4.GetLastValue());
   CHECK(sim.GetSolenoidOutput(3));
   CHECK_FALSE(sim.GetSolenoidOutput(4));
-  CHECK((0b00001000) == (pcm.GetSolenoids()));
-  CHECK((0b00001000) == (sim.GetAllSolenoidOutputs()));
+  CHECK(0b00001000 == pcm.GetSolenoids());
+  CHECK(0b00001000 == sim.GetAllSolenoidOutputs());
 
   callback3.Reset();
   callback4.Reset();
@@ -75,8 +75,8 @@ TEST_CASE("CTREPCMSimTest SolenoidOutput", "[wpilibc][simulation]") {
   CHECK_FALSE(callback4.GetLastValue());
   CHECK_FALSE(sim.GetSolenoidOutput(3));
   CHECK_FALSE(sim.GetSolenoidOutput(4));
-  CHECK((0b00000000) == (pcm.GetSolenoids()));
-  CHECK((0b00000000) == (sim.GetAllSolenoidOutputs()));
+  CHECK(0b00000000 == pcm.GetSolenoids());
+  CHECK(0b00000000 == sim.GetAllSolenoidOutputs());
 }
 
 TEST_CASE("CTREPCMSimTest SetCompressorOn", "[wpilibc][simulation]") {
@@ -106,11 +106,11 @@ TEST_CASE("CTREPCMSimTest SetEnableDigital", "[wpilibc][simulation]") {
       sim.RegisterClosedLoopEnabledCallback(callback.GetCallback(), false);
 
   pcm.DisableCompressor();
-  CHECK((pcm.GetCompressorConfigType()) == (CompressorConfigType::DISABLED));
+  CHECK(pcm.GetCompressorConfigType() == CompressorConfigType::DISABLED);
 
   pcm.EnableCompressorDigital();
   CHECK(sim.GetClosedLoopEnabled());
-  CHECK((pcm.GetCompressorConfigType()) == (CompressorConfigType::DIGITAL));
+  CHECK(pcm.GetCompressorConfigType() == CompressorConfigType::DIGITAL);
   CHECK(callback.WasTriggered());
   CHECK(callback.GetLastValue());
 }
@@ -142,9 +142,9 @@ TEST_CASE("CTREPCMSimTest SetCompressorCurrent", "[wpilibc][simulation]") {
       sim.RegisterCompressorCurrentCallback(callback.GetCallback(), false);
 
   sim.SetCompressorCurrent(35.04);
-  CHECK((35.04) == (sim.GetCompressorCurrent()));
-  CHECK((35.04_A) == (pcm.GetCompressorCurrent()));
+  CHECK(35.04 == sim.GetCompressorCurrent());
+  CHECK(35.04_A == pcm.GetCompressorCurrent());
   CHECK(callback.WasTriggered());
-  CHECK((35.04) == (callback.GetLastValue()));
+  CHECK(35.04 == callback.GetLastValue());
 }
 }  // namespace wpi::sim

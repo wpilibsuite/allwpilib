@@ -15,11 +15,11 @@ TEST_CASE("SharpIRTest SimDevices", "[wpilibc]") {
   SharpIR s = SharpIR::GP2Y0A02YK0F(1);
   SharpIRSim sim(s);
 
-  CHECK((0.2) == (s.GetRange().value()));
+  CHECK(0.2 == s.GetRange().value());
 
   sim.SetRange(30_cm);
-  CHECK((0.3) == (s.GetRange().value()));
+  CHECK(0.3 == s.GetRange().value());
 
   sim.SetRange(300_cm);
-  CHECK((1.5) == (s.GetRange().value()));
+  CHECK(1.5 == s.GetRange().value());
 }

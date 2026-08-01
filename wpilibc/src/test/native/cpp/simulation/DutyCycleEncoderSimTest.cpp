@@ -20,7 +20,7 @@ TEST_CASE("DutyCycleEncoderSimTest Set", "[wpilibc][simulation]") {
 
   constexpr double kTestValue{5.67};
   sim.Set(kTestValue);
-  CHECK((kTestValue) == (enc.Get()));
+  CHECK(kTestValue == enc.Get());
 }
 
 TEST_CASE("DutyCycleEncoderSimTest SetIsConnected", "[wpilibc][simulation]") {

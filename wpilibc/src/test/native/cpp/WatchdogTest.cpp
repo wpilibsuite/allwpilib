@@ -34,7 +34,7 @@ TEST_CASE_METHOD(WatchdogTest, "WatchdogTest EnableDisable", "[wpilibc]") {
   watchdog.Disable();
 
   UNSCOPED_INFO("Watchdog triggered early");
-  CHECK((0u) == (watchdogCounter));
+  CHECK(0u == watchdogCounter);
 
   // Run 2
   watchdogCounter = 0;
@@ -43,7 +43,7 @@ TEST_CASE_METHOD(WatchdogTest, "WatchdogTest EnableDisable", "[wpilibc]") {
   watchdog.Disable();
 
   UNSCOPED_INFO("Watchdog either didn't trigger or triggered more than once");
-  CHECK((1u) == (watchdogCounter));
+  CHECK(1u == watchdogCounter);
 
   // Run 3
   watchdogCounter = 0;
@@ -52,7 +52,7 @@ TEST_CASE_METHOD(WatchdogTest, "WatchdogTest EnableDisable", "[wpilibc]") {
   watchdog.Disable();
 
   UNSCOPED_INFO("Watchdog either didn't trigger or triggered more than once");
-  CHECK((1u) == (watchdogCounter));
+  CHECK(1u == watchdogCounter);
 }
 
 TEST_CASE_METHOD(WatchdogTest, "WatchdogTest Reset", "[wpilibc]") {
@@ -67,7 +67,7 @@ TEST_CASE_METHOD(WatchdogTest, "WatchdogTest Reset", "[wpilibc]") {
   watchdog.Disable();
 
   UNSCOPED_INFO("Watchdog triggered early");
-  CHECK((0u) == (watchdogCounter));
+  CHECK(0u == watchdogCounter);
 }
 
 TEST_CASE_METHOD(WatchdogTest, "WatchdogTest SetTimeout", "[wpilibc]") {
@@ -79,15 +79,15 @@ TEST_CASE_METHOD(WatchdogTest, "WatchdogTest SetTimeout", "[wpilibc]") {
   wpi::sim::StepTiming(0.2_s);
   watchdog.SetTimeout(0.2_s);
 
-  CHECK((0.2_s) == (watchdog.GetTimeout()));
+  CHECK(0.2_s == watchdog.GetTimeout());
   UNSCOPED_INFO("Watchdog triggered early");
-  CHECK((0u) == (watchdogCounter));
+  CHECK(0u == watchdogCounter);
 
   wpi::sim::StepTiming(0.3_s);
   watchdog.Disable();
 
   UNSCOPED_INFO("Watchdog either didn't trigger or triggered more than once");
-  CHECK((1u) == (watchdogCounter));
+  CHECK(1u == watchdogCounter);
 }
 
 TEST_CASE_METHOD(WatchdogTest, "WatchdogTest IsExpired", "[wpilibc]") {
@@ -121,7 +121,7 @@ TEST_CASE_METHOD(WatchdogTest, "WatchdogTest Epochs", "[wpilibc]") {
   watchdog.Disable();
 
   UNSCOPED_INFO("Watchdog triggered early");
-  CHECK((0u) == (watchdogCounter));
+  CHECK(0u == watchdogCounter);
 
   // Run 2
   watchdog.Enable();
@@ -133,7 +133,7 @@ TEST_CASE_METHOD(WatchdogTest, "WatchdogTest Epochs", "[wpilibc]") {
   watchdog.Disable();
 
   UNSCOPED_INFO("Watchdog triggered early");
-  CHECK((0u) == (watchdogCounter));
+  CHECK(0u == watchdogCounter);
 }
 
 TEST_CASE_METHOD(WatchdogTest, "WatchdogTest MultiWatchdog", "[wpilibc]") {
@@ -146,9 +146,9 @@ TEST_CASE_METHOD(WatchdogTest, "WatchdogTest MultiWatchdog", "[wpilibc]") {
   watchdog2.Enable();
   wpi::sim::StepTiming(0.25_s);
   UNSCOPED_INFO("Watchdog triggered early");
-  CHECK((0u) == (watchdogCounter1));
+  CHECK(0u == watchdogCounter1);
   UNSCOPED_INFO("Watchdog triggered early");
-  CHECK((0u) == (watchdogCounter2));
+  CHECK(0u == watchdogCounter2);
 
   // Sleep enough such that only the watchdog enabled later times out first
   watchdog1.Enable();
@@ -157,7 +157,7 @@ TEST_CASE_METHOD(WatchdogTest, "WatchdogTest MultiWatchdog", "[wpilibc]") {
   watchdog2.Disable();
 
   UNSCOPED_INFO("Watchdog either didn't trigger or triggered more than once");
-  CHECK((1u) == (watchdogCounter1));
+  CHECK(1u == watchdogCounter1);
   UNSCOPED_INFO("Watchdog triggered early");
-  CHECK((0u) == (watchdogCounter2));
+  CHECK(0u == watchdogCounter2);
 }

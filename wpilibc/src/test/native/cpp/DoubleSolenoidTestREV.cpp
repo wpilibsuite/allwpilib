@@ -14,13 +14,13 @@ namespace wpi {
 TEST_CASE("DoubleSolenoidREVTest ValidInitialization", "[wpilibc]") {
   DoubleSolenoid solenoid{0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2, 3};
   solenoid.Set(DoubleSolenoid::REVERSE);
-  CHECK((DoubleSolenoid::REVERSE) == (solenoid.Get()));
+  CHECK(DoubleSolenoid::REVERSE == solenoid.Get());
 
   solenoid.Set(DoubleSolenoid::FORWARD);
-  CHECK((DoubleSolenoid::FORWARD) == (solenoid.Get()));
+  CHECK(DoubleSolenoid::FORWARD == solenoid.Get());
 
   solenoid.Set(DoubleSolenoid::OFF);
-  CHECK((DoubleSolenoid::OFF) == (solenoid.Get()));
+  CHECK(DoubleSolenoid::OFF == solenoid.Get());
 }
 
 TEST_CASE("DoubleSolenoidREVTest ThrowForwardPortAlreadyInitialized",
@@ -55,15 +55,15 @@ TEST_CASE("DoubleSolenoidREVTest Toggle", "[wpilibc]") {
   solenoid.Set(DoubleSolenoid::REVERSE);
 
   solenoid.Toggle();
-  CHECK((DoubleSolenoid::FORWARD) == (solenoid.Get()));
+  CHECK(DoubleSolenoid::FORWARD == solenoid.Get());
 
   solenoid.Toggle();
-  CHECK((DoubleSolenoid::REVERSE) == (solenoid.Get()));
+  CHECK(DoubleSolenoid::REVERSE == solenoid.Get());
 
   // Of shouldn't do anything on toggle
   solenoid.Set(DoubleSolenoid::OFF);
   solenoid.Toggle();
-  CHECK((DoubleSolenoid::OFF) == (solenoid.Get()));
+  CHECK(DoubleSolenoid::OFF == solenoid.Get());
 }
 
 TEST_CASE("DoubleSolenoidREVTest InvalidForwardPort", "[wpilibc]") {

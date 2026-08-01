@@ -48,5 +48,5 @@ TEST_CASE("StateSpaceSimTest FlywheelSim", "[wpilibc][simulation]") {
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }
 
-  REQUIRE((std::abs(200 - encoder.GetRate())) < (0.1));
+  REQUIRE(std::abs(200 - encoder.GetRate()) < 0.1);
 }

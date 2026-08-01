@@ -100,63 +100,63 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest DisabledMode", "[wpilibc]") {
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  CHECK((1u) == (robot.m_simulationInitCount));
-  CHECK((0u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_autonomousInitCount));
-  CHECK((0u) == (robot.m_teleopInitCount));
-  CHECK((0u) == (robot.m_utilityInitCount));
+  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(0u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_autonomousInitCount);
+  CHECK(0u == robot.m_teleopInitCount);
+  CHECK(0u == robot.m_utilityInitCount);
 
-  CHECK((0u) == (robot.m_robotPeriodicCount));
-  CHECK((0u) == (robot.m_simulationPeriodicCount));
-  CHECK((0u) == (robot.m_disabledPeriodicCount));
-  CHECK((0u) == (robot.m_autonomousPeriodicCount));
-  CHECK((0u) == (robot.m_teleopPeriodicCount));
-  CHECK((0u) == (robot.m_utilityPeriodicCount));
+  CHECK(0u == robot.m_robotPeriodicCount);
+  CHECK(0u == robot.m_simulationPeriodicCount);
+  CHECK(0u == robot.m_disabledPeriodicCount);
+  CHECK(0u == robot.m_autonomousPeriodicCount);
+  CHECK(0u == robot.m_teleopPeriodicCount);
+  CHECK(0u == robot.m_utilityPeriodicCount);
 
-  CHECK((0u) == (robot.m_disabledExitCount));
-  CHECK((0u) == (robot.m_autonomousExitCount));
-  CHECK((0u) == (robot.m_teleopExitCount));
-  CHECK((0u) == (robot.m_utilityExitCount));
-
-  wpi::sim::StepTiming(kPeriod);
-
-  CHECK((1u) == (robot.m_simulationInitCount));
-  CHECK((1u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_autonomousInitCount));
-  CHECK((0u) == (robot.m_teleopInitCount));
-  CHECK((0u) == (robot.m_utilityInitCount));
-
-  CHECK((1u) == (robot.m_robotPeriodicCount));
-  CHECK((1u) == (robot.m_simulationPeriodicCount));
-  CHECK((1u) == (robot.m_disabledPeriodicCount));
-  CHECK((0u) == (robot.m_autonomousPeriodicCount));
-  CHECK((0u) == (robot.m_teleopPeriodicCount));
-  CHECK((0u) == (robot.m_utilityPeriodicCount));
-
-  CHECK((0u) == (robot.m_disabledExitCount));
-  CHECK((0u) == (robot.m_autonomousExitCount));
-  CHECK((0u) == (robot.m_teleopExitCount));
-  CHECK((0u) == (robot.m_utilityExitCount));
+  CHECK(0u == robot.m_disabledExitCount);
+  CHECK(0u == robot.m_autonomousExitCount);
+  CHECK(0u == robot.m_teleopExitCount);
+  CHECK(0u == robot.m_utilityExitCount);
 
   wpi::sim::StepTiming(kPeriod);
 
-  CHECK((1u) == (robot.m_simulationInitCount));
-  CHECK((1u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_autonomousInitCount));
-  CHECK((0u) == (robot.m_teleopInitCount));
-  CHECK((0u) == (robot.m_utilityInitCount));
+  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(1u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_autonomousInitCount);
+  CHECK(0u == robot.m_teleopInitCount);
+  CHECK(0u == robot.m_utilityInitCount);
 
-  CHECK((2u) == (robot.m_robotPeriodicCount));
-  CHECK((2u) == (robot.m_simulationPeriodicCount));
-  CHECK((2u) == (robot.m_disabledPeriodicCount));
-  CHECK((0u) == (robot.m_autonomousPeriodicCount));
-  CHECK((0u) == (robot.m_teleopPeriodicCount));
-  CHECK((0u) == (robot.m_utilityPeriodicCount));
+  CHECK(1u == robot.m_robotPeriodicCount);
+  CHECK(1u == robot.m_simulationPeriodicCount);
+  CHECK(1u == robot.m_disabledPeriodicCount);
+  CHECK(0u == robot.m_autonomousPeriodicCount);
+  CHECK(0u == robot.m_teleopPeriodicCount);
+  CHECK(0u == robot.m_utilityPeriodicCount);
 
-  CHECK((0u) == (robot.m_disabledExitCount));
-  CHECK((0u) == (robot.m_autonomousExitCount));
-  CHECK((0u) == (robot.m_teleopExitCount));
-  CHECK((0u) == (robot.m_utilityExitCount));
+  CHECK(0u == robot.m_disabledExitCount);
+  CHECK(0u == robot.m_autonomousExitCount);
+  CHECK(0u == robot.m_teleopExitCount);
+  CHECK(0u == robot.m_utilityExitCount);
+
+  wpi::sim::StepTiming(kPeriod);
+
+  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(1u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_autonomousInitCount);
+  CHECK(0u == robot.m_teleopInitCount);
+  CHECK(0u == robot.m_utilityInitCount);
+
+  CHECK(2u == robot.m_robotPeriodicCount);
+  CHECK(2u == robot.m_simulationPeriodicCount);
+  CHECK(2u == robot.m_disabledPeriodicCount);
+  CHECK(0u == robot.m_autonomousPeriodicCount);
+  CHECK(0u == robot.m_teleopPeriodicCount);
+  CHECK(0u == robot.m_utilityPeriodicCount);
+
+  CHECK(0u == robot.m_disabledExitCount);
+  CHECK(0u == robot.m_autonomousExitCount);
+  CHECK(0u == robot.m_teleopExitCount);
+  CHECK(0u == robot.m_utilityExitCount);
 
   robot.EndCompetition();
   robotThread.join();
@@ -183,63 +183,63 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest AutonomousMode", "[wpilibc]") {
   wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::AUTONOMOUS);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  CHECK((1u) == (robot.m_simulationInitCount));
-  CHECK((0u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_autonomousInitCount));
-  CHECK((0u) == (robot.m_teleopInitCount));
-  CHECK((0u) == (robot.m_utilityInitCount));
+  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(0u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_autonomousInitCount);
+  CHECK(0u == robot.m_teleopInitCount);
+  CHECK(0u == robot.m_utilityInitCount);
 
-  CHECK((0u) == (robot.m_robotPeriodicCount));
-  CHECK((0u) == (robot.m_simulationPeriodicCount));
-  CHECK((0u) == (robot.m_disabledPeriodicCount));
-  CHECK((0u) == (robot.m_autonomousPeriodicCount));
-  CHECK((0u) == (robot.m_teleopPeriodicCount));
-  CHECK((0u) == (robot.m_utilityPeriodicCount));
+  CHECK(0u == robot.m_robotPeriodicCount);
+  CHECK(0u == robot.m_simulationPeriodicCount);
+  CHECK(0u == robot.m_disabledPeriodicCount);
+  CHECK(0u == robot.m_autonomousPeriodicCount);
+  CHECK(0u == robot.m_teleopPeriodicCount);
+  CHECK(0u == robot.m_utilityPeriodicCount);
 
-  CHECK((0u) == (robot.m_disabledExitCount));
-  CHECK((0u) == (robot.m_autonomousExitCount));
-  CHECK((0u) == (robot.m_teleopExitCount));
-  CHECK((0u) == (robot.m_utilityExitCount));
-
-  wpi::sim::StepTiming(kPeriod);
-
-  CHECK((1u) == (robot.m_simulationInitCount));
-  CHECK((0u) == (robot.m_disabledInitCount));
-  CHECK((1u) == (robot.m_autonomousInitCount));
-  CHECK((0u) == (robot.m_teleopInitCount));
-  CHECK((0u) == (robot.m_utilityInitCount));
-
-  CHECK((1u) == (robot.m_robotPeriodicCount));
-  CHECK((1u) == (robot.m_simulationPeriodicCount));
-  CHECK((0u) == (robot.m_disabledPeriodicCount));
-  CHECK((1u) == (robot.m_autonomousPeriodicCount));
-  CHECK((0u) == (robot.m_teleopPeriodicCount));
-  CHECK((0u) == (robot.m_utilityPeriodicCount));
-
-  CHECK((0u) == (robot.m_disabledExitCount));
-  CHECK((0u) == (robot.m_autonomousExitCount));
-  CHECK((0u) == (robot.m_teleopExitCount));
-  CHECK((0u) == (robot.m_utilityExitCount));
+  CHECK(0u == robot.m_disabledExitCount);
+  CHECK(0u == robot.m_autonomousExitCount);
+  CHECK(0u == robot.m_teleopExitCount);
+  CHECK(0u == robot.m_utilityExitCount);
 
   wpi::sim::StepTiming(kPeriod);
 
-  CHECK((1u) == (robot.m_simulationInitCount));
-  CHECK((0u) == (robot.m_disabledInitCount));
-  CHECK((1u) == (robot.m_autonomousInitCount));
-  CHECK((0u) == (robot.m_teleopInitCount));
-  CHECK((0u) == (robot.m_utilityInitCount));
+  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(0u == robot.m_disabledInitCount);
+  CHECK(1u == robot.m_autonomousInitCount);
+  CHECK(0u == robot.m_teleopInitCount);
+  CHECK(0u == robot.m_utilityInitCount);
 
-  CHECK((2u) == (robot.m_robotPeriodicCount));
-  CHECK((2u) == (robot.m_simulationPeriodicCount));
-  CHECK((0u) == (robot.m_disabledPeriodicCount));
-  CHECK((2u) == (robot.m_autonomousPeriodicCount));
-  CHECK((0u) == (robot.m_teleopPeriodicCount));
-  CHECK((0u) == (robot.m_utilityPeriodicCount));
+  CHECK(1u == robot.m_robotPeriodicCount);
+  CHECK(1u == robot.m_simulationPeriodicCount);
+  CHECK(0u == robot.m_disabledPeriodicCount);
+  CHECK(1u == robot.m_autonomousPeriodicCount);
+  CHECK(0u == robot.m_teleopPeriodicCount);
+  CHECK(0u == robot.m_utilityPeriodicCount);
 
-  CHECK((0u) == (robot.m_disabledExitCount));
-  CHECK((0u) == (robot.m_autonomousExitCount));
-  CHECK((0u) == (robot.m_teleopExitCount));
-  CHECK((0u) == (robot.m_utilityExitCount));
+  CHECK(0u == robot.m_disabledExitCount);
+  CHECK(0u == robot.m_autonomousExitCount);
+  CHECK(0u == robot.m_teleopExitCount);
+  CHECK(0u == robot.m_utilityExitCount);
+
+  wpi::sim::StepTiming(kPeriod);
+
+  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(0u == robot.m_disabledInitCount);
+  CHECK(1u == robot.m_autonomousInitCount);
+  CHECK(0u == robot.m_teleopInitCount);
+  CHECK(0u == robot.m_utilityInitCount);
+
+  CHECK(2u == robot.m_robotPeriodicCount);
+  CHECK(2u == robot.m_simulationPeriodicCount);
+  CHECK(0u == robot.m_disabledPeriodicCount);
+  CHECK(2u == robot.m_autonomousPeriodicCount);
+  CHECK(0u == robot.m_teleopPeriodicCount);
+  CHECK(0u == robot.m_utilityPeriodicCount);
+
+  CHECK(0u == robot.m_disabledExitCount);
+  CHECK(0u == robot.m_autonomousExitCount);
+  CHECK(0u == robot.m_teleopExitCount);
+  CHECK(0u == robot.m_utilityExitCount);
 
   robot.EndCompetition();
   robotThread.join();
@@ -255,63 +255,63 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest TeleopMode", "[wpilibc]") {
   wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::TELEOPERATED);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  CHECK((1u) == (robot.m_simulationInitCount));
-  CHECK((0u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_autonomousInitCount));
-  CHECK((0u) == (robot.m_teleopInitCount));
-  CHECK((0u) == (robot.m_utilityInitCount));
+  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(0u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_autonomousInitCount);
+  CHECK(0u == robot.m_teleopInitCount);
+  CHECK(0u == robot.m_utilityInitCount);
 
-  CHECK((0u) == (robot.m_robotPeriodicCount));
-  CHECK((0u) == (robot.m_simulationPeriodicCount));
-  CHECK((0u) == (robot.m_disabledPeriodicCount));
-  CHECK((0u) == (robot.m_autonomousPeriodicCount));
-  CHECK((0u) == (robot.m_teleopPeriodicCount));
-  CHECK((0u) == (robot.m_utilityPeriodicCount));
+  CHECK(0u == robot.m_robotPeriodicCount);
+  CHECK(0u == robot.m_simulationPeriodicCount);
+  CHECK(0u == robot.m_disabledPeriodicCount);
+  CHECK(0u == robot.m_autonomousPeriodicCount);
+  CHECK(0u == robot.m_teleopPeriodicCount);
+  CHECK(0u == robot.m_utilityPeriodicCount);
 
-  CHECK((0u) == (robot.m_disabledExitCount));
-  CHECK((0u) == (robot.m_autonomousExitCount));
-  CHECK((0u) == (robot.m_teleopExitCount));
-  CHECK((0u) == (robot.m_utilityExitCount));
-
-  wpi::sim::StepTiming(kPeriod);
-
-  CHECK((1u) == (robot.m_simulationInitCount));
-  CHECK((0u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_autonomousInitCount));
-  CHECK((1u) == (robot.m_teleopInitCount));
-  CHECK((0u) == (robot.m_utilityInitCount));
-
-  CHECK((1u) == (robot.m_robotPeriodicCount));
-  CHECK((1u) == (robot.m_simulationPeriodicCount));
-  CHECK((0u) == (robot.m_disabledPeriodicCount));
-  CHECK((0u) == (robot.m_autonomousPeriodicCount));
-  CHECK((1u) == (robot.m_teleopPeriodicCount));
-  CHECK((0u) == (robot.m_utilityPeriodicCount));
-
-  CHECK((0u) == (robot.m_disabledExitCount));
-  CHECK((0u) == (robot.m_autonomousExitCount));
-  CHECK((0u) == (robot.m_teleopExitCount));
-  CHECK((0u) == (robot.m_utilityExitCount));
+  CHECK(0u == robot.m_disabledExitCount);
+  CHECK(0u == robot.m_autonomousExitCount);
+  CHECK(0u == robot.m_teleopExitCount);
+  CHECK(0u == robot.m_utilityExitCount);
 
   wpi::sim::StepTiming(kPeriod);
 
-  CHECK((1u) == (robot.m_simulationInitCount));
-  CHECK((0u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_autonomousInitCount));
-  CHECK((1u) == (robot.m_teleopInitCount));
-  CHECK((0u) == (robot.m_utilityInitCount));
+  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(0u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_autonomousInitCount);
+  CHECK(1u == robot.m_teleopInitCount);
+  CHECK(0u == robot.m_utilityInitCount);
 
-  CHECK((2u) == (robot.m_robotPeriodicCount));
-  CHECK((2u) == (robot.m_simulationPeriodicCount));
-  CHECK((0u) == (robot.m_disabledPeriodicCount));
-  CHECK((0u) == (robot.m_autonomousPeriodicCount));
-  CHECK((2u) == (robot.m_teleopPeriodicCount));
-  CHECK((0u) == (robot.m_utilityPeriodicCount));
+  CHECK(1u == robot.m_robotPeriodicCount);
+  CHECK(1u == robot.m_simulationPeriodicCount);
+  CHECK(0u == robot.m_disabledPeriodicCount);
+  CHECK(0u == robot.m_autonomousPeriodicCount);
+  CHECK(1u == robot.m_teleopPeriodicCount);
+  CHECK(0u == robot.m_utilityPeriodicCount);
 
-  CHECK((0u) == (robot.m_disabledExitCount));
-  CHECK((0u) == (robot.m_autonomousExitCount));
-  CHECK((0u) == (robot.m_teleopExitCount));
-  CHECK((0u) == (robot.m_utilityExitCount));
+  CHECK(0u == robot.m_disabledExitCount);
+  CHECK(0u == robot.m_autonomousExitCount);
+  CHECK(0u == robot.m_teleopExitCount);
+  CHECK(0u == robot.m_utilityExitCount);
+
+  wpi::sim::StepTiming(kPeriod);
+
+  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(0u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_autonomousInitCount);
+  CHECK(1u == robot.m_teleopInitCount);
+  CHECK(0u == robot.m_utilityInitCount);
+
+  CHECK(2u == robot.m_robotPeriodicCount);
+  CHECK(2u == robot.m_simulationPeriodicCount);
+  CHECK(0u == robot.m_disabledPeriodicCount);
+  CHECK(0u == robot.m_autonomousPeriodicCount);
+  CHECK(2u == robot.m_teleopPeriodicCount);
+  CHECK(0u == robot.m_utilityPeriodicCount);
+
+  CHECK(0u == robot.m_disabledExitCount);
+  CHECK(0u == robot.m_autonomousExitCount);
+  CHECK(0u == robot.m_teleopExitCount);
+  CHECK(0u == robot.m_utilityExitCount);
 
   robot.EndCompetition();
   robotThread.join();
@@ -326,85 +326,85 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest UtilityMode", "[wpilibc]") {
   wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::UTILITY);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  CHECK((1u) == (robot.m_simulationInitCount));
-  CHECK((0u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_autonomousInitCount));
-  CHECK((0u) == (robot.m_teleopInitCount));
-  CHECK((0u) == (robot.m_utilityInitCount));
+  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(0u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_autonomousInitCount);
+  CHECK(0u == robot.m_teleopInitCount);
+  CHECK(0u == robot.m_utilityInitCount);
 
-  CHECK((0u) == (robot.m_robotPeriodicCount));
-  CHECK((0u) == (robot.m_simulationPeriodicCount));
-  CHECK((0u) == (robot.m_disabledPeriodicCount));
-  CHECK((0u) == (robot.m_autonomousPeriodicCount));
-  CHECK((0u) == (robot.m_teleopPeriodicCount));
-  CHECK((0u) == (robot.m_utilityPeriodicCount));
+  CHECK(0u == robot.m_robotPeriodicCount);
+  CHECK(0u == robot.m_simulationPeriodicCount);
+  CHECK(0u == robot.m_disabledPeriodicCount);
+  CHECK(0u == robot.m_autonomousPeriodicCount);
+  CHECK(0u == robot.m_teleopPeriodicCount);
+  CHECK(0u == robot.m_utilityPeriodicCount);
 
-  CHECK((0u) == (robot.m_disabledExitCount));
-  CHECK((0u) == (robot.m_autonomousExitCount));
-  CHECK((0u) == (robot.m_teleopExitCount));
-  CHECK((0u) == (robot.m_utilityExitCount));
-
-  wpi::sim::StepTiming(kPeriod);
-
-  CHECK((1u) == (robot.m_simulationInitCount));
-  CHECK((0u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_autonomousInitCount));
-  CHECK((0u) == (robot.m_teleopInitCount));
-  CHECK((1u) == (robot.m_utilityInitCount));
-
-  CHECK((1u) == (robot.m_robotPeriodicCount));
-  CHECK((1u) == (robot.m_simulationPeriodicCount));
-  CHECK((0u) == (robot.m_disabledPeriodicCount));
-  CHECK((0u) == (robot.m_autonomousPeriodicCount));
-  CHECK((0u) == (robot.m_teleopPeriodicCount));
-  CHECK((1u) == (robot.m_utilityPeriodicCount));
-
-  CHECK((0u) == (robot.m_disabledExitCount));
-  CHECK((0u) == (robot.m_autonomousExitCount));
-  CHECK((0u) == (robot.m_teleopExitCount));
-  CHECK((0u) == (robot.m_utilityExitCount));
+  CHECK(0u == robot.m_disabledExitCount);
+  CHECK(0u == robot.m_autonomousExitCount);
+  CHECK(0u == robot.m_teleopExitCount);
+  CHECK(0u == robot.m_utilityExitCount);
 
   wpi::sim::StepTiming(kPeriod);
 
-  CHECK((1u) == (robot.m_simulationInitCount));
-  CHECK((0u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_autonomousInitCount));
-  CHECK((0u) == (robot.m_teleopInitCount));
-  CHECK((1u) == (robot.m_utilityInitCount));
+  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(0u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_autonomousInitCount);
+  CHECK(0u == robot.m_teleopInitCount);
+  CHECK(1u == robot.m_utilityInitCount);
 
-  CHECK((2u) == (robot.m_robotPeriodicCount));
-  CHECK((2u) == (robot.m_simulationPeriodicCount));
-  CHECK((0u) == (robot.m_disabledPeriodicCount));
-  CHECK((0u) == (robot.m_autonomousPeriodicCount));
-  CHECK((0u) == (robot.m_teleopPeriodicCount));
-  CHECK((2u) == (robot.m_utilityPeriodicCount));
+  CHECK(1u == robot.m_robotPeriodicCount);
+  CHECK(1u == robot.m_simulationPeriodicCount);
+  CHECK(0u == robot.m_disabledPeriodicCount);
+  CHECK(0u == robot.m_autonomousPeriodicCount);
+  CHECK(0u == robot.m_teleopPeriodicCount);
+  CHECK(1u == robot.m_utilityPeriodicCount);
 
-  CHECK((0u) == (robot.m_disabledExitCount));
-  CHECK((0u) == (robot.m_autonomousExitCount));
-  CHECK((0u) == (robot.m_teleopExitCount));
-  CHECK((0u) == (robot.m_utilityExitCount));
+  CHECK(0u == robot.m_disabledExitCount);
+  CHECK(0u == robot.m_autonomousExitCount);
+  CHECK(0u == robot.m_teleopExitCount);
+  CHECK(0u == robot.m_utilityExitCount);
+
+  wpi::sim::StepTiming(kPeriod);
+
+  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(0u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_autonomousInitCount);
+  CHECK(0u == robot.m_teleopInitCount);
+  CHECK(1u == robot.m_utilityInitCount);
+
+  CHECK(2u == robot.m_robotPeriodicCount);
+  CHECK(2u == robot.m_simulationPeriodicCount);
+  CHECK(0u == robot.m_disabledPeriodicCount);
+  CHECK(0u == robot.m_autonomousPeriodicCount);
+  CHECK(0u == robot.m_teleopPeriodicCount);
+  CHECK(2u == robot.m_utilityPeriodicCount);
+
+  CHECK(0u == robot.m_disabledExitCount);
+  CHECK(0u == robot.m_autonomousExitCount);
+  CHECK(0u == robot.m_teleopExitCount);
+  CHECK(0u == robot.m_utilityExitCount);
 
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);  // Wait for Notifiers
 
-  CHECK((1u) == (robot.m_simulationInitCount));
-  CHECK((1u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_autonomousInitCount));
-  CHECK((0u) == (robot.m_teleopInitCount));
-  CHECK((1u) == (robot.m_utilityInitCount));
+  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(1u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_autonomousInitCount);
+  CHECK(0u == robot.m_teleopInitCount);
+  CHECK(1u == robot.m_utilityInitCount);
 
-  CHECK((3u) == (robot.m_robotPeriodicCount));
-  CHECK((3u) == (robot.m_simulationPeriodicCount));
-  CHECK((1u) == (robot.m_disabledPeriodicCount));
-  CHECK((0u) == (robot.m_autonomousPeriodicCount));
-  CHECK((0u) == (robot.m_teleopPeriodicCount));
-  CHECK((2u) == (robot.m_utilityPeriodicCount));
+  CHECK(3u == robot.m_robotPeriodicCount);
+  CHECK(3u == robot.m_simulationPeriodicCount);
+  CHECK(1u == robot.m_disabledPeriodicCount);
+  CHECK(0u == robot.m_autonomousPeriodicCount);
+  CHECK(0u == robot.m_teleopPeriodicCount);
+  CHECK(2u == robot.m_utilityPeriodicCount);
 
-  CHECK((0u) == (robot.m_disabledExitCount));
-  CHECK((0u) == (robot.m_autonomousExitCount));
-  CHECK((0u) == (robot.m_teleopExitCount));
-  CHECK((1u) == (robot.m_utilityExitCount));
+  CHECK(0u == robot.m_disabledExitCount);
+  CHECK(0u == robot.m_autonomousExitCount);
+  CHECK(0u == robot.m_teleopExitCount);
+  CHECK(1u == robot.m_utilityExitCount);
 
   robot.EndCompetition();
   robotThread.join();
@@ -420,27 +420,27 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest ModeChange", "[wpilibc]") {
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  CHECK((0u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_autonomousInitCount));
-  CHECK((0u) == (robot.m_teleopInitCount));
-  CHECK((0u) == (robot.m_utilityInitCount));
+  CHECK(0u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_autonomousInitCount);
+  CHECK(0u == robot.m_teleopInitCount);
+  CHECK(0u == robot.m_utilityInitCount);
 
-  CHECK((0u) == (robot.m_disabledExitCount));
-  CHECK((0u) == (robot.m_autonomousExitCount));
-  CHECK((0u) == (robot.m_teleopExitCount));
-  CHECK((0u) == (robot.m_utilityExitCount));
+  CHECK(0u == robot.m_disabledExitCount);
+  CHECK(0u == robot.m_autonomousExitCount);
+  CHECK(0u == robot.m_teleopExitCount);
+  CHECK(0u == robot.m_utilityExitCount);
 
   wpi::sim::StepTiming(kPeriod);
 
-  CHECK((1u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_autonomousInitCount));
-  CHECK((0u) == (robot.m_teleopInitCount));
-  CHECK((0u) == (robot.m_utilityInitCount));
+  CHECK(1u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_autonomousInitCount);
+  CHECK(0u == robot.m_teleopInitCount);
+  CHECK(0u == robot.m_utilityInitCount);
 
-  CHECK((0u) == (robot.m_disabledExitCount));
-  CHECK((0u) == (robot.m_autonomousExitCount));
-  CHECK((0u) == (robot.m_teleopExitCount));
-  CHECK((0u) == (robot.m_utilityExitCount));
+  CHECK(0u == robot.m_disabledExitCount);
+  CHECK(0u == robot.m_autonomousExitCount);
+  CHECK(0u == robot.m_teleopExitCount);
+  CHECK(0u == robot.m_utilityExitCount);
 
   // Transition to autonomous
   wpi::sim::DriverStationSim::SetEnabled(true);
@@ -449,15 +449,15 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest ModeChange", "[wpilibc]") {
 
   wpi::sim::StepTiming(kPeriod);
 
-  CHECK((1u) == (robot.m_disabledInitCount));
-  CHECK((1u) == (robot.m_autonomousInitCount));
-  CHECK((0u) == (robot.m_teleopInitCount));
-  CHECK((0u) == (robot.m_utilityInitCount));
+  CHECK(1u == robot.m_disabledInitCount);
+  CHECK(1u == robot.m_autonomousInitCount);
+  CHECK(0u == robot.m_teleopInitCount);
+  CHECK(0u == robot.m_utilityInitCount);
 
-  CHECK((1u) == (robot.m_disabledExitCount));
-  CHECK((0u) == (robot.m_autonomousExitCount));
-  CHECK((0u) == (robot.m_teleopExitCount));
-  CHECK((0u) == (robot.m_utilityExitCount));
+  CHECK(1u == robot.m_disabledExitCount);
+  CHECK(0u == robot.m_autonomousExitCount);
+  CHECK(0u == robot.m_teleopExitCount);
+  CHECK(0u == robot.m_utilityExitCount);
 
   // Transition to teleop
   wpi::sim::DriverStationSim::SetEnabled(true);
@@ -466,15 +466,15 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest ModeChange", "[wpilibc]") {
 
   wpi::sim::StepTiming(kPeriod);
 
-  CHECK((1u) == (robot.m_disabledInitCount));
-  CHECK((1u) == (robot.m_autonomousInitCount));
-  CHECK((1u) == (robot.m_teleopInitCount));
-  CHECK((0u) == (robot.m_utilityInitCount));
+  CHECK(1u == robot.m_disabledInitCount);
+  CHECK(1u == robot.m_autonomousInitCount);
+  CHECK(1u == robot.m_teleopInitCount);
+  CHECK(0u == robot.m_utilityInitCount);
 
-  CHECK((1u) == (robot.m_disabledExitCount));
-  CHECK((1u) == (robot.m_autonomousExitCount));
-  CHECK((0u) == (robot.m_teleopExitCount));
-  CHECK((0u) == (robot.m_utilityExitCount));
+  CHECK(1u == robot.m_disabledExitCount);
+  CHECK(1u == robot.m_autonomousExitCount);
+  CHECK(0u == robot.m_teleopExitCount);
+  CHECK(0u == robot.m_utilityExitCount);
 
   // Transition to utility
   wpi::sim::DriverStationSim::SetEnabled(true);
@@ -483,15 +483,15 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest ModeChange", "[wpilibc]") {
 
   wpi::sim::StepTiming(kPeriod);
 
-  CHECK((1u) == (robot.m_disabledInitCount));
-  CHECK((1u) == (robot.m_autonomousInitCount));
-  CHECK((1u) == (robot.m_teleopInitCount));
-  CHECK((1u) == (robot.m_utilityInitCount));
+  CHECK(1u == robot.m_disabledInitCount);
+  CHECK(1u == robot.m_autonomousInitCount);
+  CHECK(1u == robot.m_teleopInitCount);
+  CHECK(1u == robot.m_utilityInitCount);
 
-  CHECK((1u) == (robot.m_disabledExitCount));
-  CHECK((1u) == (robot.m_autonomousExitCount));
-  CHECK((1u) == (robot.m_teleopExitCount));
-  CHECK((0u) == (robot.m_utilityExitCount));
+  CHECK(1u == robot.m_disabledExitCount);
+  CHECK(1u == robot.m_autonomousExitCount);
+  CHECK(1u == robot.m_teleopExitCount);
+  CHECK(0u == robot.m_utilityExitCount);
 
   // Transition to disabled
   wpi::sim::DriverStationSim::SetEnabled(false);
@@ -499,15 +499,15 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest ModeChange", "[wpilibc]") {
 
   wpi::sim::StepTiming(kPeriod);
 
-  CHECK((2u) == (robot.m_disabledInitCount));
-  CHECK((1u) == (robot.m_autonomousInitCount));
-  CHECK((1u) == (robot.m_teleopInitCount));
-  CHECK((1u) == (robot.m_utilityInitCount));
+  CHECK(2u == robot.m_disabledInitCount);
+  CHECK(1u == robot.m_autonomousInitCount);
+  CHECK(1u == robot.m_teleopInitCount);
+  CHECK(1u == robot.m_utilityInitCount);
 
-  CHECK((1u) == (robot.m_disabledExitCount));
-  CHECK((1u) == (robot.m_autonomousExitCount));
-  CHECK((1u) == (robot.m_teleopExitCount));
-  CHECK((1u) == (robot.m_utilityExitCount));
+  CHECK(1u == robot.m_disabledExitCount);
+  CHECK(1u == robot.m_autonomousExitCount);
+  CHECK(1u == robot.m_teleopExitCount);
+  CHECK(1u == robot.m_utilityExitCount);
 
   robot.EndCompetition();
   robotThread.join();
@@ -525,21 +525,21 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest AddPeriodic", "[wpilibc]") {
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  CHECK((0u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_disabledPeriodicCount));
-  CHECK((0u) == (callbackCount));
+  CHECK(0u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_disabledPeriodicCount);
+  CHECK(0u == callbackCount);
 
   wpi::sim::StepTiming(kPeriod / 2.0);
 
-  CHECK((0u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_disabledPeriodicCount));
-  CHECK((1u) == (callbackCount));
+  CHECK(0u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_disabledPeriodicCount);
+  CHECK(1u == callbackCount);
 
   wpi::sim::StepTiming(kPeriod / 2.0);
 
-  CHECK((1u) == (robot.m_disabledInitCount));
-  CHECK((1u) == (robot.m_disabledPeriodicCount));
-  CHECK((2u) == (callbackCount));
+  CHECK(1u == robot.m_disabledInitCount);
+  CHECK(1u == robot.m_disabledPeriodicCount);
+  CHECK(2u == callbackCount);
 
   robot.EndCompetition();
   robotThread.join();
@@ -565,33 +565,33 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest AddPeriodicWithOffset",
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  CHECK((0u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_disabledPeriodicCount));
-  CHECK((0u) == (callbackCount));
+  CHECK(0u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_disabledPeriodicCount);
+  CHECK(0u == callbackCount);
 
   wpi::sim::StepTiming(kPeriod * 3.0 / 8.0);
 
-  CHECK((0u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_disabledPeriodicCount));
-  CHECK((0u) == (callbackCount));
+  CHECK(0u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_disabledPeriodicCount);
+  CHECK(0u == callbackCount);
 
   wpi::sim::StepTiming(kPeriod * 3.0 / 8.0);
 
-  CHECK((0u) == (robot.m_disabledInitCount));
-  CHECK((0u) == (robot.m_disabledPeriodicCount));
-  CHECK((1u) == (callbackCount));
+  CHECK(0u == robot.m_disabledInitCount);
+  CHECK(0u == robot.m_disabledPeriodicCount);
+  CHECK(1u == callbackCount);
 
   wpi::sim::StepTiming(kPeriod / 4.0);
 
-  CHECK((1u) == (robot.m_disabledInitCount));
-  CHECK((1u) == (robot.m_disabledPeriodicCount));
-  CHECK((1u) == (callbackCount));
+  CHECK(1u == robot.m_disabledInitCount);
+  CHECK(1u == robot.m_disabledPeriodicCount);
+  CHECK(1u == callbackCount);
 
   wpi::sim::StepTiming(kPeriod / 4.0);
 
-  CHECK((1u) == (robot.m_disabledInitCount));
-  CHECK((1u) == (robot.m_disabledPeriodicCount));
-  CHECK((2u) == (callbackCount));
+  CHECK(1u == robot.m_disabledInitCount);
+  CHECK(1u == robot.m_disabledPeriodicCount);
+  CHECK(2u == callbackCount);
 
   robot.EndCompetition();
   robotThread.join();

@@ -11,7 +11,7 @@
 namespace wpi {
 TEST_CASE("SolenoidREVTest ValidInitialization", "[wpilibc]") {
   Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::REV_PH, 2};
-  CHECK((2) == (solenoid.GetChannel()));
+  CHECK(2 == solenoid.GetChannel());
 
   solenoid.Set(true);
   CHECK(solenoid.Get());

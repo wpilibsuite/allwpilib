@@ -46,11 +46,11 @@ TEST_CASE("DriverStationTest AutonomousMode", "[wpilibc][simulation]") {
                                                         false);
   DriverStationSim::SetRobotMode(RobotMode::AUTONOMOUS);
   DriverStationSim::NotifyNewData();
-  CHECK((DriverStationSim::GetRobotMode()) == (RobotMode::AUTONOMOUS));
+  CHECK(DriverStationSim::GetRobotMode() == RobotMode::AUTONOMOUS);
   CHECK(RobotState::IsAutonomous());
-  CHECK((RobotState::GetRobotMode()) == (RobotMode::AUTONOMOUS));
+  CHECK(RobotState::GetRobotMode() == RobotMode::AUTONOMOUS);
   CHECK(callback.WasTriggered());
-  CHECK((callback.GetLastValue()) == (HAL_ROBOT_MODE_AUTONOMOUS));
+  CHECK(callback.GetLastValue() == HAL_ROBOT_MODE_AUTONOMOUS);
 }
 
 TEST_CASE("DriverStationTest Mode", "[wpilibc][simulation]") {
@@ -64,11 +64,11 @@ TEST_CASE("DriverStationTest Mode", "[wpilibc][simulation]") {
                                                         false);
   DriverStationSim::SetRobotMode(RobotMode::UTILITY);
   DriverStationSim::NotifyNewData();
-  CHECK((DriverStationSim::GetRobotMode()) == (RobotMode::UTILITY));
+  CHECK(DriverStationSim::GetRobotMode() == RobotMode::UTILITY);
   CHECK(RobotState::IsUtility());
-  CHECK((RobotState::GetRobotMode()) == (RobotMode::UTILITY));
+  CHECK(RobotState::GetRobotMode() == RobotMode::UTILITY);
   CHECK(callback.WasTriggered());
-  CHECK((callback.GetLastValue()) == (HAL_ROBOT_MODE_UTILITY));
+  CHECK(callback.GetLastValue() == HAL_ROBOT_MODE_UTILITY);
 }
 
 TEST_CASE("DriverStationTest Estop", "[wpilibc][simulation]") {
@@ -143,7 +143,7 @@ TEST_CASE("DriverStationTest AllianceStationId", "[wpilibc][simulation]") {
   allianceStation = hal::AllianceStationID::UNKNOWN;
   DriverStationSim::SetAllianceStationId(allianceStation);
   wpi::sim::DriverStationSim::NotifyNewData();
-  CHECK((allianceStation) == (DriverStationSim::GetAllianceStationId()));
+  CHECK(allianceStation == DriverStationSim::GetAllianceStationId());
   CHECK_FALSE(MatchState::GetAlliance().has_value());
   CHECK_FALSE(MatchState::GetLocation().has_value());
   CHECK(callback.WasTriggered());
@@ -154,9 +154,9 @@ TEST_CASE("DriverStationTest AllianceStationId", "[wpilibc][simulation]") {
   allianceStation = hal::AllianceStationID::BLUE_1;
   DriverStationSim::SetAllianceStationId(allianceStation);
   wpi::sim::DriverStationSim::NotifyNewData();
-  CHECK((allianceStation) == (DriverStationSim::GetAllianceStationId()));
-  CHECK((Alliance::BLUE) == (MatchState::GetAlliance()));
-  CHECK((1) == (MatchState::GetLocation()));
+  CHECK(allianceStation == DriverStationSim::GetAllianceStationId());
+  CHECK(Alliance::BLUE == MatchState::GetAlliance());
+  CHECK(1 == MatchState::GetLocation());
   CHECK(callback.WasTriggered());
   CHECK(static_cast<HAL_AllianceStationID>(allianceStation) ==
         callback.GetLastValue());
@@ -165,9 +165,9 @@ TEST_CASE("DriverStationTest AllianceStationId", "[wpilibc][simulation]") {
   allianceStation = hal::AllianceStationID::BLUE_2;
   DriverStationSim::SetAllianceStationId(allianceStation);
   wpi::sim::DriverStationSim::NotifyNewData();
-  CHECK((allianceStation) == (DriverStationSim::GetAllianceStationId()));
-  CHECK((Alliance::BLUE) == (MatchState::GetAlliance()));
-  CHECK((2) == (MatchState::GetLocation()));
+  CHECK(allianceStation == DriverStationSim::GetAllianceStationId());
+  CHECK(Alliance::BLUE == MatchState::GetAlliance());
+  CHECK(2 == MatchState::GetLocation());
   CHECK(callback.WasTriggered());
   CHECK(static_cast<HAL_AllianceStationID>(allianceStation) ==
         callback.GetLastValue());
@@ -176,9 +176,9 @@ TEST_CASE("DriverStationTest AllianceStationId", "[wpilibc][simulation]") {
   allianceStation = hal::AllianceStationID::BLUE_3;
   DriverStationSim::SetAllianceStationId(allianceStation);
   wpi::sim::DriverStationSim::NotifyNewData();
-  CHECK((allianceStation) == (DriverStationSim::GetAllianceStationId()));
-  CHECK((Alliance::BLUE) == (MatchState::GetAlliance()));
-  CHECK((3) == (MatchState::GetLocation()));
+  CHECK(allianceStation == DriverStationSim::GetAllianceStationId());
+  CHECK(Alliance::BLUE == MatchState::GetAlliance());
+  CHECK(3 == MatchState::GetLocation());
   CHECK(callback.WasTriggered());
   CHECK(static_cast<HAL_AllianceStationID>(allianceStation) ==
         callback.GetLastValue());
@@ -187,9 +187,9 @@ TEST_CASE("DriverStationTest AllianceStationId", "[wpilibc][simulation]") {
   allianceStation = hal::AllianceStationID::RED_1;
   DriverStationSim::SetAllianceStationId(allianceStation);
   wpi::sim::DriverStationSim::NotifyNewData();
-  CHECK((allianceStation) == (DriverStationSim::GetAllianceStationId()));
-  CHECK((Alliance::RED) == (MatchState::GetAlliance()));
-  CHECK((1) == (MatchState::GetLocation()));
+  CHECK(allianceStation == DriverStationSim::GetAllianceStationId());
+  CHECK(Alliance::RED == MatchState::GetAlliance());
+  CHECK(1 == MatchState::GetLocation());
   CHECK(callback.WasTriggered());
   CHECK(static_cast<HAL_AllianceStationID>(allianceStation) ==
         callback.GetLastValue());
@@ -198,9 +198,9 @@ TEST_CASE("DriverStationTest AllianceStationId", "[wpilibc][simulation]") {
   allianceStation = hal::AllianceStationID::RED_2;
   DriverStationSim::SetAllianceStationId(allianceStation);
   wpi::sim::DriverStationSim::NotifyNewData();
-  CHECK((allianceStation) == (DriverStationSim::GetAllianceStationId()));
-  CHECK((Alliance::RED) == (MatchState::GetAlliance()));
-  CHECK((2) == (MatchState::GetLocation()));
+  CHECK(allianceStation == DriverStationSim::GetAllianceStationId());
+  CHECK(Alliance::RED == MatchState::GetAlliance());
+  CHECK(2 == MatchState::GetLocation());
   CHECK(callback.WasTriggered());
   CHECK(static_cast<HAL_AllianceStationID>(allianceStation) ==
         callback.GetLastValue());
@@ -209,9 +209,9 @@ TEST_CASE("DriverStationTest AllianceStationId", "[wpilibc][simulation]") {
   allianceStation = hal::AllianceStationID::RED_3;
   DriverStationSim::SetAllianceStationId(allianceStation);
   wpi::sim::DriverStationSim::NotifyNewData();
-  CHECK((allianceStation) == (DriverStationSim::GetAllianceStationId()));
-  CHECK((Alliance::RED) == (MatchState::GetAlliance()));
-  CHECK((3) == (MatchState::GetLocation()));
+  CHECK(allianceStation == DriverStationSim::GetAllianceStationId());
+  CHECK(Alliance::RED == MatchState::GetAlliance());
+  CHECK(3 == MatchState::GetLocation());
   CHECK(callback.WasTriggered());
   CHECK(static_cast<HAL_AllianceStationID>(allianceStation) ==
         callback.GetLastValue());
@@ -223,7 +223,7 @@ TEST_CASE("DriverStationTest ReplayNumber", "[wpilibc][simulation]") {
 
   DriverStationSim::SetReplayNumber(4);
   DriverStationSim::NotifyNewData();
-  CHECK((4) == (MatchState::GetReplayNumber()));
+  CHECK(4 == MatchState::GetReplayNumber());
 }
 
 TEST_CASE("DriverStationTest MatchNumber", "[wpilibc][simulation]") {
@@ -232,7 +232,7 @@ TEST_CASE("DriverStationTest MatchNumber", "[wpilibc][simulation]") {
 
   DriverStationSim::SetMatchNumber(3);
   DriverStationSim::NotifyNewData();
-  CHECK((3) == (MatchState::GetMatchNumber()));
+  CHECK(3 == MatchState::GetMatchNumber());
 }
 
 TEST_CASE("DriverStationTest MatchTime", "[wpilibc][simulation]") {
@@ -245,10 +245,10 @@ TEST_CASE("DriverStationTest MatchTime", "[wpilibc][simulation]") {
   constexpr double kTestTime = 19.174;
   DriverStationSim::SetMatchTime(kTestTime);
   wpi::sim::DriverStationSim::NotifyNewData();
-  CHECK((kTestTime) == (DriverStationSim::GetMatchTime()));
-  CHECK((kTestTime) == (MatchState::GetMatchTime().value()));
+  CHECK(kTestTime == DriverStationSim::GetMatchTime());
+  CHECK(kTestTime == MatchState::GetMatchTime().value());
   CHECK(callback.WasTriggered());
-  CHECK((kTestTime) == (callback.GetLastValue()));
+  CHECK(kTestTime == callback.GetLastValue());
 }
 
 TEST_CASE("DriverStationTest SetGameData", "[wpilibc][simulation]") {
@@ -260,7 +260,7 @@ TEST_CASE("DriverStationTest SetGameData", "[wpilibc][simulation]") {
   DriverStationSim::NotifyNewData();
   auto gameData = MatchState::GetGameData();
   REQUIRE(gameData.has_value());
-  CHECK((message) == (gameData.value()));
+  CHECK(message == gameData.value());
 }
 
 TEST_CASE("DriverStationTest SetGameDataEmpty", "[wpilibc][simulation]") {
@@ -280,5 +280,5 @@ TEST_CASE("DriverStationTest SetEventName", "[wpilibc][simulation]") {
   constexpr auto message = "The Best Event";
   DriverStationSim::SetEventName(message);
   DriverStationSim::NotifyNewData();
-  CHECK((message) == (MatchState::GetEventName()));
+  CHECK(message == MatchState::GetEventName());
 }

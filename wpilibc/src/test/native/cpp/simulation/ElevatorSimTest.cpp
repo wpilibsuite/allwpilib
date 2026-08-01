@@ -17,7 +17,7 @@
 #include "wpi/units/time.hpp"
 
 #define CHECK_NEAR_UNITS(val1, val2, eps) \
-  CHECK((wpi::units::math::abs(val1 - val2)) <= (eps))
+  CHECK(wpi::units::math::abs(val1 - val2) <= eps)
 
 TEST_CASE("ElevatorSimTest StateSpaceSim", "[wpilibc][simulation]") {
   wpi::sim::ElevatorSim sim(wpi::math::DCMotor::Vex775Pro(4), 14.67, 8_kg,
@@ -64,7 +64,7 @@ TEST_CASE("ElevatorSimTest MinMax", "[wpilibc][simulation]") {
     sim.Update(20_ms);
 
     auto height = sim.GetPosition();
-    CHECK((height) >= (0_m));
+    CHECK(height >= 0_m);
   }
 
   for (size_t i = 0; i < 100; ++i) {
@@ -72,7 +72,7 @@ TEST_CASE("ElevatorSimTest MinMax", "[wpilibc][simulation]") {
     sim.Update(20_ms);
 
     auto height = sim.GetPosition();
-    CHECK((height) <= (1_m));
+    CHECK(height <= 1_m);
   }
 }
 
