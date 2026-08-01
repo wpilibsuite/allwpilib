@@ -4,7 +4,6 @@
 
 #include "wpi/math/kinematics/proto/SwerveDriveKinematicsProto.hpp"
 
-#include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include "../../ProtoTestBase.hpp"

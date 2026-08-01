@@ -4,20 +4,35 @@
 
 #pragma once
 
-#include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/units/math.hpp"
 
-#define CHECK_DOUBLE_EQ(a, b) CHECK((a) == Catch::Approx((b)).epsilon(0x1p-50))
+#define CHECK_DOUBLE_EQ(a, b)                                    \
+  CHECK_THAT(                                                    \
+      static_cast<double>(::wpi::math::test::AssertionValue(a)), \
+      Catch::Matchers::WithinULP(                                \
+          static_cast<double>(::wpi::math::test::AssertionValue(b)), 4))
 
-#define CHECK_FLOAT_EQ(a, b) CHECK((a) == Catch::Approx((b)).epsilon(0x1p-21))
+#define CHECK_FLOAT_EQ(a, b)                                           \
+  CHECK_THAT(static_cast<float>(::wpi::math::test::AssertionValue(a)), \
+             Catch::Matchers::WithinULP(                               \
+                 static_cast<float>(::wpi::math::test::AssertionValue(b)), 4))
 
-#define CHECK_NEAR(a, b, tolerance) \
-  CHECK((a) == Catch::Approx((b)).epsilon(0.0).margin(tolerance))
+#define CHECK_NEAR(a, b, tolerance)                                  \
+  CHECK_THAT(                                                        \
+      static_cast<double>(::wpi::math::test::AssertionValue(a)),     \
+      Catch::Matchers::WithinAbs(                                    \
+          static_cast<double>(::wpi::math::test::AssertionValue(b)), \
+          static_cast<double>(::wpi::math::test::AssertionValue(tolerance))))
 
-#define REQUIRE_NEAR(a, b, tolerance) \
-  REQUIRE((a) == Catch::Approx((b)).epsilon(0.0).margin(tolerance))
+#define REQUIRE_NEAR(a, b, tolerance)                                \
+  REQUIRE_THAT(                                                      \
+      static_cast<double>(::wpi::math::test::AssertionValue(a)),     \
+      Catch::Matchers::WithinAbs(                                    \
+          static_cast<double>(::wpi::math::test::AssertionValue(b)), \
+          static_cast<double>(::wpi::math::test::AssertionValue(tolerance))))
 
 #define CHECK_UNITS_EQ(a, b) CHECK(((a) == (b)))
 

@@ -9,7 +9,6 @@
 #include <numbers>
 #include <vector>
 
-#include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/geometry/Pose2d.hpp"

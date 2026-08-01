@@ -4,7 +4,6 @@
 
 #include <Eigen/Core>
 #include <Eigen/LU>
-#include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/linalg/EigenCore.hpp"
