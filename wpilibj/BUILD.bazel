@@ -120,12 +120,14 @@ pkg_files(
 
 wpilib_java_junit5_test(
     name = "wpilibj-java-test",
+    size = "medium",
     srcs = glob([
         "src/generated/test/java/**/*.java",
         "src/test/java/**/*.java",
     ]),
     resource_strip_prefix = "wpilibj/src/test/resources",
     resources = glob(["src/test/resources/**"]),
+    tags = ["exclusive"],
     deps = [
         ":wpilibj-java",
         "//hal:hal-java",
