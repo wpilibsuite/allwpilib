@@ -217,6 +217,20 @@ TEST_F(AlertTest, CppWrapperDuplicateIsInvalid) {
   EXPECT_EQ(WPI_GetNumAlerts(), 1);
 }
 
+TEST_F(AlertTest, CppWrapperDefaultConstructsInvalid) {
+  Alert alert;
+
+  EXPECT_FALSE(alert);
+  EXPECT_FALSE(alert.Get());
+  EXPECT_EQ(alert.GetText(), "");
+  EXPECT_EQ(WPI_GetNumAlerts(), 0);
+
+  alert = Alert{"id", "text", Alert::Level::LOW};
+  EXPECT_TRUE(alert);
+  EXPECT_EQ(WPI_GetNumAlerts(), 1);
+  EXPECT_EQ(alert.GetText(), "text");
+}
+
 TEST_F(AlertTest, CApiDuplicateRulesAndPartialListing) {
   WPI_AlertHandle first = CreateAlert("group", "id", "one", WPI_ALERT_MEDIUM);
   WPI_AlertHandle second = CreateAlert("group", "id", "two", WPI_ALERT_LOW);
@@ -421,4 +435,24 @@ TEST_F(AlertTest, CustomBackendDispatchesAllOperations) {
   EXPECT_TRUE(gBackendState.reset);
   WPI_DestroyAlert(handle);
   EXPECT_EQ(gBackendState.destroyedHandle, handle);
+}
+
+TEST_F(AlertTest, CppWrapperReleaseDoesNotDestroyHandle) {
+  gBackendState = BackendState{};
+  WPI_SetAlertBackend(&kTestBackend);
+
+  {
+    Alert alert{"backendGroup", "backendId", "backendText",
+                Alert::Level::MEDIUM};
+    EXPECT_TRUE(alert);
+    WPI_AlertHandle handle = gBackendState.createdHandle;
+
+    wpi::util::detail::ReleaseAlertHandle(alert);
+
+    EXPECT_FALSE(alert);
+    EXPECT_EQ(gBackendState.destroyedHandle, WPI_INVALID_HANDLE);
+    EXPECT_EQ(handle, gBackendState.createdHandle);
+  }
+
+  EXPECT_EQ(gBackendState.destroyedHandle, WPI_INVALID_HANDLE);
 }

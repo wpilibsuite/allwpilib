@@ -7,6 +7,10 @@ functions:
     overloads:
       Alert&:
         ignore: true
+  ReleaseAlertHandle:
+    overloads:
+      Alert&:
+        ignore: true
 
 classes:
   wpi::util::Alert:
@@ -15,6 +19,8 @@ classes:
     methods:
       Alert:
         overloads:
+          "":
+            ignore: true
           std::string_view, std::string_view, Level:
             cpp_code: |
               [](std::string_view id, std::string_view text,
