@@ -37,7 +37,7 @@ public class Intake extends SubsystemBase {
   public Command retractCommand() {
     return runOnce(
             () -> {
-              motor.disable();
+              motor.setThrottle(0.0);
               pistons.set(DoubleSolenoid.Value.REVERSE);
             })
         .withName("Retract");

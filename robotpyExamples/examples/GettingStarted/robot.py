@@ -38,7 +38,7 @@ class MyRobot(wpilib.TimedRobot):
             # Drive forwards half velocity, make sure to turn input squaring off
             self.robot_drive.arcade_drive(0.5, 0, square_inputs=False)
         else:
-            self.robot_drive.stop_motor()  # Stop robot
+            self.robot_drive.arcade_drive(0, 0)  # Stop robot
 
     def teleop_init(self):
         """This function is called once each time the robot enters teleoperated mode."""

@@ -36,8 +36,8 @@ class Shooter(Subsystem):
         self.set_default_command(
             self.run_once(
                 lambda: (
-                    self.shooter_motor.disable(),
-                    self.feeder_motor.disable(),
+                    self.shooter_motor.set_throttle(0.0),
+                    self.feeder_motor.set_throttle(0.0),
                 )
             )
             .and_then(self.run(lambda: None))
