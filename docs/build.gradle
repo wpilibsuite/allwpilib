@@ -107,9 +107,6 @@ doxygen.sourceSets.main {
         // apriltag
         exclude 'apriltag_pose.h'
 
-        // json
-        exclude 'wpi/util/detail/**'
-
         // libuv
         exclude 'uv/**'
 
@@ -176,7 +173,7 @@ def javaDocProjects = [
     project(':datalog'),
 ]
 
-task generateJavaDocs(type: Javadoc) {
+tasks.register('generateJavaDocs', Javadoc) {
     javaDocProjects.each {
         classpath += it.sourceSets.main.compileClasspath
     }
@@ -234,13 +231,8 @@ task generateJavaDocs(type: Javadoc) {
     title = "WPILib API ${wpilibVersioning.version.get()}"
     ext.entryPoint = "$destinationDir/index.html"
 
-    if (JavaVersion.current().isJava8Compatible() && project.hasProperty('docWarningsAsErrors')) {
-        // Treat javadoc warnings as errors.
-        //
-        // The second argument '-quiet' is a hack. The one parameter
-        // addStringOption() doesn't work, so we add '-quiet', which is added
-        // anyway by gradle. See https://github.com/gradle/gradle/issues/2354.
-        options.addStringOption('Werror', '-quiet')
+    if (project.hasProperty('docWarningsAsErrors')) {
+        options.addBooleanOption('Werror', true)
     }
 }
 

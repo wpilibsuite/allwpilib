@@ -68,7 +68,7 @@ def generateTask = createGenerateResourcesTask('app', 'GLASS', 'wpi::glass', pro
 def mrccommIncludeDir = file('src/lib/native/thirdparty/mrccomm/include').absolutePath
 
 project(':').libraryBuild.dependsOn build
-tasks.withType(CppCompile) {
+tasks.withType(CppCompile).configureEach {
     dependsOn generateTask
     dependsOn generateCppVersion
 }

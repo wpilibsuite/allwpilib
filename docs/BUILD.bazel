@@ -25,8 +25,8 @@ paths = [
     "wpiutil/src/main/native/thirdparty/llvm/include",
     "wpiutil/src/main/native/thirdparty/mpack/include",
     "wpiutil/src/main/native/thirdparty/nanopb/include",
-    "wpiutil/src/main/native/thirdparty/protobuf/include",
     "wpiutil/src/main/native/thirdparty/sigslot/include",
+    "wpiutil/src/main/native/thirdparty/upb/include",
     "xrpVendordep/src/generated/main/native/include",
     "xrpVendordep/src/main/native/include",
 ]
@@ -94,8 +94,6 @@ doxygen(
         "*/sleipnir/optimization/solver/sqp.hpp",
         # apriltag
         "*/apriltag_pose.h",
-        # json
-        "*/wpi/util/detail/**",
         # libuv
         "*/uv/**",
         # mpack

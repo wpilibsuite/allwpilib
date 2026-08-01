@@ -32,7 +32,7 @@ apply from: "${rootDir}/shared/java/javacommon.gradle"
 def generateTask = createGenerateResourcesTask('main', 'FIELDS', 'wpi::fields', project)
 
 project(':').libraryBuild.dependsOn build
-tasks.withType(CppCompile) {
+tasks.withType(CppCompile).configureEach {
     dependsOn generateTask
 }
 
