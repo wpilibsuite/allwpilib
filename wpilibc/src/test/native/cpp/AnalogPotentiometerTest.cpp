@@ -13,14 +13,20 @@
 
 namespace wpi {
 using namespace wpi::sim;
+
+static void ResetAnalogPotentiometerTestData(int channel) {
+  RoboRioSim::ResetData();
+  AnalogInputSim{channel}.ResetData();
+}
+
 TEST_CASE("AnalogPotentiometerTest InitializeWithAnalogInput", "[wpilibc]") {
   HAL_Initialize();
+  ResetAnalogPotentiometerTestData(0);
 
   AnalogInput ai{0};
   AnalogPotentiometer pot{&ai};
   AnalogInputSim sim{ai};
 
-  RoboRioSim::ResetData();
   sim.SetVoltage(2.8);
   CHECK((2.8 / 3.3) == (pot.Get()));
 }
@@ -28,10 +34,10 @@ TEST_CASE("AnalogPotentiometerTest InitializeWithAnalogInput", "[wpilibc]") {
 TEST_CASE("AnalogPotentiometerTest InitializeWithAnalogInputAndScale",
           "[wpilibc]") {
   HAL_Initialize();
+  ResetAnalogPotentiometerTestData(0);
 
   AnalogInput ai{0};
   AnalogPotentiometer pot{&ai, 270.0};
-  RoboRioSim::ResetData();
   AnalogInputSim sim{ai};
 
   sim.SetVoltage(3.3);
@@ -46,6 +52,7 @@ TEST_CASE("AnalogPotentiometerTest InitializeWithAnalogInputAndScale",
 
 TEST_CASE("AnalogPotentiometerTest InitializeWithChannel", "[wpilibc]") {
   HAL_Initialize();
+  ResetAnalogPotentiometerTestData(1);
 
   AnalogPotentiometer pot{1};
   AnalogInputSim sim{1};
@@ -57,9 +64,9 @@ TEST_CASE("AnalogPotentiometerTest InitializeWithChannel", "[wpilibc]") {
 TEST_CASE("AnalogPotentiometerTest InitializeWithChannelAndScale",
           "[wpilibc]") {
   HAL_Initialize();
+  ResetAnalogPotentiometerTestData(1);
 
   AnalogPotentiometer pot{1, 180.0};
-  RoboRioSim::ResetData();
   AnalogInputSim sim{1};
 
   sim.SetVoltage(3.3);
@@ -70,8 +77,10 @@ TEST_CASE("AnalogPotentiometerTest InitializeWithChannelAndScale",
 }
 
 TEST_CASE("AnalogPotentiometerTest WithModifiedBatteryVoltage", "[wpilibc]") {
+  HAL_Initialize();
+  ResetAnalogPotentiometerTestData(1);
+
   AnalogPotentiometer pot{1, 180.0, 90.0};
-  RoboRioSim::ResetData();
   AnalogInputSim sim{1};
 
   // Test at 3.3v
