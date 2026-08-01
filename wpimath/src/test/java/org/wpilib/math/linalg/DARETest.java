@@ -7,14 +7,20 @@ package org.wpilib.math.linalg;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 import org.wpilib.UtilityClassTest;
+import org.wpilib.math.numbers.N10;
+import org.wpilib.math.numbers.N4;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
 
 class DARETest extends UtilityClassTest<DARE> {
+  private static final double DT = 1e-4;
+  private static final int SCALE_EXPONENT = 44;
+
   DARETest() {
     super(DARE.class);
   }
@@ -26,6 +32,73 @@ class DARETest extends UtilityClassTest<DARE> {
         assertEquals(A.get(i, j), B.get(i, j), 1e-4);
       }
     }
+  }
+
+  public static void assertAllFinite(Matrix<?, ?> matrix) {
+    for (int row = 0; row < matrix.getNumRows(); row++) {
+      for (int col = 0; col < matrix.getNumCols(); col++) {
+        assertTrue(Double.isFinite(matrix.get(row, col)));
+      }
+    }
+  }
+
+  static Matrix<N10, N10> makeQuadcopterA() {
+    var A = new Matrix<N10, N10>(Nat.N10(), Nat.N10());
+    A.set(0, 0, 0.9999);
+    A.set(0, 3, 1e-8);
+
+    double stable = Math.exp(-DT);
+    double unstable = Math.exp(6.0 * DT);
+    A.set(3, 3, stable);
+    A.set(4, 4, stable);
+    A.set(5, 5, stable);
+    A.set(6, 6, unstable);
+    A.set(7, 7, unstable);
+    A.set(8, 8, unstable);
+    A.set(9, 9, unstable);
+
+    return A;
+  }
+
+  static Matrix<N10, N4> makeQuadcopterB() {
+    var B = new Matrix<N10, N4>(Nat.N10(), Nat.N4());
+    double stableInput = 1.0 - Math.exp(-DT);
+    double unstableInput = (Math.exp(6.0 * DT) - 1.0) / 6.0;
+    for (int col = 0; col < B.getNumCols(); col++) {
+      B.set(3, col, stableInput);
+    }
+    B.set(6, 0, unstableInput);
+    B.set(7, 1, unstableInput);
+    B.set(8, 2, unstableInput);
+    B.set(9, 3, unstableInput);
+
+    return B;
+  }
+
+  static Matrix<N10, N10> makeStateTransform() {
+    var C = Matrix.eye(Nat.N10());
+    C.set(0, 0, Math.scalb(1.0, SCALE_EXPONENT));
+    return C;
+  }
+
+  <States extends Num, Inputs extends Num> double dareNormalizedResidual(
+      Matrix<States, States> A,
+      Matrix<States, Inputs> B,
+      Matrix<States, States> Q,
+      Matrix<Inputs, Inputs> R,
+      Matrix<States, States> X) {
+    var stateTerm = A.transpose().times(X).times(A);
+    var inputCost = B.transpose().times(X).times(B).plus(R);
+    var stateInput = A.transpose().times(X).times(B);
+    var feedbackTerm = stateInput.times(inputCost.inv()).times(stateInput.transpose());
+    var residual = stateTerm.minus(X).minus(feedbackTerm).plus(Q);
+    double normalizer =
+        Math.max(
+            1.0,
+            Math.max(
+                Math.max(stateTerm.normF(), X.normF()), Math.max(feedbackTerm.normF(), Q.normF())));
+
+    return residual.normF() / normalizer;
   }
 
   <States extends Num, Inputs extends Num> void assertDARESolution(
@@ -222,6 +295,29 @@ class DARETest extends UtilityClassTest<DARE> {
     var X = DARE.dare(A, B, Q, R, N);
     assertMatrixEqual(X, X.transpose());
     assertDARESolution(A, B, Q, R, N, X);
+  }
+
+  @Test
+  void testCoordinateTransformedQuadcopterDynamicJNI() {
+    var A = makeQuadcopterA();
+    var B = makeQuadcopterB();
+    var Q = Matrix.eye(Nat.N10());
+    var R = Matrix.eye(Nat.N4());
+
+    var C = makeStateTransform();
+    var CInv = Matrix.eye(Nat.N10());
+    CInv.set(0, 0, Math.scalb(1.0, -SCALE_EXPONENT));
+    var AScaled = CInv.times(A).times(C);
+    var BScaled = CInv.times(B);
+    var QScaled = C.transpose().times(Q).times(C);
+
+    var XChecked = DARE.dare(AScaled, BScaled, QScaled, R);
+    assertAllFinite(XChecked);
+    assertTrue(dareNormalizedResidual(AScaled, BScaled, QScaled, R, XChecked) < 1e-12);
+
+    var XNoPrecond = DARE.dareNoPrecond(AScaled, BScaled, QScaled, R);
+    assertAllFinite(XNoPrecond);
+    assertTrue(dareNormalizedResidual(AScaled, BScaled, QScaled, R, XNoPrecond) < 1e-12);
   }
 
   @Test

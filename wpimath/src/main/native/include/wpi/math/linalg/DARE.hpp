@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cmath>
 #include <expected>
 #include <string_view>
 
@@ -11,6 +12,7 @@
 #include <Eigen/Core>
 #include <Eigen/LU>
 
+#include "wpi/math/linalg/detail/MatrixBalance.hpp"
 #include "wpi/math/system/LinearSystemUtil.hpp"
 
 namespace wpi::math {
@@ -103,6 +105,54 @@ Eigen::Matrix<double, States, States> DARE(
   StateMatrix G_k = B * R_llt.solve(B.transpose());
   StateMatrix H_k;
   StateMatrix H_k1 = Q;
+  Eigen::VectorXi scaleExponents = Eigen::VectorXi::Zero(A.rows());
+
+  if (A_k.allFinite() && G_k.allFinite() && H_k1.allFinite()) {
+    int states = A.rows();
+    Eigen::MatrixXd pencilBalance =
+        Eigen::MatrixXd::Zero(2 * states, 2 * states);
+
+    pencilBalance.topLeftCorner(states, states) = A_k.cwiseAbs();
+    pencilBalance.topRightCorner(states, states) = G_k.cwiseAbs();
+    pencilBalance.bottomLeftCorner(states, states) = H_k1.cwiseAbs();
+    pencilBalance.bottomRightCorner(states, states) =
+        A_k.transpose().cwiseAbs();
+    pencilBalance.diagonal().setZero();
+
+    Eigen::VectorXi rawScales = detail::BalanceMatrixPowerOfTwo(pencilBalance);
+
+    Eigen::VectorXi candidateScaleExponents = Eigen::VectorXi::Zero(states);
+    for (int i = 0; i < states; ++i) {
+      candidateScaleExponents[i] =
+          detail::RoundHalfToEvenDiv2(rawScales[states + i] - rawScales[i]);
+    }
+
+    StateMatrix balancedA = A_k;
+    StateMatrix balancedG = G_k;
+    StateMatrix balancedH = H_k1;
+
+    for (int row = 0; row < states; ++row) {
+      for (int col = 0; col < states; ++col) {
+        balancedA(row, col) =
+            std::ldexp(A_k(row, col), candidateScaleExponents[row] -
+                                          candidateScaleExponents[col]);
+        balancedG(row, col) =
+            std::ldexp(G_k(row, col), candidateScaleExponents[row] +
+                                          candidateScaleExponents[col]);
+        balancedH(row, col) =
+            std::ldexp(H_k1(row, col), -candidateScaleExponents[row] -
+                                           candidateScaleExponents[col]);
+      }
+    }
+
+    if (balancedA.allFinite() && balancedG.allFinite() &&
+        balancedH.allFinite()) {
+      scaleExponents = candidateScaleExponents;
+      A_k = balancedA;
+      G_k = balancedG;
+      H_k1 = balancedH;
+    }
+  }
 
   do {
     H_k = H_k1;
@@ -143,6 +193,13 @@ Eigen::Matrix<double, States, States> DARE(
 
     // while |Hₖ₊₁ − Hₖ| > ε |Hₖ₊₁|
   } while ((H_k1 - H_k).norm() > 1e-10 * H_k1.norm());
+
+  for (int row = 0; row < A.rows(); ++row) {
+    for (int col = 0; col < A.cols(); ++col) {
+      H_k1(row, col) =
+          std::ldexp(H_k1(row, col), scaleExponents[row] + scaleExponents[col]);
+    }
+  }
 
   return H_k1;
 }
