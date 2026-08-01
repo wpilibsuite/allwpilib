@@ -149,22 +149,22 @@ class DataLogSender {
       m_joysticks;
 };
 
-enum class JoystickResourceAlert { Button, Axis, POV };
+enum class JoystickResourceAlert { BUTTON, AXIS, POV };
 
-static constexpr std::array<JoystickResourceAlert, 3> kJoystickResourceAlerts{
-    JoystickResourceAlert::Button, JoystickResourceAlert::Axis,
+static constexpr std::array<JoystickResourceAlert, 3> JOYSTICK_RESOURCE_ALERTS{
+    JoystickResourceAlert::BUTTON, JoystickResourceAlert::AXIS,
     JoystickResourceAlert::POV};
 
 static constexpr size_t JoystickResourceAlertIndex(JoystickResourceAlert type) {
   return static_cast<size_t>(type);
 }
 
-static constexpr std::array<std::string_view, kJoystickResourceAlerts.size()>
-    kJoystickResourceAlertIdSuffixes{"ButtonUnavailable", "AxisUnavailable",
-                                     "POVUnavailable"};
+static constexpr std::array<std::string_view, JOYSTICK_RESOURCE_ALERTS.size()>
+    JOYSTICK_RESOURCE_ALERT_ID_SUFFIXES{"ButtonUnavailable", "AxisUnavailable",
+                                        "POVUnavailable"};
 
-static constexpr std::array<std::string_view, kJoystickResourceAlerts.size()>
-    kJoystickResourceAlertLabels{"Button", "axis", "POV"};
+static constexpr std::array<std::string_view, JOYSTICK_RESOURCE_ALERTS.size()>
+    JOYSTICK_RESOURCE_ALERT_LABELS{"Button", "axis", "POV"};
 
 struct JoystickAlertState {
   wpi::util::Alert alert;
@@ -188,9 +188,10 @@ struct JoystickAlerts {
   int stick = 0;
   bool initialized = false;
   JoystickAlertState connectionAlert;
-  std::array<JoystickAlertState, kJoystickResourceAlerts.size()> resourceAlerts;
+  std::array<JoystickAlertState, JOYSTICK_RESOURCE_ALERTS.size()>
+      resourceAlerts;
   JoystickAlertState touchpadFingerAlert;
-  std::array<int, kJoystickResourceAlerts.size()> resourceAlertValues{};
+  std::array<int, JOYSTICK_RESOURCE_ALERTS.size()> resourceAlertValues{};
   int touchpadFingerAlertTouchpad = 0;
   int touchpadFingerAlertFinger = 0;
 };
@@ -267,15 +268,15 @@ bool JoystickAlerts::Initialize() {
     return false;
   }
 
-  std::array<wpi::util::Alert, kJoystickResourceAlerts.size()>
+  std::array<wpi::util::Alert, JOYSTICK_RESOURCE_ALERTS.size()>
       newResourceAlerts;
-  for (auto type : kJoystickResourceAlerts) {
+  for (auto type : JOYSTICK_RESOURCE_ALERTS) {
     auto index = JoystickResourceAlertIndex(type);
-    newResourceAlerts[index] =
-        wpi::util::Alert("DriverStation",
-                         std::format("joystick{}{}", stick,
-                                     kJoystickResourceAlertIdSuffixes[index]),
-                         {}, wpi::util::Alert::Level::MEDIUM);
+    newResourceAlerts[index] = wpi::util::Alert(
+        "DriverStation",
+        std::format("joystick{}{}", stick,
+                    JOYSTICK_RESOURCE_ALERT_ID_SUFFIXES[index]),
+        {}, wpi::util::Alert::Level::MEDIUM);
     if (!newResourceAlerts[index]) {
       return false;
     }
@@ -290,7 +291,7 @@ bool JoystickAlerts::Initialize() {
   }
 
   connectionAlert.alert = std::move(newConnectionAlert);
-  for (auto type : kJoystickResourceAlerts) {
+  for (auto type : JOYSTICK_RESOURCE_ALERTS) {
     auto index = JoystickResourceAlertIndex(type);
     resourceAlerts[index].alert = std::move(newResourceAlerts[index]);
   }
@@ -337,7 +338,7 @@ void JoystickAlerts::Refresh() {
     SetAlert(connectionAlert, false);
   }
 
-  for (auto type : kJoystickResourceAlerts) {
+  for (auto type : JOYSTICK_RESOURCE_ALERTS) {
     RefreshResourceAlert(type);
   }
 
@@ -379,12 +380,12 @@ bool JoystickAlerts::IsResourceAlertAvailable(
   auto index = JoystickResourceAlertIndex(type);
   auto resource = resourceAlertValues[index];
   switch (type) {
-    case JoystickResourceAlert::Button: {
+    case JoystickResourceAlert::BUTTON: {
       HAL_JoystickButtons buttons;
       HAL_GetJoystickButtons(stick, &buttons);
       return (buttons.available & (1LLU << resource)) != 0;
     }
-    case JoystickResourceAlert::Axis: {
+    case JoystickResourceAlert::AXIS: {
       HAL_JoystickAxes axes;
       HAL_GetJoystickAxes(stick, &axes);
       return (axes.available & (1 << resource)) != 0;
@@ -404,7 +405,7 @@ void JoystickAlerts::ReportResourceWarning(JoystickResourceAlert type,
   resourceAlertValues[index] = resource;
   SetAlert(resourceAlerts[index], true,
            std::format("Joystick {} {} on port {} not available",
-                       kJoystickResourceAlertLabels[index], resource, stick));
+                       JOYSTICK_RESOURCE_ALERT_LABELS[index], resource, stick));
 }
 
 void JoystickAlerts::ReportTouchpadFingerWarning(int touchpad, int finger) {
@@ -482,7 +483,7 @@ bool DriverStationBackend::GetStickButton(int stick, int button) {
   HAL_GetJoystickButtons(stick, &buttons);
 
   if ((buttons.available & mask) == 0) {
-    ReportJoystickResourceWarning(stick, JoystickResourceAlert::Button, button);
+    ReportJoystickResourceWarning(stick, JoystickResourceAlert::BUTTON, button);
     return false;
   }
 
@@ -530,7 +531,7 @@ bool DriverStationBackend::GetStickButtonPressed(int stick, int button) {
   uint64_t mask = 1LLU << button;
 
   if ((buttons.available & mask) == 0) {
-    ReportJoystickResourceWarning(stick, JoystickResourceAlert::Button, button);
+    ReportJoystickResourceWarning(stick, JoystickResourceAlert::BUTTON, button);
     return false;
   }
   auto& inst = ::GetInstance();
@@ -560,7 +561,7 @@ bool DriverStationBackend::GetStickButtonReleased(int stick, int button) {
   uint64_t mask = 1LLU << button;
 
   if ((buttons.available & mask) == 0) {
-    ReportJoystickResourceWarning(stick, JoystickResourceAlert::Button, button);
+    ReportJoystickResourceWarning(stick, JoystickResourceAlert::BUTTON, button);
     return false;
   }
   auto& inst = ::GetInstance();
@@ -589,7 +590,7 @@ double DriverStationBackend::GetStickAxis(int stick, int axis) {
   HAL_GetJoystickAxes(stick, &axes);
 
   if ((axes.available & mask) == 0) {
-    ReportJoystickResourceWarning(stick, JoystickResourceAlert::Axis, axis);
+    ReportJoystickResourceWarning(stick, JoystickResourceAlert::AXIS, axis);
     return 0.0;
   }
 
