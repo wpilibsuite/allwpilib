@@ -325,7 +325,7 @@ java_binary(
 
 py_binary(
     name = "ExponentialProfileModel",
-    srcs = ["algorithms/ExponentialProfileModel.py"],
+    srcs = ["docs/ExponentialProfile/ExponentialProfileModel.py"],
     target_compatible_with = select({
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
