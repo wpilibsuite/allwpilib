@@ -6,23 +6,23 @@
 #include "wpi/driverstation/DualShock4Controller.hpp"
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "JoystickTestMacros.hpp"
 #include "wpi/simulation/DualShock4ControllerSim.hpp"
 
 using namespace wpi;
 
-TEST_CASE("DualShock4ControllerTest WrappedHID", "[wpilibc][hid][controller]") {
+TEST_CASE("DualShock4ControllerTest wrapped HID",
+          "[wpilibc][hid][controller]") {
   DualShock4Controller controller{2};
   sim::DualShock4ControllerSim sim{controller};
   sim.NotifyNewData();
 
-  REQUIRE((controller.GetPort()) == (2));
-  REQUIRE((controller.GetHID().GetPort()) == (2));
-  REQUIRE((controller.GetHID().GetAxesAvailable()) == (0x3F));
-  REQUIRE((controller.GetHID().GetButtonsAvailable()) == (0x107FFFULL));
-  REQUIRE((controller.GetHID().GetPOVsAvailable()) == (0));
+  REQUIRE(controller.GetPort() == 2);
+  REQUIRE(controller.GetHID().GetPort() == 2);
+  REQUIRE(controller.GetHID().GetAxesAvailable() == 0x3F);
+  REQUIRE(controller.GetHID().GetButtonsAvailable() == 0x107FFFULL);
+  REQUIRE(controller.GetHID().GetPOVsAvailable() == 0);
 }
 
 BUTTON_TEST(DualShock4Controller, CrossButton)

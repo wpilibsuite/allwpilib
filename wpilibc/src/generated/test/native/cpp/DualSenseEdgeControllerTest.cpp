@@ -6,23 +6,23 @@
 #include "wpi/driverstation/DualSenseEdgeController.hpp"
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "JoystickTestMacros.hpp"
 #include "wpi/simulation/DualSenseEdgeControllerSim.hpp"
 
 using namespace wpi;
 
-TEST_CASE("DualSenseEdgeControllerTest WrappedHID", "[wpilibc][hid][controller]") {
+TEST_CASE("DualSenseEdgeControllerTest wrapped HID",
+          "[wpilibc][hid][controller]") {
   DualSenseEdgeController controller{2};
   sim::DualSenseEdgeControllerSim sim{controller};
   sim.NotifyNewData();
 
-  REQUIRE((controller.GetPort()) == (2));
-  REQUIRE((controller.GetHID().GetPort()) == (2));
-  REQUIRE((controller.GetHID().GetAxesAvailable()) == (0x3F));
-  REQUIRE((controller.GetHID().GetButtonsAvailable()) == (0x73FFFFULL));
-  REQUIRE((controller.GetHID().GetPOVsAvailable()) == (0));
+  REQUIRE(controller.GetPort() == 2);
+  REQUIRE(controller.GetHID().GetPort() == 2);
+  REQUIRE(controller.GetHID().GetAxesAvailable() == 0x3F);
+  REQUIRE(controller.GetHID().GetButtonsAvailable() == 0x73FFFFULL);
+  REQUIRE(controller.GetHID().GetPOVsAvailable() == 0);
 }
 
 BUTTON_TEST(DualSenseEdgeController, CrossButton)

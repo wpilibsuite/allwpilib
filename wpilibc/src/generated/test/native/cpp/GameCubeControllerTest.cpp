@@ -6,23 +6,23 @@
 #include "wpi/driverstation/GameCubeController.hpp"
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "JoystickTestMacros.hpp"
 #include "wpi/simulation/GameCubeControllerSim.hpp"
 
 using namespace wpi;
 
-TEST_CASE("GameCubeControllerTest WrappedHID", "[wpilibc][hid][controller]") {
+TEST_CASE("GameCubeControllerTest wrapped HID",
+          "[wpilibc][hid][controller]") {
   GameCubeController controller{2};
   sim::GameCubeControllerSim sim{controller};
   sim.NotifyNewData();
 
-  REQUIRE((controller.GetPort()) == (2));
-  REQUIRE((controller.GetHID().GetPort()) == (2));
-  REQUIRE((controller.GetHID().GetAxesAvailable()) == (0x3F));
-  REQUIRE((controller.GetHID().GetButtonsAvailable()) == (0xC07C4FULL));
-  REQUIRE((controller.GetHID().GetPOVsAvailable()) == (0));
+  REQUIRE(controller.GetPort() == 2);
+  REQUIRE(controller.GetHID().GetPort() == 2);
+  REQUIRE(controller.GetHID().GetAxesAvailable() == 0x3F);
+  REQUIRE(controller.GetHID().GetButtonsAvailable() == 0xC07C4FULL);
+  REQUIRE(controller.GetHID().GetPOVsAvailable() == 0);
 }
 
 BUTTON_TEST(GameCubeController, AButton)

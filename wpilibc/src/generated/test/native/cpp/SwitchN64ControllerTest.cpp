@@ -6,23 +6,23 @@
 #include "wpi/driverstation/SwitchN64Controller.hpp"
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "JoystickTestMacros.hpp"
 #include "wpi/simulation/SwitchN64ControllerSim.hpp"
 
 using namespace wpi;
 
-TEST_CASE("SwitchN64ControllerTest WrappedHID", "[wpilibc][hid][controller]") {
+TEST_CASE("SwitchN64ControllerTest wrapped HID",
+          "[wpilibc][hid][controller]") {
   SwitchN64Controller controller{2};
   sim::SwitchN64ControllerSim sim{controller};
   sim.NotifyNewData();
 
-  REQUIRE((controller.GetPort()) == (2));
-  REQUIRE((controller.GetHID().GetPort()) == (2));
-  REQUIRE((controller.GetHID().GetAxesAvailable()) == (0x33));
-  REQUIRE((controller.GetHID().GetButtonsAvailable()) == (0x20FE7FULL));
-  REQUIRE((controller.GetHID().GetPOVsAvailable()) == (0));
+  REQUIRE(controller.GetPort() == 2);
+  REQUIRE(controller.GetHID().GetPort() == 2);
+  REQUIRE(controller.GetHID().GetAxesAvailable() == 0x33);
+  REQUIRE(controller.GetHID().GetButtonsAvailable() == 0x20FE7FULL);
+  REQUIRE(controller.GetHID().GetPOVsAvailable() == 0);
 }
 
 BUTTON_TEST(SwitchN64Controller, AButton)

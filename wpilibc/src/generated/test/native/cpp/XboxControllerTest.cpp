@@ -6,23 +6,23 @@
 #include "wpi/driverstation/XboxController.hpp"
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "JoystickTestMacros.hpp"
 #include "wpi/simulation/XboxControllerSim.hpp"
 
 using namespace wpi;
 
-TEST_CASE("XboxControllerTest WrappedHID", "[wpilibc][hid][controller]") {
+TEST_CASE("XboxControllerTest wrapped HID",
+          "[wpilibc][hid][controller]") {
   XboxController controller{2};
   sim::XboxControllerSim sim{controller};
   sim.NotifyNewData();
 
-  REQUIRE((controller.GetPort()) == (2));
-  REQUIRE((controller.GetHID().GetPort()) == (2));
-  REQUIRE((controller.GetHID().GetAxesAvailable()) == (0x3F));
-  REQUIRE((controller.GetHID().GetButtonsAvailable()) == (0x7FFFULL));
-  REQUIRE((controller.GetHID().GetPOVsAvailable()) == (0));
+  REQUIRE(controller.GetPort() == 2);
+  REQUIRE(controller.GetHID().GetPort() == 2);
+  REQUIRE(controller.GetHID().GetAxesAvailable() == 0x3F);
+  REQUIRE(controller.GetHID().GetButtonsAvailable() == 0x7FFFULL);
+  REQUIRE(controller.GetHID().GetPOVsAvailable() == 0);
 }
 
 BUTTON_TEST(XboxController, AButton)

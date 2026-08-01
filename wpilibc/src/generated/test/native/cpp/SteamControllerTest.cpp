@@ -6,23 +6,23 @@
 #include "wpi/driverstation/SteamController.hpp"
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "JoystickTestMacros.hpp"
 #include "wpi/simulation/SteamControllerSim.hpp"
 
 using namespace wpi;
 
-TEST_CASE("SteamControllerTest WrappedHID", "[wpilibc][hid][controller]") {
+TEST_CASE("SteamControllerTest wrapped HID",
+          "[wpilibc][hid][controller]") {
   SteamController controller{2};
   sim::SteamControllerSim sim{controller};
   sim.NotifyNewData();
 
-  REQUIRE((controller.GetPort()) == (2));
-  REQUIRE((controller.GetHID().GetPort()) == (2));
-  REQUIRE((controller.GetHID().GetAxesAvailable()) == (0x3F));
-  REQUIRE((controller.GetHID().GetButtonsAvailable()) == (0x3FFFFFFULL));
-  REQUIRE((controller.GetHID().GetPOVsAvailable()) == (0));
+  REQUIRE(controller.GetPort() == 2);
+  REQUIRE(controller.GetHID().GetPort() == 2);
+  REQUIRE(controller.GetHID().GetAxesAvailable() == 0x3F);
+  REQUIRE(controller.GetHID().GetButtonsAvailable() == 0x3FFFFFFULL);
+  REQUIRE(controller.GetHID().GetPOVsAvailable() == 0);
 }
 
 BUTTON_TEST(SteamController, AButton)

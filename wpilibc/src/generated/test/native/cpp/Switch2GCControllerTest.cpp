@@ -6,23 +6,23 @@
 #include "wpi/driverstation/Switch2GCController.hpp"
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "JoystickTestMacros.hpp"
 #include "wpi/simulation/Switch2GCControllerSim.hpp"
 
 using namespace wpi;
 
-TEST_CASE("Switch2GCControllerTest WrappedHID", "[wpilibc][hid][controller]") {
+TEST_CASE("Switch2GCControllerTest wrapped HID",
+          "[wpilibc][hid][controller]") {
   Switch2GCController controller{2};
   sim::Switch2GCControllerSim sim{controller};
   sim.NotifyNewData();
 
-  REQUIRE((controller.GetPort()) == (2));
-  REQUIRE((controller.GetHID().GetPort()) == (2));
-  REQUIRE((controller.GetHID().GetAxesAvailable()) == (0x3F));
-  REQUIRE((controller.GetHID().GetButtonsAvailable()) == (0xE0FE6FULL));
-  REQUIRE((controller.GetHID().GetPOVsAvailable()) == (0));
+  REQUIRE(controller.GetPort() == 2);
+  REQUIRE(controller.GetHID().GetPort() == 2);
+  REQUIRE(controller.GetHID().GetAxesAvailable() == 0x3F);
+  REQUIRE(controller.GetHID().GetButtonsAvailable() == 0xE0FE6FULL);
+  REQUIRE(controller.GetHID().GetPOVsAvailable() == 0);
 }
 
 BUTTON_TEST(Switch2GCController, AButton)

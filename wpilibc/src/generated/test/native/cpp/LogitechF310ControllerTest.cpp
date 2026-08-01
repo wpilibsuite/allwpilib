@@ -6,23 +6,23 @@
 #include "wpi/driverstation/LogitechF310Controller.hpp"
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "JoystickTestMacros.hpp"
 #include "wpi/simulation/LogitechF310ControllerSim.hpp"
 
 using namespace wpi;
 
-TEST_CASE("LogitechF310ControllerTest WrappedHID", "[wpilibc][hid][controller]") {
+TEST_CASE("LogitechF310ControllerTest wrapped HID",
+          "[wpilibc][hid][controller]") {
   LogitechF310Controller controller{2};
   sim::LogitechF310ControllerSim sim{controller};
   sim.NotifyNewData();
 
-  REQUIRE((controller.GetPort()) == (2));
-  REQUIRE((controller.GetHID().GetPort()) == (2));
-  REQUIRE((controller.GetHID().GetAxesAvailable()) == (0x3F));
-  REQUIRE((controller.GetHID().GetButtonsAvailable()) == (0x7FFFULL));
-  REQUIRE((controller.GetHID().GetPOVsAvailable()) == (0));
+  REQUIRE(controller.GetPort() == 2);
+  REQUIRE(controller.GetHID().GetPort() == 2);
+  REQUIRE(controller.GetHID().GetAxesAvailable() == 0x3F);
+  REQUIRE(controller.GetHID().GetButtonsAvailable() == 0x7FFFULL);
+  REQUIRE(controller.GetHID().GetPOVsAvailable() == 0);
 }
 
 BUTTON_TEST(LogitechF310Controller, AButton)
