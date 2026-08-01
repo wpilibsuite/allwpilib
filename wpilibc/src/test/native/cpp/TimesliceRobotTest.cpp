@@ -37,7 +37,7 @@ class MockRobot : public TimesliceRobot {
 
   MockRobot() : TimesliceRobot{2_ms, 5_ms} {}
 
-  void RobotPeriodic() { m_robotPeriodicCount++; }
+  void RobotPeriodic() override { m_robotPeriodicCount++; }
 };
 }  // namespace
 

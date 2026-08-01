@@ -44,18 +44,18 @@ class MockOpMode : public wpi::OpMode {
   std::atomic<uint32_t> m_closeCount{0};
 
   MockOpMode() = default;
-  ~MockOpMode() { m_closeCount++; }
-  void DisabledPeriodic() { m_disabledPeriodicCount++; }
-  void Start() { m_startCount++; }
-  void Periodic() { m_periodicCount++; }
-  void End() { m_endCount++; }
+  ~MockOpMode() override { m_closeCount++; }
+  void DisabledPeriodic() override { m_disabledPeriodicCount++; }
+  void Start() override { m_startCount++; }
+  void Periodic() override { m_periodicCount++; }
+  void End() override { m_endCount++; }
 };
 
 class OneArgOpMode : public wpi::OpMode {
  public:
   explicit OneArgOpMode(MockRobot& robot) {}
-  void Start() {}
-  void End() {}
+  void Start() override {}
+  void End() override {}
 };
 
 class MockRobot : public wpi::OpModeRobot<MockRobot> {

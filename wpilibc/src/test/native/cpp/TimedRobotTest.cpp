@@ -59,35 +59,35 @@ class MockRobot : public TimedRobot {
 
   MockRobot() : TimedRobot{kPeriod} {}
 
-  void SimulationInit() { m_simulationInitCount++; }
+  void SimulationInit() override { m_simulationInitCount++; }
 
-  void DisabledInit() { m_disabledInitCount++; }
+  void DisabledInit() override { m_disabledInitCount++; }
 
-  void AutonomousInit() { m_autonomousInitCount++; }
+  void AutonomousInit() override { m_autonomousInitCount++; }
 
-  void TeleopInit() { m_teleopInitCount++; }
+  void TeleopInit() override { m_teleopInitCount++; }
 
-  void UtilityInit() { m_utilityInitCount++; }
+  void UtilityInit() override { m_utilityInitCount++; }
 
-  void RobotPeriodic() { m_robotPeriodicCount++; }
+  void RobotPeriodic() override { m_robotPeriodicCount++; }
 
-  void SimulationPeriodic() { m_simulationPeriodicCount++; }
+  void SimulationPeriodic() override { m_simulationPeriodicCount++; }
 
-  void DisabledPeriodic() { m_disabledPeriodicCount++; }
+  void DisabledPeriodic() override { m_disabledPeriodicCount++; }
 
-  void AutonomousPeriodic() { m_autonomousPeriodicCount++; }
+  void AutonomousPeriodic() override { m_autonomousPeriodicCount++; }
 
-  void TeleopPeriodic() { m_teleopPeriodicCount++; }
+  void TeleopPeriodic() override { m_teleopPeriodicCount++; }
 
-  void UtilityPeriodic() { m_utilityPeriodicCount++; }
+  void UtilityPeriodic() override { m_utilityPeriodicCount++; }
 
-  void DisabledExit() { m_disabledExitCount++; }
+  void DisabledExit() override { m_disabledExitCount++; }
 
-  void AutonomousExit() { m_autonomousExitCount++; }
+  void AutonomousExit() override { m_autonomousExitCount++; }
 
-  void TeleopExit() { m_teleopExitCount++; }
+  void TeleopExit() override { m_teleopExitCount++; }
 
-  void UtilityExit() { m_utilityExitCount++; }
+  void UtilityExit() override { m_utilityExitCount++; }
 };
 }  // namespace
 
