@@ -56,6 +56,13 @@ tasks.withType(CppCompile).configureEach {
     dependsOn generateImagesTask
 }
 
+nativeUtils.exportsConfigs {
+    fields {
+    }
+    fieldimages {
+    }
+}
+
 sourceSets.main.resources {
     srcDirs 'src/main/native/resources'
     include '**/*.json'
@@ -114,6 +121,10 @@ model {
                     }
                 }
             }
+            binaries.all {
+                it.cppCompiler.define 'WPILIB_EXPORTS'
+            }
+            appendDebugPathToBinaries(binaries)
         }
         fieldimages(NativeLibrarySpec) {
             baseName = 'fieldimages'
@@ -125,16 +136,19 @@ model {
                         include 'field_images.cpp', '*.jpg.cpp', '*.jpeg.cpp', '*.png.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include'
+                        srcDirs 'src/main/native/include',
+                                project(':wpiutil').file('src/main/native/include')
                     }
                 }
             }
             binaries.all {
+                it.cppCompiler.define 'WPILIB_EXPORTS'
                 if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                     it.buildable = false
                     return
                 }
             }
+            appendDebugPathToBinaries(binaries)
         }
     }
     binaries {

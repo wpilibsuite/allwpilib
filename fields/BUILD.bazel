@@ -145,6 +145,7 @@ wpilib_cc_library(
         ":field-resource-srcs-pkg",
     ],
     include_license_files = True,
+    local_defines = ["WPILIB_EXPORTS"],
     srcs_pkg_root = "src/generated/main/native/cpp/fields",
     strip_include_prefix = "src/main/native/include",
     third_party_header_only_libraries = [
@@ -179,10 +180,14 @@ wpilib_cc_library(
         ":field-image-resource-srcs-pkg",
     ],
     include_license_files = True,
+    local_defines = ["WPILIB_EXPORTS"],
     srcs_pkg_root = "src/generated/main/native/cpp/fieldimages",
     strip_include_prefix = "src/main/native/include",
     target_compatible_with = NO_SYSTEMCORE,
     visibility = ["//visibility:public"],
+    deps = [
+        "//wpiutil",
+    ],
 )
 
 wpilib_cc_static_library(

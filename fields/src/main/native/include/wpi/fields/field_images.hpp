@@ -7,6 +7,8 @@
 #include <span>
 #include <string_view>
 
+#include "wpi/util/SymbolExports.hpp"
+
 namespace wpi::fields {
 
 /** A built-in field image resource. */
@@ -26,6 +28,7 @@ struct FieldImageResource {
  *
  * @return Built-in field images
  */
+WPILIB_DLLEXPORT
 std::span<const FieldImageResource> GetFieldImages();
 
 /**
@@ -34,6 +37,7 @@ std::span<const FieldImageResource> GetFieldImages();
  * @param resourcePath Image resource path relative to BASE_RESOURCE_DIR
  * @return The image resource contents, or an empty view if it is not available
  */
+WPILIB_DLLEXPORT
 std::string_view GetFieldImage(std::string_view resourcePath);
 
 }  // namespace wpi::fields

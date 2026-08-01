@@ -7,14 +7,24 @@
 #include <string>
 #include <string_view>
 
+#include "wpi/util/SymbolExports.hpp"
+
 namespace wpi::util {
 class json;
 }  // namespace wpi::util
 
 namespace wpi::fields {
 
+class FieldImage;
+
+WPILIB_DLLEXPORT
+void to_json(wpi::util::json& json, const FieldImage& image);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::util::json& json, FieldImage& image);
+
 /** Field image metadata. */
-class FieldImage {
+class WPILIB_DLLEXPORT FieldImage {
  public:
   /** Constructs empty field image metadata. */
   FieldImage() = default;
@@ -87,8 +97,10 @@ class FieldImage {
   friend void from_json(const wpi::util::json& json, FieldImage& image);
 };
 
+WPILIB_DLLEXPORT
 void to_json(wpi::util::json& json, const FieldImage& image);
 
+WPILIB_DLLEXPORT
 void from_json(const wpi::util::json& json, FieldImage& image);
 
 }  // namespace wpi::fields

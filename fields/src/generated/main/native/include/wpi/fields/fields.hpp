@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "wpi/fields/Field.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::fields {
 
@@ -64,6 +65,7 @@ enum class FieldId {
  *
  * @return Built-in field selectors.
  */
+WPILIB_DLLEXPORT
 std::vector<FieldId> GetFields();
 
 /**
@@ -72,6 +74,7 @@ std::vector<FieldId> GetFields();
  * @param field Built-in field selector.
  * @return Human-readable field name.
  */
+WPILIB_DLLEXPORT
 std::string_view GetFieldName(FieldId field);
 
 /**
@@ -80,6 +83,7 @@ std::string_view GetFieldName(FieldId field);
  * @param field Built-in field selector.
  * @return Built-in field.
  */
+WPILIB_DLLEXPORT
 Field GetField(FieldId field);
 
 }  // namespace wpi::fields

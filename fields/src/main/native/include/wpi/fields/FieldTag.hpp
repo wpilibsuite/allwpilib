@@ -5,6 +5,7 @@
 #pragma once
 
 #include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::util {
 class json;
@@ -15,7 +16,7 @@ namespace wpi::fields {
 /**
  * Represents a field tag's metadata.
  */
-struct FieldTag {
+struct WPILIB_DLLEXPORT FieldTag {
   /// The tag's ID.
   int ID;
 
@@ -25,8 +26,10 @@ struct FieldTag {
   bool operator==(const FieldTag&) const = default;
 };
 
+WPILIB_DLLEXPORT
 void to_json(wpi::util::json& json, const FieldTag& tag);
 
+WPILIB_DLLEXPORT
 void from_json(const wpi::util::json& json, FieldTag& tag);
 
 }  // namespace wpi::fields
