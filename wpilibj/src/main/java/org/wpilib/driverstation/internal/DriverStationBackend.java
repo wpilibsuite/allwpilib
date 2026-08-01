@@ -513,6 +513,7 @@ public final class DriverStationBackend {
     final int[] resourceAlertValues = new int[JOYSTICK_RESOURCE_ALERTS.length];
     int touchpadFingerAlertTouchpad;
     int touchpadFingerAlertFinger;
+    boolean initialized;
 
     JoystickAlerts(int stick) {
       this.stick = stick;
@@ -524,27 +525,78 @@ public final class DriverStationBackend {
       initializeAlerts();
     }
 
-    void initializeAlerts() {
-      connectionAlert.alert =
-          new Alert(
-              "DriverStation",
-              "joystick" + stick + "Disconnected",
-              connectionText,
-              Alert.Level.HIGH);
-      for (JoystickResourceAlert resourceAlert : JOYSTICK_RESOURCE_ALERTS) {
-        resourceAlerts[resourceAlert.ordinal()].alert =
+    boolean initializeAlerts() {
+      closeAlerts();
+
+      Alert newConnectionAlert = null;
+      Alert[] newResourceAlerts = new Alert[JOYSTICK_RESOURCE_ALERTS.length];
+      Alert newTouchpadFingerAlert = null;
+
+      try {
+        newConnectionAlert =
             new Alert(
                 "DriverStation",
-                "joystick" + stick + resourceAlert.idSuffix,
+                "joystick" + stick + "Disconnected",
+                connectionText,
+                Alert.Level.HIGH);
+        for (JoystickResourceAlert resourceAlert : JOYSTICK_RESOURCE_ALERTS) {
+          newResourceAlerts[resourceAlert.ordinal()] =
+              new Alert(
+                  "DriverStation",
+                  "joystick" + stick + resourceAlert.idSuffix,
+                  "",
+                  Alert.Level.MEDIUM);
+        }
+        newTouchpadFingerAlert =
+            new Alert(
+                "DriverStation",
+                "joystick" + stick + "TouchpadFingerUnavailable",
                 "",
                 Alert.Level.MEDIUM);
+      } catch (AlertException ex) {
+        closeAlert(newConnectionAlert);
+        for (Alert alert : newResourceAlerts) {
+          closeAlert(alert);
+        }
+        closeAlert(newTouchpadFingerAlert);
+        initialized = false;
+        return false;
       }
-      touchpadFingerAlert.alert =
-          new Alert(
-              "DriverStation",
-              "joystick" + stick + "TouchpadFingerUnavailable",
-              "",
-              Alert.Level.MEDIUM);
+
+      connectionAlert.alert = newConnectionAlert;
+      for (JoystickResourceAlert resourceAlert : JOYSTICK_RESOURCE_ALERTS) {
+        resourceAlerts[resourceAlert.ordinal()].alert = newResourceAlerts[resourceAlert.ordinal()];
+      }
+      touchpadFingerAlert.alert = newTouchpadFingerAlert;
+      initialized = true;
+      return true;
+    }
+
+    void closeAlerts() {
+      closeAlert(connectionAlert);
+      for (JoystickAlertState alertState : resourceAlerts) {
+        closeAlert(alertState);
+      }
+      closeAlert(touchpadFingerAlert);
+      initialized = false;
+    }
+
+    static void closeAlert(JoystickAlertState alertState) {
+      closeAlert(alertState.alert);
+      alertState.alert = null;
+      alertState.active = false;
+    }
+
+    static void closeAlert(Alert alert) {
+      if (alert == null) {
+        return;
+      }
+
+      try {
+        alert.close();
+      } catch (AlertException ex) {
+        // Ignore stale handles while cleaning up a failed initialization attempt.
+      }
     }
 
     boolean prepareForReport() {
@@ -621,6 +673,10 @@ public final class DriverStationBackend {
 
     boolean applyAlert(
         JoystickAlertState alertState, boolean active, String text, boolean verifyActive) {
+      if (alertState.alert == null) {
+        return false;
+      }
+
       try {
         if (active && !text.isEmpty()) {
           alertState.alert.setText(text);
@@ -642,12 +698,18 @@ public final class DriverStationBackend {
         return true;
       }
 
+      if (active && !initialized && !initializeAlerts()) {
+        return false;
+      }
+
       if (!applyAlert(alertState, active, text, verifyActive)) {
         if (!active) {
           alertState.active = false;
           return true;
         }
-        initializeAlerts();
+        if (!initializeAlerts()) {
+          return false;
+        }
         if (!applyAlert(alertState, active, text, verifyActive)) {
           return false;
         }

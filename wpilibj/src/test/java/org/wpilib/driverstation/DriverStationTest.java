@@ -121,6 +121,25 @@ class DriverStationTest {
     assertFalse(isJoystickDisconnectedAlertActive(0));
   }
 
+  @Test
+  void joystickAlertCollisionDoesNotEscapeGetter() {
+    AlertSim.resetData();
+    DriverStationSim.setJoystickButtonsAvailable(0, 1);
+    DriverStationSim.setJoystickAxesAvailable(0, 1);
+    DriverStationSim.setJoystickPOVsAvailable(0, 1);
+    DriverStationSim.notifyNewData();
+
+    try (Alert collision =
+        new Alert("DriverStation", "joystick0AxisUnavailable", "collision", Alert.Level.MEDIUM)) {
+      assertEquals(0.0, DriverStationBackend.getStickAxis(0, 1));
+      assertEquals(1, AlertSim.getAll().length, DriverStationTest::alertList);
+    }
+
+    assertEquals(0.0, DriverStationBackend.getStickAxis(0, 1));
+    assertDriverStationAlertActive(
+        "joystick0AxisUnavailable", "Joystick axis 1 on port 0 not available", Alert.Level.MEDIUM);
+  }
+
   static Stream<Arguments> connectionAlertProvider() {
     return Stream.of(
         arguments(false, true, true, false),
