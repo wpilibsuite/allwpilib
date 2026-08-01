@@ -365,7 +365,7 @@ public enum Fields {
 
   private synchronized List<FieldTag> getCachedTags() {
     if (m_tags == null) {
-      m_tags = List.copyOf(m_tagsFactory.get());
+      m_tags = m_tagsFactory.get();
     }
     return m_tags;
   }
