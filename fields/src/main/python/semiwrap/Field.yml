@@ -4,8 +4,13 @@ extra_includes:
 functions:
   to_json:
     ignore: true
+    overloads:
+      wpi::util::json&, const Field&:
   from_json:
     ignore: true
+    overloads:
+      const wpi::util::json&, Field&:
+  GetField:
 classes:
   wpi::fields::Field:
     force_no_trampoline: true
