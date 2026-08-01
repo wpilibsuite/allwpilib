@@ -321,7 +321,6 @@ if(WPILIB_WITH_CSCORE)
 endif()
 
 if(WPILIB_WITH_WPILIB)
-    set(APRILTAG_DEP_REPLACE "find_dependency(apriltag)")
     set(WPILIBC_DEP_REPLACE "find_dependency(wpilibc)")
     set(COMMAND_DEP_REPLACE "find_dependency(commandsv2)")
     add_subdirectory(apriltag)
