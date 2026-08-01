@@ -1,7 +1,5 @@
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
-evaluationDependsOn(':cscore')
-evaluationDependsOn(':cameraserver')
 
 ext {
     baseId = 'wpilibj'
@@ -69,9 +67,7 @@ dependencies {
     implementation project(':wpinet')
     implementation project(':wpimath')
     implementation project(':ntcore')
-    implementation project(':cscore')
     api project(':datalog')
-    implementation project(':cameraserver')
     testImplementation(libs.bundles.mockito)
     devImplementation sourceSets.main.output
 }
@@ -82,15 +78,6 @@ apply plugin: ExtraTasks
 apply from: "${rootDir}/shared/config.gradle"
 
 project(':').libraryBuild.dependsOn build
-
-ext {
-    sharedCvConfigs = [wpilibjDev: []]
-    staticCvConfigs = [:]
-    useJava = true
-    useCpp = true
-}
-
-apply from: "${rootDir}/shared/opencv.gradle"
 
 model {
     components {
@@ -110,15 +97,12 @@ model {
             binaries.all {
                 project(':ntcore').addNtcoreDependency(it, 'shared')
                 project(':ntcore').addNtcoreJniDependency(it)
-                lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-                lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
-                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
                 project(':hal').addHalJniDependency(it)
             }

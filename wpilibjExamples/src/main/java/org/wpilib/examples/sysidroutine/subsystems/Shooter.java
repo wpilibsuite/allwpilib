@@ -83,8 +83,8 @@ public class Shooter extends SubsystemBase {
         })
         .finallyDo(
             () -> {
-              shooterMotor.stopMotor();
-              feederMotor.stopMotor();
+              shooterMotor.setVoltage(0.0);
+              feederMotor.setVoltage(0.0);
             })
         .withName("runShooter");
   }

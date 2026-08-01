@@ -26,7 +26,7 @@
 #include <implot.h>
 #include <implot_internal.h>
 
-#include "wpi/glass/Context.hpp"
+#include "wpi/glass/ContextInternal.hpp"
 #include "wpi/glass/DataSource.hpp"
 #include "wpi/glass/Storage.hpp"
 #include "wpi/glass/support/ColorSetting.hpp"
@@ -38,6 +38,10 @@
 using namespace wpi::glass;
 
 static constexpr int kAxisCount = 3;
+
+static double GetTimestampDisplayOffsetSeconds() {
+  return static_cast<double>(GetTimestampDisplayOffset()) * 1.0e-6;
+}
 
 namespace {
 class PlotView;
@@ -177,6 +181,8 @@ class Plot {
   };
   std::vector<PlotAxis> m_axis;
   ImPlotRange m_xaxisRange;  // read from plot, used for lockPrevX
+  int64_t m_timeOffset = 0;
+  bool m_timeOffsetValid = false;
 };
 
 class PlotView : public View {
@@ -357,17 +363,18 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
   // we handle the offset logic ourselves to avoid wrap issues with size + 1
   struct GetterData {
     double now;
-    double zeroTime;
+    double timeOffset;
     ImPlotPoint* data;
     int size;
     int offset;
   };
-  GetterData getterData = {now, GetZeroTime() * 1.0e-6, m_data, size, offset};
+  GetterData getterData = {now, GetTimestampDisplayOffsetSeconds(), m_data,
+                           size, offset};
   auto getter = [](int idx, void* data) {
     auto d = static_cast<GetterData*>(data);
     if (idx == d->size) {
       return ImPlotPoint{
-          d->now - d->zeroTime,
+          d->now - d->timeOffset,
           d->data[d->offset == 0 ? d->size - 1 : d->offset - 1].y};
     }
     ImPlotPoint* point;
@@ -376,7 +383,7 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
     } else {
       point = &d->data[d->offset + idx - d->size];
     }
-    return ImPlotPoint{point->x - d->zeroTime, point->y};
+    return ImPlotPoint{point->x - d->timeOffset, point->y};
   };
 
   if (m_color.GetColorFloat()[3] == IMPLOT_AUTO) {
@@ -618,6 +625,24 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
   wpi::util::format_to_n_c_str(label, sizeof(label), "{}###plot{}", m_name,
                                static_cast<int>(i));
 
+  int64_t timeOffsetUs = GetTimestampDisplayOffset();
+  double timeOffset = static_cast<double>(timeOffsetUs) * 1.0e-6;
+  bool timeOffsetChanged = false;
+  if (m_timeOffsetValid) {
+    if (timeOffsetUs != m_timeOffset) {
+      double offsetDelta = (static_cast<double>(m_timeOffset) -
+                            static_cast<double>(timeOffsetUs)) *
+                           1.0e-6;
+      m_xaxisRange.Min += offsetDelta;
+      m_xaxisRange.Max += offsetDelta;
+      m_timeOffset = timeOffsetUs;
+      timeOffsetChanged = true;
+    }
+  } else {
+    m_timeOffset = timeOffsetUs;
+    m_timeOffsetValid = true;
+  }
+
   ImPlotFlags plotFlags = (m_legend ? 0 : ImPlotFlags_NoLegend) |
                           (m_crosshairs ? ImPlotFlags_Crosshairs : 0) |
                           (m_mousePosition ? 0 : ImPlotFlags_NoMouseText);
@@ -644,10 +669,15 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
                               ImGuiCond_Always);
     } else {
       // also force-pause plots if overall timing is paused
-      double zeroTime = GetZeroTime() * 1.0e-6;
-      ImPlot::SetupAxisLimits(
-          ImAxis_X1, now - zeroTime - m_viewTime, now - zeroTime,
-          (paused || m_paused) ? ImGuiCond_Once : ImGuiCond_Always);
+      double displayNow = now - timeOffset;
+      if (timeOffsetChanged && (paused || m_paused)) {
+        ImPlot::SetupAxisLimits(ImAxis_X1, m_xaxisRange.Min, m_xaxisRange.Max,
+                                ImGuiCond_Always);
+      } else {
+        ImPlot::SetupAxisLimits(
+            ImAxis_X1, displayNow - m_viewTime, displayNow,
+            (paused || m_paused) ? ImGuiCond_Once : ImGuiCond_Always);
+      }
     }
 
     // setup y axes

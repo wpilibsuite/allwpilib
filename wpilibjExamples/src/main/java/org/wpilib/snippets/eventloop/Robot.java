@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
         // or there is a ball in the kicker
         .or(isBallAtKicker)
         // stop the intake
-        .ifHigh(intake::stopMotor);
+        .ifHigh(() -> intake.setThrottle(0.0));
 
     BooleanEvent shootTrigger = new BooleanEvent(loop, joystick::getTrigger);
 
@@ -65,7 +65,7 @@ public class Robot extends TimedRobot {
         });
 
     // if not, stop
-    shootTrigger.negate().ifHigh(shooter::stopMotor);
+    shootTrigger.negate().ifHigh(() -> shooter.setThrottle(0.0));
 
     BooleanEvent atTargetVelocity =
         new BooleanEvent(loop, controller::atSetpoint)
@@ -79,7 +79,7 @@ public class Robot extends TimedRobot {
     atTargetVelocity
         .falling()
         // so stop the kicker
-        .ifHigh(kicker::stopMotor);
+        .ifHigh(() -> kicker.setThrottle(0.0));
   }
 
   @Override

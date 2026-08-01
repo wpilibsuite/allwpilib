@@ -12,10 +12,72 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/driverstation/Alert.hpp"
 #include "wpi/hal/HAL.h"
+#include "wpi/util/Alert.hpp"
+#include "wpi/util/string.hpp"
 
 namespace wpi::sim {
+
+namespace {
+
+struct GrowingBackendState {
+  int32_t getAlertsLength = 0;
+  int32_t freeAlertsLength = 0;
+};
+
+GrowingBackendState gGrowingBackendState;
+
+int32_t GrowingBackendGetNumAlerts() {
+  return 1;
+}
+
+int32_t GrowingBackendGetAlerts(WPI_AlertInfo* arr, int32_t length) {
+  gGrowingBackendState.getAlertsLength = length;
+  if (length > 0) {
+    arr[0].group = wpi::util::alloc_wpi_string("group");
+    arr[0].id = wpi::util::alloc_wpi_string("id");
+    arr[0].text = wpi::util::alloc_wpi_string("text");
+    arr[0].activeStartTime = 1234;
+    arr[0].level = WPI_ALERT_HIGH;
+  }
+  return 2;
+}
+
+void GrowingBackendFreeAlerts(WPI_AlertInfo* arr, int32_t length) {
+  gGrowingBackendState.freeAlertsLength = length;
+  for (int32_t i = 0; i < length; ++i) {
+    WPI_FreeString(&arr[i].group);
+    WPI_FreeString(&arr[i].id);
+    WPI_FreeString(&arr[i].text);
+  }
+}
+
+const WPI_AlertBackend kGrowingBackend{nullptr,
+                                       nullptr,
+                                       nullptr,
+                                       nullptr,
+                                       nullptr,
+                                       nullptr,
+                                       nullptr,
+                                       GrowingBackendGetNumAlerts,
+                                       GrowingBackendGetAlerts,
+                                       GrowingBackendFreeAlerts,
+                                       nullptr};
+
+class ScopedAlertBackend {
+ public:
+  explicit ScopedAlertBackend(const WPI_AlertBackend* backend)
+      : m_previous{WPI_GetAlertBackend()} {
+    WPI_SetAlertBackend(backend);
+  }
+
+  ~ScopedAlertBackend() { WPI_SetAlertBackend(m_previous); }
+
+ private:
+  const WPI_AlertBackend* m_previous;
+};
+
+}  // namespace
 
 class AlertSimTest : public ::testing::Test {
  public:
@@ -29,12 +91,12 @@ class AlertSimTest : public ::testing::Test {
     return std::format("{}_{}", testInfo->test_suite_name(), testInfo->name());
   }
 
-  template <typename... Args>
-  Alert MakeAlert(Args&&... args) {
-    return Alert(GetGroupName(), std::forward<Args>(args)...);
+  wpi::util::Alert MakeAlert(std::string_view text,
+                             wpi::util::Alert::Level type) {
+    return wpi::util::Alert(GetGroupName(), text, text, type);
   }
 
-  std::vector<std::string> GetActiveAlerts(Alert::Level type) {
+  std::vector<std::string> GetActiveAlerts(wpi::util::Alert::Level type) {
     auto alerts = AlertSim::GetAll();
     std::vector<std::string> activeAlerts;
     for (const auto& alert : alerts) {
@@ -45,7 +107,7 @@ class AlertSimTest : public ::testing::Test {
     return activeAlerts;
   }
 
-  bool IsAlertActive(std::string_view text, Alert::Level type) {
+  bool IsAlertActive(std::string_view text, wpi::util::Alert::Level type) {
     auto alerts = AlertSim::GetAll();
     return std::any_of(alerts.begin(), alerts.end(),
                        [text, type](const AlertSim::AlertInfo& alert) {
@@ -64,50 +126,50 @@ TEST_F(AlertSimTest, NoAlertsInitially) {
 }
 
 TEST_F(AlertSimTest, NoAlertsAfterReset) {
-  auto alert = MakeAlert("alert", Alert::Level::HIGH);
+  auto alert = MakeAlert("alert", wpi::util::Alert::Level::HIGH);
   alert.Set(true);
-  EXPECT_TRUE(IsAlertActive("alert", Alert::Level::HIGH));
+  EXPECT_TRUE(IsAlertActive("alert", wpi::util::Alert::Level::HIGH));
   AlertSim::ResetData();
   EXPECT_EQ(AlertSim::GetCount(), 0);
   EXPECT_TRUE(AlertSim::GetAll().empty());
 }
 
 TEST_F(AlertSimTest, SetUnsetSingle) {
-  auto one = MakeAlert("one", Alert::Level::LOW);
-  EXPECT_FALSE(IsAlertActive("one", Alert::Level::LOW));
+  auto one = MakeAlert("one", wpi::util::Alert::Level::LOW);
+  EXPECT_FALSE(IsAlertActive("one", wpi::util::Alert::Level::LOW));
   one.Set(true);
-  EXPECT_TRUE(IsAlertActive("one", Alert::Level::LOW));
+  EXPECT_TRUE(IsAlertActive("one", wpi::util::Alert::Level::LOW));
   one.Set(false);
-  EXPECT_FALSE(IsAlertActive("one", Alert::Level::LOW));
+  EXPECT_FALSE(IsAlertActive("one", wpi::util::Alert::Level::LOW));
 }
 
 TEST_F(AlertSimTest, SetUnsetMultiple) {
-  auto one = MakeAlert("one", Alert::Level::HIGH);
-  auto two = MakeAlert("two", Alert::Level::LOW);
-  EXPECT_FALSE(IsAlertActive("one", Alert::Level::HIGH));
-  EXPECT_FALSE(IsAlertActive("two", Alert::Level::LOW));
+  auto one = MakeAlert("one", wpi::util::Alert::Level::HIGH);
+  auto two = MakeAlert("two", wpi::util::Alert::Level::LOW);
+  EXPECT_FALSE(IsAlertActive("one", wpi::util::Alert::Level::HIGH));
+  EXPECT_FALSE(IsAlertActive("two", wpi::util::Alert::Level::LOW));
   one.Set(true);
-  EXPECT_TRUE(IsAlertActive("one", Alert::Level::HIGH));
-  EXPECT_FALSE(IsAlertActive("two", Alert::Level::LOW));
+  EXPECT_TRUE(IsAlertActive("one", wpi::util::Alert::Level::HIGH));
+  EXPECT_FALSE(IsAlertActive("two", wpi::util::Alert::Level::LOW));
   one.Set(true);
   two.Set(true);
-  EXPECT_TRUE(IsAlertActive("one", Alert::Level::HIGH));
-  EXPECT_TRUE(IsAlertActive("two", Alert::Level::LOW));
+  EXPECT_TRUE(IsAlertActive("one", wpi::util::Alert::Level::HIGH));
+  EXPECT_TRUE(IsAlertActive("two", wpi::util::Alert::Level::LOW));
   one.Set(false);
-  EXPECT_FALSE(IsAlertActive("one", Alert::Level::HIGH));
-  EXPECT_TRUE(IsAlertActive("two", Alert::Level::LOW));
+  EXPECT_FALSE(IsAlertActive("one", wpi::util::Alert::Level::HIGH));
+  EXPECT_TRUE(IsAlertActive("two", wpi::util::Alert::Level::LOW));
 }
 
 TEST_F(AlertSimTest, SetIsIdempotent) {
-  auto a = MakeAlert("A", Alert::Level::LOW);
-  auto b = MakeAlert("B", Alert::Level::LOW);
-  auto c = MakeAlert("C", Alert::Level::LOW);
+  auto a = MakeAlert("A", wpi::util::Alert::Level::LOW);
+  auto b = MakeAlert("B", wpi::util::Alert::Level::LOW);
+  auto c = MakeAlert("C", wpi::util::Alert::Level::LOW);
   a.Set(true);
 
   b.Set(true);
   c.Set(true);
 
-  const auto startState = GetActiveAlerts(Alert::Level::LOW);
+  const auto startState = GetActiveAlerts(wpi::util::Alert::Level::LOW);
   std::vector<std::string> expected;
   expected.emplace_back("A");
   expected.emplace_back("B");
@@ -115,50 +177,50 @@ TEST_F(AlertSimTest, SetIsIdempotent) {
   EXPECT_EQ(expected, startState);
 
   b.Set(true);
-  EXPECT_STATE(Alert::Level::LOW, startState);
+  EXPECT_STATE(wpi::util::Alert::Level::LOW, startState);
 
   a.Set(true);
-  EXPECT_STATE(Alert::Level::LOW, startState);
+  EXPECT_STATE(wpi::util::Alert::Level::LOW, startState);
 }
 
 TEST_F(AlertSimTest, DestructorUnsetsAlert) {
   {
-    auto alert = MakeAlert("alert", Alert::Level::MEDIUM);
+    auto alert = MakeAlert("alert", wpi::util::Alert::Level::MEDIUM);
     alert.Set(true);
-    EXPECT_TRUE(IsAlertActive("alert", Alert::Level::MEDIUM));
+    EXPECT_TRUE(IsAlertActive("alert", wpi::util::Alert::Level::MEDIUM));
   }
-  EXPECT_FALSE(IsAlertActive("alert", Alert::Level::MEDIUM));
+  EXPECT_FALSE(IsAlertActive("alert", wpi::util::Alert::Level::MEDIUM));
 }
 
 TEST_F(AlertSimTest, SetTextWhileUnset) {
-  auto alert = MakeAlert("BEFORE", Alert::Level::LOW);
+  auto alert = MakeAlert("BEFORE", wpi::util::Alert::Level::LOW);
   EXPECT_EQ("BEFORE", alert.GetText());
   alert.Set(true);
-  EXPECT_TRUE(IsAlertActive("BEFORE", Alert::Level::LOW));
+  EXPECT_TRUE(IsAlertActive("BEFORE", wpi::util::Alert::Level::LOW));
   alert.Set(false);
-  EXPECT_FALSE(IsAlertActive("BEFORE", Alert::Level::LOW));
+  EXPECT_FALSE(IsAlertActive("BEFORE", wpi::util::Alert::Level::LOW));
   alert.SetText("AFTER");
   EXPECT_EQ("AFTER", alert.GetText());
   alert.Set(true);
-  EXPECT_FALSE(IsAlertActive("BEFORE", Alert::Level::LOW));
-  EXPECT_TRUE(IsAlertActive("AFTER", Alert::Level::LOW));
+  EXPECT_FALSE(IsAlertActive("BEFORE", wpi::util::Alert::Level::LOW));
+  EXPECT_TRUE(IsAlertActive("AFTER", wpi::util::Alert::Level::LOW));
 }
 
 TEST_F(AlertSimTest, SetTextWhileSet) {
-  auto alert = MakeAlert("BEFORE", Alert::Level::LOW);
+  auto alert = MakeAlert("BEFORE", wpi::util::Alert::Level::LOW);
   EXPECT_EQ("BEFORE", alert.GetText());
   alert.Set(true);
-  EXPECT_TRUE(IsAlertActive("BEFORE", Alert::Level::LOW));
+  EXPECT_TRUE(IsAlertActive("BEFORE", wpi::util::Alert::Level::LOW));
   alert.SetText("AFTER");
   EXPECT_EQ("AFTER", alert.GetText());
-  EXPECT_FALSE(IsAlertActive("BEFORE", Alert::Level::LOW));
-  EXPECT_TRUE(IsAlertActive("AFTER", Alert::Level::LOW));
+  EXPECT_FALSE(IsAlertActive("BEFORE", wpi::util::Alert::Level::LOW));
+  EXPECT_TRUE(IsAlertActive("AFTER", wpi::util::Alert::Level::LOW));
 }
 
 TEST_F(AlertSimTest, GetActive) {
-  auto a = MakeAlert("A", Alert::Level::HIGH);
-  auto b = MakeAlert("B", Alert::Level::HIGH);
-  auto c = MakeAlert("C", Alert::Level::HIGH);
+  auto a = MakeAlert("A", wpi::util::Alert::Level::HIGH);
+  auto b = MakeAlert("B", wpi::util::Alert::Level::HIGH);
+  auto c = MakeAlert("C", wpi::util::Alert::Level::HIGH);
   a.Set(true);
   b.Set(true);
   c.Set(false);
@@ -167,6 +229,12 @@ TEST_F(AlertSimTest, GetActive) {
   auto all = AlertSim::GetAll();
   EXPECT_EQ(active.size(), 2u);
   EXPECT_EQ(all.size(), 3u);
+  std::vector<std::string> ids;
+  for (const auto& info : all) {
+    ids.emplace_back(info.id);
+  }
+  std::ranges::sort(ids);
+  EXPECT_EQ(ids, (std::vector<std::string>{"A", "B", "C"}));
   EXPECT_TRUE((active[0].text == "A" && active[1].text == "B") ||
               (active[0].text == "B" && active[1].text == "A"));
 
@@ -177,6 +245,22 @@ TEST_F(AlertSimTest, GetActive) {
   EXPECT_EQ(active.size(), 1u);
   EXPECT_EQ(all.size(), 3u);
   EXPECT_EQ(active[0].text, "B");
+}
+
+TEST_F(AlertSimTest, GetAllClampsToAllocatedLengthWhenBackendCountGrows) {
+  gGrowingBackendState = {};
+  ScopedAlertBackend backend{&kGrowingBackend};
+
+  auto alerts = AlertSim::GetAll();
+
+  EXPECT_EQ(gGrowingBackendState.getAlertsLength, 1);
+  EXPECT_EQ(gGrowingBackendState.freeAlertsLength, 1);
+  ASSERT_EQ(alerts.size(), 1u);
+  EXPECT_EQ(alerts[0].group, "group");
+  EXPECT_EQ(alerts[0].id, "id");
+  EXPECT_EQ(alerts[0].text, "text");
+  EXPECT_EQ(alerts[0].activeStartTime, 1234);
+  EXPECT_EQ(alerts[0].level, wpi::util::Alert::Level::HIGH);
 }
 
 }  // namespace wpi::sim

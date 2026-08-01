@@ -7,8 +7,9 @@
 #include <cmath>
 #include <numbers>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/units/angle.hpp"
@@ -79,7 +80,7 @@ void CalculateAndSimulate(const wpi::math::ArmFeedforward& armFF, Ks_unit Ks,
                           wpi::units::radians_per_second_t nextVelocity,
                           wpi::units::second_t dt) {
   auto input = armFF.Calculate(currentAngle, currentVelocity, nextVelocity);
-  EXPECT_NEAR(
+  CHECK_NEAR(
       nextVelocity.value(),
       Simulate(Ks, Kv, Ka, Kg, currentAngle, currentVelocity, input, dt)(1),
       1e-4);
@@ -87,7 +88,7 @@ void CalculateAndSimulate(const wpi::math::ArmFeedforward& armFF, Ks_unit Ks,
 
 }  // namespace
 
-TEST(ArmFeedforwardTest, Calculate) {
+TEST_CASE("ArmFeedforwardTest Calculate", "[wpimath]") {
   constexpr auto Ks = 0.5_V;
   constexpr auto Kv = 1.5_V / 1_rad_per_s;
   constexpr auto Ka = 2_V / 1_rad_per_s_sq;
@@ -95,12 +96,10 @@ TEST(ArmFeedforwardTest, Calculate) {
   wpi::math::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
 
   // Calculate(angle, angular velocity)
-  EXPECT_NEAR(
-      armFF.Calculate(std::numbers::pi / 3 * 1_rad, 0_rad_per_s).value(), 0.5,
-      0.002);
-  EXPECT_NEAR(
-      armFF.Calculate(std::numbers::pi / 3 * 1_rad, 1_rad_per_s).value(), 2.5,
-      0.002);
+  CHECK_NEAR(armFF.Calculate(std::numbers::pi / 3 * 1_rad, 0_rad_per_s).value(),
+             0.5, 0.002);
+  CHECK_NEAR(armFF.Calculate(std::numbers::pi / 3 * 1_rad, 1_rad_per_s).value(),
+             2.5, 0.002);
 
   // Calculate(currentAngle, currentVelocity, nextAngle, dt)
   CalculateAndSimulate(armFF, Ks, Kv, Ka, Kg, std::numbers::pi / 3 * 1_rad,
@@ -113,7 +112,7 @@ TEST(ArmFeedforwardTest, Calculate) {
                        1_rad_per_s, 0.95_rad_per_s, 20_ms);
 }
 
-TEST(ArmFeedforwardTest, CalculateIllConditionedModel) {
+TEST_CASE("ArmFeedforwardTest CalculateIllConditionedModel", "[wpimath]") {
   constexpr auto Ks = 0.39671_V;
   constexpr auto Kv = 2.7167_V / 1_rad_per_s;
   constexpr auto Ka = 1e-2_V / 1_rad_per_s_sq;
@@ -126,14 +125,14 @@ TEST(ArmFeedforwardTest, CalculateIllConditionedModel) {
 
   constexpr auto averageAccel = (nextVelocity - currentVelocity) / 20_ms;
 
-  EXPECT_DOUBLE_EQ(
+  CHECK_DOUBLE_EQ(
       armFF.Calculate(currentAngle, currentVelocity, nextVelocity).value(),
       (Ks + Kv * currentVelocity + Ka * averageAccel +
        Kg * wpi::units::math::cos(currentAngle))
           .value());
 }
 
-TEST(ArmFeedforwardTest, CalculateIllConditionedGradient) {
+TEST_CASE("ArmFeedforwardTest CalculateIllConditionedGradient", "[wpimath]") {
   constexpr auto Ks = 0.39671_V;
   constexpr auto Kv = 2.7167_V / 1_rad_per_s;
   constexpr auto Ka = 0.50799_V / 1_rad_per_s_sq;
@@ -144,61 +143,61 @@ TEST(ArmFeedforwardTest, CalculateIllConditionedGradient) {
                        0_rad_per_s, 20_ms);
 }
 
-TEST(ArmFeedforwardTest, AchievableVelocity) {
+TEST_CASE("ArmFeedforwardTest AchievableVelocity", "[wpimath]") {
   constexpr auto Ks = 0.5_V;
   constexpr auto Kv = 1.5_V / 1_rad_per_s;
   constexpr auto Ka = 2_V / 1_rad_per_s_sq;
   constexpr auto Kg = 1_V;
   wpi::math::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
 
-  EXPECT_NEAR(armFF
-                  .MaxAchievableVelocity(12_V, std::numbers::pi / 3 * 1_rad,
-                                         1_rad_per_s_sq)
-                  .value(),
-              6, 0.002);
-  EXPECT_NEAR(armFF
-                  .MinAchievableVelocity(11.5_V, std::numbers::pi / 3 * 1_rad,
-                                         1_rad_per_s_sq)
-                  .value(),
-              -9, 0.002);
+  CHECK_NEAR(armFF
+                 .MaxAchievableVelocity(12_V, std::numbers::pi / 3 * 1_rad,
+                                        1_rad_per_s_sq)
+                 .value(),
+             6, 0.002);
+  CHECK_NEAR(armFF
+                 .MinAchievableVelocity(11.5_V, std::numbers::pi / 3 * 1_rad,
+                                        1_rad_per_s_sq)
+                 .value(),
+             -9, 0.002);
 }
 
-TEST(ArmFeedforwardTest, AchievableAcceleration) {
+TEST_CASE("ArmFeedforwardTest AchievableAcceleration", "[wpimath]") {
   constexpr auto Ks = 0.5_V;
   constexpr auto Kv = 1.5_V / 1_rad_per_s;
   constexpr auto Ka = 2_V / 1_rad_per_s_sq;
   constexpr auto Kg = 1_V;
   wpi::math::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
 
-  EXPECT_NEAR(armFF
-                  .MaxAchievableAcceleration(12_V, std::numbers::pi / 3 * 1_rad,
-                                             1_rad_per_s)
-                  .value(),
-              4.75, 0.002);
-  EXPECT_NEAR(armFF
-                  .MaxAchievableAcceleration(12_V, std::numbers::pi / 3 * 1_rad,
-                                             -1_rad_per_s)
-                  .value(),
-              6.75, 0.002);
-  EXPECT_NEAR(armFF
-                  .MinAchievableAcceleration(12_V, std::numbers::pi / 3 * 1_rad,
-                                             1_rad_per_s)
-                  .value(),
-              -7.25, 0.002);
-  EXPECT_NEAR(armFF
-                  .MinAchievableAcceleration(12_V, std::numbers::pi / 3 * 1_rad,
-                                             -1_rad_per_s)
-                  .value(),
-              -5.25, 0.002);
+  CHECK_NEAR(armFF
+                 .MaxAchievableAcceleration(12_V, std::numbers::pi / 3 * 1_rad,
+                                            1_rad_per_s)
+                 .value(),
+             4.75, 0.002);
+  CHECK_NEAR(armFF
+                 .MaxAchievableAcceleration(12_V, std::numbers::pi / 3 * 1_rad,
+                                            -1_rad_per_s)
+                 .value(),
+             6.75, 0.002);
+  CHECK_NEAR(armFF
+                 .MinAchievableAcceleration(12_V, std::numbers::pi / 3 * 1_rad,
+                                            1_rad_per_s)
+                 .value(),
+             -7.25, 0.002);
+  CHECK_NEAR(armFF
+                 .MinAchievableAcceleration(12_V, std::numbers::pi / 3 * 1_rad,
+                                            -1_rad_per_s)
+                 .value(),
+             -5.25, 0.002);
 }
 
-TEST(ArmFeedforwardTest, NegativeGains) {
+TEST_CASE("ArmFeedforwardTest NegativeGains", "[wpimath]") {
   constexpr auto Ks = 0.5_V;
   constexpr auto Kv = 1.5_V / 1_rad_per_s;
   constexpr auto Ka = 2_V / 1_rad_per_s_sq;
   constexpr auto Kg = 1_V;
   wpi::math::ArmFeedforward armFF{Ks, Kg, -Kv, -Ka};
 
-  EXPECT_EQ(armFF.GetKv().value(), 0);
-  EXPECT_EQ(armFF.GetKa().value(), 0);
+  CHECK(armFF.GetKv().value() == 0);
+  CHECK(armFF.GetKa().value() == 0);
 }

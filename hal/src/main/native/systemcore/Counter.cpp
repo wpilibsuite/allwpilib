@@ -28,7 +28,7 @@ HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
   if (channel == INVALID_HANDLE_INDEX || channel >= kNumSmartIo) {
     *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for Counter", 0,
-                                       kNumSmartIo, channel);
+                                       kNumSmartIo - 1, channel);
     return HAL_INVALID_HANDLE;
   }
 

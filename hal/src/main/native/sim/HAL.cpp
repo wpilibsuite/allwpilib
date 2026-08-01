@@ -83,7 +83,6 @@ void InitializeHAL() {
   InitializeRoboRioData();
   InitializeSimDeviceData();
   InitializeAddressableLED();
-  InitializeAlert();
   InitializeAnalogInput();
   InitializeAnalogInternal();
   InitializeCAN();
@@ -214,8 +213,6 @@ HAL_Bool HAL_Initialize(void) {
   wpi::hal::init::InitializeHAL();
 
   wpi::hal::init::HAL_IsInitialized.store(true);
-
-  wpi::hal::RestartTiming();
 
   wpi::hal::InitializeDriverStation();
 

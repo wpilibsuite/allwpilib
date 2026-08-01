@@ -38,6 +38,7 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/cscore>
     PRIVATE src/main/native/cpp
 )
+target_include_directories(cscore SYSTEM PUBLIC "$<BUILD_INTERFACE:${OpenCV_INCLUDE_DIRS}>")
 wpilib_target_warnings(cscore)
 target_link_libraries(cscore PUBLIC wpinet wpiutil opencv_imgcodecs)
 

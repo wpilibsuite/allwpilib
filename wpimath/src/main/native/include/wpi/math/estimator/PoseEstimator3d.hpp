@@ -103,7 +103,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     }
 
     // Solve for closed form Kalman gain for continuous Kalman filter with A = 0
-    // and C = I. See wpimath/algorithms.md.
+    // and C = I. See wpimath/docs/ClosedFormKalmanGain.md.
     for (size_t row = 0; row < 4; ++row) {
       if (m_q[row] == 0.0) {
         m_vision_K.diagonal()[row] = 0.0;
@@ -254,11 +254,8 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     auto odometryEstimate = m_odometryPoseBuffer.Sample(timestamp);
 
     // Step 5: Apply the vision compensation to the odometry pose.
-    // TODO Replace with std::optional::transform() in C++23
-    if (odometryEstimate) {
-      return visionUpdate.Compensate(*odometryEstimate);
-    }
-    return std::nullopt;
+    return odometryEstimate.transform(
+        [&](const auto& o) { return visionUpdate.Compensate(o); });
   }
 
   /**

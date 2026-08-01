@@ -215,7 +215,7 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
   /**
    * Matrix exponential of a quaternion.
    *
-   * <p>source: wpimath/algorithms.md
+   * <p>source: wpimath/docs/Quaternion.md
    *
    * <p>If this quaternion is in 𝖘𝖔(3) and you are looking for an element of SO(3), use {@link
    * fromRotationVector}
@@ -249,7 +249,7 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
   /**
    * The Log operator of a general quaternion.
    *
-   * <p>source: wpimath/algorithms.md
+   * <p>source: wpimath/docs/Quaternion.md
    *
    * <p>If this quaternion is in SO(3) and you are looking for an element of 𝖘𝖔(3), use {@link
    * toRotationVector}
@@ -334,7 +334,7 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
    *
    * <p>This is also the exp operator of 𝖘𝖔(3).
    *
-   * <p>source: wpimath/algorithms.md
+   * <p>source: wpimath/docs/Quaternion.md
    *
    * @param rvec The rotation vector.
    * @return The quaternion representation of this rotation vector.

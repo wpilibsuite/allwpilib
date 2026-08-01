@@ -106,7 +106,6 @@ model {
                     }
                 }
 
-                cppCompiler.define 'DYNAMIC_CAMERA_SERVER'
                 project(':ntcore').addNtcoreDependency(it, 'shared')
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
@@ -119,11 +118,11 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs "src/main/native/cppcs"
+                        srcDirs "${rootDir}/shared/singlelib"
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/generated/main/native/include', '../cameraserver/src/main/native/include'
+                        srcDirs 'src/main/native/include', 'src/generated/main/native/include'
                     }
                 }
             }
@@ -133,17 +132,6 @@ model {
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-
-                if (it instanceof SharedLibraryBinarySpec) {
-                    cppCompiler.define 'DYNAMIC_CAMERA_SERVER'
-                    if (buildType == buildTypes.debug) {
-                        cppCompiler.define 'DYNAMIC_CAMERA_SERVER_DEBUG'
-                    }
-                } else {
-                    lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                    lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
-                    nativeUtils.useRequiredLibrary(it, 'opencv_shared')
-                }
             }
             appendDebugPathToBinaries(binaries)
         }
@@ -165,13 +153,10 @@ model {
             }
             binaries.all {
                 project(':ntcore').addNtcoreDependency(it, 'shared')
-                lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
-                nativeUtils.useRequiredLibrary(it, 'opencv_shared')
             }
         }
     }
@@ -227,13 +212,10 @@ model {
         }
         withType(GoogleTestTestSuiteBinarySpec) {
             project(':ntcore').addNtcoreDependency(it, 'shared')
-            lib project: ':cscore', library: 'cscore', linkage: 'shared'
             project(':hal').addHalDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-            lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
-            nativeUtils.useRequiredLibrary(it, 'opencv_shared')
             lib library: nativeName, linkage: 'shared'
         }
     }

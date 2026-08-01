@@ -1,5 +1,19 @@
 nativeUtils.skipInstallPdb = project.hasProperty('buildServer')
 
+def isBuildFlagEnabled = { propertyName, environmentName ->
+    if (project.hasProperty(propertyName)) {
+        def propertyValue = project.findProperty(propertyName)
+        return propertyValue == null || propertyValue.toString().isBlank() || propertyValue.toString().toBoolean()
+    }
+
+    def environmentValue = System.getenv(environmentName)
+    return environmentValue != null && !environmentValue.isBlank() && environmentValue.toBoolean()
+}
+
+if (isBuildFlagEnabled('useDefaultLinuxGcc', 'WPILIB_USE_DEFAULT_LINUX_GCC')) {
+    nativeUtils.requireVersionedLinuxGcc = false
+}
+
 if (project.hasProperty('ciDebugOnly')) {
     toolchainsPlugin.registerReleaseBuildType = false
 }
@@ -13,14 +27,6 @@ nativeUtils {
             opencvVersion = libs.versions.opencv
         }
     }
-}
-
-if (project.hasProperty('onlylinuxarm64')) {
-    nativeUtils.crossCompilers.getByName(org.wpilib.toolchain.NativePlatforms.linuxarm64).optional = false
-}
-
-if (project.hasProperty('onlylinuxsystemcore')) {
-    nativeUtils.crossCompilers.getByName(org.wpilib.toolchain.NativePlatforms.systemcore).optional = false
 }
 
 nativeUtils.wpi.addWarnings()
@@ -39,39 +45,31 @@ nativeUtils.platformConfigs.each {
     if (it.name.contains('osx')) {
         it.linker.getArgs().add('-framework')
         it.linker.getArgs().add('IOKit')
-    }
-}
+    } else if (it.name.contains('linux')) {
+        // Compress debug info on Linux
+        it.cppCompiler.debugArgs.add("-gz=zlib")
+        it.linker.args.add("-gz=zlib")
+        // Make warning in OpenCV 4.10 from GCC 15 not an error
+        it.cppCompiler.args.add("-Wno-error=overloaded-virtual")
+        // Make warning from Google Benchmark not an error
+        it.cppCompiler.args.add("-Wno-error=restrict")
+    } else {
+        // On windows, for ntcoreffi, use static runtime
+        if (project.hasProperty('ntcoreffibuild')) {
+            it.cCompiler.releaseArgs.remove('/MD')
+            it.cppCompiler.releaseArgs.remove('/MD')
+            it.cCompiler.debugArgs.remove('/MDd')
+            it.cppCompiler.debugArgs.remove('/MDd')
 
-nativeUtils.platformConfigs.each {
-  if (it.name.contains('linux')) {
-    // Compress debug info on Linux
-    it.cppCompiler.debugArgs.add("-gz=zlib")
-    it.linker.args.add("-gz=zlib")
-    // Make warning in OpenCV 4.10 from GCC 15 not an error
-    it.cppCompiler.args.add("-Wno-error=overloaded-virtual")
-    // Make warning from Google Benchmark not an error
-    it.cppCompiler.args.add("-Wno-error=restrict")
-  }
+            it.cCompiler.releaseArgs.add('/MT')
+            it.cppCompiler.releaseArgs.add('/MT')
+            it.cCompiler.debugArgs.add('/MTd')
+            it.cppCompiler.debugArgs.add('/MTd')
+        }
+    }
 }
 
 nativeUtils.platformConfigs.linuxsystemcore.linker.args.add("-Wl,--fatal-warnings")
-
-if (project.hasProperty('ntcoreffibuild')) {
-  // On windows, for ntcoreffi, use static runtime
-  nativeUtils.platformConfigs.each {
-    if (it.name.contains('windows')) {
-      it.cCompiler.releaseArgs.remove('/MD')
-      it.cppCompiler.releaseArgs.remove('/MD')
-      it.cCompiler.debugArgs.remove('/MDd')
-      it.cppCompiler.debugArgs.remove('/MDd')
-
-      it.cCompiler.releaseArgs.add('/MT')
-      it.cppCompiler.releaseArgs.add('/MT')
-      it.cCompiler.debugArgs.add('/MTd')
-      it.cppCompiler.debugArgs.add('/MTd')
-    }
-  }
-}
 
 model {
     components {
@@ -89,7 +87,7 @@ model {
 apply plugin: DisableBuildingGTest
 
 if (project.hasProperty('buildServer')) {
-    tasks.withType(org.gradle.nativeplatform.test.tasks.RunTestExecutable) {
+    tasks.withType(org.gradle.nativeplatform.test.tasks.RunTestExecutable).configureEach {
         def exeFile = file(it.executable)
         def folder = exeFile.parentFile
 

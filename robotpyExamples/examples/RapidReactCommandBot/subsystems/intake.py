@@ -37,7 +37,7 @@ class Intake(Subsystem):
         """Returns a command that turns off and retracts the intake."""
         return self.run_once(
             lambda: (
-                self.motor.disable(),
+                self.motor.set_throttle(0.0),
                 self.pistons.set(wpilib.DoubleSolenoid.Value.REVERSE),
             )
         ).with_name("Retract")

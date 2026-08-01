@@ -11,10 +11,24 @@ endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
-    set(CMAKE_SYSTEM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
-    set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
-    message(STATUS "Platform version: ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
+# Windows SDK version checks
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    set(sdk_minimum 10.0.18362.0)
+
+    # If no CMAKE_SYSTEM_VERSION is set, warn the user and set a default
+    # If it's set but below the defined minimum, warn the user but don't change it
+    if(NOT DEFINED CMAKE_SYSTEM_VERSION)
+        message(WARNING "No CMAKE_SYSTEM_VERSION set, defaulting to ${sdk_minimum}")
+        set(CMAKE_SYSTEM_VERSION "${sdk_minimum}" CACHE STRING "Windows SDK target")
+    elseif(CMAKE_SYSTEM_VERSION VERSION_LESS sdk_minimum)
+        message(
+            WARNING
+            "Current Windows SDK target ${CMAKE_SYSTEM_VERSION} is below the recommended"
+            "minimum target of ${sdk_minimum}. Some features may be limited or unavailable."
+            "If this is incorrect, you may need to manually set CMAKE_SYSTEM_VERSION"
+            "to a higher target."
+        )
+    endif()
 endif()
 
 # Set default build type to release with debug info (i.e. release mode optimizations
@@ -79,6 +93,13 @@ option(WPILIB_WITH_WPIMATH "Build wpimath" ON)
 option(WPILIB_WITH_WPILIB "Build hal, wpilibc/j, and developerRobot (needs OpenCV)" ON)
 option(WPILIB_WITH_EXAMPLES "Build examples" OFF)
 option(WPILIB_WITH_TESTS "Build unit tests (requires internet connection)" ON)
+cmake_dependent_option(
+    WPILIB_WITH_FIELDS
+    "Build the fields target"
+    OFF
+    "NOT WPILIB_WITH_GUI"
+    ON
+)
 option(WPILIB_WITH_GUI "Build GUI items (needs SDL3)" OFF)
 option(WPILIB_WITH_SIMULATION_MODULES "Build simulation modules" ON)
 option(WPILIB_WITH_BENCHMARK "Build the benchmark project" ON)
@@ -247,11 +268,13 @@ endif()
 set(FILENAME_DEP_REPLACE "get_filename_component(SELF_DIR \"$\{CMAKE_CURRENT_LIST_FILE\}\" PATH)")
 set(SELF_DIR "$\{SELF_DIR\}")
 set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
-set(DATALOG_DEP_REPLACE "find_dependency(datalog)")
 
 add_subdirectory(wpiutil)
 
-add_subdirectory(datalog)
+if(WPILIB_WITH_NTCORE OR WPILIB_WITH_GUI OR WPILIB_WITH_WPILIB)
+    set(DATALOG_DEP_REPLACE "find_dependency(datalog)")
+    add_subdirectory(datalog)
+endif()
 
 if(WPILIB_WITH_NTCORE)
     set(NTCORE_DEP_REPLACE "find_dependency(ntcore)")
@@ -265,9 +288,12 @@ if(WPILIB_WITH_WPIMATH)
     add_subdirectory(wpimath)
 endif()
 
+if(WPILIB_WITH_FIELDS)
+    add_subdirectory(fields)
+endif()
+
 if(WPILIB_WITH_GUI)
     find_package(SDL3 CONFIG REQUIRED)
-    add_subdirectory(fields)
     add_subdirectory(thirdparty/imgui_suite)
     add_subdirectory(wpigui)
     add_subdirectory(glass)
@@ -287,11 +313,9 @@ if(WPILIB_WITH_WPILIB OR WPILIB_WITH_SIMULATION_MODULES)
 endif()
 
 if(WPILIB_WITH_CSCORE)
-    set(CAMERASERVER_DEP_REPLACE "find_dependency(cameraserver)")
     set(CSCORE_DEP_REPLACE "find_dependency(cscore)")
     find_package(OpenCV REQUIRED)
     add_subdirectory(cscore)
-    add_subdirectory(cameraserver)
 endif()
 
 if(WPILIB_WITH_WPILIB)
@@ -300,6 +324,9 @@ if(WPILIB_WITH_WPILIB)
     set(COMMAND_DEP_REPLACE "find_dependency(commandsv2)")
     add_subdirectory(apriltag)
     add_subdirectory(wpilibc)
+    if(WPILIB_WITH_CSCORE)
+        add_subdirectory(cameraserver)
+    endif()
     add_subdirectory(commandsv2)
     add_subdirectory(romiVendordep)
     add_subdirectory(xrpVendordep)

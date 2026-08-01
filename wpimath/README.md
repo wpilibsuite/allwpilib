@@ -30,7 +30,7 @@ Use math symbols in variable names (see [Unicodeit](#Unicodeit)) to match source
 
 ### Derivations
 
-Put small derivations in comments within the function. Put large derivations in algorithms.md and link to them.
+Put small derivations in comments within the function. Put large derivations in a file named after the class, in the wpimath/docs folder, then link to it.
 
 ## Unicodeit
 

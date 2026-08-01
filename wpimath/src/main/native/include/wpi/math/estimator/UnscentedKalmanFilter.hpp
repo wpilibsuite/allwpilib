@@ -438,10 +438,10 @@ class UnscentedKalmanFilter {
               .transpose();
     }
 
-    // Compute the Kalman gain
+    // Compute the Kalman gain (see wpimath/docs/LinalgIdentities.md)
     //
     //   K = (P_{xy} / S_{y}ᵀ) / S_{y}
-    //   K = (S_{y} \ P_{xy})ᵀ / S_{y}
+    //   K = (S_{y} \ P_{xy}ᵀ)ᵀ / S_{y}
     //   K = (S_{y}ᵀ \ (S_{y} \ P_{xy}ᵀ))ᵀ
     //
     // equation (27)

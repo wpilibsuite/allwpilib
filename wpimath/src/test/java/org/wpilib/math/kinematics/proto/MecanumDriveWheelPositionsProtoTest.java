@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.kinematics.MecanumDriveWheelPositions;
-import org.wpilib.math.proto.ProtobufMecanumDriveWheelPositions;
+import org.wpilib.math.kinematics.proto.detail.ProtobufMecanumDriveWheelPositions;
 
 class MecanumDriveWheelPositionsProtoTest {
   private static final MecanumDriveWheelPositions DATA =

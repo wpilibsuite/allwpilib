@@ -176,7 +176,10 @@
       "AprilTags"
     ],
     "foldername": "AprilTagsVision",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "extravendordeps": [
+      "cameraserver"
+    ]
   },
   {
     "name": "PDP CAN Monitoring",
@@ -240,7 +243,10 @@
       "Vision"
     ],
     "foldername": "HttpCamera",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "extravendordeps": [
+      "cameraserver"
+    ]
   },
   {
     "name": "I2C Communication",
@@ -260,7 +266,10 @@
       "Vision"
     ],
     "foldername": "IntermediateVision",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "extravendordeps": [
+      "cameraserver"
+    ]
   },
   {
     "name": "Motor Control",
@@ -291,7 +300,10 @@
       "Vision"
     ],
     "foldername": "QuickVision",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "extravendordeps": [
+      "cameraserver"
+    ]
   },
   {
     "name": "Solenoids",
