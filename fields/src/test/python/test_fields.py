@@ -153,6 +153,22 @@ def test_field_image_metadata():
     assert image.get_top() < image.get_bottom()
 
 
+def test_field_image_repr():
+    image = robotpy_fields.FieldImage("frc/2024-crescendo.png", 10, 20, 30, 40)
+
+    assert repr(image) == (
+        "FieldImage(path='frc/2024-crescendo.png', "
+        "top=10, left=20, bottom=30, right=40)"
+    )
+
+
+def test_field_tag_repr():
+    pose = Pose3d(1, 2, 3, Rotation3d())
+    tag = robotpy_fields.FieldTag(1, pose)
+
+    assert repr(tag) == f"FieldTag(ID=1, pose={pose!r})"
+
+
 def test_2022_rapid_react_tag_poses():
     field = robotpy_fields.get_field(robotpy_fields.FieldId.FRC_2022_RAPID_REACT)
 
