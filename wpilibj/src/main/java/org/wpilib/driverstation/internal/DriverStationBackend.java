@@ -498,15 +498,18 @@ public final class DriverStationBackend {
   private static final JoystickResourceAlert[] JOYSTICK_RESOURCE_ALERTS =
       JoystickResourceAlert.values();
 
+  private static final class JoystickAlertState {
+    Alert alert;
+    boolean active;
+  }
+
   private static final class JoystickAlerts {
     final int stick;
     final String connectionText;
-    Alert connectionAlert;
-    final Alert[] resourceAlerts = new Alert[JOYSTICK_RESOURCE_ALERTS.length];
-    Alert touchpadFingerAlert;
-    boolean connectionAlertActive;
-    final boolean[] resourceAlertActive = new boolean[JOYSTICK_RESOURCE_ALERTS.length];
-    boolean touchpadFingerAlertActive;
+    final JoystickAlertState connectionAlert = new JoystickAlertState();
+    final JoystickAlertState[] resourceAlerts =
+        new JoystickAlertState[JOYSTICK_RESOURCE_ALERTS.length];
+    final JoystickAlertState touchpadFingerAlert = new JoystickAlertState();
     final int[] resourceAlertValues = new int[JOYSTICK_RESOURCE_ALERTS.length];
     int touchpadFingerAlertTouchpad;
     int touchpadFingerAlertFinger;
@@ -515,25 +518,28 @@ public final class DriverStationBackend {
       this.stick = stick;
       connectionText =
           "Joystick on port " + stick + " not available, check if controller is plugged in";
+      for (int i = 0; i < resourceAlerts.length; i++) {
+        resourceAlerts[i] = new JoystickAlertState();
+      }
       initializeAlerts();
     }
 
     void initializeAlerts() {
-      connectionAlert =
+      connectionAlert.alert =
           new Alert(
               "DriverStation",
               "joystick" + stick + "Disconnected",
               connectionText,
               Alert.Level.HIGH);
       for (JoystickResourceAlert resourceAlert : JOYSTICK_RESOURCE_ALERTS) {
-        resourceAlerts[resourceAlert.ordinal()] =
+        resourceAlerts[resourceAlert.ordinal()].alert =
             new Alert(
                 "DriverStation",
                 "joystick" + stick + resourceAlert.idSuffix,
                 "",
                 Alert.Level.MEDIUM);
       }
-      touchpadFingerAlert =
+      touchpadFingerAlert.alert =
           new Alert(
               "DriverStation",
               "joystick" + stick + "TouchpadFingerUnavailable",
@@ -543,12 +549,12 @@ public final class DriverStationBackend {
 
     boolean prepareForReport() {
       if (isJoystickConnected(stick)) {
-        setConnectionAlert(false);
+        setAlert(connectionAlert, false, connectionText, true);
         return true;
       }
 
       clearResourceAlerts();
-      setConnectionAlert(true);
+      setAlert(connectionAlert, true, connectionText, true);
       return false;
     }
 
@@ -558,45 +564,45 @@ public final class DriverStationBackend {
         return;
       }
 
-      if (connectionAlertActive) {
-        setConnectionAlert(false);
+      if (connectionAlert.active) {
+        setAlert(connectionAlert, false, connectionText, true);
       }
 
       for (JoystickResourceAlert resourceAlert : JOYSTICK_RESOURCE_ALERTS) {
         refreshResourceAlert(resourceAlert);
       }
 
-      if (touchpadFingerAlertActive
+      if (touchpadFingerAlert.active
           && getStickTouchpadFingerAvailable(
               stick, touchpadFingerAlertTouchpad, touchpadFingerAlertFinger)) {
-        setTouchpadFingerAlert(false);
+        setAlert(touchpadFingerAlert, false);
       }
     }
 
     void clearAllAlerts() {
-      setConnectionAlert(false);
+      setAlert(connectionAlert, false, connectionText, true);
       clearResourceAlerts();
     }
 
     void clearResourceAlerts() {
-      for (JoystickResourceAlert resourceAlert : JOYSTICK_RESOURCE_ALERTS) {
-        setResourceAlert(resourceAlert, false);
+      for (JoystickAlertState alertState : resourceAlerts) {
+        setAlert(alertState, false);
       }
-      setTouchpadFingerAlert(false);
+      setAlert(touchpadFingerAlert, false);
     }
 
     void refreshResourceAlert(JoystickResourceAlert resourceAlert) {
       int alertIndex = resourceAlert.ordinal();
-      if (resourceAlertActive[alertIndex]
-          && resourceAlert.isAvailable(stick, resourceAlertValues[alertIndex])) {
-        setResourceAlert(resourceAlert, false);
+      JoystickAlertState alertState = resourceAlerts[alertIndex];
+      if (alertState.active && resourceAlert.isAvailable(stick, resourceAlertValues[alertIndex])) {
+        setAlert(alertState, false);
       }
     }
 
     void reportResourceWarning(JoystickResourceAlert resourceAlert, int resource) {
       int alertIndex = resourceAlert.ordinal();
       resourceAlertValues[alertIndex] = resource;
-      setResourceAlert(resourceAlert, true, resourceAlert.getText(stick, resource));
+      setAlert(resourceAlerts[alertIndex], true, resourceAlert.getText(stick, resource), false);
     }
 
     void reportTouchpadFingerWarning(int touchpad, int finger) {
@@ -610,84 +616,43 @@ public final class DriverStationBackend {
               + " not available";
       touchpadFingerAlertTouchpad = touchpad;
       touchpadFingerAlertFinger = finger;
-      setTouchpadFingerAlert(true, text);
+      setAlert(touchpadFingerAlert, true, text, false);
     }
 
-    boolean applyAlert(Alert alert, boolean active, String text, boolean verifyActive) {
+    boolean applyAlert(
+        JoystickAlertState alertState, boolean active, String text, boolean verifyActive) {
       try {
-        if (active) {
-          alert.setText(text);
+        if (active && !text.isEmpty()) {
+          alertState.alert.setText(text);
         }
-        alert.set(active);
-        return !active || !verifyActive || alert.get();
+        alertState.alert.set(active);
+        return !active || !verifyActive || alertState.alert.get();
       } catch (AlertException ex) {
         return false;
       }
     }
 
-    boolean setConnectionAlert(boolean active) {
-      if (!active && !connectionAlertActive) {
+    boolean setAlert(JoystickAlertState alertState, boolean active) {
+      return setAlert(alertState, active, "", false);
+    }
+
+    boolean setAlert(
+        JoystickAlertState alertState, boolean active, String text, boolean verifyActive) {
+      if (!active && !alertState.active) {
         return true;
       }
 
-      if (!applyAlert(connectionAlert, active, connectionText, true)) {
+      if (!applyAlert(alertState, active, text, verifyActive)) {
         if (!active) {
-          connectionAlertActive = false;
+          alertState.active = false;
           return true;
         }
         initializeAlerts();
-        if (!applyAlert(connectionAlert, active, connectionText, true)) {
+        if (!applyAlert(alertState, active, text, verifyActive)) {
           return false;
         }
       }
-      connectionAlertActive = active;
-      return true;
-    }
-
-    boolean setResourceAlert(JoystickResourceAlert resourceAlert, boolean active) {
-      return setResourceAlert(resourceAlert, active, "");
-    }
-
-    boolean setResourceAlert(JoystickResourceAlert resourceAlert, boolean active, String text) {
-      int alertIndex = resourceAlert.ordinal();
-      if (!active && !resourceAlertActive[alertIndex]) {
-        return true;
-      }
-
-      if (!applyAlert(resourceAlerts[alertIndex], active, text, false)) {
-        if (!active) {
-          resourceAlertActive[alertIndex] = false;
-          return true;
-        }
-        initializeAlerts();
-        if (!applyAlert(resourceAlerts[alertIndex], active, text, false)) {
-          return false;
-        }
-      }
-      resourceAlertActive[alertIndex] = active;
-      return true;
-    }
-
-    boolean setTouchpadFingerAlert(boolean active) {
-      return setTouchpadFingerAlert(active, "");
-    }
-
-    boolean setTouchpadFingerAlert(boolean active, String text) {
-      if (!active && !touchpadFingerAlertActive) {
-        return true;
-      }
-
-      if (!applyAlert(touchpadFingerAlert, active, text, false)) {
-        if (!active) {
-          touchpadFingerAlertActive = false;
-          return true;
-        }
-        initializeAlerts();
-        if (!applyAlert(touchpadFingerAlert, active, text, false)) {
-          return false;
-        }
-      }
-      touchpadFingerAlertActive = active;
+      alertState.active = active;
       return true;
     }
   }

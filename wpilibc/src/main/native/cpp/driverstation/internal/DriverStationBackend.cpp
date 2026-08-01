@@ -165,6 +165,11 @@ static constexpr std::array<std::string_view, kJoystickResourceAlerts.size()>
 static constexpr std::array<std::string_view, kJoystickResourceAlerts.size()>
     kJoystickResourceAlertLabels{"Button", "axis", "POV"};
 
+struct JoystickAlertState {
+  wpi::util::Alert alert;
+  bool active = false;
+};
+
 struct JoystickAlerts {
   void Initialize();
   void Release();
@@ -176,22 +181,14 @@ struct JoystickAlerts {
   bool IsResourceAlertAvailable(JoystickResourceAlert type) const;
   void ReportResourceWarning(JoystickResourceAlert type, int resource);
   void ReportTouchpadFingerWarning(int touchpad, int finger);
-  void SetConnectionAlert(bool active);
-  void SetResourceAlert(JoystickResourceAlert type, bool active);
-  void SetResourceAlert(JoystickResourceAlert type, bool active,
-                        std::string_view alertText);
-  void SetTouchpadFingerAlert(bool active);
-  void SetAlert(wpi::util::Alert& alert, bool& alertActive,
-                std::string_view alertText, bool active);
+  void SetAlert(JoystickAlertState& alertState, bool active,
+                std::string_view alertText = {});
 
   int stick = 0;
   bool initialized = false;
-  wpi::util::Alert connectionAlert;
-  std::array<wpi::util::Alert, kJoystickResourceAlerts.size()> resourceAlerts;
-  wpi::util::Alert touchpadFingerAlert;
-  bool connectionAlertActive = false;
-  std::array<bool, kJoystickResourceAlerts.size()> resourceAlertActive{};
-  bool touchpadFingerAlertActive = false;
+  JoystickAlertState connectionAlert;
+  std::array<JoystickAlertState, kJoystickResourceAlerts.size()> resourceAlerts;
+  JoystickAlertState touchpadFingerAlert;
   std::array<int, kJoystickResourceAlerts.size()> resourceAlertValues{};
   int touchpadFingerAlertTouchpad = 0;
   int touchpadFingerAlertFinger = 0;
@@ -259,7 +256,7 @@ static inline void ReportJoystickError(int stick, const S& format,
 }
 
 void JoystickAlerts::Initialize() {
-  connectionAlert = wpi::util::Alert(
+  connectionAlert.alert = wpi::util::Alert(
       "DriverStation", std::format("joystick{}Disconnected", stick),
       std::format("Joystick on port {} not available, check if all "
                   "controllers are plugged in",
@@ -267,13 +264,13 @@ void JoystickAlerts::Initialize() {
       wpi::util::Alert::Level::HIGH);
   for (auto type : kJoystickResourceAlerts) {
     auto index = JoystickResourceAlertIndex(type);
-    resourceAlerts[index] =
+    resourceAlerts[index].alert =
         wpi::util::Alert("DriverStation",
                          std::format("joystick{}{}", stick,
                                      kJoystickResourceAlertIdSuffixes[index]),
                          {}, wpi::util::Alert::Level::MEDIUM);
   }
-  touchpadFingerAlert = wpi::util::Alert(
+  touchpadFingerAlert.alert = wpi::util::Alert(
       "DriverStation",
       std::format("joystick{}TouchpadFingerUnavailable", stick), {},
       wpi::util::Alert::Level::MEDIUM);
@@ -281,11 +278,11 @@ void JoystickAlerts::Initialize() {
 }
 
 void JoystickAlerts::Release() {
-  wpi::util::detail::ReleaseAlertHandle(connectionAlert);
-  for (auto& alert : resourceAlerts) {
-    wpi::util::detail::ReleaseAlertHandle(alert);
+  wpi::util::detail::ReleaseAlertHandle(connectionAlert.alert);
+  for (auto& alertState : resourceAlerts) {
+    wpi::util::detail::ReleaseAlertHandle(alertState.alert);
   }
-  wpi::util::detail::ReleaseAlertHandle(touchpadFingerAlert);
+  wpi::util::detail::ReleaseAlertHandle(touchpadFingerAlert.alert);
   initialized = false;
 }
 
@@ -295,12 +292,12 @@ bool JoystickAlerts::PrepareForReport(bool silenceJoystickAlerts) {
   }
 
   if (DriverStationBackend::IsJoystickConnected(stick)) {
-    SetConnectionAlert(false);
+    SetAlert(connectionAlert, false);
     return true;
   }
 
   ClearResourceAlerts();
-  SetConnectionAlert(true);
+  SetAlert(connectionAlert, true);
   return false;
 }
 
@@ -314,8 +311,8 @@ void JoystickAlerts::Refresh() {
     return;
   }
 
-  if (connectionAlertActive) {
-    SetConnectionAlert(false);
+  if (connectionAlert.active) {
+    SetAlert(connectionAlert, false);
   }
 
   for (auto type : kJoystickResourceAlerts) {
@@ -326,9 +323,9 @@ void JoystickAlerts::Refresh() {
   HAL_GetJoystickTouchpads(stick, &touchpads);
   int touchpad = touchpadFingerAlertTouchpad;
   int finger = touchpadFingerAlertFinger;
-  if (touchpadFingerAlertActive && touchpad < touchpads.count &&
+  if (touchpadFingerAlert.active && touchpad < touchpads.count &&
       finger < touchpads.touchpads[touchpad].count) {
-    SetTouchpadFingerAlert(false);
+    SetAlert(touchpadFingerAlert, false);
   }
 }
 
@@ -337,21 +334,21 @@ void JoystickAlerts::ClearAllAlerts() {
     return;
   }
 
-  SetConnectionAlert(false);
+  SetAlert(connectionAlert, false);
   ClearResourceAlerts();
 }
 
 void JoystickAlerts::ClearResourceAlerts() {
-  for (auto type : kJoystickResourceAlerts) {
-    SetResourceAlert(type, false);
+  for (auto& alertState : resourceAlerts) {
+    SetAlert(alertState, false);
   }
-  SetTouchpadFingerAlert(false);
+  SetAlert(touchpadFingerAlert, false);
 }
 
 void JoystickAlerts::RefreshResourceAlert(JoystickResourceAlert type) {
   auto index = JoystickResourceAlertIndex(type);
-  if (resourceAlertActive[index] && IsResourceAlertAvailable(type)) {
-    SetResourceAlert(type, false);
+  if (resourceAlerts[index].active && IsResourceAlertAvailable(type)) {
+    SetAlert(resourceAlerts[index], false);
   }
 }
 
@@ -383,44 +380,23 @@ void JoystickAlerts::ReportResourceWarning(JoystickResourceAlert type,
                                            int resource) {
   auto index = JoystickResourceAlertIndex(type);
   resourceAlertValues[index] = resource;
-  SetResourceAlert(
-      type, true,
-      std::format("Joystick {} {} on port {} not available",
-                  kJoystickResourceAlertLabels[index], resource, stick));
+  SetAlert(resourceAlerts[index], true,
+           std::format("Joystick {} {} on port {} not available",
+                       kJoystickResourceAlertLabels[index], resource, stick));
 }
 
 void JoystickAlerts::ReportTouchpadFingerWarning(int touchpad, int finger) {
   touchpadFingerAlertTouchpad = touchpad;
   touchpadFingerAlertFinger = finger;
-  SetAlert(touchpadFingerAlert, touchpadFingerAlertActive,
+  SetAlert(touchpadFingerAlert, true,
            std::format("Joystick touchpad finger {} on touchpad {} on port {} "
                        "not available",
-                       finger, touchpad, stick),
-           true);
+                       finger, touchpad, stick));
 }
 
-void JoystickAlerts::SetConnectionAlert(bool active) {
-  SetAlert(connectionAlert, connectionAlertActive, {}, active);
-}
-
-void JoystickAlerts::SetResourceAlert(JoystickResourceAlert type, bool active) {
-  SetResourceAlert(type, active, {});
-}
-
-void JoystickAlerts::SetResourceAlert(JoystickResourceAlert type, bool active,
-                                      std::string_view alertText) {
-  auto index = JoystickResourceAlertIndex(type);
-  SetAlert(resourceAlerts[index], resourceAlertActive[index], alertText,
-           active);
-}
-
-void JoystickAlerts::SetTouchpadFingerAlert(bool active) {
-  SetAlert(touchpadFingerAlert, touchpadFingerAlertActive, {}, active);
-}
-
-void JoystickAlerts::SetAlert(wpi::util::Alert& alert, bool& alertActive,
-                              std::string_view alertText, bool active) {
-  if (!active && !alertActive) {
+void JoystickAlerts::SetAlert(JoystickAlertState& alertState, bool active,
+                              std::string_view alertText) {
+  if (!active && !alertState.active) {
     return;
   }
 
@@ -428,17 +404,17 @@ void JoystickAlerts::SetAlert(wpi::util::Alert& alert, bool& alertActive,
     Initialize();
   }
   if (active && !alertText.empty()) {
-    alert.SetText(alertText);
+    alertState.alert.SetText(alertText);
   }
-  alert.Set(active);
-  if (active && !alert.Get()) {
+  alertState.alert.Set(active);
+  if (active && !alertState.alert.Get()) {
     Initialize();
     if (!alertText.empty()) {
-      alert.SetText(alertText);
+      alertState.alert.SetText(alertText);
     }
-    alert.Set(true);
+    alertState.alert.Set(true);
   }
-  alertActive = active;
+  alertState.active = active;
 }
 
 Instance::Instance() {
