@@ -35,7 +35,7 @@ class LifecycleOpMode : public wpi::OpMode {
     m_counts.constructed++;
   }
 
-  ~LifecycleOpMode() { m_counts.destructed++; }
+  ~LifecycleOpMode() override { m_counts.destructed++; }
 
   void DisabledPeriodic() override { m_counts.disabledPeriodic++; }
   void Start() override { m_counts.start++; }
