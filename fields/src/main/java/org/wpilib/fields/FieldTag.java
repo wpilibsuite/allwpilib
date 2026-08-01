@@ -10,15 +10,12 @@ import org.wpilib.math.geometry.Pose3d;
 
 /** Represents a field tag's metadata. */
 @Json
-public class FieldTag {
-  /** The tag's ID. */
+public final class FieldTag {
   @Json.Property("ID")
-  @SuppressWarnings("PMD.PublicFieldNamingConvention")
-  public int ID;
+  private final int m_id;
 
-  /** The tag's pose. */
   @Json.Property("pose")
-  public Pose3d pose;
+  private final Pose3d m_pose;
 
   /**
    * Constructs a field tag.
@@ -29,22 +26,40 @@ public class FieldTag {
   @SuppressWarnings("ParameterName")
   @Json.Creator
   public FieldTag(int ID, Pose3d pose) {
-    this.ID = ID;
-    this.pose = pose;
+    m_id = ID;
+    m_pose = Objects.requireNonNull(pose, "pose");
+  }
+
+  /**
+   * Returns the tag's ID.
+   *
+   * @return The tag's ID.
+   */
+  public int getID() {
+    return m_id;
+  }
+
+  /**
+   * Returns the tag's pose.
+   *
+   * @return The tag's pose.
+   */
+  public Pose3d getPose() {
+    return m_pose;
   }
 
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof FieldTag tag && ID == tag.ID && pose.equals(tag.pose);
+    return obj instanceof FieldTag tag && m_id == tag.m_id && m_pose.equals(tag.m_pose);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(ID, pose);
+    return Objects.hash(m_id, m_pose);
   }
 
   @Override
   public String toString() {
-    return "FieldTag(ID: " + ID + ", pose: " + pose + ")";
+    return "FieldTag(ID: " + m_id + ", pose: " + m_pose + ")";
   }
 }

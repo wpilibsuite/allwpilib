@@ -379,8 +379,8 @@ public class Field {
       return Optional.empty();
     }
     for (FieldTag tag : tags) {
-      if (tag.ID == ID) {
-        return Optional.of(tag.pose.relativeTo(m_origin));
+      if (tag.getID() == ID) {
+        return Optional.of(tag.getPose().relativeTo(m_origin));
       }
     }
     return Optional.empty();
