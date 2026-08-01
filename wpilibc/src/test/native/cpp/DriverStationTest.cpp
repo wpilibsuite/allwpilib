@@ -139,6 +139,44 @@ TEST(DriverStationTest, JoystickResourceAlerts) {
   ResetJoystickAlerts();
 }
 
+TEST(DriverStationTest, JoystickAlertCollisionDoesNotCommitPartialAlerts) {
+  ResetJoystickAlerts();
+
+  HALSIM_SetJoystickButtonsAvailable(0, 1);
+  HALSIM_SetJoystickAxesAvailable(0, 1);
+  HALSIM_SetJoystickPOVsAvailable(0, 1);
+  wpi::sim::DriverStationSim::NotifyNewData();
+
+  {
+    wpi::util::Alert collision{"DriverStation", "joystick0AxisUnavailable",
+                               "collision", wpi::util::Alert::Level::MEDIUM};
+    ASSERT_TRUE(collision);
+
+    ::testing::internal::CaptureStderr();
+
+    EXPECT_FALSE(wpi::internal::DriverStationBackend::GetStickButton(0, 2));
+    EXPECT_EQ(::testing::internal::GetCapturedStderr(), "");
+
+    auto alerts = wpi::sim::AlertSim::GetAll();
+    ASSERT_EQ(alerts.size(), 1u);
+    EXPECT_EQ(alerts[0].group, "DriverStation");
+    EXPECT_EQ(alerts[0].id, "joystick0AxisUnavailable");
+    EXPECT_EQ(alerts[0].text, "collision");
+    EXPECT_EQ(alerts[0].level, wpi::util::Alert::Level::MEDIUM);
+    EXPECT_FALSE(alerts[0].isActive());
+
+    EXPECT_EQ(wpi::internal::DriverStationBackend::GetStickAxis(0, 1), 0.0);
+    EXPECT_EQ(wpi::sim::AlertSim::GetAll().size(), 1u);
+  }
+
+  EXPECT_FALSE(wpi::internal::DriverStationBackend::GetStickButton(0, 2));
+  EXPECT_TRUE(IsDriverStationAlertActive(
+      "joystick0ButtonUnavailable", "Joystick Button 2 on port 0 not available",
+      wpi::util::Alert::Level::MEDIUM));
+
+  ResetJoystickAlerts();
+}
+
 INSTANTIATE_TEST_SUITE_P(
     DriverStationTests, JoystickConnectionAlertTest,
     ::testing::Values(std::make_tuple(false, true, true, false),

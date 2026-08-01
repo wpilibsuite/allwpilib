@@ -14,6 +14,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "wpi/datalog/DataLog.hpp"
@@ -171,7 +172,7 @@ struct JoystickAlertState {
 };
 
 struct JoystickAlerts {
-  void Initialize();
+  bool Initialize();
   void Release();
   bool PrepareForReport(bool silenceJoystickAlerts);
   void Refresh();
@@ -181,7 +182,7 @@ struct JoystickAlerts {
   bool IsResourceAlertAvailable(JoystickResourceAlert type) const;
   void ReportResourceWarning(JoystickResourceAlert type, int resource);
   void ReportTouchpadFingerWarning(int touchpad, int finger);
-  void SetAlert(JoystickAlertState& alertState, bool active,
+  bool SetAlert(JoystickAlertState& alertState, bool active,
                 std::string_view alertText = {});
 
   int stick = 0;
@@ -255,26 +256,47 @@ static inline void ReportJoystickError(int stick, const S& format,
   ReportJoystickErrorV(stick, format, std::make_format_args(args...));
 }
 
-void JoystickAlerts::Initialize() {
-  connectionAlert.alert = wpi::util::Alert(
+bool JoystickAlerts::Initialize() {
+  wpi::util::Alert newConnectionAlert(
       "DriverStation", std::format("joystick{}Disconnected", stick),
       std::format("Joystick on port {} not available, check if all "
                   "controllers are plugged in",
                   stick),
       wpi::util::Alert::Level::HIGH);
+  if (!newConnectionAlert) {
+    return false;
+  }
+
+  std::array<wpi::util::Alert, kJoystickResourceAlerts.size()>
+      newResourceAlerts;
   for (auto type : kJoystickResourceAlerts) {
     auto index = JoystickResourceAlertIndex(type);
-    resourceAlerts[index].alert =
+    newResourceAlerts[index] =
         wpi::util::Alert("DriverStation",
                          std::format("joystick{}{}", stick,
                                      kJoystickResourceAlertIdSuffixes[index]),
                          {}, wpi::util::Alert::Level::MEDIUM);
+    if (!newResourceAlerts[index]) {
+      return false;
+    }
   }
-  touchpadFingerAlert.alert = wpi::util::Alert(
+
+  wpi::util::Alert newTouchpadFingerAlert(
       "DriverStation",
       std::format("joystick{}TouchpadFingerUnavailable", stick), {},
       wpi::util::Alert::Level::MEDIUM);
+  if (!newTouchpadFingerAlert) {
+    return false;
+  }
+
+  connectionAlert.alert = std::move(newConnectionAlert);
+  for (auto type : kJoystickResourceAlerts) {
+    auto index = JoystickResourceAlertIndex(type);
+    resourceAlerts[index].alert = std::move(newResourceAlerts[index]);
+  }
+  touchpadFingerAlert.alert = std::move(newTouchpadFingerAlert);
   initialized = true;
+  return true;
 }
 
 void JoystickAlerts::Release() {
@@ -394,27 +416,30 @@ void JoystickAlerts::ReportTouchpadFingerWarning(int touchpad, int finger) {
                        finger, touchpad, stick));
 }
 
-void JoystickAlerts::SetAlert(JoystickAlertState& alertState, bool active,
+bool JoystickAlerts::SetAlert(JoystickAlertState& alertState, bool active,
                               std::string_view alertText) {
   if (!active && !alertState.active) {
-    return;
+    return true;
   }
 
-  if (active && !initialized) {
-    Initialize();
+  if (active && !initialized && !Initialize()) {
+    return false;
   }
   if (active && !alertText.empty()) {
     alertState.alert.SetText(alertText);
   }
   alertState.alert.Set(active);
   if (active && !alertState.alert.Get()) {
-    Initialize();
+    if (!Initialize()) {
+      return false;
+    }
     if (!alertText.empty()) {
       alertState.alert.SetText(alertText);
     }
     alertState.alert.Set(true);
   }
   alertState.active = active;
+  return true;
 }
 
 Instance::Instance() {
