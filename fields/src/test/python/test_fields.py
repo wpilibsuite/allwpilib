@@ -5,7 +5,6 @@ import pytest
 import robotpy_fields
 from wpimath import Pose3d, Rotation3d
 
-
 INCH_TO_METER = 0.0254
 FOOT_TO_METER = 0.3048
 
@@ -47,15 +46,9 @@ def assert_pose_close(actual, expected):
 
     actual_rotation = actual.rotation()
     expected_rotation = expected.rotation()
-    assert angle_modulus(actual_rotation.x - expected_rotation.x) == pytest.approx(
-        0.0
-    )
-    assert angle_modulus(actual_rotation.y - expected_rotation.y) == pytest.approx(
-        0.0
-    )
-    assert angle_modulus(actual_rotation.z - expected_rotation.z) == pytest.approx(
-        0.0
-    )
+    assert angle_modulus(actual_rotation.x - expected_rotation.x) == pytest.approx(0.0)
+    assert angle_modulus(actual_rotation.y - expected_rotation.y) == pytest.approx(0.0)
+    assert angle_modulus(actual_rotation.z - expected_rotation.z) == pytest.approx(0.0)
 
 
 def angle_modulus(angle):
