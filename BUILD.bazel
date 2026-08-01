@@ -241,6 +241,7 @@ write_source_files(
     additional_update_targets = [
         "//apriltag:robotpy-apriltag-create-imports",
         "//datalog:robotpy-wpilog-create-imports",
+        "//fields:robotpy-fields-create-imports",
         "//hal:robotpy-hal-create-imports",
         "//ntcore:pyntcore-create-imports",
         "//romiVendordep:robotpy-romi-create-imports",
