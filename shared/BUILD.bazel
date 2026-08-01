@@ -1,0 +1,17 @@
+load("@rules_python//python:defs.bzl", "py_binary")
+
+exports_files(
+    srcs = ["examplecheck.py"],
+    visibility = [
+        "//wpilibcExamples:__subpackages__",
+        "//wpilibjExamples:__subpackages__",
+    ],
+)
+
+py_binary(
+    name = "examplecheck",
+    srcs = ["examplecheck.py"],
+    visibility = [
+        "//visibility:private",
+    ],
+)
