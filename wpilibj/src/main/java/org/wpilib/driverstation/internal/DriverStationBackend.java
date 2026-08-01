@@ -469,22 +469,45 @@ public final class DriverStationBackend {
 
   private static final ReentrantLock m_cacheDataMutex = new ReentrantLock();
 
+  private enum JoystickResourceAlert {
+    BUTTON("ButtonUnavailable", "Button"),
+    AXIS("AxisUnavailable", "axis"),
+    POV("POVUnavailable", "POV");
+
+    final String idSuffix;
+    final String label;
+
+    JoystickResourceAlert(String idSuffix, String label) {
+      this.idSuffix = idSuffix;
+      this.label = label;
+    }
+
+    boolean isAvailable(int stick, int resource) {
+      return switch (this) {
+        case BUTTON -> (getStickButtonsAvailable(stick) & (1L << resource)) != 0;
+        case AXIS -> (getStickAxesAvailable(stick) & (1 << resource)) != 0;
+        case POV -> (getStickPOVsAvailable(stick) & (1 << resource)) != 0;
+      };
+    }
+
+    String getText(int stick, int resource) {
+      return "Joystick " + label + " " + resource + " on port " + stick + " not available";
+    }
+  }
+
+  private static final JoystickResourceAlert[] JOYSTICK_RESOURCE_ALERTS =
+      JoystickResourceAlert.values();
+
   private static final class JoystickAlerts {
     final int stick;
     final String connectionText;
     Alert connectionAlert;
-    Alert buttonAlert;
-    Alert axisAlert;
-    Alert povAlert;
+    final Alert[] resourceAlerts = new Alert[JOYSTICK_RESOURCE_ALERTS.length];
     Alert touchpadFingerAlert;
     boolean connectionAlertActive;
-    boolean buttonAlertActive;
-    boolean axisAlertActive;
-    boolean povAlertActive;
+    final boolean[] resourceAlertActive = new boolean[JOYSTICK_RESOURCE_ALERTS.length];
     boolean touchpadFingerAlertActive;
-    int buttonAlertButton;
-    int axisAlertAxis;
-    int povAlertPOV;
+    final int[] resourceAlertValues = new int[JOYSTICK_RESOURCE_ALERTS.length];
     int touchpadFingerAlertTouchpad;
     int touchpadFingerAlertFinger;
 
@@ -502,14 +525,14 @@ public final class DriverStationBackend {
               "joystick" + stick + "Disconnected",
               connectionText,
               Alert.Level.HIGH);
-      buttonAlert =
-          new Alert(
-              "DriverStation", "joystick" + stick + "ButtonUnavailable", "", Alert.Level.MEDIUM);
-      axisAlert =
-          new Alert(
-              "DriverStation", "joystick" + stick + "AxisUnavailable", "", Alert.Level.MEDIUM);
-      povAlert =
-          new Alert("DriverStation", "joystick" + stick + "POVUnavailable", "", Alert.Level.MEDIUM);
+      for (JoystickResourceAlert resourceAlert : JOYSTICK_RESOURCE_ALERTS) {
+        resourceAlerts[resourceAlert.ordinal()] =
+            new Alert(
+                "DriverStation",
+                "joystick" + stick + resourceAlert.idSuffix,
+                "",
+                Alert.Level.MEDIUM);
+      }
       touchpadFingerAlert =
           new Alert(
               "DriverStation",
@@ -539,19 +562,8 @@ public final class DriverStationBackend {
         setConnectionAlert(false);
       }
 
-      int axesAvailable = getStickAxesAvailable(stick);
-      if (axisAlertActive && (axesAvailable & (1 << axisAlertAxis)) != 0) {
-        setAxisAlert(false);
-      }
-
-      long buttonsAvailable = getStickButtonsAvailable(stick);
-      if (buttonAlertActive && (buttonsAvailable & (1L << buttonAlertButton)) != 0) {
-        setButtonAlert(false);
-      }
-
-      int povsAvailable = getStickPOVsAvailable(stick);
-      if (povAlertActive && (povsAvailable & (1 << povAlertPOV)) != 0) {
-        setPOVAlert(false);
+      for (JoystickResourceAlert resourceAlert : JOYSTICK_RESOURCE_ALERTS) {
+        refreshResourceAlert(resourceAlert);
       }
 
       if (touchpadFingerAlertActive
@@ -567,28 +579,24 @@ public final class DriverStationBackend {
     }
 
     void clearResourceAlerts() {
-      setButtonAlert(false);
-      setAxisAlert(false);
-      setPOVAlert(false);
+      for (JoystickResourceAlert resourceAlert : JOYSTICK_RESOURCE_ALERTS) {
+        setResourceAlert(resourceAlert, false);
+      }
       setTouchpadFingerAlert(false);
     }
 
-    void reportButtonWarning(int button) {
-      String text = "Joystick Button " + button + " on port " + stick + " not available";
-      buttonAlertButton = button;
-      setButtonAlert(true, text);
+    void refreshResourceAlert(JoystickResourceAlert resourceAlert) {
+      int alertIndex = resourceAlert.ordinal();
+      if (resourceAlertActive[alertIndex]
+          && resourceAlert.isAvailable(stick, resourceAlertValues[alertIndex])) {
+        setResourceAlert(resourceAlert, false);
+      }
     }
 
-    void reportAxisWarning(int axis) {
-      String text = "Joystick axis " + axis + " on port " + stick + " not available";
-      axisAlertAxis = axis;
-      setAxisAlert(true, text);
-    }
-
-    void reportPOVWarning(int pov) {
-      String text = "Joystick POV " + pov + " on port " + stick + " not available";
-      povAlertPOV = pov;
-      setPOVAlert(true, text);
+    void reportResourceWarning(JoystickResourceAlert resourceAlert, int resource) {
+      int alertIndex = resourceAlert.ordinal();
+      resourceAlertValues[alertIndex] = resource;
+      setResourceAlert(resourceAlert, true, resourceAlert.getText(stick, resource));
     }
 
     void reportTouchpadFingerWarning(int touchpad, int finger) {
@@ -636,72 +644,27 @@ public final class DriverStationBackend {
       return true;
     }
 
-    boolean setButtonAlert(boolean active) {
-      return setButtonAlert(active, "");
+    boolean setResourceAlert(JoystickResourceAlert resourceAlert, boolean active) {
+      return setResourceAlert(resourceAlert, active, "");
     }
 
-    boolean setButtonAlert(boolean active, String text) {
-      if (!active && !buttonAlertActive) {
+    boolean setResourceAlert(JoystickResourceAlert resourceAlert, boolean active, String text) {
+      int alertIndex = resourceAlert.ordinal();
+      if (!active && !resourceAlertActive[alertIndex]) {
         return true;
       }
 
-      if (!applyAlert(buttonAlert, active, text, false)) {
+      if (!applyAlert(resourceAlerts[alertIndex], active, text, false)) {
         if (!active) {
-          buttonAlertActive = false;
+          resourceAlertActive[alertIndex] = false;
           return true;
         }
         initializeAlerts();
-        if (!applyAlert(buttonAlert, active, text, false)) {
+        if (!applyAlert(resourceAlerts[alertIndex], active, text, false)) {
           return false;
         }
       }
-      buttonAlertActive = active;
-      return true;
-    }
-
-    boolean setAxisAlert(boolean active) {
-      return setAxisAlert(active, "");
-    }
-
-    boolean setAxisAlert(boolean active, String text) {
-      if (!active && !axisAlertActive) {
-        return true;
-      }
-
-      if (!applyAlert(axisAlert, active, text, false)) {
-        if (!active) {
-          axisAlertActive = false;
-          return true;
-        }
-        initializeAlerts();
-        if (!applyAlert(axisAlert, active, text, false)) {
-          return false;
-        }
-      }
-      axisAlertActive = active;
-      return true;
-    }
-
-    boolean setPOVAlert(boolean active) {
-      return setPOVAlert(active, "");
-    }
-
-    boolean setPOVAlert(boolean active, String text) {
-      if (!active && !povAlertActive) {
-        return true;
-      }
-
-      if (!applyAlert(povAlert, active, text, false)) {
-        if (!active) {
-          povAlertActive = false;
-          return true;
-        }
-        initializeAlerts();
-        if (!applyAlert(povAlert, active, text, false)) {
-          return false;
-        }
-      }
-      povAlertActive = active;
+      resourceAlertActive[alertIndex] = active;
       return true;
     }
 
@@ -907,7 +870,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickButtonWarning(stick, button);
+    reportJoystickResourceWarning(stick, JoystickResourceAlert.BUTTON, button);
     return false;
   }
 
@@ -971,7 +934,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickButtonWarning(stick, button);
+    reportJoystickResourceWarning(stick, JoystickResourceAlert.BUTTON, button);
     return false;
   }
 
@@ -1007,7 +970,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickButtonWarning(stick, button);
+    reportJoystickResourceWarning(stick, JoystickResourceAlert.BUTTON, button);
     return false;
   }
 
@@ -1038,7 +1001,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickAxisWarning(stick, axis);
+    reportJoystickResourceWarning(stick, JoystickResourceAlert.AXIS, axis);
     return 0.0;
   }
 
@@ -1172,7 +1135,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickPOVWarning(stick, pov);
+    reportJoystickResourceWarning(stick, JoystickResourceAlert.POV, pov);
     return POVDirection.CENTER;
   }
 
@@ -2136,7 +2099,8 @@ public final class DriverStationBackend {
     return alerts;
   }
 
-  private static void reportJoystickButtonWarning(int stick, int button) {
+  private static void reportJoystickResourceWarning(
+      int stick, JoystickResourceAlert resourceAlert, int resource) {
     m_joystickAlertMutex.lock();
     try {
       if (!isFMSAttached() && m_silenceJoystickAlerts) {
@@ -2148,43 +2112,7 @@ public final class DriverStationBackend {
         return;
       }
 
-      alerts.reportButtonWarning(button);
-    } finally {
-      m_joystickAlertMutex.unlock();
-    }
-  }
-
-  private static void reportJoystickAxisWarning(int stick, int axis) {
-    m_joystickAlertMutex.lock();
-    try {
-      if (!isFMSAttached() && m_silenceJoystickAlerts) {
-        return;
-      }
-
-      JoystickAlerts alerts = getJoystickAlertsLocked(stick);
-      if (!alerts.prepareForReport()) {
-        return;
-      }
-
-      alerts.reportAxisWarning(axis);
-    } finally {
-      m_joystickAlertMutex.unlock();
-    }
-  }
-
-  private static void reportJoystickPOVWarning(int stick, int pov) {
-    m_joystickAlertMutex.lock();
-    try {
-      if (!isFMSAttached() && m_silenceJoystickAlerts) {
-        return;
-      }
-
-      JoystickAlerts alerts = getJoystickAlertsLocked(stick);
-      if (!alerts.prepareForReport()) {
-        return;
-      }
-
-      alerts.reportPOVWarning(pov);
+      alerts.reportResourceWarning(resourceAlert, resource);
     } finally {
       m_joystickAlertMutex.unlock();
     }
