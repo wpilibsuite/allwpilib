@@ -4,11 +4,16 @@
 
 package org.wpilib.command3;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.junit.jupiter.api.Test;
+import org.wpilib.command3.proto.ProtobufCommands.ProtobufCommand;
 
 class SchedulerTelemetryTests extends CommandTestBase {
+  private static final double kEpsilon = 1e-9;
+
   @Test
   void protobuf() {
     var mech = new DummyMechanism("The mechanism", m_scheduler);
@@ -27,90 +32,69 @@ class SchedulerTelemetryTests extends CommandTestBase {
 
     var message = Scheduler.proto.createMessage();
     Scheduler.proto.pack(message, m_scheduler);
-    var messageJson = message.toString();
-    assertEquals(
-        """
-        {
-          "lastTimeMs": %s,
-          "queuedCommands": [{
-            "priority": 0,
-            "id": %s,
-            "name": "Command 1",
-            "requirements": []
-          }, {
-            "priority": 0,
-            "id": %s,
-            "name": "Command 2",
-            "requirements": []
-          }],
-          "runningCommands": [{
-            "lastTimeMs": %s,
-            "totalTimeMs": %s,
-            "priority": 0,
-            "id": %s,
-            "name": "Group",
-            "requirements": [{
-              "name": "The mechanism"
-            }]
-          }, {
-            "lastTimeMs": %s,
-            "totalTimeMs": %s,
-            "priority": 0,
-            "id": %s,
-            "parentId": %s,
-            "name": "C2",
-            "requirements": [{
-              "name": "The mechanism"
-            }]
-          }, {
-            "lastTimeMs": %s,
-            "totalTimeMs": %s,
-            "priority": 0,
-            "id": %s,
-            "parentId": %s,
-            "name": "C3",
-            "requirements": [{
-              "name": "The mechanism"
-            }]
-          }, {
-            "lastTimeMs": %s,
-            "totalTimeMs": %s,
-            "priority": 0,
-            "id": %s,
-            "parentId": %s,
-            "name": "Park",
-            "requirements": [{
-              "name": "The mechanism"
-            }]
-          }]
-        }"""
-            .formatted(
-                // Scheduler data
-                m_scheduler.lastRuntimeMs(),
 
-                // On deck commands
-                m_scheduler.runId(scheduledCommand1),
-                m_scheduler.runId(scheduledCommand2),
+    assertAll(
+        () -> assertEquals(m_scheduler.lastRuntimeMs(), message.getLastTimeMs(), kEpsilon),
+        () -> assertEquals(2, message.getQueuedCommands().length()),
+        () -> assertEquals(4, message.getRunningCommands().length()));
 
-                // Running commands
-                m_scheduler.lastCommandRuntimeMs(group),
-                m_scheduler.totalRuntimeMs(group),
-                m_scheduler.runId(group), // id
-                // top-level command, no parent ID
+    assertCommand(message.getQueuedCommands().get(0), scheduledCommand1, null);
+    assertCommand(message.getQueuedCommands().get(1), scheduledCommand2, null);
+    assertCommand(message.getRunningCommands().get(0), group, null, "The mechanism");
+    assertCommand(message.getRunningCommands().get(1), c2Command, group, "The mechanism");
+    assertCommand(message.getRunningCommands().get(2), c3Command, c2Command, "The mechanism");
+    assertCommand(message.getRunningCommands().get(3), parkCommand, c3Command, "The mechanism");
+  }
 
-                m_scheduler.lastCommandRuntimeMs(c2Command),
-                m_scheduler.totalRuntimeMs(c2Command),
-                m_scheduler.runId(c2Command), // id
-                m_scheduler.runId(group), // parent
-                m_scheduler.lastCommandRuntimeMs(c3Command),
-                m_scheduler.totalRuntimeMs(c3Command),
-                m_scheduler.runId(c3Command), // id
-                m_scheduler.runId(c2Command), // parent
-                m_scheduler.lastCommandRuntimeMs(parkCommand),
-                m_scheduler.totalRuntimeMs(parkCommand),
-                m_scheduler.runId(parkCommand), // id
-                m_scheduler.runId(c3Command) // parent
-                ),
-        messageJson);
+  private void assertCommand(ProtobufCommand message, Command command, Command parent) {
+    assertCommand(message, command, parent, new String[0]);
+  }
+
+  private void assertCommand(
+      ProtobufCommand message, Command command, Command parent, String... requirements) {
+    var commandName = command.name();
+
+    assertAll(
+        commandName,
+        () -> assertEquals(m_scheduler.runId(command), message.getId(), "id"),
+        () -> assertEquals(commandName, message.getName(), "name"),
+        () -> assertEquals(command.priority(), message.getPriority(), "priority"),
+        () ->
+            assertEquals(requirements.length, message.getRequirements().length(), "requirements"));
+
+    if (parent == null) {
+      assertFalse(message.hasParentId(), commandName + " parent ID");
+    } else {
+      assertEquals(m_scheduler.runId(parent), message.getParentId(), commandName + " parent ID");
+    }
+
+    for (int i = 0; i < requirements.length; i++) {
+      assertEquals(
+          requirements[i],
+          message.getRequirements().get(i).getName(),
+          commandName + " requirement " + i);
+    }
+
+    if (m_scheduler.isRunning(command)) {
+      assertAll(
+          commandName + " timing",
+          () ->
+              assertEquals(
+                  m_scheduler.lastCommandRuntimeMs(command),
+                  message.getLastTimeMs(),
+                  kEpsilon,
+                  "lastTimeMs"),
+          () ->
+              assertEquals(
+                  m_scheduler.totalRuntimeMs(command),
+                  message.getTotalTimeMs(),
+                  kEpsilon,
+                  "totalTimeMs"));
+    } else {
+      assertAll(
+          commandName + " timing",
+          () -> assertFalse(message.hasLastTimeMs(), "lastTimeMs"),
+          () -> assertFalse(message.hasTotalTimeMs(), "totalTimeMs"));
+    }
   }
 }
