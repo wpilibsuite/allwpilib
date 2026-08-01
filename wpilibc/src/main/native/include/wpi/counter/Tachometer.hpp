@@ -80,6 +80,7 @@ class Tachometer : public wpi::util::Sendable,
    * SetEdgesPerRevolution must be set with a non 0 value for this to work.
    *
    * @return Current RPS.
+   * @Common This is one of the commonly used methods for this class
    */
   wpi::units::turns_per_second_t GetRevolutionsPerSecond() const;
 
@@ -89,6 +90,7 @@ class Tachometer : public wpi::util::Sendable,
    * SetEdgesPerRevolution must be set with a non 0 value for this to work.
    *
    * @return Current RPM.
+   * @Common This is one of the commonly used methods for this class
    */
   wpi::units::revolutions_per_minute_t GetRevolutionsPerMinute() const;
 
