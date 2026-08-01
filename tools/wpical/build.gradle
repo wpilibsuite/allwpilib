@@ -55,6 +55,7 @@ task generateCppVersion() {
         def version = wpilibVersioning.version.get()
         println "Writing version ${version} to $wpilibVersionFileOutput"
 
+        wpilibVersionFileOutput.parentFile.mkdirs()
         if (wpilibVersionFileOutput.exists()) {
             wpilibVersionFileOutput.delete()
         }
