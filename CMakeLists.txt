@@ -93,14 +93,14 @@ option(WPILIB_WITH_WPIMATH "Build wpimath" ON)
 option(WPILIB_WITH_WPILIB "Build hal, wpilibc/j, and developerRobot (needs OpenCV)" ON)
 option(WPILIB_WITH_EXAMPLES "Build examples" OFF)
 option(WPILIB_WITH_TESTS "Build unit tests (requires internet connection)" ON)
+option(WPILIB_WITH_GUI "Build GUI items (needs SDL3)" OFF)
 cmake_dependent_option(
     WPILIB_WITH_FIELDS
     "Build the fields target"
     OFF
-    "NOT WPILIB_WITH_GUI"
+    "NOT WPILIB_WITH_GUI;NOT WPILIB_WITH_EXAMPLES"
     ON
 )
-option(WPILIB_WITH_GUI "Build GUI items (needs SDL3)" OFF)
 option(WPILIB_WITH_SIMULATION_MODULES "Build simulation modules" ON)
 option(WPILIB_WITH_BENCHMARK "Build the benchmark project" ON)
 
@@ -123,6 +123,8 @@ wpilib_config(OPTIONS WPILIB_WITH_CSCORE REQUIRES WPILIB_WITH_NTCORE)
 wpilib_config(OPTIONS WPILIB_WITH_GUI REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WPIMATH)
 
 wpilib_config(OPTIONS WPILIB_WITH_WPILIB REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WPIMATH)
+
+wpilib_config(OPTIONS WPILIB_WITH_FIELDS REQUIRES WPILIB_WITH_WPIMATH)
 
 set(include_dest include)
 

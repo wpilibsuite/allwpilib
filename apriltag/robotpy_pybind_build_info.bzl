@@ -71,16 +71,6 @@ def apriltag_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
 
     APRILTAG_HEADER_GEN = [
         struct(
-            class_name = "AprilTag",
-            yml_file = "semiwrap/AprilTag.yml",
-            header_root = "$(execpath :robotpy-native-apriltag.copy_headers)",
-            header_file = "$(execpath :robotpy-native-apriltag.copy_headers)/wpi/apriltag/AprilTag.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::apriltag::AprilTag", "wpi__apriltag__AprilTag.hpp"),
-            ],
-        ),
-        struct(
             class_name = "AprilTagDetection",
             yml_file = "semiwrap/AprilTagDetection.yml",
             header_root = "$(execpath :robotpy-native-apriltag.copy_headers)",
@@ -103,24 +93,6 @@ def apriltag_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
                 ("wpi::apriltag::AprilTagDetector::QuadThresholdParameters", "wpi__apriltag__AprilTagDetector__QuadThresholdParameters.hpp"),
                 ("wpi::apriltag::AprilTagDetector::Results", "wpi__apriltag__AprilTagDetector__Results.hpp"),
             ],
-        ),
-        struct(
-            class_name = "AprilTagFieldLayout",
-            yml_file = "semiwrap/AprilTagFieldLayout.yml",
-            header_root = "$(execpath :robotpy-native-apriltag.copy_headers)",
-            header_file = "$(execpath :robotpy-native-apriltag.copy_headers)/wpi/apriltag/AprilTagFieldLayout.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::apriltag::AprilTagFieldLayout", "wpi__apriltag__AprilTagFieldLayout.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "AprilTagFields",
-            yml_file = "semiwrap/AprilTagFields.yml",
-            header_root = "$(execpath :robotpy-native-apriltag.copy_headers)",
-            header_file = "$(execpath :robotpy-native-apriltag.copy_headers)/wpi/apriltag/AprilTagFields.hpp",
-            tmpl_class_names = [],
-            trampolines = [],
         ),
         struct(
             class_name = "AprilTagPoseEstimate",

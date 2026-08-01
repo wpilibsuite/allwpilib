@@ -1,23 +1,193 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@rules_cc//cc:defs.bzl", "cc_test")
+load("@rules_java//java:defs.bzl", "java_library")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
+load("@rules_python//python:defs.bzl", "py_binary")
+load("//fields:generate_fields.bzl", "generate_fields")
+load("//fields:robotpy_native_build_info.bzl", "define_native_wrapper")
+load("//fields:robotpy_pybind_build_info.bzl", "define_pybind_library", "fields_extension")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
-load("//shared/bazel/rules:packaging.bzl", "package_static_cc_project")
+load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project", "package_static_cc_project")
+load("//shared/bazel/rules:publishing.bzl", "host_architectures", "wpilib_maven_export")
 load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
+load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
+load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
+
+FIELD_JSONS = glob(["src/main/native/resources/**/*.json"])
+
+FIELD_IMAGES = glob(
+    [
+        "src/main/native/resources/**/*.jpg",
+        "src/main/native/resources/**/*.jpeg",
+        "src/main/native/resources/**/*.png",
+    ],
+    allow_empty = True,
+)
+
+NO_SYSTEMCORE = select({
+    "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+    "//conditions:default": [],
+})
+
+filegroup(
+    name = "doxygen-files",
+    srcs = glob([
+        "src/generated/main/native/include/**/*",
+        "src/main/native/include/**/*",
+    ]),
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "field-jsons",
+    srcs = FIELD_JSONS,
+)
+
+filegroup(
+    name = "templates",
+    srcs = glob([
+        "src/generate/**/*.jinja",
+        "src/generate/*.json",
+    ]),
+)
+
+py_binary(
+    name = "generate_fields_script",
+    srcs = ["generate_fields.py"],
+    data = [
+        ":field-jsons",
+        ":templates",
+    ],
+    main = "generate_fields.py",
+    target_compatible_with = select({
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [requirement("jinja2")],
+)
+
+py_binary(
+    name = "convert_apriltag_layouts",
+    srcs = ["convert_apriltag_layouts.py"],
+    target_compatible_with = select({
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+generate_fields(
+    name = "generate_fields",
+)
+
+write_source_files(
+    name = "write_fields",
+    diff_args = ["-u"],
+    files = {
+        "src/generated": ":generate_fields",
+    },
+    suggested_update_target = "//:write_all",
+    tags = ["pregeneration"],
+    visibility = ["//visibility:public"],
+)
 
 generate_resources(
     name = "generate-resources",
     namespace = "wpi::fields",
     prefix = "FIELDS",
-    resource_files = glob(["src/main/native/resources/**"]),
+    resource_files = FIELD_JSONS,
+)
+
+generate_resources(
+    name = "generate-image-resources",
+    namespace = "wpi::fields",
+    prefix = "FIELD_IMAGES",
+    resource_files = FIELD_IMAGES,
+)
+
+pkg_files(
+    name = "field-resource-srcs-pkg",
+    srcs = [":generate-resources"],
+)
+
+pkg_files(
+    name = "field-handwritten-srcs-pkg",
+    srcs = [
+        "src/main/native/cpp/Field.cpp",
+        "src/main/native/cpp/FieldImage.cpp",
+        "src/main/native/cpp/FieldTag.cpp",
+    ],
+)
+
+pkg_files(
+    name = "field-image-resource-srcs-pkg",
+    srcs = [":generate-image-resources"],
+)
+
+third_party_cc_lib_helper(
+    name = "generated_cc",
+    include_root = "src/generated/main/native/include",
+    visibility = ["//visibility:public"],
 )
 
 wpilib_cc_library(
     name = "fields",
-    srcs = [":generate-resources"] + glob(["src/main/native/cpp/**"]),
+    srcs = [":generate-resources"] + [
+        "src/generated/main/native/cpp/fields/fields.cpp",
+        "src/main/native/cpp/Field.cpp",
+        "src/main/native/cpp/FieldImage.cpp",
+        "src/main/native/cpp/FieldTag.cpp",
+    ],
     hdrs = glob(["src/main/native/include/**/*"]),
+    extra_src_pkg_files = [
+        ":field-handwritten-srcs-pkg",
+        ":field-resource-srcs-pkg",
+    ],
     include_license_files = True,
+    local_defines = ["WPILIB_EXPORTS"],
+    srcs_pkg_root = "src/generated/main/native/cpp/fields",
     strip_include_prefix = "src/main/native/include",
+    third_party_header_only_libraries = [
+        ":generated_cc",
+    ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//wpimath",
+        "//wpiutil",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/fields",
+    dynamic_deps = [
+        "//wpimath:shared/wpimath",
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":fields",
+    ],
+)
+
+wpilib_cc_library(
+    name = "fieldimages",
+    srcs = [":generate-image-resources"] + [
+        "src/generated/main/native/cpp/fieldimages/field_images.cpp",
+    ],
+    hdrs = glob(["src/main/native/include/**/*"]),
+    extra_src_pkg_files = [
+        ":field-image-resource-srcs-pkg",
+    ],
+    include_license_files = True,
+    local_defines = ["WPILIB_EXPORTS"],
+    srcs_pkg_root = "src/generated/main/native/cpp/fieldimages",
+    strip_include_prefix = "src/main/native/include",
+    target_compatible_with = NO_SYSTEMCORE,
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiutil",
+    ],
 )
 
 wpilib_cc_static_library(
@@ -32,9 +202,24 @@ wpilib_cc_static_library(
     ],
 )
 
+wpilib_cc_static_library(
+    name = "static/fieldimages",
+    static_lib_name = select({
+        "@platforms//os:windows": "static/fieldimages.lib",
+        "//conditions:default": "static/libfieldimages.a",
+    }),
+    target_compatible_with = NO_SYSTEMCORE,
+    visibility = ["//visibility:public"],
+    deps = [
+        ":fieldimages",
+    ],
+)
+
 wpilib_java_library(
     name = "fields-java",
-    srcs = glob(["src/main/java/**/*.java"]),
+    srcs = glob(["src/main/java/**/*.java"]) + glob([
+        "src/generated/main/java/**/*.java",
+    ]),
     extra_source_pkgs = ["resources"],
     maven_artifact_name = "fields-java",
     maven_group_id = "org.wpilib.fields",
@@ -42,30 +227,114 @@ wpilib_java_library(
         "//:avaje_jsonb_generator",
     ],
     resource_strip_prefix = "fields/src/main/native/resources",
-    resources = glob(["src/main/native/resources/**"]),
+    resources = FIELD_JSONS,
     visibility = ["//visibility:public"],
     deps = [
+        "//wpimath:wpimath-java",
+        "//wpiutil:wpiutil-java",
         "@maven//:io_avaje_avaje_json_core",
         "@maven//:io_avaje_avaje_jsonb",
     ],
 )
 
+java_library(
+    name = "fields-images-java",
+    resource_strip_prefix = "fields/src/main/native/resources",
+    resources = FIELD_IMAGES,
+    tags = [
+        "maven_coordinates=org.wpilib.fields:fields-images-java:$(WPILIB_VERSION)",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+wpilib_maven_export(
+    name = "fields-images-java_publish",
+    lib_name = "fields-images-java",
+    maven_coordinates = "org.wpilib.fields:fields-images-java:$(WPILIB_VERSION)",
+    visibility = ["//visibility:public"],
+)
+
 pkg_files(
     name = "resources",
-    srcs = glob(["src/main/native/resources/**"]),
+    srcs = FIELD_JSONS,
     strip_prefix = "src/main/native/resources/",
 )
 
 wpilib_java_junit5_test(
     name = "fields-test",
     srcs = glob(["src/test/java/**/*.java"]),
+    resources = glob(["src/test/resources/**"]),
     deps = [
         ":fields-java",
+        "//wpimath:wpimath-java",
+        "//wpiutil:wpiutil-java",
+        "@maven//:io_avaje_avaje_jsonb",
+    ],
+)
+
+cc_test(
+    name = "fields-cpp-test",
+    size = "small",
+    srcs = glob(["src/test/native/cpp/**/*.cpp"]),
+    deps = [
+        ":fields",
+        "//thirdparty/catch2",
     ],
 )
 
 package_static_cc_project(
+    name = "fieldimages",
+    architectures = host_architectures,
+    maven_artifact_name = "fields-images-cpp",
+    maven_group_id = "org.wpilib.fields",
+)
+
+package_default_cc_project(
     name = "fields",
     maven_artifact_name = "fields-cpp",
     maven_group_id = "org.wpilib.fields",
+)
+
+generate_robotpy_native_wrapper_build_info(
+    name = "robotpy-native-fields-generator",
+    pyproject_toml = "src/main/python/native-pyproject.toml",
+)
+
+define_native_wrapper(
+    name = "robotpy-native-fields",
+    pyproject_toml = "src/main/python/native-pyproject.toml",
+)
+
+PYBIND_PKGCFG_DEPS = [
+    "//fields:native/fields/robotpy-native-fields.pc",
+    "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
+    "//wpimath:robotpy-wpimath.generated_pkgcfg_files",
+    "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+    "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
+]
+
+generate_robotpy_pybind_build_info(
+    name = "robotpy-fields-generator",
+    additional_srcs = [":robotpy-native-fields.copy_headers"],
+    package_root_file = "src/main/python/robotpy_fields/__init__.py",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+    yaml_files = glob(["src/main/python/semiwrap/*.yml"]),
+)
+
+fields_extension(
+    srcs = ["src/main/python/robotpy_fields/src/main.cpp"],
+)
+
+define_pybind_library(
+    name = "robotpy-fields",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+)
+
+robotpy_py_test(
+    "python_tests",
+    srcs = glob(["src/test/python/**/*.py"]),
+    deps = [
+        ":robotpy-fields",
+        requirement("pytest"),
+    ],
 )

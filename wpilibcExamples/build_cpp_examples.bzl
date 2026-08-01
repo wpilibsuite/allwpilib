@@ -41,6 +41,7 @@ def build_examples(halsim_deps = []):
             srcs = native.glob(["src/main/cpp/examples/" + folder + "/cpp/**/*.cpp", "src/main/cpp/examples/" + folder + "/c/**/*.c"], allow_empty = True),
             deps = [
                 "//apriltag",
+                "//fields",
                 "//commandsv2",
                 "//romiVendordep",
                 "//xrpVendordep",
@@ -79,6 +80,7 @@ def build_snippets():
             srcs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.cpp"]),
             deps = [
                 "//apriltag",
+                "//fields",
                 "//commandsv2",
                 "//cameraserver",
                 ":{}-snippets-headers".format(folder),
