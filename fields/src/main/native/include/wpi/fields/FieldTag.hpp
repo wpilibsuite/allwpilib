@@ -16,7 +16,7 @@ namespace wpi::fields {
 /**
  * Represents a field tag's metadata.
  */
-struct WPILIB_DLLEXPORT FieldTag {
+struct WPILIB_DLLEXPORT FieldTag final {
   /// The tag's ID.
   int ID;
 

@@ -24,7 +24,7 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::util::json& json, FieldImage& image);
 
 /** Field image metadata. */
-class WPILIB_DLLEXPORT FieldImage {
+class WPILIB_DLLEXPORT FieldImage final {
  public:
   /** Constructs empty field image metadata. */
   FieldImage() = default;

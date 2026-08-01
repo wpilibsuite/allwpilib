@@ -38,7 +38,7 @@ import org.wpilib.math.geometry.Translation3d;
  * upright and facing away from the (blue) alliance wall (that is, towards the opposing alliance).
  */
 @Json
-public class Field {
+public final class Field {
   /** Common origin positions for the field tag coordinate system. */
   public enum OriginPosition {
     /** Blue alliance wall, right side. */

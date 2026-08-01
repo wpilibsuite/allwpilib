@@ -9,7 +9,7 @@ import java.util.Objects;
 
 /** Field image metadata. */
 @Json
-public class FieldImage {
+public final class FieldImage {
   /**
    * Field image path. JSON files store this relative to the JSON file's directory; built-in fields
    * store the image resource path relative to {@link Fields#BASE_RESOURCE_DIR}.

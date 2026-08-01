@@ -36,7 +36,7 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::util::json& json, Field& field);
 
 /** A FIRST field with optional field image metadata and optional tag poses. */
-class WPILIB_DLLEXPORT Field {
+class WPILIB_DLLEXPORT Field final {
  public:
   /** Common origin positions for the field tag coordinate system. */
   enum class OriginPosition {
