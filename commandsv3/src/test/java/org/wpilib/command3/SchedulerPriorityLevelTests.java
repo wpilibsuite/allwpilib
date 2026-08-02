@@ -148,8 +148,7 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
     assertTrue(m_scheduler.isRunning(highPriority), "Higher priority command should still run");
     for (var command : List.of(grandparent, parent, current, child, grandchild)) {
       assertFalse(
-          m_scheduler.isScheduledOrRunning(command),
-          command.name() + " should have been canceled");
+          m_scheduler.isScheduledOrRunning(command), command.name() + " should have been canceled");
       assertInterruptedBy(command, highPriority);
     }
   }

@@ -1048,12 +1048,6 @@ public final class Scheduler implements ProtobufSerializable {
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   private void interruptCommandTree(Command command, Command interrupter) {
-    var childCommands =
-        m_runningCommands.values().stream()
-            .filter(state -> state.parent() == command)
-            .map(CommandState::command)
-            .toList();
-
     boolean running = isRunning(command);
     boolean scheduled = isScheduled(command);
 
@@ -1070,6 +1064,11 @@ public final class Scheduler implements ProtobufSerializable {
       emitCanceledEvent(command);
     }
 
+    var childCommands =
+        m_runningCommands.values().stream()
+            .filter(state -> state.parent() == command)
+            .map(CommandState::command)
+            .toList();
     childCommands.forEach(child -> interruptCommandTree(child, interrupter));
   }
 
