@@ -408,8 +408,12 @@ class BluetoothLEPacketClient::Impl
       return false;
     }
 
+    Disconnect({});
+    uint64_t generation;
     {
       std::scoped_lock lock{m_statusMutex};
+      m_cancelConnect = false;
+      generation = ++m_connectGeneration;
       m_config = config;
       m_status.targetAddress = config.address;
       m_status.addressType = config.addressType;
@@ -422,9 +426,6 @@ class BluetoothLEPacketClient::Impl
     }
     PublishStatus();
 
-    Disconnect({});
-    m_cancelConnect = false;
-    uint64_t generation = ++m_connectGeneration;
     auto self = shared_from_this();
     m_connectThread = std::thread{
         [self, config = std::move(config), bluetoothAddress, generation] {
@@ -434,8 +435,22 @@ class BluetoothLEPacketClient::Impl
   }
 
   void Disconnect(std::string_view reason) {
-    m_cancelConnect = true;
-    ++m_connectGeneration;
+    bool publishStatus = false;
+    BluetoothLEPacketConnectionStatus snapshot;
+    {
+      std::scoped_lock lock{m_statusMutex};
+      m_cancelConnect = true;
+      ++m_connectGeneration;
+      if (!reason.empty()) {
+        m_status.connecting = false;
+        m_status.connected = false;
+        m_status.transport = BluetoothPacketTransport::NONE;
+        m_status.status = reason;
+        snapshot = m_status;
+        publishStatus = true;
+      }
+    }
+
     if (m_connectThread.joinable()) {
       // WinRT GATT discovery calls are synchronous and cannot be interrupted by
       // m_cancelConnect. Detach so GUI disconnect/shutdown can return promptly;
@@ -445,13 +460,8 @@ class BluetoothLEPacketClient::Impl
 
     ClearGattState();
 
-    if (!reason.empty()) {
-      UpdateStatus([&](auto& status) {
-        status.connecting = false;
-        status.connected = false;
-        status.transport = BluetoothPacketTransport::NONE;
-        status.status = reason;
-      });
+    if (publishStatus) {
+      QueueStatus(snapshot);
     }
   }
 
@@ -499,8 +509,8 @@ class BluetoothLEPacketClient::Impl
             }
 
             if (operationStatus == foundation::AsyncStatus::Canceled) {
-              self->FailGattWrite("Bluetooth GATT write was canceled",
-                                  generation);
+              self->FailGeneration("Bluetooth GATT write was canceled",
+                                   generation);
               return;
             }
 
@@ -508,14 +518,15 @@ class BluetoothLEPacketClient::Impl
               EnsureWinrtApartment();
               self->CompleteGattWrite(operation.GetResults(), generation);
             } catch (winrt::hresult_error const& error) {
-              self->FailGattWrite(std::format("Bluetooth GATT write failed: {}",
-                                              ToString(error)),
-                                  generation);
+              self->FailGeneration(
+                  std::format("Bluetooth GATT write failed: {}",
+                              ToString(error)),
+                  generation);
             }
           });
       return true;
     } catch (winrt::hresult_error const& error) {
-      FailGattWrite(
+      FailGeneration(
           std::format("Bluetooth GATT write failed: {}", ToString(error)),
           generation);
     }
@@ -531,14 +542,6 @@ class BluetoothLEPacketClient::Impl
   bool IsConnectCanceled(uint64_t generation) const {
     return m_cancelConnect ||
            m_connectGeneration.load(std::memory_order_acquire) != generation;
-  }
-
-  bool TryCancelGeneration(uint64_t generation) {
-    if (m_cancelConnect) {
-      return false;
-    }
-    return m_connectGeneration.compare_exchange_strong(
-        generation, generation + 1, std::memory_order_acq_rel);
   }
 
   void RemoveGattValueChanged(gatt::GattCharacteristic const& characteristic,
@@ -565,7 +568,7 @@ class BluetoothLEPacketClient::Impl
         return;
       }
       if (!device) {
-        SetError("Bluetooth device was not found");
+        FailGeneration("Bluetooth device was not found", generation);
         return;
       }
 
@@ -580,7 +583,7 @@ class BluetoothLEPacketClient::Impl
       }
       if (servicesResult.Status() != gatt::GattCommunicationStatus::Success ||
           servicesResult.Services().Size() == 0) {
-        SetError("Bluetooth GATT service was not found");
+        FailGeneration("Bluetooth GATT service was not found", generation);
         return;
       }
 
@@ -607,7 +610,8 @@ class BluetoothLEPacketClient::Impl
           statusResult.Status() != gatt::GattCommunicationStatus::Success ||
           controlResult.Characteristics().Size() == 0 ||
           statusResult.Characteristics().Size() == 0) {
-        SetError("Bluetooth GATT packet characteristics were not found");
+        FailGeneration("Bluetooth GATT packet characteristics were not found",
+                       generation);
         return;
       }
 
@@ -639,7 +643,8 @@ class BluetoothLEPacketClient::Impl
       }
       if (notifyStatus != gatt::GattCommunicationStatus::Success) {
         RemoveGattValueChanged(statusCharacteristic, token);
-        SetError("Failed to enable Bluetooth GATT notifications");
+        FailGeneration("Failed to enable Bluetooth GATT notifications",
+                       generation);
         return;
       }
 
@@ -653,6 +658,7 @@ class BluetoothLEPacketClient::Impl
         m_controlCharacteristic = controlCharacteristic;
         m_statusCharacteristic = statusCharacteristic;
         m_valueChangedToken = token;
+        m_gattGeneration = generation;
       }
 
       UpdateStatus([&](auto& status) {
@@ -666,10 +672,9 @@ class BluetoothLEPacketClient::Impl
         status.error.clear();
       });
     } catch (winrt::hresult_error const& error) {
-      if (!IsConnectCanceled(generation)) {
-        SetError(std::format("Bluetooth GATT connection failed: {}",
-                             ToString(error)));
-      }
+      FailGeneration(
+          std::format("Bluetooth GATT connection failed: {}", ToString(error)),
+          generation);
     }
   }
 
@@ -699,27 +704,52 @@ class BluetoothLEPacketClient::Impl
       });
       return;
     }
-    FailGattWrite("Bluetooth GATT write failed", generation);
+    FailGeneration("Bluetooth GATT write failed", generation);
   }
 
-  void FailGattWrite(std::string_view error, uint64_t generation) {
-    if (TryCancelGeneration(generation)) {
-      ClearGattState();
-      SetError(error);
+  void FailGeneration(std::string_view error, uint64_t generation) {
+    BluetoothLEPacketConnectionStatus snapshot;
+    {
+      std::scoped_lock lock{m_statusMutex};
+      if (m_cancelConnect ||
+          m_connectGeneration.load(std::memory_order_acquire) != generation) {
+        return;
+      }
+      ++m_connectGeneration;
+      m_status.error = error;
+      m_status.status = error;
+      m_status.connecting = false;
+      m_status.connected = false;
+      m_status.transport = BluetoothPacketTransport::NONE;
+      snapshot = m_status;
     }
+
+    ClearGattState(generation);
+    QueueStatus(snapshot);
   }
 
-  void ClearGattState() {
+  void ClearGattState() { ClearGattStateForGeneration(0, false); }
+
+  void ClearGattState(uint64_t generation) {
+    ClearGattStateForGeneration(generation, true);
+  }
+
+  void ClearGattStateForGeneration(uint64_t generation,
+                                   bool requireGeneration) {
     std::scoped_lock lock{m_gattMutex};
+    if (requireGeneration && m_gattGeneration != generation) {
+      return;
+    }
     RemoveGattValueChanged(m_statusCharacteristic, m_valueChangedToken);
     m_valueChangedToken = {};
     m_controlCharacteristic = nullptr;
     m_statusCharacteristic = nullptr;
     m_device = nullptr;
+    m_gattGeneration = 0;
   }
 
   void FailConnectedGatt(std::string_view error) {
-    FailGattWrite(error, m_connectGeneration.load(std::memory_order_acquire));
+    FailGeneration(error, m_connectGeneration.load(std::memory_order_acquire));
   }
 
   void SetError(std::string_view error) {
@@ -743,6 +773,13 @@ class BluetoothLEPacketClient::Impl
     }
   }
 
+  void QueueStatus(const BluetoothLEPacketConnectionStatus& snapshot) {
+    if (m_statusCallback) {
+      m_exec->Send(
+          [callback = m_statusCallback, snapshot] { callback(snapshot); });
+    }
+  }
+
   template <typename F>
   void UpdateStatus(F&& func) {
     BluetoothLEPacketConnectionStatus snapshot;
@@ -751,10 +788,7 @@ class BluetoothLEPacketClient::Impl
       func(m_status);
       snapshot = m_status;
     }
-    if (m_statusCallback) {
-      m_exec->Send(
-          [callback = m_statusCallback, snapshot] { callback(snapshot); });
-    }
+    QueueStatus(snapshot);
   }
 
   uv::Loop& m_loop;
@@ -771,6 +805,7 @@ class BluetoothLEPacketClient::Impl
   gatt::GattCharacteristic m_controlCharacteristic{nullptr};
   gatt::GattCharacteristic m_statusCharacteristic{nullptr};
   winrt::event_token m_valueChangedToken{};
+  uint64_t m_gattGeneration = 0;
 
   std::atomic_bool m_cancelConnect{false};
   std::atomic<uint64_t> m_connectGeneration{0};
