@@ -1,0 +1,14 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+
+wpilib_cc_library(
+    name = "httpcvstream",
+    srcs = glob(["*.cpp"]),
+    tags = [
+        "wpi-example",
+    ],
+    deps = [
+        "//cscore",
+        "//wpiutil",
+        "@bzlmodrio-opencv//libraries/cpp/opencv",
+    ],
+)
