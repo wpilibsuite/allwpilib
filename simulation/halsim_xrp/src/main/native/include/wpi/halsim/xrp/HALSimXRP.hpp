@@ -47,6 +47,7 @@ struct XRPConnectionStatus
   }
 
   bool latencyAvailable = false;
+  std::string targetName;
   uint16_t latencyControlSeq = 0;
   double roundTripLatencyMs = 0.0;
   double xrpControlRxAgeMs = 0.0;
@@ -68,7 +69,8 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
 
   bool Initialize();
   void Start();
-  void ConnectBluetooth(std::string address, XRPBluetoothAddressType type);
+  void ConnectBluetooth(std::string address, XRPBluetoothAddressType type,
+                        std::string name = {});
   void DisconnectBluetooth();
   XRPConnectionStatus GetConnectionStatus() const;
 
@@ -77,9 +79,11 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
    *
    * @param address platform-specific Bluetooth target address.
    * @param type Bluetooth address type.
+   * @param name Bluetooth device display name.
    */
   void RememberBluetoothTarget(std::string address,
-                               XRPBluetoothAddressType type);
+                               XRPBluetoothAddressType type,
+                               std::string name = {});
 
   void ParsePacket(std::span<const uint8_t> packet);
   void OnNetValueChanged(const wpi::util::json& msg);
@@ -89,6 +93,7 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
   XRPBluetoothAddressType GetTargetAddressType() const {
     return m_targetAddressType;
   }
+  const std::string& GetTargetName() const { return m_targetName; }
   wpi::net::uv::Loop& GetLoop() { return m_loop; }
 
   UvExecFunc& GetExec() { return *m_exec; }
@@ -107,6 +112,7 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
   XRPConnectionStatus m_status;
 
   std::string m_targetAddress;
+  std::string m_targetName;
   XRPBluetoothAddressType m_targetAddressType = XRPBluetoothAddressType::RANDOM;
 
   bool m_providersConnected = false;

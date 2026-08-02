@@ -17,6 +17,7 @@
 #include <vector>
 
 #include <imgui.h>
+#include <implot.h>
 
 #include "wpi/hal/Extensions.h"
 #include "wpi/halsim/xrp/HALSimXRP.hpp"
@@ -32,6 +33,9 @@ constexpr std::string_view ADD_GUI_LATE_EXECUTE_NAME =
 constexpr std::string_view GET_IMGUI_CONTEXT_NAME =
     "halsimgui::GetImguiContext";
 constexpr std::string_view XRP_DEVICE_NAME_PREFIX = "WPIXRP-";
+constexpr double LATENCY_HISTORY_SECONDS = 10.0;
+constexpr size_t LATENCY_MAX_SAMPLES = 1500;
+constexpr float LATENCY_PLOT_HEIGHT = 110.0f;
 
 using AddGuiLateExecuteFn = void (*)(std::function<void()> execute);
 using GetImguiContextFn = ImGuiContext* (*)();
@@ -41,6 +45,7 @@ struct CommandResult {
   std::string output;
   std::vector<wpi::net::BluetoothLEDeviceInfo> devices;
   std::string targetAddress;
+  std::string targetName;
   XRPBluetoothAddressType addressType = XRPBluetoothAddressType::RANDOM;
   bool rememberTarget = false;
 };
@@ -57,6 +62,12 @@ struct GuiState {
   CommandKind pendingKind = CommandKind::NONE;
   std::string commandStatus;
   std::string commandOutput;
+  std::vector<double> latencyTimes;
+  std::vector<double> roundTripLatencyMs;
+  std::vector<double> xrpControlRxAgeMs;
+  std::string latencyTarget;
+  uint16_t lastLatencyControlSeq = 0;
+  bool haveLastLatencyControlSeq = false;
 };
 
 static std::weak_ptr<HALSimXRP> gSimXRP;
@@ -70,13 +81,65 @@ static void SetAddress(std::string_view address) {
                 static_cast<int>(address.size()), address.data());
 }
 
+static XRPBluetoothAddressType GetGuiAddressType() {
+  return gGui.addressType == 0 ? XRPBluetoothAddressType::PUBLIC
+                               : XRPBluetoothAddressType::RANDOM;
+}
+
 static bool IsXRPDevice(const wpi::net::BluetoothLEDeviceInfo& device) {
   return device.name.rfind(XRP_DEVICE_NAME_PREFIX, 0) == 0;
 }
 
+static std::string_view GetDeviceDisplayName(std::string_view name) {
+  if (name.rfind(XRP_DEVICE_NAME_PREFIX, 0) == 0) {
+    return name.substr(XRP_DEVICE_NAME_PREFIX.size());
+  }
+  return name;
+}
+
 static std::string_view GetDeviceSortKey(
     const wpi::net::BluetoothLEDeviceInfo& device) {
-  return device.name.empty() ? std::string_view{device.target} : device.name;
+  std::string_view displayName = GetDeviceDisplayName(device.name);
+  return displayName.empty() ? std::string_view{device.target} : displayName;
+}
+
+static int FindDevice(std::string_view target,
+                      XRPBluetoothAddressType addressType) {
+  auto device =
+      std::find_if(gGui.devices.begin(), gGui.devices.end(),
+                   [=](const wpi::net::BluetoothLEDeviceInfo& candidate) {
+                     return candidate.target == target &&
+                            candidate.addressType == addressType;
+                   });
+  if (device == gGui.devices.end()) {
+    return -1;
+  }
+  return static_cast<int>(device - gGui.devices.begin());
+}
+
+static void UpsertDevice(std::string_view target,
+                         XRPBluetoothAddressType addressType,
+                         std::string_view name) {
+  if (target.empty()) {
+    return;
+  }
+
+  int deviceIndex = FindDevice(target, addressType);
+  if (deviceIndex < 0) {
+    wpi::net::BluetoothLEDeviceInfo device;
+    device.target = target;
+    device.name = name;
+    device.addressType = addressType;
+    gGui.devices.emplace_back(std::move(device));
+    gGui.selectedDevice = static_cast<int>(gGui.devices.size()) - 1;
+    return;
+  }
+
+  auto& device = gGui.devices[deviceIndex];
+  if (!name.empty()) {
+    device.name = name;
+  }
+  gGui.selectedDevice = deviceIndex;
 }
 
 static void FilterAndSortXRPDevices(
@@ -110,7 +173,8 @@ static CommandResult RefreshDevices() {
 }
 
 static CommandResult PairDevice(std::string_view target,
-                                XRPBluetoothAddressType addressType) {
+                                XRPBluetoothAddressType addressType,
+                                std::string_view name) {
   CommandResult result;
   auto pairing = wpi::net::BluetoothLEPacketClient::PairDevice(target);
   result.exitCode = pairing.paired ? 0 : 1;
@@ -118,6 +182,7 @@ static CommandResult PairDevice(std::string_view target,
                                         : std::move(pairing.error);
   if (pairing.paired) {
     result.targetAddress = target;
+    result.targetName = name;
     result.addressType = addressType;
     result.rememberTarget = true;
   }
@@ -148,18 +213,22 @@ static void UpdatePendingCommand(HALSimXRP& simXRP) {
   if (gGui.pendingKind == CommandKind::REFRESH ||
       gGui.pendingKind == CommandKind::SCAN) {
     gGui.devices = std::move(result.devices);
+    int currentDevice = FindDevice(gGui.address, GetGuiAddressType());
     gGui.selectedDevice =
-        gGui.devices.empty()
-            ? -1
-            : std::clamp(gGui.selectedDevice, 0,
-                         static_cast<int>(gGui.devices.size()) - 1);
+        currentDevice >= 0
+            ? currentDevice
+            : (gGui.devices.empty()
+                   ? -1
+                   : std::clamp(gGui.selectedDevice, 0,
+                                static_cast<int>(gGui.devices.size()) - 1));
   }
 
   if (result.exitCode == 0) {
     gGui.commandStatus = "Ready";
     if (result.rememberTarget) {
       simXRP.RememberBluetoothTarget(std::move(result.targetAddress),
-                                     result.addressType);
+                                     result.addressType,
+                                     std::move(result.targetName));
     }
   } else if (!gGui.commandOutput.empty()) {
     gGui.commandStatus = "Command finished with output";
@@ -177,7 +246,122 @@ static void InitializeFromConnection(const XRPConnectionStatus& status) {
   SetAddress(status.targetAddress);
   gGui.addressType =
       status.addressType == XRPBluetoothAddressType::PUBLIC ? 0 : 1;
+  UpsertDevice(status.targetAddress, status.addressType, status.targetName);
   gGui.initializedFromConnection = true;
+}
+
+static void ClearLatencyHistory() {
+  gGui.latencyTimes.clear();
+  gGui.roundTripLatencyMs.clear();
+  gGui.xrpControlRxAgeMs.clear();
+  gGui.latencyTarget.clear();
+  gGui.haveLastLatencyControlSeq = false;
+}
+
+static void PruneLatencyHistory(double minimumTime) {
+  auto firstVisible = std::lower_bound(gGui.latencyTimes.begin(),
+                                       gGui.latencyTimes.end(), minimumTime);
+  auto eraseCount =
+      static_cast<size_t>(firstVisible - gGui.latencyTimes.begin());
+
+  if (gGui.latencyTimes.size() - eraseCount > LATENCY_MAX_SAMPLES) {
+    eraseCount = gGui.latencyTimes.size() - LATENCY_MAX_SAMPLES;
+  }
+
+  if (eraseCount == 0) {
+    return;
+  }
+
+  gGui.latencyTimes.erase(gGui.latencyTimes.begin(),
+                          gGui.latencyTimes.begin() + eraseCount);
+  gGui.roundTripLatencyMs.erase(gGui.roundTripLatencyMs.begin(),
+                                gGui.roundTripLatencyMs.begin() + eraseCount);
+  gGui.xrpControlRxAgeMs.erase(gGui.xrpControlRxAgeMs.begin(),
+                               gGui.xrpControlRxAgeMs.begin() + eraseCount);
+}
+
+static void UpdateLatencyHistory(const XRPConnectionStatus& status) {
+  if (!status.connected) {
+    ClearLatencyHistory();
+    return;
+  }
+
+  if (gGui.latencyTarget != status.targetAddress) {
+    ClearLatencyHistory();
+    gGui.latencyTarget = status.targetAddress;
+  }
+
+  if (!status.latencyAvailable ||
+      (gGui.haveLastLatencyControlSeq &&
+       gGui.lastLatencyControlSeq == status.latencyControlSeq)) {
+    return;
+  }
+
+  double now = ImGui::GetTime();
+  gGui.latencyTimes.emplace_back(now);
+  gGui.roundTripLatencyMs.emplace_back(status.roundTripLatencyMs);
+  gGui.xrpControlRxAgeMs.emplace_back(status.xrpControlRxAgeMs);
+  gGui.lastLatencyControlSeq = status.latencyControlSeq;
+  gGui.haveLastLatencyControlSeq = true;
+
+  PruneLatencyHistory(now - LATENCY_HISTORY_SECONDS);
+}
+
+static void DrawLatencyPlot(const XRPConnectionStatus& status) {
+  UpdateLatencyHistory(status);
+  if (!status.connected) {
+    return;
+  }
+
+  ImGui::TextUnformatted("Comms latency");
+  if (gGui.latencyTimes.empty()) {
+    ImGui::TextUnformatted("Waiting for timing data");
+    return;
+  }
+
+  double now = gGui.latencyTimes.back();
+  double minimumTime = std::max(0.0, now - LATENCY_HISTORY_SECONDS);
+  double maximumLatencyMs = 5.0;
+  for (size_t i = 0; i < gGui.latencyTimes.size(); ++i) {
+    if (gGui.latencyTimes[i] < minimumTime) {
+      continue;
+    }
+    maximumLatencyMs = std::max(maximumLatencyMs, gGui.roundTripLatencyMs[i]);
+    maximumLatencyMs = std::max(maximumLatencyMs, gGui.xrpControlRxAgeMs[i]);
+  }
+  maximumLatencyMs *= 1.25;
+
+  constexpr ImPlotFlags PLOT_FLAGS =
+      ImPlotFlags_NoTitle | ImPlotFlags_NoMouseText | ImPlotFlags_NoMenus |
+      ImPlotFlags_NoBoxSelect;
+  constexpr ImPlotAxisFlags TIME_AXIS_FLAGS =
+      ImPlotAxisFlags_NoLabel | ImPlotAxisFlags_NoGridLines |
+      ImPlotAxisFlags_NoTickMarks | ImPlotAxisFlags_NoTickLabels |
+      ImPlotAxisFlags_NoMenus | ImPlotAxisFlags_NoHighlight |
+      ImPlotAxisFlags_Lock;
+  constexpr ImPlotAxisFlags LATENCY_AXIS_FLAGS =
+      ImPlotAxisFlags_NoLabel | ImPlotAxisFlags_NoMenus |
+      ImPlotAxisFlags_NoHighlight | ImPlotAxisFlags_LockMin;
+
+  if (ImPlot::BeginPlot("##XRPCommsLatency", ImVec2{-1, LATENCY_PLOT_HEIGHT},
+                        PLOT_FLAGS)) {
+    ImPlot::SetupLegend(
+        ImPlotLocation_NorthWest,
+        ImPlotLegendFlags_Horizontal | ImPlotLegendFlags_NoMenus);
+    ImPlot::SetupAxis(ImAxis_X1, nullptr, TIME_AXIS_FLAGS);
+    ImPlot::SetupAxisLimits(ImAxis_X1, minimumTime, now, ImGuiCond_Always);
+    ImPlot::SetupAxis(ImAxis_Y1, nullptr, LATENCY_AXIS_FLAGS);
+    ImPlot::SetupAxisFormat(ImAxis_Y1, "%.0f ms");
+    ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, maximumLatencyMs, ImGuiCond_Always);
+    ImPlot::SetupFinish();
+
+    int sampleCount = static_cast<int>(gGui.latencyTimes.size());
+    ImPlot::PlotLine("RTT", gGui.latencyTimes.data(),
+                     gGui.roundTripLatencyMs.data(), sampleCount);
+    ImPlot::PlotLine("XRP age", gGui.latencyTimes.data(),
+                     gGui.xrpControlRxAgeMs.data(), sampleCount);
+    ImPlot::EndPlot();
+  }
 }
 
 static std::string SelectedDeviceLabel() {
@@ -187,10 +371,25 @@ static std::string SelectedDeviceLabel() {
   }
 
   const auto& device = gGui.devices[gGui.selectedDevice];
-  if (device.name.empty()) {
+  std::string_view displayName = GetDeviceDisplayName(device.name);
+  if (displayName.empty()) {
     return device.target;
   }
-  return device.name + " (" + device.target + ")";
+  return std::string{displayName} + " (" + device.target + ")";
+}
+
+static std::string GetSelectedDeviceName(std::string_view target,
+                                         XRPBluetoothAddressType addressType) {
+  if (gGui.selectedDevice < 0 ||
+      gGui.selectedDevice >= static_cast<int>(gGui.devices.size())) {
+    return {};
+  }
+
+  const auto& device = gGui.devices[gGui.selectedDevice];
+  if (device.target != target || device.addressType != addressType) {
+    return {};
+  }
+  return std::string{GetDeviceDisplayName(device.name)};
 }
 
 static void DrawDeviceControls(bool commandRunning) {
@@ -209,9 +408,13 @@ static void DrawDeviceControls(bool commandRunning) {
   if (ImGui::BeginCombo("Device", selectedLabel.c_str())) {
     for (int i = 0; i < static_cast<int>(gGui.devices.size()); ++i) {
       const auto& device = gGui.devices[i];
-      std::string label = device.name.empty()
-                              ? device.target
-                              : device.name + " (" + device.target + ")";
+      std::string label;
+      std::string_view displayName = GetDeviceDisplayName(device.name);
+      if (displayName.empty()) {
+        label = device.target;
+      } else {
+        label = std::string{displayName} + " (" + device.target + ")";
+      }
       if (ImGui::Selectable(label.c_str(), gGui.selectedDevice == i)) {
         gGui.selectedDevice = i;
         SetAddress(device.target);
@@ -231,27 +434,29 @@ static void DrawConnectionControls(HALSimXRP& simXRP,
                                    const XRPConnectionStatus& status,
                                    bool commandRunning) {
   bool targetValid = gGui.address[0] != '\0';
+  bool connectionActive = status.connected || status.connecting;
   bool pairingSupported =
       wpi::net::BluetoothLEPacketClient::IsPairingSupported();
   if (pairingSupported) {
-    ImGui::BeginDisabled(commandRunning || !targetValid);
+    ImGui::BeginDisabled(commandRunning || !targetValid || connectionActive);
     if (ImGui::Button("Pair")) {
       std::string target = gGui.address;
-      XRPBluetoothAddressType addressType =
-          gGui.addressType == 0 ? XRPBluetoothAddressType::PUBLIC
-                                : XRPBluetoothAddressType::RANDOM;
-      StartCommand(CommandKind::PAIR, "Pairing device", [target, addressType] {
-        return PairDevice(target, addressType);
-      });
+      XRPBluetoothAddressType addressType = GetGuiAddressType();
+      std::string name = GetSelectedDeviceName(target, addressType);
+      StartCommand(CommandKind::PAIR, "Pairing device",
+                   [target, addressType, name] {
+                     return PairDevice(target, addressType, name);
+                   });
     }
     ImGui::EndDisabled();
     ImGui::SameLine();
   }
-  ImGui::BeginDisabled(commandRunning || !targetValid);
+  ImGui::BeginDisabled(commandRunning || !targetValid || connectionActive);
   if (ImGui::Button("Connect")) {
-    simXRP.ConnectBluetooth(
-        gGui.address, gGui.addressType == 0 ? XRPBluetoothAddressType::PUBLIC
-                                            : XRPBluetoothAddressType::RANDOM);
+    std::string target = gGui.address;
+    XRPBluetoothAddressType addressType = GetGuiAddressType();
+    simXRP.ConnectBluetooth(target, addressType,
+                            GetSelectedDeviceName(target, addressType));
   }
   ImGui::EndDisabled();
 
@@ -310,13 +515,7 @@ static void DrawGuiImpl() {
   ImGui::Text("Packets: sent %" PRIu64 ", received %" PRIu64,
               status.packetsSent, status.packetsReceived);
 
-  if (status.connected && status.latencyAvailable) {
-    ImGui::Text("Latency: RTT %.1f ms, XRP age %.1f ms, seq %u",
-                status.roundTripLatencyMs, status.xrpControlRxAgeMs,
-                status.latencyControlSeq);
-  } else if (status.connected) {
-    ImGui::TextUnformatted("Latency: waiting for timing data");
-  }
+  DrawLatencyPlot(status);
 
   ImGui::End();
 }
