@@ -168,12 +168,7 @@ def _split_macro_args(args: str):
             bracket_depth += 1
         elif ch == "]":
             bracket_depth -= 1
-        elif (
-            ch == ","
-            and depth == 0
-            and brace_depth == 0
-            and bracket_depth == 0
-        ):
+        elif ch == "," and depth == 0 and brace_depth == 0 and bracket_depth == 0:
             split_args.append(args[start:i].strip())
             start = i + 1
 
@@ -245,9 +240,7 @@ def _replace_gtest_assertions(content: str):
 
     return _replace_macro_invocations(
         content,
-        set(comparison_macros)
-        | set(boolean_macros)
-        | {"EXPECT_DEATH", "ASSERT_DEATH"},
+        set(comparison_macros) | set(boolean_macros) | {"EXPECT_DEATH", "ASSERT_DEATH"},
         replace,
     )
 
