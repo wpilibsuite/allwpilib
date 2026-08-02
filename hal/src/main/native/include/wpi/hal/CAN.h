@@ -65,29 +65,6 @@ void HAL_CAN_SendMessage(int32_t busId, uint32_t messageId,
                          int32_t* status);
 
 /**
- * Sends a CAN message with a callback invoked before each send.
- *
- * The callback is invoked for the initial send and every periodic send.
- * Returning false suppresses that send without stopping future callbacks. The
- * callback may run on the CAN write thread. CAN read APIs may be called from
- * the callback, but APIs that send, stop, or schedule CAN messages must not be
- * called. The callback and param remain associated with the periodic message
- * until it is replaced or stopped.
- *
- * @param[in] busId     the CAN bus number
- * @param[in] messageId the message id
- * @param[in] message   the CAN message
- * @param[in] periodMs  the repeat period
- * @param[in] callback  callback invoked before each send
- * @param[in] param     user parameter passed to the callback
- * @param[out] status   Error status variable. 0 on success.
- */
-void HAL_CAN_SendMessageWithPeriodicCallback(
-    int32_t busId, uint32_t messageId, const struct HAL_CANMessage* message,
-    int32_t periodMs, HAL_CANPeriodicSendCallback callback, void* param,
-    int32_t* status);
-
-/**
  * Receives a CAN message.
  *
  * @param[in] busId       The CAN bus number

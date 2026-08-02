@@ -75,29 +75,6 @@ void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
                                  int32_t repeatMs, int32_t* status);
 
 /**
- * Writes a repeating packet with a callback invoked before each send.
- *
- * The callback is invoked for the initial send and every periodic send.
- * Returning false suppresses that send without stopping future callbacks. The
- * callback may run on the CAN write thread. CAN read APIs may be called from
- * the callback, but APIs that send, stop, or schedule CAN messages must not be
- * called. The callback and param remain associated with the periodic message
- * until it is replaced or stopped.
- *
- * @param[in] handle   the CAN handle
- * @param[in] apiId    the ID to write (0-1023)
- * @param[in] message  the message
- * @param[in] repeatMs the period to repeat in ms
- * @param[in] callback callback invoked before each send
- * @param[in] param    user parameter passed to the callback
- * @param[out] status  Error status variable. 0 on success.
- */
-void HAL_WriteCANPacketRepeatingWithCallback(
-    HAL_CANHandle handle, int32_t apiId, const struct HAL_CANMessage* message,
-    int32_t repeatMs, HAL_CANPeriodicSendCallback callback, void* param,
-    int32_t* status);
-
-/**
  * Writes an RTR frame of the specified length to the CAN device with the
  * specific ID.
  *

@@ -12,6 +12,7 @@
 #include <mutex>
 #include <string>
 
+#include "CANInternal.hpp"
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
 #include "wpi/hal/CANAPI.h"
@@ -185,9 +186,9 @@ static void SendControl(PCM* pcm, int32_t* status) {
   std::memset(&message, 0, sizeof(message));
   message.dataSize = 8;
   std::memcpy(message.data, pcm->control.data, 8);
-  HAL_WriteCANPacketRepeatingWithCallback(pcm->canHandle, Control1, &message,
-                                          SendPeriod, PrepareControl1ForSend,
-                                          pcm, status);
+  WriteCANPacketRepeatingWithCallback(pcm->canHandle, Control1, &message,
+                                      SendPeriod, PrepareControl1ForSend, pcm,
+                                      status);
 }
 
 extern "C" {

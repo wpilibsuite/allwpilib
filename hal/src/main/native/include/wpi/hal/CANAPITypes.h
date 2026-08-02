@@ -145,16 +145,6 @@ struct HAL_CANMessage {
   uint8_t data[64];
 };
 
-/**
- * Callback invoked before a callback-aware CAN message is sent.
- *
- * The callback may modify the message for the current send. Returning false
- * suppresses the current send without stopping future periodic callbacks. The
- * message is valid only for the duration of the callback.
- */
-typedef HAL_Bool (*HAL_CANPeriodicSendCallback)(void* param,
-                                                struct HAL_CANMessage* message);
-
 struct HAL_CANReceiveMessage {
   /** Receive timestamp (wpi time) */
   uint64_t timeStamp;

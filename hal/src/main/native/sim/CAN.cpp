@@ -19,17 +19,6 @@ void HAL_CAN_SendMessage(int32_t busId, uint32_t messageId,
                          int32_t* status) {
   SimCanData->sendMessage(busId, messageId, message, periodMs, status);
 }
-void HAL_CAN_SendMessageWithPeriodicCallback(
-    int32_t busId, uint32_t messageId, const struct HAL_CANMessage* message,
-    int32_t periodMs, HAL_CANPeriodicSendCallback callback, void* param,
-    int32_t* status) {
-  HAL_CANMessage callbackMessage = *message;
-  if (callback != nullptr && !callback(param, &callbackMessage)) {
-    *status = 0;
-    return;
-  }
-  HAL_CAN_SendMessage(busId, messageId, &callbackMessage, periodMs, status);
-}
 void HAL_CAN_ReceiveMessage(int32_t busId, uint32_t messageId,
                             struct HAL_CANReceiveMessage* message,
                             int32_t* status) {

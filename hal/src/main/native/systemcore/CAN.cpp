@@ -21,6 +21,7 @@
 #include <utility>
 #include <vector>
 
+#include "CANInternal.hpp"
 #include "PortsInternal.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/Threads.h"
@@ -123,7 +124,7 @@ struct CANStreamStorage {
 struct PeriodicFrame {
   canfd_frame frame;
   std::shared_ptr<wpi::net::uv::Timer> timer;
-  HAL_CANPeriodicSendCallback callback;
+  CANPeriodicSendCallback callback;
   void* callbackParam;
   int32_t status{0};
 };
@@ -149,7 +150,7 @@ struct SocketCanState {
 
   int32_t SendFrame(uint8_t busId, const canfd_frame& frame);
   int32_t SendFrameWithCallback(uint8_t busId, const canfd_frame& frame,
-                                HAL_CANPeriodicSendCallback callback,
+                                CANPeriodicSendCallback callback,
                                 void* callbackParam);
 
   void TimerCallback(uint8_t busId, uint32_t messageId);
@@ -157,7 +158,7 @@ struct SocketCanState {
   int32_t RemovePeriodic(uint8_t busId, uint32_t messageId);
   int32_t AddOrUpdatePeriodic(wpi::net::uv::Loop& loop, uint8_t busId,
                               uint32_t periodMs, const canfd_frame& frame,
-                              HAL_CANPeriodicSendCallback callback,
+                              CANPeriodicSendCallback callback,
                               void* callbackParam);
 };
 
@@ -341,9 +342,10 @@ int32_t SocketCanState::SendFrame(uint8_t busId, const canfd_frame& frame) {
   return HAL_ERR_CANSessionMux_InvalidBuffer;
 }
 
-int32_t SocketCanState::SendFrameWithCallback(
-    uint8_t busId, const canfd_frame& frame,
-    HAL_CANPeriodicSendCallback callback, void* callbackParam) {
+int32_t SocketCanState::SendFrameWithCallback(uint8_t busId,
+                                              const canfd_frame& frame,
+                                              CANPeriodicSendCallback callback,
+                                              void* callbackParam) {
   if (callback == nullptr) {
     return SendFrame(busId, frame);
   }
@@ -403,10 +405,11 @@ int32_t SocketCanState::RemovePeriodic(uint8_t busId, uint32_t messageId) {
   return status;
 }
 
-int32_t SocketCanState::AddOrUpdatePeriodic(
-    wpi::net::uv::Loop& loop, uint8_t busId, uint32_t periodMs,
-    const canfd_frame& frame, HAL_CANPeriodicSendCallback callback,
-    void* callbackParam) {
+int32_t SocketCanState::AddOrUpdatePeriodic(wpi::net::uv::Loop& loop,
+                                            uint8_t busId, uint32_t periodMs,
+                                            const canfd_frame& frame,
+                                            CANPeriodicSendCallback callback,
+                                            void* callbackParam) {
   auto [messageIt, inserted] = periodicFrames.try_emplace(frame.can_id);
   auto& periodic = messageIt->second[busId];
   if (periodic) {
@@ -445,7 +448,7 @@ namespace {
 
 void SendMessage(int32_t busId, uint32_t messageId,
                  const struct HAL_CANMessage* message, int32_t periodMs,
-                 HAL_CANPeriodicSendCallback callback, void* callbackParam,
+                 CANPeriodicSendCallback callback, void* callbackParam,
                  int32_t* status) {
   *status = 0;
 
@@ -499,19 +502,22 @@ void SendMessage(int32_t busId, uint32_t messageId,
 
 }  // namespace
 
+namespace wpi::hal {
+void SendCANMessageWithPeriodicCallback(int32_t busId, uint32_t messageId,
+                                        const HAL_CANMessage* message,
+                                        int32_t periodMs,
+                                        CANPeriodicSendCallback callback,
+                                        void* param, int32_t* status) {
+  SendMessage(busId, messageId, message, periodMs, callback, param, status);
+}
+}  // namespace wpi::hal
+
 extern "C" {
 
 void HAL_CAN_SendMessage(int32_t busId, uint32_t messageId,
                          const struct HAL_CANMessage* message, int32_t periodMs,
                          int32_t* status) {
   SendMessage(busId, messageId, message, periodMs, nullptr, nullptr, status);
-}
-
-void HAL_CAN_SendMessageWithPeriodicCallback(
-    int32_t busId, uint32_t messageId, const struct HAL_CANMessage* message,
-    int32_t periodMs, HAL_CANPeriodicSendCallback callback, void* param,
-    int32_t* status) {
-  SendMessage(busId, messageId, message, periodMs, callback, param, status);
 }
 
 void HAL_CAN_ReceiveMessage(int32_t busId, uint32_t messageId,
