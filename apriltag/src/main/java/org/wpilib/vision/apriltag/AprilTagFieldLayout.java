@@ -114,6 +114,15 @@ public class AprilTagFieldLayout {
   }
 
   /**
+   * Returns a Map of the {@link AprilTag AprilTags} used in this layout, keyed by their ID.
+   *
+   * @return The {@link AprilTag AprilTags} used in this layout.
+   */
+  public Map<Integer, AprilTag> getTagMap() {
+    return new HashMap<>(m_apriltags);
+  }
+
+  /**
    * Returns the length of the field the layout is representing in meters.
    *
    * @return length, in meters
