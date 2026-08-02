@@ -115,6 +115,7 @@ constexpr const char* DBUS_INTROSPECTABLE_INTERFACE =
 constexpr const char* BLUEZ_AGENT_PATH = "/org/wpilib/wpinet/bluetooth/agent";
 constexpr const char* BLUEZ_AGENT_CAPABILITY = "NoInputNoOutput";
 constexpr std::chrono::milliseconds BLUEZ_PAIR_TIMEOUT{30000};
+constexpr std::chrono::milliseconds BLUEZ_DISCONNECT_TIMEOUT{5000};
 
 struct BlueZAdapterInfo {
   std::string path;
@@ -184,8 +185,8 @@ class BlueZClient {
                  dbus_message_iter_init_append(message, &iter);
 
                  DBusMessageIter filter;
-                 if (!dbus_message_iter_open_container(
-                         &iter, DBUS_TYPE_ARRAY, "{sv}", &filter)) {
+                 if (!dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+                                                       "{sv}", &filter)) {
                    return false;
                  }
 
@@ -201,12 +202,12 @@ class BlueZClient {
                  }
 
                  DBusMessageIter transportVariant;
-                 if (!dbus_message_iter_open_container(
-                         &transportEntry, DBUS_TYPE_VARIANT, "s",
-                         &transportVariant) ||
-                     !dbus_message_iter_append_basic(
-                         &transportVariant, DBUS_TYPE_STRING,
-                         &transportValue) ||
+                 if (!dbus_message_iter_open_container(&transportEntry,
+                                                       DBUS_TYPE_VARIANT, "s",
+                                                       &transportVariant) ||
+                     !dbus_message_iter_append_basic(&transportVariant,
+                                                     DBUS_TYPE_STRING,
+                                                     &transportValue) ||
                      !dbus_message_iter_close_container(&transportEntry,
                                                         &transportVariant) ||
                      !dbus_message_iter_close_container(&filter,
@@ -315,6 +316,13 @@ class BlueZClient {
                },
                error)
                .Get() != nullptr;
+  }
+
+  bool DisconnectDevice(const std::string& devicePath, std::string* error,
+                        std::string* errorName) {
+    return CallNoArgs(devicePath.c_str(), BLUEZ_DEVICE_INTERFACE, "Disconnect",
+                      static_cast<int>(BLUEZ_DISCONNECT_TIMEOUT.count()), error,
+                      errorName);
   }
 
  private:
@@ -828,6 +836,41 @@ BluetoothLEPairingResult PairBlueZDevice(std::string_view target) {
   result.status = device->device.paired ? "Bluetooth device is already paired"
                                         : "Bluetooth device paired";
   return result;
+}
+
+bool DisconnectBlueZDevice(std::string_view target, std::string* error) {
+  error->clear();
+  if (!IsBluetoothAddress(target)) {
+    return true;
+  }
+
+  BlueZClient bluez;
+  if (!bluez.Connect(error)) {
+    return false;
+  }
+
+  BlueZObjects objects;
+  if (!bluez.GetManagedObjects(&objects, error)) {
+    return false;
+  }
+
+  const BlueZDeviceInfo* device = FindBluetoothDevice(objects.devices, target);
+  if (device == nullptr) {
+    return true;
+  }
+
+  std::string disconnectError;
+  std::string disconnectErrorName;
+  if (!bluez.DisconnectDevice(device->path, &disconnectError,
+                              &disconnectErrorName)) {
+    if (disconnectErrorName == "org.bluez.Error.NotConnected") {
+      return true;
+    }
+    *error = std::move(disconnectError);
+    return false;
+  }
+
+  return true;
 }
 
 }  // namespace wpi::net::linuxbluetooth

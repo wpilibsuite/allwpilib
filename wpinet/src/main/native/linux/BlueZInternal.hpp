@@ -5,6 +5,7 @@
 #pragma once
 
 #include <chrono>
+#include <string>
 #include <string_view>
 
 #include "wpi/net/BluetoothLEPacketClient.hpp"
@@ -13,5 +14,6 @@ namespace wpi::net::linuxbluetooth {
 
 BluetoothLEDeviceScanResult ScanBlueZDevices(std::chrono::milliseconds timeout);
 BluetoothLEPairingResult PairBlueZDevice(std::string_view target);
+bool DisconnectBlueZDevice(std::string_view target, std::string* error);
 
 }  // namespace wpi::net::linuxbluetooth

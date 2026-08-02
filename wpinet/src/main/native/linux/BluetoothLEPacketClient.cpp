@@ -279,6 +279,11 @@ class BluetoothLEPacketClient::Impl
 
     {
       std::scoped_lock lock{m_statusMutex};
+      if ((m_status.connecting || m_status.connected) &&
+          m_status.targetAddress == config.address &&
+          m_status.addressType == config.addressType) {
+        return true;
+      }
       m_config = config;
       m_status.targetAddress = config.address;
       m_status.addressType = config.addressType;
@@ -481,6 +486,10 @@ class BluetoothLEPacketClient::Impl
     m_activeTransport = LinuxBluetoothTransport::GATT;
     ResetGattDiscovery();
 
+    std::string bluezDisconnectError;
+    linuxbluetooth::DisconnectBlueZDevice(config.address,
+                                          &bluezDisconnectError);
+
     int fd =
         ::socket(WPI_AF_BLUETOOTH, SOCK_SEQPACKET, BLUETOOTH_PROTOCOL_L2CAP);
     if (fd < 0) {
@@ -596,8 +605,7 @@ class BluetoothLEPacketClient::Impl
   }
 
   void HandleSocketDisconnect() {
-    if (m_activeTransport == LinuxBluetoothTransport::L2CAP &&
-        IsConnecting()) {
+    if (m_activeTransport == LinuxBluetoothTransport::L2CAP && IsConnecting()) {
       BeginGattFallback("Bluetooth L2CAP connection closed", m_config,
                         m_remoteAddress);
       return;
