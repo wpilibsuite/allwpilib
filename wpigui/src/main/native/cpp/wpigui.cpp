@@ -24,6 +24,7 @@
 #include <imgui.h>
 #include <imgui_DroidSans.h>
 #include <imgui_FiraCodeRetina.h>
+#include <imgui_FontAwesomeBrands.h>
 #include <imgui_FontAwesomeSolid.h>
 #include <imgui_ProggyDotted.h>
 #include <imgui_RobotoBold.h>
@@ -877,11 +878,12 @@ ImFont* Context::FontMaker::GetFont() const {
     std::snprintf(cfg.Name, sizeof(cfg.Name), "%s", name.c_str());
     font = func(io, 0, &cfg);
 
-    // Merge font awesome solid
+    // Merge Font Awesome icon fonts.
     ImFontConfig icons_cfg;
     icons_cfg.MergeMode = true;
     icons_cfg.PixelSnapH = true;
     ImGui::AddFontFontAwesomeSolid(io, 0, &icons_cfg);
+    ImGui::AddFontFontAwesomeBrands(io, 0, &icons_cfg);
   }
   return font;
 }
