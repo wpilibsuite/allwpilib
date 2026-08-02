@@ -5,13 +5,12 @@
 #include "wpi/simulation/AlertSim.hpp"
 
 #include <algorithm>
-#include <format>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/interfaces/catch_interfaces_capture.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/hal/HAL.h"
@@ -21,6 +20,8 @@
 namespace wpi::sim {
 
 namespace {
+
+constexpr std::string_view GROUP_NAME = "AlertSimTest";
 
 struct GrowingBackendState {
   int32_t getAlertsLength = 0;
@@ -87,9 +88,7 @@ class AlertSimTest {
 
   ~AlertSimTest() { AlertSim::ResetData(); }
 
-  std::string GetGroupName() {
-    return Catch::getResultCapture().getCurrentTestName();
-  }
+  std::string_view GetGroupName() { return GROUP_NAME; }
 
   wpi::util::Alert MakeAlert(std::string_view text,
                              wpi::util::Alert::Level type) {
