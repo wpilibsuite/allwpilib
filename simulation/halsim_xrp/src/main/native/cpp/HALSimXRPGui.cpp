@@ -753,6 +753,13 @@ static void UpdateDataSources(const XRPDataSnapshot& data) {
   }
 }
 
+struct DataRowComponent {
+  bool present = false;
+  std::chrono::steady_clock::time_point lastUpdate;
+  const wpi::glass::DataSource* source = nullptr;
+  std::string value;
+};
+
 template <typename Formatter>
 static void DrawDataRow(std::string_view name, bool present,
                         std::chrono::steady_clock::time_point lastUpdate,
@@ -780,9 +787,98 @@ static void DrawDataRow(std::string_view name, bool present,
   ImGui::PopStyleColor();
 }
 
-static std::string FormatBool(bool value, std::string_view trueText,
-                              std::string_view falseText) {
-  return std::string{value ? trueText : falseText};
+static float GetCompoundComponentWidth() {
+  float componentWidth =
+      ImGui::CalcTextSize("+").x + ImGui::CalcTextSize("0000.000").x;
+  float suffixWidth = ImGui::CalcTextSize("deg/s").x;
+  float spacing = ImGui::GetStyle().ItemSpacing.x * 2.0f;
+  float availableWidth = ImGui::GetContentRegionAvail().x;
+  float availableComponentWidth =
+      (availableWidth - suffixWidth - ImGui::GetStyle().ItemSpacing.x -
+       spacing * 2.0f) /
+      3.0f;
+  return std::max(ImGui::CalcTextSize("+").x + ImGui::CalcTextSize("--").x,
+                  std::min(componentWidth, availableComponentWidth));
+}
+
+static void DrawDataRowComponent(const DataRowComponent& component,
+                                 float width) {
+  std::string display = component.present ? component.value : "--";
+  std::string sign;
+  std::string magnitude = display;
+  if (!display.empty() && (display[0] == '+' || display[0] == '-')) {
+    sign = display[0];
+    magnitude = display.substr(1);
+  }
+
+  ImGui::PushStyleColor(
+      ImGuiCol_Text, GetDataTextColor(component.present, component.lastUpdate));
+  ImVec2 textPos = ImGui::GetCursorScreenPos();
+  ImGui::PushID(component.source ? static_cast<const void*>(component.source)
+                                 : static_cast<const void*>(&component));
+  if (component.source) {
+    ImGui::Selectable("##value", false, 0,
+                      ImVec2{width, ImGui::GetTextLineHeight()});
+    component.source->EmitDrag();
+  } else {
+    ImGui::Selectable("##value", false, ImGuiSelectableFlags_Disabled,
+                      ImVec2{width, ImGui::GetTextLineHeight()});
+  }
+  ImGui::PopID();
+  ImVec2 textMax{textPos.x + width, textPos.y + ImGui::GetTextLineHeight()};
+  float signWidth = ImGui::CalcTextSize("+").x;
+  ImVec2 signMax{textPos.x + signWidth, textMax.y};
+  ImVec2 magnitudeMin{textPos.x + signWidth, textPos.y};
+  ImVec2 magnitudeSize = ImGui::CalcTextSize(magnitude.c_str());
+
+  if (!sign.empty()) {
+    ImGui::RenderTextClipped(textPos, signMax, sign.c_str(), nullptr, nullptr,
+                             ImVec2{0.0f, 0.0f});
+  }
+  ImGui::RenderTextClipped(magnitudeMin, textMax, magnitude.c_str(), nullptr,
+                           &magnitudeSize, ImVec2{1.0f, 0.0f});
+  ImGui::PopStyleColor();
+}
+
+static void DrawCompoundDataRow(
+    std::string_view name, const std::array<DataRowComponent, 3>& components,
+    std::string_view suffix = {}) {
+  bool anyPresent = false;
+  std::chrono::steady_clock::time_point latestUpdate;
+  for (const auto& component : components) {
+    if (component.present) {
+      anyPresent = true;
+      latestUpdate = std::max(latestUpdate, component.lastUpdate);
+    }
+  }
+
+  ImGui::TableNextRow();
+  ImGui::TableNextColumn();
+  ImGui::PushStyleColor(ImGuiCol_Text,
+                        GetDataTextColor(anyPresent, latestUpdate));
+  TextUnformatted(name);
+  ImGui::PopStyleColor();
+  ImGui::TableNextColumn();
+  float componentWidth = GetCompoundComponentWidth();
+  float componentSpacing = ImGui::GetStyle().ItemSpacing.x * 2.0f;
+  float startX = ImGui::GetCursorPosX();
+  for (size_t i = 0; i < components.size(); ++i) {
+    if (i != 0) {
+      ImGui::SameLine(0.0f, 0.0f);
+      ImGui::SetCursorPosX(startX + i * (componentWidth + componentSpacing));
+    }
+    DrawDataRowComponent(components[i], componentWidth);
+  }
+  if (!suffix.empty()) {
+    ImGui::SameLine(0.0f, 0.0f);
+    ImGui::SetCursorPosX(startX + components.size() * componentWidth +
+                         (components.size() - 1) * componentSpacing +
+                         ImGui::GetStyle().ItemSpacing.x);
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          GetDataTextColor(anyPresent, latestUpdate));
+    TextUnformatted(suffix);
+    ImGui::PopStyleColor();
+  }
 }
 
 static std::string FormatSigned3(double value) {
@@ -858,11 +954,6 @@ static void DrawControlDataTable(const XRPControlData& control) {
 
   const auto& sources = gGui.dataSources;
 
-  DrawDataRow("Robot state", control.packet.present, control.packet.lastUpdate,
-              sources.robotEnabled.source.get(), [&] {
-                return FormatBool(control.enabled, "Enabled", "Disabled");
-              });
-
   for (size_t i = 0; i < control.motors.size(); ++i) {
     const auto& motor = control.motors[i];
     DrawDataRow(MOTOR_LABELS[i], motor.present, motor.lastUpdate,
@@ -905,53 +996,51 @@ static void DrawStatusDataTable(const XRPStatusData& status) {
 
   DrawDioLedRow("DIO inputs", status.digitalInputs, sources.digitalInputs);
 
-  DrawDataRow("Gyro rate X", status.gyro.present, status.gyro.lastUpdate,
-              sources.gyroRates[0].source.get(), [&] {
-                return std::format("{} deg/s",
-                                   FormatSigned3(status.gyro.value.rate.x));
-              });
-  DrawDataRow("Gyro rate Y", status.gyro.present, status.gyro.lastUpdate,
-              sources.gyroRates[1].source.get(), [&] {
-                return std::format("{} deg/s",
-                                   FormatSigned3(status.gyro.value.rate.y));
-              });
-  DrawDataRow("Gyro rate Z", status.gyro.present, status.gyro.lastUpdate,
-              sources.gyroRates[2].source.get(), [&] {
-                return std::format("{} deg/s",
-                                   FormatSigned3(status.gyro.value.rate.z));
-              });
-  DrawDataRow("Gyro angle X", status.gyro.present, status.gyro.lastUpdate,
-              sources.gyroAngles[0].source.get(), [&] {
-                return std::format("{} deg",
-                                   FormatSigned3(status.gyro.value.angle.x));
-              });
-  DrawDataRow("Gyro angle Y", status.gyro.present, status.gyro.lastUpdate,
-              sources.gyroAngles[1].source.get(), [&] {
-                return std::format("{} deg",
-                                   FormatSigned3(status.gyro.value.angle.y));
-              });
-  DrawDataRow("Gyro angle Z", status.gyro.present, status.gyro.lastUpdate,
-              sources.gyroAngles[2].source.get(), [&] {
-                return std::format("{} deg",
-                                   FormatSigned3(status.gyro.value.angle.z));
-              });
-  DrawDataRow("Accel X", status.accel.present, status.accel.lastUpdate,
-              sources.accelerometer[0].source.get(),
-              [&] { return FormatSigned3(status.accel.value.x); });
-  DrawDataRow("Accel Y", status.accel.present, status.accel.lastUpdate,
-              sources.accelerometer[1].source.get(),
-              [&] { return FormatSigned3(status.accel.value.y); });
-  DrawDataRow("Accel Z", status.accel.present, status.accel.lastUpdate,
-              sources.accelerometer[2].source.get(),
-              [&] { return FormatSigned3(status.accel.value.z); });
-
-  for (size_t i = 0; i < status.analogInputs.size(); ++i) {
-    const auto& analog = status.analogInputs[i];
-    std::string label = std::format("Analog {}", i);
-    DrawDataRow(label, analog.present, analog.lastUpdate,
-                sources.analogInputs[i].source.get(),
-                [&] { return std::format("{:.2f} V", analog.value); });
-  }
+  DrawCompoundDataRow("Gyro rate X/Y/Z",
+                      {{{status.gyro.present, status.gyro.lastUpdate,
+                         sources.gyroRates[0].source.get(),
+                         FormatSigned3(status.gyro.value.rate.x)},
+                        {status.gyro.present, status.gyro.lastUpdate,
+                         sources.gyroRates[1].source.get(),
+                         FormatSigned3(status.gyro.value.rate.y)},
+                        {status.gyro.present, status.gyro.lastUpdate,
+                         sources.gyroRates[2].source.get(),
+                         FormatSigned3(status.gyro.value.rate.z)}}},
+                      "deg/s");
+  DrawCompoundDataRow("Gyro angle X/Y/Z",
+                      {{{status.gyro.present, status.gyro.lastUpdate,
+                         sources.gyroAngles[0].source.get(),
+                         FormatSigned3(status.gyro.value.angle.x)},
+                        {status.gyro.present, status.gyro.lastUpdate,
+                         sources.gyroAngles[1].source.get(),
+                         FormatSigned3(status.gyro.value.angle.y)},
+                        {status.gyro.present, status.gyro.lastUpdate,
+                         sources.gyroAngles[2].source.get(),
+                         FormatSigned3(status.gyro.value.angle.z)}}},
+                      "deg");
+  DrawCompoundDataRow("Accel X/Y/Z",
+                      {{{status.accel.present, status.accel.lastUpdate,
+                         sources.accelerometer[0].source.get(),
+                         FormatSigned3(status.accel.value.x)},
+                        {status.accel.present, status.accel.lastUpdate,
+                         sources.accelerometer[1].source.get(),
+                         FormatSigned3(status.accel.value.y)},
+                        {status.accel.present, status.accel.lastUpdate,
+                         sources.accelerometer[2].source.get(),
+                         FormatSigned3(status.accel.value.z)}}},
+                      "G");
+  DrawCompoundDataRow(
+      "Analog 0/1/2",
+      {{{status.analogInputs[0].present, status.analogInputs[0].lastUpdate,
+         sources.analogInputs[0].source.get(),
+         std::format("{:.3f}", status.analogInputs[0].value)},
+        {status.analogInputs[1].present, status.analogInputs[1].lastUpdate,
+         sources.analogInputs[1].source.get(),
+         std::format("{:.3f}", status.analogInputs[1].value)},
+        {status.analogInputs[2].present, status.analogInputs[2].lastUpdate,
+         sources.analogInputs[2].source.get(),
+         std::format("{:.3f}", status.analogInputs[2].value)}}},
+      "V");
 
   ImGui::EndTable();
 }
