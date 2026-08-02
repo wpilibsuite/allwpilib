@@ -25,6 +25,7 @@
 
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/support/ExtraGuiWidgets.hpp"
 #include "wpi/hal/Extensions.h"
 #include "wpi/halsim/xrp/HALSimXRP.hpp"
 #include "wpi/net/BluetoothLEPacketClient.hpp"
@@ -572,6 +573,26 @@ static ImVec4 GetDataTextColor(
   return {brightness, brightness, brightness, 1.0f};
 }
 
+static ImU32 GetDioLedColor(bool present,
+                            std::chrono::steady_clock::time_point lastUpdate) {
+  constexpr ImVec4 LED_COLOR = {1.0f, 1.0f, 0.4f, 1.0f};
+  constexpr ImVec4 STALE_COLOR = {DATA_STALE_TEXT_BRIGHTNESS,
+                                  DATA_STALE_TEXT_BRIGHTNESS,
+                                  DATA_STALE_TEXT_BRIGHTNESS, 1.0f};
+  if (!present) {
+    return ImGui::ColorConvertFloat4ToU32(STALE_COLOR);
+  }
+
+  double age = DataAgeSeconds(lastUpdate);
+  float fade = static_cast<float>((age - DATA_FADE_DELAY_SECONDS) /
+                                  DATA_FADE_DURATION_SECONDS);
+  fade = std::clamp(fade, 0.0f, 1.0f);
+  ImVec4 color = {LED_COLOR.x + (STALE_COLOR.x - LED_COLOR.x) * fade,
+                  LED_COLOR.y + (STALE_COLOR.y - LED_COLOR.y) * fade,
+                  LED_COLOR.z + (STALE_COLOR.z - LED_COLOR.z) * fade, 1.0f};
+  return ImGui::ColorConvertFloat4ToU32(color);
+}
+
 static void TextUnformatted(std::string_view text) {
   ImGui::TextUnformatted(text.data(), text.data() + text.size());
 }
@@ -781,10 +802,6 @@ static std::string FormatServoOutput(float value) {
                      value * 100.0f);
 }
 
-static std::string FormatDigitalValue(bool value) {
-  return value ? "High" : "Low";
-}
-
 static bool BeginXRPDataTable(const char* id) {
   constexpr ImGuiTableFlags TABLE_FLAGS = ImGuiTableFlags_Borders |
                                           ImGuiTableFlags_RowBg |
@@ -799,6 +816,39 @@ static bool BeginXRPDataTable(const char* id) {
   ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
   ImGui::TableHeadersRow();
   return true;
+}
+
+static void DrawDioLedRow(
+    std::string_view name, const std::array<XRPDataField<bool>, 8>& values,
+    const std::array<SourceSlot<wpi::glass::BooleanSource>, 8>& sourceSlots) {
+  std::array<int, 8> ledValues;
+  std::array<ImU32, 8> ledColors;
+  std::array<wpi::glass::BooleanSource*, 8> sources;
+  bool anyPresent = false;
+  std::chrono::steady_clock::time_point latestUpdate;
+
+  for (size_t i = 0; i < values.size(); ++i) {
+    const auto& value = values[i];
+    int colorIndex = static_cast<int>(i) + 1;
+    ledValues[i] = value.value ? colorIndex : -colorIndex;
+    ledColors[i] = GetDioLedColor(value.present, value.lastUpdate);
+    sources[i] = sourceSlots[i].source.get();
+    if (value.present) {
+      anyPresent = true;
+      latestUpdate = std::max(latestUpdate, value.lastUpdate);
+    }
+  }
+
+  ImGui::TableNextRow();
+  ImGui::PushStyleColor(ImGuiCol_Text,
+                        GetDataTextColor(anyPresent, latestUpdate));
+  ImGui::TableNextColumn();
+  TextUnformatted(name);
+  ImGui::TableNextColumn();
+  wpi::glass::DrawLEDSources(
+      ledValues.data(), sources.data(), static_cast<int>(ledValues.size()),
+      static_cast<int>(ledValues.size()), ledColors.data());
+  ImGui::PopStyleColor();
 }
 
 static void DrawControlDataTable(const XRPControlData& control) {
@@ -827,13 +877,7 @@ static void DrawControlDataTable(const XRPControlData& control) {
                 [&] { return FormatServoOutput(servo.value); });
   }
 
-  for (size_t i = 0; i < control.digitalOutputs.size(); ++i) {
-    const auto& dio = control.digitalOutputs[i];
-    std::string label = std::format("DIO {} output", i);
-    DrawDataRow(label, dio.present, dio.lastUpdate,
-                sources.digitalOutputs[i].source.get(),
-                [&] { return FormatDigitalValue(dio.value); });
-  }
+  DrawDioLedRow("DIO outputs", control.digitalOutputs, sources.digitalOutputs);
 
   ImGui::EndTable();
 }
@@ -859,13 +903,7 @@ static void DrawStatusDataTable(const XRPStatusData& status) {
         });
   }
 
-  for (size_t i = 0; i < status.digitalInputs.size(); ++i) {
-    const auto& dio = status.digitalInputs[i];
-    std::string label = std::format("DIO {} input", i);
-    DrawDataRow(label, dio.present, dio.lastUpdate,
-                sources.digitalInputs[i].source.get(),
-                [&] { return FormatDigitalValue(dio.value); });
-  }
+  DrawDioLedRow("DIO inputs", status.digitalInputs, sources.digitalInputs);
 
   DrawDataRow("Gyro rate X", status.gyro.present, status.gyro.lastUpdate,
               sources.gyroRates[0].source.get(), [&] {
