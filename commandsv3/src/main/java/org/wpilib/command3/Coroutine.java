@@ -29,6 +29,7 @@ public final class Coroutine {
 
   private boolean m_cancelOnForkFailure = true;
   private ForkResultFailure m_lastForkFailure = null;
+  private boolean m_cancellationRequested = false;
 
   /**
    * Creates a new coroutine. Package-private; only the scheduler should be creating these.
@@ -82,6 +83,26 @@ public final class Coroutine {
   // before the coroutine yields itself.
   boolean isInterruptRequested() {
     return m_cancelOnForkFailure && m_lastForkFailure != null;
+  }
+
+  /**
+   * Requests early cancellation of the coroutine and the command bound to it. Any child commands
+   * will be canceled as well, as commands can never outlive their parent, but the parent command
+   * will not be canceled.
+   */
+  public void requestCancellation() {
+    requireMounted();
+
+    // Set the flag and immediately yield. The scheduler will check the flag after the yield call
+    // and cancel the command and its descendants.
+    m_cancellationRequested = true;
+    this.yield();
+  }
+
+  // package-private; setting the flag will immediately yield, so user code can never access this
+  // in a state where it returns anything other than `false`
+  boolean isCancellationRequested() {
+    return m_cancellationRequested;
   }
 
   ForkResultFailure getForkResult() {

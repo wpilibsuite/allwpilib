@@ -708,9 +708,10 @@ public final class Scheduler implements ProtobufSerializable {
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public void cancel(Command command) {
-    if (command == currentCommand()) {
-      throw new IllegalArgumentException(
-          "Command `" + command.name() + "` is mounted and cannot be canceled");
+    var currentState = currentState();
+    if (currentState != null && command == currentState.command()) {
+      currentState.coroutine().requestCancellation(); // yields internally
+      return;
     }
 
     boolean running = isRunning(command);
@@ -910,7 +911,9 @@ public final class Scheduler implements ProtobufSerializable {
       }
     }
 
-    if (coroutine.isDone()) {
+    if (coroutine.isCancellationRequested()) {
+      cancel(command);
+    } else if (coroutine.isDone()) {
       handleCommandCompletion(command);
     } else if (coroutine.isInterruptRequested()) {
       handleCoroutineIRQ(coroutine, command);
