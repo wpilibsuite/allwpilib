@@ -4,17 +4,17 @@
 import argparse
 import subprocess
 import sys
-from enum import Enum, auto
+from enum import Flag, auto
 from pathlib import Path
 
 
-class GeneratorTypes(Enum):
+class GeneratorTypes(Flag):
     QUICKBUF = auto()
     NANOPB = auto()
 
 
 def make_arg_parser(
-    subproject_root: Path, repo_root: Path, *args
+    subproject_root: Path, repo_root: Path, types: GeneratorTypes = None
 ) -> argparse.ArgumentParser:
     """Creates an ArgumentParser configured for QuickBuffers or nanopb generation.
 
@@ -32,14 +32,14 @@ def make_arg_parser(
         default=subproject_root / "src/generated",
         type=Path,
     )
-    if GeneratorTypes.QUICKBUF in args or GeneratorTypes.NANOPB in args:
+    if GeneratorTypes.QUICKBUF in types or GeneratorTypes.NANOPB in types:
         parser.add_argument(
             "--proto_directory",
             help="Optional. If set, will use this directory to glob for protobuf files",
             default=subproject_root / "src/main/proto",
             type=Path,
         )
-    if GeneratorTypes.QUICKBUF in args:
+    if GeneratorTypes.QUICKBUF in types:
         parser.add_argument(
             "--protoc",
             help="Protoc executable command",
@@ -49,7 +49,7 @@ def make_arg_parser(
             "--quickbuf_plugin",
             help="Optional if you use protoc-quickbuf as protoc. Path to the quickbuf protoc plugin.",
         )
-    if GeneratorTypes.NANOPB in args:
+    if GeneratorTypes.NANOPB in types:
         parser.add_argument(
             "--nanopb",
             help="Nanopb generator command",
