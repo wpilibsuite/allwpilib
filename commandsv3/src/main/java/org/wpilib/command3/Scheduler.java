@@ -848,8 +848,10 @@ public final class Scheduler implements ProtobufSerializable {
         Continuation.mountContinuation(null);
       }
 
-      if (coroutine.isDone() || coroutine.isInterruptRequested()) {
-        // Callback finished or requested interrupt - remove it from the list
+      if (coroutine.isDone()
+          || coroutine.isInterruptRequested()
+          || coroutine.isCancellationRequested()) {
+        // Callback finished or requested early termination - remove it from the list
         iterator.remove();
       }
     }
