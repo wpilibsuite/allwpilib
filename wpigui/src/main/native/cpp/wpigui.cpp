@@ -24,7 +24,6 @@
 #include <imgui.h>
 #include <imgui_DroidSans.h>
 #include <imgui_FiraCodeRetina.h>
-#include <imgui_FontAwesomeBrands.h>
 #include <imgui_FontAwesomeSolid.h>
 #include <imgui_ProggyDotted.h>
 #include <imgui_RobotoBold.h>
@@ -883,7 +882,6 @@ ImFont* Context::FontMaker::GetFont() const {
     icons_cfg.MergeMode = true;
     icons_cfg.PixelSnapH = true;
     ImGui::AddFontFontAwesomeSolid(io, 0, &icons_cfg);
-    ImGui::AddFontFontAwesomeBrands(io, 0, &icons_cfg);
   }
   return font;
 }
