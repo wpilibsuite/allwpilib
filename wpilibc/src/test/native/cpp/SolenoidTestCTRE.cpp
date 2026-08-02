@@ -2,49 +2,51 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 #include "wpi/hardware/pneumatic/Solenoid.hpp"
 
 namespace wpi {
-TEST(SolenoidCTRETest, ValidInitialization) {
+TEST_CASE("SolenoidCTRETest ValidInitialization", "[wpilibc]") {
   Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2};
-  EXPECT_EQ(2, solenoid.GetChannel());
+  CHECK(2 == solenoid.GetChannel());
 
   solenoid.Set(true);
-  EXPECT_TRUE(solenoid.Get());
+  CHECK(solenoid.Get());
 
   solenoid.Set(false);
-  EXPECT_FALSE(solenoid.Get());
+  CHECK_FALSE(solenoid.Get());
 }
 
-TEST(SolenoidCTRETest, DoubleInitialization) {
+TEST_CASE("SolenoidCTRETest DoubleInitialization", "[wpilibc]") {
   Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2};
-  EXPECT_THROW(Solenoid(0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2),
-               std::runtime_error);
+  CHECK_THROWS_AS(Solenoid(0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2),
+                  std::runtime_error);
 }
 
-TEST(SolenoidCTRETest, DoubleInitializationFromDoubleSolenoid) {
+TEST_CASE("SolenoidCTRETest DoubleInitializationFromDoubleSolenoid",
+          "[wpilibc]") {
   DoubleSolenoid solenoid{0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2, 3};
-  EXPECT_THROW(Solenoid(0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2),
-               std::runtime_error);
+  CHECK_THROWS_AS(Solenoid(0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2),
+                  std::runtime_error);
 }
 
-TEST(SolenoidCTRETest, InvalidChannel) {
-  EXPECT_THROW(Solenoid(0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 100),
-               std::runtime_error);
+TEST_CASE("SolenoidCTRETest InvalidChannel", "[wpilibc]") {
+  CHECK_THROWS_AS(Solenoid(0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 100),
+                  std::runtime_error);
 }
 
-TEST(SolenoidCTRETest, Toggle) {
+TEST_CASE("SolenoidCTRETest Toggle", "[wpilibc]") {
   Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2};
   solenoid.Set(true);
-  EXPECT_TRUE(solenoid.Get());
+  CHECK(solenoid.Get());
 
   solenoid.Toggle();
-  EXPECT_FALSE(solenoid.Get());
+  CHECK_FALSE(solenoid.Get());
 
   solenoid.Toggle();
-  EXPECT_TRUE(solenoid.Get());
+  CHECK(solenoid.Get());
 }
 }  // namespace wpi

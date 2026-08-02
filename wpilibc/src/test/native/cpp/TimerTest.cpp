@@ -4,132 +4,134 @@
 
 #include "wpi/system/Timer.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/simulation/SimHooks.hpp"
 
 using namespace wpi;
 
 namespace {
-class TimerTest : public ::testing::Test {
- protected:
-  void SetUp() override {
+class TimerTest {
+ public:
+  TimerTest() {
     wpi::sim::PauseTiming();
     wpi::sim::RestartTiming();
   }
 
-  void TearDown() override { wpi::sim::ResumeTiming(); }
+  ~TimerTest() { wpi::sim::ResumeTiming(); }
 };
 
 }  // namespace
 
-TEST_F(TimerTest, StartStop) {
+TEST_CASE_METHOD(TimerTest, "TimerTest StartStop", "[wpilibc]") {
   Timer timer;
 
   // Verify timer is initialized as stopped
-  EXPECT_EQ(timer.Get(), 0_s);
-  EXPECT_FALSE(timer.IsRunning());
+  CHECK(timer.Get() == 0_s);
+  CHECK_FALSE(timer.IsRunning());
   wpi::sim::StepTiming(500_ms);
-  EXPECT_EQ(timer.Get(), 0_s);
-  EXPECT_FALSE(timer.IsRunning());
+  CHECK(timer.Get() == 0_s);
+  CHECK_FALSE(timer.IsRunning());
 
   // Verify timer increments after it's started
   timer.Start();
   wpi::sim::StepTiming(500_ms);
-  EXPECT_EQ(timer.Get(), 500_ms);
-  EXPECT_TRUE(timer.IsRunning());
+  CHECK(timer.Get() == 500_ms);
+  CHECK(timer.IsRunning());
 
   // Verify timer stops incrementing after it's stopped
   timer.Stop();
   wpi::sim::StepTiming(500_ms);
-  EXPECT_EQ(timer.Get(), 500_ms);
-  EXPECT_FALSE(timer.IsRunning());
+  CHECK(timer.Get() == 500_ms);
+  CHECK_FALSE(timer.IsRunning());
 }
 
-TEST_F(TimerTest, Reset) {
+TEST_CASE_METHOD(TimerTest, "TimerTest Reset", "[wpilibc]") {
   Timer timer;
   timer.Start();
 
   // Advance timer to 500 ms
-  EXPECT_EQ(timer.Get(), 0_s);
+  CHECK(timer.Get() == 0_s);
   wpi::sim::StepTiming(500_ms);
-  EXPECT_EQ(timer.Get(), 500_ms);
+  CHECK(timer.Get() == 500_ms);
 
   // Verify timer reports 0 ms after reset
   timer.Reset();
-  EXPECT_EQ(timer.Get(), 0_s);
+  CHECK(timer.Get() == 0_s);
 
   // Verify timer continues incrementing
   wpi::sim::StepTiming(500_ms);
-  EXPECT_EQ(timer.Get(), 500_ms);
+  CHECK(timer.Get() == 500_ms);
 
   // Verify timer doesn't start incrementing after reset if it was stopped
   timer.Stop();
   timer.Reset();
   wpi::sim::StepTiming(500_ms);
-  EXPECT_EQ(timer.Get(), 0_ms);
+  CHECK(timer.Get() == 0_ms);
 }
 
-TEST_F(TimerTest, HasElapsed) {
+TEST_CASE_METHOD(TimerTest, "TimerTest HasElapsed", "[wpilibc]") {
   Timer timer;
 
   // Verify 0 ms has elapsed since timer hasn't started
-  EXPECT_TRUE(timer.HasElapsed(0_s));
+  CHECK(timer.HasElapsed(0_s));
 
   // Verify timer doesn't report elapsed time when stopped
   wpi::sim::StepTiming(500_ms);
-  EXPECT_FALSE(timer.HasElapsed(400_ms));
+  CHECK_FALSE(timer.HasElapsed(400_ms));
 
   timer.Start();
 
   // Verify timer reports >= 400 ms has elapsed after multiple calls
   wpi::sim::StepTiming(500_ms);
-  EXPECT_TRUE(timer.HasElapsed(400_ms));
-  EXPECT_TRUE(timer.HasElapsed(400_ms));
+  CHECK(timer.HasElapsed(400_ms));
+  CHECK(timer.HasElapsed(400_ms));
 }
 
-TEST_F(TimerTest, AdvanceIfElapsed) {
+TEST_CASE_METHOD(TimerTest, "TimerTest AdvanceIfElapsed", "[wpilibc]") {
   Timer timer;
 
   // Verify 0 ms has elapsed since timer hasn't started
-  EXPECT_TRUE(timer.AdvanceIfElapsed(0_s));
+  CHECK(timer.AdvanceIfElapsed(0_s));
 
   // Verify timer doesn't report elapsed time when stopped
   wpi::sim::StepTiming(500_ms);
-  EXPECT_FALSE(timer.AdvanceIfElapsed(400_ms));
+  CHECK_FALSE(timer.AdvanceIfElapsed(400_ms));
 
   timer.Start();
 
   // Verify timer reports >= 400 ms has elapsed for only first call
   wpi::sim::StepTiming(500_ms);
-  EXPECT_TRUE(timer.AdvanceIfElapsed(400_ms));
-  EXPECT_FALSE(timer.AdvanceIfElapsed(400_ms));
+  CHECK(timer.AdvanceIfElapsed(400_ms));
+  CHECK_FALSE(timer.AdvanceIfElapsed(400_ms));
 
   // Verify timer reports >= 400 ms has elapsed for two calls
   wpi::sim::StepTiming(1_s);
-  EXPECT_TRUE(timer.AdvanceIfElapsed(400_ms));
-  EXPECT_TRUE(timer.AdvanceIfElapsed(400_ms));
-  EXPECT_FALSE(timer.AdvanceIfElapsed(400_ms));
+  CHECK(timer.AdvanceIfElapsed(400_ms));
+  CHECK(timer.AdvanceIfElapsed(400_ms));
+  CHECK_FALSE(timer.AdvanceIfElapsed(400_ms));
 }
 
-TEST_F(TimerTest, GetMonotonicTimestamp) {
+TEST_CASE_METHOD(TimerTest, "TimerTest GetMonotonicTimestamp", "[wpilibc]") {
   auto start = wpi::Timer::GetMonotonicTimestamp();
   wpi::sim::StepTiming(500_ms);
   auto end = wpi::Timer::GetMonotonicTimestamp();
-  EXPECT_EQ(start + 500_ms, end);
+  CHECK(start + 500_ms == end);
 }
 
-TEST_F(TimerTest, RestartTimingPreservesPausedClock) {
-  EXPECT_TRUE(wpi::sim::IsTimingPaused());
+TEST_CASE_METHOD(TimerTest, "TimerTest RestartTimingPreservesPausedClock",
+                 "[wpilibc]") {
+  CHECK(wpi::sim::IsTimingPaused());
 
   wpi::sim::StepTiming(500_ms);
   auto beforeRestart = wpi::Timer::GetMonotonicTimestamp();
 
   wpi::sim::RestartTiming();
 
-  EXPECT_TRUE(wpi::sim::IsTimingPaused());
-  EXPECT_EQ(beforeRestart, wpi::Timer::GetMonotonicTimestamp());
+  CHECK(wpi::sim::IsTimingPaused());
+  CHECK(beforeRestart == wpi::Timer::GetMonotonicTimestamp());
 
   wpi::sim::StepTiming(500_ms);
-  EXPECT_EQ(beforeRestart + 500_ms, wpi::Timer::GetMonotonicTimestamp());
+  CHECK(beforeRestart + 500_ms == wpi::Timer::GetMonotonicTimestamp());
 }

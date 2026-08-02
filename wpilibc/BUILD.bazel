@@ -198,7 +198,7 @@ cc_test(
     deps = [
         ":test-headers",
         ":wpilibc",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 
