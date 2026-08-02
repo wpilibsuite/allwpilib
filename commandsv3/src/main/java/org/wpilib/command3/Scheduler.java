@@ -356,6 +356,7 @@ public final class Scheduler implements ProtobufSerializable {
      */
     boolean successful();
 
+    /** Common interface for successful scheduling attempts. */
     sealed interface Successful extends ScheduleResult {
       @Override
       default boolean successful() {
@@ -363,6 +364,7 @@ public final class Scheduler implements ProtobufSerializable {
       }
     }
 
+    /** Common interface for failed scheduling attempts. */
     sealed interface Failure extends ScheduleResult {
       @Override
       default boolean successful() {
