@@ -9,12 +9,13 @@ from pathlib import Path
 
 
 class GeneratorTypes(Flag):
+    NONE = 0
     QUICKBUF = auto()
     NANOPB = auto()
 
 
 def make_arg_parser(
-    subproject_root: Path, repo_root: Path, types: GeneratorTypes = None
+    subproject_root: Path, repo_root: Path, types: GeneratorTypes = GeneratorTypes.NONE
 ) -> argparse.ArgumentParser:
     """Creates an ArgumentParser configured for QuickBuffers or nanopb generation.
 
