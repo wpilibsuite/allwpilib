@@ -4,9 +4,12 @@
 
 #pragma once
 
+#include <array>
+#include <chrono>
 #include <cstdint>
 #include <functional>
 #include <map>
+#include <mutex>
 #include <span>
 #include <string>
 
@@ -59,6 +62,59 @@ constexpr uint16_t STATUS_ALL_FIELDS =
     STATUS_DIO | STATUS_GYRO | STATUS_ACCEL | STATUS_ANALOG_0 |
     STATUS_ANALOG_1 | STATUS_ANALOG_2 | STATUS_TIMING;
 
+template <typename T>
+struct XRPDataField {
+  T value{};
+  bool present = false;
+  std::chrono::steady_clock::time_point lastUpdate;
+};
+
+struct XRPPacketInfo {
+  bool present = false;
+  uint16_t sequence = 0;
+  uint16_t fieldMask = 0;
+  std::chrono::steady_clock::time_point lastUpdate;
+};
+
+struct XRPAxisData {
+  float x = 0.0f;
+  float y = 0.0f;
+  float z = 0.0f;
+};
+
+struct XRPGyroData {
+  XRPAxisData rate;
+  XRPAxisData angle;
+};
+
+struct XRPEncoderData {
+  int32_t count = 0;
+  double period = 0.0;
+  bool periodValid = false;
+};
+
+struct XRPControlData {
+  XRPPacketInfo packet;
+  bool enabled = false;
+  std::array<XRPDataField<float>, 4> motors;
+  std::array<XRPDataField<float>, 4> servos;
+  std::array<XRPDataField<bool>, 8> digitalOutputs;
+};
+
+struct XRPStatusData {
+  XRPPacketInfo packet;
+  std::array<XRPDataField<XRPEncoderData>, 4> encoders;
+  std::array<XRPDataField<bool>, 8> digitalInputs;
+  XRPDataField<XRPGyroData> gyro;
+  XRPDataField<XRPAxisData> accel;
+  std::array<XRPDataField<float>, 3> analogInputs;
+};
+
+struct XRPDataSnapshot {
+  XRPControlData control;
+  XRPStatusData status;
+};
+
 class XRP {
  public:
   XRP();
@@ -72,6 +128,18 @@ class XRP {
 
   void SetupXRPSendBuffer(wpi::net::raw_uv_ostream& buf);
 
+  /**
+   * Allows status packets from a new XRP connection to restart their sequence.
+   */
+  void ResetStatusPacketSequence();
+
+  /**
+   * Gets a snapshot of the latest XRP control and status data.
+   *
+   * @return Current XRP control and status data.
+   */
+  XRPDataSnapshot GetDataSnapshot() const;
+
  private:
   // To XRP Methods
   uint16_t GetControlFieldMask() const;
@@ -79,6 +147,7 @@ class XRP {
   void SetupMotorFields(wpi::net::raw_uv_ostream& buf, uint16_t fieldMask);
   void SetupServoFields(wpi::net::raw_uv_ostream& buf, uint16_t fieldMask);
   void SetupDigitalOutFields(wpi::net::raw_uv_ostream& buf, uint16_t fieldMask);
+  void RecordControlData(uint16_t fieldMask);
 
   // WPILib Sim Update Handlers
   void HandleDriverStationSimValueChanged(const wpi::util::json& data);
@@ -90,6 +159,7 @@ class XRP {
 
   // XRP Packet Update Handlers
   void ReadGyroData(std::span<const uint8_t> packet);
+  void ReadAccelData(std::span<const uint8_t> packet);
   void ReadDIOData(uint8_t presentMask, uint8_t valueMask);
   void ReadEncoderData(uint8_t encoderId, std::span<const uint8_t> packet);
   void ReadAnalogData(uint8_t analogId, std::span<const uint8_t> packet);
@@ -111,11 +181,15 @@ class XRP {
   std::map<uint8_t, uint8_t> m_encoder_channel_map;
 
   uint16_t m_wpilib_bound_seq = 0;
+  bool m_have_wpilib_bound_seq = false;
   uint16_t m_xrp_bound_seq = 0;
 
   bool m_robot_enabled = false;
 
   std::string m_gyro_name;
+
+  mutable std::mutex m_data_snapshot_mutex;
+  XRPDataSnapshot m_data_snapshot;
 
   WPILibUpdateFunc m_wpilib_update_func;
 };

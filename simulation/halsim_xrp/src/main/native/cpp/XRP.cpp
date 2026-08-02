@@ -6,7 +6,9 @@
 
 #include <algorithm>
 #include <bit>
+#include <chrono>
 #include <limits>
+#include <mutex>
 #include <string>
 #include <utility>
 
@@ -127,15 +129,6 @@ void XRP::HandleXRPUpdate(std::span<const uint8_t> packet) {
   }
 
   uint16_t seq = (packet[0] << 8) + packet[1];
-
-  if (seq <= m_wpilib_bound_seq) {
-    // If the old sequence was within 3 or uint16_t max and the new
-    // sequence is < 3 - we've prob rolled over
-    if (!((0xFFFF - m_wpilib_bound_seq < 3) && seq < 3)) {
-      return;
-    }
-  }
-
   uint16_t fieldMask = ReadUint16(packet, 3);
   if ((fieldMask & ~STATUS_ALL_FIELDS) != 0 ||
       packet.size() !=
@@ -143,7 +136,24 @@ void XRP::HandleXRPUpdate(std::span<const uint8_t> packet) {
     return;
   }
 
-  m_wpilib_bound_seq = seq;
+  {
+    std::scoped_lock lock(m_data_snapshot_mutex);
+    if (m_have_wpilib_bound_seq && seq <= m_wpilib_bound_seq) {
+      // If the old sequence was within 3 or uint16_t max and the new
+      // sequence is < 3 - we've prob rolled over
+      if (!((0xFFFF - m_wpilib_bound_seq < 3) && seq < 3)) {
+        return;
+      }
+    }
+
+    m_wpilib_bound_seq = seq;
+    m_have_wpilib_bound_seq = true;
+    auto& packetInfo = m_data_snapshot.status.packet;
+    packetInfo.present = true;
+    packetInfo.sequence = seq;
+    packetInfo.fieldMask = fieldMask;
+    packetInfo.lastUpdate = std::chrono::steady_clock::now();
+  }
 
   packet = packet.subspan(PACKET_HEADER_SIZE);
   for (int encoder = 0; encoder < 4; encoder++) {
@@ -164,6 +174,7 @@ void XRP::HandleXRPUpdate(std::span<const uint8_t> packet) {
   }
 
   if (HasField(fieldMask, STATUS_ACCEL)) {
+    ReadAccelData(packet.subspan(0, 12));
     packet = packet.subspan(12);
   }
 
@@ -185,7 +196,19 @@ void XRP::SetupXRPSendBuffer(wpi::net::raw_uv_ostream& buf) {
   SetupMotorFields(buf, fieldMask);
   SetupServoFields(buf, fieldMask);
   SetupDigitalOutFields(buf, fieldMask);
+  RecordControlData(fieldMask);
   m_xrp_bound_seq++;
+}
+
+void XRP::ResetStatusPacketSequence() {
+  std::scoped_lock lock(m_data_snapshot_mutex);
+  m_have_wpilib_bound_seq = false;
+  m_wpilib_bound_seq = 0;
+}
+
+XRPDataSnapshot XRP::GetDataSnapshot() const {
+  std::scoped_lock lock(m_data_snapshot_mutex);
+  return m_data_snapshot;
 }
 
 // WPILib Sim Handlers
@@ -431,6 +454,54 @@ void XRP::SetupDigitalOutFields(wpi::net::raw_uv_ostream& buf,
   buf << presentMask << valueMask;
 }
 
+void XRP::RecordControlData(uint16_t fieldMask) {
+  auto now = std::chrono::steady_clock::now();
+  std::scoped_lock lock(m_data_snapshot_mutex);
+
+  auto& control = m_data_snapshot.control;
+  control.enabled = m_robot_enabled;
+  control.packet.present = true;
+  control.packet.sequence = m_xrp_bound_seq;
+  control.packet.fieldMask = fieldMask;
+  control.packet.lastUpdate = now;
+
+  for (int channel = 0; channel < 4; channel++) {
+    if (!HasField(fieldMask, CONTROL_MOTOR_0 << channel)) {
+      continue;
+    }
+    auto& motor = control.motors[channel];
+    auto motorOutput = m_motor_outputs.find(channel);
+    motor.value =
+        motorOutput == m_motor_outputs.end() ? 0.0f : motorOutput->second;
+    motor.present = true;
+    motor.lastUpdate = now;
+  }
+
+  for (int channel = 4; channel < 8; channel++) {
+    if (!HasField(fieldMask, 1u << channel)) {
+      continue;
+    }
+    auto& servo = control.servos[channel - 4];
+    auto servoOutput = m_servo_outputs.find(channel);
+    servo.value =
+        servoOutput == m_servo_outputs.end() ? 0.5f : servoOutput->second;
+    servo.present = true;
+    servo.lastUpdate = now;
+  }
+
+  if (HasField(fieldMask, CONTROL_DIO)) {
+    for (const auto& [channel, value] : m_digital_outputs) {
+      if (channel >= control.digitalOutputs.size()) {
+        continue;
+      }
+      auto& digitalOutput = control.digitalOutputs[channel];
+      digitalOutput.value = value;
+      digitalOutput.present = true;
+      digitalOutput.lastUpdate = now;
+    }
+  }
+}
+
 void XRP::ReadGyroData(std::span<const uint8_t> packet) {
   if (packet.size() < 24) {
     return;
@@ -442,6 +513,14 @@ void XRP::ReadGyroData(std::span<const uint8_t> packet) {
   float angle_x = ReadFloat(packet, 12);
   float angle_y = ReadFloat(packet, 16);
   float angle_z = ReadFloat(packet, 20);
+
+  {
+    std::scoped_lock lock(m_data_snapshot_mutex);
+    auto& gyro = m_data_snapshot.status.gyro;
+    gyro.value = {{rate_x, rate_y, rate_z}, {angle_x, angle_y, angle_z}};
+    gyro.present = true;
+    gyro.lastUpdate = std::chrono::steady_clock::now();
+  }
 
   // Make the json object
   wpi::util::json gyroJson;
@@ -460,7 +539,35 @@ void XRP::ReadGyroData(std::span<const uint8_t> packet) {
   m_wpilib_update_func(gyroJson);
 }
 
+void XRP::ReadAccelData(std::span<const uint8_t> packet) {
+  if (packet.size() < 12) {
+    return;
+  }
+
+  std::scoped_lock lock(m_data_snapshot_mutex);
+  auto& accel = m_data_snapshot.status.accel;
+  accel.value = {ReadFloat(packet, 0), ReadFloat(packet, 4),
+                 ReadFloat(packet, 8)};
+  accel.present = true;
+  accel.lastUpdate = std::chrono::steady_clock::now();
+}
+
 void XRP::ReadDIOData(uint8_t presentMask, uint8_t valueMask) {
+  auto now = std::chrono::steady_clock::now();
+  {
+    std::scoped_lock lock(m_data_snapshot_mutex);
+    for (int channel = 0; channel < 8; channel++) {
+      uint8_t bit = 1u << channel;
+      if ((presentMask & bit) == 0) {
+        continue;
+      }
+      auto& digitalInput = m_data_snapshot.status.digitalInputs[channel];
+      digitalInput.value = (valueMask & bit) != 0;
+      digitalInput.present = true;
+      digitalInput.lastUpdate = now;
+    }
+  }
+
   for (int channel = 0; channel < 8; channel++) {
     uint8_t bit = 1u << channel;
     if ((presentMask & bit) == 0) {
@@ -483,6 +590,29 @@ void XRP::ReadEncoderData(uint8_t encoderId, std::span<const uint8_t> packet) {
 
   int32_t count =
       static_cast<int32_t>(wpi::util::support::endian::read32be(&packet[0]));
+  uint32_t period_numerator =
+      static_cast<uint32_t>(wpi::util::support::endian::read32be(&packet[4]));
+  XRPEncoderData encoderData;
+  encoderData.count = count;
+  if (period_numerator != std::numeric_limits<uint32_t>::max()) {
+    encoderData.period =
+        static_cast<double>(period_numerator >> 1) / ENCODER_PERIOD_DENOMINATOR;
+
+    // If direction is not forward, return negative value for period.
+    if (!(period_numerator & 1)) {
+      encoderData.period = -encoderData.period;
+    }
+    encoderData.periodValid = true;
+  }
+
+  {
+    std::scoped_lock lock(m_data_snapshot_mutex);
+    auto& encoder = m_data_snapshot.status.encoders[encoderId];
+    encoder.value = encoderData;
+    encoder.present = true;
+    encoder.lastUpdate = std::chrono::steady_clock::now();
+  }
+
   // Look up the registered encoders
   if (m_encoder_channel_map.count(encoderId) == 0) {
     return;
@@ -495,18 +625,9 @@ void XRP::ReadEncoderData(uint8_t encoderId, std::span<const uint8_t> packet) {
   encJson["device"] = std::to_string(wpilibEncoderChannel);
   encJson["data"] = wpi::util::json::object(">count", count);
 
-  uint32_t period_numerator =
-      static_cast<uint32_t>(wpi::util::support::endian::read32be(&packet[4]));
-  if (period_numerator != std::numeric_limits<uint32_t>::max()) {
-    double period =
-        static_cast<double>(period_numerator >> 1) / ENCODER_PERIOD_DENOMINATOR;
-
-    // If direction is not forward, return negative value for period.
-    if (!(period_numerator & 1)) {
-      period = -period;
-    }
-
-    encJson["data"].emplace_back(wpi::util::json::object(">period", period));
+  if (encoderData.periodValid) {
+    encJson["data"].emplace_back(
+        wpi::util::json::object(">period", encoderData.period));
   }
   m_wpilib_update_func(encJson);
 }
@@ -518,6 +639,14 @@ void XRP::ReadAnalogData(uint8_t analogId, std::span<const uint8_t> packet) {
 
   float voltage = static_cast<float>(ReadUint16(packet)) * ANALOG_MAX_VOLTAGE /
                   ANALOG_MAX_VALUE;
+
+  {
+    std::scoped_lock lock(m_data_snapshot_mutex);
+    auto& analogInput = m_data_snapshot.status.analogInputs[analogId];
+    analogInput.value = voltage;
+    analogInput.present = true;
+    analogInput.lastUpdate = std::chrono::steady_clock::now();
+  }
 
   wpi::util::json analogJson;
   analogJson["type"] = "AI";

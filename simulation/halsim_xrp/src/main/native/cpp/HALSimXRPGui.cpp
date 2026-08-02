@@ -5,6 +5,7 @@
 #include "wpi/halsim/xrp/HALSimXRPGui.hpp"
 
 #include <algorithm>
+#include <array>
 #include <cfloat>
 #include <chrono>
 #include <cinttypes>
@@ -41,6 +42,14 @@ constexpr std::string_view XRP_DEVICE_NAME_PREFIX = "WPIXRP-";
 constexpr double LATENCY_HISTORY_SECONDS = 10.0;
 constexpr size_t LATENCY_MAX_SAMPLES = 1500;
 constexpr float LATENCY_PLOT_HEIGHT = 110.0f;
+constexpr double DATA_FADE_DELAY_SECONDS = 0.25;
+constexpr double DATA_FADE_DURATION_SECONDS = 5.0;
+constexpr float DATA_STALE_TEXT_BRIGHTNESS = 0.35f;
+
+constexpr std::array<std::string_view, 4> MOTOR_LABELS = {
+    "Left motor", "Right motor", "Motor 3", "Motor 4"};
+constexpr std::array<std::string_view, 4> SERVO_LABELS = {"Servo 1", "Servo 2",
+                                                          "Servo 3", "Servo 4"};
 
 using AddGuiLateExecuteFn = void (*)(std::function<void()> execute);
 using GetImguiContextFn = ImGuiContext* (*)();
@@ -513,6 +522,196 @@ static void DrawLatencyPlot(const XRPConnectionStatus& status) {
   }
 }
 
+static double DataAgeSeconds(std::chrono::steady_clock::time_point lastUpdate) {
+  return std::chrono::duration<double>(std::chrono::steady_clock::now() -
+                                       lastUpdate)
+      .count();
+}
+
+static ImVec4 GetDataTextColor(
+    bool present, std::chrono::steady_clock::time_point lastUpdate) {
+  if (!present) {
+    return {DATA_STALE_TEXT_BRIGHTNESS, DATA_STALE_TEXT_BRIGHTNESS,
+            DATA_STALE_TEXT_BRIGHTNESS, 1.0f};
+  }
+
+  double age = DataAgeSeconds(lastUpdate);
+  float fade = static_cast<float>((age - DATA_FADE_DELAY_SECONDS) /
+                                  DATA_FADE_DURATION_SECONDS);
+  fade = std::clamp(fade, 0.0f, 1.0f);
+  float brightness = 1.0f - (1.0f - DATA_STALE_TEXT_BRIGHTNESS) * fade;
+  return {brightness, brightness, brightness, 1.0f};
+}
+
+static void TextUnformatted(std::string_view text) {
+  ImGui::TextUnformatted(text.data(), text.data() + text.size());
+}
+
+template <typename Formatter>
+static void DrawDataRow(std::string_view name, bool present,
+                        std::chrono::steady_clock::time_point lastUpdate,
+                        Formatter formatter) {
+  ImGui::TableNextRow();
+  ImGui::PushStyleColor(ImGuiCol_Text, GetDataTextColor(present, lastUpdate));
+  ImGui::TableNextColumn();
+  TextUnformatted(name);
+  ImGui::TableNextColumn();
+  std::string value = present ? formatter() : "--";
+  ImGui::TextUnformatted(value.c_str());
+  ImGui::PopStyleColor();
+}
+
+static std::string FormatBool(bool value, std::string_view trueText,
+                              std::string_view falseText) {
+  return std::string{value ? trueText : falseText};
+}
+
+static std::string FormatSigned3(double value) {
+  return std::format("{:+.3f}", value);
+}
+
+static std::string FormatSigned4(double value) {
+  return std::format("{:+.4f}", value);
+}
+
+static std::string FormatMotorOutput(float value) {
+  return FormatSigned3(value);
+}
+
+static std::string FormatServoOutput(float value) {
+  return std::format("{:.1f} deg ({:.1f}%)", value * SERVO_MAX_DEGREES,
+                     value * 100.0f);
+}
+
+static std::string FormatDigitalValue(bool value) {
+  return value ? "High" : "Low";
+}
+
+static std::string FormatEncoderData(const XRPEncoderData& value) {
+  if (!value.periodValid) {
+    return std::format("count {}, period --", value.count);
+  }
+  return std::format("count {}, period {} s", value.count,
+                     FormatSigned4(value.period));
+}
+
+static bool BeginXRPDataTable(const char* id) {
+  constexpr ImGuiTableFlags TABLE_FLAGS = ImGuiTableFlags_Borders |
+                                          ImGuiTableFlags_RowBg |
+                                          ImGuiTableFlags_SizingStretchProp;
+  if (!ImGui::BeginTable(id, 2, TABLE_FLAGS)) {
+    return false;
+  }
+
+  float fontSize = ImGui::GetFontSize();
+  ImGui::TableSetupColumn("Signal", ImGuiTableColumnFlags_WidthFixed,
+                          fontSize * 9.0f);
+  ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+  ImGui::TableHeadersRow();
+  return true;
+}
+
+static void DrawControlDataTable(const XRPControlData& control) {
+  if (!BeginXRPDataTable("XRPControlDataTable")) {
+    return;
+  }
+
+  DrawDataRow(
+      "Robot state", control.packet.present, control.packet.lastUpdate,
+      [&] { return FormatBool(control.enabled, "Enabled", "Disabled"); });
+
+  for (size_t i = 0; i < control.motors.size(); ++i) {
+    const auto& motor = control.motors[i];
+    DrawDataRow(MOTOR_LABELS[i], motor.present, motor.lastUpdate,
+                [&] { return FormatMotorOutput(motor.value); });
+  }
+
+  for (size_t i = 0; i < control.servos.size(); ++i) {
+    const auto& servo = control.servos[i];
+    DrawDataRow(SERVO_LABELS[i], servo.present, servo.lastUpdate,
+                [&] { return FormatServoOutput(servo.value); });
+  }
+
+  for (size_t i = 0; i < control.digitalOutputs.size(); ++i) {
+    const auto& dio = control.digitalOutputs[i];
+    std::string label = std::format("DIO {} output", i);
+    DrawDataRow(label, dio.present, dio.lastUpdate,
+                [&] { return FormatDigitalValue(dio.value); });
+  }
+
+  ImGui::EndTable();
+}
+
+static void DrawStatusDataTable(const XRPStatusData& status) {
+  if (!BeginXRPDataTable("XRPStatusDataTable")) {
+    return;
+  }
+
+  for (size_t i = 0; i < status.encoders.size(); ++i) {
+    const auto& encoder = status.encoders[i];
+    std::string label = std::format("Encoder {}", i);
+    DrawDataRow(label, encoder.present, encoder.lastUpdate,
+                [&] { return FormatEncoderData(encoder.value); });
+  }
+
+  for (size_t i = 0; i < status.digitalInputs.size(); ++i) {
+    const auto& dio = status.digitalInputs[i];
+    std::string label = std::format("DIO {} input", i);
+    DrawDataRow(label, dio.present, dio.lastUpdate,
+                [&] { return FormatDigitalValue(dio.value); });
+  }
+
+  DrawDataRow("Gyro rate X", status.gyro.present, status.gyro.lastUpdate, [&] {
+    return std::format("{} deg/s", FormatSigned3(status.gyro.value.rate.x));
+  });
+  DrawDataRow("Gyro rate Y", status.gyro.present, status.gyro.lastUpdate, [&] {
+    return std::format("{} deg/s", FormatSigned3(status.gyro.value.rate.y));
+  });
+  DrawDataRow("Gyro rate Z", status.gyro.present, status.gyro.lastUpdate, [&] {
+    return std::format("{} deg/s", FormatSigned3(status.gyro.value.rate.z));
+  });
+  DrawDataRow("Gyro angle X", status.gyro.present, status.gyro.lastUpdate, [&] {
+    return std::format("{} deg", FormatSigned3(status.gyro.value.angle.x));
+  });
+  DrawDataRow("Gyro angle Y", status.gyro.present, status.gyro.lastUpdate, [&] {
+    return std::format("{} deg", FormatSigned3(status.gyro.value.angle.y));
+  });
+  DrawDataRow("Gyro angle Z", status.gyro.present, status.gyro.lastUpdate, [&] {
+    return std::format("{} deg", FormatSigned3(status.gyro.value.angle.z));
+  });
+  DrawDataRow("Accel X", status.accel.present, status.accel.lastUpdate,
+              [&] { return FormatSigned3(status.accel.value.x); });
+  DrawDataRow("Accel Y", status.accel.present, status.accel.lastUpdate,
+              [&] { return FormatSigned3(status.accel.value.y); });
+  DrawDataRow("Accel Z", status.accel.present, status.accel.lastUpdate,
+              [&] { return FormatSigned3(status.accel.value.z); });
+
+  for (size_t i = 0; i < status.analogInputs.size(); ++i) {
+    const auto& analog = status.analogInputs[i];
+    std::string label = std::format("Analog {}", i);
+    DrawDataRow(label, analog.present, analog.lastUpdate,
+                [&] { return std::format("{:.2f} V", analog.value); });
+  }
+
+  ImGui::EndTable();
+}
+
+static void DrawXRPDataWindow(const XRPDataSnapshot& data) {
+  ImGui::SetNextWindowSize(ImVec2{620, 520}, ImGuiCond_FirstUseEver);
+  if (!ImGui::Begin("XRP Control and Status")) {
+    ImGui::End();
+    return;
+  }
+
+  ImGui::TextUnformatted("Control");
+  DrawControlDataTable(data.control);
+  ImGui::Separator();
+  ImGui::TextUnformatted("Status");
+  DrawStatusDataTable(data.status);
+
+  ImGui::End();
+}
+
 static std::string SelectedDeviceLabel() {
   if (gGui.selectedDevice < 0 ||
       gGui.selectedDevice >= static_cast<int>(gGui.devices.size())) {
@@ -616,6 +815,7 @@ static void DrawGuiImpl() {
 
   auto status = simXRP->GetConnectionStatus();
   InitializeFromConnection(status);
+  XRPDataSnapshot data = simXRP->GetDataSnapshot();
 
   ImGui::SetNextWindowSize(ImVec2{430, 0}, ImGuiCond_FirstUseEver);
   float minWidth =
@@ -625,6 +825,7 @@ static void DrawGuiImpl() {
   ImGui::SetNextWindowSizeConstraints({minWidth, 0}, ImVec2{FLT_MAX, FLT_MAX});
   if (!ImGui::Begin("XRP Bluetooth")) {
     ImGui::End();
+    DrawXRPDataWindow(data);
     return;
   }
   DrawViewSettingsMenu();
@@ -662,6 +863,7 @@ static void DrawGuiImpl() {
   DrawLatencyPlot(status);
 
   ImGui::End();
+  DrawXRPDataWindow(data);
 }
 
 static void DrawGui() {

@@ -75,6 +75,13 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
   XRPConnectionStatus GetConnectionStatus() const;
 
   /**
+   * Gets a snapshot of the latest XRP control and status data.
+   *
+   * @return Current XRP control and status data.
+   */
+  XRPDataSnapshot GetDataSnapshot() const;
+
+  /**
    * Remembers the Bluetooth target without starting a connection.
    *
    * @param address platform-specific Bluetooth target address.

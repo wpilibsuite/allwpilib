@@ -248,6 +248,9 @@ bool HALSimXRP::Initialize() {
       },
       [weakSelf](const wpi::net::BluetoothLEPacketConnectionStatus& status) {
         if (auto self = weakSelf.lock()) {
+          if (!status.connected) {
+            self->m_xrp.ResetStatusPacketSequence();
+          }
           std::scoped_lock lock(self->m_statusMutex);
           self->m_status = status;
         }
@@ -377,6 +380,7 @@ void HALSimXRP::ConnectBluetooth(std::string address,
   }
 
   SaveBluetoothTarget(config.address, config.addressType, targetName);
+  m_xrp.ResetStatusPacketSequence();
 
   if (m_bluetoothClient) {
     m_bluetoothClient->Connect(std::move(config));
@@ -405,6 +409,7 @@ void HALSimXRP::RememberBluetoothTarget(std::string address,
 }
 
 void HALSimXRP::DisconnectBluetooth() {
+  m_xrp.ResetStatusPacketSequence();
   if (m_bluetoothClient) {
     m_bluetoothClient->Disconnect("Disconnected by user");
   }
@@ -413,6 +418,10 @@ void HALSimXRP::DisconnectBluetooth() {
 XRPConnectionStatus HALSimXRP::GetConnectionStatus() const {
   std::scoped_lock lock(m_statusMutex);
   return m_status;
+}
+
+XRPDataSnapshot HALSimXRP::GetDataSnapshot() const {
+  return m_xrp.GetDataSnapshot();
 }
 
 void HALSimXRP::ParsePacket(std::span<const uint8_t> packet) {
