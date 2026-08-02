@@ -296,7 +296,7 @@ def define_allwpilib_to_mostrobotpy():
         ),
         destination_files = destination_files,
         origin_files = origin_files,
-        authoring = authoring.pass_thru("Default email <default@default.com>"),
+        authoring = authoring.pass_thru("robotpy-bot <61093798+robotpy-bot@users.noreply.github.com>"),
         transformations = transformations,
     )
 
