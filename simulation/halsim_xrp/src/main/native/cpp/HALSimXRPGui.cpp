@@ -9,6 +9,7 @@
 #include <chrono>
 #include <cinttypes>
 #include <cstdio>
+#include <format>
 #include <functional>
 #include <future>
 #include <memory>
@@ -62,6 +63,7 @@ struct GuiState {
   std::vector<wpi::net::BluetoothLEDeviceInfo> devices;
   std::future<CommandResult> pendingCommand;
   CommandKind pendingKind = CommandKind::NONE;
+  std::string scanStatus;
   std::string commandStatus;
   std::string commandOutput;
   std::vector<double> latencyTimes;
@@ -265,14 +267,19 @@ static void FilterAndSortXRPDevices(
                    });
 }
 
+static std::string FormatXRPDeviceCount(size_t count) {
+  return std::format("{} XRP {}", count, count == 1 ? "device" : "devices");
+}
+
 static CommandResult ScanDevices(std::chrono::milliseconds timeout) {
   CommandResult result;
   auto scan = wpi::net::BluetoothLEPacketClient::ScanDevices(timeout);
   result.devices = std::move(scan.devices);
   FilterAndSortXRPDevices(&result.devices);
   result.exitCode = scan.error.empty() ? 0 : 1;
-  result.output =
-      scan.error.empty() ? std::move(scan.status) : std::move(scan.error);
+  result.output = scan.error.empty()
+                      ? FormatXRPDeviceCount(result.devices.size())
+                      : std::move(scan.error);
   return result;
 }
 
@@ -300,7 +307,12 @@ static void StartCommand(CommandKind kind, std::string status,
   }
 
   gGui.pendingKind = kind;
-  gGui.commandStatus = std::move(status);
+  if (kind == CommandKind::SCAN) {
+    gGui.scanStatus = std::move(status);
+    gGui.commandStatus.clear();
+  } else {
+    gGui.commandStatus = std::move(status);
+  }
   gGui.commandOutput.clear();
   gGui.pendingCommand = std::async(
       std::launch::async, [command = std::move(command)] { return command(); });
@@ -312,9 +324,10 @@ static void UpdatePendingCommand(HALSimXRP& simXRP) {
     return;
   }
 
+  CommandKind commandKind = gGui.pendingKind;
   CommandResult result = gGui.pendingCommand.get();
-  gGui.commandOutput = std::move(result.output);
-  if (gGui.pendingKind == CommandKind::SCAN) {
+  gGui.commandOutput.clear();
+  if (commandKind == CommandKind::SCAN) {
     gGui.devices = std::move(result.devices);
     int currentDevice = FindDevice(gGui.address, GetGuiAddressType());
     gGui.selectedDevice =
@@ -327,16 +340,28 @@ static void UpdatePendingCommand(HALSimXRP& simXRP) {
   }
 
   if (result.exitCode == 0) {
-    gGui.commandStatus = "Ready";
+    if (commandKind == CommandKind::SCAN) {
+      gGui.scanStatus = std::move(result.output);
+      gGui.commandStatus.clear();
+    } else {
+      gGui.commandStatus = "Ready";
+      gGui.commandOutput = std::move(result.output);
+    }
     if (result.rememberTarget) {
       simXRP.RememberBluetoothTarget(std::move(result.targetAddress),
                                      result.addressType,
                                      std::move(result.targetName));
     }
-  } else if (!gGui.commandOutput.empty()) {
-    gGui.commandStatus = "Command finished with output";
   } else {
-    gGui.commandStatus = "Command failed";
+    if (commandKind == CommandKind::SCAN) {
+      gGui.scanStatus = "Scan failed";
+      gGui.commandStatus.clear();
+    } else if (!result.output.empty()) {
+      gGui.commandStatus = "Command finished with output";
+    } else {
+      gGui.commandStatus = "Command failed";
+    }
+    gGui.commandOutput = std::move(result.output);
   }
   gGui.pendingKind = CommandKind::NONE;
 }
@@ -494,10 +519,14 @@ static std::string GetSelectedDeviceName(std::string_view target,
 static void DrawDeviceControls(bool commandRunning) {
   ImGui::BeginDisabled(commandRunning);
   if (ImGui::Button("Scan")) {
-    StartCommand(CommandKind::SCAN, "Scanning for Bluetooth devices",
+    StartCommand(CommandKind::SCAN, "Scanning...",
                  [] { return ScanDevices(8s); });
   }
   ImGui::EndDisabled();
+  if (!gGui.scanStatus.empty()) {
+    ImGui::SameLine();
+    ImGui::TextDisabled("%s", gGui.scanStatus.c_str());
+  }
 
   std::string selectedLabel = SelectedDeviceLabel();
   if (ImGui::BeginCombo("Device", selectedLabel.c_str())) {
