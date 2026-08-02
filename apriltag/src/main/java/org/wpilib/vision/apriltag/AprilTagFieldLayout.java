@@ -20,6 +20,7 @@ import java.util.Optional;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.vision.apriltag.proto.AprilTagFieldLayoutProto;
 
 /**
  * Class for representing a layout of AprilTags on a field and reading them from a JSON format.
@@ -278,4 +279,7 @@ public class AprilTagFieldLayout {
       this.fieldWidth = fieldWidth;
     }
   }
+
+  /** AprilTagFieldLayout protobuf for serialization. */
+  public static final AprilTagFieldLayoutProto proto = new AprilTagFieldLayoutProto();
 }

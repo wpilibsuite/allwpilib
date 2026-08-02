@@ -146,9 +146,15 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
   bool operator==(const AprilTagFieldLayout&) const = default;
 
  private:
+  struct FieldDimensions {
+    wpi::units::meter_t length;
+    wpi::units::meter_t width;
+
+    bool operator==(const FieldDimensions&) const = default;
+  };
+
   std::unordered_map<int, AprilTag> m_apriltags;
-  wpi::units::meter_t m_fieldLength;
-  wpi::units::meter_t m_fieldWidth;
+  struct FieldDimensions m_field;
   wpi::math::Pose3d m_origin;
 
   friend WPILIB_DLLEXPORT void to_json(wpi::util::json& json,
@@ -156,6 +162,9 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
 
   friend WPILIB_DLLEXPORT void from_json(const wpi::util::json& json,
                                          AprilTagFieldLayout& layout);
+
+  friend struct wpi::util::Protobuf<AprilTagFieldLayout>;
+  friend struct wpi::util::Protobuf<AprilTagFieldLayout::FieldDimensions>;
 };
 
 WPILIB_DLLEXPORT
@@ -165,3 +174,5 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::util::json& json, AprilTagFieldLayout& layout);
 
 }  // namespace wpi::apriltag
+
+#include "wpi/apriltag/proto/AprilTagFieldLayoutProto.hpp"

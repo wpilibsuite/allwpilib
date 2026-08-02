@@ -204,7 +204,7 @@ class ProtoOutputStream {
   const pb_msgdesc_t* MsgDesc() const noexcept { return m_msgDesc; }
 
   /**
-   * Decodes a protobuf. Flags are the same flags passed to pb_decode_ex.
+   * Encodes a protobuf.
    *
    * @param[in] msg The message to encode from
    * @return true if encoding was successful, false otherwise

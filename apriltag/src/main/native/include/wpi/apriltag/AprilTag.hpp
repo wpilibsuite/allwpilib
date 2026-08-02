@@ -37,3 +37,6 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::util::json& json, AprilTag& apriltag);
 
 }  // namespace wpi::apriltag
+
+#include "wpi/apriltag/proto/AprilTagProto.hpp"
+#include "wpi/apriltag/struct/AprilTagStruct.hpp"
