@@ -337,8 +337,6 @@ int32_t SocketCanState::SendFrame(uint8_t busId, const canfd_frame& frame) {
     }
   }
 
-  std::printf("Send Error %d %d %s\n", result, errno, std::strerror(errno));
-  std::fflush(stdout);
   return HAL_ERR_CANSessionMux_InvalidBuffer;
 }
 
