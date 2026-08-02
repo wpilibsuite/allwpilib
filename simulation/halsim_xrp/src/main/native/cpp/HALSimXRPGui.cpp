@@ -227,6 +227,18 @@ static int FindDevice(std::string_view target,
   return static_cast<int>(device - gGui.devices.begin());
 }
 
+static void SelectDevice(int deviceIndex) {
+  gGui.selectedDevice = deviceIndex;
+  if (deviceIndex < 0 || deviceIndex >= static_cast<int>(gGui.devices.size())) {
+    return;
+  }
+
+  const auto& device = gGui.devices[deviceIndex];
+  SetAddress(device.target);
+  gGui.addressType =
+      device.addressType == XRPBluetoothAddressType::PUBLIC ? 0 : 1;
+}
+
 static void UpsertDevice(std::string_view target,
                          XRPBluetoothAddressType addressType,
                          std::string_view name) {
@@ -241,7 +253,7 @@ static void UpsertDevice(std::string_view target,
     device.name = name;
     device.addressType = addressType;
     gGui.devices.emplace_back(std::move(device));
-    gGui.selectedDevice = static_cast<int>(gGui.devices.size()) - 1;
+    SelectDevice(static_cast<int>(gGui.devices.size()) - 1);
     return;
   }
 
@@ -249,7 +261,7 @@ static void UpsertDevice(std::string_view target,
   if (!name.empty()) {
     device.name = name;
   }
-  gGui.selectedDevice = deviceIndex;
+  SelectDevice(deviceIndex);
 }
 
 static void FilterAndSortXRPDevices(
@@ -330,13 +342,14 @@ static void UpdatePendingCommand(HALSimXRP& simXRP) {
   if (commandKind == CommandKind::SCAN) {
     gGui.devices = std::move(result.devices);
     int currentDevice = FindDevice(gGui.address, GetGuiAddressType());
-    gGui.selectedDevice =
+    int selectedDevice =
         currentDevice >= 0
             ? currentDevice
             : (gGui.devices.empty()
                    ? -1
                    : std::clamp(gGui.selectedDevice, 0,
                                 static_cast<int>(gGui.devices.size()) - 1));
+    SelectDevice(selectedDevice);
   }
 
   if (result.exitCode == 0) {
@@ -534,10 +547,7 @@ static void DrawDeviceControls(bool commandRunning) {
       const auto& device = gGui.devices[i];
       std::string label = GetDeviceLabel(device, true);
       if (ImGui::Selectable(label.c_str(), gGui.selectedDevice == i)) {
-        gGui.selectedDevice = i;
-        SetAddress(device.target);
-        gGui.addressType =
-            device.addressType == XRPBluetoothAddressType::PUBLIC ? 0 : 1;
+        SelectDevice(i);
       }
     }
     ImGui::EndCombo();
