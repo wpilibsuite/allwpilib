@@ -13,6 +13,7 @@
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/Models.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
+#include "wpi/simulation/RoboRioSim.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/units/time.hpp"
 
@@ -27,6 +28,9 @@ TEST_CASE("ElevatorSimTest StateSpaceSim", "[wpilibc][simulation]") {
   wpi::PWMVictorSPX motor(0);
   wpi::Encoder encoder(0, 1);
   wpi::sim::EncoderSim encoderSim(encoder);
+
+  wpi::sim::RoboRioSim::ResetData();
+  encoderSim.ResetData();
 
   for (size_t i = 0; i < 100; ++i) {
     controller.SetSetpoint(2.0);
