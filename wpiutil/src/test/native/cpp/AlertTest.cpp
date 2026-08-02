@@ -10,7 +10,11 @@
 #include <string_view>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 #include "wpi/util/Alert.h"
 #include "wpi/util/string.hpp"
@@ -20,9 +24,9 @@ namespace {
 
 using wpi::util::Alert;
 
-class AlertTest : public ::testing::Test {
+class AlertTest {
  protected:
-  void TearDown() override {
+  ~AlertTest() {
     WPI_SetAlertBackend(nullptr);
     WPI_ResetAlertData();
   }
@@ -34,8 +38,8 @@ class AlertTest : public ::testing::Test {
     WPI_String wpiId = wpi::util::make_string(id);
     WPI_String wpiText = wpi::util::make_string(text);
     WPI_AlertHandle handle = WPI_INVALID_HANDLE;
-    EXPECT_EQ(WPI_CreateAlert(&wpiGroup, &wpiId, &wpiText, level, &handle), 0);
-    EXPECT_NE(handle, WPI_INVALID_HANDLE);
+    CHECK(WPI_CreateAlert(&wpiGroup, &wpiId, &wpiText, level, &handle) == 0);
+    CHECK(handle != WPI_INVALID_HANDLE);
     return handle;
   }
 
@@ -155,83 +159,88 @@ const WPI_AlertBackend kTestBackend{
 
 }  // namespace
 
-TEST_F(AlertTest, CppWrapperSetGetTextAndLevel) {
-  EXPECT_EQ(WPI_GetNumAlerts(), 0);
+TEST_CASE_METHOD(AlertTest, "AlertTest CppWrapperSetGetTextAndLevel",
+                 "[wpiutil]") {
+  CHECK(WPI_GetNumAlerts() == 0);
 
   {
     Alert alert{"group", "id", "initial", Alert::Level::HIGH};
 
-    EXPECT_EQ(WPI_GetNumAlerts(), 1);
-    EXPECT_FALSE(alert.Get());
-    EXPECT_EQ(alert.GetText(), "initial");
-    EXPECT_EQ(alert.GetLevel(), Alert::Level::HIGH);
+    CHECK(WPI_GetNumAlerts() == 1);
+    CHECK_FALSE(alert.Get());
+    CHECK(alert.GetText() == "initial");
+    CHECK(alert.GetLevel() == Alert::Level::HIGH);
 
     alert.Set(true);
-    EXPECT_TRUE(alert.Get());
+    CHECK(alert.Get());
 
     WPI_AlertInfo info;
-    ASSERT_EQ(WPI_GetAlerts(&info, 1), 1);
-    EXPECT_EQ(ToString(info.group), "group");
-    EXPECT_EQ(ToString(info.id), "id");
-    EXPECT_EQ(ToString(info.text), "initial");
-    EXPECT_NE(info.activeStartTime, 0);
-    EXPECT_EQ(info.level, WPI_ALERT_HIGH);
+    REQUIRE(WPI_GetAlerts(&info, 1) == 1);
+    CHECK(ToString(info.group) == "group");
+    CHECK(ToString(info.id) == "id");
+    CHECK(ToString(info.text) == "initial");
+    CHECK(info.activeStartTime != 0);
+    CHECK(info.level == WPI_ALERT_HIGH);
     WPI_FreeAlerts(&info, 1);
 
     alert.SetText("updated");
-    EXPECT_EQ(alert.GetText(), "updated");
+    CHECK(alert.GetText() == "updated");
     alert.Set(false);
-    EXPECT_FALSE(alert.Get());
+    CHECK_FALSE(alert.Get());
   }
 
-  EXPECT_EQ(WPI_GetNumAlerts(), 0);
+  CHECK(WPI_GetNumAlerts() == 0);
 }
 
-TEST_F(AlertTest, CppWrapperDefaultGroupAndDestructor) {
+TEST_CASE_METHOD(AlertTest, "AlertTest CppWrapperDefaultGroupAndDestructor",
+                 "[wpiutil]") {
   {
     Alert alert{"id", "text", Alert::Level::LOW};
 
     WPI_AlertInfo info;
-    ASSERT_EQ(WPI_GetAlerts(&info, 1), 1);
-    EXPECT_EQ(ToString(info.group), "Alerts");
-    EXPECT_EQ(ToString(info.id), "id");
-    EXPECT_EQ(ToString(info.text), "text");
-    EXPECT_EQ(info.level, WPI_ALERT_LOW);
+    REQUIRE(WPI_GetAlerts(&info, 1) == 1);
+    CHECK(ToString(info.group) == "Alerts");
+    CHECK(ToString(info.id) == "id");
+    CHECK(ToString(info.text) == "text");
+    CHECK(info.level == WPI_ALERT_LOW);
     WPI_FreeAlerts(&info, 1);
   }
 
-  EXPECT_EQ(WPI_GetNumAlerts(), 0);
+  CHECK(WPI_GetNumAlerts() == 0);
 }
 
-TEST_F(AlertTest, CppWrapperDuplicateIsInvalid) {
+TEST_CASE_METHOD(AlertTest, "AlertTest CppWrapperDuplicateIsInvalid",
+                 "[wpiutil]") {
   Alert alert{"group", "id", "text", Alert::Level::HIGH};
-  EXPECT_TRUE(alert);
+  CHECK(alert);
 
   Alert duplicate{"group", "id", "duplicate", Alert::Level::HIGH};
-  EXPECT_FALSE(duplicate);
+  CHECK_FALSE(duplicate);
 
-  EXPECT_EQ(WPI_GetNumAlerts(), 1);
-  EXPECT_FALSE(alert.Get());
+  CHECK(WPI_GetNumAlerts() == 1);
+  CHECK_FALSE(alert.Get());
   duplicate.Set(true);
-  EXPECT_FALSE(duplicate.Get());
-  EXPECT_EQ(WPI_GetNumAlerts(), 1);
+  CHECK_FALSE(duplicate.Get());
+  CHECK(WPI_GetNumAlerts() == 1);
 }
 
-TEST_F(AlertTest, CppWrapperDefaultConstructsInvalid) {
+TEST_CASE_METHOD(AlertTest, "AlertTest CppWrapperDefaultConstructsInvalid",
+                 "[wpiutil]") {
   Alert alert;
 
-  EXPECT_FALSE(alert);
-  EXPECT_FALSE(alert.Get());
-  EXPECT_EQ(alert.GetText(), "");
-  EXPECT_EQ(WPI_GetNumAlerts(), 0);
+  CHECK(!alert);
+  CHECK(!alert.Get());
+  CHECK(alert.GetText() == "");
+  CHECK(WPI_GetNumAlerts() == 0);
 
   alert = Alert{"id", "text", Alert::Level::LOW};
-  EXPECT_TRUE(alert);
-  EXPECT_EQ(WPI_GetNumAlerts(), 1);
-  EXPECT_EQ(alert.GetText(), "text");
+  CHECK(alert);
+  CHECK(WPI_GetNumAlerts() == 1);
+  CHECK(alert.GetText() == "text");
 }
 
-TEST_F(AlertTest, CApiDuplicateRulesAndPartialListing) {
+TEST_CASE_METHOD(AlertTest, "AlertTest CApiDuplicateRulesAndPartialListing",
+                 "[wpiutil]") {
   WPI_AlertHandle first = CreateAlert("group", "id", "one", WPI_ALERT_MEDIUM);
   WPI_AlertHandle second = CreateAlert("group", "id", "two", WPI_ALERT_LOW);
 
@@ -239,73 +248,76 @@ TEST_F(AlertTest, CApiDuplicateRulesAndPartialListing) {
   WPI_String id = wpi::util::make_string("id");
   WPI_String text = wpi::util::make_string("duplicate");
   WPI_AlertHandle duplicate = 0;
-  EXPECT_EQ(WPI_CreateAlert(&group, &id, &text, WPI_ALERT_MEDIUM, &duplicate),
-            ALERT_ALREADY_ALLOCATED);
-  EXPECT_EQ(duplicate, WPI_INVALID_HANDLE);
+  CHECK(WPI_CreateAlert(&group, &id, &text, WPI_ALERT_MEDIUM, &duplicate) ==
+        ALERT_ALREADY_ALLOCATED);
+  CHECK(duplicate == WPI_INVALID_HANDLE);
 
   WPI_AlertInfo oneInfo;
-  EXPECT_EQ(WPI_GetAlerts(&oneInfo, 1), 2);
-  EXPECT_EQ(ToString(oneInfo.group), "group");
-  EXPECT_EQ(ToString(oneInfo.id), "id");
+  CHECK(WPI_GetAlerts(&oneInfo, 1) == 2);
+  CHECK(ToString(oneInfo.group) == "group");
+  CHECK(ToString(oneInfo.id) == "id");
   WPI_FreeAlerts(&oneInfo, 1);
 
-  EXPECT_EQ(WPI_GetNumAlerts(), 2);
+  CHECK(WPI_GetNumAlerts() == 2);
   WPI_DestroyAlert(first);
-  EXPECT_EQ(WPI_GetNumAlerts(), 1);
+  CHECK(WPI_GetNumAlerts() == 1);
   WPI_DestroyAlert(second);
-  EXPECT_EQ(WPI_GetNumAlerts(), 0);
+  CHECK(WPI_GetNumAlerts() == 0);
 }
 
-TEST_F(AlertTest, CApiSetGetAndReset) {
+TEST_CASE_METHOD(AlertTest, "AlertTest CApiSetGetAndReset", "[wpiutil]") {
   WPI_AlertHandle handle =
       CreateAlert("resetGroup", "resetId", "before", WPI_ALERT_HIGH);
 
   int32_t active = 1;
-  EXPECT_EQ(WPI_IsAlertActive(handle, &active), 0);
-  EXPECT_EQ(active, 0);
+  CHECK(WPI_IsAlertActive(handle, &active) == 0);
+  CHECK(active == 0);
 
-  EXPECT_EQ(WPI_SetAlertActive(handle, 1), 0);
-  EXPECT_EQ(WPI_IsAlertActive(handle, &active), 0);
-  EXPECT_EQ(active, 1);
+  CHECK(WPI_SetAlertActive(handle, 1) == 0);
+  CHECK(WPI_IsAlertActive(handle, &active) == 0);
+  CHECK(active == 1);
 
   WPI_String after = wpi::util::make_string("after");
-  EXPECT_EQ(WPI_SetAlertText(handle, &after), 0);
+  CHECK(WPI_SetAlertText(handle, &after) == 0);
 
   WPI_String currentText;
-  ASSERT_EQ(WPI_GetAlertText(handle, &currentText), 0);
-  EXPECT_EQ(ToString(currentText), "after");
+  REQUIRE(WPI_GetAlertText(handle, &currentText) == 0);
+  CHECK(ToString(currentText) == "after");
   WPI_FreeString(&currentText);
 
   int32_t level = -1;
-  EXPECT_EQ(WPI_GetAlertLevel(handle, &level), 0);
-  EXPECT_EQ(level, WPI_ALERT_HIGH);
+  CHECK(WPI_GetAlertLevel(handle, &level) == 0);
+  CHECK(level == WPI_ALERT_HIGH);
 
   WPI_ResetAlertData();
-  EXPECT_EQ(WPI_GetNumAlerts(), 0);
+  CHECK(WPI_GetNumAlerts() == 0);
   active = 1;
-  EXPECT_NE(WPI_IsAlertActive(handle, &active), 0);
-  EXPECT_EQ(active, 0);
+  CHECK(WPI_IsAlertActive(handle, &active) != 0);
+  CHECK(active == 0);
 }
 
-TEST_F(AlertTest, CApiSetActiveAtZeroTimeReportsActive) {
+TEST_CASE_METHOD(AlertTest, "AlertTest CApiSetActiveAtZeroTimeReportsActive",
+                 "[wpiutil]") {
   ScopedNowImpl now{0};
   WPI_AlertHandle handle =
       CreateAlert("zeroGroup", "zeroId", "zero", WPI_ALERT_HIGH);
 
-  EXPECT_EQ(WPI_SetAlertActive(handle, 1), 0);
+  CHECK(WPI_SetAlertActive(handle, 1) == 0);
   int32_t active = 0;
-  EXPECT_EQ(WPI_IsAlertActive(handle, &active), 0);
-  EXPECT_EQ(active, 1);
+  CHECK(WPI_IsAlertActive(handle, &active) == 0);
+  CHECK(active == 1);
 
   WPI_AlertInfo info;
-  ASSERT_EQ(WPI_GetAlerts(&info, 1), 1);
-  EXPECT_NE(info.activeStartTime, 0);
+  REQUIRE(WPI_GetAlerts(&info, 1) == 1);
+  CHECK(info.activeStartTime != 0);
   WPI_FreeAlerts(&info, 1);
 
   WPI_DestroyAlert(handle);
 }
 
-TEST_F(AlertTest, CApiStaleHandleAfterResetDoesNotAffectNewAlert) {
+TEST_CASE_METHOD(AlertTest,
+                 "AlertTest CApiStaleHandleAfterResetDoesNotAffectNewAlert",
+                 "[wpiutil]") {
   WPI_AlertHandle stale =
       CreateAlert("resetGroup", "id", "stale", WPI_ALERT_HIGH);
 
@@ -313,23 +325,25 @@ TEST_F(AlertTest, CApiStaleHandleAfterResetDoesNotAffectNewAlert) {
 
   WPI_AlertHandle current =
       CreateAlert("resetGroup", "id", "current", WPI_ALERT_HIGH);
-  EXPECT_NE(stale, current);
+  CHECK(stale != current);
 
   WPI_String staleText = wpi::util::make_string("stale update");
-  EXPECT_NE(WPI_SetAlertText(stale, &staleText), 0);
+  CHECK(WPI_SetAlertText(stale, &staleText) != 0);
   WPI_DestroyAlert(stale);
 
-  EXPECT_EQ(WPI_GetNumAlerts(), 1);
+  CHECK(WPI_GetNumAlerts() == 1);
   WPI_AlertInfo info;
-  ASSERT_EQ(WPI_GetAlerts(&info, 1), 1);
-  EXPECT_EQ(ToString(info.id), "id");
-  EXPECT_EQ(ToString(info.text), "current");
+  REQUIRE(WPI_GetAlerts(&info, 1) == 1);
+  CHECK(ToString(info.id) == "id");
+  CHECK(ToString(info.text) == "current");
   WPI_FreeAlerts(&info, 1);
 
   WPI_DestroyAlert(current);
 }
 
-TEST_F(AlertTest, CppWrapperStaleAlertAfterResetDoesNotAffectNewAlert) {
+TEST_CASE_METHOD(
+    AlertTest, "AlertTest CppWrapperStaleAlertAfterResetDoesNotAffectNewAlert",
+    "[wpiutil]") {
   auto stale =
       std::make_unique<Alert>("resetGroup", "id", "stale", Alert::Level::HIGH);
 
@@ -341,54 +355,59 @@ TEST_F(AlertTest, CppWrapperStaleAlertAfterResetDoesNotAffectNewAlert) {
   stale->SetText("stale update");
   stale.reset();
 
-  EXPECT_EQ(WPI_GetNumAlerts(), 1);
-  EXPECT_TRUE(current.Get());
-  EXPECT_EQ(current.GetText(), "current");
+  CHECK(WPI_GetNumAlerts() == 1);
+  CHECK(current.Get());
+  CHECK(current.GetText() == "current");
 }
 
-TEST_F(AlertTest, CApiInvalidArgumentsAndHandlesReturnErrors) {
+TEST_CASE_METHOD(AlertTest,
+                 "AlertTest CApiInvalidArgumentsAndHandlesReturnErrors",
+                 "[wpiutil]") {
   WPI_String group = wpi::util::make_string("group");
   WPI_String id = wpi::util::make_string("id");
   WPI_String text = wpi::util::make_string("text");
-  EXPECT_EQ(WPI_CreateAlert(&group, &id, &text, WPI_ALERT_HIGH, nullptr),
-            ALERT_ERROR);
+  CHECK(WPI_CreateAlert(&group, &id, &text, WPI_ALERT_HIGH, nullptr) ==
+        ALERT_ERROR);
 
-  EXPECT_NE(WPI_GetAlerts(nullptr, 1), 0);
-  EXPECT_NE(WPI_GetAlerts(nullptr, -1), 0);
-  EXPECT_EQ(WPI_GetAlerts(nullptr, 0), 0);
+  CHECK(WPI_GetAlerts(nullptr, 1) != 0);
+  CHECK(WPI_GetAlerts(nullptr, -1) != 0);
+  CHECK(WPI_GetAlerts(nullptr, 0) == 0);
 
   constexpr WPI_AlertHandle invalid = WPI_INVALID_HANDLE;
   int32_t active = 1;
-  EXPECT_NE(WPI_IsAlertActive(invalid, &active), 0);
-  EXPECT_EQ(active, 0);
-  EXPECT_NE(WPI_SetAlertActive(invalid, 1), 0);
-  EXPECT_NE(WPI_SetAlertText(invalid, &text), 0);
+  CHECK(WPI_IsAlertActive(invalid, &active) != 0);
+  CHECK(active == 0);
+  CHECK(WPI_SetAlertActive(invalid, 1) != 0);
+  CHECK(WPI_SetAlertText(invalid, &text) != 0);
 
   WPI_String outText = wpi::util::make_string("unchanged");
-  EXPECT_NE(WPI_GetAlertText(invalid, &outText), 0);
-  EXPECT_EQ(outText.str, nullptr);
-  EXPECT_EQ(outText.len, 0u);
+  CHECK(WPI_GetAlertText(invalid, &outText) != 0);
+  CHECK(outText.str == nullptr);
+  CHECK(outText.len == 0u);
 
   int32_t level = 42;
-  EXPECT_NE(WPI_GetAlertLevel(invalid, &level), 0);
-  EXPECT_EQ(level, 0);
+  CHECK(WPI_GetAlertLevel(invalid, &level) != 0);
+  CHECK(level == 0);
 }
 
-TEST_F(AlertTest, CApiNullCreateHandleRejectedBeforeBackend) {
+TEST_CASE_METHOD(AlertTest,
+                 "AlertTest CApiNullCreateHandleRejectedBeforeBackend",
+                 "[wpiutil]") {
   gBackendState = BackendState{};
   WPI_SetAlertBackend(&kTestBackend);
 
   WPI_String group = wpi::util::make_string("backendGroup");
   WPI_String id = wpi::util::make_string("backendId");
   WPI_String text = wpi::util::make_string("backendText");
-  EXPECT_EQ(WPI_CreateAlert(&group, &id, &text, WPI_ALERT_MEDIUM, nullptr),
-            ALERT_ERROR);
+  CHECK(WPI_CreateAlert(&group, &id, &text, WPI_ALERT_MEDIUM, nullptr) ==
+        ALERT_ERROR);
 
-  EXPECT_EQ(gBackendState.createdHandle, WPI_INVALID_HANDLE);
-  EXPECT_EQ(gBackendState.group, "");
+  CHECK(gBackendState.createdHandle == WPI_INVALID_HANDLE);
+  CHECK(gBackendState.group == "");
 }
 
-TEST_F(AlertTest, CustomBackendDispatchesAllOperations) {
+TEST_CASE_METHOD(AlertTest, "AlertTest CustomBackendDispatchesAllOperations",
+                 "[wpiutil]") {
   gBackendState = BackendState{};
   WPI_SetAlertBackend(&kTestBackend);
 
@@ -396,63 +415,64 @@ TEST_F(AlertTest, CustomBackendDispatchesAllOperations) {
   WPI_String id = wpi::util::make_string("backendId");
   WPI_String text = wpi::util::make_string("backendText");
   WPI_AlertHandle handle = WPI_INVALID_HANDLE;
-  ASSERT_EQ(WPI_CreateAlert(&group, &id, &text, WPI_ALERT_MEDIUM, &handle), 0);
+  REQUIRE(WPI_CreateAlert(&group, &id, &text, WPI_ALERT_MEDIUM, &handle) == 0);
 
-  EXPECT_EQ(gBackendState.group, "backendGroup");
-  EXPECT_EQ(gBackendState.id, "backendId");
-  EXPECT_EQ(gBackendState.text, "backendText");
-  EXPECT_EQ(gBackendState.level, WPI_ALERT_MEDIUM);
-  EXPECT_EQ(handle, gBackendState.createdHandle);
+  CHECK(gBackendState.group == "backendGroup");
+  CHECK(gBackendState.id == "backendId");
+  CHECK(gBackendState.text == "backendText");
+  CHECK(gBackendState.level == WPI_ALERT_MEDIUM);
+  CHECK(handle == gBackendState.createdHandle);
 
-  EXPECT_EQ(WPI_SetAlertActive(handle, 1), 0);
+  CHECK(WPI_SetAlertActive(handle, 1) == 0);
   int32_t active = 0;
-  EXPECT_EQ(WPI_IsAlertActive(handle, &active), 0);
-  EXPECT_EQ(active, 1);
+  CHECK(WPI_IsAlertActive(handle, &active) == 0);
+  CHECK(active == 1);
 
   WPI_String updated = wpi::util::make_string("backendUpdated");
-  EXPECT_EQ(WPI_SetAlertText(handle, &updated), 0);
+  CHECK(WPI_SetAlertText(handle, &updated) == 0);
   WPI_String currentText;
-  ASSERT_EQ(WPI_GetAlertText(handle, &currentText), 0);
-  EXPECT_EQ(ToString(currentText), "backendUpdated");
+  REQUIRE(WPI_GetAlertText(handle, &currentText) == 0);
+  CHECK(ToString(currentText) == "backendUpdated");
   WPI_FreeString(&currentText);
 
   int32_t level = -1;
-  EXPECT_EQ(WPI_GetAlertLevel(handle, &level), 0);
-  EXPECT_EQ(level, WPI_ALERT_MEDIUM);
+  CHECK(WPI_GetAlertLevel(handle, &level) == 0);
+  CHECK(level == WPI_ALERT_MEDIUM);
 
   WPI_AlertInfo info;
-  EXPECT_EQ(WPI_GetAlerts(&info, 1), 1);
-  EXPECT_EQ(gBackendState.getAlertsLength, 1);
-  EXPECT_EQ(ToString(info.group), "backendGroup");
-  EXPECT_EQ(ToString(info.id), "backendId");
-  EXPECT_EQ(ToString(info.text), "backendUpdated");
-  EXPECT_EQ(info.activeStartTime, 1234);
-  EXPECT_EQ(info.level, WPI_ALERT_MEDIUM);
+  CHECK(WPI_GetAlerts(&info, 1) == 1);
+  CHECK(gBackendState.getAlertsLength == 1);
+  CHECK(ToString(info.group) == "backendGroup");
+  CHECK(ToString(info.id) == "backendId");
+  CHECK(ToString(info.text) == "backendUpdated");
+  CHECK(info.activeStartTime == 1234);
+  CHECK(info.level == WPI_ALERT_MEDIUM);
   WPI_FreeAlerts(&info, 1);
-  EXPECT_EQ(gBackendState.freeAlertsLength, 1);
+  CHECK(gBackendState.freeAlertsLength == 1);
 
   WPI_ResetAlertData();
-  EXPECT_TRUE(gBackendState.reset);
+  CHECK(gBackendState.reset);
   WPI_DestroyAlert(handle);
-  EXPECT_EQ(gBackendState.destroyedHandle, handle);
+  CHECK(gBackendState.destroyedHandle == handle);
 }
 
-TEST_F(AlertTest, CppWrapperReleaseDoesNotDestroyHandle) {
+TEST_CASE_METHOD(AlertTest, "AlertTest CppWrapperReleaseDoesNotDestroyHandle",
+                 "[wpiutil]") {
   gBackendState = BackendState{};
   WPI_SetAlertBackend(&kTestBackend);
 
   {
     Alert alert{"backendGroup", "backendId", "backendText",
                 Alert::Level::MEDIUM};
-    EXPECT_TRUE(alert);
+    CHECK(alert);
     WPI_AlertHandle handle = gBackendState.createdHandle;
 
     wpi::util::detail::ReleaseAlertHandle(alert);
 
-    EXPECT_FALSE(alert);
-    EXPECT_EQ(gBackendState.destroyedHandle, WPI_INVALID_HANDLE);
-    EXPECT_EQ(handle, gBackendState.createdHandle);
+    CHECK_FALSE(alert);
+    CHECK(gBackendState.destroyedHandle == WPI_INVALID_HANDLE);
+    CHECK(handle == gBackendState.createdHandle);
   }
 
-  EXPECT_EQ(gBackendState.destroyedHandle, WPI_INVALID_HANDLE);
+  CHECK(gBackendState.destroyedHandle == WPI_INVALID_HANDLE);
 }
