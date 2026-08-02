@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 exports_files(
     srcs = ["examplecheck.py"],
@@ -6,6 +6,12 @@ exports_files(
         "//wpilibcExamples:__subpackages__",
         "//wpilibjExamples:__subpackages__",
     ],
+)
+
+py_library(
+    name = "generation",
+    srcs = ["generation.py"],
+    visibility = ["//visibility:public"],
 )
 
 py_binary(
