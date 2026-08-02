@@ -49,6 +49,7 @@
 namespace uv = wpi::net::uv;
 namespace bt = winrt::Windows::Devices::Bluetooth;
 namespace dev = winrt::Windows::Devices::Enumeration;
+namespace foundation = winrt::Windows::Foundation;
 namespace gatt = winrt::Windows::Devices::Bluetooth::GenericAttributeProfile;
 namespace streams = winrt::Windows::Storage::Streams;
 
@@ -481,21 +482,42 @@ class BluetoothLEPacketClient::Impl
       return false;
     }
 
+    uint64_t generation = m_connectGeneration.load(std::memory_order_acquire);
     try {
       EnsureWinrtApartment();
-      auto status =
-          controlCharacteristic
-              .WriteValueAsync(ToBuffer(packet),
-                               gatt::GattWriteOption::WriteWithoutResponse)
-              .get();
-      if (status == gatt::GattCommunicationStatus::Success) {
-        UpdateStatus([](auto& current) { ++current.packetsSent; });
-        return true;
-      }
-      FailConnectedGatt("Bluetooth GATT write failed");
+      auto writeOperation = controlCharacteristic.WriteValueAsync(
+          ToBuffer(packet), gatt::GattWriteOption::WriteWithoutResponse);
+      auto weak = weak_from_this();
+      writeOperation.Completed(
+          [weak, generation](
+              foundation::IAsyncOperation<gatt::GattCommunicationStatus> const&
+                  operation,
+              foundation::AsyncStatus operationStatus) {
+            auto self = weak.lock();
+            if (!self || self->IsConnectCanceled(generation)) {
+              return;
+            }
+
+            if (operationStatus == foundation::AsyncStatus::Canceled) {
+              self->FailGattWrite("Bluetooth GATT write was canceled",
+                                  generation);
+              return;
+            }
+
+            try {
+              EnsureWinrtApartment();
+              self->CompleteGattWrite(operation.GetResults(), generation);
+            } catch (winrt::hresult_error const& error) {
+              self->FailGattWrite(std::format("Bluetooth GATT write failed: {}",
+                                              ToString(error)),
+                                  generation);
+            }
+          });
+      return true;
     } catch (winrt::hresult_error const& error) {
-      FailConnectedGatt(
-          std::format("Bluetooth GATT write failed: {}", ToString(error)));
+      FailGattWrite(
+          std::format("Bluetooth GATT write failed: {}", ToString(error)),
+          generation);
     }
     return false;
   }
@@ -509,6 +531,14 @@ class BluetoothLEPacketClient::Impl
   bool IsConnectCanceled(uint64_t generation) const {
     return m_cancelConnect ||
            m_connectGeneration.load(std::memory_order_acquire) != generation;
+  }
+
+  bool TryCancelGeneration(uint64_t generation) {
+    if (m_cancelConnect) {
+      return false;
+    }
+    return m_connectGeneration.compare_exchange_strong(
+        generation, generation + 1, std::memory_order_acq_rel);
   }
 
   void RemoveGattValueChanged(gatt::GattCharacteristic const& characteristic,
@@ -656,6 +686,29 @@ class BluetoothLEPacketClient::Impl
     }
   }
 
+  void CompleteGattWrite(gatt::GattCommunicationStatus writeStatus,
+                         uint64_t generation) {
+    if (IsConnectCanceled(generation)) {
+      return;
+    }
+    if (writeStatus == gatt::GattCommunicationStatus::Success) {
+      UpdateStatus([&](auto& current) {
+        if (!IsConnectCanceled(generation) && current.connected) {
+          ++current.packetsSent;
+        }
+      });
+      return;
+    }
+    FailGattWrite("Bluetooth GATT write failed", generation);
+  }
+
+  void FailGattWrite(std::string_view error, uint64_t generation) {
+    if (TryCancelGeneration(generation)) {
+      ClearGattState();
+      SetError(error);
+    }
+  }
+
   void ClearGattState() {
     std::scoped_lock lock{m_gattMutex};
     RemoveGattValueChanged(m_statusCharacteristic, m_valueChangedToken);
@@ -666,8 +719,7 @@ class BluetoothLEPacketClient::Impl
   }
 
   void FailConnectedGatt(std::string_view error) {
-    ClearGattState();
-    SetError(error);
+    FailGattWrite(error, m_connectGeneration.load(std::memory_order_acquire));
   }
 
   void SetError(std::string_view error) {
