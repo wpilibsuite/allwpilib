@@ -1248,15 +1248,15 @@ class BluetoothLEPacketClient::Impl
       std::scoped_lock lock{m_statusMutex};
       snapshot = m_status;
     }
-    if (m_statusCallback) {
-      m_statusCallback(snapshot);
-    }
+    PublishStatusSnapshot(snapshot);
   }
 
   void PublishStatusSnapshot(
       const BluetoothLEPacketConnectionStatus& snapshot) {
-    if (m_statusCallback) {
-      m_statusCallback(snapshot);
+    StatusCallback callback = m_statusCallback;
+    if (callback) {
+      m_exec->Send(
+          [callback = std::move(callback), snapshot] { callback(snapshot); });
     }
   }
 
