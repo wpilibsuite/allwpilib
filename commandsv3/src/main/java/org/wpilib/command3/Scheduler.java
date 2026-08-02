@@ -931,6 +931,7 @@ public final class Scheduler implements ProtobufSerializable {
 
     interruptCommandTree(root, interruptor);
     m_currentCommandAncestry.clear();
+    Continuation.mountContinuation(null);
   }
 
   /**
