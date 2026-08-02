@@ -22,6 +22,7 @@ def make_arg_parser(
     Keyword arguments:
     subproject_root -- Path to the subproject root. Determines default output and proto directories.
     repo_root -- Path to the repo root. Used to find the nanopb generator.
+    types -- Flagset of all the types of generators arguments are neede for.
 
     Returns:
     The ArgumentParser with the necessary arguments.
