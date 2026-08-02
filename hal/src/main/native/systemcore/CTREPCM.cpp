@@ -172,13 +172,22 @@ void InitializeCTREPCM() {
 #define READ_SOL_FAULTS(failureValue) \
   READ_PACKET(PcmStatusFault, StatusSolFaults, failureValue)
 
+static HAL_Bool PrepareControl1ForSend(void* param, HAL_CANMessage* message) {
+  auto pcm = static_cast<PCM*>(param);
+  (void)pcm;
+  (void)message;
+  // TODO: Apply the CTRE PCM secure message context.
+  return true;
+}
+
 static void SendControl(PCM* pcm, int32_t* status) {
   HAL_CANMessage message;
   std::memset(&message, 0, sizeof(message));
   message.dataSize = 8;
   std::memcpy(message.data, pcm->control.data, 8);
-  HAL_WriteCANPacketRepeating(pcm->canHandle, Control1, &message, SendPeriod,
-                              status);
+  HAL_WriteCANPacketRepeatingWithCallback(pcm->canHandle, Control1, &message,
+                                          SendPeriod, PrepareControl1ForSend,
+                                          pcm, status);
 }
 
 extern "C" {

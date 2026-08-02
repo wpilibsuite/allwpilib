@@ -117,6 +117,14 @@ void HAL_WriteCANPacket(HAL_CANHandle handle, int32_t apiId,
 void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
                                  const struct HAL_CANMessage* message,
                                  int32_t repeatMs, int32_t* status) {
+  HAL_WriteCANPacketRepeatingWithCallback(handle, apiId, message, repeatMs,
+                                          nullptr, nullptr, status);
+}
+
+void HAL_WriteCANPacketRepeatingWithCallback(
+    HAL_CANHandle handle, int32_t apiId, const struct HAL_CANMessage* message,
+    int32_t repeatMs, HAL_CANPeriodicSendCallback callback, void* param,
+    int32_t* status) {
   auto can = canHandles->Get(handle);
   if (!can) {
     *status = HAL_HANDLE_ERROR;
@@ -125,7 +133,8 @@ void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
   auto id = CreateCANId(can.get(), apiId);
 
   std::scoped_lock lock(can->periodicSendsMutex);
-  HAL_CAN_SendMessage(can->busId, id, message, repeatMs, status);
+  HAL_CAN_SendMessageWithPeriodicCallback(can->busId, id, message, repeatMs,
+                                          callback, param, status);
   can->periodicSends[apiId] = repeatMs;
 }
 
