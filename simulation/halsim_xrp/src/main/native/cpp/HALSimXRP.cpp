@@ -158,41 +158,59 @@ uint16_t ReadUint16BE(std::span<const uint8_t> data) {
   return static_cast<uint16_t>(data[0] << 8) | data[1];
 }
 
-uint32_t ReadUint32BE(std::span<const uint8_t> data) {
-  return static_cast<uint32_t>(data[0]) << 24 |
-         static_cast<uint32_t>(data[1]) << 16 |
-         static_cast<uint32_t>(data[2]) << 8 | data[3];
+bool SkipField(std::span<const uint8_t>* packet, size_t size) {
+  if (packet->size() < size) {
+    return false;
+  }
+  *packet = packet->subspan(size);
+  return true;
 }
 
 std::optional<TimingEcho> ReadTimingEcho(std::span<const uint8_t> packet) {
-  if (packet.size() < 3) {
+  if (packet.size() < PACKET_HEADER_SIZE) {
     return std::nullopt;
   }
 
-  packet = packet.subspan(3);
-  while (!packet.empty()) {
-    if (packet.size() < 2) {
-      return std::nullopt;
-    }
-
-    uint8_t tagLength = packet[0];
-    if (tagLength == 0 || packet.size() < static_cast<size_t>(tagLength) + 1) {
-      return std::nullopt;
-    }
-
-    if (packet[1] == XRP_TAG_TIMING) {
-      if (tagLength != 7) {
-        return std::nullopt;
-      }
-
-      return TimingEcho{ReadUint16BE(packet.subspan(2, 2)),
-                        ReadUint32BE(packet.subspan(4, 4))};
-    }
-
-    packet = packet.subspan(tagLength + 1);
+  uint16_t fieldMask = ReadUint16BE(packet.subspan(3, 2));
+  if ((fieldMask & ~STATUS_ALL_FIELDS) != 0 ||
+      (fieldMask & STATUS_TIMING) == 0) {
+    return std::nullopt;
   }
 
-  return std::nullopt;
+  packet = packet.subspan(PACKET_HEADER_SIZE);
+  for (int encoder = 0; encoder < 4; encoder++) {
+    if ((fieldMask & (STATUS_ENCODER_0 << encoder)) != 0 &&
+        !SkipField(&packet, 8)) {
+      return std::nullopt;
+    }
+  }
+
+  if ((fieldMask & STATUS_DIO) != 0 && !SkipField(&packet, 2)) {
+    return std::nullopt;
+  }
+  if ((fieldMask & STATUS_GYRO) != 0 && !SkipField(&packet, 24)) {
+    return std::nullopt;
+  }
+  if ((fieldMask & STATUS_ACCEL) != 0 && !SkipField(&packet, 12)) {
+    return std::nullopt;
+  }
+  for (int analog = 0; analog < 3; analog++) {
+    if ((fieldMask & (STATUS_ANALOG_0 << analog)) != 0 &&
+        !SkipField(&packet, 2)) {
+      return std::nullopt;
+    }
+  }
+
+  if (packet.size() < 4) {
+    return std::nullopt;
+  }
+
+  uint16_t controlRxAge10Us = ReadUint16BE(packet.subspan(2, 2));
+  uint32_t controlRxAgeUs = controlRxAge10Us == INVALID_CONTROL_RX_AGE_10_US
+                                ? INVALID_CONTROL_RX_AGE_US
+                                : controlRxAge10Us * CONTROL_RX_AGE_UNIT_US;
+
+  return TimingEcho{ReadUint16BE(packet.subspan(0, 2)), controlRxAgeUs};
 }
 
 }  // namespace

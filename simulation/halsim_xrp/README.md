@@ -24,107 +24,73 @@ The native Bluetooth packet transport prefers LE L2CAP Credit-Based Mode on Linu
 
 ## XRP Protocol
 
-The WPILib -> XRP protocol is binary-based to save on bandwidth due to hardware limitations of the XRP robot. The messages to/from the XRP follow a the format below:
+The WPILib XRP protocol is binary-based to save Bluetooth bandwidth. Each GATT write value, GATT notification value, or L2CAP SDU contains exactly one protocol packet with no additional length prefix.
 
-| 2 bytes             | 1 byte            | n bytes                             |
-|---------------------|-------------------|-------------------------------------|
-| _uint16_t_ sequence | _uint8_t_ control | [&lt;Tagged Data&gt;](#tagged-data) |
+All multi-byte values are big-endian. Each packet starts with the same 5-byte header:
+
+| 2 bytes             | 1 byte            | 2 bytes                | n bytes   |
+|---------------------|-------------------|------------------------|-----------|
+| _uint16_t_ sequence | _uint8_t_ control | _uint16_t_ field mask  | payload   |
+
+The payload contains each field selected by the field mask, emitted in ascending bit order. Packets with unknown field bits or payload sizes that do not exactly match the selected fields are ignored.
 
 ### Control Byte
 
-The control byte is used to indicate the current `enabled` state of the WPILib robot code. When this is set to `1`, the robot is enabled, and when it is set to `0` it is disabled.
+For WPILib -> XRP control packets, the control byte indicates the current `enabled` state of the WPILib robot code. When this is set to `1`, the robot is enabled, and when it is set to `0`, it is disabled.
 
-Messages originating from the XRP have an unspecified value for the control byte.
+For XRP -> WPILib status packets, the control byte is a copy of the most recent accepted WPILib -> XRP control byte.
 
-### Tagged Data
+### WPILib -> XRP Control Fields
 
-The `Tagged Data` section can contain an arbitrary number of data blocks. Each block has the format below:
+| Bit   | Field       | Payload       |
+|-------|-------------|---------------|
+| 0     | XRPMotor 0  | _int16_t_ pwm |
+| 1     | XRPMotor 1  | _int16_t_ pwm |
+| 2     | XRPMotor 2  | _int16_t_ pwm |
+| 3     | XRPMotor 3  | _int16_t_ pwm |
+| 4     | XRPServo 4  | _uint8_t_ degrees |
+| 5     | XRPServo 5  | _uint8_t_ degrees |
+| 6     | XRPServo 6  | _uint8_t_ degrees |
+| 7     | XRPServo 7  | _uint8_t_ degrees |
+| 8     | DIO 0-7     | _uint8_t_ present mask, _uint8_t_ value mask |
 
-| 1 byte         | 1 byte          | n bytes         |
-|----------------|-----------------|-----------------|
-| _uint8_t_ size | _uint8_t_ tagID | &lt;payload&gt; |
+XRPMotor `pwm` values are clamped to `-255` to `255`, matching the XRP motor PWM magnitude plus direction. XRPServo `degrees` values are clamped to `0` to `180`, matching the integer degree value applied by the XRP servo library. DIO payload bits are channel-indexed; bit `n` in the present mask means DIO channel `n` is included, and bit `n` in the value mask is that channel's value.
 
-The `size` byte encodes the size of the data block, _excluding_ itself. Thus the smallest block size is 2 bytes, with a size value of 1 (1 size byte, 1 tag byte, 0 payload bytes). Maximum size of the payload is 254 bytes.
+### XRP -> WPILib Status Fields
 
+| Bit   | Field        | Payload |
+|-------|--------------|---------|
+| 0     | Encoder 0    | _int32_t_ count, _uint32_t_ period numerator |
+| 1     | Encoder 1    | _int32_t_ count, _uint32_t_ period numerator |
+| 2     | Encoder 2    | _int32_t_ count, _uint32_t_ period numerator |
+| 3     | Encoder 3    | _int32_t_ count, _uint32_t_ period numerator |
+| 4     | DIO 0-7      | _uint8_t_ present mask, _uint8_t_ value mask |
+| 5     | XRPGyro      | _float_ rate_x, _float_ rate_y, _float_ rate_z, _float_ angle_x, _float_ angle_y, _float_ angle_z |
+| 6     | XRPAccel     | _float_ accel_x, _float_ accel_y, _float_ accel_z |
+| 7     | AnalogIn 0   | _uint16_t_ value |
+| 8     | AnalogIn 1   | _uint16_t_ value |
+| 9     | AnalogIn 2   | _uint16_t_ value |
+| 10    | Timing       | _uint16_t_ last control sequence, _uint16_t_ control receive age in 10 us units |
 
-Utilizing tagged data blocks allows us to send multiple pieces of data in a single transport packet. The tags currently implemented for the XRP are as follows:
+XRP status currently reports DIO 0, the user button. Analog values are scaled over `0` to `5 V`, where `0` is `0 V` and `65535` is `5 V`.
 
-| Tag  | Description                   |
-|------|-------------------------------|
-| 0x12 | [XRPMotor](#xrpmotor)         |
-| 0x13 | [XRPServo](#xrpservo)         |
-| 0x14 | [DIO](#dio)                   |
-| 0x15 | [AnalogIn](#analogin)         |
-| 0x16 | [XRPGyro](#xrpgyro)           |
-| 0x18 | [Encoder](#encoder)           |
+#### Encoders
 
+Encoder IDs map to XRP encoders as follows:
 
-#### XRPMotor
-
-| Order | Data Type | Description       |
-|-------|-----------|-------------------|
-| 0     | _uint8_t_ | ID                |
-| 1     | _float_   | Value [-1.0, 1.0] |
-
-IDs:
 | ID | Description |
 |----|-------------|
-| 0  | Left Motor  |
-| 1  | Right Motor |
-| 2  | Motor 3     |
-| 3  | Motor 4     |
-
-#### XRPServo
-
-| Order | Data Type | Description      |
-|-------|-----------|------------------|
-| 0     | _uint8_t_ | ID               |
-| 1     | _float_   | Value [0.0, 1.0] |
-
-IDs:
-| ID | Description |
-|----|-------------|
-| 4  | Servo 1     |
-| 5  | Servo 2     |
-
-#### DIO
-
-| Order | Data Type | Description        |
-|-------|-----------|--------------------|
-| 0     | _uint8_t_ | ID                 |
-| 1     | _uint8_t_ | Value (True/False) |
-
-#### AnalogIn
-
-| Order | Data Type | Description |
-|-------|-----------|-------------|
-| 0     | _uint8_t_ | ID          |
-| 1     | _float_   | Value       |
-
-#### XRPGyro
-
-| Order | Data Type | Description   |
-|-------|-----------|---------------|
-| 0     | _float_   | rate_x (dps)  |
-| 1     | _float_   | rate_y (dps)  |
-| 2     | _float_   | rate_z (dps)  |
-| 3     | _float_   | angle_x (deg) |
-| 4     | _float_   | angle_y (deg) |
-| 5     | _float_   | angle_z (deg) |
-
-#### Encoder
-
-| Order | Data Type  |     Description    |
-|-------|------------|--------------------|
-| 0     | _uint8_t_  | ID                 |
-| 1     | _int32_t_  | Count              |
-| 2     | _uint32_t_ | Period Numerator   |
-| 3     | _uint32_t_ | Period Denominator |
-
-IDs:
-| ID | Description         |
-|----|---------------------|
 | 0  | Left Motor Encoder  |
 | 1  | Right Motor Encoder |
 | 2  | Motor 3 Encoder     |
 | 3  | Motor 4 Encoder     |
+
+Encoder period uses a fixed denominator of `1000000`. `period numerator >> 1` is the period in microseconds, and the low bit is the direction bit (`1` for forward, `0` for reverse). A period numerator of `0xffffffff` indicates no valid period.
+
+#### Timing
+
+The timing field lets the client estimate application-level round-trip latency.
+
+`last control sequence` echoes the most recent accepted WPILib -> XRP control packet sequence number. `control receive age in 10 us units * 10` is the time in microseconds between receiving that control packet and producing the status packet.
+
+A control receive age of `0xffff` indicates no control packet has been accepted yet or the age exceeded the representable range.
