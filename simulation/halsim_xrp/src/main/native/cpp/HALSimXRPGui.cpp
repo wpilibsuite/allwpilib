@@ -5,6 +5,7 @@
 #include "wpi/halsim/xrp/HALSimXRPGui.hpp"
 
 #include <algorithm>
+#include <cfloat>
 #include <chrono>
 #include <cinttypes>
 #include <cstdio>
@@ -17,6 +18,7 @@
 #include <vector>
 
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <implot.h>
 
 #include "wpi/hal/Extensions.h"
@@ -50,7 +52,7 @@ struct CommandResult {
   bool rememberTarget = false;
 };
 
-enum class CommandKind { NONE, REFRESH, SCAN, PAIR };
+enum class CommandKind { NONE, SCAN, PAIR };
 
 struct GuiState {
   bool initializedFromConnection = false;
@@ -68,6 +70,7 @@ struct GuiState {
   std::string latencyTarget;
   uint16_t lastLatencyControlSeq = 0;
   bool haveLastLatencyControlSeq = false;
+  bool showAddress = false;
 };
 
 static std::weak_ptr<HALSimXRP> gSimXRP;
@@ -101,6 +104,111 @@ static std::string_view GetDeviceSortKey(
     const wpi::net::BluetoothLEDeviceInfo& device) {
   std::string_view displayName = GetDeviceDisplayName(device.name);
   return displayName.empty() ? std::string_view{device.target} : displayName;
+}
+
+static std::string GetDeviceLabel(const wpi::net::BluetoothLEDeviceInfo& device,
+                                  bool unique) {
+  std::string_view displayName = GetDeviceDisplayName(device.name);
+  std::string label;
+  if (displayName.empty()) {
+    label = gGui.showAddress ? device.target : "XRP device";
+  } else if (gGui.showAddress) {
+    label = std::string{displayName} + " (" + device.target + ")";
+  } else {
+    label = std::string{displayName};
+  }
+
+  if (unique) {
+    label += "###";
+    label += device.target;
+    label += device.addressType == XRPBluetoothAddressType::PUBLIC ? "#PUBLIC"
+                                                                   : "#RANDOM";
+  }
+  return label;
+}
+
+static bool HamburgerButton(const ImGuiID id, const ImVec2 position) {
+  const ImGuiStyle& style = ImGui::GetStyle();
+  ImGuiWindow* window = ImGui::GetCurrentWindow();
+
+  const ImRect bb{
+      position, position + ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize()) +
+                    style.FramePadding * 2.0f};
+
+  ImGui::ItemAdd(bb, id);
+
+  bool hovered;
+  bool held;
+  bool pressed = ImGui::ButtonBehavior(bb, id, &hovered, &held);
+
+  const ImU32 bgCol =
+      ImGui::GetColorU32(held ? ImGuiCol_ButtonActive : ImGuiCol_ButtonHovered);
+  const ImVec2 center = bb.GetCenter();
+  if (hovered) {
+    window->DrawList->AddCircleFilled(
+        center, ImMax(2.0f, ImGui::GetFontSize() * 0.5f + 1.0f), bgCol, 12);
+  }
+
+  const ImU32 fgCol = ImGui::GetColorU32(ImGuiCol_Text);
+  const float halfLineWidth = ImGui::GetFontSize() * 0.5f * 0.7071f;
+  const float halfTotalHeight = halfLineWidth * 0.875f;
+  ImVec2 lineStart = {center.x - halfLineWidth, center.y - halfTotalHeight};
+  ImVec2 lineEnd = {center.x + halfLineWidth, center.y - halfTotalHeight};
+  ImVec2 increment = {0.0f, halfTotalHeight};
+
+  for (int i = 0; i < 3; ++i) {
+    window->DrawList->AddLine(lineStart, lineEnd, fgCol);
+    lineStart += increment;
+    lineEnd += increment;
+  }
+
+  return pressed;
+}
+
+static void DrawViewSettingsMenu() {
+  bool titleBarClicked =
+      ImGui::IsMouseReleased(ImGuiMouseButton_Right) && ImGui::IsItemHovered();
+  ImGuiWindow* window = ImGui::GetCurrentWindow();
+
+  bool settingsButtonClicked = false;
+  if (!ImGui::IsWindowDocked() &&
+      ImGui::GetWindowWidth() > (ImGui::GetFontSize() + 2) * 3 +
+                                    ImGui::GetStyle().FramePadding.x * 2) {
+    const ImGuiItemFlags itemFlagsRestore =
+        ImGui::GetCurrentContext()->CurrentItemFlags;
+
+    ImGui::GetCurrentContext()->CurrentItemFlags |=
+        ImGuiItemFlags_NoNavDefaultFocus;
+    window->DC.NavLayerCurrent = ImGuiNavLayer_Menu;
+
+    ImGui::PushClipRect(window->OuterRectClipped.Min,
+                        window->OuterRectClipped.Max, false);
+
+    const ImRect titleBarRect = window->TitleBarRect();
+    const ImVec2 position = {titleBarRect.Max.x -
+                                 (ImGui::GetStyle().FramePadding.x * 3) -
+                                 (ImGui::GetFontSize() * 2),
+                             titleBarRect.Min.y};
+    settingsButtonClicked =
+        HamburgerButton(ImGui::GetID("#VIEW_SETTINGS"), position);
+
+    ImGui::PopClipRect();
+    ImGui::GetCurrentContext()->CurrentItemFlags = itemFlagsRestore;
+  }
+
+  if (settingsButtonClicked || titleBarClicked) {
+    ImGui::OpenPopup("View Settings");
+  }
+
+  if (ImGui::BeginPopup("View Settings",
+                        ImGuiWindowFlags_AlwaysAutoResize |
+                            ImGuiWindowFlags_NoTitleBar |
+                            ImGuiWindowFlags_NoSavedSettings)) {
+    ImGui::TextUnformatted("View Settings");
+    ImGui::Separator();
+    ImGui::Checkbox("Show address", &gGui.showAddress);
+    ImGui::EndPopup();
+  }
 }
 
 static int FindDevice(std::string_view target,
@@ -168,10 +276,6 @@ static CommandResult ScanDevices(std::chrono::milliseconds timeout) {
   return result;
 }
 
-static CommandResult RefreshDevices() {
-  return ScanDevices(0ms);
-}
-
 static CommandResult PairDevice(std::string_view target,
                                 XRPBluetoothAddressType addressType,
                                 std::string_view name) {
@@ -210,8 +314,7 @@ static void UpdatePendingCommand(HALSimXRP& simXRP) {
 
   CommandResult result = gGui.pendingCommand.get();
   gGui.commandOutput = std::move(result.output);
-  if (gGui.pendingKind == CommandKind::REFRESH ||
-      gGui.pendingKind == CommandKind::SCAN) {
+  if (gGui.pendingKind == CommandKind::SCAN) {
     gGui.devices = std::move(result.devices);
     int currentDevice = FindDevice(gGui.address, GetGuiAddressType());
     gGui.selectedDevice =
@@ -371,11 +474,7 @@ static std::string SelectedDeviceLabel() {
   }
 
   const auto& device = gGui.devices[gGui.selectedDevice];
-  std::string_view displayName = GetDeviceDisplayName(device.name);
-  if (displayName.empty()) {
-    return device.target;
-  }
-  return std::string{displayName} + " (" + device.target + ")";
+  return GetDeviceLabel(device, false);
 }
 
 static std::string GetSelectedDeviceName(std::string_view target,
@@ -394,10 +493,6 @@ static std::string GetSelectedDeviceName(std::string_view target,
 
 static void DrawDeviceControls(bool commandRunning) {
   ImGui::BeginDisabled(commandRunning);
-  if (ImGui::Button("Refresh")) {
-    StartCommand(CommandKind::REFRESH, "Refreshing devices", RefreshDevices);
-  }
-  ImGui::SameLine();
   if (ImGui::Button("Scan")) {
     StartCommand(CommandKind::SCAN, "Scanning for Bluetooth devices",
                  [] { return ScanDevices(8s); });
@@ -408,13 +503,7 @@ static void DrawDeviceControls(bool commandRunning) {
   if (ImGui::BeginCombo("Device", selectedLabel.c_str())) {
     for (int i = 0; i < static_cast<int>(gGui.devices.size()); ++i) {
       const auto& device = gGui.devices[i];
-      std::string label;
-      std::string_view displayName = GetDeviceDisplayName(device.name);
-      if (displayName.empty()) {
-        label = device.target;
-      } else {
-        label = std::string{displayName} + " (" + device.target + ")";
-      }
+      std::string label = GetDeviceLabel(device, true);
       if (ImGui::Selectable(label.c_str(), gGui.selectedDevice == i)) {
         gGui.selectedDevice = i;
         SetAddress(device.target);
@@ -425,9 +514,11 @@ static void DrawDeviceControls(bool commandRunning) {
     ImGui::EndCombo();
   }
 
-  ImGui::InputText("Target", gGui.address, sizeof(gGui.address));
-  const char* addressTypes[] = {"Public", "Random"};
-  ImGui::Combo("Address type", &gGui.addressType, addressTypes, 2);
+  if (gGui.showAddress) {
+    ImGui::InputText("Target", gGui.address, sizeof(gGui.address));
+    const char* addressTypes[] = {"Public", "Random"};
+    ImGui::Combo("Address type", &gGui.addressType, addressTypes, 2);
+  }
 }
 
 static void DrawConnectionControls(HALSimXRP& simXRP,
@@ -437,7 +528,7 @@ static void DrawConnectionControls(HALSimXRP& simXRP,
   bool connectionActive = status.connected || status.connecting;
   bool pairingSupported =
       wpi::net::BluetoothLEPacketClient::IsPairingSupported();
-  if (pairingSupported) {
+  if (pairingSupported && gGui.showAddress) {
     ImGui::BeginDisabled(commandRunning || !targetValid || connectionActive);
     if (ImGui::Button("Pair")) {
       std::string target = gGui.address;
@@ -480,10 +571,16 @@ static void DrawGuiImpl() {
   InitializeFromConnection(status);
 
   ImGui::SetNextWindowSize(ImVec2{430, 0}, ImGuiCond_FirstUseEver);
+  float minWidth =
+      ImGui::CalcTextSize("XRP Bluetooth").x + ImGui::GetFontSize() * 3 +
+      ImGui::GetStyle().ItemInnerSpacing.x * 3 +
+      ImGui::GetStyle().FramePadding.x * 3 + ImGui::GetStyle().WindowBorderSize;
+  ImGui::SetNextWindowSizeConstraints({minWidth, 0}, ImVec2{FLT_MAX, FLT_MAX});
   if (!ImGui::Begin("XRP Bluetooth")) {
     ImGui::End();
     return;
   }
+  DrawViewSettingsMenu();
 
   ImVec4 statusColor = status.connected    ? ImVec4{0.25f, 0.75f, 0.35f, 1.0f}
                        : status.connecting ? ImVec4{0.95f, 0.7f, 0.25f, 1.0f}
