@@ -7,6 +7,7 @@ package org.wpilib.command3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -121,6 +122,77 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
     assertFalse(
         m_scheduler.isRunning(higherPriority),
         "Higher priority command should have been interrupted");
+  }
+
+  @Test
+  void innerDefaultCommandInheritsHigherParentPriority() {
+    var mech = new DummyMechanism("Mechanism", m_scheduler);
+
+    final Command higherPriority = new PriorityCommand(200, mech);
+    final Command lowPriorityChild = new PriorityCommand(-1000, mech);
+    final Command parent =
+        Command.noRequirements(
+                coroutine -> {
+                  mech.setDefaultCommand(lowPriorityChild);
+                  coroutine.park();
+                })
+            .withPriority(1000)
+            .named("Parent");
+
+    m_scheduler.schedule(parent);
+    m_scheduler.run();
+    assertEquals(List.of(parent, lowPriorityChild), m_scheduler.getRunningCommands());
+
+    // the inner default command should inherit priority=1000 and prevent
+    // the 200-priority command from running
+    var result = m_scheduler.schedule(higherPriority);
+    var failure = assertInstanceOf(LowerPriorityThanRunningCommand.class, result);
+    assertSame(lowPriorityChild, failure.alreadyRunning());
+    assertSame(higherPriority, failure.command());
+    assertEquals(
+        List.of(parent, lowPriorityChild),
+        m_scheduler.getRunningCommands(),
+        "Parent and the inner default command should continue to run");
+  }
+
+  @Test
+  void innerTriggerCommandInheritsHigherParentPriority() {
+    var mech = new DummyMechanism("Mechanism", m_scheduler);
+
+    var higherPriority = new PriorityCommand(200, mech);
+    var lowPriorityChild = new PriorityCommand(-1000, mech);
+
+    var trigger = new Trigger(m_scheduler, () -> true);
+    var parent =
+        Command.noRequirements(
+                coroutine -> {
+                  // Because the trigger is created outside this command and before it's scheduled,
+                  // an `onTrue` or `whileTrue` binding won't fire because the signal edge happens
+                  // before the binding can be evaluated.
+                  trigger.retryWhileTrue(lowPriorityChild);
+
+                  coroutine.park();
+                })
+            .withPriority(1000)
+            .named("Parent");
+
+    m_scheduler.schedule(higherPriority);
+    m_scheduler.run();
+
+    m_scheduler.schedule(parent);
+    m_scheduler.run(); // Schedules parent, adds binding. The binding is evaluated on the next run()
+    m_scheduler.run(); // Polls the binding and schedules the child
+
+    assertEquals(
+        List.of(parent, lowPriorityChild),
+        m_scheduler.getRunningCommands(),
+        "Trigger-bound child should have inherited parent's priority");
+    assertSchedulerEvent(
+        SchedulerEvent.Interrupted.class,
+        i -> {
+          return i.interrupter().equals(lowPriorityChild) && i.command().equals(higherPriority);
+        },
+        "Higher-priority command should have been interrupted by the trigger-bound child");
   }
 
   @Test

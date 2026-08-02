@@ -474,13 +474,50 @@ public final class Scheduler implements ProtobufSerializable {
       return new ScheduleResult.AlreadyRunning(command);
     }
 
+    Set<Command> ancestry = new HashSet<>();
+    for (var state = currentState(); state != null; state = m_runningCommands.get(state.parent())) {
+      ancestry.add(state.command());
+    }
+
+    return isSchedulableFromPriority(command, ancestry);
+  }
+
+  // similar to isSchedulable(Command), but used internally for processing bindings
+  // that may have command scopes.
+  private ScheduleResult isSchedulable(Binding binding) {
+    var command = binding.command();
+
+    if (isScheduledOrRunning(command)) {
+      return new ScheduleResult.AlreadyRunning(command);
+    }
+
+    Set<Command> ancestry = new HashSet<>();
+    if (binding.scope() instanceof BindingScope.ForCommand(Scheduler _, Command parent)) {
+      for (var state = m_runningCommands.get(parent);
+          state != null;
+          state = m_runningCommands.get(state.parent())) {
+        ancestry.add(state.command());
+      }
+    } else {
+      for (var state = currentState();
+          state != null;
+          state = m_runningCommands.get(state.parent())) {
+        ancestry.add(state.command());
+      }
+    }
+
+    return isSchedulableFromPriority(command, ancestry);
+  }
+
+  private Scheduler.ScheduleResult isSchedulableFromPriority(
+      Command command, Set<Command> ancestry) {
     var running = m_runningCommands.values();
-    Command conflict = lowerPriorityThanConflictingCommands(command, running);
+    Command conflict = lowerPriorityThanConflictingCommands(command, ancestry, running);
     if (conflict != null) {
       return new LowerPriorityThanRunningCommand(command, conflict);
     }
 
-    conflict = lowerPriorityThanConflictingCommands(command, m_queuedToRun);
+    conflict = lowerPriorityThanConflictingCommands(command, ancestry, m_queuedToRun);
     if (conflict != null) {
       return new LowerPriorityThanQueuedCommand(command, conflict);
     }
@@ -532,8 +569,12 @@ public final class Scheduler implements ProtobufSerializable {
   ScheduleResult schedule(Binding binding) {
     var command = binding.command();
 
-    var result = isSchedulable(command);
+    var result = isSchedulable(binding);
     if (!(result instanceof ScheduleResult.Success)) {
+      // We check specifically for Success, instead of `successful()`, because only a Success
+      // indicates that the command can actually go through the scheduling process. AlreadyRunning
+      // means what it says on the tin, and it would be incorrect to run the command back through
+      // the scheduling process.
       return result;
     }
 
@@ -582,18 +623,15 @@ public final class Scheduler implements ProtobufSerializable {
    * @return The conflicting command, or null if there is no conflict
    */
   private Command lowerPriorityThanConflictingCommands(
-      Command command, Collection<CommandState> checkAgainst) {
-    Set<CommandState> ancestors = new HashSet<>();
-    // Inherit priority from ancestor commands
+      Command command, Collection<Command> ancestry, Collection<CommandState> checkAgainst) {
     int maxAncestorPriority = command.priority();
-    for (var state = currentState(); state != null; state = m_runningCommands.get(state.parent())) {
-      ancestors.add(state);
-      maxAncestorPriority = Math.max(maxAncestorPriority, state.command().priority());
+    for (Command ancestor : ancestry) {
+      maxAncestorPriority = Math.max(maxAncestorPriority, ancestor.priority());
     }
 
     // Check for conflicts with the commands that are already running
     for (var state : checkAgainst) {
-      if (ancestors.contains(state)) {
+      if (ancestry.contains(state.command())) {
         // Can't conflict with an ancestor command
         continue;
       }
