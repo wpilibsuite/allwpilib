@@ -17,6 +17,7 @@ classes:
       GetFieldLength:
       GetFieldWidth:
       GetTags:
+      GetTagMap:
       SetOrigin:
         overloads:
           OriginPosition:

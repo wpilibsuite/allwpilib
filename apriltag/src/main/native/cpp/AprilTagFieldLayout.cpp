@@ -6,6 +6,7 @@
 
 #include <format>
 #include <system_error>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -59,6 +60,10 @@ std::vector<AprilTag> AprilTagFieldLayout::GetTags() const {
     tags.emplace_back(tag.second);
   }
   return tags;
+}
+
+std::unordered_map<int, AprilTag> AprilTagFieldLayout::GetTagMap() const {
+  return m_apriltags;
 }
 
 void AprilTagFieldLayout::SetOrigin(OriginPosition origin) {
