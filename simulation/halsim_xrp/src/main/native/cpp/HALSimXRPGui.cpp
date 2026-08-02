@@ -35,6 +35,8 @@ constexpr std::string_view ADD_GUI_LATE_EXECUTE_NAME =
     "halsimgui::AddGuiLateExecute";
 constexpr std::string_view GET_IMGUI_CONTEXT_NAME =
     "halsimgui::GetImguiContext";
+constexpr std::string_view GET_IMPLOT_CONTEXT_NAME =
+    "halsimgui::GetImPlotContext";
 constexpr std::string_view XRP_DEVICE_NAME_PREFIX = "WPIXRP-";
 constexpr double LATENCY_HISTORY_SECONDS = 10.0;
 constexpr size_t LATENCY_MAX_SAMPLES = 1500;
@@ -42,6 +44,7 @@ constexpr float LATENCY_PLOT_HEIGHT = 110.0f;
 
 using AddGuiLateExecuteFn = void (*)(std::function<void()> execute);
 using GetImguiContextFn = ImGuiContext* (*)();
+using GetImPlotContextFn = ImPlotContext* (*)();
 
 struct CommandResult {
   int exitCode = -1;
@@ -77,6 +80,7 @@ struct GuiState {
 
 static std::weak_ptr<HALSimXRP> gSimXRP;
 static GetImguiContextFn gGetImguiContext = nullptr;
+static GetImPlotContextFn gGetImPlotContext = nullptr;
 static bool gListenerRegistered = false;
 static bool gLateExecuteRegistered = false;
 static GuiState gGui;
@@ -455,6 +459,10 @@ static void DrawLatencyPlot(const XRPConnectionStatus& status) {
   }
 
   ImGui::TextUnformatted("Comms latency");
+  if (ImPlot::GetCurrentContext() == nullptr) {
+    ImGui::TextUnformatted("Latency plot unavailable");
+    return;
+  }
   if (gGui.latencyTimes.empty()) {
     ImGui::TextUnformatted("Waiting for timing data");
     return;
@@ -666,9 +674,14 @@ static void DrawGui() {
     return;
   }
 
+  ImPlotContext* plotContext =
+      gGetImPlotContext ? gGetImPlotContext() : nullptr;
   ImGuiContext* previousContext = ImGui::GetCurrentContext();
+  ImPlotContext* previousPlotContext = ImPlot::GetCurrentContext();
   ImGui::SetCurrentContext(guiContext);
+  ImPlot::SetCurrentContext(plotContext);
   DrawGuiImpl();
+  ImPlot::SetCurrentContext(previousPlotContext);
   ImGui::SetCurrentContext(previousContext);
 }
 
@@ -680,6 +693,8 @@ static void ExtensionListener(void*, const char* name, void* data) {
     gLateExecuteRegistered = true;
   } else if (nameView == GET_IMGUI_CONTEXT_NAME) {
     gGetImguiContext = reinterpret_cast<GetImguiContextFn>(data);
+  } else if (nameView == GET_IMPLOT_CONTEXT_NAME) {
+    gGetImPlotContext = reinterpret_cast<GetImPlotContextFn>(data);
   }
 }
 

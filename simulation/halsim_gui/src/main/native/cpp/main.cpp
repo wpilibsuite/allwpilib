@@ -9,6 +9,7 @@
 #include <string_view>
 
 #include <imgui.h>
+#include <implot.h>
 
 #include "AddressableLEDGui.hpp"
 #include "AnalogInputSimGui.hpp"
@@ -225,6 +226,9 @@ int HALSIM_InitExtension(void) {
   HAL_RegisterExtension(
       HALSIMGUI_EXT_GETIMGUICONTEXT,
       reinterpret_cast<void*>((GetImguiContextFn)&ImGui::GetCurrentContext));
+  HAL_RegisterExtension(
+      HALSIMGUI_EXT_GETIMPLOTCONTEXT,
+      reinterpret_cast<void*>((GetImPlotContextFn)&ImPlot::GetCurrentContext));
   HAL_RegisterExtensionListener(
       nullptr, [](void*, const char* name, void* data) {
         if (std::string_view{name} == "ds_socket") {
