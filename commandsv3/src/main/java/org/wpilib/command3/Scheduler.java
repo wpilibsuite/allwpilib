@@ -942,13 +942,10 @@ public final class Scheduler implements ProtobufSerializable {
           }
         };
 
-    Command root = command;
-    if (!m_currentCommandAncestry.isEmpty()) {
-      root = m_currentCommandAncestry.firstElement().command();
-    }
-
-    interruptCommandTree(root, interruptor);
+    Command root = getRoot(command);
     m_currentCommandAncestry.clear();
+    emitInterruptedEvent(command, interruptor);
+    cancel(root);
     Continuation.mountContinuation(null);
   }
 
@@ -968,10 +965,7 @@ public final class Scheduler implements ProtobufSerializable {
 
     // Fetch the root command
     // (needs to be done before removing the failed command from the running set)
-    Command root = command;
-    while (getParentOf(root) != null) {
-      root = getParentOf(root);
-    }
+    final Command root = getRoot(command);
 
     // Remove it from the running set.
     m_runningCommands.remove(command);
@@ -1085,38 +1079,6 @@ public final class Scheduler implements ProtobufSerializable {
   }
 
   /**
-   * Interrupts a command and all descendants in its composition tree.
-   *
-   * @param command the root of the tree to interrupt
-   * @param interrupter the command that caused the interruption
-   */
-  @SuppressWarnings("PMD.CompareObjectsWithEquals")
-  private void interruptCommandTree(Command command, Command interrupter) {
-    boolean running = isRunning(command);
-    boolean scheduled = isScheduled(command);
-
-    m_runningCommands.remove(command);
-    m_queuedToRun.removeIf(state -> state.command() == command);
-
-    if (running || scheduled) {
-      emitInterruptedEvent(command, interrupter);
-    }
-    if (running) {
-      command.onCancel();
-    }
-    if (running || scheduled) {
-      emitCanceledEvent(command);
-    }
-
-    var childCommands =
-        m_runningCommands.values().stream()
-            .filter(state -> state.parent() == command)
-            .map(CommandState::command)
-            .toList();
-    childCommands.forEach(child -> interruptCommandTree(child, interrupter));
-  }
-
-  /**
    * Builds a coroutine object that the command will be bound to. The coroutine will be scoped to
    * this scheduler object and cannot be used by another scheduler instance.
    *
@@ -1223,6 +1185,17 @@ public final class Scheduler implements ProtobufSerializable {
   @NoDiscard
   public Collection<Command> getQueuedCommands() {
     return m_queuedToRun.stream().map(CommandState::command).toList();
+  }
+
+  private Command getRoot(Command command) {
+    Command root = command;
+    Command parent = getParentOf(command);
+    while (parent != null) {
+      root = parent;
+      parent = getParentOf(parent);
+    }
+
+    return root;
   }
 
   /**

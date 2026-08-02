@@ -142,8 +142,7 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
         Command.noRequirements(
                 coroutine -> {
                   // child2 inherits parent2 priority (1000) and should fail to be scheduled due to
-                  // being
-                  //  a lower priority than child1 (2000, inherited from its parent)
+                  // being a lower priority than child1 (2000, inherited from its parent)
                   coroutine.await(child2);
                 })
             .withPriority(1000)
@@ -238,10 +237,12 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
     m_scheduler.run();
 
     assertTrue(m_scheduler.isRunning(highPriority), "Higher priority command should still run");
+    // Only the command that failed to fork should get an interrupted event.
+    // All other commands in the composition will still be canceled, but won't be interrupted.
+    assertInterruptedBy(current, highPriority);
     for (var command : List.of(grandparent, parent, current, child, grandchild)) {
       assertFalse(
           m_scheduler.isScheduledOrRunning(command), command.name() + " should have been canceled");
-      assertInterruptedBy(command, highPriority);
     }
   }
 
