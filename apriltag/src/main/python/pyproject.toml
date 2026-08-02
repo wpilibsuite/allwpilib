@@ -54,6 +54,12 @@ scan_headers_ignore = [
 
   "wpi/apriltag/AprilTagDetector_cv.hpp",
 
+  "wpi/apriltag/proto/*",
+  "wpi/apriltag/*/proto/*",
+
+  "wpi/apriltag/struct/*",
+  "wpi/apriltag/*/struct/*",
+
   "tag16h5.h",
   "tag36h11.h",
 ]

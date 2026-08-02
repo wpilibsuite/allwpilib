@@ -40,6 +40,14 @@ def make_arg_parser(
             default=subproject_root / "src/main/proto",
             type=Path,
         )
+        parser.add_argument(
+            "-I",
+            "--proto_path",
+            help="Optional. Specifies additional directories in which to search for protobuf imports. May be specified multiple times.",
+            action="append",
+            default=[],
+            type=Path,
+        )
     if GeneratorTypes.QUICKBUF in types:
         parser.add_argument(
             "--protoc",
@@ -101,7 +109,11 @@ def write_file(output_dir: Path, outfn: str, contents: str) -> None:
 
 
 def generate_quickbuf(
-    protoc: Path, quickbuf_plugin: Path | None, output_directory: Path, proto_dir: Path
+    protoc: Path,
+    quickbuf_plugin: Path | None,
+    output_directory: Path,
+    proto_dir: Path,
+    proto_path: list[Path] = [],
 ) -> None:
     """Generates QuickBuffers files.
 
@@ -110,6 +122,7 @@ def generate_quickbuf(
     quickbuf_plugin -- The QuickBuffers protoc plugin, or None if using protoc-quickbuf.
     output_directory -- The base output directory to write generated files to.
     proto_dir -- The base directory with protobuf files.
+    proto_path -- Extra directories to search for protobuf files.
     """
     # Wipe away all protobuf files (and only protobuf files) first to ensure correctness
     for file in output_directory.glob("**/Protobuf*.java"):
@@ -123,6 +136,7 @@ def generate_quickbuf(
             args += [f"--plugin=protoc-gen-quickbuf={quickbuf_plugin}"]
         args += [
             f"--quickbuf_out=gen_descriptors=true:{str(output_directory.absolute())}",
+            *map(lambda path: f"-I{path}", proto_path),
             f"-I{proto_dir.absolute()}",
             str(path.absolute()),
         ]
@@ -144,7 +158,7 @@ def generate_nanopb(
     nanopb: Path,
     output_directory: Path,
     proto_dir: Path,
-    extra_search_dirs: list[Path] = [],
+    proto_path: list[Path] = [],
 ) -> None:
     """Generates QuickBuffers files.
 
@@ -152,7 +166,7 @@ def generate_nanopb(
     nanopb -- The nanopb generator.
     output_directory -- The base output directory to write generated files to.
     proto_dir -- The base directory with protobuf files.
-    extra_search_dirs -- Extra directories to search for protobuf files.,
+    proto_path -- Extra directories to search for protobuf files.
     """
     # Wipe away all protobuf files (and only protobuf files) first to ensure correctness
     for file in output_directory.glob("**/*.npb.*"):
@@ -164,7 +178,7 @@ def generate_nanopb(
             ([sys.executable] if str(nanopb).endswith(".py") else [])
             + [
                 str(nanopb),
-                *extra_search_dirs,
+                *map(lambda path: f"-I{path}", proto_path),
                 f"-I{proto_dir.absolute()}",
                 f"-D{output_directory.absolute()}",
                 "-S.cpp",
