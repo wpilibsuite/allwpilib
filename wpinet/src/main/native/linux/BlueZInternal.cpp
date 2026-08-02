@@ -174,6 +174,52 @@ class BlueZClient {
                       errorName);
   }
 
+  bool SetLEDiscoveryFilter(const std::string& adapterPath, std::string* error,
+                            std::string* errorName) {
+    return CallMethod(
+               adapterPath.c_str(), BLUEZ_ADAPTER_INTERFACE,
+               "SetDiscoveryFilter", DBUS_TIMEOUT_USE_DEFAULT,
+               [](DBusMessage* message) {
+                 DBusMessageIter iter;
+                 dbus_message_iter_init_append(message, &iter);
+
+                 DBusMessageIter filter;
+                 if (!dbus_message_iter_open_container(
+                         &iter, DBUS_TYPE_ARRAY, "{sv}", &filter)) {
+                   return false;
+                 }
+
+                 DBusMessageIter transportEntry;
+                 const char* transportKey = "Transport";
+                 const char* transportValue = "le";
+                 if (!dbus_message_iter_open_container(
+                         &filter, DBUS_TYPE_DICT_ENTRY, nullptr,
+                         &transportEntry) ||
+                     !dbus_message_iter_append_basic(
+                         &transportEntry, DBUS_TYPE_STRING, &transportKey)) {
+                   return false;
+                 }
+
+                 DBusMessageIter transportVariant;
+                 if (!dbus_message_iter_open_container(
+                         &transportEntry, DBUS_TYPE_VARIANT, "s",
+                         &transportVariant) ||
+                     !dbus_message_iter_append_basic(
+                         &transportVariant, DBUS_TYPE_STRING,
+                         &transportValue) ||
+                     !dbus_message_iter_close_container(&transportEntry,
+                                                        &transportVariant) ||
+                     !dbus_message_iter_close_container(&filter,
+                                                        &transportEntry)) {
+                   return false;
+                 }
+
+                 return dbus_message_iter_close_container(&iter, &filter) != 0;
+               },
+               error, errorName)
+               .Get() != nullptr;
+  }
+
   void StopDiscovery(const std::string& adapterPath) {
     std::string error;
     std::string errorName;
@@ -706,6 +752,12 @@ BluetoothLEDeviceScanResult ScanBlueZDevices(
 
     std::string discoveryError;
     std::string discoveryErrorName;
+    if (!bluez.SetLEDiscoveryFilter(adapter->path, &discoveryError,
+                                    &discoveryErrorName)) {
+      result.error = std::move(discoveryError);
+      return result;
+    }
+
     bool discoveryStarted = bluez.StartDiscovery(adapter->path, &discoveryError,
                                                  &discoveryErrorName);
     if (!discoveryStarted &&

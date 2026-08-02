@@ -27,6 +27,7 @@
 #include "wpi/net/uv/Async.hpp"
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/Poll.hpp"
+#include "wpi/net/uv/Timer.hpp"
 
 namespace uv = wpi::net::uv;
 
@@ -67,6 +68,7 @@ constexpr uint8_t ATT_ERROR_ATTRIBUTE_NOT_FOUND = 0x0a;
 constexpr uint16_t GATT_PRIMARY_SERVICE_UUID = 0x2800;
 constexpr uint16_t GATT_CHARACTERISTIC_UUID = 0x2803;
 constexpr uint16_t GATT_CLIENT_CHARACTERISTIC_CONFIG_UUID = 0x2902;
+constexpr uv::Timer::Time BLUETOOTH_CONNECT_TIMEOUT{8000};
 
 #ifndef MSG_NOSIGNAL
 constexpr int MSG_NOSIGNAL = 0;
@@ -393,7 +395,7 @@ class BluetoothLEPacketClient::Impl
     auto self = shared_from_this();
     m_poll->pollEvent.connect([self](int events) {
       if ((events & UV_DISCONNECT) != 0) {
-        self->CloseOnLoop("Bluetooth connection closed");
+        self->HandleSocketDisconnect();
         return;
       }
       if ((events & UV_WRITABLE) != 0) {
@@ -453,6 +455,10 @@ class BluetoothLEPacketClient::Impl
     }
 
     SetConnecting("Connecting (L2CAP)");
+    if (!StartConnectTimer()) {
+      BeginGattFallback(GetStatus().error, config, remoteAddress);
+      return;
+    }
 
     if (result == 0) {
       CheckConnect();
@@ -512,6 +518,10 @@ class BluetoothLEPacketClient::Impl
     }
 
     SetConnecting("Connecting (GATT)");
+    if (!StartConnectTimer()) {
+      CloseSocket();
+      return;
+    }
 
     if (result == 0) {
       CheckConnect();
@@ -535,6 +545,8 @@ class BluetoothLEPacketClient::Impl
   }
 
   void CloseSocket() {
+    StopConnectTimer();
+
     if (m_poll) {
       if (!m_poll->IsClosing()) {
         m_poll->Stop();
@@ -550,6 +562,64 @@ class BluetoothLEPacketClient::Impl
 
     m_activeTransport = LinuxBluetoothTransport::NONE;
     m_gattState = GattDiscoveryState::IDLE;
+  }
+
+  bool StartConnectTimer() {
+    if (!m_connectTimer) {
+      m_connectTimer = uv::Timer::Create(m_loop);
+      if (!m_connectTimer) {
+        SetError("Failed to create Bluetooth connection timer");
+        return false;
+      }
+
+      std::weak_ptr<Impl> weakSelf = weak_from_this();
+      m_connectTimer->timeout.connect([weakSelf] {
+        if (auto self = weakSelf.lock()) {
+          self->HandleConnectTimeout();
+        }
+      });
+    }
+
+    m_connectTimer->Start(BLUETOOTH_CONNECT_TIMEOUT);
+    return true;
+  }
+
+  void StopConnectTimer() {
+    if (m_connectTimer && !m_connectTimer->IsClosing()) {
+      m_connectTimer->Stop();
+    }
+  }
+
+  bool IsConnecting() const {
+    std::scoped_lock lock{m_statusMutex};
+    return m_status.connecting && !m_status.connected;
+  }
+
+  void HandleSocketDisconnect() {
+    if (m_activeTransport == LinuxBluetoothTransport::L2CAP &&
+        IsConnecting()) {
+      BeginGattFallback("Bluetooth L2CAP connection closed", m_config,
+                        m_remoteAddress);
+      return;
+    }
+
+    CloseOnLoop("Bluetooth connection closed");
+  }
+
+  void HandleConnectTimeout() {
+    if (m_socket < 0 || m_activeTransport == LinuxBluetoothTransport::NONE ||
+        !IsConnecting()) {
+      return;
+    }
+
+    if (m_activeTransport == LinuxBluetoothTransport::L2CAP) {
+      BeginGattFallback("Bluetooth L2CAP connection timed out", m_config,
+                        m_remoteAddress);
+      return;
+    }
+
+    SetError("Bluetooth GATT connection timed out");
+    CloseSocket();
   }
 
   void CloseOnLoop(std::string_view reason) {
@@ -602,6 +672,7 @@ class BluetoothLEPacketClient::Impl
     if (m_poll) {
       m_poll->Start(UV_READABLE | UV_DISCONNECT);
     }
+    StopConnectTimer();
 
     if (m_activeTransport == LinuxBluetoothTransport::GATT) {
       StartGattDiscovery();
@@ -1161,6 +1232,7 @@ class BluetoothLEPacketClient::Impl
   BluetoothLEPacketClientConfig m_config;
 
   std::shared_ptr<uv::Poll> m_poll;
+  std::shared_ptr<uv::Timer> m_connectTimer;
   int m_socket = -1;
   bdaddr_t m_remoteAddress{};
   LinuxBluetoothTransport m_activeTransport = LinuxBluetoothTransport::NONE;
