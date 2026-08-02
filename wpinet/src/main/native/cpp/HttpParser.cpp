@@ -6,6 +6,8 @@
 
 #include <string>
 
+#include <llhttp.h>
+
 using namespace wpi::net;
 
 HttpParser::HttpParser(Type type) {
@@ -178,7 +180,7 @@ HttpParser::HttpParser(Type type) {
 
 std::string_view HttpParser::Execute(std::string_view in) {
   if (in.empty()) {
-    llhttp_finish(&m_parser);
+    m_finishErr = llhttp_finish(&m_parser);
     return in;
   }
   if (llhttp_execute(&m_parser, in.data(), in.size()) == HPE_OK) {
@@ -201,4 +203,5 @@ void HttpParser::Reset(Type type) {
   m_fieldBuf.clear();
   m_valueBuf.clear();
   m_aborted = false;
+  m_finishErr = HPE_OK;
 }

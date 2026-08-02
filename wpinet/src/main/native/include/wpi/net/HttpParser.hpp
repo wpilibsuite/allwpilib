@@ -83,14 +83,20 @@ class HttpParser {
    * @return False if no error.
    */
   bool HasError() const {
-    return llhttp_get_errno(&m_parser) != HPE_OK &&
-           llhttp_get_errno(&m_parser) != HPE_PAUSED_UPGRADE;
+    return (llhttp_get_errno(&m_parser) != HPE_OK &&
+            llhttp_get_errno(&m_parser) != HPE_PAUSED_UPGRADE) ||
+           (m_finishErr != HPE_OK && m_finishErr != HPE_PAUSED);
   }
 
   /**
    * Get error number.
    */
-  llhttp_errno GetError() const { return llhttp_get_errno(&m_parser); }
+  llhttp_errno GetError() const {
+    if (m_finishErr) {
+      return m_finishErr;
+    }
+    return llhttp_get_errno(&m_parser);
+  }
 
   /**
    * Abort the parse.  Call this from a callback handler to indicate an error.
@@ -212,6 +218,7 @@ class HttpParser {
   wpi::util::SmallString<128> m_valueBuf;
 
   bool m_aborted = false;
+  llhttp_errno m_finishErr = HPE_OK;
 };
 
 }  // namespace wpi::net
