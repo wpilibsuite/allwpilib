@@ -20,6 +20,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -345,6 +346,7 @@ class BluetoothLEPacketClient::Impl
  private:
   void ConnectOnLoop(const BluetoothLEPacketClientConfig& config) {
     CloseOnLoop("Connecting");
+    uint64_t generation = ++m_connectGeneration;
 
     bdaddr_t remoteAddress{};
     if (!ParseBluetoothAddress(config.address, &remoteAddress)) {
@@ -354,9 +356,9 @@ class BluetoothLEPacketClient::Impl
     m_remoteAddress = remoteAddress;
 
     if (config.preferL2CAP) {
-      ConnectL2CAPOnLoop(config, remoteAddress);
+      ConnectL2CAPOnLoop(config, remoteAddress, generation);
     } else {
-      ConnectGattOnLoop(config, remoteAddress);
+      ConnectGattOnLoop(config, remoteAddress, generation);
     }
   }
 
@@ -419,21 +421,21 @@ class BluetoothLEPacketClient::Impl
   }
 
   void ConnectL2CAPOnLoop(const BluetoothLEPacketClientConfig& config,
-                          const bdaddr_t& remoteAddress) {
+                          const bdaddr_t& remoteAddress, uint64_t generation) {
     m_activeTransport = LinuxBluetoothTransport::L2CAP;
 
     int fd =
         ::socket(WPI_AF_BLUETOOTH, SOCK_SEQPACKET, BLUETOOTH_PROTOCOL_L2CAP);
     if (fd < 0) {
       BeginGattFallback(ErrnoString("Failed to create Bluetooth L2CAP socket"),
-                        config, remoteAddress);
+                        config, remoteAddress, generation);
       return;
     }
 
     m_socket = fd;
 
     if (!ConfigureBluetoothSocket(fd, "L2CAP")) {
-      BeginGattFallback(GetStatus().error, config, remoteAddress);
+      BeginGattFallback(GetStatus().error, config, remoteAddress, generation);
       return;
     }
 
@@ -450,18 +452,18 @@ class BluetoothLEPacketClient::Impl
                            sizeof(remoteAddr));
     if (result < 0 && errno != EINPROGRESS) {
       BeginGattFallback(ErrnoString("Failed to connect Bluetooth L2CAP socket"),
-                        config, remoteAddress);
+                        config, remoteAddress, generation);
       return;
     }
 
     if (!StartSocketPoll(fd)) {
-      BeginGattFallback(GetStatus().error, config, remoteAddress);
+      BeginGattFallback(GetStatus().error, config, remoteAddress, generation);
       return;
     }
 
     SetConnecting("Connecting (L2CAP)");
     if (!StartConnectTimer()) {
-      BeginGattFallback(GetStatus().error, config, remoteAddress);
+      BeginGattFallback(GetStatus().error, config, remoteAddress, generation);
       return;
     }
 
@@ -473,7 +475,7 @@ class BluetoothLEPacketClient::Impl
   }
 
   void ConnectGattOnLoop(const BluetoothLEPacketClientConfig& config,
-                         const bdaddr_t& remoteAddress) {
+                         const bdaddr_t& remoteAddress, uint64_t generation) {
     if (!ParseUuid128(config.gattServiceUuid, &m_gattServiceUuid) ||
         !ParseUuid128(config.gattControlCharacteristicUuid,
                       &m_gattControlCharacteristicUuid) ||
@@ -486,14 +488,48 @@ class BluetoothLEPacketClient::Impl
     m_activeTransport = LinuxBluetoothTransport::GATT;
     ResetGattDiscovery();
 
-    std::string bluezDisconnectError;
-    linuxbluetooth::DisconnectBlueZDevice(config.address,
-                                          &bluezDisconnectError);
+    m_gattBlueZDisconnectPending = true;
+    SetConnecting("Preparing Bluetooth GATT");
+    if (!StartConnectTimer()) {
+      m_gattBlueZDisconnectPending = false;
+      CloseSocket();
+      return;
+    }
 
+    std::weak_ptr<Impl> weakSelf = weak_from_this();
+    std::thread{[weakSelf, config, remoteAddress, generation] {
+      std::string bluezDisconnectError;
+      linuxbluetooth::DisconnectBlueZDevice(config.address,
+                                            &bluezDisconnectError);
+
+      if (auto self = weakSelf.lock()) {
+        self->m_exec->Send([self, config, remoteAddress, generation] {
+          self->FinishGattBlueZDisconnectOnLoop(config, remoteAddress,
+                                                generation);
+        });
+      }
+    }}.detach();
+  }
+
+  void FinishGattBlueZDisconnectOnLoop(
+      const BluetoothLEPacketClientConfig& config,
+      const bdaddr_t& remoteAddress, uint64_t generation) {
+    if (generation != m_connectGeneration || !m_gattBlueZDisconnectPending ||
+        m_activeTransport != LinuxBluetoothTransport::GATT) {
+      return;
+    }
+
+    m_gattBlueZDisconnectPending = false;
+    ConnectGattSocketOnLoop(config, remoteAddress);
+  }
+
+  void ConnectGattSocketOnLoop(const BluetoothLEPacketClientConfig& config,
+                               const bdaddr_t& remoteAddress) {
     int fd =
         ::socket(WPI_AF_BLUETOOTH, SOCK_SEQPACKET, BLUETOOTH_PROTOCOL_L2CAP);
     if (fd < 0) {
       SetError(ErrnoString("Failed to create Bluetooth GATT socket"));
+      CloseSocket();
       return;
     }
 
@@ -541,7 +577,7 @@ class BluetoothLEPacketClient::Impl
 
   void BeginGattFallback(std::string_view l2capError,
                          const BluetoothLEPacketClientConfig& config,
-                         const bdaddr_t& remoteAddress) {
+                         const bdaddr_t& remoteAddress, uint64_t generation) {
     CloseSocket();
     UpdateStatus([&](auto& status) {
       status.connecting = true;
@@ -550,7 +586,7 @@ class BluetoothLEPacketClient::Impl
       status.error = l2capError;
       status.status = "L2CAP unavailable; connecting GATT";
     });
-    ConnectGattOnLoop(config, remoteAddress);
+    ConnectGattOnLoop(config, remoteAddress, generation);
   }
 
   void CloseSocket() {
@@ -607,7 +643,7 @@ class BluetoothLEPacketClient::Impl
   void HandleSocketDisconnect() {
     if (m_activeTransport == LinuxBluetoothTransport::L2CAP && IsConnecting()) {
       BeginGattFallback("Bluetooth L2CAP connection closed", m_config,
-                        m_remoteAddress);
+                        m_remoteAddress, m_connectGeneration);
       return;
     }
 
@@ -615,22 +651,25 @@ class BluetoothLEPacketClient::Impl
   }
 
   void HandleConnectTimeout() {
-    if (m_socket < 0 || m_activeTransport == LinuxBluetoothTransport::NONE ||
-        !IsConnecting()) {
+    if (m_activeTransport == LinuxBluetoothTransport::NONE || !IsConnecting()) {
       return;
     }
 
     if (m_activeTransport == LinuxBluetoothTransport::L2CAP) {
       BeginGattFallback("Bluetooth L2CAP connection timed out", m_config,
-                        m_remoteAddress);
+                        m_remoteAddress, m_connectGeneration);
       return;
     }
 
+    ++m_connectGeneration;
     SetError("Bluetooth GATT connection timed out");
+    m_gattBlueZDisconnectPending = false;
     CloseSocket();
   }
 
   void CloseOnLoop(std::string_view reason) {
+    ++m_connectGeneration;
+    m_gattBlueZDisconnectPending = false;
     CloseSocket();
 
     if (!reason.empty()) {
@@ -654,7 +693,8 @@ class BluetoothLEPacketClient::Impl
                      &socketErrorLen) < 0) {
       std::string error = ErrnoString("Failed to query Bluetooth connection");
       if (m_activeTransport == LinuxBluetoothTransport::L2CAP) {
-        BeginGattFallback(error, m_config, m_remoteAddress);
+        BeginGattFallback(error, m_config, m_remoteAddress,
+                          m_connectGeneration);
       } else {
         SetError(error);
         CloseSocket();
@@ -669,7 +709,8 @@ class BluetoothLEPacketClient::Impl
               ? ErrnoString("Failed to connect Bluetooth GATT socket")
               : ErrnoString("Failed to connect Bluetooth L2CAP socket");
       if (m_activeTransport == LinuxBluetoothTransport::L2CAP) {
-        BeginGattFallback(error, m_config, m_remoteAddress);
+        BeginGattFallback(error, m_config, m_remoteAddress,
+                          m_connectGeneration);
       } else {
         SetError(error);
         CloseSocket();
@@ -1244,6 +1285,8 @@ class BluetoothLEPacketClient::Impl
   int m_socket = -1;
   bdaddr_t m_remoteAddress{};
   LinuxBluetoothTransport m_activeTransport = LinuxBluetoothTransport::NONE;
+  bool m_gattBlueZDisconnectPending = false;
+  uint64_t m_connectGeneration = 0;
 
   std::array<uint8_t, 16> m_gattServiceUuid{};
   std::array<uint8_t, 16> m_gattControlCharacteristicUuid{};
