@@ -19,7 +19,9 @@
 #include <utility>
 #include <vector>
 
+#include <IconsFontAwesome6Brands.h>
 #include <imgui.h>
+#include <imgui_FontAwesomeBrands.h>
 #include <imgui_internal.h>
 #include <implot.h>
 
@@ -58,6 +60,10 @@ constexpr std::array<std::string_view, 4> MOTOR_LABELS = {
     "Left motor", "Right motor", "Motor 3", "Motor 4"};
 constexpr std::array<std::string_view, 4> SERVO_LABELS = {"Servo 1", "Servo 2",
                                                           "Servo 3", "Servo 4"};
+constexpr std::string_view XRP_BLUETOOTH_WINDOW_NAME = "XRP Bluetooth";
+constexpr std::string_view XRP_CONTROL_WINDOW_NAME = "XRP Control";
+constexpr std::string_view XRP_STATUS_WINDOW_NAME = "XRP Status";
+constexpr ImWchar FONT_AWESOME_BLUETOOTH_CODEPOINT = 0xf294;
 
 using AddGuiLateExecuteFn = void (*)(std::function<void()> execute);
 using AddMainMenuFn = void (*)(std::function<void()> menu);
@@ -132,7 +138,10 @@ struct GuiState {
   bool showAddress = false;
   GuiDataSources dataSources;
   XRPDataSnapshot data;
-  std::unique_ptr<XRPWindowManager> dataWindowManager;
+  XRPConnectionStatus connectionStatus;
+  ImFontAtlas* bluetoothIconFontAtlas = nullptr;
+  ImFont* bluetoothIconFont = nullptr;
+  std::unique_ptr<XRPWindowManager> windowManager;
 };
 
 static std::weak_ptr<HALSimXRP> gSimXRP;
@@ -217,90 +226,6 @@ static std::string GetDeviceLabel(const wpi::net::BluetoothLEDeviceInfo& device,
                                                                    : "#RANDOM";
   }
   return label;
-}
-
-static bool HamburgerButton(const ImGuiID id, const ImVec2 position) {
-  const ImGuiStyle& style = ImGui::GetStyle();
-  ImGuiWindow* window = ImGui::GetCurrentWindow();
-
-  const ImRect bb{
-      position, position + ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize()) +
-                    style.FramePadding * 2.0f};
-
-  ImGui::ItemAdd(bb, id);
-
-  bool hovered;
-  bool held;
-  bool pressed = ImGui::ButtonBehavior(bb, id, &hovered, &held);
-
-  const ImU32 bgCol =
-      ImGui::GetColorU32(held ? ImGuiCol_ButtonActive : ImGuiCol_ButtonHovered);
-  const ImVec2 center = bb.GetCenter();
-  if (hovered) {
-    window->DrawList->AddCircleFilled(
-        center, ImMax(2.0f, ImGui::GetFontSize() * 0.5f + 1.0f), bgCol, 12);
-  }
-
-  const ImU32 fgCol = ImGui::GetColorU32(ImGuiCol_Text);
-  const float halfLineWidth = ImGui::GetFontSize() * 0.5f * 0.7071f;
-  const float halfTotalHeight = halfLineWidth * 0.875f;
-  ImVec2 lineStart = {center.x - halfLineWidth, center.y - halfTotalHeight};
-  ImVec2 lineEnd = {center.x + halfLineWidth, center.y - halfTotalHeight};
-  ImVec2 increment = {0.0f, halfTotalHeight};
-
-  for (int i = 0; i < 3; ++i) {
-    window->DrawList->AddLine(lineStart, lineEnd, fgCol);
-    lineStart += increment;
-    lineEnd += increment;
-  }
-
-  return pressed;
-}
-
-static void DrawViewSettingsMenu() {
-  bool titleBarClicked =
-      ImGui::IsMouseReleased(ImGuiMouseButton_Right) && ImGui::IsItemHovered();
-  ImGuiWindow* window = ImGui::GetCurrentWindow();
-
-  bool settingsButtonClicked = false;
-  if (!ImGui::IsWindowDocked() &&
-      ImGui::GetWindowWidth() > (ImGui::GetFontSize() + 2) * 3 +
-                                    ImGui::GetStyle().FramePadding.x * 2) {
-    const ImGuiItemFlags itemFlagsRestore =
-        ImGui::GetCurrentContext()->CurrentItemFlags;
-
-    ImGui::GetCurrentContext()->CurrentItemFlags |=
-        ImGuiItemFlags_NoNavDefaultFocus;
-    window->DC.NavLayerCurrent = ImGuiNavLayer_Menu;
-
-    ImGui::PushClipRect(window->OuterRectClipped.Min,
-                        window->OuterRectClipped.Max, false);
-
-    const ImRect titleBarRect = window->TitleBarRect();
-    const ImVec2 position = {titleBarRect.Max.x -
-                                 (ImGui::GetStyle().FramePadding.x * 3) -
-                                 (ImGui::GetFontSize() * 2),
-                             titleBarRect.Min.y};
-    settingsButtonClicked =
-        HamburgerButton(ImGui::GetID("#VIEW_SETTINGS"), position);
-
-    ImGui::PopClipRect();
-    ImGui::GetCurrentContext()->CurrentItemFlags = itemFlagsRestore;
-  }
-
-  if (settingsButtonClicked || titleBarClicked) {
-    ImGui::OpenPopup("View Settings");
-  }
-
-  if (ImGui::BeginPopup("View Settings",
-                        ImGuiWindowFlags_AlwaysAutoResize |
-                            ImGuiWindowFlags_NoTitleBar |
-                            ImGuiWindowFlags_NoSavedSettings)) {
-    ImGui::TextUnformatted("View Settings");
-    ImGui::Separator();
-    ImGui::Checkbox("Show address", &gGui.showAddress);
-    ImGui::EndPopup();
-  }
 }
 
 static int FindDevice(std::string_view target,
@@ -539,7 +464,6 @@ static void UpdateLatencyHistory(const XRPConnectionStatus& status) {
 }
 
 static void DrawLatencyPlot(const XRPConnectionStatus& status) {
-  UpdateLatencyHistory(status);
   if (!status.connected) {
     return;
   }
@@ -1100,40 +1024,72 @@ static void DrawXRPStatusWindow() {
   DrawStatusDataTable(gGui.data.status);
 }
 
-static void InitializeDataWindows() {
-  if (gGui.dataWindowManager || wpi::glass::GetCurrentContext() == nullptr) {
+static void DrawXRPBluetoothWindow();
+
+class XRPBluetoothView : public wpi::glass::View {
+ public:
+  void Display() override { DrawXRPBluetoothWindow(); }
+
+  void Settings() override {
+    ImGui::Checkbox("Show address", &gGui.showAddress);
+  }
+
+  bool HasSettings() override { return true; }
+};
+
+static void InitializeWindows() {
+  if (gGui.windowManager || wpi::glass::GetCurrentContext() == nullptr) {
     return;
   }
 
-  gGui.dataWindowManager = std::make_unique<XRPWindowManager>(
+  gGui.windowManager = std::make_unique<XRPWindowManager>(
       wpi::glass::GetStorageRoot().GetChild("XRP"));
 
-  if (auto window = gGui.dataWindowManager->AddWindow("XRP Control",
-                                                      DrawXRPControlWindow)) {
+  if (auto window = gGui.windowManager->AddWindow(
+          XRP_BLUETOOTH_WINDOW_NAME, std::make_unique<XRPBluetoothView>())) {
+    window->DisableRenamePopup();
+    window->SetDefaultSize(430, 320);
+  }
+  if (auto window = gGui.windowManager->AddWindow(XRP_CONTROL_WINDOW_NAME,
+                                                  DrawXRPControlWindow)) {
+    window->DisableRenamePopup();
     window->SetDefaultSize(620, 260);
   }
-  if (auto window = gGui.dataWindowManager->AddWindow("XRP Status",
-                                                      DrawXRPStatusWindow)) {
+  if (auto window = gGui.windowManager->AddWindow(XRP_STATUS_WINDOW_NAME,
+                                                  DrawXRPStatusWindow)) {
+    window->DisableRenamePopup();
     window->SetDefaultSize(620, 420);
   }
 }
 
-static void DrawXRPDataWindows() {
-  InitializeDataWindows();
-  if (gGui.dataWindowManager) {
-    gGui.dataWindowManager->DisplayManagedWindows();
+static void ShowXRPWindow(std::string_view name) {
+  InitializeWindows();
+  if (gGui.windowManager) {
+    if (auto window = gGui.windowManager->GetWindow(name)) {
+      window->SetVisible(true);
+    }
   }
 }
 
+static void DrawXRPWindows() {
+  InitializeWindows();
+  if (gGui.windowManager) {
+    gGui.windowManager->DisplayManagedWindows();
+  }
+}
+
+static void DrawXRPMenuBarStatusControls();
+
 static void DrawXRPMainMenu() {
   WithGuiContexts([] {
-    InitializeDataWindows();
+    InitializeWindows();
     if (ImGui::BeginMenu("XRP")) {
-      if (gGui.dataWindowManager) {
-        gGui.dataWindowManager->DisplayMenu();
+      if (gGui.windowManager) {
+        gGui.windowManager->DisplayMenu();
       }
       ImGui::EndMenu();
     }
+    DrawXRPMenuBarStatusControls();
   });
 }
 
@@ -1192,15 +1148,39 @@ static void DrawDeviceControls(bool commandRunning) {
   }
 }
 
+static bool HasBluetoothTarget() {
+  return gGui.address[0] != '\0';
+}
+
+static bool IsConnectionActive(const XRPConnectionStatus& status) {
+  return status.connected || status.connecting;
+}
+
+static bool CanConnectXRP(const XRPConnectionStatus& status,
+                          bool commandRunning) {
+  return status.supported && !commandRunning && HasBluetoothTarget() &&
+         !IsConnectionActive(status);
+}
+
+static bool CanDisconnectXRP(const XRPConnectionStatus& status) {
+  return status.connected || status.connecting;
+}
+
+static void ConnectXRP(HALSimXRP& simXRP) {
+  std::string target = gGui.address;
+  XRPBluetoothAddressType addressType = GetGuiAddressType();
+  simXRP.ConnectBluetooth(target, addressType,
+                          GetSelectedDeviceName(target, addressType));
+}
+
 static void DrawConnectionControls(HALSimXRP& simXRP,
                                    const XRPConnectionStatus& status,
                                    bool commandRunning) {
-  bool targetValid = gGui.address[0] != '\0';
-  bool connectionActive = status.connected || status.connecting;
   bool pairingSupported =
       wpi::net::BluetoothLEPacketClient::IsPairingSupported();
   if (pairingSupported && gGui.showAddress) {
-    ImGui::BeginDisabled(commandRunning || !targetValid || connectionActive);
+    ImGui::BeginDisabled(commandRunning || !HasBluetoothTarget() ||
+                         IsConnectionActive(status));
     if (ImGui::Button("Pair")) {
       std::string target = gGui.address;
       XRPBluetoothAddressType addressType = GetGuiAddressType();
@@ -1213,49 +1193,28 @@ static void DrawConnectionControls(HALSimXRP& simXRP,
     ImGui::EndDisabled();
     ImGui::SameLine();
   }
-  ImGui::BeginDisabled(commandRunning || !targetValid || connectionActive);
+  ImGui::BeginDisabled(!CanConnectXRP(status, commandRunning));
   if (ImGui::Button("Connect")) {
-    std::string target = gGui.address;
-    XRPBluetoothAddressType addressType = GetGuiAddressType();
-    simXRP.ConnectBluetooth(target, addressType,
-                            GetSelectedDeviceName(target, addressType));
+    ConnectXRP(simXRP);
   }
   ImGui::EndDisabled();
 
   ImGui::SameLine();
-  ImGui::BeginDisabled(!status.connected && !status.connecting);
+  ImGui::BeginDisabled(!CanDisconnectXRP(status));
   if (ImGui::Button("Disconnect")) {
     simXRP.DisconnectBluetooth();
   }
   ImGui::EndDisabled();
 }
 
-static void DrawGuiImpl() {
+static void DrawXRPBluetoothWindow() {
   auto simXRP = gSimXRP.lock();
   if (!simXRP) {
+    ImGui::TextUnformatted("XRP unavailable");
     return;
   }
 
-  UpdatePendingCommand(*simXRP);
-
-  auto status = simXRP->GetConnectionStatus();
-  InitializeFromConnection(status);
-  gGui.data = simXRP->GetDataSnapshot();
-  UpdateDataSources(gGui.data);
-
-  ImGui::SetNextWindowSize(ImVec2{430, 0}, ImGuiCond_FirstUseEver);
-  float minWidth =
-      ImGui::CalcTextSize("XRP Bluetooth").x + ImGui::GetFontSize() * 3 +
-      ImGui::GetStyle().ItemInnerSpacing.x * 3 +
-      ImGui::GetStyle().FramePadding.x * 3 + ImGui::GetStyle().WindowBorderSize;
-  ImGui::SetNextWindowSizeConstraints({minWidth, 0}, ImVec2{FLT_MAX, FLT_MAX});
-  if (!ImGui::Begin("XRP Bluetooth")) {
-    ImGui::End();
-    DrawXRPDataWindows();
-    return;
-  }
-  DrawViewSettingsMenu();
-
+  const auto& status = gGui.connectionStatus;
   ImVec4 statusColor = status.connected    ? ImVec4{0.25f, 0.75f, 0.35f, 1.0f}
                        : status.connecting ? ImVec4{0.95f, 0.7f, 0.25f, 1.0f}
                                            : ImVec4{0.75f, 0.75f, 0.75f, 1.0f};
@@ -1287,9 +1246,177 @@ static void DrawGuiImpl() {
               status.packetsSent, status.packetsReceived);
 
   DrawLatencyPlot(status);
+}
 
-  ImGui::End();
-  DrawXRPDataWindows();
+enum class XRPMenuIcon { CONNECT, DISCONNECT, BLUETOOTH };
+
+static ImFont* GetXRPBluetoothFont() {
+  ImFontAtlas* fonts = ImGui::GetIO().Fonts;
+  if (gGui.bluetoothIconFontAtlas == fonts && gGui.bluetoothIconFont) {
+    return gGui.bluetoothIconFont;
+  }
+
+  if (fonts->Locked || fonts->Fonts.empty()) {
+    return nullptr;
+  }
+
+  static constexpr ImWchar glyphRanges[] = {
+      FONT_AWESOME_BLUETOOTH_CODEPOINT, FONT_AWESOME_BLUETOOTH_CODEPOINT, 0};
+
+  ImFontConfig fontConfig;
+  std::snprintf(fontConfig.Name, sizeof(fontConfig.Name), "XRP Bluetooth Icon");
+  gGui.bluetoothIconFont = ImGui::AddFontFontAwesomeBrands(
+      ImGui::GetIO(), 0, &fontConfig, glyphRanges);
+  gGui.bluetoothIconFontAtlas = fonts;
+  return gGui.bluetoothIconFont;
+}
+
+static void DrawBluetoothFallbackIcon(ImDrawList* drawList, ImVec2 center,
+                                      ImVec2 size, ImU32 color, float stroke) {
+  ImVec2 top{center.x, center.y - size.y * 0.34f};
+  ImVec2 bottom{center.x, center.y + size.y * 0.34f};
+  ImVec2 rightTop{center.x + size.x * 0.22f, center.y - size.y * 0.18f};
+  ImVec2 rightBottom{center.x + size.x * 0.22f, center.y + size.y * 0.18f};
+  ImVec2 leftTop{center.x - size.x * 0.20f, center.y - size.y * 0.19f};
+  ImVec2 leftBottom{center.x - size.x * 0.20f, center.y + size.y * 0.19f};
+
+  drawList->AddLine(top, bottom, color, stroke);
+  drawList->AddLine(top, rightTop, color, stroke);
+  drawList->AddLine(rightTop, center, color, stroke);
+  drawList->AddLine(center, rightBottom, color, stroke);
+  drawList->AddLine(rightBottom, bottom, color, stroke);
+  drawList->AddLine(leftTop, center, color, stroke);
+  drawList->AddLine(center, leftBottom, color, stroke);
+}
+
+static void DrawXRPMenuIcon(ImDrawList* drawList, XRPMenuIcon icon, ImVec2 min,
+                            ImVec2 max, ImU32 color) {
+  ImVec2 size{max.x - min.x, max.y - min.y};
+  ImVec2 center{(min.x + max.x) * 0.5f, (min.y + max.y) * 0.5f};
+  float stroke = std::max(1.0f, size.y * 0.08f);
+
+  if (icon == XRPMenuIcon::CONNECT) {
+    ImVec2 p1{center.x - size.x * 0.18f, center.y - size.y * 0.24f};
+    ImVec2 p2{center.x - size.x * 0.18f, center.y + size.y * 0.24f};
+    ImVec2 p3{center.x + size.x * 0.24f, center.y};
+    drawList->AddTriangleFilled(p1, p2, p3, color);
+  } else if (icon == XRPMenuIcon::DISCONNECT) {
+    ImVec2 rectMin{center.x - size.x * 0.19f, center.y - size.y * 0.19f};
+    ImVec2 rectMax{center.x + size.x * 0.19f, center.y + size.y * 0.19f};
+    drawList->AddRectFilled(rectMin, rectMax, color, stroke);
+  } else {
+    const char* iconText = ICON_FA_BLUETOOTH_B;
+    float fontSize = ImGui::GetFontSize();
+    if (ImFont* font = GetXRPBluetoothFont();
+        font && font->GetFontBaked(fontSize)->FindGlyphNoFallback(
+                    FONT_AWESOME_BLUETOOTH_CODEPOINT)) {
+      ImVec2 textSize = font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, iconText);
+      drawList->AddText(
+          font, fontSize,
+          {center.x - textSize.x * 0.5f, center.y - textSize.y * 0.5f}, color,
+          iconText);
+    } else {
+      DrawBluetoothFallbackIcon(drawList, center, size, color, stroke);
+    }
+  }
+}
+
+static bool XRPMenuIconButton(const char* id, const char* tooltip, bool enabled,
+                              XRPMenuIcon icon) {
+  ImVec2 buttonSize{ImGui::GetFrameHeight(), ImGui::GetFrameHeight()};
+  bool pressed = ImGui::InvisibleButton(id, buttonSize) && enabled;
+  bool hovered = ImGui::IsItemHovered();
+  bool active = ImGui::IsItemActive();
+
+  ImVec2 min = ImGui::GetItemRectMin();
+  ImVec2 max = ImGui::GetItemRectMax();
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+  if (enabled && (hovered || active)) {
+    drawList->AddRectFilled(min, max,
+                            ImGui::GetColorU32(active ? ImGuiCol_ButtonActive
+                                                      : ImGuiCol_ButtonHovered),
+                            ImGui::GetStyle().FrameRounding);
+  }
+
+  DrawXRPMenuIcon(
+      drawList, icon, min, max,
+      ImGui::GetColorU32(enabled ? ImGuiCol_Text : ImGuiCol_TextDisabled));
+
+  if (hovered) {
+    ImGui::SetTooltip("%s", tooltip);
+  }
+
+  return pressed;
+}
+
+static void DrawXRPConnectionBadge(const XRPConnectionStatus& status) {
+  ImVec2 badgeSize{ImGui::GetFrameHeight(), ImGui::GetFrameHeight()};
+  ImGui::InvisibleButton("##XRPConnectionBadge", badgeSize);
+  bool hovered = ImGui::IsItemHovered();
+  ImVec2 min = ImGui::GetItemRectMin();
+  ImVec2 max = ImGui::GetItemRectMax();
+  ImVec2 center{(min.x + max.x) * 0.5f, (min.y + max.y) * 0.5f};
+  ImVec4 color = status.connected ? ImVec4{0.25f, 0.75f, 0.35f, 1.0f}
+                                  : ImVec4{0.85f, 0.25f, 0.25f, 1.0f};
+  ImGui::GetWindowDrawList()->AddCircleFilled(
+      center, ImGui::GetFontSize() * 0.32f,
+      ImGui::ColorConvertFloat4ToU32(color), 18);
+
+  if (hovered) {
+    const char* fallback = status.connected ? "connected" : "disconnected";
+    ImGui::SetTooltip("XRP %s",
+                      status.status.empty() ? fallback : status.status.c_str());
+  }
+}
+
+static void DrawXRPMenuBarStatusControls() {
+  const ImGuiStyle& style = ImGui::GetStyle();
+  float buttonSize = ImGui::GetFrameHeight();
+  float controlsWidth = buttonSize * 4.0f + style.ItemSpacing.x * 3.0f;
+  float currentX = ImGui::GetCursorPosX();
+  float targetX =
+      ImGui::GetWindowWidth() - controlsWidth - style.WindowPadding.x;
+  ImGui::SameLine(std::max(currentX + style.ItemSpacing.x, targetX));
+
+  const auto& status = gGui.connectionStatus;
+  bool commandRunning = gGui.pendingCommand.valid();
+  auto simXRP = gSimXRP.lock();
+
+  DrawXRPConnectionBadge(status);
+  ImGui::SameLine();
+  if (XRPMenuIconButton("##XRPConnect", "Connect XRP",
+                        simXRP && CanConnectXRP(status, commandRunning),
+                        XRPMenuIcon::CONNECT)) {
+    ConnectXRP(*simXRP);
+  }
+  ImGui::SameLine();
+  if (XRPMenuIconButton("##XRPDisconnect", "Disconnect XRP",
+                        simXRP && CanDisconnectXRP(status),
+                        XRPMenuIcon::DISCONNECT)) {
+    simXRP->DisconnectBluetooth();
+  }
+  ImGui::SameLine();
+  if (XRPMenuIconButton("##XRPBluetoothSettings", "XRP Bluetooth Settings",
+                        true, XRPMenuIcon::BLUETOOTH)) {
+    ShowXRPWindow(XRP_BLUETOOTH_WINDOW_NAME);
+  }
+}
+
+static void DrawGuiImpl() {
+  auto simXRP = gSimXRP.lock();
+  if (!simXRP) {
+    DrawXRPWindows();
+    return;
+  }
+
+  UpdatePendingCommand(*simXRP);
+
+  gGui.connectionStatus = simXRP->GetConnectionStatus();
+  InitializeFromConnection(gGui.connectionStatus);
+  gGui.data = simXRP->GetDataSnapshot();
+  UpdateDataSources(gGui.data);
+  UpdateLatencyHistory(gGui.connectionStatus);
+  DrawXRPWindows();
 }
 
 static void DrawGui() {
