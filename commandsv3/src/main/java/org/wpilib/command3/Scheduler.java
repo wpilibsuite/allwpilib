@@ -273,11 +273,21 @@ public final class Scheduler implements ProtobufSerializable {
    * control back to the scheduler with {@link Coroutine#yield} or risk stalling your program in an
    * unrecoverable infinite loop!
    *
+   * <p>The coroutines provided to sideloaded functions will not cancel themselves if a fork or
+   * await call fails. This allows user code the opportunity to recover from a failure. You can opt
+   * into canceling the coroutine if a fork or await call fails by calling
+   * {@link Coroutine#setCancelOnForkFailure(boolean)}.
+   *
    * @param callback the callback to sideload
    * @see #addPeriodic(Runnable)
    */
   public void sideload(Consumer<Coroutine> callback) {
     var coroutine = new Coroutine(this, m_scope, callback);
+    // Sideloaded functions shouldn't be canceled if a command can't be forked. The default behavior
+    // should allow user code the opportunity to recover from a failure. This differs from
+    // coroutines issued to commands, which should fail by default to prevent unexpected robot state
+    coroutine.setCancelOnForkFailure(false);
+
     var scope = BindingScope.createNarrowestScope(this);
     m_periodicCallbacks.add(new PeriodicCallback(scope, coroutine));
   }
@@ -797,15 +807,16 @@ public final class Scheduler implements ProtobufSerializable {
       }
 
       // Update periodic callbacks
-      callback.coroutine().mount();
+      Coroutine coroutine = callback.coroutine();
+      coroutine.mount();
       try {
-        callback.coroutine().runToYieldPoint();
+        coroutine.runToYieldPoint();
       } finally {
         Continuation.mountContinuation(null);
       }
 
-      if (callback.coroutine().isDone()) {
-        // Callback finished - remove it from the list
+      if (coroutine.isDone() || coroutine.isInterruptRequested()) {
+        // Callback finished or requested interrupt - remove it from the list
         iterator.remove();
       }
     }

@@ -122,4 +122,27 @@ class SchedulerSideloadFunctionTests extends CommandTestBase {
     assertTrue(signal.get(), "Sideload should have run and set the signal");
     assertTrue(m_scheduler.isRunning(command), "Command should have started");
   }
+
+  @Test
+  void sideloadFailingToForkDoesNotCancel() {
+    var mech = new DummyMechanism("Mech", m_scheduler);
+    Command highPriority = new PriorityCommand(100, mech);
+    Command lowPriority = new PriorityCommand(0, mech);
+
+    AtomicBoolean reached = new AtomicBoolean(false);
+
+    m_scheduler.sideload(
+        coroutine -> {
+          var result = coroutine.fork(lowPriority);
+          reached.set(true);
+          assertTrue(
+              result instanceof Coroutine.ForkResultFailure(var fails)
+                  && fails.size() == 1
+                  && fails.getFirst().command().equals(lowPriority));
+        });
+
+    m_scheduler.schedule(highPriority);
+    m_scheduler.run();
+    assertTrue(reached.get(), "sideload function was terminated before it reached assertions");
+  }
 }
