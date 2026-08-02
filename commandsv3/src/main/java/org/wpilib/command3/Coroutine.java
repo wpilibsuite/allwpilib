@@ -7,6 +7,7 @@ package org.wpilib.command3;
 import static org.wpilib.units.Units.Seconds;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -25,6 +26,9 @@ public final class Coroutine {
   private final Scheduler m_scheduler;
   private final Continuation m_backingContinuation;
 
+  private boolean m_cancelOnForkFailure = true;
+  private ForkResultFailure m_lastForkFailure = null;
+
   /**
    * Creates a new coroutine. Package-private; only the scheduler should be creating these.
    *
@@ -36,6 +40,39 @@ public final class Coroutine {
   Coroutine(Scheduler scheduler, ContinuationScope scope, Consumer<Coroutine> callback) {
     m_scheduler = scheduler;
     m_backingContinuation = new Continuation(scope, () -> callback.accept(this));
+  }
+
+  /**
+   * Configures the coroutine to cancel itself if a child command couldn't be forked. This setting
+   * defaults to {@code true}, but can be changed to allow the coroutine to continue running after a
+   * fork failure.
+   *
+   * @param cancelOnForkFailure true to make the coroutine cancel itself if a child command couldn't
+   *     be forked, false to allow the coroutine to continue running after a fork failure
+   */
+  public void setCancelOnForkFailure(boolean cancelOnForkFailure) {
+    m_cancelOnForkFailure = cancelOnForkFailure;
+  }
+
+  /**
+   * Checks if the coroutine is currently configured to cancel itself if a child command couldn't be
+   * forked.
+   *
+   * @return true if the coroutine will cancel itself if a child command couldn't be forked, false
+   *     otherwise
+   */
+  public boolean isCancelOnForkFailure() {
+    return m_cancelOnForkFailure;
+  }
+
+  // Package-private. User code can never access this because setting the flag happens immediately
+  // before the coroutine yields itself.
+  boolean isInterruptRequested() {
+    return m_cancelOnForkFailure && m_lastForkFailure != null;
+  }
+
+  ForkResultFailure getForkResult() {
+    return m_lastForkFailure;
   }
 
   /**
@@ -67,9 +104,69 @@ public final class Coroutine {
     }
   }
 
+  /** The result of an attempt to fork or await commands. */
+  public sealed interface ForkResult {}
+
+  /** Commands were successfully forked. */
+  public record ForkResultSuccess() implements ForkResult {
+    // No state, so may as well use a singleton
+    private static final ForkResultSuccess INSTANCE = new ForkResultSuccess();
+  }
+
   /**
-   * Schedules a child command and then immediately returns. The child command will run until its
+   * At least one command was unable to be scheduled because a command with a higher priority is
+   * already running and owns at least one of the same required mechanisms.
+   *
+   * @param failed The failed scheduling attempts.
+   */
+  public record ForkResultFailure(List<Scheduler.ScheduleResult> failed) implements ForkResult {}
+
+  /**
+   * Checks that all the given commands can be forked.
+   *
+   * @param commands The commands to check
+   * @return A failure-type ForkResult if the commands can't all be scheduled, or null on success.
+   */
+  private ForkResultFailure checkAllForkable(Collection<? extends Command> commands) {
+    // Check for user error; there's no reason to fork conflicting commands simultaneously
+    // Because this is a bug in user code, throw an error instead of returning a failure result
+    ConflictDetector.throwIfConflicts(commands);
+
+    var unschedulable = new ArrayList<Scheduler.ScheduleResult>();
+    for (var command : commands) {
+      var result = m_scheduler.isSchedulable(command);
+      if (!result.successful()) {
+        unschedulable.add(result);
+      }
+    }
+
+    if (!unschedulable.isEmpty()) {
+      var failure = new ForkResultFailure(unschedulable);
+      if (m_cancelOnForkFailure) {
+        // Canceling on fork failure means no coroutine or user code gets to run to handle the
+        // failure result
+        m_lastForkFailure = failure;
+        this.yield();
+        // could throw an IllegalStateException, but probably shouldn't crash user code
+        return failure;
+      } else {
+        // always return the failure object if self-cancellation is disabled
+        return failure;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Schedules child commands and then immediately returns. The child commands will run until their
    * natural completion, the parent command exits, or the parent command cancels it.
+   *
+   * <p>If any child command is unable to be scheduled per the contract of {@link
+   * Scheduler#isSchedulable(Command)}, then none of the commands will be scheduled and the method
+   * call will return a {@link ForkResultFailure} containing the unschedulable commands. If the
+   * coroutine is configured to cancel on fork failure, then the coroutine will be canceled and user
+   * code will not get a chance to handle the failure result.
    *
    * <p>This is a nonblocking operation. To fork and then wait for the child command to complete,
    * use {@link #await(Command)}.
@@ -93,10 +190,13 @@ public final class Coroutine {
    * command will not be scheduled, and the existing command will continue to run.
    *
    * @param commands The commands to fork.
+   * @return a result indicating whether the fork was successful or if the commands could not be
+   *     forked
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
    * @see #await(Command)
+   * @see #setCancelOnForkFailure(boolean)
    */
-  public void fork(Command... commands) {
+  public ForkResult fork(Command... commands) {
     requireMounted();
 
     requireNonNullParam(commands, "commands", "Coroutine.fork");
@@ -104,13 +204,17 @@ public final class Coroutine {
       requireNonNullParam(commands[i], "commands[" + i + "]", "Coroutine.fork");
     }
 
-    // Check for user error; there's no reason to fork conflicting commands simultaneously
-    ConflictDetector.throwIfConflicts(List.of(commands));
+    var failure = checkAllForkable(Arrays.asList(commands));
+    if (failure != null) {
+      return failure;
+    }
 
     // Shorthand; this is handy for user-defined compositions
     for (var command : commands) {
       m_scheduler.schedule(command);
     }
+
+    return ForkResultSuccess.INSTANCE;
   }
 
   /**
@@ -118,6 +222,12 @@ public final class Coroutine {
    * exits, or the parent command cancels it. The parent command will continue executing while the
    * forked commands run, and can resync with the forked commands using {@link
    * #awaitAll(Collection)}.
+   *
+   * <p>If any child command is unable to be scheduled per the contract of {@link
+   * Scheduler#isSchedulable(Command)}, then none of the commands will be scheduled and the method
+   * call will return a {@link ForkResultFailure} containing the unschedulable commands. If the
+   * coroutine is configured to cancel on fork failure, then the coroutine will be canceled and user
+   * code will not get a chance to handle the failure result.
    *
    * <pre>{@code
    * Command example() {
@@ -135,10 +245,13 @@ public final class Coroutine {
    * command will not be scheduled, and the existing command will continue to run.
    *
    * @param commands The commands to fork.
+   * @return a result indicating whether the fork was successful or if the commands could not be
+   *     forked
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
+   * @see #setCancelOnForkFailure(boolean)
    */
-  public void fork(Collection<? extends Command> commands) {
-    fork(commands.toArray(Command[]::new));
+  public ForkResult fork(Collection<? extends Command> commands) {
+    return fork(commands.toArray(Command[]::new));
   }
 
   /**
@@ -146,14 +259,28 @@ public final class Coroutine {
    * be scheduled automatically. This is a blocking operation and will not return until the command
    * completes or has been interrupted by another command scheduled by the same parent.
    *
+   * <p>If the child command is unable to be scheduled per the contract of {@link
+   * Scheduler#isSchedulable(Command)}, then it will not be scheduled and the method call will
+   * return a {@link ForkResultFailure} containing the command. If the coroutine is configured to
+   * cancel on fork failure, then the coroutine will be canceled and user code will not get a chance
+   * to handle the failure result.
+   *
    * @param command the command to await
+   * @return a result indicating whether the await was successful or if the commands could not be
+   *     awaited
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
    * @see #fork(Command...)
+   * @see #setCancelOnForkFailure(boolean)
    */
-  public void await(Command command) {
+  public ForkResult await(Command command) {
     requireMounted();
 
     requireNonNullParam(command, "command", "Coroutine.await");
+
+    var failure = checkAllForkable(List.of(command));
+    if (failure != null) {
+      return failure;
+    }
 
     m_scheduler.schedule(command);
 
@@ -162,17 +289,28 @@ public final class Coroutine {
       // There would be nothing to await
       this.yield();
     }
+
+    return new ForkResultSuccess();
   }
 
   /**
-   * Awaits completion of all given commands. If any command is not current scheduled or running, it
-   * will be scheduled.
+   * Awaits completion of all given commands. If any command is not currently scheduled or running,
+   * it will be scheduled.
+   *
+   * <p>If any child command is unable to be scheduled per the contract of {@link
+   * Scheduler#isSchedulable(Command)}, then none of the commands will be scheduled and the method
+   * call will return a {@link ForkResultFailure} containing the unschedulable commands. If the
+   * coroutine is configured to cancel on fork failure, then the coroutine will be canceled and user
+   * code will not get a chance to handle the failure result.
    *
    * @param commands the commands to await
+   * @return a result indicating whether the await was successful or if the commands could not be
+   *     awaited
    * @throws IllegalArgumentException if any of the commands conflict with each other
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
+   * @see #setCancelOnForkFailure(boolean)
    */
-  public void awaitAll(Collection<? extends Command> commands) {
+  public ForkResult awaitAll(Collection<? extends Command> commands) {
     requireMounted();
 
     requireNonNullParam(commands, "commands", "Coroutine.awaitAll");
@@ -182,7 +320,10 @@ public final class Coroutine {
       i++;
     }
 
-    ConflictDetector.throwIfConflicts(commands);
+    var failure = checkAllForkable(commands);
+    if (failure != null) {
+      return failure;
+    }
 
     for (var command : commands) {
       m_scheduler.schedule(command);
@@ -191,29 +332,49 @@ public final class Coroutine {
     while (commands.stream().anyMatch(m_scheduler::isScheduledOrRunning)) {
       this.yield();
     }
+
+    return new ForkResultSuccess();
   }
 
   /**
-   * Awaits completion of all given commands. If any command is not current scheduled or running, it
-   * will be scheduled.
+   * Awaits completion of all given commands. If any command is not currently scheduled or running,
+   * it will be scheduled.
+   *
+   * <p>If any child command is unable to be scheduled per the contract of {@link
+   * Scheduler#isSchedulable(Command)}, then none of the commands will be scheduled and the method
+   * call will return a {@link ForkResultFailure} containing the unschedulable commands. If the
+   * coroutine is configured to cancel on fork failure, then the coroutine will be canceled and user
+   * code will not get a chance to handle the failure result.
    *
    * @param commands the commands to await
+   * @return a result indicating whether the await was successful or if the commands could not be
+   *     awaited
    * @throws IllegalArgumentException if any of the commands conflict with each other
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
+   * @see #setCancelOnForkFailure(boolean)
    */
-  public void awaitAll(Command... commands) {
-    awaitAll(Arrays.asList(commands));
+  public ForkResult awaitAll(Command... commands) {
+    return awaitAll(Arrays.asList(commands));
   }
 
   /**
    * Awaits completion of any given commands. Any command that's not already scheduled or running
-   * will be scheduled. After any of the given commands completes, the rest will be canceled.
+   * will be scheduled. After any of the given commands complete, the rest will be canceled.
+   *
+   * <p>If any child command is unable to be scheduled per the contract of {@link
+   * Scheduler#isSchedulable(Command)}, then none of the commands will be scheduled and the method
+   * call will return a {@link ForkResultFailure} containing the unschedulable commands. If the
+   * coroutine is configured to cancel on fork failure, then the coroutine will be canceled and user
+   * code will not get a chance to handle the failure result.
    *
    * @param commands the commands to await
+   * @return a result indicating whether the await was successful or if the commands could not be
+   *     awaited
    * @throws IllegalArgumentException if any of the commands conflict with each other
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
+   * @see #setCancelOnForkFailure(boolean)
    */
-  public void awaitAny(Collection<? extends Command> commands) {
+  public ForkResult awaitAny(Collection<? extends Command> commands) {
     requireMounted();
 
     requireNonNullParam(commands, "commands", "Coroutine.awaitAny");
@@ -223,7 +384,10 @@ public final class Coroutine {
       i++;
     }
 
-    ConflictDetector.throwIfConflicts(commands);
+    var failure = checkAllForkable(commands);
+    if (failure != null) {
+      return failure;
+    }
 
     // Schedule anything that's not already queued or running
     for (var command : commands) {
@@ -236,18 +400,29 @@ public final class Coroutine {
 
     // At least one command exited; cancel the rest.
     commands.forEach(m_scheduler::cancel);
+
+    return ForkResultSuccess.INSTANCE;
   }
 
   /**
    * Awaits completion of any given commands. Any command that's not already scheduled or running
    * will be scheduled. After any of the given commands completes, the rest will be canceled.
    *
+   * <p>If any child command is unable to be scheduled per the contract of {@link
+   * Scheduler#isSchedulable(Command)}, then none of the commands will be scheduled and the method
+   * call will return a {@link ForkResultFailure} containing the unschedulable commands. If the
+   * coroutine is configured to cancel on fork failure, then the coroutine will be canceled and user
+   * code will not get a chance to handle the failure result.
+   *
    * @param commands the commands to await
+   * @return a result indicating whether the await was successful or if the commands could not be
+   *     awaited
    * @throws IllegalArgumentException if any of the commands conflict with each other
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
+   * @see #setCancelOnForkFailure(boolean)
    */
-  public void awaitAny(Command... commands) {
-    awaitAny(Arrays.asList(commands));
+  public ForkResult awaitAny(Command... commands) {
+    return awaitAny(Arrays.asList(commands));
   }
 
   /**

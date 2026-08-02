@@ -22,6 +22,8 @@ import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.wpilib.annotation.NoDiscard;
+import org.wpilib.command3.Scheduler.ScheduleResult.LowerPriorityThanQueuedCommand;
+import org.wpilib.command3.Scheduler.ScheduleResult.LowerPriorityThanRunningCommand;
 import org.wpilib.command3.button.CommandGenericHID;
 import org.wpilib.command3.proto.SchedulerProto;
 import org.wpilib.event.EventLoop;
@@ -324,14 +326,140 @@ public final class Scheduler implements ProtobufSerializable {
         });
   }
 
-  /** Represents possible results of a command scheduling attempt. */
-  public enum ScheduleResult {
-    /** The command was successfully scheduled and added to the queue. */
-    SUCCESS,
-    /** The command is already scheduled or running. */
-    ALREADY_RUNNING,
-    /** The command is a lower priority and conflicts with a command that's already running. */
-    LOWER_PRIORITY_THAN_RUNNING_COMMAND,
+  /**
+   * Represents possible results of a command scheduling attempt. These can be used either as
+   * concrete results after a command was attempted to be scheduled, or as predictive results when
+   * checking if a command can be scheduled before committing to it.
+   */
+  public sealed interface ScheduleResult {
+    /**
+     * The command that was attempted to be scheduled.
+     *
+     * @return the command that was attempted to be scheduled
+     */
+    Command command();
+
+    /**
+     * Whether the scheduling attempt was successful.
+     *
+     * @return true if the scheduling attempt was successful, false if it failed
+     */
+    boolean successful();
+
+    /**
+     * A successful scheduling attempt.
+     *
+     * @param command the command that was successfully scheduled
+     */
+    record Success(Command command) implements ScheduleResult {
+      /**
+       * A successful scheduling attempt is always successful.
+       *
+       * @return true
+       */
+      @Override
+      public boolean successful() {
+        return true;
+      }
+    }
+
+    /**
+     * A scheduling attempt that was redundant because the command was already running.
+     *
+     * @param command the command that was attempted to be scheduled
+     */
+    record AlreadyRunning(Command command) implements ScheduleResult {
+      /**
+       * A scheduling attempt that was redundant because the command was already running is always
+       * successful.
+       *
+       * @return true
+       */
+      @Override
+      public boolean successful() {
+        return true;
+      }
+    }
+
+    /**
+     * A scheduling attempt that failed because the command was lower priority than a running
+     * command with shared requirements.
+     *
+     * @param command the command that failed to be scheduled
+     * @param alreadyRunning the running command that prevented the command from being scheduled
+     */
+    record LowerPriorityThanRunningCommand(Command command, Command alreadyRunning)
+        implements ScheduleResult {
+      /**
+       * A scheduling attempt that failed because the command was lower priority than a running
+       * command with shared requirements is always unsuccessful.
+       *
+       * @return false
+       */
+      @Override
+      public boolean successful() {
+        return false;
+      }
+    }
+
+    /**
+     * A scheduling attempt that failed because the command was lower priority than a queued command
+     * with shared requirements.
+     *
+     * @param command the command that failed to be scheduled
+     * @param queuedCommand the queued command that prevented the command from being scheduled
+     */
+    record LowerPriorityThanQueuedCommand(Command command, Command queuedCommand)
+        implements ScheduleResult {
+      /**
+       * A scheduling attempt that failed because the command was lower priority than a queued
+       * command with shared requirements is always unsuccessful.
+       *
+       * @return false
+       */
+      @Override
+      public boolean successful() {
+        return false;
+      }
+    }
+  }
+
+  /**
+   * Checks if a command is able to be scheduled. Returns of the following states:
+   *
+   * <ul>
+   *   <li>{@link ScheduleResult.AlreadyRunning} if the command is already scheduled or running.
+   *   <li>{@link ScheduleResult.Success} if the command is not already scheduled or running and
+   *       does not conflict with any other scheduled or running commands.
+   *   <li>{@link LowerPriorityThanRunningCommand} if the command has a lower priority than a
+   *       running command that shares requirements
+   *   <li>{@link LowerPriorityThanQueuedCommand} if the command has a lower priority than a queued
+   *       command that shares requirements
+   * </ul>
+   *
+   * @param command The command to check. Cannot be null.
+   * @return A schedule result indicating the schedulability of the command.
+   */
+  @NoDiscard
+  public ScheduleResult isSchedulable(Command command) {
+    ErrorMessages.requireNonNullParam(command, "command", "isSchedulable");
+
+    if (isScheduledOrRunning(command)) {
+      return new ScheduleResult.AlreadyRunning(command);
+    }
+
+    var running = m_runningCommands.values();
+    Command conflict = lowerPriorityThanConflictingCommands(command, running);
+    if (conflict != null) {
+      return new LowerPriorityThanRunningCommand(command, conflict);
+    }
+
+    conflict = lowerPriorityThanConflictingCommands(command, m_queuedToRun);
+    if (conflict != null) {
+      return new LowerPriorityThanQueuedCommand(command, conflict);
+    }
+
+    return new ScheduleResult.Success(command);
   }
 
   /**
@@ -341,6 +469,12 @@ public final class Scheduler implements ProtobufSerializable {
    *
    * <p>Does nothing if the command is already scheduled or running, or requires at least one
    * mechanism already used by a higher priority command.
+   *
+   * <p>For purposes of scheduling, a child command is considered to have a priority equal to the
+   * highest priority in its scheduling hierarchy. For example, if a parent command with priority 10
+   * schedules a child command with priority 5, the child command will be treated as having a
+   * priority of 10 and will interrupt any conflicting command with a priority of 10 or lower,
+   * rather than the usual 5.
    *
    * @param command the command to schedule
    * @return the result of the scheduling attempt. See {@link ScheduleResult} for details.
@@ -372,24 +506,9 @@ public final class Scheduler implements ProtobufSerializable {
   ScheduleResult schedule(Binding binding) {
     var command = binding.command();
 
-    if (isScheduledOrRunning(command)) {
-      return ScheduleResult.ALREADY_RUNNING;
-    }
-
-    if (lowerPriorityThanConflictingCommands(command)) {
-      return ScheduleResult.LOWER_PRIORITY_THAN_RUNNING_COMMAND;
-    }
-
-    for (var scheduledState : m_queuedToRun) {
-      if (!command.conflictsWith(scheduledState.command())) {
-        // No shared requirements, skip
-        continue;
-      }
-      if (command.isLowerPriorityThan(scheduledState.command())) {
-        // Lower priority than an already-scheduled (but not yet running) command that requires at
-        // one of the same mechanism. Ignore it.
-        return ScheduleResult.LOWER_PRIORITY_THAN_RUNNING_COMMAND;
-      }
+    var result = isSchedulable(command);
+    if (!(result instanceof ScheduleResult.Success)) {
+      return result;
     }
 
     // Track this binding so we can disable it when it's out of scope.
@@ -427,33 +546,39 @@ public final class Scheduler implements ProtobufSerializable {
       m_queuedToRun.add(state);
     }
 
-    return ScheduleResult.SUCCESS;
+    return result;
   }
 
   /**
    * Checks if a command conflicts with and is a lower priority than any running command. Used when
    * determining if the command can be scheduled.
+   *
+   * @return The conflicting command, or null if there is no conflict
    */
-  private boolean lowerPriorityThanConflictingCommands(Command command) {
+  private Command lowerPriorityThanConflictingCommands(
+      Command command, Collection<CommandState> checkAgainst) {
     Set<CommandState> ancestors = new HashSet<>();
+    // Inherit priority from ancestor commands
+    int maxAncestorPriority = command.priority();
     for (var state = currentState(); state != null; state = m_runningCommands.get(state.parent())) {
       ancestors.add(state);
+      maxAncestorPriority = Math.max(maxAncestorPriority, state.command().priority());
     }
 
     // Check for conflicts with the commands that are already running
-    for (var state : m_runningCommands.values()) {
+    for (var state : checkAgainst) {
       if (ancestors.contains(state)) {
         // Can't conflict with an ancestor command
         continue;
       }
 
       var c = state.command();
-      if (c.conflictsWith(command) && command.isLowerPriorityThan(c)) {
-        return true;
+      if (c.conflictsWith(command) && maxAncestorPriority < c.priority()) {
+        return c;
       }
     }
 
-    return false;
+    return null;
   }
 
   private void evictConflictingOnDeckCommands(Command command) {
@@ -687,6 +812,8 @@ public final class Scheduler implements ProtobufSerializable {
   }
 
   private void runCommands() {
+    // TODO: Track command roots and run the commands in each root in reverse order, but run the
+    //       roots in insertion order
     // Tick every command that hasn't been completed yet
     // Run in reverse so parent commands can resume in the same loop cycle an awaited child command
     // completes. Otherwise, parents could only resume on the next loop cycle, introducing a delay
@@ -741,15 +868,44 @@ public final class Scheduler implements ProtobufSerializable {
     }
 
     if (coroutine.isDone()) {
-      // Immediately check if the command has completed and remove any children commands.
-      // This prevents child commands from being executed one extra time in the run() loop
-      emitCompletedEvent(command);
-      m_runningCommands.remove(command);
-      removeOrphanedChildren(command);
+      handleCommandCompletion(command);
+    } else if (coroutine.isInterruptRequested()) {
+      handleCoroutineIRQ(coroutine, command);
     } else {
       // Yielded
       emitYieldedEvent(command);
     }
+  }
+
+  private void handleCommandCompletion(Command command) {
+    emitCompletedEvent(command);
+    m_runningCommands.remove(command);
+    removeOrphanedChildren(command);
+  }
+
+  private void handleCoroutineIRQ(Coroutine coroutine, Command command) {
+    // The coroutine requested to be interrupted. Cancel this command and bubble up the stack
+    // to interrupt the entire composition. Because InterruptEvent only supports a single
+    // interruptor, we attribute the interrupt to the first conflicting command.
+    var failure = coroutine.getForkResult().failed().getFirst();
+    Command interruptor =
+        switch (failure) {
+          case LowerPriorityThanRunningCommand(var _, Command conflict) -> conflict;
+          case LowerPriorityThanQueuedCommand(var _, Command conflict) -> conflict;
+          default -> {
+            // Shouldn't get here (this is a bug in WPILib code, not handling new cases).
+            // But we don't want to crash user programs, so just attribute to null.
+            yield null;
+          }
+        };
+
+    Command root = command;
+    if (!m_currentCommandAncestry.isEmpty()) {
+      root = m_currentCommandAncestry.firstElement().command();
+    }
+
+    interruptCommandTree(root, interruptor);
+    m_currentCommandAncestry.clear();
   }
 
   /**
@@ -882,6 +1038,39 @@ public final class Scheduler implements ProtobufSerializable {
         .filter(e -> e.getValue().parent() == parent)
         .toList() // copy to an intermediate list to avoid concurrent modification
         .forEach(e -> cancel(e.getKey()));
+  }
+
+  /**
+   * Interrupts a command and all descendants in its composition tree.
+   *
+   * @param command the root of the tree to interrupt
+   * @param interrupter the command that caused the interruption
+   */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
+  private void interruptCommandTree(Command command, Command interrupter) {
+    var childCommands =
+        m_runningCommands.values().stream()
+            .filter(state -> state.parent() == command)
+            .map(CommandState::command)
+            .toList();
+
+    boolean running = isRunning(command);
+    boolean scheduled = isScheduled(command);
+
+    m_runningCommands.remove(command);
+    m_queuedToRun.removeIf(state -> state.command() == command);
+
+    if (running || scheduled) {
+      emitInterruptedEvent(command, interrupter);
+    }
+    if (running) {
+      command.onCancel();
+    }
+    if (running || scheduled) {
+      emitCanceledEvent(command);
+    }
+
+    childCommands.forEach(child -> interruptCommandTree(child, interrupter));
   }
 
   /**
