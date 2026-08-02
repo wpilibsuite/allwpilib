@@ -172,8 +172,20 @@ public final class Coroutine {
   }
 
   /**
-   * Performs the actual fork operation for a collection of commands. This is used in conjuction
-   * with {@link #checkAllForkable(Collection)}
+   * Performs the actual fork operation for a collection of commands. This is used in conjunction
+   * with {@link #checkAllForkable(Collection)} in case a child forks a grandchild that conflicts
+   * with another entry in the set.
+   *
+   * <p>Given this setup, child1 and child2 are both forkable at the same time (no shared
+   * requirements and no conflicts with running commands), but child1 immediately forks a higher
+   * priority command than child2, which prevents child2 from being scheduled.
+   *
+   * <pre>{@code
+   * parent:
+   *   child1:
+   *     fork priority(1000, mech)
+   *   child2: priority(0, mech))
+   * }</pre>
    *
    * @param commands The commands to fork
    * @return A failure result if at least one of the given commands was unable to be scheduled, or a
@@ -189,7 +201,22 @@ public final class Coroutine {
     }
 
     if (!fails.isEmpty()) {
-      return new ForkResultFailure(fails);
+      // At least one of the commands couldn't be scheduled due to runtime behavior that can't be
+      // checked ahead of time by `checkAllForkable`.
+      //
+      // We can't roll back the partial success; the commands that successfully started will have
+      // already affected the state of the robot and may have interrupted previously running
+      // commands, which we can't restore. The two options are to either cancel the entire command
+      // composition - which is the default behavior - or to allow user code to handle the failure
+      // and do something with it (eg trying something else, retrying, etc).
+      var result = new ForkResultFailure(fails);
+      if (m_cancelOnForkFailure) {
+        m_lastForkFailure = result;
+        this.yield();
+        return result; // note: unreachable
+      } else {
+        return result;
+      }
     }
 
     return ForkResultSuccess.INSTANCE;
@@ -222,9 +249,6 @@ public final class Coroutine {
    *   }).named("Example");
    * }
    * }</pre>
-   *
-   * <p>Note: forking a command that conflicts with a higher-priority command will fail. The forked
-   * command will not be scheduled, and the existing command will continue to run.
    *
    * @param commands The commands to fork.
    * @return a result indicating whether the fork was successful or if the commands could not be
@@ -272,9 +296,6 @@ public final class Coroutine {
    *   }).named("Example");
    * }
    * }</pre>
-   *
-   * <p>Note: forking a command that conflicts with a higher-priority command will fail. The forked
-   * command will not be scheduled, and the existing command will continue to run.
    *
    * @param commands The commands to fork.
    * @return a result indicating whether the fork was successful or if the commands could not be
