@@ -507,8 +507,8 @@ static void DrawLatencyPlot(const XRPConnectionStatus& status) {
     return;
   }
 
-  double now = gGui.latencyTimes.back();
-  double minimumTime = std::max(0.0, now - LATENCY_HISTORY_SECONDS);
+  double now = ImGui::GetTime();
+  double minimumTime = now - LATENCY_HISTORY_SECONDS;
   double maximumLatencyMs = 5.0;
   for (size_t i = 0; i < gGui.latencyTimes.size(); ++i) {
     if (gGui.latencyTimes[i] < minimumTime) {
