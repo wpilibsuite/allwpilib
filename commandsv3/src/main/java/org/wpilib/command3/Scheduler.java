@@ -597,12 +597,28 @@ public final class Scheduler implements ProtobufSerializable {
       }
 
       var c = state.command();
-      if (c.conflictsWith(command) && maxAncestorPriority < c.priority()) {
+      if (c.conflictsWith(command) && maxAncestorPriority < effectivePriority(state)) {
         return c;
       }
     }
 
     return null;
+  }
+
+  /**
+   * Calculates the effective priority of a command, taking into account the priorities of its
+   * ancestors.
+   *
+   * @param state The command state to check
+   * @return The effective priority of the command
+   */
+  private int effectivePriority(CommandState state) {
+    int max = state.command().priority();
+    for (var parent = state.parent(); parent != null; parent = state.parent()) {
+      state = m_runningCommands.get(parent);
+      max = Math.max(max, parent.priority());
+    }
+    return max;
   }
 
   private void evictConflictingOnDeckCommands(Command command) {

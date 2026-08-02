@@ -98,6 +98,96 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
     assertFalse(m_scheduler.isRunning(first), "Old command should be canceled");
   }
 
+  @Test
+  void childInheritsHigherParentPriority() {
+    var mech = new DummyMechanism("Mechanism", m_scheduler);
+
+    var higherPriority = new PriorityCommand(200, mech);
+    var lowPriorityChild = new PriorityCommand(-1000, mech);
+    var parent =
+        Command.noRequirements(
+                coroutine -> {
+                  coroutine.await(lowPriorityChild);
+                })
+            .withPriority(1000)
+            .named("Parent");
+
+    m_scheduler.schedule(higherPriority);
+    m_scheduler.schedule(parent);
+    m_scheduler.run();
+
+    assertTrue(m_scheduler.isRunning(parent), "Parent command should be running");
+    assertTrue(m_scheduler.isRunning(lowPriorityChild), "Child command should be running");
+    assertFalse(
+        m_scheduler.isRunning(higherPriority),
+        "Higher priority command should have been interrupted");
+  }
+
+  @Test
+  void conflictingCommandsWithPriorityInheritance() {
+    var mech = new DummyMechanism("Mechanism", m_scheduler);
+
+    var child1 = new PriorityCommand(0, mech);
+    var child2 = new PriorityCommand(0, mech);
+
+    var parent1 =
+        Command.noRequirements(
+                coroutine -> {
+                  coroutine.await(child1);
+                })
+            .withPriority(2000)
+            .named("Parent1");
+
+    var parent2 =
+        Command.noRequirements(
+                coroutine -> {
+                  // child2 inherits parent2 priority (1000) and should fail to be scheduled due to
+                  // being
+                  //  a lower priority than child1 (2000, inherited from its parent)
+                  coroutine.await(child2);
+                })
+            .withPriority(1000)
+            .named("Parent2");
+
+    m_scheduler.schedule(parent1);
+    m_scheduler.schedule(parent2);
+    m_scheduler.run();
+
+    assertEquals(List.of(parent1, child1), m_scheduler.getRunningCommands());
+  }
+
+  @Test
+  void conflictingCommandsWithPriorityInheritance2() {
+    var mech = new DummyMechanism("Mechanism", m_scheduler);
+
+    var child1 = new PriorityCommand(0, mech);
+    var child2 = new PriorityCommand(0, mech);
+
+    var parent1 =
+        Command.noRequirements(
+                coroutine -> {
+                  coroutine.await(child1);
+                })
+            .withPriority(1000)
+            .named("Parent1");
+
+    var parent2 =
+        Command.noRequirements(
+                coroutine -> {
+                  // child2 inherits parent2 priority (2000) and should be scheduled due to being a
+                  // higher priority than child1 (1000, inherited from its parent)
+                  coroutine.await(child2);
+                })
+            .withPriority(2000)
+            .named("Parent2");
+
+    m_scheduler.schedule(parent1);
+    m_scheduler.schedule(parent2);
+    m_scheduler.run();
+
+    assertEquals(List.of(parent2, child2), m_scheduler.getRunningCommands());
+  }
+
   @ParameterizedTest(name = "{0}")
   @MethodSource("singleChildForkOperations")
   void lowPriorityChildCancelsParent(NamedCoroutineForkOperation operation) {
