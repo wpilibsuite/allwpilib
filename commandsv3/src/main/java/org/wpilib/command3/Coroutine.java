@@ -47,8 +47,20 @@ public final class Coroutine {
    * defaults to {@code true}, but can be changed to allow the coroutine to continue running after a
    * fork failure.
    *
+   * <p>This setting only affects commands forked by using the coroutine methods {@code fork},
+   * {@code await}, {@code awaitAll}, or {@code awaitAny}. Commands scheduled directly with {@link
+   * Scheduler#schedule(Command)} or via inner trigger bindings will not be affected.
+   *
    * @param cancelOnForkFailure true to make the coroutine cancel itself if a child command couldn't
    *     be forked, false to allow the coroutine to continue running after a fork failure
+   *
+   * @see #fork(Command...)
+   * @see #fork(Collection)
+   * @see #await(Command)
+   * @see #awaitAll(Command...)
+   * @see #awaitAll(Collection)
+   * @see #awaitAny(Command...)
+   * @see #awaitAny(Collection)
    */
   public void setCancelOnForkFailure(boolean cancelOnForkFailure) {
     m_cancelOnForkFailure = cancelOnForkFailure;
@@ -60,6 +72,7 @@ public final class Coroutine {
    *
    * @return true if the coroutine will cancel itself if a child command couldn't be forked, false
    *     otherwise
+   * @see #setCancelOnForkFailure(boolean)
    */
   public boolean isCancelOnForkFailure() {
     return m_cancelOnForkFailure;
