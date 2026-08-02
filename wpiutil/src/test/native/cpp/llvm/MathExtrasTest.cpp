@@ -157,22 +157,22 @@ TEST_CASE("MathExtras PowerOf2Ceil", "[wpiutil][llvm]") {
 }
 
 TEST_CASE("MathExtras ConstantLog2", "[wpiutil][llvm]") {
-  CHECK(ConstantLog2 < 1ULL << 0>() == 0U);
-  CHECK(ConstantLog2 < 1ULL << 1>() == 1U);
-  CHECK(ConstantLog2 < 1ULL << 2>() == 2U);
-  CHECK(ConstantLog2 < 1ULL << 3>() == 3U);
-  CHECK(ConstantLog2 < 1ULL << 4>() == 4U);
-  CHECK(ConstantLog2 < 1ULL << 5>() == 5U);
-  CHECK(ConstantLog2 < 1ULL << 6>() == 6U);
-  CHECK(ConstantLog2 < 1ULL << 7>() == 7U);
-  CHECK(ConstantLog2 < 1ULL << 8>() == 8U);
-  CHECK(ConstantLog2 < 1ULL << 9>() == 9U);
-  CHECK(ConstantLog2 < 1ULL << 10>() == 10U);
-  CHECK(ConstantLog2 < 1ULL << 11>() == 11U);
-  CHECK(ConstantLog2 < 1ULL << 12>() == 12U);
-  CHECK(ConstantLog2 < 1ULL << 13>() == 13U);
-  CHECK(ConstantLog2 < 1ULL << 14>() == 14U);
-  CHECK(ConstantLog2 < 1ULL << 15>() == 15U);
+  CHECK(ConstantLog2<1ULL << 0>() == 0U);
+  CHECK(ConstantLog2<1ULL << 1>() == 1U);
+  CHECK(ConstantLog2<1ULL << 2>() == 2U);
+  CHECK(ConstantLog2<1ULL << 3>() == 3U);
+  CHECK(ConstantLog2<1ULL << 4>() == 4U);
+  CHECK(ConstantLog2<1ULL << 5>() == 5U);
+  CHECK(ConstantLog2<1ULL << 6>() == 6U);
+  CHECK(ConstantLog2<1ULL << 7>() == 7U);
+  CHECK(ConstantLog2<1ULL << 8>() == 8U);
+  CHECK(ConstantLog2<1ULL << 9>() == 9U);
+  CHECK(ConstantLog2<1ULL << 10>() == 10U);
+  CHECK(ConstantLog2<1ULL << 11>() == 11U);
+  CHECK(ConstantLog2<1ULL << 12>() == 12U);
+  CHECK(ConstantLog2<1ULL << 13>() == 13U);
+  CHECK(ConstantLog2<1ULL << 14>() == 14U);
+  CHECK(ConstantLog2<1ULL << 15>() == 15U);
 }
 
 TEST_CASE("MathExtras MinAlign", "[wpiutil][llvm]") {

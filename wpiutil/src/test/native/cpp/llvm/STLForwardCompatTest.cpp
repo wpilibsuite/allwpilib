@@ -145,12 +145,12 @@ TEST_CASE("TransformTest TransformCategory", "[wpiutil][llvm]") {
 
   std::optional<StructA> A{StructA{}};
   wpi::util::transformOptional(A, [](auto &&s) {
-    CHECK_FALSE(std::is_rvalue_reference_v < decltype(s)>);
+    CHECK_FALSE(std::is_rvalue_reference_v<decltype(s)>);
     return StructB{std::move(s)};
   });
 
   wpi::util::transformOptional(std::move(A), [](auto &&s) {
-    CHECK(std::is_rvalue_reference_v < decltype(s)>);
+    CHECK(std::is_rvalue_reference_v<decltype(s)>);
     return StructB{std::move(s)};
   });
 }

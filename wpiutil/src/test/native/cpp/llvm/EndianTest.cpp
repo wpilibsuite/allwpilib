@@ -224,7 +224,7 @@ TEST_CASE("Endian PackedEndianSpecificIntegral", "[wpiutil][llvm]") {
     reinterpret_cast<little32_t *>(little + 1);
 
   CHECK(*big_val == *little_val);
-  CHECK(big_val-> value() == little_val->value());
+  CHECK(big_val->value() == little_val->value());
 }
 
 } // end anon namespace

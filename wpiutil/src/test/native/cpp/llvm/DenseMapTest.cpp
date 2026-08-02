@@ -150,15 +150,15 @@ typename T::mapped_type *const DenseMapTest<T>::dummy_value_ptr = nullptr;
 TEMPLATE_TEST_CASE_METHOD(DenseMapTest, "DenseMapTest EmptyIntMapTest", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_DenseMapTest) {
   // Size tests
   CHECK(0u == this->Map.size());
-  CHECK(this-> Map.empty());
+  CHECK(this->Map.empty());
 
   // Iterator tests
-  CHECK(this-> Map.begin() == this->Map.end());
+  CHECK(this->Map.begin() == this->Map.end());
 
   // Lookup tests
-  CHECK_FALSE(this-> Map.count(this->getKey()));
-  CHECK_FALSE(this-> Map.contains(this->getKey()));
-  CHECK(this-> Map.find(this->getKey()) == this->Map.end());
+  CHECK_FALSE(this->Map.count(this->getKey()));
+  CHECK_FALSE(this->Map.contains(this->getKey()));
+  CHECK(this->Map.find(this->getKey()) == this->Map.end());
   CHECK(typename TestType::mapped_type() == this->Map.lookup(this->getKey()));
 }
 
@@ -176,39 +176,39 @@ TEMPLATE_TEST_CASE_METHOD(DenseMapTest, "DenseMapTest SingleEntryMapTest", "[wpi
 
   // Size tests
   CHECK(1u == this->Map.size());
-  CHECK_FALSE(this-> Map.begin() == this->Map.end());
-  CHECK_FALSE(this-> Map.empty());
+  CHECK_FALSE(this->Map.begin() == this->Map.end());
+  CHECK_FALSE(this->Map.empty());
 
   // Iterator tests
   typename TestType::iterator it = this->Map.begin();
-  CHECK(this-> getKey() == it->first);
-  CHECK(this-> getValue() == it->second);
+  CHECK(this->getKey() == it->first);
+  CHECK(this->getValue() == it->second);
   ++it;
   CHECK(it == this->Map.end());
 
   // Lookup tests
-  CHECK(this-> Map.count(this->getKey()));
-  CHECK(this-> Map.contains(this->getKey()));
-  CHECK(this-> Map.find(this->getKey()) == this->Map.begin());
-  CHECK(this-> getValue() == this->Map.lookup(this->getKey()));
-  CHECK(this-> getValue() == this->Map[this->getKey()]);
+  CHECK(this->Map.count(this->getKey()));
+  CHECK(this->Map.contains(this->getKey()));
+  CHECK(this->Map.find(this->getKey()) == this->Map.begin());
+  CHECK(this->getValue() == this->Map.lookup(this->getKey()));
+  CHECK(this->getValue() == this->Map[this->getKey()]);
 }
 
 TEMPLATE_TEST_CASE_METHOD(DenseMapTest, "DenseMapTest AtTest", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_DenseMapTest) {
   this->Map[this->getKey(0)] = this->getValue(0);
   this->Map[this->getKey(1)] = this->getValue(1);
   this->Map[this->getKey(2)] = this->getValue(2);
-  CHECK(this-> getValue(0) == this->Map.at(this->getKey(0)));
-  CHECK(this-> getValue(1) == this->Map.at(this->getKey(1)));
-  CHECK(this-> getValue(2) == this->Map.at(this->getKey(2)));
+  CHECK(this->getValue(0) == this->Map.at(this->getKey(0)));
+  CHECK(this->getValue(1) == this->Map.at(this->getKey(1)));
+  CHECK(this->getValue(2) == this->Map.at(this->getKey(2)));
 
   this->Map.at(this->getKey(0)) = this->getValue(1);
-  CHECK(this-> getValue(1) == this->Map.at(this->getKey(0)));
+  CHECK(this->getValue(1) == this->Map.at(this->getKey(0)));
 
   const auto &ConstMap = this->Map;
-  CHECK(this-> getValue(1) == ConstMap.at(this->getKey(0)));
-  CHECK(this-> getValue(1) == ConstMap.at(this->getKey(1)));
-  CHECK(this-> getValue(2) == ConstMap.at(this->getKey(2)));
+  CHECK(this->getValue(1) == ConstMap.at(this->getKey(0)));
+  CHECK(this->getValue(1) == ConstMap.at(this->getKey(1)));
+  CHECK(this->getValue(2) == ConstMap.at(this->getKey(2)));
 }
 
 // Test clear() method
@@ -217,8 +217,8 @@ TEMPLATE_TEST_CASE_METHOD(DenseMapTest, "DenseMapTest ClearTest", "[wpiutil][llv
   this->Map.clear();
 
   CHECK(0u == this->Map.size());
-  CHECK(this-> Map.empty());
-  CHECK(this-> Map.begin() == this->Map.end());
+  CHECK(this->Map.empty());
+  CHECK(this->Map.begin() == this->Map.end());
 }
 
 // Test erase(iterator) method
@@ -227,8 +227,8 @@ TEMPLATE_TEST_CASE_METHOD(DenseMapTest, "DenseMapTest EraseTest", "[wpiutil][llv
   this->Map.erase(this->Map.begin());
 
   CHECK(0u == this->Map.size());
-  CHECK(this-> Map.empty());
-  CHECK(this-> Map.begin() == this->Map.end());
+  CHECK(this->Map.empty());
+  CHECK(this->Map.begin() == this->Map.end());
 }
 
 // Test erase(value) method
@@ -237,15 +237,15 @@ TEMPLATE_TEST_CASE_METHOD(DenseMapTest, "DenseMapTest EraseTest2", "[wpiutil][ll
   this->Map.erase(this->getKey());
 
   CHECK(0u == this->Map.size());
-  CHECK(this-> Map.empty());
-  CHECK(this-> Map.begin() == this->Map.end());
+  CHECK(this->Map.empty());
+  CHECK(this->Map.begin() == this->Map.end());
 }
 
 // Test insert() method
 TEMPLATE_TEST_CASE_METHOD(DenseMapTest, "DenseMapTest InsertTest", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_DenseMapTest) {
   this->Map.insert(std::make_pair(this->getKey(), this->getValue()));
   CHECK(1u == this->Map.size());
-  CHECK(this-> getValue() == this->Map[this->getKey()]);
+  CHECK(this->getValue() == this->Map[this->getKey()]);
 }
 
 // Test copy constructor method
@@ -254,7 +254,7 @@ TEMPLATE_TEST_CASE_METHOD(DenseMapTest, "DenseMapTest CopyConstructorTest", "[wp
   TestType copyMap(this->Map);
 
   CHECK(1u == copyMap.size());
-  CHECK(this-> getValue() == copyMap[this->getKey()]);
+  CHECK(this->getValue() == copyMap[this->getKey()]);
 }
 
 // Test copy constructor method where SmallDenseMap isn't small.
@@ -265,7 +265,7 @@ TEMPLATE_TEST_CASE_METHOD(DenseMapTest, "DenseMapTest CopyConstructorNotSmallTes
 
   CHECK(5u == copyMap.size());
   for (int Key = 0; Key < 5; ++Key)
-    CHECK(this-> getValue(Key) == copyMap[this->getKey(Key)]);
+    CHECK(this->getValue(Key) == copyMap[this->getKey(Key)]);
 }
 
 // Test range constructors.
@@ -277,14 +277,14 @@ TEMPLATE_TEST_CASE_METHOD(DenseMapTest, "DenseMapTest RangeConstructorTest", "[w
 
   TestType MapFromRange(wpi::util::from_range, PlainArray);
   CHECK(2u == MapFromRange.size());
-  CHECK(this-> getValue(0) == MapFromRange[this->getKey(0)]);
-  CHECK(this-> getValue(1) == MapFromRange[this->getKey(1)]);
+  CHECK(this->getValue(0) == MapFromRange[this->getKey(0)]);
+  CHECK(this->getValue(1) == MapFromRange[this->getKey(1)]);
 
   TestType MapFromInitList({{this->getKey(0), this->getValue(1)},
                              {this->getKey(1), this->getValue(2)}});
   CHECK(2u == MapFromInitList.size());
-  CHECK(this-> getValue(1) == MapFromInitList[this->getKey(0)]);
-  CHECK(this-> getValue(2) == MapFromInitList[this->getKey(1)]);
+  CHECK(this->getValue(1) == MapFromInitList[this->getKey(0)]);
+  CHECK(this->getValue(2) == MapFromInitList[this->getKey(1)]);
 }
 
 // Test copying from a default-constructed map.
@@ -310,12 +310,12 @@ TEMPLATE_TEST_CASE_METHOD(DenseMapTest, "DenseMapTest AssignmentTest", "[wpiutil
   TestType copyMap = this->Map;
 
   CHECK(1u == copyMap.size());
-  CHECK(this-> getValue() == copyMap[this->getKey()]);
+  CHECK(this->getValue() == copyMap[this->getKey()]);
 
   // test self-assignment.
   copyMap = static_cast<TestType &>(copyMap);
   CHECK(1u == copyMap.size());
-  CHECK(this-> getValue() == copyMap[this->getKey()]);
+  CHECK(this->getValue() == copyMap[this->getKey()]);
 }
 
 TEMPLATE_TEST_CASE_METHOD(DenseMapTest, "DenseMapTest AssignmentTestNotSmall", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_DenseMapTest) {
@@ -325,13 +325,13 @@ TEMPLATE_TEST_CASE_METHOD(DenseMapTest, "DenseMapTest AssignmentTestNotSmall", "
 
   CHECK(5u == copyMap.size());
   for (int Key = 0; Key < 5; ++Key)
-    CHECK(this-> getValue(Key) == copyMap[this->getKey(Key)]);
+    CHECK(this->getValue(Key) == copyMap[this->getKey(Key)]);
 
   // test self-assignment.
   copyMap = static_cast<TestType &>(copyMap);
   CHECK(5u == copyMap.size());
   for (int Key = 0; Key < 5; ++Key)
-    CHECK(this-> getValue(Key) == copyMap[this->getKey(Key)]);
+    CHECK(this->getValue(Key) == copyMap[this->getKey(Key)]);
 }
 
 // Test swap method
@@ -341,15 +341,15 @@ TEMPLATE_TEST_CASE_METHOD(DenseMapTest, "DenseMapTest SwapTest", "[wpiutil][llvm
 
   this->Map.swap(otherMap);
   CHECK(0u == this->Map.size());
-  CHECK(this-> Map.empty());
+  CHECK(this->Map.empty());
   CHECK(1u == otherMap.size());
-  CHECK(this-> getValue() == otherMap[this->getKey()]);
+  CHECK(this->getValue() == otherMap[this->getKey()]);
 
   this->Map.swap(otherMap);
   CHECK(0u == otherMap.size());
   CHECK(otherMap.empty());
   CHECK(1u == this->Map.size());
-  CHECK(this-> getValue() == this->Map[this->getKey()]);
+  CHECK(this->getValue() == this->Map[this->getKey()]);
 
   // Make this more interesting by inserting 100 numbers into the map.
   for (int i = 0; i < 100; ++i)
@@ -357,17 +357,17 @@ TEMPLATE_TEST_CASE_METHOD(DenseMapTest, "DenseMapTest SwapTest", "[wpiutil][llvm
 
   this->Map.swap(otherMap);
   CHECK(0u == this->Map.size());
-  CHECK(this-> Map.empty());
+  CHECK(this->Map.empty());
   CHECK(100u == otherMap.size());
   for (int i = 0; i < 100; ++i)
-    CHECK(this-> getValue(i) == otherMap[this->getKey(i)]);
+    CHECK(this->getValue(i) == otherMap[this->getKey(i)]);
 
   this->Map.swap(otherMap);
   CHECK(0u == otherMap.size());
   CHECK(otherMap.empty());
   CHECK(100u == this->Map.size());
   for (int i = 0; i < 100; ++i)
-    CHECK(this-> getValue(i) == this->Map[this->getKey(i)]);
+    CHECK(this->getValue(i) == this->Map[this->getKey(i)]);
 }
 
 // A more complex iteration test
