@@ -310,6 +310,14 @@ static void DrawGuiImpl() {
   ImGui::Text("Packets: sent %" PRIu64 ", received %" PRIu64,
               status.packetsSent, status.packetsReceived);
 
+  if (status.connected && status.latencyAvailable) {
+    ImGui::Text("Latency: RTT %.1f ms, XRP age %.1f ms, seq %u",
+                status.roundTripLatencyMs, status.xrpControlRxAgeMs,
+                status.latencyControlSeq);
+  } else if (status.connected) {
+    ImGui::TextUnformatted("Latency: waiting for timing data");
+  }
+
   ImGui::End();
 }
 

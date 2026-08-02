@@ -4,13 +4,16 @@
 
 #pragma once
 
+#include <chrono>
 #include <cstdint>
+#include <deque>
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <span>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 
 #include "wpi/halsim/ws_core/HALSimBaseWebSocketConnection.hpp"
 #include "wpi/halsim/ws_core/WSProviderContainer.hpp"
@@ -28,7 +31,26 @@ class json;
 namespace wpilibxrp {
 
 using XRPBluetoothAddressType = wpi::net::BluetoothAddressType;
-using XRPConnectionStatus = wpi::net::BluetoothLEPacketConnectionStatus;
+
+struct XRPConnectionStatus
+    : public wpi::net::BluetoothLEPacketConnectionStatus {
+  using Base = wpi::net::BluetoothLEPacketConnectionStatus;
+
+  XRPConnectionStatus() = default;
+
+  XRPConnectionStatus& operator=(const Base& status) {
+    static_cast<Base&>(*this) = status;
+    if (!connected) {
+      latencyAvailable = false;
+    }
+    return *this;
+  }
+
+  bool latencyAvailable = false;
+  uint16_t latencyControlSeq = 0;
+  double roundTripLatencyMs = 0.0;
+  double xrpControlRxAgeMs = 0.0;
+};
 
 // This masquerades as a "WebSocket" so that we can reuse the
 // stuff in halsim_ws_core
@@ -89,12 +111,19 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
 
   bool m_providersConnected = false;
 
+  void RecordControlPacketSent(std::span<const uint8_t> packet);
+  void UpdateLatencyFromXRP(std::span<const uint8_t> packet);
   void SendStateToXRP();
   void SendPacketToXRP(std::span<wpi::net::uv::Buffer> sendBufs);
   void SetError(std::string_view error);
   void RegisterSimProviders();
   wpi::net::uv::SimpleBufferPool<4>& GetBufferPool();
   std::mutex m_buffer_mutex;
+  std::unordered_map<uint16_t, std::chrono::steady_clock::time_point>
+      m_controlPacketSendTimes;
+  std::deque<uint16_t> m_controlPacketSendOrder;
+  uint16_t m_lastLatencyControlSeq = 0;
+  bool m_haveLastLatencyControlSeq = false;
 };
 
 }  // namespace wpilibxrp

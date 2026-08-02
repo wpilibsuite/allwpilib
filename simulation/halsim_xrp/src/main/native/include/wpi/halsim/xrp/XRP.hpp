@@ -18,6 +18,7 @@
 #define XRP_TAG_GYRO 0x16
 #define XRP_TAG_ACCEL 0x17
 #define XRP_TAG_ENCODER 0x18
+#define XRP_TAG_TIMING 0x19
 
 namespace wpi::util {
 class json;

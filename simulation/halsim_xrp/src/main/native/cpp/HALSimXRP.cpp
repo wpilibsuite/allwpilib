@@ -4,6 +4,8 @@
 
 #include "wpi/halsim/xrp/HALSimXRP.hpp"
 
+#include <chrono>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <optional>
@@ -31,6 +33,8 @@ namespace {
 
 constexpr uint16_t XRP_BLUETOOTH_PSM = 0x0081;
 constexpr size_t MAX_BLUETOOTH_PACKET_SIZE = 512;
+constexpr size_t MAX_LATENCY_SEND_TIMES = 512;
+constexpr uint32_t INVALID_CONTROL_RX_AGE_US = UINT32_MAX;
 constexpr const char* XRP_GATT_SERVICE_UUID =
     "7d2ea28a-f7bd-485d-9d6a-2c3f0b214a3f";
 constexpr const char* XRP_GATT_CONTROL_CHARACTERISTIC_UUID =
@@ -44,6 +48,11 @@ constexpr const char* XRP_BLUETOOTH_SETTINGS_ADDRESS_TYPE_KEY = "addressType";
 struct SavedBluetoothTarget {
   std::string address;
   XRPBluetoothAddressType addressType = XRPBluetoothAddressType::RANDOM;
+};
+
+struct TimingEcho {
+  uint16_t lastControlSeq = 0;
+  uint32_t controlRxAgeUs = 0;
 };
 
 const char* AddressTypeToString(XRPBluetoothAddressType type) {
@@ -136,6 +145,47 @@ void SaveBluetoothTarget(std::string_view address,
   os << '\n';
 }
 
+uint16_t ReadUint16BE(std::span<const uint8_t> data) {
+  return static_cast<uint16_t>(data[0] << 8) | data[1];
+}
+
+uint32_t ReadUint32BE(std::span<const uint8_t> data) {
+  return static_cast<uint32_t>(data[0]) << 24 |
+         static_cast<uint32_t>(data[1]) << 16 |
+         static_cast<uint32_t>(data[2]) << 8 | data[3];
+}
+
+std::optional<TimingEcho> ReadTimingEcho(std::span<const uint8_t> packet) {
+  if (packet.size() < 3) {
+    return std::nullopt;
+  }
+
+  packet = packet.subspan(3);
+  while (!packet.empty()) {
+    if (packet.size() < 2) {
+      return std::nullopt;
+    }
+
+    uint8_t tagLength = packet[0];
+    if (tagLength == 0 || packet.size() < static_cast<size_t>(tagLength) + 1) {
+      return std::nullopt;
+    }
+
+    if (packet[1] == XRP_TAG_TIMING) {
+      if (tagLength != 7) {
+        return std::nullopt;
+      }
+
+      return TimingEcho{ReadUint16BE(packet.subspan(2, 2)),
+                        ReadUint32BE(packet.subspan(4, 4))};
+    }
+
+    packet = packet.subspan(tagLength + 1);
+  }
+
+  return std::nullopt;
+}
+
 }  // namespace
 
 HALSimXRP::HALSimXRP(wpi::net::uv::Loop& loop,
@@ -169,7 +219,7 @@ bool HALSimXRP::Initialize() {
           self->ParsePacket(packet);
         }
       },
-      [weakSelf](const XRPConnectionStatus& status) {
+      [weakSelf](const wpi::net::BluetoothLEPacketConnectionStatus& status) {
         if (auto self = weakSelf.lock()) {
           std::scoped_lock lock(self->m_statusMutex);
           self->m_status = status;
@@ -327,6 +377,7 @@ void HALSimXRP::ParsePacket(std::span<const uint8_t> packet) {
 
   // Hand this off to the XRP object to deal with the messages
   m_xrp.HandleXRPUpdate(packet);
+  UpdateLatencyFromXRP(packet);
 }
 
 void HALSimXRP::OnNetValueChanged(const wpi::util::json& msg) {
@@ -397,7 +448,9 @@ void HALSimXRP::SendPacketToXRP(std::span<uv::Buffer> sendBufs) {
         packet.insert(packet.end(), data, data + buf.len);
       }
 
-      m_bluetoothClient->Send(packet);
+      if (m_bluetoothClient->Send(packet)) {
+        RecordControlPacketSent(packet);
+      }
     } else {
       SetError("XRP packet is larger than Bluetooth transport MTU");
     }
@@ -405,6 +458,50 @@ void HALSimXRP::SendPacketToXRP(std::span<uv::Buffer> sendBufs) {
 
   std::lock_guard lock(m_buffer_mutex);
   GetBufferPool().Release(sendBufs);
+}
+
+void HALSimXRP::RecordControlPacketSent(std::span<const uint8_t> packet) {
+  if (packet.size() < 2) {
+    return;
+  }
+
+  uint16_t seq = ReadUint16BE(packet.subspan(0, 2));
+  m_controlPacketSendTimes[seq] = std::chrono::steady_clock::now();
+  m_controlPacketSendOrder.push_back(seq);
+  while (m_controlPacketSendOrder.size() > MAX_LATENCY_SEND_TIMES) {
+    m_controlPacketSendTimes.erase(m_controlPacketSendOrder.front());
+    m_controlPacketSendOrder.pop_front();
+  }
+}
+
+void HALSimXRP::UpdateLatencyFromXRP(std::span<const uint8_t> packet) {
+  auto timingEcho = ReadTimingEcho(packet);
+  if (!timingEcho || timingEcho->controlRxAgeUs == INVALID_CONTROL_RX_AGE_US) {
+    return;
+  }
+
+  if (m_haveLastLatencyControlSeq &&
+      timingEcho->lastControlSeq == m_lastLatencyControlSeq) {
+    return;
+  }
+
+  auto sendTime = m_controlPacketSendTimes.find(timingEcho->lastControlSeq);
+  if (sendTime == m_controlPacketSendTimes.end()) {
+    return;
+  }
+
+  auto now = std::chrono::steady_clock::now();
+  auto roundTripLatencyMs =
+      std::chrono::duration<double, std::milli>(now - sendTime->second).count();
+
+  m_haveLastLatencyControlSeq = true;
+  m_lastLatencyControlSeq = timingEcho->lastControlSeq;
+
+  std::scoped_lock lock(m_statusMutex);
+  m_status.latencyAvailable = true;
+  m_status.latencyControlSeq = timingEcho->lastControlSeq;
+  m_status.roundTripLatencyMs = roundTripLatencyMs;
+  m_status.xrpControlRxAgeMs = timingEcho->controlRxAgeUs / 1000.0;
 }
 
 void HALSimXRP::SetError(std::string_view error) {
