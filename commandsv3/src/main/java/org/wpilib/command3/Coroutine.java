@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import org.wpilib.command3.Scheduler.ScheduleResult;
 import org.wpilib.system.Timer;
 import org.wpilib.units.measure.Time;
 
@@ -53,7 +54,6 @@ public final class Coroutine {
    *
    * @param cancelOnForkFailure true to make the coroutine cancel itself if a child command couldn't
    *     be forked, false to allow the coroutine to continue running after a fork failure
-   *
    * @see #fork(Command...)
    * @see #fork(Collection)
    * @see #await(Command)
@@ -132,7 +132,7 @@ public final class Coroutine {
    *
    * @param failed The failed scheduling attempts.
    */
-  public record ForkResultFailure(List<Scheduler.ScheduleResult> failed) implements ForkResult {}
+  public record ForkResultFailure(List<ScheduleResult.Failure> failed) implements ForkResult {}
 
   /**
    * Checks that all the given commands can be forked.
@@ -145,11 +145,11 @@ public final class Coroutine {
     // Because this is a bug in user code, throw an error instead of returning a failure result
     ConflictDetector.throwIfConflicts(commands);
 
-    var unschedulable = new ArrayList<Scheduler.ScheduleResult>();
+    var unschedulable = new ArrayList<ScheduleResult.Failure>();
     for (var command : commands) {
       var result = m_scheduler.isSchedulable(command);
-      if (!result.successful()) {
-        unschedulable.add(result);
+      if (result instanceof ScheduleResult.Failure fail) {
+        unschedulable.add(fail);
       }
     }
 
@@ -169,6 +169,30 @@ public final class Coroutine {
     }
 
     return null;
+  }
+
+  /**
+   * Performs the actual fork operation for a collection of commands. This is used in conjuction
+   * with {@link #checkAllForkable(Collection)}
+   *
+   * @param commands The commands to fork
+   * @return A failure result if at least one of the given commands was unable to be scheduled, or a
+   *     success result if all commands were scheduled.
+   */
+  private ForkResult doFork(Collection<? extends Command> commands) {
+    var fails = new ArrayList<ScheduleResult.Failure>();
+    for (var command : commands) {
+      var result = m_scheduler.schedule(command);
+      if (result instanceof ScheduleResult.Failure fail) {
+        fails.add(fail);
+      }
+    }
+
+    if (!fails.isEmpty()) {
+      return new ForkResultFailure(fails);
+    }
+
+    return ForkResultSuccess.INSTANCE;
   }
 
   /**
@@ -222,12 +246,7 @@ public final class Coroutine {
       return failure;
     }
 
-    // Shorthand; this is handy for user-defined compositions
-    for (var command : commands) {
-      m_scheduler.schedule(command);
-    }
-
-    return ForkResultSuccess.INSTANCE;
+    return doFork(Arrays.asList(commands));
   }
 
   /**
@@ -295,6 +314,7 @@ public final class Coroutine {
       return failure;
     }
 
+    // Don't need doFork() because there's no chance of sibling conflicts
     m_scheduler.schedule(command);
 
     while (m_scheduler.isScheduledOrRunning(command)) {
@@ -338,15 +358,16 @@ public final class Coroutine {
       return failure;
     }
 
-    for (var command : commands) {
-      m_scheduler.schedule(command);
+    var forkResult = doFork(commands);
+    if (forkResult instanceof ForkResultFailure forkFailed) {
+      return forkFailed;
     }
 
     while (commands.stream().anyMatch(m_scheduler::isScheduledOrRunning)) {
       this.yield();
     }
 
-    return new ForkResultSuccess();
+    return ForkResultSuccess.INSTANCE;
   }
 
   /**
@@ -402,9 +423,9 @@ public final class Coroutine {
       return failure;
     }
 
-    // Schedule anything that's not already queued or running
-    for (var command : commands) {
-      m_scheduler.schedule(command);
+    var forkResult = doFork(commands);
+    if (forkResult instanceof ForkResultFailure forkFailed) {
+      return forkFailed;
     }
 
     while (commands.stream().allMatch(m_scheduler::isScheduledOrRunning)) {

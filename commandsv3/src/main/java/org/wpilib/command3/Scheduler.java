@@ -275,8 +275,8 @@ public final class Scheduler implements ProtobufSerializable {
    *
    * <p>The coroutines provided to sideloaded functions will not cancel themselves if a fork or
    * await call fails. This allows user code the opportunity to recover from a failure. You can opt
-   * into canceling the coroutine if a fork or await call fails by calling
-   * {@link Coroutine#setCancelOnForkFailure(boolean)}.
+   * into canceling the coroutine if a fork or await call fails by calling {@link
+   * Coroutine#setCancelOnForkFailure(boolean)}.
    *
    * @param callback the callback to sideload
    * @see #addPeriodic(Runnable)
@@ -356,12 +356,26 @@ public final class Scheduler implements ProtobufSerializable {
      */
     boolean successful();
 
+    sealed interface Successful extends ScheduleResult {
+      @Override
+      default boolean successful() {
+        return true;
+      }
+    }
+
+    sealed interface Failure extends ScheduleResult {
+      @Override
+      default boolean successful() {
+        return false;
+      }
+    }
+
     /**
      * A successful scheduling attempt.
      *
      * @param command the command that was successfully scheduled
      */
-    record Success(Command command) implements ScheduleResult {
+    record Success(Command command) implements Successful {
       /**
        * A successful scheduling attempt is always successful.
        *
@@ -378,7 +392,7 @@ public final class Scheduler implements ProtobufSerializable {
      *
      * @param command the command that was attempted to be scheduled
      */
-    record AlreadyRunning(Command command) implements ScheduleResult {
+    record AlreadyRunning(Command command) implements Successful {
       /**
        * A scheduling attempt that was redundant because the command was already running is always
        * successful.
@@ -399,7 +413,7 @@ public final class Scheduler implements ProtobufSerializable {
      * @param alreadyRunning the running command that prevented the command from being scheduled
      */
     record LowerPriorityThanRunningCommand(Command command, Command alreadyRunning)
-        implements ScheduleResult {
+        implements Failure {
       /**
        * A scheduling attempt that failed because the command was lower priority than a running
        * command with shared requirements is always unsuccessful.
@@ -420,7 +434,7 @@ public final class Scheduler implements ProtobufSerializable {
      * @param queuedCommand the queued command that prevented the command from being scheduled
      */
     record LowerPriorityThanQueuedCommand(Command command, Command queuedCommand)
-        implements ScheduleResult {
+        implements Failure {
       /**
        * A scheduling attempt that failed because the command was lower priority than a queued
        * command with shared requirements is always unsuccessful.

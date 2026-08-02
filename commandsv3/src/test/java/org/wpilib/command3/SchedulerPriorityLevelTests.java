@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.wpilib.command3.Coroutine.ForkResultFailure;
+import org.wpilib.command3.Scheduler.ScheduleResult.LowerPriorityThanRunningCommand;
 
 class SchedulerPriorityLevelTests extends CommandTestBase {
   @FunctionalInterface
@@ -153,6 +155,54 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
     }
   }
 
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("multiChildForkOperations")
+  void highPriorityGrandchildWithLowPriorityChild(NamedCoroutineForkOperation operation) {
+    /*
+     Given this setup, child1 and child2 are both forkable at the same time (no shared requirements
+     and no conflicts with running commands), but child1 forks a higher-priority command than
+     child2, which should cause child2 to fail to be scheduled
+
+     parent:
+       child1:
+         fork priority(1000, mech)
+       child2: priority(0, mech))
+    */
+
+    var mech = new DummyMechanism("Mech", m_scheduler);
+
+    PriorityCommand grandchild = new PriorityCommand(1000, mech);
+    var child1 = Command.noRequirements(co -> co.await(grandchild)).named("Child1");
+    var child2 = new PriorityCommand(0, mech);
+
+    var parent =
+        Command.noRequirements(
+                co -> {
+                  co.setCancelOnForkFailure(false);
+                  var result = operation.operation().apply(co, child1, child2);
+                  assertInstanceOf(
+                      ForkResultFailure.class, result, "Forking operation should have failed");
+
+                  var failure = (ForkResultFailure) result;
+                  var fails = failure.failed();
+                  assertEquals(1, fails.size(), "Exactly one failure was expected");
+                  assertInstanceOf(
+                      LowerPriorityThanRunningCommand.class,
+                      fails.getFirst(),
+                      "Failure should be a LowerPriorityThanRunningCommand");
+
+                  var failedCommand = fails.getFirst().command();
+                  var running =
+                      ((LowerPriorityThanRunningCommand) fails.getFirst()).alreadyRunning();
+                  assertEquals(child2, failedCommand, "Failed command should be child2");
+                  assertEquals(grandchild, running, "Running command should be grandchild");
+                })
+            .named("Parent");
+
+    m_scheduler.schedule(parent);
+    m_scheduler.run();
+  }
+
   private void assertUnschedulableSingleChildCancelsParent(CoroutineForkOperation operation) {
     final var subsystem = new DummyMechanism("Subsystem", m_scheduler);
 
@@ -231,8 +281,8 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
 
   private static void assertFailureResult(
       Coroutine.ForkResult result, List<Command> expectedFailedCommands) {
-    assertInstanceOf(Coroutine.ForkResultFailure.class, result, "Fork result should be a failure");
-    var failure = (Coroutine.ForkResultFailure) result;
+    assertInstanceOf(ForkResultFailure.class, result, "Fork result should be a failure");
+    var failure = (ForkResultFailure) result;
 
     var failedCommands = failure.failed().stream().map(Scheduler.ScheduleResult::command).toList();
     assertEquals(expectedFailedCommands, failedCommands);
