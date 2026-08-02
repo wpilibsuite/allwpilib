@@ -487,13 +487,34 @@ class BluetoothLEPacketClient::Impl
 
     m_activeTransport = LinuxBluetoothTransport::GATT;
     ResetGattDiscovery();
+    m_gattBlueZDisconnectAttempted = false;
 
+    ConnectGattSocketOnLoop(config, remoteAddress, generation);
+  }
+
+  bool StartGattBlueZDisconnectRetryOnLoop(
+      const BluetoothLEPacketClientConfig& config,
+      const bdaddr_t& remoteAddress, uint64_t generation) {
+    if (m_gattBlueZDisconnectAttempted) {
+      return false;
+    }
+
+    m_gattBlueZDisconnectAttempted = true;
+    CloseSocket();
+    m_activeTransport = LinuxBluetoothTransport::GATT;
+    ResetGattDiscovery();
     m_gattBlueZDisconnectPending = true;
-    SetConnecting("Preparing Bluetooth GATT");
+    UpdateStatus([](auto& status) {
+      status.connecting = true;
+      status.connected = false;
+      status.transport = BluetoothPacketTransport::NONE;
+      status.error.clear();
+      status.status = "Bluetooth GATT socket busy; retrying";
+    });
     if (!StartConnectTimer()) {
       m_gattBlueZDisconnectPending = false;
       CloseSocket();
-      return;
+      return true;
     }
 
     std::weak_ptr<Impl> weakSelf = weak_from_this();
@@ -509,6 +530,7 @@ class BluetoothLEPacketClient::Impl
         });
       }
     }}.detach();
+    return true;
   }
 
   void FinishGattBlueZDisconnectOnLoop(
@@ -520,11 +542,12 @@ class BluetoothLEPacketClient::Impl
     }
 
     m_gattBlueZDisconnectPending = false;
-    ConnectGattSocketOnLoop(config, remoteAddress);
+    ConnectGattSocketOnLoop(config, remoteAddress, generation);
   }
 
   void ConnectGattSocketOnLoop(const BluetoothLEPacketClientConfig& config,
-                               const bdaddr_t& remoteAddress) {
+                               const bdaddr_t& remoteAddress,
+                               uint64_t generation) {
     int fd =
         ::socket(WPI_AF_BLUETOOTH, SOCK_SEQPACKET, BLUETOOTH_PROTOCOL_L2CAP);
     if (fd < 0) {
@@ -552,6 +575,13 @@ class BluetoothLEPacketClient::Impl
     int result = ::connect(fd, reinterpret_cast<sockaddr*>(&remoteAddr),
                            sizeof(remoteAddr));
     if (result < 0 && errno != EINPROGRESS) {
+      int connectError = errno;
+      if (connectError == EBUSY && StartGattBlueZDisconnectRetryOnLoop(
+                                       config, remoteAddress, generation)) {
+        return;
+      }
+
+      errno = connectError;
       SetError(ErrnoString("Failed to connect Bluetooth GATT socket"));
       CloseSocket();
       return;
@@ -703,6 +733,13 @@ class BluetoothLEPacketClient::Impl
     }
 
     if (socketError != 0) {
+      if (m_activeTransport == LinuxBluetoothTransport::GATT &&
+          socketError == EBUSY &&
+          StartGattBlueZDisconnectRetryOnLoop(m_config, m_remoteAddress,
+                                              m_connectGeneration)) {
+        return;
+      }
+
       errno = socketError;
       std::string error =
           m_activeTransport == LinuxBluetoothTransport::GATT
@@ -1286,6 +1323,7 @@ class BluetoothLEPacketClient::Impl
   bdaddr_t m_remoteAddress{};
   LinuxBluetoothTransport m_activeTransport = LinuxBluetoothTransport::NONE;
   bool m_gattBlueZDisconnectPending = false;
+  bool m_gattBlueZDisconnectAttempted = false;
   uint64_t m_connectGeneration = 0;
 
   std::array<uint8_t, 16> m_gattServiceUuid{};
