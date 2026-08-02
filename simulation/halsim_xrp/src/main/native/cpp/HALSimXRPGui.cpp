@@ -23,6 +23,8 @@
 #include <imgui_internal.h>
 #include <implot.h>
 
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/DataSource.hpp"
 #include "wpi/hal/Extensions.h"
 #include "wpi/halsim/xrp/HALSimXRP.hpp"
 #include "wpi/net/BluetoothLEPacketClient.hpp"
@@ -38,6 +40,8 @@ constexpr std::string_view GET_IMGUI_CONTEXT_NAME =
     "halsimgui::GetImguiContext";
 constexpr std::string_view GET_IMPLOT_CONTEXT_NAME =
     "halsimgui::GetImPlotContext";
+constexpr std::string_view GET_GLASS_CONTEXT_NAME =
+    "halsimgui::GetGlassContext";
 constexpr std::string_view XRP_DEVICE_NAME_PREFIX = "WPIXRP-";
 constexpr double LATENCY_HISTORY_SECONDS = 10.0;
 constexpr size_t LATENCY_MAX_SAMPLES = 1500;
@@ -54,6 +58,29 @@ constexpr std::array<std::string_view, 4> SERVO_LABELS = {"Servo 1", "Servo 2",
 using AddGuiLateExecuteFn = void (*)(std::function<void()> execute);
 using GetImguiContextFn = ImGuiContext* (*)();
 using GetImPlotContextFn = ImPlotContext* (*)();
+using GetGlassContextFn = wpi::glass::Context* (*)();
+
+template <typename Source>
+struct SourceSlot {
+  std::unique_ptr<Source> source;
+  std::chrono::steady_clock::time_point lastUpdate;
+  bool haveLastUpdate = false;
+};
+
+struct GuiDataSources {
+  SourceSlot<wpi::glass::BooleanSource> robotEnabled;
+  std::array<SourceSlot<wpi::glass::FloatSource>, 4> motors;
+  std::array<SourceSlot<wpi::glass::FloatSource>, 4> servos;
+  std::array<SourceSlot<wpi::glass::BooleanSource>, 8> digitalOutputs;
+  std::array<SourceSlot<wpi::glass::IntegerSource>, 4> encoderCounts;
+  std::array<SourceSlot<wpi::glass::FloatSource>, 4> encoderPeriods;
+  std::array<SourceSlot<wpi::glass::BooleanSource>, 8> digitalInputs;
+  std::array<SourceSlot<wpi::glass::FloatSource>, 3> gyroRates;
+  std::array<SourceSlot<wpi::glass::FloatSource>, 3> gyroAngles;
+  std::array<SourceSlot<wpi::glass::FloatSource>, 3> accelerometer;
+  std::array<SourceSlot<wpi::glass::FloatSource>, 3> analogInputs;
+  bool initialized = false;
+};
 
 struct CommandResult {
   int exitCode = -1;
@@ -85,11 +112,13 @@ struct GuiState {
   uint16_t lastLatencyControlSeq = 0;
   bool haveLastLatencyControlSeq = false;
   bool showAddress = false;
+  GuiDataSources dataSources;
 };
 
 static std::weak_ptr<HALSimXRP> gSimXRP;
 static GetImguiContextFn gGetImguiContext = nullptr;
 static GetImPlotContextFn gGetImPlotContext = nullptr;
+static GetGlassContextFn gGetGlassContext = nullptr;
 static bool gListenerRegistered = false;
 static bool gLateExecuteRegistered = false;
 static GuiState gGui;
@@ -547,17 +576,186 @@ static void TextUnformatted(std::string_view text) {
   ImGui::TextUnformatted(text.data(), text.data() + text.size());
 }
 
+template <typename Source>
+static void InitializeSource(SourceSlot<Source>& slot, std::string_view id,
+                             std::string_view name) {
+  slot.source = std::make_unique<Source>(std::string{id});
+  slot.source->SetName(name);
+}
+
+static void InitializeDataSources() {
+  if (gGui.dataSources.initialized ||
+      wpi::glass::GetCurrentContext() == nullptr) {
+    return;
+  }
+
+  auto& sources = gGui.dataSources;
+  InitializeSource(sources.robotEnabled, "XRP/Control/RobotState",
+                   "XRP Robot State");
+
+  for (size_t i = 0; i < sources.motors.size(); ++i) {
+    InitializeSource(sources.motors[i], std::format("XRP/Control/Motor/{}", i),
+                     std::format("XRP {}", MOTOR_LABELS[i]));
+  }
+
+  for (size_t i = 0; i < sources.servos.size(); ++i) {
+    InitializeSource(sources.servos[i],
+                     std::format("XRP/Control/Servo/{}", i + 4),
+                     std::format("XRP {}", SERVO_LABELS[i]));
+  }
+
+  for (size_t i = 0; i < sources.digitalOutputs.size(); ++i) {
+    InitializeSource(sources.digitalOutputs[i],
+                     std::format("XRP/Control/DIO/{}/Output", i),
+                     std::format("XRP DIO {} Output", i));
+  }
+
+  for (size_t i = 0; i < sources.encoderCounts.size(); ++i) {
+    InitializeSource(sources.encoderCounts[i],
+                     std::format("XRP/Status/Encoder/{}/Count", i),
+                     std::format("XRP Encoder {} Count", i));
+    InitializeSource(sources.encoderPeriods[i],
+                     std::format("XRP/Status/Encoder/{}/Period", i),
+                     std::format("XRP Encoder {} Period", i));
+  }
+
+  for (size_t i = 0; i < sources.digitalInputs.size(); ++i) {
+    InitializeSource(sources.digitalInputs[i],
+                     std::format("XRP/Status/DIO/{}/Input", i),
+                     std::format("XRP DIO {} Input", i));
+  }
+
+  constexpr std::array<std::string_view, 3> AXES = {"X", "Y", "Z"};
+  for (size_t i = 0; i < AXES.size(); ++i) {
+    InitializeSource(sources.gyroRates[i],
+                     std::format("XRP/Status/Gyro/Rate/{}", AXES[i]),
+                     std::format("XRP Gyro Rate {}", AXES[i]));
+    InitializeSource(sources.gyroAngles[i],
+                     std::format("XRP/Status/Gyro/Angle/{}", AXES[i]),
+                     std::format("XRP Gyro Angle {}", AXES[i]));
+    InitializeSource(sources.accelerometer[i],
+                     std::format("XRP/Status/Accelerometer/{}", AXES[i]),
+                     std::format("XRP Accelerometer {}", AXES[i]));
+    InitializeSource(sources.analogInputs[i],
+                     std::format("XRP/Status/Analog/{}", i),
+                     std::format("XRP Analog {}", i));
+  }
+
+  sources.initialized = true;
+}
+
+template <typename Source, typename T>
+static void UpdateSource(SourceSlot<Source>& slot, bool present,
+                         std::chrono::steady_clock::time_point lastUpdate,
+                         T value) {
+  // UpdateDataSources() runs every GUI frame; only emit plot samples for new
+  // XRP data.
+  if (!slot.source || !present ||
+      (slot.haveLastUpdate && slot.lastUpdate == lastUpdate)) {
+    return;
+  }
+
+  slot.source->SetValue(value);
+  slot.lastUpdate = lastUpdate;
+  slot.haveLastUpdate = true;
+}
+
+static void UpdateDataSources(const XRPDataSnapshot& data) {
+  InitializeDataSources();
+  if (!gGui.dataSources.initialized) {
+    return;
+  }
+
+  auto& sources = gGui.dataSources;
+  UpdateSource(sources.robotEnabled, data.control.packet.present,
+               data.control.packet.lastUpdate, data.control.enabled);
+
+  for (size_t i = 0; i < data.control.motors.size(); ++i) {
+    const auto& motor = data.control.motors[i];
+    UpdateSource(sources.motors[i], motor.present, motor.lastUpdate,
+                 motor.value);
+  }
+
+  for (size_t i = 0; i < data.control.servos.size(); ++i) {
+    const auto& servo = data.control.servos[i];
+    UpdateSource(sources.servos[i], servo.present, servo.lastUpdate,
+                 servo.value * SERVO_MAX_DEGREES);
+  }
+
+  for (size_t i = 0; i < data.control.digitalOutputs.size(); ++i) {
+    const auto& dio = data.control.digitalOutputs[i];
+    UpdateSource(sources.digitalOutputs[i], dio.present, dio.lastUpdate,
+                 dio.value);
+  }
+
+  for (size_t i = 0; i < data.status.encoders.size(); ++i) {
+    const auto& encoder = data.status.encoders[i];
+    UpdateSource(sources.encoderCounts[i], encoder.present, encoder.lastUpdate,
+                 static_cast<int64_t>(encoder.value.count));
+    UpdateSource(sources.encoderPeriods[i],
+                 encoder.present && encoder.value.periodValid,
+                 encoder.lastUpdate, static_cast<float>(encoder.value.period));
+  }
+
+  for (size_t i = 0; i < data.status.digitalInputs.size(); ++i) {
+    const auto& dio = data.status.digitalInputs[i];
+    UpdateSource(sources.digitalInputs[i], dio.present, dio.lastUpdate,
+                 dio.value);
+  }
+
+  const auto& gyro = data.status.gyro;
+  UpdateSource(sources.gyroRates[0], gyro.present, gyro.lastUpdate,
+               gyro.value.rate.x);
+  UpdateSource(sources.gyroRates[1], gyro.present, gyro.lastUpdate,
+               gyro.value.rate.y);
+  UpdateSource(sources.gyroRates[2], gyro.present, gyro.lastUpdate,
+               gyro.value.rate.z);
+  UpdateSource(sources.gyroAngles[0], gyro.present, gyro.lastUpdate,
+               gyro.value.angle.x);
+  UpdateSource(sources.gyroAngles[1], gyro.present, gyro.lastUpdate,
+               gyro.value.angle.y);
+  UpdateSource(sources.gyroAngles[2], gyro.present, gyro.lastUpdate,
+               gyro.value.angle.z);
+
+  const auto& accel = data.status.accel;
+  UpdateSource(sources.accelerometer[0], accel.present, accel.lastUpdate,
+               accel.value.x);
+  UpdateSource(sources.accelerometer[1], accel.present, accel.lastUpdate,
+               accel.value.y);
+  UpdateSource(sources.accelerometer[2], accel.present, accel.lastUpdate,
+               accel.value.z);
+
+  for (size_t i = 0; i < data.status.analogInputs.size(); ++i) {
+    const auto& analog = data.status.analogInputs[i];
+    UpdateSource(sources.analogInputs[i], analog.present, analog.lastUpdate,
+                 analog.value);
+  }
+}
+
 template <typename Formatter>
 static void DrawDataRow(std::string_view name, bool present,
                         std::chrono::steady_clock::time_point lastUpdate,
+                        const wpi::glass::DataSource* source,
                         Formatter formatter) {
   ImGui::TableNextRow();
   ImGui::PushStyleColor(ImGuiCol_Text, GetDataTextColor(present, lastUpdate));
+  ImGui::PushID(source);
   ImGui::TableNextColumn();
-  TextUnformatted(name);
+  if (source) {
+    ImGui::Selectable(std::string{name}.c_str(), false);
+    source->EmitDrag();
+  } else {
+    TextUnformatted(name);
+  }
   ImGui::TableNextColumn();
   std::string value = present ? formatter() : "--";
-  ImGui::TextUnformatted(value.c_str());
+  if (source) {
+    ImGui::Selectable(std::format("{}##value", value).c_str(), false);
+    source->EmitDrag();
+  } else {
+    ImGui::TextUnformatted(value.c_str());
+  }
+  ImGui::PopID();
   ImGui::PopStyleColor();
 }
 
@@ -587,14 +785,6 @@ static std::string FormatDigitalValue(bool value) {
   return value ? "High" : "Low";
 }
 
-static std::string FormatEncoderData(const XRPEncoderData& value) {
-  if (!value.periodValid) {
-    return std::format("count {}, period --", value.count);
-  }
-  return std::format("count {}, period {} s", value.count,
-                     FormatSigned4(value.period));
-}
-
 static bool BeginXRPDataTable(const char* id) {
   constexpr ImGuiTableFlags TABLE_FLAGS = ImGuiTableFlags_Borders |
                                           ImGuiTableFlags_RowBg |
@@ -616,19 +806,24 @@ static void DrawControlDataTable(const XRPControlData& control) {
     return;
   }
 
-  DrawDataRow(
-      "Robot state", control.packet.present, control.packet.lastUpdate,
-      [&] { return FormatBool(control.enabled, "Enabled", "Disabled"); });
+  const auto& sources = gGui.dataSources;
+
+  DrawDataRow("Robot state", control.packet.present, control.packet.lastUpdate,
+              sources.robotEnabled.source.get(), [&] {
+                return FormatBool(control.enabled, "Enabled", "Disabled");
+              });
 
   for (size_t i = 0; i < control.motors.size(); ++i) {
     const auto& motor = control.motors[i];
     DrawDataRow(MOTOR_LABELS[i], motor.present, motor.lastUpdate,
+                sources.motors[i].source.get(),
                 [&] { return FormatMotorOutput(motor.value); });
   }
 
   for (size_t i = 0; i < control.servos.size(); ++i) {
     const auto& servo = control.servos[i];
     DrawDataRow(SERVO_LABELS[i], servo.present, servo.lastUpdate,
+                sources.servos[i].source.get(),
                 [&] { return FormatServoOutput(servo.value); });
   }
 
@@ -636,6 +831,7 @@ static void DrawControlDataTable(const XRPControlData& control) {
     const auto& dio = control.digitalOutputs[i];
     std::string label = std::format("DIO {} output", i);
     DrawDataRow(label, dio.present, dio.lastUpdate,
+                sources.digitalOutputs[i].source.get(),
                 [&] { return FormatDigitalValue(dio.value); });
   }
 
@@ -647,49 +843,75 @@ static void DrawStatusDataTable(const XRPStatusData& status) {
     return;
   }
 
+  const auto& sources = gGui.dataSources;
+
   for (size_t i = 0; i < status.encoders.size(); ++i) {
     const auto& encoder = status.encoders[i];
-    std::string label = std::format("Encoder {}", i);
-    DrawDataRow(label, encoder.present, encoder.lastUpdate,
-                [&] { return FormatEncoderData(encoder.value); });
+    std::string countLabel = std::format("Encoder {} count", i);
+    DrawDataRow(countLabel, encoder.present, encoder.lastUpdate,
+                sources.encoderCounts[i].source.get(),
+                [&] { return std::format("{}", encoder.value.count); });
+    std::string periodLabel = std::format("Encoder {} period", i);
+    DrawDataRow(
+        periodLabel, encoder.present && encoder.value.periodValid,
+        encoder.lastUpdate, sources.encoderPeriods[i].source.get(), [&] {
+          return std::format("{} s", FormatSigned4(encoder.value.period));
+        });
   }
 
   for (size_t i = 0; i < status.digitalInputs.size(); ++i) {
     const auto& dio = status.digitalInputs[i];
     std::string label = std::format("DIO {} input", i);
     DrawDataRow(label, dio.present, dio.lastUpdate,
+                sources.digitalInputs[i].source.get(),
                 [&] { return FormatDigitalValue(dio.value); });
   }
 
-  DrawDataRow("Gyro rate X", status.gyro.present, status.gyro.lastUpdate, [&] {
-    return std::format("{} deg/s", FormatSigned3(status.gyro.value.rate.x));
-  });
-  DrawDataRow("Gyro rate Y", status.gyro.present, status.gyro.lastUpdate, [&] {
-    return std::format("{} deg/s", FormatSigned3(status.gyro.value.rate.y));
-  });
-  DrawDataRow("Gyro rate Z", status.gyro.present, status.gyro.lastUpdate, [&] {
-    return std::format("{} deg/s", FormatSigned3(status.gyro.value.rate.z));
-  });
-  DrawDataRow("Gyro angle X", status.gyro.present, status.gyro.lastUpdate, [&] {
-    return std::format("{} deg", FormatSigned3(status.gyro.value.angle.x));
-  });
-  DrawDataRow("Gyro angle Y", status.gyro.present, status.gyro.lastUpdate, [&] {
-    return std::format("{} deg", FormatSigned3(status.gyro.value.angle.y));
-  });
-  DrawDataRow("Gyro angle Z", status.gyro.present, status.gyro.lastUpdate, [&] {
-    return std::format("{} deg", FormatSigned3(status.gyro.value.angle.z));
-  });
+  DrawDataRow("Gyro rate X", status.gyro.present, status.gyro.lastUpdate,
+              sources.gyroRates[0].source.get(), [&] {
+                return std::format("{} deg/s",
+                                   FormatSigned3(status.gyro.value.rate.x));
+              });
+  DrawDataRow("Gyro rate Y", status.gyro.present, status.gyro.lastUpdate,
+              sources.gyroRates[1].source.get(), [&] {
+                return std::format("{} deg/s",
+                                   FormatSigned3(status.gyro.value.rate.y));
+              });
+  DrawDataRow("Gyro rate Z", status.gyro.present, status.gyro.lastUpdate,
+              sources.gyroRates[2].source.get(), [&] {
+                return std::format("{} deg/s",
+                                   FormatSigned3(status.gyro.value.rate.z));
+              });
+  DrawDataRow("Gyro angle X", status.gyro.present, status.gyro.lastUpdate,
+              sources.gyroAngles[0].source.get(), [&] {
+                return std::format("{} deg",
+                                   FormatSigned3(status.gyro.value.angle.x));
+              });
+  DrawDataRow("Gyro angle Y", status.gyro.present, status.gyro.lastUpdate,
+              sources.gyroAngles[1].source.get(), [&] {
+                return std::format("{} deg",
+                                   FormatSigned3(status.gyro.value.angle.y));
+              });
+  DrawDataRow("Gyro angle Z", status.gyro.present, status.gyro.lastUpdate,
+              sources.gyroAngles[2].source.get(), [&] {
+                return std::format("{} deg",
+                                   FormatSigned3(status.gyro.value.angle.z));
+              });
   DrawDataRow("Accel X", status.accel.present, status.accel.lastUpdate,
+              sources.accelerometer[0].source.get(),
               [&] { return FormatSigned3(status.accel.value.x); });
   DrawDataRow("Accel Y", status.accel.present, status.accel.lastUpdate,
+              sources.accelerometer[1].source.get(),
               [&] { return FormatSigned3(status.accel.value.y); });
   DrawDataRow("Accel Z", status.accel.present, status.accel.lastUpdate,
+              sources.accelerometer[2].source.get(),
               [&] { return FormatSigned3(status.accel.value.z); });
 
   for (size_t i = 0; i < status.analogInputs.size(); ++i) {
     const auto& analog = status.analogInputs[i];
     std::string label = std::format("Analog {}", i);
     DrawDataRow(label, analog.present, analog.lastUpdate,
+                sources.analogInputs[i].source.get(),
                 [&] { return std::format("{:.2f} V", analog.value); });
   }
 
@@ -816,6 +1038,7 @@ static void DrawGuiImpl() {
   auto status = simXRP->GetConnectionStatus();
   InitializeFromConnection(status);
   XRPDataSnapshot data = simXRP->GetDataSnapshot();
+  UpdateDataSources(data);
 
   ImGui::SetNextWindowSize(ImVec2{430, 0}, ImGuiCond_FirstUseEver);
   float minWidth =
@@ -878,11 +1101,16 @@ static void DrawGui() {
 
   ImPlotContext* plotContext =
       gGetImPlotContext ? gGetImPlotContext() : nullptr;
+  wpi::glass::Context* glassContext =
+      gGetGlassContext ? gGetGlassContext() : nullptr;
   ImGuiContext* previousContext = ImGui::GetCurrentContext();
   ImPlotContext* previousPlotContext = ImPlot::GetCurrentContext();
+  wpi::glass::Context* previousGlassContext = wpi::glass::GetCurrentContext();
   ImGui::SetCurrentContext(guiContext);
   ImPlot::SetCurrentContext(plotContext);
+  wpi::glass::SetCurrentContext(glassContext);
   DrawGuiImpl();
+  wpi::glass::SetCurrentContext(previousGlassContext);
   ImPlot::SetCurrentContext(previousPlotContext);
   ImGui::SetCurrentContext(previousContext);
 }
@@ -897,6 +1125,8 @@ static void ExtensionListener(void*, const char* name, void* data) {
     gGetImguiContext = reinterpret_cast<GetImguiContextFn>(data);
   } else if (nameView == GET_IMPLOT_CONTEXT_NAME) {
     gGetImPlotContext = reinterpret_cast<GetImPlotContextFn>(data);
+  } else if (nameView == GET_GLASS_CONTEXT_NAME) {
+    gGetGlassContext = reinterpret_cast<GetGlassContextFn>(data);
   }
 }
 

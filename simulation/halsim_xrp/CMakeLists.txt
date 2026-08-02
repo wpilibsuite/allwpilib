@@ -9,7 +9,7 @@ add_library(halsim_xrp SHARED ${halsim_xrp_src})
 wpilib_target_warnings(halsim_xrp)
 set_target_properties(halsim_xrp PROPERTIES DEBUG_POSTFIX "d")
 wpilib_link_macos_gui(halsim_xrp)
-target_link_libraries(halsim_xrp PUBLIC hal halsim_ws_core PRIVATE imgui wpigui)
+target_link_libraries(halsim_xrp PUBLIC hal halsim_ws_core PRIVATE imgui libglass wpigui)
 
 target_include_directories(halsim_xrp PRIVATE src/main/native/include)
 

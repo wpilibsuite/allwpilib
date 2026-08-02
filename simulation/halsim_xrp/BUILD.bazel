@@ -17,6 +17,7 @@ wpilib_cc_library(
     }),
     visibility = ["//visibility:public"],
     deps = [
+        "//glass",
         "//simulation/halsim_ws_core",
         "//thirdparty/imgui_suite",
         "//wpigui",
@@ -41,6 +42,7 @@ wpilib_cc_library(
     }),
     visibility = ["//visibility:public"],
     deps = [
+        "//glass",
         "//simulation/halsim_ws_core",
         "//thirdparty/imgui_suite",
         "//wpigui",
@@ -94,6 +96,7 @@ wpilib_cc_shared_library(
 wpilib_cc_static_library(
     name = "static/halsim_xrp",
     static_deps = [
+        "//glass:static/glass",
         "//thirdparty/imgui_suite:static/imguiSuite",
         "//wpinet:static/wpinet",
         "//wpigui:static/wpigui",
