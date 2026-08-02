@@ -31,6 +31,9 @@ using AddGuiLateExecuteFn = void (*)(std::function<void()> execute);
 #define HALSIMGUI_EXT_ADDGUIEARLYEXECUTE "halsimgui::AddGuiEarlyExecute"
 using AddGuiEarlyExecuteFn = void (*)(std::function<void()> execute);
 
+#define HALSIMGUI_EXT_ADDMAINMENU "halsimgui::AddMainMenu"
+using AddMainMenuFn = void (*)(std::function<void()> menu);
+
 #define HALSIMGUI_EXT_GUIEXIT "halsimgui::GuiExit"
 using GuiExitFn = void (*)();
 

@@ -95,6 +95,8 @@ int HALSIM_InitExtension(void) {
   HAL_RegisterExtension(
       HALSIMGUI_EXT_ADDGUIEARLYEXECUTE,
       reinterpret_cast<void*>((AddGuiEarlyExecuteFn)&AddGuiEarlyExecute));
+  HAL_RegisterExtension(HALSIMGUI_EXT_ADDMAINMENU,
+                        reinterpret_cast<void*>((AddMainMenuFn)&AddMainMenu));
   HAL_RegisterExtension(HALSIMGUI_EXT_GUIEXIT,
                         reinterpret_cast<void*>((GuiExitFn)&GuiExit));
   HAL_RegisterExtension(

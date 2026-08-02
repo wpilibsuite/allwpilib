@@ -25,6 +25,8 @@
 
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/WindowManager.hpp"
 #include "wpi/glass/support/ExtraGuiWidgets.hpp"
 #include "wpi/hal/Extensions.h"
 #include "wpi/halsim/xrp/HALSimXRP.hpp"
@@ -37,6 +39,7 @@ namespace {
 
 constexpr std::string_view ADD_GUI_LATE_EXECUTE_NAME =
     "halsimgui::AddGuiLateExecute";
+constexpr std::string_view ADD_MAIN_MENU_NAME = "halsimgui::AddMainMenu";
 constexpr std::string_view GET_IMGUI_CONTEXT_NAME =
     "halsimgui::GetImguiContext";
 constexpr std::string_view GET_IMPLOT_CONTEXT_NAME =
@@ -57,9 +60,23 @@ constexpr std::array<std::string_view, 4> SERVO_LABELS = {"Servo 1", "Servo 2",
                                                           "Servo 3", "Servo 4"};
 
 using AddGuiLateExecuteFn = void (*)(std::function<void()> execute);
+using AddMainMenuFn = void (*)(std::function<void()> menu);
 using GetImguiContextFn = ImGuiContext* (*)();
 using GetImPlotContextFn = ImPlotContext* (*)();
 using GetGlassContextFn = wpi::glass::Context* (*)();
+
+class XRPWindowManager : public wpi::glass::WindowManager {
+ public:
+  using wpi::glass::WindowManager::WindowManager;
+
+  void DisplayManagedWindows() {
+    wpi::glass::PushStorageStack(m_storage);
+    for (auto&& window : m_windows) {
+      window->Display();
+    }
+    wpi::glass::PopStorageStack();
+  }
+};
 
 template <typename Source>
 struct SourceSlot {
@@ -114,6 +131,8 @@ struct GuiState {
   bool haveLastLatencyControlSeq = false;
   bool showAddress = false;
   GuiDataSources dataSources;
+  XRPDataSnapshot data;
+  std::unique_ptr<XRPWindowManager> dataWindowManager;
 };
 
 static std::weak_ptr<HALSimXRP> gSimXRP;
@@ -122,7 +141,35 @@ static GetImPlotContextFn gGetImPlotContext = nullptr;
 static GetGlassContextFn gGetGlassContext = nullptr;
 static bool gListenerRegistered = false;
 static bool gLateExecuteRegistered = false;
+static bool gMainMenuRegistered = false;
 static GuiState gGui;
+
+template <typename Func>
+static void WithGuiContexts(Func&& func) {
+  if (!gGetImguiContext) {
+    return;
+  }
+
+  ImGuiContext* guiContext = gGetImguiContext();
+  if (!guiContext) {
+    return;
+  }
+
+  ImPlotContext* plotContext =
+      gGetImPlotContext ? gGetImPlotContext() : nullptr;
+  wpi::glass::Context* glassContext =
+      gGetGlassContext ? gGetGlassContext() : nullptr;
+  ImGuiContext* previousContext = ImGui::GetCurrentContext();
+  ImPlotContext* previousPlotContext = ImPlot::GetCurrentContext();
+  wpi::glass::Context* previousGlassContext = wpi::glass::GetCurrentContext();
+  ImGui::SetCurrentContext(guiContext);
+  ImPlot::SetCurrentContext(plotContext);
+  wpi::glass::SetCurrentContext(glassContext);
+  std::forward<Func>(func)();
+  wpi::glass::SetCurrentContext(previousGlassContext);
+  ImPlot::SetCurrentContext(previousPlotContext);
+  ImGui::SetCurrentContext(previousContext);
+}
 
 static void SetAddress(std::string_view address) {
   std::snprintf(gGui.address, sizeof(gGui.address), "%.*s",
@@ -1045,20 +1092,49 @@ static void DrawStatusDataTable(const XRPStatusData& status) {
   ImGui::EndTable();
 }
 
-static void DrawXRPDataWindow(const XRPDataSnapshot& data) {
-  ImGui::SetNextWindowSize(ImVec2{620, 520}, ImGuiCond_FirstUseEver);
-  if (!ImGui::Begin("XRP Control and Status")) {
-    ImGui::End();
+static void DrawXRPControlWindow() {
+  DrawControlDataTable(gGui.data.control);
+}
+
+static void DrawXRPStatusWindow() {
+  DrawStatusDataTable(gGui.data.status);
+}
+
+static void InitializeDataWindows() {
+  if (gGui.dataWindowManager || wpi::glass::GetCurrentContext() == nullptr) {
     return;
   }
 
-  ImGui::TextUnformatted("Control");
-  DrawControlDataTable(data.control);
-  ImGui::Separator();
-  ImGui::TextUnformatted("Status");
-  DrawStatusDataTable(data.status);
+  gGui.dataWindowManager = std::make_unique<XRPWindowManager>(
+      wpi::glass::GetStorageRoot().GetChild("XRP"));
 
-  ImGui::End();
+  if (auto window = gGui.dataWindowManager->AddWindow("XRP Control",
+                                                      DrawXRPControlWindow)) {
+    window->SetDefaultSize(620, 260);
+  }
+  if (auto window = gGui.dataWindowManager->AddWindow("XRP Status",
+                                                      DrawXRPStatusWindow)) {
+    window->SetDefaultSize(620, 420);
+  }
+}
+
+static void DrawXRPDataWindows() {
+  InitializeDataWindows();
+  if (gGui.dataWindowManager) {
+    gGui.dataWindowManager->DisplayManagedWindows();
+  }
+}
+
+static void DrawXRPMainMenu() {
+  WithGuiContexts([] {
+    InitializeDataWindows();
+    if (ImGui::BeginMenu("XRP")) {
+      if (gGui.dataWindowManager) {
+        gGui.dataWindowManager->DisplayMenu();
+      }
+      ImGui::EndMenu();
+    }
+  });
 }
 
 static std::string SelectedDeviceLabel() {
@@ -1164,8 +1240,8 @@ static void DrawGuiImpl() {
 
   auto status = simXRP->GetConnectionStatus();
   InitializeFromConnection(status);
-  XRPDataSnapshot data = simXRP->GetDataSnapshot();
-  UpdateDataSources(data);
+  gGui.data = simXRP->GetDataSnapshot();
+  UpdateDataSources(gGui.data);
 
   ImGui::SetNextWindowSize(ImVec2{430, 0}, ImGuiCond_FirstUseEver);
   float minWidth =
@@ -1175,7 +1251,7 @@ static void DrawGuiImpl() {
   ImGui::SetNextWindowSizeConstraints({minWidth, 0}, ImVec2{FLT_MAX, FLT_MAX});
   if (!ImGui::Begin("XRP Bluetooth")) {
     ImGui::End();
-    DrawXRPDataWindow(data);
+    DrawXRPDataWindows();
     return;
   }
   DrawViewSettingsMenu();
@@ -1213,33 +1289,11 @@ static void DrawGuiImpl() {
   DrawLatencyPlot(status);
 
   ImGui::End();
-  DrawXRPDataWindow(data);
+  DrawXRPDataWindows();
 }
 
 static void DrawGui() {
-  if (!gGetImguiContext) {
-    return;
-  }
-
-  ImGuiContext* guiContext = gGetImguiContext();
-  if (!guiContext) {
-    return;
-  }
-
-  ImPlotContext* plotContext =
-      gGetImPlotContext ? gGetImPlotContext() : nullptr;
-  wpi::glass::Context* glassContext =
-      gGetGlassContext ? gGetGlassContext() : nullptr;
-  ImGuiContext* previousContext = ImGui::GetCurrentContext();
-  ImPlotContext* previousPlotContext = ImPlot::GetCurrentContext();
-  wpi::glass::Context* previousGlassContext = wpi::glass::GetCurrentContext();
-  ImGui::SetCurrentContext(guiContext);
-  ImPlot::SetCurrentContext(plotContext);
-  wpi::glass::SetCurrentContext(glassContext);
-  DrawGuiImpl();
-  wpi::glass::SetCurrentContext(previousGlassContext);
-  ImPlot::SetCurrentContext(previousPlotContext);
-  ImGui::SetCurrentContext(previousContext);
+  WithGuiContexts(DrawGuiImpl);
 }
 
 static void ExtensionListener(void*, const char* name, void* data) {
@@ -1248,6 +1302,10 @@ static void ExtensionListener(void*, const char* name, void* data) {
     auto addGuiLateExecute = reinterpret_cast<AddGuiLateExecuteFn>(data);
     addGuiLateExecute(DrawGui);
     gLateExecuteRegistered = true;
+  } else if (nameView == ADD_MAIN_MENU_NAME && !gMainMenuRegistered) {
+    auto addMainMenu = reinterpret_cast<AddMainMenuFn>(data);
+    addMainMenu(DrawXRPMainMenu);
+    gMainMenuRegistered = true;
   } else if (nameView == GET_IMGUI_CONTEXT_NAME) {
     gGetImguiContext = reinterpret_cast<GetImguiContextFn>(data);
   } else if (nameView == GET_IMPLOT_CONTEXT_NAME) {
