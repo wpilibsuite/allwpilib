@@ -415,6 +415,41 @@ void HALSimXRP::DisconnectBluetooth() {
   }
 }
 
+bool HALSimXRP::RenameBluetoothDevice(std::string_view deviceName) {
+  if (!m_bluetoothClient || deviceName.empty() ||
+      deviceName.size() > CONTROL_DEVICE_NAME_MAX_LENGTH) {
+    return false;
+  }
+
+  wpi::util::SmallVector<uv::Buffer, 4> sendBufs;
+  wpi::net::raw_uv_ostream stream{sendBufs, [&] {
+                                    std::lock_guard lock(m_buffer_mutex);
+                                    return GetBufferPool().Allocate();
+                                  }};
+  m_xrp.SetupRenameDeviceBuffer(stream, deviceName);
+
+  size_t packetSize = 0;
+  for (const auto& buf : sendBufs) {
+    packetSize += buf.len;
+  }
+
+  std::vector<uint8_t> packet;
+  if (packetSize <= MAX_BLUETOOTH_PACKET_SIZE) {
+    packet.reserve(packetSize);
+    for (const auto& buf : sendBufs) {
+      const auto* data = reinterpret_cast<const uint8_t*>(buf.base);
+      packet.insert(packet.end(), data, data + buf.len);
+    }
+  }
+
+  {
+    std::lock_guard lock(m_buffer_mutex);
+    GetBufferPool().Release(sendBufs);
+  }
+
+  return !packet.empty() && m_bluetoothClient->Send(packet);
+}
+
 XRPConnectionStatus HALSimXRP::GetConnectionStatus() const {
   std::scoped_lock lock(m_statusMutex);
   return m_status;

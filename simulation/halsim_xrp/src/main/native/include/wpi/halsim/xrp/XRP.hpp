@@ -41,10 +41,12 @@ constexpr uint16_t CONTROL_SERVO_5 = 1u << 5;
 constexpr uint16_t CONTROL_SERVO_6 = 1u << 6;
 constexpr uint16_t CONTROL_SERVO_7 = 1u << 7;
 constexpr uint16_t CONTROL_DIO = 1u << 8;
+constexpr uint16_t CONTROL_DEVICE_NAME = 1u << 15;
+constexpr uint8_t CONTROL_DEVICE_NAME_MAX_LENGTH = 26;
 constexpr uint16_t CONTROL_ALL_FIELDS =
     CONTROL_MOTOR_0 | CONTROL_MOTOR_1 | CONTROL_MOTOR_2 | CONTROL_MOTOR_3 |
     CONTROL_SERVO_4 | CONTROL_SERVO_5 | CONTROL_SERVO_6 | CONTROL_SERVO_7 |
-    CONTROL_DIO;
+    CONTROL_DIO | CONTROL_DEVICE_NAME;
 
 constexpr uint16_t STATUS_ENCODER_0 = 1u << 0;
 constexpr uint16_t STATUS_ENCODER_1 = 1u << 1;
@@ -127,6 +129,8 @@ class XRP {
   void HandleXRPUpdate(std::span<const uint8_t> packet);
 
   void SetupXRPSendBuffer(wpi::net::raw_uv_ostream& buf);
+  void SetupRenameDeviceBuffer(wpi::net::raw_uv_ostream& buf,
+                               std::string_view deviceName);
 
   /**
    * Allows status packets from a new XRP connection to restart their sequence.

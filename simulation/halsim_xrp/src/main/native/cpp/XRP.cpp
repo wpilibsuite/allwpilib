@@ -200,6 +200,16 @@ void XRP::SetupXRPSendBuffer(wpi::net::raw_uv_ostream& buf) {
   m_xrp_bound_seq++;
 }
 
+void XRP::SetupRenameDeviceBuffer(wpi::net::raw_uv_ostream& buf,
+                                  std::string_view deviceName) {
+  SetupSendHeader(buf, CONTROL_DEVICE_NAME);
+  buf << static_cast<uint8_t>(deviceName.size());
+  for (char c : deviceName) {
+    buf << static_cast<uint8_t>(c);
+  }
+  m_xrp_bound_seq++;
+}
+
 void XRP::ResetStatusPacketSequence() {
   std::scoped_lock lock(m_data_snapshot_mutex);
   m_have_wpilib_bound_seq = false;

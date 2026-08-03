@@ -72,6 +72,7 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
   void ConnectBluetooth(std::string address, XRPBluetoothAddressType type,
                         std::string name = {});
   void DisconnectBluetooth();
+  bool RenameBluetoothDevice(std::string_view deviceName);
   XRPConnectionStatus GetConnectionStatus() const;
 
   /**

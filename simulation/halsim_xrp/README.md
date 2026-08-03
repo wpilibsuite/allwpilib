@@ -53,8 +53,11 @@ For XRP -> WPILib status packets, the control byte is a copy of the most recent 
 | 6     | XRPServo 6  | _uint8_t_ degrees |
 | 7     | XRPServo 7  | _uint8_t_ degrees |
 | 8     | DIO 0-7     | _uint8_t_ present mask, _uint8_t_ value mask |
+| 15    | Device name | _uint8_t_ length, followed by `length` printable ASCII bytes |
 
 XRPMotor `pwm` values are clamped to `-255` to `255`, matching the XRP motor PWM magnitude plus direction. XRPServo `degrees` values are clamped to `0` to `180`, matching the integer degree value applied by the XRP servo library. DIO payload bits are channel-indexed; bit `n` in the present mask means DIO channel `n` is included, and bit `n` in the value mask is that channel's value.
+
+A device name control packet must use only field bit 15. The payload may contain either the full `WPIXRP-` name or just the suffix. The firmware validates the name, writes it to `/config.ini`, and reboots so the new Bluetooth advertisement name is applied.
 
 ### XRP -> WPILib Status Fields
 
