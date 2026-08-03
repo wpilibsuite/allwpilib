@@ -15,12 +15,17 @@ open module wpilib.math {
   requires wpilib.annotation;
   requires wpilib.util;
 
+  // Note: generated protobuf classes go into `*.proto.detail` packages.
+  // We don't export them because they're internal implementation details and we don't want them
+  // appearing in intellisense.
+
   exports org.wpilib.math.autodiff;
   exports org.wpilib.math.controller;
   exports org.wpilib.math.controller.proto;
   exports org.wpilib.math.controller.struct;
   exports org.wpilib.math.estimator;
   exports org.wpilib.math.filter;
+  // org.wpilib.math.filter.internal is not exported
   exports org.wpilib.math.geometry;
   exports org.wpilib.math.geometry.proto;
   exports org.wpilib.math.geometry.struct;
@@ -37,8 +42,10 @@ open module wpilib.math {
   exports org.wpilib.math.optimization.ocp;
   exports org.wpilib.math.optimization.solver;
   exports org.wpilib.math.path;
-  exports org.wpilib.math.proto;
   exports org.wpilib.math.random;
+  exports org.wpilib.math.shape;
+  exports org.wpilib.math.shape.proto;
+  exports org.wpilib.math.shape.struct;
   exports org.wpilib.math.spline;
   exports org.wpilib.math.spline.proto;
   exports org.wpilib.math.spline.struct;
