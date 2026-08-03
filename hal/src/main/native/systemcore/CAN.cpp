@@ -299,9 +299,6 @@ bool SocketCanState::InitializeBuses() {
           msg.message.message.flags |= (frame.flags & CANFD_FDF)
                                            ? HAL_CANFlags::HAL_CAN_FD_DATALENGTH
                                            : HAL_CANFlags::HAL_CAN_NO_FLAGS;
-          msg.message.message.flags |=
-              (frame.flags & CANFD_BRS) ? HAL_CANFlags::HAL_CAN_FD_BITRATESWITCH
-                                        : HAL_CANFlags::HAL_CAN_NO_FLAGS;
 
           msg.message.message.dataSize = frame.len;
           if (frame.len > 0) {
