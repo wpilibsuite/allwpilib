@@ -59,6 +59,9 @@ namespace {
 
 constexpr const wchar_t* BLUETOOTH_DEVICE_ADDRESS_PROPERTY =
     L"System.Devices.Aep.DeviceAddress";
+constexpr const wchar_t* BLUETOOTH_LE_ADDRESS_TYPE_PROPERTY =
+    L"System.Devices.Aep.Bluetooth.Le.AddressType";
+constexpr uint8_t BLUETOOTH_LE_ADDRESS_TYPE_PUBLIC = 0;
 
 uint8_t HexDigit(char ch) {
   if (ch >= '0' && ch <= '9') {
@@ -161,7 +164,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 winrt::Windows::Foundation::Collections::IVector<winrt::hstring>
 GetBluetoothDeviceProperties() {
   return winrt::single_threaded_vector<winrt::hstring>(
-      {winrt::hstring{BLUETOOTH_DEVICE_ADDRESS_PROPERTY}});
+      {winrt::hstring{BLUETOOTH_DEVICE_ADDRESS_PROPERTY},
+       winrt::hstring{BLUETOOTH_LE_ADDRESS_TYPE_PROPERTY}});
 }
 
 std::string GetDeviceTarget(dev::DeviceInformation const& info) {
@@ -180,6 +184,23 @@ std::string GetDeviceTarget(dev::DeviceInformation const& info) {
   }
 
   return ExtractBluetoothAddress(winrt::to_string(info.Id()));
+}
+
+BluetoothAddressType GetDeviceAddressType(dev::DeviceInformation const& info) {
+  try {
+    auto properties = info.Properties();
+    winrt::hstring addressTypeProperty{BLUETOOTH_LE_ADDRESS_TYPE_PROPERTY};
+    if (properties.HasKey(addressTypeProperty)) {
+      auto addressType =
+          winrt::unbox_value<uint8_t>(properties.Lookup(addressTypeProperty));
+      if (addressType == BLUETOOTH_LE_ADDRESS_TYPE_PUBLIC) {
+        return BluetoothAddressType::PUBLIC;
+      }
+    }
+  } catch (winrt::hresult_error const&) {
+  }
+
+  return BluetoothAddressType::RANDOM;
 }
 
 bool DeviceMatchesTarget(dev::DeviceInformation const& info,
@@ -858,7 +879,7 @@ BluetoothLEDeviceScanResult BluetoothLEPacketClient::ScanDevices(
       BluetoothLEDeviceInfo device;
       device.target = std::move(target);
       device.name = winrt::to_string(info.Name());
-      device.addressType = BluetoothAddressType::RANDOM;
+      device.addressType = GetDeviceAddressType(info);
       device.paired = info.Pairing().IsPaired();
       device.pairable = info.Pairing().CanPair();
       result.devices.emplace_back(std::move(device));
