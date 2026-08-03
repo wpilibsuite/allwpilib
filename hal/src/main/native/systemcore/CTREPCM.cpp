@@ -250,7 +250,7 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
 
   // Enable closed loop control
   HAL_SetCTREPCMClosedLoopControl(handle, true, status);
-  if (*status != 0) {
+  if (*status != 0 && *status != HAL_WARN_CANSessionMux_NoToken) {
     HAL_FreeCTREPCM(handle);
     return HAL_INVALID_HANDLE;
   }
