@@ -133,10 +133,10 @@ class Timer {
    * Creates a new timer that begins started.
    *
    * <p>This is equivalent to
-   * <pre>{@code
+   * <pre>
    *   wpi::Timer timer;
    *   timer.Start();
-   * }
+   * </pre>
    *
    * @return A new started timer.
    */
