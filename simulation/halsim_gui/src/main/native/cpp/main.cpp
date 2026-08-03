@@ -241,6 +241,7 @@ int HALSIM_InitExtension(void) {
       nullptr,
       [](void*) {
         gui::Main();
+        gPlotProvider.reset();
         wpi::glass::DestroyContext();
         gui::DestroyContext();
       },
