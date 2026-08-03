@@ -40,8 +40,8 @@ public final class SwerveModule {
 
   /** Stops the module by turning off the drive and turn motors. */
   public void stop() {
-    driveMotor.stopMotor();
-    turnMotor.stopMotor();
+    driveMotor.setThrottle(0.0);
+    turnMotor.setThrottle(0.0);
   }
 
   /**

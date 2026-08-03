@@ -2,10 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <string>
+#include <optional>
 #include <thread>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "Constants.hpp"
 #include "Robot.hpp"
@@ -21,18 +22,17 @@
 
 using namespace Constants;
 
-class ElevatorSimulationTest : public testing::Test {
+class ElevatorSimulationTest {
   Robot robot;
   std::optional<std::thread> thread;
 
- protected:
+ public:
   wpi::sim::PWMMotorControllerSim motorSim{Constants::kMotorPort};
   wpi::sim::EncoderSim encoderSim =
       wpi::sim::EncoderSim::CreateForChannel(Constants::kEncoderAChannel);
   wpi::sim::JoystickSim joystickSim{Constants::kJoystickPort};
 
- public:
-  void SetUp() override {
+  ElevatorSimulationTest() {
     wpi::sim::PauseTiming();
     wpi::sim::SetProgramStarted(false);
 
@@ -40,7 +40,7 @@ class ElevatorSimulationTest : public testing::Test {
     wpi::sim::WaitForProgramStart();
   }
 
-  void TearDown() override {
+  ~ElevatorSimulationTest() {
     robot.EndCompetition();
     thread->join();
 
@@ -49,14 +49,15 @@ class ElevatorSimulationTest : public testing::Test {
   }
 };
 
-TEST_F(ElevatorSimulationTest, Teleop) {
+TEST_CASE_METHOD(ElevatorSimulationTest, "ElevatorSimulationTest teleop",
+                 "[wpilibcExamples][examples][simulation][elevator]") {
   // teleop init
   {
     wpi::sim::DriverStationSim::SetRobotMode(wpi::hal::RobotMode::TELEOPERATED);
     wpi::sim::DriverStationSim::SetEnabled(true);
     wpi::sim::DriverStationSim::NotifyNewData();
 
-    EXPECT_TRUE(encoderSim.GetInitialized());
+    CHECK(encoderSim.GetInitialized());
   }
 
   {
@@ -64,7 +65,7 @@ TEST_F(ElevatorSimulationTest, Teleop) {
     wpi::sim::StepTiming(1_s);
 
     // Ensure elevator is still at 0.
-    EXPECT_NEAR(0.0, encoderSim.GetDistance(), 0.05);
+    CHECK_THAT(encoderSim.GetDistance(), Catch::Matchers::WithinAbs(0.0, 0.05));
   }
 
   {
@@ -75,12 +76,14 @@ TEST_F(ElevatorSimulationTest, Teleop) {
     // advance 75 timesteps
     wpi::sim::StepTiming(1.5_s);
 
-    EXPECT_NEAR(kSetpoint.value(), encoderSim.GetDistance(), 0.05);
+    CHECK_THAT(encoderSim.GetDistance(),
+               Catch::Matchers::WithinAbs(kSetpoint.value(), 0.05));
 
     // advance 25 timesteps to see setpoint is held.
     wpi::sim::StepTiming(0.5_s);
 
-    EXPECT_NEAR(kSetpoint.value(), encoderSim.GetDistance(), 0.05);
+    CHECK_THAT(encoderSim.GetDistance(),
+               Catch::Matchers::WithinAbs(kSetpoint.value(), 0.05));
   }
 
   {
@@ -91,7 +94,7 @@ TEST_F(ElevatorSimulationTest, Teleop) {
     // advance 75 timesteps
     wpi::sim::StepTiming(1.5_s);
 
-    EXPECT_NEAR(0.0, encoderSim.GetDistance(), 0.05);
+    CHECK_THAT(encoderSim.GetDistance(), Catch::Matchers::WithinAbs(0.0, 0.05));
   }
 
   {
@@ -102,12 +105,14 @@ TEST_F(ElevatorSimulationTest, Teleop) {
     // advance 75 timesteps
     wpi::sim::StepTiming(1.5_s);
 
-    EXPECT_NEAR(kSetpoint.value(), encoderSim.GetDistance(), 0.05);
+    CHECK_THAT(encoderSim.GetDistance(),
+               Catch::Matchers::WithinAbs(kSetpoint.value(), 0.05));
 
     // advance 25 timesteps to see setpoint is held.
     wpi::sim::StepTiming(0.5_s);
 
-    EXPECT_NEAR(kSetpoint.value(), encoderSim.GetDistance(), 0.05);
+    CHECK_THAT(encoderSim.GetDistance(),
+               Catch::Matchers::WithinAbs(kSetpoint.value(), 0.05));
   }
 
   {
@@ -118,7 +123,8 @@ TEST_F(ElevatorSimulationTest, Teleop) {
     // advance 75 timesteps
     wpi::sim::StepTiming(1.5_s);
 
-    ASSERT_NEAR(0.0, motorSim.GetThrottle(), 0.05);
-    ASSERT_NEAR(0.0, encoderSim.GetDistance(), 0.05);
+    REQUIRE_THAT(motorSim.GetThrottle(), Catch::Matchers::WithinAbs(0.0, 0.05));
+    REQUIRE_THAT(encoderSim.GetDistance(),
+                 Catch::Matchers::WithinAbs(0.0, 0.05));
   }
 }

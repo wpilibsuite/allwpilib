@@ -8,6 +8,7 @@ evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':commandsv3')
 evaluationDependsOn(':cscore')
 evaluationDependsOn(':epilogue-runtime')
+evaluationDependsOn(':fields')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':wpiannotations')
@@ -38,6 +39,7 @@ def cppIncludeRoots = []
 cppProjectZips.add(project(':apriltag').cppHeadersZip)
 cppProjectZips.add(project(':cameraserver').cppHeadersZip)
 cppProjectZips.add(project(':cscore').cppHeadersZip)
+cppProjectZips.add(project(':fields').cppHeadersZip)
 cppProjectZips.add(project(':hal').cppHeadersZip)
 cppProjectZips.add(project(':ntcore').cppHeadersZip)
 cppProjectZips.add(project(':commandsv2').cppHeadersZip)
@@ -107,9 +109,6 @@ doxygen.sourceSets.main {
         // apriltag
         exclude 'apriltag_pose.h'
 
-        // json
-        exclude 'wpi/util/detail/**'
-
         // libuv
         exclude 'uv/**'
 
@@ -163,6 +162,7 @@ def javaDocProjects = [
     project(':commandsv3'),
     project(':cscore'),
     project(':epilogue-runtime'),
+    project(':fields'),
     project(':hal'),
     project(':ntcore'),
     project(':wpiannotations'),
@@ -235,7 +235,7 @@ def stageJavaDocModules = tasks.register('stageJavaDocModules', Sync) {
     }
 }
 
-task generateJavaDocs(type: Javadoc) {
+tasks.register('generateJavaDocs', Javadoc) {
     dependsOn stageJavaDocModules
     // Track library dependencies so javadoc can link against them
     def javaDocModulePath = files()
@@ -254,21 +254,30 @@ task generateJavaDocs(type: Javadoc) {
             "-org.wpilib.hardware.hal.simulation," +
             // TODO: ^ Document these, then remove them from the list
             "-org.wpilib.hardware.hal.struct," +
-            "-org.wpilib.math.proto," +
             "-org.wpilib.math.struct," +
             "-org.wpilib.math.controller.proto," +
+            "-org.wpilib.math.controller.proto.detail," +
             "-org.wpilib.math.controller.struct," +
             "-org.wpilib.math.geometry.proto," +
+            "-org.wpilib.math.geometry.proto.detail," +
             "-org.wpilib.math.geometry.struct," +
             "-org.wpilib.math.kinematics.proto," +
+            "-org.wpilib.math.kinematics.proto.detail," +
             "-org.wpilib.math.kinematics.struct," +
             "-org.wpilib.math.linalg.proto," +
+            "-org.wpilib.math.linalg.proto.detail," +
             "-org.wpilib.math.linalg.struct," +
+            "-org.wpilib.math.shape.proto," +
+            "-org.wpilib.math.shape.proto.detail," +
+            "-org.wpilib.math.shape.struct," +
             "-org.wpilib.math.spline.proto," +
+            "-org.wpilib.math.spline.proto.detail," +
             "-org.wpilib.math.spline.struct," +
             "-org.wpilib.math.system.proto," +
+            "-org.wpilib.math.system.proto.detail," +
             "-org.wpilib.math.system.struct," +
             "-org.wpilib.math.trajectory.proto," +
+            "-org.wpilib.math.trajectory.proto.detail," +
             "-org.wpilib.math.trajectory.struct," +
             "-org.wpilib.command3.proto," +
             // The .measure package contains generated source files for which automatic javadoc
@@ -292,13 +301,8 @@ task generateJavaDocs(type: Javadoc) {
     title = "WPILib API ${wpilibVersioning.version.get()}"
     ext.entryPoint = "$destinationDir/index.html"
 
-    if (JavaVersion.current().isJava8Compatible() && project.hasProperty('docWarningsAsErrors')) {
-        // Treat javadoc warnings as errors.
-        //
-        // The second argument '-quiet' is a hack. The one parameter
-        // addStringOption() doesn't work, so we add '-quiet', which is added
-        // anyway by gradle. See https://github.com/gradle/gradle/issues/2354.
-        options.addStringOption('Werror', '-quiet')
+    if (project.hasProperty('docWarningsAsErrors')) {
+        options.addBooleanOption('Werror', true)
     }
 }
 

@@ -21,6 +21,7 @@
 #include "mrclib/Systemcore.h"
 #include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/Errors.h"
+#include "wpi/hal/cpp/MrcLibAlert.hpp"
 #include "wpi/util/EventVector.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/print.hpp"
@@ -336,6 +337,15 @@ MrcLibDsImpl::MrcLibDsImpl() {
   MRC_DsComms_Initialize();
 
   MRC_Console_Initialize();
+  int32_t alertBackendStatus = wpi::hal::SetMrcLibAlertBackend();
+  if (alertBackendStatus != 0) {
+    wpi::util::print(
+        stderr,
+        "Error: MRC alert backend unavailable with status {}. Restarting app "
+        "and retrying...\n",
+        alertBackendStatus);
+    std::terminate();
+  }
 
   // Used in Power.cpp to get battery voltage
   MRC_Systemcore_Initialize();

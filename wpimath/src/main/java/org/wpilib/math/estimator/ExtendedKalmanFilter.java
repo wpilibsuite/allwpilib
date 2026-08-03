@@ -281,7 +281,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
     m_xHat = NumericalIntegration.rk4(f, m_xHat, u, dt);
 
-    // Pₖ₊₁⁻ = APₖ⁻Aᵀ + Q
+    // Pₖ₊₁⁻ = AₖPₖ⁻Aₖᵀ + Qₖ
     m_P = discA.times(m_P).times(discA.transpose()).plus(discQ);
 
     m_dt = dt;
@@ -362,30 +362,21 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     final var C = NumericalJacobian.numericalJacobianX(rows, m_states, h, m_xHat, u);
     final var discR = Discretization.discretizeR(R, m_dt);
 
+    // Sₖ₊₁ = Cₖ₊₁Pₖ₊₁⁻Cₖ₊₁ᵀ + Rₖ₊₁
     final var S = C.times(m_P).times(C.transpose()).plus(discR);
 
-    // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
-    // efficiently.
+    // Kₖ₊₁ = Pₖ₊₁⁻Cₖ₊₁ᵀSₖ₊₁⁻¹
+    // K = PCᵀ / S
+    // K = (Sᵀ \ CPᵀ)ᵀ
+    // K = (S \ CP)ᵀ because S and P are symmetric
     //
-    // K = PCᵀS⁻¹
-    // KS = PCᵀ
-    // (KS)ᵀ = (PCᵀ)ᵀ
-    // SᵀKᵀ = CPᵀ
-    //
-    // The solution of Ax = b can be found via x = A.solve(b).
-    //
-    // Kᵀ = Sᵀ.solve(CPᵀ)
-    // K = (Sᵀ.solve(CPᵀ))ᵀ
-    //
-    // Drop the transposes on symmetric matrices S and P.
-    //
-    // K = (S.solve(CP))ᵀ
+    // [1] wpimath/docs/LinalgIdentities.md
     final Matrix<States, Rows> K = S.solve(C.times(m_P)).transpose();
 
-    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − h(x̂ₖ₊₁⁻, uₖ₊₁))
+    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + Kₖ₊₁(y − h(x̂ₖ₊₁⁻, uₖ₊₁))
     m_xHat = addFuncX.apply(m_xHat, K.times(residualFuncY.apply(y, h.apply(m_xHat, u))));
 
-    // Pₖ₊₁⁺ = (I−Kₖ₊₁C)Pₖ₊₁⁻(I−Kₖ₊₁C)ᵀ + Kₖ₊₁RKₖ₊₁ᵀ
+    // Pₖ₊₁⁺ = (I − Kₖ₊₁Cₖ₊₁)Pₖ₊₁⁻(I − Kₖ₊₁Cₖ₊₁)ᵀ + Kₖ₊₁Rₖ₊₁Kₖ₊₁ᵀ
     // Use Joseph form for numerical stability
     m_P =
         Matrix.eye(m_states)

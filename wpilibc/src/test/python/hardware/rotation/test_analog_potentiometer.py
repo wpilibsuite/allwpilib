@@ -4,20 +4,27 @@ from wpilib import AnalogInput, AnalogPotentiometer
 from wpilib.simulation import AnalogInputSim, RoboRioSim
 
 
+def reset_analog_potentiometer_test_data(channel):
+    RoboRioSim.reset_data()
+    AnalogInputSim(channel).reset_data()
+
+
 def test_initialize_with_analog_input(wpilib_state):
+    reset_analog_potentiometer_test_data(0)
+
     ai = AnalogInput(0)
     pot = AnalogPotentiometer(ai)
     sim = AnalogInputSim(ai)
 
-    RoboRioSim.reset_data()
     sim.set_voltage(2.8)
     assert pot.get() == pytest.approx(2.8 / 3.3)
 
 
 def test_initialize_with_analog_input_and_scale(wpilib_state):
+    reset_analog_potentiometer_test_data(0)
+
     ai = AnalogInput(0)
     pot = AnalogPotentiometer(ai, 270.0)
-    RoboRioSim.reset_data()
     sim = AnalogInputSim(ai)
 
     sim.set_voltage(3.3)
@@ -31,6 +38,8 @@ def test_initialize_with_analog_input_and_scale(wpilib_state):
 
 
 def test_initialize_with_channel(wpilib_state):
+    reset_analog_potentiometer_test_data(1)
+
     pot = AnalogPotentiometer(1)
     sim = AnalogInputSim(1)
 
@@ -39,8 +48,9 @@ def test_initialize_with_channel(wpilib_state):
 
 
 def test_initialize_with_channel_and_scale(wpilib_state):
+    reset_analog_potentiometer_test_data(1)
+
     pot = AnalogPotentiometer(1, 180.0)
-    RoboRioSim.reset_data()
     sim = AnalogInputSim(1)
 
     sim.set_voltage(3.3)
@@ -51,8 +61,9 @@ def test_initialize_with_channel_and_scale(wpilib_state):
 
 
 def test_with_modified_battery_voltage(wpilib_state):
+    reset_analog_potentiometer_test_data(1)
+
     pot = AnalogPotentiometer(1, 180.0, 90.0)
-    RoboRioSim.reset_data()
     sim = AnalogInputSim(1)
 
     # Test at 3.3 V

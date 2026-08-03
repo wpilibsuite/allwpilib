@@ -4,7 +4,11 @@
 
 #include "wpi/util/timestamp.h"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 #include "wpi/util/timestamp.hpp"
 
@@ -23,45 +27,46 @@ class ResetNowImpl {
 
 }  // namespace
 
-TEST(TimestampTest, ProgramStartTimeIsStable) {
+TEST_CASE("TimestampTest ProgramStartTimeIsStable", "[wpiutil]") {
   uint64_t startTime = wpi::util::GetProgramStartTime();
 
-  EXPECT_EQ(startTime, wpi::util::GetProgramStartTime());
-  EXPECT_EQ(startTime, WPI_GetProgramStartTime());
-  EXPECT_LE(startTime, wpi::util::NowDefault());
+  CHECK(startTime == wpi::util::GetProgramStartTime());
+  CHECK(startTime == WPI_GetProgramStartTime());
+  CHECK(startTime <= wpi::util::NowDefault());
 }
 
-TEST(TimestampTest, SetNowImplUpdatesProgramStartTime) {
+TEST_CASE("TimestampTest SetNowImplUpdatesProgramStartTime", "[wpiutil]") {
   ResetNowImpl reset;
   uint64_t originalStartTime = wpi::util::GetProgramStartTime();
 
   mockTime = 1234;
   wpi::util::SetNowImpl(MockNow);
 
-  EXPECT_EQ(1234u, wpi::util::Now());
-  EXPECT_EQ(1234u, wpi::util::GetProgramStartTime());
+  CHECK(1234u == wpi::util::Now());
+  CHECK(1234u == wpi::util::GetProgramStartTime());
 
   mockTime = 5678;
 
-  EXPECT_EQ(5678u, wpi::util::Now());
-  EXPECT_EQ(1234u, wpi::util::GetProgramStartTime());
+  CHECK(5678u == wpi::util::Now());
+  CHECK(1234u == wpi::util::GetProgramStartTime());
 
   wpi::util::SetNowImpl(nullptr);
 
-  EXPECT_EQ(originalStartTime, wpi::util::GetProgramStartTime());
+  CHECK(originalStartTime == wpi::util::GetProgramStartTime());
 }
 
-TEST(TimestampTest, WPISetNowImplNullRestoresProgramStartTime) {
+TEST_CASE("TimestampTest WPISetNowImplNullRestoresProgramStartTime",
+          "[wpiutil]") {
   ResetNowImpl reset;
   uint64_t originalStartTime = WPI_GetProgramStartTime();
 
   mockTime = 4321;
   WPI_SetNowImpl(MockNow);
 
-  EXPECT_EQ(4321u, WPI_Now());
-  EXPECT_EQ(4321u, WPI_GetProgramStartTime());
+  CHECK(4321u == WPI_Now());
+  CHECK(4321u == WPI_GetProgramStartTime());
 
   WPI_SetNowImpl(nullptr);
 
-  EXPECT_EQ(originalStartTime, WPI_GetProgramStartTime());
+  CHECK(originalStartTime == WPI_GetProgramStartTime());
 }

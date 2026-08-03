@@ -4,215 +4,219 @@
 
 #include "wpi/util/struct/SchemaParser.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 using namespace wpi::util::structparser;
 
-TEST(StructParserTest, Empty) {
+TEST_CASE("StructParserTest Empty", "[wpiutil][struct]") {
   Parser p{""};
   ParsedSchema schema;
-  ASSERT_TRUE(p.Parse(&schema));
-  ASSERT_TRUE(schema.declarations.empty());
+  REQUIRE(p.Parse(&schema));
+  REQUIRE(schema.declarations.empty());
 }
 
-TEST(StructParserTest, EmptySemicolon) {
+TEST_CASE("StructParserTest EmptySemicolon", "[wpiutil][struct]") {
   Parser p{";"};
   ParsedSchema schema;
-  ASSERT_TRUE(p.Parse(&schema));
-  ASSERT_TRUE(schema.declarations.empty());
+  REQUIRE(p.Parse(&schema));
+  REQUIRE(schema.declarations.empty());
 }
 
-TEST(StructParserTest, Simple) {
+TEST_CASE("StructParserTest Simple", "[wpiutil][struct]") {
   Parser p{"int32 a"};
   ParsedSchema schema;
-  ASSERT_TRUE(p.Parse(&schema));
-  ASSERT_EQ(schema.declarations.size(), 1u);
+  REQUIRE(p.Parse(&schema));
+  REQUIRE(schema.declarations.size() == 1u);
   auto& decl = schema.declarations[0];
-  EXPECT_EQ(decl.typeString, "int32");
-  EXPECT_EQ(decl.name, "a");
-  EXPECT_EQ(decl.arraySize, 1u);
+  CHECK(decl.typeString == "int32");
+  CHECK(decl.name == "a");
+  CHECK(decl.arraySize == 1u);
 }
 
-TEST(StructParserTest, SimpleTrailingSemi) {
+TEST_CASE("StructParserTest SimpleTrailingSemi", "[wpiutil][struct]") {
   Parser p{"int32 a;"};
   ParsedSchema schema;
-  ASSERT_TRUE(p.Parse(&schema));
-  ASSERT_EQ(schema.declarations.size(), 1u);
+  REQUIRE(p.Parse(&schema));
+  REQUIRE(schema.declarations.size() == 1u);
 }
 
-TEST(StructParserTest, Array) {
+TEST_CASE("StructParserTest Array", "[wpiutil][struct]") {
   Parser p{"int32 a[2]"};
   ParsedSchema schema;
-  ASSERT_TRUE(p.Parse(&schema));
-  ASSERT_EQ(schema.declarations.size(), 1u);
+  REQUIRE(p.Parse(&schema));
+  REQUIRE(schema.declarations.size() == 1u);
   auto& decl = schema.declarations[0];
-  EXPECT_EQ(decl.typeString, "int32");
-  EXPECT_EQ(decl.name, "a");
-  EXPECT_EQ(decl.arraySize, 2u);
+  CHECK(decl.typeString == "int32");
+  CHECK(decl.name == "a");
+  CHECK(decl.arraySize == 2u);
 }
 
-TEST(StructParserTest, ArrayTrailingSemi) {
+TEST_CASE("StructParserTest ArrayTrailingSemi", "[wpiutil][struct]") {
   Parser p{"int32 a[2];"};
   ParsedSchema schema;
-  ASSERT_TRUE(p.Parse(&schema));
-  ASSERT_EQ(schema.declarations.size(), 1u);
+  REQUIRE(p.Parse(&schema));
+  REQUIRE(schema.declarations.size() == 1u);
 }
 
-TEST(StructParserTest, Bitfield) {
+TEST_CASE("StructParserTest Bitfield", "[wpiutil][struct]") {
   Parser p{"int32 a:2"};
   ParsedSchema schema;
-  ASSERT_TRUE(p.Parse(&schema));
-  ASSERT_EQ(schema.declarations.size(), 1u);
+  REQUIRE(p.Parse(&schema));
+  REQUIRE(schema.declarations.size() == 1u);
   auto& decl = schema.declarations[0];
-  EXPECT_EQ(decl.typeString, "int32");
-  EXPECT_EQ(decl.name, "a");
-  EXPECT_EQ(decl.bitWidth, 2u);
+  CHECK(decl.typeString == "int32");
+  CHECK(decl.name == "a");
+  CHECK(decl.bitWidth == 2u);
 }
 
-TEST(StructParserTest, BitfieldTrailingSemi) {
+TEST_CASE("StructParserTest BitfieldTrailingSemi", "[wpiutil][struct]") {
   Parser p{"int32 a:2;"};
   ParsedSchema schema;
-  ASSERT_TRUE(p.Parse(&schema));
-  ASSERT_EQ(schema.declarations.size(), 1u);
+  REQUIRE(p.Parse(&schema));
+  REQUIRE(schema.declarations.size() == 1u);
 }
 
-TEST(StructParserTest, EnumKeyword) {
+TEST_CASE("StructParserTest EnumKeyword", "[wpiutil][struct]") {
   Parser p{"enum {x=1} int32 a;"};
   ParsedSchema schema;
-  ASSERT_TRUE(p.Parse(&schema));
-  ASSERT_EQ(schema.declarations.size(), 1u);
+  REQUIRE(p.Parse(&schema));
+  REQUIRE(schema.declarations.size() == 1u);
   auto& decl = schema.declarations[0];
-  EXPECT_EQ(decl.typeString, "int32");
-  EXPECT_EQ(decl.name, "a");
-  ASSERT_EQ(decl.enumValues.size(), 1u);
-  EXPECT_EQ(decl.enumValues[0].first, "x");
-  EXPECT_EQ(decl.enumValues[0].second, 1);
+  CHECK(decl.typeString == "int32");
+  CHECK(decl.name == "a");
+  REQUIRE(decl.enumValues.size() == 1u);
+  CHECK(decl.enumValues[0].first == "x");
+  CHECK(decl.enumValues[0].second == 1);
 }
 
-TEST(StructParserTest, EnumNoKeyword) {
+TEST_CASE("StructParserTest EnumNoKeyword", "[wpiutil][struct]") {
   Parser p{"{x=1} int32 a;"};
   ParsedSchema schema;
-  ASSERT_TRUE(p.Parse(&schema));
-  ASSERT_EQ(schema.declarations.size(), 1u);
+  REQUIRE(p.Parse(&schema));
+  REQUIRE(schema.declarations.size() == 1u);
   auto& decl = schema.declarations[0];
-  EXPECT_EQ(decl.typeString, "int32");
-  EXPECT_EQ(decl.name, "a");
-  ASSERT_EQ(decl.enumValues.size(), 1u);
-  EXPECT_EQ(decl.enumValues[0].first, "x");
-  EXPECT_EQ(decl.enumValues[0].second, 1);
+  CHECK(decl.typeString == "int32");
+  CHECK(decl.name == "a");
+  REQUIRE(decl.enumValues.size() == 1u);
+  CHECK(decl.enumValues[0].first == "x");
+  CHECK(decl.enumValues[0].second == 1);
 }
 
-TEST(StructParserTest, EnumNoValues) {
+TEST_CASE("StructParserTest EnumNoValues", "[wpiutil][struct]") {
   Parser p{"{} int32 a;"};
   ParsedSchema schema;
-  ASSERT_TRUE(p.Parse(&schema));
-  ASSERT_EQ(schema.declarations.size(), 1u);
+  REQUIRE(p.Parse(&schema));
+  REQUIRE(schema.declarations.size() == 1u);
   auto& decl = schema.declarations[0];
-  EXPECT_EQ(decl.typeString, "int32");
-  EXPECT_EQ(decl.name, "a");
-  ASSERT_TRUE(decl.enumValues.empty());
+  CHECK(decl.typeString == "int32");
+  CHECK(decl.name == "a");
+  REQUIRE(decl.enumValues.empty());
 }
 
-TEST(StructParserTest, EnumMultipleValues) {
+TEST_CASE("StructParserTest EnumMultipleValues", "[wpiutil][struct]") {
   Parser p{"{x=1,y=-2} int32 a;"};
   ParsedSchema schema;
-  ASSERT_TRUE(p.Parse(&schema));
-  ASSERT_EQ(schema.declarations.size(), 1u);
+  REQUIRE(p.Parse(&schema));
+  REQUIRE(schema.declarations.size() == 1u);
   auto& decl = schema.declarations[0];
-  EXPECT_EQ(decl.typeString, "int32");
-  EXPECT_EQ(decl.name, "a");
-  ASSERT_EQ(decl.enumValues.size(), 2u);
-  EXPECT_EQ(decl.enumValues[0].first, "x");
-  EXPECT_EQ(decl.enumValues[0].second, 1);
-  EXPECT_EQ(decl.enumValues[1].first, "y");
-  EXPECT_EQ(decl.enumValues[1].second, -2);
+  CHECK(decl.typeString == "int32");
+  CHECK(decl.name == "a");
+  REQUIRE(decl.enumValues.size() == 2u);
+  CHECK(decl.enumValues[0].first == "x");
+  CHECK(decl.enumValues[0].second == 1);
+  CHECK(decl.enumValues[1].first == "y");
+  CHECK(decl.enumValues[1].second == -2);
 }
 
-TEST(StructParserTest, EnumTrailingComma) {
+TEST_CASE("StructParserTest EnumTrailingComma", "[wpiutil][struct]") {
   Parser p{"{x=1,y=2,} int32 a;"};
   ParsedSchema schema;
-  ASSERT_TRUE(p.Parse(&schema));
-  ASSERT_EQ(schema.declarations.size(), 1u);
+  REQUIRE(p.Parse(&schema));
+  REQUIRE(schema.declarations.size() == 1u);
   auto& decl = schema.declarations[0];
-  EXPECT_EQ(decl.typeString, "int32");
-  EXPECT_EQ(decl.name, "a");
-  ASSERT_EQ(decl.enumValues.size(), 2u);
-  EXPECT_EQ(decl.enumValues[0].first, "x");
-  EXPECT_EQ(decl.enumValues[0].second, 1);
-  EXPECT_EQ(decl.enumValues[1].first, "y");
-  EXPECT_EQ(decl.enumValues[1].second, 2);
+  CHECK(decl.typeString == "int32");
+  CHECK(decl.name == "a");
+  REQUIRE(decl.enumValues.size() == 2u);
+  CHECK(decl.enumValues[0].first == "x");
+  CHECK(decl.enumValues[0].second == 1);
+  CHECK(decl.enumValues[1].first == "y");
+  CHECK(decl.enumValues[1].second == 2);
 }
 
-TEST(StructParserTest, MultipleNoTrailingSemi) {
+TEST_CASE("StructParserTest MultipleNoTrailingSemi", "[wpiutil][struct]") {
   Parser p{"int32 a; int16 b"};
   ParsedSchema schema;
-  ASSERT_TRUE(p.Parse(&schema));
-  ASSERT_EQ(schema.declarations.size(), 2u);
-  EXPECT_EQ(schema.declarations[0].typeString, "int32");
-  EXPECT_EQ(schema.declarations[0].name, "a");
-  EXPECT_EQ(schema.declarations[1].typeString, "int16");
-  EXPECT_EQ(schema.declarations[1].name, "b");
+  REQUIRE(p.Parse(&schema));
+  REQUIRE(schema.declarations.size() == 2u);
+  CHECK(schema.declarations[0].typeString == "int32");
+  CHECK(schema.declarations[0].name == "a");
+  CHECK(schema.declarations[1].typeString == "int16");
+  CHECK(schema.declarations[1].name == "b");
 }
 
-TEST(StructParserTest, ErrBitfieldArray) {
+TEST_CASE("StructParserTest ErrBitfieldArray", "[wpiutil][struct]") {
   Parser p{"int32 a[1]:2"};
   ParsedSchema schema;
-  ASSERT_FALSE(p.Parse(&schema));
-  ASSERT_EQ(p.GetError(), "10: expected ';', got ':'");
+  REQUIRE_FALSE(p.Parse(&schema));
+  REQUIRE(p.GetError() == "10: expected ';', got ':'");
 }
 
-TEST(StructParserTest, ErrNoArrayValue) {
+TEST_CASE("StructParserTest ErrNoArrayValue", "[wpiutil][struct]") {
   Parser p{"int32 a[]"};
   ParsedSchema schema;
-  ASSERT_FALSE(p.Parse(&schema));
-  ASSERT_EQ(p.GetError(), "8: expected integer, got ']'");
+  REQUIRE_FALSE(p.Parse(&schema));
+  REQUIRE(p.GetError() == "8: expected integer, got ']'");
 }
 
-TEST(StructParserTest, ErrNoBitfieldValue) {
+TEST_CASE("StructParserTest ErrNoBitfieldValue", "[wpiutil][struct]") {
   Parser p{"int32 a:"};
   ParsedSchema schema;
-  ASSERT_FALSE(p.Parse(&schema));
-  ASSERT_EQ(p.GetError(), "8: expected integer, got ''");
+  REQUIRE_FALSE(p.Parse(&schema));
+  REQUIRE(p.GetError() == "8: expected integer, got ''");
 }
 
-TEST(StructParserTest, ErrNoNameArray) {
+TEST_CASE("StructParserTest ErrNoNameArray", "[wpiutil][struct]") {
   Parser p{"int32 [2]"};
   ParsedSchema schema;
-  ASSERT_FALSE(p.Parse(&schema));
-  ASSERT_EQ(p.GetError(), "6: expected identifier, got '['");
+  REQUIRE_FALSE(p.Parse(&schema));
+  REQUIRE(p.GetError() == "6: expected identifier, got '['");
 }
 
-TEST(StructParserTest, ErrNoNameBitField) {
+TEST_CASE("StructParserTest ErrNoNameBitField", "[wpiutil][struct]") {
   Parser p{"int32 :2"};
   ParsedSchema schema;
-  ASSERT_FALSE(p.Parse(&schema));
-  ASSERT_EQ(p.GetError(), "6: expected identifier, got ':'");
+  REQUIRE_FALSE(p.Parse(&schema));
+  REQUIRE(p.GetError() == "6: expected identifier, got ':'");
 }
 
-TEST(StructParserTest, NegativeBitField) {
+TEST_CASE("StructParserTest NegativeBitField", "[wpiutil][struct]") {
   Parser p{"int32 a:-1"};
   ParsedSchema schema;
-  ASSERT_FALSE(p.Parse(&schema));
-  ASSERT_EQ(p.GetError(), "8: bitfield width '-1' is not a positive integer");
+  REQUIRE_FALSE(p.Parse(&schema));
+  REQUIRE(p.GetError() == "8: bitfield width '-1' is not a positive integer");
 }
 
-TEST(StructParserTest, NegativeArraySize) {
+TEST_CASE("StructParserTest NegativeArraySize", "[wpiutil][struct]") {
   Parser p{"int32 a[-1]"};
   ParsedSchema schema;
-  ASSERT_FALSE(p.Parse(&schema));
-  ASSERT_EQ(p.GetError(), "8: array size '-1' is not a positive integer");
+  REQUIRE_FALSE(p.Parse(&schema));
+  REQUIRE(p.GetError() == "8: array size '-1' is not a positive integer");
 }
 
-TEST(StructParserTest, ZeroBitField) {
+TEST_CASE("StructParserTest ZeroBitField", "[wpiutil][struct]") {
   Parser p{"int32 a:0"};
   ParsedSchema schema;
-  ASSERT_FALSE(p.Parse(&schema));
-  ASSERT_EQ(p.GetError(), "8: bitfield width '0' is not a positive integer");
+  REQUIRE_FALSE(p.Parse(&schema));
+  REQUIRE(p.GetError() == "8: bitfield width '0' is not a positive integer");
 }
 
-TEST(StructParserTest, ZeroArraySize) {
+TEST_CASE("StructParserTest ZeroArraySize", "[wpiutil][struct]") {
   Parser p{"int32 a[0]"};
   ParsedSchema schema;
-  ASSERT_FALSE(p.Parse(&schema));
-  ASSERT_EQ(p.GetError(), "8: array size '0' is not a positive integer");
+  REQUIRE_FALSE(p.Parse(&schema));
+  REQUIRE(p.GetError() == "8: array size '0' is not a positive integer");
 }

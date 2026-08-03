@@ -4,10 +4,10 @@
 
 import pytest
 
-from wpimath import ExponentialProfile, SimpleMotorFeedforwardMeters
+from wpimath import ExponentialProfile, SimpleMotorFeedforward
 
 kDt = 0.01
-feedforward = SimpleMotorFeedforwardMeters(0, 2.5629, 0.43277, kDt)
+feedforward = SimpleMotorFeedforward(0, 2.5629, 0.43277, kDt)
 constraints = ExponentialProfile.Constraints.from_characteristics(12, 2.5629, 0.43277)
 
 

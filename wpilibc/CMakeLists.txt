@@ -32,9 +32,9 @@ install(FILES ${WPILIB_BINARY_DIR}/wpilibc-config.cmake DESTINATION share/wpilib
 install(EXPORT wpilibc DESTINATION share/wpilibc)
 
 if(WPILIB_WITH_TESTS)
-    wpilib_add_test(wpilibc src/test/native/cpp)
+    wpilib_add_test_catch2(wpilibc src/test/native/cpp)
     file(GLOB_RECURSE wpilibc_generated_test_src src/generated/test/native/cpp/*.cpp)
     target_sources(wpilibc_test PRIVATE ${wpilibc_generated_test_src})
     target_include_directories(wpilibc_test PRIVATE src/test/native/include)
-    target_link_libraries(wpilibc_test wpilibc googletest)
+    target_link_libraries(wpilibc_test wpilibc)
 endif()

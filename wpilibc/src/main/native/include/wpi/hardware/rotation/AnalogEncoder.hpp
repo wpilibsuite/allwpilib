@@ -103,6 +103,7 @@ class AnalogEncoder : public wpi::util::Sendable,
    * Get the encoder value.
    *
    * @return the encoder value scaled by the full range input
+   * @Common This is one of the commonly used methods for this class
    */
   double Get() const;
 

@@ -1,0 +1,17 @@
+{
+  "name": "2027 FRC Custom Resource Field",
+  "season": "2027",
+  "game": "Custom Resource Field",
+  "field-image": {
+    "path": "image.png",
+    "top": 1,
+    "left": 2,
+    "bottom": 3,
+    "right": 4
+  },
+  "field-dimensions": {
+    "length": 3.0,
+    "width": 2.0
+  },
+  "program": "frc"
+}

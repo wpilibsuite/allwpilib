@@ -21,6 +21,12 @@ exports_files([
     "ThirdPartyNotices.txt",
 ])
 
+alias(
+    name = "generation",
+    actual = "//shared:generation",
+    visibility = ["//visibility:public"],
+)
+
 pkg_files(
     name = "license_pkg_files",
     srcs = [
@@ -72,11 +78,10 @@ write_source_files(
     additional_update_targets = [
         "//ntcore:write_ntcore",
         "//wpilibc:write_wpilibc",
-        "//wpilibcExamples:write_example_project_list",
         "//wpilibj:write_wpilibj",
-        "//wpilibjExamples:write_example_project_list",
         "//commandsv2:write_wpilib_new_commands",
         "//commandsv3:write_commandsv3",
+        "//fields:write_fields",
         "//wpimath:write_wpimath",
         "//wpiunits:write_wpiunits",
         "//wpiutil:write_wpiutil",
@@ -103,7 +108,9 @@ publish_all(
         "//docs:wpilibj_publish.publish",
         "//epilogue-processor:processor-java_publish.publish",
         "//epilogue-runtime:epilogue-java_publish.publish",
+        "//fields:fieldimages-cpp_publish.publish",
         "//fields:fields-cpp_publish.publish",
+        "//fields:fields-images-java_publish.publish",
         "//fields:fields-java_publish.publish",
         "//glass:glass-cpp_publish.publish",
         "//glass:glassapp_publish.publish",
@@ -162,6 +169,7 @@ write_source_files(
     additional_update_targets = [
         "//apriltag:robotpy-native-apriltag-generator.generate_build_info",
         "//datalog:robotpy-native-datalog-generator.generate_build_info",
+        "//fields:robotpy-native-fields-generator.generate_build_info",
         "//hal:robotpy-native-wpihal-generator.generate_build_info",
         "//ntcore:robotpy-native-ntcore-generator.generate_build_info",
         "//romiVendordep:robotpy-native-xrp-generator.generate_build_info",
@@ -183,6 +191,7 @@ write_source_files(
     additional_update_targets = [
         "//apriltag:robotpy-apriltag-generator.generate_build_info",
         "//datalog:robotpy-datalog-generator.generate_build_info",
+        "//fields:robotpy-fields-generator.generate_build_info",
         "//hal:robotpy-hal-generator.generate_build_info",
         "//ntcore:pyntcore-generator.generate_build_info",
         "//romiVendordep:robotpy-romi-generator.generate_build_info",
@@ -205,6 +214,7 @@ write_source_files(
     additional_update_targets = [
         "//apriltag:write_robotpy-apriltag-update-yaml",
         "//datalog:write_robotpy-wpilog-update-yaml",
+        "//fields:write_robotpy-fields-update-yaml",
         "//hal:write_robotpy-hal-update-yaml",
         "//ntcore:write_pyntcore-update-yaml",
         "//romiVendordep:write_robotpy-romi-update-yaml",
@@ -228,6 +238,7 @@ write_source_files(
     additional_update_targets = [
         "//apriltag:robotpy-apriltag-create-imports",
         "//datalog:robotpy-wpilog-create-imports",
+        "//fields:robotpy-fields-create-imports",
         "//hal:robotpy-hal-create-imports",
         "//ntcore:pyntcore-create-imports",
         "//romiVendordep:robotpy-romi-create-imports",
@@ -277,6 +288,7 @@ filegroup(
     srcs = [
         "//apriltag:robotpy-apriltag.generated_files",
         "//datalog:robotpy-wpilog.generated_files",
+        "//fields:robotpy-fields.generated_files",
         "//hal:robotpy-hal.generated_files",
         "//ntcore:pyntcore.generated_files",
         "//wpilibc:robotpy-wpilib.generated_files",

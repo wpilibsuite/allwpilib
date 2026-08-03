@@ -113,6 +113,7 @@ endif()
 target_link_libraries(
     wpical
     apriltag
+    fields
     wpimath
     opencv_highgui
     opencv_imgproc
@@ -169,6 +170,7 @@ if(WPILIB_WITH_TESTS)
     target_link_libraries(
         wpical_test
         apriltag
+        fields
         wpimath
         opencv_highgui
         opencv_objdetect

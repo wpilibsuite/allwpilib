@@ -4,17 +4,18 @@
 
 #include "wpi/simulation/AnalogEncoderSim.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 #include "wpi/hardware/rotation/AnalogEncoder.hpp"
 
-TEST(AnalogEncoderSimTest, Basic) {
+TEST_CASE("AnalogEncoderSimTest Basic", "[wpilibc][simulation]") {
   wpi::AnalogInput ai(0);
   wpi::AnalogEncoder encoder{ai, 360, 0};
   wpi::sim::AnalogEncoderSim encoderSim{encoder};
 
   encoderSim.Set(180);
-  EXPECT_NEAR(encoder.Get(), 180, 1E-8);
-  EXPECT_NEAR(encoderSim.Get(), 180, 1E-8);
+  CHECK_THAT(encoder.Get(), Catch::Matchers::WithinAbs(180, 1E-8));
+  CHECK_THAT(encoderSim.Get(), Catch::Matchers::WithinAbs(180, 1E-8));
 }

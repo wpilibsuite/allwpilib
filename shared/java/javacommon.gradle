@@ -116,33 +116,6 @@ configurations {
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs = [
-        '--release',
-        '25',
-        '-encoding',
-        'UTF8',
-        "-Werror",
-        "-Xlint:all",
-        // ignore AutoCloseable warnings
-        "-Xlint:-try",
-        // ignore missing serialVersionUID warnings
-        "-Xlint:-serial",
-        // ignore unclaimed annotation warning from annotation processing
-        "-Xlint:-processing",
-        "-Xlint:-preview",
-        // ignore modules requiring automatic library modules
-        "-Xlint:-requires-automatic",
-        "-Xlint:-requires-transitive-automatic",
-        "-Xlint:-exports",
-        // Java modules warn about exposing classes without an explicitly declared constructor
-        "-Xlint:-missing-explicit-ctor",
-        // Java modules warn about module names with trailing digits
-        "-Xlint:-module",
-        "-Xlint:-classfile"
-    ]
-}
-
 dependencies {
     testImplementation libs.junit.api
     testRuntimeOnly libs.junit.launcher
@@ -150,7 +123,7 @@ dependencies {
     devImplementation sourceSets.main.output
 }
 
-task run(type: JavaExec) {
+tasks.register('run', JavaExec) {
     classpath = sourceSets.dev.runtimeClasspath
 
     mainClass = project.devMain

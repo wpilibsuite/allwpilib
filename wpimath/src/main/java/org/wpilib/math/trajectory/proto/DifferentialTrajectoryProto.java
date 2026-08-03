@@ -4,9 +4,9 @@
 
 package org.wpilib.math.trajectory.proto;
 
-import org.wpilib.math.proto.ProtobufDifferentialTrajectory;
 import org.wpilib.math.trajectory.DifferentialSample;
 import org.wpilib.math.trajectory.DifferentialTrajectory;
+import org.wpilib.math.trajectory.proto.detail.ProtobufDifferentialTrajectory;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 

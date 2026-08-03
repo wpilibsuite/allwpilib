@@ -24,6 +24,7 @@ void Wait(wpi::units::second_t seconds);
  * @brief  Gives real-time clock system time with nanosecond resolution
  * @return The time, just in case you want the robot to start autonomous at 8pm
  *         on Saturday.
+ * @Common This is one of the commonly used methods for this class
  */
 wpi::units::second_t GetSystemTime();
 
@@ -56,6 +57,7 @@ class Timer {
    * the clock is not running, then return the time when it was last stopped.
    *
    * @return Current time value for this timer in seconds
+   * @Common This is one of the commonly used methods for this class
    */
   wpi::units::second_t Get() const;
 
@@ -64,6 +66,8 @@ class Timer {
    *
    * Make the timer startTime the current time so new requests will be relative
    * to now.
+   *
+   * @Common This is one of the commonly used methods for this class
    */
   void Reset();
 
@@ -73,6 +77,8 @@ class Timer {
    * Just set the running flag to true indicating that all time requests should
    * be relative to the system clock. Note that this method is a no-op if the
    * timer is already running.
+   *
+   * @Common This is one of the commonly used methods for this class
    */
   void Start();
 
@@ -81,6 +87,8 @@ class Timer {
    * resetting the accumulated time, then starting the timer again. If you
    * want an event to periodically reoccur at some time interval from the
    * start time, consider using AdvanceIfElapsed() instead.
+   *
+   * @Common This is one of the commonly used methods for this class
    */
   void Restart();
 
@@ -90,6 +98,8 @@ class Timer {
    * This computes the time as of now and clears the running flag, causing all
    * subsequent time requests to be read from the accumulated time rather than
    * looking at the system clock.
+   *
+   * @Common This is one of the commonly used methods for this class
    */
   void Stop();
 

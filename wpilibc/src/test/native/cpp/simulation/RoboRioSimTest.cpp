@@ -6,14 +6,15 @@
 
 #include <string>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
 #include "wpi/system/RobotController.hpp"
 
 namespace wpi::sim {
 
-TEST(RoboRioSimTest, SetVin) {
+TEST_CASE("RoboRioSimTest SetVin", "[wpilibc][simulation]") {
   RoboRioSim::ResetData();
 
   DoubleCallback voltageCallback;
@@ -22,13 +23,13 @@ TEST(RoboRioSimTest, SetVin) {
   constexpr double kTestVoltage = 1.91;
 
   RoboRioSim::SetVInVoltage(wpi::units::volt_t{kTestVoltage});
-  EXPECT_TRUE(voltageCallback.WasTriggered());
-  EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
-  EXPECT_EQ(kTestVoltage, RoboRioSim::GetVInVoltage().value());
-  EXPECT_EQ(kTestVoltage, RobotController::GetInputVoltage());
+  CHECK(voltageCallback.WasTriggered());
+  CHECK(kTestVoltage == voltageCallback.GetLastValue());
+  CHECK(kTestVoltage == RoboRioSim::GetVInVoltage().value());
+  CHECK(kTestVoltage == RobotController::GetInputVoltage());
 }
 
-TEST(RoboRioSimTest, SetBrownout) {
+TEST_CASE("RoboRioSimTest SetBrownout", "[wpilibc][simulation]") {
   RoboRioSim::ResetData();
 
   DoubleCallback voltageCallback;
@@ -37,13 +38,13 @@ TEST(RoboRioSimTest, SetBrownout) {
   constexpr double kTestVoltage = 1.91;
 
   RoboRioSim::SetBrownoutVoltage(wpi::units::volt_t{kTestVoltage});
-  EXPECT_TRUE(voltageCallback.WasTriggered());
-  EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
-  EXPECT_EQ(kTestVoltage, RoboRioSim::GetBrownoutVoltage().value());
-  EXPECT_EQ(kTestVoltage, RobotController::GetBrownoutVoltage().value());
+  CHECK(voltageCallback.WasTriggered());
+  CHECK(kTestVoltage == voltageCallback.GetLastValue());
+  CHECK(kTestVoltage == RoboRioSim::GetBrownoutVoltage().value());
+  CHECK(kTestVoltage == RobotController::GetBrownoutVoltage().value());
 }
 
-TEST(RoboRioSimTest, Set3V3) {
+TEST_CASE("RoboRioSimTest Set3V3", "[wpilibc][simulation]") {
   RoboRioSim::ResetData();
 
   DoubleCallback voltageCallback;
@@ -63,31 +64,31 @@ TEST(RoboRioSimTest, Set3V3) {
   constexpr int kTestFaults = 229;
 
   RoboRioSim::SetUserVoltage3V3(wpi::units::volt_t{kTestVoltage});
-  EXPECT_TRUE(voltageCallback.WasTriggered());
-  EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
-  EXPECT_EQ(kTestVoltage, RoboRioSim::GetUserVoltage3V3().value());
-  EXPECT_EQ(kTestVoltage, RobotController::GetVoltage3V3());
+  CHECK(voltageCallback.WasTriggered());
+  CHECK(kTestVoltage == voltageCallback.GetLastValue());
+  CHECK(kTestVoltage == RoboRioSim::GetUserVoltage3V3().value());
+  CHECK(kTestVoltage == RobotController::GetVoltage3V3());
 
   RoboRioSim::SetUserCurrent3V3(wpi::units::ampere_t{kTestCurrent});
-  EXPECT_TRUE(currentCallback.WasTriggered());
-  EXPECT_EQ(kTestCurrent, currentCallback.GetLastValue());
-  EXPECT_EQ(kTestCurrent, RoboRioSim::GetUserCurrent3V3().value());
-  EXPECT_EQ(kTestCurrent, RobotController::GetCurrent3V3());
+  CHECK(currentCallback.WasTriggered());
+  CHECK(kTestCurrent == currentCallback.GetLastValue());
+  CHECK(kTestCurrent == RoboRioSim::GetUserCurrent3V3().value());
+  CHECK(kTestCurrent == RobotController::GetCurrent3V3());
 
   RoboRioSim::SetUserActive3V3(false);
-  EXPECT_TRUE(activeCallback.WasTriggered());
-  EXPECT_FALSE(activeCallback.GetLastValue());
-  EXPECT_FALSE(RoboRioSim::GetUserActive3V3());
-  EXPECT_FALSE(RobotController::GetEnabled3V3());
+  CHECK(activeCallback.WasTriggered());
+  CHECK_FALSE(activeCallback.GetLastValue());
+  CHECK_FALSE(RoboRioSim::GetUserActive3V3());
+  CHECK_FALSE(RobotController::GetEnabled3V3());
 
   RoboRioSim::SetUserFaults3V3(kTestFaults);
-  EXPECT_TRUE(faultCallback.WasTriggered());
-  EXPECT_EQ(kTestFaults, faultCallback.GetLastValue());
-  EXPECT_EQ(kTestFaults, RoboRioSim::GetUserFaults3V3());
-  EXPECT_EQ(kTestFaults, RobotController::GetFaultCount3V3());
+  CHECK(faultCallback.WasTriggered());
+  CHECK(kTestFaults == faultCallback.GetLastValue());
+  CHECK(kTestFaults == RoboRioSim::GetUserFaults3V3());
+  CHECK(kTestFaults == RobotController::GetFaultCount3V3());
 }
 
-TEST(RoboRioSimTest, SetCPUTemp) {
+TEST_CASE("RoboRioSimTest SetCPUTemp", "[wpilibc][simulation]") {
   RoboRioSim::ResetData();
 
   DoubleCallback callback;
@@ -96,13 +97,13 @@ TEST(RoboRioSimTest, SetCPUTemp) {
   constexpr double kCPUTemp = 100.0;
 
   RoboRioSim::SetCPUTemp(wpi::units::celsius_t{kCPUTemp});
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(kCPUTemp, callback.GetLastValue());
-  EXPECT_EQ(kCPUTemp, RoboRioSim::GetCPUTemp().value());
-  EXPECT_EQ(kCPUTemp, RobotController::GetCPUTemp().value());
+  CHECK(callback.WasTriggered());
+  CHECK(kCPUTemp == callback.GetLastValue());
+  CHECK(kCPUTemp == RoboRioSim::GetCPUTemp().value());
+  CHECK(kCPUTemp == RobotController::GetCPUTemp().value());
 }
 
-TEST(RoboRioSimTest, SetTeamNumber) {
+TEST_CASE("RoboRioSimTest SetTeamNumber", "[wpilibc][simulation]") {
   RoboRioSim::ResetData();
 
   IntCallback callback;
@@ -111,38 +112,38 @@ TEST(RoboRioSimTest, SetTeamNumber) {
   constexpr int kTeamNumber = 9999;
 
   RoboRioSim::SetTeamNumber(kTeamNumber);
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(kTeamNumber, callback.GetLastValue());
-  EXPECT_EQ(kTeamNumber, RoboRioSim::GetTeamNumber());
-  EXPECT_EQ(kTeamNumber, RobotController::GetTeamNumber());
+  CHECK(callback.WasTriggered());
+  CHECK(kTeamNumber == callback.GetLastValue());
+  CHECK(kTeamNumber == RoboRioSim::GetTeamNumber());
+  CHECK(kTeamNumber == RobotController::GetTeamNumber());
 }
 
-TEST(RoboRioSimTest, SetSerialNumber) {
+TEST_CASE("RoboRioSimTest SetSerialNumber", "[wpilibc][simulation]") {
   const std::string kSerialNum = "Hello";
 
   RoboRioSim::ResetData();
 
   RoboRioSim::SetSerialNumber(kSerialNum);
-  EXPECT_EQ(kSerialNum, RoboRioSim::GetSerialNumber());
-  EXPECT_EQ(kSerialNum, RobotController::GetSerialNumber());
+  CHECK(kSerialNum == RoboRioSim::GetSerialNumber());
+  CHECK(kSerialNum == RobotController::GetSerialNumber());
 
   const std::string kSerialNumberOverflow = "SerialNumber";
   const std::string kSerialNumberTruncated = kSerialNumberOverflow.substr(0, 8);
 
   RoboRioSim::SetSerialNumber(kSerialNumberOverflow);
-  EXPECT_EQ(kSerialNumberTruncated, RoboRioSim::GetSerialNumber());
-  EXPECT_EQ(kSerialNumberTruncated, RobotController::GetSerialNumber());
+  CHECK(kSerialNumberTruncated == RoboRioSim::GetSerialNumber());
+  CHECK(kSerialNumberTruncated == RobotController::GetSerialNumber());
 }
 
-TEST(RoboRioSimTest, SetComments) {
+TEST_CASE("RoboRioSimTest SetComments", "[wpilibc][simulation]") {
   const std::string kComments =
       "Hello! These are comments in the roboRIO web interface!";
 
   RoboRioSim::ResetData();
 
   RoboRioSim::SetComments(kComments);
-  EXPECT_EQ(kComments, RoboRioSim::GetComments());
-  EXPECT_EQ(kComments, RobotController::GetComments());
+  CHECK(kComments == RoboRioSim::GetComments());
+  CHECK(kComments == RobotController::GetComments());
 
   const std::string kCommentsOverflow =
       "Hello! These are comments in the roboRIO web interface! This comment "
@@ -150,8 +151,8 @@ TEST(RoboRioSimTest, SetComments) {
   const std::string kCommentsTruncated = kCommentsOverflow.substr(0, 64);
 
   RoboRioSim::SetComments(kCommentsOverflow);
-  EXPECT_EQ(kCommentsTruncated, RoboRioSim::GetComments());
-  EXPECT_EQ(kCommentsTruncated, RobotController::GetComments());
+  CHECK(kCommentsTruncated == RoboRioSim::GetComments());
+  CHECK(kCommentsTruncated == RobotController::GetComments());
 }
 
 }  // namespace wpi::sim

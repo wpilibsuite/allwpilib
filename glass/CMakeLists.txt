@@ -20,7 +20,10 @@ endif()
 set_property(TARGET libglass PROPERTY FOLDER "libraries")
 
 wpilib_target_warnings(libglass)
-target_link_libraries(libglass PUBLIC wpigui wpimath wpiutil fields)
+target_link_libraries(
+    libglass
+    PUBLIC wpigui wpimath wpiutil fields fieldimages
+)
 
 target_include_directories(
     libglass

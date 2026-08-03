@@ -11,10 +11,24 @@ endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
-    set(CMAKE_SYSTEM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
-    set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
-    message(STATUS "Platform version: ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
+# Windows SDK version checks
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    set(sdk_minimum 10.0.18362.0)
+
+    # If no CMAKE_SYSTEM_VERSION is set, warn the user and set a default
+    # If it's set but below the defined minimum, warn the user but don't change it
+    if(NOT DEFINED CMAKE_SYSTEM_VERSION)
+        message(WARNING "No CMAKE_SYSTEM_VERSION set, defaulting to ${sdk_minimum}")
+        set(CMAKE_SYSTEM_VERSION "${sdk_minimum}" CACHE STRING "Windows SDK target")
+    elseif(CMAKE_SYSTEM_VERSION VERSION_LESS sdk_minimum)
+        message(
+            WARNING
+            "Current Windows SDK target ${CMAKE_SYSTEM_VERSION} is below the recommended"
+            "minimum target of ${sdk_minimum}. Some features may be limited or unavailable."
+            "If this is incorrect, you may need to manually set CMAKE_SYSTEM_VERSION"
+            "to a higher target."
+        )
+    endif()
 endif()
 
 # Set default build type to release with debug info (i.e. release mode optimizations
@@ -80,6 +94,13 @@ option(WPILIB_WITH_WPILIB "Build hal, wpilibc/j, and developerRobot (needs OpenC
 option(WPILIB_WITH_EXAMPLES "Build examples" OFF)
 option(WPILIB_WITH_TESTS "Build unit tests (requires internet connection)" ON)
 option(WPILIB_WITH_GUI "Build GUI items (needs SDL3)" OFF)
+cmake_dependent_option(
+    WPILIB_WITH_FIELDS
+    "Build the fields target"
+    OFF
+    "NOT WPILIB_WITH_GUI;NOT WPILIB_WITH_EXAMPLES"
+    ON
+)
 option(WPILIB_WITH_SIMULATION_MODULES "Build simulation modules" ON)
 option(WPILIB_WITH_BENCHMARK "Build the benchmark project" ON)
 
@@ -102,6 +123,8 @@ wpilib_config(OPTIONS WPILIB_WITH_CSCORE REQUIRES WPILIB_WITH_NTCORE)
 wpilib_config(OPTIONS WPILIB_WITH_GUI REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WPIMATH)
 
 wpilib_config(OPTIONS WPILIB_WITH_WPILIB REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WPIMATH)
+
+wpilib_config(OPTIONS WPILIB_WITH_FIELDS REQUIRES WPILIB_WITH_WPIMATH)
 
 set(include_dest include)
 
@@ -267,9 +290,12 @@ if(WPILIB_WITH_WPIMATH)
     add_subdirectory(wpimath)
 endif()
 
+if(WPILIB_WITH_FIELDS)
+    add_subdirectory(fields)
+endif()
+
 if(WPILIB_WITH_GUI)
     find_package(SDL3 CONFIG REQUIRED)
-    add_subdirectory(fields)
     add_subdirectory(thirdparty/imgui_suite)
     add_subdirectory(wpigui)
     add_subdirectory(glass)
@@ -295,7 +321,6 @@ if(WPILIB_WITH_CSCORE)
 endif()
 
 if(WPILIB_WITH_WPILIB)
-    set(APRILTAG_DEP_REPLACE "find_dependency(apriltag)")
     set(WPILIBC_DEP_REPLACE "find_dependency(wpilibc)")
     set(COMMAND_DEP_REPLACE "find_dependency(commandsv2)")
     add_subdirectory(apriltag)
