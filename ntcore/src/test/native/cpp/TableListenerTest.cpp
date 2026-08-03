@@ -109,9 +109,9 @@ TEST_CASE_METHOD(TableListenerTest,
 
   table->AddListener(
       NT_EVENT_TOPIC | NT_EVENT_IMMEDIATE,
-      [&](auto table, auto key, auto& event) {
-        CHECK_THAT(m_inst, HasHandle());
-        CHECK_THAT(m_inst, MapsToInstanceImpl());
+      [&, inst = m_inst](auto table, auto key, auto& event) {
+        CHECK_THAT(inst, HasHandle());
+        CHECK_THAT(inst, MapsToInstanceImpl());
         wpi::util::SetEvent(listenerCalledEvent);
         INFO(
             "[Listener] Sent listenerCalledEvent; waiting for "
@@ -135,8 +135,8 @@ TEST_CASE_METHOD(TableListenerTest,
             if (destroyCalled) {
               CHECK(!destroyReturned);
               if (!destroyReturned) {
-                CHECK_THAT(m_inst, HasHandle());
-                CHECK_THAT(m_inst, MapsToInstanceImpl());
+                CHECK_THAT(inst, HasHandle());
+                CHECK_THAT(inst, MapsToInstanceImpl());
               }
             }
           }
