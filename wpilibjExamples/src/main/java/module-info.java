@@ -11,6 +11,7 @@ open module wpilib.examples {
   requires wpilib.command3;
   requires wpilib.cscore;
   requires wpilib.epilogue;
+  requires wpilib.gamefields;
   requires wpilib.hal;
   requires wpilib.ntcore;
   requires wpilib.romi;

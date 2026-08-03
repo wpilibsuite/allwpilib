@@ -6,9 +6,11 @@
 module wpilib.gamefields {
   requires io.avaje.json;
   requires io.avaje.jsonb;
+  requires wpilib.math;
 
   exports org.wpilib.fields;
 
   provides io.avaje.jsonb.spi.JsonbExtension with
-      org.wpilib.fields.jsonb.GeneratedJsonComponent;
+      org.wpilib.fields.jsonb.GeneratedJsonComponent,
+      org.wpilib.fields.FieldsJsonComponent;
 }
