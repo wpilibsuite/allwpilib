@@ -288,8 +288,7 @@ public final class Coroutine {
 
     requireNonNullParam(duration, "duration", "Coroutine.wait");
 
-    var timer = new Timer();
-    timer.start();
+    var timer = Timer.createStarted();
     while (!timer.hasElapsed(duration.in(Seconds))) {
       this.yield();
     }
@@ -389,8 +388,7 @@ public final class Coroutine {
     requireNonNullParam(condition, "condition", "Coroutine.waitUntil");
     requireNonNullParam(timeout, "timeout", "Coroutine.waitUntil");
 
-    Timer timer = new Timer();
-    timer.start();
+    var timer = Timer.createStarted();
 
     while (!condition.getAsBoolean()) {
       if (timer.hasElapsed(timeout)) {
