@@ -245,7 +245,7 @@ PlotSeries::PlotSeries(Storage& storage, DataSource* source, int yAxis)
 void PlotSeries::CheckSource() {
   if (!m_newValueConn.connected() && !m_sourceCreatedConn.connected()) {
     m_source = nullptr;
-    m_sourceCreatedConn = DataSource::sourceCreated.connect_connection(
+    m_sourceCreatedConn = gContext->sourceCreated.connect_connection(
         [this](const char* id, DataSource* source) {
           if (m_id == id) {
             SetSource(source);
