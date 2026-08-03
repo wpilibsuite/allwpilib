@@ -348,11 +348,31 @@ int32_t SocketCanState::SendFrameWithCallback(uint8_t busId,
   // CAN reads do not use writeLoopRunner, so they are safe from this callback.
   // CAN sends would synchronously reenter writeLoopRunner and deadlock.
   HAL_CANMessage message = MakeHALCanMessage(frame);
-  if (!callback(callbackParam, &message)) {
-    return 0;
+  int32_t status = callback(callbackParam, &message);
+
+  bool noToken = (status == HAL_WARN_CANSessionMux_NoToken);
+  bool notAllowed = (status == HAL_ERR_CANSessionMux_NotAllowed);
+
+  if (status != 0) {
+    // If not allowed, that just means not enabled and to not send.
+    // Return 0 to indicate that it was not sent, but not an error.
+    if (notAllowed) {
+      return 0;
+    } else if (!noToken) {
+      // If we have an error other then no token, just error.
+      return status;
+    }
+    // We have no token, but we will still send the frame. The status will be
+    // returned to the caller.
   }
 
-  return SendFrame(busId, MakeSocketCanFrame(frame.can_id, message));
+  status = SendFrame(busId, MakeSocketCanFrame(frame.can_id, message));
+
+  // If the send succeeded, but we have no token, return the no token warning.
+  if (noToken && status == 0) {
+    return HAL_WARN_CANSessionMux_NoToken;
+  }
+  return status;
 }
 
 void SocketCanState::TimerCallback(uint8_t busId, uint32_t messageId) {

@@ -18,7 +18,7 @@ namespace wpi::hal {
  * read APIs may be called from the callback, but APIs that send, stop, or
  * schedule CAN messages must not be called.
  */
-using CANPeriodicSendCallback = HAL_Bool (*)(void* param,
+using CANPeriodicSendCallback = int32_t (*)(void* param,
                                              HAL_CANMessage* message);
 
 bool InitializeCanBuses();

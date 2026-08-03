@@ -12,6 +12,7 @@
 #include <mutex>
 #include <string>
 
+#include "mrclib/PcmTokenizer.h"
 #include "CANInternal.hpp"
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
@@ -134,6 +135,8 @@ union PcmDebug {
 
 namespace {
 struct PCM {
+  uint8_t busId;
+  uint8_t deviceId;
   HAL_CANHandle canHandle;
   wpi::util::mutex lock;
   std::string previousAllocation;
@@ -173,12 +176,35 @@ void InitializeCTREPCM() {
 #define READ_SOL_FAULTS(failureValue) \
   READ_PACKET(PcmStatusFault, StatusSolFaults, failureValue)
 
-static HAL_Bool PrepareControl1ForSend(void* param, HAL_CANMessage* message) {
+static MRC_Status MRC_CALLCONV MrcTokenizeCallback(void* userData, uint8_t* receivedBytes) {
+  auto pcm = static_cast<PCM*>(userData);
+  HAL_CANReceiveMessage message;
+  std::memset(&message, 0, sizeof(message));
+  int32_t receiveStatus = 0;
+
+  HAL_ReadCANPacketLatest(pcm->canHandle, Status1, &message, &receiveStatus);
+
+  // Unconditionally copy the received bytes into the buffer, even if the read failed.
+  // The data is already 0'd
+  std::memcpy(receivedBytes, message.message.data, 8);
+
+  return receiveStatus == 0 ? MRC_STATUS_SUCCESS : MRC_STATUS_NO_TOKEN;
+}
+
+static int32_t PrepareControl1ForSend(void* param, HAL_CANMessage* message) {
   auto pcm = static_cast<PCM*>(param);
-  (void)pcm;
-  (void)message;
-  // TODO: Apply the CTRE PCM secure message context.
-  return true;
+
+  MRC_Status mrcStatus = MRC_PCM_Tokenize(pcm->busId, pcm->deviceId, message->data, MrcTokenizeCallback, pcm);
+
+  if (mrcStatus == MRC_STATUS_DO_NOT_SEND) {
+    return HAL_ERR_CANSessionMux_NotAllowed;
+  } else if (mrcStatus == MRC_STATUS_NO_TOKEN) {
+    return HAL_WARN_CANSessionMux_NoToken;
+  } else if (mrcStatus != MRC_STATUS_SUCCESS) {
+    // This case means a buffer error.
+    return HAL_ERR_CANSessionMux_InvalidBuffer;
+  }
+  return 0;
 }
 
 static void SendControl(PCM* pcm, int32_t* status) {
@@ -217,6 +243,8 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
   std::memset(&pcm->control, 0, sizeof(pcm->control));
 
   pcm->previousAllocation = allocationLocation ? allocationLocation : "";
+  pcm->busId = busId;
+  pcm->deviceId = module;
 
   // Enable closed loop control
   HAL_SetCTREPCMClosedLoopControl(handle, true, status);
