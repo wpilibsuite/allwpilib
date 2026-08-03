@@ -7,6 +7,7 @@
 package org.wpilib.networktables;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1269,9 +1270,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public void setServer(String[] serverNames, int port) {
     int[] ports = new int[serverNames.length];
-    for (int i = 0; i < serverNames.length; i++) {
-      ports[i] = port;
-    }
+    Arrays.fill(ports, port);
     setServer(serverNames, ports);
   }
 
@@ -1347,9 +1346,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public void setServerMdns(String serviceName, String[] serverNames, int port) {
     int[] ports = new int[serverNames.length];
-    for (int i = 0; i < serverNames.length; i++) {
-      ports[i] = port;
-    }
+    Arrays.fill(ports, port);
     setServerMdns(serviceName, port, serverNames, ports);
   }
 
