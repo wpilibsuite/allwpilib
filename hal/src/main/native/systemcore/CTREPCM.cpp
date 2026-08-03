@@ -12,10 +12,10 @@
 #include <mutex>
 #include <string>
 
-#include "mrclib/PcmTokenizer.h"
 #include "CANInternal.hpp"
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
+#include "mrclib/PcmTokenizer.h"
 #include "wpi/hal/CANAPI.h"
 #include "wpi/hal/CANAPITypes.h"
 #include "wpi/hal/ErrorHandling.hpp"
@@ -176,7 +176,8 @@ void InitializeCTREPCM() {
 #define READ_SOL_FAULTS(failureValue) \
   READ_PACKET(PcmStatusFault, StatusSolFaults, failureValue)
 
-static MRC_Status MRC_CALLCONV MrcTokenizeCallback(void* userData, uint8_t* receivedBytes) {
+static MRC_Status MRC_CALLCONV MrcTokenizeCallback(void* userData,
+                                                   uint8_t* receivedBytes) {
   auto pcm = static_cast<PCM*>(userData);
   HAL_CANReceiveMessage message;
   std::memset(&message, 0, sizeof(message));
@@ -184,8 +185,8 @@ static MRC_Status MRC_CALLCONV MrcTokenizeCallback(void* userData, uint8_t* rece
 
   HAL_ReadCANPacketLatest(pcm->canHandle, Status1, &message, &receiveStatus);
 
-  // Unconditionally copy the received bytes into the buffer, even if the read failed.
-  // The data is already 0'd
+  // Unconditionally copy the received bytes into the buffer, even if the read
+  // failed. The data is already 0'd
   std::memcpy(receivedBytes, message.message.data, 8);
 
   return receiveStatus == 0 ? MRC_STATUS_SUCCESS : MRC_STATUS_NO_TOKEN;
@@ -194,7 +195,8 @@ static MRC_Status MRC_CALLCONV MrcTokenizeCallback(void* userData, uint8_t* rece
 static int32_t PrepareControl1ForSend(void* param, HAL_CANMessage* message) {
   auto pcm = static_cast<PCM*>(param);
 
-  MRC_Status mrcStatus = MRC_PCM_Tokenize(pcm->busId, pcm->deviceId, message->data, MrcTokenizeCallback, pcm);
+  MRC_Status mrcStatus = MRC_PCM_Tokenize(
+      pcm->busId, pcm->deviceId, message->data, MrcTokenizeCallback, pcm);
 
   if (mrcStatus == MRC_STATUS_DO_NOT_SEND) {
     return HAL_ERR_CANSessionMux_NotAllowed;

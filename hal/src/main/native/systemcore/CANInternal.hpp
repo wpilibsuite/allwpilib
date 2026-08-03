@@ -19,7 +19,7 @@ namespace wpi::hal {
  * schedule CAN messages must not be called.
  */
 using CANPeriodicSendCallback = int32_t (*)(void* param,
-                                             HAL_CANMessage* message);
+                                            HAL_CANMessage* message);
 
 bool InitializeCanBuses();
 
