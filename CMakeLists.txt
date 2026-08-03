@@ -252,8 +252,6 @@ set(CMAKE_SHARED_LINKER_FLAGS_UBSAN
 
 if(WPILIB_WITH_TESTS)
     enable_testing()
-    add_subdirectory(thirdparty/googletest)
-    include(GoogleTest)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/catch2/extras")
     add_subdirectory(thirdparty/catch2)
     include(Catch)

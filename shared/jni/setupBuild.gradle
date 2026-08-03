@@ -24,14 +24,8 @@ dependencies {
 
 project(':').libraryBuild.dependsOn build
 
-ext {
-    staticGtestConfigs = [:]
-}
-
 def nativeTestSuiteName = project.findProperty('nativeTestSuiteName') ?: "${nativeName}Test"
-staticGtestConfigs[nativeTestSuiteName] = []
 
-apply from: "${rootDir}/shared/googletest.gradle"
 apply from: "${rootDir}/shared/catch2.gradle"
 
 model {

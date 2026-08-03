@@ -17,9 +17,7 @@ if (OperatingSystem.current().isWindows()) {
 
 ext {
     nativeName = 'glass'
-    staticGtestConfigs = [:]
 }
-staticGtestConfigs["${nativeName}Catch2Test"] = []
 
 apply from: "${rootDir}/shared/resources.gradle"
 apply from: "${rootDir}/shared/config.gradle"

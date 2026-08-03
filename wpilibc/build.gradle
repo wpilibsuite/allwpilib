@@ -54,12 +54,6 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
 
 project(':').libraryBuild.dependsOn build
 
-ext {
-    staticGtestConfigs = [:]
-}
-
-staticGtestConfigs["${nativeTestSuiteName}"] = []
-
 apply from: "${rootDir}/shared/catch2.gradle"
 
 nativeUtils.exportsConfigs {

@@ -129,7 +129,6 @@ All artifacts are based at `org.wpilib.artifactname` in the repository.
 
 This repository provides the builds of the following third party software:
 
-* googletest
 * imgui
 
 Other software can be found in their corresponding GitHub repositories:

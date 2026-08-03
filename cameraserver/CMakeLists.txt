@@ -1,7 +1,6 @@
 project(cameraserver)
 
 include(CompileWarnings)
-include(AddTest)
 
 file(GLOB_RECURSE cameraserver_native_src src/main/native/cpp/*.cpp)
 add_library(cameraserver ${cameraserver_native_src})
@@ -33,6 +32,10 @@ target_link_libraries(multiCameraServer cameraserver)
 set_property(TARGET multiCameraServer PROPERTY FOLDER "examples")
 
 if(WPILIB_WITH_TESTS)
-    wpilib_add_test(cameraserver src/test/native/cpp)
-    target_link_libraries(cameraserver_test cameraserver googletest)
+    file(GLOB_RECURSE cameraserver_test_src src/test/native/cpp/*.cpp)
+    add_executable(cameraserver_test ${cameraserver_test_src})
+    set_property(TARGET cameraserver_test PROPERTY FOLDER "tests")
+    wpilib_target_warnings(cameraserver_test)
+    target_link_libraries(cameraserver_test cameraserver)
+    add_test(NAME cameraserver COMMAND cameraserver_test)
 endif()
