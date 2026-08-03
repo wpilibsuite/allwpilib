@@ -16,7 +16,6 @@ using namespace wpi::math;
 MecanumDriveOdometry::MecanumDriveOdometry(
     MecanumDriveKinematics kinematics, const Rotation2d& gyroAngle,
     const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose)
-    : Odometry(m_kinematicsImpl, gyroAngle, wheelPositions, initialPose),
-      m_kinematicsImpl(kinematics) {
+    : Odometry(kinematics, gyroAngle, wheelPositions, initialPose) {
   wpi::math::MathSharedStore::ReportUsage("MecanumDriveOdometry", "");
 }

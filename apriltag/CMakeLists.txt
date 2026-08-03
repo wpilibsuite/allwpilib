@@ -1,7 +1,6 @@
 project(apriltag)
 
 include(CompileWarnings)
-include(GenResources)
 
 file(
     GLOB_RECURSE apriltaglib_src
@@ -31,17 +30,9 @@ else()
     )
 endif()
 
-generate_resources(
-    src/main/native/resources/org/wpilib/vision/apriltag
-    generated/main/cpp
-    APRILTAG
-    wpi::apriltag
-    apriltag_resources_src
-)
-
 file(GLOB apriltag_native_src src/main/native/cpp/*.cpp)
 
-add_library(apriltag ${apriltag_native_src} ${apriltag_resources_src} ${apriltaglib_src})
+add_library(apriltag ${apriltag_native_src} ${apriltaglib_src})
 set_target_properties(apriltag PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET apriltag PROPERTY FOLDER "libraries")

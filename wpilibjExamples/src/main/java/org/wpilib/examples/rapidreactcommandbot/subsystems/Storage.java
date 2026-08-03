@@ -28,7 +28,7 @@ public class Storage extends SubsystemBase {
   /** Create a new Storage subsystem. */
   public Storage() {
     // Set default command to turn off the storage motor and then idle
-    setDefaultCommand(runOnce(motor::disable).andThen(run(() -> {})).withName("Idle"));
+    setDefaultCommand(runOnce(() -> motor.setThrottle(0)).andThen(run(() -> {})).withName("Idle"));
   }
 
   /** Returns a command that runs the storage motor indefinitely. */

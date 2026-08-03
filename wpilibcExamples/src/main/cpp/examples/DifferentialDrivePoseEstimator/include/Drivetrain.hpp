@@ -6,8 +6,8 @@
 
 #include <numbers>
 
-#include "wpi/apriltag/AprilTagFieldLayout.hpp"
-#include "wpi/apriltag/AprilTagFields.hpp"
+#include "wpi/fields/Field.hpp"
+#include "wpi/fields/fields.hpp"
 #include "wpi/hardware/imu/OnboardIMU.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
@@ -128,10 +128,9 @@ class Drivetrain {
       cameraToObjectTopic.GetEntry(kDefaultVal);
   wpi::nt::DoubleArrayEntry& cameraToObjectEntryRef = cameraToObjectEntry;
 
-  wpi::apriltag::AprilTagFieldLayout aprilTagFieldLayout{
-      wpi::apriltag::AprilTagFieldLayout::LoadField(
-          wpi::apriltag::AprilTagField::k2024Crescendo)};
-  wpi::math::Pose3d objectInField{aprilTagFieldLayout.GetTagPose(0).value()};
+  wpi::fields::Field field{
+      wpi::fields::GetField(wpi::fields::FieldId::FRC_2024_CRESCENDO)};
+  wpi::math::Pose3d objectInField{field.GetTagPose(1).value()};
 
   wpi::PWMSparkMax leftLeader{1};
   wpi::PWMSparkMax leftFollower{2};
@@ -151,7 +150,6 @@ class Drivetrain {
   // Gains are for example purposes only - must be determined for your own
   // robot!
   wpi::math::DifferentialDrivePoseEstimator poseEstimator{
-      kinematics,
       imu.GetRotation2d(),
       wpi::units::meter_t{leftEncoder.GetDistance()},
       wpi::units::meter_t{rightEncoder.GetDistance()},

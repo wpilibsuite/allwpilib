@@ -22,7 +22,7 @@ import org.wpilib.simulation.testutils.EnumCallback;
 class REVPHSimTest {
   @Test
   void testInitialization() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
     sim.resetData();
@@ -39,7 +39,7 @@ class REVPHSimTest {
 
   @Test
   void solenoidOutputTest() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (PneumaticHub ph = new PneumaticHub(1);
         DoubleSolenoid doubleSolenoid = new DoubleSolenoid(1, PneumaticsModuleType.REV_PH, 3, 4)) {
@@ -92,7 +92,7 @@ class REVPHSimTest {
 
   @Test
   void setCompressorOnTest() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
     BooleanCallback callback = new BooleanCallback();
@@ -111,7 +111,7 @@ class REVPHSimTest {
 
   @Test
   void setEnableDigital() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
     EnumCallback callback = new EnumCallback();
@@ -131,7 +131,7 @@ class REVPHSimTest {
 
   @Test
   void setEnableAnalog() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
     EnumCallback callback = new EnumCallback();
@@ -151,7 +151,7 @@ class REVPHSimTest {
 
   @Test
   void setEnableHybrid() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
     EnumCallback callback = new EnumCallback();
@@ -171,7 +171,7 @@ class REVPHSimTest {
 
   @Test
   void setPressureSwitchEnabledTest() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
     BooleanCallback callback = new BooleanCallback();
@@ -190,7 +190,7 @@ class REVPHSimTest {
 
   @Test
   void setCompressorCurrentTest() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
     DoubleCallback callback = new DoubleCallback();

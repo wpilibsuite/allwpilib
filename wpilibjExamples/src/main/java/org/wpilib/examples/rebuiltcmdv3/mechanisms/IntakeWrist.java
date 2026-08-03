@@ -20,7 +20,7 @@ public class IntakeWrist implements Mechanism {
       new ExampleSmartMotorController(IntakeConstants.WRIST_MOTOR_ID);
 
   public Command stop() {
-    return runRepeatedly(motor::stopMotor).named("Intake.Wrist.Stop");
+    return runRepeatedly(() -> motor.setThrottle(0.0)).named("Intake.Wrist.Stop");
   }
 
   @Override

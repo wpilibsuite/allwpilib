@@ -23,7 +23,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
   if (channel < 0 || channel >= kNumAnalogInputs) {
     *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for Analog Input", 0,
-                                       kNumAnalogInputs, channel);
+                                       kNumAnalogInputs - 1, channel);
     return HAL_INVALID_HANDLE;
   }
 

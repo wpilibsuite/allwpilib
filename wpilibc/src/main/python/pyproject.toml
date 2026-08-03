@@ -91,9 +91,6 @@ depends = [
 ]
 includes = ["wpilib/src"]
 
-[tool.semiwrap.extension_modules."wpilib._wpilib".defines]
-DYNAMIC_CAMERA_SERVER = 1
-
 [tool.semiwrap.extension_modules."wpilib._wpilib".headers]
 # rpy
 Filesystem = "rpy/Filesystem.h"
@@ -115,7 +112,6 @@ RobotDriveBase = "wpi/drive/RobotDriveBase.hpp"
 # wpi/driverstation
 DriverStationBackend = "wpi/driverstation/internal/DriverStationBackend.hpp"
 Alliance = "wpi/driverstation/Alliance.hpp"
-Alert = "wpi/driverstation/Alert.hpp"
 DriverStation = "wpi/driverstation/DriverStation.hpp"
 DriverStationDisplay = "wpi/driverstation/DriverStationDisplay.hpp"
 MatchState = "wpi/driverstation/MatchState.hpp"

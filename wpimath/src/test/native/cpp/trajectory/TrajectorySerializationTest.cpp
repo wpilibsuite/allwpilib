@@ -6,7 +6,7 @@
 #include <utility>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/trajectory/DifferentialSample.hpp"
@@ -22,7 +22,7 @@
 
 using namespace wpi::math;
 
-TEST(TrajectorySerializationTest, TestJsonSerialization) {
+TEST_CASE("TrajectorySerializationTest TestJsonSerialization", "[wpimath]") {
   TrajectoryConfig config{12_fps, 12_fps_sq};
   auto splineTrajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
@@ -43,22 +43,22 @@ TEST(TrajectorySerializationTest, TestJsonSerialization) {
   HolonomicTrajectory deserializedTrajectory{std::move(samples_out)};
 
   // Verify they are equal
-  EXPECT_EQ(trajectory.Duration(), deserializedTrajectory.Duration());
-  EXPECT_EQ(trajectory.Samples().size(),
-            deserializedTrajectory.Samples().size());
+  CHECK(trajectory.Duration() == deserializedTrajectory.Duration());
+  CHECK(trajectory.Samples().size() == deserializedTrajectory.Samples().size());
 
   for (size_t i = 0; i < trajectory.Samples().size(); ++i) {
     const auto& original = trajectory.Samples()[i];
     const auto& deserialized = deserializedTrajectory.Samples()[i];
 
-    EXPECT_EQ(original.time, deserialized.time);
-    EXPECT_EQ(original.pose, deserialized.pose);
-    EXPECT_EQ(original.velocity, deserialized.velocity);
-    EXPECT_EQ(original.acceleration, deserialized.acceleration);
+    CHECK(original.time == deserialized.time);
+    CHECK(original.pose == deserialized.pose);
+    CHECK(original.velocity == deserialized.velocity);
+    CHECK(original.acceleration == deserialized.acceleration);
   }
 }
 
-TEST(TrajectorySerializationTest, TestDifferentialSerialization) {
+TEST_CASE("TrajectorySerializationTest TestDifferentialSerialization",
+          "[wpimath]") {
   TrajectoryConfig config{12_fps, 12_fps_sq};
   auto splineTrajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
@@ -82,19 +82,18 @@ TEST(TrajectorySerializationTest, TestDifferentialSerialization) {
   DifferentialTrajectory deserializedTrajectory{std::move(samples_out)};
 
   // Verify they are equal
-  EXPECT_EQ(trajectory.Duration(), deserializedTrajectory.Duration());
-  EXPECT_EQ(trajectory.Samples().size(),
-            deserializedTrajectory.Samples().size());
+  CHECK(trajectory.Duration() == deserializedTrajectory.Duration());
+  CHECK(trajectory.Samples().size() == deserializedTrajectory.Samples().size());
 
   for (size_t i = 0; i < trajectory.Samples().size(); ++i) {
     const auto& original = trajectory.Samples()[i];
     const auto& deserialized = deserializedTrajectory.Samples()[i];
 
-    EXPECT_EQ(original.time, deserialized.time);
-    EXPECT_EQ(original.pose, deserialized.pose);
-    EXPECT_EQ(original.velocity, deserialized.velocity);
-    EXPECT_EQ(original.acceleration, deserialized.acceleration);
-    EXPECT_EQ(original.leftVelocity, deserialized.leftVelocity);
-    EXPECT_EQ(original.rightVelocity, deserialized.rightVelocity);
+    CHECK(original.time == deserialized.time);
+    CHECK(original.pose == deserialized.pose);
+    CHECK(original.velocity == deserialized.velocity);
+    CHECK(original.acceleration == deserialized.acceleration);
+    CHECK(original.leftVelocity == deserialized.leftVelocity);
+    CHECK(original.rightVelocity == deserialized.rightVelocity);
   }
 }

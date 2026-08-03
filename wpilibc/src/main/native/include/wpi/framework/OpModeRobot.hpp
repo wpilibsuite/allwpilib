@@ -10,13 +10,13 @@
 #include <string>
 #include <vector>
 
-#include "wpi/driverstation/Alert.hpp"
 #include "wpi/framework/RobotBase.hpp"
 #include "wpi/hal/DriverStationTypes.hpp"
 #include "wpi/internal/PeriodicPriorityQueue.hpp"
 #include "wpi/opmode/OpMode.hpp"
 #include "wpi/system/Watchdog.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/Alert.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/mutex.hpp"
 
@@ -138,6 +138,9 @@ class OpModeRobotBase : public RobotBase {
   /**
    * Add a callback to run at a specific period.
    *
+   * This callback will be registered with the framework immediately when this
+   * method is called and will begin executing as soon as it is registered.
+   *
    * @param callback The callback to run.
    * @param period The period at which to run the callback.
    */
@@ -217,6 +220,18 @@ class OpModeRobotBase : public RobotBase {
    */
   void LoopFunc();
 
+  /**
+   * Starts the current OpMode, registering its periodic callback and calling
+   * Start(). Does nothing if there is no current OpMode or it is already
+   * started.
+   */
+  void StartCurrentOpMode();
+
+  /**
+   * Ends the current OpMode, cleaning up callbacks and resetting state.
+   */
+  void EndCurrentOpMode();
+
  private:
   struct OpModeData {
     std::string name;
@@ -230,7 +245,7 @@ class OpModeRobotBase : public RobotBase {
   HAL_NotifierHandle m_notifier;
   wpi::units::second_t m_period;
   std::chrono::microseconds m_startTime;
-  Alert m_loopOverrunAlert;
+  wpi::util::Alert m_loopOverrunAlert;
   Watchdog m_watchdog;
 
   // OpMode lifecycle state
@@ -238,6 +253,7 @@ class OpModeRobotBase : public RobotBase {
   bool m_calledDriverStationConnected = false;
   bool m_lastEnabledState = false;
   std::shared_ptr<OpMode> m_currentOpMode;
+  std::string m_currentOpModeName;
   std::vector<wpi::internal::PeriodicPriorityQueue::Callback>
       m_activeOpModeCallbacks;
   std::optional<wpi::internal::PeriodicPriorityQueue::Callback>

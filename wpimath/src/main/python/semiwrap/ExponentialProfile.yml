@@ -53,7 +53,7 @@ classes:
       IsFinished:
 
 templates:
-  ExponentialProfileMeterVolts:
+  ExponentialProfile:
     qualname: wpi::math::ExponentialProfile
     params:
     - wpi::units::meter

@@ -23,6 +23,10 @@ struct Twist2d;
 
 /**
  * Represents a transformation for a Pose2d in the pose's frame.
+ *
+ * Transforms are applied intrinsically, i.e. relative to the pose's own frame
+ * rather than the global frame. This is in contrast to the rotation classes,
+ * which apply rotations extrinsically.
  */
 class WPILIB_DLLEXPORT Transform2d final {
  public:

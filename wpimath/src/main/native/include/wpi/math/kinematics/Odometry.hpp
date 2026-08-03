@@ -7,7 +7,6 @@
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
-#include "wpi/math/kinematics/Kinematics.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -22,49 +21,47 @@ namespace wpi::math {
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
  *
+ * @tparam Kinematics type.
  * @tparam WheelPositions Wheel positions type.
  * @tparam WheelVelocities Wheel velocities type.
  * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename WheelPositions, typename WheelVelocities,
-          typename WheelAccelerations>
+template <typename Kinematics, typename WheelPositions,
+          typename WheelVelocities, typename WheelAccelerations>
 class WPILIB_DLLEXPORT Odometry {
  public:
   /**
    * Constructs an Odometry object.
    *
    * @param kinematics The kinematics for your drivetrain.
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit Odometry(const Kinematics<WheelPositions, WheelVelocities,
-                                     WheelAccelerations>& kinematics,
-                    const Rotation2d& gyroAngle,
+  explicit Odometry(const Kinematics& kinematics, const Rotation2d& gyroAngle,
                     const WheelPositions& wheelPositions,
                     const Pose2d& initialPose = Pose2d{})
       : m_kinematics(kinematics),
         m_pose(initialPose),
-        m_previousWheelPositions(wheelPositions) {
-    m_previousAngle = m_pose.Rotation();
-    m_gyroOffset = (-gyroAngle).RotateBy(m_pose.Rotation());
-  }
+        m_previousWheelPositions(wheelPositions),
+        m_previousGyroAngle(gyroAngle) {}
 
   /**
    * Resets the robot's position on the field.
    *
-   * The gyroscope angle does not need to be reset here on the user's robot
-   * code. The library automatically takes care of offsetting the gyro angle.
+   * The gyroscope angle does not need to be reset here in the user's robot
+   * code.
    *
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param wheelPositions The current distances measured by each wheel.
    * @param pose The position on the field that your robot is at.
    */
   void ResetPosition(const Rotation2d& gyroAngle,
                      const WheelPositions& wheelPositions, const Pose2d& pose) {
     m_pose = pose;
-    m_previousAngle = pose.Rotation();
-    m_gyroOffset = (-gyroAngle).RotateBy(m_pose.Rotation());
+    m_previousGyroAngle = gyroAngle;
     m_previousWheelPositions = wheelPositions;
   }
 
@@ -73,12 +70,7 @@ class WPILIB_DLLEXPORT Odometry {
    *
    * @param pose The pose to reset to.
    */
-  void ResetPose(const Pose2d& pose) {
-    m_gyroOffset =
-        m_gyroOffset.RotateBy(-m_pose.Rotation()).RotateBy(pose.Rotation());
-    m_pose = pose;
-    m_previousAngle = pose.Rotation();
-  }
+  void ResetPose(const Pose2d& pose) { m_pose = pose; }
 
   /**
    * Resets the translation of the pose.
@@ -95,9 +87,7 @@ class WPILIB_DLLEXPORT Odometry {
    * @param rotation The rotation to reset to.
    */
   void ResetRotation(const Rotation2d& rotation) {
-    m_gyroOffset = m_gyroOffset.RotateBy(-m_pose.Rotation()).RotateBy(rotation);
     m_pose = Pose2d{m_pose.Translation(), rotation};
-    m_previousAngle = rotation;
   }
 
   /**
@@ -112,39 +102,33 @@ class WPILIB_DLLEXPORT Odometry {
    * which is used instead of the angular rate that is calculated from forward
    * kinematics, in addition to the current distance measurement at each wheel.
    *
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param wheelPositions The current distances measured by each wheel.
    *
    * @return The new pose of the robot.
    */
   const Pose2d& Update(const Rotation2d& gyroAngle,
                        const WheelPositions& wheelPositions) {
-    auto angle = gyroAngle.RotateBy(m_gyroOffset);
-
     auto twist =
         m_kinematics.ToTwist2d(m_previousWheelPositions, wheelPositions);
-    twist.dtheta = (angle - m_previousAngle).Radians();
+    twist.dtheta = (gyroAngle - m_previousGyroAngle).Radians();
 
-    auto newPose = m_pose + twist.Exp();
+    m_pose = m_pose + twist.Exp();
 
-    m_previousAngle = angle;
     m_previousWheelPositions = wheelPositions;
-    m_pose = {newPose.Translation(), angle};
+    m_previousGyroAngle = gyroAngle;
 
     return m_pose;
   }
 
  private:
-  const Kinematics<WheelPositions, WheelVelocities, WheelAccelerations>&
-      m_kinematics;
+  Kinematics m_kinematics;
   Pose2d m_pose;
 
   WheelPositions m_previousWheelPositions;
 
-  // Always equal to m_pose.Rotation()
-  Rotation2d m_previousAngle;
-
-  Rotation2d m_gyroOffset;
+  Rotation2d m_previousGyroAngle;
 };
 
 }  // namespace wpi::math

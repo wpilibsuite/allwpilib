@@ -14,6 +14,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "wpi/datalog/DataLog.hpp"
@@ -30,7 +31,7 @@
 #include "wpi/nt/StringTopic.hpp"
 #include "wpi/nt/StructTopic.hpp"
 #include "wpi/system/Errors.hpp"
-#include "wpi/system/Timer.hpp"
+#include "wpi/util/Alert.hpp"
 #include "wpi/util/Color.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/EventVector.hpp"
@@ -148,6 +149,53 @@ class DataLogSender {
       m_joysticks;
 };
 
+enum class JoystickResourceAlert { BUTTON, AXIS, POV };
+
+static constexpr std::array<JoystickResourceAlert, 3> JOYSTICK_RESOURCE_ALERTS{
+    JoystickResourceAlert::BUTTON, JoystickResourceAlert::AXIS,
+    JoystickResourceAlert::POV};
+
+static constexpr size_t JoystickResourceAlertIndex(JoystickResourceAlert type) {
+  return static_cast<size_t>(type);
+}
+
+static constexpr std::array<std::string_view, JOYSTICK_RESOURCE_ALERTS.size()>
+    JOYSTICK_RESOURCE_ALERT_ID_SUFFIXES{"ButtonUnavailable", "AxisUnavailable",
+                                        "POVUnavailable"};
+
+static constexpr std::array<std::string_view, JOYSTICK_RESOURCE_ALERTS.size()>
+    JOYSTICK_RESOURCE_ALERT_LABELS{"Button", "axis", "POV"};
+
+struct JoystickAlertState {
+  wpi::util::Alert alert;
+  bool active = false;
+};
+
+struct JoystickAlerts {
+  bool Initialize();
+  void Release();
+  bool PrepareForReport(bool silenceJoystickAlerts);
+  void Refresh();
+  void ClearAllAlerts();
+  void ClearResourceAlerts();
+  void RefreshResourceAlert(JoystickResourceAlert type);
+  bool IsResourceAlertAvailable(JoystickResourceAlert type) const;
+  void ReportResourceWarning(JoystickResourceAlert type, int resource);
+  void ReportTouchpadFingerWarning(int touchpad, int finger);
+  bool SetAlert(JoystickAlertState& alertState, bool active,
+                std::string_view alertText = {});
+
+  int stick = 0;
+  bool initialized = false;
+  JoystickAlertState connectionAlert;
+  std::array<JoystickAlertState, JOYSTICK_RESOURCE_ALERTS.size()>
+      resourceAlerts;
+  JoystickAlertState touchpadFingerAlert;
+  std::array<int, JOYSTICK_RESOURCE_ALERTS.size()> resourceAlertValues{};
+  int touchpadFingerAlertTouchpad = 0;
+  int touchpadFingerAlertFinger = 0;
+};
+
 struct Instance {
   Instance();
   ~Instance();
@@ -165,14 +213,16 @@ struct Instance {
   std::array<uint32_t, DriverStationBackend::JOYSTICK_PORTS>
       joystickButtonsReleased;
 
-  bool silenceJoystickWarning = false;
+  // Guards joystick alert handles and active/index state.
+  wpi::util::mutex joystickAlertMutex;
+  bool silenceJoystickAlerts = false;
+  std::array<JoystickAlerts, DriverStationBackend::JOYSTICK_PORTS>
+      joystickAlerts;
 
   // Op mode lookup
   wpi::util::mutex opModeMutex;
   wpi::util::DenseMap<int64_t, HAL_OpModeOption> opModes;
   bool userProgramStarted = false;
-
-  wpi::units::second_t nextMessageTime = 0_s;
 
   std::string OpModeToString(int64_t id) {
     std::scoped_lock lock{opModeMutex};
@@ -188,14 +238,18 @@ struct Instance {
 };
 }  // namespace
 
-static constexpr auto kJoystickUnpluggedMessageInterval = 1_s;
-
 static Instance& GetInstance() {
   static Instance instance;
   return instance;
 }
 
 static void SendMatchData();
+static void ClearJoystickAlerts();
+static void ClearJoystickAlertsLocked();
+static void ReportJoystickResourceWarning(int stick, JoystickResourceAlert type,
+                                          int resource);
+static void ReportJoystickTouchpadFingerWarning(int stick, int touchpad,
+                                                int finger);
 
 template <typename S, typename... Args>
 static inline void ReportJoystickError(int stick, const S& format,
@@ -203,22 +257,194 @@ static inline void ReportJoystickError(int stick, const S& format,
   ReportJoystickErrorV(stick, format, std::make_format_args(args...));
 }
 
-/**
- * Reports errors related to joystick availability.
- *
- * Throttles the errors so that they don't overwhelm the DS.
- */
-static void ReportJoystickWarningV(int stick, std::string_view format,
-                                   std::format_args args);
+bool JoystickAlerts::Initialize() {
+  wpi::util::Alert newConnectionAlert(
+      "DriverStation", std::format("joystick{}Disconnected", stick),
+      std::format("Joystick on port {} not available, check if all "
+                  "controllers are plugged in",
+                  stick),
+      wpi::util::Alert::Level::HIGH);
+  if (!newConnectionAlert) {
+    return false;
+  }
 
-template <typename S, typename... Args>
-static inline void ReportJoystickWarning(int stick, const S& format,
-                                         Args&&... args) {
-  ReportJoystickWarningV(stick, format, std::make_format_args(args...));
+  std::array<wpi::util::Alert, JOYSTICK_RESOURCE_ALERTS.size()>
+      newResourceAlerts;
+  for (auto type : JOYSTICK_RESOURCE_ALERTS) {
+    auto index = JoystickResourceAlertIndex(type);
+    newResourceAlerts[index] = wpi::util::Alert(
+        "DriverStation",
+        std::format("joystick{}{}", stick,
+                    JOYSTICK_RESOURCE_ALERT_ID_SUFFIXES[index]),
+        {}, wpi::util::Alert::Level::MEDIUM);
+    if (!newResourceAlerts[index]) {
+      return false;
+    }
+  }
+
+  wpi::util::Alert newTouchpadFingerAlert(
+      "DriverStation",
+      std::format("joystick{}TouchpadFingerUnavailable", stick), {},
+      wpi::util::Alert::Level::MEDIUM);
+  if (!newTouchpadFingerAlert) {
+    return false;
+  }
+
+  connectionAlert.alert = std::move(newConnectionAlert);
+  for (auto type : JOYSTICK_RESOURCE_ALERTS) {
+    auto index = JoystickResourceAlertIndex(type);
+    resourceAlerts[index].alert = std::move(newResourceAlerts[index]);
+  }
+  touchpadFingerAlert.alert = std::move(newTouchpadFingerAlert);
+  initialized = true;
+  return true;
+}
+
+void JoystickAlerts::Release() {
+  wpi::util::detail::ReleaseAlertHandle(connectionAlert.alert);
+  for (auto& alertState : resourceAlerts) {
+    wpi::util::detail::ReleaseAlertHandle(alertState.alert);
+  }
+  wpi::util::detail::ReleaseAlertHandle(touchpadFingerAlert.alert);
+  initialized = false;
+}
+
+bool JoystickAlerts::PrepareForReport(bool silenceJoystickAlerts) {
+  if (!DriverStationBackend::IsFMSAttached() && silenceJoystickAlerts) {
+    return false;
+  }
+
+  if (DriverStationBackend::IsJoystickConnected(stick)) {
+    SetAlert(connectionAlert, false);
+    return true;
+  }
+
+  ClearResourceAlerts();
+  SetAlert(connectionAlert, true);
+  return false;
+}
+
+void JoystickAlerts::Refresh() {
+  if (!initialized) {
+    return;
+  }
+
+  if (!DriverStationBackend::IsJoystickConnected(stick)) {
+    ClearResourceAlerts();
+    return;
+  }
+
+  if (connectionAlert.active) {
+    SetAlert(connectionAlert, false);
+  }
+
+  for (auto type : JOYSTICK_RESOURCE_ALERTS) {
+    RefreshResourceAlert(type);
+  }
+
+  HAL_JoystickTouchpads touchpads;
+  HAL_GetJoystickTouchpads(stick, &touchpads);
+  int touchpad = touchpadFingerAlertTouchpad;
+  int finger = touchpadFingerAlertFinger;
+  if (touchpadFingerAlert.active && touchpad < touchpads.count &&
+      finger < touchpads.touchpads[touchpad].count) {
+    SetAlert(touchpadFingerAlert, false);
+  }
+}
+
+void JoystickAlerts::ClearAllAlerts() {
+  if (!initialized) {
+    return;
+  }
+
+  SetAlert(connectionAlert, false);
+  ClearResourceAlerts();
+}
+
+void JoystickAlerts::ClearResourceAlerts() {
+  for (auto& alertState : resourceAlerts) {
+    SetAlert(alertState, false);
+  }
+  SetAlert(touchpadFingerAlert, false);
+}
+
+void JoystickAlerts::RefreshResourceAlert(JoystickResourceAlert type) {
+  auto index = JoystickResourceAlertIndex(type);
+  if (resourceAlerts[index].active && IsResourceAlertAvailable(type)) {
+    SetAlert(resourceAlerts[index], false);
+  }
+}
+
+bool JoystickAlerts::IsResourceAlertAvailable(
+    JoystickResourceAlert type) const {
+  auto index = JoystickResourceAlertIndex(type);
+  auto resource = resourceAlertValues[index];
+  switch (type) {
+    case JoystickResourceAlert::BUTTON: {
+      HAL_JoystickButtons buttons;
+      HAL_GetJoystickButtons(stick, &buttons);
+      return (buttons.available & (1LLU << resource)) != 0;
+    }
+    case JoystickResourceAlert::AXIS: {
+      HAL_JoystickAxes axes;
+      HAL_GetJoystickAxes(stick, &axes);
+      return (axes.available & (1 << resource)) != 0;
+    }
+    case JoystickResourceAlert::POV: {
+      HAL_JoystickPOVs povs;
+      HAL_GetJoystickPOVs(stick, &povs);
+      return (povs.available & (1 << resource)) != 0;
+    }
+  }
+  return false;
+}
+
+void JoystickAlerts::ReportResourceWarning(JoystickResourceAlert type,
+                                           int resource) {
+  auto index = JoystickResourceAlertIndex(type);
+  resourceAlertValues[index] = resource;
+  SetAlert(resourceAlerts[index], true,
+           std::format("Joystick {} {} on port {} not available",
+                       JOYSTICK_RESOURCE_ALERT_LABELS[index], resource, stick));
+}
+
+void JoystickAlerts::ReportTouchpadFingerWarning(int touchpad, int finger) {
+  touchpadFingerAlertTouchpad = touchpad;
+  touchpadFingerAlertFinger = finger;
+  SetAlert(touchpadFingerAlert, true,
+           std::format("Joystick touchpad finger {} on touchpad {} on port {} "
+                       "not available",
+                       finger, touchpad, stick));
+}
+
+bool JoystickAlerts::SetAlert(JoystickAlertState& alertState, bool active,
+                              std::string_view alertText) {
+  if (!active && !alertState.active) {
+    return true;
+  }
+
+  if (active && !initialized && !Initialize()) {
+    return false;
+  }
+  if (active && !alertText.empty()) {
+    alertState.alert.SetText(alertText);
+  }
+  alertState.alert.Set(active);
+  if (active && !alertState.alert.Get()) {
+    if (!Initialize()) {
+      return false;
+    }
+    if (!alertText.empty()) {
+      alertState.alert.SetText(alertText);
+    }
+    alertState.alert.Set(true);
+  }
+  alertState.active = active;
+  return true;
 }
 
 Instance::Instance() {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 
   // All joysticks should default to having zero axes, povs and buttons, so
   // uninitialized memory doesn't get sent to motor controllers.
@@ -227,10 +453,14 @@ Instance::Instance() {
     joystickButtonsReleased[i] = 0;
     previousButtonStates[i].available = 0;
     previousButtonStates[i].buttons = 0;
+    joystickAlerts[i].stick = i;
   }
 }
 
 Instance::~Instance() {
+  for (auto& alerts : joystickAlerts) {
+    alerts.Release();
+  }
   if (dataLogSender) {
     delete dataLogSender.load();
   }
@@ -253,8 +483,7 @@ bool DriverStationBackend::GetStickButton(int stick, int button) {
   HAL_GetJoystickButtons(stick, &buttons);
 
   if ((buttons.available & mask) == 0) {
-    ReportJoystickWarning(stick, "Joystick Button {} on port {} not available",
-                          button, stick);
+    ReportJoystickResourceWarning(stick, JoystickResourceAlert::BUTTON, button);
     return false;
   }
 
@@ -302,8 +531,7 @@ bool DriverStationBackend::GetStickButtonPressed(int stick, int button) {
   uint64_t mask = 1LLU << button;
 
   if ((buttons.available & mask) == 0) {
-    ReportJoystickWarning(stick, "Joystick Button {} on port {} not available",
-                          button, stick);
+    ReportJoystickResourceWarning(stick, JoystickResourceAlert::BUTTON, button);
     return false;
   }
   auto& inst = ::GetInstance();
@@ -333,8 +561,7 @@ bool DriverStationBackend::GetStickButtonReleased(int stick, int button) {
   uint64_t mask = 1LLU << button;
 
   if ((buttons.available & mask) == 0) {
-    ReportJoystickWarning(stick, "Joystick Button {} on port {} not available",
-                          button, stick);
+    ReportJoystickResourceWarning(stick, JoystickResourceAlert::BUTTON, button);
     return false;
   }
   auto& inst = ::GetInstance();
@@ -363,8 +590,7 @@ double DriverStationBackend::GetStickAxis(int stick, int axis) {
   HAL_GetJoystickAxes(stick, &axes);
 
   if ((axes.available & mask) == 0) {
-    ReportJoystickWarning(stick, "Joystick axis {} on port {} not available",
-                          axis, stick);
+    ReportJoystickResourceWarning(stick, JoystickResourceAlert::AXIS, axis);
     return 0.0;
   }
 
@@ -401,10 +627,7 @@ TouchpadFinger DriverStationBackend::GetStickTouchpadFinger(int stick,
     }
   }
 
-  ReportJoystickWarning(
-      stick,
-      "Joystick touchpad finger {} on touchpad {} on port {} not available",
-      finger, touchpad, stick);
+  ReportJoystickTouchpadFingerWarning(stick, touchpad, finger);
   return TouchpadFinger{false, 0.0f, 0.0f};
 }
 
@@ -477,8 +700,7 @@ POVDirection DriverStationBackend::GetStickPOV(int stick, int pov) {
   HAL_GetJoystickPOVs(stick, &povs);
 
   if ((povs.available & mask) == 0) {
-    ReportJoystickWarning(stick, "Joystick POV {} on port {} not available",
-                          pov, stick);
+    ReportJoystickResourceWarning(stick, JoystickResourceAlert::POV, pov);
     return POVDirection::CENTER;
   }
 
@@ -839,6 +1061,8 @@ void DriverStationBackend::RefreshData() {
     }
   }
 
+  ClearJoystickAlerts();
+
   inst.refreshEvents.Wakeup();
 
   SendMatchData();
@@ -859,12 +1083,19 @@ void DriverStationBackend::RemoveRefreshedDataEventHandle(
   inst.refreshEvents.Remove(handle);
 }
 
-void DriverStationBackend::SilenceJoystickConnectionWarning(bool silence) {
-  ::GetInstance().silenceJoystickWarning = silence;
+void DriverStationBackend::SilenceJoystickConnectionAlert(bool silence) {
+  auto& inst = ::GetInstance();
+  std::scoped_lock lock{inst.joystickAlertMutex};
+  inst.silenceJoystickAlerts = silence;
+  if (silence && !IsFMSAttached()) {
+    ClearJoystickAlertsLocked();
+  }
 }
 
-bool DriverStationBackend::IsJoystickConnectionWarningSilenced() {
-  return !IsFMSAttached() && ::GetInstance().silenceJoystickWarning;
+bool DriverStationBackend::IsJoystickConnectionAlertSilenced() {
+  auto& inst = ::GetInstance();
+  std::scoped_lock lock{inst.joystickAlertMutex};
+  return !IsFMSAttached() && inst.silenceJoystickAlerts;
 }
 
 void DriverStationBackend::StartDataLog(wpi::log::DataLog& log,
@@ -886,23 +1117,46 @@ void DriverStationBackend::StartDataLog(wpi::log::DataLog& log,
   }
 }
 
-void ReportJoystickWarningV(int stick, std::string_view format,
-                            std::format_args args) {
+void ReportJoystickResourceWarning(int stick, JoystickResourceAlert type,
+                                   int resource) {
   auto& inst = GetInstance();
-  if (DriverStationBackend::IsFMSAttached() || !inst.silenceJoystickWarning) {
-    auto currentTime = Timer::GetTimestamp();
-    if (currentTime > inst.nextMessageTime) {
-      if (DriverStationBackend::IsJoystickConnected(stick)) {
-        ReportErrorV(warn::Warning, "", 0, "", format, args);
-      } else {
-        ReportError(
-            warn::Warning, "", 0, "",
-            "Joystick on port {} not available, check if all controllers are "
-            "plugged in",
-            stick);
-      }
-      inst.nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
+  std::scoped_lock lock{inst.joystickAlertMutex};
+  auto& alerts = inst.joystickAlerts[stick];
+  if (!alerts.PrepareForReport(inst.silenceJoystickAlerts)) {
+    return;
+  }
+
+  alerts.ReportResourceWarning(type, resource);
+}
+
+void ReportJoystickTouchpadFingerWarning(int stick, int touchpad, int finger) {
+  auto& inst = GetInstance();
+  std::scoped_lock lock{inst.joystickAlertMutex};
+  auto& alerts = inst.joystickAlerts[stick];
+  if (!alerts.PrepareForReport(inst.silenceJoystickAlerts)) {
+    return;
+  }
+
+  alerts.ReportTouchpadFingerWarning(touchpad, finger);
+}
+
+void ClearJoystickAlerts() {
+  auto& inst = GetInstance();
+  std::scoped_lock lock{inst.joystickAlertMutex};
+  ClearJoystickAlertsLocked();
+}
+
+void ClearJoystickAlertsLocked() {
+  auto& inst = GetInstance();
+  if (!DriverStationBackend::IsFMSAttached() && inst.silenceJoystickAlerts) {
+    for (auto& alerts : inst.joystickAlerts) {
+      alerts.ClearAllAlerts();
     }
+    return;
+  }
+
+  for (auto& alerts : inst.joystickAlerts) {
+    alerts.Refresh();
   }
 }
 

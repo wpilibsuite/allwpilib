@@ -38,8 +38,8 @@ public class Shooter extends SubsystemBase {
     setDefaultCommand(
         runOnce(
                 () -> {
-                  shooterMotor.disable();
-                  feederMotor.disable();
+                  shooterMotor.setThrottle(0.0);
+                  feederMotor.setThrottle(0.0);
                 })
             .andThen(run(() -> {}))
             .withName("Idle"));

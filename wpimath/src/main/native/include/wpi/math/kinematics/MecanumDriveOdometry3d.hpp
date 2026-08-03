@@ -25,14 +25,16 @@ namespace wpi::math {
  * when using computer-vision systems.
  */
 class WPILIB_DLLEXPORT MecanumDriveOdometry3d
-    : public Odometry3d<MecanumDriveWheelPositions, MecanumDriveWheelVelocities,
+    : public Odometry3d<MecanumDriveKinematics, MecanumDriveWheelPositions,
+                        MecanumDriveWheelVelocities,
                         MecanumDriveWheelAccelerations> {
  public:
   /**
    * Constructs a MecanumDriveOdometry3d object.
    *
    * @param kinematics The mecanum drive kinematics for your drivetrain.
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
@@ -40,9 +42,6 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry3d
       MecanumDriveKinematics kinematics, const Rotation3d& gyroAngle,
       const MecanumDriveWheelPositions& wheelPositions,
       const Pose3d& initialPose = Pose3d{});
-
- private:
-  MecanumDriveKinematics m_kinematicsImpl;
 };
 
 }  // namespace wpi::math

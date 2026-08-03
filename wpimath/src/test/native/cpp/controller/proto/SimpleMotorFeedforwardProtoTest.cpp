@@ -4,7 +4,7 @@
 
 #include "wpi/math/controller/proto/SimpleMotorFeedforwardProto.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "../../ProtoTestBase.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
@@ -21,19 +21,19 @@ struct SimpleMotorFeedforwardProtoTestData {
       wpi::units::volt_t{0.7} / (wpi::units::unit_t<T>{1} / 1_s / 1_s), 25_ms};
 
   static void CheckEq(const Type& testData, const Type& data) {
-    EXPECT_EQ(testData.GetKs().value(), data.GetKs().value());
-    EXPECT_EQ(testData.GetKv().value(), data.GetKv().value());
-    EXPECT_EQ(testData.GetKa().value(), data.GetKa().value());
-    EXPECT_EQ(testData.GetDt().value(), data.GetDt().value());
+    CHECK(testData.GetKs().value() == data.GetKs().value());
+    CHECK(testData.GetKv().value() == data.GetKv().value());
+    CHECK(testData.GetKa().value() == data.GetKa().value());
+    CHECK(testData.GetDt().value() == data.GetDt().value());
   }
 };
 
-INSTANTIATE_TYPED_TEST_SUITE_P(
+INSTANTIATE_CATCH_TYPED_TEST_SUITE_P(
     SimpleMotorFeedforwardMeters, ProtoTest,
     SimpleMotorFeedforwardProtoTestData<wpi::units::meters>);
-INSTANTIATE_TYPED_TEST_SUITE_P(
+INSTANTIATE_CATCH_TYPED_TEST_SUITE_P(
     SimpleMotorFeedforwardFeet, ProtoTest,
     SimpleMotorFeedforwardProtoTestData<wpi::units::feet>);
-INSTANTIATE_TYPED_TEST_SUITE_P(
+INSTANTIATE_CATCH_TYPED_TEST_SUITE_P(
     SimpleMotorFeedforwardRadians, ProtoTest,
     SimpleMotorFeedforwardProtoTestData<wpi::units::radians>);

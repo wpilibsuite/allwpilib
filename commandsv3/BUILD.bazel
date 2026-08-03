@@ -12,7 +12,10 @@ py_binary(
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    deps = [requirement("jinja2")],
+    deps = [
+        requirement("jinja2"),
+        "//:generation",
+    ],
 )
 
 filegroup(
@@ -54,7 +57,6 @@ wpilib_java_library(
     plugins = ["//javacPlugin:plugin"],
     visibility = ["//visibility:public"],
     deps = [
-        "//cscore:cscore-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
         "//wpiannotations",

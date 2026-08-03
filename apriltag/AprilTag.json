@@ -1,0 +1,91 @@
+{
+  "fileName": "AprilTag.json",
+  "name": "AprilTag",
+  "version": "1.0.0",
+  "uuid": "3ac3403d-7f6b-4b5a-a09c-a49a2c32e5a3",
+  "wpilibYear": "2027_alpha5",
+  "mavenUrls": [],
+  "jsonUrl": "",
+  "javaDependencies": [
+    {
+      "groupId": "org.wpilib.thirdparty.opencv",
+      "artifactId": "opencv-java",
+      "version": "2027-4.13.0-3"
+    },
+    {
+      "groupId": "org.wpilib.apriltag",
+      "artifactId": "apriltag-java",
+      "version": "wpilib"
+    }
+  ],
+  "jniDependencies": [
+    {
+      "groupId": "org.wpilib.thirdparty.opencv",
+      "artifactId": "opencv-cpp",
+      "version": "2027-4.13.0-3",
+      "skipInvalidPlatforms": true,
+      "isJar": false,
+      "validPlatforms": [
+        "linuxsystemcore",
+        "linuxarm64",
+        "windowsx86-64",
+        "windowsarm64",
+        "linuxx86-64",
+        "osxuniversal"
+      ]
+    },
+    {
+      "groupId": "org.wpilib.apriltag",
+      "artifactId": "apriltag-cpp",
+      "version": "wpilib",
+      "skipInvalidPlatforms": true,
+      "isJar": false,
+      "validPlatforms": [
+        "linuxsystemcore",
+        "linuxarm64",
+        "windowsx86-64",
+        "windowsarm64",
+        "linuxx86-64",
+        "osxuniversal"
+      ]
+    }
+  ],
+  "cppDependencies": [
+    {
+      "groupId": "org.wpilib.thirdparty.opencv",
+      "artifactId": "opencv-cpp",
+      "version": "2027-4.13.0-3",
+      "libName": "opencv",
+      "headerClassifier": "headers",
+      "sourcesClassifier": "sources",
+      "sharedLibrary": true,
+      "skipInvalidPlatforms": true,
+      "binaryPlatforms": [
+        "linuxsystemcore",
+        "linuxarm64",
+        "windowsx86-64",
+        "windowsarm64",
+        "linuxx86-64",
+        "osxuniversal"
+      ]
+    },
+    {
+      "groupId": "org.wpilib.apriltag",
+      "artifactId": "apriltag-cpp",
+      "version": "wpilib",
+      "libName": "apriltag",
+      "headerClassifier": "headers",
+      "sourcesClassifier": "sources",
+      "sharedLibrary": true,
+      "skipInvalidPlatforms": true,
+      "binaryPlatforms": [
+        "linuxsystemcore",
+        "linuxarm64",
+        "windowsx86-64",
+        "windowsarm64",
+        "linuxx86-64",
+        "osxuniversal"
+      ]
+    }
+  ]
+}

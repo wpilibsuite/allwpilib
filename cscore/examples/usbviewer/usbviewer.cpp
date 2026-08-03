@@ -75,7 +75,7 @@ int main() {
   });
 
   gui::CreateContext();
-  gui::Initialize("Hello World", 1024, 768);
+  gui::Initialize("Hello World", 1024, 768, gui::RendererPreference::PREFER_2D);
   gui::Texture tex;
   gui::AddEarlyExecute([&] {
     std::unique_ptr<cv::Mat> frame;
