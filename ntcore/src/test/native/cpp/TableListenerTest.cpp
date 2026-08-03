@@ -93,12 +93,12 @@ TEST_CASE_METHOD(TableListenerTest, "TableListenerTest AddListener",
 TEST_CASE_METHOD(TableListenerTest,
                  "TableListenerTest DestroyInstanceWhileInCallack",
                  "[ntcore][table-listener]") {
-  std::atomic_bool destroyCalled;
-  std::atomic_bool destroyReturned;
-  std::atomic_bool majorFailureDetected;
-  std::atomic_bool callbackWokeUp;
-  std::atomic_bool callbackSuccessful;
-  std::atomic_bool destroyerSuccessful;
+  std::atomic_bool destroyCalled(false);
+  std::atomic_bool destroyReturned(false);
+  std::atomic_bool majorFailureDetected(false);
+  std::atomic_bool callbackWokeUp(false);
+  std::atomic_bool callbackSuccessful(false);
+  std::atomic_bool destroyerSuccessful(false);
   auto listenerCalledEvent = wpi::util::MakeEvent(false, false);
   auto listenerDoneEvent = wpi::util::MakeEvent(false, false);
   auto destroyerThreadStartedEvent = wpi::util::MakeEvent(false, false);
@@ -144,8 +144,8 @@ TEST_CASE_METHOD(TableListenerTest,
 
         wpi::util::SetEvent(listenerDoneEvent);
         INFO("[Listener] Sent listenerDoneEvent; exiting");
-        REQUIRE(!timedOut);
-        REQUIRE(!majorFailureDetected);
+        CHECK(!timedOut);
+        CHECK(!majorFailureDetected);
         callbackSuccessful = true;
       });
 
@@ -176,14 +176,14 @@ TEST_CASE_METHOD(TableListenerTest,
     wpi::util::SetEvent(destroyerThreadDoneEvent);
   });
 
-  bool timedOut;
+  bool timedOut = false;
   CHECK(wpi::util::WaitForObject(destroyerThreadReadyEvent, 2.0, &timedOut));
   if (timedOut) {
     INFO("[Test thread] Timed out waiting for destroyerThreadReadyEvent");
     majorFailureDetected = true;  // Ensure traces from the listener are shown
     wpi::util::SetEvent(exitListenerEvent);
     wpi::util::WaitForObject(listenerDoneEvent, 3.0, NULL);
-    REQUIRE(majorFailureDetected);
+    FAIL("Timed out waiting for destroyerThreadReadyEvent");
     return;
   }
   INFO("[Test thread] Received destroyerThreadReadyEvent");
