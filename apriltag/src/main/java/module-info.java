@@ -10,13 +10,7 @@ open module wpilib.apriltag {
   requires org.opencv; // not transitive; users can import the opencv module explicitly
   requires wpilib.math;
   requires wpilib.util;
-  requires io.avaje.json;
-  requires io.avaje.jsonb;
 
   exports org.wpilib.vision.apriltag;
   exports org.wpilib.vision.apriltag.jni;
-
-  provides io.avaje.jsonb.spi.JsonbExtension with
-      org.wpilib.vision.apriltag.ApriltagJsonComponent,
-      org.wpilib.vision.apriltag.jsonb.GeneratedJsonComponent;
 }
