@@ -78,6 +78,7 @@ def build_commands(folders):
                 "//apriltag:apriltag-java",
                 "//cameraserver:cameraserver-java",
                 "//cscore:cscore-java",
+                "//fields:fields-java",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
                 "//wpimath:wpimath-java",
@@ -138,6 +139,7 @@ def build_templates(folders):
             ],
             deps = [
                 "//allwpilib-java:allwpilib-java",
+                "//fields:fields-java",
                 "//hal:hal-java",
                 "//wpilibj:wpilibj-java",
                 "//commandsv2:commandsv2-java",
@@ -156,13 +158,14 @@ def build_tests(example_test_folders, snippet_test_folders):
     for folder in example_test_folders:
         wpilib_java_junit5_test(
             name = folder + "-test",
-            srcs = native.glob(["src/test/java/org/wpilib/examples/" + folder + "/**/*.java"]),
+            srcs = native.glob(["src/test/java/org/wpilib/examples/" + folder + "/**/*.java"]) + native.glob(["**/module-info.java"]),
             plugins = [
                 "//epilogue-processor:plugin",
             ],
             deps = [
                 ":" + folder + "-example",
                 "//allwpilib-java:allwpilib-java",
+                "//fields:fields-java",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
                 "//wpilibj:wpilibj-java",
@@ -181,13 +184,14 @@ def build_tests(example_test_folders, snippet_test_folders):
     for folder in snippet_test_folders:
         wpilib_java_junit5_test(
             name = folder + "-test",
-            srcs = native.glob(["src/test/java/org/wpilib/snippets/" + folder + "/**/*.java"]),
+            srcs = native.glob(["src/test/java/org/wpilib/snippets/" + folder + "/**/*.java"]) + native.glob(["**/module-info.java"]),
             plugins = [
                 "//epilogue-processor:plugin",
             ],
             deps = [
                 ":" + folder + "-snippet",
                 "//allwpilib-java:allwpilib-java",
+                "//fields:fields-java",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
                 "//wpilibj:wpilibj-java",
