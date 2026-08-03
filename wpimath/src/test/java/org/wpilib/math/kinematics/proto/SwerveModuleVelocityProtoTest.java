@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.SwerveModuleVelocity;
-import org.wpilib.math.proto.ProtobufSwerveModuleVelocity;
+import org.wpilib.math.kinematics.proto.detail.ProtobufSwerveModuleVelocity;
 
 class SwerveModuleVelocityProtoTest {
   private static final SwerveModuleVelocity DATA =

@@ -9,8 +9,7 @@
 #include <string>
 #include <vector>
 
-#include "wpi/driverstation/Alert.hpp"
-#include "wpi/hal/Types.h"
+#include "wpi/util/Alert.hpp"
 
 namespace wpi::sim {
 
@@ -23,11 +22,11 @@ class AlertSim final {
 
   /** Information about an alert. */
   struct AlertInfo {
-    /** The handle of the alert. */
-    HAL_AlertHandle handle;
-
     /** The group of the alert. */
     std::string group;
+
+    /** The alert identifier. */
+    std::string id;
 
     /** The text of the alert. */
     std::string text;
@@ -36,7 +35,7 @@ class AlertSim final {
     int64_t activeStartTime;
 
     /** The level of the alert (HIGH, MEDIUM, or LOW). */
-    Alert::Level level;
+    wpi::util::Alert::Level level;
 
     /**
      * Returns whether the alert is currently active.

@@ -68,19 +68,19 @@ public final class DriverStationDisplay {
   }
 
   /**
-   * Adds display data in line mode.
+   * Adds display data in line mode, keyed by an identifier that is not displayed.
    *
-   * <p>Repeated calls with the same caption before {@link #updateLines()} replace the previous
-   * line. The caption is used to identify the line and is not displayed. Empty or whitespace-only
-   * captions always append a new line.
+   * <p>Repeated calls with the same key before {@link #updateLines()} replace the previous line.
+   * The key is used only to identify the line for replacement and is not displayed. Empty or
+   * whitespace-only keys always append a new line.
    *
-   * @param caption Line caption.
+   * @param key Line key.
    * @param line Line contents.
    */
-  public static void addData(String caption, String line) {
+  public static void addKeyedLine(String key, String line) {
     m_displayLock.lock();
     try {
-      addDataUnderLock(caption, line);
+      addKeyedLineUnderLock(key, line);
     } finally {
       m_displayLock.unlock();
     }
@@ -90,8 +90,31 @@ public final class DriverStationDisplay {
    * Adds display data in line mode.
    *
    * <p>Repeated calls with the same caption before {@link #updateLines()} replace the previous
-   * line. The caption is used to identify the line and is not displayed. Empty or whitespace-only
-   * captions always append a new line.
+   * line. The caption is used to identify the line and is displayed before the line contents,
+   * separated by " : ". Empty or whitespace-only captions always append a new line and are not
+   * displayed.
+   *
+   * @param caption Line caption.
+   * @param line Line contents.
+   */
+  public static void addData(String caption, String line) {
+    String captionText = nonNull(caption);
+    String lineText = nonNull(line);
+
+    if (captionText.isBlank()) {
+      addKeyedLine(captionText, lineText);
+    } else {
+      addKeyedLine(captionText, captionText + " : " + lineText);
+    }
+  }
+
+  /**
+   * Adds display data in line mode.
+   *
+   * <p>Repeated calls with the same caption before {@link #updateLines()} replace the previous
+   * line. The caption is used to identify the line and is displayed before the line contents,
+   * separated by " : ". Empty or whitespace-only captions always append a new line and are not
+   * displayed.
    *
    * <p>The value is converted to text with {@link String#valueOf(Object)}.
    *
@@ -106,8 +129,9 @@ public final class DriverStationDisplay {
    * Adds formatted display data in line mode.
    *
    * <p>Repeated calls with the same caption before {@link #updateLines()} replace the previous
-   * line. The caption is used to identify the line and is not displayed. Empty or whitespace-only
-   * captions always append a new line.
+   * line. The caption is used to identify the line and is displayed before the line contents,
+   * separated by " : ". Empty or whitespace-only captions always append a new line and are not
+   * displayed.
    *
    * @param caption Line caption.
    * @param format Format string.
@@ -117,22 +141,22 @@ public final class DriverStationDisplay {
     addData(caption, String.format(format, args));
   }
 
-  private static void addDataUnderLock(String caption, String line) {
+  private static void addKeyedLineUnderLock(String key, String line) {
     if (rawMode) {
       return;
     }
 
-    String captionText = nonNull(caption);
+    String keyText = nonNull(key);
     String lineText = nonNull(line);
 
-    if (captionText.isBlank()) {
+    if (keyText.isBlank()) {
       lines.add(lineText);
       return;
     }
 
-    Integer lineNum = lineMap.get(captionText);
+    Integer lineNum = lineMap.get(keyText);
     if (lineNum == null) {
-      lineMap.put(captionText, lines.size());
+      lineMap.put(keyText, lines.size());
       lines.add(lineText);
     } else if (lineNum < lines.size()) {
       lines.set(lineNum, lineText);
@@ -142,13 +166,13 @@ public final class DriverStationDisplay {
   /**
    * Adds an uncaptioned display line in line mode.
    *
-   * <p>This is equivalent to calling {@link #addData(String, String)} with an empty caption, which
+   * <p>This is equivalent to calling {@link #addKeyedLine(String, String)} with an empty key, which
    * always appends a new line.
    *
    * @param line Line contents.
    */
   public static void addLine(String line) {
-    addData("", line);
+    addKeyedLine("", line);
   }
 
   /**

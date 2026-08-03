@@ -26,6 +26,7 @@ foreach(example ${EXAMPLES})
         ${example}
         apriltag
         drivers
+        fields
         wpilibc
         commandsv2
         romiVendordep
@@ -37,7 +38,7 @@ foreach(example ${EXAMPLES})
         WPILIB_WITH_TESTS
         AND EXISTS ${CMAKE_SOURCE_DIR}/wpilibcExamples/src/test/cpp/examples/${example}
     )
-        wpilib_add_test(Example_${example} src/test/cpp/examples/${example}/cpp)
+        wpilib_add_test_catch2(Example_${example} src/test/cpp/examples/${example}/cpp)
         target_sources(Example_${example}_test PRIVATE ${sources})
         target_include_directories(
             Example_${example}_test
@@ -50,11 +51,11 @@ foreach(example ${EXAMPLES})
             Example_${example}_test
             apriltag
             drivers
+            fields
             wpilibc
             commandsv2
             romiVendordep
             xrpVendordep
-            googletest
         )
         add_dependencies(wpilibcExamples_test Example_${example}_test)
     endif()
@@ -74,6 +75,7 @@ foreach(template ${TEMPLATES})
         drivers
         wpilibc
         commandsv2
+        fields
         romiVendordep
         xrpVendordep
     )
@@ -101,6 +103,7 @@ foreach(snippet ${SNIPPETS})
         snippet${snippet}
         apriltag
         drivers
+        fields
         wpilibc
         commandsv2
         romiVendordep
@@ -113,7 +116,7 @@ foreach(snippet ${SNIPPETS})
         WPILIB_WITH_TESTS
         AND EXISTS ${CMAKE_SOURCE_DIR}/wpilibcExamples/src/test/cpp/snippets/${snippet}
     )
-        wpilib_add_test(Snippet_${snippet} src/test/cpp/snippets/${snippet}/cpp)
+        wpilib_add_test_catch2(Snippet_${snippet} src/test/cpp/snippets/${snippet}/cpp)
         target_sources(Snippet_${snippet}_test PRIVATE ${sources})
         target_include_directories(
             Snippet_${snippet}_test
@@ -126,11 +129,11 @@ foreach(snippet ${SNIPPETS})
             Snippet_${snippet}_test
             apriltag
             drivers
+            fields
             wpilibc
             commandsv2
             romiVendordep
             xrpVendordep
-            googletest
         )
         add_dependencies(wpilibcExamples_test Snippet_${snippet}_test)
     endif()

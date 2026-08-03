@@ -6,9 +6,9 @@
 
 #include <numbers>
 
-#include "wpi/apriltag/AprilTagFieldLayout.hpp"
-#include "wpi/apriltag/AprilTagFields.hpp"
 #include "wpi/drivers/motor/PWMSparkMax.hpp"
+#include "wpi/fields/Field.hpp"
+#include "wpi/fields/fields.hpp"
 #include "wpi/hardware/imu/OnboardIMU.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
@@ -128,10 +128,9 @@ class Drivetrain {
       cameraToObjectTopic.GetEntry(kDefaultVal);
   wpi::nt::DoubleArrayEntry& cameraToObjectEntryRef = cameraToObjectEntry;
 
-  wpi::apriltag::AprilTagFieldLayout aprilTagFieldLayout{
-      wpi::apriltag::AprilTagFieldLayout::LoadField(
-          wpi::apriltag::AprilTagField::k2024Crescendo)};
-  wpi::math::Pose3d objectInField{aprilTagFieldLayout.GetTagPose(1).value()};
+  wpi::fields::Field field{
+      wpi::fields::GetField(wpi::fields::FieldId::FRC_2024_CRESCENDO)};
+  wpi::math::Pose3d objectInField{field.GetTagPose(1).value()};
 
   wpi::PWMSparkMax leftLeader{1};
   wpi::PWMSparkMax leftFollower{2};

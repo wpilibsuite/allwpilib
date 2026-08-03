@@ -21,6 +21,8 @@ def fixup_root_package_name(name):
         return "apriltag"
     if name == "wpilib_drivers":
         return "drivers"
+    if name == "robotpy_fields":
+        return "fields"
     return name
 
 

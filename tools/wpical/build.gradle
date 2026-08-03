@@ -20,16 +20,16 @@ ext {
     nativeName = 'wpical'
     useCpp = true
     nativeTestSuiteName = "${nativeName}Catch2Test"
-    sharedCvConfigs = [
+    sharedCvConfigs = []
+    staticCvConfigs = [ (nativeName): [],
         (nativeTestSuiteName): []]
-    staticCvConfigs = []
 }
 
 apply from: "${rootDir}/shared/resources.gradle"
 apply from: "${rootDir}/shared/config.gradle"
 
 def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
-def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
+def wpilibVersionFileOutput = file("$buildDir/generated/mainVersion/cpp/WPILibVersion.cpp")
 
 apply from: "${rootDir}/shared/ceres.gradle"
 apply from: "${rootDir}/shared/opencv.gradle"
@@ -55,6 +55,7 @@ task generateCppVersion() {
         def version = wpilibVersioning.version.get()
         println "Writing version ${version} to $wpilibVersionFileOutput"
 
+        wpilibVersionFileOutput.parentFile.mkdirs()
         if (wpilibVersionFileOutput.exists()) {
             wpilibVersionFileOutput.delete()
         }
@@ -73,7 +74,7 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
 def generateTask = createGenerateResourcesTask('main', 'WPIcal', 'wpical', project)
 
 project(':').libraryBuild.dependsOn build
-tasks.withType(CppCompile) {
+tasks.withType(CppCompile).configureEach {
     dependsOn generateTask
     dependsOn generateCppVersion
 }
@@ -134,7 +135,7 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/native/cpp', 'src/main/native/thirdparty/libdogleg/src', 'src/main/native/thirdparty/mrcal/src', 'src/main/native/thirdparty/mrcal_java/src', "$buildDir/generated/main/cpp"
+                        srcDirs 'src/main/native/cpp', 'src/main/native/thirdparty/libdogleg/src', 'src/main/native/thirdparty/mrcal/src', 'src/main/native/thirdparty/mrcal_java/src', "$buildDir/generated/main/cpp", "$buildDir/generated/mainVersion/cpp"
                         include '**/*.cpp'
                     }
                     exportedHeaders {
@@ -163,14 +164,14 @@ model {
                     return
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
-                lib project: ':fields', library: 'fields', linkage: 'static'
                 lib project: ':glass', library: 'glass', linkage: 'static'
+                lib project: ':fields', library: 'fields', linkage: 'static'
+                lib project: ':fields', library: 'fieldimages', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
-                nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 project.addLibSdlGpuDependency(it)
                 it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'
                 it.cppCompiler.define 'GLOG_USE_GLOG_EXPORT'
@@ -214,14 +215,14 @@ model {
                     return
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
-                lib project: ':fields', library: 'fields', linkage: 'static'
                 lib project: ':glass', library: 'glass', linkage: 'static'
+                lib project: ':fields', library: 'fields', linkage: 'static'
+                lib project: ':fields', library: 'fieldimages', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
-                nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 project.addLibSdlGpuDependency(it)
                 it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'
                 it.cppCompiler.define('PROJECT_ROOT_PATH', testResources)

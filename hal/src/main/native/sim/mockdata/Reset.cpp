@@ -4,7 +4,6 @@
 
 #include "../PortsInternal.hpp"
 #include "wpi/hal/simulation/AddressableLEDData.h"
-#include "wpi/hal/simulation/AlertData.h"
 #include "wpi/hal/simulation/AnalogInData.h"
 #include "wpi/hal/simulation/CTREPCMData.h"
 #include "wpi/hal/simulation/CanData.h"
@@ -19,6 +18,7 @@
 #include "wpi/hal/simulation/REVPHData.h"
 #include "wpi/hal/simulation/RoboRioData.h"
 #include "wpi/hal/simulation/SimDeviceData.h"
+#include "wpi/util/Alert.h"
 
 extern "C" void HALSIM_ResetAllSimData(void) {
   for (int32_t i = 0; i < wpi::hal::kNumAddressableLEDs; i++) {
@@ -71,5 +71,5 @@ extern "C" void HALSIM_ResetAllSimData(void) {
 
   HALSIM_ResetRoboRioData();
   HALSIM_ResetSimDeviceData();
-  HALSIM_ResetAlertData();
+  WPI_ResetAlertData();
 }

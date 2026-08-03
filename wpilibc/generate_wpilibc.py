@@ -1,6 +1,17 @@
+#!/usr/bin/env python3
+
+# Copyright (c) FIRST and other WPILib contributors.
+# Open Source Software; you can modify and/or share it under the terms of
+# the WPILib BSD license file in the root directory of this project.
+
 import argparse
 import os
+import sys
 from pathlib import Path
+
+# When invoked directly, Python puts the script directory on sys.path.
+# Add the repo root so absolute package imports still work.
+sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 from wpilibc.generate_first_ds_hids import generate_first_ds_hids
 from wpilibc.generate_hids import generate_hids

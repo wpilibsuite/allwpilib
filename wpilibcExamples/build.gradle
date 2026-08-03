@@ -11,7 +11,7 @@ evaluationDependsOn(':hal')
 evaluationDependsOn(':drivers')
 
 apply from: '../shared/config.gradle'
-apply from: "${rootDir}/shared/googletest.gradle"
+apply from: "${rootDir}/shared/catch2.gradle"
 
 ext.examplesMap = [:]
 ext.templatesMap = [:]
@@ -82,6 +82,7 @@ model {
                 lib project: ':romiVendordep', library: 'romiVendordep', linkage: 'shared'
                 lib project: ':xrpVendordep', library: 'xrpVendordep', linkage: 'shared'
                 lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
+                lib project: ':fields', library: 'fields', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':drivers', library: 'drivers', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -116,6 +117,7 @@ model {
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':drivers', library: 'drivers', linkage: 'shared'
                     lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
+                    lib project: ':fields', library: 'fields', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     project(':ntcore').addNtcoreDependency(binary, 'shared')
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
@@ -165,6 +167,7 @@ model {
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':drivers', library: 'drivers', linkage: 'shared'
                     lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
+                    lib project: ':fields', library: 'fields', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     project(':ntcore').addNtcoreDependency(binary, 'shared')
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
@@ -197,6 +200,7 @@ model {
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':drivers', library: 'drivers', linkage: 'shared'
                     lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
+                    lib project: ':fields', library: 'fields', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     project(':ntcore').addNtcoreDependency(binary, 'shared')
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
@@ -241,7 +245,7 @@ model {
         examplesMap.each { key, value ->
             def testFolder = new File("${rootDir}/wpilibcExamples/src/test/cpp/examples/${key}")
             if (testFolder.exists()) {
-                "${key}Test"(GoogleTestTestSuiteSpec) {
+                "${key}Catch2Test"(GoogleTestTestSuiteSpec) {
                     for (NativeComponentSpec c : $.components) {
                         if (c.name == key) {
                             testing c
@@ -268,6 +272,9 @@ model {
                             }
                         }
                     }
+                    binaries.all {
+                        lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
+                    }
                 }
             }
         }
@@ -276,7 +283,7 @@ model {
         snippetsMap.each { key, value ->
             def testFolder = new File("${rootDir}/wpilibcExamples/src/test/cpp/snippets/${key}")
             if (testFolder.exists()) {
-                "snippets${key}Test"(GoogleTestTestSuiteSpec) {
+                "snippets${key}Catch2Test"(GoogleTestTestSuiteSpec) {
                     for (NativeComponentSpec c : $.components) {
                         if (c.name == "snippets${key}") {
                             testing c
@@ -303,6 +310,9 @@ model {
                             }
                         }
                     }
+                    binaries.all {
+                        lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
+                    }
                 }
             }
         }
@@ -315,6 +325,7 @@ model {
             lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
             lib project: ':drivers', library: 'drivers', linkage: 'shared'
             lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
+            lib project: ':fields', library: 'fields', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
@@ -360,7 +371,7 @@ model {
                 // Get the appropriate binary and create the run task.
                 component.binaries.each { binary ->
                     if (binary.targetPlatform.name == getCurrentArch() && binary.buildType.name == "debug") {
-                        project.tasks.create("run${component.name}", Exec) {
+                        project.tasks.register("run${component.name}", Exec) {
                             // Add simulation modules to HALSIM_EXTENSIONS environment variable.
                             def setupEnv = {
                                 String extensions = ""

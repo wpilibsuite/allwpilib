@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.kinematics.ChassisVelocities;
-import org.wpilib.math.proto.ProtobufChassisVelocities;
+import org.wpilib.math.kinematics.proto.detail.ProtobufChassisVelocities;
 
 class ChassisVelocitiesProtoTest {
   private static final ChassisVelocities DATA = new ChassisVelocities(2.29, 2.2, 0.3504);

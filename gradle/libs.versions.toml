@@ -3,7 +3,7 @@ avaje = "3.14"
 ceres = "2027-2.2-2"
 ejml = "0.46.0"
 gson = "2.13.1"
-libsdlgpu = "3.4.12-5"
+libsdlgpu = "3.4.12-6"
 libssh = "2027-0.120-1"
 jmh = "1.37"
 mrclib = "2027.1.0-alpha-1-91-gb154ee9"
@@ -31,7 +31,7 @@ mockito-core = { module = "org.mockito:mockito-core", version = "4.1.0" }
 # Note that these are also Gradle plugins and cannot be used with the plugin specification
 # due to their presence on the classpath without version information.
 wpilib-gradle-vscode = { module = "org.wpilib:gradle-cpp-vscode", version = "2027.0.0" }
-wpilib-native-utils = { module = "org.wpilib:native-utils", version = "2027.12.0" }
+wpilib-native-utils = { module = "org.wpilib:native-utils", version = "2027.13.1" }
 
 [bundles]
 ejml = ["ejml-java9module"]
@@ -50,6 +50,6 @@ wpilib-gradle-jni = { id = "org.wpilib.GradleJni", version = "2027.0.0" }
 # Note: these plugins can't be used. Their JARs are on the classpath for buildSrc,
 # which doesn't retain version information.
 # wpilib-gradle-vscode = { id = "org.wpilib.GradleVsCode", version = "2027.0.0" }
-# wpilib-native-utils = { id = "org.wpilib.NativeUtils", version = "2027.11.0" }
+# wpilib-native-utils = { id = "org.wpilib.NativeUtils", version = "2027.13.0" }
 wpilib-repositories = { id = "org.wpilib.WPILibRepositoriesPlugin", version = "2027.0.0" }
 wpilib-versioning = { id = "org.wpilib.WPILibVersioningPlugin", version = "2027.0.1" }

@@ -4,7 +4,7 @@
 
 #include <cstddef>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
@@ -13,7 +13,7 @@
 #include "wpi/units/length.hpp"
 #include "wpi/units/velocity.hpp"
 
-TEST(TrajectoryConcatenateTest, Samples) {
+TEST_CASE("TrajectoryConcatenateTest Samples", "[wpimath]") {
   auto t1 = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
       {}, {}, {1_m, 1_m, 0_deg}, {2_mps, 2_mps_sq});
   auto t2 = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
@@ -26,16 +26,16 @@ TEST(TrajectoryConcatenateTest, Samples) {
     const auto& state = t.Samples()[i];
 
     // Make sure that the times are strictly increasing.
-    EXPECT_GE(state.time.value(), time);
+    CHECK(state.time.value() >= time);
     time = state.time.value();
 
     // Ensure that the states in t are the same as those in t1 and t2.
     if (i < t1.Samples().size()) {
-      EXPECT_EQ(state, t1.Samples()[i]);
+      CHECK(state == t1.Samples()[i]);
     } else {
       auto st = t2.Samples()[i - t1.Samples().size()];
       st.time += t1.Duration();
-      EXPECT_EQ(state, st);
+      CHECK(state == st);
     }
   }
 }

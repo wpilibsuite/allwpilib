@@ -8,6 +8,7 @@ apply plugin: ExtraTasks
 
 ext {
     nativeName = 'wpilibc'
+    nativeTestSuiteName = "${nativeName}Catch2Test"
 }
 
 apply from: "${rootDir}/shared/config.gradle"
@@ -35,6 +36,7 @@ task generateCppVersion() {
         def version = wpilibVersioning.version.get()
         println "Writing version ${version} to $wpilibVersionFileOutput"
 
+        wpilibVersionFileOutput.parentFile.mkdirs()
         if (wpilibVersionFileOutput.exists()) {
             wpilibVersionFileOutput.delete()
         }
@@ -56,9 +58,9 @@ ext {
     staticGtestConfigs = [:]
 }
 
-staticGtestConfigs["${nativeName}Test"] = []
+staticGtestConfigs["${nativeTestSuiteName}"] = []
 
-apply from: "${rootDir}/shared/googletest.gradle"
+apply from: "${rootDir}/shared/catch2.gradle"
 
 nativeUtils.exportsConfigs {
     wpilibc {
@@ -161,7 +163,7 @@ model {
         }
     }
     testSuites {
-        "${nativeName}Test"(GoogleTestTestSuiteSpec) {
+        "${nativeTestSuiteName}"(GoogleTestTestSuiteSpec) {
             for(NativeComponentSpec c : $.components) {
                 if (c.name == nativeName) {
                     testing c
@@ -201,6 +203,9 @@ model {
                 it.exportedHeaders {
                     srcDirs 'src/test/native/include'
                 }
+            }
+            binaries.all {
+                lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
             }
         }
     }

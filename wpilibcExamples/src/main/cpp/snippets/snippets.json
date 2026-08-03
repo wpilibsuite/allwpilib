@@ -178,6 +178,7 @@
     "foldername": "AprilTagsVision",
     "gradlebase": "cpp",
     "extravendordeps": [
+      "apriltag",
       "cameraserver"
     ]
   },

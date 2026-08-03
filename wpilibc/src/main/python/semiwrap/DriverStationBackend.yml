@@ -69,7 +69,7 @@ classes:
       RefreshData:
       ProvideRefreshedDataEventHandle:
       RemoveRefreshedDataEventHandle:
-      SilenceJoystickConnectionWarning:
-      IsJoystickConnectionWarningSilenced:
+      SilenceJoystickConnectionAlert:
+      IsJoystickConnectionAlertSilenced:
       StartDataLog:
       ObserveUserProgramStarting:

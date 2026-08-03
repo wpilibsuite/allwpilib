@@ -182,7 +182,7 @@ public class DSGamepadChooser {
 
     for (int i = 0; i < m_selectables.size(); i++) {
       GamepadSelectable displaySelectable = m_selectables.get(i);
-      DriverStationDisplay.addData(
+      DriverStationDisplay.addKeyedLine(
           m_captionPrefix + displaySelectable.getName(),
           formatDisplayLine(displaySelectable, i == m_selectedSelectable));
     }

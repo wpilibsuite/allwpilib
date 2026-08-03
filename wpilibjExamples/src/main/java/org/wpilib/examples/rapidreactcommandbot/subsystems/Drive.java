@@ -117,7 +117,7 @@ public class Drive extends SubsystemBase {
         // End command when we've traveled the specified distance
         .until(() -> Math.max(leftEncoder.getDistance(), rightEncoder.getDistance()) >= distance)
         // Stop the drive when the command ends
-        .finallyDo(interrupted -> drive.stopMotor());
+        .finallyDo(interrupted -> drive.arcadeDrive(0, 0));
   }
 
   /**

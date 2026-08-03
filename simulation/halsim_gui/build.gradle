@@ -46,12 +46,13 @@ model {
             lib project: ':glass', library: 'glassnt', linkage: 'static'
             lib project: ':glass', library: 'glass', linkage: 'static'
             lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+            lib project: ':fields', library: 'fields', linkage: 'static'
+            lib project: ':fields', library: 'fieldimages', linkage: 'static'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             project(':hal').addHalDependency(it, 'shared')
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-            lib project: ':fields', library: 'fields', linkage: 'static'
             lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
             project.addLibSdlGpuDependency(it)
             if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
@@ -64,7 +65,6 @@ model {
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-            lib library: pluginName, linkage: 'shared'
         }
     }
 }

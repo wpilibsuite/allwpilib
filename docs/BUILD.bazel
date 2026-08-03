@@ -8,6 +8,8 @@ paths = [
     "cameraserver/src/generated/main/native/include",
     "cameraserver/src/main/native/include",
     "cscore/src/main/native/include",
+    "fields/src/generated/main/native/include",
+    "fields/src/main/native/include",
     "hal/src/main/native/include",
     "ntcore/src/main/native/include",
     "romiVendordep/src/generated/main/native/include",
@@ -25,8 +27,8 @@ paths = [
     "wpiutil/src/main/native/thirdparty/llvm/include",
     "wpiutil/src/main/native/thirdparty/mpack/include",
     "wpiutil/src/main/native/thirdparty/nanopb/include",
-    "wpiutil/src/main/native/thirdparty/protobuf/include",
     "wpiutil/src/main/native/thirdparty/sigslot/include",
+    "wpiutil/src/main/native/thirdparty/upb/include",
     "xrpVendordep/src/generated/main/native/include",
     "xrpVendordep/src/main/native/include",
 ]
@@ -61,6 +63,7 @@ doxygen(
         "//commandsv2:doxygen-files",
         "//cscore:doxygen-files",
         "//drivers:doxygen-files",
+        "//fields:doxygen-files",
         "//hal:doxygen-files",
         "//ntcore:doxygen-files",
         "//romiVendordep:doxygen-files",
@@ -95,8 +98,6 @@ doxygen(
         "*/sleipnir/optimization/solver/sqp.hpp",
         # apriltag
         "*/apriltag_pose.h",
-        # json
-        "*/wpi/util/detail/**",
         # libuv
         "*/uv/**",
         # mpack
@@ -140,6 +141,7 @@ javadoc(
         "//cscore:cscore-java",
         "//drivers:drivers-java",
         "//epilogue-runtime:epilogue-java",
+        "//fields:fields-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
         "//romiVendordep:romiVendordep-java",

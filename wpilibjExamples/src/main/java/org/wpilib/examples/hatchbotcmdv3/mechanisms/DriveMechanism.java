@@ -98,7 +98,7 @@ public class DriveMechanism implements Mechanism {
           }
 
           // Finally, stop
-          drive.stopMotor();
+          drive.tankDrive(0, 0);
         })
         .named("Drive Distance[" + distance + "@" + speed + "]");
   }

@@ -103,7 +103,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     }
 
     // Solve for closed form Kalman gain for continuous Kalman filter with A = 0
-    // and C = I. See wpimath/algorithms.md.
+    // and C = I. See wpimath/docs/ClosedFormKalmanGain.md.
     for (size_t row = 0; row < 4; ++row) {
       if (m_q[row] == 0.0) {
         m_vision_K.diagonal()[row] = 0.0;
