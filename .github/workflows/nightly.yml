@@ -67,7 +67,7 @@ jobs:
           - os: ubuntu-latest
             container: ghcr.io/pkgforge-dev/archlinux:latest
             name: "Arch Linux"
-            build-options: "-Ponlylinuxx86-64"
+            build-options: "-Ponlylinuxx86-64 -PuseDefaultLinuxGcc"
           - os: windows-latest
             name: Windows
             architecture: x64
