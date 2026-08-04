@@ -1,7 +1,7 @@
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+load("//shared/bazel/rules:java_rules.bzl", "patch_module", "wpilib_java_junit5_test")
 
 def first_level_folders(paths, prefix):
     output = {}
@@ -159,6 +159,14 @@ def build_tests(example_test_folders, snippet_test_folders):
         wpilib_java_junit5_test(
             name = folder + "-test",
             srcs = native.glob(["src/test/java/org/wpilib/examples/" + folder + "/**/*.java"]) + native.glob(["**/module-info.java"]),
+            javacopts = [
+                # bazel may make the junit dependencies in either the correct modules, or treat them as unnamed modules
+                # We add reads for both to ensure they're picked up
+                "--add-reads=wpilib.examples=org.junit.jupiter.api,org.junit.jupiter.api.parallel,org.junit.jupiter.params,ALL-UNNAMED",
+            ] + patch_module(
+                "wpilib.examples",
+                ["wpilibjExamples/src/test/java"],
+            ),
             plugins = [
                 "//epilogue-processor:plugin",
             ],
@@ -185,6 +193,14 @@ def build_tests(example_test_folders, snippet_test_folders):
         wpilib_java_junit5_test(
             name = folder + "-test",
             srcs = native.glob(["src/test/java/org/wpilib/snippets/" + folder + "/**/*.java"]) + native.glob(["**/module-info.java"]),
+            javacopts = [
+                # bazel may make the junit dependencies in either the correct modules, or treat them as unnamed modules
+                # We add reads for both to ensure they're picked up
+                "--add-reads=wpilib.examples=org.junit.jupiter.api,org.junit.jupiter.api.parallel,org.junit.jupiter.params,ALL-UNNAMED",
+            ] + patch_module(
+                "wpilib.examples",
+                ["wpilibjExamples/src/test/java"],
+            ),
             plugins = [
                 "//epilogue-processor:plugin",
             ],
