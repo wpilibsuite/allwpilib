@@ -12,6 +12,7 @@
 #endif
 
 #include <chrono>
+#include <format>
 #include <string>
 #include <string_view>
 #include <thread>
