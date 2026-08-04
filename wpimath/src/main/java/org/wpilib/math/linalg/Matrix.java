@@ -341,6 +341,18 @@ public class Matrix<R extends Num, C extends Num>
   }
 
   /**
+   * Returns the Moore-Penrose pseudoinverse of this matrix.
+   *
+   * <p>Unlike {@link #inv()}, the pseudoinverse is defined for rectangular and singular matrices.
+   * The result has the transposed dimensions of this matrix.
+   *
+   * @return The pseudoinverse of this matrix.
+   */
+  public final Matrix<C, R> pseudoInverse() {
+    return new Matrix<>(this.m_storage.pseudoInverse());
+  }
+
+  /**
    * Returns the solution x to the equation Ax = b, where A is "this" matrix.
    *
    * <p>The matrix equation could also be written as x = A<sup>-1</sup>b. Where the pseudo inverse

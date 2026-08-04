@@ -86,6 +86,26 @@ class MatrixTest {
   }
 
   @Test
+  void testPseudoInverse() {
+    Matrix<N2, N3> mat = MatBuilder.fill(Nat.N2(), Nat.N3(), 1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+
+    Matrix<N3, N2> pseudoInverse = mat.pseudoInverse();
+
+    assertTrue(mat.isEqual(mat.times(pseudoInverse).times(mat), 1E-9));
+    assertTrue(pseudoInverse.isEqual(pseudoInverse.times(mat).times(pseudoInverse), 1E-9));
+  }
+
+  @Test
+  void testSingularMatrixPseudoInverse() {
+    Matrix<N2, N2> mat = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.0, 2.0, 2.0, 4.0);
+
+    Matrix<N2, N2> pseudoInverse = mat.pseudoInverse();
+
+    assertTrue(mat.isEqual(mat.times(pseudoInverse).times(mat), 1E-9));
+    assertTrue(pseudoInverse.isEqual(pseudoInverse.times(mat).times(pseudoInverse), 1E-9));
+  }
+
+  @Test
   void testUninvertableMatrix() {
     var singularMatrix = MatBuilder.fill(Nat.N2(), Nat.N2(), 2.0, 1.0, 2.0, 1.0);
 
