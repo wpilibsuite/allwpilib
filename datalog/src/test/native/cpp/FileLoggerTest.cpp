@@ -74,7 +74,7 @@ TEST_CASE("FileLoggerTest MissingFileDoesNotDeadlock",
   // thread that blocked forever in read() (no watch was ever added, so no
   // event could wake it), and the destructor's join() then deadlocked.
   // Regression test: the destructor must return promptly.
-  auto path = "/tmp/wpi_filelogger_missing_" + std::to_string(getpid());
+  auto path = std::format("/tmp/wpi_filelogger_missing_{}", getpid());
   unlink(path.c_str());
 
   std::atomic<bool> done{false};
@@ -96,7 +96,7 @@ TEST_CASE("FileLoggerTest MissingFileDoesNotDeadlock",
 }
 
 TEST_CASE("FileLoggerTest ExistingFileDeliversData", "[datalog][file-logger]") {
-  auto path = "/tmp/wpi_filelogger_existing_" + std::to_string(getpid());
+  auto path = std::format("/tmp/wpi_filelogger_existing_{}", getpid());
   unlink(path.c_str());
   int fd = open(path.c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0644);
   REQUIRE(fd != -1);
