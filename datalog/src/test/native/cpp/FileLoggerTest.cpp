@@ -6,6 +6,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <format>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -118,6 +119,33 @@ TEST_CASE("FileLoggerTest ExistingFileDeliversData", "[datalog][file-logger]") {
     }
     CHECK(gotData);
   }
+  unlink(path.c_str());
+}
+
+TEST_CASE("FileLoggerTest MoveAssignedLoggerReceivesUpdatesAndStops",
+          "[datalog][file-logger]") {
+  auto path = std::format("/tmp/wpi_filelogger_move_assign_{}", getpid());
+  unlink(path.c_str());
+  int fd = open(path.c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0644);
+  REQUIRE(fd != -1);
+  close(fd);
+
+  std::atomic<bool> gotData{false};
+  wpi::log::FileLogger logger;
+  logger = {path, [&gotData](std::string_view) { gotData = true; }};
+
+  // Append repeatedly so the reader thread notices regardless of when its
+  // initial lseek() runs.
+  for (int i = 0; i < 40 && !gotData; ++i) {
+    int wfd = open(path.c_str(), O_WRONLY | O_APPEND);
+    REQUIRE(wfd != -1);
+    REQUIRE(write(wfd, "hello\n", 6) != -1);
+    close(wfd);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  }
+  CHECK(gotData);
+
+  logger = {};
   unlink(path.c_str());
 }
 #endif
