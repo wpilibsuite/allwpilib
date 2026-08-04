@@ -36,6 +36,8 @@ OpenCV needs to be findable by CMake. On systems like the Jetson, this is instal
 
 To build GUI apps (`WPILIB_WITH_GUI`), SDL3 needs to be findable by CMake.
 
+To build wpical (`WPILIB_WITH_WPICAL`), libsuitesparse-dev and libceres-dev are required.
+
 ## Build Options
 
 The following build options are available:
@@ -54,6 +56,8 @@ The following build options are available:
   * This option will build simulation modules.
 * `WPILIB_WITH_TESTS` (ON Default)
   * This option will build C++ unit tests. These can be run via `ctest -C <config>`, where `<config>` is the build configuration, e.g. `Debug` or `Release`.
+* `WPILIB_WITH_WPICAL` (OFF Default)
+  * This option will build wpical.
 * `WPILIB_WITH_WPILIB` (ON Default)
   * This option will build the HAL and wpilibc during the build. The HAL is the simulation HAL, unless the external HAL options are used. The CMake build has no capability to build for Systemcore.
 * `WPILIB_WITH_WPIMATH` (ON Default)
