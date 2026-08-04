@@ -4,6 +4,7 @@
 
 #include "fieldcalibration.hpp"
 
+#include <cmath>
 #include <filesystem>
 #include <functional>
 #include <map>
@@ -88,6 +89,16 @@ class PoseGraphError {
 };
 
 const double tagSizeMeters = 0.1651;
+
+static bool IsCameraModelValid(const wpical::CameraModel& cameraModel) {
+  return std::isfinite(cameraModel.avgReprojectionError) &&
+         cameraModel.avgReprojectionError >= 0.0 &&
+         cameraModel.intrinsicMatrix.allFinite() &&
+         cameraModel.distortionCoefficients.allFinite() &&
+         cameraModel.intrinsicMatrix(0, 0) > 0.0 &&
+         cameraModel.intrinsicMatrix(1, 1) > 0.0 &&
+         std::abs(cameraModel.intrinsicMatrix(2, 2) - 1.0) < 1e-9;
+}
 
 inline Eigen::Matrix4d EstimateTagPose(std::span<double, 8> tagCorners,
                                        const wpical::CameraModel& cameraModel,
@@ -306,6 +317,11 @@ std::optional<wpi::fields::Field> wpical::calibrate(
   // Silence OpenCV logging
   cv::utils::logging::setLogLevel(
       cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
+
+  // Reject the default/sentinel model before OpenCV tries to solve tag poses.
+  if (!IsCameraModelValid(cameraModel)) {
+    return std::nullopt;
+  }
 
   bool pinnedTagFound = false;
   // Check if pinned tag is in ideal layout
