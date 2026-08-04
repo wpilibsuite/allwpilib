@@ -90,9 +90,13 @@ class MatrixTest {
     Matrix<N2, N3> mat = MatBuilder.fill(Nat.N2(), Nat.N3(), 1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
 
     Matrix<N3, N2> pseudoInverse = mat.pseudoInverse();
+    Matrix<N2, N2> columnProjection = mat.times(pseudoInverse);
+    Matrix<N3, N3> rowProjection = pseudoInverse.times(mat);
 
-    assertTrue(mat.isEqual(mat.times(pseudoInverse).times(mat), 1E-9));
-    assertTrue(pseudoInverse.isEqual(pseudoInverse.times(mat).times(pseudoInverse), 1E-9));
+    assertTrue(mat.isEqual(columnProjection.times(mat), 1E-9));
+    assertTrue(pseudoInverse.isEqual(rowProjection.times(pseudoInverse), 1E-9));
+    assertTrue(columnProjection.isEqual(columnProjection.transpose(), 1E-9));
+    assertTrue(rowProjection.isEqual(rowProjection.transpose(), 1E-9));
   }
 
   @Test
@@ -100,9 +104,13 @@ class MatrixTest {
     Matrix<N2, N2> mat = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.0, 2.0, 2.0, 4.0);
 
     Matrix<N2, N2> pseudoInverse = mat.pseudoInverse();
+    Matrix<N2, N2> columnProjection = mat.times(pseudoInverse);
+    Matrix<N2, N2> rowProjection = pseudoInverse.times(mat);
 
-    assertTrue(mat.isEqual(mat.times(pseudoInverse).times(mat), 1E-9));
-    assertTrue(pseudoInverse.isEqual(pseudoInverse.times(mat).times(pseudoInverse), 1E-9));
+    assertTrue(mat.isEqual(columnProjection.times(mat), 1E-9));
+    assertTrue(pseudoInverse.isEqual(rowProjection.times(pseudoInverse), 1E-9));
+    assertTrue(columnProjection.isEqual(columnProjection.transpose(), 1E-9));
+    assertTrue(rowProjection.isEqual(rowProjection.transpose(), 1E-9));
   }
 
   @Test
