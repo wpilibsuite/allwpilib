@@ -33,16 +33,16 @@ TEST_CASE("MatrixBalanceTest IgnoresUnsupportedMatrices", "[wpimath]") {
   CHECK(zeroScales[0] == 0);
   CHECK(zeroScales[1] == 0);
 
-  Eigen::Matrix2d nonfinite;
-  nonfinite << 0.0, std::numeric_limits<double>::infinity(), 1.0, 0.0;
+  Eigen::Matrix2d nonfinite{{0.0, std::numeric_limits<double>::infinity()},
+                            {1.0, 0.0}};
   auto nonfiniteScales = wpi::math::detail::BalanceMatrixPowerOfTwo(nonfinite);
   CHECK(nonfiniteScales[0] == 0);
   CHECK(nonfiniteScales[1] == 0);
 }
 
 TEST_CASE("MatrixBalanceTest BalancesByPowersOfTwo", "[wpimath]") {
-  Eigen::Matrix2d matrix;
-  matrix << 0.0, std::ldexp(1.0, 20), std::ldexp(1.0, -20), 0.0;
+  Eigen::Matrix2d matrix{{0.0, std::ldexp(1.0, 20)},
+                         {std::ldexp(1.0, -20), 0.0}};
 
   auto scales = wpi::math::detail::BalanceMatrixPowerOfTwo(matrix);
   CHECK(scales[0] == 20);
@@ -61,8 +61,8 @@ TEST_CASE("MatrixBalanceTest BalancesByPowersOfTwo", "[wpimath]") {
 }
 
 TEST_CASE("MatrixBalanceTest KeepsExponentsBounded", "[wpimath]") {
-  Eigen::Matrix2d matrix;
-  matrix << 0.0, std::ldexp(1.0, 968), std::ldexp(1.0, -968), 0.0;
+  Eigen::Matrix2d matrix{{0.0, std::ldexp(1.0, 968)},
+                         {std::ldexp(1.0, -968), 0.0}};
 
   auto scales = wpi::math::detail::BalanceMatrixPowerOfTwo(matrix);
 

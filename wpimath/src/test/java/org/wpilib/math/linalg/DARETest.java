@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 import org.wpilib.UtilityClassTest;
 import org.wpilib.math.numbers.N10;
@@ -133,23 +132,13 @@ class DARETest extends UtilityClassTest<DARE> {
     return residual.normF() / normalizer;
   }
 
-  <States extends Num, Inputs extends Num> void assertDAREFixedPoint(
-      Matrix<States, States> A,
-      Matrix<States, Inputs> B,
-      Matrix<States, States> Q,
-      Matrix<Inputs, Inputs> R,
-      Matrix<States, States> X) {
-    assertAllFinite(X);
-    assertTrue(dareNormalizedResidual(A, B, Q, R, X) < 1e-12);
-  }
-
-  <States extends Num, Inputs extends Num> void assertDAREFixedPoints(
+  <States extends Num, Inputs extends Num> void assertDARESolutions(
       Matrix<States, States> A,
       Matrix<States, Inputs> B,
       Matrix<States, States> Q,
       Matrix<Inputs, Inputs> R) {
-    assertDAREFixedPoint(A, B, Q, R, DARE.dare(A, B, Q, R));
-    assertDAREFixedPoint(A, B, Q, R, DARE.dareNoPrecond(A, B, Q, R));
+    assertDARESolution(A, B, Q, R, DARE.dare(A, B, Q, R), 1e-12);
+    assertDARESolution(A, B, Q, R, DARE.dareNoPrecond(A, B, Q, R), 1e-12);
   }
 
   <States extends Num, Inputs extends Num> void assertDARESolution(
@@ -158,17 +147,21 @@ class DARETest extends UtilityClassTest<DARE> {
       Matrix<States, States> Q,
       Matrix<Inputs, Inputs> R,
       Matrix<States, States> X) {
+    assertDARESolution(A, B, Q, R, X, 1e-10);
+  }
+
+  <States extends Num, Inputs extends Num> void assertDARESolution(
+      Matrix<States, States> A,
+      Matrix<States, Inputs> B,
+      Matrix<States, States> Q,
+      Matrix<Inputs, Inputs> R,
+      Matrix<States, States> X,
+      double tolerance) {
+    assertAllFinite(X);
+
     // Check that X is the solution to the DARE
     // Y = AᵀXA − X − AᵀXB(BᵀXB + R)⁻¹BᵀXA + Q = 0
-    var Y =
-        (A.transpose().times(X).times(A))
-            .minus(X)
-            .minus(
-                (A.transpose().times(X).times(B))
-                    .times((B.transpose().times(X).times(B).plus(R)).inv())
-                    .times(B.transpose().times(X).times(A)))
-            .plus(Q);
-    assertMatrixEqual(new Matrix<>(new SimpleMatrix(Y.getNumRows(), Y.getNumCols())), Y);
+    assertTrue(dareNormalizedResidual(A, B, Q, R, X) < tolerance);
   }
 
   <States extends Num, Inputs extends Num> void assertDARESolution(
@@ -178,17 +171,34 @@ class DARETest extends UtilityClassTest<DARE> {
       Matrix<Inputs, Inputs> R,
       Matrix<States, Inputs> N,
       Matrix<States, States> X) {
+    assertDARESolution(A, B, Q, R, N, X, 1e-10);
+  }
+
+  <States extends Num, Inputs extends Num> void assertDARESolution(
+      Matrix<States, States> A,
+      Matrix<States, Inputs> B,
+      Matrix<States, States> Q,
+      Matrix<Inputs, Inputs> R,
+      Matrix<States, Inputs> N,
+      Matrix<States, States> X,
+      double tolerance) {
+    assertAllFinite(X);
+
     // Check that X is the solution to the DARE
     // Y = AᵀXA − X − (AᵀXB + N)(BᵀXB + R)⁻¹(BᵀXA + Nᵀ) + Q = 0
-    var Y =
-        (A.transpose().times(X).times(A))
-            .minus(X)
-            .minus(
-                (A.transpose().times(X).times(B).plus(N))
-                    .times((B.transpose().times(X).times(B).plus(R)).inv())
-                    .times(B.transpose().times(X).times(A).plus(N.transpose())))
-            .plus(Q);
-    assertMatrixEqual(new Matrix<>(new SimpleMatrix(Y.getNumRows(), Y.getNumCols())), Y);
+    var stateTerm = A.transpose().times(X).times(A);
+    var inputCost = B.transpose().times(X).times(B).plus(R);
+    var leftTerm = A.transpose().times(X).times(B).plus(N);
+    var rightTerm = B.transpose().times(X).times(A).plus(N.transpose());
+    var feedbackTerm = leftTerm.times(inputCost.inv()).times(rightTerm);
+    var residual = stateTerm.minus(X).minus(feedbackTerm).plus(Q);
+    double normalizer =
+        Math.max(
+            1.0,
+            Math.max(
+                Math.max(stateTerm.normF(), X.normF()), Math.max(feedbackTerm.normF(), Q.normF())));
+
+    assertTrue(residual.normF() / normalizer < tolerance);
   }
 
   @Test
@@ -352,7 +362,7 @@ class DARETest extends UtilityClassTest<DARE> {
   void testCoordinateTransformedQuadcopterDynamicJNI() {
     var problem = makeCoordinateTransformedQuadcopterDAREProblem();
 
-    assertDAREFixedPoints(problem.A, problem.B, problem.Q, problem.R);
+    assertDARESolutions(problem.A, problem.B, problem.Q, problem.R);
   }
 
   @Test

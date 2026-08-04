@@ -15,6 +15,9 @@ namespace wpi::math::detail {
 /**
  * Divides an integer by two and rounds halves to the nearest even integer.
  *
+ * This is used when projecting separate row and column balance exponents onto a
+ * single structured scale exponent.
+ *
  * @param value The integer to divide.
  * @return value / 2 rounded to the nearest even integer.
  */
@@ -39,6 +42,11 @@ inline int RoundHalfToEvenDiv2(int value) {
  * The returned vector s describes the similarity transform
  *   balanced = diag(2^-s) matrix diag(2^s).
  *
+ * The algorithm greedily scales one row/column pair at a time to make its row
+ * and column norms closer. If the input isn't square, is empty, has a zero row
+ * or column, or has nonfinite values in a row/column being considered, the
+ * corresponding scale exponents remain zero.
+ *
  * The matrix entries themselves are not modified by this function. Powers of
  * two are used so applying the transform with std::ldexp() avoids rounding from
  * the scale factors.
@@ -57,71 +65,81 @@ inline Eigen::VectorXi BalanceMatrixPowerOfTwo(
 
   Eigen::MatrixXd work = matrix.cwiseAbs();
 
-  constexpr double kRadix = 2.0;
-  constexpr double kFactor = 0.95;
+  constexpr double kScaleRadix = 2.0;
+  constexpr double kRequiredNormReductionRatio = 0.95;
   constexpr int kMinScaleExponent = std::numeric_limits<double>::min_exponent +
                                     std::numeric_limits<double>::digits - 2;
   constexpr int kMaxScaleExponent = -kMinScaleExponent;
 
-  const double sfmin1 = std::numeric_limits<double>::min() /
-                        std::numeric_limits<double>::epsilon();
-  const double sfmin2 = sfmin1 * kRadix;
-  const double sfmax2 = 1.0 / sfmin2;
+  const double scaleUnderflowThreshold = std::numeric_limits<double>::min() /
+                                         std::numeric_limits<double>::epsilon();
+  // Keep trial scaling away from underflow and overflow while estimating
+  // whether another power-of-two step would help.
+  const double safeScaleMin = scaleUnderflowThreshold * kScaleRadix;
+  const double safeScaleMax = 1.0 / safeScaleMin;
 
   bool changed = true;
   while (changed) {
     changed = false;
 
     for (int i = 0; i < n; ++i) {
-      double c = work.col(i).stableNorm();
-      double r = work.row(i).stableNorm();
-      double ca = work.col(i).maxCoeff();
-      double ra = work.row(i).maxCoeff();
+      double colNorm = work.col(i).stableNorm();
+      double rowNorm = work.row(i).stableNorm();
+      double colMax = work.col(i).maxCoeff();
+      double rowMax = work.row(i).maxCoeff();
 
-      if (c == 0.0 || r == 0.0 || !std::isfinite(c + ca + r + ra)) {
+      if (colNorm == 0.0 || rowNorm == 0.0 ||
+          !std::isfinite(colNorm + colMax + rowNorm + rowMax)) {
         continue;
       }
 
-      double g = r / kRadix;
-      double f = 1.0;
-      double s = c + r;
-      int exponent = 0;
+      double candidateScale = 1.0;
+      double originalNormSum = colNorm + rowNorm;
+      int candidateExponent = 0;
 
-      while (c < g && std::max({f, c, ca}) < sfmax2 &&
-             std::min({r, g, ra}) > sfmin2) {
-        f *= kRadix;
-        c *= kRadix;
-        ca *= kRadix;
-        r /= kRadix;
-        g /= kRadix;
-        ra /= kRadix;
-        ++exponent;
+      // Increasing the exponent scales row i down and column i up.
+      double rowNormScaleDownThreshold = rowNorm / kScaleRadix;
+      while (colNorm < rowNormScaleDownThreshold &&
+             std::max({candidateScale, colNorm, colMax}) < safeScaleMax &&
+             std::min({rowNorm, rowNormScaleDownThreshold, rowMax}) >
+                 safeScaleMin) {
+        candidateScale *= kScaleRadix;
+        colNorm *= kScaleRadix;
+        colMax *= kScaleRadix;
+        rowNorm /= kScaleRadix;
+        rowNormScaleDownThreshold /= kScaleRadix;
+        rowMax /= kScaleRadix;
+        ++candidateExponent;
       }
 
-      g = c / kRadix;
+      // Decreasing the exponent scales row i up and column i down.
+      double colNormScaleDownThreshold = colNorm / kScaleRadix;
 
-      while (g >= r && std::max(r, ra) < sfmax2 &&
-             std::min({f, c, g, ca}) > sfmin2) {
-        f /= kRadix;
-        c /= kRadix;
-        g /= kRadix;
-        ca /= kRadix;
-        r *= kRadix;
-        ra *= kRadix;
-        --exponent;
+      while (colNormScaleDownThreshold >= rowNorm &&
+             std::max(rowNorm, rowMax) < safeScaleMax &&
+             std::min({candidateScale, colNorm, colNormScaleDownThreshold,
+                       colMax}) > safeScaleMin) {
+        candidateScale /= kScaleRadix;
+        colNorm /= kScaleRadix;
+        colNormScaleDownThreshold /= kScaleRadix;
+        colMax /= kScaleRadix;
+        rowNorm *= kScaleRadix;
+        rowMax *= kScaleRadix;
+        --candidateExponent;
       }
 
-      if (exponent == 0 || c + r >= kFactor * s) {
+      if (candidateExponent == 0 ||
+          colNorm + rowNorm >= kRequiredNormReductionRatio * originalNormSum) {
         continue;
       }
 
-      int newScale = scales[i] + exponent;
+      int newScale = scales[i] + candidateExponent;
       if (newScale <= kMinScaleExponent || newScale >= kMaxScaleExponent) {
         continue;
       }
 
-      work.row(i) /= f;
-      work.col(i) *= f;
+      work.row(i) /= candidateScale;
+      work.col(i) *= candidateScale;
       scales[i] = newScale;
       changed = true;
     }

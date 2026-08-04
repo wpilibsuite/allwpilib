@@ -4,8 +4,10 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cmath>
 #include <expected>
+#include <limits>
 #include <string_view>
 
 #include <Eigen/Cholesky>
@@ -59,6 +61,8 @@ constexpr std::string_view to_string(const DAREError& error) {
 
 namespace detail {
 
+constexpr double kDAREFallbackResidualTolerance = 1e-8;
+
 /**
  * Applies diagonal power-of-two scaling to a matrix.
  *
@@ -95,6 +99,7 @@ struct DAREBalanceResult {
   Eigen::Matrix<double, States, States> G;
   Eigen::Matrix<double, States, States> H;
   Eigen::VectorXi solutionScaleExponents;
+  bool wasBalanced;
 };
 
 /**
@@ -103,8 +108,11 @@ struct DAREBalanceResult {
  * For D = diag(2^p), the DARE is invariant under
  *   A_b = DAD^-1, G_b = DGD, H_b = D^-1HD^-1, and X = D X_b D.
  *
- * The unstructured 2n-by-2n pencil balance exponents are projected back onto
- * the state scale p so the Riccati structure is preserved.
+ * To choose p, this function first balances the magnitudes of the 2n-by-2n
+ * pencil-like block matrix [A G; H Aᵀ]. A general balance of that block matrix
+ * would independently scale the upper and lower copies of each state, which
+ * would destroy the Riccati structure. The raw block exponents are therefore
+ * projected back onto the structured state scale p.
  *
  * @tparam States Number of states.
  * @param A The SDA A matrix.
@@ -120,12 +128,15 @@ DAREBalanceResult<States> BalanceDARETerms(
   using StateMatrix = Eigen::Matrix<double, States, States>;
 
   const int states = A.rows();
-  DAREBalanceResult<States> result{A, G, H, Eigen::VectorXi::Zero(states)};
+  DAREBalanceResult<States> result{A, G, H, Eigen::VectorXi::Zero(states),
+                                   false};
 
   if (!A.allFinite() || !G.allFinite() || !H.allFinite()) {
     return result;
   }
 
+  // Balance only the entry magnitudes; signs don't matter when choosing row and
+  // column scales.
   Eigen::MatrixXd pencilBalance = Eigen::MatrixXd::Zero(2 * states, 2 * states);
 
   pencilBalance.topLeftCorner(states, states) = A.cwiseAbs();
@@ -139,10 +150,16 @@ DAREBalanceResult<States> BalanceDARETerms(
 
   Eigen::VectorXi rawScales = detail::BalanceMatrixPowerOfTwo(pencilBalance);
 
+  // The upper block uses D and the lower block uses D^-1, so state exponent p_i
+  // is half the difference between the two raw block exponents.
   Eigen::VectorXi scaleExponents = Eigen::VectorXi::Zero(states);
   for (int i = 0; i < states; ++i) {
     scaleExponents[i] =
         detail::RoundHalfToEvenDiv2(rawScales[states + i] - rawScales[i]);
+  }
+
+  if (scaleExponents.isZero()) {
+    return result;
   }
 
   Eigen::VectorXi negativeScaleExponents = -scaleExponents;
@@ -161,7 +178,118 @@ DAREBalanceResult<States> BalanceDARETerms(
   result.G = balancedG;
   result.H = balancedH;
   result.solutionScaleExponents = scaleExponents;
+  result.wasBalanced = true;
   return result;
+}
+
+/**
+ * Computes the normalized residual of the DARE fixed-point equation.
+ *
+ * The SDA operates on G = BR⁻¹Bᵀ, so the residual is evaluated as:
+ *
+ *   AᵀX(I + GX)⁻¹A − X + H = 0.
+ *
+ * @tparam States Number of states.
+ * @param A The SDA A matrix.
+ * @param G The SDA G matrix.
+ * @param H The SDA H matrix.
+ * @param X The candidate DARE solution.
+ * @return Normalized residual, or infinity if it can't be evaluated.
+ */
+template <int States>
+double DAREFixedPointResidual(const Eigen::Matrix<double, States, States>& A,
+                              const Eigen::Matrix<double, States, States>& G,
+                              const Eigen::Matrix<double, States, States>& H,
+                              const Eigen::Matrix<double, States, States>& X) {
+  using StateMatrix = Eigen::Matrix<double, States, States>;
+
+  if (!X.allFinite()) {
+    return std::numeric_limits<double>::infinity();
+  }
+
+  StateMatrix W = StateMatrix::Identity(X.rows(), X.cols()) + G * X;
+  if (!W.allFinite()) {
+    return std::numeric_limits<double>::infinity();
+  }
+
+  StateMatrix solvedA = W.lu().solve(A);
+  if (!solvedA.allFinite()) {
+    return std::numeric_limits<double>::infinity();
+  }
+
+  StateMatrix stateTerm = A.transpose() * X * solvedA;
+  StateMatrix residual = stateTerm - X + H;
+  if (!stateTerm.allFinite() || !residual.allFinite()) {
+    return std::numeric_limits<double>::infinity();
+  }
+
+  double normalizer = std::max({1.0, stateTerm.norm(), X.norm(), H.norm()});
+  if (!std::isfinite(normalizer)) {
+    return std::numeric_limits<double>::infinity();
+  }
+
+  return residual.norm() / normalizer;
+}
+
+/**
+ * Runs the structured doubling iteration for the DARE.
+ *
+ * @tparam States Number of states.
+ * @param A_k The initial SDA A matrix.
+ * @param G_k The initial SDA G matrix.
+ * @param H_k1 The initial SDA H matrix.
+ * @return Solution to the DARE in the same coordinates as the inputs.
+ */
+template <int States>
+Eigen::Matrix<double, States, States> RunDARESDA(
+    Eigen::Matrix<double, States, States> A_k,
+    Eigen::Matrix<double, States, States> G_k,
+    Eigen::Matrix<double, States, States> H_k1) {
+  using StateMatrix = Eigen::Matrix<double, States, States>;
+
+  StateMatrix H_k;
+
+  do {
+    H_k = H_k1;
+
+    // W = I + GₖHₖ
+    StateMatrix W = StateMatrix::Identity(H_k.rows(), H_k.cols()) + G_k * H_k;
+
+    auto W_solver = W.lu();
+
+    // Solve WV₁ = Aₖ for V₁
+    StateMatrix V_1 = W_solver.solve(A_k);
+
+    // Solve V₂Wᵀ = Gₖ for V₂
+    //
+    // We want to put V₂Wᵀ = Gₖ into Ax = b form so we can solve it more
+    // efficiently.
+    //
+    // V₂Wᵀ = Gₖ
+    // (V₂Wᵀ)ᵀ = Gₖᵀ
+    // WV₂ᵀ = Gₖᵀ
+    //
+    // The solution of Ax = b can be found via x = A.solve(b).
+    //
+    // V₂ᵀ = W.solve(Gₖᵀ)
+    // V₂ = W.solve(Gₖᵀ)ᵀ
+    //
+    // Since W, Gₖ, and Hₖ are symmetric, drop the transposes on Gₖ and V₂.
+    //
+    // V₂ = W.solve(Gₖ)
+    StateMatrix V_2 = W_solver.solve(G_k);
+
+    // Gₖ₊₁ = Gₖ + AₖV₂Aₖᵀ
+    // Hₖ₊₁ = Hₖ + V₁ᵀHₖAₖ
+    // Aₖ₊₁ = AₖV₁
+    G_k += A_k * V_2 * A_k.transpose();
+    H_k1 = H_k + V_1.transpose() * H_k * A_k;
+    A_k *= V_1;
+
+    // while |Hₖ₊₁ − Hₖ| > ε |Hₖ₊₁|
+  } while ((H_k1 - H_k).norm() > 1e-10 * H_k1.norm());
+
+  return H_k1;
 }
 
 /**
@@ -206,58 +334,28 @@ Eigen::Matrix<double, States, States> DARE(
   // A₀ = A
   // G₀ = BR⁻¹Bᵀ
   // H₀ = Q
-  StateMatrix A_k = A;
-  StateMatrix G_k = B * R_llt.solve(B.transpose());
-  StateMatrix H_k;
-  StateMatrix H_k1 = Q;
+  StateMatrix G = B * R_llt.solve(B.transpose());
 
-  auto balanced = BalanceDARETerms(A_k, G_k, H_k1);
-  A_k = balanced.A;
-  G_k = balanced.G;
-  H_k1 = balanced.H;
+  auto balanced = BalanceDARETerms(A, G, Q);
+  StateMatrix solution = RunDARESDA(balanced.A, balanced.G, balanced.H);
 
-  do {
-    H_k = H_k1;
+  if (!balanced.wasBalanced) {
+    return solution;
+  }
 
-    // W = I + GₖHₖ
-    StateMatrix W = StateMatrix::Identity(H_k.rows(), H_k.cols()) + G_k * H_k;
+  // Convert X_b back to the original coordinates: X = D X_b D.
+  solution = ScaleByPowerOfTwo(solution, balanced.solutionScaleExponents,
+                               balanced.solutionScaleExponents);
 
-    auto W_solver = W.lu();
+  // Balancing usually improves conditioning, but for some scale patterns it can
+  // produce finite iterates that no longer satisfy the original DARE. Keep the
+  // optimization only when the unscaled result is still a fixed point.
+  double residual = DAREFixedPointResidual(A, G, Q, solution);
+  if (!std::isfinite(residual) || residual > kDAREFallbackResidualTolerance) {
+    return RunDARESDA(A, G, Q);
+  }
 
-    // Solve WV₁ = Aₖ for V₁
-    StateMatrix V_1 = W_solver.solve(A_k);
-
-    // Solve V₂Wᵀ = Gₖ for V₂
-    //
-    // We want to put V₂Wᵀ = Gₖ into Ax = b form so we can solve it more
-    // efficiently.
-    //
-    // V₂Wᵀ = Gₖ
-    // (V₂Wᵀ)ᵀ = Gₖᵀ
-    // WV₂ᵀ = Gₖᵀ
-    //
-    // The solution of Ax = b can be found via x = A.solve(b).
-    //
-    // V₂ᵀ = W.solve(Gₖᵀ)
-    // V₂ = W.solve(Gₖᵀ)ᵀ
-    //
-    // Since W, Gₖ, and Hₖ are symmetric, drop the transposes on Gₖ and V₂.
-    //
-    // V₂ = W.solve(Gₖ)
-    StateMatrix V_2 = W_solver.solve(G_k);
-
-    // Gₖ₊₁ = Gₖ + AₖV₂Aₖᵀ
-    // Hₖ₊₁ = Hₖ + V₁ᵀHₖAₖ
-    // Aₖ₊₁ = AₖV₁
-    G_k += A_k * V_2 * A_k.transpose();
-    H_k1 = H_k + V_1.transpose() * H_k * A_k;
-    A_k *= V_1;
-
-    // while |Hₖ₊₁ − Hₖ| > ε |Hₖ₊₁|
-  } while ((H_k1 - H_k).norm() > 1e-10 * H_k1.norm());
-
-  return ScaleByPowerOfTwo(H_k1, balanced.solutionScaleExponents,
-                           balanced.solutionScaleExponents);
+  return solution;
 }
 
 }  // namespace detail
