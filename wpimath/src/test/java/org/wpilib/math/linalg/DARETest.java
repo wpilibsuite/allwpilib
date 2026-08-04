@@ -81,6 +81,38 @@ class DARETest extends UtilityClassTest<DARE> {
     return C;
   }
 
+  static QuadcopterDAREProblem makeCoordinateTransformedQuadcopterDAREProblem() {
+    var A = makeQuadcopterA();
+    var B = makeQuadcopterB();
+    var Q = Matrix.eye(Nat.N10());
+    var R = Matrix.eye(Nat.N4());
+
+    var C = makeStateTransform();
+    var CInv = Matrix.eye(Nat.N10());
+    CInv.set(0, 0, Math.scalb(1.0, -SCALE_EXPONENT));
+
+    // Q = I keeps the deliberately unstable modes detectable. The 2^44 state
+    // transform recreates the badly scaled repro using exactly representable
+    // powers of two.
+    return new QuadcopterDAREProblem(
+        CInv.times(A).times(C), CInv.times(B), C.transpose().times(Q).times(C), R);
+  }
+
+  private static final class QuadcopterDAREProblem {
+    final Matrix<N10, N10> A;
+    final Matrix<N10, N4> B;
+    final Matrix<N10, N10> Q;
+    final Matrix<N4, N4> R;
+
+    QuadcopterDAREProblem(
+        Matrix<N10, N10> A, Matrix<N10, N4> B, Matrix<N10, N10> Q, Matrix<N4, N4> R) {
+      this.A = A;
+      this.B = B;
+      this.Q = Q;
+      this.R = R;
+    }
+  }
+
   <States extends Num, Inputs extends Num> double dareNormalizedResidual(
       Matrix<States, States> A,
       Matrix<States, Inputs> B,
@@ -99,6 +131,25 @@ class DARETest extends UtilityClassTest<DARE> {
                 Math.max(stateTerm.normF(), X.normF()), Math.max(feedbackTerm.normF(), Q.normF())));
 
     return residual.normF() / normalizer;
+  }
+
+  <States extends Num, Inputs extends Num> void assertDAREFixedPoint(
+      Matrix<States, States> A,
+      Matrix<States, Inputs> B,
+      Matrix<States, States> Q,
+      Matrix<Inputs, Inputs> R,
+      Matrix<States, States> X) {
+    assertAllFinite(X);
+    assertTrue(dareNormalizedResidual(A, B, Q, R, X) < 1e-12);
+  }
+
+  <States extends Num, Inputs extends Num> void assertDAREFixedPoints(
+      Matrix<States, States> A,
+      Matrix<States, Inputs> B,
+      Matrix<States, States> Q,
+      Matrix<Inputs, Inputs> R) {
+    assertDAREFixedPoint(A, B, Q, R, DARE.dare(A, B, Q, R));
+    assertDAREFixedPoint(A, B, Q, R, DARE.dareNoPrecond(A, B, Q, R));
   }
 
   <States extends Num, Inputs extends Num> void assertDARESolution(
@@ -299,25 +350,9 @@ class DARETest extends UtilityClassTest<DARE> {
 
   @Test
   void testCoordinateTransformedQuadcopterDynamicJNI() {
-    var A = makeQuadcopterA();
-    var B = makeQuadcopterB();
-    var Q = Matrix.eye(Nat.N10());
-    var R = Matrix.eye(Nat.N4());
+    var problem = makeCoordinateTransformedQuadcopterDAREProblem();
 
-    var C = makeStateTransform();
-    var CInv = Matrix.eye(Nat.N10());
-    CInv.set(0, 0, Math.scalb(1.0, -SCALE_EXPONENT));
-    var AScaled = CInv.times(A).times(C);
-    var BScaled = CInv.times(B);
-    var QScaled = C.transpose().times(Q).times(C);
-
-    var XChecked = DARE.dare(AScaled, BScaled, QScaled, R);
-    assertAllFinite(XChecked);
-    assertTrue(dareNormalizedResidual(AScaled, BScaled, QScaled, R, XChecked) < 1e-12);
-
-    var XNoPrecond = DARE.dareNoPrecond(AScaled, BScaled, QScaled, R);
-    assertAllFinite(XNoPrecond);
-    assertTrue(dareNormalizedResidual(AScaled, BScaled, QScaled, R, XNoPrecond) < 1e-12);
+    assertDAREFixedPoints(problem.A, problem.B, problem.Q, problem.R);
   }
 
   @Test

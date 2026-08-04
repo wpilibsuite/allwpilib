@@ -60,6 +60,111 @@ constexpr std::string_view to_string(const DAREError& error) {
 namespace detail {
 
 /**
+ * Applies diagonal power-of-two scaling to a matrix.
+ *
+ * The returned matrix is
+ *   diag(2^rowExponents) matrix diag(2^colExponents).
+ *
+ * @tparam Rows Number of rows.
+ * @tparam Cols Number of columns.
+ * @param matrix The matrix to scale.
+ * @param rowExponents The row scale exponents.
+ * @param colExponents The column scale exponents.
+ * @return The scaled matrix.
+ */
+template <int Rows, int Cols>
+Eigen::Matrix<double, Rows, Cols> ScaleByPowerOfTwo(
+    const Eigen::Matrix<double, Rows, Cols>& matrix,
+    const Eigen::Ref<const Eigen::VectorXi>& rowExponents,
+    const Eigen::Ref<const Eigen::VectorXi>& colExponents) {
+  Eigen::Matrix<double, Rows, Cols> result = matrix;
+
+  for (int row = 0; row < matrix.rows(); ++row) {
+    for (int col = 0; col < matrix.cols(); ++col) {
+      result(row, col) =
+          std::ldexp(matrix(row, col), rowExponents[row] + colExponents[col]);
+    }
+  }
+
+  return result;
+}
+
+template <int States>
+struct DAREBalanceResult {
+  Eigen::Matrix<double, States, States> A;
+  Eigen::Matrix<double, States, States> G;
+  Eigen::Matrix<double, States, States> H;
+  Eigen::VectorXi solutionScaleExponents;
+};
+
+/**
+ * Balances the SDA starting matrices with a structured diagonal similarity.
+ *
+ * For D = diag(2^p), the DARE is invariant under
+ *   A_b = DAD^-1, G_b = DGD, H_b = D^-1HD^-1, and X = D X_b D.
+ *
+ * The unstructured 2n-by-2n pencil balance exponents are projected back onto
+ * the state scale p so the Riccati structure is preserved.
+ *
+ * @tparam States Number of states.
+ * @param A The SDA A matrix.
+ * @param G The SDA G matrix.
+ * @param H The SDA H matrix.
+ * @return Balanced matrices and solution unscaling exponents.
+ */
+template <int States>
+DAREBalanceResult<States> BalanceDARETerms(
+    const Eigen::Matrix<double, States, States>& A,
+    const Eigen::Matrix<double, States, States>& G,
+    const Eigen::Matrix<double, States, States>& H) {
+  using StateMatrix = Eigen::Matrix<double, States, States>;
+
+  const int states = A.rows();
+  DAREBalanceResult<States> result{A, G, H, Eigen::VectorXi::Zero(states)};
+
+  if (!A.allFinite() || !G.allFinite() || !H.allFinite()) {
+    return result;
+  }
+
+  Eigen::MatrixXd pencilBalance = Eigen::MatrixXd::Zero(2 * states, 2 * states);
+
+  pencilBalance.topLeftCorner(states, states) = A.cwiseAbs();
+  pencilBalance.topRightCorner(states, states) = G.cwiseAbs();
+  pencilBalance.bottomLeftCorner(states, states) = H.cwiseAbs();
+  pencilBalance.bottomRightCorner(states, states) = A.transpose().cwiseAbs();
+
+  // Diagonal entries are unchanged by diagonal similarity scaling, so ignore
+  // them when choosing scale factors.
+  pencilBalance.diagonal().setZero();
+
+  Eigen::VectorXi rawScales = detail::BalanceMatrixPowerOfTwo(pencilBalance);
+
+  Eigen::VectorXi scaleExponents = Eigen::VectorXi::Zero(states);
+  for (int i = 0; i < states; ++i) {
+    scaleExponents[i] =
+        detail::RoundHalfToEvenDiv2(rawScales[states + i] - rawScales[i]);
+  }
+
+  Eigen::VectorXi negativeScaleExponents = -scaleExponents;
+  StateMatrix balancedA =
+      ScaleByPowerOfTwo(A, scaleExponents, negativeScaleExponents);
+  StateMatrix balancedG = ScaleByPowerOfTwo(G, scaleExponents, scaleExponents);
+  StateMatrix balancedH =
+      ScaleByPowerOfTwo(H, negativeScaleExponents, negativeScaleExponents);
+
+  if (!balancedA.allFinite() || !balancedG.allFinite() ||
+      !balancedH.allFinite()) {
+    return result;
+  }
+
+  result.A = balancedA;
+  result.G = balancedG;
+  result.H = balancedH;
+  result.solutionScaleExponents = scaleExponents;
+  return result;
+}
+
+/**
  * Computes the unique stabilizing solution X to the discrete-time algebraic
  * Riccati equation:
  *
@@ -105,54 +210,11 @@ Eigen::Matrix<double, States, States> DARE(
   StateMatrix G_k = B * R_llt.solve(B.transpose());
   StateMatrix H_k;
   StateMatrix H_k1 = Q;
-  Eigen::VectorXi scaleExponents = Eigen::VectorXi::Zero(A.rows());
 
-  if (A_k.allFinite() && G_k.allFinite() && H_k1.allFinite()) {
-    int states = A.rows();
-    Eigen::MatrixXd pencilBalance =
-        Eigen::MatrixXd::Zero(2 * states, 2 * states);
-
-    pencilBalance.topLeftCorner(states, states) = A_k.cwiseAbs();
-    pencilBalance.topRightCorner(states, states) = G_k.cwiseAbs();
-    pencilBalance.bottomLeftCorner(states, states) = H_k1.cwiseAbs();
-    pencilBalance.bottomRightCorner(states, states) =
-        A_k.transpose().cwiseAbs();
-    pencilBalance.diagonal().setZero();
-
-    Eigen::VectorXi rawScales = detail::BalanceMatrixPowerOfTwo(pencilBalance);
-
-    Eigen::VectorXi candidateScaleExponents = Eigen::VectorXi::Zero(states);
-    for (int i = 0; i < states; ++i) {
-      candidateScaleExponents[i] =
-          detail::RoundHalfToEvenDiv2(rawScales[states + i] - rawScales[i]);
-    }
-
-    StateMatrix balancedA = A_k;
-    StateMatrix balancedG = G_k;
-    StateMatrix balancedH = H_k1;
-
-    for (int row = 0; row < states; ++row) {
-      for (int col = 0; col < states; ++col) {
-        balancedA(row, col) =
-            std::ldexp(A_k(row, col), candidateScaleExponents[row] -
-                                          candidateScaleExponents[col]);
-        balancedG(row, col) =
-            std::ldexp(G_k(row, col), candidateScaleExponents[row] +
-                                          candidateScaleExponents[col]);
-        balancedH(row, col) =
-            std::ldexp(H_k1(row, col), -candidateScaleExponents[row] -
-                                           candidateScaleExponents[col]);
-      }
-    }
-
-    if (balancedA.allFinite() && balancedG.allFinite() &&
-        balancedH.allFinite()) {
-      scaleExponents = candidateScaleExponents;
-      A_k = balancedA;
-      G_k = balancedG;
-      H_k1 = balancedH;
-    }
-  }
+  auto balanced = BalanceDARETerms(A_k, G_k, H_k1);
+  A_k = balanced.A;
+  G_k = balanced.G;
+  H_k1 = balanced.H;
 
   do {
     H_k = H_k1;
@@ -194,14 +256,8 @@ Eigen::Matrix<double, States, States> DARE(
     // while |Hₖ₊₁ − Hₖ| > ε |Hₖ₊₁|
   } while ((H_k1 - H_k).norm() > 1e-10 * H_k1.norm());
 
-  for (int row = 0; row < A.rows(); ++row) {
-    for (int col = 0; col < A.cols(); ++col) {
-      H_k1(row, col) =
-          std::ldexp(H_k1(row, col), scaleExponents[row] + scaleExponents[col]);
-    }
-  }
-
-  return H_k1;
+  return ScaleByPowerOfTwo(H_k1, balanced.solutionScaleExponents,
+                           balanced.solutionScaleExponents);
 }
 
 }  // namespace detail

@@ -12,6 +12,12 @@
 
 namespace wpi::math::detail {
 
+/**
+ * Divides an integer by two and rounds halves to the nearest even integer.
+ *
+ * @param value The integer to divide.
+ * @return value / 2 rounded to the nearest even integer.
+ */
 inline int RoundHalfToEvenDiv2(int value) {
   int quotient = value / 2;
   int remainder = value % 2;
@@ -27,6 +33,19 @@ inline int RoundHalfToEvenDiv2(int value) {
   }
 }
 
+/**
+ * Computes diagonal power-of-two balancing exponents for a square matrix.
+ *
+ * The returned vector s describes the similarity transform
+ *   balanced = diag(2^-s) matrix diag(2^s).
+ *
+ * The matrix entries themselves are not modified by this function. Powers of
+ * two are used so applying the transform with std::ldexp() avoids rounding from
+ * the scale factors.
+ *
+ * @param matrix The matrix to balance.
+ * @return The power-of-two scale exponents for each row/column.
+ */
 inline Eigen::VectorXi BalanceMatrixPowerOfTwo(
     const Eigen::Ref<const Eigen::MatrixXd>& matrix) {
   const int n = matrix.rows();
@@ -40,13 +59,12 @@ inline Eigen::VectorXi BalanceMatrixPowerOfTwo(
 
   constexpr double kRadix = 2.0;
   constexpr double kFactor = 0.95;
-  constexpr int kMinScaleExponent =
-      std::numeric_limits<double>::min_exponent +
-      std::numeric_limits<double>::digits - 2;
+  constexpr int kMinScaleExponent = std::numeric_limits<double>::min_exponent +
+                                    std::numeric_limits<double>::digits - 2;
   constexpr int kMaxScaleExponent = -kMinScaleExponent;
 
-  const double sfmin1 =
-      std::numeric_limits<double>::min() / std::numeric_limits<double>::epsilon();
+  const double sfmin1 = std::numeric_limits<double>::min() /
+                        std::numeric_limits<double>::epsilon();
   const double sfmin2 = sfmin1 * kRadix;
   const double sfmax2 = 1.0 / sfmin2;
 
@@ -60,8 +78,7 @@ inline Eigen::VectorXi BalanceMatrixPowerOfTwo(
       double ca = work.col(i).maxCoeff();
       double ra = work.row(i).maxCoeff();
 
-      if (c == 0.0 || r == 0.0 ||
-          !std::isfinite(c + ca + r + ra)) {
+      if (c == 0.0 || r == 0.0 || !std::isfinite(c + ca + r + ra)) {
         continue;
       }
 
@@ -99,8 +116,7 @@ inline Eigen::VectorXi BalanceMatrixPowerOfTwo(
       }
 
       int newScale = scales[i] + exponent;
-      if (newScale <= kMinScaleExponent ||
-          newScale >= kMaxScaleExponent) {
+      if (newScale <= kMinScaleExponent || newScale >= kMaxScaleExponent) {
         continue;
       }
 
