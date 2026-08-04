@@ -564,6 +564,26 @@ class StateMachineTest extends CommandTestBase {
   }
 
   @Test
+  void runsOnExitOnCancel() {
+    var command1 = Command.noRequirements(Coroutine::park).named("Command 1");
+
+    AtomicInteger exitCount = new AtomicInteger(0);
+    var stateMachine = new StateMachine("State Machine");
+    var state1 = stateMachine.addState(command1);
+    stateMachine.setInitialState(state1);
+    state1.onExit(exitCount::incrementAndGet);
+
+    m_scheduler.schedule(stateMachine);
+    m_scheduler.run();
+    assertEquals(0, exitCount.get(), "onExit should not have been called yet");
+    assertTrue(m_scheduler.isRunning(stateMachine), "State machine should be running");
+
+    m_scheduler.cancel(stateMachine);
+    assertEquals(1, exitCount.get(), "onExit should have been called on cancel");
+    assertFalse(m_scheduler.isRunning(stateMachine), "State machine should not be running");
+  }
+
+  @Test
   void onExitCanSchedule() {
     var mech = new DummyMechanism("Mechanism", m_scheduler);
     var mainMechCommand = mech.run(Coroutine::park).named("Main Mech Command");
