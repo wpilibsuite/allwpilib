@@ -112,7 +112,7 @@ TEST_CASE("FileLoggerTest ExistingFileDeliversData", "[datalog][file-logger]") {
     for (int i = 0; i < 40 && !gotData; ++i) {
       int wfd = open(path.c_str(), O_WRONLY | O_APPEND);
       REQUIRE(wfd != -1);
-      (void)write(wfd, "hello\n", 6);
+      REQUIRE(write(wfd, "hello\n", 6) != -1);
       close(wfd);
       std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
