@@ -35,34 +35,35 @@ FileLogger::FileLogger(std::string_view file,
   // never generate events (and a file created later won't be picked up).
   // Don't spawn a thread in that case; without a watch, a reader blocked in
   // read() can never be woken up and the destructor would deadlock.
-  if (m_fileHandle != -1 && m_inotifyWatchHandle != -1) {
-    m_thread = std::thread{[=, this] {
-      char buf[8000];
-      char eventBuf[sizeof(struct inotify_event) + NAME_MAX + 1];
-      lseek(m_fileHandle, 0, SEEK_END);
-      while (m_running) {
-        // A moved-from object has m_inotifyHandle == -1; poll() ignores
-        // negative fds and would return immediately, so exit instead.
-        if (m_inotifyHandle < 0) {
-          break;
-        }
-        // poll() with a timeout instead of a blocking read() so the thread
-        // periodically checks m_running and the destructor can join it even
-        // when the watched file is gone and no events ever arrive.
-        struct pollfd pfd{m_inotifyHandle, POLLIN, 0};
-        if (poll(&pfd, 1, 100) <= 0 || (pfd.revents & POLLIN) == 0) {
-          continue;
-        }
-        if (read(m_inotifyHandle, eventBuf, sizeof(eventBuf)) > 0) {
-          int bufLen = 0;
-          if ((bufLen = read(m_fileHandle, buf, sizeof(buf))) > 0) {
-            callback(std::string_view{buf, static_cast<size_t>(bufLen)});
-          }
-          std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
-      }
-    }};
+  if (m_fileHandle == -1 || m_inotifyWatchHandle == -1) {
+    return;
   }
+  m_thread = std::thread{[=, this] {
+    char buf[8000];
+    char eventBuf[sizeof(struct inotify_event) + NAME_MAX + 1];
+    lseek(m_fileHandle, 0, SEEK_END);
+    while (m_running) {
+      // A moved-from object has m_inotifyHandle == -1; poll() ignores
+      // negative fds and would return immediately, so exit instead.
+      if (m_inotifyHandle < 0) {
+        break;
+      }
+      // poll() with a timeout instead of a blocking read() so the thread
+      // periodically checks m_running and the destructor can join it even
+      // when the watched file is gone and no events ever arrive.
+      struct pollfd pfd{m_inotifyHandle, POLLIN, 0};
+      if (poll(&pfd, 1, 100) <= 0 || (pfd.revents & POLLIN) == 0) {
+        continue;
+      }
+      if (read(m_inotifyHandle, eventBuf, sizeof(eventBuf)) > 0) {
+        int bufLen = 0;
+        if ((bufLen = read(m_fileHandle, buf, sizeof(buf))) > 0) {
+          callback(std::string_view{buf, static_cast<size_t>(bufLen)});
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      }
+    }
+  }};
 #endif
 }
 FileLogger::FileLogger(std::string_view file, log::DataLog& log,
