@@ -39,7 +39,7 @@ jobs:
     container: ${{ matrix.container }}
     steps:
       - name: CMake Build
-        uses: $/.github/workflows/cmake-build
+        uses: $/.github/actions/cmake-build
         with:
           shell: ${{ matrix.shell }}
           configure-flags: ${{ matrix.flags }}
