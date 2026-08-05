@@ -8,7 +8,7 @@ requires = [
 ]
 
 [project]
-name = "robotpy-native-drivers"
+name = "robotpy-native-wpilib-drivers"
 version = "0.0.0"
 description = "WPILib third-party drivers library"
 requires-python = ">=3.11"
