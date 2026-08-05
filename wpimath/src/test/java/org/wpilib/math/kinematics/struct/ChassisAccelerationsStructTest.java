@@ -12,8 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 
 class ChassisAccelerationsStructTest {
-  private static final ChassisAccelerations DATA =
-      new ChassisAccelerations(2.29, 2.2, 0.3504);
+  private static final ChassisAccelerations DATA = new ChassisAccelerations(2.29, 2.2, 0.3504);
 
   @Test
   void testRoundtrip() {
