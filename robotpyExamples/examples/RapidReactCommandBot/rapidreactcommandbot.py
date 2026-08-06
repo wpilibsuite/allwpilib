@@ -5,7 +5,7 @@
 #
 
 import commands2
-from commands2.button import CommandNiDsXboxController, Trigger
+from commands2.button import CommandXboxController, Trigger
 
 from constants import AutoConstants, OIConstants, ShooterConstants
 from subsystems.drive import Drive
@@ -31,7 +31,7 @@ class RapidReactCommandBot:
         self.pneumatics = Pneumatics()
 
         # The driver's controller
-        self.driver_controller = CommandNiDsXboxController(
+        self.driver_controller = CommandXboxController(
             OIConstants.DRIVER_CONTROLLER_PORT
         )
 
@@ -73,7 +73,7 @@ class RapidReactCommandBot:
         )
 
         # Toggle compressor with the Start button
-        self.driver_controller.start().toggle_on_true(
+        self.driver_controller.menu().toggle_on_true(
             self.pneumatics.disable_compressor_command()
         )
 

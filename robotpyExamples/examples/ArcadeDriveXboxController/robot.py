@@ -21,7 +21,7 @@ class MyRobot(wpilib.TimedRobot):
         left_motor = wpilib.PWMSparkMax(0)
         right_motor = wpilib.PWMSparkMax(1)
         self.robot_drive = wpilib.DifferentialDrive(left_motor, right_motor)
-        self.driver_controller = wpilib.NiDsXboxController(0)
+        self.driver_controller = wpilib.XboxController(0)
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's
