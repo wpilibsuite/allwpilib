@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.wpilib.command3.Coroutine.ForkResultFailure;
 import org.wpilib.command3.Scheduler.ScheduleResult.LowerPriorityThanRunningCommand;
 
 class SchedulerPriorityLevelTests extends CommandTestBase {
@@ -342,12 +341,10 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
         Command.noRequirements(
                 co -> {
                   co.setCancelOnForkFailure(false);
-                  var result = operation.operation().apply(co, child1, child2);
-                  assertInstanceOf(
-                      ForkResultFailure.class, result, "Forking operation should have failed");
+                  var failure = operation.operation().apply(co, child1, child2);
+                  assertTrue(failure.failed(), "Forking operation should have failed");
 
-                  var failure = (ForkResultFailure) result;
-                  var fails = failure.failed();
+                  var fails = failure.getFailedCommands();
                   assertEquals(1, fails.size(), "Exactly one failure was expected");
                   assertInstanceOf(
                       LowerPriorityThanRunningCommand.class,
@@ -444,13 +441,13 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
 
   private static void assertFailureResult(
       Coroutine.ForkResult result, List<Command> expectedFailedCommands) {
-    assertInstanceOf(ForkResultFailure.class, result, "Fork result should be a failure");
-    var failure = (ForkResultFailure) result;
+    assertTrue(result.failed(), "Fork result should be a failure");
 
-    var failedCommands = failure.failed().stream().map(Scheduler.ScheduleResult::command).toList();
+    var failedCommands =
+        result.getFailedCommands().stream().map(Scheduler.ScheduleResult::command).toList();
     assertEquals(expectedFailedCommands, failedCommands);
     assertTrue(
-        failure.failed().stream().noneMatch(Scheduler.ScheduleResult::successful),
+        result.getFailedCommands().stream().noneMatch(Scheduler.ScheduleResult::successful),
         "All failure results should be unsuccessful");
   }
 

@@ -973,7 +973,7 @@ public final class Scheduler implements ProtobufSerializable {
     // The coroutine requested to be interrupted. Cancel this command and bubble up the stack
     // to interrupt the entire composition. Because InterruptEvent only supports a single
     // interruptor, we attribute the interrupt to the first conflicting command.
-    var failure = coroutine.getForkResult().failed().getFirst();
+    var failure = coroutine.getForkResult().getFailedCommands().getFirst();
     Command interruptor =
         switch (failure) {
           case LowerPriorityThanRunningCommand(var _, Command conflict) -> conflict;

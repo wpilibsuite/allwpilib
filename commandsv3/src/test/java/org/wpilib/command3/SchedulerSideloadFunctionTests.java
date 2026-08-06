@@ -135,10 +135,11 @@ class SchedulerSideloadFunctionTests extends CommandTestBase {
         coroutine -> {
           var result = coroutine.fork(lowPriority);
           reached.set(true);
-          assertTrue(
-              result instanceof Coroutine.ForkResultFailure(var fails)
-                  && fails.size() == 1
-                  && fails.getFirst().command().equals(lowPriority));
+          assertTrue(result.failed(), "Fork result should be a failure");
+          var fails = result.getFailedCommands();
+          assertEquals(1, fails.size(), "Failed forks should show 1 command");
+          assertEquals(
+              lowPriority, fails.getFirst().command(), "Failed fork should be lowPriority");
         });
 
     m_scheduler.schedule(highPriority);
