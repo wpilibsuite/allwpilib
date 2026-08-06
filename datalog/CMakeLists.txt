@@ -42,7 +42,7 @@ if(WPILIB_WITH_TESTS)
     add_library(datalog_testlib INTERFACE ${datalog_test_src})
     target_include_directories(datalog_testlib INTERFACE src/test/native/include)
 
-    wpilib_add_test_catch2(datalog src/test/native/cpp)
+    wpilib_add_test(datalog src/test/native/cpp)
     target_link_libraries(datalog_test datalog datalog_testlib wpiutil)
     if(MSVC)
         target_compile_options(datalog_test PRIVATE /utf-8)

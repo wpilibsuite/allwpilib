@@ -7,7 +7,7 @@ ext {
     groupId = 'org.wpilib.wpiutil'
 
     nativeName = 'wpiutil'
-    nativeTestSuiteName = "${nativeName}Catch2Test"
+    nativeTestSuiteName = "${nativeName}Test"
     devMain = 'org.wpilib.util.DevMain'
     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
 

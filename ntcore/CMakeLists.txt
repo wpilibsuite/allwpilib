@@ -46,7 +46,7 @@ if(WPILIB_WITH_EXECUTABLES)
 endif()
 
 if(WPILIB_WITH_TESTS)
-    wpilib_add_test_catch2(ntcore src/test/native/cpp)
+    wpilib_add_test(ntcore src/test/native/cpp)
     target_include_directories(ntcore_test PRIVATE src/main/native/cpp)
     target_link_libraries(ntcore_test ntcore wpiutil_testlib)
 endif()

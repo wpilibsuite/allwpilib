@@ -205,7 +205,7 @@ if(WPILIB_WITH_EXECUTABLES)
 endif()
 
 if(WPILIB_WITH_TESTS)
-    wpilib_add_test_catch2(wpinet src/test/native/cpp)
+    wpilib_add_test(wpinet src/test/native/cpp)
     target_include_directories(wpinet_test PRIVATE src/test/native/include src/main/native/cpp)
     target_link_libraries(wpinet_test wpinet ${LIBUTIL} wpiutil_testlib)
 endif()

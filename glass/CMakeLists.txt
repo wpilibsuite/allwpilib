@@ -41,7 +41,7 @@ install(
 )
 
 if(WPILIB_WITH_TESTS)
-    wpilib_add_test_catch2(glass src/test/native/cpp)
+    wpilib_add_test(glass src/test/native/cpp)
     target_link_libraries(glass_test libglass)
 endif()
 

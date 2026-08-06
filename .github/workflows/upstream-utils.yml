@@ -73,12 +73,6 @@ jobs:
           ./gcem.py clone
           ./gcem.py copy-src
           ./gcem.py format-patch
-      - name: Run googletest.py
-        run: |
-          cd upstream_utils
-          ./googletest.py clone
-          ./googletest.py copy-src
-          ./googletest.py format-patch
       - name: Run imgui.py
         run: |
           cd upstream_utils
