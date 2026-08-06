@@ -899,7 +899,7 @@ static void UpdateFontScale() {
   if (fontScale < 0.5) {
     fontScale = 0.5;
   }
-  ImGui::GetStyle().FontSizeBase = 10;
+  ImGui::GetStyle().FontSizeBase = 11;
   ImGui::GetStyle().FontScaleDpi = fontScale;
 }
 
