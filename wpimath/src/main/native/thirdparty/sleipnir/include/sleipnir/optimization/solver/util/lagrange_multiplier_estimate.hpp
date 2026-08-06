@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <utility>
 
+#include <Eigen/Core>
 #include <Eigen/SparseCholesky>
 #include <Eigen/SparseCore>
 #include <gch/small_vector.hpp>
