@@ -8,19 +8,18 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 
 # When invoked directly, Python puts the script directory on sys.path.
 # Add the repo root so absolute package imports still work.
 sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 from jinja2 import Environment, FileSystemLoader
-
-from shared.generation import add_jinja_args, make_arg_parser, write_file
+from shared.generation import write_file, add_jinja_args, make_arg_parser
 
 
 def generate_cpp_headers(
-    output_root: Path, template_root: Path, pwm_motor_controllers: dict[str, Any]
+    output_root: Path, template_root: Path, pwm_motor_controllers: Dict[str, Any]
 ):
     header_template_root = template_root / "main/native/include/wpi/hardware/motor"
     env = Environment(

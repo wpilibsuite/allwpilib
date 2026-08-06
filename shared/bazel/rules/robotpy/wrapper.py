@@ -92,7 +92,7 @@ def main():
     hack_pkgconfig(pkgcfgs)
 
     module = importlib.import_module(tool)
-    tool_main = module.main
+    tool_main = getattr(module, "main")
 
     sys.argv = [""] + args
     try:

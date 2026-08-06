@@ -11,7 +11,7 @@ from pathlib import Path
 # Add the repo root so absolute package imports still work.
 sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
-from shared.generation import GeneratorTypes, generate_nanopb, make_arg_parser
+from shared.generation import make_arg_parser, generate_nanopb, GeneratorTypes
 
 
 def main():

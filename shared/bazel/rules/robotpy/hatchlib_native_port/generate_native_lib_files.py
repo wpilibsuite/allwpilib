@@ -50,7 +50,7 @@ class NativelibHook:
         return str(rel).replace("/", ".").replace("\\", ".")
 
     def _generate_pcfile(
-        self, pcfg: PcFileConfig, build_data: dict[str, T.Any]
+        self, pcfg: PcFileConfig, build_data: T.Dict[str, T.Any]
     ) -> pathlib.Path:
 
         pcfile_rel = pcfg.get_pc_path()
@@ -155,7 +155,7 @@ class NativelibHook:
         self,
         pcfg: PcFileConfig,
         prefix_path: pathlib.Path,
-        build_data: dict[str, T.Any],
+        build_data: T.Dict[str, T.Any],
     ):
         libinit_py_rel = pcfg.get_init_module_path()
         libinit_py = self.root_pth / str(libinit_py_rel).removeprefix("src/")
@@ -187,7 +187,7 @@ class NativelibHook:
             return f"lib{lib}.so"
 
     @functools.cached_property
-    def _pcfiles(self) -> list[PcFileConfig]:
+    def _pcfiles(self) -> T.List[PcFileConfig]:
         pcfiles = []
         for i, raw_pc in enumerate(self.config.get("pcfile", [])):
             pcfile = parse_input(
@@ -211,8 +211,8 @@ class NativelibHook:
 # TODO: this belongs in a separate script/api that can be used from multiple tools
 def _write_libinit_py(
     init_py: pathlib.Path,
-    libs: list[pathlib.Path],
-    requires: list[str],
+    libs: T.List[pathlib.Path],
+    requires: T.List[str],
 ):
     """
     :param init_py: the _init module for the library(ies) that is written out

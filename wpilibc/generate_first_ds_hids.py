@@ -14,8 +14,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 from jinja2 import Environment, FileSystemLoader
-
-from shared.generation import add_jinja_args, make_arg_parser, write_file
+from shared.generation import write_file, add_jinja_args, make_arg_parser
 
 
 def _capitalize_first(name: str) -> str:

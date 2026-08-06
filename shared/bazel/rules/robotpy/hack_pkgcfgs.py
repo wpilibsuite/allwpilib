@@ -1,8 +1,9 @@
 import os
 import pathlib
+from typing import List
 
 
-def hack_pkgconfig(pkgcfgs: list[pathlib.Path]):
+def hack_pkgconfig(pkgcfgs: List[pathlib.Path]):
     """
     This will place the given files in the PKG_CONFIG_PATH in such a way that will trick
     semiwrap into thinking the libraries have been installed

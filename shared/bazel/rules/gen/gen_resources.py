@@ -14,7 +14,7 @@ def generate_file(resource_file, output_file, prefix, namespace):
         data = ", ".join("0x" + hex[i : i + 2] for i in range(0, len(hex), 2))
         data_size = len(raw_data)
 
-    output = f"""#include <stddef.h>
+    output = """#include <stddef.h>
 #include <string_view>
 extern "C" {{
 static const unsigned char contents[] = {{ {data} }};
@@ -28,7 +28,13 @@ std::string_view {func_name}() {{
   return std::string_view(reinterpret_cast<const char*>(contents), {data_size});
 }}
 }}
-"""
+""".format(
+        func_name=func_name,
+        data_size=data_size,
+        prefix=prefix,
+        data=data,
+        namespace=namespace,
+    )
 
     with open(output_file, "w") as f:
         f.write(output)
