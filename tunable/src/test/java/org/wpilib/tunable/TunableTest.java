@@ -165,7 +165,7 @@ class TunableTest {
   }
 
   @Test
-  void testTunablesPublishDoubleFacade() {
+  void testTunablesPublishDoubleGetterSetterFacade() {
     double[] value = {1.0};
     TunableDouble tunable = Tunables.publishDouble("facade", () -> value[0], v -> value[0] = v);
 
@@ -205,6 +205,100 @@ class TunableTest {
     assertEquals(20L, longValue.get());
     assertEquals(30.0f, floatValue.get());
     assertEquals(40.0, doubleValue.get());
+  }
+
+  @Test
+  void testTunableTablePublishStoredTunablesAndComplex() {
+    TunableTable table = Tunables.getTable("table");
+    final Tunable<StructThing> generic = Tunable.create(new StructThing(1));
+    final TunableBoolean bool = TunableBoolean.create(true);
+    final TunableInt integer = TunableInt.create(1);
+    final TunableLong longValue = TunableLong.create(2L);
+    final TunableFloat floatValue = TunableFloat.create(3.0f);
+    final TunableDouble doubleValue = TunableDouble.create(4.0);
+
+    table.publish("point", generic);
+    table.publish("bool", bool);
+    table.publish("int", integer);
+    table.publish("long", longValue);
+    table.publish("float", floatValue);
+    table.publish("double", doubleValue);
+    table.publish("complex", new UpdatingComplex());
+
+    assertEquals(new StructThing(1), m_mock.getValue("/table/point"));
+    assertTrue(m_mock.getBoolean("/table/bool"));
+    assertEquals(1, m_mock.getInteger("/table/int"));
+    assertEquals(2L, m_mock.getLong("/table/long"));
+    assertEquals(3.0f, m_mock.getFloat("/table/float"));
+    assertEquals(4.0, m_mock.getDouble("/table/double"));
+    assertEquals(0, m_mock.getInteger("/table/complex/counter"));
+
+    m_mock.setValue("/table/point", new StructThing(10));
+    m_mock.setBoolean("/table/bool", false);
+    m_mock.setInt("/table/int", 20);
+    m_mock.setLong("/table/long", 30L);
+    m_mock.setFloat("/table/float", 40.0f);
+    m_mock.setDouble("/table/double", 50.0);
+    TunableRegistry.update();
+
+    assertEquals(new StructThing(10), generic.get());
+    assertFalse(bool.get());
+    assertEquals(20, integer.get());
+    assertEquals(30L, longValue.get());
+    assertEquals(40.0f, floatValue.get());
+    assertEquals(50.0, doubleValue.get());
+    assertEquals(1, m_mock.getInteger("/table/complex/counter"));
+  }
+
+  @Test
+  void testTunableTableGetterSetterPublishFacadesPublishAndTune() {
+    TunableTable table = Tunables.getTable("linked");
+    final boolean[] boolValue = {true};
+    final int[] intValue = {1};
+    final long[] longValue = {2L};
+    final float[] floatValue = {3.0f};
+    final double[] doubleValue = {4.0};
+    final StructThing[] point = {new StructThing(5)};
+
+    final TunableBoolean bool =
+        table.publishBoolean("bool", () -> boolValue[0], v -> boolValue[0] = v);
+    final TunableInt integer = table.publishInt("int", () -> intValue[0], v -> intValue[0] = v);
+    final TunableLong longTunable =
+        table.publishLong("long", () -> longValue[0], v -> longValue[0] = v);
+    final TunableFloat floatTunable =
+        table.publishFloat("float", () -> floatValue[0], v -> floatValue[0] = v);
+    final TunableDouble doubleTunable =
+        table.publishDouble("double", () -> doubleValue[0], v -> doubleValue[0] = v);
+    final Tunable<StructThing> generic =
+        table.publishValue("point", () -> point[0], value -> point[0] = value, StructThing.class);
+
+    assertTrue(hasAlwaysGet(bool));
+    assertTrue(hasAlwaysGet(integer));
+    assertTrue(hasAlwaysGet(longTunable));
+    assertTrue(hasAlwaysGet(floatTunable));
+    assertTrue(hasAlwaysGet(doubleTunable));
+    assertTrue(hasAlwaysGet(generic));
+    assertTrue(m_mock.getBoolean("/linked/bool"));
+    assertEquals(1, m_mock.getInteger("/linked/int"));
+    assertEquals(2L, m_mock.getLong("/linked/long"));
+    assertEquals(3.0f, m_mock.getFloat("/linked/float"));
+    assertEquals(4.0, m_mock.getDouble("/linked/double"));
+    assertEquals(new StructThing(5), m_mock.getValue("/linked/point"));
+
+    m_mock.setBoolean("/linked/bool", false);
+    m_mock.setInt("/linked/int", 10);
+    m_mock.setLong("/linked/long", 20L);
+    m_mock.setFloat("/linked/float", 30.0f);
+    m_mock.setDouble("/linked/double", 40.0);
+    m_mock.setValue("/linked/point", new StructThing(50));
+    TunableRegistry.update();
+
+    assertFalse(boolValue[0]);
+    assertEquals(10, intValue[0]);
+    assertEquals(20L, longValue[0]);
+    assertEquals(30.0f, floatValue[0]);
+    assertEquals(40.0, doubleValue[0]);
+    assertEquals(new StructThing(50), point[0]);
   }
 
   @Test
@@ -353,7 +447,7 @@ class TunableTest {
 
   @Test
   void testRegisterBackendMigratesComplexTunableWithoutDuplicateChildren() {
-    Tunables.addComplex("child/complex", new UpdatingComplex());
+    Tunables.publish("child/complex", new UpdatingComplex());
 
     MockTunableBackend childBackend = new MockTunableBackend();
     TunableRegistry.registerBackend("/child", childBackend);
@@ -371,7 +465,7 @@ class TunableTest {
   void testRegisterBackendMigratesComplexTunableWithMoreSpecificChildBackend() {
     MockTunableBackend leafBackend = new MockTunableBackend();
     TunableRegistry.registerBackend("/child/complex/counter", leafBackend);
-    Tunables.addComplex("child/complex", new UpdatingComplex());
+    Tunables.publish("child/complex", new UpdatingComplex());
 
     MockTunableBackend childBackend = new MockTunableBackend();
     TunableRegistry.registerBackend("/child", childBackend);
@@ -385,7 +479,8 @@ class TunableTest {
   void testRemoveComplexTunableRemovesChildrenFromAllBackends() {
     MockTunableBackend leafBackend = new MockTunableBackend();
     TunableRegistry.registerBackend("/complex/counter", leafBackend);
-    UpdatingComplex complex = Tunables.addComplex("complex", new UpdatingComplex());
+    UpdatingComplex complex = new UpdatingComplex();
+    Tunables.publish("complex", complex);
 
     Tunables.remove("complex");
     TunableRegistry.update();
@@ -412,7 +507,7 @@ class TunableTest {
 
   @Test
   void testComplexTunablePublishesSubtableAndUpdatesEachCycle() {
-    Tunables.addComplex("complex", new UpdatingComplex());
+    Tunables.publish("complex", new UpdatingComplex());
 
     assertEquals(0, m_mock.getInteger("/complex/counter"));
     TunableRegistry.update();
@@ -423,8 +518,8 @@ class TunableTest {
 
   @Test
   void testComplexTunablePublishesDirectStructSerializableMember() {
-    final DirectStructComplex complex =
-        Tunables.addComplex("directStruct", new DirectStructComplex());
+    final DirectStructComplex complex = new DirectStructComplex();
+    Tunables.publish("directStruct", complex);
 
     assertEquals(new StructThing(1), m_mock.getValue("/directStruct/point"));
 
@@ -436,7 +531,8 @@ class TunableTest {
 
   @Test
   void testComplexTunablePublishesWrappedStructSerializableMember() {
-    WrappedStructComplex complex = Tunables.addComplex("wrappedStruct", new WrappedStructComplex());
+    WrappedStructComplex complex = new WrappedStructComplex();
+    Tunables.publish("wrappedStruct", complex);
 
     assertInstanceOf(Tunable.TunableStruct.class, complex.m_point);
     assertEquals(new StructThing(1), m_mock.getValue("/wrappedStruct/point"));

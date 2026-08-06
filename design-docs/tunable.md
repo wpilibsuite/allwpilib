@@ -223,13 +223,13 @@ public final class TunableTable {
   // publishes a ComplexTunable under this table
   public void publish(String name, ComplexTunable tunable) {...}
 
-  // convenience methods that create and publish in one call
-  public TunableBoolean publishBoolean(String name, BooleanSupplier getter, BooleanConsumer setter) {...}
-  public TunableInt    publishInt(String name, IntSupplier getter, IntConsumer setter) {...}
-  public TunableLong   publishLong(String name, LongSupplier getter, LongConsumer setter) {...}
-  public TunableFloat  publishFloat(String name, FloatSupplier getter, FloatConsumer setter) {...}
-  public TunableDouble publishDouble(String name, DoubleSupplier getter, DoubleConsumer setter) {...}
+  // getter/setter publishing methods
   public <T> Tunable<T> publishValue(String name, Supplier<T> getter, Consumer<T> setter, Class<T> cls) {...}
+  public TunableBoolean publishBoolean(String name, BooleanSupplier getter, BooleanConsumer setter) {...}
+  public TunableInt     publishInt(String name, IntSupplier getter, IntConsumer setter) {...}
+  public TunableLong    publishLong(String name, LongSupplier getter, LongConsumer setter) {...}
+  public TunableFloat   publishFloat(String name, FloatSupplier getter, FloatConsumer setter) {...}
+  public TunableDouble  publishDouble(String name, DoubleSupplier getter, DoubleConsumer setter) {...}
 
   // removes a tunable from this table
   public void remove(String name) {...}
@@ -249,7 +249,7 @@ public final class Tunables {
   public static TunableTable getTable(String name) {...}
 
   // creates, publishes, and returns a Tunable<T> at the root
-  public static <T> Tunable<T> add(String name, T initialValue) {...}
+  public static <T> Tunable<T> addValue(String name, T initialValue) {...}
 
   // primitive-specific variants
   public static TunableBoolean addBoolean(String name, boolean initialValue) {...}
@@ -258,21 +258,18 @@ public final class Tunables {
   public static TunableFloat   addFloat(String name, float initialValue) {...}
   public static TunableDouble  addDouble(String name, double initialValue) {...}
 
-  // publishes a ComplexTunable and returns it
-  public static <T extends ComplexTunable> T addComplex(String name, T tunable) {...}
-
-  // lower-level publish (does not create the tunable)
+  // lower-level publish at the root table (does not create the tunable)
   public static void publish(String name, TunableBase tunable) {...}
   public static void publish(String name, ComplexTunable tunable) {...}
 
   // getter/setter-backed publishing at the root table
+  public static <T> Tunable<T> publishValue(String name, Supplier<T> getter,
+                                            Consumer<T> setter, Class<T> cls) {...}
   public static TunableBoolean publishBoolean(String name, BooleanSupplier getter, BooleanConsumer setter) {...}
   public static TunableInt     publishInt(String name, IntSupplier getter, IntConsumer setter) {...}
   public static TunableLong    publishLong(String name, LongSupplier getter, LongConsumer setter) {...}
   public static TunableFloat   publishFloat(String name, FloatSupplier getter, FloatConsumer setter) {...}
   public static TunableDouble  publishDouble(String name, DoubleSupplier getter, DoubleConsumer setter) {...}
-  public static <T> Tunable<T> publishValue(String name, Supplier<T> getter,
-                                            Consumer<T> setter, Class<T> cls) {...}
 
   // removes a tunable from the root table
   public static void remove(String name) {...}
@@ -348,7 +345,7 @@ Selectable<Command> autoChooser = new Selectable<>();
 autoChooser.add("Drive Straight", new DriveStraightCommand(robot));
 autoChooser.add("Score Preload", new ScorePreloadCommand(robot));
 autoChooser.setDefault("Drive Straight");
-Tunables.addComplex("auto", autoChooser);
+Tunables.publish("auto", autoChooser);
 ```
 
 ## Backend Overview / Key Features
@@ -480,7 +477,7 @@ Types implementing `StructSerializable` are automatically detected; no extra cod
 
 ```java
 // Pose2d implements StructSerializable; struct serializer is found automatically
-private final Tunable<Pose2d> targetPose = Tunables.add("drive/targetPose", new Pose2d());
+private final Tunable<Pose2d> targetPose = Tunables.addValue("drive/targetPose", new Pose2d());
 ```
 
 ### ComplexTunable implementation
@@ -513,8 +510,11 @@ public class TunablePIDController implements ComplexTunable {
 Registration at the use site:
 
 ```java
-private final TunablePIDController armPID =
-    Tunables.addComplex("arm/pid", new TunablePIDController(1.0, 0.0, 0.1));
+private final TunablePIDController armPID = new TunablePIDController(1.0, 0.0, 0.1);
+
+public RobotContainer() {
+  Tunables.publish("arm/pid", armPID);
+}
 ```
 
 ### Hierarchical tables
@@ -563,7 +563,7 @@ Key differences from 2026:
 - `SmartDashboard.putNumber("key", value)` / `SmartDashboard.getNumber("key", default)` called every loop is replaced with a single `Tunables.addDouble("key", initialValue)` declaration that returns a `TunableDouble`.  Read it with `tunable.get()` and write it with `tunable.set(value)` (or let the dashboard write it).
 - `NetworkTableEntry` / `DoublePublisher` / `DoubleSubscriber` boilerplate is replaced by the same `TunableDouble` pattern; the NT backend handles the underlying NT entry lifecycle.
 - `SendableChooser<T>` is replaced by `Selectable<T>`.  The API is similar: `add(name, object)`, `setDefault(name)`, `getSelected()`.
-- The `Sendable` interface and `SmartDashboard.putData()` are not part of the Tunable API; subsystems and mechanisms that previously implemented `Sendable` should implement `ComplexTunable` and register via `Tunables.addComplex()`.
+- The `Sendable` interface and `SmartDashboard.putData()` are not part of the Tunable API; subsystems and mechanisms that previously implemented `Sendable` should implement `ComplexTunable` and register via `Tunables.publish()`.
 
 # Drawbacks
 

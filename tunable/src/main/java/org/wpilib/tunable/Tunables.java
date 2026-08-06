@@ -51,19 +51,6 @@ public final class Tunables {
   }
 
   /**
-   * Publishes a complex tunable object.
-   *
-   * @param <T> complex tunable type
-   * @param name the name
-   * @param tunable the tunable
-   * @return the passed-in tunable
-   */
-  public static <T extends ComplexTunable> T addComplex(String name, T tunable) {
-    publish(name, tunable);
-    return tunable;
-  }
-
-  /**
    * Creates and publishes a tunable value.
    *
    * @param <T> value type
@@ -71,7 +58,7 @@ public final class Tunables {
    * @param initialValue the initial value
    * @return tunable
    */
-  public static <T> Tunable<T> add(String name, T initialValue) {
+  public static <T> Tunable<T> addValue(String name, T initialValue) {
     Tunable<T> tunable = Tunable.create(initialValue);
     publish(name, tunable);
     return tunable;
@@ -163,6 +150,21 @@ public final class Tunables {
   }
 
   /**
+   * Publishes a tunable value using a getter and setter.
+   *
+   * @param <T> value type
+   * @param name the name
+   * @param getter the getter
+   * @param setter the setter
+   * @param cls the class of the value
+   * @return the tunable
+   */
+  public static <T> Tunable<T> publishValue(
+      String name, Supplier<T> getter, Consumer<T> setter, Class<T> cls) {
+    return m_root.publishValue(name, getter, setter, cls);
+  }
+
+  /**
    * Publishes a tunable boolean value using a getter and setter.
    *
    * @param name the name
@@ -222,21 +224,6 @@ public final class Tunables {
   public static TunableDouble publishDouble(
       String name, DoubleSupplier getter, DoubleConsumer setter) {
     return m_root.publishDouble(name, getter, setter);
-  }
-
-  /**
-   * Publishes a tunable value using a getter and setter.
-   *
-   * @param <T> value type
-   * @param name the name
-   * @param getter the getter
-   * @param setter the setter
-   * @param cls the class of the value
-   * @return the tunable
-   */
-  public static <T> Tunable<T> publishValue(
-      String name, Supplier<T> getter, Consumer<T> setter, Class<T> cls) {
-    return m_root.publishValue(name, getter, setter, cls);
   }
 
   /**

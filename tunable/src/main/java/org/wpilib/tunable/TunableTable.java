@@ -75,6 +75,23 @@ public final class TunableTable {
   }
 
   /**
+   * Publishes a tunable value using a getter and setter.
+   *
+   * @param <T> value type
+   * @param name the name
+   * @param getter the getter
+   * @param setter the setter
+   * @param cls the class of the value
+   * @return the tunable
+   */
+  public <T> Tunable<T> publishValue(
+      String name, Supplier<T> getter, Consumer<T> setter, Class<T> cls) {
+    Tunable<T> tunable = Tunable.create(getter, setter, cls);
+    publish(name, tunable);
+    return tunable;
+  }
+
+  /**
    * Publishes a tunable boolean value using a getter and setter.
    *
    * @param name the name
@@ -141,23 +158,6 @@ public final class TunableTable {
    */
   public TunableDouble publishDouble(String name, DoubleSupplier getter, DoubleConsumer setter) {
     TunableDouble tunable = TunableDouble.create(getter, setter);
-    publish(name, tunable);
-    return tunable;
-  }
-
-  /**
-   * Publishes a tunable value using a getter and setter.
-   *
-   * @param <T> value type
-   * @param name the name
-   * @param getter the getter
-   * @param setter the setter
-   * @param cls the class of the value
-   * @return the tunable
-   */
-  public <T> Tunable<T> publishValue(
-      String name, Supplier<T> getter, Consumer<T> setter, Class<T> cls) {
-    Tunable<T> tunable = Tunable.create(getter, setter, cls);
     publish(name, tunable);
     return tunable;
   }
