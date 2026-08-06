@@ -14,6 +14,9 @@ import io.avaje.jsonb.Types;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 
 /**
  * For automated Jsonb use.
@@ -74,18 +77,12 @@ public class PairJsonAdapter implements JsonAdapter<Pair<?, ?>> {
       boolean wasSerializingEmpty = writer.serializeEmpty();
       // If nulls or collections are not serialized, override the flags to still put fields at the
       // correct index
-      if (value.getFirst() == null
-          || (value.getFirst() instanceof Optional && ((Optional<?>) value.getFirst()).isEmpty())
-          || (value.getFirst() instanceof Collection
-              && ((Collection<?>) value.getFirst()).isEmpty())) {
+      if (value.getFirst() == null || isEmpty(value.getFirst())) {
         writer.serializeNulls(true);
         writer.serializeEmpty(true);
       }
       firstAdapter.toJson(writer, value.getFirst());
-      if (value.getSecond() == null
-          || (value.getSecond() instanceof Optional && ((Optional<?>) value.getSecond()).isEmpty())
-          || (value.getSecond() instanceof Collection
-              && ((Collection<?>) value.getSecond()).isEmpty())) {
+      if (value.getSecond() == null || isEmpty(value.getSecond())) {
         writer.serializeNulls(true);
         writer.serializeEmpty(true);
       } else {
@@ -97,5 +94,21 @@ public class PairJsonAdapter implements JsonAdapter<Pair<?, ?>> {
       writer.serializeEmpty(wasSerializingEmpty);
     }
     writer.endArray();
+  }
+
+  private static boolean isEmpty(Object value) {
+    if (value instanceof Optional) {
+      return ((Optional<?>) value).isEmpty();
+    } else if (value instanceof OptionalInt) {
+      return ((OptionalInt) value).isEmpty();
+    } else if (value instanceof OptionalLong) {
+      return ((OptionalLong) value).isEmpty();
+    } else if (value instanceof OptionalDouble) {
+      return ((OptionalDouble) value).isEmpty();
+    } else if (value instanceof Collection) {
+      return ((Collection<?>) value).isEmpty();
+    } else {
+      return false;
+    }
   }
 }
