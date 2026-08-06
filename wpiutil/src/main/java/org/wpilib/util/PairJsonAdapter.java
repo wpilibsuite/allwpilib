@@ -12,6 +12,8 @@ import io.avaje.jsonb.CustomAdapter;
 import io.avaje.jsonb.Jsonb;
 import io.avaje.jsonb.Types;
 import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Optional;
 
 /**
  * For automated Jsonb use.
@@ -60,23 +62,39 @@ public class PairJsonAdapter implements JsonAdapter<Pair<?, ?>> {
   @Override
   public void toJson(JsonWriter writer, Pair<?, ?> value) {
     writer.beginArray();
-    if (writer.serializeNulls()) {
-      // If nulls are serialized, the default behavior works
+    if (writer.serializeNulls()
+        && (writer.serializeEmpty()
+            || !(value.getFirst() instanceof Collection
+                || value.getSecond() instanceof Collection))) {
+      // If nulls and collections are serialized, the default behavior works
       firstAdapter.toJson(writer, value.getFirst());
       secondAdapter.toJson(writer, value.getSecond());
     } else {
-      // If nulls are not serialized, override the flag to still put fields at the correct index
-      if (value.getFirst() == null) {
+      boolean wasSerializingNulls = writer.serializeNulls();
+      boolean wasSerializingEmpty = writer.serializeEmpty();
+      // If nulls or collections are not serialized, override the flags to still put fields at the
+      // correct index
+      if (value.getFirst() == null
+          || (value.getFirst() instanceof Optional && ((Optional<?>) value.getFirst()).isEmpty())
+          || (value.getFirst() instanceof Collection
+              && ((Collection<?>) value.getFirst()).isEmpty())) {
         writer.serializeNulls(true);
+        writer.serializeEmpty(true);
       }
       firstAdapter.toJson(writer, value.getFirst());
-      if (value.getSecond() == null) {
+      if (value.getSecond() == null
+          || (value.getSecond() instanceof Optional && ((Optional<?>) value.getSecond()).isEmpty())
+          || (value.getSecond() instanceof Collection
+              && ((Collection<?>) value.getSecond()).isEmpty())) {
         writer.serializeNulls(true);
+        writer.serializeEmpty(true);
       } else {
-        writer.serializeNulls(false);
+        writer.serializeNulls(wasSerializingNulls);
+        writer.serializeEmpty(wasSerializingEmpty);
       }
       secondAdapter.toJson(writer, value.getSecond());
-      writer.serializeNulls(false);
+      writer.serializeNulls(wasSerializingNulls);
+      writer.serializeEmpty(wasSerializingEmpty);
     }
     writer.endArray();
   }
