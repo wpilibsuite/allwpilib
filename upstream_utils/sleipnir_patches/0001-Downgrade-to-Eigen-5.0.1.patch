@@ -5,15 +5,15 @@ Subject: [PATCH] Downgrade to Eigen 5.0.1
 
 ---
  include/sleipnir/autodiff/variable.hpp        | 20 ++++++--
- include/sleipnir/autodiff/variable_block.hpp  | 24 ++++++---
- include/sleipnir/autodiff/variable_matrix.hpp | 50 ++++++++++++-------
- 3 files changed, 66 insertions(+), 28 deletions(-)
+ include/sleipnir/autodiff/variable_block.hpp  | 24 +++++++---
+ include/sleipnir/autodiff/variable_matrix.hpp | 46 ++++++++++++-------
+ 3 files changed, 64 insertions(+), 26 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/variable.hpp b/include/sleipnir/autodiff/variable.hpp
-index a6b054494a18eacbcae10c0e88648550a39ed48e..8937d572fae5e60672bc32e1bab0741475939ccc 100644
+index 836806a8fd6020a0976c200a8caab271e05350c8..2b730d7a7b2f79b7b5ed0d491802d8bd392be625 100644
 --- a/include/sleipnir/autodiff/variable.hpp
 +++ b/include/sleipnir/autodiff/variable.hpp
-@@ -733,7 +733,11 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
+@@ -736,7 +736,11 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
    for (int row = 0; row < rhs.rows(); ++row) {
      for (int col = 0; col < rhs.cols(); ++col) {
        // Make right-hand side zero
@@ -26,7 +26,7 @@ index a6b054494a18eacbcae10c0e88648550a39ed48e..8937d572fae5e60672bc32e1bab07414
      }
    }
  
-@@ -749,7 +753,11 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
+@@ -752,7 +756,11 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
    for (int row = 0; row < lhs.rows(); ++row) {
      for (int col = 0; col < lhs.cols(); ++col) {
        // Make right-hand side zero
@@ -39,7 +39,7 @@ index a6b054494a18eacbcae10c0e88648550a39ed48e..8937d572fae5e60672bc32e1bab07414
      }
    }
  
-@@ -767,7 +775,13 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
+@@ -770,7 +778,13 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
    for (int row = 0; row < lhs.rows(); ++row) {
      for (int col = 0; col < lhs.cols(); ++col) {
        // Make right-hand side zero
@@ -55,10 +55,10 @@ index a6b054494a18eacbcae10c0e88648550a39ed48e..8937d572fae5e60672bc32e1bab07414
    }
  
 diff --git a/include/sleipnir/autodiff/variable_block.hpp b/include/sleipnir/autodiff/variable_block.hpp
-index 272e036e7ca6372e9255b24e674e55cd60f8b75c..e744b11070d844514b0d6d1c5fe29c905512c3fc 100644
+index 9edeb0eeb3b9812008feded7434e9fdb001dd863..a3ca3465bc3e5dc8d2c1bc1856f3a284464daf90 100644
 --- a/include/sleipnir/autodiff/variable_block.hpp
 +++ b/include/sleipnir/autodiff/variable_block.hpp
-@@ -161,7 +161,7 @@ class VariableBlock : public SleipnirBase {
+@@ -164,7 +164,7 @@ class VariableBlock : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -67,7 +67,7 @@ index 272e036e7ca6372e9255b24e674e55cd60f8b75c..e744b11070d844514b0d6d1c5fe29c90
        }
      }
  
-@@ -178,7 +178,7 @@ class VariableBlock : public SleipnirBase {
+@@ -181,7 +181,7 @@ class VariableBlock : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -76,7 +76,7 @@ index 272e036e7ca6372e9255b24e674e55cd60f8b75c..e744b11070d844514b0d6d1c5fe29c90
        }
      }
    }
-@@ -438,7 +438,11 @@ class VariableBlock : public SleipnirBase {
+@@ -441,7 +441,11 @@ class VariableBlock : public SleipnirBase {
        for (int j = 0; j < rhs.cols(); ++j) {
          Variable sum{Scalar(0)};
          for (int k = 0; k < cols(); ++k) {
@@ -89,7 +89,7 @@ index 272e036e7ca6372e9255b24e674e55cd60f8b75c..e744b11070d844514b0d6d1c5fe29c90
          }
          (*this)[i, j] = sum;
        }
-@@ -484,7 +488,11 @@ class VariableBlock : public SleipnirBase {
+@@ -487,7 +491,11 @@ class VariableBlock : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -102,7 +102,7 @@ index 272e036e7ca6372e9255b24e674e55cd60f8b75c..e744b11070d844514b0d6d1c5fe29c90
        }
      }
  
-@@ -516,7 +524,11 @@ class VariableBlock : public SleipnirBase {
+@@ -519,7 +527,11 @@ class VariableBlock : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -115,7 +115,7 @@ index 272e036e7ca6372e9255b24e674e55cd60f8b75c..e744b11070d844514b0d6d1c5fe29c90
        }
      }
  
-@@ -596,7 +608,7 @@ class VariableBlock : public SleipnirBase {
+@@ -599,7 +611,7 @@ class VariableBlock : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -125,10 +125,10 @@ index 272e036e7ca6372e9255b24e674e55cd60f8b75c..e744b11070d844514b0d6d1c5fe29c90
      }
  
 diff --git a/include/sleipnir/autodiff/variable_matrix.hpp b/include/sleipnir/autodiff/variable_matrix.hpp
-index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83f8b9ef1e 100644
+index 6562a6aa5c481afa551bb21e50dde1cc4dcd8d0f..83b80de7781f23caf7e46f3bf05d0e5f4c6333eb 100644
 --- a/include/sleipnir/autodiff/variable_matrix.hpp
 +++ b/include/sleipnir/autodiff/variable_matrix.hpp
-@@ -154,7 +154,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -158,7 +158,7 @@ class VariableMatrix : public SleipnirBase {
      m_storage.reserve(values.rows() * values.cols());
      for (int row = 0; row < values.rows(); ++row) {
        for (int col = 0; col < values.cols(); ++col) {
@@ -137,7 +137,7 @@ index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83
        }
      }
    }
-@@ -262,7 +262,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -266,7 +266,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < values.rows(); ++row) {
        for (int col = 0; col < values.cols(); ++col) {
@@ -146,7 +146,7 @@ index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83
        }
      }
  
-@@ -293,7 +293,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -297,7 +297,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < values.rows(); ++row) {
        for (int col = 0; col < values.cols(); ++col) {
@@ -155,7 +155,7 @@ index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83
        }
      }
    }
-@@ -507,7 +507,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -511,7 +511,7 @@ class VariableMatrix : public SleipnirBase {
        for (int j = 0; j < rhs.cols(); ++j) {
          Variable sum{Scalar(0)};
          for (int k = 0; k < lhs.cols(); ++k) {
@@ -164,7 +164,7 @@ index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83
          }
          result[i, j] = sum;
        }
-@@ -530,7 +530,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -534,7 +534,7 @@ class VariableMatrix : public SleipnirBase {
        for (int j = 0; j < rhs.cols(); ++j) {
          Variable sum{Scalar(0)};
          for (int k = 0; k < lhs.cols(); ++k) {
@@ -173,7 +173,7 @@ index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83
          }
          result[i, j] = sum;
        }
-@@ -573,7 +573,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -577,7 +577,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
        for (int col = 0; col < result.cols(); ++col) {
@@ -182,7 +182,7 @@ index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83
        }
      }
  
-@@ -608,7 +608,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -612,7 +612,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
        for (int col = 0; col < result.cols(); ++col) {
@@ -191,7 +191,7 @@ index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83
        }
      }
  
-@@ -644,7 +644,11 @@ class VariableMatrix : public SleipnirBase {
+@@ -648,7 +648,11 @@ class VariableMatrix : public SleipnirBase {
        for (int j = 0; j < rhs.cols(); ++j) {
          Variable sum{Scalar(0)};
          for (int k = 0; k < cols(); ++k) {
@@ -204,7 +204,7 @@ index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83
          }
          (*this)[i, j] = sum;
        }
-@@ -679,7 +683,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -683,7 +687,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
        for (int col = 0; col < result.cols(); ++col) {
@@ -213,7 +213,7 @@ index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83
        }
      }
  
-@@ -751,7 +755,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -755,7 +759,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
        for (int col = 0; col < result.cols(); ++col) {
@@ -222,7 +222,7 @@ index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83
        }
      }
  
-@@ -771,7 +775,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -775,7 +779,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
        for (int col = 0; col < result.cols(); ++col) {
@@ -231,7 +231,7 @@ index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83
        }
      }
  
-@@ -807,7 +811,11 @@ class VariableMatrix : public SleipnirBase {
+@@ -811,7 +815,11 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -244,7 +244,7 @@ index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83
        }
      }
  
-@@ -843,7 +851,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -847,7 +855,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
        for (int col = 0; col < result.cols(); ++col) {
@@ -253,7 +253,7 @@ index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83
        }
      }
  
-@@ -863,7 +871,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -867,7 +875,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < result.rows(); ++row) {
        for (int col = 0; col < result.cols(); ++col) {
@@ -262,7 +262,7 @@ index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83
        }
      }
  
-@@ -899,7 +907,11 @@ class VariableMatrix : public SleipnirBase {
+@@ -903,7 +911,11 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -275,7 +275,7 @@ index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83
        }
      }
  
-@@ -992,7 +1004,7 @@ class VariableMatrix : public SleipnirBase {
+@@ -996,7 +1008,7 @@ class VariableMatrix : public SleipnirBase {
  
      for (int row = 0; row < rows(); ++row) {
        for (int col = 0; col < cols(); ++col) {
@@ -284,29 +284,12 @@ index 6f632fb7b6575205ef59f936556c98c723238888..59393e2eabdf9107de8ff6b554a48d83
        }
      }
  
-@@ -1617,14 +1629,14 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
-     MatrixXv eigen_A{A.rows(), A.cols()};
-     for (int row = 0; row < A.rows(); ++row) {
-       for (int col = 0; col < A.cols(); ++col) {
--        eigen_A[row, col] = A[row, col];
-+        eigen_A(row, col) = A[row, col];
-       }
-     }
+@@ -1013,7 +1025,7 @@ class VariableMatrix : public SleipnirBase {
  
-     MatrixXv eigen_B{B.rows(), B.cols()};
-     for (int row = 0; row < B.rows(); ++row) {
-       for (int col = 0; col < B.cols(); ++col) {
--        eigen_B[row, col] = B[row, col];
-+        eigen_B(row, col) = B[row, col];
-       }
-     }
- 
-@@ -1633,7 +1645,7 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
-     VariableMatrix<Scalar> X{detail::empty, A.cols(), B.cols()};
-     for (int row = 0; row < X.rows(); ++row) {
-       for (int col = 0; col < X.cols(); ++col) {
--        X[row, col] = eigen_X[row, col];
-+        X[row, col] = eigen_X(row, col);
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        result[row, col] = (*this)[row, col];
++        result(row, col) = (*this)[row, col];
        }
      }
  

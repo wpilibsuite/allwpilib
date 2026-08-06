@@ -158,7 +158,9 @@ void InstanceImpl::StartClient(std::string_view identity) {
           m_rtt2 = 0;
         }
       });
-  if (!m_servers.empty()) {
+  if (m_serverResolver) {
+    m_networkClient->SetServers(m_servers, *m_serverResolver);
+  } else if (!m_servers.empty()) {
     m_networkClient->SetServers(m_servers);
   }
   networkMode = NT_NET_MODE_CLIENT;
@@ -187,8 +189,20 @@ void InstanceImpl::SetServers(
     std::span<const std::pair<std::string, unsigned int>> servers) {
   std::scoped_lock lock{m_mutex};
   m_servers = {servers.begin(), servers.end()};
+  m_serverResolver.reset();
   if (m_networkClient) {
     m_networkClient->SetServers(servers);
+  }
+}
+
+void InstanceImpl::SetServers(
+    std::span<const std::pair<std::string, unsigned int>> servers,
+    const INetworkClient::ServerResolver& resolver) {
+  std::scoped_lock lock{m_mutex};
+  m_servers = {servers.begin(), servers.end()};
+  m_serverResolver = resolver;
+  if (m_networkClient) {
+    m_networkClient->SetServers(servers, resolver);
   }
 }
 
@@ -226,6 +240,7 @@ void InstanceImpl::Reset() {
   m_networkServer.reset();
   m_networkClient.reset();
   m_servers.clear();
+  m_serverResolver.reset();
   networkMode = NT_NET_MODE_NONE;
   m_serverTimeOffset.reset();
   m_rtt2 = 0;

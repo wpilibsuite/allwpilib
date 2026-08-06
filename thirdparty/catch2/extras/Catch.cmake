@@ -44,7 +44,7 @@ same as the Catch name; see also ``TEST_PREFIX`` and ``TEST_SUFFIX``.
 
   ``catch_discover_tests`` sets up a post-build command on the test executable
   that generates the list of tests by parsing the output from running the test
-  with the ``--list-test-names-only`` argument.  This ensures that the full
+  with the ``--list-tests --reporter json`` argument.  This ensures that the full
   list of tests is obtained.  Since test discovery occurs at build time, it is
   not necessary to re-run CMake when the list of tests changes.
   However, it requires that :prop_tgt:`CROSSCOMPILING_EMULATOR` is properly set
@@ -67,7 +67,7 @@ same as the Catch name; see also ``TEST_PREFIX`` and ``TEST_SUFFIX``.
 
   ``TEST_SPEC arg1...``
     Specifies test cases, wildcarded test cases, tags and tag expressions to
-    pass to the Catch executable with the ``--list-test-names-only`` argument.
+    pass to the Catch executable when listing the tests.
 
   ``EXTRA_ARGS arg1...``
     Any extra arguments to pass on the command line to each test case.
@@ -145,6 +145,12 @@ same as the Catch name; see also ``TEST_PREFIX`` and ``TEST_SUFFIX``.
     ``CMAKE_CATCH_DISCOVER_TESTS_DISCOVERY_MODE`` variable if it is not passed when
     calling ``catch_discover_tests``. This provides a mechanism for globally selecting
     a preferred test discovery behavior without having to modify each call site.
+
+    On Apple Silicon with the Xcode generator you must use ``PRE_TEST``. With the
+    default ``POST_BUILD`` mode the build fails with ``Result: Subprocess killed``,
+    because macOS on Apple Silicon refuses to run unsigned binaries and Xcode
+    code-signs the test executable only after the post-build script that
+    ``POST_BUILD`` mode uses to run it for test discovery. See Catch2 issue #2411.
 
   ``SKIP_IS_FAILURE``
     Disables skipped test detection.

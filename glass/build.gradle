@@ -17,9 +17,7 @@ if (OperatingSystem.current().isWindows()) {
 
 ext {
     nativeName = 'glass'
-    staticGtestConfigs = [:]
 }
-staticGtestConfigs["${nativeName}Catch2Test"] = []
 
 apply from: "${rootDir}/shared/resources.gradle"
 apply from: "${rootDir}/shared/config.gradle"
@@ -193,7 +191,7 @@ model {
         }
     }
     testSuites {
-        "${nativeName}Catch2Test"(GoogleTestTestSuiteSpec) {
+        "${nativeName}Test"(GoogleTestTestSuiteSpec) {
             for (NativeComponentSpec c : $.components) {
                 if (c.name == nativeName) {
                     testing c
@@ -220,7 +218,6 @@ model {
                 it.buildable = false
                 return
             }
-            lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
             lib project: ':fields', library: 'fields', linkage: 'static'
             lib project: ':fields', library: 'fieldimages', linkage: 'static'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'

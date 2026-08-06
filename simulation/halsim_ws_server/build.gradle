@@ -17,7 +17,7 @@ apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
 
 model {
     testSuites {
-        "${pluginName}Catch2Test"(GoogleTestTestSuiteSpec) {
+        "${pluginName}Test"(GoogleTestTestSuiteSpec) {
             for(NativeComponentSpec c : $.components) {
                 if (c.name == pluginName) {
                     testing c
@@ -32,9 +32,6 @@ model {
                 exportedHeaders {
                     srcDirs 'src/test/native/include', 'src/main/native/cpp'
                 }
-            }
-            binaries.all {
-                lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
             }
         }
     }
