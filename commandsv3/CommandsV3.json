@@ -16,7 +16,7 @@
   "javaDependencies": [
     {
       "groupId": "org.wpilib",
-      "artifactId": "commands3-java",
+      "artifactId": "commandsv3-java",
       "version": "wpilib"
     }
   ],
