@@ -1,6 +1,6 @@
 include(CompileWarnings)
 
-macro(wpilib_add_test_catch2 name)
+macro(wpilib_add_test name)
     set(wpilib_catch2_test_src)
     foreach(src ${ARGN})
         if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${src}")

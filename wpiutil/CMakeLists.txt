@@ -119,7 +119,7 @@ if(WPILIB_WITH_TESTS)
     add_library(wpiutil_testlib INTERFACE ${wpiutil_test_src})
     target_include_directories(wpiutil_testlib INTERFACE src/test/native/include)
 
-    wpilib_add_test_catch2(wpiutil src/test/native/cpp)
+    wpilib_add_test(wpiutil src/test/native/cpp)
     if(MSVC)
         target_compile_options(wpiutil_test PRIVATE /wd4101 /wd4251)
     endif()

@@ -77,6 +77,6 @@ foreach(example ${cscore_examples})
 endforeach()
 
 if(WPILIB_WITH_TESTS)
-    wpilib_add_test_catch2(cscore src/test/native/cpp)
+    wpilib_add_test(cscore src/test/native/cpp)
     target_link_libraries(cscore_test cscore)
 endif()
