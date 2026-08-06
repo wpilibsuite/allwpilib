@@ -877,7 +877,7 @@ ImFont* Context::FontMaker::GetFont() const {
     std::snprintf(cfg.Name, sizeof(cfg.Name), "%s", name.c_str());
     font = func(io, 0, &cfg);
 
-    // Merge font awesome solid
+    // Merge Font Awesome icon fonts.
     ImFontConfig icons_cfg;
     icons_cfg.MergeMode = true;
     icons_cfg.PixelSnapH = true;
