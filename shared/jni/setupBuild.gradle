@@ -211,11 +211,6 @@ model {
                     }
                 }
             }
-            if (nativeTestSuiteName.contains('Catch2')) {
-                binaries.all {
-                    lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
-                }
-            }
         }
     }
     binaries {

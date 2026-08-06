@@ -17,11 +17,12 @@ if (OperatingSystem.current().isWindows()) {
 
 ext {
     nativeName = 'sysid'
-    nativeTestSuiteName = "${nativeName}Catch2Test"
+    nativeTestSuiteName = "${nativeName}Test"
 }
 
 apply from: "${rootDir}/shared/resources.gradle"
 apply from: "${rootDir}/shared/config.gradle"
+apply from: "${rootDir}/shared/catch2.gradle"
 apply from: "${rootDir}/shared/libsdlgpu.gradle"
 
 def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
@@ -150,7 +151,6 @@ model {
                     }
                 }
 
-                lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
                 it.cppCompiler.define("RUNNING_SYSID_TESTS")
             }
         }
