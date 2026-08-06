@@ -10,6 +10,7 @@
 #include "callback_helpers/TestCallbackHelpers.hpp"
 #include "wpi/hal/HAL.h"
 #include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/util/deprecated.hpp"
 
 namespace wpi::sim {
@@ -49,6 +50,14 @@ TEST_CASE("EncoderSimTest Rate", "[wpilibc][simulation]") {
   CHECK(1.91 == sim.GetRate());
   CHECK(callback.WasTriggered());
   CHECK(1.91 == callback.GetLastValue());
+}
+
+TEST_CASE("EncoderSimTest SetRateWindow", "[wpilibc][simulation]") {
+  HAL_Initialize();
+
+  Encoder encoder(0, 1);
+
+  CHECK_NOTHROW(encoder.SetRateWindow(wpi::units::millisecond_t{50}));
 }
 
 TEST_CASE("EncoderSimTest ResetDataClearsRateCallbacks",

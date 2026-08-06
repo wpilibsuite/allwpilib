@@ -88,6 +88,17 @@ void HAL_SetCounterEdgeConfiguration(HAL_CounterHandle counterHandle,
   *status = port->SwitchCounterEdge(risingEdge);
 }
 
+void HAL_SetCounterRateWindow(HAL_CounterHandle counterHandle,
+                              int32_t windowMilliseconds, int32_t* status) {
+  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::COUNTER);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  *status = port->SetRateWindow(windowMilliseconds);
+}
+
 void HAL_ResetCounter(HAL_CounterHandle counterHandle, int32_t* status) {
   auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::COUNTER);
   if (port == nullptr) {

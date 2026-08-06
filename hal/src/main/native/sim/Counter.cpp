@@ -35,6 +35,10 @@ HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
 void HAL_FreeCounter(HAL_CounterHandle counterHandle) {}
 void HAL_SetCounterEdgeConfiguration(HAL_CounterHandle counterHandle,
                                      HAL_Bool risingEdge, int32_t* status) {}
+void HAL_SetCounterRateWindow(HAL_CounterHandle counterHandle,
+                              int32_t windowMilliseconds, int32_t* status) {
+  *status = 0;
+}
 void HAL_ResetCounter(HAL_CounterHandle counterHandle, int32_t* status) {}
 int32_t HAL_GetCounter(HAL_CounterHandle counterHandle, int32_t* status) {
   return 0;

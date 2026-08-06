@@ -52,6 +52,16 @@ public class Tachometer implements Sendable, AutoCloseable {
   }
 
   /**
+   * Sets the time window used to calculate the tachometer rate.
+   *
+   * @param windowMilliseconds The rate calculation window in milliseconds. Valid values are 5
+   *     through 255. The default is 50.
+   */
+  public void setRateWindow(int windowMilliseconds) {
+    CounterJNI.setCounterRateWindow(m_handle, windowMilliseconds);
+  }
+
+  /**
    * Gets the number of edges per revolution.
    *
    * @return Edges per revolution.

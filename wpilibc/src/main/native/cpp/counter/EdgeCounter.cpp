@@ -51,6 +51,5 @@ void EdgeCounter::SetEdgeConfiguration(EdgeConfiguration configuration) {
 
 void EdgeCounter::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Edge Counter");
-  builder.AddDoubleProperty(
-      "Count", [&] { return GetCount(); }, nullptr);
+  builder.AddDoubleProperty("Count", [&] { return GetCount(); }, nullptr);
 }

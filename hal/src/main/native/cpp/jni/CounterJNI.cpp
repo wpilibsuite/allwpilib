@@ -21,9 +21,9 @@ extern "C" {
  * Signature: (IZ)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_CounterJNI_initializeCounter(JNIEnv* env, jclass,
-                                                          jint channel,
-                                                          jboolean risingEdge) {
+Java_org_wpilib_hardware_hal_CounterJNI_initializeCounter
+  (JNIEnv* env, jclass, jint channel, jboolean risingEdge)
+{
   int32_t status = 0;
   auto stack = wpi::util::java::GetJavaStackTrace(env, "org.wpilib");
   auto counter =
@@ -37,8 +37,10 @@ Java_org_wpilib_hardware_hal_CounterJNI_initializeCounter(JNIEnv* env, jclass,
  * Method:    freeCounter
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_org_wpilib_hardware_hal_CounterJNI_freeCounter(
-    JNIEnv* env, jclass, jint id) {
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_CounterJNI_freeCounter
+  (JNIEnv* env, jclass, jint id)
+{
   if (id != HAL_INVALID_HANDLE) {
     HAL_FreeCounter((HAL_CounterHandle)id);
   }
@@ -50,10 +52,25 @@ JNIEXPORT void JNICALL Java_org_wpilib_hardware_hal_CounterJNI_freeCounter(
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_CounterJNI_setCounterEdgeConfiguration(
-    JNIEnv* env, jclass, jint id, jboolean valueRise) {
+Java_org_wpilib_hardware_hal_CounterJNI_setCounterEdgeConfiguration
+  (JNIEnv* env, jclass, jint id, jboolean valueRise)
+{
   int32_t status = 0;
   HAL_SetCounterEdgeConfiguration((HAL_CounterHandle)id, valueRise, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_CounterJNI
+ * Method:    setCounterRateWindow
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_CounterJNI_setCounterRateWindow
+  (JNIEnv* env, jclass, jint id, jint windowMilliseconds)
+{
+  int32_t status = 0;
+  HAL_SetCounterRateWindow((HAL_CounterHandle)id, windowMilliseconds, &status);
   CheckStatus(env, status);
 }
 
@@ -62,8 +79,10 @@ Java_org_wpilib_hardware_hal_CounterJNI_setCounterEdgeConfiguration(
  * Method:    resetCounter
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_org_wpilib_hardware_hal_CounterJNI_resetCounter(
-    JNIEnv* env, jclass, jint id) {
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_CounterJNI_resetCounter
+  (JNIEnv* env, jclass, jint id)
+{
   int32_t status = 0;
   HAL_ResetCounter((HAL_CounterHandle)id, &status);
   CheckStatus(env, status);
@@ -74,8 +93,10 @@ JNIEXPORT void JNICALL Java_org_wpilib_hardware_hal_CounterJNI_resetCounter(
  * Method:    getCounter
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_org_wpilib_hardware_hal_CounterJNI_getCounter(
-    JNIEnv* env, jclass, jint id) {
+JNIEXPORT jint JNICALL
+Java_org_wpilib_hardware_hal_CounterJNI_getCounter
+  (JNIEnv* env, jclass, jint id)
+{
   int32_t status = 0;
   jint returnValue = HAL_GetCounter((HAL_CounterHandle)id, &status);
   CheckStatus(env, status);
@@ -88,8 +109,9 @@ JNIEXPORT jint JNICALL Java_org_wpilib_hardware_hal_CounterJNI_getCounter(
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_org_wpilib_hardware_hal_CounterJNI_getCounterRate(JNIEnv* env, jclass,
-                                                       jint id) {
+Java_org_wpilib_hardware_hal_CounterJNI_getCounterRate
+  (JNIEnv* env, jclass, jint id)
+{
   int32_t status = 0;
   jdouble returnValue = HAL_GetCounterRate((HAL_CounterHandle)id, &status);
   CheckStatus(env, status);
@@ -102,8 +124,9 @@ Java_org_wpilib_hardware_hal_CounterJNI_getCounterRate(JNIEnv* env, jclass,
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_org_wpilib_hardware_hal_CounterJNI_getCounterStopped(JNIEnv* env, jclass,
-                                                          jint id) {
+Java_org_wpilib_hardware_hal_CounterJNI_getCounterStopped
+  (JNIEnv* env, jclass, jint id)
+{
   int32_t status = 0;
   jboolean returnValue = HAL_GetCounterStopped((HAL_CounterHandle)id, &status);
   CheckStatus(env, status);

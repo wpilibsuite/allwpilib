@@ -38,6 +38,16 @@ public class CounterJNI extends JNIWrapper {
   public static native void setCounterEdgeConfiguration(int counterHandle, boolean risingEdge);
 
   /**
+   * Sets the time window used to calculate the counter rate.
+   *
+   * @param counterHandle the counter handle
+   * @param windowMilliseconds the rate calculation window in milliseconds; valid values are 5
+   *     through 255
+   * @see "HAL_SetCounterRateWindow"
+   */
+  public static native void setCounterRateWindow(int counterHandle, int windowMilliseconds);
+
+  /**
    * Resets the Counter to zero.
    *
    * <p>Sets the counter value to zero. This does not effect the running state of the counter, just

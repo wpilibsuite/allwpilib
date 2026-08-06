@@ -11,7 +11,6 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-
 BASE_RESOURCE_DIR = "/org/wpilib/fields/"
 FIELDS_RESOURCE_DIR = "org/wpilib/fields"
 
@@ -42,11 +41,11 @@ def cpp_nullable_string(value: str | None) -> str:
     return string_literal(value)
 
 
-def number_literal(value: int | float) -> str:
+def number_literal(value: float) -> str:
     return json.dumps(value)
 
 
-def cpp_meter_t(value: int | float) -> str:
+def cpp_meter_t(value: float) -> str:
     return f"wpi::units::meter_t{{{number_literal(value)}}}"
 
 

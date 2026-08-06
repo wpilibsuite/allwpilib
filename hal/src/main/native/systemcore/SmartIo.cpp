@@ -67,6 +67,10 @@ int32_t SmartIo::SwitchCounterEdge(bool risingEdge) {
   return ret;
 }
 
+int32_t SmartIo::SetRateWindow(int32_t windowMilliseconds) {
+  return MRC_SmartIO_SetRateWindow(channel, windowMilliseconds);
+}
+
 int32_t SmartIo::SetDigitalOutput(bool value) {
   return MRC_SmartIO_SetDigitalOutput(channel, value);
 }

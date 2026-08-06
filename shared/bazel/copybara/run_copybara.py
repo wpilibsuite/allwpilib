@@ -5,18 +5,17 @@ import os
 import pathlib
 import re
 import subprocess
-from typing import Optional
 
 
 @dataclasses.dataclass
 class CopybaraConfig:
     # Needed to run the additional updates for updating the rdev file
-    mostrobotpy_local_repo_path: Optional[str] = None
+    mostrobotpy_local_repo_path: str | None = None
 
     # Settings for migrating to a fork that you own
-    mostrobotpy_fork_repo: Optional[str] = None
-    allwpilib_fork_repo: Optional[str] = None
-    robotpy_commandsv2_fork_repo: Optional[str] = None
+    mostrobotpy_fork_repo: str | None = None
+    allwpilib_fork_repo: str | None = None
+    robotpy_commandsv2_fork_repo: str | None = None
 
     # Settings for truth repositories
     mostrobotpy_truth_repo: str = "https://github.com/robotpy/mostrobotpy.git"

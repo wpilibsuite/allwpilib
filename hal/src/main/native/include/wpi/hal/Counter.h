@@ -51,6 +51,17 @@ void HAL_SetCounterEdgeConfiguration(HAL_CounterHandle counterHandle,
                                      HAL_Bool risingEdge, int32_t* status);
 
 /**
+ * Sets the time window used to calculate the counter rate.
+ *
+ * @param[in] counterHandle      the counter handle
+ * @param[in] windowMilliseconds the rate calculation window in milliseconds;
+ *                               valid values are 5 through 255
+ * @param[out] status            Error status variable. 0 on success.
+ */
+void HAL_SetCounterRateWindow(HAL_CounterHandle counterHandle,
+                              int32_t windowMilliseconds, int32_t* status);
+
+/**
  * Resets the Counter to zero.
  *
  * Sets the counter value to zero. This does not effect the running state of the

@@ -27,6 +27,7 @@ struct SmartIo {
   int32_t InitializeMode(MRC_SmartIOMode mode);
   int32_t SwitchDioDirection(bool input);
   int32_t SwitchCounterEdge(bool risingEdge);
+  int32_t SetRateWindow(int32_t windowMilliseconds);
 
   int32_t SetDigitalOutput(bool value);
   int32_t GetDigitalInput(bool* value);

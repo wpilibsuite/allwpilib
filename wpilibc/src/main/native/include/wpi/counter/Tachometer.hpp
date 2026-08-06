@@ -8,6 +8,7 @@
 #include "wpi/hal/Counter.h"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/frequency.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/util/Handle.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
@@ -44,6 +45,14 @@ class Tachometer : public wpi::util::Sendable,
    * @param configuration The channel configuration.
    */
   void SetEdgeConfiguration(EdgeConfiguration configuration);
+
+  /**
+   * Sets the time window used to calculate the tachometer rate.
+   *
+   * @param window The rate calculation window. Valid values are 5 ms through
+   *               255 ms. The default is 50 ms.
+   */
+  void SetRateWindow(wpi::units::millisecond_t window);
 
   /**
    * Gets the tachometer frequency.

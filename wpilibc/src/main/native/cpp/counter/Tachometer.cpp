@@ -34,6 +34,13 @@ void Tachometer::SetEdgeConfiguration(EdgeConfiguration configuration) {
   WPILIB_CheckErrorStatus(status, "{}", m_channel);
 }
 
+void Tachometer::SetRateWindow(wpi::units::millisecond_t window) {
+  int32_t status = 0;
+  HAL_SetCounterRateWindow(m_handle, static_cast<int32_t>(window.value()),
+                           &status);
+  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
+}
+
 wpi::units::hertz_t Tachometer::GetFrequency() const {
   int32_t status = 0;
   double rate = HAL_GetCounterRate(m_handle, &status);

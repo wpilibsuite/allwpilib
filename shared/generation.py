@@ -121,7 +121,7 @@ def generate_quickbuf(
             # Optional if using protoc-quickbuf
             args += [f"--plugin=protoc-gen-quickbuf={quickbuf_plugin}"]
         args += [
-            f"--quickbuf_out=gen_descriptors=true:{str(output_directory.absolute())}",
+            f"--quickbuf_out=gen_descriptors=true:{output_directory.absolute()!s}",
             f"-I{proto_dir.absolute()}",
             str(path.absolute()),
         ]

@@ -239,6 +239,16 @@ double HAL_GetEncoderRate(HAL_EncoderHandle encoderHandle, int32_t* status) {
 
   return SimEncoderData[encoder->index].rate;
 }
+void HAL_SetEncoderRateWindow(HAL_EncoderHandle encoderHandle,
+                              int32_t windowMilliseconds, int32_t* status) {
+  auto encoder = encoderHandles->Get(encoderHandle);
+  if (encoder == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  *status = 0;
+}
 void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
                                     double distancePerPulse, int32_t* status) {
   auto encoder = encoderHandles->Get(encoderHandle);

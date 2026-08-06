@@ -14,12 +14,12 @@ import re
 import sys
 from pathlib import Path
 
-
 # When invoked directly, Python puts the script directory on sys.path.
 # Add the repo root so absolute package imports still work.
 sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 from jinja2 import Environment, FileSystemLoader
+
 from shared.generation import add_jinja_args, make_arg_parser, write_file
 
 # The units for which multiply and divide mathematical operations are defined
@@ -319,7 +319,7 @@ def mtou(measure_name):
         measure_name in UNIT_CONFIGURATIONS
         and "generics" in UNIT_CONFIGURATIONS[measure_name]
     ):
-        return "{}Unit{}".format(measure_name, generics_usage(measure_name))
+        return f"{measure_name}Unit{generics_usage(measure_name)}"
     else:
         regex = re.compile(r"^(.*?)(<.*>)?$")
         return re.sub(regex, "\\1Unit\\2", measure_name)
