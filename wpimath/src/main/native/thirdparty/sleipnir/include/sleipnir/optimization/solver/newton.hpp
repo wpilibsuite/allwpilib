@@ -195,6 +195,7 @@ ExitStatus newton(
 
     constexpr Scalar α_max(1);
     Scalar α = α_max;
+    const Scalar D_ϕ = g.transpose() * p_x;
 
     // Loop until a step is accepted. If a step becomes acceptable, the loop
     // will exit early.
@@ -215,7 +216,7 @@ ExitStatus newton(
       }
 
       // Check whether filter accepts trial iterate
-      if (filter.try_add(FilterEntry{f}, FilterEntry{trial_f}, p_x, g, α)) {
+      if (filter.try_add(FilterEntry{f}, FilterEntry{trial_f}, D_ϕ, α)) {
         // Accept step
         break;
       }

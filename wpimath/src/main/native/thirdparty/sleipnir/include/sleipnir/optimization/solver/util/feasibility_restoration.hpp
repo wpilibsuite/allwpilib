@@ -4,11 +4,13 @@
 
 #include <algorithm>
 #include <cmath>
+#include <functional>
 #include <span>
 #include <tuple>
 #include <utility>
 
 #include <Eigen/Core>
+#include <Eigen/SparseCore>
 #include <gch/small_vector.hpp>
 
 #include "sleipnir/optimization/solver/exit_status.hpp"
@@ -18,6 +20,7 @@
 #include "sleipnir/optimization/solver/sqp_matrix_callbacks.hpp"
 #include "sleipnir/optimization/solver/util/append_as_triplets.hpp"
 #include "sleipnir/optimization/solver/util/lagrange_multiplier_estimate.hpp"
+#include "sleipnir/optimization/solver/util/problem_scaling.hpp"
 
 namespace slp {
 

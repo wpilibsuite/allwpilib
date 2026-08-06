@@ -865,6 +865,17 @@ public class VariableMatrix implements AutoCloseable, Iterable<Variable> {
   }
 
   /**
+   * Returns the matrix exponential.
+   *
+   * @return The matrix exponential.
+   */
+  public VariableMatrix exp() {
+    assert rows() == cols();
+
+    return new VariableMatrix(rows(), cols(), VariableMatrixJNI.exp(getHandles(), rows()));
+  }
+
+  /**
    * Returns number of elements in matrix.
    *
    * @return Number of elements in matrix.
