@@ -25,12 +25,14 @@ configure_file(cameraserver-config.cmake.in ${WPILIB_BINARY_DIR}/cameraserver-co
 install(FILES ${WPILIB_BINARY_DIR}/cameraserver-config.cmake DESTINATION share/cameraserver)
 install(EXPORT cameraserver DESTINATION share/cameraserver)
 
-file(GLOB multiCameraServer_src multiCameraServer/src/main/native/cpp/*.cpp)
-add_executable(multiCameraServer ${multiCameraServer_src})
-wpilib_target_warnings(multiCameraServer)
-target_link_libraries(multiCameraServer cameraserver)
+if(WPILIB_WITH_EXECUTABLES)
+    file(GLOB multiCameraServer_src multiCameraServer/src/main/native/cpp/*.cpp)
+    add_executable(multiCameraServer ${multiCameraServer_src})
+    wpilib_target_warnings(multiCameraServer)
+    target_link_libraries(multiCameraServer cameraserver)
 
-set_property(TARGET multiCameraServer PROPERTY FOLDER "examples")
+    set_property(TARGET multiCameraServer PROPERTY FOLDER "examples")
+endif()
 
 if(WPILIB_WITH_TESTS)
     wpilib_add_test(cameraserver src/test/native/cpp)
