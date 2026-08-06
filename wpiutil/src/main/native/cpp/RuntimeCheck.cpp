@@ -5,6 +5,7 @@
 #include "wpi/util/RuntimeCheck.h"
 
 #ifdef _WIN32
+#include <cstring>
 #include <memory>
 #pragma comment(lib, "version.lib")  // for VerQueryValueW
 #include <windows.h>

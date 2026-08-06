@@ -12,6 +12,17 @@ macro(wpilib_target_warnings target)
             set(WARNING_FLAGS ${WARNING_FLAGS} -Werror)
         endif()
 
+        # Additional MinGW annoyances that don't really affect
+        # anything of note
+        if (MINGW)
+            set(WARNING_FLAGS ${WARNING_FLAGS}
+                -Wno-unknown-pragmas
+                -Wno-type-limits
+                -Wno-sign-compare
+                -Wno-narrowing
+            )
+        endif()
+
         target_compile_options(${target} PRIVATE ${WARNING_FLAGS})
     else()
         set(WARNING_FLAGS
@@ -63,9 +74,10 @@ macro(wpilib_target_warnings target)
     endif()
 
     # Compress debug info with GCC
+    # MinGW's binutils don't support compressing debug info
     if(
         (${CMAKE_BUILD_TYPE} STREQUAL "Debug" OR ${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
-        AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU"
+        AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" AND NOT MINGW
     )
         target_compile_options(${target} PRIVATE -gz=zlib)
         target_link_options(${target} PRIVATE -gz=zlib)
