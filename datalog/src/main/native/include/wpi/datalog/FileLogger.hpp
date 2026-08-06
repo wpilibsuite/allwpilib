@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <functional>
 #include <string_view>
 #include <thread>
@@ -55,6 +56,7 @@ class FileLogger {
   int m_fileHandle = -1;
   int m_inotifyHandle = -1;
   int m_inotifyWatchHandle = -1;
+  std::atomic<bool> m_running{true};
   std::thread m_thread;
 #endif
 };
