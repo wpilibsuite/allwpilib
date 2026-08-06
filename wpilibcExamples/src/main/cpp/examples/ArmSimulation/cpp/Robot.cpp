@@ -8,7 +8,7 @@ void Robot::SimulationPeriodic() {
   arm.SimulationPeriodic();
 }
 
-void Robot::TeleopInit() {
+void Robot::TeleopEnter() {
   arm.LoadPreferences();
 }
 
@@ -22,7 +22,7 @@ void Robot::TeleopPeriodic() {
   }
 }
 
-void Robot::DisabledInit() {
+void Robot::DisabledEnter() {
   // This just makes sure that our simulation code knows that the motor's off.
   arm.Stop();
 }
