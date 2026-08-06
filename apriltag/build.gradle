@@ -36,6 +36,10 @@ dependencies {
     implementation project(':wpimath')
 }
 
+tasks.withType(Javadoc).configureEach {
+    dependsOn('compileJava')
+}
+
 cppHeadersZip {
     from('src/main/native/thirdparty/apriltag/include') {
         into '/'
