@@ -22,9 +22,11 @@ struct SmartIo {
   std::string previousAllocation;
   MRC_SmartIOMode currentMode{MRC_SmartIOMode::MRC_SmartIOMode_DigitalInput};
   uint16_t setPwmOutputMicrosecondsValue{0};
+  int32_t counterResetCount{0};
 
   int32_t InitializeMode(MRC_SmartIOMode mode);
   int32_t SwitchDioDirection(bool input);
+  int32_t SwitchCounterEdge(bool risingEdge);
 
   int32_t SetDigitalOutput(bool value);
   int32_t GetDigitalInput(bool* value);
@@ -38,7 +40,10 @@ struct SmartIo {
 
   int32_t GetAnalogInput(uint16_t* value);
 
+  int32_t ResetCounter();
   int32_t GetCounter(int32_t* count);
+  int32_t GetCounterRate(int32_t* rate);
+
   int32_t GetQuadrature(int32_t* count);
   int32_t GetQuadratureRate(int32_t* rate);
 

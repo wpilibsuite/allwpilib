@@ -35,18 +35,10 @@ void Tachometer::SetEdgeConfiguration(EdgeConfiguration configuration) {
 }
 
 wpi::units::hertz_t Tachometer::GetFrequency() const {
-  auto period = GetPeriod();
-  if (period.value() == 0) {
-    return 0_Hz;
-  }
-  return 1 / period;
-}
-
-wpi::units::second_t Tachometer::GetPeriod() const {
   int32_t status = 0;
-  double period = HAL_GetCounterPeriod(m_handle, &status);
+  double rate = HAL_GetCounterRate(m_handle, &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
-  return wpi::units::second_t{period};
+  return wpi::units::hertz_t{rate};
 }
 
 int Tachometer::GetEdgesPerRevolution() const {
@@ -57,15 +49,11 @@ void Tachometer::SetEdgesPerRevolution(int edges) {
 }
 
 wpi::units::turns_per_second_t Tachometer::GetRevolutionsPerSecond() const {
-  auto period = GetPeriod();
-  if (period.value() == 0) {
-    return 0_tps;
-  }
   int edgesPerRevolution = GetEdgesPerRevolution();
   if (edgesPerRevolution == 0) {
     return 0_tps;
   }
-  auto rotationHz = ((1.0 / edgesPerRevolution) / period);
+  auto rotationHz = GetFrequency() / edgesPerRevolution;
   return wpi::units::turns_per_second_t{rotationHz.value()};
 }
 
@@ -79,12 +67,6 @@ bool Tachometer::GetStopped() const {
   bool stopped = HAL_GetCounterStopped(m_handle, &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
   return stopped;
-}
-
-void Tachometer::SetMaxPeriod(wpi::units::second_t maxPeriod) {
-  int32_t status = 0;
-  HAL_SetCounterMaxPeriod(m_handle, maxPeriod.value(), &status);
-  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
 void Tachometer::InitSendable(wpi::util::SendableBuilder& builder) {

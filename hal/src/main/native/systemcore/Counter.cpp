@@ -79,55 +79,63 @@ void HAL_FreeCounter(HAL_CounterHandle counterHandle) {
 
 void HAL_SetCounterEdgeConfiguration(HAL_CounterHandle counterHandle,
                                      HAL_Bool risingEdge, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
+  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::COUNTER);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  *status = port->SwitchCounterEdge(risingEdge);
 }
 
 void HAL_ResetCounter(HAL_CounterHandle counterHandle, int32_t* status) {
-  // TODO
-  return;
+  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::COUNTER);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  *status = port->ResetCounter();
 }
 
 int32_t HAL_GetCounter(HAL_CounterHandle counterHandle, int32_t* status) {
   auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::COUNTER);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return false;
+    return 0;
   }
 
   int32_t ret = 0;
   *status = port->GetCounter(&ret);
   return ret;
-  return 0;
 }
 
-double HAL_GetCounterPeriod(HAL_CounterHandle counterHandle, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
+double HAL_GetCounterRate(HAL_CounterHandle counterHandle, int32_t* status) {
+  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::COUNTER);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
 
-void HAL_SetCounterMaxPeriod(HAL_CounterHandle counterHandle, double maxPeriod,
-                             int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
+  int32_t rate = 0;
+  *status = port->GetCounterRate(&rate);
+  return rate;
 }
 
 HAL_Bool HAL_GetCounterStopped(HAL_CounterHandle counterHandle,
                                int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return false;
-}
+  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::COUNTER);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return false;
+  }
 
-HAL_Bool HAL_GetCounterDirection(HAL_CounterHandle counterHandle,
-                                 int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return false;
-}
-
-void HAL_SetCounterDirection(HAL_CounterHandle counterHandle, HAL_Bool countUp,
-                             int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
+  int32_t rate = 0;
+  *status = port->GetCounterRate(&rate);
+  if (*status != 0) {
+    return false;
+  }
+  return rate == 0;
 }
 
 }  // extern "C"

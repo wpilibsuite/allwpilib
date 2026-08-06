@@ -39,11 +39,9 @@ void HAL_ResetCounter(HAL_CounterHandle counterHandle, int32_t* status) {}
 int32_t HAL_GetCounter(HAL_CounterHandle counterHandle, int32_t* status) {
   return 0;
 }
-double HAL_GetCounterPeriod(HAL_CounterHandle counterHandle, int32_t* status) {
+double HAL_GetCounterRate(HAL_CounterHandle counterHandle, int32_t* status) {
   return 0.0;
 }
-void HAL_SetCounterMaxPeriod(HAL_CounterHandle counterHandle, double maxPeriod,
-                             int32_t* status) {}
 HAL_Bool HAL_GetCounterStopped(HAL_CounterHandle counterHandle,
                                int32_t* status) {
   return false;

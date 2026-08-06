@@ -13,10 +13,10 @@ import org.wpilib.util.sendable.SendableRegistry;
 /**
  * Tachometer.
  *
- * <p>The Tachometer class measures the time between digital pulses to determine the rotation
- * velocity of a mechanism. Examples of devices that could be used with the tachometer class are a
- * hall effect sensor, break beam sensor, or optical sensor detecting tape on a shooter wheel.
- * Unlike encoders, this class only needs a single digital input.
+ * <p>The Tachometer class measures the rate of digital pulses to determine the rotation velocity of
+ * a mechanism. Examples of devices that could be used with the tachometer class are a hall effect
+ * sensor, break beam sensor, or optical sensor detecting tape on a shooter wheel. Unlike encoders,
+ * this class only needs a single digital input.
  */
 public class Tachometer implements Sendable, AutoCloseable {
   private final int m_handle;
@@ -43,25 +43,12 @@ public class Tachometer implements Sendable, AutoCloseable {
   }
 
   /**
-   * Gets the tachometer period.
-   *
-   * @return Current period (in seconds).
-   */
-  public double getPeriod() {
-    return CounterJNI.getCounterPeriod(m_handle);
-  }
-
-  /**
    * Gets the tachometer frequency.
    *
    * @return Current frequency (in hertz).
    */
   public double getFrequency() {
-    double period = getPeriod();
-    if (period == 0) {
-      return 0;
-    }
-    return 1 / period;
+    return CounterJNI.getCounterRate(m_handle);
   }
 
   /**
@@ -90,15 +77,11 @@ public class Tachometer implements Sendable, AutoCloseable {
    * @return Current RPS.
    */
   public double getRevolutionsPerSecond() {
-    double period = getPeriod();
-    if (period == 0) {
-      return 0;
-    }
     int edgesPerRevolution = getEdgesPerRevolution();
     if (edgesPerRevolution == 0) {
       return 0;
     }
-    return (1.0 / edgesPerRevolution) / period;
+    return getFrequency() / edgesPerRevolution;
   }
 
   /**
@@ -115,19 +98,12 @@ public class Tachometer implements Sendable, AutoCloseable {
   /**
    * Gets if the tachometer is stopped.
    *
+   * <p>The tachometer is stopped when its current frequency is zero.
+   *
    * @return True if the tachometer is stopped.
    */
   public boolean getStopped() {
     return CounterJNI.getCounterStopped(m_handle);
-  }
-
-  /**
-   * Sets the maximum period before the tachometer is considered stopped.
-   *
-   * @param maxPeriod The max period (in seconds).
-   */
-  public void setMaxPeriod(double maxPeriod) {
-    CounterJNI.setCounterMaxPeriod(m_handle, maxPeriod);
   }
 
   @Override

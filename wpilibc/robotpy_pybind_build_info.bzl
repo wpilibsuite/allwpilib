@@ -119,6 +119,16 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             trampolines = [],
         ),
         struct(
+            class_name = "EdgeCounter",
+            yml_file = "semiwrap/EdgeCounter.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/counter/EdgeCounter.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::EdgeCounter", "wpi__EdgeCounter.hpp"),
+            ],
+        ),
+        struct(
             class_name = "Tachometer",
             yml_file = "semiwrap/Tachometer.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -126,16 +136,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::Tachometer", "wpi__Tachometer.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "UpDownCounter",
-            yml_file = "semiwrap/UpDownCounter.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/counter/UpDownCounter.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::UpDownCounter", "wpi__UpDownCounter.hpp"),
             ],
         ),
         struct(

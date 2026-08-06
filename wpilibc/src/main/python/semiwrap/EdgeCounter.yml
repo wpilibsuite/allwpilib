@@ -1,9 +1,9 @@
 classes:
-  wpi::UpDownCounter:
+  wpi::EdgeCounter:
     ignored_bases:
-    - wpi::util::SendableHelper<UpDownCounter>
+    - wpi::util::SendableHelper<EdgeCounter>
     methods:
-      UpDownCounter:
+      EdgeCounter:
         overloads:
           DigitalSource&, DigitalSource&:
           std::shared_ptr<DigitalSource>, std::shared_ptr<DigitalSource>:
