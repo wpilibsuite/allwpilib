@@ -48,6 +48,6 @@ double HAL_GetCounterRate(HAL_CounterHandle counterHandle, int32_t* status) {
 }
 HAL_Bool HAL_GetCounterStopped(HAL_CounterHandle counterHandle,
                                int32_t* status) {
-  return false;
+  return HAL_GetCounterRate(counterHandle, status) == 0.0;
 }
 }  // extern "C"

@@ -17,3 +17,12 @@ TEST_CASE("Tachometer SetRateWindow", "[wpilibc][counter]") {
 
   CHECK_NOTHROW(tachometer.SetRateWindow(wpi::units::millisecond_t{50}));
 }
+
+TEST_CASE("Tachometer stopped state matches rate", "[wpilibc][counter]") {
+  HAL_Initialize();
+
+  wpi::Tachometer tachometer(0, wpi::EdgeConfiguration::RISING_EDGE);
+
+  CHECK(tachometer.GetFrequency().value() == 0.0);
+  CHECK(tachometer.GetStopped());
+}
