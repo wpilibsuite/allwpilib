@@ -1061,16 +1061,16 @@ bool gui::Initialize(const char* title, int width, int height,
     }
   }
 
+  if (!InitRenderer(windowFlags, rendererPreference)) {
+    CleanupFailedInitialize();
+    return false;
+  }
+
   for (auto&& makeFont : gContext->makeFonts) {
     if (makeFont.GetName() == gContext->defaultFontName) {
       io.FontDefault = makeFont.GetFont();
       break;
     }
-  }
-
-  if (!InitRenderer(windowFlags, rendererPreference)) {
-    CleanupFailedInitialize();
-    return false;
   }
 
   // Update window settings
@@ -1689,6 +1689,10 @@ void gui::SetStyle(Style style) {
     case Style::DEEP_DARK:
       StyleColorsDeepDark();
       break;
+    default:
+      style = Style::CLASSIC;
+      ImGui::StyleColorsClassic();
+      break;
   }
   ApplyCommonStyle(style);
 }
@@ -1697,9 +1701,6 @@ void gui::SetFPS(int fps) {
   SetFPSInternal(fps);
 }
 
-void gui::SetClearColor(ImVec4 color) {
-  gContext->clearColor = color;
-}
 
 std::string gui::GetPlatformSaveFileDir() {
 #if defined(_MSC_VER)
