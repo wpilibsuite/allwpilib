@@ -1061,6 +1061,13 @@ bool gui::Initialize(const char* title, int width, int height,
     }
   }
 
+  for (auto&& makeFont : gContext->makeFonts) {
+    if (makeFont.GetName() == gContext->defaultFontName) {
+      io.FontDefault = makeFont.GetFont();
+      break;
+    }
+  }
+
   if (!InitRenderer(windowFlags, rendererPreference)) {
     CleanupFailedInitialize();
     return false;
@@ -1462,8 +1469,213 @@ static void StyleColorsDeepDark() {
   style.TabRounding = 4;
 }
 
+static void ApplyCommonStyle(Style selectedStyle) {
+  ImGuiStyle& style = ImGui::GetStyle();
+  ImVec4* colors = style.Colors;
+
+  struct Palette {
+    ImVec4 text;
+    ImVec4 textDisabled;
+    ImVec4 canvas;
+    ImVec4 window;
+    ImVec4 surface;
+    ImVec4 control;
+    ImVec4 border;
+    ImVec4 accent;
+    ImVec4 accentStrong;
+  } palette;
+
+  switch (selectedStyle) {
+    case Style::CLASSIC:
+      palette = {ImVec4(0.96f, 0.97f, 0.98f, 1.00f),
+                 ImVec4(0.66f, 0.69f, 0.73f, 1.00f),
+                 ImVec4(0.075f, 0.085f, 0.10f, 1.00f),
+                 ImVec4(0.16f, 0.17f, 0.19f, 1.00f),
+                 ImVec4(0.21f, 0.23f, 0.26f, 1.00f),
+                 ImVec4(0.27f, 0.29f, 0.33f, 1.00f),
+                 ImVec4(0.48f, 0.52f, 0.58f, 0.72f),
+                 ImVec4(0.20f, 0.68f, 0.82f, 1.00f),
+                 ImVec4(0.12f, 0.78f, 0.94f, 1.00f)};
+      break;
+    case Style::DARK:
+      palette = {ImVec4(0.93f, 0.96f, 1.00f, 1.00f),
+                 ImVec4(0.60f, 0.68f, 0.78f, 1.00f),
+                 ImVec4(0.012f, 0.025f, 0.055f, 1.00f),
+                 ImVec4(0.045f, 0.075f, 0.125f, 1.00f),
+                 ImVec4(0.065f, 0.105f, 0.17f, 1.00f),
+                 ImVec4(0.095f, 0.15f, 0.235f, 1.00f),
+                 ImVec4(0.29f, 0.39f, 0.54f, 0.68f),
+                 ImVec4(0.31f, 0.64f, 0.98f, 1.00f),
+                 ImVec4(0.52f, 0.78f, 1.00f, 1.00f)};
+      break;
+    case Style::LIGHT:
+      palette = {ImVec4(0.12f, 0.12f, 0.12f, 1.00f),
+                 ImVec4(0.42f, 0.42f, 0.42f, 1.00f),
+                 ImVec4(0.92f, 0.92f, 0.92f, 1.00f),
+                 ImVec4(1.00f, 1.00f, 1.00f, 1.00f),
+                 ImVec4(0.98f, 0.98f, 0.98f, 1.00f),
+                 ImVec4(0.90f, 0.90f, 0.90f, 1.00f),
+                 ImVec4(0.62f, 0.62f, 0.62f, 1.00f),
+                 ImVec4(0.20f, 0.47f, 0.82f, 1.00f),
+                 ImVec4(0.10f, 0.35f, 0.70f, 1.00f)};
+      break;
+    case Style::DEEP_DARK:
+      palette = {ImVec4(0.96f, 0.97f, 0.99f, 1.00f),
+                 ImVec4(0.62f, 0.65f, 0.70f, 1.00f),
+                 ImVec4(0.005f, 0.007f, 0.012f, 1.00f),
+                 ImVec4(0.025f, 0.028f, 0.035f, 1.00f),
+                 ImVec4(0.055f, 0.06f, 0.075f, 1.00f),
+                 ImVec4(0.09f, 0.10f, 0.125f, 1.00f),
+                 ImVec4(0.34f, 0.37f, 0.43f, 0.68f),
+                 ImVec4(0.35f, 0.72f, 0.90f, 1.00f),
+                 ImVec4(0.55f, 0.86f, 1.00f, 1.00f)};
+      break;
+  }
+
+  auto withAlpha = [](ImVec4 color, float alpha) {
+    color.w = alpha;
+    return color;
+  };
+  colors[ImGuiCol_Text] = palette.text;
+  colors[ImGuiCol_TextDisabled] = palette.textDisabled;
+  colors[ImGuiCol_WindowBg] = palette.window;
+  colors[ImGuiCol_ChildBg] = palette.surface;
+  colors[ImGuiCol_PopupBg] = palette.surface;
+  colors[ImGuiCol_Border] = palette.border;
+  colors[ImGuiCol_BorderShadow] = withAlpha(palette.canvas, 0.35f);
+  colors[ImGuiCol_FrameBg] = palette.control;
+  colors[ImGuiCol_FrameBgHovered] = withAlpha(palette.accent, 0.35f);
+  colors[ImGuiCol_FrameBgActive] = withAlpha(palette.accent, 0.55f);
+  colors[ImGuiCol_TitleBg] = palette.window;
+  colors[ImGuiCol_TitleBgActive] = palette.surface;
+  colors[ImGuiCol_MenuBarBg] = palette.surface;
+  colors[ImGuiCol_ScrollbarBg] = palette.canvas;
+  colors[ImGuiCol_ScrollbarGrab] = withAlpha(palette.border, 0.80f);
+  colors[ImGuiCol_ScrollbarGrabHovered] = palette.accent;
+  colors[ImGuiCol_ScrollbarGrabActive] = palette.accentStrong;
+  colors[ImGuiCol_CheckMark] = palette.accentStrong;
+  colors[ImGuiCol_SliderGrab] = palette.accent;
+  colors[ImGuiCol_SliderGrabActive] = palette.accentStrong;
+  colors[ImGuiCol_Button] = palette.control;
+  colors[ImGuiCol_ButtonHovered] = withAlpha(palette.accent, 0.55f);
+  colors[ImGuiCol_ButtonActive] = withAlpha(palette.accentStrong, 0.78f);
+  colors[ImGuiCol_Header] = withAlpha(palette.control, 0.92f);
+  colors[ImGuiCol_HeaderHovered] = withAlpha(palette.accent, 0.48f);
+  colors[ImGuiCol_HeaderActive] = withAlpha(palette.accent, 0.68f);
+  colors[ImGuiCol_Separator] = palette.border;
+  colors[ImGuiCol_SeparatorHovered] = palette.accent;
+  colors[ImGuiCol_SeparatorActive] = palette.accentStrong;
+  colors[ImGuiCol_ResizeGrip] = withAlpha(palette.border, 0.65f);
+  colors[ImGuiCol_ResizeGripHovered] = palette.accent;
+  colors[ImGuiCol_ResizeGripActive] = palette.accentStrong;
+  colors[ImGuiCol_InputTextCursor] = palette.accentStrong;
+  colors[ImGuiCol_Tab] = palette.control;
+  colors[ImGuiCol_TabHovered] = withAlpha(palette.accent, 0.62f);
+  colors[ImGuiCol_TabActive] = withAlpha(palette.accent, 0.42f);
+  colors[ImGuiCol_TabUnfocused] = palette.window;
+  colors[ImGuiCol_TabUnfocusedActive] = palette.surface;
+  colors[ImGuiCol_DockingPreview] = withAlpha(palette.accent, 0.70f);
+  colors[ImGuiCol_DockingEmptyBg] = palette.canvas;
+  colors[ImGuiCol_PlotLines] = palette.accent;
+  colors[ImGuiCol_PlotLinesHovered] = palette.accentStrong;
+  colors[ImGuiCol_PlotHistogram] = palette.accent;
+  colors[ImGuiCol_PlotHistogramHovered] = palette.accentStrong;
+  colors[ImGuiCol_TableHeaderBg] = palette.control;
+  colors[ImGuiCol_TableBorderStrong] = palette.border;
+  colors[ImGuiCol_TableBorderLight] = withAlpha(palette.border, 0.45f);
+  colors[ImGuiCol_TextLink] = palette.accentStrong;
+  colors[ImGuiCol_TextSelectedBg] = withAlpha(palette.accent, 0.42f);
+  colors[ImGuiCol_DragDropTarget] = palette.accentStrong;
+  colors[ImGuiCol_NavHighlight] = palette.accentStrong;
+  colors[ImGuiCol_NavWindowingHighlight] = palette.accentStrong;
+  colors[ImGuiCol_NavWindowingDimBg] = withAlpha(palette.canvas, 0.55f);
+  colors[ImGuiCol_ModalWindowDimBg] = withAlpha(palette.canvas, 0.55f);
+  style.WindowPadding = ImVec2(14.0f, 12.0f);
+  style.FramePadding = ImVec2(9.0f, 6.0f);
+  style.CellPadding = ImVec2(10.0f, 7.0f);
+  style.ItemSpacing = ImVec2(10.0f, 8.0f);
+  style.ItemInnerSpacing = ImVec2(8.0f, 6.0f);
+  style.TouchExtraPadding = ImVec2(1.0f, 1.0f);
+  style.IndentSpacing = 24.0f;
+  style.ScrollbarSize = 14.0f;
+  style.GrabMinSize = 13.0f;
+  style.WindowBorderSize = 1.0f;
+  style.ChildBorderSize = 1.0f;
+  style.PopupBorderSize = 1.0f;
+  style.FrameBorderSize = 1.0f;
+  style.TabBorderSize = 0.0f;
+  style.WindowRounding = 4.0f;
+  style.ChildRounding = 3.0f;
+  style.FrameRounding = 2.0f;
+  style.PopupRounding = 4.0f;
+  style.ScrollbarRounding = 5.0f;
+  style.GrabRounding = 2.0f;
+  style.TabRounding = 3.0f;
+  style.LogSliderDeadzone = 4.0f;
+  style.WindowBorderHoverPadding = 4.0f;
+  style.ScrollbarPadding = 2.0f;
+  style.ImageRounding = 4.0f;
+  style.ImageBorderSize = 0.0f;
+  style.TabMinWidthBase = 64.0f;
+  style.TabMinWidthShrink = 48.0f;
+  style.TabBarBorderSize = 1.0f;
+  style.TabBarOverlineSize = 0.0f;
+  style.TreeLinesFlags = ImGuiTreeNodeFlags_DrawLinesNone;
+  style.DragDropTargetRounding = 4.0f;
+  style.DragDropTargetBorderSize = 2.0f;
+  style.DragDropTargetPadding = 2.0f;
+  style.SeparatorSize = 1.0f;
+  style.SeparatorTextBorderSize = 0.0f;
+  style.SeparatorTextAlign = ImVec2(0.0f, 0.5f);
+  style.SeparatorTextPadding = ImVec2(0.0f, 8.0f);
+  style.DockingSeparatorSize = 4.0f;
+  style.HoverStationaryDelay = 0.15f;
+  style.HoverDelayShort = 0.35f;
+  style.HoverDelayNormal = 0.60f;
+  style.HoverFlagsForTooltipMouse =
+      ImGuiHoveredFlags_Stationary | ImGuiHoveredFlags_DelayShort;
+  style.HoverFlagsForTooltipNav = ImGuiHoveredFlags_DelayNormal;
+
+  ImPlotStyle& plotStyle = ImPlot::GetStyle();
+  plotStyle.Colors[ImPlotCol_FrameBg] = palette.control;
+  plotStyle.Colors[ImPlotCol_PlotBg] = palette.window;
+  plotStyle.Colors[ImPlotCol_PlotBorder] = palette.border;
+  plotStyle.Colors[ImPlotCol_LegendBg] = palette.surface;
+  plotStyle.Colors[ImPlotCol_LegendBorder] = palette.border;
+  plotStyle.Colors[ImPlotCol_LegendText] = palette.text;
+  plotStyle.Colors[ImPlotCol_TitleText] = palette.text;
+  plotStyle.Colors[ImPlotCol_InlayText] = palette.text;
+  plotStyle.Colors[ImPlotCol_AxisText] = palette.textDisabled;
+  plotStyle.Colors[ImPlotCol_AxisGrid] = withAlpha(palette.border, 0.60f);
+  plotStyle.Colors[ImPlotCol_AxisTick] = palette.border;
+  plotStyle.Colors[ImPlotCol_AxisBgHovered] =
+      withAlpha(palette.accent, 0.35f);
+  plotStyle.Colors[ImPlotCol_AxisBgActive] =
+      withAlpha(palette.accent, 0.55f);
+  plotStyle.Colors[ImPlotCol_Selection] =
+      withAlpha(palette.accent, 0.45f);
+  plotStyle.Colors[ImPlotCol_Crosshairs] = palette.accentStrong;
+  plotStyle.PlotBorderSize = 1.0f;
+  plotStyle.MinorAlpha = 0.18f;
+  plotStyle.MajorTickLen = ImVec2(6.0f, 6.0f);
+  plotStyle.MinorTickLen = ImVec2(3.0f, 3.0f);
+  plotStyle.PlotPadding = ImVec2(12.0f, 12.0f);
+  plotStyle.LabelPadding = ImVec2(8.0f, 6.0f);
+  plotStyle.LegendPadding = ImVec2(10.0f, 10.0f);
+  plotStyle.LegendInnerPadding = ImVec2(8.0f, 6.0f);
+  plotStyle.LegendSpacing = ImVec2(8.0f, 4.0f);
+  plotStyle.MousePosPadding = ImVec2(10.0f, 8.0f);
+  plotStyle.AnnotationPadding = ImVec2(6.0f, 4.0f);
+  plotStyle.Colormap = ImPlotColormap_Paired;
+
+  gContext->clearColor = palette.canvas;
+}
+
 void gui::SetStyle(Style style) {
   gContext->style = static_cast<int>(style);
+  if (!ImGui::GetCurrentContext()) {
+    return;
+  }
   switch (style) {
     case Style::CLASSIC:
       ImGui::StyleColorsClassic();
@@ -1478,6 +1690,7 @@ void gui::SetStyle(Style style) {
       StyleColorsDeepDark();
       break;
   }
+  ApplyCommonStyle(style);
 }
 
 void gui::SetFPS(int fps) {
