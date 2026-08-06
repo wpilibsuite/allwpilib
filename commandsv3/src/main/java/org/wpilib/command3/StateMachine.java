@@ -162,6 +162,8 @@ public final class StateMachine implements Command {
     outer_loop:
     while (currentState != null) {
       final var currentCommand = currentState.command();
+      // NOTE: The state machine will exit if the child command fails to be forked. This happens
+      //       if the command shares requirements with a higher-priority command.
       coroutine.fork(currentCommand);
       currentState.runEnterCallbacks();
       boolean didYield = false;
