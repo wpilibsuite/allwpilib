@@ -1,5 +1,5 @@
 [versions]
-avaje = "3.14"
+avaje = "3.15-RC3"
 ceres = "2027-2.2-2"
 ejml = "0.46.0"
 gson = "2.13.1"

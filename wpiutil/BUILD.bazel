@@ -254,6 +254,8 @@ wpilib_cc_static_library(
 wpilib_jni_java_library(
     name = "wpiutil-java",
     srcs = glob(["src/main/java/**/*.java"]),
+    # This is only necessary while wpiutil contains @CustomAdapter annotations without any @Json annotations
+    javacopts = ["-Ajsonb.generateComponentFirstRound=true"],
     maven_artifact_name = "wpiutil-java",
     maven_group_id = "org.wpilib.wpiutil",
     native_libs = [":shared/wpiutiljni"],

@@ -244,6 +244,13 @@ model {
     }
 }
 
+tasks.withType(JavaCompile) {
+    // This is only necessary while wpiutil contains @CustomAdapter annotations without any @Json annotations
+    options.compilerArgs += [
+        "-Ajsonb.generateComponentFirstRound=true"
+    ]
+}
+
 dependencies {
     annotationProcessor libs.avaje.jsonb.generator
     api libs.avaje.jsonb
