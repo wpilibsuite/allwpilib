@@ -23,7 +23,6 @@
 #include "net/WireEncoder.hpp"
 #include "wpi/net/HttpUtil.hpp"
 #include "wpi/net/HttpWebSocketServerConnection.hpp"
-#include "wpi/net/UrlParser.hpp"
 #include "wpi/net/uv/Tcp.hpp"
 #include "wpi/net/uv/Work.hpp"
 #include "wpi/net/uv/util.hpp"
@@ -125,27 +124,26 @@ void NetworkServer::ServerConnection::ConnectionClosed() {
 
 void NetworkServer::ServerConnection4::ProcessRequest() {
   DEBUG1("HTTP request: '{}'", m_request.GetUrl());
-  wpi::net::UrlParser url{m_request.GetUrl(),
-                          m_request.GetMethod() == wpi::net::HTTP_CONNECT};
-  if (!url.IsValid()) {
+  auto url = wpi::net::ParseUrl(m_request.GetUrl());
+  if (!url) {
     // failed to parse URL
     SendError(400);
     return;
   }
 
   std::string_view path;
-  if (url.HasPath()) {
-    path = url.GetPath();
+  if (url->get_pathname_length() > 0) {
+    path = url->get_pathname();
   }
   DEBUG4("path: \"{}\"", path);
 
   std::string_view query;
-  if (url.HasQuery()) {
-    query = url.GetQuery();
+  if (url->has_search()) {
+    query = url->get_search();
   }
   DEBUG4("query: \"{}\"\n", query);
 
-  const bool isGET = m_request.GetMethod() == wpi::net::HTTP_GET;
+  const bool isGET = m_request.GetMethod() == HTTP_GET;
   if (isGET && path == "/") {
     // build HTML root page
     SendResponse(200, "OK", "text/html",
@@ -162,10 +160,10 @@ void NetworkServer::ServerConnection4::ProcessRequest() {
 
 void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
   // get name from URL
-  wpi::net::UrlParser url{m_request.GetUrl(), false};
+  auto url = wpi::net::ParseUrl(m_request.GetUrl());
   std::string_view path;
-  if (url.HasPath()) {
-    path = url.GetPath();
+  if (url && url->get_pathname_length() > 0) {
+    path = url->get_pathname();
   }
   DEBUG4("path: '{}'", path);
 

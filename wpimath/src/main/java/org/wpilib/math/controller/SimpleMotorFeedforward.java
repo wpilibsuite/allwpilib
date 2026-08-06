@@ -179,7 +179,7 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    * @return The computed feedforward.
    */
   public double calculate(double currentVelocity, double nextVelocity) {
-    // See wpimath/algorithms.md#Simple_motor_feedforward for derivation
+    // See wpimath/docs/SimpleMotorFeedforward.md for derivation
     if (ka < 1e-9) {
       return ks * Math.signum(nextVelocity) + kv * nextVelocity;
     } else {

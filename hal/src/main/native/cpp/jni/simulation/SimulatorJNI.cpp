@@ -4,7 +4,6 @@
 
 #include "SimulatorJNI.hpp"
 
-#include "AlertDataJNI.hpp"
 #include "BufferCallbackStore.hpp"
 #include "CallbackStore.hpp"
 #include "ConstBufferCallbackStore.hpp"
@@ -79,9 +78,6 @@ jint SimOnLoad(JavaVM* vm, void* reserved) {
   InitializeBufferStore();
   InitializeConstBufferStore();
   InitializeOpModeOptionsStore();
-  if (!InitializeAlertDataJNI(env)) {
-    return JNI_ERR;
-  }
   if (!InitializeSimDeviceDataJNI(env)) {
     return JNI_ERR;
   }
@@ -99,7 +95,6 @@ void SimOnUnload(JavaVM* vm, void* reserved) {
   bufferCallbackCls.free(env);
   constBufferCallbackCls.free(env);
   biConsumerCls.free(env);
-  FreeAlertDataJNI(env);
   FreeSimDeviceDataJNI(env);
   jvm = nullptr;
 }

@@ -6,7 +6,7 @@ ext {
 
     nativeName = 'datalog'
     devMain = 'org.wpilib.datalog.DevMain'
-    nativeTestSuiteName = "${nativeName}Catch2Test"
+    nativeTestSuiteName = "${nativeName}Test"
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
@@ -64,7 +64,7 @@ sourceSets {
     printlog
 }
 
-task runPrintLog(type: JavaExec) {
+tasks.register('runPrintLog', JavaExec) {
     classpath = sourceSets.printlog.runtimeClasspath
 
     mainClass = 'printlog.PrintLog'

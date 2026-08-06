@@ -25,6 +25,7 @@ foreach(example ${EXAMPLES})
     target_link_libraries(
         ${example}
         apriltag
+        fields
         wpilibc
         commandsv2
         romiVendordep
@@ -48,11 +49,11 @@ foreach(example ${EXAMPLES})
         target_link_libraries(
             Example_${example}_test
             apriltag
+            fields
             wpilibc
             commandsv2
             romiVendordep
             xrpVendordep
-            googletest
         )
         add_dependencies(wpilibcExamples_test Example_${example}_test)
     endif()
@@ -67,7 +68,14 @@ foreach(template ${TEMPLATES})
     add_executable(${template} ${sources})
     wpilib_target_warnings(${template})
     target_include_directories(${template} PUBLIC src/main/cpp/templates/${template}/include)
-    target_link_libraries(${template} wpilibc commandsv2 romiVendordep xrpVendordep)
+    target_link_libraries(
+        ${template}
+        wpilibc
+        commandsv2
+        fields
+        romiVendordep
+        xrpVendordep
+    )
     add_dependencies(wpilibcExamples ${template})
 endforeach()
 
@@ -91,6 +99,7 @@ foreach(snippet ${SNIPPETS})
     target_link_libraries(
         snippet${snippet}
         apriltag
+        fields
         wpilibc
         commandsv2
         romiVendordep
@@ -115,11 +124,11 @@ foreach(snippet ${SNIPPETS})
         target_link_libraries(
             Snippet_${snippet}_test
             apriltag
+            fields
             wpilibc
             commandsv2
             romiVendordep
             xrpVendordep
-            googletest
         )
         add_dependencies(wpilibcExamples_test Snippet_${snippet}_test)
     endif()

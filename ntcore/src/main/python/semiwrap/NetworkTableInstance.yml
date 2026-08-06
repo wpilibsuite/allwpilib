@@ -132,6 +132,14 @@ classes:
           std::span<const std::pair<std::string_view, unsigned int>>:
           std::span<const std::string_view>, unsigned int:
       SetServerTeam:
+      SetServerFixed:
+      SetServerMdns:
+        overloads:
+          std::string_view:
+          std::string_view, std::string_view, unsigned int:
+          std::string_view, std::span<const std::pair<std::string_view, unsigned int>>:
+          std::string_view, unsigned int, std::span<const std::pair<std::string_view, unsigned int>>:
+          std::string_view, std::span<const std::string_view>, unsigned int:
       Disconnect:
       StartDSClient:
       StopDSClient:

@@ -22,7 +22,7 @@ apply from: "${rootDir}/shared/resources.gradle"
 apply from: "${rootDir}/shared/config.gradle"
 
 def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
-def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
+def wpilibVersionFileOutput = file("$buildDir/generated/mainVersion/cpp/WPILibVersion.cpp")
 
 apply from: "${rootDir}/shared/libssh.gradle"
 apply from: "${rootDir}/shared/libsdlgpu.gradle"
@@ -47,6 +47,7 @@ task generateCppVersion() {
         def version = wpilibVersioning.version.get()
         println "Writing version ${version} to $wpilibVersionFileOutput"
 
+        wpilibVersionFileOutput.parentFile.mkdirs()
         if (wpilibVersionFileOutput.exists()) {
             wpilibVersionFileOutput.delete()
         }
@@ -65,7 +66,7 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
 def generateTask = createGenerateResourcesTask('main', 'DLT', 'dlt', project)
 
 project(':').libraryBuild.dependsOn build
-tasks.withType(CppCompile) {
+tasks.withType(CppCompile).configureEach {
     dependsOn generateTask
     dependsOn generateCppVersion
 }
@@ -79,7 +80,7 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/native/cpp', "$buildDir/generated/main/cpp"
+                        srcDirs 'src/main/native/cpp', "$buildDir/generated/main/cpp", "$buildDir/generated/mainVersion/cpp"
                         include '**/*.cpp'
                     }
                     exportedHeaders {
@@ -101,6 +102,8 @@ model {
                 it.cppCompiler.define("LIBSSH_STATIC")
                 lib project: ':glass', library: 'glass', linkage: 'static'
                 lib project: ':fields', library: 'fields', linkage: 'static'
+                lib project: ':fields', library: 'fieldimages', linkage: 'static'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':datalog', library: 'datalog', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'

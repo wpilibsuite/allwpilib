@@ -6,25 +6,36 @@
 
 #include <stdint.h>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
 
 template <typename T>
-class ProtoTest : public testing::Test {};
+class ProtoTest {};
 
-TYPED_TEST_SUITE_P(ProtoTest);
+#define CATCH_TYPED_TEST_SUITE_P(Suite)
 
-TYPED_TEST_P(ProtoTest, RoundTrip) {
+#define CATCH_TYPED_TEST_P(Suite, Name) \
+  template <typename TypeParam>         \
+  void Suite##_##Name()
+
+#define REGISTER_CATCH_TYPED_TEST_SUITE_P(Suite, ...)
+
+#define INSTANTIATE_CATCH_TYPED_TEST_SUITE_P(Prefix, Suite, TypeParam) \
+  TEST_CASE(#Suite " " #Prefix " RoundTrip", "[wpimath]") {            \
+    Suite##_RoundTrip<TypeParam>();                                    \
+  }
+
+CATCH_TYPED_TEST_P(ProtoTest, RoundTrip) {
   wpi::util::ProtobufMessage<decltype(TypeParam::kTestData)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, TypeParam::kTestData));
+  REQUIRE(message.Pack(buf, TypeParam::kTestData));
   auto unpacked_data = message.Unpack(buf);
-  ASSERT_TRUE(unpacked_data.has_value());
+  REQUIRE(unpacked_data.has_value());
 
   TypeParam::CheckEq(TypeParam::kTestData, *unpacked_data);
 }
 
-REGISTER_TYPED_TEST_SUITE_P(ProtoTest, RoundTrip);
+REGISTER_CATCH_TYPED_TEST_SUITE_P(ProtoTest, RoundTrip);

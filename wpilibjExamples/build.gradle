@@ -14,6 +14,7 @@ apply from: "${rootDir}/shared/opencv.gradle"
 dependencies {
     implementation project(':wpilibj')
     implementation project(':apriltag')
+    implementation project(':fields')
     implementation project(':wpimath')
     implementation project(':hal')
     implementation project(':wpiutil')
@@ -26,9 +27,9 @@ dependencies {
     implementation project(':romiVendordep')
     implementation project(':xrpVendordep')
     implementation project(':epilogue-runtime')
+    implementation project(':wpiannotations')
     annotationProcessor project(':epilogue-processor')
     annotationProcessor project(':javacPlugin')
-    annotationProcessor project(':wpiannotations')
 
     testImplementation libs.junit.api
     testRuntimeOnly libs.junit.launcher
@@ -78,11 +79,8 @@ if (!project.hasProperty('skipJavaFormat')) {
         ruleSets = []
     }
 }
-
-gradle.projectsEvaluated {
-    tasks.withType(JavaCompile) {
-        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation" << "-Werror"
-    }
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << "-Xlint:-this-escape"
 }
 
 tasks.register('buildDesktopJava') {

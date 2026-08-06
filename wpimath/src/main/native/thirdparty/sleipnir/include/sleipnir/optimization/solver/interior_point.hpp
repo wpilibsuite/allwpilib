@@ -467,7 +467,7 @@ ExitStatus interior_point(
     kkt_matrix_decomp_profiler.stop();
     ScopedProfiler kkt_system_solve_profiler{kkt_system_solve_prof};
 
-    auto compute_step = [&](Step& step) {
+    auto compute_step = [&](Step& step, const DenseVector& c_i_minus_s) {
       // p = [ pˣ]
       //     [−pʸ]
       DenseVector p = solver.solve(rhs);
@@ -475,11 +475,11 @@ ExitStatus interior_point(
       step.p_y = -p.segment(x.rows(), y.rows());
 
       // pˢ = cᵢ − s + Aᵢpˣ
-      // pᶻ = −Σcᵢ + μS⁻¹e − ΣAᵢpˣ
-      step.p_s = c_i - s + A_i * step.p_x;
-      step.p_z = -Σ * c_i + μ * s.cwiseInverse() - Σ * A_i * step.p_x;
+      // pᶻ = μS⁻¹e − z − Σpˢ
+      step.p_s = c_i_minus_s + A_i * step.p_x;
+      step.p_z = μ * s.cwiseInverse() - z - Σ * step.p_s;
     };
-    compute_step(step);
+    compute_step(step, c_i - s);
 
     kkt_system_solve_profiler.stop();
     ScopedProfiler line_search_profiler{line_search_prof};
@@ -497,6 +497,16 @@ ExitStatus interior_point(
     α_z = fraction_to_the_boundary_rule<Scalar>(z, step.p_z, τ);
 
     const FilterEntry<Scalar> current_entry{f, s, c_e, c_i, μ};
+
+    // Compute the directional derivative of the log-barrier function along the
+    // search direction.
+    //
+    //   ϕ_μ(x, s) = f(x) − μ∑ᵢ ln(sᵢ)
+    //
+    //   D_ϕ = ∇ϕ_μ(x, s)ᵀ[pˣ pˢ]
+    //       = ∇f(x)ᵀpˣ − μ∑ᵢ pᵢˢ/sᵢ
+    const Scalar D_ϕ =
+        g.transpose() * step.p_x - μ * s.cwiseInverse().dot(step.p_s);
 
     // Loop until a step is accepted
     while (1) {
@@ -533,7 +543,7 @@ ExitStatus interior_point(
 
       // Check whether filter accepts trial iterate
       FilterEntry trial_entry{trial_f, trial_s, trial_c_e, trial_c_i, μ};
-      if (filter.try_add(current_entry, trial_entry, step.p_x, g, α)) {
+      if (filter.try_add(current_entry, trial_entry, D_ϕ, α)) {
         // Accept step
         break;
       }
@@ -556,6 +566,7 @@ ExitStatus interior_point(
         Scalar α_soc = α;
         Scalar α_z_soc = α_z;
         DenseVector c_e_soc = c_e;
+        DenseVector c_i_minus_s_soc = c_i - s;
 
         Scalar soc_constraint_violation = next_constraint_violation;
 
@@ -589,15 +600,23 @@ ExitStatus interior_point(
 
           // Rebuild Newton-KKT rhs with updated constraint values.
           //
-          // rhs = −[∇f − Aₑᵀy − Aᵢᵀ(−Σcᵢ + μS⁻¹e + z)]
-          //        [              cₑˢᵒᶜ              ]
+          // rhs = −[∇f − Aₑᵀy − Aᵢᵀ(μS⁻¹e − Σ(cᵢ − s)ˢᵒᶜ)]
+          //        [               cₑˢᵒᶜ                 ]
           //
-          // where cₑˢᵒᶜ = αc(xₖ) + c(xₖ + αpₖˣ)
+          // where
+          //
+          //   cₑˢᵒᶜ = αˢᵒᶜcₑ(xₖ) + cₑ(xₖ + αˢᵒᶜpˣˢᵒᶜ)
+          //   (cᵢ − s)ˢᵒᶜ =
+          //     αˢᵒᶜ(cᵢ(xₖ) − sₖ) + cᵢ(xₖ + αˢᵒᶜpˣˢᵒᶜ) − (sₖ + αˢᵒᶜpˢˢᵒᶜ)
           c_e_soc = α_soc * c_e_soc + trial_c_e;
-          rhs.bottomRows(y.rows()) = -c_e_soc;
+          c_i_minus_s_soc = α_soc * c_i_minus_s_soc + trial_c_i - trial_s;
+          rhs.segment(0, x.rows()) =
+              -g + A_e.transpose() * y +
+              A_i.transpose() * (μ * s.cwiseInverse() - Σ * c_i_minus_s_soc);
+          rhs.segment(x.rows(), y.rows()) = -c_e_soc;
 
           // Solve the Newton-KKT system
-          compute_step(soc_step);
+          compute_step(soc_step, c_i_minus_s_soc);
 
           // αˢᵒᶜ = max(α ∈ (0, 1] : sₖ + αpₖˢ ≥ (1−τⱼ)sₖ)
           // αₖᶻˢᵒᶜ = max(α ∈ (0, 1] : zₖ + αpₖᶻ ≥ (1−τⱼ)zₖ)
@@ -615,7 +634,7 @@ ExitStatus interior_point(
 
           // Check whether filter accepts trial iterate
           FilterEntry trial_entry{trial_f, trial_s, trial_c_e, trial_c_i, μ};
-          if (filter.try_add(current_entry, trial_entry, step.p_x, g, α)) {
+          if (filter.try_add(current_entry, trial_entry, D_ϕ, α)) {
             step = soc_step;
             α = α_soc;
             α_z = α_z_soc;
@@ -729,9 +748,11 @@ ExitStatus interior_point(
         // is accepted by the normal filter, stop feasibility restoration
         FilterEntry trial_entry{matrices.f(trial_x), trial_s, trial_c_e,
                                 trial_c_i, μ};
+        const Scalar D_ϕ_restoration = g.transpose() * (trial_x - x) -
+                                       μ * s.cwiseInverse().dot(trial_s - s);
         return trial_entry.constraint_violation <
                    Scalar(0.9) * initial_entry.constraint_violation &&
-               filter.try_add(initial_entry, trial_entry, trial_x - x, g, α);
+               filter.try_add(initial_entry, trial_entry, D_ϕ_restoration, α);
       });
       auto status =
           feasibility_restoration<Scalar>(matrices, callbacks, options,

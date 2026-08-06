@@ -13,6 +13,15 @@ final class VariableMatrixJNI extends WPIMathJNI {
   }
 
   /**
+   * Returns the matrix exponential.
+   *
+   * @param mat The flattened row-major matrix.
+   * @param rows The number of rows.
+   * @return The matrix exponential.
+   */
+  static native long[] exp(long[] mat, int rows);
+
+  /**
    * Solves the VariableMatrix equation AX = B for X.
    *
    * @param A The left-hand side as a flattened row-major matrix.
