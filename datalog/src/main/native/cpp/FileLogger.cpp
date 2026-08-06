@@ -39,32 +39,33 @@ FileLogger::FileLogger(std::string_view file,
   if (m_fileHandle == -1 || m_inotifyWatchHandle == -1) {
     return;
   }
-  m_thread = std::thread{[=, this] {
-    char buf[8000];
-    char eventBuf[sizeof(struct inotify_event) + NAME_MAX + 1];
-    lseek(m_fileHandle, 0, SEEK_END);
-    while (m_running) {
-      // A moved-from object has m_inotifyHandle == -1; poll() ignores
-      // negative fds and would return immediately, so exit instead.
-      if (m_inotifyHandle < 0) {
-        break;
-      }
-      // poll() with a timeout instead of a blocking read() so the thread
-      // periodically checks m_running and the destructor can join it even
-      // when the watched file is gone and no events ever arrive.
-      struct pollfd pfd{m_inotifyHandle, POLLIN, 0};
-      if (poll(&pfd, 1, 100) <= 0 || (pfd.revents & POLLIN) == 0) {
-        continue;
-      }
-      if (read(m_inotifyHandle, eventBuf, sizeof(eventBuf)) > 0) {
-        int bufLen = 0;
-        if ((bufLen = read(m_fileHandle, buf, sizeof(buf))) > 0) {
-          callback(std::string_view{buf, static_cast<size_t>(bufLen)});
+  m_thread =
+      std::thread{[callback = std::move(callback), fileHandle = m_fileHandle,
+                   inotifyHandle = m_inotifyHandle, running = m_running] {
+        char buf[8000];
+        char eventBuf[sizeof(struct inotify_event) + NAME_MAX + 1];
+        lseek(fileHandle, 0, SEEK_END);
+        while (running->load()) {
+          // poll() with a timeout instead of a blocking read() so the thread
+          // periodically checks m_running and the destructor can join it even
+          // when the watched file is gone and no events ever arrive.
+          struct pollfd pfd{inotifyHandle, POLLIN, 0};
+          if (poll(&pfd, 1, 100) <= 0) {
+            continue;
+          }
+          if ((pfd.revents & POLLNVAL) != 0) {
+            break;
+          }
+          if ((pfd.revents & POLLIN) != 0 &&
+              read(inotifyHandle, eventBuf, sizeof(eventBuf)) > 0) {
+            int bufLen = 0;
+            if ((bufLen = read(fileHandle, buf, sizeof(buf))) > 0) {
+              callback(std::string_view{buf, static_cast<size_t>(bufLen)});
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+          }
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-      }
-    }
-  }};
+      }};
 #endif
 }
 FileLogger::FileLogger(std::string_view file, log::DataLog& log,
@@ -78,39 +79,54 @@ FileLogger::FileLogger(FileLogger&& other)
     : m_fileHandle{std::exchange(other.m_fileHandle, -1)},
       m_inotifyHandle{std::exchange(other.m_inotifyHandle, -1)},
       m_inotifyWatchHandle{std::exchange(other.m_inotifyWatchHandle, -1)},
-      m_running{true},
+      m_running{std::move(other.m_running)},
       m_thread{std::move(other.m_thread)}
 #endif
 {
 }
 FileLogger& FileLogger::operator=(FileLogger&& rhs) {
 #ifdef __linux__
-  std::swap(m_fileHandle, rhs.m_fileHandle);
-  std::swap(m_inotifyHandle, rhs.m_inotifyHandle);
-  std::swap(m_inotifyWatchHandle, rhs.m_inotifyWatchHandle);
+  if (this == &rhs) {
+    return *this;
+  }
+
+  Stop();
+  m_fileHandle = std::exchange(rhs.m_fileHandle, -1);
+  m_inotifyHandle = std::exchange(rhs.m_inotifyHandle, -1);
+  m_inotifyWatchHandle = std::exchange(rhs.m_inotifyWatchHandle, -1);
+  m_running = std::move(rhs.m_running);
   m_thread = std::move(rhs.m_thread);
 #endif
   return *this;
 }
 FileLogger::~FileLogger() {
 #ifdef __linux__
-  // Stop the reader thread first (it polls with a timeout, so the join
-  // completes quickly) so it never touches the fds after they are closed.
-  m_running = false;
+  Stop();
+#endif
+}
+
+#ifdef __linux__
+void FileLogger::Stop() {
+  if (m_running) {
+    m_running->store(false);
+  }
   if (m_thread.joinable()) {
     m_thread.join();
   }
   if (m_inotifyWatchHandle != -1) {
     inotify_rm_watch(m_inotifyHandle, m_inotifyWatchHandle);
+    m_inotifyWatchHandle = -1;
   }
   if (m_inotifyHandle != -1) {
     close(m_inotifyHandle);
+    m_inotifyHandle = -1;
   }
   if (m_fileHandle != -1) {
     close(m_fileHandle);
+    m_fileHandle = -1;
   }
-#endif
 }
+#endif
 
 std::function<void(std::string_view)> FileLogger::Buffer(
     std::function<void(std::string_view)> callback) {
