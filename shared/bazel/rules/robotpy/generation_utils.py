@@ -27,7 +27,7 @@ def fixup_root_package_name(name):
 
 
 def fixup_native_lib_name(name):
-    return name
+    return name.replace("_", "-")
 
 
 def fixup_shared_lib_name(name):

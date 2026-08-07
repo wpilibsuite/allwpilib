@@ -7,6 +7,7 @@ from jinja2 import BaseLoader, Environment
 from packaging.markers import Marker
 
 from shared.bazel.rules.robotpy.generation_utils import (
+    fixup_native_lib_name,
     fixup_python_dep_name,
     fixup_root_package_name,
 )
@@ -30,12 +31,13 @@ def main():
         return None
 
     def get_pc_dep(library):
-        base_project = library.replace("robotpy-native-", "")
+        base_project = library.replace("robotpy-native-", "").replace("-", "_")
         wpilib_project = fixup_root_package_name(base_project)
-        return f"//{wpilib_project}:native/{base_project}/{library}.pc"
+        native_library = fixup_native_lib_name(library)
+        return f"//{wpilib_project}:native/{base_project}/{native_library}.pc"
 
     def get_python_dep(library):
-        base_project = library.replace("robotpy-native-", "")
+        base_project = library.replace("robotpy-native-", "").replace("-", "_")
         wpilib_project = fixup_root_package_name(base_project)
         return f"//{fixup_root_package_name(wpilib_project)}:{fixup_python_dep_name(library)}"
 

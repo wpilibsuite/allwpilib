@@ -9,7 +9,7 @@ def define_native_wrapper(name, pyproject_toml = None):
     copy_to_directory(
         name = "{}.copy_headers".format(name),
         srcs = native.glob(["src/main/native/include/**"], allow_empty = True) + native.glob(["src/generated/main/native/include/**"], allow_empty = True),
-        out = "native/drivers/include",
+        out = "native/wpilib_drivers/include",
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
             "drivers/src/generated/main/native/include": "",
@@ -19,7 +19,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         visibility = ["//visibility:public"],
     )
 
-    libinit_files = ["native/drivers/_init_robotpy_native_drivers.py"]
+    libinit_files = ["native/wpilib_drivers/_init_robotpy_native_wpilib_drivers.py"]
 
     generate_native_files(
         name = name,
@@ -28,18 +28,18 @@ def define_native_wrapper(name, pyproject_toml = None):
             "//wpilibc:native/wpilib/robotpy-native-wpilib.pc",
         ],
         libinit_files = libinit_files,
-        pc_files = ["native/drivers/robotpy-native-drivers.pc"],
+        pc_files = ["native/wpilib_drivers/robotpy-native-wpilib-drivers.pc"],
     )
 
     copy_native_file(
         name = "drivers",
         library = "shared/drivers",
-        base_path = "native/drivers/",
+        base_path = "native/wpilib_drivers/",
     )
 
     robotpy_library(
         name = name,
-        distribution = "robotpy-native-drivers",
+        distribution = "robotpy-native-wpilib-drivers",
         srcs = libinit_files,
         data = [
             name + ".pc_wrapper",
@@ -55,7 +55,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         strip_path_prefixes = ["drivers"],
         entry_points = {
             "pkg_config": [
-                "drivers = native.drivers",
+                "wpilib_drivers = native.wpilib_drivers",
             ],
         },
     )

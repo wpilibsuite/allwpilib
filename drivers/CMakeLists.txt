@@ -22,7 +22,6 @@ target_include_directories(
 
 install(TARGETS drivers EXPORT drivers)
 export(TARGETS drivers FILE drivers.cmake NAMESPACE drivers::)
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/drivers")
 install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/drivers")
 
 configure_file(drivers-config.cmake.in ${WPILIB_BINARY_DIR}/drivers-config.cmake)
@@ -31,5 +30,5 @@ install(EXPORT drivers DESTINATION share/drivers)
 
 if(WPILIB_WITH_TESTS)
     wpilib_add_test(drivers src/test/native/cpp)
-    target_link_libraries(drivers_test drivers googletest)
+    target_link_libraries(drivers_test drivers)
 endif()

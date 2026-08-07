@@ -19,8 +19,8 @@ MOSTROBOTPY_PROJECTS = [
     ),
     struct(
         wpilib_name = "drivers",
-        robotpy_name = "robotpy-drivers",
-        native_robotpy_name = "robotpy-native-drivers",
+        robotpy_name = "wpilib-drivers",
+        native_robotpy_name = "robotpy-native-wpilib-drivers",
         has_tests = True,
     ),
     struct(

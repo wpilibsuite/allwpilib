@@ -5,7 +5,7 @@ requires = [
     "hatch-meson~=0.1.2",
     "hatch-robotpy~=0.2.1",
     "hatchling",
-    "robotpy-native-drivers==0.0.0",
+    "robotpy-native-wpilib-drivers==0.0.0",
     "wpilib==0.0.0",
 ]
 
@@ -19,7 +19,7 @@ authors = [
 ]
 license = "BSD-3-Clause"
 dependencies = [
-    "robotpy-native-drivers==0.0.0",
+    "robotpy-native-wpilib-drivers==0.0.0",
     "wpilib==0.0.0",
 ]
 
@@ -46,7 +46,7 @@ known_words = ["3V3", "5V", "CAN", "CPU", "DS", "FMS", "FPGA", "HAL", "HTTP", "I
 
 [tool.semiwrap.extension_modules."wpilib_drivers._drivers"]
 name = "drivers"
-wraps = ["robotpy-native-drivers"]
+wraps = ["robotpy-native-wpilib-drivers"]
 depends = ["wpilib"]
 
 [tool.semiwrap.extension_modules."wpilib_drivers._drivers".headers]

@@ -27,14 +27,14 @@ group_id = "org.wpilib.drivers"
 repo_url = ""
 version = "0.0.0"
 
-extract_to = "src/native/drivers"
+extract_to = "src/native/wpilib_drivers"
 libs = ["drivers"]
 
 [[tool.hatch.build.hooks.nativelib.pcfile]]
-pcfile = "src/native/drivers/robotpy-native-drivers.pc"
-name = "drivers"
+pcfile = "src/native/wpilib_drivers/robotpy-native-wpilib-drivers.pc"
+name = "wpilib_drivers"
 
-includedir = "src/native/drivers/include"
-libdir = "src/native/drivers/lib"
+includedir = "src/native/wpilib_drivers/include"
+libdir = "src/native/wpilib_drivers/lib"
 shared_libraries = ["drivers"]
 requires = ["robotpy-native-wpilib"]

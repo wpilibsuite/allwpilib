@@ -84,8 +84,11 @@ class HeaderToDatConfig:
             base_include_file = args[2].relative_to(include_root).as_posix()
             base_library = re.search("native/(.*?)/", include_root).groups(1)[0]
 
-            self.include_file = f"$(execpath :{fixup_native_lib_name('robotpy-native-' + base_library)}.copy_headers)/{base_include_file}"
-            self.include_root = f"$(execpath :{fixup_native_lib_name('robotpy-native-' + base_library)}.copy_headers)"
+            native_library = fixup_native_lib_name("robotpy-native-" + base_library)
+            self.include_file = (
+                f"$(execpath :{native_library}.copy_headers)/{base_include_file}"
+            )
+            self.include_root = f"$(execpath :{native_library}.copy_headers)"
         else:
             root_dir = pathlib.Path.cwd().absolute()
             self.include_file = (
@@ -225,7 +228,7 @@ class BazelExtensionModule:
                     if d == "robotpy-native-mrclib":
                         continue
                     base_library = fixup_root_package_name(
-                        d.replace("robotpy-native-", "")
+                        d.replace("robotpy-native-", "").replace("-", "_")
                     )
                     native_wrapper_dependencies.add(
                         f"//{base_library}:{fixup_native_lib_name(d)}.copy_headers"
@@ -391,7 +394,7 @@ def generate_pybind_build_file(
 
     def target_from_python_dep(python_dep):
         if "native" in python_dep:
-            base_library = python_dep.replace("robotpy-native-", "")
+            base_library = python_dep.replace("robotpy-native-", "").replace("-", "_")
             return f"//{fixup_root_package_name(base_library)}:{fixup_python_dep_name(python_dep)}"
         else:
             base_library = python_dep.replace("robotpy-", "")

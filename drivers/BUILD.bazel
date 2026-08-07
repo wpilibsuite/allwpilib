@@ -143,7 +143,7 @@ cc_test(
     ],
     deps = [
         ":drivers",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 
@@ -179,19 +179,19 @@ package_default_cc_project(
 )
 
 generate_robotpy_native_wrapper_build_info(
-    name = "robotpy-native-drivers-generator",
+    name = "robotpy-native-wpilib-drivers-generator",
     pyproject_toml = "src/main/python/native-pyproject.toml",
 )
 
 define_native_wrapper(
-    name = "robotpy-native-drivers",
+    name = "robotpy-native-wpilib-drivers",
     pyproject_toml = "src/main/python/native-pyproject.toml",
 )
 
 PKG_CONFIG_DEPS = [
     "//datalog:native/datalog/robotpy-native-datalog.pc",
     "//datalog:robotpy-wpilog.generated_pkgcfg_files",
-    "//drivers:native/drivers/robotpy-native-drivers.pc",
+    "//drivers:native/wpilib_drivers/robotpy-native-wpilib-drivers.pc",
     "//hal:native/wpihal/robotpy-native-mrclib.pc",
     "//hal:native/wpihal/robotpy-native-wpihal.pc",
     "//hal:robotpy-hal.generated_pkgcfg_files",
@@ -208,8 +208,8 @@ PKG_CONFIG_DEPS = [
 ]
 
 generate_robotpy_pybind_build_info(
-    name = "robotpy-drivers-generator",
-    additional_srcs = [":robotpy-native-drivers.copy_headers"],
+    name = "wpilib-drivers-generator",
+    additional_srcs = [":robotpy-native-wpilib-drivers.copy_headers"],
     package_root_file = "src/main/python/wpilib_drivers/__init__.py",
     pkgcfgs = PKG_CONFIG_DEPS,
     yaml_files = glob(["src/main/python/semiwrap/**/*.yml"]),
@@ -220,7 +220,7 @@ drivers_extension(
 )
 
 define_pybind_library(
-    name = "robotpy-drivers",
+    name = "wpilib-drivers",
     pkgcfgs = PKG_CONFIG_DEPS,
 )
 
@@ -228,7 +228,7 @@ robotpy_py_test(
     "python_tests",
     srcs = glob(["src/test/python/**/*.py"]),
     deps = [
-        ":robotpy-drivers",
+        ":wpilib-drivers",
         requirement("pytest"),
     ],
 )
