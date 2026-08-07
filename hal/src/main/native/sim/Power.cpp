@@ -73,10 +73,8 @@ void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
     return;
   }
 
-  auto brownoutMillivolts =
-      std::lround(brownoutVoltage * kMillivoltsPerVolt);
-  auto recoveryMillivolts =
-      std::lround(recoveryVoltage * kMillivoltsPerVolt);
+  auto brownoutMillivolts = std::lround(brownoutVoltage * kMillivoltsPerVolt);
+  auto recoveryMillivolts = std::lround(recoveryVoltage * kMillivoltsPerVolt);
   if (recoveryMillivolts <
       brownoutMillivolts + kRecoveryVoltageMinDeltaMillivolts) {
     *status = HAL_PARAMETER_OUT_OF_RANGE;

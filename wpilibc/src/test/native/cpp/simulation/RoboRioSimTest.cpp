@@ -38,9 +38,8 @@ TEST_CASE("RoboRioSimTest SetBrownout", "[wpilibc][simulation]") {
   DoubleCallback recoveryVoltageCallback;
   auto brownoutVoltageCb = RoboRioSim::RegisterBrownoutVoltageCallback(
       brownoutVoltageCallback.GetCallback(), false);
-  auto recoveryVoltageCb =
-      RoboRioSim::RegisterBrownoutRecoveryVoltageCallback(
-          recoveryVoltageCallback.GetCallback(), false);
+  auto recoveryVoltageCb = RoboRioSim::RegisterBrownoutRecoveryVoltageCallback(
+      recoveryVoltageCallback.GetCallback(), false);
   double recoveryVoltageDuringBrownoutCallback = 0.0;
   double brownoutVoltageDuringRecoveryCallback = 0.0;
   auto brownoutConsistencyCb = RoboRioSim::RegisterBrownoutVoltageCallback(
@@ -87,8 +86,7 @@ TEST_CASE("RoboRioSimTest Rejects invalid brownout thresholds",
     HAL_SetBrownoutVoltages(brownoutVoltage, recoveryVoltage, &status);
 
     CHECK(status == HAL_PARAMETER_OUT_OF_RANGE);
-    CHECK(RoboRioSim::GetBrownoutVoltage().value() ==
-          kDefaultBrownoutVoltage);
+    CHECK(RoboRioSim::GetBrownoutVoltage().value() == kDefaultBrownoutVoltage);
     CHECK(RoboRioSim::GetBrownoutRecoveryVoltage().value() ==
           kDefaultRecoveryVoltage);
   };

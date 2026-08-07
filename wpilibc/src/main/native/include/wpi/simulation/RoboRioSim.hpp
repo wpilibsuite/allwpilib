@@ -184,9 +184,8 @@ class RoboRioSim {
    * @return the CallbackStore object associated with this callback
    */
   [[nodiscard]]
-  static std::unique_ptr<CallbackStore>
-  RegisterBrownoutRecoveryVoltageCallback(NotifyCallback callback,
-                                          bool initialNotify);
+  static std::unique_ptr<CallbackStore> RegisterBrownoutRecoveryVoltageCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Measure the brownout recovery voltage.
