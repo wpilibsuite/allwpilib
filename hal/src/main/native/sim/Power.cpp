@@ -44,10 +44,10 @@ void HAL_ResetUserCurrentFaults(int32_t* status) {
 void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
                              int32_t* status) {
   constexpr double kMillivoltsPerVolt = 1000.0;
-  constexpr long kBrownoutVoltageMinMillivolts = 5000;
-  constexpr long kBrownoutVoltageMaxMillivolts = 8000;
-  constexpr long kRecoveryVoltageMaxMillivolts = 8500;
-  constexpr long kRecoveryVoltageMinDeltaMillivolts = 500;
+  constexpr int32_t kBrownoutVoltageMinMillivolts = 5000;
+  constexpr int32_t kBrownoutVoltageMaxMillivolts = 8000;
+  constexpr int32_t kRecoveryVoltageMaxMillivolts = 8500;
+  constexpr int32_t kRecoveryVoltageMinDeltaMillivolts = 500;
 #ifdef WPI_HAL_SIM_HAS_MRCLIB_SYSTEMCORE_H
   static_assert(kBrownoutVoltageMinMillivolts ==
                 MRC_SYSTEMCORE_BROWNOUT_VOLTAGE_MIN_MV);
