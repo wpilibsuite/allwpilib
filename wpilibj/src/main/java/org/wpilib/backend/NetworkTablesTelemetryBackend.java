@@ -94,8 +94,116 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void keepDuplicates() {
-      m_keepDuplicates = true;
-      // TODO: update publisher while not losing last value
+      Publisher oldPub = null;
+      synchronized (this) {
+        if (m_keepDuplicates) {
+          return;
+        }
+        m_keepDuplicates = true;
+
+        Publisher pub = m_pub;
+        if (pub != null) {
+          Publisher newPub = republish(pub);
+          if (newPub != null && newPub.isValid()) {
+            m_pub = newPub;
+            oldPub = pub;
+          } else if (newPub != null) {
+            newPub.close();
+          }
+        }
+      }
+      if (oldPub != null) {
+        oldPub.close();
+      }
+    }
+
+    private Publisher republish(Publisher pub) {
+      return switch (pub) {
+        case BooleanPublisher ignored ->
+            m_inst
+                .getBooleanTopic(m_path)
+                .publishEx(
+                    NetworkTableType.BOOLEAN.getValueStr(),
+                    m_properties,
+                    PubSubOption.KEEP_DUPLICATES);
+        case IntegerPublisher ignored ->
+            m_inst
+                .getIntegerTopic(m_path)
+                .publishEx(
+                    NetworkTableType.INTEGER.getValueStr(),
+                    m_properties,
+                    PubSubOption.KEEP_DUPLICATES);
+        case FloatPublisher ignored ->
+            m_inst
+                .getFloatTopic(m_path)
+                .publishEx(
+                    NetworkTableType.FLOAT.getValueStr(),
+                    m_properties,
+                    PubSubOption.KEEP_DUPLICATES);
+        case DoublePublisher ignored ->
+            m_inst
+                .getDoubleTopic(m_path)
+                .publishEx(
+                    NetworkTableType.DOUBLE.getValueStr(),
+                    m_properties,
+                    PubSubOption.KEEP_DUPLICATES);
+        case StringPublisher ignored ->
+            m_inst
+                .getStringTopic(m_path)
+                .publishEx(m_typeString, m_properties, PubSubOption.KEEP_DUPLICATES);
+        case BooleanArrayPublisher ignored ->
+            m_inst
+                .getBooleanArrayTopic(m_path)
+                .publishEx(
+                    NetworkTableType.BOOLEAN_ARRAY.getValueStr(),
+                    m_properties,
+                    PubSubOption.KEEP_DUPLICATES);
+        case IntegerArrayPublisher ignored ->
+            m_inst
+                .getIntegerArrayTopic(m_path)
+                .publishEx(
+                    NetworkTableType.INTEGER_ARRAY.getValueStr(),
+                    m_properties,
+                    PubSubOption.KEEP_DUPLICATES);
+        case FloatArrayPublisher ignored ->
+            m_inst
+                .getFloatArrayTopic(m_path)
+                .publishEx(
+                    NetworkTableType.FLOAT_ARRAY.getValueStr(),
+                    m_properties,
+                    PubSubOption.KEEP_DUPLICATES);
+        case DoubleArrayPublisher ignored ->
+            m_inst
+                .getDoubleArrayTopic(m_path)
+                .publishEx(
+                    NetworkTableType.DOUBLE_ARRAY.getValueStr(),
+                    m_properties,
+                    PubSubOption.KEEP_DUPLICATES);
+        case StringArrayPublisher ignored ->
+            m_inst
+                .getStringArrayTopic(m_path)
+                .publishEx(
+                    NetworkTableType.STRING_ARRAY.getValueStr(),
+                    m_properties,
+                    PubSubOption.KEEP_DUPLICATES);
+        case RawPublisher ignored ->
+            m_inst
+                .getRawTopic(m_path)
+                .publishEx(m_typeString, m_properties, PubSubOption.KEEP_DUPLICATES);
+        case StructPublisher<?> ignored ->
+            m_inst
+                .getStructTopic(m_path, m_struct)
+                .publishEx(m_properties, PubSubOption.KEEP_DUPLICATES);
+        case StructArrayPublisher<?> ignored ->
+            m_inst
+                .getStructArrayTopic(m_path, m_struct)
+                .publishEx(m_properties, PubSubOption.KEEP_DUPLICATES);
+        case ProtobufPublisher<?> ignored ->
+            m_inst
+                .getProtobufTopic(m_path, m_proto)
+                .publishEx(m_properties, PubSubOption.KEEP_DUPLICATES);
+        default -> null;
+      };
     }
 
     synchronized void refreshProperties() {

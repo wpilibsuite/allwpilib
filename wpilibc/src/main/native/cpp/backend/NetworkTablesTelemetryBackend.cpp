@@ -27,8 +27,18 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
       : m_inst{inst}, m_path{std::format("{}{}", prefix, path)} {}
 
   void KeepDuplicates() override {
+    std::scoped_lock lock{m_mutex};
+    if (m_keepDuplicates) {
+      return;
+    }
     m_keepDuplicates = true;
-    // TODO: update publisher
+    if (m_pub) {
+      auto newPub = Publish(m_typeString);
+      if (newPub) {
+        auto oldPub = std::move(m_pub);
+        m_pub = std::move(newPub);
+      }
+    }
   }
 
   void SetProperty(std::string_view key, std::string_view value) override {
@@ -57,8 +67,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
   void LogBoolean(bool value) override {
     std::scoped_lock lock{m_mutex};
     if (!m_pub) {
-      m_pub = m_inst.GetTopic(m_path).GenericPublishEx(
-          "boolean", m_properties, {.keepDuplicates = m_keepDuplicates});
+      m_pub = Publish("boolean");
     }
     if (!m_pub.SetBoolean(value)) {
       wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
@@ -68,8 +77,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
   void LogInt64(int64_t value) override {
     std::scoped_lock lock{m_mutex};
     if (!m_pub) {
-      m_pub = m_inst.GetTopic(m_path).GenericPublishEx(
-          "int", m_properties, {.keepDuplicates = m_keepDuplicates});
+      m_pub = Publish("int");
     }
     if (!m_pub.SetInteger(value)) {
       wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
@@ -79,8 +87,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
   void LogFloat(float value) override {
     std::scoped_lock lock{m_mutex};
     if (!m_pub) {
-      m_pub = m_inst.GetTopic(m_path).GenericPublishEx(
-          "float", m_properties, {.keepDuplicates = m_keepDuplicates});
+      m_pub = Publish("float");
     }
     if (!m_pub.SetFloat(value)) {
       wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
@@ -90,8 +97,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
   void LogDouble(double value) override {
     std::scoped_lock lock{m_mutex};
     if (!m_pub) {
-      m_pub = m_inst.GetTopic(m_path).GenericPublishEx(
-          "double", m_properties, {.keepDuplicates = m_keepDuplicates});
+      m_pub = Publish("double");
     }
     if (!m_pub.SetDouble(value)) {
       wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
@@ -101,9 +107,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
   void LogString(std::string_view value, std::string_view typeString) override {
     std::scoped_lock lock{m_mutex};
     if (!m_pub) {
-      m_typeString = typeString;
-      m_pub = m_inst.GetTopic(m_path).GenericPublishEx(
-          typeString, m_properties, {.keepDuplicates = m_keepDuplicates});
+      m_pub = Publish(typeString);
     }
     if (m_typeString != typeString || !m_pub.SetString(value)) {
       wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
@@ -113,8 +117,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
   void LogBooleanArray(std::span<const bool> value) override {
     std::scoped_lock lock{m_mutex};
     if (!m_pub) {
-      m_pub = m_inst.GetTopic(m_path).GenericPublishEx(
-          "boolean[]", m_properties, {.keepDuplicates = m_keepDuplicates});
+      m_pub = Publish("boolean[]");
     }
     if (!m_pub.SetBooleanArray(value)) {
       wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
@@ -124,8 +127,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
   void LogBooleanArray(std::span<const int> value) override {
     std::scoped_lock lock{m_mutex};
     if (!m_pub) {
-      m_pub = m_inst.GetTopic(m_path).GenericPublishEx(
-          "boolean[]", m_properties, {.keepDuplicates = m_keepDuplicates});
+      m_pub = Publish("boolean[]");
     }
     if (!m_pub.SetBooleanArray(value)) {
       wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
@@ -145,8 +147,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
   void LogInt64Array(std::span<const int64_t> value) override {
     std::scoped_lock lock{m_mutex};
     if (!m_pub) {
-      m_pub = m_inst.GetTopic(m_path).GenericPublishEx(
-          "int[]", m_properties, {.keepDuplicates = m_keepDuplicates});
+      m_pub = Publish("int[]");
     }
     if (!m_pub.SetIntegerArray(value)) {
       wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
@@ -156,8 +157,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
   void LogFloatArray(std::span<const float> value) override {
     std::scoped_lock lock{m_mutex};
     if (!m_pub) {
-      m_pub = m_inst.GetTopic(m_path).GenericPublishEx(
-          "float[]", m_properties, {.keepDuplicates = m_keepDuplicates});
+      m_pub = Publish("float[]");
     }
     if (!m_pub.SetFloatArray(value)) {
       wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
@@ -167,8 +167,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
   void LogDoubleArray(std::span<const double> value) override {
     std::scoped_lock lock{m_mutex};
     if (!m_pub) {
-      m_pub = m_inst.GetTopic(m_path).GenericPublishEx(
-          "double[]", m_properties, {.keepDuplicates = m_keepDuplicates});
+      m_pub = Publish("double[]");
     }
     if (!m_pub.SetDoubleArray(value)) {
       wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
@@ -178,8 +177,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
   void LogStringArray(std::span<const std::string> value) override {
     std::scoped_lock lock{m_mutex};
     if (!m_pub) {
-      m_pub = m_inst.GetTopic(m_path).GenericPublishEx(
-          "string[]", m_properties, {.keepDuplicates = m_keepDuplicates});
+      m_pub = Publish("string[]");
     }
     if (!m_pub.SetStringArray(value)) {
       wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
@@ -199,9 +197,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
               std::string_view typeString) override {
     std::scoped_lock lock{m_mutex};
     if (!m_pub) {
-      m_typeString = typeString;
-      m_pub = m_inst.GetTopic(m_path).GenericPublishEx(
-          typeString, m_properties, {.keepDuplicates = m_keepDuplicates});
+      m_pub = Publish(typeString);
     }
     if (m_typeString != typeString || !m_pub.SetRaw(value)) {
       wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
@@ -209,6 +205,12 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
   }
 
  private:
+  wpi::nt::GenericPublisher Publish(std::string_view typeString) {
+    m_typeString = typeString;
+    return m_inst.GetTopic(m_path).GenericPublishEx(
+        m_typeString, m_properties, {.keepDuplicates = m_keepDuplicates});
+  }
+
   wpi::nt::NetworkTableInstance m_inst;
   std::string m_path;
   wpi::util::mutex m_mutex;

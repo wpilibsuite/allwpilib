@@ -13,6 +13,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/GenericEntry.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/ProtobufTopic.hpp"
@@ -202,4 +203,23 @@ TEST_CASE_METHOD(NetworkTablesTelemetryBackendTest,
   CHECK(0.0 == min.get_number());
   CHECK(10.0 == max.get_number());
   CHECK("m/s" == unit.get_string());
+}
+
+TEST_CASE_METHOD(
+    NetworkTablesTelemetryBackendTest,
+    "NetworkTablesTelemetryBackendTest KeepDuplicatesAfterPublishing",
+    "[wpilibc][telemetry]") {
+  auto sub = inst.GetDoubleTopic("/Telemetry/duplicates")
+                 .Subscribe(0.0, {.pollStorage = 10, .keepDuplicates = true});
+
+  wpi::Telemetry::Log("duplicates", 1.0);
+  wpi::Telemetry::KeepDuplicates("duplicates");
+  CHECK(1.0 == sub.Get());
+
+  wpi::Telemetry::Log("duplicates", 1.0);
+
+  auto values = sub.ReadQueue();
+  REQUIRE(2u == values.size());
+  CHECK(1.0 == values[0].value);
+  CHECK(1.0 == values[1].value);
 }

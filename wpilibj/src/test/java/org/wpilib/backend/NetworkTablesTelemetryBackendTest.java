@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.PubSubOption;
 import org.wpilib.telemetry.Telemetry;
 import org.wpilib.telemetry.TelemetryRegistry;
 
@@ -122,6 +123,22 @@ class NetworkTablesTelemetryBackendTest {
 
     assertEquals("0", m_inst.getTopic("/Telemetry/speed").getProperty("min"));
     assertEquals("10", m_inst.getTopic("/Telemetry/speed").getProperty("max"));
+  }
+
+  @Test
+  void keepDuplicatesAfterPublishingReconfiguresPublisher() {
+    var sub =
+        m_inst
+            .getDoubleTopic("/Telemetry/duplicates")
+            .subscribe(0.0, new PubSubOption.PollStorage(10), PubSubOption.KEEP_DUPLICATES);
+
+    Telemetry.log("duplicates", 1.0);
+    Telemetry.keepDuplicates("duplicates");
+    assertEquals(1.0, sub.get());
+
+    Telemetry.log("duplicates", 1.0);
+
+    assertArrayEquals(new double[] {1.0, 1.0}, sub.readQueueValues());
   }
 
   private org.wpilib.networktables.GenericEntry entry(String name) {
