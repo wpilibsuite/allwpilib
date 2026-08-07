@@ -108,7 +108,7 @@ class TunableRegistry final {
                       std::unique_ptr<detail::TunableMemberBase> member);
 
   /**
-   * Removes a tunable.
+   * Removes a tunable and any descendant tunables.
    * @param path normalized path
    */
   static void Remove(std::string_view path);

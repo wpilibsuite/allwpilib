@@ -148,7 +148,7 @@ class Tunables final {
   }
 
   /**
-   * Removes a tunable.
+   * Removes a tunable and any descendant tunables.
    * @param name name
    */
   static void Remove(std::string_view name);

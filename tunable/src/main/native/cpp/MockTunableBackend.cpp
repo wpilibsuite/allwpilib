@@ -185,6 +185,9 @@ void MockTunableBackend::Remove(std::string_view path) {
     auto uidIt = m_uids.find(uid);
     if (uidIt != m_uids.end()) {
       std::erase(uidIt->second, path);
+      if (uidIt->second.empty()) {
+        m_uids.erase(uidIt);
+      }
     }
     m_tunables.erase(it);
     std::erase_if(m_actions, [&](auto&& action) { return action.uid == uid; });

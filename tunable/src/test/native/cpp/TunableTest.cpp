@@ -657,6 +657,24 @@ TEST_CASE_METHOD(TunableTest,
   CHECK(complex.updateCount == 1);
 }
 
+TEST_CASE_METHOD(TunableTest, "TunableTest RemoveComplexTunableRemovesMembers",
+                 "[tunable]") {
+  MemberComplex complex;
+  Tunables::Publish("complex", complex);
+
+  Tunables::Remove("complex");
+
+  CHECK_THROWS_AS(backend->SetInt32("/complex/gain", 10), std::runtime_error);
+  CHECK_THROWS_AS(backend->SetStruct<TestStruct>("/complex/point", {11, 12}),
+                  std::runtime_error);
+  TunableRegistry::Update();
+
+  CHECK(complex.gain == 1);
+  CHECK(complex.point.a == 2);
+  CHECK(complex.point.b == 3);
+  CHECK(complex.updateCount == 0);
+}
+
 TEST_CASE_METHOD(TunableTest,
                  "TunableTest ComplexTunableDirectStructSerializableMember",
                  "[tunable]") {

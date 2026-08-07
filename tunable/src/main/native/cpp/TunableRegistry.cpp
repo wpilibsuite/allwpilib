@@ -247,8 +247,13 @@ void TunableRegistry::Remove(std::string_view path) {
   // Backends may have changed since publishing, so remove from all backends
   Instance& inst = GetInstance();
   std::scoped_lock lock{inst.backendsMutex};
+  std::string childPrefix{path};
+  if (childPrefix.empty() || childPrefix.back() != '/') {
+    childPrefix.push_back('/');
+  }
   for (auto backend : inst.backends) {
     backend->Remove(path);
+    backend->RemovePrefix(childPrefix);
   }
 }
 
