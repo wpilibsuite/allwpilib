@@ -5,6 +5,7 @@
 #include "wpi/math/controller/PIDController.hpp"
 
 #include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/tunable/TunableConfig.hpp"
 #include "wpi/tunable/TunableTable.hpp"
 
 using namespace wpi::math;
@@ -31,7 +32,17 @@ void PIDController::PublishTunable(wpi::TunableTable& table) {
   table.Publish("i", m_Ki);
   table.Publish("d", m_Kd);
   table.Publish("izone", m_iZone);
-  table.Publish("setpoint", m_setpoint);
+  table.Publish(
+      "setpoint", this, &PIDController::m_setpoint,
+      wpi::TunableConfig{
+          .onTune =
+              [](wpi::detail::TunableBase&, wpi::ComplexTunable* self) {
+                if (auto controller = static_cast<PIDController*>(self)) {
+                  controller->SetSetpoint(controller->GetSetpoint());
+                }
+              },
+          .parent = this,
+          .alwaysGet = true});
 }
 
 std::string_view PIDController::GetTunableType() const {

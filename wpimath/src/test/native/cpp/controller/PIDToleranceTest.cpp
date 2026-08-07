@@ -2,10 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <memory>
+
 #include <catch2/catch_message.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/controller/PIDController.hpp"
+#include "wpi/tunable/MockTunableBackend.hpp"
+#include "wpi/tunable/TunableRegistry.hpp"
+#include "wpi/tunable/Tunables.hpp"
 
 static constexpr double kSetpoint = 50.0;
 static constexpr double kRange = 200;
@@ -16,6 +21,29 @@ TEST_CASE("PIDToleranceTest InitialTolerance", "[wpimath]") {
   controller.EnableContinuousInput(-kRange / 2, kRange / 2);
 
   CHECK_FALSE(controller.AtSetpoint());
+}
+
+TEST_CASE("PIDToleranceTest TunedSetpointUpdatesSetpointState", "[wpimath]") {
+  wpi::TunableRegistry::Reset();
+  auto backend = std::make_shared<wpi::MockTunableBackend>();
+  wpi::TunableRegistry::RegisterBackend("", backend);
+
+  wpi::math::PIDController controller{0.5, 0.0, 0.0};
+  wpi::Tunables::Publish("pid", controller);
+
+  CHECK_FALSE(controller.AtSetpoint());
+
+  backend->SetDouble("/pid/setpoint", kSetpoint);
+  wpi::TunableRegistry::Update();
+
+  CHECK(controller.GetSetpoint() == kSetpoint);
+  CHECK(controller.GetError() == kSetpoint);
+
+  controller.Calculate(kSetpoint);
+
+  CHECK(controller.AtSetpoint());
+
+  wpi::TunableRegistry::Reset();
 }
 
 TEST_CASE("PIDToleranceTest AbsoluteTolerance", "[wpimath]") {

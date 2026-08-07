@@ -419,7 +419,7 @@ class WPILIB_DLLEXPORT PIDController : public wpi::TelemetryLoggable,
   double m_errorTolerance = 0.05;
   double m_errorDerivativeTolerance = std::numeric_limits<double>::infinity();
 
-  wpi::Tunable<double> m_setpoint{0.0};
+  double m_setpoint = 0.0;
   double m_measurement = 0;
 
   bool m_haveSetpoint = false;
