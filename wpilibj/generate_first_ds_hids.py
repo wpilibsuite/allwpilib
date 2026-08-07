@@ -9,13 +9,13 @@ import re
 import sys
 from pathlib import Path
 
-
 # When invoked directly, Python puts the script directory on sys.path.
 # Add the repo root so absolute package imports still work.
 sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 from jinja2 import Environment, FileSystemLoader
-from shared.generation import write_file, add_jinja_args, make_arg_parser
+
+from shared.generation import add_jinja_args, make_arg_parser, write_file
 
 
 def _capitalize_first(name: str) -> str:
