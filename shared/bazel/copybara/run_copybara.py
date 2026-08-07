@@ -5,6 +5,7 @@ import os
 import pathlib
 import re
 import subprocess
+import tomllib
 from typing import Optional
 
 
@@ -77,7 +78,9 @@ def checkout_branch(auto_delete_branch: bool, branch_name: str):
     subprocess.check_call(["git", "checkout", branch_name])
 
 
-def update_mostrobotpy_rdev(wpilib_bin_version: str, is_development_build: bool):
+def update_mostrobotpy_rdev(
+    wpilib_bin_version: str, mrclib_version, is_development_build: bool
+):
     with open("rdev.toml") as f:
         contents = f.read()
 
@@ -90,6 +93,11 @@ def update_mostrobotpy_rdev(wpilib_bin_version: str, is_development_build: bool)
     contents = re.sub(
         'wpilib_bin_version = ".*"',
         f'wpilib_bin_version = "{wpilib_bin_version}"',
+        contents,
+    )
+    contents = re.sub(
+        'mrclib_bin_version = ".*"',
+        f'mrclib_bin_version = "{mrclib_version}"',
         contents,
     )
     contents = re.sub(
@@ -107,18 +115,20 @@ def allwpilib_to_mostrobotpy(
     mostrobotpy_local_repository: str,
     mostrobotpy_fork_repo: str,
     wpilib_bin_version: str,
+    mrclib_version: str,
     is_development_build: bool,
     auto_delete_branch: bool,
     force: bool,
     verbose: bool,
 ):
+
     run_copybara(
         copybara_file, "allwpilib_to_mostrobotpy", mostrobotpy_fork_repo, force, verbose
     )
 
     os.chdir(mostrobotpy_local_repository)
     checkout_branch(auto_delete_branch, "copybara_allwpilib_to_mostrobotpy")
-    update_mostrobotpy_rdev(wpilib_bin_version, is_development_build)
+    update_mostrobotpy_rdev(wpilib_bin_version, mrclib_version, is_development_build)
 
     # Run black
     subprocess.check_call(["black", "."])
@@ -224,11 +234,18 @@ def main():
             raise Exception(
                 "You mist specify mostrobotpy_fork_repo, either on the command line or in your user config"
             )
+
+        versions_file = script_dir / "../../../gradle/libs.versions.toml"
+        with versions_file.open("rb") as f:
+            versions = tomllib.load(f)["versions"]
+        mrclib_version = versions["mrclib"]
+
         allwpilib_to_mostrobotpy(
             copybara_file,
             args.mostrobotpy_local_repo_path,
             args.mostrobotpy_fork_repo,
             args.wpilib_bin_version,
+            mrclib_version,
             args.development_build,
             args.auto_delete_branch,
             args.force,
