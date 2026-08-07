@@ -32,7 +32,8 @@ void wpi::glass::DisplayAnalogInput(AnalogInputModel* model, int index) {
   }
 
   if (auto simDevice = model->GetSimDevice()) {
-    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
     ImGui::LabelText(label, "%s", simDevice);
     ImGui::PopStyleColor();
   } else {

@@ -23,7 +23,8 @@ void wpi::glass::DisplayGyro(GyroModel* m) {
 
   auto angle = m->GetAngleData();
   if (!angle || !m->Exists()) {
-    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
     ImGui::Text("Unknown Gyro");
     ImGui::PopStyleColor();
     return;

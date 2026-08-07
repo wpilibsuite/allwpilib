@@ -60,7 +60,8 @@ void wpi::glass::DisplayPIDController(PIDControllerModel* m) {
                                     [=](auto v) { m->SetIZone(v); });
     }
   } else {
-    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
     ImGui::Text("Unknown PID Controller");
     ImGui::PopStyleColor();
   }

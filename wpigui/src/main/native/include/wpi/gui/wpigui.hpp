@@ -222,7 +222,6 @@ void SetStyle(Style style);
  */
 void SetFPS(int fps);
 
-
 /**
  * Gets the (platform-specific) absolute directory for save files.
  *

@@ -27,7 +27,8 @@ void wpi::glass::DisplayCommandSelector(CommandSelectorModel* m) {
       }
     }
   } else {
-    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
     ImGui::Text("Unknown Command");
     ImGui::PopStyleColor();
   }

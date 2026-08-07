@@ -94,7 +94,8 @@ void wpi::glass::DisplayDS(DSModel* model, bool editableDsAttached) {
 void wpi::glass::DisplayDSReadOnly(DSModel* model) {
   bool exists = model->Exists();
   if (!exists) {
-    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
   }
 
   if (auto data = model->GetEStopData()) {

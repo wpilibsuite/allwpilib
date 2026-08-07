@@ -54,7 +54,8 @@ void EncoderModel::SetName(std::string_view name) {
 
 void wpi::glass::DisplayEncoder(EncoderModel* model) {
   if (auto simDevice = model->GetSimDevice()) {
-    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
     ImGui::TextUnformatted(simDevice);
     ImGui::PopStyleColor();
     return;

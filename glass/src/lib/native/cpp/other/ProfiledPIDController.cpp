@@ -69,7 +69,8 @@ void wpi::glass::DisplayProfiledPIDController(ProfiledPIDControllerModel* m) {
       createTuningParameter("Goal", &value, [=](auto v) { m->SetGoal(v); });
     }
   } else {
-    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
     ImGui::Text("Unknown PID Controller");
     ImGui::PopStyleColor();
   }

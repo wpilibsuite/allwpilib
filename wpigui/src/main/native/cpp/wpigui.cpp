@@ -1648,12 +1648,9 @@ static void ApplyCommonStyle(Style selectedStyle) {
   plotStyle.Colors[ImPlotCol_AxisText] = palette.textDisabled;
   plotStyle.Colors[ImPlotCol_AxisGrid] = withAlpha(palette.border, 0.60f);
   plotStyle.Colors[ImPlotCol_AxisTick] = palette.border;
-  plotStyle.Colors[ImPlotCol_AxisBgHovered] =
-      withAlpha(palette.accent, 0.35f);
-  plotStyle.Colors[ImPlotCol_AxisBgActive] =
-      withAlpha(palette.accent, 0.55f);
-  plotStyle.Colors[ImPlotCol_Selection] =
-      withAlpha(palette.accent, 0.45f);
+  plotStyle.Colors[ImPlotCol_AxisBgHovered] = withAlpha(palette.accent, 0.35f);
+  plotStyle.Colors[ImPlotCol_AxisBgActive] = withAlpha(palette.accent, 0.55f);
+  plotStyle.Colors[ImPlotCol_Selection] = withAlpha(palette.accent, 0.45f);
   plotStyle.Colors[ImPlotCol_Crosshairs] = palette.accentStrong;
   plotStyle.PlotBorderSize = 1.0f;
   plotStyle.MinorAlpha = 0.18f;
@@ -1700,7 +1697,6 @@ void gui::SetStyle(Style style) {
 void gui::SetFPS(int fps) {
   SetFPSInternal(fps);
 }
-
 
 std::string gui::GetPlatformSaveFileDir() {
 #if defined(_MSC_VER)
