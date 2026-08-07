@@ -18,9 +18,7 @@ def remove_tag(f: str):
         return False
     if "16h5" in f:
         return False
-    if "tag" in f:
-        return True
-    return False
+    return "tag" in f
 
 
 def copy_upstream_src(wpilib_root: Path):
@@ -39,10 +37,10 @@ def copy_upstream_src(wpilib_root: Path):
     # Copy apriltag source files into allwpilib
     src_files = walk_cwd_and_copy_if(
         lambda dp, f: (
-            (f.endswith(".c") or f.endswith(".cpp"))
+            f.endswith((".c", ".cpp"))
             and not has_prefix(dp, Path("example"))
             and not has_prefix(dp, Path("test"))
-            and not f == "getopt.c"
+            and f != "getopt.c"
             and "py" not in f
             and not remove_tag(f)
         ),
@@ -53,8 +51,8 @@ def copy_upstream_src(wpilib_root: Path):
     walk_cwd_and_copy_if(
         lambda dp, f: (
             f.endswith(".h")
-            and not f == "getopt.h"
-            and not f == "postscript_utils.h"
+            and f != "getopt.h"
+            and f != "postscript_utils.h"
             and not remove_tag(f)
         ),
         apriltag / "src/main/native/thirdparty/apriltag/include",
