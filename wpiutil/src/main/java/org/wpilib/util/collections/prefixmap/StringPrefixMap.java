@@ -17,6 +17,7 @@
 package org.wpilib.util.collections.prefixmap;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -34,12 +35,14 @@ import org.wpilib.util.collections.PrefixMap;
 public class StringPrefixMap<V> implements PrefixMap<V> {
   private final PrefixTrie<V> m_prefixTrie;
   private final TreeMap<String, V> m_allPrefixes;
+  private final Map<String, V> m_allPrefixesView;
 
   /** Constructor. */
   @SuppressWarnings("this-escape")
   public StringPrefixMap() {
     m_prefixTrie = new StringPrefixTrie<>();
     m_allPrefixes = new TreeMap<>();
+    m_allPrefixesView = Collections.unmodifiableMap(m_allPrefixes);
   }
 
   @Override
@@ -104,7 +107,7 @@ public class StringPrefixMap<V> implements PrefixMap<V> {
 
   @Override
   public Set<Map.Entry<String, V>> entrySet() {
-    return m_allPrefixes.entrySet();
+    return m_allPrefixesView.entrySet();
   }
 
   @Override
@@ -119,11 +122,11 @@ public class StringPrefixMap<V> implements PrefixMap<V> {
 
   @Override
   public Set<String> keySet() {
-    return m_allPrefixes.keySet();
+    return m_allPrefixesView.keySet();
   }
 
   @Override
   public Collection<V> values() {
-    return m_allPrefixes.values();
+    return m_allPrefixesView.values();
   }
 }

@@ -7,6 +7,7 @@ package org.wpilib.util.collections.prefixmap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -40,5 +41,28 @@ class StringPrefixMapTest {
     assertNull(map.get("/Other"));
     assertNull(map.get(null));
     assertNull(map.get(1));
+  }
+
+  @Test
+  void mapViewsAreUnmodifiable() {
+    var map = new StringPrefixMap<String>();
+    map.put("/Telemetry", "value");
+
+    var entryIterator = map.entrySet().iterator();
+    var entry = entryIterator.next();
+    assertThrows(UnsupportedOperationException.class, () -> entry.setValue("new"));
+    assertThrows(UnsupportedOperationException.class, entryIterator::remove);
+
+    var keyIterator = map.keySet().iterator();
+    keyIterator.next();
+    assertThrows(UnsupportedOperationException.class, keyIterator::remove);
+
+    var valueIterator = map.values().iterator();
+    valueIterator.next();
+    assertThrows(UnsupportedOperationException.class, valueIterator::remove);
+
+    assertEquals("value", map.get("/Telemetry"));
+    assertEquals("value", map.getLongestMatch("/Telemetry/value"));
+    assertEquals(Set.of(Map.entry("/Telemetry", "value")), map.entrySet());
   }
 }
