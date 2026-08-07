@@ -41,18 +41,37 @@ TEST_CASE("RoboRioSimTest SetBrownout", "[wpilibc][simulation]") {
   auto recoveryVoltageCb =
       RoboRioSim::RegisterBrownoutRecoveryVoltageCallback(
           recoveryVoltageCallback.GetCallback(), false);
-  constexpr double kTestBrownoutVoltage = 7.501;
-  constexpr double kTestRecoveryVoltage = 8.001;
+  double recoveryVoltageDuringBrownoutCallback = 0.0;
+  double brownoutVoltageDuringRecoveryCallback = 0.0;
+  auto brownoutConsistencyCb = RoboRioSim::RegisterBrownoutVoltageCallback(
+      [&](std::string_view, const HAL_Value*) {
+        recoveryVoltageDuringBrownoutCallback =
+            RoboRioSim::GetBrownoutRecoveryVoltage().value();
+      },
+      false);
+  auto recoveryConsistencyCb =
+      RoboRioSim::RegisterBrownoutRecoveryVoltageCallback(
+          [&](std::string_view, const HAL_Value*) {
+            brownoutVoltageDuringRecoveryCallback =
+                RoboRioSim::GetBrownoutVoltage().value();
+          },
+          false);
+  constexpr double kRequestedBrownoutVoltage = 7.5004;
+  constexpr double kRequestedRecoveryVoltage = 8.0003;
+  constexpr double kExpectedBrownoutVoltage = 7.5;
+  constexpr double kExpectedRecoveryVoltage = 8.0;
 
   RobotController::SetBrownoutVoltages(
-      wpi::units::volt_t{kTestBrownoutVoltage},
-      wpi::units::volt_t{kTestRecoveryVoltage});
+      wpi::units::volt_t{kRequestedBrownoutVoltage},
+      wpi::units::volt_t{kRequestedRecoveryVoltage});
   CHECK(brownoutVoltageCallback.WasTriggered());
   CHECK(recoveryVoltageCallback.WasTriggered());
-  CHECK(kTestBrownoutVoltage == brownoutVoltageCallback.GetLastValue());
-  CHECK(kTestRecoveryVoltage == recoveryVoltageCallback.GetLastValue());
-  CHECK(kTestBrownoutVoltage == RoboRioSim::GetBrownoutVoltage().value());
-  CHECK(kTestRecoveryVoltage ==
+  CHECK(kExpectedBrownoutVoltage == brownoutVoltageCallback.GetLastValue());
+  CHECK(kExpectedRecoveryVoltage == recoveryVoltageCallback.GetLastValue());
+  CHECK(kExpectedRecoveryVoltage == recoveryVoltageDuringBrownoutCallback);
+  CHECK(kExpectedBrownoutVoltage == brownoutVoltageDuringRecoveryCallback);
+  CHECK(kExpectedBrownoutVoltage == RoboRioSim::GetBrownoutVoltage().value());
+  CHECK(kExpectedRecoveryVoltage ==
         RoboRioSim::GetBrownoutRecoveryVoltage().value());
 }
 

@@ -5,6 +5,7 @@
 #include "wpi/hal/Power.h"
 
 #include <cmath>
+#include <mutex>
 
 #include "mockdata/RoboRioDataInternal.hpp"
 #include "mrclib/Systemcore.h"
@@ -67,8 +68,19 @@ void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
     return;
   }
 
-  SimRoboRioData->brownoutVoltage = brownoutVoltage;
-  SimRoboRioData->brownoutRecoveryVoltage = recoveryVoltage;
+  auto& brownoutValue = SimRoboRioData->brownoutVoltage;
+  auto& recoveryValue = SimRoboRioData->brownoutRecoveryVoltage;
+  std::scoped_lock lock{brownoutValue.GetMutex(), recoveryValue.GetMutex()};
+  bool brownoutChanged =
+      brownoutValue.SetNoNotify(brownoutMillivolts / kMillivoltsPerVolt);
+  bool recoveryChanged =
+      recoveryValue.SetNoNotify(recoveryMillivolts / kMillivoltsPerVolt);
+  if (brownoutChanged) {
+    brownoutValue.Notify();
+  }
+  if (recoveryChanged) {
+    recoveryValue.Notify();
+  }
   *status = HAL_SUCCESS;
 }
 double HAL_GetCPUTemp(int32_t* status) {

@@ -39,20 +39,37 @@ class RoboRioSimTest {
 
     DoubleCallback brownoutVoltageCallback = new DoubleCallback();
     DoubleCallback recoveryVoltageCallback = new DoubleCallback();
+    double[] recoveryVoltageDuringBrownoutCallback = {0.0};
+    double[] brownoutVoltageDuringRecoveryCallback = {0.0};
     try (CallbackStore brownoutVoltageCb =
             RoboRioSim.registerBrownoutVoltageCallback(brownoutVoltageCallback, false);
         CallbackStore recoveryVoltageCb =
-            RoboRioSim.registerBrownoutRecoveryVoltageCallback(recoveryVoltageCallback, false)) {
-      final double kTestBrownoutVoltage = 7.501;
-      final double kTestRecoveryVoltage = 8.001;
+            RoboRioSim.registerBrownoutRecoveryVoltageCallback(recoveryVoltageCallback, false);
+        CallbackStore brownoutConsistencyCb =
+            RoboRioSim.registerBrownoutVoltageCallback(
+                (name, value) ->
+                    recoveryVoltageDuringBrownoutCallback[0] =
+                        RoboRioSim.getBrownoutRecoveryVoltage(),
+                false);
+        CallbackStore recoveryConsistencyCb =
+            RoboRioSim.registerBrownoutRecoveryVoltageCallback(
+                (name, value) ->
+                    brownoutVoltageDuringRecoveryCallback[0] = RoboRioSim.getBrownoutVoltage(),
+                false)) {
+      final double kRequestedBrownoutVoltage = 7.5004;
+      final double kRequestedRecoveryVoltage = 8.0003;
+      final double kExpectedBrownoutVoltage = 7.5;
+      final double kExpectedRecoveryVoltage = 8.0;
 
-      RobotController.setBrownoutVoltages(kTestBrownoutVoltage, kTestRecoveryVoltage);
+      RobotController.setBrownoutVoltages(kRequestedBrownoutVoltage, kRequestedRecoveryVoltage);
       assertTrue(brownoutVoltageCallback.wasTriggered());
       assertTrue(recoveryVoltageCallback.wasTriggered());
-      assertEquals(kTestBrownoutVoltage, brownoutVoltageCallback.getSetValue());
-      assertEquals(kTestRecoveryVoltage, recoveryVoltageCallback.getSetValue());
-      assertEquals(kTestBrownoutVoltage, RoboRioSim.getBrownoutVoltage());
-      assertEquals(kTestRecoveryVoltage, RoboRioSim.getBrownoutRecoveryVoltage());
+      assertEquals(kExpectedBrownoutVoltage, brownoutVoltageCallback.getSetValue());
+      assertEquals(kExpectedRecoveryVoltage, recoveryVoltageCallback.getSetValue());
+      assertEquals(kExpectedRecoveryVoltage, recoveryVoltageDuringBrownoutCallback[0]);
+      assertEquals(kExpectedBrownoutVoltage, brownoutVoltageDuringRecoveryCallback[0]);
+      assertEquals(kExpectedBrownoutVoltage, RoboRioSim.getBrownoutVoltage());
+      assertEquals(kExpectedRecoveryVoltage, RoboRioSim.getBrownoutRecoveryVoltage());
     }
   }
 
