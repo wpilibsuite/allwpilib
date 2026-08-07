@@ -32,16 +32,26 @@ TEST_CASE("RoboRioSimTest SetVin", "[wpilibc][simulation]") {
 TEST_CASE("RoboRioSimTest SetBrownout", "[wpilibc][simulation]") {
   RoboRioSim::ResetData();
 
-  DoubleCallback voltageCallback;
-  auto voltageCb = RoboRioSim::RegisterBrownoutVoltageCallback(
-      voltageCallback.GetCallback(), false);
-  constexpr double kTestVoltage = 1.91;
+  DoubleCallback brownoutVoltageCallback;
+  DoubleCallback recoveryVoltageCallback;
+  auto brownoutVoltageCb = RoboRioSim::RegisterBrownoutVoltageCallback(
+      brownoutVoltageCallback.GetCallback(), false);
+  auto recoveryVoltageCb =
+      RoboRioSim::RegisterBrownoutRecoveryVoltageCallback(
+          recoveryVoltageCallback.GetCallback(), false);
+  constexpr double kTestBrownoutVoltage = 6.5;
+  constexpr double kTestRecoveryVoltage = 7.0;
 
-  RoboRioSim::SetBrownoutVoltage(wpi::units::volt_t{kTestVoltage});
-  CHECK(voltageCallback.WasTriggered());
-  CHECK(kTestVoltage == voltageCallback.GetLastValue());
-  CHECK(kTestVoltage == RoboRioSim::GetBrownoutVoltage().value());
-  CHECK(kTestVoltage == RobotController::GetBrownoutVoltage().value());
+  RobotController::SetBrownoutVoltages(
+      wpi::units::volt_t{kTestBrownoutVoltage},
+      wpi::units::volt_t{kTestRecoveryVoltage});
+  CHECK(brownoutVoltageCallback.WasTriggered());
+  CHECK(recoveryVoltageCallback.WasTriggered());
+  CHECK(kTestBrownoutVoltage == brownoutVoltageCallback.GetLastValue());
+  CHECK(kTestRecoveryVoltage == recoveryVoltageCallback.GetLastValue());
+  CHECK(kTestBrownoutVoltage == RoboRioSim::GetBrownoutVoltage().value());
+  CHECK(kTestRecoveryVoltage ==
+        RoboRioSim::GetBrownoutRecoveryVoltage().value());
 }
 
 TEST_CASE("RoboRioSimTest Set3V3", "[wpilibc][simulation]") {

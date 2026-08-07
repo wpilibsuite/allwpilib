@@ -4,6 +4,8 @@
 
 #include "wpi/hal/Power.h"
 
+#include <cmath>
+
 #include "HALInitializer.hpp"
 #include "SystemServerInternal.hpp"
 #include "mrclib/Systemcore.h"
@@ -74,16 +76,27 @@ void HAL_ResetUserCurrentFaults(int32_t* status) {
   return;
 }
 
-void HAL_SetBrownoutVoltage(double voltage, int32_t* status) {
+void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
+                             int32_t* status) {
   initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
+  if (!std::isfinite(brownoutVoltage) || !std::isfinite(recoveryVoltage) ||
+      brownoutVoltage < 5.0 || brownoutVoltage > 8.0 ||
+      recoveryVoltage > 8.5 ||
+      recoveryVoltage < brownoutVoltage + 0.5) {
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+    return;
+  }
 
-double HAL_GetBrownoutVoltage(int32_t* status) {
-  initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  MRC_Status mrcStatus = MRC_Systemcore_SetBrownoutVoltages(
+      std::lround(brownoutVoltage * 1000),
+      std::lround(recoveryVoltage * 1000));
+  if (mrcStatus == MRC_STATUS_PARAMETER_OUT_OF_RANGE) {
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+  } else if (mrcStatus != MRC_STATUS_SUCCESS) {
+    *status = HAL_INCOMPATIBLE_STATE;
+  } else {
+    *status = HAL_SUCCESS;
+  }
 }
 
 double HAL_GetCPUTemp(int32_t* status) {

@@ -33,11 +33,10 @@ void HAL_SetUserRailEnabled3V3(HAL_Bool enabled, int32_t* status) {}
 void HAL_ResetUserCurrentFaults(int32_t* status) {
   SimRoboRioData->userFaults3V3 = 0;
 }
-void HAL_SetBrownoutVoltage(double voltage, int32_t* status) {
-  SimRoboRioData->brownoutVoltage = voltage;
-}
-double HAL_GetBrownoutVoltage(int32_t* status) {
-  return SimRoboRioData->brownoutVoltage;
+void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
+                             int32_t* status) {
+  SimRoboRioData->brownoutVoltage = brownoutVoltage;
+  SimRoboRioData->brownoutRecoveryVoltage = recoveryVoltage;
 }
 double HAL_GetCPUTemp(int32_t* status) {
   return SimRoboRioData->cpuTemp;

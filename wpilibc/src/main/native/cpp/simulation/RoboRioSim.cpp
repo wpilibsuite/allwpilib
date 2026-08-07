@@ -115,6 +115,26 @@ void RoboRioSim::SetBrownoutVoltage(wpi::units::volt_t vInVoltage) {
   HALSIM_SetRoboRioBrownoutVoltage(vInVoltage.value());
 }
 
+std::unique_ptr<CallbackStore>
+RoboRioSim::RegisterBrownoutRecoveryVoltageCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      -1, callback, &HALSIM_CancelRoboRioBrownoutRecoveryVoltageCallback);
+  store->SetUid(HALSIM_RegisterRoboRioBrownoutRecoveryVoltageCallback(
+      &CallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+wpi::units::volt_t RoboRioSim::GetBrownoutRecoveryVoltage() {
+  return wpi::units::volt_t{HALSIM_GetRoboRioBrownoutRecoveryVoltage()};
+}
+
+void RoboRioSim::SetBrownoutRecoveryVoltage(
+    wpi::units::volt_t brownoutRecoveryVoltage) {
+  HALSIM_SetRoboRioBrownoutRecoveryVoltage(
+      brownoutRecoveryVoltage.value());
+}
+
 std::unique_ptr<CallbackStore> RoboRioSim::RegisterCPUTempCallback(
     NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
