@@ -29,4 +29,16 @@ class StringPrefixMapTest {
     assertEquals(List.of("new"), List.copyOf(map.values()));
     assertEquals(Set.of(Map.entry("/Telemetry", "new")), map.entrySet());
   }
+
+  @Test
+  void mapReferenceCanReadExactStringKeys() {
+    var prefixMap = new StringPrefixMap<String>();
+    prefixMap.put("/Telemetry", "value");
+    Map<String, String> map = prefixMap;
+
+    assertEquals("value", map.get("/Telemetry"));
+    assertNull(map.get("/Other"));
+    assertNull(map.get(null));
+    assertNull(map.get(1));
+  }
 }

@@ -143,8 +143,10 @@ public interface PrefixMap<V> extends Map<String, V> {
    */
   @Override
   default V get(Object prefix) {
-    throw new UnsupportedOperationException(
-        "The 'get(Object)' method ONLY accepts keys of type String");
+    if (prefix instanceof String) {
+      return get((String) prefix);
+    }
+    return null;
   }
 
   @Override
