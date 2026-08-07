@@ -52,8 +52,23 @@ public class NetworkTablesTunableBackend implements TunableBackend {
   private final Map<String, StoredEntry> m_entries = new HashMap<>();
   private final Map<Integer, TunableValueEntry> m_subscriberMap = new HashMap<>();
   private final NetworkTableListenerPoller m_poller;
+  private final List<Runnable> m_pendingMutations = new ArrayList<>();
+  private final Map<String, Boolean> m_pendingPathStates = new HashMap<>();
+  private int m_updateDepth;
+  private boolean m_closed;
 
-  private record StoredEntry(TunableEntry entry, TunableBase tunable, ComplexTunable complex) {}
+  private static final class StoredEntry {
+    StoredEntry(TunableEntry entry, TunableBase tunable, ComplexTunable complex) {
+      this.entry = entry;
+      this.tunable = tunable;
+      this.complex = complex;
+    }
+
+    private final TunableEntry entry;
+    private final TunableBase tunable;
+    private final ComplexTunable complex;
+    private boolean closed;
+  }
 
   private static String getProperties(TunableConfig config) {
     if (config == null) {
@@ -134,11 +149,9 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
     protected abstract void doUpdateTunable(NetworkTableValue value);
 
-    public void updateTunable(NetworkTableValue value) {
+    public Runnable updateTunable(NetworkTableValue value) {
       doUpdateTunable(value);
-      if (m_onChange != null) {
-        m_onChange.run();
-      }
+      return m_onChange;
     }
 
     protected final GenericPublisher m_publisher;
@@ -644,13 +657,76 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     m_poller = new NetworkTableListenerPoller(inst);
   }
 
+  private boolean hasActiveEntry(String path) {
+    StoredEntry entry = m_entries.get(path);
+    return entry != null && !entry.closed;
+  }
+
+  private boolean hasQueuedActiveEntry(String path) {
+    if (m_updateDepth > 0) {
+      Boolean pendingState = m_pendingPathStates.get(path);
+      if (pendingState != null) {
+        return pendingState;
+      }
+    }
+    return hasActiveEntry(path);
+  }
+
+  private void closeEntry(StoredEntry entry) {
+    if (entry.closed) {
+      return;
+    }
+    entry.closed = true;
+    entry.entry.close();
+  }
+
+  private void eraseEntry(String path, StoredEntry entry) {
+    if (m_updateDepth > 0) {
+      m_pendingPathStates.put(path, false);
+      m_pendingMutations.add(() -> eraseEntryNow(path, entry));
+    } else {
+      eraseEntryNow(path, entry);
+    }
+  }
+
+  private void eraseEntryNow(String path, StoredEntry entry) {
+    if (m_entries.get(path) == entry) {
+      m_entries.remove(path);
+    }
+  }
+
+  private void applyPendingMutations() {
+    try {
+      while (!m_pendingMutations.isEmpty()) {
+        List<Runnable> mutations = new ArrayList<>(m_pendingMutations);
+        m_pendingMutations.clear();
+        for (Runnable mutation : mutations) {
+          mutation.run();
+        }
+      }
+    } finally {
+      m_pendingPathStates.clear();
+    }
+  }
+
   @Override
   public void close() {
     synchronized (m_entries) {
-      for (StoredEntry entry : m_entries.values()) {
-        entry.entry().close();
+      if (m_closed) {
+        return;
       }
-      m_entries.clear();
+      m_closed = true;
+      m_pendingMutations.clear();
+      m_pendingPathStates.clear();
+      for (StoredEntry entry : m_entries.values()) {
+        closeEntry(entry);
+      }
+      if (m_updateDepth > 0) {
+        m_pendingMutations.add(m_entries::clear);
+      } else {
+        m_entries.clear();
+      }
+      m_subscriberMap.clear();
       m_poller.close();
     }
   }
@@ -658,8 +734,16 @@ public class NetworkTablesTunableBackend implements TunableBackend {
   @Override
   public void publish(String path, TunableBase tunable) {
     synchronized (m_entries) {
-      if (m_entries.containsKey(path)) {
+      if (m_closed) {
+        return;
+      }
+      if (hasQueuedActiveEntry(path)) {
         throw new IllegalArgumentException("Tunable already exists: " + path);
+      }
+      if (m_updateDepth > 0) {
+        m_pendingPathStates.put(path, true);
+        m_pendingMutations.add(() -> publish(path, tunable));
+        return;
       }
       String ntPath = m_prefix + path;
       TunableValueEntry entry;
@@ -791,8 +875,16 @@ public class NetworkTablesTunableBackend implements TunableBackend {
   public void publishComplex(String path, ComplexTunable tunable) {
     TunableTable table = TunableRegistry.getTable(path);
     synchronized (m_entries) {
-      if (m_entries.containsKey(path)) {
+      if (m_closed) {
+        return;
+      }
+      if (hasQueuedActiveEntry(path)) {
         throw new IllegalArgumentException("Tunable already exists: " + path);
+      }
+      if (m_updateDepth > 0) {
+        m_pendingPathStates.put(path, true);
+        m_pendingMutations.add(() -> publishComplex(path, tunable));
+        return;
       }
       m_entries.put(
           path, new StoredEntry(new ComplexTunableEntry(m_prefix + path, tunable), null, tunable));
@@ -804,9 +896,16 @@ public class NetworkTablesTunableBackend implements TunableBackend {
   @Override
   public void remove(String path) {
     synchronized (m_entries) {
-      StoredEntry entry = m_entries.remove(path);
-      if (entry != null) {
-        entry.entry().close();
+      if (m_closed) {
+        return;
+      }
+      StoredEntry entry = m_entries.get(path);
+      if (entry != null && !entry.closed) {
+        closeEntry(entry);
+        eraseEntry(path, entry);
+      } else if (m_updateDepth > 0 && Boolean.TRUE.equals(m_pendingPathStates.get(path))) {
+        m_pendingPathStates.put(path, false);
+        m_pendingMutations.add(() -> remove(path));
       }
     }
   }
@@ -822,9 +921,29 @@ public class NetworkTablesTunableBackend implements TunableBackend {
           continue;
         }
         StoredEntry entry = mapEntry.getValue();
-        removed.add(new PublishedTunable(mapEntry.getKey(), entry.tunable(), entry.complex()));
-        entry.entry().close();
-        iterator.remove();
+        if (entry.closed) {
+          continue;
+        }
+        removed.add(new PublishedTunable(mapEntry.getKey(), entry.tunable, entry.complex));
+        closeEntry(entry);
+        if (m_updateDepth > 0) {
+          String path = mapEntry.getKey();
+          m_pendingMutations.add(() -> eraseEntryNow(path, entry));
+        } else {
+          iterator.remove();
+        }
+      }
+      if (m_updateDepth > 0) {
+        List<String> pendingRemoves = new ArrayList<>();
+        for (var pendingEntry : m_pendingPathStates.entrySet()) {
+          if (pendingEntry.getValue() && pendingEntry.getKey().startsWith(prefix)) {
+            pendingRemoves.add(pendingEntry.getKey());
+          }
+        }
+        for (String path : pendingRemoves) {
+          m_pendingPathStates.put(path, false);
+          m_pendingMutations.add(() -> remove(path));
+        }
       }
     }
     return removed;
@@ -832,7 +951,11 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
   @Override
   public void update() {
+    List<Runnable> onChangeCallbacks = null;
     synchronized (m_entries) {
+      if (m_closed) {
+        return;
+      }
       // update tunables from network changes
       for (NetworkTableEvent event : m_poller.readQueue()) {
         if (event.valueData == null || event.valueData.value == null) {
@@ -842,17 +965,42 @@ public class NetworkTablesTunableBackend implements TunableBackend {
         if (entry == null) {
           continue;
         }
-        entry.updateTunable(event.valueData.value);
+        Runnable callback = entry.updateTunable(event.valueData.value);
+        if (callback != null) {
+          if (onChangeCallbacks == null) {
+            onChangeCallbacks = new ArrayList<>();
+          }
+          onChangeCallbacks.add(callback);
+        }
       }
 
       // update network from tunable changes
-      for (StoredEntry entry : m_entries.values()) {
-        if (entry.tunable() == null) {
-          entry.entry().updateNetwork();
-        } else if (shouldUpdateNetwork(entry.tunable())) {
-          entry.entry().updateNetwork();
-          entry.tunable().resetChanged();
+      // updateNetwork() can run user getters or complex update code that re-enters this backend.
+      m_updateDepth++;
+      try {
+        for (StoredEntry entry : m_entries.values()) {
+          if (entry.closed) {
+            continue;
+          }
+          if (entry.tunable == null) {
+            entry.entry.updateNetwork();
+          } else if (shouldUpdateNetwork(entry.tunable)) {
+            entry.entry.updateNetwork();
+            entry.tunable.resetChanged();
+          }
         }
+      } finally {
+        m_updateDepth--;
+        if (m_updateDepth == 0) {
+          applyPendingMutations();
+        }
+      }
+    }
+
+    // onTune callbacks can publish or remove tunables, so run them without the backend lock held.
+    if (onChangeCallbacks != null) {
+      for (Runnable callback : onChangeCallbacks) {
+        callback.run();
       }
     }
   }

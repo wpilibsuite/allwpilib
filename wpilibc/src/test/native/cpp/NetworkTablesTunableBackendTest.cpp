@@ -18,11 +18,55 @@
 #include "wpi/nt/ProtobufTopic.hpp"
 #include "wpi/nt/StringArrayTopic.hpp"
 #include "wpi/nt/StructTopic.hpp"
+#include "wpi/tunable/ComplexTunable.hpp"
 #include "wpi/tunable/Selectable.hpp"
 #include "wpi/tunable/Tunable.hpp"
 #include "wpi/tunable/TunableConfig.hpp"
 #include "wpi/tunable/TunableRegistry.hpp"
+#include "wpi/tunable/TunableTable.hpp"
 #include "wpi/tunable/Tunables.hpp"
+
+namespace {
+
+class MutatingComplexTunable final : public wpi::ComplexTunable {
+ public:
+  explicit MutatingComplexTunable(wpi::TunableDouble& published)
+      : m_published{published} {}
+
+  std::string_view GetTunableType() const override { return "Mutating"; }
+
+  void PublishTunable(wpi::TunableTable&) override {}
+
+  void UpdateTunable() const override {
+    if (m_updates++ != 1) {
+      return;
+    }
+    wpi::Tunables::Remove("removeMe");
+    wpi::Tunables::Publish("publishedFromComplex", m_published);
+  }
+
+  int GetUpdates() const { return m_updates; }
+
+ private:
+  wpi::TunableDouble& m_published;
+  mutable int m_updates = 0;
+};
+
+class CountingComplexTunable final : public wpi::ComplexTunable {
+ public:
+  std::string_view GetTunableType() const override { return "Counting"; }
+
+  void PublishTunable(wpi::TunableTable&) override {}
+
+  void UpdateTunable() const override { ++m_updates; }
+
+  int GetUpdates() const { return m_updates; }
+
+ private:
+  mutable int m_updates = 0;
+};
+
+}  // namespace
 
 class NetworkTablesTunableBackendTest {
  public:
@@ -354,6 +398,70 @@ TEST_CASE_METHOD(
 
   CHECK(2.0 == value.Get());
   CHECK(1 == calls);
+}
+
+TEST_CASE_METHOD(
+    NetworkTablesTunableBackendTest,
+    "NetworkTablesTunableBackendTest OnTuneCanPublishAndRemoveTunables",
+    "[wpilibc][tunable]") {
+  bool callbackRan = false;
+  wpi::TunableDouble published{3.0};
+  wpi::TunableDouble removeMe{4.0};
+  wpi::Tunables::Publish("removeMe", removeMe);
+
+  wpi::TunableConfig config;
+  config.robust = true;
+  config.onTune = [&](wpi::detail::TunableBase&, wpi::ComplexTunable*) {
+    if (callbackRan) {
+      return;
+    }
+    callbackRan = true;
+    wpi::Tunables::Remove("removeMe");
+    wpi::Tunables::Publish("publishedFromOnTune", published);
+  };
+  wpi::TunableDouble value{1.0, config};
+  wpi::Tunables::Publish("mutable", value);
+
+  auto pub = Tune("mutable", "double");
+  pub.SetDouble(2.0);
+  inst.Flush();
+  wpi::TunableRegistry::Update();
+
+  CHECK(callbackRan);
+  CHECK(2.0 == value.Get());
+  CHECK(3.0 == inst.GetDoubleTopic("/Tunables/publishedFromOnTune")
+                   .Subscribe(0.0)
+                   .Get());
+
+  wpi::TunableDouble replacement{5.0};
+  CHECK_NOTHROW(wpi::Tunables::Publish("removeMe", replacement));
+  CHECK(5.0 == inst.GetDoubleTopic("/Tunables/removeMe").Subscribe(0.0).Get());
+}
+
+TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
+                 "NetworkTablesTunableBackendTest "
+                 "ComplexUpdateCanPublishAndRemoveTunables",
+                 "[wpilibc][tunable]") {
+  wpi::TunableDouble published{3.0};
+  wpi::TunableDouble removeMe{4.0};
+  wpi::Tunables::Publish("removeMe", removeMe);
+
+  MutatingComplexTunable complex{published};
+  wpi::Tunables::Publish("complex", complex);
+  CountingComplexTunable after;
+  wpi::Tunables::Publish("z", after);
+
+  wpi::TunableRegistry::Update();
+
+  CHECK(2 == complex.GetUpdates());
+  CHECK(2 == after.GetUpdates());
+  CHECK(3.0 == inst.GetDoubleTopic("/Tunables/publishedFromComplex")
+                   .Subscribe(0.0)
+                   .Get());
+
+  wpi::TunableDouble replacement{5.0};
+  CHECK_NOTHROW(wpi::Tunables::Publish("removeMe", replacement));
+  CHECK(5.0 == inst.GetDoubleTopic("/Tunables/removeMe").Subscribe(0.0).Get());
 }
 
 TEST_CASE_METHOD(NetworkTablesTunableBackendTest,

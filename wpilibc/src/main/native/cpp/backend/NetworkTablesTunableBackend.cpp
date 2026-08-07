@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <format>
 #include <memory>
+#include <mutex>
 #include <span>
 #include <stdexcept>
 #include <string>
@@ -173,6 +174,16 @@ class NetworkTablesTunableBackend::Entry {
   virtual ~Entry() = default;
   virtual uint32_t GetUid() const = 0;
   virtual void UpdateNetwork(bool force) = 0;
+  virtual void Close() {}
+  virtual ValueEntry* AsValueEntry() { return nullptr; }
+  void SetInsertEpoch(uint64_t epoch) { m_insertEpoch = epoch; }
+  uint64_t GetInsertEpoch() const { return m_insertEpoch; }
+  void MarkClosed() { m_closed = true; }
+  bool IsClosed() const { return m_closed; }
+
+ private:
+  uint64_t m_insertEpoch = 0;
+  bool m_closed = false;
 };
 
 class NetworkTablesTunableBackend::ValueEntry : public Entry {
@@ -196,7 +207,6 @@ class NetworkTablesTunableBackend::ValueEntry : public Entry {
       subscriberOptions.excludePublisher = m_publisher.GetHandle();
       m_subscriber = topic.GenericSubscribe(typeString, subscriberOptions);
     }
-    backend->m_subscribers[m_subscriber.GetHandle()] = this;
     if (!config || config->isMutable) {
       m_listener = backend->m_poller.AddListener(
           m_subscriber, wpi::nt::EventFlags::VALUE_ALL);
@@ -207,19 +217,29 @@ class NetworkTablesTunableBackend::ValueEntry : public Entry {
     if (m_listener != 0) {
       m_backend->m_poller.RemoveListener(m_listener);
     }
-    m_backend->m_subscribers.erase(m_subscriber.GetHandle());
   }
 
   uint32_t GetUid() const override { return m_uid; }
 
-  void UpdateTunable(const wpi::nt::Value& value) {
+  void Close() override {
+    if (m_listener != 0) {
+      m_backend->m_poller.RemoveListener(m_listener);
+      m_listener = 0;
+    }
+  }
+
+  ValueEntry* AsValueEntry() override { return this; }
+
+  NT_Handle GetSubscriberHandle() const { return m_subscriber.GetHandle(); }
+
+  bool UpdateTunable(const wpi::nt::Value& value) {
     auto info = TunableRegistry::GetTunable(m_uid);
     if (!info || !TypeMatches(value, info.type)) {
-      return;
+      return false;
     }
     DoUpdateTunable(info, value);
     m_forceUpdate = true;
-    NotifyOnTune(info);
+    return true;
   }
 
  protected:
@@ -591,144 +611,197 @@ NetworkTablesTunableBackend::NetworkTablesTunableBackend(
     wpi::nt::NetworkTableInstance inst, std::string_view prefix)
     : m_inst{inst}, m_prefix{prefix}, m_poller{inst} {}
 
+void NetworkTablesTunableBackend::CloseEntry(
+    const std::shared_ptr<Entry>& entry) {
+  if (entry->IsClosed()) {
+    return;
+  }
+  entry->MarkClosed();
+  entry->Close();
+  if (auto valueEntry = entry->AsValueEntry()) {
+    m_subscribers.erase(valueEntry->GetSubscriberHandle());
+  }
+}
+
+void NetworkTablesTunableBackend::EraseEntry(
+    std::string path, const std::shared_ptr<Entry>& entry) {
+  if (m_updateDepth > 0) {
+    m_deferredErases.emplace_back(std::move(path), entry);
+    return;
+  }
+  auto it = m_entries.find(path);
+  if (it != m_entries.end() && it->second == entry) {
+    m_entries.erase(it);
+  }
+}
+
+void NetworkTablesTunableBackend::ApplyDeferredErases() {
+  for (auto&& pending : m_deferredErases) {
+    auto it = m_entries.find(pending.path);
+    if (it != m_entries.end() && it->second == pending.entry) {
+      m_entries.erase(it);
+    }
+  }
+  m_deferredErases.clear();
+}
+
 NetworkTablesTunableBackend::~NetworkTablesTunableBackend() {
-  // ValueEntry destructors unregister from backend-owned state, so destroy
-  // entries before member destruction starts.
+  // Entries use backend-owned listener state, so close them before member
+  // destruction starts.
+  std::scoped_lock lock{m_mutex};
+  for (auto&& [path, entry] : m_entries) {
+    CloseEntry(entry);
+  }
   m_entries.clear();
+  m_uids.clear();
+  m_subscribers.clear();
+  m_deferredErases.clear();
 }
 
 void NetworkTablesTunableBackend::Publish(std::string_view path, uint32_t uid,
                                           detail::TunableBase& tunable,
                                           const TunableConfig* config,
                                           detail::TunableTypeValue type) {
-  std::scoped_lock lock{m_mutex};
-  if (m_entries.contains(path)) {
-    throw std::runtime_error(std::format("Tunable already exists: {}", path));
-  }
+  std::shared_ptr<Entry> entry;
+  {
+    std::scoped_lock lock{m_mutex};
+    if (auto it = m_entries.find(path);
+        it != m_entries.end() && !it->second->IsClosed()) {
+      throw std::runtime_error(std::format("Tunable already exists: {}", path));
+    }
 
-  std::string ntPath = std::format("{}{}", m_prefix, path);
-  std::unique_ptr<Entry> entry;
-  using enum detail::TunableTypeValue;
-  switch (type) {
-    case BOOLEAN:
-    case MEMBER_BOOLEAN:
-      entry = std::make_unique<ValueTunableEntry<bool>>(this, ntPath, uid,
-                                                        config, "boolean");
-      break;
-    case INT32:
-    case MEMBER_INT32:
-      entry = std::make_unique<ValueTunableEntry<int32_t>>(this, ntPath, uid,
-                                                           config, "int");
-      break;
-    case INT64:
-    case MEMBER_INT64:
-      entry = std::make_unique<ValueTunableEntry<int64_t>>(this, ntPath, uid,
-                                                           config, "int");
-      break;
-    case FLOAT:
-    case MEMBER_FLOAT:
-      entry = std::make_unique<ValueTunableEntry<float>>(this, ntPath, uid,
-                                                         config, "float");
-      break;
-    case DOUBLE:
-    case MEMBER_DOUBLE:
-      entry = std::make_unique<ValueTunableEntry<double>>(this, ntPath, uid,
-                                                          config, "double");
-      break;
-    case STRING:
-    case MEMBER_STRING:
-      entry = std::make_unique<ValueTunableEntry<std::string>>(
-          this, ntPath, uid, config, "string");
-      break;
-    case RAW:
-    case MEMBER_RAW:
-      entry = std::make_unique<ValueTunableEntry<std::vector<uint8_t>>>(
-          this, ntPath, uid, config, "raw");
-      break;
-    case BOOLEAN_ARRAY:
-    case MEMBER_BOOLEAN_ARRAY:
-      entry = std::make_unique<ValueTunableEntry<std::vector<bool>>>(
-          this, ntPath, uid, config, "boolean[]");
-      break;
-    case INT32_ARRAY:
-    case MEMBER_INT32_ARRAY:
-      entry = std::make_unique<ValueTunableEntry<std::vector<int32_t>>>(
-          this, ntPath, uid, config, "int[]");
-      break;
-    case INT64_ARRAY:
-    case MEMBER_INT64_ARRAY:
-      entry = std::make_unique<ValueTunableEntry<std::vector<int64_t>>>(
-          this, ntPath, uid, config, "int[]");
-      break;
-    case FLOAT_ARRAY:
-    case MEMBER_FLOAT_ARRAY:
-      entry = std::make_unique<ValueTunableEntry<std::vector<float>>>(
-          this, ntPath, uid, config, "float[]");
-      break;
-    case DOUBLE_ARRAY:
-    case MEMBER_DOUBLE_ARRAY:
-      entry = std::make_unique<ValueTunableEntry<std::vector<double>>>(
-          this, ntPath, uid, config, "double[]");
-      break;
-    case STRING_ARRAY:
-    case MEMBER_STRING_ARRAY:
-      entry = std::make_unique<ValueTunableEntry<std::vector<std::string>>>(
-          this, ntPath, uid, config, "string[]");
-      break;
-    case STRUCT:
-      entry = std::make_unique<StructTunableEntry>(
-          this, ntPath, uid, config,
-          std::format("struct:{}",
-                      static_cast<detail::TunableStructBase&>(tunable)
-                          .GetStructTypeName()));
-      break;
-    case MEMBER_STRUCT:
-      entry = std::make_unique<StructTunableEntry>(
-          this, ntPath, uid, config,
-          std::format("struct:{}",
-                      static_cast<detail::TunableMemberStructBase&>(tunable)
-                          .GetStructTypeName()));
-      break;
-    case PROTOBUF:
-      entry = std::make_unique<ProtobufTunableEntry>(
-          this, ntPath, uid, config,
-          static_cast<detail::TunableProtobufBase&>(tunable)
-              .GetProtobufTypeString());
-      break;
-    case MEMBER_PROTOBUF:
-      entry = std::make_unique<ProtobufTunableEntry>(
-          this, ntPath, uid, config,
-          static_cast<detail::TunableMemberProtobufBase&>(tunable)
-              .GetProtobufTypeString());
-      break;
-    case COMPLEX:
-    case MEMBER_COMPLEX:
-      entry =
-          std::make_unique<ComplexTunableEntry>(m_inst, ntPath, uid, tunable);
-      break;
-    default:
-      TunableRegistry::ReportWarning(
-          std::format("Unsupported tunable type for path {}", path));
-      return;
+    std::string ntPath = std::format("{}{}", m_prefix, path);
+    using enum detail::TunableTypeValue;
+    switch (type) {
+      case BOOLEAN:
+      case MEMBER_BOOLEAN:
+        entry = std::make_shared<ValueTunableEntry<bool>>(this, ntPath, uid,
+                                                          config, "boolean");
+        break;
+      case INT32:
+      case MEMBER_INT32:
+        entry = std::make_shared<ValueTunableEntry<int32_t>>(this, ntPath, uid,
+                                                             config, "int");
+        break;
+      case INT64:
+      case MEMBER_INT64:
+        entry = std::make_shared<ValueTunableEntry<int64_t>>(this, ntPath, uid,
+                                                             config, "int");
+        break;
+      case FLOAT:
+      case MEMBER_FLOAT:
+        entry = std::make_shared<ValueTunableEntry<float>>(this, ntPath, uid,
+                                                           config, "float");
+        break;
+      case DOUBLE:
+      case MEMBER_DOUBLE:
+        entry = std::make_shared<ValueTunableEntry<double>>(this, ntPath, uid,
+                                                            config, "double");
+        break;
+      case STRING:
+      case MEMBER_STRING:
+        entry = std::make_shared<ValueTunableEntry<std::string>>(
+            this, ntPath, uid, config, "string");
+        break;
+      case RAW:
+      case MEMBER_RAW:
+        entry = std::make_shared<ValueTunableEntry<std::vector<uint8_t>>>(
+            this, ntPath, uid, config, "raw");
+        break;
+      case BOOLEAN_ARRAY:
+      case MEMBER_BOOLEAN_ARRAY:
+        entry = std::make_shared<ValueTunableEntry<std::vector<bool>>>(
+            this, ntPath, uid, config, "boolean[]");
+        break;
+      case INT32_ARRAY:
+      case MEMBER_INT32_ARRAY:
+        entry = std::make_shared<ValueTunableEntry<std::vector<int32_t>>>(
+            this, ntPath, uid, config, "int[]");
+        break;
+      case INT64_ARRAY:
+      case MEMBER_INT64_ARRAY:
+        entry = std::make_shared<ValueTunableEntry<std::vector<int64_t>>>(
+            this, ntPath, uid, config, "int[]");
+        break;
+      case FLOAT_ARRAY:
+      case MEMBER_FLOAT_ARRAY:
+        entry = std::make_shared<ValueTunableEntry<std::vector<float>>>(
+            this, ntPath, uid, config, "float[]");
+        break;
+      case DOUBLE_ARRAY:
+      case MEMBER_DOUBLE_ARRAY:
+        entry = std::make_shared<ValueTunableEntry<std::vector<double>>>(
+            this, ntPath, uid, config, "double[]");
+        break;
+      case STRING_ARRAY:
+      case MEMBER_STRING_ARRAY:
+        entry = std::make_shared<ValueTunableEntry<std::vector<std::string>>>(
+            this, ntPath, uid, config, "string[]");
+        break;
+      case STRUCT:
+        entry = std::make_shared<StructTunableEntry>(
+            this, ntPath, uid, config,
+            std::format("struct:{}",
+                        static_cast<detail::TunableStructBase&>(tunable)
+                            .GetStructTypeName()));
+        break;
+      case MEMBER_STRUCT:
+        entry = std::make_shared<StructTunableEntry>(
+            this, ntPath, uid, config,
+            std::format("struct:{}",
+                        static_cast<detail::TunableMemberStructBase&>(tunable)
+                            .GetStructTypeName()));
+        break;
+      case PROTOBUF:
+        entry = std::make_shared<ProtobufTunableEntry>(
+            this, ntPath, uid, config,
+            static_cast<detail::TunableProtobufBase&>(tunable)
+                .GetProtobufTypeString());
+        break;
+      case MEMBER_PROTOBUF:
+        entry = std::make_shared<ProtobufTunableEntry>(
+            this, ntPath, uid, config,
+            static_cast<detail::TunableMemberProtobufBase&>(tunable)
+                .GetProtobufTypeString());
+        break;
+      case COMPLEX:
+      case MEMBER_COMPLEX:
+        entry =
+            std::make_shared<ComplexTunableEntry>(m_inst, ntPath, uid, tunable);
+        break;
+      default:
+        TunableRegistry::ReportWarning(
+            std::format("Unsupported tunable type for path {}", path));
+        return;
+    }
+
+    entry->SetInsertEpoch(++m_nextInsertEpoch);
+    m_entries[path] = entry;
+    if (auto valueEntry = entry->AsValueEntry()) {
+      m_subscribers[valueEntry->GetSubscriberHandle()] =
+          std::static_pointer_cast<ValueEntry>(entry);
+    }
+    m_uids[uid].emplace_back(path);
   }
 
   entry->UpdateNetwork(true);
-  m_entries[path] = std::move(entry);
-  m_uids[uid].emplace_back(path);
 }
 
 void NetworkTablesTunableBackend::Remove(std::string_view path) {
   std::scoped_lock lock{m_mutex};
   auto it = m_entries.find(path);
-  if (it != m_entries.end()) {
+  if (it != m_entries.end() && !it->second->IsClosed()) {
+    std::string pathStr{it->first};
+    auto entry = it->second;
     auto uid = it->second->GetUid();
+    CloseEntry(entry);
     if (auto uidIt = m_uids.find(uid); uidIt != m_uids.end()) {
       std::erase(uidIt->second, path);
       if (uidIt->second.empty()) {
         m_uids.erase(uidIt);
       }
     }
-    m_entries.erase(it);
+    EraseEntry(std::move(pathStr), entry);
   }
 }
 
@@ -737,20 +810,23 @@ NetworkTablesTunableBackend::RemovePrefix(std::string_view prefix) {
   std::scoped_lock lock{m_mutex};
   std::vector<PublishedTunable> removed;
   for (auto it = m_entries.begin(); it != m_entries.end();) {
-    if (!wpi::util::starts_with(it->first, prefix)) {
+    if (it->second->IsClosed() || !wpi::util::starts_with(it->first, prefix)) {
       ++it;
       continue;
     }
     std::string path{it->first};
-    auto uid = it->second->GetUid();
+    auto entry = it->second;
+    auto uid = entry->GetUid();
+    ++it;
     removed.push_back({path, uid});
+    CloseEntry(entry);
     if (auto uidIt = m_uids.find(uid); uidIt != m_uids.end()) {
       std::erase(uidIt->second, path);
       if (uidIt->second.empty()) {
         m_uids.erase(uidIt);
       }
     }
-    it = m_entries.erase(it);
+    EraseEntry(std::move(path), entry);
   }
   return removed;
 }
@@ -760,26 +836,68 @@ void NetworkTablesTunableBackend::UnregisterTunable(uint32_t uid) {
   auto it = m_uids.find(uid);
   if (it != m_uids.end()) {
     for (auto&& path : it->second) {
-      m_entries.erase(path);
+      if (auto entryIt = m_entries.find(path);
+          entryIt != m_entries.end() && !entryIt->second->IsClosed()) {
+        auto entry = entryIt->second;
+        CloseEntry(entry);
+        EraseEntry(path, entry);
+      }
     }
     m_uids.erase(it);
   }
 }
 
 void NetworkTablesTunableBackend::Update() {
-  std::scoped_lock lock{m_mutex};
-  for (auto&& event : m_poller.ReadQueue()) {
+  std::vector<uint32_t> onTuneUids;
+  std::vector<wpi::nt::Event> events;
+  {
+    std::scoped_lock lock{m_mutex};
+    events = m_poller.ReadQueue();
+  }
+  for (auto&& event : events) {
     auto valueData = event.GetValueEventData();
     if (!valueData || !valueData->value) {
       continue;
     }
-    auto it = m_subscribers.find(valueData->subentry);
-    if (it != m_subscribers.end()) {
-      it->second->UpdateTunable(valueData->value);
+    std::shared_ptr<ValueEntry> entry;
+    {
+      std::scoped_lock lock{m_mutex};
+      auto it = m_subscribers.find(valueData->subentry);
+      if (it != m_subscribers.end()) {
+        entry = it->second;
+      }
+    }
+    if (entry && entry->UpdateTunable(valueData->value)) {
+      onTuneUids.emplace_back(entry->GetUid());
     }
   }
 
-  for (auto&& [path, entry] : m_entries) {
+  std::unique_lock lock{m_mutex};
+  ++m_updateDepth;
+  uint64_t updateEpoch = m_nextInsertEpoch;
+  for (auto it = m_entries.begin(); it != m_entries.end();) {
+    auto entry = it->second;
+    ++it;
+    if (entry->IsClosed() || entry->GetInsertEpoch() > updateEpoch) {
+      continue;
+    }
+
+    lock.unlock();
     entry->UpdateNetwork(false);
+    lock.lock();
+  }
+  --m_updateDepth;
+  if (m_updateDepth == 0) {
+    ApplyDeferredErases();
+  }
+  lock.unlock();
+
+  // onTune callbacks can publish or remove tunables, which re-enters this
+  // backend. Run them after releasing m_mutex so those mutations are safe.
+  for (auto uid : onTuneUids) {
+    auto info = TunableRegistry::GetTunable(uid);
+    if (info) {
+      NotifyOnTune(info);
+    }
   }
 }

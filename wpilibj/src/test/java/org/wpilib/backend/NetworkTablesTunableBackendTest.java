@@ -5,6 +5,7 @@
 package org.wpilib.backend;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,10 +20,12 @@ import org.wpilib.networktables.GenericEntry;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.networktables.NetworkTableListenerPoller;
 import org.wpilib.networktables.NetworkTableType;
+import org.wpilib.tunable.ComplexTunable;
 import org.wpilib.tunable.Tunable;
 import org.wpilib.tunable.TunableConfig;
 import org.wpilib.tunable.TunableDouble;
 import org.wpilib.tunable.TunableRegistry;
+import org.wpilib.tunable.TunableTable;
 import org.wpilib.tunable.Tunables;
 import org.wpilib.units.Measure;
 import org.wpilib.units.Units;
@@ -311,6 +314,113 @@ class NetworkTablesTunableBackendTest {
   }
 
   @Test
+  void onTuneCanPublishAndRemoveTunables() {
+    AtomicInteger calls = new AtomicInteger();
+    TunableDouble publishedFromOnTune = TunableDouble.create(3.0);
+    TunableDouble removeMe = TunableDouble.create(4.0);
+    Tunables.publish("removeMe", removeMe);
+
+    Tunable<Double> tunable =
+        Tunable.createConfig(
+            1.0,
+            robust()
+                .withOnTune(
+                    () -> {
+                      if (calls.getAndIncrement() != 0) {
+                        return;
+                      }
+                      Tunables.remove("removeMe");
+                      Tunables.publish("publishedFromOnTune", publishedFromOnTune);
+                    }));
+    Tunables.publish("mutable", tunable);
+
+    tune("mutable").setDouble(2.0);
+    m_inst.flush();
+    assertDoesNotThrow(TunableRegistry::update);
+
+    assertEquals(1, calls.get());
+    assertEquals(2.0, tunable.get());
+    assertEquals(
+        3.0, m_inst.getTopic("/Tunables/publishedFromOnTune").getGenericEntry().getDouble(0.0));
+
+    TunableDouble replacement = TunableDouble.create(5.0);
+    assertDoesNotThrow(() -> Tunables.publish("removeMe", replacement));
+    assertEquals(5.0, m_inst.getTopic("/Tunables/removeMe").getGenericEntry().getDouble(0.0));
+  }
+
+  @Test
+  void getterCanPublishAndRemoveTunablesDuringBackendUpdate() {
+    AtomicInteger gets = new AtomicInteger();
+    AtomicInteger laterGets = new AtomicInteger();
+    AtomicReference<Double> value = new AtomicReference<>(1.0);
+    TunableDouble publishedFromGetter = TunableDouble.create(3.0);
+    TunableDouble transientFromGetter = TunableDouble.create(7.0);
+    Tunables.publish("removeMe", TunableDouble.create(4.0));
+
+    TunableDouble mutatingGetter =
+        TunableDouble.createConfig(
+            () -> {
+              if (gets.getAndIncrement() == 1) {
+                Tunables.remove("removeMe");
+                Tunables.publish("publishedFromGetter", publishedFromGetter);
+                Tunables.publish("transientFromGetter", transientFromGetter);
+                Tunables.remove("transientFromGetter");
+              }
+              return value.get();
+            },
+            value::set,
+            robust().withAlwaysGet(true));
+    Tunables.publish("a", mutatingGetter);
+    Tunables.publish(
+        "z",
+        TunableDouble.createConfig(
+            () -> {
+              laterGets.incrementAndGet();
+              return 6.0;
+            },
+            unused -> {},
+            robust().withAlwaysGet(true)));
+
+    assertDoesNotThrow(TunableRegistry::update);
+
+    assertTrue(gets.get() >= 2);
+    assertEquals(2, laterGets.get());
+    assertEquals(
+        3.0, m_inst.getTopic("/Tunables/publishedFromGetter").getGenericEntry().getDouble(0.0));
+
+    TunableDouble replacement = TunableDouble.create(5.0);
+    assertDoesNotThrow(() -> Tunables.publish("removeMe", replacement));
+    assertEquals(5.0, m_inst.getTopic("/Tunables/removeMe").getGenericEntry().getDouble(0.0));
+
+    TunableDouble transientReplacement = TunableDouble.create(8.0);
+    assertDoesNotThrow(() -> Tunables.publish("transientFromGetter", transientReplacement));
+    assertEquals(
+        8.0, m_inst.getTopic("/Tunables/transientFromGetter").getGenericEntry().getDouble(0.0));
+  }
+
+  @Test
+  void complexUpdateCanPublishAndRemoveTunablesDuringBackendUpdate() {
+    TunableDouble publishedFromComplex = TunableDouble.create(3.0);
+    Tunables.publish("removeMe", TunableDouble.create(4.0));
+
+    MutatingComplexTunable mutating = new MutatingComplexTunable(publishedFromComplex);
+    CountingComplexTunable after = new CountingComplexTunable();
+    Tunables.publish("complex", mutating);
+    Tunables.publish("z", after);
+
+    assertDoesNotThrow(TunableRegistry::update);
+
+    assertEquals(1, mutating.getUpdates());
+    assertEquals(1, after.getUpdates());
+    assertEquals(
+        3.0, m_inst.getTopic("/Tunables/publishedFromComplex").getGenericEntry().getDouble(0.0));
+
+    TunableDouble replacement = TunableDouble.create(5.0);
+    assertDoesNotThrow(() -> Tunables.publish("removeMe", replacement));
+    assertEquals(5.0, m_inst.getTopic("/Tunables/removeMe").getGenericEntry().getDouble(0.0));
+  }
+
+  @Test
   void nonRobustTunablesDoNotTuneFromLocalPublishes() {
     AtomicInteger calls = new AtomicInteger();
     Tunable<Double> tunable =
@@ -418,6 +528,57 @@ class NetworkTablesTunableBackendTest {
     var field = NetworkTablesTunableBackend.class.getDeclaredField("m_poller");
     field.setAccessible(true);
     return (NetworkTableListenerPoller) field.get(backend);
+  }
+
+  private static final class MutatingComplexTunable implements ComplexTunable {
+    MutatingComplexTunable(TunableDouble published) {
+      m_published = published;
+    }
+
+    @Override
+    public String getTunableType() {
+      return "Mutating";
+    }
+
+    @Override
+    public void publishTunable(TunableTable table) {}
+
+    @Override
+    public void updateTunable() {
+      if (m_updates++ != 0) {
+        return;
+      }
+      Tunables.remove("removeMe");
+      Tunables.publish("publishedFromComplex", m_published);
+    }
+
+    int getUpdates() {
+      return m_updates;
+    }
+
+    private final TunableDouble m_published;
+    private int m_updates;
+  }
+
+  private static final class CountingComplexTunable implements ComplexTunable {
+    @Override
+    public String getTunableType() {
+      return "Counting";
+    }
+
+    @Override
+    public void publishTunable(TunableTable table) {}
+
+    @Override
+    public void updateTunable() {
+      ++m_updates;
+    }
+
+    int getUpdates() {
+      return m_updates;
+    }
+
+    private int m_updates;
   }
 
   private static final class MeasureTunableAdapter extends Tunable<Measure<?>>
