@@ -23,6 +23,7 @@ class NetworkPing {
   WireConnection& m_wire;
   uint64_t m_nextPingTimeMs{0};
   uint64_t m_pongTimeMs{0};
+  uint64_t m_firstPingTimeMs{0};
 };
 
 }  // namespace wpi::nt::net
