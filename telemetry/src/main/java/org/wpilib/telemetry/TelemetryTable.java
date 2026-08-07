@@ -82,6 +82,9 @@ public final class TelemetryTable {
   void reset() {
     m_tablesMap.clear();
     m_entriesMap.clear();
+    synchronized (this) {
+      m_type = null;
+    }
   }
 
   /**

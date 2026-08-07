@@ -573,15 +573,39 @@ class TelemetryTableTest {
   void testBackendPrefixSelectionAndCacheReset() {
     TelemetryTable drive = Telemetry.getTable("drive");
     drive.log("speed", 1.0);
+    drive.log("gyro", new ThingType(3.0, 4.0, "Gyro"));
     assertEquals(1.0, m_mock.getLastValue("/drive/speed", Double.class));
+    assertEquals(
+        "Gyro",
+        m_mock
+            .getLastValue("/drive/gyro/.type", MockTelemetryBackend.LogStringValue.class)
+            .value());
 
     m_mock.clear();
     MockTelemetryBackend driveMock = new MockTelemetryBackend();
     TelemetryRegistry.registerBackend("/drive", driveMock);
     drive.log("speed", 2.0);
+    drive.log("gyro", new ThingType(5.0, 6.0, "Gyro"));
 
     assertNull(m_mock.getLastValue("/drive/speed", Double.class));
     assertEquals(2.0, driveMock.getLastValue("/drive/speed", Double.class));
+    assertEquals(
+        "Gyro",
+        driveMock
+            .getLastValue("/drive/gyro/.type", MockTelemetryBackend.LogStringValue.class)
+            .value());
+
+    TelemetryRegistry.reset();
+    MockTelemetryBackend resetMock = new MockTelemetryBackend();
+    TelemetryRegistry.registerBackend("", resetMock);
+    drive.log("gyro", new ThingType(7.0, 8.0, "OtherGyro"));
+
+    assertEquals(
+        "OtherGyro",
+        resetMock
+            .getLastValue("/drive/gyro/.type", MockTelemetryBackend.LogStringValue.class)
+            .value());
+    assertTrue(m_warnings.isEmpty());
   }
 
   @Test
