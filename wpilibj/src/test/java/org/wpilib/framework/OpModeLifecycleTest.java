@@ -13,7 +13,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
-import org.wpilib.driverstation.internal.DriverStationBackend;
+import org.wpilib.driverstation.RobotState;
 import org.wpilib.hardware.hal.OpModeOption;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.internal.PeriodicPriorityQueue;
@@ -113,7 +113,7 @@ class OpModeLifecycleTest {
 
   @AfterEach
   void tearDown() {
-    DriverStationBackend.clearOpModes();
+    RobotState.clearOpModes();
     SimHooks.resumeTiming();
   }
 
