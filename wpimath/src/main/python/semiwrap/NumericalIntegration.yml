@@ -15,7 +15,7 @@ functions:
       F&&, wpi::units::second_t, T, wpi::units::second_t:
         template_impls:
         - ["std::function<Eigen::MatrixXd(wpi::units::second_t, Eigen::MatrixXd)>", Eigen::MatrixXd]
-  RKDP:
+  Tsit5:
     overloads:
       F&&, T, U, wpi::units::second_t, double:
         template_impls:

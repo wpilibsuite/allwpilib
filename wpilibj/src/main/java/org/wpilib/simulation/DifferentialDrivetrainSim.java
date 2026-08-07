@@ -143,7 +143,7 @@ public class DifferentialDrivetrainSim {
    * @param dt the time difference in seconds
    */
   public void update(double dt) {
-    m_x = NumericalIntegration.rkdp(this::getDynamics, m_x, m_u, dt);
+    m_x = NumericalIntegration.tsit5(this::getDynamics, m_x, m_u, dt);
     m_y = m_x;
     if (m_measurementStdDevs != null) {
       m_y = m_y.plus(Normal.normal(m_measurementStdDevs));
