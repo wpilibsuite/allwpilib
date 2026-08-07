@@ -151,10 +151,10 @@ class LinearQuadraticRegulatorTest {
     assertEquals(0.5118212835109273, K.get(0, 1), 1e-10);
 
     // QRN overload
-    var Aref = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -Kv / (Ka * 5.0));
+    var Aref = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -Kv / Ka * 100.0);
     var Kimf = getImplicitModelFollowingK(A, B, Q, R, Aref, 0.005);
     assertEquals(0.0, Kimf.get(0, 0), 1e-10);
-    assertEquals(-6.919050011675146e-05, Kimf.get(0, 1), 1e-10);
+    assertEquals(0.10525981450778985, Kimf.get(0, 1), 1e-10);
   }
 
   @Test
