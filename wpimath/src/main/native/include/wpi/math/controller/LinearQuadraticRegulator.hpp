@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cmath>
 #include <format>
 #include <stdexcept>
 #include <string>
@@ -253,7 +254,28 @@ class LinearQuadraticRegulator {
   void Reset() {
     m_r.setZero();
     m_u.setZero();
+    m_error.setZero();
   }
+
+  /**
+   * Returns true if the error is within the tolerance set by SetTolerance()
+   * for every state.
+   */
+  bool AtReference() const {
+    for (int i = 0; i < m_error.rows(); ++i) {
+      if (std::abs(m_error(i)) > m_tolerance(i)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Sets the error which is considered tolerable for use with AtReference().
+   *
+   * @param tolerance The tolerable error for each state.
+   */
+  void SetTolerance(const StateVector& tolerance) { m_tolerance = tolerance; }
 
   /**
    * Returns the next output of the controller.
@@ -261,7 +283,8 @@ class LinearQuadraticRegulator {
    * @param x The current state x.
    */
   InputVector Calculate(const StateVector& x) {
-    m_u = m_K * (m_r - x);
+    m_error = m_r - x;
+    m_u = m_K * m_error;
     return m_u;
   }
 
@@ -309,6 +332,12 @@ class LinearQuadraticRegulator {
 
   // Computed controller output
   InputVector m_u;
+
+  // Error at the time of the last controller update
+  StateVector m_error = StateVector::Zero();
+
+  // Error which is considered tolerable for use with AtReference()
+  StateVector m_tolerance = StateVector::Zero();
 
   // Controller gain
   Matrixd<Inputs, States> m_K;

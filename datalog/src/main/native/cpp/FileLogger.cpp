@@ -6,11 +6,13 @@
 
 #ifdef __linux__
 #include <fcntl.h>
+#include <poll.h>
 #include <sys/inotify.h>
 #include <unistd.h>
 #endif
 
 #include <chrono>
+#include <format>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -26,21 +28,45 @@ FileLogger::FileLogger(std::string_view file,
     : m_fileHandle{open(file.data(), O_RDONLY)},
       m_inotifyHandle{inotify_init()},
       m_inotifyWatchHandle{
-          inotify_add_watch(m_inotifyHandle, file.data(), IN_MODIFY)},
-      m_thread{[=, this] {
-        char buf[8000];
-        char eventBuf[sizeof(struct inotify_event) + NAME_MAX + 1];
-        lseek(m_fileHandle, 0, SEEK_END);
-        while (read(m_inotifyHandle, eventBuf, sizeof(eventBuf)) > 0) {
-          int bufLen = 0;
-          if ((bufLen = read(m_fileHandle, buf, sizeof(buf))) > 0) {
-            callback(std::string_view{buf, static_cast<size_t>(bufLen)});
-          }
-          std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
-      }}
+          inotify_add_watch(m_inotifyHandle, file.data(), IN_MODIFY)}
 #endif
 {
+#ifdef __linux__
+  // inotify watches the file's inode, so a file that does not exist yet will
+  // never generate events (and a file created later won't be picked up).
+  // Don't spawn a thread in that case; without a watch, a reader blocked in
+  // read() can never be woken up and the destructor would deadlock.
+  if (m_fileHandle == -1 || m_inotifyWatchHandle == -1) {
+    return;
+  }
+  m_thread =
+      std::thread{[callback = std::move(callback), fileHandle = m_fileHandle,
+                   inotifyHandle = m_inotifyHandle, running = m_running] {
+        char buf[8000];
+        char eventBuf[sizeof(struct inotify_event) + NAME_MAX + 1];
+        lseek(fileHandle, 0, SEEK_END);
+        while (running->load()) {
+          // poll() with a timeout instead of a blocking read() so the thread
+          // periodically checks m_running and the destructor can join it even
+          // when the watched file is gone and no events ever arrive.
+          struct pollfd pfd{inotifyHandle, POLLIN, 0};
+          if (poll(&pfd, 1, 100) <= 0) {
+            continue;
+          }
+          if ((pfd.revents & POLLNVAL) != 0) {
+            break;
+          }
+          if ((pfd.revents & POLLIN) != 0 &&
+              read(inotifyHandle, eventBuf, sizeof(eventBuf)) > 0) {
+            int bufLen = 0;
+            if ((bufLen = read(fileHandle, buf, sizeof(buf))) > 0) {
+              callback(std::string_view{buf, static_cast<size_t>(bufLen)});
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+          }
+        }
+      }};
+#endif
 }
 FileLogger::FileLogger(std::string_view file, log::DataLog& log,
                        std::string_view key)
@@ -53,35 +79,54 @@ FileLogger::FileLogger(FileLogger&& other)
     : m_fileHandle{std::exchange(other.m_fileHandle, -1)},
       m_inotifyHandle{std::exchange(other.m_inotifyHandle, -1)},
       m_inotifyWatchHandle{std::exchange(other.m_inotifyWatchHandle, -1)},
+      m_running{std::move(other.m_running)},
       m_thread{std::move(other.m_thread)}
 #endif
 {
 }
 FileLogger& FileLogger::operator=(FileLogger&& rhs) {
 #ifdef __linux__
-  std::swap(m_fileHandle, rhs.m_fileHandle);
-  std::swap(m_inotifyHandle, rhs.m_inotifyHandle);
-  std::swap(m_inotifyWatchHandle, rhs.m_inotifyWatchHandle);
+  if (this == &rhs) {
+    return *this;
+  }
+
+  Stop();
+  m_fileHandle = std::exchange(rhs.m_fileHandle, -1);
+  m_inotifyHandle = std::exchange(rhs.m_inotifyHandle, -1);
+  m_inotifyWatchHandle = std::exchange(rhs.m_inotifyWatchHandle, -1);
+  m_running = std::move(rhs.m_running);
   m_thread = std::move(rhs.m_thread);
 #endif
   return *this;
 }
 FileLogger::~FileLogger() {
 #ifdef __linux__
-  if (m_inotifyWatchHandle != -1) {
-    inotify_rm_watch(m_inotifyHandle, m_inotifyWatchHandle);
-  }
-  if (m_inotifyHandle != -1) {
-    close(m_inotifyHandle);
-  }
-  if (m_fileHandle != -1) {
-    close(m_fileHandle);
+  Stop();
+#endif
+}
+
+#ifdef __linux__
+void FileLogger::Stop() {
+  if (m_running) {
+    m_running->store(false);
   }
   if (m_thread.joinable()) {
     m_thread.join();
   }
-#endif
+  if (m_inotifyWatchHandle != -1) {
+    inotify_rm_watch(m_inotifyHandle, m_inotifyWatchHandle);
+    m_inotifyWatchHandle = -1;
+  }
+  if (m_inotifyHandle != -1) {
+    close(m_inotifyHandle);
+    m_inotifyHandle = -1;
+  }
+  if (m_fileHandle != -1) {
+    close(m_fileHandle);
+    m_fileHandle = -1;
+  }
 }
+#endif
 
 std::function<void(std::string_view)> FileLogger::Buffer(
     std::function<void(std::string_view)> callback) {

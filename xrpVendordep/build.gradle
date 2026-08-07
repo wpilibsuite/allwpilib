@@ -1,7 +1,7 @@
 ext {
     nativeName = 'xrpVendordep'
     devMain = 'org.wpilib.xrp.DevMain'
-    nativeTestSuiteName = "${nativeName}Catch2Test"
+    nativeTestSuiteName = "${nativeName}Test"
 }
 
 evaluationDependsOn(":ntcore")
