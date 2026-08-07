@@ -13,6 +13,7 @@
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/units/base.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/StackTrace.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
@@ -206,14 +207,22 @@ class ProfiledPIDController
    *
    * @param goal The desired unprofiled setpoint.
    */
-  constexpr void SetGoal(State goal) { m_goal = goal; }
+  constexpr void SetGoal(State goal) {
+    m_goal = goal;
+    m_haveGoal = true;
+    m_reported = false;
+  }
 
   /**
    * Sets the goal for the ProfiledPIDController.
    *
    * @param goal The desired unprofiled setpoint.
    */
-  constexpr void SetGoal(Distance_t goal) { m_goal = {goal, Velocity_t{0}}; }
+  constexpr void SetGoal(Distance_t goal) {
+    m_goal = {goal, Velocity_t{0}};
+    m_haveGoal = true;
+    m_reported = false;
+  }
 
   /**
    * Gets the goal for the ProfiledPIDController.
@@ -337,6 +346,13 @@ class ProfiledPIDController
    * @param measurement The current measurement of the process variable.
    */
   constexpr double Calculate(Distance_t measurement) {
+    if (!m_haveGoal && !m_reported && !std::is_constant_evaluated()) {
+      wpi::math::MathSharedStore::ReportError(
+          "No goal provided for ProfiledPIDController.Calculate()",
+          wpi::util::GetStackTrace(1));
+      m_reported = true;
+    }
+
     if (m_controller.IsContinuousInputEnabled()) {
       // Get error which is smallest distance between goal and measurement
       auto errorBound = (m_maximumInput - m_minimumInput) / 2.0;
@@ -403,6 +419,7 @@ class ProfiledPIDController
   constexpr void Reset(const State& measurement) {
     m_controller.Reset();
     m_setpoint = measurement;
+    m_reported = false;
   }
 
   /**
@@ -464,6 +481,8 @@ class ProfiledPIDController
   TrapezoidProfile<Distance> m_profile;
   typename wpi::math::TrapezoidProfile<Distance>::State m_goal;
   typename wpi::math::TrapezoidProfile<Distance>::State m_setpoint;
+  bool m_haveGoal = false;
+  bool m_reported = false;
 };
 
 }  // namespace wpi::math

@@ -14,6 +14,7 @@
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/StackTrace.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
@@ -217,6 +218,7 @@ class WPILIB_DLLEXPORT PIDController
   constexpr void SetSetpoint(double setpoint) {
     m_setpoint = setpoint;
     m_haveSetpoint = true;
+    m_reported = false;
 
     if (m_continuous) {
       double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
@@ -321,6 +323,13 @@ class WPILIB_DLLEXPORT PIDController
    * @param measurement The current measurement of the process variable.
    */
   constexpr double Calculate(double measurement) {
+    if (!m_haveSetpoint && !m_reported && !std::is_constant_evaluated()) {
+      wpi::math::MathSharedStore::ReportError(
+          "No setpoint provided for PIDController.Calculate()",
+          wpi::util::GetStackTrace(1));
+      m_reported = true;
+    }
+
     m_measurement = measurement;
     m_prevError = m_error;
     m_haveMeasurement = true;
@@ -357,6 +366,7 @@ class WPILIB_DLLEXPORT PIDController
   constexpr double Calculate(double measurement, double setpoint) {
     m_setpoint = setpoint;
     m_haveSetpoint = true;
+    m_reported = false;
     return Calculate(measurement);
   }
 
@@ -369,6 +379,7 @@ class WPILIB_DLLEXPORT PIDController
     m_totalError = 0;
     m_errorDerivative = 0;
     m_haveMeasurement = false;
+    m_reported = false;
   }
 
   void InitSendable(wpi::util::SendableBuilder& builder) override;
@@ -420,6 +431,7 @@ class WPILIB_DLLEXPORT PIDController
 
   bool m_haveSetpoint = false;
   bool m_haveMeasurement = false;
+  bool m_reported = false;
 
   // Usage reporting instances
   inline static int instances = 0;
