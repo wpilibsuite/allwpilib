@@ -8,7 +8,7 @@ apply plugin: ExtraTasks
 
 ext {
     nativeName = 'wpilibc'
-    nativeTestSuiteName = "${nativeName}Catch2Test"
+    nativeTestSuiteName = "${nativeName}Test"
 }
 
 apply from: "${rootDir}/shared/config.gradle"
@@ -53,12 +53,6 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
 }
 
 project(':').libraryBuild.dependsOn build
-
-ext {
-    staticGtestConfigs = [:]
-}
-
-staticGtestConfigs["${nativeTestSuiteName}"] = []
 
 apply from: "${rootDir}/shared/catch2.gradle"
 
@@ -203,9 +197,6 @@ model {
                 it.exportedHeaders {
                     srcDirs 'src/test/native/include'
                 }
-            }
-            binaries.all {
-                lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
             }
         }
     }

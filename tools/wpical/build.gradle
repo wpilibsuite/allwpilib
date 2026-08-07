@@ -19,7 +19,7 @@ if (OperatingSystem.current().isWindows()) {
 ext {
     nativeName = 'wpical'
     useCpp = true
-    nativeTestSuiteName = "${nativeName}Catch2Test"
+    nativeTestSuiteName = "${nativeName}Test"
     sharedCvConfigs = []
     staticCvConfigs = [ (nativeName): [],
         (nativeTestSuiteName): []]
@@ -27,6 +27,7 @@ ext {
 
 apply from: "${rootDir}/shared/resources.gradle"
 apply from: "${rootDir}/shared/config.gradle"
+apply from: "${rootDir}/shared/catch2.gradle"
 
 def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
 def wpilibVersionFileOutput = file("$buildDir/generated/mainVersion/cpp/WPILibVersion.cpp")
@@ -237,7 +238,6 @@ model {
                 } else {
                     it.cppCompiler.define('GLOG_DEPRECATED', '[[deprecated]]')
                 }
-                lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
                 it.cppCompiler.define("RUNNING_WPICAL_TESTS")
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     // Comdlg32.lib is needed for GetSaveFileNameA

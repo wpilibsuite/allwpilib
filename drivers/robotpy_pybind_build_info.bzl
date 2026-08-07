@@ -301,7 +301,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
-        distribution = "robotpy-drivers",
+        distribution = "wpilib-drivers",
         srcs = native.glob(["src/main/python/wpilib_drivers/**/*.py"]) + [
             "src/main/python/wpilib_drivers/_init__drivers.py",
             "{}.generate_version".format(name),

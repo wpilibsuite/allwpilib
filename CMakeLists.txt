@@ -38,6 +38,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 cmake_minimum_required(VERSION 3.21)
+
 project(allwpilib)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
@@ -92,7 +93,7 @@ option(WPILIB_WITH_WPICAL "Build wpical" OFF)
 option(WPILIB_WITH_WPIMATH "Build wpimath" ON)
 option(WPILIB_WITH_WPILIB "Build hal, wpilibc/j, drivers, and developerRobot (needs OpenCV)" ON)
 option(WPILIB_WITH_EXAMPLES "Build examples" OFF)
-option(WPILIB_WITH_TESTS "Build unit tests (requires internet connection)" ON)
+option(WPILIB_WITH_TESTS "Build unit tests (requires internet connection)" ${PROJECT_IS_TOP_LEVEL})
 option(WPILIB_WITH_GUI "Build GUI items (needs SDL3)" OFF)
 cmake_dependent_option(
     WPILIB_WITH_FIELDS
@@ -102,7 +103,8 @@ cmake_dependent_option(
     ON
 )
 option(WPILIB_WITH_SIMULATION_MODULES "Build simulation modules" ON)
-option(WPILIB_WITH_BENCHMARK "Build the benchmark project" ON)
+option(WPILIB_WITH_BENCHMARK "Build the benchmark project" ${PROJECT_IS_TOP_LEVEL})
+option(WPILIB_WITH_EXECUTABLES "Build executables" ${PROJECT_IS_TOP_LEVEL})
 
 # Options for using a package manager (e.g., vcpkg) for certain dependencies.
 option(WPILIB_USE_SYSTEM_EIGEN "Use system Eigen" OFF)
@@ -125,6 +127,12 @@ wpilib_config(OPTIONS WPILIB_WITH_GUI REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WP
 wpilib_config(OPTIONS WPILIB_WITH_WPILIB REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WPIMATH)
 
 wpilib_config(OPTIONS WPILIB_WITH_FIELDS REQUIRES WPILIB_WITH_WPIMATH)
+
+# These projects build executables
+wpilib_config(OPTIONS WPILIB_WITH_WPICAL REQUIRES WPILIB_WITH_EXECUTABLES)
+wpilib_config(OPTIONS WPILIB_WITH_BENCHMARK REQUIRES WPILIB_WITH_EXECUTABLES)
+wpilib_config(OPTIONS WPILIB_WITH_TESTS REQUIRES WPILIB_WITH_EXECUTABLES)
+wpilib_config(OPTIONS WPILIB_WITH_EXAMPLES REQUIRES WPILIB_WITH_EXECUTABLES)
 
 set(include_dest include)
 
@@ -252,8 +260,6 @@ set(CMAKE_SHARED_LINKER_FLAGS_UBSAN
 
 if(WPILIB_WITH_TESTS)
     enable_testing()
-    add_subdirectory(thirdparty/googletest)
-    include(GoogleTest)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/catch2/extras")
     add_subdirectory(thirdparty/catch2)
     include(Catch)
@@ -299,13 +305,16 @@ if(WPILIB_WITH_GUI)
     add_subdirectory(thirdparty/imgui_suite)
     add_subdirectory(wpigui)
     add_subdirectory(glass)
-    add_subdirectory(tools/outlineviewer)
-    add_subdirectory(tools/sysid)
     if(WPILIB_WITH_WPICAL)
         add_subdirectory(tools/wpical)
     endif()
-    if(LIBSSH_FOUND)
-        add_subdirectory(tools/datalogtool)
+
+    if(WPILIB_WITH_EXECUTABLES)
+        add_subdirectory(tools/outlineviewer)
+        add_subdirectory(tools/sysid)
+        if(LIBSSH_FOUND)
+            add_subdirectory(tools/datalogtool)
+        endif()
     endif()
 endif()
 
@@ -336,7 +345,10 @@ if(WPILIB_WITH_WPILIB)
     if(WPILIB_WITH_EXAMPLES)
         add_subdirectory(wpilibcExamples)
     endif()
-    add_subdirectory(developerRobot)
+
+    if(WPILIB_WITH_EXECUTABLES)
+        add_subdirectory(developerRobot)
+    endif()
 endif()
 
 if(WPILIB_WITH_BENCHMARK)

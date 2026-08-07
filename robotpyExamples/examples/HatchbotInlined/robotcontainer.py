@@ -42,7 +42,7 @@ class RobotContainer:
         )
 
         # The driver's controller
-        self.driver_controller = commands2.button.CommandNiDsPS4Controller(
+        self.driver_controller = commands2.button.CommandDualShock4Controller(
             constants.DRIVER_CONTROLLER_PORT
         )
 

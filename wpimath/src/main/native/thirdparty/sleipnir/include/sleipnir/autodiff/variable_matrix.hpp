@@ -3,7 +3,9 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <concepts>
+#include <cstddef>
 #include <initializer_list>
 #include <iterator>
 #include <span>
@@ -11,9 +13,11 @@
 #include <vector>
 
 #include <Eigen/Core>
+#include <Eigen/LU>
 #include <Eigen/QR>
 #include <gch/small_vector.hpp>
 
+#include "sleipnir/autodiff/expression_graph.hpp"
 #include "sleipnir/autodiff/sleipnir_base.hpp"
 #include "sleipnir/autodiff/slice.hpp"
 #include "sleipnir/autodiff/variable.hpp"
@@ -1011,6 +1015,23 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
+  /// Converts the VariableMatrix to an Eigen matrix.
+  ///
+  /// @return Eigen matrix.
+  Eigen::Matrix<Variable<Scalar>, Eigen::Dynamic, Eigen::Dynamic> to_eigen()
+      const {
+    Eigen::Matrix<Variable<Scalar>, Eigen::Dynamic, Eigen::Dynamic> result{
+        rows(), cols()};
+
+    for (int row = 0; row < rows(); ++row) {
+      for (int col = 0; col < cols(); ++col) {
+        result(row, col) = (*this)[row, col];
+      }
+    }
+
+    return result;
+  }
+
   /// Transforms the matrix coefficient-wise with an unary operator.
   ///
   /// @param unary_op The unary operator to use for the transform operation.
@@ -1027,6 +1048,93 @@ class VariableMatrix : public SleipnirBase {
     }
 
     return result;
+  }
+
+  /// Returns the matrix exponential.
+  ///
+  /// @return The matrix exponential.
+  VariableMatrix<Scalar> exp() const {
+    slp_assert(rows() == cols());
+
+    // Coefficients for (13, 13) Padé approximant of exp(A) are from the
+    // following program:
+    //
+    // #!/usr/bin/env python
+    //
+    // import mpmath as mp
+    //
+    // # https://en.wikipedia.org/wiki/IEEE_754#Basic_and_interchange_formats
+    // mp.mp.prec = 113  # quad precision
+    //
+    // L = 13
+    // M = 13
+    // p, q = mp.pade(mp.taylor(mp.exp, 0, L + M), L, M)
+    //
+    // print("constexpr std::array p{")
+    // for k, p_k in enumerate(p):
+    //     print(f"Scalar({p_k}L){',' if k < len(p) - 1 else '};'}")
+    // print("constexpr std::array q{")
+    // for k, q_k in enumerate(q):
+    //     print(f"Scalar({q_k}L){',' if k < len(q) - 1 else '};'}")
+    constexpr size_t NUM_COEFFS = 14;
+    constexpr std::array p{Scalar(1.0L),
+                           Scalar(0.499999999999999999999987615564159L),
+                           Scalar(0.119999999999999999999993719796468L),
+                           Scalar(0.0183333333333333333333318078905823L),
+                           Scalar(0.00199275362318840579710121408775205L),
+                           Scalar(0.00016304347826086956521736560868541L),
+                           Scalar(1.03519668737060041407846479512981e-05L),
+                           Scalar(5.17598343685300207039205144279119e-07L),
+                           Scalar(2.04315135665250081725989398668247e-08L),
+                           Scalar(6.30602270571759511499920806570486e-10L),
+                           Scalar(1.48377004840414002705850442238441e-11L),
+                           Scalar(2.52915349159796595521307855480881e-13L),
+                           Scalar(2.81017054621996217245857568431558e-15L),
+                           Scalar(1.54404975067030888596595580141692e-17L)};
+    constexpr std::array q{Scalar(1.0L),
+                           Scalar(-0.500000000000000000000012384435841L),
+                           Scalar(0.120000000000000000000006104232309L),
+                           Scalar(-0.0183333333333333333333347707904729L),
+                           Scalar(0.00199275362318840579710166350137732L),
+                           Scalar(-0.000163043478260869565217413851346892L),
+                           Scalar(1.03519668737060041407885187519331e-05L),
+                           Scalar(-5.17598343685300207039443859549262e-07L),
+                           Scalar(2.04315135665250081726103781506842e-08L),
+                           Scalar(-6.30602270571759511500345035969254e-10L),
+                           Scalar(1.48377004840414002705969744674248e-11L),
+                           Scalar(-2.52915349159796595521550648156349e-13L),
+                           Scalar(2.81017054621996217246180850207342e-15L),
+                           Scalar(-1.54404975067030888596810607146175e-17L)};
+    static_assert(p.size() == NUM_COEFFS);
+    static_assert(q.size() == NUM_COEFFS);
+
+    //     13
+    // P = Σ pₖAᵏ
+    //    k=0
+    //
+    //     13
+    // Q = Σ qₖAᵏ
+    //    k=0
+    VariableMatrix<Scalar> P{
+        Eigen::Vector<Scalar, Eigen::Dynamic>::Constant(rows(), p[0])
+            .asDiagonal()};
+    VariableMatrix<Scalar> Q{
+        Eigen::Vector<Scalar, Eigen::Dynamic>::Constant(rows(), q[0])
+            .asDiagonal()};
+    auto A_pow = *this;
+    for (size_t k = 1; k < NUM_COEFFS; ++k) {
+      P += p[k] * A_pow;
+      Q += q[k] * A_pow;
+      A_pow *= *this;
+    }
+
+    // https://mpmath.org/doc/current/calculus/approximation.html#mpmath.pade
+    // defines the Padé approximant as exp(A)Q ≈ P, so:
+    //
+    //   exp(A) ≈ P / Q
+    //   exp(A) ≈ (Qᵀ \ Pᵀ)ᵀ
+    return VariableMatrix<Scalar>{
+        Q.T().to_eigen().lu().solve(P.T().to_eigen()).transpose()};
   }
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -1196,6 +1304,22 @@ class VariableMatrix : public SleipnirBase {
   ///
   /// @return Number of elements in matrix.
   size_t size() const { return m_storage.size(); }
+
+  /// Returns an identity variable matrix.
+  ///
+  /// @param rows The number of matrix rows.
+  /// @return An identity variable matrix.
+  static VariableMatrix<Scalar> identity(int rows) {
+    VariableMatrix<Scalar> result{detail::empty, rows, rows};
+
+    for (int row = 0; row < rows; ++row) {
+      for (int col = 0; col < rows; ++col) {
+        result[row, col] = row == col ? Scalar(1) : Scalar(0);
+      }
+    }
+
+    return result;
+  }
 
   /// Returns a variable matrix filled with zeros.
   ///
@@ -1623,33 +1747,8 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
     auto det_A = a * adj_A00 + b * adj_A10 + c * adj_A20 + d * adj_A30;
     return adj_A / det_A * B;
   } else {
-    using MatrixXv =
-        Eigen::Matrix<Variable<Scalar>, Eigen::Dynamic, Eigen::Dynamic>;
-
-    MatrixXv eigen_A{A.rows(), A.cols()};
-    for (int row = 0; row < A.rows(); ++row) {
-      for (int col = 0; col < A.cols(); ++col) {
-        eigen_A(row, col) = A[row, col];
-      }
-    }
-
-    MatrixXv eigen_B{B.rows(), B.cols()};
-    for (int row = 0; row < B.rows(); ++row) {
-      for (int col = 0; col < B.cols(); ++col) {
-        eigen_B(row, col) = B[row, col];
-      }
-    }
-
-    MatrixXv eigen_X = eigen_A.householderQr().solve(eigen_B);
-
-    VariableMatrix<Scalar> X{detail::empty, A.cols(), B.cols()};
-    for (int row = 0; row < X.rows(); ++row) {
-      for (int col = 0; col < X.cols(); ++col) {
-        X[row, col] = eigen_X(row, col);
-      }
-    }
-
-    return X;
+    return VariableMatrix<Scalar>{
+        A.to_eigen().householderQr().solve(B.to_eigen())};
   }
 }
 
@@ -1718,6 +1817,9 @@ VariableMatrix<Scalar> gradient_tree(const ExpressionGraph<Scalar>& top_list,
 }
 
 }  // namespace detail
+
+extern template class EXPORT_TEMPLATE_DECLARE(SLEIPNIR_DLLEXPORT)
+VariableMatrix<double>;
 
 extern template SLEIPNIR_DLLEXPORT VariableMatrix<double> solve(
     const VariableMatrix<double>& A, const VariableMatrix<double>& B);

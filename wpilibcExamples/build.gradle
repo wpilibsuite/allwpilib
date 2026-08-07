@@ -245,7 +245,7 @@ model {
         examplesMap.each { key, value ->
             def testFolder = new File("${rootDir}/wpilibcExamples/src/test/cpp/examples/${key}")
             if (testFolder.exists()) {
-                "${key}Catch2Test"(GoogleTestTestSuiteSpec) {
+                "${key}Test"(GoogleTestTestSuiteSpec) {
                     for (NativeComponentSpec c : $.components) {
                         if (c.name == key) {
                             testing c
@@ -272,9 +272,6 @@ model {
                             }
                         }
                     }
-                    binaries.all {
-                        lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
-                    }
                 }
             }
         }
@@ -283,7 +280,7 @@ model {
         snippetsMap.each { key, value ->
             def testFolder = new File("${rootDir}/wpilibcExamples/src/test/cpp/snippets/${key}")
             if (testFolder.exists()) {
-                "snippets${key}Catch2Test"(GoogleTestTestSuiteSpec) {
+                "snippets${key}Test"(GoogleTestTestSuiteSpec) {
                     for (NativeComponentSpec c : $.components) {
                         if (c.name == "snippets${key}") {
                             testing c
@@ -309,9 +306,6 @@ model {
                                 srcDirs "src/test/cpp/snippets/${key}/include"
                             }
                         }
-                    }
-                    binaries.all {
-                        lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
                     }
                 }
             }

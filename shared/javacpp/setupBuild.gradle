@@ -16,14 +16,8 @@ apply from: "${rootDir}/shared/java/javacommon.gradle"
 
 project(':').libraryBuild.dependsOn build
 
-ext {
-    staticGtestConfigs = [:]
-}
-
 def nativeTestSuiteName = project.findProperty('nativeTestSuiteName') ?: "${nativeName}Test"
-staticGtestConfigs[nativeTestSuiteName] = []
 
-apply from: "${rootDir}/shared/googletest.gradle"
 apply from: "${rootDir}/shared/catch2.gradle"
 
 model {
@@ -121,11 +115,6 @@ model {
                     exportedHeaders {
                         srcDirs 'src/test/native/include', 'src/main/native/cpp'
                     }
-                }
-            }
-            if (nativeTestSuiteName.contains('Catch2')) {
-                binaries.all {
-                    lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
                 }
             }
         }

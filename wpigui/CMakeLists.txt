@@ -19,9 +19,11 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/wpigui>
 )
 
-add_executable(wpiguidev src/dev/native/cpp/main.cpp)
-wpilib_target_warnings(wpiguidev)
-target_link_libraries(wpiguidev wpigui)
+if(WPILIB_WITH_EXECUTABLES)
+    add_executable(wpiguidev src/dev/native/cpp/main.cpp)
+    wpilib_target_warnings(wpiguidev)
+    target_link_libraries(wpiguidev wpigui)
+endif()
 
 install(TARGETS wpigui EXPORT wpigui)
 export(TARGETS wpigui FILE wpigui.cmake NAMESPACE wpigui::)

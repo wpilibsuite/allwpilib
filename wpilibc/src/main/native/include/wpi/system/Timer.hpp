@@ -40,7 +40,8 @@ class Timer {
    * Create a new timer object.
    *
    * Create a new timer object and reset the time to zero. The timer is
-   * initially not running and must be started.
+   * initially not running and must be started. Consider using
+   * CreateStarted() if the timer is used immediately after creation.
    */
   Timer();
 
@@ -127,6 +128,19 @@ class Timer {
    * @return true if running.
    */
   bool IsRunning() const;
+
+  /**
+   * Creates a new timer that begins started.
+   *
+   * <p>This is equivalent to
+   * <pre>
+   *   wpi::Timer timer;
+   *   timer.Start();
+   * </pre>
+   *
+   * @return A new started timer.
+   */
+  static wpi::Timer CreateStarted();
 
   /**
    * Return the clock time in seconds. By default, the time is the time returned

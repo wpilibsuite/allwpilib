@@ -5,7 +5,7 @@
 #
 
 from commands2 import Command
-from commands2.button import CommandNiDsXboxController
+from commands2.button import CommandXboxController
 from commands2.sysid import SysIdRoutine
 
 from subsystems.drive import Drive
@@ -27,7 +27,7 @@ class SysIdRoutineBot:
         self.shooter = Shooter()
 
         # The driver's controller
-        self.controller = CommandNiDsXboxController(OIConstants.DRIVER_CONTROLLER_PORT)
+        self.controller = CommandXboxController(OIConstants.DRIVER_CONTROLLER_PORT)
 
     def configure_bindings(self) -> None:
         """Use this method to define bindings between conditions and commands. These are useful for
@@ -65,7 +65,7 @@ class SysIdRoutineBot:
 
         # Control the shooter wheel with the left trigger
         self.shooter.set_default_command(
-            self.shooter.run_shooter(self.controller.get_left_trigger_axis)
+            self.shooter.run_shooter(self.controller.get_left_trigger)
         )
 
         self.controller.a().and_(self.controller.left_bumper()).while_true(

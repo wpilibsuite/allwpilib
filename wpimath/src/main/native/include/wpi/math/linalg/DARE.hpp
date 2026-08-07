@@ -115,23 +115,11 @@ Eigen::Matrix<double, States, States> DARE(
     // Solve WV₁ = Aₖ for V₁
     StateMatrix V_1 = W_solver.solve(A_k);
 
-    // Solve V₂Wᵀ = Gₖ for V₂
+    // Solve V₂Wᵀ = Gₖ for V₂ (see wpimath/docs/LinalgIdentities.md)
     //
-    // We want to put V₂Wᵀ = Gₖ into Ax = b form so we can solve it more
-    // efficiently.
-    //
-    // V₂Wᵀ = Gₖ
-    // (V₂Wᵀ)ᵀ = Gₖᵀ
-    // WV₂ᵀ = Gₖᵀ
-    //
-    // The solution of Ax = b can be found via x = A.solve(b).
-    //
-    // V₂ᵀ = W.solve(Gₖᵀ)
-    // V₂ = W.solve(Gₖᵀ)ᵀ
-    //
-    // Since W, Gₖ, and Hₖ are symmetric, drop the transposes on Gₖ and V₂.
-    //
-    // V₂ = W.solve(Gₖ)
+    // V₂ = Gₖ / Wᵀ
+    // V₂ = (W \ Gₖᵀ)ᵀ
+    // V₂ = W \ Gₖ since Gₖ and V₂ are symmetric
     StateMatrix V_2 = W_solver.solve(G_k);
 
     // Gₖ₊₁ = Gₖ + AₖV₂Aₖᵀ
@@ -312,10 +300,9 @@ std::expected<Eigen::Matrix<double, States, States>, DAREError> DARE(
   // where A₂ and Q₂ are a change of variables:
   //
   //   A₂ = A − BR⁻¹Nᵀ and Q₂ = Q − NR⁻¹Nᵀ
-  Eigen::Matrix<double, States, States> A_2 =
-      A - B * R_llt.solve(N.transpose());
-  Eigen::Matrix<double, States, States> Q_2 =
-      Q - N * R_llt.solve(N.transpose());
+  Eigen::Matrix<double, Inputs, States> Rinv_NT = R_llt.solve(N.transpose());
+  Eigen::Matrix<double, States, States> A_2 = A - B * Rinv_NT;
+  Eigen::Matrix<double, States, States> Q_2 = Q - N * Rinv_NT;
 
   if (checkPreconditions) {
     // Require Q be symmetric

@@ -133,7 +133,6 @@ publish_all(
         "//simulation/halsim_ws_server:halsim_ws_server-cpp_publish.publish",
         "//simulation/halsim_xrp:halsim_xrp-cpp_publish.publish",
         "//thirdparty/catch2:catch2-cpp_publish.publish",
-        "//thirdparty/googletest:googletest-cpp_publish.publish",
         "//thirdparty/imgui_suite:imguiSuite-cpp_publish.publish",
         "//tools/datalogtool:datalogtool_publish.publish",
         "//tools/outlineviewer:outlineviewer_publish.publish",
