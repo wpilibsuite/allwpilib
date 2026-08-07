@@ -6,9 +6,11 @@ package org.wpilib.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.wpilib.hardware.hal.util.UncleanStatusException;
 import org.wpilib.simulation.testutils.BooleanCallback;
 import org.wpilib.simulation.testutils.DoubleCallback;
 import org.wpilib.simulation.testutils.IntCallback;
@@ -41,8 +43,8 @@ class RoboRioSimTest {
             RoboRioSim.registerBrownoutVoltageCallback(brownoutVoltageCallback, false);
         CallbackStore recoveryVoltageCb =
             RoboRioSim.registerBrownoutRecoveryVoltageCallback(recoveryVoltageCallback, false)) {
-      final double kTestBrownoutVoltage = 6.5;
-      final double kTestRecoveryVoltage = 7.0;
+      final double kTestBrownoutVoltage = 7.5035;
+      final double kTestRecoveryVoltage = kTestBrownoutVoltage + 0.5;
 
       RobotController.setBrownoutVoltages(kTestBrownoutVoltage, kTestRecoveryVoltage);
       assertTrue(brownoutVoltageCallback.wasTriggered());
@@ -51,6 +53,23 @@ class RoboRioSimTest {
       assertEquals(kTestRecoveryVoltage, recoveryVoltageCallback.getSetValue());
       assertEquals(kTestBrownoutVoltage, RoboRioSim.getBrownoutVoltage());
       assertEquals(kTestRecoveryVoltage, RoboRioSim.getBrownoutRecoveryVoltage());
+    }
+  }
+
+  @Test
+  void testRejectsInvalidBrownoutThresholds() {
+    final double kDefaultBrownoutVoltage = 6.75;
+    final double kDefaultRecoveryVoltage = 7.25;
+    double[][] invalidPairs = {{4.99, 7.0}, {6.5, 8.51}, {6.5, 6.99}};
+
+    for (double[] pair : invalidPairs) {
+      RoboRioSim.resetData();
+
+      assertThrows(
+          UncleanStatusException.class,
+          () -> RobotController.setBrownoutVoltages(pair[0], pair[1]));
+      assertEquals(kDefaultBrownoutVoltage, RoboRioSim.getBrownoutVoltage());
+      assertEquals(kDefaultRecoveryVoltage, RoboRioSim.getBrownoutRecoveryVoltage());
     }
   }
 

@@ -4,6 +4,7 @@
 
 #include "wpi/hal/Power.h"
 
+#include <algorithm>
 #include <cmath>
 
 #include "HALInitializer.hpp"
@@ -79,17 +80,39 @@ void HAL_ResetUserCurrentFaults(int32_t* status) {
 void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
                              int32_t* status) {
   initializePower(status);
+  constexpr double kMillivoltsPerVolt = 1000.0;
+  constexpr double kBrownoutVoltageMin =
+      MRC_SYSTEMCORE_BROWNOUT_VOLTAGE_MIN_MV / kMillivoltsPerVolt;
+  constexpr double kBrownoutVoltageMax =
+      MRC_SYSTEMCORE_BROWNOUT_VOLTAGE_MAX_MV / kMillivoltsPerVolt;
+  constexpr double kRecoveryVoltageMax =
+      MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MAX_MV /
+      kMillivoltsPerVolt;
+  constexpr double kRecoveryVoltageMinDelta =
+      MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MIN_DELTA_MV /
+      kMillivoltsPerVolt;
   if (!std::isfinite(brownoutVoltage) || !std::isfinite(recoveryVoltage) ||
-      brownoutVoltage < 5.0 || brownoutVoltage > 8.0 ||
-      recoveryVoltage > 8.5 ||
-      recoveryVoltage < brownoutVoltage + 0.5) {
+      brownoutVoltage < kBrownoutVoltageMin ||
+      brownoutVoltage > kBrownoutVoltageMax ||
+      recoveryVoltage > kRecoveryVoltageMax ||
+      recoveryVoltage < brownoutVoltage + kRecoveryVoltageMinDelta) {
     *status = HAL_PARAMETER_OUT_OF_RANGE;
     return;
   }
 
+  auto brownoutMillivolts =
+      std::lround(brownoutVoltage * kMillivoltsPerVolt);
+  auto recoveryMillivolts =
+      std::lround(recoveryVoltage * kMillivoltsPerVolt);
+  // Independent rounding can shrink an exact 0.5 V difference to 499 mV.
+  // Preserve the validated hysteresis in the values sent to mrclib.
+  recoveryMillivolts = std::max(
+      recoveryMillivolts,
+      brownoutMillivolts +
+          MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MIN_DELTA_MV);
+
   MRC_Status mrcStatus = MRC_Systemcore_SetBrownoutVoltages(
-      std::lround(brownoutVoltage * 1000),
-      std::lround(recoveryVoltage * 1000));
+      brownoutMillivolts, recoveryMillivolts);
   if (mrcStatus == MRC_STATUS_PARAMETER_OUT_OF_RANGE) {
     *status = HAL_PARAMETER_OUT_OF_RANGE;
   } else if (mrcStatus != MRC_STATUS_SUCCESS) {

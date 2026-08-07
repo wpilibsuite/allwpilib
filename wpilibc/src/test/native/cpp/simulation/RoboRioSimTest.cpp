@@ -10,6 +10,8 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/Power.h"
 #include "wpi/system/RobotController.hpp"
 
 namespace wpi::sim {
@@ -39,8 +41,8 @@ TEST_CASE("RoboRioSimTest SetBrownout", "[wpilibc][simulation]") {
   auto recoveryVoltageCb =
       RoboRioSim::RegisterBrownoutRecoveryVoltageCallback(
           recoveryVoltageCallback.GetCallback(), false);
-  constexpr double kTestBrownoutVoltage = 6.5;
-  constexpr double kTestRecoveryVoltage = 7.0;
+  constexpr double kTestBrownoutVoltage = 7.5035;
+  constexpr double kTestRecoveryVoltage = kTestBrownoutVoltage + 0.5;
 
   RobotController::SetBrownoutVoltages(
       wpi::units::volt_t{kTestBrownoutVoltage},
@@ -52,6 +54,29 @@ TEST_CASE("RoboRioSimTest SetBrownout", "[wpilibc][simulation]") {
   CHECK(kTestBrownoutVoltage == RoboRioSim::GetBrownoutVoltage().value());
   CHECK(kTestRecoveryVoltage ==
         RoboRioSim::GetBrownoutRecoveryVoltage().value());
+}
+
+TEST_CASE("RoboRioSimTest Rejects invalid brownout thresholds",
+          "[wpilibc][simulation]") {
+  constexpr double kDefaultBrownoutVoltage = 6.75;
+  constexpr double kDefaultRecoveryVoltage = 7.25;
+
+  auto checkInvalidPair = [](double brownoutVoltage, double recoveryVoltage) {
+    RoboRioSim::ResetData();
+    int32_t status = 0;
+
+    HAL_SetBrownoutVoltages(brownoutVoltage, recoveryVoltage, &status);
+
+    CHECK(status == HAL_PARAMETER_OUT_OF_RANGE);
+    CHECK(RoboRioSim::GetBrownoutVoltage().value() ==
+          kDefaultBrownoutVoltage);
+    CHECK(RoboRioSim::GetBrownoutRecoveryVoltage().value() ==
+          kDefaultRecoveryVoltage);
+  };
+
+  checkInvalidPair(4.99, 7.0);
+  checkInvalidPair(6.5, 8.51);
+  checkInvalidPair(6.5, 6.99);
 }
 
 TEST_CASE("RoboRioSimTest Set3V3", "[wpilibc][simulation]") {
