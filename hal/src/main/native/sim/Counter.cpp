@@ -7,6 +7,7 @@
 #include "CounterInternal.hpp"
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
+#include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/handles/LimitedHandleResource.hpp"
 
@@ -37,6 +38,11 @@ void HAL_SetCounterEdgeConfiguration(HAL_CounterHandle counterHandle,
                                      HAL_Bool risingEdge, int32_t* status) {}
 void HAL_SetCounterRateWindow(HAL_CounterHandle counterHandle,
                               int32_t windowMilliseconds, int32_t* status) {
+  if (windowMilliseconds < 5 || windowMilliseconds > 255) {
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
   *status = 0;
 }
 void HAL_ResetCounter(HAL_CounterHandle counterHandle, int32_t* status) {}

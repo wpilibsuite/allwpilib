@@ -57,7 +57,10 @@ TEST_CASE("EncoderSimTest SetRateWindow", "[wpilibc][simulation]") {
 
   Encoder encoder(0, 1);
 
-  CHECK_NOTHROW(encoder.SetRateWindow(wpi::units::millisecond_t{50}));
+  CHECK_NOTHROW(encoder.SetRateWindow(wpi::units::millisecond_t{5}));
+  CHECK_NOTHROW(encoder.SetRateWindow(wpi::units::millisecond_t{255}));
+  CHECK_THROWS(encoder.SetRateWindow(wpi::units::millisecond_t{4}));
+  CHECK_THROWS(encoder.SetRateWindow(wpi::units::millisecond_t{256}));
 }
 
 TEST_CASE("EncoderSimTest ResetDataClearsRateCallbacks",

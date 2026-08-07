@@ -247,6 +247,11 @@ void HAL_SetEncoderRateWindow(HAL_EncoderHandle encoderHandle,
     return;
   }
 
+  if (windowMilliseconds < 5 || windowMilliseconds > 255) {
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
   *status = 0;
 }
 void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
