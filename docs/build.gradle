@@ -118,9 +118,6 @@ doxygen.sourceSets.main {
         exclude 'wpi/util/array-hash/**'
         exclude 'wpi/util/htrie_*.hpp'
 
-        // json
-        exclude 'wpi/util/detail/**'
-
         // libuv
         exclude 'uv/**'
 

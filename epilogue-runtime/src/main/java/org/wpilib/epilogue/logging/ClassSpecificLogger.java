@@ -108,7 +108,7 @@ public abstract class ClassSpecificLogger<T> {
 
     TelemetryTable table =
         m_telemetryTables.computeIfAbsent(
-            telemetry, ignored -> new TelemetryTable(new EpilogueTelemetryBackend(backend)));
+            _, _ -> new TelemetryTable(new EpilogueTelemetryBackend(backend)));
     telemetry.logTo(table);
     String type = telemetry.getTelemetryType();
     if (type != null) {
