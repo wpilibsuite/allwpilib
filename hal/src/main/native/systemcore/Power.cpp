@@ -4,7 +4,6 @@
 
 #include "wpi/hal/Power.h"
 
-#include <algorithm>
 #include <cmath>
 
 #include "HALInitializer.hpp"
@@ -88,14 +87,11 @@ void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
   constexpr double kRecoveryVoltageMax =
       MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MAX_MV /
       kMillivoltsPerVolt;
-  constexpr double kRecoveryVoltageMinDelta =
-      MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MIN_DELTA_MV /
-      kMillivoltsPerVolt;
   if (!std::isfinite(brownoutVoltage) || !std::isfinite(recoveryVoltage) ||
       brownoutVoltage < kBrownoutVoltageMin ||
       brownoutVoltage > kBrownoutVoltageMax ||
-      recoveryVoltage > kRecoveryVoltageMax ||
-      recoveryVoltage < brownoutVoltage + kRecoveryVoltageMinDelta) {
+      recoveryVoltage < kBrownoutVoltageMin ||
+      recoveryVoltage > kRecoveryVoltageMax) {
     *status = HAL_PARAMETER_OUT_OF_RANGE;
     return;
   }
@@ -104,12 +100,12 @@ void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
       std::lround(brownoutVoltage * kMillivoltsPerVolt);
   auto recoveryMillivolts =
       std::lround(recoveryVoltage * kMillivoltsPerVolt);
-  // Independent rounding can shrink an exact 0.5 V difference to 499 mV.
-  // Preserve the validated hysteresis in the values sent to mrclib.
-  recoveryMillivolts = std::max(
-      recoveryMillivolts,
+  if (recoveryMillivolts <
       brownoutMillivolts +
-          MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MIN_DELTA_MV);
+          MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MIN_DELTA_MV) {
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+    return;
+  }
 
   MRC_Status mrcStatus = MRC_Systemcore_SetBrownoutVoltages(
       brownoutMillivolts, recoveryMillivolts);

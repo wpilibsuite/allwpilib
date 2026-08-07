@@ -47,14 +47,22 @@ void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
   constexpr double kRecoveryVoltageMax =
       MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MAX_MV /
       kMillivoltsPerVolt;
-  constexpr double kRecoveryVoltageMinDelta =
-      MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MIN_DELTA_MV /
-      kMillivoltsPerVolt;
   if (!std::isfinite(brownoutVoltage) || !std::isfinite(recoveryVoltage) ||
       brownoutVoltage < kBrownoutVoltageMin ||
       brownoutVoltage > kBrownoutVoltageMax ||
-      recoveryVoltage > kRecoveryVoltageMax ||
-      recoveryVoltage < brownoutVoltage + kRecoveryVoltageMinDelta) {
+      recoveryVoltage < kBrownoutVoltageMin ||
+      recoveryVoltage > kRecoveryVoltageMax) {
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
+  auto brownoutMillivolts =
+      std::lround(brownoutVoltage * kMillivoltsPerVolt);
+  auto recoveryMillivolts =
+      std::lround(recoveryVoltage * kMillivoltsPerVolt);
+  if (recoveryMillivolts <
+      brownoutMillivolts +
+          MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MIN_DELTA_MV) {
     *status = HAL_PARAMETER_OUT_OF_RANGE;
     return;
   }

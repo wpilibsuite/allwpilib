@@ -43,8 +43,8 @@ class RoboRioSimTest {
             RoboRioSim.registerBrownoutVoltageCallback(brownoutVoltageCallback, false);
         CallbackStore recoveryVoltageCb =
             RoboRioSim.registerBrownoutRecoveryVoltageCallback(recoveryVoltageCallback, false)) {
-      final double kTestBrownoutVoltage = 7.5035;
-      final double kTestRecoveryVoltage = kTestBrownoutVoltage + 0.5;
+      final double kTestBrownoutVoltage = 7.501;
+      final double kTestRecoveryVoltage = 8.001;
 
       RobotController.setBrownoutVoltages(kTestBrownoutVoltage, kTestRecoveryVoltage);
       assertTrue(brownoutVoltageCallback.wasTriggered());

@@ -41,8 +41,8 @@ TEST_CASE("RoboRioSimTest SetBrownout", "[wpilibc][simulation]") {
   auto recoveryVoltageCb =
       RoboRioSim::RegisterBrownoutRecoveryVoltageCallback(
           recoveryVoltageCallback.GetCallback(), false);
-  constexpr double kTestBrownoutVoltage = 7.5035;
-  constexpr double kTestRecoveryVoltage = kTestBrownoutVoltage + 0.5;
+  constexpr double kTestBrownoutVoltage = 7.501;
+  constexpr double kTestRecoveryVoltage = 8.001;
 
   RobotController::SetBrownoutVoltages(
       wpi::units::volt_t{kTestBrownoutVoltage},
