@@ -230,6 +230,32 @@ class NetworkTablesTunableBackendTest {
   }
 
   @Test
+  void publishesAndTunesStructFromSupplierTunable() {
+    Translation2d initial = new Translation2d(1.25, 2.5);
+    Translation2d tuned = new Translation2d(3.75, 4.5);
+    AtomicReference<Translation2d> value = new AtomicReference<>(initial);
+    final Tunable<Translation2d> tunable =
+        Tunables.publishValue("supplierTranslation", value::get, value::set, Translation2d.class);
+
+    var entry =
+        m_inst
+            .getStructTopic("/Tunables/supplierTranslation", Translation2d.struct)
+            .getEntry(Translation2d.kZero);
+    assertEquals(initial, entry.get());
+
+    m_inst
+        .getStructTopic("/Tunables/supplierTranslation", Translation2d.struct)
+        .publish()
+        .set(tuned);
+    m_inst.flush();
+    TunableRegistry.update();
+
+    assertEquals(tuned, value.get());
+    assertEquals(tuned, tunable.get());
+    assertEquals(tuned, entry.get());
+  }
+
+  @Test
   void publishesAndTunesProtobuf() {
     Translation2d initial = new Translation2d(5.25, 6.5);
     Translation2d tuned = new Translation2d(7.75, 8.5);

@@ -123,10 +123,23 @@ class TunableTest {
 
   private static final class DirectStructComplex implements ComplexTunable {
     private StructThing m_point = new StructThing(1);
+    private Tunable<StructThing> m_pointTunable;
 
     @Override
     public void publishTunable(TunableTable table) {
-      table.publishValue("point", () -> m_point, value -> m_point = value, StructThing.class);
+      m_pointTunable =
+          table.publishValue("point", () -> m_point, value -> m_point = value, StructThing.class);
+    }
+  }
+
+  private static final class DirectProtoComplex implements ComplexTunable {
+    private ProtoThing m_point = new ProtoThing(1);
+    private Tunable<ProtoThing> m_pointTunable;
+
+    @Override
+    public void publishTunable(TunableTable table) {
+      m_pointTunable =
+          table.publishValue("point", () -> m_point, value -> m_point = value, ProtoThing.class);
     }
   }
 
@@ -259,6 +272,7 @@ class TunableTest {
     final float[] floatValue = {3.0f};
     final double[] doubleValue = {4.0};
     final StructThing[] point = {new StructThing(5)};
+    final ProtoThing[] protoPoint = {new ProtoThing(6)};
 
     final TunableBoolean bool =
         table.publishBoolean("bool", () -> boolValue[0], v -> boolValue[0] = v);
@@ -271,6 +285,9 @@ class TunableTest {
         table.publishDouble("double", () -> doubleValue[0], v -> doubleValue[0] = v);
     final Tunable<StructThing> generic =
         table.publishValue("point", () -> point[0], value -> point[0] = value, StructThing.class);
+    final Tunable<ProtoThing> protoGeneric =
+        table.publishValue(
+            "proto", () -> protoPoint[0], value -> protoPoint[0] = value, ProtoThing.class);
 
     assertTrue(hasAlwaysGet(bool));
     assertTrue(hasAlwaysGet(integer));
@@ -278,12 +295,16 @@ class TunableTest {
     assertTrue(hasAlwaysGet(floatTunable));
     assertTrue(hasAlwaysGet(doubleTunable));
     assertTrue(hasAlwaysGet(generic));
+    assertTrue(hasAlwaysGet(protoGeneric));
+    assertInstanceOf(Tunable.TunableStruct.class, generic);
+    assertInstanceOf(Tunable.TunableProtobuf.class, protoGeneric);
     assertTrue(m_mock.getBoolean("/linked/bool"));
     assertEquals(1, m_mock.getInteger("/linked/int"));
     assertEquals(2L, m_mock.getLong("/linked/long"));
     assertEquals(3.0f, m_mock.getFloat("/linked/float"));
     assertEquals(4.0, m_mock.getDouble("/linked/double"));
     assertEquals(new StructThing(5), m_mock.getValue("/linked/point"));
+    assertEquals(new ProtoThing(6), m_mock.getValue("/linked/proto"));
 
     m_mock.setBoolean("/linked/bool", false);
     m_mock.setInt("/linked/int", 10);
@@ -291,6 +312,7 @@ class TunableTest {
     m_mock.setFloat("/linked/float", 30.0f);
     m_mock.setDouble("/linked/double", 40.0);
     m_mock.setValue("/linked/point", new StructThing(50));
+    m_mock.setValue("/linked/proto", new ProtoThing(60));
     TunableRegistry.update();
 
     assertFalse(boolValue[0]);
@@ -299,6 +321,7 @@ class TunableTest {
     assertEquals(30.0f, floatValue[0]);
     assertEquals(40.0, doubleValue[0]);
     assertEquals(new StructThing(50), point[0]);
+    assertEquals(new ProtoThing(60), protoPoint[0]);
   }
 
   @Test
@@ -521,12 +544,27 @@ class TunableTest {
     final DirectStructComplex complex = new DirectStructComplex();
     Tunables.publish("directStruct", complex);
 
+    assertInstanceOf(Tunable.TunableStruct.class, complex.m_pointTunable);
     assertEquals(new StructThing(1), m_mock.getValue("/directStruct/point"));
 
     m_mock.setValue("/directStruct/point", new StructThing(2));
     TunableRegistry.update();
 
     assertEquals(new StructThing(2), complex.m_point);
+  }
+
+  @Test
+  void testComplexTunablePublishesDirectProtobufSerializableMember() {
+    final DirectProtoComplex complex = new DirectProtoComplex();
+    Tunables.publish("directProto", complex);
+
+    assertInstanceOf(Tunable.TunableProtobuf.class, complex.m_pointTunable);
+    assertEquals(new ProtoThing(1), m_mock.getValue("/directProto/point"));
+
+    m_mock.setValue("/directProto/point", new ProtoThing(2));
+    TunableRegistry.update();
+
+    assertEquals(new ProtoThing(2), complex.m_point);
   }
 
   @Test

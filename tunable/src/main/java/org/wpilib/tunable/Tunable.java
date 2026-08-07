@@ -125,10 +125,13 @@ public abstract class Tunable<T> extends TunableBase implements Supplier<T>, Con
     TunableBase getInnerTunable();
   }
 
+  @SuppressWarnings("unchecked")
+  private static <T> Class<T> getValueClass(T value) {
+    return (Class<T>) value.getClass();
+  }
+
   private static <T> Tunable<T> createBasic(T initialValue, TunableConfig config) {
-    @SuppressWarnings("unchecked")
-    Class<T> cls = (Class<T>) initialValue.getClass();
-    return createBasic(initialValue, cls, config);
+    return createBasic(initialValue, getValueClass(initialValue), config);
   }
 
   private static <T> Tunable<T> createBasic(T initialValue, Class<T> cls, TunableConfig config) {
@@ -145,6 +148,106 @@ public abstract class Tunable<T> extends TunableBase implements Supplier<T>, Con
       }
 
       private T m_value = initialValue;
+    };
+  }
+
+  private static <T> Struct<T> getStruct(Class<T> cls) {
+    // use introspection to get "struct" static variable
+    Object obj;
+    try {
+      obj = cls.getField("struct").get(null);
+    } catch (NoSuchFieldException e) {
+      TunableRegistry.reportWarning("could not get struct field for " + cls.getName());
+      return null;
+    } catch (IllegalAccessException e) {
+      TunableRegistry.reportWarning("could not access struct field for " + cls.getName());
+      return null;
+    }
+    switch (obj) {
+      case Struct<?> s when s.getTypeClass().equals(cls) -> {
+        @SuppressWarnings("unchecked")
+        Struct<T> struct = (Struct<T>) s;
+        return struct;
+      }
+      case Struct<?> s ->
+          TunableRegistry.reportWarning(
+              "type mismatch, expected '"
+                  + s.getTypeClass().getName()
+                  + "', got '"
+                  + cls.getName()
+                  + "'");
+      default ->
+          TunableRegistry.reportWarning(
+              "struct field for " + cls.getName() + " is not of Struct<?> type");
+    }
+    return null;
+  }
+
+  private static <T> Protobuf<T, ?> getProtobuf(Class<T> cls) {
+    // use introspection to get "proto" static variable
+    Object obj;
+    try {
+      obj = cls.getField("proto").get(null);
+    } catch (NoSuchFieldException e) {
+      TunableRegistry.reportWarning("could not get proto field for " + cls.getName());
+      return null;
+    } catch (IllegalAccessException e) {
+      TunableRegistry.reportWarning("could not access proto field for " + cls.getName());
+      return null;
+    }
+    switch (obj) {
+      case Protobuf<?, ?> s when s.getTypeClass().equals(cls) -> {
+        @SuppressWarnings("unchecked")
+        Protobuf<T, ?> proto = (Protobuf<T, ?>) s;
+        return proto;
+      }
+      case Protobuf<?, ?> s ->
+          TunableRegistry.reportWarning(
+              "type mismatch, expected '"
+                  + s.getTypeClass().getName()
+                  + "', got '"
+                  + cls.getName()
+                  + "'");
+      default ->
+          TunableRegistry.reportWarning(
+              "proto field for " + cls.getName() + " is not of Protobuf<?, ?> type");
+    }
+    return null;
+  }
+
+  private static <T> Tunable<T> createGetterSetterTunable(
+      Supplier<T> getter, Consumer<T> setter, Struct<T> struct, TunableConfig config) {
+    return new TunableStruct<T>(null, struct, config) {
+      @Override
+      public void set(T value) {
+        if (setter != null) {
+          setter.accept(value);
+        }
+        m_changed = true;
+      }
+
+      @Override
+      public T get() {
+        return getter.get();
+      }
+    };
+  }
+
+  private static <T> Tunable<T> createGetterSetterTunable(
+      Supplier<T> getter, Consumer<T> setter, Protobuf<T, ?> proto, TunableConfig config) {
+    return new TunableProtobuf<T>(null, proto, config) {
+      @Override
+      public void set(T value) {
+        if (setter != null) {
+          setter.accept(value);
+        }
+        m_changed = true;
+      }
+
+      @Override
+      public T get() {
+        return getter.get();
+      }
     };
   }
 
@@ -229,80 +332,26 @@ public abstract class Tunable<T> extends TunableBase implements Supplier<T>, Con
    * @param config tunable config
    * @return Tunable
    */
-  @SuppressWarnings("PMD.SwitchDensity")
   public static <T> Tunable<T> createConfig(T initialValue, TunableConfig config) {
     Objects.requireNonNull(initialValue);
-    switch (initialValue) {
-      case StructSerializable v -> {
-        // use introspection to get "struct" static variable
-        Object obj;
-        try {
-          obj = v.getClass().getField("struct").get(null);
-        } catch (NoSuchFieldException e) {
-          TunableRegistry.reportWarning("could not get struct field for " + v.getClass().getName());
-          return createBasic(initialValue, config);
-        } catch (IllegalAccessException e) {
-          TunableRegistry.reportWarning(
-              "could not access struct field for " + v.getClass().getName());
-          return createBasic(initialValue, config);
-        }
-        switch (obj) {
-          case Struct<?> s when s.getTypeClass().equals(initialValue.getClass()) -> {
-            @SuppressWarnings("unchecked")
-            Struct<T> s2 = (Struct<T>) s;
-            return createConfig(initialValue, s2, config);
-          }
-          case Struct<?> s ->
-              TunableRegistry.reportWarning(
-                  "type mismatch, expected '"
-                      + s.getTypeClass().getName()
-                      + "', got '"
-                      + initialValue.getClass().getName()
-                      + "'");
-          default ->
-              TunableRegistry.reportWarning(
-                  "struct field for " + v.getClass().getName() + " is not of Struct<?> type");
-        }
+    Class<T> cls = getValueClass(initialValue);
+    if (initialValue instanceof StructSerializable) {
+      Struct<T> struct = getStruct(cls);
+      if (struct != null) {
+        return createConfig(initialValue, struct, config);
       }
-      case ProtobufSerializable v -> {
-        // use introspection to get "proto" static variable
-        Object obj;
-        try {
-          obj = v.getClass().getField("proto").get(null);
-        } catch (NoSuchFieldException e) {
-          TunableRegistry.reportWarning("could not get proto field for " + v.getClass().getName());
-          return createBasic(initialValue, config);
-        } catch (IllegalAccessException e) {
-          TunableRegistry.reportWarning(
-              "could not access proto field for " + v.getClass().getName());
-          return createBasic(initialValue, config);
-        }
-        switch (obj) {
-          case Protobuf<?, ?> s when s.getTypeClass().equals(initialValue.getClass()) -> {
-            @SuppressWarnings("unchecked")
-            Protobuf<T, ?> s2 = (Protobuf<T, ?>) s;
-            return createConfig(initialValue, s2, config);
-          }
-          case Protobuf<?, ?> s ->
-              TunableRegistry.reportWarning(
-                  "type mismatch, expected '"
-                      + s.getTypeClass().getName()
-                      + "', got '"
-                      + initialValue.getClass().getName()
-                      + "'");
-          default ->
-              TunableRegistry.reportWarning(
-                  "proto field for " + v.getClass().getName() + " is not of Protobuf<?, ?> type");
-        }
+    } else if (initialValue instanceof ProtobufSerializable) {
+      Protobuf<T, ?> proto = getProtobuf(cls);
+      if (proto != null) {
+        return createConfig(initialValue, proto, config);
       }
-      default -> {
-        // try other handlers
-        var handler = TunableRegistry.getTypeHandler(initialValue);
-        if (handler != null) {
-          Tunable<T> tunable = handler.createTunable(initialValue, config);
-          if (tunable != null) {
-            return tunable;
-          }
+    } else {
+      // try other handlers
+      var handler = TunableRegistry.getTypeHandler(initialValue);
+      if (handler != null) {
+        Tunable<T> tunable = handler.createTunable(initialValue, config);
+        if (tunable != null) {
+          return tunable;
         }
       }
     }
@@ -353,6 +402,17 @@ public abstract class Tunable<T> extends TunableBase implements Supplier<T>, Con
       config = TunableConfig.of(TunableOption.ALWAYS_GET);
     } else {
       config = config.withAlwaysGet(true);
+    }
+    if (cls != null && StructSerializable.class.isAssignableFrom(cls)) {
+      Struct<T> struct = getStruct(cls);
+      if (struct != null) {
+        return createGetterSetterTunable(getter, setter, struct, config);
+      }
+    } else if (cls != null && ProtobufSerializable.class.isAssignableFrom(cls)) {
+      Protobuf<T, ?> proto = getProtobuf(cls);
+      if (proto != null) {
+        return createGetterSetterTunable(getter, setter, proto, config);
+      }
     }
     return new BasicTunable<T>(cls, config) {
       @Override
