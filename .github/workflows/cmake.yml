@@ -20,73 +20,29 @@ jobs:
             name: Linux
             container: wpilib/systemcore-cross-debian:trixie
             flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON"
+            shell: bash
+
           - os: macOS-15
             name: macOS
             container: ""
             flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON"
+            shell: bash
+
           - os: windows-2025
             name: Windows
             container: ""
             flags: '--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON -DWPILIB_USE_SYSTEM_LIBUV=ON -DWPILIB_USE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE="$Env:RUNNER_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release'
+            shell: pwsh
 
     name: "Build - ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
     steps:
-      - name: Install dependencies (Linux)
-        if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libopencv-dev ninja-build
-
-      - name: Setup avahi-daemon
-        if: runner.os == 'Linux'
-        run: |
-          sudo service dbus start
-          sudo avahi-daemon -D
-
-      - name: Install dependencies (macOS)
-        if: runner.os == 'macOS'
-        run: brew install opencv ninja
-
-      - uses: TheMrMilchmann/setup-msvc-dev@v4
-        if: runner.os == 'Windows'
+      - name: CMake Build
+        uses: $/.github/actions/cmake-build
         with:
-          arch: x64
-
-      - name: Install CMake (Windows only)
-        if: runner.os == 'Windows'
-        uses: lukka/get-cmake@v4.4.0
-
-      - name: Install sccache
-        uses: mozilla-actions/sccache-action@v0.0.10
-
-      - uses: actions/checkout@v7
-
-      - name: Run vcpkg (Windows only)
-        if: runner.os == 'Windows'
-        uses: lukka/run-vcpkg@v11.6
-        with:
-          vcpkgDirectory: ${{ runner.workspace }}/vcpkg
-          vcpkgGitCommitId: 74e6536215718009aae747d86d84b78376bf9e09 # HEAD on 2025-10-17
-
-      - name: configure
-        run: cmake ${{ matrix.flags }}
-        env:
-          SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
-          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-
-      - name: build
-        run: cmake --build build-cmake --parallel $(nproc)
-        env:
-          SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
-          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-
-      - name: test
-        if: runner.os != 'Windows'
-        working-directory: build-cmake
-        run: ctest --output-on-failure
-
-      - name: test (windows)
-        if: runner.os == 'Windows'
-        working-directory: build-cmake
-        # UnitTest_test segfaults on exit occasionally
-        run: ctest --output-on-failure -E 'UnitTest'
+          shell: ${{ matrix.shell }}
+          configure-flags: ${{ matrix.flags }}
+          cmake-version: 4.4.0
+          artifactory-username: ${{ secrets.ARTIFACTORY_USERNAME }}
+          artifactory-password: ${{ secrets.ARTIFACTORY_PASSWORD }}

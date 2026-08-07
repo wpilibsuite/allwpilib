@@ -1,0 +1,163 @@
+name: Nightly Build
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Every day at 12:00 AM UTC (8PM EST)
+  pull_request: # TODO:TODO:TODO: REMOVE
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cmake:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: "Arch Linux (GCC)"
+            container: ghcr.io/pkgforge-dev/archlinux:latest
+            cc: gcc
+            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++"
+            shell: bash
+
+          - os: ubuntu-latest
+            name: "Arch Linux (Clang)"
+            container: ghcr.io/pkgforge-dev/archlinux:latest
+            cc: clang
+            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++"
+            shell: bash
+
+          - os: xcode-27
+            name: macOS
+            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON"
+            shell: bash
+
+          - os: windows-latest
+            name: Windows
+            flags: '--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON -DWPILIB_USE_SYSTEM_LIBUV=ON -DWPILIB_USE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE="$Env:RUNNER_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release'
+            shell: pwsh
+
+    name: "Build CMake - ${{ matrix.name }}"
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+    steps:
+      - name: Setup Latest Xcode (macOS)
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest
+
+      - name: CMake Build
+        uses: $/.github/actions/cmake-build
+        with:
+          shell: ${{ matrix.shell }}
+          configure-flags: ${{ matrix.flags }}
+          cc: ${{ matrix.cc }}
+          cmake-version: latest
+          artifactory-username: ${{ secrets.ARTIFACTORY_USERNAME }}
+          artifactory-password: ${{ secrets.ARTIFACTORY_PASSWORD }}
+
+  gradle:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            container: ghcr.io/pkgforge-dev/archlinux:latest
+            name: "Arch Linux"
+            build-options: "-Ponlylinuxx86-64 -PuseDefaultLinuxGcc"
+          - os: windows-latest
+            name: Windows
+            architecture: x64
+            build-options: "-PciReleaseOnly"
+            task: "copyAllOutputs"
+            outputs: "build/allOutputs"
+          - os: xcode-27
+            name: macOS
+            architecture: aarch64
+            task: "build"
+            outputs: "build/allOutputs"
+
+    name: "Build Gradle - ${{ matrix.name }}"
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Free disk space
+        if: runner.os == 'Linux'
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+
+      - name: Free disk space (macOS)
+        if: runner.os == 'macOS'
+        # CodeQL: 5G
+        # go: 748M
+        # Android: 12G
+        run: |
+          echo "##[group]Before Cleanup"
+          df -h
+          echo "##[endgroup]"
+
+          rm -rf /Users/runner/hostedtoolcache/CodeQL
+          rm -rf /Users/runner/hostedtoolcache/go
+          rm -rf /Users/runner/Library/Android
+
+          echo "##[group]After Cleanup"
+          df -h
+          echo "##[endgroup]"
+
+      - name: Setup Latest Xcode (macOS)
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest
+
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        if: runner.os != 'Linux'
+        with:
+          distribution: 'temurin'
+          java-version: 25
+          architecture: ${{ matrix.architecture }}
+
+      - name: Build with Gradle (host)
+        if: ${{ matrix.container == '' }}
+        run: ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+
+      - name: Build with Gradle (docker)
+        if: matrix.container
+        uses: wpilibsuite/docker-run-action@v4
+        with:
+          image: ${{ matrix.container }}
+          options: -v ${{ github.workspace }}:/work -w /work -e ARTIFACTORY_PUBLISH_USERNAME -e ARTIFACTORY_PUBLISH_PASSWORD -e GITHUB_REF -e CI
+          # Start avahi-daemon and build
+          run: |
+            pacman -Syu --noconfirm opencv ninja avahi cmake sccache jdk25-openjdk gcc xorg-xrandr libxinerama which
+            mkdir -p /var/run/dbus
+            dbus-uuidgen --ensure
+            dbus-daemon --system --address=unix:path=/var/run/dbus/system_bus_socket
+            avahi-daemon -D
+            ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+
+      - name: Check disk free space
+        if: always()
+        run: df -h
