@@ -78,7 +78,9 @@ def checkout_branch(auto_delete_branch: bool, branch_name: str):
     subprocess.check_call(["git", "checkout", branch_name])
 
 
-def update_mostrobotpy_rdev(wpilib_bin_version: str, mrclib_version, is_development_build: bool):
+def update_mostrobotpy_rdev(
+    wpilib_bin_version: str, mrclib_version, is_development_build: bool
+):
     with open("rdev.toml") as f:
         contents = f.read()
 
@@ -237,7 +239,6 @@ def main():
         with versions_file.open("rb") as f:
             versions = tomllib.load(f)["versions"]
         mrclib_version = versions["mrclib"]
-        
 
         allwpilib_to_mostrobotpy(
             copybara_file,
