@@ -7,14 +7,14 @@
 import argparse
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 from jinja2 import Environment, FileSystemLoader
 from jinja2.environment import Template
 
 
 def render_template(
-    template: Template, output_dir: Path, filename: str, controller: Dict[str, Any]
+    template: Template, output_dir: Path, filename: str, controller: dict[str, Any]
 ):
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / filename).write_text(
