@@ -508,10 +508,10 @@ int llhttp__on_reset(llhttp_t* s, const char* p, const char* endp) {
 void llhttp__debug(llhttp_t* s, const char* p, const char* endp,
                    const char* msg) {
   if (p == endp) {
-    fprintf(stderr, "p=%p type=%d flags=%02x next=null debug=%s\n", s, s->type,
-            s->flags, msg);
+    fprintf(stderr, "p=%p type=%d flags=%02x next=null debug=%s\n", (void*) s,
+            s->type, s->flags, msg);
   } else {
-    fprintf(stderr, "p=%p type=%d flags=%02x next=%02x   debug=%s\n", s,
-            s->type, s->flags, *p, msg);
+    fprintf(stderr, "p=%p type=%d flags=%02x next=%02x   debug=%s\n",
+            (void*) s, s->type, s->flags, *p, msg);
   }
 }

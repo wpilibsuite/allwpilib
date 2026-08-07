@@ -1,0 +1,73 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Codex <codex@example.com>
+Date: Fri, 7 Aug 2026 14:17:27 -0700
+Subject: [PATCH] Fix pedantic warnings
+
+---
+ bin/generate.ts  | 22 ++++++++++++++++++++--
+ src/native/api.c |  8 ++++----
+ 2 files changed, 24 insertions(+), 6 deletions(-)
+
+diff --git a/bin/generate.ts b/bin/generate.ts
+index 727269ddde2a6cf355c4cf16d3164a805793f300..ecb0a6ccbc9d8e44eb67d90bfe7185e76f83236b 100755
+--- a/bin/generate.ts
++++ b/bin/generate.ts
+@@ -28,6 +28,24 @@ const generated = llparse.build(new HTTP(llparse).build().entry, {
+   debug: process.env.LLPARSE_DEBUG ? 'llhttp__debug' : undefined,
+   headerGuard: 'INCLUDE_LLHTTP_ITSELF_H_',
+ });
++const generatedHeader = generated.header.replace(
++  '  void* _span_cb0;\n',
++  '  int (*_span_cb0)(llhttp__internal_t*, const unsigned char*,\n' +
++    '                   const unsigned char*);\n',
++);
++const generatedC = generated.c.replace(
++  'typedef int (*llhttp__internal__span_cb)(\n' +
++    '             llhttp__internal_t*, const char*, const char*);\n\n',
++  '',
++).replace(
++  '((llhttp__internal__span_cb) state->_span_cb0)' +
++    '(state, state->_span_pos0, (const char*) endp)',
++  'state->_span_cb0(state, state->_span_pos0, (const unsigned char*) endp)',
++);
++let generatedCWithNewline = generatedC;
++if (!generatedCWithNewline.endsWith('\n')) {
++  generatedCWithNewline += '\n';
++}
+ 
+ const headers = `
+ #ifndef INCLUDE_LLHTTP_H_
+@@ -37,7 +55,7 @@ const headers = `
+ #define LLHTTP_VERSION_MINOR ${version.minor}
+ #define LLHTTP_VERSION_PATCH ${version.patch}
+ 
+-${generated.header}
++${generatedHeader}
+ 
+ ${cHeaders.build()}
+ 
+@@ -48,4 +66,4 @@ ${nativeHeaders}
+ 
+ mkdirSync(dirname(C_FILE), { recursive: true });
+ writeFileSync(HEADER_FILE, headers);
+-writeFileSync(C_FILE, generated.c);
++writeFileSync(C_FILE, generatedCWithNewline);
+diff --git a/src/native/api.c b/src/native/api.c
+index ae5e862d98055acb17202dc78b86267f0acf1de8..dd7944408dc9afc7246fdf2bb25e949e2908f905 100644
+--- a/src/native/api.c
++++ b/src/native/api.c
+@@ -508,10 +508,10 @@ int llhttp__on_reset(llhttp_t* s, const char* p, const char* endp) {
+ void llhttp__debug(llhttp_t* s, const char* p, const char* endp,
+                    const char* msg) {
+   if (p == endp) {
+-    fprintf(stderr, "p=%p type=%d flags=%02x next=null debug=%s\n", s, s->type,
+-            s->flags, msg);
++    fprintf(stderr, "p=%p type=%d flags=%02x next=null debug=%s\n", (void*) s,
++            s->type, s->flags, msg);
+   } else {
+-    fprintf(stderr, "p=%p type=%d flags=%02x next=%02x   debug=%s\n", s,
+-            s->type, s->flags, *p, msg);
++    fprintf(stderr, "p=%p type=%d flags=%02x next=%02x   debug=%s\n",
++            (void*) s, s->type, s->flags, *p, msg);
+   }
+ }
