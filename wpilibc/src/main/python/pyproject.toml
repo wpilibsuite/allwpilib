@@ -99,10 +99,10 @@ Notifier = "rpy/Notifier.h"
 # rpy only
 AddressableLEDBuffer = "rpy/AddressableLEDBuffer.h"
 
-# wpi/counter
-EdgeConfiguration = "wpi/counter/EdgeConfiguration.hpp"
-EdgeCounter = "wpi/counter/EdgeCounter.hpp"
-Tachometer = "wpi/counter/Tachometer.hpp"
+# wpi/hardware/counter
+EdgeConfiguration = "wpi/hardware/counter/EdgeConfiguration.hpp"
+EdgeCounter = "wpi/hardware/counter/EdgeCounter.hpp"
+Tachometer = "wpi/hardware/counter/Tachometer.hpp"
 
 # wpi/drive
 DifferentialDrive = "wpi/drive/DifferentialDrive.hpp"

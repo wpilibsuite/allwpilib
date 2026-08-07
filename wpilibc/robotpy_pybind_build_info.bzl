@@ -114,7 +114,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             class_name = "EdgeConfiguration",
             yml_file = "semiwrap/EdgeConfiguration.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/counter/EdgeConfiguration.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/counter/EdgeConfiguration.hpp",
             tmpl_class_names = [],
             trampolines = [],
         ),
@@ -122,7 +122,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             class_name = "EdgeCounter",
             yml_file = "semiwrap/EdgeCounter.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/counter/EdgeCounter.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/counter/EdgeCounter.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::EdgeCounter", "wpi__EdgeCounter.hpp"),
@@ -132,7 +132,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             class_name = "Tachometer",
             yml_file = "semiwrap/Tachometer.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/counter/Tachometer.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/counter/Tachometer.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::Tachometer", "wpi__Tachometer.hpp"),

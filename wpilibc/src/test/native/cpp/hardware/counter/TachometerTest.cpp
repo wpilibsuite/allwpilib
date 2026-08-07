@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/counter/Tachometer.hpp"
+#include "wpi/hardware/counter/Tachometer.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
-#include "wpi/counter/EdgeConfiguration.hpp"
+#include "wpi/hardware/counter/EdgeConfiguration.hpp"
 #include "wpi/hal/HAL.h"
 #include "wpi/units/time.hpp"
 
