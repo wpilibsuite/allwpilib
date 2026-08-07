@@ -6,8 +6,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include "wpi/hardware/counter/EdgeConfiguration.hpp"
 #include "wpi/hal/HAL.h"
+#include "wpi/hardware/counter/EdgeConfiguration.hpp"
 #include "wpi/units/time.hpp"
 
 TEST_CASE("Tachometer SetRateWindow", "[wpilibc][counter]") {

@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "wpi/hardware/counter/EdgeConfiguration.hpp"
 #include "wpi/hal/Counter.h"
+#include "wpi/hardware/counter/EdgeConfiguration.hpp"
 #include "wpi/util/Handle.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"

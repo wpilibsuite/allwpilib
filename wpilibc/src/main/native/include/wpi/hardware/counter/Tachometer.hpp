@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "wpi/hardware/counter/EdgeConfiguration.hpp"
 #include "wpi/hal/Counter.h"
+#include "wpi/hardware/counter/EdgeConfiguration.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
