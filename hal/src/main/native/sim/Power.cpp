@@ -8,7 +8,10 @@
 #include <mutex>
 
 #include "mockdata/RoboRioDataInternal.hpp"
+#if __has_include("mrclib/Systemcore.h")
 #include "mrclib/Systemcore.h"
+#define WPI_HAL_SIM_HAS_MRCLIB_SYSTEMCORE_H
+#endif
 #include "wpi/hal/Errors.h"
 
 using namespace wpi::hal;
@@ -41,13 +44,26 @@ void HAL_ResetUserCurrentFaults(int32_t* status) {
 void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
                              int32_t* status) {
   constexpr double kMillivoltsPerVolt = 1000.0;
+  constexpr long kBrownoutVoltageMinMillivolts = 5000;
+  constexpr long kBrownoutVoltageMaxMillivolts = 8000;
+  constexpr long kRecoveryVoltageMaxMillivolts = 8500;
+  constexpr long kRecoveryVoltageMinDeltaMillivolts = 500;
+#ifdef WPI_HAL_SIM_HAS_MRCLIB_SYSTEMCORE_H
+  static_assert(kBrownoutVoltageMinMillivolts ==
+                MRC_SYSTEMCORE_BROWNOUT_VOLTAGE_MIN_MV);
+  static_assert(kBrownoutVoltageMaxMillivolts ==
+                MRC_SYSTEMCORE_BROWNOUT_VOLTAGE_MAX_MV);
+  static_assert(kRecoveryVoltageMaxMillivolts ==
+                MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MAX_MV);
+  static_assert(kRecoveryVoltageMinDeltaMillivolts ==
+                MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MIN_DELTA_MV);
+#endif
   constexpr double kBrownoutVoltageMin =
-      MRC_SYSTEMCORE_BROWNOUT_VOLTAGE_MIN_MV / kMillivoltsPerVolt;
+      kBrownoutVoltageMinMillivolts / kMillivoltsPerVolt;
   constexpr double kBrownoutVoltageMax =
-      MRC_SYSTEMCORE_BROWNOUT_VOLTAGE_MAX_MV / kMillivoltsPerVolt;
+      kBrownoutVoltageMaxMillivolts / kMillivoltsPerVolt;
   constexpr double kRecoveryVoltageMax =
-      MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MAX_MV /
-      kMillivoltsPerVolt;
+      kRecoveryVoltageMaxMillivolts / kMillivoltsPerVolt;
   if (!std::isfinite(brownoutVoltage) || !std::isfinite(recoveryVoltage) ||
       brownoutVoltage < kBrownoutVoltageMin ||
       brownoutVoltage > kBrownoutVoltageMax ||
@@ -62,8 +78,7 @@ void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
   auto recoveryMillivolts =
       std::lround(recoveryVoltage * kMillivoltsPerVolt);
   if (recoveryMillivolts <
-      brownoutMillivolts +
-          MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MIN_DELTA_MV) {
+      brownoutMillivolts + kRecoveryVoltageMinDeltaMillivolts) {
     *status = HAL_PARAMETER_OUT_OF_RANGE;
     return;
   }
