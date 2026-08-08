@@ -83,7 +83,6 @@ void InitializeHAL() {
   InitializeRoboRioData();
   InitializeSimDeviceData();
   InitializeAddressableLED();
-  InitializeAlert();
   InitializeAnalogInput();
   InitializeAnalogInternal();
   InitializeCAN();
@@ -197,7 +196,7 @@ HAL_Bool HAL_GetRSLState(int32_t* status) {
   return false;
 }
 
-HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
+HAL_Bool HAL_Initialize(void) {
   static std::atomic_bool initialized{false};
   static wpi::util::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
@@ -214,8 +213,6 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   wpi::hal::init::InitializeHAL();
 
   wpi::hal::init::HAL_IsInitialized.store(true);
-
-  wpi::hal::RestartTiming();
 
   wpi::hal::InitializeDriverStation();
 

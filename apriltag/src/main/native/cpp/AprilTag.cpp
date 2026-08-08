@@ -2,11 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/apriltag/AprilTag.hpp"
-
 #include <cstring>
 
-#include "wpi/util/json.hpp"
+#include "wpi/apriltag/AprilTagImageGenerator.hpp"
 
 #ifdef _WIN32
 #pragma warning(disable : 4200)
@@ -37,25 +35,18 @@ static bool FamilyToImage(wpi::util::RawFrame* frame, apriltag_family_t* family,
   return rv;
 }
 
-bool AprilTag::Generate36h11AprilTagImage(wpi::util::RawFrame* frame, int id) {
+bool wpi::apriltag::Generate36h11AprilTagImage(wpi::util::RawFrame* frame,
+                                               int id) {
   apriltag_family_t* tagFamily = tag36h11_create();
   bool rv = FamilyToImage(frame, tagFamily, id);
   tag36h11_destroy(tagFamily);
   return rv;
 }
 
-bool AprilTag::Generate16h5AprilTagImage(wpi::util::RawFrame* frame, int id) {
+bool wpi::apriltag::Generate16h5AprilTagImage(wpi::util::RawFrame* frame,
+                                              int id) {
   apriltag_family_t* tagFamily = tag16h5_create();
   bool rv = FamilyToImage(frame, tagFamily, id);
   tag16h5_destroy(tagFamily);
   return rv;
-}
-
-void wpi::apriltag::to_json(wpi::util::json& json, const AprilTag& apriltag) {
-  json = wpi::util::json::object("ID", apriltag.ID, "pose", apriltag.pose);
-}
-
-void wpi::apriltag::from_json(const wpi::util::json& json, AprilTag& apriltag) {
-  apriltag.ID = json.at("ID").get_int();
-  apriltag.pose = json.at("pose").get<wpi::math::Pose3d>();
 }

@@ -15,15 +15,16 @@
 using namespace wpi::cmd;
 class SelectCommandTest : public CommandTestBase {};
 
-TEST_F(SelectCommandTest, SelectCommand) {
+TEST_CASE_METHOD(SelectCommandTest, "SelectCommandTest SelectCommand",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> mock = std::make_unique<MockCommand>();
   MockCommand* mockptr = mock.get();
 
-  EXPECT_CALL(*mock, Initialize());
-  EXPECT_CALL(*mock, Execute()).Times(2);
-  EXPECT_CALL(*mock, End(false));
+  mock->ExpectInitialize(1);
+  mock->ExpectExecute(2);
+  mock->ExpectEnd(false, 1);
 
   std::vector<std::pair<int, std::unique_ptr<Command>>> temp;
 
@@ -38,10 +39,12 @@ TEST_F(SelectCommandTest, SelectCommand) {
   mockptr->SetFinished(true);
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(&select));
+  CHECK_FALSE(scheduler.IsScheduled(&select));
 }
 
-TEST_F(SelectCommandTest, SelectCommandRequirement) {
+TEST_CASE_METHOD(SelectCommandTest,
+                 "SelectCommandTest SelectCommandRequirement",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem requirement1;
@@ -59,8 +62,8 @@ TEST_F(SelectCommandTest, SelectCommandRequirement) {
   scheduler.Schedule(select);
   scheduler.Schedule(command3);
 
-  EXPECT_TRUE(scheduler.IsScheduled(command3));
-  EXPECT_FALSE(scheduler.IsScheduled(select));
+  CHECK(scheduler.IsScheduled(command3));
+  CHECK_FALSE(scheduler.IsScheduled(select));
 }
 
 class TestableSelectCommand : public SelectCommand<int> {

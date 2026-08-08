@@ -4,7 +4,8 @@
 
 #include "wpi/simulation/DifferentialDrivetrainSim.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/math/controller/LTVUnicycleController.hpp"
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
@@ -19,7 +20,8 @@
 #include "wpi/units/math.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 
-TEST(DifferentialDrivetrainSimTest, Convergence) {
+TEST_CASE("DifferentialDrivetrainSimTest Convergence",
+          "[wpilibc][simulation]") {
   using State = wpi::sim::DifferentialDrivetrainSim::State;
 
   wpi::sim::RoboRioSim::ResetData();
@@ -72,12 +74,15 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
 
   // 2 inch tolerance is OK since our ground truth is an approximation of the
   // ODE solution using wpi::math::RKDP anyway
-  EXPECT_NEAR(groundTruthX(0, 0), sim.GetState(State::X), 0.05);
-  EXPECT_NEAR(groundTruthX(1, 0), sim.GetState(State::Y), 0.05);
-  EXPECT_NEAR(groundTruthX(2, 0), sim.GetState(State::HEADING), 0.01);
+  CHECK_THAT(groundTruthX(0, 0),
+             Catch::Matchers::WithinAbs(sim.GetState(State::X), 0.05));
+  CHECK_THAT(groundTruthX(1, 0),
+             Catch::Matchers::WithinAbs(sim.GetState(State::Y), 0.05));
+  CHECK_THAT(groundTruthX(2, 0),
+             Catch::Matchers::WithinAbs(sim.GetState(State::HEADING), 0.01));
 }
 
-TEST(DifferentialDrivetrainSimTest, Current) {
+TEST_CASE("DifferentialDrivetrainSimTest Current", "[wpilibc][simulation]") {
   auto motor = wpi::math::DCMotor::NEO(2);
   auto plant = wpi::math::Models::DifferentialDriveFromPhysicalConstants(
       motor, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
@@ -89,22 +94,23 @@ TEST(DifferentialDrivetrainSimTest, Current) {
   for (int i = 0; i < 10; ++i) {
     sim.Update(20_ms);
   }
-  EXPECT_TRUE(sim.GetCurrentDraw() > 0_A);
+  CHECK(sim.GetCurrentDraw() > 0_A);
 
   sim.SetInputs(12_V, 12_V);
   for (int i = 0; i < 20; ++i) {
     sim.Update(20_ms);
   }
-  EXPECT_TRUE(sim.GetCurrentDraw() > 0_A);
+  CHECK(sim.GetCurrentDraw() > 0_A);
 
   sim.SetInputs(-12_V, 12_V);
   for (int i = 0; i < 30; ++i) {
     sim.Update(20_ms);
   }
-  EXPECT_TRUE(sim.GetCurrentDraw() > 0_A);
+  CHECK(sim.GetCurrentDraw() > 0_A);
 }
 
-TEST(DifferentialDrivetrainSimTest, ModelStability) {
+TEST_CASE("DifferentialDrivetrainSimTest ModelStability",
+          "[wpilibc][simulation]") {
   auto motor = wpi::math::DCMotor::NEO(2);
   auto plant = wpi::math::Models::DifferentialDriveFromPhysicalConstants(
       motor, 50_kg, 2_in, 12_in, 2_kg_sq_m, 5.0);
@@ -119,5 +125,5 @@ TEST(DifferentialDrivetrainSimTest, ModelStability) {
     sim.Update(20_ms);
   }
 
-  EXPECT_LT(wpi::units::math::abs(sim.GetPose().Translation().Norm()), 100_m);
+  CHECK(wpi::units::math::abs(sim.GetPose().Translation().Norm()) < 100_m);
 }

@@ -100,6 +100,10 @@ public class ParallelGroupBuilder {
    * @return The built group
    */
   public ParallelGroup named(String name) {
+    return named(name, false);
+  }
+
+  private ParallelGroup named(String name, boolean useAutomaticName) {
     requireNonNullParam(name, "name", "ParallelGroupBuilder.named");
 
     var group = new ParallelGroup(name, m_requiredCommands, m_optionalCommands);
@@ -109,9 +113,10 @@ public class ParallelGroupBuilder {
     }
 
     // We have a custom end condition, so we need to wrap the group in a race
-    return new ParallelGroupBuilder()
-        .optional(group, Command.waitUntil(m_endCondition).named("Until Condition"))
-        .named(name);
+    var out =
+        new ParallelGroupBuilder()
+            .optional(group, Command.waitUntil(m_endCondition).named("Until Condition"));
+    return useAutomaticName ? out.withAutomaticName() : out.named(name);
   }
 
   /**
@@ -130,15 +135,15 @@ public class ParallelGroupBuilder {
 
     if (m_requiredCommands.isEmpty()) {
       // No required commands, pure race
-      return named(optional);
+      return named(optional, true);
     } else if (m_optionalCommands.isEmpty()) {
       // Everything required
-      return named(required);
+      return named(required, true);
     } else {
       // Some form of deadline
       // eg "[(CommandA & CommandB) * (CommandX | CommandY | ...)]"
       String name = "[%s * %s]".formatted(required, optional);
-      return named(name);
+      return named(name, true);
     }
   }
 }

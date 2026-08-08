@@ -87,9 +87,31 @@ public class Timer {
   private double m_accumulatedTime;
   private boolean m_running;
 
-  /** Timer constructor. */
+  /**
+   * Creates a new timer. The timer is initially not running and must be started with {@link
+   * #start()} to start measuring time. Consider using {@link #createStarted()} instead if the timer
+   * will be used immediately after creation.
+   */
   public Timer() {
     reset();
+  }
+
+  /**
+   * Creates a new timer that begins started.
+   *
+   * <p>This is equivalent to
+   *
+   * {@snippet lang="java":
+   *  Timer timer = new Timer();
+   *  timer.start();
+   * }
+   *
+   * @return A new started timer.
+   */
+  public static Timer createStarted() {
+    var timer = new Timer();
+    timer.start();
+    return timer;
   }
 
   private double getMsClock() {

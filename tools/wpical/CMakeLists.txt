@@ -113,6 +113,7 @@ endif()
 target_link_libraries(
     wpical
     apriltag
+    fields
     wpimath
     opencv_highgui
     opencv_imgproc
@@ -139,7 +140,7 @@ elseif(APPLE)
 endif()
 
 if(WPILIB_WITH_TESTS)
-    wpilib_add_test_catch2(wpical src/test/native/cpp)
+    wpilib_add_test(wpical src/test/native/cpp)
     wpilib_link_macos_gui(wpical_test)
     target_sources(wpical_test PRIVATE ${wpical_src} ${wpical_thirdparty_src})
     target_compile_definitions(wpical_test PRIVATE RUNNING_WPICAL_TESTS)
@@ -169,6 +170,7 @@ if(WPILIB_WITH_TESTS)
     target_link_libraries(
         wpical_test
         apriltag
+        fields
         wpimath
         opencv_highgui
         opencv_objdetect

@@ -97,6 +97,7 @@ class AnalogPotentiometer
    *
    * @return The current position of the potentiometer (in the units used for
    *         fullRange and offset).
+   * @Common This is one of the commonly used methods for this class
    */
   double Get() const;
 

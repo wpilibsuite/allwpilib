@@ -42,14 +42,14 @@ class MyRobot(wpilib.TimedRobot):
         intake_button.and_(is_ball_at_kicker_event.negate()).if_high(
             # and there is not a ball at the kicker
             # activate the intake
-            lambda: self.intake.set(0.5)
+            lambda: self.intake.set_throttle(0.5)
         )
 
         # if the thumb button is not held
         intake_button.negate().or_(is_ball_at_kicker_event).if_high(
             # or there is a ball in the kicker
             # stop the intake
-            self.intake.stop_motor
+            lambda: self.intake.set_throttle(0.0)
         )
 
         shoot_trigger = wpilib.BooleanEvent(self.loop, self.joystick.get_trigger)
@@ -66,7 +66,7 @@ class MyRobot(wpilib.TimedRobot):
         )
 
         # if not, stop
-        shoot_trigger.negate().if_high(self.shooter.stop_motor)
+        shoot_trigger.negate().if_high(lambda: self.shooter.set_throttle(0.0))
 
         at_target_velocity = wpilib.BooleanEvent(
             self.loop, self.controller.at_setpoint
@@ -81,7 +81,7 @@ class MyRobot(wpilib.TimedRobot):
         # when we stop being at the target velocity, it means the ball was shot
         at_target_velocity.falling().if_high(
             # so stop the kicker
-            self.kicker.stop_motor
+            lambda: self.kicker.set_throttle(0.0)
         )
 
     def robot_periodic(self) -> None:

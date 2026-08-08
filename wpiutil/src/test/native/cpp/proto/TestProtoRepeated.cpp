@@ -6,7 +6,11 @@
 #include <utility>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 #include "TestProtoInner.hpp"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
@@ -148,7 +152,7 @@ namespace {
 using ProtoType = wpi::util::Protobuf<RepeatedTestProto>;
 }  // namespace
 
-TEST(RepeatedTestProtoTest, RoundtripNanopb) {
+TEST_CASE("RepeatedTestProtoTest RoundtripNanopb", "[wpiutil][proto]") {
   RepeatedTestProto kExpectedData = RepeatedTestProto{};
   kExpectedData.bool_msg.emplace_back(true);
   kExpectedData.bool_msg.emplace_back(false);
@@ -158,29 +162,29 @@ TEST(RepeatedTestProtoTest, RoundtripNanopb) {
   wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, kExpectedData));
   auto unpacked_data = message.Unpack(buf);
-  ASSERT_TRUE(unpacked_data.has_value());
+  REQUIRE(unpacked_data.has_value());
 
-  ASSERT_EQ(kExpectedData.double_msg.size(), unpacked_data->double_msg.size());
-  ASSERT_EQ(kExpectedData.float_msg.size(), unpacked_data->float_msg.size());
-  ASSERT_EQ(kExpectedData.int32_msg.size(), unpacked_data->int32_msg.size());
-  ASSERT_EQ(kExpectedData.int64_msg.size(), unpacked_data->int64_msg.size());
-  ASSERT_EQ(kExpectedData.uint32_msg.size(), unpacked_data->uint32_msg.size());
-  ASSERT_EQ(kExpectedData.uint64_msg.size(), unpacked_data->uint64_msg.size());
-  ASSERT_EQ(kExpectedData.sint32_msg.size(), unpacked_data->sint32_msg.size());
-  ASSERT_EQ(kExpectedData.sint64_msg.size(), unpacked_data->sint64_msg.size());
-  ASSERT_EQ(kExpectedData.fixed32_msg.size(),
-            unpacked_data->fixed32_msg.size());
-  ASSERT_EQ(kExpectedData.fixed64_msg.size(),
-            unpacked_data->fixed64_msg.size());
-  ASSERT_EQ(kExpectedData.sfixed32_msg.size(),
-            unpacked_data->sfixed32_msg.size());
-  ASSERT_EQ(kExpectedData.sfixed64_msg.size(),
-            unpacked_data->sfixed64_msg.size());
-  ASSERT_EQ(kExpectedData.bool_msg.size(), unpacked_data->bool_msg.size());
-  ASSERT_EQ(kExpectedData.string_msg.size(), unpacked_data->string_msg.size());
-  ASSERT_EQ(kExpectedData.bytes_msg.size(), unpacked_data->bytes_msg.size());
-  ASSERT_EQ(kExpectedData.TestProtoInner_msg.size(),
-            unpacked_data->TestProtoInner_msg.size());
+  REQUIRE(kExpectedData.double_msg.size() == unpacked_data->double_msg.size());
+  REQUIRE(kExpectedData.float_msg.size() == unpacked_data->float_msg.size());
+  REQUIRE(kExpectedData.int32_msg.size() == unpacked_data->int32_msg.size());
+  REQUIRE(kExpectedData.int64_msg.size() == unpacked_data->int64_msg.size());
+  REQUIRE(kExpectedData.uint32_msg.size() == unpacked_data->uint32_msg.size());
+  REQUIRE(kExpectedData.uint64_msg.size() == unpacked_data->uint64_msg.size());
+  REQUIRE(kExpectedData.sint32_msg.size() == unpacked_data->sint32_msg.size());
+  REQUIRE(kExpectedData.sint64_msg.size() == unpacked_data->sint64_msg.size());
+  REQUIRE(kExpectedData.fixed32_msg.size() ==
+          unpacked_data->fixed32_msg.size());
+  REQUIRE(kExpectedData.fixed64_msg.size() ==
+          unpacked_data->fixed64_msg.size());
+  REQUIRE(kExpectedData.sfixed32_msg.size() ==
+          unpacked_data->sfixed32_msg.size());
+  REQUIRE(kExpectedData.sfixed64_msg.size() ==
+          unpacked_data->sfixed64_msg.size());
+  REQUIRE(kExpectedData.bool_msg.size() == unpacked_data->bool_msg.size());
+  REQUIRE(kExpectedData.string_msg.size() == unpacked_data->string_msg.size());
+  REQUIRE(kExpectedData.bytes_msg.size() == unpacked_data->bytes_msg.size());
+  REQUIRE(kExpectedData.TestProtoInner_msg.size() ==
+          unpacked_data->TestProtoInner_msg.size());
 }

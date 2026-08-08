@@ -261,43 +261,30 @@ public final class RobotController {
   }
 
   /**
-   * Get the current brownout voltage setting.
+   * Set the voltages where the robot will enter and recover from brownout.
    *
-   * @return The brownout voltage
+   * <p>The brownout voltage must be between 5 V and 8 V, inclusive. The recovery voltage must be no
+   * greater than 8.5 V and at least 0.5 V above the brownout voltage.
+   *
+   * @param brownoutVoltage the voltage where the robot will enter brownout
+   * @param recoveryVoltage the voltage where the robot will recover from brownout
    */
-  public static double getBrownoutVoltage() {
-    return PowerJNI.getBrownoutVoltage();
+  public static void setBrownoutVoltages(double brownoutVoltage, double recoveryVoltage) {
+    PowerJNI.setBrownoutVoltages(brownoutVoltage, recoveryVoltage);
   }
 
   /**
-   * Get the current brownout voltage setting in a measure.
+   * Set the voltages in measures where the robot will enter and recover from brownout.
    *
-   * @return The brownout voltage in a measure.
+   * <p>The brownout voltage must be between 5 V and 8 V, inclusive. The recovery voltage must be no
+   * greater than 8.5 V and at least 0.5 V above the brownout voltage.
+   *
+   * @param brownoutVoltage the voltage where the robot will enter brownout
+   * @param recoveryVoltage the voltage where the robot will recover from brownout
    */
-  public static Voltage getMeasureBrownoutVoltage() {
-    return Volts.of(PowerJNI.getBrownoutVoltage());
-  }
-
-  /**
-   * Set the voltage the roboRIO will brownout and disable all outputs.
-   *
-   * <p>Note that this only does anything on the roboRIO 2. On the roboRIO it is a no-op.
-   *
-   * @param brownoutVoltage The brownout voltage
-   */
-  public static void setBrownoutVoltage(double brownoutVoltage) {
-    PowerJNI.setBrownoutVoltage(brownoutVoltage);
-  }
-
-  /**
-   * Set the voltage in a measure the roboRIO will brownout and disable all outputs.
-   *
-   * <p>Note that this only does anything on the roboRIO 2. On the roboRIO it is a no-op.
-   *
-   * @param brownoutVoltage The brownout voltage in a measure
-   */
-  public static void setBrownoutVoltage(Voltage brownoutVoltage) {
-    PowerJNI.setBrownoutVoltage(brownoutVoltage.baseUnitMagnitude());
+  public static void setBrownoutVoltages(Voltage brownoutVoltage, Voltage recoveryVoltage) {
+    PowerJNI.setBrownoutVoltages(
+        brownoutVoltage.baseUnitMagnitude(), recoveryVoltage.baseUnitMagnitude());
   }
 
   /**

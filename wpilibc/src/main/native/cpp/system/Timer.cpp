@@ -88,6 +88,12 @@ bool Timer::IsRunning() const {
   return m_running;
 }
 
+Timer Timer::CreateStarted() {
+  Timer timer;
+  timer.Start();
+  return timer;
+}
+
 wpi::units::second_t Timer::GetTimestamp() {
   return wpi::units::second_t{wpi::RobotController::GetTime() * 1.0e-6};
 }

@@ -19,20 +19,22 @@ if (OperatingSystem.current().isWindows()) {
 ext {
     nativeName = 'wpical'
     useCpp = true
-    nativeTestSuiteName = "${nativeName}Catch2Test"
-    sharedCvConfigs = [
+    nativeTestSuiteName = "${nativeName}Test"
+    sharedCvConfigs = []
+    staticCvConfigs = [ (nativeName): [],
         (nativeTestSuiteName): []]
-    staticCvConfigs = []
 }
 
 apply from: "${rootDir}/shared/resources.gradle"
 apply from: "${rootDir}/shared/config.gradle"
+apply from: "${rootDir}/shared/catch2.gradle"
 
 def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
-def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
+def wpilibVersionFileOutput = file("$buildDir/generated/mainVersion/cpp/WPILibVersion.cpp")
 
 apply from: "${rootDir}/shared/ceres.gradle"
 apply from: "${rootDir}/shared/opencv.gradle"
+apply from: "${rootDir}/shared/libsdlgpu.gradle"
 
 task generateCppVersion() {
     description = 'Generates the wpilib version class'
@@ -54,6 +56,7 @@ task generateCppVersion() {
         def version = wpilibVersioning.version.get()
         println "Writing version ${version} to $wpilibVersionFileOutput"
 
+        wpilibVersionFileOutput.parentFile.mkdirs()
         if (wpilibVersionFileOutput.exists()) {
             wpilibVersionFileOutput.delete()
         }
@@ -72,7 +75,7 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
 def generateTask = createGenerateResourcesTask('main', 'WPIcal', 'wpical', project)
 
 project(':').libraryBuild.dependsOn build
-tasks.withType(CppCompile) {
+tasks.withType(CppCompile).configureEach {
     dependsOn generateTask
     dependsOn generateCppVersion
 }
@@ -133,7 +136,7 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/native/cpp', 'src/main/native/thirdparty/libdogleg/src', 'src/main/native/thirdparty/mrcal/src', 'src/main/native/thirdparty/mrcal_java/src', "$buildDir/generated/main/cpp"
+                        srcDirs 'src/main/native/cpp', 'src/main/native/thirdparty/libdogleg/src', 'src/main/native/thirdparty/mrcal/src', 'src/main/native/thirdparty/mrcal_java/src', "$buildDir/generated/main/cpp", "$buildDir/generated/mainVersion/cpp"
                         include '**/*.cpp'
                     }
                     exportedHeaders {
@@ -162,14 +165,15 @@ model {
                     return
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
-                lib project: ':fields', library: 'fields', linkage: 'static'
                 lib project: ':glass', library: 'glass', linkage: 'static'
+                lib project: ':fields', library: 'fields', linkage: 'static'
+                lib project: ':fields', library: 'fieldimages', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
-                nativeUtils.useRequiredLibrary(it, 'opencv_static')
+                project.addLibSdlGpuDependency(it)
                 it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'
                 it.cppCompiler.define 'GLOG_USE_GLOG_EXPORT'
                 if (it.targetPlatform.operatingSystem.isWindows()) {
@@ -180,14 +184,9 @@ model {
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     // Comdlg32.lib is needed for GetSaveFileNameA
                     // dbghelp.lib is needed for glog functions
-                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib' << 'Comdlg32.lib' << 'dbghelp.lib'
+                    it.linker.args << 'Comdlg32.lib' << 'dbghelp.lib'
                 } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
-                    it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore' << '-framework' << 'Accelerate'
-                } else {
-                    it.linker.args << '-lX11'
-                    if (it.targetPlatform.name.startsWith('linuxarm')) {
-                        it.linker.args << '-lGL'
-                    }
+                    it.linker.args << '-framework' << 'Accelerate'
                 }
             }
         }
@@ -217,14 +216,15 @@ model {
                     return
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
-                lib project: ':fields', library: 'fields', linkage: 'static'
                 lib project: ':glass', library: 'glass', linkage: 'static'
+                lib project: ':fields', library: 'fields', linkage: 'static'
+                lib project: ':fields', library: 'fieldimages', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
-                nativeUtils.useRequiredLibrary(it, 'opencv_static')
+                project.addLibSdlGpuDependency(it)
                 it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'
                 it.cppCompiler.define('PROJECT_ROOT_PATH', testResources)
                 it.cppCompiler.define 'GLOG_USE_GLOG_EXPORT'
@@ -238,21 +238,14 @@ model {
                 } else {
                     it.cppCompiler.define('GLOG_DEPRECATED', '[[deprecated]]')
                 }
-                lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
                 it.cppCompiler.define("RUNNING_WPICAL_TESTS")
                 if (it.targetPlatform.operatingSystem.isWindows()) {
-                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                     // Comdlg32.lib is needed for GetSaveFileNameA
                     // dbghelp.lib is needed for glog functions
                     // advapi32.lib is needed for __imp_RegDeleteKeyA and other __imp_Reg functions for icvLoadWindowPos and the save variant
                     it.linker.args << 'advapi32.lib' << 'Comdlg32.lib' << 'dbghelp.lib'
                 } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
-                    it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore' << '-framework' << 'Accelerate'
-                } else {
-                    it.linker.args << '-lX11'
-                    if (it.targetPlatform.name.startsWith('linuxarm')) {
-                        it.linker.args << '-lGL'
-                    }
+                    it.linker.args << '-framework' << 'Accelerate' << '-framework' << 'AVFoundation' << '-framework' << 'CoreMedia'
                 }
             }
         }

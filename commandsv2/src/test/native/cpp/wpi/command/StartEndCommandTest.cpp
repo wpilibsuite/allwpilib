@@ -8,7 +8,9 @@
 using namespace wpi::cmd;
 class StartEndCommandTest : public CommandTestBase {};
 
-TEST_F(StartEndCommandTest, StartEndCommandSchedule) {
+TEST_CASE_METHOD(StartEndCommandTest,
+                 "StartEndCommandTest StartEndCommandSchedule",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   int counter = 0;
@@ -20,5 +22,5 @@ TEST_F(StartEndCommandTest, StartEndCommandSchedule) {
   scheduler.Run();
   scheduler.Cancel(command);
 
-  EXPECT_EQ(2, counter);
+  CHECK(2 == counter);
 }

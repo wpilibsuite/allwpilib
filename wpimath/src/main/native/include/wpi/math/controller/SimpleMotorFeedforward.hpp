@@ -21,7 +21,9 @@ namespace wpi::math {
  * permanent-magnet DC motor.
  */
 template <class Distance>
-  requires wpi::units::length_unit<Distance> || wpi::units::angle_unit<Distance>
+  requires wpi::units::length_unit<Distance> ||
+           wpi::units::angle_unit<Distance> ||
+           wpi::units::dimensionless_unit<Distance>
 class SimpleMotorFeedforward {
  public:
   using Velocity =
@@ -72,11 +74,11 @@ class SimpleMotorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and velocity setpoint assuming
-   * discrete control. Use this method when the velocity setpoint does not
+   * Calculates the feedforward from the gains and velocity reference assuming
+   * discrete control. Use this method when the velocity reference does not
    * change.
    *
-   * @param velocity The velocity setpoint.
+   * @param velocity The velocity reference.
    * @return The computed feedforward, in volts.
    */
   constexpr wpi::units::volt_t Calculate(
@@ -85,19 +87,19 @@ class SimpleMotorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming discrete
+   * Calculates the feedforward from the gains and references assuming discrete
    * control.
    *
-   * <p>Note this method is inaccurate when the velocity crosses 0.
+   * Note this method is inaccurate when the velocity crosses 0.
    *
-   * @param currentVelocity The current velocity setpoint.
-   * @param nextVelocity    The next velocity setpoint.
+   * @param currentVelocity The current velocity reference.
+   * @param nextVelocity    The next velocity reference.
    * @return The computed feedforward, in volts.
    */
   constexpr wpi::units::volt_t Calculate(
       wpi::units::unit_t<Velocity> currentVelocity,
       wpi::units::unit_t<Velocity> nextVelocity) const {
-    // See wpimath/algorithms.md#Simple_motor_feedforward for derivation
+    // See wpimath/docs/SimpleMotorFeedforward.md for derivation
     if (kA < decltype(kA)(1e-9)) {
       return kS * wpi::util::sgn(nextVelocity) + kV * nextVelocity;
     } else {
@@ -188,6 +190,10 @@ class SimpleMotorFeedforward {
   /**
    * Sets the static gain.
    *
+   * This setter is intended for online tuning only. Feedforward gains are
+   * assumed constant, so gain scheduling means the system was not correctly
+   * modeled.
+   *
    * @param kS The static gain.
    */
   constexpr void SetKs(wpi::units::volt_t kS) { this->kS = kS; }
@@ -195,12 +201,20 @@ class SimpleMotorFeedforward {
   /**
    * Sets the velocity gain.
    *
+   * This setter is intended for online tuning only. Feedforward gains are
+   * assumed constant, so gain scheduling means the system was not correctly
+   * modeled.
+   *
    * @param kV The velocity gain.
    */
   constexpr void SetKv(wpi::units::unit_t<kv_unit> kV) { this->kV = kV; }
 
   /**
    * Sets the acceleration gain.
+   *
+   * This setter is intended for online tuning only. Feedforward gains are
+   * assumed constant, so gain scheduling means the system was not correctly
+   * modeled.
    *
    * @param kA The acceleration gain.
    */

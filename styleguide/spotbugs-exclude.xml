@@ -117,6 +117,13 @@
     <Class name="org.wpilib.networktables.NetworkTableInstance" />
   </Match>
   <Match>
+    <!--
+    Not a common case we expect to hit.
+    -->
+    <Bug pattern="SBSC_USE_STRINGBUFFER_CONCATENATION" />
+    <Class name="org.wpilib.driverstation.internal.DriverStationBackend" />
+  </Match>
+  <Match>
     <Bug pattern="SC_START_IN_CTOR" />
     <Class name="org.wpilib.hardware.motor.MotorSafety" />
   </Match>

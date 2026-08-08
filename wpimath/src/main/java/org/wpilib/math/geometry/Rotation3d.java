@@ -422,7 +422,7 @@ public final class Rotation3d
     final var y = m_q.getY();
     final var z = m_q.getZ();
 
-    // wpimath/algorithms.md
+    // wpimath/docs/Quaternion.md
     final var cxcy = 1.0 - 2.0 * (x * x + y * y);
     final var sxcy = 2.0 * (w * x + y * z);
     final var cy_sq = cxcy * cxcy + sxcy * sxcy;
@@ -464,7 +464,7 @@ public final class Rotation3d
     final var y = m_q.getY();
     final var z = m_q.getZ();
 
-    // wpimath/algorithms.md
+    // wpimath/docs/Quaternion.md
     final var cycz = 1.0 - 2.0 * (y * y + z * z);
     final var cysz = 2.0 * (w * z + x * y);
     final var cy_sq = cycz * cycz + cysz * cysz;

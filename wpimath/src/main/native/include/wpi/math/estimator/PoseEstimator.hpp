@@ -57,8 +57,6 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * @warning The initial pose estimate will always be the default pose,
    * regardless of the odometry's current pose.
    *
-   * @param kinematics A correctly-configured kinematics object for your
-   *     drivetrain.
    * @param odometry A correctly-configured odometry object for your drivetrain.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in
    *     meters, y position in meters, and heading in radians). Increase these
@@ -68,8 +66,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  PoseEstimator(const Kinematics& kinematics,
-                Odometry<Kinematics, WheelPositions, WheelVelocities,
+  PoseEstimator(Odometry<Kinematics, WheelPositions, WheelVelocities,
                          WheelAccelerations>& odometry,
                 const wpi::util::array<double, 3>& stateStdDevs,
                 const wpi::util::array<double, 3>& visionMeasurementStdDevs)
@@ -101,7 +98,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
     }
 
     // Solve for closed form Kalman gain for continuous Kalman filter with A = 0
-    // and C = I. See wpimath/algorithms.md.
+    // and C = I. See wpimath/docs/ClosedFormKalmanGain.md.
     for (size_t row = 0; row < 3; ++row) {
       if (m_q[row] == 0.0) {
         m_vision_K.diagonal()[row] = 0.0;
@@ -115,10 +112,11 @@ class WPILIB_DLLEXPORT PoseEstimator {
   /**
    * Resets the robot's position on the field.
    *
-   * The gyroscope angle does not need to be reset in the user's robot code.
-   * The library automatically takes care of offsetting the gyro angle.
+   * The gyroscope angle does not need to be reset here in the user's robot
+   * code.
    *
-   * @param gyroAngle The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param wheelPositions The distances traveled by the encoders.
    * @param pose The estimated pose of the robot on the field.
    */
@@ -148,10 +146,6 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *
    * @param translation The pose to translation to.
    */
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif  // defined(__GNUC__) && !defined(__clang__)
   void ResetTranslation(const Translation2d& translation) {
     m_odometry.ResetTranslation(translation);
 
@@ -174,19 +168,12 @@ class WPILIB_DLLEXPORT PoseEstimator {
       m_poseEstimate = m_odometry.GetPose();
     }
   }
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif  // defined(__GNUC__) && !defined(__clang__)
 
   /**
    * Resets the robot's rotation.
    *
    * @param rotation The rotation to reset to.
    */
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif  // defined(__GNUC__) && !defined(__clang__)
   void ResetRotation(const Rotation2d& rotation) {
     m_odometry.ResetRotation(rotation);
 
@@ -209,9 +196,6 @@ class WPILIB_DLLEXPORT PoseEstimator {
       m_poseEstimate = m_odometry.GetPose();
     }
   }
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif  // defined(__GNUC__) && !defined(__clang__)
 
   /**
    * Gets the estimated robot pose.
@@ -262,11 +246,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
     auto odometryEstimate = m_odometryPoseBuffer.Sample(timestamp);
 
     // Step 5: Apply the vision compensation to the odometry pose.
-    // TODO Replace with std::optional::transform() in C++23
-    if (odometryEstimate) {
-      return visionUpdate.Compensate(*odometryEstimate);
-    }
-    return std::nullopt;
+    return odometryEstimate.transform(
+        [&](const auto& o) { return visionUpdate.Compensate(o); });
   }
 
   /**
@@ -387,7 +368,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * Updates the pose estimator with wheel encoder and gyro information. This
    * should be called every loop.
    *
-   * @param gyroAngle      The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param wheelPositions The distances traveled by the encoders.
    *
    * @return The estimated pose of the robot in meters.
@@ -403,7 +385,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * should be called every loop.
    *
    * @param currentTime   The time at which this method was called.
-   * @param gyroAngle     The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param wheelPositions The distances traveled by the encoders.
    *
    * @return The estimated pose of the robot in meters.

@@ -1,0 +1,42 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "hatchling",
+    "hatch-nativelib~=0.2.0",
+    "hatch-robotpy~=0.2.1",
+    "robotpy-native-wpiutil==0.0.0",
+    "robotpy-native-wpimath==0.0.0",
+]
+
+[project]
+name = "robotpy-native-fields"
+version = "0.0.0"
+description = "WPILib Fields Library"
+requires-python = ">=3.11"
+license = "BSD-3-Clause"
+
+dependencies = [
+    "robotpy-native-wpiutil==0.0.0",
+    "robotpy-native-wpimath==0.0.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/native"]
+
+[[tool.hatch.build.hooks.robotpy.maven_lib_download]]
+artifact_id = "fields-cpp"
+group_id = "org.wpilib.fields"
+repo_url = ""
+version = "0.0.0"
+
+extract_to = "src/native/fields"
+libs = ["fields"]
+
+[[tool.hatch.build.hooks.nativelib.pcfile]]
+pcfile = "src/native/fields/robotpy-native-fields.pc"
+name = "fields"
+
+includedir = "src/native/fields/include"
+libdir = "src/native/fields/lib"
+shared_libraries = ["fields"]
+requires = ["robotpy-native-wpiutil", "robotpy-native-wpimath"]

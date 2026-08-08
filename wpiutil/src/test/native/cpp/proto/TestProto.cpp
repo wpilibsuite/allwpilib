@@ -6,7 +6,11 @@
 #include <utility>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 #include "TestProtoInner.hpp"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
@@ -111,14 +115,14 @@ namespace {
 using ProtoType = wpi::util::Protobuf<TestProto>;
 }  // namespace
 
-TEST(TestProtoTest, RoundtripNanopb) {
+TEST_CASE("TestProtoTest RoundtripNanopb", "[wpiutil][proto]") {
   const TestProto kExpectedData = TestProto{};
 
   wpi::util::ProtobufMessage<TestProto> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, kExpectedData));
   std::optional<TestProto> unpacked_data = message.Unpack(buf);
-  ASSERT_TRUE(unpacked_data.has_value());
-  ASSERT_TRUE(unpacked_data.has_value());
+  REQUIRE(unpacked_data.has_value());
+  REQUIRE(unpacked_data.has_value());
 }

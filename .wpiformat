@@ -23,8 +23,6 @@ generatedFileExclude {
   wpigui/src/main/native/cpp/portable-file-dialogs\.cpp$
   wpigui/src/main/native/include/wpi/gui/portable-file-dialogs\.h$
   wpimath/src/main/native/include/wpi/units/base\.hpp$
-  wpinet/src/main/native/cpp/http_parser\.cpp$
-  wpinet/src/main/native/include/wpi/net/http_parser\.hpp$
   wpiutil/src/main/native/include/wpi/util/FastQueue\.hpp$
   wpiutil/src/test/native/cpp/json/
   wpiutil/src/test/native/cpp/llvm/

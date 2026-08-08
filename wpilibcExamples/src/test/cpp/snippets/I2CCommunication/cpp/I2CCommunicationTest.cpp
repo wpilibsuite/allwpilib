@@ -3,10 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <format>
+#include <optional>
 #include <string>
 #include <thread>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 
 #include "Robot.hpp"
 #include "wpi/hal/DriverStationTypes.h"
@@ -23,15 +25,14 @@ void callback(const char* name, void* param, const unsigned char* buffer,
                  static_cast<int>(count));
 }
 
-template <typename T>
-class I2CCommunicationTest : public testing::TestWithParam<T> {
+class I2CCommunicationTest {
  public:
   Robot robot;
   std::optional<std::thread> thread;
   int32_t callbackHandle;
   int32_t port;
 
-  void SetUp() override {
+  I2CCommunicationTest() {
     gString = std::string();
     wpi::sim::PauseTiming();
     wpi::sim::SetProgramStarted(false);
@@ -44,7 +45,7 @@ class I2CCommunicationTest : public testing::TestWithParam<T> {
     wpi::sim::WaitForProgramStart();
   }
 
-  void TearDown() override {
+  ~I2CCommunicationTest() {
     robot.EndCompetition();
     thread->join();
 
@@ -53,15 +54,17 @@ class I2CCommunicationTest : public testing::TestWithParam<T> {
   }
 };
 
-class AllianceTest : public I2CCommunicationTest<wpi::hal::AllianceStationID> {
-};
-
-TEST_P(AllianceTest, Alliance) {
-  auto alliance = GetParam();
+TEST_CASE_METHOD(I2CCommunicationTest, "I2CCommunication alliance",
+                 "[wpilibcExamples][snippets][i2c]") {
+  auto alliance = GENERATE(
+      wpi::hal::AllianceStationID::RED_1, wpi::hal::AllianceStationID::RED_2,
+      wpi::hal::AllianceStationID::RED_3, wpi::hal::AllianceStationID::BLUE_1,
+      wpi::hal::AllianceStationID::BLUE_2, wpi::hal::AllianceStationID::BLUE_3,
+      wpi::hal::AllianceStationID::UNKNOWN);
   wpi::sim::DriverStationSim::SetAllianceStationId(alliance);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_TRUE(HALSIM_GetI2CInitialized(port));
+  CHECK(HALSIM_GetI2CInitialized(port));
 
   wpi::sim::StepTiming(20_ms);
 
@@ -81,92 +84,49 @@ TEST_P(AllianceTest, Alliance) {
       expected = 'U';
       break;
   }
-  EXPECT_EQ(expected, gString.at(0));
+  CHECK(expected == gString.at(0));
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    I2CCommunicationTests, AllianceTest,
-    testing::Values<wpi::hal::AllianceStationID>(
-        wpi::hal::AllianceStationID::RED_1, wpi::hal::AllianceStationID::RED_2,
-        wpi::hal::AllianceStationID::RED_3, wpi::hal::AllianceStationID::BLUE_1,
-        wpi::hal::AllianceStationID::BLUE_2,
-        wpi::hal::AllianceStationID::BLUE_3,
-        wpi::hal::AllianceStationID::UNKNOWN),
-    [](const testing::TestParamInfo<AllianceTest::ParamType>& info) {
-      switch (info.param) {
-        case wpi::hal::AllianceStationID::BLUE_1:
-          return std::string{"Blue1"};
-        case wpi::hal::AllianceStationID::BLUE_2:
-          return std::string{"Blue2"};
-        case wpi::hal::AllianceStationID::BLUE_3:
-          return std::string{"Blue3"};
-        case wpi::hal::AllianceStationID::RED_1:
-          return std::string{"Red1"};
-        case wpi::hal::AllianceStationID::RED_2:
-          return std::string{"Red2"};
-        case wpi::hal::AllianceStationID::RED_3:
-          return std::string{"Red3"};
-        case wpi::hal::AllianceStationID::UNKNOWN:
-          return std::string{"Unknown"};
-      }
-      return std::string{"Error"};
-    });
-
-class EnabledTest : public I2CCommunicationTest<bool> {};
-
-TEST_P(EnabledTest, Enabled) {
-  auto enabled = GetParam();
+TEST_CASE_METHOD(I2CCommunicationTest, "I2CCommunication enabled",
+                 "[wpilibcExamples][snippets][i2c]") {
+  auto enabled = GENERATE(false, true);
   wpi::sim::DriverStationSim::SetEnabled(enabled);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_TRUE(HALSIM_GetI2CInitialized(port));
+  CHECK(HALSIM_GetI2CInitialized(port));
 
   wpi::sim::StepTiming(20_ms);
 
   char expected = enabled ? 'E' : 'D';
-  EXPECT_EQ(expected, gString.at(1));
+  CHECK(expected == gString.at(1));
 }
 
-INSTANTIATE_TEST_SUITE_P(I2CCommunicationTests, EnabledTest, testing::Bool(),
-                         testing::PrintToStringParamName());
-
-class AutonomousTest : public I2CCommunicationTest<bool> {};
-
-TEST_P(AutonomousTest, Autonomous) {
-  auto autonomous = GetParam();
+TEST_CASE_METHOD(I2CCommunicationTest, "I2CCommunication autonomous",
+                 "[wpilibcExamples][snippets][i2c]") {
+  auto autonomous = GENERATE(false, true);
   wpi::sim::DriverStationSim::SetRobotMode(
       autonomous ? wpi::hal::RobotMode::AUTONOMOUS
                  : wpi::hal::RobotMode::TELEOPERATED);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_TRUE(HALSIM_GetI2CInitialized(port));
+  CHECK(HALSIM_GetI2CInitialized(port));
 
   wpi::sim::StepTiming(20_ms);
 
   char expected = autonomous ? 'A' : 'T';
-  EXPECT_EQ(expected, gString.at(2));
+  CHECK(expected == gString.at(2));
 }
 
-INSTANTIATE_TEST_SUITE_P(I2CCommunicationTests, AutonomousTest, testing::Bool(),
-                         testing::PrintToStringParamName());
-
-class MatchTimeTest : public I2CCommunicationTest<int> {};
-
-TEST_P(MatchTimeTest, Alert) {
-  auto matchTime = GetParam();
+TEST_CASE_METHOD(I2CCommunicationTest, "I2CCommunication alert",
+                 "[wpilibcExamples][snippets][i2c]") {
+  auto matchTime = GENERATE(112, 45, 27, 23, 3);
   wpi::sim::DriverStationSim::SetMatchTime(matchTime);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_TRUE(HALSIM_GetI2CInitialized(port));
+  CHECK(HALSIM_GetI2CInitialized(port));
 
   wpi::sim::StepTiming(20_ms);
 
   std::string expected = std::format("{:03}", matchTime);
-  EXPECT_EQ(expected, gString.substr(3));
+  CHECK(expected == gString.substr(3));
 }
-
-INSTANTIATE_TEST_SUITE_P(
-    I2CCommunicationTests, MatchTimeTest, testing::Values(112, 45, 27, 23, 3),
-    [](const testing::TestParamInfo<int>& info) {
-      return testing::PrintToString(info.param).append("_s");
-    });

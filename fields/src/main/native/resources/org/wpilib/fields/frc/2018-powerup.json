@@ -1,20 +1,17 @@
 {
-  "game": "2018 FRC Power Up",
-  "field-image": "2018-powerup.jpg",
-  "field-corners": {
-    "top-left": [
-      133,
-      23
-    ],
-    "bottom-right": [
-      835,
-      373
-    ]
+  "name": "2018 FRC Power Up",
+  "season": "2018",
+  "game": "Power Up",
+  "field-image": {
+    "path": "2018-powerup.jpg",
+    "top": 23,
+    "left": 133,
+    "bottom": 373,
+    "right": 835
   },
-  "field-size": [
-    54,
-    27
-  ],
-  "field-unit": "foot",
+  "field-dimensions": {
+    "length": 16.4592,
+    "width": 8.2296
+  },
   "program": "frc"
 }

@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <exception>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -17,6 +18,7 @@
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
 
+#include "wpi/fields/field_images.hpp"
 #include "wpi/fields/fields.hpp"
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/Storage.hpp"
@@ -29,12 +31,10 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/fs.hpp"
-#include "wpi/util/json.hpp"
 #include "wpi/util/print.hpp"
 
 using namespace wpi::glass;
@@ -241,7 +241,8 @@ class FieldInfo {
  private:
   void Reset();
   bool LoadImageImpl(const std::string& fn);
-  bool LoadJson(std::span<const char> is, std::string_view filename);
+  bool LoadField(const wpi::fields::Field& field);
+  bool ApplyFieldMetadata(const wpi::fields::Field& field);
   void LoadJsonFile(std::string_view jsonfile);
 
   std::unique_ptr<pfd::open_file> m_fileOpener;
@@ -364,11 +365,12 @@ void FieldInfo::DisplaySettings() {
     if (ImGui::Selectable("Custom", m_builtin.empty())) {
       Reset();
     }
-    for (auto&& field : wpi::fields::GetFields()) {
-      bool selected = field.name == m_builtin;
-      if (ImGui::Selectable(field.name, selected)) {
+    for (auto field : wpi::fields::GetFields()) {
+      auto fieldName = wpi::fields::GetFieldName(field);
+      bool selected = fieldName == m_builtin;
+      if (ImGui::Selectable(fieldName.data(), selected)) {
         Reset();
-        m_builtin = field.name;
+        m_builtin = fieldName;
       }
       if (selected) {
         ImGui::SetItemDefaultFocus();
@@ -425,20 +427,12 @@ void FieldInfo::LoadImage() {
   }
   if (!m_texture) {
     if (!m_builtin.empty()) {
-      for (auto&& field : wpi::fields::GetFields()) {
-        if (field.name == m_builtin) {
-          auto jsonstr = field.getJson();
-          auto imagedata = field.getImage();
-          auto texture = gui::Texture::CreateFromImage(
-              reinterpret_cast<const unsigned char*>(imagedata.data()),
-              imagedata.size());
-          if (texture && LoadJson({jsonstr.data(), jsonstr.size()}, {})) {
-            m_texture = std::move(texture);
-            m_imageWidth = m_texture.GetWidth();
-            m_imageHeight = m_texture.GetHeight();
-          } else {
+      for (auto field : wpi::fields::GetFields()) {
+        if (wpi::fields::GetFieldName(field) == m_builtin) {
+          if (!LoadField(wpi::fields::GetField(field))) {
             m_builtin.clear();
           }
+          break;
         }
       }
     } else if (!m_filename.empty()) {
@@ -449,74 +443,42 @@ void FieldInfo::LoadImage() {
   }
 }
 
-bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
-  // parse file
-  auto j = wpi::util::json::parse({is.data(), is.size()});
-  if (!j) {
-    wpi::util::print(stderr, "GUI: JSON: could not parse: {}\n", j.error());
+bool FieldInfo::LoadField(const wpi::fields::Field& field) {
+  auto image = field.GetImage();
+  if (!image) {
     return false;
   }
 
-  // top level must be an object
-  if (!j->is_object()) {
-    std::fputs("GUI: JSON: does not contain a top object\n", stderr);
+  auto imagedata = wpi::fields::GetFieldImage(image->GetPath());
+  auto texture = gui::Texture::CreateFromImage(
+      reinterpret_cast<const unsigned char*>(imagedata.data()),
+      imagedata.size());
+  if (!texture) {
     return false;
   }
 
-  // image filename
-  std::string image;
-  try {
-    image = j->at("field-image").get_string();
-  } catch (const std::logic_error& e) {
-    wpi::util::print(stderr, "GUI: JSON: could not read field-image: {}\n",
-                     e.what());
+  m_texture = std::move(texture);
+  m_imageWidth = m_texture.GetWidth();
+  m_imageHeight = m_texture.GetHeight();
+  return ApplyFieldMetadata(field);
+}
+
+bool FieldInfo::ApplyFieldMetadata(const wpi::fields::Field& field) {
+  auto image = field.GetImage();
+  if (!image) {
     return false;
   }
 
-  // corners
-  int top, left, bottom, right;
-  try {
-    top = j->at("field-corners").at("top-left").at(1).get_int();
-    left = j->at("field-corners").at("top-left").at(0).get_int();
-    bottom = j->at("field-corners").at("bottom-right").at(1).get_int();
-    right = j->at("field-corners").at("bottom-right").at(0).get_int();
-  } catch (const std::logic_error& e) {
-    wpi::util::print(stderr, "GUI: JSON: could not read field-corners: {}\n",
-                     e.what());
-    return false;
-  }
+  int top = image->GetTop();
+  int left = image->GetLeft();
+  int bottom = image->GetBottom();
+  int right = image->GetRight();
 
-  // size
-  float width;
-  float height;
-  try {
-    width = j->at("field-size").at(0).get_number();
-    height = j->at("field-size").at(1).get_number();
-  } catch (const std::logic_error& e) {
-    wpi::util::print(stderr, "GUI: JSON: could not read field-size: {}\n",
-                     e.what());
-    return false;
-  }
+  float width = field.GetLength().to<float>();
+  float height = field.GetWidth().to<float>();
 
-  // units for size
-  std::string unit;
-  try {
-    unit = j->at("field-unit").get_string();
-  } catch (const std::logic_error& e) {
-    wpi::util::print(stderr, "GUI: JSON: could not read field-unit: {}\n",
-                     e.what());
-    return false;
-  }
-
-  // convert size units to meters
-  if (unit == "foot" || unit == "feet") {
-    width = wpi::units::convert<wpi::units::feet, wpi::units::meters>(width);
-    height = wpi::units::convert<wpi::units::feet, wpi::units::meters>(height);
-  }
-
-  // check scaling
-  int fieldWidth = m_right - m_left;
-  int fieldHeight = m_bottom - m_top;
+  int fieldWidth = right - left;
+  int fieldHeight = bottom - top;
   if (std::abs((fieldWidth / width) - (fieldHeight / height)) > 0.3) {
     wpi::util::print(stderr,
                      "GUI: Field X and Y scaling substantially different: "
@@ -524,18 +486,6 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
                      (fieldWidth / width), (fieldHeight / height));
   }
 
-  if (!filename.empty()) {
-    // the image filename is relative to the json file
-    auto pathname = fs::path{filename}.replace_filename(image).string();
-
-    // load field image
-    if (!LoadImageImpl(pathname.c_str())) {
-      return false;
-    }
-    m_filename = pathname;
-  }
-
-  // save to field info
   m_top = top;
   m_left = left;
   m_bottom = bottom;
@@ -546,14 +496,29 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
 }
 
 void FieldInfo::LoadJsonFile(std::string_view jsonfile) {
-  auto fileBuffer = wpi::util::MemoryBuffer::GetFile(jsonfile);
-  if (!fileBuffer) {
-    std::fputs("GUI: could not open field JSON file\n", stderr);
+  wpi::fields::Field field;
+  try {
+    field = wpi::fields::Field{jsonfile};
+  } catch (const std::exception& e) {
+    wpi::util::print(stderr, "GUI: could not load field JSON file: {}\n",
+                     e.what());
     return;
   }
-  LoadJson({reinterpret_cast<const char*>(fileBuffer.value()->begin()),
-            fileBuffer.value()->size()},
-           jsonfile);
+
+  auto image = field.GetImage();
+  if (!image) {
+    std::fputs("GUI: field JSON does not contain a field image\n", stderr);
+    return;
+  }
+
+  fs::path imagePath{std::string{image->GetPath()}};
+  if (imagePath.is_relative()) {
+    imagePath = fs::path{std::string{jsonfile}}.parent_path() / imagePath;
+  }
+  if (!LoadImageImpl(imagePath.string())) {
+    return;
+  }
+  ApplyFieldMetadata(field);
 }
 
 bool FieldInfo::LoadImageImpl(const std::string& fn) {

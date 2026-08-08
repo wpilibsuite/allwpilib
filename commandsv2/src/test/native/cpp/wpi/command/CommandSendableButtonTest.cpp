@@ -12,12 +12,7 @@ using namespace wpi::cmd;
 
 class CommandSendableButtonTest : public CommandTestBase {
  protected:
-  int m_schedule;
-  int m_cancel;
-  wpi::nt::BooleanPublisher m_publish;
-  std::optional<CommandPtr> m_command;
-
-  void SetUp() override {
+  CommandSendableButtonTest() {
     m_schedule = 0;
     m_cancel = 0;
     m_command = StartEnd([this] { m_schedule++; }, [this] { m_cancel++; });
@@ -27,70 +22,83 @@ class CommandSendableButtonTest : public CommandTestBase {
     wpi::SmartDashboard::PutData("command", m_command->get());
     wpi::SmartDashboard::UpdateValues();
   }
+
+  int m_schedule;
+  int m_cancel;
+  wpi::nt::BooleanPublisher m_publish;
+  std::optional<CommandPtr> m_command;
 };
 
-TEST_F(CommandSendableButtonTest, trueAndNotScheduledSchedules) {
+TEST_CASE_METHOD(CommandSendableButtonTest,
+                 "CommandSendableButtonTest trueAndNotScheduledSchedules",
+                 "[commandsv2][command]") {
   // Not scheduled and true -> scheduled
   GetScheduler().Run();
   wpi::SmartDashboard::UpdateValues();
-  EXPECT_FALSE(m_command->IsScheduled());
-  EXPECT_EQ(0, m_schedule);
-  EXPECT_EQ(0, m_cancel);
+  CHECK_FALSE(m_command->IsScheduled());
+  CHECK(0 == m_schedule);
+  CHECK(0 == m_cancel);
 
   m_publish.Set(true);
   wpi::SmartDashboard::UpdateValues();
   GetScheduler().Run();
-  EXPECT_TRUE(m_command->IsScheduled());
-  EXPECT_EQ(1, m_schedule);
-  EXPECT_EQ(0, m_cancel);
+  CHECK(m_command->IsScheduled());
+  CHECK(1 == m_schedule);
+  CHECK(0 == m_cancel);
 }
 
-TEST_F(CommandSendableButtonTest, trueAndScheduledNoOp) {
+TEST_CASE_METHOD(CommandSendableButtonTest,
+                 "CommandSendableButtonTest trueAndScheduledNoOp",
+                 "[commandsv2][command]") {
   // Scheduled and true -> no-op
   wpi::cmd::CommandScheduler::GetInstance().Schedule(m_command.value());
   GetScheduler().Run();
   wpi::SmartDashboard::UpdateValues();
-  EXPECT_TRUE(m_command->IsScheduled());
-  EXPECT_EQ(1, m_schedule);
-  EXPECT_EQ(0, m_cancel);
+  CHECK(m_command->IsScheduled());
+  CHECK(1 == m_schedule);
+  CHECK(0 == m_cancel);
 
   m_publish.Set(true);
   wpi::SmartDashboard::UpdateValues();
   GetScheduler().Run();
-  EXPECT_TRUE(m_command->IsScheduled());
-  EXPECT_EQ(1, m_schedule);
-  EXPECT_EQ(0, m_cancel);
+  CHECK(m_command->IsScheduled());
+  CHECK(1 == m_schedule);
+  CHECK(0 == m_cancel);
 }
 
-TEST_F(CommandSendableButtonTest, falseAndNotScheduledNoOp) {
+TEST_CASE_METHOD(CommandSendableButtonTest,
+                 "CommandSendableButtonTest falseAndNotScheduledNoOp",
+                 "[commandsv2][command]") {
   // Not scheduled and false -> no-op
   GetScheduler().Run();
   wpi::SmartDashboard::UpdateValues();
-  EXPECT_FALSE(m_command->IsScheduled());
-  EXPECT_EQ(0, m_schedule);
-  EXPECT_EQ(0, m_cancel);
+  CHECK_FALSE(m_command->IsScheduled());
+  CHECK(0 == m_schedule);
+  CHECK(0 == m_cancel);
 
   m_publish.Set(false);
   wpi::SmartDashboard::UpdateValues();
   GetScheduler().Run();
-  EXPECT_FALSE(m_command->IsScheduled());
-  EXPECT_EQ(0, m_schedule);
-  EXPECT_EQ(0, m_cancel);
+  CHECK_FALSE(m_command->IsScheduled());
+  CHECK(0 == m_schedule);
+  CHECK(0 == m_cancel);
 }
 
-TEST_F(CommandSendableButtonTest, falseAndScheduledCancel) {
+TEST_CASE_METHOD(CommandSendableButtonTest,
+                 "CommandSendableButtonTest falseAndScheduledCancel",
+                 "[commandsv2][command]") {
   // Scheduled and false -> cancel
   wpi::cmd::CommandScheduler::GetInstance().Schedule(m_command.value());
   GetScheduler().Run();
   wpi::SmartDashboard::UpdateValues();
-  EXPECT_TRUE(m_command->IsScheduled());
-  EXPECT_EQ(1, m_schedule);
-  EXPECT_EQ(0, m_cancel);
+  CHECK(m_command->IsScheduled());
+  CHECK(1 == m_schedule);
+  CHECK(0 == m_cancel);
 
   m_publish.Set(false);
   wpi::SmartDashboard::UpdateValues();
   GetScheduler().Run();
-  EXPECT_FALSE(m_command->IsScheduled());
-  EXPECT_EQ(1, m_schedule);
-  EXPECT_EQ(1, m_cancel);
+  CHECK_FALSE(m_command->IsScheduled());
+  CHECK(1 == m_schedule);
+  CHECK(1 == m_cancel);
 }

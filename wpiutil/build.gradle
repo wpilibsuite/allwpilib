@@ -7,6 +7,7 @@ ext {
     groupId = 'org.wpilib.wpiutil'
 
     nativeName = 'wpiutil'
+    nativeTestSuiteName = "${nativeName}Test"
     devMain = 'org.wpilib.util.DevMain'
     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
 
@@ -201,28 +202,6 @@ model {
         }
     }
     testSuites {
-        "${nativeName}Catch2Test"(GoogleTestTestSuiteSpec) {
-            for(NativeComponentSpec c : $.components) {
-                if (c.name == nativeName) {
-                    testing c
-                    break
-                }
-            }
-            sources {
-                cpp {
-                    source {
-                        srcDirs 'src/test/native/cpp'
-                        include '**/TestCatch2.cpp', '**/catch2main.cpp'
-                    }
-                    exportedHeaders {
-                        srcDirs 'src/test/native/include', 'src/main/native/cpp'
-                    }
-                }
-            }
-            binaries.all {
-                lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
-            }
-        }
         withType(GoogleTestTestSuiteSpec) {
             sources {
                 protobufGenCpp(CppSourceSet) {

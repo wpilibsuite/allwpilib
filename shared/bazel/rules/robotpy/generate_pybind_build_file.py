@@ -3,7 +3,6 @@ import collections
 import json
 import pathlib
 import re
-from typing import Dict, List, Tuple, Union
 
 import jinja2
 import tomli
@@ -33,7 +32,7 @@ class HeaderToDatConfig:
     def __init__(
         self,
         header_to_dat_args: BuildTarget,
-        extension_name_transforms: List[Tuple[str, str]],
+        extension_name_transforms: list[tuple[str, str]],
     ):
         includes = []
         defines = []
@@ -181,13 +180,13 @@ class BazelExtensionModule:
     def __init__(
         self,
         extension_module: ExtensionModule,
-        additional_extension_targets: Dict[str, BuildTarget],
+        additional_extension_targets: dict[str, BuildTarget],
     ):
         self.name = extension_module.name
         self.package_name = extension_module.package_name
         self.install_path = extension_module.install_path
 
-        self.extension_name_transforms: List[Tuple[str, str]] = []
+        self.extension_name_transforms: list[tuple[str, str]] = []
         self.generation_data = self._extract_header_generation(
             extension_module.sources, self.extension_name_transforms
         )
@@ -270,12 +269,12 @@ class BazelExtensionModule:
                 all_dependencies.add(child_dep.name)
                 self._collect_local_dependency_names(child_dep, all_dependencies)
             else:
-                raise
+                raise  # noqa: PLE0704
 
     def _extract_header_generation(
-        self, sources, extension_name_transforms: List[Tuple[str, str]]
-    ) -> Dict[str, HeaderToDatConfig]:
-        generation_data: Dict[str, HeaderToDatConfig] = {}
+        self, sources, extension_name_transforms: list[tuple[str, str]]
+    ) -> dict[str, HeaderToDatConfig]:
+        generation_data: dict[str, HeaderToDatConfig] = {}
 
         def get_h2d_config(target_info: BuildTarget) -> HeaderToDatConfig:
             config = HeaderToDatConfig(target_info, extension_name_transforms)
@@ -301,17 +300,17 @@ class BazelExtensionModule:
                 # Handled elsewhere
                 continue
             else:
-                raise Exception("Unknown command", source.command)
+                raise RuntimeError("Unknown command", source.command)
 
         return generation_data
 
 
 def generate_pybind_build_file(
-    pkgcfgs: List[pathlib.Path],
+    pkgcfgs: list[pathlib.Path],
     project_file: pathlib.Path,
     package_root_file: str,
     stripped_include_prefix: str,
-    yml_prefix: Union[str, None],
+    yml_prefix: str | None,
     output_file: pathlib.Path,
 ):
     project_dir = project_file.parent
@@ -326,7 +325,7 @@ def generate_pybind_build_file(
     projectcfg = pyproject.project
 
     # Cache built up for an extension module. Gets reset when an ExtensionModule is encountered
-    additional_extension_targets: Dict[str, BuildTarget] = {}
+    additional_extension_targets: dict[str, BuildTarget] = {}
     publish_casters_targets = []
 
     for item in plan:
@@ -343,7 +342,7 @@ def generate_pybind_build_file(
                 "gen-modinit-hpp",
             ]:
                 if item.command in additional_extension_targets:
-                    raise Exception(f"Repeated target {item.command}")
+                    raise RuntimeError(f"Repeated target {item.command}")
                 additional_extension_targets[item.command] = item
             elif item.command in [
                 "header2dat",
@@ -357,15 +356,13 @@ def generate_pybind_build_file(
             elif item.command == "publish-casters":
                 publish_casters_targets.append(PublishCastersConfig(projectcfg, item))
             else:
-                raise Exception(f"Unhandled build target {item.command}")
+                raise RuntimeError(f"Unhandled build target {item.command}")
         elif isinstance(item, Entrypoint):
             entry_points[item.group].append(f"{item.name} = {item.package}")
-        elif isinstance(item, LocalDependency):
-            pass
-        elif isinstance(item, CppMacroValue):
+        elif isinstance(item, (LocalDependency, CppMacroValue)):
             pass
         else:
-            raise Exception(f"Unknown item {type(item)}")
+            raise TypeError(f"Unknown item {type(item)}")
 
     with open(project_file, "rb") as fp:
         raw_config = tomli.load(fp)

@@ -22,8 +22,8 @@ class DifferentialDriveOdometryTest {
     var pose = m_odometry.update(Rotation2d.fromDegrees(135.0), 0.0, 5 * Math.PI);
 
     assertAll(
-        () -> assertEquals(pose.getX(), 5.0, kEpsilon),
-        () -> assertEquals(pose.getY(), 5.0, kEpsilon),
-        () -> assertEquals(pose.getRotation().getDegrees(), 90.0, kEpsilon));
+        () -> assertEquals(5.0, pose.getX(), kEpsilon),
+        () -> assertEquals(5.0, pose.getY(), kEpsilon),
+        () -> assertEquals(90.0, pose.getRotation().getDegrees(), kEpsilon));
   }
 }

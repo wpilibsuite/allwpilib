@@ -21,7 +21,7 @@ import org.wpilib.simulation.DualSenseEdgeControllerSim;
 class DualSenseEdgeControllerTest {
   @Test
   void testWrappedHID() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DualSenseEdgeController controller = new DualSenseEdgeController(2);
     DualSenseEdgeControllerSim sim = new DualSenseEdgeControllerSim(controller);
     sim.notifyNewData();
@@ -37,7 +37,7 @@ class DualSenseEdgeControllerTest {
   @EnumSource(value = DualSenseEdgeController.Button.class)
   void testButtons(DualSenseEdgeController.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DualSenseEdgeController joy = new DualSenseEdgeController(2);
     DualSenseEdgeControllerSim joysim = new DualSenseEdgeControllerSim(joy);
 
@@ -76,7 +76,7 @@ class DualSenseEdgeControllerTest {
   @EnumSource(value = DualSenseEdgeController.Axis.class)
   void testAxes(DualSenseEdgeController.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DualSenseEdgeController joy = new DualSenseEdgeController(2);
     DualSenseEdgeControllerSim joysim = new DualSenseEdgeControllerSim(joy);
 

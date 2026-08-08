@@ -46,7 +46,8 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator
    *
    * @param kinematics A correctly-configured kinematics object for your
    *     drivetrain.
-   * @param gyroAngle The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param wheelPositions The distance measured by each wheel.
    * @param initialPose The starting pose estimate.
    */
@@ -60,7 +61,8 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator
    *
    * @param kinematics A correctly-configured kinematics object for your
    *     drivetrain.
-   * @param gyroAngle The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param wheelPositions The distance measured by each wheel.
    * @param initialPose The starting pose estimate.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in

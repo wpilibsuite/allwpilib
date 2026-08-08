@@ -53,15 +53,13 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator3d
    * 0.1 meters for x, 0.1 meters for y, 0.1 meters for z, and 0.1 radians for
    * angle.
    *
-   * @param kinematics A correctly-configured kinematics object for your
-   *     drivetrain.
-   * @param gyroAngle The gyro angle of the robot.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    * @param initialPose The estimated initial pose.
    */
-  DifferentialDrivePoseEstimator3d(DifferentialDriveKinematics& kinematics,
-                                   const Rotation3d& gyroAngle,
+  DifferentialDrivePoseEstimator3d(const Rotation3d& gyroAngle,
                                    wpi::units::meter_t leftDistance,
                                    wpi::units::meter_t rightDistance,
                                    const Pose3d& initialPose);
@@ -69,9 +67,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator3d
   /**
    * Constructs a DifferentialDrivePoseEstimator3d.
    *
-   * @param kinematics A correctly-configured kinematics object for your
-   *     drivetrain.
-   * @param gyroAngle The gyro angle of the robot.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    * @param initialPose The estimated initial pose.
@@ -84,16 +81,16 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator3d
    * pose measurement less.
    */
   DifferentialDrivePoseEstimator3d(
-      DifferentialDriveKinematics& kinematics, const Rotation3d& gyroAngle,
-      wpi::units::meter_t leftDistance, wpi::units::meter_t rightDistance,
-      const Pose3d& initialPose,
+      const Rotation3d& gyroAngle, wpi::units::meter_t leftDistance,
+      wpi::units::meter_t rightDistance, const Pose3d& initialPose,
       const wpi::util::array<double, 4>& stateStdDevs,
       const wpi::util::array<double, 4>& visionMeasurementStdDevs);
 
   /**
    * Resets the robot's position on the field.
    *
-   * @param gyroAngle The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    * @param pose The estimated pose of the robot on the field.
@@ -109,7 +106,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator3d
    * Updates the pose estimator with wheel encoder and gyro information. This
    * should be called every loop.
    *
-   * @param gyroAngle     The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param leftDistance  The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    *
@@ -125,7 +123,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator3d
    * should be called every loop.
    *
    * @param currentTime   The time at which this method was called.
-   * @param gyroAngle     The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param leftDistance  The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    *

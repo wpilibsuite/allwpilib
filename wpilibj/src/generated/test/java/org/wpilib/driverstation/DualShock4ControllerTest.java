@@ -21,7 +21,7 @@ import org.wpilib.simulation.DualShock4ControllerSim;
 class DualShock4ControllerTest {
   @Test
   void testWrappedHID() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DualShock4Controller controller = new DualShock4Controller(2);
     DualShock4ControllerSim sim = new DualShock4ControllerSim(controller);
     sim.notifyNewData();
@@ -37,7 +37,7 @@ class DualShock4ControllerTest {
   @EnumSource(value = DualShock4Controller.Button.class)
   void testButtons(DualShock4Controller.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DualShock4Controller joy = new DualShock4Controller(2);
     DualShock4ControllerSim joysim = new DualShock4ControllerSim(joy);
 
@@ -76,7 +76,7 @@ class DualShock4ControllerTest {
   @EnumSource(value = DualShock4Controller.Axis.class)
   void testAxes(DualShock4Controller.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DualShock4Controller joy = new DualShock4Controller(2);
     DualShock4ControllerSim joysim = new DualShock4ControllerSim(joy);
 

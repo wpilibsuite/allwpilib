@@ -36,7 +36,8 @@ public class SwerveDrivePoseEstimator extends PoseEstimator<SwerveModulePosition
    * meters for x, 0.9 meters for y, and 0.9 radians for heading.
    *
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
-   * @param gyroAngle The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param modulePositions The current distance measurements and rotations of the swerve modules.
    * @param initialPose The starting pose estimate.
    */
@@ -58,7 +59,8 @@ public class SwerveDrivePoseEstimator extends PoseEstimator<SwerveModulePosition
    * Constructs a SwerveDrivePoseEstimator.
    *
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
-   * @param gyroAngle The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param modulePositions The current distance and rotation measurements of the swerve modules.
    * @param initialPose The starting pose estimate.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in meters, y position
@@ -76,7 +78,6 @@ public class SwerveDrivePoseEstimator extends PoseEstimator<SwerveModulePosition
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     super(
-        kinematics,
         new SwerveDriveOdometry(kinematics, gyroAngle, modulePositions, initialPose),
         stateStdDevs,
         visionMeasurementStdDevs);

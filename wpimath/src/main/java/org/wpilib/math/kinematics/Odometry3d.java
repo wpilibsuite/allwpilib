@@ -32,14 +32,7 @@ public class Odometry3d<T> {
   private final Kinematics<T, ?, ?> m_kinematics;
   private Pose3d m_pose;
 
-  // Applying a rotation intrinsically to the measured gyro angle should cause the corrected angle
-  // to be rotated intrinsically in the same way, so the measured gyro angle must be applied
-  // intrinsically. This is equivalent to applying the offset extrinsically to the measured gyro
-  // angle.
-  private Rotation3d m_gyroOffset;
-
-  // Always equal to m_poseMeters.getRotation()
-  private Rotation3d m_previousAngle;
+  private Rotation3d m_previousGyroAngle;
 
   private final T m_previousWheelPositions;
 
@@ -47,7 +40,8 @@ public class Odometry3d<T> {
    * Constructs an Odometry3d object.
    *
    * @param kinematics The kinematics of the drivebase.
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param wheelPositions The current encoder readings.
    * @param initialPose The starting position of the robot on the field.
    */
@@ -55,29 +49,23 @@ public class Odometry3d<T> {
       Kinematics<T, ?, ?> kinematics, Rotation3d gyroAngle, T wheelPositions, Pose3d initialPose) {
     m_kinematics = kinematics;
     m_pose = initialPose;
-    // When applied extrinsically, m_gyroOffset cancels the current gyroAngle and
-    // then rotates to m_poseMeters.getRotation()
-    m_gyroOffset = gyroAngle.inverse().rotateBy(m_pose.getRotation());
-    m_previousAngle = m_pose.getRotation();
+    m_previousGyroAngle = gyroAngle;
     m_previousWheelPositions = m_kinematics.copy(wheelPositions);
   }
 
   /**
    * Resets the robot's position on the field.
    *
-   * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
-   * automatically takes care of offsetting the gyro angle.
+   * <p>The gyroscope angle does not need to be reset here in the user's robot code.
    *
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param wheelPositions The current encoder readings.
    * @param pose The position on the field that your robot is at.
    */
   public void resetPosition(Rotation3d gyroAngle, T wheelPositions, Pose3d pose) {
     m_pose = pose;
-    // When applied extrinsically, m_gyroOffset cancels the current gyroAngle and
-    // then rotates to m_poseMeters.getRotation()
-    m_gyroOffset = gyroAngle.inverse().rotateBy(m_pose.getRotation());
-    m_previousAngle = m_pose.getRotation();
+    m_previousGyroAngle = gyroAngle;
     m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
   }
 
@@ -87,11 +75,7 @@ public class Odometry3d<T> {
    * @param pose The pose to reset to.
    */
   public void resetPose(Pose3d pose) {
-    // Cancel the previous m_pose.Rotation() and then rotate to the new angle
-    m_gyroOffset =
-        m_gyroOffset.rotateBy(m_pose.getRotation().inverse()).rotateBy(pose.getRotation());
     m_pose = pose;
-    m_previousAngle = m_pose.getRotation();
   }
 
   /**
@@ -109,10 +93,7 @@ public class Odometry3d<T> {
    * @param rotation The rotation to reset to.
    */
   public void resetRotation(Rotation3d rotation) {
-    // Cancel the previous m_pose.Rotation() and then rotate to the new angle
-    m_gyroOffset = m_gyroOffset.rotateBy(m_pose.getRotation().inverse()).rotateBy(rotation);
     m_pose = new Pose3d(m_pose.getTranslation(), rotation);
-    m_previousAngle = m_pose.getRotation();
   }
 
   /**
@@ -130,13 +111,13 @@ public class Odometry3d<T> {
    * that is calculated from forward kinematics, in addition to the current distance measurement at
    * each wheel.
    *
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param wheelPositions The current encoder readings.
    * @return The new pose of the robot.
    */
   public Pose3d update(Rotation3d gyroAngle, T wheelPositions) {
-    var angle = gyroAngle.rotateBy(m_gyroOffset);
-    var angle_difference = angle.relativeTo(m_previousAngle).toVector();
+    var angle_difference = gyroAngle.relativeTo(m_previousGyroAngle).toVector();
 
     var twist2d = m_kinematics.toTwist2d(m_previousWheelPositions, wheelPositions);
     var twist =
@@ -148,11 +129,10 @@ public class Odometry3d<T> {
             angle_difference.get(1),
             angle_difference.get(2));
 
-    var newPose = m_pose.plus(twist.exp());
+    m_pose = m_pose.plus(twist.exp());
 
     m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
-    m_previousAngle = angle;
-    m_pose = new Pose3d(newPose.getTranslation(), angle);
+    m_previousGyroAngle = gyroAngle;
 
     return m_pose;
   }

@@ -10,7 +10,9 @@
 using namespace wpi::cmd;
 class InstantCommandTest : public CommandTestBase {};
 
-TEST_F(InstantCommandTest, InstantCommandSchedule) {
+TEST_CASE_METHOD(InstantCommandTest,
+                 "InstantCommandTest InstantCommandSchedule",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   int counter = 0;
@@ -19,6 +21,6 @@ TEST_F(InstantCommandTest, InstantCommandSchedule) {
 
   scheduler.Schedule(command);
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(command));
-  EXPECT_EQ(counter, 1);
+  CHECK_FALSE(scheduler.IsScheduled(command));
+  CHECK(counter == 1);
 }

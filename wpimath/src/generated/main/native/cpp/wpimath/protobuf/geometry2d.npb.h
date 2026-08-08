@@ -60,26 +60,6 @@ typedef struct _wpi_proto_ProtobufTwist2d {
     double dtheta;
 } wpi_proto_ProtobufTwist2d;
 
-typedef struct _wpi_proto_ProtobufRectangle2d {
-    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
-    static std::string_view msg_name(void) noexcept;
-    static pb_filedesc_t file_descriptor(void) noexcept;
-
-    pb_callback_t center;
-    double xWidth;
-    double yWidth;
-} wpi_proto_ProtobufRectangle2d;
-
-typedef struct _wpi_proto_ProtobufEllipse2d {
-    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
-    static std::string_view msg_name(void) noexcept;
-    static pb_filedesc_t file_descriptor(void) noexcept;
-
-    pb_callback_t center;
-    double xSemiAxis;
-    double ySemiAxis;
-} wpi_proto_ProtobufEllipse2d;
-
 
 /* Initializer values for message structs */
 #define wpi_proto_ProtobufTranslation2d_init_default {0, 0}
@@ -87,15 +67,11 @@ typedef struct _wpi_proto_ProtobufEllipse2d {
 #define wpi_proto_ProtobufPose2d_init_default    {{{NULL}, NULL}, {{NULL}, NULL}}
 #define wpi_proto_ProtobufTransform2d_init_default {{{NULL}, NULL}, {{NULL}, NULL}}
 #define wpi_proto_ProtobufTwist2d_init_default   {0, 0, 0}
-#define wpi_proto_ProtobufRectangle2d_init_default {{{NULL}, NULL}, 0, 0}
-#define wpi_proto_ProtobufEllipse2d_init_default {{{NULL}, NULL}, 0, 0}
 #define wpi_proto_ProtobufTranslation2d_init_zero {0, 0}
 #define wpi_proto_ProtobufRotation2d_init_zero   {0}
 #define wpi_proto_ProtobufPose2d_init_zero       {{{NULL}, NULL}, {{NULL}, NULL}}
 #define wpi_proto_ProtobufTransform2d_init_zero  {{{NULL}, NULL}, {{NULL}, NULL}}
 #define wpi_proto_ProtobufTwist2d_init_zero      {0, 0, 0}
-#define wpi_proto_ProtobufRectangle2d_init_zero  {{{NULL}, NULL}, 0, 0}
-#define wpi_proto_ProtobufEllipse2d_init_zero    {{{NULL}, NULL}, 0, 0}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define wpi_proto_ProtobufTranslation2d_x_tag    1
@@ -108,12 +84,6 @@ typedef struct _wpi_proto_ProtobufEllipse2d {
 #define wpi_proto_ProtobufTwist2d_dx_tag         1
 #define wpi_proto_ProtobufTwist2d_dy_tag         2
 #define wpi_proto_ProtobufTwist2d_dtheta_tag     3
-#define wpi_proto_ProtobufRectangle2d_center_tag 1
-#define wpi_proto_ProtobufRectangle2d_xWidth_tag 2
-#define wpi_proto_ProtobufRectangle2d_yWidth_tag 3
-#define wpi_proto_ProtobufEllipse2d_center_tag   1
-#define wpi_proto_ProtobufEllipse2d_xSemiAxis_tag 2
-#define wpi_proto_ProtobufEllipse2d_ySemiAxis_tag 3
 
 /* Struct field encoding specification for nanopb */
 #define wpi_proto_ProtobufTranslation2d_FIELDLIST(X, a) \
@@ -150,27 +120,9 @@ X(a, STATIC,   SINGULAR, DOUBLE,   dtheta,            3)
 #define wpi_proto_ProtobufTwist2d_CALLBACK NULL
 #define wpi_proto_ProtobufTwist2d_DEFAULT NULL
 
-#define wpi_proto_ProtobufRectangle2d_FIELDLIST(X, a) \
-X(a, CALLBACK, OPTIONAL, MESSAGE,  center,            1) \
-X(a, STATIC,   SINGULAR, DOUBLE,   xWidth,            2) \
-X(a, STATIC,   SINGULAR, DOUBLE,   yWidth,            3)
-#define wpi_proto_ProtobufRectangle2d_CALLBACK pb_default_field_callback
-#define wpi_proto_ProtobufRectangle2d_DEFAULT NULL
-#define wpi_proto_ProtobufRectangle2d_center_MSGTYPE wpi_proto_ProtobufPose2d
-
-#define wpi_proto_ProtobufEllipse2d_FIELDLIST(X, a) \
-X(a, CALLBACK, OPTIONAL, MESSAGE,  center,            1) \
-X(a, STATIC,   SINGULAR, DOUBLE,   xSemiAxis,         2) \
-X(a, STATIC,   SINGULAR, DOUBLE,   ySemiAxis,         3)
-#define wpi_proto_ProtobufEllipse2d_CALLBACK pb_default_field_callback
-#define wpi_proto_ProtobufEllipse2d_DEFAULT NULL
-#define wpi_proto_ProtobufEllipse2d_center_MSGTYPE wpi_proto_ProtobufPose2d
-
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_ProtobufPose2d_size depends on runtime parameters */
 /* wpi_proto_ProtobufTransform2d_size depends on runtime parameters */
-/* wpi_proto_ProtobufRectangle2d_size depends on runtime parameters */
-/* wpi_proto_ProtobufEllipse2d_size depends on runtime parameters */
 #define WPI_PROTO_WPIMATH_PROTOBUF_GEOMETRY2D_NPB_H_MAX_SIZE wpi_proto_ProtobufTwist2d_size
 #define wpi_proto_ProtobufRotation2d_size        9
 #define wpi_proto_ProtobufTranslation2d_size     18

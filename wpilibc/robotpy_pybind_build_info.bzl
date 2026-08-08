@@ -114,28 +114,28 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             class_name = "EdgeConfiguration",
             yml_file = "semiwrap/EdgeConfiguration.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/counter/EdgeConfiguration.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/counter/EdgeConfiguration.hpp",
             tmpl_class_names = [],
             trampolines = [],
+        ),
+        struct(
+            class_name = "EdgeCounter",
+            yml_file = "semiwrap/EdgeCounter.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/counter/EdgeCounter.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::EdgeCounter", "wpi__EdgeCounter.hpp"),
+            ],
         ),
         struct(
             class_name = "Tachometer",
             yml_file = "semiwrap/Tachometer.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/counter/Tachometer.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/counter/Tachometer.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::Tachometer", "wpi__Tachometer.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "UpDownCounter",
-            yml_file = "semiwrap/UpDownCounter.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/counter/UpDownCounter.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::UpDownCounter", "wpi__UpDownCounter.hpp"),
             ],
         ),
         struct(
@@ -187,16 +187,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/Alliance.hpp",
             tmpl_class_names = [],
             trampolines = [],
-        ),
-        struct(
-            class_name = "Alert",
-            yml_file = "semiwrap/Alert.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/Alert.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::Alert", "wpi__Alert.hpp"),
-            ],
         ),
         struct(
             class_name = "DriverStation",
@@ -1354,7 +1344,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
         name_transforms = NAME_TRANSFORMS,
-        generation_defines = ["DYNAMIC_CAMERA_SERVER 1"],
     )
 
     create_pybind_library(
@@ -1386,7 +1375,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         extra_hdrs = extra_hdrs,
         extra_srcs = srcs,
         includes = includes,
-        local_defines = ["DYNAMIC_CAMERA_SERVER=1"],
     )
 
     native.filegroup(
