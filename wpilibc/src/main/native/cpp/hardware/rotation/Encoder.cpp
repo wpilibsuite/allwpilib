@@ -74,6 +74,13 @@ double Encoder::GetRate() const {
   return value;
 }
 
+void Encoder::SetRateWindow(wpi::units::millisecond_t window) {
+  int32_t status = 0;
+  HAL_SetEncoderRateWindow(m_encoder, static_cast<int32_t>(window.value()),
+                           &status);
+  WPILIB_CheckErrorStatus(status, "SetRateWindow");
+}
+
 void Encoder::SetDistancePerPulse(double distancePerPulse) {
   int32_t status = 0;
   HAL_SetEncoderDistancePerPulse(m_encoder, distancePerPulse, &status);

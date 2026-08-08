@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "EdgeConfiguration.hpp"
 #include "wpi/hal/Counter.h"
+#include "wpi/hardware/counter/EdgeConfiguration.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
@@ -17,11 +17,11 @@ namespace wpi {
 /**
  * Tachometer for getting rotational velocity from a device.
  *
- * <p>The Tachometer class measures the time between digital pulses to
- * determine the rotation velocity of a mechanism. Examples of devices that
- * could be used with the tachometer class are a hall effect sensor, break beam
- * sensor, or optical sensor detecting tape on a shooter wheel. Unlike
- * encoders, this class only needs a single digital input.
+ * The Tachometer class measures the rate of digital pulses to determine the
+ * rotation velocity of a mechanism. Examples of devices that could be used
+ * with the tachometer class are a hall effect sensor, break beam sensor, or
+ * optical sensor detecting tape on a shooter wheel. Unlike encoders, this class
+ * only needs a single digital input.
  */
 class Tachometer : public wpi::util::Sendable,
                    public wpi::util::SendableHelper<Tachometer> {
@@ -47,18 +47,19 @@ class Tachometer : public wpi::util::Sendable,
   void SetEdgeConfiguration(EdgeConfiguration configuration);
 
   /**
+   * Sets the time window used to calculate the tachometer rate.
+   *
+   * @param window The rate calculation window. Valid values are 5 ms through
+   *               255 ms. The default is 50 ms.
+   */
+  void SetRateWindow(wpi::units::millisecond_t window);
+
+  /**
    * Gets the tachometer frequency.
    *
    * @return Current frequency.
    */
   wpi::units::hertz_t GetFrequency() const;
-
-  /**
-   * Gets the tachometer period.
-   *
-   * @return Current period.
-   */
-  wpi::units::second_t GetPeriod() const;
 
   /**
    * Gets the number of edges per revolution.
@@ -97,23 +98,18 @@ class Tachometer : public wpi::util::Sendable,
   /**
    * Gets if the tachometer is stopped.
    *
+   * The tachometer is stopped when its current frequency is zero.
+   *
    * @return True if the tachometer is stopped.
    */
   bool GetStopped() const;
-
-  /**
-   * Sets the maximum period before the tachometer is considered stopped.
-   *
-   * @param maxPeriod The max period.
-   */
-  void SetMaxPeriod(wpi::units::second_t maxPeriod);
 
  protected:
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   wpi::util::Handle<HAL_CounterHandle, HAL_FreeCounter> m_handle;
-  int m_edgesPerRevolution;
+  int m_edgesPerRevolution{1};
   int32_t m_channel;
 };
 }  // namespace wpi
