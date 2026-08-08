@@ -218,8 +218,7 @@ public interface Command {
   default Command withTimeout(Time timeout) {
     requireNonNullParam(timeout, "timeout", "Command.withTimeout");
 
-    return race(this, waitFor(timeout).named("Timeout: " + timeout.toLongString()))
-        .named(name() + " [" + timeout.toLongString() + " timeout]");
+    return race(this, wait(timeout)).named(name() + " [" + timeout.toLongString() + " timeout]");
   }
 
   /**
@@ -338,10 +337,11 @@ public interface Command {
    * @param duration How long to wait
    * @return A command builder
    */
-  static NeedsNameBuilderStage waitFor(Time duration) {
-    requireNonNullParam(duration, "duration", "Command.waitFor");
+  static Command wait(Time duration) {
+    requireNonNullParam(duration, "duration", "Command.wait");
 
-    return noRequirements(coroutine -> coroutine.wait(duration));
+    return noRequirements(coroutine -> coroutine.wait(duration))
+        .named("Wait " + duration.toLongString());
   }
 
   /**
