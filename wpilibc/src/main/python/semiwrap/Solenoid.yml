@@ -8,8 +8,8 @@ classes:
     methods:
       Solenoid:
         overloads:
-          int, PneumaticsModuleType, int:
-          int, int, PneumaticsModuleType, int:
+          CANBusMap, PneumaticsModuleType, int:
+          CANBusMap, int, PneumaticsModuleType, int:
       Set:
       Get:
       Toggle:

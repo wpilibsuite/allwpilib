@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.wpilib.hardware.bus.CANBusMap;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.pneumatic.CompressorConfigType;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
@@ -19,6 +20,8 @@ import org.wpilib.simulation.testutils.BooleanCallback;
 import org.wpilib.simulation.testutils.DoubleCallback;
 
 class CTREPCMSimTest {
+  private static final CANBusMap kBus = CANBusMap.CAN_S0;
+
   @Test
   void testInitialization() {
     HAL.initialize();
@@ -30,7 +33,7 @@ class CTREPCMSimTest {
     BooleanCallback callback = new BooleanCallback();
 
     try (CallbackStore cb = sim.registerInitializedCallback(callback, false);
-        PneumaticsControlModule pcm = new PneumaticsControlModule(0)) {
+        PneumaticsControlModule pcm = new PneumaticsControlModule(kBus)) {
       assertTrue(sim.getInitialized());
     }
     assertFalse(sim.getInitialized());
@@ -40,9 +43,9 @@ class CTREPCMSimTest {
   void solenoidOutputTest() {
     HAL.initialize();
 
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(0);
+    try (PneumaticsControlModule pcm = new PneumaticsControlModule(kBus);
         DoubleSolenoid doubleSolenoid =
-            new DoubleSolenoid(0, PneumaticsModuleType.CTRE_PCM, 3, 4)) {
+            new DoubleSolenoid(kBus, PneumaticsModuleType.CTRE_PCM, 3, 4)) {
       CTREPCMSim sim = new CTREPCMSim(0);
       sim.resetData();
 
@@ -97,7 +100,7 @@ class CTREPCMSimTest {
     CTREPCMSim sim = new CTREPCMSim(0);
     BooleanCallback callback = new BooleanCallback();
 
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(0);
+    try (PneumaticsControlModule pcm = new PneumaticsControlModule(kBus);
         CallbackStore cb = sim.registerCompressorOnCallback(callback, false)) {
       assertFalse(pcm.getCompressor());
       assertFalse(sim.getCompressorOn());
@@ -116,7 +119,7 @@ class CTREPCMSimTest {
     CTREPCMSim sim = new CTREPCMSim(0);
     BooleanCallback callback = new BooleanCallback();
 
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(0);
+    try (PneumaticsControlModule pcm = new PneumaticsControlModule(kBus);
         CallbackStore cb = sim.registerClosedLoopEnabledCallback(callback, false)) {
       pcm.disableCompressor();
       assertEquals(pcm.getCompressorConfigType(), CompressorConfigType.DISABLED);
@@ -136,7 +139,7 @@ class CTREPCMSimTest {
     CTREPCMSim sim = new CTREPCMSim(0);
     BooleanCallback callback = new BooleanCallback();
 
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(0);
+    try (PneumaticsControlModule pcm = new PneumaticsControlModule(kBus);
         CallbackStore cb = sim.registerPressureSwitchCallback(callback, false)) {
       assertFalse(pcm.getPressureSwitch());
 
@@ -155,7 +158,7 @@ class CTREPCMSimTest {
     CTREPCMSim sim = new CTREPCMSim(0);
     DoubleCallback callback = new DoubleCallback();
 
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(0);
+    try (PneumaticsControlModule pcm = new PneumaticsControlModule(kBus);
         CallbackStore cb = sim.registerCompressorCurrentCallback(callback, false)) {
       assertFalse(pcm.getPressureSwitch());
 

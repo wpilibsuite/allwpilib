@@ -29,24 +29,26 @@ std::unique_ptr<wpi::util::DenseMap<
 // Always called under lock, so we can avoid the double lock from the magic
 // static
 std::weak_ptr<PneumaticsControlModule::DataStore>&
-PneumaticsControlModule::GetDataStore(int busId, int module) {
+PneumaticsControlModule::GetDataStore(CANBusMap busId, int module) {
+  int busIndex = static_cast<int>(busId);
   int32_t numBuses = HAL_GetNumCanBuses();
-  WPILIB_AssertMessage(busId >= 0 && busId < numBuses,
-                       "Bus {} out of range. Must be [0-{}).", busId, numBuses);
+  WPILIB_AssertMessage(busIndex >= 0 && busIndex < numBuses,
+                       "Bus {} out of range. Must be [0-{}).", busIndex,
+                       numBuses);
   if (!m_handleMaps) {
     m_handleMaps = std::make_unique<wpi::util::DenseMap<
         int, std::weak_ptr<PneumaticsControlModule::DataStore>>[]>(numBuses);
   }
 
-  return m_handleMaps[busId][module];
+  return m_handleMaps[busIndex][module];
 }
 
 class PneumaticsControlModule::DataStore {
  public:
-  explicit DataStore(int busId, int module, const char* stackTrace) {
+  explicit DataStore(CANBusMap busId, int module, const char* stackTrace) {
     int32_t status = 0;
-    HAL_CTREPCMHandle handle =
-        HAL_InitializeCTREPCM(busId, module, stackTrace, &status);
+    HAL_CTREPCMHandle handle = HAL_InitializeCTREPCM(
+        static_cast<int>(busId), module, stackTrace, &status);
     WPILIB_CheckErrorStatus(status, "Module {}", module);
     m_moduleObject = PneumaticsControlModule{busId, handle, module};
     m_moduleObject.m_dataStore =
@@ -63,13 +65,15 @@ class PneumaticsControlModule::DataStore {
   uint32_t m_reservedMask{0};
   bool m_compressorReserved{false};
   wpi::util::mutex m_reservedLock;
-  PneumaticsControlModule m_moduleObject{0, HAL_INVALID_HANDLE, 0};
+  PneumaticsControlModule m_moduleObject{CANBusMap::CAN_S0, HAL_INVALID_HANDLE,
+                                         0};
 };
 
-PneumaticsControlModule::PneumaticsControlModule(int busId)
+PneumaticsControlModule::PneumaticsControlModule(CANBusMap busId)
     : PneumaticsControlModule{busId, SensorUtil::GetDefaultCTREPCMModule()} {}
 
-PneumaticsControlModule::PneumaticsControlModule(int busId, int module) {
+PneumaticsControlModule::PneumaticsControlModule(CANBusMap busId, int module)
+    : m_busId{busId} {
   std::string stackTrace = wpi::util::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);
   auto& res = GetDataStore(busId, module);
@@ -83,10 +87,10 @@ PneumaticsControlModule::PneumaticsControlModule(int busId, int module) {
   m_module = module;
 }
 
-PneumaticsControlModule::PneumaticsControlModule(int /* busId */,
+PneumaticsControlModule::PneumaticsControlModule(CANBusMap busId,
                                                  HAL_CTREPCMHandle handle,
                                                  int module)
-    : m_handle{handle}, m_module{module} {}
+    : m_handle{handle}, m_busId{busId}, m_module{module} {}
 
 bool PneumaticsControlModule::GetCompressor() const {
   int32_t status = 0;
@@ -285,17 +289,17 @@ wpi::units::pounds_per_square_inch_t PneumaticsControlModule::GetPressure(
 }
 
 Solenoid PneumaticsControlModule::MakeSolenoid(int channel) {
-  return Solenoid{m_module, PneumaticsModuleType::CTRE_PCM, channel};
+  return Solenoid{m_busId, m_module, PneumaticsModuleType::CTRE_PCM, channel};
 }
 
 DoubleSolenoid PneumaticsControlModule::MakeDoubleSolenoid(int forwardChannel,
                                                            int reverseChannel) {
-  return DoubleSolenoid{m_module, PneumaticsModuleType::CTRE_PCM,
+  return DoubleSolenoid{m_busId, m_module, PneumaticsModuleType::CTRE_PCM,
                         forwardChannel, reverseChannel};
 }
 
 Compressor PneumaticsControlModule::MakeCompressor() {
-  return Compressor{m_module, PneumaticsModuleType::CTRE_PCM};
+  return Compressor{m_busId, m_module, PneumaticsModuleType::CTRE_PCM};
 }
 
 void PneumaticsControlModule::ReportUsage(std::string_view device,
@@ -304,7 +308,7 @@ void PneumaticsControlModule::ReportUsage(std::string_view device,
 }
 
 std::shared_ptr<PneumaticsBase> PneumaticsControlModule::GetForModule(
-    int busId, int module) {
+    CANBusMap busId, int module) {
   std::string stackTrace = wpi::util::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);
   auto& res = GetDataStore(busId, module);

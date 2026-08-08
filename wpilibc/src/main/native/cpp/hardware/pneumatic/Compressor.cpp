@@ -12,7 +12,8 @@
 
 using namespace wpi;
 
-Compressor::Compressor(int busId, int module, PneumaticsModuleType moduleType)
+Compressor::Compressor(CANBusMap busId, int module,
+                       PneumaticsModuleType moduleType)
     : m_module{PneumaticsBase::GetForType(busId, module, moduleType)},
       m_moduleType{moduleType} {
   if (!m_module->ReserveCompressor()) {
@@ -25,7 +26,7 @@ Compressor::Compressor(int busId, int module, PneumaticsModuleType moduleType)
   wpi::util::SendableRegistry::Add(this, "Compressor", module);
 }
 
-Compressor::Compressor(int busId, PneumaticsModuleType moduleType)
+Compressor::Compressor(CANBusMap busId, PneumaticsModuleType moduleType)
     : Compressor{busId, PneumaticsBase::GetDefaultForType(moduleType),
                  moduleType} {}
 

@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "wpi/hal/Types.h"
+#include "wpi/hardware/bus/CANBusMap.hpp"
 #include "wpi/hardware/pneumatic/CompressorConfigType.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
@@ -40,7 +41,7 @@ class Compressor : public wpi::util::Sendable,
    * @param module The module ID to use.
    * @param moduleType The module type to use.
    */
-  Compressor(int busId, int module, PneumaticsModuleType moduleType);
+  Compressor(CANBusMap busId, int module, PneumaticsModuleType moduleType);
 
   /**
    * Constructs a compressor for a default module and specified type.
@@ -48,7 +49,7 @@ class Compressor : public wpi::util::Sendable,
    * @param busId The bus ID.
    * @param moduleType The module type to use.
    */
-  Compressor(int busId, PneumaticsModuleType moduleType);
+  Compressor(CANBusMap busId, PneumaticsModuleType moduleType);
 
   ~Compressor() override;
 
