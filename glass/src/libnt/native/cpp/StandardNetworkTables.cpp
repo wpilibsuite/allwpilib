@@ -18,7 +18,7 @@
 #include "wpi/glass/networktables/NTMotorController.hpp"
 #include "wpi/glass/networktables/NTPIDController.hpp"
 #include "wpi/glass/networktables/NTProfiledPIDController.hpp"
-#include "wpi/glass/networktables/NTStringChooser.hpp"
+#include "wpi/glass/networktables/NTSelectable.hpp"
 #include "wpi/glass/networktables/NTSubsystem.hpp"
 #include "wpi/glass/networktables/NetworkTablesProvider.hpp"
 
@@ -180,15 +180,14 @@ void wpi::glass::AddStandardNetworkTablesViews(
         });
       });
   provider.Register(
-      NTStringChooserModel::kType,
+      NTSelectableModel::kType,
       [](wpi::nt::NetworkTableInstance inst, const char* path) {
-        return std::make_unique<NTStringChooserModel>(inst, path);
+        return std::make_unique<NTSelectableModel>(inst, path);
       },
       [](Window* win, Model* model, const char*) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-        return MakeFunctionView([=] {
-          DisplayStringChooser(static_cast<NTStringChooserModel*>(model));
-        });
+        return MakeFunctionView(
+            [=] { DisplaySelectable(static_cast<NTSelectableModel*>(model)); });
       });
   provider.Register(
       NTSubsystemModel::kType,

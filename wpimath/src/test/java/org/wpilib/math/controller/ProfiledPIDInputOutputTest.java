@@ -9,6 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.trajectory.TrapezoidProfile;
+import org.wpilib.tunable.MockTunableBackend;
+import org.wpilib.tunable.TunableRegistry;
+import org.wpilib.tunable.Tunables;
 
 class ProfiledPIDInputOutputTest {
   @Test
@@ -123,5 +126,56 @@ class ProfiledPIDInputOutputTest {
     controller.calculate(0, 0);
 
     assertEquals(-0.01 / controller.getPeriod(), controller.calculate(0.0025, 0), 1e-5);
+  }
+
+  @Test
+  void tunedConstraintsRebuildProfile() {
+    var backend = new MockTunableBackend();
+    TunableRegistry.reset();
+    TunableRegistry.registerBackend("", backend);
+
+    try {
+      var controller =
+          new ProfiledPIDController(0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(1.0, 1.0));
+      Tunables.publish("profiled", controller);
+
+      backend.setValue("/profiled/constraints", new TrapezoidProfile.Constraints(10.0, 10.0));
+      TunableRegistry.update();
+
+      assertEquals(10.0, controller.getConstraints().maxVelocity);
+      assertEquals(10.0, controller.getConstraints().maxAcceleration);
+
+      controller.reset(0.0);
+      controller.calculate(0.0, 10.0);
+      assertEquals(0.2, controller.getSetpoint().velocity, 1e-9);
+    } finally {
+      TunableRegistry.reset();
+    }
+  }
+
+  @Test
+  void tunedGoalUpdatesGoal() {
+    var backend = new MockTunableBackend();
+    TunableRegistry.reset();
+    TunableRegistry.registerBackend("", backend);
+
+    try {
+      var controller =
+          new ProfiledPIDController(0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(1.0, 1.0));
+      Tunables.publish("profiled", controller);
+
+      backend.setDouble("/profiled/goal", 2.0);
+      TunableRegistry.update();
+
+      assertEquals(2.0, controller.getGoal().position);
+      assertEquals(0.0, controller.getGoal().velocity);
+
+      controller.setGoal(3.0);
+      TunableRegistry.update();
+
+      assertEquals(3.0, backend.getDouble("/profiled/goal"));
+    } finally {
+      TunableRegistry.reset();
+    }
   }
 }

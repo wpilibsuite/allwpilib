@@ -9,9 +9,9 @@
 #include "wpi/hal/DutyCycle.h"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
 
 using namespace wpi;
 
@@ -25,7 +25,6 @@ void DutyCycle::InitDutyCycle() {
   m_handle = HAL_InitializeDutyCycle(m_channel, stackTrace.c_str(), &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   HAL_ReportUsage("IO", m_channel, "DutyCycle");
-  wpi::util::SendableRegistry::Add(this, "Duty Cycle", m_channel);
 }
 
 wpi::units::hertz_t DutyCycle::GetFrequency() const {
@@ -53,10 +52,11 @@ int DutyCycle::GetSourceChannel() const {
   return m_channel;
 }
 
-void DutyCycle::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Duty Cycle");
-  builder.AddDoubleProperty(
-      "Frequency", [this] { return this->GetFrequency().value(); }, nullptr);
-  builder.AddDoubleProperty(
-      "Output", [this] { return this->GetOutput(); }, nullptr);
+void DutyCycle::LogTo(wpi::TelemetryTable& table) const {
+  table.Log("Frequency", GetFrequency());
+  table.Log("Output", GetOutput());
+}
+
+std::string_view DutyCycle::GetTelemetryType() const {
+  return "Duty Cycle";
 }

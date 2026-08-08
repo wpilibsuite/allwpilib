@@ -181,6 +181,7 @@ define_native_wrapper(
 
 PYBIND_PKGCFG_DEPS = [
     "//datalog:native/datalog/robotpy-native-datalog.pc",
+    "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
     "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
     "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
 ]

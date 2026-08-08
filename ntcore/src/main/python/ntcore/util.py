@@ -11,7 +11,7 @@ from ._ntcore import (
     Value,
 )
 
-__all__ = ["ntproperty", "ChooserControl"]
+__all__ = ["ntproperty", "SelectableControl"]
 
 
 class _NtProperty:
@@ -110,7 +110,7 @@ def ntproperty(
     A property that you can add to your classes to access NetworkTables
     variables like a normal variable.
 
-    :param key: A full NetworkTables key (eg ``/SmartDashboard/foo``)
+    :param key: A full NetworkTables key (for example, ``/Example/foo``)
     :param default_value: Default value to use if not in the table
     :type  default_value: any
     :param write_default: If True, put the default value to the table,
@@ -126,7 +126,7 @@ def ntproperty(
 
         class Foo(object):
 
-            something = ntproperty('/SmartDashboard/something', True)
+            something = ntproperty('/Example/something', True)
 
             ...
 
@@ -152,9 +152,9 @@ def ntproperty(
     return property(fget=ntprop.get, fset=ntprop.set, doc=doc)
 
 
-class ChooserControl:
+class SelectableControl:
     """
-    Interacts with a :class:`wpilib.SendableChooser`
+    Interacts with a :class:`wpilib.Selectable`
     object over NetworkTables.
     """
 
@@ -178,7 +178,7 @@ class ChooserControl:
         if inst is None:
             inst = NetworkTableInstance.get_default()
 
-        self.subtable = inst.get_table("SmartDashboard").get_sub_table(key)
+        self.subtable = inst.get_table("Tunables").get_sub_table(key)
 
         self.on_choices = on_choices
         self.on_selected = on_selected
@@ -190,14 +190,14 @@ class ChooserControl:
             )
 
     def close(self) -> None:
-        """Stops listening for changes to the ``SendableChooser``"""
+        """Stops listening for changes to the ``Selectable``"""
         if self._listener is not None:
             self.subtable.remove_listener(self._listener)
             self._listener = None
 
     def get_choices(self) -> Sequence[str]:
         """
-        Returns the current choices. If the chooser doesn't exist, this
+        Returns the current choices. If the selectable doesn't exist, this
         will return an empty tuple.
         """
         return self.subtable.get_string_array("options", [])
@@ -206,18 +206,20 @@ class ChooserControl:
         """
         Returns the current selection or None
         """
-        selected = self.subtable.get_string("selected", None)
+        selected = self.subtable.get_string("selected/value", None)
+        if selected is None:
+            selected = self.subtable.get_string("selected/tune", None)
         if selected is None:
             selected = self.subtable.get_string("default", None)
         return selected
 
     def set_selected(self, selection: str) -> None:
         """
-        Sets the active selection on the chooser
+        Sets the active selection on the selectable
 
         :param selection: Active selection name
         """
-        self.subtable.put_string("selected", selection)
+        self.subtable.put_string("selected/tune", selection)
 
     def _on_change(self, table, key, event):
         value = event.data.value.value()
@@ -225,12 +227,13 @@ class ChooserControl:
         if key == "options":
             if self.on_choices is not None:
                 self.on_choices(value)
-        elif key == "selected":
+        elif key == "selected/value" or key == "selected/tune":
             if self.on_selected is not None:
                 self.on_selected(value)
         elif key == "default":
             if (
                 self.on_selected is not None
-                and self.subtable.get_string("selected", None) is None
+                and self.subtable.get_string("selected/value", None) is None
+                and self.subtable.get_string("selected/tune", None) is None
             ):
                 self.on_selected(value)

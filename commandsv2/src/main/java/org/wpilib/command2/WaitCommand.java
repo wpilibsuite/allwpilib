@@ -7,9 +7,8 @@ package org.wpilib.command2;
 import static org.wpilib.units.Units.Seconds;
 
 import org.wpilib.system.Timer;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.units.measure.Time;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
 
 /**
  * A command that does nothing but takes a specified amount of time to finish.
@@ -30,7 +29,7 @@ public class WaitCommand extends Command {
   @SuppressWarnings("this-escape")
   public WaitCommand(double seconds) {
     m_duration = seconds;
-    SendableRegistry.setName(this, getName() + ": " + seconds + " seconds");
+    setName(getName() + ": " + seconds + " seconds");
   }
 
   /**
@@ -63,8 +62,8 @@ public class WaitCommand extends Command {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
-    builder.addDoubleProperty("duration", () -> m_duration, null);
+  public void logTo(TelemetryTable table) {
+    super.logTo(table);
+    table.log("duration", m_duration);
   }
 }

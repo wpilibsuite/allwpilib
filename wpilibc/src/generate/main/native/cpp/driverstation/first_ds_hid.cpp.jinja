@@ -8,7 +8,7 @@
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
 #include "wpi/hal/UsageReporting.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
 
@@ -116,13 +116,15 @@ TouchpadFinger {{ ClassName }}Controller::GetTouchpadFinger(int touchpad,
 }
 {% endif %}
 
-void {{ ClassName }}Controller::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("HID");
-  builder.PublishConstString("ControllerType", "{{ ClassName }}");
+std::string_view {{ ClassName }}Controller::GetTelemetryType() const {
+  return "HID:{{ ClassName }}";
+}
+
+void {{ ClassName }}Controller::LogTo(wpi::TelemetryTable& table) const {
 {%- for axis in axes %}
-  builder.AddDoubleProperty("{{ axis.MethodName }}", [this] { return Get{{ axis.MethodName }}(); }, nullptr);
+  table.Log("{{ axis.MethodName }}", Get{{ axis.MethodName }}());
 {%- endfor -%}
 {% for button in buttons %}
-  builder.AddBooleanProperty("{{ button.MethodName }}", [this] { return Get{{ button.MethodName }}Button(); }, nullptr);
+  table.Log("{{ button.MethodName }}Button", Get{{ button.MethodName }}Button());
 {%- endfor %}
 }

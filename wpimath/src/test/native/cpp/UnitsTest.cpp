@@ -6,6 +6,7 @@
 #include <array>
 #include <chrono>
 #include <cmath>
+#include <memory>
 #if __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
 #include <format>
 #endif
@@ -21,6 +22,9 @@
 
 #include "wpi/math/TestAssertions.hpp"
 
+#include "wpi/telemetry/MockTelemetryBackend.hpp"
+#include "wpi/telemetry/TelemetryRegistry.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_acceleration.hpp"
@@ -146,6 +150,19 @@ std::string StreamOutput(F&& func) {
   return output.str();
 }
 #endif
+
+class UnitTelemetry {
+ public:
+  UnitTelemetry() {
+    wpi::TelemetryRegistry::Reset();
+    wpi::TelemetryRegistry::RegisterBackend("", mock);
+  }
+
+  ~UnitTelemetry() { wpi::TelemetryRegistry::Reset(); }
+
+  std::shared_ptr<wpi::MockTelemetryBackend> mock =
+      std::make_shared<wpi::MockTelemetryBackend>();
+};
 }  // namespace
 
 TEST_CASE_METHOD(TypeTraits, "TypeTraits isRatio", "[wpimath]") {
@@ -3334,4 +3351,57 @@ TEST_CASE("Units overloadResolution", "[wpimath]") {
   };
   // Make sure this properly selects the meter overload
   CHECK(Scope::f(1_mm));
+}
+
+static_assert(wpi::SupportsTelemetryValue<wpi::units::meter_t>);
+
+TEST_CASE_METHOD(UnitTelemetry, "UnitTelemetry Log", "[wpimath]") {
+  wpi::TelemetryTable& table = wpi::TelemetryRegistry::GetTable("/");
+  table.Log("testmeter", meter_t(5));
+  table.Log("testsquaremeter", square_meter_t(3));
+  table.Log("testwatt", watt_t(3));
+  auto actions = mock->GetActions();
+  REQUIRE(actions.size() == 6u);
+
+  REQUIRE(actions[0].path == "/testmeter");
+  REQUIRE(std::holds_alternative<
+          wpi::MockTelemetryBackend::SetPropertyValue>(actions[0].value));
+  REQUIRE(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(
+              actions[0].value)
+              .key == "unit");
+  REQUIRE(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(
+              actions[0].value)
+              .value == "m");
+
+  REQUIRE(actions[1].path == "/testmeter");
+  REQUIRE(std::holds_alternative<double>(actions[1].value));
+  REQUIRE(std::get<double>(actions[1].value) == 5);
+
+  REQUIRE(actions[2].path == "/testsquaremeter");
+  REQUIRE(std::holds_alternative<
+          wpi::MockTelemetryBackend::SetPropertyValue>(actions[2].value));
+  REQUIRE(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(
+              actions[2].value)
+              .key == "unit");
+  REQUIRE(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(
+              actions[2].value)
+              .value == "m^2");
+
+  REQUIRE(actions[3].path == "/testsquaremeter");
+  REQUIRE(std::holds_alternative<double>(actions[3].value));
+  REQUIRE(std::get<double>(actions[3].value) == 3);
+
+  REQUIRE(actions[4].path == "/testwatt");
+  REQUIRE(std::holds_alternative<
+          wpi::MockTelemetryBackend::SetPropertyValue>(actions[4].value));
+  REQUIRE(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(
+              actions[4].value)
+              .key == "unit");
+  REQUIRE(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(
+              actions[4].value)
+              .value == "m^2 kg s^-3");
+
+  REQUIRE(actions[5].path == "/testwatt");
+  REQUIRE(std::holds_alternative<double>(actions[5].value));
+  REQUIRE(std::get<double>(actions[5].value) == 3);
 }

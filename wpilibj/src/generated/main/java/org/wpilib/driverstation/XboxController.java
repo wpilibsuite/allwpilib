@@ -11,8 +11,8 @@ import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Handle input from Xbox controllers connected to the Driver Station.
@@ -20,7 +20,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * <p>This class handles Xbox input that comes from the Driver Station. Each time a value
  * is requested the most recent value is returned.
  */
-public class XboxController implements HIDDevice, Sendable {
+public class XboxController implements HIDDevice, TelemetryLoggable {
   /** The number of touchpads supported by this controller. */
   public static final int TOUCHPAD_COUNT = 0;
 
@@ -903,29 +903,32 @@ public class XboxController implements HIDDevice, Sendable {
 
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("HID");
-    builder.publishConstString("ControllerType", "Xbox");
-    builder.addDoubleProperty("LeftX", this::getLeftX, null);
-    builder.addDoubleProperty("LeftY", this::getLeftY, null);
-    builder.addDoubleProperty("RightX", this::getRightX, null);
-    builder.addDoubleProperty("RightY", this::getRightY, null);
-    builder.addDoubleProperty("LeftTrigger", this::getLeftTrigger, null);
-    builder.addDoubleProperty("RightTrigger", this::getRightTrigger, null);
-    builder.addBooleanProperty("A", this::getAButton, null);
-    builder.addBooleanProperty("B", this::getBButton, null);
-    builder.addBooleanProperty("X", this::getXButton, null);
-    builder.addBooleanProperty("Y", this::getYButton, null);
-    builder.addBooleanProperty("View", this::getViewButton, null);
-    builder.addBooleanProperty("Xbox", this::getXboxButton, null);
-    builder.addBooleanProperty("Menu", this::getMenuButton, null);
-    builder.addBooleanProperty("LeftStick", this::getLeftStickButton, null);
-    builder.addBooleanProperty("RightStick", this::getRightStickButton, null);
-    builder.addBooleanProperty("LeftBumper", this::getLeftBumperButton, null);
-    builder.addBooleanProperty("RightBumper", this::getRightBumperButton, null);
-    builder.addBooleanProperty("DpadUp", this::getDpadUpButton, null);
-    builder.addBooleanProperty("DpadDown", this::getDpadDownButton, null);
-    builder.addBooleanProperty("DpadLeft", this::getDpadLeftButton, null);
-    builder.addBooleanProperty("DpadRight", this::getDpadRightButton, null);
+  public String getTelemetryType() {
+    return "HID:Xbox";
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
+    table.log("LeftX", getLeftX());
+    table.log("LeftY", getLeftY());
+    table.log("RightX", getRightX());
+    table.log("RightY", getRightY());
+    table.log("LeftTrigger", getLeftTrigger());
+    table.log("RightTrigger", getRightTrigger());
+    table.log("AButton", getAButton());
+    table.log("BButton", getBButton());
+    table.log("XButton", getXButton());
+    table.log("YButton", getYButton());
+    table.log("ViewButton", getViewButton());
+    table.log("XboxButton", getXboxButton());
+    table.log("MenuButton", getMenuButton());
+    table.log("LeftStickButton", getLeftStickButton());
+    table.log("RightStickButton", getRightStickButton());
+    table.log("LeftBumperButton", getLeftBumperButton());
+    table.log("RightBumperButton", getRightBumperButton());
+    table.log("DpadUpButton", getDpadUpButton());
+    table.log("DpadDownButton", getDpadDownButton());
+    table.log("DpadLeftButton", getDpadLeftButton());
+    table.log("DpadRightButton", getDpadRightButton());
   }
 }

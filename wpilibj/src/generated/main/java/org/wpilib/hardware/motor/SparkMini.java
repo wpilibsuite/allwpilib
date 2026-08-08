@@ -33,7 +33,7 @@ public class SparkMini extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public SparkMini(final int channel) {
-    super("SparkMini", channel);
+    super(channel);
 
     setBoundsMicroseconds(2500, 1510, 1500, 1490, 500);
     m_pwm.setOutputPeriod(5);

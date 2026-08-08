@@ -318,7 +318,7 @@ class AnnotationProcessorTest {
 
       @Logged
       class Example {
-        private org.wpilib.smartdashboard.SendableChooser<String> chooser;
+        private org.wpilib.telemetry.TelemetryLoggable telemetry;
       }
       """;
 
@@ -334,14 +334,14 @@ class AnnotationProcessorTest {
       import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
-        // Accesses private or superclass field org.wpilib.epilogue.Example.chooser
-        private static final VarHandle $org_wpilib_epilogue_Example_chooser;
+        // Accesses private or superclass field org.wpilib.epilogue.Example.telemetry
+        private static final VarHandle $org_wpilib_epilogue_Example_telemetry;
 
         static {
           try {
             var rootLookup = MethodHandles.lookup();
             var lookup$$org_wpilib_epilogue_Example = MethodHandles.privateLookupIn(org.wpilib.epilogue.Example.class, rootLookup);
-            $org_wpilib_epilogue_Example_chooser = lookup$$org_wpilib_epilogue_Example.findVarHandle(org.wpilib.epilogue.Example.class, "chooser", org.wpilib.smartdashboard.SendableChooser.class);
+            $org_wpilib_epilogue_Example_telemetry = lookup$$org_wpilib_epilogue_Example.findVarHandle(org.wpilib.epilogue.Example.class, "telemetry", org.wpilib.telemetry.TelemetryLoggable.class);
           } catch (ReflectiveOperationException e) {
             throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
           }
@@ -354,7 +354,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            logSendable(backend.getNested("chooser"), ((org.wpilib.smartdashboard.SendableChooser<java.lang.String>) $org_wpilib_epilogue_Example_chooser.get(object)));
+            logTelemetry(backend.getNested("telemetry"), ((org.wpilib.telemetry.TelemetryLoggable) $org_wpilib_epilogue_Example_telemetry.get(object)));
           }
         }
       }

@@ -7,7 +7,7 @@ package org.wpilib.examples.encoder;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.discrete.CounterBase;
 import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 
 /**
  * Sample program displaying the value of a quadrature encoder on the SmartDashboard. Quadrature
@@ -47,7 +47,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    SmartDashboard.putNumber("Encoder Distance", encoder.getDistance());
-    SmartDashboard.putNumber("Encoder Rate", encoder.getRate());
+    Telemetry.log("Encoder Distance", encoder.getDistance());
+    Telemetry.log("Encoder Rate", encoder.getRate());
   }
 }

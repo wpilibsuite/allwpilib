@@ -7,7 +7,7 @@
 #include <string>
 
 #include "wpi/framework/TimedRobot.hpp"
-#include "wpi/smartdashboard/SendableChooser.hpp"
+#include "wpi/tunable/Selectable.hpp"
 
 class Robot : public wpi::TimedRobot {
  public:
@@ -25,7 +25,7 @@ class Robot : public wpi::TimedRobot {
   void SimulationPeriodic() override;
 
  private:
-  wpi::SendableChooser<std::string> chooser;
+  wpi::Selectable<std::string> chooser;
   const std::string kAutoNameDefault = "Default";
   const std::string kAutoNameCustom = "My Auto";
   std::string autoSelected;

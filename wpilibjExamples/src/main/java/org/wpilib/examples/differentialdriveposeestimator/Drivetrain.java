@@ -34,9 +34,9 @@ import org.wpilib.simulation.DifferentialDrivetrainSim;
 import org.wpilib.simulation.EncoderSim;
 import org.wpilib.simulation.OnboardIMUSim;
 import org.wpilib.smartdashboard.Field2d;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 import org.wpilib.system.Timer;
+import org.wpilib.telemetry.Telemetry;
 
 /** Represents a differential drive style drivetrain. */
 public class Drivetrain {
@@ -125,9 +125,6 @@ public class Drivetrain {
     cameraToObjectEntry = cameraToObjectTopic.getEntry(defaultVal);
 
     objectInField = Field.loadField(Fields.FRC_2024_CRESCENDO).getTagPose(1).get();
-
-    SmartDashboard.putData("Field", fieldSim);
-    SmartDashboard.putData("FieldEstimation", fieldApproximation);
   }
 
   /**
@@ -260,5 +257,8 @@ public class Drivetrain {
     updateOdometry();
     fieldSim.setRobotPose(drivetrainSimulator.getPose());
     fieldApproximation.setRobotPose(poseEstimator.getEstimatedPosition());
+
+    Telemetry.log("Field", fieldSim);
+    Telemetry.log("FieldEstimation", fieldApproximation);
   }
 }

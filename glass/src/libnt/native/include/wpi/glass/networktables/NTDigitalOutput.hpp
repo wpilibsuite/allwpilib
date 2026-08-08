@@ -40,17 +40,15 @@ class NTDigitalOutputModel : public DIOModel {
 
   void Update() override;
   bool Exists() override;
-  bool IsReadOnly() override { return !m_controllableValue; }
+  bool IsReadOnly() override;
 
  private:
   wpi::nt::NetworkTableInstance m_inst;
   wpi::nt::BooleanEntry m_value;
   wpi::nt::StringSubscriber m_name;
-  wpi::nt::BooleanSubscriber m_controllable;
 
   BooleanSource m_valueData;
   std::string m_nameValue;
-  bool m_controllableValue = false;
 };
 
 }  // namespace wpi::glass

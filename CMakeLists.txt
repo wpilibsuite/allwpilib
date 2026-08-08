@@ -279,6 +279,8 @@ set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
 
 add_subdirectory(wpiutil)
 
+add_subdirectory(telemetry)
+add_subdirectory(tunable)
 if(WPILIB_WITH_NTCORE OR WPILIB_WITH_GUI OR WPILIB_WITH_WPILIB)
     set(DATALOG_DEP_REPLACE "find_dependency(datalog)")
     add_subdirectory(datalog)

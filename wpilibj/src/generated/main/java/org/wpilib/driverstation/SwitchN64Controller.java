@@ -11,8 +11,8 @@ import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Handle input from SwitchN64 controllers connected to the Driver Station.
@@ -20,7 +20,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * <p>This class handles SwitchN64 input that comes from the Driver Station. Each time a value
  * is requested the most recent value is returned.
  */
-public class SwitchN64Controller implements HIDDevice, Sendable {
+public class SwitchN64Controller implements HIDDevice, TelemetryLoggable {
   /** The number of touchpads supported by this controller. */
   public static final int TOUCHPAD_COUNT = 0;
 
@@ -878,27 +878,30 @@ public class SwitchN64Controller implements HIDDevice, Sendable {
 
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("HID");
-    builder.publishConstString("ControllerType", "SwitchN64");
-    builder.addDoubleProperty("LeftX", this::getLeftX, null);
-    builder.addDoubleProperty("LeftY", this::getLeftY, null);
-    builder.addDoubleProperty("ZAxis", this::getZAxis, null);
-    builder.addDoubleProperty("ZR", this::getZR, null);
-    builder.addBooleanProperty("A", this::getAButton, null);
-    builder.addBooleanProperty("B", this::getBButton, null);
-    builder.addBooleanProperty("CLeft", this::getCLeftButton, null);
-    builder.addBooleanProperty("CUp", this::getCUpButton, null);
-    builder.addBooleanProperty("Capture", this::getCaptureButton, null);
-    builder.addBooleanProperty("Home", this::getHomeButton, null);
-    builder.addBooleanProperty("Start", this::getStartButton, null);
-    builder.addBooleanProperty("CDown", this::getCDownButton, null);
-    builder.addBooleanProperty("L", this::getLButton, null);
-    builder.addBooleanProperty("R", this::getRButton, null);
-    builder.addBooleanProperty("DpadUp", this::getDpadUpButton, null);
-    builder.addBooleanProperty("DpadDown", this::getDpadDownButton, null);
-    builder.addBooleanProperty("DpadLeft", this::getDpadLeftButton, null);
-    builder.addBooleanProperty("DpadRight", this::getDpadRightButton, null);
-    builder.addBooleanProperty("CRight", this::getCRightButton, null);
+  public String getTelemetryType() {
+    return "HID:SwitchN64";
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
+    table.log("LeftX", getLeftX());
+    table.log("LeftY", getLeftY());
+    table.log("ZAxis", getZAxis());
+    table.log("ZR", getZR());
+    table.log("AButton", getAButton());
+    table.log("BButton", getBButton());
+    table.log("CLeftButton", getCLeftButton());
+    table.log("CUpButton", getCUpButton());
+    table.log("CaptureButton", getCaptureButton());
+    table.log("HomeButton", getHomeButton());
+    table.log("StartButton", getStartButton());
+    table.log("CDownButton", getCDownButton());
+    table.log("LButton", getLButton());
+    table.log("RButton", getRButton());
+    table.log("DpadUpButton", getDpadUpButton());
+    table.log("DpadDownButton", getDpadDownButton());
+    table.log("DpadLeftButton", getDpadLeftButton());
+    table.log("DpadRightButton", getDpadRightButton());
+    table.log("CRightButton", getCRightButton());
   }
 }

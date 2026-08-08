@@ -14,5 +14,6 @@ dependencies {
     api(project(':ntcore'))
     api(project(':wpiutil'))
     api(project(':wpiunits'))
+    api(project(':telemetry'))
     testImplementation(project(':wpimath')) // for convenient protobuf types
 }

@@ -50,7 +50,7 @@ class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
 
   bool IsFinished() override;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
  private:
   wpi::util::unique_function<CommandPtr()> m_supplier;

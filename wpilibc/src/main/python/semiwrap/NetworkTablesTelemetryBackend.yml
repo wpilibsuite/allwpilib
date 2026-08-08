@@ -1,0 +1,14 @@
+extra_includes:
+- wpi/telemetry/TelemetryEntry.hpp
+
+classes:
+  wpi::backend::NetworkTablesTelemetryBackend:
+    force_no_trampoline: true
+    methods:
+      NetworkTablesTelemetryBackend:
+      GetEntry:
+      HasSchema:
+      AddSchema:
+        overloads:
+          std::string_view, std::string_view, std::span<const uint8_t>:
+          std::string_view, std::string_view, std::string_view:

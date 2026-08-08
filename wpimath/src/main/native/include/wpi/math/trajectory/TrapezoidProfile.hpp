@@ -5,6 +5,8 @@
 #pragma once
 
 #include <stdexcept>
+#include <string_view>
+#include <type_traits>
 
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/base.hpp"
@@ -12,6 +14,57 @@
 #include "wpi/units/time.hpp"
 
 namespace wpi::math {
+
+namespace detail {
+/**
+ * TrapezoidProfile constraints.
+ */
+template <class Distance>
+class TrapezoidProfileConstraints {
+ public:
+  using Velocity =
+      wpi::units::compound_unit<Distance,
+                                wpi::units::inverse<wpi::units::seconds>>;
+  using Velocity_t = wpi::units::unit_t<Velocity>;
+  using Acceleration =
+      wpi::units::compound_unit<Velocity,
+                                wpi::units::inverse<wpi::units::seconds>>;
+  using Acceleration_t = wpi::units::unit_t<Acceleration>;
+
+  /// Maximum velocity.
+  Velocity_t maxVelocity{0};
+
+  /// Maximum acceleration.
+  Acceleration_t maxAcceleration{0};
+
+  /**
+   * Default constructor.
+   */
+  constexpr TrapezoidProfileConstraints() {
+    if !consteval {
+      wpi::math::MathSharedStore::ReportUsage("TrapezoidProfile", "");
+    }
+  }
+
+  /**
+   * Constructs constraints for a Trapezoid Profile.
+   *
+   * @param maxVelocity Maximum velocity, must be non-negative.
+   * @param maxAcceleration Maximum acceleration, must be non-negative.
+   */
+  constexpr TrapezoidProfileConstraints(Velocity_t maxVelocity,
+                                        Acceleration_t maxAcceleration)
+      : maxVelocity{maxVelocity}, maxAcceleration{maxAcceleration} {
+    if !consteval {
+      wpi::math::MathSharedStore::ReportUsage("TrapezoidProfile", "");
+    }
+
+    if (maxVelocity < Velocity_t{0} || maxAcceleration < Acceleration_t{0}) {
+      throw std::domain_error("Constraints must be non-negative");
+    }
+  }
+};
+}  // namespace detail
 
 /**
  * A trapezoid-shaped velocity profile.
@@ -56,45 +109,7 @@ class TrapezoidProfile {
                                 wpi::units::inverse<wpi::units::seconds>>;
   using Acceleration_t = wpi::units::unit_t<Acceleration>;
 
-  /**
-   * Profile constraints.
-   */
-  class Constraints {
-   public:
-    /// Maximum velocity.
-    Velocity_t maxVelocity{0};
-
-    /// Maximum acceleration.
-    Acceleration_t maxAcceleration{0};
-
-    /**
-     * Default constructor.
-     */
-    constexpr Constraints() {
-      if !consteval {
-        wpi::math::MathSharedStore::ReportUsage("TrapezoidProfile", "");
-      }
-    }
-
-    /**
-     * Constructs constraints for a Trapezoid Profile.
-     *
-     * @param maxVelocity Maximum velocity, must be non-negative.
-     * @param maxAcceleration Maximum acceleration, must be non-negative.
-     */
-    constexpr Constraints(Velocity_t maxVelocity,
-                          Acceleration_t maxAcceleration)
-        : maxVelocity{maxVelocity}, maxAcceleration{maxAcceleration} {
-      if !consteval {
-        wpi::math::MathSharedStore::ReportUsage("TrapezoidProfile", "");
-      }
-
-      if (maxVelocity <= Velocity_t{0} ||
-          maxAcceleration <= Acceleration_t{0}) {
-        throw std::domain_error("Constraints must be positive");
-      }
-    }
-  };
+  using Constraints = detail::TrapezoidProfileConstraints<Distance>;
 
   /**
    * Profile state.
@@ -396,3 +411,5 @@ class TrapezoidProfile {
 };
 
 }  // namespace wpi::math
+
+#include "wpi/math/trajectory/struct/TrapezoidProfileStruct.hpp"

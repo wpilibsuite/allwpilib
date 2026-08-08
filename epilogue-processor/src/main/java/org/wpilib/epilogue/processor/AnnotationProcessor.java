@@ -95,12 +95,13 @@ public class AnnotationProcessor extends AbstractProcessor {
     var loggedTypes = getLoggedTypes(roundEnv);
 
     // Handlers are declared in order of priority. If an element could be logged in more than one
-    // way (eg a class implements both Sendable and StructSerializable), the order of the handlers
+    // way (eg a class implements both TelemetryLoggable and StructSerializable), the order of the
+    // handlers
     // in this list will determine how it gets logged.
     m_handlers =
         List.of(
             new LoggableHandler(
-                processingEnv, loggedTypes), // prioritize epilogue logging over Sendable
+                processingEnv, loggedTypes), // prioritize epilogue logging over telemetry
             new ConfiguredLoggerHandler(
                 processingEnv, customLoggers), // then customized logging configs
             new ArrayHandler(processingEnv),
@@ -109,9 +110,9 @@ public class AnnotationProcessor extends AbstractProcessor {
             new MeasureHandler(processingEnv),
             new PrimitiveHandler(processingEnv),
             new SupplierHandler(processingEnv),
-            new StructHandler(processingEnv), // prioritize struct over sendable and protobuf
+            new StructHandler(processingEnv), // prioritize struct over telemetry and protobuf
             new ProtobufHandler(processingEnv), // then protobuf
-            new SendableHandler(processingEnv));
+            new TelemetryHandler(processingEnv));
 
     m_epilogueGenerator = new EpilogueGenerator(processingEnv, customLoggers);
     m_loggerGenerator = new LoggerGenerator(processingEnv, m_handlers);

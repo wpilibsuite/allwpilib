@@ -1,12 +1,12 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
 - wpi/event/BooleanEvent.hpp
+- wpi/telemetry/TelemetryTable.hpp
 
 classes:
   wpi::NiDsPS5Controller:
     force_no_trampoline: true
     ignored_bases:
-    - wpi::util::SendableHelper<NiDsPS5Controller>
+    - wpi::TelemetryLoggable  # TODO(telemetry PR)
     methods:
       NiDsPS5Controller:
         overloads:
@@ -86,7 +86,8 @@ classes:
       GetName:
       GetPort:
       SetRumble:
-      InitSendable:
+      GetTelemetryType:
+      LogTo:
   wpi::NiDsPS5Controller::Button:
     attributes:
       kSquare:

@@ -12,9 +12,8 @@ import org.wpilib.hardware.motor.MotorController;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.util.MathUtil;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * A class for driving Mecanum drive platforms.
@@ -49,15 +48,13 @@ import org.wpilib.util.sendable.SendableRegistry;
  * <p>{@link org.wpilib.hardware.motor.MotorSafety} is enabled by default. The driveCartesian or
  * drivePolar methods should be called periodically to avoid Motor Safety timeouts.
  */
-public class MecanumDrive extends RobotDriveBase implements Sendable, AutoCloseable {
-  private static int instances;
-
+public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable, AutoCloseable {
   private final DoubleConsumer m_frontLeftMotor;
   private final DoubleConsumer m_rearLeftMotor;
   private final DoubleConsumer m_frontRightMotor;
   private final DoubleConsumer m_rearRightMotor;
 
-  // Used for Sendable property getters
+  // Used for telemetry
   private double m_frontLeftOutput;
   private double m_rearLeftOutput;
   private double m_frontRightOutput;
@@ -112,7 +109,6 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * @param frontRightMotor The motor on the front-right corner.
    * @param rearRightMotor The motor on the rear-right corner.
    */
-  @SuppressWarnings({"removal", "this-escape"})
   public MecanumDrive(
       MotorController frontLeftMotor,
       MotorController rearLeftMotor,
@@ -123,10 +119,6 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
         (double output) -> rearLeftMotor.setThrottle(output),
         (double output) -> frontRightMotor.setThrottle(output),
         (double output) -> rearRightMotor.setThrottle(output));
-    SendableRegistry.addChild(this, frontLeftMotor);
-    SendableRegistry.addChild(this, rearLeftMotor);
-    SendableRegistry.addChild(this, frontRightMotor);
-    SendableRegistry.addChild(this, rearRightMotor);
   }
 
   /**
@@ -139,7 +131,6 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * @param frontRightMotor The setter for the motor on the front-right corner.
    * @param rearRightMotor The setter for the motor on the rear-right corner.
    */
-  @SuppressWarnings("this-escape")
   public MecanumDrive(
       DoubleConsumer frontLeftMotor,
       DoubleConsumer rearLeftMotor,
@@ -154,14 +145,10 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     m_rearLeftMotor = rearLeftMotor;
     m_frontRightMotor = frontRightMotor;
     m_rearRightMotor = rearRightMotor;
-    instances++;
-    SendableRegistry.add(this, "MecanumDrive", instances);
   }
 
   @Override
-  public void close() {
-    SendableRegistry.remove(this);
-  }
+  public void close() {}
 
   /**
    * Drive method for Mecanum platform.
@@ -312,15 +299,15 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("MecanumDrive");
-    builder.setActuator(true);
-    builder.addDoubleProperty(
-        "Front Left Motor Velocity", () -> m_frontLeftOutput, m_frontLeftMotor);
-    builder.addDoubleProperty(
-        "Front Right Motor Velocity", () -> m_frontRightOutput, m_frontRightMotor);
-    builder.addDoubleProperty("Rear Left Motor Velocity", () -> m_rearLeftOutput, m_rearLeftMotor);
-    builder.addDoubleProperty(
-        "Rear Right Motor Velocity", () -> m_rearRightOutput, m_rearRightMotor);
+  public void logTo(TelemetryTable table) {
+    table.log("Front Left Motor Velocity", m_frontLeftOutput);
+    table.log("Front Right Motor Velocity", m_frontRightOutput);
+    table.log("Rear Left Motor Velocity", m_rearLeftOutput);
+    table.log("Rear Right Motor Velocity", m_rearRightOutput);
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "MecanumDrive";
   }
 }

@@ -8,7 +8,7 @@
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
 #include "wpi/hal/UsageReporting.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
 
@@ -528,39 +528,41 @@ TouchpadFinger SteamController::GetTouchpadFinger(int touchpad,
 }
 
 
-void SteamController::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("HID");
-  builder.PublishConstString("ControllerType", "Steam");
-  builder.AddDoubleProperty("LeftX", [this] { return GetLeftX(); }, nullptr);
-  builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);
-  builder.AddDoubleProperty("RightX", [this] { return GetRightX(); }, nullptr);
-  builder.AddDoubleProperty("RightY", [this] { return GetRightY(); }, nullptr);
-  builder.AddDoubleProperty("LeftTrigger", [this] { return GetLeftTrigger(); }, nullptr);
-  builder.AddDoubleProperty("RightTrigger", [this] { return GetRightTrigger(); }, nullptr);
-  builder.AddBooleanProperty("A", [this] { return GetAButton(); }, nullptr);
-  builder.AddBooleanProperty("B", [this] { return GetBButton(); }, nullptr);
-  builder.AddBooleanProperty("X", [this] { return GetXButton(); }, nullptr);
-  builder.AddBooleanProperty("Y", [this] { return GetYButton(); }, nullptr);
-  builder.AddBooleanProperty("Menu", [this] { return GetMenuButton(); }, nullptr);
-  builder.AddBooleanProperty("Steam", [this] { return GetSteamButton(); }, nullptr);
-  builder.AddBooleanProperty("View", [this] { return GetViewButton(); }, nullptr);
-  builder.AddBooleanProperty("LeftStick", [this] { return GetLeftStickButton(); }, nullptr);
-  builder.AddBooleanProperty("RightStick", [this] { return GetRightStickButton(); }, nullptr);
-  builder.AddBooleanProperty("LeftBumper", [this] { return GetLeftBumperButton(); }, nullptr);
-  builder.AddBooleanProperty("RightBumper", [this] { return GetRightBumperButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadUp", [this] { return GetDpadUpButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadDown", [this] { return GetDpadDownButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadLeft", [this] { return GetDpadLeftButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadRight", [this] { return GetDpadRightButton(); }, nullptr);
-  builder.AddBooleanProperty("QAM", [this] { return GetQAMButton(); }, nullptr);
-  builder.AddBooleanProperty("RightPaddle1", [this] { return GetRightPaddle1Button(); }, nullptr);
-  builder.AddBooleanProperty("LeftPaddle1", [this] { return GetLeftPaddle1Button(); }, nullptr);
-  builder.AddBooleanProperty("RightPaddle2", [this] { return GetRightPaddle2Button(); }, nullptr);
-  builder.AddBooleanProperty("LeftPaddle2", [this] { return GetLeftPaddle2Button(); }, nullptr);
-  builder.AddBooleanProperty("LeftTouchpad", [this] { return GetLeftTouchpadButton(); }, nullptr);
-  builder.AddBooleanProperty("RightTouchpad", [this] { return GetRightTouchpadButton(); }, nullptr);
-  builder.AddBooleanProperty("LeftStickTouch", [this] { return GetLeftStickTouchButton(); }, nullptr);
-  builder.AddBooleanProperty("RightStickTouch", [this] { return GetRightStickTouchButton(); }, nullptr);
-  builder.AddBooleanProperty("LeftGripTouch", [this] { return GetLeftGripTouchButton(); }, nullptr);
-  builder.AddBooleanProperty("RightGripTouch", [this] { return GetRightGripTouchButton(); }, nullptr);
+std::string_view SteamController::GetTelemetryType() const {
+  return "HID:Steam";
+}
+
+void SteamController::LogTo(wpi::TelemetryTable& table) const {
+  table.Log("LeftX", GetLeftX());
+  table.Log("LeftY", GetLeftY());
+  table.Log("RightX", GetRightX());
+  table.Log("RightY", GetRightY());
+  table.Log("LeftTrigger", GetLeftTrigger());
+  table.Log("RightTrigger", GetRightTrigger());
+  table.Log("AButton", GetAButton());
+  table.Log("BButton", GetBButton());
+  table.Log("XButton", GetXButton());
+  table.Log("YButton", GetYButton());
+  table.Log("MenuButton", GetMenuButton());
+  table.Log("SteamButton", GetSteamButton());
+  table.Log("ViewButton", GetViewButton());
+  table.Log("LeftStickButton", GetLeftStickButton());
+  table.Log("RightStickButton", GetRightStickButton());
+  table.Log("LeftBumperButton", GetLeftBumperButton());
+  table.Log("RightBumperButton", GetRightBumperButton());
+  table.Log("DpadUpButton", GetDpadUpButton());
+  table.Log("DpadDownButton", GetDpadDownButton());
+  table.Log("DpadLeftButton", GetDpadLeftButton());
+  table.Log("DpadRightButton", GetDpadRightButton());
+  table.Log("QAMButton", GetQAMButton());
+  table.Log("RightPaddle1Button", GetRightPaddle1Button());
+  table.Log("LeftPaddle1Button", GetLeftPaddle1Button());
+  table.Log("RightPaddle2Button", GetRightPaddle2Button());
+  table.Log("LeftPaddle2Button", GetLeftPaddle2Button());
+  table.Log("LeftTouchpadButton", GetLeftTouchpadButton());
+  table.Log("RightTouchpadButton", GetRightTouchpadButton());
+  table.Log("LeftStickTouchButton", GetLeftStickTouchButton());
+  table.Log("RightStickTouchButton", GetRightStickTouchButton());
+  table.Log("LeftGripTouchButton", GetLeftGripTouchButton());
+  table.Log("RightGripTouchButton", GetRightGripTouchButton());
 }

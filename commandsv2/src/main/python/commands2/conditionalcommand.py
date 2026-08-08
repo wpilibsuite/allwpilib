@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Callable, Optional
 
-from wpiutil import SendableBuilder
+from wpilib import TelemetryTable
 
 from .command import Command, InterruptionBehavior
 from .commandscheduler import CommandScheduler
@@ -75,10 +75,10 @@ class ConditionalCommand(Command):
         else:
             return InterruptionBehavior.CANCEL_INCOMING
 
-    def init_sendable(self, builder: SendableBuilder):
-        super().init_sendable(builder)
-        builder.add_string_property("on_true", self.on_true.get_name, lambda _: None)
-        builder.add_string_property("on_false", self.on_false.get_name, lambda _: None)
+    def log_to(self, table: TelemetryTable) -> None:
+        super().log_to(table)
+        table.log("onTrue", self.on_true.get_name())
+        table.log("onFalse", self.on_false.get_name())
 
         def _selected():
             if self.selected_command is None:
@@ -86,8 +86,4 @@ class ConditionalCommand(Command):
             else:
                 return self.selected_command.get_name()
 
-        builder.add_string_property(
-            "selected",
-            _selected,
-            lambda _: None,
-        )
+        table.log("selected", _selected())

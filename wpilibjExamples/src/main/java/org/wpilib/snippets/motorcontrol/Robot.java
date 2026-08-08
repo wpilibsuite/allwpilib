@@ -8,7 +8,7 @@ import org.wpilib.driverstation.Joystick;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 
 /**
  * This sample program shows how to control a motor using a joystick. In the operator control part
@@ -59,7 +59,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    SmartDashboard.putNumber("Encoder", encoder.getDistance());
+    Telemetry.log("Encoder", encoder.getDistance());
   }
 
   /** The teleop periodic function is called every control packet in teleop. */

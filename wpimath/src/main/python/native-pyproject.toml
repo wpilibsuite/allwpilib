@@ -4,6 +4,8 @@ requires = [
     "hatchling",
     "hatch-nativelib~=0.2.0",
     "hatch-robotpy~=0.2.1",
+    "robotpy-native-telemetry==0.0.0",
+    "robotpy-native-tunable==0.0.0",
     "robotpy-native-wpiutil==0.0.0",
 ]
 
@@ -15,6 +17,8 @@ requires-python = ">=3.11"
 license = "BSD-3-Clause"
 
 dependencies = [
+    "robotpy-native-telemetry==0.0.0",
+    "robotpy-native-tunable==0.0.0",
     "robotpy-native-wpiutil==0.0.0",
 ]
 
@@ -37,4 +41,4 @@ name = "wpimath"
 includedir = "src/native/wpimath/include"
 libdir = "src/native/wpimath/lib"
 shared_libraries = ["wpimath"]
-requires = ["robotpy-native-wpiutil"]
+requires = ["robotpy-native-telemetry", "robotpy-native-tunable", "robotpy-native-wpiutil"]

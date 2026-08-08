@@ -11,9 +11,10 @@ import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.examples.hatchbotcmdv3.Constants.DriveConstants;
 import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
-public class DriveMechanism implements Mechanism {
+public class DriveMechanism implements Mechanism, TelemetryLoggable {
   // The motors on the left side of the drive.
   private final PWMSparkMax leftLeader = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
   private final PWMSparkMax leftFollower = new PWMSparkMax(DriveConstants.kLeftMotor2Port);
@@ -42,9 +43,6 @@ public class DriveMechanism implements Mechanism {
 
   /** Creates a new DriveMechanism. */
   public DriveMechanism() {
-    SendableRegistry.addChild(drive, leftLeader);
-    SendableRegistry.addChild(drive, rightLeader);
-
     leftLeader.addFollower(leftFollower);
     rightLeader.addFollower(rightFollower);
 
@@ -127,11 +125,9 @@ public class DriveMechanism implements Mechanism {
     drive.setMaxOutput(maxOutput);
   }
 
-  //  @Override
-  //  public void initSendable(SendableBuilder builder) {
-  //    super.initSendable(builder);
-  //    // Publish encoder distances to telemetry.
-  //    builder.addDoubleProperty("leftDistance", leftEncoder::getDistance, null);
-  //    builder.addDoubleProperty("rightDistance", rightEncoder::getDistance, null);
-  //  }
+  @Override
+  public void logTo(TelemetryTable table) {
+    table.log("leftDistance", leftEncoder.getDistance());
+    table.log("rightDistance", rightEncoder.getDistance());
+  }
 }

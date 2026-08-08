@@ -1,0 +1,15 @@
+extra_includes:
+- wpi/datalog/DataLog.hpp
+- wpi/telemetry/TelemetryEntry.hpp
+
+classes:
+  wpi::backend::DataLogTelemetryBackend:
+    force_no_trampoline: true
+    methods:
+      DataLogTelemetryBackend:
+      GetEntry:
+      HasSchema:
+      AddSchema:
+        overloads:
+          std::string_view, std::string_view, std::span<const uint8_t>:
+          std::string_view, std::string_view, std::string_view:

@@ -8,7 +8,7 @@
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 
 /**
  * This sample program shows how to control a motor using a joystick. In the
@@ -34,7 +34,7 @@ class Robot : public wpi::TimedRobot {
    * robot mode.
    */
   void RobotPeriodic() override {
-    wpi::SmartDashboard::PutNumber("Encoder", encoder.GetDistance());
+    wpi::Telemetry::Log("Encoder", encoder.GetDistance());
   }
 
   Robot() {

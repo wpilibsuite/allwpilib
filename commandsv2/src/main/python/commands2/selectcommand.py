@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Callable, Dict, Hashable
 
-from wpiutil import SendableBuilder
+from wpilib import TelemetryTable
 
 from .command import Command, InterruptionBehavior
 from .commandscheduler import CommandScheduler
@@ -79,8 +79,6 @@ class SelectCommand(Command):
     def get_interruption_behavior(self) -> InterruptionBehavior:
         return self._interrupt_behavior
 
-    def init_sendable(self, builder: SendableBuilder) -> None:
-        super().init_sendable(builder)
-        builder.add_string_property(
-            "selected", lambda: self._default_command.get_name(), lambda _: None
-        )
+    def log_to(self, table: TelemetryTable) -> None:
+        super().log_to(table)
+        table.log("selected", self._selected_command.get_name())

@@ -7,7 +7,7 @@
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/Commands.hpp"
-#include "wpi/smartdashboard/SendableChooser.hpp"
+#include "wpi/tunable/Selectable.hpp"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -26,8 +26,8 @@ class RobotContainer {
   // The enum used as keys for selecting the command to run.
   enum CommandSelector { ONE, TWO, THREE };
 
-  // An example of how command selector may be used with SendableChooser
-  wpi::SendableChooser<CommandSelector> chooser;
+  // An example of how command selector may be used with Selectable
+  wpi::Selectable<CommandSelector> chooser;
 
   // The robot's subsystems and commands are defined here...
 

@@ -1,0 +1,15 @@
+classes:
+  wpi::TunableBackend:
+    force_no_default_constructor: true
+    force_no_trampoline: true
+    methods:
+      Publish:
+        ignore: true
+      Remove:
+      RemovePrefix:
+      UnregisterTunable:
+      Update:
+  wpi::TunableBackend::PublishedTunable:
+    attributes:
+      path:
+      uid:

@@ -30,9 +30,13 @@ import org.wpilib.framework.RobotBase;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.system.Watchdog;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.tunable.ComplexTunable;
+import org.wpilib.tunable.Tunable;
+import org.wpilib.tunable.TunableConfig;
+import org.wpilib.tunable.TunableOption;
+import org.wpilib.tunable.TunableTable;
 
 /**
  * The scheduler responsible for running {@link Command}s. A Command-based robot should call {@link
@@ -43,7 +47,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  *
  * <p>This class is provided by the Commands v2 VendorDep
  */
-public final class CommandScheduler implements Sendable, AutoCloseable {
+public final class CommandScheduler implements TelemetryLoggable, ComplexTunable, AutoCloseable {
   /** The Singleton Instance. */
   private static CommandScheduler instance;
 
@@ -98,8 +102,11 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
   CommandScheduler() {
     HAL.reportUsage("CommandScheduler", "");
-    SendableRegistry.add(this, "Scheduler");
   }
+
+  /** Closes this command scheduler. */
+  @Override
+  public void close() {}
 
   /**
    * Changes the period of the loop overrun watchdog. This should be kept in sync with the
@@ -109,11 +116,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    */
   public void setPeriod(double period) {
     m_watchdog.setTimeout(period);
-  }
-
-  @Override
-  public void close() {
-    SendableRegistry.remove(this);
   }
 
   /**
@@ -741,45 +743,72 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     return m_composedCommands.keySet();
   }
 
+  private String[] getScheduledCommandNames() {
+    String[] names = new String[m_scheduledCommands.size()];
+    int i = 0;
+    for (Command command : m_scheduledCommands) {
+      names[i] = command.getName();
+      i++;
+    }
+    return names;
+  }
+
+  private long[] getScheduledCommandIds() {
+    long[] ids = new long[m_scheduledCommands.size()];
+    int i = 0;
+    for (Command command : m_scheduledCommands) {
+      ids[i] = command.hashCode();
+      i++;
+    }
+    return ids;
+  }
+
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Scheduler");
-    builder.addStringArrayProperty(
+  public void logTo(TelemetryTable table) {
+    String[] names = getScheduledCommandNames();
+    table.log("Names", names);
+
+    long[] ids = getScheduledCommandIds();
+    table.log("Ids", ids);
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Scheduler";
+  }
+
+  @Override
+  public void publishTunable(TunableTable table) {
+    TunableConfig immutableConfig = TunableConfig.of(TunableOption.IMMUTABLE);
+    table.publish(
         "Names",
-        () -> {
-          String[] names = new String[m_scheduledCommands.size()];
-          int i = 0;
-          for (Command command : m_scheduledCommands) {
-            names[i] = command.getName();
-            i++;
-          }
-          return names;
-        },
-        null);
-    builder.addIntegerArrayProperty(
+        Tunable.createConfig(
+            this::getScheduledCommandNames, null, String[].class, immutableConfig));
+    table.publish(
         "Ids",
-        () -> {
-          long[] ids = new long[m_scheduledCommands.size()];
-          int i = 0;
-          for (Command command : m_scheduledCommands) {
-            ids[i] = command.hashCode();
-            i++;
-          }
-          return ids;
-        },
-        null);
-    builder.addIntegerArrayProperty(
+        Tunable.createConfig(this::getScheduledCommandIds, null, long[].class, immutableConfig));
+
+    final long[] empty = {};
+    table.publish(
         "Cancel",
-        () -> new long[] {},
-        toCancel -> {
-          Map<Long, Command> ids = new LinkedHashMap<>();
-          for (Command command : m_scheduledCommands) {
-            long id = command.hashCode();
-            ids.put(id, command);
-          }
-          for (long hash : toCancel) {
-            cancel(ids.get(hash));
-          }
-        });
+        Tunable.createConfig(
+            () -> empty,
+            toCancel -> {
+              Map<Long, Command> ids = new LinkedHashMap<>();
+              for (Command command : m_scheduledCommands) {
+                long id = command.hashCode();
+                ids.put(id, command);
+              }
+              for (long hash : toCancel) {
+                cancel(ids.get(hash));
+              }
+            },
+            long[].class,
+            TunableConfig.of(TunableOption.ROBUST)));
+  }
+
+  @Override
+  public String getTunableType() {
+    return "Scheduler";
   }
 }

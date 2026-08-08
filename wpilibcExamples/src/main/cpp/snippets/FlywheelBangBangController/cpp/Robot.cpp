@@ -11,8 +11,9 @@
 #include "wpi/math/system/Models.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/simulation/FlywheelSim.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/RobotController.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
+#include "wpi/tunable/Tunables.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 
 /**
@@ -39,11 +40,13 @@ class Robot : public wpi::TimedRobot {
     // the shooter.
     flywheelMotor.SetVoltage(bangOutput +
                              0.9 * feedforward.Calculate(setpoint));
+
+    wpi::Telemetry::Log("BangBangController", bangBangController);
   }
 
   Robot() {
     // Add bang-bang controller to SmartDashboard and networktables.
-    wpi::SmartDashboard::PutData("BangBangController", &bangBangController);
+    wpi::Tunables::Publish("BangBangController", bangBangController);
   }
 
   /**

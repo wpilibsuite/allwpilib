@@ -3,9 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/framework/TimedRobot.hpp"
-#include "wpi/hardware/discrete/DigitalInput.hpp"
 #include "wpi/hardware/rotation/DutyCycle.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 
 class Robot : public wpi::TimedRobot {
   wpi::DutyCycle dutyCycle{0};  // Duty cycle input
@@ -21,8 +20,8 @@ class Robot : public wpi::TimedRobot {
     // 1 is fully on, 0 is fully off
     auto output = dutyCycle.GetOutput();
 
-    wpi::SmartDashboard::PutNumber("Frequency", frequency.value());
-    wpi::SmartDashboard::PutNumber("Duty Cycle", output);
+    wpi::Telemetry::Log("Frequency", frequency);
+    wpi::Telemetry::Log("Duty Cycle", output);
   }
 };
 

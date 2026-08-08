@@ -13,7 +13,7 @@
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/driverstation/Joystick.hpp"
-#include "wpi/smartdashboard/SendableChooser.hpp"
+#include "wpi/tunable/Selectable.hpp"
 #include "wpi/xrp/XRPOnBoardIO.hpp"
 
 /**
@@ -43,7 +43,7 @@ class RobotContainer {
  private:
   // Assumes a gamepad plugged into channel 0
   wpi::Joystick controller{0};
-  wpi::SendableChooser<wpi::cmd::Command*> chooser;
+  wpi::Selectable<wpi::cmd::Command*> chooser;
 
   // The robot's subsystems
   Drivetrain drive;
