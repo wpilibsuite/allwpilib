@@ -4,6 +4,8 @@
 
 #include "wpi/math/linalg/DARE.hpp"
 
+#include <algorithm>
+#include <cmath>
 #include <expected>
 #include <format>
 
@@ -77,6 +79,10 @@ wpi::math::DARE<2, 3>(const Eigen::Matrix<double, 2, 2>& A,
                       const Eigen::Matrix<double, 2, 3>& N,
                       bool checkPreconditions);
 
+constexpr double kDARENormalizedResidualTolerance = 1e-12;
+constexpr double kQuadcopterDt = 1e-4;
+constexpr int kQuadcopterScaleExponent = 44;
+
 void ExpectMatrixEqual(const Eigen::MatrixXd& lhs, const Eigen::MatrixXd& rhs,
                        double tolerance) {
   for (int row = 0; row < lhs.rows(); ++row) {
@@ -98,22 +104,62 @@ void ExpectPositiveSemidefinite(const Eigen::MatrixXd& X) {
   }
 }
 
+double DARENormalizedResidualFromTerms(
+    const Eigen::Ref<const Eigen::MatrixXd>& A,
+    const Eigen::Ref<const Eigen::MatrixXd>& Q,
+    const Eigen::Ref<const Eigen::MatrixXd>& X,
+    const Eigen::Ref<const Eigen::MatrixXd>& inputCost,
+    const Eigen::Ref<const Eigen::MatrixXd>& leftTerm,
+    const Eigen::Ref<const Eigen::MatrixXd>& rightTerm) {
+  Eigen::MatrixXd stateTerm = A.transpose() * X * A;
+  Eigen::MatrixXd feedbackTerm = leftTerm * inputCost.llt().solve(rightTerm);
+  Eigen::MatrixXd residual = stateTerm - X - feedbackTerm + Q;
+  double normalizer = std::max(
+      {1.0, stateTerm.norm(), X.norm(), feedbackTerm.norm(), Q.norm()});
+
+  return residual.norm() / normalizer;
+}
+
+double DARENormalizedResidual(const Eigen::Ref<const Eigen::MatrixXd>& A,
+                              const Eigen::Ref<const Eigen::MatrixXd>& B,
+                              const Eigen::Ref<const Eigen::MatrixXd>& Q,
+                              const Eigen::Ref<const Eigen::MatrixXd>& R,
+                              const Eigen::Ref<const Eigen::MatrixXd>& X) {
+  Eigen::MatrixXd inputCost = B.transpose() * X * B + R;
+  Eigen::MatrixXd stateInput = A.transpose() * X * B;
+  Eigen::MatrixXd rightTerm = stateInput.transpose();
+
+  return DARENormalizedResidualFromTerms(A, Q, X, inputCost, stateInput,
+                                         rightTerm);
+}
+
+double DARENormalizedResidual(const Eigen::Ref<const Eigen::MatrixXd>& A,
+                              const Eigen::Ref<const Eigen::MatrixXd>& B,
+                              const Eigen::Ref<const Eigen::MatrixXd>& Q,
+                              const Eigen::Ref<const Eigen::MatrixXd>& R,
+                              const Eigen::Ref<const Eigen::MatrixXd>& N,
+                              const Eigen::Ref<const Eigen::MatrixXd>& X) {
+  Eigen::MatrixXd inputCost = B.transpose() * X * B + R;
+  Eigen::MatrixXd leftTerm = A.transpose() * X * B + N;
+  Eigen::MatrixXd rightTerm = B.transpose() * X * A + N.transpose();
+
+  return DARENormalizedResidualFromTerms(A, Q, X, inputCost, leftTerm,
+                                         rightTerm);
+}
+
 void ExpectDARESolution(const Eigen::Ref<const Eigen::MatrixXd>& A,
                         const Eigen::Ref<const Eigen::MatrixXd>& B,
                         const Eigen::Ref<const Eigen::MatrixXd>& Q,
                         const Eigen::Ref<const Eigen::MatrixXd>& R,
-                        const Eigen::Ref<const Eigen::MatrixXd>& X) {
+                        const Eigen::Ref<const Eigen::MatrixXd>& X,
+                        double tolerance = 1e-10) {
+  REQUIRE(X.allFinite());
+
   // Check that X is the solution to the DARE
   // Y = AᵀXA − X − AᵀXB(BᵀXB + R)⁻¹BᵀXA + Q = 0
-  // clang-format off
-  Eigen::MatrixXd Y =
-      A.transpose() * X * A
-      - X
-      - (A.transpose() * X * B * (B.transpose() * X * B + R).inverse()
-        * B.transpose() * X * A)
-      + Q;
-  // clang-format on
-  ExpectMatrixEqual(Y, Eigen::MatrixXd::Zero(X.rows(), X.cols()), 1e-10);
+  double residual = DARENormalizedResidual(A, B, Q, R, X);
+  UNSCOPED_INFO("normalized residual = " << residual);
+  CHECK(residual < tolerance);
 }
 
 void ExpectDARESolution(const Eigen::Ref<const Eigen::MatrixXd>& A,
@@ -121,18 +167,119 @@ void ExpectDARESolution(const Eigen::Ref<const Eigen::MatrixXd>& A,
                         const Eigen::Ref<const Eigen::MatrixXd>& Q,
                         const Eigen::Ref<const Eigen::MatrixXd>& R,
                         const Eigen::Ref<const Eigen::MatrixXd>& N,
-                        const Eigen::Ref<const Eigen::MatrixXd>& X) {
+                        const Eigen::Ref<const Eigen::MatrixXd>& X,
+                        double tolerance = 1e-10) {
+  REQUIRE(X.allFinite());
+
   // Check that X is the solution to the DARE
   // Y = AᵀXA − X − (AᵀXB + N)(BᵀXB + R)⁻¹(BᵀXA + Nᵀ) + Q = 0
-  // clang-format off
-  Eigen::MatrixXd Y =
-      A.transpose() * X * A
-      - X
-      - ((A.transpose() * X * B + N) * (B.transpose() * X * B + R).inverse()
-        * (B.transpose() * X * A + N.transpose()))
-      + Q;
-  // clang-format on
-  ExpectMatrixEqual(Y, Eigen::MatrixXd::Zero(X.rows(), X.cols()), 1e-10);
+  double residual = DARENormalizedResidual(A, B, Q, R, N, X);
+  UNSCOPED_INFO("normalized residual = " << residual);
+  CHECK(residual < tolerance);
+}
+
+wpi::math::Matrixd<10, 10> MakeQuadcopterA() {
+  wpi::math::Matrixd<10, 10> A = wpi::math::Matrixd<10, 10>::Zero();
+  A(0, 0) = 0.9999;
+  A(0, 3) = 1e-8;
+
+  double stable = std::exp(-kQuadcopterDt);
+  double unstable = std::exp(6.0 * kQuadcopterDt);
+  A(3, 3) = stable;
+  A(4, 4) = stable;
+  A(5, 5) = stable;
+  A(6, 6) = unstable;
+  A(7, 7) = unstable;
+  A(8, 8) = unstable;
+  A(9, 9) = unstable;
+
+  return A;
+}
+
+wpi::math::Matrixd<10, 4> MakeQuadcopterB() {
+  wpi::math::Matrixd<10, 4> B = wpi::math::Matrixd<10, 4>::Zero();
+  double stableInput = 1.0 - std::exp(-kQuadcopterDt);
+  double unstableInput = (std::exp(6.0 * kQuadcopterDt) - 1.0) / 6.0;
+  B.row(3).setConstant(stableInput);
+  B(6, 0) = unstableInput;
+  B(7, 1) = unstableInput;
+  B(8, 2) = unstableInput;
+  B(9, 3) = unstableInput;
+
+  return B;
+}
+
+wpi::math::Matrixd<10, 10> MakeStateTransform() {
+  wpi::math::Matrixd<10, 10> C = wpi::math::Matrixd<10, 10>::Identity();
+  C(0, 0) = std::ldexp(1.0, kQuadcopterScaleExponent);
+  return C;
+}
+
+struct QuadcopterDAREProblem {
+  wpi::math::Matrixd<10, 10> A;
+  wpi::math::Matrixd<10, 4> B;
+  wpi::math::Matrixd<10, 10> Q;
+  wpi::math::Matrixd<4, 4> R;
+};
+
+QuadcopterDAREProblem MakeCoordinateTransformedQuadcopterDAREProblem() {
+  auto A = MakeQuadcopterA();
+  auto B = MakeQuadcopterB();
+  wpi::math::Matrixd<10, 10> Q = wpi::math::Matrixd<10, 10>::Identity();
+  wpi::math::Matrixd<4, 4> R = wpi::math::Matrixd<4, 4>::Identity();
+
+  auto C = MakeStateTransform();
+  wpi::math::Matrixd<10, 10> CInv = wpi::math::Matrixd<10, 10>::Identity();
+  CInv(0, 0) = std::ldexp(1.0, -kQuadcopterScaleExponent);
+
+  // Q = I keeps the deliberately unstable modes detectable. The 2^44 state
+  // transform recreates the badly scaled repro using exactly representable
+  // powers of two.
+  return {CInv * A * C, CInv * B, C.transpose() * Q * C, R};
+}
+
+wpi::math::Matrixd<10, 4> MakeQuadcopterN() {
+  wpi::math::Matrixd<10, 4> N = wpi::math::Matrixd<10, 4>::Zero();
+  N(3, 0) = 0.125;
+  N(6, 0) = -0.0625;
+  N(7, 1) = 0.03125;
+  N(8, 2) = -0.015625;
+  N(9, 3) = 0.0078125;
+
+  return N;
+}
+
+template <int States, int Inputs>
+void ExpectDARESolutions(const Eigen::Matrix<double, States, States>& A,
+                         const Eigen::Matrix<double, States, Inputs>& B,
+                         const Eigen::Matrix<double, States, States>& Q,
+                         const Eigen::Matrix<double, Inputs, Inputs>& R) {
+  auto checkedRet = wpi::math::DARE<States, Inputs>(A, B, Q, R);
+  REQUIRE(checkedRet);
+  ExpectDARESolution(A, B, Q, R, checkedRet.value(),
+                     kDARENormalizedResidualTolerance);
+
+  auto noPrecondRet = wpi::math::DARE<States, Inputs>(A, B, Q, R, false);
+  REQUIRE(noPrecondRet);
+  ExpectDARESolution(A, B, Q, R, noPrecondRet.value(),
+                     kDARENormalizedResidualTolerance);
+}
+
+template <int States, int Inputs>
+void ExpectDARESolutions(const Eigen::Matrix<double, States, States>& A,
+                         const Eigen::Matrix<double, States, Inputs>& B,
+                         const Eigen::Matrix<double, States, States>& Q,
+                         const Eigen::Matrix<double, Inputs, Inputs>& R,
+                         const Eigen::Matrix<double, States, Inputs>& N) {
+  auto checkedRet = wpi::math::DARE<States, Inputs>(A, B, Q, R, N);
+  REQUIRE(checkedRet);
+  ExpectDARESolution(A, B, Q, R, N, checkedRet.value(),
+                     kDARENormalizedResidualTolerance);
+
+  auto noPrecondRet = wpi::math::DARE<States, Inputs>(A, B, Q, R, N, false);
+  REQUIRE(noPrecondRet);
+  ExpectDARESolution(A, B, Q, R, N, noPrecondRet.value(),
+                     kDARENormalizedResidualTolerance);
 }
 
 TEST_CASE("DARETest NonInvertibleA ABQR", "[wpimath]") {
@@ -316,6 +463,32 @@ TEST_CASE("DARETest MoreInputsThanStates ABQRN", "[wpimath]") {
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
   ExpectPositiveSemidefinite(X);
   ExpectDARESolution(A, B, Q, R, N, X);
+}
+
+TEST_CASE("DARETest FallbackForInaccurateBalancedSDA ABQR", "[wpimath]") {
+  wpi::math::Matrixd<2, 2> A{{1.2963132466700529, 0.23358083372260396},
+                             {0.24092328125583884, 1.38668343116617}};
+  wpi::math::Matrixd<2, 1> B{{-16.0}, {-256.0}};
+  wpi::math::Matrixd<2, 2> Q{{std::ldexp(1.0, -15), 0.0},
+                             {0.0, std::ldexp(1.0, 37)}};
+  wpi::math::Matrixd<1, 1> R{1.0};
+
+  ExpectDARESolutions(A, B, Q, R);
+}
+
+TEST_CASE("DARETest CoordinateTransformedQuadcopter ABQR", "[wpimath]") {
+  auto problem = MakeCoordinateTransformedQuadcopterDAREProblem();
+
+  ExpectDARESolutions(problem.A, problem.B, problem.Q, problem.R);
+}
+
+TEST_CASE("DARETest CoordinateTransformedQuadcopter ABQRN", "[wpimath]") {
+  auto problem = MakeCoordinateTransformedQuadcopterDAREProblem();
+  auto N = MakeQuadcopterN();
+  wpi::math::Matrixd<10, 10> AInput = problem.A + problem.B * N.transpose();
+  wpi::math::Matrixd<10, 10> QInput = problem.Q + N * N.transpose();
+
+  ExpectDARESolutions(AInput, problem.B, QInput, problem.R, N);
 }
 
 TEST_CASE("DARETest QNotSymmetric ABQR", "[wpimath]") {
