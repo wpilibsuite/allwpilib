@@ -26,4 +26,13 @@ class EncoderTest {
           EncoderJNI.getEncoderDecodingScaleFactor(x4.m_encoder), x4.getDecodingScaleFactor());
     }
   }
+
+  @Test
+  void testSetRateWindow() {
+    HAL.initialize();
+
+    try (Encoder encoder = new Encoder(0, 1)) {
+      encoder.setRateWindow(50);
+    }
+  }
 }
