@@ -212,4 +212,61 @@ class SchedulerDefaultCommandTests extends CommandTestBase {
         List.of("Command 1", "Command 2"),
         defaultCommandBindings.stream().map(b -> b.command().name()).toList());
   }
+
+  @Test
+  void defaultCommandSetForUnselectedOpmode() {
+    var mech = new DummyMechanism("Mech", m_scheduler);
+    var initialDefaultCommand = mech.idle();
+    mech.setDefaultCommand(initialDefaultCommand);
+
+    var opModeScopedCommand = mech.run(Coroutine::park).named("Opmode Scoped Default Command");
+
+    m_scheduler.setDefaultCommand("My Auto", mech, opModeScopedCommand);
+
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(initialDefaultCommand));
+    assertFalse(m_scheduler.isRunning(opModeScopedCommand));
+
+    m_opModeId = 1;
+    m_opModeName = "My Auto";
+    m_scheduler.run();
+
+    assertFalse(m_scheduler.isRunning(initialDefaultCommand));
+    assertTrue(m_scheduler.isRunning(opModeScopedCommand));
+
+    m_opModeId = 2;
+    m_opModeName = "My Teleop";
+    m_scheduler.run();
+
+    assertTrue(m_scheduler.isRunning(initialDefaultCommand));
+    assertFalse(m_scheduler.isRunning(opModeScopedCommand));
+  }
+
+  @Test
+  void removeDefaultCommandForOpmode() {
+    var mech = new DummyMechanism("Mech", m_scheduler);
+    var initialDefaultCommand = mech.idle();
+    mech.setDefaultCommand(initialDefaultCommand);
+
+    var opModeScopedCommand = mech.run(Coroutine::park).named("Opmode Scoped Default Command");
+
+    m_scheduler.setDefaultCommand("My Auto", mech, opModeScopedCommand);
+
+    m_opModeId = 1;
+    m_opModeName = "My Auto";
+    m_scheduler.run();
+
+    assertTrue(m_scheduler.isRunning(opModeScopedCommand));
+    assertFalse(m_scheduler.isRunning(initialDefaultCommand));
+
+    m_scheduler.removeDefaultCommand("My Auto", mech);
+
+    // The command should be cancelled because it was removed, and initial default command should
+    // run
+    assertFalse(m_scheduler.isRunning(opModeScopedCommand));
+
+    // Process the new defaults in the next cycle
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(initialDefaultCommand));
+  }
 }
