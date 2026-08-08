@@ -6,6 +6,7 @@
 
 #include "wpi/hal/Encoder.h"
 #include "wpi/hardware/discrete/CounterBase.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/util/Handle.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
@@ -128,6 +129,14 @@ class Encoder : public CounterBase,
    * @return The current rate of the encoder.
    */
   double GetRate() const;
+
+  /**
+   * Sets the time window used to calculate the encoder rate.
+   *
+   * @param window The rate calculation window. Valid values are 5 ms through
+   *               255 ms. The default is 50 ms.
+   */
+  void SetRateWindow(wpi::units::millisecond_t window);
 
   /**
    * Set the distance per pulse for this encoder.

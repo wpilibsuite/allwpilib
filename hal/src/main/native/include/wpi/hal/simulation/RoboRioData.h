@@ -57,6 +57,12 @@ void HALSIM_CancelRoboRioBrownoutVoltageCallback(int32_t uid);
 double HALSIM_GetRoboRioBrownoutVoltage(void);
 void HALSIM_SetRoboRioBrownoutVoltage(double brownoutVoltage);
 
+int32_t HALSIM_RegisterRoboRioBrownoutRecoveryVoltageCallback(
+    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify);
+void HALSIM_CancelRoboRioBrownoutRecoveryVoltageCallback(int32_t uid);
+double HALSIM_GetRoboRioBrownoutRecoveryVoltage(void);
+void HALSIM_SetRoboRioBrownoutRecoveryVoltage(double brownoutRecoveryVoltage);
+
 int32_t HALSIM_RegisterRoboRioTeamNumberCallback(HAL_NotifyCallback callback,
                                                  void* param,
                                                  HAL_Bool initialNotify);

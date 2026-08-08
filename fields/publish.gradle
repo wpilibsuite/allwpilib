@@ -3,7 +3,7 @@ apply plugin: 'maven-publish'
 def baseArtifactId = project.nativeName
 def artifactGroupId = project.groupId
 def cppZipBaseName = makeZipBaseName(artifactGroupId, "${baseArtifactId}-cpp")
-def cppImagesZipBaseName = makeZipBaseName(artifactGroupId, "${baseArtifactId}-images-cpp")
+def cppImagesZipBaseName = makeZipBaseName(artifactGroupId, "field-images-cpp")
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -131,7 +131,7 @@ model {
                 artifact cppImageHeadersZip
                 artifact cppImageSourcesZip
 
-                artifactId = "${baseArtifactId}-images-cpp"
+                artifactId = "field-images-cpp"
                 groupId = artifactGroupId
                 version = wpilibVersioning.version.get()
             }

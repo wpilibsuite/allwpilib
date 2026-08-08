@@ -6,9 +6,11 @@ package org.wpilib.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.wpilib.hardware.hal.util.UncleanStatusException;
 import org.wpilib.simulation.testutils.BooleanCallback;
 import org.wpilib.simulation.testutils.DoubleCallback;
 import org.wpilib.simulation.testutils.IntCallback;
@@ -35,16 +37,56 @@ class RoboRioSimTest {
   void testSetBrownout() {
     RoboRioSim.resetData();
 
-    DoubleCallback voltageCallback = new DoubleCallback();
-    try (CallbackStore voltageCb =
-        RoboRioSim.registerBrownoutVoltageCallback(voltageCallback, false)) {
-      final double kTestVoltage = 1.91;
+    DoubleCallback brownoutVoltageCallback = new DoubleCallback();
+    DoubleCallback recoveryVoltageCallback = new DoubleCallback();
+    double[] recoveryVoltageDuringBrownoutCallback = {0.0};
+    double[] brownoutVoltageDuringRecoveryCallback = {0.0};
+    try (CallbackStore brownoutVoltageCb =
+            RoboRioSim.registerBrownoutVoltageCallback(brownoutVoltageCallback, false);
+        CallbackStore recoveryVoltageCb =
+            RoboRioSim.registerBrownoutRecoveryVoltageCallback(recoveryVoltageCallback, false);
+        CallbackStore brownoutConsistencyCb =
+            RoboRioSim.registerBrownoutVoltageCallback(
+                (name, value) ->
+                    recoveryVoltageDuringBrownoutCallback[0] =
+                        RoboRioSim.getBrownoutRecoveryVoltage(),
+                false);
+        CallbackStore recoveryConsistencyCb =
+            RoboRioSim.registerBrownoutRecoveryVoltageCallback(
+                (name, value) ->
+                    brownoutVoltageDuringRecoveryCallback[0] = RoboRioSim.getBrownoutVoltage(),
+                false)) {
+      final double kRequestedBrownoutVoltage = 7.5004;
+      final double kRequestedRecoveryVoltage = 8.0003;
+      final double kExpectedBrownoutVoltage = 7.5;
+      final double kExpectedRecoveryVoltage = 8.0;
 
-      RoboRioSim.setBrownoutVoltage(kTestVoltage);
-      assertTrue(voltageCallback.wasTriggered());
-      assertEquals(kTestVoltage, voltageCallback.getSetValue());
-      assertEquals(kTestVoltage, RoboRioSim.getBrownoutVoltage());
-      assertEquals(kTestVoltage, RobotController.getBrownoutVoltage());
+      RobotController.setBrownoutVoltages(kRequestedBrownoutVoltage, kRequestedRecoveryVoltage);
+      assertTrue(brownoutVoltageCallback.wasTriggered());
+      assertTrue(recoveryVoltageCallback.wasTriggered());
+      assertEquals(kExpectedBrownoutVoltage, brownoutVoltageCallback.getSetValue());
+      assertEquals(kExpectedRecoveryVoltage, recoveryVoltageCallback.getSetValue());
+      assertEquals(kExpectedRecoveryVoltage, recoveryVoltageDuringBrownoutCallback[0]);
+      assertEquals(kExpectedBrownoutVoltage, brownoutVoltageDuringRecoveryCallback[0]);
+      assertEquals(kExpectedBrownoutVoltage, RoboRioSim.getBrownoutVoltage());
+      assertEquals(kExpectedRecoveryVoltage, RoboRioSim.getBrownoutRecoveryVoltage());
+    }
+  }
+
+  @Test
+  void testRejectsInvalidBrownoutThresholds() {
+    final double kDefaultBrownoutVoltage = 6.75;
+    final double kDefaultRecoveryVoltage = 7.25;
+    double[][] invalidPairs = {{4.99, 7.0}, {6.5, 8.51}, {6.5, 6.99}};
+
+    for (double[] pair : invalidPairs) {
+      RoboRioSim.resetData();
+
+      assertThrows(
+          UncleanStatusException.class,
+          () -> RobotController.setBrownoutVoltages(pair[0], pair[1]));
+      assertEquals(kDefaultBrownoutVoltage, RoboRioSim.getBrownoutVoltage());
+      assertEquals(kDefaultRecoveryVoltage, RoboRioSim.getBrownoutRecoveryVoltage());
     }
   }
 

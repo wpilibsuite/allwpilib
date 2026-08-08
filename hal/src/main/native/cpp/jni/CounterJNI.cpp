@@ -62,6 +62,20 @@ Java_org_wpilib_hardware_hal_CounterJNI_setCounterEdgeConfiguration
 
 /*
  * Class:     org_wpilib_hardware_hal_CounterJNI
+ * Method:    setCounterRateWindow
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_CounterJNI_setCounterRateWindow
+  (JNIEnv* env, jclass, jint id, jint windowMilliseconds)
+{
+  int32_t status = 0;
+  HAL_SetCounterRateWindow((HAL_CounterHandle)id, windowMilliseconds, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_CounterJNI
  * Method:    resetCounter
  * Signature: (I)V
  */
@@ -91,31 +105,17 @@ Java_org_wpilib_hardware_hal_CounterJNI_getCounter
 
 /*
  * Class:     org_wpilib_hardware_hal_CounterJNI
- * Method:    getCounterPeriod
+ * Method:    getCounterRate
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_org_wpilib_hardware_hal_CounterJNI_getCounterPeriod
+Java_org_wpilib_hardware_hal_CounterJNI_getCounterRate
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
-  jdouble returnValue = HAL_GetCounterPeriod((HAL_CounterHandle)id, &status);
+  jdouble returnValue = HAL_GetCounterRate((HAL_CounterHandle)id, &status);
   CheckStatus(env, status);
   return returnValue;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_CounterJNI
- * Method:    setCounterMaxPeriod
- * Signature: (ID)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_CounterJNI_setCounterMaxPeriod
-  (JNIEnv* env, jclass, jint id, jdouble value)
-{
-  int32_t status = 0;
-  HAL_SetCounterMaxPeriod((HAL_CounterHandle)id, value, &status);
-  CheckStatus(env, status);
 }
 
 /*

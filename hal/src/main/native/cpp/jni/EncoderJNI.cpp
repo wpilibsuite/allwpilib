@@ -182,6 +182,20 @@ Java_org_wpilib_hardware_hal_EncoderJNI_getEncoderRate
 
 /*
  * Class:     org_wpilib_hardware_hal_EncoderJNI
+ * Method:    setEncoderRateWindow
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_EncoderJNI_setEncoderRateWindow
+  (JNIEnv* env, jclass, jint id, jint windowMilliseconds)
+{
+  int32_t status = 0;
+  HAL_SetEncoderRateWindow((HAL_EncoderHandle)id, windowMilliseconds, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_EncoderJNI
  * Method:    setEncoderDistancePerPulse
  * Signature: (ID)V
  */

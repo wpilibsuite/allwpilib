@@ -18,7 +18,8 @@ typedef struct llhttp__internal_s llhttp__internal_t;
 struct llhttp__internal_s {
   int32_t _index;
   void* _span_pos0;
-  void* _span_cb0;
+  int (*_span_cb0)(llhttp__internal_t*, const unsigned char*,
+                   const unsigned char*);
   int32_t error;
   const char* reason;
   const char* error_pos;

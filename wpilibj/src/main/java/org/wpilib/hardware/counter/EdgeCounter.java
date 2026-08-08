@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.counter;
+package org.wpilib.hardware.counter;
 
 import org.wpilib.hardware.hal.CounterJNI;
 import org.wpilib.hardware.hal.HAL;
@@ -10,29 +10,24 @@ import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
 
-/**
- * Up Down Counter.
- *
- * <p>This class can count edges on a single digital input or count up based on an edge from one
- * digital input and down on an edge from another digital input.
- */
-public class UpDownCounter implements Sendable, AutoCloseable {
+/** Counts rising or falling edges on a single digital input. */
+public class EdgeCounter implements Sendable, AutoCloseable {
   private final int m_handle;
 
   /**
-   * Constructs a new UpDown Counter.
+   * Constructs a new edge counter.
    *
-   * @param channel The up count source (can be null).
+   * @param channel The DIO channel.
    * @param configuration The edge configuration.
    */
   @SuppressWarnings("this-escape")
-  public UpDownCounter(int channel, EdgeConfiguration configuration) {
+  public EdgeCounter(int channel, EdgeConfiguration configuration) {
     m_handle = CounterJNI.initializeCounter(channel, configuration.rising);
 
     reset();
 
-    HAL.reportUsage("IO", channel, "UpDownCounter");
-    SendableRegistry.add(this, "UpDown Counter", channel);
+    HAL.reportUsage("IO", channel, "EdgeCounter");
+    SendableRegistry.add(this, "Edge Counter", channel);
   }
 
   @Override
@@ -42,9 +37,9 @@ public class UpDownCounter implements Sendable, AutoCloseable {
   }
 
   /**
-   * Sets the configuration for the up source.
+   * Sets which edge of the digital input is counted.
    *
-   * @param configuration The up source configuration.
+   * @param configuration The edge configuration.
    */
   public void setEdgeConfiguration(EdgeConfiguration configuration) {
     CounterJNI.setCounterEdgeConfiguration(m_handle, configuration.rising);
@@ -66,7 +61,7 @@ public class UpDownCounter implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("UpDown Counter");
+    builder.setSmartDashboardType("Edge Counter");
     builder.addDoubleProperty("Count", this::getCount, null);
   }
 }

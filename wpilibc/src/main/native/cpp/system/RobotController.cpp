@@ -140,17 +140,12 @@ void RobotController::ResetRailFaultCounts() {
   WPILIB_CheckErrorStatus(status, "ResetRailFaultCounts");
 }
 
-wpi::units::volt_t RobotController::GetBrownoutVoltage() {
+void RobotController::SetBrownoutVoltages(wpi::units::volt_t brownoutVoltage,
+                                          wpi::units::volt_t recoveryVoltage) {
   int32_t status = 0;
-  double retVal = HAL_GetBrownoutVoltage(&status);
-  WPILIB_CheckErrorStatus(status, "GetBrownoutVoltage");
-  return wpi::units::volt_t{retVal};
-}
-
-void RobotController::SetBrownoutVoltage(wpi::units::volt_t brownoutVoltage) {
-  int32_t status = 0;
-  HAL_SetBrownoutVoltage(brownoutVoltage.value(), &status);
-  WPILIB_CheckErrorStatus(status, "SetBrownoutVoltage");
+  HAL_SetBrownoutVoltages(brownoutVoltage.value(), recoveryVoltage.value(),
+                          &status);
+  WPILIB_CheckErrorStatus(status, "SetBrownoutVoltages");
 }
 
 wpi::units::celsius_t RobotController::GetCPUTemp() {

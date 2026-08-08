@@ -238,19 +238,19 @@ wpilib_java_library(
 )
 
 java_library(
-    name = "fields-images-java",
+    name = "field-images-java",
     resource_strip_prefix = "fields/src/main/native/resources",
     resources = FIELD_IMAGES,
     tags = [
-        "maven_coordinates=org.wpilib.fields:fields-images-java:$(WPILIB_VERSION)",
+        "maven_coordinates=org.wpilib.fields:field-images-java:$(WPILIB_VERSION)",
     ],
     visibility = ["//visibility:public"],
 )
 
 wpilib_maven_export(
-    name = "fields-images-java_publish",
-    lib_name = "fields-images-java",
-    maven_coordinates = "org.wpilib.fields:fields-images-java:$(WPILIB_VERSION)",
+    name = "field-images-java_publish",
+    lib_name = "field-images-java",
+    maven_coordinates = "org.wpilib.fields:field-images-java:$(WPILIB_VERSION)",
     visibility = ["//visibility:public"],
 )
 
@@ -285,7 +285,7 @@ cc_test(
 package_static_cc_project(
     name = "fieldimages",
     architectures = host_architectures,
-    maven_artifact_name = "fields-images-cpp",
+    maven_artifact_name = "field-images-cpp",
     maven_group_id = "org.wpilib.fields",
 )
 
