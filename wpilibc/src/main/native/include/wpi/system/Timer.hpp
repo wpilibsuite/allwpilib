@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <chrono>
+
 #include "wpi/units/time.hpp"
 
 namespace wpi {
@@ -182,8 +184,11 @@ class Timer {
   static wpi::units::second_t GetMatchTime();
 
  private:
-  wpi::units::second_t m_startTime = 0_s;
-  wpi::units::second_t m_accumulatedTime = 0_s;
+  double GetMicroseconds() const;
+
+  std::chrono::microseconds m_startTime{0};
+  double m_startTimeRemainderUs = 0.0;
+  double m_accumulatedTimeUs = 0.0;
   bool m_running = false;
 };
 
