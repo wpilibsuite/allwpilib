@@ -7,6 +7,7 @@
 from commands2 import Command, Subsystem
 from commands2.button import Trigger
 import wpilib
+import wpilib_drivers
 
 from constants import StorageConstants
 
@@ -15,7 +16,7 @@ class Storage(Subsystem):
     def __init__(self) -> None:
         """Create a new Storage subsystem."""
         super().__init__()
-        self.motor = wpilib.PWMSparkMax(StorageConstants.MOTOR_PORT)
+        self.motor = wpilib_drivers.PWMSparkMax(StorageConstants.MOTOR_PORT)
         self.ball_sensor = wpilib.DigitalInput(StorageConstants.BALL_SENSOR_PORT)
 
         # Expose trigger from subsystem to improve readability and ease

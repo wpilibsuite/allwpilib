@@ -1,0 +1,63 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "semiwrap~=0.6.0",
+    "hatch-meson~=0.1.2",
+    "hatch-robotpy~=0.2.1",
+    "hatchling",
+    "robotpy-native-wpilib-drivers==0.0.0",
+    "wpilib==0.0.0",
+]
+
+[project]
+name = "wpilib-drivers"
+version = "0.0.0"
+description = "RobotPy bindings for WPILib third-party drivers"
+requires-python = ">=3.11"
+authors = [
+    {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
+]
+license = "BSD-3-Clause"
+dependencies = [
+    "robotpy-native-wpilib-drivers==0.0.0",
+    "wpilib==0.0.0",
+]
+
+[project.urls]
+"Source code" = "https://github.com/robotpy/mostrobotpy"
+
+[tool.hatch.build.hooks.robotpy]
+version_file = "wpilib_drivers/version.py"
+
+[tool.hatch.build.hooks.semiwrap]
+
+[tool.hatch.build.hooks.meson]
+
+[tool.hatch.build.targets.wheel]
+packages = ["wpilib_drivers"]
+
+[tool.semiwrap]
+update_init = ["wpilib_drivers"]
+
+[tool.semiwrap.name_transform]
+default = "snake_case"
+enum_value = "CAPS_CASE"
+known_words = ["3V3", "5V", "CAN", "CPU", "DS", "FMS", "FPGA", "HAL", "HTTP", "I2C", "IMU", "JNI", "JSON", "mDNS", "NT", "OpMode", "PCM", "PDH", "PDP", "PID", "POVs", "PWM", "RIO", "SPI", "URI", "URL", "USB", "VIn"]
+
+[tool.semiwrap.extension_modules."wpilib_drivers._drivers"]
+name = "drivers"
+wraps = ["robotpy-native-wpilib-drivers"]
+depends = ["wpilib"]
+
+[tool.semiwrap.extension_modules."wpilib_drivers._drivers".headers]
+Koors40 = "wpi/drivers/motor/Koors40.hpp"
+PWMSparkFlex = "wpi/drivers/motor/PWMSparkFlex.hpp"
+PWMSparkMax = "wpi/drivers/motor/PWMSparkMax.hpp"
+PWMTalonFX = "wpi/drivers/motor/PWMTalonFX.hpp"
+PWMTalonSRX = "wpi/drivers/motor/PWMTalonSRX.hpp"
+PWMVenom = "wpi/drivers/motor/PWMVenom.hpp"
+PWMVictorSPX = "wpi/drivers/motor/PWMVictorSPX.hpp"
+Spark = "wpi/drivers/motor/Spark.hpp"
+SparkMini = "wpi/drivers/motor/SparkMini.hpp"
+Talon = "wpi/drivers/motor/Talon.hpp"
+VictorSP = "wpi/drivers/motor/VictorSP.hpp"

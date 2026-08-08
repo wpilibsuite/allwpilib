@@ -7,7 +7,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "wpi/hardware/motor/PWMVictorSPX.hpp"
+#include "motorcontrol/TestPWMMotorController.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/system/DCMotor.hpp"
@@ -25,7 +25,7 @@ TEST_CASE("ElevatorSimTest StateSpaceSim", "[wpilibc][simulation]") {
                             0.75_in, 0_m, 3_m, true, 0_m, {0.01});
   wpi::math::PIDController controller(10, 0.0, 0.0);
 
-  wpi::PWMVictorSPX motor(0);
+  wpi::TestPWMMotorController motor(0);
   wpi::Encoder encoder(0, 1);
   wpi::sim::EncoderSim encoderSim(encoder);
 
