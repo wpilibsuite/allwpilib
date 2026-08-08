@@ -15,7 +15,7 @@
 
 using namespace wpi;
 
-Solenoid::Solenoid(int busId, int module, PneumaticsModuleType moduleType,
+Solenoid::Solenoid(CANBusMap busId, int module, PneumaticsModuleType moduleType,
                    int channel)
     : m_module{PneumaticsBase::GetForType(busId, module, moduleType)},
       m_channel{channel} {
@@ -35,7 +35,8 @@ Solenoid::Solenoid(int busId, int module, PneumaticsModuleType moduleType,
                                    m_module->GetModuleNumber(), m_channel);
 }
 
-Solenoid::Solenoid(int busId, PneumaticsModuleType moduleType, int channel)
+Solenoid::Solenoid(CANBusMap busId, PneumaticsModuleType moduleType,
+                   int channel)
     : Solenoid{busId, PneumaticsBase::GetDefaultForType(moduleType), moduleType,
                channel} {}
 

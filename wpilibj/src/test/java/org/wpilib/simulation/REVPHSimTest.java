@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.wpilib.hardware.bus.CANBusMap;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.pneumatic.CompressorConfigType;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
@@ -20,6 +21,8 @@ import org.wpilib.simulation.testutils.DoubleCallback;
 import org.wpilib.simulation.testutils.EnumCallback;
 
 class REVPHSimTest {
+  private static final CANBusMap kBus = CANBusMap.CAN_S1;
+
   @Test
   void testInitialization() {
     HAL.initialize();
@@ -31,7 +34,7 @@ class REVPHSimTest {
     BooleanCallback callback = new BooleanCallback();
 
     try (CallbackStore cb = sim.registerInitializedCallback(callback, false);
-        PneumaticHub ph = new PneumaticHub(1)) {
+        PneumaticHub ph = new PneumaticHub(kBus)) {
       assertTrue(sim.getInitialized());
     }
     assertFalse(sim.getInitialized());
@@ -41,8 +44,9 @@ class REVPHSimTest {
   void solenoidOutputTest() {
     HAL.initialize();
 
-    try (PneumaticHub ph = new PneumaticHub(1);
-        DoubleSolenoid doubleSolenoid = new DoubleSolenoid(1, PneumaticsModuleType.REV_PH, 3, 4)) {
+    try (PneumaticHub ph = new PneumaticHub(kBus);
+        DoubleSolenoid doubleSolenoid =
+            new DoubleSolenoid(kBus, PneumaticsModuleType.REV_PH, 3, 4)) {
       REVPHSim sim = new REVPHSim(ph);
       sim.resetData();
 
@@ -97,7 +101,7 @@ class REVPHSimTest {
     REVPHSim sim = new REVPHSim(1);
     BooleanCallback callback = new BooleanCallback();
 
-    try (PneumaticHub ph = new PneumaticHub(1);
+    try (PneumaticHub ph = new PneumaticHub(kBus);
         CallbackStore cb = sim.registerCompressorOnCallback(callback, false)) {
       assertFalse(ph.getCompressor());
       assertFalse(sim.getCompressorOn());
@@ -116,7 +120,7 @@ class REVPHSimTest {
     REVPHSim sim = new REVPHSim(1);
     EnumCallback callback = new EnumCallback();
 
-    try (PneumaticHub ph = new PneumaticHub(1);
+    try (PneumaticHub ph = new PneumaticHub(kBus);
         CallbackStore cb = sim.registerCompressorConfigTypeCallback(callback, false)) {
       ph.disableCompressor();
       assertEquals(ph.getCompressorConfigType(), CompressorConfigType.DISABLED);
@@ -136,7 +140,7 @@ class REVPHSimTest {
     REVPHSim sim = new REVPHSim(1);
     EnumCallback callback = new EnumCallback();
 
-    try (PneumaticHub ph = new PneumaticHub(1);
+    try (PneumaticHub ph = new PneumaticHub(kBus);
         CallbackStore cb = sim.registerCompressorConfigTypeCallback(callback, false)) {
       ph.disableCompressor();
       assertEquals(ph.getCompressorConfigType(), CompressorConfigType.DISABLED);
@@ -156,7 +160,7 @@ class REVPHSimTest {
     REVPHSim sim = new REVPHSim(1);
     EnumCallback callback = new EnumCallback();
 
-    try (PneumaticHub ph = new PneumaticHub(1);
+    try (PneumaticHub ph = new PneumaticHub(kBus);
         CallbackStore cb = sim.registerCompressorConfigTypeCallback(callback, false)) {
       ph.disableCompressor();
       assertEquals(ph.getCompressorConfigType(), CompressorConfigType.DISABLED);
@@ -176,7 +180,7 @@ class REVPHSimTest {
     REVPHSim sim = new REVPHSim(1);
     BooleanCallback callback = new BooleanCallback();
 
-    try (PneumaticHub ph = new PneumaticHub(1);
+    try (PneumaticHub ph = new PneumaticHub(kBus);
         CallbackStore cb = sim.registerPressureSwitchCallback(callback, false)) {
       assertFalse(ph.getPressureSwitch());
 
@@ -195,7 +199,7 @@ class REVPHSimTest {
     REVPHSim sim = new REVPHSim(1);
     DoubleCallback callback = new DoubleCallback();
 
-    try (PneumaticHub ph = new PneumaticHub(1);
+    try (PneumaticHub ph = new PneumaticHub(kBus);
         CallbackStore cb = sim.registerCompressorCurrentCallback(callback, false)) {
       assertFalse(ph.getPressureSwitch());
 

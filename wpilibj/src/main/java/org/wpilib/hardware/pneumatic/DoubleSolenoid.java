@@ -4,6 +4,7 @@
 
 package org.wpilib.hardware.pneumatic;
 
+import org.wpilib.hardware.bus.CANBusMap;
 import org.wpilib.hardware.hal.util.AllocationException;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
@@ -43,7 +44,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
    * @param reverseChannel The reverse channel on the module to control.
    */
   public DoubleSolenoid(
-      final int busId,
+      final CANBusMap busId,
       final PneumaticsModuleType moduleType,
       final int forwardChannel,
       final int reverseChannel) {
@@ -66,7 +67,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
    */
   @SuppressWarnings({"PMD.UseTryWithResources", "this-escape"})
   public DoubleSolenoid(
-      final int busId,
+      final CANBusMap busId,
       final int module,
       final PneumaticsModuleType moduleType,
       final int forwardChannel,

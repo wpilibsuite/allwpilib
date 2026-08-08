@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "wpi/hal/Types.h"
+#include "wpi/hardware/bus/CANBusMap.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
 #include "wpi/units/time.hpp"
@@ -33,7 +34,8 @@ class Solenoid : public wpi::util::Sendable,
    * @param moduleType The module type to use.
    * @param channel The channel the solenoid is on.
    */
-  Solenoid(int busId, int module, PneumaticsModuleType moduleType, int channel);
+  Solenoid(CANBusMap busId, int module, PneumaticsModuleType moduleType,
+           int channel);
 
   /**
    * Constructs a solenoid for a default module and specified type.
@@ -42,7 +44,7 @@ class Solenoid : public wpi::util::Sendable,
    * @param moduleType The module type to use.
    * @param channel The channel the solenoid is on.
    */
-  Solenoid(int busId, PneumaticsModuleType moduleType, int channel);
+  Solenoid(CANBusMap busId, PneumaticsModuleType moduleType, int channel);
 
   ~Solenoid() override;
 

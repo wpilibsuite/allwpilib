@@ -9,6 +9,7 @@
 #include <functional>
 #include <string>
 
+#include "wpi/hardware/bus/CANBusMap.hpp"
 #include "wpi/units/temperature.hpp"
 #include "wpi/units/voltage.hpp"
 
@@ -199,7 +200,7 @@ class RobotController {
    * @param busId The bus ID.
    * @return The status of the CAN bus
    */
-  static CANStatus GetCANStatus(int busId);
+  static CANStatus GetCANStatus(CANBusMap busId);
 
  private:
   static std::function<uint64_t()> m_timeSource;

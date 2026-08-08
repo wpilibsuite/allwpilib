@@ -160,16 +160,16 @@ wpi::units::celsius_t RobotController::GetCPUTemp() {
   return wpi::units::celsius_t{retVal};
 }
 
-CANStatus RobotController::GetCANStatus(int busId) {
+CANStatus RobotController::GetCANStatus(CANBusMap busId) {
   int32_t status = 0;
   float percentBusUtilization = 0;
   uint32_t busOffCount = 0;
   uint32_t txFullCount = 0;
   uint32_t receiveErrorCount = 0;
   uint32_t transmitErrorCount = 0;
-  HAL_CAN_GetCANStatus(busId, &percentBusUtilization, &busOffCount,
-                       &txFullCount, &receiveErrorCount, &transmitErrorCount,
-                       &status);
+  HAL_CAN_GetCANStatus(static_cast<int>(busId), &percentBusUtilization,
+                       &busOffCount, &txFullCount, &receiveErrorCount,
+                       &transmitErrorCount, &status);
   WPILIB_CheckErrorStatus(status, "GetCANStatus");
   return {percentBusUtilization, static_cast<int>(busOffCount),
           static_cast<int>(txFullCount), static_cast<int>(receiveErrorCount),

@@ -44,25 +44,27 @@ std::unique_ptr<
 
 // Always called under lock, so we can avoid the double lock from the magic
 // static
-std::weak_ptr<PneumaticHub::DataStore>& PneumaticHub::GetDataStore(int busId,
-                                                                   int module) {
+std::weak_ptr<PneumaticHub::DataStore>& PneumaticHub::GetDataStore(
+    CANBusMap busId, int module) {
+  int busIndex = static_cast<int>(busId);
   int32_t numBuses = HAL_GetNumCanBuses();
-  WPILIB_AssertMessage(busId >= 0 && busId < numBuses,
-                       "Bus {} out of range. Must be [0-{}).", busId, numBuses);
+  WPILIB_AssertMessage(busIndex >= 0 && busIndex < numBuses,
+                       "Bus {} out of range. Must be [0-{}).", busIndex,
+                       numBuses);
   if (!m_handleMaps) {
     m_handleMaps = std::make_unique<
         wpi::util::DenseMap<int, std::weak_ptr<PneumaticHub::DataStore>>[]>(
         numBuses);
   }
-  return m_handleMaps[busId][module];
+  return m_handleMaps[busIndex][module];
 }
 
 class PneumaticHub::DataStore {
  public:
-  explicit DataStore(int busId, int module, const char* stackTrace) {
+  explicit DataStore(CANBusMap busId, int module, const char* stackTrace) {
     int32_t status = 0;
-    HAL_REVPHHandle handle =
-        HAL_InitializeREVPH(busId, module, stackTrace, &status);
+    HAL_REVPHHandle handle = HAL_InitializeREVPH(static_cast<int>(busId),
+                                                 module, stackTrace, &status);
     WPILIB_CheckErrorStatus(status, "Module {}", module);
     m_moduleObject = PneumaticHub{busId, handle, module};
     m_moduleObject.m_dataStore =
@@ -90,14 +92,14 @@ class PneumaticHub::DataStore {
   uint32_t m_reservedMask{0};
   bool m_compressorReserved{false};
   wpi::util::mutex m_reservedLock;
-  PneumaticHub m_moduleObject{0, HAL_INVALID_HANDLE, 0};
+  PneumaticHub m_moduleObject{CANBusMap::CAN_S0, HAL_INVALID_HANDLE, 0};
   std::array<wpi::units::millisecond_t, 16> m_oneShotDurMs{0_ms};
 };
 
-PneumaticHub::PneumaticHub(int busId)
+PneumaticHub::PneumaticHub(CANBusMap busId)
     : PneumaticHub{busId, SensorUtil::GetDefaultREVPHModule()} {}
 
-PneumaticHub::PneumaticHub(int busId, int module) {
+PneumaticHub::PneumaticHub(CANBusMap busId, int module) : m_busId{busId} {
   std::string stackTrace = wpi::util::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);
   auto& res = GetDataStore(busId, module);
@@ -111,8 +113,8 @@ PneumaticHub::PneumaticHub(int busId, int module) {
   m_module = module;
 }
 
-PneumaticHub::PneumaticHub(int /* busId */, HAL_REVPHHandle handle, int module)
-    : m_handle{handle}, m_module{module} {}
+PneumaticHub::PneumaticHub(CANBusMap busId, HAL_REVPHHandle handle, int module)
+    : m_handle{handle}, m_busId{busId}, m_module{module} {}
 
 bool PneumaticHub::GetCompressor() const {
   int32_t status = 0;
@@ -418,24 +420,24 @@ wpi::units::pounds_per_square_inch_t PneumaticHub::GetPressure(
 }
 
 Solenoid PneumaticHub::MakeSolenoid(int channel) {
-  return Solenoid{m_module, PneumaticsModuleType::REV_PH, channel};
+  return Solenoid{m_busId, m_module, PneumaticsModuleType::REV_PH, channel};
 }
 
 DoubleSolenoid PneumaticHub::MakeDoubleSolenoid(int forwardChannel,
                                                 int reverseChannel) {
-  return DoubleSolenoid{m_module, PneumaticsModuleType::REV_PH, forwardChannel,
-                        reverseChannel};
+  return DoubleSolenoid{m_busId, m_module, PneumaticsModuleType::REV_PH,
+                        forwardChannel, reverseChannel};
 }
 
 Compressor PneumaticHub::MakeCompressor() {
-  return Compressor{m_module, PneumaticsModuleType::REV_PH};
+  return Compressor{m_busId, m_module, PneumaticsModuleType::REV_PH};
 }
 
 void PneumaticHub::ReportUsage(std::string_view device, std::string_view data) {
   HAL_ReportUsage(std::format("PH[{}]/{}", m_module, device), data);
 }
 
-std::shared_ptr<PneumaticsBase> PneumaticHub::GetForModule(int busId,
+std::shared_ptr<PneumaticsBase> PneumaticHub::GetForModule(CANBusMap busId,
                                                            int module) {
   std::string stackTrace = wpi::util::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);

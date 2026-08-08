@@ -9,7 +9,7 @@
 using namespace HatchConstants;
 
 HatchSubsystem::HatchSubsystem()
-    : hatchSolenoid{0, wpi::PneumaticsModuleType::CTRE_PCM,
+    : hatchSolenoid{wpi::CANBusMap::CAN_S0, wpi::PneumaticsModuleType::CTRE_PCM,
                     kHatchSolenoidPorts[0], kHatchSolenoidPorts[1]} {}
 
 wpi::cmd::CommandPtr HatchSubsystem::GrabHatchCommand() {
