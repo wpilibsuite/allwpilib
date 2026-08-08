@@ -52,7 +52,7 @@ wpilib_java_library(
     name = "commandsv3-java",
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
     exported_plugins = ["//javacPlugin:plugin"],
-    maven_artifact_name = "commands3-java",
+    maven_artifact_name = "commandsv3-java",
     maven_group_id = "org.wpilib",
     plugins = ["//javacPlugin:plugin"],
     visibility = ["//visibility:public"],
