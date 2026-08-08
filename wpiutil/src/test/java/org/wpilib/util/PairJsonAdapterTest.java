@@ -41,4 +41,13 @@ class PairJsonAdapterTest {
 
     assertEquals(expected, actual);
   }
+
+  @Test
+  void testRawTypeJsonRoundtrip() {
+    var expected = new Pair<>("Test", 4);
+
+    var json = Jsonb.instance().toJson(expected);
+
+    assertEquals("[\"Test\",4]", json);
+  }
 }
