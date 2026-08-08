@@ -17,6 +17,7 @@ inline void CheckInit() {
 }
 
 extern void InitializeAddressableLEDData();
+extern void InitializeA301();
 extern void InitializeAnalogInData();
 extern void InitializeCanData();
 extern void InitializeCANAPI();

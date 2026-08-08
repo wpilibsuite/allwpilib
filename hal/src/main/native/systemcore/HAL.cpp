@@ -42,6 +42,7 @@ void InitializeHAL() {
   InitializeAnalogInput();
   InitializeCAN();
   InitializeCANAPI();
+  InitializeA301();
   InitializeCounter();
   InitializeDIO();
   InitializeDutyCycle();

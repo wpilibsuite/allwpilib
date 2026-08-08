@@ -62,6 +62,8 @@ typedef HAL_Handle HAL_REVPHHandle;
 
 typedef HAL_Handle HAL_CANStreamHandle;
 
+typedef HAL_Handle HAL_A301Handle;
+
 typedef int32_t HAL_Bool;
 
 typedef int32_t HAL_Status;
