@@ -17,6 +17,7 @@ inline void CheckInit() {
 }
 
 extern void InitializeCTREPCM();
+extern void InitializeA301();
 extern void InitializeREVPH();
 extern void InitializeAddressableLED();
 extern void InitializeAnalogInput();

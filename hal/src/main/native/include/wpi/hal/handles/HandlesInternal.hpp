@@ -77,6 +77,7 @@ enum class HAL_HandleEnum {
   REV_PH = 21,
   CAN_STREAM = 22,
   ALERT = 23,
+  A301 = 24,
 };
 
 /**
