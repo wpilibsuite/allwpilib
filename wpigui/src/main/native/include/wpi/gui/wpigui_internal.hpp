@@ -29,7 +29,7 @@ struct SavedSettings {
   int userScale = 100;
   int style = 0;
   int fps = 120;
-  std::string defaultFontName = "Proggy Dotted";
+  std::string defaultFontName = "Roboto Regular";
 };
 
 struct Context : public SavedSettings {
