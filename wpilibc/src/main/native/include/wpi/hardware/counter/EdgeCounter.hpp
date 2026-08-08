@@ -4,34 +4,29 @@
 
 #pragma once
 
-#include "EdgeConfiguration.hpp"
 #include "wpi/hal/Counter.h"
+#include "wpi/hardware/counter/EdgeConfiguration.hpp"
 #include "wpi/util/Handle.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
-/** Up Down Counter.
- *
- * This class can count edges on a single digital input or count up based on an
- * edge from one digital input and down on an edge from another digital input.
- *
- */
-class UpDownCounter : public wpi::util::Sendable,
-                      public wpi::util::SendableHelper<UpDownCounter> {
+/** Counts rising or falling edges on a single digital input. */
+class EdgeCounter : public wpi::util::Sendable,
+                    public wpi::util::SendableHelper<EdgeCounter> {
  public:
   /**
-   * Constructs a new UpDown Counter.
+   * Constructs a new edge counter.
    *
    * @param channel The DIO channel
    * @param configuration Edge configuration
    */
-  UpDownCounter(int channel, EdgeConfiguration configuration);
+  EdgeCounter(int channel, EdgeConfiguration configuration);
 
-  UpDownCounter(UpDownCounter&&) = default;
-  UpDownCounter& operator=(UpDownCounter&&) = default;
+  EdgeCounter(EdgeCounter&&) = default;
+  EdgeCounter& operator=(EdgeCounter&&) = default;
 
-  ~UpDownCounter() override = default;
+  ~EdgeCounter() override = default;
 
   /**
    * Gets the current count.

@@ -358,6 +358,16 @@ double HAL_GetEncoderRate(HAL_EncoderHandle encoderHandle, int32_t* status) {
   return encoder->reverseDirection ? -scaledRate : scaledRate;
 }
 
+void HAL_SetEncoderRateWindow(HAL_EncoderHandle encoderHandle,
+                              int32_t windowMilliseconds, int32_t* status) {
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return;
+  }
+
+  *status = encoder->aPort->SetRateWindow(windowMilliseconds);
+}
+
 void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
                                     double distancePerPulse, int32_t* status) {
   auto encoder = GetEncoder(encoderHandle, status);

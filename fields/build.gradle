@@ -68,7 +68,7 @@ sourceSets.main.resources {
     include '**/*.json'
 }
 
-def fieldImagesJavaBaseName = makeZipBaseName(project.groupId, "${project.baseId}-images-java")
+def fieldImagesJavaBaseName = makeZipBaseName(project.groupId, "field-images-java")
 
 task fieldImagesJar(type: Jar) {
     archiveBaseName = fieldImagesJavaBaseName
@@ -90,7 +90,7 @@ publishing {
         fieldImagesJava(MavenPublication) {
             artifact fieldImagesJar
 
-            artifactId = "${project.baseId}-images-java"
+            artifactId = "field-images-java"
             groupId = project.groupId
             version = wpilibVersioning.version.get()
         }
