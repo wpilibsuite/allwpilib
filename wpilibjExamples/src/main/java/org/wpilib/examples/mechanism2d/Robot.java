@@ -33,7 +33,8 @@ public class Robot extends TimedRobot {
   private final Encoder elevatorEncoder = new Encoder(0, 1);
   private final Joystick joystick = new Joystick(0);
 
-  private final Mechanism2d mech;
+  // the main mechanism object
+  private final Mechanism2d mech = new Mechanism2d(3, 3);
   private final MechanismLigament2d elevator;
   private final MechanismLigament2d wrist;
 
@@ -41,8 +42,6 @@ public class Robot extends TimedRobot {
   public Robot() {
     elevatorEncoder.setDistancePerPulse(kMetersPerPulse);
 
-    // the main mechanism object
-    mech = new Mechanism2d(3, 3);
     // the mechanism root node
     MechanismRoot2d root = mech.getRoot("climber", 2, 0);
 
