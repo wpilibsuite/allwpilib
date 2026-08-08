@@ -257,11 +257,18 @@ wpilib_cc_static_library(
 wpilib_jni_java_library(
     name = "wpiutil-java",
     srcs = glob(["src/main/java/**/*.java"]),
+    # This is only necessary while wpiutil contains @CustomAdapter annotations without any @Json annotations
+    javacopts = ["-Ajsonb.generateComponentFirstRound=true"],
     maven_artifact_name = "wpiutil-java",
     maven_group_id = "org.wpilib.wpiutil",
     native_libs = [":shared/wpiutiljni"],
+    plugins = [
+        "//:avaje_jsonb_generator",
+    ],
     visibility = ["//visibility:public"],
     deps = [
+        "@maven//:io_avaje_avaje_json_core",
+        "@maven//:io_avaje_avaje_jsonb",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
@@ -302,6 +309,7 @@ wpilib_java_junit5_test(
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":wpiutil-java",
+        "@maven//:io_avaje_avaje_jsonb",
     ],
 )
 
