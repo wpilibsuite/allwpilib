@@ -1,0 +1,199 @@
+classes:
+  wpi::A301:
+    force_no_trampoline: true
+    methods:
+      A301:
+        overloads:
+          CANBusMap:
+          CANBusMap, int:
+      GetBusId:
+      GetDeviceId:
+      GetFirmwareVersion:
+      GetFirmwareString:
+      HasActiveFault:
+      HasStickyFault:
+      HasActiveWarning:
+      HasStickyWarning:
+      GetFaults:
+      GetStickyFaults:
+      GetWarnings:
+      GetStickyWarnings:
+      ClearFaults:
+      GetBusVoltage:
+      GetAppliedOutput:
+      GetMotorCurrent:
+      GetMotorTemperature:
+      GetGearboxRPM:
+      GetRelativeEncoderPosition:
+      GetEncoderVelocity:
+      GetAbsoluteEncoderPosition:
+      SetRelativeEncoderPosition:
+      SetAbsoluteEncoderPosition:
+      SetVelocity:
+      SetRelativePosition:
+      SetRelativePositionWithSpeed:
+      SetAbsolutePosition:
+      SetAbsolutePositionWithSpeed:
+      SetCurrent:
+      SetIdleMode:
+      GetIdleMode:
+      EnableAbsolutePositionContinuousInput:
+      DisableAbsolutePositionContinuousInput:
+      IsAbsolutePositionContinuousInputEnabled:
+      SetAbsoluteEncoderRangeOffset:
+      GetAbsoluteEncoderRangeOffset:
+      SetThrottle:
+      GetThrottle:
+      SetVoltage:
+      SetInverted:
+      GetInverted:
+      Disable:
+      SetStatusFramePeriod:
+      GetStatusFramePeriod:
+      FaultsPeriodMs:
+      GetFaultsPeriodMs:
+      WarningsPeriodMs:
+      GetWarningsPeriodMs:
+      BusVoltagePeriodMs:
+      GetBusVoltagePeriodMs:
+      AppliedOutputPeriodMs:
+      GetAppliedOutputPeriodMs:
+      MotorCurrentPeriodMs:
+      GetMotorCurrentPeriodMs:
+      MotorTemperaturePeriodMs:
+      GetMotorTemperaturePeriodMs:
+      RelativeEncoderPositionPeriodMs:
+      GetRelativeEncoderPositionPeriodMs:
+      EncoderVelocityPeriodMs:
+      GetEncoderVelocityPeriodMs:
+      AbsoluteEncoderPositionPeriodMs:
+      GetAbsoluteEncoderPositionPeriodMs:
+    attributes:
+      kDefaultDeviceId:
+    enums:
+      PeriodicFrame:
+      GearboxRPM:
+      IdleMode:
+  wpi::A301::FirmwareVersion:
+    attributes:
+      major:
+      minor:
+      patch:
+      prerelease:
+      hardwareRevision:
+      raw:
+  wpi::A301::Faults:
+    attributes:
+      other:
+      motorType:
+      sensor:
+      can:
+      temperature:
+      gateDriver:
+      escEeprom:
+      firmware:
+      motorStartup:
+      rawBits:
+    methods:
+      Faults:
+        overloads:
+          "":
+          uint16_t:
+  wpi::A301::Warnings:
+    attributes:
+      brownout:
+      overcurrent:
+      escEeprom:
+      extEeprom:
+      sensor:
+      stall:
+      hasReset:
+      other:
+      overvoltage:
+      motorLoopSpeed:
+      rawBits:
+    methods:
+      Warnings:
+        overloads:
+          "":
+          uint16_t:
+  wpi::A301::BooleanStatusSignal:
+    force_no_default_constructor: true
+    force_no_trampoline: true
+    ignored_bases:
+    - A301StatusSignal<bool>
+    methods:
+      A301StatusSignal:
+        ignore: true
+      Get:
+        overloads:
+          '[const]':
+          bool [const]:
+      IsValid:
+      GetError:
+      GetStatus:
+      GetTimestamp:
+  wpi::A301::DoubleStatusSignal:
+    force_no_default_constructor: true
+    force_no_trampoline: true
+    ignored_bases:
+    - A301StatusSignal<double>
+    methods:
+      A301StatusSignal:
+        ignore: true
+      Get:
+        overloads:
+          '[const]':
+          double [const]:
+      IsValid:
+      GetError:
+      GetStatus:
+      GetTimestamp:
+  wpi::A301::FaultsStatusSignal:
+    force_no_default_constructor: true
+    force_no_trampoline: true
+    ignored_bases:
+    - A301StatusSignal<Faults>
+    methods:
+      A301StatusSignal:
+        ignore: true
+      Get:
+        overloads:
+          '[const]':
+          Faults [const]:
+      IsValid:
+      GetError:
+      GetStatus:
+      GetTimestamp:
+  wpi::A301::WarningsStatusSignal:
+    force_no_default_constructor: true
+    force_no_trampoline: true
+    ignored_bases:
+    - A301StatusSignal<Warnings>
+    methods:
+      A301StatusSignal:
+        ignore: true
+      Get:
+        overloads:
+          '[const]':
+          Warnings [const]:
+      IsValid:
+      GetError:
+      GetStatus:
+      GetTimestamp:
+  wpi::A301::GearboxRPMStatusSignal:
+    force_no_default_constructor: true
+    force_no_trampoline: true
+    ignored_bases:
+    - A301StatusSignal<GearboxRPM>
+    methods:
+      A301StatusSignal:
+        ignore: true
+      Get:
+        overloads:
+          '[const]':
+          GearboxRPM [const]:
+      IsValid:
+      GetError:
+      GetStatus:
+      GetTimestamp:

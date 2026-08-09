@@ -16,6 +16,8 @@ def drivers_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
         "--name-transform-known-word",
         "5V",
         "--name-transform-known-word",
+        "A301",
+        "--name-transform-known-word",
         "CAN",
         "--name-transform-known-word",
         "CPU",
@@ -58,6 +60,8 @@ def drivers_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
         "--name-transform-known-word",
         "RIO",
         "--name-transform-known-word",
+        "RPM",
+        "--name-transform-known-word",
         "SPI",
         "--name-transform-known-word",
         "URI",
@@ -70,6 +74,32 @@ def drivers_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
     ]
 
     DRIVERS_HEADER_GEN = [
+        struct(
+            class_name = "A301Error",
+            yml_file = "semiwrap/A301Error.yml",
+            header_root = "$(execpath :robotpy-native-wpilib-drivers.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib-drivers.copy_headers)/wpi/drivers/motor/A301Error.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
+            class_name = "A301",
+            yml_file = "semiwrap/A301.yml",
+            header_root = "$(execpath :robotpy-native-wpilib-drivers.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib-drivers.copy_headers)/wpi/drivers/motor/A301.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::A301", "wpi__A301.hpp"),
+                ("wpi::A301::FirmwareVersion", "wpi__A301__FirmwareVersion.hpp"),
+                ("wpi::A301::Faults", "wpi__A301__Faults.hpp"),
+                ("wpi::A301::Warnings", "wpi__A301__Warnings.hpp"),
+                ("wpi::A301::BooleanStatusSignal", "wpi__A301__BooleanStatusSignal.hpp"),
+                ("wpi::A301::DoubleStatusSignal", "wpi__A301__DoubleStatusSignal.hpp"),
+                ("wpi::A301::FaultsStatusSignal", "wpi__A301__FaultsStatusSignal.hpp"),
+                ("wpi::A301::WarningsStatusSignal", "wpi__A301__WarningsStatusSignal.hpp"),
+                ("wpi::A301::GearboxRPMStatusSignal", "wpi__A301__GearboxRPMStatusSignal.hpp"),
+            ],
+        ),
         struct(
             class_name = "Koors40",
             yml_file = "semiwrap/Koors40.yml",

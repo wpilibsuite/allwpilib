@@ -1,0 +1,5 @@
+enums:
+  A301Error:
+functions:
+  A301ErrorFromHalStatus:
+    ignore: true
