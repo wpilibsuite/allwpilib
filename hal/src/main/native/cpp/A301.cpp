@@ -16,11 +16,11 @@
 #include <thread>
 #include <unordered_map>
 
+#include "HALInitializer.hpp"
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/CANAPI.h"
 #include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/HAL.h"
 #include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/timestamp.hpp"
@@ -301,7 +301,7 @@ void InitializeA301() {
 extern "C" {
 
 int32_t HAL_DetectA301DeviceId(int32_t busId, int32_t* status) {
-  HAL_Initialize();
+  wpi::hal::init::CheckInit();
   *status = 0;
 
   constexpr uint32_t kDeviceIdMask = 0x3f;
@@ -319,7 +319,9 @@ int32_t HAL_DetectA301DeviceId(int32_t busId, int32_t* status) {
     uint32_t messagesRead = 0;
     int32_t readStatus = 0;
     HAL_CAN_ReadStreamSession(stream, &message, 1, &messagesRead, &readStatus);
-    if (readStatus == 0 && messagesRead == 1) {
+    if ((readStatus == 0 ||
+         readStatus == HAL_ERR_CANSessionMux_SessionOverrun) &&
+        messagesRead == 1) {
       HAL_CAN_CloseStreamSession(stream);
       *status = 0;
       return message.messageId & kDeviceIdMask;
@@ -339,7 +341,7 @@ int32_t HAL_DetectA301DeviceId(int32_t busId, int32_t* status) {
 HAL_A301Handle HAL_InitializeA301(int32_t busId, int32_t deviceId,
                                   const char* allocationLocation,
                                   int32_t* status) {
-  HAL_Initialize();
+  wpi::hal::init::CheckInit();
   *status = 0;
 
   if (busId >= kFirstMotioncoreBus) {
@@ -653,10 +655,10 @@ void HAL_SetA301Setpoint(HAL_A301Handle handle, double value,
                                  &stopStatus);
     }
     a301->activeSetpointApi = api;
+    StoreFloatLE(data.data(), value);
+    StoreFloatLE(data.data() + 4, positionSpeed);
+    WritePacketRepeating(*a301, api, data.data(), data.size(), status);
   }
-  StoreFloatLE(data.data(), value);
-  StoreFloatLE(data.data() + 4, positionSpeed);
-  WritePacketRepeating(*a301, api, data.data(), data.size(), status);
 }
 
 void HAL_SetA301IdleMode(HAL_A301Handle handle, HAL_A301IdleMode idleMode,
@@ -739,7 +741,14 @@ double HAL_GetA301AbsoluteEncoderRangeOffset(HAL_A301Handle handle,
   auto data = WriteAndReadPacket(*a301, kGetAbsoluteRangeOffsetApi, nullptr, 0,
                                  kGetAbsoluteRangeOffsetResponseApi, 4,
                                  kConfigurationReadTimeoutMs, false, status);
-  return LoadFloatLE(data.data());
+  double offset = LoadFloatLE(data.data());
+  {
+    std::scoped_lock lock{a301->stateMutex};
+    if (a301->inverted) {
+      offset *= -1.0;
+    }
+  }
+  return offset;
 }
 
 void HAL_SetA301Inverted(HAL_A301Handle handle, HAL_Bool inverted,
@@ -801,8 +810,9 @@ void HAL_SetA301StatusFramePeriod(HAL_A301Handle handle,
     return;
   }
 
+  int32_t effectivePeriodMs = LoadU32LE(response.data() + 2);
   std::scoped_lock lock{a301->stateMutex};
-  a301->statusPeriods[frameIndex] = periodMs;
+  a301->statusPeriods[frameIndex] = effectivePeriodMs;
 }
 
 int32_t HAL_GetA301StatusFramePeriod(HAL_A301Handle handle,

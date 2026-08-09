@@ -315,60 +315,60 @@ Java_org_wpilib_hardware_hal_A301JNI_getPeriodicStatus3
 /*
  * Class:     org_wpilib_hardware_hal_A301JNI
  * Method:    setRelativeEncoderPosition
- * Signature: (ID)V
+ * Signature: (ID)I
  */
-JNIEXPORT void JNICALL
+JNIEXPORT jint JNICALL
 Java_org_wpilib_hardware_hal_A301JNI_setRelativeEncoderPosition
-  (JNIEnv* env, jclass, jint handle, jdouble position)
+  (JNIEnv*, jclass, jint handle, jdouble position)
 {
   int32_t status = 0;
   HAL_SetA301RelativeEncoderPosition(handle, position, &status);
-  CheckStatus(env, status, false);
+  return status;
 }
 
 /*
  * Class:     org_wpilib_hardware_hal_A301JNI
  * Method:    setAbsoluteEncoderPosition
- * Signature: (ID)V
+ * Signature: (ID)I
  */
-JNIEXPORT void JNICALL
+JNIEXPORT jint JNICALL
 Java_org_wpilib_hardware_hal_A301JNI_setAbsoluteEncoderPosition
-  (JNIEnv* env, jclass, jint handle, jdouble position)
+  (JNIEnv*, jclass, jint handle, jdouble position)
 {
   int32_t status = 0;
   HAL_SetA301AbsoluteEncoderPosition(handle, position, &status);
-  CheckStatus(env, status, false);
+  return status;
 }
 
 /*
  * Class:     org_wpilib_hardware_hal_A301JNI
  * Method:    setSetpoint
- * Signature: (IDID)V
+ * Signature: (IDID)I
  */
-JNIEXPORT void JNICALL
+JNIEXPORT jint JNICALL
 Java_org_wpilib_hardware_hal_A301JNI_setSetpoint
-  (JNIEnv* env, jclass, jint handle, jdouble value, jint controlType,
+  (JNIEnv*, jclass, jint handle, jdouble value, jint controlType,
    jdouble positionSpeed)
 {
   int32_t status = 0;
   HAL_SetA301Setpoint(handle, value,
                       static_cast<HAL_A301ControlType>(controlType),
                       positionSpeed, &status);
-  CheckStatus(env, status, false);
+  return status;
 }
 
 /*
  * Class:     org_wpilib_hardware_hal_A301JNI
  * Method:    setIdleMode
- * Signature: (II)V
+ * Signature: (II)I
  */
-JNIEXPORT void JNICALL
+JNIEXPORT jint JNICALL
 Java_org_wpilib_hardware_hal_A301JNI_setIdleMode
-  (JNIEnv* env, jclass, jint handle, jint idleMode)
+  (JNIEnv*, jclass, jint handle, jint idleMode)
 {
   int32_t status = 0;
   HAL_SetA301IdleMode(handle, static_cast<HAL_A301IdleMode>(idleMode), &status);
-  CheckStatus(env, status, false);
+  return status;
 }
 
 /*
@@ -389,15 +389,15 @@ Java_org_wpilib_hardware_hal_A301JNI_getIdleMode
 /*
  * Class:     org_wpilib_hardware_hal_A301JNI
  * Method:    setAbsolutePositionContinuousInput
- * Signature: (IZ)V
+ * Signature: (IZ)I
  */
-JNIEXPORT void JNICALL
+JNIEXPORT jint JNICALL
 Java_org_wpilib_hardware_hal_A301JNI_setAbsolutePositionContinuousInput
-  (JNIEnv* env, jclass, jint handle, jboolean enabled)
+  (JNIEnv*, jclass, jint handle, jboolean enabled)
 {
   int32_t status = 0;
   HAL_SetA301AbsolutePositionContinuousInput(handle, enabled, &status);
-  CheckStatus(env, status, false);
+  return status;
 }
 
 /*
@@ -418,15 +418,15 @@ Java_org_wpilib_hardware_hal_A301JNI_getAbsolutePositionContinuousInput
 /*
  * Class:     org_wpilib_hardware_hal_A301JNI
  * Method:    setAbsoluteEncoderRangeOffset
- * Signature: (ID)V
+ * Signature: (ID)I
  */
-JNIEXPORT void JNICALL
+JNIEXPORT jint JNICALL
 Java_org_wpilib_hardware_hal_A301JNI_setAbsoluteEncoderRangeOffset
-  (JNIEnv* env, jclass, jint handle, jdouble offset)
+  (JNIEnv*, jclass, jint handle, jdouble offset)
 {
   int32_t status = 0;
   HAL_SetA301AbsoluteEncoderRangeOffset(handle, offset, &status);
-  CheckStatus(env, status, false);
+  return status;
 }
 
 /*
@@ -447,15 +447,15 @@ Java_org_wpilib_hardware_hal_A301JNI_getAbsoluteEncoderRangeOffset
 /*
  * Class:     org_wpilib_hardware_hal_A301JNI
  * Method:    setInverted
- * Signature: (IZ)V
+ * Signature: (IZ)I
  */
-JNIEXPORT void JNICALL
+JNIEXPORT jint JNICALL
 Java_org_wpilib_hardware_hal_A301JNI_setInverted
-  (JNIEnv* env, jclass, jint handle, jboolean inverted)
+  (JNIEnv*, jclass, jint handle, jboolean inverted)
 {
   int32_t status = 0;
   HAL_SetA301Inverted(handle, inverted, &status);
-  CheckStatus(env, status, false);
+  return status;
 }
 
 /*
@@ -476,30 +476,30 @@ Java_org_wpilib_hardware_hal_A301JNI_getInverted
 /*
  * Class:     org_wpilib_hardware_hal_A301JNI
  * Method:    clearFaults
- * Signature: (I)V
+ * Signature: (I)I
  */
-JNIEXPORT void JNICALL
+JNIEXPORT jint JNICALL
 Java_org_wpilib_hardware_hal_A301JNI_clearFaults
-  (JNIEnv* env, jclass, jint handle)
+  (JNIEnv*, jclass, jint handle)
 {
   int32_t status = 0;
   HAL_ClearA301Faults(handle, &status);
-  CheckStatus(env, status, false);
+  return status;
 }
 
 /*
  * Class:     org_wpilib_hardware_hal_A301JNI
  * Method:    setStatusFramePeriod
- * Signature: (III)V
+ * Signature: (III)I
  */
-JNIEXPORT void JNICALL
+JNIEXPORT jint JNICALL
 Java_org_wpilib_hardware_hal_A301JNI_setStatusFramePeriod
-  (JNIEnv* env, jclass, jint handle, jint frame, jint periodMs)
+  (JNIEnv*, jclass, jint handle, jint frame, jint periodMs)
 {
   int32_t status = 0;
   HAL_SetA301StatusFramePeriod(
       handle, static_cast<HAL_A301PeriodicFrame>(frame), periodMs, &status);
-  CheckStatus(env, status, false);
+  return status;
 }
 
 /*

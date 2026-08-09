@@ -215,6 +215,7 @@ TEST_CASE("A301 periodic status decoding", "[hal][a301]") {
 TEST_CASE("A301 configuration request and response frames", "[hal][a301]") {
   HAL_Initialize();
   std::vector<SentFrame> sentFrames;
+  float rangeOffset = 0.125f;
   CallbackHandle sendCallback{
       HALSIM_RegisterCanSendMessageCallback(
           [](const char*, void* param, int32_t busId, uint32_t messageId,
@@ -226,10 +227,11 @@ TEST_CASE("A301 configuration request and response frames", "[hal][a301]") {
       HALSIM_CancelCanSendMessageCallback};
   CallbackHandle receiveCallback{
       HALSIM_RegisterCanReceiveMessageCallback(
-          [](const char*, void*, int32_t, uint32_t messageId,
+          [](const char*, void* param, int32_t, uint32_t messageId,
              HAL_CANReceiveMessage* message, int32_t* status) {
             std::array<uint8_t, 8> data{};
             uint8_t dataSize = 0;
+            uint64_t timestamp = wpi::util::Now();
             switch (messageId & ~0x3fu) {
               case 0x02032600:
                 data = {27, 1, 0x12, 0x34, 11, 2, 0, 0};
@@ -244,13 +246,13 @@ TEST_CASE("A301 configuration request and response frames", "[hal][a301]") {
                 dataSize = 1;
                 break;
               case 0x02035240:
-                StoreFloatLE(data.data(), 0.125f);
+                StoreFloatLE(data.data(), *static_cast<float*>(param));
                 dataSize = 4;
                 break;
               case 0x02034440:
                 data[0] = 0;
                 data[1] = HAL_A301_STATUS_2;
-                StoreU32LE(data.data() + 2, 125);
+                StoreU32LE(data.data() + 2, 1000);
                 dataSize = 6;
                 break;
               case 0x02036040:
@@ -258,15 +260,19 @@ TEST_CASE("A301 configuration request and response frames", "[hal][a301]") {
                 StoreU32LE(data.data() + 1, 125);
                 dataSize = 5;
                 break;
+              case 0x0203b880:
+                dataSize = 8;
+                timestamp -= 600'000;
+                break;
               default:
                 return;
             }
-            message->timeStamp = wpi::util::Now();
+            message->timeStamp = timestamp;
             message->message.dataSize = dataSize;
             std::memcpy(message->message.data, data.data(), dataSize);
             *status = 0;
           },
-          nullptr),
+          &rangeOffset),
       HALSIM_CancelCanReceiveMessageCallback};
 
   int32_t status = 0;
@@ -300,14 +306,30 @@ TEST_CASE("A301 configuration request and response frames", "[hal][a301]") {
   CHECK(sentFrames[1].messageId == (0x02035180u | 5));
   CHECK(sentFrames[2].messageId == (0x02035200u | 5));
 
+  HAL_SetA301Inverted(a301.handle, true, &status);
+  REQUIRE(status == 0);
   sentFrames.clear();
-  HAL_SetA301StatusFramePeriod(a301.handle, HAL_A301_STATUS_2, 125, &status);
+  HAL_SetA301AbsoluteEncoderRangeOffset(a301.handle, 0.25, &status);
+  REQUIRE(status == 0);
+  REQUIRE(sentFrames.size() == 1);
+  CHECK(sentFrames[0].messageId == (0x02032980u | 5));
+  rangeOffset = LoadFloatLE(sentFrames[0].message.data);
+  CHECK(rangeOffset == -0.25f);
+  CHECK(HAL_GetA301AbsoluteEncoderRangeOffset(a301.handle, &status) == 0.25);
+  REQUIRE(status == 0);
+
+  sentFrames.clear();
+  HAL_SetA301StatusFramePeriod(a301.handle, HAL_A301_STATUS_2, 250, &status);
   REQUIRE(status == 0);
   REQUIRE(sentFrames.size() == 1);
   CHECK(sentFrames[0].messageId == (0x02034400u | 5));
   CHECK(sentFrames[0].message.dataSize == 5);
   CHECK(sentFrames[0].message.data[0] == HAL_A301_STATUS_2);
-  CHECK(sentFrames[0].message.data[1] == 125);
+  CHECK(sentFrames[0].message.data[1] == 250);
+
+  HAL_A301PeriodicStatus2 frame{};
+  HAL_GetA301PeriodicStatus2(a301.handle, &frame, &status);
+  CHECK(status == 0);
 
   sentFrames.clear();
   CHECK(HAL_GetA301StatusFramePeriod(a301.handle, HAL_A301_STATUS_2, &status) ==
@@ -348,7 +370,7 @@ TEST_CASE("A301 device ID detection", "[hal][a301]") {
             CHECK(streamHandle == 301);
             messages[0].messageId = 0x0203b800u | 17;
             *messagesRead = 1;
-            *status = 0;
+            *status = HAL_ERR_CANSessionMux_SessionOverrun;
           },
           nullptr),
       HALSIM_CancelCanReadStreamCallback};

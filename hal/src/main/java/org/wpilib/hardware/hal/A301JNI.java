@@ -51,32 +51,32 @@ public class A301JNI extends JNIWrapper {
 
   public static native A301PeriodicStatus3 getPeriodicStatus3(int handle);
 
-  public static native void setRelativeEncoderPosition(int handle, double position);
+  public static native int setRelativeEncoderPosition(int handle, double position);
 
-  public static native void setAbsoluteEncoderPosition(int handle, double position);
+  public static native int setAbsoluteEncoderPosition(int handle, double position);
 
-  public static native void setSetpoint(
+  public static native int setSetpoint(
       int handle, double value, int controlType, double positionSpeed);
 
-  public static native void setIdleMode(int handle, int idleMode);
+  public static native int setIdleMode(int handle, int idleMode);
 
   public static native int getIdleMode(int handle);
 
-  public static native void setAbsolutePositionContinuousInput(int handle, boolean enabled);
+  public static native int setAbsolutePositionContinuousInput(int handle, boolean enabled);
 
   public static native boolean getAbsolutePositionContinuousInput(int handle);
 
-  public static native void setAbsoluteEncoderRangeOffset(int handle, double offset);
+  public static native int setAbsoluteEncoderRangeOffset(int handle, double offset);
 
   public static native double getAbsoluteEncoderRangeOffset(int handle);
 
-  public static native void setInverted(int handle, boolean inverted);
+  public static native int setInverted(int handle, boolean inverted);
 
   public static native boolean getInverted(int handle);
 
-  public static native void clearFaults(int handle);
+  public static native int clearFaults(int handle);
 
-  public static native void setStatusFramePeriod(int handle, int frame, int periodMs);
+  public static native int setStatusFramePeriod(int handle, int frame, int periodMs);
 
   public static native int getStatusFramePeriod(int handle, int frame);
 
