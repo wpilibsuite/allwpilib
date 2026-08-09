@@ -4,6 +4,7 @@
 
 #include "wpi/hal/A301.h"
 
+#include <algorithm>
 #include <array>
 #include <bit>
 #include <cstdint>
@@ -15,6 +16,7 @@
 
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/CANAPITypes.h"
+#include "wpi/hal/Errors.h"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/simulation/CanData.h"
@@ -63,14 +65,23 @@ float LoadFloatLE(const uint8_t* data) {
 TEST_CASE("A301 setpoint frames", "[hal][a301]") {
   HAL_Initialize();
   std::vector<SentFrame> sentFrames;
+  struct SendData {
+    std::vector<SentFrame>* sentFrames;
+    bool failStops = false;
+  } sendData{&sentFrames};
   CallbackHandle sendCallback{
       HALSIM_RegisterCanSendMessageCallback(
           [](const char*, void* param, int32_t busId, uint32_t messageId,
-             const HAL_CANMessage* message, int32_t periodMs, int32_t*) {
-            static_cast<std::vector<SentFrame>*>(param)->push_back(
+             const HAL_CANMessage* message, int32_t periodMs, int32_t* status) {
+            auto data = static_cast<SendData*>(param);
+            data->sentFrames->push_back(
                 {busId, messageId, *message, periodMs});
+            if (data->failStops &&
+                periodMs == HAL_CAN_SEND_PERIOD_STOP_REPEATING) {
+              *status = HAL_CAN_BUFFER_OVERRUN;
+            }
           },
-          &sentFrames),
+          &sendData),
       HALSIM_CancelCanSendMessageCallback};
 
   int32_t status = 0;
@@ -100,6 +111,27 @@ TEST_CASE("A301 setpoint frames", "[hal][a301]") {
   CHECK(sentFrames[1].messageId == (0x02030000u | 3));
   CHECK(sentFrames[1].periodMs == 20);
   CHECK(LoadFloatLE(sentFrames[1].message.data) == 125.0f);
+
+  sendData.failStops = true;
+  sentFrames.clear();
+  HAL_SetA301Setpoint(a301.handle, 0.25,
+                      HAL_A301_CONTROL_TYPE_ABSOLUTE_POSITION, 0.0, &status);
+  CHECK(status == HAL_CAN_BUFFER_OVERRUN);
+  REQUIRE(sentFrames.size() == 1);
+  CHECK(sentFrames[0].messageId == (0x02030000u | 3));
+  CHECK(sentFrames[0].periodMs == HAL_CAN_SEND_PERIOD_STOP_REPEATING);
+
+  sendData.failStops = false;
+  sentFrames.clear();
+  status = 0;
+  HAL_SetA301Setpoint(a301.handle, 0.25,
+                      HAL_A301_CONTROL_TYPE_ABSOLUTE_POSITION, 0.0, &status);
+  REQUIRE(status == 0);
+  REQUIRE(sentFrames.size() == 2);
+  CHECK(sentFrames[0].messageId == (0x02030000u | 3));
+  CHECK(sentFrames[0].periodMs == HAL_CAN_SEND_PERIOD_STOP_REPEATING);
+  CHECK(sentFrames[1].messageId == (0x02030200u | 3));
+  CHECK(sentFrames[1].periodMs == 20);
 
   sentFrames.clear();
   HAL_SetA301Inverted(a301.handle, true, &status);
@@ -386,12 +418,36 @@ TEST_CASE("A301 device ID detection", "[hal][a301]") {
 TEST_CASE("A301 allocation is released by a global handle reset",
           "[hal][a301]") {
   HAL_Initialize();
+  std::vector<SentFrame> sentFrames;
+  CallbackHandle sendCallback{
+      HALSIM_RegisterCanSendMessageCallback(
+          [](const char*, void* param, int32_t busId, uint32_t messageId,
+             const HAL_CANMessage* message, int32_t periodMs, int32_t*) {
+            static_cast<std::vector<SentFrame>*>(param)->push_back(
+                {busId, messageId, *message, periodMs});
+          },
+          &sentFrames),
+      HALSIM_CancelCanSendMessageCallback};
+
   int32_t status = 0;
   HAL_A301Handle first = HAL_InitializeA301(0, 6, "A301Test", &status);
   REQUIRE(status == 0);
   REQUIRE(first != HAL_INVALID_HANDLE);
 
+  sentFrames.clear();
   wpi::hal::HandleBase::ResetGlobalHandles();
+  constexpr std::array<uint32_t, 5> expectedStopIds{
+      0x02030080u | 6, 0x02030000u | 6, 0x02030100u | 6,
+      0x02030180u | 6, 0x02030200u | 6};
+  REQUIRE(sentFrames.size() == expectedStopIds.size());
+  for (uint32_t expectedId : expectedStopIds) {
+    CHECK(std::count_if(sentFrames.begin(), sentFrames.end(),
+                        [expectedId](const SentFrame& frame) {
+                          return frame.messageId == expectedId &&
+                                 frame.periodMs ==
+                                     HAL_CAN_SEND_PERIOD_STOP_REPEATING;
+                        }) == 1);
+  }
 
   A301Handle second{HAL_InitializeA301(0, 6, "A301Test", &status)};
   REQUIRE(status == 0);

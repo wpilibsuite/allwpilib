@@ -134,6 +134,7 @@ uint32_t MakeAllocationKey(int32_t busId, int32_t deviceId) {
 }
 
 A301Obj::~A301Obj() {
+  HAL_CleanCAN(canHandle);
   std::scoped_lock lock{gAllocationsMutex};
   gAllocations.erase(MakeAllocationKey(busId, deviceId));
 }
@@ -385,7 +386,6 @@ HAL_A301Handle HAL_InitializeA301(int32_t busId, int32_t deviceId,
 
   HAL_A301Handle handle = gA301Handles->Allocate(a301);
   if (handle == HAL_INVALID_HANDLE) {
-    HAL_CleanCAN(canHandle);
     *status = HAL_NO_AVAILABLE_RESOURCES;
     return HAL_INVALID_HANDLE;
   }
@@ -403,11 +403,7 @@ HAL_A301Handle HAL_InitializeA301(int32_t busId, int32_t deviceId,
 }
 
 void HAL_FreeA301(HAL_A301Handle handle) {
-  auto a301 = gA301Handles->Free(handle);
-  if (!a301) {
-    return;
-  }
-  HAL_CleanCAN(a301->canHandle);
+  gA301Handles->Free(handle);
 }
 
 HAL_Bool HAL_CheckA301DeviceId(int32_t deviceId) {
@@ -653,6 +649,10 @@ void HAL_SetA301Setpoint(HAL_A301Handle handle, double value,
       int32_t stopStatus = 0;
       HAL_StopCANPacketRepeating(a301->canHandle, a301->activeSetpointApi,
                                  &stopStatus);
+      if (stopStatus != 0) {
+        *status = stopStatus;
+        return;
+      }
     }
     a301->activeSetpointApi = api;
     StoreFloatLE(data.data(), value);

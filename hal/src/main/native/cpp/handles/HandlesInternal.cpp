@@ -41,10 +41,10 @@ void HandleBase::ResetHandles() {
 }
 void HandleBase::ResetGlobalHandles() {
   std::unique_lock lock(globalHandleMutex);
-  for (auto&& i : *globalHandles) {
-    if (i != nullptr) {
+  for (auto i = globalHandles->rbegin(); i != globalHandles->rend(); ++i) {
+    if (*i != nullptr) {
       lock.unlock();
-      i->ResetHandles();
+      (*i)->ResetHandles();
       lock.lock();
     }
   }
