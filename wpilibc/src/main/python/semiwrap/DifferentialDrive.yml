@@ -35,17 +35,18 @@ classes:
       Four motor drivetrain::
 
         import wpilib.drive
+        import wpilib_drivers
 
         class Robot(wpilib.TimedRobot):
             def __init__(self) -> None:
                 super().__init__()
 
-                self.front_left = wpilib.PWMVictorSPX(1)
-                self.rear_left = wpilib.PWMVictorSPX(2)
+                self.front_left = wpilib_drivers.PWMVictorSPX(1)
+                self.rear_left = wpilib_drivers.PWMVictorSPX(2)
                 self.left = wpilib.MotorControllerGroup(self.front_left, self.rear_left)
 
-                self.front_right = wpilib.PWMVictorSPX(3)
-                self.rear_right = wpilib.PWMVictorSPX(4)
+                self.front_right = wpilib_drivers.PWMVictorSPX(3)
+                self.rear_right = wpilib_drivers.PWMVictorSPX(4)
                 self.right = wpilib.MotorControllerGroup(self.front_right, self.rear_right)
 
                 self.drive = wpilib.drive.DifferentialDrive(self.left, self.right)
@@ -53,19 +54,20 @@ classes:
       Six motor drivetrain::
 
         import wpilib.drive
+        import wpilib_drivers
 
         class Robot(wpilib.TimedRobot):
             def __init__(self) -> None:
                 super().__init__()
 
-                self.front_left = wpilib.PWMVictorSPX(1)
-                self.mid_left = wpilib.PWMVictorSPX(2)
-                self.rear_left = wpilib.PWMVictorSPX(3)
+                self.front_left = wpilib_drivers.PWMVictorSPX(1)
+                self.mid_left = wpilib_drivers.PWMVictorSPX(2)
+                self.rear_left = wpilib_drivers.PWMVictorSPX(3)
                 self.left = wpilib.MotorControllerGroup(self.front_left, self.mid_left, self.rear_left)
 
-                self.front_right = wpilib.PWMVictorSPX(4)
-                self.mid_right = wpilib.PWMVictorSPX(5)
-                self.rear_right = wpilib.PWMVictorSPX(6)
+                self.front_right = wpilib_drivers.PWMVictorSPX(4)
+                self.mid_right = wpilib_drivers.PWMVictorSPX(5)
+                self.rear_right = wpilib_drivers.PWMVictorSPX(6)
                 self.right = wpilib.MotorControllerGroup(self.front_right, self.mid_right, self.rear_right)
 
                 self.drive = wpilib.drive.DifferentialDrive(self.left, self.right)

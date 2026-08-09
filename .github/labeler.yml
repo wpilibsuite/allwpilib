@@ -28,6 +28,9 @@
 "component: datalogtool":
   - changed-files:
       - any-glob-to-any-file: tools/datalogtool/**
+"component: drivers":
+  - changed-files:
+      - any-glob-to-any-file: drivers/**
 "component: epilogue":
   - changed-files:
       - any-glob-to-any-file: epilogue-*/**

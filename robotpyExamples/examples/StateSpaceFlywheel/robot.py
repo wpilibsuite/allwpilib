@@ -8,6 +8,7 @@
 import math
 
 import wpilib
+import wpilib_drivers
 import wpimath.units
 
 MOTOR_PORT = 0
@@ -78,7 +79,7 @@ class MyRobot(wpilib.TimedRobot):
         # An encoder set up to measure flywheel velocity in radians per second.
         self.encoder = wpilib.Encoder(ENCODER_A_CHANNEL, ENCODER_B_CHANNEL)
 
-        self.motor = wpilib.PWMSparkMax(MOTOR_PORT)
+        self.motor = wpilib_drivers.PWMSparkMax(MOTOR_PORT)
 
         # A joystick to read the trigger from.
         self.joystick = wpilib.Joystick(JOYSTICK_PORT)
@@ -90,7 +91,6 @@ class MyRobot(wpilib.TimedRobot):
         self.loop.reset([self.encoder.get_rate()])
 
     def teleop_periodic(self) -> None:
-
         # Sets the target velocity of our flywheel. This is similar to setting the setpoint of a
         # PID controller.
         if self.joystick.get_trigger_pressed():

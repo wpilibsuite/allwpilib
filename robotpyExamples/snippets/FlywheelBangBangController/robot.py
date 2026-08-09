@@ -6,6 +6,7 @@
 #
 
 import wpilib
+import wpilib_drivers
 import math
 
 import wpilib.simulation
@@ -46,7 +47,7 @@ class MyRobot(wpilib.TimedRobot):
         """Robot initialization function"""
         super().__init__()
 
-        self.flywheel_motor = wpilib.PWMSparkMax(self.MOTOR_PORT)
+        self.flywheel_motor = wpilib_drivers.PWMSparkMax(self.MOTOR_PORT)
         self.encoder = wpilib.Encoder(self.ENCODER_A_CHANNEL, self.ENCODER_B_CHANNEL)
 
         self.bang_bang_controler = wpimath.BangBangController()

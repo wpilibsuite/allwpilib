@@ -25,6 +25,7 @@ foreach(example ${EXAMPLES})
     target_link_libraries(
         ${example}
         apriltag
+        drivers
         fields
         wpilibc
         commandsv2
@@ -49,6 +50,7 @@ foreach(example ${EXAMPLES})
         target_link_libraries(
             Example_${example}_test
             apriltag
+            drivers
             fields
             wpilibc
             commandsv2
@@ -70,6 +72,7 @@ foreach(template ${TEMPLATES})
     target_include_directories(${template} PUBLIC src/main/cpp/templates/${template}/include)
     target_link_libraries(
         ${template}
+        drivers
         wpilibc
         commandsv2
         fields
@@ -99,6 +102,7 @@ foreach(snippet ${SNIPPETS})
     target_link_libraries(
         snippet${snippet}
         apriltag
+        drivers
         fields
         wpilibc
         commandsv2
@@ -124,6 +128,7 @@ foreach(snippet ${SNIPPETS})
         target_link_libraries(
             Snippet_${snippet}_test
             apriltag
+            drivers
             fields
             wpilibc
             commandsv2

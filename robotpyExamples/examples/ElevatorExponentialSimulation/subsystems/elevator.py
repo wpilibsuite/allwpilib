@@ -5,6 +5,7 @@
 #
 
 import wpilib
+import wpilib_drivers
 import wpilib.simulation
 import wpimath
 import wpimath.units
@@ -41,7 +42,7 @@ class Elevator:
         self.encoder = wpilib.Encoder(
             constants.ENCODER_A_CHANNEL, constants.ENCODER_B_CHANNEL
         )
-        self.motor = wpilib.PWMSparkMax(constants.MOTOR_PORT)
+        self.motor = wpilib_drivers.PWMSparkMax(constants.MOTOR_PORT)
 
         # Simulation classes help us simulate what's going on, including gravity.
         self.elevator_sim = wpilib.simulation.ElevatorSim(
