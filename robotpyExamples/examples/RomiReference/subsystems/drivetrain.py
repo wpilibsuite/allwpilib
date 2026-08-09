@@ -8,6 +8,7 @@ import math
 
 import commands2
 import wpilib
+import wpilib_drivers
 import romi
 
 
@@ -16,11 +17,10 @@ class Drivetrain(commands2.Subsystem):
     WHEEL_DIAMETER_INCH = 2.75591
 
     def __init__(self) -> None:
-
         # The Romi has the left and right motors set to
         # PWM channels 0 and 1 respectively
-        self.left_motor = wpilib.Spark(0)
-        self.right_motor = wpilib.Spark(1)
+        self.left_motor = wpilib_drivers.Spark(0)
+        self.right_motor = wpilib_drivers.Spark(1)
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's

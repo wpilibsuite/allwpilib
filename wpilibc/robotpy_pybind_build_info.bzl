@@ -114,28 +114,28 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             class_name = "EdgeConfiguration",
             yml_file = "semiwrap/EdgeConfiguration.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/counter/EdgeConfiguration.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/counter/EdgeConfiguration.hpp",
             tmpl_class_names = [],
             trampolines = [],
+        ),
+        struct(
+            class_name = "EdgeCounter",
+            yml_file = "semiwrap/EdgeCounter.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/counter/EdgeCounter.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::EdgeCounter", "wpi__EdgeCounter.hpp"),
+            ],
         ),
         struct(
             class_name = "Tachometer",
             yml_file = "semiwrap/Tachometer.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/counter/Tachometer.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/counter/Tachometer.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::Tachometer", "wpi__Tachometer.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "UpDownCounter",
-            yml_file = "semiwrap/UpDownCounter.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/counter/UpDownCounter.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::UpDownCounter", "wpi__UpDownCounter.hpp"),
             ],
         ),
         struct(
@@ -745,16 +745,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "Koors40",
-            yml_file = "semiwrap/Koors40.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/motor/Koors40.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::Koors40", "wpi__Koors40.hpp"),
-            ],
-        ),
-        struct(
             class_name = "MotorController",
             yml_file = "semiwrap/MotorController.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -782,106 +772,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::PWMMotorController", "wpi__PWMMotorController.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "PWMSparkFlex",
-            yml_file = "semiwrap/PWMSparkFlex.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/motor/PWMSparkFlex.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::PWMSparkFlex", "wpi__PWMSparkFlex.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "PWMSparkMax",
-            yml_file = "semiwrap/PWMSparkMax.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/motor/PWMSparkMax.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::PWMSparkMax", "wpi__PWMSparkMax.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "PWMTalonFX",
-            yml_file = "semiwrap/PWMTalonFX.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/motor/PWMTalonFX.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::PWMTalonFX", "wpi__PWMTalonFX.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "PWMTalonSRX",
-            yml_file = "semiwrap/PWMTalonSRX.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/motor/PWMTalonSRX.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::PWMTalonSRX", "wpi__PWMTalonSRX.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "PWMVenom",
-            yml_file = "semiwrap/PWMVenom.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/motor/PWMVenom.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::PWMVenom", "wpi__PWMVenom.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "PWMVictorSPX",
-            yml_file = "semiwrap/PWMVictorSPX.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/motor/PWMVictorSPX.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::PWMVictorSPX", "wpi__PWMVictorSPX.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "Spark",
-            yml_file = "semiwrap/Spark.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/motor/Spark.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::Spark", "wpi__Spark.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "SparkMini",
-            yml_file = "semiwrap/SparkMini.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/motor/SparkMini.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::SparkMini", "wpi__SparkMini.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "Talon",
-            yml_file = "semiwrap/Talon.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/motor/Talon.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::Talon", "wpi__Talon.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "VictorSP",
-            yml_file = "semiwrap/VictorSP.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/motor/VictorSP.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::VictorSP", "wpi__VictorSP.hpp"),
             ],
         ),
         struct(

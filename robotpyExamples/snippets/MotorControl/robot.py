@@ -6,6 +6,7 @@
 #
 
 import wpilib
+import wpilib_drivers
 
 import math
 
@@ -35,7 +36,7 @@ class MyRobot(wpilib.TimedRobot):
         """Robot initialization function"""
         super().__init__()
 
-        self.motor = wpilib.PWMSparkMax(self.MOTOR_PORT)
+        self.motor = wpilib_drivers.PWMSparkMax(self.MOTOR_PORT)
         self.joystick = wpilib.Joystick(self.JOYSTICK_PORT)
         self.encoder = wpilib.Encoder(self.ENCODER_PORT_A, self.ENCODER_PORT_B)
         # Use set_distance_per_pulse to set the multiplier for get_distance

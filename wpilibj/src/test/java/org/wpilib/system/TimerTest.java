@@ -55,6 +55,13 @@ class TimerTest {
 
   @Test
   @ResourceLock("timing")
+  void createStarted() {
+    var timer = Timer.createStarted();
+    assertTrue(timer.isRunning(), "Timer from createStarted() should be running");
+  }
+
+  @Test
+  @ResourceLock("timing")
   void resetTest() {
     var timer = new Timer();
     timer.start();

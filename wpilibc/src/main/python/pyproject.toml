@@ -99,10 +99,10 @@ Notifier = "rpy/Notifier.h"
 # rpy only
 AddressableLEDBuffer = "rpy/AddressableLEDBuffer.h"
 
-# wpi/counter
-EdgeConfiguration = "wpi/counter/EdgeConfiguration.hpp"
-Tachometer = "wpi/counter/Tachometer.hpp"
-UpDownCounter = "wpi/counter/UpDownCounter.hpp"
+# wpi/hardware/counter
+EdgeConfiguration = "wpi/hardware/counter/EdgeConfiguration.hpp"
+EdgeCounter = "wpi/hardware/counter/EdgeCounter.hpp"
+Tachometer = "wpi/hardware/counter/Tachometer.hpp"
 
 # wpi/drive
 DifferentialDrive = "wpi/drive/DifferentialDrive.hpp"
@@ -185,20 +185,9 @@ AddressableLED = "wpi/hardware/led/AddressableLED.hpp"
 LEDPattern = "wpi/hardware/led/LEDPattern.hpp"
 
 # wpi/hardware/motor
-Koors40 = "wpi/hardware/motor/Koors40.hpp"
 MotorController = "wpi/hardware/motor/MotorController.hpp"
 MotorSafety = "wpi/hardware/motor/MotorSafety.hpp"
 PWMMotorController = "wpi/hardware/motor/PWMMotorController.hpp"
-PWMSparkFlex = "wpi/hardware/motor/PWMSparkFlex.hpp"
-PWMSparkMax = "wpi/hardware/motor/PWMSparkMax.hpp"
-PWMTalonFX = "wpi/hardware/motor/PWMTalonFX.hpp"
-PWMTalonSRX = "wpi/hardware/motor/PWMTalonSRX.hpp"
-PWMVenom = "wpi/hardware/motor/PWMVenom.hpp"
-PWMVictorSPX = "wpi/hardware/motor/PWMVictorSPX.hpp"
-Spark = "wpi/hardware/motor/Spark.hpp"
-SparkMini = "wpi/hardware/motor/SparkMini.hpp"
-Talon = "wpi/hardware/motor/Talon.hpp"
-VictorSP = "wpi/hardware/motor/VictorSP.hpp"
 
 # wpi/hardware/pneumatic
 Compressor = "wpi/hardware/pneumatic/Compressor.hpp"

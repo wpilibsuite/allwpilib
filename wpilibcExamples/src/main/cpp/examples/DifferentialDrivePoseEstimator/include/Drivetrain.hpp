@@ -6,10 +6,10 @@
 
 #include <numbers>
 
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/fields/Field.hpp"
 #include "wpi/fields/fields.hpp"
 #include "wpi/hardware/imu/OnboardIMU.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"

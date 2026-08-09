@@ -167,18 +167,6 @@ public class Matrix<R extends Num, C extends Num>
   }
 
   /**
-   * Returns the diagonal elements inside a vector or square matrix.
-   *
-   * <p>If "this" {@link Matrix} is a vector then a square matrix is returned. If a "this" {@link
-   * Matrix} is a matrix then a vector of diagonal elements is returned.
-   *
-   * @return The diagonal elements inside a vector or a square matrix.
-   */
-  public final Matrix<R, C> diag() {
-    return new Matrix<>(this.m_storage.diag());
-  }
-
-  /**
    * Returns the largest element of this matrix.
    *
    * @return The largest element of this matrix.

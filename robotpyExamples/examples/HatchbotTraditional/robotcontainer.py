@@ -32,7 +32,7 @@ class RobotContainer:
 
     def __init__(self) -> None:
         # The driver's controller
-        # self.driver_controller = wpilib.NiDsXboxController(constants.DRIVER_CONTROLLER_PORT)
+        # self.driver_controller = wpilib.XboxController(constants.DRIVER_CONTROLLER_PORT)
         self.driver_controller = wpilib.Joystick(constants.DRIVER_CONTROLLER_PORT)
 
         # The robot's subsystems

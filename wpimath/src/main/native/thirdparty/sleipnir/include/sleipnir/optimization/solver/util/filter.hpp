@@ -6,7 +6,6 @@
 #include <cmath>
 
 #include <Eigen/Core>
-#include <Eigen/SparseCore>
 #include <gch/small_vector.hpp>
 
 // See docs/algorithms.md#Works_cited for citation definitions.
@@ -75,12 +74,6 @@ struct FilterEntry {
 template <typename Scalar>
 class Filter {
  public:
-  /// Type alias for dense vector.
-  using DenseVector = Eigen::Vector<Scalar, Eigen::Dynamic>;
-
-  /// Type alias for sparse vector.
-  using SparseVector = Eigen::SparseVector<Scalar>;
-
   /// The minimum constraint violation
   Scalar min_constraint_violation;
 
@@ -110,13 +103,11 @@ class Filter {
   ///
   /// @param current_entry The entry corresponding to the current iterate.
   /// @param trial_entry The entry corresponding to the trial iterate.
-  /// @param p_x Decision variable primal step.
-  /// @param g Cost function gradient.
+  /// @param D_ϕ Cost directional derivative along the search direction.
   /// @param α The step size (0, 1].
   /// @return True if the given entry is acceptable to the filter.
   bool try_add(const FilterEntry<Scalar>& current_entry,
-               const FilterEntry<Scalar>& trial_entry, const DenseVector& p_x,
-               const SparseVector& g, Scalar α) {
+               const FilterEntry<Scalar>& trial_entry, Scalar D_ϕ, Scalar α) {
     using std::isfinite;
     using std::pow;
 
@@ -126,19 +117,17 @@ class Filter {
       return false;
     }
 
-    Scalar g_p_x = g.transpose() * p_x;
-
     // Switching condition
     constexpr Scalar s_ϕ(2.3);
     constexpr Scalar s_θ(1.1);
     bool switching_condition =
-        g_p_x < Scalar(0) &&
-        α * pow(-g_p_x, s_ϕ) > pow(current_entry.constraint_violation, s_θ);
+        D_ϕ < Scalar(0) &&
+        α * pow(-D_ϕ, s_ϕ) > pow(current_entry.constraint_violation, s_θ);
 
     // Armijo condition
     constexpr Scalar η_ϕ(1e-8);
     bool armijo_condition =
-        trial_entry.cost <= current_entry.cost + η_ϕ * α * g_p_x;
+        trial_entry.cost <= current_entry.cost + η_ϕ * α * D_ϕ;
 
     // Sufficient decrease condition
     //

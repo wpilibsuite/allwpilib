@@ -47,6 +47,11 @@ TEST_CASE_METHOD(TimerTest, "TimerTest StartStop", "[wpilibc]") {
   CHECK_FALSE(timer.IsRunning());
 }
 
+TEST_CASE_METHOD(TimerTest, "TimerTest CreateStarted", "[wpilibc]") {
+  Timer timer = Timer::CreateStarted();
+  CHECK(timer.IsRunning());
+}
+
 TEST_CASE_METHOD(TimerTest, "TimerTest Reset", "[wpilibc]") {
   Timer timer;
   timer.Start();

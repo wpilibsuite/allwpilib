@@ -4,9 +4,9 @@
 
 package org.wpilib.snippets.motorcontrol;
 
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.smartdashboard.SmartDashboard;
 

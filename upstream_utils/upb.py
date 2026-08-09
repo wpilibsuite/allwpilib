@@ -65,7 +65,7 @@ def copy_upstream_src(wpilib_root: Path):
                 )
                 and "cmake" not in dp.parts
             )
-            and (f.endswith(".h") or f.endswith(".inc"))
+            and f.endswith((".h", ".inc"))
             or f == "generated_code_support.h"
         ),
         wpiutil / "src/main/native/thirdparty/upb/include/upb",
@@ -100,7 +100,7 @@ def copy_upstream_src(wpilib_root: Path):
                 )
             )
             and f.endswith(".c")
-            and not f == "descriptor.upb_minitable.c"
+            and f != "descriptor.upb_minitable.c"
         ),
         wpiutil / "src/main/native/thirdparty/upb/src",
     )

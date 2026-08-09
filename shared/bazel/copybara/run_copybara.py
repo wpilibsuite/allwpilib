@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 import dataclasses
 import json
@@ -6,18 +8,17 @@ import pathlib
 import re
 import subprocess
 import tomllib
-from typing import Optional
 
 
 @dataclasses.dataclass
 class CopybaraConfig:
     # Needed to run the additional updates for updating the rdev file
-    mostrobotpy_local_repo_path: Optional[str] = None
+    mostrobotpy_local_repo_path: str | None = None
 
     # Settings for migrating to a fork that you own
-    mostrobotpy_fork_repo: Optional[str] = None
-    allwpilib_fork_repo: Optional[str] = None
-    robotpy_commandsv2_fork_repo: Optional[str] = None
+    mostrobotpy_fork_repo: str | None = None
+    allwpilib_fork_repo: str | None = None
+    robotpy_commandsv2_fork_repo: str | None = None
 
     # Settings for truth repositories
     mostrobotpy_truth_repo: str = "https://github.com/robotpy/mostrobotpy.git"
@@ -68,7 +69,7 @@ def checkout_branch(auto_delete_branch: bool, branch_name: str):
         if not auto_delete_branch:
             ans = input(f"Delete local branch {branch_name}?")
             if ans.lower() != "y":
-                raise Exception(
+                raise RuntimeError(
                     f"You must delete your local copy of {branch_name} before the script can finish"
                 )
 
@@ -227,11 +228,11 @@ def main():
 
     if args.migration == "allwpilib_to_mostrobotpy":
         if args.mostrobotpy_local_repo_path is None:
-            raise Exception(
+            raise RuntimeError(
                 "You mist specify mostrobotpy_local_repo_path, either on the command line or in your user config"
             )
         if args.mostrobotpy_fork_repo is None:
-            raise Exception(
+            raise RuntimeError(
                 "You mist specify mostrobotpy_fork_repo, either on the command line or in your user config"
             )
 
@@ -253,14 +254,14 @@ def main():
         )
     elif args.migration == "mostrobotpy_to_allwpilib":
         if args.allwpilib_fork_repo is None:
-            raise Exception(
+            raise RuntimeError(
                 "You mist specify allwpilib_fork_repo, either on the command line or in your user config"
             )
         mostrobotpy_to_allwpilib(
             copybara_file, args.allwpilib_fork_repo, args.force, args.verbose
         )
     else:
-        raise Exception(f"Unexpected migration {args.migration}")
+        raise RuntimeError(f"Unexpected migration {args.migration}")
 
 
 if __name__ == "__main__":
