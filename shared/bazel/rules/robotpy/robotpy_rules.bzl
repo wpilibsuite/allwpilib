@@ -5,6 +5,19 @@ load("@rules_python//python:defs.bzl", "py_library")
 load("@rules_python//python:packaging.bzl", "py_wheel")
 load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select")
 
+_LINUX_PYBIND_COPTS = [
+    "-Wno-attributes",
+    "-Wno-unused-value",
+    "-Wno-deprecated",
+    "-Wno-deprecated-declarations",
+    "-Wno-unused-parameter",
+    "-Wno-redundant-move",
+    "-Wno-unused-but-set-variable",
+    "-Wno-unused-variable",
+    "-Wno-pessimizing-move",
+    "-Wno-overloaded-virtual",
+]
+
 def create_pybind_library(
         name,
         extension_name,
@@ -62,18 +75,8 @@ def create_pybind_library(
                 "-Wno-pessimizing-move",
                 "-Wno-unused-value",
             ],
-            "@bazel_tools//src/conditions:linux_x86_64": [
-                "-Wno-attributes",
-                "-Wno-unused-value",
-                "-Wno-deprecated",
-                "-Wno-deprecated-declarations",
-                "-Wno-unused-parameter",
-                "-Wno-redundant-move",
-                "-Wno-unused-but-set-variable",
-                "-Wno-unused-variable",
-                "-Wno-pessimizing-move",
-                "-Wno-overloaded-virtual",
-            ],
+            "@bazel_tools//src/conditions:linux_aarch64": _LINUX_PYBIND_COPTS,
+            "@bazel_tools//src/conditions:linux_x86_64": _LINUX_PYBIND_COPTS,
             "@bazel_tools//src/conditions:windows": [
             ],
         }),
