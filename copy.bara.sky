@@ -122,7 +122,7 @@ COMMANDS_GENERATION_SCRIPTS = [
     (
         "wpilibj/src/generate/first_ds_hids.schema.json",
         "subprojects/robotpy-commands-v2/tools/hids/first_ds_hids.schema.json",
-    ),
+    )
 ]
 
 def define_mostrobotpy_to_allwpilib():
@@ -151,8 +151,8 @@ def define_mostrobotpy_to_allwpilib():
 
     # Sync the commands generation scripts
     for (allwpilib_path, mostrobotpy_path) in COMMANDS_GENERATION_SCRIPTS:
-        origin_files.append(mostrobotpy_path)
-        destination_files.append(allwpilib_path)
+        origin_files += [mostrobotpy_path]
+        destination_files += [allwpilib_path]
         transformations.append(core.move(mostrobotpy_path, allwpilib_path))
 
     for project_info in MOSTROBOTPY_PROJECTS:
@@ -278,8 +278,8 @@ def define_allwpilib_to_mostrobotpy():
 
     # Sync the commands generation scripts
     for (allwpilib_path, mostrobotpy_path) in COMMANDS_GENERATION_SCRIPTS:
-        origin_files.append(allwpilib_path)
-        destination_files.append(mostrobotpy_path)
+        origin_files += [allwpilib_path]
+        destination_files += [mostrobotpy_path]
         transformations.append(core.move(allwpilib_path, mostrobotpy_path))
 
     origin_files += glob([
