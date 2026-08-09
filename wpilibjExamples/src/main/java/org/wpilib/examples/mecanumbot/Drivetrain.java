@@ -4,8 +4,8 @@
 
 package org.wpilib.examples.mecanumbot;
 
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.hardware.imu.OnboardIMU;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;

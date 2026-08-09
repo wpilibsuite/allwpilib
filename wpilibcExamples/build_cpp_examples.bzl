@@ -49,6 +49,7 @@ def build_examples(folders, halsim_deps = []):
                 "//apriltag",
                 "//fields",
                 "//commandsv2",
+                "//drivers",
                 "//romiVendordep",
                 "//xrpVendordep",
                 ":{}-examples-headers".format(folder),
@@ -66,6 +67,7 @@ def build_commands(folders):
             hdrs = native.glob(["src/main/cpp/commands/" + folder + "/**/*.hpp"]),
             deps = [
                 "//commandsv2",
+                "//drivers",
             ],
             strip_include_prefix = "src/main/cpp/commands/" + folder,
             tags = ["wpi-example"],
@@ -89,6 +91,7 @@ def build_snippets(folders):
                 "//fields",
                 "//commandsv2",
                 "//cameraserver",
+                "//drivers",
                 ":{}-snippets-headers".format(folder),
             ],
             strip_include_prefix = "src/main/cpp/snippets/" + folder + "/include",
@@ -105,6 +108,7 @@ def build_templates(folders):
             hdrs = native.glob(["src/main/cpp/templates/" + folder + "/**/*.hpp"]),
             deps = [
                 "//commandsv2",
+                "//drivers",
             ],
             strip_include_prefix = "src/main/cpp/templates/" + folder + "/include",
             tags = ["wpi-example"],
@@ -120,6 +124,7 @@ def build_tests(example_test_folders, snippet_test_folders):
             srcs = native.glob([example_test_folder + "/**/*.cpp", example_src_folder + "/cpp/**/*.cpp", example_src_folder + "/c/**/*.c"], allow_empty = True),
             deps = [
                 "//commandsv2",
+                "//drivers",
                 ":{}-examples-headers".format(folder),
                 "//thirdparty/catch2",
             ],
@@ -135,6 +140,7 @@ def build_tests(example_test_folders, snippet_test_folders):
             srcs = native.glob([snippet_test_folder + "/**/*.cpp", snippet_src_folder + "/**/*.cpp"], allow_empty = True),
             deps = [
                 "//commandsv2",
+                "//drivers",
                 ":{}-snippets-headers".format(folder),
                 "//thirdparty/catch2",
             ],

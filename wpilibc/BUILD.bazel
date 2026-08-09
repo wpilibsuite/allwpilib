@@ -48,19 +48,6 @@ py_binary(
 )
 
 py_binary(
-    name = "generate_pwm_motor_controllers",
-    srcs = ["generate_pwm_motor_controllers.py"],
-    target_compatible_with = select({
-        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-    deps = [
-        requirement("jinja2"),
-        "//:generation",
-    ],
-)
-
-py_binary(
     name = "generate_wpilibc_py",
     srcs = ["generate_wpilibc.py"],
     main = "generate_wpilibc.py",
@@ -71,7 +58,6 @@ py_binary(
     deps = [
         ":generate_first_ds_hids",
         ":generate_hids",
-        ":generate_pwm_motor_controllers",
     ],
 )
 
@@ -79,7 +65,6 @@ filegroup(
     name = "templates",
     srcs = glob(["src/generate/main/native/**"]) + glob(["src/generate/test/native/**"]) + [
         "//wpilibj:hid_schema",
-        "//wpilibj:pwm_schema",
     ],
 )
 
