@@ -89,7 +89,7 @@ class DualShock4ControllerTest {
 
     Method simSetMethod = joysim.getClass().getMethod(simSetMethodName, double.class);
     Method joyGetMethod = joy.getClass().getMethod(joyGetMethodName);
-    Method joySetDeadbandMethod =
+    final Method joySetDeadbandMethod =
         joy.getClass().getMethod(joySetDeadbandMethodName, double.class);
 
     simSetMethod.invoke(joysim, 0.35);
