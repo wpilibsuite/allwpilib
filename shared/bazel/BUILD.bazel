@@ -1,3 +1,5 @@
+load("@platforms//host:constraints.bzl", "HOST_CONSTRAINTS")
+
 package(default_visibility = ["//visibility:public"])
 
 windows_flags = [
@@ -52,28 +54,37 @@ platform(
     ],
 )
 
+linux_exec_properties = {
+    "OSFamily": "Linux",
+    "container-image": "docker://wpilib/debian-base:trixie@sha256:4c20e850c88d9766a3aeaaf12901c9ca5e511b6ce59930046c187ce576fa1eeb",
+    "dockerAddCapabilities": "SYS_PTRACE",
+    "dockerReuse": "True",
+}
+
 platform(
-    name = "linux_host",
+    name = "linux_arm64",
+    constraint_values = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:linux",
+    ],
+    exec_properties = linux_exec_properties,
     flags = [
     ] + gcc_flags,
-    parents = [
-        "@platforms//host",
-    ],
 )
 
 platform(
     name = "linux_x86_64",
-    exec_properties = {
-        "OSFamily": "Linux",
-        "container-image": "docker://wpilib/debian-base:trixie@sha256:4c20e850c88d9766a3aeaaf12901c9ca5e511b6ce59930046c187ce576fa1eeb",
-        "dockerAddCapabilities": "SYS_PTRACE",
-        "dockerReuse": "True",
-    },
+    exec_properties = linux_exec_properties,
     flags = [
     ] + gcc_flags,
     parents = [
         "@wpilib_toolchains//platforms/linux_x86_64",
     ],
+)
+
+alias(
+    name = "linux_host",
+    actual = ":linux_arm64" if "@platforms//cpu:aarch64" in HOST_CONSTRAINTS else ":linux_x86_64",
 )
 
 platform(
