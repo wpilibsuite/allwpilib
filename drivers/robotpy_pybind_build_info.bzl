@@ -75,16 +75,6 @@ def drivers_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
 
     DRIVERS_HEADER_GEN = [
         struct(
-            class_name = "A301StatusSignal",
-            yml_file = "semiwrap/A301StatusSignal.yml",
-            header_root = "$(execpath :robotpy-native-wpilib-drivers.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib-drivers.copy_headers)/wpi/drivers/motor/A301StatusSignal.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::A301StatusSignal", "wpi__A301StatusSignal.hpp"),
-            ],
-        ),
-        struct(
             class_name = "A301Error",
             yml_file = "semiwrap/A301Error.yml",
             header_root = "$(execpath :robotpy-native-wpilib-drivers.copy_headers)",
