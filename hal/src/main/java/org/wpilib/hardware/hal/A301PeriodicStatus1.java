@@ -123,13 +123,6 @@ public class A301PeriodicStatus1 {
     this.timestamp = timestamp;
   }
 
-  /**
-   * Returns whether a bit is set in a packed value.
-   *
-   * @param value packed bit field
-   * @param bit bit index
-   * @return true when the bit is set
-   */
   private static boolean getBit(int value, int bit) {
     return (value & (1 << bit)) != 0;
   }

@@ -25,32 +25,47 @@
 
 /** A301 periodic status frames. */
 HAL_ENUM(HAL_A301PeriodicFrame) {
+  /** Applied output, voltage, current, temperature, and controller state. */
   HAL_A301_STATUS_0 = 0,
+  /** Fault and warning state. */
   HAL_A301_STATUS_1 = 1,
+  /** Relative encoder position and velocity. */
   HAL_A301_STATUS_2 = 2,
+  /** Absolute encoder position. */
   HAL_A301_STATUS_3 = 3,
 };
 
 /** A301 gearbox speed variants. */
 HAL_ENUM(HAL_A301GearboxRPM) {
+  /** The gearbox speed is unknown. */
   HAL_A301_GEARBOX_RPM_UNKNOWN = 0,
+  /** 215 RPM gearbox. */
   HAL_A301_GEARBOX_RPM_215 = 1,
+  /** 500 RPM gearbox. */
   HAL_A301_GEARBOX_RPM_500 = 2,
 };
 
 /** A301 idle modes. */
 HAL_ENUM(HAL_A301IdleMode) {
+  /** Allow the motor to coast. */
   HAL_A301_IDLE_MODE_COAST = 0,
+  /** Actively brake the motor. */
   HAL_A301_IDLE_MODE_BRAKE = 1,
 };
 
 /** A301 closed-loop control types. */
 HAL_ENUM(HAL_A301ControlType) {
+  /** Duty-cycle control. */
   HAL_A301_CONTROL_TYPE_DUTY_CYCLE = 0,
+  /** Velocity control. */
   HAL_A301_CONTROL_TYPE_VELOCITY = 1,
+  /** Voltage control. */
   HAL_A301_CONTROL_TYPE_VOLTAGE = 2,
+  /** Relative-position control. */
   HAL_A301_CONTROL_TYPE_RELATIVE_POSITION = 3,
+  /** Absolute-position control. */
   HAL_A301_CONTROL_TYPE_ABSOLUTE_POSITION = 4,
+  /** Motor-current control. */
   HAL_A301_CONTROL_TYPE_CURRENT = 5,
 };
 

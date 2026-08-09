@@ -34,11 +34,6 @@ public class A301 implements MotorController, AutoCloseable {
 
     private final int m_value;
 
-    /**
-     * Constructs a periodic frame value.
-     *
-     * @param value HAL frame ID
-     */
     PeriodicFrame(int value) {
       m_value = value;
     }
@@ -96,22 +91,10 @@ public class A301 implements MotorController, AutoCloseable {
 
     private final int m_value;
 
-    /**
-     * Constructs an idle mode value.
-     *
-     * @param value HAL idle mode ID
-     */
     IdleMode(int value) {
       m_value = value;
     }
 
-    /**
-     * Returns the idle mode corresponding to a HAL value.
-     *
-     * @param id HAL idle mode ID
-     * @return idle mode
-     * @throws IllegalArgumentException if the ID is unknown
-     */
     private static IdleMode fromId(int id) {
       return switch (id) {
         case A301JNI.IDLE_MODE_COAST -> COAST;
@@ -134,11 +117,6 @@ public class A301 implements MotorController, AutoCloseable {
     public final boolean motorStartup;
     public final int rawBits;
 
-    /**
-     * Decodes a packed A301 fault bit field.
-     *
-     * @param rawBits packed fault bits
-     */
     private Faults(int rawBits) {
       this.rawBits = rawBits;
       other = getBit(rawBits, 0);
@@ -167,11 +145,6 @@ public class A301 implements MotorController, AutoCloseable {
     public final boolean motorLoopSpeed;
     public final int rawBits;
 
-    /**
-     * Decodes a packed A301 warning bit field.
-     *
-     * @param rawBits packed warning bits
-     */
     private Warnings(int rawBits) {
       this.rawBits = rawBits;
       brownout = getBit(rawBits, 0);
@@ -197,11 +170,6 @@ public class A301 implements MotorController, AutoCloseable {
 
     private final int m_value;
 
-    /**
-     * Constructs a control type value.
-     *
-     * @param value HAL control type ID
-     */
     ControlType(int value) {
       m_value = value;
     }
@@ -879,94 +847,49 @@ public class A301 implements MotorController, AutoCloseable {
     return getStatusFramePeriod(PeriodicFrame.STATUS_3);
   }
 
-  /**
-   * Returns whether a bit is set in a packed value.
-   *
-   * @param value packed bit field
-   * @param bit bit index
-   * @return true when the bit is set
-   */
   private static boolean getBit(int value, int bit) {
     return (value & (1 << bit)) != 0;
   }
 
-  /**
-   * Enables or disables continuous input for absolute position control.
-   *
-   * @param enabled true to enable continuous input
-   * @return command status
-   */
   private A301Error setAbsolutePositionContinuousInput(boolean enabled) {
     throwIfClosed();
     return A301Error.fromHalStatus(A301JNI.setAbsolutePositionContinuousInput(m_handle, enabled));
   }
 
-  /**
-   * @return decoded periodic status frame 0
-   */
   private A301StatusSignal<A301PeriodicStatus0> getPeriodicStatus0() {
     throwIfClosed();
     A301PeriodicStatus0 frame = A301JNI.getPeriodicStatus0(m_handle);
     return A301StatusSignal.of(frame, frame.status, frame.timestamp);
   }
 
-  /**
-   * @return decoded periodic status frame 1
-   */
   private A301StatusSignal<A301PeriodicStatus1> getPeriodicStatus1() {
     throwIfClosed();
     A301PeriodicStatus1 frame = A301JNI.getPeriodicStatus1(m_handle);
     return A301StatusSignal.of(frame, frame.status, frame.timestamp);
   }
 
-  /**
-   * @return decoded periodic status frame 2
-   */
   private A301StatusSignal<A301PeriodicStatus2> getPeriodicStatus2() {
     throwIfClosed();
     A301PeriodicStatus2 frame = A301JNI.getPeriodicStatus2(m_handle);
     return A301StatusSignal.of(frame, frame.status, frame.timestamp);
   }
 
-  /**
-   * @return decoded periodic status frame 3
-   */
   private A301StatusSignal<A301PeriodicStatus3> getPeriodicStatus3() {
     throwIfClosed();
     A301PeriodicStatus3 frame = A301JNI.getPeriodicStatus3(m_handle);
     return A301StatusSignal.of(frame, frame.status, frame.timestamp);
   }
 
-  /**
-   * Sends a repeating control setpoint using the default position speed.
-   *
-   * @param controlType controller control mode
-   * @param setpoint requested control value
-   * @return command status
-   */
   private A301Error setSetpoint(ControlType controlType, double setpoint) {
     return setSetpoint(controlType, setpoint, kDefaultPositionSpeed);
   }
 
-  /**
-   * Sends a repeating control setpoint.
-   *
-   * @param controlType controller control mode
-   * @param setpoint requested control value
-   * @param positionSpeed approach speed for position controls, or zero for maximum speed
-   * @return command status
-   */
   private A301Error setSetpoint(ControlType controlType, double setpoint, double positionSpeed) {
     throwIfClosed();
     return A301Error.fromHalStatus(
         A301JNI.setSetpoint(m_handle, setpoint, controlType.m_value, positionSpeed));
   }
 
-  /**
-   * Throws if this controller has been closed.
-   *
-   * @throws IllegalStateException if this controller has been closed
-   */
   private void throwIfClosed() {
     if (m_isClosed.get()) {
       throw new IllegalStateException("This FIRST A301 object has been closed");

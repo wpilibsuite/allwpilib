@@ -242,6 +242,5 @@ public class A301JNI extends JNIWrapper {
    */
   public static native int getStatusFramePeriod(int handle, int frame);
 
-  /** Prevents instantiation. */
   private A301JNI() {}
 }

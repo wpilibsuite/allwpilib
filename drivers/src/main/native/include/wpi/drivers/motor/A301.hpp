@@ -27,22 +27,31 @@ class A301 final : public MotorController {
 
   /** A periodic status frame produced by the A301. */
   enum class PeriodicFrame {
+    /** Applied output, voltage, current, temperature, and controller state. */
     kStatus0 = HAL_A301_STATUS_0,
+    /** Fault and warning state. */
     kStatus1 = HAL_A301_STATUS_1,
+    /** Relative encoder position and velocity. */
     kStatus2 = HAL_A301_STATUS_2,
+    /** Absolute encoder position. */
     kStatus3 = HAL_A301_STATUS_3,
   };
 
   /** A301 gearbox speed variant. */
   enum class GearboxRPM {
+    /** The gearbox speed is unknown. */
     kUnknown = HAL_A301_GEARBOX_RPM_UNKNOWN,
+    /** 215 RPM gearbox. */
     kRPM215 = HAL_A301_GEARBOX_RPM_215,
+    /** 500 RPM gearbox. */
     kRPM500 = HAL_A301_GEARBOX_RPM_500,
   };
 
   /** Neutral behavior when the controller output is zero. */
   enum class IdleMode {
+    /** Allow the motor to coast. */
     kCoast = HAL_A301_IDLE_MODE_COAST,
+    /** Actively brake the motor. */
     kBrake = HAL_A301_IDLE_MODE_BRAKE,
   };
 
@@ -658,27 +667,14 @@ class A301 final : public MotorController {
  private:
   static constexpr double kDefaultPositionSpeed = 0.0;
 
-  /** @return decoded periodic status frame 0 */
   A301StatusSignal<HAL_A301PeriodicStatus0> GetPeriodicStatus0() const;
 
-  /** @return decoded periodic status frame 1 */
   A301StatusSignal<HAL_A301PeriodicStatus1> GetPeriodicStatus1() const;
 
-  /** @return decoded periodic status frame 2 */
   A301StatusSignal<HAL_A301PeriodicStatus2> GetPeriodicStatus2() const;
 
-  /** @return decoded periodic status frame 3 */
   A301StatusSignal<HAL_A301PeriodicStatus3> GetPeriodicStatus3() const;
 
-  /**
-   * Sends a repeating control setpoint.
-   *
-   * @param controlType controller control mode
-   * @param setpoint requested control value
-   * @param positionSpeed approach speed for position controls, or zero for
-   * maximum speed
-   * @return command status
-   */
   A301Error SetSetpoint(HAL_A301ControlType controlType, double setpoint,
                         double positionSpeed = kDefaultPositionSpeed);
 
