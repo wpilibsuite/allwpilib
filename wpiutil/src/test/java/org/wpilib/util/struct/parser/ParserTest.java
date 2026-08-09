@@ -38,6 +38,19 @@ class ParserTest {
   }
 
   @Test
+  void testUtf8Identifiers() {
+    Parser p = new Parser("{\u00e9=1,\u4e8c=2} \u00c9tat donn\u00e9es;");
+    ParsedSchema schema = assertDoesNotThrow(p::parse);
+    assertEquals(schema.declarations.size(), 1);
+    var decl = schema.declarations.get(0);
+    assertEquals(decl.typeString, "\u00c9tat");
+    assertEquals(decl.name, "donn\u00e9es");
+    assertEquals(decl.enumValues.size(), 2);
+    assertEquals(decl.enumValues.get("\u00e9"), 1);
+    assertEquals(decl.enumValues.get("\u4e8c"), 2);
+  }
+
+  @Test
   void testSimpleTrailingSemi() {
     Parser p = new Parser("int32 a;");
     ParsedSchema schema = assertDoesNotThrow(p::parse);
