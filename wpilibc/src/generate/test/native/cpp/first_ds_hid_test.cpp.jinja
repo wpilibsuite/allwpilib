@@ -28,5 +28,5 @@ TEST_CASE("{{ ClassName }}ControllerTest wrapped HID",
 BUTTON_TEST({{ ClassName }}Controller, {{ button.MethodName }}Button)
 {%- endfor %}
 {% for axis in axes %}
-AXIS_TEST({{ ClassName }}Controller, {{ axis.MethodName }})
+DEADBAND_AXIS_TEST({{ ClassName }}Controller, {{ axis.MethodName }}, {{ axis.DefaultDeadband }})
 {%- endfor %}

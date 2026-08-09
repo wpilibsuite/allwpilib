@@ -90,6 +90,10 @@ def _hex_literal(value: int):
 def _normalize_controller(controller: dict):
     normalized = dict(controller)
     normalized["axes"] = _normalize_mapping(controller["axes"])
+    for axis in normalized["axes"]:
+        # The standardized DS gamepad layout uses axes 0-3 for sticks and
+        # axes 4-5 for analog triggers.
+        axis["DefaultDeadband"] = 0.1 if axis["value"] < 4 else 0.01
     normalized["buttons"] = _normalize_mapping(controller["buttons"])
     normalized["supportedOutputs"] = _supported_outputs(controller)
     normalized["SupportedOutputsValue"] = _supported_outputs_value(
