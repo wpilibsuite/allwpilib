@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.hardware.motor;
+package org.wpilib.drivers.motor;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -14,6 +14,7 @@ import org.wpilib.hardware.hal.A301PeriodicStatus1;
 import org.wpilib.hardware.hal.A301PeriodicStatus2;
 import org.wpilib.hardware.hal.A301PeriodicStatus3;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.motor.MotorController;
 
 /** High-level interface to a FIRST A301 motor controller. */
 public class A301 implements MotorController, AutoCloseable {
