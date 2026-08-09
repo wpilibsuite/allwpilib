@@ -57,7 +57,17 @@ public class A301PeriodicStatus1 {
   public final int status;
   public final long timestamp;
 
-  /** Constructs A301 periodic status 1 data (called from the HAL). */
+  /**
+   * Constructs A301 periodic status 1 data (called from the HAL).
+   *
+   * @param faults packed active fault bits
+   * @param warnings packed active warning bits
+   * @param stickyFaults packed sticky fault bits
+   * @param stickyWarnings packed sticky warning bits
+   * @param isFollower whether the controller is following another controller
+   * @param status HAL status associated with the read
+   * @param timestamp CAN frame timestamp in microseconds
+   */
   public A301PeriodicStatus1(
       int faults,
       int warnings,
@@ -113,6 +123,13 @@ public class A301PeriodicStatus1 {
     this.timestamp = timestamp;
   }
 
+  /**
+   * Returns whether a bit is set in a packed value.
+   *
+   * @param value packed bit field
+   * @param bit bit index
+   * @return true when the bit is set
+   */
   private static boolean getBit(int value, int bit) {
     return (value & (1 << bit)) != 0;
   }

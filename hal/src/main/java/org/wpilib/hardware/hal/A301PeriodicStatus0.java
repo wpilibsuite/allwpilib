@@ -16,7 +16,19 @@ public class A301PeriodicStatus0 {
   public final int status;
   public final long timestamp;
 
-  /** Constructs A301 periodic status 0 data (called from the HAL). */
+  /**
+   * Constructs A301 periodic status 0 data (called from the HAL).
+   *
+   * @param appliedOutput applied output duty cycle
+   * @param voltage controller input voltage in volts
+   * @param current motor current in amperes
+   * @param motorTemperature motor temperature in degrees Celsius
+   * @param inverted whether non-position control output is inverted
+   * @param primaryHeartbeatLock whether the primary heartbeat is locked
+   * @param gearboxRPM gearbox speed variant
+   * @param status HAL status associated with the read
+   * @param timestamp CAN frame timestamp in microseconds
+   */
   public A301PeriodicStatus0(
       double appliedOutput,
       double voltage,

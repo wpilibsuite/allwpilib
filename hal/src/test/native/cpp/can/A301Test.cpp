@@ -74,8 +74,7 @@ TEST_CASE("A301 setpoint frames", "[hal][a301]") {
           [](const char*, void* param, int32_t busId, uint32_t messageId,
              const HAL_CANMessage* message, int32_t periodMs, int32_t* status) {
             auto data = static_cast<SendData*>(param);
-            data->sentFrames->push_back(
-                {busId, messageId, *message, periodMs});
+            data->sentFrames->push_back({busId, messageId, *message, periodMs});
             if (data->failStops &&
                 periodMs == HAL_CAN_SEND_PERIOD_STOP_REPEATING) {
               *status = HAL_CAN_BUFFER_OVERRUN;
@@ -140,6 +139,36 @@ TEST_CASE("A301 setpoint frames", "[hal][a301]") {
   REQUIRE(status == 0);
   REQUIRE_FALSE(sentFrames.empty());
   CHECK(LoadFloatLE(sentFrames.back().message.data) == -0.5f);
+
+  sentFrames.clear();
+  HAL_SetA301Setpoint(a301.handle, 3.0, HAL_A301_CONTROL_TYPE_RELATIVE_POSITION,
+                      0.0, &status);
+  REQUIRE(status == 0);
+  REQUIRE(sentFrames.size() == 2);
+  CHECK(sentFrames.back().messageId == (0x02030100u | 3));
+  CHECK(LoadFloatLE(sentFrames.back().message.data) == 3.0f);
+
+  sentFrames.clear();
+  HAL_SetA301Setpoint(a301.handle, 0.25,
+                      HAL_A301_CONTROL_TYPE_ABSOLUTE_POSITION, 0.0, &status);
+  REQUIRE(status == 0);
+  REQUIRE(sentFrames.size() == 2);
+  CHECK(sentFrames.back().messageId == (0x02030200u | 3));
+  CHECK(LoadFloatLE(sentFrames.back().message.data) == 0.25f);
+
+  sentFrames.clear();
+  HAL_SetA301RelativeEncoderPosition(a301.handle, 3.0, &status);
+  REQUIRE(status == 0);
+  REQUIRE(sentFrames.size() == 1);
+  CHECK(sentFrames[0].messageId == (0x02032800u | 3));
+  CHECK(LoadFloatLE(sentFrames[0].message.data) == 3.0f);
+
+  sentFrames.clear();
+  HAL_SetA301AbsoluteEncoderPosition(a301.handle, 0.25, &status);
+  REQUIRE(status == 0);
+  REQUIRE(sentFrames.size() == 1);
+  CHECK(sentFrames[0].messageId == (0x02032880u | 3));
+  CHECK(LoadFloatLE(sentFrames[0].message.data) == 0.25f);
 }
 
 TEST_CASE("A301 periodic status decoding", "[hal][a301]") {
@@ -437,8 +466,8 @@ TEST_CASE("A301 allocation is released by a global handle reset",
   sentFrames.clear();
   wpi::hal::HandleBase::ResetGlobalHandles();
   constexpr std::array<uint32_t, 5> expectedStopIds{
-      0x02030080u | 6, 0x02030000u | 6, 0x02030100u | 6,
-      0x02030180u | 6, 0x02030200u | 6};
+      0x02030080u | 6, 0x02030000u | 6, 0x02030100u | 6, 0x02030180u | 6,
+      0x02030200u | 6};
   REQUIRE(sentFrames.size() == expectedStopIds.size());
   for (uint32_t expectedId : expectedStopIds) {
     CHECK(std::count_if(sentFrames.begin(), sentFrames.end(),

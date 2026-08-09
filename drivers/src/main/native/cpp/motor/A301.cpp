@@ -5,6 +5,7 @@
 #include "wpi/drivers/motor/A301.hpp"
 
 #include <format>
+#include <string>
 
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
@@ -22,8 +23,8 @@ uint16_t PackFaults(const HAL_A301PeriodicStatus1& frame, bool sticky) {
   if (sticky) {
     return frame.otherStickyFault | (frame.motorTypeStickyFault << 1) |
            (frame.sensorStickyFault << 2) | (frame.canStickyFault << 3) |
-           (frame.temperatureStickyFault << 4) |
-           (frame.drvStickyFault << 5) | (frame.escEepromStickyFault << 6) |
+           (frame.temperatureStickyFault << 4) | (frame.drvStickyFault << 5) |
+           (frame.escEepromStickyFault << 6) |
            (frame.firmwareStickyFault << 7) |
            (frame.motorStartupStickyFault << 8);
   }
@@ -36,12 +37,10 @@ uint16_t PackFaults(const HAL_A301PeriodicStatus1& frame, bool sticky) {
 
 uint16_t PackWarnings(const HAL_A301PeriodicStatus1& frame, bool sticky) {
   if (sticky) {
-    return frame.brownoutStickyWarning |
-           (frame.overcurrentStickyWarning << 1) |
+    return frame.brownoutStickyWarning | (frame.overcurrentStickyWarning << 1) |
            (frame.escEepromStickyWarning << 2) |
            (frame.extEepromStickyWarning << 3) |
-           (frame.sensorStickyWarning << 4) |
-           (frame.stallStickyWarning << 5) |
+           (frame.sensorStickyWarning << 4) | (frame.stallStickyWarning << 5) |
            (frame.hasResetStickyWarning << 6) |
            (frame.otherStickyWarning << 7) |
            (frame.overvoltageStickyWarning << 8) |
@@ -51,8 +50,7 @@ uint16_t PackWarnings(const HAL_A301PeriodicStatus1& frame, bool sticky) {
          (frame.escEepromWarning << 2) | (frame.extEepromWarning << 3) |
          (frame.sensorWarning << 4) | (frame.stallWarning << 5) |
          (frame.hasResetWarning << 6) | (frame.otherWarning << 7) |
-         (frame.overvoltageWarning << 8) |
-         (frame.motorLoopSpeedWarning << 9);
+         (frame.overvoltageWarning << 8) | (frame.motorLoopSpeedWarning << 9);
 }
 
 }  // namespace
@@ -88,7 +86,7 @@ A301::A301(CANBusMap bus, int deviceId) {
   auto stack = wpi::util::GetStackTrace(1);
   int32_t status = 0;
   m_handle = HAL_InitializeA301(static_cast<int>(bus), deviceId, stack.c_str(),
-                               &status);
+                                &status);
   WPILIB_CheckErrorStatus(status, "A301 bus {} device {}",
                           static_cast<int>(bus), deviceId);
 
@@ -124,11 +122,10 @@ A301::FirmwareVersion A301::GetFirmwareVersion() const {
 std::string A301::GetFirmwareString() const {
   auto version = GetFirmwareVersion();
   if (version.prerelease != 0) {
-    return std::format("v{}.{}.{} {} Debug Build", version.major,
-                       version.minor, version.patch, version.prerelease);
+    return std::format("v{}.{}.{} {} Debug Build", version.major, version.minor,
+                       version.patch, version.prerelease);
   }
-  return std::format("v{}.{}.{}", version.major, version.minor,
-                     version.patch);
+  return std::format("v{}.{}.{}", version.major, version.minor, version.patch);
 }
 
 A301::BooleanStatusSignal A301::HasActiveFault() const {
@@ -188,7 +185,8 @@ A301::DoubleStatusSignal A301::GetBusVoltage() const {
 
 A301::DoubleStatusSignal A301::GetAppliedOutput() const {
   auto signal = GetPeriodicStatus0();
-  return {signal.Get().appliedOutput, signal.GetStatus(), signal.GetTimestamp()};
+  return {signal.Get().appliedOutput, signal.GetStatus(),
+          signal.GetTimestamp()};
 }
 
 A301::DoubleStatusSignal A301::GetMotorCurrent() const {

@@ -166,96 +166,235 @@ HAL_A301Handle HAL_InitializeA301(int32_t busId, int32_t deviceId,
                                   const char* allocationLocation,
                                   int32_t* status);
 
-/** Frees an A301 handle. */
+/**
+ * Frees an A301 handle.
+ *
+ * @param handle A301 handle
+ */
 void HAL_FreeA301(HAL_A301Handle handle);
 
-/** Returns whether an A301 device ID is valid. */
+/**
+ * Returns whether an A301 device ID is valid.
+ *
+ * @param deviceId device ID to validate
+ * @return true when the device ID is valid
+ */
 HAL_Bool HAL_CheckA301DeviceId(int32_t deviceId);
 
-/** Gets the CAN bus ID associated with a handle. */
+/**
+ * Gets the CAN bus ID associated with a handle.
+ *
+ * @param handle A301 handle
+ * @param status error status variable; 0 on success
+ * @return CAN bus ID
+ */
 int32_t HAL_GetA301BusId(HAL_A301Handle handle, int32_t* status);
 
-/** Gets the resolved device ID associated with a handle. */
+/**
+ * Gets the resolved device ID associated with a handle.
+ *
+ * @param handle A301 handle
+ * @param status error status variable; 0 on success
+ * @return resolved device ID
+ */
 int32_t HAL_GetA301DeviceId(HAL_A301Handle handle, int32_t* status);
 
-/** Gets the A301 firmware version. */
+/**
+ * Gets the A301 firmware version.
+ *
+ * @param handle A301 handle
+ * @param version output firmware version
+ * @param status error status variable; 0 on success
+ */
 void HAL_GetA301FirmwareVersion(HAL_A301Handle handle,
                                 struct HAL_A301FirmwareVersion* version,
                                 int32_t* status);
 
-/** Gets periodic status frame 0. */
+/**
+ * Gets periodic status frame 0.
+ *
+ * @param handle A301 handle
+ * @param frame output decoded status frame
+ * @param status error status variable; 0 on success
+ */
 void HAL_GetA301PeriodicStatus0(HAL_A301Handle handle,
                                 struct HAL_A301PeriodicStatus0* frame,
                                 int32_t* status);
 
-/** Gets periodic status frame 1. */
+/**
+ * Gets periodic status frame 1.
+ *
+ * @param handle A301 handle
+ * @param frame output decoded status frame
+ * @param status error status variable; 0 on success
+ */
 void HAL_GetA301PeriodicStatus1(HAL_A301Handle handle,
                                 struct HAL_A301PeriodicStatus1* frame,
                                 int32_t* status);
 
-/** Gets periodic status frame 2. */
+/**
+ * Gets periodic status frame 2.
+ *
+ * @param handle A301 handle
+ * @param frame output decoded status frame
+ * @param status error status variable; 0 on success
+ */
 void HAL_GetA301PeriodicStatus2(HAL_A301Handle handle,
                                 struct HAL_A301PeriodicStatus2* frame,
                                 int32_t* status);
 
-/** Gets periodic status frame 3. */
+/**
+ * Gets periodic status frame 3.
+ *
+ * @param handle A301 handle
+ * @param frame output decoded status frame
+ * @param status error status variable; 0 on success
+ */
 void HAL_GetA301PeriodicStatus3(HAL_A301Handle handle,
                                 struct HAL_A301PeriodicStatus3* frame,
                                 int32_t* status);
 
-/** Sets the relative encoder position in rotations. */
+/**
+ * Sets the relative encoder position in rotations.
+ *
+ * @param handle A301 handle
+ * @param position position in motor rotations
+ * @param status error status variable; 0 on success
+ */
 void HAL_SetA301RelativeEncoderPosition(HAL_A301Handle handle, double position,
                                         int32_t* status);
 
-/** Sets the absolute encoder position in rotations. */
+/**
+ * Sets the absolute encoder position in rotations.
+ *
+ * @param handle A301 handle
+ * @param position position in rotations
+ * @param status error status variable; 0 on success
+ */
 void HAL_SetA301AbsoluteEncoderPosition(HAL_A301Handle handle, double position,
                                         int32_t* status);
 
-/** Sets an A301 control setpoint. */
+/**
+ * Sets an A301 control setpoint.
+ *
+ * @param handle A301 handle
+ * @param value requested control value
+ * @param controlType controller control mode
+ * @param positionSpeed approach speed for position controls, or zero for
+ * maximum speed
+ * @param status error status variable; 0 on success
+ */
 void HAL_SetA301Setpoint(HAL_A301Handle handle, double value,
                          HAL_A301ControlType controlType, double positionSpeed,
                          int32_t* status);
 
-/** Sets the A301 idle mode. */
+/**
+ * Sets the A301 idle mode.
+ *
+ * @param handle A301 handle
+ * @param idleMode idle mode
+ * @param status error status variable; 0 on success
+ */
 void HAL_SetA301IdleMode(HAL_A301Handle handle, HAL_A301IdleMode idleMode,
                          int32_t* status);
 
-/** Gets the A301 idle mode. */
+/**
+ * Gets the A301 idle mode.
+ *
+ * @param handle A301 handle
+ * @param status error status variable; 0 on success
+ * @return configured idle mode
+ */
 HAL_A301IdleMode HAL_GetA301IdleMode(HAL_A301Handle handle, int32_t* status);
 
-/** Enables or disables continuous input for absolute position control. */
+/**
+ * Enables or disables continuous input for absolute position control.
+ *
+ * @param handle A301 handle
+ * @param enabled true to enable continuous input
+ * @param status error status variable; 0 on success
+ */
 void HAL_SetA301AbsolutePositionContinuousInput(HAL_A301Handle handle,
                                                 HAL_Bool enabled,
                                                 int32_t* status);
 
-/** Gets whether absolute position continuous input is enabled. */
+/**
+ * Gets whether absolute position continuous input is enabled.
+ *
+ * @param handle A301 handle
+ * @param status error status variable; 0 on success
+ * @return true when continuous input is enabled
+ */
 HAL_Bool HAL_GetA301AbsolutePositionContinuousInput(HAL_A301Handle handle,
                                                     int32_t* status);
 
-/** Sets the absolute encoder range offset in rotations. */
+/**
+ * Sets the absolute encoder range offset in rotations.
+ *
+ * @param handle A301 handle
+ * @param offset offset in rotations, from -0.5 to 0.5
+ * @param status error status variable; 0 on success
+ */
 void HAL_SetA301AbsoluteEncoderRangeOffset(HAL_A301Handle handle, double offset,
                                            int32_t* status);
 
-/** Gets the absolute encoder range offset in rotations. */
+/**
+ * Gets the absolute encoder range offset in rotations.
+ *
+ * @param handle A301 handle
+ * @param status error status variable; 0 on success
+ * @return range offset in rotations
+ */
 double HAL_GetA301AbsoluteEncoderRangeOffset(HAL_A301Handle handle,
                                              int32_t* status);
 
-/** Sets whether the A301 output is inverted. */
+/**
+ * Sets whether non-position A301 control output is inverted.
+ *
+ * @param handle A301 handle
+ * @param inverted true to invert the output
+ * @param status error status variable; 0 on success
+ */
 void HAL_SetA301Inverted(HAL_A301Handle handle, HAL_Bool inverted,
                          int32_t* status);
 
-/** Gets whether the A301 output is inverted. */
+/**
+ * Gets whether non-position A301 control output is inverted.
+ *
+ * @param handle A301 handle
+ * @param status error status variable; 0 on success
+ * @return true when the output is inverted
+ */
 HAL_Bool HAL_GetA301Inverted(HAL_A301Handle handle, int32_t* status);
 
-/** Clears active and sticky faults. */
+/**
+ * Clears active and sticky faults and warnings.
+ *
+ * @param handle A301 handle
+ * @param status error status variable; 0 on success
+ */
 void HAL_ClearA301Faults(HAL_A301Handle handle, int32_t* status);
 
-/** Sets an A301 periodic status frame period in milliseconds. */
+/**
+ * Sets an A301 periodic status frame period in milliseconds.
+ *
+ * @param handle A301 handle
+ * @param frame periodic status frame
+ * @param periodMs requested period in milliseconds, from 0 to 1000
+ * @param status error status variable; 0 on success
+ */
 void HAL_SetA301StatusFramePeriod(HAL_A301Handle handle,
                                   HAL_A301PeriodicFrame frame, int32_t periodMs,
                                   int32_t* status);
 
-/** Gets an A301 periodic status frame period in milliseconds. */
+/**
+ * Gets an A301 periodic status frame period in milliseconds.
+ *
+ * @param handle A301 handle
+ * @param frame periodic status frame
+ * @param status error status variable; 0 on success
+ * @return effective period in milliseconds
+ */
 int32_t HAL_GetA301StatusFramePeriod(HAL_A301Handle handle,
                                      HAL_A301PeriodicFrame frame,
                                      int32_t* status);

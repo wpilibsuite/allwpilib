@@ -17,13 +17,11 @@ def test_a301_high_level_api():
     assert a301.set_velocity(125.0) == wpilib_drivers.A301Error.OK
     assert a301.set_relative_position(3.0) == wpilib_drivers.A301Error.OK
     assert (
-        a301.set_relative_position_with_speed(3.0, 50.0)
-        == wpilib_drivers.A301Error.OK
+        a301.set_relative_position_with_speed(3.0, 50.0) == wpilib_drivers.A301Error.OK
     )
     assert a301.set_absolute_position(0.25) == wpilib_drivers.A301Error.OK
     assert (
-        a301.set_absolute_position_with_speed(0.25, 50.0)
-        == wpilib_drivers.A301Error.OK
+        a301.set_absolute_position_with_speed(0.25, 50.0) == wpilib_drivers.A301Error.OK
     )
     assert a301.set_current(10.0) == wpilib_drivers.A301Error.OK
     assert a301.set_relative_encoder_position(2.0) == wpilib_drivers.A301Error.OK
@@ -33,21 +31,16 @@ def test_a301_high_level_api():
         == wpilib_drivers.A301Error.OK
     )
     assert (
-        a301.enable_absolute_position_continuous_input()
-        == wpilib_drivers.A301Error.OK
+        a301.enable_absolute_position_continuous_input() == wpilib_drivers.A301Error.OK
     )
     assert (
-        a301.disable_absolute_position_continuous_input()
-        == wpilib_drivers.A301Error.OK
+        a301.disable_absolute_position_continuous_input() == wpilib_drivers.A301Error.OK
     )
     assert a301.clear_faults() == wpilib_drivers.A301Error.OK
 
     a301.set_inverted(True)
     assert a301.get_inverted()
-    assert (
-        a301.set_absolute_encoder_range_offset(0.25)
-        == wpilib_drivers.A301Error.OK
-    )
+    assert a301.set_absolute_encoder_range_offset(0.25) == wpilib_drivers.A301Error.OK
     assert (
         a301.set_absolute_encoder_range_offset(0.75)
         == wpilib_drivers.A301Error.PARAM_INVALID

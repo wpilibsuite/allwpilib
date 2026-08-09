@@ -37,6 +37,12 @@ enum class A301Error {
 
 namespace detail {
 
+/**
+ * Converts a HAL status code to its REVLib-compatible A301 error category.
+ *
+ * @param status HAL status code
+ * @return corresponding A301 error category
+ */
 constexpr A301Error A301ErrorFromHalStatus(int32_t status) {
   switch (status) {
     case 0:

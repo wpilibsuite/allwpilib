@@ -37,8 +37,7 @@ TEST_CASE("A301 high-level API", "[drivers][a301]") {
   a301.SetInverted(true);
   CHECK(a301.GetInverted());
   CHECK(a301.SetAbsoluteEncoderRangeOffset(0.25) == A301Error::kOk);
-  CHECK(a301.SetAbsoluteEncoderRangeOffset(0.75) ==
-        A301Error::kParamInvalid);
+  CHECK(a301.SetAbsoluteEncoderRangeOffset(0.75) == A301Error::kParamInvalid);
 
   auto voltage = a301.GetBusVoltage();
   CHECK_FALSE(voltage.IsValid());

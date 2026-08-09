@@ -33,6 +33,11 @@ public enum A301Error {
   @SuppressWarnings("MemberName")
   public final int value;
 
+  /**
+   * Constructs an error category.
+   *
+   * @param value REVLib-compatible numeric value
+   */
   A301Error(int value) {
     this.value = value;
   }
@@ -52,6 +57,12 @@ public enum A301Error {
     return kInvalid;
   }
 
+  /**
+   * Converts a HAL status code to its REVLib-compatible error category.
+   *
+   * @param status HAL status code
+   * @return corresponding A301 error category
+   */
   static A301Error fromHalStatus(int status) {
     return switch (status) {
       case 0 -> kOk;

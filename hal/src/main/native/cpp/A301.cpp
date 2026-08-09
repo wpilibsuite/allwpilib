@@ -642,7 +642,11 @@ void HAL_SetA301Setpoint(HAL_A301Handle handle, double value,
   std::array<uint8_t, 8> data{};
   {
     std::scoped_lock lock{a301->stateMutex};
-    if (a301->inverted) {
+    // Position targets use the same coordinate system as the encoder position
+    // setters and periodic position feedback, which are not inverted.
+    if (a301->inverted &&
+        controlType != HAL_A301_CONTROL_TYPE_RELATIVE_POSITION &&
+        controlType != HAL_A301_CONTROL_TYPE_ABSOLUTE_POSITION) {
       value *= -1.0;
     }
     if (a301->activeSetpointApi != api) {

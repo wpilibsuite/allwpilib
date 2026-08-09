@@ -13,6 +13,13 @@ public final class A301StatusSignal<T> {
   private final int m_status;
   private final long m_timestamp;
 
+  /**
+   * Constructs an A301 status signal.
+   *
+   * @param value most recently received value
+   * @param status HAL status associated with the read
+   * @param timestamp CAN frame timestamp in microseconds
+   */
   private A301StatusSignal(T value, int status, long timestamp) {
     m_value = value;
     m_status = status;
@@ -90,6 +97,15 @@ public final class A301StatusSignal<T> {
         Objects.requireNonNull(mapper, "mapper").apply(m_value), m_status, m_timestamp);
   }
 
+  /**
+   * Constructs an A301 status signal for use by the high-level driver.
+   *
+   * @param value most recently received value
+   * @param status HAL status associated with the read
+   * @param timestamp CAN frame timestamp in microseconds
+   * @param <T> value type
+   * @return constructed status signal
+   */
   static <T> A301StatusSignal<T> of(T value, int status, long timestamp) {
     return new A301StatusSignal<>(value, status, timestamp);
   }

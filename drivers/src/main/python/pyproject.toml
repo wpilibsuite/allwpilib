@@ -50,6 +50,7 @@ wraps = ["robotpy-native-wpilib-drivers"]
 depends = ["wpilib"]
 
 [tool.semiwrap.extension_modules."wpilib_drivers._drivers".headers]
+A301StatusSignal = "wpi/drivers/motor/A301StatusSignal.hpp"
 A301Error = "wpi/drivers/motor/A301Error.hpp"
 A301 = "wpi/drivers/motor/A301.hpp"
 Koors40 = "wpi/drivers/motor/Koors40.hpp"
