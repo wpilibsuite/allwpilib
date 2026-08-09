@@ -6,9 +6,16 @@ package org.wpilib.hardware.hal;
 
 /** Data decoded from an A301 periodic status 2 frame. */
 public class A301PeriodicStatus2 {
+  /** Relative encoder velocity in RPM. */
   public final double encoderVelocity;
+
+  /** Relative encoder position in motor rotations. */
   public final double relativeEncoderPosition;
+
+  /** HAL status associated with the read. */
   public final int status;
+
+  /** CAN frame timestamp in microseconds. */
   public final long timestamp;
 
   /**

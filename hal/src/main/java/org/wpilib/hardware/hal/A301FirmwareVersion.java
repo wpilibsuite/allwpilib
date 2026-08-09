@@ -6,11 +6,22 @@ package org.wpilib.hardware.hal;
 
 /** Firmware and hardware version data received from a FIRST A301. */
 public class A301FirmwareVersion {
+  /** Major firmware version. */
   public final int major;
+
+  /** Minor firmware version. */
   public final int minor;
+
+  /** Firmware patch version. */
   public final int patch;
+
+  /** Firmware prerelease identifier. */
   public final int prerelease;
+
+  /** Controller hardware revision. */
   public final int hardwareRevision;
+
+  /** Packed firmware version. */
   public final int raw;
 
   /**

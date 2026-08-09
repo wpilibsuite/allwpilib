@@ -6,55 +6,139 @@ package org.wpilib.hardware.hal;
 
 /** Data decoded from an A301 periodic status 1 frame. */
 public class A301PeriodicStatus1 {
+  /** Packed active fault bits. */
   public final int faults;
+
+  /** Packed active warning bits. */
   public final int warnings;
+
+  /** Packed sticky fault bits. */
   public final int stickyFaults;
+
+  /** Packed sticky warning bits. */
   public final int stickyWarnings;
 
+  /** Whether an uncategorized fault is active. */
   public final boolean otherFault;
+
+  /** Whether a motor-type fault is active. */
   public final boolean motorTypeFault;
+
+  /** Whether a sensor fault is active. */
   public final boolean sensorFault;
+
+  /** Whether a CAN communication fault is active. */
   public final boolean canFault;
+
+  /** Whether a temperature fault is active. */
   public final boolean temperatureFault;
+
+  /** Whether a gate-driver fault is active. */
   public final boolean drvFault;
+
+  /** Whether an ESC EEPROM fault is active. */
   public final boolean escEepromFault;
+
+  /** Whether a firmware fault is active. */
   public final boolean firmwareFault;
+
+  /** Whether a motor-startup fault is active. */
   public final boolean motorStartupFault;
 
+  /** Whether a brownout warning is active. */
   public final boolean brownoutWarning;
+
+  /** Whether an overcurrent warning is active. */
   public final boolean overcurrentWarning;
+
+  /** Whether an ESC EEPROM warning is active. */
   public final boolean escEepromWarning;
+
+  /** Whether an external EEPROM warning is active. */
   public final boolean extEepromWarning;
+
+  /** Whether a sensor warning is active. */
   public final boolean sensorWarning;
+
+  /** Whether a stall warning is active. */
   public final boolean stallWarning;
+
+  /** Whether a controller-reset warning is active. */
   public final boolean hasResetWarning;
+
+  /** Whether an uncategorized warning is active. */
   public final boolean otherWarning;
+
+  /** Whether an overvoltage warning is active. */
   public final boolean overvoltageWarning;
+
+  /** Whether a motor-loop-speed warning is active. */
   public final boolean motorLoopSpeedWarning;
 
+  /** Whether an uncategorized fault has occurred since faults were last cleared. */
   public final boolean otherStickyFault;
+
+  /** Whether a motor-type fault has occurred since faults were last cleared. */
   public final boolean motorTypeStickyFault;
+
+  /** Whether a sensor fault has occurred since faults were last cleared. */
   public final boolean sensorStickyFault;
+
+  /** Whether a CAN communication fault has occurred since faults were last cleared. */
   public final boolean canStickyFault;
+
+  /** Whether a temperature fault has occurred since faults were last cleared. */
   public final boolean temperatureStickyFault;
+
+  /** Whether a gate-driver fault has occurred since faults were last cleared. */
   public final boolean drvStickyFault;
+
+  /** Whether an ESC EEPROM fault has occurred since faults were last cleared. */
   public final boolean escEepromStickyFault;
+
+  /** Whether a firmware fault has occurred since faults were last cleared. */
   public final boolean firmwareStickyFault;
+
+  /** Whether a motor-startup fault has occurred since faults were last cleared. */
   public final boolean motorStartupStickyFault;
 
+  /** Whether a brownout warning has occurred since warnings were last cleared. */
   public final boolean brownoutStickyWarning;
+
+  /** Whether an overcurrent warning has occurred since warnings were last cleared. */
   public final boolean overcurrentStickyWarning;
+
+  /** Whether an ESC EEPROM warning has occurred since warnings were last cleared. */
   public final boolean escEepromStickyWarning;
+
+  /** Whether an external EEPROM warning has occurred since warnings were last cleared. */
   public final boolean extEepromStickyWarning;
+
+  /** Whether a sensor warning has occurred since warnings were last cleared. */
   public final boolean sensorStickyWarning;
+
+  /** Whether a stall warning has occurred since warnings were last cleared. */
   public final boolean stallStickyWarning;
+
+  /** Whether a controller reset has occurred since warnings were last cleared. */
   public final boolean hasResetStickyWarning;
+
+  /** Whether an uncategorized warning has occurred since warnings were last cleared. */
   public final boolean otherStickyWarning;
+
+  /** Whether an overvoltage warning has occurred since warnings were last cleared. */
   public final boolean overvoltageStickyWarning;
+
+  /** Whether a motor-loop-speed warning has occurred since warnings were last cleared. */
   public final boolean motorLoopSpeedStickyWarning;
 
+  /** Whether the controller is following another controller. */
   public final boolean isFollower;
+
+  /** HAL status associated with the read. */
   public final int status;
+
+  /** CAN frame timestamp in microseconds. */
   public final long timestamp;
 
   /**

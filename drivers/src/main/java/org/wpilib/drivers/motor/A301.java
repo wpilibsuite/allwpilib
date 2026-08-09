@@ -106,15 +106,34 @@ public class A301 implements MotorController, AutoCloseable {
 
   /** Active or sticky A301 motor faults. */
   public static final class Faults {
+    /** Whether an uncategorized fault is active. */
     public final boolean other;
+
+    /** Whether a motor-type fault is active. */
     public final boolean motorType;
+
+    /** Whether a sensor fault is active. */
     public final boolean sensor;
+
+    /** Whether a CAN communication fault is active. */
     public final boolean can;
+
+    /** Whether a temperature fault is active. */
     public final boolean temperature;
+
+    /** Whether a gate-driver fault is active. */
     public final boolean gateDriver;
+
+    /** Whether an ESC EEPROM fault is active. */
     public final boolean escEeprom;
+
+    /** Whether a firmware fault is active. */
     public final boolean firmware;
+
+    /** Whether a motor-startup fault is active. */
     public final boolean motorStartup;
+
+    /** Packed fault bits reported by the controller. */
     public final int rawBits;
 
     private Faults(int rawBits) {
@@ -133,16 +152,37 @@ public class A301 implements MotorController, AutoCloseable {
 
   /** Active or sticky A301 motor warnings. */
   public static final class Warnings {
+    /** Whether a brownout warning is active. */
     public final boolean brownout;
+
+    /** Whether an overcurrent warning is active. */
     public final boolean overcurrent;
+
+    /** Whether an ESC EEPROM warning is active. */
     public final boolean escEeprom;
+
+    /** Whether an external EEPROM warning is active. */
     public final boolean extEeprom;
+
+    /** Whether a sensor warning is active. */
     public final boolean sensor;
+
+    /** Whether a stall warning is active. */
     public final boolean stall;
+
+    /** Whether a controller-reset warning is active. */
     public final boolean hasReset;
+
+    /** Whether an uncategorized warning is active. */
     public final boolean other;
+
+    /** Whether an overvoltage warning is active. */
     public final boolean overvoltage;
+
+    /** Whether a motor-loop-speed warning is active. */
     public final boolean motorLoopSpeed;
+
+    /** Packed warning bits reported by the controller. */
     public final int rawBits;
 
     private Warnings(int rawBits) {

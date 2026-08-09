@@ -6,14 +6,31 @@ package org.wpilib.hardware.hal;
 
 /** Data decoded from an A301 periodic status 0 frame. */
 public class A301PeriodicStatus0 {
+  /** Applied output duty cycle. */
   public final double appliedOutput;
+
+  /** Controller input voltage in volts. */
   public final double voltage;
+
+  /** Motor current in amperes. */
   public final double current;
+
+  /** Motor temperature in degrees Celsius. */
   public final int motorTemperature;
+
+  /** Whether non-position control output is inverted. */
   public final boolean inverted;
+
+  /** Whether the primary heartbeat is locked. */
   public final boolean primaryHeartbeatLock;
+
+  /** Gearbox speed variant. */
   public final int gearboxRPM;
+
+  /** HAL status associated with the read. */
   public final int status;
+
+  /** CAN frame timestamp in microseconds. */
   public final long timestamp;
 
   /**

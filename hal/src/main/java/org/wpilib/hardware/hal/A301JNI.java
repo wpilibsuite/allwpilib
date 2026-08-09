@@ -6,27 +6,58 @@ package org.wpilib.hardware.hal;
 
 /** FIRST A301 motor controller HAL JNI functions. */
 public class A301JNI extends JNIWrapper {
+  /** Minimum valid A301 device ID. */
   public static final int MIN_DEVICE_ID = 0;
+
+  /** Maximum valid A301 device ID. */
   public static final int MAX_DEVICE_ID = 62;
+
+  /** Factory-default A301 device ID. */
   public static final int DEFAULT_DEVICE_ID = 3;
 
+  /** Periodic status frame containing output, electrical, and controller-state data. */
   public static final int STATUS_0 = 0;
+
+  /** Periodic status frame containing fault and warning data. */
   public static final int STATUS_1 = 1;
+
+  /** Periodic status frame containing relative encoder data. */
   public static final int STATUS_2 = 2;
+
+  /** Periodic status frame containing absolute encoder data. */
   public static final int STATUS_3 = 3;
 
+  /** Unknown gearbox speed variant. */
   public static final int GEARBOX_RPM_UNKNOWN = 0;
+
+  /** 215 RPM gearbox speed variant. */
   public static final int GEARBOX_RPM_215 = 1;
+
+  /** 500 RPM gearbox speed variant. */
   public static final int GEARBOX_RPM_500 = 2;
 
+  /** Coast idle mode. */
   public static final int IDLE_MODE_COAST = 0;
+
+  /** Brake idle mode. */
   public static final int IDLE_MODE_BRAKE = 1;
 
+  /** Duty-cycle control type. */
   public static final int CONTROL_TYPE_DUTY_CYCLE = 0;
+
+  /** Velocity control type. */
   public static final int CONTROL_TYPE_VELOCITY = 1;
+
+  /** Voltage control type. */
   public static final int CONTROL_TYPE_VOLTAGE = 2;
+
+  /** Relative-position control type. */
   public static final int CONTROL_TYPE_RELATIVE_POSITION = 3;
+
+  /** Absolute-position control type. */
   public static final int CONTROL_TYPE_ABSOLUTE_POSITION = 4;
+
+  /** Motor-current control type. */
   public static final int CONTROL_TYPE_CURRENT = 5;
 
   /**

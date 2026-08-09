@@ -6,8 +6,13 @@ package org.wpilib.hardware.hal;
 
 /** Data decoded from an A301 periodic status 3 frame. */
 public class A301PeriodicStatus3 {
+  /** Absolute encoder position in rotations. */
   public final double absoluteEncoderPosition;
+
+  /** HAL status associated with the read. */
   public final int status;
+
+  /** CAN frame timestamp in microseconds. */
   public final long timestamp;
 
   /**
