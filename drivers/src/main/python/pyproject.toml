@@ -38,6 +38,9 @@ packages = ["wpilib_drivers"]
 
 [tool.semiwrap]
 update_init = ["wpilib_drivers"]
+scan_headers_ignore = [
+    "wpi/drivers/motor/A301StatusSignal.hpp",
+]
 
 [tool.semiwrap.name_transform]
 default = "snake_case"
