@@ -155,23 +155,23 @@ public abstract class OpModeRobot extends RobotBase {
    * Adds an opmode using a factory function that creates the opmode. It's necessary to call
    * publishOpModes() to make the added mode visible to the driver station.
    *
-   * @param factory factory function to create the opmode
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
    * @param textColor text color, or null for default
    * @param backgroundColor background color, or null for default
+   * @param factory factory function to create the opmode
    * @throws IllegalArgumentException if class does not meet criteria
    */
-  public void addOpModeFactory(
-      Supplier<OpMode> factory,
+  public void addOpMode(
       RobotMode mode,
       String name,
       String group,
       String description,
       Color textColor,
-      Color backgroundColor) {
+      Color backgroundColor,
+      Supplier<OpMode> factory) {
     long id = RobotState.addOpMode(mode, name, group, description, textColor, backgroundColor);
     m_opModes.put(id, new OpModeFactory(name, factory));
   }
@@ -180,44 +180,43 @@ public abstract class OpModeRobot extends RobotBase {
    * Adds an opmode using a factory function that creates the opmode. It's necessary to call
    * publishOpModes() to make the added mode visible to the driver station.
    *
-   * @param factory factory function to create the opmode
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
+   * @param factory factory function to create the opmode
    * @throws IllegalArgumentException if class does not meet criteria
    */
-  public void addOpModeFactory(
-      Supplier<OpMode> factory, RobotMode mode, String name, String group, String description) {
-    addOpModeFactory(factory, mode, name, group, description, null, null);
+  public void addOpMode(
+      RobotMode mode, String name, String group, String description, Supplier<OpMode> factory) {
+    addOpMode(mode, name, group, description, null, null, factory);
   }
 
   /**
    * Adds an opmode using a factory function that creates the opmode. It's necessary to call
    * publishOpModes() to make the added mode visible to the driver station.
    *
-   * @param factory factory function to create the opmode
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
+   * @param factory factory function to create the opmode
    * @throws IllegalArgumentException if class does not meet criteria
    */
-  public void addOpModeFactory(
-      Supplier<OpMode> factory, RobotMode mode, String name, String group) {
-    addOpModeFactory(factory, mode, name, group, "");
+  public void addOpMode(RobotMode mode, String name, String group, Supplier<OpMode> factory) {
+    addOpMode(mode, name, group, "", factory);
   }
 
   /**
    * Adds an opmode using a factory function that creates the opmode. It's necessary to call
    * publishOpModes() to make the added mode visible to the driver station.
    *
-   * @param factory factory function to create the opmode
    * @param mode robot mode
    * @param name name of the operating mode
+   * @param factory factory function to create the opmode
    * @throws IllegalArgumentException if class does not meet criteria
    */
-  public void addOpModeFactory(Supplier<OpMode> factory, RobotMode mode, String name) {
-    addOpModeFactory(factory, mode, name, "");
+  public void addOpMode(RobotMode mode, String name, Supplier<OpMode> factory) {
+    addOpMode(mode, name, "", factory);
   }
 
   /**
@@ -227,32 +226,32 @@ public abstract class OpModeRobot extends RobotBase {
    * specific parameter type is used). It's necessary to call publishOpModes() to make the added
    * mode visible to the driver station.
    *
-   * @param cls class to add
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
    * @param textColor text color, or null for default
    * @param backgroundColor background color, or null for default
+   * @param cls class to add
    * @throws IllegalArgumentException if class does not meet criteria
    */
   public void addOpMode(
-      Class<? extends OpMode> cls,
       RobotMode mode,
       String name,
       String group,
       String description,
       Color textColor,
-      Color backgroundColor) {
+      Color backgroundColor,
+      Class<? extends OpMode> cls) {
     checkOpModeClass(cls);
-    addOpModeFactory(
-        () -> constructOpModeClass(cls),
+    addOpMode(
         mode,
         name,
         group,
         description,
         textColor,
-        backgroundColor);
+        backgroundColor,
+        () -> constructOpModeClass(cls));
   }
 
   /**
@@ -262,16 +261,16 @@ public abstract class OpModeRobot extends RobotBase {
    * specific parameter type is used). It's necessary to call publishOpModes() to make the added
    * mode visible to the driver station.
    *
-   * @param cls class to add
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
+   * @param cls class to add
    * @throws IllegalArgumentException if class does not meet criteria
    */
   public void addOpMode(
-      Class<? extends OpMode> cls, RobotMode mode, String name, String group, String description) {
-    addOpMode(cls, mode, name, group, description, null, null);
+      RobotMode mode, String name, String group, String description, Class<? extends OpMode> cls) {
+    addOpMode(mode, name, group, description, null, null, cls);
   }
 
   /**
@@ -281,14 +280,14 @@ public abstract class OpModeRobot extends RobotBase {
    * specific parameter type is used). It's necessary to call publishOpModes() to make the added
    * mode visible to the driver station.
    *
-   * @param cls class to add
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
+   * @param cls class to add
    * @throws IllegalArgumentException if class does not meet criteria
    */
-  public void addOpMode(Class<? extends OpMode> cls, RobotMode mode, String name, String group) {
-    addOpMode(cls, mode, name, group, "");
+  public void addOpMode(RobotMode mode, String name, String group, Class<? extends OpMode> cls) {
+    addOpMode(mode, name, group, "", cls);
   }
 
   /**
@@ -298,13 +297,13 @@ public abstract class OpModeRobot extends RobotBase {
    * specific parameter type is used). It's necessary to call publishOpModes() to make the added
    * mode visible to the driver station.
    *
-   * @param cls class to add
    * @param mode robot mode
    * @param name name of the operating mode
+   * @param cls class to add
    * @throws IllegalArgumentException if class does not meet criteria
    */
-  public void addOpMode(Class<? extends OpMode> cls, RobotMode mode, String name) {
-    addOpMode(cls, mode, name, "");
+  public void addOpMode(RobotMode mode, String name, Class<? extends OpMode> cls) {
+    addOpMode(mode, name, "", cls);
   }
 
   private void addOpModeClassImpl(
