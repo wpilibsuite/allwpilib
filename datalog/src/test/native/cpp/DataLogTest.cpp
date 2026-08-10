@@ -175,6 +175,25 @@ TEST_CASE("DataLogTest ForegroundLargeAppendDoesNotDeadlock",
   CHECK(found);
 }
 
+TEST_CASE("DataLogTest ExtraHeaderCrossesBufferBoundary",
+          "[datalog][data-log]") {
+  for (size_t size : {0u, 16372u, 16373u, 20000u, 32768u}) {
+    DYNAMIC_SECTION("size=" << size) {
+      std::vector<uint8_t> output;
+      std::string expected(size, 'x');
+      {
+        wpi::log::DataLogWriter writer{
+            std::make_unique<wpi::util::raw_uvector_ostream>(output), expected};
+        writer.Flush();
+      }
+      wpi::log::DataLogReader reader{
+          wpi::util::MemoryBuffer::GetMemBufferCopy(output, "extra-header")};
+      REQUIRE(reader.IsValid());
+      CHECK(reader.GetExtraHeader() == expected);
+    }
+  }
+}
+
 TEST_CASE_METHOD(DataLogTest, "DataLogTest SimpleInt", "[datalog][data-log]") {
   int entry = log.Start("test", "int64", "", 1);
   log.AppendInteger(entry, 1, 2);
