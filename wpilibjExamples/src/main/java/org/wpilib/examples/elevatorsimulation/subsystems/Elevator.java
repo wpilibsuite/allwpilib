@@ -4,8 +4,8 @@
 
 package org.wpilib.examples.elevatorsimulation.subsystems;
 
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.examples.elevatorsimulation.Constants;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.ElevatorFeedforward;
 import org.wpilib.math.controller.ProfiledPIDController;

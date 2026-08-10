@@ -81,7 +81,10 @@ class OpModeLifecycleTest {
     wpi::RobotState::ClearOpModes();
   }
 
-  ~OpModeLifecycleTest() { wpi::sim::ResumeTiming(); }
+  ~OpModeLifecycleTest() {
+    wpi::sim::ResumeTiming();
+    wpi::nt::ResetInstance(wpi::nt::GetDefaultInstance());
+  }
 
  protected:
   static int64_t MakeOpModeId(wpi::RobotMode mode, std::string_view name) {

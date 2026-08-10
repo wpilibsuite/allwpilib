@@ -32,9 +32,13 @@ classes:
       GetPort:
       IsConnected:
       GetLeftX:
+      SetLeftXDeadband:
       GetLeftY:
+      SetLeftYDeadband:
       GetRightX:
+      SetRightXDeadband:
       GetRightY:
+      SetRightYDeadband:
       GetAxis:
       AxisLessThan:
       AxisGreaterThan:
@@ -117,4 +121,6 @@ classes:
       GetTouchpadFinger:
       InitSendable:
       GetL2:
+      SetL2Deadband:
       GetR2:
+      SetR2Deadband:

@@ -153,44 +153,116 @@ class DualSenseController
   /**
    * Get the Left X value of the controller.
    *
+   * A deadband of 0.1 is applied by default. Use
+   * SetLeftXDeadband() to change it.
+   *
    * @return the axis value.
    */
   double GetLeftX() const;
 
   /**
+   * Set the deadband for the Left X axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftXDeadband(double deadband);
+
+  /**
    * Get the Left Y value of the controller.
+   *
+   * A deadband of 0.1 is applied by default. Use
+   * SetLeftYDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetLeftY() const;
 
   /**
+   * Set the deadband for the Left Y axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftYDeadband(double deadband);
+
+  /**
    * Get the Right X value of the controller.
+   *
+   * A deadband of 0.1 is applied by default. Use
+   * SetRightXDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetRightX() const;
 
   /**
+   * Set the deadband for the Right X axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightXDeadband(double deadband);
+
+  /**
    * Get the Right Y value of the controller.
+   *
+   * A deadband of 0.1 is applied by default. Use
+   * SetRightYDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetRightY() const;
 
   /**
+   * Set the deadband for the Right Y axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightYDeadband(double deadband);
+
+  /**
    * Get the L 2 value of the controller.
+   *
+   * A deadband of 0.01 is applied by default. Use
+   * SetL2Deadband() to change it.
    *
    * @return the axis value.
    */
   double GetL2() const;
 
   /**
+   * Set the deadband for the L 2 axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetL2Deadband(double deadband);
+
+  /**
    * Get the R 2 value of the controller.
+   *
+   * A deadband of 0.01 is applied by default. Use
+   * SetR2Deadband() to change it.
    *
    * @return the axis value.
    */
   double GetR2() const;
+
+  /**
+   * Set the deadband for the R 2 axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetR2Deadband(double deadband);
 
   /**
    * Get the value of the axis.
@@ -819,6 +891,12 @@ class DualSenseController
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
+  double m_leftXDeadband = 0.1;
+  double m_leftYDeadband = 0.1;
+  double m_rightXDeadband = 0.1;
+  double m_rightYDeadband = 0.1;
+  double m_L2Deadband = 0.01;
+  double m_R2Deadband = 0.01;
   GenericHID* m_hid;
 };
 

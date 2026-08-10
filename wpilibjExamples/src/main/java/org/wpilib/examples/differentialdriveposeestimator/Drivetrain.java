@@ -4,10 +4,10 @@
 
 package org.wpilib.examples.differentialdriveposeestimator;
 
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.fields.Field;
 import org.wpilib.fields.Fields;
 import org.wpilib.hardware.imu.OnboardIMU;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;

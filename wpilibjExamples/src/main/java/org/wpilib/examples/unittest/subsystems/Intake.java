@@ -4,9 +4,9 @@
 
 package org.wpilib.examples.unittest.subsystems;
 
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.examples.unittest.Constants.IntakeConstants;
 import org.wpilib.hardware.bus.CANBusMap;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 

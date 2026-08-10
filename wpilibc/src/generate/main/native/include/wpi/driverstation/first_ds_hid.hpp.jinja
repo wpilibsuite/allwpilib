@@ -115,9 +115,21 @@ class {{ ClassName }}Controller
   /**
    * Get the {{ axis.DocName }} value of the controller.
    *
+   * A deadband of {{ axis.DefaultDeadband }} is applied by default. Use
+   * Set{{ axis.MethodName }}Deadband() to change it.
+   *
    * @return the axis value.
    */
   double Get{{ axis.MethodName }}() const;
+
+  /**
+   * Set the deadband for the {{ axis.DocName }} axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void Set{{ axis.MethodName }}Deadband(double deadband);
 {% endfor %}
   /**
    * Get the value of the axis.
@@ -268,7 +280,9 @@ class {{ ClassName }}Controller
 
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 
- private:
+ private:{% for axis in axes %}
+  double m_{{ axis.Name }}Deadband = {{ axis.DefaultDeadband }};
+{%- endfor %}
   GenericHID* m_hid;
 };
 
