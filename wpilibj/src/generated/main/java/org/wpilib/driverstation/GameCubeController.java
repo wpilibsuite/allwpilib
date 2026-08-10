@@ -11,6 +11,7 @@ import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 
@@ -21,6 +22,8 @@ import org.wpilib.util.sendable.SendableBuilder;
  * is requested the most recent value is returned.
  */
 public class GameCubeController implements HIDDevice, Sendable {
+  private static final double MAX_DEADBAND = Math.nextDown(1.0);
+
   /** The number of touchpads supported by this controller. */
   public static final int TOUCHPAD_COUNT = 0;
 
@@ -110,6 +113,20 @@ public class GameCubeController implements HIDDevice, Sendable {
     }
   }
 
+  private double m_leftXDeadband = 0.1;
+  private double m_leftYDeadband = 0.1;
+  private double m_CStickXDeadband = 0.1;
+  private double m_CStickYDeadband = 0.1;
+  private double m_LTriggerDeadband = 0.01;
+  private double m_RTriggerDeadband = 0.01;
+
+  private static double clampDeadband(double deadband) {
+    if (Double.isNaN(deadband)) {
+      return 0.0;
+    }
+    return Math.clamp(deadband, 0.0, MAX_DEADBAND);
+  }
+
   private final GenericHID m_hid;
 
   /**
@@ -171,55 +188,133 @@ public class GameCubeController implements HIDDevice, Sendable {
   /**
    * Get the Left X value of the controller.
    *
+   * <p>A deadband of 0.1 is applied by default. Use {@link #setLeftXDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getLeftX() {
-    return getAxis(Axis.LEFT_X);
+    return MathUtil.applyDeadband(getAxis(Axis.LEFT_X), m_leftXDeadband);
+  }
+
+  /**
+   * Set the deadband for the Left X axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setLeftXDeadband(double deadband) {
+    m_leftXDeadband = clampDeadband(deadband);
   }
 
   /**
    * Get the Left Y value of the controller.
    *
+   * <p>A deadband of 0.1 is applied by default. Use {@link #setLeftYDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getLeftY() {
-    return getAxis(Axis.LEFT_Y);
+    return MathUtil.applyDeadband(getAxis(Axis.LEFT_Y), m_leftYDeadband);
+  }
+
+  /**
+   * Set the deadband for the Left Y axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setLeftYDeadband(double deadband) {
+    m_leftYDeadband = clampDeadband(deadband);
   }
 
   /**
    * Get the C Stick X value of the controller.
    *
+   * <p>A deadband of 0.1 is applied by default. Use {@link #setCStickXDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getCStickX() {
-    return getAxis(Axis.C_STICK_X);
+    return MathUtil.applyDeadband(getAxis(Axis.C_STICK_X), m_CStickXDeadband);
+  }
+
+  /**
+   * Set the deadband for the C Stick X axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setCStickXDeadband(double deadband) {
+    m_CStickXDeadband = clampDeadband(deadband);
   }
 
   /**
    * Get the C Stick Y value of the controller.
    *
+   * <p>A deadband of 0.1 is applied by default. Use {@link #setCStickYDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getCStickY() {
-    return getAxis(Axis.C_STICK_Y);
+    return MathUtil.applyDeadband(getAxis(Axis.C_STICK_Y), m_CStickYDeadband);
+  }
+
+  /**
+   * Set the deadband for the C Stick Y axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setCStickYDeadband(double deadband) {
+    m_CStickYDeadband = clampDeadband(deadband);
   }
 
   /**
    * Get the L Trigger value of the controller.
    *
+   * <p>A deadband of 0.01 is applied by default. Use {@link #setLTriggerDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getLTrigger() {
-    return getAxis(Axis.L_TRIGGER);
+    return MathUtil.applyDeadband(getAxis(Axis.L_TRIGGER), m_LTriggerDeadband);
+  }
+
+  /**
+   * Set the deadband for the L Trigger axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setLTriggerDeadband(double deadband) {
+    m_LTriggerDeadband = clampDeadband(deadband);
   }
 
   /**
    * Get the R Trigger value of the controller.
    *
+   * <p>A deadband of 0.01 is applied by default. Use {@link #setRTriggerDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getRTrigger() {
-    return getAxis(Axis.R_TRIGGER);
+    return MathUtil.applyDeadband(getAxis(Axis.R_TRIGGER), m_RTriggerDeadband);
+  }
+
+  /**
+   * Set the deadband for the R Trigger axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setRTriggerDeadband(double deadband) {
+    m_RTriggerDeadband = clampDeadband(deadband);
   }
 
   /**

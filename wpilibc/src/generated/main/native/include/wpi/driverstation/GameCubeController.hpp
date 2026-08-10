@@ -143,44 +143,116 @@ class GameCubeController
   /**
    * Get the Left X value of the controller.
    *
+   * A deadband of 0.1 is applied by default. Use
+   * SetLeftXDeadband() to change it.
+   *
    * @return the axis value.
    */
   double GetLeftX() const;
 
   /**
+   * Set the deadband for the Left X axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftXDeadband(double deadband);
+
+  /**
    * Get the Left Y value of the controller.
+   *
+   * A deadband of 0.1 is applied by default. Use
+   * SetLeftYDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetLeftY() const;
 
   /**
+   * Set the deadband for the Left Y axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftYDeadband(double deadband);
+
+  /**
    * Get the C Stick X value of the controller.
+   *
+   * A deadband of 0.1 is applied by default. Use
+   * SetCStickXDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetCStickX() const;
 
   /**
+   * Set the deadband for the C Stick X axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetCStickXDeadband(double deadband);
+
+  /**
    * Get the C Stick Y value of the controller.
+   *
+   * A deadband of 0.1 is applied by default. Use
+   * SetCStickYDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetCStickY() const;
 
   /**
+   * Set the deadband for the C Stick Y axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetCStickYDeadband(double deadband);
+
+  /**
    * Get the L Trigger value of the controller.
+   *
+   * A deadband of 0.01 is applied by default. Use
+   * SetLTriggerDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetLTrigger() const;
 
   /**
+   * Set the deadband for the L Trigger axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLTriggerDeadband(double deadband);
+
+  /**
    * Get the R Trigger value of the controller.
+   *
+   * A deadband of 0.01 is applied by default. Use
+   * SetRTriggerDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetRTrigger() const;
+
+  /**
+   * Set the deadband for the R Trigger axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRTriggerDeadband(double deadband);
 
   /**
    * Get the value of the axis.
@@ -641,6 +713,12 @@ class GameCubeController
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
+  double m_leftXDeadband = 0.1;
+  double m_leftYDeadband = 0.1;
+  double m_CStickXDeadband = 0.1;
+  double m_CStickYDeadband = 0.1;
+  double m_LTriggerDeadband = 0.01;
+  double m_RTriggerDeadband = 0.01;
   GenericHID* m_hid;
 };
 
