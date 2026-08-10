@@ -104,6 +104,9 @@ def update_mostrobotpy_rdev(
     contents = re.sub(
         'wpilib_bin_url = ".*"', f'wpilib_bin_url = "{artifactory_path}"', contents
     )
+    contents = re.sub(
+        'mrclib_bin_url = ".*"', f'mrclib_bin_url = "{artifactory_path}"', contents
+    )
 
     with open("rdev.toml", "w") as f:
         f.write(contents)

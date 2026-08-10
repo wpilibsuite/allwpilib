@@ -150,6 +150,7 @@ def define_mostrobotpy_to_allwpilib():
     EXCLUDES = ["**/meson.build", "**/.gitignore", "**/requirements.txt", "**/.gittrack", "**/.gittrackexclude", "**/run_tests.py"]
 
     # Sync the commands generation scripts
+    # buildifier: disable=list-append
     for (allwpilib_path, mostrobotpy_path) in COMMANDS_GENERATION_SCRIPTS:
         origin_files += [mostrobotpy_path]
         destination_files += [allwpilib_path]
@@ -277,6 +278,7 @@ def define_allwpilib_to_mostrobotpy():
             transformations.append(core.move("subprojects/" + project_info.robotpy_name + "/native-pyproject.toml", "subprojects/" + project_info.native_robotpy_name + "/pyproject.toml"))
 
     # Sync the commands generation scripts
+    # buildifier: disable=list-append
     for (allwpilib_path, mostrobotpy_path) in COMMANDS_GENERATION_SCRIPTS:
         origin_files += [allwpilib_path]
         destination_files += [mostrobotpy_path]
