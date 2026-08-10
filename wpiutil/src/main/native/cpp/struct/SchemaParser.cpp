@@ -81,7 +81,7 @@ Token Lexer::Scan() {
     case -1:
       return {Token::END_OF_INPUT, {}};
     default:
-      if (isAlpha(m_current) || m_current == '_') {
+      if (isAlpha(m_current) || m_current == '_' || m_current >= 0x80) {
         [[likely]] return ScanIdentifier();
       }
       return MakeToken(Token::UNKNOWN);
@@ -99,7 +99,7 @@ Token Lexer::ScanInteger() {
 Token Lexer::ScanIdentifier() {
   do {
     Get();
-  } while (isAlnum(m_current) || m_current == '_');
+  } while (isAlnum(m_current) || m_current == '_' || m_current >= 0x80);
   Unget();
   return MakeToken(Token::IDENTIFIER);
 }
