@@ -17,6 +17,12 @@ DataLogReaderThread::~DataLogReaderThread() {
     m_active = false;
     m_thread.join();
   }
+  if (m_protoPool) {
+    upb_DefPool_Free(m_protoPool);
+  }
+  if (m_arena) {
+    upb_Arena_Free(m_arena);
+  }
 }
 
 void DataLogReaderThread::ReadMain() {

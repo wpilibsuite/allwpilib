@@ -140,10 +140,31 @@ cc_binary(
 cc_test(
     name = "datalog-cpp-test",
     size = "small",
-    srcs = glob(["src/test/native/**/*.cpp"]),
+    srcs = glob(
+        ["src/test/native/**/*.cpp"],
+        exclude = ["src/test/native/cpp/DataLogSanitizerTest.cpp"],
+    ),
     tags = [
         "exclusive",
         "no-asan",
+        "no-tsan",
+    ],
+    deps = [
+        ":datalog",
+        "//thirdparty/catch2",
+        "//wpiutil:wpiutil-testlib",
+    ],
+)
+
+cc_test(
+    name = "datalog-cpp-sanitizer-test",
+    size = "small",
+    srcs = [
+        "src/test/native/cpp/DataLogSanitizerTest.cpp",
+        "src/test/native/cpp/main.cpp",
+    ],
+    tags = [
+        "exclusive",
         "no-tsan",
     ],
     deps = [
