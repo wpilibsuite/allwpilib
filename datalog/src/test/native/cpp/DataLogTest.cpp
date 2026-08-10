@@ -3,8 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <array>
+#include <chrono>
+#include <future>
 #include <memory>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
@@ -154,6 +157,40 @@ TEST_CASE("DataLogTest ExtraHeaderCrossesBufferBoundary",
       CHECK(reader.GetExtraHeader() == expected);
     }
   }
+}
+
+TEST_CASE("DataLogTest ForegroundLargeAppendDoesNotDeadlock",
+          "[datalog][data-log]") {
+  auto output = std::make_shared<std::vector<uint8_t>>();
+  auto writer = std::make_shared<wpi::log::DataLogWriter>(
+      std::make_unique<wpi::util::raw_uvector_ostream>(*output));
+  int entry = writer->Start("raw", "raw", {}, 1);
+  auto payload = std::make_shared<std::vector<uint8_t>>(2 * 1024 * 1024);
+  std::promise<void> complete;
+  auto completed = complete.get_future();
+  std::thread appendThread{
+      [writer, output, payload, entry, complete = std::move(complete)]() mutable {
+        writer->AppendRaw(entry, *payload, 2);
+        complete.set_value();
+      }};
+
+  if (completed.wait_for(std::chrono::seconds{2}) !=
+      std::future_status::ready) {
+    appendThread.detach();
+    FAIL("large foreground append deadlocked");
+  }
+  appendThread.join();
+  writer->Flush();
+
+  wpi::log::DataLogReader reader{
+      wpi::util::MemoryBuffer::GetMemBufferCopy(*output, "large-append")};
+  bool found = false;
+  for (const auto& record : reader) {
+    if (record.GetEntry() == entry && record.GetSize() == payload->size()) {
+      found = true;
+    }
+  }
+  CHECK(found);
 }
 
 TEST_CASE_METHOD(DataLogTest, "DataLogTest SimpleInt", "[datalog][data-log]") {
