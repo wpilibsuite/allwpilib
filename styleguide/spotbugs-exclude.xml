@@ -184,6 +184,7 @@
       <Class name="org.wpilib.math.system.LinearSystem" />
       <Class name="org.wpilib.math.trajectory.Trajectory" />
       <Class name="org.wpilib.command3.SchedulerTelemetryTests" />
+      <Class name="org.wpilib.javacplugin.OpModeAnnotationProcessorTest" />
     </Or>
   </Match>
 </FindBugsFilter>
