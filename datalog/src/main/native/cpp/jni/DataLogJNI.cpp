@@ -426,13 +426,14 @@ Java_org_wpilib_datalog_DataLogJNI_appendRaw
     return;
   }
   CriticalJSpan<const jbyte> cvalue{env, value};
-  if (static_cast<unsigned int>(start + length) > cvalue.size()) {
-    wpi::ThrowIndexOobException(
-        env, "start + len must be smaller than array length");
+  size_t startPos = static_cast<size_t>(start);
+  size_t lengthSize = static_cast<size_t>(length);
+  if (startPos > cvalue.size() || lengthSize > cvalue.size() - startPos) {
+    wpi::ThrowIndexOobException(env, "start + len must be within array length");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->AppendRaw(
-      entry, cvalue.uarray().subspan(start, length), timestamp);
+      entry, cvalue.uarray().subspan(startPos, lengthSize), timestamp);
 }
 
 /*
@@ -461,14 +462,27 @@ Java_org_wpilib_datalog_DataLogJNI_appendRawBuffer
     wpi::ThrowIndexOobException(env, "length must be >= 0");
     return;
   }
-  JSpan<const jbyte> cvalue{env, value, static_cast<size_t>(start + length)};
-  if (!cvalue) {
-    wpi::ThrowIllegalArgumentException(env,
-                                       "value must be a native ByteBuffer");
+  const jlong capacity = env->GetDirectBufferCapacity(value);
+  if (capacity < 0) {
+    wpi::ThrowIllegalArgumentException(env, "value must be a native ByteBuffer");
     return;
   }
+  if (static_cast<jlong>(start) > capacity ||
+      static_cast<jlong>(length) > capacity - static_cast<jlong>(start)) {
+    wpi::ThrowIndexOobException(env,
+                                "start + len must be within buffer capacity");
+    return;
+  }
+  auto* address = static_cast<const uint8_t*>(env->GetDirectBufferAddress(value));
+  if (!address && capacity != 0) {
+    wpi::ThrowIllegalArgumentException(env, "value must be a native ByteBuffer");
+    return;
+  }
+  std::span<const uint8_t> buffer{address, static_cast<size_t>(capacity)};
   reinterpret_cast<DataLog*>(impl)->AppendRaw(
-      entry, cvalue.uarray().subspan(start, length), timestamp);
+      entry, buffer.subspan(static_cast<size_t>(start),
+                            static_cast<size_t>(length)),
+      timestamp);
 }
 
 /*
