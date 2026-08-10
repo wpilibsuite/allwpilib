@@ -9,8 +9,8 @@ classes:
     methods:
       PneumaticHub:
         overloads:
-          CANBusMap:
-          CANBusMap, int:
+          CANBus:
+          CANBus, int:
       GetCompressor:
       DisableCompressor:
       EnableCompressorDigital:

@@ -28,6 +28,6 @@ class Intake : public wpi::cmd::SubsystemBase {
 
   // Double solenoid connected to two channels of a PCM with the default CAN ID
   wpi::DoubleSolenoid piston{
-      wpi::CANBusMap::CAN_S0, wpi::PneumaticsModuleType::CTRE_PCM,
+      wpi::CANBus::CAN_S0, wpi::PneumaticsModuleType::CTRE_PCM,
       IntakeConstants::kSolenoidPorts[0], IntakeConstants::kSolenoidPorts[1]};
 };

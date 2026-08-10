@@ -4,7 +4,7 @@
 
 package org.wpilib.hardware.pneumatic;
 
-import org.wpilib.hardware.bus.CANBusMap;
+import org.wpilib.hardware.bus.CANBus;
 import org.wpilib.hardware.hal.util.AllocationException;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
@@ -28,7 +28,7 @@ public class Solenoid implements Sendable, AutoCloseable {
    * @param moduleType The module type to use.
    * @param channel The channel the solenoid is on.
    */
-  public Solenoid(final CANBusMap busId, final PneumaticsModuleType moduleType, final int channel) {
+  public Solenoid(final CANBus busId, final PneumaticsModuleType moduleType, final int channel) {
     this(busId, PneumaticsBase.getDefaultForType(moduleType), moduleType, channel);
   }
 
@@ -42,7 +42,7 @@ public class Solenoid implements Sendable, AutoCloseable {
    */
   @SuppressWarnings("this-escape")
   public Solenoid(
-      final CANBusMap busId,
+      final CANBus busId,
       final int module,
       final PneumaticsModuleType moduleType,
       final int channel) {

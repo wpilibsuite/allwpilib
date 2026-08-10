@@ -4,7 +4,7 @@
 
 package org.wpilib.hardware.power;
 
-import org.wpilib.hardware.bus.CANBusMap;
+import org.wpilib.hardware.bus.CANBus;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.PowerDistributionFaults;
 import org.wpilib.hardware.hal.PowerDistributionJNI;
@@ -48,7 +48,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @param moduleType Module type (CTRE or REV).
    */
   @SuppressWarnings("this-escape")
-  public PowerDistribution(CANBusMap busId, int module, ModuleType moduleType) {
+  public PowerDistribution(CANBus busId, int module, ModuleType moduleType) {
     m_handle = PowerDistributionJNI.initialize(busId.value, module, moduleType.value);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
@@ -68,7 +68,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @param busId The bus ID
    */
   @SuppressWarnings("this-escape")
-  public PowerDistribution(CANBusMap busId) {
+  public PowerDistribution(CANBus busId) {
     m_handle =
         PowerDistributionJNI.initialize(
             busId.value, kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);

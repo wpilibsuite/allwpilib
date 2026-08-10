@@ -5,7 +5,7 @@
 package org.wpilib.snippets.canpdp;
 
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.bus.CANBusMap;
+import org.wpilib.hardware.bus.CANBus;
 import org.wpilib.hardware.power.PowerDistribution;
 import org.wpilib.smartdashboard.SmartDashboard;
 
@@ -14,7 +14,7 @@ import org.wpilib.smartdashboard.SmartDashboard;
  * via CAN. The information will be displayed under variables through the SmartDashboard.
  */
 public class Robot extends TimedRobot {
-  private final PowerDistribution pdp = new PowerDistribution(CANBusMap.CAN_S0);
+  private final PowerDistribution pdp = new PowerDistribution(CANBus.CAN_S0);
 
   public Robot() {
     // Put the PDP itself to the dashboard

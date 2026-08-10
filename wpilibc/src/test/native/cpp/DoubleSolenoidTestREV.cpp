@@ -12,7 +12,7 @@
 namespace wpi {
 
 TEST_CASE("DoubleSolenoidREVTest ValidInitialization", "[wpilibc]") {
-  DoubleSolenoid solenoid{CANBusMap::CAN_S0, 3,
+  DoubleSolenoid solenoid{CANBus::CAN_S0, 3,
                           wpi::PneumaticsModuleType::CTRE_PCM, 2, 3};
   solenoid.Set(DoubleSolenoid::REVERSE);
   CHECK(DoubleSolenoid::REVERSE == solenoid.Get());
@@ -27,9 +27,9 @@ TEST_CASE("DoubleSolenoidREVTest ValidInitialization", "[wpilibc]") {
 TEST_CASE("DoubleSolenoidREVTest ThrowForwardPortAlreadyInitialized",
           "[wpilibc]") {
   // Single solenoid that is reused for forward port
-  Solenoid solenoid{CANBusMap::CAN_S0, 5, wpi::PneumaticsModuleType::CTRE_PCM,
+  Solenoid solenoid{CANBus::CAN_S0, 5, wpi::PneumaticsModuleType::CTRE_PCM,
                     2};
-  CHECK_THROWS_AS(DoubleSolenoid(CANBusMap::CAN_S0, 5,
+  CHECK_THROWS_AS(DoubleSolenoid(CANBus::CAN_S0, 5,
                                  wpi::PneumaticsModuleType::CTRE_PCM, 2, 3),
                   std::runtime_error);
 }
@@ -37,28 +37,28 @@ TEST_CASE("DoubleSolenoidREVTest ThrowForwardPortAlreadyInitialized",
 TEST_CASE("DoubleSolenoidREVTest ThrowReversePortAlreadyInitialized",
           "[wpilibc]") {
   // Single solenoid that is reused for forward port
-  Solenoid solenoid{CANBusMap::CAN_S0, 6, wpi::PneumaticsModuleType::CTRE_PCM,
+  Solenoid solenoid{CANBus::CAN_S0, 6, wpi::PneumaticsModuleType::CTRE_PCM,
                     3};
-  CHECK_THROWS_AS(DoubleSolenoid(CANBusMap::CAN_S0, 6,
+  CHECK_THROWS_AS(DoubleSolenoid(CANBus::CAN_S0, 6,
                                  wpi::PneumaticsModuleType::CTRE_PCM, 2, 3),
                   std::runtime_error);
 }
 
 TEST_CASE("DoubleSolenoidREVTest ThrowBothPortsAlreadyInitialized",
           "[wpilibc]") {
-  PneumaticsControlModule pcm{CANBusMap::CAN_S0, 6};
+  PneumaticsControlModule pcm{CANBus::CAN_S0, 6};
   // Single solenoid that is reused for forward port
-  Solenoid solenoid0(CANBusMap::CAN_S0, 6, wpi::PneumaticsModuleType::CTRE_PCM,
+  Solenoid solenoid0(CANBus::CAN_S0, 6, wpi::PneumaticsModuleType::CTRE_PCM,
                      2);
-  Solenoid solenoid1(CANBusMap::CAN_S0, 6, wpi::PneumaticsModuleType::CTRE_PCM,
+  Solenoid solenoid1(CANBus::CAN_S0, 6, wpi::PneumaticsModuleType::CTRE_PCM,
                      3);
-  CHECK_THROWS_AS(DoubleSolenoid(CANBusMap::CAN_S0, 6,
+  CHECK_THROWS_AS(DoubleSolenoid(CANBus::CAN_S0, 6,
                                  wpi::PneumaticsModuleType::CTRE_PCM, 2, 3),
                   std::runtime_error);
 }
 
 TEST_CASE("DoubleSolenoidREVTest Toggle", "[wpilibc]") {
-  DoubleSolenoid solenoid{CANBusMap::CAN_S0, 4,
+  DoubleSolenoid solenoid{CANBus::CAN_S0, 4,
                           wpi::PneumaticsModuleType::CTRE_PCM, 2, 3};
   // Bootstrap it into reverse
   solenoid.Set(DoubleSolenoid::REVERSE);
@@ -76,13 +76,13 @@ TEST_CASE("DoubleSolenoidREVTest Toggle", "[wpilibc]") {
 }
 
 TEST_CASE("DoubleSolenoidREVTest InvalidForwardPort", "[wpilibc]") {
-  CHECK_THROWS_AS(DoubleSolenoid(CANBusMap::CAN_S0, 0,
+  CHECK_THROWS_AS(DoubleSolenoid(CANBus::CAN_S0, 0,
                                  wpi::PneumaticsModuleType::CTRE_PCM, 100, 1),
                   std::runtime_error);
 }
 
 TEST_CASE("DoubleSolenoidREVTest InvalidReversePort", "[wpilibc]") {
-  CHECK_THROWS_AS(DoubleSolenoid(CANBusMap::CAN_S0, 0,
+  CHECK_THROWS_AS(DoubleSolenoid(CANBus::CAN_S0, 0,
                                  wpi::PneumaticsModuleType::CTRE_PCM, 0, 100),
                   std::runtime_error);
 }

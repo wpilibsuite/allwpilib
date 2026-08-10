@@ -7,7 +7,7 @@
 #include <memory>
 #include <string_view>
 
-#include "wpi/hardware/bus/CANBusMap.hpp"
+#include "wpi/hardware/bus/CANBus.hpp"
 #include "wpi/hardware/pneumatic/CompressorConfigType.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
 #include "wpi/units/current.hpp"
@@ -274,7 +274,7 @@ class PneumaticsBase {
    * @return module
    */
   static std::shared_ptr<PneumaticsBase> GetForType(
-      CANBusMap busId, int module, PneumaticsModuleType moduleType);
+      CANBus busId, int module, PneumaticsModuleType moduleType);
 
   /**
    * For internal use to get the default for a specific type.

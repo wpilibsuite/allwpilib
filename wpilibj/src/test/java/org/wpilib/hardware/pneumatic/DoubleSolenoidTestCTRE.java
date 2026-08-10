@@ -8,11 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
-import org.wpilib.hardware.bus.CANBusMap;
+import org.wpilib.hardware.bus.CANBus;
 import org.wpilib.hardware.hal.util.AllocationException;
 
 class DoubleSolenoidTestCTRE {
-  private static final CANBusMap kBus = CANBusMap.CAN_S0;
+  private static final CANBus kBus = CANBus.CAN_S0;
 
   @Test
   void testValidInitialization() {

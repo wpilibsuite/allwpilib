@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "wpi/hal/PowerDistribution.h"
-#include "wpi/hardware/bus/CANBusMap.hpp"
+#include "wpi/hardware/bus/CANBus.hpp"
 #include "wpi/util/Handle.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
@@ -42,7 +42,7 @@ class PowerDistribution : public wpi::util::Sendable,
    *
    * @param busId The bus ID.
    */
-  explicit PowerDistribution(CANBusMap busId);
+  explicit PowerDistribution(CANBus busId);
 
   /**
    * Constructs a PowerDistribution object.
@@ -51,7 +51,7 @@ class PowerDistribution : public wpi::util::Sendable,
    * @param module The CAN ID of the PDP/PDH
    * @param moduleType The type of module
    */
-  PowerDistribution(CANBusMap busId, int module, ModuleType moduleType);
+  PowerDistribution(CANBus busId, int module, ModuleType moduleType);
 
   PowerDistribution(PowerDistribution&&) = default;
   PowerDistribution& operator=(PowerDistribution&&) = default;
