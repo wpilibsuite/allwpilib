@@ -40,20 +40,22 @@ void DataLogReaderThread::ReadMain() {
     if (record.IsStart()) {
       DataLogReaderEntry data;
       if (record.GetStartData(&data)) {
-        std::scoped_lock lock{m_mutex};
-        auto& entryPtr = m_entriesById[data.entry];
-        if (entryPtr) {
-          wpi::util::print("...DUPLICATE entry ID, overriding\n");
-        }
-        auto [it, isNew] = m_entriesByName.emplace(data.name, data);
-        if (isNew) {
-          it->second.ranges.emplace_back(recordIt, recordEnd);
-        }
-        entryPtr = &it->second;
-        if (data.type == "structschema" ||
-            data.type == "proto:FileDescriptorProto") {
-          schemaEntries.try_emplace(data.entry, entryPtr,
-                                    std::span<const uint8_t>{});
+        {
+          std::scoped_lock lock{m_mutex};
+          auto& entryPtr = m_entriesById[data.entry];
+          if (entryPtr) {
+            wpi::util::print("...DUPLICATE entry ID, overriding\n");
+          }
+          auto [it, isNew] = m_entriesByName.emplace(data.name, data);
+          if (isNew) {
+            it->second.ranges.emplace_back(recordIt, recordEnd);
+          }
+          entryPtr = &it->second;
+          if (data.type == "structschema" ||
+              data.type == "proto:FileDescriptorProto") {
+            schemaEntries.try_emplace(data.entry, entryPtr,
+                                      std::span<const uint8_t>{});
+          }
         }
         sigEntryAdded(data);
       } else {
