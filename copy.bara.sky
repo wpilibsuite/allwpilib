@@ -19,7 +19,7 @@ MOSTROBOTPY_PROJECTS = [
     ),
     struct(
         wpilib_name = "drivers",
-        robotpy_name = "wpilib-drivers",
+        robotpy_name = "robotpy-wpilib-drivers",
         native_robotpy_name = "robotpy-native-wpilib-drivers",
         has_tests = True,
     ),
@@ -122,7 +122,7 @@ COMMANDS_GENERATION_SCRIPTS = [
     (
         "wpilibj/src/generate/first_ds_hids.schema.json",
         "subprojects/robotpy-commands-v2/tools/hids/first_ds_hids.schema.json",
-    )
+    ),
 ]
 
 def define_mostrobotpy_to_allwpilib():
