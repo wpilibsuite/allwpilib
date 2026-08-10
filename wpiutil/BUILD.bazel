@@ -371,6 +371,7 @@ wpiutil_extension(
 
 define_pybind_library(
     name = "robotpy-wpiutil",
+    extra_pybind_hdrs = glob(["src/main/python/**/*.h"]),
     pkgcfgs = PYBIND_PKGCFG_DEPS,
 )
 

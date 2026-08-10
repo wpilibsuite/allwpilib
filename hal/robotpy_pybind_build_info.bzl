@@ -492,7 +492,7 @@ def wpihal_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         tags = ["manual", "robotpy"],
     )
 
-def define_pybind_library(name, pkgcfgs = []):
+def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -518,7 +518,7 @@ def define_pybind_library(name, pkgcfgs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["src/main/python/hal/**"], exclude = ["src/main/python/hal/**/*.py"], allow_empty = True),
+        srcs = native.glob(["src/main/python/hal/**"], exclude = ["src/main/python/hal/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 
@@ -565,7 +565,7 @@ def define_pybind_library(name, pkgcfgs = []):
     update_yaml_files(
         name = "{}-update-yaml".format(name),
         yaml_output_directory = "src/main/python/semiwrap",
-        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
             "//datalog:robotpy-native-datalog.copy_headers",
             "//hal:robotpy-native-wpihal.copy_headers",
             "//ntcore:robotpy-native-ntcore.copy_headers",
@@ -580,7 +580,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     scan_headers(
         name = "{}-scan-headers".format(name),
-        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
             "//hal:robotpy-native-wpihal.copy_headers",
         ],
         package_root_file = "src/main/python/hal/__init__.py",

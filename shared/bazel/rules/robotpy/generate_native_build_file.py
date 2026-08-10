@@ -20,6 +20,10 @@ def main():
     parser.add_argument("--project_cfg")
     parser.add_argument("--output_file")
     parser.add_argument("--third_party_dirs", nargs="+")
+    parser.add_argument("--native_srcs_root")
+    parser.add_argument("--generated_include_target", default=None)
+    parser.add_argument("--generated_include_root")
+    parser.add_argument("--package_name", required=True)
     args = parser.parse_args()
 
     with open(args.project_cfg, "rb") as fp:
@@ -80,6 +84,27 @@ def main():
     maven_downloads = raw_config["tool"]["hatch"]["build"]["hooks"]["robotpy"][
         "maven_lib_download"
     ]
+
+    third_party_dirs = args.third_party_dirs or []
+    replace_prefix_keys = []
+    if args.native_srcs_root:
+        replace_prefix_keys.append(
+            args.package_name + "/" + args.native_srcs_root + "include"
+        )
+        for d in third_party_dirs:
+            replace_prefix_keys.append(
+                args.package_name
+                + "/"
+                + args.native_srcs_root
+                + "thirdparty/"
+                + d
+                + "/include"
+            )
+
+    if args.generated_include_target:
+        replace_prefix_keys.append(root_package + "/" + args.generated_include_root)
+    replace_prefix_keys.sort()
+
     with open(args.output_file, "w", newline="\n") as f:
         f.write(
             template.render(
@@ -91,6 +116,9 @@ def main():
                 pc_files=pc_files,
                 requires=requires,
                 project_name=project_name,
+                generated_include_target=args.generated_include_target,
+                native_srcs_root=args.native_srcs_root,
+                replace_prefix_keys=replace_prefix_keys,
             )
         )
 
@@ -101,22 +129,18 @@ load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "copy_native_file", "generate_native_files", "robotpy_library")
 
 def define_native_wrapper(name, pyproject_toml = None):
-    pyproject_toml = pyproject_toml or "src/main/python/native-pyproject.toml"
-
     copy_to_directory(
         name = "{}.copy_headers".format(name),
-        srcs = native.glob(["src/main/native/include/**"], allow_empty = True) + native.glob(["src/generated/main/native/include/**"], allow_empty = True){% if third_party_dirs %} + native.glob([
+        srcs = {% if native_srcs_root %}native.glob(["{{native_srcs_root}}include/**"]){% else %}[]{% endif %}{% if generated_include_target %} + ["{{generated_include_target}}"]{% endif %}{% if third_party_dirs %} + native.glob([
         {%- for dir in third_party_dirs %}
-            "src/main/native/thirdparty/{{dir}}/include/**",
+            "{{native_srcs_root}}thirdparty/{{dir}}/include/**",
         {%- endfor %}
         ]){%- endif %},
         out = "native/{{project_name}}/include",
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
-            "{{root_package}}/src/generated/main/native/include": "",
-            "{{root_package}}/src/main/native/include": "",
-            {%- for dir in third_party_dirs %}
-            "{{root_package}}/src/main/native/thirdparty/{{dir}}/include": "",
+        {%- for key in replace_prefix_keys %}
+            "{{key}}": "",
             {%- endfor %}
         },
         verbose = False,
@@ -172,7 +196,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         entry_points = {
             "pkg_config": [
             {%- for pcfile in pc_files %}
-                "{{pcfile.name}} = native.{{pcfile.name}}",
+                "{{pcfile.name}} = native.{{project_name}}",
             {%- endfor %}
             ],
         },

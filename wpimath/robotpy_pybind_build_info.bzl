@@ -1402,7 +1402,7 @@ def publish_library_casters():
         tags = ["robotpy"],
     )
 
-def define_pybind_library(name, pkgcfgs = []):
+def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -1428,7 +1428,7 @@ def define_pybind_library(name, pkgcfgs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["src/main/python/wpimath/**"], exclude = ["src/main/python/wpimath/**/*.py"], allow_empty = True),
+        srcs = native.glob(["src/main/python/wpimath/**"], exclude = ["src/main/python/wpimath/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 
@@ -1471,7 +1471,7 @@ def define_pybind_library(name, pkgcfgs = []):
     update_yaml_files(
         name = "{}-update-yaml".format(name),
         yaml_output_directory = "src/main/python/semiwrap",
-        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
@@ -1483,7 +1483,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     scan_headers(
         name = "{}-scan-headers".format(name),
-        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
             "//wpimath:robotpy-native-wpimath.copy_headers",
         ],
         package_root_file = "src/main/python/wpimath/__init__.py",

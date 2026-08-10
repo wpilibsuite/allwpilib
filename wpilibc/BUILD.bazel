@@ -13,11 +13,16 @@ load("//wpilibc:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//wpilibc:robotpy_pybind_build_info.bzl", "define_pybind_library", "wpilib_extension", "wpilib_simulation_extension")
 
 filegroup(
+    name = "generated-native-include-files",
+    srcs = glob(["src/generated/main/native/include/**/*"]),
+    visibility = ["//wpilibc:__subpackages__"],
+)
+
+filegroup(
     name = "doxygen-files",
     srcs = glob([
-        "src/generated/main/native/include/**/*",
         "src/main/native/include/**/*",
-    ]),
+    ]) + [":generated-native-include-files"],
     visibility = ["//visibility:public"],
 )
 
@@ -203,6 +208,7 @@ package_default_cc_project(
 
 generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-wpilib-generator",
+    generated_include_target = "//wpilibc:generated-native-include-files",
     pyproject_toml = "src/main/python/native-pyproject.toml",
 )
 
@@ -264,6 +270,7 @@ wpilib_simulation_extension(
 
 define_pybind_library(
     name = "robotpy-wpilib",
+    extra_pybind_hdrs = glob(["src/main/python/**/*.h"]),
     pkgcfgs = PKG_CONFIG_DEPS,
 )
 
