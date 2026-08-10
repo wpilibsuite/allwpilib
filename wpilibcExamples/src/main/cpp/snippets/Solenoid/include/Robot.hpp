@@ -44,8 +44,8 @@ class Robot : public wpi::TimedRobot {
   // Solenoid corresponds to a single solenoid.
   // In this case, it's connected to channel 0 of a PH with the default CAN
   // ID.
-  wpi::Solenoid solenoid{wpi::CANBus::CAN_S0,
-                         wpi::PneumaticsModuleType::REV_PH, 0};
+  wpi::Solenoid solenoid{wpi::CANBus::CAN_S0, wpi::PneumaticsModuleType::REV_PH,
+                         0};
 
   // DoubleSolenoid corresponds to a double solenoid.
   // In this case, it's connected to channels 1 and 2 of a PH with the default

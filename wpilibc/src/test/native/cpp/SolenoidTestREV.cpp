@@ -29,8 +29,8 @@ TEST_CASE("SolenoidREVTest DoubleInitialization", "[wpilibc]") {
 
 TEST_CASE("SolenoidREVTest DoubleInitializationFromDoubleSolenoid",
           "[wpilibc]") {
-  DoubleSolenoid solenoid{CANBus::CAN_S0, 3,
-                          wpi::PneumaticsModuleType::REV_PH, 2, 3};
+  DoubleSolenoid solenoid{CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::REV_PH,
+                          2, 3};
   CHECK_THROWS_AS(
       Solenoid(CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::REV_PH, 2),
       std::runtime_error);

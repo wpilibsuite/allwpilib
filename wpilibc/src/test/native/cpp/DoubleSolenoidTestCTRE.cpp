@@ -27,8 +27,7 @@ TEST_CASE("DoubleSolenoidCTRETest ValidInitialization", "[wpilibc]") {
 TEST_CASE("DoubleSolenoidCTRETest ThrowForwardPortAlreadyInitialized",
           "[wpilibc]") {
   // Single solenoid that is reused for forward port
-  Solenoid solenoid{CANBus::CAN_S0, 5, wpi::PneumaticsModuleType::CTRE_PCM,
-                    2};
+  Solenoid solenoid{CANBus::CAN_S0, 5, wpi::PneumaticsModuleType::CTRE_PCM, 2};
   CHECK_THROWS_AS(DoubleSolenoid(CANBus::CAN_S0, 5,
                                  wpi::PneumaticsModuleType::CTRE_PCM, 2, 3),
                   std::runtime_error);
@@ -37,8 +36,7 @@ TEST_CASE("DoubleSolenoidCTRETest ThrowForwardPortAlreadyInitialized",
 TEST_CASE("DoubleSolenoidCTRETest ThrowReversePortAlreadyInitialized",
           "[wpilibc]") {
   // Single solenoid that is reused for forward port
-  Solenoid solenoid{CANBus::CAN_S0, 6, wpi::PneumaticsModuleType::CTRE_PCM,
-                    3};
+  Solenoid solenoid{CANBus::CAN_S0, 6, wpi::PneumaticsModuleType::CTRE_PCM, 3};
   CHECK_THROWS_AS(DoubleSolenoid(CANBus::CAN_S0, 6,
                                  wpi::PneumaticsModuleType::CTRE_PCM, 2, 3),
                   std::runtime_error);
@@ -48,10 +46,8 @@ TEST_CASE("DoubleSolenoidCTRETest ThrowBothPortsAlreadyInitialized",
           "[wpilibc]") {
   PneumaticsControlModule pcm{CANBus::CAN_S0, 6};
   // Single solenoid that is reused for forward port
-  Solenoid solenoid0(CANBus::CAN_S0, 6, wpi::PneumaticsModuleType::CTRE_PCM,
-                     2);
-  Solenoid solenoid1(CANBus::CAN_S0, 6, wpi::PneumaticsModuleType::CTRE_PCM,
-                     3);
+  Solenoid solenoid0(CANBus::CAN_S0, 6, wpi::PneumaticsModuleType::CTRE_PCM, 2);
+  Solenoid solenoid1(CANBus::CAN_S0, 6, wpi::PneumaticsModuleType::CTRE_PCM, 3);
   CHECK_THROWS_AS(DoubleSolenoid(CANBus::CAN_S0, 6,
                                  wpi::PneumaticsModuleType::CTRE_PCM, 2, 3),
                   std::runtime_error);

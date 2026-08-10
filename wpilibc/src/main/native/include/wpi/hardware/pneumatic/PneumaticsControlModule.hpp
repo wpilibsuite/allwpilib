@@ -201,11 +201,9 @@ class PneumaticsControlModule : public PneumaticsBase {
   class DataStore;
   friend class DataStore;
   friend class PneumaticsBase;
-  PneumaticsControlModule(CANBus busId, HAL_CTREPCMHandle handle,
-                          int module);
+  PneumaticsControlModule(CANBus busId, HAL_CTREPCMHandle handle, int module);
 
-  static std::shared_ptr<PneumaticsBase> GetForModule(CANBus busId,
-                                                      int module);
+  static std::shared_ptr<PneumaticsBase> GetForModule(CANBus busId, int module);
 
   std::shared_ptr<DataStore> m_dataStore;
   HAL_CTREPCMHandle m_handle;

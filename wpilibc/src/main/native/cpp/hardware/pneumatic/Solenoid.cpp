@@ -35,8 +35,7 @@ Solenoid::Solenoid(CANBus busId, int module, PneumaticsModuleType moduleType,
                                    m_module->GetModuleNumber(), m_channel);
 }
 
-Solenoid::Solenoid(CANBus busId, PneumaticsModuleType moduleType,
-                   int channel)
+Solenoid::Solenoid(CANBus busId, PneumaticsModuleType moduleType, int channel)
     : Solenoid{busId, PneumaticsBase::GetDefaultForType(moduleType), moduleType,
                channel} {}
 

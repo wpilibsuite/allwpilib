@@ -10,8 +10,7 @@
 
 namespace wpi {
 TEST_CASE("SolenoidCTRETest ValidInitialization", "[wpilibc]") {
-  Solenoid solenoid{CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::CTRE_PCM,
-                    2};
+  Solenoid solenoid{CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2};
   CHECK(2 == solenoid.GetChannel());
 
   solenoid.Set(true);
@@ -22,8 +21,7 @@ TEST_CASE("SolenoidCTRETest ValidInitialization", "[wpilibc]") {
 }
 
 TEST_CASE("SolenoidCTRETest DoubleInitialization", "[wpilibc]") {
-  Solenoid solenoid{CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::CTRE_PCM,
-                    2};
+  Solenoid solenoid{CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2};
   CHECK_THROWS_AS(
       Solenoid(CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2),
       std::runtime_error);
@@ -45,8 +43,7 @@ TEST_CASE("SolenoidCTRETest InvalidChannel", "[wpilibc]") {
 }
 
 TEST_CASE("SolenoidCTRETest Toggle", "[wpilibc]") {
-  Solenoid solenoid{CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::CTRE_PCM,
-                    2};
+  Solenoid solenoid{CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2};
   solenoid.Set(true);
   CHECK(solenoid.Get());
 

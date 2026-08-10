@@ -44,8 +44,8 @@ std::unique_ptr<
 
 // Always called under lock, so we can avoid the double lock from the magic
 // static
-std::weak_ptr<PneumaticHub::DataStore>& PneumaticHub::GetDataStore(
-    CANBus busId, int module) {
+std::weak_ptr<PneumaticHub::DataStore>& PneumaticHub::GetDataStore(CANBus busId,
+                                                                   int module) {
   int busIndex = static_cast<int>(busId);
   int32_t numBuses = HAL_GetNumCanBuses();
   WPILIB_AssertMessage(busIndex >= 0 && busIndex < numBuses,
