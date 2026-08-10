@@ -37,8 +37,7 @@ public class Robot extends TimedRobot {
       new DoubleSolenoid(CANBus.CAN_S0, PneumaticsModuleType.REV_PH, 1, 2);
 
   // Compressor connected to a PH with a default CAN ID (1)
-  private final Compressor compressor =
-      new Compressor(CANBus.CAN_S0, PneumaticsModuleType.REV_PH);
+  private final Compressor compressor = new Compressor(CANBus.CAN_S0, PneumaticsModuleType.REV_PH);
 
   static final int kSolenoidButton = 1;
   static final int kDoubleSolenoidForwardButton = 2;
