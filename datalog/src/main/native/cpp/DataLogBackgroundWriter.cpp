@@ -303,8 +303,8 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
 
   std::unique_lock lock{m_mutex};
   do {
-    bool timedOut = !m_cond.wait_for(lock, periodTime,
-                                    [this] { return m_wakeup; });
+    bool timedOut =
+        !m_cond.wait_for(lock, periodTime, [this] { return m_wakeup; });
     bool doFlush = timedOut || m_doFlush;
     m_wakeup = false;
     m_doFlush = false;
@@ -441,8 +441,8 @@ void DataLogBackgroundWriter::WriterThreadMain(
 
   std::unique_lock lock{m_mutex};
   do {
-    bool timedOut = !m_cond.wait_for(lock, periodTime,
-                                    [this] { return m_wakeup; });
+    bool timedOut =
+        !m_cond.wait_for(lock, periodTime, [this] { return m_wakeup; });
     bool doFlush = timedOut || m_doFlush;
     m_wakeup = false;
     m_doFlush = false;
