@@ -584,13 +584,18 @@ public:
      */
     template <typename Callable>
     void connect(Callable && c) {
-        if (!m_func) {
-          m_func = std::forward<Callable>(c);
-        } else {
-          using slot_t = detail::Slot<Callable, arg_list>;
-          auto s = std::make_shared<slot_t>(std::forward<Callable>(c));
-          add_slot(s);
+        std::function<void(T...)> func{std::forward<Callable>(c)};
+        {
+            lock_type lock(m_mutex);
+            if (!m_func) {
+                m_func = std::move(func);
+                return;
+            }
         }
+
+        using slot_t = detail::Slot<std::function<void(T...)>, arg_list>;
+        auto s = std::make_shared<slot_t>(std::move(func));
+        add_slot(s);
     }
 
     /**
