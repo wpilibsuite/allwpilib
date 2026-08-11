@@ -426,7 +426,8 @@ TEST_CASE_METHOD(SwerveDriveKinematicsTest,
 
   std::array<Rotation2d, 4> expectedAngles;
   for (size_t i = 0; i < 4; i++) {
-    Rotation2d radiusAngle = m_kinematics.GetModules()[i].Angle();
+    Rotation2d radiusAngle =
+        m_kinematics.GetModules()[i].Angle().value_or(0_deg);
 
     // Tangential acceleration: perpendicular to radius (90° CCW from radius)
     Rotation2d tangentialDirection = radiusAngle + Rotation2d{90_deg};
