@@ -462,27 +462,21 @@ Java_org_wpilib_datalog_DataLogJNI_appendRawBuffer
     wpi::ThrowIndexOobException(env, "length must be >= 0");
     return;
   }
-  const jlong capacity = env->GetDirectBufferCapacity(value);
-  if (capacity < 0) {
-    wpi::ThrowIllegalArgumentException(env, "value must be a native ByteBuffer");
+  auto cvalue = JSpan<const jbyte>::Create(
+      env, value, static_cast<size_t>(start), static_cast<size_t>(length));
+  if (!cvalue) {
+    if (cvalue.error() ==
+        JSpan<const jbyte>::DirectBufferError::kOutOfBounds) {
+      wpi::ThrowIndexOobException(
+          env, "start + len must be within buffer capacity");
+    } else {
+      wpi::ThrowIllegalArgumentException(env,
+                                         "value must be a native ByteBuffer");
+    }
     return;
   }
-  if (static_cast<jlong>(start) > capacity ||
-      static_cast<jlong>(length) > capacity - static_cast<jlong>(start)) {
-    wpi::ThrowIndexOobException(env,
-                                "start + len must be within buffer capacity");
-    return;
-  }
-  auto* address = static_cast<const uint8_t*>(env->GetDirectBufferAddress(value));
-  if (!address && capacity != 0) {
-    wpi::ThrowIllegalArgumentException(env, "value must be a native ByteBuffer");
-    return;
-  }
-  std::span<const uint8_t> buffer{address, static_cast<size_t>(capacity)};
-  reinterpret_cast<DataLog*>(impl)->AppendRaw(
-      entry, buffer.subspan(static_cast<size_t>(start),
-                            static_cast<size_t>(length)),
-      timestamp);
+  reinterpret_cast<DataLog*>(impl)->AppendRaw(entry, cvalue->uarray(),
+                                              timestamp);
 }
 
 /*

@@ -7,6 +7,7 @@
 #include <jni.h>
 
 #include <concepts>
+#include <expected>
 #include <queue>
 #include <span>
 #include <string>
@@ -248,6 +249,12 @@ class JSpanBase {
   using jarray_type = typename ArrHelper::jarray_type;
 
  public:
+  /** Error returned when creating a span from a direct byte buffer. */
+  enum class DirectBufferError {
+    kNotDirect,
+    kOutOfBounds,
+  };
+
   JSpanBase(const JSpanBase&) = delete;
   JSpanBase& operator=(const JSpanBase&) = delete;
 
@@ -285,6 +292,42 @@ class JSpanBase {
       wpi::util::print(stderr, "JSpan was passed a null pointer at\n",
                        GetJavaStackTrace(env));
     }
+  }
+
+  /**
+   * Creates a span over a range of a direct byte buffer.
+   *
+   * @param env JRE environment.
+   * @param bb Direct byte buffer.
+   * @param start Start of the range within the buffer.
+   * @param size Size of the range.
+   * @return The requested span, or an error if the object is not a direct byte
+   *         buffer or the range is outside the buffer capacity.
+   */
+  static std::expected<JSpanBase, DirectBufferError> Create(JNIEnv* env,
+                                                            jobject bb,
+                                                            size_t start,
+                                                            size_t size)
+    requires(!IsCritical && Size == std::dynamic_extent)
+  {
+    jlong capacity = bb ? env->GetDirectBufferCapacity(bb) : -1;
+    if (capacity < 0) {
+      return std::unexpected{DirectBufferError::kNotDirect};
+    }
+
+    size_t capacitySize = static_cast<size_t>(capacity);
+    if (start > capacitySize || size > capacitySize - start) {
+      return std::unexpected{DirectBufferError::kOutOfBounds};
+    }
+
+    JSpanBase out{env, bb, size};
+    if (!out.m_elements && capacity != 0) {
+      return std::unexpected{DirectBufferError::kNotDirect};
+    }
+    if (out.m_elements) {
+      out.m_elements += start;
+    }
+    return out;
   }
 
   JSpanBase(JNIEnv* env, jarray_type jarr, size_t size)
