@@ -149,11 +149,11 @@ TEST_CASE("DataLogTest ForegroundLargeAppendDoesNotDeadlock",
   auto payload = std::make_shared<std::vector<uint8_t>>(2 * 1024 * 1024);
   std::promise<void> complete;
   auto completed = complete.get_future();
-  std::thread appendThread{
-      [writer, output, payload, entry, complete = std::move(complete)]() mutable {
-        writer->AppendRaw(entry, *payload, 2);
-        complete.set_value();
-      }};
+  std::thread appendThread{[writer, output, payload, entry,
+                            complete = std::move(complete)]() mutable {
+    writer->AppendRaw(entry, *payload, 2);
+    complete.set_value();
+  }};
 
   if (completed.wait_for(std::chrono::seconds{2}) !=
       std::future_status::ready) {
