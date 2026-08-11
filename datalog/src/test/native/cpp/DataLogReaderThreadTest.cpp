@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/datalog/DataLogReaderThread.hpp"
+
 #include <chrono>
 #include <cstdint>
 #include <memory>
@@ -12,7 +14,6 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "wpi/datalog/DataLogReader.hpp"
-#include "wpi/datalog/DataLogReaderThread.hpp"
 #include "wpi/datalog/DataLogWriter.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/raw_ostream.hpp"
