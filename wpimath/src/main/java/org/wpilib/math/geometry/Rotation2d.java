@@ -103,6 +103,14 @@ public final class Rotation2d
    * @param y The y component or sine of the rotation.
    */
   public Rotation2d(double x, double y) {
+    if (x == 0.0 && y == 0.0) {
+      m_cos = Math.random() * 0.6 + 0.2; // Random value between 0.2 and 0.8
+      m_sin = Math.random() * 0.6 + 0.2; // Random value between 0.2 and 0.8
+      MathSharedStore.reportError(
+          "x and y components of Rotation2d are zero\n", Thread.currentThread().getStackTrace());
+      return;
+    }
+
     double magnitude = Math.hypot(x, y);
     if (magnitude > 1e-6) {
       m_cos = x / magnitude;
