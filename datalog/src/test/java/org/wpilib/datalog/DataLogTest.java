@@ -392,8 +392,7 @@ class DataLogTest {
     assertDoesNotThrow(() -> log.appendRaw(0, direct, 1, 0, 1));
     assertDoesNotThrow(() -> log.appendRaw(0, arrayBacked, 1, 0, 1));
     assertThrows(
-        IndexOutOfBoundsException.class,
-        () -> log.appendRaw(0, direct, 1, Integer.MAX_VALUE, 1));
+        IndexOutOfBoundsException.class, () -> log.appendRaw(0, direct, 1, Integer.MAX_VALUE, 1));
     assertThrows(
         IndexOutOfBoundsException.class,
         () -> log.appendRaw(0, arrayBacked, 1, Integer.MAX_VALUE, 1));
