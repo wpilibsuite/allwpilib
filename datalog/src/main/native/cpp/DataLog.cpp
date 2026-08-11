@@ -268,9 +268,7 @@ void DataLog::SetMetadata(int entry, std::string_view metadata,
 }
 
 uint8_t* DataLog::Reserve(size_t size) {
-  if (size > kBlockSize) {
-    std::terminate();
-  }
+  assert(size <= kBlockSize);
   if (m_outgoing.empty() || size > m_outgoing.back().GetRemaining()) {
     if (m_outgoing.size() == kMaxBufferCount / 2) {
       [[unlikely]] BufferHalfFull();

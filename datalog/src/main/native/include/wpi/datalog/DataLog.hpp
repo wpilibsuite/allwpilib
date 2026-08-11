@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <concepts>
-#include <exception>
 #include <initializer_list>
 #include <optional>
 #include <ranges>
@@ -414,9 +413,7 @@ class DataLog {
     }
 
     uint8_t* Reserve(size_t size) {
-      if (size > GetRemaining()) {
-        std::terminate();
-      }
+      assert(size <= GetRemaining());
       uint8_t* rv = m_buf + m_len;
       m_len += size;
       return rv;
