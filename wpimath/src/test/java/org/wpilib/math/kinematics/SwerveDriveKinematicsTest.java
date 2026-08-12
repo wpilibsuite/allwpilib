@@ -445,7 +445,7 @@ class SwerveDriveKinematicsTest {
         Arrays.stream(m_kinematics.getModules())
             .map(
                 m -> {
-                  Rotation2d radiusAngle = m.getAngle();
+                  Rotation2d radiusAngle = m.getAngle().orElse(Rotation2d.kZero);
 
                   // Tangential acceleration: perpendicular to radius (90° CCW from radius)
                   Rotation2d tangentialDirection = radiusAngle.rotateBy(Rotation2d.kCCW_Pi_2);

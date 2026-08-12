@@ -14,7 +14,7 @@ class Intake:
     def __init__(self) -> None:
         self.motor = wpilib_drivers.PWMSparkMax(IntakeConstants.MOTOR_PORT)
         self.piston = wpilib.DoubleSolenoid(
-            0,
+            wpilib.CANBus.CAN_S0,
             wpilib.PneumaticsModuleType.CTRE_PCM,
             IntakeConstants.PISTON_FWD_CHANNEL,
             IntakeConstants.PISTON_REV_CHANNEL,

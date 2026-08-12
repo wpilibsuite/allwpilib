@@ -34,6 +34,7 @@ class NetworkTablesSettings {
 
  private:
   bool m_restart = true;
+  bool m_reconnect = false;
   bool m_serverOption = true;
   EnumSetting m_mode;
   std::string& m_persistentFilename;
@@ -52,6 +53,7 @@ class NetworkTablesSettings {
 
     NT_Inst m_inst;
     bool m_restart = false;
+    bool m_reconnect = false;
     int m_mode;
     std::string m_iniName;
     std::string m_serverTeam;

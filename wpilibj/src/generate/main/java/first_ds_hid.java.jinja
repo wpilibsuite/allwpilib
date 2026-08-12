@@ -11,6 +11,7 @@ import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 
@@ -21,6 +22,8 @@ import org.wpilib.util.sendable.SendableBuilder;
  * is requested the most recent value is returned.
  */
 public class {{ ClassName }}Controller implements HIDDevice, Sendable {
+  private static final double MAX_DEADBAND = Math.nextDown(1.0);
+
   /** The number of touchpads supported by this controller. */
   public static final int TOUCHPAD_COUNT = {{ touchpads }};
 
@@ -80,6 +83,16 @@ public class {{ ClassName }}Controller implements HIDDevice, Sendable {
     public String toString() {
       return m_name;
     }
+  }
+{% for axis in axes %}
+  private double m_{{ axis.Name }}Deadband = {{ axis.DefaultDeadband }};
+{%- endfor %}
+
+  private static double clampDeadband(double deadband) {
+    if (Double.isNaN(deadband)) {
+      return 0.0;
+    }
+    return Math.clamp(deadband, 0.0, MAX_DEADBAND);
   }
 
   private final GenericHID m_hid;
@@ -151,10 +164,23 @@ public class {{ ClassName }}Controller implements HIDDevice, Sendable {
   /**
    * Get the {{ axis.DocName }} value of the controller.
    *
+   * <p>A deadband of {{ axis.DefaultDeadband }} is applied by default. Use {@link #set{{ axis.MethodName }}Deadband} to change it.
+   *
    * @return The axis value.
    */
   public double get{{ axis.MethodName }}() {
-    return getAxis(Axis.{{ axis.ConstantName }});
+    return MathUtil.applyDeadband(getAxis(Axis.{{ axis.ConstantName }}), m_{{ axis.Name }}Deadband);
+  }
+
+  /**
+   * Set the deadband for the {{ axis.DocName }} axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void set{{ axis.MethodName }}Deadband(double deadband) {
+    m_{{ axis.Name }}Deadband = clampDeadband(deadband);
   }
 {% endfor %}
   /**

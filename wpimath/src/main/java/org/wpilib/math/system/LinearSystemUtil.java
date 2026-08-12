@@ -18,8 +18,8 @@ public final class LinearSystemUtil {
    * Returns true if (A, B) is a stabilizable pair.
    *
    * <p>(A, B) is stabilizable if and only if the uncontrollable eigenvalues of A, if any, have
-   * absolute values less than one, where an eigenvalue is uncontrollable if rank([λI - A, B]) %3C n
-   * where n is the number of states.
+   * absolute values less than one, where an eigenvalue is uncontrollable if rank([λI - A, B]) &lt;
+   * n where n is the number of states.
    *
    * @param <States> Num representing the size of A.
    * @param <Inputs> Num representing the columns of B.
@@ -37,8 +37,8 @@ public final class LinearSystemUtil {
    * Returns true if (A, C) is a detectable pair.
    *
    * <p>(A, C) is detectable if and only if the unobservable eigenvalues of A, if any, have absolute
-   * values less than one, where an eigenvalue is unobservable if rank([λI - A; C]) %3C n where n is
-   * the number of states.
+   * values less than one, where an eigenvalue is unobservable if rank([λI - A; C]) &lt; n where n
+   * is the number of states.
    *
    * @param <States> Num representing the size of A.
    * @param <Outputs> Num representing the rows of C.

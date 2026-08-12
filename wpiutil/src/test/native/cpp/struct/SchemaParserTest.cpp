@@ -37,6 +37,21 @@ TEST_CASE("StructParserTest Simple", "[wpiutil][struct]") {
   CHECK(decl.arraySize == 1u);
 }
 
+TEST_CASE("StructParserTest UTF8Identifiers", "[wpiutil][struct]") {
+  Parser p{"{\U0001f600=1,\u4e8c=2} \U0001f680Type data\U0001f4be;"};
+  ParsedSchema schema;
+  REQUIRE(p.Parse(&schema));
+  REQUIRE(schema.declarations.size() == 1u);
+  auto& decl = schema.declarations[0];
+  CHECK(decl.typeString == "\U0001f680Type");
+  CHECK(decl.name == "data\U0001f4be");
+  REQUIRE(decl.enumValues.size() == 2u);
+  CHECK(decl.enumValues[0].first == "\U0001f600");
+  CHECK(decl.enumValues[0].second == 1);
+  CHECK(decl.enumValues[1].first == "\u4e8c");
+  CHECK(decl.enumValues[1].second == 2);
+}
+
 TEST_CASE("StructParserTest SimpleTrailingSemi", "[wpiutil][struct]") {
   Parser p{"int32 a;"};
   ParsedSchema schema;
