@@ -935,11 +935,42 @@ void DriverStationBackend::ObserveUserProgramStarting() {
 }
 
 RobotMode DriverStationBackend::GetRobotMode() {
+  hal::ControlWord controlWord = GetControlWord();
   if (!::GetInstance().userProgramStarted) {
     return RobotMode::UNKNOWN;
   }
 
-  return GetControlWord().GetRobotMode();
+  return controlWord.GetRobotMode();
+}
+
+bool DriverStationBackend::IsAutonomousEnabled() {
+  hal::ControlWord controlWord = GetControlWord();
+  if (!::GetInstance().userProgramStarted) {
+    return false;
+  }
+
+  return controlWord.GetRobotMode() == RobotMode::AUTONOMOUS &&
+         controlWord.IsEnabled() && controlWord.IsDSAttached();
+}
+
+bool DriverStationBackend::IsTeleopEnabled() {
+  hal::ControlWord controlWord = GetControlWord();
+  if (!::GetInstance().userProgramStarted) {
+    return false;
+  }
+
+  return controlWord.GetRobotMode() == RobotMode::TELEOPERATED &&
+         controlWord.IsEnabled() && controlWord.IsDSAttached();
+}
+
+bool DriverStationBackend::IsUtilityEnabled() {
+  hal::ControlWord controlWord = GetControlWord();
+  if (!::GetInstance().userProgramStarted) {
+    return false;
+  }
+
+  return controlWord.GetRobotMode() == RobotMode::UTILITY &&
+         controlWord.IsEnabled() && controlWord.IsDSAttached();
 }
 
 int64_t DriverStationBackend::GetOpModeId() {

@@ -723,7 +723,7 @@ public final class DriverStationBackend {
   private static boolean m_silenceJoystickAlerts;
   private static final JoystickAlerts[] m_joystickAlerts = new JoystickAlerts[JOYSTICK_PORTS];
 
-  private static boolean m_userProgramStarted = false;
+  private static volatile boolean m_userProgramStarted = false;
   private static final Map<Long, OpModeOption> m_opModes = new HashMap<>();
   private static final ReentrantLock m_opModesMutex = new ReentrantLock();
 
@@ -1433,7 +1433,12 @@ public final class DriverStationBackend {
    * @return True if autonomous should be set and the robot should be enabled.
    */
   public static boolean isAutonomousEnabled() {
-    return isAutonomous() && isEnabled();
+    m_cacheDataMutex.lock();
+    try {
+      return isAutonomous() && isEnabled();
+    } finally {
+      m_cacheDataMutex.unlock();
+    }
   }
 
   /**
@@ -1463,7 +1468,12 @@ public final class DriverStationBackend {
    * @return True if operator-controlled mode should be set and the robot should be enabled.
    */
   public static boolean isTeleopEnabled() {
-    return isTeleop() && isEnabled();
+    m_cacheDataMutex.lock();
+    try {
+      return isTeleop() && isEnabled();
+    } finally {
+      m_cacheDataMutex.unlock();
+    }
   }
 
   /**
@@ -1493,7 +1503,12 @@ public final class DriverStationBackend {
    * @return True if utility mode should be set and the robot should be enabled.
    */
   public static boolean isUtilityEnabled() {
-    return isUtility() && isEnabled();
+    m_cacheDataMutex.lock();
+    try {
+      return isUtility() && isEnabled();
+    } finally {
+      m_cacheDataMutex.unlock();
+    }
   }
 
   private static int convertColorToInt(Color color) {

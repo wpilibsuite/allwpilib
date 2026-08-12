@@ -321,7 +321,7 @@ class DriverStationBackend final {
    * @return True if the robot is being commanded to be in autonomous mode and
    * enabled.
    */
-  static bool IsAutonomousEnabled() { return IsAutonomous() && IsEnabled(); }
+  static bool IsAutonomousEnabled();
 
   /**
    * Check if the DS is commanding teleop mode.
@@ -348,7 +348,7 @@ class DriverStationBackend final {
    * @return True if the robot is being commanded to be in teleop mode and
    * enabled.
    */
-  static bool IsTeleopEnabled() { return IsTeleop() && IsEnabled(); }
+  static bool IsTeleopEnabled();
 
   /**
    * Check if the DS is commanding utility mode.
@@ -375,7 +375,7 @@ class DriverStationBackend final {
    * @return True if the robot is being commanded to be in Utility mode and
    * enabled.
    */
-  static bool IsUtilityEnabled() { return IsUtility() && IsEnabled(); }
+  static bool IsUtilityEnabled();
 
   /**
    * Adds an operating mode option. It's necessary to call PublishOpModes() to
