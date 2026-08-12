@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.Optional;
 import org.wpilib.math.geometry.proto.Translation2dProto;
 import org.wpilib.math.geometry.struct.Translation2dStruct;
 import org.wpilib.math.interpolation.Interpolatable;
@@ -189,10 +190,14 @@ public final class Translation2d
   /**
    * Returns the angle this translation forms with the positive X axis.
    *
-   * @return The angle of the translation
+   * @return The angle of the translation, or an empty Optional if the angle was undefined.
    */
-  public Rotation2d getAngle() {
-    return new Rotation2d(m_x, m_y);
+  public Optional<Rotation2d> getAngle() {
+    if (Math.hypot(m_x, m_y) > 1e-6) {
+      return Optional.of(new Rotation2d(m_x, m_y));
+    } else {
+      return Optional.empty();
+    }
   }
 
   /**

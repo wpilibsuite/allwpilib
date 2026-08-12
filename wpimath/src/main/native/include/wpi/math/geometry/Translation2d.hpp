@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <initializer_list>
+#include <optional>
 #include <span>
 
 #include <Eigen/Core>
@@ -144,10 +145,15 @@ class WPILIB_DLLEXPORT Translation2d final {
   /**
    * Returns the angle this translation forms with the positive X axis.
    *
-   * @return The angle of the translation
+   * @return The angle of the translation, or an empty optional if the angle was
+   *     undefined.
    */
-  constexpr Rotation2d Angle() const {
-    return Rotation2d{m_x.value(), m_y.value()};
+  constexpr std::optional<Rotation2d> Angle() const {
+    if (wpi::units::math::hypot(m_x, m_y) > 1e-6_m) {
+      return Rotation2d{m_x.value(), m_y.value()};
+    } else {
+      return {};
+    }
   }
 
   /**
