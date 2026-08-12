@@ -30,20 +30,29 @@
 
 package org.wpilib.drivers;
 
+import static org.wpilib.units.Units.Hertz;
+import static org.wpilib.units.Units.Meters;
+import static org.wpilib.units.Units.MetersPerSecond;
 import static org.wpilib.units.Units.Millimeters;
+import static org.wpilib.units.Units.Radians;
+import static org.wpilib.units.Units.RadiansPerSecond;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.Objects;
 import org.wpilib.hardware.bus.I2C;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Quaternion;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.AngularVelocity;
 import org.wpilib.units.measure.Distance;
+import org.wpilib.units.measure.Frequency;
+import org.wpilib.units.measure.LinearVelocity;
+import org.wpilib.util.ErrorMessages;
 
 /**
  * Driver for the goBILDA Pinpoint Odometry Computer.
@@ -307,7 +316,7 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws IllegalArgumentException if {@code deviceAddress} is outside the 7-bit address range
    */
   public GoBildaPinpoint(I2C.Port port, int deviceAddress) {
-    Objects.requireNonNull(port, "port");
+    ErrorMessages.requireNonNullParam(port, "port", "GoBildaPinpoint");
     if (deviceAddress < 0 || deviceAddress > 0x7f) {
       throw new IllegalArgumentException("deviceAddress must be a 7-bit I2C address");
     }
@@ -397,12 +406,12 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws IllegalStateException if this driver has been closed
    */
   public void setBulkReadScope(Register... registers) {
-    Objects.requireNonNull(registers, "registers");
+    ErrorMessages.requireNonNullParam(registers, "registers", "setBulkReadScope");
     requireFirmwareVersion3("Flexible bulk reads");
 
     var uniqueRegisters = new LinkedHashSet<Register>();
     for (Register register : registers) {
-      Objects.requireNonNull(register, "registers contains null");
+      ErrorMessages.requireNonNullParam(register, "registers contains null", "setBulkReadScope");
       if (!isIndividuallyReadable(register)) {
         throw new IllegalArgumentException(register + " is not a readable data register");
       }
@@ -433,7 +442,8 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws IllegalStateException if this driver has been closed
    */
   public void setErrorDetectionType(ErrorDetectionType errorDetectionType) {
-    Objects.requireNonNull(errorDetectionType, "errorDetectionType");
+    ErrorMessages.requireNonNullParam(
+        errorDetectionType, "errorDetectionType", "setErrorDetectionType");
     requireOpen();
     if (errorDetectionType == ErrorDetectionType.CRC) {
       requireFirmwareVersion3("CRC error detection");
@@ -472,8 +482,8 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws IllegalStateException if this driver has been closed
    */
   public void setOffsets(Distance xOffset, Distance yOffset) {
-    Objects.requireNonNull(xOffset, "xOffset");
-    Objects.requireNonNull(yOffset, "yOffset");
+    ErrorMessages.requireNonNullParam(xOffset, "xOffset", "setOffsets");
+    ErrorMessages.requireNonNullParam(yOffset, "yOffset", "setOffsets");
     writeFloat(
         Register.X_POD_OFFSET,
         requireFiniteFloat(xOffset.in(Millimeters), "xOffset in millimeters"));
@@ -509,8 +519,8 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws IllegalStateException if this driver has been closed
    */
   public void setEncoderDirections(EncoderDirection xEncoder, EncoderDirection yEncoder) {
-    Objects.requireNonNull(xEncoder, "xEncoder");
-    Objects.requireNonNull(yEncoder, "yEncoder");
+    ErrorMessages.requireNonNullParam(xEncoder, "xEncoder", "setEncoderDirections");
+    ErrorMessages.requireNonNullParam(yEncoder, "yEncoder", "setEncoderDirections");
 
     writeInt(
         Register.DEVICE_CONTROL,
@@ -532,7 +542,8 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws IllegalStateException if this driver has been closed
    */
   public void setEncoderResolution(OdometryPod pod) {
-    setEncoderResolution(Objects.requireNonNull(pod, "pod").m_ticksPerMeter);
+    setEncoderResolution(
+        ErrorMessages.requireNonNullParam(pod, "pod", "setEncoderResolution").m_ticksPerMeter);
   }
 
   /**
@@ -574,10 +585,10 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws IllegalStateException if this driver has been closed
    */
   public void setPose(Pose2d pose) {
-    Objects.requireNonNull(pose, "pose");
-    setXPositionMeters(pose.getX());
-    setYPositionMeters(pose.getY());
-    setHeadingRadians(pose.getRotation().getRadians());
+    ErrorMessages.requireNonNullParam(pose, "pose", "setPose");
+    setXPosition(pose.getMeasureX());
+    setYPosition(pose.getMeasureY());
+    setHeading(pose.getRotation().getMeasure());
   }
 
   /**
@@ -593,6 +604,20 @@ public class GoBildaPinpoint implements AutoCloseable {
   }
 
   /**
+   * Overrides the tracked X position.
+   *
+   * @param position X position
+   * @throws NullPointerException if {@code position} is null
+   * @throws IllegalArgumentException if {@code position} is nonfinite or cannot be represented by
+   *     the device's 32-bit floating-point register
+   * @throws IllegalStateException if this driver has been closed
+   */
+  public void setXPosition(Distance position) {
+    ErrorMessages.requireNonNullParam(position, "position", "setXPosition");
+    setXPositionMeters(position.in(Meters));
+  }
+
+  /**
    * Overrides the tracked Y position.
    *
    * @param positionMeters Y position in meters
@@ -605,6 +630,20 @@ public class GoBildaPinpoint implements AutoCloseable {
   }
 
   /**
+   * Overrides the tracked Y position.
+   *
+   * @param position Y position
+   * @throws NullPointerException if {@code position} is null
+   * @throws IllegalArgumentException if {@code position} is nonfinite or cannot be represented by
+   *     the device's 32-bit floating-point register
+   * @throws IllegalStateException if this driver has been closed
+   */
+  public void setYPosition(Distance position) {
+    ErrorMessages.requireNonNullParam(position, "position", "setYPosition");
+    setYPositionMeters(position.in(Meters));
+  }
+
+  /**
    * Overrides the tracked heading.
    *
    * @param headingRadians heading in radians
@@ -614,6 +653,20 @@ public class GoBildaPinpoint implements AutoCloseable {
    */
   public void setHeadingRadians(double headingRadians) {
     writeFloat(Register.H_ORIENTATION, requireFiniteFloat(headingRadians, "headingRadians"));
+  }
+
+  /**
+   * Overrides the tracked heading.
+   *
+   * @param heading heading
+   * @throws NullPointerException if {@code heading} is null
+   * @throws IllegalArgumentException if {@code heading} is nonfinite or cannot be represented by
+   *     the device's 32-bit floating-point register
+   * @throws IllegalStateException if this driver has been closed
+   */
+  public void setHeading(Angle heading) {
+    ErrorMessages.requireNonNullParam(heading, "heading", "setHeading");
+    setHeadingRadians(heading.in(Radians));
   }
 
   /**
@@ -725,7 +778,7 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws IllegalStateException if this driver has been closed
    */
   public long getFailureCount(Register register) {
-    Objects.requireNonNull(register, "register");
+    ErrorMessages.requireNonNullParam(register, "register", "getFailureCount");
     requireOpen();
     return m_failureCounts[register.ordinal()];
   }
@@ -750,6 +803,16 @@ public class GoBildaPinpoint implements AutoCloseable {
   public double getFrequencyHz() {
     int loopTime = getLoopTimeMicroseconds();
     return loopTime == 0 ? 0.0 : 1_000_000.0 / loopTime;
+  }
+
+  /**
+   * Returns the most recently reported device loop frequency.
+   *
+   * @return loop frequency, or zero when no loop time has been read
+   * @throws IllegalStateException if this driver has been closed
+   */
+  public Frequency getFrequency() {
+    return Hertz.of(getFrequencyHz());
   }
 
   /**
@@ -786,6 +849,16 @@ public class GoBildaPinpoint implements AutoCloseable {
   }
 
   /**
+   * Returns the tracked X position.
+   *
+   * @return X position
+   * @throws IllegalStateException if this driver has been closed
+   */
+  public Distance getXPosition() {
+    return Meters.of(getXPositionMeters());
+  }
+
+  /**
    * Returns the tracked Y position.
    *
    * @return Y position in meters
@@ -794,6 +867,16 @@ public class GoBildaPinpoint implements AutoCloseable {
   public double getYPositionMeters() {
     readIfNotInBulkScope(Register.Y_POSITION);
     return m_yPositionMillimeters / 1000.0;
+  }
+
+  /**
+   * Returns the tracked Y position.
+   *
+   * @return Y position
+   * @throws IllegalStateException if this driver has been closed
+   */
+  public Distance getYPosition() {
+    return Meters.of(getYPositionMeters());
   }
 
   /**
@@ -808,6 +891,16 @@ public class GoBildaPinpoint implements AutoCloseable {
   }
 
   /**
+   * Returns the continuous tracked heading.
+   *
+   * @return heading, not constrained to one rotation
+   * @throws IllegalStateException if this driver has been closed
+   */
+  public Angle getHeading() {
+    return Radians.of(getHeadingRadians());
+  }
+
+  /**
    * Returns the tracked X velocity.
    *
    * @return X velocity in meters per second
@@ -816,6 +909,16 @@ public class GoBildaPinpoint implements AutoCloseable {
   public double getXVelocityMetersPerSecond() {
     readIfNotInBulkScope(Register.X_VELOCITY);
     return m_xVelocityMillimetersPerSecond / 1000.0;
+  }
+
+  /**
+   * Returns the tracked X velocity.
+   *
+   * @return X velocity
+   * @throws IllegalStateException if this driver has been closed
+   */
+  public LinearVelocity getXVelocity() {
+    return MetersPerSecond.of(getXVelocityMetersPerSecond());
   }
 
   /**
@@ -830,6 +933,16 @@ public class GoBildaPinpoint implements AutoCloseable {
   }
 
   /**
+   * Returns the tracked Y velocity.
+   *
+   * @return Y velocity
+   * @throws IllegalStateException if this driver has been closed
+   */
+  public LinearVelocity getYVelocity() {
+    return MetersPerSecond.of(getYVelocityMetersPerSecond());
+  }
+
+  /**
    * Returns the heading velocity.
    *
    * @return heading velocity in radians per second
@@ -838,6 +951,16 @@ public class GoBildaPinpoint implements AutoCloseable {
   public double getHeadingVelocityRadiansPerSecond() {
     readIfNotInBulkScope(Register.H_VELOCITY);
     return m_headingVelocityRadiansPerSecond;
+  }
+
+  /**
+   * Returns the heading velocity.
+   *
+   * @return heading velocity
+   * @throws IllegalStateException if this driver has been closed
+   */
+  public AngularVelocity getHeadingVelocity() {
+    return RadiansPerSecond.of(getHeadingVelocityRadiansPerSecond());
   }
 
   /**
@@ -852,6 +975,16 @@ public class GoBildaPinpoint implements AutoCloseable {
   }
 
   /**
+   * Returns the X pod offset.
+   *
+   * @return X pod offset
+   * @throws IllegalStateException if this driver has been closed
+   */
+  public Distance getXOffset() {
+    return Meters.of(getXOffsetMeters());
+  }
+
+  /**
    * Returns the Y pod offset.
    *
    * @return Y pod offset in meters
@@ -860,6 +993,16 @@ public class GoBildaPinpoint implements AutoCloseable {
   public double getYOffsetMeters() {
     readIfNotInBulkScope(Register.Y_POD_OFFSET);
     return m_yPodOffsetMillimeters / 1000.0;
+  }
+
+  /**
+   * Returns the Y pod offset.
+   *
+   * @return Y pod offset
+   * @throws IllegalStateException if this driver has been closed
+   */
+  public Distance getYOffset() {
+    return Meters.of(getYOffsetMeters());
   }
 
   /**
@@ -920,6 +1063,17 @@ public class GoBildaPinpoint implements AutoCloseable {
   }
 
   /**
+   * Returns the pitch. Requires v3 or newer firmware.
+   *
+   * @return pitch
+   * @throws IllegalStateException if this driver has been closed
+   * @throws UnsupportedOperationException if the firmware is older than v3
+   */
+  public Angle getPitch() {
+    return Radians.of(getPitchRadians());
+  }
+
+  /**
    * Returns the roll. Requires v3 or newer firmware.
    *
    * @return roll in radians
@@ -930,6 +1084,17 @@ public class GoBildaPinpoint implements AutoCloseable {
     requireFirmwareVersion3("Roll output");
     readIfNotInBulkScope(Register.ROLL);
     return m_rollRadians;
+  }
+
+  /**
+   * Returns the roll. Requires v3 or newer firmware.
+   *
+   * @return roll
+   * @throws IllegalStateException if this driver has been closed
+   * @throws UnsupportedOperationException if the firmware is older than v3
+   */
+  public Angle getRoll() {
+    return Radians.of(getRollRadians());
   }
 
   private I2C requireOpen() {
