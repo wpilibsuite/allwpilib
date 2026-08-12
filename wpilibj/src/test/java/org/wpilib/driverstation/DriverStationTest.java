@@ -25,6 +25,11 @@ import org.wpilib.simulation.SimHooks;
 import org.wpilib.util.Alert;
 
 class DriverStationTest {
+  @AfterEach
+  void tearDown() {
+    DriverStationBackend.clearUserProgramStarted();
+  }
+
   @ParameterizedTest
   @MethodSource("isConnectedProvider")
   void testIsConnected(int axisCount, int buttonCount, int povCount, boolean expected) {

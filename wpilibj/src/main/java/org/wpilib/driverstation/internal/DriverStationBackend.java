@@ -22,6 +22,7 @@ import org.wpilib.driverstation.MatchType;
 import org.wpilib.driverstation.POVDirection;
 import org.wpilib.driverstation.TouchpadFinger;
 import org.wpilib.framework.OpModeRobot;
+import org.wpilib.framework.RobotBase;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.hal.AllianceStationID;
 import org.wpilib.hardware.hal.ControlWord;
@@ -1698,6 +1699,28 @@ public final class DriverStationBackend {
   public static void observeUserProgramStarting() {
     m_userProgramStarted = true;
     DriverStationJNI.observeUserProgramStarting();
+  }
+
+  /**
+   * For internal unit testing in WPILib. Not for team use. Has no effect unless called in
+   * simulation mode.
+   *
+   * <p>Resets the {@code m_userProgramStarted} flag for unit tests. Does not reset anything in the
+   * JNI layer.
+   */
+  public static void clearUserProgramStarted() {
+    if (!RobotBase.isSimulation()) {
+      // NOP unless running in sim. We don't want teams to call this; it would prevent their
+      // programs from transitioning between modes and from detecting opmode selections.
+      reportWarning(
+          "DriverStationBackend.clearUserProgramStarted() was called! "
+              + "This method exists solely for internal WPILib unit tests "
+              + "and does nothing in team code.",
+          true);
+      return;
+    }
+
+    m_userProgramStarted = false;
   }
 
   /**
