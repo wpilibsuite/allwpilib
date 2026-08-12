@@ -285,57 +285,97 @@ class DriverStationBackend final {
    * <p>Note that this does not indicate whether the robot is enabled or
    * disabled.
    *
+   * <p>This method always returns RobotMode::UNKNOWN while the main robot
+   * class is being constructed and initialized (more specifically, it returns
+   * RobotMode::UNKNOWN until ObserveUserProgramStarting() is called, which
+   * the WPILib framework will automatically call during
+   * TimedRobot::StartCompetition() and OpModeRobot::StartCompetition()).
+   *
    * @return robot mode
    */
-  static RobotMode GetRobotMode() { return GetControlWord().GetRobotMode(); }
+  static RobotMode GetRobotMode();
 
   /**
    * Check if the DS is commanding autonomous mode.
    *
+   * <p>This method always returns false while the main robot class is being
+   * constructed and initialized (more specifically, it returns false until
+   * ObserveUserProgramStarting() is called, which the WPILib framework will
+   * automatically call during TimedRobot::StartCompetition() and
+   * OpModeRobot::StartCompetition()).
+   *
    * @return True if the robot is being commanded to be in autonomous mode
    */
-  static bool IsAutonomous() { return GetControlWord().IsAutonomous(); }
+  static bool IsAutonomous() { return GetRobotMode() == RobotMode::AUTONOMOUS; }
 
   /**
    * Check if the DS is commanding autonomous mode and if it has enabled the
    * robot.
    *
+   * <p>This method always returns false while the main robot class is being
+   * constructed and initialized (more specifically, it returns false until
+   * ObserveUserProgramStarting() is called, which the WPILib framework will
+   * automatically call during TimedRobot::StartCompetition() and
+   * OpModeRobot::StartCompetition()).
+   *
    * @return True if the robot is being commanded to be in autonomous mode and
    * enabled.
    */
-  static bool IsAutonomousEnabled() {
-    return GetControlWord().IsAutonomousEnabled();
-  }
+  static bool IsAutonomousEnabled() { return IsAutonomous() && IsEnabled(); }
 
   /**
    * Check if the DS is commanding teleop mode.
    *
+   * <p>This method always returns false while the main robot class is being
+   * constructed and initialized (more specifically, it returns false until
+   * ObserveUserProgramStarting() is called, which the WPILib framework will
+   * automatically call during TimedRobot::StartCompetition() and
+   * OpModeRobot::StartCompetition()).
+   *
    * @return True if the robot is being commanded to be in teleop mode
    */
-  static bool IsTeleop() { return GetControlWord().IsTeleop(); }
+  static bool IsTeleop() { return GetRobotMode() == RobotMode::TELEOPERATED; }
 
   /**
    * Check if the DS is commanding teleop mode and if it has enabled the robot.
    *
+   * <p>This method always returns false while the main robot class is being
+   * constructed and initialized (more specifically, it returns false until
+   * ObserveUserProgramStarting() is called, which the WPILib framework will
+   * automatically call during TimedRobot::StartCompetition() and
+   * OpModeRobot::StartCompetition()).
+   *
    * @return True if the robot is being commanded to be in teleop mode and
    * enabled.
    */
-  static bool IsTeleopEnabled() { return GetControlWord().IsTeleopEnabled(); }
+  static bool IsTeleopEnabled() { return IsTeleop() && IsEnabled(); }
 
   /**
    * Check if the DS is commanding utility mode.
    *
+   * <p>This method always returns false while the main robot class is being
+   * constructed and initialized (more specifically, it returns false until
+   * ObserveUserProgramStarting() is called, which the WPILib framework will
+   * automatically call during TimedRobot::StartCompetition() and
+   * OpModeRobot::StartCompetition()).
+   *
    * @return True if the robot is being commanded to be in utility mode
    */
-  static bool IsUtility() { return GetControlWord().IsUtility(); }
+  static bool IsUtility() { return GetRobotMode() == RobotMode::UTILITY; }
 
   /**
    * Check if the DS is commanding Utility mode and if it has enabled the robot.
    *
+   * <p>This method always returns false while the main robot class is being
+   * constructed and initialized (more specifically, it returns false until
+   * ObserveUserProgramStarting() is called, which the WPILib framework will
+   * automatically call during TimedRobot::StartCompetition() and
+   * OpModeRobot::StartCompetition()).
+   *
    * @return True if the robot is being commanded to be in Utility mode and
    * enabled.
    */
-  static bool IsUtilityEnabled() { return GetControlWord().IsUtilityEnabled(); }
+  static bool IsUtilityEnabled() { return IsUtility() && IsEnabled(); }
 
   /**
    * Adds an operating mode option. It's necessary to call PublishOpModes() to

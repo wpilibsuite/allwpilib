@@ -934,6 +934,14 @@ void DriverStationBackend::ObserveUserProgramStarting() {
   HAL_ObserveUserProgramStarting();
 }
 
+RobotMode DriverStationBackend::GetRobotMode() {
+  if (!::GetInstance().userProgramStarted) {
+    return RobotMode::UNKNOWN;
+  }
+
+  return GetControlWord().GetRobotMode();
+}
+
 int64_t DriverStationBackend::GetOpModeId() {
   if (!::GetInstance().userProgramStarted) {
     return 0;
