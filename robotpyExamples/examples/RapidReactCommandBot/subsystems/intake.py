@@ -18,7 +18,7 @@ class Intake(Subsystem):
 
         # Double solenoid connected to two channels of a PCM with the default CAN ID
         self.pistons = wpilib.DoubleSolenoid(
-            0,
+            wpilib.CANBus.CAN_S0,
             wpilib.PneumaticsModuleType.CTRE_PCM,
             IntakeConstants.SOLENOID_PORTS[0],
             IntakeConstants.SOLENOID_PORTS[1],

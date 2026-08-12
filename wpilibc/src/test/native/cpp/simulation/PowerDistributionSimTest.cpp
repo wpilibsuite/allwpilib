@@ -25,7 +25,8 @@ TEST_CASE("PowerDistributionSimTest Initialize", "[wpilibc][simulation]") {
   BooleanCallback callback;
 
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
-  PowerDistribution pdp(0, 2, wpi::PowerDistribution::ModuleType::CTRE);
+  PowerDistribution pdp(CANBus::CAN_S0, 2,
+                        wpi::PowerDistribution::ModuleType::CTRE);
   CHECK(sim.GetInitialized());
   CHECK(callback.WasTriggered());
   CHECK(callback.GetLastValue());
@@ -38,7 +39,8 @@ TEST_CASE("PowerDistributionSimTest Initialize", "[wpilibc][simulation]") {
 
 TEST_CASE("PowerDistributionSimTest SetTemperature", "[wpilibc][simulation]") {
   HAL_Initialize();
-  PowerDistribution pdp{0, 2, wpi::PowerDistribution::ModuleType::CTRE};
+  PowerDistribution pdp{CANBus::CAN_S0, 2,
+                        wpi::PowerDistribution::ModuleType::CTRE};
   PowerDistributionSim sim(pdp);
 
   DoubleCallback callback;
@@ -53,7 +55,8 @@ TEST_CASE("PowerDistributionSimTest SetTemperature", "[wpilibc][simulation]") {
 
 TEST_CASE("PowerDistributionSimTest SetVoltage", "[wpilibc][simulation]") {
   HAL_Initialize();
-  PowerDistribution pdp{0, 2, wpi::PowerDistribution::ModuleType::CTRE};
+  PowerDistribution pdp{CANBus::CAN_S0, 2,
+                        wpi::PowerDistribution::ModuleType::CTRE};
   PowerDistributionSim sim(pdp);
 
   DoubleCallback callback;
@@ -68,7 +71,8 @@ TEST_CASE("PowerDistributionSimTest SetVoltage", "[wpilibc][simulation]") {
 
 TEST_CASE("PowerDistributionSimTest SetCurrent", "[wpilibc][simulation]") {
   HAL_Initialize();
-  PowerDistribution pdp{0, 2, wpi::PowerDistribution::ModuleType::CTRE};
+  PowerDistribution pdp{CANBus::CAN_S0, 2,
+                        wpi::PowerDistribution::ModuleType::CTRE};
   PowerDistributionSim sim(pdp);
 
   for (int channel = 0; channel < HAL_GetNumCTREPDPChannels(); ++channel) {
@@ -87,7 +91,8 @@ TEST_CASE("PowerDistributionSimTest SetCurrent", "[wpilibc][simulation]") {
 
 TEST_CASE("PowerDistributionSimTest GetAllCurrents", "[wpilibc][simulation]") {
   HAL_Initialize();
-  PowerDistribution pdp{0, 2, wpi::PowerDistribution::ModuleType::REV};
+  PowerDistribution pdp{CANBus::CAN_S0, 2,
+                        wpi::PowerDistribution::ModuleType::REV};
   PowerDistributionSim sim(pdp);
 
   // setup

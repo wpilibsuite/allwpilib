@@ -10,7 +10,7 @@
 
 namespace wpi {
 TEST_CASE("SolenoidREVTest ValidInitialization", "[wpilibc]") {
-  Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::REV_PH, 2};
+  Solenoid solenoid{CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::REV_PH, 2};
   CHECK(2 == solenoid.GetChannel());
 
   solenoid.Set(true);
@@ -21,25 +21,29 @@ TEST_CASE("SolenoidREVTest ValidInitialization", "[wpilibc]") {
 }
 
 TEST_CASE("SolenoidREVTest DoubleInitialization", "[wpilibc]") {
-  Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::REV_PH, 2};
-  CHECK_THROWS_AS(Solenoid(0, 3, wpi::PneumaticsModuleType::REV_PH, 2),
-                  std::runtime_error);
+  Solenoid solenoid{CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::REV_PH, 2};
+  CHECK_THROWS_AS(
+      Solenoid(CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::REV_PH, 2),
+      std::runtime_error);
 }
 
 TEST_CASE("SolenoidREVTest DoubleInitializationFromDoubleSolenoid",
           "[wpilibc]") {
-  DoubleSolenoid solenoid{0, 3, wpi::PneumaticsModuleType::REV_PH, 2, 3};
-  CHECK_THROWS_AS(Solenoid(0, 3, wpi::PneumaticsModuleType::REV_PH, 2),
-                  std::runtime_error);
+  DoubleSolenoid solenoid{CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::REV_PH,
+                          2, 3};
+  CHECK_THROWS_AS(
+      Solenoid(CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::REV_PH, 2),
+      std::runtime_error);
 }
 
 TEST_CASE("SolenoidREVTest InvalidChannel", "[wpilibc]") {
-  CHECK_THROWS_AS(Solenoid(0, 3, wpi::PneumaticsModuleType::REV_PH, 100),
-                  std::runtime_error);
+  CHECK_THROWS_AS(
+      Solenoid(CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::REV_PH, 100),
+      std::runtime_error);
 }
 
 TEST_CASE("SolenoidREVTest Toggle", "[wpilibc]") {
-  Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::REV_PH, 2};
+  Solenoid solenoid{CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::REV_PH, 2};
   solenoid.Set(true);
   CHECK(solenoid.Get());
 
