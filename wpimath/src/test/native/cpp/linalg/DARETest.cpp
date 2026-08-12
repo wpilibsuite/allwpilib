@@ -5,17 +5,15 @@
 #include "wpi/math/linalg/DARE.hpp"
 
 #include <expected>
-#include <format>
 
+#include <Eigen/Cholesky>
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
 #include <catch2/catch_message.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/TestAssertions.hpp"
-#include "wpi/math/fmt/Eigen.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
-#include "wpi/util/print.hpp"
 
 // 2x1
 extern template std::expected<Eigen::Matrix<double, 2, 2>, wpi::math::DAREError>
@@ -105,14 +103,11 @@ void ExpectDARESolution(const Eigen::Ref<const Eigen::MatrixXd>& A,
                         const Eigen::Ref<const Eigen::MatrixXd>& X) {
   // Check that X is the solution to the DARE
   // Y = AᵀXA − X − AᵀXB(BᵀXB + R)⁻¹BᵀXA + Q = 0
-  // clang-format off
   Eigen::MatrixXd Y =
-      A.transpose() * X * A
-      - X
-      - (A.transpose() * X * B * (B.transpose() * X * B + R).inverse()
-        * B.transpose() * X * A)
-      + Q;
-  // clang-format on
+      A.transpose() * X * A - X -
+      A.transpose() * X * B *
+          (B.transpose() * X * B + R).llt().solve(B.transpose() * X * A) +
+      Q;
   ExpectMatrixEqual(Y, Eigen::MatrixXd::Zero(X.rows(), X.cols()), 1e-10);
 }
 
@@ -124,14 +119,12 @@ void ExpectDARESolution(const Eigen::Ref<const Eigen::MatrixXd>& A,
                         const Eigen::Ref<const Eigen::MatrixXd>& X) {
   // Check that X is the solution to the DARE
   // Y = AᵀXA − X − (AᵀXB + N)(BᵀXB + R)⁻¹(BᵀXA + Nᵀ) + Q = 0
-  // clang-format off
-  Eigen::MatrixXd Y =
-      A.transpose() * X * A
-      - X
-      - ((A.transpose() * X * B + N) * (B.transpose() * X * B + R).inverse()
-        * (B.transpose() * X * A + N.transpose()))
-      + Q;
-  // clang-format on
+  Eigen::MatrixXd Y = A.transpose() * X * A - X -
+                      (A.transpose() * X * B + N) *
+                          (B.transpose() * X * B + R)
+                              .llt()
+                              .solve(B.transpose() * X * A + N.transpose()) +
+                      Q;
   ExpectMatrixEqual(Y, Eigen::MatrixXd::Zero(X.rows(), X.cols()), 1e-10);
 }
 
