@@ -1387,9 +1387,8 @@ public final class DriverStationBackend {
    *
    * <p>This method always returns {@link RobotMode#UNKNOWN} while the main robot class is being
    * constructed and initialized (more specifically, it returns {@link RobotMode#UNKNOWN} until
-   * {@link #observeUserProgramStarting()} is called, which the WPILib framework will
-   * automatically call during {@link TimedRobot#startCompetition()} and {@link
-   * OpModeRobot#startCompetition()}).
+   * {@link #observeUserProgramStarting()} is called, which the WPILib framework will automatically
+   * call during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
    *
    * @return robot mode
    */
@@ -1410,8 +1409,8 @@ public final class DriverStationBackend {
    * Gets a value indicating whether the Driver Station requires the robot to be running in
    * autonomous mode.
    *
-   * <p>This method always returns {@code false} while the main robot class is being constructed
-   * and initialized (more specifically, it returns {@code false} until {@link
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
    * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
    * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
    *
@@ -1425,8 +1424,8 @@ public final class DriverStationBackend {
    * Gets a value indicating whether the Driver Station requires the robot to be running in
    * autonomous mode and enabled.
    *
-   * <p>This method always returns {@code false} while the main robot class is being constructed
-   * and initialized (more specifically, it returns {@code false} until {@link
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
    * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
    * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
    *
@@ -1445,8 +1444,8 @@ public final class DriverStationBackend {
    * Gets a value indicating whether the Driver Station requires the robot to be running in
    * operator-controlled mode.
    *
-   * <p>This method always returns {@code false} while the main robot class is being constructed
-   * and initialized (more specifically, it returns {@code false} until {@link
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
    * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
    * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
    *
@@ -1460,8 +1459,8 @@ public final class DriverStationBackend {
    * Gets a value indicating whether the Driver Station requires the robot to be running in
    * operator-controller mode and enabled.
    *
-   * <p>This method always returns {@code false} while the main robot class is being constructed
-   * and initialized (more specifically, it returns {@code false} until {@link
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
    * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
    * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
    *
@@ -1480,8 +1479,8 @@ public final class DriverStationBackend {
    * Gets a value indicating whether the Driver Station requires the robot to be running in Utility
    * mode.
    *
-   * <p>This method always returns {@code false} while the main robot class is being constructed
-   * and initialized (more specifically, it returns {@code false} until {@link
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
    * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
    * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
    *
@@ -1495,8 +1494,8 @@ public final class DriverStationBackend {
    * Gets a value indicating whether the Driver Station requires the robot to be running in Utility
    * mode and enabled.
    *
-   * <p>This method always returns {@code false} while the main robot class is being constructed
-   * and initialized (more specifically, it returns {@code false} until {@link
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
    * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
    * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
    *
