@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.wpilib.units.Units.Inches;
+import static org.wpilib.units.Units.Meters;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -110,6 +111,10 @@ class GoBildaPinpointTest {
       assertThrows(IllegalArgumentException.class, () -> pinpoint.setOffsets(Double.NaN, 0.0));
       assertThrows(
           IllegalArgumentException.class, () -> pinpoint.setOffsets(0.0, Double.POSITIVE_INFINITY));
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> pinpoint.setOffsets(Meters.of(1.0), Meters.of(Double.MAX_VALUE)));
+      assertEquals(0, m_writes.size());
       assertThrows(IllegalArgumentException.class, () -> pinpoint.setEncoderResolution(0.0));
       assertThrows(
           IllegalArgumentException.class, () -> pinpoint.setEncoderResolution(Double.MIN_VALUE));
@@ -213,8 +218,9 @@ class GoBildaPinpointTest {
       pinpoint.update();
 
       setRegister(
-          Register.X_POSITION, concat(encodeFloat(2000), encodeFloat(3000), encodeFloat(0.2f)));
+          Register.BULK_READ, concat(encodeFloat(2000), encodeFloat(3000), encodeFloat(0.2f)));
       final int readCount = m_readCounts.size();
+      final int writeCount = m_writes.size();
 
       Pose2d pose = pinpoint.getPose();
 
@@ -222,8 +228,23 @@ class GoBildaPinpointTest {
       assertEquals(3.0, pose.getY(), DELTA);
       assertEquals(0.2, pose.getRotation().getRadians(), DELTA);
       assertEquals(readCount + 1, m_readCounts.size());
-      assertEquals(Register.X_POSITION.getAddress(), m_readRegisters.get(readCount));
+      assertEquals(Register.BULK_READ.getAddress(), m_readRegisters.get(readCount));
       assertEquals(12, m_readCounts.get(readCount));
+      assertArrayEquals(
+          new byte[] {
+            (byte) Register.SET_BULK_READ.getAddress(),
+            (byte) Register.X_POSITION.getAddress(),
+            (byte) Register.Y_POSITION.getAddress(),
+            (byte) Register.H_ORIENTATION.getAddress()
+          },
+          m_writes.get(writeCount));
+      assertArrayEquals(
+          new byte[] {
+            (byte) Register.SET_BULK_READ.getAddress(),
+            (byte) Register.X_POSITION.getAddress(),
+            (byte) Register.H_ORIENTATION.getAddress()
+          },
+          m_writes.get(writeCount + 1));
     }
   }
 
@@ -238,7 +259,7 @@ class GoBildaPinpointTest {
       pinpoint.update();
 
       setRegister(
-          Register.X_POSITION,
+          Register.BULK_READ,
           appendCrc(concat(encodeFloat(4000), encodeFloat(-5000), encodeFloat(1.25f))));
       final int readCount = m_readCounts.size();
 
@@ -248,7 +269,7 @@ class GoBildaPinpointTest {
       assertEquals(-5.0, pose.getY(), DELTA);
       assertEquals(1.25, pose.getRotation().getRadians(), DELTA);
       assertEquals(readCount + 1, m_readCounts.size());
-      assertEquals(Register.X_POSITION.getAddress(), m_readRegisters.get(readCount));
+      assertEquals(Register.BULK_READ.getAddress(), m_readRegisters.get(readCount));
       assertEquals(13, m_readCounts.get(readCount));
     }
   }
@@ -263,7 +284,7 @@ class GoBildaPinpointTest {
       pinpoint.update();
 
       setRegister(
-          Register.QUATERNION_W,
+          Register.BULK_READ,
           concat(encodeFloat(0.5f), encodeFloat(-0.25f), encodeFloat(0.125f), encodeFloat(0.75f)));
       final int readCount = m_readCounts.size();
 
@@ -274,7 +295,7 @@ class GoBildaPinpointTest {
       assertEquals(0.125, quaternion.getY(), DELTA);
       assertEquals(0.75, quaternion.getZ(), DELTA);
       assertEquals(readCount + 1, m_readCounts.size());
-      assertEquals(Register.QUATERNION_W.getAddress(), m_readRegisters.get(readCount));
+      assertEquals(Register.BULK_READ.getAddress(), m_readRegisters.get(readCount));
       assertEquals(16, m_readCounts.get(readCount));
     }
   }
@@ -336,6 +357,93 @@ class GoBildaPinpointTest {
       assertEquals(Register.X_POSITION, pinpoint.getLastFailedRegister());
       assertEquals(FailureReason.CHANGE_TOO_LARGE, pinpoint.getLastFailureReason());
       assertEquals(1, pinpoint.getFailureCount(Register.X_POSITION));
+    }
+  }
+
+  @Test
+  void poseChangingWritesResetLocalValidationBaselines() {
+    setRegister(Register.DEVICE_VERSION, encodeInt(2));
+    setRegister(Register.BULK_READ, fixedBulkData(1, 1000, 0, 0, 0, 0, 0, 0, 0, 0));
+
+    try (var pinpoint = new GoBildaPinpoint(I2C.Port.PORT_0)) {
+      pinpoint.update();
+
+      pinpoint.setPose(new Pose2d(7.0, -7.0, new Rotation2d(1.0)));
+      setRegister(Register.BULK_READ, fixedBulkData(1, 1000, 0, 0, 7000, -7000, 1, 0, 0, 0));
+      pinpoint.update();
+      assertEquals(7.0, pinpoint.getXPositionMeters(), DELTA);
+      assertEquals(-7.0, pinpoint.getYPositionMeters(), DELTA);
+
+      pinpoint.setXPositionMeters(-7.0);
+      pinpoint.setYPositionMeters(7.0);
+      pinpoint.setHeadingRadians(130.0);
+      setRegister(Register.BULK_READ, fixedBulkData(1, 1000, 0, 0, -7000, 7000, 130, 0, 0, 0));
+      pinpoint.update();
+      assertEquals(-7.0, pinpoint.getXPositionMeters(), DELTA);
+      assertEquals(7.0, pinpoint.getYPositionMeters(), DELTA);
+      assertEquals(130.0, pinpoint.getHeadingRadians(), DELTA);
+
+      pinpoint.resetPositionAndImu();
+      setRegister(Register.BULK_READ, fixedBulkData(1, 1000, 0, 0, 0, 0, 0, 0, 0, 0));
+      pinpoint.update();
+      assertEquals(0.0, pinpoint.getXPositionMeters(), DELTA);
+      assertEquals(0.0, pinpoint.getYPositionMeters(), DELTA);
+      assertEquals(0.0, pinpoint.getHeadingRadians(), DELTA);
+      assertEquals(DeviceStatus.READY, pinpoint.getDeviceStatus());
+    }
+  }
+
+  @Test
+  void flexibleBulkReadRejectsInvalidLoopTimeBeforeCachingFloats() {
+    setRegister(Register.DEVICE_VERSION, encodeInt(3));
+
+    try (var pinpoint = new GoBildaPinpoint(I2C.Port.PORT_0)) {
+      pinpoint.setBulkReadScope(Register.X_POSITION, Register.LOOP_TIME);
+      setRegister(Register.BULK_READ, concat(encodeFloat(1500), encodeInt(0)));
+
+      pinpoint.update();
+
+      assertEquals(0.0, pinpoint.getXPositionMeters(), DELTA);
+      assertEquals(DeviceStatus.FAULT_BAD_READ, pinpoint.getDeviceStatus());
+      assertEquals(Register.LOOP_TIME, pinpoint.getLastFailedRegister());
+      assertEquals(FailureReason.INVALID_LOOP_TIME, pinpoint.getLastFailureReason());
+    }
+  }
+
+  @Test
+  void localValidationRejectsNonfiniteValuesFromEveryFloatRegister() {
+    setRegister(Register.DEVICE_VERSION, encodeInt(3));
+    Register[] floatRegisters = {
+      Register.X_POSITION,
+      Register.Y_POSITION,
+      Register.H_ORIENTATION,
+      Register.X_VELOCITY,
+      Register.Y_VELOCITY,
+      Register.H_VELOCITY,
+      Register.MM_PER_TICK,
+      Register.X_POD_OFFSET,
+      Register.Y_POD_OFFSET,
+      Register.YAW_SCALAR,
+      Register.QUATERNION_W,
+      Register.QUATERNION_X,
+      Register.QUATERNION_Y,
+      Register.QUATERNION_Z,
+      Register.PITCH,
+      Register.ROLL
+    };
+
+    try (var pinpoint = new GoBildaPinpoint(I2C.Port.PORT_0)) {
+      for (Register register : floatRegisters) {
+        pinpoint.setBulkReadScope(register);
+        setRegister(Register.BULK_READ, encodeFloat(Float.NaN));
+
+        pinpoint.update();
+
+        assertEquals(DeviceStatus.FAULT_BAD_READ, pinpoint.getDeviceStatus());
+        assertEquals(register, pinpoint.getLastFailedRegister());
+        assertEquals(FailureReason.NONFINITE_VALUE, pinpoint.getLastFailureReason());
+        assertEquals(1, pinpoint.getFailureCount(register));
+      }
     }
   }
 
@@ -499,7 +607,7 @@ class GoBildaPinpointTest {
               concat(
                   encodeFloat(0.5f), encodeFloat(-0.25f), encodeFloat(0.125f), encodeFloat(0.75f)));
       data[data.length - 1] ^= 0x01;
-      setRegister(Register.QUATERNION_W, data);
+      setRegister(Register.BULK_READ, data);
       final int readCount = m_readCounts.size();
 
       var quaternion = pinpoint.getQuaternion();
@@ -509,12 +617,12 @@ class GoBildaPinpointTest {
       assertEquals(0.0, quaternion.getY(), DELTA);
       assertEquals(0.0, quaternion.getZ(), DELTA);
       assertEquals(readCount + 1, m_readCounts.size());
-      assertEquals(Register.QUATERNION_W.getAddress(), m_readRegisters.get(readCount));
+      assertEquals(Register.BULK_READ.getAddress(), m_readRegisters.get(readCount));
       assertEquals(17, m_readCounts.get(readCount));
       assertEquals(DeviceStatus.FAULT_BAD_READ, pinpoint.getDeviceStatus());
-      assertEquals(Register.QUATERNION_W, pinpoint.getLastFailedRegister());
+      assertEquals(Register.BULK_READ, pinpoint.getLastFailedRegister());
       assertEquals(FailureReason.CRC_MISMATCH, pinpoint.getLastFailureReason());
-      assertEquals(1, pinpoint.getFailureCount(Register.QUATERNION_W));
+      assertEquals(1, pinpoint.getFailureCount(Register.BULK_READ));
     }
   }
 

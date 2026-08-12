@@ -5,6 +5,7 @@
 #include "wpi/drivers/imu/GoBildaPinpoint.hpp"
 
 #include <algorithm>
+#include <array>
 #include <bit>
 #include <cmath>
 #include <cstdint>
@@ -189,9 +190,10 @@ TEST_CASE_METHOD(PinpointTestFixture,
   pinpoint.Update();
 
   SetRegister(
-      Register::X_POSITION,
+      Register::BULK_READ,
       Concat(EncodeFloat(2000.0f), EncodeFloat(3000.0f), EncodeFloat(0.2f)));
   std::size_t readCount = m_readCounts.size();
+  std::size_t writeCount = m_writes.size();
 
   auto pose = pinpoint.GetPose();
 
@@ -199,8 +201,20 @@ TEST_CASE_METHOD(PinpointTestFixture,
   CHECK(pose.Y().value() == Catch::Approx(3.0));
   CHECK(pose.Rotation().Radians().value() == Catch::Approx(0.2));
   REQUIRE(m_readCounts.size() == readCount + 1);
-  CHECK(m_readRegisters[readCount] == static_cast<int>(Register::X_POSITION));
+  CHECK(m_readRegisters[readCount] == static_cast<int>(Register::BULK_READ));
   CHECK(m_readCounts[readCount] == 12);
+  REQUIRE(m_writes.size() == writeCount + 3);
+  CHECK(m_writes[writeCount] ==
+        std::vector<uint8_t>{static_cast<uint8_t>(Register::SET_BULK_READ),
+                             static_cast<uint8_t>(Register::X_POSITION),
+                             static_cast<uint8_t>(Register::Y_POSITION),
+                             static_cast<uint8_t>(Register::H_ORIENTATION)});
+  CHECK(m_writes[writeCount + 1] ==
+        std::vector<uint8_t>{static_cast<uint8_t>(Register::BULK_READ)});
+  CHECK(m_writes[writeCount + 2] ==
+        std::vector<uint8_t>{static_cast<uint8_t>(Register::SET_BULK_READ),
+                             static_cast<uint8_t>(Register::X_POSITION),
+                             static_cast<uint8_t>(Register::H_ORIENTATION)});
 }
 
 TEST_CASE_METHOD(
@@ -214,7 +228,7 @@ TEST_CASE_METHOD(
   SetRegister(Register::BULK_READ, AppendCrc(EncodeInt(1)));
   pinpoint.Update();
 
-  SetRegister(Register::X_POSITION,
+  SetRegister(Register::BULK_READ,
               AppendCrc(Concat(EncodeFloat(4000.0f), EncodeFloat(-5000.0f),
                                EncodeFloat(1.25f))));
   std::size_t readCount = m_readCounts.size();
@@ -225,7 +239,7 @@ TEST_CASE_METHOD(
   CHECK(pose.Y().value() == Catch::Approx(-5.0));
   CHECK(pose.Rotation().Radians().value() == Catch::Approx(1.25));
   REQUIRE(m_readCounts.size() == readCount + 1);
-  CHECK(m_readRegisters[readCount] == static_cast<int>(Register::X_POSITION));
+  CHECK(m_readRegisters[readCount] == static_cast<int>(Register::BULK_READ));
   CHECK(m_readCounts[readCount] == 13);
 }
 
@@ -240,7 +254,7 @@ TEST_CASE_METHOD(
               Concat(EncodeFloat(0.1f), EncodeFloat(0.4f)));
   pinpoint.Update();
 
-  SetRegister(Register::QUATERNION_W,
+  SetRegister(Register::BULK_READ,
               Concat(EncodeFloat(0.5f), EncodeFloat(-0.25f),
                      EncodeFloat(0.125f), EncodeFloat(0.75f)));
   std::size_t readCount = m_readCounts.size();
@@ -252,7 +266,7 @@ TEST_CASE_METHOD(
   CHECK(quaternion.Y() == Catch::Approx(0.125));
   CHECK(quaternion.Z() == Catch::Approx(0.75));
   REQUIRE(m_readCounts.size() == readCount + 1);
-  CHECK(m_readRegisters[readCount] == static_cast<int>(Register::QUATERNION_W));
+  CHECK(m_readRegisters[readCount] == static_cast<int>(Register::BULK_READ));
   CHECK(m_readCounts[readCount] == 16);
 }
 
@@ -292,7 +306,7 @@ TEST_CASE_METHOD(
   auto data = AppendCrc(Concat(EncodeFloat(0.5f), EncodeFloat(-0.25f),
                                EncodeFloat(0.125f), EncodeFloat(0.75f)));
   data.back() ^= 1;
-  SetRegister(Register::QUATERNION_W, std::move(data));
+  SetRegister(Register::BULK_READ, std::move(data));
   std::size_t readCount = m_readCounts.size();
 
   auto quaternion = pinpoint.GetQuaternion();
@@ -302,11 +316,11 @@ TEST_CASE_METHOD(
   CHECK(quaternion.Y() == Catch::Approx(0.0));
   CHECK(quaternion.Z() == Catch::Approx(0.0));
   REQUIRE(m_readCounts.size() == readCount + 1);
-  CHECK(m_readRegisters[readCount] == static_cast<int>(Register::QUATERNION_W));
+  CHECK(m_readRegisters[readCount] == static_cast<int>(Register::BULK_READ));
   CHECK(m_readCounts[readCount] == 17);
   CHECK(pinpoint.GetDeviceStatus() ==
         wpi::GoBildaPinpoint::DeviceStatus::FAULT_BAD_READ);
-  CHECK(pinpoint.GetLastFailedRegister() == Register::QUATERNION_W);
+  CHECK(pinpoint.GetLastFailedRegister() == Register::BULK_READ);
   CHECK(pinpoint.GetLastFailureReason() ==
         wpi::GoBildaPinpoint::FailureReason::CRC_MISMATCH);
 }
@@ -359,6 +373,104 @@ TEST_CASE_METHOD(PinpointTestFixture,
   CHECK(pinpoint.GetLastFailedRegister() == Register::X_POSITION);
   CHECK(pinpoint.GetLastFailureReason() ==
         wpi::GoBildaPinpoint::FailureReason::CHANGE_TOO_LARGE);
+}
+
+TEST_CASE_METHOD(
+    PinpointTestFixture,
+    "GoBildaPinpoint pose writes reset local validation baselines",
+    "[drivers][gobilda-pinpoint]") {
+  using wpi::units::meter_t;
+  using wpi::units::radian_t;
+
+  SetRegister(Register::DEVICE_VERSION, EncodeInt(2));
+  SetRegister(Register::BULK_READ,
+              FixedBulkData(1, 1000, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                            0.0f));
+  wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
+  pinpoint.Update();
+
+  pinpoint.SetPose(wpi::math::Pose2d{
+      meter_t{7.0}, meter_t{-7.0}, wpi::math::Rotation2d{radian_t{1.0}}});
+  SetRegister(Register::BULK_READ,
+              FixedBulkData(1, 1000, 0, 0, 7000.0f, -7000.0f, 1.0f, 0.0f,
+                            0.0f, 0.0f));
+  pinpoint.Update();
+  CHECK(pinpoint.GetXPosition().value() == Catch::Approx(7.0));
+  CHECK(pinpoint.GetYPosition().value() == Catch::Approx(-7.0));
+
+  pinpoint.SetXPosition(meter_t{-7.0});
+  pinpoint.SetYPosition(meter_t{7.0});
+  pinpoint.SetHeading(radian_t{130.0});
+  SetRegister(Register::BULK_READ,
+              FixedBulkData(1, 1000, 0, 0, -7000.0f, 7000.0f, 130.0f,
+                            0.0f, 0.0f, 0.0f));
+  pinpoint.Update();
+  CHECK(pinpoint.GetXPosition().value() == Catch::Approx(-7.0));
+  CHECK(pinpoint.GetYPosition().value() == Catch::Approx(7.0));
+  CHECK(pinpoint.GetHeading().value() == Catch::Approx(130.0));
+
+  pinpoint.ResetPositionAndIMU();
+  SetRegister(Register::BULK_READ,
+              FixedBulkData(1, 1000, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                            0.0f));
+  pinpoint.Update();
+  CHECK(pinpoint.GetXPosition().value() == Catch::Approx(0.0));
+  CHECK(pinpoint.GetYPosition().value() == Catch::Approx(0.0));
+  CHECK(pinpoint.GetHeading().value() == Catch::Approx(0.0));
+  CHECK(pinpoint.GetDeviceStatus() ==
+        wpi::GoBildaPinpoint::DeviceStatus::READY);
+}
+
+TEST_CASE_METHOD(
+    PinpointTestFixture,
+    "GoBildaPinpoint flexible reads reject invalid loop times before floats",
+    "[drivers][gobilda-pinpoint]") {
+  SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
+  wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
+  pinpoint.SetBulkReadScope({Register::X_POSITION, Register::LOOP_TIME});
+  SetRegister(Register::BULK_READ,
+              Concat(EncodeFloat(1500.0f), EncodeInt(0)));
+
+  pinpoint.Update();
+
+  CHECK(pinpoint.GetXPosition().value() == Catch::Approx(0.0));
+  CHECK(pinpoint.GetDeviceStatus() ==
+        wpi::GoBildaPinpoint::DeviceStatus::FAULT_BAD_READ);
+  CHECK(pinpoint.GetLastFailedRegister() == Register::LOOP_TIME);
+  CHECK(pinpoint.GetLastFailureReason() ==
+        wpi::GoBildaPinpoint::FailureReason::INVALID_LOOP_TIME);
+}
+
+TEST_CASE_METHOD(
+    PinpointTestFixture,
+    "GoBildaPinpoint local validation rejects every nonfinite float register",
+    "[drivers][gobilda-pinpoint]") {
+  constexpr std::array floatRegisters = {
+      Register::X_POSITION,    Register::Y_POSITION,
+      Register::H_ORIENTATION, Register::X_VELOCITY,
+      Register::Y_VELOCITY,    Register::H_VELOCITY,
+      Register::MM_PER_TICK,   Register::X_POD_OFFSET,
+      Register::Y_POD_OFFSET,  Register::YAW_SCALAR,
+      Register::QUATERNION_W,  Register::QUATERNION_X,
+      Register::QUATERNION_Y,  Register::QUATERNION_Z,
+      Register::PITCH,         Register::ROLL};
+  SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
+  wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
+
+  for (Register reg : floatRegisters) {
+    pinpoint.SetBulkReadScope({reg});
+    SetRegister(Register::BULK_READ,
+                EncodeFloat(std::numeric_limits<float>::quiet_NaN()));
+
+    pinpoint.Update();
+
+    CHECK(pinpoint.GetDeviceStatus() ==
+          wpi::GoBildaPinpoint::DeviceStatus::FAULT_BAD_READ);
+    CHECK(pinpoint.GetLastFailedRegister() == reg);
+    CHECK(pinpoint.GetLastFailureReason() ==
+          wpi::GoBildaPinpoint::FailureReason::NONFINITE_VALUE);
+    CHECK(pinpoint.GetFailureCount(reg) == 1);
+  }
 }
 
 TEST_CASE_METHOD(
@@ -422,6 +534,12 @@ TEST_CASE_METHOD(PinpointTestFixture,
                   std::invalid_argument);
 
   wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
+  CHECK_THROWS_AS(
+      pinpoint.SetOffsets(
+          wpi::units::meter_t{1.0},
+          wpi::units::meter_t{std::numeric_limits<double>::max()}),
+      std::invalid_argument);
+  CHECK(m_writes.empty());
   CHECK_THROWS_AS(pinpoint.SetEncoderResolution(0.0), std::invalid_argument);
   CHECK_THROWS_AS(
       pinpoint.SetYawScalar(std::numeric_limits<double>::infinity()),

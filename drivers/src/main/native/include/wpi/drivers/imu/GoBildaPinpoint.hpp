@@ -460,8 +460,6 @@ class GoBildaPinpoint {
 
   static constexpr int kRegisterLength = 4;
   static constexpr int kFixedBulkReadLength = 40;
-  static constexpr int kPoseReadLength = 3 * kRegisterLength;
-  static constexpr int kQuaternionReadLength = 4 * kRegisterLength;
   static constexpr int kCrcLength = 1;
   static constexpr uint8_t kCrcInitialValue = 0x90;
   static constexpr uint8_t kCrcPolynomialValue = 0x31;
@@ -482,7 +480,7 @@ class GoBildaPinpoint {
   static float MetersToMillimeters(wpi::units::meter_t meters,
                                    const char* parameterName);
   static float RequireFiniteFloat(double value, const char* parameterName);
-  void RequireFirmwareVersion3(const char* feature);
+  bool RequireFirmwareVersion3(const char* feature);
   void ReadIfNotInBulkScope(Register reg);
   bool BulkReadScopeContainsPose() const;
   bool BulkReadScopeContainsQuaternion() const;
@@ -493,9 +491,13 @@ class GoBildaPinpoint {
   bool WriteFloat(Register reg, float value);
   bool WriteBytes(Register reg, const std::vector<uint8_t>& data);
   std::vector<uint8_t> ReadBytes(Register reg, int count);
-  void ReadRegister(Register reg, bool clearPreviousBadRead = false);
+  bool ReadRegister(Register reg, bool clearPreviousBadRead = false);
   void ReadPose();
   void ReadQuaternion();
+  std::vector<uint8_t> ReadBulkSnapshot(
+      const std::vector<Register>& registers);
+  static std::vector<uint8_t> EncodeBulkReadScope(
+      const std::vector<Register>& registers);
   void FixedBulkRead();
   void FlexibleBulkRead();
   void SaveInt(Register reg, int32_t value);

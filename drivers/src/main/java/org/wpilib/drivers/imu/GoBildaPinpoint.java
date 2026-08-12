@@ -45,8 +45,6 @@ public class GoBildaPinpoint implements AutoCloseable {
 
   private static final int REGISTER_LENGTH = 4;
   private static final int FIXED_BULK_READ_LENGTH = 40;
-  private static final int POSE_READ_LENGTH = 3 * REGISTER_LENGTH;
-  private static final int QUATERNION_READ_LENGTH = 4 * REGISTER_LENGTH;
   private static final int CRC_LENGTH = 1;
 
   private static final byte CRC_INITIAL_VALUE = (byte) 0x90;
@@ -347,8 +345,8 @@ public class GoBildaPinpoint implements AutoCloseable {
    */
   public void update() {
     requireOpen();
-    if (m_deviceVersion == 0) {
-      readRegister(Register.DEVICE_VERSION);
+    if (m_deviceVersion == 0 && !readRegister(Register.DEVICE_VERSION)) {
+      return;
     }
 
     if (m_deviceVersion == 1 || m_deviceVersion == 2) {
@@ -383,7 +381,9 @@ public class GoBildaPinpoint implements AutoCloseable {
    */
   public void setBulkReadScope(Register... registers) {
     ErrorMessages.requireNonNullParam(registers, "registers", "setBulkReadScope");
-    requireFirmwareVersion3("Flexible bulk reads");
+    if (!requireFirmwareVersion3("Flexible bulk reads")) {
+      return;
+    }
 
     var uniqueRegisters = new LinkedHashSet<Register>();
     for (Register register : registers) {
@@ -398,12 +398,7 @@ public class GoBildaPinpoint implements AutoCloseable {
     }
 
     Register[] scope = uniqueRegisters.toArray(Register[]::new);
-    byte[] addresses = new byte[scope.length];
-    for (int i = 0; i < scope.length; i++) {
-      addresses[i] = (byte) scope[i].m_address;
-    }
-
-    if (writeBytes(Register.SET_BULK_READ, addresses)) {
+    if (writeBytes(Register.SET_BULK_READ, encodeBulkReadScope(scope))) {
       m_bulkReadScope = scope;
     }
   }
@@ -422,7 +417,9 @@ public class GoBildaPinpoint implements AutoCloseable {
         errorDetectionType, "errorDetectionType", "setErrorDetectionType");
     requireOpen();
     if (errorDetectionType == ErrorDetectionType.CRC) {
-      requireFirmwareVersion3("CRC error detection");
+      if (!requireFirmwareVersion3("CRC error detection")) {
+        return;
+      }
     }
     m_errorDetectionType = errorDetectionType;
   }
@@ -440,8 +437,10 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws IllegalStateException if this driver has been closed
    */
   public void setOffsets(double xOffsetMeters, double yOffsetMeters) {
-    writeFloat(Register.X_POD_OFFSET, metersToMillimeters(xOffsetMeters, "xOffsetMeters"));
-    writeFloat(Register.Y_POD_OFFSET, metersToMillimeters(yOffsetMeters, "yOffsetMeters"));
+    float xOffsetMillimeters = metersToMillimeters(xOffsetMeters, "xOffsetMeters");
+    float yOffsetMillimeters = metersToMillimeters(yOffsetMeters, "yOffsetMeters");
+    writeFloat(Register.X_POD_OFFSET, xOffsetMillimeters);
+    writeFloat(Register.Y_POD_OFFSET, yOffsetMillimeters);
   }
 
   /**
@@ -460,12 +459,12 @@ public class GoBildaPinpoint implements AutoCloseable {
   public void setOffsets(Distance xOffset, Distance yOffset) {
     ErrorMessages.requireNonNullParam(xOffset, "xOffset", "setOffsets");
     ErrorMessages.requireNonNullParam(yOffset, "yOffset", "setOffsets");
-    writeFloat(
-        Register.X_POD_OFFSET,
-        requireFiniteFloat(xOffset.in(Millimeters), "xOffset in millimeters"));
-    writeFloat(
-        Register.Y_POD_OFFSET,
-        requireFiniteFloat(yOffset.in(Millimeters), "yOffset in millimeters"));
+    float xOffsetMillimeters =
+        requireFiniteFloat(xOffset.in(Millimeters), "xOffset in millimeters");
+    float yOffsetMillimeters =
+        requireFiniteFloat(yOffset.in(Millimeters), "yOffset in millimeters");
+    writeFloat(Register.X_POD_OFFSET, xOffsetMillimeters);
+    writeFloat(Register.Y_POD_OFFSET, yOffsetMillimeters);
   }
 
   /**
@@ -483,7 +482,11 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws IllegalStateException if this driver has been closed
    */
   public void resetPositionAndImu() {
-    writeInt(Register.DEVICE_CONTROL, DeviceControl.RESET_POSITION_AND_IMU.m_value);
+    if (writeInt(Register.DEVICE_CONTROL, DeviceControl.RESET_POSITION_AND_IMU.m_value)) {
+      m_haveXPosition = false;
+      m_haveYPosition = false;
+      m_haveHeading = false;
+    }
   }
 
   /**
@@ -570,9 +573,15 @@ public class GoBildaPinpoint implements AutoCloseable {
     float yMillimeters = metersToMillimeters(pose.getY(), "pose Y");
     float headingRadians = requireFiniteFloat(pose.getRotation().getRadians(), "pose heading");
 
-    writeFloat(Register.X_POSITION, xMillimeters);
-    writeFloat(Register.Y_POSITION, yMillimeters);
-    writeFloat(Register.H_ORIENTATION, headingRadians);
+    if (writeFloat(Register.X_POSITION, xMillimeters)) {
+      m_haveXPosition = false;
+    }
+    if (writeFloat(Register.Y_POSITION, yMillimeters)) {
+      m_haveYPosition = false;
+    }
+    if (writeFloat(Register.H_ORIENTATION, headingRadians)) {
+      m_haveHeading = false;
+    }
   }
 
   /**
@@ -584,7 +593,9 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws IllegalStateException if this driver has been closed
    */
   public void setXPositionMeters(double positionMeters) {
-    writeFloat(Register.X_POSITION, metersToMillimeters(positionMeters, "positionMeters"));
+    if (writeFloat(Register.X_POSITION, metersToMillimeters(positionMeters, "positionMeters"))) {
+      m_haveXPosition = false;
+    }
   }
 
   /**
@@ -610,7 +621,9 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws IllegalStateException if this driver has been closed
    */
   public void setYPositionMeters(double positionMeters) {
-    writeFloat(Register.Y_POSITION, metersToMillimeters(positionMeters, "positionMeters"));
+    if (writeFloat(Register.Y_POSITION, metersToMillimeters(positionMeters, "positionMeters"))) {
+      m_haveYPosition = false;
+    }
   }
 
   /**
@@ -636,7 +649,9 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws IllegalStateException if this driver has been closed
    */
   public void setHeadingRadians(double headingRadians) {
-    writeFloat(Register.H_ORIENTATION, requireFiniteFloat(headingRadians, "headingRadians"));
+    if (writeFloat(Register.H_ORIENTATION, requireFiniteFloat(headingRadians, "headingRadians"))) {
+      m_haveHeading = false;
+    }
   }
 
   /**
@@ -1019,9 +1034,7 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws UnsupportedOperationException if the firmware is older than v3
    */
   public Quaternion getQuaternion() {
-    requireFirmwareVersion3("Quaternion output");
-    requireOpen();
-    if (!bulkReadScopeContainsQuaternion()) {
+    if (requireFirmwareVersion3("Quaternion output") && !bulkReadScopeContainsQuaternion()) {
       readQuaternion();
     }
     return new Quaternion(m_quaternionW, m_quaternionX, m_quaternionY, m_quaternionZ);
@@ -1046,8 +1059,9 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws UnsupportedOperationException if the firmware is older than v3
    */
   public double getPitchRadians() {
-    requireFirmwareVersion3("Pitch output");
-    readIfNotInBulkScope(Register.PITCH);
+    if (requireFirmwareVersion3("Pitch output")) {
+      readIfNotInBulkScope(Register.PITCH);
+    }
     return m_pitchRadians;
   }
 
@@ -1070,8 +1084,9 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws UnsupportedOperationException if the firmware is older than v3
    */
   public double getRollRadians() {
-    requireFirmwareVersion3("Roll output");
-    readIfNotInBulkScope(Register.ROLL);
+    if (requireFirmwareVersion3("Roll output")) {
+      readIfNotInBulkScope(Register.ROLL);
+    }
     return m_rollRadians;
   }
 
@@ -1106,13 +1121,14 @@ public class GoBildaPinpoint implements AutoCloseable {
     return floatValue;
   }
 
-  private void requireFirmwareVersion3(String feature) {
-    if (m_deviceVersion == 0) {
-      readRegister(Register.DEVICE_VERSION);
+  private boolean requireFirmwareVersion3(String feature) {
+    if (m_deviceVersion == 0 && !readRegister(Register.DEVICE_VERSION)) {
+      return false;
     }
     if (m_deviceVersion < 3) {
       throw new UnsupportedOperationException(feature + " requires firmware version 3 or newer");
     }
+    return true;
   }
 
   private void readIfNotInBulkScope(Register register) {
@@ -1177,11 +1193,11 @@ public class GoBildaPinpoint implements AutoCloseable {
     return data;
   }
 
-  private void readRegister(Register register) {
-    readRegister(register, false);
+  private boolean readRegister(Register register) {
+    return readRegister(register, false);
   }
 
-  private void readRegister(Register register, boolean clearPreviousBadRead) {
+  private boolean readRegister(Register register, boolean clearPreviousBadRead) {
     if (!isIndividuallyReadable(register)) {
       throw new IllegalArgumentException(register + " cannot be read individually");
     }
@@ -1194,11 +1210,11 @@ public class GoBildaPinpoint implements AutoCloseable {
     }
     byte[] data = readBytes(register, readLength);
     if (data.length == 0) {
-      return;
+      return false;
     }
     if (m_errorDetectionType == ErrorDetectionType.CRC && !checkCrc(data, REGISTER_LENGTH)) {
       recordFailure(register, FailureReason.CRC_MISMATCH);
-      return;
+      return false;
     }
 
     switch (register.m_type) {
@@ -1208,19 +1224,15 @@ public class GoBildaPinpoint implements AutoCloseable {
       default -> throw new IllegalStateException("Unknown register type");
     }
     finishRead(previousBadRead, clearPreviousBadRead);
+    return true;
   }
 
   private void readPose() {
     final boolean previousBadRead = m_badReadDetected;
     m_badReadDetected = false;
-    int readLength =
-        POSE_READ_LENGTH + (m_errorDetectionType == ErrorDetectionType.CRC ? CRC_LENGTH : 0);
-    byte[] data = readBytes(Register.X_POSITION, readLength);
+    byte[] data =
+        readBulkSnapshot(Register.X_POSITION, Register.Y_POSITION, Register.H_ORIENTATION);
     if (data.length == 0) {
-      return;
-    }
-    if (m_errorDetectionType == ErrorDetectionType.CRC && !checkCrc(data, POSE_READ_LENGTH)) {
-      recordFailure(Register.X_POSITION, FailureReason.CRC_MISMATCH);
       return;
     }
 
@@ -1233,14 +1245,13 @@ public class GoBildaPinpoint implements AutoCloseable {
   private void readQuaternion() {
     final boolean previousBadRead = m_badReadDetected;
     m_badReadDetected = false;
-    int readLength =
-        QUATERNION_READ_LENGTH + (m_errorDetectionType == ErrorDetectionType.CRC ? CRC_LENGTH : 0);
-    byte[] data = readBytes(Register.QUATERNION_W, readLength);
+    byte[] data =
+        readBulkSnapshot(
+            Register.QUATERNION_W,
+            Register.QUATERNION_X,
+            Register.QUATERNION_Y,
+            Register.QUATERNION_Z);
     if (data.length == 0) {
-      return;
-    }
-    if (m_errorDetectionType == ErrorDetectionType.CRC && !checkCrc(data, QUATERNION_READ_LENGTH)) {
-      recordFailure(Register.QUATERNION_W, FailureReason.CRC_MISMATCH);
       return;
     }
 
@@ -1249,6 +1260,37 @@ public class GoBildaPinpoint implements AutoCloseable {
     saveFloat(Register.QUATERNION_Y, decodeFloat(data, 2 * REGISTER_LENGTH), false);
     saveFloat(Register.QUATERNION_Z, decodeFloat(data, 3 * REGISTER_LENGTH), false);
     finishRead(previousBadRead, false);
+  }
+
+  private byte[] readBulkSnapshot(Register... registers) {
+    if (!writeBytes(Register.SET_BULK_READ, encodeBulkReadScope(registers))) {
+      return new byte[0];
+    }
+
+    int dataLength = registers.length * REGISTER_LENGTH;
+    int readLength = dataLength + (m_errorDetectionType == ErrorDetectionType.CRC ? CRC_LENGTH : 0);
+    byte[] data = readBytes(Register.BULK_READ, readLength);
+    if (!writeBytes(Register.SET_BULK_READ, encodeBulkReadScope(m_bulkReadScope))) {
+      m_bulkReadScope = registers.clone();
+      return new byte[0];
+    }
+
+    if (data.length == 0) {
+      return data;
+    }
+    if (m_errorDetectionType == ErrorDetectionType.CRC && !checkCrc(data, dataLength)) {
+      recordFailure(Register.BULK_READ, FailureReason.CRC_MISMATCH);
+      return new byte[0];
+    }
+    return data;
+  }
+
+  private static byte[] encodeBulkReadScope(Register[] registers) {
+    byte[] addresses = new byte[registers.length];
+    for (int i = 0; i < registers.length; i++) {
+      addresses[i] = (byte) registers[i].m_address;
+    }
+    return addresses;
   }
 
   private void fixedBulkRead() {
@@ -1297,12 +1339,30 @@ public class GoBildaPinpoint implements AutoCloseable {
       return;
     }
 
+    boolean hasLoopTime = false;
+    for (int i = 0; i < m_bulkReadScope.length; i++) {
+      if (m_bulkReadScope[i] == Register.LOOP_TIME) {
+        int loopTime = decodeInt(data, i * REGISTER_LENGTH);
+        if (m_errorDetectionType == ErrorDetectionType.LOCAL_TEST && loopTime <= 0) {
+          recordFailure(Register.LOOP_TIME, FailureReason.INVALID_LOOP_TIME);
+          return;
+        }
+        saveInt(Register.LOOP_TIME, loopTime);
+        hasLoopTime = true;
+        break;
+      }
+    }
+
     for (int i = 0; i < m_bulkReadScope.length; i++) {
       Register register = m_bulkReadScope[i];
       int offset = i * REGISTER_LENGTH;
       switch (register.m_type) {
-        case INT32 -> saveInt(register, decodeInt(data, offset));
-        case FLOAT -> saveFloat(register, decodeFloat(data, offset), false);
+        case INT32 -> {
+          if (register != Register.LOOP_TIME) {
+            saveInt(register, decodeInt(data, offset));
+          }
+        }
+        case FLOAT -> saveFloat(register, decodeFloat(data, offset), hasLoopTime);
         case BULK -> throw new IllegalStateException("A bulk-read scope contains BULK_READ");
         default -> throw new IllegalStateException("Unknown register type");
       }
@@ -1323,6 +1383,11 @@ public class GoBildaPinpoint implements AutoCloseable {
   }
 
   private void saveFloat(Register register, float value, boolean bulkUpdate) {
+    if (m_errorDetectionType == ErrorDetectionType.LOCAL_TEST && !Float.isFinite(value)) {
+      recordFailure(register, FailureReason.NONFINITE_VALUE);
+      return;
+    }
+
     switch (register) {
       case X_POSITION -> {
         Float validated =
