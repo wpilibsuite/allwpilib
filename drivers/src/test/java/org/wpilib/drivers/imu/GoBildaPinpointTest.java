@@ -551,6 +551,42 @@ class GoBildaPinpointTest {
   }
 
   @Test
+  void localValidationReestablishesPoseBaselineAfterOmittedBulkSamples() {
+    setRegister(Register.DEVICE_VERSION, encodeInt(3));
+
+    try (var pinpoint = new GoBildaPinpoint(I2C.Port.PORT_0)) {
+      pinpoint.setBulkReadScope(Register.DEVICE_STATUS);
+      setRegister(Register.BULK_READ, encodeInt(1));
+      pinpoint.update();
+
+      setRegister(
+          Register.BULK_READ, concat(encodeFloat(1000), encodeFloat(2000), encodeFloat(0.5f)));
+      Pose2d pose = pinpoint.getPose();
+      assertEquals(1.0, pose.getX(), DELTA);
+      assertEquals(2.0, pose.getY(), DELTA);
+
+      setRegister(Register.BULK_READ, encodeInt(1));
+      pinpoint.update();
+
+      setRegister(
+          Register.BULK_READ, concat(encodeFloat(7000), encodeFloat(8000), encodeFloat(1.0f)));
+      pose = pinpoint.getPose();
+      assertEquals(7.0, pose.getX(), DELTA);
+      assertEquals(8.0, pose.getY(), DELTA);
+      assertEquals(1.0, pose.getRotation().getRadians(), DELTA);
+      assertEquals(0, pinpoint.getFailureCount());
+
+      setRegister(
+          Register.BULK_READ, concat(encodeFloat(13_000), encodeFloat(8000), encodeFloat(1.0f)));
+      pose = pinpoint.getPose();
+      assertEquals(7.0, pose.getX(), DELTA);
+      assertEquals(8.0, pose.getY(), DELTA);
+      assertEquals(1.0, pose.getRotation().getRadians(), DELTA);
+      assertEquals(FailureReason.CHANGE_TOO_LARGE, pinpoint.getLastFailureReason());
+    }
+  }
+
+  @Test
   void enteringLocalValidationEstablishesFreshPoseBaselines() {
     for (ErrorDetectionType initialMode :
         new ErrorDetectionType[] {ErrorDetectionType.NONE, ErrorDetectionType.CRC}) {
@@ -945,7 +981,7 @@ class GoBildaPinpointTest {
       }
     }
 
-    void failNextRestoration() {
+    synchronized void failNextRestoration() {
       m_failNextRestoration = true;
     }
 

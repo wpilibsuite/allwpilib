@@ -754,6 +754,21 @@ void GoBildaPinpoint::FlexibleBulkRead() {
         throw std::logic_error("A bulk-read scope contains BULK_READ");
     }
   }
+  if (m_errorDetectionType == ErrorDetectionType::LOCAL_TEST) {
+    auto contains = [this](Register reg) {
+      return std::find(m_bulkReadScope.begin(), m_bulkReadScope.end(), reg) !=
+             m_bulkReadScope.end();
+    };
+    if (!contains(Register::X_POSITION)) {
+      m_haveXPosition = false;
+    }
+    if (!contains(Register::Y_POSITION)) {
+      m_haveYPosition = false;
+    }
+    if (!contains(Register::H_ORIENTATION)) {
+      m_haveHeading = false;
+    }
+  }
   FinishRead(previousBadRead, true);
 }
 

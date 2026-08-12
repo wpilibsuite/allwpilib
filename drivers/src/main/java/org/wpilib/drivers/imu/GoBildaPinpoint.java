@@ -1442,6 +1442,18 @@ public class GoBildaPinpoint implements AutoCloseable {
         default -> throw new IllegalStateException("Unknown register type");
       }
     }
+    if (m_errorDetectionType == ErrorDetectionType.LOCAL_TEST) {
+      var bulkReadScope = Arrays.asList(m_bulkReadScope);
+      if (!bulkReadScope.contains(Register.X_POSITION)) {
+        m_haveXPosition = false;
+      }
+      if (!bulkReadScope.contains(Register.Y_POSITION)) {
+        m_haveYPosition = false;
+      }
+      if (!bulkReadScope.contains(Register.H_ORIENTATION)) {
+        m_haveHeading = false;
+      }
+    }
     finishRead(previousBadRead, true);
   }
 

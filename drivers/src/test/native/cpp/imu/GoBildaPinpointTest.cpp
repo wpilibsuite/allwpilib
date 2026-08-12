@@ -566,6 +566,48 @@ TEST_CASE_METHOD(PinpointTestFixture,
   }
 }
 
+TEST_CASE_METHOD(
+    PinpointTestFixture,
+    "GoBildaPinpoint reestablishes pose baseline after omitted bulk samples",
+    "[drivers][gobilda-pinpoint]") {
+  using wpi::units::meter_t;
+
+  SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
+  wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
+  pinpoint.SetBulkReadScope({Register::DEVICE_STATUS});
+  SetRegister(Register::BULK_READ, EncodeInt(1));
+  pinpoint.Update();
+
+  SetRegister(
+      Register::BULK_READ,
+      Concat(EncodeFloat(1000.0f), EncodeFloat(2000.0f), EncodeFloat(0.5f)));
+  auto pose = pinpoint.GetPose();
+  CHECK(pose.X() == meter_t{1.0});
+  CHECK(pose.Y() == meter_t{2.0});
+
+  SetRegister(Register::BULK_READ, EncodeInt(1));
+  pinpoint.Update();
+
+  SetRegister(
+      Register::BULK_READ,
+      Concat(EncodeFloat(7000.0f), EncodeFloat(8000.0f), EncodeFloat(1.0f)));
+  pose = pinpoint.GetPose();
+  CHECK(pose.X() == meter_t{7.0});
+  CHECK(pose.Y() == meter_t{8.0});
+  CHECK(pose.Rotation().Radians().value() == Catch::Approx(1.0));
+  CHECK(pinpoint.GetFailureCount() == 0);
+
+  SetRegister(
+      Register::BULK_READ,
+      Concat(EncodeFloat(13000.0f), EncodeFloat(8000.0f), EncodeFloat(1.0f)));
+  pose = pinpoint.GetPose();
+  CHECK(pose.X() == meter_t{7.0});
+  CHECK(pose.Y() == meter_t{8.0});
+  CHECK(pose.Rotation().Radians().value() == Catch::Approx(1.0));
+  CHECK(pinpoint.GetLastFailureReason() ==
+        wpi::GoBildaPinpoint::FailureReason::CHANGE_TOO_LARGE);
+}
+
 TEST_CASE_METHOD(PinpointTestFixture,
                  "GoBildaPinpoint pose writes reset local validation baselines",
                  "[drivers][gobilda-pinpoint]") {
