@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BooleanSupplier;
 import org.junit.jupiter.api.Test;
+import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.system.RobotController;
 
 class TriggerTest extends CommandTestBase {
@@ -189,26 +190,8 @@ class TriggerTest extends CommandTestBase {
 
   @Test
   void bindingScopesToOpmodeIfAvailable() {
-    var fetcher =
-        new OpModeFetcher() {
-          long m_id = 12345;
-
-          void clear() {
-            m_id = 0;
-          }
-
-          @Override
-          long getOpModeId() {
-            return m_id;
-          }
-
-          @Override
-          String getOpModeName() {
-            return "This is an opmode!";
-          }
-        };
-    OpModeFetcher.setFetcher(fetcher);
-
+    m_opModeId = 12345;
+    m_opModeName = "This is an opmode!";
     var triggerSignal = new AtomicBoolean(false);
     var trigger = new Trigger(m_scheduler, triggerSignal::get);
 
@@ -219,9 +202,37 @@ class TriggerTest extends CommandTestBase {
     m_scheduler.run();
     assertTrue(m_scheduler.isRunning(command), "Command should have started when triggered");
 
-    fetcher.clear();
+    m_opModeId = 0;
+    m_opModeName = "";
     m_scheduler.run();
     assertFalse(m_scheduler.isRunning(command), "Command should have stopped when opmode exited");
+  }
+
+  @Test
+  void bindingScopesToRobotModeIfAvailable() {
+    for (RobotMode mode : RobotMode.values()) {
+      if (mode == RobotMode.UNKNOWN) {
+        // global scope, skip
+        continue;
+      }
+
+      m_robotMode = mode;
+
+      var triggerSignal = new AtomicBoolean(false);
+      var trigger = new Trigger(m_scheduler, triggerSignal::get);
+
+      var command = Command.noRequirements(Coroutine::park).named("Command");
+      trigger.whileTrue(command);
+
+      triggerSignal.set(true);
+      m_scheduler.run();
+      assertTrue(m_scheduler.isRunning(command), "Command should have started when triggered");
+
+      m_robotMode = RobotMode.UNKNOWN;
+      m_scheduler.run();
+      assertFalse(
+          m_scheduler.isRunning(command), "Command should have stopped when robot mode exited");
+    }
   }
 
   // The scheduler lifecycle polls triggers at the start of `run()`

@@ -7,31 +7,34 @@ package org.wpilib.command3;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import org.wpilib.driverstation.RobotState;
+import org.wpilib.hardware.hal.RobotMode;
 
 /**
- * Helper class for fetching information about the current opmode. This is a package-private class
- * so tests for this library don't need to hook into driverstation simulation and the HAL.
+ * Helper class for fetching information about the state of the robot. This is a package-private
+ * class so tests for this library don't need to hook into driverstation simulation and the HAL.
  */
-abstract class OpModeFetcher {
-  private static volatile OpModeFetcher s_fetcher;
+abstract class RobotStateFetcher {
+  private static volatile RobotStateFetcher s_fetcher;
 
   abstract long getOpModeId();
 
   abstract String getOpModeName();
 
+  abstract RobotMode getRobotMode();
+
   /**
-   * Gets the current fetcher implementation. If {@link #setFetcher(OpModeFetcher)} has not already
-   * been called to set an implementation, this will default to a {@link DriverStationOpModeFetcher}
-   * instance.
+   * Gets the current fetcher implementation. If {@link #setFetcher(RobotStateFetcher)} has not
+   * already been called to set an implementation, this will default to a {@link
+   * DriverStationRobotStateFetcher} instance.
    *
    * @return The fetcher instance to use to get opmode information.
    */
-  static OpModeFetcher getFetcher() {
+  static RobotStateFetcher getFetcher() {
     // Default to pull from the DS unless otherwise specified
     if (s_fetcher == null) {
-      synchronized (OpModeFetcher.class) {
+      synchronized (RobotStateFetcher.class) {
         if (s_fetcher == null) {
-          s_fetcher = new DriverStationOpModeFetcher();
+          s_fetcher = new DriverStationRobotStateFetcher();
         }
       }
     }
@@ -45,11 +48,11 @@ abstract class OpModeFetcher {
    *
    * @param fetcher The fetcher implementation to set. Cannot be null.
    */
-  static void setFetcher(OpModeFetcher fetcher) {
+  static void setFetcher(RobotStateFetcher fetcher) {
     s_fetcher = requireNonNullParam(fetcher, "fetcher", "setFetcher");
   }
 
-  static final class DriverStationOpModeFetcher extends OpModeFetcher {
+  static final class DriverStationRobotStateFetcher extends RobotStateFetcher {
     @Override
     public long getOpModeId() {
       return RobotState.getOpModeId();
@@ -58,6 +61,11 @@ abstract class OpModeFetcher {
     @Override
     public String getOpModeName() {
       return RobotState.getOpMode();
+    }
+
+    @Override
+    RobotMode getRobotMode() {
+      return RobotState.getRobotMode();
     }
   }
 }
