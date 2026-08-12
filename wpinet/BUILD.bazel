@@ -168,7 +168,12 @@ wpilib_cc_library(
         exclude = ["src/main/native/cpp/jni/**"],
     ) + [
         ":libuv-srcs",
-    ] + ["native-srcs"],
+    ] + [
+        "native-srcs",
+    ] + select({
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": glob(["src/main/native/systemcore/*"]),
+        "//conditions:default": [],
+    }),
     hdrs = glob(["src/main/native/include/**/*"]),
     copts = select({
         "@platforms//os:windows": [],

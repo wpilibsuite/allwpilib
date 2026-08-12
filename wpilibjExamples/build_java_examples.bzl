@@ -54,6 +54,7 @@ def build_examples(folders, halsim_deps):
                 "//ntcore:ntcore-java",
                 "//wpimath:wpimath-java",
                 "//wpilibj:wpilibj-java",
+                "//wpinet:wpinet-java",
                 "//commandsv2:commandsv2-java",
                 "//commandsv3:commandsv3-java",
                 "//wpiutil:wpiutil-java",

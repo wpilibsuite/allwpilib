@@ -12,14 +12,14 @@
 
 using namespace wpi;
 
-SerialPort::SerialPort(int baudRate, Port port, int dataBits,
+SerialPort::SerialPort(int baudRate, std::string_view portName, int dataBits,
                        SerialPort::Parity parity,
                        SerialPort::StopBits stopBits) {
   int32_t status = 0;
+  std::string portNameString{portName};
 
-  m_portHandle =
-      HAL_InitializeSerialPort(static_cast<HAL_SerialPort>(port), &status);
-  WPILIB_CheckErrorStatus(status, "Port {}", static_cast<int>(port));
+  m_portHandle = HAL_InitializeSerialPort(portNameString.c_str(), &status);
+  WPILIB_CheckErrorStatus(status, "Port {}", portName);
   HAL_SetSerialBaudRate(m_portHandle, baudRate, &status);
   WPILIB_CheckErrorStatus(status, "SetSerialBaudRate {}", baudRate);
   HAL_SetSerialDataBits(m_portHandle, dataBits, &status);
@@ -39,38 +39,7 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
 
   DisableTermination();
 
-  HAL_ReportUsage("SerialPort", static_cast<int>(port), "");
-}
-
-SerialPort::SerialPort(int baudRate, std::string_view portName, Port port,
-                       int dataBits, SerialPort::Parity parity,
-                       SerialPort::StopBits stopBits) {
-  int32_t status = 0;
-
-  m_portHandle =
-      HAL_InitializeSerialPortDirect(static_cast<HAL_SerialPort>(port),
-                                     std::string(portName).c_str(), &status);
-  WPILIB_CheckErrorStatus(status, "Port {}", static_cast<int>(port));
-  HAL_SetSerialBaudRate(m_portHandle, baudRate, &status);
-  WPILIB_CheckErrorStatus(status, "SetSerialBaudRate {}", baudRate);
-  HAL_SetSerialDataBits(m_portHandle, dataBits, &status);
-  WPILIB_CheckErrorStatus(status, "SetSerialDataBits {}", dataBits);
-  HAL_SetSerialParity(m_portHandle, static_cast<int32_t>(parity), &status);
-  WPILIB_CheckErrorStatus(status, "SetSerialParity {}",
-                          static_cast<int>(parity));
-  HAL_SetSerialStopBits(m_portHandle, static_cast<int32_t>(stopBits), &status);
-  WPILIB_CheckErrorStatus(status, "SetSerialStopBits {}",
-                          static_cast<int>(stopBits));
-
-  // Set the default timeout to 5 seconds.
-  SetTimeout(5_s);
-
-  // Don't wait until the buffer is full to transmit.
-  SetWriteBufferMode(WriteBufferMode::FLUSH_ON_ACCESS);
-
-  DisableTermination();
-
-  HAL_ReportUsage("SerialPort", static_cast<int>(port), "");
+  HAL_ReportUsage("SerialPort[" + portNameString + "]", "");
 }
 
 void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl) {

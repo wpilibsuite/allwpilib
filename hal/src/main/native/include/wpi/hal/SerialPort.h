@@ -14,13 +14,6 @@
  * @{
  */
 
-HAL_ENUM(HAL_SerialPort) {
-  HAL_SERIAL_PORT_ONBOARD = 0,
-  HAL_SERIAL_PORT_MXP = 1,
-  HAL_SERIAL_PORT_USB_1 = 2,
-  HAL_SERIAL_PORT_USB_2 = 3
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,30 +21,15 @@ extern "C" {
 /**
  * Initializes a serial port.
  *
- * The channels are either the onboard RS232, the MXP UART, or 2 USB ports. The
- * top port is USB1, the bottom port is USB2.
+ * The port name is platform-specific. For example, it may be "COM3" on Windows
+ * or "/dev/ttyUSB0" on Linux.
  *
- * @param[in] port the serial port to initialize
+ * @param[in] portName the operating system port name
  * @param[out] status the error code, or 0 for success
  * @return Serial Port Handle
  */
-HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
+HAL_SerialPortHandle HAL_InitializeSerialPort(const char* portName,
                                               int32_t* status);
-
-/**
- * Initializes a serial port with a direct name.
- *
- * This name is the /dev name for a specific port.
- * Note these are not always consistent between Systemcore reboots.
- *
- * @param[in] port     the serial port to initialize
- * @param[in] portName the dev port name
- * @param[out] status  the error code, or 0 for success
- * @return Serial Port Handle
- */
-HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
-                                                    const char* portName,
-                                                    int32_t* status);
 
 /**
  * Gets the raw serial port file descriptor from a handle.
@@ -152,7 +130,7 @@ void HAL_SetSerialFlowControl(HAL_SerialPortHandle handle, int32_t flow,
  * Sets the minimum serial read timeout of a port.
  *
  * @param[in] handle   the serial port handle
- * @param[in] timeout  the timeout in milliseconds
+ * @param[in] timeout  the timeout in seconds
  * @param[out] status  the error code, or 0 for success
  */
 void HAL_SetSerialTimeout(HAL_SerialPortHandle handle, double timeout,

@@ -8,6 +8,20 @@ ext {
     nativeTestSuiteName = "${nativeName}Test"
 
     splitSetup = {
+        if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+            it.sources {
+                wpinetSystemCoreCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/systemcore'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
+                    }
+                }
+            }
+        }
         it.sources {
             adaCpp(CppSourceSet) {
                 source {

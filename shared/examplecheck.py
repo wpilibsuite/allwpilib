@@ -65,6 +65,8 @@ TAGS = {
     "Digital Output",
     "Accelerometer",
     "IMU",
+    "USB",
+    "Serial",
     # --- HID ---
     "Gamepad",
     "Joystick",

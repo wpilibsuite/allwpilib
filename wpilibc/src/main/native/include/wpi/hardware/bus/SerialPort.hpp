@@ -13,35 +13,10 @@
 namespace wpi {
 
 /**
- * Driver for the RS-232 serial port on the roboRIO.
- *
- * The current implementation uses the VISA formatted I/O mode.  This means that
- * all traffic goes through the formatted buffers.  This allows the intermingled
- * use of Printf(), Scanf(), and the raw buffer accessors Read() and Write().
- *
- * More information can be found in the NI-VISA User Manual here:
- *   http://www.ni.com/pdf/manuals/370423a.pdf
- * and the NI-VISA Programmer's Reference Manual here:
- *   http://www.ni.com/pdf/manuals/370132c.pdf
+ * Driver for serial ports.
  */
 class SerialPort {
  public:
-  /**
-   * Serial port.
-   */
-  enum class Port {
-    /// Onboard serial port on the roboRIO.
-    ONBOARD = 0,
-    /// MXP (roboRIO MXP) serial port.
-    MXP = 1,
-    /// USB serial port (same as USB_1).
-    USB = 2,
-    /// USB serial port 1.
-    USB_1 = 2,
-    /// USB serial port 2.
-    USB_2 = 3
-  };
-
   /**
    * Represents the parity to use for serial communications.
    */
@@ -98,35 +73,16 @@ class SerialPort {
    * Create an instance of a Serial Port class.
    *
    * @param baudRate The baud rate to configure the serial port.
-   * @param port     The physical port to use
+   * @param portName The operating system port name (for example, "COM3" or
+   *                 "/dev/ttyUSB0").
    * @param dataBits The number of data bits per transfer.  Valid values are
    *                 between 5 and 8 bits.
    * @param parity   Select the type of parity checking to use.
    * @param stopBits The number of stop bits to use as defined by the enum
    *                 StopBits.
    */
-  explicit SerialPort(int baudRate, Port port = Port::ONBOARD, int dataBits = 8,
-                      Parity parity = Parity::NONE,
-                      StopBits stopBits = StopBits::ONE);
-
-  /**
-   * Create an instance of a Serial Port class.
-   *
-   * Prefer to use the constructor that doesn't take a port name, but in some
-   * cases the automatic detection might not work correctly.
-   *
-   * @param baudRate The baud rate to configure the serial port.
-   * @param port     The physical port to use
-   * @param portName The direct port name to use
-   * @param dataBits The number of data bits per transfer.  Valid values are
-   *                 between 5 and 8 bits.
-   * @param parity   Select the type of parity checking to use.
-   * @param stopBits The number of stop bits to use as defined by the enum
-   *                 StopBits.
-   */
-  SerialPort(int baudRate, std::string_view portName, Port port = Port::ONBOARD,
-             int dataBits = 8, Parity parity = Parity::NONE,
-             StopBits stopBits = StopBits::ONE);
+  SerialPort(int baudRate, std::string_view portName, int dataBits = 8,
+             Parity parity = Parity::NONE, StopBits stopBits = StopBits::ONE);
 
   SerialPort(SerialPort&& rhs) = default;
   SerialPort& operator=(SerialPort&& rhs) = default;

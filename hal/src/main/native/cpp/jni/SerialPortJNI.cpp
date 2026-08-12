@@ -19,32 +19,15 @@ extern "C" {
 /*
  * Class:     org_wpilib_hardware_hal_SerialPortJNI
  * Method:    serialInitializePort
- * Signature: (B)I
+ * Signature: (Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
 Java_org_wpilib_hardware_hal_SerialPortJNI_serialInitializePort
-  (JNIEnv* env, jclass, jbyte port)
-{
-  int32_t status = 0;
-  auto handle =
-      HAL_InitializeSerialPort(static_cast<HAL_SerialPort>(port), &status);
-  CheckStatusForceThrow(env, status);
-  return static_cast<jint>(handle);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_SerialPortJNI
- * Method:    serialInitializePortDirect
- * Signature: (BLjava/lang/String;)I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_SerialPortJNI_serialInitializePortDirect
-  (JNIEnv* env, jclass, jbyte port, jstring portName)
+  (JNIEnv* env, jclass, jstring portName)
 {
   JStringRef portNameRef{env, portName};
   int32_t status = 0;
-  auto handle = HAL_InitializeSerialPortDirect(
-      static_cast<HAL_SerialPort>(port), portNameRef.c_str(), &status);
+  auto handle = HAL_InitializeSerialPort(portNameRef.c_str(), &status);
   CheckStatusForceThrow(env, status);
   return static_cast<jint>(handle);
 }

@@ -18,6 +18,7 @@ def _define_robot_project(projects, project_type):
             "//drivers:wpilib-drivers",
             "//fields:robotpy-fields",
             "//wpilibc:robotpy-wpilib",
+            "//wpinet:robotpy-wpinet",
             "//romiVendordep:robotpy-romi",
             "//xrpVendordep:robotpy-xrp",
             requirement("numpy"),

@@ -5,22 +5,11 @@ classes:
       StopBits:
       FlowControl:
       WriteBufferMode:
-      Port:
     methods:
       SerialPort:
         overloads:
-          int, Port, int, Parity, StopBits:
+          int, std::string_view, int, Parity, StopBits:
             param_override:
-              port:
-                default: wpi::SerialPort::Port::ONBOARD
-              parity:
-                default: wpi::SerialPort::Parity::NONE
-              stopBits:
-                default: wpi::SerialPort::StopBits::ONE
-          int, std::string_view, Port, int, Parity, StopBits:
-            param_override:
-              port:
-                default: wpi::SerialPort::Port::ONBOARD
               parity:
                 default: wpi::SerialPort::Parity::NONE
               stopBits:
