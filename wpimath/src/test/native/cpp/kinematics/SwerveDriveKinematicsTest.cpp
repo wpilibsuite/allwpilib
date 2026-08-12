@@ -4,6 +4,7 @@
 
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 
+#include <array>
 #include <cmath>
 #include <cstddef>
 #include <numbers>
@@ -13,6 +14,7 @@
 #include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
 #include "wpi/math/kinematics/SwerveModulePosition.hpp"
