@@ -217,6 +217,45 @@ TEST_CASE_METHOD(
 
 TEST_CASE_METHOD(
     PinpointTestFixture,
+    "GoBildaPinpoint getter cannot overwrite the detected protocol version",
+    "[drivers][gobilda-pinpoint]") {
+  using ErrorDetectionType = wpi::GoBildaPinpoint::ErrorDetectionType;
+
+  for (ErrorDetectionType errorDetectionType :
+       std::array{ErrorDetectionType::NONE, ErrorDetectionType::LOCAL_TEST}) {
+    SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
+    SetRegister(Register::BULK_READ, FixedBulkData(1, 1000, 0, 0, 1000.0f, 0.0f,
+                                                   0.0f, 0.0f, 0.0f, 0.0f));
+    wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
+    pinpoint.SetErrorDetectionType(errorDetectionType);
+    pinpoint.Update();
+
+    std::size_t readCount = m_readCounts.size();
+    SetRegister(Register::DEVICE_VERSION, EncodeInt(2));
+    CHECK(pinpoint.GetDeviceVersion() == 3);
+    CHECK(m_readCounts.size() == readCount);
+
+    SetRegister(Register::BULK_READ, FixedBulkData(1, 1000, 0, 0, 2000.0f, 0.0f,
+                                                   0.0f, 0.0f, 0.0f, 0.0f));
+    pinpoint.Update();
+    CHECK(pinpoint.GetXPosition().value() == Catch::Approx(2.0));
+    CHECK(m_readCounts[readCount] == 40);
+
+    readCount = m_readCounts.size();
+    SetRegister(Register::DEVICE_VERSION, EncodeInt(-1));
+    CHECK(pinpoint.GetDeviceVersion() == 3);
+    CHECK(m_readCounts.size() == readCount);
+
+    SetRegister(Register::BULK_READ, FixedBulkData(1, 1000, 0, 0, 3000.0f, 0.0f,
+                                                   0.0f, 0.0f, 0.0f, 0.0f));
+    pinpoint.Update();
+    CHECK(pinpoint.GetXPosition().value() == Catch::Approx(3.0));
+    CHECK(m_readCounts[readCount] == 40);
+  }
+}
+
+TEST_CASE_METHOD(
+    PinpointTestFixture,
     "GoBildaPinpoint synchronizes the default scope for a new v3 instance",
     "[drivers][gobilda-pinpoint]") {
   SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
@@ -407,6 +446,36 @@ TEST_CASE_METHOD(PinpointTestFixture,
   CHECK(pinpoint.GetLastFailedRegister() == Register::QUATERNION_X);
   CHECK(pinpoint.GetLastFailureReason() ==
         wpi::GoBildaPinpoint::FailureReason::NONFINITE_VALUE);
+}
+
+TEST_CASE_METHOD(PinpointTestFixture,
+                 "GoBildaPinpoint rejects zero and near-zero quaternion norms",
+                 "[drivers][gobilda-pinpoint]") {
+  SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
+  wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
+  pinpoint.SetBulkReadScope({Register::QUATERNION_W, Register::QUATERNION_X,
+                             Register::QUATERNION_Y, Register::QUATERNION_Z});
+  SetRegister(Register::BULK_READ,
+              Concat(EncodeFloat(0.5f), EncodeFloat(-0.25f),
+                     EncodeFloat(0.125f), EncodeFloat(0.75f)));
+  pinpoint.Update();
+
+  for (float component : std::array{0.0f, 1e-8f}) {
+    SetRegister(Register::BULK_READ,
+                Concat(EncodeFloat(component), EncodeFloat(component),
+                       EncodeFloat(component), EncodeFloat(component)));
+    pinpoint.Update();
+
+    auto quaternion = pinpoint.GetQuaternion();
+    CHECK(quaternion.W() == Catch::Approx(0.5));
+    CHECK(quaternion.X() == Catch::Approx(-0.25));
+    CHECK(quaternion.Y() == Catch::Approx(0.125));
+    CHECK(quaternion.Z() == Catch::Approx(0.75));
+    CHECK(pinpoint.GetLastFailedRegister() == Register::QUATERNION_W);
+    CHECK(pinpoint.GetLastFailureReason() ==
+          wpi::GoBildaPinpoint::FailureReason::INVALID_QUATERNION);
+  }
+  CHECK(pinpoint.GetFailureCount(Register::QUATERNION_W) == 2);
 }
 
 TEST_CASE_METHOD(

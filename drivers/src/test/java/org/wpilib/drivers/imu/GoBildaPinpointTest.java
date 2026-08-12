@@ -292,6 +292,40 @@ class GoBildaPinpointTest {
   }
 
   @Test
+  void deviceVersionGetterCannotOverwriteDetectedProtocolVersion() {
+    for (ErrorDetectionType errorDetectionType :
+        new ErrorDetectionType[] {ErrorDetectionType.NONE, ErrorDetectionType.LOCAL_TEST}) {
+      setRegister(Register.DEVICE_VERSION, encodeInt(3));
+      setRegister(Register.BULK_READ, fixedBulkData(1, 1000, 0, 0, 1000, 0, 0, 0, 0, 0));
+
+      try (var pinpoint = new GoBildaPinpoint(I2C.Port.PORT_0)) {
+        pinpoint.setErrorDetectionType(errorDetectionType);
+        pinpoint.update();
+
+        int readCount = m_readCounts.size();
+        setRegister(Register.DEVICE_VERSION, encodeInt(2));
+        assertEquals(3, pinpoint.getDeviceVersion());
+        assertEquals(readCount, m_readCounts.size());
+
+        setRegister(Register.BULK_READ, fixedBulkData(1, 1000, 0, 0, 2000, 0, 0, 0, 0, 0));
+        pinpoint.update();
+        assertEquals(2.0, pinpoint.getXPositionMeters(), DELTA);
+        assertEquals(40, m_readCounts.get(readCount));
+
+        readCount = m_readCounts.size();
+        setRegister(Register.DEVICE_VERSION, encodeInt(-1));
+        assertEquals(3, pinpoint.getDeviceVersion());
+        assertEquals(readCount, m_readCounts.size());
+
+        setRegister(Register.BULK_READ, fixedBulkData(1, 1000, 0, 0, 3000, 0, 0, 0, 0, 0));
+        pinpoint.update();
+        assertEquals(3.0, pinpoint.getXPositionMeters(), DELTA);
+        assertEquals(40, m_readCounts.get(readCount));
+      }
+    }
+  }
+
+  @Test
   void readsPartialPoseScopeAsSingleSnapshot() {
     setRegister(Register.DEVICE_VERSION, encodeInt(3));
 
@@ -402,6 +436,50 @@ class GoBildaPinpointTest {
       assertEquals(0.75, quaternion.getZ(), DELTA);
       assertEquals(Register.QUATERNION_X, pinpoint.getLastFailedRegister());
       assertEquals(FailureReason.NONFINITE_VALUE, pinpoint.getLastFailureReason());
+    }
+  }
+
+  @Test
+  void failedSnapshotScopeRestorationRetriesRequestedScope() throws ReflectiveOperationException {
+    for (boolean quaternionSnapshot : new boolean[] {false, true}) {
+      setRegister(Register.DEVICE_VERSION, encodeInt(3));
+      setRegister(Register.BULK_READ, concat(encodeInt(1), encodeFloat(1000)));
+
+      try (var pinpoint = new GoBildaPinpoint(I2C.Port.PORT_0)) {
+        pinpoint.setBulkReadScope(Register.DEVICE_STATUS, Register.X_POSITION);
+        pinpoint.update();
+
+        byte[] requestedScope = {
+          (byte) Register.SET_BULK_READ.getAddress(),
+          (byte) Register.DEVICE_STATUS.getAddress(),
+          (byte) Register.X_POSITION.getAddress()
+        };
+        byte[] snapshotData =
+            quaternionSnapshot
+                ? concat(
+                    encodeFloat(0.5f), encodeFloat(-0.25f), encodeFloat(0.125f), encodeFloat(0.75f))
+                : concat(encodeFloat(1500), encodeFloat(2500), encodeFloat(0.5f));
+        var faultingI2c =
+            new RestoreFailingI2C(
+                requestedScope, snapshotData, concat(encodeInt(2), encodeFloat(2000)));
+        replaceI2c(pinpoint, faultingI2c);
+
+        if (quaternionSnapshot) {
+          pinpoint.getQuaternion();
+        } else {
+          pinpoint.getPose();
+        }
+        pinpoint.update();
+
+        assertEquals(2.0, pinpoint.getXPositionMeters(), DELTA);
+        assertEquals(DeviceStatus.CALIBRATING, pinpoint.getDeviceStatus());
+        assertEquals(2, faultingI2c.m_readCounts.size());
+        assertEquals(quaternionSnapshot ? 16 : 12, faultingI2c.m_readCounts.get(0));
+        assertEquals(8, faultingI2c.m_readCounts.get(1));
+        assertEquals(5, faultingI2c.m_writes.size());
+        assertArrayEquals(requestedScope, faultingI2c.m_writes.get(2));
+        assertArrayEquals(requestedScope, faultingI2c.m_writes.get(3));
+      }
     }
   }
 
@@ -756,6 +834,43 @@ class GoBildaPinpointTest {
   }
 
   @Test
+  void localValidationPreservesQuaternionForDegenerateSamples() {
+    setRegister(Register.DEVICE_VERSION, encodeInt(3));
+
+    try (var pinpoint = new GoBildaPinpoint(I2C.Port.PORT_0)) {
+      pinpoint.setBulkReadScope(
+          Register.QUATERNION_W,
+          Register.QUATERNION_X,
+          Register.QUATERNION_Y,
+          Register.QUATERNION_Z);
+      setRegister(
+          Register.BULK_READ,
+          concat(encodeFloat(0.5f), encodeFloat(-0.25f), encodeFloat(0.125f), encodeFloat(0.75f)));
+      pinpoint.update();
+
+      for (float component : new float[] {0.0f, 1e-8f}) {
+        setRegister(
+            Register.BULK_READ,
+            concat(
+                encodeFloat(component),
+                encodeFloat(component),
+                encodeFloat(component),
+                encodeFloat(component)));
+        pinpoint.update();
+
+        var quaternion = pinpoint.getQuaternion();
+        assertEquals(0.5, quaternion.getW(), DELTA);
+        assertEquals(-0.25, quaternion.getX(), DELTA);
+        assertEquals(0.125, quaternion.getY(), DELTA);
+        assertEquals(0.75, quaternion.getZ(), DELTA);
+        assertEquals(Register.QUATERNION_W, pinpoint.getLastFailedRegister());
+        assertEquals(FailureReason.INVALID_QUATERNION, pinpoint.getLastFailureReason());
+      }
+      assertEquals(2, pinpoint.getFailureCount(Register.QUATERNION_W));
+    }
+  }
+
+  @Test
   void quaternionSnapshotCrcFailurePreservesCachedValues() {
     setRegister(Register.DEVICE_VERSION, encodeInt(3));
 
@@ -808,6 +923,49 @@ class GoBildaPinpointTest {
 
   private void setRegister(Register register, byte[] data) {
     m_registerData.put(register.getAddress(), data);
+  }
+
+  private static void replaceI2c(GoBildaPinpoint pinpoint, I2C i2c)
+      throws ReflectiveOperationException {
+    var field = GoBildaPinpoint.class.getDeclaredField("m_i2c");
+    field.setAccessible(true);
+    field.set(pinpoint, i2c);
+  }
+
+  private static class RestoreFailingI2C extends I2C {
+    private final byte[] m_requestedScope;
+    private final byte[][] m_reads;
+    private final List<byte[]> m_writes = new ArrayList<>();
+    private final List<Integer> m_readCounts = new ArrayList<>();
+    private boolean m_restorationFailed;
+    private int m_readIndex;
+
+    RestoreFailingI2C(byte[] requestedScope, byte[]... reads) {
+      super(Port.PORT_0, GoBildaPinpoint.DEFAULT_ADDRESS);
+      m_requestedScope = requestedScope;
+      m_reads = reads;
+    }
+
+    @Override
+    public synchronized boolean writeBulk(byte[] data) {
+      m_writes.add(data.clone());
+      if (!m_restorationFailed && Arrays.equals(data, m_requestedScope)) {
+        m_restorationFailed = true;
+        return true;
+      }
+      return false;
+    }
+
+    @Override
+    public boolean readOnly(byte[] buffer, int count) {
+      if (m_readIndex >= m_reads.length || m_reads[m_readIndex].length != count) {
+        throw new IllegalStateException("Unexpected I2C read");
+      }
+      m_readCounts.add(count);
+      System.arraycopy(m_reads[m_readIndex], 0, buffer, 0, count);
+      m_readIndex++;
+      return false;
+    }
   }
 
   private static byte[] fixedBulkData(

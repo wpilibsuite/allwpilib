@@ -57,6 +57,7 @@ public class GoBildaPinpoint implements AutoCloseable {
   private static final float HEADING_CHANGE_LIMIT_RADIANS = 120.0f;
   private static final float VELOCITY_LIMIT_MM_PER_SECOND = 10_000.0f;
   private static final float HEADING_VELOCITY_LIMIT_RADIANS_PER_SECOND = 120.0f;
+  private static final double MIN_QUATERNION_NORM_SQUARED = 1e-12;
 
   private static final Register[] DEFAULT_BULK_READ_SCOPE = {
     Register.DEVICE_STATUS,
@@ -77,7 +78,7 @@ public class GoBildaPinpoint implements AutoCloseable {
     NONE,
     /** Validate the CRC-8 byte returned by v3 or newer firmware. */
     CRC,
-    /** Reject nonfinite values and implausibly large changes locally. */
+    /** Reject nonfinite values, invalid quaternions, and implausibly large changes locally. */
     LOCAL_TEST
   }
 
@@ -93,6 +94,8 @@ public class GoBildaPinpoint implements AutoCloseable {
     INVALID_LOOP_TIME,
     /** A floating-point register returned a nonfinite value. */
     NONFINITE_VALUE,
+    /** A quaternion sample had a zero or near-zero norm. */
+    INVALID_QUATERNION,
     /** A position or orientation changed by more than the local validation limit. */
     CHANGE_TOO_LARGE,
     /** A velocity magnitude exceeded the local validation limit. */
@@ -696,7 +699,10 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws IllegalStateException if this driver has been closed
    */
   public int getDeviceVersion() {
-    readIfNotInBulkScope(Register.DEVICE_VERSION);
+    requireOpen();
+    if (m_deviceVersion == 0) {
+      readRegister(Register.DEVICE_VERSION);
+    }
     return m_deviceVersion;
   }
 
@@ -1300,14 +1306,15 @@ public class GoBildaPinpoint implements AutoCloseable {
     if (!writeBytes(Register.SET_BULK_READ, encodeBulkReadScope(registers))) {
       return new byte[0];
     }
+    m_bulkReadScopeSynchronized = false;
 
     int dataLength = registers.length * REGISTER_LENGTH;
     int readLength = dataLength + (m_errorDetectionType == ErrorDetectionType.CRC ? CRC_LENGTH : 0);
     byte[] data = readBytes(Register.BULK_READ, readLength);
     if (!writeBytes(Register.SET_BULK_READ, encodeBulkReadScope(m_bulkReadScope))) {
-      m_bulkReadScope = registers.clone();
       return new byte[0];
     }
+    m_bulkReadScopeSynchronized = true;
 
     if (data.length == 0) {
       return data;
@@ -1489,6 +1496,12 @@ public class GoBildaPinpoint implements AutoCloseable {
     boolean validY = validateFinite(Register.QUATERNION_Y, y);
     boolean validZ = validateFinite(Register.QUATERNION_Z, z);
     if (!validW || !validX || !validY || !validZ) {
+      return;
+    }
+    double normSquared = (double) w * w + (double) x * x + (double) y * y + (double) z * z;
+    if (m_errorDetectionType == ErrorDetectionType.LOCAL_TEST
+        && normSquared < MIN_QUATERNION_NORM_SQUARED) {
+      recordFailure(Register.QUATERNION_W, FailureReason.INVALID_QUATERNION);
       return;
     }
 

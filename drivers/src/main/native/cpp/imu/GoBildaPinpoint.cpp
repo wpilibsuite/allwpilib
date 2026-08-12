@@ -236,7 +236,9 @@ int32_t GoBildaPinpoint::GetDeviceId() {
 }
 
 int32_t GoBildaPinpoint::GetDeviceVersion() {
-  ReadIfNotInBulkScope(Register::DEVICE_VERSION);
+  if (m_deviceVersion == 0) {
+    ReadRegister(Register::DEVICE_VERSION);
+  }
   return m_deviceVersion;
 }
 
@@ -604,6 +606,7 @@ std::vector<uint8_t> GoBildaPinpoint::ReadBulkSnapshot(
   if (!WriteBytes(Register::SET_BULK_READ, EncodeBulkReadScope(registers))) {
     return {};
   }
+  m_bulkReadScopeSynchronized = false;
 
   std::size_t dataLength = registers.size() * kRegisterLength;
   int readLength = static_cast<int>(
@@ -612,9 +615,9 @@ std::vector<uint8_t> GoBildaPinpoint::ReadBulkSnapshot(
   std::vector<uint8_t> data = ReadBytes(Register::BULK_READ, readLength);
   if (!WriteBytes(Register::SET_BULK_READ,
                   EncodeBulkReadScope(m_bulkReadScope))) {
-    m_bulkReadScope = registers;
     return {};
   }
+  m_bulkReadScopeSynchronized = true;
 
   if (data.empty()) {
     return data;
@@ -808,6 +811,13 @@ void GoBildaPinpoint::SaveQuaternion(float w, float x, float y, float z) {
   bool validY = ValidateFinite(Register::QUATERNION_Y, y);
   bool validZ = ValidateFinite(Register::QUATERNION_Z, z);
   if (!validW || !validX || !validY || !validZ) {
+    return;
+  }
+  double normSquared = static_cast<double>(w) * w + static_cast<double>(x) * x +
+                       static_cast<double>(y) * y + static_cast<double>(z) * z;
+  if (m_errorDetectionType == ErrorDetectionType::LOCAL_TEST &&
+      normSquared < kMinQuaternionNormSquared) {
+    RecordFailure(Register::QUATERNION_W, FailureReason::INVALID_QUATERNION);
     return;
   }
 

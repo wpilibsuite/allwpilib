@@ -43,7 +43,8 @@ class GoBildaPinpoint {
     NONE,
     /// Validate the CRC-8 byte returned by v3 or newer firmware.
     CRC,
-    /// Reject nonfinite values and implausibly large changes locally.
+    /// Reject nonfinite values, invalid quaternions, and implausibly large
+    /// changes locally.
     LOCAL_TEST
   };
 
@@ -59,6 +60,8 @@ class GoBildaPinpoint {
     INVALID_LOOP_TIME,
     /// A floating-point register returned a nonfinite value.
     NONFINITE_VALUE,
+    /// A quaternion sample had a zero or near-zero norm.
+    INVALID_QUATERNION,
     /// A position or orientation changed by more than the validation limit.
     CHANGE_TOO_LARGE,
     /// A velocity magnitude exceeded the local validation limit.
@@ -469,6 +472,7 @@ class GoBildaPinpoint {
   static constexpr float kHeadingChangeLimitRadians = 120.0f;
   static constexpr float kVelocityLimitMillimetersPerSecond = 10000.0f;
   static constexpr float kHeadingVelocityLimitRadiansPerSecond = 120.0f;
+  static constexpr double kMinQuaternionNormSquared = 1e-12;
   static constexpr std::array<Register, 10> kDefaultBulkReadScope = {
       Register::DEVICE_STATUS,   Register::LOOP_TIME,
       Register::X_ENCODER_VALUE, Register::Y_ENCODER_VALUE,
