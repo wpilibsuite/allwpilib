@@ -48,6 +48,9 @@ void GoBildaPinpoint::Update() {
   if (m_deviceVersion == 1 || m_deviceVersion == 2) {
     FixedBulkRead();
   } else if (m_deviceVersion >= 3) {
+    if (!SynchronizeBulkReadScope()) {
+      return;
+    }
     FlexibleBulkRead();
   }
 }
@@ -78,6 +81,7 @@ void GoBildaPinpoint::SetBulkReadScope(const std::vector<Register>& registers) {
 
   if (WriteBytes(Register::SET_BULK_READ, EncodeBulkReadScope(scope))) {
     m_bulkReadScope = std::move(scope);
+    m_bulkReadScopeSynchronized = true;
   }
 }
 
@@ -402,6 +406,18 @@ bool GoBildaPinpoint::RequireFirmwareVersion3(const char* feature) {
   return true;
 }
 
+bool GoBildaPinpoint::SynchronizeBulkReadScope() {
+  if (m_bulkReadScopeSynchronized) {
+    return true;
+  }
+  if (!WriteBytes(Register::SET_BULK_READ,
+                  EncodeBulkReadScope(m_bulkReadScope))) {
+    return false;
+  }
+  m_bulkReadScopeSynchronized = true;
+  return true;
+}
+
 void GoBildaPinpoint::ReadIfNotInBulkScope(Register reg) {
   if (std::find(m_bulkReadScope.begin(), m_bulkReadScope.end(), reg) ==
       m_bulkReadScope.end()) {
@@ -556,36 +572,30 @@ void GoBildaPinpoint::ReadPose() {
     return;
   }
 
-  SaveFloat(Register::X_POSITION, DecodeFloat(data, 0), false);
-  SaveFloat(Register::Y_POSITION, DecodeFloat(data, kRegisterLength), false);
-  SaveFloat(Register::H_ORIENTATION, DecodeFloat(data, 2 * kRegisterLength),
-            false);
+  SavePose(DecodeFloat(data, 0), DecodeFloat(data, kRegisterLength),
+           DecodeFloat(data, 2 * kRegisterLength), false);
   FinishRead(previousBadRead, false);
 }
 
 void GoBildaPinpoint::ReadQuaternion() {
   bool previousBadRead = m_badReadDetected;
   m_badReadDetected = false;
-  std::vector<uint8_t> data = ReadBulkSnapshot(
-      {Register::QUATERNION_W, Register::QUATERNION_X,
-       Register::QUATERNION_Y, Register::QUATERNION_Z});
+  std::vector<uint8_t> data =
+      ReadBulkSnapshot({Register::QUATERNION_W, Register::QUATERNION_X,
+                        Register::QUATERNION_Y, Register::QUATERNION_Z});
   if (data.empty()) {
     return;
   }
 
-  SaveFloat(Register::QUATERNION_W, DecodeFloat(data, 0), false);
-  SaveFloat(Register::QUATERNION_X, DecodeFloat(data, kRegisterLength), false);
-  SaveFloat(Register::QUATERNION_Y, DecodeFloat(data, 2 * kRegisterLength),
-            false);
-  SaveFloat(Register::QUATERNION_Z, DecodeFloat(data, 3 * kRegisterLength),
-            false);
+  SaveQuaternion(DecodeFloat(data, 0), DecodeFloat(data, kRegisterLength),
+                 DecodeFloat(data, 2 * kRegisterLength),
+                 DecodeFloat(data, 3 * kRegisterLength));
   FinishRead(previousBadRead, false);
 }
 
 std::vector<uint8_t> GoBildaPinpoint::ReadBulkSnapshot(
     const std::vector<Register>& registers) {
-  if (!WriteBytes(Register::SET_BULK_READ,
-                  EncodeBulkReadScope(registers))) {
+  if (!WriteBytes(Register::SET_BULK_READ, EncodeBulkReadScope(registers))) {
     return {};
   }
 
@@ -609,6 +619,18 @@ std::vector<uint8_t> GoBildaPinpoint::ReadBulkSnapshot(
     return {};
   }
   return data;
+}
+
+float GoBildaPinpoint::DecodeBulkFloat(const std::vector<uint8_t>& data,
+                                       Register reg) const {
+  auto it = std::find(m_bulkReadScope.begin(), m_bulkReadScope.end(), reg);
+  if (it == m_bulkReadScope.end()) {
+    throw std::logic_error("Register is not in the bulk-read scope");
+  }
+  std::size_t offset =
+      static_cast<std::size_t>(std::distance(m_bulkReadScope.begin(), it)) *
+      kRegisterLength;
+  return DecodeFloat(data, offset);
 }
 
 std::vector<uint8_t> GoBildaPinpoint::EncodeBulkReadScope(
@@ -645,9 +667,8 @@ void GoBildaPinpoint::FixedBulkRead() {
   SaveInt(Register::LOOP_TIME, loopTime);
   SaveInt(Register::X_ENCODER_VALUE, DecodeInt(data, 8));
   SaveInt(Register::Y_ENCODER_VALUE, DecodeInt(data, 12));
-  SaveFloat(Register::X_POSITION, DecodeFloat(data, 16), true);
-  SaveFloat(Register::Y_POSITION, DecodeFloat(data, 20), true);
-  SaveFloat(Register::H_ORIENTATION, DecodeFloat(data, 24), true);
+  SavePose(DecodeFloat(data, 16), DecodeFloat(data, 20), DecodeFloat(data, 24),
+           true);
   SaveFloat(Register::X_VELOCITY, DecodeFloat(data, 28), true);
   SaveFloat(Register::Y_VELOCITY, DecodeFloat(data, 32), true);
   SaveFloat(Register::H_VELOCITY, DecodeFloat(data, 36), true);
@@ -677,14 +698,27 @@ void GoBildaPinpoint::FlexibleBulkRead() {
       int32_t loopTime = DecodeInt(data, i * kRegisterLength);
       if (m_errorDetectionType == ErrorDetectionType::LOCAL_TEST &&
           loopTime <= 0) {
-        RecordFailure(Register::LOOP_TIME,
-                      FailureReason::INVALID_LOOP_TIME);
+        RecordFailure(Register::LOOP_TIME, FailureReason::INVALID_LOOP_TIME);
         return;
       }
       SaveInt(Register::LOOP_TIME, loopTime);
       hasLoopTime = true;
       break;
     }
+  }
+
+  bool containsPose = BulkReadScopeContainsPose();
+  if (containsPose) {
+    SavePose(DecodeBulkFloat(data, Register::X_POSITION),
+             DecodeBulkFloat(data, Register::Y_POSITION),
+             DecodeBulkFloat(data, Register::H_ORIENTATION), hasLoopTime);
+  }
+  bool containsQuaternion = BulkReadScopeContainsQuaternion();
+  if (containsQuaternion) {
+    SaveQuaternion(DecodeBulkFloat(data, Register::QUATERNION_W),
+                   DecodeBulkFloat(data, Register::QUATERNION_X),
+                   DecodeBulkFloat(data, Register::QUATERNION_Y),
+                   DecodeBulkFloat(data, Register::QUATERNION_Z));
   }
 
   for (std::size_t i = 0; i < m_bulkReadScope.size(); ++i) {
@@ -697,7 +731,15 @@ void GoBildaPinpoint::FlexibleBulkRead() {
         }
         break;
       case RegisterType::FLOAT:
-        SaveFloat(reg, DecodeFloat(data, offset), hasLoopTime);
+        if (!(containsPose &&
+              (reg == Register::X_POSITION || reg == Register::Y_POSITION ||
+               reg == Register::H_ORIENTATION)) &&
+            !(containsQuaternion &&
+              (reg == Register::QUATERNION_W || reg == Register::QUATERNION_X ||
+               reg == Register::QUATERNION_Y ||
+               reg == Register::QUATERNION_Z))) {
+          SaveFloat(reg, DecodeFloat(data, offset), hasLoopTime);
+        }
         break;
       case RegisterType::BULK:
         throw std::logic_error("A bulk-read scope contains BULK_READ");
@@ -731,10 +773,46 @@ void GoBildaPinpoint::SaveInt(Register reg, int32_t value) {
   }
 }
 
+void GoBildaPinpoint::SavePose(float xPosition, float yPosition, float heading,
+                               bool bulkUpdate) {
+  auto validatedX = ValidatePosition(
+      Register::X_POSITION, m_xPositionMillimeters, xPosition,
+      kPositionChangeLimitMillimeters, m_haveXPosition, bulkUpdate);
+  auto validatedY = ValidatePosition(
+      Register::Y_POSITION, m_yPositionMillimeters, yPosition,
+      kPositionChangeLimitMillimeters, m_haveYPosition, bulkUpdate);
+  auto validatedHeading =
+      ValidatePosition(Register::H_ORIENTATION, m_headingRadians, heading,
+                       kHeadingChangeLimitRadians, m_haveHeading, bulkUpdate);
+  if (!validatedX || !validatedY || !validatedHeading) {
+    return;
+  }
+
+  m_xPositionMillimeters = *validatedX;
+  m_yPositionMillimeters = *validatedY;
+  m_headingRadians = *validatedHeading;
+  m_haveXPosition = true;
+  m_haveYPosition = true;
+  m_haveHeading = true;
+}
+
+void GoBildaPinpoint::SaveQuaternion(float w, float x, float y, float z) {
+  bool validW = ValidateFinite(Register::QUATERNION_W, w);
+  bool validX = ValidateFinite(Register::QUATERNION_X, x);
+  bool validY = ValidateFinite(Register::QUATERNION_Y, y);
+  bool validZ = ValidateFinite(Register::QUATERNION_Z, z);
+  if (!validW || !validX || !validY || !validZ) {
+    return;
+  }
+
+  m_quaternionW = w;
+  m_quaternionX = x;
+  m_quaternionY = y;
+  m_quaternionZ = z;
+}
+
 void GoBildaPinpoint::SaveFloat(Register reg, float value, bool bulkUpdate) {
-  if (m_errorDetectionType == ErrorDetectionType::LOCAL_TEST &&
-      !std::isfinite(value)) {
-    RecordFailure(reg, FailureReason::NONFINITE_VALUE);
+  if (!ValidateFinite(reg, value)) {
     return;
   }
 
@@ -829,6 +907,15 @@ void GoBildaPinpoint::SaveFloat(Register reg, float value, bool bulkUpdate) {
     default:
       throw std::invalid_argument("Register is not a float data register");
   }
+}
+
+bool GoBildaPinpoint::ValidateFinite(Register reg, float value) {
+  if (m_errorDetectionType == ErrorDetectionType::LOCAL_TEST &&
+      !std::isfinite(value)) {
+    RecordFailure(reg, FailureReason::NONFINITE_VALUE);
+    return false;
+  }
+  return true;
 }
 
 std::optional<float> GoBildaPinpoint::ValidatePosition(

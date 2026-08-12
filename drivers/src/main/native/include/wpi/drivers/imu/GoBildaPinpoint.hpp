@@ -481,6 +481,7 @@ class GoBildaPinpoint {
                                    const char* parameterName);
   static float RequireFiniteFloat(double value, const char* parameterName);
   bool RequireFirmwareVersion3(const char* feature);
+  bool SynchronizeBulkReadScope();
   void ReadIfNotInBulkScope(Register reg);
   bool BulkReadScopeContainsPose() const;
   bool BulkReadScopeContainsQuaternion() const;
@@ -494,14 +495,18 @@ class GoBildaPinpoint {
   bool ReadRegister(Register reg, bool clearPreviousBadRead = false);
   void ReadPose();
   void ReadQuaternion();
-  std::vector<uint8_t> ReadBulkSnapshot(
-      const std::vector<Register>& registers);
+  std::vector<uint8_t> ReadBulkSnapshot(const std::vector<Register>& registers);
+  float DecodeBulkFloat(const std::vector<uint8_t>& data, Register reg) const;
   static std::vector<uint8_t> EncodeBulkReadScope(
       const std::vector<Register>& registers);
   void FixedBulkRead();
   void FlexibleBulkRead();
   void SaveInt(Register reg, int32_t value);
+  void SavePose(float xPosition, float yPosition, float heading,
+                bool bulkUpdate);
+  void SaveQuaternion(float w, float x, float y, float z);
   void SaveFloat(Register reg, float value, bool bulkUpdate);
+  bool ValidateFinite(Register reg, float value);
   std::optional<float> ValidatePosition(Register reg, float oldValue,
                                         float newValue, float changeLimit,
                                         bool haveOldValue, bool bulkUpdate);
@@ -523,6 +528,7 @@ class GoBildaPinpoint {
 
   I2C m_i2c;
   std::vector<Register> m_bulkReadScope;
+  bool m_bulkReadScopeSynchronized = false;
   ErrorDetectionType m_errorDetectionType = ErrorDetectionType::LOCAL_TEST;
 
   int32_t m_deviceId = 0;

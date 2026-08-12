@@ -241,6 +241,7 @@ public class GoBildaPinpoint implements AutoCloseable {
 
   private I2C m_i2c;
   private Register[] m_bulkReadScope = DEFAULT_BULK_READ_SCOPE.clone();
+  private boolean m_bulkReadScopeSynchronized;
   private ErrorDetectionType m_errorDetectionType = ErrorDetectionType.LOCAL_TEST;
 
   private int m_deviceId;
@@ -352,6 +353,9 @@ public class GoBildaPinpoint implements AutoCloseable {
     if (m_deviceVersion == 1 || m_deviceVersion == 2) {
       fixedBulkRead();
     } else if (m_deviceVersion >= 3) {
+      if (!synchronizeBulkReadScope()) {
+        return;
+      }
       flexibleBulkRead();
     }
   }
@@ -400,6 +404,7 @@ public class GoBildaPinpoint implements AutoCloseable {
     Register[] scope = uniqueRegisters.toArray(Register[]::new);
     if (writeBytes(Register.SET_BULK_READ, encodeBulkReadScope(scope))) {
       m_bulkReadScope = scope;
+      m_bulkReadScopeSynchronized = true;
     }
   }
 
@@ -416,10 +421,9 @@ public class GoBildaPinpoint implements AutoCloseable {
     ErrorMessages.requireNonNullParam(
         errorDetectionType, "errorDetectionType", "setErrorDetectionType");
     requireOpen();
-    if (errorDetectionType == ErrorDetectionType.CRC) {
-      if (!requireFirmwareVersion3("CRC error detection")) {
+    if (errorDetectionType == ErrorDetectionType.CRC
+        && !requireFirmwareVersion3("CRC error detection")) {
         return;
-      }
     }
     m_errorDetectionType = errorDetectionType;
   }
@@ -1131,6 +1135,17 @@ public class GoBildaPinpoint implements AutoCloseable {
     return true;
   }
 
+  private boolean synchronizeBulkReadScope() {
+    if (m_bulkReadScopeSynchronized) {
+      return true;
+    }
+    if (!writeBytes(Register.SET_BULK_READ, encodeBulkReadScope(m_bulkReadScope))) {
+      return false;
+    }
+    m_bulkReadScopeSynchronized = true;
+    return true;
+  }
+
   private void readIfNotInBulkScope(Register register) {
     requireOpen();
     if (!Arrays.asList(m_bulkReadScope).contains(register)) {
@@ -1151,6 +1166,15 @@ public class GoBildaPinpoint implements AutoCloseable {
         && bulkReadScope.contains(Register.QUATERNION_X)
         && bulkReadScope.contains(Register.QUATERNION_Y)
         && bulkReadScope.contains(Register.QUATERNION_Z);
+  }
+
+  private int bulkReadScopeOffset(Register register) {
+    for (int i = 0; i < m_bulkReadScope.length; i++) {
+      if (m_bulkReadScope[i] == register) {
+        return i * REGISTER_LENGTH;
+      }
+    }
+    throw new IllegalStateException(register + " is not in the bulk-read scope");
   }
 
   private static boolean isIndividuallyReadable(Register register) {
@@ -1236,9 +1260,11 @@ public class GoBildaPinpoint implements AutoCloseable {
       return;
     }
 
-    saveFloat(Register.X_POSITION, decodeFloat(data, 0), false);
-    saveFloat(Register.Y_POSITION, decodeFloat(data, REGISTER_LENGTH), false);
-    saveFloat(Register.H_ORIENTATION, decodeFloat(data, 2 * REGISTER_LENGTH), false);
+    savePose(
+        decodeFloat(data, 0),
+        decodeFloat(data, REGISTER_LENGTH),
+        decodeFloat(data, 2 * REGISTER_LENGTH),
+        false);
     finishRead(previousBadRead, false);
   }
 
@@ -1255,10 +1281,11 @@ public class GoBildaPinpoint implements AutoCloseable {
       return;
     }
 
-    saveFloat(Register.QUATERNION_W, decodeFloat(data, 0), false);
-    saveFloat(Register.QUATERNION_X, decodeFloat(data, REGISTER_LENGTH), false);
-    saveFloat(Register.QUATERNION_Y, decodeFloat(data, 2 * REGISTER_LENGTH), false);
-    saveFloat(Register.QUATERNION_Z, decodeFloat(data, 3 * REGISTER_LENGTH), false);
+    saveQuaternion(
+        decodeFloat(data, 0),
+        decodeFloat(data, REGISTER_LENGTH),
+        decodeFloat(data, 2 * REGISTER_LENGTH),
+        decodeFloat(data, 3 * REGISTER_LENGTH));
     finishRead(previousBadRead, false);
   }
 
@@ -1316,9 +1343,7 @@ public class GoBildaPinpoint implements AutoCloseable {
     saveInt(Register.LOOP_TIME, loopTime);
     saveInt(Register.X_ENCODER_VALUE, decodeInt(data, 8));
     saveInt(Register.Y_ENCODER_VALUE, decodeInt(data, 12));
-    saveFloat(Register.X_POSITION, decodeFloat(data, 16), true);
-    saveFloat(Register.Y_POSITION, decodeFloat(data, 20), true);
-    saveFloat(Register.H_ORIENTATION, decodeFloat(data, 24), true);
+    savePose(decodeFloat(data, 16), decodeFloat(data, 20), decodeFloat(data, 24), true);
     saveFloat(Register.X_VELOCITY, decodeFloat(data, 28), true);
     saveFloat(Register.Y_VELOCITY, decodeFloat(data, 32), true);
     saveFloat(Register.H_VELOCITY, decodeFloat(data, 36), true);
@@ -1353,6 +1378,23 @@ public class GoBildaPinpoint implements AutoCloseable {
       }
     }
 
+    boolean containsPose = bulkReadScopeContainsPose();
+    if (containsPose) {
+      savePose(
+          decodeFloat(data, bulkReadScopeOffset(Register.X_POSITION)),
+          decodeFloat(data, bulkReadScopeOffset(Register.Y_POSITION)),
+          decodeFloat(data, bulkReadScopeOffset(Register.H_ORIENTATION)),
+          hasLoopTime);
+    }
+    boolean containsQuaternion = bulkReadScopeContainsQuaternion();
+    if (containsQuaternion) {
+      saveQuaternion(
+          decodeFloat(data, bulkReadScopeOffset(Register.QUATERNION_W)),
+          decodeFloat(data, bulkReadScopeOffset(Register.QUATERNION_X)),
+          decodeFloat(data, bulkReadScopeOffset(Register.QUATERNION_Y)),
+          decodeFloat(data, bulkReadScopeOffset(Register.QUATERNION_Z)));
+    }
+
     for (int i = 0; i < m_bulkReadScope.length; i++) {
       Register register = m_bulkReadScope[i];
       int offset = i * REGISTER_LENGTH;
@@ -1362,7 +1404,22 @@ public class GoBildaPinpoint implements AutoCloseable {
             saveInt(register, decodeInt(data, offset));
           }
         }
-        case FLOAT -> saveFloat(register, decodeFloat(data, offset), hasLoopTime);
+        case FLOAT -> {
+          boolean savedAsPose =
+              containsPose
+                  && (register == Register.X_POSITION
+                      || register == Register.Y_POSITION
+                      || register == Register.H_ORIENTATION);
+          boolean savedAsQuaternion =
+              containsQuaternion
+                  && (register == Register.QUATERNION_W
+                      || register == Register.QUATERNION_X
+                      || register == Register.QUATERNION_Y
+                      || register == Register.QUATERNION_Z);
+          if (!savedAsPose && !savedAsQuaternion) {
+            saveFloat(register, decodeFloat(data, offset), hasLoopTime);
+          }
+        }
         case BULK -> throw new IllegalStateException("A bulk-read scope contains BULK_READ");
         default -> throw new IllegalStateException("Unknown register type");
       }
@@ -1382,9 +1439,60 @@ public class GoBildaPinpoint implements AutoCloseable {
     }
   }
 
+  private void savePose(float xPosition, float yPosition, float heading, boolean bulkUpdate) {
+    Float validatedX =
+        validatePosition(
+            Register.X_POSITION,
+            m_xPositionMillimeters,
+            xPosition,
+            POSITION_CHANGE_LIMIT_MM,
+            m_haveXPosition,
+            bulkUpdate);
+    Float validatedY =
+        validatePosition(
+            Register.Y_POSITION,
+            m_yPositionMillimeters,
+            yPosition,
+            POSITION_CHANGE_LIMIT_MM,
+            m_haveYPosition,
+            bulkUpdate);
+    Float validatedHeading =
+        validatePosition(
+            Register.H_ORIENTATION,
+            m_headingRadians,
+            heading,
+            HEADING_CHANGE_LIMIT_RADIANS,
+            m_haveHeading,
+            bulkUpdate);
+    if (validatedX == null || validatedY == null || validatedHeading == null) {
+      return;
+    }
+
+    m_xPositionMillimeters = validatedX;
+    m_yPositionMillimeters = validatedY;
+    m_headingRadians = validatedHeading;
+    m_haveXPosition = true;
+    m_haveYPosition = true;
+    m_haveHeading = true;
+  }
+
+  private void saveQuaternion(float w, float x, float y, float z) {
+    boolean validW = validateFinite(Register.QUATERNION_W, w);
+    boolean validX = validateFinite(Register.QUATERNION_X, x);
+    boolean validY = validateFinite(Register.QUATERNION_Y, y);
+    boolean validZ = validateFinite(Register.QUATERNION_Z, z);
+    if (!validW || !validX || !validY || !validZ) {
+      return;
+    }
+
+    m_quaternionW = w;
+    m_quaternionX = x;
+    m_quaternionY = y;
+    m_quaternionZ = z;
+  }
+
   private void saveFloat(Register register, float value, boolean bulkUpdate) {
-    if (m_errorDetectionType == ErrorDetectionType.LOCAL_TEST && !Float.isFinite(value)) {
-      recordFailure(register, FailureReason.NONFINITE_VALUE);
+    if (!validateFinite(register, value)) {
       return;
     }
 
@@ -1465,6 +1573,14 @@ public class GoBildaPinpoint implements AutoCloseable {
       case ROLL -> m_rollRadians = value;
       default -> throw new IllegalArgumentException(register + " is not a float data register");
     }
+  }
+
+  private boolean validateFinite(Register register, float value) {
+    if (m_errorDetectionType == ErrorDetectionType.LOCAL_TEST && !Float.isFinite(value)) {
+      recordFailure(register, FailureReason.NONFINITE_VALUE);
+      return false;
+    }
+    return true;
   }
 
   private Float validatePosition(
