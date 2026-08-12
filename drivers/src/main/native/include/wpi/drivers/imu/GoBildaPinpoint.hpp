@@ -93,7 +93,7 @@ class GoBildaPinpoint {
     Y_VELOCITY = 12,
     /// Heading velocity in radians per second.
     H_VELOCITY = 13,
-    /// Millimeters traveled per encoder tick.
+    /// Encoder ticks per millimeter traveled.
     MM_PER_TICK = 14,
     /// X pod offset in millimeters.
     X_POD_OFFSET = 15,
@@ -266,7 +266,8 @@ class GoBildaPinpoint {
    *
    * @param ticksPerMeter Encoder ticks per meter of pod travel.
    * @throws std::invalid_argument if ticksPerMeter is nonfinite, not positive,
-   *     or produces a value not representable by a 32-bit float.
+   *     or does not produce a positive ticks-per-millimeter value representable
+   *     by a 32-bit float.
    */
   void SetEncoderResolution(double ticksPerMeter);
 
@@ -325,15 +326,17 @@ class GoBildaPinpoint {
   double GetYawScalar();
 
   /**
-   * @return Encoder ticks per meter, or positive infinity if the device
-   *     reports zero millimeters per tick.
+   * @return Encoder ticks per meter.
    */
   double GetEncoderResolution();
 
   /** @return Highest-priority current device or read status. */
   DeviceStatus GetDeviceStatus() const;
 
-  /** @return Raw device status bit field. */
+  /**
+   * @return Cached device status bits combined with the local bad-read status
+   *     bit, if set.
+   */
   int32_t GetDeviceStatusBits() const;
 
   /**
@@ -399,12 +402,20 @@ class GoBildaPinpoint {
   /**
    * Returns the tracked pose. The heading is normalized by Rotation2d.
    *
+   * If the configured bulk-read scope does not contain all three pose
+   * registers, this reads X, Y, and heading together so the returned components
+   * are from the same device snapshot.
+   *
    * @return Tracked pose.
    */
   wpi::math::Pose2d GetPose();
 
   /**
    * Returns the device orientation quaternion.
+   *
+   * If the configured bulk-read scope does not contain all four quaternion
+   * registers, this reads all four components together so they come from the
+   * same device snapshot.
    *
    * @return Orientation quaternion.
    * @throws std::runtime_error if the firmware is older than v3.
@@ -449,6 +460,8 @@ class GoBildaPinpoint {
 
   static constexpr int kRegisterLength = 4;
   static constexpr int kFixedBulkReadLength = 40;
+  static constexpr int kPoseReadLength = 3 * kRegisterLength;
+  static constexpr int kQuaternionReadLength = 4 * kRegisterLength;
   static constexpr int kCrcLength = 1;
   static constexpr uint8_t kCrcInitialValue = 0x90;
   static constexpr uint8_t kCrcPolynomialValue = 0x31;
@@ -471,6 +484,8 @@ class GoBildaPinpoint {
   static float RequireFiniteFloat(double value, const char* parameterName);
   void RequireFirmwareVersion3(const char* feature);
   void ReadIfNotInBulkScope(Register reg);
+  bool BulkReadScopeContainsPose() const;
+  bool BulkReadScopeContainsQuaternion() const;
   static bool IsIndividuallyReadable(Register reg);
   static RegisterType GetRegisterType(Register reg);
   static std::size_t RegisterIndex(Register reg);
@@ -478,7 +493,9 @@ class GoBildaPinpoint {
   bool WriteFloat(Register reg, float value);
   bool WriteBytes(Register reg, const std::vector<uint8_t>& data);
   std::vector<uint8_t> ReadBytes(Register reg, int count);
-  void ReadRegister(Register reg);
+  void ReadRegister(Register reg, bool clearPreviousBadRead = false);
+  void ReadPose();
+  void ReadQuaternion();
   void FixedBulkRead();
   void FlexibleBulkRead();
   void SaveInt(Register reg, int32_t value);
@@ -489,8 +506,7 @@ class GoBildaPinpoint {
   std::optional<float> ValidateVelocity(Register reg, float newValue,
                                         float magnitudeLimit, bool bulkUpdate);
   void RecordFailure(Register reg, FailureReason reason);
-  void FinishRead(int32_t previousStatus, bool deviceStatusRead,
-                  bool clearPreviousBadRead);
+  void FinishRead(bool previousBadRead, bool clearPreviousBadRead);
   static DeviceStatus DecodeStatus(int32_t status);
   static std::vector<uint8_t> EncodeInt(int32_t value);
   static std::vector<uint8_t> EncodeFloat(float value);
@@ -509,7 +525,7 @@ class GoBildaPinpoint {
 
   int32_t m_deviceId = 0;
   int32_t m_deviceVersion = 0;
-  int32_t m_deviceStatus = 0;
+  int32_t m_deviceStatusBits = 0;
   int32_t m_loopTimeMicroseconds = 0;
   int32_t m_xEncoderValue = 0;
   int32_t m_yEncoderValue = 0;
@@ -519,7 +535,7 @@ class GoBildaPinpoint {
   float m_xVelocityMillimetersPerSecond = 0.0f;
   float m_yVelocityMillimetersPerSecond = 0.0f;
   float m_headingVelocityRadiansPerSecond = 0.0f;
-  float m_millimetersPerTick = 0.0f;
+  float m_ticksPerMillimeter = 0.0f;
   float m_xPodOffsetMillimeters = 0.0f;
   float m_yPodOffsetMillimeters = 0.0f;
   float m_yawScalar = 0.0f;

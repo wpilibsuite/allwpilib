@@ -53,12 +53,7 @@ void GoBildaPinpoint::Update() {
 }
 
 void GoBildaPinpoint::UpdateHeading() {
-  int32_t previousStatus = m_deviceStatus;
-  ReadRegister(Register::H_ORIENTATION);
-  if (!m_badReadDetected &&
-      DecodeStatus(previousStatus) == DeviceStatus::FAULT_BAD_READ) {
-    m_deviceStatus = static_cast<int32_t>(DeviceStatus::READY);
-  }
+  ReadRegister(Register::H_ORIENTATION, true);
 }
 
 void GoBildaPinpoint::SetBulkReadScope(const std::vector<Register>& registers) {
@@ -169,8 +164,14 @@ void GoBildaPinpoint::SetEncoderResolution(double ticksPerMeter) {
     throw std::invalid_argument(
         "ticksPerMeter must be finite and greater than zero");
   }
-  WriteFloat(Register::MM_PER_TICK, RequireFiniteFloat(1000.0 / ticksPerMeter,
-                                                       "millimeters per tick"));
+  float ticksPerMillimeter =
+      RequireFiniteFloat(ticksPerMeter / 1000.0, "ticks per millimeter");
+  if (ticksPerMillimeter <= 0.0f) {
+    throw std::invalid_argument(
+        "ticksPerMeter must produce a positive 32-bit "
+        "ticks-per-millimeter value");
+  }
+  WriteFloat(Register::MM_PER_TICK, ticksPerMillimeter);
 }
 
 void GoBildaPinpoint::SetYawScalar(double yawScalar) {
@@ -178,9 +179,14 @@ void GoBildaPinpoint::SetYawScalar(double yawScalar) {
 }
 
 void GoBildaPinpoint::SetPose(const wpi::math::Pose2d& pose) {
-  SetXPosition(pose.X());
-  SetYPosition(pose.Y());
-  SetHeading(pose.Rotation().Radians());
+  float xMillimeters = MetersToMillimeters(pose.X(), "pose X");
+  float yMillimeters = MetersToMillimeters(pose.Y(), "pose Y");
+  float headingRadians =
+      RequireFiniteFloat(pose.Rotation().Radians().value(), "pose heading");
+
+  WriteFloat(Register::X_POSITION, xMillimeters);
+  WriteFloat(Register::Y_POSITION, yMillimeters);
+  WriteFloat(Register::H_ORIENTATION, headingRadians);
 }
 
 void GoBildaPinpoint::SetXPosition(wpi::units::meter_t position) {
@@ -213,15 +219,18 @@ double GoBildaPinpoint::GetYawScalar() {
 
 double GoBildaPinpoint::GetEncoderResolution() {
   ReadIfNotInBulkScope(Register::MM_PER_TICK);
-  return 1000.0 / m_millimetersPerTick;
+  return 1000.0 * m_ticksPerMillimeter;
 }
 
 GoBildaPinpoint::DeviceStatus GoBildaPinpoint::GetDeviceStatus() const {
-  return DecodeStatus(m_deviceStatus);
+  return m_badReadDetected ? DeviceStatus::FAULT_BAD_READ
+                           : DecodeStatus(m_deviceStatusBits);
 }
 
 int32_t GoBildaPinpoint::GetDeviceStatusBits() const {
-  return m_deviceStatus;
+  return m_deviceStatusBits |
+         (m_badReadDetected ? static_cast<int32_t>(DeviceStatus::FAULT_BAD_READ)
+                            : 0);
 }
 
 std::optional<GoBildaPinpoint::Register>
@@ -305,9 +314,9 @@ wpi::units::meter_t GoBildaPinpoint::GetYOffset() {
 }
 
 wpi::math::Pose2d GoBildaPinpoint::GetPose() {
-  ReadIfNotInBulkScope(Register::X_POSITION);
-  ReadIfNotInBulkScope(Register::Y_POSITION);
-  ReadIfNotInBulkScope(Register::H_ORIENTATION);
+  if (!BulkReadScopeContainsPose()) {
+    ReadPose();
+  }
   return wpi::math::Pose2d{
       wpi::units::meter_t{m_xPositionMillimeters / 1000.0},
       wpi::units::meter_t{m_yPositionMillimeters / 1000.0},
@@ -316,10 +325,9 @@ wpi::math::Pose2d GoBildaPinpoint::GetPose() {
 
 wpi::math::Quaternion GoBildaPinpoint::GetQuaternion() {
   RequireFirmwareVersion3("Quaternion output");
-  ReadIfNotInBulkScope(Register::QUATERNION_W);
-  ReadIfNotInBulkScope(Register::QUATERNION_X);
-  ReadIfNotInBulkScope(Register::QUATERNION_Y);
-  ReadIfNotInBulkScope(Register::QUATERNION_Z);
+  if (!BulkReadScopeContainsQuaternion()) {
+    ReadQuaternion();
+  }
   return wpi::math::Quaternion{m_quaternionW, m_quaternionX, m_quaternionY,
                                m_quaternionZ};
 }
@@ -378,6 +386,26 @@ void GoBildaPinpoint::ReadIfNotInBulkScope(Register reg) {
       m_bulkReadScope.end()) {
     ReadRegister(reg);
   }
+}
+
+bool GoBildaPinpoint::BulkReadScopeContainsPose() const {
+  auto contains = [this](Register reg) {
+    return std::find(m_bulkReadScope.begin(), m_bulkReadScope.end(), reg) !=
+           m_bulkReadScope.end();
+  };
+  return contains(Register::X_POSITION) && contains(Register::Y_POSITION) &&
+         contains(Register::H_ORIENTATION);
+}
+
+bool GoBildaPinpoint::BulkReadScopeContainsQuaternion() const {
+  auto contains = [this](Register reg) {
+    return std::find(m_bulkReadScope.begin(), m_bulkReadScope.end(), reg) !=
+           m_bulkReadScope.end();
+  };
+  return contains(Register::QUATERNION_W) &&
+         contains(Register::QUATERNION_X) &&
+         contains(Register::QUATERNION_Y) &&
+         contains(Register::QUATERNION_Z);
 }
 
 bool GoBildaPinpoint::IsIndividuallyReadable(Register reg) {
@@ -440,10 +468,9 @@ bool GoBildaPinpoint::WriteFloat(Register reg, float value) {
 
 bool GoBildaPinpoint::WriteBytes(Register reg,
                                  const std::vector<uint8_t>& data) {
-  std::vector<uint8_t> output;
-  output.reserve(data.size() + 1);
-  output.push_back(static_cast<uint8_t>(reg));
-  output.insert(output.end(), data.begin(), data.end());
+  std::vector<uint8_t> output(data.size() + 1);
+  output[0] = static_cast<uint8_t>(reg);
+  std::copy(data.begin(), data.end(), output.begin() + 1);
   if (m_i2c.WriteBulk(output.data(), static_cast<int>(output.size()))) {
     RecordFailure(reg, FailureReason::I2C_WRITE_ABORTED);
     return false;
@@ -466,12 +493,12 @@ std::vector<uint8_t> GoBildaPinpoint::ReadBytes(Register reg, int count) {
   return data;
 }
 
-void GoBildaPinpoint::ReadRegister(Register reg) {
+void GoBildaPinpoint::ReadRegister(Register reg, bool clearPreviousBadRead) {
   if (!IsIndividuallyReadable(reg)) {
     throw std::invalid_argument("Register cannot be read individually");
   }
 
-  int32_t previousStatus = m_deviceStatus;
+  bool previousBadRead = m_badReadDetected;
   m_badReadDetected = false;
   int readLength = kRegisterLength;
   if (m_errorDetectionType == ErrorDetectionType::CRC) {
@@ -497,7 +524,56 @@ void GoBildaPinpoint::ReadRegister(Register reg) {
     case RegisterType::BULK:
       throw std::invalid_argument("Register cannot be read individually");
   }
-  FinishRead(previousStatus, reg == Register::DEVICE_STATUS, false);
+  FinishRead(previousBadRead, clearPreviousBadRead);
+}
+
+void GoBildaPinpoint::ReadPose() {
+  bool previousBadRead = m_badReadDetected;
+  m_badReadDetected = false;
+  int readLength =
+      kPoseReadLength +
+      (m_errorDetectionType == ErrorDetectionType::CRC ? kCrcLength : 0);
+  std::vector<uint8_t> data = ReadBytes(Register::X_POSITION, readLength);
+  if (data.empty()) {
+    return;
+  }
+  if (m_errorDetectionType == ErrorDetectionType::CRC &&
+      !CheckCrc(data, kPoseReadLength)) {
+    RecordFailure(Register::X_POSITION, FailureReason::CRC_MISMATCH);
+    return;
+  }
+
+  SaveFloat(Register::X_POSITION, DecodeFloat(data, 0), false);
+  SaveFloat(Register::Y_POSITION, DecodeFloat(data, kRegisterLength), false);
+  SaveFloat(Register::H_ORIENTATION,
+            DecodeFloat(data, 2 * kRegisterLength), false);
+  FinishRead(previousBadRead, false);
+}
+
+void GoBildaPinpoint::ReadQuaternion() {
+  bool previousBadRead = m_badReadDetected;
+  m_badReadDetected = false;
+  int readLength =
+      kQuaternionReadLength +
+      (m_errorDetectionType == ErrorDetectionType::CRC ? kCrcLength : 0);
+  std::vector<uint8_t> data =
+      ReadBytes(Register::QUATERNION_W, readLength);
+  if (data.empty()) {
+    return;
+  }
+  if (m_errorDetectionType == ErrorDetectionType::CRC &&
+      !CheckCrc(data, kQuaternionReadLength)) {
+    RecordFailure(Register::QUATERNION_W, FailureReason::CRC_MISMATCH);
+    return;
+  }
+
+  SaveFloat(Register::QUATERNION_W, DecodeFloat(data, 0), false);
+  SaveFloat(Register::QUATERNION_X, DecodeFloat(data, kRegisterLength), false);
+  SaveFloat(Register::QUATERNION_Y, DecodeFloat(data, 2 * kRegisterLength),
+            false);
+  SaveFloat(Register::QUATERNION_Z, DecodeFloat(data, 3 * kRegisterLength),
+            false);
+  FinishRead(previousBadRead, false);
 }
 
 void GoBildaPinpoint::FixedBulkRead() {
@@ -506,7 +582,8 @@ void GoBildaPinpoint::FixedBulkRead() {
         "CRC error detection requires firmware version 3 or newer");
   }
 
-  int32_t previousStatus = m_deviceStatus;
+  bool previousBadRead = m_badReadDetected;
+  m_badReadDetected = false;
   std::vector<uint8_t> data =
       ReadBytes(Register::BULK_READ, kFixedBulkReadLength);
   if (data.empty()) {
@@ -519,7 +596,6 @@ void GoBildaPinpoint::FixedBulkRead() {
     return;
   }
 
-  m_badReadDetected = false;
   SaveInt(Register::DEVICE_STATUS, DecodeInt(data, 0));
   SaveInt(Register::LOOP_TIME, loopTime);
   SaveInt(Register::X_ENCODER_VALUE, DecodeInt(data, 8));
@@ -530,11 +606,12 @@ void GoBildaPinpoint::FixedBulkRead() {
   SaveFloat(Register::X_VELOCITY, DecodeFloat(data, 28), true);
   SaveFloat(Register::Y_VELOCITY, DecodeFloat(data, 32), true);
   SaveFloat(Register::H_VELOCITY, DecodeFloat(data, 36), true);
-  FinishRead(previousStatus, true, true);
+  FinishRead(previousBadRead, true);
 }
 
 void GoBildaPinpoint::FlexibleBulkRead() {
-  int32_t previousStatus = m_deviceStatus;
+  bool previousBadRead = m_badReadDetected;
+  m_badReadDetected = false;
   std::size_t dataLength = m_bulkReadScope.size() * kRegisterLength;
   int readLength = static_cast<int>(
       dataLength +
@@ -549,7 +626,6 @@ void GoBildaPinpoint::FlexibleBulkRead() {
     return;
   }
 
-  m_badReadDetected = false;
   for (std::size_t i = 0; i < m_bulkReadScope.size(); ++i) {
     Register reg = m_bulkReadScope[i];
     std::size_t offset = i * kRegisterLength;
@@ -564,10 +640,7 @@ void GoBildaPinpoint::FlexibleBulkRead() {
         throw std::logic_error("A bulk-read scope contains BULK_READ");
     }
   }
-  FinishRead(previousStatus,
-             std::find(m_bulkReadScope.begin(), m_bulkReadScope.end(),
-                       Register::DEVICE_STATUS) != m_bulkReadScope.end(),
-             true);
+  FinishRead(previousBadRead, true);
 }
 
 void GoBildaPinpoint::SaveInt(Register reg, int32_t value) {
@@ -579,7 +652,7 @@ void GoBildaPinpoint::SaveInt(Register reg, int32_t value) {
       m_deviceVersion = value;
       break;
     case Register::DEVICE_STATUS:
-      m_deviceStatus = value;
+      m_deviceStatusBits = value;
       break;
     case Register::LOOP_TIME:
       m_loopTimeMicroseconds = value;
@@ -655,7 +728,7 @@ void GoBildaPinpoint::SaveFloat(Register reg, float value, bool bulkUpdate) {
       break;
     }
     case Register::MM_PER_TICK:
-      m_millimetersPerTick = value;
+      m_ticksPerMillimeter = value;
       break;
     case Register::X_POD_OFFSET:
       m_xPodOffsetMillimeters = value;
@@ -734,20 +807,16 @@ std::optional<float> GoBildaPinpoint::ValidateVelocity(Register reg,
 
 void GoBildaPinpoint::RecordFailure(Register reg, FailureReason reason) {
   m_badReadDetected = true;
-  m_deviceStatus = static_cast<int32_t>(DeviceStatus::FAULT_BAD_READ);
   m_lastFailedRegister = reg;
   m_lastFailureReason = reason;
   ++m_failureCount;
   ++m_failureCounts[RegisterIndex(reg)];
 }
 
-void GoBildaPinpoint::FinishRead(int32_t previousStatus, bool deviceStatusRead,
+void GoBildaPinpoint::FinishRead(bool previousBadRead,
                                  bool clearPreviousBadRead) {
-  if (m_badReadDetected) {
-    m_deviceStatus = static_cast<int32_t>(DeviceStatus::FAULT_BAD_READ);
-  } else if (clearPreviousBadRead && !deviceStatusRead &&
-             DecodeStatus(previousStatus) == DeviceStatus::FAULT_BAD_READ) {
-    m_deviceStatus = static_cast<int32_t>(DeviceStatus::READY);
+  if (!m_badReadDetected && previousBadRead && !clearPreviousBadRead) {
+    m_badReadDetected = true;
   }
 }
 

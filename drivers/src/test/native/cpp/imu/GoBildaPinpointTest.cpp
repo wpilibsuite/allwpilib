@@ -91,12 +91,16 @@ class PinpointTestFixture {
 
   std::unordered_map<int, std::vector<uint8_t>> m_registerData;
   std::vector<std::vector<uint8_t>> m_writes;
+  std::vector<int> m_readRegisters;
+  std::vector<unsigned int> m_readCounts;
   int m_selectedRegister = 0;
 
  private:
   static void ReadCallback(const char*, void* param, unsigned char* buffer,
                            unsigned int count) {
     auto& self = *static_cast<PinpointTestFixture*>(param);
+    self.m_readRegisters.push_back(self.m_selectedRegister);
+    self.m_readCounts.push_back(count);
     std::fill_n(buffer, count, 0);
     auto it = self.m_registerData.find(self.m_selectedRegister);
     if (it != self.m_registerData.end()) {
@@ -175,6 +179,148 @@ TEST_CASE_METHOD(PinpointTestFixture,
 }
 
 TEST_CASE_METHOD(PinpointTestFixture,
+                 "GoBildaPinpoint reads a partial pose scope as one snapshot",
+                 "[drivers][gobilda-pinpoint]") {
+  SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
+  wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
+  pinpoint.SetBulkReadScope(
+      {Register::X_POSITION, Register::H_ORIENTATION});
+  SetRegister(Register::BULK_READ,
+              Concat(EncodeFloat(1000.0f), EncodeFloat(0.1f)));
+  pinpoint.Update();
+
+  SetRegister(Register::X_POSITION,
+              Concat(EncodeFloat(2000.0f), EncodeFloat(3000.0f),
+                     EncodeFloat(0.2f)));
+  std::size_t readCount = m_readCounts.size();
+
+  auto pose = pinpoint.GetPose();
+
+  CHECK(pose.X().value() == Catch::Approx(2.0));
+  CHECK(pose.Y().value() == Catch::Approx(3.0));
+  CHECK(pose.Rotation().Radians().value() == Catch::Approx(0.2));
+  REQUIRE(m_readCounts.size() == readCount + 1);
+  CHECK(m_readRegisters[readCount] ==
+        static_cast<int>(Register::X_POSITION));
+  CHECK(m_readCounts[readCount] == 12);
+}
+
+TEST_CASE_METHOD(
+    PinpointTestFixture,
+    "GoBildaPinpoint reads an omitted pose scope as one CRC protected snapshot",
+    "[drivers][gobilda-pinpoint]") {
+  SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
+  wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
+  pinpoint.SetBulkReadScope({Register::DEVICE_STATUS});
+  pinpoint.SetErrorDetectionType(
+      wpi::GoBildaPinpoint::ErrorDetectionType::CRC);
+  SetRegister(Register::BULK_READ, AppendCrc(EncodeInt(1)));
+  pinpoint.Update();
+
+  SetRegister(Register::X_POSITION,
+              AppendCrc(Concat(EncodeFloat(4000.0f), EncodeFloat(-5000.0f),
+                               EncodeFloat(1.25f))));
+  std::size_t readCount = m_readCounts.size();
+
+  auto pose = pinpoint.GetPose();
+
+  CHECK(pose.X().value() == Catch::Approx(4.0));
+  CHECK(pose.Y().value() == Catch::Approx(-5.0));
+  CHECK(pose.Rotation().Radians().value() == Catch::Approx(1.25));
+  REQUIRE(m_readCounts.size() == readCount + 1);
+  CHECK(m_readRegisters[readCount] ==
+        static_cast<int>(Register::X_POSITION));
+  CHECK(m_readCounts[readCount] == 13);
+}
+
+TEST_CASE_METHOD(
+    PinpointTestFixture,
+    "GoBildaPinpoint reads a partial quaternion scope as one snapshot",
+    "[drivers][gobilda-pinpoint]") {
+  SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
+  wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
+  pinpoint.SetBulkReadScope(
+      {Register::QUATERNION_W, Register::QUATERNION_Z});
+  SetRegister(Register::BULK_READ,
+              Concat(EncodeFloat(0.1f), EncodeFloat(0.4f)));
+  pinpoint.Update();
+
+  SetRegister(Register::QUATERNION_W,
+              Concat(EncodeFloat(0.5f), EncodeFloat(-0.25f),
+                     EncodeFloat(0.125f), EncodeFloat(0.75f)));
+  std::size_t readCount = m_readCounts.size();
+
+  auto quaternion = pinpoint.GetQuaternion();
+
+  CHECK(quaternion.W() == Catch::Approx(0.5));
+  CHECK(quaternion.X() == Catch::Approx(-0.25));
+  CHECK(quaternion.Y() == Catch::Approx(0.125));
+  CHECK(quaternion.Z() == Catch::Approx(0.75));
+  REQUIRE(m_readCounts.size() == readCount + 1);
+  CHECK(m_readRegisters[readCount] ==
+        static_cast<int>(Register::QUATERNION_W));
+  CHECK(m_readCounts[readCount] == 16);
+}
+
+TEST_CASE_METHOD(PinpointTestFixture,
+                 "GoBildaPinpoint uses a complete cached quaternion scope",
+                 "[drivers][gobilda-pinpoint]") {
+  SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
+  wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
+  pinpoint.SetBulkReadScope(
+      {Register::QUATERNION_W, Register::QUATERNION_X,
+       Register::QUATERNION_Y, Register::QUATERNION_Z});
+  SetRegister(Register::BULK_READ,
+              Concat(EncodeFloat(0.5f), EncodeFloat(-0.25f),
+                     EncodeFloat(0.125f), EncodeFloat(0.75f)));
+  pinpoint.Update();
+  std::size_t readCount = m_readCounts.size();
+
+  auto quaternion = pinpoint.GetQuaternion();
+
+  CHECK(quaternion.W() == Catch::Approx(0.5));
+  CHECK(quaternion.X() == Catch::Approx(-0.25));
+  CHECK(quaternion.Y() == Catch::Approx(0.125));
+  CHECK(quaternion.Z() == Catch::Approx(0.75));
+  CHECK(m_readCounts.size() == readCount);
+}
+
+TEST_CASE_METHOD(
+    PinpointTestFixture,
+    "GoBildaPinpoint quaternion snapshot CRC failure preserves cached values",
+    "[drivers][gobilda-pinpoint]") {
+  SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
+  wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
+  pinpoint.SetBulkReadScope({Register::DEVICE_STATUS});
+  pinpoint.SetErrorDetectionType(
+      wpi::GoBildaPinpoint::ErrorDetectionType::CRC);
+  SetRegister(Register::BULK_READ, AppendCrc(EncodeInt(1)));
+  pinpoint.Update();
+
+  auto data = AppendCrc(Concat(EncodeFloat(0.5f), EncodeFloat(-0.25f),
+                               EncodeFloat(0.125f), EncodeFloat(0.75f)));
+  data.back() ^= 1;
+  SetRegister(Register::QUATERNION_W, std::move(data));
+  std::size_t readCount = m_readCounts.size();
+
+  auto quaternion = pinpoint.GetQuaternion();
+
+  CHECK(quaternion.W() == Catch::Approx(0.0));
+  CHECK(quaternion.X() == Catch::Approx(0.0));
+  CHECK(quaternion.Y() == Catch::Approx(0.0));
+  CHECK(quaternion.Z() == Catch::Approx(0.0));
+  REQUIRE(m_readCounts.size() == readCount + 1);
+  CHECK(m_readRegisters[readCount] ==
+        static_cast<int>(Register::QUATERNION_W));
+  CHECK(m_readCounts[readCount] == 17);
+  CHECK(pinpoint.GetDeviceStatus() ==
+        wpi::GoBildaPinpoint::DeviceStatus::FAULT_BAD_READ);
+  CHECK(pinpoint.GetLastFailedRegister() == Register::QUATERNION_W);
+  CHECK(pinpoint.GetLastFailureReason() ==
+        wpi::GoBildaPinpoint::FailureReason::CRC_MISMATCH);
+}
+
+TEST_CASE_METHOD(PinpointTestFixture,
                  "GoBildaPinpoint validates CRC and preserves measurements",
                  "[drivers][gobilda-pinpoint]") {
   SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
@@ -224,6 +370,62 @@ TEST_CASE_METHOD(PinpointTestFixture,
         wpi::GoBildaPinpoint::FailureReason::CHANGE_TOO_LARGE);
 }
 
+TEST_CASE_METHOD(
+    PinpointTestFixture,
+    "GoBildaPinpoint transient read failures preserve cached device status",
+    "[drivers][gobilda-pinpoint]") {
+  using DeviceStatus = wpi::GoBildaPinpoint::DeviceStatus;
+  SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
+  wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
+
+  pinpoint.SetBulkReadScope(
+      {Register::DEVICE_STATUS, Register::H_ORIENTATION});
+  SetRegister(Register::BULK_READ,
+              Concat(EncodeInt(static_cast<int32_t>(DeviceStatus::CALIBRATING)),
+                     EncodeFloat(0.25f)));
+  pinpoint.Update();
+  CHECK(pinpoint.GetDeviceStatus() == DeviceStatus::CALIBRATING);
+
+  SetRegister(Register::H_ORIENTATION,
+              EncodeFloat(std::numeric_limits<float>::quiet_NaN()));
+  pinpoint.UpdateHeading();
+  CHECK(pinpoint.GetDeviceStatus() == DeviceStatus::FAULT_BAD_READ);
+  CHECK(pinpoint.GetDeviceStatusBits() ==
+        (static_cast<int32_t>(DeviceStatus::CALIBRATING) |
+         static_cast<int32_t>(DeviceStatus::FAULT_BAD_READ)));
+
+  SetRegister(Register::H_ORIENTATION, EncodeFloat(0.5f));
+  pinpoint.UpdateHeading();
+  CHECK(pinpoint.GetDeviceStatus() == DeviceStatus::CALIBRATING);
+  CHECK(pinpoint.GetDeviceStatusBits() ==
+        static_cast<int32_t>(DeviceStatus::CALIBRATING));
+
+  SetRegister(
+      Register::BULK_READ,
+      Concat(EncodeInt(
+                 static_cast<int32_t>(DeviceStatus::FAULT_X_POD_NOT_DETECTED)),
+             EncodeFloat(0.75f)));
+  pinpoint.Update();
+  CHECK(pinpoint.GetDeviceStatus() ==
+        DeviceStatus::FAULT_X_POD_NOT_DETECTED);
+
+  pinpoint.SetBulkReadScope({Register::H_ORIENTATION});
+  SetRegister(Register::BULK_READ,
+              EncodeFloat(std::numeric_limits<float>::quiet_NaN()));
+  pinpoint.Update();
+  CHECK(pinpoint.GetDeviceStatus() == DeviceStatus::FAULT_BAD_READ);
+  CHECK(pinpoint.GetDeviceStatusBits() ==
+        (static_cast<int32_t>(DeviceStatus::FAULT_X_POD_NOT_DETECTED) |
+         static_cast<int32_t>(DeviceStatus::FAULT_BAD_READ)));
+
+  SetRegister(Register::BULK_READ, EncodeFloat(1.0f));
+  pinpoint.Update();
+  CHECK(pinpoint.GetDeviceStatus() ==
+        DeviceStatus::FAULT_X_POD_NOT_DETECTED);
+  CHECK(pinpoint.GetDeviceStatusBits() ==
+        static_cast<int32_t>(DeviceStatus::FAULT_X_POD_NOT_DETECTED));
+}
+
 TEST_CASE_METHOD(PinpointTestFixture,
                  "GoBildaPinpoint rejects invalid configuration",
                  "[drivers][gobilda-pinpoint]") {
@@ -237,6 +439,49 @@ TEST_CASE_METHOD(PinpointTestFixture,
   CHECK_THROWS_AS(
       pinpoint.SetYawScalar(std::numeric_limits<double>::infinity()),
       std::invalid_argument);
+}
+
+TEST_CASE_METHOD(PinpointTestFixture,
+                 "GoBildaPinpoint validates the entire pose before writing",
+                 "[drivers][gobilda-pinpoint]") {
+  wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
+
+  CHECK_THROWS_AS(
+      pinpoint.SetPose(wpi::math::Pose2d{
+          wpi::units::meter_t{1.0},
+          wpi::units::meter_t{std::numeric_limits<double>::max()},
+          wpi::math::Rotation2d{}}),
+      std::invalid_argument);
+  CHECK(m_writes.empty());
+
+  CHECK_THROWS_AS(
+      pinpoint.SetPose(wpi::math::Pose2d{
+          wpi::units::meter_t{1.0}, wpi::units::meter_t{2.0},
+          wpi::math::Rotation2d{wpi::units::radian_t{
+              std::numeric_limits<double>::quiet_NaN()}}}),
+      std::invalid_argument);
+  CHECK(m_writes.empty());
+}
+
+TEST_CASE_METHOD(
+    PinpointTestFixture,
+    "GoBildaPinpoint converts encoder resolution to and from device units",
+    "[drivers][gobilda-pinpoint]") {
+  SetRegister(Register::MM_PER_TICK, EncodeFloat(12.345f));
+  wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
+
+  pinpoint.SetEncoderResolution(wpi::GoBildaPinpoint::OdometryPod::SWINGARM);
+  CHECK(m_writes.back() ==
+        Concat(std::vector<uint8_t>{static_cast<uint8_t>(
+                   Register::MM_PER_TICK)},
+               EncodeFloat(13.26291192f)));
+
+  pinpoint.SetEncoderResolution(54321.0);
+  CHECK(m_writes.back() ==
+        Concat(std::vector<uint8_t>{static_cast<uint8_t>(
+                   Register::MM_PER_TICK)},
+               EncodeFloat(54.321f)));
+  CHECK(pinpoint.GetEncoderResolution() == Catch::Approx(12345.0));
 }
 
 }  // namespace

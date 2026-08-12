@@ -45,6 +45,8 @@ public class GoBildaPinpoint implements AutoCloseable {
 
   private static final int REGISTER_LENGTH = 4;
   private static final int FIXED_BULK_READ_LENGTH = 40;
+  private static final int POSE_READ_LENGTH = 3 * REGISTER_LENGTH;
+  private static final int QUATERNION_READ_LENGTH = 4 * REGISTER_LENGTH;
   private static final int CRC_LENGTH = 1;
 
   private static final byte CRC_INITIAL_VALUE = (byte) 0x90;
@@ -127,7 +129,7 @@ public class GoBildaPinpoint implements AutoCloseable {
     Y_VELOCITY(12, RegisterType.FLOAT),
     /** Heading velocity in radians per second. */
     H_VELOCITY(13, RegisterType.FLOAT),
-    /** Millimeters traveled per encoder tick. */
+    /** Encoder ticks per millimeter traveled. */
     MM_PER_TICK(14, RegisterType.FLOAT),
     /** X pod offset in millimeters. */
     X_POD_OFFSET(15, RegisterType.FLOAT),
@@ -245,7 +247,7 @@ public class GoBildaPinpoint implements AutoCloseable {
 
   private int m_deviceId;
   private int m_deviceVersion;
-  private int m_deviceStatus;
+  private int m_deviceStatusBits;
   private int m_loopTimeMicroseconds;
   private int m_xEncoderValue;
   private int m_yEncoderValue;
@@ -255,7 +257,7 @@ public class GoBildaPinpoint implements AutoCloseable {
   private float m_xVelocityMillimetersPerSecond;
   private float m_yVelocityMillimetersPerSecond;
   private float m_headingVelocityRadiansPerSecond;
-  private float m_millimetersPerTick;
+  private float m_ticksPerMillimeter;
   private float m_xPodOffsetMillimeters;
   private float m_yPodOffsetMillimeters;
   private float m_yawScalar;
@@ -366,11 +368,7 @@ public class GoBildaPinpoint implements AutoCloseable {
    */
   public void updateHeading() {
     requireOpen();
-    final int previousStatus = m_deviceStatus;
-    readRegister(Register.H_ORIENTATION);
-    if (!m_badReadDetected && decodeStatus(previousStatus) == DeviceStatus.FAULT_BAD_READ) {
-      m_deviceStatus = DeviceStatus.READY.m_mask;
-    }
+    readRegister(Register.H_ORIENTATION, true);
   }
 
   /**
@@ -528,8 +526,8 @@ public class GoBildaPinpoint implements AutoCloseable {
    * Sets a custom odometry pod encoder resolution.
    *
    * @param ticksPerMeter encoder ticks per meter of pod travel
-   * @throws IllegalArgumentException if {@code ticksPerMeter} is nonfinite, not positive, or
-   *     produces a millimeters-per-tick value that cannot be represented by the device's 32-bit
+   * @throws IllegalArgumentException if {@code ticksPerMeter} is nonfinite, not positive, or does
+   *     not produce a positive ticks-per-millimeter value representable by the device's 32-bit
    *     floating-point register
    * @throws IllegalStateException if this driver has been closed
    */
@@ -537,8 +535,12 @@ public class GoBildaPinpoint implements AutoCloseable {
     if (!Double.isFinite(ticksPerMeter) || ticksPerMeter <= 0.0) {
       throw new IllegalArgumentException("ticksPerMeter must be finite and greater than zero");
     }
-    writeFloat(
-        Register.MM_PER_TICK, requireFiniteFloat(1000.0 / ticksPerMeter, "millimeters per tick"));
+    float ticksPerMillimeter = requireFiniteFloat(ticksPerMeter / 1000.0, "ticks per millimeter");
+    if (ticksPerMillimeter <= 0.0f) {
+      throw new IllegalArgumentException(
+          "ticksPerMeter must produce a positive 32-bit ticks-per-millimeter value");
+    }
+    writeFloat(Register.MM_PER_TICK, ticksPerMillimeter);
   }
 
   /**
@@ -564,9 +566,13 @@ public class GoBildaPinpoint implements AutoCloseable {
    */
   public void setPose(Pose2d pose) {
     ErrorMessages.requireNonNullParam(pose, "pose", "setPose");
-    setXPosition(pose.getMeasureX());
-    setYPosition(pose.getMeasureY());
-    setHeading(pose.getRotation().getMeasure());
+    float xMillimeters = metersToMillimeters(pose.getX(), "pose X");
+    float yMillimeters = metersToMillimeters(pose.getY(), "pose Y");
+    float headingRadians = requireFiniteFloat(pose.getRotation().getRadians(), "pose heading");
+
+    writeFloat(Register.X_POSITION, xMillimeters);
+    writeFloat(Register.Y_POSITION, yMillimeters);
+    writeFloat(Register.H_ORIENTATION, headingRadians);
   }
 
   /**
@@ -683,13 +689,12 @@ public class GoBildaPinpoint implements AutoCloseable {
   /**
    * Returns the configured encoder resolution.
    *
-   * @return encoder ticks per meter, or positive infinity if the device reports zero millimeters
-   *     per tick
+   * @return encoder ticks per meter
    * @throws IllegalStateException if this driver has been closed
    */
   public double getEncoderResolutionTicksPerMeter() {
     readIfNotInBulkScope(Register.MM_PER_TICK);
-    return 1000.0 / m_millimetersPerTick;
+    return 1000.0 * m_ticksPerMillimeter;
   }
 
   /**
@@ -700,18 +705,18 @@ public class GoBildaPinpoint implements AutoCloseable {
    */
   public DeviceStatus getDeviceStatus() {
     requireOpen();
-    return decodeStatus(m_deviceStatus);
+    return m_badReadDetected ? DeviceStatus.FAULT_BAD_READ : decodeStatus(m_deviceStatusBits);
   }
 
   /**
-   * Returns the raw device status bit field.
+   * Returns the cached device status bits combined with the local bad-read status bit, if set.
    *
    * @return status bits
    * @throws IllegalStateException if this driver has been closed
    */
   public int getDeviceStatusBits() {
     requireOpen();
-    return m_deviceStatus;
+    return m_deviceStatusBits | (m_badReadDetected ? DeviceStatus.FAULT_BAD_READ.m_mask : 0);
   }
 
   /**
@@ -987,13 +992,17 @@ public class GoBildaPinpoint implements AutoCloseable {
    * Returns the tracked pose. Translation is in meters; heading is normalized by {@link
    * Rotation2d}.
    *
+   * <p>If the configured bulk-read scope does not contain all three pose registers, this reads X,
+   * Y, and heading together so the returned components are from the same device snapshot.
+   *
    * @return tracked pose
    * @throws IllegalStateException if this driver has been closed
    */
   public Pose2d getPose() {
-    readIfNotInBulkScope(Register.X_POSITION);
-    readIfNotInBulkScope(Register.Y_POSITION);
-    readIfNotInBulkScope(Register.H_ORIENTATION);
+    requireOpen();
+    if (!bulkReadScopeContainsPose()) {
+      readPose();
+    }
     return new Pose2d(
         m_xPositionMillimeters / 1000.0,
         m_yPositionMillimeters / 1000.0,
@@ -1001,7 +1010,9 @@ public class GoBildaPinpoint implements AutoCloseable {
   }
 
   /**
-   * Returns the device orientation quaternion. Requires v3 or newer firmware.
+   * Returns the device orientation quaternion. Requires v3 or newer firmware. If the configured
+   * bulk-read scope does not contain all four quaternion registers, this reads all four components
+   * together so they come from the same device snapshot.
    *
    * @return orientation quaternion
    * @throws IllegalStateException if this driver has been closed
@@ -1009,10 +1020,10 @@ public class GoBildaPinpoint implements AutoCloseable {
    */
   public Quaternion getQuaternion() {
     requireFirmwareVersion3("Quaternion output");
-    readIfNotInBulkScope(Register.QUATERNION_W);
-    readIfNotInBulkScope(Register.QUATERNION_X);
-    readIfNotInBulkScope(Register.QUATERNION_Y);
-    readIfNotInBulkScope(Register.QUATERNION_Z);
+    requireOpen();
+    if (!bulkReadScopeContainsQuaternion()) {
+      readQuaternion();
+    }
     return new Quaternion(m_quaternionW, m_quaternionX, m_quaternionY, m_quaternionZ);
   }
 
@@ -1111,6 +1122,21 @@ public class GoBildaPinpoint implements AutoCloseable {
     }
   }
 
+  private boolean bulkReadScopeContainsPose() {
+    var bulkReadScope = Arrays.asList(m_bulkReadScope);
+    return bulkReadScope.contains(Register.X_POSITION)
+        && bulkReadScope.contains(Register.Y_POSITION)
+        && bulkReadScope.contains(Register.H_ORIENTATION);
+  }
+
+  private boolean bulkReadScopeContainsQuaternion() {
+    var bulkReadScope = Arrays.asList(m_bulkReadScope);
+    return bulkReadScope.contains(Register.QUATERNION_W)
+        && bulkReadScope.contains(Register.QUATERNION_X)
+        && bulkReadScope.contains(Register.QUATERNION_Y)
+        && bulkReadScope.contains(Register.QUATERNION_Z);
+  }
+
   private static boolean isIndividuallyReadable(Register register) {
     return register != Register.DEVICE_CONTROL
         && register != Register.BULK_READ
@@ -1152,11 +1178,15 @@ public class GoBildaPinpoint implements AutoCloseable {
   }
 
   private void readRegister(Register register) {
+    readRegister(register, false);
+  }
+
+  private void readRegister(Register register, boolean clearPreviousBadRead) {
     if (!isIndividuallyReadable(register)) {
       throw new IllegalArgumentException(register + " cannot be read individually");
     }
 
-    final int previousStatus = m_deviceStatus;
+    final boolean previousBadRead = m_badReadDetected;
     m_badReadDetected = false;
     int readLength = REGISTER_LENGTH;
     if (m_errorDetectionType == ErrorDetectionType.CRC) {
@@ -1177,7 +1207,48 @@ public class GoBildaPinpoint implements AutoCloseable {
       case BULK -> throw new IllegalArgumentException(register + " cannot be read individually");
       default -> throw new IllegalStateException("Unknown register type");
     }
-    finishRead(previousStatus, register == Register.DEVICE_STATUS, false);
+    finishRead(previousBadRead, clearPreviousBadRead);
+  }
+
+  private void readPose() {
+    final boolean previousBadRead = m_badReadDetected;
+    m_badReadDetected = false;
+    int readLength =
+        POSE_READ_LENGTH + (m_errorDetectionType == ErrorDetectionType.CRC ? CRC_LENGTH : 0);
+    byte[] data = readBytes(Register.X_POSITION, readLength);
+    if (data.length == 0) {
+      return;
+    }
+    if (m_errorDetectionType == ErrorDetectionType.CRC && !checkCrc(data, POSE_READ_LENGTH)) {
+      recordFailure(Register.X_POSITION, FailureReason.CRC_MISMATCH);
+      return;
+    }
+
+    saveFloat(Register.X_POSITION, decodeFloat(data, 0), false);
+    saveFloat(Register.Y_POSITION, decodeFloat(data, REGISTER_LENGTH), false);
+    saveFloat(Register.H_ORIENTATION, decodeFloat(data, 2 * REGISTER_LENGTH), false);
+    finishRead(previousBadRead, false);
+  }
+
+  private void readQuaternion() {
+    final boolean previousBadRead = m_badReadDetected;
+    m_badReadDetected = false;
+    int readLength =
+        QUATERNION_READ_LENGTH + (m_errorDetectionType == ErrorDetectionType.CRC ? CRC_LENGTH : 0);
+    byte[] data = readBytes(Register.QUATERNION_W, readLength);
+    if (data.length == 0) {
+      return;
+    }
+    if (m_errorDetectionType == ErrorDetectionType.CRC && !checkCrc(data, QUATERNION_READ_LENGTH)) {
+      recordFailure(Register.QUATERNION_W, FailureReason.CRC_MISMATCH);
+      return;
+    }
+
+    saveFloat(Register.QUATERNION_W, decodeFloat(data, 0), false);
+    saveFloat(Register.QUATERNION_X, decodeFloat(data, REGISTER_LENGTH), false);
+    saveFloat(Register.QUATERNION_Y, decodeFloat(data, 2 * REGISTER_LENGTH), false);
+    saveFloat(Register.QUATERNION_Z, decodeFloat(data, 3 * REGISTER_LENGTH), false);
+    finishRead(previousBadRead, false);
   }
 
   private void fixedBulkRead() {
@@ -1186,7 +1257,8 @@ public class GoBildaPinpoint implements AutoCloseable {
           "CRC error detection requires firmware version 3 or newer");
     }
 
-    final int previousStatus = m_deviceStatus;
+    final boolean previousBadRead = m_badReadDetected;
+    m_badReadDetected = false;
     byte[] data = readBytes(Register.BULK_READ, FIXED_BULK_READ_LENGTH);
     if (data.length == 0) {
       return;
@@ -1198,7 +1270,6 @@ public class GoBildaPinpoint implements AutoCloseable {
       return;
     }
 
-    m_badReadDetected = false;
     saveInt(Register.DEVICE_STATUS, decodeInt(data, 0));
     saveInt(Register.LOOP_TIME, loopTime);
     saveInt(Register.X_ENCODER_VALUE, decodeInt(data, 8));
@@ -1209,11 +1280,12 @@ public class GoBildaPinpoint implements AutoCloseable {
     saveFloat(Register.X_VELOCITY, decodeFloat(data, 28), true);
     saveFloat(Register.Y_VELOCITY, decodeFloat(data, 32), true);
     saveFloat(Register.H_VELOCITY, decodeFloat(data, 36), true);
-    finishRead(previousStatus, true, true);
+    finishRead(previousBadRead, true);
   }
 
   private void flexibleBulkRead() {
-    final int previousStatus = m_deviceStatus;
+    final boolean previousBadRead = m_badReadDetected;
+    m_badReadDetected = false;
     int dataLength = m_bulkReadScope.length * REGISTER_LENGTH;
     int readLength = dataLength + (m_errorDetectionType == ErrorDetectionType.CRC ? CRC_LENGTH : 0);
     byte[] data = readBytes(Register.BULK_READ, readLength);
@@ -1225,7 +1297,6 @@ public class GoBildaPinpoint implements AutoCloseable {
       return;
     }
 
-    m_badReadDetected = false;
     for (int i = 0; i < m_bulkReadScope.length; i++) {
       Register register = m_bulkReadScope[i];
       int offset = i * REGISTER_LENGTH;
@@ -1236,15 +1307,14 @@ public class GoBildaPinpoint implements AutoCloseable {
         default -> throw new IllegalStateException("Unknown register type");
       }
     }
-    finishRead(
-        previousStatus, Arrays.asList(m_bulkReadScope).contains(Register.DEVICE_STATUS), true);
+    finishRead(previousBadRead, true);
   }
 
   private void saveInt(Register register, int value) {
     switch (register) {
       case DEVICE_ID -> m_deviceId = value;
       case DEVICE_VERSION -> m_deviceVersion = value;
-      case DEVICE_STATUS -> m_deviceStatus = value;
+      case DEVICE_STATUS -> m_deviceStatusBits = value;
       case LOOP_TIME -> m_loopTimeMicroseconds = value;
       case X_ENCODER_VALUE -> m_xEncoderValue = value;
       case Y_ENCODER_VALUE -> m_yEncoderValue = value;
@@ -1318,7 +1388,7 @@ public class GoBildaPinpoint implements AutoCloseable {
           m_headingVelocityRadiansPerSecond = validated;
         }
       }
-      case MM_PER_TICK -> m_millimetersPerTick = value;
+      case MM_PER_TICK -> m_ticksPerMillimeter = value;
       case X_POD_OFFSET -> m_xPodOffsetMillimeters = value;
       case Y_POD_OFFSET -> m_yPodOffsetMillimeters = value;
       case YAW_SCALAR -> m_yawScalar = value;
@@ -1381,21 +1451,15 @@ public class GoBildaPinpoint implements AutoCloseable {
 
   private void recordFailure(Register register, FailureReason reason) {
     m_badReadDetected = true;
-    m_deviceStatus = DeviceStatus.FAULT_BAD_READ.m_mask;
     m_lastFailedRegister = register;
     m_lastFailureReason = reason;
     m_failureCount++;
     m_failureCounts[register.ordinal()]++;
   }
 
-  private void finishRead(
-      int previousStatus, boolean deviceStatusRead, boolean clearPreviousBadRead) {
-    if (m_badReadDetected) {
-      m_deviceStatus = DeviceStatus.FAULT_BAD_READ.m_mask;
-    } else if (clearPreviousBadRead
-        && !deviceStatusRead
-        && decodeStatus(previousStatus) == DeviceStatus.FAULT_BAD_READ) {
-      m_deviceStatus = DeviceStatus.READY.m_mask;
+  private void finishRead(boolean previousBadRead, boolean clearPreviousBadRead) {
+    if (!m_badReadDetected && previousBadRead && !clearPreviousBadRead) {
+      m_badReadDetected = true;
     }
   }
 
