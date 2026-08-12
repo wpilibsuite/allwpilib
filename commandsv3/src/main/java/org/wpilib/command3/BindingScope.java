@@ -89,11 +89,13 @@ interface BindingScope {
     }
   }
 
+  interface RobotModeScope extends BindingScope {}
+
   /**
    * A binding scoped to the autonomous robot mode, but not any particular opmode. Comes into play
    * when robot programs are using commands v3 but not opmodes.
    */
-  final class AutonomousMode implements BindingScope {
+  final class AutonomousMode implements RobotModeScope {
     public static final AutonomousMode INSTANCE = new AutonomousMode();
 
     @Override
@@ -106,7 +108,7 @@ interface BindingScope {
    * A binding scoped to the teleop robot mode, but not any particular opmode. Comes into play when
    * robot programs are using commands v3 but not opmodes.
    */
-  final class TeleopMode implements BindingScope {
+  final class TeleopMode implements RobotModeScope {
     public static final TeleopMode INSTANCE = new TeleopMode();
 
     @Override
@@ -119,7 +121,7 @@ interface BindingScope {
    * A binding scoped to the utility robot mode, but not any particular opmode. Comes into play when
    * robot programs are using commands v3 but not opmodes.
    */
-  final class UtilityMode implements BindingScope {
+  final class UtilityMode implements RobotModeScope {
     public static final UtilityMode INSTANCE = new UtilityMode();
 
     @Override

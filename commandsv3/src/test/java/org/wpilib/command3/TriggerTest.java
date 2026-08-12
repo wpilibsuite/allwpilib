@@ -235,6 +235,78 @@ class TriggerTest extends CommandTestBase {
     }
   }
 
+  @Test
+  void triggerCreatedInOneModeSurvivesTransitionsToAllOtherModes() {
+    for (RobotMode sourceMode : concreteRobotModes()) {
+      for (RobotMode destinationMode : concreteRobotModes()) {
+        if (sourceMode == destinationMode) {
+          continue;
+        }
+
+        m_robotMode = sourceMode;
+
+        var triggerSignal = new AtomicBoolean(false);
+        var trigger = new Trigger(m_scheduler, triggerSignal::get);
+
+        var sourceModeCommand = Command.noRequirements(Coroutine::park).named("SourceModeCommand");
+        trigger.whileTrue(sourceModeCommand);
+
+        triggerSignal.set(true);
+        m_scheduler.run();
+        assertTrue(
+            m_scheduler.isRunning(sourceModeCommand),
+            () ->
+                "Command should have started in source mode "
+                    + sourceMode
+                    + " before transition to "
+                    + destinationMode);
+
+        // TRANSITION SOURCE -> DESTINATION
+
+        m_robotMode = destinationMode;
+        m_scheduler.run();
+        assertFalse(
+            m_scheduler.isRunning(sourceModeCommand),
+            () ->
+                "Source mode binding should be inactive after transition "
+                    + sourceMode
+                    + " -> "
+                    + destinationMode);
+
+        triggerSignal.set(false);
+        m_scheduler.run();
+
+        var destinationModeCommand =
+            Command.noRequirements(Coroutine::park).named("DestinationModeCommand");
+        trigger.whileTrue(destinationModeCommand);
+
+        triggerSignal.set(true);
+        m_scheduler.run();
+        assertTrue(
+            m_scheduler.isRunning(destinationModeCommand),
+            () ->
+                "Trigger should still be active after transition "
+                    + sourceMode
+                    + " -> "
+                    + destinationMode);
+
+        triggerSignal.set(false);
+        m_scheduler.run();
+        assertFalse(
+            m_scheduler.isRunning(destinationModeCommand),
+            () ->
+                "Destination mode command should cancel on falling edge after transition "
+                    + sourceMode
+                    + " -> "
+                    + destinationMode);
+      }
+    }
+  }
+
+  private static List<RobotMode> concreteRobotModes() {
+    return List.of(RobotMode.AUTONOMOUS, RobotMode.TELEOPERATED, RobotMode.UTILITY);
+  }
+
   // The scheduler lifecycle polls triggers at the start of `run()`
   // Even though the trigger condition is set, the command exits and the trigger's scope goes
   // inactive before the next `run()` call can poll the trigger
