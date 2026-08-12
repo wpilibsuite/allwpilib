@@ -307,6 +307,10 @@ public class GoBildaPinpoint implements AutoCloseable {
     HAL.reportUsage("I2C[" + port.value + "][" + deviceAddress + "]", "GoBildaPinpoint");
   }
 
+  GoBildaPinpoint(I2C i2c) {
+    m_i2c = ErrorMessages.requireNonNullParam(i2c, "i2c", "GoBildaPinpoint");
+  }
+
   /**
    * Returns the I2C port.
    *

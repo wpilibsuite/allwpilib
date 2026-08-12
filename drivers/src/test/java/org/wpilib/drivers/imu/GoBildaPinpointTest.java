@@ -440,29 +440,30 @@ class GoBildaPinpointTest {
   }
 
   @Test
-  void failedSnapshotScopeRestorationRetriesRequestedScope() throws ReflectiveOperationException {
+  void failedSnapshotScopeRestorationRetriesRequestedScope() {
     for (boolean quaternionSnapshot : new boolean[] {false, true}) {
-      setRegister(Register.DEVICE_VERSION, encodeInt(3));
-      setRegister(Register.BULK_READ, concat(encodeInt(1), encodeFloat(1000)));
+      byte[] requestedScope = {
+        (byte) Register.SET_BULK_READ.getAddress(),
+        (byte) Register.DEVICE_STATUS.getAddress(),
+        (byte) Register.X_POSITION.getAddress()
+      };
+      byte[] snapshotData =
+          quaternionSnapshot
+              ? concat(
+                  encodeFloat(0.5f), encodeFloat(-0.25f), encodeFloat(0.125f), encodeFloat(0.75f))
+              : concat(encodeFloat(1500), encodeFloat(2500), encodeFloat(0.5f));
+      var faultingI2c =
+          new RestoreFailingI2C(
+              requestedScope,
+              encodeInt(3),
+              concat(encodeInt(1), encodeFloat(1000)),
+              snapshotData,
+              concat(encodeInt(2), encodeFloat(2000)));
 
-      try (var pinpoint = new GoBildaPinpoint(I2C.Port.PORT_0)) {
+      try (var pinpoint = new GoBildaPinpoint(faultingI2c)) {
         pinpoint.setBulkReadScope(Register.DEVICE_STATUS, Register.X_POSITION);
         pinpoint.update();
-
-        byte[] requestedScope = {
-          (byte) Register.SET_BULK_READ.getAddress(),
-          (byte) Register.DEVICE_STATUS.getAddress(),
-          (byte) Register.X_POSITION.getAddress()
-        };
-        byte[] snapshotData =
-            quaternionSnapshot
-                ? concat(
-                    encodeFloat(0.5f), encodeFloat(-0.25f), encodeFloat(0.125f), encodeFloat(0.75f))
-                : concat(encodeFloat(1500), encodeFloat(2500), encodeFloat(0.5f));
-        var faultingI2c =
-            new RestoreFailingI2C(
-                requestedScope, snapshotData, concat(encodeInt(2), encodeFloat(2000)));
-        replaceI2c(pinpoint, faultingI2c);
+        faultingI2c.failNextRestoration();
 
         if (quaternionSnapshot) {
           pinpoint.getQuaternion();
@@ -473,12 +474,14 @@ class GoBildaPinpointTest {
 
         assertEquals(2.0, pinpoint.getXPositionMeters(), DELTA);
         assertEquals(DeviceStatus.CALIBRATING, pinpoint.getDeviceStatus());
-        assertEquals(2, faultingI2c.m_readCounts.size());
-        assertEquals(quaternionSnapshot ? 16 : 12, faultingI2c.m_readCounts.get(0));
+        assertEquals(4, faultingI2c.m_readCounts.size());
+        assertEquals(4, faultingI2c.m_readCounts.get(0));
         assertEquals(8, faultingI2c.m_readCounts.get(1));
-        assertEquals(5, faultingI2c.m_writes.size());
-        assertArrayEquals(requestedScope, faultingI2c.m_writes.get(2));
-        assertArrayEquals(requestedScope, faultingI2c.m_writes.get(3));
+        assertEquals(quaternionSnapshot ? 16 : 12, faultingI2c.m_readCounts.get(2));
+        assertEquals(8, faultingI2c.m_readCounts.get(3));
+        assertEquals(8, faultingI2c.m_writes.size());
+        assertArrayEquals(requestedScope, faultingI2c.m_writes.get(5));
+        assertArrayEquals(requestedScope, faultingI2c.m_writes.get(6));
       }
     }
   }
@@ -925,32 +928,32 @@ class GoBildaPinpointTest {
     m_registerData.put(register.getAddress(), data);
   }
 
-  private static void replaceI2c(GoBildaPinpoint pinpoint, I2C i2c)
-      throws ReflectiveOperationException {
-    var field = GoBildaPinpoint.class.getDeclaredField("m_i2c");
-    field.setAccessible(true);
-    field.set(pinpoint, i2c);
-  }
-
   private static class RestoreFailingI2C extends I2C {
     private final byte[] m_requestedScope;
     private final byte[][] m_reads;
     private final List<byte[]> m_writes = new ArrayList<>();
     private final List<Integer> m_readCounts = new ArrayList<>();
-    private boolean m_restorationFailed;
+    private boolean m_failNextRestoration;
     private int m_readIndex;
 
     RestoreFailingI2C(byte[] requestedScope, byte[]... reads) {
       super(Port.PORT_0, GoBildaPinpoint.DEFAULT_ADDRESS);
-      m_requestedScope = requestedScope;
-      m_reads = reads;
+      m_requestedScope = requestedScope.clone();
+      m_reads = new byte[reads.length][];
+      for (int i = 0; i < reads.length; i++) {
+        m_reads[i] = reads[i].clone();
+      }
+    }
+
+    void failNextRestoration() {
+      m_failNextRestoration = true;
     }
 
     @Override
     public synchronized boolean writeBulk(byte[] data) {
       m_writes.add(data.clone());
-      if (!m_restorationFailed && Arrays.equals(data, m_requestedScope)) {
-        m_restorationFailed = true;
+      if (m_failNextRestoration && Arrays.equals(data, m_requestedScope)) {
+        m_failNextRestoration = false;
         return true;
       }
       return false;
