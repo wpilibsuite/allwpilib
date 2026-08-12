@@ -113,14 +113,15 @@ void ParallelTcpConnector::Connect() {
   // kick off parallel lookups
   for (auto&& server : m_servers) {
     sockaddr_in address4;
-    if (uv::NameToAddr(server.first, server.second, &address4) == 0) {
+    if (!server.first.empty() &&
+        uv::NameToAddr(server.first, server.second, &address4) == 0) {
       StartConnectionAttempt(reinterpret_cast<const sockaddr&>(address4),
                              sizeof(address4), nullptr);
       continue;
     }
 
     sockaddr_in6 address6;
-    if (!m_ipv4Only &&
+    if (!server.first.empty() && !m_ipv4Only &&
         uv::NameToAddr(server.first, server.second, &address6) == 0) {
       StartConnectionAttempt(reinterpret_cast<const sockaddr&>(address6),
                              sizeof(address6), nullptr);
@@ -167,8 +168,8 @@ void ParallelTcpConnector::StartConnectionAttempt(
     const sockaddr& address, socklen_t addressLen,
     uv::GetAddrInfoReq* resolver) {
   for (auto&& attempt : m_attempts) {
-    if (AddressEquals(
-            address, reinterpret_cast<const sockaddr&>(attempt.first))) {
+    if (AddressEquals(address,
+                      reinterpret_cast<const sockaddr&>(attempt.first))) {
       return;
     }
   }
@@ -200,8 +201,8 @@ void ParallelTcpConnector::StartConnectionAttempt(
       },
       shared_from_this());
 
-  connreq->error = [selfWeak = weak_from_this(), tcp = tcp.get()](
-                       uv::Error err) {
+  connreq->error = [selfWeak = weak_from_this(),
+                    tcp = tcp.get()](uv::Error err) {
     if (auto self = selfWeak.lock()) {
       WPI_DEBUG1(self->m_logger, "connect failure ({}): {}",
                  static_cast<void*>(tcp), err.str());
@@ -212,10 +213,9 @@ void ParallelTcpConnector::StartConnectionAttempt(
     std::string ip;
     unsigned int port = 0;
     uv::AddrToName(addressCopy, &ip, &port);
-    WPI_DEBUG4(m_logger,
-               "Info({}) starting connection attempt ({}) to {} port {}",
-               static_cast<void*>(resolver), static_cast<void*>(tcp.get()), ip,
-               port);
+    WPI_DEBUG4(
+        m_logger, "Info({}) starting connection attempt ({}) to {} port {}",
+        static_cast<void*>(resolver), static_cast<void*>(tcp.get()), ip, port);
   }
   tcp->Connect(reinterpret_cast<const sockaddr&>(addressCopy), connreq);
 }
