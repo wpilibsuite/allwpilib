@@ -402,10 +402,8 @@ bool GoBildaPinpoint::BulkReadScopeContainsQuaternion() const {
     return std::find(m_bulkReadScope.begin(), m_bulkReadScope.end(), reg) !=
            m_bulkReadScope.end();
   };
-  return contains(Register::QUATERNION_W) &&
-         contains(Register::QUATERNION_X) &&
-         contains(Register::QUATERNION_Y) &&
-         contains(Register::QUATERNION_Z);
+  return contains(Register::QUATERNION_W) && contains(Register::QUATERNION_X) &&
+         contains(Register::QUATERNION_Y) && contains(Register::QUATERNION_Z);
 }
 
 bool GoBildaPinpoint::IsIndividuallyReadable(Register reg) {
@@ -545,8 +543,8 @@ void GoBildaPinpoint::ReadPose() {
 
   SaveFloat(Register::X_POSITION, DecodeFloat(data, 0), false);
   SaveFloat(Register::Y_POSITION, DecodeFloat(data, kRegisterLength), false);
-  SaveFloat(Register::H_ORIENTATION,
-            DecodeFloat(data, 2 * kRegisterLength), false);
+  SaveFloat(Register::H_ORIENTATION, DecodeFloat(data, 2 * kRegisterLength),
+            false);
   FinishRead(previousBadRead, false);
 }
 
@@ -556,8 +554,7 @@ void GoBildaPinpoint::ReadQuaternion() {
   int readLength =
       kQuaternionReadLength +
       (m_errorDetectionType == ErrorDetectionType::CRC ? kCrcLength : 0);
-  std::vector<uint8_t> data =
-      ReadBytes(Register::QUATERNION_W, readLength);
+  std::vector<uint8_t> data = ReadBytes(Register::QUATERNION_W, readLength);
   if (data.empty()) {
     return;
   }
