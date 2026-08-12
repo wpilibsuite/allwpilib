@@ -100,6 +100,23 @@ class GoBildaPinpointTest {
   }
 
   @Test
+  void cachedQuaternionGettersThrowAfterClose() {
+    setRegister(Register.DEVICE_VERSION, encodeInt(3));
+    setRegister(
+        Register.BULK_READ,
+        concat(encodeFloat(0.5f), encodeFloat(-0.25f), encodeFloat(0.125f), encodeFloat(0.75f)));
+
+    var pinpoint = new GoBildaPinpoint(I2C.Port.PORT_0);
+    pinpoint.setBulkReadScope(
+        Register.QUATERNION_W, Register.QUATERNION_X, Register.QUATERNION_Y, Register.QUATERNION_Z);
+    pinpoint.update();
+    pinpoint.close();
+
+    assertThrows(IllegalStateException.class, pinpoint::getQuaternion);
+    assertThrows(IllegalStateException.class, pinpoint::getRotation3d);
+  }
+
+  @Test
   void rejectsInvalidI2cAddresses() {
     assertThrows(IllegalArgumentException.class, () -> new GoBildaPinpoint(I2C.Port.PORT_0, -1));
     assertThrows(IllegalArgumentException.class, () -> new GoBildaPinpoint(I2C.Port.PORT_0, 0x80));
@@ -240,6 +257,37 @@ class GoBildaPinpointTest {
 
       assertEquals(8.5, pinpoint.getXPositionMeters(), DELTA);
       assertEquals(12.5, pinpoint.getHeadingRadians(), DELTA);
+    }
+  }
+
+  @Test
+  void flexibleBulkReadCannotOverwriteDetectedDeviceVersion() {
+    for (ErrorDetectionType errorDetectionType :
+        new ErrorDetectionType[] {ErrorDetectionType.NONE, ErrorDetectionType.LOCAL_TEST}) {
+      setRegister(Register.DEVICE_VERSION, encodeInt(3));
+
+      try (var pinpoint = new GoBildaPinpoint(I2C.Port.PORT_0)) {
+        pinpoint.setErrorDetectionType(errorDetectionType);
+        pinpoint.setBulkReadScope(Register.DEVICE_VERSION, Register.X_POSITION);
+        final int readCount = m_readCounts.size();
+
+        setRegister(Register.BULK_READ, concat(encodeInt(2), encodeFloat(1000)));
+        pinpoint.update();
+
+        assertEquals(3, pinpoint.getDeviceVersion());
+        assertEquals(1.0, pinpoint.getXPositionMeters(), DELTA);
+
+        setRegister(Register.BULK_READ, concat(encodeInt(1), encodeFloat(2000)));
+        pinpoint.update();
+
+        assertEquals(3, pinpoint.getDeviceVersion());
+        assertEquals(2.0, pinpoint.getXPositionMeters(), DELTA);
+        assertEquals(readCount + 2, m_readCounts.size());
+        assertEquals(8, m_readCounts.get(readCount));
+        assertEquals(8, m_readCounts.get(readCount + 1));
+        assertEquals(Register.BULK_READ.getAddress(), m_readRegisters.get(readCount));
+        assertEquals(Register.BULK_READ.getAddress(), m_readRegisters.get(readCount + 1));
+      }
     }
   }
 
@@ -417,6 +465,39 @@ class GoBildaPinpointTest {
         assertEquals(Register.X_POSITION, pinpoint.getLastFailedRegister());
         assertEquals(FailureReason.CHANGE_TOO_LARGE, pinpoint.getLastFailureReason());
         assertEquals(1, pinpoint.getFailureCount(Register.X_POSITION));
+      }
+    }
+  }
+
+  @Test
+  void enteringLocalValidationEstablishesFreshPoseBaselines() {
+    for (ErrorDetectionType initialMode :
+        new ErrorDetectionType[] {ErrorDetectionType.NONE, ErrorDetectionType.CRC}) {
+      setRegister(Register.DEVICE_VERSION, encodeInt(3));
+      byte[] corruptedPose =
+          fixedBulkData(1, 1000, 0, 0, Float.POSITIVE_INFINITY, 8000, 200, 0, 0, 0);
+      if (initialMode == ErrorDetectionType.CRC) {
+        corruptedPose = appendCrc(corruptedPose);
+      }
+      setRegister(Register.BULK_READ, corruptedPose);
+
+      try (var pinpoint = new GoBildaPinpoint(I2C.Port.PORT_0)) {
+        pinpoint.setErrorDetectionType(initialMode);
+        pinpoint.update();
+
+        assertEquals(Double.POSITIVE_INFINITY, pinpoint.getXPositionMeters());
+        assertEquals(8.0, pinpoint.getYPositionMeters(), DELTA);
+        assertEquals(200.0, pinpoint.getHeadingRadians(), DELTA);
+
+        pinpoint.setErrorDetectionType(ErrorDetectionType.LOCAL_TEST);
+        setRegister(Register.BULK_READ, fixedBulkData(1, 1000, 0, 0, 1000, 2000, 0.5f, 0, 0, 0));
+        pinpoint.update();
+
+        assertEquals(1.0, pinpoint.getXPositionMeters(), DELTA);
+        assertEquals(2.0, pinpoint.getYPositionMeters(), DELTA);
+        assertEquals(0.5, pinpoint.getHeadingRadians(), DELTA);
+        assertEquals(DeviceStatus.READY, pinpoint.getDeviceStatus());
+        assertEquals(0, pinpoint.getFailureCount());
       }
     }
   }

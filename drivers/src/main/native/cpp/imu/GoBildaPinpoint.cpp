@@ -99,6 +99,12 @@ void GoBildaPinpoint::SetErrorDetectionType(
     default:
       throw std::invalid_argument("Invalid error detection type");
   }
+  if (errorDetectionType == ErrorDetectionType::LOCAL_TEST &&
+      m_errorDetectionType != ErrorDetectionType::LOCAL_TEST) {
+    m_haveXPosition = false;
+    m_haveYPosition = false;
+    m_haveHeading = false;
+  }
   m_errorDetectionType = errorDetectionType;
 }
 
@@ -726,7 +732,7 @@ void GoBildaPinpoint::FlexibleBulkRead() {
     std::size_t offset = i * kRegisterLength;
     switch (GetRegisterType(reg)) {
       case RegisterType::INT32:
-        if (reg != Register::LOOP_TIME) {
+        if (reg != Register::LOOP_TIME && reg != Register::DEVICE_VERSION) {
           SaveInt(reg, DecodeInt(data, offset));
         }
         break;

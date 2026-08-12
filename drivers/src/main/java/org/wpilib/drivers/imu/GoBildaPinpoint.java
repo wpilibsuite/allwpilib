@@ -423,7 +423,13 @@ public class GoBildaPinpoint implements AutoCloseable {
     requireOpen();
     if (errorDetectionType == ErrorDetectionType.CRC
         && !requireFirmwareVersion3("CRC error detection")) {
-        return;
+      return;
+    }
+    if (errorDetectionType == ErrorDetectionType.LOCAL_TEST
+        && m_errorDetectionType != ErrorDetectionType.LOCAL_TEST) {
+      m_haveXPosition = false;
+      m_haveYPosition = false;
+      m_haveHeading = false;
     }
     m_errorDetectionType = errorDetectionType;
   }
@@ -1038,6 +1044,7 @@ public class GoBildaPinpoint implements AutoCloseable {
    * @throws UnsupportedOperationException if the firmware is older than v3
    */
   public Quaternion getQuaternion() {
+    requireOpen();
     if (requireFirmwareVersion3("Quaternion output") && !bulkReadScopeContainsQuaternion()) {
       readQuaternion();
     }
@@ -1400,7 +1407,7 @@ public class GoBildaPinpoint implements AutoCloseable {
       int offset = i * REGISTER_LENGTH;
       switch (register.m_type) {
         case INT32 -> {
-          if (register != Register.LOOP_TIME) {
+          if (register != Register.LOOP_TIME && register != Register.DEVICE_VERSION) {
             saveInt(register, decodeInt(data, offset));
           }
         }

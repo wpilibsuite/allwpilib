@@ -181,6 +181,42 @@ TEST_CASE_METHOD(PinpointTestFixture,
 
 TEST_CASE_METHOD(
     PinpointTestFixture,
+    "GoBildaPinpoint bulk reads cannot overwrite the detected device version",
+    "[drivers][gobilda-pinpoint]") {
+  using ErrorDetectionType = wpi::GoBildaPinpoint::ErrorDetectionType;
+
+  for (ErrorDetectionType errorDetectionType :
+       std::array{ErrorDetectionType::NONE, ErrorDetectionType::LOCAL_TEST}) {
+    SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
+    wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
+    pinpoint.SetErrorDetectionType(errorDetectionType);
+    pinpoint.SetBulkReadScope({Register::DEVICE_VERSION, Register::X_POSITION});
+    std::size_t readCount = m_readCounts.size();
+
+    SetRegister(Register::BULK_READ,
+                Concat(EncodeInt(2), EncodeFloat(1000.0f)));
+    pinpoint.Update();
+
+    CHECK(pinpoint.GetDeviceVersion() == 3);
+    CHECK(pinpoint.GetXPosition().value() == Catch::Approx(1.0));
+
+    SetRegister(Register::BULK_READ,
+                Concat(EncodeInt(1), EncodeFloat(2000.0f)));
+    pinpoint.Update();
+
+    CHECK(pinpoint.GetDeviceVersion() == 3);
+    CHECK(pinpoint.GetXPosition().value() == Catch::Approx(2.0));
+    REQUIRE(m_readCounts.size() == readCount + 2);
+    CHECK(m_readCounts[readCount] == 8);
+    CHECK(m_readCounts[readCount + 1] == 8);
+    CHECK(m_readRegisters[readCount] == static_cast<int>(Register::BULK_READ));
+    CHECK(m_readRegisters[readCount + 1] ==
+          static_cast<int>(Register::BULK_READ));
+  }
+}
+
+TEST_CASE_METHOD(
+    PinpointTestFixture,
     "GoBildaPinpoint synchronizes the default scope for a new v3 instance",
     "[drivers][gobilda-pinpoint]") {
   SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
@@ -550,6 +586,46 @@ TEST_CASE_METHOD(
     CHECK(pinpoint.GetLastFailureReason() ==
           wpi::GoBildaPinpoint::FailureReason::NONFINITE_VALUE);
     CHECK(pinpoint.GetFailureCount(reg) == 1);
+  }
+}
+
+TEST_CASE_METHOD(
+    PinpointTestFixture,
+    "GoBildaPinpoint establishes fresh pose baselines on entering local tests",
+    "[drivers][gobilda-pinpoint]") {
+  using ErrorDetectionType = wpi::GoBildaPinpoint::ErrorDetectionType;
+
+  for (ErrorDetectionType initialMode :
+       std::array{ErrorDetectionType::NONE, ErrorDetectionType::CRC}) {
+    SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
+    auto corruptedPose =
+        FixedBulkData(1, 1000, 0, 0, std::numeric_limits<float>::infinity(),
+                      8000.0f, 200.0f, 0.0f, 0.0f, 0.0f);
+    if (initialMode == ErrorDetectionType::CRC) {
+      corruptedPose = AppendCrc(std::move(corruptedPose));
+    }
+    SetRegister(Register::BULK_READ, std::move(corruptedPose));
+
+    wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
+    pinpoint.SetErrorDetectionType(initialMode);
+    pinpoint.Update();
+
+    CHECK(std::isinf(pinpoint.GetXPosition().value()));
+    CHECK(pinpoint.GetYPosition().value() == Catch::Approx(8.0));
+    CHECK(pinpoint.GetHeading().value() == Catch::Approx(200.0));
+
+    pinpoint.SetErrorDetectionType(ErrorDetectionType::LOCAL_TEST);
+    SetRegister(
+        Register::BULK_READ,
+        FixedBulkData(1, 1000, 0, 0, 1000.0f, 2000.0f, 0.5f, 0.0f, 0.0f, 0.0f));
+    pinpoint.Update();
+
+    CHECK(pinpoint.GetXPosition().value() == Catch::Approx(1.0));
+    CHECK(pinpoint.GetYPosition().value() == Catch::Approx(2.0));
+    CHECK(pinpoint.GetHeading().value() == Catch::Approx(0.5));
+    CHECK(pinpoint.GetDeviceStatus() ==
+          wpi::GoBildaPinpoint::DeviceStatus::READY);
+    CHECK(pinpoint.GetFailureCount() == 0);
   }
 }
 
