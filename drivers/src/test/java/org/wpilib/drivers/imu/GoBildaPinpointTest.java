@@ -214,7 +214,7 @@ class GoBildaPinpointTest {
 
       setRegister(
           Register.X_POSITION, concat(encodeFloat(2000), encodeFloat(3000), encodeFloat(0.2f)));
-      int readCount = m_readCounts.size();
+      final int readCount = m_readCounts.size();
 
       Pose2d pose = pinpoint.getPose();
 
@@ -240,7 +240,7 @@ class GoBildaPinpointTest {
       setRegister(
           Register.X_POSITION,
           appendCrc(concat(encodeFloat(4000), encodeFloat(-5000), encodeFloat(1.25f))));
-      int readCount = m_readCounts.size();
+      final int readCount = m_readCounts.size();
 
       Pose2d pose = pinpoint.getPose();
 
@@ -265,7 +265,7 @@ class GoBildaPinpointTest {
       setRegister(
           Register.QUATERNION_W,
           concat(encodeFloat(0.5f), encodeFloat(-0.25f), encodeFloat(0.125f), encodeFloat(0.75f)));
-      int readCount = m_readCounts.size();
+      final int readCount = m_readCounts.size();
 
       var quaternion = pinpoint.getQuaternion();
 
@@ -470,7 +470,7 @@ class GoBildaPinpointTest {
               encodeFloat(0.45f),
               encodeFloat(-0.65f)));
       pinpoint.update();
-      int readCount = m_readCounts.size();
+      final int readCount = m_readCounts.size();
 
       var quaternion = pinpoint.getQuaternion();
 
@@ -500,7 +500,7 @@ class GoBildaPinpointTest {
                   encodeFloat(0.5f), encodeFloat(-0.25f), encodeFloat(0.125f), encodeFloat(0.75f)));
       data[data.length - 1] ^= 0x01;
       setRegister(Register.QUATERNION_W, data);
-      int readCount = m_readCounts.size();
+      final int readCount = m_readCounts.size();
 
       var quaternion = pinpoint.getQuaternion();
 
