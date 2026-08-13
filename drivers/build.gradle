@@ -51,7 +51,7 @@ model {
             }
             lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
-            nativeUtils.useRequiredLibrary(binary, 'mrclib')
+            nativeUtils.useRequiredLibrary(it, 'mrclib')
             lib project: ':hal', library: 'hal', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
@@ -59,7 +59,7 @@ model {
 
             if (it.component.name == "${nativeName}Dev") {
                 project(':ntcore').addNtcoreJniDependency(it)
-                nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                nativeUtils.useRequiredLibrary(it, 'mrclib')
                 lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
