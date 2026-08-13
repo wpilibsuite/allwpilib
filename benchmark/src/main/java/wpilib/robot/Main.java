@@ -85,6 +85,20 @@ public class Main {
 
   @Benchmark
   @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.NANOSECONDS)
+  public Matrix<N5, N5> choleskyRankUpdate() {
+    return CholeskyRankUpdateBenchmark.update();
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.NANOSECONDS)
+  public Matrix<N5, N5> choleskyRankDowndate() {
+    return CholeskyRankUpdateBenchmark.downdate();
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
   @OutputTimeUnit(TimeUnit.MICROSECONDS)
   public Matrix<N5, N5> dare() {
     return DAREBenchmark.dare();
