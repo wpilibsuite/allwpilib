@@ -5,10 +5,13 @@
 #include <benchmark/benchmark.h>
 
 #include "CartPoleBenchmark.hpp"
+#include "CholeskyRankUpdateBenchmark.hpp"
 #include "DAREBenchmark.hpp"
 #include "TravelingSalesmanBenchmark.hpp"
 
 BENCHMARK(BM_CartPole);
+BENCHMARK(BM_CholeskyRankDowndate);
+BENCHMARK(BM_CholeskyRankUpdate);
 BENCHMARK(BM_DARE);
 BENCHMARK(BM_TravelingSalesman_Transform);
 BENCHMARK(BM_TravelingSalesman_Twist);
