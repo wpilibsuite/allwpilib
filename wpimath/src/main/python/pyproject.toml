@@ -1461,7 +1461,7 @@ default_arg_cast = true
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_compound_type_caster.h"
 types = [
-    "wpi::units::compound_unit",
+    "wpi::units::compound_conversion_factor",
     "wpi::units::inverse",
 ]
 default_arg_cast = false
@@ -1469,20 +1469,14 @@ default_arg_cast = false
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_misc_type_caster.h"
 types = [
-    "wpi::units::dimensionless_t",
-    "wpi::units::dimensionless::dimensionless_t",
-    "wpi::units::scalar_t",
-    "wpi::units::dimensionless::scalar_t",
+    "wpi::units::dimensionless",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_misc_type_caster.h"
 types = [
-    "wpi::units::dimensionless",
-    "wpi::units::dimensionless::dimensionless",
-    "wpi::units::scalar",
-    "wpi::units::dimensionless::scalar",
+    "wpi::units::dimensionless_",
 ]
 default_arg_cast = false
 

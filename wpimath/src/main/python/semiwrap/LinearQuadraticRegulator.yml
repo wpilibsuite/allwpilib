@@ -8,7 +8,8 @@ classes:
         overloads:
           const LinearSystem<States, Inputs, Outputs>&, const StateArray&, const InputArray&, wpi::units::seconds<>:
             ignore: true
-          const Matrixd<States, States>&, const Matrixd<States, Inputs>&, const StateArray&, const InputArray&, wpi::units::seconds<>:
+          ? const Matrixd<States, States>&, const Matrixd<States, Inputs>&, const StateArray&, const InputArray&, wpi::units::seconds<>
+          :
           ? const Matrixd<States, States>&, const Matrixd<States, Inputs>&, const Matrixd<States, States>&, const Matrixd<Inputs, Inputs>&, wpi::units::seconds<>
           :
           ? const Matrixd<States, States>&, const Matrixd<States, Inputs>&, const Matrixd<States, States>&, const Matrixd<Inputs, Inputs>&, const Matrixd<States, Inputs>&, wpi::units::seconds<>

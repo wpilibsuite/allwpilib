@@ -16,19 +16,19 @@ namespace detail {
   When going from Python to C++, the units a user uses are once again
   whatever the C++ function specifies:
 
-    void setFeet(wpi::units::feet<> ft);   // must pass a float, it's in feet
+    void setFeet(wpi::units::feet<> ft);    // must pass a float, it's in feet
     void setMeters(wpi::units::meters<> m); // must pass a float, it's in meters
 
   Unfortunately, with this type caster and robotpy-build there are mismatch
   issues with implicit conversions when default values are used that don't
   match the actual value:
 
-    foo(wpi::units::seconds<> tm = 10_ms);    // if not careful, pybind11 will 
-                                        // store as 10 seconds
+    foo(wpi::units::seconds<> tm = 10_ms);    // if not careful, pybind11 will
+                                              // store as 10 seconds
 */
-template <class U, typename T, template <typename> class S>
-struct type_caster<wpi::units::unit<U, T, S>> {
-  using value_type = wpi::units::unit<U, T, S>;
+template <class CF, typename T, typename S>
+struct type_caster<wpi::units::unit<CF, T, S>> {
+  using value_type = wpi::units::unit<CF, T, S>;
 
   // TODO: there should be a way to include the type with this
   PYBIND11_TYPE_CASTER(value_type, handle_type_name<value_type>::name);

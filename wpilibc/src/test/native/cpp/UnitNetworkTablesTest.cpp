@@ -23,7 +23,7 @@ TEST_CASE_METHOD(UnitNetworkTablesTest, "UnitNetworkTablesTest Publish",
       wpi::nt::UnitTopic<wpi::units::meters<>>{inst.GetTopic("meterTest")};
   auto pub = topic.Publish();
   pub.Set(2_m);
-  REQUIRE(topic.GetProperty("unit") == "meter");
+  REQUIRE(topic.GetProperty("unit") == "meters");
   REQUIRE(topic.IsMatchingUnit());
 }
 

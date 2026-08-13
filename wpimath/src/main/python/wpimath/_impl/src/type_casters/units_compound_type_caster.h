@@ -34,40 +34,40 @@ struct handle_type_name<
   static constexpr auto name = _("wpimath.units.units_per_second_squared");
 };
 
-using volt_seconds = wpi::units::compound_conversion_factor<wpi::units::volts_, wpi::units::seconds_>;
-using volt_seconds_squared = wpi::units::compound_conversion_factor<volt_seconds, wpi::units::seconds_>;
+using volt_seconds_ = wpi::units::compound_conversion_factor<wpi::units::volts_, wpi::units::seconds_>;
+using volt_seconds_squared_ = wpi::units::compound_conversion_factor<volt_seconds_, wpi::units::seconds_>;
 
-template <> struct handle_type_name<wpi::units::unit<volt_seconds>> {
+template <> struct handle_type_name<wpi::units::unit<volt_seconds_>> {
   static constexpr auto name = _("wpimath.units.volt_seconds");
 };
 
-template <> struct handle_type_name<wpi::units::unit<volt_seconds_squared>> {
+template <> struct handle_type_name<wpi::units::unit<volt_seconds_squared_>> {
   static constexpr auto name = _("wpimath.units.volt_seconds_squared");
 };
 
 template <>
 struct handle_type_name<wpi::units::unit<
-    wpi::units::compound_conversion_factor<volt_seconds, wpi::units::inverse<wpi::units::meters_>>>> {
+    wpi::units::compound_conversion_factor<volt_seconds_, wpi::units::inverse<wpi::units::meters_>>>> {
   static constexpr auto name = _("wpimath.units.volt_seconds_per_meter");
 };
 template <>
 struct handle_type_name<wpi::units::unit<
-    wpi::units::compound_conversion_factor<volt_seconds_squared, wpi::units::inverse<wpi::units::meters_>>>> {
+    wpi::units::compound_conversion_factor<volt_seconds_squared_, wpi::units::inverse<wpi::units::meters_>>>> {
   static constexpr auto name = _("wpimath.units.volt_seconds_squared_per_meter");
 };
 template <>
 struct handle_type_name<wpi::units::unit<
-    wpi::units::compound_conversion_factor<volt_seconds, wpi::units::inverse<wpi::units::feet_>>>> {
+    wpi::units::compound_conversion_factor<volt_seconds_, wpi::units::inverse<wpi::units::feet_>>>> {
   static constexpr auto name = _("wpimath.units.volt_seconds_per_feet");
 };
 template <>
 struct handle_type_name<wpi::units::unit<
-    wpi::units::compound_conversion_factor<volt_seconds_squared, wpi::units::inverse<wpi::units::feet_>>>> {
+    wpi::units::compound_conversion_factor<volt_seconds_squared_, wpi::units::inverse<wpi::units::feet_>>>> {
   static constexpr auto name = _("wpimath.units.volt_seconds_squared_per_feet");
 };
 template <>
 struct handle_type_name<wpi::units::unit<
-    wpi::units::compound_conversion_factor<volt_seconds, wpi::units::inverse<wpi::units::radians_>>>> {
+    wpi::units::compound_conversion_factor<volt_seconds_, wpi::units::inverse<wpi::units::radians_>>>> {
   static constexpr auto name = _("wpimath.units.volt_seconds_per_radian");
 };
 template <>
@@ -77,16 +77,16 @@ struct handle_type_name<wpi::units::unit<
 };
 template <>
 struct handle_type_name<wpi::units::unit<wpi::units::compound_conversion_factor<
-    volt_seconds_squared, wpi::units::inverse<wpi::units::radians_>>>> {
+    volt_seconds_squared_, wpi::units::inverse<wpi::units::radians_>>>> {
   static constexpr auto name = _("wpimath.units.volt_seconds_squared_per_radian");
 };
 
-using unit_seconds = wpi::units::compound_conversion_factor<wpi::units::dimensionless_, wpi::units::seconds_>;
-using unit_seconds_squared = wpi::units::compound_conversion_factor<unit_seconds, wpi::units::seconds_>;
+using unit_seconds_ = wpi::units::compound_conversion_factor<wpi::units::dimensionless_, wpi::units::seconds_>;
+using unit_seconds_squared_ = wpi::units::compound_conversion_factor<unit_seconds_, wpi::units::seconds_>;
 
 template <>
 struct handle_type_name<wpi::units::unit<
-    wpi::units::compound_conversion_factor<unit_seconds_squared, wpi::units::inverse<wpi::units::dimensionless_>>>> {
+    wpi::units::compound_conversion_factor<unit_seconds_squared_, wpi::units::inverse<wpi::units::dimensionless_>>>> {
   static constexpr auto name = _("wpimath.units.unit_seconds_squared_per_unit");
 };
 

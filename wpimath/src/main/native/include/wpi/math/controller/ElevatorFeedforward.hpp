@@ -7,9 +7,11 @@
 #include <gcem.hpp>
 
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/units/acceleration.hpp"
 #include "wpi/units/base.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
 #include "wpi/util/MathExtras.hpp"
 
@@ -21,10 +23,8 @@ namespace wpi::math {
 class ElevatorFeedforward {
  public:
   using Distance = wpi::units::meters_;
-  using Velocity = wpi::units::compound_conversion_factor<
-      Distance, wpi::units::inverse<wpi::units::seconds_>>;
-  using Acceleration = wpi::units::compound_conversion_factor<
-      Velocity, wpi::units::inverse<wpi::units::seconds_>>;
+  using Velocity = wpi::units::meters_per_second_;
+  using Acceleration = wpi::units::meters_per_second_squared_;
   using kv_unit =
       wpi::units::compound_conversion_factor<wpi::units::volts_,
                                              wpi::units::inverse<Velocity>>;

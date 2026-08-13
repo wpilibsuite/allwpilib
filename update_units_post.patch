@@ -1,22 +1,22 @@
 diff --git a/wpilibc/src/test/native/cpp/UnitNetworkTablesTest.cpp b/wpilibc/src/test/native/cpp/UnitNetworkTablesTest.cpp
-index ee315fc464..0576be9b2c 100644
+index c6881c2ef..73849be7b 100644
 --- a/wpilibc/src/test/native/cpp/UnitNetworkTablesTest.cpp
 +++ b/wpilibc/src/test/native/cpp/UnitNetworkTablesTest.cpp
-@@ -23,7 +23,7 @@ TEST_F(UnitNetworkTablesTest, Publish) {
+@@ -23,7 +23,7 @@ TEST_CASE_METHOD(UnitNetworkTablesTest, "UnitNetworkTablesTest Publish",
        wpi::nt::UnitTopic<wpi::units::meters<>>{inst.GetTopic("meterTest")};
    auto pub = topic.Publish();
    pub.Set(2_m);
--  ASSERT_EQ(topic.GetProperty("unit"), "meter");
-+  ASSERT_EQ(topic.GetProperty("unit"), "meters");
-   ASSERT_TRUE(topic.IsMatchingUnit());
+-  REQUIRE(topic.GetProperty("unit") == "meter");
++  REQUIRE(topic.GetProperty("unit") == "meters");
+   REQUIRE(topic.IsMatchingUnit());
  }
  
 diff --git a/wpimath/robotpy_native_build_info.bzl b/wpimath/robotpy_native_build_info.bzl
-index 103ac9ee62..16ab09f0f8 100644
+index 87181d64b..45757f0bc 100644
 --- a/wpimath/robotpy_native_build_info.bzl
 +++ b/wpimath/robotpy_native_build_info.bzl
 @@ -9,6 +9,7 @@ def define_native_wrapper(name, pyproject_toml = None):
-         srcs = native.glob(["src/main/native/include/**"]) + native.glob(["src/generated/main/native/include/**"], allow_empty = True) + native.glob([
+         srcs = native.glob(["src/main/native/include/**"]) + ["//wpimath:generated-native-include-files"] + native.glob([
              "src/main/native/thirdparty/gcem/include/**",
              "src/main/native/thirdparty/sleipnir/include/**",
 +            "src/main/native/thirdparty/units/include/**",
@@ -32,73 +32,60 @@ index 103ac9ee62..16ab09f0f8 100644
          verbose = False,
          visibility = ["//visibility:public"],
 diff --git a/wpimath/src/main/native/include/wpi/math/controller/ElevatorFeedforward.hpp b/wpimath/src/main/native/include/wpi/math/controller/ElevatorFeedforward.hpp
-index ef88d60c4c..2a85140058 100644
+index 93fb8dcf1..8732e9cbf 100644
 --- a/wpimath/src/main/native/include/wpi/math/controller/ElevatorFeedforward.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/controller/ElevatorFeedforward.hpp
-@@ -7,8 +7,10 @@
- #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
- #include "wpi/math/linalg/EigenCore.hpp"
+@@ -7,9 +7,11 @@
+ #include <gcem.hpp>
+ 
  #include "wpi/math/util/MathShared.hpp"
-+#include <wpi/units/acceleration.h>
- #include <wpi/units/length.h>
- #include <wpi/units/time.h>
-+#include <wpi/units/velocity.h>
- #include <wpi/units/voltage.h>
++#include "wpi/units/acceleration.hpp"
+ #include "wpi/units/base.hpp"
+ #include "wpi/units/length.hpp"
+ #include "wpi/units/time.hpp"
++#include "wpi/units/velocity.hpp"
+ #include "wpi/units/voltage.hpp"
  #include "wpi/util/MathExtras.hpp"
  
-@@ -20,12 +22,8 @@ namespace wpi::math {
+@@ -21,10 +23,8 @@ namespace wpi::math {
  class ElevatorFeedforward {
   public:
    using Distance = wpi::units::meters_;
--  using Velocity =
--      wpi::units::compound_conversion_factor<Distance,
--                                wpi::units::inverse<wpi::units::seconds_>>;
--  using Acceleration =
--      wpi::units::compound_conversion_factor<Velocity,
--                                wpi::units::inverse<wpi::units::seconds_>>;
+-  using Velocity = wpi::units::compound_conversion_factor<
+-      Distance, wpi::units::inverse<wpi::units::seconds_>>;
+-  using Acceleration = wpi::units::compound_conversion_factor<
+-      Velocity, wpi::units::inverse<wpi::units::seconds_>>;
 +  using Velocity = wpi::units::meters_per_second_;
 +  using Acceleration = wpi::units::meters_per_second_squared_;
-   using kv_unit = wpi::units::compound_conversion_factor<wpi::units::volts_,
-                                             wpi::units::inverse<Velocity>>;
-   using ka_unit = wpi::units::compound_conversion_factor<wpi::units::volts_,
-diff --git a/wpimath/src/main/native/include/wpi/math/kinematics/DifferentialDriveKinematics.hpp b/wpimath/src/main/native/include/wpi/math/kinematics/DifferentialDriveKinematics.hpp
-index 466f3911a3..f75419ec9e 100644
---- a/wpimath/src/main/native/include/wpi/math/kinematics/DifferentialDriveKinematics.hpp
-+++ b/wpimath/src/main/native/include/wpi/math/kinematics/DifferentialDriveKinematics.hpp
-@@ -15,6 +15,7 @@
- #include "wpi/math/kinematics/Kinematics.hpp"
- #include "wpi/math/util/MathShared.hpp"
- #include <wpi/units/angle.h>
-+#include <wpi/units/frequency.h>
- #include <wpi/units/length.h>
- #include "wpi/util/SymbolExports.hpp"
- 
+   using kv_unit =
+       wpi::units::compound_conversion_factor<wpi::units::volts_,
+                                              wpi::units::inverse<Velocity>>;
 diff --git a/wpimath/src/main/native/include/wpi/math/trajectory/ExponentialProfile.hpp b/wpimath/src/main/native/include/wpi/math/trajectory/ExponentialProfile.hpp
-index 5d58675230..98ed99dd30 100644
+index aa0c68916..5f3fd5ca7 100644
 --- a/wpimath/src/main/native/include/wpi/math/trajectory/ExponentialProfile.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/trajectory/ExponentialProfile.hpp
-@@ -4,6 +4,7 @@
- 
+@@ -5,6 +5,7 @@
  #pragma once
  
-+#include <wpi/units/frequency.h>
- #include <wpi/units/time.h>
+ #include "wpi/units/base.hpp"
++#include "wpi/units/frequency.hpp"
+ #include "wpi/units/time.hpp"
  
  namespace wpi::math {
-@@ -48,7 +49,7 @@ class ExponentialProfile {
-       wpi::units::compound_conversion_factor<Velocity,
-                                 wpi::units::inverse<wpi::units::seconds_>>;
+@@ -47,7 +48,7 @@ class ExponentialProfile {
+   using Acceleration = wpi::units::compound_conversion_factor<
+       Velocity, wpi::units::inverse<wpi::units::seconds_>>;
    using Input_t = wpi::units::unit<Input>;
 -  using A_t = wpi::units::unit<wpi::units::inverse<wpi::units::seconds_>>;
 +  using A_t = wpi::units::hertz<>;
-   using B_t = wpi::units::unit<
-       wpi::units::compound_conversion_factor<Acceleration, wpi::units::inverse<Input>>>;
-   using KV = wpi::units::compound_conversion_factor<Input, wpi::units::inverse<Velocity>>;
+   using B_t = wpi::units::unit<wpi::units::compound_conversion_factor<
+       Acceleration, wpi::units::inverse<Input>>>;
+   using KV =
 diff --git a/wpimath/src/main/python/pyproject.toml b/wpimath/src/main/python/pyproject.toml
-index 8b98276897..e0b4f12df5 100644
+index f91b861ca..c812751ac 100644
 --- a/wpimath/src/main/python/pyproject.toml
 +++ b/wpimath/src/main/python/pyproject.toml
-@@ -1453,7 +1453,7 @@ default_arg_cast = true
+@@ -1457,7 +1457,7 @@ default_arg_cast = true
  [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
  header = "units_compound_type_caster.h"
  types = [
@@ -107,7 +94,7 @@ index 8b98276897..e0b4f12df5 100644
      "wpi::units::inverse",
  ]
  default_arg_cast = false
-@@ -1461,20 +1461,14 @@ default_arg_cast = false
+@@ -1465,20 +1465,14 @@ default_arg_cast = false
  [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
  header = "units_misc_type_caster.h"
  types = [
@@ -131,7 +118,7 @@ index 8b98276897..e0b4f12df5 100644
  default_arg_cast = false
  
 diff --git a/wpimath/src/main/python/semiwrap/LinearQuadraticRegulator.yml b/wpimath/src/main/python/semiwrap/LinearQuadraticRegulator.yml
-index f9e2cede17..3c86358d23 100644
+index f50240398..5142ce4d9 100644
 --- a/wpimath/src/main/python/semiwrap/LinearQuadraticRegulator.yml
 +++ b/wpimath/src/main/python/semiwrap/LinearQuadraticRegulator.yml
 @@ -8,7 +8,8 @@ classes:
@@ -145,7 +132,7 @@ index f9e2cede17..3c86358d23 100644
            :
            ? const Matrixd<States, States>&, const Matrixd<States, Inputs>&, const Matrixd<States, States>&, const Matrixd<Inputs, Inputs>&, const Matrixd<States, Inputs>&, wpi::units::seconds<>
 diff --git a/wpimath/src/main/python/wpimath/_impl/src/type_casters/_units_base_type_caster.h b/wpimath/src/main/python/wpimath/_impl/src/type_casters/_units_base_type_caster.h
-index 9566128b1b..3481866255 100644
+index 9566128b1..348186625 100644
 --- a/wpimath/src/main/python/wpimath/_impl/src/type_casters/_units_base_type_caster.h
 +++ b/wpimath/src/main/python/wpimath/_impl/src/type_casters/_units_base_type_caster.h
 @@ -16,19 +16,19 @@ namespace detail {
@@ -182,10 +169,10 @@ index 9566128b1b..3481866255 100644
 \ No newline at end of file
 +} // namespace pybind11
 diff --git a/wpimath/src/main/python/wpimath/_impl/src/type_casters/units_compound_type_caster.h b/wpimath/src/main/python/wpimath/_impl/src/type_casters/units_compound_type_caster.h
-index e154cd924e..4da3f4d98b 100644
+index fb22d2aa2..b471a2450 100644
 --- a/wpimath/src/main/python/wpimath/_impl/src/type_casters/units_compound_type_caster.h
 +++ b/wpimath/src/main/python/wpimath/_impl/src/type_casters/units_compound_type_caster.h
-@@ -33,54 +33,54 @@ struct handle_type_name<
+@@ -34,40 +34,40 @@ struct handle_type_name<
    static constexpr auto name = _("wpimath.units.units_per_second_squared");
  };
  
@@ -235,6 +222,9 @@ index e154cd924e..4da3f4d98b 100644
    static constexpr auto name = _("wpimath.units.volt_seconds_per_radian");
  };
  template <>
+@@ -77,16 +77,16 @@ struct handle_type_name<wpi::units::unit<
+ };
+ template <>
  struct handle_type_name<wpi::units::unit<wpi::units::compound_conversion_factor<
 -    volt_seconds_squared, wpi::units::inverse<wpi::units::radians_>>>> {
 +    volt_seconds_squared_, wpi::units::inverse<wpi::units::radians_>>>> {
@@ -254,14 +244,14 @@ index e154cd924e..4da3f4d98b 100644
  };
  
 diff --git a/wpimath/src/main/python/wpimath/_impl/src/type_casters/units_misc_type_caster.h b/wpimath/src/main/python/wpimath/_impl/src/type_casters/units_misc_type_caster.h
-index 511df827d2..dafe4a999a 100644
+index e9acd9248..aefeff906 100644
 --- a/wpimath/src/main/python/wpimath/_impl/src/type_casters/units_misc_type_caster.h
 +++ b/wpimath/src/main/python/wpimath/_impl/src/type_casters/units_misc_type_caster.h
 @@ -1,6 +1,6 @@
  #pragma once
  
--#include <wpi/units/mass.h>
-+#include <wpi/units/core.h>
+-#include "wpi/units/mass.hpp"
++#include "wpi/units/core.hpp"
  
  namespace pybind11 {
  namespace detail {
