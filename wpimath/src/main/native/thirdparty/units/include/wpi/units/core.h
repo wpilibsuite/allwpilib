@@ -263,9 +263,9 @@ namespace wpi::units
 		{                                                                                                                                                                                              \
 			return namespaceName::namePlural<double>(static_cast<double>(d));                                                                                                                          \
 		}                                                                                                                                                                                              \
-		constexpr namespaceName::namePlural<int> operator""_##abbreviation(unsigned long long d) noexcept                                                                                              \
+		constexpr namespaceName::namePlural<double> operator""_##abbreviation(unsigned long long d) noexcept                                                                                              \
 		{                                                                                                                                                                                              \
-			return namespaceName::namePlural<int>(static_cast<int>(d));                                                                                                                                \
+			return namespaceName::namePlural<double>(static_cast<double>(d));                                                                                                                                \
 		}                                                                                                                                                                                              \
 	}
 #endif
