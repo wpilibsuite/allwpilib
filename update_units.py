@@ -5,7 +5,6 @@ import os.path
 import re
 import sys
 import time
-
 from pathlib import Path
 
 
@@ -37,8 +36,9 @@ def process_file(content: str) -> str:
         "(?<=units::)(?:traits::)?is_unit_v", "ConversionFactorType", content
     )
 
-    # Update unit_t
-    content = content.replace("unit_t", "unit")
+    # Update unit_t and is_unit_t_v
+    content = re.sub("(?<=units::)unit_t", "unit", content)
+    content = re.sub("(?<=units::traits::)is_unit_t_v", "is_unit_v", content)
 
     # Update some UDLs
     content = content.replace("_mps_sq", "_mps2")
@@ -56,28 +56,36 @@ def process_file(content: str) -> str:
             (None, "scalar", "dimensionless"),
             ("meter", "meters", None),
             ("foot", "feet", None),
+            ("inch", "inches", None),
             ("second", "seconds", None),
             ("millisecond", "milliseconds", None),
             ("microsecond", "microseconds", None),
+            ("nanosecond", "nanoseconds", None),
             ("radian", "radians", None),
             ("degree", "degrees", None),
             ("turn", "turns", None),
             ("kilogram", "kilograms", None),
             ("pound", "pounds", "mass::pounds"),
+            (None, "celsius", None),
+            (None, "hertz", None),
             ("ampere", "amperes", None),
             ("volt", "volts", None),
             ("ohm", "ohms", None),
             ("square_meter", "square_meters", None),
             ("newton_meter", "newton_meters", None),
             ("kilogram_square_meter", "kilogram_square_meters", None),
+            (None, "pounds_per_square_inch", None),
             (None, "meters_per_second", None),
             (None, "feet_per_second", None),
             (None, "meters_per_second_squared", None),
             (None, "feet_per_second_squared", None),
             (None, "radians_per_second", None),
             (None, "degrees_per_second", None),
+            (None, "turns_per_second", None),
+            (None, "revolutions_per_minute", None),
             (None, "radians_per_second_squared", None),
             (None, "degrees_per_second_squared", None),
+            (None, "turns_per_second_squared", None),
         ),
         key=lambda x: -len(x[1]),
     )
