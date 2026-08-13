@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Joseph Eng <91924258+KangarooKoala@users.noreply.github.com>
-Date: Thu, 11 Dec 2025 15:43:39 -0800
-Subject: [PATCH 3/9] Add fmt support
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Wed, 12 Aug 2026 21:49:17 -0400
+Subject: [PATCH 3/9] Add <format> support
 
 ---
  include/units/core.h | 133 +++++++++++++++++++++++++++++++++++++++++--
  1 file changed, 129 insertions(+), 4 deletions(-)
 
 diff --git a/include/units/core.h b/include/units/core.h
-index 0e5b187ac1f32edfc8711abb07926d5ec4383852..57043f35da894a3b1faaf34335996fc2e6a3d7ef 100644
+index 0e5b187ac1f32edfc8711abb07926d5ec4383852..a1f349452ceaf3dc44f6616eae5d9f309288f0bd 100644
 --- a/include/units/core.h
 +++ b/include/units/core.h
 @@ -68,7 +68,11 @@
@@ -16,11 +16,11 @@ index 0e5b187ac1f32edfc8711abb07926d5ec4383852..57043f35da894a3b1faaf34335996fc2
  #include <utility>
  
 -#if defined(UNIT_LIB_ENABLE_IOSTREAM)
-+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
-+#include <fmt/format.h>
-+#endif // __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
++#if __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
++#include <format>
++#endif // __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
 +
-+#if defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
++#if defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
  #include <clocale>
  #include <string>
  
@@ -55,7 +55,7 @@ index 0e5b187ac1f32edfc8711abb07926d5ec4383852..57043f35da894a3b1faaf34335996fc2
  	}
 +#endif // defined(UNIT_LIB_ENABLE_IOSTREAM)
  
-+#if defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
++#if defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
  	//----------------------------
  	//  to_string
  	//----------------------------
@@ -64,7 +64,7 @@ index 0e5b187ac1f32edfc8711abb07926d5ec4383852..57043f35da894a3b1faaf34335996fc2
  		}
  	}
 -#endif
-+#endif // defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
++#endif // defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
  
  	//------------------------------
  	//	std::ratio helpers
@@ -72,14 +72,14 @@ index 0e5b187ac1f32edfc8711abb07926d5ec4383852..57043f35da894a3b1faaf34335996fc2
  	/** @endcond */ // END DOXYGEN IGNORE
  } // end namespace units
  
-+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
++#if __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
 +
 +//-----------------------------
 +//	FMT SUPPORT
 +//-----------------------------
 +
 +template<class D, class E>
-+struct fmt::formatter<units::dim<D, E>>
++struct std::formatter<units::dim<D, E>>
 +{
 +	template <typename ParseContext>
 +	constexpr auto parse(ParseContext& ctx)
@@ -94,15 +94,15 @@ index 0e5b187ac1f32edfc8711abb07926d5ec4383852..57043f35da894a3b1faaf34335996fc2
 +
 +		if constexpr (E::num != 0)
 +		{
-+			out = fmt::format_to(out, " {}", D::abbreviation);
++			out = std::format_to(out, " {}", D::abbreviation);
 +		}
 +		if constexpr (E::num != 0 && E::num != 1)
 +		{
-+			out = fmt::format_to(out, "^{}", E::num);
++			out = std::format_to(out, "^{}", E::num);
 +		}
 +		if constexpr (E::den != 1)
 +		{
-+			out = fmt::format_to(out, "/{}", E::den);
++			out = std::format_to(out, "/{}", E::den);
 +		}
 +
 +		return out;
@@ -110,7 +110,7 @@ index 0e5b187ac1f32edfc8711abb07926d5ec4383852..57043f35da894a3b1faaf34335996fc2
 +};
 +
 +template<class... Dims>
-+struct fmt::formatter<units::dimension_t<Dims...>>
++struct std::formatter<units::dimension_t<Dims...>>
 +{
 +	template <typename ParseContext>
 +	constexpr auto parse(ParseContext& ctx)
@@ -122,13 +122,13 @@ index 0e5b187ac1f32edfc8711abb07926d5ec4383852..57043f35da894a3b1faaf34335996fc2
 +	auto format(const units::dimension_t<Dims...>&, FmtContext& ctx) const
 +	{
 +		auto out = ctx.out();
-+		((out = fmt::format_to(out, "{}", Dims{})), ...);
++		((out = std::format_to(out, "{}", Dims{})), ...);
 +		return out;
 +	}
 +};
 +
 +template <units::ConversionFactorType ConversionFactor, units::ArithmeticType T, units::NumericalScaleType<T> NumericalScale>
-+struct fmt::formatter<units::unit<ConversionFactor, T, NumericalScale>> : fmt::formatter<double>
++struct std::formatter<units::unit<ConversionFactor, T, NumericalScale>> : std::formatter<double>
 +{
 +	template <typename FmtContext>
 +	auto format(const units::unit<ConversionFactor, T, NumericalScale>& obj, FmtContext& ctx) const
@@ -142,7 +142,7 @@ index 0e5b187ac1f32edfc8711abb07926d5ec4383852..57043f35da894a3b1faaf34335996fc2
 +		if constexpr (units::unit_abbreviation_v<units::unit<ConversionFactor, T, NumericalScale>>)
 +		{
 +			out = formatter<double>::format(obj.raw(), ctx);
-+			out = fmt::format_to(out, " {}", obj.abbreviation());
++			out = std::format_to(out, " {}", obj.abbreviation());
 +		}
 +		else
 +		{
@@ -158,7 +158,7 @@ index 0e5b187ac1f32edfc8711abb07926d5ec4383852..57043f35da894a3b1faaf34335996fc2
 +			using DimType = units::traits::dimension_of_t<ConversionFactor>;
 +			if constexpr (!DimType::empty)
 +			{
-+				out = fmt::format_to(out, "{}", DimType{});
++				out = std::format_to(out, "{}", DimType{});
 +			}
 +		}
 +
@@ -166,7 +166,7 @@ index 0e5b187ac1f32edfc8711abb07926d5ec4383852..57043f35da894a3b1faaf34335996fc2
 +	}
 +};
 +
-+#endif // __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
++#endif // __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
 +
  //------------------------------
  //	std::common_type
@@ -175,21 +175,21 @@ index 0e5b187ac1f32edfc8711abb07926d5ec4383852..57043f35da894a3b1faaf34335996fc2
  	}
  } // end namespace units
  
-+#if __has_include(<fmt/format.h>) && !defined(UNITS_LIB_DISABLE_FMT)
++#if __has_include(<format>) && !defined(UNITS_LIB_DISABLE_FMT)
 +
 +template<class Underlying>
-+struct fmt::formatter<units::decibels<Underlying>> : fmt::formatter<double>
++struct std::formatter<units::decibels<Underlying>> : std::formatter<double>
 +{
 +	template <typename FmtContext>
 +	auto format(const units::decibels<Underlying>& obj, FmtContext& ctx) const
 +	{
 +		auto out = formatter<double>::format(obj.raw(), ctx);
-+		out = fmt::format_to(out, " dB");
++		out = std::format_to(out, " dB");
 +		return out;
 +	}
 +};
 +
-+#endif // __has_include(<fmt/format.h>) && !defined(UNITS_LIB_DISABLE_FMT)
++#endif // __has_include(<format>) && !defined(UNITS_LIB_DISABLE_FMT)
 +
  //----------------------------------------------------------------------------------------------------------------------
  //      STD Namespace extensions

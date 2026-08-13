@@ -8,7 +8,7 @@ Subject: [PATCH 6/9] Fix doxygen macro name typo
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/include/units/core.h b/include/units/core.h
-index 98ab921a65ea5b81bd83eca3a13b5e522c0ea86b..1462de86731e3ceb491d41fc53eb9b7e298ad4e5 100644
+index 8534e1e7637043d10af226d9167d89e96813877c..b4e182f1a88d4917e826e068a79227d2173a9fd9 100644
 --- a/include/units/core.h
 +++ b/include/units/core.h
 @@ -2055,7 +2055,7 @@ namespace units

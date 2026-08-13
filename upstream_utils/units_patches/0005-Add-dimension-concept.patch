@@ -8,7 +8,7 @@ Subject: [PATCH 5/9] Add dimension concept
  1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/include/units/core.h b/include/units/core.h
-index e640b29825b1b319dfec91176eb6015e9c1a08ac..98ab921a65ea5b81bd83eca3a13b5e522c0ea86b 100644
+index d20ec7accb10fe548f84bb70120ec2df77af9605..8534e1e7637043d10af226d9167d89e96813877c 100644
 --- a/include/units/core.h
 +++ b/include/units/core.h
 @@ -323,11 +323,11 @@ namespace units

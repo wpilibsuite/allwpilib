@@ -8,7 +8,7 @@ Subject: [PATCH 4/9] Group doxygen modules
  1 file changed, 10 insertions(+)
 
 diff --git a/include/units/core.h b/include/units/core.h
-index 57043f35da894a3b1faaf34335996fc2e6a3d7ef..e640b29825b1b319dfec91176eb6015e9c1a08ac 100644
+index a1f349452ceaf3dc44f6616eae5d9f309288f0bd..d20ec7accb10fe548f84bb70120ec2df77af9605 100644
 --- a/include/units/core.h
 +++ b/include/units/core.h
 @@ -414,14 +414,20 @@ namespace units

@@ -68,13 +68,13 @@
 #include <type_traits>
 #include <utility>
 
-#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
-#include <fmt/format.h>
-#endif // __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+#if __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
+#include <format>
+#endif // __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
 
 #include <gcem.hpp>
 
-#if defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+#if defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
 #include <clocale>
 #include <string>
 
@@ -263,9 +263,9 @@ namespace wpi::units
 		{                                                                                                                                                                                              \
 			return namespaceName::namePlural<double>(static_cast<double>(d));                                                                                                                          \
 		}                                                                                                                                                                                              \
-		constexpr namespaceName::namePlural<double> operator""_##abbreviation(unsigned long long d) noexcept                                                                                              \
+		constexpr namespaceName::namePlural<int> operator""_##abbreviation(unsigned long long d) noexcept                                                                                              \
 		{                                                                                                                                                                                              \
-			return namespaceName::namePlural<double>(static_cast<double>(d));                                                                                                                                \
+			return namespaceName::namePlural<int>(static_cast<int>(d));                                                                                                                                \
 		}                                                                                                                                                                                              \
 	}
 #endif
@@ -2666,7 +2666,7 @@ namespace wpi::units
 	}
 #endif // defined(UNIT_LIB_ENABLE_IOSTREAM)
 
-#if defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+#if defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
 	//----------------------------
 	//  to_string
 	//----------------------------
@@ -2696,7 +2696,7 @@ namespace wpi::units
 			return s;
 		}
 	}
-#endif // defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+#endif // defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
 
 	//------------------------------
 	//	std::ratio helpers
@@ -2714,14 +2714,14 @@ namespace wpi::units
 	/** @endcond */ // END DOXYGEN IGNORE
 } // end namespace wpi::units
 
-#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+#if __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
 
 //-----------------------------
 //	FMT SUPPORT
 //-----------------------------
 
 template<class D, class E>
-struct fmt::formatter<wpi::units::dim<D, E>>
+struct std::formatter<wpi::units::dim<D, E>>
 {
 	template <typename ParseContext>
 	constexpr auto parse(ParseContext& ctx)
@@ -2736,15 +2736,15 @@ struct fmt::formatter<wpi::units::dim<D, E>>
 
 		if constexpr (E::num != 0)
 		{
-			out = fmt::format_to(out, " {}", D::abbreviation);
+			out = std::format_to(out, " {}", D::abbreviation);
 		}
 		if constexpr (E::num != 0 && E::num != 1)
 		{
-			out = fmt::format_to(out, "^{}", E::num);
+			out = std::format_to(out, "^{}", E::num);
 		}
 		if constexpr (E::den != 1)
 		{
-			out = fmt::format_to(out, "/{}", E::den);
+			out = std::format_to(out, "/{}", E::den);
 		}
 
 		return out;
@@ -2752,7 +2752,7 @@ struct fmt::formatter<wpi::units::dim<D, E>>
 };
 
 template<class... Dims>
-struct fmt::formatter<wpi::units::dimension_t<Dims...>>
+struct std::formatter<wpi::units::dimension_t<Dims...>>
 {
 	template <typename ParseContext>
 	constexpr auto parse(ParseContext& ctx)
@@ -2764,13 +2764,13 @@ struct fmt::formatter<wpi::units::dimension_t<Dims...>>
 	auto format(const wpi::units::dimension_t<Dims...>&, FmtContext& ctx) const
 	{
 		auto out = ctx.out();
-		((out = fmt::format_to(out, "{}", Dims{})), ...);
+		((out = std::format_to(out, "{}", Dims{})), ...);
 		return out;
 	}
 };
 
 template <wpi::units::ConversionFactorType ConversionFactor, wpi::units::ArithmeticType T, wpi::units::NumericalScaleType<T> NumericalScale>
-struct fmt::formatter<wpi::units::unit<ConversionFactor, T, NumericalScale>> : fmt::formatter<double>
+struct std::formatter<wpi::units::unit<ConversionFactor, T, NumericalScale>> : std::formatter<double>
 {
 	template <typename FmtContext>
 	auto format(const wpi::units::unit<ConversionFactor, T, NumericalScale>& obj, FmtContext& ctx) const
@@ -2784,7 +2784,7 @@ struct fmt::formatter<wpi::units::unit<ConversionFactor, T, NumericalScale>> : f
 		if constexpr (wpi::units::unit_abbreviation_v<wpi::units::unit<ConversionFactor, T, NumericalScale>>)
 		{
 			out = formatter<double>::format(obj.raw(), ctx);
-			out = fmt::format_to(out, " {}", obj.abbreviation());
+			out = std::format_to(out, " {}", obj.abbreviation());
 		}
 		else
 		{
@@ -2800,7 +2800,7 @@ struct fmt::formatter<wpi::units::unit<ConversionFactor, T, NumericalScale>> : f
 			using DimType = wpi::units::traits::dimension_of_t<ConversionFactor>;
 			if constexpr (!DimType::empty)
 			{
-				out = fmt::format_to(out, "{}", DimType{});
+				out = std::format_to(out, "{}", DimType{});
 			}
 		}
 
@@ -2808,7 +2808,7 @@ struct fmt::formatter<wpi::units::unit<ConversionFactor, T, NumericalScale>> : f
 	}
 };
 
-#endif // __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+#endif // __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
 
 //------------------------------
 //	std::common_type
@@ -4181,21 +4181,21 @@ namespace wpi::units
 	}
 } // end namespace wpi::units
 
-#if __has_include(<fmt/format.h>) && !defined(UNITS_LIB_DISABLE_FMT)
+#if __has_include(<format>) && !defined(UNITS_LIB_DISABLE_FMT)
 
 template<class Underlying>
-struct fmt::formatter<wpi::units::decibels<Underlying>> : fmt::formatter<double>
+struct std::formatter<wpi::units::decibels<Underlying>> : std::formatter<double>
 {
 	template <typename FmtContext>
 	auto format(const wpi::units::decibels<Underlying>& obj, FmtContext& ctx) const
 	{
 		auto out = formatter<double>::format(obj.raw(), ctx);
-		out = fmt::format_to(out, " dB");
+		out = std::format_to(out, " dB");
 		return out;
 	}
 };
 
-#endif // __has_include(<fmt/format.h>) && !defined(UNITS_LIB_DISABLE_FMT)
+#endif // __has_include(<format>) && !defined(UNITS_LIB_DISABLE_FMT)
 
 //----------------------------------------------------------------------------------------------------------------------
 //      STD Namespace extensions

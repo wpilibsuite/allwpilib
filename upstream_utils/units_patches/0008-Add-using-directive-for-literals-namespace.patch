@@ -8,7 +8,7 @@ Subject: [PATCH 8/9] Add using-directive for literals namespace
  1 file changed, 5 insertions(+)
 
 diff --git a/include/units/core.h b/include/units/core.h
-index b2a325a50e778f8480e3bdc6508a61598b2a2954..088bd1ad69ee4d25889a2612f2456db2944bf18b 100644
+index 9294011e944da7d1a0f4c741acdd3a12dee26b7a..8f9c59e407d798421382a0782a4f4fd8974e0eb6 100644
 --- a/include/units/core.h
 +++ b/include/units/core.h
 @@ -4382,4 +4382,9 @@ namespace units

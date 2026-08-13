@@ -190,16 +190,16 @@ index 77bcd9311444f98e548ccefcc25150615350606a..263ff34ca8c60ef25f570a928434ff3f
 \ No newline at end of file
 +#endif // units_angle_h_
 diff --git a/include/units/core.h b/include/units/core.h
-index 1462de86731e3ceb491d41fc53eb9b7e298ad4e5..b2a325a50e778f8480e3bdc6508a61598b2a2954 100644
+index b4e182f1a88d4917e826e068a79227d2173a9fd9..9294011e944da7d1a0f4c741acdd3a12dee26b7a 100644
 --- a/include/units/core.h
 +++ b/include/units/core.h
 @@ -72,6 +72,8 @@
- #include <fmt/format.h>
- #endif // __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+ #include <format>
+ #endif // __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
  
 +#include <gcem.hpp>
 +
- #if defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+ #if defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
  #include <clocale>
  #include <string>
 @@ -3742,7 +3744,7 @@ namespace units
