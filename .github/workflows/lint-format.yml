@@ -82,7 +82,7 @@ jobs:
           ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2026.71
       - name: Create compile_commands.json
         run: |
-          ./gradlew generateCompileCommands -Ptoolchain-optional-Systemcore
+          ./gradlew generateCompileCommands --parallel -Ptoolchain-optional-Systemcore
           ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64release/compile_commands.json
           ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64debug/compile_commands.json
       - name: List changed files
