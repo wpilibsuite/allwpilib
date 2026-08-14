@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.drivers.imu;
+package org.wpilib.drivers.odometry;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,12 +21,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
-import org.wpilib.drivers.imu.GoBildaPinpoint.DeviceStatus;
-import org.wpilib.drivers.imu.GoBildaPinpoint.EncoderDirection;
-import org.wpilib.drivers.imu.GoBildaPinpoint.ErrorDetectionType;
-import org.wpilib.drivers.imu.GoBildaPinpoint.FailureReason;
-import org.wpilib.drivers.imu.GoBildaPinpoint.OdometryPod;
-import org.wpilib.drivers.imu.GoBildaPinpoint.Register;
+import org.wpilib.drivers.odometry.GoBildaPinpoint.DeviceStatus;
+import org.wpilib.drivers.odometry.GoBildaPinpoint.EncoderDirection;
+import org.wpilib.drivers.odometry.GoBildaPinpoint.ErrorDetectionType;
+import org.wpilib.drivers.odometry.GoBildaPinpoint.FailureReason;
+import org.wpilib.drivers.odometry.GoBildaPinpoint.OdometryPod;
+import org.wpilib.drivers.odometry.GoBildaPinpoint.Register;
 import org.wpilib.hardware.bus.I2C;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.math.geometry.Pose2d;

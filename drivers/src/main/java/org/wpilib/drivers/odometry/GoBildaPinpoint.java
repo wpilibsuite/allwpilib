@@ -6,7 +6,7 @@
 // This file is based on the goBILDA FTC driver, which was made available under
 // the MIT License. Copyright (c) 2025 Base 10 Assets, LLC.
 
-package org.wpilib.drivers.imu;
+package org.wpilib.drivers.odometry;
 
 import static org.wpilib.units.Units.Hertz;
 import static org.wpilib.units.Units.Meters;
