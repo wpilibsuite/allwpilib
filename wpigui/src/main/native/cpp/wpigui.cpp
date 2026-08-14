@@ -974,6 +974,9 @@ bool gui::Initialize(const char* title, int width, int height,
   ImGuiIO& io = ImGui::GetIO();
   io.ConfigFlags |= configFlags;
 
+  // https://github.com/wpilibsuite/allwpilib/issues/9272
+  io.ConfigInputTrickleEventQueue = false;
+
   // Hook ini handler to save settings
   ImGuiSettingsHandler iniHandler;
   iniHandler.TypeName = "MainWindow";
