@@ -69,8 +69,8 @@ class SlewRateLimiter {
         wpi::math::MathSharedStore::GetTimestamp();
     wpi::units::seconds<> elapsedTime = currentTime - m_prevTime;
     m_prevVal +=
-        std::clamp(input - m_prevVal, m_negativeRateLimit * elapsedTime,
-                   m_positiveRateLimit * elapsedTime);
+        std::clamp<Unit_t>(input - m_prevVal, m_negativeRateLimit * elapsedTime,
+                           m_positiveRateLimit * elapsedTime);
     m_prevTime = currentTime;
     return m_prevVal;
   }
