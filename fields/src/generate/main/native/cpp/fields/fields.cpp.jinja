@@ -49,9 +49,9 @@ static constexpr FieldTag FIELD_TAGS_{{ field.enum }}[] = {
         {{ tag.id }},
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                {{ tag.translation.x|cpp_meter_t }},
-                {{ tag.translation.y|cpp_meter_t }},
-                {{ tag.translation.z|cpp_meter_t }},
+                {{ tag.translation.x|cpp_meters }},
+                {{ tag.translation.y|cpp_meters }},
+                {{ tag.translation.z|cpp_meters }},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 {{ tag.quaternion.W|number }},
@@ -117,8 +117,8 @@ Field GetField(FieldId field) {
     result.m_image.emplace(data.fieldImage, data.top, data.left,
                            data.bottom, data.right);
   }
-  result.m_fieldLength = wpi::units::meter_t{data.length};
-  result.m_fieldWidth = wpi::units::meter_t{data.width};
+  result.m_fieldLength = wpi::units::meters<>{data.length};
+  result.m_fieldWidth = wpi::units::meters<>{data.width};
   result.m_program = data.program;
   result.m_resourceFile = data.resourceFile;
   result.m_hasTags = data.hasTags;

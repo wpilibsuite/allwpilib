@@ -45,8 +45,8 @@ def number_literal(value: float) -> str:
     return json.dumps(value)
 
 
-def cpp_meter_t(value: float) -> str:
-    return f"wpi::units::meter_t{{{number_literal(value)}}}"
+def cpp_meters(value: float) -> str:
+    return f"wpi::units::meters<>{{{number_literal(value)}}}"
 
 
 def java_identifier_suffix(value: str) -> str:
@@ -321,7 +321,7 @@ def make_environment(template_root: Path) -> Environment:
     env.filters["java_nullable_string"] = java_nullable_string
     env.filters["cpp_nullable_string"] = cpp_nullable_string
     env.filters["number"] = number_literal
-    env.filters["cpp_meter_t"] = cpp_meter_t
+    env.filters["cpp_meters"] = cpp_meters
     return env
 
 
