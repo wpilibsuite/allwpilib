@@ -229,6 +229,13 @@ constexpr Transform3d Transform3d::operator+(const Transform3d& other) const {
   return Transform3d{Pose3d{}, Pose3d{}.TransformBy(*this).TransformBy(other)};
 }
 
+ /**
+  * Returns a Transform2d representing this Transform3d projected into the X-Y plane.
+  */
+ constexpr Transform2d ToTransform2d() const {
+   return Transform2d{m_translation.ToTranslation2d(), m_rotation.ToRotation2d()};
+ }
+
 constexpr Twist3d Transform3d::Log() const {
   // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
 
