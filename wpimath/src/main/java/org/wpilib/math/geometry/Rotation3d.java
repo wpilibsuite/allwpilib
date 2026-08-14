@@ -324,7 +324,8 @@ public final class Rotation3d
   }
 
   /**
-   * Constructs and returns a Rotation3d with the given number of radians for the roll, pitch, and yaw.
+   * Constructs and returns a Rotation3d with the given number of radians for the roll, pitch, and
+   * yaw.
    *
    * @param roll The value of the roll in radians.
    * @param pitch The value of the pitch in radians.
@@ -336,7 +337,8 @@ public final class Rotation3d
   }
 
   /**
-   * Constructs and returns a Rotation3d with the given number of degrees for the roll, pitch, and yaw.
+   * Constructs and returns a Rotation3d with the given number of degrees for the roll, pitch, and
+   * yaw.
    *
    * @param roll The value of the roll in degrees.
    * @param pitch The value of the pitch in degrees.
@@ -348,7 +350,8 @@ public final class Rotation3d
   }
 
   /**
-   * Constructs and returns a Rotation3d with the given number of rotations for the roll, pitch, and yaw.
+   * Constructs and returns a Rotation3d with the given number of rotations for the roll, pitch, and
+   * yaw.
    *
    * @param roll The value of the roll in rotations.
    * @param pitch The value of the pitch in rotations.
@@ -356,7 +359,10 @@ public final class Rotation3d
    * @return The rotation object with the desired angle values.
    */
   public static Rotation3d fromRotations(double roll, double pitch, double yaw) {
-    return new Rotation3d(Units.rotationsToRadians(roll), Units.rotationsToRadians(pitch), Units.rotationsToRadians(yaw));
+    return new Rotation3d(
+        Units.rotationsToRadians(roll),
+        Units.rotationsToRadians(pitch),
+        Units.rotationsToRadians(yaw));
   }
 
   /**
