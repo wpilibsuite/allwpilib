@@ -328,9 +328,9 @@ public final class Rotation3d
    * Constructs and returns a Rotation3d with the given number of radians for the roll, pitch, and
    * yaw.
    *
-   * @param roll The value of the roll in radians.
-   * @param pitch The value of the pitch in radians.
-   * @param yaw The value of the yaw in radians.
+   * @param roll The counterclockwise rotation angle around the X axis (roll) in radians.
+   * @param pitch The counterclockwise rotation angle around the Y axis (pitch) in radians.
+   * @param yaw The counterclockwise rotation angle around the Z axis (yaw) in radians.
    * @return The rotation object with the desired angle values.
    */
   public static Rotation3d fromRadians(double roll, double pitch, double yaw) {
@@ -341,9 +341,9 @@ public final class Rotation3d
    * Constructs and returns a Rotation3d with the given number of degrees for the roll, pitch, and
    * yaw.
    *
-   * @param roll The value of the roll in degrees.
-   * @param pitch The value of the pitch in degrees.
-   * @param yaw The value of the yaw in degrees.
+   * @param roll The counterclockwise rotation angle around the X axis (roll) in degrees.
+   * @param pitch The counterclockwise rotation angle around the Y axis (pitch) in degrees.
+   * @param yaw The counterclockwise rotation angle around the Z axis (yaw) in degrees.
    * @return The rotation object with the desired angle values.
    */
   public static Rotation3d fromDegrees(double roll, double pitch, double yaw) {
@@ -354,9 +354,9 @@ public final class Rotation3d
    * Constructs and returns a Rotation3d with the given number of rotations for the roll, pitch, and
    * yaw.
    *
-   * @param roll The value of the roll in rotations.
-   * @param pitch The value of the pitch in rotations.
-   * @param yaw The value of the yaw in rotations.
+   * @param roll The counterclockwise rotation angle around the X axis (roll) in rotations.
+   * @param pitch The counterclockwise rotation angle around the Y axis (pitch) in rotations.
+   * @param yaw The counterclockwise rotation angle around the Z axis (yaw) in rotations.
    * @return The rotation object with the desired angle values.
    */
   public static Rotation3d fromRotations(double roll, double pitch, double yaw) {
