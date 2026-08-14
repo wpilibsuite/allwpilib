@@ -1,0 +1,16 @@
+classes:
+  wpi::sim::SolenoidSim:
+    force_type_casters:
+    - std::function
+    typealias:
+    - wpi::PneumaticsModuleType
+    methods:
+      SolenoidSim:
+        overloads:
+          std::shared_ptr<PneumaticsBaseSim>, int:
+          int, PneumaticsModuleType, int:
+          PneumaticsModuleType, int:
+      GetOutput:
+      SetOutput:
+      RegisterOutputCallback:
+      GetModuleSim:

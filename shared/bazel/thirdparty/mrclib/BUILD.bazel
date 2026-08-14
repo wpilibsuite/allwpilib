@@ -1,0 +1,37 @@
+load("@rules_cc//cc:cc_import.bzl", "cc_import")
+
+filegroup(
+    name = "mrclib_shared_interface",
+    srcs = select({
+        "@wpilib_toolchains//conditions:windows_arm64": ["@mrclib_windowsarm64//:shared_interface"],
+        "@wpilib_toolchains//conditions:windows_x86_64": ["@mrclib_windowsx86-64//:shared_interface"],
+    }),
+    target_compatible_with = select({
+        "@platforms//os:windows": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+)
+
+alias(
+    name = "MrcLib",
+    actual = select({
+        "@wpilib_toolchains//conditions:linux_x86_64": "@mrclib_linuxx86-64//:shared_libs",
+        "@wpilib_toolchains//conditions:osx": "@mrclib_osxuniversal//:shared_libs",
+        "@wpilib_toolchains//conditions:windows_arm64": "@mrclib_windowsarm64//:shared_libs",
+        "@wpilib_toolchains//conditions:windows_x86_64": "@mrclib_windowsx86-64//:shared_libs",
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": "@mrclib_linuxsystemcore//:shared_libs",
+        "@wpilib_toolchains//constraints/is_trixie64:trixie64": "@mrclib_linuxarm64//:shared_libs",
+    }),
+    visibility = ["//visibility:public"],
+)
+
+cc_import(
+    name = "mrclib",
+    interface_library = select({
+        "@platforms//os:windows": ":mrclib_shared_interface",
+        "//conditions:default": None,
+    }),
+    shared_library = ":MrcLib",
+    visibility = ["//visibility:public"],
+    deps = ["@mrclib_headers//:headers"],
+)

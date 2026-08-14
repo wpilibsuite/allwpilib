@@ -1,0 +1,52 @@
+classes:
+  wpi::math::BiquadFilter:
+    enums:
+      Kind:
+    methods:
+      BiquadFilter:
+        overloads:
+          std::span<const Section>:
+          std::initializer_list<Section>:
+            ignore: true
+      Butterworth:
+        overloads:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, wpi::units::hertz_t:
+      ChebyshevI:
+        overloads:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, wpi::units::hertz_t, double:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, double:
+      ChebyshevII:
+        overloads:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, wpi::units::hertz_t, double:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, double:
+      Elliptic:
+        overloads:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, wpi::units::hertz_t, double, double:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, double, double:
+      Notch:
+      MovingAverage:
+      Calculate:
+      Reset:
+        overloads:
+          '':
+          double:
+      LastValue:
+      NumSections:
+      Sections:
+  wpi::math::BiquadFilter::Section:
+    attributes:
+      b0:
+      b1:
+      b2:
+      a1:
+      a2:
+    inline_code: |
+      .def(py::init([](double b0, double b1, double b2, double a1, double a2) {
+        return wpi::math::BiquadFilter::Section{b0, b1, b2, a1, a2};
+      }), py::arg("b0"), py::arg("b1"), py::arg("b2"), py::arg("a1"), py::arg("a2"))
+
+      .def("__repr__", [](const wpi::math::BiquadFilter::Section &self) {
+        return py::str("BiquadFilter.Section(b0={}, b1={}, b2={}, a1={}, a2={})").format(
+          self.b0, self.b1, self.b2, self.a1, self.a2);
+      })

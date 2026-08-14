@@ -1,10 +1,11 @@
 apply plugin: 'cpp'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 apply plugin: ExtraTasks
 
-if (!project.hasProperty('onlylinuxathena')) {
-    ext.skiplinuxathena = true
+if (!project.hasProperty('onlylinuxsystemcore')) {
+    ext.skiplinuxsystemcore = true
     apply from: "${rootDir}/shared/config.gradle"
+    apply from: "${rootDir}/shared/libmrclib.gradle"
 
     model {
         components {
@@ -30,7 +31,8 @@ if (!project.hasProperty('onlylinuxathena')) {
                         it.cppCompiler.define("HALSIM_InitExtension", "HALSIM_InitExtension_$name")
                     }
 
-                    project(':hal').addHalDependency(it, 'shared')
+                    nativeUtils.useRequiredLibrary(it, 'mrclib')
+                    lib project: ':hal', library: 'hal', linkage: 'shared'
                     if (project.hasProperty('includeNtCore')) {
                         lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     }
@@ -57,8 +59,9 @@ if (!project.hasProperty('onlylinuxathena')) {
                     }
                 }
                 binaries.all {
-                    if (!project.hasProperty('onlylinuxathena')) {
-                        project(':hal').addHalDependency(it, 'shared')
+                    if (!project.hasProperty('onlylinuxsystemcore')) {
+                        nativeUtils.useRequiredLibrary(it, 'mrclib')
+                        lib project: ':hal', library: 'hal', linkage: 'shared'
                         lib library: pluginName
                         if (project.hasProperty('includeNtCore')) {
                             lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
@@ -67,9 +70,6 @@ if (!project.hasProperty('onlylinuxathena')) {
                             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                         }
                         lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                        if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                            nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
-                        }
                     } else {
                         it.buildable = false
                     }
@@ -84,7 +84,7 @@ if (!project.hasProperty('onlylinuxathena')) {
 model {
     tasks {
         def c = $.components
-        if (!project.hasProperty('onlylinuxathena')) {
+        if (!project.hasProperty('onlylinuxsystemcore')) {
             project.tasks.create('runCpp', Exec) {
                 group = 'WPILib'
                 description = "Run the ${pluginName}Dev executable"

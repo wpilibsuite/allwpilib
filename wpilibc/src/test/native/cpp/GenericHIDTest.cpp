@@ -2,49 +2,108 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/GenericHID.h>
-#include <frc/simulation/GenericHIDSim.h>
+#include "wpi/driverstation/GenericHID.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-using namespace frc;
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
+#include "wpi/simulation/GenericHIDSim.hpp"
+
+using namespace wpi;
 using RumbleType = GenericHID::RumbleType;
 static constexpr double kEpsilon = 0.0001;
-TEST(GenericHIDTest, RumbleRange) {
-  GenericHID hid{0};
+TEST_CASE("GenericHIDTest RumbleRange", "[wpilibc]") {
+  GenericHID hid = internal::DriverStationBackend::ConstructGenericHID(0);
   sim::GenericHIDSim sim{0};
 
   for (int i = 0; i <= 100; i++) {
     double rumbleValue = i / 100.0;
-    hid.SetRumble(RumbleType::kBothRumble, rumbleValue);
-    EXPECT_NEAR(rumbleValue, sim.GetRumble(RumbleType::kLeftRumble), kEpsilon);
-    EXPECT_NEAR(rumbleValue, sim.GetRumble(RumbleType::kRightRumble), kEpsilon);
+    hid.SetRumble(RumbleType::LEFT_RUMBLE, rumbleValue);
+    CHECK_THAT(rumbleValue,
+               Catch::Matchers::WithinAbs(
+                   sim.GetRumble(RumbleType::LEFT_RUMBLE), kEpsilon));
+
+    hid.SetRumble(RumbleType::RIGHT_RUMBLE, rumbleValue);
+    CHECK_THAT(rumbleValue,
+               Catch::Matchers::WithinAbs(
+                   sim.GetRumble(RumbleType::RIGHT_RUMBLE), kEpsilon));
+
+    hid.SetRumble(RumbleType::LEFT_TRIGGER_RUMBLE, rumbleValue);
+    CHECK_THAT(rumbleValue,
+               Catch::Matchers::WithinAbs(
+                   sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), kEpsilon));
+
+    hid.SetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE, rumbleValue);
+    CHECK_THAT(rumbleValue,
+               Catch::Matchers::WithinAbs(
+                   sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), kEpsilon));
   }
 }
 
-TEST(GenericHIDTest, RumbleTypes) {
-  GenericHID hid{0};
+TEST_CASE("GenericHIDTest RumbleTypes", "[wpilibc]") {
+  GenericHID hid = internal::DriverStationBackend::ConstructGenericHID(0);
   sim::GenericHIDSim sim{0};
 
-  // Make sure both are off
-  hid.SetRumble(RumbleType::kBothRumble, 0);
-  EXPECT_NEAR(0, sim.GetRumble(RumbleType::kBothRumble), kEpsilon);
-
-  // test both
-  hid.SetRumble(RumbleType::kBothRumble, 1);
-  EXPECT_NEAR(1, sim.GetRumble(RumbleType::kLeftRumble), kEpsilon);
-  EXPECT_NEAR(1, sim.GetRumble(RumbleType::kRightRumble), kEpsilon);
-  hid.SetRumble(RumbleType::kBothRumble, 0);
+  // Make sure all are off
+  hid.SetRumble(RumbleType::LEFT_RUMBLE, 0);
+  hid.SetRumble(RumbleType::LEFT_TRIGGER_RUMBLE, 0);
+  hid.SetRumble(RumbleType::RIGHT_RUMBLE, 0);
+  hid.SetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE, 0);
+  CHECK_THAT(0, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::LEFT_RUMBLE), kEpsilon));
+  CHECK_THAT(0, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), kEpsilon));
+  CHECK_THAT(0, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::RIGHT_RUMBLE), kEpsilon));
+  CHECK_THAT(0, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), kEpsilon));
 
   // test left only
-  hid.SetRumble(RumbleType::kLeftRumble, 1);
-  EXPECT_NEAR(1, sim.GetRumble(RumbleType::kLeftRumble), kEpsilon);
-  EXPECT_NEAR(0, sim.GetRumble(RumbleType::kRightRumble), kEpsilon);
-  hid.SetRumble(RumbleType::kLeftRumble, 0);
+  hid.SetRumble(RumbleType::LEFT_RUMBLE, 1);
+  CHECK_THAT(1, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::LEFT_RUMBLE), kEpsilon));
+  CHECK_THAT(0, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::RIGHT_RUMBLE), kEpsilon));
+  CHECK_THAT(0, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), kEpsilon));
+  CHECK_THAT(0, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), kEpsilon));
+  hid.SetRumble(RumbleType::LEFT_RUMBLE, 0);
 
   // test right only
-  hid.SetRumble(RumbleType::kRightRumble, 1);
-  EXPECT_NEAR(0, sim.GetRumble(RumbleType::kLeftRumble), kEpsilon);
-  EXPECT_NEAR(1, sim.GetRumble(RumbleType::kRightRumble), kEpsilon);
-  hid.SetRumble(RumbleType::kRightRumble, 0);
+  hid.SetRumble(RumbleType::RIGHT_RUMBLE, 1);
+  CHECK_THAT(0, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::LEFT_RUMBLE), kEpsilon));
+  CHECK_THAT(1, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::RIGHT_RUMBLE), kEpsilon));
+  CHECK_THAT(0, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), kEpsilon));
+  CHECK_THAT(0, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), kEpsilon));
+  hid.SetRumble(RumbleType::RIGHT_RUMBLE, 0);
+
+  // test left trigger only
+  hid.SetRumble(RumbleType::LEFT_TRIGGER_RUMBLE, 1);
+  CHECK_THAT(0, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::LEFT_RUMBLE), kEpsilon));
+  CHECK_THAT(0, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::RIGHT_RUMBLE), kEpsilon));
+  CHECK_THAT(1, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), kEpsilon));
+  CHECK_THAT(0, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), kEpsilon));
+  hid.SetRumble(RumbleType::LEFT_TRIGGER_RUMBLE, 0);
+
+  // test right trigger only
+  hid.SetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE, 1);
+  CHECK_THAT(0, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::LEFT_RUMBLE), kEpsilon));
+  CHECK_THAT(0, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::RIGHT_RUMBLE), kEpsilon));
+  CHECK_THAT(0, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), kEpsilon));
+  CHECK_THAT(1, Catch::Matchers::WithinAbs(
+                    sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), kEpsilon));
+  hid.SetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE, 0);
 }

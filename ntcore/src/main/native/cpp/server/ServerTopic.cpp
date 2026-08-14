@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ServerTopic.h"
+#include "ServerTopic.hpp"
 
-#include "Log.h"
+#include "Log.hpp"
 
-using namespace nt::server;
+using namespace wpi::nt::server;
 
-bool ServerTopic::SetProperties(const wpi::json& update) {
+bool ServerTopic::SetProperties(const wpi::util::json& update) {
   if (!update.is_object()) {
     return false;
   }
   bool updated = false;
-  for (auto&& elem : update.items()) {
-    if (elem.value().is_null()) {
-      properties.erase(elem.key());
+  for (auto&& [key, value] : update.get_object()) {
+    if (value.is_null()) {
+      properties.erase(key);
     } else {
-      properties[elem.key()] = elem.value();
+      properties[key] = value;
     }
     updated = true;
   }
@@ -32,24 +32,21 @@ void ServerTopic::RefreshProperties() {
   retained = false;
   cached = true;
 
-  auto persistentIt = properties.find("persistent");
-  if (persistentIt != properties.end()) {
-    if (auto val = persistentIt->get_ptr<bool*>()) {
-      persistent = *val;
+  if (auto prop = properties.lookup("persistent")) {
+    if (prop->is_bool()) {
+      persistent = prop->get_bool();
     }
   }
 
-  auto retainedIt = properties.find("retained");
-  if (retainedIt != properties.end()) {
-    if (auto val = retainedIt->get_ptr<bool*>()) {
-      retained = *val;
+  if (auto prop = properties.lookup("retained")) {
+    if (prop->is_bool()) {
+      retained = prop->get_bool();
     }
   }
 
-  auto cachedIt = properties.find("cached");
-  if (cachedIt != properties.end()) {
-    if (auto val = cachedIt->get_ptr<bool*>()) {
-      cached = *val;
+  if (auto prop = properties.lookup("cached")) {
+    if (prop->is_bool()) {
+      cached = prop->get_bool();
     }
   }
 

@@ -3,12 +3,13 @@ macro(add_doxygen_docs)
         apriltag
         cameraserver
         cscore
-        fieldImages
+        drivers
+        fields
         hal
         ntcore
         romiVendordep
         wpilibc
-        wpilibNewCommands
+        commandsv2
         wpimath
         wpinet
         wpiutil
@@ -17,67 +18,27 @@ macro(add_doxygen_docs)
     foreach(dir ${dirs})
         list(APPEND docs_dirs ${dir}/src/main/native/include)
         file(GLOB dirs ${dir}/src/main/native/thirdparty/*/include)
-        list(FILTER dirs EXCLUDE REGEX eigen|protobuf)
+        list(FILTER dirs EXCLUDE REGEX eigen)
         set(DOXYGEN_EXCLUDE_PATTERNS "*.pb.h" "**/.clang-tidy" "**/.clang-format")
 
         if(DOCS_WARNINGS_AS_ERRORS)
             set(DOXYGEN_WARN_AS_ERROR "FAIL_ON_WARNINGS_PRINT")
-            list(FILTER dirs EXCLUDE REGEX fmt|memory|units)
+            list(FILTER dirs EXCLUDE REGEX memory|units)
             list(
-                APPEND
-                DOXYGEN_EXCLUDE_PATTERNS
+                APPEND DOXYGEN_EXCLUDE_PATTERNS
                 # apriltag
                 "apriltag_pose.h"
                 # llvm
-                "wpi/AlignOf.h"
-                "wpi/Casting.h"
-                "wpi/Chrono.h"
-                "wpi/Compiler.h"
-                "wpi/ConvertUTF.h"
-                "wpi/DenseMap.h"
-                "wpi/DenseMapInfo.h"
-                "wpi/Endian.h"
-                "wpi/EpochTracker.h"
-                "wpi/Errc.h"
-                "wpi/Errno.h"
-                "wpi/ErrorHandling.h"
-                "wpi/bit.h"
-                "wpi/fs.h"
-                "wpi/FunctionExtras.h"
-                "wpi/function_ref.h"
-                "wpi/Hashing.h"
-                "wpi/iterator.h"
-                "wpi/iterator_range.h"
-                "wpi/ManagedStatic.h"
-                "wpi/MapVector.h"
-                "wpi/MathExtras.h"
-                "wpi/MemAlloc.h"
-                "wpi/PointerIntPair.h"
-                "wpi/PointerLikeTypeTraits.h"
-                "wpi/PointerUnion.h"
-                "wpi/raw_os_ostream.h"
-                "wpi/raw_ostream.h"
-                "wpi/SmallPtrSet.h"
-                "wpi/SmallSet.h"
-                "wpi/SmallString.h"
-                "wpi/SmallVector.h"
-                "wpi/StringExtras.h"
-                "wpi/StringMap.h"
-                "wpi/SwapByteOrder.h"
-                "wpi/type_traits.h"
-                "wpi/VersionTuple.h"
-                "wpi/WindowsError.h"
+                "wpi/util/Compiler.hpp"
+                "wpi/util/ErrorHandling.hpp"
+                "wpi/util/SmallVector.hpp"
+                "wpi/util/StringExtras.hpp"
+                "wpi/util/raw_ostream.hpp"
                 # libuv
                 "uv.h"
                 "uv/**"
-                # json
-                "wpi/adl_serializer.h"
-                "wpi/byte_container_with_subtype.h"
-                "wpi/json.h"
-                "wpi/json_fwd.h"
-                "wpi/ordered_map.h"
                 # mpack
-                "wpi/mpack.h"
+                "wpi/util/mpack.h"
             )
         endif()
         list(APPEND docs_dirs ${dirs})

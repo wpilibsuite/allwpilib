@@ -1,0 +1,162 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "wpi/hardware/rotation/Encoder.hpp"
+
+#include <format>
+
+#include "wpi/hal/Encoder.h"
+#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/system/Errors.hpp"
+#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/util/sendable/SendableRegistry.hpp"
+
+using namespace wpi;
+
+Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
+                 EncodingType encodingType) {
+  InitEncoder(aChannel, bChannel, reverseDirection, encodingType);
+}
+
+int Encoder::Get() const {
+  int32_t status = 0;
+  int value = HAL_GetEncoder(m_encoder, &status);
+  WPILIB_CheckErrorStatus(status, "Get");
+  return value;
+}
+
+void Encoder::Reset() {
+  int32_t status = 0;
+  HAL_ResetEncoder(m_encoder, &status);
+  WPILIB_CheckErrorStatus(status, "Reset");
+}
+
+bool Encoder::GetStopped() const {
+  int32_t status = 0;
+  bool value = HAL_GetEncoderStopped(m_encoder, &status);
+  WPILIB_CheckErrorStatus(status, "GetStopped");
+  return value;
+}
+
+bool Encoder::GetDirection() const {
+  int32_t status = 0;
+  bool value = HAL_GetEncoderDirection(m_encoder, &status);
+  WPILIB_CheckErrorStatus(status, "GetDirection");
+  return value;
+}
+
+int Encoder::GetRaw() const {
+  int32_t status = 0;
+  int value = HAL_GetEncoderRaw(m_encoder, &status);
+  WPILIB_CheckErrorStatus(status, "GetRaw");
+  return value;
+}
+
+int Encoder::GetEncodingScale() const {
+  int32_t status = 0;
+  int val = HAL_GetEncoderEncodingScale(m_encoder, &status);
+  WPILIB_CheckErrorStatus(status, "GetEncodingScale");
+  return val;
+}
+
+double Encoder::GetDistance() const {
+  int32_t status = 0;
+  double value = HAL_GetEncoderDistance(m_encoder, &status);
+  WPILIB_CheckErrorStatus(status, "GetDistance");
+  return value;
+}
+
+double Encoder::GetRate() const {
+  int32_t status = 0;
+  double value = HAL_GetEncoderRate(m_encoder, &status);
+  WPILIB_CheckErrorStatus(status, "GetRate");
+  return value;
+}
+
+void Encoder::SetRateWindow(wpi::units::millisecond_t window) {
+  int32_t status = 0;
+  HAL_SetEncoderRateWindow(m_encoder, static_cast<int32_t>(window.value()),
+                           &status);
+  WPILIB_CheckErrorStatus(status, "SetRateWindow");
+}
+
+void Encoder::SetDistancePerPulse(double distancePerPulse) {
+  int32_t status = 0;
+  HAL_SetEncoderDistancePerPulse(m_encoder, distancePerPulse, &status);
+  WPILIB_CheckErrorStatus(status, "SetDistancePerPulse");
+}
+
+double Encoder::GetDistancePerPulse() const {
+  int32_t status = 0;
+  double distancePerPulse = HAL_GetEncoderDistancePerPulse(m_encoder, &status);
+  WPILIB_CheckErrorStatus(status, "GetDistancePerPulse");
+  return distancePerPulse;
+}
+
+void Encoder::SetReverseDirection(bool reverseDirection) {
+  int32_t status = 0;
+  HAL_SetEncoderReverseDirection(m_encoder, reverseDirection, &status);
+  WPILIB_CheckErrorStatus(status, "SetReverseDirection");
+}
+
+void Encoder::SetSimDevice(HAL_SimDeviceHandle device) {
+  HAL_SetEncoderSimDevice(m_encoder, device);
+}
+
+int Encoder::GetFPGAIndex() const {
+  int32_t status = 0;
+  int val = HAL_GetEncoderFPGAIndex(m_encoder, &status);
+  WPILIB_CheckErrorStatus(status, "GetFPGAIndex");
+  return val;
+}
+
+void Encoder::InitSendable(wpi::util::SendableBuilder& builder) {
+  int32_t status = 0;
+  HAL_EncoderEncodingType type = HAL_GetEncoderEncodingType(m_encoder, &status);
+  WPILIB_CheckErrorStatus(status, "GetEncodingType");
+  if (type == HAL_EncoderEncodingType::HAL_ENCODER_4X_ENCODING) {
+    builder.SetSmartDashboardType("Quadrature Encoder");
+  } else {
+    builder.SetSmartDashboardType("Encoder");
+  }
+
+  builder.AddDoubleProperty(
+      "Velocity", [=, this] { return GetRate(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Distance", [=, this] { return GetDistance(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Distance per Tick", [=, this] { return GetDistancePerPulse(); },
+      nullptr);
+}
+
+void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
+                          EncodingType encodingType) {
+  int32_t status = 0;
+  m_encoder = HAL_InitializeEncoder(
+      aChannel, bChannel, reverseDirection,
+      static_cast<HAL_EncoderEncodingType>(encodingType), &status);
+  WPILIB_CheckErrorStatus(status, "InitEncoder");
+
+  const char* type = "Encoder";
+  switch (encodingType) {
+    case EncodingType::X1:
+      type = "Encoder:1x";
+      break;
+    case EncodingType::X2:
+      type = "Encoder:2x";
+      break;
+    case EncodingType::X4:
+      type = "Encoder:4x";
+      break;
+  }
+  HAL_ReportUsage(std::format("IO[{},{}]", aChannel, bChannel), type);
+  // wpi::util::SendableRegistry::Add(this, "Encoder", m_aSource->GetChannel());
+}
+
+double Encoder::DecodingScaleFactor() const {
+  int32_t status = 0;
+  double val = HAL_GetEncoderDecodingScaleFactor(m_encoder, &status);
+  WPILIB_CheckErrorStatus(status, "DecodingScaleFactor");
+  return val;
+}

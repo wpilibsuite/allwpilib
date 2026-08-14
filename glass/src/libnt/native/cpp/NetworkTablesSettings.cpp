@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NetworkTablesSettings.h"
+#include "wpi/glass/networktables/NetworkTablesSettings.hpp"
 
 #include <optional>
 #include <string_view>
@@ -11,14 +11,13 @@
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
-#include <ntcore_cpp.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
 
-#include "glass/Context.h"
-#include "glass/Storage.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 void NetworkTablesSettings::Thread::Main() {
   while (m_active) {
@@ -31,6 +30,7 @@ void NetworkTablesSettings::Thread::Main() {
 
     // clear restart flag
     m_restart = false;
+    bool reconnect = std::exchange(m_reconnect, false);
 
     int mode;
     bool dsClient;
@@ -42,69 +42,66 @@ void NetworkTablesSettings::Thread::Main() {
       // release lock while stopping to avoid blocking GUI
       lock.unlock();
 
-      // if just changing servers in client mode, no need to stop and restart
-      unsigned int curMode = nt::GetNetworkMode(m_inst);
-      if ((mode == 0 || mode == 3) ||
-          (mode == 1 && (curMode & NT_NET_MODE_CLIENT4) == 0) ||
-          (mode == 2 && (curMode & NT_NET_MODE_CLIENT3) == 0)) {
-        nt::StopClient(m_inst);
-        nt::StopServer(m_inst);
-        nt::StopLocal(m_inst);
+      // Changing servers can be done in place unless a reconnect was requested.
+      unsigned int curMode = wpi::nt::GetNetworkMode(m_inst);
+      if (reconnect || (mode == 0 || mode == 2) ||
+          (mode == 1 && (curMode & NT_NET_MODE_CLIENT) == 0)) {
+        wpi::nt::StopClient(m_inst);
+        wpi::nt::StopServer(m_inst);
+        wpi::nt::StopLocal(m_inst);
       }
 
-      if ((m_mode == 0 || m_mode == 3) || !dsClient) {
-        nt::StopDSClient(m_inst);
+      if ((m_mode == 0 || m_mode == 2) || !dsClient) {
+        wpi::nt::StopDSClient(m_inst);
       }
 
       lock.lock();
     } while (mode != m_mode || dsClient != m_dsClient);
 
-    if (m_mode == 1 || m_mode == 2) {
-      std::string_view serverTeam{m_serverTeam};
+    if (m_mode == 1) {
+      std::string_view serverTeam{wpi::util::trim(m_serverTeam)};
       std::optional<unsigned int> team;
       if (m_mode == 1) {
-        nt::StartClient4(m_inst, m_clientName);
-      } else if (m_mode == 2) {
-        nt::StartClient3(m_inst, m_clientName);
+        wpi::nt::StartClient(m_inst, m_clientName);
       }
 
-      unsigned int port = m_mode == 1 ? m_port4 : m_port3;
-      if (!wpi::contains(serverTeam, '.') &&
-          (team = wpi::parse_integer<unsigned int>(serverTeam, 10))) {
-        nt::SetServerTeam(m_inst, team.value(), port);
-      } else {
-        wpi::SmallVector<std::string_view, 4> serverNames;
-        std::vector<std::pair<std::string_view, unsigned int>> servers;
-        wpi::split(serverTeam, serverNames, ',', -1, false);
-        for (auto&& serverName : serverNames) {
-          servers.emplace_back(serverName, port);
+      if (!wpi::util::contains(serverTeam, '.') &&
+          (team = wpi::util::parse_integer<unsigned int>(serverTeam, 10))) {
+        if (m_requireTeamNumberMatch) {
+          wpi::nt::SetServerTeam(m_inst, serverTeam, m_port);
+        } else {
+          wpi::nt::SetServerFixed(m_inst, serverTeam, m_port);
         }
-        nt::SetServer(m_inst, servers);
+      } else {
+        std::vector<std::pair<std::string_view, unsigned int>> servers;
+        wpi::util::split(serverTeam, ',', -1, false, [&](auto serverName) {
+          servers.emplace_back(serverName, m_port);
+        });
+        wpi::nt::SetServer(m_inst, servers);
       }
 
       if (m_dsClient) {
-        nt::StartDSClient(m_inst, port);
+        wpi::nt::StartDSClient(m_inst, m_port);
       }
-    } else if (m_mode == 3) {
-      nt::StartServer(m_inst, m_iniName.c_str(), m_listenAddress.c_str(),
-                      m_port3, m_port4);
+    } else if (m_mode == 2) {
+      wpi::nt::StartServer(m_inst, m_iniName.c_str(), m_listenAddress.c_str(),
+                           "", m_port);
     }
   }
 }
 
 NetworkTablesSettings::NetworkTablesSettings(std::string_view clientName,
                                              Storage& storage, NT_Inst inst)
-    : m_mode{storage.GetString("mode"),
-             0,
-             {"Disabled", "Client (NT4)", "Client (NT3)", "Server"}},
+    : m_mode{storage.GetString("mode"), 0, {"Disabled", "Client", "Server"}},
       m_persistentFilename{
           storage.GetString("persistentFilename", "networktables.json")},
       m_serverTeam{storage.GetString("serverTeam")},
       m_listenAddress{storage.GetString("listenAddress")},
       m_clientName{storage.GetString("clientName", clientName)},
-      m_port3{storage.GetInt("port3", NT_DEFAULT_PORT3)},
-      m_port4{storage.GetInt("port4", NT_DEFAULT_PORT4)},
-      m_dsClient{storage.GetBool("dsClient", true)} {
+      m_port{storage.GetInt("port", NT_DEFAULT_PORT)},
+      m_dsClient{storage.GetBool("dsClient", true)},
+      m_requireTeamNumberMatch{
+          storage.GetBool("requireTeamNumberMatch", false)} {
   m_thread.Start(inst);
 }
 
@@ -117,14 +114,15 @@ void NetworkTablesSettings::Update() {
   // do actual operation on thread
   auto thr = m_thread.GetThread();
   thr->m_restart = true;
+  thr->m_reconnect |= std::exchange(m_reconnect, false);
   thr->m_mode = m_mode.GetValue();
   thr->m_iniName = m_persistentFilename;
   thr->m_serverTeam = m_serverTeam;
   thr->m_listenAddress = m_listenAddress;
   thr->m_clientName = m_clientName;
-  thr->m_port3 = m_port3;
-  thr->m_port4 = m_port4;
+  thr->m_port = m_port;
   thr->m_dsClient = m_dsClient;
+  thr->m_requireTeamNumberMatch = m_requireTeamNumberMatch;
   thr->m_cond.notify_one();
 }
 
@@ -136,25 +134,29 @@ static void LimitPortRange(int* port) {
   }
 }
 
+static constexpr int kSystemServerPort = 6810;
+
 bool NetworkTablesSettings::Display() {
-  m_mode.Combo("Mode", m_serverOption ? 4 : 3);
+  m_mode.Combo("Mode", m_serverOption ? 3 : 2);
   switch (m_mode.GetValue()) {
     case 1:
-    case 2: {
       ImGui::InputText("Team/IP", &m_serverTeam);
       if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
         ImGui::SetTooltip("Team number or IP/MDNS address of server");
       }
-      int* port = m_mode.GetValue() == 1 ? &m_port4 : &m_port3;
-      if (ImGui::InputInt("Port", port)) {
-        LimitPortRange(port);
+      if (ImGui::InputInt("Port", &m_port)) {
+        LimitPortRange(&m_port);
       }
       if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
         ImGui::SetTooltip("TCP Port - leave this at the default");
       }
       ImGui::SameLine();
       if (ImGui::SmallButton("Default")) {
-        *port = m_mode.GetValue() == 1 ? NT_DEFAULT_PORT4 : NT_DEFAULT_PORT3;
+        m_port = NT_DEFAULT_PORT;
+      }
+      ImGui::SameLine();
+      if (ImGui::SmallButton("System Server")) {
+        m_port = kSystemServerPort;
       }
       ImGui::InputText("Network Identity", &m_clientName);
       if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
@@ -166,34 +168,29 @@ bool NetworkTablesSettings::Display() {
       if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
         ImGui::SetTooltip("Attempt to fetch server IP from Driver Station");
       }
+      ImGui::Checkbox("Require Team Number Match", &m_requireTeamNumberMatch);
+      if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
+        ImGui::SetTooltip(
+            "When Team/IP is a team number, require matching the team-specific "
+            "robot address instead of using fixed robot addresses.");
+      }
       break;
-    }
-    case 3:
+    case 2:
       ImGui::InputText("Listen Address", &m_listenAddress);
       if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
         ImGui::SetTooltip(
             "Address for server to listen on. Leave blank to listen on all "
             "interfaces.");
       }
-      if (ImGui::InputInt("NT3 port", &m_port3)) {
-        LimitPortRange(&m_port3);
-      }
-      if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
-        ImGui::SetTooltip("TCP Port for NT3. Leave at default if unsure.");
-      }
-      ImGui::SameLine();
-      if (ImGui::SmallButton("Default##default3")) {
-        m_port3 = NT_DEFAULT_PORT3;
-      }
-      if (ImGui::InputInt("NT4 port", &m_port4)) {
-        LimitPortRange(&m_port4);
+      if (ImGui::InputInt("Port", &m_port)) {
+        LimitPortRange(&m_port);
       }
       if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
         ImGui::SetTooltip("TCP Port for NT4. Leave at default if unsure.");
       }
       ImGui::SameLine();
       if (ImGui::SmallButton("Default##default4")) {
-        m_port4 = NT_DEFAULT_PORT4;
+        m_port = NT_DEFAULT_PORT;
       }
       ImGui::InputText("Persistent Filename", &m_persistentFilename);
       if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
@@ -204,6 +201,13 @@ bool NetworkTablesSettings::Display() {
       break;
   }
   if (ImGui::Button("Apply")) {
+    m_reconnect = false;
+    m_restart = true;
+    return true;
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Apply and Reconnect")) {
+    m_reconnect = true;
     m_restart = true;
     return true;
   }

@@ -2,31 +2,33 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
-#include "frc/controller/PIDController.h"
+#include "wpi/math/TestAssertions.hpp"
+#include "wpi/math/controller/PIDController.hpp"
+#include "wpi/units/time.hpp"
 
-TEST(PIDInputOutputTest, ContinuousInput) {
-  frc::PIDController controller{0.0, 0.0, 0.0};
+TEST_CASE("PIDInputOutputTest ContinuousInput", "[wpimath]") {
+  wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetP(1);
   controller.EnableContinuousInput(-180, 180);
-  EXPECT_DOUBLE_EQ(controller.Calculate(-179, 179), -2);
+  CHECK_DOUBLE_EQ(controller.Calculate(-179, 179), -2);
 
   controller.EnableContinuousInput(0, 360);
-  EXPECT_DOUBLE_EQ(controller.Calculate(1, 359), -2);
+  CHECK_DOUBLE_EQ(controller.Calculate(1, 359), -2);
 }
 
-TEST(PIDInputOutputTest, ProportionalGainOutput) {
-  frc::PIDController controller{0.0, 0.0, 0.0};
+TEST_CASE("PIDInputOutputTest ProportionalGainOutput", "[wpimath]") {
+  wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetP(4);
 
-  EXPECT_DOUBLE_EQ(-0.1, controller.Calculate(0.025, 0));
+  CHECK_DOUBLE_EQ(-0.1, controller.Calculate(0.025, 0));
 }
 
-TEST(PIDInputOutputTest, IntegralGainOutput) {
-  frc::PIDController controller{0.0, 0.0, 0.0};
+TEST_CASE("PIDInputOutputTest IntegralGainOutput", "[wpimath]") {
+  wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetI(4);
 
@@ -36,38 +38,38 @@ TEST(PIDInputOutputTest, IntegralGainOutput) {
     out = controller.Calculate(0.025, 0);
   }
 
-  EXPECT_DOUBLE_EQ(-0.5 * controller.GetPeriod().value(), out);
+  CHECK_DOUBLE_EQ(-0.5 * controller.GetPeriod().value(), out);
 }
 
-TEST(PIDInputOutputTest, DerivativeGainOutput) {
-  frc::PIDController controller{0.0, 0.0, 0.0};
+TEST_CASE("PIDInputOutputTest DerivativeGainOutput", "[wpimath]") {
+  wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetD(4);
 
   controller.Calculate(0, 0);
 
-  EXPECT_DOUBLE_EQ(-10_ms / controller.GetPeriod(),
-                   controller.Calculate(0.0025, 0));
+  CHECK_DOUBLE_EQ(-10_ms / controller.GetPeriod(),
+                  controller.Calculate(0.0025, 0));
 }
 
-TEST(PIDInputOutputTest, IZoneNoOutput) {
-  frc::PIDController controller{0.0, 0.0, 0.0};
+TEST_CASE("PIDInputOutputTest IZoneNoOutput", "[wpimath]") {
+  wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetI(1);
   controller.SetIZone(1);
 
   double out = controller.Calculate(2, 0);
 
-  EXPECT_DOUBLE_EQ(0, out);
+  CHECK_DOUBLE_EQ(0, out);
 }
 
-TEST(PIDInputOutputTest, IZoneOutput) {
-  frc::PIDController controller{0.0, 0.0, 0.0};
+TEST_CASE("PIDInputOutputTest IZoneOutput", "[wpimath]") {
+  wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetI(1);
   controller.SetIZone(1);
 
   double out = controller.Calculate(1, 0);
 
-  EXPECT_DOUBLE_EQ(-1 * controller.GetPeriod().value(), out);
+  CHECK_DOUBLE_EQ(-1 * controller.GetPeriod().value(), out);
 }

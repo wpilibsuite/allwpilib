@@ -1,0 +1,40 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package org.wpilib.examples.unittest;
+
+import org.wpilib.driverstation.Joystick;
+import org.wpilib.examples.unittest.Constants.IntakeConstants;
+import org.wpilib.examples.unittest.subsystems.Intake;
+import org.wpilib.framework.TimedRobot;
+
+/**
+ * The methods in this class are called automatically corresponding to each mode, as described in
+ * the TimedRobot documentation. If you change the name of this class or the package after creating
+ * this project, you must also update the Main.java file in the project.
+ */
+public class Robot extends TimedRobot {
+  private final Intake intake = new Intake();
+  private final Joystick joystick = new Joystick(Constants.kJoystickIndex);
+
+  /** This function is called periodically during operator control. */
+  @Override
+  public void teleopPeriodic() {
+    // Activate the intake while the trigger is held
+    if (joystick.getTrigger()) {
+      intake.activate(IntakeConstants.kIntakeVelocity);
+    } else {
+      intake.activate(0);
+    }
+
+    // Toggle deploying the intake when the top button is pressed
+    if (joystick.getTop()) {
+      if (intake.isDeployed()) {
+        intake.retract();
+      } else {
+        intake.deploy();
+      }
+    }
+  }
+}

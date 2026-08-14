@@ -1,0 +1,23 @@
+extra_includes:
+- wpi/hardware/discrete/PWM.hpp
+- wpi/hardware/motor/PWMMotorController.hpp
+
+classes:
+  wpi::sim::PWMSim:
+    force_type_casters:
+    - std::function
+    methods:
+      PWMSim:
+        overloads:
+          const PWM&:
+          int:
+      RegisterInitializedCallback:
+      GetInitialized:
+      SetInitialized:
+      RegisterPulseMicrosecondCallback:
+      GetPulseMicrosecond:
+      SetPulseMicrosecond:
+      ResetData:
+      RegisterOutputPeriodCallback:
+      GetOutputPeriod:
+      SetOutputPeriod:

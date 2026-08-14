@@ -2,38 +2,39 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/REVPHSim.h"  // NOLINT(build/include_order)
+#include "wpi/simulation/REVPHSim.hpp"
 
-#include <gtest/gtest.h>
-#include <hal/HAL.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "callback_helpers/TestCallbackHelpers.h"
-#include "frc/DoubleSolenoid.h"
-#include "frc/PneumaticHub.h"
+#include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+#include "wpi/hardware/pneumatic/PneumaticHub.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
-TEST(REVPHSimTest, InitializedCallback) {
+TEST_CASE("REVPHSimTest InitializedCallback", "[wpilibc][simulation]") {
   REVPHSim sim;
 
   sim.ResetData();
-  EXPECT_FALSE(sim.GetInitialized());
+  CHECK_FALSE(sim.GetInitialized());
 
   BooleanCallback callback;
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
 
-  PneumaticHub ph;
-  EXPECT_TRUE(sim.GetInitialized());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  PneumaticHub ph{CANBus::CAN_S0};
+  CHECK(sim.GetInitialized());
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue());
 }
 
-TEST(REVPHSimTest, SolenoidOutput) {
-  PneumaticHub ph;
+TEST_CASE("REVPHSimTest SolenoidOutput", "[wpilibc][simulation]") {
+  PneumaticHub ph{CANBus::CAN_S0};
   REVPHSim sim(ph);
   sim.ResetData();
 
-  DoubleSolenoid doubleSolenoid{1, frc::PneumaticsModuleType::REVPH, 3, 4};
+  DoubleSolenoid doubleSolenoid{CANBus::CAN_S0, 1,
+                                wpi::PneumaticsModuleType::REV_PH, 3, 4};
 
   BooleanCallback callback3;
   BooleanCallback callback4;
@@ -44,60 +45,60 @@ TEST(REVPHSimTest, SolenoidOutput) {
 
   callback3.Reset();
   callback4.Reset();
-  doubleSolenoid.Set(DoubleSolenoid::kReverse);
-  EXPECT_FALSE(callback3.WasTriggered());
-  EXPECT_FALSE(callback3.GetLastValue());
-  EXPECT_TRUE(callback4.WasTriggered());
-  EXPECT_TRUE(callback4.GetLastValue());
-  EXPECT_FALSE(sim.GetSolenoidOutput(3));
-  EXPECT_TRUE(sim.GetSolenoidOutput(4));
-  EXPECT_EQ(0b00010000, ph.GetSolenoids());
-  EXPECT_EQ(0b00010000, sim.GetAllSolenoidOutputs());
+  doubleSolenoid.Set(DoubleSolenoid::REVERSE);
+  CHECK_FALSE(callback3.WasTriggered());
+  CHECK_FALSE(callback3.GetLastValue());
+  CHECK(callback4.WasTriggered());
+  CHECK(callback4.GetLastValue());
+  CHECK_FALSE(sim.GetSolenoidOutput(3));
+  CHECK(sim.GetSolenoidOutput(4));
+  CHECK(0b00010000 == ph.GetSolenoids());
+  CHECK(0b00010000 == sim.GetAllSolenoidOutputs());
 
   callback3.Reset();
   callback4.Reset();
-  doubleSolenoid.Set(DoubleSolenoid::kForward);
-  EXPECT_TRUE(callback3.WasTriggered());
-  EXPECT_TRUE(callback3.GetLastValue());
-  EXPECT_TRUE(callback4.WasTriggered());
-  EXPECT_FALSE(callback4.GetLastValue());
-  EXPECT_TRUE(sim.GetSolenoidOutput(3));
-  EXPECT_FALSE(sim.GetSolenoidOutput(4));
-  EXPECT_EQ(0b00001000, ph.GetSolenoids());
-  EXPECT_EQ(0b00001000, sim.GetAllSolenoidOutputs());
+  doubleSolenoid.Set(DoubleSolenoid::FORWARD);
+  CHECK(callback3.WasTriggered());
+  CHECK(callback3.GetLastValue());
+  CHECK(callback4.WasTriggered());
+  CHECK_FALSE(callback4.GetLastValue());
+  CHECK(sim.GetSolenoidOutput(3));
+  CHECK_FALSE(sim.GetSolenoidOutput(4));
+  CHECK(0b00001000 == ph.GetSolenoids());
+  CHECK(0b00001000 == sim.GetAllSolenoidOutputs());
 
   callback3.Reset();
   callback4.Reset();
-  doubleSolenoid.Set(DoubleSolenoid::kOff);
-  EXPECT_TRUE(callback3.WasTriggered());
-  EXPECT_FALSE(callback3.GetLastValue());
-  EXPECT_FALSE(callback4.WasTriggered());
-  EXPECT_FALSE(callback4.GetLastValue());
-  EXPECT_FALSE(sim.GetSolenoidOutput(3));
-  EXPECT_FALSE(sim.GetSolenoidOutput(4));
-  EXPECT_EQ(0b00000000, ph.GetSolenoids());
-  EXPECT_EQ(0b00000000, sim.GetAllSolenoidOutputs());
+  doubleSolenoid.Set(DoubleSolenoid::OFF);
+  CHECK(callback3.WasTriggered());
+  CHECK_FALSE(callback3.GetLastValue());
+  CHECK_FALSE(callback4.WasTriggered());
+  CHECK_FALSE(callback4.GetLastValue());
+  CHECK_FALSE(sim.GetSolenoidOutput(3));
+  CHECK_FALSE(sim.GetSolenoidOutput(4));
+  CHECK(0b00000000 == ph.GetSolenoids());
+  CHECK(0b00000000 == sim.GetAllSolenoidOutputs());
 }
 
-TEST(REVPHSimTest, SetCompressorOn) {
-  PneumaticHub ph;
+TEST_CASE("REVPHSimTest SetCompressorOn", "[wpilibc][simulation]") {
+  PneumaticHub ph{CANBus::CAN_S0};
   REVPHSim sim(ph);
   sim.ResetData();
 
   BooleanCallback callback;
   auto cb = sim.RegisterCompressorOnCallback(callback.GetCallback(), false);
 
-  EXPECT_FALSE(ph.GetCompressor());
-  EXPECT_FALSE(ph.GetCompressor());
+  CHECK_FALSE(ph.GetCompressor());
+  CHECK_FALSE(ph.GetCompressor());
   sim.SetCompressorOn(true);
-  EXPECT_TRUE(sim.GetCompressorOn());
-  EXPECT_TRUE(ph.GetCompressor());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  CHECK(sim.GetCompressorOn());
+  CHECK(ph.GetCompressor());
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue());
 }
 
-TEST(REVPHSimTest, SetEnableDigital) {
-  PneumaticHub ph;
+TEST_CASE("REVPHSimTest SetEnableDigital", "[wpilibc][simulation]") {
+  PneumaticHub ph{CANBus::CAN_S0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -106,19 +107,19 @@ TEST(REVPHSimTest, SetEnableDigital) {
       sim.RegisterCompressorConfigTypeCallback(callback.GetCallback(), false);
 
   ph.DisableCompressor();
-  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Disabled);
+  CHECK(ph.GetCompressorConfigType() == CompressorConfigType::DISABLED);
 
   ph.EnableCompressorDigital();
-  EXPECT_EQ(sim.GetCompressorConfigType(),
-            static_cast<int>(CompressorConfigType::Digital));
-  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Digital);
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(callback.GetLastValue(),
-            static_cast<int>(CompressorConfigType::Digital));
+  CHECK(sim.GetCompressorConfigType() ==
+        static_cast<int>(CompressorConfigType::DIGITAL));
+  CHECK(ph.GetCompressorConfigType() == CompressorConfigType::DIGITAL);
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue() ==
+        static_cast<int>(CompressorConfigType::DIGITAL));
 }
 
-TEST(REVPHSimTest, SetEnableAnalog) {
-  PneumaticHub ph;
+TEST_CASE("REVPHSimTest SetEnableAnalog", "[wpilibc][simulation]") {
+  PneumaticHub ph{CANBus::CAN_S0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -127,19 +128,19 @@ TEST(REVPHSimTest, SetEnableAnalog) {
       sim.RegisterCompressorConfigTypeCallback(callback.GetCallback(), false);
 
   ph.DisableCompressor();
-  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Disabled);
+  CHECK(ph.GetCompressorConfigType() == CompressorConfigType::DISABLED);
 
   ph.EnableCompressorAnalog(1_psi, 2_psi);
-  EXPECT_EQ(sim.GetCompressorConfigType(),
-            static_cast<int>(CompressorConfigType::Analog));
-  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Analog);
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(callback.GetLastValue(),
-            static_cast<int>(CompressorConfigType::Analog));
+  CHECK(sim.GetCompressorConfigType() ==
+        static_cast<int>(CompressorConfigType::ANALOG));
+  CHECK(ph.GetCompressorConfigType() == CompressorConfigType::ANALOG);
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue() ==
+        static_cast<int>(CompressorConfigType::ANALOG));
 }
 
-TEST(REVPHSimTest, SetEnableHybrid) {
-  PneumaticHub ph;
+TEST_CASE("REVPHSimTest SetEnableHybrid", "[wpilibc][simulation]") {
+  PneumaticHub ph{CANBus::CAN_S0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -148,36 +149,36 @@ TEST(REVPHSimTest, SetEnableHybrid) {
       sim.RegisterCompressorConfigTypeCallback(callback.GetCallback(), false);
 
   ph.DisableCompressor();
-  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Disabled);
+  CHECK(ph.GetCompressorConfigType() == CompressorConfigType::DISABLED);
 
   ph.EnableCompressorHybrid(1_psi, 2_psi);
-  EXPECT_EQ(sim.GetCompressorConfigType(),
-            static_cast<int>(CompressorConfigType::Hybrid));
-  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Hybrid);
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(callback.GetLastValue(),
-            static_cast<int>(CompressorConfigType::Hybrid));
+  CHECK(sim.GetCompressorConfigType() ==
+        static_cast<int>(CompressorConfigType::HYBRID));
+  CHECK(ph.GetCompressorConfigType() == CompressorConfigType::HYBRID);
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue() ==
+        static_cast<int>(CompressorConfigType::HYBRID));
 }
 
-TEST(REVPHSimTest, SetPressureSwitchEnabled) {
-  PneumaticHub ph;
+TEST_CASE("REVPHSimTest SetPressureSwitchEnabled", "[wpilibc][simulation]") {
+  PneumaticHub ph{CANBus::CAN_S0};
   REVPHSim sim(ph);
   sim.ResetData();
 
   BooleanCallback callback;
   auto cb = sim.RegisterPressureSwitchCallback(callback.GetCallback(), false);
 
-  EXPECT_FALSE(ph.GetPressureSwitch());
+  CHECK_FALSE(ph.GetPressureSwitch());
 
   sim.SetPressureSwitch(true);
-  EXPECT_TRUE(sim.GetPressureSwitch());
-  EXPECT_TRUE(ph.GetPressureSwitch());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  CHECK(sim.GetPressureSwitch());
+  CHECK(ph.GetPressureSwitch());
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue());
 }
 
-TEST(REVPHSimTest, SetCompressorCurrent) {
-  PneumaticHub ph;
+TEST_CASE("REVPHSimTest SetCompressorCurrent", "[wpilibc][simulation]") {
+  PneumaticHub ph{CANBus::CAN_S0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -186,9 +187,9 @@ TEST(REVPHSimTest, SetCompressorCurrent) {
       sim.RegisterCompressorCurrentCallback(callback.GetCallback(), false);
 
   sim.SetCompressorCurrent(35.04);
-  EXPECT_EQ(35.04, sim.GetCompressorCurrent());
-  EXPECT_EQ(35.04_A, ph.GetCompressorCurrent());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(35.04, callback.GetLastValue());
+  CHECK(35.04 == sim.GetCompressorCurrent());
+  CHECK(35.04_A == ph.GetCompressorCurrent());
+  CHECK(callback.WasTriggered());
+  CHECK(35.04 == callback.GetLastValue());
 }
-}  // namespace frc::sim
+}  // namespace wpi::sim

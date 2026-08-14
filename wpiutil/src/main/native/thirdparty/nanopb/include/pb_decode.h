@@ -136,6 +136,12 @@ void pb_release(const pb_msgdesc_t *fields, void *dest_struct);
  */
 pb_istream_t pb_istream_from_buffer(const pb_byte_t *buf, size_t msglen);
 
+/*
+ * Claim the rest of the istream buffer and return a pointer to it. The size of the
+ * remaining buffer is returned in the size parameter.
+ */
+const pb_byte_t* pb_claim_rest_of_buffer(pb_istream_t *stream, size_t *size);
+
 /* Function to read from a pb_istream_t. You can use this if you need to
  * read some custom header data, or to read data in field callbacks.
  */

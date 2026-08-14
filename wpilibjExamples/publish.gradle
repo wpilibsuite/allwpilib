@@ -3,13 +3,15 @@ apply plugin: 'maven-publish'
 def baseExamplesArtifactId = 'examples'
 def baseTemplatesArtifactId = 'templates'
 def baseCommandsArtifactId = 'commands'
-def artifactGroupId = 'edu.wpi.first.wpilibj'
+def artifactGroupId = 'org.wpilib.wpilibj'
 
-def examplesZipBaseName = '_GROUP_edu_wpi_first_wpilibj_ID_examples_CLS'
-def templatesZipBaseName = '_GROUP_edu_wpi_first_wpilibj_ID_templates_CLS'
-def commandsZipBaseName = '_GROUP_edu_wpi_first_wpilibj_ID_commands_CLS'
+def examplesZipBaseName = makeZipBaseName(artifactGroupId, baseExamplesArtifactId)
+def templatesZipBaseName = makeZipBaseName(artifactGroupId, baseTemplatesArtifactId)
+def commandsZipBaseName = makeZipBaseName(artifactGroupId, baseCommandsArtifactId)
 
 def outputsFolder = file("$project.buildDir/outputs")
+
+def mainFile = file("$projectDir/src/main/java/org/wpilib/Main.java")
 
 task javaExamplesZip(type: Zip) {
     destinationDirectory = outputsFolder
@@ -19,11 +21,15 @@ task javaExamplesZip(type: Zip) {
         into '/'
     }
 
-    from('src/main/java/edu/wpi/first/wpilibj/examples') {
+    from(mainFile) {
+        into '/'
+    }
+
+    from('src/main/java/org/wpilib/examples') {
         into 'examples'
     }
 
-    from('src/test/java/edu/wpi/first/wpilibj/examples') {
+    from('src/test/java/org/wpilib/examples') {
         into 'examples_test'
     }
 }
@@ -36,11 +42,15 @@ task javaTemplatesZip(type: Zip) {
         into '/'
     }
 
-    from('src/main/java/edu/wpi/first/wpilibj/templates') {
+    from(mainFile) {
+        into '/'
+    }
+
+    from('src/main/java/org/wpilib/templates') {
         into 'templates'
     }
 
-    from('src/test/java/edu/wpi/first/wpilibj/templates') {
+    from('src/test/java/org/wpilib/templates') {
         into 'templates_test'
     }
 }
@@ -53,11 +63,11 @@ task javaCommandsZip(type: Zip) {
         into '/'
     }
 
-    from('src/main/java/edu/wpi/first/wpilibj/commands') {
+    from('src/main/java/org/wpilib/commands') {
         into 'commands'
     }
 
-    from('src/test/java/edu/wpi/first/wpilibj/commands') {
+    from('src/test/java/org/wpilib/commands') {
         into 'commands_test'
     }
 }

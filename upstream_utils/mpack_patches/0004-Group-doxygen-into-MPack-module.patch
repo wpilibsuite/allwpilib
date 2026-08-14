@@ -116,7 +116,7 @@ index 129a276115d85e09d717504df3736a7614fbd2ea..9739205efd0406a1bd05c728556c8f36
  #include "mpack-writer.h"
  #include "mpack-reader.h"
 diff --git a/tools/amalgamate.sh b/tools/amalgamate.sh
-index 4dfe999ee49ee67fd394e948b0bb3133d6acdbdc..ebff08200198406940720efe093df909a31caf65 100755
+index 376d1c5d1179784b0246c11d2119e4370f596fec..e15d27a1ddcbd9a2284ece3fc07cd171ac429d59 100755
 --- a/tools/amalgamate.sh
 +++ b/tools/amalgamate.sh
 @@ -66,6 +66,11 @@ echo -e "#define MPACK_AMALGAMATED 1\n" >> $HEADER

@@ -1,0 +1,272 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "wpi/util/circular_buffer.hpp"
+
+#include <array>
+
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
+
+static const std::array<double, 10> values = {
+    {751.848, 766.366, 342.657, 234.252, 716.126, 132.344, 445.697, 22.727,
+     421.125, 799.913}};
+
+static const std::array<double, 8> pushFrontOut = {
+    {799.913, 421.125, 22.727, 445.697, 132.344, 716.126, 234.252, 342.657}};
+
+static const std::array<double, 8> pushBackOut = {
+    {342.657, 234.252, 716.126, 132.344, 445.697, 22.727, 421.125, 799.913}};
+
+TEST_CASE("CircularBufferTest PushFront", "[wpiutil]") {
+  wpi::util::circular_buffer<double> queue(8);
+
+  for (auto& value : values) {
+    queue.push_front(value);
+  }
+
+  for (size_t i = 0; i < pushFrontOut.size(); ++i) {
+    CHECK(pushFrontOut[i] == queue[i]);
+  }
+}
+
+TEST_CASE("CircularBufferTest PushBack", "[wpiutil]") {
+  wpi::util::circular_buffer<double> queue(8);
+
+  for (auto& value : values) {
+    queue.push_back(value);
+  }
+
+  for (size_t i = 0; i < pushBackOut.size(); ++i) {
+    CHECK(pushBackOut[i] == queue[i]);
+  }
+}
+
+TEST_CASE("CircularBufferTest EmplaceFront", "[wpiutil]") {
+  wpi::util::circular_buffer<double> queue(8);
+
+  for (auto& value : values) {
+    queue.emplace_front(value);
+  }
+
+  for (size_t i = 0; i < pushFrontOut.size(); ++i) {
+    CHECK(pushFrontOut[i] == queue[i]);
+  }
+}
+
+TEST_CASE("CircularBufferTest EmplaceBack", "[wpiutil]") {
+  wpi::util::circular_buffer<double> queue(8);
+
+  for (auto& value : values) {
+    queue.emplace_back(value);
+  }
+
+  for (size_t i = 0; i < pushBackOut.size(); ++i) {
+    CHECK(pushBackOut[i] == queue[i]);
+  }
+}
+
+TEST_CASE("CircularBufferTest PushPop", "[wpiutil]") {
+  wpi::util::circular_buffer<double> queue(3);
+
+  // Insert three elements into the buffer
+  queue.push_back(1.0);
+  queue.push_back(2.0);
+  queue.push_back(3.0);
+
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
+  CHECK(3.0 == queue[2]);
+
+  /*
+   * The buffer is full now, so pushing subsequent elements will overwrite the
+   * front-most elements.
+   */
+
+  queue.push_back(4.0);  // Overwrite 1 with 4
+
+  // The buffer now contains 2, 3 and 4
+  CHECK(2.0 == queue[0]);
+  CHECK(3.0 == queue[1]);
+  CHECK(4.0 == queue[2]);
+
+  queue.push_back(5.0);  // Overwrite 2 with 5
+
+  // The buffer now contains 3, 4 and 5
+  CHECK(3.0 == queue[0]);
+  CHECK(4.0 == queue[1]);
+  CHECK(5.0 == queue[2]);
+
+  CHECK(5.0 == queue.pop_back());  // 5 is removed
+
+  // The buffer now contains 3 and 4
+  CHECK(3.0 == queue[0]);
+  CHECK(4.0 == queue[1]);
+
+  CHECK(3.0 == queue.pop_front());  // 3 is removed
+
+  // Leaving only one element with value == 4
+  CHECK(4.0 == queue[0]);
+}
+
+TEST_CASE("CircularBufferTest Reset", "[wpiutil]") {
+  wpi::util::circular_buffer<double> queue(5);
+
+  for (size_t i = 1; i < 6; ++i) {
+    queue.push_back(i);
+  }
+
+  queue.reset();
+
+  CHECK(queue.size() == size_t{0});
+}
+
+TEST_CASE("CircularBufferTest Resize", "[wpiutil]") {
+  wpi::util::circular_buffer<double> queue(5);
+
+  /* Buffer contains {1, 2, 3, _, _}
+   *                  ^ front
+   */
+  queue.push_back(1.0);
+  queue.push_back(2.0);
+  queue.push_back(3.0);
+
+  queue.resize(2);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
+
+  queue.resize(5);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
+
+  queue.reset();
+
+  /* Buffer contains {_, 1, 2, 3, _}
+   *                     ^ front
+   */
+  queue.push_back(0.0);
+  queue.push_back(1.0);
+  queue.push_back(2.0);
+  queue.push_back(3.0);
+  queue.pop_front();
+
+  queue.resize(2);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
+
+  queue.resize(5);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
+
+  queue.reset();
+
+  /* Buffer contains {_, _, 1, 2, 3}
+   *                        ^ front
+   */
+  queue.push_back(0.0);
+  queue.push_back(0.0);
+  queue.push_back(1.0);
+  queue.push_back(2.0);
+  queue.push_back(3.0);
+  queue.pop_front();
+  queue.pop_front();
+
+  queue.resize(2);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
+
+  queue.resize(5);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
+
+  queue.reset();
+
+  /* Buffer contains {3, _, _, 1, 2}
+   *                           ^ front
+   */
+  queue.push_back(3.0);
+  queue.push_front(2.0);
+  queue.push_front(1.0);
+
+  queue.resize(2);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
+
+  queue.resize(5);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
+
+  queue.reset();
+
+  /* Buffer contains {2, 3, _, _, 1}
+   *                              ^ front
+   */
+  queue.push_back(2.0);
+  queue.push_back(3.0);
+  queue.push_front(1.0);
+
+  queue.resize(2);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
+
+  queue.resize(5);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
+
+  // Test push_back() after resize
+  queue.push_back(3.0);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
+  CHECK(3.0 == queue[2]);
+
+  // Test push_front() after resize
+  queue.push_front(4.0);
+  CHECK(4.0 == queue[0]);
+  CHECK(1.0 == queue[1]);
+  CHECK(2.0 == queue[2]);
+  CHECK(3.0 == queue[3]);
+}
+
+TEST_CASE("CircularBufferTest Iterator", "[wpiutil]") {
+  wpi::util::circular_buffer<double> queue(3);
+
+  queue.push_back(1.0);
+  queue.push_back(2.0);
+  queue.push_back(3.0);
+  queue.push_back(4.0);  // Overwrite 1 with 4
+
+  // The buffer now contains 2, 3 and 4
+  const std::array<double, 3> values = {2.0, 3.0, 4.0};
+
+  // iterator
+  int i = 0;
+  for (auto& elem : queue) {
+    CHECK(values[i] == elem);
+    ++i;
+  }
+
+  // const_iterator
+  i = 0;
+  for (const auto& elem : queue) {
+    CHECK(values[i] == elem);
+    ++i;
+  }
+
+  // reverse_iterator
+  i = 2;
+  for (auto it = queue.rbegin(); it != queue.rend(); ++it) {
+    CHECK(values[i] == *it);
+    --i;
+  }
+
+  // const_reverse_iterator
+  i = 2;
+  for (auto it = queue.crbegin(); it != queue.crend(); ++it) {
+    CHECK(values[i] == *it);
+    --i;
+  }
+}

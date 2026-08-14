@@ -1,0 +1,15 @@
+strip_prefixes:
+- HALSIM_
+
+functions:
+  HALSIM_GetNextNotifierTimeout:
+  HALSIM_GetNumNotifiers:
+  HALSIM_GetNotifierInfo:
+classes:
+  HALSIM_NotifierInfo:
+    attributes:
+      handle:
+      name:
+      alarmTime:
+      intervalTime:
+      overrunCount:

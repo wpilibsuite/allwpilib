@@ -1,0 +1,30 @@
+extra_includes:
+- wpystruct.h
+
+functions:
+  to_json:
+    overloads:
+      wpi::util::json&, const TrajectorySample&:
+        ignore: true
+      wpi::util::json&, const std::vector<TrajectorySample>&:
+        ignore: true
+  from_json:
+    overloads:
+      const wpi::util::json&, TrajectorySample&:
+        ignore: true
+      const wpi::util::json&, std::vector<TrajectorySample>&:
+        ignore: true
+classes:
+  wpi::math::TrajectorySample:
+    force_no_trampoline: true
+    attributes:
+      time:
+    methods:
+      TrajectorySample:
+        overloads:
+          "":
+          wpi::units::second_t:
+      operator==:
+
+inline_code: |
+  SetupWPyStruct<wpi::math::TrajectorySample>(cls_TrajectorySample);

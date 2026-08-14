@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "NetworkListener.h"
+#include "NetworkListener.hpp"
 
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
@@ -16,36 +16,35 @@
 #include <algorithm>
 #include <cerrno>
 
-#include <wpi/SafeThread.h>
+#include "Log.hpp"
+#include "Notifier.hpp"
+#include "wpi/util/SafeThread.hpp"
 
-#include "Log.h"
-#include "Notifier.h"
-
-using namespace cs;
+using namespace wpi::cs;
 
 class NetworkListener::Impl {
  public:
-  Impl(wpi::Logger& logger, Notifier& notifier)
+  Impl(wpi::util::Logger& logger, Notifier& notifier)
       : m_logger(logger), m_notifier(notifier) {}
 
-  wpi::Logger& m_logger;
+  wpi::util::Logger& m_logger;
   Notifier& m_notifier;
 
-  class Thread : public wpi::SafeThread {
+  class Thread : public wpi::util::SafeThread {
    public:
-    Thread(wpi::Logger& logger, Notifier& notifier)
+    Thread(wpi::util::Logger& logger, Notifier& notifier)
         : m_logger(logger), m_notifier(notifier) {}
     void Main() override;
 
-    wpi::Logger& m_logger;
+    wpi::util::Logger& m_logger;
     Notifier& m_notifier;
     int m_command_fd = -1;
   };
 
-  wpi::SafeThreadOwner<Thread> m_owner;
+  wpi::util::SafeThreadOwner<Thread> m_owner;
 };
 
-NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier)
+NetworkListener::NetworkListener(wpi::util::Logger& logger, Notifier& notifier)
     : m_impl(std::make_unique<Impl>(logger, notifier)) {}
 
 NetworkListener::~NetworkListener() {
@@ -71,15 +70,14 @@ void NetworkListener::Impl::Thread::Main() {
   // Create event socket so we can be shut down
   m_command_fd = ::eventfd(0, 0);
   if (m_command_fd < 0) {
-    ERROR("NetworkListener: could not create eventfd: {}",
-          std::strerror(errno));
+    ERR("NetworkListener: could not create eventfd: {}", std::strerror(errno));
     return;
   }
 
   // Create netlink socket
   int sd = ::socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
   if (sd < 0) {
-    ERROR("NetworkListener: could not create socket: {}", std::strerror(errno));
+    ERR("NetworkListener: could not create socket: {}", std::strerror(errno));
     ::close(m_command_fd);
     m_command_fd = -1;
     return;
@@ -92,7 +90,7 @@ void NetworkListener::Impl::Thread::Main() {
   addr.nl_groups = RTMGRP_LINK | RTMGRP_IPV4_IFADDR;
   // NOLINTNEXTLINE(modernize-avoid-bind)
   if (bind(sd, reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr)) < 0) {
-    ERROR("NetworkListener: could not create socket: {}", std::strerror(errno));
+    ERR("NetworkListener: could not create socket: {}", std::strerror(errno));
     ::close(sd);
     ::close(m_command_fd);
     m_command_fd = -1;
@@ -115,7 +113,7 @@ void NetworkListener::Impl::Thread::Main() {
     int nfds = std::max(m_command_fd, sd) + 1;
 
     if (::select(nfds, &readfds, nullptr, nullptr, &tv) < 0) {
-      ERROR("NetworkListener: select(): {}", std::strerror(errno));
+      ERR("NetworkListener: select(): {}", std::strerror(errno));
       break;  // XXX: is this the right thing to do here?
     }
 
@@ -136,8 +134,7 @@ void NetworkListener::Impl::Thread::Main() {
       if (errno == EWOULDBLOCK || errno == EAGAIN) {
         continue;
       }
-      ERROR("NetworkListener: could not read netlink: {}",
-            std::strerror(errno));
+      ERR("NetworkListener: could not read netlink: {}", std::strerror(errno));
       break;  // XXX: is this the right thing to do here?
     }
     if (len == 0) {

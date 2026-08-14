@@ -1,0 +1,65 @@
+extra_includes:
+- memory
+- stdexcept
+
+functions:
+  CloseAlertHandle:
+    overloads:
+      Alert&:
+        ignore: true
+  ReleaseAlertHandle:
+    overloads:
+      Alert&:
+        ignore: true
+
+classes:
+  wpi::util::Alert:
+    enums:
+      Level:
+    methods:
+      Alert:
+        overloads:
+          "":
+            ignore: true
+          std::string_view, std::string_view, Level:
+            cpp_code: |
+              [](std::string_view id, std::string_view text,
+                 wpi::util::Alert::Level level) {
+                auto alert =
+                    std::make_unique<wpi::util::Alert>(id, text, level);
+                if (!static_cast<bool>(*alert)) {
+                  throw std::runtime_error("Alert already allocated");
+                }
+                return alert;
+              }
+          std::string_view, std::string_view, std::string_view, Level:
+            cpp_code: |
+              [](std::string_view group, std::string_view id,
+                 std::string_view text, wpi::util::Alert::Level level) {
+                auto alert = std::make_unique<wpi::util::Alert>(group, id, text,
+                                                                level);
+                if (!static_cast<bool>(*alert)) {
+                  throw std::runtime_error("Alert already allocated");
+                }
+                return alert;
+              }
+      Set:
+      Get:
+      SetText:
+      GetText:
+      GetLevel:
+    inline_code: |
+      .def("__bool__", [](const wpi::util::Alert &self) {
+        return static_cast<bool>(self);
+      })
+      .def("close", [](wpi::util::Alert &self) {
+        py::gil_scoped_release release;
+        wpi::util::detail::CloseAlertHandle(self);
+      }, py::doc("Destroys the alert"))
+      .def("__enter__", [](wpi::util::Alert &self) -> wpi::util::Alert& {
+        return self;
+      })
+      .def("__exit__", [](wpi::util::Alert &self, py::args args) {
+        py::gil_scoped_release release;
+        wpi::util::detail::CloseAlertHandle(self);
+      })

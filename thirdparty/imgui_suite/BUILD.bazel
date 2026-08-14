@@ -1,0 +1,190 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_pkg//:mappings.bzl", "pkg_files")
+load("@rules_pkg//:pkg.bzl", "pkg_zip")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:packaging.bzl", "package_static_cc_project")
+load("//shared/bazel/rules:publishing.bzl", "host_architectures")
+
+cc_library(
+    name = "fonts",
+    srcs = glob(["generated/fonts/src/**"]),
+    hdrs = glob(["generated/fonts/include/**"]),
+    includes = ["generated/fonts/include"],
+    deps = [
+        ":imgui",
+    ],
+)
+
+#----------------------------------------
+# IMGUI
+#----------------------------------------
+IMGUI_SOURCES = glob(["imgui/cpp/*.cpp"]) + [
+    "imgui/cpp/backends/imgui_impl_sdl3.cpp",
+    "imgui/cpp/backends/imgui_impl_sdlgpu3.cpp",
+    "imgui/cpp/backends/imgui_impl_sdlgpu3_shaders.h",
+    "imgui/cpp/backends/imgui_impl_sdlrenderer3.cpp",
+    "imgui/cpp/misc/cpp/imgui_stdlib.cpp",
+]
+
+IMGUI_HEADERS = glob(["imgui/include/*.h"]) + [
+    "imgui/include/backends/imgui_impl_sdl3.h",
+    "imgui/include/backends/imgui_impl_sdlgpu3.h",
+    "imgui/include/backends/imgui_impl_sdlrenderer3.h",
+    "imgui/include/misc/cpp/imgui_stdlib.h",
+]
+
+cc_library(
+    name = "imgui",
+    srcs = IMGUI_SOURCES,
+    hdrs = IMGUI_HEADERS,
+    includes = [
+        "imgui/include",
+        "imgui/include/backends",
+        "imgui/include/misc/cpp",
+    ],
+    linkstatic = True,
+    strip_include_prefix = "imgui/include",
+    target_compatible_with = select({
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        "//shared/bazel/thirdparty/libsdlgpu",
+    ],
+)
+
+#----------------------------------------
+# IMPLOT
+#----------------------------------------
+
+cc_library(
+    name = "implot",
+    srcs = glob(["implot/cpp/**"]),
+    hdrs = glob(["implot/include/**"]),
+    includes = ["implot/include"],
+    linkstatic = True,
+    strip_include_prefix = "implot/include",
+    deps = [
+        ":imgui",
+    ],
+)
+
+#----------------------------------
+# STB
+#----------------------------------
+
+cc_library(
+    name = "stb",
+    srcs = glob(["stb/cpp/**"]),
+    hdrs = glob(["stb/include/**"]),
+    linkstatic = True,
+    strip_include_prefix = "stb/include",
+)
+
+#########################################
+# IMGUI suite
+#########################################
+wpilib_cc_library(
+    name = "imgui_suite",
+    hdrs_pkg_root = None,
+    linkstatic = True,
+    srcs_pkg_root = None,
+    visibility = ["//visibility:public"],
+    deps = [
+        ":fonts",
+        ":imgui",
+        ":implot",
+        ":stb",
+    ],
+)
+
+wpilib_cc_static_library(
+    name = "static/imguiSuite",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":imgui_suite",
+    ],
+)
+
+pkg_files(
+    name = "imgui-hdrs-pkg",
+    srcs = glob(["imgui/include/**"]),
+    strip_prefix = "imgui/include",
+)
+
+pkg_files(
+    name = "implot-hdrs-pkg",
+    srcs = glob(["implot/include/**"]),
+    strip_prefix = "implot/include",
+)
+
+pkg_files(
+    name = "stb-hdrs-pkg",
+    srcs = glob(["stb/include/**"]),
+    strip_prefix = "stb/include",
+)
+
+pkg_files(
+    name = "generated-fonts-hdrs-pkg",
+    srcs = glob(["generated/fonts/include/**"]),
+    strip_prefix = "generated/fonts/include/",
+)
+
+pkg_zip(
+    name = "imguiSuite-hdrs-zip",
+    srcs = [
+        "generated-fonts-hdrs-pkg",
+        "imgui-hdrs-pkg",
+        "implot-hdrs-pkg",
+        "stb-hdrs-pkg",
+        "//:license_pkg_files",
+    ],
+    tags = [
+        "manual",
+    ],
+)
+
+pkg_files(
+    name = "imgui-srcs-pkg",
+    srcs = glob(["imgui/cpp/**"]),
+    strip_prefix = "imgui/cpp",
+)
+
+pkg_files(
+    name = "implot-srcs-pkg",
+    srcs = glob(["implot/cpp/**"]),
+    strip_prefix = "implot/cpp",
+)
+
+pkg_files(
+    name = "stb-srcs-pkg",
+    srcs = glob(["stb/cpp/**"]),
+    strip_prefix = "stb/cpp",
+)
+
+pkg_files(
+    name = "generated-fonts-srcs-pkg",
+    srcs = glob(["generated/fonts/src/**"]),
+    strip_prefix = "generated/fonts/src/",
+)
+
+pkg_zip(
+    name = "imguiSuite-srcs-zip",
+    srcs = [
+        "generated-fonts-srcs-pkg",
+        "imgui-srcs-pkg",
+        "implot-srcs-pkg",
+        "stb-srcs-pkg",
+        "//:license_pkg_files",
+    ],
+    tags = [
+        "manual",
+    ],
+)
+
+package_static_cc_project(
+    name = "imguiSuite",
+    architectures = host_architectures,
+    maven_artifact_name = "imguiSuite-cpp",
+    maven_group_id = "org.wpilib.thirdparty.imguiSuite",
+)

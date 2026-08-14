@@ -1,0 +1,20 @@
+classes:
+  wpi::OnboardIMU:
+    enums:
+      MountOrientation:
+    methods:
+      OnboardIMU:
+      GetYaw:
+      ResetYaw:
+      GetRotation2d:
+      GetRotation3d:
+      GetQuaternion:
+      GetAngleX:
+      GetAngleY:
+      GetAngleZ:
+      GetGyroRateX:
+      GetGyroRateY:
+      GetGyroRateZ:
+      GetAccelX:
+      GetAccelY:
+      GetAccelZ:

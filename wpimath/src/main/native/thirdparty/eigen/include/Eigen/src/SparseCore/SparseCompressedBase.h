@@ -480,6 +480,7 @@ class CompressedStorageIterator {
     return *this;
   }
   inline reference operator*() const { return reference(m_data.keyPtr() + m_index, m_data.valuePtr() + m_index); }
+  inline reference operator[](int index) { return *(*this + index); }
 
 #define MAKE_COMP(OP) \
   inline bool operator OP(const CompressedStorageIterator& other) const { return m_index OP other.m_index; }

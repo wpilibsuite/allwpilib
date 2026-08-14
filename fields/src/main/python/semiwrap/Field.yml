@@ -1,0 +1,45 @@
+extra_includes:
+- pybind11/stl.h
+
+functions:
+  to_json:
+    ignore: true
+    overloads:
+      wpi::util::json&, const Field&:
+  from_json:
+    ignore: true
+    overloads:
+      const wpi::util::json&, Field&:
+  GetField:
+classes:
+  wpi::fields::Field:
+    force_no_trampoline: true
+    methods:
+      Field:
+        overloads:
+          "":
+          std::string_view:
+          ? std::string_view, std::string_view, std::string_view, std::optional<FieldImage>, wpi::units::meter_t, wpi::units::meter_t, std::string_view, std::vector<FieldTag>
+          :
+      operator==:
+      GetName:
+      GetSeason:
+      GetGame:
+      HasImage:
+      GetImage:
+      GetLength:
+      GetWidth:
+      GetProgram:
+      GetResourceFile:
+      GetJson:
+      HasTags:
+      GetTags:
+      SetOrigin:
+        overloads:
+          OriginPosition:
+          const wpi::math::Pose3d&:
+      GetOrigin:
+      GetTagPose:
+      Serialize:
+    enums:
+      OriginPosition:

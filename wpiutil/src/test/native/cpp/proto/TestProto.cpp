@@ -2,17 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/ProtoHelper.h>
-
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
-#include "TestProtoInner.h"
-#include "wpi/protobuf/ProtobufCallbacks.h"
-#include "wpiutil.npb.h"
+#include "TestProtoInner.hpp"
+#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
+#include "wpiutil_test.npb.h"
 
 struct TestProto {
   double double_msg{1};
@@ -34,18 +36,19 @@ struct TestProto {
 };
 
 template <>
-struct wpi::Protobuf<TestProto> {
+struct wpi::util::Protobuf<TestProto> {
   using MessageStruct = wpi_proto_TestProto;
-  using InputStream = wpi::ProtoInputStream<TestProto>;
-  using OutputStream = wpi::ProtoOutputStream<TestProto>;
+  using InputStream = wpi::util::ProtoInputStream<TestProto>;
+  using OutputStream = wpi::util::ProtoOutputStream<TestProto>;
   static std::optional<TestProto> Unpack(InputStream& stream);
   static bool Pack(OutputStream& stream, const TestProto& value);
 };
 
-std::optional<TestProto> wpi::Protobuf<TestProto>::Unpack(InputStream& stream) {
-  wpi::UnpackCallback<std::string> str;
-  wpi::UnpackCallback<std::vector<uint8_t>> bytes;
-  wpi::UnpackCallback<TestProtoInner> inner;
+std::optional<TestProto> wpi::util::Protobuf<TestProto>::Unpack(
+    InputStream& stream) {
+  wpi::util::UnpackCallback<std::string> str;
+  wpi::util::UnpackCallback<std::vector<uint8_t>> bytes;
+  wpi::util::UnpackCallback<TestProtoInner> inner;
   wpi_proto_TestProto msg;
   msg.string_msg = str.Callback();
   msg.bytes_msg = bytes.Callback();
@@ -82,11 +85,11 @@ std::optional<TestProto> wpi::Protobuf<TestProto>::Unpack(InputStream& stream) {
   };
 }
 
-bool wpi::Protobuf<TestProto>::Pack(OutputStream& stream,
-                                    const TestProto& value) {
-  wpi::PackCallback str{&value.string_msg};
-  wpi::PackCallback bytes{&value.bytes_msg};
-  wpi::PackCallback inner{&value.TestProtoInner_msg};
+bool wpi::util::Protobuf<TestProto>::Pack(OutputStream& stream,
+                                          const TestProto& value) {
+  wpi::util::PackCallback str{&value.string_msg};
+  wpi::util::PackCallback bytes{&value.bytes_msg};
+  wpi::util::PackCallback inner{&value.TestProtoInner_msg};
   wpi_proto_TestProto msg{
       .double_msg = value.double_msg,
       .float_msg = value.float_msg,
@@ -109,17 +112,17 @@ bool wpi::Protobuf<TestProto>::Pack(OutputStream& stream,
 }
 
 namespace {
-using ProtoType = wpi::Protobuf<TestProto>;
+using ProtoType = wpi::util::Protobuf<TestProto>;
 }  // namespace
 
-TEST(TestProtoTest, RoundtripNanopb) {
+TEST_CASE("TestProtoTest RoundtripNanopb", "[wpiutil][proto]") {
   const TestProto kExpectedData = TestProto{};
 
-  wpi::ProtobufMessage<TestProto> message;
-  wpi::SmallVector<uint8_t, 64> buf;
+  wpi::util::ProtobufMessage<TestProto> message;
+  wpi::util::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, kExpectedData));
   std::optional<TestProto> unpacked_data = message.Unpack(buf);
-  ASSERT_TRUE(unpacked_data.has_value());
-  ASSERT_TRUE(unpacked_data.has_value());
+  REQUIRE(unpacked_data.has_value());
+  REQUIRE(unpacked_data.has_value());
 }

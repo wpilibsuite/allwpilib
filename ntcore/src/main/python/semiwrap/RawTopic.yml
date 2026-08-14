@@ -1,0 +1,114 @@
+extra_includes:
+- src/nt_type_caster.h
+
+classes:
+  wpi::nt::RawSubscriber:
+    methods:
+      RawSubscriber:
+        overloads:
+          '':
+            ignore: true
+          NT_Subscriber, ParamType:
+            ignore: true
+      Get:
+        overloads:
+          '[const]':
+          ParamType [const]:
+          wpi::util::SmallVectorImpl<SmallElemType>& [const]:
+            ignore: true
+          wpi::util::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+            ignore: true
+      GetAtomic:
+        overloads:
+          '[const]':
+          ParamType [const]:
+          wpi::util::SmallVectorImpl<SmallElemType>& [const]:
+            ignore: true
+          wpi::util::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+            ignore: true
+      ReadQueue:
+      GetTopic:
+    inline_code: |
+      .def("close", [](RawSubscriber *self) {
+        py::gil_scoped_release release;
+        *self = RawSubscriber();
+      }, py::doc("Destroys the subscriber"))
+      .def("__enter__", [](RawSubscriber *self) {
+        return self;
+      })
+      .def("__exit__", [](RawSubscriber *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = RawSubscriber();
+      })
+  wpi::nt::RawPublisher:
+    methods:
+      RawPublisher:
+        overloads:
+          '':
+            ignore: true
+          NT_Publisher:
+            ignore: true
+      Set:
+      SetDefault:
+      GetTopic:
+    inline_code: |
+      .def("close", [](RawPublisher *self) {
+        py::gil_scoped_release release;
+        *self = RawPublisher();
+      }, py::doc("Destroys the publisher"))
+      .def("__enter__", [](RawPublisher *self) {
+        return self;
+      })
+      .def("__exit__", [](RawPublisher *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = RawPublisher();
+      })
+  wpi::nt::RawEntry:
+    methods:
+      RawEntry:
+        overloads:
+          '':
+            ignore: true
+          NT_Entry, ParamType:
+            ignore: true
+      GetHandle:
+        ignore: true
+      GetTopic:
+      Unpublish:
+    inline_code: |
+      .def("close", [](RawEntry *self) {
+        py::gil_scoped_release release;
+        *self = RawEntry();
+      }, py::doc("Destroys the entry"))
+      .def("__enter__", [](RawEntry *self) {
+        return self;
+      })
+      .def("__exit__", [](RawEntry *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = RawEntry();
+      })
+  wpi::nt::RawTopic:
+    methods:
+      RawTopic:
+        overloads:
+          '':
+            ignore: true
+          NT_Topic:
+            ignore: true
+          Topic:
+      Subscribe:
+      Publish:
+      PublishEx:
+      GetEntry:
+    inline_code: |
+      .def("close", [](RawTopic *self) {
+        py::gil_scoped_release release;
+        *self = RawTopic();
+      }, py::doc("Destroys the topic"))
+      .def("__enter__", [](RawTopic *self) {
+        return self;
+      })
+      .def("__exit__", [](RawTopic *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = RawTopic();
+      })

@@ -2,50 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/Power.h"
+#include "wpi/hal/Power.h"
 
-#include "mockdata/RoboRioDataInternal.h"
+#include <cmath>
+#include <mutex>
 
-using namespace hal;
+#include "mockdata/RoboRioDataInternal.hpp"
+#if __has_include("mrclib/Systemcore.h")
+#include "mrclib/Systemcore.h"
+#define WPI_HAL_SIM_HAS_MRCLIB_SYSTEMCORE_H
+#endif
+#include "wpi/hal/Errors.h"
 
-namespace hal::init {
+using namespace wpi::hal;
+
+namespace wpi::hal::init {
 void InitializePower() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 // TODO: Fix the naming in here
 extern "C" {
 double HAL_GetVinVoltage(int32_t* status) {
   return SimRoboRioData->vInVoltage;
 }
-double HAL_GetVinCurrent(int32_t* status) {
-  return SimRoboRioData->vInCurrent;
-}
-double HAL_GetUserVoltage6V(int32_t* status) {
-  return SimRoboRioData->userVoltage6V;
-}
-double HAL_GetUserCurrent6V(int32_t* status) {
-  return SimRoboRioData->userCurrent6V;
-}
-HAL_Bool HAL_GetUserActive6V(int32_t* status) {
-  return SimRoboRioData->userActive6V;
-}
-int32_t HAL_GetUserCurrentFaults6V(int32_t* status) {
-  return SimRoboRioData->userFaults6V;
-}
-void HAL_SetUserRailEnabled6V(HAL_Bool enabled, int32_t* status) {}
-double HAL_GetUserVoltage5V(int32_t* status) {
-  return SimRoboRioData->userVoltage5V;
-}
-double HAL_GetUserCurrent5V(int32_t* status) {
-  return SimRoboRioData->userCurrent5V;
-}
-HAL_Bool HAL_GetUserActive5V(int32_t* status) {
-  return SimRoboRioData->userActive5V;
-}
-int32_t HAL_GetUserCurrentFaults5V(int32_t* status) {
-  return SimRoboRioData->userFaults5V;
-}
-void HAL_SetUserRailEnabled5V(HAL_Bool enabled, int32_t* status) {}
 double HAL_GetUserVoltage3V3(int32_t* status) {
   return SimRoboRioData->userVoltage3V3;
 }
@@ -61,14 +40,61 @@ int32_t HAL_GetUserCurrentFaults3V3(int32_t* status) {
 void HAL_SetUserRailEnabled3V3(HAL_Bool enabled, int32_t* status) {}
 void HAL_ResetUserCurrentFaults(int32_t* status) {
   SimRoboRioData->userFaults3V3 = 0;
-  SimRoboRioData->userFaults5V = 0;
-  SimRoboRioData->userFaults6V = 0;
 }
-void HAL_SetBrownoutVoltage(double voltage, int32_t* status) {
-  SimRoboRioData->brownoutVoltage = voltage;
-}
-double HAL_GetBrownoutVoltage(int32_t* status) {
-  return SimRoboRioData->brownoutVoltage;
+void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
+                             int32_t* status) {
+  constexpr double kMillivoltsPerVolt = 1000.0;
+  constexpr int32_t kBrownoutVoltageMinMillivolts = 5000;
+  constexpr int32_t kBrownoutVoltageMaxMillivolts = 8000;
+  constexpr int32_t kRecoveryVoltageMaxMillivolts = 8500;
+  constexpr int32_t kRecoveryVoltageMinDeltaMillivolts = 500;
+#ifdef WPI_HAL_SIM_HAS_MRCLIB_SYSTEMCORE_H
+  static_assert(kBrownoutVoltageMinMillivolts ==
+                MRC_SYSTEMCORE_BROWNOUT_VOLTAGE_MIN_MV);
+  static_assert(kBrownoutVoltageMaxMillivolts ==
+                MRC_SYSTEMCORE_BROWNOUT_VOLTAGE_MAX_MV);
+  static_assert(kRecoveryVoltageMaxMillivolts ==
+                MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MAX_MV);
+  static_assert(kRecoveryVoltageMinDeltaMillivolts ==
+                MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MIN_DELTA_MV);
+#endif
+  constexpr double kBrownoutVoltageMin =
+      kBrownoutVoltageMinMillivolts / kMillivoltsPerVolt;
+  constexpr double kBrownoutVoltageMax =
+      kBrownoutVoltageMaxMillivolts / kMillivoltsPerVolt;
+  constexpr double kRecoveryVoltageMax =
+      kRecoveryVoltageMaxMillivolts / kMillivoltsPerVolt;
+  if (!std::isfinite(brownoutVoltage) || !std::isfinite(recoveryVoltage) ||
+      brownoutVoltage < kBrownoutVoltageMin ||
+      brownoutVoltage > kBrownoutVoltageMax ||
+      recoveryVoltage < kBrownoutVoltageMin ||
+      recoveryVoltage > kRecoveryVoltageMax) {
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
+  auto brownoutMillivolts = std::lround(brownoutVoltage * kMillivoltsPerVolt);
+  auto recoveryMillivolts = std::lround(recoveryVoltage * kMillivoltsPerVolt);
+  if (recoveryMillivolts <
+      brownoutMillivolts + kRecoveryVoltageMinDeltaMillivolts) {
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
+  auto& brownoutValue = SimRoboRioData->brownoutVoltage;
+  auto& recoveryValue = SimRoboRioData->brownoutRecoveryVoltage;
+  std::scoped_lock lock{brownoutValue.GetMutex(), recoveryValue.GetMutex()};
+  bool brownoutChanged =
+      brownoutValue.SetNoNotify(brownoutMillivolts / kMillivoltsPerVolt);
+  bool recoveryChanged =
+      recoveryValue.SetNoNotify(recoveryMillivolts / kMillivoltsPerVolt);
+  if (brownoutChanged) {
+    brownoutValue.Notify();
+  }
+  if (recoveryChanged) {
+    recoveryValue.Notify();
+  }
+  *status = HAL_SUCCESS;
 }
 double HAL_GetCPUTemp(int32_t* status) {
   return SimRoboRioData->cpuTemp;

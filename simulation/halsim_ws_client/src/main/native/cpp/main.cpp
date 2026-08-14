@@ -5,9 +5,8 @@
 #include <cstdio>
 #include <memory>
 
-#include <hal/Extensions.h>
-
-#include "HALSimWSClient.h"
+#include "wpi/hal/Extensions.h"
+#include "wpi/halsim/ws_client/HALSimWSClient.hpp"
 
 using namespace wpilibws;
 

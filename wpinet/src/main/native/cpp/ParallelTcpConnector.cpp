@@ -2,29 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/ParallelTcpConnector.h"
+#include "wpi/net/ParallelTcpConnector.hpp"
 
 #include <cstring>
+#include <format>
 #include <functional>
 #include <memory>
 #include <string>
 #include <utility>
 
-#include <fmt/format.h>
-#include <wpi/Logger.h>
+#include "wpi/net/uv/GetAddrInfo.hpp"
+#include "wpi/net/uv/Loop.hpp"
+#include "wpi/net/uv/Tcp.hpp"
+#include "wpi/net/uv/Timer.hpp"
+#include "wpi/net/uv/util.hpp"
+#include "wpi/util/Logger.hpp"
 
-#include "wpinet/uv/GetAddrInfo.h"
-#include "wpinet/uv/Loop.h"
-#include "wpinet/uv/Tcp.h"
-#include "wpinet/uv/Timer.h"
-#include "wpinet/uv/util.h"
-
-using namespace wpi;
+using namespace wpi::net;
 
 ParallelTcpConnector::ParallelTcpConnector(
-    wpi::uv::Loop& loop, wpi::uv::Timer::Time reconnectRate,
-    wpi::Logger& logger, std::function<void(wpi::uv::Tcp& tcp)> connected,
-    bool ipv4Only, const private_init&)
+    wpi::net::uv::Loop& loop, wpi::net::uv::Timer::Time reconnectRate,
+    wpi::util::Logger& logger,
+    std::function<void(wpi::net::uv::Tcp& tcp)> connected, bool ipv4Only,
+    const private_init&)
     : m_loop{loop},
       m_logger{logger},
       m_reconnectRate{reconnectRate},
@@ -52,6 +52,11 @@ void ParallelTcpConnector::Close() {
 void ParallelTcpConnector::SetServers(
     std::span<const std::pair<std::string, unsigned int>> servers) {
   m_servers.assign(servers.begin(), servers.end());
+  if (m_servers.empty()) {
+    CancelAll();
+    m_reconnectTimer->Stop();
+    return;
+  }
   if (!IsConnected()) {
     Connect();
   }
@@ -107,6 +112,22 @@ void ParallelTcpConnector::Connect() {
 
   // kick off parallel lookups
   for (auto&& server : m_servers) {
+    sockaddr_in address4;
+    if (!server.first.empty() &&
+        uv::NameToAddr(server.first, server.second, &address4) == 0) {
+      StartConnectionAttempt(reinterpret_cast<const sockaddr&>(address4),
+                             sizeof(address4), nullptr);
+      continue;
+    }
+
+    sockaddr_in6 address6;
+    if (!server.first.empty() && !m_ipv4Only &&
+        uv::NameToAddr(server.first, server.second, &address6) == 0) {
+      StartConnectionAttempt(reinterpret_cast<const sockaddr&>(address6),
+                             sizeof(address6), nullptr);
+      continue;
+    }
+
     auto req = std::make_shared<uv::GetAddrInfoReq>();
     m_resolvers.emplace_back(req);
 
@@ -118,67 +139,7 @@ void ParallelTcpConnector::Connect() {
 
           // kick off parallel connection attempts
           for (auto ai = &addrinfo; ai; ai = ai->ai_next) {
-            // check for duplicates
-            bool duplicate = false;
-            for (auto&& attempt : m_attempts) {
-              if (AddressEquals(*ai->ai_addr, reinterpret_cast<const sockaddr&>(
-                                                  attempt.first))) {
-                duplicate = true;
-                break;
-              }
-            }
-            if (duplicate) {
-              continue;
-            }
-
-            auto tcp = uv::Tcp::Create(m_loop);
-            if (!tcp) {
-              continue;
-            }
-            m_attempts.emplace_back(CopyAddress(*ai->ai_addr, ai->ai_addrlen),
-                                    tcp);
-
-            auto connreq = std::make_shared<uv::TcpConnectReq>();
-            connreq->connected.connect(
-                [this, tcp = tcp.get()] {
-                  if (m_logger.min_level() <= wpi::WPI_LOG_DEBUG4) {
-                    std::string ip;
-                    unsigned int port = 0;
-                    uv::AddrToName(tcp->GetPeer(), &ip, &port);
-                    WPI_DEBUG4(m_logger,
-                               "successful connection ({}) to {} port {}",
-                               static_cast<void*>(tcp), ip, port);
-                  }
-                  if (IsConnected()) {
-                    tcp->Shutdown([tcp] { tcp->Close(); });
-                    return;
-                  }
-                  if (m_connected) {
-                    m_connected(*tcp);
-                  }
-                },
-                shared_from_this());
-
-            connreq->error = [selfWeak = weak_from_this(),
-                              tcp = tcp.get()](uv::Error err) {
-              if (auto self = selfWeak.lock()) {
-                WPI_DEBUG1(self->m_logger, "connect failure ({}): {}",
-                           static_cast<void*>(tcp), err.str());
-              }
-            };
-
-            if (m_logger.min_level() <= wpi::WPI_LOG_DEBUG4) {
-              std::string ip;
-              unsigned int port = 0;
-              uv::AddrToName(*reinterpret_cast<sockaddr_storage*>(ai->ai_addr),
-                             &ip, &port);
-              WPI_DEBUG4(
-                  m_logger,
-                  "Info({}) starting connection attempt ({}) to {} port {}",
-                  static_cast<void*>(req), static_cast<void*>(tcp.get()), ip,
-                  port);
-            }
-            tcp->Connect(*ai->ai_addr, connreq);
+            StartConnectionAttempt(*ai->ai_addr, ai->ai_addrlen, req);
           }
         },
         shared_from_this());
@@ -198,12 +159,68 @@ void ParallelTcpConnector::Connect() {
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_NUMERICSERV | AI_ADDRCONFIG;
-    uv::GetAddrInfo(m_loop, req, server.first, fmt::format("{}", server.second),
+    uv::GetAddrInfo(m_loop, req, server.first, std::format("{}", server.second),
                     hints);
   }
 }
 
-void ParallelTcpConnector::CancelAll(wpi::uv::Tcp* except) {
+void ParallelTcpConnector::StartConnectionAttempt(
+    const sockaddr& address, socklen_t addressLen,
+    uv::GetAddrInfoReq* resolver) {
+  for (auto&& attempt : m_attempts) {
+    if (AddressEquals(address,
+                      reinterpret_cast<const sockaddr&>(attempt.first))) {
+      return;
+    }
+  }
+
+  auto addressCopy = CopyAddress(address, addressLen);
+  auto tcp = uv::Tcp::Create(m_loop);
+  if (!tcp) {
+    return;
+  }
+  m_attempts.emplace_back(addressCopy, tcp);
+
+  auto connreq = std::make_shared<uv::TcpConnectReq>();
+  connreq->connected.connect(
+      [this, tcp = tcp.get()] {
+        if (m_logger.min_level() <= wpi::util::WPI_LOG_DEBUG4) {
+          std::string ip;
+          unsigned int port = 0;
+          uv::AddrToName(tcp->GetPeer(), &ip, &port);
+          WPI_DEBUG4(m_logger, "successful connection ({}) to {} port {}",
+                     static_cast<void*>(tcp), ip, port);
+        }
+        if (IsConnected()) {
+          tcp->Shutdown([tcp] { tcp->Close(); });
+          return;
+        }
+        if (m_connected) {
+          m_connected(*tcp);
+        }
+      },
+      shared_from_this());
+
+  connreq->error = [selfWeak = weak_from_this(),
+                    tcp = tcp.get()](uv::Error err) {
+    if (auto self = selfWeak.lock()) {
+      WPI_DEBUG1(self->m_logger, "connect failure ({}): {}",
+                 static_cast<void*>(tcp), err.str());
+    }
+  };
+
+  if (m_logger.min_level() <= wpi::util::WPI_LOG_DEBUG4) {
+    std::string ip;
+    unsigned int port = 0;
+    uv::AddrToName(addressCopy, &ip, &port);
+    WPI_DEBUG4(
+        m_logger, "Info({}) starting connection attempt ({}) to {} port {}",
+        static_cast<void*>(resolver), static_cast<void*>(tcp.get()), ip, port);
+  }
+  tcp->Connect(reinterpret_cast<const sockaddr&>(addressCopy), connreq);
+}
+
+void ParallelTcpConnector::CancelAll(wpi::net::uv::Tcp* except) {
   WPI_DEBUG4(m_logger, "canceling previous attempts");
   for (auto&& resolverWeak : m_resolvers) {
     if (auto resolver = resolverWeak.lock()) {

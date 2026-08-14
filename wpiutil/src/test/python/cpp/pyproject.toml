@@ -1,0 +1,11 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "hatch-meson", "hatchling"
+]
+
+[project]
+name = "wpiutil_test"
+version = "0.0.1"
+
+[tool.hatch.build.hooks.meson]

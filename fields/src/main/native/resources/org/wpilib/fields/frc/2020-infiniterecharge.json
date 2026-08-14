@@ -1,0 +1,17 @@
+{
+  "name": "2020 FRC Infinite Recharge",
+  "season": "2020",
+  "game": "Infinite Recharge",
+  "field-image": {
+    "path": "2020-infiniterecharge.png",
+    "top": 26,
+    "left": 94,
+    "bottom": 515,
+    "right": 1038
+  },
+  "field-dimensions": {
+    "length": 15.98295,
+    "width": 8.21055
+  },
+  "program": "frc"
+}

@@ -5,144 +5,145 @@
 #include <jni.h>
 
 #include <cassert>
+#include <utility>
+#include <vector>
 
-#include <fmt/format.h>
-#include <wpi/jni_util.h>
+#include "HALUtil.hpp"
+#include "org_wpilib_hardware_hal_DriverStationJNI.h"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/DriverStationTypes.h"
+#include "wpi/util/jni_util.hpp"
 
-#include "HALUtil.h"
-#include "edu_wpi_first_hal_DriverStationJNI.h"
-#include "hal/DriverStation.h"
-#include "hal/FRCUsageReporting.h"
-#include "hal/HALBase.h"
+static_assert(
+    org_wpilib_hardware_hal_DriverStationJNI_ALLIANCE_STATION_UNKNOWN ==
+    HAL_ALLIANCE_STATION_UNKNOWN);
+static_assert(org_wpilib_hardware_hal_DriverStationJNI_ALLIANCE_STATION_RED_1 ==
+              HAL_ALLIANCE_STATION_RED_1);
+static_assert(org_wpilib_hardware_hal_DriverStationJNI_ALLIANCE_STATION_RED_2 ==
+              HAL_ALLIANCE_STATION_RED_2);
+static_assert(org_wpilib_hardware_hal_DriverStationJNI_ALLIANCE_STATION_RED_3 ==
+              HAL_ALLIANCE_STATION_RED_3);
+static_assert(
+    org_wpilib_hardware_hal_DriverStationJNI_ALLIANCE_STATION_BLUE_1 ==
+    HAL_ALLIANCE_STATION_BLUE_1);
+static_assert(
+    org_wpilib_hardware_hal_DriverStationJNI_ALLIANCE_STATION_BLUE_2 ==
+    HAL_ALLIANCE_STATION_BLUE_2);
+static_assert(
+    org_wpilib_hardware_hal_DriverStationJNI_ALLIANCE_STATION_BLUE_3 ==
+    HAL_ALLIANCE_STATION_BLUE_3);
 
-static_assert(edu_wpi_first_hal_DriverStationJNI_kUnknownAllianceStation ==
-              HAL_AllianceStationID_kUnknown);
-static_assert(edu_wpi_first_hal_DriverStationJNI_kRed1AllianceStation ==
-              HAL_AllianceStationID_kRed1);
-static_assert(edu_wpi_first_hal_DriverStationJNI_kRed2AllianceStation ==
-              HAL_AllianceStationID_kRed2);
-static_assert(edu_wpi_first_hal_DriverStationJNI_kRed3AllianceStation ==
-              HAL_AllianceStationID_kRed3);
-static_assert(edu_wpi_first_hal_DriverStationJNI_kBlue1AllianceStation ==
-              HAL_AllianceStationID_kBlue1);
-static_assert(edu_wpi_first_hal_DriverStationJNI_kBlue2AllianceStation ==
-              HAL_AllianceStationID_kBlue2);
-static_assert(edu_wpi_first_hal_DriverStationJNI_kBlue3AllianceStation ==
-              HAL_AllianceStationID_kBlue3);
+static_assert(org_wpilib_hardware_hal_DriverStationJNI_MAX_JOYSTICK_AXES ==
+              HAL_MAX_JOYSTICK_AXES);
+static_assert(org_wpilib_hardware_hal_DriverStationJNI_MAX_JOYSTICK_POVS ==
+              HAL_MAX_JOYSTICK_POVS);
+static_assert(org_wpilib_hardware_hal_DriverStationJNI_MAX_JOYSTICKS ==
+              HAL_MAX_JOYSTICKS);
+static_assert(org_wpilib_hardware_hal_DriverStationJNI_MAX_JOYSTICK_TOUCHPADS ==
+              HAL_MAX_JOYSTICK_TOUCHPADS);
+static_assert(
+    org_wpilib_hardware_hal_DriverStationJNI_MAX_JOYSTICK_TOUCHPAD_FINGERS ==
+    HAL_MAX_JOYSTICK_TOUCHPAD_FINGERS);
 
-static_assert(edu_wpi_first_hal_DriverStationJNI_kMaxJoystickAxes ==
-              HAL_kMaxJoystickAxes);
-static_assert(edu_wpi_first_hal_DriverStationJNI_kMaxJoystickPOVs ==
-              HAL_kMaxJoystickPOVs);
-static_assert(edu_wpi_first_hal_DriverStationJNI_kMaxJoysticks ==
-              HAL_kMaxJoysticks);
-
-using namespace hal;
-using namespace wpi::java;
+using namespace wpi::hal;
+using namespace wpi::util::java;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    observeUserProgramStarting
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramStarting
+Java_org_wpilib_hardware_hal_DriverStationJNI_observeUserProgramStarting
   (JNIEnv*, jclass)
 {
   HAL_ObserveUserProgramStarting();
 }
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    observeUserProgramDisabled
- * Signature: ()V
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    observeUserProgram
+ * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramDisabled
-  (JNIEnv*, jclass)
+Java_org_wpilib_hardware_hal_DriverStationJNI_observeUserProgram
+  (JNIEnv*, jclass, jlong word)
 {
-  HAL_ObserveUserProgramDisabled();
+  HAL_ObserveUserProgram({.value = word});
 }
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    observeUserProgramAutonomous
- * Signature: ()V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramAutonomous
-  (JNIEnv*, jclass)
-{
-  HAL_ObserveUserProgramAutonomous();
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    observeUserProgramTeleop
- * Signature: ()V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramTeleop
-  (JNIEnv*, jclass)
-{
-  HAL_ObserveUserProgramTeleop();
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    observeUserProgramTest
- * Signature: ()V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramTest
-  (JNIEnv*, jclass)
-{
-  HAL_ObserveUserProgramTest();
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    report
- * Signature: (IIILjava/lang/String;)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_report
-  (JNIEnv* paramEnv, jclass, jint paramResource, jint paramInstanceNumber,
-   jint paramContext, jstring paramFeature)
-{
-  JStringRef featureStr{paramEnv, paramFeature};
-  jint returnValue = HAL_Report(paramResource, paramInstanceNumber,
-                                paramContext, featureStr.c_str());
-  return returnValue;
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    nativeGetControlWord
- * Signature: ()I
+ * Signature: ()J
  */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_nativeGetControlWord
+JNIEXPORT jlong JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_nativeGetControlWord
   (JNIEnv*, jclass)
 {
-  static_assert(sizeof(HAL_ControlWord) == sizeof(jint),
+  static_assert(sizeof(HAL_ControlWord) == sizeof(jlong),
                 "Java int must match the size of control word");
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
-  jint retVal = 0;
-  std::memcpy(&retVal, &controlWord, sizeof(HAL_ControlWord));
-  return retVal;
+  return controlWord.value;
 }
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    nativeGetUncachedControlWord
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_nativeGetUncachedControlWord
+  (JNIEnv*, jclass)
+{
+  static_assert(sizeof(HAL_ControlWord) == sizeof(jlong),
+                "Java int must match the size of control word");
+  HAL_ControlWord controlWord;
+  HAL_GetUncachedControlWord(&controlWord);
+  return controlWord.value;
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    setOpModeOptions
+ * Signature: ([Ljava/lang/Object;)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_setOpModeOptions
+  (JNIEnv* env, jclass, jobjectArray options)
+{
+  std::vector<HAL_OpModeOption> coptions;
+  if (options != nullptr) {
+    jsize length = env->GetArrayLength(options);
+    coptions.reserve(length);
+    for (jsize i = 0; i < length; i++) {
+      JLocal<jobject> option{env, env->GetObjectArrayElement(options, i)};
+      if (!option) {
+        ThrowIllegalArgumentException(env, "Null OpModeOption passed in array");
+        return;
+      }
+      auto coption = CreateOpModeOptionFromJava(env, option);
+      if (coption.id == 0) {
+        // exception thrown
+        return;
+      }
+      coptions.emplace_back(std::move(coption));
+    }
+  }
+  int32_t status = HAL_SetOpModeOptions(coptions.data(), coptions.size());
+  CheckStatusForceThrow(env, status);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    nativeGetAllianceStation
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_nativeGetAllianceStation
+Java_org_wpilib_hardware_hal_DriverStationJNI_nativeGetAllianceStation
   (JNIEnv*, jclass)
 {
   int32_t status = 0;
@@ -151,217 +152,144 @@ Java_edu_wpi_first_hal_DriverStationJNI_nativeGetAllianceStation
 }
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    getJoystickAxesRaw
- * Signature: (B[I)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxesRaw
-  (JNIEnv* env, jclass, jbyte joystickNum, jintArray axesRawArray)
-{
-  HAL_JoystickAxes axes;
-  HAL_GetJoystickAxes(joystickNum, &axes);
-
-  jsize javaSize = env->GetArrayLength(axesRawArray);
-  if (axes.count > javaSize) {
-    ThrowIllegalArgumentException(
-        env,
-        fmt::format("Native array size larger then passed in java array "
-                    "size\nNative Size: {} Java Size: {}",
-                    static_cast<int>(axes.count), static_cast<int>(javaSize)));
-    return 0;
-  }
-
-  jint raw[HAL_kMaxJoystickAxes];
-  for (int16_t i = 0; i < axes.count; i++) {
-    raw[i] = axes.raw[i];
-  }
-  env->SetIntArrayRegion(axesRawArray, 0, axes.count, raw);
-
-  return axes.count;
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    getJoystickAxes
- * Signature: (B[F)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxes
-  (JNIEnv* env, jclass, jbyte joystickNum, jfloatArray axesArray)
-{
-  HAL_JoystickAxes axes;
-  HAL_GetJoystickAxes(joystickNum, &axes);
-
-  jsize javaSize = env->GetArrayLength(axesArray);
-  if (axes.count > javaSize) {
-    ThrowIllegalArgumentException(
-        env,
-        fmt::format("Native array size larger then passed in java array "
-                    "size\nNative Size: {} Java Size: {}",
-                    static_cast<int>(axes.count), static_cast<int>(javaSize)));
-    return 0;
-  }
-
-  env->SetFloatArrayRegion(axesArray, 0, axes.count, axes.axes);
-
-  return axes.count;
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    getJoystickPOVs
- * Signature: (B[S)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickPOVs
-  (JNIEnv* env, jclass, jbyte joystickNum, jshortArray povsArray)
-{
-  HAL_JoystickPOVs povs;
-  HAL_GetJoystickPOVs(joystickNum, &povs);
-
-  jsize javaSize = env->GetArrayLength(povsArray);
-  if (povs.count > javaSize) {
-    ThrowIllegalArgumentException(
-        env,
-        fmt::format("Native array size larger then passed in java array "
-                    "size\nNative Size: {} Java Size: {}",
-                    static_cast<int>(povs.count), static_cast<int>(javaSize)));
-    return 0;
-  }
-
-  env->SetShortArrayRegion(povsArray, 0, povs.count, povs.povs);
-
-  return povs.count;
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    getAllJoystickData
- * Signature: ([F[B[S[J)V
+ * Signature: (I[F[S[B[F[J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getAllJoystickData
-  (JNIEnv* env, jclass cls, jfloatArray axesArray, jbyteArray rawAxesArray,
-   jshortArray povsArray, jlongArray buttonsAndMetadataArray)
+Java_org_wpilib_hardware_hal_DriverStationJNI_getAllJoystickData
+  (JNIEnv* env, jclass cls, jint stick, jfloatArray axesArray,
+   jshortArray rawAxesArray, jbyteArray povsArray,
+   jfloatArray touchpadFingersData, jlongArray buttonsAndMetadataArray)
 {
-  HAL_JoystickAxes axes[HAL_kMaxJoysticks];
-  HAL_JoystickPOVs povs[HAL_kMaxJoysticks];
-  HAL_JoystickButtons buttons[HAL_kMaxJoysticks];
+  HAL_JoystickAxes axes;
+  HAL_JoystickPOVs povs;
+  HAL_JoystickButtons buttons;
+  HAL_JoystickTouchpads touchpads;
 
-  HAL_GetAllJoystickData(axes, povs, buttons);
+  HAL_GetAllJoystickData(stick, &axes, &povs, &buttons, &touchpads);
 
   CriticalJSpan<jfloat> jAxes(env, axesArray);
-  CriticalJSpan<jbyte> jRawAxes(env, rawAxesArray);
-  CriticalJSpan<jshort> jPovs(env, povsArray);
+  CriticalJSpan<jshort> jRawAxes(env, rawAxesArray);
+  CriticalJSpan<jbyte> jPovs(env, povsArray);
+  CriticalJSpan<jfloat> jTouchpadFingers(env, touchpadFingersData);
   CriticalJSpan<jlong> jButtons(env, buttonsAndMetadataArray);
 
-  static_assert(sizeof(jAxes[0]) == sizeof(axes[0].axes[0]));
-  static_assert(sizeof(jRawAxes[0]) == sizeof(axes[0].raw[0]));
-  static_assert(sizeof(jPovs[0]) == sizeof(povs[0].povs[0]));
+  static_assert(sizeof(jAxes[0]) == sizeof(axes.axes[0]));
+  static_assert(sizeof(jRawAxes[0]) == sizeof(axes.raw[0]));
+  static_assert(sizeof(jPovs[0]) == sizeof(povs.povs[0]));
+  static_assert(sizeof(jTouchpadFingers[0]) ==
+                sizeof(touchpads.touchpads[0].fingers[0].x));
 
-  for (size_t i = 0; i < HAL_kMaxJoysticks; i++) {
-    std::memcpy(&jAxes[i * HAL_kMaxJoystickAxes], axes[i].axes,
-                sizeof(axes[i].axes));
-    std::memcpy(&jRawAxes[i * HAL_kMaxJoystickAxes], axes[i].raw,
-                sizeof(axes[i].raw));
-    std::memcpy(&jPovs[i * HAL_kMaxJoystickPOVs], povs[i].povs,
-                sizeof(povs[i].povs));
-    jButtons[i * 4] = axes[i].count;
-    jButtons[(i * 4) + 1] = povs[i].count;
-    jButtons[(i * 4) + 2] = buttons[i].count;
-    jButtons[(i * 4) + 3] = buttons[i].buttons;
-  }
+  std::memcpy(&jAxes[0], axes.axes, sizeof(axes.axes));
+  std::memcpy(&jRawAxes[0], axes.raw, sizeof(axes.raw));
+  std::memcpy(&jPovs[0], povs.povs, sizeof(povs.povs));
+  jTouchpadFingers[0] = touchpads.touchpads[0].fingers[0].x;
+  jTouchpadFingers[1] = touchpads.touchpads[0].fingers[0].y;
+  jTouchpadFingers[2] = touchpads.touchpads[0].fingers[1].x;
+  jTouchpadFingers[3] = touchpads.touchpads[0].fingers[1].y;
+  jTouchpadFingers[4] = touchpads.touchpads[1].fingers[0].x;
+  jTouchpadFingers[5] = touchpads.touchpads[1].fingers[0].y;
+  jTouchpadFingers[6] = touchpads.touchpads[1].fingers[1].x;
+  jTouchpadFingers[7] = touchpads.touchpads[1].fingers[1].y;
+  jButtons[0] = axes.available;
+  jButtons[1] = povs.available;
+  jButtons[2] = buttons.available;
+  jButtons[3] = buttons.buttons;
+  jButtons[4] = touchpads.count;
+  jButtons[5] = (touchpads.touchpads[0].fingers[0].down ? 1 : 0) |
+                (touchpads.touchpads[0].fingers[1].down ? 2 : 0) |
+                (touchpads.touchpads[0].count << 2);
+  jButtons[6] = (touchpads.touchpads[1].fingers[0].down ? 1 : 0) |
+                (touchpads.touchpads[1].fingers[1].down ? 2 : 0) |
+                (touchpads.touchpads[1].count << 2);
 }
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    getJoystickButtons
- * Signature: (BLjava/lang/Object;)I
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    setJoystickRumble
+ * Signature: (BIIII)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickButtons
-  (JNIEnv* env, jclass, jbyte joystickNum, jobject count)
+Java_org_wpilib_hardware_hal_DriverStationJNI_setJoystickRumble
+  (JNIEnv*, jclass, jbyte port, jint leftRumble, jint rightRumble,
+   jint leftTriggerRumble, jint rightTriggerRumble)
 {
-  HAL_JoystickButtons joystickButtons;
-  HAL_GetJoystickButtons(joystickNum, &joystickButtons);
-  jbyte* countPtr =
-      reinterpret_cast<jbyte*>(env->GetDirectBufferAddress(count));
-  *countPtr = joystickButtons.count;
-  return joystickButtons.buttons;
+  return HAL_SetJoystickRumble(port, leftRumble, rightRumble, leftTriggerRumble,
+                               rightTriggerRumble);
 }
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    setJoystickOutputs
- * Signature: (BIII)I
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    setJoystickLeds
+ * Signature: (BI)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_setJoystickOutputs
-  (JNIEnv*, jclass, jbyte port, jint outputs, jint leftRumble, jint rightRumble)
+Java_org_wpilib_hardware_hal_DriverStationJNI_setJoystickLeds
+  (JNIEnv*, jclass, jbyte port, jint leds)
 {
-  return HAL_SetJoystickOutputs(port, outputs, leftRumble, rightRumble);
+  return HAL_SetJoystickLeds(port, leds);
 }
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    getJoystickIsXbox
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    getJoystickIsGamepad
  * Signature: (B)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickIsXbox
+Java_org_wpilib_hardware_hal_DriverStationJNI_getJoystickIsGamepad
   (JNIEnv*, jclass, jbyte port)
 {
-  return HAL_GetJoystickIsXbox(port);
+  return HAL_GetJoystickIsGamepad(port);
 }
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    getJoystickType
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    getJoystickSupportedOutputs
  * Signature: (B)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickType
+Java_org_wpilib_hardware_hal_DriverStationJNI_getJoystickSupportedOutputs
   (JNIEnv*, jclass, jbyte port)
 {
-  return HAL_GetJoystickType(port);
+  return HAL_GetJoystickSupportedOutputs(port);
 }
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    getJoystickGamepadType
+ * Signature: (B)I
+ */
+JNIEXPORT jint JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_getJoystickGamepadType
+  (JNIEnv*, jclass, jbyte port)
+{
+  return HAL_GetJoystickGamepadType(port);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    getJoystickName
  * Signature: (B)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickName
+Java_org_wpilib_hardware_hal_DriverStationJNI_getJoystickName
   (JNIEnv* env, jclass, jbyte port)
 {
   WPI_String joystickName;
   HAL_GetJoystickName(&joystickName, port);
-  jstring str = MakeJString(env, wpi::to_string_view(&joystickName));
+  jstring str = MakeJString(env, wpi::util::to_string_view(&joystickName));
   WPI_FreeString(&joystickName);
   return str;
 }
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    getJoystickAxisType
- * Signature: (BB)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxisType
-  (JNIEnv*, jclass, jbyte joystickNum, jbyte axis)
-{
-  return HAL_GetJoystickAxisType(joystickNum, axis);
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    getMatchTime
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getMatchTime
+Java_org_wpilib_hardware_hal_DriverStationJNI_getMatchTime
   (JNIEnv* env, jclass)
 {
   int32_t status = 0;
@@ -369,12 +297,12 @@ Java_edu_wpi_first_hal_DriverStationJNI_getMatchTime
 }
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    getMatchInfo
  * Signature: (Ljava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getMatchInfo
+Java_org_wpilib_hardware_hal_DriverStationJNI_getMatchInfo
   (JNIEnv* env, jclass, jobject info)
 {
   HAL_MatchInfo matchInfo;
@@ -386,85 +314,149 @@ Java_edu_wpi_first_hal_DriverStationJNI_getMatchInfo
 }
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    getGameData
+ * Signature: (Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_getGameData
+  (JNIEnv* env, jclass, jstring existing)
+{
+  HAL_GameData gameData;
+  HAL_GetGameData(&gameData);
+  std::string_view newView{gameData.gameData};
+  if (existing != nullptr) {
+    // Load existing, see if it matches return old
+    JStringRef existingStr{env, existing};
+    std::string_view existingView{existingStr};
+    if (existingView == newView) {
+      return existing;
+    }
+  }
+  return MakeJString(env, newView);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    sendError
- * Signature: (ZIZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)I
+ * Signature: (ZILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_sendError
-  (JNIEnv* env, jclass, jboolean isError, jint errorCode, jboolean isLVCode,
-   jstring details, jstring location, jstring callStack, jboolean printMsg)
+Java_org_wpilib_hardware_hal_DriverStationJNI_sendError
+  (JNIEnv* env, jclass, jboolean isError, jint errorCode, jstring details,
+   jstring location, jstring callStack, jboolean printMsg)
 {
   JStringRef detailsStr{env, details};
   JStringRef locationStr{env, location};
   JStringRef callStackStr{env, callStack};
 
-  jint returnValue =
-      HAL_SendError(isError, errorCode, isLVCode, detailsStr.c_str(),
-                    locationStr.c_str(), callStackStr.c_str(), printMsg);
+  WPI_String detailsWpiStr = wpi::util::make_string(detailsStr);
+  WPI_String locationWpiStr = wpi::util::make_string(locationStr);
+  WPI_String callStackWpiStr = wpi::util::make_string(callStackStr);
+
+  jint returnValue = HAL_SendError(isError, errorCode, &detailsWpiStr,
+                                   &locationWpiStr, &callStackWpiStr, printMsg);
   return returnValue;
 }
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    sendConsoleLine
  * Signature: (Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_sendConsoleLine
+Java_org_wpilib_hardware_hal_DriverStationJNI_sendConsoleLine
   (JNIEnv* env, jclass, jstring line)
 {
   JStringRef lineStr{env, line};
 
-  jint returnValue = HAL_SendConsoleLine(lineStr.c_str());
+  WPI_String lineWpiStr = wpi::util::make_string(lineStr);
+  jint returnValue = HAL_SendConsoleLine(&lineWpiStr);
   return returnValue;
 }
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    sendProgramCrash
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_sendProgramCrash
+  (JNIEnv* env, jclass, jstring details, jstring location, jstring callStack)
+{
+  JStringRef detailsStr{env, details};
+  JStringRef locationStr{env, location};
+  JStringRef callStackStr{env, callStack};
+
+  WPI_String detailsWpiStr = wpi::util::make_string(detailsStr);
+  WPI_String locationWpiStr = wpi::util::make_string(locationStr);
+  WPI_String callStackWpiStr = wpi::util::make_string(callStackStr);
+
+  jint returnValue =
+      HAL_SendProgramCrash(&detailsWpiStr, &locationWpiStr, &callStackWpiStr);
+  return returnValue;
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    refreshDSData
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_refreshDSData
+Java_org_wpilib_hardware_hal_DriverStationJNI_refreshDSData
   (JNIEnv*, jclass)
 {
   return HAL_RefreshDSData();
 }
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    provideNewDataEventHandle
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_provideNewDataEventHandle
+Java_org_wpilib_hardware_hal_DriverStationJNI_provideNewDataEventHandle
   (JNIEnv*, jclass, jint handle)
 {
   HAL_ProvideNewDataEventHandle(handle);
 }
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    removeNewDataEventHandle
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_removeNewDataEventHandle
+Java_org_wpilib_hardware_hal_DriverStationJNI_removeNewDataEventHandle
   (JNIEnv*, jclass, jint handle)
 {
   HAL_RemoveNewDataEventHandle(handle);
 }
 
 /*
- * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    getOutputsActive
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getOutputsActive
+Java_org_wpilib_hardware_hal_DriverStationJNI_getOutputsActive
   (JNIEnv*, jclass)
 {
   return HAL_GetOutputsEnabled();
 }
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    writeDisplayAnsi
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_writeDisplayAnsi
+  (JNIEnv* env, jclass, jstring data)
+{
+  JStringRef dataStr{env, data};
+  WPI_String dataWpiStr = dataStr.wpi_str();
+  HAL_WriteDisplayAnsi(&dataWpiStr);
+}
+
 }  // extern "C"

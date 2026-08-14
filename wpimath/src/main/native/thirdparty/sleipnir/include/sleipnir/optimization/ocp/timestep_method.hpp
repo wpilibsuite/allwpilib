@@ -6,9 +6,7 @@
 
 namespace slp {
 
-/**
- * Enum describing the type of system timestep.
- */
+/// Enum describing the type of system timestep.
 enum class TimestepMethod : uint8_t {
   /// The timestep is a fixed constant.
   FIXED,

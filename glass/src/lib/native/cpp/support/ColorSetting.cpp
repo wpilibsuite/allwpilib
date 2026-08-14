@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/support/ColorSetting.h"
+#include "wpi/glass/support/ColorSetting.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 ColorSetting::ColorSetting(std::vector<float>& color) : m_color{color} {
   m_color.resize(4);

@@ -1,0 +1,99 @@
+load("@rules_jvm_external//:defs.bzl", "maven_export")
+load("@rules_python//python:defs.bzl", "py_test")
+load(":build_java_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates", "build_tests", "first_level_folders")
+
+command_folders = first_level_folders(
+    glob(["src/main/java/org/wpilib/commands/*/*.java"]),
+    "src/main/java/org/wpilib/commands/",
+)
+
+example_folders = first_level_folders(
+    glob(["src/main/java/org/wpilib/examples/*/Robot.java"]),
+    "src/main/java/org/wpilib/examples/",
+)
+
+snippet_folders = first_level_folders(
+    glob(["src/main/java/org/wpilib/snippets/*/Robot.java"]),
+    "src/main/java/org/wpilib/snippets/",
+)
+
+template_folders = first_level_folders(
+    glob(["src/main/java/org/wpilib/templates/*/Robot.java"]),
+    "src/main/java/org/wpilib/templates/",
+)
+
+example_test_folders = first_level_folders(
+    glob(["src/test/java/org/wpilib/examples/*/**/*.java"]),
+    "src/test/java/org/wpilib/examples/",
+)
+
+snippet_test_folders = first_level_folders(
+    glob(["src/test/java/org/wpilib/snippets/*/**/*.java"]),
+    "src/test/java/org/wpilib/snippets/",
+)
+
+halsim_deps = [
+]
+
+build_commands(folders = command_folders)
+
+build_examples(
+    folders = example_folders,
+    halsim_deps = halsim_deps,
+)
+
+build_snippets(folders = snippet_folders)
+
+build_templates(folders = template_folders)
+
+[
+    py_test(
+        name = kind + "_check",
+        size = "small",
+        srcs = ["//shared:examplecheck.py"],
+        data = [
+            "src/main/java/org/wpilib/{kind}/{kind}.json".format(kind = kind),
+        ] + glob(["src/main/java/org/wpilib/{}/*/*.java".format(kind)]),
+        env = {
+            "EXAMPLECHECK_FOLDER": "wpilibjExamples/src/main/java/org/wpilib/" + kind,
+            "EXAMPLECHECK_KIND": kind,
+        },
+        main = "//shared:examplecheck.py",
+        tags = [
+            "no-ide",
+            "smoketest",
+        ],
+    )
+    for kind in [
+        "commands",
+        "examples",
+        "snippets",
+        "templates",
+    ]
+]
+
+build_tests(
+    example_test_folders = example_test_folders,
+    snippet_test_folders = snippet_test_folders,
+)
+
+maven_export(
+    name = "examples_publish",
+    maven_coordinates = "org.wpilib.wpilibj:examples:$(WPILIB_VERSION)",
+    target = ":examples-zip",
+    visibility = ["//visibility:public"],
+)
+
+maven_export(
+    name = "commands_publish",
+    maven_coordinates = "org.wpilib.wpilibj:commands:$(WPILIB_VERSION)",
+    target = ":commands-zip",
+    visibility = ["//visibility:public"],
+)
+
+maven_export(
+    name = "templates_publish",
+    maven_coordinates = "org.wpilib.wpilibj:templates:$(WPILIB_VERSION)",
+    target = ":templates-zip",
+    visibility = ["//visibility:public"],
+)

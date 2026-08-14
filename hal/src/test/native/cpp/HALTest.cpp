@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include "wpi/hal/HAL.h"
 
-#include "hal/HAL.h"
+#include <catch2/catch_test_macros.hpp>
 
-namespace hal {
-TEST(HALTest, RuntimeType) {
-  EXPECT_EQ(HAL_RuntimeType::HAL_Runtime_Simulation, HAL_GetRuntimeType());
+namespace wpi::hal {
+TEST_CASE("HALTest RuntimeType", "[hal]") {
+  CHECK(HAL_RuntimeType::HAL_RUNTIME_SIMULATION == HAL_GetRuntimeType());
 }
-}  // namespace hal
+}  // namespace wpi::hal

@@ -2,20 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/smartdashboard/Mechanism2d.h"
+#include "wpi/smartdashboard/Mechanism2d.hpp"
 
 #include <memory>
 #include <string_view>
 
-#include <networktables/NTSendableBuilder.h>
+#include "wpi/nt/NTSendableBuilder.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 static constexpr std::string_view kBackgroundColor = "backgroundColor";
 static constexpr std::string_view kDims = "dims";
 
 Mechanism2d::Mechanism2d(double width, double height,
-                         const Color8Bit& backgroundColor)
+                         const wpi::util::Color8Bit& backgroundColor)
     : m_width{width}, m_height{height} {
   SetBackgroundColor(backgroundColor);
 }
@@ -30,14 +30,14 @@ MechanismRoot2d* Mechanism2d::GetRoot(std::string_view name, double x,
   return &it->second;
 }
 
-void Mechanism2d::SetBackgroundColor(const Color8Bit& color) {
+void Mechanism2d::SetBackgroundColor(const wpi::util::Color8Bit& color) {
   m_color = color.HexString();
   if (m_colorPub) {
     m_colorPub.Set(m_color);
   }
 }
 
-void Mechanism2d::InitSendable(nt::NTSendableBuilder& builder) {
+void Mechanism2d::InitSendable(wpi::nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("Mechanism2d");
 
   std::scoped_lock lock(m_mutex);

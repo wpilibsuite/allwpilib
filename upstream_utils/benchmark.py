@@ -35,7 +35,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "benchmark"
     url = "https://github.com/google/benchmark.git"
-    tag = "v1.9.4"
+    tag = "v1.9.5"
 
     benchmark = Lib(name, url, tag, copy_upstream_src)
     benchmark.main()

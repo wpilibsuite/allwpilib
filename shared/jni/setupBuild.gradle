@@ -1,8 +1,8 @@
 apply plugin: 'cpp'
 apply plugin: 'google-test-test-suite'
 apply plugin: 'visual-studio'
-apply plugin: 'edu.wpi.first.NativeUtils'
-apply plugin: 'edu.wpi.first.GradleJni'
+apply plugin: 'org.wpilib.NativeUtils'
+apply plugin: 'org.wpilib.GradleJni'
 apply plugin: SingleNativeBuild
 apply plugin: ExtraTasks
 
@@ -10,7 +10,7 @@ apply from: "${rootDir}/shared/config.gradle"
 
 ext {
     baseId = nativeName
-    groupId = "edu.wpi.first.${nativeName}"
+    groupId = "org.wpilib.${nativeName}"
 }
 
 apply from: "${rootDir}/shared/java/javacommon.gradle"
@@ -24,13 +24,10 @@ dependencies {
 
 project(':').libraryBuild.dependsOn build
 
-ext {
-    staticGtestConfigs = [:]
-}
+def nativeTestSuiteName = project.findProperty('nativeTestSuiteName') ?: "${nativeName}Test"
 
-staticGtestConfigs["${nativeName}Test"] = []
-
-apply from: "${rootDir}/shared/googletest.gradle"
+apply from: "${rootDir}/shared/catch2.gradle"
+apply from: "${rootDir}/shared/libmrclib.gradle"
 
 model {
     components {
@@ -110,8 +107,7 @@ model {
 
             enableCheckTask !project.hasProperty('skipJniCheck')
             javaCompileTasks << compileJava
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.systemcore)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
             sources {
                 cpp {
@@ -173,9 +169,6 @@ model {
                 if (!project.hasProperty('noWpiutil')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
-                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                        nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
-                    }
                 }
                 if (project.hasProperty('exeSplitSetup')) {
                     exeSplitSetup(it)
@@ -197,7 +190,7 @@ model {
         }
     }
     testSuites {
-        "${nativeName}Test"(GoogleTestTestSuiteSpec) {
+        "${nativeTestSuiteName}"(GoogleTestTestSuiteSpec) {
             for(NativeComponentSpec c : $.components) {
                 if (c.name == nativeName) {
                     testing c
@@ -226,9 +219,6 @@ model {
             if (!project.hasProperty('noWpiutil')) {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilTestLib', linkage: 'shared'
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
-                }
             }
             if (project.hasProperty('exeSplitSetup')) {
                 exeSplitSetup(it)
@@ -279,11 +269,6 @@ apply from: "${rootDir}/shared/cppJavaDesktopTestTask.gradle"
 
 ext.getJniSpecClass = {
     return JniNativeLibrarySpec
-}
-
-tasks.withType(RunTestExecutable) {
-    args "--gtest_output=xml:test_detail.xml"
-    outputs.dir outputDir
 }
 
 apply from: "${rootDir}/shared/jni/publish.gradle"

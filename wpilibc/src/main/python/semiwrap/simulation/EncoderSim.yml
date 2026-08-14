@@ -1,0 +1,37 @@
+extra_includes:
+- wpi/hardware/rotation/Encoder.hpp
+
+classes:
+  wpi::sim::EncoderSim:
+    force_type_casters:
+    - std::function
+    methods:
+      EncoderSim:
+        overloads:
+          const Encoder&:
+      CreateForChannel:
+      CreateForIndex:
+      RegisterInitializedCallback:
+      GetInitialized:
+      SetInitialized:
+      RegisterCountCallback:
+      GetCount:
+      SetCount:
+      RegisterRateCallback:
+      RegisterResetCallback:
+      GetReset:
+      SetReset:
+      RegisterDirectionCallback:
+      GetDirection:
+      SetDirection:
+      RegisterReverseDirectionCallback:
+      GetReverseDirection:
+      SetReverseDirection:
+      RegisterDistancePerPulseCallback:
+      GetDistancePerPulse:
+      SetDistancePerPulse:
+      ResetData:
+      SetDistance:
+      GetDistance:
+      SetRate:
+      GetRate:

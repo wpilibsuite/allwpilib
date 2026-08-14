@@ -1,0 +1,58 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package org.wpilib.math.trajectory;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+
+class TrajectoryConcatenateTest {
+  @Test
+  void testStates() {
+    var t1 =
+        DrivetrainSplineTrajectoryGenerator.generate(
+            Pose2d.kZero,
+            List.of(),
+            new Pose2d(1, 1, Rotation2d.kZero),
+            new TrajectoryConfig(2, 2));
+
+    var t2 =
+        DrivetrainSplineTrajectoryGenerator.generate(
+            new Pose2d(1, 1, Rotation2d.kZero),
+            List.of(),
+            new Pose2d(2, 2, Rotation2d.fromDegrees(45)),
+            new TrajectoryConfig(2, 2));
+
+    var t = t1.concatenate(t2);
+
+    double time = -1.0;
+    for (int i = 0; i < t.samples.size(); ++i) {
+      var state = t.samples.get(i);
+
+      // Make sure that the times are strictly increasing.
+      assertTrue(state.time >= time);
+      time = state.time;
+
+      // Ensure that the states in t are the same as those in t1 and t2.
+      if (i < t1.samples.size()) {
+        assertEquals(state, t1.samples.get(i));
+      } else {
+        // For the second trajectory, we need to account for the offset
+        var originalIndex = i - t1.samples.size();
+        if (originalIndex < t2.samples.size()) {
+          var st = t2.samples.get(originalIndex);
+          assertEquals(state.time, st.time + t1.duration, 1e-6);
+          assertEquals(state.pose, st.pose);
+          assertEquals(state.velocity, st.velocity);
+          assertEquals(state.acceleration, st.acceleration);
+        }
+      }
+    }
+  }
+}

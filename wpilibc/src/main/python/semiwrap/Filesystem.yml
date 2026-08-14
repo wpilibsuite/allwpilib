@@ -1,0 +1,7 @@
+functions:
+  GetOperatingDirectory:
+  GetDeployDirectory:
+  GetOperatingDirectoryFs:
+    ignore: true
+  GetDeployDirectoryFs:
+    ignore: true

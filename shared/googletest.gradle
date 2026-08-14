@@ -1,7 +1,0 @@
-model {
-    binaries {
-        withType(GoogleTestTestSuiteBinarySpec).all {
-            lib project: ':thirdparty:googletest', library: 'googletest', linkage: 'static'
-        }
-    }
-}

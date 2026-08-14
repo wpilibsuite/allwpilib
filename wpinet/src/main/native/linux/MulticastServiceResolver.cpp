@@ -2,19 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/MulticastServiceResolver.h"
+#include "wpi/net/MulticastServiceResolver.hpp"
+
+#include <arpa/inet.h>
 
 #include <memory>
 #include <string>
 #include <utility>
 
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/mutex.h>
+#include "AvahiClient.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/mutex.hpp"
 
-#include "AvahiClient.h"
-
-using namespace wpi;
+using namespace wpi::net;
 
 struct MulticastServiceResolver::Impl {
   AvahiFunctionTable& table = AvahiFunctionTable::Get();
@@ -44,6 +45,26 @@ bool MulticastServiceResolver::HasImplementation() const {
   return pImpl->table.IsValid();
 }
 
+bool MulticastServiceResolver::SetCopyCallback(
+    std::function<bool(const ServiceData&)> callback) {
+  std::scoped_lock lock{*pImpl->thread};
+  if (pImpl->client) {
+    return false;
+  }
+  copyCallback = std::move(callback);
+  return true;
+}
+
+bool MulticastServiceResolver::SetMoveCallback(
+    std::function<void(ServiceData&&)> callback) {
+  std::scoped_lock lock{*pImpl->thread};
+  if (pImpl->client) {
+    return false;
+  }
+  moveCallback = std::move(callback);
+  return true;
+}
+
 static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
                             AvahiProtocol protocol, AvahiResolverEvent event,
                             const char* name, const char* type,
@@ -67,12 +88,12 @@ static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
           // Todo make this just do key
           continue;
         }
-        std::string_view key = wpi::substr(value, 0, splitIndex);
-        value =
-            wpi::substr(value, splitIndex + 1, value.size() - splitIndex - 1);
+        std::string_view key = wpi::util::substr(value, 0, splitIndex);
+        value = wpi::util::substr(value, splitIndex + 1,
+                                  value.size() - splitIndex - 1);
         data.txt.emplace_back(std::pair<std::string, std::string>{key, value});
       }
-      wpi::SmallString<256> outputHostName;
+      wpi::util::SmallString<256> outputHostName;
       char label[256];
       do {
         impl->table.unescape_label(&host_name, label, sizeof(label));
@@ -83,8 +104,8 @@ static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
         outputHostName.append(".");
       } while (true);
 
-      data.ipv4Address = address->data.ipv4.address;
-      data.port = port;
+      data.ipv4Address = ntohl(address->data.ipv4.address);
+      data.port = ntohs(port);
       data.serviceName = name;
       data.hostName = std::string{outputHostName};
 

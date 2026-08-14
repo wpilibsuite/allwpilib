@@ -2,12 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "RobotContainer.h"
+#include "RobotContainer.hpp"
 
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <frc2/command/Commands.h>
-
-#include "commands/TeleopArcadeDrive.h"
+#include "commands/TeleopArcadeDrive.hpp"
+#include "wpi/commands2/Commands.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 
 RobotContainer::RobotContainer() {
   // Configure the button bindings
@@ -16,20 +15,20 @@ RobotContainer::RobotContainer() {
 
 void RobotContainer::ConfigureButtonBindings() {
   // Also set default commands here
-  m_drive.SetDefaultCommand(TeleopArcadeDrive(
-      &m_drive, [this] { return -m_controller.GetRawAxis(1); },
-      [this] { return -m_controller.GetRawAxis(2); }));
+  drive.SetDefaultCommand(TeleopArcadeDrive(
+      &drive, [this] { return -controller.GetRawAxis(1); },
+      [this] { return -controller.GetRawAxis(2); }));
 
   // Example of how to use the onboard IO
-  m_onboardButtonA.OnTrue(frc2::cmd::Print("Button A Pressed"))
-      .OnFalse(frc2::cmd::Print("Button A Released"));
+  onboardButtonA.OnTrue(wpi::cmd::Print("Button A Pressed"))
+      .OnFalse(wpi::cmd::Print("Button A Released"));
 
   // Setup SmartDashboard options.
-  m_chooser.SetDefaultOption("Auto Routine Distance", &m_autoDistance);
-  m_chooser.AddOption("Auto Routine Time", &m_autoTime);
-  frc::SmartDashboard::PutData("Auto Selector", &m_chooser);
+  chooser.SetDefaultOption("Auto Routine Distance", &autoDistance);
+  chooser.AddOption("Auto Routine Time", &autoTime);
+  wpi::SmartDashboard::PutData("Auto Selector", &chooser);
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
-  return m_chooser.GetSelected();
+wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {
+  return chooser.GetSelected();
 }
