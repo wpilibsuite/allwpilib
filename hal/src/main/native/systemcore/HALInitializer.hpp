@@ -4,19 +4,11 @@
 
 #pragma once
 
-#include <atomic>
+#include "../cpp/HALInitializer.hpp"
 
 namespace wpi::hal::init {
-extern std::atomic_bool HAL_IsInitialized;
-extern void RunInitialize();
-inline void CheckInit() {
-  if (HAL_IsInitialized.load(std::memory_order_relaxed)) {
-    return;
-  }
-  RunInitialize();
-}
-
 extern void InitializeCTREPCM();
+extern void InitializeA301();
 extern void InitializeREVPH();
 extern void InitializeAddressableLED();
 extern void InitializeAnalogInput();

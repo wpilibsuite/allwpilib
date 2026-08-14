@@ -86,6 +86,7 @@ void InitializeHAL() {
   InitializeAnalogInput();
   InitializeAnalogInternal();
   InitializeCAN();
+  InitializeA301();
   InitializeCounter();
   InitializeDigitalInternal();
   InitializeDIO();

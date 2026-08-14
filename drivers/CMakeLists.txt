@@ -22,6 +22,7 @@ target_include_directories(
 
 install(TARGETS drivers EXPORT drivers)
 export(TARGETS drivers FILE drivers.cmake NAMESPACE drivers::)
+install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/drivers")
 install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/drivers")
 
 configure_file(drivers-config.cmake.in ${WPILIB_BINARY_DIR}/drivers-config.cmake)
