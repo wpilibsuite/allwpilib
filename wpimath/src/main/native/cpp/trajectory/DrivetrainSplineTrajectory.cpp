@@ -60,7 +60,8 @@ DrivetrainSplineSample DrivetrainSplineTrajectory::Interpolate(
   const auto interpolationFrac =
       newS / end.pose.Translation().Distance(start.pose.Translation());
 
-  Pose2d newPose = start.pose + (end.pose - start.pose) * interpolationFrac;
+  Pose2d newPose =
+      start.pose + (end.pose - start.pose) * interpolationFrac.value();
   auto newAccel =
       wpi::util::Lerp(startForwardAccel, end.ForwardAcceleration(), t);
   auto newCurvature = wpi::util::Lerp(start.curvature, end.curvature, t);
