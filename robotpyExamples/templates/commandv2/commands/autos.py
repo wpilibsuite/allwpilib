@@ -8,5 +8,5 @@ from subsystems.examplesubsystem import ExampleSubsystem
 from commands.examplecommand import ExampleCommand
 
 class Autos:
-    async def example_auto(subsystem: ExampleSubsystem) -> commands2.Command:
+    def example_auto(subsystem: ExampleSubsystem) -> commands2.Command:
         return commands2.SequentialCommandGroup(ExampleSubsystem.example_method_command(subsystem), ExampleCommand(subsystem))

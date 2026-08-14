@@ -7,7 +7,6 @@
 import wpilib
 from wpilib import OpModeRobot
 
-
 # The methods in this class are called automatically as described in the OpModeRobot documentation.
 # OpMode classes anywhere in the package (or sub-packages) where this class is located are
 # automatically registered to display in the Driver Station. If you change the name of this class

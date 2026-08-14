@@ -10,6 +10,7 @@ from commands2 import CommandScheduler
 
 class MyRobot(commands2.TimedCommandRobot):
     def __init__(self) -> None:
+        super().__init__()
         self.robotContainer = RobotContainer()
 
     def robot_periodic(self) -> None:
