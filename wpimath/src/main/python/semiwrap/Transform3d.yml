@@ -22,6 +22,7 @@ classes:
       Y:
       Z:
       ToMatrix:
+      ToTransform2d:
       Rotation:
       Inverse:
       operator*:
