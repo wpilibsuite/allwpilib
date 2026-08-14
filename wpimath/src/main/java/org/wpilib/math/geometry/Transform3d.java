@@ -258,6 +258,14 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
   }
 
   /**
+   * Returns a Transform2d from the Translation3d and Rotation3d
+   * @return new Transform2d reference
+   */
+  public Transform2d toTransform2d() {
+    return new Transform2d(m_translation.toTranslation2d() ,m_rotation.toRotation2d());
+  }
+
+  /**
    * Returns a Twist3d of the current transform (pose delta). If b is the output of {@code a.log()},
    * then {@code b.exp()} would yield a.
    *
