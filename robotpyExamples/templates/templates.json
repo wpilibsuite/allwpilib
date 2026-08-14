@@ -32,7 +32,7 @@
     "gradlebase": "python",
     "robotclass": "robot",
     "commandversion": 2
-  }
+  },
   {
     "name": "Timed Robot",
     "description": "Timed style, with explanatory comments and example code.",
