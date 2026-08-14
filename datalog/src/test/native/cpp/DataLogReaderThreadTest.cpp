@@ -66,8 +66,7 @@ TEST_CASE("DataLogReaderThreadTest MalformedProtobufDescriptor",
   wpi::log::DataLogReaderThread thread{wpi::log::DataLogReader{
       wpi::util::MemoryBuffer::GetMemBufferCopy(output, "malformed-proto")}};
   REQUIRE(WaitForDone(thread, std::chrono::seconds{2}));
-  CHECK(upb_DefPool_FindFileByName(thread.GetProtobufDatabase(), "x") ==
-        nullptr);
+  CHECK(thread.GetProtobufDatabase().Find("x") == nullptr);
 }
 
 TEST_CASE("DataLogReaderThreadTest EntryCallbackCanQueryEntries",
