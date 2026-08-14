@@ -18,6 +18,7 @@ import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Units;
 import org.wpilib.units.measure.Angle;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
