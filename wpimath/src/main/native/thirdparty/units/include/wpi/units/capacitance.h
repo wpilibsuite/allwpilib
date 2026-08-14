@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -60,7 +60,7 @@ namespace wpi::units
 	 */
 	UNIT_ADD_WITH_METRIC_PREFIXES(capacitance, farads, F, conversion_factor<std::ratio<1>, dimension::capacitance>)
 
-	UNIT_ADD_DIMENSION_TRAIT(capacitance)
+	UNIT_ADD_DIMENSION_TRAIT(capacitance, Capacitance)
 } // namespace wpi::units
 
 #endif // units_capacitance_h__

@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -58,12 +58,41 @@ namespace wpi::units
 	 * @anchor		dataContainers
 	 * @sa			See unit for more information on unit type containers.
 	 */
-	UNIT_ADD_WITH_METRIC_AND_BINARY_PREFIXES(data, bytes, B, conversion_factor<std::ratio<1>, dimension::data>)
+	// Byte quantities are always at least one, so only the large decimal prefixes (kilo and up) and the
+	// binary prefixes are meaningful; the sub-unit prefixes (deci/centi/milli/... and deca/hecto) are not
+	// spelled out. This also frees the `_dB` literal for the dimensionless decibel, since `decibytes`
+	// would otherwise claim it.
+	UNIT_ADD(data, bytes, B, conversion_factor<std::ratio<1>, dimension::data>)
+	UNIT_ADD(data, kilobytes, kB, kilo<bytes<>>)
+	UNIT_ADD(data, megabytes, MB, mega<bytes<>>)
+	UNIT_ADD(data, gigabytes, GB, giga<bytes<>>)
+	UNIT_ADD(data, terabytes, TB, tera<bytes<>>)
+	UNIT_ADD(data, petabytes, PB, peta<bytes<>>)
 	UNIT_ADD(data, exabytes, EB, conversion_factor<std::ratio<1000>, petabytes_>)
-	UNIT_ADD_WITH_METRIC_AND_BINARY_PREFIXES(data, bits, b, conversion_factor<std::ratio<1, 8>, bytes_>)
-	UNIT_ADD(data, exabits, Eb, conversion_factor<std::ratio<1000>, petabits_>)
+	UNIT_ADD(data, kibibytes, KiB, kibi<bytes<>>)
+	UNIT_ADD(data, mebibytes, MiB, mebi<bytes<>>)
+	UNIT_ADD(data, gibibytes, GiB, gibi<bytes<>>)
+	UNIT_ADD(data, tebibytes, TiB, tebi<bytes<>>)
+	UNIT_ADD(data, pebibytes, PiB, pebi<bytes<>>)
+	UNIT_ADD(data, exbibytes, EiB, exbi<bytes<>>)
 
-	UNIT_ADD_DIMENSION_TRAIT(data)
+	UNIT_ADD(data, bits, b, conversion_factor<std::ratio<1, 8>, bytes_>)
+	UNIT_ADD(data, kilobits, kb, kilo<bits<>>)
+	UNIT_ADD(data, megabits, Mb, mega<bits<>>)
+	UNIT_ADD(data, gigabits, Gb, giga<bits<>>)
+	UNIT_ADD(data, terabits, Tb, tera<bits<>>)
+	UNIT_ADD(data, petabits, Pb, peta<bits<>>)
+	UNIT_ADD(data, exabits, Eb, conversion_factor<std::ratio<1000>, petabits_>)
+	UNIT_ADD(data, kibibits, Kib, kibi<bits<>>)
+	UNIT_ADD(data, mebibits, Mib, mebi<bits<>>)
+	UNIT_ADD(data, gibibits, Gib, gibi<bits<>>)
+	UNIT_ADD(data, tebibits, Tib, tebi<bits<>>)
+	UNIT_ADD(data, pebibits, Pib, pebi<bits<>>)
+	UNIT_ADD(data, exbibits, Eib, exbi<bits<>>)
+
+	UNIT_ADD(data, nibbles, nibble, conversion_factor<std::ratio<4>, bits_>)
+
+	UNIT_ADD_DIMENSION_TRAIT(data, Data)
 } // namespace wpi::units
 
 #endif // units_data_h_

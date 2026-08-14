@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -70,7 +70,7 @@ namespace wpi::units
 	UNIT_ADD(density, pounds_per_gallon, lb_per_gal, compound_conversion_factor<mass::pounds<>, inverse<gallons<>>>)
 	UNIT_ADD(density, slugs_per_cubic_foot, slug_per_ft3, compound_conversion_factor<slugs<>, inverse<cubic_feet<>>>)
 
-	UNIT_ADD_DIMENSION_TRAIT(density)
+	UNIT_ADD_DIMENSION_TRAIT(density, Density)
 } // namespace wpi::units
 
 #endif // units_density_h_

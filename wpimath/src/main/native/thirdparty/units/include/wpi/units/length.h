@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -53,8 +53,8 @@ namespace wpi::units
 	/**
 	 * @namespace	wpi::units::length
 	 * @brief		namespace for unit types and containers representing length values
-	 * @details		The SI unit for length is `meters`, and the corresponding `dimension` dimension is
-	 *				`length_unit`.
+	 * @details		The SI unit for length is `meters`, and the corresponding dimension concept is
+	 *				`Length` (backed by the `traits::is_length_unit_v` trait).
 	 * @anchor		lengthContainers
 	 * @sa			See unit for more information on unit type containers.
 	 */
@@ -81,7 +81,15 @@ namespace wpi::units
 	template<class Underlying>
 	using metres = meters<Underlying>;
 
-	UNIT_ADD_DIMENSION_TRAIT(length)
+	UNIT_ADD(length, rods, rod, conversion_factor<std::ratio<1, 4>, chains<>>)
+	UNIT_ADD(length, links, li, conversion_factor<std::ratio<1, 100>, chains<>>)
+	UNIT_ADD(length, barleycorns, bc, conversion_factor<std::ratio<1, 3>, inches<>>)
+	UNIT_ADD(length, nails, nail, conversion_factor<std::ratio<1, 16>, yards<>>)
+	UNIT_ADD(length, spans, span, conversion_factor<std::ratio<9>, inches<>>)
+	UNIT_ADD(length, picas, pica, conversion_factor<std::ratio<1, 6>, inches<>>)
+	UNIT_ADD(length, points, pnt, conversion_factor<std::ratio<1, 72>, inches<>>)
+
+	UNIT_ADD_DIMENSION_TRAIT(length, Length)
 } // namespace wpi::units
 
 #endif // units_length_h_

@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -62,7 +62,10 @@ namespace wpi::units
 	UNIT_ADD_WITH_METRIC_PREFIXES(charge, coulombs, C, conversion_factor<std::ratio<1>, dimension::charge>)
 	UNIT_ADD_WITH_METRIC_PREFIXES(charge, ampere_hours, Ah, compound_conversion_factor<amperes_, hours_>)
 
-	UNIT_ADD_DIMENSION_TRAIT(charge)
+	UNIT_ADD(charge, abcoulombs, abC, conversion_factor<std::ratio<10>, coulombs_>)
+	UNIT_ADD(charge, statcoulombs, statC, conversion_factor<std::ratio<1, 2997924580LL>, coulombs_>)
+
+	UNIT_ADD_DIMENSION_TRAIT(charge, Charge)
 } // namespace wpi::units
 
 #endif // units_charge_h_

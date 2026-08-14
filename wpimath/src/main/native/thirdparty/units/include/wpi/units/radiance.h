@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -58,7 +58,7 @@ namespace wpi::units
 	 */
 	UNIT_ADD_WITH_METRIC_PREFIXES(radiance, watts_per_steradian_per_meter_squared, W_per_srm2, conversion_factor<std::ratio<1>, dimension::radiance>)
 
-	UNIT_ADD_DIMENSION_TRAIT(radiance)
+	UNIT_ADD_DIMENSION_TRAIT(radiance, Radiance)
 } // namespace wpi::units
 
 #endif // units_radiance_h_

@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Joseph Eng <91924258+KangarooKoala@users.noreply.github.com>
 Date: Fri, 12 Dec 2025 15:08:27 -0800
-Subject: [PATCH 06/10] Fix doxygen macro name typo
+Subject: [PATCH 4/9] Fix doxygen macro name typo
 
 ---
  include/units/core.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/include/units/core.h b/include/units/core.h
-index 8534e1e7637043d10af226d9167d89e96813877c..b4e182f1a88d4917e826e068a79227d2173a9fd9 100644
+index c2a4348f43b80e2d24cb6f6ab316809d3e53dfac..ef3567d76d0f3bed2491b0fcf745edbcc788a08b 100644
 --- a/include/units/core.h
 +++ b/include/units/core.h
-@@ -2055,7 +2055,7 @@ namespace units
+@@ -2516,7 +2516,7 @@ namespace units
  
  	namespace traits
  	{

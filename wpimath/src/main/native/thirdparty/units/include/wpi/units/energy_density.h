@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -61,7 +61,7 @@ namespace wpi::units
 	 */
 	UNIT_ADD_WITH_METRIC_PREFIXES(energy_density, joules_per_meter_cubed, J_per_m3, pascals_)
 
-	UNIT_ADD_DIMENSION_TRAIT(energy_density)
+	UNIT_ADD_DIMENSION_TRAIT(energy_density, EnergyDensity)
 } // namespace wpi::units
 
 #endif // units_energy_density_h_

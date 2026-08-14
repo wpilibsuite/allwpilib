@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -67,7 +67,7 @@ namespace wpi::units
 	UNIT_ADD(temperature, reaumur, Re, conversion_factor<std::ratio<10, 8>, celsius_>)
 	UNIT_ADD(temperature, rankine, Ra, conversion_factor<std::ratio<5, 9>, kelvin<>>)
 
-	UNIT_ADD_DIMENSION_TRAIT(temperature)
+	UNIT_ADD_DIMENSION_TRAIT(temperature, Temperature)
 } // namespace wpi::units
 
 #endif // units_temperature_h_

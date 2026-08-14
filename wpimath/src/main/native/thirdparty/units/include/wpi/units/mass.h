@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -66,9 +66,17 @@ namespace wpi::units
 	UNIT_ADD(mass, stone, st, conversion_factor<std::ratio<14>, pounds_>)
 	UNIT_ADD(mass, ounces, oz, conversion_factor<std::ratio<1, 16>, pounds_>)
 	UNIT_ADD(mass, carats, ct, conversion_factor<std::ratio<200>, milligrams_>)
-	UNIT_ADD(mass, slugs, slug, conversion_factor<std::ratio<145939029, 10000000>, kilograms_>)
+	UNIT_ADD(mass, slugs, slug, conversion_factor<std::ratio<8896443230521, 609600000000>, kilograms_>)
 
-	UNIT_ADD_DIMENSION_TRAIT(mass)
+	UNIT_ADD(mass, grains, gr, conversion_factor<std::ratio<1, 7000>, pounds_>)
+	UNIT_ADD(mass, avoirdupois_drams, dr_av, conversion_factor<std::ratio<1, 16>, ounces_>)
+	UNIT_ADD(mass, pennyweights, dwt, conversion_factor<std::ratio<24>, grains_>)
+	UNIT_ADD(mass, troy_ounces, ozt, conversion_factor<std::ratio<480>, grains_>)
+	UNIT_ADD(mass, troy_pounds, lbt, conversion_factor<std::ratio<12>, troy_ounces_>)
+	UNIT_ADD(mass, hundredweights, cwt, conversion_factor<std::ratio<112>, pounds_>)
+	UNIT_ADD(mass, short_hundredweights, sh_cwt, conversion_factor<std::ratio<100>, pounds_>)
+
+	UNIT_ADD_DIMENSION_TRAIT(mass, Mass)
 } // namespace wpi::units
 
 #endif // units_mass_h_

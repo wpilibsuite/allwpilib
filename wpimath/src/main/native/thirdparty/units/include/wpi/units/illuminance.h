@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -64,7 +64,7 @@ namespace wpi::units
 	UNIT_ADD(illuminance, lumens_per_square_inch, lm_per_in2, compound_conversion_factor<lumens_, inverse<squared<inches_>>>)
 	UNIT_ADD(illuminance, phots, ph, compound_conversion_factor<lumens_, inverse<squared<centimeters<>>>>)
 
-	UNIT_ADD_DIMENSION_TRAIT(illuminance)
+	UNIT_ADD_DIMENSION_TRAIT(illuminance, Illuminance)
 } // namespace wpi::units
 
 #endif // units_illuminance_h_

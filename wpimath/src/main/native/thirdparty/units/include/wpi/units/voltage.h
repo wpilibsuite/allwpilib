@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -59,10 +59,10 @@ namespace wpi::units
 	 * @sa			See unit for more information on unit type containers.
 	 */
 	UNIT_ADD_WITH_METRIC_PREFIXES(voltage, volts, V, conversion_factor<std::ratio<1>, dimension::voltage>)
-	UNIT_ADD(voltage, statvolts, statV, conversion_factor<std::ratio<1000000, 299792458>, volts_>)
+	UNIT_ADD(voltage, statvolts, statV, conversion_factor<std::ratio<299792458, 1000000>, volts_>)
 	UNIT_ADD(voltage, abvolts, abV, conversion_factor<std::ratio<1, 100000000>, volts_>)
 
-	UNIT_ADD_DIMENSION_TRAIT(voltage)
+	UNIT_ADD_DIMENSION_TRAIT(voltage, Voltage)
 } // namespace wpi::units
 
 #endif // units_voltage_h_

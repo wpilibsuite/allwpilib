@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -57,6 +57,7 @@
 	UNIT_ADD_STRONG_CONVERSION_FACTOR(namespaceName, namePlural, __VA_ARGS__)                                                                                  \
 	UNIT_ADD_UNIT_DEFINITION(namespaceName, namePlural, __VA_ARGS__)                                                                                           \
 	UNIT_ADD_NAME(namespaceName, namePlural, abbreviation)                                                                                                     \
+	UNIT_REGISTER_NAMED_CLASS(namespaceName, namePlural)                                                                                                       \
 	UNIT_ADD_LITERALS(namespaceName, namePlural, abbreviation)                                                                                                 \
 	UNIT_ADD_CONSTANT(namespaceName, namePlural, abbreviation##s)
 
@@ -79,7 +80,12 @@ namespace wpi::units
 	UNIT_ADD(time, julian_years, a_j, conversion_factor<std::ratio<31557600>, seconds_>)
 	UNIT_ADD(time, gregorian_years, a_g, conversion_factor<std::ratio<31556952>, seconds_>)
 
-	UNIT_ADD_DIMENSION_TRAIT(time)
+	UNIT_ADD(time, fortnights, fn, conversion_factor<std::ratio<14>, days_>)
+	UNIT_ADD(time, decades, dec, conversion_factor<std::ratio<10>, julian_years<>>)
+	UNIT_ADD(time, centuries, cent, conversion_factor<std::ratio<100>, julian_years<>>)
+	UNIT_ADD(time, millennia, kyr, conversion_factor<std::ratio<1000>, julian_years<>>)
+
+	UNIT_ADD_DIMENSION_TRAIT(time, Time)
 } // namespace wpi::units
 
 #endif // units_time_h_

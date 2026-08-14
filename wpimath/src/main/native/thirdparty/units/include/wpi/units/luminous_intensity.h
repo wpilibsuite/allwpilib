@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -60,7 +60,7 @@ namespace wpi::units
 	 */
 	UNIT_ADD_WITH_METRIC_PREFIXES(luminous_intensity, candelas, cd, conversion_factor<std::ratio<1>, dimension::luminous_intensity>)
 
-	UNIT_ADD_DIMENSION_TRAIT(luminous_intensity)
+	UNIT_ADD_DIMENSION_TRAIT(luminous_intensity, LuminousIntensity)
 } // namespace wpi::units
 
 #endif // units_luminous_intensity_h_

@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -55,7 +55,7 @@ namespace wpi::units
 	 * @brief		namespace for unit types and containers representing data values
 	 * @details		The dimension for data is `bytes`, and the corresponding `dimension` dimension is
 	 *				`data_unit`.
-	 * @anchor		dataContainers
+	 * @anchor		dataTransferRateContainers
 	 * @sa			See unit for more information on unit type containers.
 	 */
 	UNIT_ADD_WITH_METRIC_AND_BINARY_PREFIXES(data_transfer_rate, bytes_per_second, Bps, conversion_factor<std::ratio<1>, dimension::data_transfer_rate>)
@@ -63,7 +63,7 @@ namespace wpi::units
 	UNIT_ADD_WITH_METRIC_AND_BINARY_PREFIXES(data_transfer_rate, bits_per_second, bps, conversion_factor<std::ratio<1, 8>, bytes_per_second_>)
 	UNIT_ADD(data_transfer_rate, exabits_per_second, Ebps, conversion_factor<std::ratio<1000>, petabits_per_second_>)
 
-	UNIT_ADD_DIMENSION_TRAIT(data_transfer_rate)
+	UNIT_ADD_DIMENSION_TRAIT(data_transfer_rate, DataTransferRate)
 } // namespace wpi::units
 
 #endif // units_data_transfer_rate_h_

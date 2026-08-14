@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -63,7 +63,7 @@ namespace wpi::units
 	UNIT_ADD(concentration, parts_per_trillion, ppt, conversion_factor<std::ratio<1, 1000>, parts_per_billion_>)
 	UNIT_ADD(concentration, percent, pct, conversion_factor<std::ratio<1, 100>, dimension::dimensionless>)
 
-	UNIT_ADD_DIMENSION_TRAIT(concentration)
+	UNIT_ADD_DIMENSION_TRAIT(concentration, Concentration)
 } // namespace wpi::units
 
 #endif // units_concentration_h_

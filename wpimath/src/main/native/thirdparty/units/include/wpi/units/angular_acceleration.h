@@ -65,7 +65,7 @@ namespace wpi::units
 	UNIT_ADD(angular_acceleration, revolutions_per_minute_squared, rev_per_m_sq, compound_conversion_factor<turns_, inverse<squared<minutes_>>>)
 	UNIT_ADD(angular_acceleration, revolutions_per_minute_per_second, rev_per_m_per_s, compound_conversion_factor<turns_, inverse<minutes_>, inverse<seconds_>>)
 
-	UNIT_ADD_DIMENSION_TRAIT(angular_acceleration)
+	UNIT_ADD_DIMENSION_TRAIT(angular_acceleration, AngularAcceleration)
 } // namespace wpi::units
 
 #endif // units_angular_acceleration_h_

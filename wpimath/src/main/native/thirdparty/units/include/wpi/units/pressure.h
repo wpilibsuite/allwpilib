@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -78,7 +78,16 @@ namespace wpi::units
 	UNIT_ADD(pressure, millimeters_of_mercury, mmHg, conversion_factor<std::ratio<26664477483LL, 200000000LL>, pascals_>)
 	UNIT_ADD(pressure, inches_of_mercury, inHg, conversion_factor<std::ratio<254, 10>, millimeters_of_mercury_>)
 
-	UNIT_ADD_DIMENSION_TRAIT(pressure)
+	UNIT_ADD(pressure, technical_atmospheres, at, conversion_factor<std::ratio<1961330, 20>, pascals_>)
+	UNIT_ADD(pressure, pounds_per_square_foot, psf, compound_conversion_factor<force::pounds_, inverse<squared<feet_>>>)
+	UNIT_ADD(pressure, kips_per_square_inch, ksi, conversion_factor<std::ratio<1000>, pounds_per_square_inch_>)
+	UNIT_ADD(pressure, baryes, Ba, conversion_factor<std::ratio<1, 10>, pascals_>)
+	UNIT_ADD(pressure, piezes, pz, conversion_factor<std::ratio<1000>, pascals_>)
+	UNIT_ADD(pressure, centimeters_of_water, cmH2O, conversion_factor<std::ratio<1961330, 20000>, pascals_>)
+	UNIT_ADD(pressure, millimeters_of_water, mmH2O, conversion_factor<std::ratio<1, 10>, centimeters_of_water_>)
+	UNIT_ADD(pressure, inches_of_water, inH2O, conversion_factor<std::ratio<254, 100>, centimeters_of_water_>)
+
+	UNIT_ADD_DIMENSION_TRAIT(pressure, Pressure)
 } // namespace wpi::units
 
 #ifdef _MSC_VER

@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -60,7 +60,7 @@ namespace wpi::units
 	 */
 	UNIT_ADD_WITH_METRIC_PREFIXES(frequency, hertz, Hz, conversion_factor<std::ratio<1>, dimension::frequency>)
 
-	UNIT_ADD_DIMENSION_TRAIT(frequency)
+	UNIT_ADD_DIMENSION_TRAIT(frequency, Frequency)
 } // namespace wpi::units
 
 #endif // units_frequency_h_

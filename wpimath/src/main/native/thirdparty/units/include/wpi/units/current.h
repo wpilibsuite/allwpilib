@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -60,7 +60,18 @@ namespace wpi::units
 	 */
 	UNIT_ADD_WITH_METRIC_PREFIXES(current, amperes, A, conversion_factor<std::ratio<1>, dimension::current>)
 
-	UNIT_ADD_DIMENSION_TRAIT(current)
+	UNIT_ADD(current, abamperes, abA, conversion_factor<std::ratio<10>, amperes_>)
+	UNIT_ADD(current, statamperes, statA, conversion_factor<std::ratio<1, 2997924580LL>, amperes_>)
+
+	// the biot is the CGS-EMU name for the abampere (identical unit); provided as an alias, since two units
+	// cannot share the same conversion factor
+	inline namespace current
+	{
+		template<class Underlying = UNIT_LIB_DEFAULT_TYPE>
+		using biots = abamperes<Underlying>;
+	}
+
+	UNIT_ADD_DIMENSION_TRAIT(current, Current)
 } // namespace wpi::units
 
 #endif // units_current_h_

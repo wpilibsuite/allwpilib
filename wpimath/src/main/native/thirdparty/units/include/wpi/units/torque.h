@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -61,12 +61,21 @@ namespace wpi::units
 	 * @sa			See unit for more information on unit type containers.
 	 */
 	UNIT_ADD(torque, newton_meters, Nm, conversion_factor<std::ratio<1>, joules_>)
-	UNIT_ADD(torque, foot_pounds, ftlb, compound_conversion_factor<feet_, force::pounds_>)
+	// Torque is conventionally named "pound-foot" (lbf*ft) to distinguish it from the "foot-pound" (ft*lbf) energy
+	// unit. `pound_feet` is the torque unit; `foot_pounds` is a deprecated alias of it.
+	UNIT_ADD(torque, pound_feet, lbf_ft, compound_conversion_factor<feet_, force::pounds_>)
 	UNIT_ADD(torque, foot_poundals, ftpdl, compound_conversion_factor<feet_, poundals_>)
 	UNIT_ADD(torque, inch_pounds, inlb, compound_conversion_factor<inches_, force::pounds_>)
 	UNIT_ADD(torque, meter_kilograms, mkgf, compound_conversion_factor<meters<>, kiloponds<>>)
 
-	UNIT_ADD_DIMENSION_TRAIT(torque)
+	inline namespace torque
+	{
+		template<class Underlying = UNIT_LIB_DEFAULT_TYPE>
+		using foot_pounds [[deprecated("torque is conventionally 'pound-foot'; use wpi::units::torque::pound_feet. "
+									   "(wpi::units::energy::foot_pounds remains the energy unit.)")]] = pound_feet<Underlying>;
+	}
+
+	UNIT_ADD_DIMENSION_TRAIT(torque, Torque)
 } // namespace wpi::units
 
 #endif // units_torque_h_

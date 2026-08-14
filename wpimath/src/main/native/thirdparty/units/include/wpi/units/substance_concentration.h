@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -61,7 +61,7 @@ namespace wpi::units
 	 */
 	UNIT_ADD_WITH_METRIC_PREFIXES(substance_concentration, molars, M, conversion_factor<std::ratio<1000>, dimension::substance_concentration>)
 
-	UNIT_ADD_DIMENSION_TRAIT(substance_concentration)
+	UNIT_ADD_DIMENSION_TRAIT(substance_concentration, SubstanceConcentration)
 } // namespace wpi::units
 
 #endif // units_substance_concentration_h_

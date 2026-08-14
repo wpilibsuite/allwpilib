@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -58,7 +58,7 @@ namespace wpi::units
 	 */
 	UNIT_ADD_WITH_METRIC_PREFIXES(spectral_flux, watts_per_meter, W_per_m, conversion_factor<std::ratio<1>, dimension::spectral_flux>)
 
-	UNIT_ADD_DIMENSION_TRAIT(spectral_flux)
+	UNIT_ADD_DIMENSION_TRAIT(spectral_flux, SpectralFlux)
 } // namespace wpi::units
 
 #endif // units_spectral_flux_h_

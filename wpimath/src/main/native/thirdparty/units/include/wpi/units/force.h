@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -56,8 +56,8 @@ namespace wpi::units
 	/**
 	 * @namespace	wpi::units::force
 	 * @brief		namespace for unit types and containers representing force values
-	 * @details		The SI unit for force is `newtons`, and the corresponding `dimension` dimension is
-	 *				`force_unit`.
+	 * @details		The SI unit for force is `newtons`, and the corresponding dimension concept is
+	 *				`Force` (backed by the `traits::is_force_unit_v` trait).
 	 * @anchor		forceContainers
 	 * @sa			See unit for more information on unit type containers.
 	 */
@@ -67,7 +67,14 @@ namespace wpi::units
 	UNIT_ADD(force, kiloponds, kp, compound_conversion_factor<standard_gravity_, kilograms_>)
 	UNIT_ADD(force, poundals, pdl, compound_conversion_factor<mass::pounds_, feet_, inverse<squared<seconds_>>>)
 
-	UNIT_ADD_DIMENSION_TRAIT(force)
+	UNIT_ADD(force, kips, kip, conversion_factor<std::ratio<1000>, force::pounds_>)
+	UNIT_ADD(force, ounces_force, ozf, conversion_factor<std::ratio<1, 16>, force::pounds_>)
+	UNIT_ADD(force, grams_force, gf, compound_conversion_factor<acceleration::standard_gravity_, grams_>)
+	UNIT_ADD(force, short_tons_force, tonf, conversion_factor<std::ratio<2000>, force::pounds_>)
+	UNIT_ADD(force, long_tons_force, ltonf, conversion_factor<std::ratio<2240>, force::pounds_>)
+	UNIT_ADD(force, sthenes, sn, conversion_factor<std::ratio<1000>, newtons_>)
+
+	UNIT_ADD_DIMENSION_TRAIT(force, Force)
 } // namespace wpi::units
 
 #endif // units_force_h_

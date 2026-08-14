@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -68,7 +68,10 @@ namespace wpi::units
 	UNIT_ADD(angle, turns, tr, conversion_factor<std::ratio<2>, radians<>, std::ratio<1>>)
 	UNIT_ADD(angle, gradians, gon, conversion_factor<std::ratio<1, 400>, turns<>>)
 
-	UNIT_ADD_DIMENSION_TRAIT(angle)
+	UNIT_ADD(angle, angular_mils, amil, conversion_factor<std::ratio<1, 6400>, turns<>>)
+	UNIT_ADD(angle, compass_points, cpt, conversion_factor<std::ratio<1, 32>, turns<>>)
+
+	UNIT_ADD_DIMENSION_TRAIT(angle, Angle)
 
 	//----------------------------------
 	//	UNIT-ENABLED CMATH FUNCTIONS
@@ -130,7 +133,7 @@ namespace wpi::units
 	constexpr radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> acos(const dimensionlessUnit x) noexcept
 	{
 		return radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>(
-			gcem::acos(x.template to<typename dimensionlessUnit::underlying_type>()));
+			gcem::acos(x.template to<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>()));
 	}
 
 	/**
@@ -144,7 +147,7 @@ namespace wpi::units
 	constexpr radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> asin(const dimensionlessUnit x) noexcept
 	{
 		return radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>(
-			gcem::asin(x.template to<typename dimensionlessUnit::underlying_type>()));
+			gcem::asin(x.template to<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>()));
 	}
 
 	/**
@@ -162,7 +165,7 @@ namespace wpi::units
 	constexpr radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> atan(const dimensionlessUnit x) noexcept
 	{
 		return radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>(
-			gcem::atan(x.template to<typename dimensionlessUnit::underlying_type>()));
+			gcem::atan(x.template to<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>()));
 	}
 
 	/**
@@ -190,88 +193,96 @@ namespace wpi::units
 	/**
 	 * @ingroup		UnitMath
 	 * @brief		Compute hyperbolic cosine
-	 * @details		The input value can be in any unit of angle, including radians or degrees.
-	 * @tparam		AngleUnit	any `unit` type of `dimension::angle`.
-	 * @param[in]	angle		angle to compute the hyperbolic cosine of
-	 * @returns		Returns the hyperbolic cosine of <i>angle</i>
+	 * @details		The argument of a hyperbolic function is a dimensionless real number (a hyperbolic angle),
+	 *				not a geometric angle, so it is taken as a dimensionless quantity and used without any
+	 *				radian conversion.
+	 * @tparam		dimensionlessUnit	a dimensionless `unit` type.
+	 * @param[in]	x	value to compute the hyperbolic cosine of
+	 * @returns		the hyperbolic cosine of <i>x</i>
 	 */
-	template<class AngleUnit, std::enable_if_t<traits::is_angle_unit_v<AngleUnit>, int> = 0>
-	constexpr dimensionless<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>> cosh(const AngleUnit angle) noexcept
+	template<class dimensionlessUnit, std::enable_if_t<traits::is_dimensionless_unit_v<dimensionlessUnit>, int> = 0>
+	constexpr dimensionless<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> cosh(const dimensionlessUnit x) noexcept
 	{
-		return gcem::cosh(convert<radians<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>>>(angle).value());
+		return gcem::cosh(x.template to<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>());
 	}
 
 	/**
 	 * @ingroup		UnitMath
 	 * @brief		Compute hyperbolic sine
-	 * @details		The input value can be in any unit of angle, including radians or degrees.
-	 * @tparam		AngleUnit	any `unit` type of `dimension::angle`.
-	 * @param[in]	angle		angle to compute the hyperbolic sine of
-	 * @returns		Returns the hyperbolic sine of <i>angle</i>
+	 * @details		The argument of a hyperbolic function is a dimensionless real number (a hyperbolic angle),
+	 *				not a geometric angle, so it is taken as a dimensionless quantity and used without any
+	 *				radian conversion.
+	 * @tparam		dimensionlessUnit	a dimensionless `unit` type.
+	 * @param[in]	x	value to compute the hyperbolic sine of
+	 * @returns		the hyperbolic sine of <i>x</i>
 	 */
-	template<class AngleUnit, std::enable_if_t<traits::is_angle_unit_v<AngleUnit>, int> = 0>
-	constexpr dimensionless<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>> sinh(const AngleUnit angle) noexcept
+	template<class dimensionlessUnit, std::enable_if_t<traits::is_dimensionless_unit_v<dimensionlessUnit>, int> = 0>
+	constexpr dimensionless<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> sinh(const dimensionlessUnit x) noexcept
 	{
-		return gcem::sinh(convert<radians<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>>>(angle).value());
+		return gcem::sinh(x.template to<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>());
 	}
 
 	/**
 	 * @ingroup		UnitMath
 	 * @brief		Compute hyperbolic tangent
-	 * @details		The input value can be in any unit of angle, including radians or degrees.
-	 * @tparam		AngleUnit	any `unit` type of `dimension::angle`.
-	 * @param[in]	angle		angle to compute the hyperbolic tangent of
-	 * @returns		Returns the hyperbolic tangent of <i>angle</i>
+	 * @details		The argument of a hyperbolic function is a dimensionless real number (a hyperbolic angle),
+	 *				not a geometric angle, so it is taken as a dimensionless quantity and used without any
+	 *				radian conversion.
+	 * @tparam		dimensionlessUnit	a dimensionless `unit` type.
+	 * @param[in]	x	value to compute the hyperbolic tangent of
+	 * @returns		the hyperbolic tangent of <i>x</i>
 	 */
-	template<class AngleUnit, std::enable_if_t<traits::is_angle_unit_v<AngleUnit>, int> = 0>
-	constexpr dimensionless<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>> tanh(const AngleUnit angle) noexcept
+	template<class dimensionlessUnit, std::enable_if_t<traits::is_dimensionless_unit_v<dimensionlessUnit>, int> = 0>
+	constexpr dimensionless<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> tanh(const dimensionlessUnit x) noexcept
 	{
-		return gcem::tanh(convert<radians<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>>>(angle).value());
+		return gcem::tanh(x.template to<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>());
 	}
 
 	/**
 	 * @ingroup		UnitMath
 	 * @brief		Compute arc hyperbolic cosine
-	 * @details		Returns the nonnegative arc hyperbolic cosine of x, expressed in radians.
-	 * @param[in]	x	Value whose arc hyperbolic cosine is computed. If the argument is less
-	 *					than 1, a domain error occurs.
-	 * @returns		Nonnegative arc hyperbolic cosine of x, in the interval [0,+INFINITY] radians.
+	 * @details		The result of an inverse hyperbolic function is a dimensionless real number (a hyperbolic
+	 *				angle), not a geometric angle, so it is returned as a dimensionless quantity.
+	 * @param[in]	x	value whose arc hyperbolic cosine is computed. If the argument is less than 1, a domain
+	 *					error occurs.
+	 * @returns		the nonnegative arc hyperbolic cosine of <i>x</i>, as a dimensionless quantity.
 	 */
 	template<class dimensionlessUnit, std::enable_if_t<traits::is_dimensionless_unit_v<dimensionlessUnit>, int> = 0>
-	constexpr radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> acosh(const dimensionlessUnit x) noexcept
+	constexpr dimensionless<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> acosh(const dimensionlessUnit x) noexcept
 	{
-		return radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>(
-			gcem::acosh(x.template to<typename dimensionlessUnit::underlying_type>()));
+		return dimensionless<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>(
+			gcem::acosh(x.template to<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>()));
 	}
 
 	/**
 	 * @ingroup		UnitMath
 	 * @brief		Compute arc hyperbolic sine
-	 * @details		Returns the arc hyperbolic sine of x, expressed in radians.
-	 * @param[in]	x	Value whose arc hyperbolic sine is computed.
-	 * @returns		Arc hyperbolic sine of x, in radians.
+	 * @details		The result of an inverse hyperbolic function is a dimensionless real number (a hyperbolic
+	 *				angle), not a geometric angle, so it is returned as a dimensionless quantity.
+	 * @param[in]	x	value whose arc hyperbolic sine is computed.
+	 * @returns		the arc hyperbolic sine of <i>x</i>, as a dimensionless quantity.
 	 */
 	template<class dimensionlessUnit, std::enable_if_t<traits::is_dimensionless_unit_v<dimensionlessUnit>, int> = 0>
-	constexpr radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> asinh(const dimensionlessUnit x) noexcept
+	constexpr dimensionless<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> asinh(const dimensionlessUnit x) noexcept
 	{
-		return radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>(
-			gcem::asinh(x.template to<typename dimensionlessUnit::underlying_type>()));
+		return dimensionless<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>(
+			gcem::asinh(x.template to<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>()));
 	}
 
 	/**
 	 * @ingroup		UnitMath
 	 * @brief		Compute arc hyperbolic tangent
-	 * @details		Returns the arc hyperbolic tangent of x, expressed in radians.
-	 * @param[in]	x	Value whose arc hyperbolic tangent is computed, in the interval [-1,+1].
-	 *					If the argument is out of this interval, a domain error occurs. For
-	 *					values of -1 and +1, a pole error may occur.
-	 * @returns		wpi::units::angle::radian
+	 * @details		The result of an inverse hyperbolic function is a dimensionless real number (a hyperbolic
+	 *				angle), not a geometric angle, so it is returned as a dimensionless quantity.
+	 * @param[in]	x	value whose arc hyperbolic tangent is computed, in the interval [-1,+1]. If the argument
+	 *					is out of this interval, a domain error occurs; for -1 and +1 a pole error may occur.
+	 * @returns		the arc hyperbolic tangent of <i>x</i>, as a dimensionless quantity.
 	 */
 	template<class dimensionlessUnit, std::enable_if_t<traits::is_dimensionless_unit_v<dimensionlessUnit>, int> = 0>
-	constexpr radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> atanh(const dimensionlessUnit x) noexcept
+	constexpr dimensionless<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> atanh(const dimensionlessUnit x) noexcept
 	{
-		return radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>(
-			gcem::atanh(x.template to<typename dimensionlessUnit::underlying_type>()));
+		return dimensionless<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>(
+			gcem::atanh(x.template to<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>()));
 	}
 } // namespace wpi::units
 

@@ -32,51 +32,53 @@
 // http://stackoverflow.com/questions/35069778/create-comparison-trait-for-template-classes-whose-parameters-are-in-a-different
 // http://stackoverflow.com/questions/28253399/check-traits-for-all-variadic-template-arguments/28253503
 // http://stackoverflow.com/questions/36321295/rational-approximation-of-square-root-of-stdratio-at-compile-time?noredirect=1#comment60266601_36321295
-// https://en.wikipedia.org/wiki/Luminance
 // https://github.com/swatanabe/cppnow17-units
 //
 //--------------------------------------------------------------------------------------------------
 //
-/// @file	units/luminance.h
-/// @brief	units representing luminance values
+/// @file	units/viscosity.h
+/// @brief	units representing dynamic and kinematic viscosity values
 //
 //--------------------------------------------------------------------------------------------------
 
 #pragma once
 
-#ifndef units_luminance_h_
-#define units_luminance_h__
+#ifndef units_viscosity_h_
+#define units_viscosity_h_
 
-#include <wpi/units/length.h>
-#include <wpi/units/luminous_intensity.h>
+#include <wpi/units/area.h>
+#include <wpi/units/pressure.h>
+#include <wpi/units/time.h>
 
 namespace wpi::units
 {
 	/**
-	 * @namespace	wpi::units::luminance
-	 * @brief		namespace for unit types and containers representing luminance values
-	 * @details		The SI unit for illuminance is `candelas per square meter`, and the corresponding `dimension` dimension is
-	 *				`luminance_unit`.
-	 * @anchor		luminanceContainers
+	 * @namespace	wpi::units::dynamic_viscosity
+	 * @brief		namespace for unit types and containers representing dynamic (absolute) viscosity values
+	 * @details		The SI unit for dynamic viscosity is `pascal_seconds`, and the corresponding `dimension`
+	 *				dimension is `dynamic_viscosity_unit`.
+	 * @anchor		dynamicViscosityContainers
 	 * @sa			See unit for more information on unit type containers.
 	 */
-	UNIT_ADD_WITH_METRIC_PREFIXES(luminance, candelas_per_square_meter, cd_per_m2, conversion_factor<std::ratio<1>, dimension::luminance>)
-	UNIT_ADD(luminance, stilbs, sb, conversion_factor<std::ratio<10'000>, candelas_per_square_meter_>)
-	UNIT_ADD(luminance, apostilbs, asb, conversion_factor<std::ratio<1>, candelas_per_square_meter_, std::ratio<-1>>)
-	UNIT_ADD(luminance, brils, bril, conversion_factor<std::ratio<1, 10'000'000>, candelas_per_square_meter<>, std::ratio<-1>>)
-	UNIT_ADD(luminance, skots, sk, conversion_factor<std::ratio<1, 1'000>, candelas_per_square_meter<>, std::ratio<-1>>)
-	UNIT_ADD(luminance, lamberts, la, conversion_factor<std::ratio<1>, stilbs<>, std::ratio<-1>>)
-	UNIT_ADD(luminance, millilamberts, mla, conversion_factor<std::ratio<1, 1'000>, lamberts<>>)
-	UNIT_ADD(luminance, foot_lamberts, ftL, compound_conversion_factor<conversion_factor<std::ratio<1>, dimension::dimensionless, std::ratio<-1>>, candelas<>, inverse<squared<feet<>>>>)
+	UNIT_ADD(dynamic_viscosity, pascal_seconds, Pa_s, compound_conversion_factor<pascals_, seconds_>)
+	UNIT_ADD(dynamic_viscosity, poise, P, conversion_factor<std::ratio<1, 10>, pascal_seconds_>)
+	UNIT_ADD(dynamic_viscosity, centipoise, cP, conversion_factor<std::ratio<1, 100>, poise_>)
 
-	// Aliases
-	template<class T>
-	using nits = candelas_per_square_meter<T>;
+	UNIT_ADD_DIMENSION_TRAIT(dynamic_viscosity, DynamicViscosity)
 
-	template<class T>
-	using blondels = apostilbs<T>;
+	/**
+	 * @namespace	wpi::units::kinematic_viscosity
+	 * @brief		namespace for unit types and containers representing kinematic viscosity values
+	 * @details		The SI unit for kinematic viscosity is `square_meters_per_second`, and the corresponding
+	 *				`dimension` dimension is `kinematic_viscosity_unit`.
+	 * @anchor		kinematicViscosityContainers
+	 * @sa			See unit for more information on unit type containers.
+	 */
+	UNIT_ADD(kinematic_viscosity, square_meters_per_second, m2_per_s, compound_conversion_factor<squared<meters<>>, inverse<seconds_>>)
+	UNIT_ADD(kinematic_viscosity, stokes, St, conversion_factor<std::ratio<1, 10000>, square_meters_per_second_>)
+	UNIT_ADD(kinematic_viscosity, centistokes, cSt, conversion_factor<std::ratio<1, 100>, stokes_>)
 
-	UNIT_ADD_DIMENSION_TRAIT(luminance, Luminance)
+	UNIT_ADD_DIMENSION_TRAIT(kinematic_viscosity, KinematicViscosity)
 } // namespace wpi::units
 
-#endif // units_luminance_h__
+#endif // units_viscosity_h_

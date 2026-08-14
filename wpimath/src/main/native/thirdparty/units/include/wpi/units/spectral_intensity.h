@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -59,7 +59,7 @@ namespace wpi::units
 	 */
 	UNIT_ADD_WITH_METRIC_PREFIXES(spectral_intensity, watts_per_steradian_per_meter, W_per_srm, conversion_factor<std::ratio<1>, dimension::spectral_intensity>)
 
-	UNIT_ADD_DIMENSION_TRAIT(spectral_intensity)
+	UNIT_ADD_DIMENSION_TRAIT(spectral_intensity, SpectralIntensity)
 } // namespace wpi::units
 
 #endif // units_spectral_intensity_h_

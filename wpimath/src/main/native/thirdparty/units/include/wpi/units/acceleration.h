@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -64,7 +64,7 @@ namespace wpi::units
 	UNIT_ADD(acceleration, standard_gravity, SG, conversion_factor<std::ratio<980665, 100000>, meters_per_second_squared_>)
 	UNIT_ADD(acceleration, gals, Gal, compound_conversion_factor<centimeters_, inverse<squared<seconds_>>>)
 
-	UNIT_ADD_DIMENSION_TRAIT(acceleration)
+	UNIT_ADD_DIMENSION_TRAIT(acceleration, Acceleration)
 } // namespace wpi::units
 
 #endif // units_acceleration_h_

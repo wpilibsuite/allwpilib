@@ -8,8 +8,8 @@ from upstream_utils import Lib, has_prefix, walk_cwd_and_copy_if
 
 
 def copy_upstream_src(wpilib_root: Path):
-    upstream_root: Path = Path(".").absolute()
-    wpimath: Path = wpilib_root / "wpimath"
+    upstream_root = Path(".").absolute()
+    wpimath = wpilib_root / "wpimath"
 
     # Delete old install
     for d in [
@@ -19,7 +19,7 @@ def copy_upstream_src(wpilib_root: Path):
 
     # Copy units include files into allwpilib
     os.chdir(upstream_root / "include")
-    wpi_files: list[Path] = walk_cwd_and_copy_if(
+    wpi_files = walk_cwd_and_copy_if(
         lambda dp, f: has_prefix(dp, Path("units")),
         wpimath / "src/main/native/thirdparty/units/include/wpi",
     )
@@ -41,7 +41,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "units"
     url = "https://github.com/nholthaus/units.git"
-    tag = "v3.2.0"
+    tag = "v3.6.0"
 
     units = Lib(name, url, tag, copy_upstream_src)
     units.main()

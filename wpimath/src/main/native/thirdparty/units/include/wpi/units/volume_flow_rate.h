@@ -32,51 +32,43 @@
 // http://stackoverflow.com/questions/35069778/create-comparison-trait-for-template-classes-whose-parameters-are-in-a-different
 // http://stackoverflow.com/questions/28253399/check-traits-for-all-variadic-template-arguments/28253503
 // http://stackoverflow.com/questions/36321295/rational-approximation-of-square-root-of-stdratio-at-compile-time?noredirect=1#comment60266601_36321295
-// https://en.wikipedia.org/wiki/Luminance
 // https://github.com/swatanabe/cppnow17-units
 //
 //--------------------------------------------------------------------------------------------------
 //
-/// @file	units/luminance.h
-/// @brief	units representing luminance values
+/// @file	units/volume_flow_rate.h
+/// @brief	units representing volumetric flow rate values
 //
 //--------------------------------------------------------------------------------------------------
 
 #pragma once
 
-#ifndef units_luminance_h_
-#define units_luminance_h__
+#ifndef units_volume_flow_rate_h_
+#define units_volume_flow_rate_h_
 
-#include <wpi/units/length.h>
-#include <wpi/units/luminous_intensity.h>
+#include <wpi/units/time.h>
+#include <wpi/units/volume.h>
 
 namespace wpi::units
 {
 	/**
-	 * @namespace	wpi::units::luminance
-	 * @brief		namespace for unit types and containers representing luminance values
-	 * @details		The SI unit for illuminance is `candelas per square meter`, and the corresponding `dimension` dimension is
-	 *				`luminance_unit`.
-	 * @anchor		luminanceContainers
+	 * @namespace	wpi::units::volume_flow_rate
+	 * @brief		namespace for unit types and containers representing volumetric-flow-rate values
+	 * @details		The SI unit for volumetric flow rate is `cubic_meters_per_second`, and the corresponding
+	 *				`dimension` dimension is `volume_flow_rate_unit`.
+	 * @anchor		volumeFlowRateContainers
 	 * @sa			See unit for more information on unit type containers.
 	 */
-	UNIT_ADD_WITH_METRIC_PREFIXES(luminance, candelas_per_square_meter, cd_per_m2, conversion_factor<std::ratio<1>, dimension::luminance>)
-	UNIT_ADD(luminance, stilbs, sb, conversion_factor<std::ratio<10'000>, candelas_per_square_meter_>)
-	UNIT_ADD(luminance, apostilbs, asb, conversion_factor<std::ratio<1>, candelas_per_square_meter_, std::ratio<-1>>)
-	UNIT_ADD(luminance, brils, bril, conversion_factor<std::ratio<1, 10'000'000>, candelas_per_square_meter<>, std::ratio<-1>>)
-	UNIT_ADD(luminance, skots, sk, conversion_factor<std::ratio<1, 1'000>, candelas_per_square_meter<>, std::ratio<-1>>)
-	UNIT_ADD(luminance, lamberts, la, conversion_factor<std::ratio<1>, stilbs<>, std::ratio<-1>>)
-	UNIT_ADD(luminance, millilamberts, mla, conversion_factor<std::ratio<1, 1'000>, lamberts<>>)
-	UNIT_ADD(luminance, foot_lamberts, ftL, compound_conversion_factor<conversion_factor<std::ratio<1>, dimension::dimensionless, std::ratio<-1>>, candelas<>, inverse<squared<feet<>>>>)
+	UNIT_ADD(volume_flow_rate, cubic_meters_per_second, m3_per_s, conversion_factor<std::ratio<1>, dimension::volume_flow_rate>)
+	UNIT_ADD(volume_flow_rate, cubic_meters_per_hour, m3_per_hr, compound_conversion_factor<cubic_meters<>, inverse<hours<>>>)
+	UNIT_ADD(volume_flow_rate, liters_per_second, L_per_s, compound_conversion_factor<liters<>, inverse<seconds_>>)
+	UNIT_ADD(volume_flow_rate, liters_per_minute, L_per_min, compound_conversion_factor<liters<>, inverse<minutes_>>)
+	UNIT_ADD(volume_flow_rate, gallons_per_minute, gpm, compound_conversion_factor<gallons<>, inverse<minutes_>>)
+	UNIT_ADD(volume_flow_rate, gallons_per_hour, gph, compound_conversion_factor<gallons<>, inverse<hours<>>>)
+	UNIT_ADD(volume_flow_rate, cubic_feet_per_second, cfs, compound_conversion_factor<cubic_feet<>, inverse<seconds_>>)
+	UNIT_ADD(volume_flow_rate, cubic_feet_per_minute, cfm, compound_conversion_factor<cubic_feet<>, inverse<minutes_>>)
 
-	// Aliases
-	template<class T>
-	using nits = candelas_per_square_meter<T>;
-
-	template<class T>
-	using blondels = apostilbs<T>;
-
-	UNIT_ADD_DIMENSION_TRAIT(luminance, Luminance)
+	UNIT_ADD_DIMENSION_TRAIT(volume_flow_rate, VolumeFlowRate)
 } // namespace wpi::units
 
-#endif // units_luminance_h__
+#endif // units_volume_flow_rate_h_

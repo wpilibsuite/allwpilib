@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Sat, 15 Aug 2026 20:31:06 -0400
+Subject: [PATCH 8/9] Fix Apple Clang incomplete type error
+
+---
+ include/units/core.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/include/units/core.h b/include/units/core.h
+index 6f0f095749dd4f5b515b82828e21cf6e507a4fcd..fe4e89cd0cc68ba7ae872bd9ed59e9b7a7e4281d 100644
+--- a/include/units/core.h
++++ b/include/units/core.h
+@@ -958,8 +958,14 @@ namespace units
+ 		 * @details		Inherits from `std::true_type` or `std::false_type`. Use `is_unit_v<T>` to test
+ 		 *				whether `class T` implements a `unit`.
+ 		 */
++		template<class T, class = void>
++		struct is_unit : std::false_type
++		{
++		};
++
+ 		template<class T>
+-		struct is_unit : units::detail::is_unit_impl<T>::type
++		struct is_unit<T, std::void_t<decltype(sizeof(T))>>
++		: units::detail::is_unit_impl<std::remove_cv_t<T>>
+ 		{
+ 		};
+ 

@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -68,7 +68,11 @@ namespace wpi::units
 	UNIT_ADD(energy, therms, thm, conversion_factor<std::ratio<100000>, british_thermal_units_59_>)
 	UNIT_ADD(energy, foot_pounds, ftlbf, conversion_factor<std::ratio<13558179483314004, 10000000000000000>, joules_>)
 
-	UNIT_ADD_DIMENSION_TRAIT(energy)
+	UNIT_ADD(energy, ergs, erg, conversion_factor<std::ratio<1, 10000000>, joules_>)
+	UNIT_ADD(energy, calories_it, cal_it, conversion_factor<std::ratio<41868, 10000>, joules_>)
+	UNIT_ADD(energy, tons_of_tnt, tTNT, conversion_factor<std::ratio<4184000000LL>, joules_>)
+
+	UNIT_ADD_DIMENSION_TRAIT(energy, Energy)
 } // namespace wpi::units
 
 #endif // units_energy_h_

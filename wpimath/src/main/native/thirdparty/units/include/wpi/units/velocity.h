@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -54,8 +54,8 @@ namespace wpi::units
 	/**
 	 * @namespace	wpi::units::velocity
 	 * @brief		namespace for unit types and containers representing velocity values
-	 * @details		The SI unit for velocity is `meters_per_second`, and the corresponding `dimension` dimension is
-	 *				`velocity_unit`.
+	 * @details		The SI unit for velocity is `meters_per_second`, and the corresponding dimension concept is
+	 *				`Velocity` (backed by the `traits::is_velocity_unit_v` trait).
 	 * @anchor		velocityContainers
 	 * @sa			See unit for more information on unit type containers.
 	 */
@@ -65,7 +65,12 @@ namespace wpi::units
 	UNIT_ADD(velocity, kilometers_per_hour, kph, compound_conversion_factor<kilometers<>, inverse<hours<>>>)
 	UNIT_ADD(velocity, knots, kts, compound_conversion_factor<nautical_miles<>, inverse<hours<>>>)
 
-	UNIT_ADD_DIMENSION_TRAIT(velocity)
+	UNIT_ADD(velocity, feet_per_minute, fpm, compound_conversion_factor<feet_, inverse<minutes_>>)
+	UNIT_ADD(velocity, meters_per_minute, mpm, compound_conversion_factor<meters<>, inverse<minutes_>>)
+	UNIT_ADD(velocity, inches_per_second, ips, compound_conversion_factor<inches<>, inverse<seconds_>>)
+	UNIT_ADD(velocity, kilometers_per_second, kmps, compound_conversion_factor<kilometers<>, inverse<seconds_>>)
+
+	UNIT_ADD_DIMENSION_TRAIT(velocity, Velocity)
 } // namespace wpi::units
 
 #endif // units_velocity_h_

@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Joseph Eng <91924258+KangarooKoala@users.noreply.github.com>
 Date: Thu, 11 Dec 2025 20:30:41 -0800
-Subject: [PATCH 04/10] Group doxygen modules
+Subject: [PATCH 3/9] Group doxygen modules
 
 ---
  include/units/core.h | 10 ++++++++++
  1 file changed, 10 insertions(+)
 
 diff --git a/include/units/core.h b/include/units/core.h
-index a1f349452ceaf3dc44f6616eae5d9f309288f0bd..d20ec7accb10fe548f84bb70120ec2df77af9605 100644
+index 5df2099337881dfefe59082caaaa587a41fde56f..c2a4348f43b80e2d24cb6f6ab316809d3e53dfac 100644
 --- a/include/units/core.h
 +++ b/include/units/core.h
-@@ -414,14 +414,20 @@ namespace units
+@@ -597,14 +597,20 @@ namespace units
  	//	DOXYGEN
  	//----------------------------------
  
@@ -32,7 +32,7 @@ index a1f349452ceaf3dc44f6616eae5d9f309288f0bd..d20ec7accb10fe548f84bb70120ec2df
  	 * @brief		Defines a series of classes used to manipulate unit types, such as `inverse<>`, `squared<>`, and
  	 *				metric prefixes. Unit manipulators can be chained together, e.g.
  	 *				`inverse<squared<pico<time::seconds>>>` to represent picoseconds^-2.
-@@ -429,22 +435,26 @@ namespace units
+@@ -612,22 +618,26 @@ namespace units
  
  	/**
  	 * @defgroup	UnitMath Unit Math

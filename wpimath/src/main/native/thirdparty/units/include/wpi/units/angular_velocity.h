@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 //
-//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
+//	UnitConversion: A compile-time c++23 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
@@ -54,8 +54,8 @@ namespace wpi::units
 	/**
 	 * @namespace	wpi::units::angular_velocity
 	 * @brief		namespace for unit types and containers representing angular velocity values
-	 * @details		The SI unit for angular velocity is `radians_per_second`, and the corresponding `dimension`
-	 *				dimension is `angular_velocity_unit`.
+	 * @details		The SI unit for angular velocity is `radians_per_second`, and the corresponding dimension
+	 *				concept is `AngularVelocity` (backed by the `traits::is_angular_velocity_unit_v` trait).
 	 * @anchor		angularVelocityContainers
 	 * @sa			See unit for more information on unit type containers.
 	 */
@@ -66,7 +66,7 @@ namespace wpi::units
 	UNIT_ADD(angular_velocity, revolutions_per_second, rps, conversion_factor<std::ratio<2, 1>, radians_per_second<>, std::ratio<1>>)
 	UNIT_ADD(angular_velocity, milliarcseconds_per_year, mas_per_yr, compound_conversion_factor<milliarcseconds<>, inverse<years<>>>)
 
-	UNIT_ADD_DIMENSION_TRAIT(angular_velocity)
+	UNIT_ADD_DIMENSION_TRAIT(angular_velocity, AngularVelocity)
 } // namespace wpi::units
 
 #endif // units_angular_velocity_h_

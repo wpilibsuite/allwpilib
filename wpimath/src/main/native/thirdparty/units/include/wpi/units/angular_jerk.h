@@ -63,7 +63,7 @@ namespace wpi::units
 	UNIT_ADD(angular_jerk, degrees_per_second_cubed, deg_per_s_cu, compound_conversion_factor<degrees_, inverse<cubed<seconds_>>>)
 	UNIT_ADD(angular_jerk, turns_per_second_cubed, tr_per_s_cu, compound_conversion_factor<turns_, inverse<cubed<seconds_>>>)
 
-	UNIT_ADD_DIMENSION_TRAIT(angular_jerk)
+	UNIT_ADD_DIMENSION_TRAIT(angular_jerk, AngularJerk)
 } // namespace wpi::units
 
 #endif // units_jerk_h_
