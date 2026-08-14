@@ -258,11 +258,12 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
   }
 
   /**
-   * Returns a Transform2d from the Translation3d and Rotation3d
-   * @return new Transform2d reference
+   * Returns a Transform2d representing this Transform3d projected into the X-Y plane.
+   *
+   * @return A Transform2d representing this Transform3d projected into the X-Y plane.
    */
   public Transform2d toTransform2d() {
-    return new Transform2d(m_translation.toTranslation2d() ,m_rotation.toRotation2d());
+    return new Transform2d(m_translation.toTranslation2d(), m_rotation.toRotation2d());
   }
 
   /**
