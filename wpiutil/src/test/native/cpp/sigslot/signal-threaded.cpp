@@ -37,6 +37,7 @@ SOFTWARE.
 
 #include <array>
 #include <atomic>
+#include <barrier>
 #include <thread>
 
 #include <catch2/catch_template_test_macros.hpp>
@@ -105,6 +106,27 @@ TEST_CASE("SignalTest ThreadedEmission", "[wpiutil][sigslot]") {
   }
 
   REQUIRE(sum == 100000);
+}
+
+TEST_CASE("SignalTest ConcurrentConnectAndEmission", "[wpiutil][sigslot]") {
+  Signal_mt<> sig;
+  std::barrier syncPoint{2};
+  std::thread emitter{[&] {
+    for (int i = 0; i < 10000; ++i) {
+      syncPoint.arrive_and_wait();
+      sig();
+      syncPoint.arrive_and_wait();
+    }
+  }};
+
+  for (int i = 0; i < 10000; ++i) {
+    sig.disconnect_all();
+    syncPoint.arrive_and_wait();
+    sig.connect([] {});
+    syncPoint.arrive_and_wait();
+  }
+
+  emitter.join();
 }
 
 }  // namespace wpi::util

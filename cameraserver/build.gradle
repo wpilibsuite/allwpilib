@@ -49,7 +49,8 @@ model {
                 return
             }
             project(':ntcore').addNtcoreDependency(it, 'shared')
-            project(':hal').addHalDependency(it, 'shared')
+            nativeUtils.useRequiredLibrary(it, 'mrclib')
+            lib project: ':hal', library: 'hal', linkage: 'shared'
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
             lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
             lib project: ':datalog', library: 'datalog', linkage: 'shared'
