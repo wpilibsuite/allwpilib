@@ -117,6 +117,8 @@ if(WPILIB_WITH_EXECUTABLES)
 endif()
 
 if(WPILIB_WITH_TESTS)
+    find_package(JNI REQUIRED)
+
     file(GLOB_RECURSE wpiutil_testlib_src src/test/native/include/*.h)
     add_library(wpiutil_testlib INTERFACE ${wpiutil_test_src})
     target_include_directories(wpiutil_testlib INTERFACE src/test/native/include)
@@ -125,7 +127,12 @@ if(WPILIB_WITH_TESTS)
     if(MSVC)
         target_compile_options(wpiutil_test PRIVATE /wd4101 /wd4251)
     endif()
-    target_include_directories(wpiutil_test PRIVATE src/generated/test/native/cpp)
+    target_include_directories(
+        wpiutil_test
+        SYSTEM
+        PRIVATE ${JNI_INCLUDE_DIRS}
+        PRIVATE src/generated/test/native/cpp
+    )
     file(GLOB_RECURSE wpiutil_nanopb_test_src src/generated/test/native/cpp/*.cpp)
     target_sources(wpiutil_test PRIVATE ${wpiutil_nanopb_test_src})
     target_link_libraries(wpiutil_test wpiutil wpiutil_testlib)
