@@ -38,19 +38,12 @@ std::vector<uint8_t> MakeSchemaLog(std::span<const uint8_t> schema) {
   return output;
 }
 
-std::vector<uint8_t> MakeDelayedEntryLog() {
+std::vector<uint8_t> MakeEntryLog() {
   std::vector<uint8_t> output;
   {
     wpi::log::DataLogWriter writer{
         std::make_unique<wpi::util::raw_uvector_ostream>(output)};
-    int padding = writer.Start("padding", "int64", {}, 1);
-    for (int i = 0; i < 200000; ++i) {
-      writer.AppendInteger(padding, i, i + 2);
-      if ((i % 1000) == 999) {
-        writer.Flush();
-      }
-    }
-    writer.Start("late-entry", "double", {}, 300000);
+    writer.Start("entry", "double", {}, 1);
     writer.Flush();
   }
   return output;
@@ -79,22 +72,18 @@ TEST_CASE("DataLogReaderThreadTest MalformedProtobufDescriptor",
 
 TEST_CASE("DataLogReaderThreadTest EntryCallbackCanQueryEntries",
           "[datalog][reader-thread]") {
-  auto output = MakeDelayedEntryLog();
+  auto output = MakeEntryLog();
+  auto state = std::make_shared<EntryCallbackState>();
   auto thread = std::make_unique<wpi::log::DataLogReaderThread>(
       wpi::log::DataLogReader{wpi::util::MemoryBuffer::GetMemBufferCopy(
-          output, "callback-reentrancy")});
-  auto* threadPtr = thread.get();
-  auto state = std::make_shared<EntryCallbackState>();
-  thread->sigEntryAdded.connect(
-      [threadPtr, state](const wpi::log::DataLogReaderEntry& entry) {
-        if (entry.name != "late-entry") {
-          return;
-        }
-        state->foundByName = threadPtr->GetEntry(entry.name) != nullptr;
-        state->foundById = threadPtr->GetEntry(entry.entry) != nullptr;
-        threadPtr->ForEachEntryName(
+          output, "callback-reentrancy")},
+      [state](wpi::log::DataLogReaderThread& readerThread,
+              const wpi::log::DataLogReaderEntry& entry) {
+        state->foundByName = readerThread.GetEntry(entry.name) != nullptr;
+        state->foundById = readerThread.GetEntry(entry.entry) != nullptr;
+        readerThread.ForEachEntryName(
             [state](const wpi::log::DataLogReaderEntry& item) {
-              if (item.name == "late-entry") {
+              if (item.name == "entry") {
                 state->foundByIteration = true;
               }
             });

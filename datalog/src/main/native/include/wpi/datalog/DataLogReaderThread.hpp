@@ -44,8 +44,26 @@ class DataLogReaderEntry : public wpi::log::StartRecordData {
 
 class DataLogReaderThread {
  public:
+  using EntryAddedCallback =
+      std::function<void(DataLogReaderThread&, const DataLogReaderEntry&)>;
+
   explicit DataLogReaderThread(wpi::log::DataLogReader reader)
-      : m_reader{std::move(reader)}, m_thread{[this] { ReadMain(); }} {}
+      : DataLogReaderThread{std::move(reader), EntryAddedCallback{}} {}
+
+  /**
+   * Connects the callback before starting the reader thread. The callback runs
+   * on the reader thread and receives this object so it can query entries.
+   */
+  DataLogReaderThread(wpi::log::DataLogReader reader,
+                      EntryAddedCallback entryAddedCallback)
+      : m_reader{std::move(reader)} {
+    if (entryAddedCallback) {
+      sigEntryAdded.connect(
+          [this, callback = std::move(entryAddedCallback)](
+              const DataLogReaderEntry& entry) { callback(*this, entry); });
+    }
+    m_thread = std::thread{[this] { ReadMain(); }};
+  }
   ~DataLogReaderThread();
 
   bool IsDone() const { return m_done; }
