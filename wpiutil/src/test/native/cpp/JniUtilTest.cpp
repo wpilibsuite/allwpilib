@@ -30,11 +30,11 @@ static_assert(!HasFixedDirectBufferCreate<const jdouble>);
 jlong gCapacity;
 void* gAddress;
 
-jlong GetDirectBufferCapacity(JNIEnv*, jobject) {
+jlong JNICALL GetDirectBufferCapacity(JNIEnv*, jobject) {
   return gCapacity;
 }
 
-void* GetDirectBufferAddress(JNIEnv*, jobject) {
+void* JNICALL GetDirectBufferAddress(JNIEnv*, jobject) {
   return gAddress;
 }
 
