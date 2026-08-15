@@ -73,7 +73,8 @@ TEST_CASE("DataLogBackgroundWriterTest LargeHeaderResumesAfterDrain",
   bool found = false;
   for (const auto& record : reader) {
     int64_t value;
-    if (record.GetEntry() == entry && record.GetInteger(&value) && value == 42) {
+    if (record.GetEntry() == entry && record.GetInteger(&value) &&
+        value == 42) {
       found = true;
     }
   }

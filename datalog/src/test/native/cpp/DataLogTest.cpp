@@ -175,8 +175,7 @@ TEST_CASE("DataLogTest ForegroundLargeAppendDoesNotDeadlock",
   CHECK(found);
 }
 
-TEST_CASE("DataLogTest FlushDoesNotResumeManualPause",
-          "[datalog][data-log]") {
+TEST_CASE("DataLogTest FlushDoesNotResumeManualPause", "[datalog][data-log]") {
   std::vector<uint8_t> output;
   wpi::log::DataLogWriter writer{
       std::make_unique<wpi::util::raw_uvector_ostream>(output)};
