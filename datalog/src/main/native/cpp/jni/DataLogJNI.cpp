@@ -465,7 +465,8 @@ Java_org_wpilib_datalog_DataLogJNI_appendRawBuffer
   auto cvalue = JSpan<const jbyte>::Create(
       env, value, static_cast<size_t>(start), static_cast<size_t>(length));
   if (!cvalue) {
-    if (cvalue.error() == JSpan<const jbyte>::DirectBufferError::kOutOfBounds) {
+    if (cvalue.error() ==
+        JSpan<const jbyte>::DirectBufferError::OUT_OF_BOUNDS) {
       wpi::ThrowIndexOobException(env,
                                   "start + len must be within buffer capacity");
     } else {
