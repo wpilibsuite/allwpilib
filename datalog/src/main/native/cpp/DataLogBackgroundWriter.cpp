@@ -428,7 +428,9 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
       ReleaseBufs(&toWrite);
       lock.lock();
     }
-  } while (!m_shutdown);
+    // If shutdown was requested while writing, loop once more to process the
+    // destructor's flush request.
+  } while (!m_shutdown || m_doFlush);
 }
 
 void DataLogBackgroundWriter::WriterThreadMain(
@@ -471,7 +473,9 @@ void DataLogBackgroundWriter::WriterThreadMain(
       ReleaseBufs(&toWrite);
       lock.lock();
     }
-  } while (!m_shutdown);
+    // If shutdown was requested while writing, loop once more to process the
+    // destructor's flush request.
+  } while (!m_shutdown || m_doFlush);
 
   write({});  // indicate EOF
 }
