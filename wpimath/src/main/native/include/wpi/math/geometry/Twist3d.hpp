@@ -139,9 +139,9 @@ constexpr Transform3d Twist3d::Exp() const {
       B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
       C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
     } else {
-      // A = std::sin(θ)/θ
-      // B = (1 - std::cos(θ)) / θ²
-      // C = (1 - A) / θ²
+      // A = sinθ/θ
+      // B = (1 - cosθ)/θ²
+      // C = (1 - A)/θ²
       A = gcem::sin(theta) / theta;
       B = (1 - gcem::cos(theta)) / thetaSq;
       C = (1 - A) / thetaSq;
