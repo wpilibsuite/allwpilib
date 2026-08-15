@@ -23,4 +23,17 @@ py_binary(
 py_console_script_binary(
     name = "robotpy",
     pkg = "@allwpilib_pip_deps//robotpy_cli",
+    visibility = [
+        "//developerRobot:__subpackages__",
+        "//robotpyExamples:__subpackages__",
+    ],
+)
+
+alias(
+    name = "robotpy_entry_point",
+    actual = "robotpy_entry_point.py",
+    visibility = [
+        "//developerRobot:__subpackages__",
+        "//robotpyExamples:__subpackages__",
+    ],
 )
