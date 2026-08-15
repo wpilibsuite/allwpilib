@@ -18,7 +18,10 @@ def example_list_test(
         args = [
             "$(location " + config + ")",
         ],
-        data = [config] + robots + bare_robots,
+        data = [config] + robots,
         main = _MAIN,
         **kwargs
     )
+
+    if bare_robots:
+        fail("Robots missing BUILD files:\n - " + "\n - ".join(bare_robots))
