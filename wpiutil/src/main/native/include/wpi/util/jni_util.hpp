@@ -269,7 +269,8 @@ class JSpanBase {
                                                             jobject bb,
                                                             size_t start,
                                                             size_t size)
-    requires(!IsCritical && Size == std::dynamic_extent)
+    requires(!IsCritical && std::is_same_v<std::remove_cv_t<T>, jbyte> &&
+             Size == std::dynamic_extent)
   {
     return CreateDirectBufferRange(env, bb, start, size);
   }
@@ -286,7 +287,8 @@ class JSpanBase {
   static std::expected<JSpanBase, DirectBufferError> Create(JNIEnv* env,
                                                             jobject bb,
                                                             size_t start)
-    requires(!IsCritical && Size != std::dynamic_extent)
+    requires(!IsCritical && std::is_same_v<std::remove_cv_t<T>, jbyte> &&
+             Size != std::dynamic_extent)
   {
     return CreateDirectBufferRange(env, bb, start, Size);
   }

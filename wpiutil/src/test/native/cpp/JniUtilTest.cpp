@@ -12,6 +12,21 @@
 
 namespace {
 
+template <typename T>
+concept HasDynamicDirectBufferCreate = requires(JNIEnv* env, jobject bb) {
+  wpi::util::java::JSpan<T>::Create(env, bb, 0, 0);
+};
+
+template <typename T>
+concept HasFixedDirectBufferCreate = requires(JNIEnv* env, jobject bb) {
+  wpi::util::java::JSpan<T, 3>::Create(env, bb, 0);
+};
+
+static_assert(HasDynamicDirectBufferCreate<const jbyte>);
+static_assert(HasFixedDirectBufferCreate<const jbyte>);
+static_assert(!HasDynamicDirectBufferCreate<const jdouble>);
+static_assert(!HasFixedDirectBufferCreate<const jdouble>);
+
 jlong gCapacity;
 void* gAddress;
 
