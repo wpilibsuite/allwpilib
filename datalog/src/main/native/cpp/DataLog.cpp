@@ -115,6 +115,7 @@ void DataLog::FlushBufs(std::vector<Buffer>* writeBufs) {
   std::scoped_lock lock{m_mutex};
   writeBufs->swap(m_outgoing);
   DoReleaseBufs(&m_outgoing);
+  m_paused = m_manuallyPaused;
 }
 
 void DataLog::ReleaseBufs(std::vector<Buffer>* bufs) {
@@ -124,11 +125,13 @@ void DataLog::ReleaseBufs(std::vector<Buffer>* bufs) {
 
 void DataLog::Pause() {
   std::scoped_lock lock{m_mutex};
+  m_manuallyPaused = true;
   m_paused = true;
 }
 
 void DataLog::Resume() {
   std::scoped_lock lock{m_mutex};
+  m_manuallyPaused = false;
   m_paused = false;
 }
 

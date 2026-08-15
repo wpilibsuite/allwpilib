@@ -175,6 +175,25 @@ TEST_CASE("DataLogTest ForegroundLargeAppendDoesNotDeadlock",
   CHECK(found);
 }
 
+TEST_CASE("DataLogTest FlushDoesNotResumeManualPause",
+          "[datalog][data-log]") {
+  std::vector<uint8_t> output;
+  wpi::log::DataLogWriter writer{
+      std::make_unique<wpi::util::raw_uvector_ostream>(output)};
+  int entry = writer.Start("integer", "int64", {}, 1);
+  writer.Pause();
+  writer.Flush();
+  writer.AppendInteger(entry, 42, 2);
+  writer.Flush();
+
+  wpi::log::DataLogReader reader{
+      wpi::util::MemoryBuffer::GetMemBufferCopy(output, "manual-pause")};
+  REQUIRE(reader.IsValid());
+  for (const auto& record : reader) {
+    CHECK(record.GetEntry() != entry);
+  }
+}
+
 TEST_CASE("DataLogTest ExtraHeaderCrossesBufferBoundary",
           "[datalog][data-log]") {
   for (size_t size : {0u, 16372u, 16373u, 20000u, 32768u}) {
