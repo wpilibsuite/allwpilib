@@ -234,6 +234,23 @@ TEST_CASE_METHOD(WireDecodeTextClientTest, "WireDecodeTextClientTest Unpublish",
 }
 
 TEST_CASE_METHOD(WireDecodeTextClientTest,
+                 "WireDecodeTextClientTest PeriodicOutOfRange",
+                 "[ntcore][wire][decoder]") {
+  net::WireDecodeText(
+      "[{\"method\":\"subscribe\",\"params\":{\"subuid\":1,"
+      "\"topics\":[\"test\"],\"options\":{\"periodic\":-1}}}]",
+      handler, logger);
+  net::WireDecodeText(
+      "[{\"method\":\"subscribe\",\"params\":{\"subuid\":2,"
+      "\"topics\":[\"test\"],\"options\":{\"periodic\":1e100}}}]",
+      handler, logger);
+
+  logger.CheckMessages({{NT_LOG_WARNING, "0: periodic value out of range"sv},
+                        {NT_LOG_WARNING, "0: periodic value out of range"sv}});
+  CheckNoClientCalls(handler);
+}
+
+TEST_CASE_METHOD(WireDecodeTextClientTest,
                  "WireDecodeTextClientTest UnpublishMultiple",
                  "[ntcore][wire][decoder]") {
   net::WireDecodeText(
