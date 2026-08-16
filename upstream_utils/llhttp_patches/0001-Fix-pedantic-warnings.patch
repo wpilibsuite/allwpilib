@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Codex <codex@example.com>
 Date: Fri, 7 Aug 2026 14:17:27 -0700
-Subject: [PATCH] Fix pedantic warnings
+Subject: [PATCH 1/2] Fix pedantic warnings
 
 ---
  bin/generate.ts   | 22 +++++++++++++++--

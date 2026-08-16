@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Thu, 16 Jul 2026 21:49:36 -0700
-Subject: [PATCH 9/9] Suppress unused-but-set warning
+Subject: [PATCH 6/6] Suppress unused-but-set warning
 
 ---
  mrcal.cpp | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/mrcal.cpp b/mrcal.cpp
-index ce935cd21f2a175111b3163313e6685fbd260156..926705581a2e62003b0d088e677dfa144aef1fbe 100644
+index e1b2aa78fd6e129dd775caa68545e6afc70a63cb..8ea2c873b28fbdd0d53ccb6af15a6726b1741a68 100644
 --- a/mrcal.cpp
 +++ b/mrcal.cpp
-@@ -4481,7 +4481,7 @@ void optimizer_callback(// input state
+@@ -4455,7 +4455,7 @@ void optimizer_callback(// input state
  
                         const callback_context_t* ctx)
  {

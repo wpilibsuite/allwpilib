@@ -552,13 +552,7 @@ extern "C" {
 #endif
 #include <stddef.h>
 
-#if defined(__wasm__)
-#define LLHTTP_EXPORT __attribute__((visibility("default")))
-#elif defined(_WIN32)
-#define LLHTTP_EXPORT __declspec(dllexport)
-#else
 #define LLHTTP_EXPORT
-#endif
 
 typedef llhttp__internal_t llhttp_t;
 typedef struct llhttp_settings_s llhttp_settings_t;

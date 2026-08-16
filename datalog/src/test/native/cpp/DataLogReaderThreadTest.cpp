@@ -4,6 +4,7 @@
 
 #include "wpi/datalog/DataLogReaderThread.hpp"
 
+#include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <memory>
@@ -19,12 +20,30 @@
 #include "wpi/util/raw_ostream.hpp"
 
 namespace {
+struct EntryCallbackState {
+  std::atomic_bool callbackCalled{false};
+  std::atomic_bool foundByName{false};
+  std::atomic_bool foundById{false};
+  std::atomic_bool foundByIteration{false};
+};
+
 std::vector<uint8_t> MakeSchemaLog(std::span<const uint8_t> schema) {
   std::vector<uint8_t> output;
   {
     wpi::log::DataLogWriter writer{
         std::make_unique<wpi::util::raw_uvector_ostream>(output)};
     writer.AddSchema("proto:x", "proto:FileDescriptorProto", schema, 1);
+    writer.Flush();
+  }
+  return output;
+}
+
+std::vector<uint8_t> MakeEntryLog() {
+  std::vector<uint8_t> output;
+  {
+    wpi::log::DataLogWriter writer{
+        std::make_unique<wpi::util::raw_uvector_ostream>(output)};
+    writer.Start("entry", "double", {}, 1);
     writer.Flush();
   }
   return output;
@@ -49,4 +68,34 @@ TEST_CASE("DataLogReaderThreadTest MalformedProtobufDescriptor",
   REQUIRE(WaitForDone(thread, std::chrono::seconds{2}));
   CHECK(upb_DefPool_FindFileByName(thread.GetProtobufDatabase(), "x") ==
         nullptr);
+}
+
+TEST_CASE("DataLogReaderThreadTest EntryCallbackCanQueryEntries",
+          "[datalog][reader-thread]") {
+  auto output = MakeEntryLog();
+  auto state = std::make_shared<EntryCallbackState>();
+  auto thread = std::make_unique<wpi::log::DataLogReaderThread>(
+      wpi::log::DataLogReader{wpi::util::MemoryBuffer::GetMemBufferCopy(
+          output, "callback-reentrancy")},
+      [state](wpi::log::DataLogReaderThread& readerThread,
+              const wpi::log::DataLogReaderEntry& entry) {
+        state->foundByName = readerThread.GetEntry(entry.name) != nullptr;
+        state->foundById = readerThread.GetEntry(entry.entry) != nullptr;
+        readerThread.ForEachEntryName(
+            [state](const wpi::log::DataLogReaderEntry& item) {
+              if (item.name == "entry") {
+                state->foundByIteration = true;
+              }
+            });
+        state->callbackCalled = true;
+      });
+
+  if (!WaitForDone(*thread, std::chrono::seconds{2})) {
+    thread.release();
+    FAIL("entry callback deadlocked while querying entries");
+  }
+  CHECK(state->callbackCalled);
+  CHECK(state->foundByName);
+  CHECK(state->foundById);
+  CHECK(state->foundByIteration);
 }
