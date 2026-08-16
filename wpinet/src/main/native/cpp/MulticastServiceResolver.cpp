@@ -107,7 +107,7 @@ WPI_ServiceData* WPI_GetMulticastServiceResolverData(
     return nullptr;
   }
   WPI_ServiceData* rootArray = reinterpret_cast<WPI_ServiceData*>(cDataRaw);
-  cDataRaw += (sizeof(WPI_ServiceData) + allData.size());
+  cDataRaw += sizeof(WPI_ServiceData) * allData.size();
   WPI_ServiceData* currentData = rootArray;
 
   for (auto&& data : allData) {
