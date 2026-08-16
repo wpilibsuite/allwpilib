@@ -57,8 +57,15 @@ public class Trigger implements BooleanSupplier {
 
   private final Map<BindingType, List<Binding>> m_bindings = new EnumMap<>(BindingType.class);
   private final Runnable m_eventLoopCallback = this::poll;
+  // All triggers are immediately bound to the event loop when they're created.
   private boolean m_bound = true;
-  private final BindingScope m_creationScope;
+
+  // The scope for the lifetime of this trigger. All bindings are removed when the scope exits.
+  // If a trigger is reused across multiple scopes (eg created while one opmode is loaded and reused
+  // in a later opmode), the lifetime scope changes to that new scope. This doesn't apply if the
+  // original scope is still active; triggers created in the global scope will continue to use the
+  // global scope if they're used in opmodes or commands.
+  private BindingScope m_lifetimeScope;
 
   /**
    * Represents the state of a signal: high or low. Used instead of a boolean for nullity on the
@@ -109,7 +116,7 @@ public class Trigger implements BooleanSupplier {
     m_scheduler = requireNonNullParam(scheduler, "scheduler", "Trigger");
     m_loop = requireNonNullParam(loop, "loop", "Trigger");
     m_condition = requireNonNullParam(condition, "condition", "Trigger");
-    m_creationScope = BindingScope.createNarrowestScope(m_scheduler);
+    m_lifetimeScope = BindingScope.createNarrowestScope(m_scheduler);
 
     m_scheduler.addBoundTrigger(this);
     m_loop.bind(m_eventLoopCallback);
@@ -515,7 +522,7 @@ public class Trigger implements BooleanSupplier {
   /** Checks if the creation scope is currently active. */
   // package-private for the scheduler to access
   boolean isScopeActive() {
-    return m_creationScope.active();
+    return m_lifetimeScope.active();
   }
 
   /**
@@ -545,6 +552,43 @@ public class Trigger implements BooleanSupplier {
     m_bound = false;
   }
 
+  private void ensureBound() {
+    if (!m_lifetimeScope.active()) {
+      // Switch trigger lifetime scope if it's used outside its original scope.
+      // This happens if the trigger is instantiated in one scope (eg opmode A), cached, and then
+      // reused in a different scope (eg opmode B) after the original scope exited.
+      // A very common usecase is CommandGenericHID.button(), which lazily creates a trigger when
+      // called and caches it for future use. If the first time a particular button is referenced is
+      // in an opmode, that button would only be usable when that opmode is re-entered; or if that
+      // button is first referenced in a command, it'd only be usable when that command happens to
+      // be running.
+      // This would be very bad and cause inconsistent behavior. Thus, we widen the scope of the
+      // trigger if it gets reused outside its original scope (ie, it's been created in scope A,
+      // cached, and then reused in scope B after scope A exited).
+      m_lifetimeScope = BindingScope.createNarrowestScope(m_scheduler);
+
+      // The scheduler will have removed this trigger when the original scope exited.
+      // We need to re-register it so the scheduler can clean it up again when the new scope exits.
+      m_scheduler.addBoundTrigger(this);
+    }
+
+    if (!m_bound) {
+      m_loop.bind(m_eventLoopCallback);
+      m_bound = true;
+    }
+  }
+
+  /**
+   * Checks if this trigger is currently bound to the event loop. An unbound trigger will never
+   * update its {@link #getAsBoolean()} method and never schedule any commands.
+   *
+   * @return {@code true} if the trigger is currently bound to the event loop, {@code false} if not
+   * @see #unbind()
+   */
+  public boolean isBound() {
+    return m_bound;
+  }
+
   // package-private for testing
   void addBinding(BindingScope scope, BindingType bindingType, Command command) {
     // Note: we use a throwable here instead of Thread.currentThread().getStackTrace() for easier
@@ -553,12 +597,11 @@ public class Trigger implements BooleanSupplier {
         .computeIfAbsent(bindingType, _k -> new ArrayList<>())
         .add(new Binding(scope, bindingType, command, new Throwable().getStackTrace()));
 
-    if (!m_bound) {
-      // Ensure we're bound to the event loop.
-      // Otherwise, the command binding will never fire.
-      m_loop.bind(m_eventLoopCallback);
-      m_bound = true;
-    }
+    // Ensure we're bound to the event loop.
+    // Otherwise, the command binding will never fire.
+    // This also ensures that a cached trigger created in a scope that's no longer active
+    // will be re-scoped; otherwise, the scheduler would just immediately remove the bindings.
+    ensureBound();
   }
 
   private void addBinding(BindingType bindingType, Command command) {

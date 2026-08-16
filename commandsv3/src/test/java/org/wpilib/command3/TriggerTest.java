@@ -13,11 +13,24 @@ import static org.wpilib.units.Units.Seconds;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.wpilib.system.RobotController;
 
 class TriggerTest extends CommandTestBase {
+  private AtomicLong m_nextScopeId;
+
+  @BeforeEach
+  void setUp() {
+    m_nextScopeId = new AtomicLong();
+  }
+
   @Test
   void onTrue() {
     var signal = new AtomicBoolean(false);
@@ -163,6 +176,40 @@ class TriggerTest extends CommandTestBase {
     innerRan.set(false);
     m_scheduler.run();
     assertFalse(innerRan.get(), "Trigger should not have fired again");
+  }
+
+  @Test
+  void bindingsOnScopedCachedTriggerRunInLaterScopes() {
+    m_opModeId = 1;
+    m_opModeName = "mode 1";
+
+    // Create a trigger in opmode 1
+    final var signal = new AtomicBoolean(true);
+    final var trigger = new Trigger(m_scheduler, m_scheduler.getDefaultEventLoop(), signal::get);
+
+    m_scheduler.run();
+
+    m_opModeId = 2;
+    m_opModeName = "mode 2";
+
+    // Ensure the trigger is unbound from the scheduler
+    m_scheduler.run();
+    assertFalse(trigger.isBound(), "Trigger should have been unbound when mode 1 exited");
+
+    // Trigger value should be frozen since no bindings are active
+    signal.set(false);
+    m_scheduler.run();
+    assertTrue(trigger.getAsBoolean(), "Trigger value should be frozen");
+
+    // Then add a binding scoped to opmode 2
+    var ran = new AtomicBoolean(false);
+    var command = Command.noRequirements(_ -> ran.set(true)).named("Command");
+    trigger.retryWhileTrue(command);
+
+    // New binding should still run
+    signal.set(true);
+    m_scheduler.run();
+    assertTrue(ran.get(), "Bound command did not run");
   }
 
   @Test
@@ -455,6 +502,129 @@ class TriggerTest extends CommandTestBase {
         "Deeply nested composed trigger did not fire; dependencies may not have been bound first");
   }
 
+  @ParameterizedTest(name = "two-scope transition {0} -> {1}")
+  @MethodSource("allTwoScopeTransitions")
+  void ensureBoundAcrossAllTwoScopeTransitions(ScopeType firstScope, ScopeType secondScope) {
+    var signal = new AtomicBoolean(true);
+    var triggerRef = new AtomicReference<Trigger>();
+
+    final var exitFirstScope =
+        enterScope(firstScope, () -> triggerRef.set(new Trigger(m_scheduler, signal::get)));
+    final var trigger = triggerRef.get();
+    m_scheduler.run();
+
+    exitFirstScope.run();
+    m_scheduler.run();
+
+    if (firstScope != ScopeType.GLOBAL) {
+      assertFalse(
+          trigger.isBound(), "Trigger should unbind when exiting initial scope " + firstScope);
+
+      signal.set(false);
+      m_scheduler.run();
+      assertTrue(
+          trigger.getAsBoolean(),
+          "Signal should remain frozen while trigger is unbound after " + firstScope);
+    }
+
+    final var ran = new AtomicBoolean(false);
+    final var reboundCommand =
+        Command.noRequirements(_ -> ran.set(true))
+            .named("Rebound " + firstScope + " -> " + secondScope);
+    final var exitSecondScope = enterScope(secondScope, () -> trigger.onTrue(reboundCommand));
+
+    signal.set(false);
+    m_scheduler.run();
+    signal.set(true);
+    m_scheduler.run();
+
+    assertTrue(
+        ran.get(),
+        "Trigger did not fire after rebinding across transition "
+            + firstScope
+            + " -> "
+            + secondScope);
+
+    exitSecondScope.run();
+  }
+
+  @ParameterizedTest(name = "three-scope transition {0} -> {1} -> {2}")
+  @MethodSource("allThreeScopeTransitions")
+  void ensureBoundAcrossAllThreeScopeTransitions(
+      ScopeType firstScope, ScopeType secondScope, ScopeType thirdScope) {
+    var signal = new AtomicBoolean(true);
+    var triggerRef = new AtomicReference<Trigger>();
+
+    final var exitFirstScope =
+        enterScope(firstScope, () -> triggerRef.set(new Trigger(m_scheduler, signal::get)));
+    final var trigger = triggerRef.get();
+    m_scheduler.run();
+
+    exitFirstScope.run();
+    m_scheduler.run();
+
+    if (firstScope != ScopeType.GLOBAL) {
+      assertFalse(
+          trigger.isBound(), "Trigger should unbind after first scope " + firstScope + " exits");
+    }
+
+    final var secondScopeRuns = new AtomicLong(0);
+    final var secondScopeCommand =
+        Command.noRequirements(_ -> secondScopeRuns.incrementAndGet())
+            .named("Second scope command " + secondScope);
+    final var exitSecondScope = enterScope(secondScope, () -> trigger.onTrue(secondScopeCommand));
+
+    signal.set(false);
+    m_scheduler.run();
+    signal.set(true);
+    m_scheduler.run();
+    assertEquals(
+        1,
+        secondScopeRuns.get(),
+        "Second-scope binding did not run for transition " + firstScope + " -> " + secondScope);
+
+    exitSecondScope.run();
+    m_scheduler.run();
+
+    if (firstScope != ScopeType.GLOBAL && secondScope != ScopeType.GLOBAL) {
+      assertFalse(
+          trigger.isBound(), "Trigger should unbind after second scope " + secondScope + " exits");
+    }
+
+    final var thirdScopeRuns = new AtomicLong(0);
+    final var thirdScopeCommand =
+        Command.noRequirements(_ -> thirdScopeRuns.incrementAndGet())
+            .named("Third scope command " + thirdScope);
+    final var exitThirdScope = enterScope(thirdScope, () -> trigger.onTrue(thirdScopeCommand));
+
+    signal.set(false);
+    m_scheduler.run();
+    signal.set(true);
+    m_scheduler.run();
+    assertEquals(
+        1,
+        thirdScopeRuns.get(),
+        "Third-scope binding did not run for transition "
+            + firstScope
+            + " -> "
+            + secondScope
+            + " -> "
+            + thirdScope);
+
+    var expectedSecondScopeRunsAfterThirdBind = secondScope == ScopeType.GLOBAL ? 2 : 1;
+    assertEquals(
+        expectedSecondScopeRunsAfterThirdBind,
+        secondScopeRuns.get(),
+        "Unexpected second-scope binding persistence for transition "
+            + firstScope
+            + " -> "
+            + secondScope
+            + " -> "
+            + thirdScope);
+
+    exitThirdScope.run();
+  }
+
   @Test
   void composedAnd() {
     var signalA = new AtomicBoolean(false);
@@ -610,12 +780,14 @@ class TriggerTest extends CommandTestBase {
   void triggerUnbindsWhenCommandScopeInactive() {
     var triggerSignal = new AtomicBoolean(false);
     var commandRan = new AtomicBoolean(false);
+    var triggerRef = new AtomicReference<Trigger>();
     var innerCommand = Command.noRequirements(_ -> commandRan.set(true)).named("Inner");
 
     var outerCommand =
         Command.noRequirements(
                 co -> {
                   var trigger = new Trigger(m_scheduler, triggerSignal::get);
+                  triggerRef.set(trigger);
                   trigger.onTrue(innerCommand);
                   co.park();
                 })
@@ -633,6 +805,8 @@ class TriggerTest extends CommandTestBase {
     m_scheduler.cancel(outerCommand);
     m_scheduler.run();
     assertFalse(m_scheduler.isRunning(outerCommand));
+
+    assertFalse(triggerRef.get().isBound(), "Trigger should unbind when command scope exits");
 
     // The trigger should have unbound itself during the last run() call.
   }
@@ -838,5 +1012,68 @@ class TriggerTest extends CommandTestBase {
       }
       return val;
     };
+  }
+
+  private Runnable enterScope(ScopeType scope, Runnable setupAction) {
+    return switch (scope) {
+      case GLOBAL -> {
+        m_opModeId = 0;
+        m_opModeName = "";
+        setupAction.run();
+        yield () -> {};
+      }
+      case OPMODE -> {
+        m_opModeId = nextScopeId();
+        m_opModeName = "mode " + m_opModeId;
+        setupAction.run();
+        yield () -> {
+          m_opModeId = 0;
+          m_opModeName = "";
+        };
+      }
+      case COMMAND -> {
+        var scopeCommand =
+            Command.noRequirements(
+                    co -> {
+                      setupAction.run();
+                      co.park();
+                    })
+                .named("Scope command");
+        m_scheduler.schedule(scopeCommand);
+        m_scheduler.run();
+        assertTrue(m_scheduler.isRunning(scopeCommand), "Scope command should still be running");
+
+        yield () -> {
+          m_scheduler.cancel(scopeCommand);
+          m_scheduler.run();
+        };
+      }
+    };
+  }
+
+  private long nextScopeId() {
+    return m_nextScopeId.incrementAndGet();
+  }
+
+  private static Stream<Arguments> allTwoScopeTransitions() {
+    return Stream.of(ScopeType.values())
+        .flatMap(first -> Stream.of(ScopeType.values()).map(second -> Arguments.of(first, second)));
+  }
+
+  private static Stream<Arguments> allThreeScopeTransitions() {
+    return Stream.of(ScopeType.values())
+        .flatMap(
+            first ->
+                Stream.of(ScopeType.values())
+                    .flatMap(
+                        second ->
+                            Stream.of(ScopeType.values())
+                                .map(third -> Arguments.of(first, second, third))));
+  }
+
+  private enum ScopeType {
+    COMMAND,
+    OPMODE,
+    GLOBAL,
   }
 }
