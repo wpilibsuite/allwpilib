@@ -6,16 +6,16 @@
 
 import commands2
 import wpilib
+import wpilib_drivers
 import constants
 
 
 class DriveSubsystem(commands2.Subsystem):
     def __init__(self) -> None:
-
-        self.left1 = wpilib.PWMVictorSPX(constants.LEFT_MOTOR1_PORT)
-        self.left2 = wpilib.PWMVictorSPX(constants.LEFT_MOTOR2_PORT)
-        self.right1 = wpilib.PWMVictorSPX(constants.RIGHT_MOTOR1_PORT)
-        self.right2 = wpilib.PWMVictorSPX(constants.RIGHT_MOTOR2_PORT)
+        self.left1 = wpilib_drivers.PWMVictorSPX(constants.LEFT_MOTOR1_PORT)
+        self.left2 = wpilib_drivers.PWMVictorSPX(constants.LEFT_MOTOR2_PORT)
+        self.right1 = wpilib_drivers.PWMVictorSPX(constants.RIGHT_MOTOR1_PORT)
+        self.right2 = wpilib_drivers.PWMVictorSPX(constants.RIGHT_MOTOR2_PORT)
 
         self.left1.add_follower(self.left2)
         self.right1.add_follower(self.right2)

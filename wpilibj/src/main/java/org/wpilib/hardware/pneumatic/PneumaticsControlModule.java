@@ -6,6 +6,7 @@ package org.wpilib.hardware.pneumatic;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.wpilib.hardware.bus.CANBus;
 import org.wpilib.hardware.hal.CTREPCMJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.PortsJNI;
@@ -16,23 +17,23 @@ public class PneumaticsControlModule implements PneumaticsBase {
   private static class DataStore implements AutoCloseable {
     private final int m_module;
     private final int m_handle;
-    private final int m_busId;
+    private final CANBus m_busId;
     private int m_refCount;
     private int m_reservedMask;
     private boolean m_compressorReserved;
     private final Object m_reserveLock = new Object();
 
-    DataStore(int busId, int module) {
-      m_handle = CTREPCMJNI.initialize(busId, module);
+    DataStore(CANBus busId, int module) {
+      m_handle = CTREPCMJNI.initialize(busId.value, module);
       m_module = module;
       m_busId = busId;
-      m_handleMaps[busId].put(module, this);
+      m_handleMaps[busId.value].put(module, this);
     }
 
     @Override
     public void close() {
       CTREPCMJNI.free(m_handle);
-      m_handleMaps[m_busId].remove(m_module);
+      m_handleMaps[m_busId.value].remove(m_module);
     }
 
     public void addRef() {
@@ -53,12 +54,12 @@ public class PneumaticsControlModule implements PneumaticsBase {
 
   private static final Object m_handleLock = new Object();
 
-  private static DataStore getForModule(int busId, int module) {
+  private static DataStore getForModule(CANBus busId, int module) {
     synchronized (m_handleLock) {
-      Map<Integer, DataStore> handleMap = m_handleMaps[busId];
+      Map<Integer, DataStore> handleMap = m_handleMaps[busId.value];
       if (handleMap == null) {
         handleMap = new HashMap<>();
-        m_handleMaps[busId] = handleMap;
+        m_handleMaps[busId.value] = handleMap;
       }
 
       DataStore pcm = handleMap.get(module);
@@ -84,7 +85,7 @@ public class PneumaticsControlModule implements PneumaticsBase {
    *
    * @param busId The bus ID
    */
-  public PneumaticsControlModule(int busId) {
+  public PneumaticsControlModule(CANBus busId) {
     this(busId, SensorUtil.getDefaultCTREPCMModule());
   }
 
@@ -94,7 +95,7 @@ public class PneumaticsControlModule implements PneumaticsBase {
    * @param busId The bus ID
    * @param module module number to construct
    */
-  public PneumaticsControlModule(int busId, int module) {
+  public PneumaticsControlModule(CANBus busId, int module) {
     m_dataStore = getForModule(busId, module);
     m_handle = m_dataStore.m_handle;
   }
@@ -265,18 +266,23 @@ public class PneumaticsControlModule implements PneumaticsBase {
 
   @Override
   public Solenoid makeSolenoid(int channel) {
-    return new Solenoid(m_dataStore.m_module, PneumaticsModuleType.CTRE_PCM, channel);
+    return new Solenoid(
+        m_dataStore.m_busId, m_dataStore.m_module, PneumaticsModuleType.CTRE_PCM, channel);
   }
 
   @Override
   public DoubleSolenoid makeDoubleSolenoid(int forwardChannel, int reverseChannel) {
     return new DoubleSolenoid(
-        m_dataStore.m_module, PneumaticsModuleType.CTRE_PCM, forwardChannel, reverseChannel);
+        m_dataStore.m_busId,
+        m_dataStore.m_module,
+        PneumaticsModuleType.CTRE_PCM,
+        forwardChannel,
+        reverseChannel);
   }
 
   @Override
   public Compressor makeCompressor() {
-    return new Compressor(m_dataStore.m_module, PneumaticsModuleType.CTRE_PCM);
+    return new Compressor(m_dataStore.m_busId, m_dataStore.m_module, PneumaticsModuleType.CTRE_PCM);
   }
 
   @Override

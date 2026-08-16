@@ -16,7 +16,7 @@ class ADXL345SimTest {
   @ParameterizedTest
   @ValueSource(ints = {2, 4, 8, 16})
   void testInitI2C(int range) {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (ADXL345_I2C accel = new ADXL345_I2C(I2C.Port.PORT_0, range)) {
       ADXL345Sim sim = new ADXL345Sim(accel);

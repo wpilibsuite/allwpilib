@@ -19,11 +19,15 @@ def fixup_root_package_name(name):
         return "wpimath"
     if name == "robotpy_apriltag":
         return "apriltag"
+    if name == "wpilib_drivers":
+        return "drivers"
+    if name == "robotpy_fields":
+        return "fields"
     return name
 
 
 def fixup_native_lib_name(name):
-    return name
+    return name.replace("_", "-")
 
 
 def fixup_shared_lib_name(name):

@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "wpi/hal/PowerDistribution.h"
+#include "wpi/hardware/bus/CANBus.hpp"
 #include "wpi/util/Handle.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
@@ -41,7 +42,7 @@ class PowerDistribution : public wpi::util::Sendable,
    *
    * @param busId The bus ID.
    */
-  explicit PowerDistribution(int busId);
+  explicit PowerDistribution(CANBus busId);
 
   /**
    * Constructs a PowerDistribution object.
@@ -50,7 +51,7 @@ class PowerDistribution : public wpi::util::Sendable,
    * @param module The CAN ID of the PDP/PDH
    * @param moduleType The type of module
    */
-  PowerDistribution(int busId, int module, ModuleType moduleType);
+  PowerDistribution(CANBus busId, int module, ModuleType moduleType);
 
   PowerDistribution(PowerDistribution&&) = default;
   PowerDistribution& operator=(PowerDistribution&&) = default;
@@ -68,6 +69,7 @@ class PowerDistribution : public wpi::util::Sendable,
    * Query the input voltage of the PDP/PDH.
    *
    * @return The input voltage in volts
+   * @Common This is one of the commonly used methods for this class
    */
   double GetVoltage() const;
 
@@ -78,6 +80,7 @@ class PowerDistribution : public wpi::util::Sendable,
    *
    *
    * @return The temperature in degrees Celsius
+   * @Common This is one of the commonly used methods for this class
    */
   double GetTemperature() const;
 
@@ -86,6 +89,7 @@ class PowerDistribution : public wpi::util::Sendable,
    *
    * @param channel the channel to query (0-15 for PDP, 0-23 for PDH)
    * @return The current of the channel in Amperes
+   * @Common This is one of the commonly used methods for this class
    */
   double GetCurrent(int channel) const;
 
@@ -100,6 +104,7 @@ class PowerDistribution : public wpi::util::Sendable,
    * Query the total current of all monitored PDP/PDH channels.
    *
    * @return The total current drawn from all channels in Amperes
+   * @Common This is one of the commonly used methods for this class
    */
   double GetTotalCurrent() const;
 
@@ -109,6 +114,7 @@ class PowerDistribution : public wpi::util::Sendable,
    * Not supported on the Rev PDH and returns 0.
    *
    * @return The total power drawn in Watts
+   * @Common This is one of the commonly used methods for this class
    */
   double GetTotalPower() const;
 

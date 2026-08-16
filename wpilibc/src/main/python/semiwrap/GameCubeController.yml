@@ -29,11 +29,17 @@ classes:
       GetPort:
       IsConnected:
       GetLeftX:
+      SetLeftXDeadband:
       GetLeftY:
+      SetLeftYDeadband:
       GetCStickX:
+      SetCStickXDeadband:
       GetCStickY:
+      SetCStickYDeadband:
       GetLTrigger:
+      SetLTriggerDeadband:
       GetRTrigger:
+      SetRTriggerDeadband:
       GetAxis:
       AxisLessThan:
       AxisGreaterThan:

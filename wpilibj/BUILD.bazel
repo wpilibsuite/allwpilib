@@ -15,7 +15,10 @@ py_binary(
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    deps = [requirement("jinja2")],
+    deps = [
+        requirement("jinja2"),
+        "//:generation",
+    ],
 )
 
 py_binary(
@@ -25,17 +28,10 @@ py_binary(
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    deps = [requirement("jinja2")],
-)
-
-py_binary(
-    name = "generate_pwm_motor_controllers",
-    srcs = ["generate_pwm_motor_controllers.py"],
-    target_compatible_with = select({
-        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-    deps = [requirement("jinja2")],
+    deps = [
+        requirement("jinja2"),
+        "//:generation",
+    ],
 )
 
 py_binary(
@@ -49,7 +45,6 @@ py_binary(
     deps = [
         ":generate_first_ds_hids",
         ":generate_hids",
-        ":generate_pwm_motor_controllers",
     ],
 )
 
@@ -90,8 +85,6 @@ wpilib_java_library(
     maven_group_id = "org.wpilib.wpilibj",
     visibility = ["//visibility:public"],
     deps = [
-        "//cameraserver:cameraserver-java",
-        "//cscore:cscore-java",
         "//datalog:datalog-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
@@ -160,18 +153,9 @@ filegroup(
 )
 
 filegroup(
-    name = "pwm_schema",
-    srcs = [
-        "src/generate/pwm_motor_controllers.json",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-filegroup(
     name = "templates",
     srcs = glob(["src/generate/**/*.jinja"]) + [
         ":hid_schema",
-        ":pwm_schema",
     ],
     visibility = ["//visibility:public"],
 )

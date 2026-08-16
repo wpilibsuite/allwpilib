@@ -86,6 +86,38 @@ class MatrixTest {
   }
 
   @Test
+  void testPseudoInverse() {
+    // Check the four Moore-Penrose conditions:
+    // https://en.wikipedia.org/wiki/Moore-Penrose_inverse#Definition
+
+    // Invertible non-square matrix
+    var A1 = MatBuilder.fill(Nat.N2(), Nat.N3(), 1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+    var A1_pinv = A1.pseudoInverse();
+
+    // AA⁺ maps all column vectors of A to themselves: AA⁺A = A
+    assertTrue(A1.isEqual(A1.times(A1_pinv).times(A1), 1E-9));
+    // A⁺ acts like a weak inverse: A⁺AA⁺ = A⁺
+    assertTrue(A1.pseudoInverse().isEqual(A1_pinv.times(A1).times(A1_pinv), 1E-9));
+    // AA⁺ is symmetric: (AA⁺)ᵀ = AA⁺
+    assertTrue(A1.times(A1_pinv).isEqual(A1.times(A1_pinv).transpose(), 1E-9));
+    // A⁺A is symmetric: (A⁺A)ᵀ = A⁺A
+    assertTrue(A1_pinv.times(A1).isEqual(A1_pinv.times(A1).transpose(), 1E-9));
+
+    // Singular square matrix
+    var A2 = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.0, 2.0, 2.0, 4.0);
+    var A2_pinv = A2.pseudoInverse();
+
+    // AA⁺ maps all column vectors of A to themselves: AA⁺A = A
+    assertTrue(A2.isEqual(A2.times(A2_pinv).times(A2), 1E-9));
+    // A⁺ acts like a weak inverse: A⁺AA⁺ = A⁺
+    assertTrue(A2.pseudoInverse().isEqual(A2_pinv.times(A2).times(A2_pinv), 1E-9));
+    // AA⁺ is symmetric: (AA⁺)ᵀ = AA⁺
+    assertTrue(A2.times(A2_pinv).isEqual(A2.times(A2_pinv).transpose(), 1E-9));
+    // A⁺A is symmetric: (A⁺A)ᵀ = A⁺A
+    assertTrue(A2_pinv.times(A2).isEqual(A2_pinv.times(A2).transpose(), 1E-9));
+  }
+
+  @Test
   void testUninvertableMatrix() {
     var singularMatrix = MatBuilder.fill(Nat.N2(), Nat.N2(), 2.0, 1.0, 2.0, 1.0);
 

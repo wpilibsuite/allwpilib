@@ -35,7 +35,6 @@ class DifferentialDrivePoseEstimatorTest {
 
     var estimator =
         new DifferentialDrivePoseEstimator(
-            kinematics,
             Rotation2d.kZero,
             0,
             0,
@@ -72,7 +71,6 @@ class DifferentialDrivePoseEstimatorTest {
 
     var estimator =
         new DifferentialDrivePoseEstimator(
-            kinematics,
             Rotation2d.kZero,
             0,
             0,
@@ -218,11 +216,8 @@ class DifferentialDrivePoseEstimatorTest {
     // is that all measurements affect the estimated pose. The alternative result is that only one
     // vision measurement affects the outcome. If that were the case, after 1000 measurements, the
     // estimated pose would converge to that measurement.
-    var kinematics = new DifferentialDriveKinematics(1);
-
     var estimator =
         new DifferentialDrivePoseEstimator(
-            kinematics,
             Rotation2d.kZero,
             0,
             0,
@@ -265,10 +260,8 @@ class DifferentialDrivePoseEstimatorTest {
 
   @Test
   void testDiscardsStaleVisionMeasurements() {
-    var kinematics = new DifferentialDriveKinematics(1);
     var estimator =
         new DifferentialDrivePoseEstimator(
-            kinematics,
             Rotation2d.kZero,
             0,
             0,
@@ -302,10 +295,8 @@ class DifferentialDrivePoseEstimatorTest {
 
   @Test
   void testSampleAt() {
-    var kinematics = new DifferentialDriveKinematics(1);
     var estimator =
         new DifferentialDrivePoseEstimator(
-            kinematics,
             Rotation2d.kZero,
             0,
             0,
@@ -352,10 +343,8 @@ class DifferentialDrivePoseEstimatorTest {
 
   @Test
   void testReset() {
-    var kinematics = new DifferentialDriveKinematics(1);
     var estimator =
         new DifferentialDrivePoseEstimator(
-            kinematics,
             Rotation2d.kZero,
             0,
             0,

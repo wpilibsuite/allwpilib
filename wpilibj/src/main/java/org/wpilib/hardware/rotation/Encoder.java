@@ -220,6 +220,16 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
+   * Sets the time window used to calculate the encoder rate.
+   *
+   * @param windowMilliseconds The rate calculation window in milliseconds. Valid values are 5
+   *     through 255. The default is 50.
+   */
+  public void setRateWindow(int windowMilliseconds) {
+    EncoderJNI.setEncoderRateWindow(m_encoder, windowMilliseconds);
+  }
+
+  /**
    * Set the distance per pulse for this encoder. This sets the multiplier used to determine the
    * distance driven based on the count value from the encoder. Do not include the decoding type in
    * this scale. The library already compensates for the decoding type. Set this value based on the

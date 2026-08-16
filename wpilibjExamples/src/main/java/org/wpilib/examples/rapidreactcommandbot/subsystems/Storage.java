@@ -7,11 +7,11 @@ package org.wpilib.examples.rapidreactcommandbot.subsystems;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.command2.button.Trigger;
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.epilogue.Logged;
 import org.wpilib.epilogue.NotLogged;
 import org.wpilib.examples.rapidreactcommandbot.Constants.StorageConstants;
 import org.wpilib.hardware.discrete.DigitalInput;
-import org.wpilib.hardware.motor.PWMSparkMax;
 
 @Logged
 public class Storage extends SubsystemBase {
@@ -28,7 +28,7 @@ public class Storage extends SubsystemBase {
   /** Create a new Storage subsystem. */
   public Storage() {
     // Set default command to turn off the storage motor and then idle
-    setDefaultCommand(runOnce(motor::disable).andThen(run(() -> {})).withName("Idle"));
+    setDefaultCommand(runOnce(() -> motor.setThrottle(0)).andThen(run(() -> {})).withName("Idle"));
   }
 
   /** Returns a command that runs the storage motor indefinitely. */

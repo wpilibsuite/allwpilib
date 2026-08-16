@@ -7,11 +7,12 @@
 import math
 
 import ntcore
+import robotpy_fields
 import wpilib
+import wpilib_drivers
 import wpilib.simulation
 import wpimath
 import wpimath.units
-import robotpy_apriltag
 
 
 class Drivetrain:
@@ -25,10 +26,10 @@ class Drivetrain:
     ENCODER_RESOLUTION = 4096
 
     def __init__(self, camera_to_object_topic: ntcore.DoubleArrayTopic) -> None:
-        self.left_leader = wpilib.PWMSparkMax(1)
-        self.left_follower = wpilib.PWMSparkMax(2)
-        self.right_leader = wpilib.PWMSparkMax(3)
-        self.right_follower = wpilib.PWMSparkMax(4)
+        self.left_leader = wpilib_drivers.PWMSparkMax(1)
+        self.left_follower = wpilib_drivers.PWMSparkMax(2)
+        self.right_leader = wpilib_drivers.PWMSparkMax(3)
+        self.right_follower = wpilib_drivers.PWMSparkMax(4)
 
         self.left_encoder = wpilib.Encoder(0, 1)
         self.right_encoder = wpilib.Encoder(2, 3)
@@ -48,10 +49,12 @@ class Drivetrain:
         self.default_val = [0.0] * 7
         self.camera_to_object_entry = camera_to_object_topic.get_entry(self.default_val)
 
-        layout = robotpy_apriltag.AprilTagFieldLayout.load_field(
-            robotpy_apriltag.AprilTagField.K2024_CRESCENDO
-        )
-        self.object_in_field = layout.get_tag_pose(0) or wpimath.Pose3d()
+        object_in_field = robotpy_fields.get_field(
+            robotpy_fields.FieldId.FRC_2024_CRESCENDO
+        ).get_tag_pose(1)
+        if object_in_field is None:
+            raise RuntimeError("Could not load 2024 Crescendo field tag 1")
+        self.object_in_field = object_in_field
 
         self.field_sim = wpilib.Field2d()
         self.field_approximation = wpilib.Field2d()
@@ -59,7 +62,6 @@ class Drivetrain:
         # Here we use DifferentialDrivePoseEstimator so that we can fuse odometry readings. The
         # numbers used below are robot specific, and should be tuned.
         self.pose_estimator = wpimath.DifferentialDrivePoseEstimator(
-            self.kinematics,
             self.imu.get_rotation2d(),
             self.left_encoder.get_distance(),
             self.right_encoder.get_distance(),

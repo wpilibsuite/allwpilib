@@ -1,11 +1,9 @@
-apply from: "${rootDir}/shared/resources.gradle"
-
 apply plugin: 'c'
 
 ext {
     nativeName = 'apriltag'
     devMain = 'org.wpilib.vision.apriltag.DevMain'
-    nativeTestSuiteName = "${nativeName}Catch2Test"
+    nativeTestSuiteName = "${nativeName}Test"
     useJava = true
     useCpp = true
     sharedCvConfigs = [
@@ -13,19 +11,8 @@ ext {
         (nativeTestSuiteName): []]
     staticCvConfigs = []
 
-    def generateTask = createGenerateResourcesTask('main', 'APRILTAG', 'wpi::apriltag', project)
-
-    tasks.withType(CppCompile) {
-        dependsOn generateTask
-    }
     splitSetup = {
         it.sources {
-            resourcesCpp(CppSourceSet) {
-                source {
-                    srcDirs "$buildDir/generated/main/cpp", "$rootDir/shared/singlelib"
-                    include '*.cpp'
-                }
-            }
             apriltagC(CSourceSet) {
                 source {
                     srcDirs 'src/main/native/thirdparty/apriltag/src'
@@ -47,15 +34,6 @@ apply from: "${rootDir}/shared/opencv.gradle"
 
 dependencies {
     implementation project(':wpimath')
-    annotationProcessor libs.avaje.jsonb.generator
-}
-
-sourceSets {
-    main {
-        resources {
-            srcDirs 'src/main/native/resources'
-        }
-    }
 }
 
 cppHeadersZip {

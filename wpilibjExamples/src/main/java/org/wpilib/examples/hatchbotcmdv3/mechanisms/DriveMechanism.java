@@ -8,8 +8,8 @@ import java.util.function.DoubleSupplier;
 import org.wpilib.command3.Command;
 import org.wpilib.command3.Mechanism;
 import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.examples.hatchbotcmdv3.Constants.DriveConstants;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.util.sendable.SendableRegistry;
 
@@ -98,7 +98,7 @@ public class DriveMechanism implements Mechanism {
           }
 
           // Finally, stop
-          drive.stopMotor();
+          drive.tankDrive(0, 0);
         })
         .named("Drive Distance[" + distance + "@" + speed + "]");
   }

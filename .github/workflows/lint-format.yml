@@ -16,14 +16,14 @@ jobs:
     name: "Validation"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: gradle/actions/wrapper-validation@v5
+      - uses: actions/checkout@v7
+      - uses: gradle/actions/wrapper-validation@v6
 
   wpiformat:
     name: "wpiformat"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Fetch all history and metadata
@@ -31,13 +31,13 @@ jobs:
           git checkout -b pr
           git branch -f main origin/main
       - name: Set up Python 3.12
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - name: Install wpiformat
         run: |
           python -m venv ${{ runner.temp }}/wpiformat
-          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2026.64
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2026.71
       - name: Run
         run: ${{ runner.temp }}/wpiformat/bin/wpiformat
       - name: Check output
@@ -64,7 +64,7 @@ jobs:
     needs: [validation]
     container: wpilib/debian-base:trixie
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Fetch all history and metadata
@@ -73,16 +73,16 @@ jobs:
           git checkout -b pr
           git branch -f main origin/main
       - name: Set up Python 3.12
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - name: Install wpiformat
         run: |
           python -m venv ${{ runner.temp }}/wpiformat
-          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2026.64
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2026.71
       - name: Create compile_commands.json
         run: |
-          ./gradlew generateCompileCommands -Ptoolchain-optional-Systemcore
+          ./gradlew generateCompileCommands --parallel -Ptoolchain-optional-Systemcore
           ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64release/compile_commands.json
           ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64debug/compile_commands.json
       - name: List changed files
@@ -97,7 +97,7 @@ jobs:
     needs: [validation]
     container: wpilib/debian-base:trixie
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Fetch all history and metadata
@@ -128,7 +128,7 @@ jobs:
   check-spelling:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: misspell
         uses: reviewdog/action-misspell@v1
         with:
@@ -142,8 +142,6 @@ jobs:
             ./wpigui/src/main/native/cpp/portable-file-dialogs.*
             ./wpimath/src/main/native/include/wpi/units/base.hpp
             ./wpinet/src/main/native/linux/AvahiClient.*
-            ./wpinet/src/main/native/cpp/http_parser.cpp
-            ./wpinet/src/main/native/include/wpi/net/http_parser.hpp
             ./wpiutil/src/main/native/include/wpi/util/FastQueue.hpp
             ./wpiutil/src/test/native/cpp/json/**
             ./wpiutil/src/test/native/cpp/llvm/**

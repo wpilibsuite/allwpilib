@@ -6,22 +6,23 @@
 #include "wpi/simulation/PWMMotorControllerSim.hpp"
 // clang-format on
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "wpi/hardware/motor/Spark.hpp"
+#include "motorcontrol/TestPWMMotorController.hpp"
 
 namespace wpi::sim {
-TEST(PWMMotorControllerSimTest, TestMotor) {
-  wpi::Spark spark{0};
-  wpi::sim::PWMMotorControllerSim sim{spark};
+TEST_CASE("PWMMotorControllerSimTest TestMotor", "[wpilibc][simulation]") {
+  wpi::TestPWMMotorController motor{0};
+  wpi::sim::PWMMotorControllerSim sim{motor};
 
-  spark.SetThrottle(0);
-  EXPECT_EQ(0, sim.GetThrottle());
+  motor.SetThrottle(0);
+  CHECK(0 == sim.GetThrottle());
 
-  spark.SetThrottle(0.354);
-  EXPECT_EQ(0.354, sim.GetThrottle());
+  motor.SetThrottle(0.354);
+  CHECK(0.354 == sim.GetThrottle());
 
-  spark.SetThrottle(-0.785);
-  EXPECT_EQ(-0.785, sim.GetThrottle());
+  motor.SetThrottle(-0.785);
+  CHECK(-0.785 == sim.GetThrottle());
 }
 }  // namespace wpi::sim

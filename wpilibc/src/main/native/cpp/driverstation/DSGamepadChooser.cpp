@@ -190,7 +190,7 @@ void DSGamepadChooser::Update() {
 
   for (size_t i = 0; i < m_selectables.size(); i++) {
     const GamepadSelectable& displaySelectable = *m_selectables[i];
-    DriverStationDisplay::AddData(
+    DriverStationDisplay::AddKeyedLine(
         m_captionPrefix + std::string{displaySelectable.GetName()},
         FormatDisplayLine(displaySelectable,
                           i == static_cast<size_t>(m_selectedSelectable)));

@@ -6,6 +6,7 @@
 
 from commands2 import Command, InstantCommand, Subsystem, cmd
 import wpilib
+import wpilib_drivers
 import wpimath
 
 from constants import ShooterConstants
@@ -15,8 +16,12 @@ class Shooter(Subsystem):
     def __init__(self) -> None:
         """The shooter subsystem for the robot."""
         super().__init__()
-        self.shooter_motor = wpilib.PWMSparkMax(ShooterConstants.SHOOTER_MOTOR_PORT)
-        self.feeder_motor = wpilib.PWMSparkMax(ShooterConstants.FEEDER_MOTOR_PORT)
+        self.shooter_motor = wpilib_drivers.PWMSparkMax(
+            ShooterConstants.SHOOTER_MOTOR_PORT
+        )
+        self.feeder_motor = wpilib_drivers.PWMSparkMax(
+            ShooterConstants.FEEDER_MOTOR_PORT
+        )
         self.shooter_encoder = wpilib.Encoder(
             ShooterConstants.ENCODER_PORTS[0],
             ShooterConstants.ENCODER_PORTS[1],
@@ -36,8 +41,8 @@ class Shooter(Subsystem):
         self.set_default_command(
             self.run_once(
                 lambda: (
-                    self.shooter_motor.disable(),
-                    self.feeder_motor.disable(),
+                    self.shooter_motor.set_throttle(0.0),
+                    self.feeder_motor.set_throttle(0.0),
                 )
             )
             .and_then(self.run(lambda: None))

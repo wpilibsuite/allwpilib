@@ -16,12 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.simulation.SteamControllerSim;
 
 class SteamControllerTest {
   @Test
   void testWrappedHID() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SteamController controller = new SteamController(2);
     SteamControllerSim sim = new SteamControllerSim(controller);
     sim.notifyNewData();
@@ -37,7 +38,7 @@ class SteamControllerTest {
   @EnumSource(value = SteamController.Button.class)
   void testButtons(SteamController.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SteamController joy = new SteamController(2);
     SteamControllerSim joysim = new SteamControllerSim(joy);
 
@@ -76,7 +77,7 @@ class SteamControllerTest {
   @EnumSource(value = SteamController.Axis.class)
   void testAxes(SteamController.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SteamController joy = new SteamController(2);
     SteamControllerSim joysim = new SteamControllerSim(joy);
 
@@ -84,12 +85,32 @@ class SteamControllerTest {
 
     String simSetMethodName = "set" + axisName;
     String joyGetMethodName = "get" + axisName;
+    String joySetDeadbandMethodName = "set" + axisName + "Deadband";
 
     Method simSetMethod = joysim.getClass().getMethod(simSetMethodName, double.class);
     Method joyGetMethod = joy.getClass().getMethod(joyGetMethodName);
+    final Method joySetDeadbandMethod =
+        joy.getClass().getMethod(joySetDeadbandMethodName, double.class);
 
     simSetMethod.invoke(joysim, 0.35);
     joysim.notifyNewData();
+    double defaultDeadband = axis.value < 4 ? 0.1 : 0.01;
+    assertEquals(
+        MathUtil.applyDeadband(0.35, defaultDeadband),
+        (Double) joyGetMethod.invoke(joy),
+        0.001);
+
+    joySetDeadbandMethod.invoke(joy, 0.2);
+    assertEquals(
+        MathUtil.applyDeadband(0.35, 0.2), (Double) joyGetMethod.invoke(joy), 0.001);
+
+    joySetDeadbandMethod.invoke(joy, -1.0);
+    assertEquals(0.35, (Double) joyGetMethod.invoke(joy), 0.001);
+
+    joySetDeadbandMethod.invoke(joy, 2.0);
+    assertEquals(0.0, (Double) joyGetMethod.invoke(joy), 0.001);
+
+    joySetDeadbandMethod.invoke(joy, Double.NaN);
     assertEquals(0.35, (Double) joyGetMethod.invoke(joy), 0.001);
   }
 }

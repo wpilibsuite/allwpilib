@@ -33,7 +33,8 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry
    * Constructs a MecanumDriveOdometry object.
    *
    * @param kinematics The mecanum drive kinematics for your drivetrain.
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */

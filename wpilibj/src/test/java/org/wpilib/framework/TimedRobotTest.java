@@ -12,8 +12,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.wpilib.hardware.hal.RobotMode;
+import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.simulation.DriverStationSim;
 import org.wpilib.simulation.SimHooks;
+import org.wpilib.util.WPIUtilJNI;
 
 class TimedRobotTest {
   static final double kPeriod = 0.02;
@@ -147,6 +149,18 @@ class TimedRobotTest {
       new StackTraceElement("java.lang.Thread", "run", null, 1)
     };
     assertEquals("org.wpilib.framework.TimedRobotTest$MockRobot", MockRobot.getRobotName(elements));
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void constructorPublishesProgramStartTime() {
+    try (var sub =
+            NetworkTableInstance.getDefault()
+                .getIntegerTopic("/Robot/ProgramStartTime")
+                .subscribe(-1);
+        var robot = new MockRobot()) {
+      assertEquals(WPIUtilJNI.getProgramStartTime(), sub.get(-1));
+    }
   }
 
   @Test

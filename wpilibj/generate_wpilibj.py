@@ -1,10 +1,20 @@
+#!/usr/bin/env python3
+
+# Copyright (c) FIRST and other WPILib contributors.
+# Open Source Software; you can modify and/or share it under the terms of
+# the WPILib BSD license file in the root directory of this project.
+
 import argparse
 import os
+import sys
 from pathlib import Path
+
+# When invoked directly, Python puts the script directory on sys.path.
+# Add the repo root so absolute package imports still work.
+sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 from wpilibj.generate_first_ds_hids import generate_first_ds_hids
 from wpilibj.generate_hids import generate_hids
-from wpilibj.generate_pwm_motor_controllers import generate_pwm_motor_controllers
 
 
 def main():
@@ -40,7 +50,6 @@ def main():
     generate_first_ds_hids(
         args.output_directory, args.template_root, test_output_directory
     )
-    generate_pwm_motor_controllers(args.output_directory, args.template_root)
 
 
 if __name__ == "__main__":

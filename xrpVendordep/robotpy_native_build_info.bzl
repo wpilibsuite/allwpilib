@@ -8,7 +8,7 @@ def define_native_wrapper(name, pyproject_toml = None):
 
     copy_to_directory(
         name = "{}.copy_headers".format(name),
-        srcs = native.glob(["src/main/native/include/**"]) + native.glob(["src/generated/main/native/include/**"], allow_empty = True),
+        srcs = native.glob(["src/main/native/include/**"], allow_empty = True) + native.glob(["src/generated/main/native/include/**"], allow_empty = True),
         out = "native/xrp/include",
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {

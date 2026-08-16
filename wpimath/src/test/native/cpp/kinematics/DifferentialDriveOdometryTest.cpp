@@ -6,8 +6,9 @@
 
 #include <numbers>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 
@@ -15,13 +16,13 @@ static constexpr double kEpsilon = 1E-9;
 
 using namespace wpi::math;
 
-TEST(DifferentialDriveOdometryTest, EncoderDistances) {
+TEST_CASE("DifferentialDriveOdometryTest EncoderDistances", "[wpimath]") {
   DifferentialDriveOdometry odometry{45_deg, 0_m, 0_m};
 
   const auto& pose =
       odometry.Update(135_deg, 0_m, wpi::units::meter_t{5 * std::numbers::pi});
 
-  EXPECT_NEAR(pose.X().value(), 5.0, kEpsilon);
-  EXPECT_NEAR(pose.Y().value(), 5.0, kEpsilon);
-  EXPECT_NEAR(pose.Rotation().Degrees().value(), 90.0, kEpsilon);
+  CHECK_NEAR(pose.X().value(), 5.0, kEpsilon);
+  CHECK_NEAR(pose.Y().value(), 5.0, kEpsilon);
+  CHECK_NEAR(pose.Rotation().Degrees().value(), 90.0, kEpsilon);
 }

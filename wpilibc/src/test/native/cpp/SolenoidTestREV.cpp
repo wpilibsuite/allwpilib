@@ -2,49 +2,55 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 #include "wpi/hardware/pneumatic/Solenoid.hpp"
 
 namespace wpi {
-TEST(SolenoidREVTest, ValidInitialization) {
-  Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::REV_PH, 2};
-  EXPECT_EQ(2, solenoid.GetChannel());
+TEST_CASE("SolenoidREVTest ValidInitialization", "[wpilibc]") {
+  Solenoid solenoid{CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::REV_PH, 2};
+  CHECK(2 == solenoid.GetChannel());
 
   solenoid.Set(true);
-  EXPECT_TRUE(solenoid.Get());
+  CHECK(solenoid.Get());
 
   solenoid.Set(false);
-  EXPECT_FALSE(solenoid.Get());
+  CHECK_FALSE(solenoid.Get());
 }
 
-TEST(SolenoidREVTest, DoubleInitialization) {
-  Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::REV_PH, 2};
-  EXPECT_THROW(Solenoid(0, 3, wpi::PneumaticsModuleType::REV_PH, 2),
-               std::runtime_error);
+TEST_CASE("SolenoidREVTest DoubleInitialization", "[wpilibc]") {
+  Solenoid solenoid{CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::REV_PH, 2};
+  CHECK_THROWS_AS(
+      Solenoid(CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::REV_PH, 2),
+      std::runtime_error);
 }
 
-TEST(SolenoidREVTest, DoubleInitializationFromDoubleSolenoid) {
-  DoubleSolenoid solenoid{0, 3, wpi::PneumaticsModuleType::REV_PH, 2, 3};
-  EXPECT_THROW(Solenoid(0, 3, wpi::PneumaticsModuleType::REV_PH, 2),
-               std::runtime_error);
+TEST_CASE("SolenoidREVTest DoubleInitializationFromDoubleSolenoid",
+          "[wpilibc]") {
+  DoubleSolenoid solenoid{CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::REV_PH,
+                          2, 3};
+  CHECK_THROWS_AS(
+      Solenoid(CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::REV_PH, 2),
+      std::runtime_error);
 }
 
-TEST(SolenoidREVTest, InvalidChannel) {
-  EXPECT_THROW(Solenoid(0, 3, wpi::PneumaticsModuleType::REV_PH, 100),
-               std::runtime_error);
+TEST_CASE("SolenoidREVTest InvalidChannel", "[wpilibc]") {
+  CHECK_THROWS_AS(
+      Solenoid(CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::REV_PH, 100),
+      std::runtime_error);
 }
 
-TEST(SolenoidREVTest, Toggle) {
-  Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::REV_PH, 2};
+TEST_CASE("SolenoidREVTest Toggle", "[wpilibc]") {
+  Solenoid solenoid{CANBus::CAN_S0, 3, wpi::PneumaticsModuleType::REV_PH, 2};
   solenoid.Set(true);
-  EXPECT_TRUE(solenoid.Get());
+  CHECK(solenoid.Get());
 
   solenoid.Toggle();
-  EXPECT_FALSE(solenoid.Get());
+  CHECK_FALSE(solenoid.Get());
 
   solenoid.Toggle();
-  EXPECT_TRUE(solenoid.Get());
+  CHECK(solenoid.Get());
 }
 }  // namespace wpi

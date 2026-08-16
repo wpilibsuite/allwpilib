@@ -103,23 +103,6 @@ configurations {
     devImplementation.extendsFrom(implementation)
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs = [
-        '--release',
-        '25',
-        '-encoding',
-        'UTF8',
-        "-Werror",
-        "-Xlint:all",
-        // ignore AutoCloseable warnings
-        "-Xlint:-try",
-        // ignore missing serialVersionUID warnings
-        "-Xlint:-serial",
-        // ignore unclaimed annotation warning from annotation processing
-        "-Xlint:-processing",
-    ]
-}
-
 dependencies {
     testImplementation libs.junit.api
     testRuntimeOnly libs.junit.launcher
@@ -127,7 +110,7 @@ dependencies {
     devImplementation sourceSets.main.output
 }
 
-task run(type: JavaExec) {
+tasks.register('run', JavaExec) {
     classpath = sourceSets.dev.runtimeClasspath
 
     mainClass = project.devMain

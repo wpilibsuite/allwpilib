@@ -18,28 +18,29 @@ def copy_upstream_src(wpilib_root: Path):
 
     files = walk_cwd_and_copy_if(
         lambda dp, f: (
-            (f.endswith(".h") or f.endswith(".hh"))
-            and not f == "heap.h"
-            and not f == "stereo-matching-libelas.h"
+            f.endswith((".h", ".hh"))
+            and f != "heap.h"
+            and f != "stereo-matching-libelas.h"
+            and f != "python-wrapping-utilities.h"
+            and f != "python-cameramodel-converter.h"
             and not has_prefix(dp, Path("test"))
         ),
         wpical / "src/main/native/thirdparty/mrcal/include",
     )
     files = files + walk_cwd_and_copy_if(
         lambda dp, f: (
-            (
-                f.endswith(".c")
-                or f.endswith(".cc")
-                or f.endswith(".cpp")
-                or f.endswith(".pl")
-            )
-            and not f == "heap.cc"
-            and not f == "mrcal-pywrap.c"
-            and not f == "image.c"
-            and not f == "stereo.c"
-            and not f == "stereo-matching-libelas.cc"
-            and not f == "uncertainty.c"
-            and not f == "traverse-sensor-links.c"
+            f.endswith((".c", ".cc", ".cpp", ".pl"))
+            and f
+            not in [
+                "heap.cc",
+                "mrcal-pywrap.c",
+                "image.c",
+                "python-cameramodel-converter.c",
+                "stereo.c",
+                "stereo-matching-libelas.cc",
+                "uncertainty.c",
+                "traverse-sensor-links.c",
+            ]
             and not has_prefix(dp, Path("doc"))
             and not has_prefix(dp, Path("test"))
         ),
@@ -50,8 +51,6 @@ def copy_upstream_src(wpilib_root: Path):
         with open(f) as file:
             content = file.read()
         content = content.replace("#warning", "// #warning")
-        content = content.replace('__attribute__ ((visibility ("hidden")))', "")
-        content = content.replace("__attribute__((unused))", "")
         with open(f, "w") as file:
             file.write(content)
         if f.suffix == ".pl":
@@ -61,8 +60,8 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "mrcal"
     url = "https://github.com/dkogan/mrcal"
-    # master on 2024-11-29
-    tag = "662a539d3cbba4948c31d06a780569173b3fb6e6"
+    # master on 2026-06-30
+    tag = "c47576ea206f3cbd1ff86ee748c1b00bdd93361b"
 
     mrcal = Lib(name, url, tag, copy_upstream_src)
     mrcal.main()

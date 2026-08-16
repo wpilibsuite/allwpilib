@@ -12,8 +12,8 @@ classes:
     methods:
       PowerDistribution:
         overloads:
-          int:
-          int, int, ModuleType:
+          CANBus:
+          CANBus, int, ModuleType:
       GetVoltage:
       GetTemperature:
       GetCurrent:

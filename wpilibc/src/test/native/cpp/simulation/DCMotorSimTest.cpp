@@ -4,9 +4,10 @@
 
 #include "wpi/simulation/DCMotorSim.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "wpi/hardware/motor/PWMVictorSPX.hpp"
+#include "motorcontrol/TestPWMMotorController.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/system/Models.hpp"
@@ -15,7 +16,7 @@
 #include "wpi/simulation/RoboRioSim.hpp"
 #include "wpi/system/RobotController.hpp"
 
-TEST(DCMotorSimTest, VoltageSteadyState) {
+TEST_CASE("DCMotorSimTest VoltageSteadyState", "[wpilibc][simulation]") {
   wpi::math::DCMotor gearbox = wpi::math::DCMotor::NEO(1);
   auto plant = wpi::math::Models::SingleJointedArmFromPhysicalConstants(
       wpi::math::DCMotor::NEO(1), wpi::units::kilogram_square_meter_t{0.0005},
@@ -24,7 +25,7 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
 
   wpi::Encoder encoder{0, 1};
   wpi::sim::EncoderSim encoderSim{encoder};
-  wpi::PWMVictorSPX motor{0};
+  wpi::TestPWMMotorController motor{0};
 
   wpi::sim::RoboRioSim::ResetData();
   encoderSim.ResetData();
@@ -43,7 +44,8 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }
 
-  EXPECT_NEAR((gearbox.Kv * 12_V).value(), encoder.GetRate(), 0.1);
+  CHECK_THAT((gearbox.Kv * 12_V).value(),
+             Catch::Matchers::WithinAbs(encoder.GetRate(), 0.1));
 
   // Decay
   for (int i = 0; i < 100; i++) {
@@ -59,10 +61,10 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }
 
-  EXPECT_NEAR(0, encoder.GetRate(), 0.1);
+  CHECK_THAT(0, Catch::Matchers::WithinAbs(encoder.GetRate(), 0.1));
 }
 
-TEST(DCMotorSimTest, PositionFeedbackControl) {
+TEST_CASE("DCMotorSimTest PositionFeedbackControl", "[wpilibc][simulation]") {
   wpi::math::DCMotor gearbox = wpi::math::DCMotor::NEO(1);
   auto plant = wpi::math::Models::SingleJointedArmFromPhysicalConstants(
       wpi::math::DCMotor::NEO(1), wpi::units::kilogram_square_meter_t{0.0005},
@@ -73,7 +75,7 @@ TEST(DCMotorSimTest, PositionFeedbackControl) {
 
   wpi::Encoder encoder{0, 1};
   wpi::sim::EncoderSim encoderSim{encoder};
-  wpi::PWMVictorSPX motor{0};
+  wpi::TestPWMMotorController motor{0};
 
   wpi::sim::RoboRioSim::ResetData();
   encoderSim.ResetData();
@@ -92,6 +94,6 @@ TEST(DCMotorSimTest, PositionFeedbackControl) {
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }
 
-  EXPECT_NEAR(encoder.GetDistance(), 750, 1.0);
-  EXPECT_NEAR(encoder.GetRate(), 0, 0.1);
+  CHECK_THAT(encoder.GetDistance(), Catch::Matchers::WithinAbs(750, 1.0));
+  CHECK_THAT(encoder.GetRate(), Catch::Matchers::WithinAbs(0, 0.1));
 }

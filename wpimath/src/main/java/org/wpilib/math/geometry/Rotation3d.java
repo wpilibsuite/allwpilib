@@ -18,6 +18,7 @@ import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Units;
 import org.wpilib.units.measure.Angle;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
@@ -324,6 +325,48 @@ public final class Rotation3d
   }
 
   /**
+   * Constructs and returns a Rotation3d with the given number of radians for the roll, pitch, and
+   * yaw.
+   *
+   * @param roll The counterclockwise rotation angle around the X axis (roll) in radians.
+   * @param pitch The counterclockwise rotation angle around the Y axis (pitch) in radians.
+   * @param yaw The counterclockwise rotation angle around the Z axis (yaw) in radians.
+   * @return The rotation object with the desired angle values.
+   */
+  public static Rotation3d fromRadians(double roll, double pitch, double yaw) {
+    return new Rotation3d(roll, pitch, yaw);
+  }
+
+  /**
+   * Constructs and returns a Rotation3d with the given number of degrees for the roll, pitch, and
+   * yaw.
+   *
+   * @param roll The counterclockwise rotation angle around the X axis (roll) in degrees.
+   * @param pitch The counterclockwise rotation angle around the Y axis (pitch) in degrees.
+   * @param yaw The counterclockwise rotation angle around the Z axis (yaw) in degrees.
+   * @return The rotation object with the desired angle values.
+   */
+  public static Rotation3d fromDegrees(double roll, double pitch, double yaw) {
+    return new Rotation3d(Math.toRadians(roll), Math.toRadians(pitch), Math.toRadians(yaw));
+  }
+
+  /**
+   * Constructs and returns a Rotation3d with the given number of rotations for the roll, pitch, and
+   * yaw.
+   *
+   * @param roll The counterclockwise rotation angle around the X axis (roll) in rotations.
+   * @param pitch The counterclockwise rotation angle around the Y axis (pitch) in rotations.
+   * @param yaw The counterclockwise rotation angle around the Z axis (yaw) in rotations.
+   * @return The rotation object with the desired angle values.
+   */
+  public static Rotation3d fromRotations(double roll, double pitch, double yaw) {
+    return new Rotation3d(
+        Units.rotationsToRadians(roll),
+        Units.rotationsToRadians(pitch),
+        Units.rotationsToRadians(yaw));
+  }
+
+  /**
    * Takes the inverse of the current rotation.
    *
    * @return The inverse of the current rotation.
@@ -422,7 +465,7 @@ public final class Rotation3d
     final var y = m_q.getY();
     final var z = m_q.getZ();
 
-    // wpimath/algorithms.md
+    // wpimath/docs/Quaternion.md
     final var cxcy = 1.0 - 2.0 * (x * x + y * y);
     final var sxcy = 2.0 * (w * x + y * z);
     final var cy_sq = cxcy * cxcy + sxcy * sxcy;
@@ -464,7 +507,7 @@ public final class Rotation3d
     final var y = m_q.getY();
     final var z = m_q.getZ();
 
-    // wpimath/algorithms.md
+    // wpimath/docs/Quaternion.md
     final var cycz = 1.0 - 2.0 * (y * y + z * z);
     final var cysz = 2.0 * (w * z + x * y);
     final var cy_sq = cycz * cycz + cysz * cysz;

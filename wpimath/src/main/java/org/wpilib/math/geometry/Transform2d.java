@@ -17,7 +17,12 @@ import org.wpilib.units.measure.Distance;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
-/** Represents a transformation for a Pose2d in the pose's frame. */
+/**
+ * Represents a transformation for a Pose2d in the pose's frame.
+ *
+ * <p>Transforms are applied intrinsically, i.e. relative to the pose's own frame rather than the
+ * global frame. This is in contrast to the rotation classes, which apply rotations extrinsically.
+ */
 public final class Transform2d implements ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Transform2d representing no transformation.

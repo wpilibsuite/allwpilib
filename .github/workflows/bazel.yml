@@ -23,14 +23,14 @@ jobs:
 
           - { name: "macOS", classifier: "osxuniversal,osxuniversaldebug,headers,sources,osxuniversalstatic,osxuniversalstaticdebug,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug", os: macOS-15, container: "", action: "test" }
 
-          - { name: "Windows x86-64",      classifier: "windowsx86-64,windowsx86-64static,headers,sources",   os: windows-2022, container: "", action: "test" }
-          - { name: "Windows x86-64 Debug", classifier: "windowsx86-64debug,windowsx86-64staticdebug",        os: windows-2022, container: "", action: "test" }
+          - { name: "Windows x86-64",      classifier: "windowsx86-64,windowsx86-64static,headers,sources",   os: windows-2025, container: "", action: "test" }
+          - { name: "Windows x86-64 Debug", classifier: "windowsx86-64debug,windowsx86-64staticdebug",        os: windows-2025, container: "", action: "test" }
 
-          - { name: "Windows ARM64",       classifier: "windowsarm64,windowsarm64static",                    os: windows-2022, container: "", action: "build" }
-          - { name: "Windows ARM64 Debug",  classifier: "windowsarm64debug,windowsarm64staticdebug",         os: windows-2022, container: "", action: "build" }
+          - { name: "Windows ARM64",       classifier: "windowsarm64,windowsarm64static",                    os: windows-2025, container: "", action: "build" }
+          - { name: "Windows ARM64 Debug",  classifier: "windowsarm64debug,windowsarm64staticdebug",         os: windows-2025, container: "", action: "build" }
 
-          - { name: "Windows System Core", classifier: "linuxsystemcore,linuxsystemcorestatic", os: windows-2022, container: "", action: "build" }
-          - { name: "Windows System Core Debug", classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug", os: windows-2022, container: "", action: "build" }
+          - { name: "Windows System Core", classifier: "linuxsystemcore,linuxsystemcorestatic", os: windows-2025, container: "", action: "build" }
+          - { name: "Windows System Core Debug", classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug", os: windows-2025, container: "", action: "build" }
 
     name: "${{ matrix.action == 'test' && 'Test' || 'Build' }} ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
@@ -64,7 +64,7 @@ jobs:
       - name: Check disk free space post-cleanup
         run: df -h
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
 
       - id: Setup_bazel_cache
@@ -85,7 +85,7 @@ jobs:
           sudo avahi-daemon -D
 
       - if: runner.os == 'Linux'
-        uses: bazel-contrib/setup-bazel@0.15.0
+        uses: bazel-contrib/setup-bazel@0.19.0
         with:
           bazelisk-cache: true
           repository-cache: true
@@ -100,7 +100,7 @@ jobs:
             TARGETS=...
           fi
           if [ "${{ runner.os }}" = "Windows" ]; then
-            bazel --output_user_root=C:\\bazelroot ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}'
+            bazel --output_user_root=D:\\bazelroot ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}'
           else
             bazel ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}'
           fi
@@ -114,7 +114,7 @@ jobs:
     name: "buildifier"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Run buildifier
         run: bazel run //:buildifier.fix
@@ -135,7 +135,7 @@ jobs:
   mod-lock:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Check lockfile
         run: bazel mod deps --lockfile_mode=error
@@ -157,7 +157,7 @@ jobs:
     name: "Non-RobotPy Pregen"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
 
       - id: Setup_bazel_cache
@@ -177,7 +177,7 @@ jobs:
         run: git diff HEAD > non-robotpy-pregeneration.patch
         if: ${{ failure() }}
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: non-robotpy-pregeneration-fixes
           path: non-robotpy-pregeneration.patch
@@ -187,7 +187,7 @@ jobs:
     name: "Robotpy Pregeneration"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
 
       - id: Setup_bazel_cache
@@ -215,7 +215,7 @@ jobs:
         run: git diff HEAD > robotpy-pregeneration.patch
         if: ${{ failure() }}
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: robotpy-pregeneration-fixes
           path: robotpy-pregeneration.patch
@@ -228,11 +228,11 @@ jobs:
     name: "RobotPy Formatting"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Set up Python 3.12
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - name: Install black

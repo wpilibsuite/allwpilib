@@ -4,11 +4,13 @@
 
 #include "wpi/simulation/EncoderSim.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
 #include "wpi/hal/HAL.h"
 #include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/util/deprecated.hpp"
 
 namespace wpi::sim {
@@ -17,8 +19,8 @@ namespace {
 constexpr double kDefaultDistancePerPulse = .0005;
 }  // namespace
 
-TEST(EncoderSimTest, Initialize) {
-  HAL_Initialize(500, 0);
+TEST_CASE("EncoderSimTest Initialize", "[wpilibc][simulation]") {
+  HAL_Initialize();
 
   EncoderSim sim = EncoderSim::CreateForIndex(0);
   sim.ResetData();
@@ -28,13 +30,13 @@ TEST(EncoderSimTest, Initialize) {
 
   Encoder encoder(0, 1);
 
-  EXPECT_TRUE(sim.GetInitialized());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  CHECK(sim.GetInitialized());
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, Rate) {
-  HAL_Initialize(500, 0);
+TEST_CASE("EncoderSimTest Rate", "[wpilibc][simulation]") {
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -45,13 +47,25 @@ TEST(EncoderSimTest, Rate) {
   DoubleCallback callback;
   auto cb = sim.RegisterRateCallback(callback.GetCallback(), false);
   sim.SetRate(1.91);
-  EXPECT_EQ(1.91, sim.GetRate());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(1.91, callback.GetLastValue());
+  CHECK(1.91 == sim.GetRate());
+  CHECK(callback.WasTriggered());
+  CHECK(1.91 == callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, ResetDataClearsRateCallbacks) {
-  HAL_Initialize(500, 0);
+TEST_CASE("EncoderSimTest SetRateWindow", "[wpilibc][simulation]") {
+  HAL_Initialize();
+
+  Encoder encoder(0, 1);
+
+  CHECK_NOTHROW(encoder.SetRateWindow(wpi::units::millisecond_t{5}));
+  CHECK_NOTHROW(encoder.SetRateWindow(wpi::units::millisecond_t{255}));
+  CHECK_THROWS(encoder.SetRateWindow(wpi::units::millisecond_t{4}));
+  CHECK_THROWS(encoder.SetRateWindow(wpi::units::millisecond_t{256}));
+}
+
+TEST_CASE("EncoderSimTest ResetDataClearsRateCallbacks",
+          "[wpilibc][simulation]") {
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -60,16 +74,16 @@ TEST(EncoderSimTest, ResetDataClearsRateCallbacks) {
   DoubleCallback callback;
   auto cb = sim.RegisterRateCallback(callback.GetCallback(), false);
   sim.SetRate(1.91);
-  ASSERT_TRUE(callback.WasTriggered());
+  REQUIRE(callback.WasTriggered());
 
   callback.Reset();
   sim.ResetData();
   sim.SetRate(2.53);
-  EXPECT_FALSE(callback.WasTriggered());
+  CHECK_FALSE(callback.WasTriggered());
 }
 
-TEST(EncoderSimTest, Count) {
-  HAL_Initialize(500, 0);
+TEST_CASE("EncoderSimTest Count", "[wpilibc][simulation]") {
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -80,15 +94,15 @@ TEST(EncoderSimTest, Count) {
   IntCallback callback;
   auto cb = sim.RegisterCountCallback(callback.GetCallback(), false);
   sim.SetCount(3504);
-  EXPECT_EQ(3504, sim.GetCount());
+  CHECK(3504 == sim.GetCount());
 
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(3504, encoder.Get());
-  EXPECT_EQ(3504, callback.GetLastValue());
+  CHECK(callback.WasTriggered());
+  CHECK(3504 == encoder.Get());
+  CHECK(3504 == callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, Distance) {
-  HAL_Initialize(500, 0);
+TEST_CASE("EncoderSimTest Distance", "[wpilibc][simulation]") {
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -97,12 +111,12 @@ TEST(EncoderSimTest, Distance) {
   encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
 
   sim.SetDistance(229.174);
-  EXPECT_EQ(229.174, sim.GetDistance());
-  EXPECT_EQ(229.174, encoder.GetDistance());
+  CHECK(229.174 == sim.GetDistance());
+  CHECK(229.174 == encoder.GetDistance());
 }
 
-TEST(EncoderSimTest, SetDirection) {
-  HAL_Initialize(500, 0);
+TEST_CASE("EncoderSimTest SetDirection", "[wpilibc][simulation]") {
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -114,20 +128,20 @@ TEST(EncoderSimTest, SetDirection) {
   auto cb = sim.RegisterDirectionCallback(callback.GetCallback(), false);
 
   sim.SetDirection(true);
-  EXPECT_TRUE(sim.GetDirection());
-  EXPECT_TRUE(encoder.GetDirection());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  CHECK(sim.GetDirection());
+  CHECK(encoder.GetDirection());
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue());
 
   sim.SetDirection(false);
-  EXPECT_FALSE(sim.GetDirection());
-  EXPECT_FALSE(encoder.GetDirection());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_FALSE(callback.GetLastValue());
+  CHECK_FALSE(sim.GetDirection());
+  CHECK_FALSE(encoder.GetDirection());
+  CHECK(callback.WasTriggered());
+  CHECK_FALSE(callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, SetReverseDirection) {
-  HAL_Initialize(500, 0);
+TEST_CASE("EncoderSimTest SetReverseDirection", "[wpilibc][simulation]") {
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -139,18 +153,18 @@ TEST(EncoderSimTest, SetReverseDirection) {
   auto cb = sim.RegisterReverseDirectionCallback(callback.GetCallback(), false);
 
   encoder.SetReverseDirection(true);
-  EXPECT_TRUE(sim.GetReverseDirection());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  CHECK(sim.GetReverseDirection());
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue());
 
   encoder.SetReverseDirection(false);
-  EXPECT_FALSE(sim.GetReverseDirection());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_FALSE(callback.GetLastValue());
+  CHECK_FALSE(sim.GetReverseDirection());
+  CHECK(callback.WasTriggered());
+  CHECK_FALSE(callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, SetDistancePerPulse) {
-  HAL_Initialize(500, 0);
+TEST_CASE("EncoderSimTest SetDistancePerPulse", "[wpilibc][simulation]") {
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -160,14 +174,14 @@ TEST(EncoderSimTest, SetDistancePerPulse) {
   auto cb = sim.RegisterDistancePerPulseCallback(callback.GetCallback(), false);
 
   sim.SetDistancePerPulse(.03405);
-  EXPECT_EQ(.03405, sim.GetDistancePerPulse());
-  EXPECT_EQ(.03405, encoder.GetDistancePerPulse());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(.03405, callback.GetLastValue());
+  CHECK(.03405 == sim.GetDistancePerPulse());
+  CHECK(.03405 == encoder.GetDistancePerPulse());
+  CHECK(callback.WasTriggered());
+  CHECK(.03405 == callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, Reset) {
-  HAL_Initialize(500, 0);
+TEST_CASE("EncoderSimTest Reset", "[wpilibc][simulation]") {
+  HAL_Initialize();
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
@@ -183,16 +197,16 @@ TEST(EncoderSimTest, Reset) {
   sim.SetDirection(true);
 
   encoder.Reset();
-  EXPECT_TRUE(sim.GetReset());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  CHECK(sim.GetReset());
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue());
 
-  EXPECT_EQ(0, sim.GetCount());
-  EXPECT_EQ(0, encoder.Get());
-  EXPECT_EQ(0, sim.GetDistance());
-  EXPECT_EQ(0, encoder.GetDistance());
-  EXPECT_TRUE(sim.GetDirection());
-  EXPECT_TRUE(encoder.GetDirection());
+  CHECK(0 == sim.GetCount());
+  CHECK(0 == encoder.Get());
+  CHECK(0 == sim.GetDistance());
+  CHECK(0 == encoder.GetDistance());
+  CHECK(sim.GetDirection());
+  CHECK(encoder.GetDirection());
 }
 
 }  // namespace wpi::sim

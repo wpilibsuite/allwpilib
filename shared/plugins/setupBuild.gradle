@@ -30,7 +30,7 @@ if (!project.hasProperty('onlylinuxsystemcore')) {
                         it.cppCompiler.define("HALSIM_InitExtension", "HALSIM_InitExtension_$name")
                     }
 
-                    project(':hal').addHalDependency(it, 'shared')
+                    lib project: ':hal', library: 'hal', linkage: 'shared'
                     if (project.hasProperty('includeNtCore')) {
                         lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     }
@@ -58,7 +58,7 @@ if (!project.hasProperty('onlylinuxsystemcore')) {
                 }
                 binaries.all {
                     if (!project.hasProperty('onlylinuxsystemcore')) {
-                        project(':hal').addHalDependency(it, 'shared')
+                        lib project: ':hal', library: 'hal', linkage: 'shared'
                         lib library: pluginName
                         if (project.hasProperty('includeNtCore')) {
                             lib project: ':ntcore', library: 'ntcore', linkage: 'shared'

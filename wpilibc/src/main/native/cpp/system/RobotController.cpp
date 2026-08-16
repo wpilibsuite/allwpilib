@@ -140,17 +140,12 @@ void RobotController::ResetRailFaultCounts() {
   WPILIB_CheckErrorStatus(status, "ResetRailFaultCounts");
 }
 
-wpi::units::volt_t RobotController::GetBrownoutVoltage() {
+void RobotController::SetBrownoutVoltages(wpi::units::volt_t brownoutVoltage,
+                                          wpi::units::volt_t recoveryVoltage) {
   int32_t status = 0;
-  double retVal = HAL_GetBrownoutVoltage(&status);
-  WPILIB_CheckErrorStatus(status, "GetBrownoutVoltage");
-  return wpi::units::volt_t{retVal};
-}
-
-void RobotController::SetBrownoutVoltage(wpi::units::volt_t brownoutVoltage) {
-  int32_t status = 0;
-  HAL_SetBrownoutVoltage(brownoutVoltage.value(), &status);
-  WPILIB_CheckErrorStatus(status, "SetBrownoutVoltage");
+  HAL_SetBrownoutVoltages(brownoutVoltage.value(), recoveryVoltage.value(),
+                          &status);
+  WPILIB_CheckErrorStatus(status, "SetBrownoutVoltages");
 }
 
 wpi::units::celsius_t RobotController::GetCPUTemp() {
@@ -160,16 +155,16 @@ wpi::units::celsius_t RobotController::GetCPUTemp() {
   return wpi::units::celsius_t{retVal};
 }
 
-CANStatus RobotController::GetCANStatus(int busId) {
+CANStatus RobotController::GetCANStatus(CANBus busId) {
   int32_t status = 0;
   float percentBusUtilization = 0;
   uint32_t busOffCount = 0;
   uint32_t txFullCount = 0;
   uint32_t receiveErrorCount = 0;
   uint32_t transmitErrorCount = 0;
-  HAL_CAN_GetCANStatus(busId, &percentBusUtilization, &busOffCount,
-                       &txFullCount, &receiveErrorCount, &transmitErrorCount,
-                       &status);
+  HAL_CAN_GetCANStatus(static_cast<int>(busId), &percentBusUtilization,
+                       &busOffCount, &txFullCount, &receiveErrorCount,
+                       &transmitErrorCount, &status);
   WPILIB_CheckErrorStatus(status, "GetCANStatus");
   return {percentBusUtilization, static_cast<int>(busOffCount),
           static_cast<int>(txFullCount), static_cast<int>(receiveErrorCount),

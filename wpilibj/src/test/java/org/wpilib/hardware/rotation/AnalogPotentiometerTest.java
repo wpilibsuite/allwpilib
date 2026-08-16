@@ -13,15 +13,20 @@ import org.wpilib.simulation.AnalogInputSim;
 import org.wpilib.simulation.RoboRioSim;
 
 class AnalogPotentiometerTest {
+  private static void resetAnalogPotentiometerTestData(int channel) {
+    RoboRioSim.resetData();
+    new AnalogInputSim(channel).resetData();
+  }
+
   @Test
   void testInitializeWithAnalogInput() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
+    resetAnalogPotentiometerTestData(0);
 
     try (AnalogInput ai = new AnalogInput(0);
         AnalogPotentiometer pot = new AnalogPotentiometer(ai)) {
       AnalogInputSim sim = new AnalogInputSim(ai);
 
-      RoboRioSim.resetData();
       sim.setVoltage(2.8);
       assertEquals(2.8 / 3.3, pot.get());
     }
@@ -29,11 +34,11 @@ class AnalogPotentiometerTest {
 
   @Test
   void testInitializeWithAnalogInputAndScale() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
+    resetAnalogPotentiometerTestData(0);
 
     try (AnalogInput ai = new AnalogInput(0);
         AnalogPotentiometer pot = new AnalogPotentiometer(ai, 270.0)) {
-      RoboRioSim.resetData();
       AnalogInputSim sim = new AnalogInputSim(ai);
 
       sim.setVoltage(3.3);
@@ -49,10 +54,10 @@ class AnalogPotentiometerTest {
 
   @Test
   void testInitializeWithChannel() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
+    resetAnalogPotentiometerTestData(1);
 
     try (AnalogPotentiometer pot = new AnalogPotentiometer(1)) {
-      RoboRioSim.resetData();
       AnalogInputSim sim = new AnalogInputSim(1);
 
       sim.setVoltage(3.3);
@@ -62,10 +67,10 @@ class AnalogPotentiometerTest {
 
   @Test
   void testInitializeWithChannelAndScale() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
+    resetAnalogPotentiometerTestData(1);
 
     try (AnalogPotentiometer pot = new AnalogPotentiometer(1, 180.0)) {
-      RoboRioSim.resetData();
       AnalogInputSim sim = new AnalogInputSim(1);
 
       sim.setVoltage(3.3);
@@ -78,8 +83,10 @@ class AnalogPotentiometerTest {
 
   @Test
   void testWithModifiedBatteryVoltage() {
+    HAL.initialize();
+    resetAnalogPotentiometerTestData(1);
+
     try (AnalogPotentiometer pot = new AnalogPotentiometer(1, 180.0, 90.0)) {
-      RoboRioSim.resetData();
       AnalogInputSim sim = new AnalogInputSim(1);
 
       // Test at 3.3v

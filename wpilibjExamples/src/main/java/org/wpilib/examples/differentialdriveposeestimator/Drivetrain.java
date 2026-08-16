@@ -4,8 +4,10 @@
 
 package org.wpilib.examples.differentialdriveposeestimator;
 
+import org.wpilib.drivers.motor.PWMSparkMax;
+import org.wpilib.fields.Field;
+import org.wpilib.fields.Fields;
 import org.wpilib.hardware.imu.OnboardIMU;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
@@ -35,8 +37,6 @@ import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 import org.wpilib.system.Timer;
-import org.wpilib.vision.apriltag.AprilTagFieldLayout;
-import org.wpilib.vision.apriltag.AprilTagFields;
 
 /** Represents a differential drive style drivetrain. */
 public class Drivetrain {
@@ -79,7 +79,6 @@ public class Drivetrain {
   numbers used  below are robot specific, and should be tuned. */
   private final DifferentialDrivePoseEstimator poseEstimator =
       new DifferentialDrivePoseEstimator(
-          kinematics,
           imu.getRotation2d(),
           leftEncoder.getDistance(),
           rightEncoder.getDistance(),
@@ -125,8 +124,7 @@ public class Drivetrain {
 
     cameraToObjectEntry = cameraToObjectTopic.getEntry(defaultVal);
 
-    objectInField =
-        AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo).getTagPose(1).get();
+    objectInField = Field.loadField(Fields.FRC_2024_CRESCENDO).getTagPose(1).get();
 
     SmartDashboard.putData("Field", fieldSim);
     SmartDashboard.putData("FieldEstimation", fieldApproximation);

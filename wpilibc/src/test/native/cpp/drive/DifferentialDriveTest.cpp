@@ -4,243 +4,245 @@
 
 #include "wpi/drive/DifferentialDrive.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "motorcontrol/MockPWMMotorController.hpp"
 
-TEST(DifferentialDriveTest, ArcadeDriveIK) {
+TEST_CASE("DifferentialDriveTest ArcadeDriveIK", "[wpilibc][drive]") {
   // Forward
   auto velocities = wpi::DifferentialDrive::ArcadeDriveIK(1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(1.0, velocities.right);
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Forward left turn
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(0.0, velocities.left);
-  EXPECT_DOUBLE_EQ(0.5, velocities.right);
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(0.5, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Forward right turn
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(0.5, velocities.left);
-  EXPECT_DOUBLE_EQ(0.0, velocities.right);
+  CHECK_THAT(0.5, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(-1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward left turn
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(-0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(-0.5, velocities.left);
-  EXPECT_DOUBLE_EQ(0.0, velocities.right);
+  CHECK_THAT(-0.5, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward right turn
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(-0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(0.0, velocities.left);
-  EXPECT_DOUBLE_EQ(-0.5, velocities.right);
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-0.5, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Left turn (xVelocity with negative sign)
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(-0.0, 1.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(1.0, velocities.right);
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Left turn (xVelocity with positive sign)
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(0.0, 1.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(1.0, velocities.right);
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Right turn (xVelocity with negative sign)
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(-0.0, -1.0, false);
-  EXPECT_DOUBLE_EQ(1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Right turn (xVelocity with positive sign)
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(0.0, -1.0, false);
-  EXPECT_DOUBLE_EQ(1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 }
 
-TEST(DifferentialDriveTest, ArcadeDriveIKSquared) {
+TEST_CASE("DifferentialDriveTest ArcadeDriveIKSquared", "[wpilibc][drive]") {
   // Forward
   auto velocities = wpi::DifferentialDrive::ArcadeDriveIK(1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(1.0, velocities.right);
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Forward left turn
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, velocities.left);
-  EXPECT_DOUBLE_EQ(0.25, velocities.right);
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(0.25, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Forward right turn
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(0.25, velocities.left);
-  EXPECT_DOUBLE_EQ(0.0, velocities.right);
+  CHECK_THAT(0.25, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(-1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward left turn
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(-0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(-0.25, velocities.left);
-  EXPECT_DOUBLE_EQ(0.0, velocities.right);
+  CHECK_THAT(-0.25, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward right turn
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(-0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, velocities.left);
-  EXPECT_DOUBLE_EQ(-0.25, velocities.right);
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-0.25, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Left turn (xVelocity with negative sign)
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(-0.0, 1.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(1.0, velocities.right);
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Left turn (xVelocity with positive sign)
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(0.0, 1.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(1.0, velocities.right);
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Right turn (xVelocity with negative sign)
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(-0.0, -1.0, false);
-  EXPECT_DOUBLE_EQ(1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Right turn (xVelocity with positive sign)
   velocities = wpi::DifferentialDrive::ArcadeDriveIK(0.0, -1.0, false);
-  EXPECT_DOUBLE_EQ(1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 }
 
-TEST(DifferentialDriveTest, CurvatureDriveIK) {
+TEST_CASE("DifferentialDriveTest CurvatureDriveIK", "[wpilibc][drive]") {
   // Forward
   auto velocities = wpi::DifferentialDrive::CurvatureDriveIK(1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(1.0, velocities.right);
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Forward left turn
   velocities = wpi::DifferentialDrive::CurvatureDriveIK(0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(0.25, velocities.left);
-  EXPECT_DOUBLE_EQ(0.75, velocities.right);
+  CHECK_THAT(0.25, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(0.75, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Forward right turn
   velocities = wpi::DifferentialDrive::CurvatureDriveIK(0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(0.75, velocities.left);
-  EXPECT_DOUBLE_EQ(0.25, velocities.right);
+  CHECK_THAT(0.75, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(0.25, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward
   velocities = wpi::DifferentialDrive::CurvatureDriveIK(-1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward left turn
   velocities = wpi::DifferentialDrive::CurvatureDriveIK(-0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(-0.75, velocities.left);
-  EXPECT_DOUBLE_EQ(-0.25, velocities.right);
+  CHECK_THAT(-0.75, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-0.25, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward right turn
   velocities = wpi::DifferentialDrive::CurvatureDriveIK(-0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(-0.25, velocities.left);
-  EXPECT_DOUBLE_EQ(-0.75, velocities.right);
+  CHECK_THAT(-0.25, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-0.75, Catch::Matchers::WithinULP(velocities.right, 4));
 }
 
-TEST(DifferentialDriveTest, CurvatureDriveIKTurnInPlace) {
+TEST_CASE("DifferentialDriveTest CurvatureDriveIKTurnInPlace",
+          "[wpilibc][drive]") {
   // Forward
   auto velocities = wpi::DifferentialDrive::CurvatureDriveIK(1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(1.0, velocities.right);
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Forward left turn
   velocities = wpi::DifferentialDrive::CurvatureDriveIK(0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, velocities.left);
-  EXPECT_DOUBLE_EQ(1.0, velocities.right);
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Forward right turn
   velocities = wpi::DifferentialDrive::CurvatureDriveIK(0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(0.0, velocities.right);
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward
   velocities = wpi::DifferentialDrive::CurvatureDriveIK(-1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward left turn
   velocities = wpi::DifferentialDrive::CurvatureDriveIK(-0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(0.0, velocities.right);
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward right turn
   velocities = wpi::DifferentialDrive::CurvatureDriveIK(-0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, velocities.left);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 }
 
-TEST(DifferentialDriveTest, TankDriveIK) {
+TEST_CASE("DifferentialDriveTest TankDriveIK", "[wpilibc][drive]") {
   // Forward
   auto velocities = wpi::DifferentialDrive::TankDriveIK(1.0, 1.0, false);
-  EXPECT_DOUBLE_EQ(1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(1.0, velocities.right);
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Forward left turn
   velocities = wpi::DifferentialDrive::TankDriveIK(0.5, 1.0, false);
-  EXPECT_DOUBLE_EQ(0.5, velocities.left);
-  EXPECT_DOUBLE_EQ(1.0, velocities.right);
+  CHECK_THAT(0.5, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Forward right turn
   velocities = wpi::DifferentialDrive::TankDriveIK(1.0, 0.5, false);
-  EXPECT_DOUBLE_EQ(1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(0.5, velocities.right);
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(0.5, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward
   velocities = wpi::DifferentialDrive::TankDriveIK(-1.0, -1.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward left turn
   velocities = wpi::DifferentialDrive::TankDriveIK(-0.5, -1.0, false);
-  EXPECT_DOUBLE_EQ(-0.5, velocities.left);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
+  CHECK_THAT(-0.5, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward right turn
   velocities = wpi::DifferentialDrive::TankDriveIK(-0.5, 1.0, false);
-  EXPECT_DOUBLE_EQ(-0.5, velocities.left);
-  EXPECT_DOUBLE_EQ(1.0, velocities.right);
+  CHECK_THAT(-0.5, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 }
 
-TEST(DifferentialDriveTest, TankDriveIKSquared) {
+TEST_CASE("DifferentialDriveTest TankDriveIKSquared", "[wpilibc][drive]") {
   // Forward
   auto velocities = wpi::DifferentialDrive::TankDriveIK(1.0, 1.0, true);
-  EXPECT_DOUBLE_EQ(1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(1.0, velocities.right);
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Forward left turn
   velocities = wpi::DifferentialDrive::TankDriveIK(0.5, 1.0, true);
-  EXPECT_DOUBLE_EQ(0.25, velocities.left);
-  EXPECT_DOUBLE_EQ(1.0, velocities.right);
+  CHECK_THAT(0.25, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Forward right turn
   velocities = wpi::DifferentialDrive::TankDriveIK(1.0, 0.5, true);
-  EXPECT_DOUBLE_EQ(1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(0.25, velocities.right);
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(0.25, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward
   velocities = wpi::DifferentialDrive::TankDriveIK(-1.0, -1.0, true);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward left turn
   velocities = wpi::DifferentialDrive::TankDriveIK(-0.5, -1.0, true);
-  EXPECT_DOUBLE_EQ(-0.25, velocities.left);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
+  CHECK_THAT(-0.25, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.right, 4));
 
   // Backward right turn
   velocities = wpi::DifferentialDrive::TankDriveIK(-1.0, -0.5, true);
-  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
-  EXPECT_DOUBLE_EQ(-0.25, velocities.right);
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(velocities.left, 4));
+  CHECK_THAT(-0.25, Catch::Matchers::WithinULP(velocities.right, 4));
 }
 
-TEST(DifferentialDriveTest, ArcadeDrive) {
+TEST_CASE("DifferentialDriveTest ArcadeDrive", "[wpilibc][drive]") {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
   wpi::DifferentialDrive drive{
@@ -250,36 +252,36 @@ TEST(DifferentialDriveTest, ArcadeDrive) {
 
   // Forward
   drive.ArcadeDrive(1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Forward left turn
   drive.ArcadeDrive(0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(0.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.5, right.GetThrottle());
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(0.5, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Forward right turn
   drive.ArcadeDrive(0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(0.5, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.0, right.GetThrottle());
+  CHECK_THAT(0.5, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward
   drive.ArcadeDrive(-1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward left turn
   drive.ArcadeDrive(-0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(-0.5, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.0, right.GetThrottle());
+  CHECK_THAT(-0.5, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward right turn
   drive.ArcadeDrive(-0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(0.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-0.5, right.GetThrottle());
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(-0.5, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 }
 
-TEST(DifferentialDriveTest, ArcadeDriveSquared) {
+TEST_CASE("DifferentialDriveTest ArcadeDriveSquared", "[wpilibc][drive]") {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
   wpi::DifferentialDrive drive{
@@ -289,36 +291,36 @@ TEST(DifferentialDriveTest, ArcadeDriveSquared) {
 
   // Forward
   drive.ArcadeDrive(1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Forward left turn
   drive.ArcadeDrive(0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.25, right.GetThrottle());
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(0.25, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Forward right turn
   drive.ArcadeDrive(0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(0.25, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.0, right.GetThrottle());
+  CHECK_THAT(0.25, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward
   drive.ArcadeDrive(-1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(-1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward left turn
   drive.ArcadeDrive(-0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(-0.25, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.0, right.GetThrottle());
+  CHECK_THAT(-0.25, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward right turn
   drive.ArcadeDrive(-0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-0.25, right.GetThrottle());
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(-0.25, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 }
 
-TEST(DifferentialDriveTest, CurvatureDrive) {
+TEST_CASE("DifferentialDriveTest CurvatureDrive", "[wpilibc][drive]") {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
   wpi::DifferentialDrive drive{
@@ -328,36 +330,37 @@ TEST(DifferentialDriveTest, CurvatureDrive) {
 
   // Forward
   drive.CurvatureDrive(1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Forward left turn
   drive.CurvatureDrive(0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(0.25, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.75, right.GetThrottle());
+  CHECK_THAT(0.25, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(0.75, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Forward right turn
   drive.CurvatureDrive(0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(0.75, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.25, right.GetThrottle());
+  CHECK_THAT(0.75, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(0.25, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward
   drive.CurvatureDrive(-1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward left turn
   drive.CurvatureDrive(-0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(-0.75, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-0.25, right.GetThrottle());
+  CHECK_THAT(-0.75, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(-0.25, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward right turn
   drive.CurvatureDrive(-0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(-0.25, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-0.75, right.GetThrottle());
+  CHECK_THAT(-0.25, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(-0.75, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 }
 
-TEST(DifferentialDriveTest, CurvatureDriveTurnInPlace) {
+TEST_CASE("DifferentialDriveTest CurvatureDriveTurnInPlace",
+          "[wpilibc][drive]") {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
   wpi::DifferentialDrive drive{
@@ -367,36 +370,36 @@ TEST(DifferentialDriveTest, CurvatureDriveTurnInPlace) {
 
   // Forward
   drive.CurvatureDrive(1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Forward left turn
   drive.CurvatureDrive(0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Forward right turn
   drive.CurvatureDrive(0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.0, right.GetThrottle());
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward
   drive.CurvatureDrive(-1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(-1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward left turn
   drive.CurvatureDrive(-0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(-1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.0, right.GetThrottle());
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward right turn
   drive.CurvatureDrive(-0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  CHECK_THAT(0.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 }
 
-TEST(DifferentialDriveTest, TankDrive) {
+TEST_CASE("DifferentialDriveTest TankDrive", "[wpilibc][drive]") {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
   wpi::DifferentialDrive drive{
@@ -406,36 +409,36 @@ TEST(DifferentialDriveTest, TankDrive) {
 
   // Forward
   drive.TankDrive(1.0, 1.0, false);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Forward left turn
   drive.TankDrive(0.5, 1.0, false);
-  EXPECT_DOUBLE_EQ(0.5, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  CHECK_THAT(0.5, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Forward right turn
   drive.TankDrive(1.0, 0.5, false);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.5, right.GetThrottle());
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(0.5, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward
   drive.TankDrive(-1.0, -1.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward left turn
   drive.TankDrive(-0.5, -1.0, false);
-  EXPECT_DOUBLE_EQ(-0.5, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  CHECK_THAT(-0.5, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward right turn
   drive.TankDrive(-0.5, 1.0, false);
-  EXPECT_DOUBLE_EQ(-0.5, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  CHECK_THAT(-0.5, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 }
 
-TEST(DifferentialDriveTest, TankDriveSquared) {
+TEST_CASE("DifferentialDriveTest TankDriveSquared", "[wpilibc][drive]") {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
   wpi::DifferentialDrive drive{
@@ -445,31 +448,31 @@ TEST(DifferentialDriveTest, TankDriveSquared) {
 
   // Forward
   drive.TankDrive(1.0, 1.0, true);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Forward left turn
   drive.TankDrive(0.5, 1.0, true);
-  EXPECT_DOUBLE_EQ(0.25, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  CHECK_THAT(0.25, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Forward right turn
   drive.TankDrive(1.0, 0.5, true);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.25, right.GetThrottle());
+  CHECK_THAT(1.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(0.25, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward
   drive.TankDrive(-1.0, -1.0, true);
-  EXPECT_DOUBLE_EQ(-1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward left turn
   drive.TankDrive(-0.5, -1.0, true);
-  EXPECT_DOUBLE_EQ(-0.25, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  CHECK_THAT(-0.25, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 
   // Backward right turn
   drive.TankDrive(-1.0, -0.5, true);
-  EXPECT_DOUBLE_EQ(-1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-0.25, right.GetThrottle());
+  CHECK_THAT(-1.0, Catch::Matchers::WithinULP(left.GetThrottle(), 4));
+  CHECK_THAT(-0.25, Catch::Matchers::WithinULP(right.GetThrottle(), 4));
 }

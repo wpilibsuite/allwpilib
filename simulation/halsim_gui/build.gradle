@@ -13,10 +13,11 @@ apply plugin: 'google-test-test-suite'
 apply from: "${rootDir}/shared/catch2.gradle"
 
 apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
+apply from: "${rootDir}/shared/libsdlgpu.gradle"
 
 model {
     testSuites {
-        "${pluginName}Catch2Test"(GoogleTestTestSuiteSpec) {
+        "${pluginName}Test"(GoogleTestTestSuiteSpec) {
             for(NativeComponentSpec c : $.components) {
                 if (c.name == pluginName) {
                     testing c
@@ -32,9 +33,6 @@ model {
                     srcDirs 'src/test/native/include', 'src/main/native/cpp'
                 }
             }
-            binaries.all {
-                lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
-            }
         }
     }
 }
@@ -45,34 +43,25 @@ model {
             lib project: ':glass', library: 'glassnt', linkage: 'static'
             lib project: ':glass', library: 'glass', linkage: 'static'
             lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+            lib project: ':fields', library: 'fields', linkage: 'static'
+            lib project: ':fields', library: 'fieldimages', linkage: 'static'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-            project(':hal').addHalDependency(it, 'shared')
+            lib project: ':hal', library: 'hal', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-            lib project: ':fields', library: 'fields', linkage: 'static'
             lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+            project.addLibSdlGpuDependency(it)
             if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                 it.buildable = false
                 return
             }
-            if (it.targetPlatform.operatingSystem.isWindows()) {
-                it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
-            } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
-                it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
-            } else {
-                it.linker.args << '-lX11'
-                if (it.targetPlatform.name.startsWith('linuxarm')) {
-                    it.linker.args << '-lGL'
-                }
-            }
         }
         withType(GoogleTestTestSuiteBinarySpec) {
-            project(':hal').addHalDependency(it, 'shared')
+            lib project: ':hal', library: 'hal', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-            lib library: pluginName, linkage: 'shared'
         }
     }
 }

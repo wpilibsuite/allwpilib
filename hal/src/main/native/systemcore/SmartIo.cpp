@@ -57,6 +57,20 @@ int32_t SmartIo::SwitchDioDirection(bool input) {
   return ret;
 }
 
+int32_t SmartIo::SwitchCounterEdge(bool risingEdge) {
+  MRC_Status ret = MRC_SmartIO_SwitchCounterEdge(channel, risingEdge);
+  if (ret == 0) {
+    currentMode = risingEdge
+                      ? MRC_SmartIOMode::MRC_SmartIOMode_SingleCounterRising
+                      : MRC_SmartIOMode::MRC_SmartIOMode_SingleCounterFalling;
+  }
+  return ret;
+}
+
+int32_t SmartIo::SetRateWindow(int32_t windowMilliseconds) {
+  return MRC_SmartIO_SetRateWindow(channel, windowMilliseconds);
+}
+
 int32_t SmartIo::SetDigitalOutput(bool value) {
   return MRC_SmartIO_SetDigitalOutput(channel, value);
 }
@@ -118,11 +132,30 @@ int32_t SmartIo::GetAnalogInput(uint16_t* value) {
   return status;
 }
 
-int32_t SmartIo::GetCounter(int32_t* value) {
-  int32_t valueInt;
-  int32_t status = MRC_SmartIO_GetCounter(channel, &valueInt);
+int32_t SmartIo::ResetCounter() {
+  int32_t count;
+  int32_t status = MRC_SmartIO_GetCounter(channel, &count);
   if (status == 0) {
-    *value = valueInt;
+    counterResetCount = count;
+  }
+  return status;
+}
+
+int32_t SmartIo::GetCounter(int32_t* value) {
+  int32_t count;
+  int32_t status = MRC_SmartIO_GetCounter(channel, &count);
+  if (status == 0) {
+    *value =
+        static_cast<int32_t>(static_cast<int64_t>(count) - counterResetCount);
+  }
+  return status;
+}
+
+int32_t SmartIo::GetCounterRate(int32_t* value) {
+  int32_t rate;
+  int32_t status = MRC_SmartIO_GetCounterRate(channel, &rate);
+  if (status == 0) {
+    *value = rate;
   }
   return status;
 }

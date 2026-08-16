@@ -11,7 +11,7 @@ import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.DriverStationJNI;
-import org.wpilib.math.util.Pair;
+import org.wpilib.util.Pair;
 import org.wpilib.util.Color;
 import org.wpilib.util.Color8Bit;
 

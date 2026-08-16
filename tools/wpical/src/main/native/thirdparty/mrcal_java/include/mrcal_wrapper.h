@@ -1,6 +1,6 @@
 /*
  * Copyright (C) Photon Vision.
- * 
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted.
  *
@@ -15,20 +15,11 @@
 
 #pragma once
 
-extern "C" {
-// Seems to be missing C++ guards
 #include <mrcal.h>
 
-} // extern "C"
-
-// Seems like these people don't properly extern-c their headers either
-extern "C" {
-#include <suitesparse/SuiteSparse_config.h>
-#include <suitesparse/cholmod.h>
-} // extern "C"
-
 #include <memory>
-#include <opencv2/opencv.hpp>
+#include <opencv2/core/mat.hpp>
+#include <opencv2/core/types.hpp>
 #include <span>
 #include <utility>
 #include <vector>
@@ -50,9 +41,18 @@ struct mrcal_result {
         rms_error{rms_error_}, residuals{std::move(residuals_)},
         calobject_warp{calobject_warp_}, Noutliers_board{Noutliers_board_} {}
   mrcal_result(mrcal_result &&) = delete;
-  ~mrcal_result();
+  ~mrcal_result() = default;
 };
 
+/**
+ * Gets the seed pose for a board.
+ *
+ * @param c_observations_board_pool The corners in image space.
+ * @param boardSize The size of the corner grid.
+ * @param imagerSize The size of the image in pixels.
+ * @param squareSize The size of the squares in a physical distance unit.
+ * @param focal_len_guess A focal length guess in pixels.
+ */
 mrcal_pose_t getSeedPose(const mrcal_point3_t *c_observations_board_pool,
                          cv::Size boardSize, cv::Size imagerSize,
                          double squareSize, double focal_len_guess);
@@ -61,7 +61,7 @@ std::unique_ptr<mrcal_result> mrcal_main(
     // List, depth is ordered array observation[N frames, object_height,
     // object_width] = [x,y, weight] weight<0 means ignored)
     std::span<mrcal_point3_t> observations_board,
-    // RT transform from camera to object
+    // [out] RT transform from camera to object
     std::span<mrcal_pose_t> frames_rt_toref,
     // Chessboard size, in corners (not squares)
     cv::Size calobjectSize, double boardSpacing,
@@ -77,7 +77,7 @@ enum class CameraLensModel {
   LENSMODEL_SPLINED_STEREOGRAPHIC
 };
 
-bool undistort_mrcal(const cv::Mat *src, cv::Mat *dst, const cv::Mat *cameraMat,
+bool undistort_mrcal(cv::Mat *dst, const cv::Mat *cameraMat,
                      const cv::Mat *distCoeffs, CameraLensModel lensModel,
                      // Extra stuff for splined stereographic models
                      uint16_t order, uint16_t Nx, uint16_t Ny,

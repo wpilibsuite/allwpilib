@@ -29,9 +29,13 @@ classes:
       GetPort:
       IsConnected:
       GetLeftX:
+      SetLeftXDeadband:
       GetLeftY:
+      SetLeftYDeadband:
       GetZAxis:
+      SetZAxisDeadband:
       GetZR:
+      SetZRDeadband:
       GetAxis:
       AxisLessThan:
       AxisGreaterThan:

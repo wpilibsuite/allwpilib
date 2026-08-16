@@ -11,13 +11,13 @@ ext {
 
     nativeName = 'ntcore'
     devMain = 'org.wpilib.networktables.DevMain'
-    nativeTestSuiteName = "${nativeName}Catch2Test"
+    nativeTestSuiteName = "${nativeName}Test"
     generatedSources = "$projectDir/src/generated/main/native/cpp"
     generatedHeaders = "$projectDir/src/generated/main/native/include"
     jniSplitSetup = {
     }
     splitSetup = {
-        it.tasks.withType(CppCompile) {
+        it.tasks.withType(CppCompile).configureEach {
             it.includes 'src/main/native/cpp'
         }
     }
