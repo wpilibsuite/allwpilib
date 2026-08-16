@@ -14,6 +14,7 @@
 #include "Message.hpp"
 #include "MessageHandler.hpp"
 #include "wpi/util/Logger.hpp"
+#include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SpanExtras.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/mpack.h"
@@ -583,7 +584,16 @@ bool wpi::nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
   }
   // set time
   outValue->SetServerTime(time);
-  outValue->SetTime(time == 0 ? 0 : time + localTimeOffset);
+  if (time == 0) {
+    outValue->SetTime(0);
+  } else {
+    int64_t localTime;
+    if (wpi::util::AddOverflow(time, localTimeOffset, localTime)) {
+      *error = "timestamp out of range";
+      return false;
+    }
+    outValue->SetTime(localTime);
+  }
   // update input range
   *in = wpi::util::take_back(*in, remaining);
   return true;
