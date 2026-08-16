@@ -41,6 +41,7 @@ namespace uv = wpi::net::uv;
 static constexpr size_t kMaxMessageSize = 2 * 1024 * 1024;
 
 static constexpr size_t kClientProcessMessageCountMax = 16;
+static constexpr uv::Timer::Time kHandshakeTimeout{5000};
 
 class NetworkServer::ServerConnection {
  public:
@@ -81,7 +82,8 @@ class NetworkServer::ServerConnection4 final
         HttpWebSocketServerConnection(
             stream,
             {"v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu",
-             "rtt.networktables.first.wpi.edu"}) {
+             "rtt.networktables.first.wpi.edu"},
+            kHandshakeTimeout) {
     m_info.protocol_version = 0x0400;
   }
 
