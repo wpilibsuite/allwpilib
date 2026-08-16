@@ -49,7 +49,7 @@ struct type_caster<wpi::units::unit<ConversionFactor, T, NumericalScale>> {
   // C++ -> Python
   static handle cast(const value_type &src, return_value_policy /* policy */,
                      handle /* parent */) {
-    return PyFloat_FromDouble(src.template to<double>());
+    return PyFloat_FromDouble(src.raw());
   }
 };
 
