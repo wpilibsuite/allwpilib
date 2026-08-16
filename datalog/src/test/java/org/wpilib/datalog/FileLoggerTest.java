@@ -5,6 +5,7 @@
 package org.wpilib.datalog;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,7 @@ class FileLoggerTest {
   @Test
   void closeIsIdempotent(@TempDir Path tempDir) throws Exception {
     Path file = tempDir.resolve("console.txt");
-    file.toFile().createNewFile();
+    Files.createFile(file);
 
     try (DataLogWriter log = new DataLogWriter(new ByteArrayOutputStream())) {
       FileLogger logger = new FileLogger(file.toString(), log, "console");
@@ -26,14 +27,14 @@ class FileLoggerTest {
   @Test
   void closeIsThreadSafe(@TempDir Path tempDir) throws Exception {
     Path file = tempDir.resolve("console.txt");
-    file.toFile().createNewFile();
+    Files.createFile(file);
 
     try (DataLogWriter log = new DataLogWriter(new ByteArrayOutputStream())) {
       FileLogger logger = new FileLogger(file.toString(), log, "console");
       CountDownLatch ready = new CountDownLatch(2);
       CountDownLatch start = new CountDownLatch(1);
       Thread first = closeOnSignal(logger, ready, start);
-      Thread second = closeOnSignal(logger, ready, start);
+      final Thread second = closeOnSignal(logger, ready, start);
 
       ready.await();
       start.countDown();
