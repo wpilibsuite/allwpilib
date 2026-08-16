@@ -14,6 +14,7 @@ apply plugin: 'google-test-test-suite'
 apply from: "${rootDir}/shared/catch2.gradle"
 
 apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
+apply from: "${rootDir}/shared/libmrclib.gradle"
 
 model {
     testSuites {
@@ -38,6 +39,7 @@ model {
     binaries {
         all {
             nativeUtils.useRequiredLibrary(it, 'mrclib')
+            lib project: ':hal', library: 'halMrc', linkage: 'static'
             lib project: ':hal', library: 'hal', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
@@ -45,6 +47,7 @@ model {
         }
         withType(GoogleTestTestSuiteBinarySpec) {
             nativeUtils.useRequiredLibrary(it, 'mrclib')
+            lib project: ':hal', library: 'halMrc', linkage: 'static'
             lib project: ':hal', library: 'hal', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'

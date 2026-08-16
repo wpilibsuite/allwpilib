@@ -27,7 +27,6 @@ project(':').libraryBuild.dependsOn build
 def nativeTestSuiteName = project.findProperty('nativeTestSuiteName') ?: "${nativeName}Test"
 
 apply from: "${rootDir}/shared/catch2.gradle"
-apply from: "${rootDir}/shared/libmrclib.gradle"
 
 model {
     components {
@@ -44,6 +43,9 @@ model {
                         }
                         include '**/*.cpp', '**/*.cc'
                         exclude '**/jni/**/*.cpp'
+                        if (project.hasProperty('nativeCppSourceExcludes')) {
+                            nativeCppSourceExcludes.each { exclude it }
+                        }
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include', "$buildDir/generated/source/proto/main/cpp"

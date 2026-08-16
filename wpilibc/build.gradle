@@ -104,7 +104,9 @@ model {
                 }
 
                 project(':ntcore').addNtcoreDependency(it, 'shared')
-                nativeUtils.useRequiredLibrary(it, 'mrclib')
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    nativeUtils.useRequiredLibrary(it, 'mrclib')
+                }
                 lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
@@ -126,7 +128,9 @@ model {
             }
             binaries.all {
                 project(':ntcore').addNtcoreDependency(it, 'shared')
-                nativeUtils.useRequiredLibrary(it, 'mrclib')
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    nativeUtils.useRequiredLibrary(it, 'mrclib')
+                }
                 lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
@@ -152,7 +156,9 @@ model {
             }
             binaries.all {
                 project(':ntcore').addNtcoreDependency(it, 'shared')
-                nativeUtils.useRequiredLibrary(it, 'mrclib')
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    nativeUtils.useRequiredLibrary(it, 'mrclib')
+                }
                 lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
@@ -212,7 +218,9 @@ model {
         }
         withType(GoogleTestTestSuiteBinarySpec) {
             project(':ntcore').addNtcoreDependency(it, 'shared')
-            nativeUtils.useRequiredLibrary(it, 'mrclib')
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                nativeUtils.useRequiredLibrary(it, 'mrclib')
+            }
             lib project: ':hal', library: 'hal', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'

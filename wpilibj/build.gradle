@@ -104,7 +104,9 @@ model {
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
-                nativeUtils.useRequiredLibrary(it, 'mrclib')
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    nativeUtils.useRequiredLibrary(it, 'mrclib')
+                }
                 lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
             }

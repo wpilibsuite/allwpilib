@@ -219,7 +219,9 @@ model {
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
-                nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                }
                 lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
                 project(':ntcore').addNtcoreDependency(binary, 'shared')
@@ -274,7 +276,9 @@ model {
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
                 lib project: ':cscore', library: 'cscore', linkage: 'static'
-                nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                }
                 lib project: ':hal', library: 'hal', linkage: 'static'
                 project(':ntcore').addNtcoreDependency(binary, 'static')
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'

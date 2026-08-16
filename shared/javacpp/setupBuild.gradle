@@ -19,7 +19,6 @@ project(':').libraryBuild.dependsOn build
 def nativeTestSuiteName = project.findProperty('nativeTestSuiteName') ?: "${nativeName}Test"
 
 apply from: "${rootDir}/shared/catch2.gradle"
-apply from: "${rootDir}/shared/libmrclib.gradle"
 
 model {
     components {
