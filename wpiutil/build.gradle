@@ -228,7 +228,12 @@ model {
         withType(GoogleTestTestSuiteBinarySpec) {
             def jniIncludeDir = new File(Jvm.current().javaHome, 'include')
             def jniHeaderLocations = [jniIncludeDir.toString()]
-            ['darwin', 'linux', 'win32', 'freebsd'].each {
+            [
+                'darwin',
+                'linux',
+                'win32',
+                'freebsd'
+            ].each {
                 def platformIncludeDir = new File(jniIncludeDir, it)
                 if (platformIncludeDir.exists()) {
                     jniHeaderLocations << platformIncludeDir.toString()
