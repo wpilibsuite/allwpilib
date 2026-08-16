@@ -5,12 +5,46 @@
 #include "wpi/datalog/DataLogReader.hpp"
 
 #include <bit>
+#include <optional>
 #include <utility>
 
 #include "wpi/datalog/DataLog.hpp"
 #include "wpi/util/Endian.hpp"
 
 using namespace wpi::log;
+
+namespace {
+struct DataLogHeader {
+  uint16_t version;
+  std::string_view extraHeader;
+  size_t recordsStart;
+};
+
+std::optional<DataLogHeader> ParseHeader(std::span<const uint8_t> buf) {
+  constexpr size_t kFixedHeaderSize = 12;
+  if (buf.size() < kFixedHeaderSize ||
+      std::string_view{reinterpret_cast<const char*>(buf.data()), 6} !=
+          "WPILOG") {
+    return std::nullopt;
+  }
+
+  uint16_t version = wpi::util::support::endian::read16le(&buf[6]);
+  if (version < 0x0100) {
+    return std::nullopt;
+  }
+
+  uint32_t extraHeaderSize = wpi::util::support::endian::read32le(&buf[8]);
+  if (extraHeaderSize > buf.size() - kFixedHeaderSize) {
+    return std::nullopt;
+  }
+
+  return DataLogHeader{
+      version,
+      {reinterpret_cast<const char*>(buf.data() + kFixedHeaderSize),
+       extraHeaderSize},
+      kFixedHeaderSize + extraHeaderSize};
+}
+}  // namespace
 
 static bool ReadString(std::span<const uint8_t>* buf, std::string_view* str) {
   if (buf->size() < 4) {
@@ -195,54 +229,34 @@ DataLogReader::DataLogReader(std::unique_ptr<wpi::util::MemoryBuffer> buffer)
     : m_buf{std::move(buffer)} {}
 
 bool DataLogReader::IsValid() const {
-  if (!m_buf) {
-    return false;
-  }
-  auto buf = m_buf->GetBuffer();
-  return buf.size() >= 12 &&
-         std::string_view{reinterpret_cast<const char*>(buf.data()), 6} ==
-             "WPILOG" &&
-         wpi::util::support::endian::read16le(&buf[6]) >= 0x0100;
+  return m_buf && ParseHeader(m_buf->GetBuffer()).has_value();
 }
 
 uint16_t DataLogReader::GetVersion() const {
   if (!m_buf) {
     return 0;
   }
-  auto buf = m_buf->GetBuffer();
-  if (buf.size() < 12) {
-    return 0;
-  }
-  return wpi::util::support::endian::read16le(&buf[6]);
+  auto header = ParseHeader(m_buf->GetBuffer());
+  return header ? header->version : 0;
 }
 
 std::string_view DataLogReader::GetExtraHeader() const {
   if (!m_buf) {
     return {};
   }
-  auto buf = m_buf->GetBuffer();
-  if (buf.size() < 8) {
-    return {};
-  }
-  std::string_view rv;
-  buf = buf.subspan(8);
-  ReadString(&buf, &rv);
-  return rv;
+  auto header = ParseHeader(m_buf->GetBuffer());
+  return header ? header->extraHeader : std::string_view{};
 }
 
 DataLogReader::iterator DataLogReader::begin() const {
   if (!m_buf) {
     return end();
   }
-  auto buf = m_buf->GetBuffer();
-  if (buf.size() < 12) {
+  auto header = ParseHeader(m_buf->GetBuffer());
+  if (!header) {
     return end();
   }
-  uint32_t size = wpi::util::support::endian::read32le(&buf[8]);
-  if (buf.size() < (12 + size)) {
-    return end();
-  }
-  return DataLogIterator{this, 12 + size};
+  return DataLogIterator{this, header->recordsStart};
 }
 
 static uint64_t ReadVarInt(std::span<const uint8_t> buf) {
