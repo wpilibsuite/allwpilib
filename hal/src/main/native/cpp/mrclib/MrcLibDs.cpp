@@ -336,11 +336,10 @@ MrcLibDsImpl::MrcLibDsImpl() {
     std::terminate();
   }
   if (mainRobotAppInitStatus != MRC_STATUS_SUCCESS) {
-    wpi::util::print(
-        stderr,
-        "Error: MRC_InitializeMainRobotApp failed with status {}. "
-        "Restarting app and retrying...\n",
-        mainRobotAppInitStatus);
+    wpi::util::print(stderr,
+                     "Error: MRC_InitializeMainRobotApp failed with status {}. "
+                     "Restarting app and retrying...\n",
+                     mainRobotAppInitStatus);
     std::terminate();
   }
 
