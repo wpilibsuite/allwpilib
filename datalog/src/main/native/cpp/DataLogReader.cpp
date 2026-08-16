@@ -305,21 +305,16 @@ bool DataLogReader::GetNextRecord(size_t* pos) const {
     return false;
   }
   auto buf = m_buf->GetBuffer();
-  if (buf.size() < (*pos + 4)) {  // minimum header length
+  size_t nextPos = *pos;
+  DataLogRecord record;
+  if (!GetRecord(&nextPos, &record) || nextPos == buf.size()) {
     return false;
   }
-  unsigned int entryLen = (buf[*pos] & 0x3) + 1;
-  unsigned int sizeLen = ((buf[*pos] >> 2) & 0x3) + 1;
-  unsigned int timestampLen = ((buf[*pos] >> 4) & 0x7) + 1;
-  unsigned int headerLen = 1 + entryLen + sizeLen + timestampLen;
-  if (buf.size() < (*pos + headerLen)) {
+
+  size_t nextRecordEnd = nextPos;
+  if (!GetRecord(&nextRecordEnd, &record)) {
     return false;
   }
-  uint32_t size = ReadVarInt(buf.subspan(*pos + 1 + entryLen, sizeLen));
-  // check this way to avoid overflow
-  if (size >= (buf.size() - *pos - headerLen)) {
-    return false;
-  }
-  *pos += headerLen + size;
+  *pos = nextPos;
   return true;
 }
