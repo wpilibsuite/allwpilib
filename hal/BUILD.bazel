@@ -19,7 +19,9 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
-SYSTEMCORE_SRCS = glob(["src/main/native/systemcore/**"])
+MRCLIB_SRCS = glob(["src/main/native/cpp/mrclib/**"])
+
+SYSTEMCORE_SRCS = glob(["src/main/native/systemcore/**"]) + MRCLIB_SRCS
 
 SIM_SRCS = glob(["src/main/native/sim/**"])
 
@@ -70,7 +72,7 @@ wpilib_cc_library(
         "@mrclib_headers//:headers",
     ] + select({
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": [
-            ":wpiHalMrc",
+            "//shared/bazel/thirdparty/mrclib",
         ],
         "//conditions:default": [
             "//ntcore:ntcore_c_headers",
@@ -80,7 +82,7 @@ wpilib_cc_library(
 
 cc_library(
     name = "wpiHalMrc",
-    srcs = glob(["src/main/native/cpp/mrclib/**"]),
+    srcs = MRCLIB_SRCS,
     visibility = ["//visibility:public"],
     deps = [
         ":wpiHal-headers",

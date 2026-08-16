@@ -9,7 +9,10 @@ ext {
             it.sources {
                 systemCoreCpp(CppSourceSet) {
                     source {
-                        srcDirs = ['src/main/native/systemcore']
+                        srcDirs = [
+                            'src/main/native/systemcore',
+                            'src/main/native/cpp/mrclib'
+                        ]
                         include '**/*.cpp'
                     }
                     exportedHeaders {
@@ -89,7 +92,6 @@ model {
             nativeUtils.useRequiredLibrary(it, 'mrclibHeaders')
             if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                 nativeUtils.useRequiredLibrary(it, 'mrclib')
-                lib library: 'halMrc', linkage: 'static'
             }
             if (it.component.name == "${nativeName}JNI") {
                 project(':ntcore').addNtcoreDependency(it, 'static')
