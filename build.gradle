@@ -112,6 +112,18 @@ ext.makeZipBaseName = { group, artifactId ->
     return "_GROUP_${group.replace(".", "_")}_ID_${artifactId}_CLS"
 }
 
+def versionCatalogZip = tasks.register('versionCatalogZip', Zip) {
+    description = 'Packages the dependency version catalog for publication'
+    group = 'Build'
+
+    archiveBaseName = makeZipBaseName('org.wpilib', 'wpilib-versions')
+    archiveVersion = ''
+    destinationDirectory = outputsFolder
+    from "$rootDir/gradle/libs.versions.toml"
+}
+
+copyAllOutputs.dependsOn versionCatalogZip
+
 subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
