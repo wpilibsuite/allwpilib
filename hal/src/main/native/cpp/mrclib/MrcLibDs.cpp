@@ -17,8 +17,8 @@
 #include "mrclib/DsComms.h"
 #include "mrclib/DsComms.hpp"
 #include "mrclib/DsCommsControl.h"
+#include "mrclib/MrcLib.h"
 #include "mrclib/MrcString.hpp"
-#include "mrclib/Systemcore.h"
 #include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/cpp/MrcLibAlert.hpp"
@@ -317,38 +317,33 @@ MrcLibDsImpl::MrcLibDsImpl() {
     std::terminate();
   }
 
-  // Initialize control first, making sure its properly checked for errors
-  MRC_Status controlInitStatus = MRC_DsCommsControl_Initialize();
-  if (controlInitStatus == MRC_STATUS_MULTIPLE_USER_PROGRAMS) {
+  MRC_Status subscriberInitStatus = MRC_InitializeAllSubscribers();
+  if (subscriberInitStatus != MRC_STATUS_SUCCESS) {
+    wpi::util::print(
+        stderr,
+        "Error: MRC_InitializeAllSubscribers failed with status {}. "
+        "Restarting app and retrying...\n",
+        subscriberInitStatus);
+    std::terminate();
+  }
+
+  MRC_Status mainRobotAppInitStatus = MRC_InitializeMainRobotApp();
+  if (mainRobotAppInitStatus == MRC_STATUS_MULTIPLE_USER_PROGRAMS) {
     wpi::util::print(
         stderr,
         "Warning: Multiple user programs detected. Restarting app and "
         "retrying...\n");
     std::terminate();
   }
-  if (controlInitStatus != MRC_STATUS_SUCCESS) {
-    wpi::util::print(
-        stderr,
-        "Error: MRC_DsCommsControl_Initialize failed with status {}. "
-        "Restarting app and retrying...\n",
-        controlInitStatus);
-    std::terminate();
-  }
-  MRC_DsComms_Initialize();
-
-  MRC_Console_Initialize();
-  int32_t alertBackendStatus = wpi::hal::SetMrcLibAlertBackend();
-  if (alertBackendStatus != 0) {
-    wpi::util::print(
-        stderr,
-        "Error: MRC alert backend unavailable with status {}. Restarting app "
-        "and retrying...\n",
-        alertBackendStatus);
+  if (mainRobotAppInitStatus != MRC_STATUS_SUCCESS) {
+    wpi::util::print(stderr,
+                     "Error: MRC_InitializeMainRobotApp failed with status {}. "
+                     "Restarting app and retrying...\n",
+                     mainRobotAppInitStatus);
     std::terminate();
   }
 
-  // Used in Power.cpp to get battery voltage
-  MRC_Systemcore_Initialize();
+  wpi::hal::SetMrcLibAlertBackend();
 
   // Wait for 10 seconds for the system server to be ready.
   if (!MRC_DsComms_WaitForSystemServer(10000)) {
