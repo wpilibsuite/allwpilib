@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <deque>
+#include <limits>
 #include <span>
 #include <string>
 #include <string_view>
@@ -15,6 +16,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include "../MockLogger.hpp"
+#include "net/ClientImpl.hpp"
 #include "net/Message.hpp"
 #include "net/WireConnection.hpp"
 #include "net/WireDecoder.hpp"
@@ -130,6 +133,26 @@ TEST_CASE("NetworkOutgoingQueueTest UpdatePeriodCalcUsesGcdAndMinimum",
   CHECK(UpdatePeriodCalc(UINT32_MAX, 100) == 100u);
   CHECK(UpdatePeriodCalc(100, 40) == 20u);
   CHECK(UpdatePeriodCalc(6, 4) == kMinPeriodMs);
+}
+
+TEST_CASE("ClientImpl rejects overflowing RTT timestamps", "[ntcore][client]") {
+  RecordingWireConnection wire;
+  wpi::MockLogger logger;
+  int timeSyncUpdates = 0;
+  ClientImpl client{0,
+                    wire,
+                    false,
+                    logger,
+                    [&](int64_t, int64_t, bool) { ++timeSyncUpdates; },
+                    [](uint32_t) {}};
+  std::vector<uint8_t> encoded;
+  wpi::util::raw_uvector_ostream os{encoded};
+  WireEncodeBinary(os, -1, 1,
+                   Value::MakeInteger(std::numeric_limits<int64_t>::min()));
+
+  client.ProcessIncomingBinary(0, encoded);
+
+  CHECK(timeSyncUpdates == 0);
 }
 
 TEST_CASE("NetworkOutgoingQueueTest CalculatePeriodUsesGcdAndMinimum",
