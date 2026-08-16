@@ -16,7 +16,6 @@ ext {
 
 apply from: "${rootDir}/shared/config.gradle"
 apply from: "${rootDir}/shared/plugins/publish.gradle"
-apply from: "${rootDir}/shared/libmrclib.gradle"
 
 model {
     components {
@@ -31,7 +30,6 @@ model {
                 }
             }
             binaries.all {
-                nativeUtils.useRequiredLibrary(it, 'mrclib')
                 lib project: ':hal', library: 'hal', linkage: 'shared'
                 project(':ntcore').addNtcoreDependency(it, 'shared')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'

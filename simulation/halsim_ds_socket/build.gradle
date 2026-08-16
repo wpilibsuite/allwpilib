@@ -14,6 +14,7 @@ apply plugin: 'google-test-test-suite'
 apply from: "${rootDir}/shared/catch2.gradle"
 
 apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
+apply from: "${rootDir}/shared/libmrclib.gradle"
 
 model {
     testSuites {

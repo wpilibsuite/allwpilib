@@ -39,6 +39,7 @@ ext {
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
+apply from: "${rootDir}/shared/libmrclib.gradle"
 
 cppSourcesZip {
     from('src/main/native/systemcore') {

@@ -19,7 +19,6 @@ model {
                 return
             }
 
-            nativeUtils.useRequiredLibrary(it, 'mrclib')
             lib project: ':hal', library: 'hal', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
