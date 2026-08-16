@@ -44,6 +44,9 @@ model {
                         }
                         include '**/*.cpp', '**/*.cc'
                         exclude '**/jni/**/*.cpp'
+                        if (project.hasProperty('nativeCppSourceExcludes')) {
+                            nativeCppSourceExcludes.each { exclude it }
+                        }
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include', "$buildDir/generated/source/proto/main/cpp"
