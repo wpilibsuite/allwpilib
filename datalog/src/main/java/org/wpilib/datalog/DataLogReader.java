@@ -114,14 +114,42 @@ public class DataLogReader implements Iterable<DataLogRecord> {
   }
 
   DataLogRecord getRecord(int pos) {
+    return getRecordInfo(pos).record;
+  }
+
+  int getNextRecord(int pos) {
+    return getRecordInfo(pos).nextPos;
+  }
+
+  boolean hasRecord(int pos) {
     try {
+      getRecordInfo(pos);
+      return true;
+    } catch (NoSuchElementException ex) {
+      return false;
+    }
+  }
+
+  private RecordInfo getRecordInfo(int pos) {
+    try {
+      int remaining = m_buf.remaining();
+      if (pos < 0 || pos >= remaining || remaining - pos < 4) {
+        throw new NoSuchElementException();
+      }
       int lenbyte = m_buf.get(pos) & 0xff;
       int entryLen = (lenbyte & 0x3) + 1;
       int sizeLen = ((lenbyte >> 2) & 0x3) + 1;
       int timestampLen = ((lenbyte >> 4) & 0x7) + 1;
       int headerLen = 1 + entryLen + sizeLen + timestampLen;
-      final int entry = (int) readVarInt(pos + 1, entryLen);
-      final int size = (int) readVarInt(pos + 1 + entryLen, sizeLen);
+      if (headerLen > remaining - pos) {
+        throw new NoSuchElementException();
+      }
+      int entry = (int) readVarInt(pos + 1, entryLen);
+      long size = readVarInt(pos + 1 + entryLen, sizeLen);
+      if (size > remaining - pos - headerLen) {
+        throw new NoSuchElementException();
+      }
+      int checkedSize = (int) size;
       long timestamp = readVarInt(pos + 1 + entryLen + sizeLen, timestampLen);
       if (timestamp < 0 || timestamp > Long.MAX_VALUE / 1000) {
         throw new NoSuchElementException();
@@ -130,29 +158,27 @@ public class DataLogReader implements Iterable<DataLogRecord> {
       // build a slice of the data contents
       ByteBuffer data = m_buf.duplicate();
       data.position(pos + headerLen);
-      data.limit(pos + headerLen + size);
-      return new DataLogRecord(entry, timestamp, data.slice());
+      data.limit(pos + headerLen + checkedSize);
+      return new RecordInfo(
+          new DataLogRecord(entry, timestamp, data.slice()),
+          pos + headerLen + checkedSize);
     } catch (BufferUnderflowException | IndexOutOfBoundsException ex) {
       throw new NoSuchElementException();
     }
   }
 
-  int getNextRecord(int pos) {
-    int lenbyte = m_buf.get(pos) & 0xff;
-    int entryLen = (lenbyte & 0x3) + 1;
-    int sizeLen = ((lenbyte >> 2) & 0x3) + 1;
-    int timestampLen = ((lenbyte >> 4) & 0x7) + 1;
-    int headerLen = 1 + entryLen + sizeLen + timestampLen;
-
-    int size = 0;
-    for (int i = 0; i < sizeLen; i++) {
-      size |= (m_buf.get(pos + 1 + entryLen + i) & 0xff) << (i * 8);
-    }
-    return pos + headerLen + size;
-  }
-
   int size() {
     return m_buf.remaining();
+  }
+
+  private static class RecordInfo {
+    RecordInfo(DataLogRecord record, int nextPos) {
+      this.record = record;
+      this.nextPos = nextPos;
+    }
+
+    final DataLogRecord record;
+    final int nextPos;
   }
 
   private final ByteBuffer m_buf;

@@ -31,7 +31,7 @@ public class DataLogIterator implements Iterator<DataLogRecord> {
 
   @Override
   public boolean hasNext() {
-    return (m_pos + 16) <= m_reader.size();
+    return m_reader.hasRecord(m_pos);
   }
 
   @Override
