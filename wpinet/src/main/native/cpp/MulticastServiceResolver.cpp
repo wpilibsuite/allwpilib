@@ -71,6 +71,7 @@ WPI_EventHandle WPI_GetMulticastServiceResolverEventHandle(
 
 WPI_ServiceData* WPI_GetMulticastServiceResolverData(
     WPI_MulticastServiceResolverHandle handle, int32_t* dataCount) {
+  *dataCount = 0;
   std::vector<wpi::net::MulticastServiceResolver::ServiceData> allData;
   {
     auto& manager = wpi::net::GetMulticastManager();
@@ -79,7 +80,6 @@ WPI_ServiceData* WPI_GetMulticastServiceResolverData(
     allData = resolver->GetData();
   }
   if (allData.empty()) {
-    *dataCount = 0;
     return nullptr;
   }
   size_t allocSize = sizeof(WPI_ServiceData) * allData.size();
@@ -146,6 +146,7 @@ WPI_ServiceData* WPI_GetMulticastServiceResolverData(
     currentData++;
   }
 
+  *dataCount = static_cast<int32_t>(allData.size());
   return rootArray;
 }
 
