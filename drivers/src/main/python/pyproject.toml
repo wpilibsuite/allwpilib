@@ -50,6 +50,7 @@ wraps = ["robotpy-native-wpilib-drivers"]
 depends = ["wpilib"]
 
 [tool.semiwrap.extension_modules."wpilib_drivers._drivers".headers]
+GoBildaPinpoint = "wpi/drivers/odometry/GoBildaPinpoint.hpp"
 Koors40 = "wpi/drivers/motor/Koors40.hpp"
 PWMSparkFlex = "wpi/drivers/motor/PWMSparkFlex.hpp"
 PWMSparkMax = "wpi/drivers/motor/PWMSparkMax.hpp"

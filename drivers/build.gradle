@@ -15,6 +15,7 @@ apply from: "${rootDir}/shared/libmrclib.gradle"
 dependencies {
     implementation project(':hal')
     api project(':wpilibj')
+    api project(':wpimath')
     api project(':wpiunits')
     api project(':wpiutil')
 }

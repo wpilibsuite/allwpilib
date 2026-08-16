@@ -71,6 +71,16 @@ def drivers_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
 
     DRIVERS_HEADER_GEN = [
         struct(
+            class_name = "GoBildaPinpoint",
+            yml_file = "semiwrap/GoBildaPinpoint.yml",
+            header_root = "$(execpath :robotpy-native-wpilib-drivers.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib-drivers.copy_headers)/wpi/drivers/odometry/GoBildaPinpoint.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::GoBildaPinpoint", "wpi__GoBildaPinpoint.hpp"),
+            ],
+        ),
+        struct(
             class_name = "Koors40",
             yml_file = "semiwrap/Koors40.yml",
             header_root = "$(execpath :robotpy-native-wpilib-drivers.copy_headers)",

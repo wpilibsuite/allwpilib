@@ -45,6 +45,7 @@ repositories {
 }
 
 dependencies {
+    implementation project(':drivers')
     implementation project(':wpilibj')
     implementation project(':wpimath')
     implementation project(':hal')
@@ -217,6 +218,7 @@ model {
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                 lib project: ':commandsv2', library: 'commandsv2', linkage: 'shared'
+                lib project: ':drivers', library: 'drivers', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
@@ -263,6 +265,7 @@ model {
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
                 lib project: ':commandsv2', library: 'commandsv2', linkage: 'static'
+                lib project: ':drivers', library: 'drivers', linkage: 'static'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
