@@ -17,7 +17,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <string.h>
-#include "strides.h"
+#include "_strides.h"
+#include "_attribute.h"
 
 template<int NGRAD, int NVEC> struct vec_withgrad_t;
 
@@ -28,13 +29,13 @@ struct val_withgrad_t
     double x;
     double j[NGRAD == 0 ? 1 : NGRAD];
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t(double _x = 0.0) : x(_x)
     {
         for(int i=0; i<NGRAD; i++) j[i] = 0.0;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> operator+( const val_withgrad_t<NGRAD>& b ) const
     {
         val_withgrad_t<NGRAD> y = *this;
@@ -43,19 +44,19 @@ struct val_withgrad_t
             y.j[i] += b.j[i];
         return y;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> operator+( double b ) const
     {
         val_withgrad_t<NGRAD> y = *this;
         y.x += b;
         return y;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator+=( const val_withgrad_t<NGRAD>& b )
     {
         *this = (*this) + b;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> operator-( const val_withgrad_t<NGRAD>& b ) const
     {
         val_withgrad_t<NGRAD> y = *this;
@@ -64,24 +65,24 @@ struct val_withgrad_t
             y.j[i] -= b.j[i];
         return y;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> operator-( double b ) const
     {
         val_withgrad_t<NGRAD> y = *this;
         y.x -= b;
         return y;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator-=( const val_withgrad_t<NGRAD>& b )
     {
         *this = (*this) - b;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> operator-() const
     {
         return (*this) * (-1);
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> operator*( const val_withgrad_t<NGRAD>& b ) const
     {
         val_withgrad_t<NGRAD> y;
@@ -90,7 +91,7 @@ struct val_withgrad_t
             y.j[i] = j[i]*b.x + x*b.j[i];
         return y;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> operator*( double b ) const
     {
         val_withgrad_t<NGRAD> y;
@@ -99,17 +100,17 @@ struct val_withgrad_t
             y.j[i] = j[i]*b;
         return y;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator*=( const val_withgrad_t<NGRAD>& b )
     {
         *this = (*this) * b;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator*=( const double b )
     {
         *this = (*this) * b;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> operator/( const val_withgrad_t<NGRAD>& b ) const
     {
         val_withgrad_t<NGRAD> y;
@@ -118,22 +119,22 @@ struct val_withgrad_t
             y.j[i] = (j[i]*b.x - x*b.j[i]) / (b.x*b.x);
         return y;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> operator/( double b ) const
     {
         return (*this) * (1./b);
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator/=( const val_withgrad_t<NGRAD>& b )
     {
         *this = (*this) / b;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator/=( const double b )
     {
         *this = (*this) / b;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> sqrt(void) const
     {
         val_withgrad_t<NGRAD> y;
@@ -143,7 +144,7 @@ struct val_withgrad_t
         return y;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> square(void) const
     {
         val_withgrad_t<NGRAD> s;
@@ -153,7 +154,7 @@ struct val_withgrad_t
         return s;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> sin(void) const
     {
         const double s = ::sin(x);
@@ -165,7 +166,7 @@ struct val_withgrad_t
         return y;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> cos(void) const
     {
         const double s = ::sin(x);
@@ -177,7 +178,7 @@ struct val_withgrad_t
         return y;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     vec_withgrad_t<NGRAD, 2> sincos(void) const
     {
         const double s = ::sin(x);
@@ -193,7 +194,7 @@ struct val_withgrad_t
         return sc;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> tan(void) const
     {
         const double s = ::sin(x);
@@ -205,7 +206,7 @@ struct val_withgrad_t
         return y;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> atan2(val_withgrad_t<NGRAD>& x) const
     {
         val_withgrad_t<NGRAD> th;
@@ -226,7 +227,7 @@ struct val_withgrad_t
     // This function does NOT check for overflow. The gradient is infinite at
     // the valid bounds of the input. So the caller has to do the right thing in
     // those cases
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> asin(void) const
     {
         val_withgrad_t<NGRAD> th;
@@ -240,7 +241,7 @@ struct val_withgrad_t
     // This function does NOT check for overflow. The gradient is infinite at
     // the valid bounds of the input. So the caller has to do the right thing in
     // those cases
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> acos(void) const
     {
         val_withgrad_t<NGRAD> th;
@@ -251,7 +252,7 @@ struct val_withgrad_t
         return th;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> sinx_over_x(// To avoid recomputing it
                                       const val_withgrad_t<NGRAD>& sinx) const
     {
@@ -285,7 +286,7 @@ struct vec_withgrad_t
 
     vec_withgrad_t() {}
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void init_vars(const double* x_in, int ivar0, int Nvars, int i_gradvec0 = -1,
                    int stride = sizeof(double))
     {
@@ -305,31 +306,31 @@ struct vec_withgrad_t
         }
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     vec_withgrad_t(const double* x_in, int i_gradvec0 = -1,
                    int stride = sizeof(double))
     {
         init_vars(x_in, 0, NVEC, i_gradvec0, stride);
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD>& operator[](int i)
     {
         return v[i];
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     const val_withgrad_t<NGRAD>& operator[](int i) const
     {
         return v[i];
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator+=( const vec_withgrad_t<NGRAD,NVEC>& x )
     {
         (*this) = (*this) + x;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     vec_withgrad_t<NGRAD,NVEC> operator+( const vec_withgrad_t<NGRAD,NVEC>& x ) const
     {
         vec_withgrad_t<NGRAD,NVEC> p;
@@ -338,12 +339,12 @@ struct vec_withgrad_t
         return p;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator+=( const val_withgrad_t<NGRAD>& x )
     {
         (*this) = (*this) + x;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     vec_withgrad_t<NGRAD,NVEC> operator+( const val_withgrad_t<NGRAD>& x ) const
     {
         vec_withgrad_t<NGRAD,NVEC> p;
@@ -352,12 +353,12 @@ struct vec_withgrad_t
         return p;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator+=( double x )
     {
         (*this) = (*this) + x;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     vec_withgrad_t<NGRAD,NVEC> operator+( double x ) const
     {
         vec_withgrad_t<NGRAD,NVEC> p;
@@ -366,12 +367,12 @@ struct vec_withgrad_t
         return p;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator-=( const vec_withgrad_t<NGRAD,NVEC>& x )
     {
         (*this) = (*this) - x;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     vec_withgrad_t<NGRAD,NVEC> operator-( const vec_withgrad_t<NGRAD,NVEC>& x ) const
     {
         vec_withgrad_t<NGRAD,NVEC> p;
@@ -380,12 +381,12 @@ struct vec_withgrad_t
         return p;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator-=( const val_withgrad_t<NGRAD>& x )
     {
         (*this) = (*this) - x;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     vec_withgrad_t<NGRAD,NVEC> operator-( const val_withgrad_t<NGRAD>& x ) const
     {
         vec_withgrad_t<NGRAD,NVEC> p;
@@ -394,12 +395,12 @@ struct vec_withgrad_t
         return p;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator-=( double x )
     {
         (*this) = (*this) - x;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     vec_withgrad_t<NGRAD,NVEC> operator-( double x ) const
     {
         vec_withgrad_t<NGRAD,NVEC> p;
@@ -408,12 +409,12 @@ struct vec_withgrad_t
         return p;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator*=( const vec_withgrad_t<NGRAD,NVEC>& x )
     {
         (*this) = (*this) * x;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     vec_withgrad_t<NGRAD,NVEC> operator*( const vec_withgrad_t<NGRAD,NVEC>& x ) const
     {
         vec_withgrad_t<NGRAD,NVEC> p;
@@ -422,12 +423,12 @@ struct vec_withgrad_t
         return p;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator*=( const val_withgrad_t<NGRAD>& x )
     {
         (*this) = (*this) * x;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     vec_withgrad_t<NGRAD,NVEC> operator*( const val_withgrad_t<NGRAD>& x ) const
     {
         vec_withgrad_t<NGRAD,NVEC> p;
@@ -436,12 +437,12 @@ struct vec_withgrad_t
         return p;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator*=( double x )
     {
         (*this) = (*this) * x;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     vec_withgrad_t<NGRAD,NVEC> operator*( double x ) const
     {
         vec_withgrad_t<NGRAD,NVEC> p;
@@ -450,12 +451,12 @@ struct vec_withgrad_t
         return p;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator/=( const vec_withgrad_t<NGRAD,NVEC>& x )
     {
         (*this) = (*this) / x;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     vec_withgrad_t<NGRAD,NVEC> operator/( const vec_withgrad_t<NGRAD,NVEC>& x ) const
     {
         vec_withgrad_t<NGRAD,NVEC> p;
@@ -464,12 +465,12 @@ struct vec_withgrad_t
         return p;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator/=( const val_withgrad_t<NGRAD>& x )
     {
         (*this) = (*this) / x;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     vec_withgrad_t<NGRAD,NVEC> operator/( const val_withgrad_t<NGRAD>& x ) const
     {
         vec_withgrad_t<NGRAD,NVEC> p;
@@ -478,12 +479,12 @@ struct vec_withgrad_t
         return p;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void operator/=( double x )
     {
         (*this) = (*this) / x;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     vec_withgrad_t<NGRAD,NVEC> operator/( double x ) const
     {
         vec_withgrad_t<NGRAD,NVEC> p;
@@ -492,7 +493,7 @@ struct vec_withgrad_t
         return p;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> dot( const vec_withgrad_t<NGRAD,NVEC>& x) const
     {
         val_withgrad_t<NGRAD> d; // initializes to 0
@@ -504,7 +505,7 @@ struct vec_withgrad_t
         return d;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     vec_withgrad_t<NGRAD,NVEC> cross( const vec_withgrad_t<NGRAD,NVEC>& x) const
     {
         vec_withgrad_t<NGRAD,NVEC> c;
@@ -514,20 +515,20 @@ struct vec_withgrad_t
         return c;
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> norm2(void) const
     {
         return dot(*this);
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     val_withgrad_t<NGRAD> mag(void) const
     {
         val_withgrad_t<NGRAD> l2 = norm2();
         return l2.sqrt();
     }
 
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void extract_value(double* out,
                        int stride = sizeof(double),
                        int ivar0 = 0, int Nvars = NVEC) const
@@ -535,7 +536,7 @@ struct vec_withgrad_t
         for(int i=ivar0; i<ivar0+Nvars; i++)
             _P1(out,stride, i-ivar0) = v[i].x;
     }
-    
+    MRCAL_ATTRIBUTE((visibility ("hidden")))
     void extract_grad(double* J,
                       int i_gradvec0, int N_gradout,
                       int ivar0,
