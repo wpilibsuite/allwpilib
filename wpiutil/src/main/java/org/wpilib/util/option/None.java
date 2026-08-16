@@ -24,6 +24,15 @@ public record None<T>() implements Option<T> {
   @SuppressWarnings("rawtypes")
   private static final None NONE = new None();
 
+  /**
+   * Gets a {@code None} instance representing the absence of a value of type {@code T}.
+   *
+   * <p>Because {@code None} is stateless, this method returns the same singleton object every time
+   * it's invoked.
+   *
+   * @param <T> The type of values that could have been stored in the optional value.
+   * @return A {@code None} instance representing no data for type {@code T}.
+   */
   @SuppressWarnings("unchecked")
   public static <T> None<T> none() {
     return (None<T>) NONE;

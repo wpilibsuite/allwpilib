@@ -176,7 +176,7 @@ public sealed interface Option<T> permits Some, None {
    * Option<?> option = ...;
    * Option<?> mapped = switch (option) {
    *   case Some(var value) -> Option.of(mappingFunction.apply(value));
-   *   case None() -> Option.noValue();
+   *   case None() -> Option.none();
    * };
    * }</pre>
    *
@@ -203,12 +203,12 @@ public sealed interface Option<T> permits Some, None {
    * If a value is present, returns a sequential {@link Stream} containing only that value,
    * otherwise returns an empty {@code Stream}.
    *
-   * <p>This method can be used to transform a {@code Stream} of optional elements to a {@code
-   * Stream} of present value elements:
+   * <p>This method can be used to transform a {@code Stream} of option elements to a {@code Stream}
+   * of present value elements:
    *
    * <pre>{@code
-   * Stream<Optional<T>> os = ..
-   * Stream<T> s = os.flatMap(Optional::stream)
+   * Stream<Option<T>> os = ..
+   * Stream<T> s = os.flatMap(Option::stream)
    * }</pre>
    *
    * @return the optional value as a {@code Stream}
