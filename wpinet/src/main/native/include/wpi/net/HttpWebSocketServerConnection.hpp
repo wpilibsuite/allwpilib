@@ -33,6 +33,7 @@ class HttpWebSocketServerConnection
    *
    * @param stream network stream
    * @param protocols Acceptable subprotocols
+   * @param requestTimeout Timeout for server handshake to be established
    */
   HttpWebSocketServerConnection(std::shared_ptr<uv::Stream> stream,
                                 std::span<const std::string_view> protocols,
