@@ -81,6 +81,7 @@ DataLogBackgroundWriter::DataLogBackgroundWriter(
       }} {}
 
 DataLogBackgroundWriter::~DataLogBackgroundWriter() {
+  InvalidateFileLoggerCallbacks();
   {
     std::scoped_lock lock{m_mutex};
     m_shutdown = true;

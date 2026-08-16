@@ -8,7 +8,9 @@
 
 #include <algorithm>
 #include <concepts>
+#include <functional>
 #include <initializer_list>
+#include <memory>
 #include <optional>
 #include <ranges>
 #include <span>
@@ -33,6 +35,8 @@ class Logger;
 }  // namespace wpi::util
 
 namespace wpi::log {
+
+class FileLogger;
 
 namespace impl {
 
@@ -68,7 +72,7 @@ enum ControlRecordType {
  */
 class DataLog {
  public:
-  virtual ~DataLog() = default;
+  virtual ~DataLog();
 
   DataLog(const DataLog&) = delete;
   DataLog& operator=(const DataLog&) = delete;
@@ -441,8 +445,11 @@ class DataLog {
    * @param msglog message logger (will be called from separate thread)
    * @param extraHeader extra header metadata
    */
-  explicit DataLog(wpi::util::Logger& msglog, std::string_view extraHeader = "")
-      : m_msglog{msglog}, m_extraHeader{extraHeader} {}
+  explicit DataLog(wpi::util::Logger& msglog,
+                   std::string_view extraHeader = "");
+
+  /** Prevents FileLogger callbacks from accessing this log. */
+  void InvalidateFileLoggerCallbacks();
 
   /**
    * Starts the log.  Appends file header and Start records and schema data
@@ -487,6 +494,13 @@ class DataLog {
   virtual bool BufferFull() = 0;
 
  private:
+  friend class FileLogger;
+
+  struct FileLoggerCallbackState;
+
+  std::function<void(std::string_view)> MakeFileLoggerCallback(
+      std::string_view key);
+
   static constexpr size_t kMaxBufferCount = 1024 * 1024 / kBlockSize;
   static constexpr size_t kMaxFreeCount = 256 * 1024 / kBlockSize;
 
@@ -528,6 +542,7 @@ class DataLog {
   };
   wpi::util::DenseMap<int, EntryInfo2> m_entryIds;
   int m_lastId = 0;
+  std::shared_ptr<FileLoggerCallbackState> m_fileLoggerCallbackState;
 };
 
 /**

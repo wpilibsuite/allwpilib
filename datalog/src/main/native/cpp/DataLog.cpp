@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -34,6 +35,39 @@ static void DefaultLog(unsigned int level, const char* file, unsigned int line,
 }
 
 wpi::util::Logger DataLog::s_defaultMessageLog{DefaultLog};
+
+struct DataLog::FileLoggerCallbackState {
+  explicit FileLoggerCallbackState(DataLog* log) : log{log} {}
+
+  wpi::util::mutex mutex;
+  DataLog* log;
+};
+
+DataLog::DataLog(wpi::util::Logger& msglog, std::string_view extraHeader)
+    : m_msglog{msglog},
+      m_extraHeader{extraHeader},
+      m_fileLoggerCallbackState{
+          std::make_shared<FileLoggerCallbackState>(this)} {}
+
+DataLog::~DataLog() {
+  InvalidateFileLoggerCallbacks();
+}
+
+void DataLog::InvalidateFileLoggerCallbacks() {
+  std::scoped_lock lock{m_fileLoggerCallbackState->mutex};
+  m_fileLoggerCallbackState->log = nullptr;
+}
+
+std::function<void(std::string_view)> DataLog::MakeFileLoggerCallback(
+    std::string_view key) {
+  int entry = Start(key, "string");
+  return [entry, state = m_fileLoggerCallbackState](std::string_view line) {
+    std::scoped_lock lock{state->mutex};
+    if (state->log) {
+      state->log->AppendString(entry, line, 0);
+    }
+  };
+}
 
 template <typename T>
 static unsigned int WriteVarInt(uint8_t* buf, T val) {
