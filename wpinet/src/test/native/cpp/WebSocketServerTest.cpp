@@ -619,6 +619,37 @@ TEST_CASE_METHOD(WebSocketServerTest,
   REQUIRE(gotCallback == 1);
 }
 
+TEST_CASE_METHOD(WebSocketServerTest,
+                 "WebSocketServerTest RejectsInvalid64BitLength",
+                 "[websocket][server][limits]") {
+  int gotCallback = 0;
+  setupWebSocket = [&] {
+    ws->SetMaxMessageSize(1024);
+    ws->binary.connect([&](auto, bool) {
+      ws->Terminate();
+      FAIL("Should not have received an invalid-length message");
+    });
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
+      ++gotCallback;
+      UNSCOPED_INFO("reason: " << reason);
+      REQUIRE(code == 1002);
+    });
+  };
+
+  std::vector<uint8_t> data{0x03};
+  auto firstFragment = BuildMessage(0x02, false, true, data);
+  auto invalidContinuation = BuildHeader(0x00, true, true, UINT64_MAX);
+  invalidContinuation.push_back(0);
+  resp.headersComplete.connect([&](bool) {
+    clientPipe->Write({{firstFragment}, {invalidContinuation}},
+                      [&](auto, uv::Error) {});
+  });
+
+  loop->Run();
+
+  REQUIRE(gotCallback == 1);
+}
+
 //
 // Send and receive data.
 //
