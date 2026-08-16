@@ -97,7 +97,7 @@ class Robot : public wpi::TimedRobot {
                                 4096.0);
   }
 
-  void TeleopInit() override {
+  void TeleopEnter() override {
     // Reset our loop to make sure it's in a known state.
     loop.Reset(wpi::math::Vectord<2>{encoder.GetDistance(), encoder.GetRate()});
 
