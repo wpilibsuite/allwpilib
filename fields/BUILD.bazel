@@ -20,10 +20,8 @@ FIELD_JSONS = glob(["src/main/native/resources/**/*.json"])
 FIELD_IMAGES = glob(
     [
         "src/main/native/resources/**/*.jpg",
-        "src/main/native/resources/**/*.jpeg",
         "src/main/native/resources/**/*.png",
     ],
-    allow_empty = True,
 )
 
 NO_SYSTEMCORE = select({
@@ -32,11 +30,16 @@ NO_SYSTEMCORE = select({
 })
 
 filegroup(
+    name = "generated-native-include-files",
+    srcs = glob(["src/generated/main/native/include/**/*"]),
+    visibility = ["//fields:__subpackages__"],
+)
+
+filegroup(
     name = "doxygen-files",
     srcs = glob([
-        "src/generated/main/native/include/**/*",
         "src/main/native/include/**/*",
-    ]),
+    ]) + [":generated-native-include-files"],
     visibility = ["//visibility:public"],
 )
 
@@ -297,6 +300,7 @@ package_default_cc_project(
 
 generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-fields-generator",
+    generated_include_target = "//fields:generated-native-include-files",
     pyproject_toml = "src/main/python/native-pyproject.toml",
 )
 
