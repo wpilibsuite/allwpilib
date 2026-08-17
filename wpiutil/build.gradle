@@ -1,3 +1,6 @@
+import org.gradle.internal.jvm.Jvm
+import org.wpilib.jni.JniSystemDependencySet
+
 apply from: "${rootDir}/shared/resources.gradle"
 
 apply plugin: 'c'
@@ -219,6 +222,24 @@ model {
                     srcDirs 'src/test/native/include', 'src/generated/test/native/cpp'
                 }
             }
+        }
+    }
+    binaries {
+        withType(GoogleTestTestSuiteBinarySpec) {
+            def jniIncludeDir = new File(Jvm.current().javaHome, 'include')
+            def jniHeaderLocations = [jniIncludeDir.toString()]
+            [
+                'darwin',
+                'linux',
+                'win32',
+                'freebsd'
+            ].each {
+                def platformIncludeDir = new File(jniIncludeDir, it)
+                if (platformIncludeDir.exists()) {
+                    jniHeaderLocations << platformIncludeDir.toString()
+                }
+            }
+            lib(new JniSystemDependencySet(jniHeaderLocations, project))
         }
     }
 }

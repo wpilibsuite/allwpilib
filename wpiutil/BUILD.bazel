@@ -294,6 +294,7 @@ cc_test(
         ":wpiutil",
         ":wpiutil-testlib",
         "//thirdparty/catch2",
+        "@wpilib_toolchains//jni",
     ],
 )
 
