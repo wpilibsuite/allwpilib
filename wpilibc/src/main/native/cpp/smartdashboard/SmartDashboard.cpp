@@ -94,7 +94,7 @@ void SmartDashboard::PutData(std::string_view key, wpi::util::Sendable* data) {
   std::scoped_lock lock(inst.tablesToDataMutex);
   auto& uid = inst.tablesToData[key];
   wpi::util::Sendable* sddata = wpi::util::SendableRegistry::GetSendable(uid);
-  if (sddata != data) {
+  if (sddata != data || !wpi::util::SendableRegistry::IsPublished(uid)) {
     uid = wpi::util::SendableRegistry::GetUniqueId(data);
     auto dataTable = inst.table->GetSubTable(key);
     auto builder = std::make_unique<SendableBuilderImpl>();
