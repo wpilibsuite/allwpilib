@@ -4,7 +4,9 @@
 
 #include "net/WireDecoder.hpp"
 
+#include <limits>
 #include <string>
+#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -14,6 +16,7 @@
 #include "MockMessageHandler.hpp"
 #include "PubSubOptions.hpp"
 #include "net/MessageHandler.hpp"
+#include "net/WireEncoder.hpp"
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/raw_ostream.hpp"
@@ -33,6 +36,26 @@ class WireDecodeTextServerTest {
   net::MockServerMessageHandler handler;
   wpi::MockLogger logger;
 };
+
+TEST_CASE("WireDecodeBinary rejects overflowing timestamp adjustments",
+          "[ntcore][wire][decoder]") {
+  auto check = [](int64_t timestamp, int64_t offset) {
+    std::vector<uint8_t> encoded;
+    wpi::util::raw_uvector_ostream os{encoded};
+    net::WireEncodeBinary(os, 1, timestamp, Value::MakeInteger(1));
+    std::span<const uint8_t> input{encoded};
+    int id;
+    Value value;
+    std::string error;
+
+    CHECK_FALSE(net::WireDecodeBinary(&input, &id, &value, &error, offset));
+    CHECK(error == "timestamp out of range");
+    CHECK(input.size() == encoded.size());
+  };
+
+  check(std::numeric_limits<int64_t>::max(), 1);
+  check(std::numeric_limits<int64_t>::min(), -1);
+}
 
 TEST_CASE_METHOD(WireDecodeTextClientTest,
                  "WireDecodeTextClientTest EmptyArray",

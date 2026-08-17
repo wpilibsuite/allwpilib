@@ -67,6 +67,55 @@ if (project.hasProperty("publishVersion")) {
 
 wpilibVersioning.version.finalizeValue()
 
+def mrclibVersionConfiguration = configurations.create('mrclibVersion') {
+    canBeConsumed = false
+    canBeResolved = true
+    transitive = false
+    resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
+}
+
+dependencies {
+    add(mrclibVersionConfiguration.name, 'org.wpilib.mrclib:mrclib-cpp:+:windowsx86-64@zip')
+}
+
+tasks.register('updateMrclibVersion') {
+    description = 'Updates the version catalog to the latest available mrclib version'
+    group = 'WPILib'
+
+    doLast {
+        def resolvedArtifacts = mrclibVersionConfiguration.resolvedConfiguration.resolvedArtifacts
+        if (resolvedArtifacts.size() != 1) {
+            throw new GradleException("Expected one mrclib artifact, but resolved ${resolvedArtifacts.size()}")
+        }
+        def resolvedArtifact = resolvedArtifacts.iterator().next()
+        def latestVersion = resolvedArtifact.moduleVersion.id.version
+        def versionCatalog = file('gradle/libs.versions.toml')
+        def versionCatalogText = versionCatalog.getText('UTF-8')
+        def mrclibVersionRegex = ~/(?m)^mrclib\s*=\s*"[^"]*"\s*$/
+
+        if (!mrclibVersionRegex.matcher(versionCatalogText).find()) {
+            throw new GradleException("Could not find the mrclib version in ${versionCatalog}")
+        }
+
+        versionCatalog.setText(
+            mrclibVersionRegex.matcher(versionCatalogText).replaceFirst("mrclib = \"${latestVersion}\""),
+            'UTF-8'
+        )
+        logger.lifecycle("Updated mrclib to ${latestVersion}")
+
+        def pythonCommand = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')
+            ? ['python']
+            : ['python3']
+        def integrityHelper = file('shared/bazel/thirdparty/integrity_helper.py')
+
+        logger.lifecycle('Updating third-party integrity hashes')
+        providers.exec {
+            workingDir(rootDir)
+            commandLine(pythonCommand + [integrityHelper.absolutePath])
+        }.result.get()
+    }
+}
+
 def outputsFolder = file("$buildDir/allOutputs")
 
 def versionFile = file("$outputsFolder/version.txt")
@@ -111,6 +160,18 @@ ext.addTaskToCopyAllOutputs = { task ->
 ext.makeZipBaseName = { group, artifactId ->
     return "_GROUP_${group.replace(".", "_")}_ID_${artifactId}_CLS"
 }
+
+def versionCatalogZip = tasks.register('versionCatalogZip', Zip) {
+    description = 'Packages the dependency version catalog for publication'
+    group = 'Build'
+
+    archiveBaseName = makeZipBaseName('org.wpilib', 'wpilib-versions')
+    archiveVersion = ''
+    destinationDirectory = outputsFolder
+    from "$rootDir/gradle/libs.versions.toml"
+}
+
+copyAllOutputs.dependsOn versionCatalogZip
 
 subprojects {
     apply plugin: 'eclipse'

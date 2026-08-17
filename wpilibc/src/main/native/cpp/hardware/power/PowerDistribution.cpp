@@ -25,12 +25,12 @@ static_assert(wpi::PowerDistribution::kDefaultModule ==
 
 using namespace wpi;
 
-PowerDistribution::PowerDistribution(int busId) {
+PowerDistribution::PowerDistribution(CANBus busId) {
   auto stack = wpi::util::GetStackTrace(1);
 
   int32_t status = 0;
   m_handle = HAL_InitializePowerDistribution(
-      busId, kDefaultModule,
+      static_cast<int>(busId), kDefaultModule,
       HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_AUTOMATIC,
       stack.c_str(), &status);
   WPILIB_CheckErrorStatus(status, "Module {}", kDefaultModule);
@@ -46,14 +46,15 @@ PowerDistribution::PowerDistribution(int busId) {
   wpi::util::SendableRegistry::Add(this, "PowerDistribution", m_module);
 }
 
-PowerDistribution::PowerDistribution(int busId, int module,
+PowerDistribution::PowerDistribution(CANBus busId, int module,
                                      ModuleType moduleType) {
   auto stack = wpi::util::GetStackTrace(1);
 
   int32_t status = 0;
   m_handle = HAL_InitializePowerDistribution(
-      busId, module, static_cast<HAL_PowerDistributionType>(moduleType),
-      stack.c_str(), &status);
+      static_cast<int>(busId), module,
+      static_cast<HAL_PowerDistributionType>(moduleType), stack.c_str(),
+      &status);
   WPILIB_CheckErrorStatus(status, "Module {}", module);
   m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
   WPILIB_ReportError(status, "Module {}", module);

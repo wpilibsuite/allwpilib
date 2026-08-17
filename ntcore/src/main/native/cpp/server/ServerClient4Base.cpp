@@ -22,6 +22,10 @@ void ServerClient4Base::ClientPublish(int pubuid, std::string_view name,
                                       const wpi::util::json& properties,
                                       const PubSubOptionsImpl& options) {
   DEBUG3("ClientPublish({}, {}, {}, {})", m_id, name, pubuid, typeStr);
+  if (m_id != 0 && !name.empty() && name.front() == '$') {
+    WARN("client {} publish of reserved topic '{}' ignored", m_id, name);
+    return;
+  }
   auto topic = m_storage.CreateTopic(this, name, typeStr, properties);
 
   // create publisher

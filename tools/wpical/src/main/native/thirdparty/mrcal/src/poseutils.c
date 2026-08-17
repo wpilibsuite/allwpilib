@@ -14,7 +14,7 @@
 #include <math.h>
 
 #include "poseutils.h"
-#include "strides.h"
+#include "_strides.h"
 #include "minimath/minimath.h"
 
 // All arrays stored in row-major order
@@ -164,6 +164,60 @@ void mul_gen33_gen33_vout_full(// output
     for(int i=0; i<3; i++)
         for(int j=0; j<3; j++)
             P2(m0m1, i,j) = outcopy2[3*i+j];
+}
+static inline
+void mul_gen33t_gen33_vout_full(// output
+                                double* m0m1,
+                                int m0m1_stride0, int m0m1_stride1,
+
+                                // input
+                                const double* m0,
+                                int m0_stride0, int m0_stride1,
+                                const double* m1,
+                                int m1_stride0, int m1_stride1)
+{
+    mul_gen33_gen33_vout_full(m0m1,
+                              m0m1_stride0, m0m1_stride1,
+                              m0,
+                              m0_stride1, m0_stride0,
+                              m1,
+                              m1_stride0, m1_stride1);
+}
+static inline
+void mul_gen33_gen33t_vout_full(// output
+                                double* m0m1,
+                                int m0m1_stride0, int m0m1_stride1,
+
+                                // input
+                                const double* m0,
+                                int m0_stride0, int m0_stride1,
+                                const double* m1,
+                                int m1_stride0, int m1_stride1)
+{
+    mul_gen33_gen33_vout_full(m0m1,
+                              m0m1_stride0, m0m1_stride1,
+                              m0,
+                              m0_stride0, m0_stride1,
+                              m1,
+                              m1_stride1, m1_stride0);
+}
+static inline
+void mul_gen33t_gen33t_vout_full(// output
+                                double* m0m1,
+                                int m0m1_stride0, int m0m1_stride1,
+
+                                // input
+                                const double* m0,
+                                int m0_stride0, int m0_stride1,
+                                const double* m1,
+                                int m1_stride0, int m1_stride1)
+{
+    mul_gen33_gen33_vout_full(m0m1,
+                              m0m1_stride0, m0m1_stride1,
+                              m0,
+                              m0_stride1, m0_stride0,
+                              m1,
+                              m1_stride1, m1_stride0);
 }
 
 static inline
@@ -319,7 +373,7 @@ void mrcal_transform_point_Rt_full( // output
     init_stride_3D(J_Rt,  3,4,3 );
     // init_stride_2D(J_x,   3,3 );
     init_stride_2D(Rt,    4,3 );
-    // init_stride_1D(x_in,  3 );
+    init_stride_1D(x_in,  3 );
 
     if(!inverted)
     {
@@ -557,31 +611,130 @@ void mrcal_compose_Rt_full( // output
                            int Rt_0_stride1,    // in bytes. <= 0 means "contiguous"
                            const double* Rt_1,  // (4,3) array
                            int Rt_1_stride0,    // in bytes. <= 0 means "contiguous"
-                           int Rt_1_stride1     // in bytes. <= 0 means "contiguous"
-                            )
+                           int Rt_1_stride1,    // in bytes. <= 0 means "contiguous"
+                           bool inverted0,
+                           bool inverted1)
 {
     init_stride_2D(Rt_out, 4,3);
     init_stride_2D(Rt_0,   4,3);
     init_stride_2D(Rt_1,   4,3);
 
-    // for in-place operation
-    double t0[] = { P2(Rt_0,3,0),
-                    P2(Rt_0,3,1),
-                    P2(Rt_0,3,2) };
 
-    // t <- R0*t1
-    mul_vec3_gen33t_vout_full(&P2(Rt_out,3,0), Rt_out_stride1,
-                              &P2(Rt_1,  3,0), Rt_1_stride1,
-                              Rt_0, Rt_0_stride0, Rt_0_stride1);
+    /*
+      I have 4 cases based on the values of inverted0,inverted1. Nominally we have:
 
-    // R <- R0*R1
-    mul_gen33_gen33_vout_full( Rt_out, Rt_out_stride0, Rt_out_stride1,
-                               Rt_0,   Rt_0_stride0,   Rt_0_stride1,
-                               Rt_1,   Rt_1_stride0,   Rt_1_stride1 );
+         R0 R1 x + R0 t1 + t0
 
-    // t <- R0*t1+t0
-    for(int i=0; i<3; i++)
-        P2(Rt_out,3,i) += t0[i];
+      -> R01 = R0 R1
+         t01 = R0 t1 + t0
+
+      If we invert anything we use the inverted transform for r,t:
+
+         r x + t = y -> x = Rt y - Rt t
+      -> r becomes Rt, t becomes -Rt t
+
+      So
+      inverted0:
+         R01 = R0t R1
+         t01 = R0t t1 - R0t t0
+             = R0t (t1-t0)
+
+      inverted1:
+         R01 = R0 R1t
+         t01 = -R0 R1t t1 + t0
+
+      inverted01:
+         R01 = R0t R1t
+         t01 = -R0t R1t t1 - R0t t0
+    */
+
+    if(!inverted0 && !inverted1)
+    {
+        // R01 = R0 R1
+        // t01 = R0 t1 + t0
+
+        // for in-place operation
+        const double t0[] = { P2(Rt_0,3,0),
+                              P2(Rt_0,3,1),
+                              P2(Rt_0,3,2) };
+
+        // t <- R0*t1
+        mul_vec3_gen33t_vout_full(&P2(Rt_out,3,0), Rt_out_stride1,
+                                  &P2(Rt_1,  3,0), Rt_1_stride1,
+                                  Rt_0, Rt_0_stride0, Rt_0_stride1);
+        // R <- R0*R1
+        mul_gen33_gen33_vout_full( Rt_out, Rt_out_stride0, Rt_out_stride1,
+                                   Rt_0,   Rt_0_stride0,   Rt_0_stride1,
+                                   Rt_1,   Rt_1_stride0,   Rt_1_stride1 );
+        // t <- R0*t1+t0
+        for(int i=0; i<3; i++)
+            P2(Rt_out,3,i) += t0[i];
+    }
+    else if(inverted0 && !inverted1)
+    {
+        // R01 = R0t R1
+        // t01 = R0t t1 - R0t t0
+        //     = R0t (t1-t0)
+        const double t10[] = { P2(Rt_1,3,0) - P2(Rt_0,3,0),
+                               P2(Rt_1,3,1) - P2(Rt_0,3,1),
+                               P2(Rt_1,3,2) - P2(Rt_0,3,2) };
+
+        // t <- R0t*(t1-t0)
+        mul_vec3_gen33_vout_full(&P2(Rt_out,3,0), Rt_out_stride1,
+                                 t10, sizeof(t10[0]),
+                                 Rt_0, Rt_0_stride0, Rt_0_stride1);
+        // R <- R0t*R1
+        mul_gen33t_gen33_vout_full( Rt_out, Rt_out_stride0, Rt_out_stride1,
+                                    Rt_0,   Rt_0_stride0,   Rt_0_stride1,
+                                    Rt_1,   Rt_1_stride0,   Rt_1_stride1 );
+    }
+    else if(!inverted0 && inverted1)
+    {
+        // R01 = R0 R1t
+        // t01 = -R0 R1t t1 + t0
+
+        // for in-place operation
+        const double t0[] = { P2(Rt_0,3,0),
+                              P2(Rt_0,3,1),
+                              P2(Rt_0,3,2) };
+
+        // R <- R0*R1t
+        mul_gen33_gen33t_vout_full( Rt_out, Rt_out_stride0, Rt_out_stride1,
+                                    Rt_0,   Rt_0_stride0,   Rt_0_stride1,
+                                    Rt_1,   Rt_1_stride0,   Rt_1_stride1 );
+
+        // t01 <- R0 R1t t1
+        mul_vec3_gen33t_vout_full(&P2(Rt_out,3,0), Rt_out_stride1,
+                                  &P2(Rt_1,  3,0), Rt_1_stride1,
+                                  &P2(Rt_out,0,0), Rt_out_stride0, Rt_out_stride1);
+
+        // t01 <- -R0 R1t t1 + t0
+        for(int i=0; i<3; i++)
+            P2(Rt_out,3,i) = -P2(Rt_out,3,i) + t0[i];
+    }
+    else
+    {
+        // R01 = R0t R1t
+        // t01 = -R0t R1t t1 - R0t t0
+        const double R0t_t0[3];
+        mul_vec3_gen33_vout_full(R0t_t0, sizeof(R0t_t0[0]),
+                                 &P2(Rt_0,  3,0), Rt_0_stride1,
+                                 &P2(Rt_0,0,0), Rt_0_stride0, Rt_0_stride1);
+
+        // R <- R0t*R1t
+        mul_gen33t_gen33t_vout_full( Rt_out, Rt_out_stride0, Rt_out_stride1,
+                                     Rt_0,   Rt_0_stride0,   Rt_0_stride1,
+                                     Rt_1,   Rt_1_stride0,   Rt_1_stride1 );
+
+        // t01 <- R0t R1t t1
+        mul_vec3_gen33t_vout_full(&P2(Rt_out,3,0), Rt_out_stride1,
+                                  &P2(Rt_1,  3,0), Rt_1_stride1,
+                                  &P2(Rt_out,0,0), Rt_out_stride0, Rt_out_stride1);
+
+        // t01 <- -R0t R1t t1 - R0t t0
+        for(int i=0; i<3; i++)
+            P2(Rt_out,3,i) = -P2(Rt_out,3,i) - R0t_t0[i];
+    }
 }
 
 // Compose two rt transformations. It is assumed that we're getting no gradients
@@ -589,8 +742,6 @@ void mrcal_compose_Rt_full( // output
 //
 // dr_dt0 is not returned: it is always 0
 // dr_dt1 is not returned: it is always 0
-// dt_dr1 is not returned: it is always 0
-// dt_dt0 is not returned: it is always the identity matrix
 void mrcal_compose_rt_full( // output
                            double* rt_out,       // (6,) array
                            int rt_out_stride0,   // in bytes. <= 0 means "contiguous"
@@ -603,6 +754,12 @@ void mrcal_compose_rt_full( // output
                            double* dt_r0,        // (3,3) array; may be NULL
                            int dt_r0_stride0,    // in bytes. <= 0 means "contiguous"
                            int dt_r0_stride1,    // in bytes. <= 0 means "contiguous"
+                           double* dt_r1,        // (3,3) array; may be NULL
+                           int dt_r1_stride0,    // in bytes. <= 0 means "contiguous"
+                           int dt_r1_stride1,    // in bytes. <= 0 means "contiguous"
+                           double* dt_t0,        // (3,3) array; may be NULL
+                           int dt_t0_stride0,    // in bytes. <= 0 means "contiguous"
+                           int dt_t0_stride1,    // in bytes. <= 0 means "contiguous"
                            double* dt_t1,        // (3,3) array; may be NULL
                            int dt_t1_stride0,    // in bytes. <= 0 means "contiguous"
                            int dt_t1_stride1,    // in bytes. <= 0 means "contiguous"
@@ -611,25 +768,55 @@ void mrcal_compose_rt_full( // output
                            const double* rt_0,   // (6,) array
                            int rt_0_stride0,     // in bytes. <= 0 means "contiguous"
                            const double* rt_1,   // (6,) array
-                           int rt_1_stride0      // in bytes. <= 0 means "contiguous"
-                            )
+                           int rt_1_stride0,      // in bytes. <= 0 means "contiguous"
+                           bool inverted0,
+                           bool inverted1)
 {
     init_stride_1D(rt_out, 6);
     init_stride_2D(dr_r0,  3,3);
     init_stride_2D(dr_r1,  3,3);
     init_stride_2D(dt_r0,  3,3);
+    init_stride_2D(dt_r1,  3,3);
+    init_stride_2D(dt_t0,  3,3);
     init_stride_2D(dt_t1,  3,3);
     init_stride_1D(rt_0,   6);
     init_stride_1D(rt_1,   6);
 
-    // r0 (r1 x + t1) + t0 = r0 r1 x + r0 t1 + t0
-    // -> I want (r0 r1, r0 t1 + t0)
+    /*
+      I have 4 cases based on the values of inverted0,inverted1. Nominally we have:
 
+         r0 r1 x + r0 t1 + t0
+
+      -> r01 = r0 r1
+         t01 = r0 t1 + t0
+
+      If we invert anything we use the inverted transform for r,t:
+
+         r x + t = y -> x = rt y - rt t
+      -> r becomes rt, t becomes -rt t
+
+      So
+      inverted0:
+         r01 = r0t r1
+         t01 = r0t t1 - r0t t0
+
+      inverted1:
+         r01 = r0 r1t
+         t01 = -r0 r1t t1 + t0
+
+      inverted01:
+         r01 = r0t r1t
+         t01 = -r0t r1t t1 - r0t t0
+
+      All the r stuff (inversions, gradients) is handled by
+      mrcal_compose_r_full(). For the t I have custom logic in this function
+    */
 
     // to make in-place operation work
     double rt0[6];
-    for(int i=0; i<6; i++)
-        rt0[i] = P1(rt_0, i);
+    double rt1[6];
+    for(int i=0; i<6; i++) rt0[i] = P1(rt_0, i);
+    for(int i=0; i<6; i++) rt1[i] = P1(rt_1, i);
 
     // Compute r01
     mrcal_compose_r_full( rt_out, rt_out_stride0,
@@ -637,21 +824,180 @@ void mrcal_compose_rt_full( // output
                           dr_r1, dr_r1_stride0, dr_r1_stride1,
 
                           rt_0, rt_0_stride0,
-                          rt_1, rt_1_stride0);
+                          rt_1, rt_1_stride0,
+                          inverted0, inverted1);
 
 
-    // t01 <- r0 t1
-    mrcal_rotate_point_r_full( &P1(rt_out,3), rt_out_stride0,
-                               dt_r0, dt_r0_stride0, dt_r0_stride1,
-                               dt_t1, dt_t1_stride0, dt_t1_stride1,
+    if(!inverted0 && !inverted1)
+    {
+        // t01 <- r0 t1 + t0
+        mrcal_rotate_point_r_full( &P1(rt_out,3), rt_out_stride0,
+                                   dt_r0, dt_r0_stride0, dt_r0_stride1,
+                                   dt_t1, dt_t1_stride0, dt_t1_stride1,
 
-                               rt0, -1,
-                               &P1(rt_1,3), rt_1_stride0,
+                                   rt0, -1,
+                                   &P1(rt_1,3), rt_1_stride0,
 
-                               false );
-    // t01 <- r0 t1 + t0
-    for(int i=0; i<3; i++)
-        P1(rt_out,3+i) += rt0[3+i];
+                                   false );
+
+        for(int i=0; i<3; i++)
+            P1(rt_out,3+i) += rt0[3+i];
+        // dt01/dt0 = I
+        if(dt_t0 != NULL)
+            for(int i=0; i<3; i++)
+                for(int j=0; j<3; j++)
+                    P2(dt_t0,i,j) = (i==j) ? 1. : 0.;
+
+        // dt01/dr1 = 0
+        if(dt_r1 != NULL)
+            for(int i=0; i<3; i++)
+                for(int j=0; j<3; j++)
+                    P2(dt_r1,i,j) = 0.;
+    }
+    else if(inverted0 && !inverted1)
+    {
+        // t01 <- r0t t1 - r0t t0
+        //      = r0t (t1-t0)
+        double t10[3] = { rt1[0+3] - rt0[0+3],
+                          rt1[1+3] - rt0[1+3],
+                          rt1[2+3] - rt0[2+3] };
+        mrcal_rotate_point_r_full( &P1(rt_out,3), rt_out_stride0,
+                                   dt_r0, dt_r0_stride0, dt_r0_stride1,
+                                   dt_t1, dt_t1_stride0, dt_t1_stride1,
+
+                                   rt0, -1,
+                                   t10, -1,
+
+                                   true );
+
+        // dt01/dr1 = 0
+        if(dt_r1 != NULL)
+            for(int i=0; i<3; i++)
+                for(int j=0; j<3; j++)
+                    P2(dt_r1,i,j) = 0.;
+
+        // dt01/dt0 = -dt01/dt1
+        if(dt_t0 != NULL)
+            for(int i=0; i<3; i++)
+                for(int j=0; j<3; j++)
+                    P2(dt_t0,i,j) = -P2(dt_t1,i,j);
+    }
+    else if(!inverted0 && inverted1)
+    {
+        // t01 <- -r0 r1t t1 + t0
+
+        // let p = -r1t t1
+        double p[3];
+        double dp_r1[9];
+        double dp_t1[9];
+        mrcal_rotate_point_r_full( p, -1,
+                                   dp_r1, -1, -1,
+                                   dp_t1, -1, -1,
+
+                                   rt1, -1,
+                                   &rt1[3], -1,
+
+                                   true );
+        for(int i=0; i<3; i++)
+            p[i] *= -1;
+        for(int i=0; i<9; i++)
+        {
+            dp_r1[i] *= -1;
+            dp_t1[i] *= -1;
+        }
+
+        // t01 <- r0 p = -r0 r1t t1
+        double dt_p[9];
+        mrcal_rotate_point_r_full( &P1(rt_out,3), rt_out_stride0,
+                                   dt_r0, dt_r0_stride0, dt_r0_stride1,
+                                   dt_p, -1, -1,
+
+                                   rt0, -1,
+                                   p, -1,
+
+                                   false );
+
+        if(dt_r1 != NULL)
+            mul_gen33_gen33_vout_full(&P2(dt_r1,0,0), dt_r1_stride0, dt_r1_stride1,
+
+                                      // input
+                                      dt_p, 3*sizeof(double), sizeof(double),
+                                      dp_r1,3*sizeof(double), sizeof(double));
+        if(dt_t1 != NULL)
+            mul_gen33_gen33_vout_full(&P2(dt_t1,0,0), dt_t1_stride0, dt_t1_stride1,
+
+                                      // input
+                                      dt_p, 3*sizeof(double), sizeof(double),
+                                      dp_t1,3*sizeof(double), sizeof(double));
+
+        for(int i=0; i<3; i++)
+            P1(rt_out,3+i) += rt0[3+i];
+        // dt01/dt0 = I
+        if(dt_t0 != NULL)
+            for(int i=0; i<3; i++)
+                for(int j=0; j<3; j++)
+                    P2(dt_t0,i,j) = (i==j) ? 1. : 0.;
+    }
+    else
+    {
+        // t01 <- -r0t r1t t1 - r0t t0
+        //      = r0t (-r1t t1 - t0)
+
+        // let p = -r1t t1
+        double p[3];
+        double dp_r1[9];
+        double dp_t1[9];
+        mrcal_rotate_point_r_full( p, -1,
+                                   dp_r1, -1, -1,
+                                   dp_t1, -1, -1,
+
+                                   rt1, -1,
+                                   &rt1[3], -1,
+
+                                   true );
+        for(int i=0; i<3; i++)
+            p[i] *= -1;
+        for(int i=0; i<9; i++)
+        {
+            dp_r1[i] *= -1;
+            dp_t1[i] *= -1;
+        }
+
+        // p = -r1t t1 - t0
+        for(int i=0; i<3; i++)
+            p[i] -= rt0[3+i];
+
+
+        // t01 <- r0 p = -r0 r1t t1
+        double dt_p[9];
+        mrcal_rotate_point_r_full( &P1(rt_out,3), rt_out_stride0,
+                                   dt_r0, dt_r0_stride0, dt_r0_stride1,
+                                   dt_p, -1, -1,
+
+                                   rt0, -1,
+                                   p, -1,
+
+                                   true );
+
+        if(dt_r1 != NULL)
+            mul_gen33_gen33_vout_full(&P2(dt_r1,0,0), dt_r1_stride0, dt_r1_stride1,
+
+                                      // input
+                                      dt_p, 3*sizeof(double), sizeof(double),
+                                      dp_r1,3*sizeof(double), sizeof(double));
+        if(dt_t1 != NULL)
+            mul_gen33_gen33_vout_full(&P2(dt_t1,0,0), dt_t1_stride0, dt_t1_stride1,
+
+                                      // input
+                                      dt_p, 3*sizeof(double), sizeof(double),
+                                      dp_t1,3*sizeof(double), sizeof(double));
+
+        // dt01/dt0 = -dt/dp
+        if(dt_t0 != NULL)
+            for(int i=0; i<3; i++)
+                for(int j=0; j<3; j++)
+                    P2(dt_t0,i,j) = -dt_p[3*i+j];
+    }
 }
 
 void mrcal_compose_r_tinyr0_gradientr0_full( // output
@@ -865,7 +1211,18 @@ void mrcal_r_from_R_full( // output
        1. - fabs(costh) > eps*eps/2. )
     {
         // normal path
-        const double th = acos(costh);
+
+        // I have sin>0, so I'm in the first two quadrants. I can thus compute
+        // th=acos(th), but this is inaccurate if th ~ 0 or th ~ pi, so I pick
+        // the best path. This is essentially atan2
+
+        const double sinth = sqrt(norm2u)/2;
+        const double th =
+            (sinth > sqrt(2.)/2.) ? acos(costh) :
+            ( costh > 0 ?
+              asin(sinth) :
+              (M_PI - asin(sinth)) );
+
         for(int i=0; i<3; i++)
             P1(r,i) = u[i]/sqrt(norm2u) * th;
     }

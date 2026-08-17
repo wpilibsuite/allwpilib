@@ -17,12 +17,13 @@ import java.util.function.Consumer;
 /** Data log reader (reads logs written by the DataLog class). */
 public class DataLogReader implements Iterable<DataLogRecord> {
   /**
-   * Constructs from a byte buffer.
+   * Constructs from the bytes between the byte buffer's current position and limit. The reader does
+   * not modify the buffer's position, limit, or byte order.
    *
    * @param buffer byte buffer
    */
   public DataLogReader(ByteBuffer buffer) {
-    m_buf = buffer;
+    m_buf = buffer.slice().asReadOnlyBuffer();
     m_buf.order(ByteOrder.LITTLE_ENDIAN);
   }
 

@@ -14,11 +14,10 @@
 
 using namespace wpi;
 
-CAN::CAN(CANBusMap busId, int deviceId)
+CAN::CAN(CANBus busId, int deviceId)
     : CAN{busId, deviceId, TEAM_MANUFACTURER, TEAM_DEVICE_TYPE} {}
 
-CAN::CAN(CANBusMap busId, int deviceId, int deviceManufacturer,
-         int deviceType) {
+CAN::CAN(CANBus busId, int deviceId, int deviceManufacturer, int deviceType) {
   int32_t status = 0;
   m_handle = HAL_InitializeCAN(
       static_cast<int>(busId),

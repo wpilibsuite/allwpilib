@@ -46,7 +46,7 @@ model {
             lib project: ':fields', library: 'fields', linkage: 'static'
             lib project: ':fields', library: 'fieldimages', linkage: 'static'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-            project(':hal').addHalDependency(it, 'shared')
+            lib project: ':hal', library: 'hal', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
@@ -58,7 +58,7 @@ model {
             }
         }
         withType(GoogleTestTestSuiteBinarySpec) {
-            project(':hal').addHalDependency(it, 'shared')
+            lib project: ':hal', library: 'hal', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'

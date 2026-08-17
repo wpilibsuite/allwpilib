@@ -154,6 +154,7 @@ class DataLogBackgroundWriter final : public DataLog {
 
   mutable wpi::util::mutex m_mutex;
   wpi::util::condition_variable m_cond;
+  bool m_wakeup{false};
   bool m_doFlush{false};
   bool m_shutdown{false};
   enum State {

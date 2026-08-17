@@ -7,7 +7,6 @@
 #include "HALInitializer.hpp"
 #include "mrclib/SmartIO.h"
 #include "wpi/hal/AddressableLEDTypes.h"
-#include "wpi/hal/Errors.h"
 
 namespace wpi::hal {
 
@@ -22,12 +21,6 @@ void InitializeSmartIo() {
 
 }  // namespace init
 
-namespace {
-struct SmartIoInitializer {
-  MRC_Status status = MRC_SmartIO_Initialize();
-};
-}  // namespace
-
 SmartIo::~SmartIo() noexcept {
   if (closeOnDestroy) {
     MRC_SmartIO_Close(channel);
@@ -35,12 +28,6 @@ SmartIo::~SmartIo() noexcept {
 }
 
 int32_t SmartIo::InitializeMode(MRC_SmartIOMode mode) {
-  static SmartIoInitializer mrcSmartIo;
-
-  if (mrcSmartIo.status != 0) {
-    return mrcSmartIo.status;
-  }
-
   MRC_Status ret = MRC_SmartIO_InitializeMode(channel, mode);
   if (ret == 0) {
     currentMode = mode;
