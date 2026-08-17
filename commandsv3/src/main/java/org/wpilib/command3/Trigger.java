@@ -608,4 +608,17 @@ public class Trigger implements BooleanSupplier {
     var scope = BindingScope.createNarrowestScope(m_scheduler);
     addBinding(scope, bindingType, command);
   }
+
+  // prevent subclasses from overwriting equals and hashCode, which could potentially introduce
+  // collisions for distinct objects
+
+  @Override
+  public final boolean equals(Object obj) {
+    return super.equals(obj);
+  }
+
+  @Override
+  public final int hashCode() {
+    return super.hashCode();
+  }
 }
