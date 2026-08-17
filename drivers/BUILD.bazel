@@ -20,7 +20,7 @@ filegroup(
 
 filegroup(
     name = "doxygen-files",
-    srcs = [":generated-native-include-files"],
+    srcs = glob(["src/main/native/include/**/*"]) + [":generated-native-include-files"],
     visibility = ["//visibility:public"],
 )
 
@@ -67,6 +67,8 @@ filegroup(
 
 wpilib_cc_library(
     name = "drivers",
+    srcs = glob(["src/main/native/cpp/**"]),
+    hdrs = glob(["src/main/native/include/**"]),
     includes = ["src/main/native/include"],
     strip_include_prefix = "src/main/native/include",
     third_party_libraries = [
