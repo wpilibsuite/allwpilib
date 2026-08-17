@@ -174,7 +174,6 @@ package_default_cc_project(
 generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-wpilib-drivers-generator",
     generated_include_target = "//drivers:generated-native-include-files",
-    native_srcs_root = None,
     pyproject_toml = "src/main/python/native-pyproject.toml",
 )
 

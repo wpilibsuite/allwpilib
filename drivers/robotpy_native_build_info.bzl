@@ -6,11 +6,12 @@ load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "copy_native_file", "gene
 def define_native_wrapper(name, pyproject_toml = None):
     copy_to_directory(
         name = "{}.copy_headers".format(name),
-        srcs = [] + ["//drivers:generated-native-include-files"],
+        srcs = native.glob(["src/main/native/include/**"]) + ["//drivers:generated-native-include-files"],
         out = "native/wpilib_drivers/include",
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
             "drivers/src/generated/main/native/include": "",
+            "drivers/src/main/native/include": "",
         },
         verbose = False,
         visibility = ["//visibility:public"],
