@@ -31,6 +31,16 @@ public final class EventLoop {
   }
 
   /**
+   * Checks if an action is bound to the event loop.
+   *
+   * @param action the action to check
+   * @return true if the action is bound, false if not
+   */
+  public boolean isBound(Runnable action) {
+    return m_bindings.contains(action);
+  }
+
+  /**
    * Unbind an action from running when the loop is polled. Has no effect if the given action is not
    * already bound.
    *
