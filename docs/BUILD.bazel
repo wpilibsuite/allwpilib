@@ -23,6 +23,7 @@ paths = [
     "wpiutil/src/main/native/include",
     "wpiutil/src/main/native/thirdparty/argparse/include",
     "wpiutil/src/main/native/thirdparty/debugging/include",
+    "wpiutil/src/main/native/thirdparty/htrie/include",
     "wpiutil/src/main/native/thirdparty/json/include",
     "wpiutil/src/main/native/thirdparty/llvm/include",
     "wpiutil/src/main/native/thirdparty/mpack/include",
@@ -102,6 +103,8 @@ doxygen(
         "*/uv/**",
         # mpack
         "*/wpi/util/mpack.h",
+        # hat-trie internal helpers
+        "*/wpi/util/array-hash/**",
         # units
         "*/wpi/units/**",
     ],
