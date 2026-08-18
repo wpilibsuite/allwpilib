@@ -60,6 +60,10 @@ class StringPrefixTrie<V> implements PrefixTrie<V> {
   @Override
   public V remove(PrimitiveIterator.OfInt prefix) {
     StringPrefixTrie<V> node = this;
+    // Track the highest suffix that can be detached if the removed node becomes empty.
+    StringPrefixTrie<V> pruneParent = null;
+    int pruneChar = 0;
+
     while (prefix.hasNext()) {
       if (node.m_childNodes == null) {
         return null;
@@ -71,11 +75,21 @@ class StringPrefixTrie<V> implements PrefixTrie<V> {
       if (child == null) {
         return null;
       }
+      if (node == this || node.m_theValue != null || node.m_childNodes.size() > 1) {
+        pruneParent = node;
+        pruneChar = myChar;
+      }
       node = child;
     }
 
     V previousValue = node.m_theValue;
     node.m_theValue = null;
+    if (node.m_childNodes == null && pruneParent != null) {
+      pruneParent.m_childNodes.remove(pruneChar);
+      if (pruneParent.m_childNodes.isEmpty()) {
+        pruneParent.m_childNodes = null;
+      }
+    }
     return previousValue;
   }
 
