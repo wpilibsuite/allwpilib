@@ -234,9 +234,8 @@ public class SysIdRoutine extends SysIdRoutineLog {
         .mechanism
         .run(
             co -> {
-              Timer timer = new Timer();
-              timer.start();
-              while (!timer.hasElapsed(m_config.timeout.in(Seconds))) {
+              Timer timer = Timer.createStarted();
+              while (!timer.hasElapsed(m_config.timeout)) {
                 m_mechanism.drive.accept(
                     (Voltage) m_config.rampRate.times(Seconds.of(timer.get() * outputSign)));
                 m_mechanism.log.accept(this);
@@ -281,10 +280,8 @@ public class SysIdRoutine extends SysIdRoutineLog {
         .run(
             co -> {
               Voltage output = m_config.stepVoltage.times(outputSign);
-              Timer timer = new Timer();
-              timer.start();
-
-              while (!timer.hasElapsed(m_config.timeout.in(Seconds))) {
+              Timer timer = Timer.createStarted();
+              while (!timer.hasElapsed(m_config.timeout)) {
                 m_mechanism.drive.accept(output);
                 m_mechanism.log.accept(this);
                 m_recordState.accept(state);
