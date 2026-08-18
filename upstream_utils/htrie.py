@@ -3,8 +3,8 @@
 import os
 import re
 import shutil
-
 from pathlib import Path
+
 from upstream_utils import Lib, walk_if
 
 
@@ -43,14 +43,12 @@ def copy_upstream_src(wpilib_root: Path):
 
         # Handle move from .h -> .hpp
         content = re.sub(
-            '#include "array-hash/array_(.*).h"', r'#include "array-hash/array_\1.hpp"', content
+            '#include "array-hash/array_(.*).h"',
+            r'#include "array-hash/array_\1.hpp"',
+            content,
         )
-        content = re.sub(
-            '#include "array_(.*).h"', r'#include "array_\1.hpp"', content
-        )
-        content = re.sub(
-            '#include "htrie_(.*).h"', r'#include "htrie_\1.hpp"', content
-        )
+        content = re.sub('#include "array_(.*).h"', r'#include "array_\1.hpp"', content)
+        content = re.sub('#include "htrie_(.*).h"', r'#include "htrie_\1.hpp"', content)
 
         with open(include_file, "w") as f:
             f.write(content)
